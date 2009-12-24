@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<queries>
+	<query>
+		<name>findByPK</name>
+		<sql>SELECT * FROM MASK WHERE MASK_ID = ?</sql>
+	</query>
+	<query>
+		<name>findAll</name>
+		<sql>SELECT * FROM MASK WHERE STATUS_ID = 1</sql>
+	</query>
+	<query>
+		<name>findAllByStudyIdAndRoleId</name>
+		<sql>SELECT * FROM MASK WHERE STUDY_ID = ? AND ROLE_ID = ? AND STATUS_ID = 1</sql>
+	</query>
+	<query>
+		<name>findAllByRoleId</name>
+		<sql>SELECT * FROM MASK WHERE ROLE_ID = ? AND STATUS_ID = 1</sql>
+	</query>
+	<query>
+		<name>findAllByStudyId</name>
+		<sql>SELECT * FROM MASK WHERE STUDY_ID = ? AND STATUS_ID = 1</sql>
+	</query>
+	<query>
+		<name>create</name>
+		<sql>INSERT INTO MASK ()</sql>
+	</query>
+	<query>
+		<name>update</name>
+		<sql></sql>
+	</query>
+	<query>
+		<name>createPropertyValue</name>
+		<sql></sql>
+	</query>
+	<query>
+		<name>updatePropertyValue</name>
+		<sql></sql>
+	</query>
+	<query>
+		<name>findPropertiesByMaskId</name>
+		<sql></sql>
+	</query>
+	<query>
+		<name>findAllProperties</name>
+		<sql></sql>
+	</query>
+</queries>

@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<queries>
+	<query>
+		<name>getStudyEventAndFormMetaByStudyId</name>
+		<sql>
+            select
+            distinct sed.oc_oid as sed_oid, cv.oc_oid as cv_oid, sed.name as sed_name,
+            sed.repeating as sed_repeating, sed."type" as sed_type, cv.name as cv_name,
+            edc.required_crf as cv_required, crf.name as crf_name
+            from
+            study_event_definition sed, event_definition_crf edc, crf, crf_version cv
+            where
+            sed.study_id = ? and sed.status_id = 1
+            and sed.study_event_definition_id = edc.study_event_definition_id
+            and edc.status_id = 1 and edc.crf_id = crf.crf_id
+            and crf.status_id = 1 and crf.crf_id = cv.crf_id
+            and cv.status_id = 1
+		</sql>
+	</query>
+	<query>
+		<name>getItemGroupAndItemMetaByCRFVersionOID</name>
+		<sql>
+		select
+		distinct cv.oc_oid as crf_version_oid,
+		case when igm.item_id > 0 then ig.oc_oid else
+			(select distinct iig.oc_oid from item_group iig
+				where iig.name = 'Ungrouped' and iig.crf_id = cv.crf_id)
+		end as item_group_oid, item.oc_oid as item_oid, rs.response_set_id,
+		case when igm.item_id > 0 then ig.name else 'Ungrouped'
+		end as item_group_name,
+		item.name as item_name, item.item_data_type_id, ifm.header, ifm.left_item_text,
+		ifm.right_item_text, ifm.required as item_required, ifm.regexp, ifm.regexp_error_msg, ifm.width_decimal,
+		rs.response_type_id, rs.options_text, rs.options_values, rs.label as response_label,
+		igm.header as item_group_header, item.description as item_description
+		from
+		crf_version cv join item_form_metadata ifm on cv.crf_version_id = ifm.crf_version_id
+		join item on ifm.item_id = item.item_id
+		join response_set rs on ifm.response_set_id = rs.response_set_id
+		left join item_group_metadata igm on ifm.item_id = igm.item_id
+		and cv.crf_version_id = igm.crf_version_id
+		left join item_group ig on igm.item_group_id = ig.item_group_id and cv.crf_id = ig.crf_id
+		where
+		cv.oc_oid = ?
+		</sql>
+	</query>
+</queries>

@@ -1,0 +1,7 @@
+<decorators>
+
+        <decorator name="mydecorator" page="/decorator.jsp">
+            <pattern>/ManageStudy1</pattern>
+        </decorator>
+
+</decorators>

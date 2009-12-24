@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:tx="http://www.springframework.org/schema/tx"
+        xmlns:aop="http://www.springframework.org/schema/aop"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+                            http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                            http://www.springframework.org/schema/tx
+                            http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+                            http://www.springframework.org/schema/aop
+                            http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+
+
+    <!--  Service layer supports legacy DAOs via constructor injection of dataSource 
+          and Hibernate DAO injection via autowiring -->
+          
+    <bean id="ruleSetService" class="org.akaza.openclinica.service.rule.RuleSetService" autowire="byName">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+    <bean id="rulesPostImportContainerService" class="org.akaza.openclinica.service.rule.RulesPostImportContainerService" autowire="byName">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+    <bean id="subjectService" class="org.akaza.openclinica.service.subject.SubjectService">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+    <bean id="eventService" class="org.akaza.openclinica.service.EventService">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+    
+    <!-- 
+    <bean id="sdvUtil" class="org.akaza.openclinica.web.table.sdv.SDVUtil"  name="sdvUtil">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+     -->
+
+    <!-- 
+    <bean id="databaseCctsService" class="org.akaza.openclinica.ws.logic.DatabaseCctsService">
+        <property name="subjectService" ref="subjectService"/>
+        <property name="waitBeforeCommit" value="s[ccts.waitBeforeCommit]"/>
+    </bean>
+     -->
+</beans>

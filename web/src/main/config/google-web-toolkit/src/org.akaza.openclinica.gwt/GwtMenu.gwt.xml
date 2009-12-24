@@ -1,0 +1,23 @@
+<module>
+
+    <inherits name='com.google.gwt.user.User'/>
+
+    <inherits name="com.google.gwt.user.Debug"/>
+
+    <inherits name="com.google.gwt.i18n.I18N"/>
+
+    <entry-point class='org.akaza.openclinica.gwt.client.GwtMenu'/>
+
+    <!-- French language, independent of country -->
+    <extend-property name="locale" values="fr"/>
+
+    <!-- English -->
+    <extend-property name="locale" values="en"/>
+
+    <!-- Spanish language, independent of country -->
+    <extend-property name="locale" values="es"/>
+
+    <!-- Italian language, independent of country -->
+    <extend-property name="locale" values="it"/>
+
+</module>

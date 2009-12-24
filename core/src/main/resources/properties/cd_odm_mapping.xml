@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Mapping DTD Version 1.0//EN" "http://castor.org/mapping.dtd">
+<mapping>
+
+	<class name="org.akaza.openclinica.bean.submit.crfdata.ODMContainer">
+        <map-to xml="ODM"/>
+        
+        <field name="CrfDataPostImportContainer"
+            type="org.akaza.openclinica.bean.submit.crfdata.CRFDataPostImportContainer">
+            <bind-xml name="ClinicalData"/>
+        </field>
+    </class>
+    
+	<class name="org.akaza.openclinica.bean.submit.crfdata.CRFDataPostImportContainer">
+        <map-to xml="ClinicalData"/>
+        
+        <field name="SubjectData"
+            type="org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean"
+            collection="arraylist">
+            <bind-xml name="SubjectData"/>
+        </field>
+        
+        <field name="StudyOID"
+        		type="java.lang.String">
+        		<bind-xml name="StudyOID" node="attribute"/>
+        </field>
+        
+        
+    </class>
+
+	<class name="org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean"> 
+		<map-to xml="SubjectData"/>
+		
+		<field name="SubjectOID"
+               type="java.lang.String">
+            <bind-xml name="SubjectKey" node="attribute"/>
+       </field>
+       
+       <field name="StudyEventData"
+       		type="org.akaza.openclinica.bean.submit.crfdata.StudyEventDataBean"
+       		collection="arraylist">
+       		<bind-xml name="StudyEventData"/>
+       	</field>
+    </class>
+    
+    <class name="org.akaza.openclinica.bean.submit.crfdata.StudyEventDataBean">
+    	<map-to xml="StudyEventData"/>
+		
+		<field name="StudyEventOID"
+               type="java.lang.String">
+            <bind-xml name="StudyEventOID" node="attribute"/>
+       </field>
+       
+       <field name="StudyEventRepeatKey"
+               type="java.lang.String">
+            <bind-xml name="StudyEventRepeatKey" node="attribute"/>
+       </field>
+       
+       <field name="FormData"
+       		type="org.akaza.openclinica.bean.submit.crfdata.FormDataBean"
+       		collection="arraylist">
+       		<bind-xml name="FormData"/>
+       	</field>
+    </class>
+    
+    <class name="org.akaza.openclinica.bean.submit.crfdata.FormDataBean">
+    	<map-to xml="FormData"/>
+		<field name="FormOID"
+               type="java.lang.String">
+            <bind-xml name="FormOID" node="attribute"/>
+       </field>
+       
+       <field name="ItemGroupData"
+       		type="org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean"
+       		collection="arraylist">
+       		<bind-xml name="ItemGroupData"/>
+       	</field>
+    </class>
+    
+    <class name="org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean">
+    	<map-to xml="ItemGroupData"/>
+		<field name="ItemGroupOID"
+               type="java.lang.String">
+            <bind-xml name="ItemGroupOID" node="attribute"/>
+       </field>
+       
+       <field name="ItemGroupRepeatKey"
+               type="java.lang.String">
+            <bind-xml name="ItemGroupRepeatKey" node="attribute"/>
+       </field>
+       
+       <field name="ItemData"
+       		type="org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean"
+       		collection="arraylist">
+       		<bind-xml name="ItemData"/>
+       	</field>
+    </class>
+    
+    <class name="org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean">
+       <map-to xml="ItemData"/>
+	   <field name="ItemOID"
+               type="java.lang.String">
+            <bind-xml name="ItemOID" node="attribute"/>
+       </field>
+       <field name="Value"
+               type="java.lang.String">
+            <bind-xml name="Value" node="attribute"/>
+       </field>
+       <field name="TransactionType"
+               type="java.lang.String">
+            <bind-xml name="TransactionType" node="attribute"/>
+       </field>
+       <field name="IsNull"
+               type="java.lang.String">
+            <bind-xml name="IsNull" node="attribute"/>
+       </field>
+    </class>
+</mapping>

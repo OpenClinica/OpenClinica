@@ -1,0 +1,91 @@
+<?xml version="1.0"?>
+<queries>
+	<query>
+		<name>findByPK</name>
+		<sql>SELECT * FROM SUBJECT_GROUP_MAP WHERE 
+		SUBJECT_GROUP_MAP_ID = ?</sql>
+	</query>
+	<query>
+		<name>findAll</name>
+		<sql>SELECT * FROM SUBJECT_GROUP_MAP</sql>
+	</query>
+	<query>
+		<name>findAllByStudySubject</name>
+		<sql>SELECT sgm.*, sg.name as group_name,sgc.name as class_name
+		FROM SUBJECT_GROUP_MAP sgm,STUDY_GROUP sg,STUDY_GROUP_CLASS sgc, STUDY_SUBJECT ss, STUDY s		 
+		WHERE sgm.study_subject_id=?
+		AND sgm.study_group_id=sg.study_group_id
+		AND sgm.study_subject_id=ss.study_subject_id
+		AND s.study_id = ss.study_id
+		AND (s.parent_study_id = sgc.study_id OR ss.study_id=sgc.study_id)
+		AND sgm.study_group_class_id = sgc.study_group_class_id
+		ORDER BY class_name asc
+		</sql>
+	</query>
+	<query>
+        <name>findByStudySubjectAndStudyGroupClass</name>
+        <sql>SELECT sgm.*, sg.name as group_name,sgc.name as class_name
+        FROM SUBJECT_GROUP_MAP sgm,STUDY_GROUP sg,STUDY_GROUP_CLASS sgc, STUDY_SUBJECT ss, STUDY s       
+        WHERE sgm.study_subject_id=?
+        AND sgc.study_group_class_id = ?
+        AND sgm.study_group_id=sg.study_group_id
+        AND sgm.study_subject_id=ss.study_subject_id
+        AND s.study_id = ss.study_id
+        AND (s.parent_study_id = sgc.study_id OR ss.study_id=sgc.study_id)
+        AND sgm.study_group_class_id = sgc.study_group_class_id
+        ORDER BY class_name asc
+        </sql>
+    </query>
+	<query>
+		<name>create</name>
+		<sql>
+		   INSERT INTO SUBJECT_GROUP_MAP 
+		   (study_group_class_id,
+		    study_subject_id, 
+		    study_group_id,
+		    status_id,
+			owner_id,
+			date_created,			   
+            notes) 
+		   VALUES (?,?,?,?,?,NOW(),?)
+		</sql>
+	</query>
+	<query>
+		<name>update</name>
+		<sql>
+		  UPDATE SUBJECT_GROUP_MAP SET STUDY_GROUP_CLASS_ID=?,
+		  STUDY_SUBJECT_ID=?,STUDY_GROUP_ID=?,
+		  STATUS_ID=?,DATE_UPDATED=?, UPDATE_ID=?, NOTES=? 
+		  WHERE SUBJECT_GROUP_MAP_ID=?
+	    </sql>
+	</query>
+	<query>
+		<name>findAllByStudyGroupClassAndGroup</name>
+		<sql>
+		  SELECT sgm.*, ss.label FROM subject_group_map sgm, study_subject ss
+		  WHERE sgm.study_group_class_id=?
+		  AND sgm.study_group_id=? 
+		  AND sgm.study_subject_id = ss.study_subject_id
+	    </sql>
+	</query>
+	<query>
+		<name>findAllByStudyGroupId</name>
+		<sql>
+		  select * from subject_group_map WHERE study_group_id=?
+	    </sql>
+	</query>
+	<query>
+		<name>findAllByStudyGroupClassId</name>
+		<sql>
+		  select * from subject_group_map WHERE study_group_class_id=?
+	    </sql>
+	</query>
+	<query>
+		<name>getCurrentPK</name>
+		<sql>SELECT currval('subject_group_map_subject_group_map_id_seq') AS key;</sql>
+	</query>
+  <query>
+		<name>deleteTestGroupMap</name>
+		<sql>delete from subject_group_map WHERE subject_group_map_id=?</sql>
+	</query>
+</queries>

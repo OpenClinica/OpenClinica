@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:security="http://www.springframework.org/schema/security"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                           http://www.springframework.org/schema/util
+                           http://www.springframework.org/schema/util/spring-util-2.5.xsd
+                           http://www.springframework.org/schema/security
+                           http://www.springframework.org/schema/security/spring-security-2.0.4.xsd">
+
+
+  <security:http access-denied-page="/accounts/denied.htm" entry-point-ref="authenticationProcessingFilterEntryPoint">
+
+    <security:anonymous />
+    <security:intercept-url pattern="/pages/login/login" filters="none"/>
+    <security:intercept-url pattern="/SystemStatus" filters="none"/>
+    <security:intercept-url pattern="/RssReader" filters="none"/>
+    <security:intercept-url pattern="/RequestPassword" filters="none"/>
+    <security:intercept-url pattern="/RequestAccount" filters="none"/>
+    <security:intercept-url pattern="/includes/**" filters="none"/>
+    <security:intercept-url pattern="/images/**" filters="none"/>
+    <security:intercept-url pattern="/help/**" filters="none"/>
+    <security:intercept-url pattern="/ws/**" filters="none"/>
+    <security:intercept-url pattern="/Contact" filters="none"/>
+    <!--
+    <security:form-login login-page="/pages/login/login" authentication-failure-url="/pages/login/login?action=errorLogin"
+      default-target-url='/MainMenu' always-use-default-target='true' />
+     -->
+    <security:intercept-url pattern="/**" access="ROLE_USER" />
+
+  </security:http>
+
+    <security:authentication-provider user-service-ref="ocUserDetailsService">
+        <security:password-encoder ref="openClinicaPasswordEncoder" />
+        <!-- <security:password-encoder hash="md5" /> -->
+        <!-- <security:user-service properties="/WEB-INF/users.properties" /> -->
+    </security:authentication-provider>
+
+    <bean id="shaPasswordEncoder" class="org.springframework.security.providers.encoding.ShaPasswordEncoder" />
+    <bean id="md5PasswordEncoder" class="org.springframework.security.providers.encoding.Md5PasswordEncoder" />
+
+    <bean id="openClinicaPasswordEncoder" class="org.akaza.openclinica.core.OpenClinicaPasswordEncoder">
+        <property name="currentPasswordEncoder" ref="shaPasswordEncoder"/>
+        <property name="oldPasswordEncoder" ref="md5PasswordEncoder"/>
+    </bean>
+
+    <bean id="securityManager" class="org.akaza.openclinica.core.SecurityManager">
+        <property name="encoder" ref="openClinicaPasswordEncoder" />
+    </bean>
+
+    <security:authentication-manager alias="authenticationManager"/>
+
+    <bean id="myFilter" class="org.akaza.openclinica.web.filter.OpenClinicaAuthenticationProcessingFilter">
+        <property name="authenticationManager" ref="authenticationManager"/>
+        <property name="authenticationFailureUrl" value="/pages/login/login?action=errorLogin"/>
+        <property name="defaultTargetUrl" value="/MainMenu"/>
+        <property name="auditUserLoginDao" ref="auditUserLoginDao"/>
+        <property name="configurationDao" ref="configurationDao"/>
+        <property name="dataSource" ref="dataSource"/>
+        <property name="exceptionMappings">
+            <props>
+                <prop key="org.springframework.security.LockedException">/pages/login/login?action=errorLocked</prop>
+            </props>
+        </property>
+        <security:custom-filter position="AUTHENTICATION_PROCESSING_FILTER"/>
+    </bean>
+
+    <bean id="authenticationProcessingFilterEntryPoint"
+          class="org.springframework.security.ui.webapp.AuthenticationProcessingFilterEntryPoint">
+        <property name="loginFormUrl" value="/pages/login/login"/>
+        <property name="forceHttps" value="false"/>
+    </bean>
+
+     <bean id="logoutFilter" class="org.springframework.security.ui.logout.LogoutFilter">
+        <constructor-arg value="/MainMenu"></constructor-arg>
+        <constructor-arg>
+            <list>
+                <bean class="org.akaza.openclinica.web.filter.OpenClinicaSecurityContextLogoutHandler">
+                    <property name="auditUserLoginDao" ref="auditUserLoginDao"/>
+                    <property name="dataSource" ref="dataSource"/>
+                </bean>
+            </list>
+        </constructor-arg>
+        <property name="filterProcessesUrl" value="/j_spring_security_logout" />
+        <security:custom-filter position="LOGOUT_FILTER"/>
+    </bean>
+
+
+
+    <bean id="ocUserDetailsService" class="org.akaza.openclinica.web.filter.OpenClinicaJdbcService"
+        p:dataSource-ref="dataSource"
+        p:usersByUsernameQuery="SELECT user_name,passwd,enabled,account_non_locked FROM user_account WHERE user_name = ?" />
+
+    <!--<security:global-method-security secured-annotations="enabled">
+        <security:protect-pointcut
+            expression="execution(* com.springsource..*Service.*(..))"
+            access="ROLE_USER" />
+    </security:global-method-security>
+--></beans>

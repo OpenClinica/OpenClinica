@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+<head>
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+
+<title>OpenClinica Help</title>
+
+<link rel="stylesheet" href="../includes/styles_hf.css" type="text/css" media="screen" />
+<!--[if gte IE 6]> <link rel="stylesheet" href="../includes/ie6.css" type="text/css" media="screen" /><![endif]-->
+<script src="../includes/help_files_javascript.js" type="text/javascript"></script>
+
+</head>
+
+<body>
+
+<!--main container-->
+<div id="main">
+<a name="top" />
+<!--header container-->
+<div id="header">
+	<img src="../images/popup_OC.gif" alt="OpenClinica" style="float: left"/><img src="../images/popup_Help.gif" alt="Help" style="float: right" />
+</div>
+<!--end header-->
+
+<!--container for navigation on the left side-->
+<div id="navi">
+	<div class="bullets">
+	<a href="index.html">Table of Contents</a>
+	<br />
+	<div class="contTable">
+	<p>
+	<a href="1_0_myOpenClinica_Help.html">1. My OpenClinica</a><br />
+	<a href="2_0_submitData_Help.html">2. Submit Data</a><br />
+	&nbsp;<a href="2_1_subjectMatrix_Help.html"><em>2.1 Subject Matrix</em></a><br />
+	&nbsp;&nbsp;&nbsp;<a href="2.1.1_viewSubject_Help.html"><em>2.1.1 View Subject</em></a><br />
+	&nbsp;<a href="2_2_enrollSubject_Help.html"><em>2.2 Add Subject</em></a><br />
+	&nbsp;<a href="2_3_discrepancyNotes_Help.html"><em>2.3 Notes &amp; Discrepancies</em></a><br />
+	&nbsp;<a href="2_4_scheduleEvent_Help.html"><em>2.4 Schedule Event</em></a><br />
+	&nbsp;<a href="2_5_viewEvents_Help.html"><em>2.5 View Events</em></a><br />
+	&nbsp;<a href="2_6_importData_Help.html"><em>2.6 Import Data</em></a><br /><br />
+	<a href="3_0_manageStudy_Help.html">3. Monitor and Manage Data</a><br />
+	<a href="4_0_extractData_Help.html">4. Extract Data</a><br />
+	<a href="5_0_studySetup_Help.html">5. Study Setup</a><br />
+	<a href="6_0_administerSystem_Help.html">6. Administration</a><br />
+	</p>
+	</div>
+	</div>
+
+	<div class="bullets">
+	<a href="glossary.html">Glossary</a>
+	</div><br />
+
+	<div class="bullets">
+	<a href="iconkey.html">Icon Key</a>
+	</div><br />
+
+	<div class="bullets">
+	<a href="http://www.openclinica.org/page.php?pid=107" rel="external">OpenClinica Email Forums</a>
+	</div><br />
+
+	<div class="bullets">
+	<a href="http://www.openclinica.org/section.php?sid=4" rel="external">OpenClinica Enterprise</a>
+	</div>
+</div>
+<!--end navigation-->
+
+<!--content container, on the right side-->
+<div id="content">
+	<h1>2.1.1 View Subject Help</h1>
+	<p>You can minimize and maximize each section within the 'View Subject' page. The sections available to view are <em><a href="#subrec">Subjects Record</a></em>, <em><a href="#events">Events</a></em>, <em><a href="#group">Group</a></em>, and <em><a href="#global">Global Subject Record</a></em>. You can also view the audit logs by clicking on the <em><a href="#audit">Audit Logs</a></em> link in the top.</p>
+
+	<p><b><em><a name='subrec'></a>Subjects Record</em></b></p>
+	<p>This matrix provides you with general information about the Subject, e.g. Study Subject ID, Study name, or Unique Protocol ID. Other fields depend on the settings of your study, e.g. Date of birth or Year of birth.</p>
+	<p><a href="#top">Back to Top</a></p>
+
+	<p><b><em><a name='events'></a>Events</em></b></p>
+	<p>In the Event Section you can see a list of all events assigned to this subject. All Events are ordered by their Start Date, with the latest on top. You can choose to reorder the list of events by toggling the ascending or descending arrow located next to the Start Date.</p>
+	<p>Similarly, you can also reorder the event list using the event name, Location, or Status, and toggle their respective ascending or descending arrows.</p>
+	<p>The <b>Find</b> function, located at the top of the event list, allows you to search for a set of events based on their Event name or the Location.</p>
+	<p>In addition to viewing all the Events, you are also presented with a link to <em><b>Add New Event</b></em>, which will direct you to the <a href="2_4_scheduleEvent_Help.html"><b>Schedule Event</b></a> page.</p>
+	<p>The Event matrix provides you with the following columns:</p>
+	<table>
+      <tr>
+        <td class="left"><b>Event (Occurrence Number):</b></td>
+        <td>This cell indicates the name of the Event and in parenthesis the number of occurrence.<p></p></td>
+      </tr>
+      <tr>
+        <td class="left"><b>Start Date:</b></td>
+        <td>The column Start Date provides you with the start date of each event.<p></p></td>
+      </tr>
+	  <tr>
+        <td class="left"><b>Location:</b></td>
+        <td>This cell indicates the location of the event.<p></p></td>
+      </tr>
+	  <tr>
+        <td class="left"><b>Status:</b></td>
+        <td>This cell presents the status of the event. It can be <em>scheduled</em>, <em>data entry started</em>, <em>completed</em>, and <em>signed</em>.<br /><em>Not scheduled</em> events will not be displayed in this matrix.<p></p></td>
+      </tr>
+	  <tr>
+        <td class="left"><b>Actions: (depending on role)</b></td>
+        <td><img src="../images/bt_View.gif" alt="View" /> <em>View</em>
+			<p>Clicking on the <em>View</em> icon will direct you to the Enter or Validate Data for CRFs page.</p>
+			<img src="../images/bt_Edit.gif" alt="Edit" /> <em>Edit</em>
+			<p>If you want to edit the Event you can click on the <em>Edit</em> icon and you will be directed to the Update Study Event page.</p>
+			<img src="../images/bt_Remove.gif" alt="Remove" /> <em>Remove</em>
+			<p>To remove an event from the Subject Record you can click on the particular <em>Remove</em> icon. The event and all data associated with it in this Study/Site will be removed. It may be restored by a system administrator.</p>
+			<img src="../images/bt_Restore.gif" alt="Restore" /> <em>Restore</em>
+			<p>If an Event was removed a system adminitrator can restore it to the study by clicking on the <em>Restore</em> icon. The event and all data associated with it in this Study/Site will be restored.</p>
+		<p></p>
+		</td>
+	  </tr>
+	  <tr>
+        <td class="left"><b>CRFs:</b></td>
+        <td>This cell provides you with information about the Name of the <em>CRF</em>, the <em>Version</em>, the <em>Status</em>, the <em>Updated</em> date and the available <em>Actions</em>. The actions are similar to the actions on the Enter or Validate Data page (<a href="2_2_enrollSubject_Help.html"><b>Step 2 (a)</b></a>).<p></p></td>
+	  </tr>
+	</table>
+	<p><a href="#top">Back to Top</a></p>
+
+	<p><b><em><a name='group'></a>Group</em></b></p>
+	<p>You can expand the Group matrix under the event matrix by clicking on the <img src="../images/bt_Expand.gif" alt="Expand" /> icon. You will then see a list of all containing groups in this study with information about the <b>Subject Group Class</b> name, the <b>Study Group</b> as well as some <b>Notes</b>.<br />Additionally you are provided with a link to <em><b>Assign Subject to Group</b></em>.</p>
+	<p><a href="#top">Back to Top</a></p>
+
+	<p><b><em><a name='global'></a>Global Subject Record</em></b></p>
+	<p>Also, by expanding the Global Subject Record matrix you can see general information about the subject. In the top of the table you are provided with a link to <em><b>Edit Record</b></em>.</p> 
+	<p><a href="#top">Back to Top</a></p>
+
+	<p><b><em><a name='audit'></a>Audit Logs</em></b></p>
+	<p>The <b><em>Audit Logs</em></b> link, above all matrixes, will open in a popup window and displayes all captured transactions concerning this particular subject.</p> 
+	<p><a href="#top">Back to Top</a></p>
+</div>
+<!--end content-->
+
+<!--container for footer-->
+<div id="footer">
+	<a href="javascript:window.close()">Exit Help</a> 
+</div>
+<!--end footer-->
+
+</div>
+<!--end main container-->
+
+</body>
+</html>

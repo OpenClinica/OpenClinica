@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:tx="http://www.springframework.org/schema/tx"
+        xmlns:aop="http://www.springframework.org/schema/aop"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+                            http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                            http://www.springframework.org/schema/tx
+                            http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+                            http://www.springframework.org/schema/aop
+                            http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+
+
+    <!-- A Hibernate SessionFactory for mapping Domain Objects from object to relation tables -->
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="mappingLocations">
+            <list>
+                <value>classpath:org/akaza/openclinica/typedefs.hbm.xml</value>
+            </list>
+        </property>
+        <property name="annotatedClasses">
+            <list>
+                <value>org.akaza.openclinica.domain.rule.RuleSetBean</value>
+                <value>org.akaza.openclinica.domain.rule.RuleSetAuditBean</value>
+                <value>org.akaza.openclinica.domain.rule.expression.ExpressionBean</value>
+                <value>org.akaza.openclinica.domain.rule.RuleSetRuleBean</value>
+                <value>org.akaza.openclinica.domain.rule.RuleSetRuleAuditBean</value>
+                <value>org.akaza.openclinica.domain.rule.RuleBean</value>
+                <value>org.akaza.openclinica.domain.rule.action.RuleActionBean</value>
+                <value>org.akaza.openclinica.domain.rule.action.EmailActionBean</value>
+                <value>org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean</value>
+                <value>org.akaza.openclinica.domain.user.AuthoritiesBean</value>
+                <value>org.akaza.openclinica.domain.managestudy.StudyModuleStatus</value>
+                <value>org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean</value>
+                <value>org.akaza.openclinica.domain.technicaladmin.DatabaseChangeLogBean</value>
+                <value>org.akaza.openclinica.domain.technicaladmin.ConfigurationBean</value>
+                <value>org.akaza.openclinica.domain.admin.MeasurementUnit</value>
+            </list>
+        </property>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.show_sql">false</prop>
+                <prop key="hibernate.format_sql">true</prop>
+                <prop key="hibernate.dialect">s[hibernate.dialect]</prop>
+            </props>
+        </property>
+        <property name="namingStrategy">
+            <bean class="org.hibernate.cfg.ImprovedNamingStrategy"/>
+        </property>
+    </bean>
+
+  <!-- A transaction manager for working with Hibernate SessionFactories -->
+  <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+    <property name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+
+  <!-- Instructs the container to look for beans with @Transactional and decorate them -->
+  <tx:annotation-driven transaction-manager="transactionManager"/>
+
+  <bean id="abstractDomainDao" class="org.akaza.openclinica.dao.hibernate.AbstractDomainDao" abstract="true"/>
+
+  <bean id="ruleSetDao" class="org.akaza.openclinica.dao.hibernate.RuleSetDao" parent="abstractDomainDao" autowire="byName" />
+  <bean id="ruleSetAuditDao" class="org.akaza.openclinica.dao.hibernate.RuleSetAuditDao" parent="abstractDomainDao" autowire="byName" />
+  <bean id="ruleDao" class="org.akaza.openclinica.dao.hibernate.RuleDao" parent="abstractDomainDao" autowire="byName" />
+  <bean id="ruleSetRuleDao" class="org.akaza.openclinica.dao.hibernate.RuleSetRuleDao" parent="abstractDomainDao" autowire="byName" />
+  <bean id="ruleSetRuleAuditDao" class="org.akaza.openclinica.dao.hibernate.RuleSetRuleAuditDao" parent="abstractDomainDao" autowire="byName" />
+
+  <bean id="authoritiesDao" class="org.akaza.openclinica.dao.hibernate.AuthoritiesDao" parent="abstractDomainDao" autowire="byName" />
+  <bean id="studyModuleStatusDao" class="org.akaza.openclinica.dao.hibernate.StudyModuleStatusDao" parent="abstractDomainDao" autowire="byName"/>
+
+  <bean id="auditUserLoginDao" class="org.akaza.openclinica.dao.hibernate.AuditUserLoginDao" parent="abstractDomainDao" autowire="byName" />
+  <bean id="databaseChangeLogDao" class="org.akaza.openclinica.dao.hibernate.DatabaseChangeLogDao" autowire="byName" />
+  <bean id="configurationDao" class="org.akaza.openclinica.dao.hibernate.ConfigurationDao" parent="abstractDomainDao" autowire="byName" />
+
+  <bean id="measurementUnitDao" class="org.akaza.openclinica.dao.hibernate.MeasurementUnitDao" parent="abstractDomainDao" autowire="byName" />
+
+</beans>

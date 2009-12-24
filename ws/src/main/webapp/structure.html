@@ -1,0 +1,136 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+  "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="gwt:property" content="locale=en">
+    <title>prototype- Manage Study</title>
+    <script type="text/javascript" language="javascript" src="gwt/GwtMenu/GwtMenu.nocache.js"></script>
+
+    <script type="text/javascript" language="javascript" src="includes/global_functions_javascript.js"></script>
+    <link rel="stylesheet" href="includes/styles_updated.css" type="text/css">
+    <link rel="stylesheet" href="includes/proto_styles.css" type="text/css">
+    <link rel="stylesheet" href="gwt/GwtMenu/GwtMenu.css" type="text/css">
+
+    <script type="text/JavaScript" language="JavaScript" src="includes/Tabs.js"></script>
+    <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
+    <script type="text/JavaScript" language="JavaScript" src="includes/CalendarPopup.js"></script>
+
+    <!-- Added for the new Calender -->
+    <link rel="stylesheet" type="text/css" media="all" href="includes/new_cal/skins/aqua/theme.css" title="Aqua" />
+    <script type="text/javascript" src="includes/new_cal/calendar.js"></script>
+    <script type="text/javascript" src="includes/new_cal/lang/calendar-en.js"></script>
+    <script type="text/javascript" src="includes/new_cal/calendar-setup.js"></script>
+    <!-- End new Calender -->
+    <script type="text/JavaScript" language="JavaScript" src="includes/prototype.js"></script>
+
+
+</head>
+<body>
+<div id="headerDiv" style="background-color:yellow">
+    <-- Header width 1024 pixels (px); body tag width 1070 px -->
+    <div id="logoDiv"><img src="images/Logo.gif" alt="logo"/></div>
+    <!-- These DIVs define shaded box borders -->
+
+    <div id="menuContainer">
+
+    </div>
+
+    <div id="reportIssueDiv">
+        <a href="javascript:reportBug()"> <span>Report Issue</span> </a> | <a href="javascript:openDocWindow('http://www.openclinica.org/OpenClinica/2.2/support/')"><span>Support</span></a>
+    </div>
+    <div id="userBoxDiv" class="userbox">
+
+        <div class="box_T"><div class="box_L"><div class="box_R">
+
+            <div class="box_B"><div class="box_TL"><div class="box_TR">
+                <div class="box_BL"><div class="box_BR">
+
+                    <div class="userboxtext_center">
+
+                        User box
+                        <br /><br /><br /><br />
+
+                    </div></div></div></div></div></div></div></div></div>
+
+    </div>
+</div>
+
+<div id="sidebarDiv">
+
+    <div id="alertsDivTop">Alerts<img hspace="5" width="9" height="13" border="0" alt="+" src="images/sidebar_expand.gif" onclick="changeOpenDivButton(this)"/></div><div id="alertsDiv" class="sideTopBar">
+    <-- Sidebar width 165 pixels (px) -->
+</div>
+
+    <div id="instructionsDivTop">Instructions<img hspace="5" width="9" height="13" border="0" alt="+" src="images/sidebar_expand.gif" onclick="changeOpenDivButton(this)"/></div><div id="instructionsDiv" class="sideTopBar">
+
+
+</div>
+
+    <div id="infoDivTop">Info<img hspace="5" width="9" height="13" border="0" alt="+" src="images/sidebar_expand.gif" onclick="changeOpenDivButton(this)"/></div><div id="infoDiv" class="sideTopBar">
+
+
+</div>
+
+    <div id="inconKeyDivTop">Icon Key<img hspace="5" width="9" height="13" border="0" alt="+" src="images/sidebar_expand.gif" onclick="changeOpenDivButton(this)"/></div><div id="inconKeyDiv" class="sideTopBar">
+
+
+</div>
+</div>
+
+
+<div id="bodyDiv" style="font-size:1em">
+    <-- Body tag width 1070 pixels (px) -->
+    <br />
+    <br />
+    <-- Body div tag width for main content 900 pixels (px); w/5 px left margin -->
+    <br />
+    <br />
+    <-- Option 2: body tag width 1024; body div tag width for main content 854 pixels (px) -->
+    <div id="workflowDiv">
+            <div class="workflowBox_center">
+                <table border="0" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td>
+                            <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+                                <div class="textbox_center" align="center">
+<span class="title_home">
+<b>Workflow box</b>
+</span></div>
+                            </div></div></div></div></div></div></div></div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+    </div>
+    <br />
+     <-- Footer div width is not specified in CSS but ends up about 1000 pixels (px) -->
+</div>
+
+<div id="footerDiv">
+
+    <div id="footerLinksDiv">
+        <a href="http://www.openclinica.org" target="new">OpenClinica Portal</a>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="javascript:openDocWindow('help/index.html')">Help</a>
+
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+        <a href="javascript:reportBug()">Support</a>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="Contact">Contact</a>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="Enterprise">OpenClinica Enterprise</a>
+     <span class="version">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Version: SNAPSHOT &nbsp;</span>
+        <div id="logoFooterDiv">
+            <a href="http://www.akazaresearch.com"><img src="images/Akazalogo.gif" width="60" height="67" border="0" alt="Developed by Akaza Research" title="Developed by Akaza Research"></a>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

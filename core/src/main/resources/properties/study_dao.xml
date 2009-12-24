@@ -1,0 +1,161 @@
+<?xml version="1.0"?>
+<queries>
+	<query>
+		<name>findByPK</name>
+		<sql>SELECT * FROM STUDY WHERE STUDY_ID = ?</sql>
+	</query>
+	<query>
+		<name>findByName</name>
+		<sql>SELECT * FROM STUDY WHERE NAME = ?</sql>
+	</query>
+    <query>
+		<name>getStudyIdsByCRF</name>
+		<sql>select distinct study_id from event_definition_crf where crf_id=?</sql>
+	</query>
+	<query>
+		<name>deleteTestOnly</name>
+		<sql>delete from study where name=?</sql>
+	</query>
+	<query>
+		<name>findAll</name>
+		<sql>SELECT * FROM STUDY order by name</sql>
+	</query>
+	<query>
+        <name>findAllByStudyId</name>
+        <sql>SELECT * FROM STUDY where (study_id =? or parent_study_id =?) and parent_study_id is not null order by name</sql>
+    </query>
+	<query>
+		<name>findAllByStatus</name>
+		<sql>SELECT * FROM STUDY where status_id=?</sql>
+	</query>
+	<query>
+		<name>findAllParents</name>
+		<sql>SELECT * FROM STUDY WHERE parent_study_id is null order by name</sql>
+	</query>
+	<query>
+		<name>findAllByParent</name>
+		<sql>SELECT * FROM STUDY WHERE parent_study_id=? order by name</sql>
+	</query>
+	<query>
+		<name>findAllByParentLimit5</name>
+		<sql>SELECT * FROM STUDY WHERE parent_study_id=? order by name
+		    limit 5
+		</sql>
+	</query>
+	<query>
+		<name>findAllByUser</name>
+		<sql>SELECT s.* FROM study s, study_user_role sur
+           WHERE sur.user_name = ?
+           AND s.study_id=sur.study_id
+         </sql>
+	</query>
+	<!-- YW 10-18-2007 find studies belonging to a user whose study user role status is not removed or auto-removed -->
+	<query>
+		<name>findAllByUserNotRemoved</name>
+		<sql>SELECT s.* FROM study s, study_user_role sur
+           WHERE sur.user_name = ?
+           AND s.study_id=sur.study_id
+           AND sur.status_id != 5
+           AND sur.status_id != 7
+         </sql>
+	</query>
+	<!-- tbh 04/2008 -->
+	<query>
+		<name>findByOid</name>
+		<sql>SELECT s.* FROM study s
+           WHERE s.OC_OID = ?
+         </sql>
+	</query>
+	<query>
+        <name>findByUniqueIdentifier</name>
+        <sql>SELECT s.* FROM study s
+           WHERE s.unique_identifier = ?
+         </sql>
+    </query>
+    <query>
+        <name>findSiteByUniqueIdentifier</name>
+        <sql>select site.* from study site, study study where
+                site.parent_study_id = study.study_id and
+                study.unique_identifier = ? and   
+                site.unique_identifier = ?
+         </sql>
+    </query>
+	<query>
+		<name>updateStepOne</name>
+		<sql>UPDATE STUDY SET PARENT_STUDY_ID=?, NAME=?, official_title=?, UNIQUE_IDENTIFIER=?,
+		SECONDARY_IDENTIFIER=?, SUMMARY=?,
+		PRINCIPAL_INVESTIGATOR=?, DATE_PLANNED_START=?,
+		DATE_PLANNED_END=?, FACILITY_NAME=?, FACILITY_CITY=?,
+		FACILITY_STATE=?, FACILITY_ZIP=?, FACILITY_COUNTRY=?,
+		FACILITY_RECRUITMENT_STATUS=?, FACILITY_CONTACT_NAME=?,
+		FACILITY_CONTACT_DEGREE=?, FACILITY_CONTACT_PHONE=?,
+		FACILITY_CONTACT_EMAIL=?, STATUS_ID=?,
+		UPDATE_ID=?, DATE_UPDATED=? WHERE STUDY_ID=?</sql>
+	</query>
+	<query>
+		<name>findNextKey</name>
+		<sql>select nextval('study_study_id_seq') as key</sql>
+	</query>
+	<query>
+		<name>createStepOne</name>
+		<sql>INSERT INTO STUDY (STUDY_ID, PARENT_STUDY_ID, NAME, official_title,
+		UNIQUE_IDENTIFIER, SECONDARY_IDENTIFIER, SUMMARY,
+		PRINCIPAL_INVESTIGATOR, DATE_PLANNED_START,
+		DATE_PLANNED_END, FACILITY_NAME, FACILITY_CITY, FACILITY_STATE,
+		FACILITY_ZIP, FACILITY_COUNTRY, FACILITY_RECRUITMENT_STATUS,
+		FACILITY_CONTACT_NAME, FACILITY_CONTACT_DEGREE, FACILITY_CONTACT_PHONE,
+		FACILITY_CONTACT_EMAIL, STATUS_ID, DATE_CREATED, OWNER_ID, OC_OID)
+		VALUES (?,
+		?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)</sql>
+	</query>
+	<query>
+	   <name>createStepTwo</name>
+	   <sql>
+        UPDATE STUDY SET TYPE_ID=?, PROTOCOL_TYPE=?,PROTOCOL_DESCRIPTION=?,
+		PROTOCOL_DATE_VERIFICATION=?, PHASE=?, EXPECTED_TOTAL_ENROLLMENT=?,
+		SPONSOR=?, COLLABORATORS=?, MEDLINE_IDENTIFIER=?, results_reference=?,
+		URL=?,URL_DESCRIPTION=?, CONDITIONS=?, KEYWORDS=?, ELIGIBILITY=?,
+		GENDER=?, AGE_MAX=?, AGE_MIN=?, HEALTHY_VOLUNTEER_ACCEPTED=?
+		WHERE STUDY_ID=?
+      </sql>
+	</query>
+	<query>
+		<name>createStepThree</name>
+		<sql>UPDATE STUDY SET PURPOSE=?, ALLOCATION=?, MASKING=?,
+		CONTROL=?, ASSIGNMENT=?, ENDPOINT=?, INTERVENTIONS=? WHERE
+		STUDY_ID=?</sql>
+	</query>
+	<query>
+		<name>createStepFour</name>
+		<sql>UPDATE STUDY SET DURATION=?, SELECTION=?, TIMING=? WHERE
+		STUDY_ID=?</sql>
+	</query>
+    <query>
+        <name>updateSitesStatus</name>
+        <sql>UPDATE STUDY SET STATUS_ID=? WHERE PARENT_STUDY_ID=?</sql>
+    </query>
+    <query>
+        <name>updateStudyStatus</name>
+        <sql>UPDATE STUDY SET STATUS_ID=? WHERE STUDY_ID=?</sql>
+    </query>
+    <!-- YW 07-2008 find all sites' ids belonging to a study -->
+	<query>
+		<name>findAllSiteIdsByStudy</name>
+		<sql>SELECT study_id FROM study
+		WHERE study_id = ? or parent_study_id = ?</sql>
+	</query>
+	<query>
+		<name>findOlnySiteIdsByStudy</name>
+		<sql>SELECT study_id FROM study WHERE parent_study_id = ?</sql>
+	</query>
+	<query>
+		<name>findByStudySubjectId</name>
+		<sql>select s.* from study_subject ss, study s
+		where ss.study_subject_id = ? and ss.study_id = s.study_id
+      </sql>
+	</query>
+	<query>
+		<name>findAllByParentStudyIdOrderedByIdAsc</name>
+		<sql>SELECT * FROM STUDY WHERE study_id=? or parent_study_id=? order by study_id asc</sql>
+	</query>
+</queries>

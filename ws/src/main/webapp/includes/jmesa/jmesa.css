@@ -1,0 +1,304 @@
+/*
+ * - KK 20080513 : Added ".jmesa .header" to resolve conflict with out Own CSS
+ * - KK 20080513 : Changed ".jmesa caption" to conform with OC colors
+ * - KK 20090610 : Changed ".jmesa .header td" Added  background-image: none; to resolve conflict with .header in styles.css
+ * - KK 20090618 : Added new configuration to support popups inside the table rows. Look for same comment below.
+ * - KK 20091201 : Changed .jmesa .odd td,.jmesa .even td and .jmesa .highlight td to fix IE7 issues
+ */
+
+.jmesa {
+    margin: 0;
+    padding: 0;
+}
+
+.jmesa caption {
+    caption-side: top;
+    /*color: #444444;*/
+    color: #D4A718;
+    font-weight: bold;
+    font-size: 1em;
+    text-align: left;
+    padding-left: 5px;
+}
+
+.jmesa .table {
+    border: 1px solid silver;
+    padding: 2px;
+}
+
+.toolbar table {
+    margin-right: auto;
+    margin-left: 0px;
+}
+
+.jmesa .toolbar td {
+    padding: 0px 1px 0px 1px;
+}
+
+.jmesa .toolbar select {
+    font-size: 11px;
+    border: solid 1px #c4c3c2;
+}
+
+.jmesa .toolbar .pageNumber {
+    font-size: 13px;
+    font-weight: bold;
+    color: #c4634d;
+}
+
+.jmesa .toolbar .pageNumber a {
+    font-size: 13px;
+    font-weight: normal;
+    color: black;
+}
+
+.jmesa .toolbar img {
+    border:0px;
+}
+
+.jmesa .filter td {
+    padding: 2px 2px 3px 2px;
+}
+
+.jmesa .tbody input {
+    padding: 0;
+    margin: 0;
+}
+
+.jmesa .filter .dynFilter {
+    position: relative;
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-size: 11px;
+    padding: 0;
+    margin: 0;
+    border: 1px solid #c0c0c0;
+    background-color: #efebe7;
+    height: 15px;
+    white-space: nowrap;
+    cursor: pointer;
+    z-index: 4; 
+}
+
+.jmesa .filter #dynFilterDiv {
+    position: absolute;
+    top: -3px;
+    left: -2px;
+    padding: 0;
+    margin: 0;
+    height: 17px;
+    border: 1px solid #c0c0c0;
+    background-color: #e1ebf4;
+}
+
+.jmesa .filter #dynFilterInput {
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-size: 12px;
+    padding: 0;
+    margin: 0;
+    border-style: none;
+    background-color: #e1ebf4;
+}
+
+.jmesa .filter #dynFilterDroplistDiv {
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    padding: 0;
+    margin: 0;
+    height: 17px;
+    background-color: #e1ebf4;
+    z-index: 4;
+}
+
+.jmesa .filter #dynFilterDroplist {
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-size: 12px;
+    padding: 0;
+    margin: 0;
+    border: 1px solid #c0c0c0;
+    background-color: #e1ebf4;
+}
+
+.jmesa .header {
+	height: 15px;
+	max-height:30px
+}
+
+.jmesa .header td {
+    white-space: nowrap;
+    background-color: #729fcf;
+    color: white;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 4px 3px 4px 3px;
+    border-right-style: solid;
+    border-right-width: 1px;
+    border-color: white;
+    background-image: none;
+}
+
+.jmesa .odd a,.jmesa .even a {
+    color: black;
+}
+
+.jmesa .odd td,.jmesa .even td {
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-size: 11px;
+    vertical-align: top;
+    line-height: 15px;
+    padding: 2px 3px 2px 3px;
+}
+
+.jmesa .odd td {
+    border: 1px solid #ffffff;
+}
+
+.jmesa .even td {
+    border: 1px solid #e3e3e3;
+}
+
+.jmesa .odd {
+    background-color: #ffffff;
+}
+
+.jmesa .even {
+    background-color: #e3e3e3;
+}
+
+.jmesa .highlight td {
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-size: 11px;
+    vertical-align: top;
+    line-height: 15px;
+    padding: 3px 4px 3px 4px;
+    background-color: #fdecae;
+}
+
+.jmesa .highlight a {
+    color: black;
+}
+
+.jmesa .statusBar td {
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-size: 11px;
+    border-top: 1px solid silver;
+    background-color: #efebe7;
+    padding: 2px;
+}
+
+.jmesa .dropShadow {
+    padding: 10px 14px 14px 10px;
+}
+
+.jmesa .wsColumn {
+    position: relative;
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-size: 11px;
+    padding: 0;
+    margin: 0;
+    border-bottom: 1px solid #c0c0c0;
+    height: 15px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.jmesa .wsColumnError {
+    position: relative;
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-size: 11px;
+    font-style: italic;
+    padding: 0;
+    margin: 0;
+    color: #ec4646;
+    border-bottom: 1px dashed #ec4646;
+    height: 15px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.jmesa .wsColumnChange {
+    position: relative;
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-size: 11px;
+    font-style: italic;
+    padding: 0;
+    margin: 0;
+    color: #005e8f;
+    border-bottom: 1px dashed #005e8f;
+    height: 15px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.jmesa #wsColumnDiv {
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    padding: 0;
+    margin: 0;
+    height: 17px;
+    border: 1px solid #c0c0c0;
+    background-color: #ededed;
+}
+
+.jmesa #wsColumnInput {
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-size: 12px;
+    padding: 0;
+    margin: 0;
+    border-style: none;
+    background-color: #ededed;
+}
+
+/*
+ * KK - Added new configuration to support popups inside the table rows.
+ */
+
+.jmesa .ViewSubjectsPopup td, .jmesa .highlight .ViewSubjectsPopup td { 
+	background-color: #FFFFE5;
+    border-style: solid;
+    border-width: 0px 0px 0px 0px;
+    border-color: #CCCCCC;
+    padding: 0px;
+    }
+
+.jmesa .ViewSubjectsPopup td.table_header_row_left, .jmesa .highlight .ViewSubjectsPopup td.table_header_row_left { 
+	padding: 3px 1px 3px 6px;
+    border-style: solid;
+    border-width: 0px 0px 1px 0px;
+    border-color: #CCCCCC;
+    font-weight: bold;
+    color: #666666;
+    vertical-align: top;
+    }
+
+.jmesa .ViewSubjectsPopup td.table_header_row, .jmesa .highlight .ViewSubjectsPopup td.table_header_row { 
+	padding: 3px 1px 3px 2px;
+    border-style: solid;
+    border-width: 0px 0px 1px 1px;  
+    border-color: #CCCCCC;
+    font-weight: bold;
+    color: #666666;
+    vertical-align: top;
+    }
+
+.jmesa .ViewSubjectsPopup td.table_cell_left, .jmesa .highlight .ViewSubjectsPopup td.table_cell_left, .jmesa .ViewSubjectsPopup td.table_cell, .jmesa .highlight .ViewSubjectsPopup td.table_cell { 
+	padding: 3px 1px 3px 2px;  
+    border-style: solid;
+    border-width: 1px 0px 0px 1px;
+    border-top-color: #E6E6E6;
+    border-left-color: #CCCCCC;
+    vertical-align: top;
+    }
+
+.jmesa .ViewSubjectsPopup td.statusbox_scroll_R_dis, .jmesa .highlight td.ViewSubjectsPopup.statusbox_scroll_R_dis { 
+	border-style: solid;
+    border-width: 0px 0px 0px 1px;  
+    border-color: #CCCCCC;
+    }
+
+.jmesa .ViewSubjectsPopup td a, .jmesa .highlight .ViewSubjectsPopup td a { 
+	color: #789EC5; 
+	}
+
+

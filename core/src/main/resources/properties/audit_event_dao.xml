@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<queries>
+	<query>
+		<name>findByPK</name>
+		<sql>
+		 SELECT * FROM audit_event WHERE audit_id = ?
+		</sql>
+	</query>
+	<query>
+		<name>findContextByPK</name>
+		<sql>SELECT * FROM AUDIT_EVENT_CONTEXT WHERE AUDIT_ID = ?</sql>
+	</query>
+	<query>
+		<name>findAll</name>
+		<sql>SELECT * FROM audit_event</sql>
+	</query>
+	<query>
+		<name>create</name>
+		<sql>
+		   INSERT INTO audit_event
+		   (AUDIT_DATE,AUDIT_TABLE,USER_ID,ENTITY_ID,REASON_FOR_CHANGE,ACTION_MESSAGE) 
+		   VALUES (NOW(),?,?,?,?,?)
+		</sql>
+	</query>	
+	<query>
+	 <name>findAggregatesByTableName</name>
+	 <sql>
+	      SELECT count(*), av.column_name 
+	       FROM audit_event a,audit_event_values av 
+           WHERE a.audit_id = av.audit_id and
+           a.audit_table = ? group by av.column_name
+      </sql>
+	</query>
+	<query>
+	 <name>findAllByUserId</name>
+	 <sql>
+	      select ae.* , aev.old_value, aev.new_value, aev.column_name, aec.study_id, aec.subject_id 
+	 		from audit_event ae, audit_event_values aev, audit_event_context aec
+     		where ae.audit_id=aev.audit_id
+     		and ae.audit_id = aec.audit_id
+     		and ae.user_id=?
+     		order by ae.audit_date desc
+      </sql>
+	</query>
+	<query>
+	 <name>findEventStatusLogByStudySubject</name>
+	 <sql>
+	 select ae.* , aev.old_value, aev.new_value, aev.column_name 
+	 from audit_event ae, audit_event_values aev, study_event se
+     where (ae.audit_table='STUDY_EVENT' or ae.audit_table='Study Event')
+     and ae.audit_id=aev.audit_id
+     and ae.entity_id=se.study_event_id
+     and aev.column_name='Subject Event Status ID'
+     and se.study_subject_id=? 
+     order by ae.audit_date desc limit 5
+     </sql>
+	</query>
+	<query>
+		<name>findAllByStudyId</name>
+		<sql>select ae.* , aev.old_value, aev.new_value, aev.column_name, aec.study_id, aec.subject_id 
+	 		from audit_event ae, audit_event_values aev, audit_event_context aec
+     		where ae.audit_id=aev.audit_id
+     		and ae.audit_id = aec.audit_id
+     		and aec.study_id=?
+     		order by ae.audit_date desc</sql>
+	</query>
+	<query>
+		<name>findAllByStudyIdAndLimit</name>
+		<sql>select ae.* , aev.old_value, aev.new_value, aev.column_name, aec.study_id, aec.subject_id 
+	 		from audit_event ae, audit_event_values aev, audit_event_context aec
+     		where ae.audit_id=aev.audit_id
+     		and ae.audit_id = aec.audit_id
+     		and aec.study_id=?
+     		order by ae.audit_date desc limit 20</sql>
+	</query>
+	<query>
+		<name>findAllByAuditTable</name>
+		<sql>select * from audit_event where AUDIT_TABLE=?</sql>
+	</query>
+</queries>

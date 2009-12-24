@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema targetNamespace="http://www.openclinica.org/ns/openclinica_odm/v1.2"
+           xmlns="http://www.openclinica.org/ns/openclinica_odm/v1.2"
+           xmlns:odm="http://www.cdisc.org/ns/odm/v1.2"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified" attributeFormDefault="qualified">
+  <xs:import schemaLocation="http://www.w3.org/2001/03/xml.xsd" namespace="http://www.w3.org/XML/1998/namespace" />
+  <xs:import schemaLocation="ODM1-2-1.xsd" namespace="http://www.cdisc.org/ns/odm/v1.2" />
+    <xs:simpleType name="dateOrDatetime">
+          <xs:restriction base="xs:string">
+            <xs:pattern   value="[0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9](T[0-2][0-9]:[0-5][0-9]:[0-5][0-9](\.[0-9]+)?)?((\+|-)[0-2][0-9]:[0-5][0-9])?"/>
+          </xs:restriction>
+    </xs:simpleType>
+
+
+	<xs:complexType name="OCodmComplexTypeDefinition-StudyGroupClassList">
+		<xs:sequence>
+			<xs:choice>
+				<xs:element ref="StudyGroupItem" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:choice>
+			<xs:group ref="StudyGroupClassListElementExtension" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attributeGroup ref="StudyGroupClassListAttributeDefinition"/>
+		<xs:attributeGroup ref="StudyGroupClassListAttributeExtension"/>
+	</xs:complexType>
+
+	<xs:complexType name="OCodmComplexTypeDefinition-StudyGroupItem">
+		<xs:sequence>
+			<xs:group ref="StudyGroupItemElementExtension" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attributeGroup ref="StudyGroupItemAttributeDefinition"/>
+		<xs:attributeGroup ref="StudyGroupItemAttributeExtension"/>
+	</xs:complexType>
+
+	<xs:complexType name="OCodmComplexTypeDefinition-SubjectGroupData">
+		<xs:sequence>
+			<xs:group ref="SubjectGroupDataElementExtension" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attributeGroup ref="SubjectGroupDataAttributeDefinition"/>
+		<xs:attributeGroup ref="SubjectGroupDataAttributeExtension"/>
+	</xs:complexType>
+
+
+	<xs:group name="StudyGroupClassListElementExtension"> <xs:sequence/>  </xs:group>
+	<xs:group name="StudyGroupItemElementExtension"> <xs:sequence/>  </xs:group>
+	<xs:group name="SubjectGroupDataElementExtension"> <xs:sequence/>  </xs:group>
+
+
+	<xs:element name="StudyGroupClassList" type="OCodmComplexTypeDefinition-StudyGroupClassList">
+		<xs:unique name="UC-SGC-1">
+			<xs:selector xpath="StudyGroupItem"/>
+			<xs:field xpath="@Name"/>
+		</xs:unique>
+	</xs:element>
+	<xs:element name="StudyGroupItem" type="OCodmComplexTypeDefinition-StudyGroupItem"/>
+	<xs:element name="SubjectGroupData" type="OCodmComplexTypeDefinition-SubjectGroupData"/>
+
+	<xs:attributeGroup name="StudyGroupClassListAttributeDefinition">
+		<xs:attribute name="ID" type="odm:oidref" use="required"/>
+		<xs:attribute name="Name" type="odm:text"/>
+		<xs:attribute name="Type" type="odm:text"/>
+		<xs:attribute name="Status" type="odm:text"/>
+		<xs:attribute name="SubjectAssignment" type="odm:text"/>
+	</xs:attributeGroup>
+
+	<xs:attributeGroup name="StudyGroupItemAttributeDefinition">
+		<xs:attribute name="Name" type="odm:text"/>
+		<xs:attribute name="Description" type="odm:text"/>
+	</xs:attributeGroup>
+
+	<xs:attributeGroup name="SubjectGroupDataAttributeDefinition">
+		<xs:attribute name="StudyGroupClassID" type="odm:oidref" use="required"/>
+		<xs:attribute name="StudyGroupClassName" type="odm:text"/>
+		<xs:attribute name="StudyGroupName" type="odm:value"/>
+	</xs:attributeGroup>
+
+	<xs:attributeGroup name="SubjectDataAttributeDefinition">
+		<xs:attribute name="StudySubjectId" type="odm:text" />
+		<xs:attribute name="UniqueIdentifier" type="odm:text" />
+		<xs:attribute name="Status" type="odm:text" />
+		<xs:attribute name="SecondaryID" type="odm:text" />
+		<xs:attribute name="DateOfBirth" type="odm:date" />
+		<xs:attribute name="YearOfBirth" type="odm:integer" />
+		<xs:attribute name="Sex" type="odm:text" />
+	</xs:attributeGroup>
+
+	<xs:attributeGroup name="StudyEventDataAttributeDefinition">
+		<xs:attribute name="StudyEventLocation" type="odm:text" />
+		<xs:attribute name="StartDate" type="dateOrDatetime" />
+		<xs:attribute name="EndDate" type="dateOrDatetime" />
+		<xs:attribute name="Status" type="odm:text" />
+		<xs:attribute name="SubjectAgeAtEvent" type="odm:integer" />
+	</xs:attributeGroup>
+
+	<xs:attributeGroup name="FormDataAttributeDefinition">
+		<xs:attribute name="Version" type="odm:text" />
+		<xs:attribute name="InterviewerName" type="odm:text" />
+		<xs:attribute name="InterviewDate" type="odm:date" />
+		<xs:attribute name="Status" type="odm:text" />
+	</xs:attributeGroup>
+
+
+
+	<xs:attributeGroup name="StudyGroupClassListAttributeExtension"/>
+	<xs:attributeGroup name="StudyGroupItemAttributeExtension"/>
+	<xs:attributeGroup name="SubjectGroupDataAttributeExtension"/>
+	<xs:attributeGroup name="SubjectDataAttributeExtension"/>
+	<xs:attributeGroup name="StudyEventDataAttributeExtension"/>
+	<xs:attributeGroup name="FormDataAttributeExtension"/>
+</xs:schema>

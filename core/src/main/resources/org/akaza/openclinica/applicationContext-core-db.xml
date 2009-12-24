@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans
+    xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                        http://www.springframework.org/schema/beans/spring-beans-2.5.xsd"
+    >
+
+    <!-- 
+    <bean id="testDao" class="org.akaza.openclinica.dao.test.TestDao">
+        <property name="jdbcTemplate">
+            <ref bean="jdbcTemplate"/>
+        </property>
+    </bean>
+
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate" autowire="byName">
+     <property name="dataSource">
+            <ref bean="ds"/>
+        </property>
+    </bean>
+     -->
+
+    <bean id="liquibase" class="liquibase.spring.SpringLiquibase">
+      <property name="dataSource" ref="dataSource" />
+      <property name="changeLog" value="classpath:migration/master.xml" />
+    </bean>
+
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+        p:driverClassName="s[driver]"
+        p:maxActive="50" p:maxIdle="2"
+        p:maxWait="180000"
+        p:removeAbandoned="true"
+        p:removeAbandonedTimeout="300"
+        p:logAbandoned="true"
+        p:testWhileIdle="true"
+        p:testOnReturn="true"
+        p:timeBetweenEvictionRunsMillis="300000"
+        p:minEvictableIdleTimeMillis="600000"
+        p:url="s[url]"
+        p:username="s[username]"
+        p:password="s[password]"
+        />
+
+</beans>

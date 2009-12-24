@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<queries>
+	<query>
+		<name>findByPK</name>
+		<sql>select * from site_event_definition_crf where site_event_definition_crf_id=?</sql>
+	</query>
+	<query>
+		<name>findAll</name>
+		<sql>select * from site_event_definition_crf</sql>
+	</query>
+	<query>
+		<name>create</name>
+		<sql>insert into site_event_definition_crf (site_event_definition_crf_id, event_definition_crf_id,
+			study_id, update_id, date_updated, required_crf, double_entry, default_version_id,
+			electronic_signature, hide_crf, selected_version_ids, source_data_verification_code)
+			values (?,?,?,?,sysdate,?,?,?,?,?,?,?)
+		</sql>
+	</query>
+	<query>
+		<name>update</name>
+		<sql>update site_event_definition_crf set event_definition_crf_id=?, study_id=?,
+			update_id=?, date_updated=?, required_crf=?, double_entry=?, default_version_id=?,
+			electronic_signature=?, hide_crf=?, selected_version_ids=?, source_data_verification_code=?
+			where site_event_definition_crf_id=?
+	    </sql>
+	</query>
+	<query>
+		<name>getCurrentPK</name>
+		<sql>
+			SELECT currval('site_event_definition_crf_site_event_definition_crf_id_seq') AS key;
+		</sql>
+	</query>
+	<query>
+		<name>getNextPK</name>
+		<sql>
+			SELECT nextval('site_event_definition_crf_site_event_definition_crf_id_seq') AS key;
+		</sql>
+	</query>
+	<query>
+		<name>findBySiteIdAndEventDefinitionCRFId</name>
+		<sql>select * from site_event_definition_crf sedc
+			where sedc.study_id = ?	and sedc.event_definition_crf_id = ?
+		</sql>
+	</query>
+	<query>
+		<name>findAllBySiteIdAndStudyEventDefinitionId</name>
+		<sql>select * from site_event_definition_crf sedc, event_definition_crf edc
+			where sedc.study_id = ?	and edc.study_event_definition_id = ?
+			and sedc.event_definition_crf_id = edc.event_definition_crf_id
+		</sql>
+	</query>
+</queries>

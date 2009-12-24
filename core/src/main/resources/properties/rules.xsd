@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:element name="RuleImport">
+        <xs:annotation>
+            <xs:documentation> The top level root element. Allows the definition of default values
+                for all nested bean definitions. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="RuleAssignment" maxOccurs="unbounded"/>
+                <xs:element ref="RuleDef" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="RuleAssignment" type="RuleAssignmentType"/>
+    <xs:complexType name="RuleAssignmentType">
+        <xs:sequence>
+            <xs:element ref="Target"/>
+            <xs:element ref="RuleRef" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="RuleRef" type="RuleRefType"/>
+    <xs:complexType name="RuleRefType">
+        <xs:sequence>
+            <xs:element ref="DiscrepancyNoteAction" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="EmailAction" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="RuleRefAttributeType"/>
+    </xs:complexType>
+
+    <xs:element name="RuleDef" type="RuleDefType"/>
+    <xs:complexType name="RuleDefType">
+        <xs:sequence>
+            <xs:element name="Description" type="xs:string"/>
+            <xs:element name="Expression" type="TargetType"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="RuleDefAttributeType"/>
+    </xs:complexType>
+
+    <xs:element name="DiscrepancyNoteAction" type="DiscrepancyNoteActionType"/>
+    <xs:complexType name="DiscrepancyNoteActionType">
+        <xs:sequence>
+            <xs:element name="Message" type="xs:string"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="DiscrepancyNoteActionAttributeType"/>
+    </xs:complexType>
+    
+    <xs:element name="EmailAction" type="EmailActionType"/>
+    <xs:complexType name="EmailActionType">
+        <xs:sequence>
+            <xs:element name="Message" type="xs:string"/>
+            <xs:element name="To" type="xs:string"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="DiscrepancyNoteActionAttributeType"/>
+    </xs:complexType>
+
+    <xs:attributeGroup name="DiscrepancyNoteActionAttributeType">
+        <xs:attribute name="IfExpressionEvaluates" type="xs:string"/>
+    </xs:attributeGroup>
+
+    <xs:attributeGroup name="RuleRefAttributeType">
+        <xs:attribute name="OID" type="xs:string" use="required"/>
+    </xs:attributeGroup>
+
+    <xs:attributeGroup name="RuleDefAttributeType">
+        <xs:attribute name="OID" type="xs:string" use="required"/>
+        <xs:attribute name="Name" type="xs:string"/>
+    </xs:attributeGroup>
+
+    <xs:element name="Target" type="TargetType"/>
+    <xs:complexType name="TargetType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="Context" type="contextType" use="optional"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:simpleType name="contextType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="OC_RULES_V1"/>
+        </xs:restriction>
+    </xs:simpleType>
+</xs:schema>

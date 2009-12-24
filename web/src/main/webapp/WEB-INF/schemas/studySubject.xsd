@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://openclinica.org/ws/studySubject/v1"
+    xmlns:studySubjects="http://openclinica.org/ws/studySubject/v1" 
+    xmlns:beans="http://openclinica.org/ws/beans"
+    elementFormDefault="qualified">
+    
+    <import namespace="http://openclinica.org/ws/beans" schemaLocation="beans.xsd"></import>
+
+    <element name="createRequest">
+        <complexType>
+            <sequence>
+                <element name="studySubject" type="beans:studySubjectType" maxOccurs="unbounded"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <element name="createResponse">
+        <complexType>
+            <sequence>
+                <element name="result" type="string"/>
+                <element name="label" type="string"/>
+                <element name="warning" type="string" minOccurs="0" maxOccurs="unbounded"/>
+                <element name="error" type="string" minOccurs="0" maxOccurs="unbounded"/>
+            </sequence>
+        </complexType>
+    </element>
+
+</schema>

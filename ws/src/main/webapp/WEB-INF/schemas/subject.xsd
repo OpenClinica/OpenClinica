@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://openclinica.org/ws/subject/v1"
+    xmlns:subjects="http://openclinica.org/ws/subject/v1" 
+    xmlns:beans="http://openclinica.org/ws/beans"
+    elementFormDefault="qualified">
+    
+    <import namespace="http://openclinica.org/ws/beans" schemaLocation="beans.xsd"></import>
+    
+    <element name="creatRequest">
+        <complexType>
+            <sequence>
+                <element name="subject" type="beans:subjectType"/>
+                <element name="study" type="beans:studyRefType"/>
+            </sequence>
+        </complexType>
+    </element>
+    
+    <element name="creatResponse">
+        <complexType>
+            <sequence>
+                <element name="result" type="string"/>
+            </sequence>
+        </complexType>
+    </element>
+   <!--
+    <complexType name="SubjectType">
+        <sequence>
+            <element name="personId" type="subjects:customStringType" minOccurs="0"/>
+            <element name="studySubjectId" type="subjects:customStringType"/>
+            <element name="secondaryId" type="subjects:customStringType" minOccurs="0"/>
+            <element name="enrollmentDate" type="date"/>
+            <element name="sex" type="subjects:genderType" minOccurs="0" />
+            <choice minOccurs="0">
+                <element name="dateOfBirth" type="date"/>
+                <element type="subjects:customDateType" name="yearOfBirth"  />
+            </choice>
+        </sequence>
+    </complexType>
+
+    <complexType name="StudyType">
+        <attribute name="uniqueIdentifier" type="subjects:customStringType"/>
+    </complexType>
+    
+    <simpleType name="genderType">
+        <restriction base="string">
+            <enumeration value="m"/>
+            <enumeration value="f"/>
+        </restriction>
+    </simpleType>
+    
+    <simpleType name="customStringType">
+        <restriction base="normalizedString">
+            <minLength value="1"/>
+            <whiteSpace value="collapse"/> 
+        </restriction>
+    </simpleType>
+    
+    <simpleType name="customDateType">
+        <restriction base="integer">
+            <pattern value="[1-2][0-9][0-9][0-9]"></pattern>
+            <whiteSpace value="collapse"/> 
+        </restriction>
+    </simpleType>
+    -->
+</schema>

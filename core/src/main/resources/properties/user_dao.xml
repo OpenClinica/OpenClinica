@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<queries>
+	<query>
+		<name>userInsertQuery</name>
+		<sql>INSERT INTO USER (USER_ID, USER_NAME, USER_PASS) VALUES (USER_SEQ.NEXTVAL,?,?)</sql>
+	</query>
+	<query>
+		<name>userSelectQuery</name>
+		<sql>SELECT USER_NAME, USER_EMAIL, PERSON_ID FROM PERSON_USER</sql>
+	</query>
+	<query>
+		<name>userSelectQueryByProject</name>
+		<sql>SELECT USER_NAME, USER_EMAIL, PERSON_ID FROM PERSON_USER WHERE DEFAULT_PROJ=?</sql>
+	</query>
+</queries>

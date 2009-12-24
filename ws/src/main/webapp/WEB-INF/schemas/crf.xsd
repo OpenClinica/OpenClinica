@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+        targetNamespace="http://openclinica.org/ws/crf/v1"
+        xmlns:crf="http://openclinica.org/ws/crf/v1" 
+        xmlns:xmime="http://www.w3.org/2005/05/xmlmime" elementFormDefault="qualified">
+
+
+    <element name="createCrfRequest" type="crf:CrfType"/>
+    
+    <element name="createCrfResponse">
+        <complexType>
+            <sequence>
+                <element name="result" type="string"/>
+                <element name="key" type="string"/>
+                <element name="warning" type="string" minOccurs="0" maxOccurs="unbounded"/>
+                <element name="error" type="string" minOccurs="0" maxOccurs="unbounded"/>
+            </sequence>
+        </complexType>
+    </element>
+    
+    <complexType name="CrfType">
+        <sequence>
+            <element name="fileName" type="string"/>
+            <element name="file" type="base64Binary" xmime:expectedContentTypes="application/xls"/>
+        </sequence>
+    </complexType>
+    
+</schema>

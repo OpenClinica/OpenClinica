@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<queries>
+	<query>
+		<name>findByPK</name>
+		<sql>SELECT * FROM study_parameter WHERE 
+		study_parameter_id = ?</sql>
+	</query>
+	<query>
+		<name>findByStudyAndHandle</name>
+		<sql>
+			select spv.* from study_parameter_value spv, study_parameter sp
+			where spv.study_id=? and sp.handle=?
+			and spv.parameter= sp.handle
+		</sql>
+	</query>
+	<query>
+	 <name>
+		findParameterByHandle
+	 </name>	
+	 <sql>
+		select * from study_parameter where handle=?
+	 </sql>
+	</query>
+	<query>
+		<name>findAllParameters</name>
+		<sql>SELECT * FROM study_parameter
+		</sql>
+	</query>
+	<query>
+		<name>findAllParameterValuesByStudy</name>
+		<sql>select * from study_parameter_value where study_id=?
+		</sql>
+	</query>
+	<query>
+		<name>create</name>
+		<sql>INSERT INTO study_parameter_value (study_id,
+               value,parameter) 
+		VALUES (?,?,?)</sql>
+	</query>
+	<query>
+		<name>update</name>
+		<sql>UPDATE study_parameter_value
+			 SET  value=?
+			 WHERE study_id=? and parameter=?
+		</sql>
+	</query>
+	<query>
+		<name>findParamConfigByStudy</name>
+		<sql>select spv.*, sp.* 
+			from study_parameter sp, study_parameter_value spv
+            where spv.study_id=? and sp.handle = spv.parameter</sql>
+	</query>
+</queries>

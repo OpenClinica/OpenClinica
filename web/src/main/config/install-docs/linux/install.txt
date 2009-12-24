@@ -1,0 +1,366 @@
+OPENCLINICA INSTALLATION GUIDE for RED HAT LINUX
+OpenClinica Version 3.0
+Document Version 1.0 
+--------------------------------------------------------------
+Updated: September 18, 2009 smartin@akazaresearch.com, pgalvin@akazaresearch.com
+
+This installation guide assumes that OpenClinica will be installed on a Linux-based server running Redhat ES 5 or compatible.
+
+Please contact contact@akazaresearch.com for services to assist with on-site or remote installation, validation and QA testing of OpenClinica to assure complete deployment.
+
+OpenClinica 3.0 can be configured to run on Oracle (NOT PART OF THIS ALPHA RELEASE).  Please go to http://www.openclinica.org/dokuwiki/doku.php?id=ocoracleinstall:start for instructions on how to configure Oracle for OpenClinica 3.0
+
+
+About OpenClinica
+------------------------------------------------------
+
+OpenClinica: Open Source Software Platform for Managing Clinical Research Studies Professional Open Source Solutions for the Clinical Research Enterprise
+
+OpenClinica is a free, open source clinical trial software platform for Electronic Data Capture (EDC) clinical data management in clinical research. The software is web-based and designed to support all types of clinical studies in diverse research settings. From the ground up, OpenClinica is built on leading independent standards to achieve high levels of interoperability. Its modular architecture and transparent, collaborative development model offer outstanding flexibility while supporting a robust, enterprise-quality solution.
+
+More about OpenClinica: http://www.OpenClinica.org [^]
+
+Software License
+
+OpenClinica is distributed under the GNU Lesser General Public License (GNU LGPL). For details see: http://www.openclinica.org/license [^] or LICENSE.txt distributed with this distribution.
+
+
+Installation Summary
+--------------------------------------------------------------
+OpenClinica runs and depends on several external applications: Sun's Java Development Kit, Apache Jakarta's Tomcat Servlet Container, and the Postgres Relational Database. (NOTE: Building the PostgreSQL server from source as described in this document, requires gcc and its dependent libraries to be installed).
+
+<as user>Means to run the following commands using a normal unprivileged account (not root)
+<as root>Means to run the following commands using the superuser account
+<as tomcat>Means to run the following commands using the tomcat user
+<as postgres>Means to run the following commands using the postgres user
+NOTE: You probably will not know the tomcat or postgres passwords unless you explicitly set them. To login as one of these users without the password, you can login as root and then su - tomcat or su - postgres (note the dash between the su command and the user name, if you don't include that dash you will get a 'could not change directory to *username* error)
+
+NOTE: The software stack OpenClinica runs on is open source, and most open source projects release minor versions and revisions often. Sometimes only a matter of weeks may separate the release of two adjacent versions of the software. For this release, the latest stable version of each component was used in integrated testing, and its revision number is referenced in this document. In some cases, the revision number mentioned may no longer be available. For the most part, you should be able to use later minor versions and revisions of the same software without incident. For instance, if the install guide uses PostgreSQL 8.3.6, PostgreSQL 8.2.1 should work as well. We recommend that you record the revision number you use. If you have concerns about a particular combination, please post your question to the users@openclinica.org mailing list.
+
+NOTE: This installation guide is intended to get OpenClinica up and running as easily as possible on a Linux server. It does not go into details for development of OpenClinica from the source code. This information will be available soon, and will cover setting up Apache Ant and Eclipse.
+
+*) Install Java 2 SDK 1.6 Update 16
+*) Install Tomcat 6.0.20
+*) Install PostgreSQL 8.4.1
+*) Install OpenClinica 3.0
+*) Configure OpenClinica 3.0
+
+Install Java 2 SDK 1.6 Update 16
+--------------------------------------------------------------
+Installing Java might not be required since many systems already have a Java SDK installed. If you are unsure, or the system only has the Java run-time environment (JRE), please install this JDK. Your previous installation will still be available.
+
+If you want to download the SDK from the website please go to:
+https://cds.sun.com/is-bin/INTERSHOP.enfinity/WFS/CDS-CDS_Developer-Site/en_US/-/USD/ViewProductDetail-Start?ProductRef=jdk-6u16-oth-JPR@CDS-CDS_Developer 
+Select Linux as a Platform, and check the box next to I agree to the Java Development Kit 6.0 License Agreement and click on Continue
+Then click on the  jdk-6u16-linux-i586.bin (not the RPM.BIN) link to start the download and save it to your disk.
+
+After you download it run the following commands <as user>:
+open a terminal
+cd TO SAVE LOCATION OF DOWNLOADED FILE
+sh jdk-6u16-linux-i586.bin
+Read the license by pressing the spacebar until you get to bottom of screen, it will then rquire you to type "yes" and hit enter to extract
+<as root >
+mv  jdk1.6.0_16 /usr/local/ 
+cd /usr/local/
+ln -s jdk1.6.0_16 java
+echo "export JAVA_HOME=/usr/local/java" >> /etc/profile
+
+
+Install OpenClinica 3.0 Package
+----------------------------------------------------
+Create a user account and download OpenClinica 3.0 from 
+http://www.openclinica.org/section.php?sid=3
+
+<as user>
+cd TO SAVE LOCATION OF DOWNLOADED FILE
+tar -xzvf OpenClinica-3.0.tar.gz
+<as root>
+mkdir /usr/local/oc
+mv OpenClinica-3.0 /usr/local/oc/
+
+Install Apache Tomcat 6.0.20
+--------------------------------------------------------------
+Next, download the binary files of Tomcat and extract the file. Create a user called tomcat. As root, put it in a system directory and set the $CATALINA_HOME environment variable to point to the install directory. The specific steps for doing this are listed below:
+
+<as root>
+/usr/sbin/adduser tomcat
+/usr/sbin/groupadd developers
+gpasswd -a tomcat developers
+<as tomcat>
+cd /home/tomcat
+Download the Core Binary from http://tomcat.apache.org/download-60.cgi 
+tar -zxvf apache-tomcat-6.0.20.tar.gz
+<as root>
+mv /home/tomcat/apache-tomcat-6.0.20 /usr/local/
+cd /usr/local
+ln -s apache-tomcat-6.0.20 tomcat
+echo "export CATALINA_HOME=/usr/local/tomcat" >> /etc/profile
+
+To install Tomcat as a standalone service (one that stops and starts with the system) you must install a daemon. 
+
+<as root>
+cp /usr/local/oc/OpenClinica-3.0/install-docs/linux/tomcatd /etc/init.d/
+cd /etc/init.d
+chmod 755 tomcatd
+/sbin/chkconfig --del tomcatd
+/sbin/chkconfig --add tomcatd
+<exit and reboot your system>
+
+You can manually stop and start tomcat with these scripts.
+/usr/local/tomcat/bin/shutdown.sh
+/usr/local/tomcat/bin/startup.sh
+
+You can verify that tomcat is running by checking 
+http://localhost:8080 
+
+NOTE: If you are having difficulty getting the daemon to run at startup, assert that the line endings of the tomcatd file are the proper UNIX line terminators.
+
+More detailed installation instructions for Apache Tomcat can be found at http://jakarta.apache.org/tomcat/tomcat-5.5-doc/setup.html.
+
+Install PostgreSQL 8.4.1
+--------------------------------------------------------------
+This installion assumes that the development libraries are properly installed, including gcc and make.For more information about installation please check the file called INSTALL after extracting the tar file. 
+
+NOTE: Many Linux distributions come with postgres already installed. For those systems you can probably skip this section and go to "Create the OpenClinica Database". You will need to modify those commands to fit your postgres installation.
+
+Go to http://svn.akazaresearch.com/oc/software/OpenClinica-3.0/linux
+
+<as user>
+cd TO SAVE LOCATION OF DOWNLOADED FILE
+tar -zxvf postgresql-8.4.1.tar.gz
+cd postgresql-8.4.1
+./configure
+make
+<as root>
+make install
+/usr/sbin/adduser postgres (if you have installed an older version of postgres the user might already exist)
+gpasswd -a postgres developers
+mkdir /usr/local/pgsql/data
+chown postgres /usr/local/pgsql/data
+echo "export PGDATA=/usr/local/pgsql/data" >> /etc/profile
+
+Now setup postgres to run as a daemon
+
+<as root>
+cd /etc/init.d
+cp /usr/local/oc/OpenClinica-3.0/install-docs/linux/postgresqld /etc/init.d/postgresql
+Type "y" to confirm the overwrite of postgresql
+chmod 755 postgresql
+/sbin/chkconfig --levels 2345 postgresql on
+<exit and reboot your system>
+Check if postmaster is running, you should see several postgres processes
+<as root>
+ps -A | grep postmaster
+
+NOTE: If you are having difficulty getting the daemon to run at startup, assert that the line endings of the postgresqld file are the proper UNIX line terminators.
+More detailed installation instructions for Postgres can be found at http://www.postgresql.org/docs/8.4/interactive/index.html.
+
+Create the Clinica User and openclinica Database
+--------------------------------------------------------------
+<as postgres>
+/usr/local/pgsql/bin/psql -f /usr/local/oc/OpenClinica-3.0/config/database/PostgreSQL/3.0/install/create_User_and_db_3.0.sql
+
+NOTE: This step will fail if the clinica user has already been created. In this case you can skip this step.
+
+
+Create Directory Structure
+--------------------------------------------------------------
+<as tomcat>
+mkdir /usr/local/tomcat/openclinica.data/
+
+NOTE: Make sure the tomcat user has read and write permissions on this directory. 
+
+This path is required for saving uploaded CRFs and archived dataset files. 
+Also, it is the home for the CRF spreadsheet template.
+
+Once the application is deployed and operational, the system will create additional files and directories within this one. The final CRF and dataset file structure will be like the following:
+	+---filePath
+	+---crf                                 -  crf  blank template (CRF_Design_Template.xls )
+	      +---new                           -  crf verion templates reorganized by system (.xls)
+	      +---original                      - crf original templates uploaded from user's local machine (.xls)
+	+---datasets
+	    +---21                              - dataset files (.txt, .dat, .sps)
+	    +---22                              - dataset files (.txt, .dat, .sps)
+	    +---25                              - dataset files (.txt, .dat, .sps)
+	    +---etc.                            - dataset files (.txt, .dat, .sps)
+	+---rules
+	    +---original                        - rules original xml files.
+
+The folders 'new', 'original', 'rules' and 'datasets' will be created by OpenClinica application if they don't exist on the server. 
+
+NOTE: Make sure the tomcat user has write permissions on all of these directories.
+
+***OpenClinica Configuration Files - datainfo.properties
+--------------------------------------------------------------
+The next step is to copy the configuration files and the web application file (war) to the tomcat folders. Since tomcat is running, it will "hot-deploy" the application, creating the rest of the web application file structure.
+
+<as tomcat>
+cp /usr/local/oc/OpenClinica-3.0/distribution/OpenClinica.war /usr/local/tomcat/webapps 
+NOTE: If you do not see the expanded file structure after a minute (/usr/local/tomcat/webapps/OpenClinica), you can manually deploy the war file using the Tomcat Manager (http://localhost:8080/manager/html) 
+
+There is one configuration files that needs to be changed.
+
+Edit /usr/local/tomcat/webapps/OpenClinica/WEB-INF/classes/datainfo.properties and change the properties to suit your server environment as needed.  The initial datainfo.properties file looks something like this:
+
+###############################################################
+# 1- filePath
+#
+# File Path is the string which declares the
+# repository for all uploaded and generated
+# files in the system, including CRFs and
+# data sets.  The directory should NOT be
+# accessible by the web server.
+#
+# REQUIRED.  Note the difference between
+# Windows and Linux file systems.
+###############################################################
+#filePath=c:\\tomcat5.5\\openclinica.data\\
+filePath=/usr/local/tomcat/openclinica.data/
+###############################################################
+# 2- Database Configuration
+#
+# Data Base is a text string which declares
+# which type of database the system is using
+# on the back end.
+# REQUIRED.  Default is 'postgres', 'oracle' is also an option.
+###############################################################
+username=clinica
+password=clinica
+url=jdbc:postgresql://localhost:5432/openclinica
+#url=jdbc:oracle:thin:@localhost:1521:XE
+dataBase=postgres
+#dataBase=oracle
+driver=org.postgresql.Driver
+#driver=oracle.jdbc.driver.OracleDriver
+hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+#hibernate.dialect=org.hibernate.dialect.OracleDialect
+# Maven Only 
+changeLogFile=src/main/resources/migration/master.xml
+
+filePath: The path that files will be written to in the course of daily operations.  Note that this is a separate directory because the webapps/OpenClinica directory can be erased and rebuilt when you deploy a new version of the system.  This directory will hold sensitive information such as CRFs, datasets, etc. so it should be on a secured machine. This directory, and its structure, must be preserved during any backup/restore operations, along with the application database.
+
+export data file path:  Export Data File Path is the string which (optionally) declares a specific file path for file extracts to be saved.  Note that if it is set, files from Jobs only will be saved to two places: this directory and under the above file path declared in the 'filePath' property. NOT REQUIRED.  Please comment out if you want Jobs to generate one file/files only, in the directory structure under 'filePath'.
+
+dataBase configuration: Currently 'postgres' is the default database; There is an option for an 'oracle' version of OpenClinica 3.0.  Please make sure this information is correct by commenting and uncommenting out information.
+
+passwd_expiration_time: Number of days before you are prompted to change your password.  Lower numbers (30, 60, 90) will encourage users to change their passwords more often.
+
+auth_mode: Currently only 'password' will work; you will be able to add other authentication modes in the future, including 'ldap'.
+
+user_account_notification:  Can be either 'email' or 'admin'.  If it is 'email' the system will send an email to new users, notifying them that an account has been created for them.  If it is 'admin', then the system will not send an email and the administrator will have to contact the user personally to let them know that they have an account.
+
+Spring Based Email System: The current email SMTP host that you will use to relay outgoing emails to the users of the system.  Usually it is on another machine and will not be 'localhost'. 
+NOTE: You must configure the smtp host correctly, or the system will hang when trying to send email notifications. If you don't want to use outgoing mail features, a workaround would be to set this value to a mail server with a short timeout. This has been noted a a Known Issue and will be resolved in a future release.
+
+adminEmail: The reply email address used in the emails to users of the system.
+
+sysURL:  The web address for the system.  It can either be an external address (demo.openclinica.org) or an internal IP address (192.168.2.000).
+NOTE: If you reconfigure the address or port in some later step, such as by configuring SSL, you will need to come back and update this file. You will also need to restart tomcat for changes to this take effect.
+
+supportURL: The Support URL is included in the support button that appears in the top right corner. By including the URL here we will be able to configure it depending on the adopter. This is a required field.
+
+change_passwd_required: Indiates whether users are forced to change their password when it expires. (NOTE: the first time a user logs into the system, the password is considered expired.)
+
+show_unique_id: Show Unique ID is a flag where we allow a column in Extract Data to display the global ID for a subject in a study. REQUIRED. Default is 1 (display), or 0 (not display).  
+
+max_inactive_interval: This is maximum time interval between client requests. That is, if users leave any page open without sending request to server, after this time interval, when users attempt sending request they will be directed to login page.
+
+
+The next settings are for your facility's name, address, state, etc that will be treated as the 'default' location and contact information for users and subjects.
+
+	FacName=Default GCRC
+	FacCity=Boston
+	FacState=MA
+	FacZIP=02139
+	FacCountry=USA
+	FacContactName=John Smith
+	FacContactDegree=PhD, MD
+	FacContactPhone=617-123-1234
+	FacContactEmail=aaa@aaa.org
+	
+	ra=Data_Entry_Person
+	investigator=Investigator
+	director=Study_Director
+	coordinator=Study_Coordinator
+	monitor=Monitor
+	
+User Role Information:  Leave these values alone.
+
+Quartz Scheduler Configuration: Configure the Scheduler to run asynchronous jobs.
+
+Attached File Location: Location for files if item data type is "file". If it has been kept empty, "filePath" will be used as attached file location.
+
+log.dir: Will configure the location of the log files as well as the prefix of the log file names.
+
+News/About: OpenClinica can be configured to receive an RSS feed on the login page.  If you do not want an RSS feed to the right of the login box, enter any information in the about.text1 and about.text2 fields
+
+
+Restart Tomcat
+-------------------------------------------------------------
+NOTE: You will need to restart tomcat for these changes to take effect.
+NOTE: RESTARTING TOMCAT IS VERY IMPORTANT (to restart tomcat, try the following commands:
+<as root>
+/etc/init.d/tomcatd restart
+
+NOTE: /etc/init.d/tomcatd performs an su to tomcat to run the following commands:
+
+/usr/local/tomcat/bin/shutdown.sh
+/usr/local/tomcat/bin/startup.sh
+
+These commands should never be run directly by root, only by tomcat.
+
+At this point it is a good idea to check the web application to see if it deployed properly, and can make a database connection. Open a web browser on the system and go to http://<hostname>:8080/OpenClinica, you should see the OpenClinica login page. Login with the username "root" and the password "12345678". If you are unable to login, you either could not make a connection to the database, or the database is missing information. The Tomcat logs in /usr/local/tomcat/logs are a good source for additional information.
+
+
+Configure HTTPS
+--------------------------------------------------------------
+Akaza Research strongly recommends securing the Tomcat application server using SSL. SSL is the technology used to make secured 'https://' connections. SSL requires a third-party security certificate to be effective. For more information, please contact@akazaresearch.com regarding our Enterprise services.
+
+
+Verify System Environment
+--------------------------------------------------------------
+The following set of tasks must be conducted to ensure the system is setup correctly.
+
+1. First make sure Tomcat is running and properly configured in Linux:
+	Open a web browser on the system and go to http://<hostname>:8080/, you should see the Tomcat home page.
+	<as tomcat>
+	env | grep CATALINA_HOME
+	<this should return /usr/local/tomcat>
+
+2. Make sure Postgres is running:
+	<as postgres>
+	ps aux | grep postmaster
+	<this should show one or more postmaster processes>
+
+3. Verify Tomcat deployed the web application.
+	Check $CATALINA_HOME/webapps for an OpenClinica directory.
+	
+4. Test in browser.
+	On the server, if browser is installed, go to http://<hostname>:8080/OpenClinica
+	Next, go to https://<hostname>/OpenClinica from a browser on a different machine.
+
+5. Login.
+	Login with the username "root" and the password "12345678". Please change this password as soon as you log in. The root user will be assigned a default project called "default". Create a technical admininstrator login for youself and secure the password for the default root user. Create user accounts, you will want to create at least one Study Coordinator.
+
+	Refer users to the OpenClinica Quick Start for insructions on using the application.
+
+Validation and Testing
+--------------------------------------------------------------
+Please contact contact@akazaresearch.com for services to assist with on-site or remote installation, validation and quality assurance services for OpenClinica.
+
+Developer and Contact Information
+--------------------------------------------------------------
+Akaza Research, based in Cambridge, MA, provides clinical trials informatics solutions based on OpenClinica, the world's most widely used open source clinical trials software.
+
+Akaza Research
+One Kendall Square
+Bldg. 400, 4th Floor
+Cambridge, MA 02139
+phone: 617.621.8585
+fax: 617.621.0065
+email: contact@akazaresearch.com
+
+For more about Akaza’s products and services see:
+http://www.akazaresearch.com/ [^]
+and
+http://www.OpenClinica.org/ [^]

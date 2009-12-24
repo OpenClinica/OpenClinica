@@ -1,0 +1,1 @@
+Please refer to https://www.openclinica.org/dokuwiki/doku.php?id=publicwiki:i18n3.0 for information on the language files.

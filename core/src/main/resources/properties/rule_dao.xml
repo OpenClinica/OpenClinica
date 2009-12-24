@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<queries>
+	<query>
+		<name>findByPK</name>
+		<sql>SELECT * FROM RULE WHERE RULE_ID = ?</sql>
+	</query>
+	<query>
+		<name>findByOid</name>
+		<sql>SELECT * FROM RULE WHERE OC_OID = ?</sql>
+	</query>
+	<query>
+		<name>findByRuleSet</name>
+		<sql>SELECT * FROM RULE WHERE RULESET_ID = ?</sql>
+	</query>
+	<query>
+		<name>findAll</name>
+		<sql>SELECT * FROM RULE</sql>
+	</query>
+	<query>
+		<name>getCurrentPK</name>
+		<sql>select currval('rule_rule_id_seq') as key</sql>
+	</query>
+	<query>
+		<name>delete</name>
+		<sql>delete FROM RULE where RULE_ID=?</sql>
+	</query>
+	<query>
+		<name>create</name>
+		<sql>
+			INSERT INTO RULE
+			(name,description,oc_oid,enabled,RULE_EXPRESSION_ID,OWNER_ID,status_id,DATE_CREATED)
+			VALUES (?,?,?,?,?,?,?,NOW())
+		</sql>
+	</query>
+	<query>
+		<name>update</name>
+		<sql>
+			UPDATE RULE SET 
+			NAME=? , 
+			DESCRIPTION=? ,
+			DATE_UPDATED=NOW() , UPDATE_ID=?
+			WHERE RULE_ID=?
+		</sql>
+	</query>
+</queries>

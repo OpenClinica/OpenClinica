@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<queries>
+	<query>
+		<name>findByPK</name>
+		<sql>SELECT * FROM STUDY WHERE STUDY_ID = ?</sql>
+	</query>
+	<query>
+		<name>findAll</name>
+		<sql>SELECT * FROM STUDY</sql>
+	</query>
+	<query>
+		<name>updateStepOne</name>
+		<sql>UPDATE STUDY SET PARENT_STUDY_ID=?, NAME=?, LABEL=?, 
+		PRINCIPAL_INVESTIGATOR=?, OBJECTIVE=?, DATE_PLANNED_START=?,
+		DATE_PLANNED_END=?, FACILITY_NAME=?, FACILITY_CITY=?,
+		FACILITY_STATE=?, FACILITY_ZIP=?, FACILITY_COUNTRY=?, 
+		FACILITY_RECRUITMENT_STATUS=?, FACILITY_CONTACT_NAME=?,
+		FACILITY_CONTACT_DEGREE=?, FACILITY_CONTACT_PHONE=?,
+		FACILITY_CONTACT_EMAIL=?, STATUS_ID=?, 
+		OWNER_ID=?, DATE_UPDATED=?, OWNER_ID=? WHERE STUDY_ID=?</sql>
+	</query>
+	<query>
+		<name>findNextKey</name>
+		<sql>select s_study.nextval as key from dual</sql>
+	</query>
+	<query>
+		<name>createStepOne</name>
+		<sql>INSERT INTO STUDY (STUDY_ID, PARENT_STUDY_ID, NAME, LABEL, 
+		PRINCIPAL_INVESTIGATOR, OBJECTIVE, DATE_PLANNED_START,
+		DATE_PLANNED_END, FACILITY_NAME, FACILITY_CITY, FACILITY_STATE,
+		FACILITY_ZIP, FACILITY_COUNTRY, FACILITY_RECRUITMENT_STATUS,
+		FACILITY_CONTACT_NAME, FACILITY_CONTACT_DEGREE, FACILITY_CONTACT_PHONE,
+		FACILITY_CONTACT_EMAIL, STATUS_ID, DATE_CREATED, OWNER_ID) 
+		VALUES (?,
+		?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)</sql>
+	</query>
+	<query>
+		<name>createStepTwo</name>
+		<sql>UPDATE STUDY SET TYPE_ID=?, PROTOCOL_DESCRIPTION=?, 
+		PROTOCOL_DATE_VERIFICATION=?, PHASE=?, EXPECTED_TOTAL_ENROLLMENT=?,
+		GENETIC=?, SPONSOR=?, COLLABORATORS=?, MEDLINE_IDENTIFIER=?, URL=?,
+		URL_DESCRIPTION=?, CONDITIONS=?, KEYWORDS=?, ELIGIBILITY=?, 
+		GENDER=?, AGE_MAX=?, AGE_MIN=?, HEALTHY_VOLUNTEER_ACCEPTED=?
+		WHERE STUDY_ID=?</sql>
+	</query>
+	<query>
+		<name>createStepThree</name>
+		<sql>UPDATE STUDY SET PURPOSE=?, ALLOCATION=?, MASKING=?,
+		CONTROL=?, ASSIGNMENT=?, ENDPOINT=?, INTERVENTIONS=? WHERE
+		STUDY_ID=?</sql>
+	</query>
+	<query>
+		<name>createStepFour</name>
+		<sql>UPDATE STUDY SET DURATION=?, SELECTION=?, TIMING=? WHERE
+		STUDY_ID=?</sql>
+	</query> 
+</queries>

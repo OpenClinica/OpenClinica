@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<queries>
+	<query>
+		<name>findByPK</name>
+		<sql>SELECT * FROM RULE_SET_RULE WHERE 
+		RULE_SET_RULE_ID = ?</sql>
+	</query>
+	<query>
+        <name>findByRuleSetId</name>
+        <sql>SELECT * FROM RULE_SET_RULE WHERE 
+        rule_set_id = ?</sql>
+    </query>
+    <query>
+        <name>findByRuleSetIdAndRuleId</name>
+        <sql>SELECT * FROM RULE_SET_RULE WHERE 
+        rule_set_id = ? AND status_id=? and rule_id= ?</sql>
+    </query>
+	<query>
+		<name>getCurrentPK</name>
+		<sql> select currval('rule_set_rule_rule_set_rule_id_seq') as key</sql>
+	</query>
+	<query>
+		<name>findAll</name>
+		<sql>SELECT * FROM RULE_SET_RULE</sql>
+	</query>
+	<query>
+		<name>delete</name>
+		<sql>delete FROM RULE_SET where RULE_SET_ID=?</sql>
+	</query>
+	<query>
+		<name>create</name>
+		<sql>INSERT INTO RULE_SET_RULE (RULE_SET_ID, RULE_ID, 
+		 OWNER_ID,status_id,DATE_CREATED) 
+		VALUES (?,?,?,?,NOW())</sql>
+	</query>
+	<query>
+        <name>updateStatusByRuleSet</name>
+        <sql>
+            UPDATE RULE_SET_RULE
+            SET   DATE_UPDATED=NOW(),
+                  UPDATE_ID=?,
+                  STATUS_ID=?
+            WHERE RULE_SET_ID=?
+        </sql>
+    </query>
+    <query>
+        <name>updateStatusByRuleSetAuto</name>
+        <sql>
+            UPDATE RULE_SET_RULE
+            SET   DATE_UPDATED=NOW(),
+                  UPDATE_ID=?,
+                  STATUS_ID=?
+            WHERE RULE_SET_ID=? AND STATUS_ID= ?
+        </sql>
+    </query>
+    <query>
+        <name>updateStatus</name>
+        <sql>
+            UPDATE RULE_SET_RULE
+            SET   DATE_UPDATED=NOW(),
+                  UPDATE_ID=?,
+                  STATUS_ID=?
+            WHERE RULE_SET_RULE_ID=?
+        </sql>
+    </query>
+	<query>
+		<name>update</name>
+		<sql>
+			UPDATE RULE_SET
+			SET   DATE_UPDATED=NOW()
+				, UPDATE_ID=?
+			WHERE RULE_SET_ID=?
+		</sql>
+	</query>
+</queries>
