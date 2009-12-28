@@ -105,6 +105,7 @@ public class EditUserAccountServlet extends SecureController {
             // "The user could not be edited because there are no user types
             // available.",
             // Page.ADMIN_SYSTEM);
+            request.setAttribute("userName", user.getName());
             forwardPage(Page.EDIT_ACCOUNT);
         } else if (stepNum == EDIT_STEP) {
             Validator v = new Validator(request);
@@ -129,6 +130,7 @@ public class EditUserAccountServlet extends SecureController {
                 fp.addPresetValue(ARG_STEPNUM, CONFIRM_STEP);
 
                 setPresetValues(fp.getPresetValues());
+                request.setAttribute("userName", user.getName());
                 forwardPage(Page.EDIT_ACCOUNT_CONFIRM);
 
             } else {
@@ -151,6 +153,7 @@ public class EditUserAccountServlet extends SecureController {
 
                 addEntityList("userTypes", getUserTypes(), respage.getString("the_user_could_not_be_edited_because_no_user_types"), Page.ADMIN_SYSTEM);
                 setPresetValues(fp.getPresetValues());
+                request.setAttribute("userName", user.getName());
                 forwardPage(Page.EDIT_ACCOUNT);
             } else if (button.equals(resword.getString("confirm"))) {
                 user.setFirstName(fp.getString(INPUT_FIRST_NAME));

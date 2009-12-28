@@ -110,6 +110,19 @@
 
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
 	<tr>
+		<td class="table_header_column_top"><fmt:message key="user_name" bundle="${resword}"/>:</td>
+		<td valign="top">
+			<table border="0" cellpadding="0" cellspacing="0">
+				<tr>
+					<td valign="top"><div class="formfieldM_BG">
+						<c:out value="${userName}"/>
+					</div></td>
+					<td>*</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
 		<td class="table_header_column_top"><fmt:message key="first_name" bundle="${resword}"/>:</td>
 		<td valign="top">
 			<table border="0" cellpadding="0" cellspacing="0">

@@ -708,7 +708,31 @@ function displayMessageFromCheckbox(checkboxObject){
     if(checkboxObject != null && checkboxObject.checked){
         var bool =  confirm(
                 "Marking this CRF complete will finalize data entry. You will be allowed to edit the data later but this data entry stage is completed. If Double Data Entry is required, you or another user may need to complete this CRF again before it is verified as complete. Are you sure you want to mark this CRF complete?");
-        if(! bool) { checkboxObject.checked=false; }
+        if(! bool) {
+        	var checkboxObjects = document.getElementsByName(checkboxObject.name);
+        	if(checkboxObjects[0]){
+        		checkboxObjects[0].checked=false;
+        	}
+        	if(checkboxObjects[1]){
+        		checkboxObjects[1].checked=false;
+        	}
+        } else{
+		var checkboxObjects = document.getElementsByName(checkboxObject.name);
+		if(checkboxObjects[0]){
+			checkboxObjects[0].checked=true;
+		}
+		if(checkboxObjects[1]){
+			checkboxObjects[1].checked=true;
+		}
+	}
+    } else if(checkboxObject != null && !checkboxObject.checked){
+    	var checkboxObjects = document.getElementsByName(checkboxObject.name);
+	if(checkboxObjects[0]){
+		checkboxObjects[0].checked=false;
+	}
+	if(checkboxObjects[1]){
+		checkboxObjects[1].checked=false;
+	}
     }
 }
 

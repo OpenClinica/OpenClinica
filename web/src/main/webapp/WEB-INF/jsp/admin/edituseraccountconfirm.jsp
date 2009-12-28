@@ -119,8 +119,13 @@
 		<!-- Table Contents -->
 
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
-	<tr>
-	  	<td class="table_header_column_top"><fmt:message key="first_name" bundle="${resword}"/>:</td>
+    <tr>
+        <td class="table_header_column_top"><fmt:message key="user_name" bundle="${resword}"/>:</td>
+        <td class="table_cell"><c:out value="${userName}" /></td>
+    </tr>
+
+	<tr valign="bottom">
+	  	<td class="table_header_column"><fmt:message key="first_name" bundle="${resword}"/>:</td>
 	  	<td class="table_cell"><c:out value="${firstName}" /></td>
 	</tr>
 

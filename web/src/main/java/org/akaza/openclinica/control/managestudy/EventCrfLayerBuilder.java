@@ -138,7 +138,7 @@ public class EventCrfLayerBuilder {
     void clickToEnterData() {
 
         String click_to_enter_data = "Click to enter Data";
-        String to_use_another_version_click = "To user another Version Click";
+        String to_use_another_version_click = "To use a different version of the CRF, please click the View Icon for the Subject in the Actions column.";
         String in_order_to_enter_data_create_event = "In order to enter data create event";
         String click_for_more_options = "Click for more options";
 
