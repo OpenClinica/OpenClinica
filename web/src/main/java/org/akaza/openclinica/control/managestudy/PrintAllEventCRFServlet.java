@@ -1,29 +1,40 @@
 package org.akaza.openclinica.control.managestudy;
 
-import org.akaza.openclinica.control.submit.DataEntryServlet;
-import org.akaza.openclinica.control.submit.SubmitDataServlet;
-
-import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.view.display.DisplaySectionBeanHandler;
-import org.akaza.openclinica.core.form.FormProcessor;
-import org.akaza.openclinica.core.form.DiscrepancyValidator;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.dao.submit.SectionDAO;
-import org.akaza.openclinica.dao.submit.ItemGroupDAO;
-import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.PrintCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.submit.*;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.DisplayItemBean;
+import org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
+import org.akaza.openclinica.bean.submit.DisplaySectionBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.ItemGroupBean;
+import org.akaza.openclinica.bean.submit.SectionBean;
+import org.akaza.openclinica.control.form.DiscrepancyValidator;
+import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.control.submit.DataEntryServlet;
+import org.akaza.openclinica.control.submit.SubmitDataServlet;
+import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.dao.submit.ItemGroupDAO;
+import org.akaza.openclinica.dao.submit.SectionDAO;
+import org.akaza.openclinica.view.Page;
+import org.akaza.openclinica.view.display.DisplaySectionBeanHandler;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * @author Shamim
@@ -31,6 +42,7 @@ import java.util.*;
  */
 public class PrintAllEventCRFServlet extends DataEntryServlet {
     Locale locale;
+
     /**
      * Checks whether the user has the correct privilege
      */
@@ -57,14 +69,14 @@ public class PrintAllEventCRFServlet extends DataEntryServlet {
         StudyEventDefinitionDAO sedao = new StudyEventDefinitionDAO(sm.getDataSource());
         EventDefinitionCRFDAO edao = new EventDefinitionCRFDAO(sm.getDataSource());
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
-        
+
         StudyDAO studyDao = new StudyDAO(sm.getDataSource());
         StudyBean site = (StudyBean) studyDao.findByPK(siteId);
 
         ArrayList<StudyEventDefinitionBean> seds = new ArrayList<StudyEventDefinitionBean>();
         seds = sedao.findAllByStudy(site);
 
-//        ArrayList eventDefinitionCRFs = (ArrayList) edao.findAllByStudy(site);
+        //        ArrayList eventDefinitionCRFs = (ArrayList) edao.findAllByStudy(site);
 
         CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
         CRFDAO cdao = new CRFDAO(sm.getDataSource());
@@ -72,12 +84,12 @@ public class PrintAllEventCRFServlet extends DataEntryServlet {
         ArrayList<EventDefinitionCRFBean> edcs = new ArrayList();
         for (StudyEventDefinitionBean sed : seds) {
             int defId = sed.getId();
-            edcs.addAll((ArrayList<EventDefinitionCRFBean>) edcdao.findAllByDefinitionAndSiteIdAndParentStudyId(defId, siteId, site.getParentStudyId()));
+            edcs.addAll(edcdao.findAllByDefinitionAndSiteIdAndParentStudyId(defId, siteId, site.getParentStudyId()));
         }
 
         Map eventDefinitionDefaultVersions = new LinkedHashMap();
         for (int i = 0; i < edcs.size(); i++) {
-            EventDefinitionCRFBean edc = (EventDefinitionCRFBean) edcs.get(i);
+            EventDefinitionCRFBean edc = edcs.get(i);
             ArrayList versions = (ArrayList) cvdao.findAllByCRF(edc.getCrfId());
             edc.setVersions(versions);
             CRFBean crf = (CRFBean) cdao.findByPK(edc.getCrfId());
@@ -92,13 +104,13 @@ public class PrintAllEventCRFServlet extends DataEntryServlet {
             StudyEventDefinitionBean studyEventDefinitionBean = (StudyEventDefinitionBean) sedao.findByPK(edc.getStudyEventDefinitionId());
             edc.setDefaultVersionName(defaultVersion.getName());
             if (defaultVersion.getStatus().isAvailable()) {
-                List list = (ArrayList)eventDefinitionDefaultVersions.get(studyEventDefinitionBean);
-                if (list == null) list = new ArrayList();
+                List list = (ArrayList) eventDefinitionDefaultVersions.get(studyEventDefinitionBean);
+                if (list == null)
+                    list = new ArrayList();
                 list.add(defaultVersion);
                 eventDefinitionDefaultVersions.put(studyEventDefinitionBean, list);
             }
         }
-
 
         // Whether IE6 or IE7 is involved
         String isIE = fp.getString("ie");
@@ -112,9 +124,10 @@ public class PrintAllEventCRFServlet extends DataEntryServlet {
         Map sedCrfBeans = null;
 
         for (Iterator it = eventDefinitionDefaultVersions.keySet().iterator(); it.hasNext();) {
-            if (sedCrfBeans == null) sedCrfBeans = new LinkedHashMap();
-            StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean)it.next();
-            List crfVersions = (ArrayList)eventDefinitionDefaultVersions.get(sedBean);
+            if (sedCrfBeans == null)
+                sedCrfBeans = new LinkedHashMap();
+            StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) it.next();
+            List crfVersions = (ArrayList) eventDefinitionDefaultVersions.get(sedBean);
             for (Iterator crfIt = crfVersions.iterator(); crfIt.hasNext();) {
                 CRFVersionBean crfVersionBean = (CRFVersionBean) crfIt.next();
                 allSectionBeans = new ArrayList<SectionBean>();
@@ -133,12 +146,10 @@ public class PrintAllEventCRFServlet extends DataEntryServlet {
                     // a boolean value depending on whether data is involved or not
                     // ('false' in terms of this
                     // servlet; see PrintDataEntryServlet).
-                    DisplaySectionBeanHandler handler = new
-                      DisplaySectionBeanHandler(false, sm.getDataSource());
+                    DisplaySectionBeanHandler handler = new DisplaySectionBeanHandler(false, sm.getDataSource());
                     handler.setCrfVersionId(crfVersionBean.getId());
                     //handler.setEventCRFId(eventCRFId);
-                    List<DisplaySectionBean> displaySectionBeans =
-                      handler.getDisplaySectionBeans();
+                    List<DisplaySectionBean> displaySectionBeans = handler.getDisplaySectionBeans();
 
                     request.setAttribute("listOfDisplaySectionBeans", displaySectionBeans);
                     // Make available the CRF names and versions for
@@ -154,8 +165,9 @@ public class PrintAllEventCRFServlet extends DataEntryServlet {
                     printCrfBean.setCrfBean(crfBean);
                     printCrfBean.setEventCrfBean(super.ecb);
                     printCrfBean.setGrouped(true);
-                    List list = (ArrayList)sedCrfBeans.get(sedBean);
-                    if (list == null) list = new ArrayList();
+                    List list = (ArrayList) sedCrfBeans.get(sedBean);
+                    if (list == null)
+                        list = new ArrayList();
                     list.add(printCrfBean);
                     sedCrfBeans.put(sedBean, list);
 
@@ -183,13 +195,14 @@ public class PrintAllEventCRFServlet extends DataEntryServlet {
                 printCrfBean.setCrfVersionBean(crfVersionBean);
                 printCrfBean.setCrfBean(crfBean);
                 printCrfBean.setGrouped(false);
-                List list = (ArrayList)sedCrfBeans.get(sedBean);
-                if (list == null) list = new ArrayList();
+                List list = (ArrayList) sedCrfBeans.get(sedBean);
+                if (list == null)
+                    list = new ArrayList();
                 list.add(printCrfBean);
                 sedCrfBeans.put(sedBean, list);
             }
         }
-        StudyBean parentStudy = (StudyBean)studyDao.findByPK(site.getParentStudyId());
+        StudyBean parentStudy = (StudyBean) studyDao.findByPK(site.getParentStudyId());
         String studyName = parentStudy.getName();
         String siteName = site.getName();
         request.setAttribute("sedCrfBeans", sedCrfBeans);
@@ -324,12 +337,14 @@ public class PrintAllEventCRFServlet extends DataEntryServlet {
         return false;
     }
 
+    @Override
     protected boolean isAdministrativeEditing() {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        return false; //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    @Override
     protected boolean isAdminForcedReasonForChange() {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        return false; //To change body of implemented methods use File | Settings | File Templates.
     }
 
 }
