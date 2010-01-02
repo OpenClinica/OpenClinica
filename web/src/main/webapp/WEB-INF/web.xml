@@ -47,6 +47,16 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
+    <!--<filter>-->
+        <!--<filter-name>timerFilter</filter-name>-->
+        <!--<filter-class>org.akaza.openclinica.web.filter.TimerFilter</filter-class>-->
+    <!--</filter>-->
+
+    <!--<filter-mapping>-->
+        <!--<filter-name>timerFilter</filter-name>-->
+        <!--<url-pattern>/*</url-pattern>-->
+    <!--</filter-mapping>-->
+
    <servlet>
         <servlet-name>pages</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
@@ -1083,6 +1093,12 @@
         <servlet-class>org.akaza.openclinica.control.submit.UploadFileServlet</servlet-class>
     </servlet>
 
+    <servlet>
+        <servlet-name>PrintAllEventCRFServlet</servlet-name>
+        <display-name>PrintAllEventCRFServlet</display-name>
+        <servlet-class>org.akaza.openclinica.control.managestudy.PrintAllEventCRFServlet</servlet-class>
+    </servlet>
+
     <servlet-mapping>
         <servlet-name>LockCRFVersionServlet</servlet-name>
         <url-pattern>/LockCRFVersion</url-pattern>
@@ -1878,6 +1894,11 @@
         <servlet-name>ManageStudyServlet</servlet-name>
         <url-pattern>/ManageStudy1</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PrintAllEventCRFServlet</servlet-name>
+        <url-pattern>/PrintAllEventCRF</url-pattern>
+    </servlet-mapping>
+
     <!-- 
     <security-constraint>
         <web-resource-collection>

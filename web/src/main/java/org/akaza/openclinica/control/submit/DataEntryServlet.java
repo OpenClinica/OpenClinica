@@ -195,6 +195,8 @@ public abstract class DataEntryServlet extends SecureController {
 
     public static final String DATE_INTERVIEWED = "date_interviewed";
 
+    public static final String NOTE_SUBMITTED = "note_submitted";
+
     protected String SCOREITEMS;
     protected String SCOREITEMDATA;
 
@@ -1432,7 +1434,7 @@ public abstract class DataEntryServlet extends SecureController {
                     session.removeAttribute(HAS_DATA_FLAG);
                     session.removeAttribute(DDE_PROGESS);
                     session.removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
-                    System.out.println("try to remove to_create_crf44444");
+                    System.out.println("try to remove to_create_crf");
                     session.removeAttribute("to_create_crf");
 
                     // forwardPage(Page.SUBMIT_DATA_SERVLET);
@@ -1540,7 +1542,13 @@ public abstract class DataEntryServlet extends SecureController {
         int existingNotes = dndao.findNumExistingNotesForItem(idb.getId());
         if (existingNotes > 0) {
             System.out.println("has a note in db");
-            // dont do anything now, tbh
+            /*Having existing notes is not enough to let it pass through after changing data. There has to be a
+            * DiscrepancyNote for the latest changed data*/
+            Object noteSubmitted = session.getAttribute(DataEntryServlet.NOTE_SUBMITTED);
+            if (noteSubmitted == null || !(Boolean) noteSubmitted) {
+                errors.put(formName, error);
+            }
+            session.removeAttribute(DataEntryServlet.NOTE_SUBMITTED);
         } else if (idNotes.containsKey(idb.getId())) {
             System.out.println("has note in session");
         } else {
@@ -1597,7 +1605,7 @@ public abstract class DataEntryServlet extends SecureController {
                 // more than once
                 // for example, user reloads the page
                 String toCreateCRF = (String) session.getAttribute("to_create_crf");
-                if (StringUtil.isBlank(toCreateCRF)) {
+                if (StringUtil.isBlank(toCreateCRF) || "0".equals(toCreateCRF)) {
                     session.setAttribute("to_create_crf", "1");
                 }
                 try {

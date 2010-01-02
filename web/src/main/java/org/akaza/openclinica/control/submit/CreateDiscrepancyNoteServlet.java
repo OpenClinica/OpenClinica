@@ -535,6 +535,9 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                     session.setAttribute(FORM_DISCREPANCY_NOTES_NAME, noteTree);
                     //
                     System.out.println("forwarding on line 494");
+                    /*Setting a marker to check later while saving administrative edited data. This is needed to make
+                    * sure the system flags error while changing data for items which already has a DiscrepanyNote*/
+                    session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, true);
                     forwardPage(Page.ADD_DISCREPANCY_NOTE_DONE);
                 } else {
                     // if not creating a new thread(note), update exsiting notes
@@ -586,6 +589,11 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                         note = (DiscrepancyNoteBean) dndao.create(note);
                         dndao.createMapping(note);
                     }
+
+                    /*Setting a marker to check later while saving administrative edited data. This is needed to make
+                    * sure the system flags error while changing data for items which already has a DiscrepanyNote*/
+                    session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, true);
+                    session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, true);
 
                     System.out.println("found resolution status: " + note.getResolutionStatusId());
 
