@@ -3,6 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
 <jsp:include page="../include/managestudy-header.jsp"/>
@@ -15,28 +16,28 @@
 <c:set var="dateFormatPattern" value="${requestScope['dateFormatPattern']}" />
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
-		<td class="sidebar_tab">
+        <td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
+        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
 
-		<b><fmt:message key="instructions" bundle="${resword}"/></b>
+        <b><fmt:message key="instructions" bundle="${resword}"/></b>
 
-		<div class="sidebar_tab_content">
+        <div class="sidebar_tab_content">
  
 
-		</div>
+        </div>
 
-		</td>
-	
-	</tr>
-	<tr id="sidebar_Instructions_closed" style="display: all">
-		<td class="sidebar_tab">
+        </td>
+    
+    </tr>
+    <tr id="sidebar_Instructions_closed" style="display: all">
+        <td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
+        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
 
-		<b><fmt:message key="instructions" bundle="${resword}"/></b>
+        <b><fmt:message key="instructions" bundle="${resword}"/></b>
 
-		</td>
+        </td>
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
@@ -68,7 +69,14 @@
   <tr><td class="table_header_column"><fmt:message key="created_by" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${user.owner.name}"/></td></tr>
   <tr><td class="table_header_column"><fmt:message key="date_updated" bundle="${resword}"/>:</td><td class="table_cell"><fmt:formatDate value="${user.updatedDate}" type="date" pattern="${dteFormat}"/>&nbsp;</td></tr>
   <tr><td class="table_header_column"><fmt:message key="updated_by" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${user.updater.name}"/>&nbsp;</td></tr>
-  <tr><td class="table_header_column"><fmt:message key="role" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${uRole.role.description}"/></td></tr>
+  <tr><td class="table_header_column"><fmt:message key="role" bundle="${resword}"/>:</td><td class="table_cell">
+    <c:if test="${uStudy.parentStudyId > 0}">
+              <fmt:message key="${siteRoleMap[uRole.role.id] }" bundle="${resterm}"></fmt:message>
+          </c:if>
+          <c:if test="${uStudy.parentStudyId == 0}">
+              <c:out value="${uRole.role.description}"/>
+          </c:if>
+  </td></tr>
   <tr><td class="table_header_column"><fmt:message key="study" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${uStudy.name}"/></td></tr>
  
 </table>

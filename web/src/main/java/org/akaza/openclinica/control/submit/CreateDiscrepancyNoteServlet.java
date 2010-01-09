@@ -837,17 +837,17 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 
     private ArrayList generateUserAccounts(int studyId) {
         UserAccountDAO userAccountDAO = new UserAccountDAO(sm.getDataSource());
-        StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
-        StudyBean currentStudy = (StudyBean) studyDAO.findByPK(studyId);
+//        StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
+//        StudyBean currentStudy = (StudyBean) studyDAO.findByPK(studyId);
         // need to add the above two lines and grab all users by the parent
         // study id, tbh 03/2009
         ArrayList userAccounts = new ArrayList();
         if (currentStudy.getParentStudyId() > 0) {
-            userAccounts = userAccountDAO.findAllUsersByStudy(currentStudy.getParentStudyId());
-            System.out.println("found " + userAccounts.size() + " user accounts for study " + currentStudy.getParentStudyId());
+            userAccounts = userAccountDAO.findAllUsersByStudyOrSite(studyId, currentStudy.getParentStudyId());
+//            System.out.println("found " + userAccounts.size() + " user accounts for study " + currentStudy.getParentStudyId());
         } else {
             userAccounts = userAccountDAO.findAllUsersByStudy(studyId);
-            System.out.println("found " + userAccounts.size() + " user accounts for study " + studyId);
+//            System.out.println("found " + userAccounts.size() + " user accounts for study " + studyId);
         }
         return userAccounts;
     }

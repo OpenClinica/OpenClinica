@@ -120,19 +120,15 @@ public abstract class DataEntryServlet extends SecureController {
     public static final String INPUT_SECTION = "section";
 
     /**
-     * A bean used to indicate that servlets to which this servlet forwards
-     * should ignore any parameters, in particular the "submitted" parameter
-     * which controls FormProcessor.isSubmitted. If an attribute with this name
-     * is set in the request, the servlet to which this servlet forwards should
-     * consider fp.isSubmitted to always return false.
+     * A bean used to indicate that servlets to which this servlet forwards should ignore any parameters, in particular the "submitted" parameter which controls
+     * FormProcessor.isSubmitted. If an attribute with this name is set in the request, the servlet to which this servlet forwards should consider
+     * fp.isSubmitted to always return false.
      */
     public static final String INPUT_IGNORE_PARAMETERS = "ignore";
 
     /**
-     * A bean used to indicate that we are not validating inputs, that is, that
-     * the user is "confirming" values which did not validate properly the first
-     * time. If an attribute with this name is set in the request, this servlet
-     * should not perform any validation on the form inputs.
+     * A bean used to indicate that we are not validating inputs, that is, that the user is "confirming" values which did not validate properly the first time.
+     * If an attribute with this name is set in the request, this servlet should not perform any validation on the form inputs.
      */
     public static final String INPUT_CHECK_INPUTS = "checkInputs";
 
@@ -142,8 +138,7 @@ public abstract class DataEntryServlet extends SecureController {
     public static final String INPUT_ANNOTATIONS = "annotations";
 
     /**
-     * The name of the attribute in the request which hold the preset
-     * annotations form value.
+     * The name of the attribute in the request which hold the preset annotations form value.
      */
     public static final String BEAN_ANNOTATIONS = "annotations";
 
@@ -209,10 +204,8 @@ public abstract class DataEntryServlet extends SecureController {
     protected ArrayList<SectionBean> allSectionBeans;
 
     /**
-     * The event definition CRF bean which governs the event CRF bean into which
-     * we are entering data. Notice: It should be updated by info of a
-     * siteEventDefinitionCRF if dataEntry is for a site which has its own
-     * study_event_definition,
+     * The event definition CRF bean which governs the event CRF bean into which we are entering data. Notice: It should be updated by info of a
+     * siteEventDefinitionCRF if dataEntry is for a site which has its own study_event_definition,
      */
     protected EventDefinitionCRFBean edcb;
 
@@ -236,15 +229,11 @@ public abstract class DataEntryServlet extends SecureController {
     protected DiscrepancyNoteService discrepancyNoteService;
 
     /**
-     * Determines whether the form was submitted. Calculated once in
-     * processRequest. The reason we don't use the normal means to determine if
-     * the form was submitted (ie FormProcessor.isSubmitted) is because when we
-     * use forwardPage, Java confuses the inputs from the just-processed form
-     * with the inputs for the forwarded-to page. This is a problem since
-     * frequently we're forwarding from one (submitted) section to the next
-     * (unsubmitted) section. If we use the normal means, Java will always think
-     * that the unsubmitted section is, in fact, submitted. This member is
-     * guaranteed to be calculated before shouldLoadDBValues() is called.
+     * Determines whether the form was submitted. Calculated once in processRequest. The reason we don't use the normal means to determine if the form was
+     * submitted (ie FormProcessor.isSubmitted) is because when we use forwardPage, Java confuses the inputs from the just-processed form with the inputs for
+     * the forwarded-to page. This is a problem since frequently we're forwarding from one (submitted) section to the next (unsubmitted) section. If we use the
+     * normal means, Java will always think that the unsubmitted section is, in fact, submitted. This member is guaranteed to be calculated before
+     * shouldLoadDBValues() is called.
      */
     protected boolean isSubmitted = false;
 
@@ -252,25 +241,19 @@ public abstract class DataEntryServlet extends SecureController {
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.akaza.openclinica.control.core.SecureController#mayProceed()
      */
     @Override
     protected abstract void mayProceed() throws InsufficientPermissionException;
 
     /*
-     * locale = request.getLocale(); //< resmessage =
-     * ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages"
-     * ,locale); //< restext =
-     * ResourceBundle.getBundle("org.akaza.openclinica.i18n.notes",locale); //<
-     * resexception
-     * =ResourceBundle.getBundle("org.akaza.openclinica.i18n.exceptions"
+     * locale = request.getLocale(); //< resmessage = ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages" ,locale); //< restext =
+     * ResourceBundle.getBundle("org.akaza.openclinica.i18n.notes",locale); //< resexception =ResourceBundle.getBundle("org.akaza.openclinica.i18n.exceptions"
      * ,locale);
      */
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.akaza.openclinica.control.core.SecureController#processRequest()
      */
 
@@ -334,8 +317,7 @@ public abstract class DataEntryServlet extends SecureController {
         DiscrepancyNoteBean tempBean;
         for (DiscrepancyNoteThread dnThread : noteThreads) {
             /*
-             * 3014: do not count parent beans, only the last child disc note of
-             * the thread.
+             * 3014: do not count parent beans, only the last child disc note of the thread.
              */
             tempBean = dnThread.getLinkedNoteList().getLast();
             if (tempBean != null) {
@@ -368,11 +350,8 @@ public abstract class DataEntryServlet extends SecureController {
         // try to check if dn and dn. geResStatus are not null-jxu
         // npe.printStackTrace();
         /*
-         * request.setAttribute("updatedNum", "0");
-         * request.setAttribute("openNum", "0");
-         * request.setAttribute("closedNum", "0");
-         * request.setAttribute("resolvedNum", "0");
-         * request.setAttribute("notAppNum", "0");
+         * request.setAttribute("updatedNum", "0"); request.setAttribute("openNum", "0"); request.setAttribute("closedNum", "0");
+         * request.setAttribute("resolvedNum", "0"); request.setAttribute("notAppNum", "0");
          */
         // }
         StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
@@ -593,7 +572,7 @@ public abstract class DataEntryServlet extends SecureController {
             // displayed
             // in the application UI that will subsequently be displayed
             // TODO: find a better, less random place for this
-            //            session.setAttribute(HAS_DATA_FLAG, true);
+            // session.setAttribute(HAS_DATA_FLAG, true);
 
             // section.setCheckInputs(fp.getBoolean(INPUT_CHECK_INPUTS));
             errors = new HashMap();
@@ -1018,7 +997,7 @@ public abstract class DataEntryServlet extends SecureController {
                             if (isChanged(child.getData(), oldItemdata)) {
                                 changedItems.add(child.getItem().getName());
                                 changedItemsList.add(child);
-                                //changedItemsMap.put(child.getItem().getName(),
+                                // changedItemsMap.put(child.getItem().getName(),
                                 // new DisplayItemGroupBean());
                             }
                             String cinputName = getInputName(child);
@@ -1225,11 +1204,8 @@ public abstract class DataEntryServlet extends SecureController {
 
                 }
                 /*
-                 * if(studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus
-                 * .SIGNED)){ if(edcBean.isDoubleEntry()){
-                 * ecb.setStage(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE);
-                 * }else{
-                 * ecb.setStage(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE); } }
+                 * if(studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus .SIGNED)){ if(edcBean.isDoubleEntry()){
+                 * ecb.setStage(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE); }else{ ecb.setStage(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE); } }
                  */
 
                 // for Administrative editing
@@ -1542,8 +1518,9 @@ public abstract class DataEntryServlet extends SecureController {
         int existingNotes = dndao.findNumExistingNotesForItem(idb.getId());
         if (existingNotes > 0) {
             System.out.println("has a note in db");
-            /*Having existing notes is not enough to let it pass through after changing data. There has to be a
-            * DiscrepancyNote for the latest changed data*/
+            /*
+             * Having existing notes is not enough to let it pass through after changing data. There has to be a DiscrepancyNote for the latest changed data
+             */
             Object noteSubmitted = session.getAttribute(DataEntryServlet.NOTE_SUBMITTED);
             if (noteSubmitted == null || !(Boolean) noteSubmitted) {
                 errors.put(formName, error);
@@ -1560,11 +1537,8 @@ public abstract class DataEntryServlet extends SecureController {
     }
 
     /**
-     * Get the input beans - the EventCRFBean and the SectionBean. For both
-     * beans, look first in the request attributes to see if the bean has been
-     * stored there. If not, look in the parameters for the bean id, and then
-     * retrieve the bean from the database. The beans are stored as protected
-     * class members.
+     * Get the input beans - the EventCRFBean and the SectionBean. For both beans, look first in the request attributes to see if the bean has been stored
+     * there. If not, look in the parameters for the bean id, and then retrieve the bean from the database. The beans are stored as protected class members.
      */
     protected void getInputBeans() throws InsufficientPermissionException {
 
@@ -1696,9 +1670,8 @@ public abstract class DataEntryServlet extends SecureController {
     }
 
     /**
-     * Creates a new Event CRF or update the exsiting one, that is, an event CRF
-     * can be created but not item data yet, in this case, still consider it is
-     * not started(called uncompleted before)
+     * Creates a new Event CRF or update the exsiting one, that is, an event CRF can be created but not item data yet, in this case, still consider it is not
+     * started(called uncompleted before)
      * 
      * @return
      * @throws Exception
@@ -1843,11 +1816,9 @@ public abstract class DataEntryServlet extends SecureController {
     }
 
     /**
-     * Read in form values and write them to a display item bean. Note that this
-     * results in the form value being written to both the response set bean and
-     * the item data bean. The ResponseSetBean is used to display preset values
-     * on the form in the event of error, and the ItemDataBean is used to send
-     * values to the database.
+     * Read in form values and write them to a display item bean. Note that this results in the form value being written to both the response set bean and the
+     * item data bean. The ResponseSetBean is used to display preset values on the form in the event of error, and the ItemDataBean is used to send values to
+     * the database.
      * 
      * @param dib
      *            The DisplayItemBean to write data into.
@@ -1874,28 +1845,24 @@ public abstract class DataEntryServlet extends SecureController {
     }
 
     /**
-     * This methods will create an array of DisplayItemGroupBean, which contains
-     * multiple rows for an item group on the data entry form.
+     * This methods will create an array of DisplayItemGroupBean, which contains multiple rows for an item group on the data entry form.
      * 
      * @param digb
      *            The Item group which has multiple data rows
      * @param dbGroups
-     *            The original array got from DB which contains multiple data
-     *            rows
+     *            The original array got from DB which contains multiple data rows
      * @param formGroups
-     *            The new array got from front end which contains multiple data
-     *            rows
-     * @return new constructed formGroups, compare to dbGroups, some rows are
-     *         update, some new ones are added and some are removed
+     *            The new array got from front end which contains multiple data rows
+     * @return new constructed formGroups, compare to dbGroups, some rows are update, some new ones are added and some are removed
      */
     protected List<DisplayItemGroupBean> loadFormValueForItemGroup(DisplayItemGroupBean digb, List<DisplayItemGroupBean> dbGroups,
             List<DisplayItemGroupBean> formGroups, int eventDefCRFId) {
 
         int repeatMax = digb.getGroupMetaBean().getRepeatMax();
         // this allows us to truncate
-        if (repeatMax > 40 || repeatMax < 0) {
-            repeatMax = 40;
-        }
+        // if (repeatMax > 40 || repeatMax < 0) {
+        // repeatMax = 40;
+        // }
         List<ItemBean> itBeans = idao.findAllItemsByGroupId(digb.getItemGroupBean().getId(), sb.getCRFVersionId());
         logger.info("+++ starting to review groups: " + repeatMax);
         long timeCheck = System.currentTimeMillis();
@@ -1952,9 +1919,7 @@ public abstract class DataEntryServlet extends SecureController {
         // eventDefCRFId,
         // sm.getDataSource());
         /*
-         * logger.info("+++ count for null values list: " +
-         * nullValuesList.size()); logger.info(nullValuesList.toString() + "
-         * found with " + eventDefCRFId);
+         * logger.info("+++ count for null values list: " + nullValuesList.size()); logger.info(nullValuesList.toString() + " found with " + eventDefCRFId);
          */
 
         // had the call to form bean utils here, tbh
@@ -2135,25 +2100,21 @@ public abstract class DataEntryServlet extends SecureController {
     }
 
     /**
-     * @return <code>true</code> if processRequest should validate inputs when
-     *         the user clicks the "Save" button, <code>false</code> otherwise.
+     * @return <code>true</code> if processRequest should validate inputs when the user clicks the "Save" button, <code>false</code> otherwise.
      */
     protected abstract boolean validateInputOnFirstRound();
 
     /**
-     * Validate the input from the form corresponding to the provided item.
-     * Implementing methods should load data from the form into the bean before
-     * validating. The loadFormValue method should be used for this purpose.
-     * <p/> validateDisplayItemBeanText, validateDisplayItemBeanSingleCV, and
-     * validateDisplayItemBeanMultipleCV are provided to make implementing this
-     * method easy.
+     * Validate the input from the form corresponding to the provided item. Implementing methods should load data from the form into the bean before validating.
+     * The loadFormValue method should be used for this purpose.
+     * <p/>
+     * validateDisplayItemBeanText, validateDisplayItemBeanSingleCV, and validateDisplayItemBeanMultipleCV are provided to make implementing this method easy.
      * 
      * @param v
      *            The Validator to add validations to.
      * @param dib
      *            The DisplayItemBean to validate.
-     * @return The DisplayItemBean which is validated and has form values loaded
-     *         into it.
+     * @return The DisplayItemBean which is validated and has form values loaded into it.
      */
     protected abstract DisplayItemBean validateDisplayItemBean(DiscrepancyValidator v, DisplayItemBean dib, String inputName);
 
@@ -2171,10 +2132,8 @@ public abstract class DataEntryServlet extends SecureController {
     }
 
     /*
-     * Perform validation for calculation and group-calculation type. <br>
-     * Pre-condition: passed DisplayItemBean parameter has been loaded with
-     * value. @param sv @param dib @param inputName @return dib @author ywang
-     * (Feb.,2008)
+     * Perform validation for calculation and group-calculation type. <br> Pre-condition: passed DisplayItemBean parameter has been loaded with value. @param sv
+     * @param dib @param inputName @return dib @author ywang (Feb.,2008)
      */
     protected DisplayItemBean validateCalcTypeDisplayItemBean(ScoreItemValidator sv, DisplayItemBean dib, String inputName) {
 
@@ -2184,9 +2143,8 @@ public abstract class DataEntryServlet extends SecureController {
     }
 
     /**
-     * Peform validation on a item which has a TEXT or TEXTAREA response type.
-     * If the item has a null value, it's automatically validated. Otherwise,
-     * it's checked against its data type.
+     * Peform validation on a item which has a TEXT or TEXTAREA response type. If the item has a null value, it's automatically validated. Otherwise, it's
+     * checked against its data type.
      * 
      * @param v
      *            The Validator to add validations to.
@@ -2264,18 +2222,10 @@ public abstract class DataEntryServlet extends SecureController {
 
                 customValidation(v, dib, inputName);
                 /*
-                 * if (!StringUtil.isBlank(customValidationString)) { Validation
-                 * customValidation = null; if
-                 * (customValidationString.startsWith("func:")) { try {
-                 * customValidation =
-                 * Validator.processCRFValidationFunction(customValidationString
-                 * ); } catch (Exception e) { e.printStackTrace(); } } else if
-                 * (customValidationString.startsWith("regexp:")) { try {
-                 * customValidation =
-                 * Validator.processCRFValidationRegex(customValidationString);
-                 * } catch (Exception e) { } } if (customValidation != null) {
-                 * customValidation
-                 * .setErrorMessage(dib.getMetadata().getRegexpErrorMsg());
+                 * if (!StringUtil.isBlank(customValidationString)) { Validation customValidation = null; if (customValidationString.startsWith("func:")) { try
+                 * { customValidation = Validator.processCRFValidationFunction(customValidationString ); } catch (Exception e) { e.printStackTrace(); } } else
+                 * if (customValidationString.startsWith("regexp:")) { try { customValidation = Validator.processCRFValidationRegex(customValidationString); }
+                 * catch (Exception e) { } } if (customValidation != null) { customValidation .setErrorMessage(dib.getMetadata().getRegexpErrorMsg());
                  * v.addValidation(inputName, customValidation); } }
                  */
             }
@@ -2302,10 +2252,8 @@ public abstract class DataEntryServlet extends SecureController {
     }
 
     /**
-     * Peform validation on a item which has a RADIO or SINGLESELECTresponse
-     * type. This function checks that the input isn't blank, and that its value
-     * comes from the controlled vocabulary (ResponseSetBean) in the
-     * DisplayItemBean.
+     * Peform validation on a item which has a RADIO or SINGLESELECTresponse type. This function checks that the input isn't blank, and that its value comes
+     * from the controlled vocabulary (ResponseSetBean) in the DisplayItemBean.
      * 
      * @param v
      *            The Validator to add validations to.
@@ -2331,10 +2279,8 @@ public abstract class DataEntryServlet extends SecureController {
     }
 
     /**
-     * Peform validation on a item which has a RADIO or SINGLESELECTresponse
-     * type. This function checks that the input isn't blank, and that its value
-     * comes from the controlled vocabulary (ResponseSetBean) in the
-     * DisplayItemBean.
+     * Peform validation on a item which has a RADIO or SINGLESELECTresponse type. This function checks that the input isn't blank, and that its value comes
+     * from the controlled vocabulary (ResponseSetBean) in the DisplayItemBean.
      * 
      * @param v
      *            The Validator to add validations to.
@@ -2385,16 +2331,14 @@ public abstract class DataEntryServlet extends SecureController {
     }
 
     /**
-     * Writes data from the DisplayItemBean to the database. Note that if the
-     * bean contains an inactive ItemDataBean, the ItemDataBean is created;
-     * otherwise, the ItemDataBean is updated.
+     * Writes data from the DisplayItemBean to the database. Note that if the bean contains an inactive ItemDataBean, the ItemDataBean is created; otherwise,
+     * the ItemDataBean is updated.
      * 
      * @param dib
      *            The DisplayItemBean from which to write data.
      * @param iddao
      *            The DAO to use to access the database.
-     * @return <code>true</code> if the query succeeded, <code>false</code>
-     *         otherwise.
+     * @return <code>true</code> if the query succeeded, <code>false</code> otherwise.
      */
     protected boolean writeToDB(DisplayItemBean dib, ItemDataDAO iddao, int ordinal) {
         ItemDataBean idb = dib.getData();
@@ -2490,36 +2434,31 @@ public abstract class DataEntryServlet extends SecureController {
     }
 
     /**
-     * Retrieve the status which should be assigned to ItemDataBeans which have
-     * blank values for this data entry servlet.
+     * Retrieve the status which should be assigned to ItemDataBeans which have blank values for this data entry servlet.
      */
     protected abstract Status getBlankItemStatus();
 
     // unavailable in admin. editing
 
     /**
-     * Retrieve the status which should be assigned to ItemDataBeans which have
-     * non-blank values for this data entry servlet.
+     * Retrieve the status which should be assigned to ItemDataBeans which have non-blank values for this data entry servlet.
      */
     protected abstract Status getNonBlankItemStatus();
 
     // unavailable in admin. editing
 
     /**
-     * Get the eventCRF's annotations as appropriate for this data entry
-     * servlet.
+     * Get the eventCRF's annotations as appropriate for this data entry servlet.
      */
     protected abstract String getEventCRFAnnotations();
 
     /**
-     * Set the eventCRF's annotations properties as appropriate for this data
-     * entry servlet.
+     * Set the eventCRF's annotations properties as appropriate for this data entry servlet.
      */
     protected abstract void setEventCRFAnnotations(String annotations);
 
     /**
-     * Retrieve the DisplaySectionBean which will be used to display the Event
-     * CRF Section on the JSP, and also is used to controll processRequest.
+     * Retrieve the DisplaySectionBean which will be used to display the Event CRF Section on the JSP, and also is used to controll processRequest.
      */
     protected DisplaySectionBean getDisplayBean(boolean hasGroup, boolean includeUngroupedItems) throws Exception {
         DisplaySectionBean section = new DisplaySectionBean();
@@ -2618,8 +2557,7 @@ public abstract class DataEntryServlet extends SecureController {
     }
 
     /**
-     * Retrieve the DisplaySectionBean which will be used to display the Event
-     * CRF Section on the JSP, and also is used to controll processRequest.
+     * Retrieve the DisplaySectionBean which will be used to display the Event CRF Section on the JSP, and also is used to controll processRequest.
      */
     protected ArrayList getAllDisplayBeans() throws Exception {
 
@@ -2684,16 +2622,13 @@ public abstract class DataEntryServlet extends SecureController {
     }
 
     /**
-     * For each single item in this section which is a parent, get a
-     * DisplayItemBean corresponding to that item. Note that an item is a parent
-     * iff its parentId == 0.
+     * For each single item in this section which is a parent, get a DisplayItemBean corresponding to that item. Note that an item is a parent iff its parentId
+     * == 0.
      * 
      * @param sb
      *            The section whose items we are retrieving.
      * @param hasUngroupedItems
-     * @return An array of DisplayItemBean objects, one per parent item in the
-     *         section. Note that there is no guarantee on the ordering of the
-     *         objects.
+     * @return An array of DisplayItemBean objects, one per parent item in the section. Note that there is no guarantee on the ordering of the objects.
      * @throws Exception
      */
     private ArrayList getParentDisplayItems(boolean hasGroup, SectionBean sb, EventDefinitionCRFBean edcb, ItemDAO idao, ItemFormMetadataDAO ifmdao,
@@ -2767,14 +2702,12 @@ public abstract class DataEntryServlet extends SecureController {
     }
 
     /**
-     * Get the DisplayItemBean objects corresponding to the items which are
-     * children of the specified parent.
+     * Get the DisplayItemBean objects corresponding to the items which are children of the specified parent.
      * 
      * @param parent
      *            The item whose children are to be retrieved.
-     * @return An array of DisplayItemBean objects corresponding to the items
-     *         which are children of parent, and are sorted by column number
-     *         (ascending), then ordinal (ascending).
+     * @return An array of DisplayItemBean objects corresponding to the items which are children of parent, and are sorted by column number (ascending), then
+     *         ordinal (ascending).
      */
     private ArrayList getChildrenDisplayItems(DisplayItemBean parent, EventDefinitionCRFBean edcb) {
         ArrayList answer = new ArrayList();
@@ -2959,9 +2892,8 @@ public abstract class DataEntryServlet extends SecureController {
         }
 
         /*
-         * if (!isEachSectionReviewedOnce()) { addPageMessage("You may not mark
-         * this Event CRF complete, because there are some sections which have
-         * not been reviewed once."); return false; }
+         * if (!isEachSectionReviewedOnce()) { addPageMessage("You may not mark this Event CRF complete, because there are some sections which have not been
+         * reviewed once."); return false; }
          */
 
         if (isEachRequiredFieldFillout() == false) {
@@ -2970,9 +2902,8 @@ public abstract class DataEntryServlet extends SecureController {
         }
 
         /*
-         * if (ecb.getInterviewerName().trim().equals("")) { throw new
-         * InconsistentStateException(errorPage, "You may not mark this Event
-         * CRF complete, because the interviewer name is blank."); }
+         * if (ecb.getInterviewerName().trim().equals("")) { throw new InconsistentStateException(errorPage, "You may not mark this Event CRF complete, because
+         * the interviewer name is blank."); }
          */
 
         Status newStatus = ecb.getStatus();
@@ -3007,8 +2938,7 @@ public abstract class DataEntryServlet extends SecureController {
         }
         ecb.setStatus(newStatus);
         /*
-         * Marking the data entry as signed if the corresponding
-         * EventDefinitionCRF is being enabled for electronic signature.
+         * Marking the data entry as signed if the corresponding EventDefinitionCRF is being enabled for electronic signature.
          */
         if (edcb.isElectronicSignature()) {
             ecb.setElectronicSignatureStatus(true);
@@ -3131,10 +3061,8 @@ public abstract class DataEntryServlet extends SecureController {
     }
 
     /**
-     * 06/13/2007- jxu Since we don't require users to review each section
-     * before mark a CRF as complete, we need to create item data in the
-     * database because items will not be created unless the section which
-     * contains the items is reviewed by users
+     * 06/13/2007- jxu Since we don't require users to review each section before mark a CRF as complete, we need to create item data in the database because
+     * items will not be created unless the section which contains the items is reviewed by users
      */
     private boolean saveItemsToMarkComplete(Status completeStatus) throws Exception {
         ArrayList sections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
@@ -3248,8 +3176,7 @@ public abstract class DataEntryServlet extends SecureController {
     }
 
     /**
-     * Constructs a list of DisplayItemWithGroupBean, which is used for display
-     * a section of items on the UI
+     * Constructs a list of DisplayItemWithGroupBean, which is used for display a section of items on the UI
      * 
      * @param dsb
      * @param hasItemGroup
@@ -3398,9 +3325,8 @@ public abstract class DataEntryServlet extends SecureController {
         // DisplayItemWithGroupBeans;
         // These item groups are used by the data entry screens
         /*
-         * if(nullValuesList != null && (! nullValuesList.isEmpty())) {
-         * formBeanUtil.addNullValuesToDisplayItemWithGroupBeans(
-         * displayItemWithGroups, nullValuesList); }
+         * if(nullValuesList != null && (! nullValuesList.isEmpty())) { formBeanUtil.addNullValuesToDisplayItemWithGroupBeans( displayItemWithGroups,
+         * nullValuesList); }
          */
         return displayItemWithGroups;
     }
@@ -3697,9 +3623,8 @@ public abstract class DataEntryServlet extends SecureController {
     }
 
     /**
-     * This method will populate grouped and variableAndValue HashMaps grouped :
-     * Used to correctly populate group ordinals variableAndValue : Holds
-     * itemOID , value (in Form ) pairs passed in to rule processor
+     * This method will populate grouped and variableAndValue HashMaps grouped : Used to correctly populate group ordinals variableAndValue : Holds itemOID ,
+     * value (in Form ) pairs passed in to rule processor
      * 
      * @param allItems
      */

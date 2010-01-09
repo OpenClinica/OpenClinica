@@ -4,6 +4,7 @@
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 
 <jsp:include page="../include/home-header.jsp"/>
 
@@ -78,7 +79,7 @@
                  <tr>
                    <td class="table_cell">&nbsp;&nbsp;<img src="images/bullet.gif">
                    <input type="radio" checked name="studyId" value="<c:out value="${studyRole.studyId}"/>">
-                   <c:out value="${studyRole.studyName}"/> (<c:out value="${studyRole.role.description}"/>)</td>
+                   <c:out value="${studyRole.studyName}"/> (<fmt:message key="${siteRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>) </td>
                  </tr>
                </c:if>
             </c:when>
@@ -103,7 +104,7 @@
                <c:if test="${!studyRole.invalid}">
                  <tr>
                   <td class="table_cell">&nbsp;&nbsp;<img src="images/bullet.gif"><input type="radio" name="studyId" value="<c:out value="${studyRole.studyId}"/>">
-                  <c:out value="${studyRole.studyName}"/> (<c:out value="${studyRole.role.description}"/>)</td>
+                  <c:out value="${studyRole.studyName}"/> (<fmt:message key="${siteRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>)</td>
                  </tr>
                </c:if>
             </c:when>

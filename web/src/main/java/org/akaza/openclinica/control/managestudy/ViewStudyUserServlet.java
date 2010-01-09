@@ -64,6 +64,7 @@ public class ViewStudyUserServlet extends SecureController {
             StudyDAO sdao = new StudyDAO(sm.getDataSource());
             StudyBean study = (StudyBean) sdao.findByPK(studyId);
             request.setAttribute("uStudy", study);
+            request.setAttribute("siteRoleMap", Role.siteRoleMap);
             // BWP 12/7/07 >>To provide the view with the correct date format
             // pattern, locale sensitive
             String pattn = "";
