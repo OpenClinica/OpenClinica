@@ -1,7 +1,7 @@
 <%@page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ include file="/WEB-INF/jsp/taglibs.jsp" %>
 
-<%@page import="org.akaza.openclinica.dao.core.SQLInitServlet"%>
+<%@page import="org.akaza.openclinica.web.SQLInitServlet"%>
 
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/> 

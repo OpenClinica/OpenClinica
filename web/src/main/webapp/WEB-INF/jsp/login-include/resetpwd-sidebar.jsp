@@ -1,7 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@page import="org.akaza.openclinica.dao.core.SQLInitServlet"%>
+<%@page import="org.akaza.openclinica.web.SQLInitServlet"%>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/> 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/> 
