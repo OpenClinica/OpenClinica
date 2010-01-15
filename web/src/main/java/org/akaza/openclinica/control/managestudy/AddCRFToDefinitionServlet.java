@@ -153,6 +153,7 @@ public class AddCRFToDefinitionServlet extends SecureController {
                     }
                 }
                 if (hasCrf == false) {
+                    ordinalForNewCRF = ordinalForNewCRF + 1;
                     edcBean.setOrdinal(ordinalForNewCRF);
                     ordinalForNewCRF++;
                     edcs.add(edcBean);

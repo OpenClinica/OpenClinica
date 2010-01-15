@@ -110,7 +110,7 @@
   </logger>
   <!-- Show All Spring Web Services Messages -->
   <logger additivity="false" name="org.springframework.ws.server.MessageTracing.received">
-    <level value="DEBUG" />
+    <level value="TRACE" />
     <appender-ref ref="WS_LOGFILE"/>
   </logger>
   

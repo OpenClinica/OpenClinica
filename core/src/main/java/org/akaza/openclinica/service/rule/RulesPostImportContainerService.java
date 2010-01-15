@@ -116,7 +116,10 @@ public class RulesPostImportContainerService {
     private void putRuleSetInCorrectContainer(AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper, RulesPostImportContainer importContainer) {
         if (!ruleSetBeanWrapper.isSavable()) {
             importContainer.getInValidRuleSetDefs().add(ruleSetBeanWrapper);
-        } else if (ruleSetBeanWrapper.getAuditableBean().getId() == null) {
+        }else if(getExpressionService().getEventDefinitionCRF(ruleSetBeanWrapper.getAuditableBean().getTarget().getValue()).getStatus().isDeleted()){
+            importContainer.getInValidRuleSetDefs().add(ruleSetBeanWrapper);
+        }
+        else if (ruleSetBeanWrapper.getAuditableBean().getId() == null) {
             importContainer.getValidRuleSetDefs().add(ruleSetBeanWrapper);
             importContainer.getValidRuleSetExpressionValues().add(ruleSetBeanWrapper.getAuditableBean().getTarget().getValue());
         } else if (ruleSetBeanWrapper.getAuditableBean().getId() != null) {
@@ -150,6 +153,9 @@ public class RulesPostImportContainerService {
         for (RuleSetRuleBean ruleSetRuleBean : ruleSetBeanWrapper.getAuditableBean().getRuleSetRules()) {
             String ruleDefOid = ruleSetRuleBean.getOid();
             if (ruleSetRuleBean.getId() == null) {
+                if(getExpressionService().getEventDefinitionCRF(ruleSetBeanWrapper.getAuditableBean().getTarget().getValue()).getStatus().isDeleted()){
+                    ruleSetBeanWrapper.error("This is an invalid Rule Set because the target is pointing to an item in the event definition CRF that has a status of removed");                    
+                }
                 if (importContainer.getInValidRules().get(ruleDefOid) != null || importContainer.getValidRules().get(ruleDefOid) == null
                     && getRuleDao().findByOid(ruleDefOid) == null) {
                     ruleSetBeanWrapper.error("The Rule you are trying to reference does not exist or is Invalid");

@@ -122,7 +122,7 @@
         <c:when test="${status.first}">
           <c:choose>
            <c:when test="${defSize>1}">
-            <a href="ChangeDefinitionCRFOrdinal?current=<c:out value="${nextCrf.id}"/>&previous=<c:out value="${crf.id}"/>&id=<c:out value="${definition.id}"/>"><img src="images/bt_sort_descending.gif" border="0" alt="move down" title="move down"/></a>
+               <a href="ChangeDefinitionCRFOrdinal?current=<c:out value="${nextCrf.id}"/>&previous=<c:out value="${crf.id}"/>&id=<c:out value="${definition.id}"/>&currentOrdinal=<c:out value="${nextCrf.ordinal}"/>&previousOrdinal=<c:out value="${crf.ordinal}"/>"><img src="images/bt_sort_descending.gif" border="0" alt="move down" title="move down"/></a>
            </c:when>
            <c:otherwise>
              &nbsp;
@@ -130,11 +130,11 @@
           </c:choose>         
         </c:when>
         <c:when test="${status.last}">
-           <a href="ChangeDefinitionCRFOrdinal?current=<c:out value="${crf.id}"/>&previous=<c:out value="${prevCrf.id}"/>&id=<c:out value="${definition.id}"/>"><img src="images/bt_sort_ascending.gif" alt="move up" title="move up" border="0"/></a>         
+            <a href="ChangeDefinitionCRFOrdinal?current=<c:out value="${crf.id}"/>&previous=<c:out value="${prevCrf.id}"/>&id=<c:out value="${definition.id}"/>&currentOrdinal=<c:out value="${crf.ordinal}"/>&previousOrdinal=<c:out value="${prevCrf.ordinal}"/>"><img src="images/bt_sort_ascending.gif" alt="move up" title="move up" border="0"/></a>
         </c:when>
         <c:otherwise>
-          <a href="ChangeDefinitionCRFOrdinal?current=<c:out value="${crf.id}"/>&previous=<c:out value="${prevCrf.id}"/>&id=<c:out value="${definition.id}"/>"><img src="images/bt_sort_ascending.gif" alt="move up" title="move up" border="0" /></a>
-          <a href="ChangeDefinitionCRFOrdinal?previous=<c:out value="${crf.id}"/>&current=<c:out value="${nextCrf.id}"/>&id=<c:out value="${definition.id}"/>"><img src="images/bt_sort_descending.gif" alt="move down" title="move up" border="0" /></a>
+            <a href="ChangeDefinitionCRFOrdinal?current=<c:out value="${crf.id}"/>&previous=<c:out value="${prevCrf.id}"/>&id=<c:out value="${definition.id}"/>&currentOrdinal=<c:out value="${crf.ordinal}"/>&previousOrdinal=<c:out value="${prevCrf.ordinal}"/>"><img src="images/bt_sort_ascending.gif" alt="move up" title="move up" border="0" /></a>
+            <a href="ChangeDefinitionCRFOrdinal?previous=<c:out value="${crf.id}"/>&current=<c:out value="${nextCrf.id}"/>&id=<c:out value="${definition.id}"/>&previousOrdinal=<c:out value="${crf.ordinal}"/>&currentOrdinal=<c:out value="${nextCrf.ordinal}"/>"><img src="images/bt_sort_descending.gif" alt="move down" title="move up" border="0" /></a>
         </c:otherwise>
       </c:choose>
     </td>             

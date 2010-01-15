@@ -398,7 +398,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             request.setAttribute(DIS_NOTE, dnb);
             request.setAttribute("unlock", "0");
             request.setAttribute(WRITE_TO_DB, writeToDB ? "1" : "0");
-            ArrayList userAccounts = this.generateUserAccounts(ub.getActiveStudyId());
+            ArrayList userAccounts = this.generateUserAccounts(ub.getActiveStudyId(), subjectId);
             request.setAttribute(USER_ACCOUNTS, userAccounts);
 
             // ideally should be only two cases
@@ -509,7 +509,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 
             request.setAttribute(DIS_NOTE, note);
             request.setAttribute(WRITE_TO_DB, writeToDB ? "1" : "0");
-            ArrayList userAccounts = this.generateUserAccounts(ub.getActiveStudyId());
+            ArrayList userAccounts = this.generateUserAccounts(ub.getActiveStudyId(), subjectId);
 
             request.setAttribute(USER_ACCOUNT_ID, new Integer(note.getAssignedUserId()).toString());
             // formality more than anything else, we should go to say the note
@@ -835,19 +835,18 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
         }
     }
 
-    private ArrayList generateUserAccounts(int studyId) {
+    private ArrayList generateUserAccounts(int studyId, int subjectId) {
         UserAccountDAO userAccountDAO = new UserAccountDAO(sm.getDataSource());
-//        StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
-//        StudyBean currentStudy = (StudyBean) studyDAO.findByPK(studyId);
-        // need to add the above two lines and grab all users by the parent
+        StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
+        StudyBean subjectStudy = studyDAO.findByStudySubjectId(subjectId);
         // study id, tbh 03/2009
         ArrayList userAccounts = new ArrayList();
         if (currentStudy.getParentStudyId() > 0) {
             userAccounts = userAccountDAO.findAllUsersByStudyOrSite(studyId, currentStudy.getParentStudyId());
-//            System.out.println("found " + userAccounts.size() + " user accounts for study " + currentStudy.getParentStudyId());
+        } else if(subjectStudy.getParentStudyId() > 0){
+            userAccounts = userAccountDAO.findAllUsersByStudyOrSite(subjectStudy.getId(), subjectStudy.getParentStudyId());
         } else {
-            userAccounts = userAccountDAO.findAllUsersByStudy(studyId);
-//            System.out.println("found " + userAccounts.size() + " user accounts for study " + studyId);
+            userAccounts = userAccountDAO.findAllUsersByStudyOrSite(studyId, 0);
         }
         return userAccounts;
     }

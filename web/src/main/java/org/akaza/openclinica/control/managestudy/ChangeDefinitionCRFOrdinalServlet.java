@@ -29,9 +29,12 @@ public class ChangeDefinitionCRFOrdinalServlet extends ChangeOrdinalServlet {
         FormProcessor fp = new FormProcessor(request);
         int current = fp.getInt("current");
         int previous = fp.getInt("previous");
+        int currOrdinal = fp.getInt("currentOrdinal");
+        int prevOrdinal = fp.getInt("previousOrdinal");
+
         int definitionId = fp.getInt("id");
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
-        increase(current, previous, edcdao);
+        increase(current, previous, currOrdinal, prevOrdinal, edcdao);
         StudyDAO sdao = new StudyDAO(sm.getDataSource());
         int siteId = fp.getInt("siteId");
         if (siteId > 0) {
@@ -52,22 +55,23 @@ public class ChangeDefinitionCRFOrdinalServlet extends ChangeOrdinalServlet {
      * @param idPrevious
      * @param dao
      */
-    private void increase(int idCurrent, int idPrevious, EventDefinitionCRFDAO dao) {
+    private void increase(int idCurrent, int idPrevious, int currOrdinal, int prevOrdinal, EventDefinitionCRFDAO dao) {
+        EventDefinitionCRFBean current = (EventDefinitionCRFBean) dao.findByPK(idCurrent);
+        EventDefinitionCRFBean previous = (EventDefinitionCRFBean) dao.findByPK(idPrevious);
 
-        if (idCurrent > 0) {
-            EventDefinitionCRFBean current = (EventDefinitionCRFBean) dao.findByPK(idCurrent);
-
-            int currentOrdinal = current.getOrdinal();
-            current.setOrdinal(currentOrdinal - 1);
-            current.setUpdater((UserAccountBean) session.getAttribute("userBean"));
-            dao.update(current);
-        }
-        if (idPrevious > 0) {
-            EventDefinitionCRFBean previous = (EventDefinitionCRFBean) dao.findByPK(idPrevious);
-            int previousOrdinal = previous.getOrdinal();
-            previous.setOrdinal(previousOrdinal + 1);
-            previous.setUpdater((UserAccountBean) session.getAttribute("userBean"));
-            dao.update(previous);
+        if (current.getOrdinal() == currOrdinal && previous.getOrdinal() == prevOrdinal) {
+            if (idCurrent > 0) {
+                int currentOrdinal = current.getOrdinal();
+                current.setOrdinal(currentOrdinal - 1);
+                current.setUpdater((UserAccountBean) session.getAttribute("userBean"));
+                dao.update(current);
+            }
+            if (idPrevious > 0) {
+                int previousOrdinal = previous.getOrdinal();
+                previous.setOrdinal(previousOrdinal + 1);
+                previous.setUpdater((UserAccountBean) session.getAttribute("userBean"));
+                dao.update(previous);
+            }
         }
 
     }

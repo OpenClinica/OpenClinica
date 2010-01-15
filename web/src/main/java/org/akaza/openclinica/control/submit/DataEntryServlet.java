@@ -601,17 +601,17 @@ public abstract class DataEntryServlet extends SecureController {
                     logger.info("got db item group size " + dbGroups.size());
                     List<DisplayItemGroupBean> formGroups = new ArrayList<DisplayItemGroupBean>();
                     if (validate) {
-                        logger.info("===IF VALIDATE NOT A SINGLE ITEM: got to this part in the validation loop: " + dgb.getGroupMetaBean().getName());
+                        System.out.println("===IF VALIDATE NOT A SINGLE ITEM: got to this part in the validation loop: " + dgb.getGroupMetaBean().getName());
                         // TODO next marker tbh 112007
                         // formGroups = validateDisplayItemGroupBean(v,
                         // dgb,dbGroups, formGroups,
                         // ruleValidator,groupOrdinalPLusItemOid);
                         formGroups = validateDisplayItemGroupBean(v, dgb, dbGroups, formGroups);
-                        logger.info("form group size after validation " + formGroups.size());
+                        System.out.println("form group size after validation " + formGroups.size());
                     } else {
-                        logger.info("+++ELSE NOT A SINGLE ITEM: got to this part in the validation loop: " + dgb.getGroupMetaBean().getName());
+                        System.out.println("+++ELSE NOT A SINGLE ITEM: got to this part in the validation loop: " + dgb.getGroupMetaBean().getName());
                         formGroups = loadFormValueForItemGroup(dgb, dbGroups, formGroups, eventDefinitionCRFId);
-                        logger.info("form group size without validation " + formGroups.size());
+                        System.out.println("form group size without validation " + formGroups.size());
                     }
 
                     diwg.setItemGroup(dgb);
@@ -637,13 +637,13 @@ public abstract class DataEntryServlet extends SecureController {
                         // DDE not
                         // working-jxu
 
-                        logger.debug("&&& found name: " + itemName);
-                        logger.debug("input VALIDATE " + itemName + ": " + fp.getString(itemName));
+                        System.out.println("&&& found name: " + itemName);
+                        System.out.println("input VALIDATE " + itemName + ": " + fp.getString(itemName));
                         // dib.loadFormValue(fp.getString(itemName));
-                        logger.debug("input " + itemName + " has a response set of " + dib.getMetadata().getResponseSet().getOptions().size() + " options");
+                        System.out.println("input " + itemName + " has a response set of " + dib.getMetadata().getResponseSet().getOptions().size() + " options");
                     } else {
                         String itemName = getInputName(dib);
-                        logger.debug("input NONVALIDATE " + itemName + ": " + fp.getString(itemName));
+                        System.out.println("input NONVALIDATE " + itemName + ": " + fp.getString(itemName));
                         // dib.loadFormValue(itemName);
                         dib = loadFormValue(dib);
                         // String itemName = getInputName(dib);
@@ -666,7 +666,7 @@ public abstract class DataEntryServlet extends SecureController {
                             // child.loadFormValue(itemName);
                             child = loadFormValue(child);
                         }
-                        logger.info("Checking child value for " + itemName + ": " + child.getData().getValue());
+                        System.out.println("Checking child value for " + itemName + ": " + child.getData().getValue());
                         children.set(j, child);
                     }
 
@@ -696,7 +696,7 @@ public abstract class DataEntryServlet extends SecureController {
                         formGroups = validateDisplayItemGroupBean(v, dgb, dbGroups, formGroups, ruleValidator, groupOrdinalPLusItemOid);
                         // formGroups = validateDisplayItemGroupBean(v, dgb,
                         // dbGroups, formGroups);
-                        logger.info("form group size after validation " + formGroups.size());
+                        System.out.println("form group size after validation " + formGroups.size());
                     }
                     diwg.setItemGroup(dgb);
                     diwg.setItemGroups(formGroups);
@@ -775,13 +775,16 @@ public abstract class DataEntryServlet extends SecureController {
                                 changedItemsList.add(displayItem);
 
                                 String formName = displayItem.getItem().getName();
+                                // System.out.println("SET: formName:" + formName);
                                 if (displayGroup.isAuto()) {
                                     formName = getGroupItemInputName(displayGroup, displayGroup.getFormInputOrdinal(), displayItem);
+                                    // System.out.println("GET: changed formName to " + formName);
                                 } else {
                                     formName = getGroupItemManualInputName(displayGroup, displayGroup.getFormInputOrdinal(), displayItem);
+                                    System.out.println("GET-MANUAL: changed formName to " + formName);
                                 }
                                 changedItemsMap.put(formName, displayGroup);
-                                logger.debug("adding to changed items map: " + formName);
+                                System.out.println("adding to changed items map: " + formName);
                             }
                         }
                     }
@@ -829,13 +832,16 @@ public abstract class DataEntryServlet extends SecureController {
                                 changedItems.add(itemName);
                                 changedItemsList.add(displayItem);
                                 String formName = displayItem.getItem().getName();
+                                // System.out.println("SET: formName:" + formName);
                                 if (displayGroup.isAuto()) {
                                     formName = getGroupItemInputName(displayGroup, displayGroup.getFormInputOrdinal(), displayItem);
+                                    // System.out.println("RESET: formName group-item-input:" + formName);
                                 } else {
                                     formName = getGroupItemManualInputName(displayGroup, displayGroup.getFormInputOrdinal(), displayItem);
+                                    System.out.println("RESET: formName group-item-input-manual:" + formName);
                                 }
                                 changedItemsMap.put(formName, displayGroup);
-                                logger.debug("adding to changed items map: " + formName);
+                                System.out.println("adding to changed items map: " + formName);
                             }
                         }
                         first = false;
@@ -907,15 +913,15 @@ public abstract class DataEntryServlet extends SecureController {
                                 // getFormInputOrdinal() here, tbh 06/2009
                                 if (displayGroup.isAuto()) {
                                     inputName = getGroupItemInputName(displayGroup, displayGroup.getFormInputOrdinal(), displayItem);
-                                    logger.info("returning input name: " + inputName);
+                                    System.out.println("returning input name: " + inputName);
                                 } else {
                                     inputName = getGroupItemManualInputName(displayGroup, displayGroup.getFormInputOrdinal(), displayItem);
-                                    logger.info("returning input name: " + inputName);
+                                    System.out.println("returning input name: " + inputName);
                                 }
                                 if (robBean.getValue().startsWith("func: getexternalvalue") || robBean.getValue().startsWith("func: getExternalValue")) {
 
                                     value = fp.getString(inputName);
-                                    logger.info("*** just set " + fp.getString(inputName) + " for line 815 " + displayItem.getItem().getName()
+                                    System.out.println("*** just set " + fp.getString(inputName) + " for line 815 " + displayItem.getItem().getName()
                                         + " with input name " + inputName);
 
                                 } else {
@@ -948,8 +954,8 @@ public abstract class DataEntryServlet extends SecureController {
                         if (robBean.getValue().startsWith("func: getexternalvalue") || robBean.getValue().startsWith("func: getExternalValue")) {
                             String itemName = getInputName(dib);
                             value = fp.getString(itemName);
-                            logger.info("just set " + fp.getString(itemName) + " for " + dib.getItem().getName());
-                            logger.info("found in fp: " + fp.getString(dib.getItem().getName()));
+                            System.out.println("just set " + fp.getString(itemName) + " for " + dib.getItem().getName());
+                            System.out.println("found in fp: " + fp.getString(dib.getItem().getName()));
                             // System.out.println("scoreitemdata: " +
                             // scoreItemdata.toString());
                         } else {
@@ -988,7 +994,7 @@ public abstract class DataEntryServlet extends SecureController {
                             if (crobBean.getValue().startsWith("func: getexternalvalue") || crobBean.getValue().startsWith("func: getExternalValue")) {
                                 String itemName = getInputName(child);
                                 cvalue = fp.getString(itemName);
-                                logger.info("just set " + fp.getString(itemName) + " for " + child.getItem().getName());
+                                System.out.println("just set " + fp.getString(itemName) + " for " + child.getItem().getName());
 
                             } else {
                                 cvalue = sc.doCalculation(child, scoreItems, scoreItemdata, itemOrdinals, cerr, 1);
@@ -1053,7 +1059,7 @@ public abstract class DataEntryServlet extends SecureController {
                 // change everything here from changed items list to changed
                 // items map
                 if (changedItemsList.size() > 0) {
-                    logger.info("found admin force reason for change: changed items " + changedItems.toString() + " and changed items list: "
+                    System.out.println("found admin force reason for change: changed items " + changedItems.toString() + " and changed items list: "
                         + changedItemsList.toString() + " changed items map: " + changedItemsMap.toString());
 
                     for (DisplayItemBean displayItem : changedItemsList) {
@@ -1061,7 +1067,7 @@ public abstract class DataEntryServlet extends SecureController {
 
                         ItemDataBean idb = displayItem.getData();
                         ItemFormMetadataBean ifmb = displayItem.getMetadata();
-                        logger.info("-- found group label " + ifmb.getGroupLabel());
+                        System.out.println("-- found group label " + ifmb.getGroupLabel());
                         if (!ifmb.getGroupLabel().equalsIgnoreCase("Ungrouped") && !ifmb.getGroupLabel().equalsIgnoreCase("")) {
                             // << tbh 11/2009 sometimes the group label is blank instead of ungrouped???
                             Iterator iter = changedItemsMap.entrySet().iterator();
@@ -1086,7 +1092,7 @@ public abstract class DataEntryServlet extends SecureController {
                                     formName = formName2;
                                     this.setReasonForChangeError(idb, formName, error);
                                     changedItemsMap.remove(formName2);
-                                    logger.info("form name changed: " + formName);
+                                    System.out.println("form name changed: " + formName);
                                     break;
                                     // .., send it as the form name
                                 }
@@ -1096,7 +1102,7 @@ public abstract class DataEntryServlet extends SecureController {
 
                         } else {
                             this.setReasonForChangeError(idb, formName, error);
-                            logger.info("form name added: " + formName);
+                            System.out.println("form name added: " + formName);
                         }
                     }
                 }
@@ -1104,7 +1110,7 @@ public abstract class DataEntryServlet extends SecureController {
                     // do smething here?
                 }
             }
-            logger.debug("errors here: " + errors.toString());
+            System.out.println("errors here: " + errors.toString());
             // <<
             if (errors.isEmpty() && shouldRunRules()) {
                 logger.debug("Errors was empty");
@@ -1150,7 +1156,7 @@ public abstract class DataEntryServlet extends SecureController {
             }
 
             if (!errors.isEmpty()) {
-                logger.info("threw an error with data entry...");
+                logger.debug("threw an error with data entry...");
                 String[] textFields = { INPUT_INTERVIEWER, INPUT_INTERVIEW_DATE };
                 fp.setCurrentStringValuesAsPreset(textFields);
                 setPresetValues(fp.getPresetValues());
@@ -1248,7 +1254,7 @@ public abstract class DataEntryServlet extends SecureController {
 
                 // items = section.getItems();
                 allItems = section.getDisplayItemGroups();
-                logger.info("all items before saving into DB" + allItems.size());
+                System.out.println("all items before saving into DB" + allItems.size());
 
                 String attachedFilePath = Utils.getAttachedFilePath(currentStudy);
 
@@ -1262,7 +1268,7 @@ public abstract class DataEntryServlet extends SecureController {
 
                         List<DisplayItemGroupBean> dgbs = diwb.getItemGroups();
                         List<DisplayItemGroupBean> dbGroups = diwb.getDbItemGroups();
-                        logger.info("item group size: " + dgbs.size());
+                        System.out.println("item group size: " + dgbs.size());
                         for (int j = 0; j < dgbs.size(); j++) {
                             DisplayItemGroupBean displayGroup = dgbs.get(j);
                             List<DisplayItemBean> items = displayGroup.getItems();
@@ -1273,9 +1279,9 @@ public abstract class DataEntryServlet extends SecureController {
                             for (DisplayItemBean displayItem : items) {
                                 String fileName = this.addAttachedFilePath(displayItem, attachedFilePath);
                                 displayItem.setEditFlag(displayGroup.getEditFlag());
-                                logger.info("group item value:" + displayItem.getData().getValue());
+                                // System.out.println("group item value:" + displayItem.getData().getValue());
                                 temp = writeToDB(displayItem, iddao, nextOrdinal);
-                                logger.info("just executed writeToDB - 1");
+                                // System.out.println("just executed writeToDB - 1");
                                 if (temp && newUploadedFiles.containsKey(fileName)) {
                                     newUploadedFiles.remove(fileName);
                                 }
@@ -1860,11 +1866,13 @@ public abstract class DataEntryServlet extends SecureController {
 
         int repeatMax = digb.getGroupMetaBean().getRepeatMax();
         // this allows us to truncate
+
         // if (repeatMax > 40 || repeatMax < 0) {
         // repeatMax = 40;
         // }
+
         List<ItemBean> itBeans = idao.findAllItemsByGroupId(digb.getItemGroupBean().getId(), sb.getCRFVersionId());
-        logger.info("+++ starting to review groups: " + repeatMax);
+        System.out.println("+++ starting to review groups: " + repeatMax);
         long timeCheck = System.currentTimeMillis();
 
         // adding this code from below, since we want to pass a null values list
@@ -1881,6 +1889,8 @@ public abstract class DataEntryServlet extends SecureController {
         // logger.info("time 2: " + two + "ms");
         // >>TBH below for loop is a lot of repeated work, trying to shave some
         // time here, 12-1-2007
+        int firstLoopBreak = 0;
+        int secondLoopBreak = 0;
         for (int i = 0; i < repeatMax; i++) {
             DisplayItemGroupBean formGroup = new DisplayItemGroupBean();
             formGroup.setItemGroupBean(digb.getItemGroupBean());
@@ -1900,12 +1910,19 @@ public abstract class DataEntryServlet extends SecureController {
                 formGroup.setOrdinal(i);
                 formGroup.setFormInputOrdinal(i);
                 formGroup.setAuto(false);
+                // System.out.println("set auto to false for " + igb.getOid() + " " + i);
 
                 dibs = processInputForGroupItem(fp, dibs, i, digb, false);
 
                 formGroup.setItems(dibs);
                 formGroups.add(formGroup);
 
+            } else {
+                firstLoopBreak++;
+            }
+            if (firstLoopBreak > 14) {
+                System.out.println("break first loop");
+                break;
             }
         }// end of for (int i = 0; i < repeatMax; i++)
         // >>TBH remove the above eventually, repeat some work here?
@@ -1965,14 +1982,23 @@ public abstract class DataEntryServlet extends SecureController {
                     // reprocessed
                 }
                 formGroup.setAuto(true);
+                // System.out.println("set auto to TRUE for " + igb.getOid() + " " + i);
                 dibs = processInputForGroupItem(fp, dibs, i, digb, true);
                 logger.info("+++ group ordinal: " + i + " igb name " + igb.getName());
 
                 formGroup.setItems(dibs);
                 formGroups.add(formGroup);
+            } else {
+                secondLoopBreak++;
+            }
+            if (secondLoopBreak > 14) {
+                System.out.println("break second loop");
+                break;
             }
 
         } // end of for (int i = 0; i < repeatMax; i++)
+        System.out.println("first loop: " + firstLoopBreak);
+        System.out.println("second loop: " + secondLoopBreak);
         logger.info("+++ starting to review groups 4: " + repeatMax);
         two = System.currentTimeMillis() - timeCheck;
         // logger.info("time 4: " + two + "ms");
@@ -2020,7 +2046,7 @@ public abstract class DataEntryServlet extends SecureController {
         for (int j = 0; j < formGroups.size(); j++) {
             DisplayItemGroupBean formItemGroup = formGroups.get(j);
             logger.info("formGroup Ordinal:" + formItemGroup.getOrdinal());
-            System.out.println("=== formGroup Ordinal:" + formItemGroup.getOrdinal());
+            // System.out.println("=== formGroup Ordinal:" + formItemGroup.getOrdinal());
             // the below if loop addresses a specific problem with the repeating model
             // if we cut a row out of a long list, the repeater returns double ordinals of another row
             // and a second row gets deleted by mistake.
@@ -2086,7 +2112,7 @@ public abstract class DataEntryServlet extends SecureController {
         for (int i = 0; i < dbGroups.size(); i++) {
             DisplayItemGroupBean dbItemGroup = dbGroups.get(i);
             logger.info("+++ found edit flag of " + dbItemGroup.getEditFlag() + " for #" + dbItemGroup.getOrdinal());
-            System.out.println("+++ found edit flag of " + dbItemGroup.getEditFlag() + " for #" + dbItemGroup.getOrdinal() + ": " + i);
+            // System.out.println("+++ found edit flag of " + dbItemGroup.getEditFlag() + " for #" + dbItemGroup.getOrdinal() + ": " + i);
             if (!"edit".equalsIgnoreCase(dbItemGroup.getEditFlag()) && !"initial".equalsIgnoreCase(dbItemGroup.getEditFlag())) {
                 // && !"".equalsIgnoreCase(dbItemGroup.getEditFlag())) {
                 logger.info("+++ one row removed, edit flag was " + dbItemGroup.getEditFlag());

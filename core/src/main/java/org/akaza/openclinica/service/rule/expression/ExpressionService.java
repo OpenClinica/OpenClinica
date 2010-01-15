@@ -617,6 +617,17 @@ public class ExpressionService {
         logger.debug("Item ID : " + item.getId());
     }
 
+    public EventDefinitionCRFBean getEventDefinitionCRF(String expression) {
+        StudyEventDefinitionBean studyEventDefinition = getStudyEventDefinitionFromExpression(expression);
+        CRFBean crf = getCRFFromExpression(expression);
+
+        if (studyEventDefinition == null || crf == null)
+            throw new OpenClinicaSystemException("StudyEventDefinition OID or CRF OID is Invalid");
+
+        return getEventDefinitionCRFDao().findByStudyEventDefinitionIdAndCRFId(this.expressionWrapper.getStudyBean(), studyEventDefinition.getId(), crf.getId());
+    }
+
+
     public boolean checkSyntax(String expression) {
         if (expression.startsWith(SEPERATOR) || expression.endsWith(SEPERATOR)) {
             return false;

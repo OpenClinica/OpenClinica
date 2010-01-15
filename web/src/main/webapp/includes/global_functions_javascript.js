@@ -1118,6 +1118,7 @@ function openNewWindow(inURL, name, features, windowSize) {
     /*
      Detect Internet Explorer, for the sake of printing CRFs.
      */
+
     if(inURL && inURL.indexOf("Print") != -1) {
         if(detectIEWindows(navigator.userAgent)) {
             inURL = inURL+"&ie=y";
@@ -1179,11 +1180,8 @@ function openNewWindow(inURL, name, features, windowSize) {
 
     features += ",width=" + width + ",height=" + height;
 
-    var docView = window.open (inURL, name, features);
-
+    var docView = window.open (inURL, '', features);
     docView.focus();
-
-
 }
 
 
