@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>OpenClinica-ws</artifactId>
     <packaging>war</packaging>
-    <name>OpenClinica Web Application</name>
+    <name>OpenClinica Web Services</name>
     <parent>
         <groupId>org.akaza.openclinica</groupId>
         <artifactId>OpenClinica</artifactId>
