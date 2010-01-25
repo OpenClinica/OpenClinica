@@ -51,7 +51,7 @@
 		<test.dbPassword>clinica</test.dbPassword>
 		<test.hibernateDialect>org.hibernate.dialect.PostgreSQLDialect</test.hibernateDialect>
 		<test.locale>en_US</test.locale>
-		<scm.path>scm:svn:http://svn.akazaresearch.com/openclinica/OpenClinica/trunk</scm.path>
+		<scm.path>scm:svn:http://svn.akazaresearch.com/openclinica/OpenClinica/trunk2</scm.path>
 		<!--  Library Versions -->
 		<spring.version>2.5.6.SEC01</spring.version>
 	</properties>
@@ -191,6 +191,10 @@
             </plugin>
         </plugins>
     </reporting>
+    <scm>
+		<connection>${scm.path}</connection>
+		<developerConnection>${scm.path}</developerConnection>
+	</scm>
 
     <distributionManagement>
         <repository>
