@@ -13,6 +13,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
@@ -21,6 +22,7 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -39,6 +41,7 @@ public class RuleActionBean extends AbstractAuditableMutableDomainObject {
     private Boolean expressionEvaluatesTo;
     private String summary;
     private String curatedMessage;
+    private RuleActionRunBean ruleActionRun;
 
     @Transient
     public String getCuratedMessage() {
@@ -84,6 +87,16 @@ public class RuleActionBean extends AbstractAuditableMutableDomainObject {
 
     public void setRuleSetRule(RuleSetRuleBean ruleSetRule) {
         this.ruleSetRule = ruleSetRule;
+    }
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "rule_action_run_id")
+    public RuleActionRunBean getRuleActionRun() {
+        return ruleActionRun;
+    }
+
+    public void setRuleActionRun(RuleActionRunBean ruleActionRun) {
+        this.ruleActionRun = ruleActionRun;
     }
 
 }

@@ -7,6 +7,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Properties;
 
 public class CoreResources implements ResourceLoaderAware {
@@ -30,6 +32,14 @@ public class CoreResources implements ResourceLoaderAware {
         } catch (OpenClinicaSystemException e) {
             //throw new OpenClinicaSystemException(e.getMessage(), e.fillInStackTrace());
         }
+    }
+
+    public InputStream getInputStream(String fileName) throws IOException {
+        return resourceLoader.getResource("classpath:properties/" + fileName).getInputStream();
+    }
+
+    public URL getURL(String fileName) throws IOException {
+        return resourceLoader.getResource("classpath:properties/" + fileName).getURL();
     }
 
     private void setPROPERTIES_DIR() {

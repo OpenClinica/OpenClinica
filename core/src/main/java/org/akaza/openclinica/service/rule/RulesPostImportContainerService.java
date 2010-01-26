@@ -17,6 +17,9 @@ import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
+import org.akaza.openclinica.domain.rule.action.RuleActionBean;
+import org.akaza.openclinica.domain.rule.action.RuleActionRunBean;
+import org.akaza.openclinica.domain.rule.action.ShowActionBean;
 import org.akaza.openclinica.domain.rule.expression.Context;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
@@ -40,7 +43,7 @@ public class RulesPostImportContainerService {
     DataSource ds;
     private RuleDao ruleDao;
     private RuleSetDao ruleSetDao;
-    private OidGenerator oidGenerator;
+    private final OidGenerator oidGenerator;
     private StudyBean currentStudy;
 
     private ExpressionService expressionService;
@@ -116,10 +119,9 @@ public class RulesPostImportContainerService {
     private void putRuleSetInCorrectContainer(AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper, RulesPostImportContainer importContainer) {
         if (!ruleSetBeanWrapper.isSavable()) {
             importContainer.getInValidRuleSetDefs().add(ruleSetBeanWrapper);
-        }else if(getExpressionService().getEventDefinitionCRF(ruleSetBeanWrapper.getAuditableBean().getTarget().getValue()).getStatus().isDeleted()){
+        } else if (getExpressionService().getEventDefinitionCRF(ruleSetBeanWrapper.getAuditableBean().getTarget().getValue()).getStatus().isDeleted()) {
             importContainer.getInValidRuleSetDefs().add(ruleSetBeanWrapper);
-        }
-        else if (ruleSetBeanWrapper.getAuditableBean().getId() == null) {
+        } else if (ruleSetBeanWrapper.getAuditableBean().getId() == null) {
             importContainer.getValidRuleSetDefs().add(ruleSetBeanWrapper);
             importContainer.getValidRuleSetExpressionValues().add(ruleSetBeanWrapper.getAuditableBean().getTarget().getValue());
         } else if (ruleSetBeanWrapper.getAuditableBean().getId() != null) {
@@ -153,8 +155,9 @@ public class RulesPostImportContainerService {
         for (RuleSetRuleBean ruleSetRuleBean : ruleSetBeanWrapper.getAuditableBean().getRuleSetRules()) {
             String ruleDefOid = ruleSetRuleBean.getOid();
             if (ruleSetRuleBean.getId() == null) {
-                if(getExpressionService().getEventDefinitionCRF(ruleSetBeanWrapper.getAuditableBean().getTarget().getValue()).getStatus().isDeleted()){
-                    ruleSetBeanWrapper.error("This is an invalid Rule Set because the target is pointing to an item in the event definition CRF that has a status of removed");                    
+                if (getExpressionService().getEventDefinitionCRF(ruleSetBeanWrapper.getAuditableBean().getTarget().getValue()).getStatus().isDeleted()) {
+                    ruleSetBeanWrapper
+                            .error("This is an invalid Rule Set because the target is pointing to an item in the event definition CRF that has a status of removed");
                 }
                 if (importContainer.getInValidRules().get(ruleDefOid) != null || importContainer.getValidRules().get(ruleDefOid) == null
                     && getRuleDao().findByOid(ruleDefOid) == null) {
@@ -166,8 +169,27 @@ public class RulesPostImportContainerService {
                         ruleSetBeanWrapper
                                 .error("The Contextual expression in one of the Rules does not validate against the Target expression in the Current RuleSet");
                 }
+                for (RuleActionBean ruleActionBean : ruleSetRuleBean.getActions()) {
+                    // TODO: change this when you allow configurable runs in xml
+                    ruleActionBean.setRuleActionRun(new RuleActionRunBean());
+                    isRuleActionValid(ruleActionBean, ruleSetBeanWrapper);
+                }
             }
         }
+    }
+
+    private void isRuleActionValid(RuleActionBean ruleActionBean, AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper) {
+        if (ruleActionBean instanceof ShowActionBean) {
+            String[] oids = (((ShowActionBean) ruleActionBean).getOIDs()).split(",");
+            for (String oid : oids) {
+                String result = getExpressionService().checkValidityOfItemOrItemGroupOidInCrf(oid, ruleSetBeanWrapper.getAuditableBean());
+                if (!result.equals("OK")) {
+                    ruleSetBeanWrapper.error("ShowAction OID " + result + " is not Valid. ");
+                }
+            }
+
+        }
+
     }
 
     private boolean isRuleExpressionValid(AuditableBeanWrapper<RuleBean> ruleBeanWrapper, RuleSetBean ruleSet) {

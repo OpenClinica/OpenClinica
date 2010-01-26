@@ -13,6 +13,8 @@ public class ActionProcessorFacade {
             return new DiscrepancyNoteActionProcessor(ds);
         case EMAIL:
             return new EmailActionProcessor(ds, mailSender);
+        case SHOW:
+            return new ShowActionProcessor(ds);
         default:
             throw new OpenClinicaSystemException("actionType", "Unrecognized action type!");
         }

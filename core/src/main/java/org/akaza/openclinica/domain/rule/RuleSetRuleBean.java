@@ -9,6 +9,7 @@ package org.akaza.openclinica.domain.rule;
 
 import org.akaza.openclinica.domain.AbstractAuditableMutableDomainObject;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
+import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
@@ -100,6 +101,24 @@ public class RuleSetRuleBean extends AbstractAuditableMutableDomainObject {
         for (RuleActionBean action : actions) {
             String key = action.getExpressionEvaluatesTo().toString();
             if (ruleEvaluatedTo.equals(key)) {
+                ruleActions.add(action);
+            }
+        }
+        return ruleActions;
+    }
+
+    /**
+     * Run the rule and pass in the result. Will return all actions 
+     * that match the result. 
+     * @param actionEvaluatesTo
+     * @return
+     */
+    @Transient
+    public List<RuleActionBean> getActions(String ruleEvaluatedTo, Phase phase) {
+        List<RuleActionBean> ruleActions = new ArrayList<RuleActionBean>();
+        for (RuleActionBean action : actions) {
+            String key = action.getExpressionEvaluatesTo().toString();
+            if (ruleEvaluatedTo.equals(key) && action.getRuleActionRun().canRun(phase)) {
                 ruleActions.add(action);
             }
         }

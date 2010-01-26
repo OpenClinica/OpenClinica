@@ -3,6 +3,7 @@
 <mapping>
 
     <field-handler name="emailHandler" class="org.akaza.openclinica.bean.rule.EmailHandler"/>
+    <field-handler name="oidHandler" class="org.akaza.openclinica.bean.rule.OidHandler"/>
 
     <class name="org.akaza.openclinica.domain.rule.RulesPostImportContainer">
         <map-to xml="RuleImport"/>
@@ -97,6 +98,32 @@
         <field name="To"
                type="java.lang.String" handler="emailHandler">
             <bind-xml name="To" node="element"/>
+        </field>
+     </class>
+     <class name="org.akaza.openclinica.domain.rule.action.ShowActionBean">
+        <map-to xml="ShowAction" />
+        <field name="ExpressionEvaluatesTo"
+               type="java.lang.Boolean">
+            <bind-xml name="IfExpressionEvaluates" node="attribute"/>
+       </field>
+        <field name="Message"
+               type="java.lang.String">
+            <bind-xml name="Message" node="element"/>
+        </field>
+        <field name="OIDs"
+               type="java.lang.String" handler="oidHandler">
+            <bind-xml name="OIDs" node="element"/>
+        </field>
+     </class>
+     <class name="org.akaza.openclinica.domain.rule.action.InsertActionBean">
+        <map-to xml="InsertAction" />
+        <field name="ExpressionEvaluatesTo"
+               type="java.lang.Boolean">
+            <bind-xml name="IfExpressionEvaluates" node="attribute"/>
+       </field>
+        <field name="Message"
+               type="java.lang.String">
+            <bind-xml name="Message" node="element"/>
         </field>
      </class>
      <class name="org.akaza.openclinica.domain.rule.expression.ExpressionBean">

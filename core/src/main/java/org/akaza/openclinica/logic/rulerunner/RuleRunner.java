@@ -55,10 +55,15 @@ public class RuleRunner {
     private ItemFormMetadataDAO itemFormMetadataDao;
     private SectionDAO sectionDao;
     private final JavaMailSenderImpl mailSender;
+    protected RuleRunnerMode ruleRunnerMode;
     DataSource ds;
 
     String requestURLMinusServletPath;
     String contextPath;
+
+    public enum RuleRunnerMode {
+        DATA_ENTRY, CRF_BULK, RULSET_BULK
+    };
 
     public RuleRunner(DataSource ds, String requestURLMinusServletPath, String contextPath, JavaMailSenderImpl mailSender) {
         this.ds = ds;

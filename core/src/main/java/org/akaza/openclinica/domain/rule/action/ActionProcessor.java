@@ -2,8 +2,11 @@ package org.akaza.openclinica.domain.rule.action;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
+import org.akaza.openclinica.logic.rulerunner.RuleRunner.RuleRunnerMode;
 
 public interface ActionProcessor {
 
-    public void execute(RuleActionBean ruleAction, int itemDataBeanId, String itemData, StudyBean currentStudy, UserAccountBean ub, Object... arguments);
+    public RuleActionBean execute(RuleRunnerMode ruleRunnerMode, ExecutionMode executionMode, RuleActionBean ruleAction, int itemDataBeanId, String itemData,
+            StudyBean currentStudy, UserAccountBean ub, Object... arguments);
 }

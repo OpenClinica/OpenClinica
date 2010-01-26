@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+	<changeSet author="kkrumlian" id="2010-01-13-4575-1">
+		<comment>update rule_action add oids column</comment>
+		<addColumn tableName="rule_action">
+            <column name="oids" type="varchar(512)"/>
+        </addColumn>
+	</changeSet>
+	<changeSet author="kkrumlian" id="2010-01-13-4575-2">
+        <comment>Create a table named audit_user_login</comment>
+        <createTable tableName="rule_action_run">
+            <column autoIncrement="true" name="id" type="int">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="administrative_data_entry" type="BOOLEAN"/>
+            <column name="initial_data_entry" type="BOOLEAN"/>
+            <column name="double_data_entry" type="BOOLEAN"/>
+            <column name="import_data_entry" type="BOOLEAN"/>
+            <column name="batch" type="BOOLEAN"/>
+            <column name="version" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="kkrumlian" id="2010-01-13-4575-3" dbms="oracle">
+        <comment>Create a sequence/trigger to imitate autoIncrement functionality for oracle</comment>
+        <comment>trigger name, table name, sequence name Will need to be changed for each table.</comment>
+        <createSequence sequenceName="RULE_ACTION_RUN_ID_SEQ"/>
+        <sql splitStatements="false"> 
+            create or replace trigger rule_action_run_bef_trg 
+                before insert on rule_action_run
+                    for each row begin 
+                        if :new.id is null 
+                         then select RULE_ACTION_RUN_ID_SEQ.nextval into :new.id from dual; 
+                        end if; 
+                    end; 
+        </sql>
+        <rollback>
+            drop trigger rule_action_run_bef_trg;
+            drop sequence RULE_ACTION_RUN_ID_SEQ;
+        </rollback>
+    </changeSet>
+    <changeSet author="kkrumlian" id="2010-01-13-4575-3">
+        <comment>update rule_action add rule_action_run_id column</comment>
+        <addColumn tableName="rule_action">
+            <column name="rule_action_run_id" type="INT"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

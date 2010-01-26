@@ -19,7 +19,7 @@
      <util:properties id="dataInfo" location="classpath:datainfo.properties"/>
      <util:properties id="enterpriseInfo" location="classpath:enterprise.properties"/>
      
-     <bean class="org.akaza.openclinica.dao.core.CoreResources">
+     <bean id="coreResources" class="org.akaza.openclinica.dao.core.CoreResources">
         <property name="dataInfo" ref="dataInfo"/>
      </bean>
      

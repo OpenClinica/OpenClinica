@@ -640,7 +640,8 @@ public abstract class DataEntryServlet extends SecureController {
                         System.out.println("&&& found name: " + itemName);
                         System.out.println("input VALIDATE " + itemName + ": " + fp.getString(itemName));
                         // dib.loadFormValue(fp.getString(itemName));
-                        System.out.println("input " + itemName + " has a response set of " + dib.getMetadata().getResponseSet().getOptions().size() + " options");
+                        System.out.println("input " + itemName + " has a response set of " + dib.getMetadata().getResponseSet().getOptions().size()
+                            + " options");
                     } else {
                         String itemName = getInputName(dib);
                         System.out.println("input NONVALIDATE " + itemName + ": " + fp.getString(itemName));

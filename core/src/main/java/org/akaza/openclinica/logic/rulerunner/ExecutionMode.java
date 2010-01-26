@@ -1,28 +1,22 @@
-package org.akaza.openclinica.domain.rule.action;
+package org.akaza.openclinica.logic.rulerunner;
 
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.enumsupport.CodedEnum;
 
 import java.util.HashMap;
 
-/*
- * Use this enum as operator holder
- * @author Krikor Krumlian
- *
- */
+public enum ExecutionMode implements CodedEnum {
 
-public enum ActionType implements CodedEnum {
-
-    FILE_DISCREPANCY_NOTE(1, "File Discrepancy Note"), EMAIL(2, "Email"), SHOW(3, "Show"), INSERT(4, "Insert");
+    DRY_RUN(1, "Dry Run"), SAVE(2, "Email");
 
     private int code;
     private String description;
 
-    ActionType(int code) {
+    ExecutionMode(int code) {
         this(code, null);
     }
 
-    ActionType(int code, String description) {
+    ExecutionMode(int code, String description) {
         this.code = code;
         this.description = description;
     }
@@ -31,9 +25,9 @@ public enum ActionType implements CodedEnum {
         return Status.valueOf(Status.class, name);
     }
 
-    public static ActionType getByCode(Integer code) {
-        HashMap<Integer, ActionType> enumObjects = new HashMap<Integer, ActionType>();
-        for (ActionType theEnum : ActionType.values()) {
+    public static ExecutionMode getByCode(Integer code) {
+        HashMap<Integer, ExecutionMode> enumObjects = new HashMap<Integer, ExecutionMode>();
+        for (ExecutionMode theEnum : ExecutionMode.values()) {
             enumObjects.put(theEnum.getCode(), theEnum);
         }
         return enumObjects.get(Integer.valueOf(code));

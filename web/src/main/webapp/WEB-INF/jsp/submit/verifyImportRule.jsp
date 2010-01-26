@@ -215,20 +215,20 @@
                 <td class="table_header_row"><fmt:message key="rule_verify_import_action_message" bundle="${resword}"/></td>
             </tr>
             <c:forEach var="ruleSetRule" items="${ruleBeanWrapper.auditableBean.ruleSetRules}" >
-
-            <tr valign="top">
+                
+                <c:forEach var="action" items="${ruleSetRule.actions}" >
+                <tr valign="top">
                 <td class="table_cell_left">
                     <c:out value="${ruleSetRule.oid}" />
                 </td>
-                <c:forEach var="action" items="${ruleSetRule.actions}" >
                 <td class="table_cell_left">
                         <c:out value="${action.actionType}" />
                 </td>
                 <td class="table_cell_left">
                         <c:out value="${action.message}" />
                 </td>
+                </tr>
                 </c:forEach>
-            </tr>
             </c:forEach>
             </table>
             </div>

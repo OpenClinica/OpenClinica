@@ -13,6 +13,7 @@ import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
@@ -32,6 +33,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Locale;
 
 /**
@@ -62,7 +64,8 @@ public class ImportRuleServlet extends SecureController {
             try {
                 File f = uploadHelper.returnFiles(request, context, getDirToSaveUploadedFileIn()).get(0);
                 //File xsdFile = new File(getServletContext().getInitParameter("propertiesDir") + "rules.xsd");
-                File xsdFile = new File(SpringServletAccess.getPropertiesDir(context) +  "rules.xsd");
+                //File xsdFile = new File(SpringServletAccess.getPropertiesDir(context) + "rules.xsd");
+                InputStream xsdFile = getCoreResources().getInputStream("rules.xsd");
 
                 schemaValidator.validateAgainstSchema(f, xsdFile);
                 RulesPostImportContainer importedRules = handleLoadCastor(f);
@@ -95,7 +98,8 @@ public class ImportRuleServlet extends SecureController {
             XMLContext xmlContext = new XMLContext();
             // create and set a Mapping instance
             Mapping mapping = xmlContext.createMapping();
-            mapping.loadMapping(SpringServletAccess.getPropertiesDir(context) + "mapping.xml");
+            //mapping.loadMapping(SpringServletAccess.getPropertiesDir(context) + "mapping.xml");
+            mapping.loadMapping(getCoreResources().getURL("mapping.xml"));
 
             xmlContext.addMapping(mapping);
             // create a new Unmarshaller
@@ -130,6 +134,10 @@ public class ImportRuleServlet extends SecureController {
                     .getApplicationContext(context).getBean("rulesPostImportContainerService");
         rulesPostImportContainerService.setCurrentStudy(currentStudy);
         return rulesPostImportContainerService;
+    }
+
+    private CoreResources getCoreResources() {
+        return (CoreResources) SpringServletAccess.getApplicationContext(context).getBean("coreResources");
     }
 
     @Override

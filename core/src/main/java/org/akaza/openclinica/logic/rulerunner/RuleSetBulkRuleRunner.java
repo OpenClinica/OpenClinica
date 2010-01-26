@@ -88,7 +88,7 @@ public class RuleSetBulkRuleRunner extends RuleRunner {
                                 int itemDataBeanId = getExpressionService().getItemDataBeanFromDb(ruleSet.getTarget().getValue()).getId();
                                 ruleAction.setCuratedMessage(curateMessage(ruleAction, ruleSetRule));
                                 ActionProcessor ap = ActionProcessorFacade.getActionProcessor(ruleAction.getActionType(), ds, getMailSender());
-                                ap.execute(ruleAction, itemDataBeanId, DiscrepancyNoteBean.ITEM_DATA, currentStudy, ub, prepareEmailContents(ruleSet,
+                                ap.execute(null, ExecutionMode.SAVE, ruleAction, itemDataBeanId, DiscrepancyNoteBean.ITEM_DATA, currentStudy, ub, prepareEmailContents(ruleSet,
                                         ruleSetRule, currentStudy, ruleAction));
                                 // getDiscrepancyNoteService().saveFieldNotes(ruleAction.getSummary(), itemDataBeanId, "ItemData", currentStudy, ub);
                             }

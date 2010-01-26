@@ -26,6 +26,7 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
+import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -91,27 +92,27 @@ public class ExpressionService {
     private void init(DataSource ds, ExpressionObjectWrapper expressionWrapper) {
         pattern = new Pattern[4];
         pattern[3] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN); // STUDY_EVENT_DEFINITION_OID
-                                                                                    // +
-                                                                                    // ordinal
+        // +
+        // ordinal
         pattern[2] = Pattern.compile(CRF_OID_OR_ITEM_DATA_PATTERN); // CRF_OID
-                                                                    // or
-                                                                    // CRF_VERSION_OID
+        // or
+        // CRF_VERSION_OID
         pattern[1] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN); // ITEM_GROUP_DATA_OID
-                                                                                    // +
-                                                                                    // ordinal
+        // +
+        // ordinal
         pattern[0] = Pattern.compile(CRF_OID_OR_ITEM_DATA_PATTERN); // ITEM_DATA_OID
 
         // [ALL] ordinals are not accepted in Rule Expressions
         rulePattern = new Pattern[4];
         rulePattern[3] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN_NO_ALL); // STUDY_EVENT_DEFINITION_OID
-                                                                                                // +
-                                                                                                // ordinal
+        // +
+        // ordinal
         rulePattern[2] = Pattern.compile(CRF_OID_OR_ITEM_DATA_PATTERN); // CRF_OID
-                                                                        // or
-                                                                        // CRF_VERSION_OID
+        // or
+        // CRF_VERSION_OID
         rulePattern[1] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN_NO_ALL); // ITEM_GROUP_DATA_OID
-                                                                                                // +
-                                                                                                // ordinal
+        // +
+        // ordinal
         rulePattern[0] = Pattern.compile(CRF_OID_OR_ITEM_DATA_PATTERN); // ITEM_DATA_OID
 
         this.studyEventDefinitions = new HashMap<String, StudyEventDefinitionBean>();
@@ -624,9 +625,37 @@ public class ExpressionService {
         if (studyEventDefinition == null || crf == null)
             throw new OpenClinicaSystemException("StudyEventDefinition OID or CRF OID is Invalid");
 
-        return getEventDefinitionCRFDao().findByStudyEventDefinitionIdAndCRFId(this.expressionWrapper.getStudyBean(), studyEventDefinition.getId(), crf.getId());
+        return getEventDefinitionCRFDao()
+                .findByStudyEventDefinitionIdAndCRFId(this.expressionWrapper.getStudyBean(), studyEventDefinition.getId(), crf.getId());
     }
 
+    public String checkValidityOfItemOrItemGroupOidInCrf(String oid, RuleSetBean ruleSet) {
+
+        String[] theOid = oid.split(ESCAPED_SEPERATOR);
+        if (theOid.length == 2) {
+            ItemGroupBean itemGroup = getItemGroupDao().findByOid(theOid[0]);
+            if (itemGroup != null && itemGroup.getCrfId().equals(ruleSet.getCrfId())) {
+                ItemBean item = getItemDao().findItemByGroupIdandItemOid(itemGroup.getId(), theOid[1]);
+                if (item != null) {
+                    return "OK";
+                }
+            }
+
+        }
+        if (theOid.length == 1) {
+            ItemGroupBean itemGroup = getItemGroupDao().findByOid(oid);
+            if (itemGroup != null && itemGroup.getCrfId() == ruleSet.getCrf().getId()) {
+                return "OK";
+            }
+
+            ItemBean item = getItemDao().findItemByGroupIdandItemOid(getItemGroupExpression(ruleSet.getTarget().getValue()).getId(), oid);
+            if (item != null) {
+                return "OK";
+            }
+        }
+
+        return oid;
+    }
 
     public boolean checkSyntax(String expression) {
         if (expression.startsWith(SEPERATOR) || expression.endsWith(SEPERATOR)) {

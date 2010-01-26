@@ -4,6 +4,8 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
+import org.akaza.openclinica.logic.rulerunner.RuleRunner.RuleRunnerMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mail.MailException;
@@ -32,9 +34,21 @@ public class EmailActionProcessor implements ActionProcessor {
         this.mailSender = mailSender;
     }
 
-    public void execute(RuleActionBean ruleAction, int itemDataBeanId, String itemData, StudyBean currentStudy, UserAccountBean ub, Object... arguments) {
-        HashMap<String, String> arg0 = (HashMap<String, String>) arguments[0];
-        sendEmail(ruleAction, ub, arg0.get("body"), arg0.get("subject"));
+    public RuleActionBean execute(RuleRunnerMode ruleRunnerMode, ExecutionMode executionMode, RuleActionBean ruleAction, int itemDataBeanId, String itemData,
+            StudyBean currentStudy, UserAccountBean ub, Object... arguments) {
+        switch (executionMode) {
+        case DRY_RUN: {
+            return ruleAction;
+        }
+
+        case SAVE: {
+            HashMap<String, String> arg0 = (HashMap<String, String>) arguments[0];
+            sendEmail(ruleAction, ub, arg0.get("body"), arg0.get("subject"));
+            return null;
+        }
+        default:
+            return null;
+        }
     }
 
     private void sendEmail(RuleActionBean ruleAction, UserAccountBean ub, String body, String subject) throws OpenClinicaSystemException {

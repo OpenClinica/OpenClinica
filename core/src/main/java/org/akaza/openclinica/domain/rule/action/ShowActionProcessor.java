@@ -4,28 +4,34 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.RuleRunner.RuleRunnerMode;
-import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
 
 import javax.sql.DataSource;
 
-public class DiscrepancyNoteActionProcessor implements ActionProcessor {
+public class ShowActionProcessor implements ActionProcessor {
 
     DataSource ds;
-    DiscrepancyNoteService discrepancyNoteService;
 
-    public DiscrepancyNoteActionProcessor(DataSource ds) {
+    public ShowActionProcessor(DataSource ds) {
         this.ds = ds;
     }
 
     public RuleActionBean execute(RuleRunnerMode ruleRunnerMode, ExecutionMode executionMode, RuleActionBean ruleAction, int itemDataBeanId, String itemData,
             StudyBean currentStudy, UserAccountBean ub, Object... arguments) {
+
         switch (executionMode) {
         case DRY_RUN: {
-            dryRun(ruleAction, itemDataBeanId, itemData, currentStudy, ub);
+            if (ruleRunnerMode == RuleRunnerMode.DATA_ENTRY) {
+                return null;
+            } else {
+                dryRun(ruleAction, itemDataBeanId, itemData, currentStudy, ub);
+            }
         }
-
         case SAVE: {
-            save(ruleAction, itemDataBeanId, itemData, currentStudy, ub);
+            if (ruleRunnerMode == RuleRunnerMode.DATA_ENTRY) {
+                saveAndReturnMessage(ruleAction, itemDataBeanId, itemData, currentStudy, ub);
+            } else {
+                save(ruleAction, itemDataBeanId, itemData, currentStudy, ub);
+            }
         }
         default:
             return null;
@@ -33,26 +39,17 @@ public class DiscrepancyNoteActionProcessor implements ActionProcessor {
     }
 
     private RuleActionBean save(RuleActionBean ruleAction, int itemDataBeanId, String itemData, StudyBean currentStudy, UserAccountBean ub) {
-        getDiscrepancyNoteService().saveFieldNotes(ruleAction.getCuratedMessage(), itemDataBeanId, itemData, currentStudy, ub);
+        //
         return null;
     }
 
     private RuleActionBean saveAndReturnMessage(RuleActionBean ruleAction, int itemDataBeanId, String itemData, StudyBean currentStudy, UserAccountBean ub) {
-        getDiscrepancyNoteService().saveFieldNotes(ruleAction.getCuratedMessage(), itemDataBeanId, itemData, currentStudy, ub);
+        //
         return ruleAction;
     }
 
     private RuleActionBean dryRun(RuleActionBean ruleAction, int itemDataBeanId, String itemData, StudyBean currentStudy, UserAccountBean ub) {
         return ruleAction;
-    }
-
-    public void execute(String message, int itemDataBeanId, String itemData, StudyBean currentStudy, UserAccountBean ub, Object... arguments) {
-        getDiscrepancyNoteService().saveFieldNotes(message, itemDataBeanId, itemData, currentStudy, ub);
-    }
-
-    private DiscrepancyNoteService getDiscrepancyNoteService() {
-        discrepancyNoteService = this.discrepancyNoteService != null ? discrepancyNoteService : new DiscrepancyNoteService(ds);
-        return discrepancyNoteService;
     }
 
 }
