@@ -378,6 +378,14 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
         return executeFindAllQuery("findAllByEventDefinitionId", variables);
     }
 
+    public ArrayList findAllByEventDefinitionIdAndOrdinal(int eventDefinitionId, int ordinal) {
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(eventDefinitionId));
+        variables.put(new Integer(2), new Integer(ordinal));
+
+        return executeFindAllQuery("findAllByEventDefinitionIdAndOrdinal", variables);
+    }
+
     /**
      * Find all EventDefinitionCRFBean for the StudyBean.
      * 

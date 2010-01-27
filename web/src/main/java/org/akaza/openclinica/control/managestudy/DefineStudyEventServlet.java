@@ -75,10 +75,10 @@ public class DefineStudyEventServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
         FormProcessor fpr = new FormProcessor(request);
-        // logger.info("action*******" + fpr.getString("action"));
+        // logger.info("actionName*******" + fpr.getString("actionName"));
         // logger.info("pageNum*******" + fpr.getString("pageNum"));
 
-        String action = request.getParameter("action");
+        String actionName = request.getParameter("actionName");
         ArrayList crfsWithVersion = (ArrayList) session.getAttribute("crfsWithVersion");
         if (crfsWithVersion == null) {
             crfsWithVersion = new ArrayList();
@@ -96,17 +96,17 @@ public class DefineStudyEventServlet extends SecureController {
             }
             session.setAttribute("crfsWithVersion", crfsWithVersion);
         }
-        if (StringUtil.isBlank(action)) {
+        if (StringUtil.isBlank(actionName)) {
             StudyEventDefinitionBean sed = new StudyEventDefinitionBean();
             sed.setStudyId(currentStudy.getId());
             session.setAttribute("definition", sed);
             session.removeAttribute("tmpCRFIdMap");
             forwardPage(Page.DEFINE_STUDY_EVENT1);
         } else {
-            if ("confirm".equalsIgnoreCase(action)) {
+            if ("confirm".equalsIgnoreCase(actionName)) {
                 confirmWholeDefinition();
 
-            } else if ("submit".equalsIgnoreCase(action)) {
+            } else if ("submit".equalsIgnoreCase(actionName)) {
                 // put a try catch in here to fix task # 1642 in Mantis, added
                 // 092007 tbh
                 try {
@@ -132,7 +132,7 @@ public class DefineStudyEventServlet extends SecureController {
 //                            boolean redir = "y".equalsIgnoreCase((String)request.getParameter("r"));
 //                            if(redir)  { return;}
                         } else {
-                            logger.info("action ==> 3");
+                            logger.info("actionName ==> 3");
                             submitDefinition();
                             StudyEventDefinitionBean sed = new StudyEventDefinitionBean();
                             sed.setStudyId(currentStudy.getId());
@@ -151,7 +151,7 @@ public class DefineStudyEventServlet extends SecureController {
                 }
                 // above added 092007 tbh
 
-            } else if ("next".equalsIgnoreCase(action)) {
+            } else if ("next".equalsIgnoreCase(actionName)) {
                 Integer pageNumber = Integer.valueOf(request.getParameter("pageNum"));
                 if (pageNumber != null) {
                     if (pageNumber.intValue() == 2) {
@@ -196,7 +196,7 @@ public class DefineStudyEventServlet extends SecureController {
 
         if (errors.isEmpty()) {
             logger.info("no errors in the first section");
-            // logger.info("action*******" + fp.getString("action"));
+            // logger.info("actionName*******" + fp.getString("actionName"));
             // logger.info("pageNum*******" + fp.getString("pageNum"));
             CRFVersionDAO vdao = new CRFVersionDAO(sm.getDataSource());
             ArrayList crfArray = new ArrayList();
@@ -236,7 +236,7 @@ public class DefineStudyEventServlet extends SecureController {
             table.hideColumnLink(5);
             StudyEventDefinitionBean def1 = (StudyEventDefinitionBean) session.getAttribute("definition");
             HashMap args = new HashMap();
-            args.put("action", "next");
+            args.put("actionName", "next");
             args.put("pageNum", "1");
             args.put("name", def1.getName());
             args.put("repeating", new Boolean(def1.isRepeating()).toString());
@@ -376,6 +376,10 @@ public class DefineStudyEventServlet extends SecureController {
         CRFVersionDAO vdao = new CRFVersionDAO(sm.getDataSource());
         ArrayList crfArray = new ArrayList();
         Map tmpCRFIdMap = (HashMap) session.getAttribute("tmpCRFIdMap");
+        // trying to avoid NPE not sure why we would get it there ((tmpCRFIdMap.containsKey(id))), tbh
+        if (tmpCRFIdMap == null) {
+            tmpCRFIdMap = new HashMap();
+        }
         ArrayList crfsWithVersion = (ArrayList) session.getAttribute("crfsWithVersion");
         for (int i = 0; i < crfsWithVersion.size(); i++) {
             int id = fp.getInt("id" + i);

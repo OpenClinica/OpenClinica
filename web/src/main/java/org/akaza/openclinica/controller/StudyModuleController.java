@@ -173,7 +173,7 @@ public class StudyModuleController {
         UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
         request.setAttribute("userBean", userBean);
         ArrayList statusMap = Status.toStudyUpdateMembersList();
-        statusMap.add(Status.PENDING);
+//        statusMap.add(Status.PENDING);
         request.setAttribute("statusMap", statusMap);
 
         ArrayList pageMessages = new ArrayList();

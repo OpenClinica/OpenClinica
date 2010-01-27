@@ -202,17 +202,28 @@ function switchStr(itemId, id,attribute,str1,str2) {
 
 <%--  for setting errors, AE only required one check but others can be more 'elastic' --%>
 <%--  have removed the check for AE, instead have changed the auto parsed name  --%>
+
 <c:forEach var="frmMsg" items="${formMessages}">
+
+	<!-- found frmMsg: <c:out value="${frmMsg.key}"/> -->
+	<!-- checking <c:out value="${parsedInputName}"/>, auto <c:out value="${autoParsedInputName}"/> -->
+
    <c:if test="${(frmMsg.key eq parsedInputName) || (frmMsg.key eq autoParsedInputName)}">
-	<!-- setting error to true here, <c:out value="${parsedInputName}"/>, auto <c:out value="${autoParsedInputName}"/>, 
+
+    	<%-- need to avoid duplicate tripping, but catch the "_manualX" names at the same time, TBH --%>
+    	<%--|| (frmMsg.key eq inputName) || (frmMsg.key eq manualInputName)}">--%>
+		<!-- found frmMsg again: <c:out value="${frmMsg.key}"/> -->
+		<!-- setting error to true here, <c:out value="${parsedInputName}"/>, auto <c:out value="${autoParsedInputName}"/>, 
+	inputName <c:out value="${inputName}"/>, manualInputName <c:out value="${manualInputName}"/>
 	row count <c:out value="${rowCount}"/>, manual rows <c:out value="${manualRows}"/> -->
-	<%-- that can create a 'mirror' effect when an autoparsed input name gets picked up twice --%>
-    <c:set var="isInError" value="${true}" />
-    <c:set var="errorTxtMessage" value="${frmMsg.value}" />
-    <c:set var="errorTxtMessage" value='<%= StringEscapeUtils.escapeJavaScript(pageContext.getAttribute("errorTxtMessage").toString()) %>' />
-	<%-- can we pop off the messages so that they dont repeat? --%>
-	
-  </c:if>
+		<%-- that can create a 'mirror' effect when an autoparsed input name gets picked up twice --%>
+		<c:set var="isInError" value="${true}" />
+		<c:set var="errorTxtMessage" value="${frmMsg.value}" />
+		<c:set var="errorTxtMessage"
+			value='<%=StringEscapeUtils.escapeJavaScript(pageContext.getAttribute("errorTxtMessage").toString())%>' />
+		<%-- can we pop off the messages so that they dont repeat? --%>
+
+	</c:if>
 </c:forEach>
 
 <%-- end of for each loop for setting errors  --%>

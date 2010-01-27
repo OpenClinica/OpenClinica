@@ -41,7 +41,7 @@ public class SubjectEventStatus extends Term implements Comparable {
 
     public static final SubjectEventStatus SIGNED = new SubjectEventStatus(8, "signed");
 
-    private static final SubjectEventStatus[] members = { SCHEDULED, NOT_SCHEDULED, DATA_ENTRY_STARTED, COMPLETED, STOPPED, SKIPPED, LOCKED, SIGNED };
+    private static final SubjectEventStatus[] members = { SCHEDULED, NOT_SCHEDULED, DATA_ENTRY_STARTED, COMPLETED, STOPPED, SKIPPED, SIGNED, LOCKED };
 
     private static List list = Arrays.asList(members);
 

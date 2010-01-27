@@ -9,9 +9,9 @@ package org.akaza.openclinica.bean.core;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
 // Internationalized name and description in Term.getName and
 // Term.getDescription()
@@ -30,19 +30,23 @@ public class Status extends Term implements Comparable {
     public static final Status FROZEN = new Status(9, "frozen");
     public static final Status SOURCE_DATA_VERIFICATION = new Status(10, "source_data_verification");
 
-    private static final Status[] members = { AVAILABLE, PENDING, PRIVATE, UNAVAILABLE, LOCKED, DELETED, AUTO_DELETED, SIGNED, FROZEN,SOURCE_DATA_VERIFICATION };
+    private static final Status[] members =
+        { AVAILABLE, PENDING, PRIVATE, UNAVAILABLE, LOCKED, DELETED, AUTO_DELETED, SIGNED, FROZEN, SOURCE_DATA_VERIFICATION };
     private static List list = Arrays.asList(members);
 
-    private static final Status[] activeMembers = { AVAILABLE, PENDING, PRIVATE, UNAVAILABLE, LOCKED, SIGNED};
+    private static final Status[] activeMembers = { AVAILABLE, PENDING, PRIVATE, UNAVAILABLE, LOCKED, SIGNED };
     private static List activeList = Arrays.asList(activeMembers);
 
-    private static final Status[] studyUpdateMembers = {AVAILABLE, LOCKED, FROZEN};
+    private static final Status[] studySubjectDropDownMembers = { AVAILABLE, SIGNED, DELETED };
+    private static List studySubjectDropDownList = Arrays.asList(studySubjectDropDownMembers);
+
+    private static final Status[] studyUpdateMembers = { PENDING, AVAILABLE, FROZEN, LOCKED };
     private static List studyUpdateMembersList = Arrays.asList(studyUpdateMembers);
 
     //Solve the problem with the get() method...
-    private static final Map<Integer,String> membersMap = new HashMap<Integer,String>();
-    static{
-        membersMap.put(0,"invalid");
+    private static final Map<Integer, String> membersMap = new HashMap<Integer, String>();
+    static {
+        membersMap.put(0, "invalid");
         membersMap.put(1, "available");
         membersMap.put(2, "unavailable");
         membersMap.put(3, "private");
@@ -70,11 +74,11 @@ public class Status extends Term implements Comparable {
         return (Status) Term.get(id, list);
     }
 
-    public static Status getFromMap(int id){
-        if(id < 0 || id > (membersMap.size()-1)) {
+    public static Status getFromMap(int id) {
+        if (id < 0 || id > (membersMap.size() - 1)) {
             return Status.INVALID;
         }
-        return (Status)get(id, list);
+        return (Status) get(id, list);
     }
 
     public static ArrayList toArrayList() {
@@ -83,6 +87,10 @@ public class Status extends Term implements Comparable {
 
     public static ArrayList toActiveArrayList() {
         return new ArrayList(activeList);
+    }
+
+    public static ArrayList toDropDownArrayList() {
+        return new ArrayList(studySubjectDropDownList);
     }
 
     public static ArrayList toStudyUpdateMembersList() {
@@ -161,17 +169,18 @@ public class Status extends Term implements Comparable {
     public boolean isSigned() {
         return this == Status.SIGNED;
     }
+
     public boolean isFrozen() {
         return this == Status.FROZEN;
     }
 
-   /* public static void main(String[] args) {
-        int[] nums = {0,1,2,3,4,5,6,7,8,9};
-        Status stat;
+    /* public static void main(String[] args) {
+         int[] nums = {0,1,2,3,4,5,6,7,8,9};
+         Status stat;
 
-        for(int tmp : nums){
-             stat = (Status) get(tmp);
-        }
-    }*/
+         for(int tmp : nums){
+              stat = (Status) get(tmp);
+         }
+     }*/
 
 }

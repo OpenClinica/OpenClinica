@@ -386,7 +386,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 
             }
             dnb.setOwnerId(parent.getOwnerId());
-            System.out.println("just set owner id to " + parent.getOwnerId());
+            // System.out.println("just set owner id to " + parent.getOwnerId());
             String detailedDes = fp.getString("strErrMsg");
             if (detailedDes != null) {
                 dnb.setDetailedNotes(detailedDes);
@@ -395,6 +395,12 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             // #4346 TBH 10/2009 
 
             dnb = getNoteInfo(dnb);// populate note infos
+//            String detailedDes = fp.getString("strErrMsg");
+//            if (detailedDes != null) {
+//            	dnb.setDetailedNotes(detailedDes);
+//            	// System.out.println("found strErrMsg: " +fp.getString("strErrMsg"));
+//            }
+//            // #4346 TBH 10/2009 
             request.setAttribute(DIS_NOTE, dnb);
             request.setAttribute("unlock", "0");
             request.setAttribute(WRITE_TO_DB, writeToDB ? "1" : "0");
@@ -437,6 +443,9 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             int assignedUserAccountId = fp.getInt(SUBMITTED_USER_ACCOUNT_ID);
             int resStatusId = fp.getInt(RES_STATUS_ID);
             String detailedDes = fp.getString("detailedDes");
+            // #4346 TBH 10/2009
+            // String detailedDes = fp.getString("strErrMsg");
+            // System.out.println("found strErrMsg: " +fp.getString("strErrMsg") + " and detailedDes: " + fp.getString("detailedDes"));
             int sectionId = fp.getInt("sectionId");
             String groupLabel = fp.getString("groupLabel");
             DiscrepancyNoteBean note = new DiscrepancyNoteBean();
@@ -529,12 +538,12 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             if (errors.isEmpty()) {
 
                 if (!writeToDB) {
-                    logger.info("save note into session");
+                    System.out.println("*** save note into session: " + field);
                     noteTree.addNote(field, note);
                     noteTree.addIdNote(note.getEntityId(), field);
                     session.setAttribute(FORM_DISCREPANCY_NOTES_NAME, noteTree);
                     //
-                    System.out.println("forwarding on line 494");
+                    System.out.println("forwarding on line 537");
                     /*Setting a marker to check later while saving administrative edited data. This is needed to make
                     * sure the system flags error while changing data for items which already has a DiscrepanyNote*/
                     session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, true);

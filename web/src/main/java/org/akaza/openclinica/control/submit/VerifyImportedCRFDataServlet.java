@@ -102,9 +102,9 @@ public class VerifyImportedCRFDataServlet extends SecureController {
         DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(ds);
         note = (DiscrepancyNoteBean) dndao.create(note);
         // so that the below method works, need to set the entity above
-        System.out.println("trying to create mapping with " + note.getId() + " " + note.getEntityId() + " " + note.getColumn() + " " + note.getEntityType());
+        // System.out.println("trying to create mapping with " + note.getId() + " " + note.getEntityId() + " " + note.getColumn() + " " + note.getEntityType());
         dndao.createMapping(note);
-        System.out.println("just created mapping");
+        // System.out.println("just created mapping");
         return note;
     }
 
@@ -141,7 +141,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 
         if ("save".equalsIgnoreCase(action)) {
             List<DisplayItemBeanWrapper> displayItemBeanWrappers = (List<DisplayItemBeanWrapper>) session.getAttribute("importedData");
-            System.out.println("Size of displayItemBeanWrappers : " + displayItemBeanWrappers.size());
+            // System.out.println("Size of displayItemBeanWrappers : " + displayItemBeanWrappers.size());
 
             for (DisplayItemBeanWrapper wrapper : displayItemBeanWrappers) {
 
@@ -166,7 +166,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                     // Template, a discrepancy note is automatically logged.
                     // The DN will have a type of Failed Validation Check, and
                     // a message of Failed Validation check."
-                    System.out.println("wrapper problems found : " + wrapper.getValidationErrors().toString());
+                    // System.out.println("wrapper problems found : " + wrapper.getValidationErrors().toString());
                     for (DisplayItemBean displayItemBean : wrapper.getDisplayItemBeans()) {
                         eventCrfBeanId = displayItemBean.getData().getEventCRFId();
                         eventCrfBean = (EventCRFBean) eventCrfDao.findByPK(eventCrfBeanId);
@@ -229,7 +229,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                         ItemBean ibean = (ItemBean) idao.findByPK(displayItemBean.getData().getItemId());
                         // logger.info("continued2: getName " +
                         // ibean.getName());
-                        System.out.println("*** checking for validation errors: " + ibean.getName());
+                        // System.out.println("*** checking for validation errors: " + ibean.getName());
                         String itemOid =
                             displayItemBean.getItem().getOid() + "_" + wrapper.getStudyEventRepeatKey() + "_" + displayItemBean.getData().getOrdinal() + "_"
                                 + wrapper.getStudySubjectOid();
@@ -250,7 +250,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                                             currentStudy);
                                 ImportSpringJob.createDiscrepancyNote(ibean, message, eventCrfBean, displayItemBean, parentDn.getId(), ub, sm.getDataSource(),
                                         currentStudy);
-                                System.out.println("*** created disc note with message: " + message);
+                                // System.out.println("*** created disc note with message: " + message);
                                 // displayItemBean);
                             }
                         }
@@ -258,7 +258,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                         // "+displayItemBean.getDbData().getName());
                         if (!eventCrfInts.contains(new Integer(eventCrfBean.getId()))) {
                             crfBusinessLogicHelper.markCRFComplete(eventCrfBean, ub);
-                            System.out.println("*** just updated event crf bean: " + eventCrfBean.getId());
+                            // System.out.println("*** just updated event crf bean: " + eventCrfBean.getId());
                             eventCrfInts.add(new Integer(eventCrfBean.getId()));
                         }
                     }

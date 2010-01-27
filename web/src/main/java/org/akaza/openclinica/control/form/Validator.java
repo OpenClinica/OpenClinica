@@ -58,7 +58,7 @@ import javax.servlet.http.HttpServletRequest;
  *
  * // fieldName is the name of your HTML input field.
  * // validationType is one of the Validator static ints
- * // args depends on which type of validation you’re doing,
+ * // args depends on which type of validation you're doing,
  * // see below for details
  * v.addValidation(fieldName, validationType, args);
  *
@@ -73,12 +73,12 @@ import javax.servlet.http.HttpServletRequest;
  * HashMap errors = v.validate();
  *
  * if (errors.isEmpty()) {
- * 		// this means all of your validations were successful;
- *		// you can proceed with writing to the database or whatever
+ *      // this means all of your validations were successful;
+ *      // you can proceed with writing to the database or whatever
  * }
  *
  * else {
- * 		// this means at least one of your fields did not validate properly.
+ *      // this means at least one of your fields did not validate properly.
  * }
  * </code>
  * 
@@ -90,10 +90,10 @@ import javax.servlet.http.HttpServletRequest;
  * ArrayList fieldMessages = errors.get(fieldname);
  *
  * if (fieldMessages.isEmpty()) {
- * 		// there were no errors on the form
+ *      // there were no errors on the form
  * }
  * else {
- * 		// there were errors on the form
+ *      // there were errors on the form
  * }
  * </code>
  * 
@@ -102,28 +102,28 @@ import javax.servlet.http.HttpServletRequest;
  * semantics as well as the syntax of the addValidation call:
  * 
  * <ul>
- * <li> NO_BLANKS – test that a given input is not blank
+ * <li> NO_BLANKS   test that a given input is not blank
  * <ul>
  * <li> addValidation(fieldname, Validator.NO_BLANKS);
  * </ul>
- * <li> IS_A_NUMBER – test that a given input is a valid number, e.g. "5",
+ * <li> IS_A_NUMBER   test that a given input is a valid number, e.g. "5",
  * "5.5", "-5", etc.
  * <ul>
  * <li> addValidation(fieldname, Validator.IS_A_NUMBER);
  * </ul>
- * <li> IS_IN_RANGE – test that a given input is an integer in a specified range
+ * <li> IS_IN_RANGE   test that a given input is an integer in a specified range
  * (inclusive), e.g. is between 1 and 5 inclusive
  * <ul>
  * <li> addValidation(fieldname, Validator.IS_IN_RANGE, lowerBound, upperBound);
  * <li> e.g. addValidation(fieldname, Validator.IS_IN_RANGE, 1, 5);
  * </ul>
- * <li> IS_A_DATE – test that a given input is in "MM/DD/YYYY" format. Note that
+ * <li> IS_A_DATE   test that a given input is in "MM/DD/YYYY" format. Note that
  * this format is specified as Validator.DATE.getDescription() (DATE is a static
  * ValidationRegularExpression object)
  * <ul>
  * <li> addValidation(fieldname, Validator.IS_A_DATE)
  * </ul>
- * <li> IS_DATE_TIME – test that a given input is in "MM/DD/YYYY HH:MM a"
+ * <li> IS_DATE_TIME   test that a given input is in "MM/DD/YYYY HH:MM a"
  * format. Note that this format is specified as
  * Validator.DATE_TIME.getDescription() (DATE is a static
  * ValidationRegularExpression object)
@@ -150,13 +150,13 @@ import javax.servlet.http.HttpServletRequest;
  * <li> to complete the example, if errors exist on the form, they will appear
  * in the "start" and "end" key of the error messages
  * </ul>
- * <li> CHECK_SAME – test that one field equals the value of another. This is
+ * <li> CHECK_SAME   test that one field equals the value of another. This is
  * null-safe meaning that if both fields are blank, no errors are reported.
  * <ul>
  * <li> addValidation(fieldname, Validator.CHECK_SAME, fieldname2)
- * <li> e.g. addValidation(“password”, Validator.CHECK_SAME, “confirmPassword”);
+ * <li> e.g. addValidation( password , Validator.CHECK_SAME,  confirmPassword );
  * </ul>
- * <li> IS_A_EMAIL – test that one field is in proper e-mail format, ie
+ * <li> IS_A_EMAIL   test that one field is in proper e-mail format, ie
  * "username@institution.domain". Note that this format is specified as
  * Validator.EMAIL.getDescription() (EMAIL is a static
  * ValidationRegularExpression object)
@@ -170,37 +170,37 @@ import javax.servlet.http.HttpServletRequest;
  * <ul>
  * <li> addValidation(fieldname, Validator.IS_A_PHONE_NUMER);
  * </ul>
- * <li> LENGTH_NUMERIC_COMPARISON – test that the length of a string meets some
+ * <li> LENGTH_NUMERIC_COMPARISON   test that the length of a string meets some
  * numeric comparison test, e.g. ">= 8 characters long".
  * <ul>
  * <li> addValidation(fieldname, Validator.LENGTH_NUMERIC_COMPARISON, operator,
  * compareTo);
  * <li> operator is a NumericComparisonOperator object.
  * (NumericComparisonOperator is a typesafe enumeration which implements a
- * controlled vocabulary of “=”, “!=”, “ <”, “ <=”, “>”, “>=”)
+ * controlled vocabulary of  = ,  != ,   < ,   <= ,  > ,  >= )
  * <li> compareTo is an integer
- * <li> e.g. addValidation(“password”, Validator.LENGTH_NUMERIC_COMPARISON,
+ * <li> e.g. addValidation( password , Validator.LENGTH_NUMERIC_COMPARISON,
  * NumericComparisonOperator.GREATER_THAN_OR_EQUAL_TO, 8);
  * </ul>
- * <li> ENTITY_EXISTS – not yet implemented, but it will test that the value of
+ * <li> ENTITY_EXISTS   not yet implemented, but it will test that the value of
  * an input field holds the primary key of some entity in the database; the
  * entity type is implicitly specified by an EntityDAO passed to addValidation
  * <li> USERNAME_UNIQUE - not yet implemented, but it will test that there are
  * no users with the specified username
- * <li> IS_AN_INTEGER – test that a string is a valid integer
+ * <li> IS_AN_INTEGER   test that a string is a valid integer
  * <ul>
  * <li> addValidation(fieldname, Validator.IS_AN_INTEGER)
  * </ul>
- * <li> IS_A_FILE – not yet implemented, but it will test that the value of an
+ * <li> IS_A_FILE   not yet implemented, but it will test that the value of an
  * input is a successfully updated file
- * <li> IS_OF_FILE_TYPE – not yet implemented, but it will test that an uploaded
+ * <li> IS_OF_FILE_TYPE   not yet implemented, but it will test that an uploaded
  * file has a specified file type
- * <li> IS_IN_SET – test that an input field belongs to some ad-hoc set
+ * <li> IS_IN_SET   test that an input field belongs to some ad-hoc set
  * <ul>
  * <li> addValidation(fieldname, Validator.IS_IN_SET, set);
  * <li> set is an ArrayList of Entities
  * </ul>
- * <li> IS_A_PASSWORD – test that an input field is a valid password
+ * <li> IS_A_PASSWORD   test that an input field is a valid password
  * <ul>
  * <li> addValidation(fieldname, Validator.IS_A_PASSWORD);
  * </ul>
@@ -208,23 +208,23 @@ import javax.servlet.http.HttpServletRequest;
  * <ul>
  * <li> addValidation(fieldname, Validator.IS_A_USERNAME, username);
  * </ul>
- * <li> IS_VALID_TERM – test that an input field holds the id of some controlled
+ * <li> IS_VALID_TERM   test that an input field holds the id of some controlled
  * vocabulary term
  * <ul>
  * <li> addValidation(fieldname, Validator.IS_VALID_TERM, termType);
  * <li> termType is a TermType object
  * <li> TermType is a controlled vocabulary of controlled vocabularies, e.g. it
  * lists all of the controlled vocabularies
- * <li> e.g. addValidation(“statusId”, Validator.IS_VALID_TERM,
+ * <li> e.g. addValidation( statusId , Validator.IS_VALID_TERM,
  * TermType.STATUS);
  * </ul>
- * <li> COMPARES_TO_STATIC_VALUE – test that an input field is an integer which
+ * <li> COMPARES_TO_STATIC_VALUE   test that an input field is an integer which
  * matches a Boolean comparison to some fixed integer value
  * <ul>
  * <li> addValidation(fieldname, Validator.COMPARES_TO_STATIC_VALUE, operator,
  * compareTo);
  * <li> operator is a NumericComparisonOperator object
- * <li> e.g. addValidation(“numSubjects”, Validator.COMPARES_TO_STATIC_VALUE,
+ * <li> e.g. addValidation( numSubjects , Validator.COMPARES_TO_STATIC_VALUE,
  * NumericComparisonOperator.GREATER_THAN_OR_EQUAL_TO, 1)
  * </ul>
  * <li> DATE_IS_AFTER_OR_EQUAL - test that one date comes after or is equal to
@@ -277,10 +277,10 @@ import javax.servlet.http.HttpServletRequest;
  * fact, there is no such method (at the time of writing), so we add one: <br/><br/>
  * <code>
  * public void addValidation(String fieldName, int type, int multiple) {
- * 		// for use with IS_MULTIPLE validations
- * 		Validation v = new Validation(type);
- * 		v.addArgument(multiple);
- * 		addValidation(fieldName, v);
+ *      // for use with IS_MULTIPLE validations
+ *      Validation v = new Validation(type);
+ *      v.addArgument(multiple);
+ *      addValidation(fieldName, v);
  * }
  * </code>
  * 
@@ -298,21 +298,21 @@ import javax.servlet.http.HttpServletRequest;
  * validations. don't reinvent the wheel! <br/> a new method is necessary, so we
  * will write one: <br/><br/> <code>
  * public boolean isMultiple(String fieldName, int multiple) {
- * 		String fieldValue = request.getParameter(fieldName);
+ *      String fieldValue = request.getParameter(fieldName);
  *
- * 		if (fieldValue == null) {
- * 			return false;
- * 		}
+ *      if (fieldValue == null) {
+ *          return false;
+ *      }
  *
- * 		try {
- * 			int i = Integer.parseInt(fieldValue);
- * 			if ((i % multiple) != 0) {
- * 				return false;
- * 			}
- * 		} catch (Exception e) {
- * 			return false;
- * 		}
- * 		return true;
+ *      try {
+ *          int i = Integer.parseInt(fieldValue);
+ *          if ((i % multiple) != 0) {
+ *              return false;
+ *          }
+ *      } catch (Exception e) {
+ *          return false;
+ *      }
+ *      return true;
  * }
  * </code>
  * 
@@ -322,14 +322,14 @@ import javax.servlet.http.HttpServletRequest;
  * v) if the field does not pass validation <br/>For example: <br/><br/>
  * 
  * <code>
- * 	// ... (top of switch statement)
- * 	case IS_MULTIPLE:
- * 		int multiple = v.getArgument(0);
- * 		if (!isMultiple(fieldName, multiple)) {
- * 			addError(fieldName, v);
- * 		}
- * 		break;
- * 	// ... (bottom of switch statement)
+ *  // ... (top of switch statement)
+ *  case IS_MULTIPLE:
+ *      int multiple = v.getArgument(0);
+ *      if (!isMultiple(fieldName, multiple)) {
+ *          addError(fieldName, v);
+ *      }
+ *      break;
+ *  // ... (bottom of switch statement)
  * </code>
  * 
  * <li> in addError(String fieldName, Validation v), add a case to set a default
@@ -337,12 +337,12 @@ import javax.servlet.http.HttpServletRequest;
  * validation rule. <br/>For example: <br/><br/>
  * 
  * <code>
- * 	// ... (top of switch statement)
- * 	case IS_MULTIPLE:
- * 		int multiple = v.getArgument(0);
- * 		errorMessage = "The input you provided is not a multiple of " + multiple + ".";
- * 		break;
- * 	// ... (bottom of switch statement)
+ *  // ... (top of switch statement)
+ *  case IS_MULTIPLE:
+ *      int multiple = v.getArgument(0);
+ *      errorMessage = "The input you provided is not a multiple of " + multiple + ".";
+ *      break;
+ *  // ... (bottom of switch statement)
  * </code>
  * 
  * @author ssachs
@@ -1153,10 +1153,14 @@ public class Validator {
         if (StringUtil.isBlank(fieldValue)) {
             return false;
         }
+        if (!StringUtil.isFormatDate(fieldValue, resformat.getString("date_format_string"))) {
+            return false;
+        }
         SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_format_string"));
         sdf.setLenient(false);
         try {
             java.util.Date date = sdf.parse(fieldValue);
+            String s = date.toString();
             return isYearNotFourDigits(date);
         } catch (ParseException fe) {
             return false;
@@ -1223,7 +1227,6 @@ public class Validator {
     protected boolean isYearNotFourDigits(Date d) {
         Calendar c = Calendar.getInstance();
         c.setTime(d);
-
         if (c.get(Calendar.YEAR) < 1000 || c.get(Calendar.YEAR) > 9999) { // did
             // the
             // user

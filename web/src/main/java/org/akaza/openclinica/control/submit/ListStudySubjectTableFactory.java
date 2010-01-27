@@ -551,7 +551,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         @Override
         protected List<Option> getOptions() {
             List<Option> options = new ArrayList<Option>();
-            for (Object status : Status.toActiveArrayList()) {
+            for (Object status : Status.toDropDownArrayList()) {
                 ((Status) status).getName();
                 options.add(new Option(String.valueOf(((Status) status).getId()), ((Status) status).getName()));
             }
@@ -695,7 +695,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                 url.append(viewStudySubjectLinkBuilder(studySubjectBean));
                 if (getCurrentRole().getRole() != Role.MONITOR) {
                     if (getStudyBean().getStatus() == Status.AVAILABLE && studySubjectBean.getStatus() != Status.DELETED
-                            && getCurrentRole().getRole() != Role.RESEARCHASSISTANT) {
+                        && getCurrentRole().getRole() != Role.RESEARCHASSISTANT) {
                         url.append(removeStudySubjectLinkBuilder(studySubjectBean));
                     }
                     if (getStudyBean().getStatus() == Status.AVAILABLE && studySubjectBean.getStatus() == Status.DELETED) {

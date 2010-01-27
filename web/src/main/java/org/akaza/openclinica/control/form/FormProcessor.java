@@ -164,6 +164,26 @@ public class FormProcessor {
         return answer;
     }
 
+    // GET STARTS WITH, added tbh 01/2010
+    public boolean getStartsWith(String partialFieldName) {
+        boolean answer = false;
+        CharSequence seq = partialFieldName.subSequence(0, partialFieldName.length());
+        // System.out.println("checking " + seq.toString());
+        java.util.Enumeration<String> names = request.getParameterNames();
+
+        while (names.hasMoreElements()) {
+
+            String name = names.nextElement();
+            // System.out.println("*** Comparing " + name + " and " + seq.toString() );
+            if (name.contains(seq)) {
+                System.out.println("*** FOUND " + seq.toString());
+                return true;
+            }
+
+        }
+        return answer;
+    }
+
     // GET INTEGER
     public static int getIntFromString(String value) {
         if (value == null) {

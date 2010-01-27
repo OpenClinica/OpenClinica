@@ -209,10 +209,17 @@ form element in red --%>
     <c:otherwise>
 
     <c:choose>
+    <%--
        <c:when test="${(originJSP eq 'doubleDataEntry' ||
   (! (originJSP eq 'administrativeEditing'))) && (ddeEntered || (! hasDataFlag))
   && (ddeEntered || (! sessionScope['groupHasData'])) &&
   			displayItem.metadata.defaultValue != '' && displayItem.metadata.defaultValue != null}">
+  	 --%>
+  	 <c:when test="${
+                      (originJSP eq 'doubleDataEntry' || (! (originJSP eq 'administrativeEditing'))) 
+                       && (ddeEntered != false || ( hasDataFlag != true)) 
+                       && (ddeEntered != false || ( sessionScope['groupHasData'] != true)) 
+                       && displayItem.metadata.defaultValue != '' && displayItem.metadata.defaultValue != null}">		
         <c:set var="printDefault" value="true"/>
       </c:when>
       <c:otherwise>

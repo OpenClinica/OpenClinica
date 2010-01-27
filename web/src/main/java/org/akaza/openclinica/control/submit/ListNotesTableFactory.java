@@ -204,7 +204,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             DiscrepancyNoteBean dnb = (DiscrepancyNoteBean) noteRows.get(i);
             dnb.setAssignedUser((UserAccountBean) getUserAccountDao().findByPK(dnb.getAssignedUserId()));
             if (dnb.getParentDnId() == 0) {
-                System.out.println("running query on study id " + currentStudy.getId() + " and dnb " + dnb.getId());
+                // System.out.println("running query on study id " + currentStudy.getId() + " and dnb " + dnb.getId());
                 ArrayList children = dndao.findAllByStudyAndParent(currentStudy, dnb.getId());
                 // dnr.setNumChildren(children.size());
                 dnb.setNumChildren(children.size());

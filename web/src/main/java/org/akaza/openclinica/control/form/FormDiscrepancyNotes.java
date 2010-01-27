@@ -15,8 +15,7 @@ import java.util.HashMap;
 /**
  * @author jxu
  *
- * TODO To change the template for this generated type comment go to Window -
- * Preferences - Java - Code Style - Code Templates
+ * 
  */
 public class FormDiscrepancyNotes {
     private HashMap fieldNotes;
@@ -32,7 +31,7 @@ public class FormDiscrepancyNotes {
     public void addNote(String field, DiscrepancyNoteBean note) {
         ArrayList notes;
         if (fieldNotes.containsKey(field)) {
-            notes = (ArrayList) fieldNotes.get(field);            
+            notes = (ArrayList) fieldNotes.get(field);
         } else {
             notes = new ArrayList();
         }
@@ -41,12 +40,13 @@ public class FormDiscrepancyNotes {
         //System.out.println("after adding note:" + notes.size());
         fieldNotes.put(field, notes);
     }
+
     /** want to map entity Id with field names
      * So we know if an entity has discrepancy note giving entity id
      * @param entityId
      * @param field
      */
-    public void addIdNote(int entityId,String field) {
+    public void addIdNote(int entityId, String field) {
         ArrayList notes;
         if (idNotes.containsKey(entityId)) {
             notes = (ArrayList) fieldNotes.get(entityId);
@@ -57,7 +57,7 @@ public class FormDiscrepancyNotes {
         if (notes != null) {
             notes.add(field);
         }
-        idNotes.put(new Integer(entityId),notes);
+        idNotes.put(new Integer(entityId), notes);
     }
 
     public boolean hasNote(String field) {

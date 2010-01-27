@@ -14,6 +14,8 @@ import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
 
+import java.util.ArrayList;
+
 /**
  * Processes request to change CRF ordinals in a study event definition
  * 
@@ -34,7 +36,7 @@ public class ChangeDefinitionCRFOrdinalServlet extends ChangeOrdinalServlet {
 
         int definitionId = fp.getInt("id");
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
-        increase(current, previous, currOrdinal, prevOrdinal, edcdao);
+        increase(current, previous, currOrdinal, prevOrdinal, definitionId, edcdao);
         StudyDAO sdao = new StudyDAO(sm.getDataSource());
         int siteId = fp.getInt("siteId");
         if (siteId > 0) {
@@ -55,7 +57,7 @@ public class ChangeDefinitionCRFOrdinalServlet extends ChangeOrdinalServlet {
      * @param idPrevious
      * @param dao
      */
-    private void increase(int idCurrent, int idPrevious, int currOrdinal, int prevOrdinal, EventDefinitionCRFDAO dao) {
+    private void increase(int idCurrent, int idPrevious, int currOrdinal, int prevOrdinal, int defId, EventDefinitionCRFDAO dao) {
         EventDefinitionCRFBean current = (EventDefinitionCRFBean) dao.findByPK(idCurrent);
         EventDefinitionCRFBean previous = (EventDefinitionCRFBean) dao.findByPK(idPrevious);
 
@@ -72,8 +74,46 @@ public class ChangeDefinitionCRFOrdinalServlet extends ChangeOrdinalServlet {
                 previous.setUpdater((UserAccountBean) session.getAttribute("userBean"));
                 dao.update(previous);
             }
-        }
 
+            ArrayList currOrdlist = dao.findAllByEventDefinitionIdAndOrdinal(defId, current.getOrdinal());
+            ArrayList prevOrdlist = dao.findAllByEventDefinitionIdAndOrdinal(defId, previous.getOrdinal());
+            if (currOrdlist.size() > 1 || prevOrdlist.size() > 1 ) {
+                fixDuplicates(defId, dao);
+            }
+        }
     }
+
+    /**
+     * Fixes ordinal values if there is any duplicates
+     *
+     * @param definitionId
+     * @param dao
+     */
+    private void fixDuplicates(int definitionId, EventDefinitionCRFDAO dao) {
+        ArrayList list = dao.findAllByEventDefinitionId(definitionId);
+        int prevOrdinal = 0;
+        boolean incrementNextOrdinal = false;
+        for (int i =0; i < list.size(); i++) {
+            EventDefinitionCRFBean edc = (EventDefinitionCRFBean) list.get(i);
+            if (i == 0) {
+                if (edc.getOrdinal() != 0) {
+                    edc.setOrdinal(i);
+                    dao.update(edc);
+                }
+                continue;
+            }
+            if (incrementNextOrdinal) {
+                edc.setOrdinal(i);
+                dao.update(edc);
+                continue;
+            }
+            if (edc.getOrdinal() != i) {
+                edc.setOrdinal(i);
+                dao.update(edc);
+                incrementNextOrdinal = true;
+            }
+        }
+    }
+
 
 }

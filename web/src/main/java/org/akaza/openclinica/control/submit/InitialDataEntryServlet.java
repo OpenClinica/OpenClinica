@@ -149,12 +149,15 @@ public class InitialDataEntryServlet extends DataEntryServlet {
                 order = displayGroup.getFormInputOrdinal();
             }
             for (DisplayItemBean displayItem : items) {
+            	// int manualcount = 0;
+            	// tbh trying to set this correctly 01/2010
                 if (displayGroup.isAuto()) {
                     inputName = getGroupItemInputName(displayGroup, order, displayItem);
                 } else {
                     inputName = getGroupItemManualInputName(displayGroup, order, displayItem);
+                    // manualcount++;
                 }
-                logger.debug("THe oid is " + displayItem.getItem().getOid() + " order : " + order);
+                logger.debug("THe oid is " + displayItem.getItem().getOid() + " order : " + order + " inputName : " + inputName);
 
                 if (groupOrdinalPLusItemOid.containsKey(displayItem.getItem().getOid())
                     || groupOrdinalPLusItemOid.containsKey(String.valueOf(order + 1) + displayItem.getItem().getOid())) {

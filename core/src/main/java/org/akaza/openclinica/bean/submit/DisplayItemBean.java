@@ -261,6 +261,7 @@ public class DisplayItemBean implements Comparable {
         ResponseSetBean rsb = metadata.getResponseSet();
         org.akaza.openclinica.bean.core.ResponseType rt = rsb.getResponseType();
         String dbValue = data.getValue();
+        // System.out.println("setting dbValue: " + dbValue);
         if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)) {
             String dbValues[] = dbValue.split(",");
 

@@ -68,7 +68,7 @@
 
 * <fmt:message key="indicates_required_field" bundle="${resword}"/><br>
 <form action="DefineStudyEvent" method="post">
-<input type="hidden" name="action" value="next">
+<input type="hidden" name="actionName" value="next">
 <input type="hidden" name="pageNum" value="1">
 <div style="width: 600px">
 <!-- These DIVs define shaded box borders -->

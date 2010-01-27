@@ -232,19 +232,19 @@
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>   
     <td><form action="DefineStudyEvent" method="POST">
-         <input type="hidden" name="action" value="submit"> 
-         <input type="hidden" name="nextAction" value="2"> 
+         <input type="hidden" name="actionName" value="submit">
+         <input type="hidden" name="nextAction" value="2">
          <input type="submit" name="submit" value="<fmt:message key="confirm_and_finish" bundle="${resword}"/>" class="button_long">
         </form>
     </td>
     <td><form action="DefineStudyEvent" method="POST">
-         <input type="hidden" name="action" value="submit"> 
-         <input type="hidden" name="nextAction" value="3"> 
+         <input type="hidden" name="actionName" value="submit">
+         <input type="hidden" name="nextAction" value="3">
          <input type="submit" name="submit" value="<fmt:message key="confirm_and_create_another_definition" bundle="${resword}"/>" class="button_xlong">
         </form>
     </td>
     <td><form action="DefineStudyEvent" method="POST">
-         <input type="hidden" name="action" value="submit">
+         <input type="hidden" name="actionName" value="submit">
          <input type="hidden" name="nextAction" value="1">
          <input type="submit" name="submit" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium">
         </form>

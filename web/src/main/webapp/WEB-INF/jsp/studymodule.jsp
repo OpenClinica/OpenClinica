@@ -103,7 +103,8 @@
   </div>
   &nbsp;&nbsp;&nbsp;
   <div style="border: 1px solid #ccc; width:70%; padding:5px 0px 5px 5px;">
-      <fmt:message key="set_study_status" bundle="${resword}"/> &nbsp; <select name="studyStatus">
+      <fmt:message key="set_study_status" bundle="${resword}"/> &nbsp;
+      <select name="studyStatus">
           <c:forEach var="status" items="${statusMap}">
            <c:choose>
             <c:when test="${currentStudy.status.id == status.id}">
@@ -114,11 +115,11 @@
                  <c:if test="${status.id == 1}">
                      <fmt:message key="available" bundle="${resword}"/>
                  </c:if>
+                     <c:if test="${status.id == 9}">
+                         <fmt:message key="frozen" bundle="${resword}"/>
+                     </c:if>
 				 <c:if test="${status.id == 6}">
                      <fmt:message key="locked" bundle="${resword}"/>
-                 </c:if>
-				 <c:if test="${status.id == 9}">
-                     <fmt:message key="frozen" bundle="${resword}"/>
                  </c:if>
             </c:when>
             <c:otherwise>
@@ -129,11 +130,12 @@
                  <c:if test="${status.id == 1}">
                      <fmt:message key="available" bundle="${resword}"/>
                  </c:if>
+                     <c:if test="${status.id == 9}">
+                         <fmt:message key="frozen" bundle="${resword}"/>
+                     </c:if>
+
 				 <c:if test="${status.id == 6}">
                      <fmt:message key="locked" bundle="${resword}"/>
-                 </c:if>
-				 <c:if test="${status.id == 9}">
-                     <fmt:message key="frozen" bundle="${resword}"/>
                  </c:if>
             </c:otherwise>
            </c:choose>

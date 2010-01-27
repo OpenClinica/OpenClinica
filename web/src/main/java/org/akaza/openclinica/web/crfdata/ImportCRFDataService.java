@@ -144,14 +144,14 @@ public class ImportCRFDataService {
                                     logger.debug("   created and added new event crf");
                                 }
                             } else {
-                            	// we need to update the event crf that already exists
-//                            	for (EventCRFBean ecb : eventCrfBeans) {
-//                            		ecb.setDateInterviewed(new Date());
-//                            		ecb.setInterviewerName(ub.getName());
-//                            		ecb = (EventCRFBean) eventCrfDAO.update(ecb);
-//                            		logger.info("    updated event crf");
-//                            	}
-                            	// right now not doing this, since bug was not able to be replicated, tbh
+                                // we need to update the event crf that already exists
+                                //                              for (EventCRFBean ecb : eventCrfBeans) {
+                                //                                  ecb.setDateInterviewed(new Date());
+                                //                                  ecb.setInterviewerName(ub.getName());
+                                //                                  ecb = (EventCRFBean) eventCrfDAO.update(ecb);
+                                //                                  logger.info("    updated event crf");
+                                //                              }
+                                // right now not doing this, since bug was not able to be replicated, tbh
                             }
 
                             // below to prevent duplicates
@@ -274,7 +274,7 @@ public class ImportCRFDataService {
                     // instead work on sections
                     EventCRFBean eventCRFBean = eventCRFDAO.findByEventCrfVersion(studyEvent, crfVersion);
                     // >>tbh, 09/2008
-                    System.out.println("found event crf bean: using study event " + studyEvent.getId() + " crf version name: " + crfVersion.getOid());
+                    // System.out.println("found event crf bean: using study event " + studyEvent.getId() + " crf version name: " + crfVersion.getOid());
                     // >>
                     EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(ds);
                     EventDefinitionCRFBean eventDefinitionCRF =
@@ -293,7 +293,7 @@ public class ImportCRFDataService {
                             ItemGroupBean testBean = itemGroupDAO.findByOid(itemGroupDataBean.getItemGroupOID());
                             if (testBean == null) {
                                 // TODO i18n of message
-                                System.out.println("hit the exception for item groups! " + itemGroupDataBean.getItemGroupOID());
+                                // System.out.println("hit the exception for item groups! " + itemGroupDataBean.getItemGroupOID());
                                 MessageFormat mf = new MessageFormat("");
                                 mf.applyPattern(respage.getString("your_item_group_oid_for_form_oid"));
                                 Object[] arguments = { itemGroupDataBean.getItemGroupOID(), formDataBean.getFormOID() };
@@ -396,7 +396,7 @@ public class ImportCRFDataService {
                     // totalValidationErrors.
                     // totalValidationErrors.addAll(validationErrors);
                     for (Object errorKey : validationErrors.keySet()) {
-                        System.out.println(errorKey.toString() + " -- " + validationErrors.get(errorKey));
+                        // System.out.println(errorKey.toString() + " -- " + validationErrors.get(errorKey));
                         totalValidationErrors.put(errorKey.toString(), validationErrors.get(errorKey).toString());
                         // assuming that this will be put back in to the core
                         // method's hashmap, updating statically, tbh 06/2008
@@ -423,8 +423,7 @@ public class ImportCRFDataService {
                     boolean overwrite = false;
                     // tbh >>
                     if (eventCRFStatus.equals(Status.UNAVAILABLE) || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE)
-                        || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)
-                        || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY)
+                        || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE) || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY)
                         || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
                         overwrite = true;
                     }
@@ -600,10 +599,10 @@ public class ImportCRFDataService {
             String theValue =
                 matchValueWithManyOptions(displayItemBean, displayItemBean.getData().getValue(), displayItemBean.getMetadata().getResponseSet().getOptions());
             request.setAttribute(itemOid, theValue);
-            System.out.println("        found the value for checkbx/multi: " + theValue);
+            // System.out.println("        found the value for checkbx/multi: " + theValue);
             if (theValue == null && displayItemBean.getData().getValue() != null) {
                 // fail it here? found an 0,1 in the place of a NULL
-                System.out.println("--  theValue was NULL, the real value was " + displayItemBean.getData().getValue());
+                // System.out.println("--  theValue was NULL, the real value was " + displayItemBean.getData().getValue());
                 hardv.put(itemOid, "This is not in the correct response set.");
             }
             displayItemBean = importHelper.validateDisplayItemBeanMultipleCV(v, displayItemBean, itemOid);
@@ -648,7 +647,7 @@ public class ImportCRFDataService {
         if (!options.isEmpty()) {
             for (Object responseOption : options) {
                 ResponseOptionBean responseOptionBean = (ResponseOptionBean) responseOption;
-                System.out.println("testing response option bean get value: " + responseOptionBean.getValue());
+                // System.out.println("testing response option bean get value: " + responseOptionBean.getValue());
                 // entireOptions += responseOptionBean.getValue() + "{0,1}|";//
                 // once, or not at all
                 entireOptions += responseOptionBean.getValue();
@@ -673,12 +672,12 @@ public class ImportCRFDataService {
             for (Object nullValue : nullValues) {
                 NullValue nullValueTerm = (NullValue) nullValue;
                 entireOptions += nullValueTerm.getName();
-                System.out.println("found and added " + nullValueTerm.getName());
+                // System.out.println("found and added " + nullValueTerm.getName());
             }
 
             for (String sim : simValues) {
                 sim = sim.replace(" ", "");
-                System.out.println("checking on this string: " + entireOptions + " versus this value " + sim);
+                // System.out.println("checking on this string: " + entireOptions + " versus this value " + sim);
                 checkComplete = entireOptions.contains(sim);// Pattern.matches(
                 // entireOptions,
                 // sim);

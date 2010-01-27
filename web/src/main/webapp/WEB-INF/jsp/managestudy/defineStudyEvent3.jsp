@@ -62,7 +62,7 @@
 </script>
 
 <form action="DefineStudyEvent" method="post">
-    <input type="hidden" name="action" value="confirm">
+    <input type="hidden" name="actionName" value="confirm">
     <div style="width: 600px">
         <!-- These DIVs define shaded box borders -->
         <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">

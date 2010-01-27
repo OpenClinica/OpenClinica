@@ -151,7 +151,13 @@ giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%>
                 <li style="color:  #ff0000"><span style="text-decoration: underline"><strong>
                     <label onclick="getFocused('<c:out value="${formMsg.key}" />');"><c:out value="${formMsg.value}" /></label>
                 </strong></span></li>
-                <%--<li style="color:  #ff0000"><span style="text-decoration: underline"><strong><label for="<c:out value="${formMsg.key}"/>"><c:out value="${formMsg.value}" /></label></strong></span></li> --%>
+                <%--<li style="color:  #ff0000">
+                	<span style="text-decoration: underline"><strong>
+                		<label for="<c:out value="${formMsg.key}"/>">
+                			<c:out value="${formMsg.value}" />
+                		</label></strong>
+                	</span>	
+                	</li> --%>
             </c:forEach>
         </ul>
         <!--  Use the formMessages request attribute to grab each validation
@@ -647,6 +653,7 @@ but the custom tag uses that, not this jstl code--%>
 <!-- for the last but not the first row and only row, we need to use [] so the repetition javascript can copy it to create new row-->
 <tr id="<c:out value="${repeatParentId}"/>" repeat="template" repeat-start="<c:out value="${repeatNumber}"/>" repeat-max="<c:out value="${repeatMax}"/>">
     <c:forEach var="bodyItem" items="${bodyItemGroup.items}">
+		<!-- discrepancy count for this item <c:out value="${repeatParentId}"/> <c:out value="${bodyItem.numDiscrepancyNotes}"/> -->
         <c:set var="itemNum" value="${itemNum + 1}" />
         <c:set var="isHorizontalCellLevel" scope="request" value="${false}"/>
         <c:if test="${bodyItem.metadata.responseLayout eq 'horizontal' ||

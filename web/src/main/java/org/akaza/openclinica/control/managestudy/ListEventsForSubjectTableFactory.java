@@ -1,16 +1,5 @@
 package org.akaza.openclinica.control.managestudy;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
@@ -58,6 +47,17 @@ import org.jmesa.view.editor.BasicCellEditor;
 import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpServletResponse;
 
 public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
@@ -176,9 +176,10 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
     @Override
     public void configureTableFacadePostColumnConfiguration(TableFacade tableFacade) {
-        Role r =  currentRole.getRole();
+        Role r = currentRole.getRole();
         boolean addSubjectLinkShow = studyBean.getStatus().isAvailable() && !r.equals(Role.MONITOR);
-        tableFacade.setToolbar(new ListEventsForSubjectTableToolbar(getStudyEventDefinitions(), getStudyGroupClasses(), selectedStudyEventDefinition, addSubjectLinkShow));
+        tableFacade.setToolbar(new ListEventsForSubjectTableToolbar(getStudyEventDefinitions(), getStudyGroupClasses(), selectedStudyEventDefinition,
+                addSubjectLinkShow));
     }
 
     @SuppressWarnings("unchecked")
@@ -576,7 +577,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         @Override
         protected List<Option> getOptions() {
             List<Option> options = new ArrayList<Option>();
-            for (Object status : Status.toActiveArrayList()) {
+            for (Object status : Status.toDropDownArrayList()) {
                 ((Status) status).getName();
                 options.add(new Option(String.valueOf(((Status) status).getId()), ((Status) status).getName()));
             }

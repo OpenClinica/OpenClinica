@@ -37,7 +37,7 @@ public class FindSubjectsFilter implements CriteriaCommand {
     private String buildCriteria(String criteria, String property, Object value) {
         value = StringEscapeUtils.escapeSql(value.toString());
         if (value != null) {
-            if (property.equals("status")) {
+            if (property.equals("studySubject.status")) {
                 criteria = criteria + " and ";
                 criteria = criteria + " " + columnMapping.get(property) + " = " + value.toString() + " ";
             } else if (property.startsWith("sed_")) {

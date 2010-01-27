@@ -252,8 +252,16 @@ public class DatasetBean extends AuditableEntityBean {
 
         String pattern = "yyyy-MM-dd";
         SimpleDateFormat sdf = new SimpleDateFormat(pattern);
-        String beginDate = sdf.format(this.dateStart);
-        String stopDate = sdf.format(this.dateEnd);
+        // guard clauses to defend vs NPE, tbh 10-2009
+        String beginDate = "1900-01-01";
+        if (dateStart != null) {
+            beginDate = sdf.format(this.dateStart);
+        }
+        String stopDate = "2100-01-01";
+        if (dateEnd != null) {
+            stopDate = sdf.format(this.dateEnd);
+        }
+        // << tbh 10/2009
         sb.append("(date(date_created) >= date('" + beginDate + "')) and (date(date_created) <= date('" + stopDate + "'))");
         // perform regexp here that pulls out [] square brackets
 

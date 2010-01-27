@@ -505,7 +505,7 @@ public class ViewStudySubjectServlet extends SecureController {
         ItemDataDAO iddao = new ItemDataDAO(ds);
         for (i = 0; i < eventCRFs.size(); i++) {
             EventCRFBean ecrf = (EventCRFBean) eventCRFs.get(i);
-            System.out.println("########event crf id:" + ecrf.getId());
+            // System.out.println("########event crf id:" + ecrf.getId());
             int crfId = cvdao.getCRFIdFromCRFVersionId(ecrf.getCRFVersionId());
             ArrayList idata = iddao.findAllByEventCRFId(ecrf.getId());
             if (!idata.isEmpty()) {// this crf has data already

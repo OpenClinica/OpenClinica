@@ -65,13 +65,13 @@
 <p><fmt:message key="select_CRFs_to_define_study_event" bundle="${restext}"/></p>
 <br>
 <form name="crfForm" action="DefineStudyEvent" method="post">
-<input type="hidden" name="action" value="next">
+<input type="hidden" name="actionName" value="next">
 <input type="hidden" name="pageNum" value="2">
 
 <c:import url="../include/showTableForEventDefinitionCRFList.jsp">
 	<c:param name="rowURL" value="showDefineEventCRFRow.jsp" />
 	<c:param name="outerFormName" value="crfForm" />
-	<c:param name="searchFormOnClickJS" value="document.crfForm.elements['action'].value='next';document.crfForm.elements[1].value='1';" />
+	<c:param name="searchFormOnClickJS" value="document.crfForm.elements['actionName'].value='next';document.crfForm.elements[1].value='1';" />
 </c:import>
  
 <table border="0" cellpadding="0" cellspacing="0">
