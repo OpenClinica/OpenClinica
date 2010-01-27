@@ -504,27 +504,32 @@ public class AddNewSubjectServlet extends SecureController {
                             updateSubject = subjectWithSameId;
                             updateSubject.setDobCollected(true);
 
-                            String y = String.valueOf(subjectWithSameId.getDateOfBirth()).split("\\-")[0];
-                            String[] d = DOB.split("\\/");
-                            // if year-of-birth in subject table
-                            if (!y.equals("0001")) {
-                                // if year-of-birth is different from DOB's
-                                // year, use year-of-birth
-                                if (!y.equals(d[2])) {
-                                    fp.addPresetValue(D_WARNING, "dobYearWrong");
-                                    fp.addPresetValue(INPUT_DOB, d[0] + "/" + d[1] + "/" + y);
-                                    updateSubject.setDateOfBirth(sdf.parse(d[0] + "/" + d[1] + "/" + y));
-                                } else {
-                                    fp.addPresetValue(D_WARNING, "dobUsed");
+                            if(subjectWithSameId.getDateOfBirth()==null){
+                                fp.addPresetValue(INPUT_DOB, DOB);
+                                updateSubject.setDateOfBirth(new Date(DOB));
+                            }else{
+                                String y = String.valueOf(subjectWithSameId.getDateOfBirth()).split("\\-")[0];
+                                String[] d = DOB.split("\\/");
+                                // if year-of-birth in subject table
+                                if (!y.equals("0001")) {
+                                    // if year-of-birth is different from DOB's
+                                    // year, use year-of-birth
+                                    if (!y.equals(d[2])) {
+                                        fp.addPresetValue(D_WARNING, "dobYearWrong");
+                                        fp.addPresetValue(INPUT_DOB, d[0] + "/" + d[1] + "/" + y);
+                                        updateSubject.setDateOfBirth(sdf.parse(d[0] + "/" + d[1] + "/" + y));
+                                    } else {
+                                        fp.addPresetValue(D_WARNING, "dobUsed");
+                                        fp.addPresetValue(INPUT_DOB, DOB);
+                                        updateSubject.setDateOfBirth(sdf.parse(DOB));
+                                    }
+                                }
+                                // date-of-birth is not required in subject table
+                                else {
+                                    fp.addPresetValue(D_WARNING, "emptyD");
                                     fp.addPresetValue(INPUT_DOB, DOB);
                                     updateSubject.setDateOfBirth(sdf.parse(DOB));
                                 }
-                            }
-                            // date-of-birth is not required in subject table
-                            else {
-                                fp.addPresetValue(D_WARNING, "emptyD");
-                                fp.addPresetValue(INPUT_DOB, DOB);
-                                updateSubject.setDateOfBirth(sdf.parse(DOB));
                             }
                             warningCount++;
                         }
