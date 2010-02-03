@@ -40,7 +40,7 @@
             drop sequence RULE_ACTION_RUN_ID_SEQ;
         </rollback>
     </changeSet>
-    <changeSet author="kkrumlian" id="2010-01-13-4575-3">
+    <changeSet author="kkrumlian" id="2010-01-13-4575-4">
         <comment>update rule_action add rule_action_run_id column</comment>
         <addColumn tableName="rule_action">
             <column name="rule_action_run_id" type="INT"/>
