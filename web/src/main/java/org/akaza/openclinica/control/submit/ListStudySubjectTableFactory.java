@@ -706,7 +706,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                         url.append(reAssignStudySubjectLinkBuilder(studySubjectBean));
                     }
 
-                    if ((getCurrentRole().getRole() == Role.STUDYDIRECTOR || getCurrentRole().getRole() == Role.COORDINATOR || getCurrentRole().getRole() == Role.INVESTIGATOR)
+                    if ((getCurrentRole().getRole() == Role.INVESTIGATOR)
                         && getStudyBean().getStatus() == Status.AVAILABLE && studySubjectBean.getStatus() != Status.DELETED && isSignable) {
                         url.append(signStudySubjectLinkBuilder(studySubjectBean));
                     }

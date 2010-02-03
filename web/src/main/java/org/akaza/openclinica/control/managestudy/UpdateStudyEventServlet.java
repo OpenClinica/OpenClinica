@@ -207,7 +207,7 @@ public class UpdateStudyEventServlet extends SecureController {
         }
 
 
-        if (removeSign == true) {
+        if (removeSign == true || !currentRole.isInvestigator()) {
             statuses.remove(SubjectEventStatus.SIGNED);
         }
         // ///End of remove signed status from the list
