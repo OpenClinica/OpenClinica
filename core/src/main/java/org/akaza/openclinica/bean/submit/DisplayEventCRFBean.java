@@ -158,9 +158,10 @@ public class DisplayEventCRFBean implements Comparable {
         if (stage.equals(DataEntryStage.UNCOMPLETED)) {
             startInitialDataEntryPermitted = true;
         } else if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY)) {
-            if (eventCRF.getOwner().equals(user) || isSuper) {
+            /*Ownershipt logic has been asked to remove, issue-4573*/
+//            if (eventCRF.getOwner().equals(user) || isSuper) {
                 continueInitialDataEntryPermitted = true;
-            }
+  //          }
         } else if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)) {
             if (doubleDataEntryPermitted) {
                 logger.info("doubleDataEntryPermitted");
