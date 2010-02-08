@@ -11,6 +11,7 @@ public class ListNotesFilter implements CriteriaCommand {
 
     public ListNotesFilter() {
         columnMapping.put("studySubject.label", "ss.label");
+        columnMapping.put("siteId", "ss.label");
         columnMapping.put("discrepancyNoteBean.createdDate", "dn.date_created");
         columnMapping.put("discrepancyNoteBean.updatedDate", "dn.date_created");
         columnMapping.put("discrepancyNoteBean.description", "dn.description");
@@ -34,10 +35,15 @@ public class ListNotesFilter implements CriteriaCommand {
 
     private String buildCriteria(String criteria, String property, Object value) {
         if (value != null) {
-            if (property.equals("studySubject.label") || property.equals("discrepancyNoteBean.description") || property.equals("discrepancyNoteBean.user")) {
+            if (property.equals("studySubject.label") || property.equals("discrepancyNoteBean.description")
+                    || property.equals("discrepancyNoteBean.user")) {
                 criteria = criteria + " and ";
                 criteria = criteria + " UPPER(" + columnMapping.get(property) + ") like UPPER('%" + value.toString() + "%')" + " ";
-            } else {
+            } else if (property.equals("siteId")) {
+                criteria = criteria + " and ";
+                criteria = criteria + "ss.study_id in ( SELECT study_id FROM study WHERE unique_identifier like '%"+ value.toString() +"%')";
+            }
+            else {
                 criteria = criteria + " and ";
                 criteria = criteria + " " + columnMapping.get(property) + " = '" + value.toString() + "' ";
             }
