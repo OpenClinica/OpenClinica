@@ -993,7 +993,23 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         } else {
                             isRequired = "1".equals(required) ? true : false;
                         }
-
+                        // >> tbh 02/04/2010 adding this column for Dynamics 
+                        ++cellIndex;
+                        boolean isShowItem = true;
+                        // default is true
+                        cell = sheet.getRow(k).getCell((short) cellIndex);
+                        String showItem = getValue(cell);
+                        
+                        if (!StringUtil.isBlank(showItem)) {
+                            isShowItem = "0".equals(showItem) ? false : true;
+                        }
+                      
+                        //                        if (!"1".equals(showItem) && !"0".equals(showItem)) {
+                        //                            errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("SHOW_ITEM_column") + " "
+                        //                                    + resPageMsg.getString("was_invalid_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet") + ". "
+                        //                                    + resPageMsg.getString("SHOW_ITEM_column") + resPageMsg.getString("can_only_be_either_0_or_1"));
+                        //                            htmlErrors.put(j + "," + k + "," + cellIndex, resPageMsg.getString("INVALID_VALUE"));
+                        //                        }
                         // Create oid for Item Bean
                         String itemOid = idao.getValidOid(new ItemBean(), crfName, itemName, itemOids);
                         itemOids.add(itemOid);
@@ -1037,6 +1053,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 
                         ItemFormMetadataBean ifmb = new ItemFormMetadataBean();
                         ifmb.setResponseSet(rsb);
+                        ifmb.setShowItem(isShowItem);
                         ib.setItemMeta(ifmb);
                         items.put(itemName, ib);
 
@@ -1188,7 +1205,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             sql2 =
                                 "INSERT INTO ITEM_FORM_METADATA (CRF_VERSION_ID, RESPONSE_SET_ID," + "ITEM_ID,SUBHEADER,HEADER,LEFT_ITEM_TEXT,"
                                     + "RIGHT_ITEM_TEXT,PARENT_ID,SECTION_ID,ORDINAL,PARENT_LABEL,COLUMN_NUMBER,PAGE_NUMBER_LABEL,question_number_label,"
-                                    + "REGEXP,REGEXP_ERROR_MSG,REQUIRED,DEFAULT_VALUE,RESPONSE_LAYOUT,WIDTH_DECIMAL)" + " VALUES ("
+                                    + "REGEXP,REGEXP_ERROR_MSG,REQUIRED,DEFAULT_VALUE,RESPONSE_LAYOUT,WIDTH_DECIMAL, show_item)" + " VALUES ("
                                     + versionIdString
                                     + ",(SELECT RESPONSE_SET_ID FROM RESPONSE_SET WHERE LABEL='"
                                     + stripQuotes(responseLabel)
@@ -1229,14 +1246,14 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                     + "', "
                                     + (isRequired ? 1 : 0)
                                     + ", '"
-                                    + stripQuotes(default_value) + "','" + stripQuotes(responseLayout) + "','" + widthDecimal + "')";
+                                    + stripQuotes(default_value) + "','" + stripQuotes(responseLayout) + "','" + widthDecimal + ", " + isShowItem + "')";
                             logger.warn(sql2);
 
                         } else {
                             sql2 =
                                 "INSERT INTO ITEM_FORM_METADATA (CRF_VERSION_ID, RESPONSE_SET_ID," + "ITEM_ID,SUBHEADER,HEADER,LEFT_ITEM_TEXT,"
                                     + "RIGHT_ITEM_TEXT,PARENT_ID,SECTION_ID,ORDINAL,PARENT_LABEL,COLUMN_NUMBER,PAGE_NUMBER_LABEL,question_number_label,"
-                                    + "REGEXP,REGEXP_ERROR_MSG,REQUIRED,DEFAULT_VALUE,RESPONSE_LAYOUT,WIDTH_DECIMAL)" + " VALUES ("
+                                    + "REGEXP,REGEXP_ERROR_MSG,REQUIRED,DEFAULT_VALUE,RESPONSE_LAYOUT,WIDTH_DECIMAL, show_item)" + " VALUES ("
                                     + versionIdString
                                     + ",(SELECT RESPONSE_SET_ID FROM RESPONSE_SET WHERE LABEL='"
                                     + stripQuotes(responseLabel)
@@ -1279,7 +1296,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                     + ", '"
                                     + stripQuotes(default_value)
                                     + "','"
-                                    + stripQuotes(responseLayout) + "','" + widthDecimal + "'" + ")";
+                                    + stripQuotes(responseLayout) + "','" + widthDecimal + "'," + isShowItem + ")";
 
                         }
 
@@ -1330,7 +1347,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                 if (dbName.equals("oracle")) {
                                     sqlGroupLabel =
                                         "INSERT INTO ITEM_GROUP_METADATA (" + "item_group_id,HEADER," + "subheader, layout, repeat_number, repeat_max,"
-                                            + " repeat_array,row_start_number, crf_version_id," + "item_id , ordinal) VALUES ("
+                                            + " repeat_array,row_start_number, crf_version_id," + "item_id , ordinal, show_group) VALUES ("
                                             + "(SELECT MAX(ITEM_GROUP_ID) FROM ITEM_GROUP WHERE NAME='"
                                             + itemGroup.getName()
                                             + "' AND crf_id = "
@@ -1367,12 +1384,12 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                             + itemName
                                             + "' "
                                             + "AND ITEM.ITEM_ID = ITEM_FORM_METADATA.ITEM_ID and ITEM_FORM_METADATA.CRF_VERSION_ID=CRF_VERSION.CRF_VERSION_ID "
-                                            + "AND CRF_VERSION.CRF_ID= " + crfId + " )," + k + ")";
+                                            + "AND CRF_VERSION.CRF_ID= " + crfId + " )," + k + ", " + igMeta.isShowGroup() + ")";
 
                                 } else {
                                     sqlGroupLabel =
                                         "INSERT INTO ITEM_GROUP_METADATA (" + "item_group_id,header," + "subheader, layout, repeat_number, repeat_max,"
-                                            + " repeat_array,row_start_number, crf_version_id," + "item_id , ordinal) VALUES ("
+                                            + " repeat_array,row_start_number, crf_version_id," + "item_id , ordinal, show_group) VALUES ("
                                             + "(SELECT ITEM_GROUP_ID FROM ITEM_GROUP WHERE NAME='"
                                             + itemGroup.getName()
                                             + "' AND crf_id = "
@@ -1410,7 +1427,8 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                             + itemName
                                             + "' "
                                             + "AND ITEM.ITEM_ID = ITEM_FORM_METADATA.ITEM_ID and ITEM_FORM_METADATA.CRF_VERSION_ID=CRF_VERSION.CRF_VERSION_ID "
-                                            + "AND CRF_VERSION.CRF_ID= " + crfId + " ORDER BY ITEM.OID DESC LIMIT 1)," + k + ")";
+                                            + "AND CRF_VERSION.CRF_ID= " + crfId + " ORDER BY ITEM.OID DESC LIMIT 1)," + k + ", " 
+                                            + igMeta.isShowGroup() + ")";
 
                                 }
 
@@ -1580,6 +1598,26 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         } else {
                             logger.info("found a non-numeric code in a numeric field: groupRepeatMax");
                         }
+                        // >> tbh 02/2010 adding show_hide for Dynamics
+                        cell = sheet.getRow(gk).getCell((short) 4);
+                        String showGroup = getValue(cell);
+                        boolean isShowGroup = true;
+                        if (!StringUtil.isBlank(showGroup)) {
+                         
+                            try {
+                                isShowGroup = "0".equals(showGroup) ? false : true;
+                            } catch (Exception eee) {
+                                logger.debug("caught an exception with the boolean value for groups");
+                            }
+                        }
+                        //                        if (!"1".equals(showGroup) && !"0".equals(showGroup)) {
+                        //                            // throw an error here
+                        //                            errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("SHOW_GROUP_column") + " "
+                        //                                    + resPageMsg.getString("was_invalid_at_row") + " " + gk + ", " + resPageMsg.getString("Groups_worksheet") + ". "
+                        //                                    + resPageMsg.getString("SHOW_GROUP_column") + resPageMsg.getString("can_only_be_either_0_or_1"));
+                        //                            htmlErrors.put(j + "," + gk + "," + 4, resPageMsg.getString("INVALID_VALUE"));
+                        //                        }
+                        
                         // cell = sheet.getRow(gk).getCell((short) 6);
                         // String groupRepeatArray = getValue(cell);
                         // below added 06/14/2007, tbh
@@ -1608,6 +1646,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         igMeta.setHeader(groupHeader);
                         // igMeta.setLayout(groupLayout);
                         // igMeta.setRepeatArray(groupRepeatArray);
+                        igMeta.setShowGroup(isShowGroup);
                         try {
                             igMeta.setRepeatMax(new Integer(Integer.parseInt(groupRepeatMax)));
                         } catch (NumberFormatException n2) {
@@ -2165,6 +2204,13 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
             // cell.getStringCellValue()
             // + "</font></td>");
             break;
+        case HSSFCell.CELL_TYPE_BOOLEAN:
+            boolean val2 = cell.getBooleanCellValue();
+            if (val2) { 
+                val = "true";
+            } else {
+                val = "false";
+            }
         default:
             val = "";
             // buf.append("<td></td>");
