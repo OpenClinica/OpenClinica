@@ -6,8 +6,8 @@
     INSERT INTO item_group_metadata (item_group_metadata_id,item_group_id,
   header, subheader,layout,repeat_number,repeat_max,
   repeat_array, row_start_number,crf_version_id,
-  item_id, ordinal,borders)
-      VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
+  item_id, ordinal,borders, show_group)
+      VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
       </sql>
   </query>
   <query>
@@ -15,7 +15,7 @@
     <sql>UPDATE item_group_metadata SET item_group_id=?,
         header=?, subheader=?,layout=?,repeat_number=?,repeat_max=?,
         repeat_array=?, row_start_number=?,crf_version_id=?,
-        item_id=?, ordinal=?, borders =?
+        item_id=?, ordinal=?, borders =?, show_group=?
         WHERE item_group_metadata_id=?
      </sql>
   </query>

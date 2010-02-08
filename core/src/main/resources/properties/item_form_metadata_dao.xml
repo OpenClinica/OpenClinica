@@ -81,8 +81,9 @@
                     required,
                     default_value =?,
                     response_layout =?,
-                    width_decimal =?  )
-			VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                    width_decimal =?,
+                    show_item  )
+			VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 		</sql>
 	</query>
 	<query>
@@ -110,7 +111,8 @@
                     required =?,
                     default_value =?,
                     response_layout =?,
-                    width_decimal =?
+                    width_decimal =?,
+                    show_item =?
 			WHERE item_form_metadata_id = ?
 		</sql>
 	</query>

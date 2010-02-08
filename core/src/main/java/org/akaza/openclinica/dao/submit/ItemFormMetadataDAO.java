@@ -147,6 +147,7 @@ public class ItemFormMetadataDAO extends EntityDAO {
         answer.setDefaultValue(getStringFromRow(hm, "default_value"));
         answer.setResponseLayout(getStringFromRow(hm, "response_layout"));
         answer.setWidthDecimal(getStringFromRow(hm, "width_decimal"));
+        answer.setShowItem(((Boolean) hm.get("show_item")).booleanValue());
 
         // now get the response set
         ResponseSetBean rsb = new ResponseSetBean();
@@ -211,6 +212,9 @@ public class ItemFormMetadataDAO extends EntityDAO {
         ind++;
         this.setTypeExpected(ind, TypeNames.STRING); // width_decimal
         ind++;
+        // will need to set the boolean value here, tbh
+        this.setTypeExpected(ind, TypeNames.BOOL);
+        ind++; // show_item
         this.setTypeExpected(ind, TypeNames.INT);
         ind++; // response_set.response_type_id
         this.setTypeExpected(ind, TypeNames.STRING);
@@ -303,11 +307,11 @@ public class ItemFormMetadataDAO extends EntityDAO {
         this.setTypesExpected();
         // BWP: changed from 25 to 26 when added response_layout?
         // YW: now added width_decimal
-        this.setTypeExpected(27, TypeNames.STRING);// version name
+        this.setTypeExpected(28, TypeNames.STRING);// version name
         // add more here for display, tbh 082007
-        this.setTypeExpected(28, TypeNames.STRING);// group_label
-        this.setTypeExpected(29, TypeNames.INT);// repeat_max
-        this.setTypeExpected(30, TypeNames.STRING);// section_name
+        this.setTypeExpected(29, TypeNames.STRING);// group_label
+        this.setTypeExpected(30, TypeNames.INT);// repeat_max
+        this.setTypeExpected(31, TypeNames.STRING);// section_name
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(itemId));
 
@@ -455,6 +459,8 @@ public class ItemFormMetadataDAO extends EntityDAO {
         variables.put(new Integer(ind), ifmb.getResponseLayout());
         ind++;
         variables.put(new Integer(ind), ifmb.getWidthDecimal());
+        ind++;
+        variables.put(new Integer(ind), new Boolean(ifmb.isShowItem()));
 
         execute("create", variables);
 
@@ -519,6 +525,8 @@ public class ItemFormMetadataDAO extends EntityDAO {
         variables.put(new Integer(ind), ifmb.getResponseLayout());
         ind++;
         variables.put(new Integer(ind), ifmb.getWidthDecimal());
+        ind++;
+        variables.put(new Integer(ind), new Boolean(ifmb.isShowItem()));
 
         execute("update", variables);
 

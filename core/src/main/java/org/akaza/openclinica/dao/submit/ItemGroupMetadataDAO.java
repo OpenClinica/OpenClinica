@@ -43,6 +43,7 @@ public class ItemGroupMetadataDAO extends EntityDAO {
         // item_id numeric NOT NULL,
         // ordinal numeric NOT NULL,
         // borders numeric,
+        // show_group boolean,
         this.unsetTypeExpected();
         this.setTypeExpected(1, TypeNames.INT);
         this.setTypeExpected(2, TypeNames.INT);
@@ -57,7 +58,7 @@ public class ItemGroupMetadataDAO extends EntityDAO {
         this.setTypeExpected(11, TypeNames.INT);
         this.setTypeExpected(12, TypeNames.INT);
         this.setTypeExpected(13, TypeNames.INT);
-
+        this.setTypeExpected(14, TypeNames.BOOL);
     }
 
     public Object getEntityFromHashMap(HashMap hm) {
@@ -75,6 +76,7 @@ public class ItemGroupMetadataDAO extends EntityDAO {
         meta.setItemId((Integer) hm.get("item_id"));
         meta.setOrdinal((Integer) hm.get("ordinal"));
         meta.setBorders((Integer) hm.get("borders"));
+        meta.setShowGroup(((Boolean) hm.get("show_group")).booleanValue());
         return meta;
     }
 
@@ -96,7 +98,7 @@ public class ItemGroupMetadataDAO extends EntityDAO {
         // INSERT INTO item_group_metadata (item_group_id,
         // header, subheader,layout,repeat_number,repeat_max,
         // repeat_array, row_start_number,crf_version_id,
-        // item_id, ordinal,borders)
+        // item_id, ordinal,borders, show_group)
         // VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
         ItemGroupMetadataBean igMetaBean = (ItemGroupMetadataBean) eb;
         HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
@@ -114,6 +116,7 @@ public class ItemGroupMetadataDAO extends EntityDAO {
         variables.put(11, igMetaBean.getItemId());
         variables.put(12, igMetaBean.getOrdinal());
         variables.put(13, igMetaBean.getBorders());
+        variables.put(14, new Boolean(igMetaBean.isShowGroup()));
 
         this.execute(digester.getQuery("create"), variables);
         if (isQuerySuccessful()) {

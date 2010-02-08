@@ -374,6 +374,7 @@ public class NewCRFBean extends Object implements java.io.Serializable {
             con.setAutoCommit(false);
             Set mySet = itemQueries.entrySet();
             logger.info("---start of item query generation here---");
+            System.out.println("start query generation");
             for (Iterator itvl = mySet.iterator(); itvl.hasNext();) {
                 Map.Entry ment = (Map.Entry) itvl.next();
                 String pQuery = (String) ment.getValue();
@@ -396,7 +397,7 @@ public class NewCRFBean extends Object implements java.io.Serializable {
                 String query = (String) queries.get(th);// it.next();
                 count = th;
                 s = con.createStatement();
-                // logger.info(query);
+                // System.out.println(query);
                 s.executeUpdate(query);
                 s.close();
                 error.add(query);

@@ -36,6 +36,9 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
     // YW 08-01-2007, default_value has been added
     private String defaultValue;
     private String widthDecimal;
+    
+    private boolean showItem;
+    // tbh 02/2010, for dynamics
 
     // New properties added in response to group-related
     // template
@@ -75,6 +78,7 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
         regexpErrorMsg = "";
         ordinal = 0;
         required = false;
+        showItem = false;
         defaultValue = "";
         responseSet = new ResponseSetBean();
     }
@@ -126,6 +130,14 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 
     public void setRepeatMax(int repeatMax) {
         this.repeatMax = repeatMax;
+    }
+
+    public boolean isShowItem() {
+        return showItem;
+    }
+
+    public void setShowItem(boolean showItem) {
+        this.showItem = showItem;
     }
 
     public String getSectionName() {

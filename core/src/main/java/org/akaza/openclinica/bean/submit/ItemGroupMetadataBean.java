@@ -18,6 +18,8 @@ public class ItemGroupMetadataBean extends EntityBean implements Comparable {
     private Integer itemId;
     private Integer ordinal;
     private Integer borders;
+    private boolean showGroup;
+    // << tbh 02/2010 for dynamics
 
     public ItemGroupMetadataBean() {
         super();
@@ -32,6 +34,7 @@ public class ItemGroupMetadataBean extends EntityBean implements Comparable {
         rowStartNumber = 0;
         ordinal = 0;
         borders = 1;
+        showGroup = false;
     }
 
     /**
@@ -212,6 +215,14 @@ public class ItemGroupMetadataBean extends EntityBean implements Comparable {
      */
     public void setBorders(Integer borders) {
         this.borders = borders;
+    }
+
+    public boolean isShowGroup() {
+        return showGroup;
+    }
+
+    public void setShowGroup(boolean showGroup) {
+        this.showGroup = showGroup;
     }
 
     public int compareTo(Object o) {
