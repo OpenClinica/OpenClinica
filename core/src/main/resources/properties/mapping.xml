@@ -117,16 +117,26 @@
      </class>
      <class name="org.akaza.openclinica.domain.rule.action.InsertActionBean">
         <map-to xml="InsertAction" />
+        <field name="Properties"
+            type="org.akaza.openclinica.domain.rule.action.PropertyBean"
+            collection="arraylist">
+            <bind-xml name="Property"/>
+        </field>
         <field name="ExpressionEvaluatesTo"
                type="java.lang.Boolean">
             <bind-xml name="IfExpressionEvaluates" node="attribute"/>
        </field>
-        <field name="Message"
-               type="java.lang.String">
-            <bind-xml name="Message" node="element"/>
-        </field>
      </class>
-     <class name="org.akaza.openclinica.domain.rule.expression.ExpressionBean">
+     
+     <class name="org.akaza.openclinica.domain.rule.action.PropertyBean" auto-complete="true">
+        <field name="oid" type="string">
+            <bind-xml name="Oid" node="attribute"/>
+       </field>
+       <field name="value" type="string">
+            <bind-xml name="Value" node="attribute"/>
+       </field>
+     </class>
+     <class name="org.akaza.openclinica.domain.rule.expression.ExpressionBean" auto-complete="true">
         <field name="ContextName" type="string">
             <bind-xml name="Context" node="attribute"/>
        </field>

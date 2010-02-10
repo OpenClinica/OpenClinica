@@ -33,6 +33,8 @@
                 <value>org.akaza.openclinica.domain.rule.action.EmailActionBean</value>
                 <value>org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean</value>
                 <value>org.akaza.openclinica.domain.rule.action.ShowActionBean</value>
+                <value>org.akaza.openclinica.domain.rule.action.InsertActionBean</value>
+                <value>org.akaza.openclinica.domain.rule.action.PropertyBean</value>
                 <value>org.akaza.openclinica.domain.user.AuthoritiesBean</value>
                 <value>org.akaza.openclinica.domain.managestudy.StudyModuleStatus</value>
                 <value>org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean</value>

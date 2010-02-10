@@ -17,7 +17,6 @@ import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.logic.expressionTree.OpenClinicaExpressionParser;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -50,11 +49,11 @@ public class DataEntryRuleRunner extends RuleRunner {
                         OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(eow);
                         result = oep.parseAndEvaluateExpression(rule.getExpression().getValue());
 
-                        HashMap<String, ArrayList<String>> messagesOfActionsToBeExecuted = ruleSetRule.getActionsAsKeyPair(result);
+                        //HashMap<String, ArrayList<String>> messagesOfActionsToBeExecuted = ruleSetRule.getActionsAsKeyPair(result);
                         // Actions
                         List<RuleActionBean> actionListBasedOnRuleExecutionResult = ruleSetRule.getActions(result, Phase.INITIAL_DATA_ENTRY);
                         logger.info("RuleSet with target  : {} , Ran Rule : {}  The Result was : {} , Based on that {} action will be executed ", new Object[] {
-                            ruleSet.getTarget().getValue(), rule.getName(), result, messagesOfActionsToBeExecuted.size() });
+                            ruleSet.getTarget().getValue(), rule.getName(), result, actionListBasedOnRuleExecutionResult.size() });
 
                         // If not a dryRun(Meaning don't execute Actions) and if actions exist then execute the Action
                         if (actionListBasedOnRuleExecutionResult.size() > 0) {

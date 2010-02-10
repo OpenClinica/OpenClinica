@@ -17,6 +17,7 @@ import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
+import org.akaza.openclinica.domain.rule.action.InsertActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean;
 import org.akaza.openclinica.domain.rule.action.ShowActionBean;
@@ -187,9 +188,14 @@ public class RulesPostImportContainerService {
                     ruleSetBeanWrapper.error("ShowAction OID " + result + " is not Valid. ");
                 }
             }
-
         }
-
+        if (ruleActionBean instanceof InsertActionBean) {
+            String oid = (((InsertActionBean) ruleActionBean)).getProperties().get(0).getOid();
+            String result = getExpressionService().checkValidityOfItemOrItemGroupOidInCrf(oid, ruleSetBeanWrapper.getAuditableBean());
+            if (!result.equals("OK")) {
+                ruleSetBeanWrapper.error("InsertAction OID " + result + " is not Valid. ");
+            }
+        }
     }
 
     private boolean isRuleExpressionValid(AuditableBeanWrapper<RuleBean> ruleBeanWrapper, RuleSetBean ruleSet) {

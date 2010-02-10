@@ -225,7 +225,7 @@
                         <c:out value="${action.actionType}" />
                 </td>
                 <td class="table_cell_left">
-                        <c:out value="${action.message}" />
+                        <c:out value="${action.summary}" />
                 </td>
                 </tr>
                 </c:forEach>
@@ -282,7 +282,7 @@
                         <c:out value="${action.actionType}" />
                 </td>
                 <td class="table_cell_left">
-                        <c:out value="${action.message}" />
+                        <c:out value="${action.summary}" />
                 </td>
                 </c:forEach>
             </tr>
@@ -339,7 +339,7 @@
                         <c:out value="${action.actionType}" />
                 </td>
                 <td class="table_cell_left">
-                        <c:out value="${action.message}" />
+                        <c:out value="${action.summary}" />
                 </td>
                 </c:forEach>
             </tr>

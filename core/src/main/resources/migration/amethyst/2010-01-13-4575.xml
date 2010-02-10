@@ -46,4 +46,35 @@
             <column name="rule_action_run_id" type="INT"/>
         </addColumn>
     </changeSet>
+    <changeSet author="kkrumlian" id="2010-01-13-4575-5">
+        <comment>Create a table named rule_action_property</comment>
+        <createTable tableName="rule_action_property">
+            <column autoIncrement="true" name="id" type="int">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="rule_action_id" type="int"/>
+            <column name="oid" type="varchar(512)"/>
+            <column name="value" type="varchar(512)"/>
+            <column name="reference" type="varchar(512)"/>
+            <column name="version" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="kkrumlian" id="2010-01-13-4575-6" dbms="oracle">
+        <comment>Create a sequence/trigger to imitate autoIncrement functionality for oracle</comment>
+        <comment>trigger name, table name, sequence name Will need to be changed for each table.</comment>
+        <createSequence sequenceName="RULE_ACTION_PROPERTY_ID_SEQ"/>
+        <sql splitStatements="false"> 
+            create or replace trigger rule_action_property_bef_trg 
+                before insert on rule_action_property
+                    for each row begin 
+                        if :new.id is null 
+                         then select RULE_ACTION_PROPERTY_ID_SEQ.nextval into :new.id from dual; 
+                        end if; 
+                    end; 
+        </sql>
+        <rollback>
+            drop trigger rule_action_property_bef_trg;
+            drop sequence RULE_ACTION_PROPERTY_ID_SEQ;
+        </rollback>
+    </changeSet>
 </databaseChangeLog>

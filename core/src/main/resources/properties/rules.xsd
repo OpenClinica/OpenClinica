@@ -68,10 +68,10 @@
         <xs:attributeGroup ref="DiscrepancyNoteActionAttributeType"/>
     </xs:complexType>
     
-    <xs:element name="InsertAction" type="InsertActionType"/>
+   <xs:element name="InsertAction" type="InsertActionType"/>
     <xs:complexType name="InsertActionType">
         <xs:sequence>
-            <xs:element name="Message" type="xs:string"/>
+            <xs:element name="Property" type="PropertyType"/>
         </xs:sequence>
         <xs:attributeGroup ref="DiscrepancyNoteActionAttributeType"/>
     </xs:complexType>
@@ -88,6 +88,11 @@
         <xs:attribute name="OID" type="xs:string" use="required"/>
         <xs:attribute name="Name" type="xs:string"/>
     </xs:attributeGroup>
+    
+    <xs:attributeGroup name="PropertyAttributeType">
+        <xs:attribute name="Oid" type="xs:string" use="required"/>
+        <xs:attribute name="Value" type="xs:string" use="required"/>
+    </xs:attributeGroup>
 
     <xs:element name="Target" type="TargetType"/>
     <xs:complexType name="TargetType">
@@ -96,6 +101,12 @@
                 <xs:attribute name="Context" type="contextType" use="optional"/>
             </xs:extension>
         </xs:simpleContent>
+    </xs:complexType>
+    
+    <xs:complexType name="PropertyType">
+        <xs:sequence>
+        </xs:sequence>
+        <xs:attributeGroup ref="PropertyAttributeType"/>
     </xs:complexType>
 
     <xs:simpleType name="contextType">
