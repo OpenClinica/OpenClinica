@@ -105,7 +105,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         configureColumn(row.getColumn("crfName"), "CRF", null, null, false, false);
         configureColumn(row.getColumn("entityName"), "Entity Name", null, null, false, false);
         configureColumn(row.getColumn("entityValue"), "Entity Value", null, null, false, false);
-        configureColumn(row.getColumn("discrepancyNoteBean.description"), "Description", null, null, true, false);
+        configureColumn(row.getColumn("discrepancyNoteBean.description"), "Description of Parent Discrepancy Note", null, null, true, false);
         configureColumn(row.getColumn("discrepancyNoteBean.detailedNotes"), "Detailed Notes", null, null, false, false);
         configureColumn(row.getColumn("numberOfNotes"), "# of Notes", null, null, false, false);
         configureColumn(row.getColumn("discrepancyNoteBean.user"), "Assigned User", new AssignedUserCellEditor(), null, true, false);
