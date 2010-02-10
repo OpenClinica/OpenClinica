@@ -33,8 +33,7 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 
 /**
  * @author jxu Processes request to update a study subject
@@ -155,24 +154,31 @@ public class UpdateStudySubjectServlet extends SecureController {
                 if (!groups.isEmpty()) {
                     for (int i = 0; i < groups.size(); i++) {
                         StudyGroupClassBean sgc = (StudyGroupClassBean) groups.get(i);
-                        SubjectGroupMapBean sgm = new SubjectGroupMapBean();
-                        SubjectGroupMapBean gMap = (SubjectGroupMapBean) gMaps.get(new Integer(sgc.getId()));
-                        sgm.setStudyGroupId(sgc.getStudyGroupId());
-                        sgm.setNotes(sgc.getGroupNotes());
-                        sgm.setStudyGroupClassId(sgc.getId());
-                        sgm.setStudySubjectId(subject.getId());
-                        sgm.setStatus(Status.AVAILABLE);
-                        if (sgm.getStudyGroupId() > 0) {
-                            if (gMap != null && gMap.getId() > 0) {
-                                sgm.setUpdater(ub);
-                                sgm.setId(gMap.getId());
-                                sgmdao.update(sgm);
-                            } else {
-                                sgm.setOwner(ub);
-                                sgmdao.create(sgm);
+                        /*We will be allowing users to remove a subject from all groups. Issue-4524*/
+                        if (sgc.getStudyGroupId() == 0) {
+                            Collection subjectGroups = sgmdao.findAllByStudySubject(subject.getId());
+                            for (Iterator it = subjectGroups.iterator(); it.hasNext();) {
+                                sgmdao.deleteTestGroupMap(((SubjectGroupMapBean)it.next()).getId());
+                            }
+                        } else {
+                            SubjectGroupMapBean sgm = new SubjectGroupMapBean();
+                            SubjectGroupMapBean gMap = (SubjectGroupMapBean) gMaps.get(new Integer(sgc.getId()));
+                            sgm.setStudyGroupId(sgc.getStudyGroupId());
+                            sgm.setNotes(sgc.getGroupNotes());
+                            sgm.setStudyGroupClassId(sgc.getId());
+                            sgm.setStudySubjectId(subject.getId());
+                            sgm.setStatus(Status.AVAILABLE);
+                            if (sgm.getStudyGroupId() > 0) {
+                                if (gMap != null && gMap.getId() > 0) {
+                                    sgm.setUpdater(ub);
+                                    sgm.setId(gMap.getId());
+                                    sgmdao.update(sgm);
+                                } else {
+                                    sgm.setOwner(ub);
+                                    sgmdao.create(sgm);
+                                }
                             }
                         }
-
                     }
                 }
 
