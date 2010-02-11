@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class StudyEventDataBean {
     private ArrayList<FormDataBean> formData;
     private String studyEventOID;
-    private String studyEventRepeatKey;
+    private String studyEventRepeatKey = "1";// to prevent nulls, tbh 01/2010
     
     public StudyEventDataBean() {
         formData = new ArrayList<FormDataBean>();

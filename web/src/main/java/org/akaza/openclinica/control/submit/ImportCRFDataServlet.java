@@ -375,6 +375,7 @@ public class ImportCRFDataServlet extends SecureController {
                 // wrappers for is the 'overwrite' flag
 
                 logger.debug("found total validation errors: " + totalValidationErrors.size());
+                logger.debug("+++ content of total validation errors: " + totalValidationErrors.toString());
                 SummaryStatsBean ssBean = getImportCRFDataService().generateSummaryStatsBean(odmContainer, displayItemBeanWrappers);
                 session.setAttribute("summaryStats", ssBean);
                 // will have to set hard edit checks here as well

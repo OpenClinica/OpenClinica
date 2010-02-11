@@ -26,6 +26,7 @@
 <c:set var="defValue" value="${param.defaultValue}" />
 <%-- What is the including JSP (e.g., doubleDataEntry)--%>
 <c:set var="originJSP" value="${param.originJSP}" />
+<c:set var="isForcedRFC" value="${param.isForcedRFC}" />
 <c:set var="hasDataFlag" value="${hasDataFlag}" />
 <c:set var="ddeEntered" value="${requestScope['ddeEntered']}" />
 <!-- for the rows in model, input name processed by back-end servlet, needs to change them back to the name got from form, so we can show error frame around the input -->
@@ -653,10 +654,20 @@ include the default value first in the select list --%>
   </c:choose>
 
   <c:choose>
-  <c:when test="${originJSP eq 'administrativeEditing'}">
+  <c:when test="${(originJSP eq 'administrativeEditing') && (isForcedRFC eq 'true')}">
+
+	<%-- added to allow for DN creation tbh --%>
+   <a tabindex="<c:out value="${tabNum + 1000}"/>" href="#" onClick=
+    "openDNWindow('CreateDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&groupLabel=<c:out value="${displayItem.metadata.groupLabel}"/>&isRfc=1&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=<c:out value="${inputName}"/>&column=value&enterData=1&errorFlag=<c:out value="${errorFlag}"/>','spanAlert-<c:out value="${inputName}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
+    ><img id="flag_<c:out value="${inputName}"/>" name="flag_<c:out value="${inputName}"/>" src=
+    "images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"
+    ></a>
+
+  </c:when>
+  <c:when test="${(originJSP eq 'administrativeEditing') && (isForcedRFC eq 'false')}">
 
    <a tabindex="<c:out value="${tabNum + 1000}"/>" href="#" onClick=
-    "openDNoteWindow('ViewDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=<c:out value="${parsedInputName}"/>&column=value&enterData=1&writeToDB=1','spanAlert-<c:out value="${parsedInputName}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
+    "openDNoteWindow('ViewDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=<c:out value="${parsedInputName}"/>&isRfc=1&column=value&enterData=1&writeToDB=1','spanAlert-<c:out value="${parsedInputName}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
     ><img id="flag_<c:out value="${inputName}"/>" name="flag_<c:out value="${inputName}"/>" src=
     "images/<c:out value="${imageFileName}"/>.gif" border="0" alt=
     "<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"

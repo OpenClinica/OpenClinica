@@ -181,10 +181,25 @@ public class ResponseSetBean extends EntityBean {
             int ind = ((Integer) optionIndexesByValue.get(value)).intValue();
 
             if (ind >= 0 && ind < options.size()) {
+                if(responseType.getId() == 5 || responseType.getId() == 6){
+                    //only for radio and single-select menu
+                    options = removeSelection();
+                }
                 ResponseOptionBean rob = (ResponseOptionBean) options.get(ind);
                 rob.setSelected(selected);
                 options.set(ind, rob);
             }
         }
+    }
+    public ArrayList removeSelection(){
+        ArrayList list = new ArrayList();
+        for(int i = 0; i < options.size(); i++){
+            ResponseOptionBean rob = (ResponseOptionBean) options.get(i);
+            if(rob.isSelected()){
+                rob.setSelected(false);
+            }
+            list.add(rob);
+        }
+        return list;
     }
 }

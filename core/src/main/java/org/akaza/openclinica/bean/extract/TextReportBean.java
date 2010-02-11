@@ -32,7 +32,8 @@ public class TextReportBean extends ReportBean {
         for (int i = 0; i < data.size(); i++) {
             ArrayList row = (ArrayList) data.get(i);
             for (int j = 0; j < row.size(); j++) {
-                buffer.append(row.get(j));
+                String s = ((String)row.get(j)).replaceAll("\\s", " ");
+                buffer.append(s);
                 buffer.append(sep);
             }
             buffer.append(end);

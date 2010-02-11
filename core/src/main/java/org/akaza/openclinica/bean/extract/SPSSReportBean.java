@@ -7,6 +7,14 @@
  */
 package org.akaza.openclinica.bean.extract;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+
 import org.akaza.openclinica.bean.core.ResponseType;
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
@@ -17,14 +25,6 @@ import org.akaza.openclinica.bean.submit.ResponseSetBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * @author jxu
@@ -49,7 +49,7 @@ public class SPSSReportBean extends ReportBean {
         { "A", "A", "ADATE10", "ADATE10", "A", "A", "A", "A", "A", "ADATE10", "ADATE10", "A", "F8.0", "ADATE10", "A", "A", "A" };
 
     // hold validated variable name
-    private ArrayList itemNames = new ArrayList();
+    private final ArrayList itemNames = new ArrayList();
     // YW >>
 
     public static final List list = Arrays.asList(builtin);
@@ -381,7 +381,8 @@ public class SPSSReportBean extends ReportBean {
             // include header, just row data
             row = (ArrayList) data.get(i);
             for (int j = 0; j < row.size(); j++) {
-                answer.append(Utils.convertedItemDateValue((String) row.get(j), local_df_string, "MM/dd/yyyy") + "\t");
+                String s = ((String)row.get(j)).replaceAll("\\s", " ");
+                answer.append(Utils.convertedItemDateValue(s, local_df_string, "MM/dd/yyyy") + "\t");
             }
             answer.append("\n");
         }

@@ -355,6 +355,7 @@ public class ImportCRFDataService {
                                         // set event def crf?
                                         displayItemBean.setEventDefinitionCRF(eventDefinitionCRF);
                                         String eventCRFRepeatKey = studyEventDataBean.getStudyEventRepeatKey();
+                                        // if you do indeed leave off this in the XML it will pass but return 'null' tbh
                                         attachValidator(displayItemBean, importHelper, discValidator, hardValidator, request, eventCRFRepeatKey,
                                                 studySubjectBean.getOid());
                                         displayItemBeans.add(displayItemBean);
@@ -400,6 +401,7 @@ public class ImportCRFDataService {
                         totalValidationErrors.put(errorKey.toString(), validationErrors.get(errorKey).toString());
                         // assuming that this will be put back in to the core
                         // method's hashmap, updating statically, tbh 06/2008
+                        logger.debug("+++ adding " + errorKey.toString());
                     }
                     logger.debug("-- hard validation checks: --");
                     for (Object errorKey : hardValidator.keySet()) {

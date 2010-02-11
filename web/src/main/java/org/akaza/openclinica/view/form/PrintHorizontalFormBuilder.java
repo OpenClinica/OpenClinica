@@ -44,7 +44,7 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
     // entry?
     private boolean hasDbFormValues;
     // Alter print view for Internet Explorer browsers
-    private boolean isInternetExplorer=true;
+    private boolean isInternetExplorer=false;
     // Does the print view have to be reconfigured for IE browsers?
     private boolean reconfigureView;
 

@@ -84,6 +84,8 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
     public static final String DIS_NOTE = "discrepancyNote";
 
     public static final String WRITE_TO_DB = "writeToDB";
+    
+    public static final String IS_REASON_FOR_CHANGE = "isRfc";
 
     public static final String PRESET_RES_STATUS = "strResStatus";
 
@@ -164,6 +166,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
          */
 
         boolean writeToDB = fp.getBoolean(WRITE_TO_DB, true);
+        boolean isReasonForChange = fp.getBoolean(IS_REASON_FOR_CHANGE);
         int entityId = fp.getInt(ENTITY_ID);
         // subjectId has to be added to the database when disc notes area saved
         // as entity_type 'subject'
@@ -341,7 +344,15 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                         // dnb.setAssignedUser(ub);
                         // dnb.setAssignedUserId(ub.getId());
                         // << tbh 08/2009
+                        
                     }
+                    if (isReasonForChange) {
+                        dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.REASON_FOR_CHANGE.getId());
+                        dnb.setResolutionStatusId(ResolutionStatus.NOT_APPLICABLE.getId());
+                        // request.setAttribute(PRESET_RES_STATUS, new Integer(ResolutionStatus.NOT_APPLICABLE.getId()).toString());
+                    }
+                    // << tbh 02/2010, trumps failed evaluation error checks
+                    // can we put this in admin editing 
                     request.setAttribute("autoView", "0");
                     // above set to automatically open up the user panel
                 } else {

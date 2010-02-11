@@ -74,10 +74,10 @@ function setStatus(typeId) {
 		objtr2.value=1; //new
 	} else {
   		if (objtr2.value ==5 && objtr2.disabled) {
-   		objtr2.value=1;
-  	}
+   			objtr2.value=1;
+  		}
 
-  	objtr2.disabled = false;
+  		objtr2.disabled = false;
 
 	}
 }
@@ -86,7 +86,7 @@ function setResStatus(resStatusId, destinationUserId) {
 	objtr1=document.getElementById('resStatusId');
 	objtr2=document.getElementById('userAccountId');
 	objtr3=document.getElementById('xxx');
-
+	objtr4=document.getElementById('typeId');
 
 	if (resStatusId == 3 || resStatusId == 4) { //Resolutiuon proposed or Closed
 		// objtr2.disabled = false;
@@ -98,13 +98,18 @@ function setResStatus(resStatusId, destinationUserId) {
 		// disable?
 		//objtr3.disabled = false;
 	}
+
+	if (resStatusId == 5 && objtr4.value == 4) { // Not applicable AND Reason for Change
+		objtr1.disabled = true;
+	}
 }
 
 
 //-->
 </script>
 </head>
-<body class="popup_BG" >
+<body class="popup_BG" onload="javascript:setStatus(<c:out value="${discrepancyNote.discrepancyNoteTypeId}"/>);">
+<%-- needs to run at first to possibly gray out the drop down, tbh 02/2010--%>
 <div style="float: left;"><h1 class="table_title_Submit"><fmt:message key="add_discrepancy_note" bundle="${resword}"/></h1></div>
 <div style="float: right;"><p><a href="#" onclick="javascript:window.close();"><fmt:message key="close_window" bundle="${resword}"/></a></p></div>
 <br clear="all">
@@ -177,15 +182,15 @@ function setResStatus(resStatusId, destinationUserId) {
                 			 <%-- need to create a special case for Queries, tbh --%>
 			                  <c:choose>
 			                    <c:when test="${type.id == 3}">
-				                   <input type="radio" name="typeId" value="<c:out value="${type.id}"/>" checked  onclick ="javascript:setStatus(<c:out value="${type.id}"/>);javascript:leftnavExpand('user1');javascript:leftnavExpand('user2');"><c:out value="${type.name}"/><br>
+				                   <input type="radio" name="typeId" id="typeId" value="<c:out value="${type.id}"/>" checked  onclick ="javascript:setStatus(<c:out value="${type.id}"/>);javascript:leftnavExpand('user1');javascript:leftnavExpand('user2');"><c:out value="${type.name}"/><br>
 			                    </c:when>
 			                    <c:otherwise>
                                     <c:choose>
                                     <c:when test="${study.status.frozen && (type.id==2 || type.id==4)}">
-				                        <input type="radio" name="typeId" value="<c:out value="${type.id}"/>" disabled="true" checked  onclick ="javascript:setStatus(<c:out value="${type.id}"/>);javascript:hide('user1');javascript:hide('user2');"><c:out value="${type.name}"/><br>
+				                        <input type="radio" name="typeId" id="typeId" value="<c:out value="${type.id}"/>" disabled="true" checked  onclick ="javascript:setStatus(<c:out value="${type.id}"/>);javascript:hide('user1');javascript:hide('user2');"><c:out value="${type.name}"/><br>
                                     </c:when>
                                     <c:otherwise>
-                                        <input type="radio" name="typeId" value="<c:out value="${type.id}"/>" checked  onclick ="javascript:setStatus(<c:out value="${type.id}"/>);javascript:hide('user1');javascript:hide('user2');"><c:out value="${type.name}"/><br>
+                                        <input type="radio" name="typeId" id="typeId" value="<c:out value="${type.id}"/>" checked  onclick ="javascript:setStatus(<c:out value="${type.id}"/>);javascript:hide('user1');javascript:hide('user2');"><c:out value="${type.name}"/><br>
                                     </c:otherwise>
                                     </c:choose>
 			                    </c:otherwise>
@@ -194,15 +199,15 @@ function setResStatus(resStatusId, destinationUserId) {
                               <c:otherwise>
         		                <c:choose>
 		    	                <c:when test="${type.id == 3}">
-			        	            <input type="radio" name="typeId" value="<c:out value="${type.id}"/>" onclick ="javascript:setStatus(<c:out value="${type.id}"/>);javascript:leftnavExpand('user1');javascript:leftnavExpand('user2');"><c:out value="${type.name}"/><br>
+			        	            <input type="radio" name="typeId" id="typeId" value="<c:out value="${type.id}"/>" onclick ="javascript:setStatus(<c:out value="${type.id}"/>);javascript:leftnavExpand('user1');javascript:leftnavExpand('user2');"><c:out value="${type.name}"/><br>
 			                    </c:when>
 			                    <c:otherwise>
                                     <c:choose>
                                     <c:when test="${study.status.frozen && (type.id==2 || type.id==4)}">
-				                        <input type="radio" name="typeId" disabled="true" value="<c:out value="${type.id}"/>" onclick ="javascript:setStatus(<c:out value="${type.id}"/>);javascript:hide('user1');javascript:hide('user2');"><c:out value="${type.name}"/><br>
+				                        <input type="radio" name="typeId" id="typeId" disabled="true" value="<c:out value="${type.id}"/>" onclick ="javascript:setStatus(<c:out value="${type.id}"/>);javascript:hide('user1');javascript:hide('user2');"><c:out value="${type.name}"/><br>
                                     </c:when>
                                     <c:otherwise>
-                                        <input type="radio" name="typeId" value="<c:out value="${type.id}"/>" onclick ="javascript:setStatus(<c:out value="${type.id}"/>);javascript:hide('user1');javascript:hide('user2');"><c:out value="${type.name}"/><br>
+                                        <input type="radio" name="typeId" id="typeId" value="<c:out value="${type.id}"/>" onclick ="javascript:setStatus(<c:out value="${type.id}"/>);javascript:hide('user1');javascript:hide('user2');"><c:out value="${type.name}"/><br>
                                     </c:otherwise>
                                     </c:choose>
 			                    </c:otherwise>
@@ -217,10 +222,10 @@ function setResStatus(resStatusId, destinationUserId) {
             <c:forEach var="type" items="${discrepancyTypes}">
                 <c:choose>
                     <c:when test="${typeId1 == type.id}">
-                        <input type="radio" name="typeId" value="<c:out value="${type.id}"/>" checked disabled><c:out value="${type.name}"/><br>
+                        <input type="radio" name="typeId" id="typeId" value="<c:out value="${type.id}"/>" checked disabled><c:out value="${type.name}"/><br>
                     </c:when>
                     <c:otherwise>
-                        <input type="radio" name="typeId" value="<c:out value="${type.id}"/>" disabled><c:out value="${type.name}"/><br>
+                        <input type="radio" name="typeId" id="typeId" value="<c:out value="${type.id}"/>" disabled><c:out value="${type.name}"/><br>
                     </c:otherwise>
                 </c:choose>
             </c:forEach>

@@ -540,9 +540,9 @@ public class CreateDatasetServlet extends SecureController {
             allItems = (ArrayList) session.getAttribute("allSelectedItems");
             // need to add 'view selected groups' here as well, tbh
             ArrayList allGroups = (ArrayList) session.getAttribute("allSelectedGroups");
-            db.getItemIds().clear();
-            db.getItemMap().clear();
-            db.getItemDefCrf().clear();
+            //db.getItemIds().clear();
+            //db.getItemMap().clear();
+            //db.getItemDefCrf().clear();
         } else if (crfId > 0) {// user chose a CRF and submitted items
             // remove all old items first, since user submitted again
             // so user can de-select items
@@ -595,6 +595,19 @@ public class CreateDatasetServlet extends SecureController {
                         db.getItemDefCrf().add(selectedItem);
                     }
 
+                } else {
+                	if(crfId == -1) {
+                		if(db.getItemMap().containsKey(selectedItem.getDatasetItemMapKey())) {
+                            for (int j = 0; j < db.getItemDefCrf().size(); ++j) {
+                                ItemBean ib = (ItemBean) db.getItemDefCrf().get(j);
+                                if (ib.getId() == selectedItem.getId()) {
+                                    db.getItemDefCrf().remove(j);
+                                }
+                            }
+                            db.getItemIds().remove(new Integer(selectedItem.getId()));
+                            db.getItemMap().remove(selectedItem.getDatasetItemMapKey());
+                		}
+                	}
                 }
             }
 
@@ -996,12 +1009,12 @@ public class CreateDatasetServlet extends SecureController {
     }
 
     private void extractEventIds(DatasetBean db) {
-        ArrayList<String> selectedSedIds = new ArrayList<String>();
+        ArrayList<Integer> selectedSedIds = new ArrayList<Integer>();
         HashMap dbItemMap = db != null ? db.getItemMap() : new HashMap();
         if (dbItemMap.size() > 0) {
             Iterator<String> it = dbItemMap.keySet().iterator();
             while (it.hasNext()) {
-                String selected = it.next().split("_")[0].trim();
+                Integer selected = Integer.valueOf(it.next().split("_")[0].trim());
                 if (!"0".equals(selected) && !selectedSedIds.contains(selected)) {
                     selectedSedIds.add(selected);
                 }

@@ -579,6 +579,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                             <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
                             <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                             <c:param name="originJSP" value="administrativeEditing"/>
+                            <c:param name="isForcedRFC" value="${study.studyParameterConfig.adminForcedReasonForChange}"/>
                         </c:import>
                     </td>
                 </c:forEach>
@@ -600,6 +601,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                             <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
                             <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                             <c:param name="originJSP" value="administrativeEditing"/>
+                            <c:param name="isForcedRFC" value="${study.studyParameterConfig.adminForcedReasonForChange}"/>
                         </c:import>
                     </td>
                 </c:forEach>
@@ -625,6 +627,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                         <c:param name="tabNum" value="${itemNum}"/>
                         <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                         <c:param name="originJSP" value="administrativeEditing"/>
+                        <c:param name="isForcedRFC" value="${study.studyParameterConfig.adminForcedReasonForChange}"/>
                     </c:import>
 					<c:import url="../submit/generateGroupItemTxt.jsp">
 						<c:param name="itemId" value="${bodyItem.item.id}"/>
@@ -660,6 +663,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                         <c:param name="tabNum" value="${itemNum}"/>
                         <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                         <c:param name="originJSP" value="administrativeEditing"/>
+                        <c:param name="isForcedRFC" value="${study.studyParameterConfig.adminForcedReasonForChange}"/>
                     </c:import>
 					<c:import url="../submit/generateGroupItemTxt.jsp">
 						<c:param name="itemId" value="${bodyItem.item.id}"/>
@@ -723,6 +727,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                         <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
                         <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                         <c:param name="originJSP" value="administrativeEditing"/>
+                        <c:param name="isForcedRFC" value="${study.studyParameterConfig.adminForcedReasonForChange}"/>
                     </c:import>
                 </td>
             </c:forEach>
@@ -744,6 +749,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                         <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
                         <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                         <c:param name="originJSP" value="administrativeEditing"/>
+                        <c:param name="isForcedRFC" value="${study.studyParameterConfig.adminForcedReasonForChange}"/>
                     </c:import>
                 </td>
             </c:forEach>
@@ -769,6 +775,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                     <c:param name="tabNum" value="${itemNum}"/>
                     <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                     <c:param name="originJSP" value="administrativeEditing"/>
+                    <c:param name="isForcedRFC" value="${study.studyParameterConfig.adminForcedReasonForChange}"/>
                 </c:import>
 				<c:import url="../submit/generateGroupItemTxt.jsp">
 						<c:param name="itemId" value="${bodyItem.item.id}"/>
@@ -804,6 +811,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                     <c:param name="tabNum" value="${itemNum}"/>
                     <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                     <c:param name="originJSP" value="administrativeEditing"/>
+                    <c:param name="isForcedRFC" value="${study.studyParameterConfig.adminForcedReasonForChange}"/>
                 </c:import>
 				<c:import url="../submit/generateGroupItemTxt.jsp">
 						<c:param name="itemId" value="${bodyItem.item.id}"/>
@@ -951,6 +959,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                                     <c:param name="defaultValue" value="${displayItem.singleItem.metadata.defaultValue}"/>
                                     <c:param name="respLayout" value="${displayItem.singleItem.metadata.responseLayout}"/>
                                     <c:param name="originJSP" value="administrativeEditing"/>
+                                    <c:param name="isForcedRFC" value="${study.studyParameterConfig.adminForcedReasonForChange}"/>
                                 </c:import>
 
                             </td>
@@ -1041,6 +1050,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                                         <c:param name="defaultValue" value="${childItem.metadata.defaultValue}"/>
                                         <c:param name="respLayout" value="${childItem.metadata.responseLayout}"/>
                                         <c:param name="originJSP" value="administrativeEditing"/>
+                                        <c:param name="isForcedRFC" value="${study.studyParameterConfig.adminForcedReasonForChange}"/>
                                     </c:import>
                                         <%--	<br />--%><%--<c:import url="../showMessage.jsp"><c:param name="key" value="input${childItem.item.id}" /></c:import>--%>
                                 </td>
