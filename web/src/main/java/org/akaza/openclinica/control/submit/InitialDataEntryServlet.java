@@ -204,6 +204,7 @@ public class InitialDataEntryServlet extends DataEntryServlet {
             dib = validateDisplayItemBeanMultipleCV(v, dib, inputName);
         }
 
+        logger.debug("just ran validate display item bean on " + inputName);
         return dib;
     }
 

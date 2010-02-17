@@ -193,20 +193,19 @@ public class ViewBuilderPrintDecorator {
         // follow this one.
         // See below
         int startOrdinal = 0;
-
+        int i = 0;
         for (DisplayItemGroupBean existingDisplayBean : groupBeans) {
             // If the group table has more than three columns and does not have
             // a name of "ungrouped" then break the bean up into single column
             // beans
             if (existingDisplayBean.getItems().size() > 3 && !BeanFactory.UNGROUPED.equalsIgnoreCase(existingDisplayBean.getItemGroupBean().getName())) {
-
+                
                 startOrdinal = existingDisplayBean.getOrdinal();
                 // increment the ordinals of the other beans to make up for this
                 // one
-                this.incrementDisplayBeanOrdinals(groupBeans, startOrdinal, existingDisplayBean.getItems().size() - 1);
+//                this.incrementDisplayBeanOrdinals(groupBeans, startOrdinal, existingDisplayBean.getItems().size() - 1);
 
                 newGroupBeans.addAll(splitUpGroupBeanIntoSingleColumns(existingDisplayBean));
-
             } else {
                 // otherwise, add the existing bean to the List
                 newGroupBeans.add(existingDisplayBean);
@@ -255,27 +254,28 @@ public class ViewBuilderPrintDecorator {
     public List<DisplayItemGroupBean> splitUpGroupBeanIntoSingleColumns(DisplayItemGroupBean existingBean) {
 
         List<DisplayItemGroupBean> newDisplayBeans = new ArrayList<DisplayItemGroupBean>();
-
-        DisplayItemGroupBean cloneDisplayBean;
+        int ordinal = existingBean.getOrdinal();
+        DisplayItemGroupBean cloneDisplayBean = cloneDisplayItemGroupBean(existingBean, existingBean.getItems().get(0), ordinal);
 
         if (existingBean == null) {
-
             return newDisplayBeans;
         }
-
-        int ordinal = existingBean.getOrdinal();
         // Create a DisplayItemGroupBean for every display item bean
-        for (DisplayItemBean displayItemBean : existingBean.getItems()) {
-
-            cloneDisplayBean = cloneDisplayItemGroupBean(existingBean, displayItemBean, ordinal);
-            ++ordinal;
-            newDisplayBeans.add(cloneDisplayBean);
-
+        for (int i=1; i< existingBean.getItems().size(); i++) {
+            DisplayItemBean displayItemBean = existingBean.getItems().get(i);
+            if(i%3==0){
+                ordinal++;
+                newDisplayBeans.add(cloneDisplayBean);
+                cloneDisplayBean = cloneDisplayItemGroupBean(existingBean, displayItemBean, ordinal);
+            }else{
+                cloneDisplayBean.getItems().add(displayItemBean);
+            }
         }
+        newDisplayBeans.add(cloneDisplayBean);
         return newDisplayBeans;
     }
 
-    public DisplayItemGroupBean cloneDisplayItemGroupBean(DisplayItemGroupBean clonedGroupBean, DisplayItemBean displayItemBean, int ordinal) {
+    public DisplayItemGroupBean cloneDisplayItemGroupBean(DisplayItemGroupBean clonedGroupBean, DisplayItemBean displayItemBean,int ordinal) {
 
         DisplayItemGroupBean newGroupBean = new DisplayItemGroupBean();
         if (clonedGroupBean == null)
@@ -283,8 +283,8 @@ public class ViewBuilderPrintDecorator {
 
         newGroupBean.setGroupMetaBean(clonedGroupBean.getGroupMetaBean());
         newGroupBean.setItemGroupBean(clonedGroupBean.getItemGroupBean());
-        newGroupBean.setOrdinal(ordinal);
         newGroupBean.getItems().add(displayItemBean);
+        newGroupBean.setOrdinal(ordinal);
 
         return newGroupBean;
     }

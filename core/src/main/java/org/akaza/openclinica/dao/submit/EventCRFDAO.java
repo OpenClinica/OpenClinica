@@ -602,7 +602,8 @@ public class EventCRFDAO extends AuditableEntityDAO {
         //sql = sql + sort.execute("");
         sql = sql + " order By  ec.date_created ASC "; //major hack
         if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
-            sql += " )  where rownum <= " + rowEnd + " and rownum >" + rowStart + " ";
+            // sql += " )  where rownum <= " + rowEnd + " and rownum >" + rowStart + " ";
+            sql += " )x)where r between " + (rowStart + 1) + " and " + rowEnd;
         } else {
             sql = sql + " LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
         }

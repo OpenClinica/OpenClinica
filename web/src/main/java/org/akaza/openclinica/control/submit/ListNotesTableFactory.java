@@ -223,7 +223,10 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                      * The update date is the date created of the latest child
                      * note
                      */
-                    dnb.setUpdatedDate(((DiscrepancyNoteBean) children.get(0)).getCreatedDate());
+                    // dnb.setUpdatedDate(((DiscrepancyNoteBean) children.get(0)).getCreatedDate());
+                    dnb.setUpdatedDate(child.getCreatedDate());
+                    // << one line change tbh, 02/2010
+                    // the previous line didnt work since we always create two notes on creation.
                 }
             }
 

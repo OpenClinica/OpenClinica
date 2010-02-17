@@ -7,6 +7,18 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
@@ -81,18 +93,6 @@ import org.akaza.openclinica.view.form.FormBeanUtil;
 import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * @author ssachs
@@ -373,6 +373,7 @@ public abstract class DataEntryServlet extends SecureController {
         if (newUploadedFiles == null) {
             newUploadedFiles = new HashMap<String, String>();
         }
+        request.setAttribute("newUploadedFiles", newUploadedFiles);
         if (!fp.getString("exitTo").equals("")) {
             request.setAttribute("exitTo", fp.getString("exitTo"));
         }
@@ -702,7 +703,7 @@ public abstract class DataEntryServlet extends SecureController {
                         formGroups = validateDisplayItemGroupBean(v, dgb, dbGroups, formGroups, ruleValidator, groupOrdinalPLusItemOid);
                         // formGroups = validateDisplayItemGroupBean(v, dgb,
                         // dbGroups, formGroups);
-                        logger.debug("form group size after validation " + formGroups.size());
+                        logger.debug("*** form group size after validation " + formGroups.size());
                     }
                     diwg.setItemGroup(dgb);
                     diwg.setItemGroups(formGroups);
@@ -1057,6 +1058,7 @@ public abstract class DataEntryServlet extends SecureController {
                 v.alwaysExecuteLastValidation(INPUT_INTERVIEW_DATE);
             }
 
+            // logger.debug("about to validate: " + v.getKeySet());
             errors = v.validate();
 
             // tbh >>
@@ -1183,6 +1185,44 @@ public abstract class DataEntryServlet extends SecureController {
                         errors.put(fieldName, siErrors.get(fieldName));
                     }
                 }
+                // we should 'shift' the names here, tbh 02/2010
+                // need: total number of rows, manual rows, all row names
+                // plus: error names
+                Iterator iter2 = errors.keySet().iterator();
+                while (iter2.hasNext()) {
+                    String fieldName = iter2.next().toString();
+                    logger.debug("found error " + fieldName);
+                }
+//                for (int i = 0; i < allItems.size(); i++) {
+//                    DisplayItemWithGroupBean diwb = allItems.get(i);
+//
+//                    if (diwb.isInGroup()) {
+//                        List<DisplayItemGroupBean> dgbs = diwb.getItemGroups();
+//                        logger.debug("found manual rows " + getManualRows(dgbs) + " and total rows " + dgbs.size() + " from ordinal " + diwb.getOrdinal());
+//                    }
+//                }
+                
+                errors = reshuffleErrorGroupNames(errors, allItems);
+                // reset manual rows, so that we can catch errors correctly
+                // but it needs to be set per block of repeating items?  what if there are two or more?
+                
+                int manualRows = 0; // getManualRows(formGroups);
+                for (int i = 0; i < allItems.size(); i++) {
+                    DisplayItemWithGroupBean diwb = allItems.get(i);
+
+                    if (diwb.isInGroup()) {
+                        List<DisplayItemGroupBean> dgbs = diwb.getItemGroups();
+                        manualRows = getManualRows(dgbs);
+                    }
+                }
+                request.setAttribute("manualRows", new Integer(manualRows));
+                Iterator iter3 = errors.keySet().iterator();
+                while (iter3.hasNext()) {
+                    String fieldName = iter3.next().toString();
+                    logger.debug("found error after shuffle " + fieldName);
+                }
+                // << tbh, 02/2010
+                
                 // YW >>
                 request.setAttribute(BEAN_DISPLAY, section);
                 request.setAttribute(BEAN_ANNOTATIONS, fp.getString(INPUT_ANNOTATIONS));
@@ -1300,6 +1340,9 @@ public abstract class DataEntryServlet extends SecureController {
                                 String fileName = this.addAttachedFilePath(displayItem, attachedFilePath);
                                 displayItem.setEditFlag(displayGroup.getEditFlag());
                                 logger.debug("group item value: " + displayItem.getData().getValue());
+                                if("add".equalsIgnoreCase(displayItem.getEditFlag()) && fileName.length()>0 && !newUploadedFiles.containsKey(fileName)) {
+                                    displayItem.getData().setValue("");
+                                }
                                 temp = writeToDB(displayItem, iddao, nextOrdinal);
                                 logger.debug("just executed writeToDB - 1");
                                 logger.debug("next ordinal: " + nextOrdinal);
@@ -1315,9 +1358,10 @@ public abstract class DataEntryServlet extends SecureController {
                                     inputName = this.getGroupItemManualInputName(displayGroup, j, displayItem);
 
                                 }
-                                if (j == (dgbs.size() - 1)) {
+                                if (j == dgbs.size() - 1) {
                                     // LAST ONE
                                     logger.info("last one");
+                                    
                                     int ordinal = j - this.getManualRows(dgbs);
                                     inputName = getGroupItemInputName(displayGroup, ordinal, displayItem);
                                 }
@@ -1336,6 +1380,9 @@ public abstract class DataEntryServlet extends SecureController {
                                     String fileName = this.addAttachedFilePath(displayItem, attachedFilePath);
                                     displayItem.setEditFlag(displayGroup.getEditFlag());
                                     logger.debug("group item value: " + displayItem.getData().getValue());
+                                    if("add".equalsIgnoreCase(displayItem.getEditFlag()) && fileName.length()>0 && !newUploadedFiles.containsKey(fileName)) {
+                                        displayItem.getData().setValue("");
+                                    }
                                     temp = writeToDB(displayItem, iddao, 0);
                                     logger.info("just executed writeToDB - 2");
                                     if (temp && newUploadedFiles.containsKey(fileName)) {
@@ -2132,7 +2179,7 @@ public abstract class DataEntryServlet extends SecureController {
                 logger.debug("found a match btw previous and ordinal");
                 formItemGroup.setEditFlag("edit");
                 formItemGroup.setOrdinal(previous + 1);
-                dbGroups.get(j).setEditFlag("edit");
+                // dbGroups.get(j).setEditFlag("edit");
             }
             // << tbh 08/2009
             if (formItemGroup.getOrdinal() > dbGroups.size() - 1) {
@@ -2913,7 +2960,7 @@ public abstract class DataEntryServlet extends SecureController {
                     List<DisplayItemBean> items = displayGroup.getItems();
                     // for (DisplayItemBean dib : items) {
                     for (int j = 0; j < items.size(); j++) {
-                        DisplayItemBean dib = (DisplayItemBean) items.get(j);
+                        DisplayItemBean dib = items.get(j);
                         int itemDataId = dib.getData().getId();
                         int numNotes = dndao.findNumExistingNotesForItem(itemDataId);
 
@@ -2923,24 +2970,29 @@ public abstract class DataEntryServlet extends SecureController {
                         // String inputName =
                         // displayGroup.getItemGroupBean().getName() + "_" + i +
                         // "." + getInputName(dib);
-                        String inputName = getGroupItemInputName(displayGroup, i, dib);
+                        int ordinal = this.getManualRows(digbs);
+                        String inputName = getGroupItemInputName(displayGroup, displayGroup.getFormInputOrdinal(), dib);
+                        if (!displayGroup.isAuto()) {
+                            inputName = getGroupItemManualInputName(displayGroup, i, dib);
+                        }
+
                         // String inputName = getGroupItemInputName(displayGroup, i, getManualRows(digbs), dib);
                         // logger.info("inputName: " + inputName);
                         discNotes.setNumExistingFieldNotes(inputName, numNotes);
                         ArrayList notes = discNotes.getNotes(inputName);
                         // we need to also set the notes for the manual input name, tbh 01/2010
-                        String inputName2 = this.getGroupItemManualInputName(displayGroup, i, dib);
-                        logger.info("inputName 2: " + inputName2);
-                        ArrayList notes2 = discNotes.getNotes(inputName2);
-                        discNotes.setNumExistingFieldNotes(inputName2, numNotes);
-                        if (numNotes > 0) {
-                            logger.debug("itemDataId:" + itemDataId);
-                            logger.debug("numNotes:" + numNotes);
-                            logger.debug("inputName: " + inputName);
-                            logger.debug("inputName 2: " + inputName2);
-                        }
-                        dib.setNumDiscrepancyNotes(numNotes + notes.size() + notes2.size());
-                        logger.debug("dib note size:" + dib.getNumDiscrepancyNotes() + " " + dib.getData().getId());
+//                        String inputName2 = this.getGroupItemManualInputName(displayGroup, i, dib);
+//                        logger.info("inputName 2: " + inputName2);
+//                        ArrayList notes2 = discNotes.getNotes(inputName2);
+//                        discNotes.setNumExistingFieldNotes(inputName2, numNotes);
+//                        if (numNotes > 0) {
+//                            logger.debug("itemDataId:" + itemDataId);
+//                            logger.debug("numNotes:" + numNotes);
+//                            logger.debug("inputName: " + inputName);
+//                            logger.debug("inputName 2: " + inputName2);
+//                        }
+                        dib.setNumDiscrepancyNotes(numNotes + notes.size());// + notes2.size());
+                        logger.debug("dib note size:" + dib.getNumDiscrepancyNotes() + " " + dib.getData().getId() + " " + inputName);
                         items.set(j, dib);
                     }
                     displayGroup.setItems(items);
@@ -3983,6 +4035,56 @@ public abstract class DataEntryServlet extends SecureController {
             }
         }
         return manualRows;
+    }
+    
+    private HashMap reshuffleErrorGroupNames(HashMap errors, List<DisplayItemWithGroupBean> allItems) {
+        for (int i = 0; i < allItems.size(); i++) {
+            DisplayItemWithGroupBean diwb = allItems.get(i);
+
+            if (diwb.isInGroup()) {
+                List<DisplayItemGroupBean> dgbs = diwb.getItemGroups();
+                int manualRows = getManualRows(dgbs);
+                int totalRows = dgbs.size();
+                logger.debug("found manual rows " + manualRows + 
+                        " and total rows " + totalRows + " from ordinal " + 
+                        diwb.getOrdinal());
+                for (DisplayItemGroupBean digb : dgbs) {
+                    ItemGroupBean igb = digb.getItemGroupBean();
+                    List<DisplayItemBean> dibs = digb.getItems();
+                    int placeHolder = 1;
+                    while ((totalRows - manualRows) > 2) {
+                        
+                        for (DisplayItemBean dib : dibs) {
+                            // needs to be 2, 3, 4 ... in the place of 4, 3, 2...
+                            String intendedKey = getGroupItemInputName(digb, placeHolder, dib);
+                            String replacementKey = getGroupItemManualInputName(digb, manualRows + 1, dib);
+                            if (errors.containsKey(intendedKey)) {
+                                // String errorMessage = (String)errors.get(intendedKey);
+                                errors.put(replacementKey, errors.get(intendedKey));
+                                errors.remove(intendedKey);
+                                logger.debug("removing: " + intendedKey + 
+                                        " and replacing it with " + replacementKey);
+                            }
+                        }
+                        placeHolder++;
+                        manualRows++;
+                    }
+                    // but what about the last row? use the placeholder
+                    for (DisplayItemBean dib : dibs) {
+                        String lastIntendedKey = getGroupItemInputName(digb, placeHolder, dib);
+                        String lastReplacementKey = getGroupItemInputName(digb, 1, dib);
+                        if (!lastIntendedKey.equals(lastReplacementKey) && errors.containsKey(lastIntendedKey)) {
+                         // String errorMessage = (String)errors.get(intendedKey);
+                            errors.put(lastReplacementKey, errors.get(lastIntendedKey));
+                            errors.remove(lastIntendedKey);
+                            logger.debug("removing: " + lastIntendedKey + 
+                                    " and replacing it with " + lastReplacementKey);
+                        }
+                    }
+                }
+            }
+        }
+        return errors;
     }
 
 }

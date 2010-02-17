@@ -117,7 +117,7 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
             // in IE browsers?
             boolean changeHTMLForIE = false;
             if (reconfigureView) {
-                changeHTMLForIE = builderUtil.hasThreePlusColumns(displaySecBean);
+//                changeHTMLForIE = builderUtil.hasThreePlusColumns(displaySecBean);
             }
 
             // We have to change the Section's ItemGroupBeans if the Section has
@@ -128,13 +128,13 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
             // three columns; changeHTMLForIE is 'true' if this section has any
             // group tables
             // that are 3+ columns
-            if (changeHTMLForIE) {
-                List<DisplayItemGroupBean> newGroupBeans = builderUtil.reduceColumnsGroupTables(displaySecBean.getDisplayFormGroups());
-
-                // Now set the display section beans groups to the reshuffled
-                // list
-                displaySecBean.setDisplayFormGroups(newGroupBeans);
-            }
+//            if (changeHTMLForIE) {
+//                List<DisplayItemGroupBean> newGroupBeans = builderUtil.reduceColumnsGroupTables(displaySecBean.getDisplayFormGroups());
+//
+//                // Now set the display section beans groups to the reshuffled
+//                // list
+//                displaySecBean.setDisplayFormGroups(newGroupBeans);
+//            }
 
             // increment the page number
             ++pageNumber;
@@ -186,6 +186,9 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
             // Create a table for every DisplayItemGroupBean
             // A DisplayItemGroupBean contains an ItemGroupBean and
             // its list of DisplayItemBeans
+            ArrayList headerlist = new ArrayList();
+            ArrayList bodylist = new ArrayList();
+            ArrayList subHeadList = new ArrayList();
             for (DisplayItemGroupBean displayItemGroup : displaySecBean.getDisplayFormGroups()) {
 
                 List<DisplayItemBean> currentDisplayItems = displayItemGroup.getItems();
@@ -283,16 +286,12 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
                 repeatNumber = repeatNumber > 12 ? 12 : repeatNumber;
                 // This is always true during this iteration
                 repeatFlag = true;
-
                 Element table = createTable();
 
                 // add the thead element
-                Element thead = this.createThead();
-                table.addContent(thead);
+                Element thead = new Element("tr");
                 tableDiv.addContent(table);
-                // Add the first row for the th tags
-                Element thRow = new Element("tr");
-                thead.addContent(thRow);
+//                table.addContent(thead);
                 // Does this group involve a Horizontal checkbox or radio
                 // button?
                 boolean hasResponseLayout = builderUtil.hasResponseLayout(currentDisplayItems);
@@ -304,27 +303,30 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
                 List<Element> thTags =
                     repeatFlag ? createTheadContentsFromDisplayItems(currentDisplayItems, true) : createTheadContentsFromDisplayItems(currentDisplayItems,
                             false);
-
+                int i = 0;
                 for (Element el : thTags) {
-                    thRow.addContent(el);
+                    i++;
+                    if(i%4 == 0) {
+                        thead.addContent(el);
+                        headerlist.add(thead);
+                        thead = new Element("tr");
+                    } else{
+                        thead.addContent(el);
+                    }
                 }
+
+                if(i%4!=0)headerlist.add(thead);
+                
                 // Make sure the layout for "horizontal" checkboxes or radios is
                 // displayed
                 // in this manner.
                 if (hasResponseLayout) {
-                    Element thRowSubhead = new Element("tr");
-                    thead.addContent(thRowSubhead);
-                    addResponseLayoutRow(thRowSubhead, currentDisplayItems);
+                    addResponseLayoutRow(subHeadList, currentDisplayItems);
                 }
 
-                // Create the tbody tag
-                Element tbody;
+
                 Element row;
                 Element td;
-                tbody = this.createTbody();
-                // The table adds the tbody to the XML or markup
-                table.addContent(tbody);
-
                 // For each row in the table
                 row = new Element("tr");
                 // If the group has repeat behavior and repeats row by row,
@@ -332,10 +334,12 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
                 // repetition model type attributes have to be added to the tr
                 // tag
                 if (repeatFlag && !(involvesDataEntry && hasStoredRepeatedRows)) {
-                    row = repeatManager.addParentRepeatAttributes(row, repeatParentId, repeatNumber, displayItemGroup.getGroupMetaBean().getRepeatMax());
+                    table = repeatManager.addParentRepeatAttributes(table, repeatParentId, repeatNumber, displayItemGroup.getGroupMetaBean().getRepeatMax());
                 }
                 // The content for the table cells. For each item...
+                int j = 0;
                 for (DisplayItemBean displayBean : currentDisplayItems) {
+                    j++;
                     // What type of input: text, radio, checkbox, etc.?
                     String responseName = displayBean.getMetadata().getResponseSet().getResponseType().getName();
                     // We have to create cells in a different way if the input
@@ -350,7 +354,7 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
                         for (Element el : elements) {
                             el = builderUtil.setClassNames(el);
                             if (repeatFlag) {
-                                el = repeatManager.addChildRepeatAttributes(el, repeatParentId, displayBean.getItem().getId(), null);
+//                                el = repeatManager.addChildRepeatAttributes(el, repeatParentId, displayBean.getItem().getId(), null);
                             }
                             row.addContent(el);
                         }
@@ -362,20 +366,47 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
                     // Create cells within each row
                     td = cellFactory.createCellContents(td, responseName, displayBean, ++tabindex, hasDiscrepancyMgt, hasDbFormValues, true);
                     if (repeatFlag) {
-                        td = repeatManager.addChildRepeatAttributes(td, repeatParentId, displayBean.getItem().getId(), null);
+//                        td = repeatManager.addChildRepeatAttributes(td, repeatParentId, displayBean.getItem().getId(), null);
                     }
 
-                    row.addContent(td);
+                    if(j%4==0){
+                        row.addContent(td);
+                        bodylist.add(row);
+                        row = new Element("tr");
+                        if (repeatFlag) {
+                            repeatParentId = repeatParentId+uniqueId++;
+//                            newBodyRow = repeatManager.addParentRepeatAttributes(newBodyRow, repeatParentId, repeatNumber, displayItemGroup.getGroupMetaBean().getRepeatMax());
+//                            newBodyRow = repeatManager.addChildRepeatAttributes(newBodyRow, repeatParentId, displayBean.getItem().getId(), null);
+                        }
+                    } else{
+                        row.addContent(td);
+                    }
                 }// end for displayBean
                 // We need an extra cell for holding the "Remove Row" button
-                if (repeatFlag) {
-                    builderUtil.addRemoveRowControl(row, repeatParentId);
+                if(j%4!=0)bodylist.add(row);
+                for(int k=0; k<headerlist.size();k++){
+                    Element head = (Element)headerlist.get(k);
+                    Element body = (Element)bodylist.get(k);
+                    table.addContent(head);
+                    if(subHeadList.size()>0){
+                        try{
+                            Element subHead = (Element)subHeadList.get(k);
+                            table.addContent(subHead);
+                        }catch (IndexOutOfBoundsException IOB){
+                        }
+                    }
+                    table.addContent(body);
+//                    int span = body.getContentSize();
+//                    Element blankSpace = new Element("tr");
+//                    blankSpace.setAttribute("height", "10");
+//                    blankSpace.setAttribute("border", "1");
+//                    Element blankTd = new Element("td");
+//                    blankSpace.addContent(blankTd);
+//                    blankTd.setAttribute("span", span+"");
+//                    blankTd.setText(" ");
+//                    table.addContent(blankSpace);
                 }
-
-                tbody.addContent(row);
-
                 // }//end for every row
-
                 // The final true parameter is for disabling D Note icons from
                 // being clicked
                 if (hasStoredRepeatedRows) {
@@ -384,14 +415,14 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
 
                     // add these new rows to the table
                     for (Element newRow : storedRepeatedRows) {
-                        tbody.addContent(newRow);
+                        table.addContent(newRow);
                     }
 
                 }
                 // Create a row for the Add Row button, if the group includes
                 // any repeaters
                 if (repeatFlag) {
-                    builderUtil.createAddRowControl(tbody, repeatParentId, (builderUtil.calcNumberofColumns(displayItemGroup) + 1));
+                    builderUtil.createAddRowControl(table, repeatParentId, (builderUtil.calcNumberofColumns(displayItemGroup) + 1));
 
                 }
             }// end for displayFormGroup
@@ -414,8 +445,8 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
         return webPageBuilder.toString();
     }
 
-    private void addResponseLayoutRow(Element thRow, List<DisplayItemBean> displayBeans) {
-
+    private void addResponseLayoutRow(ArrayList subHeadList, List<DisplayItemBean> displayBeans) {
+        Element thRow = new Element("tr");
         String responseName;
         String responseLayout;
         ItemFormMetadataBean metaBean;
@@ -425,7 +456,9 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
 
         ResponseSetBean respBean;
         ResponseOptionBean optBean;
+        int j = 0;
         for (DisplayItemBean dBean : displayBeans) {
+            j++;
             metaBean = dBean.getMetadata();
             respBean = metaBean.getResponseSet();
             responseName = respBean.getResponseType().getName();
@@ -458,7 +491,12 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
                 th2 = createThCell("", 1);
                 thRow.addContent(th2);
             }
+            if(j%4==0){
+                subHeadList.add(thRow);
+                thRow = new Element("tr");
+            }
         }
+        if(j%4!=0)subHeadList.add(thRow);
         // now add the final empty th cell for the row
         th2 = createThCell();
         thRow.addContent(th2);
@@ -471,11 +509,15 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
     }
 
     public Element createThCell(String cellText, int colSpan) {
-        Element th = super.createThCell(cellText);
+        Element th = new Element("td");
+        th.setText(cellText);
         if (colSpan > 1) {
             th.setAttribute("colspan", colSpan + "");
         }
-        return setClassNames(th);
+        th.setAttribute("class", "aka_headerBackground aka_padding_large aka_cellBorders aka_font_general");
+        th.setAttribute("align", "center");
+
+        return th;
     }
 
     public Element createTHTagFromItemMeta(ItemFormMetadataBean itemFormBean) {
@@ -485,12 +527,13 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
         String responseType = itemFormBean.getResponseSet().getResponseType().getName();
         boolean hasQuestNumber = !"".equalsIgnoreCase(itemFormBean.getQuestionNumberLabel());
         Element newSpan = new Element("span");
+        String header = itemFormBean.getHeader();
         if (hasQuestNumber) {
             newSpan = new Element("span");
             newSpan.setAttribute("style", "margin-right:1em");
             newSpan.addContent(itemFormBean.getQuestionNumberLabel());
         }
-        String header = itemFormBean.getHeader();
+
         if (header != null && header.length() == 0) {
             header = itemFormBean.getLeftItemText();
         }
@@ -506,9 +549,9 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
             thTag.addContent(0, newSpan);
         }
         // Add font for printing
-        String classNames = thTag.getAttribute("class").getValue();
-        classNames = classNames + " general_font";
-        thTag.setAttribute("class", classNames);
+//        String classNames = thTag.getAttribute("class").getValue();
+//        classNames = classNames + " general_font";
+//        thTag.setAttribute("class", classNames);
 
         return thTag;
 
@@ -525,9 +568,9 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
             elements.add(createTHTagFromItemMeta(itemFormBean));
         }
         // Create an extra column for the cells that contain a Remove Row button
-        if (generateExtraColumn) {
-            elements.add(this.createThCell(""));
-        }
+//        if (generateExtraColumn) {
+//            elements.add(this.createThCell(""));
+//        }
         return elements;
     }
 

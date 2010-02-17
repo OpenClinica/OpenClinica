@@ -18,4 +18,5 @@
     <include file="migration/3.0/2009-09-10-3599.xml"/>
     <include file="migration/3.0/2009-12-01-4439.xml"/>
     <include file="migration/3.0/2009-12-11-4502.xml"/>
+    <include file="migration/3.0/2010-02-16-NA01.xml"/>
 </databaseChangeLog>

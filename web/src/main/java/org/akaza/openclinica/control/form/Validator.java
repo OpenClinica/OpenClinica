@@ -58,7 +58,7 @@ import javax.servlet.http.HttpServletRequest;
  *
  * // fieldName is the name of your HTML input field.
  * // validationType is one of the Validator static ints
- * // args depends on which type of validation you're doing,
+ * // args depends on which type of validation you re doing,
  * // see below for details
  * v.addValidation(fieldName, validationType, args);
  *
@@ -659,10 +659,33 @@ public class Validator {
                 Validation v = (Validation) fieldValidations.get(i);
                 logger.debug("fieldName=" + fieldName);
                 validate(fieldName, v);
+                if (errors.containsKey(fieldName)) {
+                    logger.debug("found an error for " + fieldName + " v-type: " + v.getType() + " " + v.getErrorMessage() + ": " + getFieldValue(fieldName));
+                } else {
+                    logger.debug("did NOT find an error for " + fieldName + " v-type: " + v.getType() + " " + v.getErrorMessage() + ": "
+                        + getFieldValue(fieldName));
+                }
             }
         }
 
         return errors;
+    }
+
+    /*
+     * quick debug function to look inside the validations set
+     */
+    public String getKeySet() {
+        String retMe = "";
+        Set keys = validations.keySet();
+        Iterator keysIt = keys.iterator();
+
+        while (keysIt.hasNext()) {
+            String fieldName = (String) keysIt.next();
+            retMe += fieldName;
+            ArrayList fieldValidations = getFieldValidations(fieldName);
+            retMe += " found " + fieldValidations.size() + " field validations; ";
+        }
+        return retMe;
     }
 
     protected void addError(String fieldName, Validation v) {

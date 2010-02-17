@@ -11,7 +11,11 @@
   margin-top:10px;
   float:left;
   clear: both;
-  border:thin solid gray;
+  border-style: solid;
+  border-top:1px;
+  border-left:1px;
+  border-right:0px;
+  border-bottom:1px;  
   font-family: Tahoma, Arial, Helvetica, Sans-Serif;
   font-size: 11px;
   line-height: 15px;

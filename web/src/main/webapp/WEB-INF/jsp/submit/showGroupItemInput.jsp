@@ -29,8 +29,12 @@
 <c:set var="isForcedRFC" value="${param.isForcedRFC}" />
 <c:set var="hasDataFlag" value="${hasDataFlag}" />
 <c:set var="ddeEntered" value="${requestScope['ddeEntered']}" />
+<c:set var="autoParsedOrdinal" value="${rowCount - manualRows}"/>
 <!-- for the rows in model, input name processed by back-end servlet, needs to change them back to the name got from form, so we can show error frame around the input -->
-<c:set var="autoParsedInputName" value="${repeatParentId}_${rowCount - manualRows}input${itemId}" />
+<%-- addition tbh 02/2010 have to reduce this by one to make up for non-manual rows (at the end) --%>
+<c:set var="autoParsedInputName" value="${repeatParentId}_${autoParsedOrdinal - 1}input${itemId}" />
+<c:set var="autoParsedInputName2" value="${repeatParentId}_${autoParsedOrdinal}input${itemId}" />
+<c:set var="autoParsedInputNameLast" value="${repeatParentId}_1input${itemId}" />
 
 <%-- Some javascript functions for handling file data type -- ywang Dec.,2008 --%>
 <script lang="Javascript">
@@ -182,7 +186,8 @@ function switchStr(itemId, id,attribute,str1,str2) {
 <c:if test="${isLast == false && rowCount >0}">
   <c:set var="inputName" value="${repeatParentId}_manual${rowCount}input${itemId}" />
   <c:set var="parsedInputName" value="${repeatParentId}_manual${rowCount}input${itemId}" />
-  <c:set var="autoParsedInputName" value="${repeatParentId}_manual${rowCount - manualRows}input${itemId}" />		
+  <c:set var="autoParsedInputName" value="${repeatParentId}_manual${rowCount - manualRows}input${itemId}" />	
+  <c:set var="autoParsedInputName2" value="${repeatParentId}_manual${rowCount - manualRows}input${itemId}" />	
 </c:if>
 
 <%-- for tab index. must start from 1, not 0--%>
@@ -209,19 +214,21 @@ function switchStr(itemId, id,attribute,str1,str2) {
 
 <c:forEach var="frmMsg" items="${formMessages}">
 
-   <c:if test="${(frmMsg.key eq parsedInputName) || (frmMsg.key eq autoParsedInputName) || (frmMsg.key eq errorInputName) || (frmMsg.key eq errorParsedInputName)}">
-
+   <%-- <c:if test="${(frmMsg.key eq parsedInputName) || (frmMsg.key eq autoParsedInputName) || (frmMsg.key eq errorInputName) || (frmMsg.key eq errorParsedInputName)}">
+   --%>
 
 	<!-- found frmMsg: <c:out value="${frmMsg.key}"/> -->
 	<!-- checking <c:out value="${parsedInputName}"/>, auto <c:out value="${autoParsedInputName}"/> -->
 
-   <%-- <c:if test="${(frmMsg.key eq parsedInputName) || (frmMsg.key eq autoParsedInputName)}"> --%>
+   <c:choose>
+   <c:when test="${(frmMsg.key eq parsedInputName) || (frmMsg.key eq autoParsedInputName) || (frmMsg.key eq autoParsedInputName2)}"> 
 
 
     	<%-- need to avoid duplicate tripping, but catch the "_manualX" names at the same time, TBH --%>
     	<%--|| (frmMsg.key eq inputName) || (frmMsg.key eq manualInputName)}">--%>
 		<!-- found frmMsg again: <c:out value="${frmMsg.key}"/> -->
 		<!-- setting error to true here, <c:out value="${parsedInputName}"/>, auto <c:out value="${autoParsedInputName}"/>, 
+		auto 2 <c:out value="${autoParsedInputName2}"/>
 	inputName <c:out value="${inputName}"/>, manualInputName <c:out value="${manualInputName}"/>
 	error <c:out value="${errorInputName}"/>
 	error 2 <c:out value="${errorParsedInputName}"/>
@@ -233,7 +240,14 @@ function switchStr(itemId, id,attribute,str1,str2) {
 			value='<%=StringEscapeUtils.escapeJavaScript(pageContext.getAttribute("errorTxtMessage").toString())%>' />
 		<%-- can we pop off the messages so that they dont repeat? --%>
 
-	</c:if>
+	</c:when>
+    <c:when test="${(frmMsg.key eq autoParsedInputNameLast) && (isLast == true)}">
+		<c:set var="isInError" value="${true}" />
+		<c:set var="errorTxtMessage" value="${frmMsg.value}" />
+		<c:set var="errorTxtMessage"
+			value='<%=StringEscapeUtils.escapeJavaScript(pageContext.getAttribute("errorTxtMessage").toString())%>' />
+    </c:when>
+    </c:choose>
 </c:forEach>
 
 <%-- end of for each loop for setting errors  --%>
