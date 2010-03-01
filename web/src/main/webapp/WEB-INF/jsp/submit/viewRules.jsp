@@ -170,7 +170,7 @@
         <c:forEach items="${status.current.value}" var="val">
         <tr valign="top">
             <td class="table_cell"><c:out value="${val.actionType}"/></td>
-            <td class="table_cell"><c:out value="${val.message}"/></td>
+            <td class="table_cell"><c:out value="${val.summary}"/></td>
             <td class="table_cell">&nbsp;</td>
         </tr>
         </c:forEach>

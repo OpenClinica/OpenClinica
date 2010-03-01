@@ -126,6 +126,10 @@
                type="java.lang.Boolean">
             <bind-xml name="IfExpressionEvaluates" node="attribute"/>
        </field>
+       <field name="RuleActionRun"
+               type="org.akaza.openclinica.domain.rule.action.RuleActionRunBean">
+               <bind-xml name="Run"/>
+       </field>
      </class>
      
      <class name="org.akaza.openclinica.domain.rule.action.PropertyBean" auto-complete="true">
@@ -142,6 +146,23 @@
        </field>
        <field name="Value" type="string">
             <bind-xml node="text"/>         
+       </field>
+     </class>
+     <class name="org.akaza.openclinica.domain.rule.action.RuleActionRunBean" auto-complete="true">
+        <field name="administrativeDataEntry" type="boolean">
+            <bind-xml name="AdministrativeDataEntry" node="attribute"/>
+       </field>
+       <field name="initialDataEntry" type="boolean">
+            <bind-xml name="InitialDataEntry" node="attribute"/>
+       </field>
+       <field name="doubleDataEntry" type="boolean">
+            <bind-xml name="DoubleDataEntry" node="attribute"/>
+       </field>
+       <field name="importDataEntry" type="boolean">
+            <bind-xml name="ImportDataEntry" node="attribute"/>
+       </field>
+       <field name="batch" type="boolean">
+            <bind-xml name="Batch" node="attribute"/>
        </field>
      </class>
 </mapping>

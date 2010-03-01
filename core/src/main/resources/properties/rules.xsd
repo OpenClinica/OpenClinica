@@ -45,6 +45,7 @@
     <xs:element name="DiscrepancyNoteAction" type="DiscrepancyNoteActionType"/>
     <xs:complexType name="DiscrepancyNoteActionType">
         <xs:sequence>
+            <xs:element name="Run" type="ActionRunType"/>
             <xs:element name="Message" type="xs:string"/>
         </xs:sequence>
         <xs:attributeGroup ref="DiscrepancyNoteActionAttributeType"/>
@@ -53,6 +54,7 @@
     <xs:element name="EmailAction" type="EmailActionType"/>
     <xs:complexType name="EmailActionType">
         <xs:sequence>
+            <xs:element name="Run" type="ActionRunType"/>
             <xs:element name="Message" type="xs:string"/>
             <xs:element name="To" type="xs:string"/>
         </xs:sequence>
@@ -62,6 +64,7 @@
     <xs:element name="ShowAction" type="ShowActionType"/>
     <xs:complexType name="ShowActionType">
         <xs:sequence>
+            <xs:element name="Run" type="ActionRunType"/>
             <xs:element name="Message" type="xs:string"/>
             <xs:element name="OIDs" type="xs:string"/>
         </xs:sequence>
@@ -71,6 +74,7 @@
    <xs:element name="InsertAction" type="InsertActionType"/>
     <xs:complexType name="InsertActionType">
         <xs:sequence>
+            <xs:element name="Run" type="ActionRunType"/>
             <xs:element name="Property" type="PropertyType"/>
         </xs:sequence>
         <xs:attributeGroup ref="DiscrepancyNoteActionAttributeType"/>
@@ -93,6 +97,14 @@
         <xs:attribute name="Oid" type="xs:string" use="required"/>
         <xs:attribute name="Value" type="xs:string" use="required"/>
     </xs:attributeGroup>
+    
+     <xs:attributeGroup name="ActionRunAttributeType">
+        <xs:attribute name="AdministrativeDataEntry" type="xs:boolean" use="required"/>
+        <xs:attribute name="InitialDataEntry" type="xs:boolean" use="required"/>
+        <xs:attribute name="DoubleDataEntry" type="xs:boolean" use="required"/>
+        <xs:attribute name="ImportDataEntry" type="xs:boolean" use="required"/>
+        <xs:attribute name="Batch" type="xs:boolean" use="required"/>
+    </xs:attributeGroup>
 
     <xs:element name="Target" type="TargetType"/>
     <xs:complexType name="TargetType">
@@ -107,6 +119,12 @@
         <xs:sequence>
         </xs:sequence>
         <xs:attributeGroup ref="PropertyAttributeType"/>
+    </xs:complexType>
+    
+     <xs:complexType name="ActionRunType">
+        <xs:sequence>
+        </xs:sequence>
+        <xs:attributeGroup ref="ActionRunAttributeType"/>
     </xs:complexType>
 
     <xs:simpleType name="contextType">
