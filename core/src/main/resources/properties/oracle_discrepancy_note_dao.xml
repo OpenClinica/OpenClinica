@@ -625,6 +625,54 @@
               AND dn.parent_dn_id is null
         </sql>
     </query>
+    <query>
+    	<name>countBySubjectTypeAndStudyEvent</name>
+    	<sql>
+    	select dn.resolution_status_id,count(dn.resolution_status_id) count
+			from discrepancy_note dn, dn_subject_map dsm, study_event se, study_subject ss
+			where dsm.subject_id = ss.subject_id
+			and ss.study_subject_id = se.study_subject_id
+			and dsm.discrepancy_note_id = dn.discrepancy_note_id
+			and se.study_event_id = ?
+			and dn.parent_dn_id is null
+    	</sql>
+    </query>
+    <query>
+    	<name>countByStudySubjectTypeAndStudyEvent</name>
+    	<sql>
+    	select dn.resolution_status_id,count(dn.resolution_status_id) count
+			from discrepancy_note dn, dn_study_subject_map dssm, study_event se
+			where dssm.study_subject_id = se.study_subject_id
+			and dssm.discrepancy_note_id = dn.discrepancy_note_id
+			and se.study_event_id = ?
+			and dn.parent_dn_id is null
+    	</sql>
+    </query>
+    <query>
+    	<name>countByEventCrfTypeAndStudyEvent</name>
+    	<sql>
+    	select dn.resolution_status_id,count(dn.resolution_status_id) count
+			from discrepancy_note dn, dn_event_crf_map decm, event_crf ec, study_event se
+			where se.study_event_id = ec.study_event_id
+			and ec.event_crf_id = decm.event_crf_id
+			and decm.discrepancy_note_id = dn.discrepancy_note_id
+			and se.study_event_id = ?
+			and dn.parent_dn_id is null
+    	</sql>
+    </query>
+    <query>
+    	<name>countByStudyEventTypeAndStudyEvent</name>
+    	<sql>
+    	select dn.resolution_status_id,count(dn.resolution_status_id) count
+			from discrepancy_note dn, dn_study_event_map dsem, study_event se
+			where dsem.study_event_id = se.study_event_id
+			and dsem.discrepancy_note_id = dn.discrepancy_note_id
+			and se.study_event_id = ?
+			and dn.parent_dn_id is null 
+    	</sql>
+    </query>
+    
+    
 	<query>
 		<name>create</name>
 		<sql>

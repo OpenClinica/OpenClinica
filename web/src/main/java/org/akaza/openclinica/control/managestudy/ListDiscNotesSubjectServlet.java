@@ -51,9 +51,19 @@ public class ListDiscNotesSubjectServlet extends SecureController {
     protected void processRequest() throws Exception {
 
         String module = request.getParameter("module");
-        if (module != null) {
-            request.setAttribute("module", module);
+        String moduleStr = "manage";
+        if (module != null && module.trim().length() > 0) {
+            if ("submit".equals(module)) {
+                request.setAttribute("module", "submit");
+                moduleStr = "submit";
+            } else if ("admin".equals(module)) {
+                request.setAttribute("module", "admin");
+                moduleStr = "admin";
+            } else {
+                request.setAttribute("module", "manage");
+            }
         }
+        // << tbh 02/2010 filter out the entire module parameter to catch injections
 
         // BWP 3098>> close the info side panel and show icons
         request.setAttribute("closeInfoShowIcons", true);
@@ -144,7 +154,8 @@ public class ListDiscNotesSubjectServlet extends SecureController {
         factory.setEventDefintionCRFDAO(eddao);
         factory.setStudyGroupDAO(sgdao);
         factory.setDiscrepancyNoteDAO(dnDAO);
-        factory.setModule(module);
+        
+        factory.setModule(moduleStr);
         factory.setDiscNoteType(discNoteType);
         // factory.setStudyHasDiscNotes(allDiscNotes != null &&
         // !allDiscNotes.isEmpty());

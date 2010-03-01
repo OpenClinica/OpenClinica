@@ -87,7 +87,7 @@
                 <c:if test="${!studyRole.invalid}">
                  <tr>
                  <td class="table_cell"><input type="radio" checked name="studyId" value="<c:out value="${studyRole.studyId}"/>">
-                 <b><c:out value="${studyRole.studyName}"/> (<c:out value="${studyRole.role.description}"/>)</b></td>
+                 <b><c:out value="${studyRole.studyName}"/> (<fmt:message key="${studyRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>)</b></td>
                  </tr>
                </c:if>
                 <c:if test="${studyRole.invalid}">
@@ -112,7 +112,7 @@
                 <c:if test="${!studyRole.invalid}">
                  <tr>
                   <td class="table_cell"><input type="radio" name="studyId" value="<c:out value="${studyRole.studyId}"/>">
-                  <b><c:out value="${studyRole.studyName}"/> (<c:out value="${studyRole.role.description}"/>)</b></td>
+                  <b><c:out value="${studyRole.studyName}"/> (<fmt:message key="${studyRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>)</b></td>
                  </tr>
                </c:if>
                 <c:if test="${studyRole.invalid}">

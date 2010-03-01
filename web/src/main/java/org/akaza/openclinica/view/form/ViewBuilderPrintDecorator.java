@@ -70,7 +70,7 @@ public class ViewBuilderPrintDecorator {
 
         Element pageDiv = new Element("div");
         pageDiv.setAttribute("id", ("page" + pageNumber));
-        pageDiv.setAttribute("class", "page");
+//        pageDiv.setAttribute("class", "page");
         if (changeForInternetExplorer) {
             pageDiv.setAttribute("style", "float:none");
         }
@@ -126,11 +126,11 @@ public class ViewBuilderPrintDecorator {
         }
     }
 
-    public List<Element> generatePersistentMatrixRows(SortedMap<Integer, List<ItemDataBean>> sortedDataMap, List<DisplayItemBean> rowContentBeans,
-            int tabIndex, String repeatParentId, boolean hasDiscrepancyMgt, boolean forPrinting) {
+    public List generatePersistentMatrixRows(SortedMap<Integer, List<ItemDataBean>> sortedDataMap, List<DisplayItemBean> rowContentBeans,
+            int tabIndex, String repeatParentId, boolean hasDiscrepancyMgt, boolean forPrinting, int maxColRows) {
 
         synchronized (this.viewBuilderUtil) {
-            return viewBuilderUtil.generatePersistentMatrixRows(sortedDataMap, rowContentBeans, tabIndex, repeatParentId, hasDiscrepancyMgt, forPrinting, false);
+            return viewBuilderUtil.generatePersistentMatrixRowsNew(sortedDataMap, rowContentBeans, tabIndex, repeatParentId, hasDiscrepancyMgt, forPrinting, false, maxColRows);
         }
 
     }

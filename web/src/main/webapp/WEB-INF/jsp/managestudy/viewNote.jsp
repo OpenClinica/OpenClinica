@@ -147,7 +147,7 @@
 
 		<b><c:out value="${singleNote.description}"/></b>
         </div>
-		<div style="float: right; padding-left: 30px;"><b>Last updated:</b> <fmt:formatDate value="${singleNote.createdDate}" pattern="${dteFormat}"/> by <c:out value="${singleNote.owner.name}"/></div>
+		<div style="float: right; padding-left: 30px;"><b>Last updated:</b> <fmt:formatDate value="${singleNote.updatedDate}" pattern="${dteFormat}"/> by <c:out value="${singleNote.owner.name}"/></div>
 		</td>
 	   </tr>
 	   <tr class="aka_stripes">

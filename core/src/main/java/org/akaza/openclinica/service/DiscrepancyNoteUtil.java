@@ -1,18 +1,5 @@
 package org.akaza.openclinica.service;
 
-import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,6 +12,19 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.sql.DataSource;
+
+import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.submit.EventCRFDAO;
 
 /**
  * DiscrepancyNoteUtil is a convenience class for managing discrepancy notes,
@@ -594,9 +594,9 @@ public class DiscrepancyNoteUtil {
         // make sure that any "parent" notes have the last resolution status of
         // any
         // of their child notes
-        if (updateStatusOfParents) {
-            updateStatusOfParents(allDiscNotes, dataSource, currentStudy);
-        }
+        //if (updateStatusOfParents) {
+        //    updateStatusOfParents(allDiscNotes, dataSource, currentStudy);
+        //}
 
         if (filterDiscNotes) {
             // filter for the resolution status
@@ -739,6 +739,7 @@ public class DiscrepancyNoteUtil {
             // are no children
             tempDNThread.setLatestResolutionStatus(this.getResolutionStatusName(resolutionStatusId));
 
+            /*
             if (!childDiscBeans.isEmpty()) {
 
                 for (DiscrepancyNoteBean childBean : childDiscBeans) {
@@ -751,7 +752,7 @@ public class DiscrepancyNoteUtil {
                     }
                     tempDNThread.getLinkedNoteList().offer(childBean);
                 }
-            }
+            }*/
             dnThreads.add(tempDNThread);
 
         }
@@ -1426,6 +1427,7 @@ public class DiscrepancyNoteUtil {
             if (!childDiscBeans.isEmpty()) {
 
                 for (DiscrepancyNoteBean childBean : childDiscBeans) {
+                    /*
                     if (childBean.getResolutionStatusId() != resolutionStatusId) {
                         // BWP issue 3468 WHO 5/2009: this local variable needs
                         // to be updated>>
@@ -1433,6 +1435,7 @@ public class DiscrepancyNoteUtil {
                         // <<
                         tempDNThread.setLatestResolutionStatus(this.getResolutionStatusName(childBean.getResolutionStatusId()));
                     }
+                    */   
                     tempDNThread.getLinkedNoteList().offer(childBean);
                 }
             }

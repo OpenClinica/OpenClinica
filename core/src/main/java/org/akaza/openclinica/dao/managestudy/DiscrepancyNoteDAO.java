@@ -7,6 +7,16 @@
  */
 package org.akaza.openclinica.dao.managestudy;
 
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.EntityBean;
@@ -25,16 +35,6 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
-
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
-
-import javax.sql.DataSource;
 
 /**
  * @author jxu
@@ -1487,6 +1487,81 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
             }
         }
+        sql += " group By  dn.resolution_status_id ";
+        Iterator it = this.select(sql, variables).iterator();
+        HashMap<ResolutionStatus, Integer> discCounts = new HashMap<ResolutionStatus, Integer>();
+        while (it.hasNext()) {
+            HashMap h = (HashMap) it.next();
+            Integer resolutionStatusId = (Integer) h.get("resolution_status_id");
+            Integer count = (Integer) h.get("count");
+            discCounts.put(ResolutionStatus.get(resolutionStatusId), count);
+        }
+        return discCounts;
+    }
+    
+    public HashMap<ResolutionStatus, Integer> countByEntityTypeAndStudyEventWithConstraints(String entityType, StudyEventBean studyEvent, StringBuffer constraints, boolean isSite) {
+        this.unsetTypeExpected();
+        this.setTypeExpected(1, TypeNames.INT);
+        this.setTypeExpected(2, TypeNames.INT);
+        ArrayList answer = new ArrayList();
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(studyEvent.getId()));
+        String sql = "";
+        String temp = "";
+        if("itemData".equalsIgnoreCase(entityType)) {
+            sql = digester.getQuery("findByStudyEvent");
+            temp = " and (dn.entity_type='itemData' or dn.entity_type='ItemData') ";
+            if (isSite) {
+                if ("oracle".equalsIgnoreCase(SQLInitServlet.getDBName())) {
+                    temp +=
+                        " AND ec.crf_version_id not in (select cv.crf_version_id from crf_version cv where cv.crf_id in ("
+                            + "select edc.crf_id from event_definition_crf edc, study_event se where se.study_event_id = " + studyEvent.getId()
+                            + " AND edc.study_event_definition_id = se.study_event_definition_id AND edc.hide_crf = 1"
+                            + " AND edc.event_definition_crf_id not in ("
+                            + "select parent_id from event_definition_crf where study_event_definition_id = se.study_event_definition_id and parent_id > 0)) )";
+                } else {
+                    temp +=
+                        " AND ec.crf_version_id not in (select cv.crf_version_id from crf_version cv where cv.crf_id in ("
+                            + "select edc.crf_id from event_definition_crf edc, study_event se where se.study_event_id = " + studyEvent.getId()
+                            + " AND edc.study_event_definition_id = se.study_event_definition_id AND edc.hide_crf = 'true'"
+                            + " AND edc.event_definition_crf_id not in ("
+                            + "select parent_id from event_definition_crf where study_event_definition_id = se.study_event_definition_id and parent_id > 0)) )";
+    
+                }
+            }
+        } else if("eventCrf".equalsIgnoreCase(entityType)) {
+            sql = digester.getQuery("countByEventCrfTypeAndStudyEvent");
+            temp = " and dn.entity_type='eventCrf' ";
+            if (isSite) {
+                if ("oracle".equalsIgnoreCase(SQLInitServlet.getDBName())) {
+                    temp +=
+                        " AND ec.crf_version_id not in (select cv.crf_version_id from crf_version cv where cv.crf_id in ("
+                            + "select edc.crf_id from event_definition_crf edc, study_event se where se.study_event_id = " + studyEvent.getId()
+                            + " AND edc.study_event_definition_id = se.study_event_definition_id AND edc.hide_crf = 1"
+                            + " AND edc.event_definition_crf_id not in ("
+                            + "select parent_id from event_definition_crf where study_event_definition_id = se.study_event_definition_id and parent_id > 0)) )";
+                } else {
+                    temp +=
+                        " AND ec.crf_version_id not in (select cv.crf_version_id from crf_version cv where cv.crf_id in ("
+                            + "select edc.crf_id from event_definition_crf edc, study_event se where se.study_event_id = " + studyEvent.getId()
+                            + " AND edc.study_event_definition_id = se.study_event_definition_id AND edc.hide_crf = 'true'"
+                            + " AND edc.event_definition_crf_id not in ("
+                            + "select parent_id from event_definition_crf where study_event_definition_id = se.study_event_definition_id and parent_id > 0)) )";
+    
+                }
+            }
+        } else if("studyEvent".equalsIgnoreCase(entityType)) {
+            sql = digester.getQuery("countByStudyEventTypeAndStudyEvent");
+            temp = " and dn.entity_type='studyEvent' ";
+        } else if("studySub".equalsIgnoreCase(entityType)) {
+            sql = digester.getQuery("countByStudySubjectTypeAndStudyEvent");
+            temp = " and dn.entity_type='studySub' ";
+        } else if("subject".equalsIgnoreCase(entityType)) {
+            sql = digester.getQuery("countBySubjectTypeAndStudyEvent");
+            temp = " and dn.entity_type='subject' ";
+        }     
+        sql += temp; 
+        sql += constraints.toString();
         sql += " group By  dn.resolution_status_id ";
         Iterator it = this.select(sql, variables).iterator();
         HashMap<ResolutionStatus, Integer> discCounts = new HashMap<ResolutionStatus, Integer>();

@@ -70,12 +70,14 @@ function reportBug(versionNumber) {
 
 	<br><br>
 	<a href="MainMenu"><fmt:message key="login" bundle="${resword}"/> </a>	
+
+    <c:if test="${userBean != null && userRole != null && !userRole.invalid && passwordExpired == 'no'}">
 	<br><br>
 	<a href="RequestAccount"><fmt:message key="request_an_account" bundle="${resword}"/></a>
 	<br><br>
 	<a href="RequestPassword"><fmt:message key="forgot_password" bundle="${resword}"/></a>
 	
-
+    </c:if>
 
 <!-- End Sidebar Contents -->
 

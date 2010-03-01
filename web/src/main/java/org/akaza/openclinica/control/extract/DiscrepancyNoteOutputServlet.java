@@ -9,7 +9,6 @@ import java.util.Set;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
-import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.extract.DownloadDiscrepancyNote;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -118,7 +117,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         }
         ListNotesSort listNotesSort = new ListNotesSort();//getListSubjectSort(limit);
         listNotesSort.addSort("","");
-        ArrayList<DiscrepancyNoteBean> allDiscNotes = (new DiscrepancyNoteDAO(sm.getDataSource())).getNotesWithFilterAndSort(studyBean, listNotesFilter, listNotesSort);
+        ArrayList<DiscrepancyNoteBean> allDiscNotes = new DiscrepancyNoteDAO(sm.getDataSource()).getNotesWithFilterAndSort(studyBean, listNotesFilter, listNotesSort);
         allDiscNotes = populateRowsWithAttachedData(allDiscNotes);
         // Now we have to package all the discrepancy notes in DiscrepancyNoteThread objects
         // Do the filtering for type or status here
@@ -182,7 +181,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
                     }
                 }
                 DiscrepancyNoteBean lastdn = (DiscrepancyNoteBean) children.get(lastChild);
-                dnb.setResStatus(ResolutionStatus.get(lastdn.getResolutionStatusId()));
+                //dnb.setResStatus(ResolutionStatus.get(lastdn.getResolutionStatusId()));
                 /*
                  * The update date is the date created of the latest child
                  * note

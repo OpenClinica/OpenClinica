@@ -87,6 +87,7 @@ public class ChangeStudyServlet extends SecureController {
 
         ArrayList studies = udao.findStudyByUser(ub.getName(), (ArrayList) sdao.findAll());
         request.setAttribute("siteRoleMap", Role.siteRoleMap);
+        request.setAttribute("studyRoleMap", Role.studyRoleMap);
 
         ArrayList validStudies = new ArrayList();
         for (int i = 0; i < studies.size(); i++) {

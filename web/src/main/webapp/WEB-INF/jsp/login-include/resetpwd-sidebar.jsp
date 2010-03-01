@@ -25,11 +25,11 @@ function reportBug(versionNumber) {
     <br><br>
     <a href="MainMenu">&nbsp;<fmt:message key="home" bundle="${resworkflow}"/></a>
     <br><br>
-    <a href="RequestAccount">&nbsp;<fmt:message key="request_an_account" bundle="${resword}"/></a>
+<!--    <a href="RequestAccount">&nbsp;<fmt:message key="request_an_account" bundle="${resword}"/></a>
     <br><br>
     <a href="RequestPassword">&nbsp;<fmt:message key="forgot_password" bundle="${resword}"/></a>
     
-
+    -->
 
 <!-- End Sidebar Contents -->
 

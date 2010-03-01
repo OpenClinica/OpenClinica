@@ -28,8 +28,17 @@
 <h1><span class="title_manage"><fmt:message key="an_error_has_ocurred" bundle="${resword}"/></span></h1>
 
 <font class="bodytext">
+<c:set var="referer" value="MainMenu"/>
+<c:forEach var="refererValue" items="${pageContext.request.headerNames}">
+	<c:if test="${refererValue eq 'referer'}">
+		<!-- found it! -->
+		<c:set var="referer" value="${header[refererValue]}"/>
+	</c:if>
+</c:forEach>
 <fmt:message key="error_page" bundle="${resword}">
-	<fmt:param><%=request.getHeader("Referer")%></fmt:param>
+	<%--<fmt:param><%=request.getHeader("Referer")%></fmt:param>--%>
+	<%-- tbh 02/2010 remove HTML/XML from the referer name --%>
+	<fmt:param><c:out value="${referer}"/></fmt:param>
 	<fmt:param><%=SQLInitServlet.getField("mail.errormsg")%></fmt:param>
 </fmt:message>
 

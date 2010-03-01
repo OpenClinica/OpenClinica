@@ -33,6 +33,7 @@ import java.util.TreeMap;
  * to a Web browser by a custom JSP tag.
  */
 public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
+    private int maxColRow = 4;
     // The sections that make up the print version of the form
     private List<DisplaySectionBean> displaySectionBeans = new ArrayList<DisplaySectionBean>();
 
@@ -186,10 +187,10 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
             // Create a table for every DisplayItemGroupBean
             // A DisplayItemGroupBean contains an ItemGroupBean and
             // its list of DisplayItemBeans
-            ArrayList headerlist = new ArrayList();
-            ArrayList bodylist = new ArrayList();
-            ArrayList subHeadList = new ArrayList();
             for (DisplayItemGroupBean displayItemGroup : displaySecBean.getDisplayFormGroups()) {
+                ArrayList headerlist = new ArrayList();
+                ArrayList bodylist = new ArrayList();
+                ArrayList subHeadList = new ArrayList();
 
                 List<DisplayItemBean> currentDisplayItems = displayItemGroup.getItems();
                 // A Map that contains persistent (stored in a database),
@@ -306,16 +307,14 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
                 int i = 0;
                 for (Element el : thTags) {
                     i++;
-                    if(i%4 == 0) {
-                        thead.addContent(el);
+                    thead.addContent(el);
+                    if(i%maxColRow == 0) {
                         headerlist.add(thead);
                         thead = new Element("tr");
-                    } else{
-                        thead.addContent(el);
-                    }
+                    } 
                 }
 
-                if(i%4!=0)headerlist.add(thead);
+                if(i%maxColRow!=0)headerlist.add(thead);
                 
                 // Make sure the layout for "horizontal" checkboxes or radios is
                 // displayed
@@ -366,24 +365,30 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
                     // Create cells within each row
                     td = cellFactory.createCellContents(td, responseName, displayBean, ++tabindex, hasDiscrepancyMgt, hasDbFormValues, true);
                     if (repeatFlag) {
-//                        td = repeatManager.addChildRepeatAttributes(td, repeatParentId, displayBean.getItem().getId(), null);
                     }
-
-                    if(j%4==0){
-                        row.addContent(td);
+                    row.addContent(td);
+                    if(j%maxColRow==0){
                         bodylist.add(row);
                         row = new Element("tr");
                         if (repeatFlag) {
                             repeatParentId = repeatParentId+uniqueId++;
-//                            newBodyRow = repeatManager.addParentRepeatAttributes(newBodyRow, repeatParentId, repeatNumber, displayItemGroup.getGroupMetaBean().getRepeatMax());
-//                            newBodyRow = repeatManager.addChildRepeatAttributes(newBodyRow, repeatParentId, displayBean.getItem().getId(), null);
                         }
-                    } else{
-                        row.addContent(td);
-                    }
+                    } 
                 }// end for displayBean
-                // We need an extra cell for holding the "Remove Row" button
-                if(j%4!=0)bodylist.add(row);
+                if(j%maxColRow!=0)bodylist.add(row);
+                //Creating the first/main table
+                if(repeatNumber > 1){
+                    Element newRow = new Element("tr");
+                    Element div = new Element("div");
+                    div.setAttribute("id", "repeatCaption");
+                    Element newCol = new Element("td");
+                    Element strong = new Element("strong");
+                    strong.addContent("Repeat: 1");
+                    div.addContent(strong);
+                    newCol.addContent(div);
+                    newRow.addContent(newCol);
+                    table.addContent(newRow);
+                }
                 for(int k=0; k<headerlist.size();k++){
                     Element head = (Element)headerlist.get(k);
                     Element body = (Element)bodylist.get(k);
@@ -396,34 +401,20 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
                         }
                     }
                     table.addContent(body);
-//                    int span = body.getContentSize();
-//                    Element blankSpace = new Element("tr");
-//                    blankSpace.setAttribute("height", "10");
-//                    blankSpace.setAttribute("border", "1");
-//                    Element blankTd = new Element("td");
-//                    blankSpace.addContent(blankTd);
-//                    blankTd.setAttribute("span", span+"");
-//                    blankTd.setText(" ");
-//                    table.addContent(blankSpace);
                 }
-                // }//end for every row
+                
                 // The final true parameter is for disabling D Note icons from
                 // being clicked
                 if (hasStoredRepeatedRows) {
-                    List<Element> storedRepeatedRows =
-                        builderUtil.generatePersistentMatrixRows(ordinalItemDataMap, currentDisplayItems, tabindex, repeatParentId, hasDiscrepancyMgt, true);
-
+                    List storedRepeatedRows =
+                        builderUtil.generatePersistentMatrixRows(ordinalItemDataMap, currentDisplayItems, tabindex, repeatParentId, hasDiscrepancyMgt, true, maxColRow);
                     // add these new rows to the table
-                    for (Element newRow : storedRepeatedRows) {
-                        table.addContent(newRow);
+                    int count = 1;
+                    for(int l = 0; l<storedRepeatedRows.size();l++){
+                        ++count;
+                        List<Element> rowsList = (ArrayList)storedRepeatedRows.get(l);
+                        divRoot.addContent(createTableWithData(rowsList, headerlist, subHeadList, count));
                     }
-
-                }
-                // Create a row for the Add Row button, if the group includes
-                // any repeaters
-                if (repeatFlag) {
-                    builderUtil.createAddRowControl(table, repeatParentId, (builderUtil.calcNumberofColumns(displayItemGroup) + 1));
-
                 }
             }// end for displayFormGroup
             XMLOutputter outp = new XMLOutputter();
@@ -444,6 +435,32 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
         }
         return webPageBuilder.toString();
     }
+
+    private Element createTableWithData(List<Element> rows, ArrayList headerList, ArrayList subHeaderList, int rep) {
+        Element table = createTable();
+        Element newRow = new Element("tr");
+        Element newCol = new Element("td");
+        Element strong = new Element("strong");
+        strong.addContent("Repeat :"+rep);
+        newCol.addContent(strong);
+        newRow.addContent(newCol);
+        table.addContent(newRow);
+        for(int i=0; i<headerList.size();i++){
+            Element head = (Element)headerList.get(i);
+            Element body = rows.get(i);
+            table.addContent((Element)head.clone());
+            if(subHeaderList.size()>0){
+                try{
+                    Element subHead = (Element)subHeaderList.get(i);
+                    table.addContent((Element)subHead.clone());
+                }catch (IndexOutOfBoundsException IOB){
+                }
+            }
+            table.addContent(body);
+        }
+        return table;
+    }
+
 
     private void addResponseLayoutRow(ArrayList subHeadList, List<DisplayItemBean> displayBeans) {
         Element thRow = new Element("tr");
@@ -491,12 +508,12 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
                 th2 = createThCell("", 1);
                 thRow.addContent(th2);
             }
-            if(j%4==0){
+            if(j%maxColRow==0){
                 subHeadList.add(thRow);
                 thRow = new Element("tr");
             }
         }
-        if(j%4!=0)subHeadList.add(thRow);
+        if(j%maxColRow!=0)subHeadList.add(thRow);
         // now add the final empty th cell for the row
         th2 = createThCell();
         thRow.addContent(th2);

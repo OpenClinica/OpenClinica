@@ -875,7 +875,7 @@ public class AddNewSubjectServlet extends SecureController {
             return;
         }
         ArrayList fieldNotes = notes.getNotes(field);
-        // logger.info("notes size:" + fieldNotes.size());
+        System.out.println("+++ notes size:" + fieldNotes.size() + " for field " + field);
         for (int i = 0; i < fieldNotes.size(); i++) {
             DiscrepancyNoteBean dnb = (DiscrepancyNoteBean) fieldNotes.get(i);
             dnb.setEntityId(entityId);
@@ -883,6 +883,7 @@ public class AddNewSubjectServlet extends SecureController {
             dnb.setEntityType(entityType);
 
             // updating exsiting note if necessary
+            /*
             if ("itemData".equalsIgnoreCase(entityType)) {
                 System.out.println(" **** find parent note for item data:" + dnb.getEntityId());
                 ArrayList parentNotes = dndao.findExistingNotesForItemData(dnb.getEntityId());
@@ -898,6 +899,7 @@ public class AddNewSubjectServlet extends SecureController {
                     }
                 }
             }
+            */
             dnb = (DiscrepancyNoteBean) dndao.create(dnb);
             dndao.createMapping(dnb);
 

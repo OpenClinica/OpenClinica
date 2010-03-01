@@ -476,16 +476,18 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             note.setDiscrepancyNoteTypeId(typeId);
             note.setParentDnId(parent.getId());
 
-            if (assignedUserAccountId > 0) {
-                note.setAssignedUserId(assignedUserAccountId);
-                System.out.println("^^^ found assigned user id: " + assignedUserAccountId);
+            if (typeId != DiscrepancyNoteType.ANNOTATION.getId() && typeId != DiscrepancyNoteType.FAILEDVAL.getId() && typeId != DiscrepancyNoteType.REASON_FOR_CHANGE.getId()) {
+                if (assignedUserAccountId > 0) {
+                    note.setAssignedUserId(assignedUserAccountId);
+                    System.out.println("^^^ found assigned user id: " + assignedUserAccountId);
 
-            } else {
-                // a little bit of a workaround, should ideally be always from
-                // the form
-                note.setAssignedUserId(parent.getOwnerId());
-                System.out.println("found user assigned id, in the PARENT OWNER ID: " + parent.getOwnerId() + " note that user assgined id did not work: "
-                    + assignedUserAccountId);
+                } else {
+                    // a little bit of a workaround, should ideally be always from
+                    // the form
+                    note.setAssignedUserId(parent.getOwnerId());
+                    System.out.println("found user assigned id, in the PARENT OWNER ID: " + parent.getOwnerId() + " note that user assgined id did not work: "
+                        + assignedUserAccountId);
+                }
             }
 
             note.setField(field);

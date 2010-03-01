@@ -1,5 +1,17 @@
 package org.akaza.openclinica.control.submit;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -43,18 +55,6 @@ import org.jmesa.view.editor.BasicCellEditor;
 import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletResponse;
 
 public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
 
@@ -236,10 +236,8 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
                     subjectEventStatus = SubjectEventStatus.NOT_SCHEDULED;
                 } else {
                     for (StudyEventBean studyEventBean : studyEvents) {
-                        discCounts =
-                            getDiscrepancyNoteDAO().findAllByStudyEventWithConstraints(studyEventBean, constraints, study.isSite(study.getParentStudyId()));
+                        discCounts = countAll(studyEventBean, constraints, study.isSite(study.getParentStudyId()));
                         hasDN = hasDN == false ? discCounts.size() > 0 : hasDN;
-
                         if (studyEventBean.getSampleOrdinal() == 1) {
                             subjectEventStatus = studyEventBean.getSubjectEventStatus();
                             // break;
@@ -1243,6 +1241,43 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
 
     public void setResolutionStatusIds(Set<Integer> resolutionStatusIds) {
         this.resolutionStatusIds = resolutionStatusIds;
+    }
+    
+    public HashMap<ResolutionStatus, Integer> countAll(StudyEventBean studyEvent, StringBuffer constraints, boolean isSite) {
+        HashMap<ResolutionStatus, Integer> discCounts = new HashMap<ResolutionStatus, Integer>();
+        discCounts =
+            getDiscrepancyNoteDAO().countByEntityTypeAndStudyEventWithConstraints("itemData", studyEvent, constraints, isSite);
+
+        HashMap<ResolutionStatus, Integer> temp = new HashMap<ResolutionStatus, Integer>();
+        temp =
+            getDiscrepancyNoteDAO().countByEntityTypeAndStudyEventWithConstraints("subject", studyEvent, constraints, isSite);
+        this.getTotal(discCounts, temp);
+        temp =
+            getDiscrepancyNoteDAO().countByEntityTypeAndStudyEventWithConstraints("eventCrf", studyEvent, constraints, isSite);
+        this.getTotal(discCounts, temp);
+        temp =
+            getDiscrepancyNoteDAO().countByEntityTypeAndStudyEventWithConstraints("StudySub", studyEvent, constraints, isSite);
+        this.getTotal(discCounts, temp);
+        temp =
+            getDiscrepancyNoteDAO().countByEntityTypeAndStudyEventWithConstraints("studyEvent", studyEvent, constraints, isSite);
+        this.getTotal(discCounts, temp);
+        
+        return discCounts;
+    }
+    
+    public HashMap<ResolutionStatus, Integer> getTotal(HashMap<ResolutionStatus, Integer> discCounts, HashMap<ResolutionStatus, Integer> discCountsTemp) {
+        if(discCountsTemp.size()>0) {
+            for(int i=1; i<6; ++i) {
+                Integer c = 0;
+                if(discCounts.get(ResolutionStatus.get(i))!=null) {
+                    c = discCounts.get(ResolutionStatus.get(i));
+                }
+                if(discCountsTemp.get(ResolutionStatus.get(i))!=null) {
+                    discCounts.put(ResolutionStatus.get(i), c+discCountsTemp.get(ResolutionStatus.get(i)));
+                }
+            }
+        }
+        return discCounts;
     }
 
 }

@@ -524,11 +524,11 @@ public abstract class DataEntryServlet extends SecureController {
             session.setAttribute("shouldRunValidation", null);
             session.setAttribute("rulesErrors", null);
 
-            // discNotes = new FormDiscrepancyNotes();
-            discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
-            if (discNotes == null) {
-                discNotes = new FormDiscrepancyNotes();
-            }
+            discNotes = new FormDiscrepancyNotes();
+//            discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
+//            if (discNotes == null) {
+//                discNotes = new FormDiscrepancyNotes();
+//            }
             // << tbh 01/2010
             section = populateNotesWithDBNoteCounts(discNotes, section);
             logger.debug("+++ just ran populateNotes, printing field notes: " + discNotes.getFieldNotes().toString());
@@ -1040,10 +1040,10 @@ public abstract class DataEntryServlet extends SecureController {
             // setting this AFTER we populate notes - will that make a difference?
             section.setDisplayItemGroups(allItems);
 
-            logger.debug("+++ try to populate notes");
+            System.out.println("+++ try to populate notes");
 
             section = populateNotesWithDBNoteCounts(discNotes, section);
-            logger.debug("+++ try to populate notes, got count of field notes: " + discNotes.getFieldNotes().toString());
+            System.out.println("+++ try to populate notes, got count of field notes: " + discNotes.getFieldNotes().toString());
 
             if (currentStudy.getStudyParameterConfig().getInterviewerNameRequired().equals("true")) {
                 v.addValidation(INPUT_INTERVIEWER, Validator.NO_BLANKS);
@@ -1058,7 +1058,7 @@ public abstract class DataEntryServlet extends SecureController {
                 v.alwaysExecuteLastValidation(INPUT_INTERVIEW_DATE);
             }
 
-            // logger.debug("about to validate: " + v.getKeySet());
+            // System.out.println("about to validate: " + v.getKeySet());
             errors = v.validate();
 
             // tbh >>
@@ -1219,7 +1219,7 @@ public abstract class DataEntryServlet extends SecureController {
                 Iterator iter3 = errors.keySet().iterator();
                 while (iter3.hasNext()) {
                     String fieldName = iter3.next().toString();
-                    logger.debug("found error after shuffle " + fieldName);
+                    System.out.println("found error after shuffle " + fieldName);
                 }
                 // << tbh, 02/2010
                 

@@ -7,6 +7,16 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
@@ -35,19 +45,8 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
-import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author jxu
@@ -291,7 +290,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
         // BWP 5/13/2009 3468 WHO; update the resolution status of parent disc
         // notes based
         // on the status of child notes
-        new DiscrepancyNoteUtil().updateStatusOfParents(notes, sm.getDataSource(), currentStudy);
+        //new DiscrepancyNoteUtil().updateStatusOfParents(notes, sm.getDataSource(), currentStudy);
 
         FormDiscrepancyNotes newNotes = (FormDiscrepancyNotes) session.getAttribute(CreateDiscrepancyNoteServlet.FORM_DISCREPANCY_NOTES_NAME);
 
@@ -468,8 +467,8 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
                     UserAccountBean lastUpdator = (UserAccountBean) userDAO.findByPK(lastChild.getOwnerId());
                     parent.setLastUpdator(lastUpdator);
                     parent.setLastDateUpdated(lastUpdatedDate);
-                    parent.setResolutionStatusId(lastChild.getResolutionStatusId());
-                    parent.setResStatus(ResolutionStatus.get(lastChild.getResolutionStatusId()));
+                    //parent.setResolutionStatusId(lastChild.getResolutionStatusId());
+                    //parent.setResStatus(ResolutionStatus.get(lastChild.getResolutionStatusId()));
                 }
             }
         }

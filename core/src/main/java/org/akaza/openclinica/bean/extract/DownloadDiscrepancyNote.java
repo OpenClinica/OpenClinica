@@ -529,7 +529,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
         DiscrepancyNoteBean dnBean = discNoteThread.getLinkedNoteList().getFirst();
         DiscrepancyNoteUtil discUtil = new DiscrepancyNoteUtil();
         String latestResolutionStatus = discUtil.getResolutionStatusName(
-                discNoteThread.getLinkedNoteList().getLast().getResolutionStatusId());
+                discNoteThread.getLinkedNoteList().getFirst().getResolutionStatusId());
 
         StringBuilder content = new StringBuilder("");
         if(dnBean != null){

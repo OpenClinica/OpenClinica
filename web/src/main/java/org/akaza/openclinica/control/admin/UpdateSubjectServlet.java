@@ -306,6 +306,7 @@ public class UpdateSubjectServlet extends SecureController {
                 v.alwaysExecuteLastValidation(DATE_DOB);
                 request.setAttribute(DATE_DOB, fp.getString(DATE_DOB));
                 newDobInput = true;
+                sub.setDateOfBirth(fp.getDate(DATE_DOB));
 
             } else {
                 sub.setDateOfBirth(null);

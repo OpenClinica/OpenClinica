@@ -256,6 +256,10 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                 + resPageMsg.getString("was_blank_at_row") + k + ", " + resPageMsg.getString("items_worksheet") + ".");
                             htmlErrors.put(j + "," + k + ",0", resPageMsg.getString("required_field"));
                         }
+                        if (itemName != null && itemName.length() > 255) {
+                            errors.add(resPageMsg.getString("item_name_length_error"));
+                        }
+
                         if (repeats.contains(itemName)) {
                             // errors.add("A duplicate ITEM_NAME of " + itemName
                             // + " was detected at row " + k
@@ -277,9 +281,17 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                 + resPageMsg.getString("was_blank_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet") + ".");
                             htmlErrors.put(j + "," + k + ",1", resPageMsg.getString("required_field"));
                         }
+                        if (descLabel != null && descLabel.length() > 4000) {
+                            errors.add(resPageMsg.getString("item_desc_length_error"));
+                        }
+
 
                         cell = sheet.getRow(k).getCell((short) 2);
                         String leftItemText = getValue(cell);
+                        if (leftItemText != null && leftItemText.length() > 4000) {
+                            errors.add(resPageMsg.getString("left_item_length_error"));
+                        }
+
                         // Commented out to resolve issue-2413
                         // if (StringUtil.isBlank(leftItemText)) {
                         // errors.add(resPageMsg.getString("the") + " " +
@@ -332,11 +344,17 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 
                         cell = sheet.getRow(k).getCell((short) 4);
                         String rightItemText = getValue(cell);
+                        if (rightItemText != null && rightItemText.length() > 2000) {
+                            errors.add(resPageMsg.getString("right_item_length_error"));
+                        }
 
                         cell = sheet.getRow(k).getCell((short) 5);
                         if (cell != null) {
                             secName = getValue(cell);
                             secName = secName.replaceAll("<[^>]*>", "");
+                        }
+                        if (secName != null && secName.length() > 2000) {
+                            errors.add(resPageMsg.getString("section_label_length_error"));
                         }
 
                         if (!secNames.contains(secName)) {
@@ -373,9 +391,15 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 
                         cell = sheet.getRow(k).getCell((short) 7);
                         String header = getValue(cell);
+                        if (header != null && header.length() > 2000) {
+                            errors.add(resPageMsg.getString("item_header_length_error"));
+                        }
 
                         cell = sheet.getRow(k).getCell((short) 8);
                         String subHeader = getValue(cell);
+                        if (subHeader != null && subHeader.length() > 240) {
+                            errors.add(resPageMsg.getString("item_subheader_length_error"));
+                        }
 
                         cell = sheet.getRow(k).getCell((short) 9);
                         String parentItem = getValue(cell);
@@ -930,6 +954,9 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                 + resPageMsg.getString("was_blank_at_row") + k + ", " + resPageMsg.getString("items_worksheet") + ". "
                                 + resPageMsg.getString("cannot_be_blank_if_VALIDATION_not_blank"));
                             htmlErrors.put(j + "," + k + "," + cellIndex, resPageMsg.getString("required_field"));
+                        }
+                        if (regexpError != null && regexpError.length() > 255) {
+                            errors.add(resPageMsg.getString("regexp_errror_length_error"));
                         }
 
                         ++cellIndex;
@@ -1781,6 +1808,10 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                 + resPageMsg.getString("was_blank_at_row") + k + " " + ", " + resPageMsg.getString("sections_worksheet") + ".");
                             htmlErrors.put(j + "," + k + ",0", resPageMsg.getString("required_field"));
                         }
+                        if (secLabel != null && secLabel.length() > 2000) {
+                            errors.add(resPageMsg.getString("section_label_length_error"));
+                        }
+
                         if (secNames.contains(secLabel)) {
                             // errors.add("The SECTION_LABEL column was a
                             // duplicate of " + secLabel + " at row " + k
@@ -1807,13 +1838,27 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                 + resPageMsg.getString("was_blank_at_row") + " " + k + ", " + resPageMsg.getString("sections_worksheet") + ".");
                             htmlErrors.put(j + "," + k + ",1", resPageMsg.getString("required_field"));
                         }
+                        if (title != null && title.length() > 2000) {
+                            errors.add(resPageMsg.getString("section_title_length_error"));
+                        }
 
                         cell = sheet.getRow(k).getCell((short) 2);
                         String subtitle = getValue(cell);
+                        if (subtitle != null && subtitle.length() > 2000) {
+                            errors.add(resPageMsg.getString("section_subtitle_length_error"));
+                        }
+
                         cell = sheet.getRow(k).getCell((short) 3);
                         String instructions = getValue(cell);
+                        if (instructions != null && instructions.length() > 2000) {
+                            errors.add(resPageMsg.getString("section_instruction_length_error"));
+                        }
+
                         cell = sheet.getRow(k).getCell((short) 4);
                         String pageNumber = getValue(cell);
+                        if (pageNumber != null && pageNumber.length() > 5) {
+                            errors.add(resPageMsg.getString("section_page_number_length_error"));
+                        }
 
                         cell = sheet.getRow(k).getCell((short) 5);
                         String parentSection = getValue(cell);
@@ -1874,6 +1919,10 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         throw new CRFReadingException("The CRF_NAME column was blank in the CRF worksheet.");
                     }
 
+                    if (crfName.length() > 255) {
+                        errors.add(resPageMsg.getString("crf_name_length_error"));
+                    }
+
                     CRFBean existingCRFWithSameName = (CRFBean) cdao.findByName(crfName);
                     if (this.getCrfId() == 0) {
                         if (existingCRFWithSameName.getName() != null && existingCRFWithSameName.getName().equals(crfName)) {
@@ -1908,6 +1957,10 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                     String version = getValue(cell);
                     version = version.replaceAll("<[^>]*>", "");
                     ncrf.setVersionName(version);
+                    if (version != null && version.length() > 255) {
+                        errors.add(resPageMsg.getString("version_length_error"));
+                    }
+
                     // YW, 08-22-2007, since versionName is now obtained from
                     // spreadsheet,
                     // blank check has been moved to
@@ -1929,9 +1982,16 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                     cell = sheet.getRow(1).getCell((short) 2);
                     String versionDesc = getValue(cell);
                     versionDesc = versionDesc.replaceAll("<[^>]*>", "");
+                    if (versionDesc != null && versionDesc.length() > 4000) {
+                        errors.add(resPageMsg.getString("version_description_length_error"));
+                    }
+
                     cell = sheet.getRow(1).getCell((short) 3);
                     String revisionNotes = getValue(cell);
                     revisionNotes = revisionNotes.replaceAll("<[^>]*>", "");
+                    if (revisionNotes != null && revisionNotes.length() > 255) {
+                        errors.add(resPageMsg.getString("revision_notes_length_error"));
+                    }
                     if (StringUtil.isBlank(revisionNotes)) {
                         // errors.add("The REVISION_NOTES column was blank in
                         // the CRF worksheet.");

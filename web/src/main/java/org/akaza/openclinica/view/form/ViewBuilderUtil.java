@@ -239,4 +239,94 @@ public class ViewBuilderUtil {
         return newRows;
     }
 
+
+    public List generatePersistentMatrixRowsNew(SortedMap<Integer, List<ItemDataBean>> sortedDataMap, List<DisplayItemBean> rowContentBeans,
+                                                      int tabIndex, String repeatParentId,
+                                                      boolean hasDiscrepancyMgt, boolean forPrinting,
+                                                      boolean hasDarkBorders, int maxColRows) {
+
+        List newRows = new ArrayList();
+        List<ItemDataBean> tempList;
+        Element tr;
+        Element td;
+        CellFactory cellFactory = new CellFactory();
+        RepeatManager repeatManager = new RepeatManager();
+        String responseName;
+        boolean repeatFlag = true; // for now...
+        String forcedParentId = "";
+        // for each repeated row of the matrix table..
+        for (Integer ordinal : sortedDataMap.keySet()) {
+            List<Element> rowList = new ArrayList();
+            tr = new Element("tr");
+            tempList = sortedDataMap.get(ordinal);
+            forcedParentId = ordinal - 1 + "";
+            int count = 0;
+            for (DisplayItemBean disItemBean : rowContentBeans) {
+                count++;
+                for (ItemDataBean itemDBean : tempList) {
+                    if (disItemBean.getItem().getId() == itemDBean.getItemId()) {
+                        disItemBean.setData(itemDBean);
+                        break;
+                    }
+                }
+                responseName = disItemBean.getMetadata().getResponseSet().getResponseType().getName();
+                if ((responseName.equalsIgnoreCase("radio")
+                        || responseName.equalsIgnoreCase("multi-select")
+                        || responseName.equalsIgnoreCase("single-select")
+                        || responseName.equalsIgnoreCase("checkbox")) && forPrinting) {
+                    responseName = "checkbox";                    
+                }
+
+                // start horiz
+                if (disItemBean.getMetadata().getResponseLayout().equalsIgnoreCase("horizontal")
+                  && (responseName.equalsIgnoreCase("checkbox") || responseName.equalsIgnoreCase("radio"))) {
+                    // The final true parameter styfles the display of default
+                    // values in CRFs (because
+                    // default values do not appear in forms that have db values
+                    Element[] elements =
+                      cellFactory.createCellContentsForChecks(responseName, disItemBean, disItemBean.getMetadata().getResponseSet().getOptions().size(),
+                        ++tabIndex, true, forPrinting);
+                    for (Element el : elements) {
+                        if(hasDarkBorders){
+                            String cssClasses = CssRules.getClassNamesForTag("td borders_on");
+                            el.setAttribute("class",cssClasses);
+                        }   else {
+                            el = this.setClassNames(el);
+                        }
+                        if (repeatFlag) {
+                            el = repeatManager.addChildRepeatAttributes(el, repeatParentId, disItemBean.getItem().getId(), forcedParentId);
+                        }
+                        tr.addContent(el);
+                        if(count%maxColRows==0){
+                            rowList.add(tr);
+                            tr = new Element("tr");
+                        }
+                    }
+                    // move to the next item
+                    continue;
+                }
+                // end
+                td = new Element("td");
+                if(hasDarkBorders){
+                    String cssClasses = CssRules.getClassNamesForTag("td borders_on");
+                    td.setAttribute("class",cssClasses);
+                }   else {
+                    td = this.setClassNames(td);
+                }
+                td = cellFactory.createCellContents(td, responseName, disItemBean, ++tabIndex, hasDiscrepancyMgt, true, forPrinting);
+                // In this case, the parent id looks like parentId_1, etc.
+                td = repeatManager.addChildRepeatAttributes(td, repeatParentId, disItemBean.getItem().getId(), forcedParentId);
+                tr.addContent(td);
+                if(count%maxColRows==0){
+                    rowList.add(tr);
+                    tr = new Element("tr");
+                }
+            }
+            if(count%maxColRows!=0)rowList.add(tr);
+            newRows.add(rowList);
+        }
+
+        return newRows;
+    }
+    
 }

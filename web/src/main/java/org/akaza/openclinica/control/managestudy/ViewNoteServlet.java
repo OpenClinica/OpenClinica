@@ -14,7 +14,6 @@ import java.util.Locale;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
-import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -265,8 +264,9 @@ public class ViewNoteServlet extends SecureController {
         lastUpdator = (UserAccountBean) udao.findByPK(lastChild.getOwnerId());
         note.setLastUpdator(lastUpdator);
         note.setLastDateUpdated(lastUpdatedDate);
-        note.setResolutionStatusId(lastChild.getResolutionStatusId());
-        note.setResStatus(ResolutionStatus.get(lastChild.getResolutionStatusId()));
+        note.setUpdatedDate(lastUpdatedDate);
+        //note.setResolutionStatusId(lastChild.getResolutionStatusId());
+        //note.setResStatus(ResolutionStatus.get(lastChild.getResolutionStatusId()));
 
         for (DiscrepancyNoteBean dnBean : notes) {
             if (dnBean.getParentDnId() > 0) {

@@ -243,11 +243,11 @@
         <display-name>ContactServlet</display-name>
         <servlet-class>org.akaza.openclinica.control.login.ContactServlet</servlet-class>
     </servlet>
-    <servlet>
+<!--    <servlet>
         <servlet-name>RequestAccountServlet</servlet-name>
         <display-name>RequestAccountServlet</display-name>
         <servlet-class>org.akaza.openclinica.control.login.RequestAccountServlet</servlet-class>
-    </servlet>
+    </servlet>-->
     <servlet>
         <servlet-name>RequestStudyServlet</servlet-name>
         <display-name>RequestStudyServlet</display-name>
@@ -1341,10 +1341,10 @@
         <servlet-name>ViewSchedulerServlet</servlet-name>
         <url-pattern>/ViewScheduler</url-pattern>
     </servlet-mapping>
-    <servlet-mapping>
+<!--    <servlet-mapping>
         <servlet-name>RequestAccountServlet</servlet-name>
         <url-pattern>/RequestAccount</url-pattern>
-    </servlet-mapping>
+    </servlet-mapping>-->
     <servlet-mapping>
         <servlet-name>RequestStudyServlet</servlet-name>
         <url-pattern>/RequestStudy</url-pattern>
