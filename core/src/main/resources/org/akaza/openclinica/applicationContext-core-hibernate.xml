@@ -41,6 +41,8 @@
                 <value>org.akaza.openclinica.domain.technicaladmin.DatabaseChangeLogBean</value>
                 <value>org.akaza.openclinica.domain.technicaladmin.ConfigurationBean</value>
                 <value>org.akaza.openclinica.domain.admin.MeasurementUnit</value>
+                <value>org.akaza.openclinica.domain.crfdata.DynamicsItemGroupMetadataBean</value>
+                <value>org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean</value>
             </list>
         </property>
         <property name="hibernateProperties">
@@ -65,6 +67,8 @@
 
   <bean id="abstractDomainDao" class="org.akaza.openclinica.dao.hibernate.AbstractDomainDao" abstract="true"/>
 
+  <bean id="dynamicsItemFormMetadataDao" class="org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao" parent="abstractDomainDao" autowire="byName" />
+  <bean id="dynamicsItemGroupMetadataDao" class="org.akaza.openclinica.dao.hibernate.DynamicsItemGroupMetadataDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="ruleSetDao" class="org.akaza.openclinica.dao.hibernate.RuleSetDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="ruleSetAuditDao" class="org.akaza.openclinica.dao.hibernate.RuleSetAuditDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="ruleDao" class="org.akaza.openclinica.dao.hibernate.RuleDao" parent="abstractDomainDao" autowire="byName" />
