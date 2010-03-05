@@ -29,6 +29,8 @@ import java.util.Date;
  * TODO sync up fields with the table, eventually
  */
 public class ArchivedDatasetFileBean extends EntityBean {
+
+    private int id;
     private int datasetId;
     private int exportFormatId;
     private ExportFormatBean exportFormatBean;
@@ -39,6 +41,15 @@ public class ArchivedDatasetFileBean extends EntityBean {
     private int runTime;
     private Date dateCreated;
     private int ownerId;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+    
 
     /**
      * @return Returns the datasetId.

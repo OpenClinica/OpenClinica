@@ -103,6 +103,7 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
 
     public Object getEntityFromHashMap(HashMap hm) {
         ArchivedDatasetFileBean fb = new ArchivedDatasetFileBean();
+        fb.setId(((Integer) hm.get("archived_dataset_file_id")).intValue());
         fb.setDateCreated((Date) hm.get("date_created"));
 
         fb.setName((String) hm.get("name"));
@@ -118,6 +119,14 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
         fb.setOwner(owner);
         return fb;
     }
+
+    public void deleteArchiveDataset(ArchivedDatasetFileBean adfBean){
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), adfBean.getId());
+        this.execute(digester.getQuery("deleteArchiveDataset"), variables);
+    }
+
+
 
     public Collection findAll() {
         this.setTypesExpected();

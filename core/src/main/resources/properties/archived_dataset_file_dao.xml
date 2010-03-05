@@ -17,6 +17,11 @@
 		OWNER_ID=? WHERE 
 	    ARCHIVED_DATASET_FILE_ID=?</sql>
 	</query>
+    <query>
+        <name>deleteArchiveDataset</name>
+        <sql>Delete from ARCHIVED_DATASET_FILE where ARCHIVED_DATASET_FILE_ID=?             
+        </sql>
+    </query>
 	<query>
 		<name>create</name>
 		<sql>INSERT INTO ARCHIVED_DATASET_FILE (NAME, DATASET_ID, 

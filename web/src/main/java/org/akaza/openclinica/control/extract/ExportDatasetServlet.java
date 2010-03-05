@@ -72,11 +72,13 @@ public class ExportDatasetServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
         DatasetDAO dsdao = new DatasetDAO(sm.getDataSource());
+        ArchivedDatasetFileDAO asdfdao = new ArchivedDatasetFileDAO(sm.getDataSource());
         FormProcessor fp = new FormProcessor(request);
 
         GenerateExtractFileService generateFileService = new GenerateExtractFileService(sm.getDataSource(), request, sm.getUserBean());
         String action = fp.getString("action");
         int datasetId = fp.getInt("datasetId");
+        int adfId = fp.getInt("adfId");
         if (datasetId == 0) {
             try {
                 DatasetBean dsb = (DatasetBean) session.getAttribute("newDataset");
@@ -117,74 +119,27 @@ public class ExportDatasetServlet extends SecureController {
         // eb.setDateCreated(new java.util.Date());
 
         if (StringUtil.isBlank(action)) {
-            logger.info("action is blank");
-            request.setAttribute("dataset", db);
-            logger.info("just set dataset to request");
-            // find out if there are any files here:
-            File currentDir = new File(DATASET_DIR + db.getId() + File.separator);
-            if (!currentDir.isDirectory()) {
-                currentDir.mkdirs();
-            }
-            ArchivedDatasetFileDAO asdfdao = new ArchivedDatasetFileDAO(sm.getDataSource());
-            ArrayList fileListRaw = new ArrayList();
-            fileListRaw = asdfdao.findByDatasetId(datasetId);
-            fileList = new ArrayList();
-            Iterator fileIterator = fileListRaw.iterator();
-            while (fileIterator.hasNext()) {
-                ArchivedDatasetFileBean asdfBean = (ArchivedDatasetFileBean) fileIterator.next();
-                // set the correct webPath in each bean here
-                // changed here, tbh, 4-18
-                // asdfBean.setWebPath(WEB_DIR+db.getId()+"/"+asdfBean.getName());
-                // asdfBean.setWebPath(DATASET_DIR+db.getId()+File.separator+
-                // asdfBean.getName());
-                asdfBean.setWebPath(asdfBean.getFileReference());
-                if (new File(asdfBean.getFileReference()).isFile()) {
-                    // logger.warn(asdfBean.getFileReference()+" is a
-                    // file!");
-                    fileList.add(asdfBean);
-                } else {
-                    logger.warn(asdfBean.getFileReference() + " is NOT a file!");
+            loadList(db, asdfdao, datasetId, fp, eb);
+            forwardPage(Page.EXPORT_DATASETS);
+        }else if("delete".equalsIgnoreCase(action) && adfId > 0) {
+            boolean success = false;
+            ArchivedDatasetFileBean adfBean = (ArchivedDatasetFileBean) asdfdao.findByPK(adfId);
+            File file = new File(adfBean.getFileReference());
+            if(!file.canWrite()){
+                addPageMessage(respage.getString("write_protected"));
+            }else{
+                success = file.delete();
+                if(success){
+                    asdfdao.deleteArchiveDataset(adfBean);
+                    addPageMessage(respage.getString("file_removed"));
+                }else{
+                    addPageMessage(respage.getString("error_removing_file"));
                 }
             }
-
-            logger.warn("");
-            logger.warn("file list length: " + fileList.size());
-            request.setAttribute("filelist", fileList);
-
-            ArrayList filterRows = ArchivedDatasetFileRow.generateRowsFromBeans(fileList);
-            EntityBeanTable table = fp.getEntityBeanTable();
-            String[] columns =
-                { resword.getString("file_name"), resword.getString("run_time"), resword.getString("file_size"), resword.getString("created_date"),
-                    resword.getString("created_by") };
-            table.setColumns(new ArrayList(Arrays.asList(columns)));
-            table.hideColumnLink(0);
-            table.hideColumnLink(1);
-            table.hideColumnLink(2);
-            table.hideColumnLink(3);
-            table.hideColumnLink(4);
-
-            table.setQuery("ExportDataset?datasetId=" + db.getId(), new HashMap());
-            // trying to continue...
-            session.setAttribute("newDataset", db);
-            table.setRows(filterRows);
-            table.computeDisplay();
-
-            request.setAttribute("table", table);
-            // for the side info bar
-            TabReportBean answer = new TabReportBean();
-
-            resetPanel();
-            panel.setStudyInfoShown(false);
-            setToPanel(resword.getString("study_name"), eb.getStudy().getName());
-            setToPanel(resword.getString("protocol_ID"), eb.getStudy().getIdentifier());
-            setToPanel(resword.getString("dataset_name"), db.getName());
-            setToPanel(resword.getString("created_date"), local_df.format(db.getCreatedDate()));
-            setToPanel(resword.getString("dataset_owner"), db.getOwner().getName());
-            setToPanel(resword.getString("date_last_run"), local_df.format(db.getDateLastRun()));
-
-            logger.warn("just set file list to request, sending to page");
+            loadList(db, asdfdao, datasetId, fp, eb);
             forwardPage(Page.EXPORT_DATASETS);
-        } else {
+        }
+        else {
             logger.info("**** found action ****: " + action);
             String generateReport = "";
             // generate file, and show screen export
@@ -375,7 +330,7 @@ public class ExportDatasetServlet extends SecureController {
                 // "/WEB-INF/jsp/extract/generatedFileDataset.jsp");
                 finalTarget.setFileName("" + "/WEB-INF/jsp/extract/generateMetadataCore.jsp");
                 // also set up table here???
-                ArchivedDatasetFileDAO asdfdao = new ArchivedDatasetFileDAO(sm.getDataSource());
+                asdfdao = new ArchivedDatasetFileDAO(sm.getDataSource());
 
                 ArchivedDatasetFileBean asdfBean = (ArchivedDatasetFileBean) asdfdao.findByPK(fId);
                 // *** do we need this below? tbh
@@ -444,5 +399,76 @@ public class ExportDatasetServlet extends SecureController {
         adfb.setWebPath(relativePath);
         adfb.setDateCreated(new java.util.Date(datasetFile.lastModified()));
         return adfb;
+    }
+
+    public void loadList(DatasetBean db, ArchivedDatasetFileDAO asdfdao, int datasetId, FormProcessor fp, ExtractBean eb){
+        logger.info("action is blank");
+        request.setAttribute("dataset", db);
+        logger.info("just set dataset to request");
+        // find out if there are any files here:
+        File currentDir = new File(DATASET_DIR + db.getId() + File.separator);
+        if (!currentDir.isDirectory()) {
+            currentDir.mkdirs();
+        }
+
+        ArrayList fileListRaw = new ArrayList();
+        fileListRaw = asdfdao.findByDatasetId(datasetId);
+        fileList = new ArrayList();
+        Iterator fileIterator = fileListRaw.iterator();
+        while (fileIterator.hasNext()) {
+            ArchivedDatasetFileBean asdfBean = (ArchivedDatasetFileBean) fileIterator.next();
+            // set the correct webPath in each bean here
+            // changed here, tbh, 4-18
+            // asdfBean.setWebPath(WEB_DIR+db.getId()+"/"+asdfBean.getName());
+            // asdfBean.setWebPath(DATASET_DIR+db.getId()+File.separator+
+            // asdfBean.getName());
+            asdfBean.setWebPath(asdfBean.getFileReference());
+            if (new File(asdfBean.getFileReference()).isFile()) {
+                // logger.warn(asdfBean.getFileReference()+" is a
+                // file!");
+                fileList.add(asdfBean);
+            } else {
+                logger.warn(asdfBean.getFileReference() + " is NOT a file!");
+            }
+        }
+
+        logger.warn("");
+        logger.warn("file list length: " + fileList.size());
+        request.setAttribute("filelist", fileList);
+
+        ArrayList filterRows = ArchivedDatasetFileRow.generateRowsFromBeans(fileList);
+        EntityBeanTable table = fp.getEntityBeanTable();
+        String[] columns =
+            { resword.getString("file_name"), resword.getString("run_time"), resword.getString("file_size"), resword.getString("created_date"),
+                resword.getString("created_by"), resword.getString("action")};
+        table.setColumns(new ArrayList(Arrays.asList(columns)));
+        table.hideColumnLink(0);
+        table.hideColumnLink(1);
+        table.hideColumnLink(2);
+        table.hideColumnLink(3);
+        table.hideColumnLink(4);
+        table.hideColumnLink(5);
+
+        table.setQuery("ExportDataset?datasetId=" + db.getId(), new HashMap());
+        // trying to continue...
+        session.setAttribute("newDataset", db);
+        table.setRows(filterRows);
+        table.computeDisplay();
+
+        request.setAttribute("table", table);
+        // for the side info bar
+        TabReportBean answer = new TabReportBean();
+
+        resetPanel();
+        panel.setStudyInfoShown(false);
+        setToPanel(resword.getString("study_name"), eb.getStudy().getName());
+        setToPanel(resword.getString("protocol_ID"), eb.getStudy().getIdentifier());
+        setToPanel(resword.getString("dataset_name"), db.getName());
+        setToPanel(resword.getString("created_date"), local_df.format(db.getCreatedDate()));
+        setToPanel(resword.getString("dataset_owner"), db.getOwner().getName());
+        setToPanel(resword.getString("date_last_run"), local_df.format(db.getDateLastRun()));
+
+        logger.warn("just set file list to request, sending to page");
+
     }
 }
