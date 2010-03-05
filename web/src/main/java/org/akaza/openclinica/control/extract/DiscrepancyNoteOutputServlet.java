@@ -164,8 +164,10 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
 
         for (int i = 0; i < noteRows.size(); i++) {
             DiscrepancyNoteBean dnb = noteRows.get(i);
+            dnb.setCreatedDateString(dnb.getCreatedDate()==null?"":sdf.format(dnb.getCreatedDate()));
             if (dnb.getParentDnId() == 0) {
                 ArrayList children = dndao.findAllByStudyAndParent(currentStudy, dnb.getId());
+                children = children == null? new ArrayList():children;
                 dnb.setNumChildren(children.size());
                 dnb.setChildren(children);
                 int lastDnId = dnb.getId();
@@ -173,6 +175,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
 
                 for (int j = 0; j < children.size(); j++) {
                     DiscrepancyNoteBean child = (DiscrepancyNoteBean) children.get(j);
+                    child.setCreatedDateString(child.getCreatedDate()==null?"":sdf.format(child.getCreatedDate()));
                     child.setUpdatedDateString(child.getCreatedDate()!=null?sdf.format(child.getCreatedDate()):"");
 
                     if (child.getId() > lastDnId) {
@@ -180,14 +183,16 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
                         lastChild = j;
                     }
                 }
-                DiscrepancyNoteBean lastdn = (DiscrepancyNoteBean) children.get(lastChild);
-                //dnb.setResStatus(ResolutionStatus.get(lastdn.getResolutionStatusId()));
-                /*
-                 * The update date is the date created of the latest child
-                 * note
-                 */
-                dnb.setUpdatedDate(lastdn.getCreatedDate());
-                dnb.setUpdatedDateString(dnb.getUpdatedDate()!=null?sdf.format(dnb.getUpdatedDate()):"");
+                if(children.size()>0) {
+                    DiscrepancyNoteBean lastdn = (DiscrepancyNoteBean) children.get(lastChild);
+                    //dnb.setResStatus(ResolutionStatus.get(lastdn.getResolutionStatusId()));
+                    /*
+                     * The update date is the date created of the latest child
+                     * note
+                     */
+                    dnb.setUpdatedDate(lastdn.getCreatedDate());
+                    dnb.setUpdatedDateString(dnb.getUpdatedDate()!=null?sdf.format(dnb.getUpdatedDate()):"");
+                }
             }
 
             String entityType = dnb.getEntityType();

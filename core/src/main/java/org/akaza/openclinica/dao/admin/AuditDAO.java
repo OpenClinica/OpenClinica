@@ -274,11 +274,11 @@ public class AuditDAO extends EntityDAO {
     public List findDeletedEventCRFsFromAuditEvent(int studyEventId) {
         this.unsetTypeExpected();
         this.setTypeExpected(1, TypeNames.INT); // study_event_id
-        this.setTypeExpected(2, TypeNames.INT); // study_event_id
-        this.setTypeExpected(3, TypeNames.STRING); // crf name
-        this.setTypeExpected(4, TypeNames.STRING); // crf version
-        this.setTypeExpected(5, TypeNames.STRING); // user name
-        this.setTypeExpected(6, TypeNames.DATE); // delete date
+        //this.setTypeExpected(2, TypeNames.INT); // study_event_id
+        this.setTypeExpected(2, TypeNames.STRING); // crf name
+        this.setTypeExpected(3, TypeNames.STRING); // crf version
+        this.setTypeExpected(4, TypeNames.STRING); // user name
+        this.setTypeExpected(5, TypeNames.DATE); // delete date
 
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(13)); // audit_log_event_type_id

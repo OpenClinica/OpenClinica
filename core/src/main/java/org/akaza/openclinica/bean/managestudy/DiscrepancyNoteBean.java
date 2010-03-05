@@ -72,8 +72,17 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
     private int assignedUserId = 0;
     private UserAccountBean assignedUser = new UserAccountBean();
 
+    private String createdDateString = "";
     private String updatedDateString = "";
 
+    public String getCreatedDateString() {
+        return createdDateString;
+    }
+    
+    public void setCreatedDateString(String createdDateString) {
+        this.createdDateString = createdDateString;
+    }
+    
     public String getUpdatedDateString() {
         return updatedDateString;
     }

@@ -112,40 +112,23 @@
     <query>
         <name>getCountWithFilterListDiscNotes</name>
         <sql><![CDATA[SELECT COUNT( DISTINCT  SS.study_subject_id) as count
-                FROM study_subject SS,STUDY ST, study_event SE where
-                SS.study_id = ST.study_id AND 
+              FROM study_subject SS,STUDY ST, study_event SE,dn_item_data_map didm, discrepancy_note dn where
+                SS.study_id = ST.study_id AND
                 ss.study_subject_id = se.study_subject_id AND
-                (ST.study_id=? or ST.parent_study_id=?) AND
-                0 < ( select count(ed.item_data_id) from study_subject ss1 , study_event se ,
-                                event_crf ec,  item_data ed, dn_item_data_map didm, discrepancy_note dn
-                where 
-                   SE.study_event_id = ec.study_event_id 
-                   AND ss1.study_subject_id = se.study_subject_id
-                   AND EC.event_crf_id = ed.event_crf_id
-                   AND ed.item_data_id = didm.item_data_id
-                   AND didm.discrepancy_note_id = dn.discrepancy_note_id
-                   AND SS1.study_subject_id = ss.study_subject_id
+                (ST.study_id=5 or ST.parent_study_id= 5) AND
+                didm.study_subject_id =  ss.study_subject_id AND
+                didm.discrepancy_note_id = dn.discrepancy_note_id
         ]]></sql>
     </query>
     <query>
         <name>getWithFilterAndSortListDiscNotes</name>
         <sql><![CDATA[
-                SELECT * from (select x.*, rownum as r from(
-                SELECT DISTINCT ss.*
-                FROM study_subject SS,STUDY ST, study_event SE where
+                  FROM study_subject SS,STUDY ST, study_event SE,dn_item_data_map didm, discrepancy_note dn where
                 SS.study_id = ST.study_id AND
                 ss.study_subject_id = se.study_subject_id AND
-                (ST.study_id=? or ST.parent_study_id=?) AND 
-                0 < ( select count(ed.item_data_id) from study_subject ss1 , study_event se ,
-                                event_crf ec,  item_data ed, dn_item_data_map didm, discrepancy_note dn
-                where 
-                   SE.study_event_id = ec.study_event_id 
-                   AND ss.study_subject_id = se.study_subject_id
-                   AND EC.event_crf_id = ed.event_crf_id
-                   AND ed.item_data_id = didm.item_data_id
-                   AND didm.discrepancy_note_id = dn.discrepancy_note_id
-                   AND SS1.study_subject_id = ss.study_subject_id 
-                   
+                (ST.study_id=5 or ST.parent_study_id= 5) AND
+                didm.study_subject_id =  ss.study_subject_id AND
+                didm.discrepancy_note_id = dn.discrepancy_note_id
         ]]></sql>
     </query>
     

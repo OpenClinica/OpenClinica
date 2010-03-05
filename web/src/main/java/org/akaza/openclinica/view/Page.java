@@ -629,8 +629,10 @@ public class Page {
     // Page("pages/studymodule", "Manage study");
     public final static String MANAGE_STUDY_MODULE = "/pages/studymodule";
 
+    public final static Page VIEW_ALL_SITE_DEFAULT_CRF_VERSIONS_PRINT = new Page("/WEB-INF/jsp/managestudy/defaultAllSiteCrfVersionPrint.jsp", "View default crf versions print");
+    public final static Page VIEW_DEFAULT_CRF_VERSIONS_PRINT = new Page("/WEB-INF/jsp/managestudy/defaultCrfVersionPrint.jsp", "View default crf versions print");
     public final static Page VIEW_ALL_DEFAULT_CRF_VERSIONS_PRINT = new Page("/WEB-INF/jsp/managestudy/defaultAllCrfVersionPrint.jsp", "View default crf versions print");
-    
+
 
     /**
      * Constructs the JSP Page instance

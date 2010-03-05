@@ -6,6 +6,7 @@ import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -1201,7 +1202,7 @@ public class SDVUtil {
 
     }
 
-    public boolean setSDVStatusForStudySubjects(List<Integer> studySubjectIds, boolean setVerification) {
+    public boolean setSDVStatusForStudySubjects(List<Integer> studySubjectIds, boolean setVerification, UserAccountBean userAccount) {
 
         EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
@@ -1229,7 +1230,10 @@ public class SDVUtil {
                 if (eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.AllREQUIRED
                     || eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.PARTIALREQUIRED) {
                     try {
-                        eventCRFDAO.setSDVStatus(setVerification, eventCRFBean.getId());
+                        eventCRFBean.setSdvStatus(setVerification);
+                        eventCRFBean.setUpdater(userAccount);
+                        eventCRFDAO.update(eventCRFBean);
+
                     } catch (Exception exc) {
                         System.out.println(exc.getMessage());
                         return false;
@@ -1242,7 +1246,7 @@ public class SDVUtil {
         return true;
     }
 
-    public boolean setSDVerified(List<Integer> eventCRFIds, boolean setVerification) {
+    public boolean setSDVerified(List<Integer> eventCRFIds, boolean setVerification, UserAccountBean userAccount) {
 
         //If no event CRFs are offered to SDV, then the transaction has not
         //caused a problem, so return true
@@ -1254,7 +1258,10 @@ public class SDVUtil {
 
         for (Integer eventCrfId : eventCRFIds) {
             try {
-                eventCRFDAO.setSDVStatus(setVerification, eventCrfId);
+                EventCRFBean ec = (EventCRFBean) eventCRFDAO.findByPK(eventCrfId);
+                ec.setSdvStatus(setVerification);
+                ec.setUpdater(userAccount);
+                eventCRFDAO.update(ec);
             } catch (Exception exc) {
                 System.out.println(exc.getMessage());
                 return false;

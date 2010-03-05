@@ -1592,6 +1592,11 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
             sql = digester.getQuery("findStudyEventMapByDNId");
         } else if ("itemData".equalsIgnoreCase(entityType)) {
             sql = digester.getQuery("findItemDataMapByDNId");
+            this.unsetTypeExpected();
+            this.setTypeExpected(1, TypeNames.INT);
+            this.setTypeExpected(2, TypeNames.INT);
+            this.setTypeExpected(3, TypeNames.STRING);
+            this.setTypeExpected(4, TypeNames.INT);
         }
 
         ArrayList hms = select(sql, variables);

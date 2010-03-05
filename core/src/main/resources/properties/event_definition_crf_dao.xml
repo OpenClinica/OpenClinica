@@ -13,6 +13,15 @@
 		<name>findAllByDefinition</name>
 		<sql>SELECT * FROM EVENT_DEFINITION_CRF Where study_event_definition_id=? order by ordinal asc</sql>
 	</query>
+    <query>
+        <name>findAllByStudy</name>
+        <sql>SELECT edc.* FROM EVENT_DEFINITION_CRF edc, study st
+             WHERE edc.study_id = st.study_id
+				AND (st.study_id=? or st.parent_study_id=?)
+				AND edc.status_id=1
+				order by edc.study_event_definition_id, edc.ordinal asc
+        </sql>
+    </query>
 	<query>
 		<name>findAllParentsByDefinition</name>
 		<!-- find all which have unavailable parent_id.

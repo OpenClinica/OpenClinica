@@ -443,12 +443,6 @@
         </sql>
     </query>
     <query>
-        <name>setSDVStatus</name>
-        <sql>
-            update event_crf set sdv_status=? where event_crf_id=?
-        </sql>
-    </query>
-    <query>
         <name>findAllByStudySubject</name>
         <sql>
             SELECT * FROM event_crf WHERE study_event_id in (SELECT se.study_event_id FROM study_event se, study_event_definition sed

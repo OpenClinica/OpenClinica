@@ -12,6 +12,7 @@
 //issue 1868: global variable added to deal with clearing input values from added rows.
 //SEE LINE 942
 var firstRepeatingNumber=2;
+var RepeatingBlockid="";
 var global_addButtonClicked=false;
 //ADDITIONAL CODE HAS BEEN INCLUDED TO CALL METHODS IN global_functions_javascript.js,
 //RELATED TO OpenClinica 2.2 functionality: SEE LINES 304 AND 1217
@@ -188,6 +189,11 @@ if(!window.RepetitionElement || (
       {
        // mantis issue 4597 -- Start
        //alert(node.childNodes[1].childNodes[0].childNodes[1].innerHTML);
+        if(RepeatingBlockid != node.id){
+            firstRepeatingNumber=2;
+            RepeatingBlockid = node.id;
+        }
+
        if(document.getElementById("repeatCaption")){
            node.childNodes[1].childNodes[0].childNodes[1].innerHTML = "<strong>Repeat: "+(firstRepeatingNumber++)+"<strong>";
        }

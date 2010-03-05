@@ -28,7 +28,7 @@ public class ListDiscNotesSubjectFilter implements CriteriaCommand {
                 theCriteria += buildCriteriaForSelect(criteria, filter.getProperty(), filter.getValue());
             }
         }
-        theCriteria += " ) ";
+        // theCriteria += " ) ";
         for (Filter filter : filters) {
             if (!filter.getProperty().equals("dn.discrepancy_note_type_id") && !filter.getProperty().equals("dn.resolution_status_id")) {
                 theCriteria += buildCriteria(criteria, filter.getProperty(), filter.getValue());

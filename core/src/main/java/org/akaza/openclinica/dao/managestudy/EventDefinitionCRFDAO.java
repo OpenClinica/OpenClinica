@@ -37,6 +37,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
     private void setQueryNames() {
         getCurrentPKName = "getCurrentPK";
         getNextPKName = "getNextPK";
+        findAllByStudyName = "findAllByStudy";
     }
 
     public EventDefinitionCRFDAO(DataSource ds) {

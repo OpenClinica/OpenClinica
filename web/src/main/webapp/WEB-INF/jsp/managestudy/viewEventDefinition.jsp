@@ -83,6 +83,17 @@
   <fmt:message key="CRFs" bundle="${resword}"/>
 </div>
 <p><fmt:message key="click_the_up_down_arrow_icons" bundle="${restext}"/></p>
+    <div style="float:right;padding-right:6px;width:8%">
+       <a href="javascript:openDocWindow('PrintEventCRF?id=<c:out value="${definition.id}"/>')"
+       onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
+       onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><img
+       name="bt_Print1" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print_all_available_crf" bundle="${resword}"/>" title="<fmt:message key="print_all_available_crf" bundle="${resword}"/>" align="left" hspace="6"></a>
+   </div>
+    &nbsp;
+    &nbsp;
+<p>
+    
+</p>
 <div style="width: 700px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 

@@ -219,6 +219,8 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
             writer.append(",");
             writer.append("Entity value");
             writer.append(",");
+            writer.append("Date created");
+            writer.append(",");
             writer.append("Date updated");
             writer.append(",");
             writer.append("Study id");
@@ -265,6 +267,9 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
         writer.append(",");
 
         writer.append(escapeQuotesInCSV(discNoteBean.getEntityValue()));
+        writer.append(",");
+
+        writer.append(escapeQuotesInCSV(discNoteBean.getCreatedDateString()+""));
         writer.append(",");
 
         writer.append(escapeQuotesInCSV(discNoteBean.getUpdatedDateString()+""));

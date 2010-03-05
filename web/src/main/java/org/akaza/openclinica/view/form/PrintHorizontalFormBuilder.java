@@ -97,7 +97,7 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
                     break;
             }
         }
-
+        int uniqueId = 0;
         // Print all the sections of a group-type table
         for (DisplaySectionBean displaySecBean : this.displaySectionBeans) {
 
@@ -173,7 +173,7 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
             // Show the section's title, subtitle, or instructions
             builderUtil.showTitles(divRoot, sectionBean, pageNumber, isInternetExplorer);
             // One way to generate an id for the repeating tbody or tr element
-            int uniqueId = 0;
+
             // The tabindex attribute for select and input tags
             int tabindex = 1;
 
@@ -377,7 +377,7 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
                 }// end for displayBean
                 if(j%maxColRow!=0)bodylist.add(row);
                 //Creating the first/main table
-                if(repeatNumber > 1){
+                if((repeatNumber > 1)||hasStoredRepeatedRows){
                     Element newRow = new Element("tr");
                     Element div = new Element("div");
                     div.setAttribute("id", "repeatCaption");
@@ -441,7 +441,7 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
         Element newRow = new Element("tr");
         Element newCol = new Element("td");
         Element strong = new Element("strong");
-        strong.addContent("Repeat :"+rep);
+        strong.addContent("Repeat: "+rep);
         newCol.addContent(strong);
         newRow.addContent(newCol);
         table.addContent(newRow);

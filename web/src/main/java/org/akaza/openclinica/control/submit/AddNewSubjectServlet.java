@@ -753,7 +753,32 @@ public class AddNewSubjectServlet extends SecureController {
                 if (!StringUtil.isBlank(submitEvent)) {
                     forwardPage(Page.CREATE_NEW_STUDY_EVENT_SERVLET);
                 } else if (!StringUtil.isBlank(submitEnroll)) {
-                    forwardPage(Page.INSTRUCTIONS_ENROLL_SUBJECT_SERVLET);
+                    // NEW MANTIS ISSUE 4770
+                    setUpBeans(classes);
+                    Date today = new Date(System.currentTimeMillis());
+                    String todayFormatted = local_df.format(today);
+                    fp.addPresetValue(INPUT_ENROLLMENT_DATE, todayFormatted);
+
+                    // YW 10-07-2007 <<
+                    String idSetting = "";
+                    if (currentStudy.getParentStudyId() > 0) {
+                        parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "subjectIdGeneration");
+                        currentStudy.getStudyParameterConfig().setSubjectIdGeneration(parentSPV.getValue());
+                    }
+                    idSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();
+                    // YW >>
+                    logger.info("subject id setting :" + idSetting);
+                    // set up auto study subject id
+                    if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
+                        int nextLabel = ssd.findTheGreatestLabel() + 1;
+                        fp.addPresetValue(INPUT_LABEL, new Integer(nextLabel).toString());
+                    }
+
+                    setPresetValues(fp.getPresetValues());
+                    discNotes = new FormDiscrepancyNotes();
+                    session.setAttribute(FORM_DISCREPANCY_NOTES_NAME, discNotes);
+                    //End of 4770
+                    forwardPage(Page.ADD_NEW_SUBJECT);
                 } else {
                     // forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
                     // forwardPage(Page.SUBMIT_DATA_SERVLET);

@@ -236,7 +236,7 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
                     subjectEventStatus = SubjectEventStatus.NOT_SCHEDULED;
                 } else {
                     for (StudyEventBean studyEventBean : studyEvents) {
-                        discCounts = countAll(studyEventBean, constraints, study.isSite(study.getParentStudyId()));
+                        discCounts = countAll(discCounts, studyEventBean, constraints, study.isSite(study.getParentStudyId()));
                         hasDN = hasDN == false ? discCounts.size() > 0 : hasDN;
                         if (studyEventBean.getSampleOrdinal() == 1) {
                             subjectEventStatus = studyEventBean.getSubjectEventStatus();
@@ -1243,12 +1243,11 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
         this.resolutionStatusIds = resolutionStatusIds;
     }
     
-    public HashMap<ResolutionStatus, Integer> countAll(StudyEventBean studyEvent, StringBuffer constraints, boolean isSite) {
-        HashMap<ResolutionStatus, Integer> discCounts = new HashMap<ResolutionStatus, Integer>();
-        discCounts =
-            getDiscrepancyNoteDAO().countByEntityTypeAndStudyEventWithConstraints("itemData", studyEvent, constraints, isSite);
-
+    public HashMap<ResolutionStatus, Integer> countAll(HashMap<ResolutionStatus, Integer> discCounts, StudyEventBean studyEvent, StringBuffer constraints, boolean isSite) {
         HashMap<ResolutionStatus, Integer> temp = new HashMap<ResolutionStatus, Integer>();
+        temp =
+            getDiscrepancyNoteDAO().countByEntityTypeAndStudyEventWithConstraints("itemData", studyEvent, constraints, isSite);
+        this.getTotal(discCounts, temp);
         temp =
             getDiscrepancyNoteDAO().countByEntityTypeAndStudyEventWithConstraints("subject", studyEvent, constraints, isSite);
         this.getTotal(discCounts, temp);

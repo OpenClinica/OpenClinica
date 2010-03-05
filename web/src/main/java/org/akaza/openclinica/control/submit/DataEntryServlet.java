@@ -405,8 +405,7 @@ public abstract class DataEntryServlet extends SecureController {
             } else {
                 if (!fp.getString("exitTo").equals("")) {
                     response.sendRedirect(response.encodeRedirectURL(fp.getString("exitTo")));
-                }
-                response.sendRedirect(response.encodeRedirectURL("ListStudySubjects"));
+                }else response.sendRedirect(response.encodeRedirectURL("ListStudySubjects"));
             }
             // forwardPage(Page.SUBMIT_DATA_SERVLET);
             return;
@@ -2698,12 +2697,21 @@ public abstract class DataEntryServlet extends SecureController {
             dib.setChildren(getChildrenDisplayItems(dib, edcb));
 
             // TODO use the setData command here to make sure we get a value?
-            if (shouldLoadDBValues(dib)) {
-                logger.info("should load db values is true, set value");
-                dib.loadDBValue();
-                logger.info("just got data loaded: " + dib.getData().getValue());
+            //On Submition of the Admin Editing form the loadDBValue does not required
+            //
+            if(ecb.getStage() == DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE
+                    || ecb.getStage() == DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE){
+                if (shouldLoadDBValues(dib) && !isSubmitted) {
+                    dib.loadDBValue();
+                }
+            }else{
+                if (shouldLoadDBValues(dib)) {
+                    logger.info("should load db values is true, set value");
+                    dib.loadDBValue();
+                    logger.info("just got data loaded: " + dib.getData().getValue());
+                }
             }
-
+            
             displayItems.set(i, dib);
         }
 

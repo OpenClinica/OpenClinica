@@ -352,23 +352,10 @@ include the default value first in the select list --%>
              </option>
           </c:if>
     <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
-        <c:choose>
-            <c:when test="${! printDefaultFirst}">
                 <option value="<c:out value="${option.value}" />"
                         <c:if test="${option.selected}"> selected="selected"</c:if>>
                     <c:out value="${option.text}" />
                 </option>
-
-            </c:when>
-            <c:otherwise>
-                <option value="${option.value}">
-                    <c:out value="${option.text}" />
-                </option>
-
-            </c:otherwise>
-
-        </c:choose>
-
         <c:set var="count" value="${count+1}"/>
     </c:forEach>
     </select>

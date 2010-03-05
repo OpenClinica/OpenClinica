@@ -407,7 +407,7 @@
 
 	<div class="table_title_Manage" style="width:300px;float:left"><fmt:message key="view_site_event_definitions" bundle="${resword}"/></div>
 <div style="float:left;width:8%">
-   <a href="javascript:openDocWindow('PrintAllEventCRF?siteId=<c:out value="${siteToView.id}"/>')"
+   <a href="javascript:openDocWindow('PrintAllSiteEventCRF?siteId=<c:out value="${siteToView.id}"/>')"
    onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
    onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><img
    name="bt_Print1" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print_all_available_crf" bundle="${resword}"/>" title="<fmt:message key="print_all_available_crf" bundle="${resword}"/>" align="left" hspace="6"></a>

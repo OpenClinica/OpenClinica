@@ -7,6 +7,11 @@
  */
 package org.akaza.openclinica.control;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.admin.EventStatusStatisticsTableFactory;
 import org.akaza.openclinica.control.admin.SiteStatisticsTableFactory;
@@ -30,11 +35,6 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
 
 /**
  *
@@ -150,6 +150,12 @@ public class MainMenuServlet extends SecureController {
                         + ub.getId() + " AND (dn.resolution_status_id=1 OR dn.resolution_status_id=2 OR dn.resolution_status_id=3)", currentStudy);
                 request.setAttribute("assignedDiscrepancies", assignedDiscrepancies == null ? 0 : assignedDiscrepancies);
 
+                String idSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();
+                if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
+                    int nextLabel = this.getStudySubjectDAO().findTheGreatestLabel() + 1;
+                    request.setAttribute("label", new Integer(nextLabel).toString());
+                }
+                
                 if (currentRole.isInvestigator() || currentRole.isResearchAssistant()) {
                     setupListStudySubjectTable();
                 }

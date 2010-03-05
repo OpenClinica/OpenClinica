@@ -26,32 +26,27 @@
 </head>
 <jsp:useBean scope="request" id="section" class="org.akaza.openclinica.bean.submit.DisplaySectionBean" />
 <jsp:useBean scope="session" id="studyEvent" class="org.akaza.openclinica.bean.managestudy.StudyEventBean" />
-<jsp:useBean scope="request" id="sedCrfBeans" class="java.util.LinkedHashMap" />
+<jsp:useBean scope="request" id="printCrfBeans" class="java.util.ArrayList" />
 
 <body>
 <div style="border:0px #000000 solid;padding-left:0px;width:820px;margin:5px">
-<c:forEach var="item" items="${sedCrfBeans}" varStatus="status">
-<div style="page-break-after:always" >
-
 <table border=0 align="center" width="100%">
-
 <thead>
     <tr>
 <th width=100%>
         <table class="infotab" cellpadding="0" cellspacing="0">
             <tr>
-                <td width="20%"><h1><fmt:message key="study_name" bundle="${resword}"/></h1> </td>
-                <td width="20%"><h1><fmt:message key="event_definition_name" bundle="${resword}"/></h1></td>
-                <td width="20%"><h1><fmt:message key="site" bundle="${resword}"/></h1></td>
-                <td width="20%"><h1><fmt:message key="study_subject_ID" bundle="${resword}"/></h1></td>
-                <td width="20%"><h1><fmt:message key="date_interviewed" bundle="${resword}"/></h1></td>
+                <td width="15%"><h1><fmt:message key="study_name" bundle="${resword}"/></h1> </td>
+                <td width="15%"><h1><fmt:message key="event_definition_name" bundle="${resword}"/></h1></td>
+                <td width="15%"><h1><fmt:message key="site" bundle="${resword}"/></h1></td>
+                <td width="15%"><h1><fmt:message key="study_subject_ID" bundle="${resword}"/></h1></td>
+                <td width="15%"><h1><fmt:message key="date_interviewed" bundle="${resword}"/></h1></td>
                 <td width="15%"><h1>Global ID </h1></td>
                 <td width="10%"><h1><fmt:message key="interviewer_name" bundle="${resword}"/></h1></td>
-
             </tr>
             <tr>
                 <td><h1><c:out value="${studyName}"/></h1></td>
-                <td><h1><c:out value="${item.key.name}"/></h1></td>
+                <td><h1><c:out value="${eventDefinition}"/></h1></td>
                 <td><h1>&nbsp;<c:out value="${site}"/></h1></td>
                 <td>&nbsp;<h1></h1></td>
                 <td>&nbsp;<h1></h1></td>
@@ -65,7 +60,7 @@
 <tbody>
 <tr>
 <td width="100%">
-    <c:forEach var="printCrfBean" items="${item.value}" varStatus="status">
+<c:forEach var="printCrfBean" items="${printCrfBeans}" varStatus="status">
     <div style="padding-left:10px;padding-bottom:20px;padding-top:10px;page-break-after:always" >
 <h1>
 <c:out value="${printCrfBean.crfBean.name}" /> <c:out value="${printCrfBean.crfVersionBean.name}" />
@@ -92,13 +87,11 @@
     <c:if test="${!status.last}">
         <hr/>
     </c:if>
-    </c:forEach>
+</c:forEach>
  </td>
 </tr>
 </tbody>
  </table>
- </div>
-</c:forEach>
  </div>
 </body>
 </html>

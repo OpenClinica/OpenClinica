@@ -1094,6 +1094,18 @@
     </servlet>
 
     <servlet>
+        <servlet-name>PrintAllSiteEventCRFServlet</servlet-name>
+        <display-name>PrintAllSiteEventCRFServlet</display-name>
+        <servlet-class>org.akaza.openclinica.control.managestudy.PrintAllSiteEventCRFServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>PrintEventCRFServlet</servlet-name>
+        <display-name>PrintEventCRFServlet</display-name>
+        <servlet-class>org.akaza.openclinica.control.managestudy.PrintEventCRFServlet</servlet-class>
+    </servlet>
+
+    <servlet>
         <servlet-name>PrintAllEventCRFServlet</servlet-name>
         <display-name>PrintAllEventCRFServlet</display-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.PrintAllEventCRFServlet</servlet-class>
@@ -1895,9 +1907,18 @@
         <url-pattern>/ManageStudy1</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
+        <servlet-name>PrintAllSiteEventCRFServlet</servlet-name>
+        <url-pattern>/PrintAllSiteEventCRF</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PrintEventCRFServlet</servlet-name>
+        <url-pattern>/PrintEventCRF</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
         <servlet-name>PrintAllEventCRFServlet</servlet-name>
         <url-pattern>/PrintAllEventCRF</url-pattern>
     </servlet-mapping>
+    
 
     <!-- 
     <security-constraint>
