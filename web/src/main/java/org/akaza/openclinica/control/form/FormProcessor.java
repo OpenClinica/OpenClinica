@@ -280,7 +280,7 @@ public class FormProcessor {
         Date answer;
         ResourceBundle resformat = ResourceBundleProvider.getFormatBundle();
         try {
-            SimpleDateFormat f = new SimpleDateFormat(resformat.getString("date_format_string"));
+            SimpleDateFormat f = new SimpleDateFormat(resformat.getString("date_format_string"), ResourceBundleProvider.getLocale());
             f.setLenient(false);
             answer = f.parse(date);
         } catch (Exception e) {

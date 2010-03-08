@@ -145,7 +145,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
         respage = ResourceBundleProvider.getPageMessagesBundle(locale);
         resworkflow = ResourceBundleProvider.getWorkflowBundle(locale);
 
-        local_df = new SimpleDateFormat(resformat.getString("date_format_string"));
+        local_df = new SimpleDateFormat(resformat.getString("date_format_string"), ResourceBundleProvider.getLocale());
     }
 
     // BWP 01/08>>

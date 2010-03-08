@@ -150,7 +150,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         Locale l = request.getLocale();
         resword = ResourceBundleProvider.getWordsBundle(l);
         resformat = ResourceBundleProvider.getFormatBundle(l);
-        SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_format_string"));
+        SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_format_string"), ResourceBundleProvider.getLocale());
         DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(sm.getDataSource());
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(sm.getDataSource());
         StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());

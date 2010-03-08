@@ -267,7 +267,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         respage = ResourceBundleProvider.getPageMessagesBundle(locale);
         resworkflow = ResourceBundleProvider.getWorkflowBundle(locale);
 
-        local_df = new SimpleDateFormat(resformat.getString("date_format_string"));
+        local_df = new SimpleDateFormat(resformat.getString("date_format_string"), ResourceBundleProvider.getLocale());
 
         try {
             String userName = request.getRemoteUser();
