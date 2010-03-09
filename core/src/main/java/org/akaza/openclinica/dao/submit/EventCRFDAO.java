@@ -100,6 +100,7 @@ public class EventCRFDAO extends AuditableEntityDAO {
         this.setTypeExpected(20, TypeNames.BOOL);// electronic_signature_status
         this.setTypeExpected(21, TypeNames.BOOL);// sdv_status
         this.setTypeExpected(22, TypeNames.INT);// sdv_status
+        this.setTypeExpected(23, TypeNames.STRING); // R for oracle
 
     }
 
@@ -407,6 +408,14 @@ public class EventCRFDAO extends AuditableEntityDAO {
         this.execute(digester.getQuery("delete"), variables);
         return;
 
+    }
+
+    public void setSDVStatus(boolean sdvStatus, int eventCRFId) {
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), sdvStatus);
+        variables.put(new Integer(2), eventCRFId);
+
+        this.execute(digester.getQuery("setSDVStatus"), variables);
     }
 
     public Integer countEventCRFsByStudy(int studyId, int parentStudyId) {

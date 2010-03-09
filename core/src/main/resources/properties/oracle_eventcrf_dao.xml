@@ -49,7 +49,7 @@
             crf.crf_id = cv.crf_id AND edc.crf_id = crf.crf_id AND cv.crf_version_id = ec.crf_version_id AND
             edc.source_data_verification_code != 4 AND edc.study_event_definition_id = sed.study_event_definition_id AND
             (ec.status_id = 2 or ec.status_id = 6) AND
-            (ss.study_id = ? or ss.study_id in (select study_id from study where parent_study_id = ?)
+            (ss.study_id = ? or ss.study_id in (select study_id from study where parent_study_id = ?))
             AND (
             ( s.parent_study_id = edc.study_id 
             and 0 = (select count(1) from event_definition_crf xedc where xedc.study_id = ss.study_id
@@ -449,6 +449,13 @@
         <sql>select ec.* from event_crf  ec, crf_version cv
             where ec.crf_version_id=cv.crf_version_id
             and ec.study_event_id=? and cv.crf_version_id=?
+        </sql>
+    </query>
+
+    <query>
+        <name>setSDVStatus</name>
+        <sql>
+            update event_crf set sdv_status=? where event_crf_id=?
         </sql>
     </query>
 

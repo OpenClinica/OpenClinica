@@ -38,7 +38,8 @@
 			    odm_metadataversion_oid1            varchar2(255),
 			    odm_prior_study_oid1                varchar2(255),
 			    odm_prior_metadataversion_oid1      varchar2(255),
-			    show_secondary_id1                  varchar2(1) DEFAULT '0'
+			    show_secondary_id1                  varchar2(1) DEFAULT '0',
+			    dataset_item_status_id1             integer
 			   );
 			   
 			   
@@ -72,6 +73,7 @@
 			     update dataset set odm_prior_study_oid1 = odm_prior_study_oid ;      
 			     update dataset set odm_prior_metadataversion_oid1=odm_prior_metadataversion_oid;
 			     update dataset set show_secondary_id1 = show_secondary_id ;
+			     update dataset set dataset_item_status_id1 = dataset_item_status_id ;
 			     
 			     
 			     alter table dataset drop column sql_statement;
@@ -103,7 +105,8 @@
 			     alter table dataset drop column  odm_metadataversion_oid;          
 			     alter table dataset drop column  odm_prior_study_oid;            
 			     alter table dataset drop column  odm_prior_metadataversion_oid;     
-			     alter table dataset drop column  show_secondary_id;            
+			     alter table dataset drop column  show_secondary_id;
+			     alter table dataset drop column  dataset_item_status_id;            
 			
 			     
 			     alter table dataset rename column sql_statement1 to sql_statement;
@@ -136,6 +139,7 @@
 			     alter table dataset rename column odm_prior_study_oid1 to odm_prior_study_oid  ;     
 			     alter table dataset rename column odm_prior_metadataversion_oid1 to odm_prior_metadataversion_oid;
 			     alter table dataset rename column show_secondary_id1 to show_secondary_id ;
+			     alter table dataset rename column dataset_item_status_id1 to dataset_item_status_id;
 			
 			commit
     	</sql>

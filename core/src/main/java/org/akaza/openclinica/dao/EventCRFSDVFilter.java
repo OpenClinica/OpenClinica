@@ -84,7 +84,7 @@ public class EventCRFSDVFilter implements CriteriaCommand {
                     criteria = criteria + " and ";
                     criteria =
                         criteria + " ( " + columnMapping.get(property)
-                            + " = 2 and  se.subject_event_status_id != 5 and se.subject_event_status_id != 6 and se.subject_event_status_id != 7 ) ) ";
+                            + " = 2 and  se.subject_event_status_id != 5 and se.subject_event_status_id != 6 and se.subject_event_status_id != 7 ) ";
                 } else {
                     criteria = criteria + " and ";
                     criteria =

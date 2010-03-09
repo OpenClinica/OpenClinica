@@ -361,7 +361,7 @@
 		<dependency>
 			<groupId>oracle</groupId>
 			<artifactId>ojdbc14</artifactId>
-			<version>9i</version>
+			<version>10g</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>

@@ -5,6 +5,7 @@ import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBasedViewContainer;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
@@ -13,6 +14,7 @@ import org.akaza.openclinica.domain.rule.action.ActionProcessor;
 import org.akaza.openclinica.domain.rule.action.ActionProcessorFacade;
 import org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionProcessor;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
+import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
@@ -32,24 +34,23 @@ public class RuleSetBulkRuleRunner extends RuleRunner {
     }
 
     private List<RuleSetBasedViewContainer> populateForRuleSetBasedView(List<RuleSetBasedViewContainer> theList, RuleSetBean ruleSet, RuleBean rule,
-            HashMap<String, ArrayList<RuleActionBean>> actionsToBeExecuted) {
+            String akey, RuleActionBean ruleAction) {
 
         StudyEventBean studyEvent =
             (StudyEventBean) getStudyEventDao().findByPK(
                     Integer.valueOf(getExpressionService().getStudyEventDefenitionOrdninalCurated(ruleSet.getTarget().getValue())));
 
-        for (String akey : actionsToBeExecuted.keySet()) {
-            for (RuleActionBean ruleAction : actionsToBeExecuted.get(akey)) {
-                RuleSetBasedViewContainer container =
-                    new RuleSetBasedViewContainer(rule.getName(), rule.getExpression().getValue(), akey, ruleAction.getActionType().toString(), ruleAction
-                            .getSummary());
-                if (!theList.contains(container)) {
-                    theList.add(container);
-                }
-                StudySubjectBean studySubject = (StudySubjectBean) getStudySubjectDao().findByPK(studyEvent.getStudySubjectId());
-                theList.get(theList.indexOf(container)).addSubject(studySubject.getLabel());
-            }
+        //for (String akey : actionsToBeExecuted.keySet()) {
+        //    for (RuleActionBean ruleAction : actionsToBeExecuted.get(akey)) {
+        RuleSetBasedViewContainer container =
+            new RuleSetBasedViewContainer(rule.getName(), rule.getExpression().getValue(), akey, ruleAction.getActionType().toString(), ruleAction.getSummary());
+        if (!theList.contains(container)) {
+            theList.add(container);
         }
+        StudySubjectBean studySubject = (StudySubjectBean) getStudySubjectDao().findByPK(studyEvent.getStudySubjectId());
+        theList.get(theList.indexOf(container)).addSubject(studySubject.getLabel());
+        //   }
+        //}
         return theList;
     }
 
@@ -74,25 +75,28 @@ public class RuleSetBulkRuleRunner extends RuleRunner {
                         OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(eow);
                         result = oep.parseAndEvaluateExpression(rule.getExpression().getValue());
 
-                        HashMap<String, ArrayList<RuleActionBean>> actionsToBeExecuted = ruleSetRule.getAllActionsWithEvaluatesToAsKey(result);
+                        //HashMap<String, ArrayList<RuleActionBean>> actionsToBeExecuted = ruleSetRule.getAllActionsWithEvaluatesToAsKey(result);
+                        List<RuleActionBean> actionListBasedOnRuleExecutionResult = ruleSetRule.getActions(result, Phase.BATCH);
                         logger.info("RuleSet with target  : {} , Ran Rule : {}  The Result was : {} , Based on that {} action will be executed ", new Object[] {
-                            ruleSet.getTarget().getValue(), rule.getName(), result, actionsToBeExecuted.size() });
-
-                        if (dryRun && actionsToBeExecuted.size() > 0) {
-                            ruleSetBasedView = populateForRuleSetBasedView(ruleSetBasedView, ruleSet, rule, actionsToBeExecuted);
-                        }
+                            ruleSet.getTarget().getValue(), rule.getName(), result, actionListBasedOnRuleExecutionResult.size() });
 
                         // If not a dryRun(Meaning don't execute Actions) and if actions exist then execute the Action
-                        if (!dryRun && actionsToBeExecuted.size() > 0) {
-                            for (RuleActionBean ruleAction : ruleSetRule.getActions()) {
-                                int itemDataBeanId = getExpressionService().getItemDataBeanFromDb(ruleSet.getTarget().getValue()).getId();
+                        if (actionListBasedOnRuleExecutionResult.size() > 0) {
+                            for (RuleActionBean ruleAction : actionListBasedOnRuleExecutionResult) {
+                                ItemDataBean itemData = getExpressionService().getItemDataBeanFromDb(ruleSet.getTarget().getValue());
+                                int itemDataBeanId = itemData != null ? itemData.getId() : 0;
                                 ruleAction.setCuratedMessage(curateMessage(ruleAction, ruleSetRule));
-                                ActionProcessor ap = ActionProcessorFacade.getActionProcessor(ruleAction.getActionType(), ds, getMailSender());
-                                ap.execute(null, ExecutionMode.SAVE, ruleAction, itemDataBeanId, DiscrepancyNoteBean.ITEM_DATA, currentStudy, ub, prepareEmailContents(ruleSet,
-                                        ruleSetRule, currentStudy, ruleAction));
                                 // getDiscrepancyNoteService().saveFieldNotes(ruleAction.getSummary(), itemDataBeanId, "ItemData", currentStudy, ub);
+                                ActionProcessor ap = ActionProcessorFacade.getActionProcessor(ruleAction.getActionType(), ds, getMailSender());
+                                RuleActionBean rab =
+                                    ap.execute(RuleRunnerMode.RULSET_BULK, ExecutionMode.SAVE, ruleAction, itemDataBeanId, DiscrepancyNoteBean.ITEM_DATA,
+                                            currentStudy, ub, prepareEmailContents(ruleSet, ruleSetRule, currentStudy, ruleAction));
+                                if (rab != null) {
+                                    ruleSetBasedView = populateForRuleSetBasedView(ruleSetBasedView, ruleSet, rule, result, ruleAction);
+                                }
                             }
                         }
+
                     } catch (OpenClinicaSystemException osa) {
                         String errorMessage =
                             "RuleSet with target  : " + ruleSet.getTarget().getValue() + " , Ran Rule : " + rule.getName()

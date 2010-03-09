@@ -2,7 +2,6 @@ package org.akaza.openclinica.controller;
 
 import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
 
-import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
@@ -243,7 +242,7 @@ public class SDVController {
 
         }
         List<Integer> eventCRFIds = sdvUtil.getListOfSdvEventCRFIds(parameterMap.keySet());
-        boolean updateCRFs = sdvUtil.setSDVerified(eventCRFIds, true, (UserAccountBean) request.getSession().getAttribute("userBean"));
+        boolean updateCRFs = sdvUtil.setSDVerified(eventCRFIds, true);
 
         if (updateCRFs) {
             pageMessages.add("The Event CRFs have been source data verified.");
@@ -273,7 +272,7 @@ public class SDVController {
 
         List<Integer> eventCRFIds = new ArrayList<Integer>();
         eventCRFIds.add(crfId);
-        boolean updateCRFs = sdvUtil.setSDVerified(eventCRFIds, true, (UserAccountBean) request.getSession().getAttribute("userBean"));
+        boolean updateCRFs = sdvUtil.setSDVerified(eventCRFIds, true);
 
         if (updateCRFs) {
             pageMessages.add("The Event CRFs have been source data verified.");
@@ -303,7 +302,7 @@ public class SDVController {
 
         List<Integer> eventCRFIds = new ArrayList<Integer>();
         eventCRFIds.add(crfId);
-        boolean updateCRFs = sdvUtil.setSDVerified(eventCRFIds, false, (UserAccountBean) request.getSession().getAttribute("userBean"));
+        boolean updateCRFs = sdvUtil.setSDVerified(eventCRFIds, false);
 
         if (updateCRFs) {
             pageMessages.add("The application has unset SDV for the Event CRF.");
@@ -333,7 +332,7 @@ public class SDVController {
 
         List<Integer> studySubjectIds = new ArrayList<Integer>();
         studySubjectIds.add(studySubjectId);
-        boolean updateCRFs = sdvUtil.setSDVStatusForStudySubjects(studySubjectIds, true, (UserAccountBean) request.getSession().getAttribute("userBean"));
+        boolean updateCRFs = sdvUtil.setSDVStatusForStudySubjects(studySubjectIds, true);
 
         if (updateCRFs) {
             pageMessages.add("The Subject has been source data verified.");
@@ -356,7 +355,7 @@ public class SDVController {
         List<Integer> studySubjectIds = new ArrayList<Integer>();
 
         studySubjectIds.add(studySubjectId);
-        boolean updateCRFs = sdvUtil.setSDVStatusForStudySubjects(studySubjectIds, false, (UserAccountBean) request.getSession().getAttribute("userBean"));
+        boolean updateCRFs = sdvUtil.setSDVStatusForStudySubjects(studySubjectIds, false);
 
         if (updateCRFs) {
             pageMessages.add("The application has unset SDV for the Event CRF.");
@@ -398,7 +397,7 @@ public class SDVController {
 
         }
         List<Integer> studySubjectIds = sdvUtil.getListOfStudySubjectIds(parameterMap.keySet());
-        boolean updateCRFs = sdvUtil.setSDVStatusForStudySubjects(studySubjectIds, true, (UserAccountBean) request.getSession().getAttribute("userBean"));
+        boolean updateCRFs = sdvUtil.setSDVStatusForStudySubjects(studySubjectIds, true);
 
         if (updateCRFs) {
             pageMessages.add("The Event CRFs have been source data verified.");

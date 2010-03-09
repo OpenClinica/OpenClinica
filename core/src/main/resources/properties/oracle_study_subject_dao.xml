@@ -115,7 +115,7 @@
               FROM study_subject SS,STUDY ST, study_event SE,dn_item_data_map didm, discrepancy_note dn where
                 SS.study_id = ST.study_id AND
                 ss.study_subject_id = se.study_subject_id AND
-                (ST.study_id=5 or ST.parent_study_id= 5) AND
+                (ST.study_id=? or ST.parent_study_id= ?) AND
                 didm.study_subject_id =  ss.study_subject_id AND
                 didm.discrepancy_note_id = dn.discrepancy_note_id
         ]]></sql>
@@ -123,10 +123,12 @@
     <query>
         <name>getWithFilterAndSortListDiscNotes</name>
         <sql><![CDATA[
+                 SELECT * from (
+                    SELECT x.*, rownum as r from(select DISTINCT ss.*
                   FROM study_subject SS,STUDY ST, study_event SE,dn_item_data_map didm, discrepancy_note dn where
                 SS.study_id = ST.study_id AND
                 ss.study_subject_id = se.study_subject_id AND
-                (ST.study_id=5 or ST.parent_study_id= 5) AND
+                (ST.study_id=? or ST.parent_study_id= ?) AND
                 didm.study_subject_id =  ss.study_subject_id AND
                 didm.discrepancy_note_id = dn.discrepancy_note_id
         ]]></sql>

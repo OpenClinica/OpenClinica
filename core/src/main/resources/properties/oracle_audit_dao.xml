@@ -57,13 +57,14 @@
     <query>
         <name>findDeletedEventCRFsFromAuditEvent</name>
         <sql>
-            SELECT distinct (ale.event_crf_id), ale.study_event_id as study_event_id, crf.name as crf_name,
-            cv.name as crf_version_name, ua.user_name as user_name, ale.audit_date as audit_date
+            SELECT MAX(ale.study_event_id) as study_event_id, MAX(crf.name) as crf_name,
+            MAX(cv.name) as crf_version_name, MAX(ua.user_name) as user_name, MAX(ale.audit_date) as audit_date
             FROM audit_log_event ale JOIN user_account ua ON ale.user_id=ua.user_id
             JOIN audit_log_event_type alet ON ale.audit_log_event_type_id=alet.audit_log_event_type_id
             JOIN crf_version cv on ale.event_crf_version_id=cv.crf_version_id
             JOIN crf crf on cv.crf_id=crf.crf_id
             WHERE ale.audit_log_event_type_id=? AND ale.study_event_id=?
+            GROUP BY ale.event_crf_id
         </sql>
     </query>
     <query>
