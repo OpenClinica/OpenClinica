@@ -4,6 +4,7 @@ import org.akaza.openclinica.domain.AbstractMutableDomainObject;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
@@ -16,6 +17,7 @@ public class PropertyBean extends AbstractMutableDomainObject {
     String value;
     String reference;
 
+    @Column(name = "oc_oid")
     public String getOid() {
         return oid;
     }
