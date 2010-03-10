@@ -564,11 +564,11 @@ public class ItemFormMetadataDAO extends EntityDAO {
     public ItemFormMetadataBean findByItemIdAndCRFVersionId(int itemId, int crfVersionId) {
         this.setTypesExpected();
         // TODO note to come back here, tbh
-        this.setTypeExpected(27, TypeNames.STRING);// version name
+        this.setTypeExpected(28, TypeNames.STRING);// version name
         // add more here for display, tbh 082007
-        this.setTypeExpected(28, TypeNames.STRING);// group_label
-        this.setTypeExpected(29, TypeNames.INT);// repeat_max
-        this.setTypeExpected(30, TypeNames.STRING);// section_name
+        this.setTypeExpected(29, TypeNames.STRING);// group_label
+        this.setTypeExpected(30, TypeNames.INT);// repeat_max
+        this.setTypeExpected(31, TypeNames.STRING);// section_name
 
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(itemId));
