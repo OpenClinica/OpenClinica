@@ -13,9 +13,9 @@ import org.akaza.openclinica.dao.hibernate.AbstractDomainDao;
  */
 public interface MetadataServiceInterface {
 
-    public abstract boolean isShown(Object metadataBean);
+    public abstract boolean isShown(Object metadataBean, EventCRFBean eventCrfBean);
     
-    public abstract boolean hide(Object metadataBean, EventCRFBean eventCrfBean, AbstractDomainDao metadataDao);
+    public abstract boolean hide(Object metadataBean, EventCRFBean eventCrfBean);
     
-    public abstract boolean show(Object metadataBean);
+    public abstract boolean show(Object metadataBean, EventCRFBean eventCrfBean);
 }

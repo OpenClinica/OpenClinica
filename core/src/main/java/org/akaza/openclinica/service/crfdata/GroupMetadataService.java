@@ -7,20 +7,20 @@ import org.akaza.openclinica.dao.hibernate.AbstractDomainDao;
 
 public class GroupMetadataService implements MetadataServiceInterface {
 
-    public boolean hide(Object metadataBean, EventCRFBean eventCrfBean, AbstractDomainDao metadataDao) {
+    public boolean hide(Object metadataBean, EventCRFBean eventCrfBean) {
         ItemGroupMetadataBean itemGroupMetadataBean = (ItemGroupMetadataBean) metadataBean;
-        DynamicsItemGroupMetadataDao dynamicsMetadataDao = (DynamicsItemGroupMetadataDao) metadataDao;
+        // DynamicsItemGroupMetadataDao dynamicsMetadataDao = (DynamicsItemGroupMetadataDao) metadataDao;
         itemGroupMetadataBean.setShowGroup(false);
         
         return false;
     }
 
-    public boolean isShown(Object metadataBean) {
+    public boolean isShown(Object metadataBean, EventCRFBean eventCrfBean) {
         // TODO Auto-generated method stub
         return false;
     }
 
-    public boolean show(Object metadataBean) {
+    public boolean show(Object metadataBean, EventCRFBean eventCrfBean) {
         // TODO Auto-generated method stub
         return false;
     }
