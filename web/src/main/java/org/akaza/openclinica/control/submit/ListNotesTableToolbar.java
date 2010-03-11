@@ -8,8 +8,15 @@ import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.core.CoreContext;
 
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 public class ListNotesTableToolbar extends DefaultToolbar {
+
+    private String module;
+    private int resolutionStatus;
+    private int discNoteType;
+    private boolean studyHasDiscNotes;
+    private ResourceBundle resword;
 
     public ListNotesTableToolbar() {
         super();
@@ -19,9 +26,21 @@ public class ListNotesTableToolbar extends DefaultToolbar {
     protected void addToolbarItems() {
         addToolbarItem(ToolbarItemType.SEPARATOR);
         addToolbarItem(createCustomItem(new ShowMoreItem()));
+        if (this.studyHasDiscNotes) {
+            addToolbarItem(createDownloadLinkItem());
+        }
         addToolbarItem(ToolbarItemType.SEPARATOR);
         addToolbarItem(createBackToNotesMatrixListItem());    
 
+    }
+
+    public ToolbarItem createDownloadLinkItem() {
+        DownloadLinkItem item = new DownloadLinkItem();
+        item.setCode(ToolbarItemType.CLEAR_ITEM.toCode());
+        ToolbarItemRenderer renderer = new ClearItemRenderer(item, getCoreContext());
+        renderer.setOnInvokeAction("onInvokeAction");
+        item.setToolbarItemRenderer(renderer);
+        return item;
     }
 
     private ToolbarItem createCustomItem(AbstractItem item) {
@@ -110,4 +129,64 @@ public class ListNotesTableToolbar extends DefaultToolbar {
         }
     }
 
+    private class DownloadLinkItem extends AbstractItem {
+        @Override
+        public String disabled() {
+            return null;
+        }
+
+        @Override
+        public String enabled() {
+            HtmlBuilder html = new HtmlBuilder();
+            html.a().href(
+                    "javascript:openDocWindow('ChooseDownloadFormat?resolutionStatus=" + resolutionStatus + "&discNoteType=" + discNoteType + "&module="
+                        + module + "')");
+            html.quote();
+            html.append(getAction());
+            html.quote().close();
+            html.img().name("bt_View1").src("images/bt_Download.gif").border("0").alt(resword.getString("download_all_discrepancy_notes")).title(
+                    resword.getString("download_all_discrepancy_notes")).append("class=\"downloadAllDNotes\" width=\"24 \" height=\"15\"").end().aEnd();
+            return html.toString();
+        }
+    }
+
+    public String getModule() {
+        return module;
+    }
+
+    public void setModule(String module) {
+        this.module = module;
+    }
+
+    public int getResolutionStatus() {
+        return resolutionStatus;
+    }
+
+    public void setResolutionStatus(int resolutionStatus) {
+        this.resolutionStatus = resolutionStatus;
+    }
+
+    public int getDiscNoteType() {
+        return discNoteType;
+    }
+
+    public void setDiscNoteType(int discNoteType) {
+        this.discNoteType = discNoteType;
+    }
+
+    public boolean isStudyHasDiscNotes() {
+        return studyHasDiscNotes;
+    }
+
+    public void setStudyHasDiscNotes(boolean studyHasDiscNotes) {
+        this.studyHasDiscNotes = studyHasDiscNotes;
+    }
+
+    public ResourceBundle getResword() {
+        return resword;
+    }
+
+    public void setResword(ResourceBundle resword) {
+        this.resword = resword;
+    }
 }

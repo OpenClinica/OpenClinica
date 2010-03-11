@@ -41,6 +41,7 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.DiscrepancyNoteRow;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -59,6 +60,7 @@ public class ViewNotesServlet extends SecureController {
     public static final String TYPE = "discNoteType";
     public static final String WIN_LOCATION = "window_location";
     public static final String NOTES_TABLE = "notesTable";
+    public static final String DISCREPANCY_NOTE_TYPE = "discrepancyNoteType";
 
     /*
      * public static final Map<Integer,String> TYPES = new HashMap<Integer,String>();
@@ -74,6 +76,20 @@ public class ViewNotesServlet extends SecureController {
      */
     @Override
     protected void processRequest() throws Exception {
+        String module = request.getParameter("module");
+        String moduleStr = "manage";
+        if (module != null && module.trim().length() > 0) {
+            if ("submit".equals(module)) {
+                request.setAttribute("module", "submit");
+                moduleStr = "submit";
+            } else if ("admin".equals(module)) {
+                request.setAttribute("module", "admin");
+                moduleStr = "admin";
+            } else {
+                request.setAttribute("module", "manage");
+            }
+        }
+
         FormProcessor fp = new FormProcessor(request);
         int oneSubjectId = fp.getInt("id");
         // BWP 11/03/2008 3029: This session attribute in removed in
@@ -82,12 +98,16 @@ public class ViewNotesServlet extends SecureController {
         // >>
 
         int resolutionStatusSubj = fp.getInt(RESOLUTION_STATUS);
-        int discNoteType = fp.getInt(TYPE);
+        int discNoteType = 0;
+        try {
+            discNoteType = Integer.parseInt(request.getParameter("type"));
+        } catch (NumberFormatException nfe) {
+            // Show all DN's
+            discNoteType = -1;
+        }
+        request.setAttribute(DISCREPANCY_NOTE_TYPE, discNoteType);
 
         boolean removeSession = fp.getBoolean("removeSession");
-
-        String module = fp.getString("module");
-        request.setAttribute("module", module);
 
         // BWP 11/03/2008 3029: This session attribute in removed in
         // ResolveDiscrepancyServlet.mayProceed() >>
@@ -102,7 +122,13 @@ public class ViewNotesServlet extends SecureController {
         StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
         dndao.setFetchMapping(true);
 
-        String resolutionStatus = fp.getString(RESOLUTION_STATUS);
+        int resolutionStatus = 0;
+        try {
+            resolutionStatus = Integer.parseInt(request.getParameter("resolutionStatus"));
+        } catch (NumberFormatException nfe) {
+            // Show all DN's
+            resolutionStatus = -1;
+        }
 
         if (removeSession) {
             session.removeAttribute(WIN_LOCATION);
@@ -144,6 +170,11 @@ public class ViewNotesServlet extends SecureController {
         factory.setItemDao(itemDao);
         factory.setItemDataDao(itemDataDao);
         factory.setEventCRFDao(eventCRFDao);
+        factory.setModule(moduleStr);
+        factory.setDiscNoteType(discNoteType);
+        factory.setResolutionStatus(resolutionStatus);
+        //factory.setResolutionStatusIds(resolutionStatusIds);
+
 
         String viewNotesHtml = factory.createTable(request, response).render();
         request.setAttribute("viewNotesHtml", viewNotesHtml);

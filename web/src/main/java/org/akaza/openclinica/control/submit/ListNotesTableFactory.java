@@ -82,6 +82,11 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     private ResourceBundle resword;
     private ResourceBundle resformat;
     private ArrayList<DiscrepancyNoteBean> allNotes = new ArrayList<DiscrepancyNoteBean>();
+    private ArrayList<StudyEventDefinitionBean> studyEventDefinitions;
+    private String module;
+    private Integer resolutionStatus;
+    private Integer discNoteType;
+    private Boolean studyHasDiscNotes = new Boolean(false);
 
     @Override
     protected String getTableName() {
@@ -130,7 +135,16 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
     @Override
     public void configureTableFacadePostColumnConfiguration(TableFacade tableFacade) {
-        tableFacade.setToolbar(new ListNotesTableToolbar());
+        ListNotesTableToolbar toolbar = new ListNotesTableToolbar();
+        tableFacade.setToolbar(toolbar);
+        toolbar.setStudyHasDiscNotes(studyHasDiscNotes);
+        toolbar.setDiscNoteType(discNoteType);
+        toolbar.setResolutionStatus(resolutionStatus);
+        toolbar.setModule(module);
+        toolbar.setResword(resword);
+        tableFacade.setToolbar(toolbar);
+
+
     }
 
     @SuppressWarnings("unchecked")
@@ -187,9 +201,11 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             h.put("discrepancyNoteBean.owner", owner);
 
             theItems.add(h);
+            setStudyHasDiscNotes(true);
         }
 
         tableFacade.setItems(theItems);
+
     }
 
     private ArrayList<DiscrepancyNoteBean> populateRowsWithAttachedData(ArrayList noteRows) {
@@ -588,8 +604,39 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                 }
             }
 
+            StudySubjectBean studySubjectBean = (StudySubjectBean) ((HashMap<Object, Object>) item).get("studySubject");
+            Integer studySubjectId = studySubjectBean.getId();
+            if (studySubjectId != null) {
+                StringBuilder url = new StringBuilder();
+                url.append(downloadNotesLinkBuilder(studySubjectBean));
+                value = url.toString();
+            }
+
+
             return builder.toString();
         }
+    }
+
+    private String downloadNotesLinkBuilder(StudySubjectBean studySubject) {
+        HtmlBuilder actionLink = new HtmlBuilder();
+        if (this.isStudyHasDiscNotes()) {
+            if (this.getResolutionStatus() >= 1 && this.getResolutionStatus() <= 5) {
+                actionLink.a().href(
+                        "javascript:openDocWindow('ChooseDownloadFormat?subjectId=" + studySubject.getId() + "&discNoteType=" + discNoteType
+                            + "&resolutionStatus=" + resolutionStatus + "')");
+                actionLink.img().name("bt_View1").src("images/bt_Download.gif").border("0").alt(resword.getString("download_discrepancy_notes")).title(
+                        resword.getString("download_discrepancy_notes")).append("hspace=\"4\" width=\"24 \" height=\"15\"").end().aEnd();
+                actionLink.append("&nbsp;&nbsp;&nbsp;");
+            } else {
+                actionLink.a().href(
+                        "javascript:openDocWindow('ChooseDownloadFormat?subjectId=" + studySubject.getId() + "&discNoteType=" + discNoteType + "&module="
+                            + module + "')");
+                actionLink.img().name("bt_View1").src("images/bt_Download.gif").border("0").alt(resword.getString("download_discrepancy_notes")).title(
+                        resword.getString("download_discrepancy_notes")).append("hspace=\"2\" width=\"24 \" height=\"15\"").end().aEnd();
+                actionLink.append("&nbsp;&nbsp;&nbsp;");
+            }
+        }
+        return actionLink.toString();
     }
 
     private String updateSubjectLink(Integer subjectId) {
@@ -765,4 +812,37 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     public void setAllNotes(ArrayList<DiscrepancyNoteBean> allNotes) {
         this.allNotes = allNotes;
     }
+
+    public String getModule() {
+        return module;
+    }
+
+    public void setModule(String module) {
+        this.module = module;
+    }
+
+    public Integer getDiscNoteType() {
+        return discNoteType;
+    }
+
+    public void setDiscNoteType(Integer discNoteType) {
+        this.discNoteType = discNoteType;
+    }
+
+    public Boolean isStudyHasDiscNotes() {
+        return studyHasDiscNotes;
+    }
+
+    public void setStudyHasDiscNotes(Boolean studyHasDiscNotes) {
+        this.studyHasDiscNotes = studyHasDiscNotes;
+    }
+
+    public Integer getResolutionStatus() {
+        return resolutionStatus;
+    }
+
+    public void setResolutionStatus(Integer resolutionStatus) {
+        this.resolutionStatus = resolutionStatus;
+    }
+
 }
