@@ -58,6 +58,10 @@
 <div class="homebox_bullets"><a href="ViewSectionDataEntry?crfVersionId=<%=request.getAttribute("crfVersionId")%>&tabId=1"><fmt:message key="view_CRF_version_data_entry" bundle="${resword}"/></a></div>
 <p>
 <div class="homebox_bullets"><a href="pages/studymodule"><fmt:message key="go_back_build_study_page" bundle="${resword}"/></a></div>
+<p>
+<div class="homebox_bullets">
+    <a href="ViewCRFVersion?id=<%=request.getAttribute("crfVersionId")%>">CRF Version Metada</a>
+</div>
 <%--<c:forEach var="query" items="${queries}">
 <c:out value="${query}"/></br>
 <hr/>
