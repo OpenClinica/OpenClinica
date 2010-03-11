@@ -38,4 +38,10 @@ public class ShowActionBean extends RuleActionBean {
     public String getSummary() {
         return this.message;
     }
+
+    @Transient
+    public String[] getOIDsAsArray() {
+        String[] oids = getOIDs().split(",");
+        return oids;
+    }
 }

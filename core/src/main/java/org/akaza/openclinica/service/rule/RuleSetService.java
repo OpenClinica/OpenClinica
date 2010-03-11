@@ -40,6 +40,7 @@ import org.akaza.openclinica.logic.rulerunner.CrfBulkRuleRunner;
 import org.akaza.openclinica.logic.rulerunner.DataEntryRuleRunner;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.RuleSetBulkRuleRunner;
+import org.akaza.openclinica.service.crfdata.ItemMetadataService;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,6 +82,7 @@ public class RuleSetService implements RuleSetServiceInterface {
     private ExpressionService expressionService;
     private String requestURLMinusServletPath;
     private String contextPath;
+    private ItemMetadataService itemMetadataService;
 
     /* public RuleSetService(DataSource ds, String requestURLMinusServletPath, String contextPath) {
          this.dataSource = ds;
@@ -248,6 +250,7 @@ public class RuleSetService implements RuleSetServiceInterface {
     public HashMap<String, ArrayList<String>> runRulesInDataEntry(List<RuleSetBean> ruleSets, Boolean dryRun, StudyBean currentStudy, UserAccountBean ub,
             HashMap<String, String> variableAndValue) {
         DataEntryRuleRunner ruleRunner = new DataEntryRuleRunner(dataSource, requestURLMinusServletPath, contextPath, mailSender);
+        ruleRunner.setItemMetadataService(itemMetadataService);
         // TODO: KK return the new object && Pass in the Execution Mode
         ExecutionMode executionMode = dryRun == true ? ExecutionMode.DRY_RUN : ExecutionMode.SAVE;
         ruleRunner.runRules(ruleSets, executionMode, currentStudy, variableAndValue, ub);
@@ -737,6 +740,14 @@ public class RuleSetService implements RuleSetServiceInterface {
 
     public void setMailSender(JavaMailSenderImpl mailSender) {
         this.mailSender = mailSender;
+    }
+
+    public ItemMetadataService getItemMetadataService() {
+        return itemMetadataService;
+    }
+
+    public void setItemMetadataService(ItemMetadataService itemMetadataService) {
+        this.itemMetadataService = itemMetadataService;
     }
 
 }

@@ -1,10 +1,8 @@
 package org.akaza.openclinica.domain.crfdata;
 
-import org.akaza.openclinica.domain.AbstractMutableDomainObject;
-import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
-import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-
+import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import org.akaza.openclinica.domain.AbstractMutableDomainObject;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
@@ -17,20 +15,20 @@ import javax.persistence.Table;
  *
  */
 @Entity
-@Table(name = "dynamics_item_form_metadata")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "dynamics_item_form_metadata_id_seq") })
+@Table(name = "dyn_item_form_metadata")
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "dyn_item_form_metadata_id_seq") })
 public class DynamicsItemFormMetadataBean extends AbstractMutableDomainObject {
-    
+
     boolean showItem;
     int eventCrfId;
     int itemId;
     int itemFormMetadataId;
     int crfVersionId;
-    
+
     public DynamicsItemFormMetadataBean() {
-        
+
     }
-    
+
     public DynamicsItemFormMetadataBean(ItemFormMetadataBean metadataBean, EventCRFBean eventCRFBean) {
         setItemId(metadataBean.getItemId());
         setItemFormMetadataId(metadataBean.getId());

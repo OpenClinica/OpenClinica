@@ -399,6 +399,15 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-plugin</artifactId>
+                <version>1.9.1.0</version>
+                <configuration>
+                    <!--<propertyFile>src/main/resources/datainfo.properties</propertyFile>-->
+                    <propertyFile>${config.file}</propertyFile>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>

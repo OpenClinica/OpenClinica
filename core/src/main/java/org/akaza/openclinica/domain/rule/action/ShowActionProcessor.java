@@ -4,14 +4,17 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.RuleRunner.RuleRunnerMode;
+import org.akaza.openclinica.service.crfdata.ItemMetadataService;
 
 import javax.sql.DataSource;
 
 public class ShowActionProcessor implements ActionProcessor {
 
     DataSource ds;
+    ItemMetadataService itemMetadataService;
 
-    public ShowActionProcessor(DataSource ds) {
+    public ShowActionProcessor(DataSource ds, ItemMetadataService itemMetadataService) {
+        this.itemMetadataService = itemMetadataService;
         this.ds = ds;
     }
 
@@ -39,17 +42,21 @@ public class ShowActionProcessor implements ActionProcessor {
     }
 
     private RuleActionBean save(RuleActionBean ruleAction, int itemDataBeanId, String itemData, StudyBean currentStudy, UserAccountBean ub) {
-        //
+        getItemMetadataService().show(itemDataBeanId, ((ShowActionBean) ruleAction).getOIDsAsArray());
         return null;
     }
 
     private RuleActionBean saveAndReturnMessage(RuleActionBean ruleAction, int itemDataBeanId, String itemData, StudyBean currentStudy, UserAccountBean ub) {
-        //
+        getItemMetadataService().show(itemDataBeanId, ((ShowActionBean) ruleAction).getOIDsAsArray());
         return ruleAction;
     }
 
     private RuleActionBean dryRun(RuleActionBean ruleAction, int itemDataBeanId, String itemData, StudyBean currentStudy, UserAccountBean ub) {
         return ruleAction;
+    }
+
+    private ItemMetadataService getItemMetadataService() {
+        return itemMetadataService;
     }
 
 }

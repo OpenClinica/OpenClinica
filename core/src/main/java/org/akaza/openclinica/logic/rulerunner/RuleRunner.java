@@ -27,6 +27,7 @@ import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.crfdata.ItemMetadataService;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +57,7 @@ public class RuleRunner {
     private SectionDAO sectionDao;
     private final JavaMailSenderImpl mailSender;
     protected RuleRunnerMode ruleRunnerMode;
+    protected ItemMetadataService itemMetadataService;
     DataSource ds;
 
     String requestURLMinusServletPath;
@@ -243,6 +245,14 @@ public class RuleRunner {
 
     public JavaMailSenderImpl getMailSender() {
         return mailSender;
+    }
+
+    public ItemMetadataService getItemMetadataService() {
+        return itemMetadataService;
+    }
+
+    public void setItemMetadataService(ItemMetadataService itemMetadataService) {
+        this.itemMetadataService = itemMetadataService;
     }
 
 }
