@@ -327,7 +327,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 </c:if>
 <c:set var="repeatCount" value="1"/>
 <c:forEach var="displayItem" items="${section.displayItemGroups}" varStatus="itemStatus">
-
+<c:if test="${displayItem.itemGroup.groupMetaBean.showGroup}">
 <c:if test="${displayItemNum ==0}">
     <!-- always show the button and page above the first item-->
     <!-- to handle the case of no pageNumLabel for all the items-->
@@ -443,6 +443,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
         <%-- if there are horizontal checkboxes or radios anywhere in the group...--%>
     <c:set var="isHorizontal" scope="request" value="${false}"/>
     <c:forEach var="thItem" items="${displayItem.itemGroup.items}">
+    <c:if test="${thItem.metadata.showItem}">
         <c:set var="questionNumber" value="${thItem.metadata.questionNumberLabel}"/>
         <%-- We have to add a second row of headers if the response_layout property is
      horizontal for checkboxes. --%>
@@ -493,6 +494,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
             </c:otherwise>
         </c:choose>
         </th>
+        </c:if>
     </c:forEach>
     <c:choose>
         <c:when test="${sectionBorders == 1}">
@@ -508,6 +510,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
     <%-- create another row --%>
     <tr>
         <c:forEach var="thItem" items="${displayItem.itemGroup.items}">
+        <c:if test="${thItem.metadata.showItem}">
             <c:set var="isHorizontalCellLevel" scope="request" value="${false}"/>
             <c:if test="${thItem.metadata.responseLayout eq 'horizontal' ||
       thItem.metadata.responseLayout eq 'Horizontal'}">
@@ -537,6 +540,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                     <th class="aka_headerBackground aka_padding_large aka_cellBorders"/>
                 </c:otherwise>
             </c:choose>
+            </c:if>
         </c:forEach>
         <th />
     </tr>
@@ -556,6 +560,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
     <input type="hidden" name="<c:out value="${repeatParentId}"/>_[<c:out value="${repeatParentId}"/>].existing" value="<c:out value="${uniqueId+1}"/>">
 
     <c:forEach var="bodyItem" items="${bodyItemGroup.items}">
+    <c:if test="${bodyItem.metadata.showItem}">
         <c:set var="itemNum" value="${itemNum + 1}" />
         <c:set var="isHorizontalCellLevel" scope="request" value="${false}"/>
         <c:if test="${bodyItem.metadata.responseLayout eq 'horizontal' ||
@@ -679,6 +684,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
             </c:otherwise>
         </c:choose>
         <c:set var="columnNum" value="${columnNum+1}"/>
+        </c:if>
     </c:forEach>
     <c:choose>
         <c:when test="${sectionBorders == 1}">
@@ -703,6 +709,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 <tr repeat="0">
 <c:set var="columnNum"  value="1"/>
 <c:forEach var="bodyItem" items="${bodyItemGroup.items}">
+<c:if test="${bodyItem.metadata.showItem}">
     <c:set var="itemNum" value="${itemNum + 1}" />
     <c:set var="isHorizontalCellLevel" scope="request" value="${false}"/>
     <c:if test="${bodyItem.metadata.responseLayout eq 'horizontal' ||
@@ -827,6 +834,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
         </c:otherwise>
     </c:choose>
     <c:set var="columnNum" value="${columnNum+1}"/>
+    </c:if>
 </c:forEach>
 <c:choose>
     <c:when test="${sectionBorders == 1}">
@@ -1005,7 +1013,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
             <table border="0">
                 <c:set var="notFirstRow" value="${0}" />
                 <c:forEach var="childItem" items="${displayItem.singleItem.children}">
-
+				<c:if test="${childItem.metadata.showItem}">
 
                 <c:set var="currColumn" value="${childItem.metadata.columnNumber}" />
                 <c:if test="${currColumn == 1}">
@@ -1074,6 +1082,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                             </tr>
                         </table>
                     </td>
+                    </c:if>
                     </c:forEach>
                 </tr>
             </table>
@@ -1087,7 +1096,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 
 <c:set var="displayItemNum" value="${displayItemNum + 1}" />
 <c:set var="itemNum" value="${itemNum + 1}" />
-
+</c:if>
 </c:forEach>
 </table>
 
