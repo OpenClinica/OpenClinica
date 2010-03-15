@@ -6,7 +6,15 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 
 <jsp:include page="../include/extract-refresh-header.jsp"/>
-
+<script type="text/javascript">
+    var openDataExtractLink = true;
+    function openDoc(inURL) {
+        if(openDataExtractLink){
+            openDataExtractLink = false;
+            openDocWindow(inURL);
+        }
+    }
+</script>
 
 <!-- move the alert message to the sidebar-->
 <jsp:include page="../include/sideAlert.jsp"/>
@@ -71,16 +79,16 @@
 	<ul><li><a href="ExportDataset?action=html&datasetId=<c:out value="${dataset.id}"/>"><fmt:message key="view_as_HTML" bundle="${resword}"/></a></li>
 	<li><fmt:message key="download_a_file" bundle="${resword}"/>:
 		<ul>
-		<li><a href="javascript:openDocWindow('ExportDataset?action=txt&datasetId=<c:out value="${dataset.id}"/>')"><fmt:message key="tab_delimited_text" bundle="${resword}"/></a></li>
+		<li><a href="javascript:openDoc('ExportDataset?action=txt&datasetId=<c:out value="${dataset.id}"/>')"><fmt:message key="tab_delimited_text" bundle="${resword}"/></a></li>
 		<%--<li><a href="javascript:openDocWindow('ExportDataset?action=csv&datasetId=<c:out value="${dataset.id}"/>')"><fmt:message key="comma_delimited_text" bundle="${resword}"/></a></li>--%>
-		<li><a href="javascript:openDocWindow('ExportDataset?action=spss&datasetId=<c:out value="${dataset.id}"/>')"><fmt:message key="SPSS_syntax_and_data" bundle="${resword}"/></a>&nbsp;<a href="javascript:openDocWindow('help/4_4_spssSpec_Help.html')"><img src="images/bt_Help_Extract.gif" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>" border="0"></a></li>
-		<li><a href="javascript:openDocWindow('ExportDataset?action=odm&datasetId=<c:out value="${dataset.id}"/>&odmVersion=1.3')"><fmt:message key="CDISC_ODM_XML_format" bundle="${resword}"/>&nbsp;1.3</a></li>
-		<li><a href="javascript:openDocWindow('ExportDataset?action=odm&datasetId=<c:out value="${dataset.id}"/>&odmVersion=1.2')"><fmt:message key="CDISC_ODM_XML_format" bundle="${resword}"/>&nbsp;1.2</a></li>
-			<ul><li><fmt:message key="import_CDISC_ODM_XML_into_SAS" bundle="${resword}"/>&nbsp;<a href="javascript:openDocWindow('help/4_5_sasSpec_Help.html')"><img src="images/bt_Help_Extract.gif" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>" border="0"></a></li></ul></li>
+		<li><a href="javascript:openDoc('ExportDataset?action=spss&datasetId=<c:out value="${dataset.id}"/>')"><fmt:message key="SPSS_syntax_and_data" bundle="${resword}"/></a>&nbsp;<a href="javascript:openDocWindow('help/4_4_spssSpec_Help.html')"><img src="images/bt_Help_Extract.gif" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>" border="0"></a></li>
+		<li><a href="javascript:openDoc('ExportDataset?action=odm&datasetId=<c:out value="${dataset.id}"/>&odmVersion=1.3')"><fmt:message key="CDISC_ODM_XML_format" bundle="${resword}"/>&nbsp;1.3</a></li>
+		<li><a href="javascript:openDoc('ExportDataset?action=odm&datasetId=<c:out value="${dataset.id}"/>&odmVersion=1.2')"><fmt:message key="CDISC_ODM_XML_format" bundle="${resword}"/>&nbsp;1.2</a></li>
+			<ul><li><fmt:message key="import_CDISC_ODM_XML_into_SAS" bundle="${resword}"/>&nbsp;<a href="javascript:openDoc('help/4_5_sasSpec_Help.html')"><img src="images/bt_Help_Extract.gif" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>" border="0"></a></li></ul></li>
 		<li><fmt:message key="odm_openclinica_extension" bundle="${resword}"/></li>
 			<ul>
-			<li><a href="javascript:openDocWindow('ExportDataset?action=odm&datasetId=<c:out value="${dataset.id}"/>&odmVersion=oc1.3')">OpenClinica-Extension-1.3</a></li>
-			<li><a href="javascript:openDocWindow('ExportDataset?action=odm&datasetId=<c:out value="${dataset.id}"/>&odmVersion=oc1.2')">OpenClinica-Extension-1.2</a></li>
+			<li><a href="javascript:openDoc('ExportDataset?action=odm&datasetId=<c:out value="${dataset.id}"/>&odmVersion=oc1.3')">OpenClinica-Extension-1.3</a></li>
+			<li><a href="javascript:openDoc('ExportDataset?action=odm&datasetId=<c:out value="${dataset.id}"/>&odmVersion=oc1.2')">OpenClinica-Extension-1.2</a></li>
 			</ul
 		</ul>
 	</li>
