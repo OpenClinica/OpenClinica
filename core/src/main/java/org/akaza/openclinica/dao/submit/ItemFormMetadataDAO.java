@@ -147,8 +147,9 @@ public class ItemFormMetadataDAO extends EntityDAO {
         answer.setDefaultValue(getStringFromRow(hm, "default_value"));
         answer.setResponseLayout(getStringFromRow(hm, "response_layout"));
         answer.setWidthDecimal(getStringFromRow(hm, "width_decimal"));
-        answer.setShowItem(((Boolean) hm.get("show_item")).booleanValue());
-
+        // answer.setShowItem(((Boolean) hm.get("show_item")).booleanValue());
+        answer.setShowItem(getBooleanFromRow(hm, "show_item"));
+        // System.out.println("found show item: " + getBooleanFromRow(hm, "show_item"));
         // now get the response set
         ResponseSetBean rsb = new ResponseSetBean();
 

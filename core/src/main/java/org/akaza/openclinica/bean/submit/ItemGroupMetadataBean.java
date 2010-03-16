@@ -34,7 +34,7 @@ public class ItemGroupMetadataBean extends EntityBean implements Comparable {
         rowStartNumber = 0;
         ordinal = 0;
         borders = 1;
-        showGroup = false;
+        showGroup = true;
     }
 
     /**

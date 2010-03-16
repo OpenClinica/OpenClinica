@@ -78,7 +78,7 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
         regexpErrorMsg = "";
         ordinal = 0;
         required = false;
-        showItem = false;
+        showItem = true;
         defaultValue = "";
         responseSet = new ResponseSetBean();
     }
