@@ -31,6 +31,25 @@ public class MessageContainer {
         }
     }
 
+    public HashMap<String, ArrayList<String>> getByMessageType(MessageType messageType) {
+        HashMap<String, ArrayList<String>> h = new HashMap<String, ArrayList<String>>();
+        for (String key : groupOrdinalPLusItemOid2.keySet()) {
+            ArrayList<TheContainer> container = groupOrdinalPLusItemOid2.get(key);
+            for (TheContainer theContainer : container) {
+                if (theContainer.getType().equals(messageType)) {
+                    if (h.get(key) != null) {
+                        h.get(key).add(theContainer.getMessage());
+                    } else {
+                        ArrayList<String> a = new ArrayList<String>();
+                        a.add(theContainer.getMessage());
+                        h.put(key, a);
+                    }
+                }
+            }
+        }
+        return h;
+    }
+
     public enum MessageType {
         ERROR, WARNING
     }

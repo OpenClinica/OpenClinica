@@ -39,8 +39,9 @@ import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.logic.rulerunner.CrfBulkRuleRunner;
 import org.akaza.openclinica.logic.rulerunner.DataEntryRuleRunner;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
+import org.akaza.openclinica.logic.rulerunner.MessageContainer;
 import org.akaza.openclinica.logic.rulerunner.RuleSetBulkRuleRunner;
-import org.akaza.openclinica.service.crfdata.ItemMetadataService;
+import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +83,7 @@ public class RuleSetService implements RuleSetServiceInterface {
     private ExpressionService expressionService;
     private String requestURLMinusServletPath;
     private String contextPath;
-    private ItemMetadataService itemMetadataService;
+    private DynamicsMetadataService dynamicsMetadataService;
 
     /* public RuleSetService(DataSource ds, String requestURLMinusServletPath, String contextPath) {
          this.dataSource = ds;
@@ -247,14 +248,14 @@ public class RuleSetService implements RuleSetServiceInterface {
     /* (non-Javadoc)
      * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#runRulesInDataEntry(java.util.List, java.lang.Boolean, org.akaza.openclinica.bean.managestudy.StudyBean, org.akaza.openclinica.bean.login.UserAccountBean, java.util.HashMap)
      */
-    public HashMap<String, ArrayList<String>> runRulesInDataEntry(List<RuleSetBean> ruleSets, Boolean dryRun, StudyBean currentStudy, UserAccountBean ub,
+    public MessageContainer runRulesInDataEntry(List<RuleSetBean> ruleSets, Boolean dryRun, StudyBean currentStudy, UserAccountBean ub,
             HashMap<String, String> variableAndValue) {
         DataEntryRuleRunner ruleRunner = new DataEntryRuleRunner(dataSource, requestURLMinusServletPath, contextPath, mailSender);
-        ruleRunner.setItemMetadataService(itemMetadataService);
+        ruleRunner.setDynamicsMetadataService(dynamicsMetadataService);
         // TODO: KK return the new object && Pass in the Execution Mode
         ExecutionMode executionMode = dryRun == true ? ExecutionMode.DRY_RUN : ExecutionMode.SAVE;
-        ruleRunner.runRules(ruleSets, executionMode, currentStudy, variableAndValue, ub);
-        return new HashMap<String, ArrayList<String>>();
+        return ruleRunner.runRules(ruleSets, executionMode, currentStudy, variableAndValue, ub);
+        //return new HashMap<String, ArrayList<String>>();
         // return runRules(ruleSets, dryRun, currentStudy, c.variableAndValue, ub);
     }
 
@@ -742,12 +743,12 @@ public class RuleSetService implements RuleSetServiceInterface {
         this.mailSender = mailSender;
     }
 
-    public ItemMetadataService getItemMetadataService() {
-        return itemMetadataService;
+    public DynamicsMetadataService getDynamicsMetadataService() {
+        return dynamicsMetadataService;
     }
 
-    public void setItemMetadataService(ItemMetadataService itemMetadataService) {
-        this.itemMetadataService = itemMetadataService;
+    public void setDynamicsMetadataService(DynamicsMetadataService dynamicsMetadataService) {
+        this.dynamicsMetadataService = dynamicsMetadataService;
     }
 
 }

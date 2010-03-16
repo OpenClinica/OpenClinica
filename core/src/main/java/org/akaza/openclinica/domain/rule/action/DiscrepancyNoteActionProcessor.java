@@ -21,11 +21,11 @@ public class DiscrepancyNoteActionProcessor implements ActionProcessor {
             StudyBean currentStudy, UserAccountBean ub, Object... arguments) {
         switch (executionMode) {
         case DRY_RUN: {
-            dryRun(ruleAction, itemDataBeanId, itemData, currentStudy, ub);
+            return dryRun(ruleAction, itemDataBeanId, itemData, currentStudy, ub);
         }
 
         case SAVE: {
-            save(ruleAction, itemDataBeanId, itemData, currentStudy, ub);
+            return save(ruleAction, itemDataBeanId, itemData, currentStudy, ub);
         }
         default:
             return null;

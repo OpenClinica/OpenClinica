@@ -15,7 +15,7 @@
     <!--  Service layer supports legacy DAOs via constructor injection of dataSource 
           and Hibernate DAO injection via autowiring -->
           
-    <bean id="itemMetadataService" class="org.akaza.openclinica.service.crfdata.ItemMetadataService" autowire="byName">
+    <bean id="dynamicsMetadataService" class="org.akaza.openclinica.service.crfdata.DynamicsMetadataService" autowire="byName">
         <constructor-arg ref="dataSource"/>
     </bean>      
     <bean id="ruleSetService" class="org.akaza.openclinica.service.rule.RuleSetService" autowire="byName">

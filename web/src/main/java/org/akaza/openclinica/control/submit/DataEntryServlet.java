@@ -7,18 +7,6 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
@@ -82,6 +70,7 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.logic.expressionTree.ExpressionTreeHelper;
+import org.akaza.openclinica.logic.rulerunner.MessageContainer.MessageType;
 import org.akaza.openclinica.logic.score.ScoreCalculator;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
@@ -93,6 +82,18 @@ import org.akaza.openclinica.view.form.FormBeanUtil;
 import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * @author ssachs
@@ -405,7 +406,8 @@ public abstract class DataEntryServlet extends SecureController {
             } else {
                 if (!fp.getString("exitTo").equals("")) {
                     response.sendRedirect(response.encodeRedirectURL(fp.getString("exitTo")));
-                }else response.sendRedirect(response.encodeRedirectURL("ListStudySubjects"));
+                } else
+                    response.sendRedirect(response.encodeRedirectURL("ListStudySubjects"));
             }
             // forwardPage(Page.SUBMIT_DATA_SERVLET);
             return;
@@ -524,10 +526,10 @@ public abstract class DataEntryServlet extends SecureController {
             session.setAttribute("rulesErrors", null);
 
             discNotes = new FormDiscrepancyNotes();
-//            discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
-//            if (discNotes == null) {
-//                discNotes = new FormDiscrepancyNotes();
-//            }
+            //            discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
+            //            if (discNotes == null) {
+            //                discNotes = new FormDiscrepancyNotes();
+            //            }
             // << tbh 01/2010
             section = populateNotesWithDBNoteCounts(discNotes, section);
             logger.debug("+++ just ran populateNotes, printing field notes: " + discNotes.getFieldNotes().toString());
@@ -1192,19 +1194,19 @@ public abstract class DataEntryServlet extends SecureController {
                     String fieldName = iter2.next().toString();
                     logger.debug("found error " + fieldName);
                 }
-//                for (int i = 0; i < allItems.size(); i++) {
-//                    DisplayItemWithGroupBean diwb = allItems.get(i);
-//
-//                    if (diwb.isInGroup()) {
-//                        List<DisplayItemGroupBean> dgbs = diwb.getItemGroups();
-//                        logger.debug("found manual rows " + getManualRows(dgbs) + " and total rows " + dgbs.size() + " from ordinal " + diwb.getOrdinal());
-//                    }
-//                }
-                
+                //                for (int i = 0; i < allItems.size(); i++) {
+                //                    DisplayItemWithGroupBean diwb = allItems.get(i);
+                //
+                //                    if (diwb.isInGroup()) {
+                //                        List<DisplayItemGroupBean> dgbs = diwb.getItemGroups();
+                //                        logger.debug("found manual rows " + getManualRows(dgbs) + " and total rows " + dgbs.size() + " from ordinal " + diwb.getOrdinal());
+                //                    }
+                //                }
+
                 errors = reshuffleErrorGroupNames(errors, allItems);
                 // reset manual rows, so that we can catch errors correctly
                 // but it needs to be set per block of repeating items?  what if there are two or more?
-                
+
                 int manualRows = 0; // getManualRows(formGroups);
                 for (int i = 0; i < allItems.size(); i++) {
                     DisplayItemWithGroupBean diwb = allItems.get(i);
@@ -1221,7 +1223,7 @@ public abstract class DataEntryServlet extends SecureController {
                     System.out.println("found error after shuffle " + fieldName);
                 }
                 // << tbh, 02/2010
-                
+
                 // YW >>
                 request.setAttribute(BEAN_DISPLAY, section);
                 request.setAttribute(BEAN_ANNOTATIONS, fp.getString(INPUT_ANNOTATIONS));
@@ -1339,7 +1341,7 @@ public abstract class DataEntryServlet extends SecureController {
                                 String fileName = this.addAttachedFilePath(displayItem, attachedFilePath);
                                 displayItem.setEditFlag(displayGroup.getEditFlag());
                                 logger.debug("group item value: " + displayItem.getData().getValue());
-                                if("add".equalsIgnoreCase(displayItem.getEditFlag()) && fileName.length()>0 && !newUploadedFiles.containsKey(fileName)) {
+                                if ("add".equalsIgnoreCase(displayItem.getEditFlag()) && fileName.length() > 0 && !newUploadedFiles.containsKey(fileName)) {
                                     displayItem.getData().setValue("");
                                 }
                                 temp = writeToDB(displayItem, iddao, nextOrdinal);
@@ -1360,7 +1362,7 @@ public abstract class DataEntryServlet extends SecureController {
                                 if (j == dgbs.size() - 1) {
                                     // LAST ONE
                                     logger.info("last one");
-                                    
+
                                     int ordinal = j - this.getManualRows(dgbs);
                                     inputName = getGroupItemInputName(displayGroup, ordinal, displayItem);
                                 }
@@ -1379,7 +1381,7 @@ public abstract class DataEntryServlet extends SecureController {
                                     String fileName = this.addAttachedFilePath(displayItem, attachedFilePath);
                                     displayItem.setEditFlag(displayGroup.getEditFlag());
                                     logger.debug("group item value: " + displayItem.getData().getValue());
-                                    if("add".equalsIgnoreCase(displayItem.getEditFlag()) && fileName.length()>0 && !newUploadedFiles.containsKey(fileName)) {
+                                    if ("add".equalsIgnoreCase(displayItem.getEditFlag()) && fileName.length() > 0 && !newUploadedFiles.containsKey(fileName)) {
                                         displayItem.getData().setValue("");
                                     }
                                     temp = writeToDB(displayItem, iddao, 0);
@@ -2699,19 +2701,18 @@ public abstract class DataEntryServlet extends SecureController {
             // TODO use the setData command here to make sure we get a value?
             //On Submition of the Admin Editing form the loadDBValue does not required
             //
-            if(ecb.getStage() == DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE
-                    || ecb.getStage() == DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE){
+            if (ecb.getStage() == DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE || ecb.getStage() == DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) {
                 if (shouldLoadDBValues(dib) && !isSubmitted) {
                     dib.loadDBValue();
                 }
-            }else{
+            } else {
                 if (shouldLoadDBValues(dib)) {
                     logger.info("should load db values is true, set value");
                     dib.loadDBValue();
                     logger.info("just got data loaded: " + dib.getData().getValue());
                 }
             }
-            
+
             displayItems.set(i, dib);
         }
 
@@ -2989,16 +2990,16 @@ public abstract class DataEntryServlet extends SecureController {
                         discNotes.setNumExistingFieldNotes(inputName, numNotes);
                         ArrayList notes = discNotes.getNotes(inputName);
                         // we need to also set the notes for the manual input name, tbh 01/2010
-//                        String inputName2 = this.getGroupItemManualInputName(displayGroup, i, dib);
-//                        logger.info("inputName 2: " + inputName2);
-//                        ArrayList notes2 = discNotes.getNotes(inputName2);
-//                        discNotes.setNumExistingFieldNotes(inputName2, numNotes);
-//                        if (numNotes > 0) {
-//                            logger.debug("itemDataId:" + itemDataId);
-//                            logger.debug("numNotes:" + numNotes);
-//                            logger.debug("inputName: " + inputName);
-//                            logger.debug("inputName 2: " + inputName2);
-//                        }
+                        //                        String inputName2 = this.getGroupItemManualInputName(displayGroup, i, dib);
+                        //                        logger.info("inputName 2: " + inputName2);
+                        //                        ArrayList notes2 = discNotes.getNotes(inputName2);
+                        //                        discNotes.setNumExistingFieldNotes(inputName2, numNotes);
+                        //                        if (numNotes > 0) {
+                        //                            logger.debug("itemDataId:" + itemDataId);
+                        //                            logger.debug("numNotes:" + numNotes);
+                        //                            logger.debug("inputName: " + inputName);
+                        //                            logger.debug("inputName 2: " + inputName2);
+                        //                        }
                         dib.setNumDiscrepancyNotes(numNotes + notes.size());// + notes2.size());
                         logger.debug("dib note size:" + dib.getNumDiscrepancyNotes() + " " + dib.getData().getId() + " " + inputName);
                         items.set(j, dib);
@@ -3951,7 +3952,7 @@ public abstract class DataEntryServlet extends SecureController {
             ruleSets = getRuleSetService().solidifyGroupOrdinalsUsingFormProperties(ruleSets, c.grouped);
             // return getRuleSetService().runRules(ruleSets, dryRun,
             // currentStudy, c.variableAndValue, ub);
-            return getRuleSetService().runRulesInDataEntry(ruleSets, dryRun, currentStudy, ub, c.variableAndValue);
+            return getRuleSetService().runRulesInDataEntry(ruleSets, dryRun, currentStudy, ub, c.variableAndValue).getByMessageType(MessageType.ERROR);
         } else {
             return new HashMap<String, ArrayList<String>>();
         }
@@ -4044,7 +4045,7 @@ public abstract class DataEntryServlet extends SecureController {
         }
         return manualRows;
     }
-    
+
     private HashMap reshuffleErrorGroupNames(HashMap errors, List<DisplayItemWithGroupBean> allItems) {
         for (int i = 0; i < allItems.size(); i++) {
             DisplayItemWithGroupBean diwb = allItems.get(i);
@@ -4053,15 +4054,13 @@ public abstract class DataEntryServlet extends SecureController {
                 List<DisplayItemGroupBean> dgbs = diwb.getItemGroups();
                 int manualRows = getManualRows(dgbs);
                 int totalRows = dgbs.size();
-                logger.debug("found manual rows " + manualRows + 
-                        " and total rows " + totalRows + " from ordinal " + 
-                        diwb.getOrdinal());
+                logger.debug("found manual rows " + manualRows + " and total rows " + totalRows + " from ordinal " + diwb.getOrdinal());
                 for (DisplayItemGroupBean digb : dgbs) {
                     ItemGroupBean igb = digb.getItemGroupBean();
                     List<DisplayItemBean> dibs = digb.getItems();
                     int placeHolder = 1;
                     while ((totalRows - manualRows) > 2) {
-                        
+
                         for (DisplayItemBean dib : dibs) {
                             // needs to be 2, 3, 4 ... in the place of 4, 3, 2...
                             String intendedKey = getGroupItemInputName(digb, placeHolder, dib);
@@ -4070,8 +4069,7 @@ public abstract class DataEntryServlet extends SecureController {
                                 // String errorMessage = (String)errors.get(intendedKey);
                                 errors.put(replacementKey, errors.get(intendedKey));
                                 errors.remove(intendedKey);
-                                logger.debug("removing: " + intendedKey + 
-                                        " and replacing it with " + replacementKey);
+                                logger.debug("removing: " + intendedKey + " and replacing it with " + replacementKey);
                             }
                         }
                         placeHolder++;
@@ -4082,11 +4080,10 @@ public abstract class DataEntryServlet extends SecureController {
                         String lastIntendedKey = getGroupItemInputName(digb, placeHolder, dib);
                         String lastReplacementKey = getGroupItemInputName(digb, 1, dib);
                         if (!lastIntendedKey.equals(lastReplacementKey) && errors.containsKey(lastIntendedKey)) {
-                         // String errorMessage = (String)errors.get(intendedKey);
+                            // String errorMessage = (String)errors.get(intendedKey);
                             errors.put(lastReplacementKey, errors.get(lastIntendedKey));
                             errors.remove(lastIntendedKey);
-                            logger.debug("removing: " + lastIntendedKey + 
-                                    " and replacing it with " + lastReplacementKey);
+                            logger.debug("removing: " + lastIntendedKey + " and replacing it with " + lastReplacementKey);
                         }
                     }
                 }

@@ -1,7 +1,8 @@
 package org.akaza.openclinica.service.crfdata;
 
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.dao.hibernate.AbstractDomainDao;
+import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 
 /**
  * MetadataServiceInterface, our abstract interface for Dynamics
@@ -14,8 +15,10 @@ import org.akaza.openclinica.dao.hibernate.AbstractDomainDao;
 public interface MetadataServiceInterface {
 
     public abstract boolean isShown(Object metadataBean, EventCRFBean eventCrfBean);
-    
+
     public abstract boolean hide(Object metadataBean, EventCRFBean eventCrfBean);
-    
-    public abstract boolean show(Object metadataBean, EventCRFBean eventCrfBean);
+
+    public abstract boolean showItem(ItemFormMetadataBean metadataBean, EventCRFBean eventCrfBean);
+
+    public abstract boolean showGroup(ItemGroupMetadataBean metadataBean, EventCRFBean eventCrfBean);
 }

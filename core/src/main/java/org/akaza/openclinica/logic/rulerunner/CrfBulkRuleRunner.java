@@ -131,7 +131,7 @@ public class CrfBulkRuleRunner extends RuleRunner {
                                 ruleAction.setCuratedMessage(curateMessage(ruleAction, ruleSetRule));
                                 // getDiscrepancyNoteService().saveFieldNotes(ruleAction.getSummary(), itemDataBeanId, "ItemData", currentStudy, ub);
                                 ActionProcessor ap =
-                                    ActionProcessorFacade.getActionProcessor(ruleAction.getActionType(), ds, getMailSender(), itemMetadataService);
+                                    ActionProcessorFacade.getActionProcessor(ruleAction.getActionType(), ds, getMailSender(), dynamicsMetadataService);
                                 ap.execute(null, ExecutionMode.SAVE, ruleAction, itemDataBeanId, DiscrepancyNoteBean.ITEM_DATA, currentStudy, ub,
                                         prepareEmailContents(ruleSet, ruleSetRule, currentStudy, ruleAction));
 

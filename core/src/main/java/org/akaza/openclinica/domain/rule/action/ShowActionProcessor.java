@@ -4,16 +4,16 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.RuleRunner.RuleRunnerMode;
-import org.akaza.openclinica.service.crfdata.ItemMetadataService;
+import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 
 import javax.sql.DataSource;
 
 public class ShowActionProcessor implements ActionProcessor {
 
     DataSource ds;
-    ItemMetadataService itemMetadataService;
+    DynamicsMetadataService itemMetadataService;
 
-    public ShowActionProcessor(DataSource ds, ItemMetadataService itemMetadataService) {
+    public ShowActionProcessor(DataSource ds, DynamicsMetadataService itemMetadataService) {
         this.itemMetadataService = itemMetadataService;
         this.ds = ds;
     }
@@ -55,7 +55,7 @@ public class ShowActionProcessor implements ActionProcessor {
         return ruleAction;
     }
 
-    private ItemMetadataService getItemMetadataService() {
+    private DynamicsMetadataService getItemMetadataService() {
         return itemMetadataService;
     }
 
