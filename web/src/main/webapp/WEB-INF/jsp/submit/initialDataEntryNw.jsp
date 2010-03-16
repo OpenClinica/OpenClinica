@@ -388,6 +388,7 @@ window.onload = initmb;
 </c:if>
 <c:set var="repeatCount" value="1"/>
 <c:forEach var="displayItem" items="${section.displayItemGroups}" varStatus="itemStatus">
+<!-- found showGroup: <c:out value="${displayItem.itemGroup.groupMetaBean.showGroup}"/> -->
 <c:if test="${displayItem.itemGroup.groupMetaBean.showGroup}">
 <c:if test="${displayItemNum ==0}">
     <!-- always show the button and page above the first item-->
@@ -533,6 +534,7 @@ but the custom tag uses that, not this jstl code--%>
         <%-- if there are horizontal checkboxes or radios anywhere in the group...--%>
     <c:set var="isHorizontal" scope="request" value="${false}"/>
     <c:forEach var="thItem" items="${displayItem.itemGroup.items}">
+	<!-- found show item: <c:out value="${thItem.metadata.showItem}"/> -->
     <c:if test="${thItem.metadata.showItem}">
         <c:set var="questionNumber" value="${thItem.metadata.questionNumberLabel}"/>
         <%-- We have to add a second row of headers if the response_layout property is
@@ -600,6 +602,7 @@ but the custom tag uses that, not this jstl code--%>
     <%-- create another row --%>
     <tr>
         <c:forEach var="thItem" items="${displayItem.itemGroup.items}">
+		<!-- found show item: <c:out value="${thItem.metadata.showItem}"/> -->
         <c:if test="${thItem.metadata.showItem}">
             <c:set var="isHorizontalCellLevel" scope="request" value="${false}"/>
             <c:if test="${thItem.metadata.responseLayout eq 'horizontal' ||
@@ -657,6 +660,7 @@ but the custom tag uses that, not this jstl code--%>
 <!-- for the last but not the first row and only row, we need to use [] so the repetition javascript can copy it to create new row-->
 <tr id="<c:out value="${repeatParentId}"/>" repeat="template" repeat-start="<c:out value="${repeatNumber}"/>" repeat-max="<c:out value="${repeatMax}"/>">
     <c:forEach var="bodyItem" items="${bodyItemGroup.items}">
+	<!-- found show item: <c:out value="${bodyItem.metadata.showItem}"/> -->
     <c:if test="${bodyItem.metadata.showItem}">
 		<!-- discrepancy count for this item <c:out value="${repeatParentId}"/> <c:out value="${bodyItem.numDiscrepancyNotes}"/> -->
         <c:set var="itemNum" value="${itemNum + 1}" />
@@ -783,6 +787,7 @@ but the custom tag uses that, not this jstl code--%>
 <tr repeat="0" />
 <c:set var="columnNum"  value="1"/>
 <c:forEach var="bodyItem" items="${bodyItemGroup.items}">
+<!-- found show item: <c:out value="${bodyItem.metadata.showItem}"/> -->
 <c:if test="${bodyItem.metadata.showItem}">
     <c:set var="itemNum" value="${itemNum + 1}" />
     <c:set var="isHorizontalCellLevel" scope="request" value="${false}"/>
@@ -974,6 +979,8 @@ but the custom tag uses that, not this jstl code--%>
 
 <c:set var="currPage" value="${displayItem.singleItem.metadata.pageNumberLabel}" />
 
+<!--  found show item <c:out value="${displayItem.singleItem.metadata.showItem}"/> -->
+<c:if test="${displayItem.singleItem.metadata.showItem}">
     <%-- SHOW THE PARENT FIRST --%>
 <c:if test="${displayItem.singleItem.metadata.parentId == 0}">
 
@@ -1172,6 +1179,7 @@ but the custom tag uses that, not this jstl code--%>
             </table>
         </td>
     </tr>
+</c:if>
 </c:if>
 </c:if>
 

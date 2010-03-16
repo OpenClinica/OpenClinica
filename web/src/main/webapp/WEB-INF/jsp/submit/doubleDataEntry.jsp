@@ -957,6 +957,7 @@ window.onload = initmb;
 
 <c:set var="currPage" value="${displayItem.singleItem.metadata.pageNumberLabel}" />
 
+<c:if test="${displayItem.singleItem.metadata.showItem}">
     <%-- SHOW THE PARENT FIRST --%>
 <c:if test="${displayItem.singleItem.metadata.parentId == 0}">
 
@@ -1149,7 +1150,7 @@ window.onload = initmb;
     </tr>
 </c:if>
 </c:if>
-
+</c:if>
 </c:otherwise>
 </c:choose>
 

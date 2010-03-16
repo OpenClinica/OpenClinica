@@ -905,6 +905,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 
 <c:set var="currPage" value="${displayItem.singleItem.metadata.pageNumberLabel}" />
 
+<c:if test="${displayItem.singleItem.metadata.showItem}">
     <%-- SHOW THE PARENT FIRST --%>
 <c:if test="${displayItem.singleItem.metadata.parentId == 0}">
 
@@ -1090,7 +1091,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
     </tr>
 </c:if>
 </c:if>
-
+</c:if>
 </c:otherwise>
 </c:choose>
 
