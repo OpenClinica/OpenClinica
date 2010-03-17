@@ -224,7 +224,7 @@ public class ExpressionService {
         List<ItemDataBean> itemData =
             getItemDataDao().findByStudyEventAndOids(Integer.valueOf(studyEventId), getItemOidFromExpression(expression),
                     getItemGroupOidFromExpression(expression));
-        return itemData.size() > 0 ? itemData.get(index) : null;
+        return itemData.size() > index ? itemData.get(index) : null;
     }
 
     public String getValueFromForm(String expression) {
