@@ -67,6 +67,7 @@ import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
+import org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.logic.expressionTree.ExpressionTreeHelper;
@@ -74,6 +75,8 @@ import org.akaza.openclinica.logic.rulerunner.MessageContainer.MessageType;
 import org.akaza.openclinica.logic.score.ScoreCalculator;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
+import org.akaza.openclinica.service.crfdata.MetadataServiceInterface;
+import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
@@ -228,6 +231,7 @@ public abstract class DataEntryServlet extends SecureController {
     protected RuleSetServiceInterface ruleSetService;
     protected ExpressionService expressionService;
     protected DiscrepancyNoteService discrepancyNoteService;
+    DynamicsMetadataService itemMetadataService; 
 
     /**
      * Determines whether the form was submitted. Calculated once in processRequest. The reason we don't use the normal means to determine if the form was
@@ -2839,6 +2843,12 @@ public abstract class DataEntryServlet extends SecureController {
             ItemFormMetadataBean ifmb = (ItemFormMetadataBean) metadata.get(i);
             DisplayItemBean dib = (DisplayItemBean) displayItems.get(new Integer(ifmb.getItemId()));
             if (dib != null) {
+
+                boolean showItem = getItemMetadataService().isShown(ifmb.getItemId(), ecb);
+                if (showItem) { // we are only showing, not hiding
+                    ifmb.setShowItem(showItem);
+                }
+                // System.out.println("did not catch NPE 1");
                 dib.setMetadata(ifmb);
                 displayItems.put(new Integer(ifmb.getItemId()), dib);
             }
@@ -2894,6 +2904,12 @@ public abstract class DataEntryServlet extends SecureController {
             }
             // <<tbh 07/2009, bug #3883
             dib.setDbData(data);
+            boolean showItem = getItemMetadataService().isShown(metadata, ecb);
+            if (showItem) {
+                metadata.setShowItem(showItem);
+            }
+            // System.out.println("did not catch NPE");
+
             dib.setMetadata(metadata);
 
             if (shouldLoadDBValues(dib)) {
@@ -2911,6 +2927,15 @@ public abstract class DataEntryServlet extends SecureController {
         Collections.sort(answer);
 
         return answer;
+    }
+    
+    /**
+     * gets the available dynamics service
+     */
+    private DynamicsMetadataService getItemMetadataService() {
+        itemMetadataService =
+            this.itemMetadataService != null ? itemMetadataService : (DynamicsMetadataService)SpringServletAccess.getApplicationContext(context).getBean("dynamicsMetadataService");
+        return itemMetadataService;
     }
 
     /**
@@ -3952,6 +3977,7 @@ public abstract class DataEntryServlet extends SecureController {
             ruleSets = getRuleSetService().solidifyGroupOrdinalsUsingFormProperties(ruleSets, c.grouped);
             // return getRuleSetService().runRules(ruleSets, dryRun,
             // currentStudy, c.variableAndValue, ub);
+            System.out.println("running rules ... rule sets size is " + ruleSets.size());
             return getRuleSetService().runRulesInDataEntry(ruleSets, dryRun, currentStudy, ub, c.variableAndValue).getByMessageType(MessageType.ERROR);
         } else {
             return new HashMap<String, ArrayList<String>>();
