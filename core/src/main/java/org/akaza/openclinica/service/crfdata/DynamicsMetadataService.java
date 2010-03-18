@@ -23,7 +23,7 @@ import javax.sql.DataSource;
 
 public class DynamicsMetadataService implements MetadataServiceInterface {
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    // protected final java.util.logging.Logger logger = LoggerFactory.getLogger(getClass().getName());
     private final String ESCAPED_SEPERATOR = "\\.";
     private DynamicsItemFormMetadataDao dynamicsItemFormMetadataDao;
     DataSource ds;
@@ -54,15 +54,40 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         // do we check against the database, or just against the object? prob against the db
         ItemFormMetadataBean itemFormMetadataBean = (ItemFormMetadataBean) metadataBean;
         // return itemFormMetadataBean.isShowItem();
-        DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataDao().findByMetadataBean(itemFormMetadataBean, eventCrfBean);
-        return dynamicsMetadataBean.isShowItem();
+        DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataBean(itemFormMetadataBean, eventCrfBean);
+        // DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataDao().findByMetadataBean(itemFormMetadataBean, eventCrfBean);
+        if (dynamicsMetadataBean != null) {
+            return dynamicsMetadataBean.isShowItem();
+        } else {
+            System.out.println("did not find a row in the db for " + itemFormMetadataBean.getId());
+            return false;
+        }
+        // return false;
+    }
+    
+    public boolean isShown(int itemId, EventCRFBean eventCrfBean) {
+        // do we check against the database, or just against the object? prob against the db
+        // ItemFormMetadataBean itemFormMetadataBean = (ItemFormMetadataBean) metadataBean;
+        // return itemFormMetadataBean.isShowItem();
+        ItemFormMetadataBean itemFormMetadataBean =
+            getItemFormMetadataDAO().findByItemIdAndCRFVersionId(itemId, eventCrfBean.getCRFVersionId());
+        DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataBean(itemFormMetadataBean, eventCrfBean);
+        // DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataDao().findByMetadataBean(itemFormMetadataBean, eventCrfBean);
+        if (dynamicsMetadataBean != null) {
+            return dynamicsMetadataBean.isShowItem();
+        } else {
+            System.out.println("did not find a row in the db for " + itemFormMetadataBean.getId());
+            return false;
+        }
         // return false;
     }
 
     public DynamicsItemFormMetadataBean getDynamicsItemFormMetadataBean(ItemFormMetadataBean metadataBean, EventCRFBean eventCrfBean) {
         ItemFormMetadataBean itemFormMetadataBean = metadataBean;
+        
         DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataDao().findByMetadataBean(itemFormMetadataBean, eventCrfBean);
         return dynamicsMetadataBean;
+        
     }
 
     public boolean showItem(ItemFormMetadataBean metadataBean, EventCRFBean eventCrfBean) {
@@ -83,6 +108,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         ItemDataBean itemDataBean = (ItemDataBean) getItemDataDAO().findByPK(itemDataId);
         EventCRFBean eventCrfBean = (EventCRFBean) getEventCRFDAO().findByPK(itemDataBean.getEventCRFId());
         for (String oid : oids) {
+            // System.out.println("... looking at this oid " + oid + " ...");
             ItemOrItemGroupHolder itemOrItemGroup = getItemOrItemGroup(oid);
             if (itemOrItemGroup.getItemBean() != null) {
                 ItemFormMetadataBean itemFormMetadataBean =
@@ -90,6 +116,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                 DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataBean(itemFormMetadataBean, eventCrfBean);
                 if (dynamicsMetadataBean == null) {
                     showItem(itemFormMetadataBean, eventCrfBean);
+                    // System.out.println("... just set oid " + oid + " to shown ...");
                 } else if (dynamicsMetadataBean != null && !dynamicsMetadataBean.isShowItem()) {
                     dynamicsMetadataBean.setShowItem(true);
                     getDynamicsItemFormMetadataDao().saveOrUpdate(dynamicsMetadataBean);

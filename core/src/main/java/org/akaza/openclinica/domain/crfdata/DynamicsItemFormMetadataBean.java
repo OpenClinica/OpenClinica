@@ -19,14 +19,18 @@ import javax.persistence.Table;
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "dyn_item_form_metadata_id_seq") })
 public class DynamicsItemFormMetadataBean extends AbstractMutableDomainObject {
 
-    boolean showItem;
-    int eventCrfId;
-    int itemId;
-    int itemFormMetadataId;
-    int crfVersionId;
+    private Boolean showItem;
+    private Integer eventCrfId;
+    private Integer itemId;
+    private Integer itemFormMetadataId;
+    private Integer crfVersionId;
 
     public DynamicsItemFormMetadataBean() {
-
+        showItem = false;
+        eventCrfId = 0;
+        itemId = 0;
+        itemFormMetadataId = 0;
+        crfVersionId = 0;
     }
 
     public DynamicsItemFormMetadataBean(ItemFormMetadataBean metadataBean, EventCRFBean eventCRFBean) {
