@@ -13,6 +13,8 @@
  */
 package org.akaza.openclinica.bean.extract.odm;
 
+import java.util.ArrayList;
+
 import org.akaza.openclinica.bean.odmbeans.BasicDefinitionsBean;
 import org.akaza.openclinica.bean.odmbeans.CodeListBean;
 import org.akaza.openclinica.bean.odmbeans.CodeListItemBean;
@@ -31,8 +33,6 @@ import org.akaza.openclinica.bean.odmbeans.StudyGroupItemBean;
 import org.akaza.openclinica.bean.odmbeans.SymbolBean;
 import org.akaza.openclinica.bean.odmbeans.TranslatedTextBean;
 import org.apache.commons.lang.StringEscapeUtils;
-
-import java.util.ArrayList;
 
 /**
  * Create ODM XML Study Element for a study.
@@ -317,8 +317,11 @@ public class MetaDataReportBean extends OdmXmlReportBean {
             // add MeasurementUnitRef
             String muRefOid = item.getMeasurementUnitRef().getElementDefOID();
             if (muRefOid != null && muRefOid.length() > 0) {
-                xml.append(">");
-                xml.append(nls);
+                if (!hasNode) {
+                    hasNode = true;
+                    xml.append(">");
+                    xml.append(nls);
+                }
                 xml.append(currentIndent + indent + this.measurementUnitRefString(muRefOid));
                 xml.append(nls);
             }
