@@ -5,6 +5,9 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.*;
+
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +28,7 @@ public final class SpreadsheetPreview implements Preview {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
-    public Map<String, Map> createCrfMetaObject(HSSFWorkbook workbook) {
+    public Map<String, Map> createCrfMetaObject(Workbook workbook) {
         if (workbook == null)
             return new HashMap<String, Map>();
         Map<String, Map> spreadSheetMap = new HashMap<String, Map>();
@@ -60,16 +63,16 @@ public final class SpreadsheetPreview implements Preview {
      *            should specify "items" or "sections" or the associated static
      *            variable, i.e. SpreadsheetPreview.ITEMS
      */
-    public Map<Integer, Map<String, String>> createItemsOrSectionMap(HSSFWorkbook workbook, String itemsOrSection) {
+    public Map<Integer, Map<String, String>> createItemsOrSectionMap(Workbook workbook, String itemsOrSection) {
         if (workbook == null || workbook.getNumberOfSheets() == 0) {
             return new HashMap<Integer, Map<String, String>>();
         }
         if (itemsOrSection == null || !itemsOrSection.equalsIgnoreCase(ITEMS) && !itemsOrSection.equalsIgnoreCase(SECTIONS)) {
             return new HashMap<Integer, Map<String, String>>();
         }
-        HSSFSheet sheet;
-        HSSFRow row;
-        HSSFCell cell;
+        Sheet sheet;
+        Row row;
+        Cell cell;
         // static item headers for a CRF; TODO: change these so they are not
         // static and hard-coded
         /*
@@ -124,13 +127,13 @@ public final class SpreadsheetPreview implements Preview {
         return allRows;
     }
 
-    public Map<Integer, Map<String, String>> createGroupsMap(HSSFWorkbook workbook) {
+    public Map<Integer, Map<String, String>> createGroupsMap(Workbook workbook) {
         if (workbook == null || workbook.getNumberOfSheets() == 0) {
             return new HashMap<Integer, Map<String, String>>();
         }
-        HSSFSheet sheet;
-        HSSFRow row;
-        HSSFCell cell;
+        Sheet sheet;
+        Row row;
+        Cell cell;
         // static group headers for a CRF; TODO: change these so they are not
         // static and hard-coded
         String[] groupHeaders =
@@ -168,27 +171,26 @@ public final class SpreadsheetPreview implements Preview {
         return allRows;
     }
 
-    private String getCellValue(HSSFCell cell) {
+    private String getCellValue(Cell cell) {
         if (cell == null)
             return "";
         switch (cell.getCellType()) {
-        case HSSFCell.CELL_TYPE_STRING:
+        case Cell.CELL_TYPE_STRING:
             return cell.getStringCellValue();
-        case HSSFCell.CELL_TYPE_NUMERIC:
+        case Cell.CELL_TYPE_NUMERIC:
             return Double.toString(cell.getNumericCellValue());
-        case HSSFCell.CELL_TYPE_BOOLEAN:
+        case Cell.CELL_TYPE_BOOLEAN:
             return new Boolean(cell.getBooleanCellValue()).toString();
-        case HSSFCell.CELL_TYPE_FORMULA:
+        case Cell.CELL_TYPE_FORMULA:
             return cell.getCellFormula().toString();
         }
         return "";
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InvalidFormatException {
 
         // Simple3.xls , Cancer_History5.xls , Can3.xls
-        POIFSFileSystem fs = new POIFSFileSystem(new FileInputStream(new File("/Users/bruceperry/work/OpenClinica-Cancer-Demo-Study/Cancer_History5.xls")));
-        HSSFWorkbook wb = new HSSFWorkbook(fs);
+        Workbook wb = WorkbookFactory.create(new FileInputStream(new File("/Users/bruceperry/work/OpenClinica-Cancer-Demo-Study/Cancer_History5.xls")));
         SpreadsheetPreview prev = new SpreadsheetPreview();
         // createSectionsMap createItemsMap
         Map map = prev.createItemsOrSectionMap(wb, "sections");
@@ -213,13 +215,13 @@ public final class SpreadsheetPreview implements Preview {
      * keys. Returns an empty HashMap if the spreadsheet does not contain any
      * sheets named "Sections."
      */
-    public Map<String, String> createCrfMap(HSSFWorkbook workbook) {
+    public Map<String, String> createCrfMap(Workbook workbook) {
         if (workbook == null || workbook.getNumberOfSheets() == 0) {
             return new HashMap<String, String>();
         }
-        HSSFSheet sheet;
-        HSSFRow row;
-        HSSFCell cell;
+        Sheet sheet;
+        Row row;
+        Cell cell;
         Map<String, String> crfInfo = new HashMap<String, String>();
         String mapKey = "";
         String val = "";

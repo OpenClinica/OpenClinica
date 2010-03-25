@@ -7,6 +7,8 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +51,7 @@ public final class SpreadsheetPreviewNw implements Preview {
      * are items, sections, groups, and crf_info. Here is an example return value: groups: {1={group_repeat_number=1.0, group_header=, group_layout=Horizontal,
      * group_repeat_array=, group_row_start_number=2.0, group_sub_header=, group_label=MyGroupLabel, group_repeat_max=3.0}}
      */
-    public Map<String, Map> createCrfMetaObject(HSSFWorkbook workbook) {
+    public Map<String, Map> createCrfMetaObject(Workbook workbook) {
         if (workbook == null)
             return new HashMap<String, Map>();
         Map<String, Map> spreadSheetMap = new HashMap<String, Map>();
@@ -81,16 +83,16 @@ public final class SpreadsheetPreviewNw implements Preview {
      * @param itemsOrSection
      *            should specify "items" or "sections" or the associated static variable, i.e. SpreadsheetPreview.ITEMS
      */
-    public Map<Integer, Map<String, String>> createItemsOrSectionMap(HSSFWorkbook workbook, String itemsOrSection) {
+    public Map<Integer, Map<String, String>> createItemsOrSectionMap(Workbook workbook, String itemsOrSection) {
         if (workbook == null || workbook.getNumberOfSheets() == 0) {
             return new HashMap<Integer, Map<String, String>>();
         }
         if (itemsOrSection == null || !itemsOrSection.equalsIgnoreCase(ITEMS) && !itemsOrSection.equalsIgnoreCase(SECTIONS)) {
             return new HashMap<Integer, Map<String, String>>();
         }
-        HSSFSheet sheet;
-        HSSFRow row;
-        HSSFCell cell;
+        Sheet sheet;
+        Row row;
+        Cell cell;
         // static item headers for a CRF; TODO: change these so they are not
         // static and hard-coded
         /*
@@ -167,8 +169,8 @@ public final class SpreadsheetPreviewNw implements Preview {
         return allRows;
     }
 
-    private boolean isDateDatatype(String[] headers, HSSFRow row) {
-        HSSFCell cell;
+    private boolean isDateDatatype(String[] headers, Row row) {
+        Cell cell;
         String currentDataType = "";
         if (headers == null || headers.length == 0 || row == null) {
             return false;
@@ -185,13 +187,13 @@ public final class SpreadsheetPreviewNw implements Preview {
         return false;
     }
 
-    public Map<Integer, Map<String, String>> createGroupsMap(HSSFWorkbook workbook) {
+    public Map<Integer, Map<String, String>> createGroupsMap(Workbook workbook) {
         if (workbook == null || workbook.getNumberOfSheets() == 0) {
             return new HashMap<Integer, Map<String, String>>();
         }
-        HSSFSheet sheet;
-        HSSFRow row;
-        HSSFCell cell;
+        Sheet sheet;
+        Row row;
+        Cell cell;
         // static group headers for a CRF; TODO: change these so they are not
         // static and hard-coded
         // BWP>>remove "group_borders" column
@@ -228,15 +230,15 @@ public final class SpreadsheetPreviewNw implements Preview {
         return allRows;
     }
 
-    private String getCellValue(HSSFCell cell) {
+    private String getCellValue(Cell cell) {
         String val = "";
         if (cell == null)
             return "";
         // new SimpleDateFormat("yyyy-MM-dd").format(cell.getDateCellValue());
         switch (cell.getCellType()) {
-        case HSSFCell.CELL_TYPE_STRING:
+        case Cell.CELL_TYPE_STRING:
             return cell.getStringCellValue();
-        case HSSFCell.CELL_TYPE_NUMERIC:
+        case Cell.CELL_TYPE_NUMERIC:
             val = Double.toString(cell.getNumericCellValue());
             // code derived from SpreadsheetTableRepeating.java
             double dphi = cell.getNumericCellValue();
@@ -244,20 +246,19 @@ public final class SpreadsheetPreviewNw implements Preview {
                 val = (int) dphi + "";
             }
             return val;
-        case HSSFCell.CELL_TYPE_BOOLEAN:
+        case Cell.CELL_TYPE_BOOLEAN:
             return Boolean.toString(cell.getBooleanCellValue());
-        case HSSFCell.CELL_TYPE_FORMULA:
+        case Cell.CELL_TYPE_FORMULA:
             return cell.getCellFormula();
 
         }
         return "";
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InvalidFormatException {
 
         // Simple3.xls , Cancer_History5.xls , Can3.xls
-        POIFSFileSystem fs = new POIFSFileSystem(new FileInputStream(new File("d:/23TestComma2.xls")));
-        HSSFWorkbook wb = new HSSFWorkbook(fs);
+        Workbook wb = WorkbookFactory.create(new FileInputStream(new File("d:/23TestComma2.xls")));
         SpreadsheetPreviewNw spnw = new SpreadsheetPreviewNw();
         // createSectionsMap createItemsMap
         Map map = spnw.createCrfMetaObject(wb);
@@ -279,13 +280,13 @@ public final class SpreadsheetPreviewNw implements Preview {
      * @author Bruce Perry @returns A HashMap containing CRF section names as keys. Returns an empty HashMap if the spreadsheet does not contain any sheets
      * named "Sections."
      */
-    public Map<String, String> createCrfMap(HSSFWorkbook workbook) {
+    public Map<String, String> createCrfMap(Workbook workbook) {
         if (workbook == null || workbook.getNumberOfSheets() == 0) {
             return new HashMap<String, String>();
         }
-        HSSFSheet sheet;
-        HSSFRow row;
-        HSSFCell cell;
+        Sheet sheet;
+        Row row;
+        Cell cell;
         Map<String, String> crfInfo = new HashMap<String, String>();
         String mapKey = "";
         String val = "";
@@ -304,16 +305,16 @@ public final class SpreadsheetPreviewNw implements Preview {
                         // Set the Map key to the crf header
 
                         switch (cell.getCellType()) {
-                        case HSSFCell.CELL_TYPE_STRING:
+                        case Cell.CELL_TYPE_STRING:
                             val = cell.getStringCellValue();
                             break;
-                        case HSSFCell.CELL_TYPE_NUMERIC:
+                        case Cell.CELL_TYPE_NUMERIC:
                             val = Double.toString(cell.getNumericCellValue());
                             break;
-                        case HSSFCell.CELL_TYPE_BOOLEAN:
+                        case Cell.CELL_TYPE_BOOLEAN:
                             val = Boolean.toString(cell.getBooleanCellValue());
                             break;
-                        case HSSFCell.CELL_TYPE_FORMULA:
+                        case Cell.CELL_TYPE_FORMULA:
                             cell.getCellFormula();
                             break;
                         }

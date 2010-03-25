@@ -32,6 +32,8 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 import com.oreilly.servlet.MultipartRequest;
 
@@ -471,11 +473,11 @@ public class CreateCRFVersionServlet extends SecureController {
                     // This object is created to pull preview information out of
                     // the
                     // spreadsheet
-                    HSSFWorkbook workbook = null;
+                    Workbook workbook = null;
                     FileInputStream inputStream = null;
                     try {
                         inputStream = new FileInputStream(theDir + tempFile);
-                        workbook = new HSSFWorkbook(inputStream);
+                        workbook = WorkbookFactory.create(inputStream);
                         // Store the Sections, Items, Groups, and CRF name and
                         // version information
                         // so they can be displayed in a preview. The Map
