@@ -44,9 +44,9 @@ import java.util.HashMap;
 public class DeleteStudyEventServlet extends SecureController{
     @Override
     public void mayProceed() throws InsufficientPermissionException {
-//        checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"));
-//        checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"));
-
+        checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"));
+        checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"));
+        
         if (ub.isSysAdmin()) {
             return;
         }
