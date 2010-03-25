@@ -68,6 +68,17 @@
          </c:otherwise>
         </c:choose>
 
+        <c:if test="${currRow.bean.studyEvent.subjectEventStatus.scheduled && userRole.manageStudy && study.status.available}">
+            <tr><td>&nbsp;</td></tr>
+            <tr><td>
+                <a href="DeleteStudyEvent?action=confirm&id=<c:out value="${currRow.bean.studyEvent.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
+                 onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
+                 onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"><img
+                 name="bt_Remove1" src="images/bt_Delete.gif" border="0" alt="<fmt:message key="delete" bundle="${resword}"/>" title="<fmt:message key="delete" bundle="${resword}"/>" align="left" hspace="6"></a>
+            </td></tr>
+        </c:if>
+
+
 		</td>
        </tr>
       </table>

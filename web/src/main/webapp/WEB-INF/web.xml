@@ -649,6 +649,11 @@
         <servlet-class>org.akaza.openclinica.control.managestudy.RestoreStudyEventServlet</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>DeleteStudyEventServlet</servlet-name>
+        <display-name>DeleteStudyEvent</display-name>
+        <servlet-class>org.akaza.openclinica.control.managestudy.DeleteStudyEventServlet</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>RemoveEventCRFServlet</servlet-name>
         <display-name>RemoveEventCRF</display-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.RemoveEventCRFServlet</servlet-class>
@@ -1648,6 +1653,10 @@
     <servlet-mapping>
         <servlet-name>RestoreStudyEventServlet</servlet-name>
         <url-pattern>/RestoreStudyEvent</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DeleteStudyEventServlet</servlet-name>
+        <url-pattern>/DeleteStudyEvent</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>RemoveEventCRFServlet</servlet-name>
