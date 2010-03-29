@@ -45,12 +45,12 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
 
     private List<RuleSetRuleBean> ruleSetRules;
     private ExpressionBean target;
+    private ExpressionBean originalTarget;
 
     // transient properties
     private List<ExpressionBean> expressions; // itemGroup & item populated when RuleSets are retrieved
     private ItemGroupBean itemGroup;
-    private ItemBean item; // originalTarget populated with same value as target.
-    private ExpressionBean originalTarget;
+    private ItemBean item;
 
     // TODO : Pending conversion of the objects below to use Hibernate
     private Integer studyEventDefinitionId;
@@ -167,16 +167,6 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
         this.ruleSetRules = ruleSetRuleAssignment;
     }
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "rule_expression_id")
-    public ExpressionBean getTarget() {
-        return target;
-    }
-
-    public void setTarget(ExpressionBean target) {
-        this.target = target;
-    }
-
     @Transient
     public StudyBean getStudy() {
         return study;
@@ -240,10 +230,23 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
         this.expressions = expressions;
     }
 
+    @Transient
+    public ExpressionBean getTarget() {
+        if (this.target == null) {
+            target = originalTarget;
+        }
+        return target;
+    }
+
+    public void setTarget(ExpressionBean target) {
+        this.target = target;
+    }
+
     /**
      * @return originalTarget
      */
-    @Transient
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "rule_expression_id")
     public ExpressionBean getOriginalTarget() {
         return originalTarget;
     }

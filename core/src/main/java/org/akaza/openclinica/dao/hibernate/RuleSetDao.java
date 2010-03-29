@@ -48,7 +48,7 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
     }
 
     public RuleSetBean findByExpression(RuleSetBean ruleSet) {
-        String query = "from " + getDomainClassName() + " ruleSet  where ruleSet.target.value = :value AND ruleSet.target.context = :context ";
+        String query = "from " + getDomainClassName() + " ruleSet  where ruleSet.originalTarget.value = :value AND ruleSet.originalTarget.context = :context ";
         org.hibernate.Query q = getCurrentSession().createQuery(query);
         q.setString("value", ruleSet.getTarget().getValue());
         q.setParameter("context", ruleSet.getTarget().getContext());
