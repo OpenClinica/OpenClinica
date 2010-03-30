@@ -1,6 +1,7 @@
 package org.akaza.openclinica.domain.crfdata;
 
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.domain.AbstractMutableDomainObject;
 import org.hibernate.annotations.GenericGenerator;
@@ -24,6 +25,7 @@ public class DynamicsItemFormMetadataBean extends AbstractMutableDomainObject {
     private Integer itemId;
     private Integer itemFormMetadataId;
     private Integer crfVersionId;
+    private Integer itemDataId;
 
     public DynamicsItemFormMetadataBean() {
         showItem = false;
@@ -31,6 +33,7 @@ public class DynamicsItemFormMetadataBean extends AbstractMutableDomainObject {
         itemId = 0;
         itemFormMetadataId = 0;
         crfVersionId = 0;
+        itemDataId = 0;
     }
 
     public DynamicsItemFormMetadataBean(ItemFormMetadataBean metadataBean, EventCRFBean eventCRFBean) {
@@ -39,6 +42,14 @@ public class DynamicsItemFormMetadataBean extends AbstractMutableDomainObject {
         setCrfVersionId(metadataBean.getCrfVersionId());
         setEventCrfId(eventCRFBean.getId());
     }
+    
+    public DynamicsItemFormMetadataBean(ItemFormMetadataBean metadataBean, EventCRFBean eventCRFBean, ItemDataBean itemData) {
+        setItemId(metadataBean.getItemId());
+        setItemFormMetadataId(metadataBean.getId());
+        setCrfVersionId(metadataBean.getCrfVersionId());
+        setEventCrfId(eventCRFBean.getId());
+        setItemDataId(itemData.getId());
+    }
 
     public boolean isShowItem() {
         return showItem;
@@ -46,6 +57,14 @@ public class DynamicsItemFormMetadataBean extends AbstractMutableDomainObject {
 
     public void setShowItem(boolean showItem) {
         this.showItem = showItem;
+    }
+
+    public Integer getItemDataId() {
+        return itemDataId;
+    }
+
+    public void setItemDataId(Integer itemDataId) {
+        this.itemDataId = itemDataId;
     }
 
     public int getEventCrfId() {
