@@ -148,16 +148,18 @@ giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%>
     <div id="errorMessagesContainer" class="aka_err_message">
         <ul>
             <c:forEach var="formMsg" items="${formMessages}">
+				<c:choose>
+				<c:when test="${hasShown}">
+				<li style="color:  #006633"><span style="text-decoration: underline"><strong>
+                    <label onclick="getFocused('<c:out value="${formMsg.key}" />');"><c:out value="${formMsg.value}" /></label>
+                </strong></span></li>
+				</c:when>
+				<c:otherwise>
                 <li style="color:  #ff0000"><span style="text-decoration: underline"><strong>
                     <label onclick="getFocused('<c:out value="${formMsg.key}" />');"><c:out value="${formMsg.value}" /></label>
                 </strong></span></li>
-                <%--<li style="color:  #ff0000">
-                	<span style="text-decoration: underline"><strong>
-                		<label for="<c:out value="${formMsg.key}"/>">
-                			<c:out value="${formMsg.value}" />
-                		</label></strong>
-                	</span>	
-                	</li> --%>
+				</c:otherwise>
+				</c:choose>
             </c:forEach>
         </ul>
         <!--  Use the formMessages request attribute to grab each validation

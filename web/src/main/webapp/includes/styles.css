@@ -119,8 +119,20 @@
     color:  #ff0000;
 }
 
+.aka_exclaim_show{
+    font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+    font-size: 2em;
+    font-style: normal;
+    font-weight: bold;
+    color:  #006633;
+}
+
 .aka_input_error{
     border: 1px solid #ff0000;
+}
+
+.aka_input_show{
+    border: 1px solid #006633;
 }
 
 .aka_input_readonly{

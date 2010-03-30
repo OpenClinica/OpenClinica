@@ -693,8 +693,8 @@ public abstract class DataEntryServlet extends SecureController {
                 }
             }
 
-            HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid = runRules(allItems, ruleSets, true, shouldRunRules());
-
+            HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid = runRules(allItems, ruleSets, true, shouldRunRules(), MessageType.ERROR);
+            // System.out.println("first run of rules : " + groupOrdinalPLusItemOid.toString());
             for (int i = 0; i < allItems.size(); i++) {
                 DisplayItemWithGroupBean diwg = allItems.get(i);
                 if (diwg.isInGroup()) {
@@ -1178,6 +1178,7 @@ public abstract class DataEntryServlet extends SecureController {
 
             if (!errors.isEmpty()) {
                 logger.debug("threw an error with data entry...");
+                // copying below three lines, tbh 03/2010
                 String[] textFields = { INPUT_INTERVIEWER, INPUT_INTERVIEW_DATE };
                 fp.setCurrentStringValuesAsPreset(textFields);
                 setPresetValues(fp.getPresetValues());
@@ -1229,6 +1230,7 @@ public abstract class DataEntryServlet extends SecureController {
                 // << tbh, 02/2010
 
                 // YW >>
+                // copied
                 request.setAttribute(BEAN_DISPLAY, section);
                 request.setAttribute(BEAN_ANNOTATIONS, fp.getString(INPUT_ANNOTATIONS));
                 setInputMessages(errors);
@@ -1436,7 +1438,62 @@ public abstract class DataEntryServlet extends SecureController {
                         }
                     }
                 }
-                runRules(allItems, ruleSets, false, shouldRunRules());
+                HashMap<String, ArrayList<String>> rulesPostDryRun = runRules(allItems, ruleSets, false, shouldRunRules(), MessageType.WARNING);
+                System.out.println("found rules post dry run: " + rulesPostDryRun.toString());
+                HashMap<String, ArrayList<String>> errorsPostDryRun = new HashMap<String, ArrayList<String>> ();
+                // additional step needed, run rules and see if any items are 'shown' AFTER saving data
+                if (!rulesPostDryRun.isEmpty()) {
+                    // in same section?
+                    boolean inSameSection = false;
+                    // iterate through the OIDs and see if any of them belong to this section
+                    Iterator iter3 = rulesPostDryRun.keySet().iterator();
+                    while (iter3.hasNext()) {
+                        String fieldName = iter3.next().toString();
+                        System.out.println("found oid after post dry run " + fieldName);
+                        // set up a listing of OIDs in the section
+                        ArrayList<DisplayItemBean> displayItems = section.getItems();
+                        for (DisplayItemBean displayItemBean : displayItems) {
+                            ItemBean itemBean = displayItemBean.getItem();
+                            if (fieldName.equals(itemBean.getOid())) {
+                                if (!displayItemBean.getMetadata().isShowItem()) {
+                                    inSameSection = true;
+                                    System.out.println("found item " + this.getInputName(displayItemBean) + " vs. " + fieldName);
+                                    // if is repeating, use the other input name
+                                    errorsPostDryRun.put(this.getInputName(displayItemBean), rulesPostDryRun.get(fieldName));
+                                    displayItemBean.getMetadata().setShowItem(true);
+                                }
+                                // break;
+                            }
+                        } 
+                        section.setItems(displayItems);
+                    }
+                    
+                    // if so, stay at this section
+                    System.out.println(" in same section: " + inSameSection);
+                    if (inSameSection) {
+                        // copy of one line from early on around line 400, forcing a re-show of the items
+                        // section = getDisplayBean(hasGroup, true);// include all items, tbh
+                        // below a copy of three lines from the if errors = true line, tbh 03/2010
+                        String[] textFields = { INPUT_INTERVIEWER, INPUT_INTERVIEW_DATE };
+                        fp.setCurrentStringValuesAsPreset(textFields);
+                        setPresetValues(fp.getPresetValues());
+                        // below essetially a copy except for rulesPostDryRun
+                        request.setAttribute(BEAN_DISPLAY, section);
+                        request.setAttribute(BEAN_ANNOTATIONS, fp.getString(INPUT_ANNOTATIONS));
+                        setInputMessages(errorsPostDryRun);
+                        addPageMessage(respage.getString("your_answers_activated_hidden_items"));
+                        request.setAttribute("hasError", "true");
+                        request.setAttribute("hasShown", "true");
+                        
+                        session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
+                        setUpPanel(section);
+                        forwardPage(getJSPPage());
+                    }
+                    // if not, progress as usual
+                }
+                
+                // can we just forward page or do we actually need an ELSE here?
+                
                 ArrayList<String> updateFailedItems = sc.redoCalculations(scoreItems, scoreItemdata, changedItems, itemOrdinals, sb.getId());
                 success = updateFailedItems.size() > 0 ? false : true;
 
@@ -3969,7 +4026,7 @@ public abstract class DataEntryServlet extends SecureController {
     }
 
     private HashMap<String, ArrayList<String>> runRules(List<DisplayItemWithGroupBean> allItems, List<RuleSetBean> ruleSets, Boolean dryRun,
-            Boolean shouldRunRules) {
+            Boolean shouldRunRules, MessageType mt) {
         if (shouldRunRules) {
             Container c = new Container();
             c = populateRuleSpecificHashMaps(allItems, c, dryRun);
@@ -3978,7 +4035,7 @@ public abstract class DataEntryServlet extends SecureController {
             // return getRuleSetService().runRules(ruleSets, dryRun,
             // currentStudy, c.variableAndValue, ub);
             System.out.println("running rules ... rule sets size is " + ruleSets.size());
-            return getRuleSetService().runRulesInDataEntry(ruleSets, dryRun, currentStudy, ub, c.variableAndValue).getByMessageType(MessageType.ERROR);
+            return getRuleSetService().runRulesInDataEntry(ruleSets, dryRun, currentStudy, ub, c.variableAndValue).getByMessageType(mt);
         } else {
             return new HashMap<String, ArrayList<String>>();
         }
