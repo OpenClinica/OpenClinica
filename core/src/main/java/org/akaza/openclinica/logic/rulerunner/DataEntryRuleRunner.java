@@ -54,7 +54,9 @@ public class DataEntryRuleRunner extends RuleRunner {
                         List<RuleActionBean> actionListBasedOnRuleExecutionResult = ruleSetRule.getActions(result, Phase.INITIAL_DATA_ENTRY);
                         logger.info("RuleSet with target  : {} , Ran Rule : {}  The Result was : {} , Based on that {} action will be executed ", new Object[] {
                             ruleSet.getTarget().getValue(), rule.getName(), result, actionListBasedOnRuleExecutionResult.size() });
-
+                        // System.out.println("ran ruleset with target: " + ruleSet.getTarget().getValue() + 
+                        //        " : " + result + 
+                        //        " : " + actionListBasedOnRuleExecutionResult.size());
                         // If not a dryRun(Meaning don't execute Actions) and if actions exist then execute the Action
                         if (actionListBasedOnRuleExecutionResult.size() > 0) {
                             for (RuleActionBean ruleAction : actionListBasedOnRuleExecutionResult) {
@@ -62,12 +64,14 @@ public class DataEntryRuleRunner extends RuleRunner {
                                 int itemDataBeanId = itemData != null ? itemData.getId() : 0;
                                 ruleAction.setCuratedMessage(curateMessage(ruleAction, ruleSetRule));
                                 // getDiscrepancyNoteService().saveFieldNotes(ruleAction.getSummary(), itemDataBeanId, "ItemData", currentStudy, ub);
+                                // System.out.println(" shipping rule action type " + ruleAction.getActionType().name());
                                 ActionProcessor ap =
                                     ActionProcessorFacade.getActionProcessor(ruleAction.getActionType(), ds, getMailSender(), dynamicsMetadataService);
                                 RuleActionBean rab =
                                     ap.execute(RuleRunnerMode.DATA_ENTRY, executionMode, ruleAction, itemDataBeanId, DiscrepancyNoteBean.ITEM_DATA,
                                             currentStudy, ub, prepareEmailContents(ruleSet, ruleSetRule, currentStudy, ruleAction));
                                 if (rab != null) {
+                                    // System.out.println(" adding message rab " + rab.getCuratedMessage() + " : " + ruleAction.getCuratedMessage());
                                     messageContainer.add(getExpressionService().getGroupOrdninalConcatWithItemOid(ruleSet.getTarget().getValue()), ruleAction);
                                 }
                             }
@@ -76,6 +80,7 @@ public class DataEntryRuleRunner extends RuleRunner {
                         // TODO: Auditing might happen here failed rule
                         logger.warn("RuleSet with target  : {} , Ran Rule : {} , It resulted in an error due to : {}", new Object[] {
                             ruleSet.getTarget().getValue(), rule.getName(), osa.getMessage() });
+                        System.out.println("FAIL ON ruleset with target: " + ruleSet.getTarget().getValue() + " : " + osa.getMessage());
                     }
                 }
             }

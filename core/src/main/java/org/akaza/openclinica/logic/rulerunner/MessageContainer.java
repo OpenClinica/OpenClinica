@@ -13,10 +13,12 @@ public class MessageContainer {
 
     public void add(String groupOrdinalPLusItemOid, RuleActionBean ruleActionBean) {
         addInternal(groupOrdinalPLusItemOid, ruleActionBean.getSummary(), MessageType.ERROR);
+        System.out.println("just added error : " + ruleActionBean.getSummary());
         if (ruleActionBean instanceof ShowActionBean) {
             String[] oids = (((ShowActionBean) ruleActionBean).getOIDs()).split(",");
             for (String oid : oids) {
                 addInternal(oid, ruleActionBean.getSummary(), MessageType.WARNING);
+                System.out.println("just added warning : " + ruleActionBean.getSummary());
             }
         }
     }

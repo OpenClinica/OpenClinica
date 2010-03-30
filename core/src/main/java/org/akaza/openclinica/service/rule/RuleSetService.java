@@ -254,6 +254,7 @@ public class RuleSetService implements RuleSetServiceInterface {
         ruleRunner.setDynamicsMetadataService(dynamicsMetadataService);
         // TODO: KK return the new object && Pass in the Execution Mode
         ExecutionMode executionMode = dryRun == true ? ExecutionMode.DRY_RUN : ExecutionMode.SAVE;
+        // System.out.println("just determined execution mode: " + dryRun);
         return ruleRunner.runRules(ruleSets, executionMode, currentStudy, variableAndValue, ub);
         //return new HashMap<String, ArrayList<String>>();
         // return runRules(ruleSets, dryRun, currentStudy, c.variableAndValue, ub);

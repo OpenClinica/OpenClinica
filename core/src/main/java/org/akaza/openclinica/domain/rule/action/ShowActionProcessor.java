@@ -31,9 +31,9 @@ public class ShowActionProcessor implements ActionProcessor {
         }
         case SAVE: {
             if (ruleRunnerMode == RuleRunnerMode.DATA_ENTRY) {
-                saveAndReturnMessage(ruleAction, itemDataBeanId, itemData, currentStudy, ub);
+                return saveAndReturnMessage(ruleAction, itemDataBeanId, itemData, currentStudy, ub);
             } else {
-                save(ruleAction, itemDataBeanId, itemData, currentStudy, ub);
+                return save(ruleAction, itemDataBeanId, itemData, currentStudy, ub);
             }
         }
         default:
@@ -43,7 +43,7 @@ public class ShowActionProcessor implements ActionProcessor {
 
     private RuleActionBean save(RuleActionBean ruleAction, int itemDataBeanId, String itemData, StudyBean currentStudy, UserAccountBean ub) {
         getItemMetadataService().show(itemDataBeanId, ((ShowActionBean) ruleAction).getOIDsAsArray());
-        return null;
+        return ruleAction;
     }
 
     private RuleActionBean saveAndReturnMessage(RuleActionBean ruleAction, int itemDataBeanId, String itemData, StudyBean currentStudy, UserAccountBean ub) {
