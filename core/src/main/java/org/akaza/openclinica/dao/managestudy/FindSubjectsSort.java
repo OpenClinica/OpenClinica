@@ -11,6 +11,7 @@ public class FindSubjectsSort implements CriteriaCommand {
     public FindSubjectsSort() {
         columnMapping.put("studySubject.label", "label");
         columnMapping.put("studySubject.status", "status_id");
+        columnMapping.put("enrolledAt", "ST.unique_identifier");
         columnMapping.put("studySubject.oid", "oc_oid");
         columnMapping.put("studySubject.secondaryLabel", "secondary_label");
 //        columnMapping.put("subject.charGender", "gender");
