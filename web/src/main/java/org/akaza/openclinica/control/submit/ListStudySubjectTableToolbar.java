@@ -19,14 +19,15 @@ public class ListStudySubjectTableToolbar extends DefaultToolbar {
     private final ArrayList<StudyEventDefinitionBean> studyEventDefinitions;
     private final ArrayList<StudyGroupClassBean> studyGroupClasses;
     private final boolean addSubjectLinkShow;
+    private final boolean showMoreLink; 
 
     public ListStudySubjectTableToolbar(ArrayList<StudyEventDefinitionBean> studyEventDefinitions, ArrayList<StudyGroupClassBean> studyGroupClasses,
-            boolean addSubjectLinkShow) {
+            boolean addSubjectLinkShow, boolean showMoreLink) {
         super();
         this.studyEventDefinitions = studyEventDefinitions;
         this.studyGroupClasses = studyGroupClasses;
         this.addSubjectLinkShow = addSubjectLinkShow;
-
+        this.showMoreLink = showMoreLink;
     }
 
     @Override
@@ -72,14 +73,20 @@ public class ListStudySubjectTableToolbar extends DefaultToolbar {
         @Override
         public String enabled() {
             HtmlBuilder html = new HtmlBuilder();
-            html.a().id("showMore").href("javascript:hideCols('findSubjects',[" + getIndexes() + "],true);").close();
-            html.div().close().nbsp().append("Show More").nbsp().divEnd().aEnd();
-            html.a().id("hide").style("display: none;").href("javascript:hideCols('findSubjects',[" + getIndexes() + "],false);").close();
-            html.div().close().nbsp().append("Hide").nbsp().divEnd().aEnd();
+            if(showMoreLink){
+                html.a().id("showMore").href("javascript:hideCols('findSubjects',[" + getIndexes() + "],true);").close();
+                html.div().close().nbsp().append("Show More").nbsp().divEnd().aEnd();
+                html.a().id("hide").style("display: none;").href("javascript:hideCols('findSubjects',[" + getIndexes() + "],false);").close();
+                html.div().close().nbsp().append("Hide").nbsp().divEnd().aEnd();
 
-            html.script().type("text/javascript").close().append(
-                    "$j = jQuery.noConflict(); $j(document).ready(function(){ " + "hideCols('findSubjects',[" + getIndexes() + "],false);});").scriptEnd();
-
+                html.script().type("text/javascript").close().append(
+                        "$j = jQuery.noConflict(); $j(document).ready(function(){ " + "hideCols('findSubjects',[" + getIndexes() + "],false);});").scriptEnd();
+            }else{
+                html.a().id("hide").href("javascript:hideCols('findSubjects',[" + getIndexes() + "],false);").close();
+                html.div().close().nbsp().append("Hide").nbsp().divEnd().aEnd();
+                html.a().id("showMore").style("display: none;").href("javascript:hideCols('findSubjects',[" + getIndexes() + "],true);").close();
+                html.div().close().nbsp().append("Show More").nbsp().divEnd().aEnd();
+            }
             return html.toString();
         }
 

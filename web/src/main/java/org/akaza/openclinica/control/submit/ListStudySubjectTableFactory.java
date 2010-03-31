@@ -73,8 +73,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     private ArrayList<StudyGroupClassBean> studyGroupClasses;
     private StudyUserRoleBean currentRole;
     private UserAccountBean currentUser;
+    private boolean showMoreLink = true;
     private ResourceBundle resword;
     private ResourceBundle resformat;
+
 
     final HashMap<Integer, String> imageIconPaths = new HashMap<Integer, String>(8);
 
@@ -160,7 +162,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         Role r = currentRole.getRole();
         boolean addSubjectLinkShow = studyBean.getStatus().isAvailable() && !r.equals(Role.MONITOR);
 
-        tableFacade.setToolbar(new ListStudySubjectTableToolbar(getStudyEventDefinitions(), getStudyGroupClasses(), addSubjectLinkShow));
+        tableFacade.setToolbar(new ListStudySubjectTableToolbar(getStudyEventDefinitions(), getStudyGroupClasses(), addSubjectLinkShow, showMoreLink));
     }
 
     @Override
@@ -334,6 +336,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         Collection<Filter> filters = filterSet.getFilters();
         for (Filter filter : filters) {
             String property = filter.getProperty();
+            showMoreLink = auditUserLoginFilter.getColumnMapping().get(property).equals("ss.label");
             String value = filter.getValue();
             auditUserLoginFilter.addFilter(property, value);
         }
@@ -355,6 +358,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         SortSet sortSet = limit.getSortSet();
         Collection<Sort> sorts = sortSet.getSorts();
         for (Sort sort : sorts) {
+            showMoreLink = sort.getPosition() < 1;
             String property = sort.getProperty();
             String order = sort.getOrder().toParam();
             auditUserLoginSort.addSort(property, order);
@@ -491,6 +495,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         this.currentUser = currentUser;
     }
 
+    public void setShowMoreLink(boolean showMoreLink){
+        this.showMoreLink = showMoreLink;        
+    }
+    
     private class CharFilterMatcher implements FilterMatcher {
         public boolean evaluate(Object itemValue, String filterValue) {
             String item = StringUtils.lowerCase(String.valueOf(itemValue));
