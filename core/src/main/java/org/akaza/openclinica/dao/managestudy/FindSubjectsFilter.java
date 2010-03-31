@@ -73,6 +73,9 @@ public class FindSubjectsFilter implements CriteriaCommand {
         }
         return criteria;
     }
+    public HashMap getColumnMapping(){
+        return columnMapping;
+    }
 
     private static class Filter {
         private final String property;
