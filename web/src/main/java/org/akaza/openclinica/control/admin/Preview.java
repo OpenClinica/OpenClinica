@@ -1,7 +1,6 @@
 package org.akaza.openclinica.control.admin;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Workbook;
 
 import java.util.Map;
 
@@ -10,11 +9,11 @@ import java.util.Map;
  *
  */
 public interface Preview {
-    Map<String, Map> createCrfMetaObject(Workbook workbook);
+    Map<String, Map> createCrfMetaObject(HSSFWorkbook workbook);
 
-    Map<Integer, Map<String, String>> createItemsOrSectionMap(Workbook workbook, String itemsOrSection);
+    Map<Integer, Map<String, String>> createItemsOrSectionMap(HSSFWorkbook workbook, String itemsOrSection);
 
-    Map<Integer, Map<String, String>> createGroupsMap(Workbook workbook);
+    Map<Integer, Map<String, String>> createGroupsMap(HSSFWorkbook workbook);
 
-    Map<String, String> createCrfMap(Workbook workbook);
+    Map<String, String> createCrfMap(HSSFWorkbook workbook);
 }

@@ -423,7 +423,7 @@
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
-			<version>3.6</version>
+			<version>3.0.1-FINAL</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
