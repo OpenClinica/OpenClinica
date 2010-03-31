@@ -495,9 +495,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         this.currentUser = currentUser;
     }
 
-    public void setShowMoreLink(boolean showMoreLink){
-        this.showMoreLink = showMoreLink;        
-    }
     
     private class CharFilterMatcher implements FilterMatcher {
         public boolean evaluate(Object itemValue, String filterValue) {
