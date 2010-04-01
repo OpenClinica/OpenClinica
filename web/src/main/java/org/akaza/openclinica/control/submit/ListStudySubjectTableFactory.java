@@ -336,7 +336,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         Collection<Filter> filters = filterSet.getFilters();
         for (Filter filter : filters) {
             String property = filter.getProperty();
-            showMoreLink = auditUserLoginFilter.getColumnMapping().get(property).equals("ss.label");
+            showMoreLink = auditUserLoginFilter.getColumnMapping().get(property)==null?false:auditUserLoginFilter.getColumnMapping().get(property).equals("ss.label");
             String value = filter.getValue();
             auditUserLoginFilter.addFilter(property, value);
         }
