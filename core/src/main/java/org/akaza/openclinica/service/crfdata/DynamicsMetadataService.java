@@ -14,8 +14,6 @@ import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -64,13 +62,12 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         }
         // return false;
     }
-    
+
     public boolean isShown(int itemId, EventCRFBean eventCrfBean) {
         // do we check against the database, or just against the object? prob against the db
         // ItemFormMetadataBean itemFormMetadataBean = (ItemFormMetadataBean) metadataBean;
         // return itemFormMetadataBean.isShowItem();
-        ItemFormMetadataBean itemFormMetadataBean =
-            getItemFormMetadataDAO().findByItemIdAndCRFVersionId(itemId, eventCrfBean.getCRFVersionId());
+        ItemFormMetadataBean itemFormMetadataBean = getItemFormMetadataDAO().findByItemIdAndCRFVersionId(itemId, eventCrfBean.getCRFVersionId());
         DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataBean(itemFormMetadataBean, eventCrfBean);
         // DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataDao().findByMetadataBean(itemFormMetadataBean, eventCrfBean);
         if (dynamicsMetadataBean != null) {
@@ -84,10 +81,10 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 
     public DynamicsItemFormMetadataBean getDynamicsItemFormMetadataBean(ItemFormMetadataBean metadataBean, EventCRFBean eventCrfBean) {
         ItemFormMetadataBean itemFormMetadataBean = metadataBean;
-        
+
         DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataDao().findByMetadataBean(itemFormMetadataBean, eventCrfBean);
         return dynamicsMetadataBean;
-        
+
     }
 
     public boolean showItem(ItemFormMetadataBean metadataBean, EventCRFBean eventCrfBean) {

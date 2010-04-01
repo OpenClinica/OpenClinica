@@ -8,6 +8,7 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleBulkExecuteContainer;
@@ -18,12 +19,14 @@ import org.akaza.openclinica.domain.rule.action.ActionProcessor;
 import org.akaza.openclinica.domain.rule.action.ActionProcessorFacade;
 import org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionProcessor;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
+import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.logic.expressionTree.OpenClinicaExpressionParser;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -116,26 +119,39 @@ public class CrfBulkRuleRunner extends RuleRunner {
                         result = oep.parseAndEvaluateExpression(rule.getExpression().getValue());
 
                         // Actions
-                        List<RuleActionBean> actionListBasedOnRuleExecutionResult = ruleSetRule.getActions(result);
+                        List<RuleActionBean> actionListBasedOnRuleExecutionResult = ruleSetRule.getActions(result, Phase.BATCH);
 
+                        /*
                         if (dryRun && actionListBasedOnRuleExecutionResult.size() > 0) {
                             crfViewSpecificOrderedObjects =
                                 populateForCrfBasedRulesView(crfViewSpecificOrderedObjects, ruleSet, rule, result, currentStudy,
                                         actionListBasedOnRuleExecutionResult);
                         }
+                        */
 
                         // If not a dryRun meaning run Actions
-                        if (!dryRun) {
+                        List<RuleActionBean> actionBeansToShow = new ArrayList<RuleActionBean>();
+                        if (actionListBasedOnRuleExecutionResult.size() > 0) {
+                            //if (!dryRun) {
                             for (RuleActionBean ruleAction : actionListBasedOnRuleExecutionResult) {
-                                int itemDataBeanId = getExpressionService().getItemDataBeanFromDb(ruleSet.getTarget().getValue()).getId();
+                                ItemDataBean itemData = getExpressionService().getItemDataBeanFromDb(ruleSet.getTarget().getValue());
+                                int itemDataBeanId = itemData != null ? itemData.getId() : 0;
                                 ruleAction.setCuratedMessage(curateMessage(ruleAction, ruleSetRule));
                                 // getDiscrepancyNoteService().saveFieldNotes(ruleAction.getSummary(), itemDataBeanId, "ItemData", currentStudy, ub);
                                 ActionProcessor ap =
                                     ActionProcessorFacade.getActionProcessor(ruleAction.getActionType(), ds, getMailSender(), dynamicsMetadataService);
-                                ap.execute(null, ExecutionMode.SAVE, ruleAction, itemDataBeanId, DiscrepancyNoteBean.ITEM_DATA, currentStudy, ub,
-                                        prepareEmailContents(ruleSet, ruleSetRule, currentStudy, ruleAction));
-
+                                RuleActionBean rab =
+                                    ap.execute(RuleRunnerMode.RULSET_BULK, ExecutionMode.SAVE, ruleAction, itemDataBeanId, DiscrepancyNoteBean.ITEM_DATA,
+                                            currentStudy, ub, prepareEmailContents(ruleSet, ruleSetRule, currentStudy, ruleAction));
+                                if (rab != null) {
+                                    actionBeansToShow.add(ruleAction);
+                                }
                             }
+                            if (actionBeansToShow.size() > 0) {
+                                crfViewSpecificOrderedObjects =
+                                    populateForCrfBasedRulesView(crfViewSpecificOrderedObjects, ruleSet, rule, result, currentStudy, actionBeansToShow);
+                            }
+
                         }
                     } catch (OpenClinicaSystemException osa) {
                         String errorMessage =
