@@ -49,11 +49,8 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
     }
 
     public boolean isShown(Object metadataBean, EventCRFBean eventCrfBean) {
-        // do we check against the database, or just against the object? prob against the db
         ItemFormMetadataBean itemFormMetadataBean = (ItemFormMetadataBean) metadataBean;
-        // return itemFormMetadataBean.isShowItem();
-        DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataBean(itemFormMetadataBean, eventCrfBean);
-        // DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataDao().findByMetadataBean(itemFormMetadataBean, eventCrfBean);
+        DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataBean(itemFormMetadataBean, eventCrfBean, null);
         if (dynamicsMetadataBean != null) {
             return dynamicsMetadataBean.isShowItem();
         } else {
@@ -63,12 +60,12 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         // return false;
     }
 
-    public boolean isShown(int itemId, EventCRFBean eventCrfBean) {
+    public boolean isShown(Integer itemId, EventCRFBean eventCrfBean) {
         // do we check against the database, or just against the object? prob against the db
         // ItemFormMetadataBean itemFormMetadataBean = (ItemFormMetadataBean) metadataBean;
         // return itemFormMetadataBean.isShowItem();
         ItemFormMetadataBean itemFormMetadataBean = getItemFormMetadataDAO().findByItemIdAndCRFVersionId(itemId, eventCrfBean.getCRFVersionId());
-        DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataBean(itemFormMetadataBean, eventCrfBean);
+        DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataBean(itemFormMetadataBean, eventCrfBean, null);
         // DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataDao().findByMetadataBean(itemFormMetadataBean, eventCrfBean);
         if (dynamicsMetadataBean != null) {
             return dynamicsMetadataBean.isShowItem();
@@ -79,18 +76,33 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         // return false;
     }
 
-    public DynamicsItemFormMetadataBean getDynamicsItemFormMetadataBean(ItemFormMetadataBean metadataBean, EventCRFBean eventCrfBean) {
+    /**
+     * 
+     * TODO: remove the @deprecated call. The reason it is there now is to accommodate the call being made from the DataEntryServlet
+     * 
+     * @param metadataBean
+     * @param eventCrfBean
+     * @param itemDataBean
+     * @return DynamicsItemFormMetadataBean
+     */
+    private DynamicsItemFormMetadataBean getDynamicsItemFormMetadataBean(ItemFormMetadataBean metadataBean, EventCRFBean eventCrfBean, ItemDataBean itemDataBean) {
         ItemFormMetadataBean itemFormMetadataBean = metadataBean;
+        DynamicsItemFormMetadataBean dynamicsMetadataBean = null;
+        if (itemDataBean == null) {
+            dynamicsMetadataBean = getDynamicsItemFormMetadataDao().findByMetadataBean(itemFormMetadataBean, eventCrfBean);
+        } else {
+            dynamicsMetadataBean = getDynamicsItemFormMetadataDao().findByMetadataBean(itemFormMetadataBean, eventCrfBean, itemDataBean);
+        }
 
-        DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataDao().findByMetadataBean(itemFormMetadataBean, eventCrfBean);
         return dynamicsMetadataBean;
 
     }
 
-    public boolean showItem(ItemFormMetadataBean metadataBean, EventCRFBean eventCrfBean) {
+    public boolean showItem(ItemFormMetadataBean metadataBean, EventCRFBean eventCrfBean, ItemDataBean itemDataBean) {
         ItemFormMetadataBean itemFormMetadataBean = metadataBean;
         itemFormMetadataBean.setShowItem(true);
         DynamicsItemFormMetadataBean dynamicsMetadataBean = new DynamicsItemFormMetadataBean(itemFormMetadataBean, eventCrfBean);
+        dynamicsMetadataBean.setItemDataId(itemDataBean.getId());
         dynamicsMetadataBean.setShowItem(true);
         getDynamicsItemFormMetadataDao().saveOrUpdate(dynamicsMetadataBean);
         return true;
@@ -105,24 +117,31 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         ItemDataBean itemDataBean = (ItemDataBean) getItemDataDAO().findByPK(itemDataId);
         EventCRFBean eventCrfBean = (EventCRFBean) getEventCRFDAO().findByPK(itemDataBean.getEventCRFId());
         for (String oid : oids) {
-            // System.out.println("... looking at this oid " + oid + " ...");
             ItemOrItemGroupHolder itemOrItemGroup = getItemOrItemGroup(oid);
+            // OID is an item
             if (itemOrItemGroup.getItemBean() != null) {
+                ItemDataBean oidBasedItemData = getItemData(itemOrItemGroup.getItemBean(), eventCrfBean, itemDataBean.getOrdinal());
                 ItemFormMetadataBean itemFormMetadataBean =
                     getItemFormMetadataDAO().findByItemIdAndCRFVersionId(itemOrItemGroup.getItemBean().getId(), eventCrfBean.getCRFVersionId());
-                DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataBean(itemFormMetadataBean, eventCrfBean);
+                DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataBean(itemFormMetadataBean, eventCrfBean, oidBasedItemData);
                 if (dynamicsMetadataBean == null) {
-                    showItem(itemFormMetadataBean, eventCrfBean);
-                    // System.out.println("... just set oid " + oid + " to shown ...");
+                    showItem(itemFormMetadataBean, eventCrfBean, oidBasedItemData);
                 } else if (dynamicsMetadataBean != null && !dynamicsMetadataBean.isShowItem()) {
                     dynamicsMetadataBean.setShowItem(true);
                     getDynamicsItemFormMetadataDao().saveOrUpdate(dynamicsMetadataBean);
                 }
-            } else {
-                // Group
+            }
+            // OID is a group
+            else {
+
             }
 
         }
+    }
+
+    private ItemDataBean getItemData(ItemBean itemBean, EventCRFBean eventCrfBean, Integer ordinal) {
+        return getItemDataDAO().findByItemIdAndEventCRFIdAndOrdinal(itemBean.getId(), eventCrfBean.getId(), ordinal);
+
     }
 
     private ItemOrItemGroupHolder getItemOrItemGroup(String oid) {
