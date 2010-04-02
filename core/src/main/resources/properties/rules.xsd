@@ -28,6 +28,7 @@
             <xs:element ref="DiscrepancyNoteAction" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="EmailAction" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="ShowAction" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="HideAction" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="InsertAction" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attributeGroup ref="RuleRefAttributeType"/>
@@ -63,6 +64,16 @@
     
     <xs:element name="ShowAction" type="ShowActionType"/>
     <xs:complexType name="ShowActionType">
+        <xs:sequence>
+            <xs:element name="Run" type="ActionRunType"/>
+            <xs:element name="Message" type="xs:string"/>
+            <xs:element name="OIDs" type="xs:string"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="DiscrepancyNoteActionAttributeType"/>
+    </xs:complexType>
+    
+    <xs:element name="HideAction" type="HideActionType"/>
+    <xs:complexType name="HideActionType">
         <xs:sequence>
             <xs:element name="Run" type="ActionRunType"/>
             <xs:element name="Message" type="xs:string"/>

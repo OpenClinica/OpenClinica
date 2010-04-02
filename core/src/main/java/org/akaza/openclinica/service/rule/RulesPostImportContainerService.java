@@ -17,6 +17,7 @@ import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
+import org.akaza.openclinica.domain.rule.action.HideActionBean;
 import org.akaza.openclinica.domain.rule.action.InsertActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean;
@@ -182,6 +183,15 @@ public class RulesPostImportContainerService {
     private void isRuleActionValid(RuleActionBean ruleActionBean, AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper) {
         if (ruleActionBean instanceof ShowActionBean) {
             String[] oids = (((ShowActionBean) ruleActionBean).getOIDs()).split(",");
+            for (String oid : oids) {
+                String result = getExpressionService().checkValidityOfItemOrItemGroupOidInCrf(oid, ruleSetBeanWrapper.getAuditableBean());
+                if (!result.equals("OK")) {
+                    ruleSetBeanWrapper.error("ShowAction OID " + result + " is not Valid. ");
+                }
+            }
+        }
+        if (ruleActionBean instanceof HideActionBean) {
+            String[] oids = (((HideActionBean) ruleActionBean).getOIDs()).split(",");
             for (String oid : oids) {
                 String result = getExpressionService().checkValidityOfItemOrItemGroupOidInCrf(oid, ruleSetBeanWrapper.getAuditableBean());
                 if (!result.equals("OK")) {

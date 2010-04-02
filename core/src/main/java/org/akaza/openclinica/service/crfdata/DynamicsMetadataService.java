@@ -108,6 +108,15 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         return true;
     }
 
+    public boolean hideItem(ItemFormMetadataBean metadataBean, EventCRFBean eventCrfBean, ItemDataBean itemDataBean) {
+        ItemFormMetadataBean itemFormMetadataBean = metadataBean;
+        DynamicsItemFormMetadataBean dynamicsMetadataBean = new DynamicsItemFormMetadataBean(itemFormMetadataBean, eventCrfBean);
+        dynamicsMetadataBean.setItemDataId(itemDataBean.getId());
+        dynamicsMetadataBean.setShowItem(false);
+        getDynamicsItemFormMetadataDao().saveOrUpdate(dynamicsMetadataBean);
+        return true;
+    }
+
     public boolean showGroup(ItemGroupMetadataBean metadataBean, EventCRFBean eventCrfBean) {
         ItemGroupMetadataBean itemGroupMetadataBean = metadataBean;
         return true;
@@ -135,7 +144,31 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
             else {
 
             }
+        }
+    }
 
+    public void hide(Integer itemDataId, String[] oids) {
+        ItemDataBean itemDataBean = (ItemDataBean) getItemDataDAO().findByPK(itemDataId);
+        EventCRFBean eventCrfBean = (EventCRFBean) getEventCRFDAO().findByPK(itemDataBean.getEventCRFId());
+        for (String oid : oids) {
+            ItemOrItemGroupHolder itemOrItemGroup = getItemOrItemGroup(oid);
+            // OID is an item
+            if (itemOrItemGroup.getItemBean() != null) {
+                ItemDataBean oidBasedItemData = getItemData(itemOrItemGroup.getItemBean(), eventCrfBean, itemDataBean.getOrdinal());
+                ItemFormMetadataBean itemFormMetadataBean =
+                    getItemFormMetadataDAO().findByItemIdAndCRFVersionId(itemOrItemGroup.getItemBean().getId(), eventCrfBean.getCRFVersionId());
+                DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataBean(itemFormMetadataBean, eventCrfBean, oidBasedItemData);
+                if (dynamicsMetadataBean == null && oidBasedItemData.getValue().equals("")) {
+                    showItem(itemFormMetadataBean, eventCrfBean, oidBasedItemData);
+                } else if (dynamicsMetadataBean != null && dynamicsMetadataBean.isShowItem() && oidBasedItemData.getValue().equals("")) {
+                    dynamicsMetadataBean.setShowItem(false);
+                    getDynamicsItemFormMetadataDao().saveOrUpdate(dynamicsMetadataBean);
+                }
+            }
+            // OID is a group
+            else {
+
+            }
         }
     }
 

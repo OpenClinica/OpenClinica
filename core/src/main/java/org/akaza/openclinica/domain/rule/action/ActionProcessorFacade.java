@@ -17,6 +17,8 @@ public class ActionProcessorFacade {
             return new EmailActionProcessor(ds, mailSender);
         case SHOW:
             return new ShowActionProcessor(ds, itemMetadataService);
+        case HIDE:
+            return new HideActionProcessor(ds, itemMetadataService);
         default:
             throw new OpenClinicaSystemException("actionType", "Unrecognized action type!");
         }
