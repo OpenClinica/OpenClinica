@@ -80,6 +80,10 @@
                type="java.lang.Boolean">
             <bind-xml name="IfExpressionEvaluates" node="attribute"/>
        </field>
+       <field name="RuleActionRun"
+               type="org.akaza.openclinica.domain.rule.action.RuleActionRunBean">
+               <bind-xml name="Run"/>
+       </field>
         <field name="Message"
                type="java.lang.String">
             <bind-xml name="Message" node="element"/>
@@ -90,6 +94,10 @@
         <field name="ExpressionEvaluatesTo"
                type="java.lang.Boolean">
             <bind-xml name="IfExpressionEvaluates" node="attribute"/>
+       </field>
+       <field name="RuleActionRun"
+               type="org.akaza.openclinica.domain.rule.action.RuleActionRunBean">
+               <bind-xml name="Run"/>
        </field>
         <field name="Message"
                type="java.lang.String">
@@ -106,6 +114,10 @@
                type="java.lang.Boolean">
             <bind-xml name="IfExpressionEvaluates" node="attribute"/>
        </field>
+       <field name="RuleActionRun"
+               type="org.akaza.openclinica.domain.rule.action.RuleActionRunBean">
+               <bind-xml name="Run"/>
+       </field>
         <field name="Message"
                type="java.lang.String">
             <bind-xml name="Message" node="element"/>
@@ -120,6 +132,10 @@
         <field name="ExpressionEvaluatesTo"
                type="java.lang.Boolean">
             <bind-xml name="IfExpressionEvaluates" node="attribute"/>
+       </field>
+       <field name="RuleActionRun"
+               type="org.akaza.openclinica.domain.rule.action.RuleActionRunBean">
+               <bind-xml name="Run"/>
        </field>
         <field name="Message"
                type="java.lang.String">

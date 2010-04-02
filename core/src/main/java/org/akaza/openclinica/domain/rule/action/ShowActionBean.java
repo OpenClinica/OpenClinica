@@ -14,6 +14,7 @@ public class ShowActionBean extends RuleActionBean {
 
     public ShowActionBean() {
         setActionType(ActionType.SHOW);
+        setRuleActionRun(new RuleActionRunBean(true, true, true, false, false));
     }
 
     public String getMessage() {
@@ -44,4 +45,10 @@ public class ShowActionBean extends RuleActionBean {
         String[] oids = getOIDs().split(",");
         return oids;
     }
+
+    @Override
+    public String toString() {
+        return "ShowActionBean [OIDs=" + OIDs + ", message=" + message + "]";
+    }
+
 }

@@ -14,6 +14,7 @@ public class HideActionBean extends RuleActionBean {
 
     public HideActionBean() {
         setActionType(ActionType.HIDE);
+        setRuleActionRun(new RuleActionRunBean(true, true, true, false, false));
     }
 
     public String getMessage() {
@@ -43,5 +44,10 @@ public class HideActionBean extends RuleActionBean {
     public String[] getOIDsAsArray() {
         String[] oids = getOIDs().split(",");
         return oids;
+    }
+
+    @Override
+    public String toString() {
+        return "HideActionBean [OIDs=" + OIDs + ", message=" + message + "]";
     }
 }

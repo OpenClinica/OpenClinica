@@ -12,6 +12,7 @@ public class DiscrepancyNoteActionBean extends RuleActionBean {
 
     public DiscrepancyNoteActionBean() {
         setActionType(ActionType.FILE_DISCREPANCY_NOTE);
+        setRuleActionRun(new RuleActionRunBean(true, true, true, true, true));
     }
 
     public String getMessage() {

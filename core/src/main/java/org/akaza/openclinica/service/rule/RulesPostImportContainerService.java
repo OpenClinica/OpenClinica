@@ -17,10 +17,10 @@ import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
+import org.akaza.openclinica.domain.rule.action.EmailActionBean;
 import org.akaza.openclinica.domain.rule.action.HideActionBean;
 import org.akaza.openclinica.domain.rule.action.InsertActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
-import org.akaza.openclinica.domain.rule.action.RuleActionRunBean;
 import org.akaza.openclinica.domain.rule.action.ShowActionBean;
 import org.akaza.openclinica.domain.rule.expression.Context;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
@@ -172,8 +172,6 @@ public class RulesPostImportContainerService {
                                 .error("The Contextual expression in one of the Rules does not validate against the Target expression in the Current RuleSet");
                 }
                 for (RuleActionBean ruleActionBean : ruleSetRuleBean.getActions()) {
-                    // TODO: change this when you allow configurable runs in xml
-                    ruleActionBean.setRuleActionRun(new RuleActionRunBean());
                     isRuleActionValid(ruleActionBean, ruleSetBeanWrapper);
                 }
             }
@@ -183,6 +181,9 @@ public class RulesPostImportContainerService {
     private void isRuleActionValid(RuleActionBean ruleActionBean, AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper) {
         if (ruleActionBean instanceof ShowActionBean) {
             String[] oids = (((ShowActionBean) ruleActionBean).getOIDs()).split(",");
+            if (ruleActionBean.getRuleActionRun().getBatch() == true || ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
+                ruleSetBeanWrapper.error("ShowAction " + ((ShowActionBean) ruleActionBean).toString() + " is not Valid. ");
+            }
             for (String oid : oids) {
                 String result = getExpressionService().checkValidityOfItemOrItemGroupOidInCrf(oid, ruleSetBeanWrapper.getAuditableBean());
                 if (!result.equals("OK")) {
@@ -192,6 +193,9 @@ public class RulesPostImportContainerService {
         }
         if (ruleActionBean instanceof HideActionBean) {
             String[] oids = (((HideActionBean) ruleActionBean).getOIDs()).split(",");
+            if (ruleActionBean.getRuleActionRun().getBatch() == true || ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
+                ruleSetBeanWrapper.error("HideAction " + ((HideActionBean) ruleActionBean).toString() + " is not Valid. ");
+            }
             for (String oid : oids) {
                 String result = getExpressionService().checkValidityOfItemOrItemGroupOidInCrf(oid, ruleSetBeanWrapper.getAuditableBean());
                 if (!result.equals("OK")) {
@@ -201,9 +205,17 @@ public class RulesPostImportContainerService {
         }
         if (ruleActionBean instanceof InsertActionBean) {
             String oid = (((InsertActionBean) ruleActionBean)).getProperties().get(0).getOid();
+            if (ruleActionBean.getRuleActionRun().getBatch() == true || ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
+                ruleSetBeanWrapper.error("InsertAction " + ((InsertActionBean) ruleActionBean).toString() + " is not Valid. ");
+            }
             String result = getExpressionService().checkValidityOfItemOrItemGroupOidInCrf(oid, ruleSetBeanWrapper.getAuditableBean());
             if (!result.equals("OK")) {
                 ruleSetBeanWrapper.error("InsertAction OID " + result + " is not Valid. ");
+            }
+        }
+        if (ruleActionBean instanceof EmailActionBean) {
+            if (ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
+                ruleSetBeanWrapper.error("EmailAction " + ((EmailActionBean) ruleActionBean).toString() + " is not Valid. ");
             }
         }
     }

@@ -67,15 +67,14 @@ import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
-import org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
+import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.logic.expressionTree.ExpressionTreeHelper;
 import org.akaza.openclinica.logic.rulerunner.MessageContainer.MessageType;
 import org.akaza.openclinica.logic.score.ScoreCalculator;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
-import org.akaza.openclinica.service.crfdata.MetadataServiceInterface;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
@@ -231,7 +230,7 @@ public abstract class DataEntryServlet extends SecureController {
     protected RuleSetServiceInterface ruleSetService;
     protected ExpressionService expressionService;
     protected DiscrepancyNoteService discrepancyNoteService;
-    DynamicsMetadataService itemMetadataService; 
+    DynamicsMetadataService itemMetadataService;
 
     /**
      * Determines whether the form was submitted. Calculated once in processRequest. The reason we don't use the normal means to determine if the form was
@@ -1440,7 +1439,7 @@ public abstract class DataEntryServlet extends SecureController {
                 }
                 HashMap<String, ArrayList<String>> rulesPostDryRun = runRules(allItems, ruleSets, false, shouldRunRules(), MessageType.WARNING);
                 System.out.println("found rules post dry run: " + rulesPostDryRun.toString());
-                HashMap<String, ArrayList<String>> errorsPostDryRun = new HashMap<String, ArrayList<String>> ();
+                HashMap<String, ArrayList<String>> errorsPostDryRun = new HashMap<String, ArrayList<String>>();
                 // additional step needed, run rules and see if any items are 'shown' AFTER saving data
                 if (!rulesPostDryRun.isEmpty()) {
                     // in same section?
@@ -1464,10 +1463,10 @@ public abstract class DataEntryServlet extends SecureController {
                                 }
                                 // break;
                             }
-                        } 
+                        }
                         section.setItems(displayItems);
                     }
-                    
+
                     // if so, stay at this section
                     System.out.println(" in same section: " + inSameSection);
                     if (inSameSection) {
@@ -1484,16 +1483,16 @@ public abstract class DataEntryServlet extends SecureController {
                         addPageMessage(respage.getString("your_answers_activated_hidden_items"));
                         request.setAttribute("hasError", "true");
                         request.setAttribute("hasShown", "true");
-                        
+
                         session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
                         setUpPanel(section);
                         forwardPage(getJSPPage());
                     }
                     // if not, progress as usual
                 }
-                
+
                 // can we just forward page or do we actually need an ELSE here?
-                
+
                 ArrayList<String> updateFailedItems = sc.redoCalculations(scoreItems, scoreItemdata, changedItems, itemOrdinals, sb.getId());
                 success = updateFailedItems.size() > 0 ? false : true;
 
@@ -2985,13 +2984,14 @@ public abstract class DataEntryServlet extends SecureController {
 
         return answer;
     }
-    
+
     /**
      * gets the available dynamics service
      */
     private DynamicsMetadataService getItemMetadataService() {
         itemMetadataService =
-            this.itemMetadataService != null ? itemMetadataService : (DynamicsMetadataService)SpringServletAccess.getApplicationContext(context).getBean("dynamicsMetadataService");
+            this.itemMetadataService != null ? itemMetadataService : (DynamicsMetadataService) SpringServletAccess.getApplicationContext(context).getBean(
+                    "dynamicsMetadataService");
         return itemMetadataService;
     }
 
@@ -4035,7 +4035,8 @@ public abstract class DataEntryServlet extends SecureController {
             // return getRuleSetService().runRules(ruleSets, dryRun,
             // currentStudy, c.variableAndValue, ub);
             System.out.println("running rules ... rule sets size is " + ruleSets.size());
-            return getRuleSetService().runRulesInDataEntry(ruleSets, dryRun, currentStudy, ub, c.variableAndValue).getByMessageType(mt);
+            return getRuleSetService().runRulesInDataEntry(ruleSets, dryRun, currentStudy, ub, c.variableAndValue, Phase.INITIAL_DATA_ENTRY).getByMessageType(
+                    mt);
         } else {
             return new HashMap<String, ArrayList<String>>();
         }

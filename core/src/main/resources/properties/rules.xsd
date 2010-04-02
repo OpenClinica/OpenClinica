@@ -46,7 +46,7 @@
     <xs:element name="DiscrepancyNoteAction" type="DiscrepancyNoteActionType"/>
     <xs:complexType name="DiscrepancyNoteActionType">
         <xs:sequence>
-            <xs:element name="Run" type="ActionRunType"/>
+            <xs:element name="Run" type="ActionRunType" minOccurs="0"/>
             <xs:element name="Message" type="xs:string"/>
         </xs:sequence>
         <xs:attributeGroup ref="DiscrepancyNoteActionAttributeType"/>
@@ -55,7 +55,7 @@
     <xs:element name="EmailAction" type="EmailActionType"/>
     <xs:complexType name="EmailActionType">
         <xs:sequence>
-            <xs:element name="Run" type="ActionRunType"/>
+            <xs:element name="Run" type="ActionRunType" minOccurs="0"/>
             <xs:element name="Message" type="xs:string"/>
             <xs:element name="To" type="xs:string"/>
         </xs:sequence>
@@ -65,7 +65,7 @@
     <xs:element name="ShowAction" type="ShowActionType"/>
     <xs:complexType name="ShowActionType">
         <xs:sequence>
-            <xs:element name="Run" type="ActionRunType"/>
+            <xs:element name="Run" type="ActionRunType" minOccurs="0"/>
             <xs:element name="Message" type="xs:string"/>
             <xs:element name="OIDs" type="xs:string"/>
         </xs:sequence>
@@ -75,7 +75,7 @@
     <xs:element name="HideAction" type="HideActionType"/>
     <xs:complexType name="HideActionType">
         <xs:sequence>
-            <xs:element name="Run" type="ActionRunType"/>
+            <xs:element name="Run" type="ActionRunType" minOccurs="0"/>
             <xs:element name="Message" type="xs:string"/>
             <xs:element name="OIDs" type="xs:string"/>
         </xs:sequence>
@@ -85,7 +85,7 @@
    <xs:element name="InsertAction" type="InsertActionType"/>
     <xs:complexType name="InsertActionType">
         <xs:sequence>
-            <xs:element name="Run" type="ActionRunType"/>
+            <xs:element name="Run" type="ActionRunType" minOccurs="0"/>
             <xs:element name="Property" type="PropertyType"/>
         </xs:sequence>
         <xs:attributeGroup ref="DiscrepancyNoteActionAttributeType"/>

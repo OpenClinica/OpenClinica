@@ -39,6 +39,15 @@ public class RuleActionRunBean extends AbstractMutableDomainObject {
         this.batch = true;
     }
 
+    public RuleActionRunBean(Boolean administrativeDataEntry, Boolean initialDataEntry, Boolean doubleDataEntry, Boolean importDataEntry, Boolean batch) {
+        super();
+        this.administrativeDataEntry = administrativeDataEntry;
+        this.initialDataEntry = initialDataEntry;
+        this.doubleDataEntry = doubleDataEntry;
+        this.importDataEntry = importDataEntry;
+        this.batch = batch;
+    }
+
     public enum Phase {
         ADMIN_EDITING, INITIAL_DATA_ENTRY, DOUBLE_DATA_ENTRY, IMPORT, BATCH
     }

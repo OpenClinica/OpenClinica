@@ -14,6 +14,7 @@ public class EmailActionBean extends RuleActionBean {
 
     public EmailActionBean() {
         setActionType(ActionType.EMAIL);
+        setRuleActionRun(new RuleActionRunBean(true, true, true, false, true));
     }
 
     public String getMessage() {

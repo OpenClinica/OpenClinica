@@ -29,7 +29,7 @@ public class DataEntryRuleRunner extends RuleRunner {
     }
 
     public MessageContainer runRules(List<RuleSetBean> ruleSets, ExecutionMode executionMode, StudyBean currentStudy, HashMap<String, String> variableAndValue,
-            UserAccountBean ub) {
+            UserAccountBean ub, Phase phase) {
 
         if (variableAndValue == null || variableAndValue.isEmpty()) {
             logger.warn("You must be executing Rules in Batch");
@@ -51,7 +51,7 @@ public class DataEntryRuleRunner extends RuleRunner {
 
                         //HashMap<String, ArrayList<String>> messagesOfActionsToBeExecuted = ruleSetRule.getActionsAsKeyPair(result);
                         // Actions
-                        List<RuleActionBean> actionListBasedOnRuleExecutionResult = ruleSetRule.getActions(result, Phase.INITIAL_DATA_ENTRY);
+                        List<RuleActionBean> actionListBasedOnRuleExecutionResult = ruleSetRule.getActions(result, phase);
                         logger.info("RuleSet with target  : {} , Ran Rule : {}  The Result was : {} , Based on that {} action will be executed ", new Object[] {
                             ruleSet.getTarget().getValue(), rule.getName(), result, actionListBasedOnRuleExecutionResult.size() });
                         // System.out.println("ran ruleset with target: " + ruleSet.getTarget().getValue() + 

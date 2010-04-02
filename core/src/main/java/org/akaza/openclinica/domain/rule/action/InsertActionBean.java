@@ -17,6 +17,7 @@ public class InsertActionBean extends RuleActionBean {
 
     public InsertActionBean() {
         setActionType(ActionType.INSERT);
+        setRuleActionRun(new RuleActionRunBean(true, true, true, false, false));
     }
 
     @OneToMany(cascade = CascadeType.ALL)
