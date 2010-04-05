@@ -2384,7 +2384,7 @@ public abstract class DataEntryServlet extends SecureController {
         if (!isNull) {
             if (StringUtil.isBlank(idb.getValue())) {
                 // check required first
-                if (ibMeta.isRequired()) {
+                if (ibMeta.isRequired() && ibMeta.isShowItem()) {
                     v.addValidation(inputName, Validator.IS_REQUIRED);
                 }
             } else {
@@ -2450,7 +2450,7 @@ public abstract class DataEntryServlet extends SecureController {
         ItemFormMetadataBean ibMeta = dib.getMetadata();
         ItemDataBean idb = dib.getData();
         if (StringUtil.isBlank(idb.getValue())) {
-            if (ibMeta.isRequired()) {
+            if (ibMeta.isRequired() && ibMeta.isShowItem()) {
                 v.addValidation(inputName, Validator.IS_REQUIRED);
             }
             v.addValidation(inputName, Validator.IS_AN_RULE, messages);
@@ -2478,7 +2478,7 @@ public abstract class DataEntryServlet extends SecureController {
         ItemFormMetadataBean ibMeta = dib.getMetadata();
         ItemDataBean idb = dib.getData();
         if (StringUtil.isBlank(idb.getValue())) {
-            if (ibMeta.isRequired()) {
+            if (ibMeta.isRequired() && ibMeta.isShowItem()) {
                 v.addValidation(inputName, Validator.IS_REQUIRED);
             }
         } else {
@@ -2505,7 +2505,7 @@ public abstract class DataEntryServlet extends SecureController {
         ItemFormMetadataBean ibMeta = dib.getMetadata();
         ItemDataBean idb = dib.getData();
         if (StringUtil.isBlank(idb.getValue())) {
-            if (ibMeta.isRequired()) {
+            if (ibMeta.isRequired() && ibMeta.isShowItem()) {
                 v.addValidation(inputName, Validator.IS_REQUIRED);
             }
         } else {
