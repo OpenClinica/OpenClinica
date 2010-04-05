@@ -3,7 +3,6 @@
 <mapping>
 
     <field-handler name="emailHandler" class="org.akaza.openclinica.bean.rule.EmailHandler"/>
-    <field-handler name="oidHandler" class="org.akaza.openclinica.bean.rule.OidHandler"/>
 
     <class name="org.akaza.openclinica.domain.rule.RulesPostImportContainer">
         <map-to xml="RuleImport"/>
@@ -123,10 +122,10 @@
             <bind-xml name="Message" node="element"/>
         </field>
         <field name="OIDs"
-               type="java.lang.String" handler="oidHandler">
+               type="java.lang.String" handler="org.akaza.openclinica.bean.rule.OidHandler">
             <bind-xml name="OIDs" node="element"/>
         </field>
-     </class>
+     </class> 
      <class name="org.akaza.openclinica.domain.rule.action.HideActionBean">
         <map-to xml="HideAction" />
         <field name="ExpressionEvaluatesTo"
@@ -142,7 +141,7 @@
             <bind-xml name="Message" node="element"/>
         </field>
         <field name="OIDs"
-               type="java.lang.String" handler="oidHandler">
+               type="java.lang.String" handler="org.akaza.openclinica.bean.rule.OidHandler">
             <bind-xml name="OIDs" node="element"/>
         </field>
      </class>

@@ -182,7 +182,8 @@ public class RulesPostImportContainerService {
         if (ruleActionBean instanceof ShowActionBean) {
             String[] oids = (((ShowActionBean) ruleActionBean).getOIDs()).split(",");
             if (ruleActionBean.getRuleActionRun().getBatch() == true || ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
-                ruleSetBeanWrapper.error("ShowAction " + ((ShowActionBean) ruleActionBean).toString() + " is not Valid. ");
+                ruleSetBeanWrapper.error("ShowAction " + ((ShowActionBean) ruleActionBean).toString()
+                    + " is not Valid. You cannot have ImportDataEntry=\"true\" Batch=\"true\". ");
             }
             for (String oid : oids) {
                 String result = getExpressionService().checkValidityOfItemOrItemGroupOidInCrf(oid, ruleSetBeanWrapper.getAuditableBean());
@@ -194,12 +195,13 @@ public class RulesPostImportContainerService {
         if (ruleActionBean instanceof HideActionBean) {
             String[] oids = (((HideActionBean) ruleActionBean).getOIDs()).split(",");
             if (ruleActionBean.getRuleActionRun().getBatch() == true || ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
-                ruleSetBeanWrapper.error("HideAction " + ((HideActionBean) ruleActionBean).toString() + " is not Valid. ");
+                ruleSetBeanWrapper.error("HideAction " + ((HideActionBean) ruleActionBean).toString()
+                    + " is not Valid. You cannot have ImportDataEntry=\"true\" Batch=\"true\". ");
             }
             for (String oid : oids) {
                 String result = getExpressionService().checkValidityOfItemOrItemGroupOidInCrf(oid, ruleSetBeanWrapper.getAuditableBean());
                 if (!result.equals("OK")) {
-                    ruleSetBeanWrapper.error("ShowAction OID " + result + " is not Valid. ");
+                    ruleSetBeanWrapper.error("HideAction OID " + result + " is not Valid. ");
                 }
             }
         }
@@ -215,7 +217,8 @@ public class RulesPostImportContainerService {
         }
         if (ruleActionBean instanceof EmailActionBean) {
             if (ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
-                ruleSetBeanWrapper.error("EmailAction " + ((EmailActionBean) ruleActionBean).toString() + " is not Valid. ");
+                ruleSetBeanWrapper.error("EmailAction " + ((EmailActionBean) ruleActionBean).toString()
+                    + " is not Valid.You cannot have ImportDataEntry=\"true\". ");
             }
         }
     }
