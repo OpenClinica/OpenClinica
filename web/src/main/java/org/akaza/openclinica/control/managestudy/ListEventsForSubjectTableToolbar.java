@@ -20,14 +20,16 @@ public class ListEventsForSubjectTableToolbar extends DefaultToolbar {
     private final ArrayList<StudyGroupClassBean> studyGroupClasses;
     private final StudyEventDefinitionBean selectedStudyEventDefinition;
     private final boolean addSubjectLinkShow;
+    private final boolean showMoreLink;
 
     public ListEventsForSubjectTableToolbar(ArrayList<StudyEventDefinitionBean> studyEventDefinitions, ArrayList<StudyGroupClassBean> studyGroupClasses,
-            StudyEventDefinitionBean selectedStudyEventDefinition, boolean addSubjectLinkShow) {
+            StudyEventDefinitionBean selectedStudyEventDefinition, boolean addSubjectLinkShow, boolean showMoreLink) {
         super();
         this.studyEventDefinitions = studyEventDefinitions;
         this.studyGroupClasses = studyGroupClasses;
         this.selectedStudyEventDefinition = selectedStudyEventDefinition;
         this.addSubjectLinkShow = addSubjectLinkShow;
+        this.showMoreLink = showMoreLink;
     }
 
     @Override
@@ -72,14 +74,21 @@ public class ListEventsForSubjectTableToolbar extends DefaultToolbar {
         @Override
         public String enabled() {
             HtmlBuilder html = new HtmlBuilder();
-            html.a().id("showMore").href("javascript:hideCols('listEventsForSubject',[" + getIndexes() + "],true);").close();
-            html.div().close().nbsp().append("Show More").nbsp().divEnd().aEnd();
-            html.a().id("hide").style("display: none;").href("javascript:hideCols('listEventsForSubject',[" + getIndexes() + "],false);").close();
-            html.div().close().nbsp().append("Hide").nbsp().divEnd().aEnd();
+            if(showMoreLink){
+                html.a().id("showMore").href("javascript:hideCols('listEventsForSubject',[" + getIndexes() + "],true);").close();
+                html.div().close().nbsp().append("Show More").nbsp().divEnd().aEnd();
+                html.a().id("hide").style("display: none;").href("javascript:hideCols('listEventsForSubject',[" + getIndexes() + "],false);").close();
+                html.div().close().nbsp().append("Hide").nbsp().divEnd().aEnd();
 
-            html.script().type("text/javascript").close().append(
-                    "$j = jQuery.noConflict(); $j(document).ready(function(){ " + "hideCols('listEventsForSubject',[" + getIndexes() + "],false);});")
-                    .scriptEnd();
+                html.script().type("text/javascript").close().append(
+                        "$j = jQuery.noConflict(); $j(document).ready(function(){ " + "hideCols('listEventsForSubject',[" + getIndexes() + "],false);});")
+                        .scriptEnd();
+            }else{
+                html.a().id("showMore").style("display: none;").href("javascript:hideCols('listEventsForSubject',[" + getIndexes() + "],true);").close();
+                html.div().close().nbsp().append("Show More").nbsp().divEnd().aEnd();
+                html.a().id("hide").href("javascript:hideCols('listEventsForSubject',[" + getIndexes() + "],false);").close();
+                html.div().close().nbsp().append("Hide").nbsp().divEnd().aEnd();
+            }
 
             return html.toString();
         }

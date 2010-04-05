@@ -80,9 +80,11 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
     private ArrayList<StudyGroupClassBean> studyGroupClasses;
     private StudyUserRoleBean currentRole;
     private UserAccountBean currentUser;
+    private boolean showMoreLink = true;
     private ResourceBundle resword;
     private ResourceBundle resformat;
     private StudyEventDefinitionBean selectedStudyEventDefinition;
+
 
     final HashMap<Integer, String> imageIconPaths = new HashMap<Integer, String>(8);
     final HashMap<Integer, String> crfColumnImageIconPaths = new HashMap<Integer, String>(8);
@@ -179,7 +181,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         Role r = currentRole.getRole();
         boolean addSubjectLinkShow = studyBean.getStatus().isAvailable() && !r.equals(Role.MONITOR);
         tableFacade.setToolbar(new ListEventsForSubjectTableToolbar(getStudyEventDefinitions(), getStudyGroupClasses(), selectedStudyEventDefinition,
-                addSubjectLinkShow));
+                addSubjectLinkShow, showMoreLink));
     }
 
     @SuppressWarnings("unchecked")
@@ -328,6 +330,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         Collection<Filter> filters = filterSet.getFilters();
         for (Filter filter : filters) {
             String property = filter.getProperty();
+            showMoreLink = listEventsForSubjectFilter.getColumnMapping().get(property).equals("ss.label");
             String value = filter.getValue();
             listEventsForSubjectFilter.addFilter(property, value);
         }
@@ -340,6 +343,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         SortSet sortSet = limit.getSortSet();
         Collection<Sort> sorts = sortSet.getSorts();
         for (Sort sort : sorts) {
+            showMoreLink = sort.getPosition() < 1;
             String property = sort.getProperty();
             String order = sort.getOrder().toParam();
             listEventsForSubjectSort.addSort(property, order);

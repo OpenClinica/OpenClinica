@@ -133,6 +133,9 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
         }
         return status;
     }
+    public HashMap getColumnMapping(){
+        return columnMapping;
+    }
 
     private static class Filter {
         private final String property;
