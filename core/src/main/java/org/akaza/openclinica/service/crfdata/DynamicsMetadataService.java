@@ -14,6 +14,7 @@ import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean;
+import org.akaza.openclinica.domain.rule.action.PropertyBean;
 
 import java.util.List;
 
@@ -169,6 +170,18 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
             else {
 
             }
+        }
+    }
+
+    public void insert(Integer itemDataId, List<PropertyBean> properties) {
+        ItemDataBean itemDataBean = (ItemDataBean) getItemDataDAO().findByPK(itemDataId);
+        EventCRFBean eventCrfBean = (EventCRFBean) getEventCRFDAO().findByPK(itemDataBean.getEventCRFId());
+        for (PropertyBean propertyBean : properties) {
+
+            ItemBean itemBean = getItemDAO().findByOid(propertyBean.getOid()).get(0);
+            ItemDataBean oidBasedItemData = getItemData(itemBean, eventCrfBean, itemDataBean.getOrdinal());
+            oidBasedItemData.setValue(propertyBean.getValue());
+            getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd");
         }
     }
 

@@ -33,6 +33,6 @@ public class InsertActionBean extends RuleActionBean {
     @Override
     @Transient
     public String getSummary() {
-        return null;
+        return "";
     }
 }

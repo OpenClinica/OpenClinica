@@ -4,14 +4,17 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.RuleRunner.RuleRunnerMode;
+import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 
 import javax.sql.DataSource;
 
 public class InsertActionProcessor implements ActionProcessor {
 
     DataSource ds;
+    DynamicsMetadataService itemMetadataService;
 
-    public InsertActionProcessor(DataSource ds) {
+    public InsertActionProcessor(DataSource ds, DynamicsMetadataService itemMetadataService) {
+        this.itemMetadataService = itemMetadataService;
         this.ds = ds;
     }
 
@@ -28,7 +31,7 @@ public class InsertActionProcessor implements ActionProcessor {
         }
         case SAVE: {
             if (ruleRunnerMode == RuleRunnerMode.DATA_ENTRY) {
-                saveAndReturnMessage(ruleAction, itemDataBeanId, itemData, currentStudy, ub);
+                save(ruleAction, itemDataBeanId, itemData, currentStudy, ub);
             } else {
                 save(ruleAction, itemDataBeanId, itemData, currentStudy, ub);
             }
@@ -39,7 +42,7 @@ public class InsertActionProcessor implements ActionProcessor {
     }
 
     private RuleActionBean save(RuleActionBean ruleAction, int itemDataBeanId, String itemData, StudyBean currentStudy, UserAccountBean ub) {
-        //
+        getItemMetadataService().insert(itemDataBeanId, ((InsertActionBean) ruleAction).getProperties());
         return null;
     }
 
@@ -50,6 +53,10 @@ public class InsertActionProcessor implements ActionProcessor {
 
     private RuleActionBean dryRun(RuleActionBean ruleAction, int itemDataBeanId, String itemData, StudyBean currentStudy, UserAccountBean ub) {
         return ruleAction;
+    }
+
+    private DynamicsMetadataService getItemMetadataService() {
+        return itemMetadataService;
     }
 
 }

@@ -19,6 +19,8 @@ public class ActionProcessorFacade {
             return new ShowActionProcessor(ds, itemMetadataService);
         case HIDE:
             return new HideActionProcessor(ds, itemMetadataService);
+        case INSERT:
+            return new InsertActionProcessor(ds, itemMetadataService);
         default:
             throw new OpenClinicaSystemException("actionType", "Unrecognized action type!");
         }

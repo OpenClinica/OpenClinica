@@ -28,8 +28,11 @@ import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
 import org.akaza.openclinica.domain.rule.expression.ExpressionProcessor;
 import org.akaza.openclinica.domain.rule.expression.ExpressionProcessorFactory;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
+import org.akaza.openclinica.validator.rule.action.InsertActionValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.validation.DataBinder;
+import org.springframework.validation.Errors;
 
 import java.util.List;
 
@@ -49,6 +52,7 @@ public class RulesPostImportContainerService {
     private StudyBean currentStudy;
 
     private ExpressionService expressionService;
+    private InsertActionValidator insertActionValidator;
 
     public RulesPostImportContainerService(DataSource ds, StudyBean currentStudy) {
         oidGenerator = new GenericOidGenerator();
@@ -210,10 +214,19 @@ public class RulesPostImportContainerService {
             if (ruleActionBean.getRuleActionRun().getBatch() == true || ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
                 ruleSetBeanWrapper.error("InsertAction " + ((InsertActionBean) ruleActionBean).toString() + " is not Valid. ");
             }
+            DataBinder dataBinder = new DataBinder((ruleActionBean));
+            Errors errors = dataBinder.getBindingResult();
+            getInsertActionValidator().validate((ruleActionBean), errors);
+            if (errors.hasErrors()) {
+                ruleSetBeanWrapper.error("InsertAction is not Valid. " + errors.toString());
+            }
+
+            /*
             String result = getExpressionService().checkValidityOfItemOrItemGroupOidInCrf(oid, ruleSetBeanWrapper.getAuditableBean());
             if (!result.equals("OK")) {
                 ruleSetBeanWrapper.error("InsertAction OID " + result + " is not Valid. ");
             }
+            */
         }
         if (ruleActionBean instanceof EmailActionBean) {
             if (ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
@@ -312,6 +325,14 @@ public class RulesPostImportContainerService {
      */
     public void setCurrentStudy(StudyBean currentStudy) {
         this.currentStudy = currentStudy;
+    }
+
+    public InsertActionValidator getInsertActionValidator() {
+        return insertActionValidator;
+    }
+
+    public void setInsertActionValidator(InsertActionValidator insertActionValidator) {
+        this.insertActionValidator = insertActionValidator;
     }
 
     private ExpressionService getExpressionService() {

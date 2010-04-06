@@ -164,6 +164,36 @@ public class ItemDataDAO extends AuditableEntityDAO {
         return idb;
     }
 
+    /**
+     * This will update item data value
+     * 
+     * @param eb
+     * @return
+     */
+    public EntityBean updateValue(EntityBean eb, String current_df_string) {
+        ItemDataBean idb = (ItemDataBean) eb;
+
+        // YW 12-06-2007 << convert to oc_date_format_string pattern before
+        // inserting into database
+        idb.setValue(Utils.convertedItemDateValue(idb.getValue(), current_df_string, oc_df_string));
+        // YW >>
+
+        idb.setActive(false);
+
+        HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
+        variables.put(new Integer(1), new Integer(idb.getStatus().getId()));
+        variables.put(new Integer(2), idb.getValue());
+        variables.put(new Integer(3), new Integer(idb.getUpdaterId()));
+        variables.put(new Integer(4), new Integer(idb.getId()));
+        this.execute(digester.getQuery("updateValue"), variables);
+
+        if (isQuerySuccessful()) {
+            idb.setActive(true);
+        }
+
+        return idb;
+    }
+
     public EntityBean create(EntityBean eb) {
         ItemDataBean idb = (ItemDataBean) eb;
         // YW 12-06-2007 << convert to oc_date_format_string pattern before
@@ -188,7 +218,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
         return idb;
     }
-    
+
     public EntityBean upsert(EntityBean eb) {
         ItemDataBean idb = (ItemDataBean) eb;
         // YW 12-06-2007 << convert to oc_date_format_string pattern before
@@ -292,6 +322,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
         return;
 
     }
+
     public void deleteDnMap(int itemDataId) {
         HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
         variables.put(new Integer(1), new Integer(itemDataId));
@@ -300,7 +331,6 @@ public class ItemDataDAO extends AuditableEntityDAO {
         return;
 
     }
-
 
     public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
         ArrayList al = new ArrayList();

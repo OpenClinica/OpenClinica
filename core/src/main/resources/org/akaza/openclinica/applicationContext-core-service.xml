@@ -31,6 +31,10 @@
         <constructor-arg ref="dataSource"/>
     </bean>
     
+    <bean id="insertActionValidator" class="org.akaza.openclinica.validator.rule.action.InsertActionValidator">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+    
     <!-- 
     <bean id="sdvUtil" class="org.akaza.openclinica.web.table.sdv.SDVUtil"  name="sdvUtil">
         <property name="dataSource" ref="dataSource"/>
