@@ -85,5 +85,8 @@ public class StudySubjectSDVFilter implements CriteriaCommand {
             return value;
         }
     }
+    public HashMap getColumnMapping(){
+        return columnMapping;
+    }
 
 }
