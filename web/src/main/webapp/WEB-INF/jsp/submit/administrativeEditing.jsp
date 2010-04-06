@@ -363,8 +363,14 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                                 <td><input type="submit" id="seh" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class=
                                   "button_medium" onClick="return checkEntryStatus('DataStatus_top');" /></td>
 
-                                <td valign="bottom"><img name=
-                                  "DataStatus_top" id="status_top" alt="<fmt:message key="data_status" bundle="${resword}"/>" src="images/icon_UnchangedData.gif"></td>
+                                <c:choose>
+                                    <c:when test="${! empty formMessages}">
+                                        <td valign="bottom"><img name="DataStatus_top" id="status_top" alt="<fmt:message key="data_status" bundle="${resword}"/>" src="images/icon_UnsavedData.gif"></td>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <td valign="bottom"><img name="DataStatus_top" id="status_top" alt="<fmt:message key="data_status" bundle="${resword}"/>" src="images/icon_UnchangedData.gif"></td>
+                                    </c:otherwise>
+                                </c:choose>
 
                             </tr>
                         </table>
@@ -1135,10 +1141,14 @@ table-->
                     <td>
                     <input type="hidden" name="fromResolvingNotes" value="${fromResolvingNotes}"/>
                     <input type="submit" id="sel" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkEntryStatus('DataStatus_bottom');" /></td>
-
-                    <td valign="bottom"><img name="DataStatus_bottom" alt="<fmt:message key="data_status" bundle="${resword}"/>" src="images/icon_UnchangedData.gif">&nbsp;</td>
-
-
+                    <c:choose>
+                        <c:when test="${! empty formMessages}">
+                            <td valign="bottom"><img name="DataStatus_bottom" alt="<fmt:message key="data_status" bundle="${resword}"/>" src="images/icon_UnsavedData.gif">&nbsp;</td>
+                        </c:when>
+                        <c:otherwise>
+                            <td valign="bottom"><img name="DataStatus_bottom" alt="<fmt:message key="data_status" bundle="${resword}"/>" src="images/icon_UnchangedData.gif">&nbsp;</td>
+                        </c:otherwise>
+                    </c:choose>
                 </tr>
             </table>
         </td>
