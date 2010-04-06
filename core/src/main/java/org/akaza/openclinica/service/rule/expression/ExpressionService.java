@@ -644,7 +644,7 @@ public class ExpressionService {
         }
         if (theOid.length == 1) {
             ItemGroupBean itemGroup = getItemGroupDao().findByOid(oid);
-            if (itemGroup != null && itemGroup.getCrfId() == ruleSet.getCrf().getId()) {
+            if (itemGroup != null && itemGroup.getCrfId() == ruleSet.getCrfId()) {
                 return "OK";
             }
 
