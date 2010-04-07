@@ -426,10 +426,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
         List<ItemGroupBean> itemGroups = igdao.findLegitGroupBySectionId(sectionId);
         if (!itemGroups.isEmpty()) {
             hasItemGroup = true;
-            /*
-             * newDisplayBean = formUtil.
-             * createDisplaySectionBWithFormGroups(sectionId,crfVersionId, sm );
-             */
+            
         }
 
         // if the List of DisplayFormGroups is empty, then the servlet defers to

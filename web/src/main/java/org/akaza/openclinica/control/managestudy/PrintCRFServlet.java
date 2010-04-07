@@ -113,7 +113,7 @@ public class PrintCRFServlet extends DataEntryServlet {
                 // a boolean value depending on whether data is involved or not
                 // ('false' in terms of this
                 // servlet; see PrintDataEntryServlet).
-                DisplaySectionBeanHandler handler = new DisplaySectionBeanHandler(false, sm.getDataSource());
+                DisplaySectionBeanHandler handler = new DisplaySectionBeanHandler(false, sm.getDataSource(), context);
                 handler.setCrfVersionId(crfVersionId);
                 handler.setEventCRFId(eventCRFId);
                 List<DisplaySectionBean> displaySectionBeans = handler.getDisplaySectionBeans();

@@ -168,7 +168,7 @@ public class PrintDataEntryServlet extends DataEntryServlet {
             // handler takes
             // a boolean value depending on whether an event or data is involved
             // or not
-            DisplaySectionBeanHandler handler = new DisplaySectionBeanHandler(true, sm.getDataSource());
+            DisplaySectionBeanHandler handler = new DisplaySectionBeanHandler(true, sm.getDataSource(), context);
 
             handler.setCrfVersionId(crfVersionId);
             handler.setEventCRFId(eventCRFId);

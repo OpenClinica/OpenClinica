@@ -35,6 +35,7 @@ import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
+import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.bean.submit.ResponseOptionBean;
 import org.akaza.openclinica.bean.submit.ResponseSetBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
@@ -69,6 +70,7 @@ import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
+import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.logic.expressionTree.ExpressionTreeHelper;
 import org.akaza.openclinica.logic.rulerunner.MessageContainer.MessageType;
@@ -2034,13 +2036,15 @@ public abstract class DataEntryServlet extends SecureController {
         for (int i = 0; i < repeatMax; i++) {
             DisplayItemGroupBean formGroup = new DisplayItemGroupBean();
             formGroup.setItemGroupBean(digb.getItemGroupBean());
-            formGroup.setGroupMetaBean(digb.getGroupMetaBean());
+            formGroup.setGroupMetaBean(runDynamicsCheck(digb.getGroupMetaBean()));
+            
 
             ItemGroupBean igb = digb.getItemGroupBean();
 
             // want to do deep copy here, so always get a fresh copy for items,
             // may use other better way to do, like clone
-            List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, sm.getDataSource(), ecb.getCRFVersionId(), sb.getId(), nullValuesList);
+            List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, sm.getDataSource(), 
+                    ecb, sb.getId(), nullValuesList, context);
 
             // get the values from the manually created rows first- not from the
             // rep model
@@ -2100,8 +2104,21 @@ public abstract class DataEntryServlet extends SecureController {
         for (int i = 0; i < repeatMax; i++) {
             DisplayItemGroupBean formGroup = new DisplayItemGroupBean();
             formGroup.setItemGroupBean(digb.getItemGroupBean());
-            formGroup.setGroupMetaBean(digb.getGroupMetaBean());
-
+            
+//            try {
+//                // set isShown here, tbh 04/2010
+//                boolean showGroup = getItemMetadataService().isGroupShown(digb.getGroupMetaBean().getId(), ecb);
+//                System.out.println("found show group for group meta bean " + digb.getGroupMetaBean().getId() + ": " + showGroup);
+//                if (showGroup) {
+//                    digb.getGroupMetaBean().setShowGroup(showGroup);
+//                    // we are only hiding, not showing (for now) tbh
+//                }
+//                // << tbh 04/2010
+//            } catch (OpenClinicaException oce) {
+//                // do nothing for right now, just store the bean
+//                System.out.println("throws an OCE for " + digb.getGroupMetaBean().getId());
+//            }
+            formGroup.setGroupMetaBean(runDynamicsCheck(digb.getGroupMetaBean()));
             ItemGroupBean igb = digb.getItemGroupBean();
             // adding this code from below, since we want to pass a null values
             // list
@@ -2117,7 +2134,8 @@ public abstract class DataEntryServlet extends SecureController {
             // may use other better way to do, like clone
 
             // moved it back down here to fix another bug, tbh 12-3-2007
-            List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, sm.getDataSource(), ecb.getCRFVersionId(), sb.getId(), nullValuesList);
+            List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, sm.getDataSource(), 
+                    ecb, sb.getId(), nullValuesList, context);
             logger.info("+++count for dibs after deep copy: " + dibs.size());
             two = System.currentTimeMillis() - timeCheck;
             // logger.info("time 3.dibs: " + two + "ms");
@@ -2163,7 +2181,7 @@ public abstract class DataEntryServlet extends SecureController {
                 // logger.debug("set auto to false for " + igb.getOid() + " " + i);
                 // } else {
                 formGroup.setAuto(true);
-
+                
                 logger.debug("2: set auto to TRUE for " + igb.getOid() + " " + i);
 
                 dibs = processInputForGroupItem(fp, dibs, i, digb, true);
@@ -2339,6 +2357,30 @@ public abstract class DataEntryServlet extends SecureController {
     protected List<DisplayItemGroupBean> validateDisplayItemGroupBean(DiscrepancyValidator v, DisplayItemGroupBean dib, List<DisplayItemGroupBean> digbs,
             List<DisplayItemGroupBean> formGroups, RuleValidator rv, HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid) {
         return digbs;
+    }
+    
+    /*
+     * function written out here to return itemMetadataGroupBeans after they have been checked for show/hide via dynamics.
+     * author: tbh 04/2010
+     *
+     */
+    private ItemGroupMetadataBean runDynamicsCheck(ItemGroupMetadataBean metadataBean) {
+        try {
+            if (!metadataBean.isShowGroup()) {
+                // set isShown here, tbh 04/2010
+                boolean showGroup = getItemMetadataService().isGroupShown(metadataBean.getId(), ecb);
+                System.out.println("found show group for group meta bean " + metadataBean.getId() + ": " + 
+                        metadataBean.getItemGroupId() + 
+                        ": " + ecb.getId() + ": " + showGroup);
+
+                metadataBean.setShowGroup(showGroup);
+            }
+            // << tbh 04/2010
+        } catch (OpenClinicaException oce) {
+            // do nothing for right now, just store the bean
+            System.out.println("throws an OCE for " + metadataBean.getId());
+        }
+        return metadataBean;
     }
 
     /*
@@ -2702,10 +2744,12 @@ public abstract class DataEntryServlet extends SecureController {
             if (includeUngroupedItems) {
                 // Null values: this method adds null values to the
                 // displayitembeans
-                newDisplayBean = formBeanUtil.createDisplaySectionBWithFormGroups(sb.getId(), ecb.getCRFVersionId(), sm.getDataSource(), eventDefinitionCRFId);
+                newDisplayBean = formBeanUtil.createDisplaySectionBWithFormGroups(sb.getId(), ecb.getCRFVersionId(), 
+                        sm.getDataSource(), eventDefinitionCRFId, ecb, context);
             } else {
                 newDisplayBean =
-                    formBeanUtil.createDisplaySectionWithItemGroups(study, sb.getId(), ecb.getCRFVersionId(), ecb.getStudyEventId(), sm, eventDefinitionCRFId);
+                    formBeanUtil.createDisplaySectionWithItemGroups(study, sb.getId(), ecb, 
+                            ecb.getStudyEventId(), sm, eventDefinitionCRFId, context);
             }
             itemGroups = newDisplayBean.getDisplayFormGroups();
             // setDataForDisplayItemGroups(itemGroups, sb,ecb,sm);
@@ -3554,11 +3598,11 @@ public abstract class DataEntryServlet extends SecureController {
                         // better way to
                         // do deep copy, like clone
                         List<DisplayItemBean> dibs =
-                            FormBeanUtil.getDisplayBeansFromItems(itBeans, sm.getDataSource(), ecb.getCRFVersionId(), sb.getId(), edcb, 0);
+                            FormBeanUtil.getDisplayBeansFromItems(itBeans, sm.getDataSource(), ecb, sb.getId(), edcb, 0, context);
 
                         digb.setItems(dibs);
                         logger.info("set with dibs list of : " + dibs.size());
-                        digb.setGroupMetaBean(itemGroup.getGroupMetaBean());
+                        digb.setGroupMetaBean(runDynamicsCheck(itemGroup.getGroupMetaBean()));
                         digb.setItemGroupBean(itemGroup.getItemGroupBean());
                         newOne.getItemGroups().add(digb);
                         newOne.getDbItemGroups().add(digb);
@@ -3598,11 +3642,11 @@ public abstract class DataEntryServlet extends SecureController {
                     // no data, still add a blank row for displaying
                     DisplayItemGroupBean digb = new DisplayItemGroupBean();
                     List<DisplayItemBean> dibs =
-                        FormBeanUtil.getDisplayBeansFromItems(itBeans, sm.getDataSource(), ecb.getCRFVersionId(), sb.getId(), nullValuesList);
+                        FormBeanUtil.getDisplayBeansFromItems(itBeans, sm.getDataSource(), ecb, sb.getId(), nullValuesList, context);
                     digb.setItems(dibs);
                     logger.info("set with nullValuesList of : " + nullValuesList);
                     digb.setEditFlag("initial");
-                    digb.setGroupMetaBean(itemGroup.getGroupMetaBean());
+                    digb.setGroupMetaBean(runDynamicsCheck(itemGroup.getGroupMetaBean()));
                     digb.setItemGroupBean(itemGroup.getItemGroupBean());
                     newOne.getItemGroups().add(digb);
                     newOne.getDbItemGroups().add(digb);

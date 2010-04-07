@@ -20,6 +20,8 @@ import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.view.form.FormBeanUtil;
 import org.akaza.openclinica.view.form.ViewPersistanceHandler;
 
+import javax.servlet.ServletContext;
+
 /**
  * This class handles the responsibility for generating a List of
  * DisplaySectionBeans for a form, such as for a CRF that will be printed. The
@@ -30,17 +32,20 @@ public class DisplaySectionBeanHandler {
     private int crfVersionId;
     private int eventCRFId;
     private List<DisplaySectionBean> displaySectionBeans;
-
+    private ServletContext context;
     private DataSource dataSource;
 
     public DisplaySectionBeanHandler(boolean dataEntry) {
         this.hasStoredData = dataEntry;
     }
 
-    public DisplaySectionBeanHandler(boolean dataEntry, DataSource dataSource) {
+    public DisplaySectionBeanHandler(boolean dataEntry, DataSource dataSource, ServletContext context) {
         this(dataEntry);
         if (dataSource != null) {
             this.setDataSource(dataSource);
+        }
+        if (context != null) {
+            this.context = context;
         }
     }
 
@@ -94,9 +99,10 @@ public class DisplaySectionBeanHandler {
             // for the purposes of null values, try to obtain a valid
             // eventCrfDefinition id
             EventDefinitionCRFBean eventDefBean = null;
+            EventCRFBean eventCRFBean = null;
             if (eventCRFId > 0) {
                 EventCRFDAO ecdao = new EventCRFDAO(dataSource);
-                EventCRFBean eventCRFBean = (EventCRFBean) ecdao.findByPK(eventCRFId);
+                eventCRFBean = (EventCRFBean) ecdao.findByPK(eventCRFId);
                 StudyEventDAO sedao = new StudyEventDAO(dataSource);
                 StudyEventBean studyEvent = (StudyEventBean) sedao.findByPK(eventCRFBean.getStudyEventId());
 
@@ -111,7 +117,8 @@ public class DisplaySectionBeanHandler {
             // for printing
             DisplaySectionBean displaySectionBean;
             for (SectionBean sectionBean : allCrfSections) {
-                displaySectionBean = formBeanUtil.createDisplaySectionBWithFormGroups(sectionBean.getId(), this.crfVersionId, dataSource, eventDefBean.getId());
+                displaySectionBean = formBeanUtil.createDisplaySectionBWithFormGroups(sectionBean.getId(), 
+                        this.crfVersionId, dataSource, eventDefBean.getId(), eventCRFBean, context);
                 displaySectionBeans.add(displaySectionBean);
             }
         }
