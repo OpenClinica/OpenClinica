@@ -87,6 +87,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     private Integer resolutionStatus;
     private Integer discNoteType;
     private Boolean studyHasDiscNotes = new Boolean(false);
+    private boolean showMoreLink = true;
 
     @Override
     protected String getTableName() {
@@ -135,7 +136,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
     @Override
     public void configureTableFacadePostColumnConfiguration(TableFacade tableFacade) {
-        ListNotesTableToolbar toolbar = new ListNotesTableToolbar();
+        ListNotesTableToolbar toolbar = new ListNotesTableToolbar(showMoreLink);
         tableFacade.setToolbar(toolbar);
         toolbar.setStudyHasDiscNotes(studyHasDiscNotes);
         toolbar.setDiscNoteType(discNoteType);
@@ -419,6 +420,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         Collection<Filter> filters = filterSet.getFilters();
         for (Filter filter : filters) {
             String property = filter.getProperty();
+            showMoreLink = (property.equalsIgnoreCase("discrepancyNoteBean.createdDate")|| property.equalsIgnoreCase("discrepancyNoteBean.owner") ||property.equalsIgnoreCase("discrepancyNoteBean.entityType"))?false:true;
             String value = filter.getValue();
             listNotesFilter.addFilter(property, value);
         }
@@ -440,6 +442,11 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         Collection<Sort> sorts = sortSet.getSorts();
         for (Sort sort : sorts) {
             String property = sort.getProperty();
+            if(sort.getPosition()==2){
+                showMoreLink = false;
+            }else if(sort.getPosition()>3){
+                showMoreLink = false;
+            }
             String order = sort.getOrder().toParam();
             listNotesSort.addSort(property, order);
         }

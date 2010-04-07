@@ -17,9 +17,11 @@ public class ListNotesTableToolbar extends DefaultToolbar {
     private int discNoteType;
     private boolean studyHasDiscNotes;
     private ResourceBundle resword;
+    private final boolean showMoreLink;
 
-    public ListNotesTableToolbar() {
+    public ListNotesTableToolbar(boolean showMoreLink) {
         super();
+        this.showMoreLink = showMoreLink;
     }
 
     @Override
@@ -73,13 +75,23 @@ public class ListNotesTableToolbar extends DefaultToolbar {
         @Override
         public String enabled() {
             HtmlBuilder html = new HtmlBuilder();
-            html.a().id("showMore").href("javascript:hideCols('listNotes',[" + getIndexes() + "],true);").close();
-            html.div().close().nbsp().append("Show More").nbsp().divEnd().aEnd();
-            html.a().id("hide").style("display: none;").href("javascript:hideCols('listNotes',[" + getIndexes() + "],false);").close();
-            html.div().close().nbsp().append("Hide").nbsp().divEnd().aEnd();
+            if(showMoreLink){
+                html.a().id("showMore").href("javascript:hideCols('listNotes',[" + getIndexes() + "],true);").close();
+                html.div().close().nbsp().append("Show More").nbsp().divEnd().aEnd();
+                html.a().id("hide").style("display: none;").href("javascript:hideCols('listNotes',[" + getIndexes() + "],false);").close();
+                html.div().close().nbsp().append("Hide").nbsp().divEnd().aEnd();
 
-            html.script().type("text/javascript").close().append(
-                    "$j = jQuery.noConflict(); $j(document).ready(function(){ " + "hideCols('listNotes',[" + getIndexes() + "],false);});").scriptEnd();
+                html.script().type("text/javascript").close().append(
+                        "$j = jQuery.noConflict(); $j(document).ready(function(){ " + "hideCols('listNotes',[" + getIndexes() + "],false);});").scriptEnd();
+            }else{
+                html.a().id("showMore").style("display:none;").href("javascript:hideCols('listNotes',[" + getIndexes() + "],true);").close();
+                html.div().close().nbsp().append("Show More").nbsp().divEnd().aEnd();
+                html.a().id("hide").href("javascript:hideCols('listNotes',[" + getIndexes() + "],false);").close();
+                html.div().close().nbsp().append("Hide").nbsp().divEnd().aEnd();
+
+                html.script().type("text/javascript").close().append(
+                        "$j = jQuery.noConflict(); $j(document).ready(function(){ " + "hideCols('listNotes',[" + getIndexes() + "],true);});").scriptEnd();
+            }
 
             return html.toString();
         }
