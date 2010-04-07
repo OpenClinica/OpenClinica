@@ -1,6 +1,7 @@
 package org.akaza.openclinica.dao.submit;
 
 import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.dao.core.EntityDAO;
 import org.akaza.openclinica.dao.core.SQLFactory;
@@ -10,6 +11,7 @@ import org.akaza.openclinica.exception.OpenClinicaException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -89,7 +91,19 @@ public class ItemGroupMetadataDAO extends EntityDAO {
     }
 
     public EntityBean findByPK(int id) throws OpenClinicaException {
-        return new ItemGroupMetadataBean(); // To change body of implemented
+        ItemGroupMetadataBean eb = new ItemGroupMetadataBean();
+        this.setTypesExpected();
+        HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
+        variables.put(1, id);
+        String sql = digester.getQuery("findByPK");
+        ArrayList alist = this.select(sql, variables);
+        Iterator it = alist.iterator();
+
+        if (it.hasNext()) {
+            eb = (ItemGroupMetadataBean) this.getEntityFromHashMap((HashMap) it.next());
+        }
+        return eb;
+        //return new ItemGroupMetadataBean(); // To change body of implemented
         // methods use File | Settings |
         // File Templates.;
     }

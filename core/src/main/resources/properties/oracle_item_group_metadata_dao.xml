@@ -30,7 +30,12 @@
     order by igm.ordinal asc
      </sql>
   </query>
-  
+  <query>
+    <name>findByPK</name>
+    <sql>select igm.* from item_group_metadata igm
+    where igm.item_group_metadata_id =?
+     </sql>
+  </query>
    <query>
     <name>findCurrentPKValue</name>
     <sql>select item_form_metadata_id_seq.currval as key from dual</sql>

@@ -1,21 +1,30 @@
 package org.akaza.openclinica.service.crfdata;
 
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
+import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
+import org.akaza.openclinica.dao.hibernate.DynamicsItemGroupMetadataDao;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
+import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean;
+import org.akaza.openclinica.domain.crfdata.DynamicsItemGroupMetadataBean;
+import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.domain.rule.action.PropertyBean;
 
+
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -25,11 +34,14 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
     // protected final java.util.logging.Logger logger = LoggerFactory.getLogger(getClass().getName());
     private final String ESCAPED_SEPERATOR = "\\.";
     private DynamicsItemFormMetadataDao dynamicsItemFormMetadataDao;
+    private DynamicsItemGroupMetadataDao dynamicsItemGroupMetadataDao;
     DataSource ds;
     private EventCRFDAO eventCRFDAO;
     private ItemDataDAO itemDataDAO;
     private ItemDAO itemDAO;
     private ItemGroupDAO itemGroupDAO;
+    private SectionDAO sectionDAO;
+    // private CRFVersionDAO crfVersionDAO;
     private ItemFormMetadataDAO itemFormMetadataDAO;
     private ItemGroupMetadataDAO itemGroupMetadataDAO;
 
@@ -76,6 +88,45 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         }
         // return false;
     }
+    
+    public boolean isShown(Integer itemId, EventCRFBean eventCrfBean, ItemDataBean itemDataBean) {
+        // do we check against the database, or just against the object? prob against the db
+        // ItemFormMetadataBean itemFormMetadataBean = (ItemFormMetadataBean) metadataBean;
+        // return itemFormMetadataBean.isShowItem();
+        ItemFormMetadataBean itemFormMetadataBean = getItemFormMetadataDAO().findByItemIdAndCRFVersionId(itemId, eventCrfBean.getCRFVersionId());
+        DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataBean(itemFormMetadataBean, eventCrfBean, itemDataBean);
+        // DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataDao().findByMetadataBean(itemFormMetadataBean, eventCrfBean);
+        if (dynamicsMetadataBean != null) {
+            return dynamicsMetadataBean.isShowItem();
+        } else {
+            System.out.println("did not find a row in the db for (with IDB)" + itemFormMetadataBean.getId());
+            return false;
+        }
+        // return false;
+    }
+    
+    public boolean isGroupShown(int metadataId, EventCRFBean eventCrfBean) throws OpenClinicaException {
+        ItemGroupMetadataBean itemGroupMetadataBean = (ItemGroupMetadataBean)getItemGroupMetadataDAO().findByPK(metadataId);
+        DynamicsItemGroupMetadataBean dynamicsMetadataBean = getDynamicsItemGroupMetadataBean(itemGroupMetadataBean, eventCrfBean);
+        if (dynamicsMetadataBean != null) {
+            return dynamicsMetadataBean.isShowGroup();
+        } else {
+            System.out.println("didnt find a group row in the db ");
+            return false;
+        }
+    
+    }
+    
+    public boolean isGroupShown(int metadataId, int eventCrfBeanId) throws OpenClinicaException {
+        ItemGroupMetadataBean itemGroupMetadataBean = (ItemGroupMetadataBean)getItemGroupMetadataDAO().findByPK(metadataId);
+        DynamicsItemGroupMetadataBean dynamicsMetadataBean = getDynamicsItemGroupMetadataBean(itemGroupMetadataBean, eventCrfBeanId); 
+        if (dynamicsMetadataBean != null) {
+            return dynamicsMetadataBean.isShowGroup();
+        } else {
+            System.out.println("didnt find a group row in the db ");
+            return false;   
+        }
+    }
 
     /**
      * 
@@ -95,6 +146,22 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
             dynamicsMetadataBean = getDynamicsItemFormMetadataDao().findByMetadataBean(itemFormMetadataBean, eventCrfBean, itemDataBean);
         }
 
+        return dynamicsMetadataBean;
+
+    }
+    
+    private DynamicsItemGroupMetadataBean getDynamicsItemGroupMetadataBean(ItemGroupMetadataBean metadataBean, EventCRFBean eventCrfBean) {
+        
+        DynamicsItemGroupMetadataBean dynamicsMetadataBean = getDynamicsItemGroupMetadataDao().findByMetadataBean(metadataBean, eventCrfBean);
+        System.out.println(" returning " + metadataBean.getId() + " " + metadataBean.getItemGroupId() + " " + eventCrfBean.getId());
+        return dynamicsMetadataBean;
+
+    }
+    
+    private DynamicsItemGroupMetadataBean getDynamicsItemGroupMetadataBean(ItemGroupMetadataBean metadataBean, int eventCrfBeanId) {
+        
+        DynamicsItemGroupMetadataBean dynamicsMetadataBean = null;
+        dynamicsMetadataBean = getDynamicsItemGroupMetadataDao().findByMetadataBean(metadataBean, eventCrfBeanId);
         return dynamicsMetadataBean;
 
     }
@@ -119,7 +186,11 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
     }
 
     public boolean showGroup(ItemGroupMetadataBean metadataBean, EventCRFBean eventCrfBean) {
+        
         ItemGroupMetadataBean itemGroupMetadataBean = metadataBean;
+        itemGroupMetadataBean.setShowGroup(true);
+        DynamicsItemGroupMetadataBean dynamicsMetadataBean = new DynamicsItemGroupMetadataBean(itemGroupMetadataBean, eventCrfBean);
+        getDynamicsItemGroupMetadataDao().saveOrUpdate(dynamicsMetadataBean);
         return true;
     }
 
@@ -143,7 +214,27 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
             }
             // OID is a group
             else {
-
+                // System.out.println("found item group id 1 " + oid);
+                ItemGroupBean itemGroupBean = itemOrItemGroup.getItemGroupBean();
+                ArrayList sectionBeans = getSectionDAO().findAllByCRFVersionId(eventCrfBean.getCRFVersionId());
+                for (int i = 0; i < sectionBeans.size(); i++) {
+                    SectionBean sectionBean = (SectionBean)sectionBeans.get(i);
+                    // System.out.println("found section " + sectionBean.getId());
+                    List<ItemGroupMetadataBean> itemGroupMetadataBeans = getItemGroupMetadataDAO().findMetaByGroupAndSection(itemGroupBean.getId(),
+                            eventCrfBean.getCRFVersionId(), sectionBean.getId());
+                    for (ItemGroupMetadataBean itemGroupMetadataBean : itemGroupMetadataBeans) {
+                        if (itemGroupMetadataBean.getItemGroupId() == itemGroupBean.getId()) {
+                            System.out.println("found item group id 2 " + oid);
+                            DynamicsItemGroupMetadataBean dynamicsGroupBean = getDynamicsItemGroupMetadataBean(itemGroupMetadataBean, eventCrfBean);
+                            if (dynamicsGroupBean == null) {
+                                showGroup(itemGroupMetadataBean, eventCrfBean);
+                            } else if (dynamicsGroupBean != null && !dynamicsGroupBean.isShowGroup()) {
+                                dynamicsGroupBean.setShowGroup(true);
+                                getDynamicsItemGroupMetadataDao().saveOrUpdate(dynamicsGroupBean);
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -168,7 +259,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
             }
             // OID is a group
             else {
-
+                // ItemGroupBean itemGroupBean = itemOrItemGroup.getItemGroupBean();
             }
         }
     }
@@ -198,6 +289,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
             if (itemGroup != null) {
                 ItemBean item = getItemDAO().findItemByGroupIdandItemOid(itemGroup.getId(), theOid[1]);
                 if (item != null) {
+                    System.out.println("");
                     return new ItemOrItemGroupHolder(item, itemGroup);
                 }
             }
@@ -220,6 +312,14 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 
     public DynamicsItemFormMetadataDao getDynamicsItemFormMetadataDao() {
         return dynamicsItemFormMetadataDao;
+    }
+
+    public DynamicsItemGroupMetadataDao getDynamicsItemGroupMetadataDao() {
+        return dynamicsItemGroupMetadataDao;
+    }
+
+    public void setDynamicsItemGroupMetadataDao(DynamicsItemGroupMetadataDao dynamicsItemGroupMetadataDao) {
+        this.dynamicsItemGroupMetadataDao = dynamicsItemGroupMetadataDao;
     }
 
     public void setDynamicsItemFormMetadataDao(DynamicsItemFormMetadataDao dynamicsItemFormMetadataDao) {
@@ -245,6 +345,11 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         itemGroupDAO = this.itemGroupDAO != null ? itemGroupDAO : new ItemGroupDAO(ds);
         return itemGroupDAO;
     }
+    
+    private SectionDAO getSectionDAO() {
+        sectionDAO = this.sectionDAO != null ? sectionDAO : new SectionDAO(ds);
+        return sectionDAO;
+    }
 
     private ItemFormMetadataDAO getItemFormMetadataDAO() {
         itemFormMetadataDAO = this.itemFormMetadataDAO != null ? itemFormMetadataDAO : new ItemFormMetadataDAO(ds);
@@ -255,6 +360,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         itemGroupMetadataDAO = this.itemGroupMetadataDAO != null ? itemGroupMetadataDAO : new ItemGroupMetadataDAO(ds);
         return itemGroupMetadataDAO;
     }
+    
 
     class ItemOrItemGroupHolder {
 
