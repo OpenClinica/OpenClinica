@@ -325,9 +325,30 @@ form element in red --%>
   </c:choose>
 </c:if>
 <c:if test="${study.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
+    <c:choose>
+    <c:when test="${displayItem.discrepancyNoteStatus == 0}">
+        <c:set var="imageFileName" value="icon_noNote" />
+    </c:when>
+    <c:when test="${displayItem.discrepancyNoteStatus == 1}">
+        <c:set var="imageFileName" value="icon_Note" />
+    </c:when>
+    <c:when test="${displayItem.discrepancyNoteStatus == 2}">
+        <c:set var="imageFileName" value="icon_flagYellow" />
+    </c:when>
+    <c:when test="${displayItem.discrepancyNoteStatus == 3}">
+        <c:set var="imageFileName" value="icon_flagGreen" />
+    </c:when>
+    <c:when test="${displayItem.discrepancyNoteStatus == 4}">
+        <c:set var="imageFileName" value="icon_flagBlack" />
+    </c:when>
+    <c:when test="${displayItem.discrepancyNoteStatus == 5}">
+        <c:set var="imageFileName" value="icon_flagWhite" />
+    </c:when>
+    <c:otherwise>
+    </c:otherwise>
+  </c:choose>
   <c:choose>
     <c:when test="${displayItem.numDiscrepancyNotes > 0}">
-      <c:set var="imageFileName" value="icon_Note" />
 
       <td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#" onClick=
     "openDNoteWindow('ViewDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=input<c:out value="${itemId}"/>&column=value&monitor=1&writeToDB=1&isLocked=<c:out value="${isLocked}"/>','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
