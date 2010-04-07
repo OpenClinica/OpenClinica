@@ -328,9 +328,32 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
                 <c:if test="${study.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
                     <%--<c:if test="${! (enclosingPage eq 'viewSectionData')}">--%>
                 <c:choose>
+                  <c:when test="${nameNoteResStatus == 0}">
+                      <c:set var="imageFileName" value="icon_noNote" />
+                  </c:when>
+                  <c:when test="${nameNoteResStatus == 1}">
+                      <c:set var="imageFileName" value="icon_Note" />
+                  </c:when>
+                  <c:when test="${nameNoteResStatus == 2}">
+                      <c:set var="imageFileName" value="icon_flagYellow" />
+                  </c:when>
+                  <c:when test="${nameNoteResStatus == 3}">
+                      <c:set var="imageFileName" value="icon_flagGreen" />
+                  </c:when>
+                  <c:when test="${nameNoteResStatus == 4}">
+                      <c:set var="imageFileName" value="icon_flagBlack" />
+                  </c:when>
+                  <c:when test="${nameNoteResStatus == 5}">
+                      <c:set var="imageFileName" value="icon_flagWhite" />
+                  </c:when>
+                  <c:otherwise>
+                  </c:otherwise>
+                </c:choose>
+
+                <c:choose>
                 <c:when test="${hasNameNote eq 'yes'}">
                 <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySubject.id}&itemId=${itemId}&id=${InterviewerNameNote.eventCRFId}&name=${InterviewerNameNote.entityType}&field=interviewer&column=${InterviewerNameNote.column}&enterData=${enterData}&monitor=${monitor}&blank=${blank}','spanAlert-interviewDate'); return false;">
-                    <img id="flag_interviewer" name="flag_interviewer" src="images/icon_Note.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
+                    <img id="flag_interviewer" name="flag_interviewer" src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
                     </c:when>
                     <c:otherwise>
                     <a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?viewData=y&id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewer&column=interviewer_name&writeToDB=1&new=${isNewDN}','spanAlert-interviewer'); return false;">
@@ -417,11 +440,33 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
                     and switched it back for 2898--%>
                     <%-- <c:if test="${! (enclosingPage eq 'viewSectionData')}">--%>
                 <c:set var="isNewDNDate" value="${hasDateNote eq 'yes' ? 0 : 1}"/>
+                <c:choose>
+                  <c:when test="${IntrvDateNoteResStatus == 0}">
+                      <c:set var="imageFileName" value="icon_noNote" />
+                  </c:when>
+                  <c:when test="${IntrvDateNoteResStatus == 1}">
+                      <c:set var="imageFileName" value="icon_Note" />
+                  </c:when>
+                  <c:when test="${IntrvDateNoteResStatus == 2}">
+                      <c:set var="imageFileName" value="icon_flagYellow" />
+                  </c:when>
+                  <c:when test="${IntrvDateNoteResStatus == 3}">
+                      <c:set var="imageFileName" value="icon_flagGreen" />
+                  </c:when>
+                  <c:when test="${IntrvDateNoteResStatus == 4}">
+                      <c:set var="imageFileName" value="icon_flagBlack" />
+                  </c:when>
+                  <c:when test="${IntrvDateNoteResStatus == 5}">
+                      <c:set var="imageFileName" value="icon_flagWhite" />
+                  </c:when>
+                  <c:otherwise>
+                  </c:otherwise>
+                </c:choose>
 
                 <c:choose>
                 <c:when test="${hasDateNote eq 'yes'}">
                 <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySubject.id}&itemId=${itemId}&id=${InterviewerDateNote.eventCRFId}&name=${InterviewerDateNote.entityType}&field=interviewDate&column=${InterviewerDateNote.column}&enterData=${enterData}&monitor=${monitor}&blank=${blank}','spanAlert-interviewDate'); return false;">
-                    <img id="flag_interviewDate" name="flag_interviewDate" src="images/icon_Note.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+                    <img id="flag_interviewDate" name="flag_interviewDate" src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                     </c:when>
                     <c:otherwise>
                     <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewDate&column=date_interviewed&writeToDB=1&new=${isNewDNDate}','spanAlert-interviewDate'); return false;">

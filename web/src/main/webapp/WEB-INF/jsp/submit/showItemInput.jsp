@@ -532,14 +532,28 @@ include the default value first in the select list --%>
         </c:choose>
 </c:if>
 <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
-  <c:choose>
-    <c:when test="${displayItem.numDiscrepancyNotes > 0}">
-      <c:set var="imageFileName" value="icon_Note" />
-    </c:when>
-    <c:otherwise>
-      <c:set var="imageFileName" value="icon_noNote" />
-    </c:otherwise>
-  </c:choose>
+    <c:choose>
+      <c:when test="${displayItem.discrepancyNoteStatus == 0}">
+          <c:set var="imageFileName" value="icon_noNote" />
+      </c:when>
+      <c:when test="${displayItem.discrepancyNoteStatus == 1}">
+          <c:set var="imageFileName" value="icon_Note" />
+      </c:when>
+      <c:when test="${displayItem.discrepancyNoteStatus == 2}">
+          <c:set var="imageFileName" value="icon_flagYellow" />
+      </c:when>
+      <c:when test="${displayItem.discrepancyNoteStatus == 3}">
+          <c:set var="imageFileName" value="icon_flagGreen" />
+      </c:when>
+      <c:when test="${displayItem.discrepancyNoteStatus == 4}">
+          <c:set var="imageFileName" value="icon_flagBlack" />
+      </c:when>
+      <c:when test="${displayItem.discrepancyNoteStatus == 5}">
+          <c:set var="imageFileName" value="icon_flagWhite" />
+      </c:when>
+      <c:otherwise>
+      </c:otherwise>
+    </c:choose>
 
   <c:choose>
    <c:when test="${originJSP eq 'administrativeEditing'}">

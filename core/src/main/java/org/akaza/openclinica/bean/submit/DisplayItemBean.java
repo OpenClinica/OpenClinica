@@ -58,6 +58,11 @@ public class DisplayItemBean implements Comparable {
      */
     private EventDefinitionCRFBean eventDefinitionCRF;
 
+    /**
+     * Will hold the discrepancy note status for the item.
+     */
+    private int discrepancyNoteStatus;
+
     private void setProperties() {
         data = new ItemDataBean();
         item = new ItemBean();
@@ -360,4 +365,11 @@ public class DisplayItemBean implements Comparable {
         this.dbData = dbData;
     }
 
+    public int getDiscrepancyNoteStatus() {
+        return discrepancyNoteStatus;
+    }
+
+    public void setDiscrepancyNoteStatus(int discrepancyNoteStatus) {
+        this.discrepancyNoteStatus = discrepancyNoteStatus;
+    }
 }

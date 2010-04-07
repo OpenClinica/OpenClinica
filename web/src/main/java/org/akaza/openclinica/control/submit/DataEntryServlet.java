@@ -3022,19 +3022,27 @@ public abstract class DataEntryServlet extends SecureController {
 
         // ArrayList items = section.getItems();
         ArrayList<DiscrepancyNoteBean> ecNotes = dndao.findEventCRFDNotesFromEventCRF(ecb);
+        ArrayList<DiscrepancyNoteBean> existingNameNotes = new ArrayList();
+        ArrayList<DiscrepancyNoteBean> existingIntrvDateNotes = new ArrayList();
         for (int i = 0; i < ecNotes.size(); i++) {
             DiscrepancyNoteBean dn = ecNotes.get(i);
             if (INTERVIEWER_NAME.equalsIgnoreCase(dn.getColumn())) {
                 discNotes.setNumExistingFieldNotes(INPUT_INTERVIEWER, 1);
                 request.setAttribute("hasNameNote", "yes");
                 request.setAttribute(INTERVIEWER_NAME_NOTE, dn);
+                existingNameNotes.add(dn);
             }
+
             if (DATE_INTERVIEWED.equalsIgnoreCase(dn.getColumn())) {
                 discNotes.setNumExistingFieldNotes(INPUT_INTERVIEW_DATE, 1);
                 request.setAttribute("hasDateNote", "yes");
                 request.setAttribute(INTERVIEWER_DATE_NOTE, dn);
+                existingIntrvDateNotes.add(dn);
             }
         }
+
+        request.setAttribute("nameNoteResStatus", getDiscrepancyNoteResolutionStatus(existingNameNotes));
+        request.setAttribute("IntrvDateNoteResStatus", getDiscrepancyNoteResolutionStatus(existingIntrvDateNotes));
 
         List<DisplayItemWithGroupBean> allItems = section.getDisplayItemGroups();
         logger.debug("start to populate notes: " + section.getDisplayItemGroups().size());
@@ -3083,6 +3091,8 @@ public abstract class DataEntryServlet extends SecureController {
                         //                            logger.debug("inputName 2: " + inputName2);
                         //                        }
                         dib.setNumDiscrepancyNotes(numNotes + notes.size());// + notes2.size());
+                        dib.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(itemDataId, notes));
+
                         logger.debug("dib note size:" + dib.getNumDiscrepancyNotes() + " " + dib.getData().getId() + " " + inputName);
                         items.set(j, dib);
                     }
@@ -3108,6 +3118,7 @@ public abstract class DataEntryServlet extends SecureController {
 
                 discNotes.setNumExistingFieldNotes(inputFieldName, numNotes);
                 dib.setNumDiscrepancyNotes(numNotes + discNotes.getNotes(inputFieldName).size());
+                dib.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(itemDataId, discNotes.getNotes(inputFieldName)));
 
                 ArrayList childItems = dib.getChildren();
                 for (int j = 0; j < childItems.size(); j++) {
@@ -3120,6 +3131,7 @@ public abstract class DataEntryServlet extends SecureController {
                     logger.debug("*** setting " + childInputFieldName);
                     discNotes.setNumExistingFieldNotes(childInputFieldName, childNumNotes);
                     child.setNumDiscrepancyNotes(childNumNotes + discNotes.getNotes(childInputFieldName).size());
+                    child.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(childItemDataId, discNotes.getNotes(childInputFieldName)));
                     childItems.set(j, child);
                 }
                 dib.setChildren(childItems);
@@ -4174,6 +4186,61 @@ public abstract class DataEntryServlet extends SecureController {
             }
         }
         return errors;
+    }
+
+    /*Determining the resolution status that will be shown in color flag for an item.*/
+    private int getDiscrepancyNoteResolutionStatus(int itemDataId, ArrayList formNotes) {
+        int resolutionStatus = 0;
+        boolean hasOtherThread = false;
+        ArrayList existingNotes = dndao.findExistingNotesForItemData(itemDataId);
+        for (Object obj : existingNotes) {
+            DiscrepancyNoteBean note = (DiscrepancyNoteBean) obj;
+            if (note.getParentDnId() == 0) {
+                resolutionStatus = note.getResolutionStatusId();
+                if (hasOtherThread) {
+                    if (resolutionStatus > note.getResolutionStatusId()) {
+                        resolutionStatus = note.getResolutionStatusId();
+                    }
+                }
+                hasOtherThread = true;
+            }
+        }
+
+        if (formNotes == null || formNotes.isEmpty()) {
+            return resolutionStatus;
+        }
+
+        for (Object obj : formNotes) {
+            DiscrepancyNoteBean note = (DiscrepancyNoteBean) obj;
+            if (note.getParentDnId() == 0) {
+                resolutionStatus = note.getResolutionStatusId();
+                if (hasOtherThread) {
+                    if (resolutionStatus > note.getResolutionStatusId()) {
+                        resolutionStatus = note.getResolutionStatusId();
+                    }
+                }
+                hasOtherThread = true;
+            }
+        }
+        return resolutionStatus;
+    }
+
+    private int getDiscrepancyNoteResolutionStatus(List existingNotes) {
+        int resolutionStatus = 0;
+        boolean hasOtherThread = false;
+        for (Object obj : existingNotes) {
+            DiscrepancyNoteBean note = (DiscrepancyNoteBean) obj;
+            if (note.getParentDnId() == 0) {
+                resolutionStatus = note.getResolutionStatusId();
+                if (hasOtherThread) {
+                    if (resolutionStatus > note.getResolutionStatusId()) {
+                        resolutionStatus = note.getResolutionStatusId();
+                    }
+                }
+                hasOtherThread = true;
+            }
+        }
+        return resolutionStatus;
     }
 
 }
