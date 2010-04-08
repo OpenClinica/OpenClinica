@@ -7,6 +7,7 @@
  */
 package org.akaza.openclinica.service.rule;
 
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.oid.GenericOidGenerator;
 import org.akaza.openclinica.bean.oid.OidGenerator;
@@ -161,7 +162,9 @@ public class RulesPostImportContainerService {
         for (RuleSetRuleBean ruleSetRuleBean : ruleSetBeanWrapper.getAuditableBean().getRuleSetRules()) {
             String ruleDefOid = ruleSetRuleBean.getOid();
             if (ruleSetRuleBean.getId() == null) {
-                if (getExpressionService().getEventDefinitionCRF(ruleSetBeanWrapper.getAuditableBean().getTarget().getValue()).getStatus().isDeleted()) {
+                EventDefinitionCRFBean eventDefinitionCRFBean =
+                    getExpressionService().getEventDefinitionCRF(ruleSetBeanWrapper.getAuditableBean().getTarget().getValue());
+                if (eventDefinitionCRFBean.getStatus().isDeleted()) {
                     ruleSetBeanWrapper
                             .error("This is an invalid Rule Set because the target is pointing to an item in the event definition CRF that has a status of removed");
                 }
@@ -176,13 +179,14 @@ public class RulesPostImportContainerService {
                                 .error("The Contextual expression in one of the Rules does not validate against the Target expression in the Current RuleSet");
                 }
                 for (RuleActionBean ruleActionBean : ruleSetRuleBean.getActions()) {
-                    isRuleActionValid(ruleActionBean, ruleSetBeanWrapper);
+                    isRuleActionValid(ruleActionBean, ruleSetBeanWrapper, eventDefinitionCRFBean);
                 }
             }
         }
     }
 
-    private void isRuleActionValid(RuleActionBean ruleActionBean, AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper) {
+    private void isRuleActionValid(RuleActionBean ruleActionBean, AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper,
+            EventDefinitionCRFBean eventDefinitionCRFBean) {
         if (ruleActionBean instanceof ShowActionBean) {
             String[] oids = (((ShowActionBean) ruleActionBean).getOIDs()).split(",");
             if (ruleActionBean.getRuleActionRun().getBatch() == true || ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
@@ -216,7 +220,9 @@ public class RulesPostImportContainerService {
             }
             DataBinder dataBinder = new DataBinder((ruleActionBean));
             Errors errors = dataBinder.getBindingResult();
-            getInsertActionValidator().validate((ruleActionBean), errors);
+            InsertActionValidator insertActionValidator = getInsertActionValidator();
+            insertActionValidator.setEventDefinitionCRFBean(eventDefinitionCRFBean);
+            insertActionValidator.validate((ruleActionBean), errors);
             if (errors.hasErrors()) {
                 ruleSetBeanWrapper.error("InsertAction is not Valid. " + errors.toString());
             }
