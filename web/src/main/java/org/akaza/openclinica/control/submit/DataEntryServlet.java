@@ -4239,12 +4239,15 @@ public abstract class DataEntryServlet extends SecureController {
         ArrayList existingNotes = dndao.findExistingNotesForItemData(itemDataId);
         for (Object obj : existingNotes) {
             DiscrepancyNoteBean note = (DiscrepancyNoteBean) obj;
+            /*We would only take the resolution status of the parent note of any note thread. If there
+            * are more than one note thread, the thread with the worst resolution status will be taken.*/
             if (note.getParentDnId() == 0) {
-                resolutionStatus = note.getResolutionStatusId();
                 if (hasOtherThread) {
                     if (resolutionStatus > note.getResolutionStatusId()) {
                         resolutionStatus = note.getResolutionStatusId();
                     }
+                } else {
+                    resolutionStatus = note.getResolutionStatusId();
                 }
                 hasOtherThread = true;
             }
@@ -4257,11 +4260,12 @@ public abstract class DataEntryServlet extends SecureController {
         for (Object obj : formNotes) {
             DiscrepancyNoteBean note = (DiscrepancyNoteBean) obj;
             if (note.getParentDnId() == 0) {
-                resolutionStatus = note.getResolutionStatusId();
                 if (hasOtherThread) {
                     if (resolutionStatus > note.getResolutionStatusId()) {
                         resolutionStatus = note.getResolutionStatusId();
                     }
+                } else {
+                    resolutionStatus = note.getResolutionStatusId();
                 }
                 hasOtherThread = true;
             }
@@ -4274,12 +4278,15 @@ public abstract class DataEntryServlet extends SecureController {
         boolean hasOtherThread = false;
         for (Object obj : existingNotes) {
             DiscrepancyNoteBean note = (DiscrepancyNoteBean) obj;
+            /*We would only take the resolution status of the parent note of any note thread. If there
+            * are more than one note thread, the thread with the worst resolution status will be taken.*/
             if (note.getParentDnId() == 0) {
-                resolutionStatus = note.getResolutionStatusId();
                 if (hasOtherThread) {
                     if (resolutionStatus > note.getResolutionStatusId()) {
                         resolutionStatus = note.getResolutionStatusId();
                     }
+                } else {
+                    resolutionStatus = note.getResolutionStatusId();
                 }
                 hasOtherThread = true;
             }
