@@ -5,6 +5,8 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean;
 
+import java.util.ArrayList;
+
 public class DynamicsItemFormMetadataDao extends AbstractDomainDao<DynamicsItemFormMetadataBean> {
 
     @Override
@@ -38,4 +40,13 @@ public class DynamicsItemFormMetadataDao extends AbstractDomainDao<DynamicsItemF
         q.setInteger("item_data_id", new Integer(itemDataBean.getId()));
         return (DynamicsItemFormMetadataBean) q.uniqueResult();
     }
+    
+//    public int findAllShownByCRFVersionId(int crfVersionId) {
+//        String query = "from " + getDomainClassName()
+//            + " metadata where metadata.crfVersionId = :crf_version_id and metadata.showItem = true ";
+//        org.hibernate.Query q = getCurrentSession().createQuery(query);
+//        q.setInteger("crf_version_id", new Integer(crfVersionId));
+//        ArrayList<DynamicsItemFormMetadataBean> alist = q.list();
+//        return alist.size();
+//    }
 }

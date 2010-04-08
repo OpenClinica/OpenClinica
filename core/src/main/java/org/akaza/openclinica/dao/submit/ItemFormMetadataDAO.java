@@ -258,6 +258,84 @@ public class ItemFormMetadataDAO extends EntityDAO {
 
         return answer;
     }
+    /*
+     * <query>
+        <name>findAllCountHiddenByCRFVersionId</name>
+        <sql>
+           select count(i.*) as number from item i, item_form_metadata ifm
+           where i.item_id = ifm.item_id
+           and ifm.crf_version_id=?
+           and ifm.required=true
+           and ifm.show_item=false  
+        </sql>
+    </query>
+     */
+    public int findCountAllHiddenByCRFVersionId(int crfVersionId) {
+        int answer = 0;
+        this.unsetTypeExpected();
+        this.setTypeExpected(1, TypeNames.INT);
+        
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(crfVersionId));
+        String sql = digester.getQuery("findAllCountHiddenByCRFVersionId");
+
+        ArrayList rows = select(sql, variables);
+
+        if (rows.size() > 0) {
+            HashMap row = (HashMap) rows.get(0);
+            answer = ((Integer) row.get("number")).intValue();
+        }
+        
+        // what about those shown but in a hidden section?
+        /*
+         * select count(i.*) as number from item i, item_form_metadata ifm, item_group_metadata igm
+           where i.item_id = ifm.item_id
+           and ifm.item_id = igm.item_id
+           and ifm.crf_version_id=?
+           and ifm.required=true
+           and ifm.show_item=true
+           and igm.show_group=false
+         */
+        int answer2 = 0;
+        
+        String sql2 = digester.getQuery("findAllCountHiddenUnderGroupsByCRFVersionId");
+        rows = select (sql2, variables);
+        if (rows.size() > 0) {
+            HashMap row = (HashMap) rows.get(0);
+            answer2 = ((Integer) row.get("number")).intValue();
+        }
+        return answer + answer2;
+    }
+    /*
+     * <query>
+        <name>findAllCountHiddenButShownByCRFVersionId</name>
+        <sql>
+           select count(dyn.*) as number from item_form_metadata ifm, dyn_item_form_metadata dyn
+           where dyn.item_form_metadata_id = ifm.item_form_metadata_id
+           and dyn.event_crf_id = ?
+           and ifm.required=true
+           and dyn.show_item=true 
+        </sql>
+    </query>
+     */
+    public int findCountAllHiddenButShownByEventCRFId(int eventCrfId) {
+        int answer = 0;
+        this.unsetTypeExpected();
+        this.setTypeExpected(1, TypeNames.INT);
+        
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(eventCrfId));
+        String sql = digester.getQuery("findAllCountHiddenButShownByEventCrfId");
+
+        ArrayList rows = select(sql, variables);
+
+        if (rows.size() > 0) {
+            HashMap row = (HashMap) rows.get(0);
+            answer = ((Integer) row.get("number")).intValue();
+        }
+        
+        return answer;
+    }
 
     public ArrayList findAllByCRFVersionId(int crfVersionId) throws OpenClinicaException {
         ArrayList answer = new ArrayList();

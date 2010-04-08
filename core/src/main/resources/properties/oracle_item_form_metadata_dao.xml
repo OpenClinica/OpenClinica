@@ -22,6 +22,40 @@
                                 AND m.response_set_id = rs.response_set_id
                 </sql>
         </query>
+        <query>
+        <name>findAllCountHiddenByCRFVersionId</name>
+        <sql>
+           select count(*) as "number" from item i, item_form_metadata ifm
+           where i.item_id = ifm.item_id
+           and ifm.crf_version_id=?
+           and ifm.required=1
+           and ifm.show_item=0  
+        </sql>
+    </query>
+    
+    <query>
+    	<name>findAllCountHiddenUnderGroupsByCRFVersionId</name>
+    	<sql>
+    	select count(*) as "number" from item i, item_form_metadata ifm, item_group_metadata igm
+           where i.item_id = ifm.item_id
+           and ifm.item_id = igm.item_id
+           and ifm.crf_version_id=?
+           and ifm.required=1
+           and ifm.show_item=1
+           and igm.show_group=0
+    	</sql>
+    </query>
+    
+   <query>
+        <name>findAllCountHiddenButShownByEventCrfId</name>
+        <sql>
+           select count(*) as "number" from dyn_item_form_metadata dyn, item_form_metadata ifm 
+           where dyn.item_form_metadata_id = ifm.item_form_metadata_id
+           and dyn.event_crf_id = ?
+           and ifm.required=1
+           and dyn.show_item=1 
+        </sql>
+    </query>
    <query>
                 <name>findAllByItemId</name>
                 <sql>

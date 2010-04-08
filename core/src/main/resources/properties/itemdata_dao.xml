@@ -110,6 +110,7 @@
 		   and i.item_id = ifm.item_id
 		   and ifm.crf_version_id=?
 		   and ifm.required=true
+		   and ifm.show_item=true
 		   and (id.value='')
 		</sql>
 	</query>
