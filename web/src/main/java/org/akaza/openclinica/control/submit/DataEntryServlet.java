@@ -3359,15 +3359,25 @@ public abstract class DataEntryServlet extends SecureController {
     }
 
     protected boolean isEachRequiredFieldFillout() {
+        // need to update this method to accomodate dynamics, tbh
         ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
         ItemDAO idao = new ItemDAO(sm.getDataSource());
+        ItemFormMetadataDAO itemFormMetadataDao = new ItemFormMetadataDAO(sm.getDataSource());
         int allRequiredNum = idao.findAllRequiredByCRFVersionId(ecb.getCRFVersionId());
         int allRequiredFilledOut = iddao.findAllRequiredByEventCRFId(ecb);
-        if (allRequiredNum > allRequiredFilledOut) {
-            logger.info("allRequiredNum > allRequiredFilledOut:" + allRequiredNum + " " + allRequiredFilledOut);
+        int allRequiredButHidden = itemFormMetadataDao.findCountAllHiddenByCRFVersionId(ecb.getCRFVersionId());
+        int allHiddenButShown = itemFormMetadataDao.findCountAllHiddenButShownByEventCRFId(ecb.getId());
+        // add all hidden items minus all hidden but now shown items to the allRequiredFilledOut variable
+        
+        if (allRequiredNum > (allRequiredFilledOut + allRequiredButHidden - allHiddenButShown)) {
+            System.out.println("using crf version number: " + ecb.getCRFVersionId());
+            System.out.println("allRequiredNum > allRequiredFilledOut:" + allRequiredNum + " " + 
+                    allRequiredFilledOut + " plus " + 
+                    allRequiredButHidden + " minus " + 
+                    allHiddenButShown);
             return false;
         }
-
+        // had to change the query below to allow for hidden items here, tbh 04/2010
         ArrayList allFilled = iddao.findAllBlankRequiredByEventCRFId(ecb.getId(), ecb.getCRFVersionId());
         int numNotes = 0;
         if (!allFilled.isEmpty()) {
@@ -3390,6 +3400,8 @@ public abstract class DataEntryServlet extends SecureController {
                 logger.info("all required are filled out");
                 return true;
             } else {
+                System.out.println("numNotes < allFilled.size() " + numNotes + 
+                        ": " + allFilled.size());
                 return false;
             }
         }
