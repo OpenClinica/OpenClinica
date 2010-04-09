@@ -286,6 +286,12 @@ public abstract class DataEntryServlet extends SecureController {
 
         panel.setStudyInfoShown(false);
         String age = "";
+        if(unavailableCRFList.get(ecb.getId())!=null){
+            UserAccountBean user = (UserAccountBean)unavailableCRFList.get(ecb.getId());
+            throw new InconsistentStateException(Page.LIST_STUDY_SUBJECTS_SERVLET, resword.getString("CRF_unavailable") +" "+user.getName()
+                    + " "+ resword.getString("Currently_entering_data")
+                    + " "+resword.getString("Leave_the_CRF"));
+        }
 
         if (!ecb.isActive()) {
             throw new InconsistentStateException(Page.LIST_STUDY_SUBJECTS_SERVLET, resexception.getString("event_not_exists"));
