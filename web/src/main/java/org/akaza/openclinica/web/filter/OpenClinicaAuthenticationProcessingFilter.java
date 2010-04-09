@@ -23,6 +23,7 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean;
 import org.akaza.openclinica.domain.technicaladmin.LoginStatus;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.control.core.SecureController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.Authentication;
@@ -108,6 +109,8 @@ public class OpenClinicaAuthenticationProcessingFilter extends AbstractProcessin
             authentication = this.getAuthenticationManager().authenticate(authRequest);
             auditUserLogin(username, LoginStatus.SUCCESSFUL_LOGIN, userAccountBean);
             resetLockCounter(username, LoginStatus.SUCCESSFUL_LOGIN, userAccountBean);
+            //To remove the locking of Event CRFs previusly locked by this user. 
+            SecureController.removeLockedCRF(userAccountBean);
         } catch (LockedException le) {
             auditUserLogin(username, LoginStatus.FAILED_LOGIN_LOCKED, userAccountBean);
             throw le;

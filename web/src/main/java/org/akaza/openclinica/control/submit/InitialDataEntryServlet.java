@@ -60,36 +60,36 @@ public class InitialDataEntryServlet extends DataEntryServlet {
 
         getInputBeans();
 
-        DataEntryStage stage = ecb.getStage();
-        Role r = currentRole.getRole();
-
-        if (stage.equals(DataEntryStage.UNCOMPLETED)) {
-            if (!SubmitDataServlet.maySubmitData(ub, currentRole)) {
-                this.session.setAttribute("mayProcessUploading", "false");
-                String exceptionName = resexception.getString("no_permission_to_perform_data_entry");
-                String noAccessMessage =
-                    respage.getString("you_may_not_perform_data_entry_on_a_CRF") + respage.getString("change_study_contact_study_coordinator");
-
-                addPageMessage(noAccessMessage);
-                throw new InsufficientPermissionException(Page.MENU, exceptionName, "1");
-            }
-        } else if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY)) {
-            if (ub.getId() != ecb.getOwnerId() && !r.equals(Role.STUDYDIRECTOR) && !r.equals(Role.COORDINATOR)) {
-                UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-                String ownerName = ((UserAccountBean) udao.findByPK(ecb.getOwnerId())).getName();
-                this.session.setAttribute("mayProcessUploading", "false");
-                MessageFormat mf = new MessageFormat("");
-                mf.applyPattern(respage.getString("you_may_not_perform_data_entry_on_event_CRF_because_not_owner"));
-                Object[] arguments = { ownerName };
-                addPageMessage(mf.format(arguments));
-
-                throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET, resexception.getString("non_owner_attempting_DE_on_event"), "1");
-            }
-        } else {
-            this.session.setAttribute("mayProcessUploading", "false");
-            addPageMessage(respage.getString("you_not_enter_data_initial_DE_completed"));
-            throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET, resexception.getString("using_IDE_event_CRF_completed"), "1");
-        }
+//        DataEntryStage stage = ecb.getStage();
+//        Role r = currentRole.getRole();
+//
+//        if (stage.equals(DataEntryStage.UNCOMPLETED)) {
+//            if (!SubmitDataServlet.maySubmitData(ub, currentRole)) {
+//                this.session.setAttribute("mayProcessUploading", "false");
+//                String exceptionName = resexception.getString("no_permission_to_perform_data_entry");
+//                String noAccessMessage =
+//                    respage.getString("you_may_not_perform_data_entry_on_a_CRF") + respage.getString("change_study_contact_study_coordinator");
+//
+//                addPageMessage(noAccessMessage);
+//                throw new InsufficientPermissionException(Page.MENU, exceptionName, "1");
+//            }
+//        } else if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY)) {
+//            if (ub.getId() != ecb.getOwnerId() && !r.equals(Role.STUDYDIRECTOR) && !r.equals(Role.COORDINATOR)) {
+//                UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
+//                String ownerName = ((UserAccountBean) udao.findByPK(ecb.getOwnerId())).getName();
+//                this.session.setAttribute("mayProcessUploading", "false");
+//                MessageFormat mf = new MessageFormat("");
+//                mf.applyPattern(respage.getString("you_may_not_perform_data_entry_on_event_CRF_because_not_owner"));
+//                Object[] arguments = { ownerName };
+//                addPageMessage(mf.format(arguments));
+//
+//                throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET, resexception.getString("non_owner_attempting_DE_on_event"), "1");
+//            }
+//        } else {
+//            this.session.setAttribute("mayProcessUploading", "false");
+//            addPageMessage(respage.getString("you_not_enter_data_initial_DE_completed"));
+//            throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET, resexception.getString("using_IDE_event_CRF_completed"), "1");
+//        }
 
         return;
     }

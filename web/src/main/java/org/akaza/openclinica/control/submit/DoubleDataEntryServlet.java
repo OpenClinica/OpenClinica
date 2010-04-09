@@ -143,33 +143,33 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
         Role r = currentRole.getRole();
         this.session.setAttribute("mayProcessUploading", "true");
 
-        if (!SubmitDataServlet.maySubmitData(ub, currentRole)) {
-            this.session.setAttribute("mayProcessUploading", "false");
-            String exceptionName = resexception.getString("no_permission_validation");
-            String noAccessMessage = resexception.getString("not_perfom_validation_syscontact");
-
-            addPageMessage(noAccessMessage);
-            throw new InsufficientPermissionException(Page.MENU, exceptionName, "1");
-        }
-
-        if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)) {
-            if (userIsOwnerAndLessThanTwelveHoursHavePassed() && !r.equals(Role.STUDYDIRECTOR) && !r.equals(Role.COORDINATOR)) {
-                this.session.setAttribute("mayProcessUploading", "false");
-                addPageMessage(respage.getString("since_perform_data_entry"));
-                throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET, resexception.getString("owner_attempting_double_data_entry"), "1");
-            }
-        } else if (stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
-            if (ub.getId() != ecb.getValidatorId() && !r.equals(Role.STUDYDIRECTOR) && !r.equals(Role.COORDINATOR)) {
-                this.session.setAttribute("mayProcessUploading", "false");
-                addPageMessage(respage.getString("validation_has_already_begun"));
-                throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET, resexception
-                        .getString("non_validator_attempting_double_data_entry"), "1");
-            }
-        } else {
-            this.session.setAttribute("mayProcessUploading", "false");
-            addPageMessage(respage.getString("not_perform_validation"));
-            throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET, resexception.getString("using_double_data_entry_CRF_completed"), "1");
-        }
+//        if (!SubmitDataServlet.maySubmitData(ub, currentRole)) {
+//            this.session.setAttribute("mayProcessUploading", "false");
+//            String exceptionName = resexception.getString("no_permission_validation");
+//            String noAccessMessage = resexception.getString("not_perfom_validation_syscontact");
+//
+//            addPageMessage(noAccessMessage);
+//            throw new InsufficientPermissionException(Page.MENU, exceptionName, "1");
+//        }
+//
+//        if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)) {
+//            if (userIsOwnerAndLessThanTwelveHoursHavePassed() && !r.equals(Role.STUDYDIRECTOR) && !r.equals(Role.COORDINATOR)) {
+//                this.session.setAttribute("mayProcessUploading", "false");
+//                addPageMessage(respage.getString("since_perform_data_entry"));
+//                throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET, resexception.getString("owner_attempting_double_data_entry"), "1");
+//            }
+//        } else if (stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
+//            if (ub.getId() != ecb.getValidatorId() && !r.equals(Role.STUDYDIRECTOR) && !r.equals(Role.COORDINATOR)) {
+//                this.session.setAttribute("mayProcessUploading", "false");
+//                addPageMessage(respage.getString("validation_has_already_begun"));
+//                throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET, resexception
+//                        .getString("non_validator_attempting_double_data_entry"), "1");
+//            }
+//        } else {
+//            this.session.setAttribute("mayProcessUploading", "false");
+//            addPageMessage(respage.getString("not_perform_validation"));
+//            throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET, resexception.getString("using_double_data_entry_CRF_completed"), "1");
+//        }
 
         return;
     }

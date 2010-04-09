@@ -102,7 +102,7 @@ public class ViewStudySubjectServlet extends SecureController {
         // YW 10-18-2007, if a study subject with passing parameter does not
         // belong to user's studies, it can not be viewed
         mayAccess();
-
+        removeLockedCRF(ub);
         if (ub.isSysAdmin()) {
             return;
         }
@@ -448,6 +448,8 @@ public class ViewStudySubjectServlet extends SecureController {
                 // System.out.println("edc.isDoubleEntry()" +
                 // edc.isDoubleEntry() + ecb.getId());
                 dec.setFlags(ecb, ub, currentRole, edc.isDoubleEntry());
+                dec.setLockedBy(checkCRFLocked(ecb));
+                
                 if (dec.isLocked()) {
                     // System.out.println("*** found a locked DEC:
                     // "+edc.getCrfName());

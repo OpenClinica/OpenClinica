@@ -40,6 +40,7 @@ import org.akaza.openclinica.bean.submit.ResponseOptionBean;
 import org.akaza.openclinica.bean.submit.ResponseSetBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
@@ -277,18 +278,10 @@ public abstract class DataEntryServlet extends SecureController {
     protected void processRequest() throws Exception {
 
         locale = request.getLocale();
-        // < resmessage =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",
-        // locale);
-        // < restext =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.notes",locale);
-        // <
-        // resexception=ResourceBundle.getBundle(
-        // "org.akaza.openclinica.i18n.exceptions",locale);
-        // < respage =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",
-        // locale);
-
+        
+        //Adding the Event CRF with the user into the Locked CRF list
+        unavailableCRFList.put(ecb.getId(), ub);
+        
         FormDiscrepancyNotes discNotes;
 
         panel.setStudyInfoShown(false);
@@ -387,6 +380,8 @@ public abstract class DataEntryServlet extends SecureController {
             session.removeAttribute(GROUP_HAS_DATA);
             session.removeAttribute("to_create_crf");
             session.removeAttribute("mayProcessUploading");
+            //Removing the user and EventCRF from the locked CRF List
+            unavailableCRFList.remove(ecb.getId());
             if (newUploadedFiles.size() > 0) {
                 if (this.unloadFiles(newUploadedFiles)) {
 

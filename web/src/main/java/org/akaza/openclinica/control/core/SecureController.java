@@ -14,6 +14,7 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.SessionManager;
@@ -168,6 +169,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     public static final String SUPPORT_URL = "supportURL";
 
     public static final String MODULE = "module";// to determine which module
+
+    public static HashMap unavailableCRFList = new HashMap();
 
     // user is in
 
@@ -807,6 +810,23 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     }
 
+    public static UserAccountBean checkCRFLocked(EventCRFBean ecb){
+        UserAccountBean newUser;
+        if(unavailableCRFList.containsKey(ecb.getId())){
+            newUser = (UserAccountBean)unavailableCRFList.get(ecb.getId());
+            return newUser;
+        }
+        return null;
+    }
+
+    public static void removeLockedCRF(UserAccountBean user){
+        for (Iterator iter = unavailableCRFList.entrySet().iterator(); iter.hasNext();) {
+            java.util.Map.Entry entry = (java.util.Map.Entry) iter.next();
+            UserAccountBean userAccountBean = (UserAccountBean)entry.getValue();
+            if(userAccountBean.getId()==user.getId())unavailableCRFList.remove(entry.getKey());
+        }
+    }
+
     /**
      * A inner class designed to allow the implementation of a JUnit test case
      * for abstract SecureController. The inner class allows the test case to
@@ -826,5 +846,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             SecureController.this.process(request, response);
         }
     }
+
+
 
 }
