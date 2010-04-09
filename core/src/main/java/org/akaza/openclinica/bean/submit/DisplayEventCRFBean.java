@@ -40,7 +40,7 @@ public class DisplayEventCRFBean implements Comparable {
     private boolean continueDoubleDataEntryPermitted = false;
     private boolean performAdministrativeEditingPermitted = false;
     private boolean locked = false;
-
+    private UserAccountBean lockedBy;
     /**
      * Does the user have to wait twelve hours before starting double data
      * entry?
@@ -127,6 +127,13 @@ public class DisplayEventCRFBean implements Comparable {
         return locked;
     }
 
+    public UserAccountBean getLockedBy(){
+        return lockedBy;
+    }
+    public void setLockedBy(UserAccountBean lockedBy){
+        this.lockedBy = lockedBy;
+    }
+
     /**
      * @return Returns the twelveHourWaitRequired.
      */
@@ -146,9 +153,9 @@ public class DisplayEventCRFBean implements Comparable {
 
         // if the user has no role in the current study
         // which permits data entry
-        if (!isSuper && !r.equals(Role.INVESTIGATOR) && !r.equals(Role.RESEARCHASSISTANT)) {
-            return;
-        }
+//        if (!isSuper && !r.equals(Role.INVESTIGATOR) && !r.equals(Role.RESEARCHASSISTANT)) {
+//            return;
+//        }
 
         if (stage.equals(DataEntryStage.LOCKED)) {
             locked = true;
@@ -159,34 +166,22 @@ public class DisplayEventCRFBean implements Comparable {
             startInitialDataEntryPermitted = true;
         } else if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY)) {
             /*Ownershipt logic has been asked to remove, issue-4573*/
-//            if (eventCRF.getOwner().equals(user) || isSuper) {
-                continueInitialDataEntryPermitted = true;
-  //          }
+            continueInitialDataEntryPermitted = true;
         } else if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)) {
             if (doubleDataEntryPermitted) {
-                logger.info("doubleDataEntryPermitted");
-                if (eventCRF.getOwner().equals(user)) {
-                    logger.info("ec owner is same as curr user");
-                    if (initialDataEntryCompletedMoreThanTwelveHoursAgo(eventCRF) || isSuper) {
-                        logger.info("super: " + isSuper);
+                    if (initialDataEntryCompletedMoreThanTwelveHoursAgo(eventCRF)) {
                         startDoubleDataEntryPermitted = true;
                     } else {
                         startDoubleDataEntryPermitted = false;
                         twelveHourWaitRequired = true;
                     }
-                } else {
-                    logger.info("ec owner is diff from curr user");
-                    startDoubleDataEntryPermitted = true;
-                }
             } else {
                 if (isEditor) {
                     performAdministrativeEditingPermitted = true;
                 }
             }
         } else if (stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY) && doubleDataEntryPermitted) {
-            if (eventCRF.getValidatorId() == user.getId() || isSuper) {
                 continueDoubleDataEntryPermitted = true;
-            }
         } else if (stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE)) {
             if (isEditor) {
                 performAdministrativeEditingPermitted = true;
