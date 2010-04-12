@@ -8,9 +8,11 @@ import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.ResponseOptionBean;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
+import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.action.InsertActionBean;
 import org.akaza.openclinica.domain.rule.action.PropertyBean;
 import org.akaza.openclinica.logic.expressionTree.ExpressionTreeHelper;
+import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
@@ -26,6 +28,8 @@ public class InsertActionValidator implements Validator {
     ItemFormMetadataDAO itemFormMetadataDAO;
     DataSource dataSource;
     EventDefinitionCRFBean eventDefinitionCRFBean;
+    ExpressionService expressionService;
+    RuleSetBean ruleSetBean;
 
     public InsertActionValidator(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -46,7 +50,7 @@ public class InsertActionValidator implements Validator {
             ValidationUtils.rejectIfEmpty(e, p + "oid", "oid.empty");
             ValidationUtils.rejectIfEmpty(e, p + "value", "value.empty");
             List<ItemBean> itemBeans = getItemDAO().findByOid(propertyBean.getOid());
-            if (itemBeans.size() != 1) {
+            if (!getExpressionService().isExpressionValid(propertyBean.getOid(), getRuleSetBean(), 3) && itemBeans.size() != 1) {
                 e.rejectValue(p + "oid", "oid.invalid");
             } else {
                 checkValidity(itemBeans.get(0), propertyBean.getValue(), p, e);
@@ -213,5 +217,21 @@ public class InsertActionValidator implements Validator {
 
     public void setEventDefinitionCRFBean(EventDefinitionCRFBean eventDefinitionCRFBean) {
         this.eventDefinitionCRFBean = eventDefinitionCRFBean;
+    }
+
+    public ExpressionService getExpressionService() {
+        return expressionService;
+    }
+
+    public void setExpressionService(ExpressionService expressionService) {
+        this.expressionService = expressionService;
+    }
+
+    public RuleSetBean getRuleSetBean() {
+        return ruleSetBean;
+    }
+
+    public void setRuleSetBean(RuleSetBean ruleSetBean) {
+        this.ruleSetBean = ruleSetBean;
     }
 }

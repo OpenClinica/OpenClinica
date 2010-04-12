@@ -280,6 +280,27 @@ public class ExpressionService {
         return value;
     }
 
+    public boolean isExpressionValid(String expression, RuleSetBean ruleSet, Integer allowedLength) {
+        boolean result = false;
+        boolean isRuleExpressionValid = false;
+
+        if (getExpressionSize(expression).intValue() > allowedLength.intValue()) {
+            return false;
+        }
+
+        if (ruleSet != null) {
+            String fullExpression = constructFullExpressionIfPartialProvided(expression, ruleSet.getTarget().getValue());
+            isRuleExpressionValid = checkSyntax(fullExpression);
+
+            if (isRuleExpressionValid) {
+                isExpressionValid(fullExpression);
+                result = true;
+            }
+
+        }
+        return result;
+    }
+
     public boolean ruleExpressionChecker(String expression) {
         boolean result = false;
         boolean isRuleExpressionValid = false;
@@ -303,6 +324,11 @@ public class ExpressionService {
             }
         }
         return result;
+    }
+
+    private Integer getExpressionSize(String expression) {
+        String[] splitExpression = expression.split(ESCAPED_SEPERATOR);
+        return splitExpression.length;
     }
 
     private Boolean isExpressionPartial(String expression) {
@@ -631,7 +657,48 @@ public class ExpressionService {
 
     public String checkValidityOfItemOrItemGroupOidInCrf(String oid, RuleSetBean ruleSet) {
 
+        oid = oid.trim();
         String[] theOid = oid.split(ESCAPED_SEPERATOR);
+        if (theOid.length == 2) {
+            ItemGroupBean itemGroup = getItemGroupDao().findByOid(theOid[0]);
+            if (itemGroup != null && itemGroup.getCrfId().equals(ruleSet.getCrfId())) {
+                ItemBean item = getItemDao().findItemByGroupIdandItemOid(itemGroup.getId(), theOid[1]);
+                if (item != null) {
+                    return "OK";
+                }
+            }
+
+        }
+        if (theOid.length == 1) {
+            ItemGroupBean itemGroup = getItemGroupDao().findByOid(oid);
+            if (itemGroup != null && itemGroup.getCrfId().equals(ruleSet.getCrfId())) {
+                return "OK";
+            }
+
+            ItemBean item = getItemDao().findItemByGroupIdandItemOid(getItemGroupExpression(ruleSet.getTarget().getValue()).getId(), oid);
+            if (item != null) {
+                return "OK";
+            }
+        }
+
+        return oid;
+    }
+
+    public String isExpressionValid(String oid, RuleSetBean ruleSet) {
+
+        StudyEventDefinitionBean studyEventDefinition = getStudyEventDefinitionFromExpression(ruleSet.getTarget().getValue());
+
+        String[] theOid = oid.split(ESCAPED_SEPERATOR);
+        if (theOid.length == 3) {
+            ItemGroupBean itemGroup = getItemGroupDao().findByOid(theOid[0]);
+            if (itemGroup != null && itemGroup.getCrfId().equals(ruleSet.getCrfId())) {
+                ItemBean item = getItemDao().findItemByGroupIdandItemOid(itemGroup.getId(), theOid[1]);
+                if (item != null) {
+                    return "OK";
+                }
+            }
+
+        }
         if (theOid.length == 2) {
             ItemGroupBean itemGroup = getItemGroupDao().findByOid(theOid[0]);
             if (itemGroup != null && itemGroup.getCrfId().equals(ruleSet.getCrfId())) {

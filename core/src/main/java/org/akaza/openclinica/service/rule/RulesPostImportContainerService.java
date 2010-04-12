@@ -195,6 +195,7 @@ public class RulesPostImportContainerService {
             }
             for (String oid : oids) {
                 String result = getExpressionService().checkValidityOfItemOrItemGroupOidInCrf(oid, ruleSetBeanWrapper.getAuditableBean());
+                //String result = getExpressionService().isExpressionValid(oid, ruleSetBeanWrapper.getAuditableBean(), 2) ? "OK" : "";
                 if (!result.equals("OK")) {
                     ruleSetBeanWrapper.error("ShowAction OID " + result + " is not Valid. ");
                 }
@@ -208,6 +209,7 @@ public class RulesPostImportContainerService {
             }
             for (String oid : oids) {
                 String result = getExpressionService().checkValidityOfItemOrItemGroupOidInCrf(oid, ruleSetBeanWrapper.getAuditableBean());
+                //String result = getExpressionService().isExpressionValid(oid, ruleSetBeanWrapper.getAuditableBean(), 2) ? "OK" : "";
                 if (!result.equals("OK")) {
                     ruleSetBeanWrapper.error("HideAction OID " + result + " is not Valid. ");
                 }
@@ -222,6 +224,8 @@ public class RulesPostImportContainerService {
             Errors errors = dataBinder.getBindingResult();
             InsertActionValidator insertActionValidator = getInsertActionValidator();
             insertActionValidator.setEventDefinitionCRFBean(eventDefinitionCRFBean);
+            insertActionValidator.setRuleSetBean(ruleSetBeanWrapper.getAuditableBean());
+            insertActionValidator.setExpressionService(expressionService);
             insertActionValidator.validate((ruleActionBean), errors);
             if (errors.hasErrors()) {
                 ruleSetBeanWrapper.error("InsertAction is not Valid. " + errors.toString());
