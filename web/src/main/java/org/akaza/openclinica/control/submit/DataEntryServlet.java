@@ -289,9 +289,11 @@ public abstract class DataEntryServlet extends SecureController {
         if(fp.getString(GO_EXIT).equals("")){
             if(unavailableCRFList.containsKey(ecb.getId())){
                 UserAccountBean user = (UserAccountBean)unavailableCRFList.get(ecb.getId());
-                throw new InconsistentStateException(Page.LIST_STUDY_SUBJECTS_SERVLET, resword.getString("CRF_unavailable") +" "+user.getName()
-                        + " "+ resword.getString("Currently_entering_data")
-                        + " "+resword.getString("Leave_the_CRF"));
+                if(user.getId()!=ub.getId()){
+                    throw new InconsistentStateException(Page.LIST_STUDY_SUBJECTS_SERVLET, resword.getString("CRF_unavailable") +" "+user.getName()
+                            + " "+ resword.getString("Currently_entering_data")
+                            + " "+resword.getString("Leave_the_CRF"));
+                }
             }else{
                 unavailableCRFList.put(ecb.getId(), ub);
             }
