@@ -280,18 +280,22 @@ public abstract class DataEntryServlet extends SecureController {
         locale = request.getLocale();
         
         //Adding the Event CRF with the user into the Locked CRF list
-        unavailableCRFList.put(ecb.getId(), ub);
+
         
         FormDiscrepancyNotes discNotes;
 
         panel.setStudyInfoShown(false);
         String age = "";
-//        if(unavailableCRFList.get(ecb.getId())!=null){
-//            UserAccountBean user = (UserAccountBean)unavailableCRFList.get(ecb.getId());
-//            throw new InconsistentStateException(Page.LIST_STUDY_SUBJECTS_SERVLET, resword.getString("CRF_unavailable") +" "+user.getName()
-//                    + " "+ resword.getString("Currently_entering_data")
-//                    + " "+resword.getString("Leave_the_CRF"));
-//        }
+        if(fp.getString(GO_EXIT).equals("")){
+            if(unavailableCRFList.containsKey(ecb.getId())){
+                UserAccountBean user = (UserAccountBean)unavailableCRFList.get(ecb.getId());
+                throw new InconsistentStateException(Page.LIST_STUDY_SUBJECTS_SERVLET, resword.getString("CRF_unavailable") +" "+user.getName()
+                        + " "+ resword.getString("Currently_entering_data")
+                        + " "+resword.getString("Leave_the_CRF"));
+            }else{
+                unavailableCRFList.put(ecb.getId(), ub);
+            }
+        }
 
         if (!ecb.isActive()) {
             throw new InconsistentStateException(Page.LIST_STUDY_SUBJECTS_SERVLET, resexception.getString("event_not_exists"));
