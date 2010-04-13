@@ -143,19 +143,10 @@ public class DisplayEventCRFBean implements Comparable {
 
     public void setFlags(EventCRFBean eventCRF, UserAccountBean user, StudyUserRoleBean surb, boolean doubleDataEntryPermitted) {
         this.eventCRF = eventCRF;
-
         stage = eventCRF.getStage();
-        // logger.info("stage:" + stage.getName() + eventCRF.getId());
-
         Role r = surb.getRole();
         boolean isSuper = isSuper(user, r);
         boolean isEditor = isEditor(user, r);
-
-        // if the user has no role in the current study
-        // which permits data entry
-//        if (!isSuper && !r.equals(Role.INVESTIGATOR) && !r.equals(Role.RESEARCHASSISTANT)) {
-//            return;
-//        }
 
         if (stage.equals(DataEntryStage.LOCKED)) {
             locked = true;
@@ -165,31 +156,37 @@ public class DisplayEventCRFBean implements Comparable {
         if (stage.equals(DataEntryStage.UNCOMPLETED)) {
             startInitialDataEntryPermitted = true;
         } else if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY)) {
-            /*Ownershipt logic has been asked to remove, issue-4573*/
             continueInitialDataEntryPermitted = true;
         } else if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)) {
             if (doubleDataEntryPermitted) {
-                    if (initialDataEntryCompletedMoreThanTwelveHoursAgo(eventCRF)) {
+                if (eventCRF.getOwner().equals(user)) {
+                    if (initialDataEntryCompletedMoreThanTwelveHoursAgo(eventCRF) || isSuper) {
                         startDoubleDataEntryPermitted = true;
                     } else {
                         startDoubleDataEntryPermitted = false;
                         twelveHourWaitRequired = true;
                     }
+                } else {
+                    startDoubleDataEntryPermitted = true;
+                }
             } else {
                 if (isEditor) {
                     performAdministrativeEditingPermitted = true;
                 }
             }
         } else if (stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY) && doubleDataEntryPermitted) {
+            if (eventCRF.getValidatorId() == user.getId() || isSuper) {
                 continueDoubleDataEntryPermitted = true;
+            }
         } else if (stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE)) {
             if (isEditor) {
                 performAdministrativeEditingPermitted = true;
             }
         } else if (stage.equals(DataEntryStage.INVALID)) {
-            // logger.info("**found invalid stage**");
         }
     }
+
+
 
     /**
      * @param user
