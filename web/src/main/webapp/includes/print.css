@@ -42,6 +42,7 @@ H1, H2, H3 {background: white; color: black; padding-bottom: 1px;
 }
 
 .aka_exclaim_show{
+	background: yellow;
     font-family: Tahoma, Arial, Helvetica, Sans-Serif;
 	font-size: 2em;
 	font-style: normal;
@@ -54,7 +55,13 @@ H1, H2, H3 {background: white; color: black; padding-bottom: 1px;
 }
 
 .aka_input_show{
-  border: 1px solid #006633;
+	background: yellow;
+  	border: 1px solid #006633;
+}
+
+.aka_group_show{
+	background: pink;
+    border: 1px solid red;
 }
 
 .aka_input_readonly{

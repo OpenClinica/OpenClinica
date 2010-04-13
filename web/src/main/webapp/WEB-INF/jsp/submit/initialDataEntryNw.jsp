@@ -515,7 +515,24 @@ window.onload = initmb;
 <c:set var="currPage" value="${displayItem.pageNumberLabel}" />
 <%-- the section borders property value --%>
 <c:set var="sectionBorders" value="${section.section.borders}" />
-<tr><td>
+<tr>
+<%-- place where we need to highlight sections, 
+	one of the error keys should equal the item group's OID --%>
+<c:set var="isSectionShown" value="false"/>
+<c:forEach var="formMsg" items="${formMessages}">
+	<c:if test="${formMsg.key eq displayItem.itemGroup.itemGroupBean.oid}">
+		<c:set var="isSectionShown" value="true"/>
+	</c:if>
+</c:forEach>
+<c:choose>
+	<c:when test="${hasShown && isSectionShown}">
+        <td id="<c:out value="${displayItem.itemGroup.itemGroupBean.oid}"/>" class="aka_group_show">
+	</c:when>
+	<c:otherwise>
+		<td>
+	</c:otherwise>
+</c:choose>
+<%-- end place where we highlight sections --%>
 <c:set var="uniqueId" value="0"/>
 <c:set var="repeatParentId" value="${displayItem.itemGroup.itemGroupBean.oid}"/>
 

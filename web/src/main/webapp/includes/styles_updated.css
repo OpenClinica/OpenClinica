@@ -60,6 +60,7 @@
 }
 
 .aka_exclaim_show{
+	background: yellow;
   font-family: Tahoma, Arial, Helvetica, Sans-Serif;
   font-size: 2em;
   font-style: normal;
@@ -72,7 +73,13 @@
 }
 
 .aka_input_show{
+	background: yellow;
   border: 1px solid #006633;
+}
+
+.aka_group_show{
+	background: pink;
+    border: 1px solid red;
 }
 
 .aka_bodywidth{

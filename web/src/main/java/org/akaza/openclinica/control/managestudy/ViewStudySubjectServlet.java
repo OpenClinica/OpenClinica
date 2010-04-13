@@ -556,7 +556,7 @@ public class ViewStudySubjectServlet extends SecureController {
                  */
             }
         }
-        System.out.println("size of answer" + answer.size());
+        // System.out.println("size of answer" + answer.size());
         return answer;
     }
 
