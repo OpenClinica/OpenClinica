@@ -99,7 +99,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         if (dynamicsMetadataBean != null) {
             return dynamicsMetadataBean.isShowItem();
         } else {
-            System.out.println("did not find a row in the db for (with IDB) " + itemFormMetadataBean.getId() + " idb id " + itemDataBean.getId());
+            // System.out.println("did not find a row in the db for (with IDB) " + itemFormMetadataBean.getId() + " idb id " + itemDataBean.getId());
             return false;
         }
         // return false;
@@ -219,12 +219,12 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                 ArrayList sectionBeans = getSectionDAO().findAllByCRFVersionId(eventCrfBean.getCRFVersionId());
                 for (int i = 0; i < sectionBeans.size(); i++) {
                     SectionBean sectionBean = (SectionBean)sectionBeans.get(i);
-                    System.out.println("found section " + sectionBean.getId());
+                    // System.out.println("found section " + sectionBean.getId());
                     List<ItemGroupMetadataBean> itemGroupMetadataBeans = getItemGroupMetadataDAO().findMetaByGroupAndSection(itemGroupBean.getId(),
                             eventCrfBean.getCRFVersionId(), sectionBean.getId());
                     for (ItemGroupMetadataBean itemGroupMetadataBean : itemGroupMetadataBeans) {
                         if (itemGroupMetadataBean.getItemGroupId() == itemGroupBean.getId()) {
-                            System.out.println("found item group id 2 " + oid);
+                            // System.out.println("found item group id 2 " + oid);
                             DynamicsItemGroupMetadataBean dynamicsGroupBean = getDynamicsItemGroupMetadataBean(itemGroupMetadataBean, eventCrfBean);
                             if (dynamicsGroupBean == null) {
                                 showGroup(itemGroupMetadataBean, eventCrfBean);
