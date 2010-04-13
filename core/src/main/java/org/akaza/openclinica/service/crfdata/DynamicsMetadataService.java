@@ -99,7 +99,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         if (dynamicsMetadataBean != null) {
             return dynamicsMetadataBean.isShowItem();
         } else {
-            System.out.println("did not find a row in the db for (with IDB)" + itemFormMetadataBean.getId());
+            System.out.println("did not find a row in the db for (with IDB) " + itemFormMetadataBean.getId() + " idb id " + itemDataBean.getId());
             return false;
         }
         // return false;
@@ -214,12 +214,12 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
             }
             // OID is a group
             else {
-                // System.out.println("found item group id 1 " + oid);
+                System.out.println("found item group id 1 " + oid);
                 ItemGroupBean itemGroupBean = itemOrItemGroup.getItemGroupBean();
                 ArrayList sectionBeans = getSectionDAO().findAllByCRFVersionId(eventCrfBean.getCRFVersionId());
                 for (int i = 0; i < sectionBeans.size(); i++) {
                     SectionBean sectionBean = (SectionBean)sectionBeans.get(i);
-                    // System.out.println("found section " + sectionBean.getId());
+                    System.out.println("found section " + sectionBean.getId());
                     List<ItemGroupMetadataBean> itemGroupMetadataBeans = getItemGroupMetadataDAO().findMetaByGroupAndSection(itemGroupBean.getId(),
                             eventCrfBean.getCRFVersionId(), sectionBean.getId());
                     for (ItemGroupMetadataBean itemGroupMetadataBean : itemGroupMetadataBeans) {
@@ -285,29 +285,31 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 
         String[] theOid = oid.split(ESCAPED_SEPERATOR);
         if (theOid.length == 2) {
-            ItemGroupBean itemGroup = getItemGroupDAO().findByOid(theOid[0]);
+            ItemGroupBean itemGroup = getItemGroupDAO().findByOid(theOid[0].trim());
             if (itemGroup != null) {
-                ItemBean item = getItemDAO().findItemByGroupIdandItemOid(itemGroup.getId(), theOid[1]);
+                ItemBean item = getItemDAO().findItemByGroupIdandItemOid(itemGroup.getId(), theOid[1].trim());
                 if (item != null) {
-                    System.out.println("");
+                    System.out.println("returning two non nulls");
                     return new ItemOrItemGroupHolder(item, itemGroup);
                 }
             }
         }
         if (theOid.length == 1) {
-            ItemGroupBean itemGroup = getItemGroupDAO().findByOid(oid);
+            ItemGroupBean itemGroup = getItemGroupDAO().findByOid(oid.trim());
             if (itemGroup != null) {
+                System.out.println("returning item group not null");
                 return new ItemOrItemGroupHolder(null, itemGroup);
             }
 
-            List<ItemBean> items = getItemDAO().findByOid(oid);
+            List<ItemBean> items = getItemDAO().findByOid(oid.trim());
             ItemBean item = items.size() > 0 ? items.get(0) : null;
             if (item != null) {
+                System.out.println("returning item not null");
                 return new ItemOrItemGroupHolder(item, null);
             }
         }
 
-        return null;
+        return new ItemOrItemGroupHolder(null, null);
     }
 
     public DynamicsItemFormMetadataDao getDynamicsItemFormMetadataDao() {
