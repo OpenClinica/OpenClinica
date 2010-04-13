@@ -1473,7 +1473,41 @@ public abstract class DataEntryServlet extends SecureController {
                                 // break;
                             }
                         }
+                        // check groups
+                        List<DisplayItemGroupBean> itemGroups = new ArrayList<DisplayItemGroupBean>();
+                        itemGroups = section.getDisplayFormGroups();
+                        // List<DisplayItemGroupBean> newItemGroups = new ArrayList<DisplayItemGroupBean>();
+                        for (DisplayItemGroupBean displayGroup : itemGroups) {
+                            if (fieldName.equals(displayGroup.getItemGroupBean().getOid())) {
+                                if (!displayGroup.getGroupMetaBean().isShowGroup()) {
+                                    inSameSection = true;
+                                    System.out.println("found itemgroup " + displayGroup.getItemGroupBean().getOid() + " vs. " + fieldName);
+                                    // hmmm how to set highlighting for a group?
+                                    errorsPostDryRun.put(displayGroup.getItemGroupBean().getOid(), rulesPostDryRun.get(fieldName));
+                                    displayGroup.getGroupMetaBean().setShowGroup(true);
+                                    // add necessary rows to the display group here????
+                                    // we have to set the items in the itemGroup for the displayGroup
+                                    
+                                    // List<ItemBean> itBeans = idao.findAllItemsByGroupId(displayGroup.getItemGroupBean().getId(), sb.getCRFVersionId());
+                                    // List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, sm.getDataSource(), 
+                                    //        ecb, sb.getId(), null, context);
+                                    // List<DisplayItemBean> displayItemBeans = FormBeanUtil.getDisplayBeansFromItems(itBeans, sm.getDataSource(), ecb, sb.getId(), null, context);
+                                    // displayGroup.setItems(dibs);
+                                    // System.out.println("found " + dibs.size() + " display items from reset of item group " + 
+                                       //     displayGroup.getItemGroupBean().getOid());
+                                }
+                            }
+                            // newItemGroups.add(displayGroup);
+                        }
+                        // trying to reset the display form groups here, tbh
+                        // FormBeanUtil formBeanUtil = new FormBeanUtil();
+                        // DisplaySectionBean newDisplayBean = formBeanUtil.createDisplaySectionBWithFormGroups(sb.getId(), ecb.getCRFVersionId(), 
+                           //     sm.getDataSource(), eventDefinitionCRFId, ecb, context);
                         section.setItems(displayItems);
+                        List<DisplayItemWithGroupBean> displayItemWithGroups2 = createItemWithGroups(section, hasGroup, eventDefinitionCRFId);
+
+                        section.setDisplayItemGroups(displayItemWithGroups2);
+                        // section.setDisplayFormGroups(newDisplayBean.getDisplayFormGroups());
                     }
 
                     // if so, stay at this section
@@ -2381,6 +2415,7 @@ public abstract class DataEntryServlet extends SecureController {
                         ": " + ecb.getId() + ": " + showGroup);
 
                 metadataBean.setShowGroup(showGroup);
+                // what about the items which should be shown?
             }
             // << tbh 04/2010
         } catch (OpenClinicaException oce) {
@@ -2944,23 +2979,7 @@ public abstract class DataEntryServlet extends SecureController {
             dib.setItem(ib);
             displayItems.put(new Integer(dib.getItem().getId()), dib);
         }
-
-        ArrayList metadata = ifmdao.findAllBySectionId(sb.getId());
-        for (int i = 0; i < metadata.size(); i++) {
-            ItemFormMetadataBean ifmb = (ItemFormMetadataBean) metadata.get(i);
-            DisplayItemBean dib = (DisplayItemBean) displayItems.get(new Integer(ifmb.getItemId()));
-            if (dib != null) {
-
-                boolean showItem = getItemMetadataService().isShown(ifmb.getItemId(), ecb);
-                if (showItem) { // we are only showing, not hiding
-                    ifmb.setShowItem(showItem);
-                }
-                // System.out.println("did not catch NPE 1");
-                dib.setMetadata(ifmb);
-                displayItems.put(new Integer(ifmb.getItemId()), dib);
-            }
-        }
-
+        
         ArrayList data = iddao.findAllBySectionIdAndEventCRFId(sb.getId(), ecb.getId());
         for (int i = 0; i < data.size(); i++) {
             ItemDataBean idb = (ItemDataBean) data.get(i);
@@ -2968,6 +2987,24 @@ public abstract class DataEntryServlet extends SecureController {
             if (dib != null) {
                 dib.setData(idb);
                 displayItems.put(new Integer(idb.getItemId()), dib);
+            }
+        }
+
+        ArrayList metadata = ifmdao.findAllBySectionId(sb.getId());
+        for (int i = 0; i < metadata.size(); i++) {
+            ItemFormMetadataBean ifmb = (ItemFormMetadataBean) metadata.get(i);
+            DisplayItemBean dib = (DisplayItemBean) displayItems.get(new Integer(ifmb.getItemId()));
+            if (dib != null) {
+                // Fboolean showItem = false;
+                boolean showItem = getItemMetadataService().isShown(ifmb.getItemId(), ecb, dib.getData());
+                
+                // is the above needed for children items too?
+                if (showItem) { // we are only showing, not hiding
+                    ifmb.setShowItem(showItem);
+                }
+                // System.out.println("did not catch NPE 1");
+                dib.setMetadata(ifmb);
+                displayItems.put(new Integer(ifmb.getItemId()), dib);
             }
         }
 
@@ -3011,7 +3048,7 @@ public abstract class DataEntryServlet extends SecureController {
             }
             // <<tbh 07/2009, bug #3883
             dib.setDbData(data);
-            boolean showItem = getItemMetadataService().isShown(metadata, ecb);
+            boolean showItem = getItemMetadataService().isShown(metadata.getItemId(), ecb, data);
             if (showItem) {
                 metadata.setShowItem(showItem);
             }
