@@ -111,6 +111,7 @@
   <td class="table_header_row"><fmt:message key="header" bundle="${resword}"/></td>
   <td class="table_header_row"><fmt:message key="repeat_number" bundle="${resword}"/></td>
   <td class="table_header_row"><fmt:message key="repeat_max" bundle="${resword}"/></td>
+  <td class="table_header_row">Is shown?</td>
  </tr>
  <c:forEach var ="group" items="${section.groups}">
   <tr valign="top">
@@ -119,6 +120,16 @@
    <td class="table_cell"><c:out value="${group.meta.header}"/>&nbsp;</td>
    <td class="table_cell"><c:out value="${group.meta.repeatNum}"/>&nbsp;</td>
    <td class="table_cell"><c:out value="${group.meta.repeatMax}"/>&nbsp;</td>
+   <td class="table_cell">
+   		<c:choose>
+      <c:when test="${group.meta.showGroup==true}">
+       <fmt:message key="yes" bundle="${resword}"/>
+      </c:when>
+      <c:otherwise>
+        <fmt:message key="no" bundle="${resword}"/>
+      </c:otherwise>
+      </c:choose>
+   </td>
   </tr>
   </c:forEach>
  </table>
@@ -159,6 +170,7 @@
     <td class="table_header_row"><fmt:message key="response_options" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="response_values" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="required" bundle="${resword}"/></td>
+    <td class="table_header_row">Is shown?</td>
 
   </tr>
   <c:forEach var ="item" items="${section.items}">
@@ -234,6 +246,17 @@
      <td class="table_cell">
      <c:choose>
       <c:when test="${item.itemMeta.required==true}">
+       <fmt:message key="yes" bundle="${resword}"/>
+      </c:when>
+      <c:otherwise>
+        <fmt:message key="no" bundle="${resword}"/>
+      </c:otherwise>
+      </c:choose>
+      </td>
+      <%-- adding a column for dynamics, tbh --%>
+      <td class="table_cell">
+     <c:choose>
+      <c:when test="${item.itemMeta.showItem==true}">
        <fmt:message key="yes" bundle="${resword}"/>
       </c:when>
       <c:otherwise>
