@@ -1044,8 +1044,24 @@ but the custom tag uses that, not this jstl code--%>
                     <c:if test="${displayItem.singleItem.metadata.columnNumber >1}">
                 <td valign="top">
                     </c:if>
-                    <table border="0">
-                        <tr>
+                    <table border="0" cellspacing="0" cellpadding="1">
+                    <%-- this is where we need to set the block for shown items, tbh --%>
+                    	<c:set var="isItemShown" value="false"/>
+						<c:forEach var="formMsg" items="${formMessages}">
+							<c:set var="inputValue">input<c:out value="${displayItem.singleItem.item.id}"/></c:set>
+							<c:if test="${formMsg.key eq inputValue}">
+								<c:set var="isItemShown" value="true"/>
+							</c:if>
+						</c:forEach>
+                    	<c:choose>
+                    		<c:when test="${isItemShown && hasShown}">
+                    			<tr class="aka_group_show">
+                    		</c:when>
+                    		<c:otherwise>
+                    			<tr>
+                    		</c:otherwise>
+                    	</c:choose>
+                        
                             <td valign="top" class="aka_ques_block"><c:out value="${displayItem.singleItem.metadata.questionNumberLabel}" escapeXml="false"/></td>
                             <!--
                             <td valign="top" class="aka_text_block"><c:out value="${displayItem.singleItem.metadata.leftItemText}" escapeXml="false"/></td>
@@ -1143,6 +1159,7 @@ but the custom tag uses that, not this jstl code--%>
 
                     <td valign="top">
                         <table border="0">
+                        	<%-- this is where we need to set the block for shown items (children), tbh --%>
                             <tr>
                                     <%--          <td valign="top" class="text_block">
                                   <c:out value="${childItem.metadata.questionNumberLabel}" escapeXml="false"/>
