@@ -37,6 +37,7 @@ public class ListStudySubjectTableToolbar extends DefaultToolbar {
 
         addToolbarItem(ToolbarItemType.SEPARATOR);
         addToolbarItem(createCustomItem(new StudyEventDefinitionDropDownItem()));
+        addToolbarItem(createCustomItem(new NewHiddenItem()));
         if (addSubjectLinkShow) {
             addToolbarItem(createAddSubjectItem());
         }
@@ -150,6 +151,23 @@ public class ListStudySubjectTableToolbar extends DefaultToolbar {
             html.quote().close();
             html.nbsp().append("Add New Subject").nbsp().aEnd();
 
+            return html.toString();
+        }
+
+    }
+
+    private class NewHiddenItem extends AbstractItem {
+
+        @Override
+        public String disabled() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public String enabled() {
+            HtmlBuilder html = new HtmlBuilder();
+            html.input().id("showMoreLink").type("hidden").name("showMoreLink").value(showMoreLink+"").aEnd();
             return html.toString();
         }
 

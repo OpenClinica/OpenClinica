@@ -337,7 +337,7 @@ public class ChangeStudyServlet extends SecureController {
 
     private void setupListStudySubjectTable() {
 
-        ListStudySubjectTableFactory factory = new ListStudySubjectTableFactory();
+        ListStudySubjectTableFactory factory = new ListStudySubjectTableFactory(true);
         factory.setStudyEventDefinitionDao(getStudyEventDefinitionDao());
         factory.setSubjectDAO(getSubjectDAO());
         factory.setStudySubjectDAO(getStudySubjectDAO());

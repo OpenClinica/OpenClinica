@@ -24,6 +24,7 @@ function hideCols(tableId,columnNumArray,showTable){
         if(document.getElementById('showMore') && document.getElementById('hide')){
             document.getElementById('showMore').style.display='none';
             document.getElementById('hide').style.display='';
+            document.getElementById('showMoreLink').value="false";
         }
     }
     else  {
@@ -31,6 +32,7 @@ function hideCols(tableId,columnNumArray,showTable){
         if(document.getElementById('showMore') && document.getElementById('hide')){
             document.getElementById('showMore').style.display='';
             document.getElementById('hide').style.display='none';
+            document.getElementById('showMoreLink').value="true";
         }
     }
     //alert("found theStyle: "+ theStyle);

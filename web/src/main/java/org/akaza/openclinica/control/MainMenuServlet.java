@@ -247,7 +247,7 @@ public class MainMenuServlet extends SecureController {
 
     private void setupListStudySubjectTable() {
 
-        ListStudySubjectTableFactory factory = new ListStudySubjectTableFactory();
+        ListStudySubjectTableFactory factory = new ListStudySubjectTableFactory(false);
         factory.setStudyEventDefinitionDao(getStudyEventDefinitionDao());
         factory.setSubjectDAO(getSubjectDAO());
         factory.setStudySubjectDAO(getStudySubjectDAO());

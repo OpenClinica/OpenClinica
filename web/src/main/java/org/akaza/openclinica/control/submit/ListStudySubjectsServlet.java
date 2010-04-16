@@ -44,6 +44,7 @@ public class ListStudySubjectsServlet extends SecureController {
     private EventCRFDAO eventCRFDAO;
     private EventDefinitionCRFDAO eventDefintionCRFDAO;
     private StudyGroupDAO studyGroupDAO;
+    private boolean showMoreLink; 
     Locale locale;
 
     /*
@@ -71,7 +72,11 @@ public class ListStudySubjectsServlet extends SecureController {
     @Override
     protected void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
-
+        if(fp.getString("showMoreLink").equals("")){
+            showMoreLink = true;
+        }else {
+            showMoreLink = Boolean.parseBoolean(fp.getString("showMoreLink"));
+        }
         String idSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();
         // set up auto study subject id
         if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
@@ -96,7 +101,7 @@ public class ListStudySubjectsServlet extends SecureController {
 
     private void createTable() {
 
-        ListStudySubjectTableFactory factory = new ListStudySubjectTableFactory();
+        ListStudySubjectTableFactory factory = new ListStudySubjectTableFactory(showMoreLink);
         factory.setStudyEventDefinitionDao(getStudyEventDefinitionDao());
         factory.setSubjectDAO(getSubjectDAO());
         factory.setStudySubjectDAO(getStudySubjectDAO());
