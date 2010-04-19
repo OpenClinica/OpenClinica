@@ -1,7 +1,6 @@
 package org.akaza.openclinica.dao.submit;
 
 import org.akaza.openclinica.bean.core.EntityBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.dao.core.EntityDAO;
 import org.akaza.openclinica.dao.core.SQLFactory;
@@ -106,6 +105,22 @@ public class ItemGroupMetadataDAO extends EntityDAO {
         //return new ItemGroupMetadataBean(); // To change body of implemented
         // methods use File | Settings |
         // File Templates.;
+    }
+
+    public EntityBean findByItemAndCrfVersion(Integer itemId, Integer crfVersionId) {
+        ItemGroupMetadataBean eb = new ItemGroupMetadataBean();
+        this.setTypesExpected();
+        HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
+        variables.put(1, itemId);
+        variables.put(2, crfVersionId);
+        String sql = digester.getQuery("findByItemIdAndCrfVersionId");
+        ArrayList alist = this.select(sql, variables);
+        Iterator it = alist.iterator();
+
+        if (it.hasNext()) {
+            eb = (ItemGroupMetadataBean) this.getEntityFromHashMap((HashMap) it.next());
+        }
+        return eb;
     }
 
     public EntityBean create(EntityBean eb) throws OpenClinicaException {

@@ -38,6 +38,13 @@
      </sql>
   </query>
   
+  <query>
+    <name>findByItemIdAndCrfVersionId</name>
+    <sql>select igm.* from item_group_metadata igm
+        where igm.item_id =? and igm.crf_version_id =?
+    </sql>
+  </query>
+  
    <query>
     <name>findCurrentPKValue</name>
     <sql>select currval('item_form_metadata_item_form_metadata_id_seq') as key</sql>

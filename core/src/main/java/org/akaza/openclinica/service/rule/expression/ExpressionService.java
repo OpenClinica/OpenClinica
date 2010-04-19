@@ -339,7 +339,7 @@ public class ExpressionService {
             return true;
     }
 
-    private String constructFullExpressionIfPartialProvided(String expression, String ruleSetTargetExpression) {
+    public String constructFullExpressionIfPartialProvided(String expression, String ruleSetTargetExpression) {
         String[] splitExpression = expression.split(ESCAPED_SEPERATOR);
         switch (splitExpression.length) {
         case 1:

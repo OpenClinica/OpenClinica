@@ -85,6 +85,10 @@
                 <sql>select * from item_data where event_crf_id=?</sql>
         </query>
         <query>
+                <name>findAllByEventCRFIdAndItemId</name>
+                <sql>select * from item_data where event_crf_id=? and item_id = ? and status_id!=5 and status_id!=7 Order by ordinal asc </sql>
+        </query>
+        <query>
                 <name>getCurrentPK</name>
                 <sql> select item_data_id_seq.currval as key from dual</sql>
         </query>
@@ -124,6 +128,12 @@
                         And id.item_id = igm.item_id
             And id.item_id = ifm.item_id
                 </sql>
+        <query>
+                <name>getMaxOrdinalForGroupByItemAndEventCrf</name>
+                <sql>
+                    select max(ordinal) AS max_ord from item_data where item_id = ? and event_crf_id = ?
+                </sql>
+        </query>        
         </query>
         	<query>
 		<name>findByItemIdAndEventCRFIdAndOrdinal</name>
@@ -133,7 +143,7 @@
 	</query>
 	<query>
 		<name>getGroupSize</name>
-		<sql>SELECT count(*) From item_data id, item
+		<sql>SELECT count(*) as count From item_data id
 		WHERE id.item_id = ? and id.event_crf_id = ? and id.status_id!=5 and id.status_id!=7
 		</sql>
 	</query>

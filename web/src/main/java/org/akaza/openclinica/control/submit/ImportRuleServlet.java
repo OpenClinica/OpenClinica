@@ -104,6 +104,7 @@ public class ImportRuleServlet extends SecureController {
             xmlContext.addMapping(mapping);
             // create a new Unmarshaller
             Unmarshaller unmarshaller = xmlContext.createUnmarshaller();
+            unmarshaller.setWhitespacePreserve(false);
             unmarshaller.setClass(RulesPostImportContainer.class);
             // Create a Reader to the file to unmarshal from
             FileReader reader = new FileReader(xmlFile);

@@ -11,6 +11,7 @@ import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
@@ -370,6 +371,15 @@ public class ItemDataDAO extends AuditableEntityDAO {
         return this.executeFindAllQuery("findAllByEventCRFId", variables);
     }
 
+    public ArrayList<ItemDataBean> findAllByEventCRFIdAndItemId(int eventCRFId, int itemId) {
+        setTypesExpected();
+        HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
+        variables.put(new Integer(1), new Integer(eventCRFId));
+        variables.put(new Integer(2), new Integer(itemId));
+
+        return this.executeFindAllQuery("findAllByEventCRFIdAndItemId", variables);
+    }
+
     public ArrayList<ItemDataBean> findAllBlankRequiredByEventCRFId(int eventCRFId, int crfVersionId) {
         setTypesExpected();
         HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
@@ -485,6 +495,29 @@ public class ItemDataDAO extends AuditableEntityDAO {
         return 0;
     }
 
+    public int getMaxOrdinalForGroupByItemAndEventCrf(ItemBean ib, EventCRFBean ec) {
+
+        this.unsetTypeExpected();
+        this.setTypeExpected(1, TypeNames.INT);
+
+        HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
+        variables.put(new Integer(1), new Integer(ib.getId()));
+        variables.put(new Integer(2), new Integer(ec.getId()));
+
+        ArrayList alist = this.select(digester.getQuery("getMaxOrdinalForGroupByItemAndEventCrf"), variables);
+        Iterator it = alist.iterator();
+        if (it.hasNext()) {
+            try {
+                HashMap hm = (HashMap) it.next();
+                Integer max = (Integer) hm.get("max_ord");
+                return max.intValue();
+            } catch (Exception e) {
+            }
+        }
+
+        return 0;
+    }
+
     public int getGroupSize(int itemId, int eventcrfId) {
         this.unsetTypeExpected();
         this.setTypeExpected(1, TypeNames.INT);
@@ -496,13 +529,11 @@ public class ItemDataDAO extends AuditableEntityDAO {
         ArrayList alist = this.select(digester.getQuery("getGroupSize"), variables);
         Iterator it = alist.iterator();
         if (it.hasNext()) {
-            try {
-                return ((Integer) it.next()).intValue();
-            } catch (Exception e) {
-            }
+            Integer count = (Integer) ((HashMap) it.next()).get("count");
+            return count;
+        } else {
+            return 0;
         }
-
-        return 0;
     }
 
     public List<String> findValuesByItemOID(String itoid) {

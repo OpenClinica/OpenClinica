@@ -66,7 +66,7 @@ public class DataEntryRuleRunner extends RuleRunner {
                                 // getDiscrepancyNoteService().saveFieldNotes(ruleAction.getSummary(), itemDataBeanId, "ItemData", currentStudy, ub);
                                 // System.out.println(" shipping rule action type " + ruleAction.getActionType().name());
                                 ActionProcessor ap =
-                                    ActionProcessorFacade.getActionProcessor(ruleAction.getActionType(), ds, getMailSender(), dynamicsMetadataService);
+                                    ActionProcessorFacade.getActionProcessor(ruleAction.getActionType(), ds, getMailSender(), dynamicsMetadataService, ruleSet);
                                 RuleActionBean rab =
                                     ap.execute(RuleRunnerMode.DATA_ENTRY, executionMode, ruleAction, itemDataBeanId, DiscrepancyNoteBean.ITEM_DATA,
                                             currentStudy, ub, prepareEmailContents(ruleSet, ruleSetRule, currentStudy, ruleAction));

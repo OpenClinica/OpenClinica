@@ -1,5 +1,10 @@
 package org.akaza.openclinica.service.crfdata;
 
+import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
@@ -10,7 +15,8 @@ import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemGroupMetadataDao;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
@@ -20,9 +26,10 @@ import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean;
 import org.akaza.openclinica.domain.crfdata.DynamicsItemGroupMetadataBean;
-import org.akaza.openclinica.exception.OpenClinicaException;
+import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.action.PropertyBean;
-
+import org.akaza.openclinica.exception.OpenClinicaException;
+import org.akaza.openclinica.service.rule.expression.ExpressionService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +51,9 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
     // private CRFVersionDAO crfVersionDAO;
     private ItemFormMetadataDAO itemFormMetadataDAO;
     private ItemGroupMetadataDAO itemGroupMetadataDAO;
+    private StudyEventDAO studyEventDAO;
+    private EventDefinitionCRFDAO eventDefinitionCRFDAO;
+    private ExpressionService expressionService;
 
     public DynamicsMetadataService(DataSource ds) {
         this.ds = ds;
@@ -88,7 +98,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         }
         // return false;
     }
-    
+
     public boolean isShown(Integer itemId, EventCRFBean eventCrfBean, ItemDataBean itemDataBean) {
         // do we check against the database, or just against the object? prob against the db
         // ItemFormMetadataBean itemFormMetadataBean = (ItemFormMetadataBean) metadataBean;
@@ -104,9 +114,9 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         }
         // return false;
     }
-    
+
     public boolean isGroupShown(int metadataId, EventCRFBean eventCrfBean) throws OpenClinicaException {
-        ItemGroupMetadataBean itemGroupMetadataBean = (ItemGroupMetadataBean)getItemGroupMetadataDAO().findByPK(metadataId);
+        ItemGroupMetadataBean itemGroupMetadataBean = (ItemGroupMetadataBean) getItemGroupMetadataDAO().findByPK(metadataId);
         DynamicsItemGroupMetadataBean dynamicsMetadataBean = getDynamicsItemGroupMetadataBean(itemGroupMetadataBean, eventCrfBean);
         if (dynamicsMetadataBean != null) {
             return dynamicsMetadataBean.isShowGroup();
@@ -114,17 +124,17 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
             System.out.println("didnt find a group row in the db ");
             return false;
         }
-    
+
     }
-    
+
     public boolean isGroupShown(int metadataId, int eventCrfBeanId) throws OpenClinicaException {
-        ItemGroupMetadataBean itemGroupMetadataBean = (ItemGroupMetadataBean)getItemGroupMetadataDAO().findByPK(metadataId);
-        DynamicsItemGroupMetadataBean dynamicsMetadataBean = getDynamicsItemGroupMetadataBean(itemGroupMetadataBean, eventCrfBeanId); 
+        ItemGroupMetadataBean itemGroupMetadataBean = (ItemGroupMetadataBean) getItemGroupMetadataDAO().findByPK(metadataId);
+        DynamicsItemGroupMetadataBean dynamicsMetadataBean = getDynamicsItemGroupMetadataBean(itemGroupMetadataBean, eventCrfBeanId);
         if (dynamicsMetadataBean != null) {
             return dynamicsMetadataBean.isShowGroup();
         } else {
             System.out.println("didnt find a group row in the db ");
-            return false;   
+            return false;
         }
     }
 
@@ -149,17 +159,17 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         return dynamicsMetadataBean;
 
     }
-    
+
     private DynamicsItemGroupMetadataBean getDynamicsItemGroupMetadataBean(ItemGroupMetadataBean metadataBean, EventCRFBean eventCrfBean) {
-        
+
         DynamicsItemGroupMetadataBean dynamicsMetadataBean = getDynamicsItemGroupMetadataDao().findByMetadataBean(metadataBean, eventCrfBean);
         System.out.println(" returning " + metadataBean.getId() + " " + metadataBean.getItemGroupId() + " " + eventCrfBean.getId());
         return dynamicsMetadataBean;
 
     }
-    
+
     private DynamicsItemGroupMetadataBean getDynamicsItemGroupMetadataBean(ItemGroupMetadataBean metadataBean, int eventCrfBeanId) {
-        
+
         DynamicsItemGroupMetadataBean dynamicsMetadataBean = null;
         dynamicsMetadataBean = getDynamicsItemGroupMetadataDao().findByMetadataBean(metadataBean, eventCrfBeanId);
         return dynamicsMetadataBean;
@@ -186,7 +196,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
     }
 
     public boolean showGroup(ItemGroupMetadataBean metadataBean, EventCRFBean eventCrfBean) {
-        
+
         ItemGroupMetadataBean itemGroupMetadataBean = metadataBean;
         itemGroupMetadataBean.setShowGroup(true);
         DynamicsItemGroupMetadataBean dynamicsMetadataBean = new DynamicsItemGroupMetadataBean(itemGroupMetadataBean, eventCrfBean);
@@ -218,10 +228,10 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                 ItemGroupBean itemGroupBean = itemOrItemGroup.getItemGroupBean();
                 ArrayList sectionBeans = getSectionDAO().findAllByCRFVersionId(eventCrfBean.getCRFVersionId());
                 for (int i = 0; i < sectionBeans.size(); i++) {
-                    SectionBean sectionBean = (SectionBean)sectionBeans.get(i);
+                    SectionBean sectionBean = (SectionBean) sectionBeans.get(i);
                     // System.out.println("found section " + sectionBean.getId());
-                    List<ItemGroupMetadataBean> itemGroupMetadataBeans = getItemGroupMetadataDAO().findMetaByGroupAndSection(itemGroupBean.getId(),
-                            eventCrfBean.getCRFVersionId(), sectionBean.getId());
+                    List<ItemGroupMetadataBean> itemGroupMetadataBeans =
+                        getItemGroupMetadataDAO().findMetaByGroupAndSection(itemGroupBean.getId(), eventCrfBean.getCRFVersionId(), sectionBean.getId());
                     for (ItemGroupMetadataBean itemGroupMetadataBean : itemGroupMetadataBeans) {
                         if (itemGroupMetadataBean.getItemGroupId() == itemGroupBean.getId()) {
                             // System.out.println("found item group id 2 " + oid);
@@ -264,15 +274,180 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         }
     }
 
-    public void insert(Integer itemDataId, List<PropertyBean> properties) {
-        ItemDataBean itemDataBean = (ItemDataBean) getItemDataDAO().findByPK(itemDataId);
-        EventCRFBean eventCrfBean = (EventCRFBean) getEventCRFDAO().findByPK(itemDataBean.getEventCRFId());
-        for (PropertyBean propertyBean : properties) {
+    private Boolean isGroupRepeating(ItemGroupMetadataBean itemGroupMetadataBean) {
+        return itemGroupMetadataBean.getRepeatNum() > 1 || itemGroupMetadataBean.getRepeatMax() > 1;
+    }
 
-            ItemBean itemBean = getItemDAO().findByOid(propertyBean.getOid()).get(0);
-            ItemDataBean oidBasedItemData = getItemData(itemBean, eventCrfBean, itemDataBean.getOrdinal());
-            oidBasedItemData.setValue(propertyBean.getValue());
+    /**
+     * 
+     * 
+     * @param itemDataBeanA
+     * @param eventCrfBeanA
+     * @param itemGroupMetadataBeanA
+     * @param itemBeanB
+     * @param itemGroupBeanB
+     * @param itemGroupMetadataBeanB
+     * @param ub
+     * @param value
+     */
+    private void oneToMany(ItemDataBean itemDataBeanA, EventCRFBean eventCrfBeanA, ItemGroupMetadataBean itemGroupMetadataBeanA, ItemBean itemBeanB,
+            ItemGroupBean itemGroupBeanB, ItemGroupMetadataBean itemGroupMetadataBeanB, EventCRFBean eventCrfBeanB, UserAccountBean ub, String value) {
+
+        Integer size = getItemDataDAO().getGroupSize(itemBeanB.getId(), eventCrfBeanB.getId());
+        int maxOrdinal = getItemDataDAO().getMaxOrdinalForGroupByItemAndEventCrf(itemBeanB, eventCrfBeanB);
+        if (size > 0 || maxOrdinal > 0) {
+            List<ItemDataBean> itemDataBeans = getItemDataDAO().findAllByEventCRFIdAndItemId(eventCrfBeanB.getId(), itemBeanB.getId());
+            for (ItemDataBean oidBasedItemData : itemDataBeans) {
+                oidBasedItemData.setValue(value);
+                getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd");
+            }
+        } else {
+            List<ItemBean> items = getItemDAO().findAllItemsByGroupId(itemGroupBeanB.getId(), eventCrfBeanB.getCRFVersionId());
+            for (int ordinal = 1 + maxOrdinal; ordinal <= itemGroupMetadataBeanB.getRepeatNum() + maxOrdinal; ordinal++) {
+                for (ItemBean itemBeanX : items) {
+                    ItemDataBean oidBasedItemData = getItemData(itemBeanX, eventCrfBeanB, ordinal);
+                    if (oidBasedItemData.getId() == 0) {
+                        oidBasedItemData = createItemData(oidBasedItemData, itemBeanX, ordinal, eventCrfBeanB, ub);
+                    }
+                    if (itemBeanX.getId() == itemBeanB.getId()) {
+                        oidBasedItemData.setValue(value);
+                        getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd");
+                    }
+                }
+            }
+        }
+    }
+
+    private void oneToIndexedMany(ItemDataBean itemDataBeanA, EventCRFBean eventCrfBeanA, ItemGroupMetadataBean itemGroupMetadataBeanA, ItemBean itemBeanB,
+            ItemGroupBean itemGroupBeanB, ItemGroupMetadataBean itemGroupMetadataBeanB, EventCRFBean eventCrfBeanB, UserAccountBean ub, String value, int index) {
+
+        int size = getItemDataDAO().getGroupSize(itemBeanB.getId(), eventCrfBeanB.getId());
+        int maxOrdinal = getItemDataDAO().getMaxOrdinalForGroupByItemAndEventCrf(itemBeanB, eventCrfBeanB);
+        if (size > 0 && size >= index) {
+            List<ItemDataBean> itemDataBeans = getItemDataDAO().findAllByEventCRFIdAndItemId(eventCrfBeanB.getId(), itemBeanB.getId());
+            ItemDataBean oidBasedItemData = itemDataBeans.get(index - 1);
+            oidBasedItemData.setValue(value);
             getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd");
+        } else {
+            List<ItemBean> items = getItemDAO().findAllItemsByGroupId(itemGroupBeanB.getId(), eventCrfBeanB.getCRFVersionId());
+            int number =
+                itemGroupMetadataBeanB.getRepeatNum() > index ? itemGroupMetadataBeanB.getRepeatNum() : index <= itemGroupMetadataBeanB.getRepeatMax() ? index
+                    : 0;
+            for (int ordinal = 1 + maxOrdinal; ordinal <= number + maxOrdinal - size; ordinal++) {
+                for (ItemBean itemBeanX : items) {
+                    ItemDataBean oidBasedItemData = getItemData(itemBeanX, eventCrfBeanB, ordinal);
+                    if (oidBasedItemData.getId() == 0) {
+                        oidBasedItemData = createItemData(oidBasedItemData, itemBeanX, ordinal, eventCrfBeanB, ub);
+                    }
+                }
+            }
+            List<ItemDataBean> itemDataBeans = getItemDataDAO().findAllByEventCRFIdAndItemId(eventCrfBeanB.getId(), itemBeanB.getId());
+            ItemDataBean oidBasedItemData = itemDataBeans.get(index - 1);
+            oidBasedItemData.setValue(value);
+            getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd");
+        }
+    }
+
+    private void oneToOne(ItemDataBean itemDataBeanA, EventCRFBean eventCrfBeanA, ItemGroupMetadataBean itemGroupMetadataBeanA, ItemBean itemBeanB,
+            ItemGroupMetadataBean itemGroupMetadataBeanB, EventCRFBean eventCrfBeanB, UserAccountBean ub, Integer ordinal, String value) {
+        ordinal = ordinal == null ? 1 : ordinal;
+        itemGroupMetadataBeanB.getRepeatNum();
+        ItemDataBean oidBasedItemData = getItemData(itemBeanB, eventCrfBeanB, ordinal);
+        if (oidBasedItemData.getId() == 0) {
+            oidBasedItemData = createItemData(oidBasedItemData, itemBeanB, ordinal, eventCrfBeanB, ub);
+        }
+        oidBasedItemData.setValue(value);
+        getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd");
+
+    }
+
+    private ItemDataBean createItemData(ItemDataBean oidBasedItemData, ItemBean itemBeanB, int ordinal, EventCRFBean eventCrfBeanA, UserAccountBean ub) {
+        oidBasedItemData.setItemId(itemBeanB.getId());
+        oidBasedItemData.setEventCRFId(eventCrfBeanA.getId());
+        oidBasedItemData.setStatus(Status.AVAILABLE);
+        oidBasedItemData.setOwner(ub);
+        oidBasedItemData.setOrdinal(ordinal);
+        oidBasedItemData = (ItemDataBean) getItemDataDAO().create(oidBasedItemData);
+        return oidBasedItemData;
+    }
+
+    public void insert(Integer itemDataId, List<PropertyBean> properties, UserAccountBean ub, RuleSetBean ruleSet) {
+        ItemDataBean itemDataBeanA = (ItemDataBean) getItemDataDAO().findByPK(itemDataId);
+        EventCRFBean eventCrfBeanA = (EventCRFBean) getEventCRFDAO().findByPK(itemDataBeanA.getEventCRFId());
+        StudyEventBean studyEventBeanA = (StudyEventBean) getStudyEventDAO().findByPK(eventCrfBeanA.getStudyEventId());
+        ItemGroupMetadataBean itemGroupMetadataBeanA =
+            (ItemGroupMetadataBean) getItemGroupMetadataDAO().findByItemAndCrfVersion(itemDataBeanA.getItemId(), eventCrfBeanA.getCRFVersionId());
+        Boolean isGroupARepeating = isGroupRepeating(itemGroupMetadataBeanA);
+        String itemGroupAOrdinal = getExpressionService().getGroupOrdninalCurated(ruleSet.getTarget().getValue());
+
+        for (PropertyBean propertyBean : properties) {
+            String expression = getExpressionService().constructFullExpressionIfPartialProvided(propertyBean.getOid(), ruleSet.getTarget().getValue());
+            ItemBean itemBeanB = getExpressionService().getItemBeanFromExpression(expression);
+            ItemGroupBean itemGroupBeanB = getExpressionService().getItemGroupExpression(expression);
+            ItemGroupMetadataBean itemGroupMetadataBeanB = null;
+            Boolean isGroupBRepeating = null;
+            String itemGroupBOrdinal = null;
+            EventCRFBean eventCrfBeanB = null;
+            // Does item belong to same CRF version as target
+            Boolean isItemInSameForm =
+                getItemFormMetadataDAO().findByItemIdAndCRFVersionId(itemBeanB.getId(), eventCrfBeanA.getCRFVersionId()).getId() != 0 ? true : false;
+            if (!isItemInSameForm) {
+                List<EventCRFBean> eventCrfs =
+                    getEventCRFDAO().findAllByStudyEventAndCrfOrCrfVersionOid(studyEventBeanA, getExpressionService().getCrfOid(expression));
+                if (eventCrfs.size() == 0) {
+                    CRFVersionBean crfVersion = getExpressionService().getCRFVersionFromExpression(expression);
+                    CRFBean crf = getExpressionService().getCRFFromExpression(expression);
+                    int crfVersionId = 0;
+                    EventDefinitionCRFBean eventDefinitionCRFBean =
+                        getEventDefinitionCRfDAO().findByStudyEventDefinitionIdAndCRFId(studyEventBeanA.getStudyEventDefinitionId(), crf.getId());
+                    if (eventDefinitionCRFBean.getId() != 0) {
+                        crfVersionId = crfVersion != null ? crfVersion.getId() : eventDefinitionCRFBean.getDefaultVersionId();
+
+                    }
+                    // Create new event crf
+                    eventCrfBeanB = eventCrfBeanA;
+                    eventCrfBeanB.setId(0);
+                    eventCrfBeanB.setCRFVersionId(crfVersionId);
+                    eventCrfBeanB = (EventCRFBean) getEventCRFDAO().create(eventCrfBeanB);
+
+                } else {
+                    eventCrfBeanB = eventCrfs.get(0);
+                }
+            }
+            if (isItemInSameForm) {
+                eventCrfBeanB = eventCrfBeanA;
+            }
+
+            itemGroupMetadataBeanB =
+                (ItemGroupMetadataBean) getItemGroupMetadataDAO().findByItemAndCrfVersion(itemBeanB.getId(), eventCrfBeanB.getCRFVersionId());
+            isGroupBRepeating = isGroupRepeating(itemGroupMetadataBeanB);
+            itemGroupBOrdinal = getExpressionService().getGroupOrdninalCurated(expression);
+
+            // If A and B are both non repeating groups
+            if (!isGroupARepeating && !isGroupBRepeating) {
+                oneToOne(itemDataBeanA, eventCrfBeanA, itemGroupMetadataBeanA, itemBeanB, itemGroupMetadataBeanB, eventCrfBeanB, ub, 1, propertyBean.getValue());
+            }
+            // If A is not repeating group & B is a repeating group with no index selected
+            if (!isGroupARepeating && isGroupBRepeating && itemGroupBOrdinal.equals("")) {
+                oneToMany(itemDataBeanA, eventCrfBeanA, itemGroupMetadataBeanA, itemBeanB, itemGroupBeanB, itemGroupMetadataBeanB, eventCrfBeanB, ub,
+                        propertyBean.getValue());
+            }
+            // If A is not repeating group & B is a repeating group with index selected
+            if (!isGroupARepeating && isGroupBRepeating && !itemGroupBOrdinal.equals("")) {
+                oneToIndexedMany(itemDataBeanA, eventCrfBeanA, itemGroupMetadataBeanA, itemBeanB, itemGroupBeanB, itemGroupMetadataBeanB, eventCrfBeanB, ub,
+                        propertyBean.getValue(), Integer.valueOf(itemGroupBOrdinal));
+            }
+            // If A is repeating group with index & B is a repeating group with index selected
+            if (isGroupARepeating && isGroupBRepeating && !itemGroupBOrdinal.equals("")) {
+                oneToIndexedMany(itemDataBeanA, eventCrfBeanA, itemGroupMetadataBeanA, itemBeanB, itemGroupBeanB, itemGroupMetadataBeanB, eventCrfBeanB, ub,
+                        propertyBean.getValue(), Integer.valueOf(itemGroupBOrdinal));
+            }
+            // If A is repeating group with index & B is a repeating group with no index selected
+            if (isGroupARepeating && isGroupBRepeating && itemGroupBOrdinal.equals("")) {
+                oneToIndexedMany(itemDataBeanA, eventCrfBeanA, itemGroupMetadataBeanA, itemBeanB, itemGroupBeanB, itemGroupMetadataBeanB, eventCrfBeanB, ub,
+                        propertyBean.getValue(), Integer.valueOf(itemGroupAOrdinal));
+            }
+
         }
     }
 
@@ -347,7 +522,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         itemGroupDAO = this.itemGroupDAO != null ? itemGroupDAO : new ItemGroupDAO(ds);
         return itemGroupDAO;
     }
-    
+
     private SectionDAO getSectionDAO() {
         sectionDAO = this.sectionDAO != null ? sectionDAO : new SectionDAO(ds);
         return sectionDAO;
@@ -362,7 +537,24 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         itemGroupMetadataDAO = this.itemGroupMetadataDAO != null ? itemGroupMetadataDAO : new ItemGroupMetadataDAO(ds);
         return itemGroupMetadataDAO;
     }
-    
+
+    public StudyEventDAO getStudyEventDAO() {
+        studyEventDAO = this.studyEventDAO != null ? studyEventDAO : new StudyEventDAO(ds);
+        return studyEventDAO;
+    }
+
+    public EventDefinitionCRFDAO getEventDefinitionCRfDAO() {
+        eventDefinitionCRFDAO = this.eventDefinitionCRFDAO != null ? eventDefinitionCRFDAO : new EventDefinitionCRFDAO(ds);
+        return eventDefinitionCRFDAO;
+    }
+
+    public ExpressionService getExpressionService() {
+        return expressionService;
+    }
+
+    public void setExpressionService(ExpressionService expressionService) {
+        this.expressionService = expressionService;
+    }
 
     class ItemOrItemGroupHolder {
 
