@@ -685,14 +685,18 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
                 } else {
                     inputName = getGroupItemManualInputName(displayGroup, order, displayItem);
                 }
-                if (groupOrdinalPLusItemOid.containsKey(displayItem.getItem().getOid())
-                    || groupOrdinalPLusItemOid.containsKey(String.valueOf(order + 1) + displayItem.getItem().getOid())) {
-                    logger.debug("IN : " + String.valueOf(order + 1) + displayItem.getItem().getOid());
-                    validateDisplayItemBean(v, displayItem, inputName, rv, groupOrdinalPLusItemOid, true, groupOrdinalPLusItemOid.get(String.valueOf(order + 1)
-                        + displayItem.getItem().getOid()));
-                } else {
-                    validateDisplayItemBean(v, displayItem, inputName, rv, groupOrdinalPLusItemOid, false, null);
+                if (displayItem.getMetadata().isShowItem() || getItemMetadataService().isShown(displayItem.getItem().getId(), ecb, displayItem.getData())) {
+                    // add the validation
+                    if (groupOrdinalPLusItemOid.containsKey(displayItem.getItem().getOid())
+                            || groupOrdinalPLusItemOid.containsKey(String.valueOf(order + 1) + displayItem.getItem().getOid())) {
+                        logger.debug("IN : " + String.valueOf(order + 1) + displayItem.getItem().getOid());
+                        validateDisplayItemBean(v, displayItem, inputName, rv, groupOrdinalPLusItemOid, true, groupOrdinalPLusItemOid.get(String.valueOf(order + 1)
+                                + displayItem.getItem().getOid()));
+                    } else {
+                        validateDisplayItemBean(v, displayItem, inputName, rv, groupOrdinalPLusItemOid, false, null);
+                    }
                 }
+                
                 // validateDisplayItemBean(v, displayItem, inputName);
             }
 

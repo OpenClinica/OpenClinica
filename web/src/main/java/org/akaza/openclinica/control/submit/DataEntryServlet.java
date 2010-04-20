@@ -1459,10 +1459,16 @@ public abstract class DataEntryServlet extends SecureController {
                         String fieldName = iter3.next().toString();
                         System.out.println("found oid after post dry run " + fieldName);
                         // set up a listing of OIDs in the section
+                        // BUT: Oids can have the group name in them.
+                        String newFieldName = fieldName;
+                        String[] fieldNames = fieldName.split("\\.");
+                        if (fieldNames.length == 2) {
+                            newFieldName = fieldNames[1];
+                        }
                         ArrayList<DisplayItemBean> displayItems = section.getItems();
                         for (DisplayItemBean displayItemBean : displayItems) {
                             ItemBean itemBean = displayItemBean.getItem();
-                            if (fieldName.equals(itemBean.getOid())) {
+                            if (newFieldName.equals(itemBean.getOid())) {
                                 if (!displayItemBean.getMetadata().isShowItem()) {
                                     inSameSection = true;
                                     System.out.println("found item " + this.getInputName(displayItemBean) + " vs. " + fieldName);
@@ -2997,7 +3003,9 @@ public abstract class DataEntryServlet extends SecureController {
             if (dib != null) {
                 // Fboolean showItem = false;
                 boolean showItem = getItemMetadataService().isShown(ifmb.getItemId(), ecb, dib.getData());
-                
+                if (getServletPage().equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
+                    showItem = getItemMetadataService().isShown(ifmb.getItemId(), ecb, dib.getDbData());
+                }
                 // is the above needed for children items too?
                 if (showItem) { // we are only showing, not hiding
                     ifmb.setShowItem(showItem);
@@ -3047,8 +3055,14 @@ public abstract class DataEntryServlet extends SecureController {
                 dib.setData(data);
             }
             // <<tbh 07/2009, bug #3883
+            // ItemDataBean dbData = iddao.findByItemIdAndEventCRFIdAndOrdinal(itemId, eventCRFId, ordinal)
             dib.setDbData(data);
-            boolean showItem = getItemMetadataService().isShown(metadata.getItemId(), ecb, data);
+            boolean showItem = false;
+            if (!getServletPage().equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
+                showItem = getItemMetadataService().isShown(metadata.getItemId(), ecb, data);
+            } else {
+                showItem = getItemMetadataService().isShown(metadata.getItemId(), ecb, dib.getDbData());
+            }
             if (showItem) {
                 metadata.setShowItem(showItem);
             }
@@ -3076,7 +3090,7 @@ public abstract class DataEntryServlet extends SecureController {
     /**
      * gets the available dynamics service
      */
-    private DynamicsMetadataService getItemMetadataService() {
+    public DynamicsMetadataService getItemMetadataService() {
         itemMetadataService =
             this.itemMetadataService != null ? itemMetadataService : (DynamicsMetadataService) SpringServletAccess.getApplicationContext(context).getBean(
                     "dynamicsMetadataService");
