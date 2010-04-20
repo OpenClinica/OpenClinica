@@ -10,7 +10,6 @@ import org.jmesa.view.html.toolbar.ToolbarItemRenderer;
 import org.jmesa.view.html.toolbar.ToolbarItemType;
 
 public class SDVToolbarSubject extends DefaultToolbar {
-    private final boolean showMoreLink;
     public SDVToolbarSubject(boolean showMoreLink){
         this.showMoreLink = showMoreLink;
     }
@@ -18,6 +17,7 @@ public class SDVToolbarSubject extends DefaultToolbar {
     protected void addToolbarItems() {
         addToolbarItem(ToolbarItemType.SEPARATOR);
         addToolbarItem(createCustomItem(new ShowMoreItem()));
+        addToolbarItem(createCustomItem(new NewHiddenItem()));
     }
 
     private ToolbarItem createCustomItem(AbstractItem item) {

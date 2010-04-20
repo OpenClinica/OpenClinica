@@ -10,12 +10,16 @@ import org.jmesa.view.html.toolbar.ToolbarItemRenderer;
 import org.jmesa.view.html.toolbar.ToolbarItemType;
 
 public class SDVToolbar extends DefaultToolbar {
+    public SDVToolbar(boolean showMoreLink){
+        this.showMoreLink = showMoreLink;
+    }
 
     @Override
     protected void addToolbarItems() {
         addToolbarItem(ToolbarItemType.SEPARATOR);
         addToolbarItem(createCustomItem(new ShowMoreItem()));
         addToolbarItem(ToolbarItemType.SEPARATOR);
+        addToolbarItem(createCustomItem(new NewHiddenItem()));
         addToolbarItem(createCustomItem(new InfoItem()));
     }
 
@@ -56,13 +60,24 @@ public class SDVToolbar extends DefaultToolbar {
         @Override
         public String enabled() {
             HtmlBuilder html = new HtmlBuilder();
-            html.a().id("showMore").href("javascript:hideCols('sdv',[" + getIndexes() + "],true);").close();
-            html.div().close().nbsp().append("Show More").nbsp().divEnd().aEnd();
-            html.a().id("hide").style("display: none;").href("javascript:hideCols('sdv',[" + getIndexes() + "],false);").close();
-            html.div().close().nbsp().append("Hide").nbsp().divEnd().aEnd();
+            if(showMoreLink){
+                html.a().id("showMore").href("javascript:hideCols('sdv',[" + getIndexes() + "],true);").close();
+                html.div().close().nbsp().append("Show More").nbsp().divEnd().aEnd();
+                html.a().id("hide").style("display: none;").href("javascript:hideCols('sdv',[" + getIndexes() + "],false);").close();
+                html.div().close().nbsp().append("Hide").nbsp().divEnd().aEnd();
 
-            html.script().type("text/javascript").close().append(
-                    "$j = jQuery.noConflict(); $j(document).ready(function(){ " + "hideCols('sdv',[" + getIndexes() + "],false);});").scriptEnd();
+                html.script().type("text/javascript").close().append(
+                        "$j = jQuery.noConflict(); $j(document).ready(function(){ " + "hideCols('sdv',[" + getIndexes() + "],false);});").scriptEnd();
+
+            }else{
+                html.a().id("showMore").style("display: none;").href("javascript:hideCols('sdv',[" + getIndexes() + "],true);").close();
+                html.div().close().nbsp().append("Show More").nbsp().divEnd().aEnd();
+                html.a().id("hide").href("javascript:hideCols('sdv',[" + getIndexes() + "],false);").close();
+                html.div().close().nbsp().append("Hide").nbsp().divEnd().aEnd();
+
+                html.script().type("text/javascript").close().append(
+                        "$j = jQuery.noConflict(); $j(document).ready(function(){ " + "hideCols('sdv',[" + getIndexes() + "],true);});").scriptEnd();
+            }
 
             return html.toString();
         }
