@@ -5,6 +5,8 @@ import org.jmesa.view.component.Row;
 import org.jmesa.view.html.toolbar.AbstractToolbar;
 import org.jmesa.view.html.toolbar.MaxRowsItem;
 import org.jmesa.view.html.toolbar.ToolbarItemType;
+import org.jmesa.view.html.toolbar.AbstractItem;
+import org.jmesa.view.html.HtmlBuilder;
 
 import java.util.List;
 
@@ -14,7 +16,7 @@ public class DefaultToolbar extends AbstractToolbar {
         super();
 
     }
-
+    public boolean showMoreLink;
     @SuppressWarnings("unchecked")
     @Override
     public String render() {
@@ -60,7 +62,23 @@ public class DefaultToolbar extends AbstractToolbar {
 
         return super.render();
     }
+    public class NewHiddenItem extends AbstractItem {
 
+        @Override
+        public String disabled() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public String enabled() {
+            HtmlBuilder html = new HtmlBuilder();
+            html.input().id("showMoreLink").type("hidden").name("showMoreLink").value(showMoreLink+"").end();
+            return html.toString();
+        }
+
+    }
+    
     protected void addToolbarItems() {
 
     }
