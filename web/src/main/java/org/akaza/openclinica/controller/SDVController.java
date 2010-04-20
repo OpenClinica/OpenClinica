@@ -72,7 +72,14 @@ public class SDVController {
     public ModelMap viewSubjectAggregateHandler(HttpServletRequest request, HttpServletResponse response, @RequestParam("studyId") int studyId) {
 
         ModelMap gridMap = new ModelMap();
-
+        boolean showMoreLink = false;
+        if(request.getParameter("showMoreLink")!=null){
+            showMoreLink = Boolean.parseBoolean(request.getParameter("showMoreLink").toString());
+        }else{
+            showMoreLink = true;
+        }
+        request.setAttribute("showMoreLink", showMoreLink+"");
+        
         request.setAttribute("studyId", studyId);
         // request.setAttribute("studySubjectId",studySubjectId);
         /*SubjectIdSDVFactory tableFactory = new SubjectIdSDVFactory();
@@ -85,7 +92,7 @@ public class SDVController {
         }
 
         request.setAttribute("pageMessages", pageMessages);
-
+        sdvFactory.showMoreLink = showMoreLink;
         TableFacade facade = sdvFactory.createTable(request, response);
         String sdvMatrix = facade.render();
         gridMap.addAttribute(SUBJECT_SDV_TABLE_ATTRIBUTE, sdvMatrix);
@@ -118,13 +125,18 @@ public class SDVController {
 
     @RequestMapping("/viewAllSubjectSDVtmp")
     public ModelMap viewAllSubjectHandler(HttpServletRequest request, @RequestParam("studyId") int studyId) {
-
+       
         ModelMap gridMap = new ModelMap();
-
         //set up request attributes for sidebar
         //Not necessary when using old page design...
         // setUpSidebar(request);
-
+        boolean showMoreLink = false;
+        if(request.getParameter("showMoreLink")!=null){
+            showMoreLink = Boolean.parseBoolean(request.getParameter("showMoreLink").toString());
+        }else{
+            showMoreLink = true;
+        }
+        request.setAttribute("showMoreLink", showMoreLink+"");
         request.setAttribute("studyId", studyId);
         //request.setAttribute("imagePathPrefix","../");
         //We need a study subject id for the first tab;
