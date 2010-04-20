@@ -9,6 +9,7 @@ package org.akaza.openclinica.control.admin;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.core.CoreResources;
@@ -16,8 +17,10 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
+import org.apache.commons.io.IOUtils;
 
 import java.io.File;
+import java.io.FileOutputStream;
 
 /**
  * @author jxu
@@ -59,7 +62,6 @@ public class DownloadVersionSpreadSheetServlet extends SecureController {
         String dir = SQLInitServlet.getField("filePath") + "crf" + File.separator + "new" + File.separator;
         // YW 09-10-2007 << Now CRF_Design_Template_v2.xls is located at
         // $CATALINA_HOME/webapps/OpenClinica-instanceName/properties
-        String templateDir = CoreResources.PROPERTIES_DIR;
         FormProcessor fp = new FormProcessor(request);
 
         String crfIdString = fp.getString(CRF_ID);
@@ -75,21 +77,26 @@ public class DownloadVersionSpreadSheetServlet extends SecureController {
 
         // aha, what if it's the old style? next line is for backwards compat,
         // tbh 07/2008
+        File excelFile = null;
         String oldExcelFileName = crfIdString + version.getName() + ".xls";
         if (isTemplate) {
+            excelFile = new File(dir + CRF_VERSION_TEMPLATE);
             excelFileName = CRF_VERSION_TEMPLATE;
-            dir = templateDir;
-        }
-
-        File excelFile = new File(dir + excelFileName);
-        // backwards compat
-        File oldExcelFile = new File(dir + oldExcelFileName);
-        if (oldExcelFile.exists() && oldExcelFile.length() > 0) {
-            if (!excelFile.exists() || excelFile.length() <= 0) {
-                // if the old name exists and the new name does not...
-                excelFile = oldExcelFile;
-                excelFileName = oldExcelFileName;
+            FileOutputStream fos = new FileOutputStream(excelFile);
+            IOUtils.copy(getCoreResources().getInputStream(CRF_VERSION_TEMPLATE), fos);
+            IOUtils.closeQuietly(fos);
+        } else {
+            excelFile = new File(dir + excelFileName);
+            // backwards compat
+            File oldExcelFile = new File(dir + oldExcelFileName);
+            if (oldExcelFile.exists() && oldExcelFile.length() > 0) {
+                if (!excelFile.exists() || excelFile.length() <= 0) {
+                    // if the old name exists and the new name does not...
+                    excelFile = oldExcelFile;
+                    excelFileName = oldExcelFileName;
+                }
             }
+
         }
         logger.info("looking for : " + excelFile.getName());
         if (!excelFile.exists() || excelFile.length() <= 0) {
@@ -107,6 +114,10 @@ public class DownloadVersionSpreadSheetServlet extends SecureController {
             forwardPage(finalTarget);
         }
 
+    }
+
+    private CoreResources getCoreResources() {
+        return (CoreResources) SpringServletAccess.getApplicationContext(context).getBean("coreResources");
     }
 
 }
