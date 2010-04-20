@@ -47,7 +47,7 @@ public class ListEventsForSubjectsServlet extends SecureController {
     private EventDefinitionCRFDAO eventDefintionCRFDAO;
     private CRFDAO crfDAO;
     Locale locale;
-
+    private boolean showMoreLink;
     /*
      * (non-Javadoc)
      * @see org.akaza.openclinica.control.core.SecureController#mayProceed()
@@ -73,7 +73,11 @@ public class ListEventsForSubjectsServlet extends SecureController {
     public void processRequest() throws Exception {
 
         FormProcessor fp = new FormProcessor(request);
-
+        if(fp.getString("showMoreLink").equals("")){
+            showMoreLink = true;
+        }else {
+            showMoreLink = Boolean.parseBoolean(fp.getString("showMoreLink"));
+        }
         String idSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();
         // set up auto study subject id
         if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
@@ -92,7 +96,7 @@ public class ListEventsForSubjectsServlet extends SecureController {
             return;
         }
 
-        ListEventsForSubjectTableFactory factory = new ListEventsForSubjectTableFactory();
+        ListEventsForSubjectTableFactory factory = new ListEventsForSubjectTableFactory(showMoreLink);
         factory.setStudyEventDefinitionDao(getStudyEventDefinitionDao());
         factory.setSubjectDAO(getSubjectDAO());
         factory.setStudySubjectDAO(getStudySubjectDAO());

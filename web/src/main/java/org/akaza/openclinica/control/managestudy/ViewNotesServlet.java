@@ -61,6 +61,7 @@ public class ViewNotesServlet extends SecureController {
     public static final String WIN_LOCATION = "window_location";
     public static final String NOTES_TABLE = "notesTable";
     public static final String DISCREPANCY_NOTE_TYPE = "discrepancyNoteType";
+    private boolean showMoreLink;
 
     /*
      * public static final Map<Integer,String> TYPES = new HashMap<Integer,String>();
@@ -91,6 +92,12 @@ public class ViewNotesServlet extends SecureController {
         }
 
         FormProcessor fp = new FormProcessor(request);
+        if(fp.getString("showMoreLink").equals("")){
+            showMoreLink = true;
+        }else {
+            showMoreLink = Boolean.parseBoolean(fp.getString("showMoreLink"));
+        }
+        
         int oneSubjectId = fp.getInt("id");
         // BWP 11/03/2008 3029: This session attribute in removed in
         // ResolveDiscrepancyServlet.mayProceed() >>
@@ -155,7 +162,7 @@ public class ViewNotesServlet extends SecureController {
         ItemDAO itemDao = new ItemDAO(sm.getDataSource());
         EventCRFDAO eventCRFDao = new EventCRFDAO(sm.getDataSource());
 
-        ListNotesTableFactory factory = new ListNotesTableFactory();
+        ListNotesTableFactory factory = new ListNotesTableFactory(showMoreLink);
         factory.setSubjectDao(sdao);
         factory.setStudySubjectDao(subdao);
         factory.setUserAccountDao(uadao);

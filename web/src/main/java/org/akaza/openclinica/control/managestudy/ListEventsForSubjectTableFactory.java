@@ -80,7 +80,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
     private ArrayList<StudyGroupClassBean> studyGroupClasses;
     private StudyUserRoleBean currentRole;
     private UserAccountBean currentUser;
-    private boolean showMoreLink = true;
+    private boolean showMoreLink;
     private ResourceBundle resword;
     private ResourceBundle resformat;
     private StudyEventDefinitionBean selectedStudyEventDefinition;
@@ -89,7 +89,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
     final HashMap<Integer, String> imageIconPaths = new HashMap<Integer, String>(8);
     final HashMap<Integer, String> crfColumnImageIconPaths = new HashMap<Integer, String>(8);
 
-    public ListEventsForSubjectTableFactory() {
+    public ListEventsForSubjectTableFactory(boolean showMoreLink) {
         imageIconPaths.put(1, "images/icon_Scheduled.gif");
         imageIconPaths.put(2, "images/icon_NotStarted.gif");
         imageIconPaths.put(3, "images/icon_InitialDE.gif");
@@ -107,7 +107,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         crfColumnImageIconPaths.put(5, "images/CRF_status_icon_Complete.gif");
         crfColumnImageIconPaths.put(6, "images/CRF_status_icon_Complete.gif");
         crfColumnImageIconPaths.put(7, "images/CRF_status_icon_Locked.gif");
-
+        this.showMoreLink = showMoreLink;
     }
 
     @Override
@@ -330,7 +330,6 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         Collection<Filter> filters = filterSet.getFilters();
         for (Filter filter : filters) {
             String property = filter.getProperty();
-            showMoreLink = listEventsForSubjectFilter.getColumnMapping().get(property).equals("ss.label");
             String value = filter.getValue();
             listEventsForSubjectFilter.addFilter(property, value);
         }
@@ -343,7 +342,6 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         SortSet sortSet = limit.getSortSet();
         Collection<Sort> sorts = sortSet.getSorts();
         for (Sort sort : sorts) {
-            showMoreLink = sort.getPosition() < 1;
             String property = sort.getProperty();
             String order = sort.getOrder().toParam();
             listEventsForSubjectSort.addSort(property, order);

@@ -20,7 +20,6 @@ public class ListEventsForSubjectTableToolbar extends DefaultToolbar {
     private final ArrayList<StudyGroupClassBean> studyGroupClasses;
     private final StudyEventDefinitionBean selectedStudyEventDefinition;
     private final boolean addSubjectLinkShow;
-    private final boolean showMoreLink;
 
     public ListEventsForSubjectTableToolbar(ArrayList<StudyEventDefinitionBean> studyEventDefinitions, ArrayList<StudyGroupClassBean> studyGroupClasses,
             StudyEventDefinitionBean selectedStudyEventDefinition, boolean addSubjectLinkShow, boolean showMoreLink) {
@@ -39,6 +38,7 @@ public class ListEventsForSubjectTableToolbar extends DefaultToolbar {
 
         addToolbarItem(ToolbarItemType.SEPARATOR);
         addToolbarItem(createCustomItem(new StudyEventDefinitionDropDownItem()));
+        addToolbarItem(createCustomItem(new NewHiddenItem()));
         if (addSubjectLinkShow) {
             addToolbarItem(createAddSubjectItem());
         }
