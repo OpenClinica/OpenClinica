@@ -60,7 +60,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
     private String contextPath;
     private ResourceBundle resword;
     private final static String ICON_FORCRFSTATUS_SUFFIX = ".gif'/>";
-    private boolean showMoreLink = true;
+    public boolean showMoreLink;
 
     public SubjectIdSDVFactory() {
     }
@@ -178,7 +178,6 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
         Collection<Filter> filters = filterSet.getFilters();
         for (Filter filter : filters) {
             String property = filter.getProperty();
-            showMoreLink = studySubjectSDVFilter.getColumnMapping().get(property).equals("mst.unique_identifier")?false:true;
             String value = filter.getValue();
             studySubjectSDVFilter.addFilter(property, value);
         }

@@ -52,17 +52,7 @@ import org.springframework.validation.BindingResult;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -591,6 +581,7 @@ public class SDVUtil {
 
     public String renderEventCRFTableWithLimit(HttpServletRequest request, int studyId, String pathPrefix) {
 
+        boolean showMoreLink = Boolean.parseBoolean(request.getAttribute("showMoreLink").toString());
         TableFacade tableFacade = createTableFacade("sdv", request);
         tableFacade.setStateAttr("restore");
         resformat = ResourceBundleProvider.getFormatBundle(request.getLocale());
@@ -645,7 +636,7 @@ public class SDVUtil {
             "studyEventStatus", "sdvStatusActions" });
 
         //Create the custom toolbar
-        SDVToolbar sDVToolbar = new SDVToolbar();
+        SDVToolbar sDVToolbar = new SDVToolbar(showMoreLink);
 
         // if(totalRowCount > 0){
         sDVToolbar.setMaxRowsIncrements(new int[] { 15, 25, 50 });
@@ -721,7 +712,7 @@ public class SDVUtil {
             "lastUpdatedBy" });
 
         //Create the custom toolbar
-        SDVToolbar sDVToolbar = new SDVToolbar();
+        SDVToolbar sDVToolbar = new SDVToolbar(true);
 
         // if(totalRowCount > 0){
         sDVToolbar.setMaxRowsIncrements(new int[] { 15, 50, totalRowCount });
