@@ -21,6 +21,7 @@ import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import org.akaza.openclinica.domain.rule.action.EmailActionBean;
 import org.akaza.openclinica.domain.rule.action.HideActionBean;
 import org.akaza.openclinica.domain.rule.action.InsertActionBean;
+import org.akaza.openclinica.domain.rule.action.PropertyBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.rule.action.ShowActionBean;
 import org.akaza.openclinica.domain.rule.expression.Context;
@@ -188,13 +189,13 @@ public class RulesPostImportContainerService {
     private void isRuleActionValid(RuleActionBean ruleActionBean, AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper,
             EventDefinitionCRFBean eventDefinitionCRFBean) {
         if (ruleActionBean instanceof ShowActionBean) {
-            String[] oids = (((ShowActionBean) ruleActionBean).getOIDs()).split(",");
+            List<PropertyBean> properties = (((ShowActionBean) ruleActionBean).getProperties());
             if (ruleActionBean.getRuleActionRun().getBatch() == true || ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
                 ruleSetBeanWrapper.error("ShowAction " + ((ShowActionBean) ruleActionBean).toString()
                     + " is not Valid. You cannot have ImportDataEntry=\"true\" Batch=\"true\". ");
             }
-            for (String oid : oids) {
-                String result = getExpressionService().checkValidityOfItemOrItemGroupOidInCrf(oid, ruleSetBeanWrapper.getAuditableBean());
+            for (PropertyBean propertyBean : properties) {
+                String result = getExpressionService().checkValidityOfItemOrItemGroupOidInCrf(propertyBean.getOid(), ruleSetBeanWrapper.getAuditableBean());
                 //String result = getExpressionService().isExpressionValid(oid, ruleSetBeanWrapper.getAuditableBean(), 2) ? "OK" : "";
                 if (!result.equals("OK")) {
                     ruleSetBeanWrapper.error("ShowAction OID " + result + " is not Valid. ");
@@ -202,13 +203,13 @@ public class RulesPostImportContainerService {
             }
         }
         if (ruleActionBean instanceof HideActionBean) {
-            String[] oids = (((HideActionBean) ruleActionBean).getOIDs()).split(",");
+            List<PropertyBean> properties = (((ShowActionBean) ruleActionBean).getProperties());
             if (ruleActionBean.getRuleActionRun().getBatch() == true || ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
                 ruleSetBeanWrapper.error("HideAction " + ((HideActionBean) ruleActionBean).toString()
                     + " is not Valid. You cannot have ImportDataEntry=\"true\" Batch=\"true\". ");
             }
-            for (String oid : oids) {
-                String result = getExpressionService().checkValidityOfItemOrItemGroupOidInCrf(oid, ruleSetBeanWrapper.getAuditableBean());
+            for (PropertyBean propertyBean : properties) {
+                String result = getExpressionService().checkValidityOfItemOrItemGroupOidInCrf(propertyBean.getOid(), ruleSetBeanWrapper.getAuditableBean());
                 //String result = getExpressionService().isExpressionValid(oid, ruleSetBeanWrapper.getAuditableBean(), 2) ? "OK" : "";
                 if (!result.equals("OK")) {
                     ruleSetBeanWrapper.error("HideAction OID " + result + " is not Valid. ");

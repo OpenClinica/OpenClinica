@@ -51,7 +51,7 @@ public class InsertActionValidator implements Validator {
             ValidationUtils.rejectIfEmpty(e, p + "value", "value.empty");
             String expression = getExpressionService().constructFullExpressionIfPartialProvided(propertyBean.getOid(), getRuleSetBean().getTarget().getValue());
             List<ItemBean> itemBeans = getItemDAO().findByOid(getExpressionService().getItemOid(expression));
-            if (!getExpressionService().isExpressionValid(propertyBean.getOid(), getRuleSetBean(), 3) && itemBeans.size() != 1) {
+            if (!getExpressionService().isExpressionValid(propertyBean.getOid(), getRuleSetBean(), 3) || itemBeans.size() != 1) {
                 e.rejectValue(p + "oid", "oid.invalid");
             } else {
                 checkValidity(itemBeans.get(0), propertyBean.getValue(), p, e);

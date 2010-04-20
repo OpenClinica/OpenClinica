@@ -1,10 +1,12 @@
 package org.akaza.openclinica.logic.rulerunner;
 
+import org.akaza.openclinica.domain.rule.action.PropertyBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.rule.action.ShowActionBean;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class MessageContainer {
 
@@ -15,9 +17,9 @@ public class MessageContainer {
         addInternal(groupOrdinalPLusItemOid, ruleActionBean.getSummary(), MessageType.ERROR);
         System.out.println("just added error : " + ruleActionBean.getSummary());
         if (ruleActionBean instanceof ShowActionBean) {
-            String[] oids = (((ShowActionBean) ruleActionBean).getOIDs()).split(",");
-            for (String oid : oids) {
-                addInternal(oid, ruleActionBean.getSummary(), MessageType.WARNING);
+            List<PropertyBean> properties = (((ShowActionBean) ruleActionBean).getProperties());
+            for (PropertyBean propertyBean : properties) {
+                addInternal(propertyBean.getOid(), ruleActionBean.getSummary(), MessageType.WARNING);
                 System.out.println("just added warning : " + ruleActionBean.getSummary());
             }
         }

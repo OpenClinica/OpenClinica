@@ -2,6 +2,7 @@ package org.akaza.openclinica.domain.rule.action;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.RuleRunner.RuleRunnerMode;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
@@ -12,9 +13,11 @@ public class ShowActionProcessor implements ActionProcessor {
 
     DataSource ds;
     DynamicsMetadataService itemMetadataService;
+    RuleSetBean ruleSet;
 
-    public ShowActionProcessor(DataSource ds, DynamicsMetadataService itemMetadataService) {
+    public ShowActionProcessor(DataSource ds, DynamicsMetadataService itemMetadataService, RuleSetBean ruleSet) {
         this.itemMetadataService = itemMetadataService;
+        this.ruleSet = ruleSet;
         this.ds = ds;
     }
 
@@ -42,12 +45,12 @@ public class ShowActionProcessor implements ActionProcessor {
     }
 
     private RuleActionBean save(RuleActionBean ruleAction, int itemDataBeanId, String itemData, StudyBean currentStudy, UserAccountBean ub) {
-        getItemMetadataService().show(itemDataBeanId, ((ShowActionBean) ruleAction).getOIDsAsArray());
+        getItemMetadataService().showNew(itemDataBeanId, ((ShowActionBean) ruleAction).getProperties(), ub, ruleSet);
         return ruleAction;
     }
 
     private RuleActionBean saveAndReturnMessage(RuleActionBean ruleAction, int itemDataBeanId, String itemData, StudyBean currentStudy, UserAccountBean ub) {
-        getItemMetadataService().show(itemDataBeanId, ((ShowActionBean) ruleAction).getOIDsAsArray());
+        getItemMetadataService().showNew(itemDataBeanId, ((ShowActionBean) ruleAction).getProperties(), ub, ruleSet);
         return ruleAction;
     }
 

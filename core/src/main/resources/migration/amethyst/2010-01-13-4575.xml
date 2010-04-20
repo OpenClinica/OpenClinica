@@ -77,4 +77,8 @@
             drop sequence RULE_ACTION_PROPERTY_ID_SEQ;
         </rollback>
     </changeSet>
+    <changeSet author="kkrumlian" id="2010-01-13-4575-7">
+        <comment>update rule_action drop oids column</comment>
+        <dropColumn tableName="rule_action" columnName="oids"/>
+    </changeSet>
 </databaseChangeLog>

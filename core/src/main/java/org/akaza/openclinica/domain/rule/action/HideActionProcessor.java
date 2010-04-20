@@ -2,6 +2,7 @@ package org.akaza.openclinica.domain.rule.action;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.RuleRunner.RuleRunnerMode;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
@@ -11,11 +12,13 @@ import javax.sql.DataSource;
 public class HideActionProcessor implements ActionProcessor {
 
     DataSource ds;
-    DynamicsMetadataService itemMetadataService;
+    DynamicsMetadataService dynamicsMetadataService;
+    RuleSetBean ruleSet;
 
-    public HideActionProcessor(DataSource ds, DynamicsMetadataService itemMetadataService) {
-        this.itemMetadataService = itemMetadataService;
+    public HideActionProcessor(DataSource ds, DynamicsMetadataService dynamicsMetadataService, RuleSetBean ruleSet) {
+        this.dynamicsMetadataService = dynamicsMetadataService;
         this.ds = ds;
+        this.ruleSet = ruleSet;
     }
 
     public RuleActionBean execute(RuleRunnerMode ruleRunnerMode, ExecutionMode executionMode, RuleActionBean ruleAction, int itemDataBeanId, String itemData,
@@ -42,12 +45,12 @@ public class HideActionProcessor implements ActionProcessor {
     }
 
     private RuleActionBean save(RuleActionBean ruleAction, int itemDataBeanId, String itemData, StudyBean currentStudy, UserAccountBean ub) {
-        getItemMetadataService().hide(itemDataBeanId, ((HideActionBean) ruleAction).getOIDsAsArray());
+        getDynamicsMetadataService().hideNew(itemDataBeanId, ((HideActionBean) ruleAction).getProperties(), ub, ruleSet);
         return ruleAction;
     }
 
     private RuleActionBean saveAndReturnMessage(RuleActionBean ruleAction, int itemDataBeanId, String itemData, StudyBean currentStudy, UserAccountBean ub) {
-        getItemMetadataService().hide(itemDataBeanId, ((HideActionBean) ruleAction).getOIDsAsArray());
+        getDynamicsMetadataService().hideNew(itemDataBeanId, ((HideActionBean) ruleAction).getProperties(), ub, ruleSet);
         return ruleAction;
     }
 
@@ -55,8 +58,8 @@ public class HideActionProcessor implements ActionProcessor {
         return ruleAction;
     }
 
-    private DynamicsMetadataService getItemMetadataService() {
-        return itemMetadataService;
+    private DynamicsMetadataService getDynamicsMetadataService() {
+        return dynamicsMetadataService;
     }
 
 }

@@ -21,7 +21,7 @@ public class InsertActionBean extends RuleActionBean {
     }
 
     @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "rule_action_id", nullable = false)
+    @JoinColumn(name = "rule_action_id", nullable = true)
     public List<PropertyBean> getProperties() {
         return properties;
     }

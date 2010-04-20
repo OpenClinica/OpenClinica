@@ -17,9 +17,9 @@ public class ActionProcessorFacade {
         case EMAIL:
             return new EmailActionProcessor(ds, mailSender);
         case SHOW:
-            return new ShowActionProcessor(ds, itemMetadataService);
+            return new ShowActionProcessor(ds, itemMetadataService, ruleSet);
         case HIDE:
-            return new HideActionProcessor(ds, itemMetadataService);
+            return new HideActionProcessor(ds, itemMetadataService, ruleSet);
         case INSERT:
             return new InsertActionProcessor(ds, itemMetadataService, ruleSet);
         default:

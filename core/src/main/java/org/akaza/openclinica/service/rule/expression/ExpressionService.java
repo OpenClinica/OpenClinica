@@ -284,7 +284,8 @@ public class ExpressionService {
         boolean result = false;
         boolean isRuleExpressionValid = false;
 
-        if (getExpressionSize(expression).intValue() > allowedLength.intValue()) {
+        Integer k = getExpressionSize(expression);
+        if (k.intValue() > allowedLength.intValue()) {
             return false;
         }
 

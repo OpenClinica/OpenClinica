@@ -1,8 +1,12 @@
 package org.akaza.openclinica.domain.rule.action;
 
-import javax.persistence.Column;
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
 @Entity
@@ -10,7 +14,7 @@ import javax.persistence.Transient;
 public class ShowActionBean extends RuleActionBean {
 
     private String message;
-    private String OIDs;
+    private List<PropertyBean> properties;
 
     public ShowActionBean() {
         setActionType(ActionType.SHOW);
@@ -25,30 +29,25 @@ public class ShowActionBean extends RuleActionBean {
         this.message = message;
     }
 
-    public String getOIDs() {
-        return OIDs;
-    }
-
-    @Column(name = "oids")
-    public void setOIDs(String oIDs) {
-        OIDs = oIDs;
-    }
-
     @Override
     @Transient
     public String getSummary() {
         return this.message;
     }
 
-    @Transient
-    public String[] getOIDsAsArray() {
-        String[] oids = getOIDs().split(",");
-        return oids;
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "rule_action_id", nullable = true)
+    public List<PropertyBean> getProperties() {
+        return properties;
+    }
+
+    public void setProperties(List<PropertyBean> properties) {
+        this.properties = properties;
     }
 
     @Override
     public String toString() {
-        return "ShowActionBean [OIDs=" + OIDs + ", message=" + message + "]";
+        return "ShowActionBean [message=" + message + ", properties=" + properties + "]";
     }
 
 }

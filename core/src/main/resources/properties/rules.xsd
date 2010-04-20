@@ -67,7 +67,7 @@
         <xs:sequence>
             <xs:element name="Run" type="ActionRunType" minOccurs="0"/>
             <xs:element name="Message" type="xs:string"/>
-            <xs:element name="OIDs" type="xs:string"/>
+            <xs:element name="DestinationProperty" type="PropertyType" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attributeGroup ref="DiscrepancyNoteActionAttributeType"/>
     </xs:complexType>
@@ -77,7 +77,7 @@
         <xs:sequence>
             <xs:element name="Run" type="ActionRunType" minOccurs="0"/>
             <xs:element name="Message" type="xs:string"/>
-            <xs:element name="OIDs" type="xs:string"/>
+            <xs:element name="DestinationProperty" type="PropertyType" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attributeGroup ref="DiscrepancyNoteActionAttributeType"/>
     </xs:complexType>
@@ -86,7 +86,7 @@
     <xs:complexType name="InsertActionType">
         <xs:sequence>
             <xs:element name="Run" type="ActionRunType" minOccurs="0"/>
-            <xs:element name="Property" type="PropertyType"/>
+            <xs:element name="DestinationProperty" type="PropertyType"/>
         </xs:sequence>
         <xs:attributeGroup ref="DiscrepancyNoteActionAttributeType"/>
     </xs:complexType>
@@ -105,8 +105,8 @@
     </xs:attributeGroup>
     
     <xs:attributeGroup name="PropertyAttributeType">
-        <xs:attribute name="Oid" type="xs:string" use="required"/>
-        <xs:attribute name="Value" type="xs:string" use="required"/>
+        <xs:attribute name="OID" type="xs:string" use="required"/>
+        <xs:attribute name="Value" type="xs:string" use="optional"/>
     </xs:attributeGroup>
     
      <xs:attributeGroup name="ActionRunAttributeType">

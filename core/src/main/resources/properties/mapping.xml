@@ -121,9 +121,10 @@
                type="java.lang.String">
             <bind-xml name="Message" node="element"/>
         </field>
-        <field name="OIDs"
-               type="java.lang.String" handler="org.akaza.openclinica.bean.rule.OidHandler">
-            <bind-xml name="OIDs" node="element"/>
+        <field name="Properties"
+            type="org.akaza.openclinica.domain.rule.action.PropertyBean"
+            collection="arraylist">
+            <bind-xml name="DestinationProperty"/>
         </field>
      </class> 
      <class name="org.akaza.openclinica.domain.rule.action.HideActionBean">
@@ -140,9 +141,10 @@
                type="java.lang.String">
             <bind-xml name="Message" node="element"/>
         </field>
-        <field name="OIDs"
-               type="java.lang.String" handler="org.akaza.openclinica.bean.rule.OidHandler">
-            <bind-xml name="OIDs" node="element"/>
+        <field name="Properties"
+            type="org.akaza.openclinica.domain.rule.action.PropertyBean"
+            collection="arraylist">
+            <bind-xml name="DestinationProperty"/>
         </field>
      </class>
      <class name="org.akaza.openclinica.domain.rule.action.InsertActionBean">
@@ -150,7 +152,7 @@
         <field name="Properties"
             type="org.akaza.openclinica.domain.rule.action.PropertyBean"
             collection="arraylist">
-            <bind-xml name="Property"/>
+            <bind-xml name="DestinationProperty"/>
         </field>
         <field name="ExpressionEvaluatesTo"
                type="java.lang.Boolean">
@@ -163,10 +165,10 @@
      </class>
      
      <class name="org.akaza.openclinica.domain.rule.action.PropertyBean" auto-complete="true">
-        <field name="oid" type="string"  handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler">
-            <bind-xml name="Oid" node="attribute"/>
+        <field name="oid" type="string"  handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler" required="true">
+            <bind-xml name="OID" node="attribute"/>
        </field>
-       <field name="value" type="string" handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler">
+       <field name="value" type="string" handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler" required="false">
             <bind-xml name="Value" node="attribute"/>
        </field>
      </class>
