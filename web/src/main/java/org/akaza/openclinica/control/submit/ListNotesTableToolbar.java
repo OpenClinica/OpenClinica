@@ -17,7 +17,6 @@ public class ListNotesTableToolbar extends DefaultToolbar {
     private int discNoteType;
     private boolean studyHasDiscNotes;
     private ResourceBundle resword;
-    private final boolean showMoreLink;
 
     public ListNotesTableToolbar(boolean showMoreLink) {
         super();
@@ -32,7 +31,8 @@ public class ListNotesTableToolbar extends DefaultToolbar {
             addToolbarItem(createDownloadLinkItem());
         }
         addToolbarItem(ToolbarItemType.SEPARATOR);
-        addToolbarItem(createBackToNotesMatrixListItem());    
+        addToolbarItem(createBackToNotesMatrixListItem());
+        addToolbarItem(createCustomItem(new NewHiddenItem()));
 
     }
 
@@ -161,6 +161,8 @@ public class ListNotesTableToolbar extends DefaultToolbar {
             return html.toString();
         }
     }
+
+    
 
     public String getModule() {
         return module;
