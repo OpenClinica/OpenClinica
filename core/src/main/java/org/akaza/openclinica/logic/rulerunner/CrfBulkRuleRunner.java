@@ -17,8 +17,8 @@ import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.action.ActionProcessor;
 import org.akaza.openclinica.domain.rule.action.ActionProcessorFacade;
-import org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionProcessor;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
+import org.akaza.openclinica.domain.rule.action.RuleActionRunLogBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
@@ -29,6 +29,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -121,27 +122,30 @@ public class CrfBulkRuleRunner extends RuleRunner {
                         // Actions
                         List<RuleActionBean> actionListBasedOnRuleExecutionResult = ruleSetRule.getActions(result, Phase.BATCH);
 
-                        /*
-                        if (dryRun && actionListBasedOnRuleExecutionResult.size() > 0) {
-                            crfViewSpecificOrderedObjects =
-                                populateForCrfBasedRulesView(crfViewSpecificOrderedObjects, ruleSet, rule, result, currentStudy,
-                                        actionListBasedOnRuleExecutionResult);
+                        ItemDataBean itemData = getExpressionService().getItemDataBeanFromDb(ruleSet.getTarget().getValue());
+                        if (itemData != null) {
+                            Iterator<RuleActionBean> itr = actionListBasedOnRuleExecutionResult.iterator();
+                            while (itr.hasNext()) {
+                                RuleActionBean ruleActionBean = itr.next();
+                                RuleActionRunLogBean ruleActionRunLog =
+                                    new RuleActionRunLogBean(ruleActionBean.getActionType(), itemData, itemData.getValue(), ruleSetRule.getRuleBean().getOid());
+                                if (getRuleActionRunLogDao().findByRuleActionRunLogBean(ruleActionRunLog) != null) {
+                                    itr.remove();
+                                }
+                            }
                         }
-                        */
 
-                        // If not a dryRun meaning run Actions
                         List<RuleActionBean> actionBeansToShow = new ArrayList<RuleActionBean>();
                         if (actionListBasedOnRuleExecutionResult.size() > 0) {
                             //if (!dryRun) {
                             for (RuleActionBean ruleAction : actionListBasedOnRuleExecutionResult) {
-                                ItemDataBean itemData = getExpressionService().getItemDataBeanFromDb(ruleSet.getTarget().getValue());
-                                int itemDataBeanId = itemData != null ? itemData.getId() : 0;
                                 ruleAction.setCuratedMessage(curateMessage(ruleAction, ruleSetRule));
                                 // getDiscrepancyNoteService().saveFieldNotes(ruleAction.getSummary(), itemDataBeanId, "ItemData", currentStudy, ub);
                                 ActionProcessor ap =
-                                    ActionProcessorFacade.getActionProcessor(ruleAction.getActionType(), ds, getMailSender(), dynamicsMetadataService, null);
+                                    ActionProcessorFacade.getActionProcessor(ruleAction.getActionType(), ds, getMailSender(), dynamicsMetadataService, ruleSet,
+                                            getRuleActionRunLogDao(), ruleSetRule);
                                 RuleActionBean rab =
-                                    ap.execute(RuleRunnerMode.RULSET_BULK, ExecutionMode.SAVE, ruleAction, itemDataBeanId, DiscrepancyNoteBean.ITEM_DATA,
+                                    ap.execute(RuleRunnerMode.RULSET_BULK, ExecutionMode.SAVE, ruleAction, itemData, DiscrepancyNoteBean.ITEM_DATA,
                                             currentStudy, ub, prepareEmailContents(ruleSet, ruleSetRule, currentStudy, ruleAction));
                                 if (rab != null) {
                                     actionBeansToShow.add(ruleAction);
@@ -159,12 +163,6 @@ public class CrfBulkRuleRunner extends RuleRunner {
                                 + " , It resulted in an error due to : " + osa.getMessage();
                         // log error
                         logger.warn(errorMessage);
-                        // Add a discrepancy note
-                        if (!dryRun) {
-                            DiscrepancyNoteActionProcessor dnap = new DiscrepancyNoteActionProcessor(ds);
-                            int itemDataBeanId = getExpressionService().getItemDataBeanFromDb(ruleSet.getTarget().getValue()).getId();
-                            dnap.execute(errorMessage, itemDataBeanId, DiscrepancyNoteBean.ITEM_DATA, currentStudy, ub);
-                        }
 
                     }
                 }

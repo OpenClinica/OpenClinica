@@ -2,6 +2,7 @@ package org.akaza.openclinica.domain.rule.action;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.RuleRunner.RuleRunnerMode;
@@ -21,22 +22,22 @@ public class ShowActionProcessor implements ActionProcessor {
         this.ds = ds;
     }
 
-    public RuleActionBean execute(RuleRunnerMode ruleRunnerMode, ExecutionMode executionMode, RuleActionBean ruleAction, int itemDataBeanId, String itemData,
-            StudyBean currentStudy, UserAccountBean ub, Object... arguments) {
+    public RuleActionBean execute(RuleRunnerMode ruleRunnerMode, ExecutionMode executionMode, RuleActionBean ruleAction, ItemDataBean itemDataBean,
+            String itemData, StudyBean currentStudy, UserAccountBean ub, Object... arguments) {
 
         switch (executionMode) {
         case DRY_RUN: {
             if (ruleRunnerMode == RuleRunnerMode.DATA_ENTRY) {
                 return null;
             } else {
-                dryRun(ruleAction, itemDataBeanId, itemData, currentStudy, ub);
+                dryRun(ruleAction, itemDataBean, itemData, currentStudy, ub);
             }
         }
         case SAVE: {
             if (ruleRunnerMode == RuleRunnerMode.DATA_ENTRY) {
-                return saveAndReturnMessage(ruleAction, itemDataBeanId, itemData, currentStudy, ub);
+                return saveAndReturnMessage(ruleAction, itemDataBean, itemData, currentStudy, ub);
             } else {
-                return save(ruleAction, itemDataBeanId, itemData, currentStudy, ub);
+                return save(ruleAction, itemDataBean, itemData, currentStudy, ub);
             }
         }
         default:
@@ -44,17 +45,18 @@ public class ShowActionProcessor implements ActionProcessor {
         }
     }
 
-    private RuleActionBean save(RuleActionBean ruleAction, int itemDataBeanId, String itemData, StudyBean currentStudy, UserAccountBean ub) {
-        getItemMetadataService().showNew(itemDataBeanId, ((ShowActionBean) ruleAction).getProperties(), ub, ruleSet);
+    private RuleActionBean save(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, StudyBean currentStudy, UserAccountBean ub) {
+        getItemMetadataService().showNew(itemDataBean.getId(), ((ShowActionBean) ruleAction).getProperties(), ub, ruleSet);
         return ruleAction;
     }
 
-    private RuleActionBean saveAndReturnMessage(RuleActionBean ruleAction, int itemDataBeanId, String itemData, StudyBean currentStudy, UserAccountBean ub) {
-        getItemMetadataService().showNew(itemDataBeanId, ((ShowActionBean) ruleAction).getProperties(), ub, ruleSet);
+    private RuleActionBean saveAndReturnMessage(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, StudyBean currentStudy,
+            UserAccountBean ub) {
+        getItemMetadataService().showNew(itemDataBean.getId(), ((ShowActionBean) ruleAction).getProperties(), ub, ruleSet);
         return ruleAction;
     }
 
-    private RuleActionBean dryRun(RuleActionBean ruleAction, int itemDataBeanId, String itemData, StudyBean currentStudy, UserAccountBean ub) {
+    private RuleActionBean dryRun(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, StudyBean currentStudy, UserAccountBean ub) {
         return ruleAction;
     }
 

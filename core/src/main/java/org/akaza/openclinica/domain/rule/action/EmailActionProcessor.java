@@ -2,7 +2,10 @@ package org.akaza.openclinica.domain.rule.action;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.core.EmailEngine;
+import org.akaza.openclinica.dao.hibernate.RuleActionRunLogDao;
+import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.RuleRunner.RuleRunnerMode;
@@ -28,14 +31,16 @@ public class EmailActionProcessor implements ActionProcessor {
     DataSource ds;
     EmailEngine emailEngine;
     JavaMailSenderImpl mailSender;
+    RuleActionRunLogDao ruleActionRunLogDao;
+    RuleSetRuleBean ruleSetRule;
 
-    public EmailActionProcessor(DataSource ds, JavaMailSenderImpl mailSender) {
+    public EmailActionProcessor(DataSource ds, JavaMailSenderImpl mailSender, RuleActionRunLogDao ruleActionRunLogDao, RuleSetRuleBean ruleSetRule) {
         this.ds = ds;
         this.mailSender = mailSender;
     }
 
-    public RuleActionBean execute(RuleRunnerMode ruleRunnerMode, ExecutionMode executionMode, RuleActionBean ruleAction, int itemDataBeanId, String itemData,
-            StudyBean currentStudy, UserAccountBean ub, Object... arguments) {
+    public RuleActionBean execute(RuleRunnerMode ruleRunnerMode, ExecutionMode executionMode, RuleActionBean ruleAction, ItemDataBean itemDataBean,
+            String itemData, StudyBean currentStudy, UserAccountBean ub, Object... arguments) {
         switch (executionMode) {
         case DRY_RUN: {
             return ruleAction;
@@ -44,6 +49,9 @@ public class EmailActionProcessor implements ActionProcessor {
         case SAVE: {
             HashMap<String, String> arg0 = (HashMap<String, String>) arguments[0];
             sendEmail(ruleAction, ub, arg0.get("body"), arg0.get("subject"));
+            RuleActionRunLogBean ruleActionRunLog =
+                new RuleActionRunLogBean(ruleAction.getActionType(), itemDataBean, itemDataBean.getValue(), ruleSetRule.getRuleBean().getOid());
+            ruleActionRunLogDao.saveOrUpdate(ruleActionRunLog);
             return null;
         }
         default:

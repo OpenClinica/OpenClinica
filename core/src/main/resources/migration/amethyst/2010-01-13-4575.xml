@@ -81,4 +81,35 @@
         <comment>update rule_action drop oids column</comment>
         <dropColumn tableName="rule_action" columnName="oids"/>
     </changeSet>
+    <changeSet author="kkrumlian" id="2010-01-13-4575-8">
+        <comment>Create a table named rule_action_run_log</comment>
+        <createTable tableName="rule_action_run_log">
+            <column autoIncrement="true" name="id" type="int">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="action_type" type="INT"/>
+            <column name="item_data_id" type="INT"/>
+            <column name="value" type="varchar(4000)"/>
+            <column name="rule_oc_oid" type="varchar(40)"/>
+            <column name="version" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="kkrumlian" id="2010-01-13-4575-9" dbms="oracle">
+        <comment>Create a sequence/trigger to imitate autoIncrement functionality for oracle</comment>
+        <comment>trigger name, table name, sequence name Will need to be changed for each table.</comment>
+        <createSequence sequenceName="RULE_ACTION_RUN_LOG_ID_SEQ"/>
+        <sql splitStatements="false"> 
+            create or replace trigger rule_action_run_log_bef_trg 
+                before insert on rule_action_run_log
+                    for each row begin 
+                        if :new.id is null 
+                         then select RULE_ACTION_RUN_LOG_ID_SEQ.nextval into :new.id from dual; 
+                        end if; 
+                    end; 
+        </sql>
+        <rollback>
+            drop trigger  rule_action_run_log_bef_trg;
+            drop sequence RULE_ACTION_RUN_LOG_ID_SEQ;
+        </rollback>
+    </changeSet>
 </databaseChangeLog>

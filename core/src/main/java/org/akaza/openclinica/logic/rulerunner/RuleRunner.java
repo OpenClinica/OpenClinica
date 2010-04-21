@@ -10,6 +10,7 @@ import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.hibernate.RuleActionRunLogDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -58,6 +59,7 @@ public class RuleRunner {
     private final JavaMailSenderImpl mailSender;
     protected RuleRunnerMode ruleRunnerMode;
     protected DynamicsMetadataService dynamicsMetadataService;
+    protected RuleActionRunLogDao ruleActionRunLogDao;
     DataSource ds;
 
     String requestURLMinusServletPath;
@@ -255,4 +257,11 @@ public class RuleRunner {
         this.dynamicsMetadataService = dynamicsMetadataService;
     }
 
+    public RuleActionRunLogDao getRuleActionRunLogDao() {
+        return ruleActionRunLogDao;
+    }
+
+    public void setRuleActionRunLogDao(RuleActionRunLogDao ruleActionRunLogDao) {
+        this.ruleActionRunLogDao = ruleActionRunLogDao;
+    }
 }

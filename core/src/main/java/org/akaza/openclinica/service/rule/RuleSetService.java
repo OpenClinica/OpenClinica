@@ -15,6 +15,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.hibernate.RuleActionRunLogDao;
 import org.akaza.openclinica.dao.hibernate.RuleDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetAuditDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
@@ -85,6 +86,7 @@ public class RuleSetService implements RuleSetServiceInterface {
     private String requestURLMinusServletPath;
     private String contextPath;
     private DynamicsMetadataService dynamicsMetadataService;
+    private RuleActionRunLogDao ruleActionRunLogDao;
 
     /* public RuleSetService(DataSource ds, String requestURLMinusServletPath, String contextPath) {
          this.dataSource = ds;
@@ -211,6 +213,9 @@ public class RuleSetService implements RuleSetServiceInterface {
         ruleSets = filterRuleSetsByStudyEventOrdinal(ruleSets);
         ruleSets = filterRuleSetsByGroupOrdinal(ruleSets);
         CrfBulkRuleRunner ruleRunner = new CrfBulkRuleRunner(dataSource, requestURLMinusServletPath, contextPath, mailSender);
+        dynamicsMetadataService.setExpressionService(getExpressionService());
+        ruleRunner.setDynamicsMetadataService(dynamicsMetadataService);
+        ruleRunner.setRuleActionRunLogDao(ruleActionRunLogDao);
         return ruleRunner.runRulesBulk(ruleSets, dryRun, currentStudy, null, ub);
         // return runRulesBulk(ruleSets, dryRun, currentStudy, null, ub);
     }
@@ -232,6 +237,7 @@ public class RuleSetService implements RuleSetServiceInterface {
         CrfBulkRuleRunner ruleRunner = new CrfBulkRuleRunner(dataSource, requestURLMinusServletPath, contextPath, mailSender);
         dynamicsMetadataService.setExpressionService(getExpressionService());
         ruleRunner.setDynamicsMetadataService(dynamicsMetadataService);
+        ruleRunner.setRuleActionRunLogDao(ruleActionRunLogDao);
         return ruleRunner.runRulesBulk(ruleSets, dryRun, currentStudy, null, ub);
         // return runRulesBulk(ruleSets, dryRun, currentStudy, null, ub);
     }
@@ -246,6 +252,7 @@ public class RuleSetService implements RuleSetServiceInterface {
         RuleSetBulkRuleRunner ruleRunner = new RuleSetBulkRuleRunner(dataSource, requestURLMinusServletPath, contextPath, mailSender);
         dynamicsMetadataService.setExpressionService(getExpressionService());
         ruleRunner.setDynamicsMetadataService(dynamicsMetadataService);
+        ruleRunner.setRuleActionRunLogDao(ruleActionRunLogDao);
         return ruleRunner.runRulesBulkFromRuleSetScreen(ruleSets, dryRun, currentStudy, null, ub);
         // return runRulesBulkFromRuleSetScreen(ruleSets, dryRun, currentStudy, null, ub);
     }
@@ -258,6 +265,7 @@ public class RuleSetService implements RuleSetServiceInterface {
         DataEntryRuleRunner ruleRunner = new DataEntryRuleRunner(dataSource, requestURLMinusServletPath, contextPath, mailSender);
         dynamicsMetadataService.setExpressionService(getExpressionService());
         ruleRunner.setDynamicsMetadataService(dynamicsMetadataService);
+        ruleRunner.setRuleActionRunLogDao(ruleActionRunLogDao);
         // TODO: KK return the new object && Pass in the Execution Mode
         ExecutionMode executionMode = dryRun == true ? ExecutionMode.DRY_RUN : ExecutionMode.SAVE;
         return ruleRunner.runRules(ruleSets, executionMode, currentStudy, variableAndValue, ub, phase);
@@ -755,6 +763,14 @@ public class RuleSetService implements RuleSetServiceInterface {
 
     public void setDynamicsMetadataService(DynamicsMetadataService dynamicsMetadataService) {
         this.dynamicsMetadataService = dynamicsMetadataService;
+    }
+
+    public RuleActionRunLogDao getRuleActionRunLogDao() {
+        return ruleActionRunLogDao;
+    }
+
+    public void setRuleActionRunLogDao(RuleActionRunLogDao ruleActionRunLogDao) {
+        this.ruleActionRunLogDao = ruleActionRunLogDao;
     }
 
 }

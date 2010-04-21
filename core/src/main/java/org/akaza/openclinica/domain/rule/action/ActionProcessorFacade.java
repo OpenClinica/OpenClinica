@@ -1,6 +1,8 @@
 package org.akaza.openclinica.domain.rule.action;
 
+import org.akaza.openclinica.dao.hibernate.RuleActionRunLogDao;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
+import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -10,12 +12,13 @@ import javax.sql.DataSource;
 public class ActionProcessorFacade {
 
     public static ActionProcessor getActionProcessor(ActionType actionType, DataSource ds, JavaMailSenderImpl mailSender,
-            DynamicsMetadataService itemMetadataService, RuleSetBean ruleSet) throws OpenClinicaSystemException {
+            DynamicsMetadataService itemMetadataService, RuleSetBean ruleSet, RuleActionRunLogDao ruleActionRunLogDao, RuleSetRuleBean ruleSetRule)
+            throws OpenClinicaSystemException {
         switch (actionType) {
         case FILE_DISCREPANCY_NOTE:
-            return new DiscrepancyNoteActionProcessor(ds);
+            return new DiscrepancyNoteActionProcessor(ds, ruleActionRunLogDao, ruleSetRule);
         case EMAIL:
-            return new EmailActionProcessor(ds, mailSender);
+            return new EmailActionProcessor(ds, mailSender, ruleActionRunLogDao, ruleSetRule);
         case SHOW:
             return new ShowActionProcessor(ds, itemMetadataService, ruleSet);
         case HIDE:

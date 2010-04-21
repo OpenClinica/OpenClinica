@@ -30,6 +30,7 @@
                 <value>org.akaza.openclinica.domain.rule.RuleBean</value>
                 <value>org.akaza.openclinica.domain.rule.action.RuleActionBean</value>
                 <value>org.akaza.openclinica.domain.rule.action.RuleActionRunBean</value>
+                <value>org.akaza.openclinica.domain.rule.action.RuleActionRunLogBean</value>
                 <value>org.akaza.openclinica.domain.rule.action.EmailActionBean</value>
                 <value>org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean</value>
                 <value>org.akaza.openclinica.domain.rule.action.ShowActionBean</value>
@@ -68,6 +69,7 @@
 
   <bean id="abstractDomainDao" class="org.akaza.openclinica.dao.hibernate.AbstractDomainDao" abstract="true"/>
 
+  <bean id="ruleActionRunLogDao" class="org.akaza.openclinica.dao.hibernate.RuleActionRunLogDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="dynamicsItemFormMetadataDao" class="org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="dynamicsItemGroupMetadataDao" class="org.akaza.openclinica.dao.hibernate.DynamicsItemGroupMetadataDao" parent="abstractDomainDao" autowire="byName" />
   <bean id="ruleSetDao" class="org.akaza.openclinica.dao.hibernate.RuleSetDao" parent="abstractDomainDao" autowire="byName" />
