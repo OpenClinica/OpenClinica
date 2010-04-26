@@ -91,9 +91,9 @@
               <fmt:param value="<img src='../images/bt_Details.gif'/>"/>
           </fmt:message>
       </p>
-      <p>
-          <fmt:message key="study_module_description_2" bundle="${pagemessage}"/>
-      </p>
+      <%--<p>--%>
+          <%--<fmt:message key="study_module_description_2" bundle="${pagemessage}"/>--%>
+      <%--</p>--%>
       <p>
           <fmt:message key="study_module_description_3" bundle="${pagemessage}"/>
       </p>
@@ -407,7 +407,7 @@
   </table>
   <br>
   <br>
-  <c:if test="${studyModuleStatus.study == 3 && studyModuleStatus.crf == 3 && studyModuleStatus.eventDefinition == 3 && studyModuleStatus.subjectGroup == 3 && studyModuleStatus.rule == 3}">
+  <%--<c:if test="${studyModuleStatus.study == 3 && studyModuleStatus.crf == 3 && studyModuleStatus.eventDefinition == 3 && studyModuleStatus.subjectGroup == 3 && studyModuleStatus.rule == 3}">--%>
   <table width="78%" class="contenttable" cellspacing="0" cellpadding="2">
       <thead>
         <td width="20"></td>
@@ -572,7 +572,7 @@
         </tbody>
    </table>
    </c:if>
-  </c:if>
+  <%--</c:if>--%>
   <div>
       <input type="submit" name="submitEvent" value="Save" class="button_long">
       <input type="button" onclick="confirmCancel('${pageContext.request.contextPath}/MainMenu');" name="cancel" value="Cancel" class="button_long">
