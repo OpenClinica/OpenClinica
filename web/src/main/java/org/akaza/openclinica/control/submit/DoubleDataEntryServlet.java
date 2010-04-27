@@ -205,58 +205,63 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
         if (!isSingleItem) {
             valueToCompare = dib.getDbData();
         }
-        if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXT) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXTAREA)) {
-            dib = validateDisplayItemBeanText(v, dib, inputName);
-            if (validationCount == null || validationCount.intValue() == 0) {
-                v.addValidation(inputName, Validator.MATCHES_INITIAL_DATA_ENTRY_VALUE, valueToCompare, false);
-                v.setErrorMessage(respage.getString("value_you_specified") + " " + valueToCompare.getValue() + " "
-                    + respage.getString("from_initial_data_entry"));
+        boolean showOriginalItem = getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getData());
+        boolean showItem = dib.getMetadata().isShowItem();//getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getDbData());
+        System.out.println("*** show original item has value " + dib.getData().getValue() + " and show item has value " + dib.getDbData().getValue());
+        if (showOriginalItem && showItem) {
+            if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXT) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXTAREA)) {
+                dib = validateDisplayItemBeanText(v, dib, inputName);
+                if (showItem && (validationCount == null || validationCount.intValue() == 0)) {
+                    v.addValidation(inputName, Validator.MATCHES_INITIAL_DATA_ENTRY_VALUE, valueToCompare, false);
+                    v.setErrorMessage(respage.getString("value_you_specified") + " " + valueToCompare.getValue() + " "
+                            + respage.getString("from_initial_data_entry"));
 
-            }
-
-        } else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.RADIO) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECT)) {
-            dib = validateDisplayItemBeanSingleCV(v, dib, inputName);
-            // ItemFormMetadataBean ifmdb = dib.getMetadata();
-            // ResponseSetBean rsBean = ifmdb.getResponseSet();
-            // logger.info("### found a response set count of "+inputName+"
-            // "+rsBean.getOptions().size());
-            // TODO sees it at this end tbh 1878
-            if (validationCount == null || validationCount.intValue() == 0) {
-                v.addValidation(inputName, Validator.MATCHES_INITIAL_DATA_ENTRY_VALUE, valueToCompare, false);
-                String errorValue = valueToCompare.getValue();
-
-                java.util.ArrayList options = dib.getMetadata().getResponseSet().getOptions();
-
-                for (int u = 0; u < options.size(); u++) {
-                    ResponseOptionBean rob = (ResponseOptionBean) options.get(u);
-                    if (rob.getValue().equals(errorValue)) {
-                        errorValue = rob.getText();
-                    }
                 }
-                v.setErrorMessage(respage.getString("value_you_specified") + " " + errorValue + " " + respage.getString("from_initial_data_entry"));
-            }
-        } else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)) {
-            dib = validateDisplayItemBeanMultipleCV(v, dib, inputName);
-            if (validationCount == null || validationCount.intValue() == 0) {
-                v.addValidation(inputName, Validator.MATCHES_INITIAL_DATA_ENTRY_VALUE, valueToCompare, true);
-                // repeated from above, tbh 112007
-                String errorValue = valueToCompare.getValue();
-                String errorTexts = "";
 
-                java.util.ArrayList options = dib.getMetadata().getResponseSet().getOptions();
+            } else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.RADIO) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECT)) {
+                dib = validateDisplayItemBeanSingleCV(v, dib, inputName);
+                // ItemFormMetadataBean ifmdb = dib.getMetadata();
+                // ResponseSetBean rsBean = ifmdb.getResponseSet();
+                // logger.info("### found a response set count of "+inputName+"
+                // "+rsBean.getOptions().size());
+                // TODO sees it at this end tbh 1878
+                if (showItem && (validationCount == null || validationCount.intValue() == 0)) {
+                    v.addValidation(inputName, Validator.MATCHES_INITIAL_DATA_ENTRY_VALUE, valueToCompare, false);
+                    String errorValue = valueToCompare.getValue();
 
-                for (int u = 0; u < options.size(); u++) {
-                    ResponseOptionBean rob = (ResponseOptionBean) options.get(u);
-                    if (errorValue.contains(rob.getValue())) {
-                        errorTexts = errorTexts + rob.getText();
-                        if (u < options.size() - 1) {
-                            // the values for multi-select are seperated by
-                            // comma
-                            errorTexts = errorTexts + ", ";
+                    java.util.ArrayList options = dib.getMetadata().getResponseSet().getOptions();
+
+                    for (int u = 0; u < options.size(); u++) {
+                        ResponseOptionBean rob = (ResponseOptionBean) options.get(u);
+                        if (rob.getValue().equals(errorValue)) {
+                            errorValue = rob.getText();
                         }
                     }
+                    v.setErrorMessage(respage.getString("value_you_specified") + " " + errorValue + " " + respage.getString("from_initial_data_entry"));
                 }
-                v.setErrorMessage(respage.getString("value_you_specified") + " " + errorTexts + " " + respage.getString("from_initial_data_entry"));
+            } else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)) {
+                dib = validateDisplayItemBeanMultipleCV(v, dib, inputName);
+                if (showItem && (validationCount == null || validationCount.intValue() == 0)) {
+                    v.addValidation(inputName, Validator.MATCHES_INITIAL_DATA_ENTRY_VALUE, valueToCompare, true);
+                    // repeated from above, tbh 112007
+                    String errorValue = valueToCompare.getValue();
+                    String errorTexts = "";
+
+                    java.util.ArrayList options = dib.getMetadata().getResponseSet().getOptions();
+
+                    for (int u = 0; u < options.size(); u++) {
+                        ResponseOptionBean rob = (ResponseOptionBean) options.get(u);
+                        if (errorValue.contains(rob.getValue())) {
+                            errorTexts = errorTexts + rob.getText();
+                            if (u < options.size() - 1) {
+                                // the values for multi-select are seperated by
+                                // comma
+                                errorTexts = errorTexts + ", ";
+                            }
+                        }
+                    }
+                    v.setErrorMessage(respage.getString("value_you_specified") + " " + errorTexts + " " + respage.getString("from_initial_data_entry"));
+                }
             }
 
         }
@@ -270,75 +275,6 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
         return dib;
 
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.akaza.openclinica.control.submit.DataEntryServlet#validateDisplayItemBean
-     * (org.akaza.openclinica.core.form.Validator,
-     * org.akaza.openclinica.bean.submit.DisplayItemBean)
-     */
-    /*
-     * protected DisplayItemBean validateDisplayItemBean( DiscrepancyValidator
-     * v, DisplayItemBean dib, String inputName) {
-     * 
-     * //logger.info("===reached head of validate display item bean"); ItemBean
-     * ib = dib.getItem(); org.akaza.openclinica.bean.core.ResponseType rt =
-     * dib.getMetadata().getResponseSet() .getResponseType();
-     * 
-     * //YW << I commented the condition which is " if
-     * (!StringUtil.isBlank(dib.getData().getValue())) { " // to fix bug0001167.
-     * // This change intends to give an error when there exists difference
-     * between initial and second data entry // no matter an item's value is
-     * empty or not. // Will this change break anything? //YW >> //tbh, put it
-     * back in, changes nothing now, so i took it out, 082007
-     * 
-     * int keyId = ecb.getId(); Integer count =
-     * (Integer)session.getAttribute(COUNT_VALIDATE+keyId); // types TEL and ED
-     * are not supported yet if
-     * (rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXT) ||
-     * rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXTAREA)) {
-     * 
-     * if (count != null && count.intValue() > 0) { //validate nothing from text
-     * and textarea for starters //but how/when to remove?
-     * //session.removeAttribute(COUNT_VALIDATE); //logger.info("^^^found
-     * count_validate with key id"+ keyId + ", should remove here?"); } else {
-     * //logger.info("===reached text validation with
-     * "+dib.getData().getValue()); dib = validateDisplayItemBeanText(v,
-     * dib,inputName); //if (!StringUtil.isBlank(dib.getData().getValue())) {
-     * v.addValidation(inputName, Validator.MATCHES_INITIAL_DATA_ENTRY_VALUE,
-     * dib.getData(), false);
-     * v.setErrorMessage(respage.getString("value_you_specified") +
-     * dib.getData().getValue() + " " +
-     * respage.getString("from_initial_data_entry")); } } else if
-     * (rt.equals(org.akaza.openclinica.bean.core.ResponseType.RADIO) ||
-     * rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECT)) { if
-     * (count != null && count.intValue() > 0) { } else {
-     * //logger.info("===reached radio or select validation with "+ //
-     * inputName+" and "+ // dib.getData().getValue());
-     * 
-     * dib = validateDisplayItemBeanSingleCV(v, dib, inputName); //if
-     * (!StringUtil.isBlank(dib.getData().getValue())) {
-     * v.addValidation(inputName, Validator.MATCHES_INITIAL_DATA_ENTRY_VALUE,
-     * dib.getData(), false);
-     * v.setErrorMessage(respage.getString("value_you_specified") +
-     * dib.getData().getValue() + " " +
-     * respage.getString("from_initial_data_entry")); } } else if
-     * (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX) ||
-     * rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)) { if
-     * (count != null && count.intValue() > 0) { } else {
-     * //logger.info("===reached check box or multi validation for "+ //
-     * inputName+" and "+ // dib.getData().getValue()); dib =
-     * validateDisplayItemBeanMultipleCV(v, dib, inputName); //if
-     * (!StringUtil.isBlank(dib.getData().getValue())) {
-     * v.addValidation(inputName, Validator.MATCHES_INITIAL_DATA_ENTRY_VALUE,
-     * dib.getData(), true);
-     * 
-     * v.setErrorMessage(respage.getString("value_you_specified") +
-     * dib.getData().getValue() + " " +
-     * respage.getString("from_initial_data_entry")); } } /}
-     */
 
     // note that this step sets us up both for
     // displaying the data on the form again, in the event of an error
@@ -395,24 +331,6 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
             }
 
         }
-        /*
-         * for (int i=0; i<formGroups.size(); i++) { DisplayItemGroupBean
-         * displayGroup= formGroups.get(i);
-         * 
-         * List<DisplayItemBean> items = displayGroup.getItems(); String
-         * inputName = ""; for(DisplayItemBean displayItem : items){ inputName
-         * =getGroupItemInputName(displayGroup, displayGroup.getOrdinal(),
-         * displayItem); //logger.info("===found this name: "+inputName);
-         * 
-         * validateDisplayItemBean(v, displayItem, inputName); }
-         * 
-         * if (i==0&&(formGroups.size()!=digbs.size())) {
-         * v.addValidation(inputName+"group",
-         * Validator.DIFFERENT_NUMBER_OF_GROUPS_IN_DDE); //TODO internationalize
-         * this string, tbh v.setErrorMessage("You have entered a different
-         * number of groups"+ " for the item groups containing "+ inputName); }
-         * }
-         */
 
         return formGroups;
 
@@ -444,8 +362,12 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
             valueToCompare = dib.getDbData();
         }
         if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CALCULATION) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.GROUP_CALCULATION)) {
-            dib = validateDisplayItemBeanText(sv, dib, inputName);
-            if (validationCount == null || validationCount.intValue() == 0) {
+            boolean showOriginalItem = getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getDbData());
+            boolean showItem = dib.getMetadata().isShowItem();//getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getDbData());
+            if (showOriginalItem && showItem) {
+                dib = validateDisplayItemBeanText(sv, dib, inputName);
+            }
+            if (showItem && (validationCount == null || validationCount.intValue() == 0)) {
                 sv.addValidation(inputName, Validator.MATCHES_INITIAL_DATA_ENTRY_VALUE, valueToCompare, false);
                 sv.setErrorMessage(respage.getString("value_you_specified") + " " + valueToCompare.getValue() + " "
                     + respage.getString("from_initial_data_entry"));
@@ -591,60 +513,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
         if (!isSingleItem) {
             valueToCompare = dib.getDbData();
         }
-        /*
-         * if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXT) ||
-         * rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXTAREA)) {
-         * dib = validateDisplayItemBeanText(v, dib, inputName); if
-         * (validationCount == null || validationCount.intValue() == 0) {
-         * v.addValidation(inputName,
-         * Validator.MATCHES_INITIAL_DATA_ENTRY_VALUE, valueToCompare, false);
-         * v.setErrorMessage(respage.getString("value_you_specified") + " " +
-         * valueToCompare.getValue() + " " +
-         * respage.getString("from_initial_data_entry")); } } else if
-         * (rt.equals(org.akaza.openclinica.bean.core.ResponseType.RADIO) ||
-         * rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECT)) { dib
-         * = validateDisplayItemBeanSingleCV(v, dib, inputName); //
-         * ItemFormMetadataBean ifmdb = dib.getMetadata(); // ResponseSetBean
-         * rsBean = ifmdb.getResponseSet(); // logger.info("### found a response
-         * set count of "+inputName+" // "+rsBean.getOptions().size()); // TODO
-         * sees it at this end tbh 1878 if (validationCount == null ||
-         * validationCount.intValue() == 0) { v.addValidation(inputName,
-         * Validator.MATCHES_INITIAL_DATA_ENTRY_VALUE, valueToCompare, false);
-         * String errorValue = valueToCompare.getValue();
-         * 
-         * java.util.ArrayList options =
-         * dib.getMetadata().getResponseSet().getOptions();
-         * 
-         * for (int u = 0; u < options.size(); u++) { ResponseOptionBean rob =
-         * (ResponseOptionBean) options.get(u); if
-         * (rob.getValue().equals(errorValue)) { errorValue = rob.getText(); } }
-         * v.setErrorMessage(respage.getString("value_you_specified") + " " +
-         * errorValue + " " + respage.getString("from_initial_data_entry")); } }
-         * else if
-         * (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX) ||
-         * rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI))
-         * { dib = validateDisplayItemBeanMultipleCV(v, dib, inputName); if
-         * (validationCount == null || validationCount.intValue() == 0) {
-         * v.addValidation(inputName,
-         * Validator.MATCHES_INITIAL_DATA_ENTRY_VALUE, valueToCompare, true); //
-         * repeated from above, tbh 112007 String errorValue =
-         * valueToCompare.getValue(); String errorTexts = "";
-         * 
-         * java.util.ArrayList options =
-         * dib.getMetadata().getResponseSet().getOptions();
-         * 
-         * for (int u = 0; u < options.size(); u++) { ResponseOptionBean rob =
-         * (ResponseOptionBean) options.get(u); if
-         * (errorValue.contains(rob.getValue())) { errorTexts = errorTexts +
-         * rob.getText(); if (u < options.size() - 1) { // the values for
-         * multi-select are seperated by // comma errorTexts = errorTexts +
-         * ", "; } } }
-         * v.setErrorMessage(respage.getString("value_you_specified") + " " +
-         * errorTexts + " " + respage.getString("from_initial_data_entry")); } }
-         */
-        // only load form value when an item is not in a group,
-        // if in group, the value is already loaded
-        // see formGroups = loadFormValueForItemGroup(digb,digbs,formGroups);
+        
         if (isSingleItem) {
             dib = loadFormValue(dib);
         }
@@ -689,27 +558,16 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
                     // add the validation
                     if (groupOrdinalPLusItemOid.containsKey(displayItem.getItem().getOid())
                             || groupOrdinalPLusItemOid.containsKey(String.valueOf(order + 1) + displayItem.getItem().getOid())) {
-                        logger.debug("IN : " + String.valueOf(order + 1) + displayItem.getItem().getOid());
+                        System.out.println("IN : " + String.valueOf(order + 1) + displayItem.getItem().getOid());
                         validateDisplayItemBean(v, displayItem, inputName, rv, groupOrdinalPLusItemOid, true, groupOrdinalPLusItemOid.get(String.valueOf(order + 1)
                                 + displayItem.getItem().getOid()));
                     } else {
                         validateDisplayItemBean(v, displayItem, inputName, rv, groupOrdinalPLusItemOid, false, null);
                     }
                 }
-                
                 // validateDisplayItemBean(v, displayItem, inputName);
             }
 
-            /*
-             * if (validationCount == null || validationCount.intValue() == 0) {
-             * if (i == 0 && formGroups.size() != digbs.size()) {
-             * v.addValidation(inputName + "group",
-             * Validator.DIFFERENT_NUMBER_OF_GROUPS_IN_DDE); // TODO
-             * internationalize this string, tbh v .setErrorMessage("There are
-             * additional values here that were not present in the initial data
-             * entry. You have entered a different number of groups" + " for the
-             * item groups containing " + inputName); } }
-             */
         }
         return formGroups;
     }

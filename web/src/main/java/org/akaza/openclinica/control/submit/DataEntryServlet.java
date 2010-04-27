@@ -1139,7 +1139,7 @@ public abstract class DataEntryServlet extends SecureController {
                     // do smething here?
                 }
             }
-            logger.debug("errors here: " + errors.toString());
+            System.out.println("errors here: " + errors.toString());
             // <<
             if (errors.isEmpty() && shouldRunRules()) {
                 logger.debug("Errors was empty");
@@ -1185,7 +1185,7 @@ public abstract class DataEntryServlet extends SecureController {
             }
 
             if (!errors.isEmpty()) {
-                logger.debug("threw an error with data entry...");
+                System.out.println("threw an error with data entry...");
                 // copying below three lines, tbh 03/2010
                 String[] textFields = { INPUT_INTERVIEWER, INPUT_INTERVIEW_DATE };
                 fp.setCurrentStringValuesAsPreset(textFields);
@@ -2579,7 +2579,7 @@ public abstract class DataEntryServlet extends SecureController {
     }
 
     /**
-     * Peform validation on a item which has a RADIO or SINGLESELECTresponse type. This function checks that the input isn't blank, and that its value comes
+     * Peform validation on a item which has a RADIO or SINGLESELECT response type. This function checks that the input isn't blank, and that its value comes
      * from the controlled vocabulary (ResponseSetBean) in the DisplayItemBean.
      * 
      * @param v
@@ -3008,6 +3008,7 @@ public abstract class DataEntryServlet extends SecureController {
                 }
                 // is the above needed for children items too?
                 if (showItem) { // we are only showing, not hiding
+                    System.out.println("set show item " + ifmb.getItemId() + " idb " + dib.getData().getId());
                     ifmb.setShowItem(showItem);
                 }
                 // System.out.println("did not catch NPE 1");
@@ -3064,6 +3065,7 @@ public abstract class DataEntryServlet extends SecureController {
                 showItem = getItemMetadataService().isShown(metadata.getItemId(), ecb, dib.getDbData());
             }
             if (showItem) {
+                System.out.println("set show item: " + metadata.getItemId() + " data " + data.getId());
                 metadata.setShowItem(showItem);
             }
             // System.out.println("did not catch NPE");

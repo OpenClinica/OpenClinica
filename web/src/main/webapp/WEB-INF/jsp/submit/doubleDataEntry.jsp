@@ -128,12 +128,21 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 <c:if test="${! empty formMessages}">
     <!-- initial position for data entry error messages; we'll
     improve the style as well -->
-    <div id="errorMessagesContainer" class="aka_err_message">
+	<div id="errorMessagesContainer" class="aka_err_message">
         <ul>
             <c:forEach var="formMsg" items="${formMessages}">
+				<c:choose>
+				<c:when test="${hasShown}">
+				<li style="color:  #006633"><span style="text-decoration: underline"><strong>
+                    <label onclick="getFocused('<c:out value="${formMsg.key}" />');"><c:out value="${formMsg.value}" /></label>
+                </strong></span></li>
+				</c:when>
+				<c:otherwise>
                 <li style="color:  #ff0000"><span style="text-decoration: underline"><strong>
                     <label onclick="getFocused('<c:out value="${formMsg.key}" />');"><c:out value="${formMsg.value}" /></label>
                 </strong></span></li>
+				</c:otherwise>
+				</c:choose>
             </c:forEach>
         </ul>
         <!--  Use the formMessages request attribute to grab each validation
@@ -143,6 +152,17 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
        Woops, you forgot to provide a value for
        <strong><label for="formElementName">formElementName</label></strong>.<br/>-->
     </div>
+
+    <%-- <div id="errorMessagesContainer" class="aka_err_message">
+        <ul>
+            <c:forEach var="formMsg" items="${formMessages}">
+                <li style="color:  #ff0000"><span style="text-decoration: underline"><strong>
+                    <label onclick="getFocused('<c:out value="${formMsg.key}" />');"><c:out value="${formMsg.value}" /></label>
+                </strong></span></li>
+            </c:forEach>
+        </ul>
+    </div> --%>
+	<%-- tbh << 04/2010 --%>
 </c:if><%-- error messages are not null --%>
 <div id="box" class="dialog">
 <span id="mbm">
