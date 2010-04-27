@@ -109,7 +109,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         if (dynamicsMetadataBean != null) {
             return dynamicsMetadataBean.isShowItem();
         } else {
-            // System.out.println("did not find a row in the db for (with IDB) " + itemFormMetadataBean.getId() + " idb id " + itemDataBean.getId());
+            System.out.println("did not find a row in the db for (with IDB) " + itemFormMetadataBean.getId() + " idb id " + itemDataBean.getId());
             return false;
         }
         // return false;
@@ -121,7 +121,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         if (dynamicsMetadataBean != null) {
             return dynamicsMetadataBean.isShowGroup();
         } else {
-            System.out.println("didnt find a group row in the db ");
+            // System.out.println("didnt find a group row in the db ");
             return false;
         }
 
@@ -150,11 +150,11 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
     private DynamicsItemFormMetadataBean getDynamicsItemFormMetadataBean(ItemFormMetadataBean metadataBean, EventCRFBean eventCrfBean, ItemDataBean itemDataBean) {
         ItemFormMetadataBean itemFormMetadataBean = metadataBean;
         DynamicsItemFormMetadataBean dynamicsMetadataBean = null;
-        if (itemDataBean == null) {
-            dynamicsMetadataBean = getDynamicsItemFormMetadataDao().findByMetadataBean(itemFormMetadataBean, eventCrfBean);
-        } else {
-            dynamicsMetadataBean = getDynamicsItemFormMetadataDao().findByMetadataBean(itemFormMetadataBean, eventCrfBean, itemDataBean);
-        }
+        //if (itemDataBean == null) {
+          // dynamicsMetadataBean = getDynamicsItemFormMetadataDao().findByMetadataBean(itemFormMetadataBean, eventCrfBean);
+        //} else {
+        dynamicsMetadataBean = getDynamicsItemFormMetadataDao().findByMetadataBean(itemFormMetadataBean, eventCrfBean, itemDataBean);
+        //}
 
         return dynamicsMetadataBean;
 
