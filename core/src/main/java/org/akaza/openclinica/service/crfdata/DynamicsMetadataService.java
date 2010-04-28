@@ -82,6 +82,19 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         }
         // return false;
     }
+    
+    public boolean hasPassedDDE(ItemDataBean itemDataBean) {
+    	DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataDao().findByItemDataBean(itemDataBean);
+    	if (dynamicsMetadataBean == null) {
+    		return false;
+    	}
+    	if (dynamicsMetadataBean.getVersion() > 0) {
+    		return true;
+    	} else {
+    		return false;
+    	}
+    	
+    }
 
     public boolean isShown(Integer itemId, EventCRFBean eventCrfBean) {
         // do we check against the database, or just against the object? prob against the db
@@ -150,11 +163,8 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
     private DynamicsItemFormMetadataBean getDynamicsItemFormMetadataBean(ItemFormMetadataBean metadataBean, EventCRFBean eventCrfBean, ItemDataBean itemDataBean) {
         ItemFormMetadataBean itemFormMetadataBean = metadataBean;
         DynamicsItemFormMetadataBean dynamicsMetadataBean = null;
-        //if (itemDataBean == null) {
-          // dynamicsMetadataBean = getDynamicsItemFormMetadataDao().findByMetadataBean(itemFormMetadataBean, eventCrfBean);
-        //} else {
+        
         dynamicsMetadataBean = getDynamicsItemFormMetadataDao().findByMetadataBean(itemFormMetadataBean, eventCrfBean, itemDataBean);
-        //}
 
         return dynamicsMetadataBean;
 
@@ -183,6 +193,11 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         dynamicsMetadataBean.setItemDataId(itemDataBean.getId());
         dynamicsMetadataBean.setShowItem(true);
         getDynamicsItemFormMetadataDao().saveOrUpdate(dynamicsMetadataBean);
+        System.out.println("just touched ifmb id " + 
+        		metadataBean.getId() + " ecb id " + 
+        		eventCrfBean.getId() + " item id " +
+        		metadataBean.getItemId() + " itemdata id " +
+        		itemDataBean.getId());
         return true;
     }
 
@@ -671,7 +686,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                                 eventCrfBeanB, ub, Integer.valueOf(itemGroupAOrdinal));
                     itemDataBeans.add(oidBasedItemData);
                 }
-
+                System.out.println("** found item data beans: " + itemDataBeans.toString());
                 for (ItemDataBean oidBasedItemData : itemDataBeans) {
                     ItemFormMetadataBean itemFormMetadataBean =
                         getItemFormMetadataDAO().findByItemIdAndCRFVersionId(itemBeanB.getId(), eventCrfBeanB.getCRFVersionId());
@@ -681,6 +696,10 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                     } else if (dynamicsMetadataBean != null && !dynamicsMetadataBean.isShowItem()) {
                         dynamicsMetadataBean.setShowItem(true);
                         getDynamicsItemFormMetadataDao().saveOrUpdate(dynamicsMetadataBean);
+                    } else {
+                    	// if we get there, it means that we've hit DDE and the bean exists
+                    	dynamicsMetadataBean.setVersion(1);// version 1 = passed DDE
+                    	getDynamicsItemFormMetadataDao().saveOrUpdate(dynamicsMetadataBean);
                     }
                 }
 
@@ -720,7 +739,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
             if (itemGroup != null) {
                 ItemBean item = getItemDAO().findItemByGroupIdandItemOid(itemGroup.getId(), theOid[1].trim());
                 if (item != null) {
-                    System.out.println("returning two non nulls");
+                    // System.out.println("returning two non nulls");
                     return new ItemOrItemGroupHolder(item, itemGroup);
                 }
             }
@@ -728,14 +747,14 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         if (theOid.length == 1) {
             ItemGroupBean itemGroup = getItemGroupDAO().findByOid(oid.trim());
             if (itemGroup != null) {
-                System.out.println("returning item group not null");
+                // System.out.println("returning item group not null");
                 return new ItemOrItemGroupHolder(null, itemGroup);
             }
 
             List<ItemBean> items = getItemDAO().findByOid(oid.trim());
             ItemBean item = items.size() > 0 ? items.get(0) : null;
             if (item != null) {
-                System.out.println("returning item not null");
+                // System.out.println("returning item not null");
                 return new ItemOrItemGroupHolder(item, null);
             }
         }
