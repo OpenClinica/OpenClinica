@@ -19,7 +19,9 @@
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
-
+    <listener>
+        <listener-class>org.akaza.openclinica.control.OCSessionListener</listener-class>
+    </listener>
    <filter>
         <filter-name>springSecurityFilterChain</filter-name>
         <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
@@ -126,7 +128,13 @@
         <description>AuditDatabaseServlet</description>
         <servlet-class>org.akaza.openclinica.control.admin.AuditDatabaseServlet</servlet-class>
     </servlet>
-    
+
+    <servlet>
+        <servlet-name>CheckCRFLocked</servlet-name>
+        <description>CheckCRFLocked</description>
+        <servlet-class>org.akaza.openclinica.control.submit.CheckCRFLocked</servlet-class>
+    </servlet>
+
     <servlet>
         <servlet-name>ConfigureServlet</servlet-name>
         <description>ConfigureServlet</description>
@@ -1773,6 +1781,10 @@
     <servlet-mapping>
         <servlet-name>ChangeDefinitionCRFOrdinalServlet</servlet-name>
         <url-pattern>/ChangeDefinitionCRFOrdinal</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CheckCRFLocked</servlet-name>
+        <url-pattern>/CheckCRFLocked</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AdministrativeEditingServlet</servlet-name>

@@ -47,7 +47,7 @@
     <!-- End -->
 
 </head>
-<body class="aka_bodywidth" onload="alert('onload')">
+<body class="aka_bodywidth" onload="alert('onload')" onunload="javascript:clsWin();">
 <%-- onload="if(! detectFirefoxWindows(navigator.userAgent)){document.getElementById('centralContainer').style.display='none';new Effect.Appear('centralContainer', {duration:1});}"
 giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%>
 <div id="centralContainer" style=
@@ -194,7 +194,6 @@ giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%>
 <td align="right" style="padding-left: 12px" id="TabsBackDis">
     <img src="images/arrow_back_dis.gif" border="0"/></td>
 
-
 <script type="text/JavaScript" language="JavaScript">
 <!--
 
@@ -288,6 +287,28 @@ function gotoLink() {
         window.location = document.crfForm.sectionName.options[OptionIndex].value;
     }
 }
+var closing = true;
+function clsWin() {
+	if(closing) {
+        jQuery.post("CheckCRFLocked?userName=<c:out value="${userBean.name}"/>", function(data){
+            return;
+        });
+	}
+}
+
+    jQuery(document).ready(function(){
+       jQuery("a").click(function(event){
+           closing = false;
+       });
+       jQuery("input").click(function(event){
+           closing = false;
+       });
+       jQuery("select").click(function(event){
+           closing = false;
+        });
+
+     });
+
 
 function pageWidth() {return window.innerWidth != null? window.innerWidth: document.documentElement && document.documentElement.clientWidth ? document.documentElement.clientWidth:document.body != null? document.body.clientWidth:null;}
 function pageHeight() {return window.innerHeight != null? window.innerHeight: document.documentElement && document.documentElement.clientHeight ? document.documentElement.clientHeight:document.body != null? document.body.clientHeight:null;}
@@ -302,6 +323,7 @@ function sm(obl, chkbox, wd, ht){if(chkbox.checked==false){checkboxObject=chkbox
 function hm(){var v='visible';var n='none';$('ol').style.display=n;$('mbox').style.display=n;inf(v);document.onkeypress=''}
 function initmb(){var ab='absolute';var n='none';var obody=document.getElementsByTagName('body')[0];var frag=document.createDocumentFragment();var obol=document.createElement('div');obol.setAttribute('id','ol');obol.style.display=n;obol.style.position=ab;obol.style.top=0;obol.style.left=0;obol.style.zIndex=998;obol.style.width='100%';frag.appendChild(obol);var obbx=document.createElement('div');obbx.setAttribute('id','mbox');obbx.style.display=n;obbx.style.position=ab;obbx.style.zIndex=999;var obl=document.createElement('span');obbx.appendChild(obl);var obbxd=document.createElement('div');obbxd.setAttribute('id','mbd');obl.appendChild(obbxd);frag.insertBefore(obbx,obol.nextSibling);obody.insertBefore(frag,obody.firstChild);
     window.onscroll = scrollFix; window.onresize = sizeFix;
+//    closing = true;
 }
 window.onload = initmb;
 
@@ -331,7 +353,7 @@ window.onload = initmb;
 <script type="text/javascript" language="JavaScript">
     <!--
     function checkSectionStatus() {
-
+        closing = false;
         objImage=document.getElementById('status_top');
     //alert(objImage.src);
         if (objImage != null && objImage.src.indexOf('images/icon_UnsavedData.gif')>0) {
@@ -343,6 +365,7 @@ window.onload = initmb;
 
 
     function checkEntryStatus(strImageName) {
+        closing = false;        
         objImage = MM_findObj(strImageName);
     //alert(objImage.src);
         if (objImage != null && objImage.src.indexOf('images/icon_UnsavedData.gif')>0) {

@@ -25,6 +25,28 @@
     </c:otherwise>
 </c:choose>
 
+<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" language="javascript">
+    function checkCRFLocked(ecId, url){
+        jQuery.post("CheckCRFLocked?ecId="+ ecId + "&ran="+Math.random(), function(data){
+            if(data == 'true'){
+                window.location = url;
+            }else{
+                alert(data);return false;
+            }
+        });
+    }
+    function checkCRFLockedInitial(ecId, formName){
+        if(ecId==0) {formName.submit(); return;} 
+        jQuery.post("CheckCRFLocked?ecId="+ ecId + "&ran="+Math.random(), function(data){
+            if(data == 'true'){
+                formName.submit();
+            }else{
+                alert(data);
+            }
+        });
+    }
+</script>
 
 <!-- move the alert message to the sidebar-->
 <jsp:include page="../include/sideAlert.jsp"/>

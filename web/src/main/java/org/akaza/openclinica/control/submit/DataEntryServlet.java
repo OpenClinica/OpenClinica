@@ -279,23 +279,20 @@ public abstract class DataEntryServlet extends SecureController {
 
         locale = request.getLocale();
         
-        //Adding the Event CRF with the user into the Locked CRF list
-
-        
         FormDiscrepancyNotes discNotes;
 
         panel.setStudyInfoShown(false);
         String age = "";
-        if(fp.getString(GO_EXIT).equals("")){
+        if(fp.getString(GO_EXIT).equals("") && !isSubmitted && fp.getString("tabId").equals("") && fp.getString("sectionId").equals("")){
             if(unavailableCRFList.containsKey(ecb.getId())){
-                UserAccountBean user = (UserAccountBean)unavailableCRFList.get(ecb.getId());
-                if(user.getId()!=ub.getId()){
-                    throw new InconsistentStateException(Page.LIST_STUDY_SUBJECTS_SERVLET, resword.getString("CRF_unavailable") +" "+user.getName()
+                String userName = (String)unavailableCRFList.get(ecb.getId());
+                addPageMessage(resword.getString("CRF_unavailable") +" "+ userName
                             + " "+ resword.getString("Currently_entering_data")
-                            + " "+resword.getString("Leave_the_CRF"));
-                }
+                            + " "+ resword.getString("Leave_the_CRF"));
+
+                    forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
             }else{
-                unavailableCRFList.put(ecb.getId(), ub);
+                unavailableCRFList.put(ecb.getId(), ub.getName());
             }
         }
 
@@ -1949,43 +1946,48 @@ public abstract class DataEntryServlet extends SecureController {
 
         ecb = new EventCRFBean();
         if (eventCRFId == 0) {// no event CRF created yet
-            ecb.setAnnotations("");
-            ecb.setCreatedDate(new Date());
-            ecb.setCRFVersionId(crfVersionId);
+            ArrayList ecList = ecdao.findByEventSubjectVersion(sEvent, ssb, (CRFVersionBean)eb);
+            if(ecList.size() > 0){
+                ecb = (EventCRFBean)ecList.get(0);
+            }else{
+                ecb.setAnnotations("");
+                ecb.setCreatedDate(new Date());
+                ecb.setCRFVersionId(crfVersionId);
 
-            if (currentStudy.getStudyParameterConfig().getInterviewerNameDefault().equals("blank")) {
-                ecb.setInterviewerName("");
-            } else {
-                // default will be event's owner name
-                ecb.setInterviewerName(sEvent.getOwner().getName());
-
-            }
-            if (!currentStudy.getStudyParameterConfig().getInterviewDateDefault().equals("blank")) {
-                if (sEvent.getDateStarted() != null) {
-                    ecb.setDateInterviewed(sEvent.getDateStarted());// default
-                    // date
+                if (currentStudy.getStudyParameterConfig().getInterviewerNameDefault().equals("blank")) {
+                    ecb.setInterviewerName("");
                 } else {
-                    // logger.info("evnet start date is null, so date
-                    // interviewed is null");
-                    ecb.setDateInterviewed(null);
-                }
-            } else {
-                ecb.setDateInterviewed(null);
-                // logger.info("date interviewed is
-                // null,getInterviewDateDefault() is blank");
-            }
-            // ecb.setOwnerId(ub.getId());
-            // above depreciated, try without it, tbh
-            ecb.setOwner(ub);
-            ecb.setStatus(Status.AVAILABLE);
-            ecb.setCompletionStatusId(1);
-            ecb.setStudySubjectId(ssb.getId());
-            ecb.setStudyEventId(studyEventId);
-            ecb.setValidateString("");
-            ecb.setValidatorAnnotations("");
+                    // default will be event's owner name
+                    ecb.setInterviewerName(sEvent.getOwner().getName());
 
-            ecb = (EventCRFBean) ecdao.create(ecb);
-            logger.debug("*********CREATED EVENT CRF");
+                }
+                if (!currentStudy.getStudyParameterConfig().getInterviewDateDefault().equals("blank")) {
+                    if (sEvent.getDateStarted() != null) {
+                        ecb.setDateInterviewed(sEvent.getDateStarted());// default
+                        // date
+                    } else {
+                        // logger.info("evnet start date is null, so date
+                        // interviewed is null");
+                        ecb.setDateInterviewed(null);
+                    }
+                } else {
+                    ecb.setDateInterviewed(null);
+                    // logger.info("date interviewed is
+                    // null,getInterviewDateDefault() is blank");
+                }
+                // ecb.setOwnerId(ub.getId());
+                // above depreciated, try without it, tbh
+                ecb.setOwner(ub);
+                ecb.setStatus(Status.AVAILABLE);
+                ecb.setCompletionStatusId(1);
+                ecb.setStudySubjectId(ssb.getId());
+                ecb.setStudyEventId(studyEventId);
+                ecb.setValidateString("");
+                ecb.setValidatorAnnotations("");
+
+                ecb = (EventCRFBean) ecdao.create(ecb);
+                logger.debug("*********CREATED EVENT CRF");
+            }
         } else {
             // there is an event CRF already, only need to update
             ecb = (EventCRFBean) ecdao.findByPK(eventCRFId);

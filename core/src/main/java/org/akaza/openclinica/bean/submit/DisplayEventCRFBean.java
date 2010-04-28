@@ -40,7 +40,6 @@ public class DisplayEventCRFBean implements Comparable {
     private boolean continueDoubleDataEntryPermitted = false;
     private boolean performAdministrativeEditingPermitted = false;
     private boolean locked = false;
-    private UserAccountBean lockedBy;
     /**
      * Does the user have to wait twelve hours before starting double data
      * entry?
@@ -125,13 +124,6 @@ public class DisplayEventCRFBean implements Comparable {
      */
     public boolean isLocked() {
         return locked;
-    }
-
-    public UserAccountBean getLockedBy(){
-        return lockedBy;
-    }
-    public void setLockedBy(UserAccountBean lockedBy){
-        this.lockedBy = lockedBy;
     }
 
     /**

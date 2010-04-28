@@ -110,7 +110,7 @@ public class OpenClinicaAuthenticationProcessingFilter extends AbstractProcessin
             auditUserLogin(username, LoginStatus.SUCCESSFUL_LOGIN, userAccountBean);
             resetLockCounter(username, LoginStatus.SUCCESSFUL_LOGIN, userAccountBean);
             //To remove the locking of Event CRFs previusly locked by this user. 
-            SecureController.removeLockedCRF(userAccountBean);
+            SecureController.removeLockedCRF(userAccountBean.getName());
         } catch (LockedException le) {
             auditUserLogin(username, LoginStatus.FAILED_LOGIN_LOCKED, userAccountBean);
             throw le;

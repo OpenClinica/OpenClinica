@@ -810,20 +810,12 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     }
 
-    public static UserAccountBean checkCRFLocked(EventCRFBean ecb){
-        UserAccountBean newUser;
-        if(unavailableCRFList.containsKey(ecb.getId())){
-            newUser = (UserAccountBean)unavailableCRFList.get(ecb.getId());
-            return newUser;
-        }
-        return null;
-    }
 
-    public static void removeLockedCRF(UserAccountBean user){
+    public static void removeLockedCRF(String userName){
         for (Iterator iter = unavailableCRFList.entrySet().iterator(); iter.hasNext();) {
             java.util.Map.Entry entry = (java.util.Map.Entry) iter.next();
-            UserAccountBean userAccountBean = (UserAccountBean)entry.getValue();
-            if(userAccountBean.getId()==user.getId())unavailableCRFList.remove(entry.getKey());
+            String user = (String)entry.getValue();
+            if(user.equalsIgnoreCase(userName))unavailableCRFList.remove(entry.getKey());
         }
     }
 

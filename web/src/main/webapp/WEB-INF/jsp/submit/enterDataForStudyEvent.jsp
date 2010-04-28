@@ -11,6 +11,29 @@
 
 <jsp:include page="../include/submit-header.jsp"/>
 
+<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" language="javascript">
+    function checkCRFLocked(ecId, url){
+        jQuery.post("CheckCRFLocked?ecId="+ ecId + "&ran="+Math.random(), function(data){
+            if(data == 'true'){
+                window.location = url;
+            }else{
+                alert(data);
+            }
+        });
+    }
+    function checkCRFLockedInitial(ecId, formName){
+        if(ecId==0) {formName.submit(); return;} 
+        jQuery.post("CheckCRFLocked?ecId="+ ecId + "&ran="+Math.random(), function(data){
+            if(data == 'true'){
+                formName.submit();
+            }else{
+                alert(data);
+            }
+        });
+    }
+</script>
+
 
 <!-- move the alert message to the sidebar-->
 <jsp:include page="../include/sideAlert.jsp"/>
@@ -238,7 +261,7 @@
     <%-- nothing for right now --%>&nbsp;
 </c:when>
 <c:otherwise>
-<c:set var="getQuery" value="action=ide_s&eventDefinitionCRFId=${dedc.edc.id}&studyEventId=${studyEvent.id}&subjectId=${studySubject.subjectId}&eventCRFId=${dedc.eventCRF.id}" />
+<c:set var="getQuery" value="action=ide_s&eventDefinitionCRFId=${dedc.edc.id}&studyEventId=${studyEvent.id}&subjectId=${studySubject.subjectId}&eventCRFId=${dedc.eventCRF.id}&exitTo=EnterDataForStudyEvent?eventId=${eventId}" />
 <tr valign="top">
 <td class="table_cell_left"><c:out value="${dedc.edc.crf.name}" /></td>
     <%--
@@ -364,10 +387,10 @@
 
                 <c:when test="${studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && study.status.available && !studyEvent.status.deleted}">
                     <td class="table_cell">
-                        <a href="#" onclick="javascript:document.startForm<c:out value="${dedc.edc.crf.id}"/>.submit();"
+                        <a href="#" onclick="checkCRFLockedInitial('<c:out value="${dedc.eventCRF.id}"/>',document.startForm<c:out value="${dedc.edc.crf.id}"/>);"
                            onMouseDown="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData_d.gif');"
-                           onMouseUp="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData.gif');"
-                          ><img name="bt_EnterData<c:out value="${rowCount}"/>" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="enter_data" bundle="${resword}"/>" title="<fmt:message key="enter_data" bundle="${resword}"/>" align="left" hspace="2"></a>&nbsp;
+                           onMouseUp="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData.gif');">
+                           <img name="bt_EnterData<c:out value="${rowCount}"/>" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="enter_data" bundle="${resword}"/>" title="<fmt:message key="enter_data" bundle="${resword}"/>" align="left" hspace="2"></a>&nbsp;
                     </td>
                 </c:when>
 
@@ -511,31 +534,31 @@
         <c:otherwise>
             <c:if test="${studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed'}">
                 <c:if test="${dec.continueInitialDataEntryPermitted}">
-                <a href="<c:out value="${actionQuery}"/>"
+                <a href="#"
                     onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
                     onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');"
-                    <c:if test="${dec.lockedBy!=null}">onclick="return lockedCRFAlert('<c:out value="${dec.lockedBy.name}"/>');"</c:if>>
+                    onclick="checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
                     <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="continue_entering_data" bundle="${resword}"/>" title="<fmt:message key="continue_entering_data" bundle="${resword}"/>" align="left" hspace="6"></a>
                 </c:if>
                 <c:if test="${dec.startDoubleDataEntryPermitted}">
-                    <a href="<c:out value="${actionQuery}"/>&<c:out value="${getQuery}"/>"
+                    <a href="#"
                     onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
                     onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');"
-                    <c:if test="${dec.lockedBy!=null}">onclick="return lockedCRFAlert('<c:out value="${dec.lockedBy.name}"/>');"</c:if>>
+                    onclick="checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>&<c:out value="${getQuery}"/>');">
                     <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="begin_double_data_entry" bundle="${resword}"/>" title="<fmt:message key="begin_double_data_entry" bundle="${resword}"/>" align="left" hspace="6"></a>
                 </c:if>
                 <c:if test="${dec.continueDoubleDataEntryPermitted}">
-                  <a href="<c:out value="${actionQuery}"/>&<c:out value="${getQuery}"/>"
+                  <a href="#"
                     onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
                     onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');"
-                    <c:if test="${dec.lockedBy!=null}">onclick="return lockedCRFAlert('<c:out value="${dec.lockedBy.name}"/>');"</c:if>>
+                    onclick="checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>&<c:out value="${getQuery}"/>');">
                     <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="continue_entering_data" bundle="${resword}"/>" title="<fmt:message key="continue_entering_data" bundle="${resword}"/>" align="left" hspace="6"></a>
                 </c:if>
                 <c:if test="${dec.performAdministrativeEditingPermitted}">
-                 <a href="<c:out value="${actionQuery}"/>&<c:out value="${getQuery}"/>"
+                 <a href="#"
                     onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
                     onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');"
-                    <c:if test="${dec.lockedBy!=null}">onclick="return lockedCRFAlert('<c:out value="${dec.lockedBy.name}"/>');"</c:if>>
+                    onclick="checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>&<c:out value="${getQuery}"/>');">
                     <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="administrative_editing" bundle="${resword}"/>" title="<fmt:message key="administrative_editing" bundle="${resword}"/>" align="left" hspace="6">
                     </a>
                 </c:if>

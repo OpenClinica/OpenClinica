@@ -12,6 +12,7 @@
 <c:set var="interviewer" value="${toc.eventCRF.interviewerName}" />
 <c:set var="interviewDate" value="${toc.eventCRF.dateInterviewed}" />
 <c:set var="itemId" value="${displayItem.item.id}" />
+<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
 <%--<c:set var="inputVal" value="input${itemId}" />--%>
 
 <%--<c:set var="hasNameNote" value="${param.hasNameNote}"/>

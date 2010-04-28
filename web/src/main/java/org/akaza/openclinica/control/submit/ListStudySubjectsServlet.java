@@ -71,6 +71,7 @@ public class ListStudySubjectsServlet extends SecureController {
 
     @Override
     protected void processRequest() throws Exception {
+        removeLockedCRF(ub.getName());
         FormProcessor fp = new FormProcessor(request);
         if(fp.getString("showMoreLink").equals("")){
             showMoreLink = true;
