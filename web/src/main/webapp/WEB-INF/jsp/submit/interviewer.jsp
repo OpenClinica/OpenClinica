@@ -13,6 +13,30 @@
 <c:set var="interviewDate" value="${toc.eventCRF.dateInterviewed}" />
 <c:set var="itemId" value="${displayItem.item.id}" />
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" language="javascript">
+    //If someone closes the browser on data entry stage, the following request should be
+    //sent to the server to make this CRF available for data entry.
+var closing = true;
+    function clsWin() {
+        if(closing) {
+            jQuery.post("CheckCRFLocked?userName=<c:out value="${userBean.name}"/>", function(data){
+                return;
+            });
+        }
+    }
+    jQuery(document).ready(function(){
+       jQuery("a").click(function(event){
+           closing = false;
+       });
+       jQuery("input").click(function(event){
+           closing = false;
+       });
+       jQuery("select").click(function(event){
+           closing = false;
+        });
+     });
+</script>
+
 <%--<c:set var="inputVal" value="input${itemId}" />--%>
 
 <%--<c:set var="hasNameNote" value="${param.hasNameNote}"/>

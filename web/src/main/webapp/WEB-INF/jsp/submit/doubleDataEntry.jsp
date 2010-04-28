@@ -47,7 +47,7 @@
     <script type="text/JavaScript" language="JavaScript" src="includes/effects.js"></script>
 
 </head>
-<body class="aka_bodywidth">
+<body class="aka_bodywidth" onunload="javascript:clsWin();">
 <%-- BWP:  onload=
   "if(! detectFirefoxWindows(navigator.userAgent)){document.getElementById('centralContainer').style.display='none';new Effect.Appear('centralContainer', {duration:1});} TabsForwardByNum(<c:out value="${tabId}"/>);"
   alert(self.screen.availWidth);

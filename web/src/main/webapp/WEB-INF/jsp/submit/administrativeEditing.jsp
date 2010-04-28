@@ -43,7 +43,7 @@
 </head>
 <body class="aka_bodywidth" onload="
         <c:if test='${popUpURL != ""}'>
-        openDNoteWindow('<c:out value="${popUpURL}" />');</c:if>">
+        openDNoteWindow('<c:out value="${popUpURL}" />');</c:if>" onunload="javascript:clsWin();">
 
 <%-- BWP:
  onload=

@@ -287,28 +287,6 @@ function gotoLink() {
         window.location = document.crfForm.sectionName.options[OptionIndex].value;
     }
 }
-var closing = true;
-function clsWin() {
-	if(closing) {
-        jQuery.post("CheckCRFLocked?userName=<c:out value="${userBean.name}"/>", function(data){
-            return;
-        });
-	}
-}
-
-    jQuery(document).ready(function(){
-       jQuery("a").click(function(event){
-           closing = false;
-       });
-       jQuery("input").click(function(event){
-           closing = false;
-       });
-       jQuery("select").click(function(event){
-           closing = false;
-        });
-
-     });
-
 
 function pageWidth() {return window.innerWidth != null? window.innerWidth: document.documentElement && document.documentElement.clientWidth ? document.documentElement.clientWidth:document.body != null? document.body.clientWidth:null;}
 function pageHeight() {return window.innerHeight != null? window.innerHeight: document.documentElement && document.documentElement.clientHeight ? document.documentElement.clientHeight:document.body != null? document.body.clientHeight:null;}
