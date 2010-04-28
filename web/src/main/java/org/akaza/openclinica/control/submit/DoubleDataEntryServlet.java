@@ -205,13 +205,16 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
         if (!isSingleItem) {
             valueToCompare = dib.getDbData();
         }
-        boolean showOriginalItem = getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getData());
-        boolean showItem = dib.getMetadata().isShowItem();//getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getDbData());
+        boolean showOriginalItem = getItemMetadataService().isShown(dib.getItem().getId(), ecb, valueToCompare);// was dib.getData()
+        boolean showItem = dib.getMetadata().isShowItem();
+        boolean showDuplicateItem = getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getDbData());// where is the set db data? 
         System.out.println("*** show original item has value " + dib.getData().getValue() + " and show item has value " + dib.getDbData().getValue());
-        if (showOriginalItem && showItem) {
+        if ((showOriginalItem && showDuplicateItem) || showItem) {
+        	// it should either be shown already, OR shown in the database?
             if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXT) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXTAREA)) {
                 dib = validateDisplayItemBeanText(v, dib, inputName);
-                if (showItem && (validationCount == null || validationCount.intValue() == 0)) {
+                // necessary?
+                if (((showOriginalItem && showDuplicateItem) || showItem) && (validationCount == null || validationCount.intValue() == 0)) {
                     v.addValidation(inputName, Validator.MATCHES_INITIAL_DATA_ENTRY_VALUE, valueToCompare, false);
                     v.setErrorMessage(respage.getString("value_you_specified") + " " + valueToCompare.getValue() + " "
                             + respage.getString("from_initial_data_entry"));
@@ -225,7 +228,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
                 // logger.info("### found a response set count of "+inputName+"
                 // "+rsBean.getOptions().size());
                 // TODO sees it at this end tbh 1878
-                if (showItem && (validationCount == null || validationCount.intValue() == 0)) {
+                if (((showOriginalItem && showDuplicateItem) || showItem) && (validationCount == null || validationCount.intValue() == 0)) {
                     v.addValidation(inputName, Validator.MATCHES_INITIAL_DATA_ENTRY_VALUE, valueToCompare, false);
                     String errorValue = valueToCompare.getValue();
 
@@ -241,7 +244,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
                 }
             } else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)) {
                 dib = validateDisplayItemBeanMultipleCV(v, dib, inputName);
-                if (showItem && (validationCount == null || validationCount.intValue() == 0)) {
+                if (((showOriginalItem && showDuplicateItem) || showItem) && (validationCount == null || validationCount.intValue() == 0)) {
                     v.addValidation(inputName, Validator.MATCHES_INITIAL_DATA_ENTRY_VALUE, valueToCompare, true);
                     // repeated from above, tbh 112007
                     String errorValue = valueToCompare.getValue();
@@ -362,12 +365,13 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
             valueToCompare = dib.getDbData();
         }
         if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CALCULATION) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.GROUP_CALCULATION)) {
-            boolean showOriginalItem = getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getDbData());
-            boolean showItem = dib.getMetadata().isShowItem();//getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getDbData());
-            if (showOriginalItem && showItem) {
+            boolean showOriginalItem = getItemMetadataService().isShown(dib.getItem().getId(), ecb, valueToCompare);
+            boolean showItem = dib.getMetadata().isShowItem();
+            boolean showDuplicateItem = getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getDbData());
+            if ((showOriginalItem && showDuplicateItem) || showItem) {
                 dib = validateDisplayItemBeanText(sv, dib, inputName);
             }
-            if (showItem && (validationCount == null || validationCount.intValue() == 0)) {
+            if (((showOriginalItem && showDuplicateItem) || showItem) && (validationCount == null || validationCount.intValue() == 0)) {
                 sv.addValidation(inputName, Validator.MATCHES_INITIAL_DATA_ENTRY_VALUE, valueToCompare, false);
                 sv.setErrorMessage(respage.getString("value_you_specified") + " " + valueToCompare.getValue() + " "
                     + respage.getString("from_initial_data_entry"));

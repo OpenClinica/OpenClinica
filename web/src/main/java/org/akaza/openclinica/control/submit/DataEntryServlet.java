@@ -697,8 +697,13 @@ public abstract class DataEntryServlet extends SecureController {
 
                 }
             }
-
-            HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid = runRules(allItems, ruleSets, true, shouldRunRules(), MessageType.ERROR);
+            Phase phase2 = Phase.INITIAL_DATA_ENTRY;
+            if (getServletPage().equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
+            	phase2 = Phase.DOUBLE_DATA_ENTRY;
+            } else if (getServletPage().equals(Page.ADMIN_EDIT_SERVLET)) {
+            	phase2 = Phase.ADMIN_EDITING;
+            }
+            HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid = runRules(allItems, ruleSets, true, shouldRunRules(), MessageType.ERROR, phase2);
             // System.out.println("first run of rules : " + groupOrdinalPLusItemOid.toString());
             for (int i = 0; i < allItems.size(); i++) {
                 DisplayItemWithGroupBean diwg = allItems.get(i);
@@ -1443,7 +1448,11 @@ public abstract class DataEntryServlet extends SecureController {
                         }
                     }
                 }
-                HashMap<String, ArrayList<String>> rulesPostDryRun = runRules(allItems, ruleSets, false, shouldRunRules(), MessageType.WARNING);
+                phase2 = Phase.INITIAL_DATA_ENTRY;
+                if (getServletPage().equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
+                	phase2 = Phase.DOUBLE_DATA_ENTRY;
+                }
+                HashMap<String, ArrayList<String>> rulesPostDryRun = runRules(allItems, ruleSets, false, shouldRunRules(), MessageType.WARNING, phase2);
                 System.out.println("found rules post dry run: " + rulesPostDryRun.toString());
                 HashMap<String, ArrayList<String>> errorsPostDryRun = new HashMap<String, ArrayList<String>>();
                 // additional step needed, run rules and see if any items are 'shown' AFTER saving data
@@ -1466,13 +1475,17 @@ public abstract class DataEntryServlet extends SecureController {
                         for (DisplayItemBean displayItemBean : displayItems) {
                             ItemBean itemBean = displayItemBean.getItem();
                             if (newFieldName.equals(itemBean.getOid())) {
+                            	boolean passedDDE = getItemMetadataService().hasPassedDDE(displayItemBean.getData());
+                            	System.out.println("found passed dde: " + passedDDE);
                                 if (!displayItemBean.getMetadata().isShowItem()) {
                                     inSameSection = true;
                                     System.out.println("found item " + this.getInputName(displayItemBean) + " vs. " + fieldName);
                                     // if is repeating, use the other input name
                                     errorsPostDryRun.put(this.getInputName(displayItemBean), rulesPostDryRun.get(fieldName));
                                     displayItemBean.getMetadata().setShowItem(true);
-                                }
+                                } // else if (passedDDE) {
+                                	// displayItemBean.getMetadata().setShowItem(true);
+                                // }
                                 // break;
                             }
                         }
@@ -2418,9 +2431,9 @@ public abstract class DataEntryServlet extends SecureController {
             if (!metadataBean.isShowGroup()) {
                 // set isShown here, tbh 04/2010
                 boolean showGroup = getItemMetadataService().isGroupShown(metadataBean.getId(), ecb);
-                System.out.println("found show group for group meta bean " + metadataBean.getId() + ": " + 
-                        metadataBean.getItemGroupId() + 
-                        ": " + ecb.getId() + ": " + showGroup);
+                // System.out.println("found show group for group meta bean " + metadataBean.getId() + ": " + 
+                //        metadataBean.getItemGroupId() + 
+                //        ": " + ecb.getId() + ": " + showGroup);
 
                 metadataBean.setShowGroup(showGroup);
                 // what about the items which should be shown?
@@ -3009,9 +3022,14 @@ public abstract class DataEntryServlet extends SecureController {
                     showItem = getItemMetadataService().isShown(ifmb.getItemId(), ecb, dib.getDbData());
                 }
                 // is the above needed for children items too?
-                if (showItem) { // we are only showing, not hiding
-                    System.out.println("set show item " + ifmb.getItemId() + " idb " + dib.getData().getId());
-                    ifmb.setShowItem(showItem);
+                boolean passedDDE = getItemMetadataService().hasPassedDDE(dib.getData());
+                if (showItem || passedDDE) { // we are only showing, not hiding
+                    System.out.println("set show item " + ifmb.getItemId() + 
+                    		" idb " + dib.getData().getId() +
+                    		" show item " + showItem +
+                    		" passed dde " + passedDDE);
+                    // ifmb.setShowItem(showItem);
+                    ifmb.setShowItem(true);
                 }
                 // System.out.println("did not catch NPE 1");
                 dib.setMetadata(ifmb);
@@ -3066,9 +3084,11 @@ public abstract class DataEntryServlet extends SecureController {
             } else {
                 showItem = getItemMetadataService().isShown(metadata.getItemId(), ecb, dib.getDbData());
             }
-            if (showItem) {
+            boolean passedDDE = getItemMetadataService().hasPassedDDE(data);
+            if (showItem || passedDDE) {
                 System.out.println("set show item: " + metadata.getItemId() + " data " + data.getId());
-                metadata.setShowItem(showItem);
+                // metadata.setShowItem(showItem);
+                metadata.setShowItem(true);
             }
             // System.out.println("did not catch NPE");
 
@@ -4156,7 +4176,7 @@ public abstract class DataEntryServlet extends SecureController {
     }
 
     private HashMap<String, ArrayList<String>> runRules(List<DisplayItemWithGroupBean> allItems, List<RuleSetBean> ruleSets, Boolean dryRun,
-            Boolean shouldRunRules, MessageType mt) {
+            Boolean shouldRunRules, MessageType mt, Phase phase) {
         if (shouldRunRules) {
             Container c = new Container();
             c = populateRuleSpecificHashMaps(allItems, c, dryRun);
@@ -4165,7 +4185,7 @@ public abstract class DataEntryServlet extends SecureController {
             // return getRuleSetService().runRules(ruleSets, dryRun,
             // currentStudy, c.variableAndValue, ub);
             System.out.println("running rules ... rule sets size is " + ruleSets.size());
-            return getRuleSetService().runRulesInDataEntry(ruleSets, dryRun, currentStudy, ub, c.variableAndValue, Phase.INITIAL_DATA_ENTRY).getByMessageType(
+            return getRuleSetService().runRulesInDataEntry(ruleSets, dryRun, currentStudy, ub, c.variableAndValue, phase).getByMessageType(
                     mt);
         } else {
             return new HashMap<String, ArrayList<String>>();
