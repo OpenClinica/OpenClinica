@@ -12,14 +12,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -233,7 +226,14 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                     if (!GroupCheck.containsKey("Ungrouped")) {
                         queries.add(defaultSql);
                     }
-
+                    //Adding itemnames for further use
+                    HashMap itemNames = new HashMap();
+                    for (int k = 1; k < numRows; k++) {
+                        HSSFCell cell = sheet.getRow(k).getCell((short) 0);
+                        String itemName = getValue(cell);
+                        itemName = itemName.replaceAll("<[^>]*>", "");
+                        itemNames.put(k, itemName);
+                    }
                     for (int k = 1; k < numRows; k++) {
                         // logger.info("hit row "+k);
                         if (blankRowCount == 5) {
@@ -384,10 +384,17 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                         cell = sheet.getRow(k).getCell((short) 8);
                         String parentItem = getValue(cell);
                         parentItem = parentItem.replaceAll("<[^>]*>", "");
+                        // Checking for a valid paren item name
+                        if(!StringUtil.isBlank(parentItem)){
+                            if(!itemNames.containsValue(parentItem)){
+                                errors.add("the Parent item specified on row "+k+" does not exist in the CRF template. Please update the value. ");
+                            }
+                        }
                         // BWP>>Prevent parent names that equal the Item names
                         if (itemName != null && itemName.equalsIgnoreCase(parentItem)) {
                             parentItem = "";
                         }
+
 
                         cell = sheet.getRow(k).getCell((short) 9);
                         int columnNum = 0;
@@ -1596,6 +1603,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
         return buf.toString();
     }
 
+   
     private String getMUInsertSql(String oid, String measurementUnitName, int ownerId, String dbName) {
         return "insert into measurement_unit (oc_oid, name) values ('" + oid + "', '" + stripQuotes(measurementUnitName) + "')";
     }

@@ -237,6 +237,15 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                     Map labelWithType = new HashMap<String, String>();
                     logger.debug("row20 is: " + getValue(sheet.getRow(0).getCell((short) 20)));
                     boolean hasWDColumn = "width_decimal".equalsIgnoreCase(getValue(sheet.getRow(0).getCell((short) 20))) ? true : false;
+                    //Adding itemnames for further use
+                    HashMap itemNames = new HashMap();
+                    for (int k = 1; k < numRows; k++) {
+                        HSSFCell cell = sheet.getRow(k).getCell((short) 0);
+                        String itemName = getValue(cell);
+                        itemName = itemName.replaceAll("<[^>]*>", "");
+                        itemNames.put(k, itemName);
+                    }
+
                     for (int k = 1; k < numRows; k++) {
                         // logger.info("hit row "+k);
                         if (blankRowCount == 5) {
@@ -404,7 +413,12 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         cell = sheet.getRow(k).getCell((short) 9);
                         String parentItem = getValue(cell);
                         parentItem = parentItem.replaceAll("<[^>]*>", "");
-
+                        // Checking for a valid paren item name
+                        if(!StringUtil.isBlank(parentItem)){
+                            if(!itemNames.containsValue(parentItem)){
+                                errors.add("the Parent item specified on row "+k+" does not exist in the CRF template. Please update the value. ");    
+                            }
+                        }
                         // BWP>>Prevent parent names that equal the Item names
                         if (itemName != null && itemName.equalsIgnoreCase(parentItem)) {
                             parentItem = "";
@@ -2348,6 +2362,13 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
         return muSql;
     }
 
+
+
+    /**
+     * Checks whether the parent_item is valid a name
+     *
+     */
+    
     public boolean isRepeating() {
         return isRepeating;
     }
