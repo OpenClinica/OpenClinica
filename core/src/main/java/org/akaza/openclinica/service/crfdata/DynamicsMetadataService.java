@@ -1,6 +1,7 @@
 package org.akaza.openclinica.service.crfdata;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -106,7 +107,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         if (dynamicsMetadataBean != null) {
             return dynamicsMetadataBean.isShowItem();
         } else {
-            System.out.println("did not find a row in the db for " + itemFormMetadataBean.getId());
+            // System.out.println("did not find a row in the db for " + itemFormMetadataBean.getId());
             return false;
         }
         // return false;
@@ -122,7 +123,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         if (dynamicsMetadataBean != null) {
             return dynamicsMetadataBean.isShowItem();
         } else {
-            System.out.println("did not find a row in the db for (with IDB) " + itemFormMetadataBean.getId() + " idb id " + itemDataBean.getId());
+            // System.out.println("did not find a row in the db for (with IDB) " + itemFormMetadataBean.getId() + " idb id " + itemDataBean.getId());
             return false;
         }
         // return false;
@@ -146,7 +147,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         if (dynamicsMetadataBean != null) {
             return dynamicsMetadataBean.isShowGroup();
         } else {
-            System.out.println("didnt find a group row in the db ");
+            // System.out.println("didnt find a group row in the db ");
             return false;
         }
     }
@@ -696,7 +697,9 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                     } else if (dynamicsMetadataBean != null && !dynamicsMetadataBean.isShowItem()) {
                         dynamicsMetadataBean.setShowItem(true);
                         getDynamicsItemFormMetadataDao().saveOrUpdate(dynamicsMetadataBean);
-                    } else {
+                    } else if (eventCrfBeanA.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY)){
+                    	System.out.println("hit DDE here: idb " + oidBasedItemData.getId() );
+                    	// need a guard clause to guarantee DDE
                     	// if we get there, it means that we've hit DDE and the bean exists
                     	dynamicsMetadataBean.setVersion(1);// version 1 = passed DDE
                     	getDynamicsItemFormMetadataDao().saveOrUpdate(dynamicsMetadataBean);
