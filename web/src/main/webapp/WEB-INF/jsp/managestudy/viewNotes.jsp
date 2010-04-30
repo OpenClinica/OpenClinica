@@ -124,12 +124,33 @@
 </c:import>
 <br><br>
 --%>
-<form  action="${pageContext.request.contextPath}/ViewNotes">
+
+<div><a id="sumBoxParent" href="javascript:void(0)" onclick="showSummaryBox('sumBox',document.getElementById('sumBoxParent'),'<fmt:message key="show_summary_statistics" bundle="${resword}"/>','<fmt:message key="hide_summary_statistics" bundle="${resword}"/>')"> <img name="ExpandGroup1" src="images/bt_Expand.gif" border="0"><fmt:message key="show_summary_statistics" bundle="${resword}"/></a> </div>
+<div id="sumBox" class="summaryBox" style="display:none;">
+    <h3>Summary statistics</h3>
+    <c:if test="${empty summaryMap}"><fmt:message key="There_are_no_discrepancy_notes" bundle="${resword}"/></c:if>
+    <c:forEach var="mapkey"  varStatus="status" items="${mapKeys}">
+        <c:if test="${summaryMap[mapkey]['Total'] > 0}">
+            <span style="float:left;margin:5px">
+            <strong> ${mapkey}</strong>:  ${summaryMap[mapkey]["Total"]} <br />
+
+            <c:forEach var="statusType" items="${summaryMap[mapkey]}">
+                <c:if test="${! ('Total' eq statusType.key)}">
+                    ${statusType.key}: ${statusType.value} <br />
+                </c:if>
+            </c:forEach>
+        </c:if>
+        </span>
+    </c:forEach>
+</div>
+
+<form  action="${pageContext.request.contextPath}/ViewNotes" style="clear:left; float:left;">
         <input type="hidden" name="module" value="submit">
         ${viewNotesHtml}
     </form>
 <!-- EXPANDING WORKFLOW BOX -->
 
+<div style="clear:left">
 <table border="0" cellpadding="0" cellspacing="0" style="position: relative; left: -14px;">
 	<tr>
 		<td id="sidebar_Workflow_closed" style="display: none">
@@ -211,6 +232,7 @@
 	</td>
    </tr>
 </table>
+</div>
 
 <!-- END WORKFLOW BOX -->
 <jsp:include page="../include/footer.jsp"/>

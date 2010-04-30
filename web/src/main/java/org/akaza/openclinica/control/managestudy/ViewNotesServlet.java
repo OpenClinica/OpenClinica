@@ -38,14 +38,13 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
+import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.DiscrepancyNoteRow;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * 
@@ -146,6 +145,28 @@ public class ViewNotesServlet extends SecureController {
         // save the current URL
         // so we can go back later
         session.setAttribute(WIN_LOCATION, "ViewNotes?viewForOne=" + viewForOne + "&id=" + oneSubjectId + "&module=" + module + " &removeSession=1");
+
+        boolean hasAResolutionStatus = resolutionStatus >= 1 && resolutionStatus <= 5;
+        Set<Integer> resolutionStatusIds = (HashSet) session.getAttribute(RESOLUTION_STATUS);
+        // remove the session if there is no resolution status
+        if (!hasAResolutionStatus && resolutionStatusIds != null) {
+            session.removeAttribute(RESOLUTION_STATUS);
+            resolutionStatusIds = null;
+        }
+        if (hasAResolutionStatus) {
+            if (resolutionStatusIds == null) {
+                resolutionStatusIds = new HashSet<Integer>();
+            }
+            resolutionStatusIds.add(resolutionStatus);
+            session.setAttribute(RESOLUTION_STATUS, resolutionStatusIds);
+        }
+
+        DiscrepancyNoteUtil discNoteUtil = new DiscrepancyNoteUtil();
+        Map stats = discNoteUtil.generateDiscNoteSummaryRefactored(sm.getDataSource(), currentStudy, resolutionStatusIds, discNoteType);
+        request.setAttribute("summaryMap", stats);
+        Set mapKeys = stats.keySet();
+        request.setAttribute("mapKeys", mapKeys);
+
 
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
         StudyDAO studyDao = new StudyDAO(sm.getDataSource());
