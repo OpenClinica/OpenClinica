@@ -1476,12 +1476,16 @@ public abstract class DataEntryServlet extends SecureController {
                             ItemBean itemBean = displayItemBean.getItem();
                             if (newFieldName.equals(itemBean.getOid())) {
                             	boolean passedDDE = getItemMetadataService().hasPassedDDE(displayItemBean.getData());
-                            	System.out.println("found passed dde: " + passedDDE);
+                            	System.out.println("found passed dde: " + passedDDE + " for " + fieldName);
+                            	System.out.println("is show item: " + displayItemBean.getMetadata().isShowItem());
                                 if (!displayItemBean.getMetadata().isShowItem()) {
                                     inSameSection = true;
                                     System.out.println("found item " + this.getInputName(displayItemBean) + " vs. " + fieldName);
                                     // if is repeating, use the other input name
+                                    // if we already have the message, dont add it again
+                                    
                                     errorsPostDryRun.put(this.getInputName(displayItemBean), rulesPostDryRun.get(fieldName));
+                                    
                                     displayItemBean.getMetadata().setShowItem(true);
                                 } // else if (passedDDE) {
                                 	// displayItemBean.getMetadata().setShowItem(true);
@@ -3016,7 +3020,7 @@ public abstract class DataEntryServlet extends SecureController {
             ItemFormMetadataBean ifmb = (ItemFormMetadataBean) metadata.get(i);
             DisplayItemBean dib = (DisplayItemBean) displayItems.get(new Integer(ifmb.getItemId()));
             if (dib != null) {
-                // Fboolean showItem = false;
+                // boolean showItem = false;
                 boolean showItem = getItemMetadataService().isShown(ifmb.getItemId(), ecb, dib.getData());
                 if (getServletPage().equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
                     showItem = getItemMetadataService().isShown(ifmb.getItemId(), ecb, dib.getDbData());
@@ -3028,8 +3032,8 @@ public abstract class DataEntryServlet extends SecureController {
                     		" idb " + dib.getData().getId() +
                     		" show item " + showItem +
                     		" passed dde " + passedDDE);
-                    // ifmb.setShowItem(showItem);
-                    ifmb.setShowItem(true);
+                    ifmb.setShowItem(showItem);
+                    // ifmb.setShowItem(true);
                 }
                 // System.out.println("did not catch NPE 1");
                 dib.setMetadata(ifmb);
@@ -3087,8 +3091,8 @@ public abstract class DataEntryServlet extends SecureController {
             boolean passedDDE = getItemMetadataService().hasPassedDDE(data);
             if (showItem || passedDDE) {
                 System.out.println("set show item: " + metadata.getItemId() + " data " + data.getId());
-                // metadata.setShowItem(showItem);
-                metadata.setShowItem(true);
+                metadata.setShowItem(showItem);
+                // metadata.setShowItem(true);
             }
             // System.out.println("did not catch NPE");
 
