@@ -89,7 +89,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
     	if (dynamicsMetadataBean == null) {
     		return false;
     	}
-    	if (dynamicsMetadataBean.getVersion() > 0) {
+    	if (dynamicsMetadataBean.getPassedDde() > 0) {
     		return true;
     	} else {
     		return false;
@@ -151,6 +151,19 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
             return false;
         }
     }
+    
+    public boolean hasGroupPassedDDE(int metadataId, int eventCrfBeanId) throws OpenClinicaException {
+        ItemGroupMetadataBean itemGroupMetadataBean = (ItemGroupMetadataBean) getItemGroupMetadataDAO().findByPK(metadataId);
+        DynamicsItemGroupMetadataBean dynamicsMetadataBean = getDynamicsItemGroupMetadataBean(itemGroupMetadataBean, eventCrfBeanId);
+        if (dynamicsMetadataBean == null) {
+            return false;
+        }
+        if (dynamicsMetadataBean.getPassedDde() > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     /**
      * 
@@ -193,6 +206,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         DynamicsItemFormMetadataBean dynamicsMetadataBean = new DynamicsItemFormMetadataBean(itemFormMetadataBean, eventCrfBean);
         dynamicsMetadataBean.setItemDataId(itemDataBean.getId());
         dynamicsMetadataBean.setShowItem(true);
+        dynamicsMetadataBean.setPassedDde(0);
         getDynamicsItemFormMetadataDao().saveOrUpdate(dynamicsMetadataBean);
         System.out.println("just touched ifmb id " + 
         		metadataBean.getId() + " ecb id " + 
@@ -216,6 +230,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         ItemGroupMetadataBean itemGroupMetadataBean = metadataBean;
         itemGroupMetadataBean.setShowGroup(true);
         DynamicsItemGroupMetadataBean dynamicsMetadataBean = new DynamicsItemGroupMetadataBean(itemGroupMetadataBean, eventCrfBean);
+        dynamicsMetadataBean.setPassedDde(0);
         getDynamicsItemGroupMetadataDao().saveOrUpdate(dynamicsMetadataBean);
         return true;
     }
@@ -701,7 +716,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                     	System.out.println("hit DDE here: idb " + oidBasedItemData.getId() );
                     	// need a guard clause to guarantee DDE
                     	// if we get there, it means that we've hit DDE and the bean exists
-                    	dynamicsMetadataBean.setVersion(1);// version 1 = passed DDE
+                    	dynamicsMetadataBean.setPassedDde(1);//setVersion(1);// version 1 = passed DDE
                     	getDynamicsItemFormMetadataDao().saveOrUpdate(dynamicsMetadataBean);
                     }
                 }
@@ -725,6 +740,9 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                                 showGroup(itemGroupMetadataBean, eventCrfBeanA);
                             } else if (dynamicsGroupBean != null && !dynamicsGroupBean.isShowGroup()) {
                                 dynamicsGroupBean.setShowGroup(true);
+                                getDynamicsItemGroupMetadataDao().saveOrUpdate(dynamicsGroupBean);
+                            } else if (eventCrfBeanA.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
+                                dynamicsGroupBean.setPassedDde(1);//setVersion(1); // version 1 = passed DDE
                                 getDynamicsItemGroupMetadataDao().saveOrUpdate(dynamicsGroupBean);
                             }
                         }

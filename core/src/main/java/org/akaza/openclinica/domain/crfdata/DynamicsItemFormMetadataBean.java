@@ -26,6 +26,7 @@ public class DynamicsItemFormMetadataBean extends AbstractMutableDomainObject {
     private Integer itemFormMetadataId;
     private Integer crfVersionId;
     private Integer itemDataId;
+    private Integer passedDde;
 
     public DynamicsItemFormMetadataBean() {
         showItem = false;
@@ -34,6 +35,7 @@ public class DynamicsItemFormMetadataBean extends AbstractMutableDomainObject {
         itemFormMetadataId = 0;
         crfVersionId = 0;
         itemDataId = 0;
+        passedDde = 0;
     }
 
     public DynamicsItemFormMetadataBean(ItemFormMetadataBean metadataBean, EventCRFBean eventCRFBean) {
@@ -41,6 +43,7 @@ public class DynamicsItemFormMetadataBean extends AbstractMutableDomainObject {
         setItemFormMetadataId(metadataBean.getId());
         setCrfVersionId(metadataBean.getCrfVersionId());
         setEventCrfId(eventCRFBean.getId());
+        setPassedDde(0);
     }
     
     public DynamicsItemFormMetadataBean(ItemFormMetadataBean metadataBean, EventCRFBean eventCRFBean, ItemDataBean itemData) {
@@ -49,6 +52,7 @@ public class DynamicsItemFormMetadataBean extends AbstractMutableDomainObject {
         setCrfVersionId(metadataBean.getCrfVersionId());
         setEventCrfId(eventCRFBean.getId());
         setItemDataId(itemData.getId());
+        setPassedDde(0);
     }
 
     public boolean isShowItem() {
@@ -57,6 +61,14 @@ public class DynamicsItemFormMetadataBean extends AbstractMutableDomainObject {
 
     public void setShowItem(boolean showItem) {
         this.showItem = showItem;
+    }
+
+    public Integer getPassedDde() {
+        return passedDde;
+    }
+
+    public void setPassedDde(Integer passedDde) {
+        this.passedDde = passedDde;
     }
 
     public Integer getItemDataId() {

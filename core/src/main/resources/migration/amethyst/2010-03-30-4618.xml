@@ -6,4 +6,16 @@
             <column name="item_data_id" type="int"/>
         </addColumn>
 	</changeSet>
+	<changeSet author="thickerson" id="2010-03-30-4618-2">
+		<comment>Add a column to dyn_item_form_metadata: PASSED DDE</comment>
+        <addColumn tableName="dyn_item_form_metadata">
+            <column name="passed_dde" type="int" defaultValue="0"/>
+        </addColumn>
+	</changeSet>
+	<changeSet author="thickerson" id="2010-03-30-4618-3">
+		<comment>Add a column to dyn_item_group_metadata: PASSED DDE</comment>
+        <addColumn tableName="dyn_item_group_metadata">
+            <column name="passed_dde" type="int" defaultValue="0"/>
+        </addColumn>
+	</changeSet>
 </databaseChangeLog>

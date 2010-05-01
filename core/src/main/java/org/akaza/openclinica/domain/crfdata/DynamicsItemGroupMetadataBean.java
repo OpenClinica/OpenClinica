@@ -14,19 +14,21 @@ import javax.persistence.Table;
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "dyn_item_group_metadata_id_seq") })
 public class DynamicsItemGroupMetadataBean extends AbstractMutableDomainObject {
 
-    boolean showGroup;
-    int eventCrfId;
-    int itemGroupMetadataId;
-    int itemGroupId;
+    private boolean showGroup;
+    private int eventCrfId;
+    private int itemGroupMetadataId;
+    private int itemGroupId;
+    private int passedDde;
 
     public DynamicsItemGroupMetadataBean() {
-
+        passedDde = 0;
     }
 
     public DynamicsItemGroupMetadataBean(ItemGroupMetadataBean metadataBean, EventCRFBean eventCrfBean) {
         setEventCrfId(eventCrfBean.getId());
         setItemGroupMetadataId(metadataBean.getId());
         setItemGroupId(metadataBean.getItemGroupId());
+        setPassedDde(0);
     }
 
     public boolean isShowGroup() {
@@ -35,6 +37,14 @@ public class DynamicsItemGroupMetadataBean extends AbstractMutableDomainObject {
 
     public void setShowGroup(boolean showGroup) {
         this.showGroup = showGroup;
+    }
+
+    public int getPassedDde() {
+        return passedDde;
+    }
+
+    public void setPassedDde(int passedDde) {
+        this.passedDde = passedDde;
     }
 
     public int getEventCrfId() {
