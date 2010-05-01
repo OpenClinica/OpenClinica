@@ -70,6 +70,8 @@ public class FormBeanUtil {
             metadataBean.setShowItem(showItem);
         // setting true or false here, tbh
         }
+        // however, we run into a puzzle here at the last section, apparently we might take a deep-copy again, resetting this to false
+        
         return metadataBean;
     }
     /**

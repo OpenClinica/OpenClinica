@@ -1055,10 +1055,10 @@ public abstract class DataEntryServlet extends SecureController {
             // setting this AFTER we populate notes - will that make a difference?
             section.setDisplayItemGroups(allItems);
 
-            System.out.println("+++ try to populate notes");
+            // System.out.println("+++ try to populate notes");
 
             section = populateNotesWithDBNoteCounts(discNotes, section);
-            System.out.println("+++ try to populate notes, got count of field notes: " + discNotes.getFieldNotes().toString());
+            // System.out.println("+++ try to populate notes, got count of field notes: " + discNotes.getFieldNotes().toString());
 
             if (currentStudy.getStudyParameterConfig().getInterviewerNameRequired().equals("true")) {
                 v.addValidation(INPUT_INTERVIEWER, Validator.NO_BLANKS);
@@ -1209,15 +1209,7 @@ public abstract class DataEntryServlet extends SecureController {
                     String fieldName = iter2.next().toString();
                     logger.debug("found error " + fieldName);
                 }
-                //                for (int i = 0; i < allItems.size(); i++) {
-                //                    DisplayItemWithGroupBean diwb = allItems.get(i);
-                //
-                //                    if (diwb.isInGroup()) {
-                //                        List<DisplayItemGroupBean> dgbs = diwb.getItemGroups();
-                //                        logger.debug("found manual rows " + getManualRows(dgbs) + " and total rows " + dgbs.size() + " from ordinal " + diwb.getOrdinal());
-                //                    }
-                //                }
-
+                
                 errors = reshuffleErrorGroupNames(errors, allItems);
                 // reset manual rows, so that we can catch errors correctly
                 // but it needs to be set per block of repeating items?  what if there are two or more?
@@ -1459,6 +1451,8 @@ public abstract class DataEntryServlet extends SecureController {
                 if (!rulesPostDryRun.isEmpty()) {
                     // in same section?
                     boolean inSameSection = false;
+                    
+                    
                     // iterate through the OIDs and see if any of them belong to this section
                     Iterator iter3 = rulesPostDryRun.keySet().iterator();
                     while (iter3.hasNext()) {
@@ -1475,22 +1469,16 @@ public abstract class DataEntryServlet extends SecureController {
                         for (DisplayItemBean displayItemBean : displayItems) {
                             ItemBean itemBean = displayItemBean.getItem();
                             if (newFieldName.equals(itemBean.getOid())) {
-                            	boolean passedDDE = getItemMetadataService().hasPassedDDE(displayItemBean.getData());
-                            	System.out.println("found passed dde: " + passedDDE + " for " + fieldName);
+                            	
                             	System.out.println("is show item: " + displayItemBean.getMetadata().isShowItem());
                                 if (!displayItemBean.getMetadata().isShowItem()) {
                                     inSameSection = true;
                                     System.out.println("found item " + this.getInputName(displayItemBean) + " vs. " + fieldName);
                                     // if is repeating, use the other input name
-                                    // if we already have the message, dont add it again
-                                    
                                     errorsPostDryRun.put(this.getInputName(displayItemBean), rulesPostDryRun.get(fieldName));
                                     
                                     displayItemBean.getMetadata().setShowItem(true);
-                                } // else if (passedDDE) {
-                                	// displayItemBean.getMetadata().setShowItem(true);
-                                // }
-                                // break;
+                                } 
                             }
                         }
                         // check groups
@@ -1528,6 +1516,7 @@ public abstract class DataEntryServlet extends SecureController {
 
                         section.setDisplayItemGroups(displayItemWithGroups2);
                         // section.setDisplayFormGroups(newDisplayBean.getDisplayFormGroups());
+                        
                     }
 
                     // if so, stay at this section
@@ -2439,6 +2428,9 @@ public abstract class DataEntryServlet extends SecureController {
                 //        metadataBean.getItemGroupId() + 
                 //        ": " + ecb.getId() + ": " + showGroup);
 
+                if (getServletPage().equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
+                    showGroup = getItemMetadataService().hasGroupPassedDDE(metadataBean.getId(), ecb.getId());
+                }
                 metadataBean.setShowGroup(showGroup);
                 // what about the items which should be shown?
             }
@@ -2668,7 +2660,11 @@ public abstract class DataEntryServlet extends SecureController {
      */
     protected boolean writeToDB(DisplayItemBean dib, ItemDataDAO iddao, int ordinal) {
         ItemDataBean idb = dib.getData();
-
+        if (!dib.getMetadata().isShowItem() && idb.getValue().equals("")) {
+            System.out.println("not shown - not writing for idb id " + dib.getData().getId());
+            return true;
+        }
+        
         idb.setItemId(dib.getItem().getId());
         idb.setEventCRFId(ecb.getId());
 
@@ -3023,11 +3019,11 @@ public abstract class DataEntryServlet extends SecureController {
                 // boolean showItem = false;
                 boolean showItem = getItemMetadataService().isShown(ifmb.getItemId(), ecb, dib.getData());
                 if (getServletPage().equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
-                    showItem = getItemMetadataService().isShown(ifmb.getItemId(), ecb, dib.getDbData());
+                    showItem = getItemMetadataService().hasPassedDDE(dib.getData());
                 }
                 // is the above needed for children items too?
                 boolean passedDDE = getItemMetadataService().hasPassedDDE(dib.getData());
-                if (showItem || passedDDE) { // we are only showing, not hiding
+                if (showItem) { // we are only showing, not hiding
                     System.out.println("set show item " + ifmb.getItemId() + 
                     		" idb " + dib.getData().getId() +
                     		" show item " + showItem +
@@ -3082,14 +3078,14 @@ public abstract class DataEntryServlet extends SecureController {
             // <<tbh 07/2009, bug #3883
             // ItemDataBean dbData = iddao.findByItemIdAndEventCRFIdAndOrdinal(itemId, eventCRFId, ordinal)
             dib.setDbData(data);
-            boolean showItem = false;
-            if (!getServletPage().equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
-                showItem = getItemMetadataService().isShown(metadata.getItemId(), ecb, data);
-            } else {
-                showItem = getItemMetadataService().isShown(metadata.getItemId(), ecb, dib.getDbData());
-            }
-            boolean passedDDE = getItemMetadataService().hasPassedDDE(data);
-            if (showItem || passedDDE) {
+            boolean showItem = getItemMetadataService().isShown(metadata.getItemId(), ecb, data);
+            if (getServletPage().equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
+                showItem = getItemMetadataService().hasPassedDDE(data);
+            } //else {
+//                showItem = getItemMetadataService().isShown(metadata.getItemId(), ecb, dib.getDbData());
+//            }
+            // boolean passedDDE = getItemMetadataService().hasPassedDDE(data);
+            if (showItem) {
                 System.out.println("set show item: " + metadata.getItemId() + " data " + data.getId());
                 metadata.setShowItem(showItem);
                 // metadata.setShowItem(true);
