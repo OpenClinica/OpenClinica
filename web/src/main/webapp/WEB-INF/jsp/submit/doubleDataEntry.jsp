@@ -502,13 +502,29 @@ window.onload = initmb;
 <c:when test="${displayItem.inGroup == true}">
 <c:set var="currPage" value="${displayItem.pageNumberLabel}" />
 
-<tr><td>
+<tr>
 <c:set var="uniqueId" value="0"/>
 <c:set var="repeatParentId" value="${displayItem.itemGroup.itemGroupBean.name}"/>
     <%-- the section borders property value --%>
 <c:set var="sectionBorders" value="${section.section.borders}" />
 <!--<c:set var="repeatNumber" value="${displayItem.itemGroup.groupMetaBean.repeatNum}"/>-->
-
+<!--  was just <td>, tbh 05/03/2010 -->
+<%-- place where we need to highlight sections, 
+	one of the error keys should equal the item group's OID --%>
+<c:set var="isSectionShown" value="false"/>
+<c:forEach var="formMsg" items="${formMessages}">
+	<c:if test="${formMsg.key eq displayItem.itemGroup.itemGroupBean.oid}">
+		<c:set var="isSectionShown" value="true"/>
+	</c:if>
+</c:forEach>
+<c:choose>
+	<c:when test="${hasShown && isSectionShown}">
+        <td id="<c:out value="${displayItem.itemGroup.itemGroupBean.oid}"/>" class="aka_group_show">
+	</c:when>
+	<c:otherwise>
+		<td>
+	</c:otherwise>
+</c:choose>
 <!-- there are already item data for an item group, repeat number just be 1-->
 <c:set var="repeatNumber" value="1"/>
 
@@ -1022,8 +1038,22 @@ window.onload = initmb;
                     <c:if test="${displayItem.singleItem.metadata.columnNumber >1}">
                 <td valign="top">
                     </c:if>
-                    <table border="0">
-                        <tr>
+                    <table border="0" cellspacing="0" cellpadding="1">
+						<c:set var="isItemShown" value="false"/>
+						<c:forEach var="formMsg" items="${formMessages}">
+							<c:set var="inputValue">input<c:out value="${displayItem.singleItem.item.id}"/></c:set>
+							<c:if test="${formMsg.key eq inputValue}">
+								<c:set var="isItemShown" value="true"/>
+							</c:if>
+						</c:forEach>
+                        <c:choose>
+                    		<c:when test="${isItemShown && hasShown}">
+                    			<tr class="aka_group_show">
+                    		</c:when>
+                    		<c:otherwise>
+                    			<tr>
+                    		</c:otherwise>
+                    	</c:choose>
                             <td valign="top" class="aka_ques_block"><c:out value="${displayItem.singleItem.metadata.questionNumberLabel}" escapeXml="false"/></td>
                             <!--
                             <td valign="top" class="aka_text_block"><c:out value="${displayItem.singleItem.metadata.leftItemText}" escapeXml="false"/></td>

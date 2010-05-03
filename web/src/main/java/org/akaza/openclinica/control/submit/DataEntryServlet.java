@@ -1440,17 +1440,18 @@ public abstract class DataEntryServlet extends SecureController {
                         }
                     }
                 }
-                phase2 = Phase.INITIAL_DATA_ENTRY;
-                if (getServletPage().equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
-                	phase2 = Phase.DOUBLE_DATA_ENTRY;
-                }
+//                phase2 = Phase.INITIAL_DATA_ENTRY;
+//                if (getServletPage().equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
+//                	phase2 = Phase.DOUBLE_DATA_ENTRY;
+//                }
                 HashMap<String, ArrayList<String>> rulesPostDryRun = runRules(allItems, ruleSets, false, shouldRunRules(), MessageType.WARNING, phase2);
                 System.out.println("found rules post dry run: " + rulesPostDryRun.toString());
                 HashMap<String, ArrayList<String>> errorsPostDryRun = new HashMap<String, ArrayList<String>>();
                 // additional step needed, run rules and see if any items are 'shown' AFTER saving data
+                boolean inSameSection = false;
                 if (!rulesPostDryRun.isEmpty()) {
                     // in same section?
-                    boolean inSameSection = false;
+                    
                     
                     
                     // iterate through the OIDs and see if any of them belong to this section
@@ -1539,178 +1540,181 @@ public abstract class DataEntryServlet extends SecureController {
                         session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
                         setUpPanel(section);
                         forwardPage(getJSPPage());
-                    }
-                    // if not, progress as usual
-                }
+                    }    
+                } 
+                
+                if (!inSameSection) {// else if not in same section, progress as usual
 
-                // can we just forward page or do we actually need an ELSE here?
+                    // can we just forward page or do we actually need an ELSE here?
+                    // yes, we do. tbh 05/03/2010
 
-                ArrayList<String> updateFailedItems = sc.redoCalculations(scoreItems, scoreItemdata, changedItems, itemOrdinals, sb.getId());
-                success = updateFailedItems.size() > 0 ? false : true;
+                    ArrayList<String> updateFailedItems = sc.redoCalculations(scoreItems, scoreItemdata, changedItems, itemOrdinals, sb.getId());
+                    success = updateFailedItems.size() > 0 ? false : true;
 
-                // now check if CRF is marked complete
-                boolean markComplete = fp.getString(INPUT_MARK_COMPLETE).equals(VALUE_YES);
-                boolean markSuccessfully = false; // if the CRF was marked
-                // complete
-                // successfully
-                if (markComplete) {
-                    logger.info("need to mark CRF as complete");
-                    markSuccessfully = markCRFComplete();
-                    if (!markSuccessfully) {
-                        request.setAttribute(BEAN_DISPLAY, section);
-                        request.setAttribute(BEAN_ANNOTATIONS, fp.getString(INPUT_ANNOTATIONS));
-                        setUpPanel(section);
-                        forwardPage(getJSPPage());
-                        return;
-                    }
-
-                }
-
-                // now write the event crf bean to the database
-                String annotations = fp.getString(INPUT_ANNOTATIONS);
-                setEventCRFAnnotations(annotations);
-                Date now = new Date();
-                ecb.setUpdatedDate(now);
-                ecb.setUpdater(ub);
-                ecb = (EventCRFBean) ecdao.update(ecb);
-                success = success && ecb.isActive();
-
-                StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
-                StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
-                seb.setUpdatedDate(now);
-                seb.setUpdater(ub);
-                seb = (StudyEventBean) sedao.update(seb);
-                success = success && seb.isActive();
-
-                request.setAttribute(INPUT_IGNORE_PARAMETERS, Boolean.TRUE);
-
-                if (newUploadedFiles.size() > 0) {
-                    if (this.unloadFiles(newUploadedFiles)) {
-
-                    } else {
-                        String missed = "";
-                        Iterator iter = newUploadedFiles.keySet().iterator();
-                        while (iter.hasNext()) {
-                            missed += " " + newUploadedFiles.get(iter.next());
+                    // now check if CRF is marked complete
+                    boolean markComplete = fp.getString(INPUT_MARK_COMPLETE).equals(VALUE_YES);
+                    boolean markSuccessfully = false; // if the CRF was marked
+                    // complete
+                    // successfully
+                    if (markComplete) {
+                        System.out.println("need to mark CRF as complete");
+                        markSuccessfully = markCRFComplete();
+                        System.out.println("...marked CRF as complete: " + markSuccessfully);
+                        if (!markSuccessfully) {
+                            request.setAttribute(BEAN_DISPLAY, section);
+                            request.setAttribute(BEAN_ANNOTATIONS, fp.getString(INPUT_ANNOTATIONS));
+                            setUpPanel(section);
+                            forwardPage(getJSPPage());
+                            return;
                         }
-                        addPageMessage(respage.getString("uploaded_files_not_deleted_or_not_exist") + ": " + missed);
-                    }
-                }
-                if (!success) {
-                    // YW, 3-6-2008 <<
-                    if (updateFailedItems.size() > 0) {
-                        String mess = "";
-                        for (String ss : updateFailedItems) {
-                            mess += ss + ", ";
-                        }
-                        mess = mess.substring(0, mess.length() - 2);
-                        addPageMessage(resexception.getString("item_save_failed_because_database_error") + mess);
-                    } else {
-                        // YW>>
-                        addPageMessage(resexception.getString("database_error"));
-                    }
-                    request.setAttribute(BEAN_DISPLAY, section);
-                    session.removeAttribute(GROUP_HAS_DATA);
-                    session.removeAttribute(HAS_DATA_FLAG);
-                    session.removeAttribute(DDE_PROGESS);
-                    session.removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
-                    logger.debug("try to remove to_create_crf");
-                    session.removeAttribute("to_create_crf");
 
-                    // forwardPage(Page.SUBMIT_DATA_SERVLET);
-                    forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
-                    // >> changed tbh, 06/2009
-                } else {
-                    boolean forwardingSucceeded = false;
-
-                    if (!fp.getString(GO_PREVIOUS).equals("")) {
-                        if (previousSec.isActive()) {
-                            forwardingSucceeded = true;
-                            request.setAttribute(INPUT_EVENT_CRF, ecb);
-                            request.setAttribute(INPUT_SECTION, previousSec);
-                            int tabNum = 0;
-                            if (fp.getString("tab") == null) {
-                                tabNum = 1;
-                            } else {
-                                tabNum = fp.getInt("tab");
-                            }
-                            request.setAttribute("tab", new Integer(tabNum - 1).toString());
-                            forwardPage(getServletPage());
-                        }
-                    } else if (!fp.getString(GO_NEXT).equals("")) {
-                        if (nextSec.isActive()) {
-                            forwardingSucceeded = true;
-                            request.setAttribute(INPUT_EVENT_CRF, ecb);
-                            request.setAttribute(INPUT_SECTION, nextSec);
-                            int tabNum = 0;
-                            if (fp.getString("tab") == null) {
-                                tabNum = 1;
-                            } else {
-                                tabNum = fp.getInt("tab");
-                            }
-                            request.setAttribute("tab", new Integer(tabNum + 1).toString());
-                            forwardPage(getServletPage());
-                        }
                     }
 
-                    if (!forwardingSucceeded) {
-                        // request.setAttribute(TableOfContentsServlet.
-                        // INPUT_EVENT_CRF_BEAN,
-                        // ecb);
-                        if (markSuccessfully) {
-                            addPageMessage(respage.getString("data_saved_CRF_marked_complete"));
-                            session.removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
-                            session.removeAttribute(GROUP_HAS_DATA);
-                            session.removeAttribute(HAS_DATA_FLAG);
-                            session.removeAttribute(DDE_PROGESS);
-                            session.removeAttribute("to_create_crf");
+                    // now write the event crf bean to the database
+                    String annotations = fp.getString(INPUT_ANNOTATIONS);
+                    setEventCRFAnnotations(annotations);
+                    Date now = new Date();
+                    ecb.setUpdatedDate(now);
+                    ecb.setUpdater(ub);
+                    ecb = (EventCRFBean) ecdao.update(ecb);
+                    success = success && ecb.isActive();
 
-                            request.setAttribute("eventId", new Integer(ecb.getStudyEventId()).toString());
-                            forwardPage(Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET);
+                    StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
+                    StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
+                    seb.setUpdatedDate(now);
+                    seb.setUpdater(ub);
+                    seb = (StudyEventBean) sedao.update(seb);
+                    success = success && seb.isActive();
+
+                    request.setAttribute(INPUT_IGNORE_PARAMETERS, Boolean.TRUE);
+
+                    if (newUploadedFiles.size() > 0) {
+                        if (this.unloadFiles(newUploadedFiles)) {
+
                         } else {
-                            // use clicked 'save'
-                            addPageMessage(respage.getString("data_saved_continue_entering_edit_later"));
-                            request.setAttribute(INPUT_EVENT_CRF, ecb);
-                            request.setAttribute(INPUT_EVENT_CRF_ID, new Integer(ecb.getId()).toString());
-                            // forward to the next section if the previous one
-                            // is not the last section
-                            if (!section.isLastSection()) {
+                            String missed = "";
+                            Iterator iter = newUploadedFiles.keySet().iterator();
+                            while (iter.hasNext()) {
+                                missed += " " + newUploadedFiles.get(iter.next());
+                            }
+                            addPageMessage(respage.getString("uploaded_files_not_deleted_or_not_exist") + ": " + missed);
+                        }
+                    }
+                    if (!success) {
+                        // YW, 3-6-2008 <<
+                        if (updateFailedItems.size() > 0) {
+                            String mess = "";
+                            for (String ss : updateFailedItems) {
+                                mess += ss + ", ";
+                            }
+                            mess = mess.substring(0, mess.length() - 2);
+                            addPageMessage(resexception.getString("item_save_failed_because_database_error") + mess);
+                        } else {
+                            // YW>>
+                            addPageMessage(resexception.getString("database_error"));
+                        }
+                        request.setAttribute(BEAN_DISPLAY, section);
+                        session.removeAttribute(GROUP_HAS_DATA);
+                        session.removeAttribute(HAS_DATA_FLAG);
+                        session.removeAttribute(DDE_PROGESS);
+                        session.removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
+                        logger.debug("try to remove to_create_crf");
+                        session.removeAttribute("to_create_crf");
+
+                        // forwardPage(Page.SUBMIT_DATA_SERVLET);
+                        forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
+                        // >> changed tbh, 06/2009
+                    } else {
+                        boolean forwardingSucceeded = false;
+
+                        if (!fp.getString(GO_PREVIOUS).equals("")) {
+                            if (previousSec.isActive()) {
+                                forwardingSucceeded = true;
+                                request.setAttribute(INPUT_EVENT_CRF, ecb);
+                                request.setAttribute(INPUT_SECTION, previousSec);
+                                int tabNum = 0;
+                                if (fp.getString("tab") == null) {
+                                    tabNum = 1;
+                                } else {
+                                    tabNum = fp.getInt("tab");
+                                }
+                                request.setAttribute("tab", new Integer(tabNum - 1).toString());
+                                forwardPage(getServletPage());
+                            }
+                        } else if (!fp.getString(GO_NEXT).equals("")) {
+                            if (nextSec.isActive()) {
+                                forwardingSucceeded = true;
+                                request.setAttribute(INPUT_EVENT_CRF, ecb);
                                 request.setAttribute(INPUT_SECTION, nextSec);
-                                request.setAttribute(INPUT_SECTION_ID, new Integer(nextSec.getId()).toString());
-                                session.removeAttribute("mayProcessUploading");
-                            } else {
-                                // already the last section, should go back to
-                                // view event page
+                                int tabNum = 0;
+                                if (fp.getString("tab") == null) {
+                                    tabNum = 1;
+                                } else {
+                                    tabNum = fp.getInt("tab");
+                                }
+                                request.setAttribute("tab", new Integer(tabNum + 1).toString());
+                                forwardPage(getServletPage());
+                            }
+                        }
+
+                        if (!forwardingSucceeded) {
+                            // request.setAttribute(TableOfContentsServlet.
+                            // INPUT_EVENT_CRF_BEAN,
+                            // ecb);
+                            if (markSuccessfully) {
+                                addPageMessage(respage.getString("data_saved_CRF_marked_complete"));
+                                session.removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
                                 session.removeAttribute(GROUP_HAS_DATA);
                                 session.removeAttribute(HAS_DATA_FLAG);
                                 session.removeAttribute(DDE_PROGESS);
                                 session.removeAttribute("to_create_crf");
-                                session.removeAttribute("mayProcessUploading");
 
                                 request.setAttribute("eventId", new Integer(ecb.getStudyEventId()).toString());
                                 forwardPage(Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET);
-                                return;
-
-                            }
-                            int tabNum = 0;
-                            if (fp.getString("tab") == null) {
-                                tabNum = 1;
                             } else {
-                                tabNum = fp.getInt("tab");
-                            }
-                            if (!section.isLastSection()) {
-                                request.setAttribute("tab", new Integer(tabNum + 1).toString());
-                            }
+                                // use clicked 'save'
+                                addPageMessage(respage.getString("data_saved_continue_entering_edit_later"));
+                                request.setAttribute(INPUT_EVENT_CRF, ecb);
+                                request.setAttribute(INPUT_EVENT_CRF_ID, new Integer(ecb.getId()).toString());
+                                // forward to the next section if the previous one
+                                // is not the last section
+                                if (!section.isLastSection()) {
+                                    request.setAttribute(INPUT_SECTION, nextSec);
+                                    request.setAttribute(INPUT_SECTION_ID, new Integer(nextSec.getId()).toString());
+                                    session.removeAttribute("mayProcessUploading");
+                                } else {
+                                    // already the last section, should go back to
+                                    // view event page
+                                    session.removeAttribute(GROUP_HAS_DATA);
+                                    session.removeAttribute(HAS_DATA_FLAG);
+                                    session.removeAttribute(DDE_PROGESS);
+                                    session.removeAttribute("to_create_crf");
+                                    session.removeAttribute("mayProcessUploading");
 
-                            forwardPage(getServletPage());
+                                    request.setAttribute("eventId", new Integer(ecb.getStudyEventId()).toString());
+                                    forwardPage(Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET);
+                                    return;
 
+                                }
+                                int tabNum = 0;
+                                if (fp.getString("tab") == null) {
+                                    tabNum = 1;
+                                } else {
+                                    tabNum = fp.getInt("tab");
+                                }
+                                if (!section.isLastSection()) {
+                                    request.setAttribute("tab", new Integer(tabNum + 1).toString());
+                                }
+
+                                forwardPage(getServletPage());
+
+                            }
+                            // session.removeAttribute(AddNewSubjectServlet.
+                            // FORM_DISCREPANCY_NOTES_NAME);
+                            // forwardPage(Page.SUBMIT_DATA_SERVLET);
                         }
-                        // session.removeAttribute(AddNewSubjectServlet.
-                        // FORM_DISCREPANCY_NOTES_NAME);
-                        // forwardPage(Page.SUBMIT_DATA_SERVLET);
-
                     }
-                }
+                }// end of if-block for dynamic rules not in same section, tbh 05/2010
             }// end of save
         }
     }
