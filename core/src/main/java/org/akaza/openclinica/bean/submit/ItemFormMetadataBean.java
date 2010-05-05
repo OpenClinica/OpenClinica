@@ -50,6 +50,8 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 
     private String sectionName;// not in the DB only for display, tbh 082007
     private int repeatMax;// not in the DB, tbh 082007
+    
+    private boolean isHighlighted;// not in the db, tbh 052010
 
     /**
      * Not in the database. Not guaranteed to correspond to responseSetId,
@@ -81,6 +83,7 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
         showItem = true;
         defaultValue = "";
         responseSet = new ResponseSetBean();
+        isHighlighted = false;
     }
 
     public String getDefaultValue() {
@@ -138,6 +141,14 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 
     public void setShowItem(boolean showItem) {
         this.showItem = showItem;
+    }
+
+    public boolean isHighlighted() {
+        return isHighlighted;
+    }
+
+    public void setHighlighted(boolean isHighlighted) {
+        this.isHighlighted = isHighlighted;
     }
 
     public String getSectionName() {

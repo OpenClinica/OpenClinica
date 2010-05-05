@@ -19,7 +19,9 @@ public class ItemGroupMetadataBean extends EntityBean implements Comparable {
     private Integer ordinal;
     private Integer borders;
     private boolean showGroup;
+    private boolean isHighlighted;
     // << tbh 02/2010 for dynamics
+    // << tbh isHighlighted only for admin editing 05/2010
 
     public ItemGroupMetadataBean() {
         super();
@@ -35,6 +37,7 @@ public class ItemGroupMetadataBean extends EntityBean implements Comparable {
         ordinal = 0;
         borders = 1;
         showGroup = true;
+        isHighlighted = false;
     }
 
     /**
@@ -223,6 +226,14 @@ public class ItemGroupMetadataBean extends EntityBean implements Comparable {
 
     public void setShowGroup(boolean showGroup) {
         this.showGroup = showGroup;
+    }
+
+    public boolean isHighlighted() {
+        return isHighlighted;
+    }
+
+    public void setHighlighted(boolean isHighlighted) {
+        this.isHighlighted = isHighlighted;
     }
 
     public int compareTo(Object o) {
