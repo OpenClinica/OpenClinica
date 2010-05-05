@@ -688,6 +688,25 @@ but the custom tag uses that, not this jstl code--%>
     <c:forEach var="bodyItem" items="${bodyItemGroup.items}">
 	<!-- found show item: <c:out value="${bodyItem.metadata.showItem}"/> -->
     <c:if test="${bodyItem.metadata.showItem}">
+		<%-- highlighting for items within item groups, tbh --%>
+		<%-- update td class with aka_group_show if they meet the criteria --%>
+		<c:set var="isItemShown" value="false"/>
+						<c:forEach var="formMsg" items="${formMessages}">
+							<c:set var="inputValue">input<c:out value="${displayItem.singleItem.item.id}"/></c:set>
+							<c:if test="${formMsg.key eq inputValue}">
+								<c:set var="isItemShown" value="true"/>
+							</c:if>
+						</c:forEach>
+                    	<c:choose>
+                    		<c:when test="${isItemShown && hasShown}">
+                    			<c:set var="extraClass" value="aka_group_shown"/>
+                    		</c:when>
+                    		<c:otherwise>
+								<c:set var="extraClass" value=" "/>
+                    			<%-- do nothing here ? --%>
+                    		</c:otherwise>
+                    	</c:choose>
+		<%-- end of highlighting for items within item groups, tbh 05/2010--%>
 		<!-- discrepancy count for this item <c:out value="${repeatParentId}"/> <c:out value="${bodyItem.numDiscrepancyNotes}"/> -->
         <c:set var="itemNum" value="${itemNum + 1}" />
         <c:set var="isHorizontalCellLevel" scope="request" value="${false}"/>

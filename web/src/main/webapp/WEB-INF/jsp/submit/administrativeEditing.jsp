@@ -426,7 +426,16 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 <c:when test="${displayItem.inGroup == true}">
 <c:set var="currPage" value="${displayItem.pageNumberLabel}" />
 
-<tr><td>
+<tr>
+<%-- next place holder for highlighting, tbh 052010 --%>
+<c:choose>
+	<c:when test="${displayItem.itemGroup.groupMetaBean.highlighted}">
+        <td class="aka_group_show">
+	</c:when>
+	<c:otherwise>
+		<td>
+	</c:otherwise>
+</c:choose>
 <c:set var="uniqueId" value="0"/>
 <c:set var="repeatParentId" value="${displayItem.itemGroup.itemGroupBean.name}"/>
 <c:set var="sectionBorders" value="${section.section.borders}" />
@@ -950,8 +959,16 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                     <c:if test="${displayItem.singleItem.metadata.columnNumber >1}">
                 <td valign="top">
                     </c:if>
-                    <table border="0">
-                        <tr>
+                    <table border="0" cellspacing="0" cellpadding="1">
+						<%-- put in highlighting here, tbh --%>
+                        <c:choose>
+                    		<c:when test="${displayItem.singleItem.metadata.highlighted}">
+                    			<tr class="aka_group_show">
+                    		</c:when>
+                    		<c:otherwise>
+                    			<tr>
+                    		</c:otherwise>
+                    	</c:choose><%-- end of highlighting block, tbh --%>
                             <td valign="top" class="aka_ques_block"><c:out value="${displayItem.singleItem.metadata.questionNumberLabel}" escapeXml="false"/></td>
                             <td valign="top" class="aka_text_block">
                             	<!--<c:out value="${displayItem.singleItem.metadata.leftItemText}" escapeXml="false"/>-->

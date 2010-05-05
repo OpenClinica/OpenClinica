@@ -1465,6 +1465,7 @@ public abstract class DataEntryServlet extends SecureController {
                         String[] fieldNames = fieldName.split("\\.");
                         if (fieldNames.length == 2) {
                             newFieldName = fieldNames[1];
+                            // check items in item groups here?
                         }
                         ArrayList<DisplayItemBean> displayItems = section.getItems();
                         for (DisplayItemBean displayItemBean : displayItems) {
@@ -1476,6 +1477,7 @@ public abstract class DataEntryServlet extends SecureController {
                                     inSameSection = true;
                                     System.out.println("found item " + this.getInputName(displayItemBean) + " vs. " + fieldName);
                                     // if is repeating, use the other input name
+                                    
                                     errorsPostDryRun.put(this.getInputName(displayItemBean), rulesPostDryRun.get(fieldName));
                                     
                                     displayItemBean.getMetadata().setShowItem(true);
@@ -2437,6 +2439,10 @@ public abstract class DataEntryServlet extends SecureController {
                 }
                 metadataBean.setShowGroup(showGroup);
                 // what about the items which should be shown?
+                if (getServletPage().equals(Page.ADMIN_EDIT_SERVLET) && metadataBean.isShowGroup()) {
+                    metadataBean.setHighlighted(true);
+                }
+                // sets highlighting for AE, tbh 05/2010
             }
             // << tbh 04/2010
         } catch (OpenClinicaException oce) {
@@ -3021,6 +3027,7 @@ public abstract class DataEntryServlet extends SecureController {
             DisplayItemBean dib = (DisplayItemBean) displayItems.get(new Integer(ifmb.getItemId()));
             if (dib != null) {
                 // boolean showItem = false;
+                boolean needsHighlighting = !ifmb.isShowItem();
                 boolean showItem = getItemMetadataService().isShown(ifmb.getItemId(), ecb, dib.getData());
                 if (getServletPage().equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
                     showItem = getItemMetadataService().hasPassedDDE(dib.getData());
@@ -3035,6 +3042,15 @@ public abstract class DataEntryServlet extends SecureController {
                     ifmb.setShowItem(showItem);
                     // ifmb.setShowItem(true);
                 }
+                // now set highlighting for admin entry only
+                if (getServletPage().equals(Page.ADMIN_EDIT_SERVLET)) {
+                    if (needsHighlighting && ifmb.isShowItem()) {
+                        // that is, if it was not shown but now is shown ...
+                        ifmb.setHighlighted(true);
+                        System.out.println("set highlighted to true");
+                    }
+                }
+                // TODO child items
                 // System.out.println("did not catch NPE 1");
                 dib.setMetadata(ifmb);
                 displayItems.put(new Integer(ifmb.getItemId()), dib);
