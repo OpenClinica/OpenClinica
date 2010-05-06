@@ -26,7 +26,7 @@ public class StudyEventDefinitionOidGenerator extends OidGenerator {
     String createOid(String... keys) {
         String oid = "SE_";
         String key = keys[0];
-        oid = oid + truncateTo8Chars(capitalize(stripNonAlphaNumeric(key)));
+        oid = oid + truncateToXChars(capitalize(stripNonAlphaNumeric(key)), 28);
         if (oid.length() == 3) {
             oid = randomizeOid(oid);
 

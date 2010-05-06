@@ -31,8 +31,8 @@ public class ItemOidGenerator extends OidGenerator {
         logger.info(crfName);
         logger.info(itemLabel);
 
-        crfName = truncateTo4Chars(capitalize(stripNonAlphaNumeric(crfName)));
-        itemLabel = truncateToXChars(capitalize(stripNonAlphaNumeric(itemLabel)), 28);
+        crfName = truncateToXChars(capitalize(stripNonAlphaNumeric(crfName)), 5);
+        itemLabel = truncateToXChars(capitalize(stripNonAlphaNumeric(itemLabel)), 27);
 
         oid = oid + crfName + "_" + itemLabel;
 

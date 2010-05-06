@@ -10,6 +10,7 @@ package org.akaza.openclinica.control.submit;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
+import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.NullValue;
@@ -1051,7 +1052,7 @@ public abstract class DataEntryServlet extends SecureController {
             }
             // YW >>
 
-            // we have to do this since we loaded all the form values into the
+			// we have to do this since we loaded all the form values into the
             // display
             // item beans above
             // section.setItems(items);
@@ -1076,7 +1077,7 @@ public abstract class DataEntryServlet extends SecureController {
                 v.alwaysExecuteLastValidation(INPUT_INTERVIEW_DATE);
             }
 
-            // System.out.println("about to validate: " + v.getKeySet());
+            // logger.debug("about to validate: " + v.getKeySet());
             errors = v.validate();
 
             // tbh >>
@@ -1230,7 +1231,7 @@ public abstract class DataEntryServlet extends SecureController {
                 Iterator iter3 = errors.keySet().iterator();
                 while (iter3.hasNext()) {
                     String fieldName = iter3.next().toString();
-                    System.out.println("found error after shuffle " + fieldName);
+                    logger.debug("found error after shuffle " + fieldName);
                 }
                 // << tbh, 02/2010
 
@@ -1723,22 +1724,41 @@ public abstract class DataEntryServlet extends SecureController {
             }// end of save
         }
     }
-
+    
+    /**
+     * Changed by thickerson 05/2010
+     * @param idb
+     * @param formName
+     * @param error
+     */
     protected void setReasonForChangeError(ItemDataBean idb, String formName, String error) {
         DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(sm.getDataSource());
         FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
         HashMap idNotes = fdn.getIdNotes();
         int existingNotes = dndao.findNumExistingNotesForItem(idb.getId());
         if (existingNotes > 0) {
-            logger.debug("has a note in db");
+            logger.debug("has a note in db " + formName);
             /*
              * Having existing notes is not enough to let it pass through after changing data. There has to be a DiscrepancyNote for the latest changed data
              */
             Object noteSubmitted = session.getAttribute(DataEntryServlet.NOTE_SUBMITTED);
             if (noteSubmitted == null || !(Boolean) noteSubmitted) {
-                errors.put(formName, error);
+                boolean hasRfcAlready = false;
+                ArrayList<DiscrepancyNoteBean> notes = dndao.findExistingNotesForItemData(idb.getId());
+                for (DiscrepancyNoteBean note : notes) {
+                    if (note.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.REASON_FOR_CHANGE.getId()) {
+                        hasRfcAlready = true;
+                        logger.debug("has Rfc already: " + formName + " note id " + note.getId());
+                    }
+                }
+                if (!hasRfcAlready) {
+                    errors.put(formName, error);
+                }
+            } else {
+                logger.debug("found note in session");
             }
-            session.removeAttribute(DataEntryServlet.NOTE_SUBMITTED);
+            
+            // session.removeAttribute(DataEntryServlet.NOTE_SUBMITTED);
         } else if (idNotes.containsKey(idb.getId())) {
             logger.debug("has note in session");
         } else {
@@ -1938,7 +1958,7 @@ public abstract class DataEntryServlet extends SecureController {
         EntityBean eb = cvdao.findByPK(crfVersionId);
 
         if (eb.getId() <= 0) {
-            addPageMessage(resexception.getString("begin_data_entry_without_event_but_CRF"));
+            //addPageMessage(resexception.getString("begin_data_entry_without_event_but_CRF"));
             throw new InconsistentStateException(Page.LIST_STUDY_SUBJECTS_SERVLET, resexception.getString("begin_data_entry_without_event_but_CRF"));
         }
 
@@ -2543,8 +2563,10 @@ public abstract class DataEntryServlet extends SecureController {
                     v.addValidation(inputName, Validator.IS_VALID_WIDTH_DECIMAL, params);
                     v.alwaysExecuteLastValidation(inputName);
                 }
-
-                customValidation(v, dib, inputName);
+                // >> tbh 4/30/2010 #4963 removing custom validations firing during AE
+                if (!isAdministrativeEditing()) {
+                    customValidation(v, dib, inputName);
+                }
                 /*
                  * if (!StringUtil.isBlank(customValidationString)) { Validation customValidation = null; if (customValidationString.startsWith("func:")) { try
                  * { customValidation = Validator.processCRFValidationFunction(customValidationString ); } catch (Exception e) { e.printStackTrace(); } } else
@@ -2598,7 +2620,9 @@ public abstract class DataEntryServlet extends SecureController {
         } else {
             v.addValidation(inputName, Validator.IN_RESPONSE_SET_SINGLE_VALUE, dib.getMetadata().getResponseSet());
         }
-        customValidation(v, dib, inputName);
+        if (!isAdministrativeEditing()) {
+            customValidation(v, dib, inputName);
+        }
         return dib;
     }
 
@@ -2625,7 +2649,9 @@ public abstract class DataEntryServlet extends SecureController {
         } else {
             v.addValidation(inputName, Validator.IN_RESPONSE_SET, dib.getMetadata().getResponseSet());
         }
-        customValidation(v, dib, inputName);
+        if (!isAdministrativeEditing()) {
+            customValidation(v, dib, inputName);
+        }
         return dib;
     }
 

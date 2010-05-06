@@ -211,9 +211,13 @@ public class UpdateEventDefinitionServlet extends SecureController {
 
             }
         }
-
         session.removeAttribute("definition");
         session.removeAttribute("eventDefinitionCRFs");
+
+        session.removeAttribute("tmpCRFIdMap");
+        session.removeAttribute("crfsWithVersion");
+        session.removeAttribute("eventDefinitionCRFs");
+        
         addPageMessage(respage.getString("the_ED_has_been_updated_succesfully"));
         forwardPage(Page.LIST_DEFINITION_SERVLET);
     }

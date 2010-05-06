@@ -10,6 +10,7 @@ package org.akaza.openclinica.control.submit;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.rule.FileUploadHelper;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBeanWrapper;
@@ -30,14 +31,11 @@ import org.akaza.openclinica.web.crfdata.ImportCRFDataService;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Unmarshaller;
 
-import com.oreilly.servlet.MultipartRequest;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -57,6 +55,7 @@ public class ImportCRFDataServlet extends SecureController {
     private ImportCRFDataService dataService;
 
     XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
+    FileUploadHelper uploadHelper = new FileUploadHelper();
 
     // < ResourceBundleresword,resexception,respage;
 
@@ -118,10 +117,10 @@ public class ImportCRFDataServlet extends SecureController {
                 (new File(theDir)).mkdirs();
                 logger.info("Made the directory " + theDir);
             }
-            MultipartRequest multi = new MultipartRequest(request, theDir, 50 * 1024 * 1024);
+            //MultipartRequest multi = new MultipartRequest(request, theDir, 50 * 1024 * 1024);
             File f = null;
             try {
-                f = uploadFile(multi, theDir, version);
+                f = uploadFile(theDir, version);
 
             } catch (Exception e) {
                 logger.warn("*** Found exception during file upload***");
@@ -389,12 +388,15 @@ public class ImportCRFDataServlet extends SecureController {
      * Given the MultipartRequest extract the first File validate that it is an
      * xml file and then return it.
      */
-    private File getFirstFile(MultipartRequest multi) {
+    private File getFirstFile() {
         File f = null;
-        Enumeration files = multi.getFileNames();
-        if (files.hasMoreElements()) {
-            String name = (String) files.nextElement();
-            f = multi.getFile(name);
+        List<File> files = uploadHelper.returnFiles(request, context);
+        for (File file : files) {
+            //Enumeration files = multi.getFileNames();
+            //if (files.hasMoreElements()) {
+            //String name = (String) files.nextElement();
+            //f = multi.getFile(name);
+            f = file;
             if (f == null || f.getName() == null) {
                 logger.info("file is empty.");
                 Validator.addError(errors, "xml_file", "You have to provide an XML file!");
@@ -414,9 +416,9 @@ public class ImportCRFDataServlet extends SecureController {
      * @param version
      * @throws Exception
      */
-    public File uploadFile(MultipartRequest multi, String theDir, CRFVersionBean version) throws Exception {
+    public File uploadFile(String theDir, CRFVersionBean version) throws Exception {
 
-        return getFirstFile(multi);
+        return getFirstFile();
     }
 
     public ImportCRFDataService getImportCRFDataService() {

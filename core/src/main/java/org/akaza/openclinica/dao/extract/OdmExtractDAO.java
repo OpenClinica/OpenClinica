@@ -23,6 +23,8 @@ import org.akaza.openclinica.bean.odmbeans.ItemGroupDefBean;
 import org.akaza.openclinica.bean.odmbeans.MeasurementUnitBean;
 import org.akaza.openclinica.bean.odmbeans.MetaDataVersionBean;
 import org.akaza.openclinica.bean.odmbeans.MetaDataVersionProtocolBean;
+import org.akaza.openclinica.bean.odmbeans.MultiSelectListBean;
+import org.akaza.openclinica.bean.odmbeans.MultiSelectListItemBean;
 import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
 import org.akaza.openclinica.bean.odmbeans.StudyEventDefBean;
 import org.akaza.openclinica.bean.odmbeans.StudyGroupClassListBean;
@@ -222,6 +224,16 @@ public class OdmExtractDAO extends DatasetDAO {
         this.setTypeExpected(i, TypeNames.STRING); // name
     }
 
+    public void setNullValueCVsTypesExpected() {
+        this.unsetTypeExpected();
+        int i = 1;
+        this.setTypeExpected(i, TypeNames.STRING); //study_event_definition oc_oid
+        ++i;
+        this.setTypeExpected(i, TypeNames.STRING); //crf_version oc_oid
+        ++i;
+        this.setTypeExpected(i, TypeNames.STRING); //null_values
+    }
+
     public void getBasicDefinitions(int studyId, BasicDefinitionsBean basicDef) {
         ArrayList<MeasurementUnitBean> units = basicDef.getMeasurementUnits();
         String uprev = "";
@@ -322,6 +334,7 @@ public class OdmExtractDAO extends DatasetDAO {
         String sedprev = "";
         MetaDataVersionProtocolBean protocol = metadata.getProtocol();
         HashMap<Integer, String> nullMap = new HashMap<Integer, String>();
+        HashMap<String, String> nullValueCVs = new HashMap<String, String>();
         while (it.hasNext()) {
             HashMap row = (HashMap) it.next();
             Integer sedOrder = (Integer) row.get("definition_order");
@@ -371,6 +384,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 cvIds += cvId + ",";
                 if (nullValue != null && nullValue.length() > 0) {
                     nullMap.put(cvId, nullValue);
+                    nullValueCVs.put(sedOID + "-" + cvOID, nullValue);
                 }
             }
         }
@@ -396,12 +410,14 @@ public class OdmExtractDAO extends DatasetDAO {
         ArrayList<ItemGroupDefBean> itemGroupDefs = (ArrayList<ItemGroupDefBean>) metadata.getItemGroupDefs();
         ArrayList<ItemDefBean> itemDefs = (ArrayList<ItemDefBean>) metadata.getItemDefs();
         ArrayList<CodeListBean> codeLists = (ArrayList<CodeListBean>) metadata.getCodeLists();
+        ArrayList<MultiSelectListBean> multiSelectLists = (ArrayList<MultiSelectListBean>) metadata.getMultiSelectLists();
         ArrayList<ElementRefBean> itemGroupRefs = new ArrayList<ElementRefBean>();
         Set<String> igset = new HashSet<String>();
         Set<String> igdset = new HashSet<String>();
         Set<String> itset = new HashSet<String>();
         Set<Integer> itdset = new HashSet<Integer>();
         Set<Integer> clset = new HashSet<Integer>();
+        Set<Integer> mslset = new HashSet<Integer>();
         int cvprev = -1;
         String igprev = "";
         String itMandatory = "No";
@@ -461,7 +477,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 if (!igset.contains(key)) {
                     igset.add(key);
                     ElementRefBean igref = new ElementRefBean();
-                    igref.setElementDefOID(igOID + "-" + cvOID);
+                    igref.setElementDefOID(igOID);
                     int size = itemGroupRefs.size();
                     if (size > 0) {
                         itemGroupRefs.get(size - 1).setMandatory(itMandatory);
@@ -470,7 +486,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 }
                 if (!igdset.contains(key)) {
                     igdset.add(key);
-                    igdef.setOid(igOID + "-" + cvOID);
+                    igdef.setOid(igOID);
                     igdef.setName("ungrouped".equalsIgnoreCase(igName) ? cvOID + "-" + igName : igName);
                     igdef.setRepeating("ungrouped".equalsIgnoreCase(igName) ? "No" : "Yes");
                     igdef.setComment(igHeader);
@@ -492,14 +508,27 @@ public class OdmExtractDAO extends DatasetDAO {
             boolean hasCode = MetadataUnit.needCodeList(rsTypeId, dataTypeId);
             LinkedHashMap<String, String> codes = new LinkedHashMap<String, String>();
             if (hasCode) {
+                /*
+                //null value will not be added to codelist
                 if (nullMap.containsKey(cvId)) {
                     codes = MetadataUnit.parseCode(rsText, rsValue, nullMap.get(cvId));
                 } else {
                     codes = MetadataUnit.parseCode(rsText, rsValue);
                 }
+                */
+                codes = MetadataUnit.parseCode(rsText, rsValue);
                 // no action has been taken if rsvalue/rstext go wrong,
                 // since they have been validated when uploading crf.
             }
+
+            boolean hasMultiSelect = MetadataUnit.needMultiSelectList(rsTypeId);
+            LinkedHashMap<String, String> multi = new LinkedHashMap<String, String>();
+            if (hasMultiSelect) {
+                multi = MetadataUnit.parseCode(rsText, rsValue);
+                // no action has been taken if rsvalue/rstext go wrong,
+                // since they have been validated when uploading crf.
+            }
+
             String datatype = MetadataUnit.getOdmItemDataType(rsTypeId, dataTypeId, odmVersion);
 
             if (!itdset.contains(itId)) {
@@ -515,6 +544,13 @@ public class OdmExtractDAO extends DatasetDAO {
                 }
                 idef.setPreSASFieldName(itName);
                 idef.setCodeListOID(hasCode ? "CL_" + rsId : "");
+                if (hasMultiSelect) {
+                    ElementRefBean multiSelectListRef = new ElementRefBean();
+                    multiSelectListRef.setElementDefOID("MSL_" + rsId);
+                    idef.setMultiSelectListRef(multiSelectListRef);
+                }
+                //if(nullMap.containsKey(cvId)) {
+                //}
                 idef.getQuestion().setText(MetadataUnit.getItemQuestionText(header, left, right));
                 if (regexp != null && regexp.startsWith("func:")) {
                     idef.setRangeCheck(MetadataUnit.getItemRangeCheck(regexp.substring(5).trim(), metadata.getSoftHard(), regexpErr, muOid));
@@ -579,6 +615,28 @@ public class OdmExtractDAO extends DatasetDAO {
                     cl.getCodeListItems().add(cli);
                 }
                 codeLists.add(cl);
+            }
+
+            if (odmVersion.startsWith("oc") && hasMultiSelect && !mslset.contains(rsId)) {
+                mslset.add(rsId);
+                MultiSelectListBean msl = new MultiSelectListBean();
+                msl.setOid("MSL_" + rsId);
+                msl.setName(rsLabel);
+                msl.setDataType(datatype);
+                msl.setActualDataType(datatype);
+                Iterator<String> iter = multi.keySet().iterator();
+                while (iter.hasNext()) {
+                    String de = iter.next();
+                    MultiSelectListItemBean msli = new MultiSelectListItemBean();
+                    msli.setCodedOptionValue(de);
+                    TranslatedTextBean tt = new TranslatedTextBean();
+                    String t = multi.get(de);
+                    tt.setText(t);
+                    tt.setXmlLang(CoreResources.getField("translated_text_language"));
+                    msli.setDecode(tt);
+                    msl.getMultiSelectListItems().add(msli);
+                }
+                multiSelectLists.add(msl);
             }
         }
         itemGroupRefs.get(itemGroupRefs.size() - 1).setMandatory(itMandatory);
@@ -657,6 +715,30 @@ public class OdmExtractDAO extends DatasetDAO {
             return "d".equalsIgnoreCase(d) ? 0 : Integer.parseInt(d);
         }
         return 0;
+    }
+
+    protected HashMap<String, String> getNullValueCVs(StudyBean study) {
+        HashMap<String, String> nullValueCVs = new HashMap<String, String>();
+        int studyId = study.getId();
+        this.setNullValueCVsTypesExpected();
+        ArrayList viewRows = new ArrayList();
+        if (study.getParentStudyId() > 0) {
+            viewRows = select(this.getNullValueCVsSql(studyId + ""));
+            if (viewRows.size() <= 0) {
+                viewRows = select(this.getNullValueCVsSql(study.getParentStudyId() + ""));
+            }
+        } else {
+            viewRows = select(this.getNullValueCVsSql(studyId + ""));
+        }
+        Iterator iter = viewRows.iterator();
+        while (iter.hasNext()) {
+            HashMap row = (HashMap) iter.next();
+            String sedOID = (String) row.get("definition_oid");
+            String cvOID = (String) row.get("crf_version_oid");
+            String nullValues = (String) row.get("null_values");
+            nullValueCVs.put(studyId + "-" + sedOID + "-" + cvOID, nullValues);
+        }
+        return nullValueCVs;
     }
 
     public void getClinicalData(StudyBean study, DatasetBean dataset, OdmClinicalDataBean data, String odmVersion) {
@@ -774,107 +856,114 @@ public class OdmExtractDAO extends DatasetDAO {
         logger.debug("Begin to GetEventGroupItemWithUnitSql");
         ArrayList viewRows = select(getEventGroupItemWithUnitSql(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId));
         logger.error("getEventGroupItemWithUnitSql : " + getEventGroupItemWithUnitSql(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId));
-        Iterator iter = viewRows.iterator();
-        ExportSubjectDataBean sub = new ExportSubjectDataBean();
-        ExportStudyEventDataBean se = new ExportStudyEventDataBean();
-        ExportFormDataBean form = new ExportFormDataBean();
-        int ecprev = -1;
-        igprev = "";
-        boolean goon = true;
-        String itprev = "";
-        HashMap<String, String> nullValueMap = ClinicalDataUnit.getNullValueMap();
-        String yearMonthFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString("date_format_year_month"));
-        String yearFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString("date_format_year"));
-        while (iter.hasNext()) {
-            HashMap row = (HashMap) iter.next();
-            Integer ecId = (Integer) row.get("event_crf_id");
-            Integer igId = (Integer) row.get("item_group_id");
-            String igOID = (String) row.get("item_group_oid");
-            String igName = (String) row.get("item_group_name");
-            Integer itId = (Integer) row.get("item_id");
-            String itOID = (String) row.get("item_oid");
-            Integer itDataOrdinal = (Integer) row.get("item_data_ordinal");
-            String itValue = (String) row.get("value");
-            Integer datatypeid = (Integer) row.get("item_data_type_id");
-            String muOid = (String) row.get("mu_oid");
-            String key = "";
-            if (ecId != ecprev) {
-                logger.error("Found ecId=" + ecId + " in subjectEventFormSql is:" + oidPoses.containsKey(ecId));
-                if (oidPoses.containsKey(ecId)) {
-                    goon = true;
-                    String[] poses = oidPoses.get(ecId).split("---");
-                    sub = data.getExportSubjectData().get(Integer.valueOf(poses[0]));
-                    se = sub.getExportStudyEventData().get(Integer.valueOf(poses[1]));
-                    form = se.getExportFormData().get(Integer.valueOf(poses[2]));
-                } else {
-                    goon = false;
+        if (viewRows.size() > 0) {
+            Iterator iter = viewRows.iterator();
+            ExportSubjectDataBean sub = new ExportSubjectDataBean();
+            ExportStudyEventDataBean se = new ExportStudyEventDataBean();
+            ExportFormDataBean form = new ExportFormDataBean();
+            int ecprev = -1;
+            igprev = "";
+            boolean goon = true;
+            String itprev = "";
+            //HashMap<String, String> nullValueMap = ClinicalDataUnit.getNullValueMap();
+            HashMap<String, String> nullValueCVs = this.getNullValueCVs(study);
+            String yearMonthFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString("date_format_year_month"));
+            String yearFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString("date_format_year"));
+            while (iter.hasNext()) {
+                HashMap row = (HashMap) iter.next();
+                Integer ecId = (Integer) row.get("event_crf_id");
+                Integer igId = (Integer) row.get("item_group_id");
+                String igOID = (String) row.get("item_group_oid");
+                String igName = (String) row.get("item_group_name");
+                Integer itId = (Integer) row.get("item_id");
+                String itOID = (String) row.get("item_oid");
+                Integer itDataOrdinal = (Integer) row.get("item_data_ordinal");
+                String itValue = (String) row.get("value");
+                Integer datatypeid = (Integer) row.get("item_data_type_id");
+                String muOid = (String) row.get("mu_oid");
+                String key = "";
+                if (ecId != ecprev) {
+                    logger.error("Found ecId=" + ecId + " in subjectEventFormSql is:" + oidPoses.containsKey(ecId));
+                    if (oidPoses.containsKey(ecId)) {
+                        goon = true;
+                        String[] poses = oidPoses.get(ecId).split("---");
+                        sub = data.getExportSubjectData().get(Integer.valueOf(poses[0]));
+                        se = sub.getExportStudyEventData().get(Integer.valueOf(poses[1]));
+                        form = se.getExportFormData().get(Integer.valueOf(poses[2]));
+                    } else {
+                        goon = false;
+                    }
+                    ecprev = ecId;
                 }
-                ecprev = ecId;
-            }
-            if (goon) {
-                ImportItemGroupDataBean ig = new ImportItemGroupDataBean();
-                // key = ecId + igOID;
-                key = ecId + "-" + igId;
-                if (!igprev.equals(key) || !igpos.containsKey(key + itDataOrdinal)) {
-                    igpos.put(key + itDataOrdinal, form.getItemGroupData().size());
-                    igprev = key;
-                    ig.setItemGroupOID(igOID + "-" + form.getFormOID());
-                    ig.setItemGroupRepeatKey("ungrouped".equalsIgnoreCase(igName) ? "-1" : itDataOrdinal + "");
-                    form.getItemGroupData().add(ig);
-                } else {
-                    ig = form.getItemGroupData().get(igpos.get(key + itDataOrdinal));
-                }
+                if (goon) {
+                    ImportItemGroupDataBean ig = new ImportItemGroupDataBean();
+                    // key = ecId + igOID;
+                    key = ecId + "-" + igId;
+                    if (!igprev.equals(key) || !igpos.containsKey(key + itDataOrdinal)) {
+                        igpos.put(key + itDataOrdinal, form.getItemGroupData().size());
+                        igprev = key;
+                        ig.setItemGroupOID(igOID);
+                        ig.setItemGroupRepeatKey("ungrouped".equalsIgnoreCase(igName) ? "-1" : itDataOrdinal + "");
+                        form.getItemGroupData().add(ig);
+                    } else {
+                        ig = form.getItemGroupData().get(igpos.get(key + itDataOrdinal));
+                    }
 
-                // item should be distinct; but duplicated item data have
-                // been reported because "save" have been clicked twice.
-                // those duplicated item data have been arranged together by
-                // "distinct" because of their same
-                // ecId+igOID+itOID+itDataOrdinal (08-2008)
-                key = itId + "_" + itDataOrdinal + key;
-                if (!itprev.equals(key)) {
-                    itprev = key;
-                    ImportItemDataBean it = new ImportItemDataBean();
-                    it.setItemOID(itOID);
-                    it.setTransactionType("Insert");
-                    if (nullValueMap.containsKey(itValue.trim().toUpperCase())) {
-                        itValue = nullValueMap.get(itValue.trim().toUpperCase());
-                    }
-                    if (datatypeid == 9) {
-                        try {
-                            itValue = new SimpleDateFormat("yyyy-MM-dd").format(new SimpleDateFormat(oc_df_string).parse(itValue));
-                        } catch (Exception fe) {
-                            logger.info("Item -" + itOID + " value " + itValue + " might not be ODM date format yyyy-MM-dd.");
-                        }
-                    } else if (datatypeid == 10 && odmVersion.contains("1.3")) {
-                        if (StringUtil.isFormatDate(itValue, oc_df_string)) {
-                            try {
-                                itValue = new SimpleDateFormat("yyyy-MM-dd").format(new SimpleDateFormat(oc_df_string).parse(itValue));
-                            } catch (Exception e) {
-                                logger.info("Item -" + itOID + " value " + itValue + " might not be ODM partialDate format yyyy[-MM[-dd]].");
-                            }
+                    // item should be distinct; but duplicated item data have
+                    // been reported because "save" have been clicked twice.
+                    // those duplicated item data have been arranged together by
+                    // "distinct" because of their same
+                    // ecId+igOID+itOID+itDataOrdinal (08-2008)
+                    key = itId + "_" + itDataOrdinal + key;
+                    if (!itprev.equals(key)) {
+                        itprev = key;
+                        ImportItemDataBean it = new ImportItemDataBean();
+                        it.setItemOID(itOID);
+                        it.setTransactionType("Insert");
+                        if (ClinicalDataUnit.isNull(itValue, study.getId() + "-" + se.getStudyEventOID() + "-" + form.getFormOID(), nullValueCVs)) {
+                            //if (nullValueMap.containsKey(itValue.trim().toUpperCase())) {
+                            //itValue = nullValueMap.get(itValue.trim().toUpperCase());
+                            it.setIsNull("Yes");
+                            it.setReasonForNull(itValue.trim());
                         } else {
-                            if (StringUtil.isPartialYearMonth(itValue, yearMonthFormat)) {
+                            if (datatypeid == 9) {
                                 try {
-                                    itValue = new SimpleDateFormat("yyyy-MM").format(new SimpleDateFormat(yearMonthFormat).parse(itValue));
-                                } catch (Exception e) {
-                                    logger.info("Item -" + itOID + " value " + itValue + " might not be ODM partialDate format yyyy[-MM[-dd]].");
+                                    itValue = new SimpleDateFormat("yyyy-MM-dd").format(new SimpleDateFormat(oc_df_string).parse(itValue));
+                                } catch (Exception fe) {
+                                    logger.info("Item -" + itOID + " value " + itValue + " might not be ODM date format yyyy-MM-dd.");
                                 }
-                            } else {
-                                try {
-                                    itValue = new SimpleDateFormat("yyyy").format(new SimpleDateFormat(yearFormat).parse(itValue));
-                                } catch (Exception e) {
-                                    logger.info("Item -" + itOID + " value " + itValue + " might not be ODM partialDate format yyyy[-MM[-dd]].");
+                            } else if (datatypeid == 10 && odmVersion.contains("1.3")) {
+                                if (StringUtil.isFormatDate(itValue, oc_df_string)) {
+                                    try {
+                                        itValue = new SimpleDateFormat("yyyy-MM-dd").format(new SimpleDateFormat(oc_df_string).parse(itValue));
+                                    } catch (Exception e) {
+                                        logger.info("Item -" + itOID + " value " + itValue + " might not be ODM partialDate format yyyy[-MM[-dd]].");
+                                    }
+                                } else {
+                                    if (StringUtil.isPartialYearMonth(itValue, yearMonthFormat)) {
+                                        try {
+                                            itValue = new SimpleDateFormat("yyyy-MM").format(new SimpleDateFormat(yearMonthFormat).parse(itValue));
+                                        } catch (Exception e) {
+                                            logger.info("Item -" + itOID + " value " + itValue + " might not be ODM partialDate format yyyy[-MM[-dd]].");
+                                        }
+                                    } else {
+                                        try {
+                                            itValue = new SimpleDateFormat("yyyy").format(new SimpleDateFormat(yearFormat).parse(itValue));
+                                        } catch (Exception e) {
+                                            logger.info("Item -" + itOID + " value " + itValue + " might not be ODM partialDate format yyyy[-MM[-dd]].");
+                                        }
+                                    }
                                 }
                             }
+                            it.setValue(itValue);
                         }
+                        if (muOid != null && muOid.length() > 0) {
+                            ElementRefBean measurementUnitRef = new ElementRefBean();
+                            measurementUnitRef.setElementDefOID(muOid);
+                            it.setMeasurementUnitRef(measurementUnitRef);
+                        }
+                        ig.getItemData().add(it);
                     }
-                    it.setValue(itValue);
-                    if (muOid != null && muOid.length() > 0) {
-                        ElementRefBean measurementUnitRef = new ElementRefBean();
-                        measurementUnitRef.setElementDefOID(muOid);
-                        it.setMeasurementUnitRef(measurementUnitRef);
-                    }
-                    ig.getItemData().add(it);
                 }
             }
         }
@@ -1293,5 +1382,14 @@ public class OdmExtractDAO extends DatasetDAO {
         return "select cv.*, mu.oc_oid as mu_oid from (" + this.getItemGroupAndItemMetaSql(crfVersionIds) + ")cv left join"
             + " (select item.item_id, mu.oc_oid from versioning_map vm, item, measurement_unit mu" + " where vm.crf_version_id in (" + crfVersionIds
             + ") and vm.item_id = item.item_id" + " and item.units = mu.name )mu on cv.item_id = mu.item_id ";
+    }
+
+    protected String getNullValueCVsSql(String studyId) {
+        return "select sed.oc_oid as definition_oid, cv.oc_oid as crf_version_oid, edc.null_values from study_event_definition sed, event_definition_crf edc, crf_version cv"
+            + " where edc.study_id = "
+            + studyId
+            + " and length(edc.null_values) > 0"
+            + " and sed.study_event_definition_id = edc.study_event_definition_id"
+            + " and edc.crf_id = cv.crf_id";
     }
 }

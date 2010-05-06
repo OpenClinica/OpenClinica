@@ -398,6 +398,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         ArrayList<DiscrepancyNoteBean> discNotes = new ArrayList<DiscrepancyNoteBean>();
         setTypesExpected();
         this.setTypeExpected(12, TypeNames.STRING);
+        this.setTypeExpected(13, TypeNames.STRING);
 
         HashMap variables = new HashMap();
         variables.put(new Integer(1), currentStudy.getId());
@@ -410,7 +411,12 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         variables.put(new Integer(8), currentStudy.getId());
         variables.put(new Integer(9), currentStudy.getId());
         variables.put(new Integer(10), currentStudy.getId());
-        String sql = digester.getQuery("findAllSubjectDNByStudy");
+
+        String sql = "";
+        if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
+            sql = sql + "SELECT * FROM ( SELECT x.*, ROWNUM as rnum FROM (";
+        }
+        sql = sql + digester.getQuery("findAllSubjectDNByStudy");
         sql = sql + filter.execute("");
         sql += " UNION ";
         sql += digester.getQuery("findAllStudySubjectDNByStudy");
@@ -432,7 +438,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         sql += filter.execute("");
 
         if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
-            sql += " AND rownum <= " + rowEnd + " and rownum >" + rowStart;
+            sql += ") x )  WHERE rnum BETWEEN " + (rowStart + 1) + " and " + rowEnd;
             sql += sort.execute("");
         } else {
             sql += sort.execute("");

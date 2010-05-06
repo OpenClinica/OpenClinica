@@ -29,6 +29,7 @@ public class ItemDefBean extends ElementOIDBean {
     private List<RangeCheckBean> rangeChecks;
     private String codeListOID;
     private String comment;
+    private ElementRefBean multiSelectListRef;
 
     public ItemDefBean() {
         question = new TranslatedTextBean();
@@ -114,5 +115,13 @@ public class ItemDefBean extends ElementOIDBean {
 
     public void setMeasurementUnitRef(ElementRefBean measurementUnitRef) {
         this.measurementUnitRef = measurementUnitRef;
+    }
+
+    public ElementRefBean getMultiSelectListRef() {
+        return multiSelectListRef;
+    }
+
+    public void setMultiSelectListRef(ElementRefBean multiSelectListRef) {
+        this.multiSelectListRef = multiSelectListRef;
     }
 }

@@ -822,7 +822,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
 
     }
 
-    public ArrayList findAllUsersByStudyOrSite(int studyId, int parentStudyId) {
+    public ArrayList findAllUsersByStudyOrSite(int studyId, int parentStudyId, int studySubjectId) {
         this.unsetTypeExpected();
 
         this.setTypeExpected(1, TypeNames.STRING);
@@ -842,8 +842,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(studyId));
         variables.put(new Integer(2), new Integer(parentStudyId));
-        variables.put(new Integer(3), new Integer(studyId));
-        variables.put(new Integer(4), new Integer(parentStudyId));
+        variables.put(new Integer(3), new Integer(studySubjectId));
         ArrayList alist = this.select(digester.getQuery("findAllUsersByStudyOrSite"), variables);
         Iterator it = alist.iterator();
         while (it.hasNext()) {

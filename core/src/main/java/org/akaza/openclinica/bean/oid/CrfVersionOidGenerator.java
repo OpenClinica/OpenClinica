@@ -30,7 +30,7 @@ public class CrfVersionOidGenerator extends OidGenerator {
         String crfVersion = keys[1];
 
         // crfOid = truncateTo4Chars(capitalize(stripNonAlphaNumeric(crfOid)));
-        crfVersion = truncateTo4Chars(capitalize(stripNonAlphaNumeric(crfVersion)));
+        crfVersion = truncateToXChars(capitalize(stripNonAlphaNumeric(crfVersion)), 10);
 
         logger.info(crfOid);
         logger.info(crfVersion);

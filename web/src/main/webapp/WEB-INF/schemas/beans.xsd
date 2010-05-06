@@ -19,7 +19,7 @@
 
     <complexType name="studySubjectType">
         <sequence>
-            <element name="label" type="beans:customStringType"/>
+            <element name="label" type="beans:customStringType" minOccurs="0"/>
             <element name="secondaryLabel" type="beans:customStringType" minOccurs="0"/>
             <element name="enrollmentDate" type="date"/>
             <element name="subject" type="beans:subjectType"/>

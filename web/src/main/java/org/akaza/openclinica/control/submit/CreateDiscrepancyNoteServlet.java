@@ -170,7 +170,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
         int entityId = fp.getInt(ENTITY_ID);
         // subjectId has to be added to the database when disc notes area saved
         // as entity_type 'subject'
-        int subjectId = fp.getInt(SUBJECT_ID);
+        int studySubjectId = fp.getInt(SUBJECT_ID);
         int itemId = fp.getInt(ITEM_ID);
         String entityType = fp.getString(ENTITY_TYPE);
         String field = fp.getString(ENTITY_FIELD);
@@ -261,12 +261,12 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
         if (!fp.isSubmitted()) {
             DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
 
-            if (subjectId > 0) {
+            if (studySubjectId > 0) {
                 // BWP: this doesn't seem correct, because the SubjectId should
                 // be the id for
                 // the SubjectBean, different from StudySubjectBean
                 StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
-                StudySubjectBean ssub = (StudySubjectBean) ssdao.findByPK(subjectId);
+                StudySubjectBean ssub = (StudySubjectBean) ssdao.findByPK(studySubjectId);
                 dnb.setSubjectName(ssub.getName());
                 dnb.setSubjectId(ssub.getId());
                 dnb.setStudySub(ssub);
@@ -415,7 +415,9 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             request.setAttribute(DIS_NOTE, dnb);
             request.setAttribute("unlock", "0");
             request.setAttribute(WRITE_TO_DB, writeToDB ? "1" : "0");
-            ArrayList userAccounts = this.generateUserAccounts(ub.getActiveStudyId(), subjectId);
+            EventCRFDAO eventCrfDAO = new EventCRFDAO(sm.getDataSource());
+            EventCRFBean eventCrfBean = (EventCRFBean) eventCrfDAO.findByPK(dnb.getEventCRFId());
+            ArrayList userAccounts = this.generateUserAccounts(ub.getActiveStudyId(), studySubjectId);
             request.setAttribute(USER_ACCOUNTS, userAccounts);
 
             // ideally should be only two cases
@@ -425,9 +427,6 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                 System.out.println("assigned owner id: " + parent.getOwnerId());
             } else if (dnb.getEventCRFId() > 0) {
                 System.out.println("found a event crf id: " + dnb.getEventCRFId());
-                EventCRFDAO eventCrfDAO = new EventCRFDAO(sm.getDataSource());
-                EventCRFBean eventCrfBean = new EventCRFBean();
-                eventCrfBean = (EventCRFBean) eventCrfDAO.findByPK(dnb.getEventCRFId());
                 request.setAttribute(USER_ACCOUNT_ID, new Integer(eventCrfBean.getOwnerId()).toString());
                 System.out.println("assigned owner id: " + eventCrfBean.getOwnerId());
             } else {
@@ -531,7 +530,10 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 
             request.setAttribute(DIS_NOTE, note);
             request.setAttribute(WRITE_TO_DB, writeToDB ? "1" : "0");
-            ArrayList userAccounts = this.generateUserAccounts(ub.getActiveStudyId(), subjectId);
+            EventCRFDAO eventCrfDAO = new EventCRFDAO(sm.getDataSource());
+            EventCRFBean eventCrfBean = (EventCRFBean) eventCrfDAO.findByPK(note.getEventCRFId());
+
+            ArrayList userAccounts = this.generateUserAccounts(ub.getActiveStudyId(), eventCrfBean.getStudySubjectId());
 
             request.setAttribute(USER_ACCOUNT_ID, new Integer(note.getAssignedUserId()).toString());
             // formality more than anything else, we should go to say the note
@@ -857,18 +859,18 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
         }
     }
 
-    private ArrayList generateUserAccounts(int studyId, int subjectId) {
+    private ArrayList generateUserAccounts(int studyId, int studySubjectId) {
         UserAccountDAO userAccountDAO = new UserAccountDAO(sm.getDataSource());
         StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
-        StudyBean subjectStudy = studyDAO.findByStudySubjectId(subjectId);
+        StudyBean subjectStudy = studyDAO.findByStudySubjectId(studySubjectId);
         // study id, tbh 03/2009
         ArrayList userAccounts = new ArrayList();
         if (currentStudy.getParentStudyId() > 0) {
-            userAccounts = userAccountDAO.findAllUsersByStudyOrSite(studyId, currentStudy.getParentStudyId());
+            userAccounts = userAccountDAO.findAllUsersByStudyOrSite(studyId, currentStudy.getParentStudyId(), studySubjectId);
         } else if(subjectStudy.getParentStudyId() > 0){
-            userAccounts = userAccountDAO.findAllUsersByStudyOrSite(subjectStudy.getId(), subjectStudy.getParentStudyId());
+            userAccounts = userAccountDAO.findAllUsersByStudyOrSite(subjectStudy.getId(), subjectStudy.getParentStudyId(), studySubjectId);
         } else {
-            userAccounts = userAccountDAO.findAllUsersByStudyOrSite(studyId, 0);
+            userAccounts = userAccountDAO.findAllUsersByStudyOrSite(studyId, 0, studySubjectId);
         }
         return userAccounts;
     }

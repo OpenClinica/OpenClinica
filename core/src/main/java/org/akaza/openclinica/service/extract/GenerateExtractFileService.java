@@ -1,5 +1,20 @@
 package org.akaza.openclinica.service.extract;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.zip.ZipOutputStream;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.DisplayItemHeaderBean;
@@ -23,21 +38,6 @@ import org.akaza.openclinica.logic.odmExport.ClinicalDataCollector;
 import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.zip.ZipOutputStream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
 
 public class GenerateExtractFileService {
 
@@ -122,7 +122,8 @@ public class GenerateExtractFileService {
                 cdc.setODMBean(odmb);
             } else if ("oc1.2".equals(odmVersion)) {
                 ODMBean odmb = new ODMBean();
-                odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.2 OpenClinica-ODM1-2-1.xsd");
+                //odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.2 OpenClinica-ODM1-2-1.xsd");
+                odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.2 OpenClinica-ODM1-2-1-OC1.xsd");
                 ArrayList<String> xmlnsList = new ArrayList<String>();
                 xmlnsList.add("xmlns=\"http://www.cdisc.org/ns/odm/v1.2\"");
                 xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/openclinica_odm/v1.2\"");
@@ -132,7 +133,8 @@ public class GenerateExtractFileService {
                 cdc.setODMBean(odmb);
             } else if ("oc1.3".equals(odmVersion)) {
                 ODMBean odmb = mdc.getODMBean();
-                odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0.xsd");
+                //odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0.xsd");
+                odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC1.xsd");
                 ArrayList<String> xmlnsList = new ArrayList<String>();
                 xmlnsList.add("xmlns=\"http://www.cdisc.org/ns/odm/v1.3\"");
                 xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/openclinica_odm/v1.3\"");
@@ -263,6 +265,8 @@ public class GenerateExtractFileService {
     public int createFile(String zipName, ArrayList names, String dir, ArrayList contents, DatasetBean datasetBean, long time, ExportFormatBean efb,
             boolean saveToDB) {
         ArchivedDatasetFileBean fbFinal = new ArchivedDatasetFileBean();
+        // >> tbh #4915
+        zipName = zipName.replaceAll(" ", "_");
         fbFinal.setId(0);
         try {
             File complete = new File(dir);
@@ -274,6 +278,8 @@ public class GenerateExtractFileService {
             FileInputStream is = null;
             for (int i = 0; i < names.size(); i++) {
                 String name = (String) names.get(i);
+                // >> tbh #4915
+                name = name.replaceAll(" ", "_");
                 String content = (String) contents.get(i);
                 File newFile = new File(complete, name);
                 // totalSize = totalSize + (int)newFile.length();
@@ -353,6 +359,8 @@ public class GenerateExtractFileService {
 
     public int createFile(String name, String dir, String content, DatasetBean datasetBean, long time, ExportFormatBean efb, boolean saveToDB) {
         ArchivedDatasetFileBean fbFinal = new ArchivedDatasetFileBean();
+        // >> tbh 04/2010 #4915 replace all names' spaces with underscores
+        name = name.replaceAll(" ", "_");
         fbFinal.setId(0);
         try {
             File complete = new File(dir);

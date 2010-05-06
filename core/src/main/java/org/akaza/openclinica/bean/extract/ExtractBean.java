@@ -727,6 +727,10 @@ public class ExtractBean {
 
                     }
                 }// end j
+            }
+            
+            for (int i = 1; i <= numSEDs; i++) {
+                int numSamples = getSEDNumSamples(i);
                 // restart j so that text reports match tbh 03/08
                 for (int j = 1; j <= numSamples; j++) {
                     int numSEDCRFs = getSEDNumCRFs(i);

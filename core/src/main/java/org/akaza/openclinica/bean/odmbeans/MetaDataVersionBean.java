@@ -30,6 +30,7 @@ public class MetaDataVersionBean extends ElementOIDBean {
     private List<StudyGroupClassListBean> studyGroupClassLists;
     // OpenClinica system has set softhard constraint on study level
     private String softhard;
+    private List<MultiSelectListBean> multiSelectLists;
 
     public MetaDataVersionBean() {
         include = new MetaDataVersionIncludeBean();
@@ -40,6 +41,7 @@ public class MetaDataVersionBean extends ElementOIDBean {
         itemDefs = new ArrayList<ItemDefBean>();
         codeLists = new ArrayList<CodeListBean>();
         studyGroupClassLists = new ArrayList<StudyGroupClassListBean>();
+        multiSelectLists = new ArrayList<MultiSelectListBean>();
     }
 
     public void setName(String metadataVersionName) {
@@ -128,5 +130,13 @@ public class MetaDataVersionBean extends ElementOIDBean {
 
     public String getSoftHard() {
         return this.softhard;
+    }
+
+    public List<MultiSelectListBean> getMultiSelectLists() {
+        return multiSelectLists;
+    }
+
+    public void setMultiSelectLists(List<MultiSelectListBean> multiSelectLists) {
+        this.multiSelectLists = multiSelectLists;
     }
 }

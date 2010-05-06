@@ -61,12 +61,13 @@
 			<tr>
 				<td valign="top" class="table_tools">
 					<c:if test="${table.paginated && (table.currPageNumber > 1)}">
-						<a href="<c:out value="${firstPageQuery}"/>"><img src="images/arrow_first.gif" border="0" alt="<fmt:message key="first_page" bundle="${resword}"/>" title="<fmt:message key="first_page" bundle="${resword}"/>"></a>
-						<a href="<c:out value="${prevPageQuery}"/>"><img src="images/arrow_back.gif" border="0" alt="<fmt:message key="back" bundle="${resword}"/>" title="<fmt:message key="back" bundle="${resword}"/>"></a>
-						<%-- 
-						<a href="#" onclick="document.forms[0].action='<c:out value="${firstPageQuery}"/>';document.forms[0].submit()"><img src="images/arrow_first.gif" border="0" alt="<fmt:message key="first_page" bundle="${resword}"/>" title="<fmt:message key="first_page" bundle="${resword}"/>"></a>
-						<a href="#" onclick="document.forms[0].action='<c:out value="${prevPageQuery}"/>';document.forms[0].submit()"><img src="images/arrow_back.gif" border="0" alt="<fmt:message key="back" bundle="${resword}"/>" title="<fmt:message key="back" bundle="${resword}"/>"></a>
-						--%>
+						<%--<a href="<c:out value="${firstPageQuery}"/>"><img src="images/arrow_first.gif" border="0" alt="<fmt:message key="first_page" bundle="${resword}"/>" title="<fmt:message key="first_page" bundle="${resword}"/>"></a>--%>
+						<%--<a href="<c:out value="${prevPageQuery}"/>"><img src="images/arrow_back.gif" border="0" alt="<fmt:message key="back" bundle="${resword}"/>" title="<fmt:message key="back" bundle="${resword}"/>"></a>--%>
+						<a href="#" onclick="document.forms[1].action='<c:out value="${firstPageQuery}"/>';document.forms[1].submit()"><img src="images/arrow_first.gif" border="0" alt="<fmt:message key="first_page" bundle="${resword}"/>" title="<fmt:message key="first_page" bundle="${resword}"/>"></a>
+						<a href="#" onclick="document.forms[1].action='<c:out value="${prevPageQuery}"/>';document.forms[1].submit()"><img src="images/arrow_back.gif" border="0" alt="<fmt:message key="back" bundle="${resword}"/>" title="<fmt:message key="back" bundle="${resword}"/>"></a>
+                        <%--<a href="#" onclick="document.crfForm.action='<c:out value="${firstPageQuery}"/>';document.crfForm.submit()"><img src="images/arrow_first.gif" border="0" alt="<fmt:message key="first_page" bundle="${resword}"/>" title="<fmt:message key="first_page" bundle="${resword}"/>"></a>--%>
+                        <%--<a href="#" onclick="document.crfForm.action='<c:out value="${prevPageQuery}"/>';document.crfForm.submit()"><img src="images/arrow_back.gif" border="0" alt="<fmt:message key="back" bundle="${resword}"/>" title="<fmt:message key="back" bundle="${resword}"/>"></a>--%>
+
 					</c:if>
 				</td>
 				<td valign="top" class="table_tools">
@@ -76,10 +77,12 @@
 					</c:choose>
 				<td valign="top" class="table_tools">
 					<c:if test="${table.paginated && (table.currPageNumber < table.totalPageNumbers)}">
-						<%-- <a href="#" onclick="document.forms[0].action='<c:out value="${nextPageQuery}"/>';document.forms[0].submit()"><img src="images/arrow_next.gif" border="0" alt="<fmt:message key="next" bundle="${resword}"/>" title="<fmt:message key="next" bundle="${resword}"/>"></a>
-						<a href="#" onclick="document.forms[0].action='<c:out value="${lastPageQuery}"/>';document.forms[0].submit()"><img src="images/arrow_last.gif" border="0" alt="<fmt:message key="last_page" bundle="${resword}"/>" title="<fmt:message key="last_page" bundle="${resword}"/>"></a> --%>
-						<a href="<c:out value="${nextPageQuery}"/>"><img src="images/arrow_next.gif" border="0" alt="<fmt:message key="next" bundle="${resword}"/>" title="<fmt:message key="next" bundle="${resword}"/>"></a>
-						<a href="<c:out value="${lastPageQuery}"/>"><img src="images/arrow_last.gif" border="0" alt="<fmt:message key="last_page" bundle="${resword}"/>" title="<fmt:message key="last_page" bundle="${resword}"/>"></a>
+                        <%--<a href="<c:out value="${nextPageQuery}"/>"><img src="images/arrow_next.gif" border="0" alt="<fmt:message key="next" bundle="${resword}"/>" title="<fmt:message key="next" bundle="${resword}"/>"></a>--%>
+                        <%--<a href="<c:out value="${lastPageQuery}"/>"><img src="images/arrow_last.gif" border="0" alt="<fmt:message key="last_page" bundle="${resword}"/>" title="<fmt:message key="last_page" bundle="${resword}"/>"></a>--%>
+						<a href="#" onclick="document.forms[1].action='<c:out value="${nextPageQuery}"/>';document.forms[1].submit()"><img src="images/arrow_next.gif" border="0" alt="<fmt:message key="next" bundle="${resword}"/>" title="<fmt:message key="next" bundle="${resword}"/>"></a>
+						<a href="#" onclick="document.forms[1].action='<c:out value="${lastPageQuery}"/>';document.forms[1].submit()"><img src="images/arrow_last.gif" border="0" alt="<fmt:message key="last_page" bundle="${resword}"/>" title="<fmt:message key="last_page" bundle="${resword}"/>"></a>
+                        <%--<a href="#" onclick="document.crfForm.action='<c:out value="${nextPageQuery}"/>';document.crfForm.submit()"><img src="images/arrow_next.gif" border="0" alt="<fmt:message key="next" bundle="${resword}"/>" title="<fmt:message key="next" bundle="${resword}"/>"></a>--%>
+                        <%--<a href="#" onclick="document.crfForm.action='<c:out value="${lastPageQuery}"/>';document.crfForm.submit()"><img src="images/arrow_last.gif" border="0" alt="<fmt:message key="last_page" bundle="${resword}"/>" title="<fmt:message key="last_page" bundle="${resword}"/>"></a>--%>
 					</c:if>
 				</td>
 			</tr>

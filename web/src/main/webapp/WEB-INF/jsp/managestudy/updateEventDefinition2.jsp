@@ -39,7 +39,7 @@
 <jsp:include page="../include/sideInfo.jsp"/>
 
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
-<jsp:useBean scope="request" id="crfs" class="java.util.ArrayList"/>
+<%--<jsp:useBean scope="request" id="crfs" class="java.util.ArrayList"/>--%>
 
 <script type="text/JavaScript" language="JavaScript">
   <!--
@@ -61,11 +61,19 @@
 <h1><span class="title_manage"><fmt:message key="update_SED" bundle="${resword}"/> - <fmt:message key="add_CRFs" bundle="${resword}"/></span></h1>
 
 <form name="crfForm" action="AddCRFToDefinition"  method="post">
-<input type="hidden" name="action" value="add">
-<c:import url="../include/showTable.jsp">
-<c:param name="rowURL" value="showDefineEventCRFRow.jsp" />
-<c:param name="outerFormName" value="crfForm" />
-</c:import>
+    <input type="hidden" name="action" value="next">
+    <input type="hidden" name="pageNum" value="2">
+
+    <c:import url="../include/showTableForEventDefinitionCRFList.jsp">
+        <c:param name="rowURL" value="showDefineEventCRFRow.jsp" />
+        <c:param name="outerFormName" value="crfForm" />
+        <%--<c:param name="searchFormOnClickJS" value="document.crfForm.elements['actionName'].value='next';document.crfForm.elements[1].value='1';" />--%>
+    </c:import>
+
+<%--<c:import url="../include/showTable.jsp">--%>
+<%--<c:param name="rowURL" value="showDefineEventCRFRow.jsp" />--%>
+<%--<c:param name="outerFormName" value="crfForm" />--%>
+<%--</c:import>--%>
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>
 <td>

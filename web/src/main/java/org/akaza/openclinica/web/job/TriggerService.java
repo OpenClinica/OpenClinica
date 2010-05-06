@@ -173,7 +173,7 @@ public class TriggerService {
         v.addValidation(EMAIL, Validator.IS_A_EMAIL);
         v.addValidation(PERIOD, Validator.NO_BLANKS);
         v.addValidation(DATE_START_JOB + "Date", Validator.IS_A_DATE);
-
+        // v.addValidation(DATE_START_JOB + "Date", new Date(), Validator.DATE_IS_AFTER_OR_EQUAL);
         // TODO job names will have to be unique, tbh
 
         String tab = fp.getString(TAB);
@@ -182,6 +182,7 @@ public class TriggerService {
         String cdisc13 = fp.getString(ExampleSpringJob.CDISC13);
         String cdisc13oc = fp.getString(ExampleSpringJob.CDISC13OC);
         String spss = fp.getString(SPSS);
+        Date jobDate = fp.getDateTime(DATE_START_JOB);
         HashMap errors = v.validate();
         if ((tab == "") && (cdisc == "") && (spss == "") && (cdisc12 == "") && (cdisc13 == "") && (cdisc13oc == "")) {
             // throw an error here, at least one should work
@@ -192,6 +193,9 @@ public class TriggerService {
             if (triggerName.equals(fp.getString(JOB_NAME)) && (!triggerName.equals(properName))) {
                 v.addError(errors, JOB_NAME, "A job with that name already exists.  Please pick another name.");
             }
+        }
+        if (jobDate.before(new Date())) {
+            v.addError(errors, DATE_START_JOB + "Date", "This date needs to be later than the present time.");
         }
         return errors;
     }

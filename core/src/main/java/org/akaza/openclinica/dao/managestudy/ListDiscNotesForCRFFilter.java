@@ -33,7 +33,7 @@ public class ListDiscNotesForCRFFilter implements CriteriaCommand {
                 theCriteria += buildCriteriaForSelect(criteria, filter.getProperty(), filter.getValue());
             }
         }
-        theCriteria += " ) ";
+        //theCriteria += " ) ";
         for (Filter filter : filters) {
             if (!filter.getProperty().equals("dn.discrepancy_note_type_id") && !filter.getProperty().equals("dn.resolution_status_id")) {
                 theCriteria += buildCriteria(criteria, filter.getProperty(), filter.getValue());
@@ -84,7 +84,7 @@ public class ListDiscNotesForCRFFilter implements CriteriaCommand {
                     // DataEntryStage.UNCOMPLETED
                     int stage = getStatusForStage(Integer.parseInt(value.toString()));
                     criteria +=
-                        "AND "
+                        " AND "
                             + stage
                             + " = ("
                             + "SELECT event_crf.status_id FROM event_crf event_crf, crf_version crf_version WHERE study_event_id in (SELECT se.study_event_id FROM study_event se, study_event_definition sed"
@@ -96,7 +96,8 @@ public class ListDiscNotesForCRFFilter implements CriteriaCommand {
                     } else if (value.equals("4")) { // DataEntryStage.DOUBLE_DATA_ENTRY
                         criteria += " and event_crf.validator_id != 0";
                     }
-                    criteria += " order by event_crf_id asc" + ")";
+                    criteria += ")";
+//                    criteria += " order by event_crf_id asc" + ")";
                 } else {// DataEntryStage.UNCOMPLETED
                     criteria += " AND (se.study_subject_id is null or (se.study_event_definition_id != " + studyEventDefinitionId;
                     criteria += " AND (select count(*) from  study_subject ss1 LEFT JOIN study_event ON ss1.study_subject_id = study_event.study_subject_id";

@@ -19,12 +19,29 @@ import javax.servlet.http.HttpServletRequest;
 public class FileUploadHelper {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    FileRenamePolicy fileRenamePolicy;
 
     public List<File> returnFiles(HttpServletRequest request, ServletContext context) {
 
         // Check that we have a file upload request
         boolean isMultipart = ServletFileUpload.isMultipartContent(request);
         return isMultipart ? getFiles(request, context, null) : new ArrayList<File>();
+    }
+
+    public List<File> returnFiles(HttpServletRequest request, ServletContext context, FileRenamePolicy fileRenamePolicy) {
+
+        // Check that we have a file upload request
+        this.fileRenamePolicy = fileRenamePolicy;
+        boolean isMultipart = ServletFileUpload.isMultipartContent(request);
+        return isMultipart ? getFiles(request, context, null) : new ArrayList<File>();
+    }
+
+    public List<File> returnFiles(HttpServletRequest request, ServletContext context, String dirToSaveUploadedFileIn, FileRenamePolicy fileRenamePolicy) {
+
+        // Check that we have a file upload request
+        this.fileRenamePolicy = fileRenamePolicy;
+        boolean isMultipart = ServletFileUpload.isMultipartContent(request);
+        return isMultipart ? getFiles(request, context, createDirectoryIfDoesntExist(dirToSaveUploadedFileIn)) : new ArrayList<File>();
     }
 
     public List<File> returnFiles(HttpServletRequest request, ServletContext context, String dirToSaveUploadedFileIn) {
@@ -56,6 +73,7 @@ public class FileUploadHelper {
                 FileItem item = iter.next();
 
                 if (item.isFormField()) {
+                    request.setAttribute(item.getFieldName(), item.getString());
                     // DO NOTHING , THIS SHOULD NOT BE Handled here
                 } else {
                     files.add(processUploadedFile(item, dirToSaveUploadedFileIn));
@@ -79,6 +97,9 @@ public class FileUploadHelper {
         }
 
         File uploadedFile = new File(dirToSaveUploadedFileIn + File.separator + fileName);
+        if (fileRenamePolicy != null) {
+            uploadedFile = fileRenamePolicy.rename(uploadedFile);
+        }
         item.write(uploadedFile);
         return uploadedFile;
 

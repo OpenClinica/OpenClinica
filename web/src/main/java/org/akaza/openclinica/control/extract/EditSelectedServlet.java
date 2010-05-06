@@ -232,6 +232,7 @@ public class EditSelectedServlet extends SecureController {
                     ItemBean item = (ItemBean) items.get(j);
                     item.setCrfName(crf.getName());
                     item.setDefName(sed.getName());
+                    item.setDefId(sed.getId());
                     item.setSelected(true);
                 }
                 allItems.addAll(items);

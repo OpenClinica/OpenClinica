@@ -42,6 +42,7 @@ public class ItemBean extends AuditableEntityBean implements Comparable {
     private boolean selected = false; // not in DB, used for creating dataset
 
     private String defName = ""; // not in DB
+    private int defId; //not in DB
     private String crfName = ""; // not in DB
 
     private String oid;
@@ -276,5 +277,13 @@ public class ItemBean extends AuditableEntityBean implements Comparable {
 
     public void setDatasetItemMapKey(String key) {
         this.datasetItemMapKey = key;
+    }
+
+    public int getDefId() {
+        return defId;
+    }
+
+    public void setDefId(int defId) {
+        this.defId = defId;
     }
 }

@@ -13,6 +13,8 @@
  */
 package org.akaza.openclinica.bean.extract.odm;
 
+import java.util.ArrayList;
+
 import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ExportFormDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ExportStudyEventDataBean;
@@ -21,8 +23,6 @@ import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.SubjectGroupDataBean;
 import org.apache.commons.lang.StringEscapeUtils;
-
-import java.util.ArrayList;
 
 /**
  * Create ODM XML ClinicalData Element for a study.
@@ -65,11 +65,11 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                 xml.append("\" OpenClinica:StudySubjectId=\"" + StringEscapeUtils.escapeXml(sub.getStudySubjectId()));
                 String uniqueIdentifier = sub.getUniqueIdentifier();
                 if (uniqueIdentifier != null && uniqueIdentifier.length() > 0) {
-                    xml.append("\" OpenClinica:UniqueIdentifier=\"" + uniqueIdentifier);
+                    xml.append("\" OpenClinica:UniqueIdentifier=\"" + StringEscapeUtils.escapeXml(uniqueIdentifier));
                 }
                 String status = sub.getStatus();
                 if (status != null && status.length() > 0) {
-                    xml.append("\" OpenClinica:Status=\"" + status);
+                    xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml(status));
                 }
                 String secondaryId = sub.getSecondaryId();
                 if (secondaryId != null && secondaryId.length() > 0) {
@@ -85,7 +85,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                 }
                 String gender = sub.getSubjectGender();
                 if (gender != null && gender.length() > 0) {
-                    xml.append("\" OpenClinica:Sex=\"" + gender);
+                    xml.append("\" OpenClinica:Sex=\"" + StringEscapeUtils.escapeXml(gender));
                 }
             }
             xml.append("\">");
@@ -97,7 +97,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                 if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
                     String location = se.getLocation();
                     if (location != null && location.length() > 0) {
-                        xml.append("\" OpenClinica:StudyEventLocation=\"" + location);
+                        xml.append("\" OpenClinica:StudyEventLocation=\"" + StringEscapeUtils.escapeXml(location));
                     }
                     String startDate = se.getStartDate();
                     if (startDate != null && startDate.length() > 0) {
@@ -109,7 +109,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                     }
                     String status = se.getStatus();
                     if (status != null && status.length() > 0) {
-                        xml.append("\" OpenClinica:Status=\"" + status);
+                        xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml(status));
                     }
                     if (se.getAgeAtEvent() != null) {
                         xml.append("\" OpenClinica:SubjectAgeAtEvent=\"" + se.getAgeAtEvent());
@@ -128,18 +128,18 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                     if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
                         String crfVersion = form.getCrfVersion();
                         if (crfVersion != null && crfVersion.length() > 0) {
-                            xml.append("\" OpenClinica:Version=\"" + crfVersion);
+                            xml.append("\" OpenClinica:Version=\"" + StringEscapeUtils.escapeXml(crfVersion));
                         }
                         String interviewerName = form.getInterviewerName();
                         if (interviewerName != null && interviewerName.length() > 0) {
-                            xml.append("\" OpenClinica:InterviewerName=\"" + interviewerName);
+                            xml.append("\" OpenClinica:InterviewerName=\"" + StringEscapeUtils.escapeXml(interviewerName));
                         }
                         if (form.getInterviewDate() != null) {
                             xml.append("\" OpenClinica:InterviewDate=\"" + form.getInterviewDate());
                         }
                         String status = form.getStatus();
                         if (status != null && status.length() > 0) {
-                            xml.append("\" OpenClinica:Status=\"" + status);
+                            xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml(status));
                         }
                     }
                     xml.append("\">");
@@ -156,20 +156,30 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                         xml.append(nls);
                         ArrayList<ImportItemDataBean> items = ig.getItemData();
                         for (ImportItemDataBean item : items) {
-                            String muRefOid = item.getMeasurementUnitRef().getElementDefOID();
-                            if (muRefOid != null && muRefOid.length() > 0) {
+                            if("Yes".equals(item.getIsNull())) {
                                 xml.append(indent + indent + indent + indent + indent + indent + "<ItemData ItemOID=\""
-                                    + StringEscapeUtils.escapeXml(item.getItemOID()) + "\" Value=\"" + StringEscapeUtils.escapeXml(item.getValue()) + "\">");
-                                xml.append(nls);
-                                xml.append(indent + indent + indent + indent + indent + indent + indent + "<MeasurementUnitRef MeasurementUnitOID=\""
-                                    + StringEscapeUtils.escapeXml(muRefOid) + "\"/>");
-                                xml.append(nls);
-                                xml.append(indent + indent + indent + indent + indent + indent + "</ItemData>");
+                                        + StringEscapeUtils.escapeXml(item.getItemOID()) + "\" IsNull=\"Yes\"");
+                                if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
+                                    xml.append(" OpenClinica:ReasonForNull=\"" + StringEscapeUtils.escapeXml(item.getReasonForNull()) + "\"");
+                                }    
+                                xml.append("/>");
                                 xml.append(nls);
                             } else {
-                                xml.append(indent + indent + indent + indent + indent + indent + "<ItemData ItemOID=\""
-                                    + StringEscapeUtils.escapeXml(item.getItemOID()) + "\" Value=\"" + StringEscapeUtils.escapeXml(item.getValue()) + "\"/>");
-                                xml.append(nls);
+                                String muRefOid = item.getMeasurementUnitRef().getElementDefOID();
+                                if (muRefOid != null && muRefOid.length() > 0) {
+                                    xml.append(indent + indent + indent + indent + indent + indent + "<ItemData ItemOID=\""
+                                        + StringEscapeUtils.escapeXml(item.getItemOID()) + "\" Value=\"" + StringEscapeUtils.escapeXml(item.getValue()) + "\">");
+                                    xml.append(nls);
+                                    xml.append(indent + indent + indent + indent + indent + indent + indent + "<MeasurementUnitRef MeasurementUnitOID=\""
+                                        + StringEscapeUtils.escapeXml(muRefOid) + "\"/>");
+                                    xml.append(nls);
+                                    xml.append(indent + indent + indent + indent + indent + indent + "</ItemData>");
+                                    xml.append(nls);
+                                } else {
+                                    xml.append(indent + indent + indent + indent + indent + indent + "<ItemData ItemOID=\""
+                                        + StringEscapeUtils.escapeXml(item.getItemOID()) + "\" Value=\"" + StringEscapeUtils.escapeXml(item.getValue()) + "\"/>");
+                                    xml.append(nls);
+                                }
                             }
                         }
                         xml.append(indent + indent + indent + indent + indent + "</ItemGroupData>");

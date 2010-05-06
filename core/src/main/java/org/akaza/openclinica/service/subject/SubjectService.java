@@ -43,15 +43,7 @@ public class SubjectService implements SubjectServiceInterface {
     }
 
     public boolean validate(SubjectTransferBean subjectTransferBean) throws OpenClinicaSystemException {
-        String studySubjectId = subjectTransferBean.getStudySubjectId();
-        if (studySubjectId == null || studySubjectId.length() < 1) {
-            logger.info("studySubjectId is required.");
-            throw new OpenClinicaSystemException("studySubjectId is required.");
-            // return false;
-        } else if (studySubjectId.length() > 30) {
-            throw new OpenClinicaSystemException("studySubjectId should not be longer than 30.");
-            // return false;
-        }
+
         StudyDAO stdao = new StudyDAO(this.getDataSource());
         StudyBean study = stdao.findByUniqueIdentifier(subjectTransferBean.getStudyOid());
         if (study == null) {
@@ -91,6 +83,15 @@ public class SubjectService implements SubjectServiceInterface {
         if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
             int nextLabel = getStudySubjectDao().findTheGreatestLabel() + 1;
             subjectTransferBean.setStudySubjectId(new Integer(nextLabel).toString());
+        }
+        String studySubjectId = subjectTransferBean.getStudySubjectId();
+        if (studySubjectId == null || studySubjectId.length() < 1) {
+            logger.info("studySubjectId is required.");
+            throw new OpenClinicaSystemException("studySubjectId is required.");
+            // return false;
+        } else if (studySubjectId.length() > 30) {
+            throw new OpenClinicaSystemException("studySubjectId should not be longer than 30.");
+            // return false;
         }
 
         String secondaryId = subjectTransferBean.getSecondaryId();

@@ -1585,6 +1585,10 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                 + resPageMsg.getString("was_blank_at_row") + gk + ", " + resPageMsg.getString("Groups_worksheet") + ".");
                             htmlErrors.put(j + "," + gk + ",0", resPageMsg.getString("required_field"));
                         }
+
+                        if (groupLabel != null && groupLabel.length() > 255) {
+                            errors.add(resPageMsg.getString("group_label_length_error"));
+                        }
                         // must these be unique? probably so, tbh
                         if (groupNames.contains(groupLabel)) {
                             errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("GROUP_LABEL_column")
@@ -1600,6 +1604,10 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         String groupHeader = getValue(cell);
                         // replace any apostrophes in groupHeader: issue 3277
                         groupHeader = org.akaza.openclinica.core.form.StringUtil.escapeSingleQuote(groupHeader);
+                        if (groupHeader != null && groupHeader.length() > 255) {
+                            errors.add(resPageMsg.getString("group_header_length_error"));
+                        }
+
 
                         // cell = sheet.getRow(gk).getCell((short) 3);
                         // String groupSubheader = getValue(cell);

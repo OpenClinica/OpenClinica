@@ -12,7 +12,7 @@
 	<td class="table_cell_left"><c:out value="${currRow.bean.name}" /></td>
 	<td class="table_cell"><c:out value="${currRow.bean.runTime}" /></td>
 	<td class="table_cell"><c:out value="${currRow.bean.fileSize}" /></td>
-	<td class="table_cell"><fmt:formatDate value="${currRow.bean.dateCreated}" pattern="${dtetmeFormat}"/></td>
+	<td class="table_cell"><fmt:formatDate value="${currRow.bean.dateCreated}"/></td>
 	<td class="table_cell"><c:out value="${currRow.bean.owner.name}" /></td>
     <td class="table_cell">
         <a target="_new" href="AccessFile?fileId=<c:out value="${currRow.bean.id}"/>">

@@ -7,25 +7,24 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Locale;
-
 import org.akaza.openclinica.bean.core.Utils;
+import org.akaza.openclinica.bean.rule.FileUploadHelper;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
-import com.oreilly.servlet.MultipartRequest;
-import com.oreilly.servlet.multipart.FileRenamePolicy;
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 public class UploadFileServlet extends SecureController {
     Locale locale;
+    FileUploadHelper uploadHelper = new FileUploadHelper();
 
     @Override
     protected void mayProceed() throws InsufficientPermissionException {
@@ -61,11 +60,14 @@ public class UploadFileServlet extends SecureController {
                 }
                 request.setAttribute("attachedFilePath", dir);
                 try {
-                    MultipartRequest multi = new MultipartRequest(request, dir, 20 * 1024 * 1024, new OCFileRename());
-                    Enumeration files = multi.getFileNames();
+                    List<File> files = uploadHelper.returnFiles(request, context, dir, new OCFileRename());
                     String fileName = "";
-                    if (files.hasMoreElements()) {
-                        File temp = multi.getFile((String) files.nextElement());
+                    for (File temp : files) {
+                        //MultipartRequest multi = new MultipartRequest(request, dir, 20 * 1024 * 1024, new OCFileRename());
+                        //Enumeration files = multi.getFileNames();
+
+                        //if (files.hasMoreElements()) {
+                        //File temp = multi.getFile((String) files.nextElement());
                         if (temp == null || temp.getName() == null) {
                             fileName = "";
                         } else {
@@ -75,8 +77,8 @@ public class UploadFileServlet extends SecureController {
                     request.setAttribute("fileName", fileName);
                     request.setAttribute("uploadFileStatus", "successed");
                     String key = "";
-                    String inputName = multi.getParameter("inputName");
-                    String itemId = multi.getParameter("itemId");
+                    String inputName = (String) request.getAttribute("inputName");
+                    String itemId = (String) request.getAttribute("itemId");
                     request.setAttribute("fileItemId", itemId + "");
                     if (inputName != null && inputName.length() > 0) {
                         // for group file items
@@ -86,8 +88,7 @@ public class UploadFileServlet extends SecureController {
                     }
                     if (fileName.length() > 0) {
                         newUploadedFiles.put(key, dir + File.separator + fileName);
-                        addPageMessage(fileName
-                            + " " + respage.getString("uploaded_successfully_go_to_data_entry_page_to_save_into_database"));
+                        addPageMessage(fileName + " " + respage.getString("uploaded_successfully_go_to_data_entry_page_to_save_into_database"));
                     } else {
                         request.setAttribute("uploadFileStatus", "empty");
                         addPageMessage(respage.getString("no_file_uploaded_please_specify_file"));
@@ -96,7 +97,7 @@ public class UploadFileServlet extends SecureController {
                         request.setAttribute("inputName", inputName);
                     }
                     session.setAttribute("newUploadedFiles", newUploadedFiles);
-                } catch (IOException e) {
+                } catch (OpenClinicaSystemException e) {
                     request.setAttribute("uploadFileStauts", "failed");
                     addPageMessage(respage.getString("file_uploading_failed_please_check_logs_and_upload_again"));
                     e.printStackTrace();
@@ -106,7 +107,19 @@ public class UploadFileServlet extends SecureController {
         }
     }
 
+    /*
     class OCFileRename implements FileRenamePolicy {
+        public File rename(File f) {
+            // here, File f has been validated as a valid File.
+            String pathAndName = f.getPath();
+            int p = pathAndName.lastIndexOf('.');
+            String newName = pathAndName.substring(0, p) + (new SimpleDateFormat("yyyyMMddHHmmssZ")).format(new Date()) + pathAndName.substring(p);
+            return new File(newName);
+        }
+    }
+    */
+
+    class OCFileRename implements org.akaza.openclinica.bean.rule.FileRenamePolicy {
         public File rename(File f) {
             // here, File f has been validated as a valid File.
             String pathAndName = f.getPath();

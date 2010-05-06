@@ -15,7 +15,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
+import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
+import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
@@ -925,6 +927,16 @@ public class AddNewSubjectServlet extends SecureController {
                 }
             }
             */
+            if (dnb.getResolutionStatusId() == 0) {
+                dnb.setResStatus(ResolutionStatus.NOT_APPLICABLE);
+                dnb.setResolutionStatusId(ResolutionStatus.NOT_APPLICABLE.getId());
+                if (!dnb.getDisType().equals(DiscrepancyNoteType.REASON_FOR_CHANGE)) {
+                    dnb.setResStatus(ResolutionStatus.OPEN);
+                    dnb.setResolutionStatusId(ResolutionStatus.OPEN.getId());
+                }
+                
+            }
+            // << tbh 05/2010 second fix to try out queries
             dnb = (DiscrepancyNoteBean) dndao.create(dnb);
             dndao.createMapping(dnb);
 

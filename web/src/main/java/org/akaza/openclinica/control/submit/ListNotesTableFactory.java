@@ -293,6 +293,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                         }
                     }
                 } else if (entityType.equalsIgnoreCase("eventCRF")) {
+                    allNotes.add(dnb);
                     StudyEventDAO sed = getStudyEventDao();
                     StudyEventBean se = (StudyEventBean) sed.findByPK(dnb.getEntityId());
 

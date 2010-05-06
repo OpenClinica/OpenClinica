@@ -541,7 +541,7 @@
                     <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="continue_entering_data" bundle="${resword}"/>" title="<fmt:message key="continue_entering_data" bundle="${resword}"/>" align="left" hspace="6"></a>
                 </c:if>
                 <c:if test="${dec.startDoubleDataEntryPermitted}">
-                    <a href="#"
+                 <a href="#"
                     onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
                     onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');"
                     onclick="checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>&<c:out value="${getQuery}"/>');">

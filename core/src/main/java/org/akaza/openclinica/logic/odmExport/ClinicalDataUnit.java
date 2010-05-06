@@ -9,13 +9,15 @@
 
 package org.akaza.openclinica.logic.odmExport;
 
+import java.util.HashMap;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.ODMBean;
 import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
 import org.akaza.openclinica.dao.extract.OdmExtractDAO;
-
-import javax.sql.DataSource;
 
 /**
  * A class for one ODM ClinicalData Element.
@@ -76,5 +78,17 @@ public class ClinicalDataUnit extends OdmUnit {
 
     public void setOdmClinicalData(OdmClinicalDataBean odmClinicalData) {
         this.odmClinicalData = odmClinicalData;
+    }
+    
+    public static Boolean isNull(String itValue, String key, HashMap<String, String> nullValueCVs) {
+        if(nullValueCVs.containsKey(key)) {
+            String[] nullvalues = nullValueCVs.get(key).split(",");
+            for(String n : nullvalues) {
+                if(itValue.contains(n)) {
+                    return true;
+                } 
+            }
+        }
+        return false;
     }
 }

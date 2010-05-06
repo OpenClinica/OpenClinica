@@ -47,12 +47,16 @@
                 <td width="20%"><h1><fmt:message key="event_definition_name" bundle="${resword}"/></h1></td>
                 <td width="20%"><h1><fmt:message key="site" bundle="${resword}"/></h1></td>
                 <td width="20%"><h1><fmt:message key="study_subject_ID" bundle="${resword}"/></h1></td>
-                <td width="20%"><h1><fmt:message key="completion_date" bundle="${resword}"/></h1></td>
+                <td width="20%"><h1><fmt:message key="date_interviewed" bundle="${resword}"/></h1></td>
+                <td width="15%"><h1>Global ID </h1></td>
+                <td width="10%"><h1><fmt:message key="interviewer_name" bundle="${resword}"/></h1></td>
             </tr>
             <tr>
                 <td><h1><c:out value="${studyName}"/></h1></td>
                 <td><h1><c:out value="${item.key.name}"/></h1></td>
                 <td><h1>&nbsp;<c:out value="${site}"/></h1></td>
+                <td>&nbsp;<h1></h1></td>
+                <td>&nbsp;<h1></h1></td>
                 <td>&nbsp;<h1></h1></td>
                 <td>&nbsp;<h1></h1></td>
             </tr>

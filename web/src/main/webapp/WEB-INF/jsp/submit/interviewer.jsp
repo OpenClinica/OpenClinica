@@ -382,7 +382,7 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
                     <img id="flag_interviewer" name="flag_interviewer" src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
                     </c:when>
                     <c:otherwise>
-                    <a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?viewData=y&id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewer&column=interviewer_name&writeToDB=1&new=${isNewDN}','spanAlert-interviewer'); return false;">
+                    <a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${studySubject.id}&viewData=y&id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewer&column=interviewer_name&writeToDB=1&new=${isNewDN}','spanAlert-interviewer'); return false;">
                         <img id="flag_interviewer" name="flag_interviewer" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
                         </c:otherwise>
                         </c:choose>
@@ -495,7 +495,7 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
                     <img id="flag_interviewDate" name="flag_interviewDate" src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                     </c:when>
                     <c:otherwise>
-                    <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewDate&column=date_interviewed&writeToDB=1&new=${isNewDNDate}','spanAlert-interviewDate'); return false;">
+                    <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?subjectId=${studySubject.id}&id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewDate&column=date_interviewed&writeToDB=1&new=${isNewDNDate}','spanAlert-interviewDate'); return false;">
                         <img id="flag_interviewDate" name="flag_interviewDate" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                         </c:otherwise>
                         </c:choose>

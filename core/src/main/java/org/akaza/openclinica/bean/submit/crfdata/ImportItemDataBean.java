@@ -8,6 +8,7 @@ public class ImportItemDataBean {
     private String value;
     private String isNull; // boolean, tbh?
     private ElementRefBean measurementUnitRef = new ElementRefBean();
+    private String reasonForNull;
 
     public String getItemOID() {
         return itemOID;
@@ -47,5 +48,13 @@ public class ImportItemDataBean {
 
     public void setMeasurementUnitRef(ElementRefBean measurementUnitRef) {
         this.measurementUnitRef = measurementUnitRef;
+    }
+
+    public String getReasonForNull() {
+        return reasonForNull;
+    }
+
+    public void setReasonForNull(String reasonForNull) {
+        this.reasonForNull = reasonForNull;
     }
 }

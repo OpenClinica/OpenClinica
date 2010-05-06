@@ -27,7 +27,7 @@ public class CrfOidGenerator extends OidGenerator {
         String oid = "F_";
         String crfName = keys[0];
 
-        crfName = truncateTo4Chars(capitalize(stripNonAlphaNumeric(crfName)));
+        crfName = truncateToXChars(capitalize(stripNonAlphaNumeric(crfName)), 12);
         oid = oid + crfName;
 
         if (oid.equals("F_")) {

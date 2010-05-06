@@ -25,6 +25,8 @@ import org.akaza.openclinica.bean.odmbeans.ItemDefBean;
 import org.akaza.openclinica.bean.odmbeans.ItemGroupDefBean;
 import org.akaza.openclinica.bean.odmbeans.MeasurementUnitBean;
 import org.akaza.openclinica.bean.odmbeans.MetaDataVersionBean;
+import org.akaza.openclinica.bean.odmbeans.MultiSelectListBean;
+import org.akaza.openclinica.bean.odmbeans.MultiSelectListItemBean;
 import org.akaza.openclinica.bean.odmbeans.OdmStudyBean;
 import org.akaza.openclinica.bean.odmbeans.RangeCheckBean;
 import org.akaza.openclinica.bean.odmbeans.StudyEventDefBean;
@@ -131,7 +133,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
             // xml.append(currentIndent + indent + "<TranslatedText xml:lang=\""
             // + text.getXmlLang() + "\">" + text.getText() +
             // "</TranslatedText>");
-            xml.append(currentIndent + indent + "<TranslatedText>" + text.getText() + "</TranslatedText>");
+            xml.append(currentIndent + indent + "<TranslatedText>" + StringEscapeUtils.escapeXml(text.getText()) + "</TranslatedText>");
             xml.append(nls);
         }
         xml.append(currentIndent + "</Symbol>");
@@ -185,6 +187,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
                 addItemDef(currentIndent + indent);
                 addCodeList(currentIndent + indent);
                 if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
+                    addMultiSelectList(currentIndent + indent);
                     addStudyGroupClassList(currentIndent + indent);
                 }
             }
@@ -365,6 +368,22 @@ public class MetaDataReportBean extends OdmXmlReportBean {
                 xml.append(currentIndent + indent + "<CodeListRef CodeListOID=\"" + StringEscapeUtils.escapeXml(clOid) + "\"/>");
                 xml.append(nls);
             }
+            // add MultiSelectListRef
+            String ODMVersion = this.getODMVersion();
+            if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
+                if(item.getMultiSelectListRef() != null) {
+                String mslOid = item.getMultiSelectListRef().getElementDefOID();
+                    if (mslOid != null && mslOid.length() > 0) {
+                        if (!hasNode) {
+                            hasNode = true;
+                            xml.append(">");
+                            xml.append(nls);
+                        }
+                        xml.append(currentIndent + indent + "<OpenClinica:MultiSelectListRef OpenClinica:MultiSelectListID=\"" + StringEscapeUtils.escapeXml(mslOid) + "\"/>");
+                        xml.append(nls);
+                    }
+                }
+            }
             if (hasNode) {
                 xml.append(currentIndent + "</ItemDef>");
                 xml.append(nls);
@@ -411,6 +430,56 @@ public class MetaDataReportBean extends OdmXmlReportBean {
                         }
                     }
                     xml.append(currentIndent + "</CodeList>");
+                    xml.append(nls);
+                }
+            }
+        }
+    }
+    
+    public void addMultiSelectList(String currentIndent) {
+        StringBuffer xml = this.getXmlOutput();
+        String indent = this.getIndent();
+        ArrayList<MultiSelectListBean> lists = (ArrayList<MultiSelectListBean>) odmstudy.getMetaDataVersion().getMultiSelectLists();
+        if(lists != null) {
+            if(lists.size()>0) {
+                for(MultiSelectListBean l : lists) {
+                    xml.append(currentIndent + "<OpenClinica:MultiSelectList OpenClinica:ID=\"" + StringEscapeUtils.escapeXml(l.getOid()) + "\" ");
+                    if (l.getName() != null) {
+                        xml.append("OpenClinica:Name=\"" + StringEscapeUtils.escapeXml(l.getName()) + "\" ");
+                    }
+                    if (l.getDataType() != null) {
+                        xml.append("OpenClinica:DataType=\"" + l.getDataType() + "\" ");
+                    }
+                    if (l.getActualDataType() != null) {
+                        xml.append("OpenClinica:ActualDataType=\"" + StringEscapeUtils.escapeXml(l.getActualDataType()) + "\" ");
+                    }
+                    xml.append(">");
+                    xml.append(nls);
+                    
+                    ArrayList<MultiSelectListItemBean> mslis = (ArrayList<MultiSelectListItemBean>) l.getMultiSelectListItems();
+                    if (mslis != null && mslis.size() > 0) {
+                        for (MultiSelectListItemBean msli : mslis) {
+                            xml.append(currentIndent + indent + "<OpenClinica:MultiSelectListItem OpenClinica:CodedOptionValue=\"" + StringEscapeUtils.escapeXml(msli.getCodedOptionValue()) + "\">");
+                            xml.append(nls);
+                            xml.append(currentIndent + indent + indent + "<Decode>");
+                            xml.append(nls);
+                            TranslatedTextBean tt = msli.getDecode();
+                            if (tt.getXmlLang().length() > 0) {
+                                xml.append(currentIndent + indent + indent + indent + "<TranslatedText xml:lang=\"" + tt.getXmlLang() + "\">"
+                                    + StringEscapeUtils.escapeXml(msli.getDecode().getText()) + "</TranslatedText>");
+                            } else {
+                                xml.append(currentIndent + indent + indent + indent + "<TranslatedText>"
+                                    + StringEscapeUtils.escapeXml(msli.getDecode().getText()) + "</TranslatedText>");
+                            }
+                            xml.append(nls);
+                            xml.append(currentIndent + indent + indent + "</Decode>");
+                            xml.append(nls);
+                            xml.append(currentIndent + indent + "</OpenClinica:MultiSelectListItem>");
+                            xml.append(nls);
+                        }
+                    }
+
+                    xml.append(currentIndent + "</OpenClinica:MultiSelectList>");
                     xml.append(nls);
                 }
             }

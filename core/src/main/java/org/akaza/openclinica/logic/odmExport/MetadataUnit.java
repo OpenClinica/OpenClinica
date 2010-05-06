@@ -111,8 +111,9 @@ public class MetadataUnit extends OdmUnit {
         MetaDataVersionBean metadata = this.odmStudy.getMetaDataVersion();
 
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(this.ds);
-        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getId(), "discrepancyManagement");
-        metadata.setSoftHard(spv.getValue().equalsIgnoreCase("true") ? "Soft" : "Hard");
+        int parentId = study.getParentStudyId()>0 ? study.getParentStudyId() : study.getId();
+        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(parentId, "discrepancyManagement");
+        metadata.setSoftHard(spv.getValue().equalsIgnoreCase("true") ? "Hard" : "Soft");
 
         OdmExtractDAO oedao = new OdmExtractDAO(this.ds);
         int studyId = study.getId();
@@ -256,14 +257,14 @@ public class MetadataUnit extends OdmUnit {
         if ("float".equalsIgnoreCase(datatype)) {
             return hasCode ? getSignificantDigits(values) : 6;
         }
-        return (new String()).length();
+        return new String().length();
     }
 
     public static int getSignificantDigits(String datatype, Set<String> values, boolean hasCode) {
         if ("float".equalsIgnoreCase(datatype)) {
             return hasCode ? getSignificantDigits(values) : 6;
         }
-        return (new String()).length();
+        return new String().length();
     }
 
     public static int getDataTypeLength(List<String> values) {
@@ -388,6 +389,13 @@ public class MetadataUnit extends OdmUnit {
 
     public static boolean needCodeList(int rsTypeId, int datatypeid) {
         if ((rsTypeId == 5 || rsTypeId == 6) && (datatypeid == 5 || datatypeid == 6 || datatypeid == 7)) {
+            return true;
+        }
+        return false;
+    }
+    
+    public static boolean needMultiSelectList(int rsTypeId) {
+        if (rsTypeId == 7) {
             return true;
         }
         return false;

@@ -591,7 +591,11 @@ public class CreateDatasetServlet extends SecureController {
                         // logger.info("one item selected");
                         logger.info("one item selected");
                         db.getItemIds().add(new Integer(selectedItem.getId()));
-                        db.getItemMap().put(defId + "_" + selectedItem.getId(), selectedItem);
+                        if (selectedItem.getDefId() == 0) {
+                            db.getItemMap().put(defId + "_" + selectedItem.getId(), selectedItem);
+                        } else {
+                            db.getItemMap().put(selectedItem.getDefId() + "_" + selectedItem.getId(), selectedItem);
+                        }
                         db.getItemDefCrf().add(selectedItem);
                     }
 

@@ -9,6 +9,7 @@ package org.akaza.openclinica.control.admin;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.admin.NewCRFBean;
+import org.akaza.openclinica.bean.rule.FileUploadHelper;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
@@ -33,8 +34,6 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
-import com.oreilly.servlet.MultipartRequest;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -42,7 +41,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -57,6 +55,7 @@ import java.util.Set;
 public class CreateCRFVersionServlet extends SecureController {
 
     Locale locale;
+    FileUploadHelper uploadHelper = new FileUploadHelper();
 
     // < ResourceBundleresword,resexception,respage;
 
@@ -125,10 +124,10 @@ public class CreateCRFVersionServlet extends SecureController {
                 (new File(theDir)).mkdirs();
                 logger.info("Made the directory " + theDir);
             }
-            MultipartRequest multi = new MultipartRequest(request, theDir, 50 * 1024 * 1024);
+            //MultipartRequest multi = new MultipartRequest(request, theDir, 50 * 1024 * 1024);
             String tempFile = "";
             try {
-                tempFile = uploadFile(multi, theDir, version);
+                tempFile = uploadFile(theDir, version);
             } catch (CRFReadingException crfException) {
                 Validator.addError(errors, "excel_file", crfException.getMessage());
                 String msg = crfException.getMessage();
@@ -400,13 +399,15 @@ public class CreateCRFVersionServlet extends SecureController {
      * @param version
      * @throws Exception
      */
-    public String uploadFile(MultipartRequest multi, String theDir, CRFVersionBean version) throws Exception {
-        Enumeration files = multi.getFileNames();
+    public String uploadFile(String theDir, CRFVersionBean version) throws Exception {
+        List<File> theFiles = uploadHelper.returnFiles(request, context, theDir);
+        //Enumeration files = multi.getFileNames();
         errors.remove("excel_file");
         String tempFile = null;
-        while (files.hasMoreElements()) {
-            String name = (String) files.nextElement();
-            File f = multi.getFile(name);
+        for (File f : theFiles) {
+            //while (files.hasMoreElements()) {
+            //String name = (String) files.nextElement();
+            //File f = multi.getFile(name);
             if (f == null || f.getName() == null) {
                 logger.info("file is empty.");
                 Validator.addError(errors, "excel_file", resword.getString("you_have_to_provide_spreadsheet"));

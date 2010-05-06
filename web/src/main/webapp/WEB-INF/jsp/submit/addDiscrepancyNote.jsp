@@ -297,7 +297,7 @@ function setResStatus(resStatusId, destinationUserId) {
 		<tr valign="top">
       	</c:otherwise>
 		</c:choose>
-
+        <c:if test="${discrepancyNote.discrepancyNoteTypeId != 1}">
             <td>Assigned To</td>
             <td><div class="formfieldL_BG">
 			<c:choose>
@@ -368,7 +368,7 @@ function setResStatus(resStatusId, destinationUserId) {
             <td><input name="sendEmail" value="1" type="checkbox"/></td>
         </tr>
 
-
+       </c:if>
 
 		<tr valign="top">
             <td><fmt:message key="date" bundle="${resword}"/></td>
