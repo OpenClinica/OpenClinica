@@ -28,7 +28,7 @@ public class LogoutServlet extends SecureController {
     public void processRequest() throws Exception {
         sm = null;// set sm to null after user logs out
         logger.info("User  : {} , email address : {} Logged Out ", ub.getName(), ub.getEmail());
-        removeLockedCRF(ub.getName());
+        removeLockedCRF(ub.getId());
         session.removeAttribute("userBean");
         session.removeAttribute("study");
         session.removeAttribute("userRole");

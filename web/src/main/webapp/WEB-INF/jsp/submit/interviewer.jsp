@@ -4,6 +4,7 @@
 <jsp:useBean scope="request" id="section" class="org.akaza.openclinica.bean.submit.DisplaySectionBean" />
 <jsp:useBean scope="request" id="displayItem" class="org.akaza.openclinica.bean.submit.DisplayItemBean" />
 <jsp:useBean scope='request' id='formMessages' class='java.util.HashMap'/>
+<jsp:useBean scope='request' id='exitTo' class='java.lang.String'/>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
@@ -19,7 +20,7 @@
 var closing = true;
     function clsWin() {
         if(closing) {
-            jQuery.post("CheckCRFLocked?userName=<c:out value="${userBean.name}"/>", function(data){
+            jQuery.post("CheckCRFLocked?userId=<c:out value="${userBean.id}"/>&exitTo=<c:out value="${exitTo}" />", function(data){
                 return;
             });
         }

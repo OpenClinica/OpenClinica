@@ -811,11 +811,11 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     }
 
 
-    public static void removeLockedCRF(String userName){
+    public static void removeLockedCRF(int userId){
         for (Iterator iter = unavailableCRFList.entrySet().iterator(); iter.hasNext();) {
             java.util.Map.Entry entry = (java.util.Map.Entry) iter.next();
-            String user = (String)entry.getValue();
-            if(user.equalsIgnoreCase(userName))unavailableCRFList.remove(entry.getKey());
+            int id = (Integer)entry.getValue();
+            if(id==userId)unavailableCRFList.remove(entry.getKey());
         }
     }
 

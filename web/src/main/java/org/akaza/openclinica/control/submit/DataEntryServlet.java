@@ -69,6 +69,7 @@ import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
 import org.akaza.openclinica.exception.OpenClinicaException;
@@ -285,14 +286,16 @@ public abstract class DataEntryServlet extends SecureController {
         String age = "";
         if(fp.getString(GO_EXIT).equals("") && !isSubmitted && fp.getString("tabId").equals("") && fp.getString("sectionId").equals("")){
             if(unavailableCRFList.containsKey(ecb.getId())){
-                String userName = (String)unavailableCRFList.get(ecb.getId());
-                addPageMessage(resword.getString("CRF_unavailable") +" "+ userName
+                int userId = (Integer)unavailableCRFList.get(ecb.getId());
+                UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
+                UserAccountBean ubean = (UserAccountBean)udao.findByPK(userId);
+                addPageMessage(resword.getString("CRF_unavailable") +" "+ ubean.getName()
                             + " "+ resword.getString("Currently_entering_data")
                             + " "+ resword.getString("Leave_the_CRF"));
 
                     forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
             }else{
-                unavailableCRFList.put(ecb.getId(), ub.getName());
+                unavailableCRFList.put(ecb.getId(), ub.getId());
             }
         }
 

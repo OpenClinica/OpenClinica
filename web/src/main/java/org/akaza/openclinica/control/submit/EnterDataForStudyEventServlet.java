@@ -109,7 +109,7 @@ public class EnterDataForStudyEventServlet extends SecureController {
      */
     @Override
     protected void processRequest() throws Exception {
-        removeLockedCRF(ub.getName());
+        removeLockedCRF(ub.getId());
         FormProcessor fp = new FormProcessor(request);
 
         int eventId = fp.getInt(INPUT_EVENT_ID, true);

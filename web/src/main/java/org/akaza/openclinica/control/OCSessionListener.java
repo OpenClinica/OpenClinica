@@ -26,7 +26,7 @@ public class OCSessionListener implements HttpSessionListener
       //This method will be called just before session is to be destroyed
       HttpSession session = arg0.getSession();
       UserAccountBean ub = (UserAccountBean)session.getAttribute("userBean");
-      SecureController.removeLockedCRF(ub.getName());
+      SecureController.removeLockedCRF(ub.getId());
 //      System.out.println("=========================="+ub.getName());
   }
 }
