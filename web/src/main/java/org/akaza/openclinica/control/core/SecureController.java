@@ -45,15 +45,7 @@ import org.springframework.security.userdetails.UserDetails;
 
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.StringTokenizer;
+import java.util.*;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
@@ -812,10 +804,22 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
 
     public static void removeLockedCRF(int userId){
-        for (Iterator iter = unavailableCRFList.entrySet().iterator(); iter.hasNext();) {
-            java.util.Map.Entry entry = (java.util.Map.Entry) iter.next();
-            int id = (Integer)entry.getValue();
-            if(id==userId)unavailableCRFList.remove(entry.getKey());
+        boolean temp = true;
+        while(temp){
+            try{
+                if(unavailableCRFList.size() > 0){
+                    for (Iterator iter = unavailableCRFList.entrySet().iterator(); iter.hasNext();) {
+                        temp = false;
+                        java.util.Map.Entry entry = (java.util.Map.Entry) iter.next();
+                        int id = (Integer)entry.getValue();
+                        if(id==userId)unavailableCRFList.remove(entry.getKey());
+                    }
+                }else{
+                    temp = false;
+                }
+            }catch(ConcurrentModificationException cex){
+                temp = true;
+            }
         }
     }
 
