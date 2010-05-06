@@ -295,7 +295,7 @@ public abstract class DataEntryServlet extends SecureController {
 
                     forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
             }else{
-                unavailableCRFList.put(ecb.getId(), ub.getId());
+                lockThisEventCRF(ecb.getId(), ub.getId());
             }
         }
 

@@ -824,6 +824,19 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         }
     }
 
+    public void lockThisEventCRF(int ecb, int ub){
+        boolean temp = true;
+        // If ConcurrentModificationException occures the item will be added again
+        while(temp){
+            try{
+                unavailableCRFList.put(ecb, ub);
+                temp = false;
+            }catch(ConcurrentModificationException cex){
+                temp = true;
+            }
+        }
+    }
+
     /**
      * A inner class designed to allow the implementation of a JUnit test case
      * for abstract SecureController. The inner class allows the test case to
