@@ -238,13 +238,13 @@
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-core</artifactId>
-			<version>0.9.15</version>
+			<version>0.9.20</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-			<version>0.9.15</version>
+			<version>0.9.20</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
@@ -353,12 +353,6 @@
 					<groupId>xml-apis</groupId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>cos</groupId>
-			<artifactId>cos</artifactId>
-			<version>05Nov2002</version>
-			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>commons-fileupload</groupId>
