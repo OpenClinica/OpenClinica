@@ -803,38 +803,16 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     }
 
 
-    public static void removeLockedCRF(int userId){
-        boolean temp = true;
-        // If ConcurrentModificationException occures the iteration will start again
-        while(temp){
-            try{
-                if(unavailableCRFList.size() > 0){
-                    for (Iterator iter = unavailableCRFList.entrySet().iterator(); iter.hasNext();) {
-                        temp = false;
-                        java.util.Map.Entry entry = (java.util.Map.Entry) iter.next();
-                        int id = (Integer)entry.getValue();
-                        if(id==userId)unavailableCRFList.remove(entry.getKey());
-                    }
-                }else{
-                    temp = false;
-                }
-            }catch(ConcurrentModificationException cex){
-                temp = true;
-            }
+    public synchronized static void removeLockedCRF(int userId) {
+        for (Iterator iter = unavailableCRFList.entrySet().iterator(); iter.hasNext();) {
+            java.util.Map.Entry entry = (java.util.Map.Entry) iter.next();
+            int id = (Integer)entry.getValue();
+            if(id==userId)unavailableCRFList.remove(entry.getKey());
         }
     }
 
-    public void lockThisEventCRF(int ecb, int ub){
-        boolean temp = true;
-        // If ConcurrentModificationException occures the item will be added again
-        while(temp){
-            try{
-                unavailableCRFList.put(ecb, ub);
-                temp = false;
-            }catch(ConcurrentModificationException cex){
-                temp = true;
-            }
-        }
+    public synchronized void lockThisEventCRF(int ecb, int ub){
+        unavailableCRFList.put(ecb, ub);
     }
 
     /**
