@@ -209,18 +209,10 @@
                 AND (sur.study_id=s.study_id)
                 AND ua.status_id=1
                 AND sur.status_id=1
-                AND (s.study_id=? OR s.study_id=?)
-                AND ua.user_id NOT IN
-            (SELECT ua.user_id FROM
-                user_account ua
-                , study_user_role sur
-                , study s
-            WHERE ua.user_name=sur.user_name
-                AND sur.study_id=s.study_id
-                AND ua.status_id=1
-                AND sur.status_id=1
-                AND (s.study_id!=? AND s.parent_study_id=?))
-            ORDER BY ua.date_created ASC
+                AND (s.study_id=? OR s.study_id=?
+			        OR s.study_id in (select ss.study_id from study_subject ss WHERE ss.study_subject_id=?)
+                )
+                ORDER BY ua.date_created ASC
         </sql>
     </query>
     <query>
