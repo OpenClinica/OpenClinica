@@ -805,6 +805,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     public static void removeLockedCRF(int userId){
         boolean temp = true;
+        // If ConcurrentModificationException occures the iteration will start again
         while(temp){
             try{
                 if(unavailableCRFList.size() > 0){
