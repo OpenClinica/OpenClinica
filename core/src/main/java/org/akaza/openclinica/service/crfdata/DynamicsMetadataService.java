@@ -84,8 +84,11 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         // return false;
     }
     
-    public boolean hasPassedDDE(ItemDataBean itemDataBean) {
-    	DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataDao().findByItemDataBean(itemDataBean);
+    public boolean hasPassedDDE(ItemFormMetadataBean itemFormMetadataBean, EventCRFBean eventCrfBean, ItemDataBean itemDataBean) {
+    	DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataDao().findByMetadataBean(
+    			itemFormMetadataBean, 
+    			eventCrfBean, 
+    			itemDataBean);//findByItemDataBean(itemDataBean);
     	if (dynamicsMetadataBean == null) {
     		return false;
     	}
