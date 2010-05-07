@@ -286,8 +286,8 @@ public abstract class DataEntryServlet extends SecureController {
         panel.setStudyInfoShown(false);
         String age = "";
         if(fp.getString(GO_EXIT).equals("") && !isSubmitted && fp.getString("tabId").equals("") && fp.getString("sectionId").equals("")){
-            if(unavailableCRFList.containsKey(ecb.getId())){
-                int userId = (Integer)unavailableCRFList.get(ecb.getId());
+            if(getUnavailableCRFList().containsKey(ecb.getId())){
+                int userId = (Integer)getUnavailableCRFList().get(ecb.getId());
                 UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
                 UserAccountBean ubean = (UserAccountBean)udao.findByPK(userId);
                 addPageMessage(resword.getString("CRF_unavailable") +" "+ ubean.getName()
@@ -394,7 +394,7 @@ public abstract class DataEntryServlet extends SecureController {
             session.removeAttribute("to_create_crf");
             session.removeAttribute("mayProcessUploading");
             //Removing the user and EventCRF from the locked CRF List
-            unavailableCRFList.remove(ecb.getId());
+            getUnavailableCRFList().remove(ecb.getId());
             if (newUploadedFiles.size() > 0) {
                 if (this.unloadFiles(newUploadedFiles)) {
 

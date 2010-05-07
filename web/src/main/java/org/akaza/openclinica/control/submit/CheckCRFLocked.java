@@ -19,8 +19,8 @@ public class CheckCRFLocked extends SecureController {
         int userId;
         String ecId = request.getParameter("ecId");
         if (ecId != null && !ecId.equals("")) {
-            if (unavailableCRFList.containsKey(Integer.parseInt(ecId))) {
-                userId = (Integer)unavailableCRFList.get(Integer.parseInt(ecId));
+            if (getUnavailableCRFList().containsKey(Integer.parseInt(ecId))) {
+                userId = (Integer)getUnavailableCRFList().get(Integer.parseInt(ecId));
                 UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
                 UserAccountBean ubean = (UserAccountBean)udao.findByPK(userId);
                 response.getWriter().print(resword.getString("CRF_unavailable") +

@@ -162,7 +162,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     public static final String MODULE = "module";// to determine which module
 
-    public static HashMap unavailableCRFList = new HashMap();
+    private static HashMap unavailableCRFList = new HashMap();
 
     // user is in
 
@@ -804,15 +804,19 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
 
     public synchronized static void removeLockedCRF(int userId) {
-        for (Iterator iter = unavailableCRFList.entrySet().iterator(); iter.hasNext();) {
+        for (Iterator iter = getUnavailableCRFList().entrySet().iterator(); iter.hasNext();) {
             java.util.Map.Entry entry = (java.util.Map.Entry) iter.next();
             int id = (Integer)entry.getValue();
-            if(id==userId)unavailableCRFList.remove(entry.getKey());
+            if(id==userId)getUnavailableCRFList().remove(entry.getKey());
         }
     }
 
     public synchronized void lockThisEventCRF(int ecb, int ub){
-        unavailableCRFList.put(ecb, ub);
+        getUnavailableCRFList().put(ecb, ub);
+    }
+
+    public synchronized static HashMap getUnavailableCRFList(){
+        return unavailableCRFList;
     }
 
     /**
