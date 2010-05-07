@@ -46,14 +46,6 @@
           <property name="dataSource" ref="dataSource"/>
     </bean>
 
-    <bean name="sdvFactory" class="org.akaza.openclinica.web.table.sdv.SubjectIdSDVFactory">
-          <property name="dataSource" ref="dataSource"/>
-    </bean>
-
-    <bean name="sdvUtil" class="org.akaza.openclinica.web.table.sdv.SDVUtil">
-          <property name="dataSource" ref="dataSource"/>
-    </bean>
-
        <bean class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping"/>
 
       <!-- Map the interceptor implementation to all annotated Controllers -->

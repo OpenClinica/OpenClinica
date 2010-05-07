@@ -143,7 +143,7 @@ public class StudySubjectEndpoint {
         subjectTransferBean.setYearOfBirth(yearOfBirthValue);
         subjectTransferBean.setEnrollmentDate(getDate(enrollmentDateValue));
 
-        subjectTransferBean.setOwner(getUserAccount());
+        //subjectTransferBean.setOwner(getUserAccount());
 
         return subjectTransferBean;
     }

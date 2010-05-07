@@ -5,6 +5,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="resmessages"/>
 
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='session' id='study' class='org.akaza.openclinica.bean.managestudy.StudyBean' />
@@ -255,6 +256,18 @@
         HighlightTab(1);
     </script>
 </div>
+    <script type="text/javascript">
+        function prompt(formObj,crfId){
+            var bool = confirm(
+                    "<fmt:message key="uncheck_sdv" bundle="${resmessages}"/>");
+            if(bool){
+                formObj.action='${pageContext.request.contextPath}/pages/handleSDVRemove';
+                formObj.crfId.value=crfId;
+                formObj.submit();
+            }
+        }
+    </script>
+
 <div id="subjectSDV">
     <form name='sdvForm' action="${pageContext.request.contextPath}/pages/viewAllSubjectSDVtmp">
         <input type="hidden" name="studyId" value="${study.id}">

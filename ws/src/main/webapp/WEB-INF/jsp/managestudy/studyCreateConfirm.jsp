@@ -122,7 +122,16 @@
    <fmt:formatDate value="${newStudy.datePlannedEnd}" pattern="${dteFormat}"/>&nbsp;
   </td></tr>
 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="study_system_status" bundle="${resword}"/>:</td><td class="table_cell">
+  <c:choose>
+   <c:when test="${newStudy.parentStudyId == 0}">
+      <c:set var="key" value="study_system_status"/>
+   </c:when>
+   <c:otherwise>
+       <c:set var="key" value="site_system_status"/>
+   </c:otherwise>
+  </c:choose>
+
+  <tr valign="top"><td class="table_header_column"><fmt:message key="${key}" bundle="${resword}"/>:</td><td class="table_cell">
    <%-- <c:out value="${newStudy.status.name}"/> --%> <c:out value="Available"/>
    </td></tr>
 

@@ -250,7 +250,16 @@ function updateThis(multiSelEle, count) {
   <div class="formfieldXL_BG"><input type="text" name="facConEmail" value="<c:out value="${newStudy.facilityContactEmail}"/>"  class="formfieldXL">
   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="facConEmail"/></jsp:include></td></tr>
 
-  <tr valign="top"><td class="formlabel"><fmt:message key="study_system_status" bundle="${resword}"/>:</td><td>
+  <c:choose>
+   <c:when test="${newStudy.parentStudyId == 0}">
+      <c:set var="key" value="study_system_status"/>
+   </c:when>
+   <c:otherwise>
+       <c:set var="key" value="site_system_status"/>
+   </c:otherwise>
+  </c:choose>
+
+  <tr valign="top"><td class="formlabel"><fmt:message key="${key}" bundle="${resword}"/>:</td><td>
 
    <c:set var="status1" value="${newStudy.status.id}"/>
    <div class="formfieldM_BG"><select name="statusId" class="formfieldM">

@@ -52,9 +52,11 @@
     
     <!-- Endpoint Mappings  -->
     <bean class="org.springframework.ws.server.endpoint.mapping.PayloadRootAnnotationMethodEndpointMapping">
+        <!-- 
         <property name="interceptors">
             <list><ref bean="wsSecurityInterceptor"/></list>
         </property>
+         -->
     </bean>
     
     <!--  Annotation Based MethodEndpoint Adapter -->

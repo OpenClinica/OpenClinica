@@ -331,7 +331,7 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
             <td valign="top" nowrap>
                 <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
                     <c:if test="${! (enclosingPage eq 'viewSectionData')}">
-                        <a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?viewData=y&id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewer&column=interviewer_name','spanAlert-interviewer'); return false;">
+                        <a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${studySubject.id}&viewData=y&id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewer&column=interviewer_name','spanAlert-interviewer'); return false;">
                             <c:choose>
                                 <c:when test="${hasNameNote eq 'yes'}">
                                     <img id="flag_interviewer" name="flag_interviewer" src="images/icon_Note.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
@@ -417,7 +417,7 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
                 <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
                     <%--BWP: 2808 related>> --%>
                     <c:if test="${! (enclosingPage eq 'viewSectionData')}">
-                        <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewDate&column=date_interviewed','spanAlert-interviewDate'); return false;">
+                        <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?subjectId=${studySubject.id}&id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewDate&column=date_interviewed','spanAlert-interviewDate'); return false;">
                             <c:choose>
                                 <c:when test="${hasDateNote eq 'yes'}">
                                     <img id="flag_interviewDate" name="flag_interviewDate" src="images/icon_Note.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >

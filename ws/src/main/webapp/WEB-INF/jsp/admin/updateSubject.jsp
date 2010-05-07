@@ -90,7 +90,7 @@
         </c:choose>
         <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="gender"/></jsp:include>
         <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
-		<a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?name=subject&id=<c:out value="${subjectToUpdate.id}"/>&field=gender&column=gender','spanAlert-gender'); return false;">
+		<a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${studySubId}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&field=gender&column=gender','spanAlert-gender'); return false;">
 		<img name="flag_gender" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
 		</c:if>
 		</td>
@@ -109,7 +109,7 @@
 		  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dateOfBirth"/></jsp:include>
 	  	</td><td class="formlabel">(<fmt:message key="date_format" bundle="${resformat}"/>) *
 	  	<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
-		 <a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?name=subject&id=<c:out value="${subjectToUpdate.id}"/>&field=dateOfBirth&column=date_of_birth','spanAlert-dateOfBirth'); return false;">
+		 <a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${studySubId}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&field=dateOfBirth&column=date_of_birth','spanAlert-dateOfBirth'); return false;">
 		 <img name="flag_dateOfBirth" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
 		</c:if>
 	  	</td>
@@ -123,7 +123,7 @@
 		  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dateOfBirth"/></jsp:include>
 	  	</td><td class="formlabel">(<fmt:message key="date_format" bundle="${resformat}"/>) *
 	  	<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
-		 <a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?name=subject&id=<c:out value="${subjectToUpdate.id}"/>&field=dateOfBirth&column=date_of_birth','spanAlert-dateOfBirth'); return false;">
+		 <a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${studySubId}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&field=dateOfBirth&column=date_of_birth','spanAlert-dateOfBirth'); return false;">
 		 <img name="flag_dateOfBirth" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
 		</c:if>
 	  	</td>
@@ -137,7 +137,7 @@
 		  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="yearOfBirth"/></jsp:include>
 	  	</td><td class="formlabel">(<fmt:message key="date_format_year" bundle="${resformat}"/>)*
 	  	<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
-		 <a href="#" onClick="openDefWindow('CreateDiscrepancyNote?name=subject&id=<c:out value="${subjectToUpdate.id}"/>&field=yearOfBirth&column=date_of_birth','spanAlert-yearOfBirth'); return false;">
+		 <a href="#" onClick="openDefWindow('CreateDiscrepancyNote?subjectId=${studySubId}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&field=yearOfBirth&column=date_of_birth','spanAlert-yearOfBirth'); return false;">
 		 <img name="flag_yearOfBirth" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
 		</c:if>
 	  	</td>

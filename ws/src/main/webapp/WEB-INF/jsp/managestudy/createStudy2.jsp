@@ -134,8 +134,16 @@
   </td></tr>
   -->
 
+    <c:choose>
+     <c:when test="${newStudy.parentStudyId == 0}">
+        <c:set var="key" value="study_system_status"/>
+     </c:when>
+     <c:otherwise>
+         <c:set var="key" value="site_system_status"/>
+     </c:otherwise>
+    </c:choose>
 
-  <tr valign="top"><td class="formlabel"><fmt:message key="study_system_status" bundle="${resword}"/>:</td><td><div class="formfieldL_BG">
+  <tr valign="top"><td class="formlabel"><fmt:message key="${key}" bundle="${resword}"/>:</td><td><div class="formfieldL_BG">
    <%--
    <c:set var="status1" value="${newStudy.status.id}"/>
    <select class="formfieldL" name="statusId">

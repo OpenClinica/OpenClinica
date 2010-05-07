@@ -62,6 +62,8 @@ onload="TabsForwardByNum(<c:out value="${tabId}"/>);<jsp:include page="../includ
 </c:otherwise>
 </c:choose>
 >
+<script type="text/JavaScript" language="JavaScript" src="../includes/wz_tooltip/wz_tooltip.js"></script>
+
 <table border="0" cellpadding="0" cellspacing="0" width="100%" height="100%" class=
   "background">
 	<tr>

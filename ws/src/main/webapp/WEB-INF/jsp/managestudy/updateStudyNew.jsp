@@ -145,8 +145,16 @@
           <td>&nbsp;</td>
           </tr>
 
+          <c:choose>
+           <c:when test="${studyToView.parentStudyId == 0}">
+              <c:set var="key" value="study_system_status"/>
+           </c:when>
+           <c:otherwise>
+               <c:set var="key" value="site_system_status"/>
+           </c:otherwise>
+          </c:choose>
           <tr valign="top">
-              <td class="formlabel"><fmt:message key="study_system_status" bundle="${resword}"/>:</td>
+              <td class="formlabel"><fmt:message key="${key}" bundle="${resword}"/>:</td>
               <td><div class="formfieldXL_BG">
 
            <c:set var="status1" value="${studyToView.status.id}"/>
