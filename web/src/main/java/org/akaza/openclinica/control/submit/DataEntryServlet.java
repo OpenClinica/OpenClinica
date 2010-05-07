@@ -1455,9 +1455,7 @@ public abstract class DataEntryServlet extends SecureController {
                 boolean inSameSection = false;
                 if (!rulesPostDryRun.isEmpty()) {
                     // in same section?
-                    
-                    
-                    
+
                     // iterate through the OIDs and see if any of them belong to this section
                     Iterator iter3 = rulesPostDryRun.keySet().iterator();
                     while (iter3.hasNext()) {
@@ -1470,24 +1468,55 @@ public abstract class DataEntryServlet extends SecureController {
                         if (fieldNames.length == 2) {
                             newFieldName = fieldNames[1];
                             // check items in item groups here?
+//                            List<DisplayItemGroupBean> displayGroups = section.getDisplayFormGroups();
+//                            for (DisplayItemGroupBean displayGroup : displayGroups) {
+//                            	ItemGroupBean itemGroup = displayGroup.getItemGroupBean();
+//                            	if (fieldNames[0].equals(itemGroup.getOid())) {
+//                            		System.out.println("found group: " + fieldNames[0]);
+//                            		// List itemsInGroup = itemGroup.getItemGroupMetaBeans();
+//                            		List<DisplayItemWithGroupBean> displayGroupsWithItems = section.getDisplayItemGroups();
+//                            		for (DisplayItemWithGroupBean itemWithGroup : displayGroupsWithItems) {
+//                            			if (itemWithGroup.isInGroup()) {
+//                            				List<DisplayItemGroupBean> groups = itemWithGroup.getItemGroups();
+//                            				for (DisplayItemGroupBean group : groups) {
+//                            					
+//                            				}
+//                            			}
+//                            		}
+//                            	}
+//                            }
                         }
-                        ArrayList<DisplayItemBean> displayItems = section.getItems();
-                        for (DisplayItemBean displayItemBean : displayItems) {
-                            ItemBean itemBean = displayItemBean.getItem();
-                            if (newFieldName.equals(itemBean.getOid())) {
-                            	
-                            	System.out.println("is show item: " + displayItemBean.getMetadata().isShowItem());
-                                if (!displayItemBean.getMetadata().isShowItem()) {
-                                    inSameSection = true;
-                                    System.out.println("found item " + this.getInputName(displayItemBean) + " vs. " + fieldName);
-                                    // if is repeating, use the other input name
-                                    
-                                    errorsPostDryRun.put(this.getInputName(displayItemBean), rulesPostDryRun.get(fieldName));
-                                    
-                                    displayItemBean.getMetadata().setShowItem(true);
-                                } 
-                            }
+                        List<DisplayItemWithGroupBean> displayGroupsWithItems = section.getDisplayItemGroups();
+                        //ArrayList<DisplayItemBean> displayItems = section.getItems();
+                        for (int i = 0; i < displayGroupsWithItems.size(); i++) {
+                        	DisplayItemWithGroupBean itemWithGroup = displayGroupsWithItems.get(i);
+                        	if (itemWithGroup.isInGroup()) {
+                        		System.out.println("found group: " + fieldNames[0]);
+                        		// do something there
+                        		
+                        	} else {
+                        		DisplayItemBean displayItemBean = itemWithGroup.getSingleItem();
+                        		ItemBean itemBean = displayItemBean.getItem();
+                                if (newFieldName.equals(itemBean.getOid())) {
+                                	
+                                	System.out.println("is show item: " + displayItemBean.getMetadata().isShowItem());
+                                    if (!displayItemBean.getMetadata().isShowItem()) {
+                                        inSameSection = true;
+                                        System.out.println("found item " + this.getInputName(displayItemBean) + " vs. " + fieldName);
+                                        // if is repeating, use the other input name
+                                        
+                                        errorsPostDryRun.put(this.getInputName(displayItemBean), rulesPostDryRun.get(fieldName));
+                                        
+                                        displayItemBean.getMetadata().setShowItem(true);
+                                    } 
+                                }
+                                itemWithGroup.setSingleItem(displayItemBean);
+                        	}
+                        	displayGroupsWithItems.set(i, itemWithGroup);
                         }
+//                        for (DisplayItemBean displayItemBean : displayItems) {
+//                            
+//                        }
                         // check groups
                         List<DisplayItemGroupBean> itemGroups = new ArrayList<DisplayItemGroupBean>();
                         itemGroups = section.getDisplayFormGroups();
@@ -1503,22 +1532,14 @@ public abstract class DataEntryServlet extends SecureController {
                                     // add necessary rows to the display group here????
                                     // we have to set the items in the itemGroup for the displayGroup
                                     
-                                    // List<ItemBean> itBeans = idao.findAllItemsByGroupId(displayGroup.getItemGroupBean().getId(), sb.getCRFVersionId());
-                                    // List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, sm.getDataSource(), 
-                                    //        ecb, sb.getId(), null, context);
-                                    // List<DisplayItemBean> displayItemBeans = FormBeanUtil.getDisplayBeansFromItems(itBeans, sm.getDataSource(), ecb, sb.getId(), null, context);
-                                    // displayGroup.setItems(dibs);
-                                    // System.out.println("found " + dibs.size() + " display items from reset of item group " + 
-                                       //     displayGroup.getItemGroupBean().getOid());
                                 }
                             }
                             // newItemGroups.add(displayGroup);
                         }
                         // trying to reset the display form groups here, tbh
-                        // FormBeanUtil formBeanUtil = new FormBeanUtil();
-                        // DisplaySectionBean newDisplayBean = formBeanUtil.createDisplaySectionBWithFormGroups(sb.getId(), ecb.getCRFVersionId(), 
-                           //     sm.getDataSource(), eventDefinitionCRFId, ecb, context);
-                        section.setItems(displayItems);
+                        
+                        // section.setItems(displayItems);
+                        section.setDisplayItemGroups(displayGroupsWithItems);
                         List<DisplayItemWithGroupBean> displayItemWithGroups2 = createItemWithGroups(section, hasGroup, eventDefinitionCRFId);
 
                         section.setDisplayItemGroups(displayItemWithGroups2);
@@ -2699,7 +2720,7 @@ public abstract class DataEntryServlet extends SecureController {
      */
     protected boolean writeToDB(DisplayItemBean dib, ItemDataDAO iddao, int ordinal) {
         ItemDataBean idb = dib.getData();
-        if (!dib.getMetadata().isShowItem() && idb.getValue().equals("")) {
+        if (!dib.getMetadata().isShowItem() && idb.getValue().equals("") && !getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getData())) {
             System.out.println("not shown - not writing for idb id " + dib.getData().getId());
             return true;
         }
@@ -3059,10 +3080,10 @@ public abstract class DataEntryServlet extends SecureController {
                 boolean needsHighlighting = !ifmb.isShowItem();
                 boolean showItem = getItemMetadataService().isShown(ifmb.getItemId(), ecb, dib.getData());
                 if (getServletPage().equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
-                    showItem = getItemMetadataService().hasPassedDDE(dib.getData());
+                    showItem = getItemMetadataService().hasPassedDDE(ifmb, ecb, dib.getData());
                 }
                 // is the above needed for children items too?
-                boolean passedDDE = getItemMetadataService().hasPassedDDE(dib.getData());
+                boolean passedDDE = getItemMetadataService().hasPassedDDE(ifmb, ecb, dib.getData());
                 if (showItem) { // we are only showing, not hiding
                     System.out.println("set show item " + ifmb.getItemId() + 
                     		" idb " + dib.getData().getId() +
@@ -3129,7 +3150,7 @@ public abstract class DataEntryServlet extends SecureController {
             dib.setDbData(data);
             boolean showItem = getItemMetadataService().isShown(metadata.getItemId(), ecb, data);
             if (getServletPage().equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
-                showItem = getItemMetadataService().hasPassedDDE(data);
+                showItem = getItemMetadataService().hasPassedDDE(metadata, ecb, data);
             } //else {
 //                showItem = getItemMetadataService().isShown(metadata.getItemId(), ecb, dib.getDbData());
 //            }

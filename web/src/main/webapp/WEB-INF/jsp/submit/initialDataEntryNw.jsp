@@ -1064,7 +1064,7 @@ but the custom tag uses that, not this jstl code--%>
                     <c:if test="${displayItem.singleItem.metadata.columnNumber >1}">
                 <td valign="top">
                     </c:if>
-                    <table border="0" cellspacing="0" cellpadding="1">
+                    
                     <%-- this is where we need to set the block for shown items, tbh --%>
                     	<c:set var="isItemShown" value="false"/>
 						<c:forEach var="formMsg" items="${formMessages}">
@@ -1075,9 +1075,11 @@ but the custom tag uses that, not this jstl code--%>
 						</c:forEach>
                     	<c:choose>
                     		<c:when test="${isItemShown && hasShown}">
-                    			<tr class="aka_group_show">
+                    			<table border="0" cellspacing="0" cellpadding="1" class="aka_group_show">
+                    			<tr>
                     		</c:when>
                     		<c:otherwise>
+                    			<table border="0" cellspacing="0" cellpadding="1">
                     			<tr>
                     		</c:otherwise>
                     	</c:choose>
