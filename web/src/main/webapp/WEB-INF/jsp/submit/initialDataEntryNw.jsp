@@ -692,7 +692,7 @@ but the custom tag uses that, not this jstl code--%>
 		<%-- update td class with aka_group_show if they meet the criteria --%>
 		<c:set var="isItemShown" value="false"/>
 						<c:forEach var="formMsg" items="${formMessages}">
-							<c:set var="inputValue">input<c:out value="${displayItem.singleItem.item.id}"/></c:set>
+							<c:set var="inputValue"><c:out value="${repeatParentId}"/>_0input<c:out value="${displayItem.singleItem.item.id}"/></c:set>
 							<c:if test="${formMsg.key eq inputValue}">
 								<c:set var="isItemShown" value="true"/>
 							</c:if>
@@ -719,7 +719,7 @@ but the custom tag uses that, not this jstl code--%>
            bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
                 <%-- For horizontal checkboxes, radio buttons--%>
                 <c:forEach var="respOption" items="${bodyItem.metadata.responseSet.options}">
-                    <td class="aka_padding_norm aka_cellBorders_dark">
+                    <td class="aka_padding_norm aka_cellBorders_dark <c:out value="${extraClass}"/>">
                         <c:set var="displayItem" scope="request" value="${bodyItem}" />
                         <c:set var="responseOptionBean" scope="request" value="${respOption}" />
                         <c:import url="../submit/showGroupItemInput.jsp">
@@ -740,7 +740,7 @@ but the custom tag uses that, not this jstl code--%>
            bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
                 <%-- For horizontal checkboxes, radio buttons--%>
                 <c:forEach var="respOption" items="${bodyItem.metadata.responseSet.options}">
-                    <td class="aka_padding_norm aka_cellBorders">
+                    <td class="aka_padding_norm aka_cellBorders <c:out value="${extraClass}"/>">
                         <c:set var="displayItem" scope="request" value="${bodyItem}" />
                         <c:set var="responseOptionBean" scope="request" value="${respOption}" />
                         <c:import url="../submit/showGroupItemInput.jsp">
@@ -757,7 +757,7 @@ but the custom tag uses that, not this jstl code--%>
                 </c:forEach>
             </c:when>
             <c:when test="${sectionBorders == 1}">
-                <td class="aka_padding_norm aka_cellBorders_dark">
+                <td class="aka_padding_norm aka_cellBorders_dark <c:out value="${extraClass}"/>">
                     <c:set var="displayItem" scope="request" value="${bodyItem}" />
                     <c:import url="../submit/showGroupItemInput.jsp">
                         <c:param name="repeatParentId" value="${repeatParentId}"/>
@@ -772,7 +772,7 @@ but the custom tag uses that, not this jstl code--%>
             </c:when>
             <%-- could be a radio or checkbox that is not horizontal --%>
             <c:otherwise>
-                <td class="aka_padding_norm aka_cellBorders">
+                <td class="aka_padding_norm aka_cellBorders <c:out value="${extraClass}"/>">
                     <c:set var="displayItem" scope="request" value="${bodyItem}" />
                     <c:import url="../submit/generateGroupItemTxt.jsp">
                         <c:param name="itemId" value="${bodyItem.item.id}"/>
@@ -834,6 +834,24 @@ but the custom tag uses that, not this jstl code--%>
 <c:forEach var="bodyItem" items="${bodyItemGroup.items}">
 <!-- found show item: <c:out value="${bodyItem.metadata.showItem}"/> -->
 <c:if test="${bodyItem.metadata.showItem}">
+	<%-- highlighting for items within item groups, tbh --%>
+		<%-- update td class with aka_group_show if they meet the criteria --%>
+		<c:set var="isItemShown" value="false"/>
+						<c:forEach var="formMsg" items="${formMessages}">
+							<c:set var="inputValue"><c:out value="${repeatParentId}"/>_0input<c:out value="${displayItem.singleItem.item.id}"/></c:set>
+							<c:if test="${formMsg.key eq inputValue}">
+								<c:set var="isItemShown" value="true"/>
+							</c:if>
+						</c:forEach>
+                    	<c:choose>
+                    		<c:when test="${isItemShown && hasShown}">
+                    			<c:set var="extraClass" value="aka_group_shown"/>
+                    		</c:when>
+                    		<c:otherwise>
+								<c:set var="extraClass" value=" "/>
+                    			<%-- do nothing here ? --%>
+                    		</c:otherwise>
+                    	</c:choose>
     <c:set var="itemNum" value="${itemNum + 1}" />
     <c:set var="isHorizontalCellLevel" scope="request" value="${false}"/>
     <c:if test="${bodyItem.metadata.responseLayout eq 'horizontal' ||
@@ -846,7 +864,7 @@ but the custom tag uses that, not this jstl code--%>
            bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
             <%-- For horizontal checkboxes, radio buttons--%>
             <c:forEach var="respOption" items="${bodyItem.metadata.responseSet.options}">
-                <td class="aka_padding_norm aka_cellBorders_dark">
+                <td class="aka_padding_norm aka_cellBorders_dark <c:out value="${extraClass}"/>">
                     <c:set var="displayItem" scope="request" value="${bodyItem}" />
                     <c:set var="responseOptionBean" scope="request" value="${respOption}" />
                     <c:import url="../submit/showGroupItemInput.jsp">
@@ -867,7 +885,7 @@ but the custom tag uses that, not this jstl code--%>
            bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
             <%-- For horizontal checkboxes, radio buttons--%>
             <c:forEach var="respOption" items="${bodyItem.metadata.responseSet.options}">
-                <td class="aka_padding_norm aka_cellBorders">
+                <td class="aka_padding_norm aka_cellBorders <c:out value="${extraClass}"/>">
                     <c:set var="displayItem" scope="request" value="${bodyItem}" />
                     <c:set var="responseOptionBean" scope="request" value="${respOption}" />
                     <c:import url="../submit/showGroupItemInput.jsp">
@@ -884,7 +902,7 @@ but the custom tag uses that, not this jstl code--%>
             </c:forEach>
         </c:when>
         <c:when test="${sectionBorders == 1}">
-            <td class="aka_padding_norm aka_cellBorders_dark">
+            <td class="aka_padding_norm aka_cellBorders_dark <c:out value="${extraClass}"/>">
                 <c:set var="displayItem" scope="request" value="${bodyItem}" />
                 <c:import url="../submit/generateGroupItemTxt.jsp">
                     <c:param name="itemId" value="${bodyItem.item.id}"/>
@@ -919,7 +937,7 @@ but the custom tag uses that, not this jstl code--%>
         </c:when>
         <%-- could be a radio or checkbox that is not horizontal --%>
         <c:otherwise>
-            <td class="aka_padding_norm aka_cellBorders">
+            <td class="aka_padding_norm aka_cellBorders <c:out value="${extraClass}"/>">
                 <c:set var="displayItem" scope="request" value="${bodyItem}" />
                 <c:import url="../submit/generateGroupItemTxt.jsp">
                     <c:param name="itemId" value="${bodyItem.item.id}"/>

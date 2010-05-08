@@ -1493,7 +1493,28 @@ public abstract class DataEntryServlet extends SecureController {
                         	if (itemWithGroup.isInGroup()) {
                         		System.out.println("found group: " + fieldNames[0]);
                         		// do something there
-                        		
+                        		List<DisplayItemGroupBean> digbs = itemWithGroup.getItemGroups();
+                                logger.info("digbs size: " + digbs.size());
+                                for (int j = 0; j < digbs.size(); j++) {
+                                    DisplayItemGroupBean displayGroup = digbs.get(j);
+                                    if (displayGroup.getItemGroupBean().getOid().equals(fieldNames[0])) {
+                                    	List<DisplayItemBean> items = displayGroup.getItems();
+                                        
+                                        for (int k = 0; k < items.size(); k++) {
+                                            DisplayItemBean dib = items.get(k);
+                                            if (dib.getItem().getOid().equals(newFieldName)) {
+                                            	inSameSection = true;
+                                            	System.out.println("found item " + this.getGroupItemInputName(displayGroup, j, dib) + " vs. " + fieldName);
+                                            	dib.getMetadata().setShowItem(true);
+                                            	errorsPostDryRun.put(this.getGroupItemInputName(displayGroup, j, dib), rulesPostDryRun.get(fieldName));
+                                            }
+                                            items.set(k, dib);
+                                        }
+                                        displayGroup.setItems(items);
+                                        digbs.set(j, displayGroup);	
+                                    }   
+                                }
+                                itemWithGroup.setItemGroups(digbs);
                         	} else {
                         		DisplayItemBean displayItemBean = itemWithGroup.getSingleItem();
                         		ItemBean itemBean = displayItemBean.getItem();
