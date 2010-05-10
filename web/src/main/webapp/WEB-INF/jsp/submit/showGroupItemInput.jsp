@@ -313,7 +313,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
   <%-- add for error messages --%>
   <label for="<c:out value="${inputName}"/>"></label>
   <c:choose>
-    <c:when test="${isInError}">
+    <c:when test="${isInError && !hasShown}">
       <span class="<c:out value="${exclaim}"/>">! </span><input class="<c:out value="${input}"/>" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="text" name="<c:out value="${inputName}"/>" value="<c:out value="${inputTxtValue}"/>" />
     </c:when>
     <c:otherwise>
@@ -336,7 +336,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
 <c:if test='${inputType == "textarea"}'>
   <label for="<c:out value="${inputName}"/>"></label>
   <c:choose>
-    <c:when test="${isInError}">
+    <c:when test="${isInError && !hasShown}">
       <span class="<c:out value="${exclaim}"/>">! </span><textarea class="<c:out value="${input}"/>" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" name="<c:out value="${inputName}"/>" rows="5" cols="40"><c:out value="${inputTxtValue}"/></textarea>
     </c:when>
     <c:otherwise>
@@ -360,7 +360,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
       </c:forTokens>
       <label for="<c:out value="${inputName}"/>"></label>
       <c:choose>
-        <c:when test="${isInError}">
+        <c:when test="${isInError && !hasShown}">
           <span class="<c:out value="${exclaim}"/>">! </span><input class="<c:out value="${input}"/>" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <br/>
         </c:when>
         <c:otherwise>
@@ -384,7 +384,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
       </c:forTokens>
     <label for="<c:out value="${inputName}"/>"></label>
     <c:choose>
-      <c:when test="${isInError}">
+      <c:when test="${isInError && !hasShown}">
         <span class="<c:out value="${exclaim}"/>">! </span><input class="<c:out value="${input}"/>" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="checkbox" name="<c:out value="${inputName}"/>" value="<c:out value="${responseOptionBean.value}" />" <c:out value="${checked}"/> />
       </c:when>
       <c:otherwise>
@@ -405,7 +405,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
       </c:choose>
       <label for="<c:out value="${inputName}"/>"></label>
       <c:choose>
-        <c:when test="${isInError}">
+        <c:when test="${isInError && !hasShown}">
           <!-- this.className='changedField';-->
           <span class="<c:out value="${exclaim}"/>">! </span><input class="<c:out value="${input}"/>" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onclick="if(detectIEWindows(navigator.userAgent)){this.checked=true; unCheckSiblings(this,'vertical');}" onChange="if(! detectIEWindows(navigator.userAgent)){this.className='changedField';} javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="radio" name="<c:out value="${inputName}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /><c:if test="${! isHorizontal}"><c:out value="${option.text}" /></c:if> <br/>
         </c:when>
@@ -425,7 +425,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
     <%-- Only have one of these per radio button--%>
     <label for="<c:out value="${inputName}"/>"></label>
     <c:choose>
-      <c:when test="${isInError}">
+      <c:when test="${isInError && !hasShown}">
         <span class="<c:out value="${exclaim}"/>">! </span><input class="<c:out value="${input}"/>" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onclick="if(detectIEWindows(navigator.userAgent)){this.checked=true; unCheckSiblings(this,'horizontal');}" onChange="if(! detectIEWindows(navigator.userAgent)){this.className='changedField';} javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="radio" name="<c:out value="${inputName}"/>" value="<c:out value="${responseOptionBean.value}" />" <c:out value="${checked}"/> />
       </c:when>
       <c:otherwise>
@@ -465,7 +465,7 @@ include the default value first in the select list --%>
 
   <c:choose>
 
-    <c:when test="${isInError}">
+    <c:when test="${isInError && !hasShown}">
       <span class="<c:out value="${exclaim}"/>">! </span>
       <select class="<c:out value="${input}"/>" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" name="<c:out value="${inputName}"/>" class="formfield">
           
@@ -538,7 +538,7 @@ include the default value first in the select list --%>
 <c:if test='${inputType == "multi-select"}'>
   <label for="<c:out value="${inputName}"/>"></label>
   <c:choose>
-    <c:when test="${isInError}">
+    <c:when test="${isInError && !hasShown}">
       <span class="<c:out value="${exclaim}"/>">! </span><select  class="<c:out value="${input}"/>" id="<c:out value="${inputName}"/>" multiple  tabindex=
       "<c:out value="${tabNum}"/>" name="<c:out value="${inputName}"/>" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');">
     </c:when>
@@ -617,7 +617,7 @@ include the default value first in the select list --%>
 			</script> 
 			
 		    <c:choose>
-		        <c:when test="${isInError}">
+		        <c:when test="${isInError && !hasShown}">
 		            <span class="<c:out value="${exclaim}"/>">! </span><input class="<c:out value="${input}"/>" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" readonly="readonly" onChange=
 		          "this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="text" name="<c:out value="${inputName}" />" value="<c:out value="${inputTxtValue}"/>" />
 		        </c:when>
@@ -631,7 +631,7 @@ include the default value first in the select list --%>
 			<input type="hidden" name="input<c:out value="${itemId}"/>" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
 			<label for="<c:out value="${inputName}"/>"></label>
 			<c:choose>
-				<c:when test="${isInError}">
+				<c:when test="${isInError && !hasShown}">
 					<span class="<c:out value="${exclaim}"/>">! </span><input class="<c:out value="${input}"/>" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="text" class="disabled" disabled="disabled" name="<c:out value="${inputName}"/>" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
 				</c:when>
 				<c:otherwise>
