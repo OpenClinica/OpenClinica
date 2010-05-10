@@ -691,17 +691,17 @@ but the custom tag uses that, not this jstl code--%>
 		<%-- highlighting for items within item groups, tbh --%>
 		<%-- update td class with aka_group_show if they meet the criteria --%>
 		<c:set var="isItemShown" value="false"/>
-		<c:set var="iteratorId" value="0"/>
+		
 		<c:forEach var="formMsg" items="${formMessages}">
-			<c:out value="${iteratorId}"/>
-			<c:set var="inputValue"><c:out value="${repeatParentId}"/>_<c:out value="${iteratorId}"/>input<c:out value="${bodyItem.item.id}"/></c:set>
+			
+			<c:set var="inputValue"><c:out value="${repeatParentId}"/>_<c:out value="${uniqueId}"/>input<c:out value="${bodyItem.item.id}"/></c:set>
 			<c:if test="${formMsg.key eq inputValue}">
 				<c:set var="isItemShown" value="true"/>
-				PASS! <c:out value="${inputValue}"/>
+				<%-- PASS! <c:out value="${inputValue}"/> --%>
 			</c:if>
 			
 		</c:forEach>
-		<c:set var="iteratorId" value="${iteratorId+1}"/>
+		
         <c:choose>
 			<c:when test="${isItemShown && hasShown}">
                  <c:set var="extraClass" value="aka_group_show"/>
@@ -842,21 +842,23 @@ but the custom tag uses that, not this jstl code--%>
 	<%-- highlighting for items within item groups, tbh --%>
 		<%-- update td class with aka_group_show if they meet the criteria --%>
 		<c:set var="isItemShown" value="false"/>
-						<c:forEach var="formMsg" items="${formMessages}">
-							<c:set var="inputValue"><c:out value="${repeatParentId}"/>_0input<c:out value="${displayItem.singleItem.item.id}"/></c:set>
-							<c:if test="${formMsg.key eq inputValue}">
-								<c:set var="isItemShown" value="true"/>
-							</c:if>
-						</c:forEach>
-                    	<c:choose>
-                    		<c:when test="${isItemShown && hasShown}">
-                    			<c:set var="extraClass" value="aka_group_shown"/>
-                    		</c:when>
-                    		<c:otherwise>
-								<c:set var="extraClass" value=" "/>
-                    			<%-- do nothing here ? --%>
-                    		</c:otherwise>
-                    	</c:choose>
+		<c:forEach var="formMsg" items="${formMessages}">
+			
+			<c:set var="inputValue"><c:out value="${repeatParentId}"/>_<c:out value="${uniqueId}"/>input<c:out value="${bodyItem.item.id}"/></c:set>
+			<c:if test="${formMsg.key eq inputValue}">
+				<c:set var="isItemShown" value="true"/>
+<!--				Pass .. <c:out value="${inputValue}"/>-->
+			</c:if>
+		</c:forEach>
+        <c:choose>
+        	<c:when test="${isItemShown && hasShown}">
+            	<c:set var="extraClass" value="aka_group_show"/>
+            </c:when>
+            <c:otherwise>
+				<c:set var="extraClass" value=" "/>
+            	<%-- do nothing here ? --%>
+            </c:otherwise>
+        </c:choose>
     <c:set var="itemNum" value="${itemNum + 1}" />
     <c:set var="isHorizontalCellLevel" scope="request" value="${false}"/>
     <c:if test="${bodyItem.metadata.responseLayout eq 'horizontal' ||
