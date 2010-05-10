@@ -14,7 +14,6 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.SessionManager;
@@ -40,12 +39,20 @@ import org.slf4j.LoggerFactory;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.security.context.SecurityContextHolder;
-import org.springframework.security.userdetails.UserDetails;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.StringTokenizer;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
@@ -802,20 +809,20 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     }
 
-
     public synchronized static void removeLockedCRF(int userId) {
         for (Iterator iter = getUnavailableCRFList().entrySet().iterator(); iter.hasNext();) {
             java.util.Map.Entry entry = (java.util.Map.Entry) iter.next();
-            int id = (Integer)entry.getValue();
-            if(id==userId)getUnavailableCRFList().remove(entry.getKey());
+            int id = (Integer) entry.getValue();
+            if (id == userId)
+                getUnavailableCRFList().remove(entry.getKey());
         }
     }
 
-    public synchronized void lockThisEventCRF(int ecb, int ub){
+    public synchronized void lockThisEventCRF(int ecb, int ub) {
         getUnavailableCRFList().put(ecb, ub);
     }
 
-    public synchronized static HashMap getUnavailableCRFList(){
+    public synchronized static HashMap getUnavailableCRFList() {
         return unavailableCRFList;
     }
 
@@ -838,7 +845,5 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             SecureController.this.process(request, response);
         }
     }
-
-
 
 }

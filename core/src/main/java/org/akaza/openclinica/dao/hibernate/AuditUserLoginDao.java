@@ -24,7 +24,7 @@ public class AuditUserLoginDao extends AbstractDomainDao<AuditUserLoginBean> {
         Criteria criteria = getCurrentSession().createCriteria(domainClass());
         criteria = filter.execute(criteria);
         criteria.setProjection(Projections.rowCount()).uniqueResult();
-        return (Integer) criteria.uniqueResult();
+        return ((Long) criteria.uniqueResult()).intValue();
     }
 
     @SuppressWarnings("unchecked")

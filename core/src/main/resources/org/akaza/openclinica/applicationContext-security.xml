@@ -5,15 +5,15 @@
     xmlns:util="http://www.springframework.org/schema/util"
     xmlns:security="http://www.springframework.org/schema/security"
     xsi:schemaLocation="http://www.springframework.org/schema/beans
-                           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
                            http://www.springframework.org/schema/util
-                           http://www.springframework.org/schema/util/spring-util-2.5.xsd
+                           http://www.springframework.org/schema/util/spring-util-3.0.xsd
                            http://www.springframework.org/schema/security
-                           http://www.springframework.org/schema/security/spring-security-2.0.4.xsd">
+                           http://www.springframework.org/schema/security/spring-security-3.0.xsd">
 
 
   <security:http access-denied-page="/accounts/denied.htm" entry-point-ref="authenticationProcessingFilterEntryPoint">
-
+    
     <security:anonymous />
     <security:intercept-url pattern="/pages/login/login" filters="none"/>
     <security:intercept-url pattern="/SystemStatus" filters="none"/>
@@ -30,17 +30,27 @@
       default-target-url='/MainMenu' always-use-default-target='true' />
      -->
     <security:intercept-url pattern="/**" access="ROLE_USER" />
-
+    <security:custom-filter position="FORM_LOGIN_FILTER" ref="myFilter" />
+    <!--  <security:custom-filter position="LOGOUT_FILTER" ref="logoutFilter" /> -->
+    <security:custom-filter position="CONCURRENT_SESSION_FILTER" ref="concurrencyFilter" />
+    <security:session-management session-authentication-strategy-ref="sas"/>
+    <security:logout logout-success-url="/MainMenu" logout-url="/j_spring_security_logout" />
+    
   </security:http>
-
+  
+  <security:authentication-manager alias="authenticationManager">
     <security:authentication-provider user-service-ref="ocUserDetailsService">
         <security:password-encoder ref="openClinicaPasswordEncoder" />
         <!-- <security:password-encoder hash="md5" /> -->
         <!-- <security:user-service properties="/WEB-INF/users.properties" /> -->
     </security:authentication-provider>
+  </security:authentication-manager>
+  
 
-    <bean id="shaPasswordEncoder" class="org.springframework.security.providers.encoding.ShaPasswordEncoder" />
-    <bean id="md5PasswordEncoder" class="org.springframework.security.providers.encoding.Md5PasswordEncoder" />
+    
+
+    <bean id="shaPasswordEncoder" class="org.springframework.security.authentication.encoding.ShaPasswordEncoder" />
+    <bean id="md5PasswordEncoder" class="org.springframework.security.authentication.encoding.Md5PasswordEncoder" />
 
     <bean id="openClinicaPasswordEncoder" class="org.akaza.openclinica.core.OpenClinicaPasswordEncoder">
         <property name="currentPasswordEncoder" ref="shaPasswordEncoder"/>
@@ -51,8 +61,7 @@
         <property name="encoder" ref="openClinicaPasswordEncoder" />
     </bean>
 
-    <security:authentication-manager alias="authenticationManager"/>
-
+    <!-- 
     <bean id="myFilter" class="org.akaza.openclinica.web.filter.OpenClinicaAuthenticationProcessingFilter">
         <property name="authenticationManager" ref="authenticationManager"/>
         <property name="authenticationFailureUrl" value="/pages/login/login?action=errorLogin"/>
@@ -67,26 +76,81 @@
         </property>
         <security:custom-filter position="AUTHENTICATION_PROCESSING_FILTER"/>
     </bean>
+    -->
 
     <bean id="authenticationProcessingFilterEntryPoint"
-          class="org.springframework.security.ui.webapp.AuthenticationProcessingFilterEntryPoint">
+          class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
         <property name="loginFormUrl" value="/pages/login/login"/>
         <property name="forceHttps" value="false"/>
     </bean>
+    
+    <bean id="myFilter" class="org.akaza.openclinica.web.filter.OpenClinicaUsernamePasswordAuthenticationFilter">
+        <property name="authenticationManager" ref="authenticationManager"/>
+        <property name="authenticationFailureHandler" ref="failureHandler" />
+        <property name="authenticationSuccessHandler" ref="successHandler" />
+        <!-- 
+        <property name="authenticationFailureUrl" value="/pages/login/login?action=errorLogin"/>
+        <property name="defaultTargetUrl" value="/MainMenu"/>
+         -->
+        <property name="auditUserLoginDao" ref="auditUserLoginDao"/>
+        <property name="configurationDao" ref="configurationDao"/>
+        <property name="dataSource" ref="dataSource"/>
+        <property name="allowSessionCreation" value="true" />
+        <property name="sessionAuthenticationStrategy" ref="sas"/>
+    </bean>
+    
+    <bean id="successHandler" class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler" >
+        <property name="defaultTargetUrl" value="/MainMenu" /> <!-- which is the default value -->
+    </bean>
+    
+    <bean id="failureHandler" class="org.springframework.security.web.authentication.ExceptionMappingAuthenticationFailureHandler" >
+        <property name="defaultFailureUrl" value="/pages/login/login?action=errorLogin" />
+        <property name="exceptionMappings">
+            <props>
+                <prop key="org.springframework.security.LockedException">/pages/login/login?action=errorLocked</prop>
+            </props>
+        </property>
+    </bean>
+    
+     <bean id="concurrencyFilter" class="org.springframework.security.web.session.ConcurrentSessionFilter">
+        <property name="sessionRegistry" ref="sessionRegistry" />
+        <property name="expiredUrl" value="/MainMenu" />
+        <property name="logoutHandlers">
+            <list>
+               <ref bean="openClinicaLogoutHandler"/>
+            </list>
+        </property>
+     </bean>
+     
+     <bean id="sessionRegistry" class="org.akaza.openclinica.web.filter.OpenClinicaSessionRegistryImpl">
+        <property name="auditUserLoginDao" ref="auditUserLoginDao"/>
+        <property name="dataSource" ref="dataSource"/>
+     </bean>
+    
+    
+   
+    <bean id="sas" class="org.springframework.security.web.authentication.session.ConcurrentSessionControlStrategy">
+        <constructor-arg name="sessionRegistry" ref="sessionRegistry" />
+        <property name="maximumSessions" value="1" />
+    </bean>
 
-     <bean id="logoutFilter" class="org.springframework.security.ui.logout.LogoutFilter">
+    
+    <bean id="openClinicaLogoutHandler" class="org.akaza.openclinica.web.filter.OpenClinicaSecurityContextLogoutHandler">
+        <property name="auditUserLoginDao" ref="auditUserLoginDao"/>
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    
+    <!-- 
+     <bean id="logoutFilter" class="org.springframework.security.web.authentication.logout.LogoutFilter">
         <constructor-arg value="/MainMenu"></constructor-arg>
         <constructor-arg>
             <list>
-                <bean class="org.akaza.openclinica.web.filter.OpenClinicaSecurityContextLogoutHandler">
-                    <property name="auditUserLoginDao" ref="auditUserLoginDao"/>
-                    <property name="dataSource" ref="dataSource"/>
-                </bean>
+               <ref bean="openClinicaLogoutHandler"/>
             </list>
         </constructor-arg>
         <property name="filterProcessesUrl" value="/j_spring_security_logout" />
-        <security:custom-filter position="LOGOUT_FILTER"/>
     </bean>
+     -->
 
 
 
@@ -99,4 +163,5 @@
             expression="execution(* com.springsource..*Service.*(..))"
             access="ROLE_USER" />
     </security:global-method-security>
---></beans>
+    -->
+</beans>

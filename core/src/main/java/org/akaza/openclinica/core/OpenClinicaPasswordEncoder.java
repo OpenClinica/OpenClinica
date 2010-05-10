@@ -1,7 +1,7 @@
 package org.akaza.openclinica.core;
 
 import org.springframework.dao.DataAccessException;
-import org.springframework.security.providers.encoding.PasswordEncoder;
+import org.springframework.security.authentication.encoding.PasswordEncoder;
 
 public class OpenClinicaPasswordEncoder implements PasswordEncoder {
 
