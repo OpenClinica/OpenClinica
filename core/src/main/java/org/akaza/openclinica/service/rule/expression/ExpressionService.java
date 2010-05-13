@@ -15,10 +15,8 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
-import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
@@ -29,7 +27,6 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
-import org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
@@ -52,11 +49,12 @@ public class ExpressionService {
     private final String ESCAPED_SEPERATOR = "\\.";
     private final String STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN = "[A-Z_0-9]+|[A-Z_0-9]+\\[(ALL|[1-9]\\d*)\\]$";
     private final String STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN_NO_ALL = "[A-Z_0-9]+|[A-Z_0-9]+\\[[1-9]\\d*\\]$";
-    private final String STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN_WITH_ORDINAL = "[A-Z_0-9]+\\[(ALL|[1-9]\\d*)\\]$";
+    private final String STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN_WITH_ORDINAL = "[A-Z_0-9]+\\[(END|ALL|[1-9]\\d*)\\]$";
+    private final String STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN_WITH_END = "[A-Z_0-9]+|[A-Z_0-9]+\\[(END|ALL|[1-9]\\d*)\\]$";
     private final String PRE = "[A-Z_0-9]+\\[";
     private final String POST = "\\]";
     private final String CRF_OID_OR_ITEM_DATA_PATTERN = "[A-Z_0-9]+";
-    private final String BRACKETS_AND_CONTENTS = "\\[(ALL|[1-9]\\d*)\\]";
+    private final String BRACKETS_AND_CONTENTS = "\\[(END|ALL|[1-9]\\d*)\\]";
     private final String ALL_IN_BRACKETS = "ALL";
     private final String OPENNIG_BRACKET = "[";
     private final String CLOSING_BRACKET = "]";
@@ -64,6 +62,7 @@ public class ExpressionService {
     DataSource ds;
     Pattern[] pattern;
     Pattern[] rulePattern;
+    Pattern[] ruleActionPattern;
     ExpressionObjectWrapper expressionWrapper;
 
     private ItemDAO itemDao;
@@ -96,29 +95,24 @@ public class ExpressionService {
 
     private void init(DataSource ds, ExpressionObjectWrapper expressionWrapper) {
         pattern = new Pattern[4];
-        pattern[3] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN); // STUDY_EVENT_DEFINITION_OID
-        // +
-        // ordinal
-        pattern[2] = Pattern.compile(CRF_OID_OR_ITEM_DATA_PATTERN); // CRF_OID
-        // or
-        // CRF_VERSION_OID
-        pattern[1] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN); // ITEM_GROUP_DATA_OID
-        // +
-        // ordinal
+        pattern[3] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN); // STUDY_EVENT_DEFINITION_OID + ordinal
+        pattern[2] = Pattern.compile(CRF_OID_OR_ITEM_DATA_PATTERN); // CRF_OID or CRF_VERSION_OID
+        pattern[1] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN); // ITEM_GROUP_DATA_OID + ordinal
         pattern[0] = Pattern.compile(CRF_OID_OR_ITEM_DATA_PATTERN); // ITEM_DATA_OID
 
         // [ALL] ordinals are not accepted in Rule Expressions
         rulePattern = new Pattern[4];
-        rulePattern[3] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN_NO_ALL); // STUDY_EVENT_DEFINITION_OID
-        // +
-        // ordinal
-        rulePattern[2] = Pattern.compile(CRF_OID_OR_ITEM_DATA_PATTERN); // CRF_OID
-        // or
-        // CRF_VERSION_OID
-        rulePattern[1] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN_NO_ALL); // ITEM_GROUP_DATA_OID
-        // +
-        // ordinal
+        rulePattern[3] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN_NO_ALL); // STUDY_EVENT_DEFINITION_OID + ordinal
+        rulePattern[2] = Pattern.compile(CRF_OID_OR_ITEM_DATA_PATTERN); // CRF_OID or CRF_VERSION_OID
+        rulePattern[1] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN_NO_ALL); // ITEM_GROUP_DATA_OID + ordinal
         rulePattern[0] = Pattern.compile(CRF_OID_OR_ITEM_DATA_PATTERN); // ITEM_DATA_OID
+
+        // [END] support added
+        ruleActionPattern = new Pattern[4];
+        ruleActionPattern[3] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN); // STUDY_EVENT_DEFINITION_OID + ordinal
+        ruleActionPattern[2] = Pattern.compile(CRF_OID_OR_ITEM_DATA_PATTERN); // CRF_OID or CRF_VERSION_OID
+        ruleActionPattern[1] = Pattern.compile(STUDY_EVENT_DEFINITION_OR_ITEM_GROUP_PATTERN_WITH_END); // ITEM_GROUP_DATA_OID + ordinal
+        ruleActionPattern[0] = Pattern.compile(CRF_OID_OR_ITEM_DATA_PATTERN); // ITEM_DATA_OID
 
         this.studyEventDefinitions = new HashMap<String, StudyEventDefinitionBean>();
         this.itemGroups = new HashMap<String, ItemGroupBean>();
@@ -229,12 +223,12 @@ public class ExpressionService {
         List<ItemDataBean> itemData =
             getItemDataDao().findByStudyEventAndOids(Integer.valueOf(studyEventId), getItemOidFromExpression(expression),
                     getItemGroupOidFromExpression(expression));
-        
+
         ItemDataBean itemDataBean = itemData.size() > index ? itemData.get(index) : null;
         return itemDataBean;
         // << tbh 04/28/2010
     }
-    
+
     public String getValueFromForm(String expression) {
         String result = null;
         HashMap<String, String> formValues = expressionWrapper.getItemsAndTheirValues();
@@ -286,6 +280,28 @@ public class ExpressionService {
             }
         }
         return value;
+    }
+
+    public boolean isInsertActionExpressionValid(String expression, RuleSetBean ruleSet, Integer allowedLength) {
+        boolean result = false;
+        boolean isRuleExpressionValid = false;
+
+        Integer k = getExpressionSize(expression);
+        if (k.intValue() > allowedLength.intValue()) {
+            return false;
+        }
+
+        if (ruleSet != null) {
+            String fullExpression = constructFullExpressionIfPartialProvided(expression, ruleSet.getTarget().getValue());
+            isRuleExpressionValid = checkInsertActionExpressionSyntax(fullExpression);
+
+            if (isRuleExpressionValid) {
+                isExpressionValid(fullExpression);
+                result = true;
+            }
+
+        }
+        return result;
     }
 
     public boolean isExpressionValid(String expression, RuleSetBean ruleSet, Integer allowedLength) {
@@ -527,7 +543,9 @@ public class ExpressionService {
         String[] splitExpression = expression.split(ESCAPED_SEPERATOR);
         // int patternIndex = ?;
         if (!match(splitExpression[splitExpression.length - 1 - expressionIndex], pattern[patternIndex])) {
-            throw new OpenClinicaSystemException("The OID is Not Valid");
+            if (!match(splitExpression[splitExpression.length - 1 - expressionIndex], ruleActionPattern[patternIndex])) {
+                throw new OpenClinicaSystemException("The OID is Not Valid");
+            }
         }
         return splitExpression[splitExpression.length - 1 - expressionIndex];
     }
@@ -741,6 +759,20 @@ public class ExpressionService {
         int patternIndex = 0;
         for (int i = splitExpression.length - 1; i >= 0; i--) {
             if (!match(splitExpression[i], pattern[patternIndex++])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean checkInsertActionExpressionSyntax(String expression) {
+        if (expression.startsWith(SEPERATOR) || expression.endsWith(SEPERATOR)) {
+            return false;
+        }
+        String[] splitExpression = expression.split(ESCAPED_SEPERATOR);
+        int patternIndex = 0;
+        for (int i = splitExpression.length - 1; i >= 0; i--) {
+            if (!match(splitExpression[i], ruleActionPattern[patternIndex++])) {
                 return false;
             }
         }

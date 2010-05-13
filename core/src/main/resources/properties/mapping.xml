@@ -171,6 +171,10 @@
        <field name="value" type="string" handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler" required="false">
             <bind-xml name="Value" node="attribute"/>
        </field>
+       <field name="valueExpression"
+               type="org.akaza.openclinica.domain.rule.expression.ExpressionBean">
+               <bind-xml name="ValueExpression"/>
+       </field>
      </class>
      <class name="org.akaza.openclinica.domain.rule.expression.ExpressionBean" auto-complete="true">
         <field name="ContextName" type="string" handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler">

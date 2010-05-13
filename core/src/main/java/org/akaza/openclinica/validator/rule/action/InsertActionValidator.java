@@ -45,16 +45,35 @@ public class InsertActionValidator implements Validator {
     public void validate(Object obj, Errors e) {
         InsertActionBean insertActionBean = (InsertActionBean) obj;
         for (int i = 0; i < insertActionBean.getProperties().size(); i++) {
-            String p = "properties[" + i + "]";
+            String p = "properties[" + i + "].";
             PropertyBean propertyBean = insertActionBean.getProperties().get(i);
             ValidationUtils.rejectIfEmpty(e, p + "oid", "oid.empty");
-            ValidationUtils.rejectIfEmpty(e, p + "value", "value.empty");
+
             String expression = getExpressionService().constructFullExpressionIfPartialProvided(propertyBean.getOid(), getRuleSetBean().getTarget().getValue());
             List<ItemBean> itemBeans = getItemDAO().findByOid(getExpressionService().getItemOid(expression));
-            if (!getExpressionService().isExpressionValid(propertyBean.getOid(), getRuleSetBean(), 3) || itemBeans.size() != 1) {
-                e.rejectValue(p + "oid", "oid.invalid");
+            if (!getExpressionService().isInsertActionExpressionValid(propertyBean.getOid(), getRuleSetBean(), 3) || itemBeans.size() != 1) {
+                e.rejectValue(p + "oid", "oid.invalid", "OID: " + propertyBean.getOid() + " is Invalid.");
             } else {
-                checkValidity(itemBeans.get(0), propertyBean.getValue(), p, e);
+
+                if (propertyBean.getValueExpression() != null && propertyBean.getValueExpression().getValue() != null
+                    && propertyBean.getValueExpression().getValue().length() != 0) {
+
+                    String valueExpression =
+                        getExpressionService().constructFullExpressionIfPartialProvided(propertyBean.getValueExpression().getValue(),
+                                getRuleSetBean().getTarget().getValue());
+                    List<ItemBean> valueItemBeans = getItemDAO().findByOid(getExpressionService().getItemOid(valueExpression));
+                    if (!getExpressionService().isExpressionValid(propertyBean.getValueExpression().getValue(), getRuleSetBean(), 2)
+                        || valueItemBeans.size() != 1) {
+                        e.rejectValue(p + "valueExpression", "valueExpression.invalid", "Value provided for ValueExpression is Invalid");
+                    }
+                } else {
+                    if (propertyBean.getValue() == null || propertyBean.getValue().length() > 0) {
+                        ValidationUtils.rejectIfEmpty(e, p + "value", "value.empty");
+                    } else {
+                        checkValidity(itemBeans.get(0), propertyBean.getValue(), p, e);
+                    }
+                }
+
             }
         }
     }

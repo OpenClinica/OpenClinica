@@ -3,7 +3,9 @@ package org.akaza.openclinica.domain.rule.action;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.dao.hibernate.RuleActionRunLogDao;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
+import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.RuleRunner.RuleRunnerMode;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
@@ -14,11 +16,16 @@ public class InsertActionProcessor implements ActionProcessor {
 
     DataSource ds;
     DynamicsMetadataService itemMetadataService;
+    RuleActionRunLogDao ruleActionRunLogDao;
     RuleSetBean ruleSet;
+    RuleSetRuleBean ruleSetRule;
 
-    public InsertActionProcessor(DataSource ds, DynamicsMetadataService itemMetadataService, RuleSetBean ruleSet) {
+    public InsertActionProcessor(DataSource ds, DynamicsMetadataService itemMetadataService, RuleActionRunLogDao ruleActionRunLogDao, RuleSetBean ruleSet,
+            RuleSetRuleBean ruleSetRule) {
         this.itemMetadataService = itemMetadataService;
         this.ruleSet = ruleSet;
+        this.ruleSetRule = ruleSetRule;
+        this.ruleActionRunLogDao = ruleActionRunLogDao;
         this.ds = ds;
     }
 
@@ -47,6 +54,9 @@ public class InsertActionProcessor implements ActionProcessor {
 
     private RuleActionBean save(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, StudyBean currentStudy, UserAccountBean ub) {
         getItemMetadataService().insert(itemDataBean.getId(), ((InsertActionBean) ruleAction).getProperties(), ub, ruleSet);
+        RuleActionRunLogBean ruleActionRunLog =
+            new RuleActionRunLogBean(ruleAction.getActionType(), itemDataBean, itemDataBean.getValue(), ruleSetRule.getRuleBean().getOid());
+        ruleActionRunLogDao.saveOrUpdate(ruleActionRunLog);
         return null;
     }
 

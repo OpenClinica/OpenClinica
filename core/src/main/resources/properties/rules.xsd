@@ -128,6 +128,7 @@
     
     <xs:complexType name="PropertyType">
         <xs:sequence>
+            <xs:element name="ValueExpression" type="TargetType" minOccurs="0"/>
         </xs:sequence>
         <xs:attributeGroup ref="PropertyAttributeType"/>
     </xs:complexType>

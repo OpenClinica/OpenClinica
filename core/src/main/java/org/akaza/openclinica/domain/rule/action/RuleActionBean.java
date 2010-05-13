@@ -34,7 +34,7 @@ import javax.persistence.Transient;
 @DiscriminatorColumn(name = "action_type", discriminatorType = DiscriminatorType.INTEGER)
 @Table(name = "rule_action")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "rule_action_id_seq") })
-public class RuleActionBean extends AbstractAuditableMutableDomainObject {
+public class RuleActionBean extends AbstractAuditableMutableDomainObject implements Comparable<RuleActionBean> {
 
     private RuleSetRuleBean ruleSetRule;
     private ActionType actionType;
@@ -97,6 +97,12 @@ public class RuleActionBean extends AbstractAuditableMutableDomainObject {
 
     public void setRuleActionRun(RuleActionRunBean ruleActionRun) {
         this.ruleActionRun = ruleActionRun;
+    }
+
+    @Transient
+    public int compareTo(RuleActionBean o) {
+        // TODO Auto-generated method stub
+        return 0;
     }
 
 }

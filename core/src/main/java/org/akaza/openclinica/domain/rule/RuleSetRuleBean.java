@@ -9,11 +9,13 @@ package org.akaza.openclinica.domain.rule;
 
 import org.akaza.openclinica.domain.AbstractAuditableMutableDomainObject;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
+import org.akaza.openclinica.domain.rule.action.RuleActionComparator;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -122,6 +124,7 @@ public class RuleSetRuleBean extends AbstractAuditableMutableDomainObject {
                 ruleActions.add(action);
             }
         }
+        Collections.sort(ruleActions, new RuleActionComparator());
         return ruleActions;
     }
 

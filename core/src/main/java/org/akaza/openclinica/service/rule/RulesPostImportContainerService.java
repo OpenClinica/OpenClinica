@@ -217,7 +217,6 @@ public class RulesPostImportContainerService {
             }
         }
         if (ruleActionBean instanceof InsertActionBean) {
-            String oid = (((InsertActionBean) ruleActionBean)).getProperties().get(0).getOid();
             if (ruleActionBean.getRuleActionRun().getBatch() == true || ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
                 ruleSetBeanWrapper.error("InsertAction " + ((InsertActionBean) ruleActionBean).toString() + " is not Valid. ");
             }
@@ -231,13 +230,6 @@ public class RulesPostImportContainerService {
             if (errors.hasErrors()) {
                 ruleSetBeanWrapper.error("InsertAction is not Valid. " + errors.toString());
             }
-
-            /*
-            String result = getExpressionService().checkValidityOfItemOrItemGroupOidInCrf(oid, ruleSetBeanWrapper.getAuditableBean());
-            if (!result.equals("OK")) {
-                ruleSetBeanWrapper.error("InsertAction OID " + result + " is not Valid. ");
-            }
-            */
         }
         if (ruleActionBean instanceof EmailActionBean) {
             if (ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {

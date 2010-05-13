@@ -112,4 +112,11 @@
             drop sequence RULE_ACTION_RUN_LOG_ID_SEQ;
         </rollback>
     </changeSet>
+    <changeSet author="kkrumlian" id="2010-01-13-4575-10">
+        <comment>Drop/Add Column</comment>
+        <dropColumn tableName="rule_action_property" columnName="reference"/>
+        <addColumn tableName="rule_action_property">
+            <column name="rule_expression_id" type="INT"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

@@ -1,11 +1,15 @@
 package org.akaza.openclinica.domain.rule.action;
 
 import org.akaza.openclinica.domain.AbstractMutableDomainObject;
+import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -13,9 +17,9 @@ import javax.persistence.Table;
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "rule_action_property_id_seq") })
 public class PropertyBean extends AbstractMutableDomainObject {
 
-    String oid;
-    String value;
-    String reference;
+    private String oid;
+    private String value;
+    private ExpressionBean valueExpression;
 
     @Column(name = "oc_oid")
     public String getOid() {
@@ -34,12 +38,14 @@ public class PropertyBean extends AbstractMutableDomainObject {
         this.value = value;
     }
 
-    public String getReference() {
-        return reference;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "rule_expression_id")
+    public ExpressionBean getValueExpression() {
+        return valueExpression;
     }
 
-    public void setReference(String reference) {
-        this.reference = reference;
+    public void setValueExpression(ExpressionBean valueExpression) {
+        this.valueExpression = valueExpression;
     }
 
 }

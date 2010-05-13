@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 public enum ExecutionMode implements CodedEnum {
 
-    DRY_RUN(1, "Dry Run"), SAVE(2, "Email");
+    DRY_RUN(1, "Dry Run"), SAVE(2, "Save");
 
     private int code;
     private String description;
