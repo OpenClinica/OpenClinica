@@ -847,7 +847,6 @@ but the custom tag uses that, not this jstl code--%>
 			<c:set var="inputValue"><c:out value="${repeatParentId}"/>_<c:out value="${uniqueId}"/>input<c:out value="${bodyItem.item.id}"/></c:set>
 			<c:if test="${formMsg.key eq inputValue}">
 				<c:set var="isItemShown" value="true"/>
-<!--				Pass .. <c:out value="${inputValue}"/>-->
 			</c:if>
 		</c:forEach>
         <c:choose>

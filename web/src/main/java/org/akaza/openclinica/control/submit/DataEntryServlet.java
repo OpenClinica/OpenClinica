@@ -1186,7 +1186,6 @@ public abstract class DataEntryServlet extends SecureController {
                         session.setAttribute("shouldRunValidation", "1");
                         session.setAttribute("rulesErrors", errors.keySet());
                     }
-
                 }
             }
 
@@ -1444,10 +1443,7 @@ public abstract class DataEntryServlet extends SecureController {
                         }
                     }
                 }
-//                phase2 = Phase.INITIAL_DATA_ENTRY;
-//                if (getServletPage().equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
-//                	phase2 = Phase.DOUBLE_DATA_ENTRY;
-//                }
+                System.out.println("running rules: " + phase2.name());
                 HashMap<String, ArrayList<String>> rulesPostDryRun = runRules(allItems, ruleSets, false, shouldRunRules(), MessageType.WARNING, phase2);
                 System.out.println("found rules post dry run: " + rulesPostDryRun.toString());
                 HashMap<String, ArrayList<String>> errorsPostDryRun = new HashMap<String, ArrayList<String>>();
@@ -1468,23 +1464,6 @@ public abstract class DataEntryServlet extends SecureController {
                         if (fieldNames.length == 2) {
                             newFieldName = fieldNames[1];
                             // check items in item groups here?
-//                            List<DisplayItemGroupBean> displayGroups = section.getDisplayFormGroups();
-//                            for (DisplayItemGroupBean displayGroup : displayGroups) {
-//                            	ItemGroupBean itemGroup = displayGroup.getItemGroupBean();
-//                            	if (fieldNames[0].equals(itemGroup.getOid())) {
-//                            		System.out.println("found group: " + fieldNames[0]);
-//                            		// List itemsInGroup = itemGroup.getItemGroupMetaBeans();
-//                            		List<DisplayItemWithGroupBean> displayGroupsWithItems = section.getDisplayItemGroups();
-//                            		for (DisplayItemWithGroupBean itemWithGroup : displayGroupsWithItems) {
-//                            			if (itemWithGroup.isInGroup()) {
-//                            				List<DisplayItemGroupBean> groups = itemWithGroup.getItemGroups();
-//                            				for (DisplayItemGroupBean group : groups) {
-//                            					
-//                            				}
-//                            			}
-//                            		}
-//                            	}
-//                            }
                         }
                         List<DisplayItemWithGroupBean> displayGroupsWithItems = section.getDisplayItemGroups();
                         //ArrayList<DisplayItemBean> displayItems = section.getItems();
@@ -1503,10 +1482,18 @@ public abstract class DataEntryServlet extends SecureController {
                                         for (int k = 0; k < items.size(); k++) {
                                             DisplayItemBean dib = items.get(k);
                                             if (dib.getItem().getOid().equals(newFieldName)) {
-                                            	inSameSection = true;
-                                            	System.out.println("found item " + this.getGroupItemInputName(displayGroup, j, dib) + " vs. " + fieldName);
-                                            	dib.getMetadata().setShowItem(true);
-                                            	errorsPostDryRun.put(this.getGroupItemInputName(displayGroup, j, dib), rulesPostDryRun.get(fieldName));
+                                            	//inSameSection = true;
+                                            	System.out.println("found item in group " + 
+                                            			this.getGroupItemInputName(displayGroup, j, dib) + 
+                                            			" vs. " + 
+                                            			fieldName +
+                                                		" and is show item: " + 
+                                                		dib.getMetadata().isShowItem());
+                                            	if (!dib.getMetadata().isShowItem()) {
+                                            		dib.getMetadata().setShowItem(true);
+                                            		inSameSection = true;
+                                            		errorsPostDryRun.put(this.getGroupItemInputName(displayGroup, j, dib), rulesPostDryRun.get(fieldName));
+                                            	}
                                             }
                                             items.set(k, dib);
                                         }
@@ -1520,11 +1507,15 @@ public abstract class DataEntryServlet extends SecureController {
                         		ItemBean itemBean = displayItemBean.getItem();
                                 if (newFieldName.equals(itemBean.getOid())) {
                                 	
-                                	System.out.println("is show item: " + displayItemBean.getMetadata().isShowItem());
+                                	// System.out.println("is show item: " + displayItemBean.getMetadata().isShowItem());
                                     if (!displayItemBean.getMetadata().isShowItem()) {
                                         inSameSection = true;
-                                        System.out.println("found item " + this.getInputName(displayItemBean) + " vs. " + fieldName);
-                                        // if is repeating, use the other input name
+                                        System.out.println("found item " + this.getInputName(displayItemBean) + 
+                                        		" vs. " + 
+                                        		fieldName +
+                                        		" and is show item: " + 
+                                        		displayItemBean.getMetadata().isShowItem());
+                                        // if is repeating, use the other input name? no
                                         
                                         errorsPostDryRun.put(this.getInputName(displayItemBean), rulesPostDryRun.get(fieldName));
                                         
@@ -1535,9 +1526,7 @@ public abstract class DataEntryServlet extends SecureController {
                         	}
                         	displayGroupsWithItems.set(i, itemWithGroup);
                         }
-//                        for (DisplayItemBean displayItemBean : displayItems) {
-//                            
-//                        }
+
                         // check groups
                         List<DisplayItemGroupBean> itemGroups = new ArrayList<DisplayItemGroupBean>();
                         itemGroups = section.getDisplayFormGroups();
@@ -1546,7 +1535,11 @@ public abstract class DataEntryServlet extends SecureController {
                             if (fieldName.equals(displayGroup.getItemGroupBean().getOid())) {
                                 if (!displayGroup.getGroupMetaBean().isShowGroup()) {
                                     inSameSection = true;
-                                    System.out.println("found itemgroup " + displayGroup.getItemGroupBean().getOid() + " vs. " + fieldName);
+                                    System.out.println("found itemgroup " + displayGroup.getItemGroupBean().getOid() + 
+                                    		" vs. " + 
+                                    		fieldName +
+                                    		" and is show item: " + 
+                                    		displayGroup.getGroupMetaBean().isShowGroup());
                                     // hmmm how to set highlighting for a group?
                                     errorsPostDryRun.put(displayGroup.getItemGroupBean().getOid(), rulesPostDryRun.get(fieldName));
                                     displayGroup.getGroupMetaBean().setShowGroup(true);

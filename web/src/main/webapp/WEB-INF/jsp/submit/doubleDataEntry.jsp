@@ -661,6 +661,28 @@ window.onload = initmb;
 
     <c:forEach var="bodyItem" items="${bodyItemGroup.items}">
     <c:if test="${bodyItem.metadata.showItem}">
+	<%-- set up highlighting here, tbh 05/2010 --%>
+		<c:set var="isItemShown" value="false"/>
+		
+		<c:forEach var="formMsg" items="${formMessages}">
+			
+			<c:set var="inputValue"><c:out value="${repeatParentId}"/>_<c:out value="${uniqueId}"/>input<c:out value="${bodyItem.item.id}"/></c:set>
+			<c:if test="${formMsg.key eq inputValue}">
+				<c:set var="isItemShown" value="true"/>
+				<%-- PASS! <c:out value="${inputValue}"/> --%>
+			</c:if>
+			
+		</c:forEach>
+		
+        <c:choose>
+			<c:when test="${isItemShown && hasShown}">
+                 <c:set var="extraClass" value="aka_group_show"/>
+            </c:when>
+            <c:otherwise>
+				<c:set var="extraClass" value=" "/>
+                <%-- do nothing here ? --%>
+            </c:otherwise>
+        </c:choose>
         <c:set var="itemNum" value="${itemNum + 1}" />
         <c:set var="isHorizontalCellLevel" scope="request" value="${false}"/>
         <c:if test="${bodyItem.metadata.responseLayout eq 'horizontal' ||
@@ -672,7 +694,7 @@ window.onload = initmb;
            bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
                 <%-- For horizontal checkboxes, radio buttons--%>
                 <c:forEach var="respOption" items="${bodyItem.metadata.responseSet.options}">
-                    <td class="aka_padding_norm aka_cellBorders_dark">
+                    <td class="aka_padding_norm aka_cellBorders_dark <c:out value="${extraClass}"/>">
                         <c:set var="displayItem" scope="request" value="${bodyItem}" />
                         <c:set var="responseOptionBean" scope="request" value="${respOption}" />
                         <c:import url="../submit/showGroupItemInput.jsp">
@@ -693,7 +715,7 @@ window.onload = initmb;
            bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
                 <%-- For horizontal checkboxes, radio buttons--%>
                 <c:forEach var="respOption" items="${bodyItem.metadata.responseSet.options}">
-                    <td class="aka_padding_norm aka_cellBorders">
+                    <td class="aka_padding_norm aka_cellBorders <c:out value="${extraClass}"/>">
                         <c:set var="displayItem" scope="request" value="${bodyItem}" />
                         <c:set var="responseOptionBean" scope="request" value="${respOption}" />
                         <c:import url="../submit/showGroupItemInput.jsp">
@@ -710,7 +732,7 @@ window.onload = initmb;
                 </c:forEach>
             </c:when>
             <c:when test="${sectionBorders == 1}">
-                <td class="aka_padding_norm aka_cellBorders_dark">
+                <td class="aka_padding_norm aka_cellBorders_dark <c:out value="${extraClass}"/>">
                     <c:set var="displayItem" scope="request" value="${bodyItem}" />
 					<c:import url="../submit/generateGroupItemTxt.jsp">
 						<c:param name="itemId" value="${bodyItem.item.id}"/>
@@ -745,7 +767,7 @@ window.onload = initmb;
             </c:when>
             <%-- could be a radio or checkbox that is not horizontal --%>
             <c:otherwise>
-                <td class="aka_padding_norm aka_cellBorders">
+                <td class="aka_padding_norm aka_cellBorders <c:out value="${extraClass}"/>">
 				<!-- link text here -->
                     <c:set var="displayItem" scope="request" value="${bodyItem}" />
 					<c:import url="../submit/generateGroupItemTxt.jsp">
@@ -808,6 +830,24 @@ window.onload = initmb;
 <c:set var="columnNum"  value="1"/>
 <c:forEach var="bodyItem" items="${bodyItemGroup.items}">
 <c:if test="${bodyItem.metadata.showItem}">
+	<%-- adding more highlighting here, tbh 05/2010 --%>
+	<c:set var="isItemShown" value="false"/>
+		<c:forEach var="formMsg" items="${formMessages}">
+			
+			<c:set var="inputValue"><c:out value="${repeatParentId}"/>_<c:out value="${uniqueId}"/>input<c:out value="${bodyItem.item.id}"/></c:set>
+			<c:if test="${formMsg.key eq inputValue}">
+				<c:set var="isItemShown" value="true"/>
+			</c:if>
+		</c:forEach>
+        <c:choose>
+        	<c:when test="${isItemShown && hasShown}">
+            	<c:set var="extraClass" value="aka_group_show"/>
+            </c:when>
+            <c:otherwise>
+				<c:set var="extraClass" value=" "/>
+            	<%-- do nothing here ? --%>
+            </c:otherwise>
+        </c:choose>
     <c:set var="itemNum" value="${itemNum + 1}" />
     <c:set var="isHorizontalCellLevel" scope="request" value="${false}"/>
     <c:if test="${bodyItem.metadata.responseLayout eq 'horizontal' ||
@@ -820,7 +860,7 @@ window.onload = initmb;
            bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
             <%-- For horizontal checkboxes, radio buttons--%>
             <c:forEach var="respOption" items="${bodyItem.metadata.responseSet.options}">
-                <td class="aka_padding_norm aka_cellBorders_dark">
+                <td class="aka_padding_norm aka_cellBorders_dark <c:out value="${extraClass}"/>">
                     <c:set var="displayItem" scope="request" value="${bodyItem}" />
                     <c:set var="responseOptionBean" scope="request" value="${respOption}" />
                     <c:import url="../submit/showGroupItemInput.jsp">
@@ -841,7 +881,7 @@ window.onload = initmb;
            bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
             <%-- For horizontal checkboxes, radio buttons--%>
             <c:forEach var="respOption" items="${bodyItem.metadata.responseSet.options}">
-                <td class="aka_padding_norm aka_cellBorders">
+                <td class="aka_padding_norm aka_cellBorders <c:out value="${extraClass}"/>">
                     <c:set var="displayItem" scope="request" value="${bodyItem}" />
                     <c:set var="responseOptionBean" scope="request" value="${respOption}" />
                     <c:import url="../submit/showGroupItemInput.jsp">
@@ -858,7 +898,7 @@ window.onload = initmb;
             </c:forEach>
         </c:when>
         <c:when test="${sectionBorders == 1}">
-            <td class="aka_padding_norm aka_cellBorders_dark">
+            <td class="aka_padding_norm aka_cellBorders_dark <c:out value="${extraClass}"/>">
                 <c:set var="displayItem" scope="request" value="${bodyItem}" />
 				<!-- text goes here -->
 				<c:import url="../submit/generateGroupItemTxt.jsp">
@@ -895,7 +935,7 @@ window.onload = initmb;
         </c:when>
         <%-- could be a radio or checkbox that is not horizontal --%>
         <c:otherwise>
-            <td class="aka_padding_norm aka_cellBorders">
+            <td class="aka_padding_norm aka_cellBorders <c:out value="${extraClass}"/>">
                 <c:set var="displayItem" scope="request" value="${bodyItem}" />
 				<c:import url="../submit/generateGroupItemTxt.jsp">
 						<c:param name="itemId" value="${bodyItem.item.id}"/>
@@ -1038,7 +1078,7 @@ window.onload = initmb;
                     <c:if test="${displayItem.singleItem.metadata.columnNumber >1}">
                 <td valign="top">
                     </c:if>
-                    <table border="0" cellspacing="0" cellpadding="1">
+                    
 						<c:set var="isItemShown" value="false"/>
 						<c:forEach var="formMsg" items="${formMessages}">
 							<c:set var="inputValue">input<c:out value="${displayItem.singleItem.item.id}"/></c:set>
@@ -1048,9 +1088,11 @@ window.onload = initmb;
 						</c:forEach>
                         <c:choose>
                     		<c:when test="${isItemShown && hasShown}">
-                    			<tr class="aka_group_show">
+								<table border="0" cellspacing="0" cellpadding="1" class="aka_group_show">
+                    			<tr>
                     		</c:when>
                     		<c:otherwise>
+								<table border="0" cellspacing="0" cellpadding="1">
                     			<tr>
                     		</c:otherwise>
                     	</c:choose>

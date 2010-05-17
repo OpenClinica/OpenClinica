@@ -959,13 +959,15 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                     <c:if test="${displayItem.singleItem.metadata.columnNumber >1}">
                 <td valign="top">
                     </c:if>
-                    <table border="0" cellspacing="0" cellpadding="1">
+                    
 						<%-- put in highlighting here, tbh --%>
                         <c:choose>
                     		<c:when test="${displayItem.singleItem.metadata.highlighted}">
-                    			<tr class="aka_group_show">
+								<table border="0" cellspacing="0" cellpadding="1" class="aka_group_show">
+                    			<tr>
                     		</c:when>
                     		<c:otherwise>
+								<table border="0" cellspacing="0" cellpadding="1">
                     			<tr>
                     		</c:otherwise>
                     	</c:choose><%-- end of highlighting block, tbh --%>
