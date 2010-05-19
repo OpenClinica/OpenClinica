@@ -467,6 +467,13 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             } else {
                                 responseTypeId = ResponseType.getByName(responseType.toLowerCase()).getId();
                             }
+                            if(responseTypeId == 5){
+                                cell = sheet.getRow(k).getCell((short) 18);
+                                String def = getValue(cell);
+                                if(!StringUtil.isBlank(def)){
+                                    errors.add(resPageMsg.getString("radio_with_default")+ itemNames.get(k) +resPageMsg.getString("change_radio"));
+                                }
+                            }
                         }
 
                         cell = sheet.getRow(k).getCell((short) 14);
