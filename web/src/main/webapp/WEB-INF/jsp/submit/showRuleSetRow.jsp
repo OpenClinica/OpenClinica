@@ -21,6 +21,7 @@
   <td rowspan="<c:out value="${count}"/>" class="table_cell"><c:out value="${currRow.bean.groupLabel}"/>&nbsp;</td>
   <td rowspan="<c:out value="${count}"/>" class="table_cell"><c:out value="${currRow.bean.itemName}"/>&nbsp;</td>
   <td class="table_cell"></td>
+  <td class="table_cell">&nbsp;</td>
     <%--oid space --%>
   <td class="table_cell">&nbsp;</td>
   <%--
@@ -86,6 +87,7 @@
   </c:choose>--%>
   <tr valign="top">
     <td class="table_cell"><c:out value="${ruleSetRule.ruleBean.name}"/></td>
+    <td class="table_cell"><c:out value="${ruleSetRule.ruleBean.oid}"/></td>
     <td class="table_cell">
         <c:forEach var ="action" items="${ruleSetRule.actions}">
             <c:out value="${action.actionType}"/>
