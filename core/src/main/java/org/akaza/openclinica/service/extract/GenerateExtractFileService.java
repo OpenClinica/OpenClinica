@@ -34,6 +34,7 @@ import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.logic.odmExport.AdminDataCollector;
 import org.akaza.openclinica.logic.odmExport.ClinicalDataCollector;
 import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
 import org.slf4j.Logger;
@@ -90,7 +91,7 @@ public class GenerateExtractFileService {
 
         int fId = this.createFile(TXTFileName, generalFileDir, answer.toString(), datasetBean, sysTimeEnd, ExportFormatBean.TXTFILE, true);
         if (!"".equals(generalFileDirCopy)) {
-            int fId2 = this.createFile(TXTFileName, generalFileDirCopy, answer.toString(), datasetBean, sysTimeEnd, ExportFormatBean.TXTFILE, false);
+        	int fId2 = this.createFile(TXTFileName, generalFileDirCopy, answer.toString(), datasetBean, sysTimeEnd, ExportFormatBean.TXTFILE, false);
         }
         logger.info("created txt file");
         // return TXTFileName;
@@ -103,9 +104,10 @@ public class GenerateExtractFileService {
      * createODMfile, added by tbh, 01/2009
      */
 
-    public HashMap<String, Integer> createODMFile(String odmVersion, long sysTimeBegin, String generalFileDir, DatasetBean datasetBean, StudyBean currentStudy,
-            String generalFileDirCopy) {
+    public HashMap<String, Integer> createODMFile(String odmVersion, long sysTimeBegin, String generalFileDir, DatasetBean datasetBean, 
+    		StudyBean currentStudy, String generalFileDirCopy) {
         MetaDataCollector mdc = new MetaDataCollector(ds, datasetBean, currentStudy);
+        AdminDataCollector adc = new AdminDataCollector(ds, datasetBean, currentStudy);
         ClinicalDataCollector cdc = new ClinicalDataCollector(ds, datasetBean, currentStudy);
         MetaDataCollector.setTextLength(200);
         if (odmVersion != null) {
@@ -115,10 +117,10 @@ public class GenerateExtractFileService {
                 odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 ODM1-3-0.xsd");
                 ArrayList<String> xmlnsList = new ArrayList<String>();
                 xmlnsList.add("xmlns=\"http://www.cdisc.org/ns/odm/v1.3\"");
-                xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/openclinica_odm/v1.3\"");
                 odmb.setXmlnsList(xmlnsList);
                 odmb.setODMVersion("1.3");
                 mdc.setODMBean(odmb);
+                adc.setOdmbean(odmb);
                 cdc.setODMBean(odmb);
             } else if ("oc1.2".equals(odmVersion)) {
                 ODMBean odmb = new ODMBean();
@@ -130,6 +132,7 @@ public class GenerateExtractFileService {
                 odmb.setXmlnsList(xmlnsList);
                 odmb.setODMVersion("oc1.2");
                 mdc.setODMBean(odmb);
+                adc.setOdmbean(odmb);
                 cdc.setODMBean(odmb);
             } else if ("oc1.3".equals(odmVersion)) {
                 ODMBean odmb = mdc.getODMBean();
@@ -141,13 +144,16 @@ public class GenerateExtractFileService {
                 odmb.setXmlnsList(xmlnsList);
                 odmb.setODMVersion("oc1.3");
                 mdc.setODMBean(odmb);
+                adc.setOdmbean(odmb);
                 cdc.setODMBean(odmb);
             }
         }
         mdc.collectFileData();
+        adc.collectOdmAdminDataMap();
         cdc.collectOdmClinicalDataMap();
         FullReportBean report = new FullReportBean();
         report.setClinicalDataMap(cdc.getOdmClinicalDataMap());
+        report.setAdminDataMap(adc.getOdmAdminDataMap());
         report.setOdmStudyMap(mdc.getOdmStudyMap());
         report.setOdmBean(mdc.getODMBean());
         report.setODMVersion(odmVersion);
@@ -156,8 +162,7 @@ public class GenerateExtractFileService {
         String ODMXMLFileName = mdc.getODMBean().getFileOID() + ".xml";
         int fId = this.createFile(ODMXMLFileName, generalFileDir, report.getXmlOutput().toString(), datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE, true);
         if (!"".equals(generalFileDirCopy)) {
-            int fId2 =
-                this.createFile(ODMXMLFileName, generalFileDirCopy, report.getXmlOutput().toString(), datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE, false);
+        	int fId2 = this.createFile(ODMXMLFileName, generalFileDirCopy, report.getXmlOutput().toString(), datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE, false);
         }
         // return ODMXMLFileName;
         HashMap answerMap = new HashMap<String, Integer>();
@@ -233,13 +238,13 @@ public class GenerateExtractFileService {
 
         ArrayList generatedReports = new ArrayList<String>();
         try {
-            // YW <<
-            generatedReports.add(answer.getMetadataFile(svnvbean, eb2).toString());
-            generatedReports.add(answer.getDataFile().toString());
-            // YW >>
+        	// YW <<
+        	generatedReports.add(answer.getMetadataFile(svnvbean, eb2).toString());
+        	generatedReports.add(answer.getDataFile().toString());
+        	// YW >>
         } catch (IndexOutOfBoundsException i) {
-            generatedReports.add(answer.getMetadataFile(svnvbean, eb2).toString());
-            logger.debug("throw the error here");
+        	generatedReports.add(answer.getMetadataFile(svnvbean, eb2).toString());
+        	logger.debug("throw the error here");
         }
 
         long sysTimeEnd = System.currentTimeMillis() - sysTimeBegin;
@@ -254,7 +259,7 @@ public class GenerateExtractFileService {
         // put into zip files
         int fId = this.createFile(ZIPFileName, titles, generalFileDir, generatedReports, db, sysTimeEnd, ExportFormatBean.TXTFILE, true);
         if (!"".equals(generalFileDirCopy)) {
-            int fId2 = this.createFile(ZIPFileName, titles, generalFileDirCopy, generatedReports, db, sysTimeEnd, ExportFormatBean.TXTFILE, false);
+        	int fId2 = this.createFile(ZIPFileName, titles, generalFileDirCopy, generatedReports, db, sysTimeEnd, ExportFormatBean.TXTFILE, false);
         }
         // return DDLFileName;
         HashMap answerMap = new HashMap<String, Integer>();
@@ -262,8 +267,8 @@ public class GenerateExtractFileService {
         return answerMap;
     }
 
-    public int createFile(String zipName, ArrayList names, String dir, ArrayList contents, DatasetBean datasetBean, long time, ExportFormatBean efb,
-            boolean saveToDB) {
+    public int createFile(String zipName, ArrayList names, String dir, ArrayList contents, DatasetBean datasetBean, long time, 
+    		ExportFormatBean efb, boolean saveToDB) {
         ArchivedDatasetFileBean fbFinal = new ArchivedDatasetFileBean();
         // >> tbh #4915
         zipName = zipName.replaceAll(" ", "_");
@@ -321,31 +326,31 @@ public class GenerateExtractFileService {
             logger.info("finished zipping up file...");
             // set up the zip to go into the database
             if (saveToDB) {
-                ArchivedDatasetFileBean fb = new ArchivedDatasetFileBean();
-                fb.setName(zipName + ".zip");
-                fb.setFileReference(dir + zipName + ".zip");
-                // current location of the file on the system
-                fb.setFileSize(totalSize);
-                // set the above to compressed size?
-                fb.setRunTime((int) time);
-                // need to set this in milliseconds, get it passed from above
-                // methods?
-                fb.setDatasetId(datasetBean.getId());
-                fb.setExportFormatBean(efb);
-                fb.setExportFormatId(efb.getId());
-                fb.setOwner(userBean);
-                fb.setOwnerId(userBean.getId());
-                fb.setDateCreated(new Date(System.currentTimeMillis()));
-
-                boolean write = true;
-                ArchivedDatasetFileDAO asdfDAO = new ArchivedDatasetFileDAO(ds);
-
-                if (write) {
-                    fbFinal = (ArchivedDatasetFileBean) asdfDAO.create(fb);
-                    logger.info("Created ADSFile!: " + fbFinal.getId() + " for " + zipName + ".zip");
-                } else {
-                    logger.info("duplicate found: " + fb.getName());
-                }
+	            ArchivedDatasetFileBean fb = new ArchivedDatasetFileBean();
+	            fb.setName(zipName + ".zip");
+	            fb.setFileReference(dir + zipName + ".zip");
+	            // current location of the file on the system
+	            fb.setFileSize(totalSize);
+	            // set the above to compressed size?
+	            fb.setRunTime((int) time);
+	            // need to set this in milliseconds, get it passed from above
+	            // methods?
+	            fb.setDatasetId(datasetBean.getId());
+	            fb.setExportFormatBean(efb);
+	            fb.setExportFormatId(efb.getId());
+	            fb.setOwner(userBean);
+	            fb.setOwnerId(userBean.getId());
+	            fb.setDateCreated(new Date(System.currentTimeMillis()));
+	
+	            boolean write = true;
+	            ArchivedDatasetFileDAO asdfDAO = new ArchivedDatasetFileDAO(ds);
+	
+	            if (write) {
+	                fbFinal = (ArchivedDatasetFileBean) asdfDAO.create(fb);
+	                logger.info("Created ADSFile!: " + fbFinal.getId() + " for " + zipName + ".zip");
+	            } else {
+	                logger.info("duplicate found: " + fb.getName());
+	            }
             }
             // created in database!
 
@@ -411,38 +416,38 @@ public class GenerateExtractFileService {
             logger.info("finished zipping up file...");
             // set up the zip to go into the database
             if (saveToDB) {
-                ArchivedDatasetFileBean fb = new ArchivedDatasetFileBean();
-                fb.setName(name + ".zip");
-                // logger.info("ODM filename: " + name + ".zip");
-                fb.setFileReference(dir + name + ".zip");
-                // logger.info("ODM fileReference: " + dir + name + ".zip");
-                // current location of the file on the system
-                fb.setFileSize((int) newFile.length());
-                // logger.info("ODM setFileSize: " + (int)newFile.length() );
-                // set the above to compressed size?
-                fb.setRunTime((int) time);
-                // logger.info("ODM setRunTime: " + (int)time );
-                // need to set this in milliseconds, get it passed from above
-                // methods?
-                fb.setDatasetId(datasetBean.getId());
-                // logger.info("ODM setDatasetid: " + ds.getId() );
-                fb.setExportFormatBean(efb);
-                // logger.info("ODM setExportFormatBean: success" );
-                fb.setExportFormatId(efb.getId());
-                // logger.info("ODM setExportFormatId: " + efb.getId());
-                fb.setOwner(userBean);
-                // logger.info("ODM setOwner: " + sm.getUserBean());
-                fb.setOwnerId(userBean.getId());
-                // logger.info("ODM setOwnerId: " + sm.getUserBean().getId() );
-                fb.setDateCreated(new Date(System.currentTimeMillis()));
-                boolean write = true;
-                ArchivedDatasetFileDAO asdfDAO = new ArchivedDatasetFileDAO(ds);
-                // eliminating all checks so that we create multiple files, tbh 6-7
-                if (write) {
-                    fbFinal = (ArchivedDatasetFileBean) asdfDAO.create(fb);
-                } else {
-                    logger.info("duplicate found: " + fb.getName());
-                }
+	            ArchivedDatasetFileBean fb = new ArchivedDatasetFileBean();
+	            fb.setName(name + ".zip");
+	            // logger.info("ODM filename: " + name + ".zip");
+	            fb.setFileReference(dir + name + ".zip");
+	            // logger.info("ODM fileReference: " + dir + name + ".zip");
+	            // current location of the file on the system
+	            fb.setFileSize((int) newFile.length());
+	            // logger.info("ODM setFileSize: " + (int)newFile.length() );
+	            // set the above to compressed size?
+	            fb.setRunTime((int) time);
+	            // logger.info("ODM setRunTime: " + (int)time );
+	            // need to set this in milliseconds, get it passed from above
+	            // methods?
+	            fb.setDatasetId(datasetBean.getId());
+	            // logger.info("ODM setDatasetid: " + ds.getId() );
+	            fb.setExportFormatBean(efb);
+	            // logger.info("ODM setExportFormatBean: success" );
+	            fb.setExportFormatId(efb.getId());
+	            // logger.info("ODM setExportFormatId: " + efb.getId());
+	            fb.setOwner(userBean);
+	            // logger.info("ODM setOwner: " + sm.getUserBean());
+	            fb.setOwnerId(userBean.getId());
+	            // logger.info("ODM setOwnerId: " + sm.getUserBean().getId() );
+	            fb.setDateCreated(new Date(System.currentTimeMillis()));
+	            boolean write = true;
+	            ArchivedDatasetFileDAO asdfDAO = new ArchivedDatasetFileDAO(ds);
+	            // eliminating all checks so that we create multiple files, tbh 6-7
+	            if (write) {
+	                fbFinal = (ArchivedDatasetFileBean) asdfDAO.create(fb);
+	            } else {
+	                logger.info("duplicate found: " + fb.getName());
+	            }
             }
             // created in database!
 
