@@ -395,7 +395,7 @@ public class MetadataUnit extends OdmUnit {
     }
     
     public static boolean needMultiSelectList(int rsTypeId) {
-        if (rsTypeId == 7) {
+        if (rsTypeId == 3 || rsTypeId == 7) {
             return true;
         }
         return false;
