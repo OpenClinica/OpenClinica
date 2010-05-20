@@ -13,11 +13,12 @@
  */
 package org.akaza.openclinica.bean.extract.odm;
 
-import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
-import org.akaza.openclinica.bean.odmbeans.OdmStudyBean;
-
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+
+import org.akaza.openclinica.bean.odmbeans.OdmAdminDataBean;
+import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
+import org.akaza.openclinica.bean.odmbeans.OdmStudyBean;
 
 /**
  * Create one ODM XML file.
@@ -28,6 +29,7 @@ import java.util.LinkedHashMap;
 public class FullReportBean extends OdmXmlReportBean {
     private LinkedHashMap<String, OdmStudyBean> odmStudyMap;
     private LinkedHashMap<String, OdmClinicalDataBean> clinicalDataMap;
+    private LinkedHashMap<String, OdmAdminDataBean> adminDataMap;
 
     /**
      * Create one ODM XML This method is still under construction. Right now it
@@ -46,7 +48,14 @@ public class FullReportBean extends OdmXmlReportBean {
             addNodeStudy(s, isDataset);
         }
         // 2) the information about administrative data
-        // addNodeAdminData();
+        String ODMVersion = this.getODMVersion();
+        if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
+            Iterator<OdmAdminDataBean> ita = this.adminDataMap.values().iterator();
+            while (ita.hasNext()) {
+                OdmAdminDataBean a = ita.next();
+                addNodeAdminData(a);
+            }
+        }
         // 3) the information about reference data
         // addNodeReferenceData();
         // 4) the information about clinical Data
@@ -66,6 +75,16 @@ public class FullReportBean extends OdmXmlReportBean {
         meta.setODMVersion(this.getODMVersion());
         meta.setXmlOutput(this.getXmlOutput());
         meta.addNodeStudy(isDataset);
+    }
+    
+    /*
+     * Currently, this only be called for OpenClinica ODM extension 
+     */
+    private void addNodeAdminData(OdmAdminDataBean adminData) {
+        AdminDataReportBean admin = new AdminDataReportBean(adminData);
+        admin.setODMVersion(this.getODMVersion());
+        admin.setXmlOutput(this.getXmlOutput());
+        admin.addNodeAdminData();
     }
 
     public void addNodeClinicalData(OdmClinicalDataBean clinicaldata) {
@@ -89,5 +108,13 @@ public class FullReportBean extends OdmXmlReportBean {
 
     public void setClinicalDataMap(LinkedHashMap<String, OdmClinicalDataBean> clinicalDataMap) {
         this.clinicalDataMap = clinicalDataMap;
+    }
+
+    public LinkedHashMap<String, OdmAdminDataBean> getAdminDataMap() {
+        return adminDataMap;
+    }
+
+    public void setAdminDataMap(LinkedHashMap<String, OdmAdminDataBean> adminDataMap) {
+        this.adminDataMap = adminDataMap;
     }
 }

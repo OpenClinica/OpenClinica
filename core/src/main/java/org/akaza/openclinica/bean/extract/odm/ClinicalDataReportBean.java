@@ -13,8 +13,15 @@
  */
 package org.akaza.openclinica.bean.extract.odm;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
+import org.akaza.openclinica.bean.odmbeans.AuditLogBean;
+import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
+import org.akaza.openclinica.bean.odmbeans.ChildNoteBean;
+import org.akaza.openclinica.bean.odmbeans.DiscrepancyNoteBean;
+import org.akaza.openclinica.bean.odmbeans.DiscrepancyNotesBean;
 import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ExportFormDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ExportStudyEventDataBean;
@@ -160,33 +167,82 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                 xml.append(indent + indent + indent + indent + indent + indent + "<ItemData ItemOID=\""
                                         + StringEscapeUtils.escapeXml(item.getItemOID()) + "\" IsNull=\"Yes\"");
                                 if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
-                                    xml.append(" OpenClinica:ReasonForNull=\"" + StringEscapeUtils.escapeXml(item.getReasonForNull()) + "\"");
-                                }    
-                                xml.append("/>");
-                                xml.append(nls);
+                                    xml.append(" OpenClinica:ReasonForNull=\"" + StringEscapeUtils.escapeXml(item.getReasonForNull()) + "\"/>");
+                                } 
                             } else {
+                                Boolean hasElm = false;
+                                xml.append(indent + indent + indent + indent + indent + indent + "<ItemData ItemOID=\""
+                                        + StringEscapeUtils.escapeXml(item.getItemOID()) + "\" Value=\"" + StringEscapeUtils.escapeXml(item.getValue()) + "\"");
+                                
                                 String muRefOid = item.getMeasurementUnitRef().getElementDefOID();
                                 if (muRefOid != null && muRefOid.length() > 0) {
-                                    xml.append(indent + indent + indent + indent + indent + indent + "<ItemData ItemOID=\""
-                                        + StringEscapeUtils.escapeXml(item.getItemOID()) + "\" Value=\"" + StringEscapeUtils.escapeXml(item.getValue()) + "\">");
-                                    xml.append(nls);
+                                    if(hasElm) {
+                                    } else {
+                                        xml.append(">");
+                                        xml.append(nls); 
+                                        hasElm = true;
+                                    }
                                     xml.append(indent + indent + indent + indent + indent + indent + indent + "<MeasurementUnitRef MeasurementUnitOID=\""
                                         + StringEscapeUtils.escapeXml(muRefOid) + "\"/>");
                                     xml.append(nls);
+                                }
+                                //
+                                if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
+                                    if(item.getAuditLogs()!=null && item.getAuditLogs().getAuditLogs().size()>0) {
+                                        if(hasElm) {
+                                        } else {
+                                            xml.append(">");
+                                            xml.append(nls); 
+                                            hasElm = true;
+                                        }
+                                        this.addAuditLogs(item.getAuditLogs(), indent+indent+indent+indent+indent+indent+indent);
+                                    }
+                                    //
+                                    if(item.getDiscrepancyNotes()!=null && item.getDiscrepancyNotes().getDiscrepancyNotes().size()>0) {
+                                        if(hasElm) {
+                                        } else {
+                                            xml.append(">");
+                                            xml.append(nls); 
+                                            hasElm = true;
+                                        }
+                                        this.addDiscrepancyNotes(item.getDiscrepancyNotes(), indent+indent+indent+indent+indent+indent+indent);
+                                    }
+                                }
+                                if(hasElm) {
                                     xml.append(indent + indent + indent + indent + indent + indent + "</ItemData>");
                                     xml.append(nls);
-                                } else {
-                                    xml.append(indent + indent + indent + indent + indent + indent + "<ItemData ItemOID=\""
-                                        + StringEscapeUtils.escapeXml(item.getItemOID()) + "\" Value=\"" + StringEscapeUtils.escapeXml(item.getValue()) + "\"/>");
-                                    xml.append(nls);
+                                    hasElm = false;
+                                }else {
+                                    xml.append("/>");
+                                    xml.append(nls); 
                                 }
                             }
                         }
                         xml.append(indent + indent + indent + indent + indent + "</ItemGroupData>");
                         xml.append(nls);
+                    } 
+                    //
+                    if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
+                        if(form.getAuditLogs()!=null && form.getAuditLogs().getAuditLogs().size()>0) {
+                            this.addAuditLogs(form.getAuditLogs(), indent + indent + indent + indent + indent);
+                        }
+                        //
+                        if(form.getDiscrepancyNotes()!=null && form.getDiscrepancyNotes().getDiscrepancyNotes().size()>0) {
+                            this.addDiscrepancyNotes(form.getDiscrepancyNotes(), indent+indent+indent+indent+indent);
+                        }
                     }
                     xml.append(indent + indent + indent + indent + "</FormData>");
                     xml.append(nls);
+                }
+                //
+                if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
+                    if(se.getAuditLogs()!=null && se.getAuditLogs().getAuditLogs().size()>0) {
+                        this.addAuditLogs(se.getAuditLogs(), indent+indent+indent+indent);
+                    }
+                    //
+                    if(se.getDiscrepancyNotes()!=null && se.getDiscrepancyNotes().getDiscrepancyNotes().size()>0) {
+                        this.addDiscrepancyNotes(se.getDiscrepancyNotes(), indent+indent+indent+indent);
+                    }
                 }
                 xml.append(indent + indent + indent + "</StudyEventData>");
                 xml.append(nls);
@@ -211,11 +267,183 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                         xml.append(nls);
                     }
                 }
+                //
+                if(sub.getAuditLogs()!=null && sub.getAuditLogs().getAuditLogs().size()>0) {
+                    this.addAuditLogs(sub.getAuditLogs(), indent + indent + indent);
+                }
+                //
+                if(sub.getDiscrepancyNotes()!=null && sub.getDiscrepancyNotes().getDiscrepancyNotes().size()>0) {
+                    this.addDiscrepancyNotes(sub.getDiscrepancyNotes(), indent+indent+indent);
+                }
             }
             xml.append(indent + indent + "</SubjectData>");
             xml.append(nls);
         }
         xml.append(indent + "</ClinicalData>");
+        xml.append(nls);
+    }
+    
+    protected void addAuditLogs(AuditLogsBean auditLogs, String currentIndent) {
+        if(auditLogs != null) {
+            ArrayList<AuditLogBean> audits = auditLogs.getAuditLogs();
+            if(audits != null && audits.size()>0) {
+                StringBuffer xml = this.getXmlOutput();
+                String indent = this.getIndent();
+                String nls = System.getProperty("line.separator");
+                xml.append(currentIndent+"<OpenClinica:AuditLogs OpenClinica:EntityID=\""+auditLogs.getEntityID()+"\">");
+                xml.append(nls);
+                for(AuditLogBean audit : audits) {
+                    this.addOneAuditLog(audit, currentIndent+indent);
+                }
+                xml.append(currentIndent+"</OpenClinica:AuditLogs>");
+                xml.append(nls);
+            }
+        }
+    }
+    
+    protected void addOneAuditLog(AuditLogBean audit, String currentIndent) {
+        if(audit!=null) {
+            StringBuffer xml = this.getXmlOutput();
+            String indent = this.getIndent();
+            String nls = System.getProperty("line.separator");
+            String i= audit.getOid();
+            String u = audit.getUserId();
+            Date d = audit.getDatetimeStamp();
+            String t = audit.getType();
+            String r = audit.getReasonForChange();
+            String o= audit.getOldValue();
+            String n= audit.getNewValue();
+            Boolean p = i.length()>0||u.length()>0||d!=null||t.length()>0||r.length()>0||o.length()>0||n.length()>0 ? true : false;
+            if(p) {
+                xml.append(currentIndent+"<OpenClinica:AuditLog ");
+                if(i.length()>0) {
+                    xml.append("OpenClinica:ID=\""+StringEscapeUtils.escapeXml(i)+"\" ");
+                }
+                if(u.length()>0) {
+                    xml.append("OpenClinica:UserID=\""+StringEscapeUtils.escapeXml(u)+"\" ");
+                }
+                if(d != null) {
+                    xml.append("OpenClinica:DateTimeStamp=\""+new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(d)+"\" ");
+                }
+                if(t.length()>0) {
+                    xml.append(nls);
+                    xml.append(currentIndent+"                      OpenClinica:Type=\""+t+"\" ");
+                }
+                if(r.length()>0) {
+                    xml.append(nls);
+                    xml.append(currentIndent+"                      OpenClinica:ReasonForChange=\""+StringEscapeUtils.escapeXml(r)+"\" ");
+                }
+                if(o.length()>0) {
+                    xml.append(nls);
+                    xml.append(currentIndent+"                      OpenClinica:OldValue=\""+StringEscapeUtils.escapeXml(o)+"\" ");
+                }
+                if(n.length()>0) {
+                    xml.append(nls);
+                    xml.append(currentIndent+"                      OpenClinica:NewValue=\""+StringEscapeUtils.escapeXml(n)+"\"");
+                }
+                xml.append("/>");
+                xml.append(nls);
+            }
+        }
+    }
+    
+    protected void addDiscrepancyNotes(DiscrepancyNotesBean DNs, String currentIndent) {
+        if(DNs != null) {
+            ArrayList<DiscrepancyNoteBean> dns = DNs.getDiscrepancyNotes();
+            if(dns != null && dns.size()>0) {
+                StringBuffer xml = this.getXmlOutput();
+                String indent = this.getIndent();
+                String nls = System.getProperty("line.separator");
+                xml.append(currentIndent+"<OpenClinica:DiscrepancyNotes OpenClinica:EntityID=\""+DNs.getEntityID()+"\">");
+                xml.append(nls);
+                for(DiscrepancyNoteBean dn : dns) {
+                    this.addOneDN(dn, currentIndent+indent);
+                }
+                xml.append(currentIndent+"</OpenClinica:DiscrepancyNotes>");
+                xml.append(nls);
+            }
+        }
+    }
+    
+    protected void addOneDN(DiscrepancyNoteBean dn, String currentIndent) {
+        StringBuffer xml = this.getXmlOutput();
+        String indent = this.getIndent();
+        String nls = System.getProperty("line.separator");
+        //Boolean p = s.length()>0||i.length()>0||d.toString().length()>0||n>0 ? true : false;
+        xml.append(currentIndent+"<OpenClinica:DiscrepancyNote ");
+        if(dn.getOid()!=null) {
+            String i = dn.getOid();
+            if(i.length()>0) {
+                xml.append("OpenClinica:ID=\""+StringEscapeUtils.escapeXml(i)+"\" ");
+            }
+        }
+        if(dn.getStatus()!=null) {
+            String s = dn.getStatus();
+            if(s.length()>0) {
+                xml.append("OpenClinica:Status=\""+s+"\" ");
+            }
+        }
+        if(dn.getNoteType()!=null) {
+            String s = dn.getNoteType();
+            if(s.length()>0) {
+                xml.append("OpenClinica:NoteType=\""+s+"\" ");
+            }
+        }
+        if(dn.getDateUpdated()!=null) {
+            Date d = dn.getDateUpdated();
+            if(d.toString().length()>0) {
+                xml.append("OpenClinica:DateUpdated=\""+new SimpleDateFormat("yyyy-MM-dd").format(d)+"\" ");
+            }
+        }
+        int n = dn.getNumberOfChildNotes();
+        if(n>0) {
+            xml.append("OpenClinica:NumberOfChildNotes=\""+dn.getNumberOfChildNotes()+"\"");
+        }
+        xml.append(">");
+        xml.append(nls);
+        if(dn.getChildNotes()!=null && dn.getChildNotes().size()>0) {
+            for(ChildNoteBean cn : dn.getChildNotes()) {
+                xml.append(currentIndent+indent+"<OpenClinica:ChildNote ");
+                if(cn.getStatus()!=null) {
+                    String s = cn.getStatus();
+                    if(s.length()>0) {
+                        xml.append("OpenClinica:Status=\""+s+"\" ");
+                    }
+                }
+                if(cn.getDateCreated()!=null) {
+                    Date d = cn.getDateCreated();
+                    if(d.toString().length()>0) {
+                        xml.append("OpenClinica:DateCreated=\""+new SimpleDateFormat("yyyy-MM-dd").format(d)+"\"");
+                    }
+                }
+                xml.append(">");
+                xml.append(nls);
+                if(cn.getDescription()!=null) {
+                    String dc = cn.getDescription();
+                    if(dc.length()>0) {
+                        xml.append(currentIndent+indent+indent+"<OpenClinica:Description>"+StringEscapeUtils.escapeXml(dc)+"</OpenClinica:Description>");
+                        xml.append(nls);
+                    }
+                }
+                if(cn.getDetailedNote()!=null) {
+                    String nt = cn.getDetailedNote();
+                    if(nt.length()>0) {
+                    xml.append(currentIndent+indent+indent+"<OpenClinica:DetailedNote>"+StringEscapeUtils.escapeXml(nt)+"</OpenClinica:DetailedNote>");
+                    xml.append(nls);
+                    }
+                }
+                if(cn.getUserRef()!=null) {
+                    String uid = cn.getUserRef().getElementDefOID();
+                    if(uid.length()>0) {
+                        xml.append(currentIndent+indent+indent+"<UserRef UserOID=\""+StringEscapeUtils.escapeXml(uid)+"\"/>");
+                        xml.append(nls);
+                    }
+                }
+                xml.append(currentIndent+indent+"</OpenClinica:ChildNote>");
+                xml.append(nls);
+            }
+        }
+        xml.append(currentIndent+"</OpenClinica:DiscrepancyNote>");
         xml.append(nls);
     }
 
