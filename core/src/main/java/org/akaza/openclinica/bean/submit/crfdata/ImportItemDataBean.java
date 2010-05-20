@@ -1,5 +1,7 @@
 package org.akaza.openclinica.bean.submit.crfdata;
 
+import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
+import org.akaza.openclinica.bean.odmbeans.DiscrepancyNotesBean;
 import org.akaza.openclinica.bean.odmbeans.ElementRefBean;
 
 public class ImportItemDataBean {
@@ -9,6 +11,8 @@ public class ImportItemDataBean {
     private String isNull; // boolean, tbh?
     private ElementRefBean measurementUnitRef = new ElementRefBean();
     private String reasonForNull;
+    private AuditLogsBean auditLogs = new AuditLogsBean();
+    private DiscrepancyNotesBean discrepancyNotes = new DiscrepancyNotesBean();
 
     public String getItemOID() {
         return itemOID;
@@ -56,5 +60,21 @@ public class ImportItemDataBean {
 
     public void setReasonForNull(String reasonForNull) {
         this.reasonForNull = reasonForNull;
+    }
+    
+    public AuditLogsBean getAuditLogs() {
+        return auditLogs;
+    }
+
+    public void setAuditLogs(AuditLogsBean auditLogs) {
+        this.auditLogs = auditLogs;
+    }
+
+    public DiscrepancyNotesBean getDiscrepancyNotes() {
+        return discrepancyNotes;
+    }
+
+    public void setDiscrepancyNotes(DiscrepancyNotesBean discrepancyNotes) {
+        this.discrepancyNotes = discrepancyNotes;
     }
 }

@@ -2,13 +2,20 @@ package org.akaza.openclinica.bean.submit.crfdata;
 
 import java.util.ArrayList;
 
+import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
+import org.akaza.openclinica.bean.odmbeans.DiscrepancyNotesBean;
+
 public class StudyEventDataBean {
     private ArrayList<FormDataBean> formData;
     private String studyEventOID;
-    private String studyEventRepeatKey = "1";// to prevent nulls, tbh 01/2010
+    private String studyEventRepeatKey;
+    private AuditLogsBean auditLogs;
+    private DiscrepancyNotesBean discrepancyNotes;
     
     public StudyEventDataBean() {
         formData = new ArrayList<FormDataBean>();
+        auditLogs = new AuditLogsBean();
+        discrepancyNotes = new DiscrepancyNotesBean();
     }
 
     public String getStudyEventRepeatKey() {
@@ -33,5 +40,21 @@ public class StudyEventDataBean {
 
     public void setFormData(ArrayList<FormDataBean> formData) {
         this.formData = formData;
+    }
+
+    public AuditLogsBean getAuditLogs() {
+        return auditLogs;
+    }
+
+    public void setAuditLogs(AuditLogsBean auditLogs) {
+        this.auditLogs = auditLogs;
+    }
+
+    public DiscrepancyNotesBean getDiscrepancyNotes() {
+        return discrepancyNotes;
+    }
+
+    public void setDiscrepancyNotes(DiscrepancyNotesBean discrepancyNotes) {
+        this.discrepancyNotes = discrepancyNotes;
     }
 }
