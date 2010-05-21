@@ -277,12 +277,20 @@ public class ViewStudySubjectServlet extends SecureController {
             // find study events
             StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
             StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-            EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
-
-            // find all eventcrfs for each event
-            EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
 
             ArrayList<DisplayStudyEventBean> displayEvents = getDisplayStudyEventsForStudySubject(studySub, sm.getDataSource(), ub, currentRole);
+            //A. Hamid.
+            // Mantis Issue 5048: Preventing Investigators from Unlocking Events
+            for(int i = 0; i < displayEvents.size(); i++){
+                DisplayStudyEventBean decb = displayEvents.get(i);
+                    if(currentRole.isInvestigator() && decb.getStudyEvent().getSubjectEventStatus().isLocked()){
+                        if(decb.getStudyEvent().getUpdater().getRoleByStudy(currentStudy).isDirector()
+                                || decb.getStudyEvent().getUpdater().getRoleByStudy(currentStudy).isCoordinator()){
+                            decb.getStudyEvent().setEditable(false);
+                        }
+                    }
+            }
+
 
             // BWP 3212; remove event CRFs that are supposed to be "hidden" >>
             if (currentStudy.getParentStudyId() > 0) {
