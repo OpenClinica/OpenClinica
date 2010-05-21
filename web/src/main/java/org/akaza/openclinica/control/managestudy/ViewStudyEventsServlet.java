@@ -193,10 +193,16 @@ public class ViewStudyEventsServlet extends SecureController {
                 ArrayList evts = sedao.findAllWithSubjectLabelByStudySubjectAndDefinition(ssb.getId(), sed.getId());
 
                 for (int v = 0; v < evts.size(); ++v) {
-                    events.add(evts.get(v));
+                    StudyEventBean seb = (StudyEventBean)evts.get(v);
+                    if(currentRole.isInvestigator() && seb.getSubjectEventStatus().isLocked()){
+                        if(seb.getUpdater().getRoleByStudy(currentStudy).isDirector()
+                                || seb.getUpdater().getRoleByStudy(currentStudy).isCoordinator()){
+                            seb.setEditable(false);
+                        }
+                    }
+                    events.add(seb);
                 }
             }
-            // YW >>
 
             int subjectScheduled = 0;
             int subjectCompleted = 0;
@@ -284,11 +290,17 @@ public class ViewStudyEventsServlet extends SecureController {
             table.setQuery("ViewStudyEvents", args);
             table.setRows(allEventRows);
             table.computeDisplay();
+
             ved.setStudyEventTable(table);
+
+
+
             if (!events.isEmpty()) {
                 allEvents.add(ved);
             }
         }
+
+        //A. Hamid.
         return allEvents;
     }
 
