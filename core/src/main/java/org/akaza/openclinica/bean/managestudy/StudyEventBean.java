@@ -54,6 +54,10 @@ public class StudyEventBean extends AuditableEntityBean {
 
     private ArrayList<StudyEventBean> repeatEvents = new ArrayList<StudyEventBean>();
 
+    // A. Hamid.
+    // will the edit icon be appeared
+    private boolean editable = true;
+
     // YW 08-17-2007
     private boolean startTimeFlag = false;
     private boolean endTimeFlag = false;
@@ -336,5 +340,12 @@ public class StudyEventBean extends AuditableEntityBean {
      */
     public void setScheduledDatePast(boolean scheduledDatePast) {
         this.scheduledDatePast = scheduledDatePast;
+    }
+
+    public boolean isEditable(){
+        return editable;
+    }
+    public void setEditable(boolean editable){
+        this.editable = editable;
     }
 }
