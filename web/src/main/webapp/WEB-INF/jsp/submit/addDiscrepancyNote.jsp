@@ -297,7 +297,7 @@ function setResStatus(resStatusId, destinationUserId) {
 		<tr valign="top">
       	</c:otherwise>
 		</c:choose>
-        <c:if test="${discrepancyNote.discrepancyNoteTypeId != 1}">
+        <c:if test="${discrepancyNote.discrepancyNoteTypeId != 1 || (discrepancyNote.discrepancyNoteTypeId==1 && discrepancyNote.parentDnId>0)}">
             <td>Assigned To</td>
             <td><div class="formfieldL_BG">
 			<c:choose>
