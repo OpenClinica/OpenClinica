@@ -207,14 +207,16 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
         }
         boolean showOriginalItem = getItemMetadataService().isShown(dib.getItem().getId(), ecb, valueToCompare);// was dib.getData()
         boolean showItem = dib.getMetadata().isShowItem();
-        boolean showDuplicateItem = getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getDbData());// where is the set db data? 
-        System.out.println("*** show original item has value " + dib.getData().getValue() + " and show item has value " + dib.getDbData().getValue());
+        boolean showDuplicateItem = getItemMetadataService().hasPassedDDE(dib.getMetadata(), ecb, valueToCompare);//.isShown(dib.getItem().getId(), ecb, dib.getDbData());// where is the set db data? 
+        logger.debug("*** show original item has value " + dib.getData().getValue() + " and show item has value " + dib.getDbData().getValue());
+        logger.debug("--- show original: " + showOriginalItem + " show duplicate: " + showDuplicateItem + " and just show item: " + showItem);
         if ((showOriginalItem && showDuplicateItem) || showItem) {
         	// it should either be shown already, OR shown in the database?
+            logger.debug("=== we passed, adding validation here");
             if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXT) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXTAREA)) {
                 dib = validateDisplayItemBeanText(v, dib, inputName);
                 // necessary?
-                if (((showOriginalItem && showDuplicateItem) || showItem) && (validationCount == null || validationCount.intValue() == 0)) {
+                if (validationCount == null || validationCount.intValue() == 0) {
                     v.addValidation(inputName, Validator.MATCHES_INITIAL_DATA_ENTRY_VALUE, valueToCompare, false);
                     v.setErrorMessage(respage.getString("value_you_specified") + " " + valueToCompare.getValue() + " "
                             + respage.getString("from_initial_data_entry"));
@@ -367,7 +369,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
         if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CALCULATION) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.GROUP_CALCULATION)) {
             boolean showOriginalItem = getItemMetadataService().isShown(dib.getItem().getId(), ecb, valueToCompare);
             boolean showItem = dib.getMetadata().isShowItem();
-            boolean showDuplicateItem = getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getDbData());
+            boolean showDuplicateItem = getItemMetadataService().hasPassedDDE(dib.getMetadata(), ecb, valueToCompare);//.isShown(dib.getItem().getId(), ecb, dib.getDbData());
             if ((showOriginalItem && showDuplicateItem) || showItem) {
                 dib = validateDisplayItemBeanText(sv, dib, inputName);
             }
