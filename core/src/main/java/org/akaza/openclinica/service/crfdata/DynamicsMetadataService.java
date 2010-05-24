@@ -79,7 +79,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         if (dynamicsMetadataBean != null) {
             return dynamicsMetadataBean.isShowItem();
         } else {
-            System.out.println("did not find a row in the db for " + itemFormMetadataBean.getId());
+            logger.debug("did not find a row in the db for " + itemFormMetadataBean.getId());
             return false;
         }
         // return false;
@@ -116,16 +116,17 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
     }
 
     public boolean isShown(Integer itemId, EventCRFBean eventCrfBean, ItemDataBean itemDataBean) {
-        // do we check against the database, or just against the object? prob against the db
+        // do we check against the database, or just against the object? against the db
         // ItemFormMetadataBean itemFormMetadataBean = (ItemFormMetadataBean) metadataBean;
         // return itemFormMetadataBean.isShowItem();
         ItemFormMetadataBean itemFormMetadataBean = getItemFormMetadataDAO().findByItemIdAndCRFVersionId(itemId, eventCrfBean.getCRFVersionId());
         DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataBean(itemFormMetadataBean, eventCrfBean, itemDataBean);
         // DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataDao().findByMetadataBean(itemFormMetadataBean, eventCrfBean);
         if (dynamicsMetadataBean != null) {
+            logger.debug("DID find a row in the db for (with IDB) " + itemFormMetadataBean.getId() + " idb id " + itemDataBean.getId());
             return dynamicsMetadataBean.isShowItem();
         } else {
-            // System.out.println("did not find a row in the db for (with IDB) " + itemFormMetadataBean.getId() + " idb id " + itemDataBean.getId());
+            logger.debug("did not find a row in the db for (with IDB) " + itemFormMetadataBean.getId() + " idb id " + itemDataBean.getId());
             return false;
         }
         // return false;
