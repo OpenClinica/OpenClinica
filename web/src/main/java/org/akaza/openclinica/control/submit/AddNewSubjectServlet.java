@@ -902,7 +902,7 @@ public class AddNewSubjectServlet extends SecureController {
             return;
         }
         ArrayList fieldNotes = notes.getNotes(field);
-        System.out.println("+++ notes size:" + fieldNotes.size() + " for field " + field);
+        // System.out.println("+++ notes size:" + fieldNotes.size() + " for field " + field);
         for (int i = 0; i < fieldNotes.size(); i++) {
             DiscrepancyNoteBean dnb = (DiscrepancyNoteBean) fieldNotes.get(i);
             dnb.setEntityId(entityId);

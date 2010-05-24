@@ -65,6 +65,7 @@ public class FormBeanUtil {
     
     public static ItemFormMetadataBean runDynamicsCheck(ItemFormMetadataBean metadataBean, EventCRFBean eventCrfBean, ItemDataBean itemDataBean, ServletContext context) {
         if (!metadataBean.isShowItem()) {
+            System.out.println("running is shown to the db...");
             // if the base case is not already shown, let's check it
             boolean showItem = getItemMetadataService(context).isShown(new Integer(metadataBean.getItemId()), eventCrfBean, itemDataBean);
             metadataBean.setShowItem(showItem);
