@@ -7,6 +7,11 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
@@ -44,11 +49,6 @@ import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
 
 /**
  * Create a discrepancy note for a data entity
@@ -327,6 +327,10 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                     types2.remove(DiscrepancyNoteType.QUERY);
                     request.setAttribute(DIS_TYPES, types2);
                     System.out.println("reset discrepancy types");
+                    //Cannot log new "Query", and "Anotation" & "Reason For Change" only include "Not Applicable"
+                    ArrayList resStatuses = ResolutionStatus.toArrayList();
+                    resStatuses.remove(ResolutionStatus.CLOSED);
+                    request.setAttribute(RES_STATUSES, resStatuses);
                 }
 
             }
