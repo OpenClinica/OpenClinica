@@ -36,9 +36,11 @@ import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.apache.commons.lang.StringUtils;
 import org.jmesa.core.filter.DateFilterMatcher;
 import org.jmesa.core.filter.FilterMatcher;
 import org.jmesa.core.filter.MatcherKey;
+import org.jmesa.core.filter.StringFilterMatcher;
 import org.jmesa.facade.TableFacade;
 import org.jmesa.limit.Filter;
 import org.jmesa.limit.FilterSet;
@@ -111,10 +113,10 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         configureColumn(row.getColumn("discrepancyNoteBean.createdDate"), "Date Created", new DateCellEditor(getDateFormat()), null, true, true);
         configureColumn(row.getColumn("discrepancyNoteBean.updatedDate"), "Date Updated", new DateCellEditor(getDateFormat()), null, true, true);
         configureColumn(row.getColumn("eventStartDate"), "Event Date", new DateCellEditor(getDateFormat()), null, false, false);
-        configureColumn(row.getColumn("eventName"), "Event Name", null, null, false, false);
-        configureColumn(row.getColumn("crfName"), "CRF", null, null, false, false);
-        configureColumn(row.getColumn("entityName"), "Entity Name", null, null, false, false);
-        configureColumn(row.getColumn("entityValue"), "Entity Value", null, null, false, false);
+        configureColumn(row.getColumn("eventName"), "Event Name", null, null, true, true);
+        configureColumn(row.getColumn("crfName"), "CRF", null, null, true, true);
+        configureColumn(row.getColumn("entityName"), "Entity Name", null, null, true, true);
+        configureColumn(row.getColumn("entityValue"), "Entity Value", null, null, true, true);
         configureColumn(row.getColumn("discrepancyNoteBean.description"), "Description of Parent Discrepancy Note", null, null, true, false);
         configureColumn(row.getColumn("discrepancyNoteBean.detailedNotes"), "Detailed Notes", null, null, false, false);
         configureColumn(row.getColumn("numberOfNotes"), "# of Notes", null, null, false, false);
@@ -136,6 +138,10 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         tableFacade.addFilterMatcher(new MatcherKey(Date.class, "discrepancyNoteBean.updatedDate"), new DateFilterMatcher(getDateFormat()));
         tableFacade.addFilterMatcher(new MatcherKey(UserAccountBean.class, "discrepancyNoteBean.user"), new GenericFilterMatecher());
         tableFacade.addFilterMatcher(new MatcherKey(UserAccountBean.class, "studySubject.label"), new GenericFilterMatecher());
+        tableFacade.addFilterMatcher(new MatcherKey(String.class, "eventName"), new StringFilterMatcher());
+        tableFacade.addFilterMatcher(new MatcherKey(String.class, "crfName"), new StringFilterMatcher());
+        tableFacade.addFilterMatcher(new MatcherKey(String.class, "entityName"), new StringFilterMatcher());
+        tableFacade.addFilterMatcher(new MatcherKey(String.class, "entityValue"), new StringFilterMatcher());
     }
 
     @Override

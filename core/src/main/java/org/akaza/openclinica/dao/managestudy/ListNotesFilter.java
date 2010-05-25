@@ -28,6 +28,9 @@ public class ListNotesFilter implements CriteriaCommand {
     public String execute(String criteria) {
         String theCriteria = "";
         for (Filter filter : filters) {
+            if (columnMapping.get(filter.getProperty()) == null) {
+                continue;
+            }
             theCriteria += buildCriteria(criteria, filter.getProperty(), filter.getValue());
         }
         return theCriteria;
