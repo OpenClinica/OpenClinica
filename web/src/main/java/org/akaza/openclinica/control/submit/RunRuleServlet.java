@@ -15,6 +15,7 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.domain.rule.RuleBulkExecuteContainer;
 import org.akaza.openclinica.domain.rule.RuleBulkExecuteContainerTwo;
+import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
 import org.akaza.openclinica.view.Page;
@@ -54,21 +55,22 @@ public class RunRuleServlet extends SecureController {
             forwardPage(Page.MENU_SERVLET);
         }
 
-        Boolean dryRun = action == null || "dryRun".equalsIgnoreCase(action) ? true : false;
+        //Boolean dryRun = action == null || "dryRun".equalsIgnoreCase(action) ? true : false;
+        ExecutionMode executionMode = action == null || "dryRun".equalsIgnoreCase(action) ? ExecutionMode.DRY_RUN : ExecutionMode.SAVE;
         String submitLinkParams = "";
 
         HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> result = null;
         if (ruleSetRuleId != null && versionId != null) {
             submitLinkParams = "ruleSetRuleId=" + ruleSetRuleId + "&versionId=" + versionId + "&action=no";
-            result = getRuleSetService().runRulesInBulk(ruleSetRuleId, versionId, dryRun, currentStudy, ub);
+            result = getRuleSetService().runRulesInBulk(ruleSetRuleId, versionId, executionMode, currentStudy, ub);
         } else {
             submitLinkParams = "crfId=" + crfId + "&action=no";
-            result = getRuleSetService().runRulesInBulk(crfId, dryRun, currentStudy, ub);
+            result = getRuleSetService().runRulesInBulk(crfId, executionMode, currentStudy, ub);
         }
 
         request.setAttribute("result", result);
         request.setAttribute("submitLinkParams", submitLinkParams);
-        if (!dryRun) {
+        if (executionMode == ExecutionMode.SAVE) {
             forwardPage(Page.LIST_RULE_SETS_SERVLET);
         } else {
             forwardPage(Page.VIEW_EXECUTED_RULES_FROM_CRF);

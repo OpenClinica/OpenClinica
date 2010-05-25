@@ -19,6 +19,7 @@ import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
+import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.MessageContainer;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,11 +62,11 @@ public interface RuleSetServiceInterface {
 
     public abstract RuleSetBean replaceRuleSet(RuleSetBean ruleSetBean);
 
-    public abstract HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> runRulesInBulk(String crfId, Boolean dryRun,
-            StudyBean currentStudy, UserAccountBean ub);
+    public abstract HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> runRulesInBulk(String crfId,
+            ExecutionMode executionMode, StudyBean currentStudy, UserAccountBean ub);
 
     public abstract HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> runRulesInBulk(String ruleSetRuleId,
-            String crfVersionId, Boolean dryRun, StudyBean currentStudy, UserAccountBean ub);
+            String crfVersionId, ExecutionMode executionMode, StudyBean currentStudy, UserAccountBean ub);
 
     public abstract List<RuleSetBasedViewContainer> runRulesInBulk(List<RuleSetBean> ruleSets, Boolean dryRun, StudyBean currentStudy, UserAccountBean ub);
 

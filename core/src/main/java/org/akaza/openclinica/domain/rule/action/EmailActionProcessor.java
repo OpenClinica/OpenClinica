@@ -37,6 +37,8 @@ public class EmailActionProcessor implements ActionProcessor {
     public EmailActionProcessor(DataSource ds, JavaMailSenderImpl mailSender, RuleActionRunLogDao ruleActionRunLogDao, RuleSetRuleBean ruleSetRule) {
         this.ds = ds;
         this.mailSender = mailSender;
+        this.ruleSetRule = ruleSetRule;
+        this.ruleActionRunLogDao = ruleActionRunLogDao;
     }
 
     public RuleActionBean execute(RuleRunnerMode ruleRunnerMode, ExecutionMode executionMode, RuleActionBean ruleAction, ItemDataBean itemDataBean,

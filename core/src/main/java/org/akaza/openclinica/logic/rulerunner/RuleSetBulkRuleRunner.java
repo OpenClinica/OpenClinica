@@ -22,6 +22,7 @@ import org.akaza.openclinica.logic.expressionTree.OpenClinicaExpressionParser;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -55,7 +56,7 @@ public class RuleSetBulkRuleRunner extends RuleRunner {
         return theList;
     }
 
-    public List<RuleSetBasedViewContainer> runRulesBulkFromRuleSetScreen(List<RuleSetBean> ruleSets, Boolean dryRun, StudyBean currentStudy,
+    public List<RuleSetBasedViewContainer> runRulesBulkFromRuleSetScreenOLD(List<RuleSetBean> ruleSets, Boolean dryRun, StudyBean currentStudy,
             HashMap<String, String> variableAndValue, UserAccountBean ub) {
 
         if (variableAndValue == null || variableAndValue.isEmpty()) {
@@ -86,7 +87,7 @@ public class RuleSetBulkRuleRunner extends RuleRunner {
                                 RuleActionBean ruleActionBean = itr.next();
                                 RuleActionRunLogBean ruleActionRunLog =
                                     new RuleActionRunLogBean(ruleActionBean.getActionType(), itemData, itemData.getValue(), ruleSetRule.getRuleBean().getOid());
-                                if (getRuleActionRunLogDao().findByRuleActionRunLogBean(ruleActionRunLog) != null) {
+                                if (getRuleActionRunLogDao().findCountByRuleActionRunLogBean(ruleActionRunLog) > 0) {
                                     itr.remove();
                                 }
                             }
@@ -121,6 +122,81 @@ public class RuleSetBulkRuleRunner extends RuleRunner {
                     }
                 }
             }
+        }
+        return ruleSetBasedView;
+    }
+
+    public List<RuleSetBasedViewContainer> runRulesBulkFromRuleSetScreen(List<RuleSetBean> ruleSets, ExecutionMode executionMode, StudyBean currentStudy,
+            HashMap<String, String> variableAndValue, UserAccountBean ub) {
+
+        if (variableAndValue == null || variableAndValue.isEmpty()) {
+            logger.warn("You must be executing Rules in Batch");
+            variableAndValue = new HashMap<String, String>();
+        }
+
+        List<RuleSetBasedViewContainer> ruleSetBasedView = new ArrayList<RuleSetBasedViewContainer>();
+        for (RuleSetBean ruleSet : ruleSets) {
+            List<RuleActionContainer> allActionContainerListBasedOnRuleExecutionResult = new ArrayList<RuleActionContainer>();
+            ItemDataBean itemData = null;
+
+            for (ExpressionBean expressionBean : ruleSet.getExpressions()) {
+                ruleSet.setTarget(expressionBean);
+
+                for (RuleSetRuleBean ruleSetRule : ruleSet.getRuleSetRules()) {
+                    String result = null;
+                    RuleBean rule = ruleSetRule.getRuleBean();
+                    ExpressionObjectWrapper eow = new ExpressionObjectWrapper(ds, currentStudy, rule.getExpression(), ruleSet, variableAndValue);
+                    try {
+                        OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(eow);
+                        result = oep.parseAndEvaluateExpression(rule.getExpression().getValue());
+                        itemData = getExpressionService().getItemDataBeanFromDb(ruleSet.getTarget().getValue());
+
+                        List<RuleActionBean> actionListBasedOnRuleExecutionResult = ruleSetRule.getActions(result, Phase.BATCH);
+
+                        if (itemData != null) {
+                            Iterator<RuleActionBean> itr = actionListBasedOnRuleExecutionResult.iterator();
+                            while (itr.hasNext()) {
+                                RuleActionBean ruleActionBean = itr.next();
+                                RuleActionRunLogBean ruleActionRunLog =
+                                    new RuleActionRunLogBean(ruleActionBean.getActionType(), itemData, itemData.getValue(), ruleSetRule.getRuleBean().getOid());
+                                if (getRuleActionRunLogDao().findCountByRuleActionRunLogBean(ruleActionRunLog) > 0) {
+                                    itr.remove();
+                                }
+                            }
+                        }
+                        for (RuleActionBean ruleActionBean : actionListBasedOnRuleExecutionResult) {
+                            RuleActionContainer ruleActionContainer = new RuleActionContainer(ruleActionBean, expressionBean, itemData);
+                            allActionContainerListBasedOnRuleExecutionResult.add(ruleActionContainer);
+                        }
+                        logger.info("RuleSet with target  : {} , Ran Rule : {}  The Result was : {} , Based on that {} action will be executed in {} mode. ",
+                                new Object[] { ruleSet.getTarget().getValue(), rule.getName(), result, actionListBasedOnRuleExecutionResult.size(),
+                                    executionMode.name() });
+                    } catch (OpenClinicaSystemException osa) {
+                        // TODO: report something useful 
+                    }
+                }
+            }
+
+            // Sort the list of actions
+            Collections.sort(allActionContainerListBasedOnRuleExecutionResult, new RuleActionContainerComparator());
+            // Execute Actions
+            for (RuleActionContainer ruleActionContainer : allActionContainerListBasedOnRuleExecutionResult) {
+                //ruleSet.setTarget(ruleAction.getRuleSetExpression());
+                ruleActionContainer.getRuleAction().setCuratedMessage(
+                        curateMessage(ruleActionContainer.getRuleAction(), ruleActionContainer.getRuleAction().getRuleSetRule()));
+                ActionProcessor ap =
+                    ActionProcessorFacade.getActionProcessor(ruleActionContainer.getRuleAction().getActionType(), ds, getMailSender(), dynamicsMetadataService,
+                            ruleSet, getRuleActionRunLogDao(), ruleActionContainer.getRuleAction().getRuleSetRule());
+                RuleActionBean rab = null;
+                //ap.execute(RuleRunnerMode.RULSET_BULK, executionMode, ruleAction, ruleAction.getItemData(), DiscrepancyNoteBean.ITEM_DATA, currentStudy,
+                //        ub, prepareEmailContents(ruleSet, ruleAction.getRuleSetRule(), currentStudy, ruleAction));
+                if (rab != null) {
+                    ruleSetBasedView =
+                        populateForRuleSetBasedView(ruleSetBasedView, ruleSet, ruleActionContainer.getRuleAction().getRuleSetRule().getRuleBean(),
+                                ruleActionContainer.getRuleAction().getExpressionEvaluatesTo().toString(), ruleActionContainer.getRuleAction());
+                }
+            }
+
         }
         return ruleSetBasedView;
     }

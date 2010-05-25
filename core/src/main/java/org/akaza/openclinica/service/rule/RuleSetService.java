@@ -204,7 +204,7 @@ public class RuleSetService implements RuleSetServiceInterface {
     /* (non-Javadoc)
      * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#runRulesInBulk(java.lang.String, java.lang.Boolean, org.akaza.openclinica.bean.managestudy.StudyBean, org.akaza.openclinica.bean.login.UserAccountBean)
      */
-    public HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> runRulesInBulk(String crfId, Boolean dryRun,
+    public HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> runRulesInBulk(String crfId, ExecutionMode executionMode,
             StudyBean currentStudy, UserAccountBean ub) {
         CRFBean crf = new CRFBean();
         crf.setId(Integer.valueOf(crfId));
@@ -216,7 +216,7 @@ public class RuleSetService implements RuleSetServiceInterface {
         dynamicsMetadataService.setExpressionService(getExpressionService());
         ruleRunner.setDynamicsMetadataService(dynamicsMetadataService);
         ruleRunner.setRuleActionRunLogDao(ruleActionRunLogDao);
-        return ruleRunner.runRulesBulk(ruleSets, dryRun, currentStudy, null, ub);
+        return ruleRunner.runRulesBulk(ruleSets, executionMode, currentStudy, null, ub);
         // return runRulesBulk(ruleSets, dryRun, currentStudy, null, ub);
     }
 
@@ -224,7 +224,7 @@ public class RuleSetService implements RuleSetServiceInterface {
      * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#runRulesInBulk(java.lang.String, java.lang.String, java.lang.Boolean, org.akaza.openclinica.bean.managestudy.StudyBean, org.akaza.openclinica.bean.login.UserAccountBean)
      */
     public HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> runRulesInBulk(String ruleSetRuleId, String crfVersionId,
-            Boolean dryRun, StudyBean currentStudy, UserAccountBean ub) {
+            ExecutionMode executionMode, StudyBean currentStudy, UserAccountBean ub) {
 
         List<RuleSetBean> ruleSets = new ArrayList<RuleSetBean>();
         RuleSetBean ruleSet = getRuleSetBeanByRuleSetRuleAndSubstituteCrfVersion(ruleSetRuleId, crfVersionId, currentStudy);
@@ -238,7 +238,7 @@ public class RuleSetService implements RuleSetServiceInterface {
         dynamicsMetadataService.setExpressionService(getExpressionService());
         ruleRunner.setDynamicsMetadataService(dynamicsMetadataService);
         ruleRunner.setRuleActionRunLogDao(ruleActionRunLogDao);
-        return ruleRunner.runRulesBulk(ruleSets, dryRun, currentStudy, null, ub);
+        return ruleRunner.runRulesBulk(ruleSets, executionMode, currentStudy, null, ub);
         // return runRulesBulk(ruleSets, dryRun, currentStudy, null, ub);
     }
 
@@ -253,7 +253,8 @@ public class RuleSetService implements RuleSetServiceInterface {
         dynamicsMetadataService.setExpressionService(getExpressionService());
         ruleRunner.setDynamicsMetadataService(dynamicsMetadataService);
         ruleRunner.setRuleActionRunLogDao(ruleActionRunLogDao);
-        return ruleRunner.runRulesBulkFromRuleSetScreen(ruleSets, dryRun, currentStudy, null, ub);
+        ExecutionMode executionMode = dryRun == true ? ExecutionMode.DRY_RUN : ExecutionMode.SAVE;
+        return ruleRunner.runRulesBulkFromRuleSetScreen(ruleSets, executionMode, currentStudy, null, ub);
         // return runRulesBulkFromRuleSetScreen(ruleSets, dryRun, currentStudy, null, ub);
     }
 

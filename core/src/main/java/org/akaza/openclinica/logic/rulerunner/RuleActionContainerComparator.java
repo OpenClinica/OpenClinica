@@ -3,22 +3,20 @@
  * GNU Lesser General Public License (GNU LGPL).
  * For details see: http://www.openclinica.org/license
  *
- * Copyright 2003-2008 Akaza Research 
+ * Copyright 2003-2010 Akaza Research 
  */
-package org.akaza.openclinica.domain.rule.action;
+package org.akaza.openclinica.logic.rulerunner;
+
+import org.akaza.openclinica.domain.rule.action.ActionType;
 
 import java.util.Comparator;
 import java.util.HashMap;
 
-/**
- * @author Krikor Krumlian
- */
-
-public class RuleActionComparator implements Comparator<RuleActionBean> {
+public class RuleActionContainerComparator implements Comparator<RuleActionContainer> {
 
     HashMap<ActionType, String> order = new HashMap<ActionType, String>();
 
-    public RuleActionComparator() {
+    public RuleActionContainerComparator() {
         order.put(ActionType.EMAIL, "1");
         order.put(ActionType.FILE_DISCREPANCY_NOTE, "2");
         order.put(ActionType.INSERT, "3");
@@ -27,8 +25,8 @@ public class RuleActionComparator implements Comparator<RuleActionBean> {
 
     }
 
-    public int compare(RuleActionBean o1, RuleActionBean o2) {
-        return order.get(o1.getActionType()).compareTo(order.get(o2.getActionType()));
+    public int compare(RuleActionContainer o1, RuleActionContainer o2) {
+        return order.get(o1.getRuleAction().getActionType()).compareTo(order.get(o2.getRuleAction().getActionType()));
     }
 
 }

@@ -27,10 +27,12 @@ import org.akaza.openclinica.logic.expressionTree.OpenClinicaExpressionParser;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.sql.DataSource;
@@ -97,8 +99,9 @@ public class CrfBulkRuleRunner extends RuleRunner {
         return crfViewSpecificOrderedObjects;
     }
 
-    public HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> runRulesBulk(List<RuleSetBean> ruleSets, Boolean dryRun,
-            StudyBean currentStudy, HashMap<String, String> variableAndValue, UserAccountBean ub) {
+    @Deprecated
+    public HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> runRulesBulkOLD(List<RuleSetBean> ruleSets,
+            ExecutionMode executionMode, StudyBean currentStudy, HashMap<String, String> variableAndValue, UserAccountBean ub) {
 
         if (variableAndValue == null || variableAndValue.isEmpty()) {
             logger.warn("You must be executing Rules in Batch");
@@ -129,7 +132,7 @@ public class CrfBulkRuleRunner extends RuleRunner {
                                 RuleActionBean ruleActionBean = itr.next();
                                 RuleActionRunLogBean ruleActionRunLog =
                                     new RuleActionRunLogBean(ruleActionBean.getActionType(), itemData, itemData.getValue(), ruleSetRule.getRuleBean().getOid());
-                                if (getRuleActionRunLogDao().findByRuleActionRunLogBean(ruleActionRunLog) != null) {
+                                if (getRuleActionRunLogDao().findCountByRuleActionRunLogBean(ruleActionRunLog) > 0) {
                                     itr.remove();
                                 }
                             }
@@ -145,8 +148,8 @@ public class CrfBulkRuleRunner extends RuleRunner {
                                     ActionProcessorFacade.getActionProcessor(ruleAction.getActionType(), ds, getMailSender(), dynamicsMetadataService, ruleSet,
                                             getRuleActionRunLogDao(), ruleSetRule);
                                 RuleActionBean rab =
-                                    ap.execute(RuleRunnerMode.RULSET_BULK, ExecutionMode.SAVE, ruleAction, itemData, DiscrepancyNoteBean.ITEM_DATA,
-                                            currentStudy, ub, prepareEmailContents(ruleSet, ruleSetRule, currentStudy, ruleAction));
+                                    ap.execute(RuleRunnerMode.RULSET_BULK, executionMode, ruleAction, itemData, DiscrepancyNoteBean.ITEM_DATA, currentStudy,
+                                            ub, prepareEmailContents(ruleSet, ruleSetRule, currentStudy, ruleAction));
                                 if (rab != null) {
                                     actionBeansToShow.add(ruleAction);
                                 }
@@ -172,4 +175,171 @@ public class CrfBulkRuleRunner extends RuleRunner {
         return crfViewSpecificOrderedObjects;
     }
 
+    public HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> runRulesBulk(List<RuleSetBean> ruleSets,
+            ExecutionMode executionMode, StudyBean currentStudy, HashMap<String, String> variableAndValue, UserAccountBean ub) {
+
+        if (variableAndValue == null || variableAndValue.isEmpty()) {
+            logger.warn("You must be executing Rules in Batch");
+            variableAndValue = new HashMap<String, String>();
+        }
+
+        HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> crfViewSpecificOrderedObjects =
+            new HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>>();
+        for (RuleSetBean ruleSet : ruleSets) {
+            List<RuleActionContainer> allActionContainerListBasedOnRuleExecutionResult = new ArrayList<RuleActionContainer>();
+            ItemDataBean itemData = null;
+
+            for (ExpressionBean expressionBean : ruleSet.getExpressions()) {
+                ruleSet.setTarget(expressionBean);
+
+                for (RuleSetRuleBean ruleSetRule : ruleSet.getRuleSetRules()) {
+                    String result = null;
+                    RuleBean rule = ruleSetRule.getRuleBean();
+                    ExpressionObjectWrapper eow = new ExpressionObjectWrapper(ds, currentStudy, rule.getExpression(), ruleSet, variableAndValue);
+                    try {
+                        OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(eow);
+                        result = oep.parseAndEvaluateExpression(rule.getExpression().getValue());
+                        itemData = getExpressionService().getItemDataBeanFromDb(ruleSet.getTarget().getValue());
+
+                        // Actions
+                        List<RuleActionBean> actionListBasedOnRuleExecutionResult = ruleSetRule.getActions(result, Phase.BATCH);
+
+                        if (itemData != null) {
+                            Iterator<RuleActionBean> itr = actionListBasedOnRuleExecutionResult.iterator();
+                            while (itr.hasNext()) {
+                                RuleActionBean ruleActionBean = itr.next();
+                                RuleActionRunLogBean ruleActionRunLog =
+                                    new RuleActionRunLogBean(ruleActionBean.getActionType(), itemData, itemData.getValue(), ruleSetRule.getRuleBean().getOid());
+                                if (getRuleActionRunLogDao().findCountByRuleActionRunLogBean(ruleActionRunLog) > 0) {
+                                    itr.remove();
+                                }
+                            }
+                        }
+                        for (RuleActionBean ruleActionBean : actionListBasedOnRuleExecutionResult) {
+                            RuleActionContainer ruleActionContainer = new RuleActionContainer(ruleActionBean, expressionBean, itemData);
+                            allActionContainerListBasedOnRuleExecutionResult.add(ruleActionContainer);
+                        }
+                        logger.info("RuleSet with target  : {} , Ran Rule : {}  The Result was : {} , Based on that {} action will be executed in {} mode. ",
+                                new Object[] { ruleSet.getTarget().getValue(), rule.getName(), result, actionListBasedOnRuleExecutionResult.size(),
+                                    executionMode.name() });
+                    } catch (OpenClinicaSystemException osa) {
+                        // TODO: report something useful 
+                    }
+                }
+            }
+
+            // Sort the list of actions
+            Collections.sort(allActionContainerListBasedOnRuleExecutionResult, new RuleActionContainerComparator());
+
+            HashMap<Key, List<RuleActionBean>> hms = new HashMap<Key, List<RuleActionBean>>();
+
+            for (RuleActionContainer ruleActionContainer : allActionContainerListBasedOnRuleExecutionResult) {
+                //ruleSet.setTarget(ruleAction.getRuleSetExpression());
+                ruleActionContainer.getRuleAction().setCuratedMessage(
+                        curateMessage(ruleActionContainer.getRuleAction(), ruleActionContainer.getRuleAction().getRuleSetRule()));
+                ActionProcessor ap =
+                    ActionProcessorFacade.getActionProcessor(ruleActionContainer.getRuleAction().getActionType(), ds, getMailSender(), dynamicsMetadataService,
+                            ruleSet, getRuleActionRunLogDao(), ruleActionContainer.getRuleAction().getRuleSetRule());
+                RuleActionBean rab = null;
+                // ap.execute(RuleRunnerMode.RULSET_BULK, executionMode, ruleAction, ruleAction.getItemData(), DiscrepancyNoteBean.ITEM_DATA, currentStudy,
+                //         ub, prepareEmailContents(ruleSet, ruleAction.getRuleSetRule(), currentStudy, ruleAction));
+                if (rab != null) {
+                    Key k =
+                        new Key(ruleSet, ruleActionContainer.getRuleAction().getExpressionEvaluatesTo().toString(), ruleActionContainer.getRuleAction()
+                                .getRuleSetRule().getRuleBean());
+                    if (hms.containsKey(k)) {
+                        hms.get(k).add(ruleActionContainer.getRuleAction());
+                    } else {
+                        List<RuleActionBean> theActionBeansToShow = new ArrayList<RuleActionBean>();
+                        theActionBeansToShow.add(ruleActionContainer.getRuleAction());
+                        hms.put(k, theActionBeansToShow);
+                    }
+                }
+            }
+            for (Map.Entry<Key, List<RuleActionBean>> entry : hms.entrySet()) {
+                Key key = entry.getKey();
+                List<RuleActionBean> value = entry.getValue();
+                crfViewSpecificOrderedObjects =
+                    populateForCrfBasedRulesView(crfViewSpecificOrderedObjects, key.getRuleSet(), key.getRule(), key.getResult(), currentStudy, value);
+            }
+        }
+        //logCrfViewSpecificOrderedObjects(crfViewSpecificOrderedObjects);
+        return crfViewSpecificOrderedObjects;
+    }
+
+}
+
+class Key {
+
+    RuleSetBean ruleSet;
+    String result;
+    RuleBean rule;
+
+    public Key(RuleSetBean ruleSet, String result, RuleBean rule) {
+        super();
+        this.ruleSet = ruleSet;
+        this.result = result;
+        this.rule = rule;
+    }
+
+    public RuleSetBean getRuleSet() {
+        return ruleSet;
+    }
+
+    public void setRuleSet(RuleSetBean ruleSet) {
+        this.ruleSet = ruleSet;
+    }
+
+    public String getResult() {
+        return result;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
+    }
+
+    public RuleBean getRule() {
+        return rule;
+    }
+
+    public void setRule(RuleBean rule) {
+        this.rule = rule;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((this.result == null) ? 0 : this.result.hashCode());
+        result = prime * result + ((rule == null) ? 0 : rule.hashCode());
+        result = prime * result + ((ruleSet == null) ? 0 : ruleSet.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Key other = (Key) obj;
+        if (result == null) {
+            if (other.result != null)
+                return false;
+        } else if (!result.equals(other.result))
+            return false;
+        if (rule == null) {
+            if (other.rule != null)
+                return false;
+        } else if (!rule.equals(other.rule))
+            return false;
+        if (ruleSet == null) {
+            if (other.ruleSet != null)
+                return false;
+        } else if (!ruleSet.equals(other.ruleSet))
+            return false;
+        return true;
+    }
 }
