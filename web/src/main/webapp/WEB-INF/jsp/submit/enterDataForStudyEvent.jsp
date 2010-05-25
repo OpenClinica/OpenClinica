@@ -94,8 +94,11 @@
                 <table border="0" cellpadding="0" cellspacing="0">
                     <tr>
                         <td class="table_tools">
-                            <c:if test="${!userRole.monitor && studySubject.status.name != 'removed' && studySubject.status.name != 'auto-removed' && study.status.available}">
-                                <a href="UpdateStudyEvent?event_id=<c:out value="${studyEvent.id}"/>&ss_id=<c:out value="${studySubject.id}"/>"><img src="images/bt_Edit.gif" border="0" align="left"></a>&nbsp;<a href="UpdateStudyEvent?event_id=<c:out value="${studyEvent.id}"/>&ss_id=<c:out value="${studySubject.id}"/>"><fmt:message key="edit_study_event" bundle="${resword}"/></a>
+                            &nbsp;
+                            <c:if test="${!userRole.monitor && studySubject.status.name != 'removed' && studySubject.status.name != 'auto-removed' && study.status.available && studyEvent.editable}">
+                                <a href="UpdateStudyEvent?event_id=<c:out value="${studyEvent.id}"/>&ss_id=<c:out value="${studySubject.id}"/>"><img src="images/bt_Edit.gif" border="0" align="left"></a>
+                                &nbsp;
+                                <a href="UpdateStudyEvent?event_id=<c:out value="${studyEvent.id}"/>&ss_id=<c:out value="${studySubject.id}"/>"><fmt:message key="edit_study_event" bundle="${resword}"/></a>
                             </c:if>
                         </td>
                     </tr>
