@@ -2418,7 +2418,6 @@ public abstract class DataEntryServlet extends SecureController {
                         }// else
                         break;
                     }
-
                 }
             } // else
             previous = formItemGroup.getOrdinal();
@@ -2440,9 +2439,13 @@ public abstract class DataEntryServlet extends SecureController {
             // logger.debug("+++ found edit flag of " + dbItemGroup.getEditFlag() + " for #" + dbItemGroup.getOrdinal() + ": " + i);
             if (!"edit".equalsIgnoreCase(dbItemGroup.getEditFlag()) && !"initial".equalsIgnoreCase(dbItemGroup.getEditFlag())) {
                 // && !"".equalsIgnoreCase(dbItemGroup.getEditFlag())) {
-                logger.trace("+++ one row removed, edit flag was " + dbItemGroup.getEditFlag());
-                logger.debug("+++ one row removed, edit flag was " + dbItemGroup.getEditFlag());
-                dbItemGroup.setEditFlag("remove");
+                // >> tbh if the group is not shown, we should not touch it 05/2010
+                if (dbItemGroup.getGroupMetaBean().isShowGroup()) {
+                    logger.trace("+++ one row removed, edit flag was " + dbItemGroup.getEditFlag());
+                    logger.debug("+++ one row removed, edit flag was " + dbItemGroup.getEditFlag());
+                    dbItemGroup.setEditFlag("remove");
+                }
+                // << tbh
             }
 
         }
@@ -2771,7 +2774,7 @@ public abstract class DataEntryServlet extends SecureController {
                 idb.setOrdinal(ordinal);
                 idb.setCreatedDate(new Date());
                 idb.setOwner(ub);
-                logger.trace("create a new item data" + idb.getItemId() + idb.getValue());
+                logger.debug("create a new item data" + idb.getItemId() + idb.getValue());
                 // idb = (ItemDataBean) iddao.create(idb);
                 // >>tbh 08/2008
                 idb.setUpdater(ub);
@@ -2787,12 +2790,12 @@ public abstract class DataEntryServlet extends SecureController {
                 idb.setUpdatedDate(new Date());
                 // not setting id with just Updater() trying UpdaterId() <<tbh
                 // 08/2008
-                logger.trace("update an item data " + idb.getId() + ":" + idb.getValue());
+                logger.debug("update an item data " + idb.getId() + ":" + idb.getValue());
                 logger.trace("update item update_id " + idb.getUpdater().getId());
                 idb = (ItemDataBean) iddao.updateValue(idb);
 
             } else if ("remove".equalsIgnoreCase(dib.getEditFlag())) {
-                logger.trace("remove an item data" + idb.getItemId() + idb.getValue());
+                logger.debug("REMOVE an item data" + idb.getItemId() + idb.getValue());
                 idb.setUpdater(ub);
                 idb.setStatus(Status.DELETED);
                 idb = (ItemDataBean) iddao.updateValue(idb);
@@ -3781,6 +3784,7 @@ public abstract class DataEntryServlet extends SecureController {
                     ItemDataBean idb = (ItemDataBean) data.get(i);
                     if (idb.getItemId() == firstItem.getItem().getId()) {
                         hasData = true;
+                        logger.debug("set has data to --TRUE--");
                         DisplayItemGroupBean digb = new DisplayItemGroupBean();
                         // always get a fresh copy for items, may use other
                         // better way to

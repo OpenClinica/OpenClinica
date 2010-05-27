@@ -50,7 +50,7 @@ import javax.servlet.ServletContext;
  */
 public class FormBeanUtil {
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    private static Logger logger = null;//LoggerFactory.getLogger(getClass().getName());
     public static final String UNGROUPED = "Ungrouped";
     public static final String ADMIN_EDIT = "administrativeEditing";
     private static DynamicsMetadataService itemMetadataService;
@@ -96,6 +96,7 @@ public class FormBeanUtil {
      */
     public static List<DisplayItemBean> getDisplayBeansFromItems(List<ItemBean> itemBeans, DataSource dataSource, EventCRFBean eventCrfBean, int sectionId,
             List<String> nullValuesList, ServletContext context) {
+        // logger = LoggerFactory.getLogger(getClass().getName());
         List<DisplayItemBean> disBeans = new ArrayList<DisplayItemBean>();
         if (itemBeans == null || itemBeans.isEmpty())
             return disBeans;
@@ -125,6 +126,8 @@ public class FormBeanUtil {
                 // displayBean.setEventDefinitionCRF();
                 displayBean.setMetadata(runDynamicsCheck(meta, eventCrfBean, itemDataBean, context));
                 displayBean.setData(itemDataBean);
+                displayBean.setDbData(itemDataBean);
+                System.out.println("just set: " + itemDataBean.getValue() + " from " + itemDataBean.getItemId());
                 responseName = displayBean.getMetadata().getResponseSet().getResponseType().getName();
                 respOptions = displayBean.getMetadata().getResponseSet().getOptions();
                 if (hasNullValues
@@ -754,7 +757,7 @@ public class FormBeanUtil {
 
         for (ItemGroupBean itemGroup : itemGroupBeans) {
             itBeans = itemDao.findAllItemsByGroupId(itemGroup.getId(), crfVersionId);
-
+            System.out.println("just ran find all by group id " + itemGroup.getId() + " found " + itBeans.size() + " item beans");
             List<ItemGroupMetadataBean> metadata = igMetaDAO.findMetaByGroupAndSection(itemGroup.getId(), crfVersionId, sectionId);
             if (!metadata.isEmpty()) {
                 // for a given crf version, all the items in the same group

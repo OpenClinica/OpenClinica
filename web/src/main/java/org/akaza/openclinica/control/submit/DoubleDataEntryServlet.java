@@ -578,6 +578,8 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
                     } else {
                         validateDisplayItemBean(v, displayItem, inputName, rv, groupOrdinalPLusItemOid, false, null);
                     }
+                } else {
+                    System.out.println("OUT : " + String.valueOf(order + 1) + displayItem.getItem().getOid());
                 }
                 // validateDisplayItemBean(v, displayItem, inputName);
             }
