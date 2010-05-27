@@ -649,8 +649,7 @@ public abstract class DataEntryServlet extends SecureController {
                         String itemName = getInputName(dib);
                         // no Item group for single item, so just use blank
                         // string as parameter for inputName
-                        // dib = validateDisplayItemBean(v, dib,
-                        // "",ruleValidator, groupOrdinalPLusItemOid, false);//
+                        
                         dib = validateDisplayItemBean(v, dib, "");// this
                         // should be
                         // used,
@@ -2739,7 +2738,7 @@ public abstract class DataEntryServlet extends SecureController {
      */
     protected boolean writeToDB(DisplayItemBean dib, ItemDataDAO iddao, int ordinal) {
         ItemDataBean idb = dib.getData();
-        if (!dib.getMetadata().isShowItem() && idb.getValue().equals("") && !getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getData())) {
+        if (!dib.getMetadata().isShowItem() && idb.getValue().equals("")) {// && !getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getData())) {
             logger.debug("*** not shown - not writing for idb id " + dib.getData().getId() + " and item id " + dib.getItem().getId());
             return true;
         }
@@ -3814,6 +3813,7 @@ public abstract class DataEntryServlet extends SecureController {
                                 if (idb.getItemId() == dib.getItem().getId() && !idb.isSelected()) {
                                     idb.setSelected(true);
                                     dib.setData(idb);
+                                    logger.debug("--> set data " + idb.getId() + ": " + idb.getValue());
                                     if (shouldLoadDBValues(dib)) {
                                         logger.trace("+++should load db values is true, set value");
                                         dib.loadDBValue();

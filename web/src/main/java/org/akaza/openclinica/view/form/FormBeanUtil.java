@@ -65,10 +65,11 @@ public class FormBeanUtil {
     
     public static ItemFormMetadataBean runDynamicsCheck(ItemFormMetadataBean metadataBean, EventCRFBean eventCrfBean, ItemDataBean itemDataBean, ServletContext context) {
         if (!metadataBean.isShowItem()) {
-            System.out.println("running is shown to the db...");
+            
             // if the base case is not already shown, let's check it
             boolean showItem = getItemMetadataService(context).isShown(new Integer(metadataBean.getItemId()), eventCrfBean, itemDataBean);
             metadataBean.setShowItem(showItem);
+            System.out.println("running is shown to the db..." + showItem + " for " + metadataBean.getItemId());
         // setting true or false here, tbh
         }
         // however, we run into a puzzle here at the last section, apparently we might take a deep-copy again, resetting this to false
@@ -123,6 +124,7 @@ public class FormBeanUtil {
                 // here we have taken a different approach, tbh
                 // displayBean.setEventDefinitionCRF();
                 displayBean.setMetadata(runDynamicsCheck(meta, eventCrfBean, itemDataBean, context));
+                displayBean.setData(itemDataBean);
                 responseName = displayBean.getMetadata().getResponseSet().getResponseType().getName();
                 respOptions = displayBean.getMetadata().getResponseSet().getOptions();
                 if (hasNullValues
@@ -160,8 +162,13 @@ public class FormBeanUtil {
         return disBeans;
     }
 
-    public static List<DisplayItemBean> getDisplayBeansFromItems(List<ItemBean> itemBeans, DataSource dataSource, EventCRFBean eventCrfBean, int sectionId,
-                EventDefinitionCRFBean edcb, int test, ServletContext context) {
+    public static List<DisplayItemBean> getDisplayBeansFromItems(List<ItemBean> itemBeans, 
+    		DataSource dataSource, 
+    		EventCRFBean eventCrfBean, 
+    		int sectionId,
+            EventDefinitionCRFBean edcb, 
+            int test, 
+            ServletContext context) {
             //int test is for method overloading. 
             List<DisplayItemBean> disBeans = new ArrayList<DisplayItemBean>();
             if (itemBeans == null || itemBeans.isEmpty())
@@ -179,6 +186,8 @@ public class FormBeanUtil {
                 if (meta.getSectionId() == sectionId) {
                     displayBean.setItem(iBean);
                     displayBean.setMetadata(runDynamicsCheck(meta, eventCrfBean, itemDataBean, context));
+                    displayBean.setData(itemDataBean);
+                    // << tbh 05/2010
                     disBeans.add(displayBean);
                 }
             }
@@ -223,8 +232,13 @@ public class FormBeanUtil {
         return responseOptionBeans;
     }
 
-    public DisplayItemBean getDisplayBeanFromSingleItem(ItemFormMetadataBean itemFBean, 
-            int sectionId, DataSource dataSource, EventCRFBean eventCrfBean, List<String> nullValuesList, ServletContext context) {
+    public DisplayItemBean getDisplayBeanFromSingleItem(
+    		ItemFormMetadataBean itemFBean, 
+            int sectionId, 
+            DataSource dataSource, 
+            EventCRFBean eventCrfBean, 
+            List<String> nullValuesList, 
+            ServletContext context) {
 
         DisplayItemBean disBean = new DisplayItemBean();
         ItemBean itemBean = new ItemBean();
@@ -249,6 +263,7 @@ public class FormBeanUtil {
             ItemDataBean itemDataBean = itemDataDao.findByItemIdAndEventCRFId(itemBean.getId(), eventCrfBean.getId());
             disBean.setItem(itemBean);
             disBean.setMetadata(runDynamicsCheck(itemFBean, eventCrfBean, itemDataBean, context));
+            disBean.setData(itemDataBean);
             responseName = disBean.getMetadata().getResponseSet().getResponseType().getName();
             respOptions = disBean.getMetadata().getResponseSet().getOptions();
             if (hasNullValues
