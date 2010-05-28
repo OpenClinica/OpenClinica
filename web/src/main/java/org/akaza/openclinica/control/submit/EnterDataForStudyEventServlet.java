@@ -100,11 +100,8 @@ public class EnterDataForStudyEventServlet extends SecureController {
         StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(seb.getStudyEventDefinitionId());
         seb.setStudyEventDefinition(sedb);
         //A. Hamid mantis issue 5048
-        if(currentRole.isInvestigator() && seb.getSubjectEventStatus().isLocked()){
-            if(seb.getUpdater().getRoleByStudy(currentStudy).isDirector()
-                    || seb.getUpdater().getRoleByStudy(currentStudy).isCoordinator()){
-                seb.setEditable(false);
-            }
+        if(!(currentRole.isDirector() || currentRole.isCoordinator()) && seb.getSubjectEventStatus().isLocked()){
+            seb.setEditable(false);
         }
         return seb;
     }

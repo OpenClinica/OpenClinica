@@ -283,11 +283,8 @@ public class ViewStudySubjectServlet extends SecureController {
             // Mantis Issue 5048: Preventing Investigators from Unlocking Events
             for(int i = 0; i < displayEvents.size(); i++){
                 DisplayStudyEventBean decb = displayEvents.get(i);
-                    if(currentRole.isInvestigator() && decb.getStudyEvent().getSubjectEventStatus().isLocked()){
-                        if(decb.getStudyEvent().getUpdater().getRoleByStudy(currentStudy).isDirector()
-                                || decb.getStudyEvent().getUpdater().getRoleByStudy(currentStudy).isCoordinator()){
-                            decb.getStudyEvent().setEditable(false);
-                        }
+                    if(!(currentRole.isDirector() || currentRole.isCoordinator()) && decb.getStudyEvent().getSubjectEventStatus().isLocked()){
+                         decb.getStudyEvent().setEditable(false);
                     }
             }
 
