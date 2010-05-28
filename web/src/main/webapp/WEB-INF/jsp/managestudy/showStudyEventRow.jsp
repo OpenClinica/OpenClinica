@@ -38,7 +38,7 @@
 		<tr><td>&nbsp;</td></tr>
 		<tr>
 		<td>
-		<c:if test="${(!userRole.monitor && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && !currRow.bean.studyEvent.status.deleted && currRow.bean.studyEvent.editable) && (study.status.available)}">
+		<c:if test="${(studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && !currRow.bean.studyEvent.status.deleted && currRow.bean.studyEvent.editable) && (study.status.available)}">
         <a href="UpdateStudyEvent?event_id=<c:out value="${currRow.bean.studyEvent.id}"/>&ss_id=<c:out value="${studySub.id}"/>"
 		onMouseDown="javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');"
 		onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"><img
