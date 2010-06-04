@@ -22,6 +22,7 @@ import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.service.extract.GenerateExtractFileService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -149,7 +150,8 @@ public class ExportDatasetServlet extends SecureController {
             String pattern = "yyyy" + File.separator + "MM" + File.separator + "dd" + File.separator + "HHmmssSSS" + File.separator;
             SimpleDateFormat sdfDir = new SimpleDateFormat(pattern);
             String generalFileDir = DATASET_DIR + db.getId() + File.separator + sdfDir.format(new java.util.Date());
-
+            String fileName = "";
+            
             db.setName(db.getName().replaceAll(" ", "_"));
             Page finalTarget = Page.GENERATE_DATASET;
             finalTarget = Page.EXPORT_DATA_CUSTOM;
@@ -172,6 +174,7 @@ public class ExportDatasetServlet extends SecureController {
                 logger.info("created sas file");
                 request.setAttribute("generate", generalFileDir + SASFileName);
                 finalTarget.setFileName(generalFileDir + SASFileName);
+                fileName = SASFileName;
                 // won't work since page creator is private
             } else if ("odm".equalsIgnoreCase(action)) {
                 String odmVersion = fp.getString("odmVersion");
@@ -186,6 +189,7 @@ public class ExportDatasetServlet extends SecureController {
                     Integer fileID = (Integer) value;
                     fId = fileID.intValue();
                 }
+                fileName = ODMXMLFileName;
                 request.setAttribute("generate", generalFileDir + ODMXMLFileName);
                 System.out.println("+++ set the following: " + generalFileDir + ODMXMLFileName);
             } else if ("txt".equalsIgnoreCase(action)) {
@@ -210,7 +214,7 @@ public class ExportDatasetServlet extends SecureController {
                     Integer fileID = (Integer) value;
                     fId = fileID.intValue();
                 }
-
+                fileName = TXTFileName;
                 request.setAttribute("generate", generalFileDir + TXTFileName);
                 // finalTarget.setFileName(generalFileDir+TXTFileName);
                 System.out.println("+++ set the following: " + generalFileDir + TXTFileName);
@@ -280,6 +284,7 @@ public class ExportDatasetServlet extends SecureController {
                 // logger.info("found data set: "+generateReport);
                 String CSVFileName = db.getName() + "_comma.txt";
                 fId = generateFileService.createFile(CSVFileName, generalFileDir, answer.toString(), db, sysTimeEnd, ExportFormatBean.CSVFILE, true);
+                fileName = CSVFileName;
                 logger.info("just created csv file");
                 request.setAttribute("generate", generalFileDir + CSVFileName);
                 // finalTarget.setFileName(generalFileDir+CSVFileName);
@@ -308,6 +313,7 @@ public class ExportDatasetServlet extends SecureController {
                 response.setHeader("Content-Disposition", "attachment; filename=" + db.getName() + "_excel.xls");
                 request.setAttribute("generate", generalFileDir + excelFileName);
                 logger.info("set 'generate' to :" + generalFileDir + excelFileName);
+                fileName = excelFileName;
                 // excelReport.write(stream);
                 // stream.flush();
                 // stream.close();
@@ -365,6 +371,13 @@ public class ExportDatasetServlet extends SecureController {
             }
             logger.info("set first part of 'generate' to :" + generalFileDir);
             logger.info("found file name: " + finalTarget.getFileName());
+
+            String del = CoreResources.getField("dataset_file_delete");
+            if(del.equalsIgnoreCase("yes")){
+                File deleteFile = new File(generalFileDir+fileName);
+                deleteFile.delete();
+            }
+
             forwardPage(finalTarget);
         }
     }
