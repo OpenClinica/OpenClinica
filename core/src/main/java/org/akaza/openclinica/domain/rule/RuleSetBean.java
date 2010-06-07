@@ -42,6 +42,7 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
     private StudyBean study;
     private CRFBean crf;
     private CRFVersionBean crfVersion;
+    private ItemBean item;
 
     private List<RuleSetRuleBean> ruleSetRules;
     private ExpressionBean target;
@@ -50,13 +51,13 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
     // transient properties
     private List<ExpressionBean> expressions; // itemGroup & item populated when RuleSets are retrieved
     private ItemGroupBean itemGroup;
-    private ItemBean item;
 
     // TODO : Pending conversion of the objects below to use Hibernate
     private Integer studyEventDefinitionId;
     private Integer studyId;
     private Integer crfId;
     private Integer crfVersionId;
+    private Integer itemId;
 
     // Business
 
@@ -97,25 +98,25 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
 
     @Transient
     public String getStudyEventDefinitionName() {
-        return getStudyEventDefinition().getName();
+        return getStudyEventDefinition() == null ? "" : getStudyEventDefinition().getName();
     }
 
     @Transient
     public String getStudyEventDefinitionNameWithOID() {
-        return getStudyEventDefinitionName() + " (" + getStudyEventDefinition().getOid() + ")";
+        return getStudyEventDefinition() == null ? "" : getStudyEventDefinitionName() + " (" + getStudyEventDefinition().getOid() + ")";
     }
 
     @Transient
     public String getCrfWithVersionName() {
         String crfVersionName = getCrfVersion() != null ? " - " + getCrfVersion().getName() : "";
-        String crfName = getCrf().getName();
+        String crfName = getCrf() != null ? getCrf().getName() : "";
         return crfName + crfVersionName;
     }
 
     @Transient
     public String getCrfWithVersionNameWithOid() {
-        String oid = getCrfVersion() != null ? getCrfVersion().getOid() : getCrf().getOid();
-        return getCrfWithVersionName() + " (" + oid + ")";
+        String oid = getCrfVersion() != null ? getCrfVersion().getOid() : getCrf() != null ? getCrf().getOid() : "";
+        return getCrfWithVersionName() + (!oid.equals("") ? " (" + oid + ")" : "");
     }
 
     @Transient
@@ -125,7 +126,7 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
 
     @Transient
     public String getGroupLabel() {
-        return getItemGroup().getName();
+        return getItemGroup() == null ? "" : getItemGroup().getName();
     }
 
     @Transient
@@ -135,7 +136,7 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
 
     @Transient
     public String getGroupLabelWithOid() {
-        return getGroupLabel() + " (" + getItemGroup().getOid() + ")";
+        return getItemGroup() == null ? "" : getGroupLabel() + " (" + getItemGroup().getOid() + ")";
     }
 
     @Transient
@@ -150,7 +151,7 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
     }
 
     public void setStudyEventDefinition(StudyEventDefinitionBean studyEventDefinition) {
-        if (studyEventDefinition.getId() > 0) {
+        if (studyEventDefinition != null && studyEventDefinition.getId() > 0) {
             this.studyEventDefinitionId = studyEventDefinition.getId();
         }
         this.studyEventDefinition = studyEventDefinition;
@@ -194,6 +195,9 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
     }
 
     public void setItem(ItemBean item) {
+        if (item != null && item.getId() > 0) {
+            this.itemId = item.getId();
+        }
         this.item = item;
     }
 
@@ -203,7 +207,7 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
     }
 
     public void setCrf(CRFBean crf) {
-        if (crf.getId() > 0) {
+        if (crf != null && crf.getId() > 0) {
             this.crfId = crf.getId();
         }
         this.crf = crf;
@@ -312,6 +316,20 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
      */
     public void setCrfVersionId(Integer crfVersionId) {
         this.crfVersionId = crfVersionId;
+    }
+
+    /**
+     * @return the itemId
+     */
+    public Integer getItemId() {
+        return itemId;
+    }
+
+    /**
+     * @param itemId the itemId to set
+     */
+    public void setItemId(Integer itemId) {
+        this.itemId = itemId;
     }
 
 }

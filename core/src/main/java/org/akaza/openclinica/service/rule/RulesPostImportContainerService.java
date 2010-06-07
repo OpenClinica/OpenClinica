@@ -87,6 +87,7 @@ public class RulesPostImportContainerService {
                             getExpressionService().getStudyEventDefinitionFromExpression(ruleSetBean.getTarget().getValue()));
                     ruleSetBeanWrapper.getAuditableBean().setCrf(getExpressionService().getCRFFromExpression(ruleSetBean.getTarget().getValue()));
                     ruleSetBeanWrapper.getAuditableBean().setCrfVersion(getExpressionService().getCRFVersionFromExpression(ruleSetBean.getTarget().getValue()));
+                    ruleSetBeanWrapper.getAuditableBean().setItem(getExpressionService().getItemBeanFromExpression(ruleSetBean.getTarget().getValue()));
                 }
                 isRuleSetRuleValid(importContainer, ruleSetBeanWrapper);
             }
@@ -127,7 +128,8 @@ public class RulesPostImportContainerService {
     private void putRuleSetInCorrectContainer(AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper, RulesPostImportContainer importContainer) {
         if (!ruleSetBeanWrapper.isSavable()) {
             importContainer.getInValidRuleSetDefs().add(ruleSetBeanWrapper);
-        } else if (getExpressionService().getEventDefinitionCRF(ruleSetBeanWrapper.getAuditableBean().getTarget().getValue()).getStatus().isDeleted()) {
+        } else if (getExpressionService().getEventDefinitionCRF(ruleSetBeanWrapper.getAuditableBean().getTarget().getValue()) != null
+            && getExpressionService().getEventDefinitionCRF(ruleSetBeanWrapper.getAuditableBean().getTarget().getValue()).getStatus().isDeleted()) {
             importContainer.getInValidRuleSetDefs().add(ruleSetBeanWrapper);
         } else if (ruleSetBeanWrapper.getAuditableBean().getId() == null) {
             importContainer.getValidRuleSetDefs().add(ruleSetBeanWrapper);
@@ -165,7 +167,7 @@ public class RulesPostImportContainerService {
             if (ruleSetRuleBean.getId() == null) {
                 EventDefinitionCRFBean eventDefinitionCRFBean =
                     getExpressionService().getEventDefinitionCRF(ruleSetBeanWrapper.getAuditableBean().getTarget().getValue());
-                if (eventDefinitionCRFBean.getStatus().isDeleted()) {
+                if (eventDefinitionCRFBean != null && eventDefinitionCRFBean.getStatus().isDeleted()) {
                     ruleSetBeanWrapper
                             .error("This is an invalid Rule Set because the target is pointing to an item in the event definition CRF that has a status of removed");
                 }

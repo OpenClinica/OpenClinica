@@ -6,6 +6,16 @@
 		CRF_ID = ?</sql>
 	</query>
 	<query>
+        <name>findByItemOid</name>
+        <sql>
+            select distinct(crf.*) from crf,item_form_metadata ifm,crf_version cv,item i where 
+                ifm.item_id = i.item_id and 
+                ifm.crf_version_id = cv.crf_version_id and 
+                cv.crf_id = crf.crf_id and 
+                i.oc_oid = ?        
+        </sql>
+    </query>
+	<query>
         <name>findByOID</name>
         <sql>SELECT * FROM CRF WHERE
         OC_OID = ?</sql>

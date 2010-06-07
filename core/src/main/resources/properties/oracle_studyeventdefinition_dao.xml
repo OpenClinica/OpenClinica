@@ -104,6 +104,14 @@
                 </sql>
         </query>
         <query>
+            <name>findAllByCrf</name>
+            <sql>
+            select distinct (sed.*) from study_event_definition sed, event_definition_crf edc where 
+                sed.study_event_definition_id = edc.study_event_definition_id and 
+                edc.crf_id = ?
+            </sql>
+        </query>
+        <query>
                 <name>findByEventDefinitionCRFId</name>
                 <sql>
                         SELECT D.*

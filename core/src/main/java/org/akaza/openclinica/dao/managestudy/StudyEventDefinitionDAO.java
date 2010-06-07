@@ -7,6 +7,7 @@
  */
 package org.akaza.openclinica.dao.managestudy;
 
+import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
@@ -282,6 +283,24 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
         variables.put(new Integer(2), new Integer(currentStudy.getId()));
 
         ArrayList alist = this.select(digester.getQuery("findAllWithStudyEvent"), variables);
+
+        Iterator it = alist.iterator();
+        while (it.hasNext()) {
+            StudyEventDefinitionBean seb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) it.next());
+            answer.add(seb);
+        }
+
+        return answer;
+    }
+
+    public ArrayList<StudyEventDefinitionBean> findAllByCrf(CRFBean crf) {
+        ArrayList answer = new ArrayList();
+
+        this.setTypesExpected();
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(crf.getId()));
+
+        ArrayList alist = this.select(digester.getQuery("findAllByCrf"), variables);
 
         Iterator it = alist.iterator();
         while (it.hasNext()) {

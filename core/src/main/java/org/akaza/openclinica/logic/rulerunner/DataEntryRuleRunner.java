@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -30,76 +31,6 @@ public class DataEntryRuleRunner extends RuleRunner {
 
     public DataEntryRuleRunner(DataSource ds, String requestURLMinusServletPath, String contextPath, JavaMailSenderImpl mailSender) {
         super(ds, requestURLMinusServletPath, contextPath, mailSender);
-    }
-
-    public MessageContainer runRulesOLD(List<RuleSetBean> ruleSets, ExecutionMode executionMode, StudyBean currentStudy,
-            HashMap<String, String> variableAndValue, UserAccountBean ub, Phase phase) {
-
-        if (variableAndValue == null || variableAndValue.isEmpty()) {
-            logger.warn("You must be executing Rules in Batch");
-            variableAndValue = new HashMap<String, String>();
-        }
-
-        MessageContainer messageContainer = new MessageContainer();
-        for (RuleSetBean ruleSet : ruleSets) {
-            for (ExpressionBean expressionBean : ruleSet.getExpressions()) {
-                ruleSet.setTarget(expressionBean);
-
-                for (RuleSetRuleBean ruleSetRule : ruleSet.getRuleSetRules()) {
-                    String result = null;
-                    RuleBean rule = ruleSetRule.getRuleBean();
-                    ExpressionObjectWrapper eow = new ExpressionObjectWrapper(ds, currentStudy, rule.getExpression(), ruleSet, variableAndValue);
-                    try {
-                        OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(eow);
-                        result = oep.parseAndEvaluateExpression(rule.getExpression().getValue());
-
-                        // Actions
-                        List<RuleActionBean> actionListBasedOnRuleExecutionResult = ruleSetRule.getActions(result, phase);
-
-                        ItemDataBean itemData = getExpressionService().getItemDataBeanFromDb(ruleSet.getTarget().getValue());
-                        if (itemData != null) {
-                            Iterator<RuleActionBean> itr = actionListBasedOnRuleExecutionResult.iterator();
-                            while (itr.hasNext()) {
-                                RuleActionBean ruleActionBean = itr.next();
-                                RuleActionRunLogBean ruleActionRunLog =
-                                    new RuleActionRunLogBean(ruleActionBean.getActionType(), itemData, itemData.getValue(), ruleSetRule.getRuleBean().getOid());
-                                if (getRuleActionRunLogDao().findCountByRuleActionRunLogBean(ruleActionRunLog) > 0) {
-                                    itr.remove();
-                                }
-                            }
-                        }
-
-                        logger.info("RuleSet with target  : {} , Ran Rule : {}  The Result was : {} , Based on that {} action will be executed in {} mode. ",
-                                new Object[] { ruleSet.getTarget().getValue(), rule.getName(), result, actionListBasedOnRuleExecutionResult.size(),
-                                    executionMode.name() });
-
-                        if (actionListBasedOnRuleExecutionResult.size() > 0) {
-                            for (RuleActionBean ruleAction : actionListBasedOnRuleExecutionResult) {
-
-                                ruleAction.setCuratedMessage(curateMessage(ruleAction, ruleSetRule));
-                                // getDiscrepancyNoteService().saveFieldNotes(ruleAction.getSummary(), itemDataBeanId, "ItemData", currentStudy, ub);
-                                // System.out.println(" shipping rule action type " + ruleAction.getActionType().name());
-                                ActionProcessor ap =
-                                    ActionProcessorFacade.getActionProcessor(ruleAction.getActionType(), ds, getMailSender(), dynamicsMetadataService, ruleSet,
-                                            getRuleActionRunLogDao(), ruleSetRule);
-                                RuleActionBean rab =
-                                    ap.execute(RuleRunnerMode.DATA_ENTRY, executionMode, ruleAction, itemData, DiscrepancyNoteBean.ITEM_DATA, currentStudy, ub,
-                                            prepareEmailContents(ruleSet, ruleSetRule, currentStudy, ruleAction));
-                                if (rab != null) {
-                                    messageContainer.add(getExpressionService().getGroupOrdninalConcatWithItemOid(ruleSet.getTarget().getValue()), ruleAction);
-                                }
-                            }
-                        }
-                    } catch (OpenClinicaSystemException osa) {
-                        // TODO: Auditing might happen here failed rule
-                        logger.warn("RuleSet with target  : {} , Ran Rule : {} , It resulted in an error due to : {}", new Object[] {
-                            ruleSet.getTarget().getValue(), rule.getName(), osa.getMessage() });
-                        System.out.println("FAIL ON ruleset with target: " + ruleSet.getTarget().getValue() + " : " + osa.getMessage());
-                    }
-                }
-            }
-        }
-        return messageContainer;
     }
 
     public MessageContainer runRules(List<RuleSetBean> ruleSets, ExecutionMode executionMode, StudyBean currentStudy, HashMap<String, String> variableAndValue,
@@ -111,8 +42,16 @@ public class DataEntryRuleRunner extends RuleRunner {
         }
 
         MessageContainer messageContainer = new MessageContainer();
+        HashMap<String, ArrayList<RuleActionContainer>> toBeExecuted = new HashMap<String, ArrayList<RuleActionContainer>>();
         for (RuleSetBean ruleSet : ruleSets) {
-            List<RuleActionContainer> allActionContainerListBasedOnRuleExecutionResult = new ArrayList<RuleActionContainer>();
+            String key = getExpressionService().getItemOid(ruleSet.getOriginalTarget().getValue());
+            List<RuleActionContainer> allActionContainerListBasedOnRuleExecutionResult = null;
+            if (toBeExecuted.containsKey(key)) {
+                allActionContainerListBasedOnRuleExecutionResult = toBeExecuted.get(key);
+            } else {
+                toBeExecuted.put(key, new ArrayList<RuleActionContainer>());
+                allActionContainerListBasedOnRuleExecutionResult = toBeExecuted.get(key);
+            }
             ItemDataBean itemData = null;
 
             for (ExpressionBean expressionBean : ruleSet.getExpressions()) {
@@ -143,7 +82,7 @@ public class DataEntryRuleRunner extends RuleRunner {
                         }
 
                         for (RuleActionBean ruleActionBean : actionListBasedOnRuleExecutionResult) {
-                            RuleActionContainer ruleActionContainer = new RuleActionContainer(ruleActionBean, expressionBean, itemData);
+                            RuleActionContainer ruleActionContainer = new RuleActionContainer(ruleActionBean, expressionBean, itemData, ruleSet);
                             allActionContainerListBasedOnRuleExecutionResult.add(ruleActionContainer);
                         }
                         logger.info("RuleSet with target  : {} , Ran Rule : {}  The Result was : {} , Based on that {} action will be executed in {} mode. ",
@@ -154,25 +93,27 @@ public class DataEntryRuleRunner extends RuleRunner {
                     }
                 }
             }
+        }
 
+        for (Map.Entry<String, ArrayList<RuleActionContainer>> entry : toBeExecuted.entrySet()) {
             // Sort the list of actions
-            Collections.sort(allActionContainerListBasedOnRuleExecutionResult, new RuleActionContainerComparator());
+            Collections.sort(entry.getValue(), new RuleActionContainerComparator());
 
-            for (RuleActionContainer ruleActionContainer : allActionContainerListBasedOnRuleExecutionResult) {
+            for (RuleActionContainer ruleActionContainer : entry.getValue()) {
 
-                ruleSet.setTarget(ruleActionContainer.getExpressionBean());
+                ruleActionContainer.getRuleSetBean().setTarget(ruleActionContainer.getExpressionBean());
                 ruleActionContainer.getRuleAction().setCuratedMessage(
                         curateMessage(ruleActionContainer.getRuleAction(), (ruleActionContainer.getRuleAction().getRuleSetRule())));
                 ActionProcessor ap =
                     ActionProcessorFacade.getActionProcessor(ruleActionContainer.getRuleAction().getActionType(), ds, getMailSender(), dynamicsMetadataService,
-                            ruleSet, getRuleActionRunLogDao(), ruleActionContainer.getRuleAction().getRuleSetRule());
+                            ruleActionContainer.getRuleSetBean(), getRuleActionRunLogDao(), ruleActionContainer.getRuleAction().getRuleSetRule());
                 RuleActionBean rab =
                     ap.execute(RuleRunnerMode.DATA_ENTRY, executionMode, ruleActionContainer.getRuleAction(), ruleActionContainer.getItemDataBean(),
-                            DiscrepancyNoteBean.ITEM_DATA, currentStudy, ub, prepareEmailContents(ruleSet,
-                                    ruleActionContainer.getRuleAction().getRuleSetRule(), currentStudy, ruleActionContainer.getRuleAction()));
+                            DiscrepancyNoteBean.ITEM_DATA, currentStudy, ub, prepareEmailContents(ruleActionContainer.getRuleSetBean(), ruleActionContainer
+                                    .getRuleAction().getRuleSetRule(), currentStudy, ruleActionContainer.getRuleAction()));
                 if (rab != null) {
-                    messageContainer.add(getExpressionService().getGroupOrdninalConcatWithItemOid(ruleSet.getTarget().getValue()), ruleActionContainer
-                            .getRuleAction());
+                    messageContainer.add(getExpressionService().getGroupOrdninalConcatWithItemOid(ruleActionContainer.getRuleSetBean().getTarget().getValue()),
+                            ruleActionContainer.getRuleAction());
                 }
             }
         }

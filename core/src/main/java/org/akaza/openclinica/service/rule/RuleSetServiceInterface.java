@@ -106,12 +106,14 @@ public interface RuleSetServiceInterface {
      * 
      * @param ruleSets
      * @param studyEvent
+     * @param crfVersion TODO
+     * @param studyEventDefinition TODO
      * @return
      */
-    public abstract List<RuleSetBean> filterRuleSetsByStudyEventOrdinal(List<RuleSetBean> ruleSets, StudyEventBean studyEvent);
+    public abstract List<RuleSetBean> filterRuleSetsByStudyEventOrdinal(List<RuleSetBean> ruleSets, StudyEventBean studyEvent, CRFVersionBean crfVersion, StudyEventDefinitionBean studyEventDefinition);
 
     @SuppressWarnings("unchecked")
-    public abstract List<RuleSetBean> filterRuleSetsByStudyEventOrdinal(List<RuleSetBean> ruleSets);
+    public abstract List<RuleSetBean> filterRuleSetsByStudyEventOrdinal(List<RuleSetBean> ruleSets, String crfVersionId);
 
     /**
      * Iterate over ruleSet.getExpressions(). Given the following expression

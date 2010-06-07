@@ -185,8 +185,16 @@ public class CrfBulkRuleRunner extends RuleRunner {
 
         HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> crfViewSpecificOrderedObjects =
             new HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>>();
+        HashMap<String, ArrayList<RuleActionContainer>> toBeExecuted = new HashMap<String, ArrayList<RuleActionContainer>>();
         for (RuleSetBean ruleSet : ruleSets) {
-            List<RuleActionContainer> allActionContainerListBasedOnRuleExecutionResult = new ArrayList<RuleActionContainer>();
+            String key = getExpressionService().getItemOid(ruleSet.getOriginalTarget().getValue());
+            List<RuleActionContainer> allActionContainerListBasedOnRuleExecutionResult = null;
+            if (toBeExecuted.containsKey(key)) {
+                allActionContainerListBasedOnRuleExecutionResult = toBeExecuted.get(key);
+            } else {
+                toBeExecuted.put(key, new ArrayList<RuleActionContainer>());
+                allActionContainerListBasedOnRuleExecutionResult = toBeExecuted.get(key);
+            }
             ItemDataBean itemData = null;
 
             for (ExpressionBean expressionBean : ruleSet.getExpressions()) {
@@ -216,7 +224,7 @@ public class CrfBulkRuleRunner extends RuleRunner {
                             }
                         }
                         for (RuleActionBean ruleActionBean : actionListBasedOnRuleExecutionResult) {
-                            RuleActionContainer ruleActionContainer = new RuleActionContainer(ruleActionBean, expressionBean, itemData);
+                            RuleActionContainer ruleActionContainer = new RuleActionContainer(ruleActionBean, expressionBean, itemData, ruleSet);
                             allActionContainerListBasedOnRuleExecutionResult.add(ruleActionContainer);
                         }
                         logger.info("RuleSet with target  : {} , Ran Rule : {}  The Result was : {} , Based on that {} action will be executed in {} mode. ",
@@ -227,26 +235,28 @@ public class CrfBulkRuleRunner extends RuleRunner {
                     }
                 }
             }
+        }
 
+        for (Map.Entry<String, ArrayList<RuleActionContainer>> entry : toBeExecuted.entrySet()) {
             // Sort the list of actions
-            Collections.sort(allActionContainerListBasedOnRuleExecutionResult, new RuleActionContainerComparator());
-
+            Collections.sort(entry.getValue(), new RuleActionContainerComparator());
             HashMap<Key, List<RuleActionBean>> hms = new HashMap<Key, List<RuleActionBean>>();
+            for (RuleActionContainer ruleActionContainer : entry.getValue()) {
 
-            for (RuleActionContainer ruleActionContainer : allActionContainerListBasedOnRuleExecutionResult) {
                 //ruleSet.setTarget(ruleAction.getRuleSetExpression());
                 ruleActionContainer.getRuleAction().setCuratedMessage(
                         curateMessage(ruleActionContainer.getRuleAction(), ruleActionContainer.getRuleAction().getRuleSetRule()));
                 ActionProcessor ap =
                     ActionProcessorFacade.getActionProcessor(ruleActionContainer.getRuleAction().getActionType(), ds, getMailSender(), dynamicsMetadataService,
-                            ruleSet, getRuleActionRunLogDao(), ruleActionContainer.getRuleAction().getRuleSetRule());
+                            ruleActionContainer.getRuleSetBean(), getRuleActionRunLogDao(), ruleActionContainer.getRuleAction().getRuleSetRule());
                 RuleActionBean rab = null;
-                // ap.execute(RuleRunnerMode.RULSET_BULK, executionMode, ruleAction, ruleAction.getItemData(), DiscrepancyNoteBean.ITEM_DATA, currentStudy,
-                //         ub, prepareEmailContents(ruleSet, ruleAction.getRuleSetRule(), currentStudy, ruleAction));
+                ap.execute(RuleRunnerMode.RULSET_BULK, executionMode, ruleActionContainer.getRuleAction(), ruleActionContainer.getItemDataBean(),
+                        DiscrepancyNoteBean.ITEM_DATA, currentStudy, ub, prepareEmailContents(ruleActionContainer.getRuleSetBean(), ruleActionContainer
+                                .getRuleAction().getRuleSetRule(), currentStudy, ruleActionContainer.getRuleAction()));
                 if (rab != null) {
                     Key k =
-                        new Key(ruleSet, ruleActionContainer.getRuleAction().getExpressionEvaluatesTo().toString(), ruleActionContainer.getRuleAction()
-                                .getRuleSetRule().getRuleBean());
+                        new Key(ruleActionContainer.getRuleSetBean(), ruleActionContainer.getRuleAction().getExpressionEvaluatesTo().toString(),
+                                ruleActionContainer.getRuleAction().getRuleSetRule().getRuleBean());
                     if (hms.containsKey(k)) {
                         hms.get(k).add(ruleActionContainer.getRuleAction());
                     } else {
@@ -256,9 +266,9 @@ public class CrfBulkRuleRunner extends RuleRunner {
                     }
                 }
             }
-            for (Map.Entry<Key, List<RuleActionBean>> entry : hms.entrySet()) {
-                Key key = entry.getKey();
-                List<RuleActionBean> value = entry.getValue();
+            for (Map.Entry<Key, List<RuleActionBean>> theEntry : hms.entrySet()) {
+                Key key = theEntry.getKey();
+                List<RuleActionBean> value = theEntry.getValue();
                 crfViewSpecificOrderedObjects =
                     populateForCrfBasedRulesView(crfViewSpecificOrderedObjects, key.getRuleSet(), key.getRule(), key.getResult(), currentStudy, value);
             }

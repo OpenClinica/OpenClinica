@@ -213,6 +213,22 @@ public class CRFDAO extends AuditableEntityDAO {
         return eb;
     }
 
+    public CRFBean findByItemOid(String itemOid) {
+        CRFBean eb = new CRFBean();
+        this.setTypesExpected();
+
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), itemOid);
+
+        ArrayList alist = this.select(digester.getQuery("findByItemOid"), variables);
+        Iterator it = alist.iterator();
+
+        if (it.hasNext()) {
+            eb = (CRFBean) this.getEntityFromHashMap((HashMap) it.next());
+        }
+        return eb;
+    }
+
     public EntityBean findByName(String name) {
         CRFBean eb = new CRFBean();
         this.setTypesExpected();

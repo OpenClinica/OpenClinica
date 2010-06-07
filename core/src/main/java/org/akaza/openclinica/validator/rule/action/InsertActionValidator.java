@@ -92,17 +92,26 @@ public class InsertActionValidator implements Validator {
                 }
             }
 
+            // TODO: check Null Value logic based on not event definition crf being selected
             if (itemFormMetadataBean.getResponseSet().getResponseType().equals(ResponseType.CHECKBOX)
                 || itemFormMetadataBean.getResponseSet().getResponseType().equals(ResponseType.SELECTMULTI)) {
+                if (getEventDefinitionCRFBean() == null) {
+                    result = true;
+                    break;
+                }
                 if (matchValueWithManyOptions(value, itemFormMetadataBean.getResponseSet().getOptions()) != null) {
                     result = true;
                     break;
                 }
             }
 
+            // TODO: check Null Value logic based on not event definition crf being selected
             if (itemFormMetadataBean.getResponseSet().getResponseType().equals(ResponseType.TEXT)
                 || itemFormMetadataBean.getResponseSet().getResponseType().equals(ResponseType.TEXTAREA)) {
-                if (checkValidityBasedonNullValues(value, index, e)) {
+                if (getEventDefinitionCRFBean() == null) {
+                    result = true;
+                    break;
+                } else if (checkValidityBasedonNullValues(value, index, e)) {
                     result = true;
                     break;
                 } else {

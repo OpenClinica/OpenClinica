@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -135,8 +136,16 @@ public class RuleSetBulkRuleRunner extends RuleRunner {
         }
 
         List<RuleSetBasedViewContainer> ruleSetBasedView = new ArrayList<RuleSetBasedViewContainer>();
+        HashMap<String, ArrayList<RuleActionContainer>> toBeExecuted = new HashMap<String, ArrayList<RuleActionContainer>>();
         for (RuleSetBean ruleSet : ruleSets) {
-            List<RuleActionContainer> allActionContainerListBasedOnRuleExecutionResult = new ArrayList<RuleActionContainer>();
+            String key = getExpressionService().getItemOid(ruleSet.getOriginalTarget().getValue());
+            List<RuleActionContainer> allActionContainerListBasedOnRuleExecutionResult = null;
+            if (toBeExecuted.containsKey(key)) {
+                allActionContainerListBasedOnRuleExecutionResult = toBeExecuted.get(key);
+            } else {
+                toBeExecuted.put(key, new ArrayList<RuleActionContainer>());
+                allActionContainerListBasedOnRuleExecutionResult = toBeExecuted.get(key);
+            }
             ItemDataBean itemData = null;
 
             for (ExpressionBean expressionBean : ruleSet.getExpressions()) {
@@ -165,7 +174,7 @@ public class RuleSetBulkRuleRunner extends RuleRunner {
                             }
                         }
                         for (RuleActionBean ruleActionBean : actionListBasedOnRuleExecutionResult) {
-                            RuleActionContainer ruleActionContainer = new RuleActionContainer(ruleActionBean, expressionBean, itemData);
+                            RuleActionContainer ruleActionContainer = new RuleActionContainer(ruleActionBean, expressionBean, itemData, ruleSet);
                             allActionContainerListBasedOnRuleExecutionResult.add(ruleActionContainer);
                         }
                         logger.info("RuleSet with target  : {} , Ran Rule : {}  The Result was : {} , Based on that {} action will be executed in {} mode. ",
@@ -176,24 +185,28 @@ public class RuleSetBulkRuleRunner extends RuleRunner {
                     }
                 }
             }
+        }
 
+        for (Map.Entry<String, ArrayList<RuleActionContainer>> entry : toBeExecuted.entrySet()) {
             // Sort the list of actions
-            Collections.sort(allActionContainerListBasedOnRuleExecutionResult, new RuleActionContainerComparator());
-            // Execute Actions
-            for (RuleActionContainer ruleActionContainer : allActionContainerListBasedOnRuleExecutionResult) {
-                //ruleSet.setTarget(ruleAction.getRuleSetExpression());
+            Collections.sort(entry.getValue(), new RuleActionContainerComparator());
+
+            for (RuleActionContainer ruleActionContainer : entry.getValue()) {
+                ruleActionContainer.getRuleSetBean().setTarget(ruleActionContainer.getExpressionBean());
                 ruleActionContainer.getRuleAction().setCuratedMessage(
                         curateMessage(ruleActionContainer.getRuleAction(), ruleActionContainer.getRuleAction().getRuleSetRule()));
                 ActionProcessor ap =
                     ActionProcessorFacade.getActionProcessor(ruleActionContainer.getRuleAction().getActionType(), ds, getMailSender(), dynamicsMetadataService,
-                            ruleSet, getRuleActionRunLogDao(), ruleActionContainer.getRuleAction().getRuleSetRule());
-                RuleActionBean rab = null;
-                //ap.execute(RuleRunnerMode.RULSET_BULK, executionMode, ruleAction, ruleAction.getItemData(), DiscrepancyNoteBean.ITEM_DATA, currentStudy,
-                //        ub, prepareEmailContents(ruleSet, ruleAction.getRuleSetRule(), currentStudy, ruleAction));
+                            ruleActionContainer.getRuleSetBean(), getRuleActionRunLogDao(), ruleActionContainer.getRuleAction().getRuleSetRule());
+                RuleActionBean rab =
+                    ap.execute(RuleRunnerMode.RULSET_BULK, executionMode, ruleActionContainer.getRuleAction(), ruleActionContainer.getItemDataBean(),
+                            DiscrepancyNoteBean.ITEM_DATA, currentStudy, ub, prepareEmailContents(ruleActionContainer.getRuleSetBean(), ruleActionContainer
+                                    .getRuleAction().getRuleSetRule(), currentStudy, ruleActionContainer.getRuleAction()));
                 if (rab != null) {
                     ruleSetBasedView =
-                        populateForRuleSetBasedView(ruleSetBasedView, ruleSet, ruleActionContainer.getRuleAction().getRuleSetRule().getRuleBean(),
-                                ruleActionContainer.getRuleAction().getExpressionEvaluatesTo().toString(), ruleActionContainer.getRuleAction());
+                        populateForRuleSetBasedView(ruleSetBasedView, ruleActionContainer.getRuleSetBean(), ruleActionContainer.getRuleAction()
+                                .getRuleSetRule().getRuleBean(), ruleActionContainer.getRuleAction().getExpressionEvaluatesTo().toString(), ruleActionContainer
+                                .getRuleAction());
                 }
             }
 
