@@ -21,40 +21,27 @@
             <artifactId>rome-fetcher</artifactId>
             <version>1.0</version>
             <scope>compile</scope>
+            <exclusions>
+            	<!-- We are using jdom 1.1 lib below -->
+				<exclusion>
+					<groupId>jdom</groupId>
+					<artifactId>jdom</artifactId>
+				</exclusion>
+			</exclusions>
         </dependency>
         <dependency>
             <groupId>rome</groupId>
             <artifactId>rome</artifactId>
             <version>1.0</version>
             <scope>compile</scope>
-        </dependency>
-		<dependency>
-			<groupId>javax.xml.bind</groupId>
-			<artifactId>jaxb-api</artifactId>
-			<scope>compile</scope>
-			<version>2.1</version>
-			<exclusions>
+            <exclusions>
+            	<!-- We are using jdom 1.1 lib below -->
 				<exclusion>
-					<groupId>javax.xml.stream</groupId>
-					<artifactId>stax-api</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>javax.activation</groupId>
-					<artifactId>activation</artifactId>
+					<groupId>jdom</groupId>
+					<artifactId>jdom</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-impl</artifactId>
-			<version>2.1.5</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.liquibase</groupId>
-			<artifactId>liquibase-plugin</artifactId>
-			<version>1.9.1.0</version>
-		</dependency>
+        </dependency>
 		<dependency>
 			<groupId>javax.transaction</groupId>
 			<artifactId>transaction-api</artifactId>
@@ -91,11 +78,6 @@
 			<version>1.6</version>
 		</dependency>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
-		</dependency>
-		<dependency>
 			<groupId>opensymphony</groupId>
 			<artifactId>sitemesh</artifactId>
 			<version>2.3</version>
@@ -105,21 +87,6 @@
 			<artifactId>itext</artifactId>
 			<version>2.1.2</version>
 			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.dbunit</groupId>
-			<artifactId>dbunit</artifactId>
-			<version>2.3.0</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>org.slf4j</artifactId>
-					<groupId>slf4j-nop</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>org.slf4j</artifactId>
-					<groupId>slf4j-api</groupId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<!-- for servlet tests  -->
 		<dependency>
