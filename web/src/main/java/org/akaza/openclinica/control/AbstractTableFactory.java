@@ -3,12 +3,20 @@ package org.akaza.openclinica.control;
 import org.jmesa.facade.TableFacade;
 import org.jmesa.facade.TableFacadeImpl;
 import org.jmesa.limit.ExportType;
+import org.jmesa.limit.Limit;
+import org.jmesa.limit.LimitImpl;
+import org.jmesa.limit.RowSelect;
+import org.jmesa.limit.RowSelectImpl;
 import org.jmesa.view.component.Column;
 import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.editor.FilterEditor;
 import org.jmesa.view.html.component.HtmlColumn;
 import org.jmesa.view.html.component.HtmlTable;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
@@ -48,6 +56,66 @@ public abstract class AbstractTableFactory {
             configureExportColumns(tableFacade, locale);
         }
         return tableFacade;
+    }
+
+    /**
+     * Use this method to export all data from table. 
+     * 1. filters/sorts will be ignored
+     * 2. Whole table will be exported page by page
+     * 3. Configure getSize(Limit limit)
+     * 
+     * @param request
+     * @param response
+     * @see getSize(Limit limit), createLimits()
+     * @see filter & sort methods in implementations
+     */
+    public void exportCSVTable(HttpServletRequest request, HttpServletResponse response, String path) {
+        locale = request.getLocale();
+        String DATE_FORMAT = "yyyyMMddHHmmss";
+        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+        String fileName = getTableName() + "_" + sdf.format(new Date());
+
+        for (Limit limit : createLimits()) {
+            TableFacade tableFacade = new OCTableFacadeImpl(getTableName(), request, response, path + File.separator + fileName);
+            tableFacade.setStateAttr("restore");
+            tableFacade.setLimit(limit);
+            tableFacade.autoFilterAndSort(false);
+            setDataAndLimitVariables(tableFacade);
+            configureTableFacade(response, tableFacade);
+            configureExportColumns(tableFacade, locale);
+            tableFacade.render();
+        }
+    }
+
+    private ArrayList<Limit> createLimits() {
+        Limit limit = new LimitImpl(getTableName());
+        ArrayList<Limit> limits = new ArrayList<Limit>();
+        int size = getSize(limit);
+        for (RowSelect rowSelect : getRowSelects(size)) {
+            Limit theLimit = new LimitImpl(getTableName());
+            theLimit.setRowSelect(rowSelect);
+            theLimit.setExportType(ExportType.CSV);
+            limits.add(theLimit);
+        }
+        return limits;
+    }
+
+    private ArrayList<RowSelect> getRowSelects(int size) {
+        ArrayList<RowSelect> rowSelects = new ArrayList<RowSelect>();
+        int i = 0;
+        for (i = 0; i < size / 50; i++) {
+            RowSelect rowSelect = new RowSelectImpl(i + 1, 50, size);
+            rowSelects.add(rowSelect);
+        }
+        if (size % 50 > 0) {
+            RowSelect rowSelect = new RowSelectImpl(i + 1, size % 50, size);
+            rowSelects.add(rowSelect);
+        }
+        return rowSelects;
+    }
+
+    public int getSize(Limit limit) {
+        return 0;
     }
 
     public void configureTableFacade(HttpServletResponse response, TableFacade tableFacade) {

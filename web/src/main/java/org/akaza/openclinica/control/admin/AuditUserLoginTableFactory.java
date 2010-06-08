@@ -71,6 +71,11 @@ public class AuditUserLoginTableFactory extends AbstractTableFactory {
     }
 
     @Override
+    public int getSize(Limit limit) {
+        return getAuditUserLoginDao().getCountWithFilter(new AuditUserLoginFilter());
+    }
+
+    @Override
     public void setDataAndLimitVariables(TableFacade tableFacade) {
         // initialize i18n 
         resword = ResourceBundleProvider.getWordsBundle(getLocale());
@@ -114,11 +119,13 @@ public class AuditUserLoginTableFactory extends AbstractTableFactory {
     protected AuditUserLoginFilter getAuditUserLoginFilter(Limit limit) {
         AuditUserLoginFilter auditUserLoginFilter = new AuditUserLoginFilter();
         FilterSet filterSet = limit.getFilterSet();
-        Collection<Filter> filters = filterSet.getFilters();
-        for (Filter filter : filters) {
-            String property = filter.getProperty();
-            String value = filter.getValue();
-            auditUserLoginFilter.addFilter(property, value);
+        if (filterSet != null) {
+            Collection<Filter> filters = filterSet.getFilters();
+            for (Filter filter : filters) {
+                String property = filter.getProperty();
+                String value = filter.getValue();
+                auditUserLoginFilter.addFilter(property, value);
+            }
         }
 
         return auditUserLoginFilter;
@@ -135,11 +142,13 @@ public class AuditUserLoginTableFactory extends AbstractTableFactory {
     protected AuditUserLoginSort getAuditUserLoginSort(Limit limit) {
         AuditUserLoginSort auditUserLoginSort = new AuditUserLoginSort();
         SortSet sortSet = limit.getSortSet();
-        Collection<Sort> sorts = sortSet.getSorts();
-        for (Sort sort : sorts) {
-            String property = sort.getProperty();
-            String order = sort.getOrder().toParam();
-            auditUserLoginSort.addSort(property, order);
+        if (sortSet != null) {
+            Collection<Sort> sorts = sortSet.getSorts();
+            for (Sort sort : sorts) {
+                String property = sort.getProperty();
+                String order = sort.getOrder().toParam();
+                auditUserLoginSort.addSort(property, order);
+            }
         }
 
         return auditUserLoginSort;
