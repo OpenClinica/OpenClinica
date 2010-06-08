@@ -309,6 +309,15 @@ public class GenerateExtractFileService {
                     totalSize += 512;
                 }
                 z.closeEntry();
+                //A. Hamid. 4910 
+                is.close();
+                if(CoreResources.getField("dataset_file_delete").equalsIgnoreCase("yes")){
+                    newFile.delete();
+                }
+
+
+
+
             }
             logger.info("writing buffer...");
             // }
