@@ -311,7 +311,8 @@ public class GenerateExtractFileService {
                 z.closeEntry();
                 //A. Hamid. 4910 
                 is.close();
-                if(CoreResources.getField("dataset_file_delete").equalsIgnoreCase("yes")){
+                if(CoreResources.getField("dataset_file_delete").equalsIgnoreCase("true")
+                        || CoreResources.getField("dataset_file_delete").equals("")){
                     newFile.delete();
                 }
 

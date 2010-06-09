@@ -373,7 +373,7 @@ public class ExportDatasetServlet extends SecureController {
             logger.info("found file name: " + finalTarget.getFileName());
 
             String del = CoreResources.getField("dataset_file_delete");
-            if(del.equalsIgnoreCase("yes")){
+            if(del.equalsIgnoreCase("true") || del.equals("")){
                 File deleteFile = new File(generalFileDir+fileName);
                 deleteFile.delete();
             }
