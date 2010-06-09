@@ -205,7 +205,7 @@ public class RulesPostImportContainerService {
             }
         }
         if (ruleActionBean instanceof HideActionBean) {
-            List<PropertyBean> properties = (((ShowActionBean) ruleActionBean).getProperties());
+            List<PropertyBean> properties = (((HideActionBean) ruleActionBean).getProperties());
             if (ruleActionBean.getRuleActionRun().getBatch() == true || ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
                 ruleSetBeanWrapper.error("HideAction " + ((HideActionBean) ruleActionBean).toString()
                     + " is not Valid. You cannot have ImportDataEntry=\"true\" Batch=\"true\". ");
