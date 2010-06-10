@@ -1,10 +1,9 @@
-/*
- * OpenClinica is distributed under the
- * GNU Lesser General Public License (GNU LGPL).
+/* OpenClinica is distributed under the
+* GNU Lesser General Public License (GNU LGPL).
 
- * For details see: http://www.openclinica.org/license
- * copyright 2003-2005 Akaza Research
- */
+* For details see: http://www.openclinica.org/license
+* copyright 2003-2005 Akaza Research
+*/
 package org.akaza.openclinica.control.admin;
 
 import org.akaza.openclinica.bean.core.Role;
@@ -19,12 +18,13 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.apache.commons.io.IOUtils;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletOutputStream;
+import java.io.*;
 
 /**
  * @author jxu
- * 
+ *         <p/>
  *         TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style - Code Templates
  */
 public class DownloadVersionSpreadSheetServlet extends SecureController {
@@ -34,13 +34,10 @@ public class DownloadVersionSpreadSheetServlet extends SecureController {
 
     public static String CRF_VERSION_ID = "crfVersionId";
 
-    // public static String CRF_VERSION_TEMPLATE = "CRF_Design_Template.xls";
-
-    // YW 09-05-2007
     public static String CRF_VERSION_TEMPLATE = "CRF_Design_Template_v3.1.xls";
 
     /**
-     * 
+     *
      */
     @Override
     public void mayProceed() throws InsufficientPermissionException {
@@ -82,9 +79,9 @@ public class DownloadVersionSpreadSheetServlet extends SecureController {
         if (isTemplate) {
             excelFile = new File(dir + CRF_VERSION_TEMPLATE);
             excelFileName = CRF_VERSION_TEMPLATE;
-            FileOutputStream fos = new FileOutputStream(excelFile);
-            IOUtils.copy(getCoreResources().getInputStream(CRF_VERSION_TEMPLATE), fos);
-            IOUtils.closeQuietly(fos);
+            // FileOutputStream fos = new FileOutputStream(excelFile);
+            // IOUtils.copy(getCoreResources().getInputStream(CRF_VERSION_TEMPLATE), fos);
+            // IOUtils.closeQuietly(fos);
         } else {
             excelFile = new File(dir + excelFileName);
             // backwards compat
@@ -103,21 +100,41 @@ public class DownloadVersionSpreadSheetServlet extends SecureController {
             addPageMessage(respage.getString("the_excel_is_not_available_on_server_contact"));
             forwardPage(Page.CRF_LIST_SERVLET);
         } else {
-            response.setContentType("application/excel");
             response.setHeader("Content-disposition", "attachment; filename=\"" + excelFileName + "\";");
+            response.setContentType("application/vnd.ms-excel");
+            response.setHeader("Pragma", "public");
 
-            response.setHeader("Pragma", "public");
-            request.setAttribute("generate", dir + excelFileName);
-            response.setHeader("Pragma", "public");
-            Page finalTarget = Page.EXPORT_DATA_CUSTOM;
-            finalTarget.setFileName("/WEB-INF/jsp/extract/generatedExcelDataset.jsp");
-            forwardPage(finalTarget);
+            ServletOutputStream op = response.getOutputStream();
+            DataInputStream in = null;
+            try {
+                response.setContentType("application/vnd.ms-excel");
+                response.setHeader("Pragma", "public");
+                response.setContentLength((int) excelFile.length());
+
+                byte[] bbuf = new byte[(int) excelFile.length()];
+                in = new DataInputStream(new FileInputStream(excelFile));
+                int length;
+                while ((in != null) && ((length = in.read(bbuf)) != -1)) {
+                    op.write(bbuf, 0, length);
+                }
+
+                in.close();
+                op.flush();
+                op.close();
+            } catch (Exception ee) {
+                ee.printStackTrace();
+            } finally {
+                if(in != null){
+                    in.close();
+                }
+                if(op != null){
+                    op.close();
+                }
+            }
         }
 
     }
 
-    private CoreResources getCoreResources() {
-        return (CoreResources) SpringServletAccess.getApplicationContext(context).getBean("coreResources");
-    }
-
 }
+
+
