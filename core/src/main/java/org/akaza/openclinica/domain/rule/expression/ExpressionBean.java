@@ -78,4 +78,10 @@ public class ExpressionBean extends AbstractAuditableMutableDomainObject {
         this.contextName = contextName;
         this.context = Context.getByName(contextName);
     }
+
+    @Override
+    public String toString() {
+        return "ExpressionBean [context=" + context + ", contextName=" + contextName + ", value=" + value + "]";
+    }
+
 }

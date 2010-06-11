@@ -48,4 +48,9 @@ public class PropertyBean extends AbstractMutableDomainObject {
         this.valueExpression = valueExpression;
     }
 
+    @Override
+    public String toString() {
+        return "PropertyBean [oid=" + oid + ", value=" + value + ", valueExpression=" + valueExpression + "]";
+    }
+
 }
