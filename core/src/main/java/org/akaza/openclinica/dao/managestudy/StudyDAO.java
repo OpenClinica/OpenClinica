@@ -177,6 +177,7 @@ public class StudyDAO extends AuditableEntityDAO {
         this.setTypeExpected(54, TypeNames.BOOL);// results_reference
         this.setTypeExpected(55, TypeNames.STRING);// oc oid
         // this.setTypeExpected(56, TypeNames.BOOL);//discrepancy_management
+        this.setTypeExpected(56, TypeNames.INT);
     }
 
     /**
@@ -254,9 +255,10 @@ public class StudyDAO extends AuditableEntityDAO {
         variables.put(new Integer(21), new Integer(sb.getUpdaterId()));// owner
         // id
         variables.put(new Integer(22), sb.getUpdatedDate());// date updated
+        variables.put(new Integer(23), new Integer(sb.getOldStatus().getId()));// study id
         // variables.put(new Integer(22), new Integer(1));
         // stop gap measure for owner and updater id
-        variables.put(new Integer(23), new Integer(sb.getId()));// study id
+        variables.put(new Integer(24), new Integer(sb.getId()));// study id
         this.execute(digester.getQuery("updateStepOne"), variables, nullVars);
         return sb;
     }
@@ -621,7 +623,8 @@ public class StudyDAO extends AuditableEntityDAO {
         // jxu
         eb.setStatus(Status.get(statusId.intValue()));
         eb.setOid((String) hm.get("oc_oid"));
-
+        Integer oldStatusId = (Integer) hm.get("old_status_id");
+        eb.setOldStatus(Status.get(oldStatusId));
         return eb;
     }
 
@@ -940,7 +943,8 @@ public class StudyDAO extends AuditableEntityDAO {
         HashMap nullVars = new HashMap();
 
         variables.put(new Integer(1), sb.getStatus().getId());
-        variables.put(new Integer(2), sb.getId());
+        variables.put(new Integer(2), sb.getOldStatus().getId());
+        variables.put(new Integer(3), sb.getId());
 
         this.execute(digester.getQuery("updateSitesStatus"), variables, nullVars);
         return sb;
@@ -951,7 +955,9 @@ public class StudyDAO extends AuditableEntityDAO {
         HashMap nullVars = new HashMap();
 
         variables.put(new Integer(1), sb.getStatus().getId());
-        variables.put(new Integer(2), sb.getId());
+        variables.put(new Integer(2), sb.getOldStatus().getId());
+        variables.put(new Integer(3), sb.getId());
+
 
         this.execute(digester.getQuery("updateStudyStatus"), variables, nullVars);
         return sb;

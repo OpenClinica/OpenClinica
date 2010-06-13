@@ -72,6 +72,7 @@ public class StudyBean extends AuditableEntityBean {
     private String collaborators = "";
     private String medlineIdentifier = "";
     private boolean resultsReference = false;
+    private Status oldStatus;
     // private boolean usingDOB = false;
     // private boolean discrepancyManagement = false;
     private String oid;
@@ -1086,5 +1087,13 @@ public class StudyBean extends AuditableEntityBean {
 
     public boolean isSite(int parentStudyId) {
         return parentStudyId > 0 ? true : false;
+    }
+
+    public Status getOldStatus() {
+        return oldStatus;
+    }
+
+    public void setOldStatus(Status oldStatus) {
+        this.oldStatus = oldStatus;
     }
 }

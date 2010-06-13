@@ -104,7 +104,7 @@
   &nbsp;&nbsp;&nbsp;
   <div style="border: 1px solid #ccc; width:70%; padding:5px 0px 5px 5px;">
       <fmt:message key="set_study_status" bundle="${resword}"/> &nbsp;
-      <select name="studyStatus">
+      <select name="studyStatus" <c:if test="${parentStudy!=null && parentStudy.status.id!=1}">disabled="true"</c:if>>
           <c:forEach var="status" items="${statusMap}">
            <c:choose>
             <c:when test="${currentStudy.status.id == status.id}">

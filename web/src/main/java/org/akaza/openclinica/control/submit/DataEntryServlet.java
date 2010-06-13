@@ -537,6 +537,7 @@ public abstract class DataEntryServlet extends SecureController {
             request.setAttribute(BEAN_ANNOTATIONS, getEventCRFAnnotations());
             session.setAttribute("shouldRunValidation", null);
             session.setAttribute("rulesErrors", null);
+            session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, null);
 
             discNotes = new FormDiscrepancyNotes();
             //            discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
@@ -619,9 +620,15 @@ public abstract class DataEntryServlet extends SecureController {
                     // for the items in groups
                     DisplayItemGroupBean dgb = diwg.getItemGroup();
                     List<DisplayItemGroupBean> dbGroups = diwg.getDbItemGroups();
-                    logger.trace("got db item group size " + dbGroups.size());
+                    //dbGroups = diwg.getItemGroups();
                     List<DisplayItemGroupBean> formGroups = new ArrayList<DisplayItemGroupBean>();
+                    // List<DisplayItemGroupBean> dbGroups2 = loadFormValueForItemGroup(dgb, dbGroups, formGroups, eventDefinitionCRFId);
+                    // tbh 01/2010 change here to collect manual row counts
+                    logger.info("got db item group size " + dbGroups.size());
+
                     if (validate) {
+                        // int manualGroups = getManualRows(dbGroups2);
+                        // logger.info("+++ found manual rows from db group 2: " + manualGroups);
                         logger.debug("===IF VALIDATE NOT A SINGLE ITEM: got to this part in the validation loop: " + dgb.getGroupMetaBean().getName());
                         // TODO next marker tbh 112007
                         // formGroups = validateDisplayItemGroupBean(v,
@@ -714,10 +721,15 @@ public abstract class DataEntryServlet extends SecureController {
                     // for the items in groups
                     DisplayItemGroupBean dgb = diwg.getItemGroup();
                     List<DisplayItemGroupBean> dbGroups = diwg.getDbItemGroups();
+                    //dbGroups = diwg.getItemGroups();
+                    // tbh 01/2010 change the group list?
                     List<DisplayItemGroupBean> formGroups = new ArrayList<DisplayItemGroupBean>();
+                    // List<DisplayItemGroupBean> dbGroups2 = loadFormValueForItemGroup(dgb, dbGroups, formGroups, eventDefinitionCRFId);
                     // jxu- this part need to be refined, why need to validate
                     // items again?
                     if (validate) {
+                        // int manualGroups = getManualRows(dbGroups2);
+                        // logger.info("+++ found manual rows for db group2: " + manualGroups);
                         formGroups = validateDisplayItemGroupBean(v, dgb, dbGroups, formGroups, ruleValidator, groupOrdinalPLusItemOid);
                         // formGroups = validateDisplayItemGroupBean(v, dgb,
                         // dbGroups, formGroups);
@@ -1116,7 +1128,7 @@ public abstract class DataEntryServlet extends SecureController {
                                 } else {
                                     testFormName = getGroupItemManualInputName(dgb, dgb.getFormInputOrdinal(), displayItem);
                                 }
-                                logger.debug("found test form name: " + testFormName);
+                                System.out.println("found test form name: " + testFormName);
                                 // if our test is the same with both the display
                                 // item and the display group ...
                                 // logger.debug("comparing " +
@@ -1126,7 +1138,7 @@ public abstract class DataEntryServlet extends SecureController {
                                     formName = formName2;
                                     this.setReasonForChangeError(idb, formName, error);
                                     changedItemsMap.remove(formName2);
-                                    logger.debug("form name changed: " + formName);
+                                    System.out.println("form name changed: " + formName);
                                     break;
                                     // .., send it as the form name
                                 }
@@ -1211,11 +1223,20 @@ public abstract class DataEntryServlet extends SecureController {
                     String fieldName = iter2.next().toString();
                     logger.debug("found error " + fieldName);
                 }
+                //                for (int i = 0; i < allItems.size(); i++) {
+                //                    DisplayItemWithGroupBean diwb = allItems.get(i);
+                //
+                //                    if (diwb.isInGroup()) {
+                //                        List<DisplayItemGroupBean> dgbs = diwb.getItemGroups();
+                //                        logger.debug("found manual rows " + getManualRows(dgbs) + " and total rows " + dgbs.size() + " from ordinal " + diwb.getOrdinal());
+                //                    }
+                //                }
 
-                errors = reshuffleErrorGroupNames(errors, allItems);
+                errors = reshuffleErrorGroupNamesKK(errors, allItems);
                 // reset manual rows, so that we can catch errors correctly
                 // but it needs to be set per block of repeating items?  what if there are two or more?
 
+                /*
                 int manualRows = 0; // getManualRows(formGroups);
                 for (int i = 0; i < allItems.size(); i++) {
                     DisplayItemWithGroupBean diwb = allItems.get(i);
@@ -1225,14 +1246,14 @@ public abstract class DataEntryServlet extends SecureController {
                         manualRows = getManualRows(dgbs);
                     }
                 }
-                request.setAttribute("manualRows", new Integer(manualRows));
+                */
+                //request.setAttribute("manualRows", new Integer(manualRows));
                 Iterator iter3 = errors.keySet().iterator();
                 while (iter3.hasNext()) {
                     String fieldName = iter3.next().toString();
                     logger.debug("found error after shuffle " + fieldName);
                 }
                 // << tbh, 02/2010
-
                 // YW >>
                 // copied
                 request.setAttribute(BEAN_DISPLAY, section);
@@ -1336,6 +1357,7 @@ public abstract class DataEntryServlet extends SecureController {
                     if (diwb.isInGroup()) {
 
                         List<DisplayItemGroupBean> dgbs = diwb.getItemGroups();
+                        // using the above gets us the correct number of manual groups, tbh 01/2010
                         List<DisplayItemGroupBean> dbGroups = diwb.getDbItemGroups();
                         logger.debug("item group size: " + dgbs.size());
                         logger.debug("item db-group size: " + dbGroups.size());
@@ -1372,8 +1394,8 @@ public abstract class DataEntryServlet extends SecureController {
                                 if (j == dgbs.size() - 1) {
                                     // LAST ONE
                                     logger.trace("last one");
-
                                     int ordinal = j - this.getManualRows(dgbs);
+                                    logger.info("+++ found manual rows from line 1326: " + ordinal);
                                     inputName = getGroupItemInputName(displayGroup, ordinal, displayItem);
                                 }
                                 // logger.trace("&&& we get previous looking at input name: " + inputName + " " + inputName2);
@@ -1766,12 +1788,14 @@ public abstract class DataEntryServlet extends SecureController {
         HashMap idNotes = fdn.getIdNotes();
         int existingNotes = dndao.findNumExistingNotesForItem(idb.getId());
         if (existingNotes > 0) {
+
             logger.debug("has a note in db " + formName);
+
             /*
              * Having existing notes is not enough to let it pass through after changing data. There has to be a DiscrepancyNote for the latest changed data
              */
-            Object noteSubmitted = session.getAttribute(DataEntryServlet.NOTE_SUBMITTED);
-            if (noteSubmitted == null || !(Boolean) noteSubmitted) {
+            HashMap<Integer, Boolean> noteSubmitted = (HashMap<Integer, Boolean>) session.getAttribute(DataEntryServlet.NOTE_SUBMITTED);
+            if (noteSubmitted == null || noteSubmitted.get(idb.getId()) == null || !(Boolean) noteSubmitted.get(idb.getId())) {
                 boolean hasRfcAlready = false;
                 ArrayList<DiscrepancyNoteBean> notes = dndao.findExistingNotesForItemData(idb.getId());
                 for (DiscrepancyNoteBean note : notes) {
@@ -1785,6 +1809,7 @@ public abstract class DataEntryServlet extends SecureController {
                 }
             } else {
                 logger.debug("found note in session");
+                logger.debug("has a note in db: entered an error here: " + formName + ": " + errors.toString());
             }
 
             // session.removeAttribute(DataEntryServlet.NOTE_SUBMITTED);
@@ -2166,6 +2191,7 @@ public abstract class DataEntryServlet extends SecureController {
                 formGroup.setOrdinal(i);
                 formGroup.setFormInputOrdinal(i);
                 formGroup.setAuto(false);
+                formGroup.setInputId(igb.getOid() + "_manual" + i);
                 logger.debug("1: set auto to false for " + igb.getOid() + " " + i);
 
                 dibs = processInputForGroupItem(fp, dibs, i, digb, false);
@@ -2179,6 +2205,7 @@ public abstract class DataEntryServlet extends SecureController {
                 // repetition javascript
                 formGroup.setOrdinal(i);
                 formGroup.setFormInputOrdinal(i);
+                formGroup.setInputId(igb.getOid() + "_manual" + i + ".newRow");
 
                 formGroup.setAuto(false);
 
@@ -2255,6 +2282,7 @@ public abstract class DataEntryServlet extends SecureController {
             // row and any new rows
             // created by rep model(add button)
             if (fp.getStartsWith(igb.getOid() + "_" + i + "input")) {
+                formGroup.setInputId(igb.getOid() + "_" + i);
                 if (i == 0) {
                     formGroup.setOrdinal(i);// ordinal that will be saved into
                     // DB
@@ -2275,6 +2303,7 @@ public abstract class DataEntryServlet extends SecureController {
                 // || (fp.getStartsWith(igb.getOid() + "_" + i + "input"))) {
                 // the ordinal is the number got from [ ] and submitted by
                 // repetition javascript
+                formGroup.setInputId(igb.getOid() + "_" + i);
                 if (i == 0) {
                     formGroup.setOrdinal(i);// ordinal that will be saved into
                     // DB
@@ -2437,6 +2466,10 @@ public abstract class DataEntryServlet extends SecureController {
 
         }
         logger.debug("+++ about to return form groups: " + formGroups.toString());
+        for (int j = 0; j < formGroups.size(); j++) {
+            DisplayItemGroupBean formGroup = formGroups.get(j);
+            formGroup.setIndex(j);
+        }
         return formGroups;
     }
 
@@ -2786,6 +2819,35 @@ public abstract class DataEntryServlet extends SecureController {
                 idb.setUpdater(ub);
                 idb.setStatus(Status.DELETED);
                 idb = (ItemDataBean) iddao.updateValue(idb);
+
+                DiscrepancyNoteDAO dnDao = new DiscrepancyNoteDAO(sm.getDataSource());
+                List dnNotesOfRemovedItem = dnDao.findExistingNotesForItemData(idb.getId());
+                if (!dnNotesOfRemovedItem.isEmpty()) {
+                    DiscrepancyNoteBean itemParentNote = null;
+                    for (Object obj : dnNotesOfRemovedItem) {
+                        if (((DiscrepancyNoteBean) obj).getParentDnId() == 0) {
+                            itemParentNote = (DiscrepancyNoteBean) obj;
+                        }
+                    }
+                    DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
+                    if (itemParentNote != null) {
+                        dnb.setParentDnId(itemParentNote.getId());
+                        dnb.setDiscrepancyNoteTypeId(itemParentNote.getDiscrepancyNoteTypeId());
+                    }
+                    dnb.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
+                    dnb.setStudyId(currentStudy.getId());
+                    dnb.setAssignedUserId(ub.getId());
+                    dnb.setOwner(ub);
+                    dnb.setEntityType(DiscrepancyNoteBean.ITEM_DATA);
+                    dnb.setEntityId(idb.getId());
+                    dnb.setCreatedDate(new Date());
+                    dnb.setColumn("value");
+                    dnb.setDescription("The item has been removed, this Discrepancy Note has been Closed.");
+                    dnDao.create(dnb);
+                    dnDao.createMapping(dnb);
+                    itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
+                    dnDao.update(itemParentNote);
+                }
             }
 
         }
@@ -2923,7 +2985,7 @@ public abstract class DataEntryServlet extends SecureController {
 
         // get all the parent display item beans not in group
         ArrayList displayItems = getParentDisplayItems(hasGroup, sb, edcb, idao, ifmdao, iddao, hasUngroupedItems);
-
+        logger.debug("just ran get parent display, has group " + hasGroup + " has ungrouped " + hasUngroupedItems);
         // now sort them by ordinal
         Collections.sort(displayItems);
 
@@ -2997,6 +3059,7 @@ public abstract class DataEntryServlet extends SecureController {
             // get all the display item beans
             ArrayList displayItems = getParentDisplayItems(false, sb, edcb, idao, ifmdao, iddao, false);
 
+            logger.debug("222 just ran get parent display, has group " + " FALSE has ungrouped FALSE");
             // now sort them by ordinal
             Collections.sort(displayItems);
 
@@ -3032,6 +3095,7 @@ public abstract class DataEntryServlet extends SecureController {
      */
     private ArrayList getParentDisplayItems(boolean hasGroup, SectionBean sb, EventDefinitionCRFBean edcb, ItemDAO idao, ItemFormMetadataDAO ifmdao,
             ItemDataDAO iddao, boolean hasUngroupedItems) throws Exception {
+
         ArrayList answer = new ArrayList();
 
         // DisplayItemBean objects are composed of an ItemBean, ItemDataBean and
@@ -3055,11 +3119,15 @@ public abstract class DataEntryServlet extends SecureController {
             if (hasUngroupedItems) {
                 items = idao.findAllUngroupedParentsBySectionId(sb.getId(), sb.getCRFVersionId());
             }
+            // however, if we have true:true, we exclude all grouped items
+            //            items.addAll(
+            //            		idao.findAllGroupedParentsBySectionId(
+            //            				sb.getId(), sb.getCRFVersionId()));
         } else {
             logger.trace("no item groups");
             items = idao.findAllParentsBySectionId(sb.getId());
         }
-        // logger.trace("items size" + items.size());
+        logger.debug("items size" + items.size());
         for (int i = 0; i < items.size(); i++) {
             DisplayItemBean dib = new DisplayItemBean();
             dib.setEventDefinitionCRF(edcb);
@@ -3697,19 +3765,6 @@ public abstract class DataEntryServlet extends SecureController {
         // method returns null values as a List<String>
         nullValuesList = formBeanUtil.getNullValuesByEventCRFDefId(eventCRFDefId, sm.getDataSource());
         // >>BWP
-        // ArrayList metadata = ifmdao.findAllBySectionId(sb.getId());
-        // for (int i = 0; i < metadata.size(); i++) {
-        // ItemFormMetadataBean ifmb = (ItemFormMetadataBean) metadata.get(i);
-        // DisplayItemBean dib = (DisplayItemBean) displayItems.get(new
-        // Integer(ifmb.getItemId()));
-        // if (dib != null) {
-        // dib.setMetadata(ifmb);
-        // displayItems.put(new Integer(ifmb.getItemId()), dib);
-        // }
-        // }
-
-        // logger.trace("set with nullValuesList of : " +
-        // nullValuesList.toString());
         ArrayList items = dsb.getItems();
         logger.trace("single items size: " + items.size());
         for (int i = 0; i < items.size(); i++) {
@@ -3741,11 +3796,27 @@ public abstract class DataEntryServlet extends SecureController {
             logger.trace("data.toString: " + data.toString());
 
             for (DisplayItemGroupBean itemGroup : dsb.getDisplayFormGroups()) {
+                logger.debug("found one itemGroup");
                 DisplayItemWithGroupBean newOne = new DisplayItemWithGroupBean();
                 // to arrange item groups and other single items, the ordinal of
                 // a item group will be the ordinal of the first item in this
                 // group
                 DisplayItemBean firstItem = itemGroup.getItems().get(0);
+                DisplayItemBean checkItem = firstItem;
+                // does not work if there is not any data in the first item of the group
+                // i.e. imports.
+                // does it make a difference if we take a last item? 
+                boolean noNeedToSwitch = false;
+                for (int i = 0; i < data.size(); i++) {
+                    ItemDataBean idb = (ItemDataBean) data.get(i);
+                    if (idb.getItemId() == firstItem.getItem().getId()) {
+                        noNeedToSwitch = true;
+                    }
+                }
+                if (!noNeedToSwitch) {
+                    checkItem = itemGroup.getItems().get(itemGroup.getItems().size() - 1);
+                }
+                // so we are either checking the first or the last item, BUT ONLY ONCE
                 newOne.setPageNumberLabel(firstItem.getMetadata().getPageNumberLabel());
 
                 newOne.setItemGroup(itemGroup);
@@ -3755,13 +3826,19 @@ public abstract class DataEntryServlet extends SecureController {
                 List<ItemBean> itBeans = idao.findAllItemsByGroupId(itemGroup.getItemGroupBean().getId(), sb.getCRFVersionId());
 
                 boolean hasData = false;
+                int checkAllColumns = 0;
                 // if a group has repetitions, the number of data of
                 // first item should be same as the row number
                 for (int i = 0; i < data.size(); i++) {
                     ItemDataBean idb = (ItemDataBean) data.get(i);
-                    if (idb.getItemId() == firstItem.getItem().getId()) {
+
+                    logger.debug("check all columns: " + checkAllColumns);
+                    if (idb.getItemId() == checkItem.getItem().getId()) {
                         hasData = true;
                         logger.debug("set has data to --TRUE--");
+                        checkAllColumns = 0;
+                        // so that we only fire once a row
+                        logger.debug("has data set to true");
                         DisplayItemGroupBean digb = new DisplayItemGroupBean();
                         // always get a fresh copy for items, may use other
                         // better way to
@@ -3774,7 +3851,6 @@ public abstract class DataEntryServlet extends SecureController {
                         digb.setItemGroupBean(itemGroup.getItemGroupBean());
                         newOne.getItemGroups().add(digb);
                         newOne.getDbItemGroups().add(digb);
-
                     }
                 }
 
@@ -3794,11 +3870,12 @@ public abstract class DataEntryServlet extends SecureController {
                                     idb.setSelected(true);
                                     dib.setData(idb);
                                     logger.debug("--> set data " + idb.getId() + ": " + idb.getValue());
+
                                     if (shouldLoadDBValues(dib)) {
-                                        logger.trace("+++should load db values is true, set value");
+                                        logger.debug("+++should load db values is true, set value");
                                         dib.loadDBValue();
-                                        logger.trace("+++data loaded: " + idb.getName() + ": " + idb.getOrdinal() + " " + idb.getValue());
-                                        logger.trace("+++try dib OID: " + dib.getItem().getOid());
+                                        logger.debug("+++data loaded: " + idb.getName() + ": " + idb.getOrdinal() + " " + idb.getValue());
+                                        logger.debug("+++try dib OID: " + dib.getItem().getOid());
                                     }
                                     break;
                                 }
@@ -3809,15 +3886,15 @@ public abstract class DataEntryServlet extends SecureController {
                 } else {
                     session.setAttribute(GROUP_HAS_DATA, Boolean.FALSE);
                     // no data, still add a blank row for displaying
-                    DisplayItemGroupBean digb = new DisplayItemGroupBean();
+                    DisplayItemGroupBean digb2 = new DisplayItemGroupBean();
                     List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, sm.getDataSource(), ecb, sb.getId(), nullValuesList, context);
-                    digb.setItems(dibs);
+                    digb2.setItems(dibs);
                     logger.trace("set with nullValuesList of : " + nullValuesList);
-                    digb.setEditFlag("initial");
-                    digb.setGroupMetaBean(runDynamicsCheck(itemGroup.getGroupMetaBean()));
-                    digb.setItemGroupBean(itemGroup.getItemGroupBean());
-                    newOne.getItemGroups().add(digb);
-                    newOne.getDbItemGroups().add(digb);
+                    digb2.setEditFlag("initial");
+                    digb2.setGroupMetaBean(itemGroup.getGroupMetaBean());
+                    digb2.setItemGroupBean(itemGroup.getItemGroupBean());
+                    newOne.getItemGroups().add(digb2);
+                    newOne.getDbItemGroups().add(digb2);
 
                 }
 
@@ -3890,7 +3967,7 @@ public abstract class DataEntryServlet extends SecureController {
      */
     public final String getGroupItemManualInputName(DisplayItemGroupBean digb, int ordinal, DisplayItemBean dib) {
         String inputName = digb.getItemGroupBean().getOid() + "_manual" + ordinal + getInputName(dib);
-        logger.trace("returning manual: " + inputName);
+        logger.info("+++ returning manual: " + inputName);
         return inputName;
     }
 
@@ -4211,10 +4288,9 @@ public abstract class DataEntryServlet extends SecureController {
             // Items in repeating groups
             for (DisplayItemGroupBean itemGroupBean : displayItemWithGroupBean.getItemGroups()) {
                 logger.debug("Item Group Name : {} , Item Group OID : {} , Ordinal : {} ", new Object[] { itemGroupBean.getItemGroupBean().getName(),
-                    itemGroupBean.getItemGroupBean().getOid(), itemGroupBean.getFormInputOrdinal() });
+                    itemGroupBean.getItemGroupBean().getOid(), itemGroupBean.getIndex() });
                 for (DisplayItemBean displayItemBean : itemGroupBean.getItems()) {
-                    String key1 =
-                        itemGroupBean.getItemGroupBean().getOid() + "[" + (itemGroupBean.getFormInputOrdinal() + 1) + "]." + displayItemBean.getItem().getOid();
+                    String key1 = itemGroupBean.getItemGroupBean().getOid() + "[" + (itemGroupBean.getIndex() + 1) + "]." + displayItemBean.getItem().getOid();
                     String key = itemGroupBean.getItemGroupBean().getOid() + "." + displayItemBean.getItem().getOid();
                     c.variableAndValue.put(key1, ifValueIsDate(displayItemBean.getItem(), displayItemBean.getData().getValue(), dryRun));
                     if (c.grouped.containsKey(key)) {
@@ -4340,17 +4416,75 @@ public abstract class DataEntryServlet extends SecureController {
         }
     }
 
-    private int getManualRows(List<DisplayItemGroupBean> formGroups) {
+    public int getManualRows(List<DisplayItemGroupBean> formGroups) {
         int manualRows = 0;
         for (int j = 0; j < formGroups.size(); j++) {
             DisplayItemGroupBean formItemGroup = formGroups.get(j);
-            // logger.trace("begin formGroup Ordinal:" +
-            // formItemGroup.getOrdinal());
+            logger.debug("begin formGroup Ordinal:" + formItemGroup.getOrdinal());
+
             if (formItemGroup.isAuto() == false) {
                 manualRows = manualRows + 1;
             }
+
         }
+        logger.debug("+++ returning manual rows: " + manualRows + " from a form group size of " + formGroups.size());
+        // logger.debug("+++ returning manual rows: " + manualRows + " from a form group size of " + formGroups.size());
         return manualRows;
+    }
+
+    private HashMap reshuffleErrorGroupNamesKK(HashMap errors, List<DisplayItemWithGroupBean> allItems) {
+        int manualRows = 0;
+        for (int i = 0; i < allItems.size(); i++) {
+            DisplayItemWithGroupBean diwb = allItems.get(i);
+
+            if (diwb.isInGroup()) {
+                List<DisplayItemGroupBean> dgbs = diwb.getItemGroups();
+                for (int j = 0; j < dgbs.size(); j++) {
+                    DisplayItemGroupBean digb = dgbs.get(j);
+
+                    ItemGroupBean igb = digb.getItemGroupBean();
+                    List<DisplayItemBean> dibs = digb.getItems();
+
+                    if (j == 0) { // first repeat
+                        for (DisplayItemBean dib : dibs) {
+                            String intendedKey = digb.getInputId() + getInputName(dib);
+                            String replacementKey = digb.getItemGroupBean().getOid() + "_" + j + getInputName(dib);
+                            if (!replacementKey.equals(intendedKey) && errors.containsKey(intendedKey)) {
+                                // String errorMessage = (String)errors.get(intendedKey);
+                                errors.put(replacementKey, errors.get(intendedKey));
+                                errors.remove(intendedKey);
+                                logger.debug("removing: " + intendedKey + " and replacing it with " + replacementKey);
+                            }
+                        }
+                    } else if (j == dgbs.size() - 1) { // last repeat
+                        for (DisplayItemBean dib : dibs) {
+                            String intendedKey = digb.getInputId() + getInputName(dib);
+                            String replacementKey = digb.getItemGroupBean().getOid() + "_1" + getInputName(dib);
+                            if (!replacementKey.equals(intendedKey) && errors.containsKey(intendedKey)) {
+                                // String errorMessage = (String)errors.get(intendedKey);
+                                errors.put(replacementKey, errors.get(intendedKey));
+                                errors.remove(intendedKey);
+                                logger.debug("removing: " + intendedKey + " and replacing it with " + replacementKey);
+                            }
+                        }
+                    } else { // everything in between
+                        manualRows++;
+                        for (DisplayItemBean dib : dibs) {
+                            String intendedKey = digb.getInputId() + getInputName(dib);
+                            String replacementKey = digb.getItemGroupBean().getOid() + "_manual" + j + getInputName(dib);
+                            if (!replacementKey.equals(intendedKey) && errors.containsKey(intendedKey)) {
+                                // String errorMessage = (String)errors.get(intendedKey);
+                                errors.put(replacementKey, errors.get(intendedKey));
+                                errors.remove(intendedKey);
+                                logger.debug("removing: " + intendedKey + " and replacing it with " + replacementKey);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        request.setAttribute("manualRows", new Integer(manualRows));
+        return errors;
     }
 
     private HashMap reshuffleErrorGroupNames(HashMap errors, List<DisplayItemWithGroupBean> allItems) {

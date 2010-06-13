@@ -114,6 +114,7 @@ public class RulesPostImportContainerService {
                     ruleBeanWrapper.getAuditableBean().setName(name);
                     ruleBeanWrapper.getAuditableBean().getExpression().setValue(expressionValue);
                     ruleBeanWrapper.getAuditableBean().getExpression().setContext(context);
+                    doesPersistentRuleBeanBelongToCurrentStudy(ruleBeanWrapper);
                     // ruleBeanWrapper.getAuditableBean().setId(persistentRuleBean.getId());
                     // ruleBeanWrapper.getAuditableBean().getExpression().setId(persistentRuleBean.getExpression().getId());
                 }
@@ -290,6 +291,16 @@ public class RulesPostImportContainerService {
         return isValid;
     }
 
+    private boolean doesPersistentRuleBeanBelongToCurrentStudy(AuditableBeanWrapper<RuleBean> ruleBeanWrapper) {
+        boolean isValid = true;
+        int studyId = ruleBeanWrapper.getAuditableBean().getRuleSetRules().get(0).getRuleSetBean().getStudyId();
+        if (studyId != currentStudy.getId()) {
+            ruleBeanWrapper.error("The RuleDef OID you specified is used in a different study, please provide a new RuleDef OID.");
+            isValid = false;
+        }
+        return isValid;
+    }
+
     /**
      * @return the ruleDao
      */
@@ -343,6 +354,8 @@ public class RulesPostImportContainerService {
     private ExpressionService getExpressionService() {
         expressionService =
             this.expressionService != null ? expressionService : new ExpressionService(new ExpressionObjectWrapper(ds, currentStudy, null, null));
+        expressionService.setExpressionWrapper(new ExpressionObjectWrapper(ds, currentStudy, null, null));
+
         return expressionService;
     }
 }

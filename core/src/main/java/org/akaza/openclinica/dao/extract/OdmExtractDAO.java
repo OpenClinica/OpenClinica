@@ -7,18 +7,6 @@
  */
 package org.akaza.openclinica.dao.extract;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Set;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -67,6 +55,18 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.logic.odmExport.ClinicalDataUnit;
 import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
 import org.akaza.openclinica.logic.odmExport.MetadataUnit;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Set;
+
+import javax.sql.DataSource;
 
 /**
  * Fetch odm data from database and load odm related classes.
@@ -236,7 +236,7 @@ public class OdmExtractDAO extends DatasetDAO {
         this.unsetTypeExpected();
         int i = 1;
         this.setTypeExpected(i, TypeNames.STRING); // study_event_definition
-                                                   // oc_oid
+        // oc_oid
         ++i;
         this.setTypeExpected(i, TypeNames.STRING); // crf_version oc_oid
         ++i;
@@ -366,7 +366,7 @@ public class OdmExtractDAO extends DatasetDAO {
         ++i;
         this.setTypeExpected(i, TypeNames.STRING); // discrepancy_note_type.name
     }
-    
+
     public void setOCEventDataDNsTypesExpected() {
         this.unsetTypeExpected();
         int i = 1;
@@ -390,7 +390,7 @@ public class OdmExtractDAO extends DatasetDAO {
         ++i;
         this.setTypeExpected(i, TypeNames.STRING); // discrepancy_note_type.name
     }
-    
+
     public void setOCFormDataDNsTypesExpected() {
         this.unsetTypeExpected();
         int i = 1;
@@ -412,7 +412,7 @@ public class OdmExtractDAO extends DatasetDAO {
         ++i;
         this.setTypeExpected(i, TypeNames.STRING); // discrepancy_note_type.name
     }
-    
+
     public void setOCItemDataDNsTypesExpected() {
         this.unsetTypeExpected();
         int i = 1;
@@ -434,7 +434,7 @@ public class OdmExtractDAO extends DatasetDAO {
         ++i;
         this.setTypeExpected(i, TypeNames.STRING); // discrepancy_note_type.name
     }
-    
+
     public void getBasicDefinitions(int studyId, BasicDefinitionsBean basicDef) {
         ArrayList<MeasurementUnitBean> units = basicDef.getMeasurementUnits();
         String uprev = "";
@@ -971,7 +971,7 @@ public class OdmExtractDAO extends DatasetDAO {
         return nullValueCVs;
     }
 
-    public void getClinicalData(StudyBean study, DatasetBean dataset, OdmClinicalDataBean data, String odmVersion) {
+    public void getClinicalData(StudyBean study, DatasetBean dataset, OdmClinicalDataBean data, String odmVersion, String studySubjectIds) {
         String dbName = CoreResources.getDBName();
         String subprev = "";
         HashMap<String, Integer> sepos = new HashMap<String, Integer>();
@@ -1013,15 +1013,16 @@ public class OdmExtractDAO extends DatasetDAO {
         }
         logger.debug("Begin to GetSubjectEventFormSql");
         if (odmVersion.startsWith("oc")) {
-            logger.error("getOCSubjectEventFormSql=" + getOCSubjectEventFormSql(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId));
+            logger.error("getOCSubjectEventFormSql="
+                + getOCSubjectEventFormSqlSS(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds));
             this.setSubjectEventFormDataTypesExpected(odmVersion);
-            ArrayList viewRows = select(getOCSubjectEventFormSql(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId));
+            ArrayList viewRows = select(getOCSubjectEventFormSqlSS(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds));
             Iterator iter = viewRows.iterator();
             this.setDataWithOCAttributes(study, dataset, data, odmVersion, iter, oidPoses);
         } else {
-            logger.error("getSubjectEventFormSql=" + getSubjectEventFormSql(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId));
+            logger.error("getSubjectEventFormSql=" + getSubjectEventFormSqlSS(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds));
             this.setSubjectEventFormDataTypesExpected();
-            ArrayList viewRows = select(getSubjectEventFormSql(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId));
+            ArrayList viewRows = select(getSubjectEventFormSqlSS(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds));
             Iterator iter = viewRows.iterator();
             // if any algorithm modification has been done in this block,
             // the method "setDataWithOCAttributes" should be checked about the
@@ -1210,7 +1211,7 @@ public class OdmExtractDAO extends DatasetDAO {
         }
 
         if (odmVersion.startsWith("oc")) {
-            idataIds = idataIds.length()>0?idataIds.substring(0, idataIds.length()-2):idataIds;
+            idataIds = idataIds.length() > 0 ? idataIds.substring(0, idataIds.length() - 2) : idataIds;
             setOCItemDataAuditLogs(study, data, idataIds, idataOidPoses);
             setOCItemDataDNs(data, idataIds, idataOidPoses);
         }
@@ -1235,22 +1236,22 @@ public class OdmExtractDAO extends DatasetDAO {
             Integer typeId = (Integer) row.get("audit_log_event_type_id");
 
             if (subOidPoses.containsKey(studySubjectLabel)) {
-                
+
                 ExportSubjectDataBean sub = data.getExportSubjectData().get(Integer.parseInt(subOidPoses.get(studySubjectLabel)));
                 AuditLogBean auditLog = new AuditLogBean();
-                auditLog.setOid("AL_"+auditId);
+                auditLog.setOid("AL_" + auditId);
                 auditLog.setUserId("USR_" + userId);
-                System.out.println("datatime=" + auditDate+" or " + new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(auditDate));
+                System.out.println("datatime=" + auditDate + " or " + new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(auditDate));
                 auditLog.setDatetimeStamp(auditDate);
                 auditLog.setType(type);
                 auditLog.setReasonForChange(auditReason);
-                if(typeId==3||typeId==6) {
-                    if("0".equals(newValue)) {
+                if (typeId == 3 || typeId == 6) {
+                    if ("0".equals(newValue)) {
                         auditLog.setOldValue(Status.INVALID.getName());
                     } else {
                         auditLog.setNewValue(Status.getFromMap(Integer.parseInt(newValue)).getName());
                     }
-                    if("0".equals(oldValue)) {
+                    if ("0".equals(oldValue)) {
                         auditLog.setOldValue(Status.INVALID.getName());
                     } else {
                         auditLog.setOldValue(Status.getFromMap(Integer.parseInt(oldValue)).getName());
@@ -1260,7 +1261,7 @@ public class OdmExtractDAO extends DatasetDAO {
                     auditLog.setOldValue(oldValue);
                 }
                 AuditLogsBean logs = sub.getAuditLogs();
-                if(logs.getEntityID()==null || logs.getEntityID().length()<=0) {
+                if (logs.getEntityID() == null || logs.getEntityID().length() <= 0) {
                     logs.setEntityID(sub.getSubjectOID());
                 }
                 logs.getAuditLogs().add(auditLog);
@@ -1293,18 +1294,18 @@ public class OdmExtractDAO extends DatasetDAO {
                 ExportStudyEventDataBean se =
                     data.getExportSubjectData().get(Integer.parseInt(poses[0])).getExportStudyEventData().get(Integer.parseInt(poses[1]));
                 AuditLogBean auditLog = new AuditLogBean();
-                auditLog.setOid("AL_"+auditId);
-                auditLog.setUserId("USR_"+userId);
+                auditLog.setOid("AL_" + auditId);
+                auditLog.setUserId("USR_" + userId);
                 auditLog.setDatetimeStamp(auditDate);
                 auditLog.setType(type);
                 auditLog.setReasonForChange(auditReason);
-                if(typeId==17||typeId==18||typeId==19||typeId==20||typeId==21||typeId==22||typeId==23||typeId==31) {
-                    if("0".equals(newValue)) {
+                if (typeId == 17 || typeId == 18 || typeId == 19 || typeId == 20 || typeId == 21 || typeId == 22 || typeId == 23 || typeId == 31) {
+                    if ("0".equals(newValue)) {
                         auditLog.setOldValue(SubjectEventStatus.INVALID.getName());
                     } else {
                         auditLog.setNewValue(SubjectEventStatus.getFromMap(Integer.parseInt(newValue)).getName());
                     }
-                    if("0".equals(oldValue)) {
+                    if ("0".equals(oldValue)) {
                         auditLog.setOldValue(SubjectEventStatus.INVALID.getName());
                     } else {
                         auditLog.setOldValue(SubjectEventStatus.getFromMap(Integer.parseInt(oldValue)).getName());
@@ -1314,7 +1315,7 @@ public class OdmExtractDAO extends DatasetDAO {
                     auditLog.setOldValue(oldValue);
                 }
                 AuditLogsBean logs = se.getAuditLogs();
-                if(logs.getEntityID()==null || logs.getEntityID().length()<=0) {
+                if (logs.getEntityID() == null || logs.getEntityID().length() <= 0) {
                     logs.setEntityID(se.getStudyEventOID());
                 }
                 logs.getAuditLogs().add(auditLog);
@@ -1345,32 +1346,32 @@ public class OdmExtractDAO extends DatasetDAO {
             if (formOidPoses.containsKey(ecId)) {
                 String[] poses = formOidPoses.get(ecId).split("---");
                 ExportFormDataBean form =
-                    data.getExportSubjectData().get(Integer.parseInt(poses[0])).getExportStudyEventData().get(Integer.parseInt(poses[1]))
-                            .getExportFormData().get(Integer.parseInt(poses[2]));
+                    data.getExportSubjectData().get(Integer.parseInt(poses[0])).getExportStudyEventData().get(Integer.parseInt(poses[1])).getExportFormData()
+                            .get(Integer.parseInt(poses[2]));
                 AuditLogBean auditLog = new AuditLogBean();
-                auditLog.setOid("AL_"+auditId);
+                auditLog.setOid("AL_" + auditId);
                 auditLog.setUserId("USR_" + userId);
                 auditLog.setDatetimeStamp(auditDate);
                 auditLog.setType(type);
                 auditLog.setReasonForChange(auditReason);
-                if(typeId==8||typeId==10||typeId==11||typeId==14||typeId==15||typeId==16) {
-                    if("0".equals(newValue)) {
+                if (typeId == 8 || typeId == 10 || typeId == 11 || typeId == 14 || typeId == 15 || typeId == 16) {
+                    if ("0".equals(newValue)) {
                         auditLog.setNewValue(Status.INVALID.getName());
                     } else {
                         auditLog.setNewValue(Status.getFromMap(Integer.parseInt(newValue)).getName());
                     }
-                    if("0".equals(oldValue)) {
+                    if ("0".equals(oldValue)) {
                         auditLog.setOldValue(Status.INVALID.getName());
                     } else {
                         auditLog.setOldValue(Status.getFromMap(Integer.parseInt(oldValue)).getName());
                     }
-                } else if(typeId==32) {
-                    if("1".equals(newValue)) {
+                } else if (typeId == 32) {
+                    if ("1".equals(newValue)) {
                         auditLog.setNewValue("TRUE");
                     } else {
                         auditLog.setNewValue("FALSE");
                     }
-                    if("1".equals(oldValue)) {
+                    if ("1".equals(oldValue)) {
                         auditLog.setOldValue("TRUE");
                     } else {
                         auditLog.setOldValue("FALSE");
@@ -1380,7 +1381,7 @@ public class OdmExtractDAO extends DatasetDAO {
                     auditLog.setOldValue(oldValue);
                 }
                 AuditLogsBean logs = form.getAuditLogs();
-                if(logs.getEntityID()==null || logs.getEntityID().length()<=0) {
+                if (logs.getEntityID() == null || logs.getEntityID().length() <= 0) {
                     logs.setEntityID(form.getFormOID());
                 }
                 logs.getAuditLogs().add(auditLog);
@@ -1410,22 +1411,21 @@ public class OdmExtractDAO extends DatasetDAO {
             if (idataOidPoses.containsKey(idataId)) {
                 String[] poses = idataOidPoses.get(idataId).split("---");
                 ImportItemDataBean idata =
-                    data.getExportSubjectData().get(Integer.parseInt(poses[0])).getExportStudyEventData().get(Integer.parseInt(poses[1]))
-                            .getExportFormData().get(Integer.parseInt(poses[2])).getItemGroupData().get(Integer.parseInt(poses[3])).getItemData().get(
-                                    Integer.parseInt(poses[4]));
+                    data.getExportSubjectData().get(Integer.parseInt(poses[0])).getExportStudyEventData().get(Integer.parseInt(poses[1])).getExportFormData()
+                            .get(Integer.parseInt(poses[2])).getItemGroupData().get(Integer.parseInt(poses[3])).getItemData().get(Integer.parseInt(poses[4]));
                 AuditLogBean auditLog = new AuditLogBean();
-                auditLog.setOid("AL_"+auditId);
-                auditLog.setUserId("USR_"+userId);
+                auditLog.setOid("AL_" + auditId);
+                auditLog.setUserId("USR_" + userId);
                 auditLog.setDatetimeStamp(auditDate);
                 auditLog.setType(type);
                 auditLog.setReasonForChange(auditReason);
-                if(typeId == 12) {
-                    if("0".equals(newValue)) {
+                if (typeId == 12) {
+                    if ("0".equals(newValue)) {
                         auditLog.setOldValue(Status.INVALID.getName());
                     } else {
                         auditLog.setNewValue(Status.getFromMap(Integer.parseInt(newValue)).getName());
                     }
-                    if("0".equals(oldValue)) {
+                    if ("0".equals(oldValue)) {
                         auditLog.setOldValue(Status.INVALID.getName());
                     } else {
                         auditLog.setOldValue(Status.getFromMap(Integer.parseInt(oldValue)).getName());
@@ -1435,7 +1435,7 @@ public class OdmExtractDAO extends DatasetDAO {
                     auditLog.setOldValue(oldValue);
                 }
                 AuditLogsBean logs = idata.getAuditLogs();
-                if(logs.getEntityID()==null || logs.getEntityID().length()<=0) {
+                if (logs.getEntityID() == null || logs.getEntityID().length() <= 0) {
                     logs.setEntityID(idata.getItemOID());
                 }
                 logs.getAuditLogs().add(auditLog);
@@ -1446,8 +1446,8 @@ public class OdmExtractDAO extends DatasetDAO {
 
     protected void setOCSubjectDataDNs(OdmClinicalDataBean data, String studySubjectOids, HashMap<String, String> subOidPoses) {
         this.setOCSubjectDataDNsTypesExpected();
-        HashMap<String,ArrayList<ChildNoteBean>> pDNs = new HashMap<String,ArrayList<ChildNoteBean>>();
-        HashMap<String,ArrayList<DiscrepancyNoteBean>> sDNs = new HashMap<String,ArrayList<DiscrepancyNoteBean>>();
+        HashMap<String, ArrayList<ChildNoteBean>> pDNs = new HashMap<String, ArrayList<ChildNoteBean>>();
+        HashMap<String, ArrayList<DiscrepancyNoteBean>> sDNs = new HashMap<String, ArrayList<DiscrepancyNoteBean>>();
         logger.debug("Begin to execute GetOCSubjectDataDNsSql");
         logger.error("getOCSubjectDataDNsSql= " + this.getOCSubjectDataDNsSql(studySubjectOids));
         ArrayList rows = select(this.getOCSubjectDataDNsSql(studySubjectOids));
@@ -1464,16 +1464,16 @@ public class OdmExtractDAO extends DatasetDAO {
             String status = (String) row.get("status");
             String noteType = (String) row.get("name");
 
-            if(pdnId != null && pdnId > 0) {
+            if (pdnId != null && pdnId > 0) {
                 String key = studySubjectLabel + "-" + pdnId;
                 ChildNoteBean cn = new ChildNoteBean();
                 cn.setDateCreated(dateCreated);
                 cn.setDescription(description);
                 cn.setDetailedNote(detailedNote);
                 cn.setStatus(status);
-                cn.setOid("CDN_"+dnId);
+                cn.setOid("CDN_" + dnId);
                 ElementRefBean userRef = new ElementRefBean();
-                userRef.setElementDefOID("USR_"+ownerId);
+                userRef.setElementDefOID("USR_" + ownerId);
                 cn.setUserRef(userRef);
                 ArrayList<ChildNoteBean> cns = pDNs.containsKey(key) ? pDNs.get(key) : new ArrayList<ChildNoteBean>();
                 cns.add(cn);
@@ -1481,19 +1481,19 @@ public class OdmExtractDAO extends DatasetDAO {
             } else {
                 DiscrepancyNoteBean dn = new DiscrepancyNoteBean();
                 String k = studySubjectLabel + "-" + dnId;
-                if(pDNs != null && pDNs.containsKey(k)) {
+                if (pDNs != null && pDNs.containsKey(k)) {
                     dn.setChildNotes(pDNs.get(k));
                     dn.setNumberOfChildNotes(dn.getChildNotes().size());
                 }
                 dn.setDateUpdated(dateCreated);
                 dn.setNoteType(noteType);
                 dn.setStatus(status);
-                dn.setOid("DN_"+dnId);
+                dn.setOid("DN_" + dnId);
                 ElementRefBean userRef = new ElementRefBean();
-                userRef.setElementDefOID("USR_"+ownerId);
-                if(subOidPoses.containsKey(studySubjectLabel)) {
+                userRef.setElementDefOID("USR_" + ownerId);
+                if (subOidPoses.containsKey(studySubjectLabel)) {
                     int i = Integer.parseInt(subOidPoses.get(studySubjectLabel));
-                    String entityID =  data.getExportSubjectData().get(i).getSubjectOID();
+                    String entityID = data.getExportSubjectData().get(i).getSubjectOID();
                     data.getExportSubjectData().get(i).getDiscrepancyNotes().setEntityID(entityID);
                     data.getExportSubjectData().get(i).getDiscrepancyNotes().getDiscrepancyNotes().add(dn);
                 }
@@ -1503,8 +1503,8 @@ public class OdmExtractDAO extends DatasetDAO {
 
     protected void setOCEventDataDNs(OdmClinicalDataBean data, String definitionOids, String studySubjectOids, HashMap<String, String> evnOidPoses) {
         this.setOCEventDataDNsTypesExpected();
-        HashMap<String,ArrayList<ChildNoteBean>> pDNs = new HashMap<String,ArrayList<ChildNoteBean>>();
-        HashMap<String,ArrayList<DiscrepancyNoteBean>> sDNs = new HashMap<String,ArrayList<DiscrepancyNoteBean>>();
+        HashMap<String, ArrayList<ChildNoteBean>> pDNs = new HashMap<String, ArrayList<ChildNoteBean>>();
+        HashMap<String, ArrayList<DiscrepancyNoteBean>> sDNs = new HashMap<String, ArrayList<DiscrepancyNoteBean>>();
         logger.debug("Begin to execute GetOCEventDataDNsSql");
         logger.error("getOCEventDataDNsSql= " + this.getOCEventDataDNsSql(definitionOids, studySubjectOids));
         ArrayList rows = select(this.getOCEventDataDNsSql(definitionOids, studySubjectOids));
@@ -1523,16 +1523,16 @@ public class OdmExtractDAO extends DatasetDAO {
             String noteType = (String) row.get("name");
 
             String oidKey = studySubjectLabel + defOid;
-            if(pdnId != null && pdnId > 0) {
+            if (pdnId != null && pdnId > 0) {
                 String key = oidKey + pdnId;
                 ChildNoteBean cn = new ChildNoteBean();
                 cn.setDateCreated(dateCreated);
                 cn.setDescription(description);
                 cn.setDetailedNote(detailedNote);
                 cn.setStatus(status);
-                cn.setOid("CDN_"+dnId);
+                cn.setOid("CDN_" + dnId);
                 ElementRefBean userRef = new ElementRefBean();
-                userRef.setElementDefOID("USR_"+ownerId);
+                userRef.setElementDefOID("USR_" + ownerId);
                 cn.setUserRef(userRef);
                 ArrayList<ChildNoteBean> cns = pDNs.containsKey(key) ? pDNs.get(key) : new ArrayList<ChildNoteBean>();
                 cns.add(cn);
@@ -1540,22 +1540,21 @@ public class OdmExtractDAO extends DatasetDAO {
             } else {
                 DiscrepancyNoteBean dn = new DiscrepancyNoteBean();
                 String k = oidKey + dnId;
-                if(pDNs != null && pDNs.containsKey(k)) {
+                if (pDNs != null && pDNs.containsKey(k)) {
                     dn.setChildNotes(pDNs.get(k));
                     dn.setNumberOfChildNotes(dn.getChildNotes().size());
                 }
                 dn.setDateUpdated(dateCreated);
                 dn.setNoteType(noteType);
                 dn.setStatus(status);
-                dn.setOid("DN_"+dnId);
+                dn.setOid("DN_" + dnId);
                 ElementRefBean userRef = new ElementRefBean();
-                userRef.setElementDefOID("USR_"+ownerId);
-                if(evnOidPoses.containsKey(oidKey)) {
+                userRef.setElementDefOID("USR_" + ownerId);
+                if (evnOidPoses.containsKey(oidKey)) {
                     String[] poses = evnOidPoses.get(oidKey).split("---");
                     int p0 = Integer.parseInt(poses[0]);
                     int p1 = Integer.parseInt(poses[1]);
-                    String entityID = 
-                    data.getExportSubjectData().get(p0).getExportStudyEventData().get(p1).getStudyEventOID();
+                    String entityID = data.getExportSubjectData().get(p0).getExportStudyEventData().get(p1).getStudyEventOID();
                     data.getExportSubjectData().get(p0).getExportStudyEventData().get(p1).getDiscrepancyNotes().setEntityID(entityID);
                     data.getExportSubjectData().get(p0).getExportStudyEventData().get(p1).getDiscrepancyNotes().getDiscrepancyNotes().add(dn);
                 }
@@ -1565,8 +1564,8 @@ public class OdmExtractDAO extends DatasetDAO {
 
     protected void setOCFormDataDNs(OdmClinicalDataBean data, String ecIds, HashMap<Integer, String> formOidPoses) {
         this.setOCFormDataDNsTypesExpected();
-        HashMap<String,ArrayList<ChildNoteBean>> pDNs = new HashMap<String,ArrayList<ChildNoteBean>>();
-        HashMap<String,ArrayList<DiscrepancyNoteBean>> sDNs = new HashMap<String,ArrayList<DiscrepancyNoteBean>>();
+        HashMap<String, ArrayList<ChildNoteBean>> pDNs = new HashMap<String, ArrayList<ChildNoteBean>>();
+        HashMap<String, ArrayList<DiscrepancyNoteBean>> sDNs = new HashMap<String, ArrayList<DiscrepancyNoteBean>>();
         logger.debug("Begin to execute GetOCEventDataDNsSql");
         logger.error("getOCFormDataDNsSql= " + this.getOCFormDataDNsSql(ecIds));
         ArrayList rows = select(this.getOCFormDataDNsSql(ecIds));
@@ -1583,16 +1582,16 @@ public class OdmExtractDAO extends DatasetDAO {
             String status = (String) row.get("status");
             String noteType = (String) row.get("name");
 
-            if(pdnId != null && pdnId > 0) {
+            if (pdnId != null && pdnId > 0) {
                 String key = ecId + "-" + pdnId;
                 ChildNoteBean cn = new ChildNoteBean();
                 cn.setDateCreated(dateCreated);
                 cn.setDescription(description);
                 cn.setDetailedNote(detailedNote);
                 cn.setStatus(status);
-                cn.setOid("CDN_"+dnId);
+                cn.setOid("CDN_" + dnId);
                 ElementRefBean userRef = new ElementRefBean();
-                userRef.setElementDefOID("USR_"+ownerId);
+                userRef.setElementDefOID("USR_" + ownerId);
                 cn.setUserRef(userRef);
                 ArrayList<ChildNoteBean> cns = pDNs.containsKey(key) ? pDNs.get(key) : new ArrayList<ChildNoteBean>();
                 cns.add(cn);
@@ -1600,28 +1599,26 @@ public class OdmExtractDAO extends DatasetDAO {
             } else {
                 DiscrepancyNoteBean dn = new DiscrepancyNoteBean();
                 String k = ecId + "-" + dnId;
-                if(pDNs != null && pDNs.containsKey(k)) {
+                if (pDNs != null && pDNs.containsKey(k)) {
                     dn.setChildNotes(pDNs.get(k));
                     dn.setNumberOfChildNotes(dn.getChildNotes().size());
                 }
                 dn.setDateUpdated(dateCreated);
                 dn.setNoteType(noteType);
                 dn.setStatus(status);
-                dn.setOid("DN_"+dnId);
+                dn.setOid("DN_" + dnId);
                 ElementRefBean userRef = new ElementRefBean();
-                userRef.setElementDefOID("USR_"+ownerId);
-                if(formOidPoses.containsKey(ecId)) {
+                userRef.setElementDefOID("USR_" + ownerId);
+                if (formOidPoses.containsKey(ecId)) {
                     String[] poses = formOidPoses.get(ecId).split("---");
                     int p0 = Integer.parseInt(poses[0]);
                     int p1 = Integer.parseInt(poses[1]);
                     int p2 = Integer.parseInt(poses[2]);
-                    String entityID = 
-                    data.getExportSubjectData().get(p0).getExportStudyEventData().get(p1)
-                        .getExportFormData().get(p2).getFormOID();
-                    data.getExportSubjectData().get(p0).getExportStudyEventData().get(p1)
-                    .getExportFormData().get(p2).getDiscrepancyNotes().setEntityID(entityID);
-                    data.getExportSubjectData().get(p0).getExportStudyEventData().get(p1)
-                        .getExportFormData().get(p2).getDiscrepancyNotes().getDiscrepancyNotes().add(dn);
+                    String entityID = data.getExportSubjectData().get(p0).getExportStudyEventData().get(p1).getExportFormData().get(p2).getFormOID();
+                    data.getExportSubjectData().get(p0).getExportStudyEventData().get(p1).getExportFormData().get(p2).getDiscrepancyNotes().setEntityID(
+                            entityID);
+                    data.getExportSubjectData().get(p0).getExportStudyEventData().get(p1).getExportFormData().get(p2).getDiscrepancyNotes()
+                            .getDiscrepancyNotes().add(dn);
                 }
             }
         }
@@ -1629,8 +1626,8 @@ public class OdmExtractDAO extends DatasetDAO {
 
     protected void setOCItemDataDNs(OdmClinicalDataBean data, String idataIds, HashMap<Integer, String> idataOidPoses) {
         this.setOCItemDataDNsTypesExpected();
-        HashMap<String,ArrayList<ChildNoteBean>> pDNs = new HashMap<String,ArrayList<ChildNoteBean>>();
-        HashMap<String,ArrayList<DiscrepancyNoteBean>> sDNs = new HashMap<String,ArrayList<DiscrepancyNoteBean>>();
+        HashMap<String, ArrayList<ChildNoteBean>> pDNs = new HashMap<String, ArrayList<ChildNoteBean>>();
+        HashMap<String, ArrayList<DiscrepancyNoteBean>> sDNs = new HashMap<String, ArrayList<DiscrepancyNoteBean>>();
         logger.debug("Begin to execute GetOCItemDataDNsSql");
         logger.error("getOCItemDataDNsSql= " + this.getOCItemDataDNsSql(idataIds));
         ArrayList rows = select(this.getOCItemDataDNsSql(idataIds));
@@ -1647,17 +1644,16 @@ public class OdmExtractDAO extends DatasetDAO {
             String status = (String) row.get("status");
             String noteType = (String) row.get("name");
 
-            
-            if(pdnId != null && pdnId > 0) {
+            if (pdnId != null && pdnId > 0) {
                 String key = idataId + "-" + pdnId;
                 ChildNoteBean cn = new ChildNoteBean();
                 cn.setDateCreated(dateCreated);
                 cn.setDescription(description);
                 cn.setDetailedNote(detailedNote);
                 cn.setStatus(status);
-                cn.setOid("CDN_"+dnId);
+                cn.setOid("CDN_" + dnId);
                 ElementRefBean userRef = new ElementRefBean();
-                userRef.setElementDefOID("USR_"+ownerId);
+                userRef.setElementDefOID("USR_" + ownerId);
                 cn.setUserRef(userRef);
                 ArrayList<ChildNoteBean> cns = pDNs.containsKey(key) ? pDNs.get(key) : new ArrayList<ChildNoteBean>();
                 cns.add(cn);
@@ -1665,30 +1661,30 @@ public class OdmExtractDAO extends DatasetDAO {
             } else {
                 DiscrepancyNoteBean dn = new DiscrepancyNoteBean();
                 String k = idataId + "-" + dnId;
-                if(pDNs != null && pDNs.containsKey(k)) {
+                if (pDNs != null && pDNs.containsKey(k)) {
                     dn.setChildNotes(pDNs.get(k));
                     dn.setNumberOfChildNotes(dn.getChildNotes().size());
                 }
                 dn.setDateUpdated(dateCreated);
                 dn.setNoteType(noteType);
                 dn.setStatus(status);
-                dn.setOid("DN_"+dnId);
+                dn.setOid("DN_" + dnId);
                 ElementRefBean userRef = new ElementRefBean();
-                userRef.setElementDefOID("USR_"+ownerId);
-                if(idataOidPoses.containsKey(idataId)) {
+                userRef.setElementDefOID("USR_" + ownerId);
+                if (idataOidPoses.containsKey(idataId)) {
                     String[] poses = idataOidPoses.get(idataId).split("---");
                     int p0 = Integer.parseInt(poses[0]);
                     int p1 = Integer.parseInt(poses[1]);
                     int p2 = Integer.parseInt(poses[2]);
                     int p3 = Integer.parseInt(poses[3]);
                     int p4 = Integer.parseInt(poses[4]);
-                    String entityID = 
-                        data.getExportSubjectData().get(p0).getExportStudyEventData().get(p1)
-                        .getExportFormData().get(p2).getItemGroupData().get(p3).getItemData().get(p4).getItemOID();
-                    data.getExportSubjectData().get(p0).getExportStudyEventData().get(p1)
-                    .getExportFormData().get(p2).getItemGroupData().get(p3).getItemData().get(p4).getDiscrepancyNotes().setEntityID(entityID);
-                    data.getExportSubjectData().get(p0).getExportStudyEventData().get(p1)
-                                .getExportFormData().get(p2).getItemGroupData().get(p3).getItemData().get(p4).getDiscrepancyNotes().getDiscrepancyNotes().add(dn);
+                    String entityID =
+                        data.getExportSubjectData().get(p0).getExportStudyEventData().get(p1).getExportFormData().get(p2).getItemGroupData().get(p3)
+                                .getItemData().get(p4).getItemOID();
+                    data.getExportSubjectData().get(p0).getExportStudyEventData().get(p1).getExportFormData().get(p2).getItemGroupData().get(p3).getItemData()
+                            .get(p4).getDiscrepancyNotes().setEntityID(entityID);
+                    data.getExportSubjectData().get(p0).getExportStudyEventData().get(p1).getExportFormData().get(p2).getItemGroupData().get(p3).getItemData()
+                            .get(p4).getDiscrepancyNotes().getDiscrepancyNotes().add(dn);
                 }
             }
         }
@@ -1879,9 +1875,9 @@ public class OdmExtractDAO extends DatasetDAO {
             oidPoses.put(ecId, oidPos);
             oidPos = "";
         }
-        studySubjectOids = studySubjectOids.length()>0?studySubjectOids.substring(0, studySubjectOids.length() - 2).trim():studySubjectOids;
-        sedOids = sedOids.length()>0?sedOids.substring(0, sedOids.length() - 2).trim():sedOids;
-        ecIds = ecIds.length()>0?ecIds.substring(0, ecIds.length() - 2).trim():ecIds;
+        studySubjectOids = studySubjectOids.length() > 0 ? studySubjectOids.substring(0, studySubjectOids.length() - 2).trim() : studySubjectOids;
+        sedOids = sedOids.length() > 0 ? sedOids.substring(0, sedOids.length() - 2).trim() : sedOids;
+        ecIds = ecIds.length() > 0 ? ecIds.substring(0, ecIds.length() - 2).trim() : ecIds;
 
         this.setOCSubjectDataAuditLogs(parentStudy, data, studySubjectOids, subOidPoses);
 
@@ -2018,6 +2014,22 @@ public class OdmExtractDAO extends DatasetDAO {
             + " and edc.crf_id = cv.crf_id and ec.crf_version_id = cv.crf_version_id order by ss.oc_oid, sed.ordinal, se.sample_ordinal, edc.ordinal";
     }
 
+    protected String getSubjectEventFormSqlSS(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId,
+            String studySubjectIds) {
+        return "select ss.oc_oid as study_subject_oid, sed.ordinal as definition_order, sed.oc_oid as definition_oid,"
+            + " sed.repeating as definition_repeating, se.sample_ordinal as sample_ordinal, edc.ordinal as crf_order, "
+            + " cv.oc_oid as crf_version_oid, ec.event_crf_id from (select study_event_id, study_event_definition_id, study_subject_id,"
+            + " sample_ordinal from study_event where study_event_definition_id in " + sedIds + " and study_subject_id in ( " + studySubjectIds
+            + ")) se, (select ss.oc_oid, ss.study_subject_id from study_subject ss where ss.study_subject_id in (" + studySubjectIds + ") " + ") ss,"
+            + " study_event_definition sed, event_definition_crf edc,"
+            + " (select event_crf_id, crf_version_id, study_event_id from event_crf where event_crf_id in ("
+            + getEventCrfIdsByItemDataSqlSS(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds) + ")) ec, crf_version cv"
+            + " where sed.study_event_definition_id in " + sedIds
+            + " and sed.study_event_definition_id = se.study_event_definition_id and se.study_subject_id = ss.study_subject_id"
+            + " and sed.study_event_definition_id = edc.study_event_definition_id and se.study_event_id = ec.study_event_id"
+            + " and edc.crf_id = cv.crf_id and ec.crf_version_id = cv.crf_version_id order by ss.oc_oid, sed.ordinal, se.sample_ordinal, edc.ordinal";
+    }
+
     protected String getOCSubjectEventFormSql(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId) {
         return "select ss.oc_oid as study_subject_oid, ss.label, ss.unique_identifier, ss.secondary_label, ss.gender, ss.date_of_birth,"
             + " ss.status_id, ss.sgc_id, ss.sgc_name, ss.sg_name, sed.ordinal as definition_order, sed.oc_oid as definition_oid, sed.repeating as definition_repeating,"
@@ -2047,6 +2059,42 @@ public class OdmExtractDAO extends DatasetDAO {
             + " study_event_definition sed, event_definition_crf edc,"
             + " (select event_crf_id, crf_version_id, study_event_id, status_id, date_interviewed, interviewer_name, validator_id from event_crf where event_crf_id in ("
             + getEventCrfIdsByItemDataSql(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId)
+            + ")) ec, crf_version cv"
+            + " where sed.study_event_definition_id in "
+            + sedIds
+            + " and sed.study_event_definition_id = se.study_event_definition_id and se.study_subject_id = ss.study_subject_id"
+            + " and sed.study_event_definition_id = edc.study_event_definition_id and se.study_event_id = ec.study_event_id"
+            + " and edc.crf_id = cv.crf_id and ec.crf_version_id = cv.crf_version_id order by ss.oc_oid, sed.ordinal, se.sample_ordinal, edc.ordinal, ss.sgc_id";
+    }
+
+    protected String getOCSubjectEventFormSqlSS(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId,
+            String studySubjectIds) {
+        return "select ss.oc_oid as study_subject_oid, ss.label, ss.unique_identifier, ss.secondary_label, ss.gender, ss.date_of_birth,"
+            + " ss.status_id, ss.sgc_id, ss.sgc_name, ss.sg_name, sed.ordinal as definition_order, sed.oc_oid as definition_oid, sed.repeating as definition_repeating,"
+            + " se.sample_ordinal as sample_ordinal, se.se_location, se.date_start, se.date_end, se.start_time_flag,"
+            + " se.end_time_flag, se.subject_event_status_id as event_status_id, edc.ordinal as crf_order,"
+            + " cv.oc_oid as crf_version_oid, cv.name as crf_version, cv.status_id as cv_status_id, ec.status_id as ec_status_id, ec.event_crf_id, ec.date_interviewed,"
+            + " ec.interviewer_name, ec.validator_id from (select study_event_id, study_event_definition_id, study_subject_id, location as se_location,"
+            + " sample_ordinal, date_start, date_end, subject_event_status_id, start_time_flag, end_time_flag from study_event "
+            + " where study_event_definition_id in "
+            + sedIds
+            + " and study_subject_id in (select ss.study_subject_id from study_subject ss where ss.study_subject_id in ("
+            + studySubjectIds
+            + ") "
+            + ")) se, ( select st_sub.oc_oid, st_sub.study_subject_id, st_sub.label,"
+            + " st_sub.secondary_label, st_sub.subject_id, st_sub.unique_identifier, st_sub.gender, st_sub.date_of_birth, st_sub.status_id,"
+            + " sb_g.sgc_id, sb_g.sgc_name, sb_g.sg_id, sb_g.sg_name from (select ss.oc_oid, ss.study_subject_id, ss.label, ss.secondary_label, ss.subject_id,"
+            + " s.unique_identifier, s.gender, s.date_of_birth, s.status_id from study_subject ss, subject s where ss.study_subject_id in ("
+            + studySubjectIds
+            + ") "
+            + " and ss.subject_id = s.subject_id)st_sub left join (select sgm.study_subject_id, sgc.study_group_class_id as sgc_id, sgc.name as sgc_name,"
+            + " sg.study_group_id as sg_id, sg.name as sg_name from subject_group_map sgm, study_group_class sgc, study_group sg where sgc.study_id in ("
+            + studyIds
+            + ") and sgm.study_group_class_id = sgc.study_group_class_id and sgc.study_group_class_id = sg.study_group_class_id"
+            + " and sgm.study_group_id = sg.study_group_id) sb_g on st_sub.study_subject_id = sb_g.study_subject_id) ss, "
+            + " study_event_definition sed, event_definition_crf edc,"
+            + " (select event_crf_id, crf_version_id, study_event_id, status_id, date_interviewed, interviewer_name, validator_id from event_crf where event_crf_id in ("
+            + getEventCrfIdsByItemDataSqlSS(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds)
             + ")) ec, crf_version cv"
             + " where sed.study_event_definition_id in "
             + sedIds
@@ -2103,6 +2151,18 @@ public class OdmExtractDAO extends DatasetDAO {
             + " and (status_id " + ecStatusConstraint + ")) and length(value) > 0";
     }
 
+    protected String getEventCrfIdsByItemDataSqlSS(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId,
+            String studySubjectIds) {
+        String ecStatusConstraint = getECStatusConstraint(datasetItemStatusId);
+        String itStatusConstraint = this.getItemDataStatusConstraint(datasetItemStatusId);
+        return "select distinct idata.event_crf_id from item_data idata" + " where idata.item_id in " + itemIds + " and (idata.status_id " + itStatusConstraint
+            + ")" + " and idata.event_crf_id in (select event_crf_id from event_crf where study_subject_id in"
+            + " (select ss.study_subject_id from study_subject ss WHERE ss.study_subject_id in (" + studySubjectIds + ") " + ")"
+            + " and study_event_id in (select study_event_id from study_event where study_event_definition_id in " + sedIds
+            + " and study_subject_id in (select ss.study_subject_id from study_subject ss where ss.study_subject_id in (" + studySubjectIds + ") " + "))"
+            + " and (status_id " + ecStatusConstraint + ")) and length(value) > 0";
+    }
+
     protected String eventDefinitionCrfCondition(int studyId, int parentStudyId, boolean isIncludedSite) {
         if (isIncludedSite) {
             return "edc.study_id = " + studyId;
@@ -2149,36 +2209,25 @@ public class OdmExtractDAO extends DatasetDAO {
     }
 
     protected String getOCSubjectDataAuditsSql(String studySubjectOids) {
-        return "(select ss.oc_oid as study_subject_oid, ale.audit_id, alet.name, ale.user_id," 
+        return "(select ss.oc_oid as study_subject_oid, ale.audit_id, alet.name, ale.user_id,"
             + " ale.audit_date, ale.reason_for_change, ale.old_value, ale.new_value, ale.audit_log_event_type_id"
-            + " from audit_log_event ale, study_subject ss, audit_log_event_type alet"
-            + " where audit_table = 'subject' and ss.oc_oid in ("
-            + studySubjectOids
-            + ") and ss.subject_id = ale.entity_id"
-            + " and ale.audit_log_event_type_id = alet.audit_log_event_type_id"
-            + " ) union "
-            + " (select ss.oc_oid as study_subject_oid, ale.audit_id,  alet.name, ale.user_id," 
-            +       " ale.audit_date, ale.reason_for_change, ale.old_value, ale.new_value, ale.audit_log_event_type_id"
-            + " from audit_log_event ale, study_subject ss, audit_log_event_type alet"
-            + " where audit_table = 'study_subject' and ss.oc_oid in ("
-            + studySubjectOids
-            + ") and ss.study_subject_id = ale.entity_id"
-            + " and ale.audit_log_event_type_id = alet.audit_log_event_type_id"
-            + " ) union "
-            + " (select ss.oc_oid as study_subject_oid, ale.audit_id, alet.name, ale.user_id," 
-            +       " ale.audit_date, ale.reason_for_change, ale.old_value, ale.new_value, ale.audit_log_event_type_id"
+            + " from audit_log_event ale, study_subject ss, audit_log_event_type alet" + " where audit_table = 'subject' and ss.oc_oid in (" + studySubjectOids
+            + ") and ss.subject_id = ale.entity_id" + " and ale.audit_log_event_type_id = alet.audit_log_event_type_id" + " ) union "
+            + " (select ss.oc_oid as study_subject_oid, ale.audit_id,  alet.name, ale.user_id,"
+            + " ale.audit_date, ale.reason_for_change, ale.old_value, ale.new_value, ale.audit_log_event_type_id"
+            + " from audit_log_event ale, study_subject ss, audit_log_event_type alet" + " where audit_table = 'study_subject' and ss.oc_oid in ("
+            + studySubjectOids + ") and ss.study_subject_id = ale.entity_id" + " and ale.audit_log_event_type_id = alet.audit_log_event_type_id" + " ) union "
+            + " (select ss.oc_oid as study_subject_oid, ale.audit_id, alet.name, ale.user_id,"
+            + " ale.audit_date, ale.reason_for_change, ale.old_value, ale.new_value, ale.audit_log_event_type_id"
             + " from audit_log_event ale, study_subject ss, subject_group_map sgm, audit_log_event_type alet"
-            + " where audit_table = 'subject_group_map' and ss.oc_oid in ("
-            + studySubjectOids
-            + ") and ss.study_subject_id = sgm.study_subject_id"
+            + " where audit_table = 'subject_group_map' and ss.oc_oid in (" + studySubjectOids + ") and ss.study_subject_id = sgm.study_subject_id"
             + " and ale.entity_id = sgm.subject_group_map_id and ale.audit_log_event_type_id = alet.audit_log_event_type_id"
             + " ) order by study_subject_oid, audit_id asc";
     }
 
     protected String getOCEventDataAuditsSql(String studySubjectOids) {
         return "select ss.oc_oid as study_subject_oid, sed.oc_oid as definition_oid, ale.audit_id,"
-            + " alet.name, ale.user_id, ale.audit_date, ale.reason_for_change, ale.old_value, ale.new_value,"
-            + " ale.audit_log_event_type_id"
+            + " alet.name, ale.user_id, ale.audit_date, ale.reason_for_change, ale.old_value, ale.new_value," + " ale.audit_log_event_type_id"
             + " from audit_log_event ale, study_subject ss, study_event se, study_event_definition sed, audit_log_event_type alet"
             + " where audit_table = 'study_event' and ss.oc_oid in (" + studySubjectOids + ") and ss.study_subject_id = se.study_subject_id"
             + " and ale.entity_id = se.study_event_id" + " and se.study_event_definition_id = sed.study_event_definition_id"
@@ -2186,76 +2235,74 @@ public class OdmExtractDAO extends DatasetDAO {
     }
 
     protected String getOCFormDataAuditsSql(String studySubjectOids, String ecIds) {
-        return "select ale.entity_id as event_crf_id, ale.audit_id, alet.name, ale.user_id," 
-            +   " ale.audit_date, ale.reason_for_change, ale.old_value, ale.new_value, ale.audit_log_event_type_id"
+        return "select ale.entity_id as event_crf_id, ale.audit_id, alet.name, ale.user_id,"
+            + " ale.audit_date, ale.reason_for_change, ale.old_value, ale.new_value, ale.audit_log_event_type_id"
             + " from audit_log_event ale, study_subject ss, event_crf ec, audit_log_event_type alet"
-            + " where audit_table = 'event_crf' and ec.event_crf_id in ("
-            + ecIds
-            + ") and ss.oc_oid in ("
-            + studySubjectOids
-            + ") and ss.study_subject_id = ec.study_subject_id"
-            + " and ale.entity_id = ec.event_crf_id"
+            + " where audit_table = 'event_crf' and ec.event_crf_id in (" + ecIds + ") and ss.oc_oid in (" + studySubjectOids
+            + ") and ss.study_subject_id = ec.study_subject_id" + " and ale.entity_id = ec.event_crf_id"
             + " and ale.audit_log_event_type_id = alet.audit_log_event_type_id" + " order by ale.entity_id asc";
     }
 
     protected String getOCItemDataAuditsSql(String idataIds) {
-        return "select ale.entity_id as item_data_id, ale.audit_id, alet.name, ale.user_id," 
-            +   " ale.audit_date, ale.reason_for_change, ale.old_value, ale.new_value, ale.audit_log_event_type_id"
-            + " from audit_log_event ale, audit_log_event_type alet"
-            + " where audit_table = 'item_data' and ale.entity_id in ("
-            + idataIds
+        return "select ale.entity_id as item_data_id, ale.audit_id, alet.name, ale.user_id,"
+            + " ale.audit_date, ale.reason_for_change, ale.old_value, ale.new_value, ale.audit_log_event_type_id"
+            + " from audit_log_event ale, audit_log_event_type alet" + " where audit_table = 'item_data' and ale.entity_id in (" + idataIds
             + ") and ale.audit_log_event_type_id = alet.audit_log_event_type_id" + " order by ale.entity_id asc";
     }
 
     protected String getOCSubjectDataDNsSql(String studySubjectOids) {
-        return "(select ss.oc_oid as study_subject_oid, dn.parent_dn_id, dn.discrepancy_note_id as dn_id, dn.description, dn.detailed_notes, " 
+        return "(select ss.oc_oid as study_subject_oid, dn.parent_dn_id, dn.discrepancy_note_id as dn_id, dn.description, dn.detailed_notes, "
             + " dn.owner_id, dn.date_created, rs.name as status, dnt.name"
             + " from discrepancy_note dn, dn_subject_map dnsm, study_subject ss, discrepancy_note_type dnt, resolution_status rs"
-            + " where dn.entity_type = 'subject'"
-            + " and dn.discrepancy_note_id = dnsm.discrepancy_note_id and ss.oc_oid in (" + studySubjectOids 
+            + " where dn.entity_type = 'subject'" + " and dn.discrepancy_note_id = dnsm.discrepancy_note_id and ss.oc_oid in (" + studySubjectOids
             + ") and ss.subject_id = dnsm.subject_id and dn.resolution_status_id = rs.resolution_status_id"
             + " and dn.discrepancy_note_type_id = dnt.discrepancy_note_type_id) union"
-            + "(select ss.oc_oid as study_subject_oid, dn.parent_dn_id, dn.discrepancy_note_id as dn_id, dn.description, dn.detailed_notes, " 
+            + "(select ss.oc_oid as study_subject_oid, dn.parent_dn_id, dn.discrepancy_note_id as dn_id, dn.description, dn.detailed_notes, "
             + " dn.owner_id, dn.date_created, rs.name as status, dnt.name"
             + " from discrepancy_note dn, dn_study_subject_map dnssm, study_subject ss, discrepancy_note_type dnt, resolution_status rs"
-            + " where dn.entity_type = 'studySub'"
-            + " and dn.discrepancy_note_id = dnssm.discrepancy_note_id and ss.oc_oid in (" + studySubjectOids
+            + " where dn.entity_type = 'studySub'" + " and dn.discrepancy_note_id = dnssm.discrepancy_note_id and ss.oc_oid in (" + studySubjectOids
             + ") and ss.study_subject_id = dnssm.study_subject_id and dn.resolution_status_id = rs.resolution_status_id"
-            + " and dn.discrepancy_note_type_id = dnt.discrepancy_note_type_id"
-            + ") order by study_subject_oid, parent_dn_id, dn_id";
+            + " and dn.discrepancy_note_type_id = dnt.discrepancy_note_type_id" + ") order by study_subject_oid, parent_dn_id, dn_id";
     }
 
     protected String getOCEventDataDNsSql(String definitionOids, String studySubjectOids) {
-        return "select ss.oc_oid as study_subject_oid, sed.oc_oid as definition_oid, dn.parent_dn_id, dn.discrepancy_note_id as dn_id, dn.description, dn.detailed_notes, " 
+        return "select ss.oc_oid as study_subject_oid, sed.oc_oid as definition_oid, dn.parent_dn_id, dn.discrepancy_note_id as dn_id, dn.description, dn.detailed_notes, "
             + " dn.owner_id, dn.date_created, rs.name as status, dnt.name"
             + " from discrepancy_note dn, dn_study_event_map dnsem, study_event se, study_event_definition sed, study_subject ss, discrepancy_note_type dnt, resolution_status rs"
             + " where dn.entity_type = 'studyEvent'"
             + " and dn.discrepancy_note_id = dnsem.discrepancy_note_id and dnsem.study_event_id = se.study_event_id"
-            + " and sed.oc_oid in (" + definitionOids + ") and se.study_event_definition_id = sed.study_event_definition_id"
-            + " and ss.oc_oid in (" + studySubjectOids + ") and se.study_subject_id = ss.study_subject_id"
+            + " and sed.oc_oid in ("
+            + definitionOids
+            + ") and se.study_event_definition_id = sed.study_event_definition_id"
+            + " and ss.oc_oid in ("
+            + studySubjectOids
+            + ") and se.study_subject_id = ss.study_subject_id"
             + " and dn.resolution_status_id = rs.resolution_status_id"
-            + " and dn.discrepancy_note_type_id = dnt.discrepancy_note_type_id"
-            + " order by ss.oc_oid, sed.oc_oid, dn.parent_dn_id, dn.discrepancy_note_id";
+            + " and dn.discrepancy_note_type_id = dnt.discrepancy_note_type_id" + " order by ss.oc_oid, sed.oc_oid, dn.parent_dn_id, dn.discrepancy_note_id";
     }
 
     protected String getOCFormDataDNsSql(String ecIds) {
         return "select ec.event_crf_id, dn.parent_dn_id, dn.discrepancy_note_id as dn_id, dn.description, dn.detailed_notes, dn.owner_id, dn.date_created, rs.name as status, dnt.name"
             + " from discrepancy_note dn, dn_event_crf_map dnecm, event_crf ec, discrepancy_note_type dnt, resolution_status rs"
             + " where dn.entity_type = 'eventCrf'"
-            + " and dnecm.event_crf_id in (" + ecIds + ") and dn.discrepancy_note_id = dnecm.discrepancy_note_id"
-            + " and ec.event_crf_id in (" + ecIds + ") and dnecm.event_crf_id = ec.event_crf_id"
+            + " and dnecm.event_crf_id in ("
+            + ecIds
+            + ") and dn.discrepancy_note_id = dnecm.discrepancy_note_id"
+            + " and ec.event_crf_id in ("
+            + ecIds
+            + ") and dnecm.event_crf_id = ec.event_crf_id"
             + " and dn.resolution_status_id = rs.resolution_status_id"
-            + " and dn.discrepancy_note_type_id = dnt.discrepancy_note_type_id"
-            + " order by ec.event_crf_id, dn.parent_dn_id, dn.discrepancy_note_id";
+            + " and dn.discrepancy_note_type_id = dnt.discrepancy_note_type_id" + " order by ec.event_crf_id, dn.parent_dn_id, dn.discrepancy_note_id";
     }
 
     protected String getOCItemDataDNsSql(String idataIds) {
         return "select dnidm.item_data_id, dn.parent_dn_id, dn.discrepancy_note_id as dn_id, dn.description, dn.detailed_notes, dn.owner_id, dn.date_created, rs.name as status, dnt.name"
             + " from discrepancy_note dn, dn_item_data_map dnidm, discrepancy_note_type dnt, resolution_status rs"
             + " where (dn.entity_type = 'itemData' or dn.entity_type = 'itemdata')"
-            + " and dnidm.item_data_id in (" + idataIds + ") and dn.discrepancy_note_id = dnidm.discrepancy_note_id"
+            + " and dnidm.item_data_id in ("
+            + idataIds
+            + ") and dn.discrepancy_note_id = dnidm.discrepancy_note_id"
             + " and dn.resolution_status_id = rs.resolution_status_id"
-            + " and dn.discrepancy_note_type_id = dnt.discrepancy_note_type_id"
-            + " order by dnidm.item_data_id, dn.parent_dn_id, dn.discrepancy_note_id";
+            + " and dn.discrepancy_note_type_id = dnt.discrepancy_note_type_id" + " order by dnidm.item_data_id, dn.parent_dn_id, dn.discrepancy_note_id";
     }
 }

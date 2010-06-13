@@ -4,21 +4,15 @@
  * For details see: http://www.openclinica.org/license copyright 2003-2005 Akaza
  * Research
  *
- *//* OpenClinica is distributed under the GNU Lesser General Public License (GNU
- * LGPL).
- *
- * For details see: http://www.openclinica.org/license copyright 2003-2005 Akaza
- * Research
- *
  */
 package org.akaza.openclinica.bean.extract.odm;
-
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 
 import org.akaza.openclinica.bean.odmbeans.OdmAdminDataBean;
 import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
 import org.akaza.openclinica.bean.odmbeans.OdmStudyBean;
+
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 /**
  * Create one ODM XML file.
@@ -30,6 +24,7 @@ public class FullReportBean extends OdmXmlReportBean {
     private LinkedHashMap<String, OdmStudyBean> odmStudyMap;
     private LinkedHashMap<String, OdmClinicalDataBean> clinicalDataMap;
     private LinkedHashMap<String, OdmAdminDataBean> adminDataMap;
+    private OdmClinicalDataBean clinicaldata;
 
     /**
      * Create one ODM XML This method is still under construction. Right now it
@@ -70,13 +65,20 @@ public class FullReportBean extends OdmXmlReportBean {
         this.addRootEndLine();
     }
 
+    public void createChunkedOdmXml(boolean isDataset, boolean header, boolean footer) {
+        ClinicalDataReportBean data = new ClinicalDataReportBean(this.clinicaldata);
+        data.setXmlOutput(this.getXmlOutput());
+        data.setODMVersion(this.getODMVersion());
+        data.addNodeClinicalData(header, footer);
+    }
+
     public void addNodeStudy(OdmStudyBean odmstudy, boolean isDataset) {
         MetaDataReportBean meta = new MetaDataReportBean(odmstudy);
         meta.setODMVersion(this.getODMVersion());
         meta.setXmlOutput(this.getXmlOutput());
         meta.addNodeStudy(isDataset);
     }
-    
+
     /*
      * Currently, this only be called for OpenClinica ODM extension 
      */
@@ -91,7 +93,7 @@ public class FullReportBean extends OdmXmlReportBean {
         ClinicalDataReportBean data = new ClinicalDataReportBean(clinicaldata);
         data.setODMVersion(this.getODMVersion());
         data.setXmlOutput(this.getXmlOutput());
-        data.addNodeClinicalData();
+        data.addNodeClinicalData(true, true);
     }
 
     public LinkedHashMap<String, OdmStudyBean> getOdmStudyMap() {
@@ -116,5 +118,9 @@ public class FullReportBean extends OdmXmlReportBean {
 
     public void setAdminDataMap(LinkedHashMap<String, OdmAdminDataBean> adminDataMap) {
         this.adminDataMap = adminDataMap;
+    }
+
+    public void setClinicalData(OdmClinicalDataBean clinicaldata) {
+        this.clinicaldata = clinicaldata;
     }
 }

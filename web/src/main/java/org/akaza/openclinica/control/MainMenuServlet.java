@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.control.admin.EventStatusStatisticsTableFactory;
 import org.akaza.openclinica.control.admin.SiteStatisticsTableFactory;
 import org.akaza.openclinica.control.admin.StudyStatisticsTableFactory;
@@ -28,6 +29,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
@@ -150,7 +152,11 @@ public class MainMenuServlet extends SecureController {
                         + ub.getId() + " AND (dn.resolution_status_id=1 OR dn.resolution_status_id=2 OR dn.resolution_status_id=3)", currentStudy);
                 request.setAttribute("assignedDiscrepancies", assignedDiscrepancies == null ? 0 : assignedDiscrepancies);
 
-                String idSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();
+                int parentStudyId = currentStudy.getParentStudyId()>0?currentStudy.getParentStudyId():currentStudy.getId();
+                StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
+                StudyParameterValueBean parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "subjectIdGeneration");
+                currentStudy.getStudyParameterConfig().setSubjectIdGeneration(parentSPV.getValue());
+                String idSetting = parentSPV.getValue();
                 if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
                     int nextLabel = this.getStudySubjectDAO().findTheGreatestLabel() + 1;
                     request.setAttribute("label", new Integer(nextLabel).toString());

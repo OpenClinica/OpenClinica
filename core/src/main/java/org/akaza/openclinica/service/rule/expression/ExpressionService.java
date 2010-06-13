@@ -123,6 +123,7 @@ public class ExpressionService {
 
         this.ds = ds;
         this.expressionWrapper = expressionWrapper;
+
     }
 
     public boolean ruleSetExpressionChecker(String expression) {
@@ -961,6 +962,10 @@ public class ExpressionService {
     private StudyEventDAO getStudyEventDao() {
         studyEventDao = this.studyEventDao != null ? studyEventDao : new StudyEventDAO(ds);
         return studyEventDao;
+    }
+
+    public void setExpressionWrapper(ExpressionObjectWrapper expressionWrapper) {
+        this.expressionWrapper = expressionWrapper;
     }
 
 }

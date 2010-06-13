@@ -10,7 +10,7 @@
 
 
 <jsp:include page="../include/sidebar.jsp"/>
-
+<jsp:useBean scope='request' id='parentStudy' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
 <jsp:useBean scope='session' id='newStudy' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope="request" id="facRecruitStatusMap" class="java.util.HashMap"/>
@@ -261,8 +261,9 @@ function updateThis(multiSelEle, count) {
 
   <tr valign="top"><td class="formlabel"><fmt:message key="${key}" bundle="${resword}"/>:</td><td>
 
+   <c:set var="dis" value="${parentStudy.name!='' && !parentStudy.status.available}"/>
    <c:set var="status1" value="${newStudy.status.id}"/>
-   <div class="formfieldM_BG"><select name="statusId" class="formfieldM">
+   <div class="formfieldM_BG"><select name="statusId" class="formfieldM" <c:if test="${dis}">disabled="true" </c:if>>
       <c:forEach var="status" items="${statuses}">
        <c:choose>
         <c:when test="${status1 == status.id}">

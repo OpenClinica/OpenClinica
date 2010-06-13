@@ -473,6 +473,7 @@ public class Page {
     public final static Page VIEW_ALL_JOBS = new Page(path + "admin/viewAllJobs.jsp", "View Jobs");
     public final static Page VIEW_IMPORT_JOB = new Page(path + "admin/viewImportJobs.jsp", "View Import Jobs");
     public final static Page VIEW_IMPORT_JOB_SERVLET = new Page("/ViewImportJob", "View Import Jobs");
+    public final static Page VIEW_LOG_MESSAGE = new Page(path + "admin/viewLogMessage.jsp", "View Log Message");
     // below line for redirect without having to generate the table, tbh
     public final static Page VIEW_JOB_SERVLET = new Page("/ViewJob", "View Jobs");
     public final static Page VIEW_SINGLE_JOB = new Page(path + "admin/viewSingleJob.jsp", "View Jobs");

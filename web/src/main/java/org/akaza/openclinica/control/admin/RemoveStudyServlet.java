@@ -103,6 +103,7 @@ public class RemoveStudyServlet extends SecureController {
                 logger.info("submit to remove the study");
                 // change all statuses to unavailable
                 StudyDAO studao = new StudyDAO(sm.getDataSource());
+                study.setOldStatus(study.getStatus());
                 study.setStatus(Status.DELETED);
                 study.setUpdater(ub);
                 study.setUpdatedDate(new Date());
@@ -112,6 +113,7 @@ public class RemoveStudyServlet extends SecureController {
                 for (int i = 0; i < sites.size(); i++) {
                     StudyBean site = (StudyBean) sites.get(i);
                     if (!site.getStatus().equals(Status.DELETED)) {
+                        site.setOldStatus(site.getStatus());
                         site.setStatus(Status.AUTO_DELETED);
                         site.setUpdater(ub);
                         site.setUpdatedDate(new Date());

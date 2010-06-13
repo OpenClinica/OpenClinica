@@ -698,14 +698,14 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
             if (this.getResolutionStatus() >= 1 && this.getResolutionStatus() <= 5) {
                 actionLink.a().href(
                         "javascript:openDocWindow('ChooseDownloadFormat?subjectId=" + studySubject.getId() + "&discNoteType=" + discNoteType
-                            + "&resolutionStatus=" + resolutionStatus + "')");
-                actionLink.img().name("bt_View1").src("images/bt_Download.gif").border("0").alt(resword.getString("download_discrepancy_notes")).title(
+                            + "&resolutionStatus=" + resolutionStatus + "')").close();
+                actionLink.img().name("bt_Download").src("images/bt_Download.gif").border("0").alt(resword.getString("download_discrepancy_notes")).title(
                         resword.getString("download_discrepancy_notes")).append("hspace=\"4\" width=\"24 \" height=\"15\"").end().aEnd();
                 actionLink.append("&nbsp;&nbsp;&nbsp;");
             } else {
                 actionLink.a().href(
                         "javascript:openDocWindow('ChooseDownloadFormat?subjectId=" + studySubject.getId() + "&discNoteType=" + discNoteType + "&module="
-                            + module + "')");
+                            + module + "')").close();
                 actionLink.img().name("bt_View1").src("images/bt_Download.gif").border("0").alt(resword.getString("download_discrepancy_notes")).title(
                         resword.getString("download_discrepancy_notes")).append("hspace=\"2\" width=\"24 \" height=\"15\"").end().aEnd();
                 actionLink.append("&nbsp;&nbsp;&nbsp;");

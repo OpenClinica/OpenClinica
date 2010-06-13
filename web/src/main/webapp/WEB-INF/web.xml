@@ -111,6 +111,11 @@
         <servlet-class>org.akaza.openclinica.control.extract.ChooseDownloadFormat</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>ViewLogMessage</servlet-name>
+        <description>ViewLogMessage</description>
+        <servlet-class>org.akaza.openclinica.control.admin.ViewLogMessageServlet</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>RssReaderServlet</servlet-name>
         <description>RssReaderServlet</description>
         <servlet-class>org.akaza.openclinica.control.RssReaderServlet</servlet-class>
@@ -1918,6 +1923,10 @@
     <servlet-mapping>
         <servlet-name>ChooseDownloadFormat</servlet-name>
         <url-pattern>/ChooseDownloadFormat</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ViewLogMessage</servlet-name>
+        <url-pattern>/ViewLogMessage</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>RssReaderServlet</servlet-name>

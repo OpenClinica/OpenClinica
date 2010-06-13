@@ -101,6 +101,7 @@ public class RemoveSiteServlet extends SecureController {
                 logger.info("submit to remove the site");
                 // change all statuses to unavailable
                 StudyDAO studao = new StudyDAO(sm.getDataSource());
+                study.setOldStatus(study.getStatus());
                 study.setStatus(Status.DELETED);
                 study.setUpdater(ub);
                 study.setUpdatedDate(new Date());

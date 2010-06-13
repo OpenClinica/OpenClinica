@@ -68,6 +68,8 @@ public class OpenClinicaVariableNode extends ExpressionNode {
                 return testString;
             case 9:
                 return testDate;
+            case 11:
+                return testString + ".txt";
             default:
                 throw new OpenClinicaSystemException("Type not supported");
             }

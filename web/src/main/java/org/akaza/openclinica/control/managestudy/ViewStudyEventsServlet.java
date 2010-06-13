@@ -190,7 +190,7 @@ public class ViewStudyEventsServlet extends SecureController {
             ArrayList events = new ArrayList();
             for (int s = 0; s < studySubjects.size(); ++s) {
                 StudySubjectBean ssb = (StudySubjectBean) studySubjects.get(s);
-                ArrayList evts = sedao.findAllWithSubjectLabelByStudySubjectAndDefinition(ssb.getId(), sed.getId());
+                ArrayList evts = sedao.findAllWithSubjectLabelByStudySubjectAndDefinition(ssb, sed.getId());
 
                 for (int v = 0; v < evts.size(); ++v) {
                     StudyEventBean seb = (StudyEventBean)evts.get(v);
@@ -332,7 +332,7 @@ public class ViewStudyEventsServlet extends SecureController {
             ArrayList events = new ArrayList();
             for (int s = 0; s < studySubjects.size(); ++s) {
                 StudySubjectBean ssb = (StudySubjectBean) studySubjects.get(s);
-                ArrayList evts = sedao.findAllWithSubjectLabelByStudySubjectAndDefinition(ssb.getId(), sed.getId());
+                ArrayList evts = sedao.findAllWithSubjectLabelByStudySubjectAndDefinition(ssb, sed.getId());
 
                 for (int v = 0; v < evts.size(); ++v) {
                     events.add(evts.get(v));

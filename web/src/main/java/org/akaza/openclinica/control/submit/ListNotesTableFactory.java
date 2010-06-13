@@ -241,11 +241,12 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                 for (int j = 0; j < children.size(); j++) {
                     DiscrepancyNoteBean child = (DiscrepancyNoteBean) children.get(j);
 
+                    /*
                     if (child.getResolutionStatusId() > dnb.getResolutionStatusId()) {
                         // dnr.setStatus(ResolutionStatus.get(child.
                         // getResolutionStatusId()));
                         dnb.setResStatus(ResolutionStatus.get(child.getResolutionStatusId()));
-                    }
+                    }*/
                     /*
                      * The update date is the date created of the latest child
                      * note
@@ -596,13 +597,13 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             builder.close();
             builder.img().name("bt_View1").src("images/bt_View_d.gif").border("0").alt("View").title("View").align("left").append("hspace=\"6\"").close();
             builder.aEnd();
-            if(!getCurrentStudy().getStatus().isLocked()){
+            if (!getCurrentStudy().getStatus().isLocked()) {
                 if (!dnb.getResStatus().isClosed() && !dnb.getResStatus().isNotApplicable()) {
                     if (dnb.getEntityType() != "eventCrf") {
                         builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId());
                         builder.close();
-                        builder.img().name("bt_Reassign1").src("images/bt_Reassign_d.gif").border("0").alt(resword.getString("resolve_discrepancy_note")).title(
-                                resword.getString("resolve_discrepancy_note")).align("left").append("hspace=\"6\"").close();
+                        builder.img().name("bt_Reassign1").src("images/bt_Reassign_d.gif").border("0").alt(resword.getString("resolve_discrepancy_note"))
+                                .title(resword.getString("resolve_discrepancy_note")).align("left").append("hspace=\"6\"").close();
                         builder.aEnd();
                     } else {
                         if (dnb.getStageId() == 5) {

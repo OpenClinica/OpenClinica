@@ -176,6 +176,12 @@ public class StudyModuleController {
 //        statusMap.add(Status.PENDING);
         request.setAttribute("statusMap", statusMap);
 
+        if(currentStudy.getParentStudyId() > 0){
+            StudyBean parentStudy = (StudyBean)studyDao.findByPK(currentStudy.getParentStudyId());
+            request.setAttribute("parentStudy", parentStudy);
+        }
+
+
         ArrayList pageMessages = new ArrayList();
         if (request.getSession().getAttribute("pageMessages") != null) {
             pageMessages.addAll((ArrayList) request.getSession().getAttribute("pageMessages"));
@@ -191,7 +197,8 @@ public class StudyModuleController {
         StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
         studyModuleStatusDao.saveOrUpdate(studyModuleStatus);
         status.setComplete();
-
+        //A. Hamid.
+        currentStudy.setOldStatus(currentStudy.getStatus());
         currentStudy.setStatus(Status.get(studyModuleStatus.getStudyStatus()));
         if (currentStudy.getParentStudyId() > 0) {
             studyDao.updateStudyStatus(currentStudy);

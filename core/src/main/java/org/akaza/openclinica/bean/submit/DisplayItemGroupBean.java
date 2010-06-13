@@ -14,6 +14,8 @@ public class DisplayItemGroupBean implements Comparable {
     private String editFlag;// add, edit or remove
     private int formInputOrdinal;
     private boolean isAuto;// if it is auto generated from rep model
+    private String inputId; // @See loadFormValueForItemGroup() 
+    private int index;
 
     public DisplayItemGroupBean() {
         this.itemGroupBean = new ItemGroupBean();
@@ -114,6 +116,22 @@ public class DisplayItemGroupBean implements Comparable {
      */
     public void setAuto(boolean isAuto) {
         this.isAuto = isAuto;
+    }
+
+    public String getInputId() {
+        return inputId;
+    }
+
+    public void setInputId(String inputId) {
+        this.inputId = inputId;
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
     }
 
     public int compareTo(Object o) {

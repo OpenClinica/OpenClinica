@@ -61,7 +61,7 @@
 <h1><span class="title_manage"><fmt:message key="update_SED" bundle="${resword}"/> - <fmt:message key="add_CRFs" bundle="${resword}"/></span></h1>
 
 <form name="crfForm" action="AddCRFToDefinition"  method="post">
-    <input type="hidden" name="action" value="next">
+    <input type="hidden" name="actionName" value="next">
     <input type="hidden" name="pageNum" value="2">
 
     <c:import url="../include/showTableForEventDefinitionCRFList.jsp">

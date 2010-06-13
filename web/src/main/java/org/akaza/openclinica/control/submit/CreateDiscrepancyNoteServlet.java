@@ -7,11 +7,6 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
@@ -50,6 +45,13 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+
+import javax.servlet.http.HttpSession;
+
 /**
  * Create a discrepancy note for a data entity
  *
@@ -84,7 +86,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
     public static final String DIS_NOTE = "discrepancyNote";
 
     public static final String WRITE_TO_DB = "writeToDB";
-    
+
     public static final String IS_REASON_FOR_CHANGE = "isRfc";
 
     public static final String PRESET_RES_STATUS = "strResStatus";
@@ -258,6 +260,25 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             logger.info("has notes:" + "no");
         }
 
+        if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) && currentStudy.getId() != currentStudy.getParentStudyId()
+            || currentRole.getRole().equals(Role.INVESTIGATOR)) {
+            if (parent.getId() > 0 && parent.getDisType().equals(DiscrepancyNoteType.QUERY)) {
+                ArrayList resStatuses = new ArrayList(); // ResolutionStatus.toArrayList();
+                resStatuses.add(ResolutionStatus.UPDATED);
+                resStatuses.add(ResolutionStatus.RESOLVED);//resolution proposed
+                request.setAttribute(RES_STATUSES, resStatuses);
+                System.out.println("reset resolution status");
+            } else {
+                // they cant do anything to log a new query, so we remove
+                // this type
+                ArrayList types2 = DiscrepancyNoteType.toArrayList();
+                types2.remove(DiscrepancyNoteType.QUERY);
+                request.setAttribute(DIS_TYPES, types2);
+                System.out.println("reset discrepancy types");
+            }
+
+        }
+
         if (!fp.isSubmitted()) {
             DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
 
@@ -312,28 +333,6 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
              */
 
             // above extra business rule here, tbh
-            if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) && currentStudy.getId() != currentStudy.getParentStudyId()
-                || currentRole.getRole().equals(Role.INVESTIGATOR)) {
-                if (parent.getId() > 0 && parent.getDisType().equals(DiscrepancyNoteType.QUERY)) {
-                    ArrayList resStatuses = new ArrayList(); // ResolutionStatus.toArrayList();
-                    resStatuses.add(ResolutionStatus.UPDATED);
-                    resStatuses.add(ResolutionStatus.RESOLVED);//resolution proposed
-                    request.setAttribute(RES_STATUSES, resStatuses);
-                    System.out.println("reset resolution status");
-                } else {
-                    // they cant do anything to log a new query, so we remove
-                    // this type
-                    ArrayList types2 = DiscrepancyNoteType.toArrayList();
-                    types2.remove(DiscrepancyNoteType.QUERY);
-                    request.setAttribute(DIS_TYPES, types2);
-                    System.out.println("reset discrepancy types");
-                    //Cannot log new "Query", and "Anotation" & "Reason For Change" only include "Not Applicable"
-                    ArrayList resStatuses = ResolutionStatus.toArrayList();
-                    resStatuses.remove(ResolutionStatus.CLOSED);
-                    request.setAttribute(RES_STATUSES, resStatuses);
-                }
-
-            }
 
             if (parent.getId() == 0 || isNew) {// no parent, new note thread
                 if (enteringData) {
@@ -348,7 +347,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                         // dnb.setAssignedUser(ub);
                         // dnb.setAssignedUserId(ub.getId());
                         // << tbh 08/2009
-                        
+
                     }
                     if (isReasonForChange) {
                         dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.REASON_FOR_CHANGE.getId());
@@ -405,17 +404,17 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             String detailedDes = fp.getString("strErrMsg");
             if (detailedDes != null) {
                 dnb.setDetailedNotes(detailedDes);
-                System.out.println("found strErrMsg: " +fp.getString("strErrMsg"));
+                System.out.println("found strErrMsg: " + fp.getString("strErrMsg"));
             }
             // #4346 TBH 10/2009 
 
             dnb = getNoteInfo(dnb);// populate note infos
-//            String detailedDes = fp.getString("strErrMsg");
-//            if (detailedDes != null) {
-//            	dnb.setDetailedNotes(detailedDes);
-//            	// System.out.println("found strErrMsg: " +fp.getString("strErrMsg"));
-//            }
-//            // #4346 TBH 10/2009 
+            //            String detailedDes = fp.getString("strErrMsg");
+            //            if (detailedDes != null) {
+            //            	dnb.setDetailedNotes(detailedDes);
+            //            	// System.out.println("found strErrMsg: " +fp.getString("strErrMsg"));
+            //            }
+            //            // #4346 TBH 10/2009 
             request.setAttribute(DIS_NOTE, dnb);
             request.setAttribute("unlock", "0");
             request.setAttribute(WRITE_TO_DB, writeToDB ? "1" : "0");
@@ -479,7 +478,8 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             note.setDiscrepancyNoteTypeId(typeId);
             note.setParentDnId(parent.getId());
 
-            if (typeId != DiscrepancyNoteType.ANNOTATION.getId() && typeId != DiscrepancyNoteType.FAILEDVAL.getId() && typeId != DiscrepancyNoteType.REASON_FOR_CHANGE.getId()) {
+            if (typeId != DiscrepancyNoteType.ANNOTATION.getId() && typeId != DiscrepancyNoteType.FAILEDVAL.getId()
+                && typeId != DiscrepancyNoteType.REASON_FOR_CHANGE.getId()) {
                 if (assignedUserAccountId > 0) {
                     note.setAssignedUserId(assignedUserAccountId);
                     System.out.println("^^^ found assigned user id: " + assignedUserAccountId);
@@ -565,7 +565,8 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                     System.out.println("forwarding on line 537");
                     /*Setting a marker to check later while saving administrative edited data. This is needed to make
                     * sure the system flags error while changing data for items which already has a DiscrepanyNote*/
-                    session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, true);
+                    //session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, true);
+                    manageReasonForChangeState(session, entityId);
                     forwardPage(Page.ADD_DISCREPANCY_NOTE_DONE);
                 } else {
                     // if not creating a new thread(note), update exsiting notes
@@ -620,8 +621,9 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 
                     /*Setting a marker to check later while saving administrative edited data. This is needed to make
                     * sure the system flags error while changing data for items which already has a DiscrepanyNote*/
-                    session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, true);
-                    session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, true);
+                    //session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, true);
+                    //session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, true);
+                    manageReasonForChangeState(session, entityId);
 
                     System.out.println("found resolution status: " + note.getResolutionStatusId());
 
@@ -871,7 +873,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
         ArrayList userAccounts = new ArrayList();
         if (currentStudy.getParentStudyId() > 0) {
             userAccounts = userAccountDAO.findAllUsersByStudyOrSite(studyId, currentStudy.getParentStudyId(), studySubjectId);
-        } else if(subjectStudy.getParentStudyId() > 0){
+        } else if (subjectStudy.getParentStudyId() > 0) {
             userAccounts = userAccountDAO.findAllUsersByStudyOrSite(subjectStudy.getId(), subjectStudy.getParentStudyId(), studySubjectId);
         } else {
             userAccounts = userAccountDAO.findAllUsersByStudyOrSite(studyId, 0, studySubjectId);
@@ -909,4 +911,14 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             }
         }
     }
+
+    private void manageReasonForChangeState(HttpSession session, Integer itemDataBeanId) {
+        HashMap<Integer, Boolean> noteSubmitted = (HashMap<Integer, Boolean>) session.getAttribute(DataEntryServlet.NOTE_SUBMITTED);
+        if (noteSubmitted == null) {
+            noteSubmitted = new HashMap<Integer, Boolean>();
+        }
+        noteSubmitted.put(itemDataBeanId, Boolean.TRUE);
+        session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, noteSubmitted);
+    }
+
 }

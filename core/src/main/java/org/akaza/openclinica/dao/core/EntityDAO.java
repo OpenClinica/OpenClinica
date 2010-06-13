@@ -1002,12 +1002,14 @@ public abstract class EntityDAO implements DAOInterface {
         Statement ps = null;
         try {
             con = ds.getConnection();
+            con.setAutoCommit(false);
             if (con.isClosed()) {
                 if (logger.isWarnEnabled())
                     logger.warn("Connection is closed: GenericDAO.select!");
                 throw new SQLException();
             }
             ps = con.createStatement();
+            ps.setFetchSize(50);
             rs = ps.executeQuery(query);
             if (logger.isInfoEnabled()) {
                 logger.info("Executing static query, GenericDAO.select: " + query);
@@ -1311,12 +1313,14 @@ public abstract class EntityDAO implements DAOInterface {
         Statement ps = null;
         try {
             con = ds.getConnection();
+            con.setAutoCommit(false);
             if (con.isClosed()) {
                 if (logger.isWarnEnabled())
                     logger.warn("Connection is closed: GenericDAO.select!");
                 throw new SQLException();
             }
             ps = con.createStatement();
+            ps.setFetchSize(50);
             rs = ps.executeQuery(query);
             if (logger.isInfoEnabled()) {
                 logger.info("Executing static query, GenericDAO.select: " + query);
@@ -1368,12 +1372,14 @@ public abstract class EntityDAO implements DAOInterface {
         Statement ps = null;
         try {
             con = ds.getConnection();
+            con.setAutoCommit(false);
             if (con.isClosed()) {
                 if (logger.isWarnEnabled())
                     logger.warn("Connection is closed: GenericDAO.select!");
                 throw new SQLException();
             }
             ps = con.createStatement();
+            ps.setFetchSize(50);
             rs = ps.executeQuery(query);
             if (logger.isInfoEnabled()) {
                 logger.info("Executing static query, GenericDAO.select: " + query);
@@ -3268,7 +3274,7 @@ public abstract class EntityDAO implements DAOInterface {
         return local_df_string;
     }
 
-    protected String genDatabaseDateConstraint(ExtractBean eb) {
+    public String genDatabaseDateConstraint(ExtractBean eb) {
         String dateConstraint = "";
         String dbName = CoreResources.getDBName();
         String sql = eb.getDataset().getSQLStatement();
@@ -3283,7 +3289,7 @@ public abstract class EntityDAO implements DAOInterface {
         return dateConstraint;
     }
 
-    protected String getECStatusConstraint(int datasetItemStatusId) {
+    public String getECStatusConstraint(int datasetItemStatusId) {
         String statusConstraint = "";
         switch (datasetItemStatusId) {
         default:
@@ -3301,7 +3307,7 @@ public abstract class EntityDAO implements DAOInterface {
         return statusConstraint;
     }
 
-    protected String getItemDataStatusConstraint(int datasetItemStatusId) {
+    public String getItemDataStatusConstraint(int datasetItemStatusId) {
         String statusConstraint = "";
         switch (datasetItemStatusId) {
         default:

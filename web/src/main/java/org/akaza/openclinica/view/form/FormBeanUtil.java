@@ -28,7 +28,6 @@ import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.jdom.Element;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,8 +39,8 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import javax.sql.DataSource;
 import javax.servlet.ServletContext;
+import javax.sql.DataSource;
 
 /**
  * This class builds DisplayFormGroupBeans and DisplayItemBeans in preparation
@@ -55,27 +54,29 @@ public class FormBeanUtil {
     public static final String ADMIN_EDIT = "administrativeEditing";
     private static DynamicsMetadataService itemMetadataService;
     private ServletContext context;
-    
+
     private static DynamicsMetadataService getItemMetadataService(ServletContext context) {
         itemMetadataService =
             itemMetadataService != null ? itemMetadataService : (DynamicsMetadataService) SpringServletAccess.getApplicationContext(context).getBean(
                     "dynamicsMetadataService");
         return itemMetadataService;
     }
-    
-    public static ItemFormMetadataBean runDynamicsCheck(ItemFormMetadataBean metadataBean, EventCRFBean eventCrfBean, ItemDataBean itemDataBean, ServletContext context) {
+
+    public static ItemFormMetadataBean runDynamicsCheck(ItemFormMetadataBean metadataBean, EventCRFBean eventCrfBean, ItemDataBean itemDataBean,
+            ServletContext context) {
         if (!metadataBean.isShowItem()) {
-            
+
             // if the base case is not already shown, let's check it
             boolean showItem = getItemMetadataService(context).isShown(new Integer(metadataBean.getItemId()), eventCrfBean, itemDataBean);
             metadataBean.setShowItem(showItem);
             System.out.println("running is shown to the db..." + showItem + " for " + metadataBean.getItemId());
-        // setting true or false here, tbh
+            // setting true or false here, tbh
         }
         // however, we run into a puzzle here at the last section, apparently we might take a deep-copy again, resetting this to false
-        
+
         return metadataBean;
     }
+
     /**
      * Create a List of DisplayItemBeans from a List of Items.
      * 
@@ -165,38 +166,33 @@ public class FormBeanUtil {
         return disBeans;
     }
 
-    public static List<DisplayItemBean> getDisplayBeansFromItems(List<ItemBean> itemBeans, 
-    		DataSource dataSource, 
-    		EventCRFBean eventCrfBean, 
-    		int sectionId,
-            EventDefinitionCRFBean edcb, 
-            int test, 
-            ServletContext context) {
-            //int test is for method overloading. 
-            List<DisplayItemBean> disBeans = new ArrayList<DisplayItemBean>();
-            if (itemBeans == null || itemBeans.isEmpty())
-                return disBeans;
-            ItemFormMetadataDAO metaDao = new ItemFormMetadataDAO(dataSource);
-            ItemDataDAO itemDataDao = new ItemDataDAO(dataSource);
-            DisplayItemBean displayBean;
-            ItemFormMetadataBean meta;
-            for (ItemBean iBean : itemBeans) {
-                displayBean = new DisplayItemBean();
-                displayBean.setEventDefinitionCRF(edcb);
-                meta = metaDao.findByItemIdAndCRFVersionId(iBean.getId(), eventCrfBean.getCRFVersionId());
-                ItemDataBean itemDataBean = itemDataDao.findByItemIdAndEventCRFId(iBean.getId(), eventCrfBean.getId());
-
-                if (meta.getSectionId() == sectionId) {
-                    displayBean.setItem(iBean);
-                    displayBean.setMetadata(runDynamicsCheck(meta, eventCrfBean, itemDataBean, context));
-                    displayBean.setData(itemDataBean);
-                    // << tbh 05/2010
-                    disBeans.add(displayBean);
-                }
-            }
-            Collections.sort(disBeans);
+    public static List<DisplayItemBean> getDisplayBeansFromItems(List<ItemBean> itemBeans, DataSource dataSource, EventCRFBean eventCrfBean, int sectionId,
+            EventDefinitionCRFBean edcb, int test, ServletContext context) {
+        //int test is for method overloading. 
+        List<DisplayItemBean> disBeans = new ArrayList<DisplayItemBean>();
+        if (itemBeans == null || itemBeans.isEmpty())
             return disBeans;
+        ItemFormMetadataDAO metaDao = new ItemFormMetadataDAO(dataSource);
+        ItemDataDAO itemDataDao = new ItemDataDAO(dataSource);
+        DisplayItemBean displayBean;
+        ItemFormMetadataBean meta;
+        for (ItemBean iBean : itemBeans) {
+            displayBean = new DisplayItemBean();
+            displayBean.setEventDefinitionCRF(edcb);
+            meta = metaDao.findByItemIdAndCRFVersionId(iBean.getId(), eventCrfBean.getCRFVersionId());
+            ItemDataBean itemDataBean = itemDataDao.findByItemIdAndEventCRFId(iBean.getId(), eventCrfBean.getId());
+
+            if (meta.getSectionId() == sectionId) {
+                displayBean.setItem(iBean);
+                displayBean.setMetadata(runDynamicsCheck(meta, eventCrfBean, itemDataBean, context));
+                displayBean.setData(itemDataBean);
+                // << tbh 05/2010
+                disBeans.add(displayBean);
+            }
         }
+        Collections.sort(disBeans);
+        return disBeans;
+    }
 
     public void addBeansToResponseOptions(List<String> values, List<ResponseOptionBean> respOptions) {
         ResponseOptionBean respBean;
@@ -235,13 +231,8 @@ public class FormBeanUtil {
         return responseOptionBeans;
     }
 
-    public DisplayItemBean getDisplayBeanFromSingleItem(
-    		ItemFormMetadataBean itemFBean, 
-            int sectionId, 
-            DataSource dataSource, 
-            EventCRFBean eventCrfBean, 
-            List<String> nullValuesList, 
-            ServletContext context) {
+    public DisplayItemBean getDisplayBeanFromSingleItem(ItemFormMetadataBean itemFBean, int sectionId, DataSource dataSource, EventCRFBean eventCrfBean,
+            List<String> nullValuesList, ServletContext context) {
 
         DisplayItemBean disBean = new DisplayItemBean();
         ItemBean itemBean = new ItemBean();
@@ -296,8 +287,7 @@ public class FormBeanUtil {
      * @param forPrinting
      * @return The org.jdom Element that represents the table.
      */
-    public Element createXHTMLTableFromNonGroup(List<DisplayItemBean> items,
-                                                Integer tabindex, boolean hasDiscrepancyMgt, boolean hasDBValues,
+    public Element createXHTMLTableFromNonGroup(List<DisplayItemBean> items, Integer tabindex, boolean hasDiscrepancyMgt, boolean hasDBValues,
             boolean forPrinting) {
         Element table = new Element("table");
         String cssClasses = CssRules.getClassNamesForTag(table.getName());
@@ -709,8 +699,8 @@ public class FormBeanUtil {
      *         the CRF section.
      * @return A DisplaySectionBean representing a CRF section.
      */
-    public DisplaySectionBean createDisplaySectionBWithFormGroups(int sectionId, int crfVersionId, 
-            DataSource dataSource, int eventCRFDefId, EventCRFBean eventCrfBean, ServletContext context) {
+    public DisplaySectionBean createDisplaySectionBWithFormGroups(int sectionId, int crfVersionId, DataSource dataSource, int eventCRFDefId,
+            EventCRFBean eventCrfBean, ServletContext context) {
 
         DisplaySectionBean displaySectionBean = new DisplaySectionBean();
 
@@ -1047,8 +1037,8 @@ public class FormBeanUtil {
      *            DAO objects.
      * @return A DisplaySectionBean.
      */
-    public DisplaySectionBean createDisplaySectionBeanWithItemGroups(int sectionId, EventCRFBean eventCrfBean, 
-            SectionBean sectionBean, SessionManager sm, ServletContext context) {
+    public DisplaySectionBean createDisplaySectionBeanWithItemGroups(int sectionId, EventCRFBean eventCrfBean, SectionBean sectionBean, SessionManager sm,
+            ServletContext context) {
         DisplaySectionBean dBean = new DisplaySectionBean();
         ItemGroupDAO formGroupDAO = new ItemGroupDAO(sm.getDataSource());
         ItemGroupMetadataDAO igMetaDAO = new ItemGroupMetadataDAO(sm.getDataSource());
@@ -1124,8 +1114,8 @@ public class FormBeanUtil {
      *            DAO objects.
      * @return A DisplaySectionBean.
      */
-    public DisplaySectionBean createDisplaySectionWithItemGroups(StudyBean study, int sectionId, EventCRFBean eventCrfBean, int studyEventId, SessionManager sm,
-            int eventDefinitionCRFId, ServletContext context) {
+    public DisplaySectionBean createDisplaySectionWithItemGroups(StudyBean study, int sectionId, EventCRFBean eventCrfBean, int studyEventId,
+            SessionManager sm, int eventDefinitionCRFId, ServletContext context) {
 
         DisplaySectionBean dBean = new DisplaySectionBean();
         ItemGroupDAO formGroupDAO = new ItemGroupDAO(sm.getDataSource());

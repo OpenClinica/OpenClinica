@@ -91,7 +91,7 @@
                 FACILITY_RECRUITMENT_STATUS=?, FACILITY_CONTACT_NAME=?,
                 FACILITY_CONTACT_DEGREE=?, FACILITY_CONTACT_PHONE=?,
                 FACILITY_CONTACT_EMAIL=?, STATUS_ID=?,
-                UPDATE_ID=?, DATE_UPDATED=? WHERE STUDY_ID=?</sql>
+                UPDATE_ID=?, DATE_UPDATED=?, OLD_STATUS_ID=? WHERE STUDY_ID=?</sql>
         </query>
         <query>
                 <name>findNextKey</name>
@@ -134,7 +134,7 @@
         </query>
         <query>
             <name>updateSitesStatus</name>
-            <sql>UPDATE STUDY SET STATUS_ID=? WHERE PARENT_STUDY_ID=?</sql>
+            <sql>UPDATE STUDY SET STATUS_ID=?, OLD_STATUS_ID=? WHERE PARENT_STUDY_ID=?</sql>
         </query>
         <!-- YW 07-2008 find all sites' ids belonging to a study -->
 		<query>
@@ -158,6 +158,6 @@
 		</query>
         <query>
             <name>updateStudyStatus</name>
-            <sql>UPDATE STUDY SET STATUS_ID=? WHERE STUDY_ID=?</sql>
+            <sql>UPDATE STUDY SET STATUS_ID=?, OLD_STATUS_ID=? WHERE STUDY_ID=?</sql>
         </query>
 </queries>

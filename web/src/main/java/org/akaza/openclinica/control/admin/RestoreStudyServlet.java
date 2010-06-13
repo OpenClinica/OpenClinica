@@ -103,7 +103,7 @@ public class RestoreStudyServlet extends SecureController {
                 logger.info("submit to restore the study");
                 // change all statuses to unavailable
                 StudyDAO studao = new StudyDAO(sm.getDataSource());
-                study.setStatus(Status.AVAILABLE);
+                study.setStatus(study.getOldStatus());
                 study.setUpdater(ub);
                 study.setUpdatedDate(new Date());
                 studao.update(study);
@@ -112,7 +112,7 @@ public class RestoreStudyServlet extends SecureController {
                 for (int i = 0; i < sites.size(); i++) {
                     StudyBean site = (StudyBean) sites.get(i);
                     if (site.getStatus() == Status.AUTO_DELETED) {
-                        site.setStatus(Status.AVAILABLE);
+                        site.setStatus(site.getOldStatus());
                         site.setUpdater(ub);
                         site.setUpdatedDate(new Date());
                         sdao.update(site);

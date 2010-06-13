@@ -28,6 +28,8 @@ public class StudyEventBean extends AuditableEntityBean {
 
     private int studySubjectId;
 
+    private StudySubjectBean studySubject;
+
     private String location = "";
 
     private int sampleOrdinal;
@@ -347,5 +349,13 @@ public class StudyEventBean extends AuditableEntityBean {
     }
     public void setEditable(boolean editable){
         this.editable = editable;
+    }
+
+    public StudySubjectBean getStudySubject() {
+        return studySubject;
+    }
+
+    public void setStudySubject(StudySubjectBean studySubject) {
+        this.studySubject = studySubject;
     }
 }

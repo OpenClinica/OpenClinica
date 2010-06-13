@@ -53,7 +53,7 @@ public class AddCRFToDefinitionServlet extends SecureController {
 
     @Override
     public void processRequest() throws Exception {
-        String action = request.getParameter("action");
+        String actionName = request.getParameter("actionName");
         String submit = request.getParameter("Submit");
 
         CRFDAO cdao = new CRFDAO(sm.getDataSource());
@@ -78,7 +78,7 @@ public class AddCRFToDefinitionServlet extends SecureController {
         if(submit!=null){
             addCRF();
         }else{
-            if (StringUtil.isBlank(action)) {
+            if (StringUtil.isBlank(actionName)) {
                 FormProcessor fp = new FormProcessor(request);
                 EntityBeanTable table = fp.getEntityBeanTable();
                 ArrayList allRows = CRFRow.generateRowsFromBeans(crfs);
@@ -93,7 +93,7 @@ public class AddCRFToDefinitionServlet extends SecureController {
 
                 request.setAttribute("table", table);
                 forwardPage(Page.UPDATE_EVENT_DEFINITION2);
-            }else if(action.equalsIgnoreCase("next")){
+            }else if(actionName.equalsIgnoreCase("next")){
                 Integer pageNumber = Integer.valueOf(request.getParameter("pageNum"));
                 if (pageNumber != null) {
                     if (pageNumber.intValue() == 2) {

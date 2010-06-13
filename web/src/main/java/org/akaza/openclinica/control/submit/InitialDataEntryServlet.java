@@ -149,8 +149,8 @@ public class InitialDataEntryServlet extends DataEntryServlet {
                 order = displayGroup.getFormInputOrdinal();
             }
             for (DisplayItemBean displayItem : items) {
-            	// int manualcount = 0;
-            	// tbh trying to set this correctly 01/2010
+                // int manualcount = 0;
+                // tbh trying to set this correctly 01/2010
                 if (displayGroup.isAuto()) {
                     inputName = getGroupItemInputName(displayGroup, order, displayItem);
                 } else {
@@ -160,9 +160,10 @@ public class InitialDataEntryServlet extends DataEntryServlet {
                 logger.debug("THe oid is " + displayItem.getItem().getOid() + " order : " + order + " inputName : " + inputName);
 
                 if (groupOrdinalPLusItemOid.containsKey(displayItem.getItem().getOid())
-                    || groupOrdinalPLusItemOid.containsKey(String.valueOf(order + 1) + displayItem.getItem().getOid())) {
-                    logger.debug("IN : " + String.valueOf(order + 1) + displayItem.getItem().getOid());
-                    validateDisplayItemBean(v, displayItem, inputName, rv, groupOrdinalPLusItemOid, true, groupOrdinalPLusItemOid.get(String.valueOf(order + 1)
+                    || groupOrdinalPLusItemOid.containsKey(String.valueOf(displayGroup.getIndex() + 1) + displayItem.getItem().getOid())) {
+                    logger.debug("IN : " + String.valueOf(displayGroup.getIndex() + 1) + displayItem.getItem().getOid());
+                    validateDisplayItemBean(v, displayItem, inputName, rv, groupOrdinalPLusItemOid, true, groupOrdinalPLusItemOid.get(String
+                            .valueOf(displayGroup.getIndex() + 1)
                         + displayItem.getItem().getOid()));
                 } else {
                     validateDisplayItemBean(v, displayItem, inputName, rv, groupOrdinalPLusItemOid, false, null);

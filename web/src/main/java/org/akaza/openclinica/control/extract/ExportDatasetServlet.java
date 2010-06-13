@@ -19,10 +19,10 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.service.extract.GenerateExtractFileService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -122,25 +122,24 @@ public class ExportDatasetServlet extends SecureController {
         if (StringUtil.isBlank(action)) {
             loadList(db, asdfdao, datasetId, fp, eb);
             forwardPage(Page.EXPORT_DATASETS);
-        }else if("delete".equalsIgnoreCase(action) && adfId > 0) {
+        } else if ("delete".equalsIgnoreCase(action) && adfId > 0) {
             boolean success = false;
             ArchivedDatasetFileBean adfBean = (ArchivedDatasetFileBean) asdfdao.findByPK(adfId);
             File file = new File(adfBean.getFileReference());
-            if(!file.canWrite()){
+            if (!file.canWrite()) {
                 addPageMessage(respage.getString("write_protected"));
-            }else{
+            } else {
                 success = file.delete();
-                if(success){
+                if (success) {
                     asdfdao.deleteArchiveDataset(adfBean);
                     addPageMessage(respage.getString("file_removed"));
-                }else{
+                } else {
                     addPageMessage(respage.getString("error_removing_file"));
                 }
             }
             loadList(db, asdfdao, datasetId, fp, eb);
             forwardPage(Page.EXPORT_DATASETS);
-        }
-        else {
+        } else {
             logger.info("**** found action ****: " + action);
             String generateReport = "";
             // generate file, and show screen export
@@ -151,7 +150,7 @@ public class ExportDatasetServlet extends SecureController {
             SimpleDateFormat sdfDir = new SimpleDateFormat(pattern);
             String generalFileDir = DATASET_DIR + db.getId() + File.separator + sdfDir.format(new java.util.Date());
             String fileName = "";
-            
+
             db.setName(db.getName().replaceAll(" ", "_"));
             Page finalTarget = Page.GENERATE_DATASET;
             finalTarget = Page.EXPORT_DATA_CUSTOM;
@@ -180,7 +179,11 @@ public class ExportDatasetServlet extends SecureController {
                 String odmVersion = fp.getString("odmVersion");
                 String ODMXMLFileName = "";
                 // DRY
-                HashMap answerMap = generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, db, this.currentStudy, "");
+                HashMap answerMap = new HashMap();
+                /*
+                answerMap =
+                    generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, db, this.currentStudy, "", eb, currentstudyid, parentstudy);
+                    */
                 for (Iterator it = answerMap.entrySet().iterator(); it.hasNext();) {
                     java.util.Map.Entry entry = (java.util.Map.Entry) it.next();
                     Object key = entry.getKey();
@@ -373,8 +376,8 @@ public class ExportDatasetServlet extends SecureController {
             logger.info("found file name: " + finalTarget.getFileName());
 
             String del = CoreResources.getField("dataset_file_delete");
-            if(del.equalsIgnoreCase("true") || del.equals("")){
-                File deleteFile = new File(generalFileDir+fileName);
+            if (del.equalsIgnoreCase("true") || del.equals("")) {
+                File deleteFile = new File(generalFileDir + fileName);
                 deleteFile.delete();
             }
 
@@ -414,7 +417,7 @@ public class ExportDatasetServlet extends SecureController {
         return adfb;
     }
 
-    public void loadList(DatasetBean db, ArchivedDatasetFileDAO asdfdao, int datasetId, FormProcessor fp, ExtractBean eb){
+    public void loadList(DatasetBean db, ArchivedDatasetFileDAO asdfdao, int datasetId, FormProcessor fp, ExtractBean eb) {
         logger.info("action is blank");
         request.setAttribute("dataset", db);
         logger.info("just set dataset to request");
@@ -453,7 +456,7 @@ public class ExportDatasetServlet extends SecureController {
         EntityBeanTable table = fp.getEntityBeanTable();
         String[] columns =
             { resword.getString("file_name"), resword.getString("run_time"), resword.getString("file_size"), resword.getString("created_date"),
-                resword.getString("created_by"), resword.getString("action")};
+                resword.getString("created_by"), resword.getString("action") };
         table.setColumns(new ArrayList(Arrays.asList(columns)));
         table.hideColumnLink(0);
         table.hideColumnLink(1);

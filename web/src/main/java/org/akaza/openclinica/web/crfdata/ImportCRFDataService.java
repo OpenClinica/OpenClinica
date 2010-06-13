@@ -259,6 +259,7 @@ public class ImportCRFDataService {
 
                 displayItemBeans = new ArrayList<DisplayItemBean>();
                 // INIT here instead, tbh 08/2008
+
                 for (FormDataBean formDataBean : formDataBeans) {
 
                     // displayItemBeans = new ArrayList<DisplayItemBean>();
@@ -267,8 +268,17 @@ public class ImportCRFDataService {
                     EventCRFDAO eventCRFDAO = new EventCRFDAO(ds);
                     ArrayList<CRFVersionBean> crfVersionBeans = crfVersionDAO.findAllByOid(formDataBean.getFormOID());
                     ArrayList<ImportItemGroupDataBean> itemGroupDataBeans = formDataBean.getItemGroupData();
+                    // >>> tbh 05/22/2010
+                    if ((crfVersionBeans == null) || (crfVersionBeans.size() == 0)) {
+                        MessageFormat mf = new MessageFormat("");
+                        mf.applyPattern(respage.getString("your_crf_version_oid_did_not_generate"));
+                        Object[] arguments = { formDataBean.getFormOID() };
 
+                        throw new OpenClinicaException(mf.format(arguments), "");
+                    }
                     CRFVersionBean crfVersion = crfVersionBeans.get(0);
+                    // if you have a mispelled form oid you get an error here
+                    // need to error out gracefully and post an error
                     logger.debug("iterating through form beans: found " + crfVersion.getOid());
                     // may be the point where we cut off item groups etc and
                     // instead work on sections
@@ -341,6 +351,7 @@ public class ImportCRFDataService {
                                             // looking for a number format
                                             // exception
                                             // from the above.
+                                            System.out.println("found npe for group ordinals, line 344!");
                                         }
                                     }
                                     ItemDataBean itemDataBean = createItemDataBean(itemBean, eventCRFBean, importItemDataBean.getValue(), ub, groupOrdinal);
@@ -448,6 +459,7 @@ public class ImportCRFDataService {
                     discValidator = new DiscrepancyValidator(request, discNotes);
                     // reset to allow for new errors...
                 }// after forms
+
                 wrappers.add(displayItemBeanWrapper);
             }// after study events
 

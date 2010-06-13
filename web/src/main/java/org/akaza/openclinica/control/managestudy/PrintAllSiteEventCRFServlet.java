@@ -90,6 +90,9 @@ public class PrintAllSiteEventCRFServlet extends DataEntryServlet {
         Map eventDefinitionDefaultVersions = new LinkedHashMap();
         for (int i = 0; i < edcs.size(); i++) {
             EventDefinitionCRFBean edc = edcs.get(i);
+            if (!edc.getStatus().equals(Status.AVAILABLE)) {
+                continue;
+            }
             ArrayList versions = (ArrayList) cvdao.findAllByCRF(edc.getCrfId());
             edc.setVersions(versions);
             CRFBean crf = (CRFBean) cdao.findByPK(edc.getCrfId());

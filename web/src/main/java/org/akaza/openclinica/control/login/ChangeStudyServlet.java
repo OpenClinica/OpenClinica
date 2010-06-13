@@ -7,10 +7,16 @@
  */
 package org.akaza.openclinica.control.login;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.admin.EventStatusStatisticsTableFactory;
 import org.akaza.openclinica.control.admin.SiteStatisticsTableFactory;
@@ -38,11 +44,6 @@ import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * @author jxu
@@ -88,6 +89,12 @@ public class ChangeStudyServlet extends SecureController {
         ArrayList studies = udao.findStudyByUser(ub.getName(), (ArrayList) sdao.findAll());
         request.setAttribute("siteRoleMap", Role.siteRoleMap);
         request.setAttribute("studyRoleMap", Role.studyRoleMap);
+        if(request.getAttribute("label")!=null) {
+            String label = (String) request.getAttribute("label");
+            if(label.length()>0) {
+                request.setAttribute("label", label);
+            }
+        }
 
         ArrayList validStudies = new ArrayList();
         for (int i = 0; i < studies.size(); i++) {
@@ -156,8 +163,15 @@ public class ChangeStudyServlet extends SecureController {
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
 
         ArrayList studyParameters = spvdao.findParamConfigByStudy(current);
-
         current.setStudyParameters(studyParameters);
+        int parentStudyId = currentStudy.getParentStudyId()>0?currentStudy.getParentStudyId():currentStudy.getId();
+        StudyParameterValueBean parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "subjectIdGeneration");
+        current.getStudyParameterConfig().setSubjectIdGeneration(parentSPV.getValue());
+        String idSetting = current.getStudyParameterConfig().getSubjectIdGeneration();
+        if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
+            int nextLabel = this.getStudySubjectDAO().findTheGreatestLabel() + 1;
+            request.setAttribute("label", new Integer(nextLabel).toString());
+        }
 
         StudyConfigService scs = new StudyConfigService(sm.getDataSource());
         if (current.getParentStudyId() <= 0) {// top study

@@ -208,7 +208,8 @@ public class ViewNotesServlet extends SecureController {
         request.setAttribute("viewNotesHtml", viewNotesHtml);
 
         if ("yes".equalsIgnoreCase(fp.getString(PRINT))) {
-            request.setAttribute("allNotes", factory.getAllNotes());
+            List allNotes = dndao.findAllDiscrepancyNotesDataByStudy(currentStudy);
+            request.setAttribute("allNotes", allNotes);
             forwardPage(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_PRINT);
         } else {
             forwardPage(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY);

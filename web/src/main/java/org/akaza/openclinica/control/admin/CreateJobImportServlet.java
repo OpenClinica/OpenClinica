@@ -101,44 +101,10 @@ public class CreateJobImportServlet extends SecureController {
         addEntityList("studies", finalList, respage.getString("a_user_cannot_be_created_no_study_as_active"), Page.ADMIN_SYSTEM);
         // YW >>
         // << tbh
-        // Date jobDate = new Date();
-        // jobDate = (fp2.getDateTime(DATE_START_JOB));
-        // HashMap presetValues = new HashMap();
-        // // presetValues.put("filePath", directory);
-        // Calendar calendar = new GregorianCalendar();
-        // calendar.setTime(jobDate);
-        // presetValues.put(DATE_START_JOB + "Hour",
-        // calendar.get(Calendar.HOUR_OF_DAY));
-        // presetValues.put(DATE_START_JOB + "Minute",
-        // calendar.get(Calendar.MINUTE));
-        // // TODO this will have to match l10n formatting
-        // String preparedDate = (calendar.get(Calendar.MONTH) + 1) + "/" +
-        // calendar.get(Calendar.DATE) + "/" + calendar.get(Calendar.YEAR);
-        // SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-        // try {
-        // Date preparedDate2 = sdf.parse(preparedDate);
-        // String preparedDate3 = local_df.format(preparedDate2);
-        // presetValues.put(DATE_START_JOB + "Date", preparedDate3);
-        // } catch (ParseException e) {
-        // // TODO Auto-generated catch block
-        // e.printStackTrace();
-        // }
-        // presetValues.put(DATE_START_JOB + "Date",
-        // (calendar.get(Calendar.MONTH) + 1) + "/" +
-        // calendar.get(Calendar.DATE) + "/" +
-        // calendar.get(Calendar.YEAR));
-        // fp2.setPresetValues(presetValues);
-        // setPresetValues(fp2.getPresetValues());
+        
         request.setAttribute("filePath", directory);
         // request.setAttribute("activeStudy", activeStudy);
-        // try {
-        // request.setAttribute(DATE_START_JOB, fp2.getDateTime(DATE_START_JOB +
-        // "Date"));
-        // } catch (Exception e) {
-        // // TODO Auto-generated catch block
-        // System.out.println("reached exception " + e.getMessage());
-        // request.setAttribute(DATE_START_JOB, new Date());
-        // }
+        
         request.setAttribute(JOB_NAME, fp2.getString(JOB_NAME));
         request.setAttribute(JOB_DESC, fp2.getString(JOB_DESC));
         request.setAttribute(EMAIL, fp2.getString(EMAIL));

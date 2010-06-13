@@ -117,7 +117,7 @@ public class RestoreSiteServlet extends SecureController {
                 logger.info("submit to restore the site");
                 // change all statuses to unavailable
                 StudyDAO studao = new StudyDAO(sm.getDataSource());
-                study.setStatus(Status.AVAILABLE);
+                study.setStatus(study.getOldStatus());
                 study.setUpdater(ub);
                 study.setUpdatedDate(new Date());
                 studao.update(study);

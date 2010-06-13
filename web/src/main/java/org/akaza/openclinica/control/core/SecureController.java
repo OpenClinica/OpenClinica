@@ -44,15 +44,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.StringTokenizer;
+import java.util.*;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
@@ -231,10 +223,22 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     public static final String USER_BEAN_NAME = "userBean";
 
+    public void passwdTimeOut(){
+        Date lastChangeDate = ub.getPasswdTimestamp();
+        if (lastChangeDate == null) {
+            addPageMessage(respage.getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName() + ". " + respage.getString("password_set") + " "
+                + "<a href=\"UpdateProfile\">" + respage.getString("user_profile") + " </a>");
+            int pwdChangeRequired = new Integer(SQLInitServlet.getField("change_passwd_required")).intValue();
+            if (pwdChangeRequired == 1) {
+                request.setAttribute("mustChangePass", "yes");
+                forwardPage(Page.RESET_PASSWORD);
+            }
+        }
+    }
+
     private void process(HttpServletRequest request, HttpServletResponse response) throws OpenClinicaException, UnsupportedEncodingException {
 
         request.setCharacterEncoding("UTF-8");
-
         session = request.getSession();
         // BWP >> 1/8/2008
         try {
@@ -270,7 +274,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         resworkflow = ResourceBundleProvider.getWorkflowBundle(locale);
 
         local_df = new SimpleDateFormat(resformat.getString("date_format_string"), ResourceBundleProvider.getLocale());
-
+        
         try {
             String userName = request.getRemoteUser();
             // BWP 1/8/08<< the sm variable may already be set with a mock
@@ -445,7 +449,9 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             // rq_names += " - " + en_request.nextElement();
             // }
             // logger.info(rq_names);
-
+            if(!request.getRequestURI().endsWith("ResetPassword")){
+                passwdTimeOut();
+            }
             mayProceed();
             processRequest();
         } catch (InconsistentStateException ise) {

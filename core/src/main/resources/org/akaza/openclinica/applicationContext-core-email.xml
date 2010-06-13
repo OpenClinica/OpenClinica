@@ -13,13 +13,13 @@
    
      <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
       <property name="host" value="s[mail.host]" />
+      <property name="username" value="s[mail.username]"/>
+      <property name="password" value="s[mail.password]"/>
       <property name="port" value="s[mail.port]"/>
       <property name="protocol" value="s[mail.protocol]"/>
       <property name="defaultEncoding" value="UTF-8" />
       <property name="javaMailProperties">
         <props>
-          <prop key="mail.username">s[mail.username]</prop>
-          <prop key="mail.password">s[mail.password]</prop>
           <prop key="mail.smtp.auth">s[mail.smtp.auth]</prop>
           <prop key="mail.smtp.starttls.enable">s[mail.smtp.starttls.enable]</prop>
           <!--  IF using HTTPS -->

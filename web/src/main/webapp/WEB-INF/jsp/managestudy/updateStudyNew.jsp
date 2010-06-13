@@ -71,6 +71,7 @@
 		</td>
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
+<jsp:useBean scope='request' id='parentStudy' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
 <jsp:useBean scope='request' id='studyToView' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
 <jsp:useBean scope='request' id='sitesToView' class='java.util.ArrayList'/>
 
@@ -98,6 +99,10 @@
 <h1><span class="title_manage">
 <fmt:message key="update_study_details" bundle="${resword}"/> <c:out value="${studyToView.name}"/>
 </span></h1>
+
+
+
+
 <c:set var="startDate" value="" />
 <c:set var="endDate" value="" />
 <c:set var="protocolDateVerification" value="" />
@@ -156,9 +161,9 @@
           <tr valign="top">
               <td class="formlabel"><fmt:message key="${key}" bundle="${resword}"/>:</td>
               <td><div class="formfieldXL_BG">
-
+           <c:set var="dis" value="${parentStudy.name!='' && !parentStudy.status.available}"/>
            <c:set var="status1" value="${studyToView.status.id}"/>
-           <select name="statusId" class="formfieldXL">
+           <select name="statusId" class="formfieldXL" <c:if test="${dis}">disabled="true" </c:if>>
               <c:forEach var="status" items="${statuses}">
                <c:choose>
                 <c:when test="${status1 == status.id}">

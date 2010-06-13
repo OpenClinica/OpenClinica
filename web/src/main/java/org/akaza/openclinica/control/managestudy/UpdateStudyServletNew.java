@@ -82,6 +82,12 @@ public class UpdateStudyServletNew extends SecureController {
         request.setAttribute("isInterventional", isInterventional ? "1" : "0");
         String protocolType = study.getProtocolTypeKey();
 
+        //A. Hamid. 5001
+        if(study.getParentStudyId() > 0){
+            StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+            request.setAttribute("parentStudy", parentStudy);
+        }
+
         ArrayList interventionArray = new ArrayList();
         if (isInterventional) {
             interventionArray = parseInterventions((study));
@@ -332,7 +338,7 @@ public class UpdateStudyServletNew extends SecureController {
     }
 
     private StudyBean createStudyBean(FormProcessor fp) {
-        StudyBean newStudy = new StudyBean();
+        StudyBean newStudy = study;
         newStudy.setId(fp.getInt("studyId"));
         newStudy.setName(fp.getString("name"));
         newStudy.setOfficialTitle(fp.getString("officialTitle"));
@@ -351,6 +357,7 @@ public class UpdateStudyServletNew extends SecureController {
 
     private boolean updateStudy2(FormProcessor fp) {
 
+        study.setOldStatus(study.getStatus());
         study.setStatus(Status.get(fp.getInt("statusId")));
 
         if (StringUtil.isBlank(fp.getString(INPUT_VER_DATE))) {

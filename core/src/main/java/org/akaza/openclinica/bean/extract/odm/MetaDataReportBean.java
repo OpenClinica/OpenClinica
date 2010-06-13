@@ -4,16 +4,8 @@
  * For details see: http://www.openclinica.org/license copyright 2003-2005 Akaza
  * Research
  *
- *//* OpenClinica is distributed under the GNU Lesser General Public License (GNU
- * LGPL).
- *
- * For details see: http://www.openclinica.org/license copyright 2003-2005 Akaza
- * Research
- *
  */
 package org.akaza.openclinica.bean.extract.odm;
-
-import java.util.ArrayList;
 
 import org.akaza.openclinica.bean.odmbeans.BasicDefinitionsBean;
 import org.akaza.openclinica.bean.odmbeans.CodeListBean;
@@ -36,6 +28,10 @@ import org.akaza.openclinica.bean.odmbeans.SymbolBean;
 import org.akaza.openclinica.bean.odmbeans.TranslatedTextBean;
 import org.apache.commons.lang.StringEscapeUtils;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+
 /**
  * Create ODM XML Study Element for a study.
  * 
@@ -44,10 +40,16 @@ import org.apache.commons.lang.StringEscapeUtils;
 
 public class MetaDataReportBean extends OdmXmlReportBean {
     private OdmStudyBean odmstudy;
+    private LinkedHashMap<String, OdmStudyBean> odmStudyMap;
 
     public MetaDataReportBean(OdmStudyBean odmstudy) {
         super();
         this.odmstudy = odmstudy;
+    }
+
+    public MetaDataReportBean(LinkedHashMap<String, OdmStudyBean> odmStudyMap) {
+        super();
+        this.odmStudyMap = odmStudyMap;
     }
 
     private static String nls = System.getProperty("line.separator");
@@ -61,6 +63,17 @@ public class MetaDataReportBean extends OdmXmlReportBean {
         // this.addRootStartLine();
         // addNodeStudy();
         // this.addRootEndLine();
+    }
+
+    public void createChunkedOdmXml(boolean isDataset) {
+        this.addHeading();
+        this.addRootStartLine();
+        Iterator<OdmStudyBean> itm = this.odmStudyMap.values().iterator();
+        while (itm.hasNext()) {
+            OdmStudyBean s = itm.next();
+            odmstudy = s;
+            this.addNodeStudy(isDataset);
+        }
     }
 
     public void addNodeStudy(boolean isDataset) {
@@ -371,15 +384,16 @@ public class MetaDataReportBean extends OdmXmlReportBean {
             // add MultiSelectListRef
             String ODMVersion = this.getODMVersion();
             if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
-                if(item.getMultiSelectListRef() != null) {
-                String mslOid = item.getMultiSelectListRef().getElementDefOID();
+                if (item.getMultiSelectListRef() != null) {
+                    String mslOid = item.getMultiSelectListRef().getElementDefOID();
                     if (mslOid != null && mslOid.length() > 0) {
                         if (!hasNode) {
                             hasNode = true;
                             xml.append(">");
                             xml.append(nls);
                         }
-                        xml.append(currentIndent + indent + "<OpenClinica:MultiSelectListRef OpenClinica:MultiSelectListID=\"" + StringEscapeUtils.escapeXml(mslOid) + "\"/>");
+                        xml.append(currentIndent + indent + "<OpenClinica:MultiSelectListRef OpenClinica:MultiSelectListID=\""
+                            + StringEscapeUtils.escapeXml(mslOid) + "\"/>");
                         xml.append(nls);
                     }
                 }
@@ -435,14 +449,14 @@ public class MetaDataReportBean extends OdmXmlReportBean {
             }
         }
     }
-    
+
     public void addMultiSelectList(String currentIndent) {
         StringBuffer xml = this.getXmlOutput();
         String indent = this.getIndent();
         ArrayList<MultiSelectListBean> lists = (ArrayList<MultiSelectListBean>) odmstudy.getMetaDataVersion().getMultiSelectLists();
-        if(lists != null) {
-            if(lists.size()>0) {
-                for(MultiSelectListBean l : lists) {
+        if (lists != null) {
+            if (lists.size() > 0) {
+                for (MultiSelectListBean l : lists) {
                     xml.append(currentIndent + "<OpenClinica:MultiSelectList OpenClinica:ID=\"" + StringEscapeUtils.escapeXml(l.getOid()) + "\" ");
                     if (l.getName() != null) {
                         xml.append("OpenClinica:Name=\"" + StringEscapeUtils.escapeXml(l.getName()) + "\" ");
@@ -455,11 +469,12 @@ public class MetaDataReportBean extends OdmXmlReportBean {
                     }
                     xml.append(">");
                     xml.append(nls);
-                    
+
                     ArrayList<MultiSelectListItemBean> mslis = (ArrayList<MultiSelectListItemBean>) l.getMultiSelectListItems();
                     if (mslis != null && mslis.size() > 0) {
                         for (MultiSelectListItemBean msli : mslis) {
-                            xml.append(currentIndent + indent + "<OpenClinica:MultiSelectListItem OpenClinica:CodedOptionValue=\"" + StringEscapeUtils.escapeXml(msli.getCodedOptionValue()) + "\">");
+                            xml.append(currentIndent + indent + "<OpenClinica:MultiSelectListItem OpenClinica:CodedOptionValue=\""
+                                + StringEscapeUtils.escapeXml(msli.getCodedOptionValue()) + "\">");
                             xml.append(nls);
                             xml.append(currentIndent + indent + indent + "<Decode>");
                             xml.append(nls);
@@ -533,6 +548,14 @@ public class MetaDataReportBean extends OdmXmlReportBean {
 
     public OdmStudyBean getOdmStudyBean() {
         return this.odmstudy;
+    }
+
+    public LinkedHashMap<String, OdmStudyBean> getOdmStudyMap() {
+        return odmStudyMap;
+    }
+
+    public void setOdmStudyMap(LinkedHashMap<String, OdmStudyBean> odmStudyMap) {
+        this.odmStudyMap = odmStudyMap;
     }
 
     protected String measurementUnitRefString(String muRefOid) {

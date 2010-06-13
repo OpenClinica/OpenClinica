@@ -32,7 +32,7 @@
 <c:set var="autoParsedOrdinal" value="${rowCount - manualRows}"/>
 <!-- for the rows in model, input name processed by back-end servlet, needs to change them back to the name got from form, so we can show error frame around the input -->
 <%-- addition tbh 02/2010 have to reduce this by one to make up for non-manual rows (at the end) --%>
-<c:set var="autoParsedInputName" value="${repeatParentId}_${autoParsedOrdinal - 1}input${itemId}" />
+<c:set var="autoParsedInputName" value="${repeatParentId}_${autoParsedOrdinal}input${itemId}" />
 <c:set var="autoParsedInputName2" value="${repeatParentId}_${autoParsedOrdinal}input${itemId}" />
 <c:set var="autoParsedInputNameLast" value="${repeatParentId}_1input${itemId}" />
 
@@ -670,6 +670,27 @@ include the default value first in the select list --%>
   </c:choose>
 
   <c:choose>
+  
+  <c:when test="${(originJSP eq 'administrativeEditing')  && (displayItem.numDiscrepancyNotes > 0) && (isForcedRFC eq 'true')}">
+    <c:if test="${errorTxtMessage eq null }">
+      <a tabindex="<c:out value="${tabNum + 1000}"/>" href="#" onClick=
+    "openDNoteWindow('ViewDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=<c:out value="${parsedInputName}"/>&isRfc=1&column=value&enterData=1&writeToDB=1','spanAlert-<c:out value="${parsedInputName}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
+    ><img id="flag_<c:out value="${inputName}"/>" name="flag_<c:out value="${inputName}"/>" src=
+    "images/<c:out value="${imageFileName}"/>.gif" border="0" alt=
+    "<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"
+     ></a>
+     </c:if>
+     
+     <c:if test="${errorTxtMessage != null}">
+        <a tabindex="<c:out value="${tabNum + 1000}"/>" href="#" onClick=
+    "openDNWindow('CreateDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&groupLabel=<c:out value="${displayItem.metadata.groupLabel}"/>&isRfc=1&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=<c:out value="${inputName}"/>&column=value&enterData=1&errorFlag=<c:out value="${errorFlag}"/>','spanAlert-<c:out value="${inputName}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
+    ><img id="flag_<c:out value="${inputName}"/>" name="flag_<c:out value="${inputName}"/>" src=
+    "images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"
+    ></a>
+     </c:if>
+    
+    </c:when>
+  
   <c:when test="${(originJSP eq 'administrativeEditing') && (isForcedRFC eq 'true')}">
 
 	<%-- added to allow for DN creation tbh --%>

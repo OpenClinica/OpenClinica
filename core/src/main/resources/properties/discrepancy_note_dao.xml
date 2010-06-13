@@ -11,33 +11,33 @@
     </query>
     <query>
     	<name>findAllSubjectDNByStudy</name>
-    	<sql> SELECT dn.*,ss.label FROM study_subject ss, discrepancy_note dn, dn_subject_map ds, user_account ua
+    	<sql> SELECT dn.*,ss.label FROM study_subject ss, dn_subject_map ds,discrepancy_note dn left outer join user_account ua on ua.user_id = dn.assigned_user_id
 			WHERE ss.study_id in ( SELECT study_id FROM study WHERE study_id = ? or parent_study_id=? )
-				AND ss.subject_id = ds.subject_id AND dn.discrepancy_note_id = ds.discrepancy_note_id AND ua.user_id = dn.assigned_user_id
+				AND ss.subject_id = ds.subject_id AND dn.discrepancy_note_id = ds.discrepancy_note_id 
 				AND ((dn.parent_dn_id IS NULL) or (dn.parent_dn_id = 0))
     	</sql>
     </query>
     <query>
     	<name>findAllStudySubjectDNByStudy</name>
-    	<sql>SELECT dn.*,ss.label FROM study_subject ss, discrepancy_note dn, dn_study_subject_map dss, user_account ua
+    	<sql>SELECT dn.*,ss.label FROM study_subject ss, dn_study_subject_map dss,discrepancy_note dn left outer join user_account ua on ua.user_id = dn.assigned_user_id
 		WHERE ss.study_id in ( SELECT study_id FROM study WHERE study_id = ? or parent_study_id=? ) 
-			AND ss.study_subject_id = dss.study_subject_id AND dn.discrepancy_note_id = dss.discrepancy_note_id AND ua.user_id = dn.assigned_user_id
+			AND ss.study_subject_id = dss.study_subject_id AND dn.discrepancy_note_id = dss.discrepancy_note_id 
 			AND ((dn.parent_dn_id IS NULL) or (dn.parent_dn_id = 0))
     	</sql>
     </query>
     <query>
     	<name>findAllStudyEventDNByStudy</name>
-    	<sql>SELECT dn.*,ss.label FROM study_subject ss, study_event se, discrepancy_note dn, dn_study_event_map dse, user_account ua
+    	<sql>SELECT dn.*,ss.label FROM study_subject ss, study_event se, dn_study_event_map dse, discrepancy_note dn left outer join user_account ua on ua.user_id = dn.assigned_user_id
 		WHERE ss.study_id in ( SELECT study_id FROM study WHERE study_id = ? or parent_study_id=? )
-			AND ss.study_subject_id = se.study_subject_id AND se.study_event_id = dse.study_event_id AND ua.user_id = dn.assigned_user_id
+			AND ss.study_subject_id = se.study_subject_id AND se.study_event_id = dse.study_event_id 
 			AND dn.discrepancy_note_id = dse.discrepancy_note_id AND ((dn.parent_dn_id IS NULL) or (dn.parent_dn_id = 0))
     	</sql>
     </query>
     <query>
     	<name>findAllEventCrfDNByStudy</name>
-    	<sql>SELECT dn.*,ss.label FROM study_subject ss, event_crf ec, discrepancy_note dn, dn_event_crf_map dec, user_account ua
+    	<sql>SELECT dn.*,ss.label FROM study_subject ss, event_crf ec, dn_event_crf_map dec, discrepancy_note dn left outer join user_account ua on ua.user_id = dn.assigned_user_id
 		WHERE ss.study_id in ( SELECT study_id FROM study WHERE study_id = ? or parent_study_id=? )
-			AND ss.study_subject_id = ec.study_subject_id AND ec.event_crf_id = dec.event_crf_id AND ua.user_id = dn.assigned_user_id
+			AND ss.study_subject_id = ec.study_subject_id AND ec.event_crf_id = dec.event_crf_id 
 			AND dn.discrepancy_note_id = dec.discrepancy_note_id
 			AND ((dn.parent_dn_id IS NULL) or (dn.parent_dn_id = 0))
     	</sql>

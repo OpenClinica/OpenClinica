@@ -344,10 +344,10 @@ public class StudyEventDAO extends AuditableEntityDAO {
     }
 
     // YW <<
-    public ArrayList findAllWithSubjectLabelByStudySubjectAndDefinition(int studySubjectId, int definitionId) {
+    public ArrayList findAllWithSubjectLabelByStudySubjectAndDefinition(StudySubjectBean studySubject, int definitionId) {
         this.setTypesExpected(true);
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(studySubjectId));
+        variables.put(new Integer(1), new Integer(studySubject.getId()));
         variables.put(new Integer(2), new Integer(definitionId));
 
         String sql = digester.getQuery("findAllWithSubjectLabelByStudySubjectAndDefinition");
@@ -356,6 +356,7 @@ public class StudyEventDAO extends AuditableEntityDAO {
         Iterator it = alist.iterator();
         while (it.hasNext()) {
             StudyEventBean eb = (StudyEventBean) this.getEntityFromHashMap((HashMap) it.next(), true);
+            eb.setStudySubject(studySubject);
             al.add(eb);
         }
         return al;

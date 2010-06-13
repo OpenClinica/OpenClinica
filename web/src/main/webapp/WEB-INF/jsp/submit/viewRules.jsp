@@ -108,7 +108,7 @@
   <c:forEach var ="ruleSetRule" items="${ruleSet.ruleSetRules}">
     <c:choose>
      <c:when test="${ruleSetRule.status.name eq 'AVAILABLE'}">
-    <c:set var="className" value="aka_green_highlight"/>
+        <c:set var="className" value="aka_green_highlight"/>
     </c:when>
     <c:otherwise>
      <c:set var="className" value="aka_red_highlight"/>
@@ -130,8 +130,8 @@
     <td class="table_cell">
       <table border="0" cellpadding="0" cellspacing="0">
       <tr>
-      <c:choose>
-      <c:when test="${ ruleSet.status.name eq 'AVAILABLE'  }">
+      <%--<c:choose>--%>
+      <%--<c:when test="${ ruleSet.status.name eq 'AVAILABLE'  }">--%>
       <c:if test="${ ruleSetRule.status.name eq 'AVAILABLE'  }">
       <td><a href="RunRuleSet?ruleSetId=<c:out value="${ruleSet.id}"/>&ruleId=<c:out value="${ruleSetRule.ruleBean.id}"/>"
       onMouseDown="javascript:setImage('bt_View1','images/bt_ExexuteRules.gif');"
@@ -154,10 +154,10 @@
       name="bt_Restore3" src="images/bt_Restore.gif" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a>
       </td>
       </c:if>
-      </c:when>
-      <c:otherwise>
-      </c:otherwise>
-      </c:choose>
+      <%--</c:when>--%>
+      <%--<c:otherwise>--%>
+      <%--</c:otherwise>--%>
+      <%--</c:choose>--%>
       </tr></table></td>
 
     <c:forEach items="${ruleSetRule.allActionsWithEvaluatesToAsKey}" varStatus="status">

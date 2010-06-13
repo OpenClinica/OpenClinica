@@ -71,8 +71,9 @@ public class InitUpdateSubStudyServlet extends SecureController {
             int studyId = Integer.valueOf(idString.trim()).intValue();
             StudyBean study = (StudyBean) sdao.findByPK(studyId);
             String parentStudyName = "";
+            StudyBean parent = new StudyBean();
             if (study.getParentStudyId() > 0) {
-                StudyBean parent = (StudyBean) sdao.findByPK(study.getParentStudyId());
+                parent = (StudyBean) sdao.findByPK(study.getParentStudyId());
                 parentStudyName = parent.getName();
                 // at this time, this feature is only available for site
                 createEventDefinitions(parent);
@@ -105,7 +106,7 @@ public class InitUpdateSubStudyServlet extends SecureController {
 
                 study.setStudyParameters(configs);
             }
-
+            request.setAttribute("parentStudy", parent);
             session.setAttribute("parentName", parentStudyName);
             session.setAttribute("newStudy", study);
             request.setAttribute("facRecruitStatusMap", CreateStudyServlet.facRecruitStatusMap);

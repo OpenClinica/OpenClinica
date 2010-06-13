@@ -78,6 +78,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
             resolutionStatus=-1;
         }*/
         // possibly for a later implementation: int definitionId = fp.getInt("defId");
+        //here subjectId actually is study_subject_id !!!
         int subjectId = fp.getInt("subjectId");
         int discNoteType = fp.getInt("discNoteType");
 
@@ -104,7 +105,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         ListNotesFilter listNotesFilter = new ListNotesFilter();
         StudySubjectBean studySubject = new StudySubjectBean();
         if(subjectId>0) {
-            studySubject = new StudySubjectDAO(sm.getDataSource()).findBySubjectIdAndStudy(subjectId, studyBean);
+            studySubject = (StudySubjectBean) new StudySubjectDAO(sm.getDataSource()).findByPK(subjectId);
             listNotesFilter.addFilter("studySubject.label", studySubject.getLabel());
         }
         if(discNoteType >= 1 && discNoteType <= 5) {

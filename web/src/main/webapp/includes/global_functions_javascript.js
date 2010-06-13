@@ -1182,7 +1182,7 @@ function openNewWindow(inURL, name, features, windowSize) {
 
     features += ",width=" + width + ",height=" + height;
 
-    var docView = window.open (inURL, '', features);
+    var docView = window.open (inURL, name, features);
     docView.focus();
 }
 

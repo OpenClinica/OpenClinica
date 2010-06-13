@@ -14,6 +14,7 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
 import java.util.Locale;
+import java.io.PrintWriter;
 
 // allows both deletion and restoration of a study user role
 
@@ -36,9 +37,13 @@ public class SystemStatusServlet extends SecureController {
         Long databaseChangelLogCount = getDatabaseChangeLogDao().count();
         String applicationStatus = "OK";
 
-        request.setAttribute("databaseChangeLogCount", String.valueOf(databaseChangelLogCount));
-        request.setAttribute("applicationStatus", applicationStatus);
-        forwardPage(Page.SYSTEM_STATUS);
+//        request.setAttribute("databaseChangeLogCount", String.valueOf(databaseChangelLogCount));
+//        request.setAttribute("applicationStatus", applicationStatus);
+//        forwardPage(Page.SYSTEM_STATUS);
+        
+        PrintWriter out = response.getWriter();
+        out.println(applicationStatus);
+        out.println(String.valueOf(databaseChangelLogCount));
     }
 
     public DatabaseChangeLogDao getDatabaseChangeLogDao() {
