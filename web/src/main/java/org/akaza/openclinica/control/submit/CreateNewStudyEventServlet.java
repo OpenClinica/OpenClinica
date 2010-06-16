@@ -271,7 +271,8 @@ public class CreateNewStudyEventServlet extends SecureController {
             v.addValidation(INPUT_STUDY_EVENT_DEFINITION, Validator.ENTITY_EXISTS_IN_STUDY, seddao, studyWithEventDefinitions);
             // v.addValidation(INPUT_STUDY_SUBJECT, Validator.ENTITY_EXISTS_IN_STUDY, sdao, currentStudy);
             // removed tbh 11/2009
-            v.addValidation(INPUT_LOCATION, Validator.NO_BLANKS);
+            //Made optional field-issue-4904.
+            //v.addValidation(INPUT_LOCATION, Validator.NO_BLANKS);
             v.addValidation(INPUT_STUDY_SUBJECT_LABEL, Validator.NO_BLANKS);
             v.addValidation(INPUT_LOCATION, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
             v.alwaysExecuteLastValidation(INPUT_LOCATION);

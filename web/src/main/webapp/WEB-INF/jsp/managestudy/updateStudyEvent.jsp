@@ -114,19 +114,6 @@
   &nbsp;&nbsp;<c:out value="${eventDefinition.name}"/></div>
   </td></tr>
 
-  <tr valign="top"><td class="formlabel"><fmt:message key="location" bundle="${resword}"/>:</td>
-  <td>
-  	<table border="0" cellpadding="0" cellspacing="0">
-  	<tr><td>
-  	<div class="formfieldXL_BG">
-    <input type="text" name="location" value="<c:out value="${event.location}"/>" class="formfieldXL"></div>
-     <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="location"/></jsp:include>
-    </td>
-    <td><c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${ss_id}&id=<c:out value="${event.id}"/>&name=studyEvent&field=location&column=location','spanAlert-location'); return false;"><img name="flag_location" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if>
-    </td></tr>
-   </table>
-  </td></tr>
-
   <tr valign="top">
   	<td class="formlabel"><fmt:message key="start_date_time" bundle="${resword}"/>:</td>
 	  	<td valign="top">
@@ -158,6 +145,18 @@
 			</table>
 		</td>
 	</tr>
+    <tr valign="top"><td class="formlabel"><fmt:message key="location" bundle="${resword}"/>:</td>
+    <td>
+        <table border="0" cellpadding="0" cellspacing="0">
+        <tr><td>
+        <div class="formfieldXL_BG">
+      <input type="text" name="location" value="<c:out value="${event.location}"/>" class="formfieldXL"></div>
+       <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="location"/></jsp:include>
+      </td>
+      <td><c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${ss_id}&id=<c:out value="${event.id}"/>&name=studyEvent&field=location&column=location','spanAlert-location'); return false;"><img name="flag_location" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if>
+      </td></tr>
+     </table>
+    </td></tr>
 
   <tr valign="top">
     <td class="formlabel"><fmt:message key="status" bundle="${resword}"/>:</td>

@@ -798,7 +798,7 @@ public class AddNewSubjectServlet extends SecureController {
         int studyEventDefinitionId = fp.getInt("studyEventDefinition");
         String location = fp.getString("location");
         Date startDate = s.getEventStartDate();
-        if (studyEventDefinitionId > 0 && !StringUtil.isBlank(location)) {
+        if (studyEventDefinitionId > 0) {
             String locationTerm = resword.getString("location");
             // don't allow user to use the default value 'Location' since
             // location

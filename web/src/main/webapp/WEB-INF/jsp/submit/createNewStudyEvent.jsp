@@ -252,26 +252,6 @@
 	</tr>
 
 	<tr>
-		<td class="formlabel"><fmt:message key="location" bundle="${resword}"/>:</td>
-	  	<td valign="top">
-		  	<table border="0" cellpadding="0" cellspacing="0">
-			<tr>
-				<td valign="top">
-				<div class="formfieldXL_BG">
-					<input type="text" name="location" value="<c:out value="${location}"/>" size="50" class="formfieldXL">
-				</div>
-				</td>
-				<td>*<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=location&column=location','spanAlert-location'); return false;">
-				<img name="flag_location" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
-			</tr>
-			<tr>
-				<td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="location"/></jsp:include></td>
-			</tr>
-			</table>
-		</td>
-	</tr>
-
-	<tr>
 		<td class="formlabel"><fmt:message key="start_date_time" bundle="${resword}"/>:</td>
 	  	<td valign="top">
 		  	<table border="0" cellpadding="0" cellspacing="0">
@@ -313,6 +293,27 @@
 			</table>
 		</td>
 	</tr>
+
+    <tr>
+        <td class="formlabel"><fmt:message key="location" bundle="${resword}"/>:</td>
+          <td valign="top">
+              <table border="0" cellpadding="0" cellspacing="0">
+            <tr>
+                <td valign="top">
+                <div class="formfieldXL_BG">
+                    <input type="text" name="location" value="<c:out value="${location}"/>" size="50" class="formfieldXL">
+                </div>
+                </td>
+                <td><c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=location&column=location','spanAlert-location'); return false;">
+                <img name="flag_location" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
+            </tr>
+            <tr>
+                <td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="location"/></jsp:include></td>
+            </tr>
+            </table>
+        </td>
+    </tr>
+    
 </table>
 
 </div>

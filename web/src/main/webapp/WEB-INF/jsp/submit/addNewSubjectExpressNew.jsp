@@ -254,20 +254,6 @@
     </tr>
 
     <tr valign="top">
-        <td class="formlabel"><fmt:message key="location" bundle="${resword}"/>:</td>
-        <td valign="top">
-            <table border="0" cellpadding="0" cellspacing="0">
-                <tr>
-                    <td valign="top"><div class="formfieldXL_BG">
-                       <input type="text" name="location"size="50" class="formfieldXL">
-                    </div></td>
-                    <td>*</td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-
-    <tr valign="top">
         <td class="formlabel">
             <fmt:message key="start_date" bundle="${resword}"/>:
         </td>
@@ -289,6 +275,20 @@
             </table>
           </td>
     </tr>
+
+    <tr valign="top">
+        <td class="formlabel"><fmt:message key="location" bundle="${resword}"/>:</td>
+        <td valign="top">
+            <table border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td valign="top"><div class="formfieldXL_BG">
+                       <input type="text" name="location"size="50" class="formfieldXL">
+                    </div></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    
     <tr>
         <td colspan="2" align="center">
         <input type="submit" name="addSubject" value="<fmt:message key="add2" bundle="${resword}"/>" class="button" />
