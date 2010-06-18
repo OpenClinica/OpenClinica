@@ -35,10 +35,10 @@ public class DynamicsItemFormMetadataDao extends AbstractDomainDao<DynamicsItemF
         return (DynamicsItemFormMetadataBean) q.uniqueResult();
     }
 
-    @Override
-    public DynamicsItemFormMetadataBean saveOrUpdate(DynamicsItemFormMetadataBean domainObject) {
-        getCurrentSession().saveOrUpdate(domainObject);
-        return domainObject;
-    }
+//    @Override
+//    public DynamicsItemFormMetadataBean saveOrUpdate(DynamicsItemFormMetadataBean domainObject) {
+//        getCurrentSession().saveOrUpdate(domainObject);
+//        return domainObject;
+//    }
 
 }
