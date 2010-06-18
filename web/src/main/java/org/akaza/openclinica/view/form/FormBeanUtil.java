@@ -128,7 +128,7 @@ public class FormBeanUtil {
                 displayBean.setMetadata(runDynamicsCheck(meta, eventCrfBean, itemDataBean, context));
                 displayBean.setData(itemDataBean);
                 displayBean.setDbData(itemDataBean);
-                System.out.println("just set: " + itemDataBean.getValue() + " from " + itemDataBean.getItemId());
+                // System.out.println("just set: " + itemDataBean.getValue() + " from " + itemDataBean.getItemId());
                 responseName = displayBean.getMetadata().getResponseSet().getResponseType().getName();
                 respOptions = displayBean.getMetadata().getResponseSet().getOptions();
                 if (hasNullValues

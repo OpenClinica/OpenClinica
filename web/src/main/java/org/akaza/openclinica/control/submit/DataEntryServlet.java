@@ -698,7 +698,7 @@ public abstract class DataEntryServlet extends SecureController {
                     }
 
                     dib.setChildren(children);
-                    diwg.setSingleItem(dib);
+                    diwg.setSingleItem(runDynamicsItemCheck(dib));
                     // logger.trace("just set single item on line 447:
                     // "+dib.getData().getValue());
                     // items.set(i, dib);
@@ -765,7 +765,7 @@ public abstract class DataEntryServlet extends SecureController {
                     }
 
                     dib.setChildren(children);
-                    diwg.setSingleItem(dib);
+                    diwg.setSingleItem(runDynamicsItemCheck(dib));
                     logger.debug(" I : " + i);
                     allItems.set(i, diwg);
                 }
@@ -1466,7 +1466,7 @@ public abstract class DataEntryServlet extends SecureController {
                 }
                 logger.debug("running rules: " + phase2.name());
                 HashMap<String, ArrayList<String>> rulesPostDryRun = runRules(allItems, ruleSets, false, shouldRunRules(), MessageType.WARNING, phase2);
-                logger.debug("found rules post dry run: " + rulesPostDryRun.toString());
+                // System.out.println("found rules post dry run: " + rulesPostDryRun.toString());
                 HashMap<String, ArrayList<String>> errorsPostDryRun = new HashMap<String, ArrayList<String>>();
                 // additional step needed, run rules and see if any items are 'shown' AFTER saving data
                 boolean inSameSection = false;
@@ -1477,7 +1477,7 @@ public abstract class DataEntryServlet extends SecureController {
                     Iterator iter3 = rulesPostDryRun.keySet().iterator();
                     while (iter3.hasNext()) {
                         String fieldName = iter3.next().toString();
-                        logger.debug("found oid after post dry run " + fieldName);
+                        System.out.println("found oid after post dry run " + fieldName);
                         // set up a listing of OIDs in the section
                         // BUT: Oids can have the group name in them.
                         String newFieldName = fieldName;
@@ -1506,7 +1506,7 @@ public abstract class DataEntryServlet extends SecureController {
                                                 //inSameSection = true;
 
                                                 if (!dib.getMetadata().isShowItem()) {
-                                                    logger.debug("found item in group " + this.getGroupItemInputName(displayGroup, j, dib) + " vs. "
+                                                    System.out.println("found item in group " + this.getGroupItemInputName(displayGroup, j, dib) + " vs. "
                                                         + fieldName + " and is show item: " + dib.getMetadata().isShowItem());
                                                     dib.getMetadata().setShowItem(true);
                                                     inSameSection = true;
@@ -1528,7 +1528,7 @@ public abstract class DataEntryServlet extends SecureController {
                                     // logger.debug("is show item: " + displayItemBean.getMetadata().isShowItem());
                                     if (!displayItemBean.getMetadata().isShowItem()) {
                                         inSameSection = true;
-                                        logger.debug("found item " + this.getInputName(displayItemBean) + " vs. " + fieldName + " and is show item: "
+                                        System.out.println("found item " + this.getInputName(displayItemBean) + " vs. " + fieldName + " and is show item: "
                                             + displayItemBean.getMetadata().isShowItem());
                                         // if is repeating, use the other input name? no
 
@@ -1579,6 +1579,7 @@ public abstract class DataEntryServlet extends SecureController {
 
                     // if so, stay at this section
                     logger.debug(" in same section: " + inSameSection);
+                    System.out.println(" in same section: " + inSameSection);
                     if (inSameSection) {
                         // copy of one line from early on around line 400, forcing a re-show of the items
                         // section = getDisplayBean(hasGroup, true);// include all items, tbh
@@ -1838,8 +1839,9 @@ public abstract class DataEntryServlet extends SecureController {
         ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
         if (ecb == null) {
             int eventCRFId = fp.getInt(INPUT_EVENT_CRF_ID, true);
+            System.out.println("found event crf id: " + eventCRFId);
             if (eventCRFId > 0) {
-                logger.trace("***NOTE*** that we didnt have to create an event crf because we already have one: " + eventCRFId);
+                System.out.println("***NOTE*** that we didnt have to create an event crf because we already have one: " + eventCRFId);
                 // there is an event CRF already, only need to update
                 ecb = (EventCRFBean) ecdao.findByPK(eventCRFId);
                 // ecb.setUpdatedDate(new Date());
@@ -1890,7 +1892,6 @@ public abstract class DataEntryServlet extends SecureController {
                     throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET, ne.getMessage(), "1");
                 }
             }
-
         }
         // added to allow sections shown on this page
         DisplayTableOfContentsBean displayBean = new DisplayTableOfContentsBean();
@@ -2536,6 +2537,21 @@ public abstract class DataEntryServlet extends SecureController {
         }
         return metadataBean;
     }
+    
+    private DisplayItemBean runDynamicsItemCheck(DisplayItemBean dib) {
+        try {
+            System.out.println("trying run dynamics item check: item id " + dib.getItem().getId());
+            if (!dib.getMetadata().isShowItem()) {
+                boolean showItem = getItemMetadataService().isShown(dib.getItem().getId(), ecb);
+                dib.getMetadata().setShowItem(showItem);
+            }
+        } catch (NullPointerException npe) {
+            logger.debug("found NPE! item id " + dib.getItem().getId());
+        }
+
+        return dib;
+        
+    }
 
     /*
      * Perform validation for calculation and group-calculation type. <br> Pre-condition: passed DisplayItemBean parameter has been loaded with value. @param sv
@@ -2927,7 +2943,7 @@ public abstract class DataEntryServlet extends SecureController {
             EventDefinitionCRFBean edcBean = edcdao.findByStudyEventIdAndCRFVersionId(study, ecb.getStudyEventId(), ecb.getCRFVersionId());
             eventDefinitionCRFId = edcBean.getId();
         }
-        logger.trace("eventDefinitionCRFId" + eventDefinitionCRFId);
+        logger.trace("eventDefinitionCRFId " + eventDefinitionCRFId);
         // Use this class to find out whether there are ungrouped items in this
         // section
         FormBeanUtil formBeanUtil = new FormBeanUtil();
@@ -2954,7 +2970,7 @@ public abstract class DataEntryServlet extends SecureController {
         hasUngroupedItems = formBeanUtil.sectionHasUngroupedItems(sm.getDataSource(), sb.getId(), itemGroups);
 
         section.setEventCRF(ecb);
-
+        
         if (sb.getParentId() > 0) {
             SectionBean parent = (SectionBean) sdao.findByPK(sb.getParentId());
             sb.setParent(parent);
@@ -3161,8 +3177,8 @@ public abstract class DataEntryServlet extends SecureController {
                 boolean passedDDE = getItemMetadataService().hasPassedDDE(ifmb, ecb, dib.getData());
                 if (showItem) { // we are only showing, not hiding
                     logger.debug("set show item " + ifmb.getItemId() + " idb " + dib.getData().getId() + " show item " + showItem + " passed dde " + passedDDE);
-                    ifmb.setShowItem(showItem);
-                    // ifmb.setShowItem(true);
+                    // ifmb.setShowItem(showItem);
+                    ifmb.setShowItem(true);
                 } else {
                     logger.debug("DID NOT set show item " + ifmb.getItemId() + " idb " + dib.getData().getId() + " show item " + showItem + " passed dde "
                         + passedDDE + " value " + dib.getData().getValue());
@@ -3232,8 +3248,8 @@ public abstract class DataEntryServlet extends SecureController {
             // boolean passedDDE = getItemMetadataService().hasPassedDDE(data);
             if (showItem) {
                 logger.debug("set show item: " + metadata.getItemId() + " data " + data.getId());
-                metadata.setShowItem(showItem);
-                // metadata.setShowItem(true);
+                // metadata.setShowItem(showItem);
+                metadata.setShowItem(true);
             }
             // logger.debug("did not catch NPE");
 
@@ -3406,7 +3422,7 @@ public abstract class DataEntryServlet extends SecureController {
                     childItems.set(j, child);
                 }
                 dib.setChildren(childItems);
-                itemWithGroup.setSingleItem(dib);
+                itemWithGroup.setSingleItem(runDynamicsItemCheck(dib));
             }
             // missing piece of the puzzle - reset the itemgroup into all items?
             allItems.set(k, itemWithGroup);
@@ -3770,7 +3786,7 @@ public abstract class DataEntryServlet extends SecureController {
         for (int i = 0; i < items.size(); i++) {
             DisplayItemBean item = (DisplayItemBean) items.get(i);
             DisplayItemWithGroupBean newOne = new DisplayItemWithGroupBean();
-            newOne.setSingleItem(item);
+            newOne.setSingleItem(runDynamicsItemCheck(item));
             newOne.setOrdinal(item.getMetadata().getOrdinal());
             newOne.setInGroup(false);
             newOne.setPageNumberLabel(item.getMetadata().getPageNumberLabel());
@@ -4329,12 +4345,18 @@ public abstract class DataEntryServlet extends SecureController {
             Boolean shouldRunRules, MessageType mt, Phase phase) {
         if (shouldRunRules) {
             Container c = new Container();
-            c = populateRuleSpecificHashMaps(allItems, c, dryRun);
-            ruleSets = getRuleSetService().filterRuleSetsBySectionAndGroupOrdinal(ruleSets, c.grouped);
-            ruleSets = getRuleSetService().solidifyGroupOrdinalsUsingFormProperties(ruleSets, c.grouped);
+            try {
+                c = populateRuleSpecificHashMaps(allItems, c, dryRun);
+                ruleSets = getRuleSetService().filterRuleSetsBySectionAndGroupOrdinal(ruleSets, c.grouped);
+                ruleSets = getRuleSetService().solidifyGroupOrdinalsUsingFormProperties(ruleSets, c.grouped);
+            } catch (NullPointerException npe) {
+                System.out.println("found NPE " + npe.getMessage());
+                npe.printStackTrace();
+            }
+            // above throws NPE?
             // return getRuleSetService().runRules(ruleSets, dryRun,
             // currentStudy, c.variableAndValue, ub);
-            logger.debug("running rules ... rule sets size is " + ruleSets.size());
+            System.out.println("running rules ... rule sets size is " + ruleSets.size());
             return getRuleSetService().runRulesInDataEntry(ruleSets, dryRun, currentStudy, ub, c.variableAndValue, phase).getByMessageType(mt);
         } else {
             return new HashMap<String, ArrayList<String>>();
@@ -4427,7 +4449,7 @@ public abstract class DataEntryServlet extends SecureController {
             }
 
         }
-        logger.debug("+++ returning manual rows: " + manualRows + " from a form group size of " + formGroups.size());
+        System.out.println("+++ returning manual rows: " + manualRows + " from a form group size of " + formGroups.size());
         // logger.debug("+++ returning manual rows: " + manualRows + " from a form group size of " + formGroups.size());
         return manualRows;
     }
