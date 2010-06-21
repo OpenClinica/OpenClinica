@@ -823,7 +823,8 @@ public class ExpressionService {
                 return "OK";
             }
 
-            ItemBean item = getItemDao().findItemByGroupIdandItemOid(getItemGroupExpression(ruleSet.getTarget().getValue()).getId(), oid);
+            //ItemBean item = getItemDao().findItemByGroupIdandItemOid(getItemGroupExpression(ruleSet.getTarget().getValue()).getId(), oid);
+            ItemBean item = getItemDao().findByOid(oid).get(0);
             if (item != null) {
                 return "OK";
             }

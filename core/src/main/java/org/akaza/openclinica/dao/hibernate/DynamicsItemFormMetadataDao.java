@@ -35,10 +35,13 @@ public class DynamicsItemFormMetadataDao extends AbstractDomainDao<DynamicsItemF
         return (DynamicsItemFormMetadataBean) q.uniqueResult();
     }
 
-//    @Override
-//    public DynamicsItemFormMetadataBean saveOrUpdate(DynamicsItemFormMetadataBean domainObject) {
-//        getCurrentSession().saveOrUpdate(domainObject);
-//        return domainObject;
-//    }
-
+    /* (non-Javadoc)
+     * @see org.akaza.openclinica.dao.hibernate.AbstractDomainDao#saveOrUpdate(org.akaza.openclinica.domain.DomainObject)
+     * The reason we overwrite this method is to make it non transactional. and mainly to make saves faster.
+     */
+    @Override
+    public DynamicsItemFormMetadataBean saveOrUpdate(DynamicsItemFormMetadataBean domainObject) {
+        getCurrentSession().saveOrUpdate(domainObject);
+        return domainObject;
+    }
 }
