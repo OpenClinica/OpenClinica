@@ -374,4 +374,28 @@ public class AuditDAO extends EntityDAO {
 
     }
 
+    /*
+        Find audit events for a single Item 
+     */
+
+    public ArrayList findItemAuditEvents(int entityId, String auditTable) {
+        this.setTypesExpected();
+
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(entityId));
+        variables.put(new Integer(2), auditTable);
+
+        String sql = digester.getQuery("findSingleItemAuditEvents");
+        ArrayList alist = this.select(sql, variables);
+        ArrayList al = new ArrayList();
+        Iterator it = alist.iterator();
+        while (it.hasNext()) {
+            AuditBean eb = (AuditBean) this.getEntityFromHashMap((HashMap) it.next());
+            al.add(eb);
+        }
+        return al;
+
+    }
+
+
 }

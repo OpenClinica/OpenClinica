@@ -1133,6 +1133,11 @@
         <display-name>PrintAllEventCRFServlet</display-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.PrintAllEventCRFServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ViewItemAuditLogServlet</servlet-name>
+        <display-name>ViewItemAuditLogServlet</display-name>
+        <servlet-class>org.akaza.openclinica.control.managestudy.ViewItemAuditLogServlet</servlet-class>
+    </servlet>
 
     <servlet-mapping>
         <servlet-name>LockCRFVersionServlet</servlet-name>
@@ -1953,7 +1958,11 @@
         <servlet-name>PrintAllEventCRFServlet</servlet-name>
         <url-pattern>/PrintAllEventCRF</url-pattern>
     </servlet-mapping>
-    
+    <servlet-mapping>
+        <servlet-name>ViewItemAuditLogServlet</servlet-name>
+        <url-pattern>/ViewItemAuditLog</url-pattern>
+    </servlet-mapping>
+
 
     <!-- 
     <security-constraint>

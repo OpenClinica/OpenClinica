@@ -394,6 +394,9 @@ public class Page {
     public final static Page AUDIT_LOG_USER = new Page("/WEB-INF/jsp/admin/auditLogUser.jsp", "Audit Log display by User");
     public final static Page AUDIT_LOG_STUDY = new Page("/WEB-INF/jsp/admin/auditLogStudy.jsp", "Audit Log display by Study");
     public final static Page AUDIT_LOGS_STUDY = new Page("/WEB-INF/jsp/admin/studyAuditLog.jsp", "Audit Log display by Study");
+    
+    public final static Page AUDIT_LOGS_ITEMS = new Page("/WEB-INF/jsp/admin/auditItem.jsp", "Audit Log for Item");
+
     /**
      * Page for extract datasets main, tbh
      */

@@ -4,8 +4,11 @@
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
-<c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
+<jsp:useBean id="id" scope="request" class="java.lang.String"/>
+<jsp:useBean id="name" scope="request" class="java.lang.String"/>
+
+<c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 <html>
 <head>
     <title><fmt:message key="openclinica" bundle="${resword}"/>- <fmt:message key="view_discrepancy_note" bundle="${resword}"/></title>
@@ -128,6 +131,8 @@
     </tr>
 
 </table>
+
+<p><a href="#" onclick="window.openNewWindow('ViewItemAuditLog?entityId=<c:out value="${id}"/>&auditTable=<c:out value="${name}"/>','','no','dn')"><fmt:message key="audit_log_item" bundle="${resword}"/></a></p>
 
 <h3 class="title_manage"><fmt:message key="note_details" bundle="${resword}"/></h3>
 

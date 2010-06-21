@@ -96,4 +96,15 @@
 			LEFT JOIN item ON id.item_id = item.item_id and ale.entity_name = item.name
     	</sql>
     </query>
+    <query>
+        <name>findSingleItemAuditEvents</name>
+        <sql>
+            SELECT  ale.audit_id, ale.audit_date, ale.audit_table, ale.user_id, ale.entity_id,
+            ale.entity_name, ale.reason_for_change, ale.audit_log_event_type_id, ale.old_value,
+            ale.new_value, ale.event_crf_id, ua.user_name, alet.name
+            FROM audit_log_event ale JOIN user_account ua ON ale.user_id=ua.user_id
+            JOIN audit_log_event_type alet ON ale.audit_log_event_type_id=alet.audit_log_event_type_id
+            WHERE ale.entity_id = ? and ale.audit_table = ?
+        </sql>
+    </query>
 </queries>
