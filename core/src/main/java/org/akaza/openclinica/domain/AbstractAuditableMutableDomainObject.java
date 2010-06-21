@@ -48,7 +48,7 @@ public abstract class AbstractAuditableMutableDomainObject extends AbstractMutab
      */
     @Column(name = "date_updated", insertable = false)
     public Date getUpdatedDate() {
-        return new Date();
+        return updatedDate;
     }
 
     @Transient

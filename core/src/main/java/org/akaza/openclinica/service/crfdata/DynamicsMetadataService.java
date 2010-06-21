@@ -99,7 +99,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         }
 
     }
-    
+
     // deprecated?
     public boolean isShown(Integer itemId, EventCRFBean eventCrfBean) {
         // do we check against the database, or just against the object? prob against the db
@@ -214,7 +214,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         dynamicsMetadataBean.setPassedDde(0);
         getDynamicsItemFormMetadataDao().saveOrUpdate(dynamicsMetadataBean);
         logger.debug("just touched ifmb id " + metadataBean.getId() + " ecb id " + eventCrfBean.getId() + " item id " + metadataBean.getItemId()
-           + " itemdata id " + itemDataBean.getId());
+            + " itemdata id " + itemDataBean.getId());
         return true;
     }
 

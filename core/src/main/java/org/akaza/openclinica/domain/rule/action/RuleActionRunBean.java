@@ -32,7 +32,7 @@ public class RuleActionRunBean extends AbstractMutableDomainObject {
 
     public RuleActionRunBean() {
         // TODO Auto-generated constructor stub
-        this.administrativeDataEntry = false;
+        this.administrativeDataEntry = true;
         this.initialDataEntry = true;
         this.doubleDataEntry = true;
         this.importDataEntry = false;
