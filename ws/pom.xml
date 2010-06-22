@@ -13,7 +13,7 @@
     <dependencies>
     	<dependency>
             <groupId>${groupId}</groupId>
-            <artifactId>openclinica-core</artifactId>
+            <artifactId>OpenClinica-core</artifactId>
             <version>${project.version}</version>
         </dependency>
 	    <dependency>
