@@ -461,7 +461,7 @@ public abstract class DataEntryServlet extends SecureController {
         CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
         CRFVersionBean crfVersionBean = (CRFVersionBean) cvdao.findByPK(ecb.getCRFVersionId());
 
-        List<RuleSetBean> ruleSets = createAndInitializeRuleSet(currentStudy, studyEventDefinition, crfVersionBean, studyEventBean, shouldRunRules());
+        List<RuleSetBean> ruleSets = createAndInitializeRuleSet(currentStudy, studyEventDefinition, crfVersionBean, studyEventBean, ecb, shouldRunRules());
         DisplaySectionBean section = getDisplayBean(hasGroup, false);
 
         // 2790: Find out the id of the section's first field
@@ -4332,12 +4332,18 @@ public abstract class DataEntryServlet extends SecureController {
         return c;
     }
 
-    private List<RuleSetBean> createAndInitializeRuleSet(StudyBean currentStudy, StudyEventDefinitionBean studyEventDefinition, CRFVersionBean crfVersionBean,
-            StudyEventBean studyEventBean, Boolean shouldRunRules) {
+    private List<RuleSetBean> createAndInitializeRuleSet(StudyBean currentStudy, 
+            StudyEventDefinitionBean studyEventDefinition, 
+            CRFVersionBean crfVersionBean,
+            StudyEventBean studyEventBean, 
+            EventCRFBean eventCrfBean,
+            Boolean shouldRunRules) {
         if (shouldRunRules) {
             List<RuleSetBean> ruleSets = getRuleSetService().getRuleSetsByCrfStudyAndStudyEventDefinition(currentStudy, studyEventDefinition, crfVersionBean);
             ruleSets = getRuleSetService().filterByStatusEqualsAvailable(ruleSets);
             ruleSets = getRuleSetService().filterRuleSetsByStudyEventOrdinal(ruleSets, studyEventBean, crfVersionBean, studyEventDefinition);
+            // place next line here, tbh
+            ruleSets = getRuleSetService().filterRuleSetsByHiddenItems(ruleSets, eventCrfBean, crfVersionBean);
             return ruleSets;
         } else
             return new ArrayList<RuleSetBean>();
@@ -4351,6 +4357,7 @@ public abstract class DataEntryServlet extends SecureController {
                 c = populateRuleSpecificHashMaps(allItems, c, dryRun);
                 ruleSets = getRuleSetService().filterRuleSetsBySectionAndGroupOrdinal(ruleSets, c.grouped);
                 ruleSets = getRuleSetService().solidifyGroupOrdinalsUsingFormProperties(ruleSets, c.grouped);
+                // next line here ?
             } catch (NullPointerException npe) {
                 logger.debug("found NPE " + npe.getMessage());
                 npe.printStackTrace();
