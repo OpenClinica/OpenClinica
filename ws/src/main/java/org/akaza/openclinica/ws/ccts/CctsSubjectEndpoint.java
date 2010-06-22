@@ -11,17 +11,10 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
 import org.akaza.openclinica.service.subject.SubjectServiceInterface;
 import org.akaza.openclinica.ws.logic.CctsService;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Source;
-import javax.xml.transform.dom.DOMSource;
-
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.context.SecurityContextHolder;
-import org.springframework.security.userdetails.UserDetails;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.xml.DomUtils;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
@@ -34,6 +27,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Source;
+import javax.xml.transform.dom.DOMSource;
 
 /**
  * @author Krikor Krumlian
@@ -49,7 +46,6 @@ public class CctsSubjectEndpoint {
 
     private final SubjectServiceInterface subjectService;
     private final CctsService cctsService;
-    
 
     /**
      * Constructor
@@ -60,7 +56,7 @@ public class CctsSubjectEndpoint {
         this.subjectService = subjectService;
         this.cctsService = cctsService;
     }
-    
+
     /**
      * if NAMESPACE_URI_V1:commitRequest execute this method
      * @param gridId
@@ -70,14 +66,15 @@ public class CctsSubjectEndpoint {
      * @throws Exception
      */
     @PayloadRoot(localPart = "commitRequest", namespace = NAMESPACE_URI_V1)
-    public Source createSubject(@XPathParam("//s:gridId") String gridId,@XPathParam("//s:subject") NodeList subject, @XPathParam("//s:study/@oid") String studyOid) throws Exception{
-        Element subjectElement  = (Element)(subject.item(0));
-        SubjectTransferBean subjectTranferBean = unMarshallToSubjectTransfer(gridId,subjectElement, studyOid);
+    public Source createSubject(@XPathParam("//s:gridId") String gridId, @XPathParam("//s:subject") NodeList subject,
+            @XPathParam("//s:study/@oid") String studyOid) throws Exception {
+        Element subjectElement = (Element) (subject.item(0));
+        SubjectTransferBean subjectTranferBean = unMarshallToSubjectTransfer(gridId, subjectElement, studyOid);
         // TODO: Add Logic
         logger.debug("In CreateSubject");
         return new DOMSource(mapConfirmation(SUCCESS_MESSAGE));
     }
-    
+
     /**
      * if NAMESPACE_URI_V1:commitRequest execute this method
      * @param gridId
@@ -87,14 +84,14 @@ public class CctsSubjectEndpoint {
      * @throws Exception
      */
     @PayloadRoot(localPart = "rollbackRequest", namespace = NAMESPACE_URI_V1)
-    public Source rollBackSubject(@XPathParam("//s:gridId") String gridId,@XPathParam("//s:subject") NodeList subject, @XPathParam("//s:study/@oid") String studyOid) throws Exception{
-        Element subjectElement  = (Element)(subject.item(0));
-        SubjectTransferBean subjectTranferBean = unMarshallToSubjectTransfer(gridId,subjectElement, studyOid);
+    public Source rollBackSubject(@XPathParam("//s:gridId") String gridId, @XPathParam("//s:subject") NodeList subject,
+            @XPathParam("//s:study/@oid") String studyOid) throws Exception {
+        Element subjectElement = (Element) (subject.item(0));
+        SubjectTransferBean subjectTranferBean = unMarshallToSubjectTransfer(gridId, subjectElement, studyOid);
         // TODO: Add Logic 
         return new DOMSource(mapConfirmation(SUCCESS_MESSAGE));
     }
-    
-    
+
     /**
      * UnMarshall SubjectTransferBean, aka create SubjectTransferBean from XML
      * @param gridId
@@ -103,15 +100,14 @@ public class CctsSubjectEndpoint {
      * @return
      * @throws ParseException
      */
-    private SubjectTransferBean unMarshallToSubjectTransfer(String gridId, Element subjectElement, String studyOidValue) throws ParseException{
-        
+    private SubjectTransferBean unMarshallToSubjectTransfer(String gridId, Element subjectElement, String studyOidValue) throws ParseException {
+
         Element personIdElement = DomUtils.getChildElementByTagName(subjectElement, "personId");
         Element studySubjectIdElement = DomUtils.getChildElementByTagName(subjectElement, "studySubjectId");
         Element secondaryIdElement = DomUtils.getChildElementByTagName(subjectElement, "secondaryId");
         Element enrollmentDateElement = DomUtils.getChildElementByTagName(subjectElement, "enrollmentDate");
         Element genderElement = DomUtils.getChildElementByTagName(subjectElement, "gender");
         Element dateOfBirthElement = DomUtils.getChildElementByTagName(subjectElement, "dateOfBirth");
-        
 
         String personIdValue = DomUtils.getTextValue(personIdElement);
         String studySubjectIdValue = DomUtils.getTextValue(studySubjectIdElement);
@@ -119,9 +115,9 @@ public class CctsSubjectEndpoint {
         String secondaryIdValue = DomUtils.getTextValue(secondaryIdElement);
         String enrollmentDateValue = DomUtils.getTextValue(enrollmentDateElement);
         String dateOfBirthValue = DomUtils.getTextValue(dateOfBirthElement);
-        
+
         SubjectTransferBean subjectTransferBean = new SubjectTransferBean();
-        
+
         subjectTransferBean.setStudyOid(studyOidValue);
         subjectTransferBean.setPersonId(personIdValue);
         subjectTransferBean.setStudySubjectId(studySubjectIdValue);
@@ -130,9 +126,9 @@ public class CctsSubjectEndpoint {
         //subjectTransferBean.setSecondaryId(secondaryIdValue);
         subjectTransferBean.setEnrollmentDate(getDate(enrollmentDateValue));
         return subjectTransferBean;
-        
+
     }
-    
+
     /**
      * Create Response 
      * @param confirmation
@@ -149,11 +145,9 @@ public class CctsSubjectEndpoint {
         resultElement.setTextContent(confirmation);
         responseElement.appendChild(resultElement);
         return responseElement;
-        
-   
+
     }
-    
-    
+
     /**
      * Helper Method to resolve dates
      * @param dateAsString
@@ -164,18 +158,18 @@ public class CctsSubjectEndpoint {
         SimpleDateFormat sdf = new SimpleDateFormat(getDateFormat());
         return sdf.parse(dateAsString);
     }
-    
+
     /**
      * Helper Method to get the user account
      * @return UserAccountBean
      */
-    private UserAccountBean getUserAccount(){
+    private UserAccountBean getUserAccount() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username = null;
         if (principal instanceof UserDetails) {
-          username = ((UserDetails)principal).getUsername();
+            username = ((UserDetails) principal).getUsername();
         } else {
-          username = principal.toString();
+            username = principal.toString();
         }
         // TODO: Call UserAccountDao.findByUserName()
         return null;

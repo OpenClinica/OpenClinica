@@ -51,12 +51,10 @@
     </bean>
     
     <!-- Endpoint Mappings  -->
-    <bean class="org.springframework.ws.server.endpoint.mapping.PayloadRootAnnotationMethodEndpointMapping">
-        <!-- 
+    <bean class="org.springframework.ws.server.endpoint.mapping.PayloadRootAnnotationMethodEndpointMapping"> 
         <property name="interceptors">
             <list><ref bean="wsSecurityInterceptor"/></list>
         </property>
-         -->
     </bean>
     
     <!--  Annotation Based MethodEndpoint Adapter -->
@@ -112,16 +110,16 @@
         <property name="callbackHandlers" ref="springSecurityHandler"/>
     </bean>
     
-    <bean id="authenticationManager" class="org.springframework.security.providers.ProviderManager">
+    <bean id="authenticationManager" class="org.springframework.security.authentication.ProviderManager">
       <property name="providers">
-          <bean class="org.springframework.security.providers.dao.DaoAuthenticationProvider">
+          <bean class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
               <property name="userDetailsService" ref="ocUserDetailsService"/>
           </bean>
       </property>
     </bean>
   
     <bean id="springSecurityHandler"
-      class="org.springframework.ws.soap.security.xwss.callback.SpringPlainTextPasswordValidationCallbackHandler">
+      class="org.akaza.openclinica.ws.SpringPlainTextPasswordValidationCallbackHandler">
     <property name="authenticationManager" ref="authenticationManager"/>
     </bean>
 </beans>

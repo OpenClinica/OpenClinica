@@ -6,47 +6,30 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean;
 import org.akaza.openclinica.domain.technicaladmin.LoginStatus;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.security.core.session.SessionInformation;
+import org.springframework.security.core.session.SessionRegistryImpl;
+import org.springframework.security.core.userdetails.User;
 
 import java.util.Date;
 import java.util.Locale;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
-/**
- * Call Super Class SecurityContextLogoutHandler that Performs a logout by modifying the {@link org.springframework.security.context.SecurityContextHolder}.
- * <p>
- * Will log this event to an OpenClinica user logging table
- * 
- * @author Krikor Krumlian
- */
-public class OpenClinicaSecurityContextLogoutHandler extends SecurityContextLogoutHandler {
+public class OpenClinicaSessionRegistryImpl extends SessionRegistryImpl {
 
     AuditUserLoginDao auditUserLoginDao;
     UserAccountDAO userAccountDao;
     DataSource dataSource;
 
-    // ~ Methods ========================================================================================================
-
-    /**
-     * Requires the request to be passed in.
-     * 
-     * @param request
-     *            from which to obtain a HTTP session (cannot be null)
-     * @param response
-     *            not used (can be <code>null</code>)
-     * @param authentication
-     *            not used (can be <code>null</code>)
-     */
     @Override
-    public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-        if (authentication != null) {
-            auditLogout(authentication.getName());
+    public void removeSessionInformation(String sessionId) {
+        SessionInformation info = getSessionInformation(sessionId);
+
+        if (info != null) {
+            User u = (User) info.getPrincipal();
+            auditLogout(u.getUsername());
         }
-        super.logout(request, response, authentication);
+        super.removeSessionInformation(sessionId);
     }
 
     void auditLogout(String username) {
@@ -79,5 +62,4 @@ public class OpenClinicaSecurityContextLogoutHandler extends SecurityContextLogo
     public void setAuditUserLoginDao(AuditUserLoginDao auditUserLoginDao) {
         this.auditUserLoginDao = auditUserLoginDao;
     }
-
 }

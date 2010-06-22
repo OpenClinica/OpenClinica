@@ -2,11 +2,11 @@ package org.akaza.openclinica.web.filter;
 
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.object.MappingSqlQuery;
-import org.springframework.security.GrantedAuthority;
-import org.springframework.security.GrantedAuthorityImpl;
-import org.springframework.security.userdetails.User;
-import org.springframework.security.userdetails.UserDetails;
-import org.springframework.security.userdetails.jdbc.JdbcDaoImpl;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -40,7 +40,6 @@ public class OpenClinicaJdbcService extends JdbcDaoImpl {
      *            the combined array of authorities from all the authority loading queries.
      * @return the final UserDetails which should be used in the system.
      */
-    @Override
     protected UserDetails createUserDetails(String username, UserDetails userFromUserQuery, GrantedAuthority[] combinedAuthorities) {
         String returnUsername = userFromUserQuery.getUsername();
 
