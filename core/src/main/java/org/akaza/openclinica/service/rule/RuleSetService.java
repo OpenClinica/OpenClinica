@@ -13,9 +13,12 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
 import org.akaza.openclinica.dao.hibernate.RuleActionRunLogDao;
 import org.akaza.openclinica.dao.hibernate.RuleDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetAuditDao;
@@ -28,7 +31,9 @@ import org.akaza.openclinica.dao.rule.action.RuleActionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.domain.Status;
+import org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean;
 import org.akaza.openclinica.domain.rule.AuditableBeanWrapper;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleBulkExecuteContainer;
@@ -85,6 +90,8 @@ public class RuleSetService implements RuleSetServiceInterface {
     private StudyEventDAO studyEventDao;
     private ItemDAO itemDao;
     private ItemDataDAO itemDataDao;
+    private ItemFormMetadataDAO itemFormMetadataDao;
+    private DynamicsItemFormMetadataDao dynamicsItemFormMetadataDao;
     private ExpressionService expressionService;
     private String requestURLMinusServletPath;
     private String contextPath;
@@ -465,6 +472,28 @@ public class RuleSetService implements RuleSetServiceInterface {
         logger.debug("Size of RuleSets post filterRuleSetsByStudyEventOrdinal() {} ", validRuleSets.size());
         return validRuleSets;
     }
+    
+    public List<RuleSetBean> filterRuleSetsByHiddenItems(List<RuleSetBean> ruleSets, EventCRFBean eventCrf, CRFVersionBean crfVersion) {
+        ArrayList<RuleSetBean> shownRuleSets = new ArrayList<RuleSetBean>();
+        for (RuleSetBean ruleSetBean : ruleSets) {
+            ItemBean target = ruleSetBean.getItem();
+            ItemFormMetadataBean metadataBean = this.getItemFormMetadataDao().findByItemIdAndCRFVersionId(target.getId(), crfVersion.getId());
+            ItemDataBean itemData = this.getItemDataDao().findByItemIdAndEventCRFId(target.getId(), eventCrf.getId());
+            DynamicsItemFormMetadataBean dynamicsBean = this.getDynamicsItemFormMetadataDao().findByMetadataBean(metadataBean, eventCrf, itemData);
+            if (dynamicsBean == null) {
+                if (metadataBean.isShowItem()) {
+                    logger.debug("just added rule set bean");
+                    shownRuleSets.add(ruleSetBean);
+                }
+            } else {
+                if (metadataBean.isShowItem() || dynamicsBean.isShowItem()) {
+                    logger.debug("just added rule set bean 2, with dyn bean");
+                    shownRuleSets.add(ruleSetBean);
+                }
+            }
+        }
+        return shownRuleSets;
+    }
 
     /* (non-Javadoc)
      * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#filterRuleSetsByStudyEventOrdinal(java.util.List)
@@ -750,6 +779,11 @@ public class RuleSetService implements RuleSetServiceInterface {
         itemDao = this.itemDao != null ? itemDao : new ItemDAO(dataSource);
         return itemDao;
     }
+    
+    private ItemFormMetadataDAO getItemFormMetadataDao() {
+        itemFormMetadataDao = this.itemFormMetadataDao != null ? itemFormMetadataDao : new ItemFormMetadataDAO(dataSource);
+        return itemFormMetadataDao;
+    }
 
     private ExpressionService getExpressionService() {
         expressionService = this.expressionService != null ? expressionService : new ExpressionService(dataSource);
@@ -774,6 +808,14 @@ public class RuleSetService implements RuleSetServiceInterface {
     private CRFVersionDAO getCrfVersionDao() {
         crfVersionDao = this.crfVersionDao != null ? crfVersionDao : new CRFVersionDAO(dataSource);
         return crfVersionDao;
+    }
+    
+    public DynamicsItemFormMetadataDao getDynamicsItemFormMetadataDao() {
+        return dynamicsItemFormMetadataDao;
+    }
+
+    public void setDynamicsItemFormMetadataDao(DynamicsItemFormMetadataDao dynamicsItemFormMetadataDao) {
+        this.dynamicsItemFormMetadataDao = dynamicsItemFormMetadataDao;
     }
 
     public RuleSetAuditDao getRuleSetAuditDao() {

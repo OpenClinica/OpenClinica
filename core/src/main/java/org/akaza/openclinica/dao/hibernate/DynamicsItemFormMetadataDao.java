@@ -45,4 +45,5 @@ public class DynamicsItemFormMetadataDao extends AbstractDomainDao<DynamicsItemF
         getCurrentSession().flush();
         return domainObject;
     }
+
 }
