@@ -40,7 +40,7 @@
 <br clear="all">
 
 <!-- Entity box -->
-<table border="0" cellpadding="0" cellspacing="0">
+<table border="0" cellpadding="0" cellspacing="0" style="float:left;">
 <tr>
   <td valign="bottom">
     <table border="0" cellpadding="0" cellspacing="0">
@@ -118,6 +118,13 @@
 </tr>
 
 </table>
+
+<div style="width:200px; float:right;">
+    <p><b>
+        <a href="#" onclick="window.openNewWindow('ViewItemAuditLog?entityId=<c:out value="${singleNote.entityId}"/>&auditTable=<c:out value="${singleNote.entityType}"/>','','no','dn')"><fmt:message key="audit_log_item" bundle="${resword}"/></a>
+    </b></p>
+</div>
+<div style="clear:both;"></div>
 
 <h3 class="title_manage"><fmt:message key="note_details" bundle="${resword}"/></h3>
 

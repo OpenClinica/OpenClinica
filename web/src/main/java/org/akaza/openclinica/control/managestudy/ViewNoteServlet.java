@@ -100,7 +100,8 @@ public class ViewNoteServlet extends SecureController {
 
                     note.setEntityValue(itemData.getValue());
                     note.setEntityName(item.getName());
-                    note.setEntityId(item.getId());
+                    //Mantis Issue 5165. It should be itemData.getId() instead of item.getId()
+                    note.setEntityId(itemData.getId());
 
                     EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
                     EventCRFBean ec = (EventCRFBean) ecdao.findByPK(itemData.getEventCRFId());
