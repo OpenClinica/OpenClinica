@@ -6,8 +6,11 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.util.Properties;
 
@@ -40,6 +43,27 @@ public class CoreResources implements ResourceLoaderAware {
 
     public URL getURL(String fileName) throws IOException {
         return resourceLoader.getResource("classpath:properties/" + fileName).getURL();
+    }
+
+    public File getTemplateFile(String fileName) {
+        try {
+            InputStream inputStream = getInputStream(fileName);
+            File f = new File(fileName);
+            OutputStream outputStream = new FileOutputStream(f);
+            byte buf[] = new byte[1024];
+            int len;
+            try {
+                while ((len = inputStream.read(buf)) > 0)
+                    outputStream.write(buf, 0, len);
+            } finally {
+                outputStream.close();
+                inputStream.close();
+            }
+            return f;
+
+        } catch (IOException e) {
+            throw new OpenClinicaSystemException(e.getMessage(), e.fillInStackTrace());
+        }
     }
 
     private void setPROPERTIES_DIR() {

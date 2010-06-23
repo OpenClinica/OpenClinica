@@ -16,11 +16,12 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
-import org.apache.commons.io.IOUtils;
 
-import javax.servlet.ServletContext;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+
 import javax.servlet.ServletOutputStream;
-import java.io.*;
 
 /**
  * @author jxu
@@ -54,6 +55,10 @@ public class DownloadVersionSpreadSheetServlet extends SecureController {
 
     }
 
+    private CoreResources getCoreResources() {
+        return (CoreResources) SpringServletAccess.getApplicationContext(context).getBean("coreResources");
+    }
+
     @Override
     public void processRequest() throws Exception {
         String dir = SQLInitServlet.getField("filePath") + "crf" + File.separator + "new" + File.separator;
@@ -77,7 +82,8 @@ public class DownloadVersionSpreadSheetServlet extends SecureController {
         File excelFile = null;
         String oldExcelFileName = crfIdString + version.getName() + ".xls";
         if (isTemplate) {
-            excelFile = new File(dir + CRF_VERSION_TEMPLATE);
+            //excelFile = new File(dir + CRF_VERSION_TEMPLATE);
+            excelFile = getCoreResources().getTemplateFile(CRF_VERSION_TEMPLATE);
             excelFileName = CRF_VERSION_TEMPLATE;
             // FileOutputStream fos = new FileOutputStream(excelFile);
             // IOUtils.copy(getCoreResources().getInputStream(CRF_VERSION_TEMPLATE), fos);
@@ -124,10 +130,10 @@ public class DownloadVersionSpreadSheetServlet extends SecureController {
             } catch (Exception ee) {
                 ee.printStackTrace();
             } finally {
-                if(in != null){
+                if (in != null) {
                     in.close();
                 }
-                if(op != null){
+                if (op != null) {
                     op.close();
                 }
             }
@@ -136,5 +142,3 @@ public class DownloadVersionSpreadSheetServlet extends SecureController {
     }
 
 }
-
-
