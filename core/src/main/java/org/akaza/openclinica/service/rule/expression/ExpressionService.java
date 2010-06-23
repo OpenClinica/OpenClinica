@@ -810,6 +810,12 @@ public class ExpressionService {
         if (theOid.length == 2) {
             ItemGroupBean itemGroup = getItemGroupDao().findByOid(theOid[0]);
             if (itemGroup != null && itemGroup.getCrfId().equals(ruleSet.getCrfId())) {
+                if (ruleSet.getCrfId() != null && itemGroup.getCrfId().equals(ruleSet.getCrfId())) {
+                    return "OK";
+                }
+                if (ruleSet.getCrfId() != null && !itemGroup.getCrfId().equals(ruleSet.getCrfId())) {
+                    return oid;
+                }
                 ItemBean item = getItemDao().findItemByGroupIdandItemOid(itemGroup.getId(), theOid[1]);
                 if (item != null) {
                     return "OK";
@@ -819,7 +825,13 @@ public class ExpressionService {
         }
         if (theOid.length == 1) {
             ItemGroupBean itemGroup = getItemGroupDao().findByOid(oid);
-            if (itemGroup != null && itemGroup.getCrfId().equals(ruleSet.getCrfId())) {
+            if (itemGroup != null) {
+                if (ruleSet.getCrfId() != null && itemGroup.getCrfId().equals(ruleSet.getCrfId())) {
+                    return "OK";
+                }
+                if (ruleSet.getCrfId() != null && !itemGroup.getCrfId().equals(ruleSet.getCrfId())) {
+                    return oid;
+                }
                 return "OK";
             }
 
