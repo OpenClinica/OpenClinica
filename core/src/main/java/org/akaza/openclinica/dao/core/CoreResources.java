@@ -45,10 +45,10 @@ public class CoreResources implements ResourceLoaderAware {
         return resourceLoader.getResource("classpath:properties/" + fileName).getURL();
     }
 
-    public File getTemplateFile(String fileName) {
+    public File getTemplateFile(String dir, String fileName) {
         try {
             InputStream inputStream = getInputStream(fileName);
-            File f = new File(fileName);
+            File f = new File(dir + fileName);
             OutputStream outputStream = new FileOutputStream(f);
             byte buf[] = new byte[1024];
             int len;

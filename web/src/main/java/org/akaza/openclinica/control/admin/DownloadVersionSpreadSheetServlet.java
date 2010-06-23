@@ -82,9 +82,9 @@ public class DownloadVersionSpreadSheetServlet extends SecureController {
         File excelFile = null;
         String oldExcelFileName = crfIdString + version.getName() + ".xls";
         if (isTemplate) {
-            //excelFile = new File(dir + CRF_VERSION_TEMPLATE);
-            excelFile = getCoreResources().getTemplateFile(CRF_VERSION_TEMPLATE);
-            excelFileName = CRF_VERSION_TEMPLATE;
+            excelFile = new File(dir + CRF_VERSION_TEMPLATE);
+            //excelFile = getCoreResources().getTemplateFile(dir, CRF_VERSION_TEMPLATE);
+            //excelFileName = CRF_VERSION_TEMPLATE;
             // FileOutputStream fos = new FileOutputStream(excelFile);
             // IOUtils.copy(getCoreResources().getInputStream(CRF_VERSION_TEMPLATE), fos);
             // IOUtils.closeQuietly(fos);
@@ -140,5 +140,4 @@ public class DownloadVersionSpreadSheetServlet extends SecureController {
         }
 
     }
-
 }
