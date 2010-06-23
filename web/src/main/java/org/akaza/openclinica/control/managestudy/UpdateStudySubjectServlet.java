@@ -213,7 +213,7 @@ public class UpdateStudySubjectServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         java.util.Date enrollDate = sub.getEnrollmentDate();
 
-        if (ub.isSysAdmin() || currentRole.isManageStudy() || (currentStudy.getParentStudyId() > 0 && currentRole.isResearchAssistant())){
+        if (ub.isSysAdmin() || currentRole.isManageStudy() || currentRole.isInvestigator() || (currentStudy.getParentStudyId() > 0 && currentRole.isResearchAssistant())){
             //currentRole.getRoleName().equals(Role.STUDYDIRECTOR) || currentRole.getRoleName().equals(Role.COORDINATOR)) {
 
             v.addValidation("label", Validator.NO_BLANKS);
