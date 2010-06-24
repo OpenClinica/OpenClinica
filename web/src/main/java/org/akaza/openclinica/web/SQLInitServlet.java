@@ -9,8 +9,14 @@ package org.akaza.openclinica.web;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.control.SpringServletAccess;
+import org.akaza.openclinica.control.admin.DownloadVersionSpreadSheetServlet;
+import org.akaza.openclinica.dao.core.CoreResources;
 
 import java.util.Properties;
+import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.FileOutputStream;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -45,7 +51,21 @@ public class SQLInitServlet extends HttpServlet {
         Role.INVESTIGATOR.setDescription(getField("investigator"));
         Role.RESEARCHASSISTANT.setDescription(getField("ra"));
         Role.MONITOR.setDescription(getField("monitor"));
-
+        
+        //The crf/original/CRF Template  will be created if not exist.
+        String theDir = getField("filePath");
+        String dir1 = "crf" + File.separator;
+        String dir2 = "original" + File.separator;
+        if (!(new File(theDir)).isDirectory() || !(new File(dir1)).isDirectory()
+                || !(new File(dir2)).isDirectory()) {
+            (new File(theDir + dir1 + dir2)).mkdirs();
+            copyTemplate(theDir + dir1 + dir2 + DownloadVersionSpreadSheetServlet.CRF_VERSION_TEMPLATE);
+        }
+        theDir = theDir + dir1 + dir2;
+        File excelFile = new File(theDir + DownloadVersionSpreadSheetServlet.CRF_VERSION_TEMPLATE);
+        if(!excelFile.isFile()){
+            copyTemplate(theDir);
+        }
     }
 
     /**
@@ -99,6 +119,30 @@ public class SQLInitServlet extends HttpServlet {
     public static String getDBName() {
         String name = params.getProperty("dataBase");
         return name == null ? "" : name;
+    }
+
+    public void copyTemplate(String theDir){
+        OutputStream out = null;
+        InputStream is = null;
+        CoreResources cr = (CoreResources) SpringServletAccess.getApplicationContext(context).getBean("coreResources");
+        try {
+            is = cr.getInputStream(DownloadVersionSpreadSheetServlet.CRF_VERSION_TEMPLATE);
+            File excelOutFile = new File(theDir);
+            out = new FileOutputStream(excelOutFile);
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = is.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            try{
+                is.close();
+                out.close();
+            }catch(Exception e){
+            }
+        }
     }
 
 }
