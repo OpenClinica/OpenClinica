@@ -11,6 +11,7 @@ import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.DeletedEventCRFBean;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Utils;
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.EntityDAO;
 import org.akaza.openclinica.dao.core.SQLFactory;
@@ -391,6 +392,12 @@ public class AuditDAO extends EntityDAO {
         Iterator it = alist.iterator();
         while (it.hasNext()) {
             AuditBean eb = (AuditBean) this.getEntityFromHashMap((HashMap) it.next());
+            //3 6 12 32
+            if(eb.getAuditEventTypeId()==3 || eb.getAuditEventTypeId()==6 || eb.getAuditEventTypeId()==12 || eb.getAuditEventTypeId()==32){
+                eb.setOldValue(Status.get(new Integer(eb.getOldValue())).getName());
+                eb.setNewValue(Status.get(new Integer(eb.getNewValue())).getName());
+            }
+
             al.add(eb);
         }
         return al;
