@@ -7,12 +7,12 @@
  */
 package org.akaza.openclinica.bean.submit;
 
-import java.util.Date;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
+
+import java.util.Date;
 
 /**
  * <P>
@@ -43,8 +43,8 @@ public class EventCRFBean extends AuditableEntityBean {
     private Status prevStatus;
 
     //the following are not in the table
-    private String studySubjectName ="";
-    private String eventName="";
+    private String studySubjectName = "";
+    private String eventName = "";
     private String studyName = "";
     private int eventOrdinal = 1;
 
@@ -58,6 +58,44 @@ public class EventCRFBean extends AuditableEntityBean {
         stage = DataEntryStage.INVALID;
         status = Status.INVALID;
         nexGenStatus = org.akaza.openclinica.domain.Status.INVALID;
+    }
+
+    public EventCRFBean(EventCRFBean eventCRFBean) {
+        super();
+        this.studyEventId = eventCRFBean.getStudyEventId();
+        this.CRFVersionId = eventCRFBean.getCRFVersionId();
+        this.dateInterviewed = eventCRFBean.getDateInterviewed();
+        this.interviewerName = eventCRFBean.getInterviewerName();
+        this.completionStatusId = eventCRFBean.getCompletionStatusId();
+        this.status = eventCRFBean.getStatus();
+        this.nexGenStatus = eventCRFBean.getNexGenStatus();
+        this.annotations = eventCRFBean.getAnnotations();
+        this.dateCompleted = eventCRFBean.getDateCompleted();
+        this.validatorId = eventCRFBean.getValidatorId();
+        this.dateValidate = eventCRFBean.getDateValidate();
+        this.dateValidateCompleted = eventCRFBean.getDateValidateCompleted();
+        this.validatorAnnotations = eventCRFBean.getValidatorAnnotations();
+        this.validateString = eventCRFBean.getValidateString();
+        this.studySubjectId = eventCRFBean.getStudySubjectId();
+        this.electronicSignatureStatus = eventCRFBean.isElectronicSignatureStatus();
+        this.sdvStatus = eventCRFBean.isSdvStatus();
+        this.prevStatus = eventCRFBean.getPrevStatus();
+        this.studySubjectName = eventCRFBean.getStudySubjectName();
+        this.eventName = eventCRFBean.getEventName();
+        this.studyName = eventCRFBean.getStudyName();
+        this.eventOrdinal = eventCRFBean.getEventOrdinal();
+        this.crf = eventCRFBean.getCrf();
+        this.crfVersion = eventCRFBean.getCrfVersion();
+        this.stage = eventCRFBean.getStage();
+        this.ownerId = eventCRFBean.getOwnerId();
+        this.createdDate = eventCRFBean.getCreatedDate();
+        this.updaterId = eventCRFBean.getUpdaterId();
+    }
+
+    public EventCRFBean copy() {
+        EventCRFBean newObj = new EventCRFBean(this);
+        return newObj;
+
     }
 
     public boolean isSdvStatus() {
@@ -455,11 +493,11 @@ public class EventCRFBean extends AuditableEntityBean {
         this.studySubjectName = studySubjectName;
     }
 
-    public void setEventOrdinal (int i) {
+    public void setEventOrdinal(int i) {
         this.eventOrdinal = i;
     }
 
-    public int getEventOrdinal () {
+    public int getEventOrdinal() {
         return this.eventOrdinal;
     }
 
