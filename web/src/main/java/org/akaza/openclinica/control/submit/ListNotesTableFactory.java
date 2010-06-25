@@ -54,13 +54,7 @@ import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -103,12 +97,15 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     @Override
     protected void configureColumns(TableFacade tableFacade, Locale locale) {
 
-        tableFacade.setColumnProperties("studySubject.label", "siteId", "discrepancyNoteBean.createdDate", "discrepancyNoteBean.updatedDate", "eventName",
+        tableFacade.setColumnProperties("studySubject.label", "discrepancyNoteBean.disType", "discrepancyNoteBean.resolutionStatus", "siteId", "discrepancyNoteBean.createdDate", "discrepancyNoteBean.updatedDate", "eventName",
                 "eventStartDate", "crfName", "entityName", "entityValue", "discrepancyNoteBean.description", "discrepancyNoteBean.detailedNotes",
-                "numberOfNotes", "discrepancyNoteBean.user", "discrepancyNoteBean.resolutionStatus", "discrepancyNoteBean.disType",
-                "discrepancyNoteBean.entityType", "discrepancyNoteBean.owner", "actions");
+                "numberOfNotes", "discrepancyNoteBean.user",
+                "discrepancyNoteBean.entityType", "discrepancyNoteBean.owner", "age", "days", "actions");
         Row row = tableFacade.getTable().getRow();
         configureColumn(row.getColumn("studySubject.label"), resword.getString("study_subject_ID"), null, null, true, true);
+        configureColumn(row.getColumn("discrepancyNoteBean.disType"), "Type", new DiscrepancyNoteTypeCellEditor(), new TypeDroplistFilterEditor(), true, false);
+        configureColumn(row.getColumn("discrepancyNoteBean.resolutionStatus"), "Resolution status", new ResolutionStatusCellEditor(),
+                new ResolutionStatusDroplistFilterEditor(), true, false);
         configureColumn(row.getColumn("siteId"), resword.getString("site_id"), null, null, true, false);
         configureColumn(row.getColumn("discrepancyNoteBean.createdDate"), "Date Created", new DateCellEditor(getDateFormat()), null, true, true);
         configureColumn(row.getColumn("discrepancyNoteBean.updatedDate"), "Date Updated", new DateCellEditor(getDateFormat()), null, true, true);
@@ -121,11 +118,10 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         configureColumn(row.getColumn("discrepancyNoteBean.detailedNotes"), "Detailed Notes", null, null, false, false);
         configureColumn(row.getColumn("numberOfNotes"), "# of Notes", null, null, false, false);
         configureColumn(row.getColumn("discrepancyNoteBean.user"), "Assigned User", new AssignedUserCellEditor(), null, true, false);
-        configureColumn(row.getColumn("discrepancyNoteBean.resolutionStatus"), "Resolution status", new ResolutionStatusCellEditor(),
-                new ResolutionStatusDroplistFilterEditor(), true, false);
-        configureColumn(row.getColumn("discrepancyNoteBean.disType"), "Type", new DiscrepancyNoteTypeCellEditor(), new TypeDroplistFilterEditor(), true, false);
         configureColumn(row.getColumn("discrepancyNoteBean.entityType"), "Entity Type", null, null, true, false);
         configureColumn(row.getColumn("discrepancyNoteBean.owner"), "Owner", new OwnerCellEditor(), null);
+        configureColumn(row.getColumn("age"), "Age", null, null, false, false);
+        configureColumn(row.getColumn("days"), "Days", null, null, false, false);
         String actionsHeader = resword.getString("actions") + "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;";
         configureColumn(row.getColumn("actions"), actionsHeader, new ActionsCellEditor(), new DefaultActionsEditor(locale), true, false);
 
@@ -192,6 +188,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
             h.put("studySubject", discrepancyNoteBean.getStudySub());
             h.put("studySubject.label", discrepancyNoteBean.getStudySub().getLabel());
+            h.put("discrepancyNoteBean.disType", discrepancyNoteBean.getDisType());
+            h.put("discrepancyNoteBean.resolutionStatus", discrepancyNoteBean.getResStatus());
             h.put("siteId", ((StudyBean) getStudyDao().findByPK(discrepancyNoteBean.getStudySub().getStudyId())).getIdentifier());
             h.put("discrepancyNoteBean", discrepancyNoteBean);
             h.put("discrepancyNoteBean.createdDate", discrepancyNoteBean.getCreatedDate());
@@ -206,10 +204,10 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             h.put("discrepancyNoteBean.detailedNotes", discrepancyNoteBean.getDetailedNotes());
             h.put("numberOfNotes", discrepancyNoteBean.getNumChildren());
             h.put("discrepancyNoteBean.user", discrepancyNoteBean.getAssignedUser());
-            h.put("discrepancyNoteBean.resolutionStatus", discrepancyNoteBean.getResStatus());
-            h.put("discrepancyNoteBean.disType", discrepancyNoteBean.getDisType());
             h.put("discrepancyNoteBean.entityType", discrepancyNoteBean.getEntityType());
             h.put("discrepancyNoteBean.owner", owner);
+            h.put("age", calculateAge(discrepancyNoteBean));
+            h.put("days", calculateDays(discrepancyNoteBean));
 
             theItems.add(h);
             setStudyHasDiscNotes(true);
@@ -422,7 +420,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
      * A very custom way to filter the items. The AuditUserLoginFilter acts as a
      * command for the Hibernate criteria object. Take the Limit information and
      * filter the rows.
-     * 
+     *
      * @param limit
      *            The Limit to use.
      */
@@ -443,7 +441,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
      * A very custom way to sort the items. The AuditUserLoginSort acts as a
      * command for the Hibernate criteria object. Take the Limit information and
      * sort the rows.
-     * 
+     *
      * @param limit
      *            The Limit to use.
      */
@@ -695,6 +693,43 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         builder.aEnd();
         return builder.toString();
     }
+
+    public long calculateAge(DiscrepancyNoteBean discBean){
+
+        DiscrepancyNoteBean childBean = (DiscrepancyNoteBean)discrepancyNoteDao.findLatestChildByParent(discBean.getId());
+        //childnote.createDate - parentBean.createDate
+
+        Date childDate = childBean.getCreatedDate();
+        Date discDate = discBean.getCreatedDate(); 
+
+        Calendar chcal = java.util.GregorianCalendar.getInstance();
+        chcal.setTime(childDate);
+        Calendar descal =java.util.GregorianCalendar.getInstance();
+        descal.setTime(discDate);
+
+        long result = (childDate.getTime() - discDate.getTime())/86400000;
+        
+        return result;
+    }
+
+    public String calculateDays(DiscrepancyNoteBean discBean){
+
+        if(discBean.getResStatus().isClosed() || discBean.getResStatus().isNotApplicable())return "";
+
+        DiscrepancyNoteBean childBean = (DiscrepancyNoteBean)discrepancyNoteDao.findLatestChildByParent(discBean.getId());
+        //currentDate-Child Note-createdDate
+        Date childDate = childBean.getCreatedDate();
+        Date serverDate = new Date();
+
+        Calendar chcal = java.util.GregorianCalendar.getInstance();
+        chcal.setTime(childDate);
+        Calendar descal =java.util.GregorianCalendar.getInstance();
+        descal.setTime(serverDate);
+
+        long result = (serverDate.getTime() - childDate.getTime())/86400000;
+        return result+"";
+    }
+
 
     private String formatDate(Date date) {
         String format = resformat.getString("date_format_string");

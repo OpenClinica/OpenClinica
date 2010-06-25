@@ -881,4 +881,14 @@
             order by dn.date_created desc
         </sql>
     </query>
+    <query>
+        <name>findLatestChildByParent</name>
+        <sql>
+            SELECT dn.*
+            FROM discrepancy_note dn
+            WHERE parent_dn_id=?
+            and dn.discrepancy_note_id =
+            (select max(discrepancy_note_id) from discrepancy_note where parent_dn_id = ?)  
+        </sql>
+    </query>
 </queries>

@@ -1772,4 +1772,24 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         }
         return sql;
     }
+
+
+    public EntityBean findLatestChildByParent(int parentId) {
+        DiscrepancyNoteBean eb = new DiscrepancyNoteBean();
+        this.setTypesExpected();
+
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(parentId));
+        variables.put(new Integer(2), new Integer(parentId));
+
+        String sql = digester.getQuery("findLatestChildByParent");
+        ArrayList alist = this.select(sql, variables);
+        Iterator it = alist.iterator();
+
+        if (it.hasNext()) {
+            eb = (DiscrepancyNoteBean) this.getEntityFromHashMap((HashMap) it.next());
+        }
+        return eb;
+    }
+
 }
