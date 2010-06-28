@@ -1050,7 +1050,7 @@ but the custom tag uses that, not this jstl code--%>
 <c:set var="currPage" value="${displayItem.singleItem.metadata.pageNumberLabel}" />
 
 <!--  found show item <c:out value="${displayItem.singleItem.metadata.showItem}"/> -->
-<c:if test="${displayItem.singleItem.metadata.showItem}">
+<c:if test="${displayItem.singleItem.metadata.showItem || fn:length(displayItem.singleItem.metadata.conditionalDisplay)>0}">
     <%-- SHOW THE PARENT FIRST --%>
 <c:if test="${displayItem.singleItem.metadata.parentId == 0}">
 
@@ -1067,22 +1067,72 @@ but the custom tag uses that, not this jstl code--%>
 </c:if>
 <c:set var="numOfTr" value="${numOfTr+1}"/>
 <c:if test="${!empty displayItem.singleItem.metadata.header}">
-    <tr class="aka_stripes">
+	<c:choose>
+	<c:when test="${fn:length(displayItem.singleItem.metadata.conditionalDisplay)>0}">
+		<c:set var="scdId" value="${displayItem.singleItem.item.id}"/>
+		<c:set var="statusId" value="${displayItem.singleItem.data.status.id}"/>
+		<c:choose>
+        <c:when test="${statusId>0&&statusId!=5 || displayItem.singleItem.isSCDtoBeShown}">
+        	<tr class="aka_stripes" style="display:all">
+        </c:when>
+        <c:otherwise>
+        	<tr class="aka_stripes" id="hd<c:out value="${scdId}"/>" style="display:none">
+        </c:otherwise>
+        </c:choose>
+    </c:when>
+    <c:otherwise>
+    	<tr class="aka_stripes">
+    </c:otherwise>
+    </c:choose>
             <%--<td class="table_cell_left" bgcolor="#F5F5F5">--%>
         <td class="table_cell_left aka_stripes"><b><c:out value=
           "${displayItem.singleItem.metadata.header}" escapeXml="false"/></b></td>
     </tr>
 </c:if>
+
 <c:if test="${!empty displayItem.singleItem.metadata.subHeader}">
-    <tr class="aka_stripes">
+	<c:choose>
+	<c:when test="${fn:length(displayItem.singleItem.metadata.conditionalDisplay)>0}">
+		<c:set var="scdId" value="${displayItem.singleItem.item.id}"/>
+		<c:set var="statusId" value="${displayItem.singleItem.data.status.id}"/>
+		<c:choose>
+        <c:when test="${statusId>0&&statusId!=5 || displayItem.singleItem.isSCDtoBeShown}">
+        	<tr class="aka_stripes" style="display:all">
+        </c:when>
+        <c:otherwise>
+        	<tr class="aka_stripes" id="sub<c:out value="${scdId}"/>" style="display:none">
+        </c:otherwise>
+        </c:choose>
+    </c:when>
+    <c:otherwise>
+    	<tr class="aka_stripes">
+    </c:otherwise>
+    </c:choose>
         <td class="table_cell_left"><c:out value="${displayItem.singleItem.metadata.subHeader}" escapeXml=
           "false"/></td>
     </tr>
 </c:if>
+
 <tr>
     <td class="table_cell_left">
         <table border="0" >
-            <tr>
+        	<c:choose>
+        	<c:when test="${fn:length(displayItem.singleItem.metadata.conditionalDisplay)>0}">
+        		<c:set var="scdId" value="${displayItem.singleItem.item.id}"/>
+        		<c:set var="statusId" value="${displayItem.singleItem.data.status.id}"/>
+        		<c:choose>
+	            <c:when test="${statusId>0&&statusId!=5 || displayItem.singleItem.isSCDtoBeShown}">
+	            	<tr style="display:all">
+	            </c:when>
+	            <c:otherwise>
+	            	<tr id="<c:out value="${scdId}"/>" style="display:none">
+	            </c:otherwise>
+	            </c:choose>
+	        </c:when>
+            <c:otherwise>
+            	<tr>
+            </c:otherwise>
+            </c:choose>
                 <td valign="top">
                     </c:if>
 

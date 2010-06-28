@@ -64,179 +64,246 @@ form element in red --%>
       <c:set var="errorFlag" value="1"/><!--  use in discrepancy note-->
   </c:if>
 
+<script language="JavaScript" src="includes/global_functions_javascript.js"></script>
 <%-- Some javascript functions for handling file data type -- ywang Dec.,2008 --%>
 <script lang="Javascript">
 function replaceSwitch(eventCRFId,itemId,id,attribute,str1,str2,filename,pathAndName,status) {
-    var rp = document.getElementById(id+itemId);
-    var div = document.getElementById('div'+itemId);
-    var a = document.getElementById('a'+itemId);
-    var ft = document.getElementById('ft'+itemId);
-    var up = document.getElementById('up'+itemId);
-    var uploadLink = 'UploadFile?submitted=no&itemId=' + itemId;
-    var downloadLink = 'DownloadAttachedFile?eventCRFId=' + eventCRFId + '&fileName=' + pathAndName;
-    if(rp.getAttribute('value')=="<fmt:message key="replace" bundle="${resword}"/>") {
-        if(a) {
-            div.appendChild(a);
-            div.removeChild(a);
-        }
-        if(!ft) {
-            var new_ft = document.createElement('input');
-            new_ft.setAttribute("id","ft"+itemId);
-            new_ft.setAttribute("type","text");
-            new_ft.setAttribute("name","fileText"+itemId);
-            new_ft.setAttribute("disabled","disabled");
-            div.appendChild(new_ft);
-            var new_up = document.createElement('input');
-            new_up.setAttribute("id", "up"+itemId);
-            new_up.setAttribute("type", "button");
-            new_up.setAttribute("name", "uploadFile"+itemId);
-            new_up.setAttribute("value", '<fmt:message key="click_to_upload" bundle="${resword}"/>');
-            new_up.onclick = function(){var itemid=itemId; javascript:openDocWindow(uploadLink)};
-            div.appendChild(new_up);
-        }
-        var fa = document.getElementById('fa'+itemId);
-        fa.setAttribute("value","upload");
-        div.appendChild(fa);
-        switchStr(itemId,"rm","value",'<fmt:message key="cancel_remove" bundle="${resword}"/>','<fmt:message key="remove" bundle="${resword}"/>');
-    } else if(rp.getAttribute('value')=="<fmt:message key="cancel_replace" bundle="${resword}"/>") {
-        if(ft) {
-            div.appendChild(ft);
-            div.appendChild(up);
-            div.removeChild(ft);
-            div.removeChild(up);
-        }
-        if(!a) {
-            if(status=='found') {
-                var new_a = document.createElement('a');
-                new_a.href = downloadLink;
-                new_a.setAttribute("id","a"+itemId);
-                new_a.appendChild(document.createTextNode(filename));
-                div.appendChild(new_a);
-            } else if(status=='notFound') {
-                var new_a = document.createElement('del');
-                new_a.setAttribute("id","a"+itemId);
-                new_a.innerHTML = filename;
-                div.appendChild(new_a);
-            }
-        }
-        var fa = document.getElementById('fa'+itemId);
-        fa.setAttribute("value","noAction");
-        div.appendChild(fa);
-    }
-    switchAttribute(itemId,id,attribute,str1,str2);
+	var rp = document.getElementById(id+itemId);
+	var div = document.getElementById('div'+itemId);
+	var a = document.getElementById('a'+itemId);
+	var ft = document.getElementById('ft'+itemId);
+	var up = document.getElementById('up'+itemId);
+	var uploadLink = 'UploadFile?submitted=no&itemId=' + itemId;
+	var downloadLink = 'DownloadAttachedFile?eventCRFId=' + eventCRFId + '&fileName=' + pathAndName;
+	if(rp.getAttribute('value')=="<fmt:message key="replace" bundle="${resword}"/>") {
+		if(a) {
+			div.appendChild(a);
+			div.removeChild(a);
+		}
+		if(!ft) {
+			var new_ft = document.createElement('input');
+			new_ft.setAttribute("id","ft"+itemId);
+			new_ft.setAttribute("type","text");
+			new_ft.setAttribute("name","fileText"+itemId);
+			new_ft.setAttribute("disabled","disabled");
+			div.appendChild(new_ft);
+			var new_up = document.createElement('input');
+			new_up.setAttribute("id", "up"+itemId);
+			new_up.setAttribute("type", "button");
+			new_up.setAttribute("name", "uploadFile"+itemId);
+			new_up.setAttribute("value", '<fmt:message key="click_to_upload" bundle="${resword}"/>');
+			new_up.onclick = function(){var itemid=itemId; javascript:openDocWindow(uploadLink)};
+			div.appendChild(new_up);
+		}
+		var fa = document.getElementById('fa'+itemId);
+		fa.setAttribute("value","upload");
+		div.appendChild(fa);
+		switchStr(itemId,"rm","value",'<fmt:message key="cancel_remove" bundle="${resword}"/>','<fmt:message key="remove" bundle="${resword}"/>');
+	} else if(rp.getAttribute('value')=="<fmt:message key="cancel_replace" bundle="${resword}"/>") {
+		if(ft) {
+			div.appendChild(ft);
+			div.appendChild(up);
+			div.removeChild(ft);
+			div.removeChild(up);
+		}
+		if(!a) {
+			if(status=='found') {
+				var new_a = document.createElement('a');
+				new_a.href = downloadLink;
+				new_a.setAttribute("id","a"+itemId);
+				new_a.appendChild(document.createTextNode(filename));
+				div.appendChild(new_a);
+			} else if(status=='notFound') {
+				var new_a = document.createElement('del');
+				new_a.setAttribute("id","a"+itemId);
+				new_a.innerHTML = filename;
+				div.appendChild(new_a);
+			}
+		}
+		var fa = document.getElementById('fa'+itemId);
+		fa.setAttribute("value","noAction");
+		div.appendChild(fa);
+	}
+	switchAttribute(itemId,id,attribute,str1,str2);
 }
 
 function removeSwitch(eventCRFId,itemId,id,attribute,str1,str2,filename,pathAndName,status) {
-    var rm = document.getElementById(id+itemId);
-    var div = document.getElementById('div'+itemId);
-    var a = document.getElementById('a'+itemId);
-    var ft = document.getElementById('ft'+itemId);
-    var up = document.getElementById('up'+itemId);
-    var input = document.getElementById('input'+itemId);
-    var downloadLink = 'DownloadAttachedFile?eventCRFId=' + eventCRFId + '&fileName=' + pathAndName;
-    if(rm.getAttribute('value')=='<fmt:message key="remove" bundle="${resword}"/>') {
-        input.setAttribute("value","");
-        if(a) {
-            div.appendChild(a);
-            div.removeChild(a);
-        }
-        if(ft) {
-            div.appendChild(ft);
-            div.appendChild(up);
-            div.removeChild(ft);
-            div.removeChild(up);
-            switchStr(itemId,"rp","value",'<fmt:message key="cancel_replace" bundle="${resword}"/>','<fmt:message key="replace" bundle="${resword}"/>');
-        }
-        var new_a = document.createElement('del');
-        new_a.setAttribute("id","a"+itemId);
-        if(navigator.appName=="Microsoft Internet Explorer") {
-            new_a.style.setAttribute("color","red");
-        } else {
-            new_a.setAttribute("style","color:red");
-        }
-        new_a.innerHTML = filename;
-        div.appendChild(new_a);
-        var fa = document.getElementById('fa'+itemId);
-        fa.setAttribute("value","erase");
-        div.appendChild(fa);
-    } else if(rm.getAttribute('value')=='<fmt:message key="cancel_remove" bundle="${resword}"/>') {
-        input.setAttribute("value",filename);
-        if(a) {
-            div.appendChild(a);
-            div.removeChild(a);
-            if(status=='found') {
-                var new_a = document.createElement('a');
-                new_a.href = downloadLink;
-                new_a.setAttribute("id","a"+itemId);
-                new_a.appendChild(document.createTextNode(filename));
-                div.appendChild(new_a);
-            } else if(status=='notFound') {
-                var new_a = document.createElement('del');
-                new_a.setAttribute("id","a"+itemId);
-                new_a.innerHTML = filename;
-                div.appendChild(new_a);
-            }
-        }
-        var fa = document.getElementById('fa'+itemId);
-        fa.setAttribute("value","noAction");
-        div.appendChild(fa);
-    }
+	var rm = document.getElementById(id+itemId);
+	var div = document.getElementById('div'+itemId);
+	var a = document.getElementById('a'+itemId);
+	var ft = document.getElementById('ft'+itemId);
+	var up = document.getElementById('up'+itemId);
+	var input = document.getElementById('input'+itemId);
+	var downloadLink = 'DownloadAttachedFile?eventCRFId=' + eventCRFId + '&fileName=' + pathAndName;
+	if(rm.getAttribute('value')=='<fmt:message key="remove" bundle="${resword}"/>') {
+		input.setAttribute("value","");
+		if(a) {
+			div.appendChild(a);
+			div.removeChild(a);
+		}
+		if(ft) {
+			div.appendChild(ft);
+			div.appendChild(up);
+			div.removeChild(ft);
+			div.removeChild(up);
+			switchStr(itemId,"rp","value",'<fmt:message key="cancel_replace" bundle="${resword}"/>','<fmt:message key="replace" bundle="${resword}"/>');
+		}
+		var new_a = document.createElement('del');
+		new_a.setAttribute("id","a"+itemId);
+		if(navigator.appName=="Microsoft Internet Explorer") {
+			new_a.style.setAttribute("color","red");
+		} else {
+			new_a.setAttribute("style","color:red");
+		}
+		new_a.innerHTML = filename;
+		div.appendChild(new_a);
+		var fa = document.getElementById('fa'+itemId);
+		fa.setAttribute("value","erase");
+		div.appendChild(fa);
+	} else if(rm.getAttribute('value')=='<fmt:message key="cancel_remove" bundle="${resword}"/>') {
+		input.setAttribute("value",filename);
+		if(a) {
+			div.appendChild(a);
+			div.removeChild(a);
+			if(status=='found') {
+				var new_a = document.createElement('a');
+				new_a.href = downloadLink;
+				new_a.setAttribute("id","a"+itemId);
+				new_a.appendChild(document.createTextNode(filename));
+				div.appendChild(new_a);
+			} else if(status=='notFound') {
+				var new_a = document.createElement('del');
+				new_a.setAttribute("id","a"+itemId);
+				new_a.innerHTML = filename;
+				div.appendChild(new_a);
+			}
+		}
+		var fa = document.getElementById('fa'+itemId);
+		fa.setAttribute("value","noAction");
+		div.appendChild(fa);
+	}
 
-    switchAttribute(itemId,id,attribute,str1,str2);
+	switchAttribute(itemId,id,attribute,str1,str2);
 }
 
 function switchAttribute(itemId, id, attribute, str1, str2) {
-    var e = document.getElementById(id+itemId);
-    if(e.getAttribute(attribute)==str1) {
-        e.setAttribute(attribute,str2);
-    }else if(e.getAttribute(attribute)==str2) {
-        e.setAttribute(attribute,str1);
-    }
+	var e = document.getElementById(id+itemId);
+	if(e.getAttribute(attribute)==str1) {
+		e.setAttribute(attribute,str2);
+	}else if(e.getAttribute(attribute)==str2) {
+		e.setAttribute(attribute,str1);
+	}
 }
 
 function switchStr(itemId, id,attribute,str1,str2) {
-    var e = document.getElementById(id+itemId);
-    if(e.getAttribute(attribute)==str1) {
-        e.setAttribute(attribute,str2);
+	var e = document.getElementById(id+itemId);
+	if(e.getAttribute(attribute)==str1) {
+		e.setAttribute(attribute,str2);
+	}
+}
+
+function conditionalShow(strLeftNavRowElementName){
+    var objLeftNavRowElement;
+
+    objLeftNavRowElement = MM_findObj(strLeftNavRowElementName);
+    if (objLeftNavRowElement != null) {
+        if (objLeftNavRowElement.style) { objLeftNavRowElement = objLeftNavRowElement.style; }
+        objLeftNavRowElement.display = (objLeftNavRowElement.display == "none" ) ? "" : "all";
+    }
+    objLeftNavRowElement1 = MM_findObj("hd"+strLeftNavRowElementName);
+    if (objLeftNavRowElement1 != null) {
+        if (objLeftNavRowElement1.style) { objLeftNavRowElement1 = objLeftNavRowElement1.style; }
+        objLeftNavRowElement1.display = (objLeftNavRowElement1.display == "none" ) ? "" : "all";
+    }
+    objLeftNavRowElement2 = MM_findObj("sub"+strLeftNavRowElementName);
+    if (objLeftNavRowElement2 != null) {
+        if (objLeftNavRowElement2.style) { objLeftNavRowElement2 = objLeftNavRowElement2.style; }
+        objLeftNavRowElement2.display = (objLeftNavRowElement2.display == "none" ) ? "" : "all";
+    }
+}
+
+function conditionalHide(strLeftNavRowElementName){
+    var objLeftNavRowElement;
+
+    objLeftNavRowElement = MM_findObj(strLeftNavRowElementName);
+    if (objLeftNavRowElement != null) {
+        if (objLeftNavRowElement.style) { objLeftNavRowElement = objLeftNavRowElement.style; }
+        objLeftNavRowElement.display = "none";
+    }
+    objLeftNavRowElement1 = MM_findObj("hd"+strLeftNavRowElementName);
+    if (objLeftNavRowElement1 != null) {
+        if (objLeftNavRowElement1.style) { objLeftNavRowElement1 = objLeftNavRowElement1.style; }
+        objLeftNavRowElement1.display = "none";
+    }
+    objLeftNavRowElement2 = MM_findObj("sub"+strLeftNavRowElementName);
+    if (objLeftNavRowElement2 != null) {
+        if (objLeftNavRowElement2.style) { objLeftNavRowElement2 = objLeftNavRowElement2.style; }
+        objLeftNavRowElement2.display = "none";
+    }
+}
+
+function selectControlShow(element,cdId,controlValue) {
+	var temp = 0;
+    for(var i = 0; i < element.options.length; i++){
+        if(element.options[i].selected) {
+	        if(element.options[i].value==controlValue){
+		        temp = 1;
+        	}
+        }
+    }
+    if(temp==1) {
+		conditionalShow(cdId);
+	}else {
+		conditionalHide(cdId);
+	} 
+}
+
+function checkControlShow(element,cdId,controlValue) {
+	if(element.value==controlValue) {
+		if(element.checked) {
+			conditionalShow(cdId);
+        } else {
+	      	conditionalHide(cdId);
+        }
     }
 }
 </script>
 
 <%-- A way to deal with the lack of 'break' out of forEach loop--%>
 <c:if test='${inputType=="file"}'>
-    <label for="input<c:out value="${itemId}"/>"></label>
-    <c:set var="pathAndName" value="${displayItem.data.value}"/>
-    <c:choose>
-    <c:when test="${inputTxtValue==null || empty inputTxtValue}">
-        <input type="hidden" id="input<c:out value="${itemId}"/>" name="input<c:out value="${itemId}"/>" value="<c:out value="${inputTxtValue}"/>">
-        <div id="div<c:out value="${itemId}"/>" name="myDiv">
-            <input type="text" id="ft<c:out value="${itemId}"/>" name="fileText<c:out value="${itemId}"/>" disabled>
-            <input type="button" id="up<c:out value="${itemId}"/>" name="uploadFile<c:out value="${itemId}"/>" value="<fmt:message key="click_to_upload" bundle="${resword}"/>" onClick="javascript:openDocWindow('UploadFile?submitted=no&itemId=<c:out value="${itemId}"/>')">
-            <input type="hidden" id="fa<c:out value="${itemId}"/>" name="fileAction<c:out value="${itemId}"/>" value="upload">
-        </div>
-    </c:when>
-    <c:otherwise>
-        <div id="div<c:out value="${itemId}"/>" name="myDiv">
-        <c:choose>
-        <c:when test="${fn:contains(inputTxtValue, 'fileNotFound#')}">
-            <c:set var="inputTxtValue" value="${fn:substringAfter(inputTxtValue,'fileNotFound#')}"/>
-            <del id="a<c:out value="${itemId}"/>"><c:out value="${inputTxtValue}"/></del>
-        </div><br>
-        <input id="rp<c:out value="${itemId}"/>" type="button" value="<fmt:message key="replace" bundle="${resword}"/>" onClick="replaceSwitch('<c:out value="${section.eventCRF.id}"/>','<c:out value="${itemId}"/>','rp','value','Replace','Cancel Replace','<c:out value="${inputTxtValue}"/>','<c:out value="${fn:replace(pathAndName,'+','%2B')}"/>','notFound')">
-        <input id="rm<c:out value="${itemId}"/>" type="button" value="<fmt:message key="remove" bundle="${resword}"/>" onClick="removeSwitch('<c:out value="${section.eventCRF.id}"/>','<c:out value="${itemId}"/>','rm','value','Remove','Cancel Remove','<c:out value="${inputTxtValue}"/>','<c:out value="${fn:replace(pathAndName,'+','%2B')}"/>','notFound')">
-        </c:when>
-        <c:otherwise>
-            <c:set var="prefilename" value="${pathAndName}"/>
-            <a href="DownloadAttachedFile?eventCRFId=<c:out value="${section.eventCRF.id}"/>&fileName=<c:out value="${fn:replace(prefilename,'+','%2B')}"/>" id="a<c:out value="${itemId}"/>"><c:out value="${inputTxtValue}"/></a>
-        </div><br>
-        <input id="rp<c:out value="${itemId}"/>" type="button" value="<fmt:message key="replace" bundle="${resword}"/>" onClick="replaceSwitch('<c:out value="${section.eventCRF.id}"/>','<c:out value="${itemId}"/>','rp','value','Replace','Cancel Replace','<c:out value="${inputTxtValue}"/>','<c:out value="${pathAndName}"/>','found')">
-        <input id="rm<c:out value="${itemId}"/>" type="button" value="<fmt:message key="remove" bundle="${resword}"/>" onClick="removeSwitch('<c:out value="${section.eventCRF.id}"/>','<c:out value="${itemId}"/>','rm','value','Remove','Cancel Remove','<c:out value="${inputTxtValue}"/>','<c:out value="${pathAndName}"/>','found')">
-        </c:otherwise>
-        </c:choose>
-        <input type="hidden" id="input<c:out value="${itemId}"/>" name="input<c:out value="${itemId}"/>" value="<c:out value="${inputTxtValue}"/>">
-        <input type="hidden" id="fa<c:out value="${itemId}"/>" name="fileAction<c:out value="${itemId}"/>" value="noAction">
-    </c:otherwise>
-    </c:choose>
+	<label for="input<c:out value="${itemId}"/>"></label>
+	<c:set var="pathAndName" value="${displayItem.data.value}"/>
+	<c:choose>
+	<c:when test="${inputTxtValue==null || empty inputTxtValue}">
+		<input type="hidden" id="input<c:out value="${itemId}"/>" name="input<c:out value="${itemId}"/>" value="<c:out value="${inputTxtValue}"/>">
+		<div id="div<c:out value="${itemId}"/>" name="myDiv">
+			<input type="text" id="ft<c:out value="${itemId}"/>" name="fileText<c:out value="${itemId}"/>" disabled>
+			<input type="button" id="up<c:out value="${itemId}"/>" name="uploadFile<c:out value="${itemId}"/>" value="<fmt:message key="click_to_upload" bundle="${resword}"/>" onClick="javascript:openDocWindow('UploadFile?submitted=no&itemId=<c:out value="${itemId}"/>')">
+			<input type="hidden" id="fa<c:out value="${itemId}"/>" name="fileAction<c:out value="${itemId}"/>" value="upload">
+		</div>
+	</c:when>
+	<c:otherwise>
+		<div id="div<c:out value="${itemId}"/>" name="myDiv">
+		<c:choose>
+		<c:when test="${fn:contains(inputTxtValue, 'fileNotFound#')}">
+			<c:set var="inputTxtValue" value="${fn:substringAfter(inputTxtValue,'fileNotFound#')}"/>
+			<del id="a<c:out value="${itemId}"/>"><c:out value="${inputTxtValue}"/></del>
+		</div><br>
+		<input id="rp<c:out value="${itemId}"/>" type="button" value="<fmt:message key="replace" bundle="${resword}"/>" onClick="replaceSwitch('<c:out value="${section.eventCRF.id}"/>','<c:out value="${itemId}"/>','rp','value','Replace','Cancel Replace','<c:out value="${inputTxtValue}"/>','<c:out value="${fn:replace(pathAndName,'+','%2B')}"/>','notFound')">
+		<input id="rm<c:out value="${itemId}"/>" type="button" value="<fmt:message key="remove" bundle="${resword}"/>" onClick="removeSwitch('<c:out value="${section.eventCRF.id}"/>','<c:out value="${itemId}"/>','rm','value','Remove','Cancel Remove','<c:out value="${inputTxtValue}"/>','<c:out value="${fn:replace(pathAndName,'+','%2B')}"/>','notFound')">
+		</c:when>
+		<c:otherwise>
+			<c:set var="prefilename" value="${pathAndName}"/>
+			<a href="DownloadAttachedFile?eventCRFId=<c:out value="${section.eventCRF.id}"/>&fileName=<c:out value="${fn:replace(prefilename,'+','%2B')}"/>" id="a<c:out value="${itemId}"/>"><c:out value="${inputTxtValue}"/></a>
+		</div><br>
+		<input id="rp<c:out value="${itemId}"/>" type="button" value="<fmt:message key="replace" bundle="${resword}"/>" onClick="replaceSwitch('<c:out value="${section.eventCRF.id}"/>','<c:out value="${itemId}"/>','rp','value','Replace','Cancel Replace','<c:out value="${inputTxtValue}"/>','<c:out value="${pathAndName}"/>','found')">
+		<input id="rm<c:out value="${itemId}"/>" type="button" value="<fmt:message key="remove" bundle="${resword}"/>" onClick="removeSwitch('<c:out value="${section.eventCRF.id}"/>','<c:out value="${itemId}"/>','rm','value','Remove','Cancel Remove','<c:out value="${inputTxtValue}"/>','<c:out value="${pathAndName}"/>','found')">
+		</c:otherwise>
+		</c:choose>
+		<input type="hidden" id="input<c:out value="${itemId}"/>" name="input<c:out value="${itemId}"/>" value="<c:out value="${inputTxtValue}"/>">
+		<input type="hidden" id="fa<c:out value="${itemId}"/>" name="fileAction<c:out value="${itemId}"/>" value="noAction">
+	</c:otherwise>
+	</c:choose>
 </c:if>
 
 <c:choose>
@@ -285,6 +352,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
 <c:if test='${inputType == "checkbox"}'>
   <%-- What if the defaultValue is a comma- or space-separated value for
  multiple checkboxes or multi-select tags? --%>
+  <c:set var="allChecked" value=""/>
   <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
     <c:choose>
       <c:when test="${option.selected}"><c:set var="checked" value="checked" />
@@ -302,8 +370,19 @@ function switchStr(itemId, id,attribute,str1,str2) {
         <span class="<c:out value="${exclaim}"/>">! </span><input class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="checkbox" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
       </c:when>
       <c:otherwise>
-        <input id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="checkbox" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
-      </c:otherwise>
+      	<c:choose>
+		<c:when test="${fn:length(displayItem.SCDPairs)>0}">
+			<c:forEach var="aPair" items="${displayItem.SCDPairs}">
+				<c:set var="scdId" value="${aPair.SCDItemId}"/>
+				<c:set var="optionValue" value="${aPair.optionValue}"/>
+    			<input id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="javascript:checkControlShow(this, '<c:out value="${scdId}"/>','<c:out value="${optionValue}"/>', '<c:out value="${isChecked}"/>'); this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="checkbox" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:out value="${isChecked}"/> <c:if test="${! isHorizontal}"><br/></c:if>
+      		</c:forEach>      
+    	</c:when>
+		<c:otherwise>
+			<input id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="checkbox" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
+      	</c:otherwise>
+		</c:choose>
+      	</c:otherwise>
     </c:choose>
   </c:forEach>
 </c:if>
@@ -319,9 +398,28 @@ function switchStr(itemId, id,attribute,str1,str2) {
         <c:choose>
             <c:when test="${isInError && !hasShown}">
                 <span class="<c:out value="${exclaim}"/>">! </span><input class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="radio" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
-            </c:when><c:otherwise>
-            <input id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="radio" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
-        </c:otherwise>
+            </c:when>
+            <c:otherwise>
+            	<c:choose>
+            	<c:when test="${fn:length(displayItem.SCDPairs)>0}">
+            		<c:forEach var="aPair" items="${displayItem.SCDPairs}">
+            			<c:set var="scdId" value="${aPair.SCDItemId}"/>
+            			<c:set var="optionValue" value="${aPair.optionValue}"/>
+			            <c:choose>
+			            	<c:when test="${option.value eq optionValue}">
+			            		<input id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>"  onChange="javascript:conditionalShow('<c:out value="${scdId}"/>'); javascript:conditionalShow('<c:out value="true${scdId}"/>'); this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="radio" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
+			        		</c:when>
+			        		<c:otherwise>
+			        			<input id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>"  onChange="javascript:conditionalHide('<c:out value="${scdId}"/>'); javascript:conditionalHide('true<c:out value="${scdId}"/>'); this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="radio" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
+			        		</c:otherwise>
+			        	</c:choose>
+		        	</c:forEach>	
+		        </c:when>
+		        <c:otherwise>
+		        	<input id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>"  onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="radio" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
+		        </c:otherwise>
+	        	</c:choose>
+        	</c:otherwise>
         </c:choose>
     </c:forEach>
 </c:if>
@@ -381,7 +479,7 @@ include the default value first in the select list --%>
           <c:set var="printDefault" value="true"/>
         </c:when>
       <c:otherwise>
-        <c:set var="printDefault" value="false"/>
+      	<c:set var="printDefault" value="false"/>
       </c:otherwise>
     </c:choose>--%>
 
@@ -390,7 +488,7 @@ include the default value first in the select list --%>
     <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
 
       <c:if test="${option.selected}">
-        <c:set var="selectedOption" value="${count}" />
+      	<c:set var="selectedOption" value="${count}" />
       </c:if>
 
       <c:if test="${printDefault=='true'}">
@@ -402,9 +500,18 @@ include the default value first in the select list --%>
 
       <c:set var="count" value="${count+1}"/>
     </c:forEach>
-
-    <select id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" name="input<c:out value="${itemId}"/>" class="formfield">
-
+    <c:choose>
+	<c:when test="${fn:length(displayItem.SCDPairs)>0}">
+		<c:forEach var="aPair" items="${displayItem.SCDPairs}">
+			<c:set var="scdId" value="${aPair.SCDItemId}"/>
+			<c:set var="optionValue" value="${aPair.optionValue}"/>
+    		<select id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="javascript:selectControlShow(this, '<c:out value="${scdId}"/>','<c:out value="${optionValue}"/>'); this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" name="input<c:out value="${itemId}"/>" class="formfield">
+		</c:forEach>
+    </c:when>
+	<c:otherwise>
+		<select id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" name="input<c:out value="${itemId}"/>" class="formfield">
+	</c:otherwise>
+	</c:choose>
       <c:choose>
 
         <c:when test="${printDefault == 'true'}">
@@ -449,9 +556,21 @@ include the default value first in the select list --%>
   <c:choose>
     <c:when test="${isInError && !hasShown}">
       <span class="<c:out value="${exclaim}"/>">! </span><select class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" multiple  tabindex="<c:out value="${tabNum}"/>" name="input<c:out value="${itemId}"/>" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');">
-    </c:when><c:otherwise>
-    <select id="input<c:out value="${itemId}"/>" multiple  tabindex="<c:out value="${tabNum}"/>" name="input<c:out value="${itemId}"/>" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');">
-  </c:otherwise>
+    </c:when>
+    <c:otherwise>
+    	<c:choose>
+    	<c:when test="${fn:length(displayItem.SCDPairs)>0}">
+    		<c:forEach var="aPair" items="${displayItem.SCDPairs}">
+            	<c:set var="scdId" value="${aPair.SCDItemId}"/>
+            	<c:set var="optionValue" value="${aPair.optionValue}"/>
+    <select id="input<c:out value="${itemId}"/>" multiple  tabindex="<c:out value="${tabNum}"/>" name="input<c:out value="${itemId}"/>" onChange="javascript:selectControlShow(this, '<c:out value="${scdId}"/>','<c:out value="${optionValue}"/>'); this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');">
+  			</c:forEach>
+  		</c:when>
+  		<c:otherwise>
+  			<select id="input<c:out value="${itemId}"/>" multiple  tabindex="<c:out value="${tabNum}"/>" name="input<c:out value="${itemId}"/>" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');">
+  		</c:otherwise>
+  		</c:choose>
+   </c:otherwise>
   </c:choose>
   <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
     <c:choose>
@@ -467,6 +586,8 @@ include the default value first in the select list --%>
   </c:forEach>
   </select>
 </c:if>
+
+
 <c:if test="${displayItem.metadata.required}">
   <td valign="top"><span class="alert">*</span></td>
 </c:if>
@@ -560,44 +681,25 @@ include the default value first in the select list --%>
 
    <c:choose>
     <c:when test="${(displayItem.numDiscrepancyNotes > 0) && (isForcedRFC eq 'false')}">
+
        <td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#" onClick=
     "openDNoteWindow('ViewDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&isRfc=0&itemId=<c:out value="${itemId}" />&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=input<c:out value="${itemId}"/>&column=value&monitor=1&writeToDB=1','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
     ><img id="flag_input<c:out value="${itemId}" />" name="flag_input<c:out value="${itemId}" />" src=
     "images/<c:out value="${imageFileName}"/>.gif" border="0" alt=
     "<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"
      ></a></td>
+
     </c:when>
-    
-    <c:when test="${(displayItem.numDiscrepancyNotes > 0) && (isForcedRFC eq 'true')}">
-    <c:if test="${errorTxtMessage eq null }">
-       <td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#" onClick=
-    "openDNoteWindow('ViewDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&isRfc=1&itemId=<c:out value="${itemId}" />&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=input<c:out value="${itemId}"/>&column=value&monitor=1&writeToDB=1','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
-    ><img id="flag_input<c:out value="${itemId}" />" name="flag_input<c:out value="${itemId}" />" src=
-    "images/<c:out value="${imageFileName}"/>.gif" border="0" alt=
-    "<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"
-     ></a></td>
-     </c:if>
-     
-     <c:if test="${errorTxtMessage != null}">
-        <td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#" onClick=
-    "openDNWindow('CreateDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&isRfc=1&itemId=<c:out value="${itemId}" />&groupLabel=<c:out value="${displayItem.metadata.groupLabel}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=input<c:out value="${itemId}" />&column=value&enterData=1&writeToDB=0&errorFlag=<c:out value="${errorFlag}"/>','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
-    ><img id="flag_input<c:out value="${itemId}" />" name="flag_input<c:out value="${itemId}" />" src=
-    "images/<c:out value="${imageFileName}"/>.gif" border="0" alt=
-    "<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"
-      ></a></td>
-     </c:if>
-    
-    </c:when>
-    
-    <c:when test="${isForcedRFC eq 'true'}">
-        <td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#" onClick=
+	<c:when test="${isForcedRFC eq 'true'}">
+	
+		<td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#" onClick=
     "openDNWindow('CreateDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&isRfc=1&itemId=<c:out value="${itemId}" />&groupLabel=<c:out value="${displayItem.metadata.groupLabel}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=input<c:out value="${itemId}" />&column=value&enterData=1&writeToDB=0&errorFlag=<c:out value="${errorFlag}"/>','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
     ><img id="flag_input<c:out value="${itemId}" />" name="flag_input<c:out value="${itemId}" />" src=
     "images/<c:out value="${imageFileName}"/>.gif" border="0" alt=
     "<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"
       ></a></td>
 
-    </c:when>
+	</c:when>
     <c:otherwise>
 
        <td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#" onClick=
