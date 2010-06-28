@@ -7,6 +7,24 @@
  */
 package org.akaza.openclinica.control.form;
 
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.EntityAction;
 import org.akaza.openclinica.bean.core.EntityBean;
@@ -27,24 +45,6 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.math.BigDecimal;
-import java.text.NumberFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * 
@@ -448,6 +448,8 @@ public class Validator {
     public static final int IS_AN_RULE = 33;
     public static final int BARCODE_EAN_13 = 36;
     public static final int IS_VALID_WIDTH_DECIMAL = 35;
+    
+    public static final int TO_HIDE_CONDITIONAL_DISPLAY = 37;
 
     /**
      * The last field for which an addValidation method was invoked. This is
@@ -822,6 +824,8 @@ public class Validator {
             case BARCODE_EAN_13:
                 errorMessage = resexception.getString("input_not_barcode");
                 break;
+            case TO_HIDE_CONDITIONAL_DISPLAY:
+                errorMessage = v.getErrorMessage();
             }
         }
         // logger.info("<<<error added: "+errorMessage+" to "+fieldName);
@@ -1100,6 +1104,9 @@ public class Validator {
             if (!eanChk.isValid(getFieldValue(fieldName))) {
                 addError(fieldName, v);
             }
+            break;
+        case TO_HIDE_CONDITIONAL_DISPLAY:
+            addError(fieldName, v);
             break;
         }
 
