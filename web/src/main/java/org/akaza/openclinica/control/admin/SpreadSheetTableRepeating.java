@@ -174,9 +174,10 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
         ItemDAO idao = new ItemDAO(ds);
         CRFVersionDAO cvdao = new CRFVersionDAO(ds);
         ItemGroupDAO itemGroupDao = new ItemGroupDAO(ds);
-
         // YW 1-30-2008
         HashMap<String, String> allItems = new HashMap<String, String>();
+        Map<String, String[]> parentValues = new HashMap<String, String[]>();
+        
 
         int validSheetNum = 0;
         for (int j = 0; j < numSheets; j++) {
@@ -673,6 +674,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         String[] mapValArray = (String[]) labelWithValues.get(responseLabel);
                         String value1 = resValues.replaceAll("\\\\,", "##");
                         String[] resValArray = value1.split(",");
+                        parentValues.put(secName+"---"+itemName, resValArray);
                         if (labelWithValues.containsKey(responseLabel)) {
                             if (!StringUtil.isBlank(resValues)) {
                                 for (int i = 0; i < resValArray.length; i++) {
@@ -1060,6 +1062,67 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         //                                    + resPageMsg.getString("SHOW_ITEM_column") + resPageMsg.getString("can_only_be_either_0_or_1"));
                         //                            htmlErrors.put(j + "," + k + "," + cellIndex, resPageMsg.getString("INVALID_VALUE"));
                         //                        }
+                        
+                        //
+                        ++cellIndex;
+                        cell = sheet.getRow(k).getCell((short) cellIndex);
+                        String display = getValue(cell);
+                        if (!StringUtil.isBlank(display)) {
+                            String pvKey = secName+"---";
+                            String d = display.replaceAll("\\\\,", "##");
+                            String[] par = d.split(",");
+                            //validate availability of item_label
+                            if(par.length==3) {
+                                String p0 = par[0].trim();
+                                String p1 = par[1].trim();
+                                String p2 = par[2].trim();
+                                if(p0.length()>0 && p1.length()>0 && p2.length()>0) {
+                                    if(repeats.contains(p0)) {
+                                        pvKey+=p0;
+                                        if(parentValues.containsKey(pvKey)) {
+                                            String[] pvs = parentValues.get(pvKey);
+                                            boolean existing = false;
+                                            for(String s: pvs) {
+                                                if(s.trim().equals(p1)) {
+                                                    existing = true;
+                                                    break;
+                                                }
+                                            }
+                                            if(!existing){
+                                                errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("SIMPLE_CONDITIONAL_DISPLAY_column") + " "
+                                                        + resPageMsg.getString("was_invalid_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet") + ". "
+                                                        + resPageMsg.getString("parent_response_value_invalid") + " " + p1.replace("##", "\\\\,"));
+                                                    htmlErrors.put(j + "," + k + "," + cellIndex, resPageMsg.getString("INVALID_VALUE"));
+                                            }
+                                        }
+                                    }else {
+                                        errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("SIMPLE_CONDITIONAL_DISPLAY_column") + " "
+                                                + resPageMsg.getString("was_invalid_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet") + ". "
+                                                + resPageMsg.getString("parent_item_name_invalid") + " " + p0);
+                                            htmlErrors.put(j + "," + k + "," + cellIndex, resPageMsg.getString("INVALID_VALUE"));
+                                    }
+                                } else {
+                                    errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("SIMPLE_CONDITIONAL_DISPLAY_column") + " "
+                                            + resPageMsg.getString("was_invalid_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet") + ". "
+                                            + resPageMsg.getString("correct_pattern"));
+                                        htmlErrors.put(j + "," + k + "," + cellIndex, resPageMsg.getString("INVALID_VALUE"));
+                                }
+                            } else {
+                                errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("SIMPLE_CONDITIONAL_DISPLAY_column") + " "
+                                        + resPageMsg.getString("was_invalid_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet") + ". "
+                                        + resPageMsg.getString("correct_pattern"));
+                                    htmlErrors.put(j + "," + k + "," + cellIndex, resPageMsg.getString("INVALID_VALUE"));
+                            }
+                        }
+                      
+                        //                        if (!"1".equals(showItem) && !"0".equals(showItem)) {
+                        //                            errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("SHOW_ITEM_column") + " "
+                        //                                    + resPageMsg.getString("was_invalid_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet") + ". "
+                        //                                    + resPageMsg.getString("SHOW_ITEM_column") + resPageMsg.getString("can_only_be_either_0_or_1"));
+                        //                            htmlErrors.put(j + "," + k + "," + cellIndex, resPageMsg.getString("INVALID_VALUE"));
+                        //                        }
+                        
+                        
                         // Create oid for Item Bean
                         String itemOid = idao.getValidOid(new ItemBean(), crfName, itemName, itemOids);
                         itemOids.add(itemOid);
@@ -1255,7 +1318,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             sql2 =
                                 "INSERT INTO ITEM_FORM_METADATA (CRF_VERSION_ID, RESPONSE_SET_ID," + "ITEM_ID,SUBHEADER,HEADER,LEFT_ITEM_TEXT,"
                                     + "RIGHT_ITEM_TEXT,PARENT_ID,SECTION_ID,ORDINAL,PARENT_LABEL,COLUMN_NUMBER,PAGE_NUMBER_LABEL,question_number_label,"
-                                    + "REGEXP,REGEXP_ERROR_MSG,REQUIRED,DEFAULT_VALUE,RESPONSE_LAYOUT,WIDTH_DECIMAL, show_item)" + " VALUES ("
+                                    + "REGEXP,REGEXP_ERROR_MSG,REQUIRED,DEFAULT_VALUE,RESPONSE_LAYOUT,WIDTH_DECIMAL, show_item, simple_conditional_display)" + " VALUES ("
                                     + versionIdString
                                     + ",(SELECT RESPONSE_SET_ID FROM RESPONSE_SET WHERE LABEL='"
                                     + stripQuotes(responseLabel)
@@ -1296,14 +1359,15 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                     + "', "
                                     + (isRequired ? 1 : 0)
                                     + ", '"
-                                    + stripQuotes(default_value) + "','" + stripQuotes(responseLayout) + "','" + widthDecimal + ", " + isShowItem + "')";
+                                    + stripQuotes(default_value) + "','" + stripQuotes(responseLayout) + "','" + widthDecimal + ", " + isShowItem 
+                                    + "', '" + stripQuotes(display) + "')";
                             logger.warn(sql2);
 
                         } else {
                             sql2 =
                                 "INSERT INTO ITEM_FORM_METADATA (CRF_VERSION_ID, RESPONSE_SET_ID," + "ITEM_ID,SUBHEADER,HEADER,LEFT_ITEM_TEXT,"
                                     + "RIGHT_ITEM_TEXT,PARENT_ID,SECTION_ID,ORDINAL,PARENT_LABEL,COLUMN_NUMBER,PAGE_NUMBER_LABEL,question_number_label,"
-                                    + "REGEXP,REGEXP_ERROR_MSG,REQUIRED,DEFAULT_VALUE,RESPONSE_LAYOUT,WIDTH_DECIMAL, show_item)" + " VALUES ("
+                                    + "REGEXP,REGEXP_ERROR_MSG,REQUIRED,DEFAULT_VALUE,RESPONSE_LAYOUT,WIDTH_DECIMAL, show_item, simple_conditional_display)" + " VALUES ("
                                     + versionIdString
                                     + ",(SELECT RESPONSE_SET_ID FROM RESPONSE_SET WHERE LABEL='"
                                     + stripQuotes(responseLabel)
@@ -1346,7 +1410,8 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                     + ", '"
                                     + stripQuotes(default_value)
                                     + "','"
-                                    + stripQuotes(responseLayout) + "','" + widthDecimal + "'," + isShowItem + ")";
+                                    + stripQuotes(responseLayout) + "','" + widthDecimal + "'," + isShowItem 
+                                    + ", '" + stripQuotes(display) + "')";
 
                         }
 
