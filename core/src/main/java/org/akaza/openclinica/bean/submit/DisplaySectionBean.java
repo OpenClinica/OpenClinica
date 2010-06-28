@@ -7,11 +7,13 @@
  */
 package org.akaza.openclinica.bean.submit;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author ssachs
@@ -24,10 +26,12 @@ public class DisplaySectionBean {
     private SectionBean section;
     private ArrayList items; // an array of DisplayItemBeans which belong to
     // this section
-    private boolean checkInputs;
+    private final boolean checkInputs;
     private boolean firstSection;
     private boolean lastSection;
     private Integer ruleEditCheck;
+    //collect item_id of simple conditional display items to be shown in this section 
+    private Set<Integer> showSCDItemIds;
     // The Item groups associated with this section.
     private List<DisplayItemGroupBean> displayFormGroups;// for items in
     // groups
@@ -38,7 +42,7 @@ public class DisplaySectionBean {
     // single ones
     // and in group
     // ones
-
+    
     public DisplaySectionBean() {
         crf = new CRFBean();
         crfVersion = new CRFVersionBean();
@@ -51,6 +55,7 @@ public class DisplaySectionBean {
         displayFormGroups = new ArrayList<DisplayItemGroupBean>();
         displayItemGroups = new ArrayList<DisplayItemWithGroupBean>();
         ruleEditCheck = 0;
+        showSCDItemIds = new HashSet<Integer>();
     }
 
     /**
@@ -225,4 +230,11 @@ public class DisplaySectionBean {
         this.ruleEditCheck = ruleEditCheck;
     }
 
+    public Set<Integer> getShowSCDItemIds() {
+        return showSCDItemIds;
+    }
+
+    public void setShowSCDItemIds(Set<Integer> showSCDItemIds) {
+        this.showSCDItemIds = showSCDItemIds;
+    }
 }

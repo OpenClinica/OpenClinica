@@ -58,7 +58,9 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
      * although ItemFormDAO should take care of that correspondence.
      */
     private ResponseSetBean responseSet;
-
+    
+    private String conditionalDisplay; //simple_conditional_display
+    
     public ItemFormMetadataBean() {
         itemId = 0;
         crfVersionId = 0;
@@ -84,6 +86,7 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
         defaultValue = "";
         responseSet = new ResponseSetBean();
         isHighlighted = false;
+        conditionalDisplay = "";
     }
 
     public String getDefaultValue() {
@@ -502,5 +505,20 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
 
     public void setWidthDecimal(String widthDecimal) {
         this.widthDecimal = widthDecimal;
+    }
+
+    public String getConditionalDisplay() {
+        return conditionalDisplay;
+    }
+
+    public void setConditionalDisplay(String conditionalDisplay) {
+        this.conditionalDisplay = conditionalDisplay;
+    }
+    
+    public boolean isConditionalDisplayItem() {
+        if(this.conditionalDisplay!=null && this.conditionalDisplay.length()>0) {
+            return true;
+        }
+        return false;
     }
 }

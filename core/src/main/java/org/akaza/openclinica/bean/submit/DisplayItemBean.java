@@ -7,11 +7,11 @@
  */
 package org.akaza.openclinica.bean.submit;
 
-import org.akaza.openclinica.bean.core.NullValue;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-
 import java.io.File;
 import java.util.ArrayList;
+
+import org.akaza.openclinica.bean.core.NullValue;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 
 /**
  * @author ssachs
@@ -62,7 +62,13 @@ public class DisplayItemBean implements Comparable {
      * Will hold the discrepancy note status for the item.
      */
     private int discrepancyNoteStatus;
+    
+    //this is for a item which controlls scd item
+    private ArrayList<SimpleConditionalDisplayPair> SCDPairs = new ArrayList<SimpleConditionalDisplayPair> ();
 
+    //this is for a scd item to be shown at display. This is not a status of database, it is a status at display
+    private boolean isSCDtoBeShown = false;
+    
     private void setProperties() {
         data = new ItemDataBean();
         item = new ItemBean();
@@ -71,6 +77,8 @@ public class DisplayItemBean implements Comparable {
         numChildren = 0;
         numColumns = 0;
         dbData = new ItemDataBean();
+        SCDPairs = new ArrayList<SimpleConditionalDisplayPair>();
+        isSCDtoBeShown = false;
     }
 
     public DisplayItemBean() {
@@ -371,5 +379,21 @@ public class DisplayItemBean implements Comparable {
 
     public void setDiscrepancyNoteStatus(int discrepancyNoteStatus) {
         this.discrepancyNoteStatus = discrepancyNoteStatus;
+    }
+
+    public ArrayList<SimpleConditionalDisplayPair> getSCDPairs() {
+        return SCDPairs;
+    }
+
+    public void setConditionalDisplayPairs(ArrayList<SimpleConditionalDisplayPair> SCDPairs) {
+        this.SCDPairs = SCDPairs;
+    }
+
+    public boolean getIsSCDtoBeShown() {
+        return isSCDtoBeShown;
+    }
+
+    public void setIsSCDtoBeShown(boolean isSCDtoBeShown) {
+        this.isSCDtoBeShown = isSCDtoBeShown;
     }
 }

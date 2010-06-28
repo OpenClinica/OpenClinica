@@ -7,9 +7,9 @@
  */
 package org.akaza.openclinica.bean.submit;
 
-import org.akaza.openclinica.bean.core.AuditableEntityBean;
-
 import java.util.ArrayList;
+
+import org.akaza.openclinica.bean.core.AuditableEntityBean;
 
 /**
  * <P>
@@ -62,6 +62,9 @@ public class SectionBean extends AuditableEntityBean {
      * for display.
      */
     private int numItemsCompleted = 0;
+    
+    //if section contains simple conditional display item
+    private boolean hasSCDItem;
 
     /**
      * The Section whose id == parentId. Not in the database. Only used for
@@ -78,6 +81,7 @@ public class SectionBean extends AuditableEntityBean {
         pageNumberLabel = "";
         ordinal = 0;
         parentId = 0;
+        hasSCDItem = false;
 
         // we do this so that we don't go into infinite recursion
         // however in getParent() we guarantee that the returned value
@@ -319,4 +323,13 @@ public class SectionBean extends AuditableEntityBean {
     public void setGroups(ArrayList<ItemGroupBean> groups) {
         this.groups = groups;
     }
+
+    public boolean hasSCDItem() {
+        return hasSCDItem;
+    }
+    
+    public void setHasSCDItem(boolean hasSCDItem) {
+        this.hasSCDItem = hasSCDItem;
+    }
+    
 }
