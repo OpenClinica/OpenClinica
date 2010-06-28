@@ -2526,10 +2526,11 @@ public abstract class DataEntryServlet extends SecureController {
                 }
                 metadataBean.setShowGroup(showGroup);
                 // what about the items which should be shown?
-                if (getServletPage().equals(Page.ADMIN_EDIT_SERVLET) && metadataBean.isShowGroup()) {
-                    metadataBean.setHighlighted(true);
-                }
+                // if (getServletPage().equals(Page.ADMIN_EDIT_SERVLET) && metadataBean.isShowGroup()) {
+                //    metadataBean.setHighlighted(true);
+                // }
                 // sets highlighting for AE, tbh 05/2010
+                // unset highlighting for admin editing, tbh 06/2010
             }
             // << tbh 04/2010
         } catch (OpenClinicaException oce) {
@@ -3186,13 +3187,14 @@ public abstract class DataEntryServlet extends SecureController {
                         + passedDDE + " value " + dib.getData().getValue());
                 }
                 // now set highlighting for admin entry only
-                if (getServletPage().equals(Page.ADMIN_EDIT_SERVLET)) {
-                    if (needsHighlighting && ifmb.isShowItem()) {
-                        // that is, if it was not shown but now is shown ...
-                        ifmb.setHighlighted(true);
-                        logger.debug("set highlighted to true");
-                    }
-                }
+                //                if (getServletPage().equals(Page.ADMIN_EDIT_SERVLET)) {
+                //                    if (needsHighlighting && ifmb.isShowItem()) {
+                //                        // that is, if it was not shown but now is shown ...
+                //                        ifmb.setHighlighted(true);
+                //                        logger.debug("set highlighted to true");
+                //                    }
+                //                }
+                // << tbh 06/2010
                 // TODO child items
                 // logger.debug("did not catch NPE 1");
                 dib.setMetadata(ifmb);
