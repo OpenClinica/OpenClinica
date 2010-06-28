@@ -7,14 +7,6 @@
  */
 package org.akaza.openclinica.dao.submit;
 
-import org.akaza.openclinica.bean.core.EntityBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.SectionBean;
-import org.akaza.openclinica.dao.core.AuditableEntityDAO;
-import org.akaza.openclinica.dao.core.DAODigester;
-import org.akaza.openclinica.dao.core.SQLFactory;
-import org.akaza.openclinica.dao.core.TypeNames;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -22,6 +14,14 @@ import java.util.Iterator;
 import java.util.Locale;
 
 import javax.sql.DataSource;
+
+import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.SectionBean;
+import org.akaza.openclinica.dao.core.AuditableEntityDAO;
+import org.akaza.openclinica.dao.core.DAODigester;
+import org.akaza.openclinica.dao.core.SQLFactory;
+import org.akaza.openclinica.dao.core.TypeNames;
 
 /**
  * <P>
@@ -316,4 +316,18 @@ public class SectionDAO extends AuditableEntityDAO {
         this.execute(digester.getQuery("deleteTestSection"), variables);
     }
 
+    public boolean hasSCDItem(Integer sectionId) {
+        return countSCDItemBySectionId(sectionId) > 0;
+    }
+    
+    public int countSCDItemBySectionId(Integer sectionId) {
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), sectionId);
+        ArrayList rows = this.select(digester.getQuery("countSCDItemBySectionId"), variables);
+        if(rows.size()>0) {
+            return (Integer) ((HashMap) rows.iterator().next()).get("count");
+        } else {
+            return 0;
+        }
+    }
 }

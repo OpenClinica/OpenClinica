@@ -7,6 +7,15 @@
  */
 package org.akaza.openclinica.dao.submit;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.Utils;
@@ -19,15 +28,6 @@ import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-
-import javax.sql.DataSource;
 
 /**
  * <P>
@@ -157,6 +157,24 @@ public class ItemDataDAO extends AuditableEntityDAO {
         variables.put(new Integer(3), new Integer(idb.getUpdaterId()));
         variables.put(new Integer(4), new Integer(idb.getId()));
         this.execute(digester.getQuery("updateValue"), variables);
+
+        if (isQuerySuccessful()) {
+            idb.setActive(true);
+        }
+
+        return idb;
+    }
+    
+    /**
+     * this will update item data status
+     */
+    public EntityBean updateStatus(EntityBean eb) {
+        ItemDataBean idb = (ItemDataBean) eb;
+        idb.setActive(false);
+        HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
+        variables.put(new Integer(1), new Integer(idb.getStatus().getId()));
+        variables.put(new Integer(2), new Integer(idb.getId()));
+        this.execute(digester.getQuery("updateStatus"), variables);
 
         if (isQuerySuccessful()) {
             idb.setActive(true);

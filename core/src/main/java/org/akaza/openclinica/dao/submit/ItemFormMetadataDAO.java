@@ -7,6 +7,14 @@
  */
 package org.akaza.openclinica.dao.submit;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.ResponseSetBean;
@@ -15,14 +23,6 @@ import org.akaza.openclinica.dao.core.EntityDAO;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.exception.OpenClinicaException;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-
-import javax.sql.DataSource;
 
 /**
  * @author ssachs
@@ -150,6 +150,7 @@ public class ItemFormMetadataDAO extends EntityDAO {
         // answer.setShowItem(((Boolean) hm.get("show_item")).booleanValue());
         answer.setShowItem(getBooleanFromRow(hm, "show_item"));
         // System.out.println("found show item: " + getBooleanFromRow(hm, "show_item"));
+        answer.setConditionalDisplay(getStringFromRow(hm, "simple_conditional_display"));
         // now get the response set
         ResponseSetBean rsb = new ResponseSetBean();
 
@@ -216,6 +217,8 @@ public class ItemFormMetadataDAO extends EntityDAO {
         // will need to set the boolean value here, tbh
         this.setTypeExpected(ind, TypeNames.BOOL);
         ind++; // show_item
+        this.setTypeExpected(ind, TypeNames.STRING); // simple_conditional_display
+        ind++;
         this.setTypeExpected(ind, TypeNames.INT);
         ind++; // response_set.response_type_id
         this.setTypeExpected(ind, TypeNames.STRING);
@@ -540,6 +543,8 @@ public class ItemFormMetadataDAO extends EntityDAO {
         variables.put(new Integer(ind), ifmb.getWidthDecimal());
         ind++;
         variables.put(new Integer(ind), new Boolean(ifmb.isShowItem()));
+        ind++;
+        variables.put(new Integer(ind), ifmb.getConditionalDisplay());
 
         execute("create", variables);
 
@@ -606,6 +611,10 @@ public class ItemFormMetadataDAO extends EntityDAO {
         variables.put(new Integer(ind), ifmb.getWidthDecimal());
         ind++;
         variables.put(new Integer(ind), new Boolean(ifmb.isShowItem()));
+        ind++;
+        variables.put(new Integer(ind), ifmb.getConditionalDisplay());
+        ind++;
+        variables.put(new Integer(ind), ifmb.getId());
 
         execute("update", variables);
 
@@ -730,6 +739,22 @@ public class ItemFormMetadataDAO extends EntityDAO {
         variables.put(new Integer(1), new Integer(id));
 
         return (ResponseSetBean) this.executeFindByPKQuery("findResponseSetByPK", variables);
-
+    }
+    
+    public ArrayList<ItemFormMetadataBean> findSCDItemsBySectionId(Integer sectionId) {
+        ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
+        this.unsetTypeExpected();
+        this.setTypesExpected();
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), sectionId);
+        
+        String sql = digester.getQuery("findSCDItemsBySectionId");
+        ArrayList alist = this.select(sql, variables);
+        Iterator it = alist.iterator();
+        while (it.hasNext()) {
+            ItemFormMetadataBean ifmb = (ItemFormMetadataBean) this.getEntityFromHashMap((HashMap) it.next());
+            answer.add(ifmb);
+        }
+        return answer;
     }
 }

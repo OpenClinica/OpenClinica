@@ -7,6 +7,17 @@
  */
 package org.akaza.openclinica.dao.submit;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.ItemDataType;
@@ -17,16 +28,6 @@ import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-
-import javax.sql.DataSource;
 
 /**
  * @author thickerson
@@ -412,5 +413,47 @@ public class ItemDAO extends AuditableEntityDAO {
         variables.put(new Integer(1), new Integer(sectionId));
 
         return this.executeFindAllQuery("findAllRequiredBySectionId", variables);
+    }
+    
+    public Map<String,Integer> mapAllItemNameAndItemIdInSection(Integer sectionId) {
+        Map<String,Integer> nameIdMap = new HashMap<String,Integer>();
+        this.unsetTypeExpected();
+        this.setTypeExpected(1, TypeNames.INT); //item_id
+        this.setTypeExpected(2, TypeNames.STRING); //(item)name
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(sectionId));
+        String sql = digester.getQuery("findIdAndNamesInSection");
+        ArrayList rows = select(sql, variables);
+        Iterator it = rows.iterator();
+        while (it.hasNext()) {
+            HashMap row = (HashMap) it.next();
+            Integer id = (Integer) row.get("item_id");
+            String name = (String) row.get("name");
+            nameIdMap.put(name, id);
+        }
+        return nameIdMap;
+    }
+    
+    public Map<String,String> mapAllChildAndParentNameInSection(Integer sectionId) {
+        Map<String,String> nameMap = new HashMap<String,String>();
+        this.unsetTypeExpected();
+        this.setTypeExpected(1, TypeNames.STRING);//(item)name
+        this.setTypeExpected(2, TypeNames.INT);//item_id
+        this.setTypeExpected(3, TypeNames.STRING);//parent_name
+        this.setTypeExpected(4, TypeNames.INT);//parent_id
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(sectionId));
+        String sql = digester.getQuery("findChildAndParentNamesInSection");
+        ArrayList rows = select(sql, variables);
+        Iterator it = rows.iterator();
+        while (it.hasNext()) {
+            HashMap row = (HashMap) it.next();
+            String cn = (String) row.get("name");
+            Integer cid = (Integer) row.get("item_id");
+            String pn = (String) row.get("parent_name");
+            Integer pid = (Integer) row.get("parent_id");
+            nameMap.put(cn, pn);
+        }
+        return nameMap;
     }
 }
