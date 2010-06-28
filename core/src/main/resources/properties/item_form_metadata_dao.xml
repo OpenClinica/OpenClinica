@@ -115,11 +115,11 @@
                     regexp_error_msg,
                     ordinal,
                     required,
-                    default_value =?,
-                    response_layout =?,
-                    width_decimal =?,
-                    show_item  )
-			VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                    default_value,
+                    response_layout,
+                    width_decimal,
+                    show_item, simple_conditional_display  )
+			VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 		</sql>
 	</query>
 	<query>
@@ -148,7 +148,8 @@
                     default_value =?,
                     response_layout =?,
                     width_decimal =?,
-                    show_item =?
+                    show_item =?,
+                    simple_conditional_display = ?
 			WHERE item_form_metadata_id = ?
 		</sql>
 	</query>
@@ -209,5 +210,11 @@
 	<query>
 		<name>getNextPK</name>
 		<sql> select nextval('item_form_metadata_item_form_metadata_id_seq') as key </sql>
+	</query>
+	<query>
+		<name>findSCDItemsBySectionId</name>
+		<sql>select * from item_form_metadata 
+		where section_id = ? and length(simple_conditional_display) > 0
+		</sql>
 	</query>
 </queries>

@@ -107,4 +107,11 @@
 			delete from section where label=?
 		</sql>
 	</query>
+	<query>
+		<name>countSCDItemBySectionId</name>
+		<sql>
+			select count(item_form_metadata) from item_form_metadata 
+			where section_id = ? and length(simple_conditional_display) > 0
+		</sql>
+	</query>
 </queries>

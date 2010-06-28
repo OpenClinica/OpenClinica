@@ -177,4 +177,8 @@
 			and id.value != ''
 		</sql>
 	</query>
+	<query>
+		<name>updateStatus</name>
+		<sql>UPDATE item_data SET status_id=? WHERE item_data_id=?</sql>
+	</query>
 </queries>
