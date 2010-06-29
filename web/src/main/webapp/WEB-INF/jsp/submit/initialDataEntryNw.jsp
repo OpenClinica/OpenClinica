@@ -1073,7 +1073,7 @@ but the custom tag uses that, not this jstl code--%>
 		<c:set var="statusId" value="${displayItem.singleItem.data.status.id}"/>
 		<c:choose>
         <c:when test="${statusId>0&&statusId!=5 || displayItem.singleItem.isSCDtoBeShown}">
-        	<tr class="aka_stripes" style="display:all">
+        	<tr class="aka_stripes" id="hd<c:out value="${scdId}"/>" style="display:all">
         </c:when>
         <c:otherwise>
         	<tr class="aka_stripes" id="hd<c:out value="${scdId}"/>" style="display:none">
@@ -1097,7 +1097,7 @@ but the custom tag uses that, not this jstl code--%>
 		<c:set var="statusId" value="${displayItem.singleItem.data.status.id}"/>
 		<c:choose>
         <c:when test="${statusId>0&&statusId!=5 || displayItem.singleItem.isSCDtoBeShown}">
-        	<tr class="aka_stripes" style="display:all">
+        	<tr class="aka_stripes" id="sub<c:out value="${scdId}"/>" style="display:all">
         </c:when>
         <c:otherwise>
         	<tr class="aka_stripes" id="sub<c:out value="${scdId}"/>" style="display:none">
@@ -1122,7 +1122,7 @@ but the custom tag uses that, not this jstl code--%>
         		<c:set var="statusId" value="${displayItem.singleItem.data.status.id}"/>
         		<c:choose>
 	            <c:when test="${statusId>0&&statusId!=5 || displayItem.singleItem.isSCDtoBeShown}">
-	            	<tr style="display:all">
+	            	<tr id="<c:out value="${scdId}"/>" style="display:all">
 	            </c:when>
 	            <c:otherwise>
 	            	<tr id="<c:out value="${scdId}"/>" style="display:none">
