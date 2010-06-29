@@ -171,62 +171,62 @@ public class ItemFormMetadataDAO extends EntityDAO {
 
         int ind = 1;
         this.setTypeExpected(ind, TypeNames.INT);
-        ind++; // item form metadata id
+        ind++; // item form metadata id 2
         this.setTypeExpected(ind, TypeNames.INT);
-        ind++; // item id
+        ind++; // item id 3
         this.setTypeExpected(ind, TypeNames.INT);
-        ind++; // crf version id
+        ind++; // crf version id 4
         this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; // header
+        ind++; // header 5
         this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; // subheader
+        ind++; // subheader 6
         this.setTypeExpected(ind, TypeNames.INT);
-        ind++; // parent id
+        ind++; // parent id 7
         this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; // parent label
+        ind++; // parent label 8
         this.setTypeExpected(ind, TypeNames.INT);
-        ind++; // column number
+        ind++; // column number 9
         this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; // page number label
+        ind++; // page number label 10
         this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; // question number label
+        ind++; // question number label 11
         this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; // left item text
+        ind++; // left item text 12
         this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; // right item text
+        ind++; // right item text 13
         this.setTypeExpected(ind, TypeNames.INT);
-        ind++; // section id
+        ind++; // section id 14
         this.setTypeExpected(ind, TypeNames.INT);
-        ind++; // decision condition id
+        ind++; // decision condition id 15
         this.setTypeExpected(ind, TypeNames.INT);
-        ind++; // response set id
+        ind++; // response set id 16
         this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; // regexp
+        ind++; // regexp 17
         this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; // regexp error msg
+        ind++; // regexp error msg 18
         this.setTypeExpected(ind, TypeNames.INT);
-        ind++; // ordinal
+        ind++; // ordinal 19
         this.setTypeExpected(ind, TypeNames.BOOL);
-        ind++; // required
+        ind++; // required 20
         this.setTypeExpected(ind, TypeNames.STRING); // default_value
+        ind++; 
+        this.setTypeExpected(ind, TypeNames.STRING); // response_layout 21
         ind++;
-        this.setTypeExpected(ind, TypeNames.STRING); // response_layout
+        this.setTypeExpected(ind, TypeNames.STRING); // width_decimal 22
         ind++;
-        this.setTypeExpected(ind, TypeNames.STRING); // width_decimal
-        ind++;
-        // will need to set the boolean value here, tbh
+        // will need to set the boolean value here, tbh 23
         this.setTypeExpected(ind, TypeNames.BOOL);
         ind++; // show_item
-        this.setTypeExpected(ind, TypeNames.STRING); // simple_conditional_display
+        this.setTypeExpected(ind, TypeNames.STRING); // simple_conditional_display 24
         ind++;
         this.setTypeExpected(ind, TypeNames.INT);
-        ind++; // response_set.response_type_id
+        ind++; // response_set.response_type_id 25
         this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; // response_set.label
+        ind++; // response_set.label 26
         this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; // response_set.options_text
+        ind++; // response_set.options_text 27
         this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; // response_set.options_values
+        ind++; // response_set.options_values 28
     }
 
     /*
@@ -652,11 +652,11 @@ public class ItemFormMetadataDAO extends EntityDAO {
     public ItemFormMetadataBean findByItemIdAndCRFVersionId(int itemId, int crfVersionId) {
         this.setTypesExpected();
         // TODO note to come back here, tbh
-        this.setTypeExpected(28, TypeNames.STRING);// version name
+        this.setTypeExpected(29, TypeNames.STRING);// version name
         // add more here for display, tbh 082007
-        this.setTypeExpected(29, TypeNames.STRING);// group_label
-        this.setTypeExpected(30, TypeNames.INT);// repeat_max
-        this.setTypeExpected(31, TypeNames.STRING);// section_name
+        this.setTypeExpected(30, TypeNames.STRING);// group_label
+        this.setTypeExpected(31, TypeNames.INT);// repeat_max
+        this.setTypeExpected(32, TypeNames.STRING);// section_name
 
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(itemId));
