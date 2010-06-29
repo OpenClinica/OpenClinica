@@ -321,6 +321,9 @@ public class SectionDAO extends AuditableEntityDAO {
     }
     
     public int countSCDItemBySectionId(Integer sectionId) {
+        this.unsetTypeExpected();
+        this.setTypeExpected(1, TypeNames.INT); // count
+        
         HashMap variables = new HashMap();
         variables.put(new Integer(1), sectionId);
         ArrayList rows = this.select(digester.getQuery("countSCDItemBySectionId"), variables);
