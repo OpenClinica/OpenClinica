@@ -3060,6 +3060,7 @@ public abstract class DataEntryServlet extends SecureController {
 
         // Find out whether any display items are *not* grouped; see issue 1689
         hasUngroupedItems = formBeanUtil.sectionHasUngroupedItems(sm.getDataSource(), sb.getId(), itemGroups);
+        sdao = new SectionDAO(sm.getDataSource());
         sb.setHasSCDItem(hasUngroupedItems?this.sdao.hasSCDItem(sb.getId()):false);
         
         section.setEventCRF(ecb);
