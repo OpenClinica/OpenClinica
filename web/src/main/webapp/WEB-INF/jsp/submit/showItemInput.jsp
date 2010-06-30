@@ -205,27 +205,27 @@ function switchStr(itemId, id,attribute,str1,str2) {
 function conditionalShow(strLeftNavRowElementName){
     var objLeftNavRowElement;
 
-    objLeftNavRowElement = MM_findObj(strLeftNavRowElementName);
+    objLeftNavRowElement = MM_findObj("t"+strLeftNavRowElementName);
     if (objLeftNavRowElement != null) {
         if (objLeftNavRowElement.style) { objLeftNavRowElement = objLeftNavRowElement.style; }
-        objLeftNavRowElement.display = (objLeftNavRowElement.display == "none" ) ? "" : "all";
+		if (objLeftNavRowElement.display = "none") { objLeftNavRowElement.display = "";}
     }
     objLeftNavRowElement1 = MM_findObj("hd"+strLeftNavRowElementName);
     if (objLeftNavRowElement1 != null) {
         if (objLeftNavRowElement1.style) { objLeftNavRowElement1 = objLeftNavRowElement1.style; }
-        objLeftNavRowElement1.display = (objLeftNavRowElement1.display == "none" ) ? "" : "all";
+		if (objLeftNavRowElement1.display = "none") { objLeftNavRowElement1.display = "";}
     }
     objLeftNavRowElement2 = MM_findObj("sub"+strLeftNavRowElementName);
     if (objLeftNavRowElement2 != null) {
         if (objLeftNavRowElement2.style) { objLeftNavRowElement2 = objLeftNavRowElement2.style; }
-        objLeftNavRowElement2.display = (objLeftNavRowElement2.display == "none" ) ? "" : "all";
+		if (objLeftNavRowElement2.display = "none") { objLeftNavRowElement2.display = "";}
     }
 }
 
 function conditionalHide(strLeftNavRowElementName){
     var objLeftNavRowElement;
 
-    objLeftNavRowElement = MM_findObj(strLeftNavRowElementName);
+    objLeftNavRowElement = MM_findObj("t"+strLeftNavRowElementName);
     if (objLeftNavRowElement != null) {
         if (objLeftNavRowElement.style) { objLeftNavRowElement = objLeftNavRowElement.style; }
         objLeftNavRowElement.display = "none";
@@ -375,7 +375,7 @@ function checkControlShow(element,cdId,controlValue) {
 			<c:forEach var="aPair" items="${displayItem.SCDPairs}">
 				<c:set var="scdId" value="${aPair.SCDItemId}"/>
 				<c:set var="optionValue" value="${aPair.optionValue}"/>
-    			<input id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="javascript:checkControlShow(this, '<c:out value="${scdId}"/>','<c:out value="${optionValue}"/>', '<c:out value="${isChecked}"/>'); this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="checkbox" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:out value="${isChecked}"/> <c:if test="${! isHorizontal}"><br/></c:if>
+    			<input id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onClick="javascript:checkControlShow(this, '<c:out value="${scdId}"/>','<c:out value="${optionValue}"/>', '<c:out value="${isChecked}"/>');" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="checkbox" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:out value="${isChecked}"/> <c:if test="${! isHorizontal}"><br/></c:if>
       		</c:forEach>      
     	</c:when>
 		<c:otherwise>
@@ -407,10 +407,10 @@ function checkControlShow(element,cdId,controlValue) {
             			<c:set var="optionValue" value="${aPair.optionValue}"/>
 			            <c:choose>
 			            	<c:when test="${option.value eq optionValue}">
-			            		<input id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>"  onChange="javascript:conditionalShow('<c:out value="${scdId}"/>'); this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="radio" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
+			            		<input id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>"  onClick="javascript:conditionalShow('<c:out value="${scdId}"/>');" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="radio" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
 			        		</c:when>
 			        		<c:otherwise>
-			        			<input id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>"  onChange="javascript:conditionalHide('<c:out value="${scdId}"/>'); this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="radio" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
+			        			<input id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>"  onClick="javascript:conditionalHide('<c:out value="${scdId}"/>');" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="radio" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
 			        		</c:otherwise>
 			        	</c:choose>
 		        	</c:forEach>	
