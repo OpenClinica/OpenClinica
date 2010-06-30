@@ -1067,72 +1067,70 @@ but the custom tag uses that, not this jstl code--%>
 </c:if>
 <c:set var="numOfTr" value="${numOfTr+1}"/>
 <c:if test="${!empty displayItem.singleItem.metadata.header}">
-	<c:choose>
+    <c:choose>
 	<c:when test="${fn:length(displayItem.singleItem.metadata.conditionalDisplay)>0}">
-		<c:set var="scdId" value="${displayItem.singleItem.item.id}"/>
+		<c:set var="cdId" value="${displayItem.singleItem.item.id}"/>
 		<c:set var="statusId" value="${displayItem.singleItem.data.status.id}"/>
 		<c:choose>
-        <c:when test="${statusId>0&&statusId!=5 || displayItem.singleItem.isSCDtoBeShown}">
-        	<tr class="aka_stripes" id="hd<c:out value="${scdId}"/>" style="display:all">
-        </c:when>
-        <c:otherwise>
-        	<tr class="aka_stripes" id="hd<c:out value="${scdId}"/>" style="display:none">
-        </c:otherwise>
-        </c:choose>
-    </c:when>
-    <c:otherwise>
+		<c:when test="${statusId>0&&statusId!=5 || displayItem.singleItem.isSCDtoBeShown}">
+    		<tr class="aka_stripes">
+		</c:when>
+		<c:otherwise>
+			<tr class="aka_stripes" id="<c:out value="hd${cdId}"/>" style="display:none">
+		</c:otherwise>
+		</c:choose>
+	</c:when>
+	<c:otherwise>
     	<tr class="aka_stripes">
-    </c:otherwise>
-    </c:choose>
+	</c:otherwise>
+	</c:choose>
             <%--<td class="table_cell_left" bgcolor="#F5F5F5">--%>
         <td class="table_cell_left aka_stripes"><b><c:out value=
           "${displayItem.singleItem.metadata.header}" escapeXml="false"/></b></td>
     </tr>
 </c:if>
-
 <c:if test="${!empty displayItem.singleItem.metadata.subHeader}">
-	<c:choose>
+    <c:choose>
 	<c:when test="${fn:length(displayItem.singleItem.metadata.conditionalDisplay)>0}">
-		<c:set var="scdId" value="${displayItem.singleItem.item.id}"/>
+		<c:set var="cdId" value="${displayItem.singleItem.item.id}"/>
 		<c:set var="statusId" value="${displayItem.singleItem.data.status.id}"/>
 		<c:choose>
-        <c:when test="${statusId>0&&statusId!=5 || displayItem.singleItem.isSCDtoBeShown}">
-        	<tr class="aka_stripes" id="sub<c:out value="${scdId}"/>" style="display:all">
-        </c:when>
-        <c:otherwise>
-        	<tr class="aka_stripes" id="sub<c:out value="${scdId}"/>" style="display:none">
-        </c:otherwise>
-        </c:choose>
-    </c:when>
-    <c:otherwise>
+		<c:when test="${statusId>0&&statusId!=5 || displayItem.singleItem.isSCDtoBeShown}">
+    		<tr class="aka_stripes">
+		</c:when>
+		<c:otherwise>
+			<tr class="aka_stripes" id="<c:out value="sub${cdId}"/>" style="display:none">
+		</c:otherwise>
+		</c:choose>
+	</c:when>
+	<c:otherwise>
     	<tr class="aka_stripes">
-    </c:otherwise>
-    </c:choose>
+	</c:otherwise>
+	</c:choose>
         <td class="table_cell_left"><c:out value="${displayItem.singleItem.metadata.subHeader}" escapeXml=
           "false"/></td>
     </tr>
 </c:if>
-
-<tr>
+<c:choose>
+<c:when test="${fn:length(displayItem.singleItem.metadata.conditionalDisplay)>0}">
+	<c:set var="cdId" value="${displayItem.singleItem.item.id}"/>
+	<c:set var="statusId" value="${displayItem.singleItem.data.status.id}"/>
+	<c:choose>
+	<c:when test="${statusId>0&&statusId!=5 || displayItem.singleItem.isSCDtoBeShown}">
+		<tr>
+	</c:when>
+	<c:otherwise>
+		<tr id="<c:out value="t${cdId}"/>" style="display:none">
+	</c:otherwise>
+	</c:choose>
+</c:when>
+<c:otherwise>
+	<tr>
+</c:otherwise>
+</c:choose>
     <td class="table_cell_left">
         <table border="0" >
-        	<c:choose>
-        	<c:when test="${fn:length(displayItem.singleItem.metadata.conditionalDisplay)>0}">
-        		<c:set var="scdId" value="${displayItem.singleItem.item.id}"/>
-        		<c:set var="statusId" value="${displayItem.singleItem.data.status.id}"/>
-        		<c:choose>
-	            <c:when test="${statusId>0&&statusId!=5 || displayItem.singleItem.isSCDtoBeShown}">
-	            	<tr id="<c:out value="${scdId}"/>" style="display:all">
-	            </c:when>
-	            <c:otherwise>
-	            	<tr id="<c:out value="${scdId}"/>" style="display:none">
-	            </c:otherwise>
-	            </c:choose>
-	        </c:when>
-            <c:otherwise>
-            	<tr>
-            </c:otherwise>
-            </c:choose>
+            <tr>
                 <td valign="top">
                     </c:if>
 
