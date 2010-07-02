@@ -11,44 +11,49 @@
     </query>
     <query>
     	<name>findAllSubjectDNByStudy</name>
-    	<sql> SELECT dn.*,ss.label FROM study_subject ss, dn_subject_map ds,discrepancy_note dn left outer join user_account ua on ua.user_id = dn.assigned_user_id
+    	<sql> SELECT dn.*, ss.label, dad.age, dad.days FROM study_subject ss, dn_subject_map ds, dn_age_days dad, discrepancy_note dn left outer join user_account ua on ua.user_id = dn.assigned_user_id
 			WHERE ss.study_id in ( SELECT study_id FROM study WHERE study_id = ? or parent_study_id=? )
-				AND ss.subject_id = ds.subject_id AND dn.discrepancy_note_id = ds.discrepancy_note_id 
+				AND ss.subject_id = ds.subject_id AND dn.discrepancy_note_id = ds.discrepancy_note_id
 				AND ((dn.parent_dn_id IS NULL) or (dn.parent_dn_id = 0))
+                AND dn.discrepancy_note_id = dad.discrepancy_note_id
     	</sql>
     </query>
     <query>
     	<name>findAllStudySubjectDNByStudy</name>
-    	<sql>SELECT dn.*,ss.label FROM study_subject ss, dn_study_subject_map dss,discrepancy_note dn left outer join user_account ua on ua.user_id = dn.assigned_user_id
-		WHERE ss.study_id in ( SELECT study_id FROM study WHERE study_id = ? or parent_study_id=? ) 
-			AND ss.study_subject_id = dss.study_subject_id AND dn.discrepancy_note_id = dss.discrepancy_note_id 
+    	<sql>SELECT dn.*,ss.label, dad.age, dad.days FROM study_subject ss, dn_study_subject_map dss, dn_age_days dad, discrepancy_note dn left outer join user_account ua on ua.user_id = dn.assigned_user_id
+		WHERE ss.study_id in ( SELECT study_id FROM study WHERE study_id = ? or parent_study_id=? )
+			AND ss.study_subject_id = dss.study_subject_id AND dn.discrepancy_note_id = dss.discrepancy_note_id
 			AND ((dn.parent_dn_id IS NULL) or (dn.parent_dn_id = 0))
+            AND dn.discrepancy_note_id = dad.discrepancy_note_id
     	</sql>
     </query>
     <query>
     	<name>findAllStudyEventDNByStudy</name>
-    	<sql>SELECT dn.*,ss.label FROM study_subject ss, study_event se, dn_study_event_map dse, discrepancy_note dn left outer join user_account ua on ua.user_id = dn.assigned_user_id
+    	<sql>SELECT dn.*,ss.label, dad.age, dad.days FROM study_subject ss, study_event se, dn_study_event_map dse, dn_age_days dad, discrepancy_note dn left outer join user_account ua on ua.user_id = dn.assigned_user_id
 		WHERE ss.study_id in ( SELECT study_id FROM study WHERE study_id = ? or parent_study_id=? )
-			AND ss.study_subject_id = se.study_subject_id AND se.study_event_id = dse.study_event_id 
+			AND ss.study_subject_id = se.study_subject_id AND se.study_event_id = dse.study_event_id
 			AND dn.discrepancy_note_id = dse.discrepancy_note_id AND ((dn.parent_dn_id IS NULL) or (dn.parent_dn_id = 0))
+            AND dn.discrepancy_note_id = dad.discrepancy_note_id
     	</sql>
     </query>
     <query>
     	<name>findAllEventCrfDNByStudy</name>
-    	<sql>SELECT dn.*,ss.label FROM study_subject ss, event_crf ec, dn_event_crf_map dec, discrepancy_note dn left outer join user_account ua on ua.user_id = dn.assigned_user_id
+    	<sql>SELECT dn.*,ss.label, dad.age, dad.days FROM study_subject ss, event_crf ec, dn_event_crf_map dec, dn_age_days dad, discrepancy_note dn left outer join user_account ua on ua.user_id = dn.assigned_user_id
 		WHERE ss.study_id in ( SELECT study_id FROM study WHERE study_id = ? or parent_study_id=? )
-			AND ss.study_subject_id = ec.study_subject_id AND ec.event_crf_id = dec.event_crf_id 
+			AND ss.study_subject_id = ec.study_subject_id AND ec.event_crf_id = dec.event_crf_id
 			AND dn.discrepancy_note_id = dec.discrepancy_note_id
 			AND ((dn.parent_dn_id IS NULL) or (dn.parent_dn_id = 0))
+            AND dn.discrepancy_note_id = dad.discrepancy_note_id
     	</sql>
     </query>
     <query>
     	  <name>findAllItemDataDNByStudy</name>
-    	<sql>SELECT dn.*,ss.label FROM study_subject ss, event_crf ec, item_data itd, dn_item_data_map did, discrepancy_note dn left outer join user_account ua on ua.user_id = dn.assigned_user_id
+    	<sql>SELECT dn.*,ss.label, dad.age, dad.days FROM study_subject ss, event_crf ec, item_data itd, dn_item_data_map did, dn_age_days dad, discrepancy_note dn left outer join user_account ua on ua.user_id = dn.assigned_user_id
 		WHERE ss.study_id in ( SELECT study_id FROM study WHERE study_id = ? or parent_study_id=? )
-			AND ss.study_subject_id = ec.study_subject_id AND ec.event_crf_id = itd.event_crf_id 
+			AND ss.study_subject_id = ec.study_subject_id AND ec.event_crf_id = itd.event_crf_id
 			AND itd.item_data_id = did.item_data_id AND dn.discrepancy_note_id = did.discrepancy_note_id
 			AND ((dn.parent_dn_id IS NULL) or (dn.parent_dn_id = 0))
+            AND dn.discrepancy_note_id = dad.discrepancy_note_id
     	</sql>
     </query>
     <query>
@@ -627,7 +632,7 @@
     <query>
     	<name>countBySubjectTypeAndStudyEvent</name>
     	<sql>
-    	select dn.resolution_status_id,count(dn.resolution_status_id) 
+    	select dn.resolution_status_id,count(dn.resolution_status_id)
 			from discrepancy_note dn, dn_subject_map dsm, study_event se, study_subject ss
 			where dsm.subject_id = ss.subject_id
 			and ss.study_subject_id = se.study_subject_id
@@ -639,7 +644,7 @@
     <query>
     	<name>countByStudySubjectTypeAndStudyEvent</name>
     	<sql>
-    	select dn.resolution_status_id,count(dn.resolution_status_id) 
+    	select dn.resolution_status_id,count(dn.resolution_status_id)
 			from discrepancy_note dn, dn_study_subject_map dssm, study_event se
 			where dssm.study_subject_id = se.study_subject_id
 			and dssm.discrepancy_note_id = dn.discrepancy_note_id
@@ -650,7 +655,7 @@
     <query>
     	<name>countByEventCrfTypeAndStudyEvent</name>
     	<sql>
-    	select dn.resolution_status_id,count(dn.resolution_status_id) 
+    	select dn.resolution_status_id,count(dn.resolution_status_id)
 			from discrepancy_note dn, dn_event_crf_map decm, event_crf ec, study_event se
 			where se.study_event_id = ec.study_event_id
 			and ec.event_crf_id = decm.event_crf_id
@@ -662,12 +667,12 @@
     <query>
     	<name>countByStudyEventTypeAndStudyEvent</name>
     	<sql>
-    	select dn.resolution_status_id,count(dn.resolution_status_id) 
+    	select dn.resolution_status_id,count(dn.resolution_status_id)
 			from discrepancy_note dn, dn_study_event_map dsem, study_event se
 			where dsem.study_event_id = se.study_event_id
 			and dsem.discrepancy_note_id = dn.discrepancy_note_id
 			and se.study_event_id = ?
-			and dn.parent_dn_id is null 
+			and dn.parent_dn_id is null
     	</sql>
     </query>
 
@@ -888,7 +893,7 @@
             FROM discrepancy_note dn
             WHERE parent_dn_id=?
             and dn.discrepancy_note_id =
-            (select max(discrepancy_note_id) from discrepancy_note where parent_dn_id = ?)  
+            (select max(discrepancy_note_id) from discrepancy_note where parent_dn_id = ?)
         </sql>
     </query>
 </queries>

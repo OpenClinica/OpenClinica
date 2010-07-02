@@ -19,6 +19,8 @@ public class ListNotesFilter implements CriteriaCommand {
         columnMapping.put("discrepancyNoteBean.disType", "dn.discrepancy_note_type_id");
         columnMapping.put("discrepancyNoteBean.entityType", "dn.entity_type");
         columnMapping.put("discrepancyNoteBean.resolutionStatus", "dn.resolution_status_id");
+        columnMapping.put("discrepancyNoteBean.age", "age");
+        columnMapping.put("discrepancyNoteBean.days", "days");
     }
 
     public void addFilter(String property, Object value) {
@@ -45,8 +47,19 @@ public class ListNotesFilter implements CriteriaCommand {
             } else if (property.equals("siteId")) {
                 criteria = criteria + " and ";
                 criteria = criteria + "ss.study_id in ( SELECT study_id FROM study WHERE unique_identifier like '%"+ value.toString() +"%')";
-            }
-            else {
+            } else if (property.equals("discrepancyNoteBean.age")) {
+                if(value.toString().startsWith(">") || value.toString().startsWith("<")
+                        || value.toString().startsWith("=")){
+                    criteria = criteria + " and ";
+                    criteria = criteria + " age " + value.toString();
+                }
+            } else if (property.equals("discrepancyNoteBean.days")) {
+                if(value.toString().startsWith(">") || value.toString().startsWith("<")
+                        || value.toString().startsWith("=")){
+                    criteria = criteria + " and ";
+                    criteria = criteria + " days " + value.toString();
+                }
+            } else {
                 criteria = criteria + " and ";
                 criteria = criteria + " " + columnMapping.get(property) + " = '" + value.toString() + "' ";
             }

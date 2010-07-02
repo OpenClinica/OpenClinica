@@ -6,4 +6,5 @@
     <include file="migration/amethyst/2010-03-30-4618.xml"/>
     <include file="migration/amethyst/2010-05-27-5095.xml"/>
     <include file="migration/amethyst/2010-05-28-5051.xml"/>
+    <include file="migration/amethyst/2010-07-01-5245.xml"/>
 </databaseChangeLog>

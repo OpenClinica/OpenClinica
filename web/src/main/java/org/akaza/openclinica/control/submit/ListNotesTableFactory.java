@@ -37,10 +37,7 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.apache.commons.lang.StringUtils;
-import org.jmesa.core.filter.DateFilterMatcher;
-import org.jmesa.core.filter.FilterMatcher;
-import org.jmesa.core.filter.MatcherKey;
-import org.jmesa.core.filter.StringFilterMatcher;
+import org.jmesa.core.filter.*;
 import org.jmesa.facade.TableFacade;
 import org.jmesa.limit.Filter;
 import org.jmesa.limit.FilterSet;
@@ -100,7 +97,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         tableFacade.setColumnProperties("studySubject.label", "discrepancyNoteBean.disType", "discrepancyNoteBean.resolutionStatus", "siteId", "discrepancyNoteBean.createdDate", "discrepancyNoteBean.updatedDate", "eventName",
                 "eventStartDate", "crfName", "entityName", "entityValue", "discrepancyNoteBean.description", "discrepancyNoteBean.detailedNotes",
                 "numberOfNotes", "discrepancyNoteBean.user",
-                "discrepancyNoteBean.entityType", "discrepancyNoteBean.owner", "age", "days", "actions");
+                "discrepancyNoteBean.entityType", "discrepancyNoteBean.owner", "discrepancyNoteBean.age", "discrepancyNoteBean.days", "actions");
         Row row = tableFacade.getTable().getRow();
         configureColumn(row.getColumn("studySubject.label"), resword.getString("study_subject_ID"), null, null, true, true);
         configureColumn(row.getColumn("discrepancyNoteBean.disType"), "Type", new DiscrepancyNoteTypeCellEditor(), new TypeDroplistFilterEditor(), true, false);
@@ -120,8 +117,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         configureColumn(row.getColumn("discrepancyNoteBean.user"), "Assigned User", new AssignedUserCellEditor(), null, true, false);
         configureColumn(row.getColumn("discrepancyNoteBean.entityType"), "Entity Type", null, null, true, false);
         configureColumn(row.getColumn("discrepancyNoteBean.owner"), "Owner", new OwnerCellEditor(), null);
-        configureColumn(row.getColumn("age"), "Age", null, null, false, false);
-        configureColumn(row.getColumn("days"), "Days", null, null, false, false);
+        configureColumn(row.getColumn("discrepancyNoteBean.age"), "Age", null, null, true, false);
+        configureColumn(row.getColumn("discrepancyNoteBean.days"), "Days", null, null, true, false);
         String actionsHeader = resword.getString("actions") + "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;";
         configureColumn(row.getColumn("actions"), actionsHeader, new ActionsCellEditor(), new DefaultActionsEditor(locale), true, false);
 
@@ -138,6 +135,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "crfName"), new StringFilterMatcher());
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "entityName"), new StringFilterMatcher());
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "entityValue"), new StringFilterMatcher());
+        tableFacade.addFilterMatcher(new MatcherKey(String.class, "discrepancyNoteBean.age"), new AgeDaysFilterMatcher());
+        tableFacade.addFilterMatcher(new MatcherKey(String.class, "discrepancyNoteBean.days"), new AgeDaysFilterMatcher());
     }
 
     @Override
@@ -150,8 +149,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         toolbar.setModule(module);
         toolbar.setResword(resword);
         tableFacade.setToolbar(toolbar);
-
-
     }
 
     @SuppressWarnings("unchecked")
@@ -181,8 +178,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         // for (DiscrepancyNoteBean discrepancyNoteBean : items) {
         for (DiscrepancyNoteBean discrepancyNoteBean : allNotes) {
             UserAccountBean owner = (UserAccountBean) getUserAccountDao().findByPK(discrepancyNoteBean.getOwnerId());
-            UserAccountBean assignedUser =
-                discrepancyNoteBean.getUpdaterId() == 0 ? null : (UserAccountBean) getUserAccountDao().findByPK(discrepancyNoteBean.getAssignedUserId());
+//            UserAccountBean assignedUser =
+//                discrepancyNoteBean.getUpdaterId() == 0 ? null : (UserAccountBean) getUserAccountDao().findByPK(discrepancyNoteBean.getAssignedUserId());
 
             HashMap<Object, Object> h = new HashMap<Object, Object>();
 
@@ -206,8 +203,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             h.put("discrepancyNoteBean.user", discrepancyNoteBean.getAssignedUser());
             h.put("discrepancyNoteBean.entityType", discrepancyNoteBean.getEntityType());
             h.put("discrepancyNoteBean.owner", owner);
-            h.put("age", calculateAge(discrepancyNoteBean));
-            h.put("days", calculateDays(discrepancyNoteBean));
+            h.put("discrepancyNoteBean.age", discrepancyNoteBean.getAge());
+            h.put("discrepancyNoteBean.days", discrepancyNoteBean.getDays());
 
             theItems.add(h);
             setStudyHasDiscNotes(true);
@@ -558,6 +555,33 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         }
     }
 
+//    private class AgeCellEditor implements CellEditor {
+//        @SuppressWarnings("unchecked")
+//        public Object getValue(Object item, String property, int rowcount) {
+//            String value = "";
+//            int age = (Integer) ((HashMap<Object, Object>) item).get("discrepancyNoteBean.age");
+//
+//            if (age != 0) {
+//                value = age + "";
+//            }
+//            return value;
+//        }
+//    }
+//    private class DaysCellEditor implements CellEditor {
+//        @SuppressWarnings("unchecked")
+//        public Object getValue(Object item, String property, int rowcount) {
+//            String value = "";
+//            int days = (Integer) ((HashMap<Object, Object>) item).get("discrepancyNoteBean.days");
+//
+//            if (days != 0) {
+//                value = days + "";
+//            }
+//            return value;
+//        }
+//    }
+
+
+
     private class AssignedUserCellEditor implements CellEditor {
         @SuppressWarnings("unchecked")
         public Object getValue(Object item, String property, int rowcount) {
@@ -693,43 +717,12 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         builder.aEnd();
         return builder.toString();
     }
-
-    public long calculateAge(DiscrepancyNoteBean discBean){
-
-        DiscrepancyNoteBean childBean = (DiscrepancyNoteBean)discrepancyNoteDao.findLatestChildByParent(discBean.getId());
-        //childnote.createDate - parentBean.createDate
-
-        Date childDate = childBean.getCreatedDate();
-        Date discDate = discBean.getCreatedDate(); 
-
-        Calendar chcal = java.util.GregorianCalendar.getInstance();
-        chcal.setTime(childDate);
-        Calendar descal =java.util.GregorianCalendar.getInstance();
-        descal.setTime(discDate);
-
-        long result = (childDate.getTime() - discDate.getTime())/86400000;
-        
-        return result;
+    // Ignore the mathing values with filter 
+    public class AgeDaysFilterMatcher implements FilterMatcher {
+    public boolean evaluate(Object itemValue, String filterValue) {
+        return true;
     }
-
-    public String calculateDays(DiscrepancyNoteBean discBean){
-
-        if(discBean.getResStatus().isClosed() || discBean.getResStatus().isNotApplicable())return "";
-
-        DiscrepancyNoteBean childBean = (DiscrepancyNoteBean)discrepancyNoteDao.findLatestChildByParent(discBean.getId());
-        //currentDate-Child Note-createdDate
-        Date childDate = childBean.getCreatedDate();
-        Date serverDate = new Date();
-
-        Calendar chcal = java.util.GregorianCalendar.getInstance();
-        chcal.setTime(childDate);
-        Calendar descal =java.util.GregorianCalendar.getInstance();
-        descal.setTime(serverDate);
-
-        long result = (serverDate.getTime() - childDate.getTime())/86400000;
-        return result+"";
-    }
-
+}
 
     private String formatDate(Date date) {
         String format = resformat.getString("date_format_string");

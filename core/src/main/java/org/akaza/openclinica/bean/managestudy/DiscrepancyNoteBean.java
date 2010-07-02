@@ -75,6 +75,9 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
     private String createdDateString = "";
     private String updatedDateString = "";
 
+    private int days = 0;
+    private int age = 0;
+
     public String getCreatedDateString() {
         return createdDateString;
     }
@@ -537,5 +540,21 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
 
     public void setAssignedUser(UserAccountBean assignedUser) {
         this.assignedUser = assignedUser;
+    }
+
+    public int getDays() {
+        return days;
+    }
+
+    public void setDays(int days) {
+        this.days = days;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
     }
 }

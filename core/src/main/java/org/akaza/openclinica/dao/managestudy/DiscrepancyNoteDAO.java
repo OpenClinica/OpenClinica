@@ -155,6 +155,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
             UserAccountBean assignedUser = (UserAccountBean) userAccountDAO.findByPK(eb.getAssignedUserId());
             eb.setAssignedUser(assignedUser);
         }
+        eb.setAge(selectInt(hm, "age"));
+        eb.setDays(selectInt(hm, "days"));
         return eb;
     }
 
@@ -398,7 +400,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         ArrayList<DiscrepancyNoteBean> discNotes = new ArrayList<DiscrepancyNoteBean>();
         setTypesExpected();
         this.setTypeExpected(12, TypeNames.STRING);
-        this.setTypeExpected(13, TypeNames.STRING);
+        this.setTypeExpected(13, TypeNames.INT);
+        this.setTypeExpected(14, TypeNames.INT);
 
         HashMap variables = new HashMap();
         variables.put(new Integer(1), currentStudy.getId());
