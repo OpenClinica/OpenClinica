@@ -242,30 +242,67 @@ function conditionalHide(strLeftNavRowElementName){
     }
 }
 
-function selectControlShow(element,cdId,controlValue) {
-	var temp = 0;
-    for(var i = 0; i < element.options.length; i++){
-        if(element.options[i].selected) {
-	        if(element.options[i].value==controlValue){
-		        temp = 1;
-        	}
-        }
-    }
-    if(temp==1) {
-		conditionalShow(cdId);
-	}else {
-		conditionalHide(cdId);
-	} 
+function selectControlShow(element,scdPairStr) {
+	var showIds = [];
+	var n = 0;
+	var m = 0;
+	var hideIds = [];
+	var arr = scdPairStr.split('-----');
+	for(var j=1; j<arr.length; j+=2) {
+		hideIds[m] = arr[j];
+	    for(var i = 0; i < element.options.length; i++){
+	        if(element.options[i].selected) {
+		        if(element.options[i].value==arr[j+1]){
+			        showIds[n] = arr[j]; 
+			        hideIds[m] = -1;
+			        ++n;
+	        	}
+	        }
+	    }
+	    ++m;
+	}
+	for(var i=0; i<showIds.length; ++i) {
+		conditionalShow(showIds[i]);
+	}
+	for(var i=0; i<hideIds.length; ++i) {
+		if(hideIds[i] != -1) {
+			conditionalHide(hideIds[i]);
+		}
+	}
 }
 
-function checkControlShow(element,cdId,controlValue) {
-	if(element.value==controlValue) {
-		if(element.checked) {
-			conditionalShow(cdId);
-        } else {
-	      	conditionalHide(cdId);
-        }
-    }
+function checkControlShow(element,scdPairStr) {
+	var arr = scdPairStr.split('-----');
+	for(var j=1; j<arr.length; j+=2) {
+		if(element.value==arr[j+1]) {
+			if(element.checked) {
+				conditionalShow(arr[j]);
+	        } else {
+		      	conditionalHide(arr[j]);
+	        }
+	    }
+	}
+}
+
+function radioControlShow(element,scdPairStr) {
+	var m = 0;
+	var hideIds = [];
+	var arr = scdPairStr.split('-----');
+	for(var j=1; j<arr.length; j+=2) {
+		hideIds[m] = arr[j];
+		if(element.value==arr[j+1]) {
+			if(element.checked) {
+				conditionalShow(arr[j]);
+			    hideIds[m] = -1;
+	        }
+	    }
+	    ++m;
+	}
+	for(var i=0; i<hideIds.length; ++i) {
+		if(hideIds[i] != -1) {
+			conditionalHide(hideIds[i]);
+		}
+	}
 }
 </script>
 
@@ -372,12 +409,12 @@ function checkControlShow(element,cdId,controlValue) {
       <c:otherwise>
       	<c:choose>
 		<c:when test="${fn:length(displayItem.SCDPairs)>0}">
+			<c:set var="scdPairStr" value=""/>
 			<c:forEach var="aPair" items="${displayItem.SCDPairs}">
-				<c:set var="scdId" value="${aPair.SCDItemId}"/>
-				<c:set var="optionValue" value="${aPair.optionValue}"/>
-    			<input id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onClick="javascript:checkControlShow(this, '<c:out value="${scdId}"/>','<c:out value="${optionValue}"/>', '<c:out value="${isChecked}"/>');" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="checkbox" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:out value="${isChecked}"/> <c:if test="${! isHorizontal}"><br/></c:if>
-      		</c:forEach>      
-    	</c:when>
+				<c:set var="scdPairStr" value="${scdPairStr}-----${aPair.SCDItemId}-----${aPair.optionValue}"/>
+	    	</c:forEach>
+    		<input id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onClick="javascript:checkControlShow(this, '<c:out value="${scdPairStr}"/>');" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="checkbox" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:out value="${isChecked}"/> <c:if test="${! isHorizontal}"><br/></c:if>
+      	</c:when>
 		<c:otherwise>
 			<input id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="checkbox" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
       	</c:otherwise>
@@ -402,18 +439,11 @@ function checkControlShow(element,cdId,controlValue) {
             <c:otherwise>
             	<c:choose>
             	<c:when test="${fn:length(displayItem.SCDPairs)>0}">
-            		<c:forEach var="aPair" items="${displayItem.SCDPairs}">
-            			<c:set var="scdId" value="${aPair.SCDItemId}"/>
-            			<c:set var="optionValue" value="${aPair.optionValue}"/>
-			            <c:choose>
-			            	<c:when test="${option.value eq optionValue}">
-			            		<input id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>"  onClick="javascript:conditionalShow('<c:out value="${scdId}"/>');" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="radio" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
-			        		</c:when>
-			        		<c:otherwise>
-			        			<input id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>"  onClick="javascript:conditionalHide('<c:out value="${scdId}"/>');" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="radio" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
-			        		</c:otherwise>
-			        	</c:choose>
-		        	</c:forEach>	
+            		<c:set var="scdPairStr" value=""/>
+					<c:forEach var="aPair" items="${displayItem.SCDPairs}">
+						<c:set var="scdPairStr" value="${scdPairStr}-----${aPair.SCDItemId}-----${aPair.optionValue}"/>
+	    			</c:forEach>
+		            <input id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>"  onClick="javascript:radioControlShow(this, '<c:out value="${scdPairStr}"/>');" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="radio" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
 		        </c:when>
 		        <c:otherwise>
 		        	<input id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>"  onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="radio" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
@@ -502,11 +532,11 @@ include the default value first in the select list --%>
     </c:forEach>
     <c:choose>
 	<c:when test="${fn:length(displayItem.SCDPairs)>0}">
+		<c:set var="scdPairStr" value=""/>
 		<c:forEach var="aPair" items="${displayItem.SCDPairs}">
-			<c:set var="scdId" value="${aPair.SCDItemId}"/>
-			<c:set var="optionValue" value="${aPair.optionValue}"/>
-    		<select id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="javascript:selectControlShow(this, '<c:out value="${scdId}"/>','<c:out value="${optionValue}"/>'); this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" name="input<c:out value="${itemId}"/>" class="formfield">
-		</c:forEach>
+			<c:set var="scdPairStr" value="${scdPairStr}-----${aPair.SCDItemId}-----${aPair.optionValue}"/>
+    	</c:forEach>
+    	<select id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="javascript:selectControlShow(this, '<c:out value="${scdPairStr}"/>'); this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" name="input<c:out value="${itemId}"/>" class="formfield">
     </c:when>
 	<c:otherwise>
 		<select id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" name="input<c:out value="${itemId}"/>" class="formfield">
@@ -560,11 +590,11 @@ include the default value first in the select list --%>
     <c:otherwise>
     	<c:choose>
     	<c:when test="${fn:length(displayItem.SCDPairs)>0}">
-    		<c:forEach var="aPair" items="${displayItem.SCDPairs}">
-            	<c:set var="scdId" value="${aPair.SCDItemId}"/>
-            	<c:set var="optionValue" value="${aPair.optionValue}"/>
-    <select id="input<c:out value="${itemId}"/>" multiple  tabindex="<c:out value="${tabNum}"/>" name="input<c:out value="${itemId}"/>" onChange="javascript:selectControlShow(this, '<c:out value="${scdId}"/>','<c:out value="${optionValue}"/>'); this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');">
-  			</c:forEach>
+	    	<c:set var="scdPairStr" value=""/>
+			<c:forEach var="aPair" items="${displayItem.SCDPairs}">
+				<c:set var="scdPairStr" value="${scdPairStr}-----${aPair.SCDItemId}-----${aPair.optionValue}"/>
+	    	</c:forEach>
+    		<select id="input<c:out value="${itemId}"/>" multiple  tabindex="<c:out value="${tabNum}"/>" name="input<c:out value="${itemId}"/>" onChange="javascript:selectControlShow(this, '<c:out value="${scdPairStr}"/>'); this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');">
   		</c:when>
   		<c:otherwise>
   			<select id="input<c:out value="${itemId}"/>" multiple  tabindex="<c:out value="${tabNum}"/>" name="input<c:out value="${itemId}"/>" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');">
