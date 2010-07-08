@@ -1122,7 +1122,7 @@ public abstract class DataEntryServlet extends SecureController {
             errors = v.validate();
 
             // tbh >>
-            if (this.isAdminForcedReasonForChange() && this.isAdministrativeEditing()) {
+            if (this.isAdminForcedReasonForChange() && this.isAdministrativeEditing() && errors.isEmpty()) {
                 // "You have changed data after this CRF was marked complete. "
                 // +
                 // "You must provide a Reason For Change discrepancy note for this item before you can save this updated information."
@@ -2700,9 +2700,9 @@ public abstract class DataEntryServlet extends SecureController {
                     v.alwaysExecuteLastValidation(inputName);
                 }
                 // >> tbh 4/30/2010 #4963 removing custom validations firing during AE
-                if (!isAdministrativeEditing()) {
-                    customValidation(v, dib, inputName);
-                }
+
+                customValidation(v, dib, inputName);
+
                 /*
                  * if (!StringUtil.isBlank(customValidationString)) { Validation customValidation = null; if (customValidationString.startsWith("func:")) { try
                  * { customValidation = Validator.processCRFValidationFunction(customValidationString ); } catch (Exception e) { e.printStackTrace(); } } else
@@ -2756,9 +2756,7 @@ public abstract class DataEntryServlet extends SecureController {
         } else {
             v.addValidation(inputName, Validator.IN_RESPONSE_SET_SINGLE_VALUE, dib.getMetadata().getResponseSet());
         }
-        if (!isAdministrativeEditing()) {
-            customValidation(v, dib, inputName);
-        }
+        customValidation(v, dib, inputName);
         return dib;
     }
     
@@ -2797,9 +2795,7 @@ public abstract class DataEntryServlet extends SecureController {
         } else {
             v.addValidation(inputName, Validator.IN_RESPONSE_SET, dib.getMetadata().getResponseSet());
         }
-        if (!isAdministrativeEditing()) {
-            customValidation(v, dib, inputName);
-        }
+        customValidation(v, dib, inputName);
         return dib;
     }
 
