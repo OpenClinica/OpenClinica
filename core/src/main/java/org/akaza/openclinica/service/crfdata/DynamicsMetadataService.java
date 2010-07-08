@@ -640,8 +640,9 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                         getItemFormMetadataDAO().findByItemIdAndCRFVersionId(itemOrItemGroup.getItemBean().getId(), eventCrfBeanA.getCRFVersionId());
                     DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataBean(itemFormMetadataBean, eventCrfBeanA, oidBasedItemData);
                     if (dynamicsMetadataBean == null && oidBasedItemData.getValue().equals("")) {
-                        showItem(itemFormMetadataBean, eventCrfBeanA, oidBasedItemData);
+                        hideItem(itemFormMetadataBean, eventCrfBeanA, oidBasedItemData);
                     } else if (dynamicsMetadataBean != null && dynamicsMetadataBean.isShowItem() && oidBasedItemData.getValue().equals("")) {
+                        // tbh #5287: add an additional check here to see if it should be hidden?
                         dynamicsMetadataBean.setShowItem(false);
                         getDynamicsItemFormMetadataDao().saveOrUpdate(dynamicsMetadataBean);
                     }
