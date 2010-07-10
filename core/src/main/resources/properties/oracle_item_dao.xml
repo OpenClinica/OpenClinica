@@ -159,7 +159,7 @@
 		<sql>select item.name, item.item_id, pn.parent_name, pn.parent_id 
 		from item_form_metadata ifm, item, 	(select item.name as parent_name, item_id as parent_id 
 			from item where item_id in (
-				select ifm.parent_id from item_form_metadata ifm where section_id = 3 and parent_id > 0)
+				select ifm.parent_id from item_form_metadata ifm where section_id = ? and parent_id > 0)
 			) pn
 		where section_id = ? and ifm.parent_id > 0 and ifm.item_id = item.item_id 
 			and ifm.parent_id = pn.parent_id
