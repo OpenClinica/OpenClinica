@@ -1231,7 +1231,7 @@ but the custom tag uses that, not this jstl code--%>
             <table border="0">
                 <c:set var="notFirstRow" value="${0}" />
                 <c:forEach var="childItem" items="${displayItem.singleItem.children}">
-				<c:if test="${childItem.metadata.showItem}">
+				<c:if test="${childItem.metadata.showItem || fn:length(childItem.metadata.conditionalDisplay)>0}">
 
                 <c:set var="currColumn" value="${childItem.metadata.columnNumber}" />
                 <c:if test="${currColumn == 1}">
@@ -1255,7 +1255,23 @@ but the custom tag uses that, not this jstl code--%>
                     <td valign="top">
                         <table border="0">
                         	<%-- this is where we need to set the block for shown items (children), tbh --%>
-                            <tr>
+                            <c:choose>
+							<c:when test="${fn:length(childItem.metadata.conditionalDisplay)>0}">
+								<c:set var="cdId" value="${childItem.item.id}"/>
+								<c:set var="statusId" value="${childItem.data.status.id}"/>
+								<c:choose>
+								<c:when test="${statusId>0&&statusId!=5 || childItem.isSCDtoBeShown}">
+									<tr>
+								</c:when>
+								<c:otherwise>
+									<tr id="<c:out value="t${cdId}"/>" style="display:none">
+								</c:otherwise>
+								</c:choose>
+							</c:when>
+							<c:otherwise>
+								<tr>
+							</c:otherwise>
+							</c:choose>
                                     <%--          <td valign="top" class="text_block">
                                   <c:out value="${childItem.metadata.questionNumberLabel}" escapeXml="false"/>
                                   <c:out value="${childItem.metadata.leftItemText}" escapeXml="false"/></td>--%>
