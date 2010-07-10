@@ -1485,10 +1485,10 @@ public abstract class DataEntryServlet extends SecureController {
                         for (int j = 0; j < childItems.size(); j++) {
                             DisplayItemBean child = (DisplayItemBean) childItems.get(j);
                             this.addAttachedFilePath(child, attachedFilePath);
-                            if(dib.getMetadata().isConditionalDisplayItem()){
-                                temp=this.writeConditionalDisplayItemToDB(dib,iddao,1,section.getShowSCDItemIds().contains(dib.getMetadata().getItemId()));
+                            if(child.getMetadata().isConditionalDisplayItem()){
+                                temp=this.writeConditionalDisplayItemToDB(child,iddao,1,section.getShowSCDItemIds().contains(child.getMetadata().getItemId()));
                             } else {
-                                temp = writeToDB(dib, iddao, 1);
+                                temp = writeToDB(child, iddao, 1);
                             }
                             logger.debug("just executed writeToDB - 4");
                             if (temp && newUploadedFiles.containsKey(child.getItem().getId() + "")) {
@@ -4761,8 +4761,8 @@ public abstract class DataEntryServlet extends SecureController {
             DisplayItemBean controlItem = new DisplayItemBean();
             if(childParentNameMap.containsKey(ss[0].trim())) {
                 //among child items
-                ArrayList<DisplayItemBean> children = 
-                    sectionDisplayItemMap.get(ss[0].trim()).getChildren();
+                DisplayItemBean pItem = sectionDisplayItemMap.get(childParentNameMap.get(ss[0]).trim());
+                ArrayList<DisplayItemBean> children = pItem.getChildren();
                 for(int i=0; i<children.size(); ++i) {
                     controlItem = children.get(i);
                     if(ss[0].trim().equalsIgnoreCase(controlItem.getItem().getName())) {
