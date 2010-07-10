@@ -714,7 +714,7 @@ public abstract class DataEntryServlet extends SecureController {
                                 } else if(child.getMetadata().isConditionalDisplayItem()) {
                                     //for scd item
                                     //a control item is always before its scd item
-                                    dib.setIsSCDtoBeShown(section.getShowSCDItemIds().contains(child.getMetadata().getItemId()));
+                                    child.setIsSCDtoBeShown(section.getShowSCDItemIds().contains(child.getMetadata().getItemId()));
                                     validateSCDItemBean(v, child);
                                 }
                             }
