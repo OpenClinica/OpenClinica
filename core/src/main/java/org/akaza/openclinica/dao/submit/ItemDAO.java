@@ -443,6 +443,7 @@ public class ItemDAO extends AuditableEntityDAO {
         this.setTypeExpected(4, TypeNames.INT);//parent_id
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(sectionId));
+        variables.put(new Integer(2), new Integer(sectionId));
         String sql = digester.getQuery("findChildAndParentNamesInSection");
         ArrayList rows = select(sql, variables);
         Iterator it = rows.iterator();
