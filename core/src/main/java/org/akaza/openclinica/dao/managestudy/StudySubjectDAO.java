@@ -7,6 +7,15 @@
  */
 package org.akaza.openclinica.dao.managestudy;
 
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -20,15 +29,6 @@ import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
-
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-
-import javax.sql.DataSource;
 
 /**
  * @author jxu
@@ -1162,5 +1162,19 @@ public class StudySubjectDAO extends AuditableEntityDAO {
         }
 
         return answer;
+    }
+    
+    public String findStudySubjectIdsByStudyIds(String studyIds) {
+        String studySubjectIds = "";
+        this.unsetTypeExpected();
+        this.setTypeExpected(1, TypeNames.STRING);
+        ArrayList alist = this.select("select study_subject_id from study_subject where study_id in (" + studyIds + ")");
+        Iterator it = alist.iterator();
+        while (it.hasNext()) {
+            HashMap hm = (HashMap) it.next();
+            studySubjectIds += (String) hm.get("study_subject_id")+",";
+        }
+        studySubjectIds = studySubjectIds.endsWith(",")?studySubjectIds.substring(0, studySubjectIds.length()-1):studySubjectIds;
+        return studySubjectIds;
     }
 }
