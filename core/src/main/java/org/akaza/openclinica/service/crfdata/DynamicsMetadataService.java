@@ -236,6 +236,16 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         getDynamicsItemGroupMetadataDao().saveOrUpdate(dynamicsMetadataBean);
         return true;
     }
+    
+    public boolean hideGroup(ItemGroupMetadataBean metadataBean, EventCRFBean eventCrfBean) {
+
+        ItemGroupMetadataBean itemGroupMetadataBean = metadataBean;
+        itemGroupMetadataBean.setShowGroup(false);
+        DynamicsItemGroupMetadataBean dynamicsMetadataBean = new DynamicsItemGroupMetadataBean(itemGroupMetadataBean, eventCrfBean);
+        dynamicsMetadataBean.setPassedDde(0);
+        getDynamicsItemGroupMetadataDao().saveOrUpdate(dynamicsMetadataBean);
+        return true;
+    }
 
     public void show(Integer itemDataId, List<PropertyBean> properties, RuleSetBean ruleSet) {
         ItemDataBean itemDataBeanA = (ItemDataBean) getItemDataDAO().findByPK(itemDataId);
@@ -651,6 +661,32 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
             // OID is a group
             else {
                 // ItemGroupBean itemGroupBean = itemOrItemGroup.getItemGroupBean();
+                // below taken from showNew and reversed, tbh 07/2010
+                logger.debug("found item group id 1 " + oid);
+                ItemGroupBean itemGroupBean = itemOrItemGroup.getItemGroupBean();
+                ArrayList sectionBeans = getSectionDAO().findAllByCRFVersionId(eventCrfBeanA.getCRFVersionId());
+                for (int i = 0; i < sectionBeans.size(); i++) {
+                    SectionBean sectionBean = (SectionBean) sectionBeans.get(i);
+                    // System.out.println("found section " + sectionBean.getId());
+                    List<ItemGroupMetadataBean> itemGroupMetadataBeans =
+                        getItemGroupMetadataDAO().findMetaByGroupAndSection(itemGroupBean.getId(), eventCrfBeanA.getCRFVersionId(), sectionBean.getId());
+                    for (ItemGroupMetadataBean itemGroupMetadataBean : itemGroupMetadataBeans) {
+                        if (itemGroupMetadataBean.getItemGroupId() == itemGroupBean.getId()) {
+                            // System.out.println("found item group id 2 " + oid);
+                            DynamicsItemGroupMetadataBean dynamicsGroupBean = getDynamicsItemGroupMetadataBean(itemGroupMetadataBean, eventCrfBeanA);
+                            if (dynamicsGroupBean == null) {
+                                hideGroup(itemGroupMetadataBean, eventCrfBeanA);
+                            } else if (dynamicsGroupBean != null && !dynamicsGroupBean.isShowGroup()) {
+                                dynamicsGroupBean.setShowGroup(false);
+                                getDynamicsItemGroupMetadataDao().saveOrUpdate(dynamicsGroupBean);
+                                // TODO is below required in hide?
+                            } else if (eventCrfBeanA.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
+                                dynamicsGroupBean.setPassedDde(1);//setVersion(1); // version 1 = passed DDE
+                                getDynamicsItemGroupMetadataDao().saveOrUpdate(dynamicsGroupBean);
+                            }
+                        }
+                    }
+                }
             }
         }
     }
