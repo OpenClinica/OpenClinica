@@ -7,6 +7,13 @@
  */
 package org.akaza.openclinica.control.extract;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.extract.CommaReportBean;
@@ -29,13 +36,6 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.bean.ArchivedDatasetFileRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
-
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
 
 /**
  * Take a dataset and show it in different formats,<BR/> Detect whether or not
@@ -179,11 +179,7 @@ public class ExportDatasetServlet extends SecureController {
                 String odmVersion = fp.getString("odmVersion");
                 String ODMXMLFileName = "";
                 // DRY
-                HashMap answerMap = new HashMap();
-                /*
-                answerMap =
-                    generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, db, this.currentStudy, "", eb, currentstudyid, parentstudy);
-                    */
+                HashMap answerMap = generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, db, this.currentStudy, "");
                 for (Iterator it = answerMap.entrySet().iterator(); it.hasNext();) {
                     java.util.Map.Entry entry = (java.util.Map.Entry) it.next();
                     Object key = entry.getKey();
