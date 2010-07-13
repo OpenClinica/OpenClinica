@@ -9,14 +9,15 @@
 
 package org.akaza.openclinica.logic.odmExport;
 
-import org.akaza.openclinica.bean.extract.DatasetBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
-
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import javax.sql.DataSource;
+
+import org.akaza.openclinica.bean.extract.DatasetBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 
 /**
  * Populate ODM ClinicalData Element for a ODM XML file. It supports:
@@ -54,6 +55,8 @@ public class ClinicalDataCollector extends OdmDataCollector {
             OdmStudyBase u = it.next();
             ClinicalDataUnit cdata = new ClinicalDataUnit(this.ds, this.dataset, this.getOdmbean(), u.getStudy(), this.getCategory());
             cdata.setCategory(this.getCategory());
+            StudySubjectDAO ssdao = new StudySubjectDAO(this.ds);
+            cdata.setStudySubjectIds(ssdao.findStudySubjectIdsByStudyIds(u.getStudy().getId()+""));
             cdata.collectOdmClinicalData();
             odmClinicalDataMap.put(u.getStudy().getOid(), cdata.getOdmClinicalData());
         }
