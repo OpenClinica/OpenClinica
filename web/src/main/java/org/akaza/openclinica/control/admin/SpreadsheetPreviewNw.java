@@ -195,7 +195,7 @@ public final class SpreadsheetPreviewNw implements Preview {
         // static group headers for a CRF; TODO: change these so they are not
         // static and hard-coded
         // BWP>>remove "group_borders" column
-        String[] groupHeaders = { "group_label", "group_header", "group_repeat_number", "group_repeat_max" };
+        String[] groupHeaders = { "group_label", "repeating_group", "group_header", "group_repeat_number", "group_repeat_max" };
         Map<String, String> rowCells = new HashMap<String, String>();
         SortedMap<Integer, Map<String, String>> allRows = new TreeMap<Integer, Map<String, String>>();
         String str;

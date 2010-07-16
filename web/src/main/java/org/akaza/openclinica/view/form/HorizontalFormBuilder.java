@@ -194,11 +194,11 @@ public class HorizontalFormBuilder extends DefaultFormBuilder {
             repeatNumber = displayItemGroup.getGroupMetaBean().getRepeatNum();
             // If the form has repeat behavior, this number is > 0
             // Do not allow repeat numbers < 1
-            repeatNumber = repeatNumber < 1 ? 1 : repeatNumber;
+//            repeatNumber = repeatNumber < 1 ? 1 : repeatNumber;
             // And a limit of 12
             repeatNumber = repeatNumber > 12 ? 12 : repeatNumber;
             // This is always true during this iteration
-            repeatFlag = repeatNumber > 0;
+            repeatFlag = displayItemGroup.getGroupMetaBean().isRepeatingGroup();
 
             Element table = createTable();
             // add the thead element

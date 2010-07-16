@@ -1056,14 +1056,6 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             // supporting both, tbh 03/2010
                         }
                       
-                        //                        if (!"1".equals(showItem) && !"0".equals(showItem)) {
-                        //                            errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("SHOW_ITEM_column") + " "
-                        //                                    + resPageMsg.getString("was_invalid_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet") + ". "
-                        //                                    + resPageMsg.getString("SHOW_ITEM_column") + resPageMsg.getString("can_only_be_either_0_or_1"));
-                        //                            htmlErrors.put(j + "," + k + "," + cellIndex, resPageMsg.getString("INVALID_VALUE"));
-                        //                        }
-                        
-                        //
                         ++cellIndex;
                         cell = sheet.getRow(k).getCell((short) cellIndex);
                         String display = getValue(cell);
@@ -1115,14 +1107,6 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             }
                         }
                       
-                        //                        if (!"1".equals(showItem) && !"0".equals(showItem)) {
-                        //                            errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("SHOW_ITEM_column") + " "
-                        //                                    + resPageMsg.getString("was_invalid_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet") + ". "
-                        //                                    + resPageMsg.getString("SHOW_ITEM_column") + resPageMsg.getString("can_only_be_either_0_or_1"));
-                        //                            htmlErrors.put(j + "," + k + "," + cellIndex, resPageMsg.getString("INVALID_VALUE"));
-                        //                        }
-                        
-                        
                         // Create oid for Item Bean
                         String itemOid = idao.getValidOid(new ItemBean(), crfName, itemName, itemOids);
                         itemOids.add(itemOid);
@@ -1462,7 +1446,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                 if (dbName.equals("oracle")) {
                                     sqlGroupLabel =
                                         "INSERT INTO ITEM_GROUP_METADATA (" + "item_group_id,HEADER," + "subheader, layout, repeat_number, repeat_max,"
-                                            + " repeat_array,row_start_number, crf_version_id," + "item_id , ordinal, show_group) VALUES ("
+                                            + " repeat_array,row_start_number, crf_version_id," + "item_id , ordinal, show_group, repeating_group) VALUES ("
                                             + "(SELECT MAX(ITEM_GROUP_ID) FROM ITEM_GROUP WHERE NAME='"
                                             + itemGroup.getName()
                                             + "' AND crf_id = "
@@ -1490,21 +1474,16 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                             + ","
                                             + versionIdString
                                             + ","
-                                            // + "(SELECT MAX(ITEM_ID) FROM ITEM
-                                            // WHERE NAME='"
-                                            // + itemName
-                                            // + "' AND owner_id = " +
-                                            // ub.getId() + "),"
                                             + "(SELECT MAX(ITEM.ITEM_ID) FROM ITEM,ITEM_FORM_METADATA,CRF_VERSION WHERE ITEM.NAME='"
                                             + itemName
                                             + "' "
                                             + "AND ITEM.ITEM_ID = ITEM_FORM_METADATA.ITEM_ID and ITEM_FORM_METADATA.CRF_VERSION_ID=CRF_VERSION.CRF_VERSION_ID "
-                                            + "AND CRF_VERSION.CRF_ID= " + crfId + " )," + k + ", " + igMeta.isShowGroup() + ")";
+                                            + "AND CRF_VERSION.CRF_ID= " + crfId + " )," + k + ", " + igMeta.isShowGroup() + ", " + igMeta.isRepeatingGroup() + ")";
 
                                 } else {
                                     sqlGroupLabel =
                                         "INSERT INTO ITEM_GROUP_METADATA (" + "item_group_id,header," + "subheader, layout, repeat_number, repeat_max,"
-                                            + " repeat_array,row_start_number, crf_version_id," + "item_id , ordinal, show_group) VALUES ("
+                                            + " repeat_array,row_start_number, crf_version_id," + "item_id , ordinal, show_group, repeating_group) VALUES ("
                                             + "(SELECT ITEM_GROUP_ID FROM ITEM_GROUP WHERE NAME='"
                                             + itemGroup.getName()
                                             + "' AND crf_id = "
@@ -1543,7 +1522,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                             + "' "
                                             + "AND ITEM.ITEM_ID = ITEM_FORM_METADATA.ITEM_ID and ITEM_FORM_METADATA.CRF_VERSION_ID=CRF_VERSION.CRF_VERSION_ID "
                                             + "AND CRF_VERSION.CRF_ID= " + crfId + " ORDER BY ITEM.OID DESC LIMIT 1)," + k + ", " 
-                                            + igMeta.isShowGroup() + ")";
+                                            + igMeta.isShowGroup() + ", " + igMeta.isRepeatingGroup() + ")";
 
                                 }
 
@@ -1672,7 +1651,21 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         }
                         // removed reference to 'groupLayout' here, tbh 102007
 
+//                        RAPEATING_GROUP
                         cell = sheet.getRow(gk).getCell((short) 1);
+                        String repeatingGroup = cell.toString();
+                        boolean isRepeatingGroup = true;
+                        if (!StringUtil.isBlank(repeatingGroup)) {
+                            try {
+                                isRepeatingGroup = "false".equalsIgnoreCase(repeatingGroup) ? false : true;
+                            } catch (Exception eee) {
+                                errors.add(resPageMsg.getString("repeating_group_error"));
+                            }
+                        }else{
+                            errors.add(resPageMsg.getString("repeating_group_error"));
+                        }
+
+                        cell = sheet.getRow(gk).getCell((short) 2);
                         String groupHeader = getValue(cell);
                         // replace any apostrophes in groupHeader: issue 3277
                         groupHeader = org.akaza.openclinica.core.form.StringUtil.escapeSingleQuote(groupHeader);
@@ -1680,49 +1673,58 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             errors.add(resPageMsg.getString("group_header_length_error"));
                         }
 
-
-                        // cell = sheet.getRow(gk).getCell((short) 3);
-                        // String groupSubheader = getValue(cell);
-
-                        cell = sheet.getRow(gk).getCell((short) 2);
+                        cell = sheet.getRow(gk).getCell((short) 3);
                         String groupRepeatNumber = getValue(cell);
                         // to be switched to int, tbh
                         // adding clause to convert to int, tbh, 06/07
-                        if (StringUtil.isBlank(groupRepeatNumber)) {
-                            groupRepeatNumber = "1";
-                        } else if (cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
-                            double dr = cell.getNumericCellValue();
-                            if ((dr - (int) dr) * 1000 == 0) {
-                                groupRepeatNumber = (int) dr + "";
-                            }
+                        if (!isRepeatingGroup && !StringUtil.isBlank(groupRepeatNumber)){
+                            errors.add(resPageMsg.getString("repeat_number_none_repeating"));    
+                        } else if (!isRepeatingGroup && StringUtil.isBlank(groupRepeatNumber)) {
+                                groupRepeatNumber = "1";
                         } else {
-                            logger.info("found a non-numeric code in a numeric field: groupRepeatNumber");
+                            if (StringUtil.isBlank(groupRepeatNumber)) {
+                                groupRepeatNumber = "1";
+                            } else if (cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
+                                double dr = cell.getNumericCellValue();
+                                if ((dr - (int) dr) * 1000 == 0) {
+                                    groupRepeatNumber = (int) dr + "";
+                                }
+                            } else {
+                                logger.info("found a non-numeric code in a numeric field: groupRepeatNumber");
+                            }
                         }
-                        cell = sheet.getRow(gk).getCell((short) 3);
+
+                        cell = sheet.getRow(gk).getCell((short) 4);
                         String groupRepeatMax = getValue(cell);
                         // to be switched to int, tbh
                         // adding clause to convert to int, tbh 06/07
-                        if (StringUtil.isBlank(groupRepeatMax)) {
-                            groupRepeatMax = "40";// problem, tbh
-                        } else if (cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
-                            double dr = cell.getNumericCellValue();
-                            if ((dr - (int) dr) * 1000 == 0) {
-                                groupRepeatMax = (int) dr + "";
-                                // check for zero value
-                                try {
-                                    int repeatMaxInt = Integer.parseInt(groupRepeatMax);
-                                    if (repeatMaxInt < 1) {
+                        if (!isRepeatingGroup && !StringUtil.isBlank(groupRepeatMax)){
+                            errors.add(resPageMsg.getString("repeat_max_none_repeating"));    
+                        } else if (!isRepeatingGroup && StringUtil.isBlank(groupRepeatMax)) {
+                            groupRepeatMax = "1";
+                        } else {
+                            if (StringUtil.isBlank(groupRepeatMax)) {
+                                groupRepeatMax = "40";// problem, tbh
+                            } else if (cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
+                                double dr = cell.getNumericCellValue();
+                                if ((dr - (int) dr) * 1000 == 0) {
+                                    groupRepeatMax = (int) dr + "";
+                                    // check for zero value
+                                    try {
+                                        int repeatMaxInt = Integer.parseInt(groupRepeatMax);
+                                        if (repeatMaxInt < 1) {
+                                            groupRepeatMax = "40";
+                                        }
+                                    } catch (NumberFormatException nfe) {
                                         groupRepeatMax = "40";
                                     }
-                                } catch (NumberFormatException nfe) {
-                                    groupRepeatMax = "40";
                                 }
+                            } else {
+                                logger.info("found a non-numeric code in a numeric field: groupRepeatMax");
                             }
-                        } else {
-                            logger.info("found a non-numeric code in a numeric field: groupRepeatMax");
                         }
                         // >> tbh 02/2010 adding show_hide for Dynamics
-                        cell = sheet.getRow(gk).getCell((short) 4);
+                        cell = sheet.getRow(gk).getCell((short) 5);
                         String showGroup = getValue(cell);
                         boolean isShowGroup = true;
                         if (!StringUtil.isBlank(showGroup)) {
@@ -1768,6 +1770,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 
                         ItemGroupMetadataBean igMeta = new ItemGroupMetadataBean();
                         igMeta.setHeader(groupHeader);
+                        igMeta.setRepeatingGroup(isRepeatingGroup);
                         // igMeta.setLayout(groupLayout);
                         // igMeta.setRepeatArray(groupRepeatArray);
                         igMeta.setShowGroup(isShowGroup);
@@ -1986,7 +1989,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         if (dbName.equals("oracle")) {
                             sql =
                                 "INSERT INTO SECTION (CRF_VERSION_ID," + "STATUS_ID,LABEL, TITLE, INSTRUCTIONS, SUBTITLE, PAGE_NUMBER_LABEL,"
-                                    + "ORDINAL, PARENT_ID, OWNER_ID, DATE_CREATED,BORDERS) " + "VALUES (" + versionIdString + ",1,'" + secLabel + "','"
+                                    + "ORDINAL, PARENT_ID, OWNER_ID, DATE_CREATED, BORDERS) " + "VALUES (" + versionIdString + ",1,'" + secLabel + "','"
                                     + stripQuotes(title) + "', '" + stripQuotes(instructions) + "', '" + stripQuotes(subtitle) + "','" + pageNumber + "'," + k
                                     + "," + parentId + "," + ub.getId() + ",sysdate," + intBorder + ")";
                         } else {

@@ -513,15 +513,16 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
         </th>
         </c:if>
     </c:forEach>
-    <c:choose>
-        <c:when test="${sectionBorders == 1}">
-            <th class="aka_headerBackground aka_padding_large aka_cellBorders_dark" />
-
-        </c:when>
-        <c:otherwise>
-            <th class="aka_headerBackground aka_padding_large aka_cellBorders" />
-        </c:otherwise>
-    </c:choose>
+    <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">            
+        <c:choose>
+            <c:when test="${sectionBorders == 1}">
+                <th class="aka_headerBackground aka_padding_large aka_cellBorders_dark" />
+            </c:when>
+            <c:otherwise>
+                <th class="aka_headerBackground aka_padding_large aka_cellBorders" />
+            </c:otherwise>
+        </c:choose>
+    </c:if>
 </tr>
 <c:if test="${isHorizontal}">
     <%-- create another row --%>
@@ -703,21 +704,23 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
         <c:set var="columnNum" value="${columnNum+1}"/>
         </c:if>
     </c:forEach>
-    <c:choose>
-        <c:when test="${sectionBorders == 1}">
-            <td class="aka_padding_norm aka_cellBorders_dark">
-                <input type="hidden" name="<c:out value="${repeatParentId}"/>_[<c:out value="${repeatParentId}"/>].newRow" value="yes" />
-                <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove"></button>
-            </td>
-        </c:when>
+    <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">
+        <c:choose>
+            <c:when test="${sectionBorders == 1}">
+                <td class="aka_padding_norm aka_cellBorders_dark">
+                    <input type="hidden" name="<c:out value="${repeatParentId}"/>_[<c:out value="${repeatParentId}"/>].newRow" value="yes" />
+                    <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove"></button>
+                </td>
+            </c:when>
 
-        <c:otherwise>
-            <td class="aka_padding_norm aka_cellBorders">
-                <input type="hidden" name="<c:out value="${repeatParentId}"/>_[<c:out value="${repeatParentId}"/>].newRow" value="yes" />
-                <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove"></button>
-            </td>
-        </c:otherwise>
-    </c:choose>
+            <c:otherwise>
+                <td class="aka_padding_norm aka_cellBorders">
+                    <input type="hidden" name="<c:out value="${repeatParentId}"/>_[<c:out value="${repeatParentId}"/>].newRow" value="yes" />
+                    <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove"></button>
+                </td>
+            </c:otherwise>
+        </c:choose>
+    </c:if>
 </tr>
 
 </c:when>
@@ -853,59 +856,62 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
     <c:set var="columnNum" value="${columnNum+1}"/>
     </c:if>
 </c:forEach>
-<c:choose>
-    <c:when test="${sectionBorders == 1}">
-        <td class="aka_padding_norm aka_cellBorders_dark">
-                <%-- check for manual in the input name; if rowCount > 0 then manual
-           will be in the name --%>
-            <c:choose>
-                <c:when test="${uniqueId ==0}">
-                    <input type="hidden" name="<c:out value="${repeatParentId}"/>_<c:out value="${uniqueId}"/>.newRow" value="yes">
-                </c:when>
-                <c:otherwise>
-                    <input type="hidden" name="<c:out value="${repeatParentId}"/>_manual<c:out value="${uniqueId}"/>.newRow" value="yes">
-                </c:otherwise>
-            </c:choose>
-            <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove"></button>
-        </td>
-    </c:when>
-    <c:otherwise>
-        <td class="aka_padding_norm aka_cellBorders">
-                <%-- check for manual in the input name; if rowCount > 0 then manual
-           will be in the name --%>
-            <c:choose>
-                <c:when test="${uniqueId ==0}">
-                    <input type="hidden" name="<c:out value="${repeatParentId}"/>_<c:out value="${uniqueId}"/>.newRow" value="yes">
-                </c:when>
-                <c:otherwise>
-                    <input type="hidden" name="<c:out value="${repeatParentId}"/>_manual<c:out value="${uniqueId}"/>.newRow" value="yes">
-                </c:otherwise>
-            </c:choose>
-            <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove"></button>
-        </td>
+<c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">
+    <c:choose>
+        <c:when test="${sectionBorders == 1}">
+            <td class="aka_padding_norm aka_cellBorders_dark">
+                    <%-- check for manual in the input name; if rowCount > 0 then manual
+               will be in the name --%>
+                <c:choose>
+                    <c:when test="${uniqueId ==0}">
+                        <input type="hidden" name="<c:out value="${repeatParentId}"/>_<c:out value="${uniqueId}"/>.newRow" value="yes">
+                    </c:when>
+                    <c:otherwise>
+                        <input type="hidden" name="<c:out value="${repeatParentId}"/>_manual<c:out value="${uniqueId}"/>.newRow" value="yes">
+                    </c:otherwise>
+                </c:choose>
+                <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove"></button>
+            </td>
+        </c:when>
+        <c:otherwise>
+            <td class="aka_padding_norm aka_cellBorders">
+                    <%-- check for manual in the input name; if rowCount > 0 then manual
+               will be in the name --%>
+                <c:choose>
+                    <c:when test="${uniqueId ==0}">
+                        <input type="hidden" name="<c:out value="${repeatParentId}"/>_<c:out value="${uniqueId}"/>.newRow" value="yes">
+                    </c:when>
+                    <c:otherwise>
+                        <input type="hidden" name="<c:out value="${repeatParentId}"/>_manual<c:out value="${uniqueId}"/>.newRow" value="yes">
+                    </c:otherwise>
+                </c:choose>
+                <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove"></button>
+            </td>
 
-    </c:otherwise>
-</c:choose>
+        </c:otherwise>
+    </c:choose>
+</c:if>    
 </tr>
 </c:otherwise>
 </c:choose>
 <c:set var="uniqueId" value="${uniqueId +1}"/>
 </c:forEach>
-
-<tr>
-    <c:choose>
-        <c:when test="${sectionBorders == 1}">
-            <%-- Add 1 to the totalColsPlusSubcols variable to accommodate the cell
-            containing the remove button--%>
-            <td class="aka_padding_norm aka_cellBorders_dark" colspan="<c:out value="${totalColsPlusSubcols + 1}"/>">
-                <button stype="add" type="button" template="<c:out value="${repeatParentId}"/>" class="button_search"><fmt:message key="add" bundle="${resword}"/></button></td>
-        </c:when>
-        <c:otherwise>
-            <td class="aka_padding_norm aka_cellBorders" colspan="<c:out value="${totalColsPlusSubcols + 1}"/>">
-                <button stype="add" type="button" template="<c:out value="${repeatParentId}"/>" class="button_search"><fmt:message key="add" bundle="${resword}"/></button></td>
-        </c:otherwise>
-    </c:choose>
-</tr>
+<c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">
+    <tr>
+        <c:choose>
+            <c:when test="${sectionBorders == 1}">
+                <%-- Add 1 to the totalColsPlusSubcols variable to accommodate the cell
+                containing the remove button--%>
+                <td class="aka_padding_norm aka_cellBorders_dark" colspan="<c:out value="${totalColsPlusSubcols + 1}"/>">
+                    <button stype="add" type="button" template="<c:out value="${repeatParentId}"/>" class="button_search"><fmt:message key="add" bundle="${resword}"/></button></td>
+            </c:when>
+            <c:otherwise>
+                <td class="aka_padding_norm aka_cellBorders" colspan="<c:out value="${totalColsPlusSubcols + 1}"/>">
+                    <button stype="add" type="button" template="<c:out value="${repeatParentId}"/>" class="button_search"><fmt:message key="add" bundle="${resword}"/></button></td>
+            </c:otherwise>
+        </c:choose>
+    </tr>
+</c:if>
 </tbody>
 
 </table>

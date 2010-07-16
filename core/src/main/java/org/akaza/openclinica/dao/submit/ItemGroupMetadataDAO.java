@@ -60,6 +60,7 @@ public class ItemGroupMetadataDAO extends EntityDAO {
         this.setTypeExpected(12, TypeNames.INT);
         this.setTypeExpected(13, TypeNames.INT);
         this.setTypeExpected(14, TypeNames.BOOL);
+        this.setTypeExpected(15, TypeNames.BOOL);
     }
 
     public Object getEntityFromHashMap(HashMap hm) {
@@ -78,6 +79,7 @@ public class ItemGroupMetadataDAO extends EntityDAO {
         meta.setOrdinal((Integer) hm.get("ordinal"));
         meta.setBorders((Integer) hm.get("borders"));
         meta.setShowGroup(((Boolean) hm.get("show_group")).booleanValue());
+        meta.setRepeatingGroup(((Boolean) hm.get("repeating_group")).booleanValue());
         return meta;
     }
 

@@ -11,6 +11,7 @@ import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.bean.submit.ResponseSetBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
+import org.akaza.openclinica.core.form.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -250,12 +251,16 @@ public class BeanFactory {
             if (groupValues.get("group_label").equalsIgnoreCase(groupLabel)) {
                 formGroupBean.setName(groupLabel);
                 igMetaBean.setHeader(groupValues.get("group_header"));
+                //Hamid repeating group or not
+                igMetaBean.setRepeatingGroup(Boolean.parseBoolean(groupValues.get("repeating_group")));
                 // YW 10-04-2007 <<
                 // BWP changed to try/catch block
                 tempValue = groupValues.get("group_repeat_max");
                 // This line is necessary because "0" will not throw an
                 // exception, but is still unacceptable
-                if ("0.0".equalsIgnoreCase(tempValue)) {
+                if(StringUtil.isBlank(tempValue)){
+                    tempValue = "0";
+                } else if ("0.0".equalsIgnoreCase(tempValue)) {
                     tempValue = "22000";
                 }
                 try {
@@ -273,7 +278,9 @@ public class BeanFactory {
                 tempValue = groupValues.get("group_repeat_number");
                 // This line is necessary because "0" will not throw an
                 // exception, but is still unacceptable
-                if ("0.0".equalsIgnoreCase(tempValue)) {
+                if(StringUtil.isBlank(tempValue)){
+                    tempValue = "0";
+                } else if ("0.0".equalsIgnoreCase(tempValue)) {
                     tempValue = "1";
                 }
                 try {

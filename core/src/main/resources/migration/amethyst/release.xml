@@ -8,4 +8,5 @@
     <include file="migration/amethyst/2010-05-28-5051.xml"/>
     <include file="migration/amethyst/2010-07-01-5245.xml"/>
     <include file="migration/amethyst/2010-07-07-5429.xml"/>
+    <include file="migration/amethyst/2010-07-14-5265.xml"/>
 </databaseChangeLog>

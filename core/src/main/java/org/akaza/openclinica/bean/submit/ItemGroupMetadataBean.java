@@ -20,6 +20,7 @@ public class ItemGroupMetadataBean extends EntityBean implements Comparable {
     private Integer borders;
     private boolean showGroup;
     private boolean isHighlighted;
+    private boolean repeatingGroup;
     // << tbh 02/2010 for dynamics
     // << tbh isHighlighted only for admin editing 05/2010
 
@@ -38,6 +39,7 @@ public class ItemGroupMetadataBean extends EntityBean implements Comparable {
         borders = 1;
         showGroup = true;
         isHighlighted = false;
+        repeatingGroup = true;
     }
 
     /**
@@ -242,4 +244,11 @@ public class ItemGroupMetadataBean extends EntityBean implements Comparable {
         return this.getOrdinal().compareTo(((ItemGroupMetadataBean) o).getOrdinal());
     }
 
+    public boolean isRepeatingGroup() {
+        return repeatingGroup;
+    }
+
+    public void setRepeatingGroup(boolean repeatingGroup) {
+        this.repeatingGroup = repeatingGroup;
+    }
 }
