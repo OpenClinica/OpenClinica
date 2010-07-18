@@ -75,6 +75,7 @@ public class ImportRuleServlet extends SecureController {
                 session.setAttribute("importedData", importedRules);
                 forwardPage(Page.VERIFY_RULES_IMPORT_SERVLET);
             } catch (OpenClinicaSystemException re) {
+            	// re.printStackTrace();
                 addPageMessage(re.getMessage());
                 forwardPage(Page.IMPORT_RULES);
             }

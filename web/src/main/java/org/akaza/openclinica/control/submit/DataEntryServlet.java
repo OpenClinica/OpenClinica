@@ -743,8 +743,9 @@ public abstract class DataEntryServlet extends SecureController {
             } else if (getServletPage().equals(Page.ADMIN_EDIT_SERVLET)) {
                 phase2 = Phase.ADMIN_EDITING;
             }
+            this.getItemMetadataService().resetItemCounter();
             HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid = runRules(allItems, ruleSets, true, shouldRunRules(), MessageType.ERROR, phase2);
-            // logger.debug("first run of rules : " + groupOrdinalPLusItemOid.toString());
+            System.out.println("first run of rules : " + groupOrdinalPLusItemOid.toString());
             for (int i = 0; i < allItems.size(); i++) {
                 DisplayItemWithGroupBean diwg = allItems.get(i);
                 if (diwg.isInGroup()) {
@@ -1502,9 +1503,10 @@ public abstract class DataEntryServlet extends SecureController {
                         }
                     }
                 }
-                logger.debug("running rules: " + phase2.name());
+                System.out.println("running rules: " + phase2.name());
+                
                 HashMap<String, ArrayList<String>> rulesPostDryRun = runRules(allItems, ruleSets, false, shouldRunRules(), MessageType.WARNING, phase2);
-                // System.out.println("found rules post dry run: " + rulesPostDryRun.toString());
+                System.out.println("found rules post dry run: " + rulesPostDryRun.toString());
                 HashMap<String, ArrayList<String>> errorsPostDryRun = new HashMap<String, ArrayList<String>>();
                 // additional step needed, run rules and see if any items are 'shown' AFTER saving data
                 boolean inSameSection = false;
@@ -1562,8 +1564,8 @@ public abstract class DataEntryServlet extends SecureController {
                                 DisplayItemBean displayItemBean = itemWithGroup.getSingleItem();
                                 ItemBean itemBean = displayItemBean.getItem();
                                 if (newFieldName.equals(itemBean.getOid())) {
-
                                     System.out.println("is show item for " + displayItemBean.getItem().getId() + ": " + displayItemBean.getMetadata().isShowItem());
+                                    System.out.println("check run dynamics item check " + runDynamicsItemCheck(displayItemBean).getMetadata().isShowItem());
                                     if (!displayItemBean.getMetadata().isShowItem() && !runDynamicsItemCheck(displayItemBean).getMetadata().isShowItem()) {
                                         // double check there?
                                         inSameSection = true;
@@ -1605,16 +1607,15 @@ public abstract class DataEntryServlet extends SecureController {
 
                         // section.setItems(displayItems);
                         section.setDisplayItemGroups(displayGroupsWithItems);
-                        // List<DisplayItemWithGroupBean> displayItemWithGroups2 = createItemWithGroups(section, hasGroup, eventDefinitionCRFId);
-
-                        // section.setDisplayItemGroups(displayItemWithGroups2);
+                        
                         // section.setDisplayFormGroups(newDisplayBean.getDisplayFormGroups());
 
                     }
                     // we need the following for repeating groups, tbh
-                    List<DisplayItemWithGroupBean> displayItemWithGroups2 = createItemWithGroups(section, hasGroup, eventDefinitionCRFId);
+                    // >> tbh 06/2010
+                    // List<DisplayItemWithGroupBean> displayItemWithGroups2 = createItemWithGroups(section, hasGroup, eventDefinitionCRFId);
 
-                    section.setDisplayItemGroups(displayItemWithGroups2);
+                    // section.setDisplayItemGroups(displayItemWithGroups2);
 
                     // if so, stay at this section
                     logger.debug(" in same section: " + inSameSection);
@@ -2843,9 +2844,20 @@ public abstract class DataEntryServlet extends SecureController {
      */
     protected boolean writeToDB(DisplayItemBean dib, ItemDataDAO iddao, int ordinal) {
         ItemDataBean idb = dib.getData();
-        if (!dib.getMetadata().isShowItem() && idb.getValue().equals("")) {// && !getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getData())) {
-            logger.debug("*** not shown - not writing for idb id " + dib.getData().getId() + " and item id " + dib.getItem().getId());
-            return true;
+        if (getServletPage().equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
+        	if (!dib.getMetadata().isShowItem() && 
+        			idb.getValue().equals("") && 
+        			!getItemMetadataService().hasPassedDDE(dib.getMetadata(), ecb, idb)) {//(dib.getItem().getId(), ecb, idb)) {// && !getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getData())) {
+        		logger.debug("*** not shown - not writing for idb id " + dib.getData().getId() + " and item id " + dib.getItem().getId());
+        		return true;
+        	}
+        } else {
+        	if (!dib.getMetadata().isShowItem() && 
+            		idb.getValue().equals("") && 
+            		!getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getData())) {
+                logger.debug("*** not shown - not writing for idb id " + dib.getData().getId() + " and item id " + dib.getItem().getId());
+                return true;
+            }
         }
 
         if (idb.getValue().equals("")) {

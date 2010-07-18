@@ -95,8 +95,12 @@ public class FormBeanUtil {
      *            applicable" or NA.
      * @return A List of DisplayItemBeans.
      */
-    public static List<DisplayItemBean> getDisplayBeansFromItems(List<ItemBean> itemBeans, DataSource dataSource, EventCRFBean eventCrfBean, int sectionId,
-            List<String> nullValuesList, ServletContext context) {
+    public static List<DisplayItemBean> getDisplayBeansFromItems(List<ItemBean> itemBeans, 
+    		DataSource dataSource, 
+    		EventCRFBean eventCrfBean, 
+    		int sectionId,
+            List<String> nullValuesList, 
+            ServletContext context) {
         // logger = LoggerFactory.getLogger(getClass().getName());
         List<DisplayItemBean> disBeans = new ArrayList<DisplayItemBean>();
         if (itemBeans == null || itemBeans.isEmpty())
@@ -129,6 +133,7 @@ public class FormBeanUtil {
                 displayBean.setData(itemDataBean);
                 displayBean.setDbData(itemDataBean);
                 // System.out.println("just set: " + itemDataBean.getValue() + " from " + itemDataBean.getItemId());
+
                 responseName = displayBean.getMetadata().getResponseSet().getResponseType().getName();
                 respOptions = displayBean.getMetadata().getResponseSet().getOptions();
                 if (hasNullValues
@@ -258,6 +263,7 @@ public class FormBeanUtil {
             disBean.setItem(itemBean);
             disBean.setMetadata(runDynamicsCheck(itemFBean, eventCrfBean, itemDataBean, context));
             disBean.setData(itemDataBean);
+            System.out.println("3. just set: " + itemDataBean.getValue());
             responseName = disBean.getMetadata().getResponseSet().getResponseType().getName();
             respOptions = disBean.getMetadata().getResponseSet().getOptions();
             if (hasNullValues

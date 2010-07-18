@@ -380,7 +380,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
             if ((showOriginalItem && showDuplicateItem) || showItem) {
                 dib = validateDisplayItemBeanText(sv, dib, inputName);
             }
-            if (((showOriginalItem && showDuplicateItem) || showItem) && (validationCount == null || validationCount.intValue() == 0)) {
+            if ((showOriginalItem && showDuplicateItem) || showItem) {
                 sv.addValidation(inputName, Validator.MATCHES_INITIAL_DATA_ENTRY_VALUE, valueToCompare, false);
                 sv.setErrorMessage(respage.getString("value_you_specified") + " " + valueToCompare.getValue() + " "
                     + respage.getString("from_initial_data_entry"));

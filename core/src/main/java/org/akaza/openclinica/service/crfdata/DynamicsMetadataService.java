@@ -56,9 +56,15 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
     private StudyEventDAO studyEventDAO;
     private EventDefinitionCRFDAO eventDefinitionCRFDAO;
     private ExpressionService expressionService;
+    private ArrayList<Integer> itemsAlreadyShown;
 
     public DynamicsMetadataService(DataSource ds) {
+    	itemsAlreadyShown = new ArrayList<Integer>();
         this.ds = ds;
+    }
+    
+    public void resetItemCounter() {
+    	itemsAlreadyShown = new ArrayList<Integer>();
     }
 
     public boolean hide(Object metadataBean, EventCRFBean eventCrfBean) {
@@ -125,10 +131,10 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataBean(itemFormMetadataBean, eventCrfBean, itemDataBean);
         // DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataDao().findByMetadataBean(itemFormMetadataBean, eventCrfBean);
         if (dynamicsMetadataBean != null) {
-            logger.debug("DID find a row in the db for (with IDB) " + itemFormMetadataBean.getId() + " idb id " + itemDataBean.getId());
+            // System.out.println("DID find a row in the db for (with IDB) " + itemFormMetadataBean.getId() + " idb id " + itemDataBean.getId());
             return dynamicsMetadataBean.isShowItem();
         } else {
-            logger.debug("did not find a row in the db for (with IDB) " + itemFormMetadataBean.getId() + " idb id " + itemDataBean.getId());
+            // System.out.println("did not find a row in the db for (with IDB) " + itemFormMetadataBean.getId() + " idb id " + itemDataBean.getId());
             return false;
         }
         // return false;
@@ -651,7 +657,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                     DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataBean(itemFormMetadataBean, eventCrfBeanA, oidBasedItemData);
                     if (dynamicsMetadataBean == null && oidBasedItemData.getValue().equals("")) {
                         hideItem(itemFormMetadataBean, eventCrfBeanA, oidBasedItemData);
-                    } else if (dynamicsMetadataBean != null && dynamicsMetadataBean.isShowItem() && oidBasedItemData.getValue().equals("")) {
+                    } else if (dynamicsMetadataBean != null && dynamicsMetadataBean.isShowItem() && oidBasedItemData.getValue().equals("") && !itemsAlreadyShown.contains(new Integer(oidBasedItemData.getItemId()))) {
                         // tbh #5287: add an additional check here to see if it should be hidden?
                         dynamicsMetadataBean.setShowItem(false);
                         getDynamicsItemFormMetadataDao().saveOrUpdate(dynamicsMetadataBean);
@@ -755,9 +761,11 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                     DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataBean(itemFormMetadataBean, eventCrfBeanA, oidBasedItemData);
                     if (dynamicsMetadataBean == null) {
                         showItem(itemFormMetadataBean, eventCrfBeanA, oidBasedItemData);
+                        itemsAlreadyShown.add(new Integer(oidBasedItemData.getItemId()));
                     } else if (dynamicsMetadataBean != null && !dynamicsMetadataBean.isShowItem()) {
                         dynamicsMetadataBean.setShowItem(true);
                         getDynamicsItemFormMetadataDao().saveOrUpdate(dynamicsMetadataBean);
+                        itemsAlreadyShown.add(new Integer(oidBasedItemData.getItemId()));
                     } else if (eventCrfBeanA.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
                         logger.debug("hit DDE here: idb " + oidBasedItemData.getId());
                         // need a guard clause to guarantee DDE

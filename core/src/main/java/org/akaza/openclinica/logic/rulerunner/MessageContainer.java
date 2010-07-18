@@ -14,14 +14,17 @@ public class MessageContainer {
     HashMap<String, ArrayList<TheContainer>> groupOrdinalPLusItemOid2 = new HashMap<String, ArrayList<TheContainer>>();
 
     public void add(String groupOrdinalPLusItemOid, RuleActionBean ruleActionBean) {
-        addInternal(groupOrdinalPLusItemOid, ruleActionBean.getSummary(), MessageType.ERROR);
-        System.out.println("just added error : " + ruleActionBean.getSummary());
+        // addInternal(groupOrdinalPLusItemOid, ruleActionBean.getSummary(), MessageType.ERROR);
+        // System.out.println("just added error : " + ruleActionBean.getSummary());
         if (ruleActionBean instanceof ShowActionBean) {
             List<PropertyBean> properties = (((ShowActionBean) ruleActionBean).getProperties());
             for (PropertyBean propertyBean : properties) {
                 addInternal(propertyBean.getOid(), ruleActionBean.getSummary(), MessageType.WARNING);
                 System.out.println("just added warning : " + ruleActionBean.getSummary());
             }
+        } else {
+        	addInternal(groupOrdinalPLusItemOid, ruleActionBean.getSummary(), MessageType.ERROR);
+            System.out.println("just added error : " + ruleActionBean.getSummary());
         }
     }
 
