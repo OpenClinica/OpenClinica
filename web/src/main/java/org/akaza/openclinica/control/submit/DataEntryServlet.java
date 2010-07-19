@@ -743,7 +743,7 @@ public abstract class DataEntryServlet extends SecureController {
             } else if (getServletPage().equals(Page.ADMIN_EDIT_SERVLET)) {
                 phase2 = Phase.ADMIN_EDITING;
             }
-            this.getItemMetadataService().resetItemCounter();
+            // this.getItemMetadataService().resetItemCounter();
             HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid = runRules(allItems, ruleSets, true, shouldRunRules(), MessageType.ERROR, phase2);
             System.out.println("first run of rules : " + groupOrdinalPLusItemOid.toString());
             for (int i = 0; i < allItems.size(); i++) {
