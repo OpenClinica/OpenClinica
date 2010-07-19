@@ -306,13 +306,21 @@ public class AssignUserToStudyServlet extends SecureController {
 //    }
 
     private String sendEmail(UserAccountBean u, StudyUserRoleBean sub) throws Exception {
-
         logger.info("Sending email...");
         String body =
             u.getFirstName() + " " + u.getLastName() + "(" + resword.getString("username") + ": " + u.getName() + ") "
-                + respage.getString("has_been_assigned_to_the_study_site") + ((StudyBean) session.getAttribute("study")).getName() + " "
+                + respage.getString("has_been_assigned_to_the_study") + currentStudy.getName() + " "
                 + resword.getString("as") + " \"" + sub.getRole().getDescription() + "\". ";
 
+        if (currentStudy.getParentStudyId() > 0){
+            body =
+                    u.getFirstName() + " " + u.getLastName() + "(" + resword.getString("username") + ": " + u.getName() + ") "
+                        + respage.getString("has_been_assigned_to_the_site")
+                        + currentStudy.getName()
+                        + " under the Study " + currentStudy.getParentStudyName() +" "
+                        + resword.getString("as") + " \"" + sub.getRole().getDescription() + "\". ";
+        }
+        System.out.println("Email Content: " + body);
         boolean emailSent = sendEmail(u.getEmail().trim(), respage.getString("new_user_added_to_study"), body, false);
         if (emailSent) {
             sendEmail(ub.getEmail().trim(), EmailEngine.getAdminEmail(), respage.getString("new_user_added_to_study"), body, false,"","", false);
