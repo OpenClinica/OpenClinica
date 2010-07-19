@@ -658,7 +658,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                     if (dynamicsMetadataBean == null && oidBasedItemData.getValue().equals("")) {
                         hideItem(itemFormMetadataBean, eventCrfBeanA, oidBasedItemData);
                     } else if (dynamicsMetadataBean != null && dynamicsMetadataBean.isShowItem() && oidBasedItemData.getValue().equals("") && !itemsAlreadyShown.contains(new Integer(oidBasedItemData.getItemId()))) {
-                        // tbh #5287: add an additional check here to see if it should be hidden?
+                        // tbh #5287: add an additional check here to see if it should be hidden
                         dynamicsMetadataBean.setShowItem(false);
                         getDynamicsItemFormMetadataDao().saveOrUpdate(dynamicsMetadataBean);
                     }
@@ -695,6 +695,8 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                 }
             }
         }
+        // tbh #5287: reset the check to make sure items that have been shown are not re-hidden
+        resetItemCounter();
     }
 
     public void showNew(Integer itemDataId, List<PropertyBean> properties, UserAccountBean ub, RuleSetBean ruleSet) {
