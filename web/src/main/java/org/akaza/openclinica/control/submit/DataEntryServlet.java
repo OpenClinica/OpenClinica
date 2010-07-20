@@ -2870,7 +2870,7 @@ public abstract class DataEntryServlet extends SecureController {
         
     protected boolean writeConditionalDisplayItemToDB(DisplayItemBean dib, ItemDataDAO iddao, int ordinal, boolean isDisplay) {
         ItemDataBean idb = dib.getData();
-        if(isDisplay || idb.getValue().length()>0) {
+        if(isDisplay || idb.getValue().length()>0 || dib.getNumDiscrepancyNotes()>0) {
             if (idb.getValue().equals("")) {
                 idb.setStatus(getBlankItemStatus());
             } else {
