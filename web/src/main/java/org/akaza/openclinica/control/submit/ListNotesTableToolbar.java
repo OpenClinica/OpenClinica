@@ -104,7 +104,7 @@ public class ListNotesTableToolbar extends DefaultToolbar {
          *      java.util.Locale)
          */
         String getIndexes() {
-            String result = "2,10,11,15,16";
+            String result = "5,6,7,10,11,15,16";
             return result;
         }
 
