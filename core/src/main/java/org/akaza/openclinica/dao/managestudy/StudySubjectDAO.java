@@ -688,10 +688,10 @@ public class StudySubjectDAO extends AuditableEntityDAO {
             sql = sql + sort.execute("");
         } else {
             sql = sql + sort.execute("");
-            sql = sql + " LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
+            sql = sql + "  LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
         }
         // Order by Clause for the defect id 0005480 
-        sql = sql+ " ORDER BY SS.STUDY_SUBJECT_ID ASC";
+        //sql = sql+ "";
         
         //System.out.println("SQL: "+sql);
         ArrayList rows = this.select(sql, variables);
