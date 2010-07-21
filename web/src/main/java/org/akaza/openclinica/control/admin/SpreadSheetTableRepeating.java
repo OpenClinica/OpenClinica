@@ -1060,6 +1060,13 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         cell = sheet.getRow(k).getCell((short) cellIndex);
                         String display = getValue(cell);
                         if (!StringUtil.isBlank(display)) {
+                            if(isShowItem != false) {
+                                errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("ITEM_DISPLAY_STATUS_column") + " "
+                                        + resPageMsg.getString("was_invalid_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet") + ". "
+                                        + resPageMsg.getString("should_be_hide_for_scd"));
+                                    htmlErrors.put(j + "," + k + "," + (cellIndex-1), resPageMsg.getString("INVALID_VALUE"));
+                            }
+                            
                             String pvKey = secName+"---";
                             String d = display.replaceAll("\\\\,", "##");
                             String[] par = d.split(",");
@@ -1083,14 +1090,14 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                             if(!existing){
                                                 errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("SIMPLE_CONDITIONAL_DISPLAY_column") + " "
                                                         + resPageMsg.getString("was_invalid_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet") + ". "
-                                                        + resPageMsg.getString("parent_response_value_invalid") + " " + p1.replace("##", "\\\\,"));
+                                                        + resPageMsg.getString("control_response_value_invalid") + " " + p1.replace("##", "\\\\,"));
                                                     htmlErrors.put(j + "," + k + "," + cellIndex, resPageMsg.getString("INVALID_VALUE"));
                                             }
                                         }
                                     }else {
                                         errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("SIMPLE_CONDITIONAL_DISPLAY_column") + " "
                                                 + resPageMsg.getString("was_invalid_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet") + ". "
-                                                + resPageMsg.getString("parent_item_name_invalid") + " " + p0);
+                                                + resPageMsg.getString("control_item_name_invalid") + " " + p0);
                                             htmlErrors.put(j + "," + k + "," + cellIndex, resPageMsg.getString("INVALID_VALUE"));
                                     }
                                 } else {
