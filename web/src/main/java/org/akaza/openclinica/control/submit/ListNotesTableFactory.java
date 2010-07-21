@@ -188,11 +188,10 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             h.put("studySubject.label", discrepancyNoteBean.getStudySub().getLabel());
             h.put("discrepancyNoteBean.disType", discrepancyNoteBean.getDisType());
             h.put("discrepancyNoteBean.resolutionStatus", discrepancyNoteBean.getResStatus());
+            h.put("discrepancyNoteBean.age", discrepancyNoteBean.getAge());
             if (discrepancyNoteBean.getResStatus().isClosed() || discrepancyNoteBean.getResStatus().isNotApplicable()){
-                h.put("discrepancyNoteBean.age", 0);
-                h.put("discrepancyNoteBean.days", 0);
+                h.put("discrepancyNoteBean.days", "");
             } else {
-                h.put("discrepancyNoteBean.age", discrepancyNoteBean.getAge());
                 h.put("discrepancyNoteBean.days", discrepancyNoteBean.getDays());
             }
             h.put("siteId", ((StudyBean) getStudyDao().findByPK(discrepancyNoteBean.getStudySub().getStudyId())).getIdentifier());
