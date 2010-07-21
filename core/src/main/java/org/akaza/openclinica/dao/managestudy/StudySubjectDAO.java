@@ -677,21 +677,22 @@ public class StudySubjectDAO extends AuditableEntityDAO {
     public ArrayList<StudySubjectBean> getWithFilterAndSort(StudyBean currentStudy, FindSubjectsFilter filter, FindSubjectsSort sort, int rowStart, int rowEnd) {
         ArrayList<StudySubjectBean> studySubjects = new ArrayList<StudySubjectBean>();
         setTypesExpected();
-
+        
         HashMap variables = new HashMap();
         variables.put(new Integer(1), currentStudy.getId());
         variables.put(new Integer(2), currentStudy.getId());
         String sql = digester.getQuery("getWithFilterAndSort");
         sql = sql + filter.execute("");
+     // Order by Clause for the defect id 0005480 
+     
+        
         if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
-            sql += " )x)where r between " + (rowStart + 1) + " and " + rowEnd;
+            sql += " ORDER BY ss.study_subject_id  )x)where r between " + (rowStart + 1) + " and " + rowEnd ;
             sql = sql + sort.execute("");
         } else {
             sql = sql + sort.execute("");
-            sql = sql + "  LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
+            sql = sql + "  ORDER BY SS.STUDY_SUBJECT_ID LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
         }
-        // Order by Clause for the defect id 0005480 
-        //sql = sql+ "";
         
         //System.out.println("SQL: "+sql);
         ArrayList rows = this.select(sql, variables);
