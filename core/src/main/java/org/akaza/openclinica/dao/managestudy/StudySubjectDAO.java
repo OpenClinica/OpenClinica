@@ -677,21 +677,29 @@ public class StudySubjectDAO extends AuditableEntityDAO {
     public ArrayList<StudySubjectBean> getWithFilterAndSort(StudyBean currentStudy, FindSubjectsFilter filter, FindSubjectsSort sort, int rowStart, int rowEnd) {
         ArrayList<StudySubjectBean> studySubjects = new ArrayList<StudySubjectBean>();
         setTypesExpected();
-        
+        String partialSql;
         HashMap variables = new HashMap();
         variables.put(new Integer(1), currentStudy.getId());
         variables.put(new Integer(2), currentStudy.getId());
         String sql = digester.getQuery("getWithFilterAndSort");
         sql = sql + filter.execute("");
      // Order by Clause for the defect id 0005480 
-     
         
+        partialSql = sort.execute("");
         if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
-            sql += " ORDER BY ss.study_subject_id  )x)where r between " + (rowStart + 1) + " and " + rowEnd ;
-            sql = sql + sort.execute("");
+        	if(partialSql.equals(""))
+            sql += " ORDER BY SS.label )x)where r between " + (rowStart + 1) + " and " + rowEnd ;
+        	else
+        	sql += ")x)where r between " + (rowStart + 1) + " and " + rowEnd ;
+        	
+            sql = sql + partialSql;
         } else {
-            sql = sql + sort.execute("");
-            sql = sql + "  ORDER BY SS.STUDY_SUBJECT_ID LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
+            
+        	sql = sql + partialSql;
+           if(partialSql.equals(""))
+            sql = sql + "  ORDER BY SS.label LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
+           else
+        	   sql = sql + " LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
         }
         
         //System.out.println("SQL: "+sql);
