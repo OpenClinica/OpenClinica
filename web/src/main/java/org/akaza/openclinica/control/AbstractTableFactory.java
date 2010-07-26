@@ -38,11 +38,15 @@ public abstract class AbstractTableFactory {
         configureColumns(tableFacade, locale);
     }
 
+    public TableFacade getTableFacadeImpl(HttpServletRequest request, HttpServletResponse response) {
+        return new TableFacadeImpl(getTableName(), request);
+    }
+
     public abstract void setDataAndLimitVariables(TableFacade tableFacade);
 
     public TableFacade createTable(HttpServletRequest request, HttpServletResponse response) {
         locale = request.getLocale();
-        TableFacade tableFacade = new TableFacadeImpl(getTableName(), request);
+        TableFacade tableFacade = getTableFacadeImpl(request, response);
         tableFacade.setStateAttr("restore");
         setDataAndLimitVariables(tableFacade);
         configureTableFacade(response, tableFacade);

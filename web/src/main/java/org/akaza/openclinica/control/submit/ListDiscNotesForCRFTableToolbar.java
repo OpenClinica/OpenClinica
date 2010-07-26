@@ -84,10 +84,10 @@ public class ListDiscNotesForCRFTableToolbar extends DefaultToolbar {
                     + "window.location='ListDiscNotesForCRFServlet?module=submit&defId='+selectedValue;}"
                     + " if (selectedValue != null && selectedValue == 0 ) { " + "window.location='ListDiscNotesSubjectServlet?module=submit' } ";
             HtmlBuilder html = new HtmlBuilder();
-            html.append("Events : ");
+            html.append(resword.getString("events")+": ");
             html.select().id("sedDropDown").onchange(js).close();
             html.option().value("0");
-            html.close().append("All Events").optionEnd();
+            html.close().append(resword.getString("all_events")).optionEnd();
             for (StudyEventDefinitionBean studyEventDefinition : studyEventDefinitions) {
                 html.option().value(String.valueOf(studyEventDefinition.getId()));
                 if (studyEventDefinition.getId() == selectedStudyEventDefinition.getId()) {

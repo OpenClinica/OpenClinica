@@ -41,10 +41,10 @@ public class ExpressionTreeHelper {
                 Date d = sdf.parse(dateString);
                 return d;
             } catch (ParseException e) {
-                throw new OpenClinicaSystemException(dateString + " Can not be transformed into a Date");
+                throw new OpenClinicaSystemException("OCRERR_0004", new Object[] { dateString });
             }
         } else {
-            throw new OpenClinicaSystemException(dateString + " Can not be transformed into a Date");
+            throw new OpenClinicaSystemException("OCRERR_0004", new Object[] { dateString });
         }
     }
 

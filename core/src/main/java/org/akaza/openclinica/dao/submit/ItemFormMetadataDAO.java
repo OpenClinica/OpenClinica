@@ -7,14 +7,6 @@
  */
 package org.akaza.openclinica.dao.submit;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.ResponseSetBean;
@@ -23,6 +15,14 @@ import org.akaza.openclinica.dao.core.EntityDAO;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.exception.OpenClinicaException;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+
+import javax.sql.DataSource;
 
 /**
  * @author ssachs
@@ -209,7 +209,7 @@ public class ItemFormMetadataDAO extends EntityDAO {
         this.setTypeExpected(ind, TypeNames.BOOL);
         ind++; // required 20
         this.setTypeExpected(ind, TypeNames.STRING); // default_value
-        ind++; 
+        ind++;
         this.setTypeExpected(ind, TypeNames.STRING); // response_layout 21
         ind++;
         this.setTypeExpected(ind, TypeNames.STRING); // width_decimal 22
@@ -261,6 +261,7 @@ public class ItemFormMetadataDAO extends EntityDAO {
 
         return answer;
     }
+
     /*
      * <query>
         <name>findAllCountHiddenByCRFVersionId</name>
@@ -277,7 +278,7 @@ public class ItemFormMetadataDAO extends EntityDAO {
         int answer = 0;
         this.unsetTypeExpected();
         this.setTypeExpected(1, TypeNames.INT);
-        
+
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(crfVersionId));
         String sql = digester.getQuery("findAllCountHiddenByCRFVersionId");
@@ -288,7 +289,7 @@ public class ItemFormMetadataDAO extends EntityDAO {
             HashMap row = (HashMap) rows.get(0);
             answer = ((Integer) row.get("number")).intValue();
         }
-        
+
         // what about those shown but in a hidden section?
         /*
          * select count(i.*) as number from item i, item_form_metadata ifm, item_group_metadata igm
@@ -300,15 +301,16 @@ public class ItemFormMetadataDAO extends EntityDAO {
            and igm.show_group=false
          */
         int answer2 = 0;
-        
+
         String sql2 = digester.getQuery("findAllCountHiddenUnderGroupsByCRFVersionId");
-        rows = select (sql2, variables);
+        rows = select(sql2, variables);
         if (rows.size() > 0) {
             HashMap row = (HashMap) rows.get(0);
             answer2 = ((Integer) row.get("number")).intValue();
         }
         return answer + answer2;
     }
+
     /*
      * <query>
         <name>findAllCountHiddenButShownByCRFVersionId</name>
@@ -325,7 +327,7 @@ public class ItemFormMetadataDAO extends EntityDAO {
         int answer = 0;
         this.unsetTypeExpected();
         this.setTypeExpected(1, TypeNames.INT);
-        
+
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(eventCrfId));
         String sql = digester.getQuery("findAllCountHiddenButShownByEventCrfId");
@@ -336,7 +338,7 @@ public class ItemFormMetadataDAO extends EntityDAO {
             HashMap row = (HashMap) rows.get(0);
             answer = ((Integer) row.get("number")).intValue();
         }
-        
+
         return answer;
     }
 
@@ -349,6 +351,27 @@ public class ItemFormMetadataDAO extends EntityDAO {
         variables.put(new Integer(1), new Integer(crfVersionId));
 
         String sql = digester.getQuery("findAllByCRFVersionId");
+        ArrayList alist = this.select(sql, variables);
+        Iterator it = alist.iterator();
+
+        while (it.hasNext()) {
+            ItemFormMetadataBean ifmb = (ItemFormMetadataBean) this.getEntityFromHashMap((HashMap) it.next());
+            answer.add(ifmb);
+        }
+
+        return answer;
+    }
+
+    public ArrayList findAllByCRFIdItemIdAndHasValidations(int crfId, int itemId) {
+        ArrayList answer = new ArrayList();
+
+        this.setTypesExpected();
+
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(crfId));
+        variables.put(new Integer(2), new Integer(itemId));
+
+        String sql = digester.getQuery("findAllByCRFIdItemIdAndHasValidations");
         ArrayList alist = this.select(sql, variables);
         Iterator it = alist.iterator();
 
@@ -398,6 +421,46 @@ public class ItemFormMetadataDAO extends EntityDAO {
         variables.put(new Integer(1), new Integer(itemId));
 
         String sql = digester.getQuery("findAllByItemId");
+        // logger.info("<<<found SQL: "+sql);
+        ArrayList alist = this.select(sql, variables);
+        Iterator it = alist.iterator();
+
+        while (it.hasNext()) {
+            HashMap hm = (HashMap) it.next();
+            ItemFormMetadataBean ifmb = (ItemFormMetadataBean) this.getEntityFromHashMap(hm);
+            String versionName = (String) hm.get("cvname");
+            String groupLabel = (String) hm.get("group_label");
+            String sectionName = (String) hm.get("section_name");
+            int repeatMax = new Integer((Integer) hm.get("repeat_max")).intValue();
+            ifmb.setCrfVersionName(versionName);
+            ifmb.setGroupLabel(groupLabel);
+            // logger.info(">>>added group name: "+groupLabel);
+            ifmb.setSectionName(sectionName);
+            // logger.info("<<<added section name: "+sectionName);
+            ifmb.setRepeatMax(repeatMax);
+            answer.add(ifmb);
+        }
+
+        return answer;
+    }
+
+    public ArrayList findAllByItemIdAndHasValidations(int itemId) {
+
+        // TODO place holder for returning here, tbh
+        ArrayList answer = new ArrayList();
+
+        this.setTypesExpected();
+        // BWP: changed from 25 to 26 when added response_layout?
+        // YW: now added width_decimal
+        this.setTypeExpected(28, TypeNames.STRING);// version name
+        // add more here for display, tbh 082007
+        this.setTypeExpected(29, TypeNames.STRING);// group_label
+        this.setTypeExpected(30, TypeNames.INT);// repeat_max
+        this.setTypeExpected(31, TypeNames.STRING);// section_name
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(itemId));
+
+        String sql = digester.getQuery("findAllByItemIdAndHasValidations");
         // logger.info("<<<found SQL: "+sql);
         ArrayList alist = this.select(sql, variables);
         Iterator it = alist.iterator();
@@ -740,14 +803,14 @@ public class ItemFormMetadataDAO extends EntityDAO {
 
         return (ResponseSetBean) this.executeFindByPKQuery("findResponseSetByPK", variables);
     }
-    
+
     public ArrayList<ItemFormMetadataBean> findSCDItemsBySectionId(Integer sectionId) {
         ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
         this.unsetTypeExpected();
         this.setTypesExpected();
         HashMap variables = new HashMap();
         variables.put(new Integer(1), sectionId);
-        
+
         String sql = digester.getQuery("findSCDItemsBySectionId");
         ArrayList alist = this.select(sql, variables);
         Iterator it = alist.iterator();

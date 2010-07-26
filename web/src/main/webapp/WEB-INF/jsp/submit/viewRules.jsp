@@ -55,13 +55,13 @@
 <c:otherwise>
 <span class="title_Manage">
 </c:otherwise>
-</c:choose><fmt:message key="rule_manage_rule_title" bundle="${resword}"/></span></h1>
+</c:choose><fmt:message key="rule_manage_rule_title" bundle="${resword}"/> <c:out value="${ruleSet.itemName}"/></span></h1>
 <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
 <div class="tablebox_center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
-  <tr valign="top"><td class="table_header_column"><fmt:message key="rule_expression" bundle="${resword}"/>:</td><td class="table_cell">
+  <tr valign="top"><td class="table_header_column"><fmt:message key="rule_target_oid" bundle="${resword}"/>:</td><td class="table_cell">
   <c:out value="${ruleSet.target.value}"/>
   </td></tr>
   <tr valign="top"><td class="table_header_column_top"><fmt:message key="rule_study_event_definition" bundle="${resword}"/>:</td><td class="table_cell">
@@ -74,7 +74,20 @@
   <c:out value="${ruleSet.groupLabelWithOid}"/>
   </td></tr>
   <tr valign="top"><td class="table_header_column"><fmt:message key="rule_item_name" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${ruleSet.itemNameWithOid}"/>
+  <a href="javascript: openDocWindow('ViewItemDetail?itemId=${ruleSet.itemId}')"><c:out value="${ruleSet.itemNameWithOid}"/></a>
+  </td></tr>
+  <tr valign="top"><td class="table_header_column"><fmt:message key="actions" bundle="${resword}"/>:</td><td class="table_cell">
+    <a href="RunRuleSet?ruleSetId=<c:out value="${ruleSet.id}"/>"
+       onmouseover="Tip('<fmt:message key="view_rules_run_tip" bundle="${resword}"/>')" 
+       onmouseout="UnTip()"><fmt:message key="view_rules_run_all" bundle="${resword}"/></a> ,
+    <a href="UpdateRuleSetRule?action=remove&ruleSetId=<c:out value="${ruleSet.id}"/>&source=ViewRuleSet"
+       onClick='return confirm("<fmt:message key="rule_if_you_remove_this_all" bundle="${resword}"/>");'><fmt:message key="view_rules_remove_all" bundle="${resword}"/></a> ,
+    <a href="DownloadRuleSetXml?ruleSetRuleIds=<c:out value="${validRuleSetRuleIds}"/>"
+       onmouseover="Tip('<fmt:message key="view_rules_download_tip" bundle="${resword}"/>')" 
+       onmouseout="UnTip()"
+    ><fmt:message key="view_rules_get_xml" bundle="${resword}"/></a> , 
+    <a href="ViewRuleSetAudit?ruleSetId=<c:out value="${ruleSet.id}"/>"><fmt:message key="view_rules_audit" bundle="${resword}"/></a>
+    
   </td></tr>
 </table>
 </div>
@@ -101,7 +114,7 @@
     <td class="table_header_row"><fmt:message key="rule_expression" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="rule_status" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="rule_execute_on" bundle="${resword}"/></td>
-    <td class="table_header_row"><fmt:message key="rule_action_type" bundle="${resword}"/></td>
+    <!-- <td class="table_header_row"><fmt:message key="rule_action_type" bundle="${resword}"/></td>  -->
     <td class="table_header_row"><fmt:message key="rule_action_summary" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="action" bundle="${resword}"/></td>
     </tr>
@@ -125,7 +138,6 @@
     <td rowspan="${count +1}" class="table_cell"><c:out value="${ruleSetRule.ruleBean.expression.value}"/></td>
     <td rowspan="${count +1}" class="table_cell <c:out value='${className}'/>">${ruleSetRule.status.description}</td>
     <td class="table_cell"></td>
-    <td class="table_cell"></td>
     <td class="table_cell">&nbsp;</td>
     <td class="table_cell">
       <table border="0" cellpadding="0" cellspacing="0">
@@ -138,7 +150,7 @@
       onMouseUp="javascript:setImage('bt_View1','images/bt_ExexuteRules.gif');"><img
       name="bt_View1" src="images/bt_ExexuteRules.gif" border="0" alt="<fmt:message key="rule_run" bundle="${resword}"/>" title="<fmt:message key="rule_run" bundle="${resword}"/>" align="left" hspace="6"></a>
       </td>
-      <td><a href="UpdateRuleSetRule?action=remove&ruleSetRuleId=<c:out value="${ruleSetRule.id}"/>&ruleSetId=<c:out value="${ruleSet.id}"/>"
+      <td><a href="UpdateRuleSetRule?action=remove&ruleSetRuleId=<c:out value="${ruleSetRule.id}"/>&ruleSetId=<c:out value="${ruleSet.id}"/>&source=ViewRuleSet"
       onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
       onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"
       onClick='return confirm("<fmt:message key="rule_if_you_remove_this" bundle="${resword}"/>");'><img
@@ -147,13 +159,19 @@
       </c:if>
       <c:if test="${ ruleSetRule.status.name eq 'DELETED' }">
       <td>
-      <a href="UpdateRuleSetRule?action=restore&ruleSetRuleId=<c:out value="${ruleSetRule.id}"/>&ruleSetId=<c:out value="${ruleSet.id}"/>"
+      <a href="UpdateRuleSetRule?action=restore&ruleSetRuleId=<c:out value="${ruleSetRule.id}"/>&ruleSetId=<c:out value="${ruleSet.id}"/>&source=ViewRuleSet"
       onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
       onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"
       onClick='return confirm("<fmt:message key="rule_if_you_restore_this" bundle="${resword}"/>");'><img
       name="bt_Restore3" src="images/bt_Restore.gif" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a>
       </td>
       </c:if>
+      <td>
+      <a onmouseup="javascript:setImage('bt_run','images/bt_EnterData.gif');" 
+         onmousedown="javascript:setImage('bt_run','images/bt_EnterData_d.gif');" 
+         href="TestRule?ruleSetRuleId=<c:out value='${ruleSetRule.id}'/>&ruleSetId=<c:out value="${ruleSet.id}"/>"><img align="left" hspace="6" border="0" title="Test" alt="Test" src="images/bt_EnterData.gif" name="Test"></a>
+      
+      </td>
       <%--</c:when>--%>
       <%--<c:otherwise>--%>
       <%--</c:otherwise>--%>
@@ -163,14 +181,20 @@
     <c:forEach items="${ruleSetRule.allActionsWithEvaluatesToAsKey}" varStatus="status">
     <tr valign="top">
         <td rowspan="${fn:length(status.current.value) +1 }" class="table_cell"><c:out value="${status.current.key}"/></td>
-        <td class="table_cell">&nbsp;</td>
-        <td class="table_cell">&nbsp;</td>
-        <td class="table_cell">&nbsp;</td>
+        
     </tr>
         <c:forEach items="${status.current.value}" var="val">
         <tr valign="top">
-            <td class="table_cell"><c:out value="${val.actionType}"/></td>
-            <td class="table_cell"><c:out value="${val.summary}"/></td>
+            <td class="table_cell">
+            <table>
+                <c:forEach items="${val.propertiesForDisplay}" var="mapEntry" varStatus="status">
+                <tr valign="top">
+                    <td ><i><fmt:message key="${mapEntry.key}" bundle="${resword}" /></i></td>
+                    <td ><c:out value="${mapEntry.value}"/></td>
+                </tr>
+                </c:forEach>
+            </table>
+            </td>
             <td class="table_cell">&nbsp;</td>
         </tr>
         </c:forEach>

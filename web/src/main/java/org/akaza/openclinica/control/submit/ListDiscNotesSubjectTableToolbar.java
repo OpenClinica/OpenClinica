@@ -79,7 +79,7 @@ public class ListDiscNotesSubjectTableToolbar extends DefaultToolbar {
             html.quote();
             html.append(getAction());
             html.quote().close();
-            html.nbsp().append("View as List").nbsp().aEnd();
+            html.nbsp().append(resword.getString("view_as_list")).nbsp().aEnd();
             return html.toString();
         }
     }
@@ -120,7 +120,7 @@ public class ListDiscNotesSubjectTableToolbar extends DefaultToolbar {
                     + " if (selectedValue != null  ) { " + "window.location='ListDiscNotesForCRFServlet?module=submit&defId=' + selectedValue;" + " } ";
             HtmlBuilder html = new HtmlBuilder();
             html.select().id("sedDropDown").onchange(js).close();
-            html.option().close().append("Select An Event").optionEnd();
+            html.option().close().append(resword.getString("select_an_event")).optionEnd();
             for (StudyEventDefinitionBean studyEventDefinition : studyEventDefinitions) {
                 html.option().value(String.valueOf(studyEventDefinition.getId())).close().append(studyEventDefinition.getName()).optionEnd();
             }

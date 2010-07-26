@@ -6,6 +6,7 @@ import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.StatisticsView;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.jmesa.core.filter.DateFilterMatcher;
 import org.jmesa.core.filter.MatcherKey;
 import org.jmesa.facade.TableFacade;
@@ -21,6 +22,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -29,6 +31,7 @@ public class StudySubjectStatusStatisticsTableFactory extends AbstractTableFacto
     private StudyDAO studyDao;
     private StudySubjectDAO studySubjectDao;
     private StudyBean currentStudy;
+    private ResourceBundle reswords = ResourceBundleProvider.getWordsBundle();
 
     @Override
     protected String getTableName() {
@@ -45,9 +48,9 @@ public class StudySubjectStatusStatisticsTableFactory extends AbstractTableFacto
         tableFacade.setColumnProperties("status", "studySubjects", "percentage");
         ((HtmlTableRenderer) tableFacade.getTable().getTableRenderer()).setWidth("350px");
         Row row = tableFacade.getTable().getRow();
-        configureColumn(row.getColumn("status"), "Study Subject Status", null, null, false, true);
-        configureColumn(row.getColumn("studySubjects"), "# of Study Subjects", null, null, false, true);
-        configureColumn(row.getColumn("percentage"), "Percentage", new PercentageCellEditor(), null, false, true);
+        configureColumn(row.getColumn("status"), reswords.getString("study_subject_status"), null, null, false, true);
+        configureColumn(row.getColumn("studySubjects"), reswords.getString("n_study_subjects"), null, null, false, true);
+        configureColumn(row.getColumn("percentage"), reswords.getString("percentage"), new PercentageCellEditor(), null, false, true);
 
     }
 

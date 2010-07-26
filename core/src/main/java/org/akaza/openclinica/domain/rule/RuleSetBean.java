@@ -58,6 +58,7 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
     private Integer crfId;
     private Integer crfVersionId;
     private Integer itemId;
+    private Integer itemGroupId;
 
     // Business
 
@@ -98,7 +99,7 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
 
     @Transient
     public String getStudyEventDefinitionName() {
-        return getStudyEventDefinition() == null ? "" : getStudyEventDefinition().getName();
+        return getStudyEventDefinition() != null ? getStudyEventDefinition().getName() : "All";
     }
 
     @Transient
@@ -114,6 +115,16 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
     }
 
     @Transient
+    public String getCrfName() {
+        return getCrf() != null ? getCrf().getName() : "";
+    }
+
+    @Transient
+    public String getCrfVersionName() {
+        return getCrfVersion() != null ? getCrfVersion().getName() : "All";
+    }
+
+    @Transient
     public String getCrfWithVersionNameWithOid() {
         String oid = getCrfVersion() != null ? getCrfVersion().getOid() : getCrf() != null ? getCrf().getOid() : "";
         return getCrfWithVersionName() + (!oid.equals("") ? " (" + oid + ")" : "");
@@ -126,7 +137,7 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
 
     @Transient
     public String getGroupLabel() {
-        return getItemGroup() == null ? "" : getItemGroup().getName();
+        return getItemGroup() != null ? getItemGroup().getName() : "";
     }
 
     @Transient
@@ -186,6 +197,9 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
     }
 
     public void setItemGroup(ItemGroupBean itemGroup) {
+        if (itemGroup != null && itemGroup.getId() > 0) {
+            this.itemGroupId = itemGroup.getId();
+        }
         this.itemGroup = itemGroup;
     }
 
@@ -326,10 +340,49 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
     }
 
     /**
-     * @param itemId the itemId to set
+     * @param itemId
      */
     public void setItemId(Integer itemId) {
         this.itemId = itemId;
+    }
+
+    /**
+     * @return the itemGroupId
+     */
+    public Integer getItemGroupId() {
+        return itemGroupId;
+    }
+
+    /**
+     * @param itemGroupId
+     */
+    public void setItemGroupId(Integer itemGroupId) {
+        this.itemGroupId = itemGroupId;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((target == null) ? 0 : target.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        RuleSetBean other = (RuleSetBean) obj;
+        if (target == null) {
+            if (other.target != null)
+                return false;
+        } else if (!target.equals(other.target))
+            return false;
+        return true;
     }
 
 }

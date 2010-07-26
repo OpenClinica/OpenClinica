@@ -3,6 +3,7 @@ package org.akaza.openclinica.control.managestudy;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.control.DefaultToolbar;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.jmesa.core.CoreContext;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.toolbar.AbstractItem;
@@ -13,6 +14,7 @@ import org.jmesa.view.html.toolbar.ToolbarItemRenderer;
 import org.jmesa.view.html.toolbar.ToolbarItemType;
 
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 public class ListEventsForSubjectTableToolbar extends DefaultToolbar {
 
@@ -20,6 +22,8 @@ public class ListEventsForSubjectTableToolbar extends DefaultToolbar {
     private final ArrayList<StudyGroupClassBean> studyGroupClasses;
     private final StudyEventDefinitionBean selectedStudyEventDefinition;
     private final boolean addSubjectLinkShow;
+    protected ResourceBundle resword = ResourceBundleProvider.getWordsBundle();
+    protected ResourceBundle resnotes = ResourceBundleProvider.getTextsBundle();
 
     public ListEventsForSubjectTableToolbar(ArrayList<StudyEventDefinitionBean> studyEventDefinitions, ArrayList<StudyGroupClassBean> studyGroupClasses,
             StudyEventDefinitionBean selectedStudyEventDefinition, boolean addSubjectLinkShow, boolean showMoreLink) {
@@ -74,20 +78,21 @@ public class ListEventsForSubjectTableToolbar extends DefaultToolbar {
         @Override
         public String enabled() {
             HtmlBuilder html = new HtmlBuilder();
-            if(showMoreLink){
-                html.a().id("showMore").href("javascript:hideCols('listEventsForSubject',[" + getIndexes() + "],true);").close();
-                html.div().close().nbsp().append("Show More").nbsp().divEnd().aEnd();
-                html.a().id("hide").style("display: none;").href("javascript:hideCols('listEventsForSubject',[" + getIndexes() + "],false);").close();
-                html.div().close().nbsp().append("Hide").nbsp().divEnd().aEnd();
 
-                html.script().type("text/javascript").close().append(
+		 if(showMoreLink){
+            html.a().id("showMore").href("javascript:hideCols('listEventsForSubject',[" + getIndexes() + "],true);").close();
+            html.div().close().nbsp().append(resword.getString("show_more")).nbsp().divEnd().aEnd();
+            html.a().id("hide").style("display: none;").href("javascript:hideCols('listEventsForSubject',[" + getIndexes() + "],false);").close();
+            html.div().close().nbsp().append(resword.getString("hide")).nbsp().divEnd().aEnd();
+
+            html.script().type("text/javascript").close().append(
                         "$j = jQuery.noConflict(); $j(document).ready(function(){ " + "hideCols('listEventsForSubject',[" + getIndexes() + "],false);});")
                         .scriptEnd();
             }else{
                 html.a().id("showMore").style("display: none;").href("javascript:hideCols('listEventsForSubject',[" + getIndexes() + "],true);").close();
-                html.div().close().nbsp().append("Show More").nbsp().divEnd().aEnd();
+                html.div().close().nbsp().append(resword.getString("show_more")).nbsp().divEnd().aEnd();
                 html.a().id("hide").href("javascript:hideCols('listEventsForSubject',[" + getIndexes() + "],false);").close();
-                html.div().close().nbsp().append("Hide").nbsp().divEnd().aEnd();
+                html.div().close().nbsp().append(resword.getString("hide")).nbsp().divEnd().aEnd();
             }
 
             return html.toString();
@@ -124,10 +129,10 @@ public class ListEventsForSubjectTableToolbar extends DefaultToolbar {
                     + " if (selectedValue != null && selectedValue != 0 ) { " + "window.location='ListEventsForSubjects?module=submit&defId='+selectedValue;}"
                     + " if (selectedValue != null && selectedValue == 0 ) { " + "window.location='ListStudySubjects' } ";
             HtmlBuilder html = new HtmlBuilder();
-            html.append("Events : ");
+            html.append(resword.getString("events")+": ");
             html.select().id("sedDropDown").onchange(js).close();
             html.option().value("0");
-            html.close().append("All Events").optionEnd();
+            html.close().append(resnotes.getString("all_events")).optionEnd();
             for (StudyEventDefinitionBean studyEventDefinition : studyEventDefinitions) {
                 html.option().value(String.valueOf(studyEventDefinition.getId()));
                 if (studyEventDefinition.getId() == selectedStudyEventDefinition.getId()) {
@@ -155,7 +160,7 @@ public class ListEventsForSubjectTableToolbar extends DefaultToolbar {
             html.a().href("#").id("addSubject");//onclick("initmb();sm('box', 730,100);");
             html.quote();
             html.quote().close();
-            html.nbsp().append("Add New Subject").nbsp().aEnd();
+            html.nbsp().append(resword.getString("add_new_subject")).nbsp().aEnd();
 
             return html.toString();
         }

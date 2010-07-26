@@ -62,6 +62,7 @@ public class SPSSReportBean extends ReportBean {
 
     protected Locale locale = ResourceBundleProvider.getLocale();
     protected String local_df_string = ResourceBundleProvider.getFormatBundle(locale).getString("date_format_string");
+    protected String local_datetime_string = ResourceBundleProvider.getFormatBundle(locale).getString("date_time_format_string");
 
     /**
      * @return Returns the datFileName.
@@ -170,10 +171,33 @@ public class SPSSReportBean extends ReportBean {
                     logger.debug("varLabel[" + varLabel + "] index[" + index + "] attributeTypes[" + attributeTypes[1] + "]");
 
                     answer.append("\t" + varLabel + " " + attributeTypes[index]);
+                    // >> tbh #5524
+                    DisplayItemHeaderBean dih = (DisplayItemHeaderBean) items.get(i);
+                    ItemBean ib = dih.getItem();
+                    // << tbh
                     if (attributeTypes[index].equals("A")) {
                         int len = getDataColumnMaxLen(i);
                         if (len == 0) {
                             len = 1; // mininum length required by spss
+                        }
+                        // >> tbh #5524
+                        ArrayList metas = ib.getItemMetas();
+                        
+                        for (int k = 0; k < metas.size(); k++) {
+                            ItemFormMetadataBean ifmb = (ItemFormMetadataBean) metas.get(k);
+                            ResponseSetBean rsb = ifmb.getResponseSet();
+                            ArrayList options = rsb.getOptions();
+                            for (int l = 0; l < options.size(); l++) {
+                                ResponseOptionBean ro = (ResponseOptionBean) options.get(l);
+                                if (ro.getText().length() > len) {
+                                    len = ro.getText().length();
+                                    // System.out.println("--> 2. changed len to " + len);
+                                }
+                            }
+                        }
+                        // << tbh
+                        if (len > 8) {
+                            len = 8;
                         }
                         answer.append(len);
                     }
@@ -223,6 +247,16 @@ public class SPSSReportBean extends ReportBean {
                             || rsb.getResponseType().equals(ResponseType.SELECT) || rsb.getResponseType().equals(ResponseType.SELECTMULTI)) {
                             optionCount++;
                         }
+                        // tbh >> #5524: all possible response value options should be reviewed so that length is OK
+                        ArrayList options = rsb.getOptions();
+                        for (int l = 0; l < options.size(); l++) {
+                            ResponseOptionBean ro = (ResponseOptionBean) options.get(l);
+                            if (ro.getText().length() > len) {
+                                len = ro.getText().length();
+                                // System.out.println("--> change len to " + ro.getText().length());
+                            }
+                        }
+                        // << tbh
                     }
                     if (optionCount == metas.size()) {
                         // all responsetype of metas have options,need to show
@@ -382,7 +416,14 @@ public class SPSSReportBean extends ReportBean {
             row = (ArrayList) data.get(i);
             for (int j = 0; j < row.size(); j++) {
                 String s = ((String)row.get(j)).replaceAll("\\s", " ");
-                answer.append(Utils.convertedItemDateValue(s, local_df_string, "MM/dd/yyyy") + "\t");
+                // >> tbh #5523: we should catch strings of type dd-MMM-yyyy AND yyyy-MM-dd
+                String convert = Utils.convertedItemDateValue(s, local_df_string, "MM/dd/yyyy");
+                String convertAgain = Utils.convertedItemDateValue(convert, "yyyy-MM-dd", "MM/dd/yyyy");
+                // and wait, what about date timestamps?
+                String convertAgainAgain = Utils.convertedItemDateValue(convertAgain, local_datetime_string, "MM/dd/yyyy");
+                answer.append(convertAgainAgain + "\t");
+                // System.out.println("just converted from " + local_df_string + ": " + s + " -> " + convertAgain);
+                // << tbh
             }
             answer.append("\n");
         }

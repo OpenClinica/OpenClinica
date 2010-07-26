@@ -14,6 +14,9 @@ import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
@@ -32,6 +35,7 @@ public class OpenClinicaV1ExpressionProcessor implements ExpressionProcessor {
     DataSource ds;
     ExpressionService expressionService;
     ExpressionObjectWrapper expressionWrapper;
+    ResourceBundle respage;
 
     public OpenClinicaV1ExpressionProcessor(ExpressionObjectWrapper expressionWrapper) {
         this.expressionWrapper = expressionWrapper;
@@ -45,10 +49,17 @@ public class OpenClinicaV1ExpressionProcessor implements ExpressionProcessor {
             if (expressionService.ruleSetExpressionChecker(e.getValue())) {
                 return null;
             } else {
-                return "Expression Syntax InValid";
+                MessageFormat mf = new MessageFormat("");
+                String errorCode = "OCRERR_0024";
+                mf.applyPattern(respage.getString(errorCode));
+                Object[] arguments = {};
+                return errorCode + " : " + mf.format(arguments);
             }
         } catch (OpenClinicaSystemException e) {
-            return e.getMessage();
+            MessageFormat mf = new MessageFormat("");
+            mf.applyPattern(respage.getString(e.getErrorCode()));
+            Object[] arguments = e.getErrorParams();
+            return e.getErrorCode() + " : " + mf.format(arguments);
         }
     }
 
@@ -59,7 +70,11 @@ public class OpenClinicaV1ExpressionProcessor implements ExpressionProcessor {
             logger.info("Test Result : " + result);
             return null;
         } catch (OpenClinicaSystemException e) {
-            return e.getMessage();
+            MessageFormat mf = new MessageFormat("");
+            mf.applyPattern(respage.getString(e.getErrorCode()));
+            Object[] arguments = e.getErrorParams();
+            return e.getErrorCode() + " : " + mf.format(arguments);
+
         }
     }
 
@@ -70,7 +85,31 @@ public class OpenClinicaV1ExpressionProcessor implements ExpressionProcessor {
             logger.info("Test Result : " + result);
             return "Pass : " + result;
         } catch (OpenClinicaSystemException e) {
-            return "Fail : " + e.getMessage();
+            MessageFormat mf = new MessageFormat("");
+            mf.applyPattern(respage.getString(e.getErrorCode()));
+            Object[] arguments = e.getErrorParams();
+            return "Fail - " + e.getErrorCode() + " : " + mf.format(arguments);
+        }
+    }
+
+    public HashMap<String, String> testEvaluateExpression(HashMap<String, String> testValues) {
+        try {
+            oep = new OpenClinicaExpressionParser(expressionWrapper);
+            HashMap<String, String> resultAndTestValues = oep.parseAndTestEvaluateExpression(e.getValue(), testValues);
+            String returnedResult = resultAndTestValues.get("result");
+            logger.info("Test Result : " + returnedResult);
+            resultAndTestValues.put("ruleValidation", "rule_valid");
+            resultAndTestValues.put("ruleEvaluatesTo", returnedResult);
+
+            return resultAndTestValues;
+        } catch (OpenClinicaSystemException e) {
+            MessageFormat mf = new MessageFormat("");
+            mf.applyPattern(respage.getString(e.getErrorCode()));
+            Object[] arguments = e.getErrorParams();
+            testValues.put("ruleValidation", "rule_invalid");
+            testValues.put("ruleValidationFailMessage", e.getErrorCode() + " : " + mf.format(arguments));
+            testValues.put("ruleEvaluatesTo", "");
+            return testValues;
         }
     }
 
@@ -80,6 +119,10 @@ public class OpenClinicaV1ExpressionProcessor implements ExpressionProcessor {
 
     public void setExpression(ExpressionBean e) {
         this.e = e;
+    }
+
+    public void setRespage(ResourceBundle respage) {
+        this.respage = respage;
     }
 
 }

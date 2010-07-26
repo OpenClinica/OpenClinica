@@ -45,6 +45,26 @@ public class RulesPostImportContainer {
         this.ruleDefs = ruleDefs;
     }
 
+    public void addRuleSet(RuleSetBean ruleSetBean) {
+        if (ruleSets == null) {
+            ruleSets = new ArrayList<RuleSetBean>();
+        }
+        getRuleSets().add(ruleSetBean);
+    }
+
+    public void addRuleDef(RuleBean ruleBean) {
+        if (ruleDefs == null) {
+            ruleDefs = new ArrayList<RuleBean>();
+        }
+        getRuleDefs().add(ruleBean);
+    }
+
+    public void initializeRuleDef() {
+        if (ruleDefs == null) {
+            ruleDefs = new ArrayList<RuleBean>();
+        }
+    }
+
     public ArrayList<RuleSetBean> getRuleSets() {
         return ruleSets;
     }

@@ -11,9 +11,11 @@ import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.jmesa.view.html.HtmlBuilder;
 
 import java.util.List;
+import java.util.ResourceBundle;
 
 public class EventCrfLayerBuilder {
 
@@ -29,6 +31,8 @@ public class EventCrfLayerBuilder {
     UserAccountBean currentUser;
     EventDefinitionCRFBean eventDefinitionCrf;
     CRFBean crf;
+    private ResourceBundle reswords = ResourceBundleProvider.getWordsBundle();
+    private ResourceBundle restexts = ResourceBundleProvider.getTextsBundle();
 
     public EventCrfLayerBuilder(SubjectBean subject, Integer rowCount, List<StudyEventBean> studyEvents, DataEntryStage eventCrfStatus,
             EventCRFBean eventCrfBean, StudySubjectBean studySubject, StudyBean currentStudy, StudyUserRoleBean currentRole, UserAccountBean currentUser,
@@ -93,8 +97,8 @@ public class EventCrfLayerBuilder {
 
         String studySubjectLabel = studySubject.getLabel();
         String tableHeaderRowLeftStyleClass = "table_header_row_left";
-        String subjectText = "Subject";
-        String crfText = "Crf";
+        String subjectText = reswords.getString("subject");
+        String crfText = reswords.getString("CRF");
 
         // Event Div
         html.div().id("Event_" + studySubjectLabel + "_" + crf.getId() + "_" + rowCount).style(
@@ -137,10 +141,11 @@ public class EventCrfLayerBuilder {
 
     void clickToEnterData() {
 
-        String click_to_enter_data = "Click to enter Data";
-        String to_use_another_version_click = "To use a different version of the CRF, please click the View Icon for the Subject in the Actions column.";
-        String in_order_to_enter_data_create_event = "In order to enter data create event";
-        String click_for_more_options = "Click for more options";
+        String click_to_enter_data = restexts.getString("click_to_enter_data");
+        String to_use_another_version_click = restexts.getString("to_use_another_version");
+        String in_order_to_enter_data_create_event = restexts.getString("in_order_to_enter_data_create_e");
+        String click_for_more_options = restexts.getString("click_for_more_options");
+
 
         String table_cell_left = "table_cell_left";
 
@@ -170,26 +175,26 @@ public class EventCrfLayerBuilder {
             html.td(0).styleClass(table_cell_left).close();
             viewEventCrfContentLink(html, studySubject, eventCrfBean, getStudyEvent());
             html.nbsp().nbsp();
-            viewSectionDataEntry(html, eventCrfBean, "View", eventDefinitionCrf);
+            viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf);
             html.tdEnd().trEnd(0);
             html.tr(0).valign("top").close();
             html.td(0).styleClass(table_cell_left).close();
             printDataEntry(html, eventCrfBean);
             html.nbsp().nbsp();
-            printDataEntry(html, eventCrfBean, "Print");
+            printDataEntry(html, eventCrfBean, reswords.getString("print"));
             html.tdEnd().trEnd(0);
             if (currentStudy.getStatus() == Status.AVAILABLE && (currentRole.isDirector() || currentUser.isSysAdmin())) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 administrativeEditing(html, eventCrfBean);
                 html.nbsp().nbsp();
-                administrativeEditing(html, eventCrfBean, "Edit");
+                administrativeEditing(html, eventCrfBean, reswords.getString("edit"));
                 html.tdEnd().trEnd(0);
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 removeEventCrf(html, eventCrfBean, studySubject);
                 html.nbsp().nbsp();
-                removeEventCrf(html, eventCrfBean, studySubject, "Remove");
+                removeEventCrf(html, eventCrfBean, studySubject, reswords.getString("remove"));
                 html.tdEnd().trEnd(0);
             }
             if (currentStudy.getStatus() == Status.AVAILABLE && currentUser.isSysAdmin()) {
@@ -197,7 +202,7 @@ public class EventCrfLayerBuilder {
                 html.td(0).styleClass(table_cell_left).close();
                 deleteEventCrf(html, eventCrfBean, studySubject);
                 html.nbsp().nbsp();
-                deleteEventCrf(html, eventCrfBean, studySubject, "Delete");
+                deleteEventCrf(html, eventCrfBean, studySubject, reswords.getString("delete"));
                 html.tdEnd().trEnd(0);
             }
         } else if (eventCrfStatus == DataEntryStage.LOCKED) {
@@ -205,20 +210,20 @@ public class EventCrfLayerBuilder {
             html.td(0).styleClass(table_cell_left).close();
             viewEventCrfContentLink(html, studySubject, eventCrfBean, getStudyEvent());
             html.nbsp().nbsp();
-            viewSectionDataEntry(html, eventCrfBean, "View", eventDefinitionCrf);
+            viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf);
             html.tdEnd().trEnd(0);
             html.tr(0).valign("top").close();
             html.td(0).styleClass(table_cell_left).close();
             viewEventCrfContentLinkPrint(html, studySubject, eventCrfBean, getStudyEvent());
             html.nbsp().nbsp();
-            viewEventCrfContentLink(html, studySubject, eventCrfBean, getStudyEvent(), "Print");
+            viewEventCrfContentLink(html, studySubject, eventCrfBean, getStudyEvent(), reswords.getString("print"));
             html.tdEnd().trEnd(0);
             if (currentStudy.getStatus() == Status.AVAILABLE && (currentRole.isDirector() || currentUser.isSysAdmin())) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 removeEventCrf(html, eventCrfBean, studySubject);
                 html.nbsp().nbsp();
-                removeEventCrf(html, eventCrfBean, studySubject, "Remove");
+                removeEventCrf(html, eventCrfBean, studySubject, reswords.getString("remove"));
                 html.tdEnd().trEnd(0);
             }
         } else if (eventCrfStatus == DataEntryStage.UNCOMPLETED) {
@@ -228,33 +233,33 @@ public class EventCrfLayerBuilder {
                 initialDataEntryLink(html, eventCrfBean == null ? new EventCRFBean() : eventCrfBean, studySubject, eventDefinitionCrf, getStudyEvent());
                 html.nbsp().nbsp();
                 initialDataEntryLink(html, eventCrfBean == null ? new EventCRFBean() : eventCrfBean, studySubject, eventDefinitionCrf, getStudyEvent(),
-                        "Enter Data");
+                        reswords.getString("enter_data"));
                 html.tdEnd().trEnd(0);
             }
             html.tr(0).valign("top").close();
             html.td(0).styleClass(table_cell_left).close();
             viewSectionDataEntryParameterized(html, eventDefinitionCrf);
             html.nbsp().nbsp();
-            viewSectionDataEntryParameterized(html, eventDefinitionCrf, "View");
+            viewSectionDataEntryParameterized(html, eventDefinitionCrf, reswords.getString("view"));
             html.tdEnd().trEnd(0);
             html.tr(0).valign("top").close();
             html.td(0).styleClass(table_cell_left).close();
             printCrf(html, eventDefinitionCrf);
             html.nbsp().nbsp();
-            printCrf(html, eventDefinitionCrf, "Print");
+            printCrf(html, eventDefinitionCrf, reswords.getString("print"));
             html.tdEnd().trEnd(0);
         } else if (eventCrfStatus == DataEntryStage.INVALID) {
             html.tr(0).valign("top").close();
             html.td(0).styleClass(table_cell_left).close();
             viewSectionDataEntry(html, eventCrfBean, eventDefinitionCrf);
             html.nbsp().nbsp();
-            viewSectionDataEntry(html, eventCrfBean, "View", eventDefinitionCrf);
+            viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf);
             html.tdEnd().trEnd(0);
             html.tr(0).valign("top").close();
             html.td(0).styleClass(table_cell_left).close();
             printDataEntry(html, eventCrfBean);
             html.nbsp().nbsp();
-            printDataEntry(html, eventCrfBean, "Print");
+            printDataEntry(html, eventCrfBean, reswords.getString("print"));
             html.tdEnd().trEnd(0);
             if (studySubject.getStatus() != Status.DELETED && studySubject.getStatus() != Status.AUTO_DELETED
                 && (currentRole.isDirector() || currentUser.isSysAdmin())) {
@@ -262,7 +267,7 @@ public class EventCrfLayerBuilder {
                 html.td(0).styleClass(table_cell_left).close();
                 restoreEventCrf(html, eventCrfBean, studySubject);
                 html.nbsp().nbsp();
-                restoreEventCrf(html, eventCrfBean, studySubject, "Resore");
+                restoreEventCrf(html, eventCrfBean, studySubject, "Restore");
                 html.tdEnd().trEnd(0);
             }
         } else {
@@ -272,14 +277,14 @@ public class EventCrfLayerBuilder {
                     html.td(0).styleClass(table_cell_left).close();
                     doubleDataEntryLink(html, eventCrfBean);
                     html.nbsp().nbsp();
-                    doubleDataEntryLink(html, eventCrfBean, "Enter Data");
+                    doubleDataEntryLink(html, eventCrfBean, reswords.getString("enter_data"));
                     html.tdEnd().trEnd(0);
                 } else {
                     html.tr(0).valign("top").close();
                     html.td(0).styleClass(table_cell_left).close();
                     initialDataEntryParameterizedLink(html, eventCrfBean);
                     html.nbsp().nbsp();
-                    initialDataEntryParameterizedLink(html, eventCrfBean, "Enter Data");
+                    initialDataEntryParameterizedLink(html, eventCrfBean, reswords.getString("enter_data"));
                     html.tdEnd().trEnd(0);
                 }
             }
@@ -287,20 +292,20 @@ public class EventCrfLayerBuilder {
             html.td(0).styleClass(table_cell_left).close();
             viewSectionDataEntry(html, eventCrfBean, eventDefinitionCrf);
             html.nbsp().nbsp();
-            viewSectionDataEntry(html, eventCrfBean, "View", eventDefinitionCrf);
+            viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf);
             html.tdEnd().trEnd(0);
             html.tr(0).valign("top").close();
             html.td(0).styleClass(table_cell_left).close();
             printDataEntry(html, eventCrfBean);
             html.nbsp().nbsp();
-            printDataEntry(html, eventCrfBean, "Print");
+            printDataEntry(html, eventCrfBean, reswords.getString("print"));
             html.tdEnd().trEnd(0);
             if (currentStudy.getStatus() == Status.AVAILABLE && (currentRole.isDirector() || currentUser.isSysAdmin())) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 removeEventCrf(html, eventCrfBean, studySubject);
                 html.nbsp().nbsp();
-                removeEventCrf(html, eventCrfBean, studySubject, "Remove");
+                removeEventCrf(html, eventCrfBean, studySubject, reswords.getString("remove"));
                 html.tdEnd().trEnd(0);
             }
             if (currentStudy.getStatus() == Status.AVAILABLE && currentUser.isSysAdmin()) {
@@ -308,7 +313,7 @@ public class EventCrfLayerBuilder {
                 html.td(0).styleClass(table_cell_left).close();
                 deleteEventCrf(html, eventCrfBean, studySubject);
                 html.nbsp().nbsp();
-                deleteEventCrf(html, eventCrfBean, studySubject, "Delete");
+                deleteEventCrf(html, eventCrfBean, studySubject, reswords.getString("delete"));
                 html.tdEnd().trEnd(0);
             }
         }
@@ -478,7 +483,7 @@ public class EventCrfLayerBuilder {
             StudyEventBean studyEvent) {
         String href =
             "InitialDataEntry?eventDefinitionCRFId=" + eventDefinitionCrf.getId() + "&studyEventId=" + studyEvent.getId() + "&subjectId="
-                + studySubject.getSubjectId() + "&eventCRFId=" + eventCrf.getId() + "&crfVersionId=" + eventDefinitionCrf.getDefaultVersionId()+"&exitTo=ListStudySubjects";
+                + studySubject.getId() + "&eventCRFId=" + eventCrf.getId() + "&crfVersionId=" + eventCrf.getCRFVersionId()+"&exitTo=ListStudySubjects";
         builder.a().href(href).close();
         builder.img().src("images/bt_Edit.gif").border("0").align("left").close();
         builder.aEnd();
@@ -488,7 +493,7 @@ public class EventCrfLayerBuilder {
             StudyEventBean studyEvent, String link) {
         String href =
             "InitialDataEntry?eventDefinitionCRFId=" + eventDefinitionCrf.getId() + "&studyEventId=" + studyEvent.getId() + "&subjectId="
-                + studySubject.getSubjectId() + "&eventCRFId=" + eventCrf.getId() + "&crfVersionId=" + eventDefinitionCrf.getDefaultVersionId()+"&exitTo=ListStudySubjects";
+                + studySubject.getId() + "&eventCRFId=" + eventCrf.getId() + "&crfVersionId=" + eventCrf.getCRFVersionId()+"&exitTo=ListStudySubjects";
         builder.a().href(href).close();
         builder.append(link);
         builder.aEnd();
@@ -509,14 +514,14 @@ public class EventCrfLayerBuilder {
     }
 
     private void doubleDataEntryLink(HtmlBuilder builder, EventCRFBean eventCrf) {
-        String href = "DoubleDataEntry?eventCRFId=" + eventCrf.getId()+"&exitTo=ListStudySubjects";
+        String href = "DoubleDataEntry?eventCRFId= " + eventCrf.getId()+"&exitTo=ListStudySubjects";
         builder.a().href(href).close();
         builder.img().src("images/bt_Edit.gif").border("0").align("left").close();
         builder.aEnd();
     }
 
     private void doubleDataEntryLink(HtmlBuilder builder, EventCRFBean eventCrf, String link) {
-        String href = "DoubleDataEntry?eventCRFId=" + eventCrf.getId()+"&exitTo=ListStudySubjects";
+        String href = "DoubleDataEntry?eventCRFId= " + eventCrf.getId()+"&exitTo=ListStudySubjects";
         builder.a().href(href).close();
         builder.append(link);
         builder.aEnd();

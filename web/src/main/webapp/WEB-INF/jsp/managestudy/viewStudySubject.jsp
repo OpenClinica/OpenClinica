@@ -160,7 +160,7 @@
 </c:choose>
 
 <a href="javascript:leftnavExpand('studySubjectRecord');">
-    <img id="excl_studySubjectRecord" src="images/bt_Expand.gif" border="0"> Study Subject Record</a></div>
+	<img id="excl_studySubjectRecord" src="images/bt_Expand.gif" border="0"> <fmt:message key="study_subject_record" bundle="${resword}"/></a></div>
 <div id="studySubjectRecord" style="display: none">
 
 <table border="0" cellpadding="0" cellspacing="0">

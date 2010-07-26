@@ -78,31 +78,32 @@
 
 
 
-<script language="JavaScript">
-    function leftnavExpand(strLeftNavRowElementName){
-      var objLeftNavRowElement;
 
-      objLeftNavRowElement = MM_findObj(strLeftNavRowElementName);
-      if (objLeftNavRowElement != null) {
-        if (objLeftNavRowElement.style) { objLeftNavRowElement = objLeftNavRowElement.style; }
-          objLeftNavRowElement.display = (objLeftNavRowElement.display == "none" ) ? "" : "none";
-          objExCl = MM_findObj("excl_"+strLeftNavRowElementName);
-          if(objLeftNavRowElement.display == "none"){
-              objExCl.src = "images/bt_Expand.gif";
-          }else{
-              objExCl.src = "images/bt_Collapse.gif";
-          }
-        }
-      }
+<script language="JavaScript">
+       <!--
+         function leftnavExpand(strLeftNavRowElementName){
+
+	       var objLeftNavRowElement;
+
+           objLeftNavRowElement = MM_findObj(strLeftNavRowElementName);
+           if (objLeftNavRowElement != null) {
+             if (objLeftNavRowElement.style) { objLeftNavRowElement = objLeftNavRowElement.style; }
+	           objLeftNavRowElement.display = (objLeftNavRowElement.display == "none" ) ? "" : "none";
+	           objExCl = MM_findObj("excl_"+strLeftNavRowElementName);
+	           if(objLeftNavRowElement.display == "none"){
+    	          objExCl.src = "images/bt_Expand.gif";
+        	   }else{
+               	   objExCl.src = "images/bt_Collapse.gif";
+		       }
+	         }
+           }
+
+       //-->
  </script>
 
 <h1><span class="title_manage">
 <fmt:message key="update_study_details" bundle="${resword}"/> <c:out value="${studyToView.name}"/>
 </span></h1>
-
-
-
-
 <c:set var="startDate" value="" />
 <c:set var="endDate" value="" />
 <c:set var="protocolDateVerification" value="" />
@@ -125,7 +126,7 @@
 <form action="UpdateStudyNew" method="post">
 <input type=hidden name="action" value="submit">
 <input type=hidden name="studyId" value="<c:out value="${studyId}"/>">
-<a href="javascript:leftnavExpand('sectiona');">
+<a href="javascript:leftnavExpand('sectiona');>
     <img id="excl_sectiona" src="images/bt_Collapse.gif" border="0"> <span class="table_title_Admin">
     <fmt:message key="study_description_status" bundle="${resword}"/>  </span></a>
 <div id="sectiona" style="display: ">
@@ -188,7 +189,6 @@
             </c:forEach>
            </select></div>
           </td><td>*</td></tr>
-
           <tr valign="top"><td class="formlabel"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#SecondaryIds" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#SecondaryIds'); return false;"><b><fmt:message key="secondary_IDs" bundle="${resword}"/></b>:</a><br>(<fmt:message key="separate_by_commas" bundle="${resword}"/>)</td>
           <td> <div class="formtextareaXL4_BG">
            <textarea class="formtextareaXL4" name="secondProId" rows="4" cols="50"><c:out value="${studyToView.secondaryIdentifier}"/></textarea></div>
@@ -537,14 +537,13 @@
 <br>
 
 <div style="font-family: Tahoma, Arial, Helvetica, Sans-Serif;font-size:17px;">
-    You must expand each section and fill out the required fields.
-    <br>
-    If you do not fill out the required fields in each section,<br> your data will not be saved and you will have to edit the study again.
+    
+    <fmt:message key="expand_each_section" bundle="${restext}"/>
 </div>
     <br>
 
 <a href="javascript:leftnavExpand('sectionc');">
-    <img id="excl_sectionc" src="images/bt_Expand.gif" border="0"> <span class="table_title_Admin">
+	<img id="excl_sectionc" src="images/bt_Expand.gif" border="0"> <span class="table_title_Admin">
          <fmt:message key="conditions_and_eligibility" bundle="${resword}"/></span></a>
 <div id="sectionc" style="display:none ">
 <div style="width: 600px">
@@ -637,7 +636,7 @@
 <br>
 
 <a href="javascript:leftnavExpand('sectiond');">
-    <img id="excl_sectiond" src="images/bt_Expand.gif" border="0">
+	<img id="excl_sectiond" src="images/bt_Expand.gif" border="0">
     <span class="table_title_Admin">
         <fmt:message key="facility_information" bundle="${resword}"/></span></a>
 <div id="sectiond" style="display:none ">
@@ -716,7 +715,7 @@
 
 
  <a href="javascript:leftnavExpand('sectione');">
-     <img id="excl_sectione" src="images/bt_Expand.gif" border="0"> <span class="table_title_Admin">
+ 	<img id="excl_sectione" src="images/bt_Expand.gif" border="0"> <span class="table_title_Admin">
            <fmt:message key="related_infomation" bundle="${resword}"/></span></a>
 <div id="sectione" style="display:none ">
 <div style="width: 600px">
@@ -762,7 +761,7 @@
 </div>
 <br>
 <a href="javascript:leftnavExpand('sectionf');">
-    <img id="excl_sectionf" src="images/bt_Expand.gif" border="0"> <span class="table_title_Admin">
+	<img id="excl_sectionf" src="images/bt_Expand.gif" border="0"> <span class="table_title_Admin">
     <fmt:message key="study_parameter_configuration" bundle="${resword}"/></span></a>
 <div id="sectionf" style="display:none ">
 <div style="width: 600px">

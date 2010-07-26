@@ -95,8 +95,9 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 
         SDVUtil sdvUtil = new SDVUtil();
         String[] allTitles =
-            new String[] { "SDV Status", "Study Subject ID", " Site ID", "Person ID", "Study Subject Status", "Group", "# of CRFs Completed",
-                "# of CRFs SDV'd", "Total Event CRFs", "Actions" };
+        	new String[] { resword.getString("SDV_status"), resword.getString("study_subject_ID"), resword.getString("site_id"), resword.getString("person_ID"), resword.getString("study_subject_status"), resword.getString("group"), resword.getString("num_CRFs_completed"),
+        		resword.getString("num_CRFs_SDV"), resword.getString("total_events_CRF"), resword.getString("actions") };
+
         sdvUtil.setTitles(allTitles, (HtmlTable) tableFacade.getTable());
         sdvUtil.turnOffFilters(tableFacade, new String[] { "personId", "studySubjectStatus", "group", "numberCRFComplete", "numberOfCRFsSDV", "totalEventCRF",
             "actions" });

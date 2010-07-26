@@ -707,13 +707,17 @@ if(!window.RepetitionElement || (
                 }
               }
               if(selectOption){
-                if(attr.name.indexOf("SELECTED") != -1 || attr.name.indexOf("selected") != -1) {
-                  attributeVal=node.getAttribute(attr.name);
+//                if(attr.name.indexOf("SELECTED") != -1 || attr.name.indexOf("selected") != -1) {
+                //Checking if there is any 'selected' attribute in the current node's outerHTML. In IE8
+                //there does'nt seem to be any 'selected' attribue present.
+                if(node.outerHTML.indexOf("SELECTED") != -1 || node.outerHTML.indexOf("selected") != -1) {
+
+//                  attributeVal=node.getAttribute(attr.name);
                  // alert(attr.name+" "+attributeVal);
-                  if(attributeVal) { //will be true in IE
+//                  if(attributeVal) { //will be true in IE
                     //clone.setAttribute(attr.name,attributeVal);
                     clone.selected = true;
-                  }
+  //                }
                 }
               }
             }//end detect IEWindows

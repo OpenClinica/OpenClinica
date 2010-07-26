@@ -3,6 +3,7 @@ package org.akaza.openclinica.control.submit;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.control.DefaultToolbar;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.jmesa.view.html.toolbar.*;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.core.CoreContext;
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 public class ListNotesTableToolbar extends DefaultToolbar {
-
+    private ResourceBundle reswords = ResourceBundleProvider.getWordsBundle();
     private String module;
     private int resolutionStatus;
     private int discNoteType;
@@ -76,18 +77,18 @@ public class ListNotesTableToolbar extends DefaultToolbar {
         public String enabled() {
             HtmlBuilder html = new HtmlBuilder();
             if(showMoreLink){
-                html.a().id("showMore").href("javascript:hideCols('listNotes',[" + getIndexes() + "],true);").close();
-                html.div().close().nbsp().append("Show More").nbsp().divEnd().aEnd();
-                html.a().id("hide").style("display: none;").href("javascript:hideCols('listNotes',[" + getIndexes() + "],false);").close();
-                html.div().close().nbsp().append("Hide").nbsp().divEnd().aEnd();
+                           html.a().id("showMore").href("javascript:hideCols('listNotes',[" + getIndexes() + "],true);").close();
+            html.div().close().nbsp().append(reswords.getString("show_more")).nbsp().divEnd().aEnd();
+            html.a().id("hide").style("display: none;").href("javascript:hideCols('listNotes',[" + getIndexes() + "],false);").close();
+            html.div().close().nbsp().append(reswords.getString("hide")).nbsp().divEnd().aEnd();
 
                 html.script().type("text/javascript").close().append(
                         "$j = jQuery.noConflict(); $j(document).ready(function(){ " + "hideCols('listNotes',[" + getIndexes() + "],false);});").scriptEnd();
             }else{
                 html.a().id("showMore").style("display:none;").href("javascript:hideCols('listNotes',[" + getIndexes() + "],true);").close();
-                html.div().close().nbsp().append("Show More").nbsp().divEnd().aEnd();
+                html.div().close().nbsp().append(reswords.getString("show_more")).nbsp().divEnd().aEnd();
                 html.a().id("hide").href("javascript:hideCols('listNotes',[" + getIndexes() + "],false);").close();
-                html.div().close().nbsp().append("Hide").nbsp().divEnd().aEnd();
+                html.div().close().nbsp().append(reswords.getString("hide")).nbsp().divEnd().aEnd();
 
                 html.script().type("text/javascript").close().append(
                         "$j = jQuery.noConflict(); $j(document).ready(function(){ " + "hideCols('listNotes',[" + getIndexes() + "],true);});").scriptEnd();
@@ -122,7 +123,7 @@ public class ListNotesTableToolbar extends DefaultToolbar {
             html.a().href("ListDiscNotesSubjectServlet?module=submit").id("backToNotesMatrix");
             html.quote();
             html.quote().close();
-            html.nbsp().append("View as Matrix").nbsp().aEnd();
+            html.nbsp().append(reswords.getString("view_as_matrix")).nbsp().aEnd();
 
             return html.toString();
         }

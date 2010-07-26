@@ -99,12 +99,14 @@ public class ChangeStudyServlet extends SecureController {
         ArrayList validStudies = new ArrayList();
         for (int i = 0; i < studies.size(); i++) {
             StudyUserRoleBean sr = (StudyUserRoleBean) studies.get(i);
-            // StudyBean s = (StudyBean) sdao.findByPK(sr.getStudyId());
-            // if (s != null && s.getStatus().equals(Status.AVAILABLE)) {
+            StudyBean study = (StudyBean) sdao.findByPK(sr.getStudyId());
+            if (study != null && study.getStatus().equals(Status.PENDING)) {
+                sr.setStatus(study.getStatus());
+            }
             validStudies.add(sr);
-            // }
-
         }
+
+        
         if (StringUtil.isBlank(action)) {
             request.setAttribute("studies", validStudies);
 
@@ -143,9 +145,11 @@ public class ChangeStudyServlet extends SecureController {
                     request.setAttribute("currentStudy", currentStudy);
                     forwardPage(Page.CHANGE_STUDY_CONFIRM);
                     return;
+                    
                 }
             }
             addPageMessage(restext.getString("no_study_selected"));
+            
             forwardPage(Page.CHANGE_STUDY);
         }
     }

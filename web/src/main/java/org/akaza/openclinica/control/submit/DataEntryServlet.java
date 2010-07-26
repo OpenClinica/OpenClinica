@@ -3696,7 +3696,7 @@ public abstract class DataEntryServlet extends SecureController {
                 // required CRFs, and all
                 // CRFs have been finished?
                 addPageMessage(respage.getString("CRF_completed"));
-            } else {
+            } else if (!edcb.isDoubleEntry()){
                 logger.trace("just set subj event status to -- COMPLETED --");
                 seb.setSubjectEventStatus(SubjectEventStatus.COMPLETED);
             }

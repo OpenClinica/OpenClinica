@@ -13,6 +13,9 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -61,6 +64,13 @@ public class RuleActionBean extends AbstractAuditableMutableDomainObject {
         this.summary = summary;
     }
 
+    @Transient
+    public HashMap<String, Object> getPropertiesForDisplay() {
+        LinkedHashMap<String, Object> p = new LinkedHashMap<String, Object>();
+        p.put("rule_action_type", getActionType());
+        return p;
+    }
+
     @Type(type = "actionType")
     @Column(name = "action_type", updatable = false, insertable = false)
     public ActionType getActionType() {
@@ -99,4 +109,40 @@ public class RuleActionBean extends AbstractAuditableMutableDomainObject {
         this.ruleActionRun = ruleActionRun;
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((actionType == null) ? 0 : actionType.hashCode());
+        result = prime * result + ((expressionEvaluatesTo == null) ? 0 : expressionEvaluatesTo.hashCode());
+        result = prime * result + ((summary == null) ? 0 : summary.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        RuleActionBean other = (RuleActionBean) obj;
+        if (actionType == null) {
+            if (other.actionType != null)
+                return false;
+        } else if (!actionType.equals(other.actionType))
+            return false;
+        if (expressionEvaluatesTo == null) {
+            if (other.expressionEvaluatesTo != null)
+                return false;
+        } else if (!expressionEvaluatesTo.equals(other.expressionEvaluatesTo))
+            return false;
+        if (summary == null) {
+            if (other.summary != null)
+                return false;
+        } else if (!summary.equals(other.summary))
+            return false;
+        return true;
+    }
 }

@@ -24,6 +24,8 @@ import org.akaza.openclinica.dao.hibernate.RuleDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetAuditDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
+import org.akaza.openclinica.dao.hibernate.ViewRuleAssignmentFilter;
+import org.akaza.openclinica.dao.hibernate.ViewRuleAssignmentSort;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -44,6 +46,7 @@ import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
+import org.akaza.openclinica.domain.rule.RuleSetRuleBean.RuleSetRuleBeanImportStatus;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.logic.rulerunner.CrfBulkRuleRunner;
 import org.akaza.openclinica.logic.rulerunner.DataEntryRuleRunner;
@@ -171,7 +174,7 @@ public class RuleSetService implements RuleSetServiceInterface {
         for (RuleSetRuleBean ruleSetRule : ruleSetBean.getRuleSetRules()) {
             if (ruleSetRule.getId() == null) {
                 String ruleOid = ruleSetRule.getOid();
-                ruleSetRule.setRuleBean(ruleDao.findByOid(ruleOid));
+                ruleSetRule.setRuleBean(ruleDao.findByOid(ruleOid, ruleSetBean.getStudyId()));
             }
         }
     }
@@ -204,7 +207,7 @@ public class RuleSetService implements RuleSetServiceInterface {
         RuleSetBean detachedRuleSetBean = ruleSetBean;
 
         for (RuleSetRuleBean ruleSetRuleBean : detachedRuleSetBean.getRuleSetRules()) {
-            if (ruleSetRuleBean.getId() != null) {
+            if (ruleSetRuleBean.getId() != null && ruleSetRuleBean.getRuleSetRuleBeanImportStatus() == RuleSetRuleBeanImportStatus.TO_BE_REMOVED) {
                 ruleSetRuleBean.setStatus(org.akaza.openclinica.domain.Status.DELETED);
             }
         }
@@ -299,6 +302,25 @@ public class RuleSetService implements RuleSetServiceInterface {
         // return eagerFetchRuleSet(ruleSets);
     }
 
+    public int getCountWithFilter(ViewRuleAssignmentFilter viewRuleAssignmentFilter) {
+        int count = getRuleSetRuleDao().getCountWithFilter(viewRuleAssignmentFilter);
+        return count;
+
+    }
+
+    public List<RuleSetRuleBean> getWithFilterAndSort(ViewRuleAssignmentFilter viewRuleAssignmentFilter, ViewRuleAssignmentSort viewRuleAssignmentSort,
+            int rowStart, int rowEnd) {
+
+        //List<RuleSetBean> ruleSets = getRuleSetDao().getWithFilterAndSort(viewRuleAssignmentFilter, viewRuleAssignmentSort, rowStart, rowEnd);
+        List<RuleSetRuleBean> ruleSetRules = getRuleSetRuleDao().getWithFilterAndSort(viewRuleAssignmentFilter, viewRuleAssignmentSort, rowStart, rowEnd);
+        //for (RuleSetBean ruleSetBean : ruleSets) {
+        //    getObjects(ruleSetBean);
+        //}
+        //logger.info("getRuleSetsByStudy() : ruleSets Size : {}", ruleSets.size());
+        return ruleSetRules;
+
+    }
+
     /*
      * Used to Manage RuleSets ,Hence will return all RuleSets whether removed or not
      * 
@@ -352,7 +374,7 @@ public class RuleSetService implements RuleSetServiceInterface {
         return ruleSets;
     }
 
-    private RuleSetBean getObjects(RuleSetBean ruleSetBean) {
+    public RuleSetBean getObjects(RuleSetBean ruleSetBean) {
         ruleSetBean.setStudy((StudyBean) getStudyDao().findByPK(ruleSetBean.getStudyId()));
         if (ruleSetBean.getStudyEventDefinitionId() != null && ruleSetBean.getStudyEventDefinitionId() != 0) {
             ruleSetBean.setStudyEventDefinition((StudyEventDefinitionBean) getStudyEventDefinitionDao().findByPK(ruleSetBean.getStudyEventDefinitionId()));

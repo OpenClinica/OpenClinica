@@ -20,7 +20,7 @@ View
 
         <table border="0" cellpadding="4" cellspacing="0" width="100%">
             <tr>
-                <td><strong><u>Statuses</u></strong></td>
+                <td><strong><u><fmt:message key="statuses" bundle="${reswords}"/></u></strong></td>
             </tr>
             <tr>
                 <td>&nbsp;<img src="images/icon_NotStarted.gif"></td>
@@ -59,7 +59,7 @@ View
                 <td><fmt:message key="invalid" bundle="${reswords}"/></td>
             </tr>
             <tr>
-                <td><strong><u>Actions</u></strong></td>
+                <td><strong><u><fmt:message key="actions" bundle="${reswords}"/></u></strong></td>
             </tr>
             <tr>
                 <td>&nbsp;<img src="images/bt_View.gif"></td>

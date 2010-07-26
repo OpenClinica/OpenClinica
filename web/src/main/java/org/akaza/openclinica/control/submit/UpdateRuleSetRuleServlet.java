@@ -15,6 +15,7 @@ import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleAuditDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.domain.Status;
+import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleAuditBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
@@ -57,20 +58,49 @@ public class UpdateRuleSetRuleServlet extends SecureController {
     public void processRequest() throws Exception {
         String ruleSetId = request.getParameter(RULESET_ID);
         String ruleSetRuleId = request.getParameter(RULESETRULE_ID);
+        String source = request.getParameter("source");
         String action = request.getParameter(ACTION);
         Status status = null;
-        RuleSetRuleBean ruleSetRule = getRuleSetRuleDao().findById(Integer.valueOf(ruleSetRuleId));
-        if (ruleSetRuleId != null && action.equals("remove")) {
-            status = Status.DELETED;
-        } else if (ruleSetRuleId != null && action.equals("restore")) {
-            status = Status.AVAILABLE;
+        String pageMessage = "";
+        if (ruleSetRuleId != null) {
+            RuleSetRuleBean ruleSetRule = getRuleSetRuleDao().findById(Integer.valueOf(ruleSetRuleId));
+            if (ruleSetRuleId != null && action.equals("remove")) {
+                status = Status.DELETED;
+                updateRuleSetRule(ruleSetRule, status);
+                pageMessage = "view_rules_remove_confirmation";
+            } else if (ruleSetRuleId != null && action.equals("restore")) {
+                status = Status.AVAILABLE;
+                ruleSetRule.getRuleSetBean().setStatus(Status.AVAILABLE);
+                updateRuleSetRule(ruleSetRule, status);
+                pageMessage = "view_rules_restore_confirmation";
+            }
         }
+        if (ruleSetRuleId == null && ruleSetId != null && action.equals("remove")) {
+            RuleSetBean rs = getRuleSetDao().findById(Integer.valueOf(ruleSetId));
+            for (RuleSetRuleBean theRuleSetRule : rs.getRuleSetRules()) {
+                if (theRuleSetRule.getStatus() != Status.DELETED) {
+                    status = Status.DELETED;
+                    updateRuleSetRule(theRuleSetRule, status);
+                    pageMessage = "view_rules_remove_confirmation";
+                }
+            }
+        }
+
+        addPageMessage(resword.getString(pageMessage));
+        if (source != null && source.equals("ViewRuleSet")) {
+
+            context.getRequestDispatcher("/ViewRuleSet?ruleSetId=" + ruleSetId).forward(request, response);
+        } else {
+            forwardPage(Page.LIST_RULE_SETS_SERVLET);
+        }
+    }
+
+    private void updateRuleSetRule(RuleSetRuleBean ruleSetRule, Status status) {
         ruleSetRule.setStatus(status);
         ruleSetRule.setUpdater(ub);
         ruleSetRule = getRuleSetRuleDao().saveOrUpdate(ruleSetRule);
         createRuleSetRuleAuditBean(ruleSetRule, ub, status);
 
-        forwardPage(Page.LIST_RULE_SETS_SERVLET);
     }
 
     private void createRuleSetRuleAuditBean(RuleSetRuleBean ruleSetRuleBean, UserAccountBean ub, Status status) {
@@ -79,6 +109,11 @@ public class UpdateRuleSetRuleServlet extends SecureController {
         ruleSetRuleAuditBean.setUpdater(ub);
         ruleSetRuleAuditBean.setStatus(status);
         getRuleSetRuleAuditDao().saveOrUpdate(ruleSetRuleAuditBean);
+    }
+
+    private RuleSetDao getRuleSetDao() {
+        ruleSetDao = this.ruleSetDao != null ? ruleSetDao : (RuleSetDao) SpringServletAccess.getApplicationContext(context).getBean("ruleSetDao");
+        return ruleSetDao;
     }
 
     private RuleSetRuleDao getRuleSetRuleDao() {

@@ -110,6 +110,22 @@ public class CRFDAO extends AuditableEntityDAO {
         return findAllByLimit(false);
     }
 
+    public Integer getCountofActiveCRFs() {
+        setTypesExpected();
+
+        String sql = digester.getQuery("getCountofCRFs");
+
+        ArrayList rows = this.select(sql);
+        Iterator it = rows.iterator();
+
+        if (it.hasNext()) {
+            Integer count = (Integer) ((HashMap) it.next()).get("count");
+            return count;
+        } else {
+            return null;
+        }
+    }
+
     public Collection findAllByStudy(int studyId) {
         this.setTypesExpected();
         HashMap variables = new HashMap();

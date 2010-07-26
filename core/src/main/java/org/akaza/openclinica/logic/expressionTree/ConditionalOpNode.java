@@ -31,7 +31,7 @@ public class ConditionalOpNode extends ExpressionNode {
     String testCalculate() throws OpenClinicaSystemException {
         String l = String.valueOf(left.testValue());
         String r = String.valueOf(right.testValue());
-        validate(l, r);
+        validate(l, r, left.getNumber(), right.getNumber());
         return calc(l, r);
     }
 
@@ -51,7 +51,7 @@ public class ConditionalOpNode extends ExpressionNode {
         case AND:
             return String.valueOf(Boolean.valueOf(x) && Boolean.valueOf(y));
         default:
-            throw new OpenClinicaSystemException(left.value() + " and " + right.value() + " cannot be calculated with the " + op.toString() + " operator");
+            throw new OpenClinicaSystemException("OCRERR_0002", new Object[] { left.value(), right.value(), op.toString() });
         }
     }
 
@@ -60,7 +60,16 @@ public class ConditionalOpNode extends ExpressionNode {
             Boolean.valueOf(l);
             Boolean.valueOf(r);
         } catch (NumberFormatException e) {
-            throw new OpenClinicaSystemException(l + " and " + r + " cannot be used with the " + op.toString() + " operator");
+            throw new OpenClinicaSystemException("OCRERR_0001", new Object[] { l, r, op.toString() });
+        }
+    }
+
+    void validate(String l, String r, String ltext, String rtext) throws OpenClinicaSystemException {
+        try {
+            Boolean.valueOf(l);
+            Boolean.valueOf(r);
+        } catch (NumberFormatException e) {
+            throw new OpenClinicaSystemException("OCRERR_0001", new Object[] { ltext, rtext, op.toString() });
         }
     }
 

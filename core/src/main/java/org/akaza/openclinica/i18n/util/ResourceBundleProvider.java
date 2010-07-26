@@ -100,6 +100,10 @@ public class ResourceBundleProvider {
         return getResBundle("org.akaza.openclinica.i18n.notes", locale);
     }
 
+    public static ResourceBundle getTextsBundle() {
+        return getResBundle("org.akaza.openclinica.i18n.notes");
+    }
+
     public static ResourceBundle getWorkflowBundle(Locale locale) {
         return getResBundle("org.akaza.openclinica.i18n.workflow", locale);
     }

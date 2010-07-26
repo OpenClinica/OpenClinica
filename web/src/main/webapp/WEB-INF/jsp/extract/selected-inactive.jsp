@@ -271,7 +271,10 @@
     </c:otherwise>
    </c:choose>
    </td>
-   <td class="table_cell"><a href="javascript: openDocWindow('ViewItemDetail?itemName=<c:out value="${item.name}"/>')"><c:out value="${item.name}"/></a></td>
+   <td class="table_cell">
+       <a href="javascript: openDocWindow('ViewItemDetail?itemId=<c:out value='${item.id}'/>&itemName=<c:out value='${item.name}'/>')">
+           <c:out value="${item.name}"/></a>
+   </td>
    <td class="table_cell"><c:out value="${item.description}"/>&nbsp;</td>
    <td class="table_cell">
     <input type="hidden" name="itemDefName<c:out value="${count}"/>" value="<c:out value="${item.defName}"/>">

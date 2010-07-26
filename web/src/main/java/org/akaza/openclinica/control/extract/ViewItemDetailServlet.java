@@ -16,7 +16,11 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.submit.*;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.dao.submit.ItemDAO;
+import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
+import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
+import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -34,6 +38,7 @@ public class ViewItemDetailServlet extends SecureController {
     // < ResourceBundle respage;
 
     public static String ITEM_ID = "itemId";
+    public static String ITEM_OID = "itemOid";
     public static String ITEM_BEAN = "item";
     public static String VERSION_ITEMS = "versionItems";
 
@@ -55,6 +60,7 @@ public class ViewItemDetailServlet extends SecureController {
     public void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
         int itemId = fp.getInt(ITEM_ID);
+        String itemOid = fp.getString(ITEM_OID);
         ItemDAO idao = new ItemDAO(sm.getDataSource());
         ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(sm.getDataSource());
         ItemGroupMetadataDAO igmdao = new ItemGroupMetadataDAO(sm.getDataSource());
@@ -62,12 +68,12 @@ public class ViewItemDetailServlet extends SecureController {
         CRFDAO cdao = new CRFDAO(sm.getDataSource());
         SectionDAO sectionDao = new SectionDAO(sm.getDataSource());
 
-        if (itemId == 0) {
+        if (itemId == 0 && itemOid == null) {
             addPageMessage(respage.getString("please_choose_an_item_first"));
             forwardPage(Page.ITEM_DETAIL);
             return;
         }
-        ItemBean item = (ItemBean) idao.findByPK(itemId);
+        ItemBean item = itemId > 0 ? (ItemBean) idao.findByPK(itemId) : (ItemBean) idao.findByOid(itemOid).get(0);
         ArrayList versions = idao.findAllVersionsByItemId(item.getId());
         ArrayList versionItems = new ArrayList();
         CRFBean crf = null;

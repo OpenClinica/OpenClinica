@@ -1,10 +1,12 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %> 
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
+
 
 <c:choose>
 <c:when test="${userBean.sysAdmin && module=='admin'}">
@@ -15,6 +17,14 @@
 </c:otherwise>
 </c:choose>
 
+<script type="text/javascript">
+   function proceed(){
+            var confirm1 = confirm('<fmt:message key="rule_verify_import_rule_message" bundle="${resword}"/>');
+            if(confirm1){
+                document.forms["verifyImportedRule"].submit();
+            }
+        }
+</script>
 
 <!-- move the alert message to the sidebar-->
 <jsp:include page="../include/sideAlert.jsp"/>
@@ -63,16 +73,70 @@
     </c:otherwise>
 </c:choose>
 
-<fmt:message key="import_rule_data" bundle="${resworkflow}"/></h1>
-<p><fmt:message key="import_rule_instructions" bundle="${restext}"/></p>
+<fmt:message key="import_rule_data" bundle="${resworkflow}"/>
+<a href="javascript:openDocWindow('help/5_5_rules_Help.html')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${restext}"/>" title="<fmt:message key="help" bundle="${restext}"/>"></a>
+</h1>
+<p><fmt:message key="verify_import_rule_instructions" bundle="${restext}"/></p>
 
-<form action="VerifyImportedRule?action=save" method="POST">
-
-
+<form action="VerifyImportedRule?action=save" name="verifyImportedRule" method="POST">
 <input type="hidden" name="crfId" value="<c:out value="${version.crfId}"/>">
+<p>
+<c:choose>
+<c:when test="${fn:length(importedData.inValidRuleDefs) > 0 || fn:length(importedData.inValidRuleSetDefs) > 0 }"></c:when>
+<c:otherwise>
+    <input type="button" onClick="proceed()" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_long"> 
+</c:otherwise>
+</c:choose>
+<input type="button" onclick="goBack()"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
 
-<fmt:message key="rule_verify_import_valid_rules" bundle="${resword}"/>
+</p>
 
+<div style="width: 500px">
+
+<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+<div class="textbox_center">
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+
+    <tr valign="top">
+        <td class="table_header_row" colspan="2"><fmt:message key="summary_statistics" bundle="${resword}"/>:</td>
+    </tr>
+    <tr valign="top">
+        <td class="table_cell_left"><fmt:message key="rule_verify_import_valid_rules_num" bundle="${resword}"/> <c:out value="${fn:length(importedData.validRuleDefs)}" /></td>
+        <td class="table_cell_left"><fmt:message key="rule_verify_import_valid_rule_assign_num" bundle="${resword}"/> <c:out value="${fn:length(importedData.validRuleSetDefs)}" /></td>
+    </tr>
+    <tr valign="top">
+        <td class="table_cell_left"><fmt:message key="rule_verify_import_dup_valid_rules_num" bundle="${resword}"/><c:out value="${fn:length(importedData.duplicateRuleDefs)}" /></td>
+        <td class="table_cell_left"><fmt:message key="rule_verify_import_dup_valid_rule_assign_num" bundle="${resword}"/> <c:out value="${fn:length(importedData.duplicateRuleSetDefs)}" /></td>
+    </tr>
+    <tr valign="top">
+        <td class="table_cell_left">
+            <fmt:message key="rule_verify_import_invalid_rules_num" bundle="${resword}"/>
+            <c:set var="inValidRuleDefs" value="${fn:length(importedData.inValidRuleDefs)}"/>
+            <c:if test="${inValidRuleDefs > 0 }">
+                <b><span style="color:red"><c:out value="${inValidRuleDefs}" /></span></b>
+            </c:if>
+            <c:if test="${inValidRuleDefs == 0 }">
+                <c:out value="${inValidRuleDefs}" />
+            </c:if>
+        </td>
+        <td class="table_cell_left"><fmt:message key="rule_verify_import_invalid_rule_assign_num" bundle="${resword}"/>
+            <c:set var="inValidRuleSetDefs" value="${fn:length(importedData.inValidRuleSetDefs)}"/>
+            <c:if test="${inValidRuleSetDefs > 0 }">
+                <b><span style="color:red"><c:out value="${inValidRuleSetDefs}" /></span></b>
+            </c:if>
+            <c:if test="${inValidRuleSetDefs == 0 }">
+                <c:out value="${inValidRuleSetDefs}" />
+            </c:if>
+        </td>
+    </tr>
+</table>
+</div>
+</div></div></div></div></div></div></div></div>
+</div>
+<br/>
+
+
+<h3><fmt:message key="rule_verify_import_valid_rules" bundle="${resword}"/></h3>
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 <div class="tablebox_center">
 <table border="0" cellpadding="0" cellspacing="0">
@@ -109,8 +173,8 @@
 </div>
 </div></div></div></div></div></div></div></div></div>
 <br clear="all">
-<fmt:message key="rule_verify_import_duplicate_rules" bundle="${resword}"/>
-
+<h3 style="margin-bottom: 0px;"><fmt:message key="rule_verify_import_duplicate_rules" bundle="${resword}"/></h3>
+<div style="margin-bottom: 14px;"><fmt:message key="rule_verify_import_duplicate_rules2" bundle="${resword}"/></div>
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 <div class="tablebox_center">
 
@@ -149,7 +213,7 @@
 </div></div></div></div></div></div></div></div></div>
 
 <br clear="all">
-<fmt:message key="rule_verify_import_invalid_rules" bundle="${resword}"/>
+<h3><fmt:message key="rule_verify_import_invalid_rules" bundle="${resword}"/></h3>
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 <div class="tablebox_center">
 <table border="0" cellpadding="0" cellspacing="0">
@@ -175,7 +239,7 @@
         </td>
         <td class="table_cell_left">
             <c:forEach var="error" items="${ruleBeanWrapper.importErrors}" >
-            <c:out value="${error}" />
+            <span style="color:red"><b><c:out value="${error}" /></b></span>
             </c:forEach>
         </td>
 </tr>
@@ -186,7 +250,7 @@
 </div></div></div></div></div></div></div></div></div>
 <br clear="all"/>
 
-<fmt:message key="rule_verify_import_valid_rule_assignments" bundle="${resword}"/>
+<h3><fmt:message key="rule_verify_import_valid_rule_assignments" bundle="${resword}"/></h3>
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 <div class="tablebox_center">
 <table border="0" cellpadding="0" cellspacing="0">
@@ -211,24 +275,53 @@
             <table border="0" cellpadding="0" cellspacing="0">
             <tr valign="top">
                 <td class="table_header_row"><fmt:message key="rule_verify_import_rule_oid" bundle="${resword}"/></td>
-                <td class="table_header_row"><fmt:message key="rule_verify_import_action_type" bundle="${resword}"/></td>
+                <!-- <td class="table_header_row"><fmt:message key="rule_verify_import_action_type" bundle="${resword}"/></td> -->
                 <td class="table_header_row"><fmt:message key="rule_verify_import_action_message" bundle="${resword}"/></td>
             </tr>
             <c:forEach var="ruleSetRule" items="${ruleBeanWrapper.auditableBean.ruleSetRules}" >
-                
+            <tr valign="top">
+
+                <c:if test="${ruleSetRule.status.code != 5 }">
                 <c:forEach var="action" items="${ruleSetRule.actions}" >
-                <tr valign="top">
+                <tr>
                 <td class="table_cell_left">
-                    <c:out value="${ruleSetRule.oid}" />
+                    <c:choose>
+                        <c:when test="${ruleSetRule.ruleBean.oid != '' && ruleSetRule.ruleBean.oid != null}">
+                            <c:out value="${ruleSetRule.ruleBean.oid}" />
+                        </c:when>
+                        <c:otherwise>
+                            <c:out value="${ruleSetRule.originalOid}" />
+                        </c:otherwise>
+                    </c:choose>
                 </td>
+                <td class="table_cell_left">
+                    <table>
+                    <c:forEach items="${action.propertiesForDisplay}" var="mapEntry" varStatus="status">
+                            <tr valign="top">
+                                <td class="formlabel"><i><fmt:message key="${mapEntry.key}" bundle="${resword}" /></i></td>
+                                <td class="formValue">${mapEntry.value}</td>
+                            </tr>
+                    </c:forEach>
+                    </table>
+                </td>
+                <!-- 
                 <td class="table_cell_left">
                         <c:out value="${action.actionType}" />
                 </td>
                 <td class="table_cell_left">
                         <c:out value="${action.summary}" />
                 </td>
+                 -->
+                <td class="table_cell_left">
+                        <c:if test="${ruleSetRule.status.code == 5 }"><b><fmt:message key="rule_verify_import_info1" bundle="${resword}"/></b></c:if>
+                        <c:if test="${ruleSetRule.id ==  null }"><b><fmt:message key="rule_verify_import_info3" bundle="${resword}"/></b></c:if>
+                        <c:if test="${ruleSetRule.ruleSetRuleBeanImportStatus == 'TO_BE_REMOVED'}"><b><fmt:message key="rule_verify_import_info2" bundle="${resword}"/></b></c:if>
+                        <c:if test="${ruleSetRule.ruleSetRuleBeanImportStatus == 'EXACT_DOUBLE' }"><b><fmt:message key="rule_verify_import_info4" bundle="${resword}"/></b></c:if>
+                </td>
                 </tr>
-                </c:forEach>
+				</c:forEach>
+                </c:if>
+            </tr>
             </c:forEach>
             </table>
             </div>
@@ -243,7 +336,8 @@
 
 
 <br clear="all">
-<fmt:message key="rule_verify_import_duplicate_rule_assignments" bundle="${resword}"/>
+<h3 style="margin-bottom: 0px;"><fmt:message key="rule_verify_import_duplicate_rule_assignments" bundle="${resword}"/></h3>
+<div style="margin-bottom: 14px;"><fmt:message key="rule_verify_import_duplicate_rule_assignments2" bundle="${resword}"/></div>
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 <div class="tablebox_center">
 <table border="0" cellpadding="0" cellspacing="0">
@@ -268,23 +362,55 @@
             <table border="0" cellpadding="0" cellspacing="0">
             <tr valign="top">
                 <td class="table_header_row"><fmt:message key="rule_verify_import_rule_oid" bundle="${resword}"/></td>
-                <td class="table_header_row"><fmt:message key="rule_verify_import_action_type" bundle="${resword}"/></td>
+                <!--<td class="table_header_row"><fmt:message key="rule_verify_import_action_type" bundle="${resword}"/></td> -->
                 <td class="table_header_row"><fmt:message key="rule_verify_import_action_message" bundle="${resword}"/></td>
+                <td class="table_header_row"><fmt:message key="rule_verify_import_info" bundle="${resword}"/></td>
             </tr>
             <c:forEach var="ruleSetRule" items="${ruleBeanWrapper.auditableBean.ruleSetRules}" >
-
             <tr valign="top">
-                <td class="table_cell_left">
-                    <c:out value="${ruleSetRule.oid}" />
-                </td>
+                
+                <c:if test="${ruleSetRule.status.code != 5 && ruleSetRule.ruleSetRuleBeanImportStatus != null }">
                 <c:forEach var="action" items="${ruleSetRule.actions}" >
+                <tr>
+                <td class="table_cell_left">
+                    ${ruleSetRule.ruleBean.oid}
+                    <c:choose>
+                        <c:when test="${ruleSetRule.ruleBean.oid != '' && ruleSetRule.ruleBean.oid != null }">
+                            <c:out value="${ruleSetRule.ruleBean.oid}" />
+                        </c:when>
+                        <c:otherwise>
+                            <c:out value="${ruleSetRule.originalOid}" />
+                        </c:otherwise>
+                    </c:choose>
+                </td>
+                <td class="table_cell_left">
+                    <table>
+                    <c:forEach items="${action.ForDisplay}" var="mapEntry" varStatus="status">
+                            <tr valign="top">
+                                <td class="formlabel"><i><fmt:message key="${mapEntry.key}" bundle="${resword}" /></i></td>
+                                <td class="formValue">${mapEntry.value}</td>
+                            </tr>
+                    </c:forEach>
+                    </table>
+                </td>
+                <!--
                 <td class="table_cell_left">
                         <c:out value="${action.actionType}" />
                 </td>
                 <td class="table_cell_left">
                         <c:out value="${action.summary}" />
                 </td>
+                -->
+                <td class="table_cell_left">
+                        <c:if test="${ruleSetRule.status.code == 5 }"><b><fmt:message key="rule_verify_import_info1" bundle="${resword}"/></b></c:if>
+                        <c:if test="${ruleSetRule.status.code == 1 && ruleSetRule.ruleSetRuleBeanImportStatus == null }"><b><fmt:message key="rule_verify_import_info5" bundle="${resword}"/></b></c:if>
+                        <c:if test="${ruleSetRule.id ==  null }"><b><fmt:message key="rule_verify_import_info3" bundle="${resword}"/></b></c:if>
+                        <c:if test="${ruleSetRule.ruleSetRuleBeanImportStatus == 'TO_BE_REMOVED'}"><b><fmt:message key="rule_verify_import_info2" bundle="${resword}"/></b></c:if>
+                        <c:if test="${ruleSetRule.ruleSetRuleBeanImportStatus == 'EXACT_DOUBLE' }"><b><fmt:message key="rule_verify_import_info4" bundle="${resword}"/></b></c:if>
+                </td>
+                </tr>
                 </c:forEach>
+                </c:if>
             </tr>
             </c:forEach>
             </table>
@@ -299,7 +425,7 @@
 </div></div></div></div></div></div></div></div></div>
 
 <br clear="all">
-<fmt:message key="rule_verify_import_invalid_rule_assignments" bundle="${resword}"/>
+<h3><fmt:message key="rule_verify_import_invalid_rule_assignments" bundle="${resword}"/></h3>
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 <div class="tablebox_center">
 <table border="0" cellpadding="0" cellspacing="0">
@@ -323,25 +449,56 @@
             <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
             <div class="tablebox_center">
             <table border="0" cellpadding="0" cellspacing="0">
-            <tr valign="top">
+             <tr valign="top">
                 <td class="table_header_row"><fmt:message key="rule_verify_import_rule_oid" bundle="${resword}"/></td>
-                <td class="table_header_row"><fmt:message key="rule_verify_import_action_type" bundle="${resword}"/></td>
+                <!--<td class="table_header_row"><fmt:message key="rule_verify_import_action_type" bundle="${resword}"/></td> -->
                 <td class="table_header_row"><fmt:message key="rule_verify_import_action_message" bundle="${resword}"/></td>
+                <td class="table_header_row"><fmt:message key="rule_verify_import_info" bundle="${resword}"/></td>
             </tr>
             <c:forEach var="ruleSetRule" items="${ruleBeanWrapper.auditableBean.ruleSetRules}" >
-
             <tr valign="top">
-                <td class="table_cell_left">
-                    <c:out value="${ruleSetRule.oid}" />
-                </td>
+                
+                <c:if test="${ruleSetRule.status.code != 5 && ruleSetRule.ruleSetRuleBeanImportStatus != null }">
                 <c:forEach var="action" items="${ruleSetRule.actions}" >
+                <tr>
+                <td class="table_cell_left">
+                    <c:choose>
+                        <c:when test="${ruleSetRule.ruleBean.oid != '' && ruleSetRule.ruleBean.oid != null}">
+                            <c:out value="${ruleSetRule.ruleBean.oid}" />
+                        </c:when>
+                        <c:otherwise>
+                            <c:out value="${ruleSetRule.originalOid}" />
+                        </c:otherwise>
+                    </c:choose>
+                </td>
+                <td class="table_cell_left">
+                    <table>
+                    <c:forEach items="${action.propertiesForDisplay}" var="mapEntry" varStatus="status">
+                            <tr valign="top">
+                                <td class="formlabel"><i><fmt:message key="${mapEntry.key}" bundle="${resword}" /></i></td>
+                                <td class="formValue">${mapEntry.value}</td>
+                            </tr>
+                    </c:forEach>
+                    </table>
+                </td>
+                <!--
                 <td class="table_cell_left">
                         <c:out value="${action.actionType}" />
                 </td>
                 <td class="table_cell_left">
                         <c:out value="${action.summary}" />
                 </td>
+                -->
+                <td class="table_cell_left">
+                        <c:if test="${ruleSetRule.status.code == 5 }"><b><fmt:message key="rule_verify_import_info1" bundle="${resword}"/></b></c:if>
+                        <c:if test="${ruleSetRule.status.code == 1 && ruleSetRule.ruleSetRuleBeanImportStatus == null }"><b><fmt:message key="rule_verify_import_info5" bundle="${resword}"/></b></c:if>
+                        <c:if test="${ruleSetRule.id ==  null }"><b><fmt:message key="rule_verify_import_info3" bundle="${resword}"/></b></c:if>
+                        <c:if test="${ruleSetRule.ruleSetRuleBeanImportStatus == 'TO_BE_REMOVED'}"><b><fmt:message key="rule_verify_import_info2" bundle="${resword}"/></b></c:if>
+                        <c:if test="${ruleSetRule.ruleSetRuleBeanImportStatus == 'EXACT_DOUBLE' }"><b><fmt:message key="rule_verify_import_info4" bundle="${resword}"/></b></c:if>
+                </td>
+                </tr>
                 </c:forEach>
+                </c:if>
             </tr>
             </c:forEach>
             </table>
@@ -351,7 +508,7 @@
         </td>
         <td class="table_cell_left">
             <c:forEach var="error" items="${ruleBeanWrapper.importErrors}" >
-            <c:out value="${error}" />
+                <span style="color:red"><b><c:out value="${error}" /></b></span>
             </c:forEach>
         </td>
     </tr>
@@ -361,7 +518,12 @@
 </div></div></div></div></div></div></div></div></div>
 
 <br clear="all">
-<input type="submit" value="Continue" class="button_long">
+<c:choose>
+<c:when test="${fn:length(importedData.inValidRuleDefs) > 0 || fn:length(importedData.inValidRuleSetDefs) > 0 }"></c:when>
+<c:otherwise>
+    <input type="button" onClick="proceed()" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_long"> 
+</c:otherwise>
+</c:choose>
 <input type="button" onclick="goBack()"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
 
 </form>

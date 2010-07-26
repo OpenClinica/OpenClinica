@@ -69,7 +69,7 @@
 
 </div></div></div></div></div></div></div></div>
 </div>
-<p><fmt:message key="download.data.to.discrepancy.notes" bundle="${restext}"/><a href="ListDiscNotesSubjectServlet">&nbsp;here</a> </p>
+<p><fmt:message key="download.data.to.discrepancy.notes" bundle="${restext}"/><a href="ListDiscNotesSubjectServlet">&nbsp;<fmt:message key="here" bundle="${resword}"/></a> </p>
 <p><fmt:message key="export_dataset_download1" bundle="${restext}"/></p>
 
 <input type="hidden" name="datasetId" value="<c:out value="${dataset.id}"/>"/>

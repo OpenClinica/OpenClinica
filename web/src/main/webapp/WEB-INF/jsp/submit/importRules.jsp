@@ -6,6 +6,8 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="respage"/>
 
 <c:choose>
 <c:when test="${userBean.sysAdmin && module=='admin'}">
@@ -63,7 +65,9 @@
 	</c:otherwise>
 </c:choose>
 
-<fmt:message key="import_rule_data" bundle="${resworkflow}"/></h1>
+<fmt:message key="import_rule_data" bundle="${resworkflow}"/> ${study.name}
+<a href="javascript:openDocWindow('help/5_5_rules_Help.html')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${restext}"/>" title="<fmt:message key="help" bundle="${restext}"/>"></a>
+</h1>
 <p><fmt:message key="import_rule_instructions" bundle="${restext}"/></p>
 
 
@@ -89,11 +93,43 @@
 </div>
 </div></div></div></div></div></div></div></div>
 </div>
+<p>
+<fmt:message key="rules_Import_info" bundle="${respage}"/>
+</p>
+
+<span class="table_title_Admin"><fmt:message key="rule_import_getting_started" bundle="${resterm}"/></span>
+<div>&nbsp;</div>
+<div class="homebox_bullets"><a href="javascript:openDocWindow('help/5_5_rules_Help.html')"><fmt:message key="rule_import_rules_documentation" bundle="${resterm}"/></a></div><br/>
+
+<span class="table_title_Admin"><fmt:message key="rule_import_example_rules" bundle="${resterm}"/></span>
+<div>&nbsp;</div>
+<div class="homebox_bullets"><a href="ImportRule?action=downloadrulesxsd"><fmt:message key="rule_import_cross_field_email" bundle="${resterm}"/></a></div><br/>
+<div class="homebox_bullets"><a href="ImportRule?action=downloadrulesxsd"><fmt:message key="rule_import_cross_field_dn" bundle="${resterm}"/></a></div><br/>
+
+<span class="table_title_Admin"><fmt:message key="rule_import_templates" bundle="${resterm}"/></span>
+<div>&nbsp;</div>
+<div class="homebox_bullets"><a href="ImportRule?action=downloadrulesxsd"><fmt:message key="rule_import_all_actions_with_notes" bundle="${resterm}"/></a></div><br/>
+<div class="homebox_bullets"><a href="ImportRule?action=downloadrulesxsd"><fmt:message key="rule_import_all_actions_without_notes" bundle="${resterm}"/></a></div><br/>
+
+<span class="table_title_Admin"><fmt:message key="rule_import_resources" bundle="${resterm}"/></span>
+<div>&nbsp;</div>
+<div class="homebox_bullets"><a href="ImportRule?action=downloadrulesxsd"><fmt:message key="rule_import_download_rules_xsd" bundle="${resterm}"/></a></div><br/>
 
 <br clear="all">
-<input type="submit" value="Continue" class="button_long">
+<input type="submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_long">
 <input type="button" onclick="goBack()"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
 </form>
 
-
+<c:choose>
+    <c:when test="${userBean.sysAdmin && module=='admin'}">
+        <c:import url="../include/workflow.jsp">
+            <c:param name="module" value="admin" />
+        </c:import>
+    </c:when>
+    <c:otherwise>
+        <c:import url="../include/workflow.jsp">
+            <c:param name="module" value="manage" />
+        </c:import>
+    </c:otherwise>
+</c:choose>
 <jsp:include page="../include/footer.jsp"/>

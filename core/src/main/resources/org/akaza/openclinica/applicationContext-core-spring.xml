@@ -17,11 +17,32 @@
      />
      
      <util:properties id="dataInfo" location="classpath:datainfo.properties"/>
+     <util:properties id="oracle" location="classpath:oracle.properties"/>
      <util:properties id="enterpriseInfo" location="classpath:enterprise.properties"/>
      
      <bean id="coreResources" class="org.akaza.openclinica.dao.core.CoreResources">
         <property name="dataInfo" ref="dataInfo"/>
      </bean>
+     
+     <!-- ENABLING THIS WILL ACTIVATE I18N VIA SPRING  
+     <bean id="messageSource"
+        class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="basenames">
+            <list>
+                <value>org.akaza.openclinica.i18n.admin</value>
+                <value>org.akaza.openclinica.i18n.audit_events</value>
+                <value>org.akaza.openclinica.i18n.exceptions</value>
+                <value>org.akaza.openclinica.i18n.format</value>
+                <value>org.akaza.openclinica.i18n.notes</value>
+                <value>org.akaza.openclinica.i18n.page_messages</value>
+                <value>org.akaza.openclinica.i18n.terms</value>
+                <value>org.akaza.openclinica.i18n.words</value>
+                <value>org.akaza.openclinica.i18n.workflow</value>
+            </list>
+        </property>
+    </bean>
+     -->
+     
      
      
 </beans>

@@ -12,11 +12,11 @@
 <c:choose>
     <c:when test="${module eq 'manage'}">
         <jsp:include page="../include/managestudy-header.jsp"/>
-		<c:set var="moduleStr" value="manage"/>
+        <c:set var="moduleStr" value="manage"/>
     </c:when>
     <c:otherwise>
     	<jsp:include page="../include/submit-header.jsp"/>
-		<c:set var="moduleStr" value="submit"/>
+    	<c:set var="moduleStr" value="submit"/>
     </c:otherwise>
 </c:choose>
 
@@ -53,7 +53,9 @@
 
         <div class="sidebar_tab_content">
 
-            <fmt:message key="select_subject_view_more_details" bundle="${restext}"/>
+            <fmt:message key="select_subject_view_more_details_" bundle="${restext}"/>
+            <br><br>
+            <fmt:message key="click_download_disc" bundle="${restext}"/>
 
         </div>
 
@@ -106,7 +108,7 @@ applied on resolution status or type--%>
 <div class="dnKey"><strong><fmt:message key="Filter_by_status" bundle="${resword}"/>
     :</strong>
 
-    <a href="ListDiscNotesSubjectServlet?module=${moduleStr}&type=${param.type}" <c:if test="${param.type == 50}">style="color:green"</c:if>>All Notes</a>&nbsp;
+    <a href="ListDiscNotesSubjectServlet?module=${moduleStr}&type=${param.type}" <c:if test="${param.type == 50}">style="color:green"</c:if>><fmt:message key="all_notes" bundle="${resterm}"/></a>&nbsp;
 
     <a href="ListDiscNotesSubjectServlet?module=${moduleStr}&resolutionStatus=1&type=${param.type}"><img
       name="icon_Note" src="images/icon_Note.gif" border="0"
@@ -158,7 +160,7 @@ applied on resolution status or type--%>
 </div>
 <div><a id="sumBoxParent" href="javascript:void(0)" onclick="showSummaryBox('sumBox',document.getElementById('sumBoxParent'),'<fmt:message key="show_summary_statistics" bundle="${resword}"/>','<fmt:message key="hide_summary_statistics" bundle="${resword}"/>')"> <img name="ExpandGroup1" src="images/bt_Expand.gif" border="0"><fmt:message key="show_summary_statistics" bundle="${resword}"/></a> </div>
 <div id="sumBox" class="summaryBox" style="display:none;">
-    <h3>Summary statistics</h3>
+    <h3><fmt:message key="summary_statistics" bundle="${resword}"/></h3>
     <c:if test="${empty summaryMap}"><fmt:message key="There_are_no_discrepancy_notes" bundle="${resword}"/></c:if>
     <c:forEach var="mapkey"  varStatus="status" items="${mapKeys}">
         <c:if test="${summaryMap[mapkey]['Total'] > 0}">

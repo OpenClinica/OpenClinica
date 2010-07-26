@@ -58,6 +58,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.TreeSet;
 
 public class ScoreCalculator {
@@ -456,7 +457,7 @@ public class ScoreCalculator {
         String widthDecimal = ifm.getWidthDecimal();
         int width = parseWidth(widthDecimal);
         int decimal = parseDecimal(widthDecimal);
-        NumberFormat nf = NumberFormat.getInstance();
+        NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
         if (idt.equals(ItemDataType.INTEGER)) {
             try {
                 Double d = nf.parse(value).doubleValue();

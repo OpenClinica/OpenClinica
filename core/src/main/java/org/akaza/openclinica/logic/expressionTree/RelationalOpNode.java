@@ -32,7 +32,7 @@ public class RelationalOpNode extends ExpressionNode {
         double x, y;
         String l = String.valueOf(left.testValue());
         String r = String.valueOf(right.testValue());
-        validate(l, r);
+        validate(l, r, left.getNumber(), right.getNumber());
         if (ExpressionTreeHelper.isDateyyyyMMdd(l) && ExpressionTreeHelper.isDateyyyyMMdd(r)) {
             x = ExpressionTreeHelper.getDate(l).getTime();
             y = ExpressionTreeHelper.getDate(r).getTime();
@@ -86,7 +86,15 @@ public class RelationalOpNode extends ExpressionNode {
 
     void validate(String l, String r) throws OpenClinicaSystemException {
         if (!(ExpressionTreeHelper.isDateyyyyMMdd(l) && ExpressionTreeHelper.isDateyyyyMMdd(r)) && !isDouble(l, r)) {
-            throw new OpenClinicaSystemException(l + " and " + r + " cannot be used with the " + op.toString() + " operator");
+            //throw new OpenClinicaSystemException(l + " and " + r + " cannot be used with the " + op.toString() + " operator");
+            throw new OpenClinicaSystemException("OCRERR_0001", new Object[] { l, r, op.toString() });
+        }
+    }
+
+    void validate(String l, String r, String ltext, String rtext) throws OpenClinicaSystemException {
+        if (!(ExpressionTreeHelper.isDateyyyyMMdd(l) && ExpressionTreeHelper.isDateyyyyMMdd(r)) && !isDouble(l, r)) {
+            //throw new OpenClinicaSystemException(l + " and " + r + " cannot be used with the " + op.toString() + " operator");
+            throw new OpenClinicaSystemException("OCRERR_0001", new Object[] { ltext, rtext, op.toString() });
         }
     }
 

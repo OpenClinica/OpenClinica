@@ -342,6 +342,13 @@ H3 { font-family: Tahoma, Arial, Helvetica, sans-serif;
     color: #789EC5;
 }
 
+h4 { font-family: Tahoma, Arial, Helvetica, sans-serif;
+    font-size: 18px;
+    line-height: 24px;
+    font-weight: bold;
+    color: #E46E16;
+}
+
 
 p { font-family: Tahoma, Arial, Helvetica, Sans-Serif;
     font-size: 11px;

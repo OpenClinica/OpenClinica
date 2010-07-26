@@ -36,7 +36,7 @@
 
     <link rel="stylesheet" type="text/css" media="all" href="../includes/new_cal/skins/aqua/theme.css" title="Aqua" />
     <script type="text/javascript" src="../includes/new_cal/calendar.js"></script>
-    <script type="text/javascript" src="../includes/new_cal/lang/calendar-en.js"></script>
+    <script type="text/javascript" src="../includes/new_cal/lang/<fmt:message key="jscalendar_language_file" bundle="${resformat}"/>"></script>
     <script type="text/javascript" src="../includes/new_cal/calendar-setup.js"></script>
 <!-- End -->
 
@@ -62,8 +62,6 @@ onload="TabsForwardByNum(<c:out value="${tabId}"/>);<jsp:include page="../includ
 </c:otherwise>
 </c:choose>
 >
-<script type="text/JavaScript" language="JavaScript" src="../includes/wz_tooltip/wz_tooltip.js"></script>
-
 <table border="0" cellpadding="0" cellspacing="0" width="100%" height="100%" class=
   "background">
 	<tr>

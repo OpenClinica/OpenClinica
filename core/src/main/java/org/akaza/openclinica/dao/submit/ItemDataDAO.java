@@ -17,6 +17,7 @@ import java.util.Locale;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
@@ -28,6 +29,7 @@ import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
+import org.akaza.openclinica.dao.submit.ItemDAO;
 
 /**
  * <P>
@@ -113,7 +115,9 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
         // YW 12-06-2007 << convert to oc_date_format_string pattern before
         // inserting into database
-        idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string));
+        if (isADateType(idb.getItemId())) {
+        	idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string));
+        }
         // YW >>
 
         idb.setActive(false);
@@ -146,7 +150,9 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
         // YW 12-06-2007 << convert to oc_date_format_string pattern before
         // inserting into database
-        idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string));
+        if (isADateType(idb.getItemId())) {
+        	idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string));
+        }
         // YW >>
 
         idb.setActive(false);
@@ -217,7 +223,9 @@ public class ItemDataDAO extends AuditableEntityDAO {
         ItemDataBean idb = (ItemDataBean) eb;
         // YW 12-06-2007 << convert to oc_date_format_string pattern before
         // inserting into database
-        idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string));
+        if (isADateType(idb.getItemId())) {
+        	idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string));
+        }
         // YW >>
 
         HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
@@ -242,7 +250,9 @@ public class ItemDataDAO extends AuditableEntityDAO {
         ItemDataBean idb = (ItemDataBean) eb;
         // YW 12-06-2007 << convert to oc_date_format_string pattern before
         // inserting into database
-        idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string));
+        if (isADateType(idb.getItemId())) {
+        	idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string));
+        }
         // YW >>
 
         HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
@@ -263,6 +273,18 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
         return idb;
     }
+    /*
+     * Small check to make sure the type is a date, tbh
+     */
+    public boolean isADateType(int itemId) {
+    	ItemDAO itemDAO = new ItemDAO(this.getDs());
+    	ItemBean itemBean = (ItemBean)itemDAO.findByPK(itemId);
+    	if (itemBean.getDataType().equals(ItemDataType.DATE)) {
+    		return true;
+    	}
+    	return false;
+    	
+    }
 
     public Object getEntityFromHashMap(HashMap hm) {
         ItemDataBean eb = new ItemDataBean();
@@ -275,7 +297,9 @@ public class ItemDataDAO extends AuditableEntityDAO {
         // right now,
         // convert item date value to local_date_format_string pattern once
         // fetching out from database
-        eb.setValue(Utils.convertedItemDateValue(eb.getValue(), oc_df_string, local_df_string));
+        if (isADateType(eb.getItemId())) {
+        	eb.setValue(Utils.convertedItemDateValue(eb.getValue(), oc_df_string, local_df_string));
+        }
         // YW >>
         eb.setStatus(Status.get(((Integer) hm.get("status_id")).intValue()));
         eb.setOrdinal(((Integer) hm.get("ordinal")).intValue());

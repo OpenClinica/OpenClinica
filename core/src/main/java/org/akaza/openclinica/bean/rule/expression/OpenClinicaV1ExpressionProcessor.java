@@ -14,6 +14,8 @@ import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
@@ -32,6 +34,7 @@ public class OpenClinicaV1ExpressionProcessor implements ExpressionProcessor {
     DataSource ds;
     ExpressionService expressionService;
     ExpressionObjectWrapper expressionWrapper;
+    ResourceBundle respage;
 
     public OpenClinicaV1ExpressionProcessor(ExpressionObjectWrapper expressionWrapper) {
         this.expressionWrapper = expressionWrapper;
@@ -74,6 +77,21 @@ public class OpenClinicaV1ExpressionProcessor implements ExpressionProcessor {
         }
     }
 
+    public HashMap<String, String> testEvaluateExpression(HashMap<String, String> testValues) {
+        try {
+            oep = null; // new OpenClinicaExpressionParser(expressionWrapper);
+            HashMap<String, String> resultAndTestValues = oep.parseAndTestEvaluateExpression(e.getValue(), testValues);
+            String returnedResult = resultAndTestValues.get("result");
+            logger.info("Test Result : " + returnedResult);
+            resultAndTestValues.put("result", "Pass : " + returnedResult);
+
+            return resultAndTestValues;
+        } catch (OpenClinicaSystemException e) {
+            testValues.put("result", "Fail : " + e.getMessage());
+            return testValues;
+        }
+    }
+
     public boolean process() {
         return false;
     }
@@ -82,4 +100,7 @@ public class OpenClinicaV1ExpressionProcessor implements ExpressionProcessor {
         this.e = e;
     }
 
+    public void setRespage(ResourceBundle respage) {
+        this.respage = respage;
+    }
 }

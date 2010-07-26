@@ -719,7 +719,7 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
         actionLink.a().href("ReassignStudySubject?id=" + studySubject.getId());
         actionLink.append("onMouseDown=\"javascript:setImage('bt_Reassign1','images/bt_Reassign_d.gif');\"");
         actionLink.append("onMouseUp=\"javascript:setImage('bt_Reassign1','images/bt_Reassign.gif');\"").close();
-        actionLink.img().name("bt_Reassign1").src("images/bt_Reassign.gif").border("0").alt("Reassign").title("Reassign").append("hspace=\"2\"").end().aEnd();
+        actionLink.img().name("bt_Reassign1").src("images/bt_Reassign.gif").border("0").alt(resword.getString("reassign")).title(resword.getString("reassign")).append("hspace=\"2\"").end().aEnd();
         actionLink.append("&nbsp;&nbsp;&nbsp;");
         return actionLink.toString();
 
@@ -732,7 +732,7 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
                     + studySubject.getStudyId());
         actionLink.append("onMouseDown=\"javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');\"");
         actionLink.append("onMouseUp=\"javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');\"").close();
-        actionLink.img().name("bt_Restore1").src("images/bt_Remove.gif").border("0").alt("Restore").title("Restore").align("left").append("hspace=\"6\"").end()
+        actionLink.img().name("bt_Restore1").src("images/bt_Remove.gif").border("0").alt(resword.getString("restore")).title(resword.getString("restore")).align("left").append("hspace=\"6\"").end()
                 .aEnd();
         return actionLink.toString();
 
@@ -781,16 +781,16 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
 
         String tableHeaderRowStyleClass = "table_header_row";
         String tableHeaderRowLeftStyleClass = "table_header_row_left";
-        String add_another_occurrence = "Add Another Occurrence";
-        String click_for_more_options = "Click for more options";
-        String schedule = "Schedule";
-        String view = "View/Enter Data";
-        String edit = "Edit";
-        String remove = "Remove";
-        String occurrence_x_of = "Occurrence: ";
-        String subjectText = "Subject";
-        String eventText = "Event";
-        String status = "Status";
+        String add_another_occurrence = resword.getString("add_another_occurrence");
+        String click_for_more_options = resword.getString("click_for_more_options");
+        String schedule = resword.getString("schedule");
+        String view = resword.getString("view")+"/"+resword.getString("enter_data");
+        String edit = resword.getString("edit");
+        String remove = resword.getString("remove");
+        String occurrence_x_of = resword.getString("ocurrence");
+        String subjectText = resword.getString("subject");
+        String eventText = resword.getString("event");
+        String status = resword.getString("status");
 
         StudyEventBean defaultEvent = studyEvents.get(0);
         String studySubjectLabel = studySubject.getLabel();
@@ -906,9 +906,9 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
         SubjectEventStatus eventStatus = currentEvent.getSubjectEventStatus();
         String studyEventId = String.valueOf(currentEvent.getId());
 
-        String view = "View/Enter Data";
-        String edit = "Edit";
-        String remove = "Remove";
+        String view = resword.getString("view")+"/"+resword.getString("enter_data");
+        String edit = resword.getString("edit");
+        String remove = resword.getString("remove");;
 
         if (eventSysStatus.getId() == Status.AVAILABLE.getId() || eventSysStatus == Status.SIGNED) {
 
@@ -973,16 +973,16 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
 
         String tableHeaderRowStyleClass = "table_header_row";
         String tableHeaderRowLeftStyleClass = "table_header_row_left";
-        String add_another_occurrence = "Add Another Occurrence";
-        String click_for_more_options = "Click for more options";
-        String schedule = "Schedule";
-        String view = "View/Enter Data";
-        String edit = "Edit";
-        String remove = "Remove";
-        String occurrence_x_of = "Occurrence: ";
-        String subjectText = "Subject";
-        String eventText = "Event";
-        String status = "Status";
+        String add_another_occurrence = resword.getString("add_another_occurrence");
+        String click_for_more_options = resword.getString("click_for_more_options");
+        String schedule = resword.getString("schedule");
+        String view = resword.getString("view")+"/"+resword.getString("enter_data");
+        String edit = resword.getString("edit");
+        String remove = resword.getString("remove");
+        String occurrence_x_of = resword.getString("ocurrence");
+        String subjectText = resword.getString("subject");
+        String eventText = resword.getString("event");
+        String status = resword.getString("status");
 
         SubjectEventStatus eventStatus = studyEvents.size() == 0 ? SubjectEventStatus.NOT_SCHEDULED : studyEvents.get(0).getSubjectEventStatus();
         String studyEventName = studyEvents.size() == 0 ? "" : studyEvents.get(0).getName();
@@ -995,7 +995,7 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
         eventDiv.append(eventText).append(": ").append(sed.getName()).br();
 
         if (!sed.isRepeating()) {
-            eventDiv.append("Status").append(":").append(eventStatus.getName()).br();
+            eventDiv.append(resword.getString("status")).append(":").append(eventStatus.getName()).br();
             eventDiv.tdEnd();
             eventDiv.td(0).styleClass(tableHeaderRowLeftStyleClass).align("right").close();
             linkBuilder(eventDiv, studySubjectLabel, rowCount, studyEvents, sed);

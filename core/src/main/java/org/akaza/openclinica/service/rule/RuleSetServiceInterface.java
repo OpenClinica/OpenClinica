@@ -11,6 +11,8 @@ import org.akaza.openclinica.dao.hibernate.RuleDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetAuditDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
+import org.akaza.openclinica.dao.hibernate.ViewRuleAssignmentFilter;
+import org.akaza.openclinica.dao.hibernate.ViewRuleAssignmentSort;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleBulkExecuteContainer;
@@ -82,6 +84,11 @@ public interface RuleSetServiceInterface {
      */
     public abstract List<RuleSetBean> getRuleSetsByStudy(StudyBean study);
 
+    public int getCountWithFilter(ViewRuleAssignmentFilter viewRuleAssignmentFilter);
+
+    public List<RuleSetRuleBean> getWithFilterAndSort(ViewRuleAssignmentFilter viewRuleAssignmentFilter, ViewRuleAssignmentSort viewRuleAssignmentSort,
+            int rowStart, int rowEnd);
+
     // . TODO: why are we including study but not using it in query
     public abstract RuleSetBean getRuleSetById(StudyBean study, String id);
 
@@ -94,6 +101,8 @@ public interface RuleSetServiceInterface {
     public abstract List<RuleSetBean> filterByStatusEqualsAvailable(List<RuleSetBean> ruleSets);
 
     public abstract RuleSetBean filterByRules(RuleSetBean ruleSet, Integer ruleBeanId);
+
+    public RuleSetBean getObjects(RuleSetBean ruleSetBean);
 
     /**
      * Use in DataEntry Rule Execution Scenarios

@@ -128,7 +128,7 @@
                                     <a href="ViewSectionDataEntry?module=<c:out value="${module}"/>&crfId=<c:out value="${crf.id}"/>&crfVersionId=<c:out value="${version.id}"/>&tabId=1"
                                        onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
                                        onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
-                                            name="bt_View1" src="images/bt_View.gif" border="0" alt="View" title="View" align="left" hspace="6"></a>
+                                            name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
                                 </td>
                                 <td>
                                     <a href="javascript:openDocWindow('PrintCRF?id=<c:out value="${version.id}"/>')"
@@ -151,6 +151,8 @@
     </div></div></div></div></div></div></div></div>
 
 </div>
+<br/>
+<span class="table_title_Admin"><fmt:message key="studies_using_crf" bundle="${resword}"/></span>
 
 <div id="studiesDiv">
     <form  action="${pageContext.request.contextPath}/ViewCRF">
@@ -159,16 +161,19 @@
         ${studiesTableHTML}
     </form>
 </div>
-
+<!-- 
 <form  action="${pageContext.request.contextPath}/ViewCRF">
     <input type="hidden" name="module" value="manager">
     <input type="hidden" name="crfId" value="${crf.id}">
     ${rules}
 </form>
-
-<a href="RunRule?crfId=<c:out value="${crf.id}"/>&action=dryRun"><fmt:message key="rule_crf_run_all" bundle="${resword}"/></a>
-<br>
-<br>
+ -->
+ <br/>
+<span class="table_title_Admin"><fmt:message key="rule_rules" bundle="${resword}"/></span>
+<div>&nbsp;</div>
+<div class="homebox_bullets"><a href="RunRule?crfId=<c:out value="${crf.id}"/>&action=dryRun"><fmt:message key="rule_crf_run_all" bundle="${resword}"/></a></div><br/>
+<div class="homebox_bullets"><a href="ViewRuleAssignment?ruleAssignments_f_crfName=<c:out value="${crfName}"/>"><fmt:message key="rule_crf_view_rules_for_this_crf" bundle="${resword}"/></a></div><br/>
+<br/>
 <input type="button" onclick="confirmExit('ListCRF?module=<c:out value="${module}"/>');"  name="exit" value="<fmt:message key="exit" bundle="${resword}"/>   " class="button_medium"/>
 
 <jsp:include page="../include/footer.jsp"/>

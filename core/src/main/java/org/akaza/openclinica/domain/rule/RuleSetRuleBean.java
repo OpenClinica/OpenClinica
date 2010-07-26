@@ -36,6 +36,11 @@ public class RuleSetRuleBean extends AbstractAuditableMutableDomainObject {
 
     // Transient
     String oid;
+    RuleSetRuleBeanImportStatus ruleSetRuleBeanImportStatus;
+
+    public enum RuleSetRuleBeanImportStatus {
+        EXACT_DOUBLE, TO_BE_REMOVED, LINE
+    }
 
     @Transient
     public HashMap<String, ArrayList<RuleActionBean>> getAllActionsWithEvaluatesToAsKey() {
@@ -166,11 +171,57 @@ public class RuleSetRuleBean extends AbstractAuditableMutableDomainObject {
     }
 
     @Transient
-    public String getOid() {
+    public String getOriginalOid() {
         return oid;
+    }
+
+    @Transient
+    public String getOid() {
+        return this.oid == null && getRuleBean() != null ? getRuleBean().getOid() : oid;
     }
 
     public void setOid(String oid) {
         this.oid = oid;
     }
+
+    @Transient
+    public RuleSetRuleBeanImportStatus getRuleSetRuleBeanImportStatus() {
+        return ruleSetRuleBeanImportStatus;
+    }
+
+    public void setRuleSetRuleBeanImportStatus(RuleSetRuleBeanImportStatus ruleSetRuleBeanImportStatus) {
+        this.ruleSetRuleBeanImportStatus = ruleSetRuleBeanImportStatus;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((actions == null) ? 0 : actions.hashCode());
+        result = prime * result + ((ruleBean == null) ? 0 : ruleBean.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        RuleSetRuleBean other = (RuleSetRuleBean) obj;
+        if (actions == null) {
+            if (other.actions != null)
+                return false;
+        } else if (!actions.equals(other.actions))
+            return false;
+        if (ruleBean == null) {
+            if (other.ruleBean != null)
+                return false;
+        } else if (!ruleBean.equals(other.ruleBean))
+            return false;
+        return true;
+    }
+
 }

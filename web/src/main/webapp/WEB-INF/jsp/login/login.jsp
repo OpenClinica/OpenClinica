@@ -43,6 +43,29 @@
     <div ID="OClogo">&nbsp;</div>
   	<%}%>
     <!-- end OpenClinica logo -->
+        <table width="720 px">
+        <script type="text/javascript">
+                if (/Firefox[\/\s](\d+\.\d+)/.test(navigator.userAgent)){
+                    var ffversion=new Number(RegExp.$1)
+                    if (!(ffversion>=3)){
+                        document.write("<tr> <td align='center' ><h4>"+
+                        " <fmt:message key="choose_browser" bundle="${restext}"/>"+
+                        "</h4></td> </tr>");
+                    }
+                } else if (/MSIE (\d+\.\d+);/.test(navigator.userAgent)){
+                     var ieversion=new Number(RegExp.$1)
+                     if (ieversion!=8 && ieversion!=7){
+                     document.write("<tr> <td align='center' > <h4>"+
+                         "<fmt:message key="choose_browser" bundle="${restext}"/> "+
+                         "</h4></td> </tr>");
+                     }
+                }else{
+                    document.write("<tr> <td align='center' ><h4>"+
+                    " <fmt:message key="choose_browser" bundle="${restext}"/>"+
+                    "</h4></td> </tr>");
+                }
+             </script>
+            </table>
 
     <table border="0" cellpadding="0" cellspacing="0" class="loginBoxes">
         <tr>
@@ -63,7 +86,7 @@
 
                     <b><fmt:message key="password" bundle="${resword}"/></b>
                         <div class="formfieldM_BG">
-                            <input type="password" id="j_password" name="j_password"  class="formfieldM">
+                            <input type="password" id="j_password" name="j_password"  class="formfieldM"  autocomplete="off">
                         </div>
                     <input type="submit" name="submit" value="<fmt:message key='login' bundle='${resword}'/>" class="loginbutton" />
                     <a href="#" id="requestPassword"> <fmt:message key="forgot_password" bundle="${resword}"/></a>
@@ -77,32 +100,11 @@
             <td class="loginBox">
             <div ID="newsBox">
                 <!-- News box contents -->
-                <h1>News</h1>Loading ...
+                <h1><fmt:message key="news" bundle="${resword}"/></h1><fmt:message key="loading" bundle="${resword}"/> ...
                 <!-- End News box contents -->
             </div>
             </td>
       </tr>
-        <script type="text/javascript">
-                if (/Firefox[\/\s](\d+\.\d+)/.test(navigator.userAgent)){
-                    var ffversion=new Number(RegExp.$1)
-                    if (!(ffversion>=3)){
-                        document.write("<tr> <td align='center' colspan=2 style='padding-left: 20px;' >"+
-                        " <fmt:message key="choose_browser" bundle="${restext}"/>"+
-                        "</td> </tr>");
-                    }
-                } else if (/MSIE (\d+\.\d+);/.test(navigator.userAgent)){
-                     var ieversion=new Number(RegExp.$1)
-                     if (ieversion!=8 && ieversion!=7){
-                     document.write("<tr> <td align='justify' colspan=2 style='padding-left: 20px;' >"+
-                         "<div style='width: 600px;' > <fmt:message key="choose_browser" bundle="${restext}"/> </div>"+
-                         "</td> </tr>");
-                     }
-                }else{
-                    document.write("<tr> <td align='center' colspan=2 style='padding-left: 20px;' >"+
-                    " <fmt:message key="choose_browser" bundle="${restext}"/>"+
-                    "</td> </tr>");
-                }
-             </script>
     </table>
 
     </center>

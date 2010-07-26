@@ -70,6 +70,7 @@
     <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
      <table border="0" cellpadding="0" cellspacing="0" width="100%">
        <c:forEach var="studyRole" items="${studies}">
+           <c:set var="statusId" value="${studyRole.status.id}"/>
         <c:choose>
          <c:when test="${study.id == studyRole.studyId}">
 
@@ -78,15 +79,18 @@
                <c:if test="${!studyRole.invalid}">
                  <tr>
                    <td class="table_cell">&nbsp;&nbsp;<img src="images/bullet.gif">
-                   <input type="radio" checked name="studyId" value="<c:out value="${studyRole.studyId}"/>">
-                   <c:out value="${studyRole.studyName}"/> (<fmt:message key="${siteRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>) </td>
+                   <input type="radio" checked name="studyId" value="<c:out value="${studyRole.studyId}"/>" <c:if test="${statusId==4}">disabled="true"</c:if>>
+                   <c:out value="${studyRole.studyName}"/>
+                       <c:if test="${statusId==4}">(Design)&nbsp;</c:if>
+                       (<fmt:message key="${siteRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>) </td>
                  </tr>
                </c:if>
             </c:when>
             <c:otherwise>
                 <c:if test="${!studyRole.invalid}">
                  <tr>
-                 <td class="table_cell"><input type="radio" checked name="studyId" value="<c:out value="${studyRole.studyId}"/>">
+                 <td class="table_cell">
+                     <input type="radio" checked name="studyId" value="<c:out value="${studyRole.studyId}"/>">
                  <b><c:out value="${studyRole.studyName}"/> (<fmt:message key="${studyRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>)</b></td>
                  </tr>
                </c:if>
@@ -103,15 +107,19 @@
             <c:when test="${studyRole.parentStudyId > 0}">
                <c:if test="${!studyRole.invalid}">
                  <tr>
-                  <td class="table_cell">&nbsp;&nbsp;<img src="images/bullet.gif"><input type="radio" name="studyId" value="<c:out value="${studyRole.studyId}"/>">
-                  <c:out value="${studyRole.studyName}"/> (<fmt:message key="${siteRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>)</td>
+                  <td class="table_cell">&nbsp;&nbsp;<img src="images/bullet.gif">
+                      <input type="radio" name="studyId" value="<c:out value="${studyRole.studyId}"/>" <c:if test="${statusId==4}">disabled="true"</c:if>>
+                      <c:out value="${studyRole.studyName}"/>
+                      <c:if test="${statusId==4}">(Design)&nbsp;</c:if>
+                      (<fmt:message key="${siteRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>)</td>
                  </tr>
                </c:if>
             </c:when>
             <c:otherwise>
                 <c:if test="${!studyRole.invalid}">
                  <tr>
-                  <td class="table_cell"><input type="radio" name="studyId" value="<c:out value="${studyRole.studyId}"/>">
+                  <td class="table_cell">
+                      <input type="radio" name="studyId" value="<c:out value="${studyRole.studyId}"/>">
                   <b><c:out value="${studyRole.studyName}"/> (<fmt:message key="${studyRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>)</b></td>
                  </tr>
                </c:if>

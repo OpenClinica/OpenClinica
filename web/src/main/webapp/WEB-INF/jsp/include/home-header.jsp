@@ -35,13 +35,13 @@
 
     <link rel="stylesheet" type="text/css" media="all" href="includes/new_cal/skins/aqua/theme.css" title="Aqua" />
     <script type="text/javascript" src="includes/new_cal/calendar.js"></script>
-    <script type="text/javascript" src="includes/new_cal/lang/calendar-en.js"></script>
+    <script type="text/javascript" src="includes/new_cal/lang/<fmt:message key="jscalendar_language_file" bundle="${resformat}"/>"></script>
     <script type="text/javascript" src="includes/new_cal/calendar-setup.js"></script>
 <!-- End -->
 
     <script language="JavaScript">
         function reportBug() {
-            var bugtrack = "http://dev.openclinica.org/OpenClinica/bug.php?version=<fmt:message key="version_number" bundle="${resword}"/>&user=";
+            var bugtrack = "https://www.openclinica.org/OpenClinica/bug.php?version=<fmt:message key="version_number" bundle="${resword}"/>&user=";
             var user= "<c:out value="${userBean.name}"/>";
             bugtrack = bugtrack + user+ "&url=" + window.location.href;
             openDocWindow(bugtrack);

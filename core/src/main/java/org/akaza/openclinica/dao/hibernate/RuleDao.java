@@ -10,16 +10,18 @@ public class RuleDao extends AbstractDomainDao<RuleBean> {
     }
 
     public RuleBean findByOid(RuleBean ruleBean) {
-        String query = "from " + getDomainClassName() + " rule  where rule.oid = :oid ";
+        String query = "from " + getDomainClassName() + " rule  where rule.oid = :oid and  rule.studyId = :studyId ";
         org.hibernate.Query q = getCurrentSession().createQuery(query);
         q.setString("oid", ruleBean.getOid());
+        q.setInteger("studyId", ruleBean.getStudyId());
         return (RuleBean) q.uniqueResult();
     }
 
-    public RuleBean findByOid(String oid) {
-        String query = "from " + getDomainClassName() + " rule  where rule.oid = :oid ";
+    public RuleBean findByOid(String oid, Integer studyId) {
+        String query = "from " + getDomainClassName() + " rule  where rule.oid = :oid and  rule.studyId = :studyId ";
         org.hibernate.Query q = getCurrentSession().createQuery(query);
         q.setString("oid", oid);
+        q.setInteger("studyId", studyId);
         return (RuleBean) q.uniqueResult();
     }
 

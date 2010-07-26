@@ -91,6 +91,12 @@ public class ViewImportJobServlet extends SecureController {
             if (trigger.getJobDataMap().size() > 0) {
                 dataMap = trigger.getJobDataMap();
                 triggerBean.setStudyName(dataMap.getString(ExampleSpringJob.STUDY_NAME));
+                String oid = dataMap.getString("study_oid");
+                if (oid != null) {
+                	System.out.println("oid is not null: " + oid);
+                } else {
+                	System.out.println("oid is null");
+                }
             }
 
             // this next bit of code looks to see if the trigger is paused

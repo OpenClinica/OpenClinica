@@ -8,8 +8,6 @@
 package org.akaza.openclinica.control.admin;
 
 import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
-import static org.jmesa.limit.ExportType.CSV;
-import static org.jmesa.limit.ExportType.JEXCEL;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
@@ -28,9 +26,7 @@ import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
-
 import org.jmesa.facade.TableFacade;
-import org.jmesa.limit.Limit;
 import org.jmesa.view.component.Column;
 import org.jmesa.view.component.Row;
 import org.jmesa.view.component.Table;
@@ -45,7 +41,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ResourceBundle;
 
 /**
  * @author jxu
@@ -106,9 +101,10 @@ public class ViewCRFServlet extends SecureController {
             CRFDAO cdao = new CRFDAO(sm.getDataSource());
             CRFVersionDAO vdao = new CRFVersionDAO(sm.getDataSource());
             CRFBean crf = (CRFBean) cdao.findByPK(crfId);
+            request.setAttribute("crfName", crf.getName());
             ArrayList<CRFVersionBean> versions = (ArrayList<CRFVersionBean>) vdao.findAllByCRF(crfId);
             crf.setVersions(versions);
-            if("admin".equalsIgnoreCase(module)){
+            if ("admin".equalsIgnoreCase(module)) {
                 //BWP 3279: generate a table showing a list of studies associated with the CRF>>
                 StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
 
@@ -118,15 +114,16 @@ public class ViewCRFServlet extends SecureController {
                 studyBeans = findStudiesForCRF(studyEventDefinitionBeans,crfId,
                   cdao,studyDAO);*/
 
-                studyBeans = findStudiesForCRFId(crfId,studyDAO);
+                studyBeans = findStudiesForCRFId(crfId, studyDAO);
                 //Create the Jmesa table for the studies associated with the CRF
                 String studyHtml = renderStudiesTable(studyBeans);
-                request.setAttribute("studiesTableHTML",studyHtml);
+                request.setAttribute("studiesTableHTML", studyHtml);
                 //>>
             }
             // Collection<RuleSetBean> items =
             // getRuleSetService().getRuleSetsByCrf(crf);
             Collection<TableColumnHolder> items = populate(crf, versions);
+            /********* No need for this table anymore
             TableFacade tableFacade = createTableFacade("rules", request);
             tableFacade.setItems(items); // set the items
             tableFacade.setExportTypes(response, CSV, JEXCEL);
@@ -141,6 +138,7 @@ public class ViewCRFServlet extends SecureController {
 
             String html = html(tableFacade);
             request.setAttribute("rules", html); // Set the Html in the
+            */
             // request for the JSP.
 
             request.setAttribute(CRF, crf);
@@ -148,61 +146,60 @@ public class ViewCRFServlet extends SecureController {
 
         }
     }
+
     /*
     Create a JMesa-based table for showing the studies associated with a CRF.
      */
-    private String renderStudiesTable(List<StudyBean> studyBeans)  {
+    private String renderStudiesTable(List<StudyBean> studyBeans) {
 
         Collection<StudyRowContainer> items = getStudyRows(studyBeans);
         TableFacade tableFacade = createTableFacade("studies", request);
-        tableFacade.setColumnProperties("name","uniqueProtocolid","actions");
+        tableFacade.setColumnProperties("name", "uniqueProtocolid", "actions");
 
         tableFacade.setItems(items);
         //Fix column titles
         HtmlTable table = (HtmlTable) tableFacade.getTable();
         //i18n caption; TODO: convert to Spring messages
-        ResourceBundle  resourceBundle = ResourceBundle.getBundle(
-          "org.akaza.openclinica.i18n.words",request.getLocale());
+        /*
+        ResourceBundle resourceBundle = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words", request.getLocale());
         String captionText = resourceBundle.getString("studies_using_crf");
-        if(captionText == null || "".equalsIgnoreCase(captionText)){
+        if (captionText == null || "".equalsIgnoreCase(captionText)) {
             captionText = "Studies Using this CRF for Data Entry";
         }
         table.setCaption(captionText);
+        */
         HtmlRow row = table.getRow();
-        SDVUtil  sDVUtil = new SDVUtil();
+        SDVUtil sDVUtil = new SDVUtil();
 
-        String[] colNames = new String[]{"name","uniqueProtocolid","actions"};
-        sDVUtil.setHtmlCellEditors(tableFacade,colNames,true);
+        String[] colNames = new String[] { "name", "uniqueProtocolid", "actions" };
+        sDVUtil.setHtmlCellEditors(tableFacade, colNames, true);
 
         HtmlColumn firstName = row.getColumn("name");
         firstName.setTitle("Study Name");
 
-
         HtmlColumn protocol = row.getColumn("uniqueProtocolid");
         protocol.setTitle("Unique Protocol Id");
 
-
         HtmlColumn actions = row.getColumn("actions");
-         actions.setTitle("Actions");
-
+        actions.setTitle("Actions");
 
         return tableFacade.render();
     }
+
     /*
     Generate the rows for the study table. Each row represents a StudyBean domain object.
      */
-    private Collection<StudyRowContainer> getStudyRows(List<StudyBean> studyBeans)  {
+    private Collection<StudyRowContainer> getStudyRows(List<StudyBean> studyBeans) {
 
         Collection<StudyRowContainer> allRows = new ArrayList<StudyRowContainer>();
         StudyRowContainer tempBean = null;
         StringBuilder actions = new StringBuilder("");
-        for(StudyBean studBean : studyBeans) {
+        for (StudyBean studBean : studyBeans) {
             tempBean = new StudyRowContainer();
             tempBean.setName(studBean.getName());
             tempBean.setUniqueProtocolid(studBean.getIdentifier());
             tempBean.setStudyBean(studBean);
-            actions.append(StudyRowContainer.VIEW_STUDY_DETAILS_URL).append(studBean.getId()).
-              append(StudyRowContainer.VIEW_STUDY_DETAILS_SUFFIX);
+            actions.append(StudyRowContainer.VIEW_STUDY_DETAILS_URL).append(studBean.getId()).append(StudyRowContainer.VIEW_STUDY_DETAILS_SUFFIX);
             tempBean.setActions(actions.toString());
             allRows.add(tempBean);
 
@@ -211,20 +208,20 @@ public class ViewCRFServlet extends SecureController {
 
         return allRows;
     }
-     /*
-     Fetch the studies associated with a CRF, via an event definition that uses the CRF.
-      */
-    private List<StudyBean> findStudiesForCRFId(int crfId,
-                                                StudyDAO studyDao){
+
+    /*
+    Fetch the studies associated with a CRF, via an event definition that uses the CRF.
+     */
+    private List<StudyBean> findStudiesForCRFId(int crfId, StudyDAO studyDao) {
         List<StudyBean> studyBeans = new ArrayList<StudyBean>();
-        if(crfId == 0 || studyDao == null) {
+        if (crfId == 0 || studyDao == null) {
             return studyBeans;
         }
 
         ArrayList<Integer> studyIds = studyDao.getStudyIdsByCRF(crfId);
         StudyBean tempBean = new StudyBean();
 
-        for(Integer id : studyIds){
+        for (Integer id : studyIds) {
             tempBean = (StudyBean) studyDao.findByPK(id);
             studyBeans.add(tempBean);
 
@@ -232,10 +229,8 @@ public class ViewCRFServlet extends SecureController {
         return studyBeans;
     }
 
-    private Collection<TableColumnHolder> populate(CRFBean crf,
-                                                   ArrayList<CRFVersionBean> versions) {
-        HashMap<CRFVersionBean, ArrayList<TableColumnHolder>> hm = new
-          HashMap<CRFVersionBean, ArrayList<TableColumnHolder>>();
+    private Collection<TableColumnHolder> populate(CRFBean crf, ArrayList<CRFVersionBean> versions) {
+        HashMap<CRFVersionBean, ArrayList<TableColumnHolder>> hm = new HashMap<CRFVersionBean, ArrayList<TableColumnHolder>>();
         List<TableColumnHolder> tableColumnHolders = new ArrayList<TableColumnHolder>();
         for (CRFVersionBean versionBean : versions) {
             hm.put(versionBean, new ArrayList<TableColumnHolder>());
@@ -264,7 +259,7 @@ public class ViewCRFServlet extends SecureController {
             String ruleExpression = ruleSetRule.getRuleBean().getExpression().getValue();
             String ruleName = ruleSetRule.getRuleBean().getName();
             TableColumnHolder tch =
-              new TableColumnHolder(crfVersion.getName(), crfVersion.getId(), ruleName, ruleExpression, ruleSetRule.getActions(), ruleSetRule.getId());
+                new TableColumnHolder(crfVersion.getName(), crfVersion.getId(), ruleName, ruleExpression, ruleSetRule.getActions(), ruleSetRule.getId());
             tchs.add(tch);
 
         }
@@ -275,28 +270,28 @@ public class ViewCRFServlet extends SecureController {
 
         // set the column properties
         tableFacade.setColumnProperties("versionName", "ruleName", "ruleExpression", "executeOnPlaceHolder", "actionTypePlaceHolder",
-          "actionSummaryPlaceHolder", "link");
+                "actionSummaryPlaceHolder", "link");
 
         HtmlTable table = (HtmlTable) tableFacade.getTable();
-        table.setCaption("Rules");
+        table.setCaption(resword.getString("rule_rules"));
         table.getTableRenderer().setWidth("800px");
 
         HtmlRow row = table.getRow();
 
         HtmlColumn versionName = row.getColumn("versionName");
-        versionName.setTitle("CRF Version");
+        versionName.setTitle(resword.getString("CRF_version"));
 
         HtmlColumn ruleName = row.getColumn("ruleName");
-        ruleName.setTitle("Rule Name");
+        ruleName.setTitle(resword.getString("rule_name"));
 
         HtmlColumn career = row.getColumn("ruleExpression");
         career.setWidth("100px");
-        career.setTitle("Expression");
+        career.setTitle(resword.getString("rule_expression"));
 
         HtmlColumn executeOn = row.getColumn("executeOnPlaceHolder");
         executeOn.setSortable(false);
         executeOn.setFilterable(false);
-        executeOn.setTitle("Execute On");
+        executeOn.setTitle(resword.getString("rule_execute_on"));
         executeOn.getCellRenderer().setCellEditor(new CellEditor() {
             @SuppressWarnings("unchecked")
             public Object getValue(Object item, String property, int rowcount) {
@@ -316,7 +311,7 @@ public class ViewCRFServlet extends SecureController {
         HtmlColumn actionTypePlaceHolder = row.getColumn("actionTypePlaceHolder");
         actionTypePlaceHolder.setSortable(false);
         actionTypePlaceHolder.setFilterable(false);
-        actionTypePlaceHolder.setTitle("Action Type");
+        actionTypePlaceHolder.setTitle(resword.getString("rule_action_type"));
         actionTypePlaceHolder.getCellRenderer().setCellEditor(new CellEditor() {
             @SuppressWarnings("unchecked")
             public Object getValue(Object item, String property, int rowcount) {
@@ -336,7 +331,7 @@ public class ViewCRFServlet extends SecureController {
         HtmlColumn actionSummaryPlaceHolder = row.getColumn("actionSummaryPlaceHolder");
         actionSummaryPlaceHolder.setSortable(false);
         actionSummaryPlaceHolder.setFilterable(false);
-        actionSummaryPlaceHolder.setTitle("Action Summary");
+        actionSummaryPlaceHolder.setTitle(resword.getString("rule_action_summary"));
         actionSummaryPlaceHolder.getCellRenderer().setCellEditor(new CellEditor() {
             @SuppressWarnings("unchecked")
             public Object getValue(Object item, String property, int rowcount) {
@@ -356,7 +351,7 @@ public class ViewCRFServlet extends SecureController {
         HtmlColumn link = row.getColumn("link");
         link.setSortable(false);
         link.setFilterable(false);
-        link.setTitle("Action");
+        link.setTitle(resword.getString("action"));
         link.getCellRenderer().setCellEditor(new CellEditor() {
             @SuppressWarnings("unchecked")
             public Object getValue(Object item, String property, int rowcount) {
@@ -364,7 +359,7 @@ public class ViewCRFServlet extends SecureController {
                 String param2 = (String) new BasicCellEditor().getValue(item, "versionId", rowcount);
                 HtmlBuilder html = new HtmlBuilder();
                 html.a().href().quote().append(request.getContextPath() + "/RunRule?ruleSetRuleId=" + param1 + "&versionId=" + param2 + "&action=dryRun")
-                  .quote().close();
+                        .quote().close();
                 html.img().name("bt_View1").src("images/bt_ExexuteRules.gif").border("0").end();
                 html.aEnd();
                 return html.toString();
@@ -377,7 +372,7 @@ public class ViewCRFServlet extends SecureController {
     private void export(TableFacade tableFacade) {
         // set the column properties
         tableFacade.setColumnProperties("versionName", "ruleName", "ruleExpression", "executeOnPlaceHolder", "actionTypePlaceHolder",
-          "actionSummaryPlaceHolder");
+                "actionSummaryPlaceHolder");
         Table table = tableFacade.getTable();
         table.setCaption("Rules");
 
@@ -451,7 +446,8 @@ public class ViewCRFServlet extends SecureController {
 
     private RuleSetServiceInterface getRuleSetService() {
         ruleSetService =
-          this.ruleSetService != null ? ruleSetService : (RuleSetServiceInterface) SpringServletAccess.getApplicationContext(context).getBean("ruleSetService");
+            this.ruleSetService != null ? ruleSetService : (RuleSetServiceInterface) SpringServletAccess.getApplicationContext(context).getBean(
+                    "ruleSetService");
 
         /*ruleSetService =
             this.ruleSetService != null ? ruleSetService : new RuleSetService(sm.getDataSource(), getRequestURLMinusServletPath(), getContextPath());*/

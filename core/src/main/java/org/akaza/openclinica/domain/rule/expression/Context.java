@@ -35,13 +35,14 @@ public enum Context implements CodedEnum {
         this(code, null);
     }
 
-    Context(int code, String longName) {
+    Context(int code, String description) {
         this.code = code;
+        this.description = description;
     }
 
     @Override
     public String toString() {
-        return resterm.getString(getDescription());
+        return this.name();
     }
 
     public static Context getByName(String name) {

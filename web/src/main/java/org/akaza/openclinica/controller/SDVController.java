@@ -463,8 +463,11 @@ public class SDVController {
         ResourceBundle resourceBundle = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words", request.getLocale());
 
         String[] allTitles =
-            { "Study Subject Id", "Person Id", "Secondary Id", "Event Name", "Event Date", "Enrollment Date", "Subject Status", "CRF Name / Version",
-                "CRF Status", "Last Updated Date", "Last Updated By", "SDV Status / Actions" };
+            { resourceBundle.getString("study_subject_ID"), resourceBundle.getString("person_ID"), resourceBundle.getString("secondary_ID"), 
+              resourceBundle.getString("event_name"), resourceBundle.getString("event_date"), resourceBundle.getString("enrollment_date"), 
+              resourceBundle.getString("subject_status"),resourceBundle.getString("CRF_name")+" / "+resourceBundle.getString("version"),
+              resourceBundle.getString("CRF_status"),resourceBundle.getString("last_updated_date"), resourceBundle.getString("last_updated_by"), 
+              resourceBundle.getString("SDV_status")+" / "+resourceBundle.getString("actions") };
 
         setTitles(allTitles, table);
 

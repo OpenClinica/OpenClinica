@@ -358,7 +358,7 @@ public class TextIO {
         while (true) {
             String str = readRealString();
             if (str == null) {
-                throw new OpenClinicaSystemException("This has to be either a Number or a date");
+                throw new OpenClinicaSystemException("OCRERR_0014");
                 // errorMessage("Floating point number not found.", "Real number
                 // in the range " + -Float.MAX_VALUE + " to " +
                 // Float.MAX_VALUE);
@@ -430,7 +430,7 @@ public class TextIO {
         StringBuffer str = new StringBuffer(50);
         char ch = lookChar();
         int quoteCount = 0;
-        while (ch == EOF || quoteCount < 2) {
+        while (ch != EOF && quoteCount < 2) {
             if (Character.toString(ch).equals("\"")) {
                 quoteCount++;
             }

@@ -18,6 +18,8 @@ import java.io.PrintWriter;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -33,10 +35,13 @@ public class RssReaderServlet extends HttpServlet {
     String rssMore = SQLInitServlet.getField("rss.more");
     String text1 = SQLInitServlet.getField("about.text1");
     String text2 = SQLInitServlet.getField("about.text2");
-
+    ResourceBundle resword,resformat;
+    
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        PrintWriter pw = new PrintWriter(resp.getOutputStream());
+    	resword = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words",req.getLocale());
+    	resformat = ResourceBundle.getBundle("org.akaza.openclinica.i18n.format",req.getLocale());
+    	PrintWriter pw = new PrintWriter(resp.getOutputStream());
         if (rssUrl == null || rssUrl.length() == 0) {
             about(pw);
         } else {
@@ -76,7 +81,7 @@ public class RssReaderServlet extends HttpServlet {
 
     void about(PrintWriter pw) {
         HtmlBuilder htmlBuilder = new HtmlBuilder();
-        htmlBuilder.h1().close().append("About").h1End().ul().close();
+        htmlBuilder.h1().close().append(resword.getString("about")).h1End().ul().close();
         htmlBuilder.li().close().append(text1).liEnd();
         htmlBuilder.li().close().append(text2).liEnd();
         htmlBuilder.ulEnd().toString();
@@ -88,7 +93,7 @@ public class RssReaderServlet extends HttpServlet {
 
     String feedHtml(SyndFeed feed) {
         HtmlBuilder htmlBuilder = new HtmlBuilder();
-        htmlBuilder.h1().close().append("News").h1End().ul().close();
+        htmlBuilder.h1().close().append(resword.getString("news")).h1End().ul().close();
         List<SyndEntryImpl> theFeeds = feed.getEntries();
 
         for (int i = 0; i < (theFeeds.size() >= 4 ? 4 : theFeeds.size()); i++) {
@@ -104,14 +109,14 @@ public class RssReaderServlet extends HttpServlet {
             } else {
                 description = syndFeed.getDescription().getValue();
             }
-            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd");
+            SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("mid_date_format"));
             String theDate = sdf.format(syndFeed.getPublishedDate());
             htmlBuilder.li().close().a().href(syndFeed.getLink()).append(" target=\"_blank\"").close().append(
                     theDate + " - " + StringEscapeUtils.escapeHtml(syndFeed.getTitle()) + " - " + description).aEnd().liEnd();
 
         }
         if (rssMore != null && rssMore.length() > 0) {
-            return htmlBuilder.ulEnd().a().href(rssMore).append(" target=\"_blank\"").close().div().align("right").close().append("More...").divEnd().aEnd()
+            return htmlBuilder.ulEnd().a().href(rssMore).append(" target=\"_blank\"").close().div().align("right").close().append(resword.getString("more")+"...").divEnd().aEnd()
                     .toString();
         } else {
             return htmlBuilder.ulEnd().toString();
@@ -121,8 +126,8 @@ public class RssReaderServlet extends HttpServlet {
 
     String errorFeedHtml(String error) {
         HtmlBuilder htmlBuilder = new HtmlBuilder();
-        htmlBuilder.h1().close().append("News").h1End().ul().close();
-        htmlBuilder.li().close().append("Could not retrieve news. ").liEnd();
+        htmlBuilder.h1().close().append(resword.getString("news")).h1End().ul().close();
+        htmlBuilder.li().close().append(resword.getString("couldnot_retrieve_news")).liEnd();
         return htmlBuilder.ulEnd().toString();
     }
 }

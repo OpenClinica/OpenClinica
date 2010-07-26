@@ -5,7 +5,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
-
+<fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterms"/>
 <c:choose>
 <c:when test="${userBean.sysAdmin && module=='admin'}">
  <c:import url="../include/admin-header.jsp"/>
@@ -78,7 +78,7 @@
 <table border="0" cellpadding="0" cellspacing="0">
 
 <tr>
-	<td class="formlabel">XML File To Upload:</td>
+	<td class="formlabel"><fmt:message key="xml_file_to_upload" bundle="${resterms}"/>:</td>
 	<td>
 		<div class="formfieldFile_BG"><input type="file" name="xml_file" > </div>
 		<br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="xml_file"/></jsp:include>
@@ -93,8 +93,8 @@
 </div>
 
 <br clear="all">
-<input type="submit" value="Continue" class="button_long">
-<input type="button" onclick="goBack()"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
+<input type="submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_long">
+<input type="button" onclick="goBack()"  name="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium"/>
 
 </form>
 

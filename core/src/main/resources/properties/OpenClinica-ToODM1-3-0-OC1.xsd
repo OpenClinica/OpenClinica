@@ -66,6 +66,10 @@
 				</xs:extension>
 			</xs:complexContent>
 		</xs:complexType>
+		<xs:attributeGroup name="ItemDefAttributeExtension">
+	      <xs:attributeGroup ref="ItemDefAttributeExtension" />
+	      <xs:attributeGroup ref="OpenClinica:ItemDefAttributeDefinition" />
+	    </xs:attributeGroup>
 	    <xs:attributeGroup name="SubjectDataAttributeExtension">
 	      <xs:attributeGroup ref="SubjectDataAttributeExtension" />
 	      <xs:attributeGroup ref="OpenClinica:SubjectDataAttributeDefinition" />

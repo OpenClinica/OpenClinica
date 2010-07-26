@@ -96,7 +96,7 @@
 <div class="dnKey"><strong><fmt:message key="Filter_by_status" bundle="${resword}"/>
 :</strong>
 
-    <a href="ListDiscNotesForCRFServlet?type=${param.type}&module=${module}&defId=<c:out value="${eventDefinitionId}"/>&tab=1" <c:if test="${param.type == 50}">style="color:green"</c:if>>All Notes</a>&nbsp;
+    <a href="ListDiscNotesForCRFServlet?type=${param.type}&module=${module}&defId=<c:out value="${eventDefinitionId}"/>&tab=1" <c:if test="${param.type == 50}">style="color:green"</c:if>><fmt:message key="all_notes" bundle="${resterm}"/></a>&nbsp;
 
     <a href="ListDiscNotesForCRFServlet?resolutionStatus=1&type=${param.type}&tab=${param.tab}&module=${module}&defId=<c:out value="${eventDefinitionId}"/>"><img
                       name="icon_Note" src="images/icon_Note.gif" border="0"

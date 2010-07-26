@@ -13,7 +13,8 @@ import java.util.HashMap;
 
 public enum ActionType implements CodedEnum {
 
-    FILE_DISCREPANCY_NOTE(1, "File Discrepancy Note"), EMAIL(2, "Email"), SHOW(3, "Show"), INSERT(4, "Insert"), HIDE(5, "Hide");
+    FILE_DISCREPANCY_NOTE(1, "DiscrepancyNoteAction"), EMAIL(2, "EmailAction"), SHOW(3, "ShowAction"), INSERT(4, "InsertAction"), HIDE(5, "HideAction");
+
 
     private int code;
     private String description;

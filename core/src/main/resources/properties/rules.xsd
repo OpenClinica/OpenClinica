@@ -9,7 +9,7 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element ref="RuleAssignment" maxOccurs="unbounded"/>
-                <xs:element ref="RuleDef" maxOccurs="unbounded"/>
+                <xs:element ref="RuleDef"  minOccurs="0"  maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>

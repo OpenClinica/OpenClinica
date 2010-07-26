@@ -33,21 +33,21 @@ import java.util.Locale;
 import javax.sql.DataSource;
 
 /**
- * <p/> EntityDAO.java, the generic data access object class for the database
- * layer, by Tom Hickerson, 09/24/2004 <p/> A signalling system was added on 7
- * Dec 04 to indicate the success or failure of a query. A query is considered
- * successful iff a SQLException was not thrown in the process of executing the
- * query. <p/> The system can be used by outside classes / subclasses as
- * follows: - Immediately after calling select or execute, isQuerySuccessful()
- * is <code>true</code> if the query was successful, <code>false</code>
- * otherwise. - If isQuerySuccessful returns <code>false</code>
- * getFailureDetails() returns the SQLException which was thrown. <p/> In order
- * to maintain the system, the following invariants must be maintained by
- * developers: 1. Every method executing a query must call clearSignals() as the
- * first statement. 2. Every method executing a query must call either
- * signalSuccess or signalFailure before returning. <p/> At the time of writing,
- * the only methods which execute queries are select and execute.
- *
+ * <p/>
+ * EntityDAO.java, the generic data access object class for the database layer, by Tom Hickerson, 09/24/2004
+ * <p/>
+ * A signalling system was added on 7 Dec 04 to indicate the success or failure of a query. A query is considered successful iff a SQLException was not thrown
+ * in the process of executing the query.
+ * <p/>
+ * The system can be used by outside classes / subclasses as follows: - Immediately after calling select or execute, isQuerySuccessful() is <code>true</code> if
+ * the query was successful, <code>false</code> otherwise. - If isQuerySuccessful returns <code>false</code> getFailureDetails() returns the SQLException which
+ * was thrown.
+ * <p/>
+ * In order to maintain the system, the following invariants must be maintained by developers: 1. Every method executing a query must call clearSignals() as the
+ * first statement. 2. Every method executing a query must call either signalSuccess or signalFailure before returning.
+ * <p/>
+ * At the time of writing, the only methods which execute queries are select and execute.
+ * 
  * @author thickerson
  */
 public abstract class EntityDAO implements DAOInterface {
@@ -69,16 +69,14 @@ public abstract class EntityDAO implements DAOInterface {
     private SQLException failureDetails;
 
     /**
-     * Should the name of a query which refers to a SQL command of the following
-     * form: <code>SELECT currval('sequence') AS key</code> The column name
-     * "key" is required, as getCurrentPK() relies on it.
+     * Should the name of a query which refers to a SQL command of the following form: <code>SELECT currval('sequence') AS key</code> The column name "key" is required, as
+     * getCurrentPK() relies on it.
      */
     protected String getCurrentPKName;
 
     /**
-     * Should the name of a query which refers to a SQL command of the following
-     * form: <code>SELECT nextval('sequence') AS key</code> The column name
-     * "key" is required, as getNextPK() relies on it.
+     * Should the name of a query which refers to a SQL command of the following form: <code>SELECT nextval('sequence') AS key</code> The column name "key" is required, as getNextPK()
+     * relies on it.
      */
     protected String getNextPKName;
 
@@ -102,9 +100,8 @@ public abstract class EntityDAO implements DAOInterface {
     }
 
     /**
-     * setTypeExpected, expects to enter the type of object to retrieve from the
-     * database
-     *
+     * setTypeExpected, expects to enter the type of object to retrieve from the database
+     * 
      * @param num
      *            the order the column should be extracted from the database
      * @param type
@@ -119,13 +116,10 @@ public abstract class EntityDAO implements DAOInterface {
     }
 
     /**
-     * select, a static query interface to the database, returning an array of
-     * hashmaps that contain key->object pairs.
+     * select, a static query interface to the database, returning an array of hashmaps that contain key->object pairs.
      * <P>
-     * This is the first operation created for the database, so therefore it is
-     * the simplest; cull information from the database but not specify any
-     * parameters.
-     *
+     * This is the first operation created for the database, so therefore it is the simplest; cull information from the database but not specify any parameters.
+     * 
      * @param query
      *            a static query of the database.
      * @return ArrayList of HashMaps carrying the database values.
@@ -363,9 +357,8 @@ public abstract class EntityDAO implements DAOInterface {
     // }
 
     /**
-     * execute, the static version of executing an update or insert on a table
-     * in the database.
-     *
+     * execute, the static version of executing an update or insert on a table in the database.
+     * 
      * @param query
      *            a static SQL statement which updates or inserts.
      */
@@ -471,13 +464,12 @@ public abstract class EntityDAO implements DAOInterface {
     }
 
     /**
-     * This method inserts one row for an entity table and gets latestPK of this
-     * row.
-     *
+     * This method inserts one row for an entity table and gets latestPK of this row.
+     * 
      * @param query
      * @param variables
      * @param nullVars
-     *
+     * 
      * @author ywang 11-26-2007
      */
     public void executeWithPK(String query, HashMap variables, HashMap nullVars) {
@@ -530,13 +522,9 @@ public abstract class EntityDAO implements DAOInterface {
     }
 
     /*
-     * Currently, latestPK is set only in executeWithPK() after inserting has
-     * been executed successfully. So, this method should be called only
-     * immediately after executeWithPK()
-     *
-     * @return
-     *
-     * ywang 11-26-2007
+     * Currently, latestPK is set only in executeWithPK() after inserting has been executed successfully. So, this method should be called only immediately
+     * after executeWithPK()
+     * @return ywang 11-26-2007
      */
     protected int getLatestPK() {
         return latestPK;
@@ -566,8 +554,7 @@ public abstract class EntityDAO implements DAOInterface {
                         hm.put(column, rs.getDate(i));
                         // do we want to put in a fake date if it's null?
                         /*
-                         * if (rs.wasNull()) { hm.put(column,new
-                         * Date(System.currentTimeMillis())); }
+                         * if (rs.wasNull()) { hm.put(column,new Date(System.currentTimeMillis())); }
                          */
                         break;
                     case TypeNames.TIMESTAMP:
@@ -652,9 +639,7 @@ public abstract class EntityDAO implements DAOInterface {
     }
 
     /*
-     * @return the current value of the primary key sequence, if <code>
-     * getNextPKName </code> is non-null, or null if <code> getNextPKName
-     * </code> is null.
+     * @return the current value of the primary key sequence, if <code> getNextPKName </code> is non-null, or null if <code> getNextPKName </code> is null.
      */
     public int getNextPK() {
         int answer = 0;
@@ -677,9 +662,8 @@ public abstract class EntityDAO implements DAOInterface {
     }
 
     /*
-     * @return the current value of the primary key sequence, if <code>
-     * getCurrentPKName </code> is non-null, or null if <code> getCurrentPKName
-     * </code> is null.
+     * @return the current value of the primary key sequence, if <code> getCurrentPKName </code> is non-null, or null if <code> getCurrentPKName </code> is
+     * null.
      */
     public int getCurrentPK() {
         int answer = 0;
@@ -702,30 +686,23 @@ public abstract class EntityDAO implements DAOInterface {
     }
 
     /**
-     * This method executes a "findByPK-style" query. Such a query has two
-     * characteristics:
+     * This method executes a "findByPK-style" query. Such a query has two characteristics:
      * <ol>
-     * <li>The columns SELECTed by the SQL are all of the columns in the table
-     * relevant to the DAO, and only those columns. (e.g., in StudyDAO, the
-     * columns SELECTed are all of the columns in the study table, and only
-     * those columns.)
+     * <li>The columns SELECTed by the SQL are all of the columns in the table relevant to the DAO, and only those columns. (e.g., in StudyDAO, the columns
+     * SELECTed are all of the columns in the study table, and only those columns.)
      * <li>It returns at most one EntityBean.
      * <ul>
-     * <li>Typically this means that the WHERE clause includes the columns in a
-     * candidate key with "=" criteria.
+     * <li>Typically this means that the WHERE clause includes the columns in a candidate key with "=" criteria.
      * <li>e.g., "WHERE item_id = ?" when selecting from item
-     * <li>e.g., "WHERE item_id = ? AND event_crf_id=?" when selecting from
-     * item_data
+     * <li>e.g., "WHERE item_id = ? AND event_crf_id=?" when selecting from item_data
      * </ol>
-     *
-     * Note that queries which join two tables may be included in the definition
-     * of "findByPK-style" query, as long as the first criterion is met.
-     *
+     * 
+     * Note that queries which join two tables may be included in the definition of "findByPK-style" query, as long as the first criterion is met.
+     * 
      * @param queryName
      *            The name of the query which should be executed.
      * @param variables
-     *            The set of variables used to populate the PreparedStatement;
-     *            should be empty if none are needed.
+     *            The set of variables used to populate the PreparedStatement; should be empty if none are needed.
      * @return The EntityBean selected by the query.
      */
     public EntityBean executeFindByPKQuery(String queryName, HashMap variables) {
@@ -750,9 +727,8 @@ public abstract class EntityDAO implements DAOInterface {
     }
 
     /**
-     * Exactly equivalent to calling
-     * <code>executeFindByPKQuery(queryName, new HashMap())</code>.
-     *
+     * Exactly equivalent to calling <code>executeFindByPKQuery(queryName, new HashMap())</code>.
+     * 
      * @param queryName
      *            The name of the query which should be executed.
      * @return The EntityBean selected by the query.
@@ -855,7 +831,7 @@ public abstract class EntityDAO implements DAOInterface {
 
     /**
      * getDS, had to add it to allow queries of other daos within the daos
-     *
+     * 
      * @return Returns the ds.
      */
     public DataSource getDs() {
@@ -870,30 +846,24 @@ public abstract class EntityDAO implements DAOInterface {
     // this.ds = ds;
     // }
     /**
-     * Clear the signals which indicate the success or failure of the query.
-     * This method should be called at the beginning of every select or execute
-     * method.
+     * Clear the signals which indicate the success or failure of the query. This method should be called at the beginning of every select or execute method.
      */
     protected void clearSignals() {
         querySuccessful = false;
     }
 
     /**
-     * Signal that the query was successful. Either this method or signalFailure
-     * should be called by the time a select or execute method returns.
+     * Signal that the query was successful. Either this method or signalFailure should be called by the time a select or execute method returns.
      */
     protected void signalSuccess() {
         querySuccessful = true;
     }
 
     /**
-     * Signal that the query was unsuccessful. Either this method or
-     * signalSuccess should be called by the time a select or execute method
-     * returns.
-     *
+     * Signal that the query was unsuccessful. Either this method or signalSuccess should be called by the time a select or execute method returns.
+     * 
      * @param sqle
-     *            The SQLException which was thrown by
-     *            PreparedStatement.execute/executeUpdate.
+     *            The SQLException which was thrown by PreparedStatement.execute/executeUpdate.
      */
     protected void signalFailure(SQLException sqle) {
         querySuccessful = false;
@@ -958,7 +928,7 @@ public abstract class EntityDAO implements DAOInterface {
 
     public void initializeI18nStrings() {
         if (locale != null) {
-            //oc_df_string = ResourceBundleProvider.getFormatBundle(locale).getString("oc_date_format_string");
+            // oc_df_string = ResourceBundleProvider.getFormatBundle(locale).getString("oc_date_format_string");
             oc_df_string = ApplicationConstants.getDateFormatInItemData();
             local_df_string = ResourceBundleProvider.getFormatBundle(locale).getString("date_format_string");
         }
@@ -967,25 +937,19 @@ public abstract class EntityDAO implements DAOInterface {
     /**
      * ********************************************************************************
      * ********************************************************************************
-     *
-     * @vbc 08/06/2008 NEW EXTRACT DATA IMPLEMENTATION - a new section that uses
-     *      a different way to access the data - this is to improve performance
-     *      and fix some bugs with the data extraction
-     *      *******************************************************************************
-     *
-     *
-     * @ywang, 09-09-2008, modified syntax of some sql scripts for oracle
-     *         database.
-     *
+     * 
+     * @vbc 08/06/2008 NEW EXTRACT DATA IMPLEMENTATION - a new section that uses a different way to access the data - this is to improve performance and fix
+     *      some bugs with the data extraction *******************************************************************************
+     * 
+     * 
+     * @ywang, 09-09-2008, modified syntax of some sql scripts for oracle database.
+     * 
      */
     /**
-     * select, a static query interface to the database, returning an array of
-     * hashmaps that contain key->object pairs.
+     * select, a static query interface to the database, returning an array of hashmaps that contain key->object pairs.
      * <P>
-     * This is the first operation created for the database, so therefore it is
-     * the simplest; cull information from the database but not specify any
-     * parameters.
-     *
+     * This is the first operation created for the database, so therefore it is the simplest; cull information from the database but not specify any parameters.
+     * 
      * @param query
      *            a static query of the database.
      * @return ArrayList of HashMaps carrying the database values.
@@ -1036,7 +1000,7 @@ public abstract class EntityDAO implements DAOInterface {
     }//
 
     /**
-     *
+     * 
      * @param rs
      * @return
      */
@@ -1121,123 +1085,79 @@ public abstract class EntityDAO implements DAOInterface {
     protected String getSQLSubjectStudySubjectDataset(int studyid, int studyparentid, String sedin, String it_in, String dateConstraint,
             String ecStatusConstraint, String itStatusConstraint, String databaseName) {
         /**
-         *
+         * 
          * SELECT
-         *
-         * DISTINCT ON (study_subject.study_subject_id )
-         * study_subject.study_subject_id , study_subject.subject_id,
-         * study_subject.label, subject.date_of_birth, subject.gender,
-         * subject.unique_identifier,subject.dob_collected, subject.status_id,
-         * study_subject.secondary_label, study_event.start_time_flag,
+         * 
+         * DISTINCT ON (study_subject.study_subject_id ) study_subject.study_subject_id , study_subject.subject_id, study_subject.label, subject.date_of_birth,
+         * subject.gender, subject.unique_identifier,subject.dob_collected, subject.status_id, study_subject.secondary_label, study_event.start_time_flag,
          * study_event.end_time_flag FROM study_subject
-         *
-         *
-         * JOIN subject ON (study_subject.subject_id =
-         * subject.subject_id::numeric) JOIN study_event ON
-         * (study_subject.study_subject_id = study_event.study_subject_id)
-         *
-         *
+         * 
+         * 
+         * JOIN subject ON (study_subject.subject_id = subject.subject_id::numeric) JOIN study_event ON (study_subject.study_subject_id =
+         * study_event.study_subject_id)
+         * 
+         * 
          * WHERE
-         *
+         * 
          * study_subject.study_subject_id IN (
-         *
+         * 
          * SELECT DISTINCT studysubjectid FROM
-         *
+         * 
          * (SELECT
-         *
-         * itemdataid, studysubjectid, study_event.sample_ordinal,
-         * study_event.study_event_definition_id, study_event_definition.name,
-         * study_event.location, study_event.date_start, study_event.date_end,
-         *
+         * 
+         * itemdataid, studysubjectid, study_event.sample_ordinal, study_event.study_event_definition_id, study_event_definition.name, study_event.location,
+         * study_event.date_start, study_event.date_end,
+         * 
          * itemid, crfversionid, eventcrfid, studyeventid
-         *
-         * FROM ( SELECT item_data.item_data_id AS itemdataid, item_data.item_id
-         * AS itemid, item_data.value AS itemvalue, item.name AS itemname,
-         * item.description AS itemdesc, item.units AS itemunits,
-         * event_crf.event_crf_id AS eventcrfid, crf_version.name AS
-         * crfversioname, crf_version.crf_version_id AS crfversionid,
-         * event_crf.study_subject_id as studysubjectid,
-         * event_crf.study_event_id AS studyeventid
-         *
+         * 
+         * FROM ( SELECT item_data.item_data_id AS itemdataid, item_data.item_id AS itemid, item_data.value AS itemvalue, item.name AS itemname,
+         * item.description AS itemdesc, item.units AS itemunits, event_crf.event_crf_id AS eventcrfid, crf_version.name AS crfversioname,
+         * crf_version.crf_version_id AS crfversionid, event_crf.study_subject_id as studysubjectid, event_crf.study_event_id AS studyeventid
+         * 
          * FROM item_data, item, event_crf
-         *
-         * join crf_version ON event_crf.crf_version_id =
-         * crf_version.crf_version_id and (event_crf.status_id = 2::numeric OR
-         * event_crf.status_id = 6::numeric)
-         *
+         * 
+         * join crf_version ON event_crf.crf_version_id = crf_version.crf_version_id and (event_crf.status_id = 2::numeric OR event_crf.status_id = 6::numeric)
+         * 
          * WHERE
-         *
-         * item_data.item_id = item.item_id AND item_data.event_crf_id =
-         * event_crf.event_crf_id AND
-         *
-         * item_data.item_id IN ( 1005, 1006, 1007, 1008, 1009, 1010, 1011,
-         * 1012, 1013, 1014, 1015, 1016, 1017, 1018, 1133, 1134, 1198, 1135,
-         * 1136, 1137, 1138, 1139, 1140, 1141, 1142, 1143, 1144, 1145, 1146,
-         * 1147, 1148, 1149, 1150, 1151, 1152, 1153, 1154, 1155, 1156, 1157,
-         * 1158, 1159, 1160, 1161, 1162, 1163, 1164, 1165, 1166, 1167, 1168,
-         * 1169, 1170, 1171, 1172, 1173, 1174, 1175, 1176, 1177, 1178, 1179,
-         * 1180, 1181, 1182, 1183, 1184, 1185, 1186, 1187, 1188, 1189, 1190,
-         * 1191, 1192, 1193, 1194, 1195, 1196, 1197 )
-         *
-         * AND item_data.event_crf_id IN ( SELECT event_crf_id FROM event_crf
-         * WHERE event_crf.study_event_id IN ( SELECT study_event_id FROM
-         * study_event
-         *
-         * WHERE study_event.study_event_definition_id IN (9) AND (
-         * study_event.sample_ordinal IS NOT NULL AND study_event.location IS
-         * NOT NULL AND study_event.date_start IS NOT NULL ) AND
-         * study_event.study_subject_id IN (
-         *
-         * SELECT DISTINCT study_subject.study_subject_id FROM study_subject
-         * JOIN study ON ( study.study_id::numeric = study_subject.study_id AND
-         * (study.study_id=2 OR study.parent_study_id=2) ) JOIN subject ON
-         * study_subject.subject_id = subject.subject_id::numeric JOIN
-         * study_event_definition ON ( study.study_id::numeric =
-         * study_event_definition.study_id OR study.parent_study_id =
-         * study_event_definition.study_id ) JOIN study_event ON (
-         * study_subject.study_subject_id = study_event.study_subject_id AND
-         * study_event_definition.study_event_definition_id::numeric =
-         * study_event.study_event_definition_id ) JOIN event_crf ON (
-         * study_event.study_event_id = event_crf.study_event_id AND
-         * study_event.study_subject_id = event_crf.study_subject_id AND
-         * (event_crf.status_id = 2::numeric OR event_crf.status_id =
-         * 6::numeric) ) WHERE (date(study_subject.enrollment_date) >=
-         * date('1900-01-01')) and (date(study_subject.enrollment_date) <=
-         * date('2100-12-31')) AND
-         * study_event_definition.study_event_definition_id IN (9) ) ) AND
-         * study_subject_id IN ( SELECT DISTINCT study_subject.study_subject_id
-         * FROM study_subject JOIN study ON ( study.study_id::numeric =
-         * study_subject.study_id AND (study.study_id=2 OR
-         * study.parent_study_id=2) ) JOIN subject ON study_subject.subject_id =
-         * subject.subject_id::numeric JOIN study_event_definition ON (
-         * study.study_id::numeric = study_event_definition.study_id OR
-         * study.parent_study_id = study_event_definition.study_id ) JOIN
-         * study_event ON ( study_subject.study_subject_id =
-         * study_event.study_subject_id AND
-         * study_event_definition.study_event_definition_id::numeric =
-         * study_event.study_event_definition_id ) JOIN event_crf ON (
-         * study_event.study_event_id = event_crf.study_event_id AND
-         * study_event.study_subject_id = event_crf.study_subject_id AND
-         * (event_crf.status_id = 2::numeric OR event_crf.status_id =
-         * 6::numeric) ) WHERE (date(study_subject.enrollment_date) >=
-         * date('1900-01-01')) and (date(study_subject.enrollment_date) <=
-         * date('2100-12-31')) AND
-         * study_event_definition.study_event_definition_id IN (9) ) AND
-         * (event_crf.status_id = 2::numeric OR event_crf.status_id =
-         * 6::numeric) ) AND (item_data.status_id = 2::numeric OR
-         * item_data.status_id = 6::numeric) ) AS SBQONE, study_event,
-         * study_event_definition
-         *
-         *
-         *
+         * 
+         * item_data.item_id = item.item_id AND item_data.event_crf_id = event_crf.event_crf_id AND
+         * 
+         * item_data.item_id IN ( 1005, 1006, 1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014, 1015, 1016, 1017, 1018, 1133, 1134, 1198, 1135, 1136, 1137, 1138,
+         * 1139, 1140, 1141, 1142, 1143, 1144, 1145, 1146, 1147, 1148, 1149, 1150, 1151, 1152, 1153, 1154, 1155, 1156, 1157, 1158, 1159, 1160, 1161, 1162, 1163,
+         * 1164, 1165, 1166, 1167, 1168, 1169, 1170, 1171, 1172, 1173, 1174, 1175, 1176, 1177, 1178, 1179, 1180, 1181, 1182, 1183, 1184, 1185, 1186, 1187, 1188,
+         * 1189, 1190, 1191, 1192, 1193, 1194, 1195, 1196, 1197 )
+         * 
+         * AND item_data.event_crf_id IN ( SELECT event_crf_id FROM event_crf WHERE event_crf.study_event_id IN ( SELECT study_event_id FROM study_event
+         * 
+         * WHERE study_event.study_event_definition_id IN (9) AND ( study_event.sample_ordinal IS NOT NULL AND study_event.location IS NOT NULL AND
+         * study_event.date_start IS NOT NULL ) AND study_event.study_subject_id IN (
+         * 
+         * SELECT DISTINCT study_subject.study_subject_id FROM study_subject JOIN study ON ( study.study_id::numeric = study_subject.study_id AND
+         * (study.study_id=2 OR study.parent_study_id=2) ) JOIN subject ON study_subject.subject_id = subject.subject_id::numeric JOIN study_event_definition ON
+         * ( study.study_id::numeric = study_event_definition.study_id OR study.parent_study_id = study_event_definition.study_id ) JOIN study_event ON (
+         * study_subject.study_subject_id = study_event.study_subject_id AND study_event_definition.study_event_definition_id::numeric =
+         * study_event.study_event_definition_id ) JOIN event_crf ON ( study_event.study_event_id = event_crf.study_event_id AND study_event.study_subject_id =
+         * event_crf.study_subject_id AND (event_crf.status_id = 2::numeric OR event_crf.status_id = 6::numeric) ) WHERE (date(study_subject.enrollment_date) >=
+         * date('1900-01-01')) and (date(study_subject.enrollment_date) <= date('2100-12-31')) AND study_event_definition.study_event_definition_id IN (9) ) )
+         * AND study_subject_id IN ( SELECT DISTINCT study_subject.study_subject_id FROM study_subject JOIN study ON ( study.study_id::numeric =
+         * study_subject.study_id AND (study.study_id=2 OR study.parent_study_id=2) ) JOIN subject ON study_subject.subject_id = subject.subject_id::numeric
+         * JOIN study_event_definition ON ( study.study_id::numeric = study_event_definition.study_id OR study.parent_study_id = study_event_definition.study_id
+         * ) JOIN study_event ON ( study_subject.study_subject_id = study_event.study_subject_id AND study_event_definition.study_event_definition_id::numeric =
+         * study_event.study_event_definition_id ) JOIN event_crf ON ( study_event.study_event_id = event_crf.study_event_id AND study_event.study_subject_id =
+         * event_crf.study_subject_id AND (event_crf.status_id = 2::numeric OR event_crf.status_id = 6::numeric) ) WHERE (date(study_subject.enrollment_date) >=
+         * date('1900-01-01')) and (date(study_subject.enrollment_date) <= date('2100-12-31')) AND study_event_definition.study_event_definition_id IN (9) ) AND
+         * (event_crf.status_id = 2::numeric OR event_crf.status_id = 6::numeric) ) AND (item_data.status_id = 2::numeric OR item_data.status_id = 6::numeric) )
+         * AS SBQONE, study_event, study_event_definition
+         * 
+         * 
+         * 
          * WHERE
-         *
-         * (study_event.study_event_id = SBQONE.studyeventid) AND
-         * (study_event.study_event_definition_id =
-         * study_event_definition.study_event_definition_id) ) AS SBQTWO )
-         *
-         *
-         *
+         * 
+         * (study_event.study_event_id = SBQONE.studyeventid) AND (study_event.study_event_definition_id = study_event_definition.study_event_definition_id) )
+         * AS SBQTWO )
+         * 
+         * 
+         * 
          */
         if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
             // The original sql for postgresql fetched only one record for each
@@ -1256,24 +1176,13 @@ public abstract class EntityDAO implements DAOInterface {
                 + getSQLDatasetBASE_EVENTSIDE(studyid, studyparentid, sedin, it_in, dateConstraint, ecStatusConstraint, itStatusConstraint) + " ) SBQTWO "
                 + "  ) order by study_subject.study_subject_id";
             /*
-             * // Here, for oracle, we go for min(study_event_id) for a //
-             * study_subject_id return "SELECT study_subject.study_subject_id ,
-             * study_subject.label, study_subject.subject_id, " + "
-             * subject.date_of_birth, subject.gender, subject.unique_identifier,
-             * subject.dob_collected, " + " subject.status_id,
-             * study_subject.secondary_label, study_event.start_time_flag,
-             * study_event.end_time_flag " + " FROM " + " study_subject " + "
-             * JOIN subject ON (study_subject.subject_id = subject.subject_id) " + "
-             * JOIN study_event ON (study_subject.study_subject_id =
-             * study_event.study_subject_id) " + " WHERE " + "
-             * study_subject.study_subject_id IN " + " ( " + "SELECT DISTINCT
-             * studysubjectid FROM " + "( " +
-             * getSQLDatasetBASE_EVENTSIDE(studyid, studyparentid, sedin, it_in,
-             * dateConstraint) + " ) SBQTWO " + " ) and
-             * study_event.study_event_id = (select min(se.study_event_id) from
-             * study_event se" + " where se.study_subject_id =
-             * study_event.study_subject_id) order by
-             * study_subject.study_subject_id";
+             * // Here, for oracle, we go for min(study_event_id) for a // study_subject_id return "SELECT study_subject.study_subject_id , study_subject.label,
+             * study_subject.subject_id, " + " subject.date_of_birth, subject.gender, subject.unique_identifier, subject.dob_collected, " + " subject.status_id,
+             * study_subject.secondary_label, study_event.start_time_flag, study_event.end_time_flag " + " FROM " + " study_subject " + " JOIN subject ON
+             * (study_subject.subject_id = subject.subject_id) " + " JOIN study_event ON (study_subject.study_subject_id = study_event.study_subject_id) " + "
+             * WHERE " + " study_subject.study_subject_id IN " + " ( " + "SELECT DISTINCT studysubjectid FROM " + "( " + getSQLDatasetBASE_EVENTSIDE(studyid,
+             * studyparentid, sedin, it_in, dateConstraint) + " ) SBQTWO " + " ) and study_event.study_event_id = (select min(se.study_event_id) from
+             * study_event se" + " where se.study_subject_id = study_event.study_subject_id) order by study_subject.study_subject_id";
              */
         } else {
             return " SELECT   " + " DISTINCT ON (study_subject.study_subject_id ) "
@@ -1290,7 +1199,7 @@ public abstract class EntityDAO implements DAOInterface {
     }// getSQLSubjectStudySubjectDataset
 
     /**
-     *
+     * 
      * @param studyid
      * @param parentid
      * @param sedin
@@ -1329,6 +1238,7 @@ public abstract class EntityDAO implements DAOInterface {
             }
             // ps.close();
             signalSuccess();
+            System.out.println("*** query that runs before we fill the ItemGroupSide: " + query);
             processBASE_ITEMGROUPSIDERecords(rs, eb);
             bret = true;
             // rs.close();
@@ -1349,7 +1259,7 @@ public abstract class EntityDAO implements DAOInterface {
 
     /**
      * Main function call
-     *
+     * 
      * @param studyid
      * @param parentid
      * @param sedin
@@ -1388,6 +1298,7 @@ public abstract class EntityDAO implements DAOInterface {
             }
             // ps.close();
             signalSuccess();
+            System.out.println("*** query that generates the event side records " + query);
             bret = processBASE_EVENTSIDERecords(rs, eb);
             // rs.close();
             bret = true;
@@ -1408,7 +1319,7 @@ public abstract class EntityDAO implements DAOInterface {
 
     /**
      * For each item_data_id stores a getSQLDatasetBASE_ITEMGROUPSIDE object
-     *
+     * 
      * @param rs
      * @return
      */
@@ -1418,16 +1329,13 @@ public abstract class EntityDAO implements DAOInterface {
         int cnt = 0;
 
         /**
-         * fields are: SELECT itemdataid, itemdataordinal,
-         * item_group_metadata.item_group_id , item_group.name, itemdesc,
-         * itemname, itemvalue, itemunits, crfversioname, crfversionstatusid,
-         * dateinterviewed, interviewername, eventcrfdatecompleted,
-         * eventcrfdatevalidatecompleted, eventcrfcompletionstatusid,
-         * repeat_number, crfid,
-         *
-         *
+         * fields are: SELECT itemdataid, itemdataordinal, item_group_metadata.item_group_id , item_group.name, itemdesc, itemname, itemvalue, itemunits,
+         * crfversioname, crfversionstatusid, dateinterviewed, interviewername, eventcrfdatecompleted, eventcrfdatevalidatecompleted,
+         * eventcrfcompletionstatusid, repeat_number, crfid,
+         * 
+         * 
          * //and ids studysubjectid, eventcrfid, itemid, crfversionid
-         *
+         * 
          */
         try {
             while (rs.next()) {
@@ -1612,7 +1520,7 @@ public abstract class EntityDAO implements DAOInterface {
 
     /**
      * For each item_data_id stores a getSQLDatasetBASE_ITEMGROUPSIDE object
-     *
+     * 
      * @param rs
      * @return
      */
@@ -1621,17 +1529,15 @@ public abstract class EntityDAO implements DAOInterface {
 
         /**
          * fields are: SELECT
-         *
-         * itemdataid, studysubjectid, study_event.sample_ordinal,
-         * study_event.study_event_definition_id, study_event_definition.name,
-         * study_event.location, study_event.date_start, study_event.date_end,
-         *
-         * study_event.start_time_flag study_event.end_time_flag
-         * study_event.status_id study_event.subject_event_status_id
-         *
-         *
+         * 
+         * itemdataid, studysubjectid, study_event.sample_ordinal, study_event.study_event_definition_id, study_event_definition.name, study_event.location,
+         * study_event.date_start, study_event.date_end,
+         * 
+         * study_event.start_time_flag study_event.end_time_flag study_event.status_id study_event.subject_event_status_id
+         * 
+         * 
          * //ids itemid, crfversionid, eventcrfid, studyeventid
-         *
+         * 
          */
 
         int cnt = 0;
@@ -1828,7 +1734,7 @@ public abstract class EntityDAO implements DAOInterface {
 
     /**
      * There are two base querries for dataset
-     *
+     * 
      * @param studyid
      * @param studyparentid
      * @param sedin
@@ -1839,102 +1745,60 @@ public abstract class EntityDAO implements DAOInterface {
             String itStatusConstraint) {
 
         /**
-         * NEEEDS to replace four elements: - item_id IN (...) from dataset sql -
-         * study_event_definition_id IN (...) from sql dataset - study_id and
+         * NEEEDS to replace four elements: - item_id IN (...) from dataset sql - study_event_definition_id IN (...) from sql dataset - study_id and
          * parent_study_id from current study
-         *
+         * 
          * SELECT
-         *
-         * itemdataid, studysubjectid, study_event.sample_ordinal,
-         * study_event.study_event_definition_id, study_event_definition.name,
-         * study_event.location, study_event.date_start, study_event.date_end,
-         *
+         * 
+         * itemdataid, studysubjectid, study_event.sample_ordinal, study_event.study_event_definition_id, study_event_definition.name, study_event.location,
+         * study_event.date_start, study_event.date_end,
+         * 
          * itemid, crfversionid, eventcrfid, studyeventid
-         *
-         * FROM ( SELECT item_data.item_data_id AS itemdataid, item_data.item_id
-         * AS itemid, item_data.value AS itemvalue, item.name AS itemname,
-         * item.description AS itemdesc, item.units AS itemunits,
-         * event_crf.event_crf_id AS eventcrfid, crf_version.name AS
-         * crfversioname, crf_version.crf_version_id AS crfversionid,
-         * event_crf.study_subject_id as studysubjectid,
-         * event_crf.study_event_id AS studyeventid
-         *
+         * 
+         * FROM ( SELECT item_data.item_data_id AS itemdataid, item_data.item_id AS itemid, item_data.value AS itemvalue, item.name AS itemname,
+         * item.description AS itemdesc, item.units AS itemunits, event_crf.event_crf_id AS eventcrfid, crf_version.name AS crfversioname,
+         * crf_version.crf_version_id AS crfversionid, event_crf.study_subject_id as studysubjectid, event_crf.study_event_id AS studyeventid
+         * 
          * FROM item_data, item, event_crf
-         *
-         * join crf_version ON event_crf.crf_version_id =
-         * crf_version.crf_version_id and (event_crf.status_id = 2::numeric OR
-         * event_crf.status_id = 6::numeric)
-         *
+         * 
+         * join crf_version ON event_crf.crf_version_id = crf_version.crf_version_id and (event_crf.status_id = 2::numeric OR event_crf.status_id = 6::numeric)
+         * 
          * WHERE
-         *
-         * item_data.item_id = item.item_id AND item_data.event_crf_id =
-         * event_crf.event_crf_id AND
-         *
-         * item_data.item_id IN ( 1005, 1006, 1007, 1008, 1009, 1010, 1011,
-         * 1012, 1013, 1014, 1015, 1016, 1017, 1018, 1133, 1134, 1198, 1135,
-         * 1136, 1137, 1138, 1139, 1140, 1141, 1142, 1143, 1144, 1145, 1146,
-         * 1147, 1148, 1149, 1150, 1151, 1152, 1153, 1154, 1155, 1156, 1157,
-         * 1158, 1159, 1160, 1161, 1162, 1163, 1164, 1165, 1166, 1167, 1168,
-         * 1169, 1170, 1171, 1172, 1173, 1174, 1175, 1176, 1177, 1178, 1179,
-         * 1180, 1181, 1182, 1183, 1184, 1185, 1186, 1187, 1188, 1189, 1190,
-         * 1191, 1192, 1193, 1194, 1195, 1196, 1197 )
-         *
-         * AND item_data.event_crf_id IN ( SELECT event_crf_id FROM event_crf
-         * WHERE event_crf.study_event_id IN ( SELECT study_event_id FROM
-         * study_event
-         *
-         * WHERE study_event.study_event_definition_id IN (9) AND (
-         * study_event.sample_ordinal IS NOT NULL AND study_event.location IS
-         * NOT NULL AND study_event.date_start IS NOT NULL ) AND
-         * study_event.study_subject_id IN (
-         *
-         * SELECT DISTINCT study_subject.study_subject_id FROM study_subject
-         * JOIN study ON ( study.study_id::numeric = study_subject.study_id AND
-         * (study.study_id=2 OR study.parent_study_id=2) ) JOIN subject ON
-         * study_subject.subject_id = subject.subject_id::numeric JOIN
-         * study_event_definition ON ( study.study_id::numeric =
-         * study_event_definition.study_id OR study.parent_study_id =
-         * study_event_definition.study_id ) JOIN study_event ON (
-         * study_subject.study_subject_id = study_event.study_subject_id AND
-         * study_event_definition.study_event_definition_id::numeric =
-         * study_event.study_event_definition_id ) JOIN event_crf ON (
-         * study_event.study_event_id = event_crf.study_event_id AND
-         * study_event.study_subject_id = event_crf.study_subject_id AND
-         * (event_crf.status_id = 2::numeric OR event_crf.status_id =
-         * 6::numeric) ) WHERE (date(study_subject.enrollment_date) >=
-         * date('1900-01-01')) and (date(study_subject.enrollment_date) <=
-         * date('2100-12-31')) AND
-         * study_event_definition.study_event_definition_id IN (9) ) ) AND
-         * study_subject_id IN ( SELECT DISTINCT study_subject.study_subject_id
-         * FROM study_subject JOIN study ON ( study.study_id::numeric =
-         * study_subject.study_id AND (study.study_id=2 OR
-         * study.parent_study_id=2) ) JOIN subject ON study_subject.subject_id =
-         * subject.subject_id::numeric JOIN study_event_definition ON (
-         * study.study_id::numeric = study_event_definition.study_id OR
-         * study.parent_study_id = study_event_definition.study_id ) JOIN
-         * study_event ON ( study_subject.study_subject_id =
-         * study_event.study_subject_id AND
-         * study_event_definition.study_event_definition_id::numeric =
-         * study_event.study_event_definition_id ) JOIN event_crf ON (
-         * study_event.study_event_id = event_crf.study_event_id AND
-         * study_event.study_subject_id = event_crf.study_subject_id AND
-         * (event_crf.status_id = 2::numeric OR event_crf.status_id =
-         * 6::numeric) ) WHERE (date(study_subject.enrollment_date) >=
-         * date('1900-01-01')) and (date(study_subject.enrollment_date) <=
-         * date('2100-12-31')) AND
-         * study_event_definition.study_event_definition_id IN (9) ) AND
-         * (event_crf.status_id = 2::numeric OR event_crf.status_id =
-         * 6::numeric) ) AND (item_data.status_id = 2::numeric OR
-         * item_data.status_id = 6::numeric) ) AS SBQONE, study_event,
-         * study_event_definition
-         *
-         *
-         *
+         * 
+         * item_data.item_id = item.item_id AND item_data.event_crf_id = event_crf.event_crf_id AND
+         * 
+         * item_data.item_id IN ( 1005, 1006, 1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014, 1015, 1016, 1017, 1018, 1133, 1134, 1198, 1135, 1136, 1137, 1138,
+         * 1139, 1140, 1141, 1142, 1143, 1144, 1145, 1146, 1147, 1148, 1149, 1150, 1151, 1152, 1153, 1154, 1155, 1156, 1157, 1158, 1159, 1160, 1161, 1162, 1163,
+         * 1164, 1165, 1166, 1167, 1168, 1169, 1170, 1171, 1172, 1173, 1174, 1175, 1176, 1177, 1178, 1179, 1180, 1181, 1182, 1183, 1184, 1185, 1186, 1187, 1188,
+         * 1189, 1190, 1191, 1192, 1193, 1194, 1195, 1196, 1197 )
+         * 
+         * AND item_data.event_crf_id IN ( SELECT event_crf_id FROM event_crf WHERE event_crf.study_event_id IN ( SELECT study_event_id FROM study_event
+         * 
+         * WHERE study_event.study_event_definition_id IN (9) AND ( study_event.sample_ordinal IS NOT NULL AND study_event.location IS NOT NULL AND
+         * study_event.date_start IS NOT NULL ) AND study_event.study_subject_id IN (
+         * 
+         * SELECT DISTINCT study_subject.study_subject_id FROM study_subject JOIN study ON ( study.study_id::numeric = study_subject.study_id AND
+         * (study.study_id=2 OR study.parent_study_id=2) ) JOIN subject ON study_subject.subject_id = subject.subject_id::numeric JOIN study_event_definition ON
+         * ( study.study_id::numeric = study_event_definition.study_id OR study.parent_study_id = study_event_definition.study_id ) JOIN study_event ON (
+         * study_subject.study_subject_id = study_event.study_subject_id AND study_event_definition.study_event_definition_id::numeric =
+         * study_event.study_event_definition_id ) JOIN event_crf ON ( study_event.study_event_id = event_crf.study_event_id AND study_event.study_subject_id =
+         * event_crf.study_subject_id AND (event_crf.status_id = 2::numeric OR event_crf.status_id = 6::numeric) ) WHERE (date(study_subject.enrollment_date) >=
+         * date('1900-01-01')) and (date(study_subject.enrollment_date) <= date('2100-12-31')) AND study_event_definition.study_event_definition_id IN (9) ) )
+         * AND study_subject_id IN ( SELECT DISTINCT study_subject.study_subject_id FROM study_subject JOIN study ON ( study.study_id::numeric =
+         * study_subject.study_id AND (study.study_id=2 OR study.parent_study_id=2) ) JOIN subject ON study_subject.subject_id = subject.subject_id::numeric
+         * JOIN study_event_definition ON ( study.study_id::numeric = study_event_definition.study_id OR study.parent_study_id = study_event_definition.study_id
+         * ) JOIN study_event ON ( study_subject.study_subject_id = study_event.study_subject_id AND study_event_definition.study_event_definition_id::numeric =
+         * study_event.study_event_definition_id ) JOIN event_crf ON ( study_event.study_event_id = event_crf.study_event_id AND study_event.study_subject_id =
+         * event_crf.study_subject_id AND (event_crf.status_id = 2::numeric OR event_crf.status_id = 6::numeric) ) WHERE (date(study_subject.enrollment_date) >=
+         * date('1900-01-01')) and (date(study_subject.enrollment_date) <= date('2100-12-31')) AND study_event_definition.study_event_definition_id IN (9) ) AND
+         * (event_crf.status_id = 2::numeric OR event_crf.status_id = 6::numeric) ) AND (item_data.status_id = 2::numeric OR item_data.status_id = 6::numeric) )
+         * AS SBQONE, study_event, study_event_definition
+         * 
+         * 
+         * 
          * WHERE
-         *
-         * (study_event.study_event_id = SBQONE.studyeventid) AND
-         * (study_event.study_event_definition_id =
-         * study_event_definition.study_event_definition_id)
+         * 
+         * (study_event.study_event_id = SBQONE.studyeventid) AND (study_event.study_event_definition_id = study_event_definition.study_event_definition_id)
          */
 
         if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
@@ -2207,7 +2071,7 @@ public abstract class EntityDAO implements DAOInterface {
 
     /**
      * This is the second base sql
-     *
+     * 
      * @param studyid
      * @param studyparentid
      * @param sedin
@@ -2217,109 +2081,64 @@ public abstract class EntityDAO implements DAOInterface {
     protected String getSQLDatasetBASE_ITEMGROUPSIDE(int studyid, int studyparentid, String sedin, String it_in, String dateConstraint,
             String ecStatusConstraint, String itStatusConstraint) {
         /**
-         * NEEEDS to replace four elements: - item_id IN (...) from dataset sql -
-         * study_event_definition_id IN (...) from sql dataset - study_id and
+         * NEEEDS to replace four elements: - item_id IN (...) from dataset sql - study_event_definition_id IN (...) from sql dataset - study_id and
          * parent_study_id from current study
-         *
-         *
-         * SELECT itemdataid, itemdataordinal, item_group_metadata.item_group_id ,
-         * item_group.name, itemdesc, itemname, itemvalue, itemunits,
-         * crfversioname, crfversionstatusid, crfid,
-         * item_group_metadata.repeat_number, dateinterviewed, interviewername,
+         * 
+         * 
+         * SELECT itemdataid, itemdataordinal, item_group_metadata.item_group_id , item_group.name, itemdesc, itemname, itemvalue, itemunits, crfversioname,
+         * crfversionstatusid, crfid, item_group_metadata.repeat_number, dateinterviewed, interviewername,
          * eventcrfdatevalidatecompleted,eventcrfcompletionstatusid,
-         *
-         *
-         * studysubjectid, eventcrfid, itemid, crfversionid FROM ( SELECT
-         * item_data.item_data_id AS itemdataid, item_data.item_id AS itemid,
-         * item_data.value AS itemvalue, item_data.ordinal AS itemdataordinal,
-         * item.name AS itemname, item.description AS itemdesc, item.units AS
-         * itemunits, event_crf.event_crf_id AS eventcrfid, crf_version.name AS
-         * crfversioname, crf_version.crf_version_id AS crfversionid,
-         * crf_version.crf_id AS crfid, event_crf.study_subject_id as
-         * studysubjectid, crf_version.status_id AS crfversionstatusid,
-         * event_crf.date_interviewed AS dateinterviewed,
-         * event_crf.interviewer_name as interviewername,
-         * event_crf.date_validate_completed AS eventcrfdatevalidatecompleted,
-         * event_crf.completion_status_id AS eventcrfcompletionstatusid
-         *
+         * 
+         * 
+         * studysubjectid, eventcrfid, itemid, crfversionid FROM ( SELECT item_data.item_data_id AS itemdataid, item_data.item_id AS itemid, item_data.value AS
+         * itemvalue, item_data.ordinal AS itemdataordinal, item.name AS itemname, item.description AS itemdesc, item.units AS itemunits, event_crf.event_crf_id
+         * AS eventcrfid, crf_version.name AS crfversioname, crf_version.crf_version_id AS crfversionid, crf_version.crf_id AS crfid, event_crf.study_subject_id
+         * as studysubjectid, crf_version.status_id AS crfversionstatusid, event_crf.date_interviewed AS dateinterviewed, event_crf.interviewer_name as
+         * interviewername, event_crf.date_validate_completed AS eventcrfdatevalidatecompleted, event_crf.completion_status_id AS eventcrfcompletionstatusid
+         * 
          * FROM item_data, item, event_crf
-         *
-         * join crf_version ON event_crf.crf_version_id =
-         * crf_version.crf_version_id and (event_crf.status_id = 2::numeric OR
-         * event_crf.status_id = 6::numeric)
-         *
+         * 
+         * join crf_version ON event_crf.crf_version_id = crf_version.crf_version_id and (event_crf.status_id = 2::numeric OR event_crf.status_id = 6::numeric)
+         * 
          * WHERE
-         *
-         * item_data.item_id = item.item_id AND item_data.event_crf_id =
-         * event_crf.event_crf_id AND
-         *
-         * item_data.item_id IN ( 1005, 1006, 1007, 1008, 1009, 1010, 1011,
-         * 1012, 1013, 1014, 1015, 1016, 1017, 1018, 1133, 1134, 1198, 1135,
-         * 1136, 1137, 1138, 1139, 1140, 1141, 1142, 1143, 1144, 1145, 1146,
-         * 1147, 1148, 1149, 1150, 1151, 1152, 1153, 1154, 1155, 1156, 1157,
-         * 1158, 1159, 1160, 1161, 1162, 1163, 1164, 1165, 1166, 1167, 1168,
-         * 1169, 1170, 1171, 1172, 1173, 1174, 1175, 1176, 1177, 1178, 1179,
-         * 1180, 1181, 1182, 1183, 1184, 1185, 1186, 1187, 1188, 1189, 1190,
-         * 1191, 1192, 1193, 1194, 1195, 1196, 1197 )
-         *
-         * AND item_data.event_crf_id IN ( SELECT event_crf_id FROM event_crf
-         * WHERE event_crf.study_event_id IN ( SELECT study_event_id FROM
-         * study_event
-         *
-         * WHERE study_event.study_event_definition_id IN (9) AND (
-         * study_event.sample_ordinal IS NOT NULL AND study_event.location IS
-         * NOT NULL AND study_event.date_start IS NOT NULL ) AND
-         * study_event.study_subject_id IN (
-         *
-         * SELECT DISTINCT study_subject.study_subject_id FROM study_subject
-         * JOIN study ON ( study.study_id::numeric = study_subject.study_id AND
-         * (study.study_id=2 OR study.parent_study_id=2) ) JOIN subject ON
-         * study_subject.subject_id = subject.subject_id::numeric JOIN
-         * study_event_definition ON ( study.study_id::numeric =
-         * study_event_definition.study_id OR study.parent_study_id =
-         * study_event_definition.study_id ) JOIN study_event ON (
-         * study_subject.study_subject_id = study_event.study_subject_id AND
-         * study_event_definition.study_event_definition_id::numeric =
-         * study_event.study_event_definition_id ) JOIN event_crf ON (
-         * study_event.study_event_id = event_crf.study_event_id AND
-         * study_event.study_subject_id = event_crf.study_subject_id AND
-         * (event_crf.status_id = 2::numeric OR event_crf.status_id =
-         * 6::numeric) ) WHERE (date(study_subject.enrollment_date) >=
-         * date('1900-01-01')) and (date(study_subject.enrollment_date) <=
-         * date('2100-12-31')) AND
-         * study_event_definition.study_event_definition_id IN (9) ) ) AND
-         * study_subject_id IN ( SELECT DISTINCT study_subject.study_subject_id
-         * FROM study_subject JOIN study ON ( study.study_id::numeric =
-         * study_subject.study_id AND (study.study_id=2 OR
-         * study.parent_study_id=2) ) JOIN subject ON study_subject.subject_id =
-         * subject.subject_id::numeric JOIN study_event_definition ON (
-         * study.study_id::numeric = study_event_definition.study_id OR
-         * study.parent_study_id = study_event_definition.study_id ) JOIN
-         * study_event ON ( study_subject.study_subject_id =
-         * study_event.study_subject_id AND
-         * study_event_definition.study_event_definition_id::numeric =
-         * study_event.study_event_definition_id ) JOIN event_crf ON (
-         * study_event.study_event_id = event_crf.study_event_id AND
-         * study_event.study_subject_id = event_crf.study_subject_id AND
-         * (event_crf.status_id = 2::numeric OR event_crf.status_id =
-         * 6::numeric) ) WHERE (date(study_subject.enrollment_date) >=
-         * date('1900-01-01')) and (date(study_subject.enrollment_date) <=
-         * date('2100-12-31')) AND
-         * study_event_definition.study_event_definition_id IN (9) ) AND
-         * (event_crf.status_id = 2::numeric OR event_crf.status_id =
-         * 6::numeric) ) AND (item_data.status_id = 2::numeric OR
-         * item_data.status_id = 6::numeric) ) AS SBQONE, item_group_metadata,
-         * item_group
-         *
-         *
-         *
+         * 
+         * item_data.item_id = item.item_id AND item_data.event_crf_id = event_crf.event_crf_id AND
+         * 
+         * item_data.item_id IN ( 1005, 1006, 1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014, 1015, 1016, 1017, 1018, 1133, 1134, 1198, 1135, 1136, 1137, 1138,
+         * 1139, 1140, 1141, 1142, 1143, 1144, 1145, 1146, 1147, 1148, 1149, 1150, 1151, 1152, 1153, 1154, 1155, 1156, 1157, 1158, 1159, 1160, 1161, 1162, 1163,
+         * 1164, 1165, 1166, 1167, 1168, 1169, 1170, 1171, 1172, 1173, 1174, 1175, 1176, 1177, 1178, 1179, 1180, 1181, 1182, 1183, 1184, 1185, 1186, 1187, 1188,
+         * 1189, 1190, 1191, 1192, 1193, 1194, 1195, 1196, 1197 )
+         * 
+         * AND item_data.event_crf_id IN ( SELECT event_crf_id FROM event_crf WHERE event_crf.study_event_id IN ( SELECT study_event_id FROM study_event
+         * 
+         * WHERE study_event.study_event_definition_id IN (9) AND ( study_event.sample_ordinal IS NOT NULL AND study_event.location IS NOT NULL AND
+         * study_event.date_start IS NOT NULL ) AND study_event.study_subject_id IN (
+         * 
+         * SELECT DISTINCT study_subject.study_subject_id FROM study_subject JOIN study ON ( study.study_id::numeric = study_subject.study_id AND
+         * (study.study_id=2 OR study.parent_study_id=2) ) JOIN subject ON study_subject.subject_id = subject.subject_id::numeric JOIN study_event_definition ON
+         * ( study.study_id::numeric = study_event_definition.study_id OR study.parent_study_id = study_event_definition.study_id ) JOIN study_event ON (
+         * study_subject.study_subject_id = study_event.study_subject_id AND study_event_definition.study_event_definition_id::numeric =
+         * study_event.study_event_definition_id ) JOIN event_crf ON ( study_event.study_event_id = event_crf.study_event_id AND study_event.study_subject_id =
+         * event_crf.study_subject_id AND (event_crf.status_id = 2::numeric OR event_crf.status_id = 6::numeric) ) WHERE (date(study_subject.enrollment_date) >=
+         * date('1900-01-01')) and (date(study_subject.enrollment_date) <= date('2100-12-31')) AND study_event_definition.study_event_definition_id IN (9) ) )
+         * AND study_subject_id IN ( SELECT DISTINCT study_subject.study_subject_id FROM study_subject JOIN study ON ( study.study_id::numeric =
+         * study_subject.study_id AND (study.study_id=2 OR study.parent_study_id=2) ) JOIN subject ON study_subject.subject_id = subject.subject_id::numeric
+         * JOIN study_event_definition ON ( study.study_id::numeric = study_event_definition.study_id OR study.parent_study_id = study_event_definition.study_id
+         * ) JOIN study_event ON ( study_subject.study_subject_id = study_event.study_subject_id AND study_event_definition.study_event_definition_id::numeric =
+         * study_event.study_event_definition_id ) JOIN event_crf ON ( study_event.study_event_id = event_crf.study_event_id AND study_event.study_subject_id =
+         * event_crf.study_subject_id AND (event_crf.status_id = 2::numeric OR event_crf.status_id = 6::numeric) ) WHERE (date(study_subject.enrollment_date) >=
+         * date('1900-01-01')) and (date(study_subject.enrollment_date) <= date('2100-12-31')) AND study_event_definition.study_event_definition_id IN (9) ) AND
+         * (event_crf.status_id = 2::numeric OR event_crf.status_id = 6::numeric) ) AND (item_data.status_id = 2::numeric OR item_data.status_id = 6::numeric) )
+         * AS SBQONE, item_group_metadata, item_group
+         * 
+         * 
+         * 
          * WHERE
-         *
-         * (item_group_metadata.item_id = SBQONE.itemid AND
-         * item_group_metadata.crf_version_id = SBQONE.crfversionid)
-         *
+         * 
+         * (item_group_metadata.item_id = SBQONE.itemid AND item_group_metadata.crf_version_id = SBQONE.crfversionid)
+         * 
          * AND
-         *
+         * 
          * (item_group.item_group_id = item_group_metadata.item_group_id)
          */
 
@@ -2597,7 +2416,7 @@ public abstract class EntityDAO implements DAOInterface {
     }// getSQLDatasetBASE_ITEMGROUPSIDE
 
     /**
-     *
+     * 
      * @param sedin
      * @param itin
      * @param currentstudyid
@@ -2607,112 +2426,67 @@ public abstract class EntityDAO implements DAOInterface {
     protected String getSQLInKeyDatasetHelper(int studyid, int studyparentid, String sedin, String it_in, String dateConstraint, String ecStatusConstraint,
             String itStatusConstraint) {
         /**
-         * SELECT DISTINCT study_event.study_event_definition_id,
-         * study_event.sample_ordinal, crfv.crf_id, it.item_id, ig.name AS
-         * item_group_name FROM event_crf ec
-         *
-         * JOIN crf_version crfv ON ec.crf_version_id = crfv.crf_version_id AND
-         * (ec.status_id = 2::numeric OR ec.status_id = 6::numeric) JOIN
-         * item_form_metadata ifm ON crfv.crf_version_id = ifm.crf_version_id
-         * LEFT JOIN item_group_metadata igm ON ifm.item_id = igm.item_id AND
-         * crfv.crf_version_id::numeric = igm.crf_version_id LEFT JOIN
-         * item_group ig ON igm.item_group_id = ig.item_group_id::numeric JOIN
-         * item it ON ifm.item_id = it.item_id::numeric JOIN study_event ON
-         * study_event.study_event_id = ec.study_event_id AND
-         * study_event.study_subject_id = ec.study_subject_id
-         *
+         * SELECT DISTINCT study_event.study_event_definition_id, study_event.sample_ordinal, crfv.crf_id, it.item_id, ig.name AS item_group_name FROM event_crf
+         * ec
+         * 
+         * JOIN crf_version crfv ON ec.crf_version_id = crfv.crf_version_id AND (ec.status_id = 2::numeric OR ec.status_id = 6::numeric) JOIN item_form_metadata
+         * ifm ON crfv.crf_version_id = ifm.crf_version_id LEFT JOIN item_group_metadata igm ON ifm.item_id = igm.item_id AND crfv.crf_version_id::numeric =
+         * igm.crf_version_id LEFT JOIN item_group ig ON igm.item_group_id = ig.item_group_id::numeric JOIN item it ON ifm.item_id = it.item_id::numeric JOIN
+         * study_event ON study_event.study_event_id = ec.study_event_id AND study_event.study_subject_id = ec.study_subject_id
+         * 
          * WHERE ec.event_crf_id IN (
-         *
+         * 
          * SELECT DISTINCT eventcrfid FROM ( SELECT
-         *
-         * itemdataid, studysubjectid, study_event.sample_ordinal,
-         * study_event.study_event_definition_id, study_event_definition.name,
-         * study_event.location, study_event.date_start, study_event.date_end,
-         *
+         * 
+         * itemdataid, studysubjectid, study_event.sample_ordinal, study_event.study_event_definition_id, study_event_definition.name, study_event.location,
+         * study_event.date_start, study_event.date_end,
+         * 
          * itemid, crfversionid, eventcrfid, studyeventid
-         *
-         * FROM ( SELECT item_data.item_data_id AS itemdataid, item_data.item_id
-         * AS itemid, item_data.value AS itemvalue, item.name AS itemname,
-         * item.description AS itemdesc, item.units AS itemunits,
-         * event_crf.event_crf_id AS eventcrfid, crf_version.name AS
-         * crfversioname, crf_version.crf_version_id AS crfversionid,
-         * event_crf.study_subject_id as studysubjectid,
-         * event_crf.study_event_id AS studyeventid
-         *
+         * 
+         * FROM ( SELECT item_data.item_data_id AS itemdataid, item_data.item_id AS itemid, item_data.value AS itemvalue, item.name AS itemname,
+         * item.description AS itemdesc, item.units AS itemunits, event_crf.event_crf_id AS eventcrfid, crf_version.name AS crfversioname,
+         * crf_version.crf_version_id AS crfversionid, event_crf.study_subject_id as studysubjectid, event_crf.study_event_id AS studyeventid
+         * 
          * FROM item_data, item, event_crf
-         *
-         * join crf_version ON event_crf.crf_version_id =
-         * crf_version.crf_version_id and (event_crf.status_id = 2::numeric OR
-         * event_crf.status_id = 6::numeric)
-         *
+         * 
+         * join crf_version ON event_crf.crf_version_id = crf_version.crf_version_id and (event_crf.status_id = 2::numeric OR event_crf.status_id = 6::numeric)
+         * 
          * WHERE
-         *
-         * item_data.item_id = item.item_id AND item_data.event_crf_id =
-         * event_crf.event_crf_id AND
-         *
-         * item_data.item_id IN ( 1005, 1006, 1007, 1008, 1009, 1010, 1011,
-         * 1012, 1013, 1014, 1015, 1016, 1017, 1018, 1133, 1134, 1198, 1135,
-         * 1136, 1137, 1138, 1139, 1140, 1141, 1142, 1143, 1144, 1145, 1146,
-         * 1147, 1148, 1149, 1150, 1151, 1152, 1153, 1154, 1155, 1156, 1157,
-         * 1158, 1159, 1160, 1161, 1162, 1163, 1164, 1165, 1166, 1167, 1168,
-         * 1169, 1170, 1171, 1172, 1173, 1174, 1175, 1176, 1177, 1178, 1179,
-         * 1180, 1181, 1182, 1183, 1184, 1185, 1186, 1187, 1188, 1189, 1190,
-         * 1191, 1192, 1193, 1194, 1195, 1196, 1197 ) AND item_data.event_crf_id
-         * IN ( SELECT event_crf_id FROM event_crf WHERE
+         * 
+         * item_data.item_id = item.item_id AND item_data.event_crf_id = event_crf.event_crf_id AND
+         * 
+         * item_data.item_id IN ( 1005, 1006, 1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014, 1015, 1016, 1017, 1018, 1133, 1134, 1198, 1135, 1136, 1137, 1138,
+         * 1139, 1140, 1141, 1142, 1143, 1144, 1145, 1146, 1147, 1148, 1149, 1150, 1151, 1152, 1153, 1154, 1155, 1156, 1157, 1158, 1159, 1160, 1161, 1162, 1163,
+         * 1164, 1165, 1166, 1167, 1168, 1169, 1170, 1171, 1172, 1173, 1174, 1175, 1176, 1177, 1178, 1179, 1180, 1181, 1182, 1183, 1184, 1185, 1186, 1187, 1188,
+         * 1189, 1190, 1191, 1192, 1193, 1194, 1195, 1196, 1197 ) AND item_data.event_crf_id IN ( SELECT event_crf_id FROM event_crf WHERE
          * event_crf.study_event_id IN ( SELECT study_event_id FROM study_event
-         *
-         * WHERE study_event.study_event_definition_id IN (9) AND (
-         * study_event.sample_ordinal IS NOT NULL AND study_event.location IS
-         * NOT NULL AND study_event.date_start IS NOT NULL ) AND
-         * study_event.study_subject_id IN (
-         *
-         * SELECT DISTINCT study_subject.study_subject_id FROM study_subject
-         * JOIN study ON ( study.study_id::numeric = study_subject.study_id AND
-         * (study.study_id=2 OR study.parent_study_id=2) ) JOIN subject ON
-         * study_subject.subject_id = subject.subject_id::numeric JOIN
-         * study_event_definition ON ( study.study_id::numeric =
-         * study_event_definition.study_id OR study.parent_study_id =
-         * study_event_definition.study_id ) JOIN study_event ON (
-         * study_subject.study_subject_id = study_event.study_subject_id AND
-         * study_event_definition.study_event_definition_id::numeric =
-         * study_event.study_event_definition_id ) JOIN event_crf ON (
-         * study_event.study_event_id = event_crf.study_event_id AND
-         * study_event.study_subject_id = event_crf.study_subject_id AND
-         * (event_crf.status_id = 2::numeric OR event_crf.status_id =
-         * 6::numeric) ) WHERE (date(study_subject.enrollment_date) >=
-         * date('1900-01-01')) and (date(study_subject.enrollment_date) <=
-         * date('2100-12-31')) AND
-         * study_event_definition.study_event_definition_id IN (9) ) ) AND
-         * study_subject_id IN ( SELECT DISTINCT study_subject.study_subject_id
-         * FROM study_subject JOIN study ON ( study.study_id::numeric =
-         * study_subject.study_id AND (study.study_id=2 OR
-         * study.parent_study_id=2) ) JOIN subject ON study_subject.subject_id =
-         * subject.subject_id::numeric JOIN study_event_definition ON (
-         * study.study_id::numeric = study_event_definition.study_id OR
-         * study.parent_study_id = study_event_definition.study_id ) JOIN
-         * study_event ON ( study_subject.study_subject_id =
-         * study_event.study_subject_id AND
-         * study_event_definition.study_event_definition_id::numeric =
-         * study_event.study_event_definition_id ) JOIN event_crf ON (
-         * study_event.study_event_id = event_crf.study_event_id AND
-         * study_event.study_subject_id = event_crf.study_subject_id AND
-         * (event_crf.status_id = 2::numeric OR event_crf.status_id =
-         * 6::numeric) ) WHERE (date(study_subject.enrollment_date) >=
-         * date('1900-01-01')) and (date(study_subject.enrollment_date) <=
-         * date('2100-12-31')) AND
-         * study_event_definition.study_event_definition_id IN (9) ) AND
-         * (event_crf.status_id = 2::numeric OR event_crf.status_id =
-         * 6::numeric) ) AND (item_data.status_id = 2::numeric OR
-         * item_data.status_id = 6::numeric) ) AS SBQONE, study_event,
-         * study_event_definition
-         *
-         *
-         *
+         * 
+         * WHERE study_event.study_event_definition_id IN (9) AND ( study_event.sample_ordinal IS NOT NULL AND study_event.location IS NOT NULL AND
+         * study_event.date_start IS NOT NULL ) AND study_event.study_subject_id IN (
+         * 
+         * SELECT DISTINCT study_subject.study_subject_id FROM study_subject JOIN study ON ( study.study_id::numeric = study_subject.study_id AND
+         * (study.study_id=2 OR study.parent_study_id=2) ) JOIN subject ON study_subject.subject_id = subject.subject_id::numeric JOIN study_event_definition ON
+         * ( study.study_id::numeric = study_event_definition.study_id OR study.parent_study_id = study_event_definition.study_id ) JOIN study_event ON (
+         * study_subject.study_subject_id = study_event.study_subject_id AND study_event_definition.study_event_definition_id::numeric =
+         * study_event.study_event_definition_id ) JOIN event_crf ON ( study_event.study_event_id = event_crf.study_event_id AND study_event.study_subject_id =
+         * event_crf.study_subject_id AND (event_crf.status_id = 2::numeric OR event_crf.status_id = 6::numeric) ) WHERE (date(study_subject.enrollment_date) >=
+         * date('1900-01-01')) and (date(study_subject.enrollment_date) <= date('2100-12-31')) AND study_event_definition.study_event_definition_id IN (9) ) )
+         * AND study_subject_id IN ( SELECT DISTINCT study_subject.study_subject_id FROM study_subject JOIN study ON ( study.study_id::numeric =
+         * study_subject.study_id AND (study.study_id=2 OR study.parent_study_id=2) ) JOIN subject ON study_subject.subject_id = subject.subject_id::numeric
+         * JOIN study_event_definition ON ( study.study_id::numeric = study_event_definition.study_id OR study.parent_study_id = study_event_definition.study_id
+         * ) JOIN study_event ON ( study_subject.study_subject_id = study_event.study_subject_id AND study_event_definition.study_event_definition_id::numeric =
+         * study_event.study_event_definition_id ) JOIN event_crf ON ( study_event.study_event_id = event_crf.study_event_id AND study_event.study_subject_id =
+         * event_crf.study_subject_id AND (event_crf.status_id = 2::numeric OR event_crf.status_id = 6::numeric) ) WHERE (date(study_subject.enrollment_date) >=
+         * date('1900-01-01')) and (date(study_subject.enrollment_date) <= date('2100-12-31')) AND study_event_definition.study_event_definition_id IN (9) ) AND
+         * (event_crf.status_id = 2::numeric OR event_crf.status_id = 6::numeric) ) AND (item_data.status_id = 2::numeric OR item_data.status_id = 6::numeric) )
+         * AS SBQONE, study_event, study_event_definition
+         * 
+         * 
+         * 
          * WHERE
-         *
-         * (study_event.study_event_id = SBQONE.studyeventid) AND
-         * (study_event.study_event_definition_id =
-         * study_event_definition.study_event_definition_id) ) AS SBQTWO )
+         * 
+         * (study_event.study_event_id = SBQONE.studyeventid) AND (study_event.study_event_definition_id = study_event_definition.study_event_definition_id) )
+         * AS SBQTWO )
          */
 
         if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
@@ -2745,7 +2519,7 @@ public abstract class EntityDAO implements DAOInterface {
     }
 
     /**
-     *
+     * 
      * @param studyid
      * @param parentid
      * @param sedin
@@ -2796,9 +2570,8 @@ public abstract class EntityDAO implements DAOInterface {
     }//
 
     /**
-     * Return directly the HashMap with the key It shouldn't be NULL !! TODO -
-     * throw an error if any of the fields is null!
-     *
+     * Return directly the HashMap with the key It shouldn't be NULL !! TODO - throw an error if any of the fields is null!
+     * 
      * @param rs
      * @return
      */
@@ -2839,8 +2612,7 @@ public abstract class EntityDAO implements DAOInterface {
                 }
 
                 /**
-                 * build the key as
-                 * [study_event_definition_id]_[sample_ordinal]_[crf_id]_[item_id]_[item_group_name]
+                 * build the key as [study_event_definition_id]_[sample_ordinal]_[crf_id]_[item_id]_[item_group_name]
                  */
                 String key = stsed + "_" + stso + "_" + stcrf + "_" + stitem + "_" + stgn;
 
@@ -2861,14 +2633,13 @@ public abstract class EntityDAO implements DAOInterface {
 
     /**
      * ======================================================================================
-     * ======================================================================================
-     * Extra helper function to retrieve various report data from database
+     * ====================================================================================== Extra helper function to retrieve various report data from
+     * database
      */
 
     /**
-     * *******************************************************************************
-     * This returns the final array of strings of event_crf_id
-     *
+     * ******************************************************************************* This returns the final array of strings of event_crf_id
+     * 
      * @param studyid
      * @param parentid
      * @param sedin
@@ -2918,7 +2689,7 @@ public abstract class EntityDAO implements DAOInterface {
 
     /**
      * This returns an ArrayList of Strings
-     *
+     * 
      * @param rs
      * @return
      */
@@ -2950,7 +2721,7 @@ public abstract class EntityDAO implements DAOInterface {
     }
 
     /**
-     *
+     * 
      * @param studyid
      * @param studyparentid
      * @param sedin
@@ -2961,104 +2732,64 @@ public abstract class EntityDAO implements DAOInterface {
 
         /**
          * This is the SQL that will extract the event_crf_id list
-         *
+         * 
          * SELECT DISTINCT eventcrfid FROM
-         *
+         * 
          * (SELECT
-         *
-         * itemdataid, studysubjectid, study_event.sample_ordinal,
-         * study_event.study_event_definition_id, study_event_definition.name,
-         * study_event.location, study_event.date_start, study_event.date_end,
-         *
+         * 
+         * itemdataid, studysubjectid, study_event.sample_ordinal, study_event.study_event_definition_id, study_event_definition.name, study_event.location,
+         * study_event.date_start, study_event.date_end,
+         * 
          * itemid, crfversionid, eventcrfid, studyeventid
-         *
-         * FROM ( SELECT item_data.item_data_id AS itemdataid, item_data.item_id
-         * AS itemid, item_data.value AS itemvalue, item.name AS itemname,
-         * item.description AS itemdesc, item.units AS itemunits,
-         * event_crf.event_crf_id AS eventcrfid, crf_version.name AS
-         * crfversioname, crf_version.crf_version_id AS crfversionid,
-         * event_crf.study_subject_id as studysubjectid,
-         * event_crf.study_event_id AS studyeventid
-         *
+         * 
+         * FROM ( SELECT item_data.item_data_id AS itemdataid, item_data.item_id AS itemid, item_data.value AS itemvalue, item.name AS itemname,
+         * item.description AS itemdesc, item.units AS itemunits, event_crf.event_crf_id AS eventcrfid, crf_version.name AS crfversioname,
+         * crf_version.crf_version_id AS crfversionid, event_crf.study_subject_id as studysubjectid, event_crf.study_event_id AS studyeventid
+         * 
          * FROM item_data, item, event_crf
-         *
-         * join crf_version ON event_crf.crf_version_id =
-         * crf_version.crf_version_id and (event_crf.status_id = 2::numeric OR
-         * event_crf.status_id = 6::numeric)
-         *
+         * 
+         * join crf_version ON event_crf.crf_version_id = crf_version.crf_version_id and (event_crf.status_id = 2::numeric OR event_crf.status_id = 6::numeric)
+         * 
          * WHERE
-         *
-         * item_data.item_id = item.item_id AND item_data.event_crf_id =
-         * event_crf.event_crf_id AND
-         *
+         * 
+         * item_data.item_id = item.item_id AND item_data.event_crf_id = event_crf.event_crf_id AND
+         * 
          * item_data.item_id IN
-         *
-         * (98, 99, 100, 102, 103, 104, 105, 106, 107, 108, 109, 110, 37, 38,
-         * 39, 41, 42, 43, 44, 45, 46, 47, 48, 49, 37, 38, 39, 40, 41, 42, 43,
-         * 44, 45, 46, 47, 48, 49, 1632, 1633, 1634, 1635, 1636, 1637, 1638,
-         * 1639, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
-         * 19, 20, 21, 22, 23, 24, 25, 26, 27, 431, 28, 432, 433, 29, 434, 30,
-         * 435, 31, 32, 436, 437, 438, 439, 440, 441, 442, 443, 444, 445, 446,
-         * 447, 448, 449, 450, 451, 452, 453, 454, 455, 456, 457, 458, 459, 460,
-         * 461, 462)
-         *
-         * AND item_data.event_crf_id IN ( SELECT event_crf_id FROM event_crf
-         * WHERE event_crf.study_event_id IN ( SELECT study_event_id FROM
-         * study_event
-         *
-         * WHERE study_event.study_event_definition_id IN (2, 7, 3) AND (
-         * study_event.sample_ordinal IS NOT NULL AND study_event.location IS
-         * NOT NULL AND study_event.date_start IS NOT NULL ) AND
-         * study_event.study_subject_id IN (
-         *
-         * SELECT DISTINCT study_subject.study_subject_id FROM study_subject
-         * JOIN study ON ( study.study_id::numeric = study_subject.study_id AND
-         * (study.study_id=2 OR study.parent_study_id=2) ) JOIN subject ON
-         * study_subject.subject_id = subject.subject_id::numeric JOIN
-         * study_event_definition ON ( study.study_id::numeric =
-         * study_event_definition.study_id OR study.parent_study_id =
-         * study_event_definition.study_id ) JOIN study_event ON (
-         * study_subject.study_subject_id = study_event.study_subject_id AND
-         * study_event_definition.study_event_definition_id::numeric =
-         * study_event.study_event_definition_id ) JOIN event_crf ON (
-         * study_event.study_event_id = event_crf.study_event_id AND
-         * study_event.study_subject_id = event_crf.study_subject_id AND
-         * (event_crf.status_id = 2::numeric OR event_crf.status_id =
-         * 6::numeric) ) WHERE (date(study_subject.enrollment_date) >=
-         * date('1900-01-01')) and (date(study_subject.enrollment_date) <=
-         * date('2100-12-31')) AND
-         * study_event_definition.study_event_definition_id IN (2, 7, 3) ) ) AND
-         * study_subject_id IN ( SELECT DISTINCT study_subject.study_subject_id
-         * FROM study_subject JOIN study ON ( study.study_id::numeric =
-         * study_subject.study_id AND (study.study_id=2 OR
-         * study.parent_study_id=2) ) JOIN subject ON study_subject.subject_id =
-         * subject.subject_id::numeric JOIN study_event_definition ON (
-         * study.study_id::numeric = study_event_definition.study_id OR
-         * study.parent_study_id = study_event_definition.study_id ) JOIN
-         * study_event ON ( study_subject.study_subject_id =
-         * study_event.study_subject_id AND
-         * study_event_definition.study_event_definition_id::numeric =
-         * study_event.study_event_definition_id ) JOIN event_crf ON (
-         * study_event.study_event_id = event_crf.study_event_id AND
-         * study_event.study_subject_id = event_crf.study_subject_id AND
-         * (event_crf.status_id = 2::numeric OR event_crf.status_id =
-         * 6::numeric) ) WHERE (date(study_subject.enrollment_date) >=
-         * date('1900-01-01')) and (date(study_subject.enrollment_date) <=
-         * date('2100-12-31')) AND
-         * study_event_definition.study_event_definition_id IN (2, 7, 3) ) AND
-         * (event_crf.status_id = 2::numeric OR event_crf.status_id =
-         * 6::numeric) ) AND (item_data.status_id = 2::numeric OR
-         * item_data.status_id = 6::numeric) ) AS SBQONE, study_event,
-         * study_event_definition
-         *
-         *
-         *
+         * 
+         * (98, 99, 100, 102, 103, 104, 105, 106, 107, 108, 109, 110, 37, 38, 39, 41, 42, 43, 44, 45, 46, 47, 48, 49, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46,
+         * 47, 48, 49, 1632, 1633, 1634, 1635, 1636, 1637, 1638, 1639, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
+         * 25, 26, 27, 431, 28, 432, 433, 29, 434, 30, 435, 31, 32, 436, 437, 438, 439, 440, 441, 442, 443, 444, 445, 446, 447, 448, 449, 450, 451, 452, 453,
+         * 454, 455, 456, 457, 458, 459, 460, 461, 462)
+         * 
+         * AND item_data.event_crf_id IN ( SELECT event_crf_id FROM event_crf WHERE event_crf.study_event_id IN ( SELECT study_event_id FROM study_event
+         * 
+         * WHERE study_event.study_event_definition_id IN (2, 7, 3) AND ( study_event.sample_ordinal IS NOT NULL AND study_event.location IS NOT NULL AND
+         * study_event.date_start IS NOT NULL ) AND study_event.study_subject_id IN (
+         * 
+         * SELECT DISTINCT study_subject.study_subject_id FROM study_subject JOIN study ON ( study.study_id::numeric = study_subject.study_id AND
+         * (study.study_id=2 OR study.parent_study_id=2) ) JOIN subject ON study_subject.subject_id = subject.subject_id::numeric JOIN study_event_definition ON
+         * ( study.study_id::numeric = study_event_definition.study_id OR study.parent_study_id = study_event_definition.study_id ) JOIN study_event ON (
+         * study_subject.study_subject_id = study_event.study_subject_id AND study_event_definition.study_event_definition_id::numeric =
+         * study_event.study_event_definition_id ) JOIN event_crf ON ( study_event.study_event_id = event_crf.study_event_id AND study_event.study_subject_id =
+         * event_crf.study_subject_id AND (event_crf.status_id = 2::numeric OR event_crf.status_id = 6::numeric) ) WHERE (date(study_subject.enrollment_date) >=
+         * date('1900-01-01')) and (date(study_subject.enrollment_date) <= date('2100-12-31')) AND study_event_definition.study_event_definition_id IN (2, 7, 3)
+         * ) ) AND study_subject_id IN ( SELECT DISTINCT study_subject.study_subject_id FROM study_subject JOIN study ON ( study.study_id::numeric =
+         * study_subject.study_id AND (study.study_id=2 OR study.parent_study_id=2) ) JOIN subject ON study_subject.subject_id = subject.subject_id::numeric
+         * JOIN study_event_definition ON ( study.study_id::numeric = study_event_definition.study_id OR study.parent_study_id = study_event_definition.study_id
+         * ) JOIN study_event ON ( study_subject.study_subject_id = study_event.study_subject_id AND study_event_definition.study_event_definition_id::numeric =
+         * study_event.study_event_definition_id ) JOIN event_crf ON ( study_event.study_event_id = event_crf.study_event_id AND study_event.study_subject_id =
+         * event_crf.study_subject_id AND (event_crf.status_id = 2::numeric OR event_crf.status_id = 6::numeric) ) WHERE (date(study_subject.enrollment_date) >=
+         * date('1900-01-01')) and (date(study_subject.enrollment_date) <= date('2100-12-31')) AND study_event_definition.study_event_definition_id IN (2, 7, 3)
+         * ) AND (event_crf.status_id = 2::numeric OR event_crf.status_id = 6::numeric) ) AND (item_data.status_id = 2::numeric OR item_data.status_id =
+         * 6::numeric) ) AS SBQONE, study_event, study_event_definition
+         * 
+         * 
+         * 
          * WHERE
-         *
-         * (study_event.study_event_id = SBQONE.studyeventid) AND
-         * (study_event.study_event_definition_id =
-         * study_event_definition.study_event_definition_id) ) AS SBQTWO
-         *
+         * 
+         * (study_event.study_event_id = SBQONE.studyeventid) AND (study_event.study_event_definition_id = study_event_definition.study_event_definition_id) )
+         * AS SBQTWO
+         * 
          */
 
         String ret = "";
@@ -3070,9 +2801,8 @@ public abstract class EntityDAO implements DAOInterface {
     }
 
     /**
-     * *******************************************************************************
-     * Returns a list with study_subject_id
-     *
+     * ******************************************************************************* Returns a list with study_subject_id
+     * 
      * @param studyid
      * @param studyparentid
      * @param sedin
@@ -3120,7 +2850,7 @@ public abstract class EntityDAO implements DAOInterface {
 
     /**
      * This returns an ArrayList of Strings
-     *
+     * 
      * @param rs
      * @return
      */
@@ -3155,7 +2885,7 @@ public abstract class EntityDAO implements DAOInterface {
 
     /**
      * This returns the SQL with all active study_subject_id.
-     *
+     * 
      * @param studyid
      * @param studyparentid
      * @param sedin
@@ -3163,94 +2893,40 @@ public abstract class EntityDAO implements DAOInterface {
      */
     protected String getSQLStudySubjectIDs(int studyid, int studyparentid, String sedin) {
         /*
-         * SELECT * FROM study_subject WHERE study_subject_id IN ( SELECT
-         * DISTINCT studysubjectid FROM ( SELECT itemdataid, studysubjectid,
-         * study_event.sample_ordinal, study_event.study_event_definition_id,
-         * study_event_definition.name, study_event.location,
-         * study_event.date_start, study_event.date_end, itemid, crfversionid,
-         * eventcrfid, studyeventid
-         *
-         * FROM ( SELECT item_data.item_data_id AS itemdataid, item_data.item_id
-         * AS itemid, item_data.value AS itemvalue, item.name AS itemname,
-         * item.description AS itemdesc, item.units AS itemunits,
-         * event_crf.event_crf_id AS eventcrfid, crf_version.name AS
-         * crfversioname, crf_version.crf_version_id AS crfversionid,
-         * event_crf.study_subject_id as studysubjectid,
-         * event_crf.study_event_id AS studyeventid
-         *
-         * FROM item_data, item, event_crf
-         *
-         * JOIN crf_version ON ( (event_crf.crf_version_id =
-         * crf_version.crf_version_id) AND (event_crf.status_id = 2::numeric OR
-         * event_crf.status_id = 6::numeric) ) WHERE item_data.item_id =
-         * item.item_id AND item_data.event_crf_id = event_crf.event_crf_id AND
-         * item_data.item_id IN
-         *
-         * //this is the item_id group from SQL dataset ( 1005, 1006, 1007,
-         * 1008, 1009, 1010, 1011, 1012, 1013, 1014, 1015, 1016, 1017, 1018,
-         * 1133, 1134, 1198, 1135, 1136, 1137, 1138, 1139, 1140, 1141, 1142,
-         * 1143, 1144, 1145, 1146, 1147, 1148, 1149, 1150, 1151, 1152, 1153,
-         * 1154, 1155, 1156, 1157, 1158, 1159, 1160, 1161, 1162, 1163, 1164,
-         * 1165, 1166, 1167, 1168, 1169, 1170, 1171, 1172, 1173, 1174, 1175,
-         * 1176, 1177, 1178, 1179, 1180, 1181, 1182, 1183, 1184, 1185, 1186,
-         * 1187, 1188, 1189, 1190, 1191, 1192, 1193, 1194, 1195, 1196, 1197)
-         *
-         * AND item_data.event_crf_id IN ( SELECT event_crf_id FROM event_crf
-         * WHERE event_crf.study_event_id IN ( SELECT study_event_id FROM
-         * study_event
-         *
-         * WHERE //here is the first (from three )replacement - 9 is the
-         * event_definition_id from SQL dataset
-         * study_event.study_event_definition_id IN (9) AND (
-         * study_event.sample_ordinal IS NOT NULL AND study_event.location IS
-         * NOT NULL AND study_event.date_start IS NOT NULL ) AND
-         * study_event.study_subject_id IN (
-         *
-         * SELECT DISTINCT study_subject.study_subject_id FROM study_subject
-         * JOIN study ON ( study.study_id::numeric = study_subject.study_id AND
-         * //here is the )replacement - 2 is the study_id and parent_study_id
-         * from SQL dataset (study.study_id=2 OR study.parent_study_id=2) ) JOIN
-         * subject ON study_subject.subject_id = subject.subject_id::numeric
-         * JOIN study_event_definition ON ( study.study_id::numeric =
-         * study_event_definition.study_id OR study.parent_study_id =
-         * study_event_definition.study_id ) JOIN study_event ON (
-         * study_subject.study_subject_id = study_event.study_subject_id AND
-         * study_event_definition.study_event_definition_id::numeric =
-         * study_event.study_event_definition_id ) JOIN event_crf ON (
-         * study_event.study_event_id = event_crf.study_event_id AND
-         * study_event.study_subject_id = event_crf.study_subject_id AND
-         * (event_crf.status_id = 2::numeric OR event_crf.status_id =
-         * 6::numeric) ) WHERE (date(study_subject.enrollment_date) >=
-         * date('1900-01-01')) and (date(study_subject.enrollment_date) <=
-         * date('2100-12-31')) AND //here is the second (from three )replacement -
-         * 9 is the event_definition_id from SQL dataset
-         * study_event_definition.study_event_definition_id IN (9) ) ) AND
-         * study_subject_id IN ( SELECT DISTINCT study_subject.study_subject_id
-         * FROM study_subject JOIN study ON ( study.study_id::numeric =
-         * study_subject.study_id AND (study.study_id=2 OR
-         * study.parent_study_id=2) ) JOIN subject ON study_subject.subject_id =
-         * subject.subject_id::numeric JOIN study_event_definition ON (
-         * study.study_id::numeric = study_event_definition.study_id OR //here
-         * is the )replacement - 2 is the study_id and parent_study_id from SQL
-         * dataset study.parent_study_id = study_event_definition.study_id )
-         * JOIN study_event ON ( study_subject.study_subject_id =
-         * study_event.study_subject_id AND
-         * study_event_definition.study_event_definition_id::numeric =
-         * study_event.study_event_definition_id ) JOIN event_crf ON (
-         * study_event.study_event_id = event_crf.study_event_id AND
-         * study_event.study_subject_id = event_crf.study_subject_id AND
-         * (event_crf.status_id = 2::numeric OR event_crf.status_id =
-         * 6::numeric) ) WHERE (date(study_subject.enrollment_date) >=
-         * date('1900-01-01')) and (date(study_subject.enrollment_date) <=
-         * date('2100-12-31')) AND ////here is the third (from three
-         * )replacement - 9 is the event_definition_id from SQL dataset
-         * study_event_definition.study_event_definition_id IN (9) ) AND
-         * (event_crf.status_id = 2::numeric OR event_crf.status_id =
-         * 6::numeric) ) AND (item_data.status_id = 2::numeric OR
-         * item_data.status_id = 6::numeric) ) AS SBQONE, study_event,
-         * study_event_definition WHERE (study_event.study_event_id =
-         * SBQONE.studyeventid) AND (study_event.study_event_definition_id =
-         * study_event_definition.study_event_definition_id) ) AS SBQTWO )
+         * SELECT * FROM study_subject WHERE study_subject_id IN ( SELECT DISTINCT studysubjectid FROM ( SELECT itemdataid, studysubjectid,
+         * study_event.sample_ordinal, study_event.study_event_definition_id, study_event_definition.name, study_event.location, study_event.date_start,
+         * study_event.date_end, itemid, crfversionid, eventcrfid, studyeventid FROM ( SELECT item_data.item_data_id AS itemdataid, item_data.item_id AS itemid,
+         * item_data.value AS itemvalue, item.name AS itemname, item.description AS itemdesc, item.units AS itemunits, event_crf.event_crf_id AS eventcrfid,
+         * crf_version.name AS crfversioname, crf_version.crf_version_id AS crfversionid, event_crf.study_subject_id as studysubjectid, event_crf.study_event_id
+         * AS studyeventid FROM item_data, item, event_crf JOIN crf_version ON ( (event_crf.crf_version_id = crf_version.crf_version_id) AND
+         * (event_crf.status_id = 2::numeric OR event_crf.status_id = 6::numeric) ) WHERE item_data.item_id = item.item_id AND item_data.event_crf_id =
+         * event_crf.event_crf_id AND item_data.item_id IN //this is the item_id group from SQL dataset ( 1005, 1006, 1007, 1008, 1009, 1010, 1011, 1012, 1013,
+         * 1014, 1015, 1016, 1017, 1018, 1133, 1134, 1198, 1135, 1136, 1137, 1138, 1139, 1140, 1141, 1142, 1143, 1144, 1145, 1146, 1147, 1148, 1149, 1150, 1151,
+         * 1152, 1153, 1154, 1155, 1156, 1157, 1158, 1159, 1160, 1161, 1162, 1163, 1164, 1165, 1166, 1167, 1168, 1169, 1170, 1171, 1172, 1173, 1174, 1175, 1176,
+         * 1177, 1178, 1179, 1180, 1181, 1182, 1183, 1184, 1185, 1186, 1187, 1188, 1189, 1190, 1191, 1192, 1193, 1194, 1195, 1196, 1197) AND
+         * item_data.event_crf_id IN ( SELECT event_crf_id FROM event_crf WHERE event_crf.study_event_id IN ( SELECT study_event_id FROM study_event WHERE
+         * //here is the first (from three )replacement - 9 is the event_definition_id from SQL dataset study_event.study_event_definition_id IN (9) AND (
+         * study_event.sample_ordinal IS NOT NULL AND study_event.location IS NOT NULL AND study_event.date_start IS NOT NULL ) AND study_event.study_subject_id
+         * IN ( SELECT DISTINCT study_subject.study_subject_id FROM study_subject JOIN study ON ( study.study_id::numeric = study_subject.study_id AND //here is
+         * the )replacement - 2 is the study_id and parent_study_id from SQL dataset (study.study_id=2 OR study.parent_study_id=2) ) JOIN subject ON
+         * study_subject.subject_id = subject.subject_id::numeric JOIN study_event_definition ON ( study.study_id::numeric = study_event_definition.study_id OR
+         * study.parent_study_id = study_event_definition.study_id ) JOIN study_event ON ( study_subject.study_subject_id = study_event.study_subject_id AND
+         * study_event_definition.study_event_definition_id::numeric = study_event.study_event_definition_id ) JOIN event_crf ON ( study_event.study_event_id =
+         * event_crf.study_event_id AND study_event.study_subject_id = event_crf.study_subject_id AND (event_crf.status_id = 2::numeric OR event_crf.status_id =
+         * 6::numeric) ) WHERE (date(study_subject.enrollment_date) >= date('1900-01-01')) and (date(study_subject.enrollment_date) <= date('2100-12-31')) AND
+         * //here is the second (from three )replacement - 9 is the event_definition_id from SQL dataset study_event_definition.study_event_definition_id IN (9)
+         * ) ) AND study_subject_id IN ( SELECT DISTINCT study_subject.study_subject_id FROM study_subject JOIN study ON ( study.study_id::numeric =
+         * study_subject.study_id AND (study.study_id=2 OR study.parent_study_id=2) ) JOIN subject ON study_subject.subject_id = subject.subject_id::numeric
+         * JOIN study_event_definition ON ( study.study_id::numeric = study_event_definition.study_id OR //here is the )replacement - 2 is the study_id and
+         * parent_study_id from SQL dataset study.parent_study_id = study_event_definition.study_id ) JOIN study_event ON ( study_subject.study_subject_id =
+         * study_event.study_subject_id AND study_event_definition.study_event_definition_id::numeric = study_event.study_event_definition_id ) JOIN event_crf
+         * ON ( study_event.study_event_id = event_crf.study_event_id AND study_event.study_subject_id = event_crf.study_subject_id AND (event_crf.status_id =
+         * 2::numeric OR event_crf.status_id = 6::numeric) ) WHERE (date(study_subject.enrollment_date) >= date('1900-01-01')) and
+         * (date(study_subject.enrollment_date) <= date('2100-12-31')) AND ////here is the third (from three )replacement - 9 is the event_definition_id from
+         * SQL dataset study_event_definition.study_event_definition_id IN (9) ) AND (event_crf.status_id = 2::numeric OR event_crf.status_id = 6::numeric) )
+         * AND (item_data.status_id = 2::numeric OR item_data.status_id = 6::numeric) ) AS SBQONE, study_event, study_event_definition WHERE
+         * (study_event.study_event_id = SBQONE.studyeventid) AND (study_event.study_event_definition_id = study_event_definition.study_event_definition_id) )
+         * AS SBQTWO )
          */
 
         String ret = "";
@@ -3316,7 +2992,7 @@ public abstract class EntityDAO implements DAOInterface {
             statusConstraint = "in (2,6)";
             break;
         case 2:
-            statusConstraint = "not in (6,5,7)"; //6 is locked.
+            statusConstraint = "not in (6,5,7)"; // 6 is locked.
             break;
         case 3:
             statusConstraint = "not in (5,7)";

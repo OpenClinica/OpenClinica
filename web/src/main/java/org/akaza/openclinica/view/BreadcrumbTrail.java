@@ -794,13 +794,14 @@ public class BreadcrumbTrail {
                 trail.add(new BreadcrumbBean(resworkflow.getString("rule_manage_assignment"), "ViewRuleAssignment", Status.AVAILABLE));
             } else if (jspPage.equals(Page.IMPORT_RULES)) {
                 trail = new ArrayList();
-                trail.add(new BreadcrumbBean(resworkflow.getString("manage_study"), "ManageStudy", Status.AVAILABLE));
-                trail.add(new BreadcrumbBean(resworkflow.getString("rule_manage_assignment"), "ViewRuleAssignment", Status.AVAILABLE));
-                trail.add(new BreadcrumbBean(resworkflow.getString("rule_import"), "#", Status.PENDING));
+                trail.add(new BreadcrumbBean(resworkflow.getString("import_rules_1"), "ManageStudy", Status.AVAILABLE));
+                trail.add(new BreadcrumbBean(resworkflow.getString("import_rules_2"), "ViewRuleAssignment", Status.AVAILABLE));
+                trail.add(new BreadcrumbBean(resworkflow.getString("import_rules_3"), "#", Status.AVAILABLE));
             } else if (jspPage.equals(Page.TEST_RULES)) {
                 trail = new ArrayList();
-                trail.add(new BreadcrumbBean(resworkflow.getString("manage_study"), "ManageStudy", Status.AVAILABLE));
-                trail.add(new BreadcrumbBean(resworkflow.getString("rule_test"), "TestRule", Status.AVAILABLE));
+                trail.add(new BreadcrumbBean(resworkflow.getString("test_rules_validate"), "ManageStudy", Status.AVAILABLE));
+                trail.add(new BreadcrumbBean(resworkflow.getString("test_rules_test"), "ManageStudy", Status.AVAILABLE));
+                trail.add(new BreadcrumbBean(resworkflow.getString("test_rules_get_results"), "TestRule", Status.AVAILABLE));
             }
             // else {
             // trail = new ArrayList();

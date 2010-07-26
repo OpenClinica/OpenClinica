@@ -153,7 +153,7 @@
 </div>
 
 
-<p><a href="ViewRuleAssignment"/><fmt:message key="rule_go_back_to_Assignment_list" bundle="${resword}"/></a></p>
+<p><a href="ViewRuleSet?ruleSetId=${ruleSet.id}"/><fmt:message key="rule_go_back_to_Manage_rules" bundle="${resword}"/></a></p>
 
 <c:choose>
   <c:when test="${userBean.sysAdmin && module=='admin'}">

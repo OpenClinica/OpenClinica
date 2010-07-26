@@ -11,6 +11,8 @@ import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+
 /**
  * @author Krikor Krumlian
  * 
@@ -18,6 +20,8 @@ import org.slf4j.LoggerFactory;
 public abstract class ExpressionNode {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    private HashMap<String, String> testValues;
+    private OpenClinicaExpressionParser expressionParser;
 
     String value() throws OpenClinicaSystemException {
         return calculate();
@@ -38,4 +42,21 @@ public abstract class ExpressionNode {
     abstract String testCalculate() throws OpenClinicaSystemException;
 
     abstract void printStackCommands();
+
+    String getNumber() {
+        return null;
+    }
+
+    public void setExpressionParser(OpenClinicaExpressionParser expressionParser) {
+        this.expressionParser = expressionParser;
+    }
+
+    public HashMap<String, String> getTestValues() {
+        return expressionParser.getTestValues();
+    }
+
+    public HashMap<String, String> getResponseTestValues() {
+        return expressionParser.getResponseTestValues();
+    }
+
 }

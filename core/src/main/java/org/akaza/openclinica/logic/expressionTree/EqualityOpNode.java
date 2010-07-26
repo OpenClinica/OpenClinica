@@ -65,7 +65,7 @@ public class EqualityOpNode extends ExpressionNode {
         case CONTAINS:
             return String.valueOf(x.contains(y));
         default:
-            throw new OpenClinicaSystemException(left.value() + " and " + right.value() + " cannot be calculated with the " + op.toString() + " operator");
+            throw new OpenClinicaSystemException("OCRERR_0002", new Object[] { left.value(), right.value(), op.toString() });
         }
     }
 

@@ -45,7 +45,17 @@
            and igm.show_group=0
     	</sql>
     </query>
-    
+        <query>
+            <name>findAllByCRFIdItemIdAndHasValidations</name>
+            <sql>
+            SELECT m.*, rs.response_type_id, rs.label, rs.options_text, rs.options_values
+            FROM item_form_metadata m, response_set rs
+            WHERE m.crf_version_id in ( select crf_version_id from crf_version where crf_id= ? )
+                AND m.response_set_id = rs.response_set_id
+                AND m.item_id = ? 
+                AND m.regexp != ''
+            </sql>
+        </query>
    <query>
         <name>findAllCountHiddenButShownByEventCrfId</name>
         <sql>

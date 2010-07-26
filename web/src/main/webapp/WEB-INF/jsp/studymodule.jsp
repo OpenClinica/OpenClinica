@@ -1,3 +1,4 @@
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -56,7 +57,7 @@
             padding: 4px;
         }
     .contenttable.hiddencontent td {
-    	border-left: 0px;
+        border-left: 0px;
         border-top: 0px;
         border-bottom: 0px;
     }
@@ -79,8 +80,8 @@
   <form action="studymodule" method="post">
   <div>
       <h1><span class="title_manage"><c:out value="${currentStudy.name}"/>&nbsp;
-		<a href="javascript:openDocWindow('http://www.openclinica.org/OpenClinica/3.0/doc/5_1_buildStudy_Help.html')"><img border="0" title="Help" alt="Help" src="../images/bt_Help_Manage.gif"/></a>
-	  </span></h1>
+        <a href="javascript:openDocWindow('http://www.openclinica.org/OpenClinica/3.0/doc/5_1_buildStudy_Help.html')"><img border="0" title="Help" alt="Help" src="../images/bt_Help_Manage.gif"/></a>
+      </span></h1>
   </div>
   <div style="border: 1px solid #ccc; width:70%; padding-left:5px">
       <p>
@@ -103,8 +104,7 @@
   </div>
   &nbsp;&nbsp;&nbsp;
   <div style="border: 1px solid #ccc; width:70%; padding:5px 0px 5px 5px;">
-      <fmt:message key="set_study_status" bundle="${resword}"/> &nbsp;
-      <select name="studyStatus" <c:if test="${parentStudy!=null && parentStudy.status.id!=1}">disabled="true"</c:if>>
+      <fmt:message key="set_study_status" bundle="${resword}"/> &nbsp; <select name="studyStatus">
           <c:forEach var="status" items="${statusMap}">
            <c:choose>
             <c:when test="${currentStudy.status.id == status.id}">
@@ -115,11 +115,11 @@
                  <c:if test="${status.id == 1}">
                      <fmt:message key="available" bundle="${resword}"/>
                  </c:if>
-                     <c:if test="${status.id == 9}">
-                         <fmt:message key="frozen" bundle="${resword}"/>
-                     </c:if>
-				 <c:if test="${status.id == 6}">
+                 <c:if test="${status.id == 6}">
                      <fmt:message key="locked" bundle="${resword}"/>
+                 </c:if>
+                 <c:if test="${status.id == 9}">
+                     <fmt:message key="frozen" bundle="${resword}"/>
                  </c:if>
             </c:when>
             <c:otherwise>
@@ -130,12 +130,11 @@
                  <c:if test="${status.id == 1}">
                      <fmt:message key="available" bundle="${resword}"/>
                  </c:if>
-                     <c:if test="${status.id == 9}">
-                         <fmt:message key="frozen" bundle="${resword}"/>
-                     </c:if>
-
-				 <c:if test="${status.id == 6}">
+                 <c:if test="${status.id == 6}">
                      <fmt:message key="locked" bundle="${resword}"/>
+                 </c:if>
+                 <c:if test="${status.id == 9}">
+                     <fmt:message key="frozen" bundle="${resword}"/>
                  </c:if>
             </c:otherwise>
            </c:choose>
@@ -146,32 +145,32 @@
   <table width="78%" class="contenttable" cellspacing="0" cellpadding="2">
       <thead>
         <td width="20"></td>
-        <td width="200"><b>Task</b></td>
-        <td width="120"><b>Status</b></td>
-        <td width="70"><b>Count</b></td>
-        <td width="85"><b>Mark Complete</b></td>
-        <td ><b>Actions</b></td>
+        <td width="200"><b><fmt:message key="task" bundle="${resword}"/></b></td>
+        <td width="120"><b><fmt:message key="status" bundle="${resword}"/></b></td>
+        <td width="70"><b><fmt:message key="count" bundle="${resword}"/></b></td>
+        <td width="85"><b><fmt:message key="mark_complete" bundle="${resword}"/></b></td>
+        <td ><b><fmt:message key="actions" bundle="${resword}"/></b></td>
       </thead>
       <tbody>
         <tr>
             <td>1</td>
             <c:url var="studyUrl" value="/CreateStudy"/>
-            <td>Create Study</td>
+            <td><fmt:message key="create_study" bundle="${resword}"/></td>
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.study == 3}">
-                        Completed
+                        <fmt:message key="completed" bundle="${resword}"/>
                     </c:when>
                     <c:otherwise>
-                        In Progress
+                        <fmt:message key="in_progress" bundle="${resword}"/>
                     </c:otherwise>
                 </c:choose>
             </td>
-            <td>n/a</td>
+            <td><fmt:message key="NA" bundle="${resword}"/></td>
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.study == 3}">
-                        <a href='javascript:void(0)' onclick="prompt('study')"><img src="../images/icon_DEcomplete.gif" title="<fmt:message key="complete" bundle="${resword}"/>" border="0"/></a>
+                        <a href='javascript:void(0)' onclick="prompt('study')"><img src="../images/icon_DEcomplete.gif" border="0"/></a>
                         <input type="hidden" id="study" name="study" value=""/>
                     </c:when>
                     <c:otherwise>
@@ -182,24 +181,24 @@
             <c:url var="updateStudy" value="/UpdateStudyNew?id=${studyId}"/>
             <c:url var="viewStudy" value="/ViewStudy?id=${studyId}&viewFull=yes"/>
             <td>
-				<a href="${viewStudy}"><img src="../images/bt_Details.gif" title="<fmt:message key="view" bundle="${resword}"/>" border="0"/></a>
-                <a href="${updateStudy}"><img src="../images/bt_Edit.gif" title="<fmt:message key="edit" bundle="${resword}"/>" border="0"/></a>
+                <a href="${viewStudy}"><img src="../images/bt_Details.gif" border="0"/></a>
+                <a href="${updateStudy}"><img src="../images/bt_Edit.gif" border="0"/></a>
             </td>
         </tr>
         <tr>
             <td>2</td>
             <c:url var="crfUrl" value="/CreateCRFVersion"/>
-            <td>Create CRF</td>
+            <td><fmt:message key="create_CRF" bundle="${resword}"/></td>
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.crf == 1}">
-                        Not Started
+                        <fmt:message key="not_started" bundle="${resword}"/>
                     </c:when>
                     <c:when test="${studyModuleStatus.crf == 2}">
-                        In Progress
+                        <fmt:message key="in_progress" bundle="${resword}"/>
                     </c:when>
                     <c:otherwise>
-                        Completed
+                        <fmt:message key="completed" bundle="${resword}"/>
                     </c:otherwise>
                 </c:choose>
             </td>
@@ -209,7 +208,7 @@
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.crf == 3}">
-                        <a href='javascript:void(0)' onclick="prompt('crf')"><img src="../images/icon_DEcomplete.gif" title="<fmt:message key="complete" bundle="${resword}"/>" border="0"/></a>
+                        <a href='javascript:void(0)' onclick="prompt('crf')"><img src="../images/icon_DEcomplete.gif" border="0"/></a>
                         <input type="hidden" id="crf" name="crf" value=""/>
                     </c:when>
                     <c:otherwise>
@@ -223,17 +222,17 @@
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.crf == 1}">
-                        <a href="${crfCreateUrl}"><img src="../images/create_new.gif" title="<fmt:message key="new" bundle="${resword}"/>" border="0"/></a>
+                        <a href="${crfCreateUrl}"><img src="../images/create_new.gif" border="0"/></a>
                     </c:when>
                     <c:when test="${studyModuleStatus.crf == 2}">
-						<a href="${crfListUrl}"><img src="../images/bt_Details.gif" title="<fmt:message key="view" bundle="${resword}"/>" border="0"/></a>
-                        <a href="${crfCreateUrl}"><img src="../images/create_new.gif" title="<fmt:message key="new" bundle="${resword}"/>" border="0"/></a>
+                        <a href="${crfListUrl}"><img src="../images/bt_Details.gif" border="0"/></a>
+                        <a href="${crfCreateUrl}"><img src="../images/create_new.gif" border="0"/></a>
                         <%-- <a href="${crfListUrl}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
                         
                     </c:when>
                     <c:otherwise>
-						<a href="${crfListUrl}"><img src="../images/bt_Details.gif" title="<fmt:message key="view" bundle="${resword}"/>" border="0"/></a>
-                        <a href="${crfCreateUrl}"><img src="../images/create_new.gif" title="<fmt:message key="new" bundle="${resword}"/>" border="0"/></a>
+                        <a href="${crfListUrl}"><img src="../images/bt_Details.gif" border="0"/></a>
+                        <a href="${crfCreateUrl}"><img src="../images/create_new.gif" border="0"/></a>
                         <%-- <a href="${crfListUrl}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
                         
                     </c:otherwise>
@@ -244,17 +243,17 @@
             <td>
                 3
             </td>
-            <td>Create Event Definitions</td>
+            <td><fmt:message key="create_events_definitions" bundle="${resword}"/></td>
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.eventDefinition == 1}">
-                        Not Started
+                        <fmt:message key="not_started" bundle="${resword}"/>
                     </c:when>
                     <c:when test="${studyModuleStatus.eventDefinition == 2}">
-                        In Progress
+                        <fmt:message key="in_progress" bundle="${resword}"/>
                     </c:when>
                     <c:otherwise>
-                        Completed
+                        <fmt:message key="completed" bundle="${resword}"/>
                     </c:otherwise>
                 </c:choose>
             </td>
@@ -264,7 +263,7 @@
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.eventDefinition == 3}">
-                        <a href='javascript:void(0)' onclick="prompt('eventDefinition')"><img src="../images/icon_DEcomplete.gif" title="<fmt:message key="complete" bundle="${resword}"/>" border="0"/></a>
+                        <a href='javascript:void(0)' onclick="prompt('eventDefinition')"><img src="../images/icon_DEcomplete.gif" border="0"/></a>
                         <input type="hidden" id="eventDefinition" name="eventDefinition" value=""/>
                     </c:when>
                     <c:otherwise>
@@ -278,17 +277,17 @@
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.eventDefinition == 1}">
-                        <a href="${eventUrl}"><img src="../images/create_new.gif" title="<fmt:message key="new" bundle="${resword}"/>" border="0"/></a>
+                        <a href="${eventUrl}"><img src="../images/create_new.gif" border="0"/></a>
                     </c:when>
                     <c:when test="${studyModuleStatus.eventDefinition == 2}">
-						<a href="${edListUrl}"><img src="../images/bt_Details.gif" title="<fmt:message key="view" bundle="${resword}"/>" border="0"/></a>
-                        <a href="${eventUrl}"><img src="../images/create_new.gif" title="<fmt:message key="new" bundle="${resword}"/>" border="0"/></a>
+                        <a href="${edListUrl}"><img src="../images/bt_Details.gif" border="0"/></a>
+                        <a href="${eventUrl}"><img src="../images/create_new.gif" border="0"/></a>
                         <%-- <a href="${edListUrl}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
                         
                     </c:when>
                     <c:otherwise>
-						<a href="${edListUrl}"><img src="../images/bt_Details.gif" title="<fmt:message key="view" bundle="${resword}"/>" border="0"/></a>
-                        <a href="${eventUrl}"><img src="../images/create_new.gif" title="<fmt:message key="new" bundle="${resword}"/>" border="0"/></a>
+                        <a href="${edListUrl}"><img src="../images/bt_Details.gif" border="0"/></a>
+                        <a href="${eventUrl}"><img src="../images/create_new.gif" border="0"/></a>
                         <%-- <a href="${edListUrl}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
                         
                     </c:otherwise>
@@ -299,17 +298,17 @@
             <td>
                 4
             </td>
-            <td>Create Subject Group Classes</td>
+            <td><fmt:message key="create_subject_group_classes" bundle="${resword}"/></td>
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.subjectGroup == 1}">
-                        Not Started
+                        <fmt:message key="not_started" bundle="${resword}"/>
                     </c:when>
                     <c:when test="${studyModuleStatus.subjectGroup == 2}">
-                        In Progress
+                        <fmt:message key="in_progress" bundle="${resword}"/>
                     </c:when>
                     <c:otherwise>
-                        Completed
+                        <fmt:message key="completed" bundle="${resword}"/>
                     </c:otherwise>
                 </c:choose>
             </td>
@@ -319,7 +318,7 @@
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.subjectGroup == 3}">
-                        <a href='javascript:void(0)' onclick="prompt('subjectGroup')"><img src="../images/icon_DEcomplete.gif" title="<fmt:message key="complete" bundle="${resword}"/>" border="0"/></a>
+                        <a href='javascript:void(0)' onclick="prompt('subjectGroup')"><img src="../images/icon_DEcomplete.gif" border="0"/></a>
                         <input type="hidden" id="subjectGroup" name="subjectGroup" value=""/>
                     </c:when>
                     <c:otherwise>
@@ -333,17 +332,17 @@
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.subjectGroup == 1}">
-                        <a href="${createSubGroupUrl}"><img src="../images/create_new.gif" title="<fmt:message key="new" bundle="${resword}"/>" border="0"/></a>
+                        <a href="${createSubGroupUrl}"><img src="../images/create_new.gif" border="0"/></a>
                     </c:when>
                     <c:when test="${studyModuleStatus.subjectGroup == 2}">
-						<a href="${listSubGroupUrl}"><img src="../images/bt_Details.gif" title="<fmt:message key="view" bundle="${resword}"/>" border="0"/></a>
-                        <a href="${createSubGroupUrl}"><img src="../images/create_new.gif" title="<fmt:message key="new" bundle="${resword}"/>" border="0"/></a>
+                        <a href="${listSubGroupUrl}"><img src="../images/bt_Details.gif" border="0"/></a>
+                        <a href="${createSubGroupUrl}"><img src="../images/create_new.gif" border="0"/></a>
                         <%-- <a href="${listSubGroupUrl}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
                         
                     </c:when>
                     <c:otherwise>
-						<a href="${listSubGroupUrl}"><img src="../images/bt_Details.gif" title="<fmt:message key="view" bundle="${resword}"/>" border="0"/></a>
-                        <a href="${createSubGroupUrl}"><img src="../images/create_new.gif" title="<fmt:message key="new" bundle="${resword}"/>" border="0"/></a>
+                        <a href="${listSubGroupUrl}"><img src="../images/bt_Details.gif" border="0"/></a>
+                        <a href="${createSubGroupUrl}"><img src="../images/create_new.gif" border="0"/></a>
                         <%-- <a href="${listSubGroupUrl}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
                         
                     </c:otherwise>
@@ -352,17 +351,17 @@
         </tr>
         <tr>
             <td>5</td>
-            <td>Create Rules</td>
+            <td><fmt:message key="create_rules" bundle="${resword}"/></td>
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.rule == 1}">
-                        Not Started
+                        <fmt:message key="not_started" bundle="${resword}"/>
                     </c:when>
                     <c:when test="${studyModuleStatus.rule == 2}">
-                        In Progress
+                        <fmt:message key="in_progress" bundle="${resword}"/>
                     </c:when>
                     <c:otherwise>
-                        Completed
+                        <fmt:message key="completed" bundle="${resword}"/>
                     </c:otherwise>
                 </c:choose>
             </td>
@@ -372,7 +371,7 @@
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.rule == 3}">
-                        <a href='javascript:void(0)' onclick="prompt('rule')"><img src="../images/icon_DEcomplete.gif" title="<fmt:message key="complete" bundle="${resword}"/>" border="0"/></a>
+                        <a href='javascript:void(0)' onclick="prompt('rule')"><img src="../images/icon_DEcomplete.gif" border="0"/></a>
                         <input type="hidden" id="rule" name="rule" value=""/>
                     </c:when>
                     <c:otherwise>
@@ -386,17 +385,17 @@
 
                 <c:choose>
                     <c:when test="${studyModuleStatus.rule == 1}">
-                        <a href="${createRule}"><img src="../images/create_new.gif" title="<fmt:message key="new" bundle="${resword}"/>" border="0"/></a>
+                        <a href="${createRule}"><img src="../images/create_new.gif" border="0"/></a>
                     </c:when>
                     <c:when test="${studyModuleStatus.rule == 2}">
-						<a href="${viewRule}"><img src="../images/bt_Details.gif" title="<fmt:message key="view" bundle="${resword}"/>" border="0"/></a>
-                        <a href="${createRule}"><img src="../images/create_new.gif" title="<fmt:message key="new" bundle="${resword}"/>" border="0"/></a>
+                        <a href="${viewRule}"><img src="../images/bt_Details.gif" border="0"/></a>
+                        <a href="${createRule}"><img src="../images/create_new.gif" border="0"/></a>
                         <%-- <a href="${viewRule}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
                         
                     </c:when>
                     <c:otherwise>
-					    <a href="${viewRule}"><img src="../images/bt_Details.gif" title="<fmt:message key="view" bundle="${resword}"/>" border="0"/></a>
-                        <a href="${createRule}"><img src="../images/create_new.gif" title="<fmt:message key="new" bundle="${resword}"/>" border="0"/></a>
+                        <a href="${viewRule}"><img src="../images/bt_Details.gif" border="0"/></a>
+                        <a href="${createRule}"><img src="../images/create_new.gif" border="0"/></a>
                         <%-- <a href="${viewRule}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
                  
                     </c:otherwise>
@@ -407,30 +406,30 @@
   </table>
   <br>
   <br>
-  <%--<c:if test="${studyModuleStatus.study == 3 && studyModuleStatus.crf == 3 && studyModuleStatus.eventDefinition == 3 && studyModuleStatus.subjectGroup == 3 && studyModuleStatus.rule == 3}">--%>
+  <%-- <c:if test="${studyModuleStatus.study == 3 && studyModuleStatus.crf == 3 && studyModuleStatus.eventDefinition == 3 && studyModuleStatus.subjectGroup == 3 && studyModuleStatus.rule == 3}"> --%>
   <table width="78%" class="contenttable" cellspacing="0" cellpadding="2">
       <thead>
         <td width="20"></td>
-        <td width="200"><b>Task</b></td>
-        <td width="120"><b>Status</b></td>
-        <td width="70"><b>Count</b></td>
-        <td width="85"><b>Mark Complete</b></td>
-        <td><b>Actions</b></td>
+        <td width="200"><b><fmt:message key="task" bundle="${resword}"/></b></td>
+        <td width="120"><b><fmt:message key="status" bundle="${resword}"/></b></td>
+        <td width="70"><b><fmt:message key="count" bundle="${resword}"/></b></td>
+        <td width="85"><b><fmt:message key="mark_complete" bundle="${resword}"/></b></td>
+        <td><b><fmt:message key="actions" bundle="${resword}"/></b></td>
       </thead>
       <tbody>
         <tr>
             <td>6</td>
-            <td>Create Sites</td>
+            <td><fmt:message key="create_sites" bundle="${resword}"/></td>
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.site == 1}">
-                        Not Started
+                        <fmt:message key="not_started" bundle="${resword}"/>
                     </c:when>
                     <c:when test="${studyModuleStatus.site == 2}">
-                        In Progress
+                        <fmt:message key="in_progress" bundle="${resword}"/>
                     </c:when>
                     <c:otherwise>
-                        Completed
+                        <fmt:message key="completed" bundle="${resword}"/>
                     </c:otherwise>
                 </c:choose>
             </td>
@@ -440,7 +439,7 @@
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.site == 3}">
-                        <a href='javascript:void(0)' onclick="prompt('site')"><img src="../images/icon_DEcomplete.gif" title="<fmt:message key="complete" bundle="${resword}"/>" border="0"/></a>
+                        <a href='javascript:void(0)' onclick="prompt('site')"><img src="../images/icon_DEcomplete.gif" border="0"/></a>
                         <input type="hidden" id="site" name="site" value=""/>
                     </c:when>
                     <c:otherwise>
@@ -454,17 +453,17 @@
 
                 <c:choose>
                     <c:when test="${studyModuleStatus.site == 1}">
-                        <a href="${subGroupUrl}"><img src="../images/create_new.gif" title="<fmt:message key="new" bundle="${resword}"/>" border="0"/></a>
+                        <a href="${subGroupUrl}"><img src="../images/create_new.gif" border="0"/></a>
                     </c:when>
                     <c:when test="${studyModuleStatus.site == 2}">
-						<a href="${siteList}"><img src="../images/bt_Details.gif" title="<fmt:message key="view" bundle="${resword}"/>" border="0"/></a>
-                        <a href="${subGroupUrl}"><img src="../images/create_new.gif" title="<fmt:message key="new" bundle="${resword}"/>" border="0"/></a>
+                        <a href="${siteList}"><img src="../images/bt_Details.gif" border="0"/></a>
+                        <a href="${subGroupUrl}"><img src="../images/create_new.gif" border="0"/></a>
                         <%-- <a href="${siteList}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
                         
                     </c:when>
                     <c:otherwise>
-						<a href="${siteList}"><img src="../images/bt_Details.gif" title="<fmt:message key="view" bundle="${resword}"/>" border="0"/></a>
-                        <a href="${subGroupUrl}"><img src="../images/create_new.gif" title="<fmt:message key="new" bundle="${resword}"/>" border="0"/></a>
+                        <a href="${siteList}"><img src="../images/bt_Details.gif" border="0"/></a>
+                        <a href="${subGroupUrl}"><img src="../images/create_new.gif" border="0"/></a>
                         <%-- <a href="${siteList}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
                         
                     </c:otherwise>
@@ -479,26 +478,26 @@
   <table width="78%" class="contenttable" cellspacing="0" cellpadding="2">
         <thead>
         <td width="20"></td>
-        <td width="200"><b>Task</b></td>
-        <td width="120"><b>Status</b></td>
-        <td width="70"><b>Count</b></td>
-        <td width="85"><b>Mark Complete</b></td>
-        <td><b>Actions</b></td>
+        <td width="200"><b><fmt:message key="task" bundle="${resword}"/></b></td>
+        <td width="120"><b><fmt:message key="status" bundle="${resword}"/></b></td>
+        <td width="70"><b><fmt:message key="count" bundle="${resword}"/></b></td>
+        <td width="85"><b><fmt:message key="mark_complete" bundle="${resword}"/></b></td>
+        <td><b><fmt:message key="actions" bundle="${resword}"/></b></td>
       </thead>
       <tbody>
         <tr>
             <td>7</td>
-            <td>Assign Users</td>
+            <td><fmt:message key="assign_users" bundle="${resword}"/></td>
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.users == 1}">
-                        Not Started
+                        <fmt:message key="not_started" bundle="${resword}"/>
                     </c:when>
                     <c:when test="${studyModuleStatus.users == 2}">
-                        In Progress
+                        <fmt:message key="in_progress" bundle="${resword}"/>
                     </c:when>
                     <c:otherwise>
-                        Completed
+                        <fmt:message key="completed" bundle="${resword}"/>
                     </c:otherwise>
                 </c:choose>
 
@@ -514,7 +513,7 @@
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.users == 3}">
-                        <a href='javascript:void(0)' onclick="prompt('users')"><img src="../images/icon_DEcomplete.gif" title="<fmt:message key="complete" bundle="${resword}"/>" border="0"/></a>
+                        <a href='javascript:void(0)' onclick="prompt('users')"><img src="../images/icon_DEcomplete.gif" border="0"/></a>
                         <input type="hidden" id="users" name="users" value=""/>
                     </c:when>
                     <c:otherwise>
@@ -527,17 +526,17 @@
                 <c:url var="listStudyUser" value="/ListStudyUser"/>
                 <c:choose>
                     <c:when test="${studyModuleStatus.users == 1}">
-                        <a href="${assignUrl}"><img src="../images/create_new.gif" title="<fmt:message key="new" bundle="${resword}"/>" border="0"/></a>
+                        <a href="${assignUrl}"><img src="../images/create_new.gif" border="0"/></a>
                     </c:when>
                     <c:when test="${studyModuleStatus.users == 2}">
-						<a href="${listStudyUser}"><img src="../images/bt_Details.gif" title="<fmt:message key="view" bundle="${resword}"/>" border="0"/></a>
-                        <a href="${assignUrl}"><img src="../images/create_new.gif" title="<fmt:message key="new" bundle="${resword}"/>" border="0"/></a>
+                        <a href="${listStudyUser}"><img src="../images/bt_Details.gif" border="0"/></a>
+                        <a href="${assignUrl}"><img src="../images/create_new.gif" border="0"/></a>
                         <%-- <a href="${listStudyUser}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
                         
                     </c:when>
                     <c:otherwise>
-						<a href="${listStudyUser}"><img src="../images/bt_Details.gif" title="<fmt:message key="view" bundle="${resword}"/>" border="0"/></a>
-                        <a href="${assignUrl}"><img src="../images/create_new.gif" title="<fmt:message key="new" bundle="${resword}"/>" border="0"/></a>
+                        <a href="${listStudyUser}"><img src="../images/bt_Details.gif" border="0"/></a>
+                        <a href="${assignUrl}"><img src="../images/create_new.gif" border="0"/></a>
                         <%-- <a href="${listStudyUser}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
                         
                     </c:otherwise>
@@ -553,20 +552,20 @@
   <%-- additional table added tbh, 09/05/2009 --%>
   <c:if test="${!empty childStudyUserCount }">
   <table width="4%" style="border-left: 0px; border-top: 0px; border-bottom: 0px; border-right: 0px;" align="left" cellspacing="0" cellpadding="0">
-	<tr><td>&nbsp;&nbsp;</td></tr>
-	</table>
+    <tr><td>&nbsp;&nbsp;</td></tr>
+    </table>
   <table width="74%" class="contenttable" cellspacing="0" cellpadding="2">
         <thead>
         <%-- <td width="20" style="border-left: 0px; border-top: 0px; border-bottom: 0px;"></td> --%>
-        <td width="475"><b>Site</b></td>
-        <td><b>Count of Users</b></td>
+        <td width="475"><b><fmt:message key="site" bundle="${resword}"/></b></td>
+        <td><b><fmt:message key="count_of_users" bundle="${resword}"/></b></td>
         </thead>
         <tbody>
         <c:forEach var="childStudy" items="${childStudyUserCount}">
             <tr>
-            	<%-- <td style="border-left: 0px; border-top: 0px; border-bottom: 0px;"></td> --%>
-            	<td><c:out value="${childStudy.key}"></c:out></td>
-            	<td><c:out value="${childStudy.value}"></c:out></td>
+                <%-- <td style="border-left: 0px; border-top: 0px; border-bottom: 0px;"></td> --%>
+                <td><c:out value="${childStudy.key}"></c:out></td>
+                <td><c:out value="${childStudy.value}"></c:out></td>
             </tr>
         </c:forEach>
         </tbody>
@@ -574,8 +573,8 @@
    </c:if>
   <%--</c:if>--%>
   <div>
-      <input type="submit" name="submitEvent" value="Save" class="button_long">
-      <input type="button" onclick="confirmCancel('${pageContext.request.contextPath}/MainMenu');" name="cancel" value="Cancel" class="button_long">
+      <input type="submit" name="submitEvent" value="<fmt:message key="save" bundle="${resword}"/>" class="button_long">
+      <input type="button" onclick="confirmCancel('${pageContext.request.contextPath}/MainMenu');" name="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_long">
   </div>
 </form>
 <jsp:include page="include/footer.jsp"/>

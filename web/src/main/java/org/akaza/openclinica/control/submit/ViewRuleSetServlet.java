@@ -10,7 +10,9 @@ package org.akaza.openclinica.control.submit;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
+import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -50,6 +52,21 @@ public class ViewRuleSetServlet extends SecureController {
             forwardPage(Page.CRF_LIST);
         } else {
             RuleSetBean ruleSetBean = getRuleSetService().getRuleSetById(currentStudy, ruleSetId);
+            Boolean firstTime = true;
+            String validRuleSetRuleIds = "";
+            for (int j = 0; j < ruleSetBean.getRuleSetRules().size(); j++) {
+                RuleSetRuleBean rsr = ruleSetBean.getRuleSetRules().get(j);
+                if (rsr.getStatus() == Status.AVAILABLE) {
+                    if (firstTime) {
+                        validRuleSetRuleIds += rsr.getId();
+                        firstTime = false;
+                    } else {
+                        validRuleSetRuleIds += "," + rsr.getId();
+                    }
+                }
+
+            }
+            request.setAttribute("validRuleSetRuleIds", validRuleSetRuleIds);
             request.setAttribute(RULESET, ruleSetBean);
             forwardPage(Page.VIEW_RULES);
         }
@@ -66,7 +83,8 @@ public class ViewRuleSetServlet extends SecureController {
 
     private RuleSetServiceInterface getRuleSetService() {
         ruleSetService =
-            this.ruleSetService != null ? ruleSetService : (RuleSetServiceInterface) SpringServletAccess.getApplicationContext(context).getBean("ruleSetService");
+            this.ruleSetService != null ? ruleSetService : (RuleSetServiceInterface) SpringServletAccess.getApplicationContext(context).getBean(
+                    "ruleSetService");
         // TODO: Add getRequestURLMinusServletPath(),getContextPath()
         return ruleSetService;
     }

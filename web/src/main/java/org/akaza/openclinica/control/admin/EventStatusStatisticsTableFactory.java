@@ -7,6 +7,7 @@ import org.akaza.openclinica.control.StatisticsView;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.jmesa.core.filter.DateFilterMatcher;
 import org.jmesa.core.filter.MatcherKey;
 import org.jmesa.facade.TableFacade;
@@ -22,6 +23,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -31,6 +33,7 @@ public class EventStatusStatisticsTableFactory extends AbstractTableFactory {
     private StudySubjectDAO studySubjectDao;
     private StudyEventDAO studyEventDao;
     private StudyBean currentStudy;
+    private ResourceBundle reswords = ResourceBundleProvider.getWordsBundle();
 
     @Override
     protected String getTableName() {
@@ -47,9 +50,9 @@ public class EventStatusStatisticsTableFactory extends AbstractTableFactory {
         tableFacade.setColumnProperties("status", "studySubjects", "percentage");
         ((HtmlTableRenderer) tableFacade.getTable().getTableRenderer()).setWidth("375px");
         Row row = tableFacade.getTable().getRow();
-        configureColumn(row.getColumn("status"), "Event Status", null, null, false, true);
-        configureColumn(row.getColumn("studySubjects"), "# of Events", null, null, false, true);
-        configureColumn(row.getColumn("percentage"), "Percentage", new PercentageCellEditor(), null, false, true);
+        configureColumn(row.getColumn("status"), reswords.getString("event_status"), null, null, false, true);
+        configureColumn(row.getColumn("studySubjects"), reswords.getString("n_events"), null, null, false, true);
+        configureColumn(row.getColumn("percentage"), reswords.getString("percentage"), new PercentageCellEditor(), null, false, true);
 
     }
 

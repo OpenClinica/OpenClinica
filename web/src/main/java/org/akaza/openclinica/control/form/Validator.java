@@ -7,24 +7,6 @@
  */
 package org.akaza.openclinica.control.form;
 
-import java.math.BigDecimal;
-import java.text.NumberFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.EntityAction;
 import org.akaza.openclinica.bean.core.EntityBean;
@@ -45,6 +27,24 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 
@@ -425,6 +425,7 @@ public class Validator {
     public static final int IS_A_PHONE_NUMBER = 20;
     public static final int NO_BLANKS_SET = 22;
     public static final int IN_RESPONSE_SET = 23;
+    public static final int IN_RESPONSE_SET_COMMA_SEPERATED = 38;
     public static final int IN_RESPONSE_SET_SINGLE_VALUE = 24;
     public static final int MATCHES_INITIAL_DATA_ENTRY_VALUE = 25;
     public static final int IS_REQUIRED = 26;
@@ -448,7 +449,7 @@ public class Validator {
     public static final int IS_AN_RULE = 33;
     public static final int BARCODE_EAN_13 = 36;
     public static final int IS_VALID_WIDTH_DECIMAL = 35;
-    
+
     public static final int TO_HIDE_CONDITIONAL_DISPLAY = 37;
 
     /**
@@ -789,6 +790,9 @@ public class Validator {
             case IN_RESPONSE_SET:
                 errorMessage = resexception.getString("all_values_must_from_specified");
                 break;
+            case IN_RESPONSE_SET_COMMA_SEPERATED:
+                errorMessage = resexception.getString("all_values_must_from_specified");
+                break;
             case IN_RESPONSE_SET_SINGLE_VALUE:
                 errorMessage = resexception.getString("values_must_from_valid");
                 break;
@@ -1009,6 +1013,13 @@ public class Validator {
                 addError(fieldName, v);
             }
             break;
+        case IN_RESPONSE_SET_COMMA_SEPERATED:
+            ResponseSetBean rsbs = (ResponseSetBean) v.getArg(0);
+
+            if (!isInResponseSetCommaSeperated(fieldName, rsbs, true)) {
+                addError(fieldName, v);
+            }
+            break;
         case IN_RESPONSE_SET_SINGLE_VALUE:
             ResponseSetBean rsbSingle = (ResponseSetBean) v.getArg(0);
 
@@ -1079,8 +1090,7 @@ public class Validator {
                 // StringUtil.isFormatYear(fieldValue)
                 // || StringUtil.isFormatDate(fieldValue,
                 // resformat.getString("date_format_string"))) {
-                if (StringUtil.isFormatDate(fieldValue, resformat.getString("date_format_string"))
-                    || StringUtil.isPartialYear(fieldValue, resformat.getString("date_format_year"))
+                if (StringUtil.isFormatDate(fieldValue, resformat.getString("date_format_string")) || StringUtil.isPartialYear(fieldValue, "yyyy")
                     || StringUtil.isPartialYearMonth(fieldValue, resformat.getString("date_format_year_month"))) {
 
                     isPDate = true;
@@ -1620,6 +1630,47 @@ public class Validator {
         String fieldValues[];
         if (multValues) {
             fieldValues = request.getParameterValues(fieldName);
+        } else {
+            fieldValues = new String[1];
+            String fieldValue = getFieldValue(fieldName);
+            fieldValues[0] = fieldValue == null ? "" : fieldValue;
+        }
+
+        // this means the user didn't fill in anything - and nothing is still,
+        // trivially, in the response set
+        if (fieldValues == null) {
+            return true;
+        }
+
+        for (String value : fieldValues) {
+            // in principle this shouldn't happen, but since the empty valye is
+            // trivially a member of the response set, it's okay
+            if (value == null) {
+                continue;
+            }
+
+            if (!values.containsKey(value)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    protected boolean isInResponseSetCommaSeperated(String fieldName, ResponseSetBean set, boolean multValues) {
+        // prep work - makes checking for a value in the set very fast
+        HashMap values = new HashMap();
+
+        ArrayList options = set.getOptions();
+        for (int i = 0; i < options.size(); i++) {
+            ResponseOptionBean rob = (ResponseOptionBean) options.get(i);
+            values.put(rob.getValue(), Boolean.TRUE);
+        }
+
+        String fieldValues[];
+        if (multValues) {
+            //fieldValues = request.getParameterValues(fieldName);
+            fieldValues = request.getParameter(fieldName).split(",");
         } else {
             fieldValues = new String[1];
             String fieldValue = getFieldValue(fieldName);

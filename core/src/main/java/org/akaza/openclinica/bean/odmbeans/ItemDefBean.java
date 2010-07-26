@@ -30,6 +30,8 @@ public class ItemDefBean extends ElementOIDBean {
     private String codeListOID;
     private String comment;
     private ElementRefBean multiSelectListRef;
+    //openclinica extension: which crf-versions this item belong to
+    private String formOIDs;
 
     public ItemDefBean() {
         question = new TranslatedTextBean();
@@ -123,5 +125,13 @@ public class ItemDefBean extends ElementOIDBean {
 
     public void setMultiSelectListRef(ElementRefBean multiSelectListRef) {
         this.multiSelectListRef = multiSelectListRef;
+    }
+
+    public String getFormOIDs() {
+        return formOIDs;
+    }
+
+    public void setFormOIDs(String formOIDs) {
+        this.formOIDs = formOIDs;
     }
 }

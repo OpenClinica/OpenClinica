@@ -25,7 +25,7 @@ class ExpressionNodeFactory {
         } else if (op == Operator.OR || op == Operator.AND) {
             return new ConditionalOpNode(op, node1, node2);
         } else {
-            throw new OpenClinicaSystemException("Operator you specified is not valid");
+            throw new OpenClinicaSystemException("OCRERR_0003");
         }
 
     }

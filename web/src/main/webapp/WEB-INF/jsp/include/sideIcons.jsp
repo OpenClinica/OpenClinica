@@ -31,7 +31,7 @@
 			</tr>
 			<tr>
 				<td><img src="images/bt_Delete.gif"></td>
-				<td>Delete</td>
+				<td><fmt:message key="delete" bundle="${reswords}"/></td>
 			</tr>
 			<tr>
 				<td><img src="images/bt_Lock.gif"></td>

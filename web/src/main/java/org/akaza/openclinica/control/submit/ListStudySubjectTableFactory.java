@@ -1,5 +1,6 @@
 package org.akaza.openclinica.control.submit;
 
+import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -76,6 +77,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     private boolean showMoreLink;
     private ResourceBundle resword;
     private ResourceBundle resformat;
+    private ResourceBundle resterms = ResourceBundleProvider.getTermsBundle();
 
 
     final HashMap<Integer, String> imageIconPaths = new HashMap<Integer, String>(8);
@@ -523,8 +525,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     public class SubjectEventStatusFilterMatcher implements FilterMatcher {
         public boolean evaluate(Object itemValue, String filterValue) {
             String item = StringUtils.lowerCase(SubjectEventStatus.getSubjectEventStatusName((Integer) itemValue));
-            String filter = StringUtils.lowerCase(String.valueOf(filterValue)).trim().replace(" ", "_");
-            if (filter.equals(item)) {
+            String filter = StringUtils.lowerCase(String.valueOf(filterValue));//.trim().replace(" ", "_");
+            if (filterValue.equals(resterms.getString(item))) {
                 return true;
             }
             return false;
@@ -728,7 +730,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         actionLink.a().href("ViewStudySubject?id=" + studySubject.getId());
         actionLink.append("onMouseDown=\"javascript:setImage('bt_View1','images/bt_View_d.gif');\"");
         actionLink.append("onMouseUp=\"javascript:setImage('bt_View1','images/bt_View.gif');\"").close();
-        actionLink.img().name("bt_View1").src("images/bt_View.gif").border("0").alt("View").title("View").append("hspace=\"2\"").end().aEnd();
+        actionLink.img().name("bt_View1").src("images/bt_View.gif").border("0").alt(resword.getString("view")).title(resword.getString("view")).append("hspace=\"2\"").end().aEnd();
         actionLink.append("&nbsp;&nbsp;&nbsp;");
         return actionLink.toString();
 
@@ -741,7 +743,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                     + studySubject.getStudyId());
         actionLink.append("onMouseDown=\"javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');\"");
         actionLink.append("onMouseUp=\"javascript:setImage('bt_Remove1','images/bt_Remove.gif');\"").close();
-        actionLink.img().name("bt_Remove1").src("images/bt_Remove.gif").border("0").alt("Remove").title("Remove").append("hspace=\"2\"").end().aEnd();
+        actionLink.img().name("bt_Remove1").src("images/bt_Remove.gif").border("0").alt(resword.getString("remove")).title(resword.getString("remove")).append("hspace=\"2\"").end().aEnd();
         actionLink.append("&nbsp;&nbsp;&nbsp;");
         return actionLink.toString();
 
@@ -752,7 +754,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         actionLink.a().href("SignStudySubject?id=" + studySubject.getId());
         actionLink.append("onMouseDown=\"javascript:setImage('icon_signed','images/icon_Signed.gif');\"");
         actionLink.append("onMouseUp=\"javascript:setImage('icon_signed','images/icon_Signed.gif');\"").close();
-        actionLink.img().name("bt_Sign1").src("images/icon_Signed.gif").border("0").alt("Sign").title("Sign").append("hspace=\"2\"").end().aEnd();
+        actionLink.img().name("bt_Sign1").src("images/icon_Signed.gif").border("0").alt(resword.getString("sign")).title(resword.getString("sign")).append("hspace=\"2\"").end().aEnd();
         actionLink.append("&nbsp;&nbsp;&nbsp;");
         return actionLink.toString();
 
@@ -763,7 +765,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         actionLink.a().href("ReassignStudySubject?id=" + studySubject.getId());
         actionLink.append("onMouseDown=\"javascript:setImage('bt_Reassign1','images/bt_Reassign_d.gif');\"");
         actionLink.append("onMouseUp=\"javascript:setImage('bt_Reassign1','images/bt_Reassign.gif');\"").close();
-        actionLink.img().name("bt_Reassign1").src("images/bt_Reassign.gif").border("0").alt("Reassign").title("Reassign").append("hspace=\"2\"").end().aEnd();
+        actionLink.img().name("bt_Reassign1").src("images/bt_Reassign.gif").border("0").alt(resword.getString("reassign")).title(resword.getString("reassign")).append("hspace=\"2\"").end().aEnd();
         actionLink.append("&nbsp;&nbsp;&nbsp;");
         return actionLink.toString();
 
@@ -776,7 +778,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                     + studySubject.getStudyId());
         actionLink.append("onMouseDown=\"javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');\"");
         actionLink.append("onMouseUp=\"javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');\"").close();
-        actionLink.img().name("bt_Restore1").src("images/bt_Restore.gif").border("0").alt("Restore").title("Restore").append("hspace=\"2\"").end().aEnd();
+        actionLink.img().name("bt_Restore1").src("images/bt_Restore.gif").border("0").alt(resword.getString("restore")).title(resword.getString("restore")).append("hspace=\"2\"").end().aEnd();
         return actionLink.toString();
 
     }
@@ -828,16 +830,16 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
         String tableHeaderRowStyleClass = "table_header_row";
         String tableHeaderRowLeftStyleClass = "table_header_row_left";
-        String add_another_occurrence = "Add Another Occurrence";
-        String click_for_more_options = "Click for more options";
-        String schedule = "Schedule";
-        String view = "View/Enter Data";
-        String edit = "Edit";
-        String remove = "Remove";
-        String occurrence_x_of = "Occurrence: ";
-        String subjectText = "Subject";
-        String eventText = "Event";
-        String status = "Status";
+        String add_another_occurrence = resword.getString("add_another_occurrence");
+        String click_for_more_options = resword.getString("click_for_more_options");
+        String schedule = resword.getString("schedule");
+        String view = resword.getString("view")+"/"+resword.getString("enter_data");
+        String edit = resword.getString("edit");
+        String remove = resword.getString("remove");
+        String occurrence_x_of = resword.getString("ocurrence");
+        String subjectText = resword.getString("subject");
+        String eventText = resword.getString("event");
+        String status = resword.getString("status");
 
         StudyEventBean defaultEvent = studyEvents.get(0);
         String studySubjectLabel = studySubject.getLabel();
@@ -953,9 +955,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         SubjectEventStatus eventStatus = currentEvent.getSubjectEventStatus();
         String studyEventId = String.valueOf(currentEvent.getId());
 
-        String view = "View/Enter Data";
-        String edit = "Edit";
-        String remove = "Remove";
+        String view = resword.getString("view")+"/"+resword.getString("enter_data");
+        String edit = resword.getString("edit");
+        String remove = resword.getString("remove");
 
         if (eventSysStatus.getId() == Status.AVAILABLE.getId() || eventSysStatus == Status.SIGNED) {
 
@@ -1020,16 +1022,16 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
         String tableHeaderRowStyleClass = "table_header_row";
         String tableHeaderRowLeftStyleClass = "table_header_row_left";
-        String add_another_occurrence = "Add Another Occurrence";
-        String click_for_more_options = "Click for more options";
-        String schedule = "Schedule";
-        String view = "View/Enter Data";
-        String edit = "Edit";
-        String remove = "Remove";
-        String occurrence_x_of = "Occurrence: ";
-        String subjectText = "Subject";
-        String eventText = "Event";
-        String status = "Status";
+        String add_another_occurrence = resword.getString("add_another_occurrence");
+        String click_for_more_options = resword.getString("click_for_more_options");
+        String schedule = resword.getString("schedule");
+        String view = resword.getString("view")+"/"+resword.getString("enter_data");
+        String edit = resword.getString("edit");
+        String remove = resword.getString("remove");
+        String occurrence_x_of = resword.getString("ocurrence");
+        String subjectText = resword.getString("subject");
+        String eventText = resword.getString("event");
+        String status = resword.getString("status");
 
         SubjectEventStatus eventStatus = studyEvents.size() == 0 ? SubjectEventStatus.NOT_SCHEDULED : studyEvents.get(0).getSubjectEventStatus();
         String studyEventName = studyEvents.size() == 0 ? "" : studyEvents.get(0).getName();
@@ -1042,7 +1044,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         eventDiv.append(eventText).append(": ").append(sed.getName()).br();
 
         if (!sed.isRepeating()) {
-            eventDiv.append("Status").append(":").append(eventStatus.getName()).br();
+            eventDiv.append(resword.getString("status")).append(":").append(eventStatus.getName()).br();
             eventDiv.tdEnd();
             eventDiv.td(0).styleClass(tableHeaderRowLeftStyleClass).align("right").close();
             linkBuilder(eventDiv, studySubjectLabel, rowCount, studyEvents, sed);

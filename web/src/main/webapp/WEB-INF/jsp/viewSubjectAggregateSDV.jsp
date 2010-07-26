@@ -59,13 +59,13 @@
         <tr>
             <td valign="bottom" id="Tab1'">
                 <div id="Tab1NotSelected"><div class="tab_BG"><div class="tab_L"><div class="tab_R">
-                    <a class="tabtext" title="View By Event CRF" href='viewAllSubjectSDV?studyId=49&decorator=mydecorator' onclick="javascript:HighlightTab(1);">View By Event CRF</a></div></div></div></div>
-                <div id="Tab1Selected" style="display:none"><div class="tab_BG_h"><div class="tab_L_h"><div class="tab_R_h"><span class="tabtext">View By Event CRF</span></div></div></div></div></td>
+                    <a class="tabtext" title="<fmt:message key="view_by_event_CRF" bundle="${resword}"/>" href='viewAllSubjectSDV?studyId=49&decorator=mydecorator' onclick="javascript:HighlightTab(1);"><fmt:message key="view_by_event_CRF" bundle="${resword}"/></a></div></div></div></div>
+                <div id="Tab1Selected" style="display:none"><div class="tab_BG_h"><div class="tab_L_h"><div class="tab_R_h"><span class="tabtext"><fmt:message key="view_by_event_CRF" bundle="${resword}"/></span></div></div></div></div></td>
 
             <td valign="bottom" id="Tab2'">
                 <div id="Tab2NotSelected"><div class="tab_BG"><div class="tab_L"><div class="tab_R">
-					<a class="tabtext" title="View By Study Subject ID" href='viewSubjectSDV?studyId=${studyId}&studySubjectId=${studySubjectId}&decorator=mydecorator' onclick="javascript:HighlightTab(2);">View By Study Subject ID</a></div></div></div></div>
-                <div id="Tab2Selected" style="display:none"><div class="tab_BG_h"><div class="tab_L_h"><div class="tab_R_h"><span class="tabtext">View By Study Subject ID</span></div></div></div></div></td>
+					<a class="tabtext" title="<fmt:message key="view_by_studysubjectID" bundle="${resword}"/>" href='viewSubjectSDV?studyId=${studyId}&studySubjectId=${studySubjectId}&decorator=mydecorator' onclick="javascript:HighlightTab(2);"><fmt:message key="view_by_studysubjectID" bundle="${resword}"/></a></div></div></div></div>
+                <div id="Tab2Selected" style="display:none"><div class="tab_BG_h"><div class="tab_L_h"><div class="tab_R_h"><span class="tabtext"><fmt:message key="view_by_studysubjectID" bundle="${resword}"/></span></div></div></div></div></td>
                     
         </tr>
     </table>
@@ -147,9 +147,9 @@
 
 <div id="subjectSDV">
     <a href="javascript:void(0)"
-       onclick="if(this.innerHTML.indexOf('Show More') == -1)
+       onclick="if(this.innerHTML.indexOf('<fmt:message key="show_more" bundle="${resword}"/>') == -1)
     {hideCols('s_sdv',[2]);}
-    else {hideCols('s_sdv',[2],true);} toggleName(this);">Show More</a>
+    else {hideCols('s_sdv',[2],true);} toggleName(this);"><fmt:message key="show_more" bundle="${resword}"/></a>
     <form  action="${pageContext.request.contextPath}/pages/viewSubjectAggregateSDV">
         <input type="hidden" name="studyId" value="${param.studyId}">
 <!--        <input type="hidden" name="decorator" value="mydecorator"> -->

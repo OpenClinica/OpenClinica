@@ -61,13 +61,13 @@
         <tr>
             <td valign="bottom" id="Tab1'">
                 <div id="Tab1Selected"><div class="tab_BG"><div class="tab_L"><div class="tab_R">
-                    <a class="tabtext" title="View By Study Subject ID" href='viewAllSubjectSDV?studyId=${studyId}&studySubjectId=${studySubjectId}' onclick="javascript:HighlightTab(1);">View By Study Subject ID</a></div></div></div></div>
-                <div id="Tab1NotSelected" style="display:none"><div class="tab_BG_h"><div class="tab_L_h"><div class="tab_R_h"><span class="tabtext">View By Study Subject ID</span></div></div></div></div></td>
+                    <a class="tabtext" title="<fmt:message key="view_by_studysubjectID" bundle="${resword}"/>" href='viewAllSubjectSDV?studyId=${studyId}&studySubjectId=${studySubjectId}' onclick="javascript:HighlightTab(1);"><fmt:message key="view_by_studysubjectID" bundle="${resword}"/></a></div></div></div></div>
+                <div id="Tab1NotSelected" style="display:none"><div class="tab_BG_h"><div class="tab_L_h"><div class="tab_R_h"><span class="tabtext"><fmt:message key="view_by_studysubjectID" bundle="${resword}"/></span></div></div></div></div></td>
 
             <td valign="bottom" id="Tab2'">
                 <%--<div id="Tab2NotSelected"><div class="tab_BG"><div class="tab_L"><div class="tab_R">
-                    <a class="tabtext" title="View By Event CRF" href='viewAllSubjectSDVtmp?studyId=${studyId}' onclick="javascript:HighlightTab(2);">View By Event CRF</a></div></div></div></div>
-                <div id="Tab2Selected" style="display:none"><div class="tab_BG_h"><div class="tab_L_h"><div class="tab_R_h"><span class="tabtext">View By Event CRF</span></div></div></div></div>--%></td>
+                    <a class="tabtext" title="<fmt:message key="view_by_event_CRF" bundle="${resword}"/>" href='viewAllSubjectSDVtmp?studyId=${studyId}' onclick="javascript:HighlightTab(2);"><fmt:message key="view_by_event_CRF" bundle="${resword}"/></a></div></div></div></div>
+                <div id="Tab2Selected" style="display:none"><div class="tab_BG_h"><div class="tab_L_h"><div class="tab_R_h"><span class="tabtext"><fmt:message key="view_by_event_CRF" bundle="${resword}"/></span></div></div></div></div>--%></td>
         </tr>
     </table>
     <script language="JavaScript">
@@ -225,8 +225,8 @@
         <%--<input type="hidden" name="decorator" value="mydecorator">--%>
         ${sdvTableAttribute}
         <br />
-        <input type="submit" name="sdvAllFormSubmit" class="button_medium" value="Submit" onclick="this.form.method='POST';this.form.action='${pageContext.request.contextPath}/pages/handleSDVPost';this.form.submit();"/>
-        <input type="submit" name="sdvAllFormCancel" class="button_medium" value="Cancel" onclick="this.form.action='${pageContext.request.contextPath}/pages/viewAllSubjectSDVtmp';this.form.submit();"/>
+        <input type="submit" name="sdvAllFormSubmit" class="button_medium" value="<fmt:message key="submit" bundle="${resword}"/>" onclick="this.form.method='POST';this.form.action='${pageContext.request.contextPath}/pages/handleSDVPost';this.form.submit();"/>
+        <input type="submit" name="sdvAllFormCancel" class="button_medium" value="<fmt:message key="cancel" bundle="${resword}"/>" onclick="this.form.action='${pageContext.request.contextPath}/pages/viewAllSubjectSDVtmp';this.form.submit();"/>
     </form>
     <script type="text/javascript">hideCols('sdv',[2,3,6,7,11,12,13])</script>
 

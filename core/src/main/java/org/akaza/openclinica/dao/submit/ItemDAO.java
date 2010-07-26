@@ -122,6 +122,22 @@ public class ItemDAO extends AuditableEntityDAO {
         }
     }
 
+    public Integer getCountofActiveItems() {
+        setTypesExpected();
+
+        String sql = digester.getQuery("getCountofItems");
+
+        ArrayList rows = this.select(sql);
+        Iterator it = rows.iterator();
+
+        if (it.hasNext()) {
+            Integer count = (Integer) ((HashMap) it.next()).get("count");
+            return count;
+        } else {
+            return null;
+        }
+    }
+
     public String getValidOid(ItemBean itemBean, String crfName, String itemLabel, ArrayList<String> oidList) {
 
         String oid = getOid(itemBean, crfName, itemLabel);
@@ -213,7 +229,7 @@ public class ItemDAO extends AuditableEntityDAO {
         return this.executeFindAllQuery("findAllBySectionId", variables);
     }
 
-    public ArrayList findAllUngroupedParentsBySectionId(int sectionId,int crfVersionId) {
+    public ArrayList findAllUngroupedParentsBySectionId(int sectionId, int crfVersionId) {
         HashMap variables = new HashMap();
         variables.put(1, sectionId);
         variables.put(2, crfVersionId);
@@ -243,7 +259,7 @@ public class ItemDAO extends AuditableEntityDAO {
 
     }
 
-    public List<ItemBean> findAllItemsByGroupId(int id,int crfVersionId) {
+    public List<ItemBean> findAllItemsByGroupId(int id, int crfVersionId) {
         this.setTypesExpected();
         HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
         variables.put(1, id);

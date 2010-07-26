@@ -7,17 +7,20 @@
  */
 package org.akaza.openclinica.service.rule;
 
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.oid.GenericOidGenerator;
 import org.akaza.openclinica.bean.oid.OidGenerator;
 import org.akaza.openclinica.dao.hibernate.RuleDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
+import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.rule.AuditableBeanWrapper;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
+import org.akaza.openclinica.domain.rule.RuleSetRuleBean.RuleSetRuleBeanImportStatus;
 import org.akaza.openclinica.domain.rule.action.EmailActionBean;
 import org.akaza.openclinica.domain.rule.action.HideActionBean;
 import org.akaza.openclinica.domain.rule.action.InsertActionBean;
@@ -36,7 +39,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
 
+import java.text.MessageFormat;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ResourceBundle;
 
 import javax.sql.DataSource;
 
@@ -52,9 +58,11 @@ public class RulesPostImportContainerService {
     private RuleSetDao ruleSetDao;
     private final OidGenerator oidGenerator;
     private StudyBean currentStudy;
+    private UserAccountBean userAccount;
 
     private ExpressionService expressionService;
     private InsertActionValidator insertActionValidator;
+    ResourceBundle respage;
 
     public RulesPostImportContainerService(DataSource ds, StudyBean currentStudy) {
         oidGenerator = new GenericOidGenerator();
@@ -76,18 +84,41 @@ public class RulesPostImportContainerService {
 
                 if (persistentRuleSetBean != null) {
                     List<RuleSetRuleBean> importedRuleSetRules = ruleSetBeanWrapper.getAuditableBean().getRuleSetRules();
+                    persistentRuleSetBean.setUpdaterAndDate(getUserAccount());
                     ruleSetBeanWrapper.setAuditableBean(persistentRuleSetBean);
+                    Iterator<RuleSetRuleBean> itr = importedRuleSetRules.iterator();
+                    while (itr.hasNext()) {
+                        RuleSetRuleBean ruleSetRuleBean = itr.next();
+                        ruleSetRuleBean.setRuleBean(getRuleDao().findByOid(ruleSetRuleBean.getOid(), persistentRuleSetBean.getStudyId()));
+                        //ruleSetRuleBean.setRuleSetBean(ruleSetBeanWrapper.getAuditableBean());
+                        for (RuleSetRuleBean persistentruleSetRuleBean : persistentRuleSetBean.getRuleSetRules()) {
+                            if (persistentruleSetRuleBean.getStatus() != Status.DELETED && ruleSetRuleBean.equals(persistentruleSetRuleBean)) {
+                                persistentruleSetRuleBean.setRuleSetRuleBeanImportStatus(RuleSetRuleBeanImportStatus.EXACT_DOUBLE);
+                                itr.remove();
+                                break;
+                            } else if (persistentruleSetRuleBean.getStatus() != Status.DELETED && ruleSetRuleBean.getRuleBean() != null
+                                && ruleSetRuleBean.getRuleBean().equals(persistentruleSetRuleBean.getRuleBean())) {
+                                //persistentruleSetRuleBean.setActions(ruleSetRuleBean.getActions());
+                                persistentruleSetRuleBean.setRuleSetRuleBeanImportStatus(RuleSetRuleBeanImportStatus.TO_BE_REMOVED);
+                                //itr.remove();
+                                break;
+                            }
+                            ruleSetRuleBean.setRuleSetRuleBeanImportStatus(RuleSetRuleBeanImportStatus.LINE);
+                        }
+                    }
                     ruleSetBeanWrapper.getAuditableBean().addRuleSetRules(importedRuleSetRules);
                     // ruleSetBeanWrapper.getAuditableBean().setId(persistentRuleSetBean.getId());
                 } else {
                     if (importContainer.getValidRuleSetExpressionValues().contains(ruleSetBeanWrapper.getAuditableBean().getTarget().getValue())) {
-                        ruleSetBeanWrapper.error("You have two rule assignments with exact same Target, Combine and try again");
+                        ruleSetBeanWrapper.error(createError("OCRERR_0031"));
                     }
+                    ruleSetBeanWrapper.getAuditableBean().setOwner(getUserAccount());
                     ruleSetBeanWrapper.getAuditableBean().setStudyEventDefinition(
                             getExpressionService().getStudyEventDefinitionFromExpression(ruleSetBean.getTarget().getValue()));
                     ruleSetBeanWrapper.getAuditableBean().setCrf(getExpressionService().getCRFFromExpression(ruleSetBean.getTarget().getValue()));
                     ruleSetBeanWrapper.getAuditableBean().setCrfVersion(getExpressionService().getCRFVersionFromExpression(ruleSetBean.getTarget().getValue()));
                     ruleSetBeanWrapper.getAuditableBean().setItem(getExpressionService().getItemBeanFromExpression(ruleSetBean.getTarget().getValue()));
+                    ruleSetBeanWrapper.getAuditableBean().setItemGroup(getExpressionService().getItemGroupExpression(ruleSetBean.getTarget().getValue()));
                 }
                 isRuleSetRuleValid(importContainer, ruleSetBeanWrapper);
             }
@@ -102,6 +133,10 @@ public class RulesPostImportContainerService {
     public RulesPostImportContainer validateRuleDefs(RulesPostImportContainer importContainer) {
         for (RuleBean ruleBean : importContainer.getRuleDefs()) {
             AuditableBeanWrapper<RuleBean> ruleBeanWrapper = new AuditableBeanWrapper<RuleBean>(ruleBean);
+            ruleBeanWrapper.getAuditableBean().setStudy(currentStudy);
+            // Remove illegal characters from expression value
+            ruleBeanWrapper.getAuditableBean().getExpression().setValue(
+                    ruleBeanWrapper.getAuditableBean().getExpression().getValue().trim().replaceAll("(\n|\t|\r)", " "));
 
             if (isRuleOidValid(ruleBeanWrapper) && isRuleExpressionValid(ruleBeanWrapper, null)) {
                 RuleBean persistentRuleBean = getRuleDao().findByOid(ruleBeanWrapper.getAuditableBean());
@@ -109,14 +144,19 @@ public class RulesPostImportContainerService {
                     String name = ruleBeanWrapper.getAuditableBean().getName();
                     String expressionValue = ruleBeanWrapper.getAuditableBean().getExpression().getValue();
                     String expressionContextName = ruleBeanWrapper.getAuditableBean().getExpression().getContextName();
+                    String description = ruleBeanWrapper.getAuditableBean().getDescription();
                     Context context = expressionContextName != null ? Context.getByName(expressionContextName) : Context.OC_RULES_V1;
+                    persistentRuleBean.setUpdaterAndDate(getUserAccount());
                     ruleBeanWrapper.setAuditableBean(persistentRuleBean);
                     ruleBeanWrapper.getAuditableBean().setName(name);
+                    ruleBeanWrapper.getAuditableBean().setDescription(description);
                     ruleBeanWrapper.getAuditableBean().getExpression().setValue(expressionValue);
                     ruleBeanWrapper.getAuditableBean().getExpression().setContext(context);
                     doesPersistentRuleBeanBelongToCurrentStudy(ruleBeanWrapper);
                     // ruleBeanWrapper.getAuditableBean().setId(persistentRuleBean.getId());
                     // ruleBeanWrapper.getAuditableBean().getExpression().setId(persistentRuleBean.getExpression().getId());
+                } else {
+                    ruleBeanWrapper.getAuditableBean().setOwner(getUserAccount());
                 }
             }
             putRuleInCorrectContainer(ruleBeanWrapper, importContainer);
@@ -165,26 +205,32 @@ public class RulesPostImportContainerService {
     private void isRuleSetRuleValid(RulesPostImportContainer importContainer, AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper) {
         for (RuleSetRuleBean ruleSetRuleBean : ruleSetBeanWrapper.getAuditableBean().getRuleSetRules()) {
             String ruleDefOid = ruleSetRuleBean.getOid();
-            if (ruleSetRuleBean.getId() == null) {
+            if (ruleSetRuleBean.getId() == null || ruleSetRuleBean.getRuleSetRuleBeanImportStatus() == RuleSetRuleBeanImportStatus.EXACT_DOUBLE) {
                 EventDefinitionCRFBean eventDefinitionCRFBean =
                     getExpressionService().getEventDefinitionCRF(ruleSetBeanWrapper.getAuditableBean().getTarget().getValue());
                 if (eventDefinitionCRFBean != null && eventDefinitionCRFBean.getStatus().isDeleted()) {
-                    ruleSetBeanWrapper
-                            .error("This is an invalid Rule Set because the target is pointing to an item in the event definition CRF that has a status of removed");
+                    ruleSetBeanWrapper.error(createError("OCRERR_0026"));
                 }
                 if (importContainer.getInValidRules().get(ruleDefOid) != null || importContainer.getValidRules().get(ruleDefOid) == null
-                    && getRuleDao().findByOid(ruleDefOid) == null) {
-                    ruleSetBeanWrapper.error("The Rule you are trying to reference does not exist or is Invalid");
+                    && getRuleDao().findByOid(ruleDefOid, ruleSetBeanWrapper.getAuditableBean().getStudyId()) == null) {
+                    ruleSetBeanWrapper.error(createError("OCRERR_0025"));
                 }
                 if (importContainer.getValidRules().get(ruleDefOid) != null) {
                     AuditableBeanWrapper<RuleBean> r = importContainer.getValidRules().get(ruleDefOid);
                     if (!isRuleExpressionValid(r, ruleSetBeanWrapper.getAuditableBean()))
-                        ruleSetBeanWrapper
-                                .error("The Contextual expression in one of the Rules does not validate against the Target expression in the Current RuleSet");
+                        ruleSetBeanWrapper.error(createError("OCRERR_0027"));
                 }
+                if (importContainer.getValidRules().get(ruleDefOid) == null) {
+                    RuleBean rule = getRuleDao().findByOid(ruleDefOid, ruleSetBeanWrapper.getAuditableBean().getStudyId());
+                    AuditableBeanWrapper<RuleBean> r = new AuditableBeanWrapper<RuleBean>(rule);
+                    if (!isRuleExpressionValid(r, ruleSetBeanWrapper.getAuditableBean()))
+                        ruleSetBeanWrapper.error(createError("OCRERR_0027"));
+                }
+
                 for (RuleActionBean ruleActionBean : ruleSetRuleBean.getActions()) {
                     isRuleActionValid(ruleActionBean, ruleSetBeanWrapper, eventDefinitionCRFBean);
                 }
+
             }
         }
     }
@@ -231,7 +277,7 @@ public class RulesPostImportContainerService {
             insertActionValidator.setExpressionService(expressionService);
             insertActionValidator.validate((ruleActionBean), errors);
             if (errors.hasErrors()) {
-                ruleSetBeanWrapper.error("InsertAction is not Valid. " + errors.toString());
+                ruleSetBeanWrapper.error("InsertAction is not valid: " + errors.getAllErrors().get(0).getDefaultMessage());
             }
         }
         if (ruleActionBean instanceof EmailActionBean) {
@@ -242,11 +288,19 @@ public class RulesPostImportContainerService {
         }
     }
 
+    private String createError(String key) {
+        MessageFormat mf = new MessageFormat("");
+        mf.applyPattern(respage.getString(key));
+        Object[] arguments = {};
+        return key + ": " + mf.format(arguments);
+    }
+
     private boolean isRuleExpressionValid(AuditableBeanWrapper<RuleBean> ruleBeanWrapper, RuleSetBean ruleSet) {
         boolean isValid = true;
         ExpressionBean expressionBean = isExpressionValid(ruleBeanWrapper.getAuditableBean().getExpression(), ruleBeanWrapper);
         ExpressionObjectWrapper eow = new ExpressionObjectWrapper(ds, currentStudy, expressionBean, ruleSet);
         ExpressionProcessor ep = ExpressionProcessorFactory.createExpressionProcessor(eow);
+        ep.setRespage(respage);
         String errorString = ep.isRuleExpressionValid();
         if (errorString != null) {
             ruleBeanWrapper.error(errorString);
@@ -260,6 +314,7 @@ public class RulesPostImportContainerService {
         ExpressionBean expressionBean = isExpressionValid(beanWrapper.getAuditableBean().getTarget(), beanWrapper);
         ExpressionObjectWrapper eow = new ExpressionObjectWrapper(ds, currentStudy, expressionBean);
         ExpressionProcessor ep = ExpressionProcessorFactory.createExpressionProcessor(eow);
+        ep.setRespage(respage);
         String errorString = ep.isRuleAssignmentExpressionValid();
         if (errorString != null) {
             beanWrapper.error(errorString);
@@ -274,7 +329,7 @@ public class RulesPostImportContainerService {
             expressionBean.setContext(Context.OC_RULES_V1);
         }
         if (expressionBean.getContextName() != null && expressionBean.getContext() == null) {
-            beanWrapper.warning("The Context you selected is not support we will use the default one");
+            beanWrapper.warning(createError("OCRERR_0029"));
             expressionBean.setContext(Context.OC_RULES_V1);
         }
         return expressionBean;
@@ -285,7 +340,7 @@ public class RulesPostImportContainerService {
         try {
             oidGenerator.validate(ruleBeanWrapper.getAuditableBean().getOid());
         } catch (Exception e) {
-            ruleBeanWrapper.error("OID is not Valid, The OID can only be made of A-Z_0-9");
+            ruleBeanWrapper.error(createError("OCRERR_0028"));
             isValid = false;
         }
         return isValid;
@@ -293,10 +348,12 @@ public class RulesPostImportContainerService {
 
     private boolean doesPersistentRuleBeanBelongToCurrentStudy(AuditableBeanWrapper<RuleBean> ruleBeanWrapper) {
         boolean isValid = true;
-        int studyId = ruleBeanWrapper.getAuditableBean().getRuleSetRules().get(0).getRuleSetBean().getStudyId();
-        if (studyId != currentStudy.getId()) {
-            ruleBeanWrapper.error("The RuleDef OID you specified is used in a different study, please provide a new RuleDef OID.");
-            isValid = false;
+        if (ruleBeanWrapper.getAuditableBean().getRuleSetRules().size() > 0) {
+            int studyId = ruleBeanWrapper.getAuditableBean().getRuleSetRules().get(0).getRuleSetBean().getStudyId();
+            if (studyId != currentStudy.getId()) {
+                ruleBeanWrapper.error(createError("OCRERR_0030"));
+                isValid = false;
+            }
         }
         return isValid;
     }
@@ -349,6 +406,34 @@ public class RulesPostImportContainerService {
 
     public void setInsertActionValidator(InsertActionValidator insertActionValidator) {
         this.insertActionValidator = insertActionValidator;
+    }
+
+    /**
+     * @return the respage
+     */
+    public ResourceBundle getRespage() {
+        return respage;
+    }
+
+    /**
+     * @param respage
+     */
+    public void setRespage(ResourceBundle respage) {
+        this.respage = respage;
+    }
+
+    /**
+     * @return userAccount
+     */
+    public UserAccountBean getUserAccount() {
+        return userAccount;
+    }
+
+    /**
+     * @param userAccount
+     */
+    public void setUserAccount(UserAccountBean userAccount) {
+        this.userAccount = userAccount;
     }
 
     private ExpressionService getExpressionService() {

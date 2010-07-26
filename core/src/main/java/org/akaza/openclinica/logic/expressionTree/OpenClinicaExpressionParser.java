@@ -12,6 +12,8 @@ import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+
 /**
  * @author Krikor Krumlian
  * 
@@ -21,10 +23,31 @@ public class OpenClinicaExpressionParser {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     TextIO textIO;
     ExpressionObjectWrapper expressionWrapper;
-    private final String ERROR_MESSAGE = "Extra Data in Expression.";
+    private final String ERROR_MESSAGE_KEY = "OCRERR_0005";
+    private HashMap<String, String> testValues;
+    private HashMap<String, String> responseTestValues;
 
     public OpenClinicaExpressionParser() {
         textIO = new TextIO();
+    }
+
+    public HashMap<String, String> getTestValues() {
+        return testValues;
+    }
+
+    public void setTestValues(HashMap<String, String> testValues) {
+        this.testValues = testValues;
+    }
+
+    public HashMap<String, String> getResponseTestValues() {
+        if (responseTestValues == null) {
+            responseTestValues = new HashMap<String, String>();
+        }
+        return responseTestValues;
+    }
+
+    public void setResponseTestValues(HashMap<String, String> responseTestValues) {
+        this.responseTestValues = responseTestValues;
     }
 
     public OpenClinicaExpressionParser(ExpressionObjectWrapper expressionWrapper) {
@@ -37,7 +60,7 @@ public class OpenClinicaExpressionParser {
         getTextIO().skipBlanks();
         ExpressionNode exp = expressionTree();
         if (getTextIO().peek() != '\n')
-            throw new OpenClinicaSystemException(ERROR_MESSAGE);
+            throw new OpenClinicaSystemException(ERROR_MESSAGE_KEY);
         exp.printStackCommands();
     }
 
@@ -46,7 +69,7 @@ public class OpenClinicaExpressionParser {
         getTextIO().skipBlanks();
         ExpressionNode exp = expressionTree();
         if (getTextIO().peek() != '\n')
-            throw new OpenClinicaSystemException(ERROR_MESSAGE);
+            throw new OpenClinicaSystemException(ERROR_MESSAGE_KEY);
         return exp.value();
     }
 
@@ -55,8 +78,23 @@ public class OpenClinicaExpressionParser {
         getTextIO().skipBlanks();
         ExpressionNode exp = expressionTree();
         if (getTextIO().peek() != '\n')
-            throw new OpenClinicaSystemException(ERROR_MESSAGE);
+            throw new OpenClinicaSystemException(ERROR_MESSAGE_KEY);
         return exp.testValue();
+
+    }
+
+    public HashMap<String, String> parseAndTestEvaluateExpression(String expression, HashMap<String, String> h) throws OpenClinicaSystemException {
+        getTextIO().fillBuffer(expression);
+        getTextIO().skipBlanks();
+        ExpressionNode exp = expressionTree();
+
+        if (getTextIO().peek() != '\n')
+            throw new OpenClinicaSystemException(ERROR_MESSAGE_KEY);
+        setTestValues(h);
+        //HashMap<String, String> theTestValues = getTestValues();
+        HashMap<String, String> theTestValues = getResponseTestValues();
+        theTestValues.put("result", exp.testValue());
+        return theTestValues;
 
     }
 
@@ -197,25 +235,25 @@ public class OpenClinicaExpressionParser {
             ExpressionNode exp = expressionTree();
             textIO.skipBlanks();
             if (textIO.peek() != ')')
-                throw new OpenClinicaSystemException("Missing right parenthesis.");
+                throw new OpenClinicaSystemException("OCRERR_0006");
             textIO.getAnyChar(); // Read the ")"
             return exp;
         } else if (String.valueOf(ch).matches("\\w+")) {
             String k = textIO.getWord();
             logger.info("TheWord 1 is : " + k);
-            return new OpenClinicaVariableNode(k, expressionWrapper);
+            return new OpenClinicaVariableNode(k, expressionWrapper, this);
         } else if (String.valueOf(ch).matches("\"")) {
             String k = textIO.getDoubleQuoteWord();
             logger.info("TheWord 2 is : " + k);
             return new ConstantNode(k);
         } else if (ch == '\n')
-            throw new OpenClinicaSystemException("End-of-line encountered in the middle of an expression.");
+            throw new OpenClinicaSystemException("OCRERR_0007");
         else if (ch == ')')
-            throw new OpenClinicaSystemException("Extra right parenthesis.");
+            throw new OpenClinicaSystemException("OCRERR_0008");
         else if (ch == '+' || ch == '-' || ch == '*' || ch == '/')
-            throw new OpenClinicaSystemException("Misplaced operator.");
+            throw new OpenClinicaSystemException("OCRERR_0009");
         else
-            throw new OpenClinicaSystemException("Unexpected character \"" + ch + "\" encountered.");
+            throw new OpenClinicaSystemException("OCRERR_0010", new Object[] { ch });
     } // end factorTree()
 
     /**

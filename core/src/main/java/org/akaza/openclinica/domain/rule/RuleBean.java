@@ -7,6 +7,7 @@
  */
 package org.akaza.openclinica.domain.rule;
 
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.oid.GenericOidGenerator;
 import org.akaza.openclinica.bean.oid.OidGenerator;
 import org.akaza.openclinica.domain.AbstractAuditableMutableDomainObject;
@@ -42,10 +43,14 @@ public class RuleBean extends AbstractAuditableMutableDomainObject {
     private String type;
     private String description;
     private boolean enabled;
+    private StudyBean study;
 
     private ExpressionBean expression;
     private List<RuleSetRuleBean> ruleSetRules;
     private OidGenerator oidGenerator;
+
+    // TODO : Pending conversion of the objects below to use Hibernate
+    private Integer studyId;
 
     public RuleBean() {
         this.oidGenerator = new GenericOidGenerator();
@@ -112,6 +117,32 @@ public class RuleBean extends AbstractAuditableMutableDomainObject {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * @return the studyId
+     */
+    public Integer getStudyId() {
+        return studyId;
+    }
+
+    /**
+     * @param studyId the studyId to set
+     */
+    public void setStudyId(Integer studyId) {
+        this.studyId = studyId;
+    }
+
+    @Transient
+    public StudyBean getStudy() {
+        return study;
+    }
+
+    public void setStudy(StudyBean study) {
+        if (study.getId() > 0) {
+            this.studyId = study.getId();
+        }
+        this.study = study;
     }
 
     @Transient

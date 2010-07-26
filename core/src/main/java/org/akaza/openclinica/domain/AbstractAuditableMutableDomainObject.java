@@ -100,6 +100,12 @@ public abstract class AbstractAuditableMutableDomainObject extends AbstractMutab
 
     }
 
+    @Transient
+    public void setUpdaterAndDate(UserAccountBean updater) {
+        setUpdater(updater);
+        setUpdatedDate(new Date());
+    }
+
     /**
      * @return the status
      */

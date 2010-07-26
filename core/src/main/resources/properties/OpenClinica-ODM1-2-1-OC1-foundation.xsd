@@ -156,6 +156,10 @@
 	<xs:attributeGroup name="MultiSelectListItemAttributeDefinition">
             <xs:attribute  name="CodedOptionValue" type="odm:value" use="required"/>
         </xs:attributeGroup>  
+        
+    <xs:attributeGroup name="ItemDefAttributeDefinition">
+		<xs:attribute name="FormOIDs" type="odm:text"/>
+	</xs:attributeGroup>
 	
 	<xs:attributeGroup name="StudyGroupClassListAttributeDefinition">
 		<xs:attribute name="ID" type="odm:oid" use="required"/>

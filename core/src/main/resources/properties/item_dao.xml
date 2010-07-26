@@ -162,4 +162,10 @@
 			and ifm.parent_id = pn.parent_id
 		</sql>
 	</query>
+	<query>
+        <name>getCountofItems</name>
+        <sql>
+           select count(item.item_id) from item where item.status_id != 5
+        </sql>
+    </query>
 </queries>

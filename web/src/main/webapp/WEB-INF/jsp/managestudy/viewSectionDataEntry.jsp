@@ -25,12 +25,11 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
-
+<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="resformat"/>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head><title>OpenClinica <fmt:message key="view_data_entry" bundle="${resword}"/></title>
-    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7"/>
     <link rel="stylesheet" href="includes/styles.css" type="text/css" media="screen">
     <link rel="stylesheet" href="includes/styles2.css" type="text/css" media="screen">
     <link rel="stylesheet" href="includes/print.css" type="text/css" media="print">
@@ -46,7 +45,7 @@
 
     <link rel="stylesheet" type="text/css" media="all" href="includes/new_cal/skins/aqua/theme.css" title="Aqua" />
     <script type="text/javascript" src="includes/new_cal/calendar.js"></script>
-    <script type="text/javascript" src="includes/new_cal/lang/calendar-en.js"></script>
+    <script type="text/javascript" src="includes/new_cal/lang/<fmt:message key="jscalendar_language_file" bundle="${resformat}"/>"></script>
     <script type="text/javascript" src="includes/new_cal/calendar-setup.js"></script>
     <!-- End -->
 

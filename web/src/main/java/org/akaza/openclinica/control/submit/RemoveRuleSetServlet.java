@@ -8,11 +8,16 @@
 package org.akaza.openclinica.control.submit;
 
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
+import org.akaza.openclinica.dao.hibernate.RuleSetRuleAuditDao;
+import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
+import org.akaza.openclinica.domain.rule.RuleSetRuleAuditBean;
+import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -26,6 +31,8 @@ public class RemoveRuleSetServlet extends SecureController {
     private static final long serialVersionUID = 1L;
     RuleSetDao ruleSetDao;
     RuleSetServiceInterface ruleSetService;
+    RuleSetRuleAuditDao ruleSetRuleAuditDao;
+    RuleSetRuleDao ruleSetRuleDao;
 
     private static String RULESET_ID = "ruleSetId";
     private static String RULESET = "ruleSet";
@@ -56,16 +63,29 @@ public class RemoveRuleSetServlet extends SecureController {
         } else {
             RuleSetBean ruleSetBean = null;
             ruleSetBean = getRuleSetService().getRuleSetById(currentStudy, ruleSetId);
-            if (action.equals("confirm")) {
+            if (action != null && action.equals("confirm")) {
                 request.setAttribute(RULESET, ruleSetBean);
                 forwardPage(Page.REMOVE_RULE_SET);
             } else {
-                // ruleSetService.removeRuleSet(ruleSetBean, ub);
-                ruleSetService.updateRuleSet(ruleSetBean, ub, Status.DELETED);
-                // getRuleSetDao().remove(ruleSetBean, ub);
+                for (RuleSetRuleBean ruleSetRuleBean : ruleSetBean.getRuleSetRules()) {
+                    if (ruleSetRuleBean.getStatus() != Status.DELETED) {
+                        ruleSetRuleBean.setStatus(Status.DELETED);
+                        ruleSetRuleBean.setUpdater(ub);
+                        ruleSetRuleBean = getRuleSetRuleDao().saveOrUpdate(ruleSetRuleBean);
+                        createRuleSetRuleAuditBean(ruleSetRuleBean, ub, Status.DELETED);
+                    }
+                }
                 forwardPage(Page.LIST_RULE_SETS_SERVLET);
             }
         }
+    }
+
+    private void createRuleSetRuleAuditBean(RuleSetRuleBean ruleSetRuleBean, UserAccountBean ub, Status status) {
+        RuleSetRuleAuditBean ruleSetRuleAuditBean = new RuleSetRuleAuditBean();
+        ruleSetRuleAuditBean.setRuleSetRuleBean(ruleSetRuleBean);
+        ruleSetRuleAuditBean.setUpdater(ub);
+        ruleSetRuleAuditBean.setStatus(status);
+        getRuleSetRuleAuditDao().saveOrUpdate(ruleSetRuleAuditBean);
     }
 
     /**
@@ -82,9 +102,23 @@ public class RemoveRuleSetServlet extends SecureController {
         this.ruleSetDao = ruleSetDao;
     }
 
+    private RuleSetRuleAuditDao getRuleSetRuleAuditDao() {
+        ruleSetRuleAuditDao =
+            this.ruleSetRuleAuditDao != null ? ruleSetRuleAuditDao : (RuleSetRuleAuditDao) SpringServletAccess.getApplicationContext(context).getBean(
+                    "ruleSetRuleAuditDao");
+        return ruleSetRuleAuditDao;
+    }
+
+    private RuleSetRuleDao getRuleSetRuleDao() {
+        ruleSetRuleDao =
+            this.ruleSetRuleDao != null ? ruleSetRuleDao : (RuleSetRuleDao) SpringServletAccess.getApplicationContext(context).getBean("ruleSetRuleDao");
+        return ruleSetRuleDao;
+    }
+
     private RuleSetServiceInterface getRuleSetService() {
         ruleSetService =
-            this.ruleSetService != null ? ruleSetService : (RuleSetServiceInterface) SpringServletAccess.getApplicationContext(context).getBean("ruleSetService");
+            this.ruleSetService != null ? ruleSetService : (RuleSetServiceInterface) SpringServletAccess.getApplicationContext(context).getBean(
+                    "ruleSetService");
         // TODO: Add getRequestURLMinusServletPath(),getContextPath()
         return ruleSetService;
     }

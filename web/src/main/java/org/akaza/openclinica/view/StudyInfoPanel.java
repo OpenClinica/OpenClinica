@@ -7,19 +7,6 @@
  */
 package org.akaza.openclinica.view;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.TreeMap;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
@@ -39,6 +26,19 @@ import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.TreeMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 /**
  * To create a flexible panel of information that will change while the user
@@ -206,7 +206,7 @@ public class StudyInfoPanel {
             } else if (page.equals(Page.CREATE_DATASET_2) || page.equals(Page.CREATE_DATASET_EVENT_ATTR) || page.equals(Page.CREATE_DATASET_SUB_ATTR)
                 || page.equals(Page.CREATE_DATASET_CRF_ATTR) || page.equals(Page.CREATE_DATASET_GROUP_ATTR) || page.equals(Page.CREATE_DATASET_VIEW_SELECTED)) {
                 HashMap eventlist = (HashMap) request.getAttribute("eventlist");
-                ArrayList displayData = generateEventTree(eventlist);
+                ArrayList displayData = generateEventTree(eventlist, true);
 
                 this.reset();
                 this.setUserOrderedData(displayData);
@@ -382,7 +382,7 @@ public class StudyInfoPanel {
                 // HashMap eventlist = (HashMap)
                 // request.getAttribute("eventlist");
                 HashMap eventlist = (LinkedHashMap) session.getAttribute("eventsForCreateDataset");
-                ArrayList displayData = generateEventTree(eventlist);
+                ArrayList displayData = generateEventTree(eventlist, true);
 
                 this.setCreateDataset(true);
                 this.setOrderedData(true);
@@ -449,9 +449,19 @@ public class StudyInfoPanel {
                 this.setCreateDataset(false);
                 this.setIconInfoShown(true);
                 this.setManageSubject(false);
-            }
+            } else if (page.equals(Page.VIEW_RULE_SETS2)) {
+                HashMap eventlist = (HashMap) request.getAttribute("eventlist");
+                ArrayList displayData = generateEventTree(eventlist, false);
 
-            else {
+                this.reset();
+                this.setUserOrderedData(displayData);
+                this.setStudyInfoShown(true);
+                this.setOrderedData(true);
+                this.setCreateDataset(true);
+                this.setSubmitDataModule(false);
+                this.setExtractData(false);
+
+            } else {
                 // automatically reset if we don't know what's happening
                 this.reset();
                 this.setStudyInfoShown(true);
@@ -555,6 +565,27 @@ public class StudyInfoPanel {
         return answer;
     }
 
+    public void addStudyEventRulesTree(StudyBean study, StudySubjectBean studySubject, ArrayList displayStudyEventBeans, EventCRFBean ecb, boolean withLink) {
+        // method behind madness: we want the other pages to show
+        // this information, but we don't want to hit the database when we do.
+        // so, we gather--and hide--the information here.
+        this.setStudyInfoShown(true);
+        this.setOrderedData(false);
+
+        ArrayList displayData = new ArrayList();
+        // displayData.add(new StudyInfoPanelLine("Study", study.getName(),
+        // true, false));
+        // displayData.add(new StudyInfoPanelLine("<span class='alert'>Subject",
+        // studySubject.getLabel() + "</span>", true, false));
+        if (withLink) {
+            displayData = generateTreeFromBeans(displayStudyEventBeans, displayData, studySubject, ecb);
+        } else {
+            displayData = generateTreeFromBeansWithoutLink(displayStudyEventBeans, displayData, studySubject, ecb);
+
+        }
+        this.setUserOrderedData(displayData);
+    }
+
     public void addStudyEventTree(StudyBean study, StudySubjectBean studySubject, ArrayList displayStudyEventBeans, EventCRFBean ecb, boolean withLink) {
         // method behind madness: we want the other pages to show
         // this information, but we don't want to hit the database when we do.
@@ -601,8 +632,8 @@ public class StudyInfoPanel {
                 displayData.add(new StudyInfoPanelLine("Study Event", seBean.getStudyEventDefinition().getName(), true, false, false));
             }
 
-            displayData.add(new StudyInfoPanelLine("<b>Status: </b>", "<a href='EnterDataForStudyEvent?eventId=" + seBean.getId()
-                + "'>" + seBean.getSubjectEventStatus().getName() + "</a>", false, false, false));
+            displayData.add(new StudyInfoPanelLine("<b>Status: </b>", "<a href='EnterDataForStudyEvent?eventId=" + seBean.getId() + "'>"
+                + seBean.getSubjectEventStatus().getName() + "</a>", false, false, false));
             ArrayList displayCRFs = dseBean.getDisplayEventCRFs();
             int count = 0;
             Iterator displayIt = displayCRFs.iterator();
@@ -793,7 +824,7 @@ public class StudyInfoPanel {
         return displayData;
     }
 
-    private ArrayList generateEventTree(HashMap eventlist) {
+    private ArrayList generateEventTree(HashMap eventlist, Boolean isExtractData) {
         ArrayList displayData = new ArrayList();
         // Iterator keyIt = eventlist.keySet().iterator();
         // logger.info("how many events =" + eventlist.size());
@@ -807,11 +838,22 @@ public class StudyInfoPanel {
             for (int i = 0; i < crfs.size(); i++) {
                 CRFBean crf = (CRFBean) crfs.get(i);
                 if (ordinal_crf < crfs.size()) {
-                    displayData.add(new StudyInfoPanelLine("CRF", "<a href='SelectItems?crfId=" + crf.getId() + "&defId=" + sed.getId() + "'>" + crf.getName()
-                        + "</a>", false, false));
+                    if (isExtractData) {
+                        displayData.add(new StudyInfoPanelLine("CRF", "<a href='SelectItems?crfId=" + crf.getId() + "&defId=" + sed.getId() + "'>"
+                            + crf.getName() + "</a>", false, false));
+                    } else {
+                        displayData.add(new StudyInfoPanelLine("CRF", "<a href='ViewRuleAssignment?ruleAssignments_f_crfName=" + crf.getName() + "'>"
+                            + crf.getName() + "</a>", false, false));
+                    }
                 } else {
-                    displayData.add(new StudyInfoPanelLine("CRF", "<a href='SelectItems?crfId=" + crf.getId() + "&defId=" + sed.getId() + "'>" + crf.getName()
-                        + "</a>", false, true));
+                    if (isExtractData) {
+                        displayData.add(new StudyInfoPanelLine("CRF", "<a href='SelectItems?crfId=" + crf.getId() + "&defId=" + sed.getId() + "'>"
+                            + crf.getName() + "</a>", false, true));
+                    } else {
+                        displayData.add(new StudyInfoPanelLine("CRF", "<a href='ViewRuleAssignment?ruleAssignments_f_studyEventDefinitionName=" + sed.getName()
+                            + "&ruleAssignments_f_crfName=" + crf.getName() + "'>" + crf.getName() + "</a>", false, true));
+                    }
+
                 }
                 ordinal_crf++;
             }
@@ -836,4 +878,5 @@ public class StudyInfoPanel {
     public void setCreateDataset(boolean createDataset) {
         this.createDataset = createDataset;
     }
+
 }

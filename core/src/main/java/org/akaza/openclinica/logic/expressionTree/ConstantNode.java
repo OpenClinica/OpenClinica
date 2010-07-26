@@ -22,6 +22,11 @@ public class ConstantNode extends ExpressionNode {
     }
 
     @Override
+    String getNumber() {
+        return number;
+    }
+
+    @Override
     String testCalculate() throws OpenClinicaSystemException {
         return calculate();
     }

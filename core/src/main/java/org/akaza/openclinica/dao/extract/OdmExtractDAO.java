@@ -7,18 +7,6 @@
  */
 package org.akaza.openclinica.dao.extract;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Set;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -67,6 +55,18 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.logic.odmExport.ClinicalDataUnit;
 import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
 import org.akaza.openclinica.logic.odmExport.MetadataUnit;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Set;
+
+import javax.sql.DataSource;
 
 /**
  * Fetch odm data from database and load odm related classes.
@@ -123,30 +123,31 @@ public class OdmExtractDAO extends DatasetDAO {
 
     public void setItemGroupAndItemMetaWithUnitTypesExpected() {
         this.unsetTypeExpected();
-        this.setTypeExpected(1, TypeNames.INT);// crf_version_id
-        this.setTypeExpected(2, TypeNames.INT);// item_group_id
-        this.setTypeExpected(3, TypeNames.INT);// item_id
-        this.setTypeExpected(4, TypeNames.INT);// response_set_id
-        this.setTypeExpected(5, TypeNames.STRING);// crf_version_oid
-        this.setTypeExpected(6, TypeNames.STRING);// item_group_oid
-        this.setTypeExpected(7, TypeNames.STRING);// item_oid
-        this.setTypeExpected(8, TypeNames.STRING); // item_group_name
-        this.setTypeExpected(9, TypeNames.STRING);// item_name
-        this.setTypeExpected(10, TypeNames.INT);// item_data_type_id
-        this.setTypeExpected(11, TypeNames.STRING);// item_header
-        this.setTypeExpected(12, TypeNames.STRING);// left_item_text
-        this.setTypeExpected(13, TypeNames.STRING);// right_item_text
-        this.setTypeExpected(14, TypeNames.BOOL);// item_required
-        this.setTypeExpected(15, TypeNames.STRING);// regexp
-        this.setTypeExpected(16, TypeNames.STRING);// regexp_error_msg
-        this.setTypeExpected(17, TypeNames.STRING);// width_decimal
-        this.setTypeExpected(18, TypeNames.INT);// response_type_id
-        this.setTypeExpected(19, TypeNames.STRING);// options_text
-        this.setTypeExpected(20, TypeNames.STRING);// options_values
-        this.setTypeExpected(21, TypeNames.STRING);// response_label
-        this.setTypeExpected(22, TypeNames.STRING);// item_group_header
-        this.setTypeExpected(23, TypeNames.STRING);// item_description
-        this.setTypeExpected(24, TypeNames.STRING);// mu_oid
+        this.setTypeExpected(1, TypeNames.INT);// crf_id
+        this.setTypeExpected(2, TypeNames.INT);// crf_version_id
+        this.setTypeExpected(3, TypeNames.INT);// item_group_id
+        this.setTypeExpected(4, TypeNames.INT);// item_id
+        this.setTypeExpected(5, TypeNames.INT);// response_set_id
+        this.setTypeExpected(6, TypeNames.STRING);// crf_version_oid
+        this.setTypeExpected(7, TypeNames.STRING);// item_group_oid
+        this.setTypeExpected(8, TypeNames.STRING);// item_oid
+        this.setTypeExpected(9, TypeNames.STRING); // item_group_name
+        this.setTypeExpected(10, TypeNames.STRING);// item_name
+        this.setTypeExpected(11, TypeNames.INT);// item_data_type_id
+        this.setTypeExpected(12, TypeNames.STRING);// item_header
+        this.setTypeExpected(13, TypeNames.STRING);// left_item_text
+        this.setTypeExpected(14, TypeNames.STRING);// right_item_text
+        this.setTypeExpected(15, TypeNames.BOOL);// item_required
+        this.setTypeExpected(16, TypeNames.STRING);// regexp
+        this.setTypeExpected(17, TypeNames.STRING);// regexp_error_msg
+        this.setTypeExpected(18, TypeNames.STRING);// width_decimal
+        this.setTypeExpected(19, TypeNames.INT);// response_type_id
+        this.setTypeExpected(20, TypeNames.STRING);// options_text
+        this.setTypeExpected(21, TypeNames.STRING);// options_values
+        this.setTypeExpected(22, TypeNames.STRING);// response_label
+        this.setTypeExpected(23, TypeNames.STRING);// item_group_header
+        this.setTypeExpected(24, TypeNames.STRING);// item_description
+        this.setTypeExpected(25, TypeNames.STRING);// mu_oid
     }
 
     public void setSubjectEventFormDataTypesExpected() {
@@ -241,6 +242,20 @@ public class OdmExtractDAO extends DatasetDAO {
         this.setTypeExpected(i, TypeNames.STRING); // crf_version oc_oid
         ++i;
         this.setTypeExpected(i, TypeNames.STRING); // null_values
+    }
+
+    public void setItemCVOIDsTypesExpected() {
+        this.unsetTypeExpected();
+        int i = 1;
+        this.setTypeExpected(i, TypeNames.INT); //crf_id
+        ++i;
+        this.setTypeExpected(i, TypeNames.INT); //crf_version_id
+        ++i;
+        this.setTypeExpected(i, TypeNames.INT); //item_id
+        ++i;
+        this.setTypeExpected(i, TypeNames.STRING); //cv_oid
+        ++i;
+        this.setTypeExpected(i, TypeNames.STRING); //item_oid
     }
 
     public void setStudyUsersTypesExpected() {
@@ -619,14 +634,20 @@ public class OdmExtractDAO extends DatasetDAO {
         Set<Integer> itdset = new HashSet<Integer>();
         Set<Integer> clset = new HashSet<Integer>();
         Set<Integer> mslset = new HashSet<Integer>();
+        HashMap<String, String> igMandatories = new HashMap<String, String>();
+        int cprev = -1;
+        boolean isLatest = false;
         int cvprev = -1;
-        String igprev = "";
+        String igrprev = "";
+        String igdprev = "";
         String itMandatory = "No";
         int itOrder = 0;
+        Integer igId = -1;
         while (it.hasNext()) {
             HashMap row = (HashMap) it.next();
+            Integer cId = (Integer) row.get("crf_id");
             Integer cvId = (Integer) row.get("crf_version_id");
-            Integer igId = (Integer) row.get("item_group_id");
+            igId = (Integer) row.get("item_group_id");
             Integer itId = (Integer) row.get("item_id");
             Integer rsId = (Integer) row.get("response_set_id");
             String cvOID = (String) row.get("crf_version_oid");
@@ -652,8 +673,10 @@ public class OdmExtractDAO extends DatasetDAO {
             if (cvprev != cvId) {
                 // at this point, itemGroupRefs is for old cvId
                 if (itemGroupRefs != null && itemGroupRefs.size() > 0) {
-                    itemGroupRefs.get(itemGroupRefs.size() - 1).setMandatory(itMandatory);
+                    String temp = igMandatories.containsKey(igdprev) ? igMandatories.get(igdprev) : itMandatory;
+                    itemGroupRefs.get(itemGroupRefs.size() - 1).setMandatory(temp);
                 }
+                itMandatory = "No";
                 // now update to new cvId
                 cvprev = cvId;
                 FormDefBean formDef = new FormDefBean();
@@ -666,42 +689,59 @@ public class OdmExtractDAO extends DatasetDAO {
                 itemGroupRefs = (ArrayList<ElementRefBean>) formDef.getItemGroupRefs();
             }
 
-            String mandatory = itRequired ? "Yes" : "No";
-            String key = igId + "-" + cvId;
+            //mandatory is based on the last crf-version
+            String igDefKey = igId + "";
             ItemGroupDefBean igdef = new ItemGroupDefBean();
-            if (igprev.equals(key)) {
-                itMandatory = itRequired && "No".equals(itMandatory) ? "Yes" : itMandatory;
+            if (igdprev.equals(igDefKey)) {
                 igdef = itemGroupDefs.get(itemGroupDefs.size() - 1);
             } else {
                 itOrder = 0;
-                igprev = key;
-                if (!igset.contains(key)) {
-                    igset.add(key);
-                    ElementRefBean igref = new ElementRefBean();
-                    igref.setElementDefOID(igOID + "-" + cvOID);
-                    int size = itemGroupRefs.size();
-                    if (size > 0) {
-                        itemGroupRefs.get(size - 1).setMandatory(itMandatory);
-                    }
-                    itemGroupRefs.add(igref);
-                }
-                if (!igdset.contains(key)) {
-                    igdset.add(key);
-                    igdef.setOid(igOID + "-" + cvOID);
-                    igdef.setName("ungrouped".equalsIgnoreCase(igName) ? cvOID + "-" + igName : igName);
+                if (igdset.contains(igDefKey)) {
+                    isLatest = false;
+                } else {
+                    igdset.add(igDefKey);
+                    igMandatories.put(igdprev, itMandatory);
+                    isLatest = true;
+                    igdef.setOid(igOID);
+                    //igdef.setName("ungrouped".equalsIgnoreCase(igName) ? cvOID + "-" + igName : igName);
+                    igdef.setName(igName);
                     igdef.setRepeating("ungrouped".equalsIgnoreCase(igName) ? "No" : "Yes");
                     igdef.setComment(igHeader);
                     igdef.setPreSASDatasetName(igName.toUpperCase());
                     itemGroupDefs.add(igdef);
                 }
+                igdprev = igDefKey;
             }
 
-            if (!itset.contains(key + itId)) {
+            String igRefKey = igId + "-" + cvId;
+            if (igrprev.equals(igRefKey)) {
+                itMandatory = isLatest && itRequired && "No".equals(itMandatory) ? "Yes" : itMandatory;
+            } else {
+                if (!igset.contains(igRefKey)) {
+                    igset.add(igRefKey);
+                    ElementRefBean igref = new ElementRefBean();
+                    igref.setElementDefOID(igOID);
+                    int size = itemGroupRefs.size();
+                    if (size > 0) {
+                        String prev = igrprev.split("-")[0].trim();
+                        String temp = igMandatories.containsKey(prev) ? igMandatories.get(prev) : itMandatory;
+                        itemGroupRefs.get(size - 1).setMandatory(temp);
+                    }
+                    itemGroupRefs.add(igref);
+                    itMandatory = "No";
+                }
+                igrprev = igRefKey;
+            }
+
+            String mandatory = itRequired ? "Yes" : "No";
+            if (!itset.contains(igDefKey + itId)) {
                 ++itOrder;
-                itset.add(key + itId);
+                itset.add(igDefKey + itId);
                 ElementRefBean itemRef = new ElementRefBean();
                 itemRef.setElementDefOID(itOID);
-                itemRef.setMandatory(mandatory);
+                if (itemRef.getMandatory() == null || itemRef.getMandatory().length() <= 0) {
+                    itemRef.setMandatory(mandatory);
+                }
                 itemRef.setOrderNumber(itOrder);
                 igdef.getItemRefs().add(itemRef);
             }
@@ -839,10 +879,43 @@ public class OdmExtractDAO extends DatasetDAO {
                 multiSelectLists.add(msl);
             }
         }
-        itemGroupRefs.get(itemGroupRefs.size() - 1).setMandatory(itMandatory);
+        if (itemGroupRefs != null && itemGroupRefs.size() > 0) {
+            String last = igMandatories.containsKey(igId + "") ? igMandatories.get(igId + "") : itMandatory;
+            itemGroupRefs.get(itemGroupRefs.size() - 1).setMandatory(last);
+        }
 
-        // add StudyGroupClassList
         if (odmVersion.startsWith("oc")) {
+            //add CRFVersions that itemDef belong to
+            HashMap<String, String> itDefCVs = new HashMap<String, String>();
+            this.setItemCVOIDsTypesExpected();
+            ArrayList al = this.select(this.getItemCVOIDsSql(cvIds));
+            Iterator iter = al.iterator();
+            while (iter.hasNext()) {
+                HashMap row = (HashMap) iter.next();
+                Integer cId = (Integer) row.get("crf_id");
+                Integer cvId = (Integer) row.get("crf_version_id");
+                Integer itId = (Integer) row.get("item_id");
+                String cvOID = (String) row.get("cv_oid");
+                String itOID = (String) row.get("item_oid");
+                if (itDefCVs.containsKey(itOID)) {
+                    String cvs = itDefCVs.get(itOID);
+                    if (!cvs.contains(cvOID + ",")) {
+                        cvs += cvOID + ",";
+                    }
+                    itDefCVs.put(itOID, cvs);
+                } else {
+                    itDefCVs.put(itOID, cvOID + ",");
+                }
+            }
+            for (ItemDefBean itdef : metadata.getItemDefs()) {
+                String key = itdef.getOid();
+                if (itDefCVs.containsKey(key)) {
+                    String cvs = itDefCVs.get(key);
+                    itdef.setFormOIDs(cvs.substring(0, cvs.length() - 1));
+                }
+            }
+
+            // add StudyGroupClassList
             this.setStudyGroupClassTypesExpected();
             rows.clear();
             logger.debug("Begin to execute GetStudyGroupClassSql");
@@ -1138,7 +1211,7 @@ public class OdmExtractDAO extends DatasetDAO {
                     if (!igprev.equals(key) || !igpos.containsKey(key + itDataOrdinal)) {
                         igpos.put(key + itDataOrdinal, form.getItemGroupData().size());
                         igprev = key;
-                        ig.setItemGroupOID(igOID + "-" + form.getFormOID());
+                        ig.setItemGroupOID(igOID + "");
                         ig.setItemGroupRepeatKey("ungrouped".equalsIgnoreCase(igName) ? "-1" : itDataOrdinal + "");
                         form.getItemGroupData().add(ig);
                     } else {
@@ -1973,7 +2046,7 @@ public class OdmExtractDAO extends DatasetDAO {
             + " and edc.status_id not in (5,7) and edc.crf_id = crf.crf_id and crf.status_id not in (5,7) and crf.crf_id = cv.crf_id and (cv.status_id not in (5,7))"
             + " and exists (select ifm.crf_version_id from item_form_metadata ifm, item_group_metadata igm"
             + " where cv.crf_version_id = ifm.crf_version_id and cv.crf_version_id = igm.crf_version_id and ifm.item_id = igm.item_id)"
-            + " order by sed.ordinal, edc.ordinal, edc.crf_id, cv.crf_version_id";
+            + " order by sed.ordinal, edc.ordinal, edc.crf_id, cv.crf_version_id desc";
     }
 
     protected String getItemDataMaxLengths(String crfVersionIds) {
@@ -1983,7 +2056,7 @@ public class OdmExtractDAO extends DatasetDAO {
     }
 
     protected String getItemGroupAndItemMetaSql(String crfVersionIds) {
-        return "select cv.crf_version_id,"
+        return "select cv.crf_id, cv.crf_version_id,"
             + " ig.item_group_id, item.item_id, rs.response_set_id, cv.oc_oid as crf_version_oid, ig.oc_oid as item_group_oid, item.oc_oid as item_oid,"
             + " ig.name as item_group_name, item.name as item_name, item.item_data_type_id, ifm.item_header, ifm.left_item_text,"
             + " ifm.right_item_text, ifm.required as item_required, ifm.regexp, ifm.regexp_error_msg, ifm.width_decimal,"
@@ -1995,7 +2068,7 @@ public class OdmExtractDAO extends DatasetDAO {
             + "))igm," + " item_group ig where cv.crf_version_id in (" + crfVersionIds + ") and cv.crf_version_id = ifm.crf_version_id"
             + " and ifm.item_id = item.item_id and ifm.response_set_id = rs.response_set_id"
             + " and ifm.item_id = igm.item_id and cv.crf_version_id = igm.crf_version_id and igm.item_group_id = ig.item_group_id"
-            + " order by cv.crf_version_id, ig.item_group_id, item.item_id, rs.response_set_id";
+            + " order by cv.crf_id, cv.crf_version_id desc, ig.item_group_id, item.item_id, rs.response_set_id";
     }
 
     protected String getSubjectEventFormSql(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId) {
@@ -2078,7 +2151,8 @@ public class OdmExtractDAO extends DatasetDAO {
             + " sample_ordinal, date_start, date_end, subject_event_status_id, start_time_flag, end_time_flag from study_event "
             + " where study_event_definition_id in "
             + sedIds
-            + " and study_subject_id in (" + studySubjectIds
+            + " and study_subject_id in ("
+            + studySubjectIds
             + ")) se, ( select st_sub.oc_oid, st_sub.study_subject_id, st_sub.label,"
             + " st_sub.secondary_label, st_sub.subject_id, st_sub.unique_identifier, st_sub.gender, st_sub.date_of_birth, st_sub.status_id,"
             + " sb_g.sgc_id, sb_g.sgc_name, sb_g.sg_id, sb_g.sg_name from (select ss.oc_oid, ss.study_subject_id, ss.label, ss.secondary_label, ss.subject_id,"
@@ -2302,5 +2376,11 @@ public class OdmExtractDAO extends DatasetDAO {
             + ") and dn.discrepancy_note_id = dnidm.discrepancy_note_id"
             + " and dn.resolution_status_id = rs.resolution_status_id"
             + " and dn.discrepancy_note_type_id = dnt.discrepancy_note_type_id" + " order by dnidm.item_data_id, dn.parent_dn_id, dn.discrepancy_note_id";
+    }
+
+    protected String getItemCVOIDsSql(String crfVersionIds) {
+        return "select cv.crf_id, cv.crf_version_id, item.item_id, cv.oc_oid as cv_oid, item.oc_oid as item_oid"
+            + " from crf_version cv, versioning_map vm, item" + " where vm.crf_version_id in (" + crfVersionIds + ")"
+            + " and vm.crf_version_id = cv.crf_version_id and vm.item_id = item.item_id" + " order by cv.crf_id, cv.crf_version_id desc, item.item_id";
     }
 }

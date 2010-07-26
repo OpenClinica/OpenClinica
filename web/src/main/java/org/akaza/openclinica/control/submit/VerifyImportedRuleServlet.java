@@ -16,6 +16,7 @@ import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -38,6 +39,7 @@ public class VerifyImportedRuleServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
 
         // checks which module the requests are from
+        /*
         String module = fp.getString(MODULE);
         request.setAttribute(MODULE, module);
 
@@ -50,6 +52,7 @@ public class VerifyImportedRuleServlet extends SecureController {
         setToPanel(resword.getString("revise_CRF_version"), respage.getString("br_if_you_owner_CRF_version"));
         setToPanel(resword.getString("CRF_spreadsheet_template"), respage.getString("br_download_blank_CRF_spreadsheet_from"));
         setToPanel(resword.getString("example_CRF_br_spreadsheets"), respage.getString("br_download_example_CRF_instructions_from"));
+        */
 
         if ("confirm".equalsIgnoreCase(action)) {
             // session.setAttribute("crf", new CRFBean());
@@ -62,7 +65,13 @@ public class VerifyImportedRuleServlet extends SecureController {
         if ("save".equalsIgnoreCase(action)) {
             RulesPostImportContainer rulesContainer = (RulesPostImportContainer) session.getAttribute("importedData");
             getRuleSetService().saveImport(rulesContainer);
-            addPageMessage(resword.getString("successful_rule_upload"));
+            MessageFormat mf = new MessageFormat("");
+            mf.applyPattern(resword.getString("successful_rule_upload"));
+
+            Object[] arguments =
+                { rulesContainer.getValidRuleDefs().size() + rulesContainer.getDuplicateRuleDefs().size(),
+                    rulesContainer.getValidRuleSetDefs().size() + rulesContainer.getDuplicateRuleSetDefs().size() };
+            addPageMessage(mf.format(arguments));
             ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
             session.setAttribute("pageMessages", pageMessages);
             response.sendRedirect(request.getContextPath() + Page.MANAGE_STUDY_MODULE);

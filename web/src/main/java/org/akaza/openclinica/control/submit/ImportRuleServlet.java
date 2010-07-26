@@ -34,6 +34,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.Locale;
 
 /**
@@ -59,6 +60,10 @@ public class ImportRuleServlet extends SecureController {
             forwardPage(Page.IMPORT_RULES);
 
         }
+        if ("downloadrulesxsd".equalsIgnoreCase(action)) {
+            File xsdFile = new File(SpringServletAccess.getPropertiesDir(context) + "rules.xsd");
+            dowloadFile(xsdFile, "text/xml");
+        }
         if ("confirm".equalsIgnoreCase(action)) {
 
             try {
@@ -73,12 +78,36 @@ public class ImportRuleServlet extends SecureController {
                 importedRules = getRulesPostImportContainerService().validateRuleDefs(importedRules);
                 importedRules = getRulesPostImportContainerService().validateRuleSetDefs(importedRules);
                 session.setAttribute("importedData", importedRules);
+                provideMessage(importedRules);
                 forwardPage(Page.VERIFY_RULES_IMPORT_SERVLET);
             } catch (OpenClinicaSystemException re) {
             	// re.printStackTrace();
-                addPageMessage(re.getMessage());
+                MessageFormat mf = new MessageFormat("");
+                mf.applyPattern(respage.getString("OCRERR_0016"));
+                Object[] arguments = { re.getMessage() };
+                addPageMessage(mf.format(arguments));
                 forwardPage(Page.IMPORT_RULES);
             }
+        }
+    }
+
+    private void provideMessage(RulesPostImportContainer rulesContainer) {
+        int validRuleSetDefs = rulesContainer.getValidRuleSetDefs().size();
+        int duplicateRuleSetDefs = rulesContainer.getDuplicateRuleSetDefs().size();
+        int invalidRuleSetDefs = rulesContainer.getInValidRuleSetDefs().size();
+
+        int validRuleDefs = rulesContainer.getValidRuleDefs().size();
+        int duplicateRuleDefs = rulesContainer.getDuplicateRuleDefs().size();
+        int invalidRuleDefs = rulesContainer.getInValidRuleDefs().size();
+
+        if (validRuleSetDefs > 0 && duplicateRuleSetDefs == 0 && invalidRuleSetDefs == 0 && duplicateRuleDefs == 0 && invalidRuleDefs == 0) {
+            addPageMessage(respage.getString("rules_Import_message1"));
+        }
+        if (duplicateRuleSetDefs > 0 && invalidRuleSetDefs == 0 && duplicateRuleDefs >= 0 && invalidRuleDefs == 0) {
+            addPageMessage(respage.getString("rules_Import_message2"));
+        }
+        if (invalidRuleSetDefs > 0 && invalidRuleDefs >= 0) {
+            addPageMessage(respage.getString("rules_Import_message3"));
         }
     }
 
@@ -110,6 +139,7 @@ public class ImportRuleServlet extends SecureController {
             // Create a Reader to the file to unmarshal from
             FileReader reader = new FileReader(xmlFile);
             ruleImport = (RulesPostImportContainer) unmarshaller.unmarshal(reader);
+            ruleImport.initializeRuleDef();
             logRuleImport(ruleImport);
             return ruleImport;
         } catch (FileNotFoundException ex) {
@@ -135,6 +165,8 @@ public class ImportRuleServlet extends SecureController {
             this.rulesPostImportContainerService != null ? rulesPostImportContainerService : (RulesPostImportContainerService) SpringServletAccess
                     .getApplicationContext(context).getBean("rulesPostImportContainerService");
         rulesPostImportContainerService.setCurrentStudy(currentStudy);
+        rulesPostImportContainerService.setRespage(respage);
+        rulesPostImportContainerService.setUserAccount(ub);
         return rulesPostImportContainerService;
     }
 

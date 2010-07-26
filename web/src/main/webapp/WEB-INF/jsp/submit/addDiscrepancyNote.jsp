@@ -298,7 +298,7 @@ function setResStatus(resStatusId, destinationUserId) {
       	</c:otherwise>
 		</c:choose>
         <c:if test="${discrepancyNote.discrepancyNoteTypeId != 1 || (discrepancyNote.discrepancyNoteTypeId==1 && discrepancyNote.parentDnId>0)}">
-            <td>Assigned To</td>
+            <td><fmt:message key="assigned_to" bundle="${resword}"/></td>
             <td><div class="formfieldL_BG">
 			<c:choose>
 				<c:when test='${strUserAccountId != ""}'>
@@ -363,12 +363,12 @@ function setResStatus(resStatusId, destinationUserId) {
       	</c:otherwise>
 		</c:choose>
 
-            <td>Send an email to the assigned user?</td>
+            <td><fmt:message key="send_to_assigned" bundle="${resword}"/></td>
 			<%-- should be an option for checked, unchecked, disabled--%>
             <td><input name="sendEmail" value="1" type="checkbox"/></td>
         </tr>
 
-       </c:if>
+
 
 		<tr valign="top">
             <td><fmt:message key="date" bundle="${resword}"/></td>

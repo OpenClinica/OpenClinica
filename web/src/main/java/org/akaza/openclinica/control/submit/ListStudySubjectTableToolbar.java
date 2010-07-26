@@ -3,6 +3,7 @@ package org.akaza.openclinica.control.submit;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.control.DefaultToolbar;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.jmesa.core.CoreContext;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.toolbar.AbstractItem;
@@ -13,13 +14,14 @@ import org.jmesa.view.html.toolbar.ToolbarItemRenderer;
 import org.jmesa.view.html.toolbar.ToolbarItemType;
 
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 public class ListStudySubjectTableToolbar extends DefaultToolbar {
 
     private final ArrayList<StudyEventDefinitionBean> studyEventDefinitions;
     private final ArrayList<StudyGroupClassBean> studyGroupClasses;
     private final boolean addSubjectLinkShow;
-     
+    private ResourceBundle reswords = ResourceBundleProvider.getWordsBundle();
 
     public ListStudySubjectTableToolbar(ArrayList<StudyEventDefinitionBean> studyEventDefinitions, ArrayList<StudyGroupClassBean> studyGroupClasses,
             boolean addSubjectLinkShow, boolean showMoreLink) {
@@ -75,18 +77,18 @@ public class ListStudySubjectTableToolbar extends DefaultToolbar {
         public String enabled() {
             HtmlBuilder html = new HtmlBuilder();
             if(showMoreLink){
-                html.a().id("showMore").href("javascript:hideCols('findSubjects',[" + getIndexes() + "],true);").close();
-                html.div().close().nbsp().append("Show More").nbsp().divEnd().aEnd();
-                html.a().id("hide").style("display: none;").href("javascript:hideCols('findSubjects',[" + getIndexes() + "],false);").close();
-                html.div().close().nbsp().append("Hide").nbsp().divEnd().aEnd();
+                          html.a().id("showMore").href("javascript:hideCols('findSubjects',[" + getIndexes() + "],true);").close();
+            html.div().close().nbsp().append(reswords.getString("show_more")).nbsp().divEnd().aEnd();
+            html.a().id("hide").style("display: none;").href("javascript:hideCols('findSubjects',[" + getIndexes() + "],false);").close();
+            html.div().close().nbsp().append(reswords.getString("hide")).nbsp().divEnd().aEnd();
 
                 html.script().type("text/javascript").close().append(
                         "$j = jQuery.noConflict(); $j(document).ready(function(){ " + "hideCols('findSubjects',[" + getIndexes() + "],false);});").scriptEnd();
             }else{
                 html.a().id("hide").href("javascript:hideCols('findSubjects',[" + getIndexes() + "],false);").close();
-                html.div().close().nbsp().append("Hide").nbsp().divEnd().aEnd();
+                html.div().close().nbsp().append(reswords.getString("hide")).nbsp().divEnd().aEnd();
                 html.a().id("showMore").style("display: none;").href("javascript:hideCols('findSubjects',[" + getIndexes() + "],true);").close();
-                html.div().close().nbsp().append("Show More").nbsp().divEnd().aEnd();
+                html.div().close().nbsp().append(reswords.getString("show_more")).nbsp().divEnd().aEnd();
             }
             return html.toString();
         }
@@ -123,7 +125,7 @@ public class ListStudySubjectTableToolbar extends DefaultToolbar {
                     + " if (selectedValue != null  ) { " + "window.location='ListEventsForSubjects?module=submit&defId=' + selectedValue;" + " } ";
             HtmlBuilder html = new HtmlBuilder();
             html.select().id("sedDropDown").onchange(js).close();
-            html.option().close().append("Select An Event").optionEnd();
+            html.option().close().append(reswords.getString("select_an_event")).optionEnd();
             for (StudyEventDefinitionBean studyEventDefinition : studyEventDefinitions) {
                 html.option().value(String.valueOf(studyEventDefinition.getId())).close().append(studyEventDefinition.getName()).optionEnd();
             }
@@ -149,7 +151,7 @@ public class ListStudySubjectTableToolbar extends DefaultToolbar {
             // );
             html.quote();
             html.quote().close();
-            html.nbsp().append("Add New Subject").nbsp().aEnd();
+            html.nbsp().append(reswords.getString("add_new_subject")).nbsp().aEnd();
 
             return html.toString();
         }

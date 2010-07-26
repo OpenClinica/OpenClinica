@@ -42,15 +42,27 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.StringTokenizer;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.SingleThreadModel;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -223,7 +235,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     public static final String USER_BEAN_NAME = "userBean";
 
-    public void passwdTimeOut(){
+    public void passwdTimeOut() {
         Date lastChangeDate = ub.getPasswdTimestamp();
         if (lastChangeDate == null) {
             addPageMessage(respage.getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName() + ". " + respage.getString("password_set") + " "
@@ -274,7 +286,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         resworkflow = ResourceBundleProvider.getWorkflowBundle(locale);
 
         local_df = new SimpleDateFormat(resformat.getString("date_format_string"), ResourceBundleProvider.getLocale());
-        
+
         try {
             String userName = request.getRemoteUser();
             // BWP 1/8/08<< the sm variable may already be set with a mock
@@ -449,7 +461,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             // rq_names += " - " + en_request.nextElement();
             // }
             // logger.info(rq_names);
-            if(!request.getRequestURI().endsWith("ResetPassword")){
+            if (!request.getRequestURI().endsWith("ResetPassword")) {
                 passwdTimeOut();
             }
             mayProceed();
@@ -830,6 +842,42 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     public synchronized static HashMap getUnavailableCRFList() {
         return unavailableCRFList;
+    }
+
+    public void dowloadFile(File f, String contentType) throws Exception {
+
+        response.setHeader("Content-disposition", "attachment; filename=\"" + f.getName() + "\";");
+        response.setContentType("text/xml");
+        response.setHeader("Pragma", "public");
+
+        ServletOutputStream op = response.getOutputStream();
+
+        DataInputStream in = null;
+        try {
+            response.setContentType("text/xml");
+            response.setHeader("Pragma", "public");
+            response.setContentLength((int) f.length());
+
+            byte[] bbuf = new byte[(int) f.length()];
+            in = new DataInputStream(new FileInputStream(f));
+            int length;
+            while ((in != null) && ((length = in.read(bbuf)) != -1)) {
+                op.write(bbuf, 0, length);
+            }
+
+            in.close();
+            op.flush();
+            op.close();
+        } catch (Exception ee) {
+            ee.printStackTrace();
+        } finally {
+            if (in != null) {
+                in.close();
+            }
+            if (op != null) {
+                op.close();
+            }
+        }
     }
 
     /**

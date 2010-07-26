@@ -4,8 +4,10 @@ import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 
 public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
@@ -13,6 +15,60 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
     @Override
     public Class<RuleSetBean> domainClass() {
         return RuleSetBean.class;
+    }
+
+    @SuppressWarnings("unchecked")
+    public RuleSetBean findById(Integer id, StudyBean study) {
+        String query = "from " + getDomainClassName() + " ruleSet  where ruleSet.id = :id and ruleSet.studyId = :studyId ";
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setInteger("id", id);
+        q.setInteger("studyId", study.getId());
+        return (RuleSetBean) q.uniqueResult();
+    }
+
+    public Long count(StudyBean study) {
+        String query = "select count(*) from " + domainClass().getName() + " ruleSet where ruleSet.studyId = :studyId " + " AND ruleSet.status != :status ";
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setInteger("studyId", study.getId());
+        q.setParameter("status", Status.DELETED);
+        return (Long) q.uniqueResult();
+
+    }
+
+    public int getCountWithFilter(final ViewRuleAssignmentFilter filter) {
+
+        // Using a sql query because we are referencing objects not managed by hibernate
+        String query =
+            "select COUNT(DISTINCT(rs.id)) from rule_set rs "
+                + " left outer join study_event_definition sed on rs.study_event_definition_id = sed.study_event_definition_id "
+                + " left outer join crf_version cv on rs.crf_version_id = cv.crf_version_id " + " left outer join crf c on rs.crf_id = c.crf_id "
+                + " left outer join item i on rs.item_id = i.item_id " + " left outer join item_group ig on rs.item_group_id = ig.item_group_id "
+                + " join rule_expression re on rs.rule_expression_id = re.id " + " join rule_set_rule rsr on rs.id = rsr.rule_set_id  "
+                + " join rule r on r.id = rsr.rule_id " + " join rule_expression rer on r.rule_expression_id = rer.id " + " where ";
+
+        query += filter.execute("");
+        org.hibernate.Query q = getCurrentSession().createSQLQuery(query);
+
+        return ((BigInteger) q.uniqueResult()).intValue();
+    }
+
+    @SuppressWarnings("unchecked")
+    public ArrayList<RuleSetBean> getWithFilterAndSort(final ViewRuleAssignmentFilter filter, final ViewRuleAssignmentSort sort, final int rowStart,
+            final int rowEnd) {
+
+        String query =
+            "select DISTINCT(rs.*) from rule_set rs "
+                + " left outer join study_event_definition sed on rs.study_event_definition_id = sed.study_event_definition_id "
+                + " left outer join crf_version cv on rs.crf_version_id = cv.crf_version_id " + " left outer join crf c on rs.crf_id = c.crf_id "
+                + " left outer join item i on rs.item_id = i.item_id " + " left outer join item_group ig on rs.item_group_id = ig.item_group_id "
+                + " join rule_expression re on rs.rule_expression_id = re.id " + " join rule_set_rule rsr on rs.id = rsr.rule_set_id "
+                + " join rule r on r.id = rsr.rule_id " + " join rule_expression rer on r.rule_expression_id = rer.id " + " where ";
+
+        query += filter.execute("");
+        org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(domainClass());
+        q.setFirstResult(rowStart);
+        q.setMaxResults(rowEnd - rowStart);
+        return (ArrayList<RuleSetBean>) q.list();
     }
 
     @SuppressWarnings("unchecked")

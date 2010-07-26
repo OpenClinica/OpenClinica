@@ -125,7 +125,7 @@ public class ViewJobServlet extends SecureController {
         ArrayList allRows = TriggerRow.generateRowsFromBeans(triggerBeans);
 
         EntityBeanTable table = fp.getEntityBeanTable();
-        String[] columns = { "Name", "Previous Fire Time", "Next Fire Time", "Description", "Period To Run", "Dataset", "Study", resword.getString("actions") };
+        String[] columns = { resword.getString("name"), resword.getString("previous_fire_time"), resword.getString("next_fire_time"), resword.getString("description"), resword.getString("period_to_run"), resword.getString("dataset"), resword.getString("study"), resword.getString("actions") };
         table.setColumns(new ArrayList(Arrays.asList(columns)));
         table.hideColumnLink(3);
         table.hideColumnLink(7);

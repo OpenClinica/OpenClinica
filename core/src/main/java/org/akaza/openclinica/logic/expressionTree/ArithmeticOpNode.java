@@ -36,7 +36,7 @@ public class ArithmeticOpNode extends ExpressionNode {
 
         String l = left.testValue();
         String r = right.testValue();
-        validate(l, r);
+        validate(l, r, left.getNumber(), right.getNumber());
         String t = calculateDate(l, r);
         if (t != null) {
             return t;
@@ -134,7 +134,20 @@ public class ArithmeticOpNode extends ExpressionNode {
                 Double.valueOf(l);
                 Double.valueOf(r);
             } catch (NumberFormatException e) {
-                throw new OpenClinicaSystemException(l + " and " + r + " cannot be used with the " + op.toString() + " operator");
+                throw new OpenClinicaSystemException("OCRERR_0001", new Object[] { l, r, op.toString() });
+            }
+        }
+    }
+
+    void validate(String l, String r, String ltext, String rtext) throws OpenClinicaSystemException {
+
+        String t = calculateDate(l, r);
+        if (t == null) {
+            try {
+                Double.valueOf(l);
+                Double.valueOf(r);
+            } catch (NumberFormatException e) {
+                throw new OpenClinicaSystemException("OCRERR_0001", new Object[] { ltext, rtext, op.toString() });
             }
         }
     }

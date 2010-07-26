@@ -7,6 +7,8 @@
  */
 package org.akaza.openclinica.bean.rule.expression;
 
+import java.util.HashMap;
+
 /**
  * @author Krikor Krumlian
  * 
@@ -22,5 +24,7 @@ public interface ExpressionProcessor {
     void setExpression(ExpressionBean e);
 
     String testEvaluateExpression();
+
+    HashMap<String, String> testEvaluateExpression(HashMap<String, String> testValues);
 
 }

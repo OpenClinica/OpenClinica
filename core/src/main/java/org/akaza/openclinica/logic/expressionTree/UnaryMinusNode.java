@@ -40,7 +40,7 @@ public class UnaryMinusNode extends ExpressionNode {
         try {
             Double.valueOf(theOperand);
         } catch (NumberFormatException e) {
-            throw new OpenClinicaSystemException(theOperand + " cannot be Negative ");
+            throw new OpenClinicaSystemException("OCRERR_0015", new Object[] { theOperand });
         }
     }
 

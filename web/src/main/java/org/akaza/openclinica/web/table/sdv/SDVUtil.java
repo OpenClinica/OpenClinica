@@ -646,12 +646,11 @@ public class SDVUtil {
         //Fix column titles
         HtmlTable table = (HtmlTable) tableFacade.getTable();
         //i18n caption; TODO: convert to Spring messages
-        /* ResourceBundle resourceBundle = ResourceBundle.getBundle(
-        "org.akaza.openclinica.i18n.words",request.getLocale());*/
+        ResourceBundle resword = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words",request.getLocale());
 
         String[] allTitles =
-            { "SDV Status", "Study Subject ID", "Site ID", "Person ID", "Secondary ID", "Event Name", "Event Date", "Enrollment Date", "Subject Status",
-                "CRF Name / Version", "SDV Requirement", "CRF Status", "Last Updated Date", "Last Updated By", "Study Event Status", "Actions" };
+        { resword.getString("SDV_status"), resword.getString("study_subject_ID"), resword.getString("site_id"), resword.getString("person_ID"), resword.getString("secondary_ID"), resword.getString("event_name"), resword.getString("event_date"), resword.getString("enrollment_date"), resword.getString("subject_status"),
+    		resword.getString("CRF_name")+" / "+resword.getString("version"), resword.getString("SDV_requirement"), resword.getString("CRF_status"), resword.getString("last_updated_date"), resword.getString("last_updated_by"), resword.getString("study_event_status"), resword.getString("actions")};
 
         setTitles(allTitles, table);
 
@@ -721,12 +720,11 @@ public class SDVUtil {
         //Fix column titles
         HtmlTable table = (HtmlTable) tableFacade.getTable();
         //i18n caption; TODO: convert to Spring messages
-        /* ResourceBundle resourceBundle = ResourceBundle.getBundle(
-        "org.akaza.openclinica.i18n.words",request.getLocale());*/
+        ResourceBundle resword = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words",request.getLocale());
 
         String[] allTitles =
-            { "Study Subject Id", "Site Id", "Person Id", "Secondary Id", "Event Name", "Event Date", "Enrollment Date", "Subject Status",
-                "CRF Name / Version", "SDV Requirement", "CRF Status", "Last Updated Date", "Last Updated By", "Study Event Status", "SDV Status / Actions" };
+        {  resword.getString("study_subject_ID"), resword.getString("site_id"), resword.getString("person_ID"), resword.getString("secondary_ID"), resword.getString("event_name"), resword.getString("event_date"), resword.getString("enrollment_date"), resword.getString("subject_status"),
+    		resword.getString("CRF_name")+" / "+resword.getString("version"), resword.getString("SDV_requirement"), resword.getString("CRF_status"), resword.getString("last_updated_date"), resword.getString("last_updated_by"), resword.getString("study_event_status"), resword.getString("SDV_status")+" / "+resword.getString("actions")};
 
         setTitles(allTitles, table);
 
@@ -1181,9 +1179,9 @@ public class SDVUtil {
         //Fix column titles
         HtmlTable table = (HtmlTable) tableFacade.getTable();
         //i18n caption; TODO: convert to Spring messages
-        ResourceBundle resourceBundle = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words", request.getLocale());
+        ResourceBundle resword = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words", request.getLocale());
 
-        String[] allTitles = { "Study Subject Id", "Study Subject Status", "# Of CRFs SDV'd", "% Of CRFs SDV'd", "Group" };
+        String[] allTitles = { resword.getString("study_subject_ID"), resword.getString("study_subject_status"), resword.getString("num_CRFs_SDV"), resword.getString("porc_CRFs_SDV"), resword.getString("group") };
 
         setTitles(allTitles, table);
 

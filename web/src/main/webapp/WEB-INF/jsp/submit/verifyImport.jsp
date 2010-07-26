@@ -5,12 +5,13 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 
 <script type="text/javascript" language="JavaScript">
   <!--
   function checkOverwriteStatus() {
-      //return confirm('<fmt:message key="you_have_unsaved_data2" bundle="${resword}"/>');
-      return confirm('You will overwrite event CRFs that have already been saved in the database.  Do you want to continue?');
+      //return confirm('<fmt:message key="you_will_overwrite_event_CRFs_continue" bundle="${resword}"/>');
+      return confirm('<fmt:message key="you_will_overwrite_event_CRFs_continue" bundle="${resword}"/>');
   }
  //-->
 </script>
@@ -89,16 +90,16 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
 
 	<tr valign="top">
-		<td class="table_header_row">Summary Statistics:</td>
+		<td class="table_header_row"><fmt:message key="summary_statistics" bundle="${resword}"/>:</td>
 	</tr>
 	<tr valign="top">
-    	<td class="table_cell_left">Subjects Affected: <c:out value="${summaryStats.studySubjectCount}" /></td>
+    	<td class="table_cell_left"><fmt:message key="subjects_affected" bundle="${resword}"/>: <c:out value="${summaryStats.studySubjectCount}" /></td>
 	</tr>
 	<tr valign="top">
-    	<td class="table_cell_left">Event CRFs Affected: <c:out value="${summaryStats.eventCrfCount}" /></td>
+    	<td class="table_cell_left"><fmt:message key="event_CRFs_affected" bundle="${resword}"/>: <c:out value="${summaryStats.eventCrfCount}" /></td>
 	</tr>
 	<tr valign="top">
-    	<td class="table_cell_left">Validation Rules Generated: <c:out value="${summaryStats.discNoteCount}" /></td>
+    	<td class="table_cell_left"><fmt:message key="validation_rules_generated" bundle="${resword}"/>: <c:out value="${summaryStats.discNoteCount}" /></td>
 	</tr>
 
 
@@ -113,7 +114,7 @@
 <%-- if we have hard validation errors here, we stop and don't generate the other two tables --%>
 <c:choose>
 	<c:when test="${not empty hardValidationErrors}">
-	Hard Validation Error Checks
+	<fmt:message key="hard_validation_error_checks" bundle="${resword}"/>
 	<div style="width: 600px">
 
 	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -122,18 +123,20 @@
 
 		<c:forEach var="subjectDataBean" items="${subjectData}" >
 			<tr valign="top">
-				<td class="table_header_row" colspan="4">Study Subject: <c:out value="${subjectDataBean.subjectOID}"/></td>
+				<td class="table_header_row" colspan="4"><fmt:message key="study_subject" bundle="${resword}"/>: <c:out value="${subjectDataBean.subjectOID}"/></td>
 			</tr>
 			<c:forEach var="studyEventData" items="${subjectDataBean.studyEventData}">
 				<tr valign="top">
-		    		<td class="table_header_row">Event CRF OID</td>
+		    		<td class="table_header_row"><fmt:message key="event_CRF_OID" bundle="${resword}"/></td>
 		    		<td class="table_header_row" colspan="3"></td>
 				</tr>
 				<tr valign="top">
 		    		<td class="table_cell_left"><c:out value="${studyEventData.studyEventOID}"/>
 		    		<c:choose>
 		    			<c:when test="${studyEventData.studyEventRepeatKey != null}">
-		    				(Repeat Key <c:out value="${studyEventData.studyEventRepeatKey}"/>)
+		    				(<fmt:message key="repeated_key" bundle="${resword}">
+		    					<fmt:param><c:out value="${studyEventData.studyEventRepeatKey}"/></fmt:param>
+		    				</fmt:message>)
 		    				<c:set var="studyEventRepeatKey" value="${studyEventData.studyEventRepeatKey}"/>
 		    			</c:when>
 		    			<c:otherwise>
@@ -146,7 +149,7 @@
 				<c:forEach var="formData" items="${studyEventData.formData}">
 					<tr valign="top">
 			    		<td class="table_header_row"></td>
-			    		<td class="table_header_row">CRF Version OID</td>
+			    		<td class="table_header_row"><fmt:message key="CRF_version_OID" bundle="${resword}"/></td>
 			    		<td class="table_header_row" colspan="2"></td>
 					</tr>
 					<tr valign="top">
@@ -161,7 +164,9 @@
 				    		<td class="table_header_row" colspan="2"><c:out value="${itemGroupData.itemGroupOID}"/>
 				    		<c:choose>
 				    			<c:when test="${itemGroupData.itemGroupRepeatKey != null}">
-				    				(Repeat Key <c:out value="${itemGroupData.itemGroupRepeatKey}"/>)
+				    				(<fmt:message key="repeated_key" bundle="${resword}">
+		    						 	<fmt:param><c:out value="${itemGroupData.itemGroupRepeatKey}"/></fmt:param>
+		    						 </fmt:message> )
 				    				<c:set var="groupRepeatKey" value="${itemGroupData.itemGroupRepeatKey}"/>
 				    			</c:when>
 				    			<c:otherwise>
@@ -209,7 +214,7 @@
 	<table border="0" cellpadding="0" cellspacing="0">
 
 	<tr>
-		<td class="formlabel">XML File To Upload:</td>
+		<td class="formlabel"><fmt:message key="xml_file_to_upload" bundle="${resterm}"/>:</td>
 		<td>
 			<div class="formfieldFile_BG"><input type="file" name="xml_file" > </div>
 			<br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="xml_file"/></jsp:include>
@@ -224,7 +229,7 @@
 	</div>
 
 	<br clear="all">
-	<input type="submit" value="Continue" class="button_long">
+	<input type="submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_long">
 
 	</form>
 	</c:when>
@@ -233,7 +238,7 @@
 	<%-- place everything else here --%>
 	<%-- validation errors here --%>
 		<c:if test="${not empty validationErrors}">
-		Validation Error Checks Generated
+		<fmt:message key="validation_error_generated" bundle="${resword}"/>
 
 		<div style="width: 600px">
 
@@ -243,18 +248,20 @@
 
 			<c:forEach var="subjectDataBean" items="${subjectData}" >
 				<tr valign="top">
-					<td class="table_header_row" colspan="4">Study Subject: <c:out value="${subjectDataBean.subjectOID}"/></td>
+					<td class="table_header_row" colspan="4"><fmt:message key="study_subject" bundle="${resword}"/>: <c:out value="${subjectDataBean.subjectOID}"/></td>
 				</tr>
 				<c:forEach var="studyEventData" items="${subjectDataBean.studyEventData}">
 					<tr valign="top">
-			    		<td class="table_header_row">Event CRF OID</td>
+			    		<td class="table_header_row"><fmt:message key="event_CRF_OID" bundle="${resword}"/></td>
 			    		<td class="table_header_row" colspan="3"></td>
 					</tr>
 					<tr valign="top">
 			    		<td class="table_cell_left"><c:out value="${studyEventData.studyEventOID}"/>
 			    		<c:choose>
 			    			<c:when test="${studyEventData.studyEventRepeatKey != null}">
-			    				(Repeat Key <c:out value="${studyEventData.studyEventRepeatKey}"/>)
+			    				(<fmt:message key="repeated_key" bundle="${resword}">
+		    						 	<fmt:param><c:out value="${studyEventData.studyEventRepeatKey}"/></fmt:param>
+		    						 </fmt:message> )
 			    				<c:set var="studyEventRepeatKey" value="${studyEventData.studyEventRepeatKey}"/>
 			    			</c:when>
 			    			<c:otherwise>
@@ -267,7 +274,7 @@
 					<c:forEach var="formData" items="${studyEventData.formData}">
 						<tr valign="top">
 				    		<td class="table_header_row"></td>
-				    		<td class="table_header_row">CRF Version OID</td>
+				    		<td class="table_header_row"><fmt:message key="CRF_version_OID" bundle="${resword}"/></td>
 				    		<td class="table_header_row" colspan="2"></td>
 						</tr>
 						<tr valign="top">
@@ -282,7 +289,9 @@
 					    		<td class="table_header_row" colspan="2"><c:out value="${itemGroupData.itemGroupOID}"/>
 					    		<c:choose>
 					    			<c:when test="${itemGroupData.itemGroupRepeatKey != null}">
-					    				(Repeat Key <c:out value="${itemGroupData.itemGroupRepeatKey}"/>)
+					    				(<fmt:message key="repeated_key" bundle="${resword}">
+		    						 	<fmt:param> <c:out value="${itemGroupData.itemGroupRepeatKey}"/></fmt:param>
+		    						 </fmt:message> )
 					    				<c:set var="groupRepeatKey" value="${itemGroupData.itemGroupRepeatKey}"/>
 					    			</c:when>
 					    			<c:otherwise>
@@ -324,7 +333,7 @@
 
 
 		<!--  valid data section, show all valid data -->
-		Valid Data Imported
+		<fmt:message key="valid_data_imported" bundle="${resword}">
 
 		<div style="width: 600px">
 
@@ -334,18 +343,20 @@
 
 			<c:forEach var="subjectDataBean" items="${subjectData}" >
 				<tr valign="top">
-					<td class="table_header_row" colspan="4">Study Subject: <c:out value="${subjectDataBean.subjectOID}"/></td>
+					<td class="table_header_row" colspan="4"><fmt:message key="study_subject" bundle="${resword}"/>: <c:out value="${subjectDataBean.subjectOID}"/></td>
 				</tr>
 				<c:forEach var="studyEventData" items="${subjectDataBean.studyEventData}">
 					<tr valign="top">
-			    		<td class="table_header_row">Event CRF OID</td>
+			    		<td class="table_header_row"><fmt:message key="event_CRF_OID" bundle="${resword}"/></td>
 			    		<td class="table_header_row" colspan="3"></td>
 					</tr>
 					<tr valign="top">
 			    		<td class="table_cell_left"><c:out value="${studyEventData.studyEventOID}"/>
 			    		<c:choose>
 			    			<c:when test="${studyEventData.studyEventRepeatKey != null}">
-			    				(Repeat Key <c:out value="${studyEventData.studyEventRepeatKey}"/>)
+			    				(<fmt:message key="repeated_key" bundle="${resword}">
+		    						 	<fmt:param> <c:out value="${studyEventData.studyEventRepeatKey}"/></fmt:param>
+		    						 </fmt:message>)
 			    				<c:set var="studyEventRepeatKey" value="${studyEventData.studyEventRepeatKey}"/>
 			    			</c:when>
 			    			<c:otherwise>
@@ -358,7 +369,7 @@
 					<c:forEach var="formData" items="${studyEventData.formData}">
 						<tr valign="top">
 				    		<td class="table_header_row"></td>
-				    		<td class="table_header_row">CRF Version OID</td>
+				    		<td class="table_header_row"><fmt:message key="CRF_version_OID" bundle="${resword}"/></td>
 				    		<td class="table_header_row" colspan="2"></td>
 						</tr>
 						<tr valign="top">
@@ -373,7 +384,9 @@
 					    		<td class="table_header_row" colspan="2"><c:out value="${itemGroupData.itemGroupOID}"/>
 					    		<c:choose>
 					    			<c:when test="${itemGroupData.itemGroupRepeatKey != null}">
-					    				(Repeat Key <c:out value="${itemGroupData.itemGroupRepeatKey}"/>)
+					    				(<fmt:message key="repeated_key" bundle="${resword}">
+		    						 	<fmt:param> <c:out value="${itemGroupData.itemGroupRepeatKey}"/></fmt:param>
+		    						 </fmt:message> )
 					    				<c:set var="groupRepeatKey" value="${itemGroupData.itemGroupRepeatKey}"/>
 					    			</c:when>
 					    			<c:otherwise>
@@ -421,10 +434,10 @@
 	</c:forEach>
 
 	<c:if test="${overwriteCount == 0}">
-		<input type="submit" value="Continue" class="button_long">
+		<input type="submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_long">
 	</c:if>
 	<c:if test="${overwriteCount > 0 }">
-		<input type="submit" value="Continue" class="button_long" onClick="return checkOverwriteStatus();">
+		<input type="submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_long" onClick="return checkOverwriteStatus();">
 	</c:if>
 
 	</form>
@@ -432,7 +445,7 @@
 	<%-- added an alert above --%>
 
 	<form action="ListStudySubjects">
-		<input type="submit" value="Cancel" class="button_long">
+		<input type="submit" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_long">
 	</form>
 	<%-- end of the other loop --%>
 	</c:otherwise>

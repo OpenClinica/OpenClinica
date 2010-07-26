@@ -137,4 +137,8 @@
          and (c.source_study_id !=? or c.source_study_id is null) 
       </sql>
     </query>
+    <query>
+      <name>getCountofCRFs</name>
+      <sql>select count(crf.crf_id) from crf where crf.status_id != 5</sql>
+    </query>
 </queries>

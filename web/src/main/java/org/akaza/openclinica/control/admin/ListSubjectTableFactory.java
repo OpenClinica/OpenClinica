@@ -273,7 +273,7 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
         builder.onmouseout("javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');");
         builder.onmouseover("javascript:setImage('bt_Edit1','images/bt_Edit.gif');");
         builder.close();
-        builder.img().name("bt_Edit1").src("images/bt_Edit.gif").border("0").alt("Edit").title("Edit").align("left").append("hspace=\"6\"").close();
+        builder.img().name("bt_Edit1").src("images/bt_Edit.gif").border("0").alt(resword.getString("edit")).title(resword.getString("edit")).align("left").append("hspace=\"6\"").close();
         builder.aEnd();
         return builder.toString();
     }
@@ -284,7 +284,7 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
         builder.onmouseout("javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');");
         builder.onmouseover("javascript:setImage('bt_Remove1','images/bt_Remove.gif');");
         builder.close();
-        builder.img().name("bt_Remove1").src("images/bt_Remove.gif").border("0").alt("Remove").title("Remove").append("hspace=\"2\"").close();
+        builder.img().name("bt_Remove1").src("images/bt_Remove.gif").border("0").alt(resword.getString("remove")).title(resword.getString("remove")).append("hspace=\"2\"").close();
         builder.aEnd();
         return builder.toString();
     }
@@ -295,7 +295,7 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
         builder.onmouseout("javascript:setImage('bt_View1','images/bt_View_d.gif');");
         builder.onmouseover("javascript:setImage('bt_View1','images/bt_View.gif');");
         builder.close();
-        builder.img().name("bt_View1").src("images/bt_View.gif").border("0").alt("View").title("View").align("left").append("hspace=\"6\"").close();
+        builder.img().name("bt_View1").src("images/bt_View.gif").border("0").alt(resword.getString("view")).title(resword.getString("view")).align("left").append("hspace=\"6\"").close();
         builder.aEnd();
         return builder.toString();
     }
@@ -306,7 +306,7 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
         builder.onmouseout("javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');");
         builder.onmouseover("javascript:setImage('bt_Restore3','images/bt_Restore.gif');");
         builder.close();
-        builder.img().name("bt_Restore3").src("images/bt_Restore.gif").border("0").alt("Restore").title("Restore").align("left").append("hspace=\"6\"").close();
+        builder.img().name("bt_Restore3").src("images/bt_Restore.gif").border("0").alt(resword.getString("restore")).title(resword.getString("restore")).align("left").append("hspace=\"6\"").close();
         builder.aEnd();
         return builder.toString();
     }

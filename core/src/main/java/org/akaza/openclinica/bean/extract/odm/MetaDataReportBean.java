@@ -7,6 +7,10 @@
  */
 package org.akaza.openclinica.bean.extract.odm;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+
 import org.akaza.openclinica.bean.odmbeans.BasicDefinitionsBean;
 import org.akaza.openclinica.bean.odmbeans.CodeListBean;
 import org.akaza.openclinica.bean.odmbeans.CodeListItemBean;
@@ -27,10 +31,6 @@ import org.akaza.openclinica.bean.odmbeans.StudyGroupItemBean;
 import org.akaza.openclinica.bean.odmbeans.SymbolBean;
 import org.akaza.openclinica.bean.odmbeans.TranslatedTextBean;
 import org.apache.commons.lang.StringEscapeUtils;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 
 /**
  * Create ODM XML Study Element for a study.
@@ -295,6 +295,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
         StringBuffer xml = this.getXmlOutput();
         String indent = this.getIndent();
         ArrayList<ItemDefBean> items = (ArrayList<ItemDefBean>) odmstudy.getMetaDataVersion().getItemDefs();
+        String ODMVersion = this.getODMVersion();
         for (ItemDefBean item : items) {
             xml.append(currentIndent + "<ItemDef OID=\"" + StringEscapeUtils.escapeXml(item.getOid()) + "\" Name=\""
                 + StringEscapeUtils.escapeXml(item.getName()) + "\" DataType=\"" + item.getDateType() + "\"");
@@ -309,6 +310,9 @@ public class MetaDataReportBean extends OdmXmlReportBean {
             xml.append(" SASFieldName=\"" + this.getSasNameValidatory().getValidSasName(item.getPreSASFieldName()) + "\"");
             if (item.getComment().length() > 0) {
                 xml.append(" Comment=\"" + StringEscapeUtils.escapeXml(item.getComment()) + "\"");
+            }
+            if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
+                xml.append(" OpenClinica:FormOIDs=\""+item.getFormOIDs()+"\"");
             }
             boolean hasNode = false;
             // add question
@@ -382,7 +386,6 @@ public class MetaDataReportBean extends OdmXmlReportBean {
                 xml.append(nls);
             }
             // add MultiSelectListRef
-            String ODMVersion = this.getODMVersion();
             if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
                 if (item.getMultiSelectListRef() != null) {
                     String mslOid = item.getMultiSelectListRef().getElementDefOID();

@@ -107,7 +107,7 @@ function toggleName(str){
     }
 }
 function reportBug() {
-    var bugtrack = "http://dev.openclinica.org/OpenClinica/bug.php?version=SNAPSHOT&user=";
+    var bugtrack = "https://www.openclinica.org/OpenClinica/bug.php?version=SNAPSHOT&user=";
     var user= "newuser3";
     bugtrack = bugtrack + user+ "&url=" + window.location.href;
     openDocWindow(bugtrack);

@@ -54,6 +54,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -64,8 +65,7 @@ import java.util.ResourceBundle;
 import javax.sql.DataSource;
 
 /**
- * Import Spring Job, a job running asynchronously on the Tomcat server using
- * Spring and Quartz.
+ * Import Spring Job, a job running asynchronously on the Tomcat server using Spring and Quartz.
  * 
  * @author thickerson, 04/2009
  * 
@@ -81,13 +81,13 @@ public class ImportSpringJob extends QuartzJobBean {
 
     Locale locale;
     /*
-     * variables to be pulled out of the JobDataMap. Note that these are stored
-     * in binary format in the database.
+     * variables to be pulled out of the JobDataMap. Note that these are stored in binary format in the database.
      */
     public static final String DIRECTORY = "filePathDir";
     public static final String EMAIL = "contactEmail";
     public static final String USER_ID = "user_id";
     public static final String STUDY_NAME = "study_name";
+    public static final String STUDY_OID = "study_oid";
     public static final String DEST_DIR = "Event_CRF_Data";
 
     // below is the directory where we copy the files to, our target
@@ -135,6 +135,7 @@ public class ImportSpringJob extends QuartzJobBean {
 
             String directory = dataMap.getString(DIRECTORY);
             String studyName = dataMap.getString(STUDY_NAME);
+            String studyOid = dataMap.getString(STUDY_OID);
             String localeStr = dataMap.getString(ExampleSpringJob.LOCALE);
             if (localeStr != null) {
                 locale = new Locale(localeStr);
@@ -142,7 +143,12 @@ public class ImportSpringJob extends QuartzJobBean {
                 respage = ResourceBundleProvider.getPageMessagesBundle();
             }
             StudyDAO studyDAO = new StudyDAO(dataSource);
-            StudyBean studyBean = (StudyBean) studyDAO.findByName(studyName);
+            StudyBean studyBean;
+            if (studyOid != null) {
+            	studyBean = (StudyBean) studyDAO.findByOid(studyOid);
+            } else {
+            	studyBean = (StudyBean) studyDAO.findByName(studyName);
+            }
             // might also need study id here for the data service?
             File fileDirectory = new File(IMPORT_DIR);
             if ("".equals(directory)) { // avoid NPEs
@@ -194,20 +200,22 @@ public class ImportSpringJob extends QuartzJobBean {
                 cutAndPaste(target, destination);
                 // do everything else here with 'destination'
                 System.out.println("=== about to start processData... ===");
-                ArrayList<String> auditMessages = processData(destination, dataSource, respage, ub, studyBean, destDirectory);
+                ArrayList<String> auditMessages = processData(destination, dataSource, respage, ub, studyBean, destDirectory, triggerBean);
                 System.out.println("=== finished process data, audit message returned ===");
                 // String[] messages = auditMessage.split("===+");
 
                 auditEventDAO.createRowForExtractDataJobSuccess(triggerBean, auditMessages.get(1));
                 try {
-                    mailSender.sendEmail(contactEmail, respage.getString("job_ran_for") + " " + triggerBean.getFullName(), generateMsg(auditMessages.get(0),
-                            contactEmail), true);
-                    System.out.println("=== sent email ===");
-                    System.out.println("email body: " + auditMessages.get(1));
+                    if ((contactEmail != null) && (!"".equals(contactEmail))) {
+                        mailSender.sendEmail(contactEmail, respage.getString("job_ran_for") + " " + triggerBean.getFullName(), generateMsg(
+                                auditMessages.get(0), contactEmail), true);
+                        System.out.println("=== sent email ===");
+                        System.out.println("email body: " + auditMessages.get(1));
+                    }
                 } catch (OpenClinicaSystemException e) {
                     // Do nothing
-                	System.out.println("=== throw an ocse === " + e.getMessage());
-                	e.printStackTrace();
+                    System.out.println("=== throw an ocse === " + e.getMessage());
+                    e.printStackTrace();
                 }
 
             } else {
@@ -235,8 +243,8 @@ public class ImportSpringJob extends QuartzJobBean {
                 mailSender.sendEmail(contactEmail, respage.getString("job_failure_for") + " " + triggerBean.getFullName(), e.getMessage(), true);
             } catch (OpenClinicaSystemException ose) {
                 // Do nothing
-            	System.out.println("=== throw an ocse: " + ose.getMessage());
-            	ose.printStackTrace();
+                System.out.println("=== throw an ocse: " + ose.getMessage());
+                ose.printStackTrace();
             }
         }
     }
@@ -256,16 +264,11 @@ public class ImportSpringJob extends QuartzJobBean {
     }
 
     /*
-     * processData, a method which should take in all XML files, check to see if
-     * they were imported previously, ? insert them into the database if not,
-     * and return a message which will go to audit and to the end user.
+     * processData, a method which should take in all XML files, check to see if they were imported previously, ? insert them into the database if not, and
+     * return a message which will go to audit and to the end user.
      */
-    private ArrayList<String> processData(File[] dest, 
-            DataSource dataSource, 
-            ResourceBundle respage, 
-            UserAccountBean ub, 
-            StudyBean studyBean, 
-            File destDirectory) throws Exception {
+    private ArrayList<String> processData(File[] dest, DataSource dataSource, ResourceBundle respage, UserAccountBean ub, StudyBean studyBean,
+            File destDirectory, TriggerBean triggerBean) throws Exception {
         StringBuffer msg = new StringBuffer();
         StringBuffer auditMsg = new StringBuffer();
         Mapping myMap = new Mapping();
@@ -278,13 +281,18 @@ public class ImportSpringJob extends QuartzJobBean {
         myMap.loadMapping(propertiesPath + File.separator + "cd_odm_mapping.xml");
         Unmarshaller um1 = new Unmarshaller(myMap);
         ODMContainer odmContainer = new ODMContainer();
+        // BufferedWriter out = new BufferedWriter(new FileWriter(new File("log.txt")));
         for (File f : dest) {
             // >> tbh
             String regex = "\\s+"; // all whitespace, one or more times
             String replacement = "_"; // replace with underscores
-            File logDestDirectory = new File(destDirectory + File.separator + f.getName().replaceAll(regex, replacement) + ".log.txt");
+            String startDirectory = destDirectory + File.separator + f.getName().replaceAll(regex, replacement) + ".log.txt";
+            String pattern = "yyyy" + File.separator + "MM" + File.separator + "dd" + File.separator + "HHmmssSSS" + File.separator;
+            SimpleDateFormat sdfDir = new SimpleDateFormat(pattern);
+            String generalFileDir = sdfDir.format(new java.util.Date());
+            File logDestDirectory = new File(destDirectory + File.separator + generalFileDir + f.getName().replaceAll(regex, replacement) + ".log.txt");
             if (!logDestDirectory.isDirectory()) {
-                System.out.println("creating new dir: " + logDestDirectory.getAbsolutePath() + " " + logDestDirectory.getName());
+                System.out.println("creating new dir: " + logDestDirectory.getAbsolutePath());
                 logDestDirectory.mkdirs();
             }
             File newFile = new File(logDestDirectory, "log.txt");
@@ -294,14 +302,14 @@ public class ImportSpringJob extends QuartzJobBean {
             BufferedWriter out = new BufferedWriter(new FileWriter(newFile));
 
             // TODO add more info here, like a timestamp
-            
+
             // << tbh 06/2010
             if (f != null) {
                 String firstLine = "<P>" + f.getName() + ": ";
                 msg.append(firstLine);
                 out.write(firstLine);
                 auditMsg.append(firstLine);
-                
+
             } else {
                 msg.append("<P>" + respage.getString("unreadable_file") + ": ");
                 out.write("<P>" + respage.getString("unreadable_file") + ": ");
@@ -347,12 +355,13 @@ public class ImportSpringJob extends QuartzJobBean {
                 // add to session
                 // forward to another page
                 System.out.println(errors.toString());
-                out.write("<P>Errors:<br/>");
-                for (String error : errors) {
-                    out.write(error + "<br/>");
-                }
-                out.write("</P>");
+                
                 if (errors.size() > 0) {
+                	out.write("<P>Errors:<br/>");
+                    for (String error : errors) {
+                        out.write(error + "<br/>");
+                    }
+                    out.write("</P>");
                     // fail = true;
                     // forwardPage(Page.IMPORT_CRF_DATA);
                     // break here with an exception
@@ -367,17 +376,14 @@ public class ImportSpringJob extends QuartzJobBean {
                     Object[] arguments = { f.getName(), errors.size() };
                     auditMsg.append(mf.format(arguments) + "<br/>");
                     msg.append(mf.format(arguments) + "<br/>");
-                    auditMsg.append("You can see the log file <a href='" + SQLInitServlet.getField("sysURL.base") + 
-                    		"ViewLogMessage?n=" + 
-                    		f.getName() + 
-                    		"'>here</a>.<br/>");
-                    msg.append("You can see the log file <a href='" + SQLInitServlet.getField("sysURL.base") + 
-                    		"ViewLogMessage?n=" + 
-                    		f.getName() + 
-                    		"'>here</a>.<br/>");
+                    auditMsg.append("You can see the log file <a href='" + SQLInitServlet.getField("sysURL.base") + "ViewLogMessage?n=" + generalFileDir
+                        + f.getName() + "&tn=" + triggerBean.getName() + "&gn=1'>here</a>.<br/>");
+                    msg.append("You can see the log file <a href='" + SQLInitServlet.getField("sysURL.base") + "ViewLogMessage?n=" + generalFileDir
+                        + f.getName() + "&tn=" + triggerBean.getName() + "&gn=1'>here</a>.<br/>");
                     // auditMsg.append("Your XML in the file " + f.getName() +
                     // " was well formed, but generated " + errors.size() +
                     // " metadata errors." + "<br/>");
+                    out.close();
                     continue;
                 } else {
                     msg.append(respage.getString("passed_study_check") + "<br/>");
@@ -422,6 +428,8 @@ public class ImportSpringJob extends QuartzJobBean {
                         Object[] arguments = { f.getName() };
                         msg.append(mf.format(arguments) + "<br/>");
                         auditMsg.append(mf.format(arguments) + "<br/>");
+                        out.write(mf.format(arguments) + "<br/>");
+                        out.close();
                         continue;
                     }
                 }
@@ -454,26 +462,32 @@ public class ImportSpringJob extends QuartzJobBean {
                     fail = true;
                     System.out.println("threw a NPE after calling lookup validation errors");
                     msg.append(respage.getString("an_error_was_thrown_while_validation_errors") + "<br/>");
+                    auditMsg.append(respage.getString("an_error_was_thrown_while_validation_errors") + "<br/>");
+                    out.write(respage.getString("an_error_was_thrown_while_validation_errors") + "<br/>");
                     System.out.println("=== threw the null pointer, import ===");
                 } catch (OpenClinicaException oce1) {
                     fail = true;
                     System.out.println("threw an OCE after calling lookup validation errors " + oce1.getOpenClinicaMessage());
                     msg.append(oce1.getOpenClinicaMessage() + "<br/>");
+                    // auditMsg.append(oce1.getOpenClinicaMessage() + "<br/>");
+                    out.write(oce1.getOpenClinicaMessage() + "<br/>");
                     System.out.println("=== threw the openclinica message, import ===");
                 }
             } else {
                 // fail = true;
                 // break here with an exception
                 msg.append(respage.getString("no_event_crfs_matching_the_xml_metadata") + "<br/>");
-                auditMsg.append(respage.getString("no_event_crfs_matching_the_xml_metadata") + "<br/>");
+                // auditMsg.append(respage.getString("no_event_crfs_matching_the_xml_metadata") + "<br/>");
+                out.write(respage.getString("no_event_crfs_matching_the_xml_metadata") + "<br/>");
                 // throw new Exception(msg.toString());
+                out.close();
                 continue;
             }
-            
+
             ArrayList<SubjectDataBean> subjectData = odmContainer.getCrfDataPostImportContainer().getSubjectData();
-            
+
             if (!hardValidationErrors.isEmpty()) {
-                
+
                 String messageHardVals = triggerService.generateHardValidationErrorMessage(subjectData, hardValidationErrors, false);
                 // byte[] messageHardValsBytes = messageHardVals.getBytes();
                 out.write(messageHardVals);
@@ -486,20 +500,12 @@ public class ImportSpringJob extends QuartzJobBean {
                 }
                 String validMsgs = triggerService.generateValidMessage(subjectData, totalValidationErrors);
                 out.write(validMsgs);
-                // third place to append data to the file?  tbh 06/2010
+                // third place to append data to the file? tbh 06/2010
             }
             // << tbh 05/2010, bug #5110, leave off the detailed reports
             out.close();
-            
-            String linkMessage = respage.getString("you_can_review_the_data") + SQLInitServlet.getField("sysURL.base") +
-            	respage.getString("you_can_review_the_data_2") + SQLInitServlet.getField("sysURL.base") +
-            	respage.getString("you_can_review_the_data_3") + f.getName() +
-            	respage.getString("you_can_review_the_data_4");
-            // mf.applyPattern(respage.getString("you_can_review_the_data"));
-            // Object[] arguments = { SQLInitServlet.getField("sysURL.base"), SQLInitServlet.getField("sysURL.base"), f.getName() };
-            msg.append(linkMessage);
-            auditMsg.append(linkMessage);
 
+            
             if (fail) {
                 // forwardPage(Page.IMPORT_CRF_DATA);
                 // break here with an exception
@@ -509,7 +515,7 @@ public class ImportSpringJob extends QuartzJobBean {
                 mf.applyPattern(respage.getString("problems_encountered_with_file"));
                 Object[] arguments = { f.getName(), msg.toString() };
                 msg.append(mf.format(arguments) + "<br/>");
-
+                out.close();
                 // msg.append("Problems encountered with file " + f.getName() +
                 // ": " + msg.toString() + "<br/>");
                 continue;
@@ -544,8 +550,7 @@ public class ImportSpringJob extends QuartzJobBean {
                 // forwardPage(Page.VERIFY_IMPORT_SERVLET);
                 // instead of forwarding, go ahead and save it all, sending a
                 // message at the end
-                
-                
+
                 CrfBusinessLogicHelper crfBusinessLogicHelper = new CrfBusinessLogicHelper(dataSource);
                 for (DisplayItemBeanWrapper wrapper : displayItemBeanWrappers) {
 
@@ -613,9 +618,18 @@ public class ImportSpringJob extends QuartzJobBean {
                 // msg.append("===+");
                 msg.append(respage.getString("data_has_been_successfully_import") + "<br/>");
                 auditMsg.append(respage.getString("data_has_been_successfully_import") + "<br/>");
-                
+
                 // MessageFormat mf = new MessageFormat("");
-                
+                String linkMessage =
+                    respage.getString("you_can_review_the_data") + SQLInitServlet.getField("sysURL.base") + respage.getString("you_can_review_the_data_2")
+                        + SQLInitServlet.getField("sysURL.base") + respage.getString("you_can_review_the_data_3") + generalFileDir + f.getName() 
+                        + "&tn=" + triggerBean.getFullName() + "&gn=1"
+                        + respage.getString("you_can_review_the_data_4") + "<br/>";
+                // mf.applyPattern(respage.getString("you_can_review_the_data"));
+                // Object[] arguments = { SQLInitServlet.getField("sysURL.base"), SQLInitServlet.getField("sysURL.base"), f.getName() };
+                msg.append(linkMessage);
+                auditMsg.append(linkMessage);
+
                 // was here but is now moved up, tbh
                 // String finalLine =
                 // "<p>You can review the entered data <a href='" +
@@ -629,6 +643,9 @@ public class ImportSpringJob extends QuartzJobBean {
                 // auditMsg.append(finalLine);
             }
         }// end for loop
+        // is the writer still not closed? try to close it
+        
+        
         ArrayList<String> retList = new ArrayList<String>();
         retList.add(msg.toString());
         retList.add(auditMsg.toString());

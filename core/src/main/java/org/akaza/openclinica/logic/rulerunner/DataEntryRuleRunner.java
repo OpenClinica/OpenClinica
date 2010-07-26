@@ -100,6 +100,8 @@ public class DataEntryRuleRunner extends RuleRunner {
             Collections.sort(entry.getValue(), new RuleActionContainerComparator());
 
             for (RuleActionContainer ruleActionContainer : entry.getValue()) {
+                logger.info("START Expression is : {} , RuleAction : {} , ExecutionMode : {} ", new Object[] {
+                    ruleActionContainer.getExpressionBean().getValue(), ruleActionContainer.getRuleAction().toString(), executionMode });
 
                 ruleActionContainer.getRuleSetBean().setTarget(ruleActionContainer.getExpressionBean());
                 ruleActionContainer.getRuleAction().setCuratedMessage(
@@ -115,6 +117,8 @@ public class DataEntryRuleRunner extends RuleRunner {
                     messageContainer.add(getExpressionService().getGroupOrdninalConcatWithItemOid(ruleActionContainer.getRuleSetBean().getTarget().getValue()),
                             ruleActionContainer.getRuleAction());
                 }
+                logger.info("END Expression is : {} , RuleAction : {} , ExecutionMode : {} ", new Object[] {
+                    ruleActionContainer.getExpressionBean().getValue(), ruleActionContainer.getRuleAction().toString(), executionMode });
             }
         }
         return messageContainer;

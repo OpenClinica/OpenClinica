@@ -96,7 +96,6 @@
     <td class="table_header_row"><fmt:message key="rule_expression" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="rule_status" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="rule_execute_on" bundle="${resword}"/></td>
-    <td class="table_header_row"><fmt:message key="rule_action_type" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="rule_action_summary" bundle="${resword}"/></td>
     </tr>
   <c:forEach var ="ruleSetRule" items="${ruleSet.ruleSetRules}">
@@ -124,14 +123,20 @@
     <c:forEach items="${ruleSetRule.allActionsWithEvaluatesToAsKey}" varStatus="status">
     <tr valign="top">
         <td rowspan="${fn:length(status.current.value) +1 }" class="table_cell"><c:out value="${status.current.key}"/></td>
-        <td class="table_cell">&nbsp;</td>
-        <td class="table_cell">&nbsp;</td>
-        <td class="table_cell">&nbsp;</td>
+        
     </tr>
         <c:forEach items="${status.current.value}" var="val">
         <tr valign="top">
-            <td class="table_cell"><c:out value="${val.actionType}"/></td>
-            <td class="table_cell"><c:out value="${val.message}"/></td>
+            <td class="table_cell">
+            <table>
+                <c:forEach items="${val.properties}" var="mapEntry" varStatus="status">
+                <tr valign="top">
+                    <td ><i><fmt:message key="${mapEntry.key}" bundle="${resword}" /></i></td>
+                    <td ><c:out value="${mapEntry.value}"/></td>
+                </tr>
+                </c:forEach>
+            </table>
+            </td>
             <td class="table_cell">&nbsp;</td>
         </tr>
         </c:forEach>
@@ -147,7 +152,7 @@
 </div></div></div></div></div></div></div></div>
 
 </div>
-<form action='RemoveRuleSet?action=submit&ruleSetId=<c:out value="${ruleSet.id}"/>' method="POST">
+<form action='ViewRuleSet?ruleSetId=<c:out value="${ruleSet.id}"/>' method="POST">
 <input type="submit" name="Submit" value="<fmt:message key="rule_remove_rule_assignments_button" bundle="${resword}"/>" class="button_xlong" onClick='return confirm("<fmt:message key="rule_if_you_remove_this_assignments" bundle="${resword}"/>");'>
 <input type="button" name="Cancel" id="cancel" value="<fmt:message key='cancel' bundle='${resword}'/>" class="button_long" onClick="window.location.href='ViewRuleAssignment';"/>
 </form>

@@ -36,8 +36,43 @@ public class OpenClinicaVariableNode extends ExpressionNode {
         // validate();
     }
 
+    OpenClinicaVariableNode(String val, ExpressionObjectWrapper expressionWrapper, OpenClinicaExpressionParser parser) {
+        setExpressionParser(parser);
+        this.expressionWrapper = expressionWrapper;
+        number = val;
+        // validate();
+    }
+
+    @Override
+    String getNumber() {
+        return number;
+
+    }
+
+    /**
+     * 
+     * getTestValues() returns a hashMap of user defined values
+     * getResponseTestValues() is empty and will be filled with variables being processed
+     * @param var the default test value
+     * @return the Value
+     */
+    private String theTest(String var) {
+        if (getTestValues() == null) {
+            return var;
+        } else if (getTestValues().get(number) == null) {
+            getTestValues().put(number, var);
+            getResponseTestValues().put(number, var);
+            return var;
+        } else {
+            getResponseTestValues().put(number, getTestValues().get(number));
+            return getTestValues().get(number);
+        }
+
+    }
+
     @Override
     String testCalculate() throws OpenClinicaSystemException {
+
         String variableValue = testCalculateVariable();
         if (variableValue != null) {
             return variableValue;
@@ -50,31 +85,41 @@ public class OpenClinicaVariableNode extends ExpressionNode {
         if (item != null) {
             ItemDataType itemDataType = ItemDataType.get(item.getItemDataTypeId());
             switch (itemDataType.getId()) {
-            case 1:
-                return testBoolean;
-            case 2:
-                return testBoolean;
-            case 3:
-                return testString;
-            case 4:
-                return testString;
-            case 5:
-                return testString;
-            case 6:
-                return testInt;
-            case 7:
-                return testInt;
-            case 8:
-                return testString;
-            case 9:
-                return testDate;
-            case 11:
-                return testString + ".txt";
+            case 1: {
+                return theTest(testBoolean);
+            }
+            case 2: {
+                return theTest(testBoolean);
+            }
+            case 3: {
+                return theTest(testString);
+            }
+            case 4: {
+                return theTest(testString);
+            }
+            case 5: {
+                return theTest(testString);
+            }
+            case 6: {
+                return theTest(testInt);
+            }
+            case 7: {
+                return theTest(testInt);
+            }
+            case 8: {
+                return theTest(testString);
+            }
+            case 9: {
+                return theTest(testDate);
+            }
+            case 11: {
+                return theTest(testString + ".txt");
+            }
             default:
-                throw new OpenClinicaSystemException("Type not supported");
+                throw new OpenClinicaSystemException("OCRERR_0011");
             }
         } else {
-            throw new OpenClinicaSystemException("Item not found");
+            throw new OpenClinicaSystemException("OCRERR_0012", new String[] { number });
         }
     }
 
@@ -99,7 +144,7 @@ public class OpenClinicaVariableNode extends ExpressionNode {
         // logger.info("e" + expressionWrapper.getRuleSet());
         else if (!getExpressionService().ruleExpressionChecker(number)) {
             logger.info("Go down");
-            throw new OpenClinicaSystemException("The following : " + number + " is not valid");
+            throw new OpenClinicaSystemException("OCRERR_0013", new Object[] { number });
         }
     }
 

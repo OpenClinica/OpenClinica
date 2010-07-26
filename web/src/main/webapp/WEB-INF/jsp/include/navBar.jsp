@@ -112,12 +112,12 @@
                                     </td>
                                     <td align="right" style="font-weight: normal;">
                                         
-                                        <form METHOD="GET" action="${urlPrefix}ListStudySubjects" onSubmit=" if (document.forms[0]['findSubjects_f_studySubject.label'].value == 'Study Subject Id') { document.forms[0]['findSubjects_f_studySubject.label'].value=''}">
+                                        <form METHOD="GET" action="${urlPrefix}ListStudySubjects" onSubmit=" if (document.forms[0]['findSubjects_f_studySubject.label'].value == '<fmt:message key="study_subject_ID" bundle="${resword}"/>') { document.forms[0]['findSubjects_f_studySubject.label'].value=''}">
                                             <a href="javascript:reportBug()"><fmt:message key="openclinica_report_issue" bundle="${resword}"/></a>&nbsp;|&nbsp; 
                                             <a href="javascript:openDocWindow('<c:out value="${sessionScope.supportURL}" />')"><fmt:message key="openclinica_feedback" bundle="${resword}"/></a>&nbsp;&nbsp;
                                             <input type="text" name="findSubjects_f_studySubject.label" onblur="if (this.value == '') this.value = 'Study Subject Id'" onfocus="if (this.value == 'Study Subject Id') this.value = ''" value="Study Subject Id" class="navSearch"/>
                                             <input type="hidden" name="navBar" value="yes"/>
-                                            <input type="submit" value="Go"  class="navSearchButton"/>
+                                            <input type="submit" value="<fmt:message key="go" bundle="${resword}"/>"  class="navSearchButton"/>
                                         </form>
                                         
                                     </td>

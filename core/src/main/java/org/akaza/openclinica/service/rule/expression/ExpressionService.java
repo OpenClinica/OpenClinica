@@ -9,6 +9,7 @@ package org.akaza.openclinica.service.rule.expression;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.ItemDataType;
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -127,10 +128,11 @@ public class ExpressionService {
     }
 
     public boolean ruleSetExpressionChecker(String expression) {
-        if (checkSyntax(expression)) {
+        int k = expression.split(ESCAPED_SEPERATOR).length;
+        if (checkSyntax(expression) && expression.split(ESCAPED_SEPERATOR).length == 4) {
             isExpressionValid(expression);
         } else {
-            throw new OpenClinicaSystemException("Target Syntax Invalid");
+            throw new OpenClinicaSystemException("OCRERR_0032");
         }
         return true;
     }
@@ -256,8 +258,8 @@ public class ExpressionService {
                     String valueFromDb = getValueFromDb(fullExpression);
                     logger.debug("valueFromForm : {} , valueFromDb : {}", valueFromForm, valueFromDb);
                     if (valueFromForm == null && valueFromDb == null) {
-                        throw new OpenClinicaSystemException(fullExpression + " you provided is not Valid for Target : "
-                            + expressionWrapper.getRuleSet().getTarget().getValue());
+                        throw new OpenClinicaSystemException("OCRERR_0017", new Object[] { fullExpression,
+                            expressionWrapper.getRuleSet().getTarget().getValue() });
                     }
                     /*
                      * if (valueFromForm != null) { // TODO: Do this if type a
@@ -276,7 +278,7 @@ public class ExpressionService {
                 if (checkSyntax(expression)) {
                     String valueFromDb = getValueFromDbb(expression, expressionWrapper.getRuleSet().getTarget().getValue());
                     if (valueFromDb == null) {
-                        throw new OpenClinicaSystemException(expression + " you provided is not Valid");
+                        throw new OpenClinicaSystemException("OCRERR_0018", new Object[] { expression });
                     }
                     logger.debug("valueFromDb : {}", valueFromDb);
                     value = valueFromDb;
@@ -355,7 +357,7 @@ public class ExpressionService {
         return result;
     }
 
-    private Integer getExpressionSize(String expression) {
+    public Integer getExpressionSize(String expression) {
         String[] splitExpression = expression.split(ESCAPED_SEPERATOR);
         return splitExpression.length;
     }
@@ -584,7 +586,7 @@ public class ExpressionService {
         // int patternIndex = ?;
         if (!match(splitExpression[splitExpression.length - 1 - expressionIndex], pattern[patternIndex])) {
             if (!match(splitExpression[splitExpression.length - 1 - expressionIndex], ruleActionPattern[patternIndex])) {
-                throw new OpenClinicaSystemException("The OID is Not Valid");
+               throw new OpenClinicaSystemException("OCRERR_0019", new String[] { expression });
             }
         }
         return splitExpression[splitExpression.length - 1 - expressionIndex];
@@ -721,20 +723,20 @@ public class ExpressionService {
         StudyEventDefinitionBean studyEventDefinition = getStudyEventDefinitionFromExpression(expression);
         CRFBean crf = getCRFFromExpression(expression);
         if (studyEventDefinition == null || crf == null)
-            throw new OpenClinicaSystemException("StudyEventDefinition OID or CRF OID is Invalid");
+            throw new OpenClinicaSystemException("OCRERR_0020");
 
         EventDefinitionCRFBean eventDefinitionCrf =
             getEventDefinitionCRFDao().findByStudyEventDefinitionIdAndCRFId(this.expressionWrapper.getStudyBean(), studyEventDefinition.getId(), crf.getId());
-        if (eventDefinitionCrf == null || eventDefinitionCrf.getId() == 0)
-            throw new OpenClinicaSystemException("eventDefinitionCrf is Invalid");
+        if (eventDefinitionCrf == null || eventDefinitionCrf.getId() == 0 || eventDefinitionCrf.getStatus() != Status.AVAILABLE)
+            throw new OpenClinicaSystemException("OCRERR_0021");
 
         ItemGroupBean itemGroup = getItemGroupExpression(expression, crf);
         if (itemGroup == null)
-            throw new OpenClinicaSystemException("itemGroup is Invalid");
+            throw new OpenClinicaSystemException("OCRERR_0022");
 
         ItemBean item = getItemExpression(expression, itemGroup);
         if (item == null)
-            throw new OpenClinicaSystemException("item is Invalid");
+            throw new OpenClinicaSystemException("OCRERR_0023");
 
         logger.debug("Study Event Definition ID : " + studyEventDefinition.getId());
         logger.debug("Crf ID : " + crf.getId());
@@ -797,7 +799,7 @@ public class ExpressionService {
         CRFBean crf = getCRFFromExpression(expression);
 
         if (studyEventDefinition == null || crf == null)
-            throw new OpenClinicaSystemException("StudyEventDefinition OID or CRF OID is Invalid");
+            throw new OpenClinicaSystemException("OCRERR_0020");
 
         return getEventDefinitionCRFDao()
                 .findByStudyEventDefinitionIdAndCRFId(this.expressionWrapper.getStudyBean(), studyEventDefinition.getId(), crf.getId());
