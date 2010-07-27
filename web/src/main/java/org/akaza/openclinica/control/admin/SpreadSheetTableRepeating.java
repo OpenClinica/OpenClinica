@@ -1200,8 +1200,34 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                     }// end of if dbName
                                     openQueries.put(itemName, upSql);
                                 } else {
-                                    String upSql = "";
-                                    if (dbName.equals("oracle")) {
+                               	 String upSql = "";
+                             	if((oldItem.getDataType() == oldItem.getDataType().DATE) && (ib.getDataType() == ib.getDataType().PDATE))//New Feature allow date to pdate even if the data is entered
+                             	{
+                             		  
+                                        if (dbName.equals("oracle")) {
+                                            upSql =
+                                                "UPDATE ITEM SET DESCRIPTION='" + stripQuotes(descLabel) 
+                                                    + "',PHI_STATUS=" + (phiBoolean ? 1 : 0) + "," + "ITEM_DATA_TYPE_ID=" + dataTypeIdString
+                                                    + " WHERE exists (SELECT versioning_map.item_id from versioning_map, crf_version where"
+                                                    + " versioning_map.crf_version_id = crf_version.crf_version_id" + " AND crf_version.crf_id= " + crfId
+                                                    + " AND item.item_id = versioning_map.item_id)" + " AND item.name='" + stripQuotes(itemName)
+                                                    + "' AND item.owner_id = " + ownerId;
+                                        } else {
+                                            upSql =
+                                                "UPDATE ITEM SET DESCRIPTION='" + stripQuotes(descLabel)
+                                                    + "',PHI_STATUS=" + phiBoolean
+                                                    + ","
+                                                    + "ITEM_DATA_TYPE_ID="
+                                                    + dataTypeIdString
+                                                    + " FROM versioning_map, crf_version" + " WHERE item.name='" + stripQuotes(itemName) + "' AND item.owner_id = "
+                                                    + ownerId + " AND item.item_id = versioning_map.item_id AND"
+                                                    + " versioning_map.crf_version_id = crf_version.crf_version_id" + " AND crf_version.crf_id = " + crfId;
+                                        }// end of if dbName
+                             		
+                             	}
+                             	else{
+                             		if (dbName.equals("oracle")) {
+                             	
                                         upSql =
                                             "UPDATE ITEM SET DESCRIPTION='" + stripQuotes(descLabel) + "'," + "PHI_STATUS=" + (phiBoolean ? 1 : 0)
                                                 + " WHERE exists (SELECT versioning_map.item_id from versioning_map, crf_version where"
@@ -1215,7 +1241,8 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                                 + ownerId + " AND item.item_id = versioning_map.item_id AND"
                                                 + " versioning_map.crf_version_id = crf_version.crf_version_id" + " AND crf_version.crf_id = " + crfId;
                                     }// end of if dbName
-                                    openQueries.put(itemName, upSql);
+                             	}
+                             	openQueries.put(itemName, upSql);
                                 }
                             } else {
                                 ownerId = oldItem.getOwner().getId();
