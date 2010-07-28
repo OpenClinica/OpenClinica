@@ -367,7 +367,7 @@ function setResStatus(resStatusId, destinationUserId) {
 			<%-- should be an option for checked, unchecked, disabled--%>
             <td><input name="sendEmail" value="1" type="checkbox"/></td>
         </tr>
-
+        </c:if>
 
 
 		<tr valign="top">
