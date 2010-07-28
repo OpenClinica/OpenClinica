@@ -1099,7 +1099,7 @@ function openNctEntryWindow(inURL) {
 function openDocWindow(inURL) {
 
     openNewWindow(inURL,
-    		inURL,
+    		'',
             'directories=no,location=no,menubar=yes,scrollbars=yes,toolbar=no,status=no,resizable=yes',
             'medium');
 
