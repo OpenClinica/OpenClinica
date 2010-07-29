@@ -581,7 +581,8 @@ public class SDVUtil {
 
     public String renderEventCRFTableWithLimit(HttpServletRequest request, int studyId, String pathPrefix) {
 
-        boolean showMoreLink = Boolean.parseBoolean(request.getAttribute("showMoreLink").toString());
+        //boolean showMoreLink = Boolean.parseBoolean(request.getAttribute("showMoreLink").toString());//commented by Jamuna, throwing null pointer exception
+        boolean showMoreLink = Boolean.parseBoolean(request.getAttribute("showMoreLink")==null?"false":request.getAttribute("showMoreLink").toString());
         TableFacade tableFacade = createTableFacade("sdv", request);
         tableFacade.setStateAttr("restore");
         resformat = ResourceBundleProvider.getFormatBundle(request.getLocale());
