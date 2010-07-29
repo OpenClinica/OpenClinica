@@ -325,7 +325,7 @@ public class UpdateStudyEventServlet extends SecureController {
                 v.addValidation(INPUT_ENDDATE_PREFIX, Validator.IS_DATE_TIME);
                 v.alwaysExecuteLastValidation(INPUT_ENDDATE_PREFIX);
             }
-            v.addValidation(INPUT_LOCATION, Validator.NO_BLANKS);
+       //     v.addValidation(INPUT_LOCATION, Validator.NO_BLANKS); Disable validation on location, location can be empty when updating a study event
             HashMap errors = v.validate();
             // YW, 3-12-2008, 2220 fix <<
             if (!strEnd.equals("") && !errors.containsKey(INPUT_STARTDATE_PREFIX) && !errors.containsKey(INPUT_ENDDATE_PREFIX)) {
