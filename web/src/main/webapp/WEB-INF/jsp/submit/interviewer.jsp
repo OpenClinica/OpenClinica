@@ -5,7 +5,7 @@
 <jsp:useBean scope="request" id="displayItem" class="org.akaza.openclinica.bean.submit.DisplayItemBean" />
 <jsp:useBean scope='request' id='formMessages' class='java.util.HashMap'/>
 <jsp:useBean scope='request' id='exitTo' class='java.lang.String'/>
-
+<script type="text/javascript" src="includes/wz_tooltip/wz_tooltip.js"></script>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
@@ -14,6 +14,32 @@
 <c:set var="interviewDate" value="${toc.eventCRF.dateInterviewed}" />
 <c:set var="itemId" value="${displayItem.item.id}" />
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
+<style type="text/css">
+.tooltip {
+		
+	width:100px;
+	font-size:11px;
+	color:black; 
+	background-color: #FFFFE5;
+	border-color:Black;
+	
+}
+.tooltip .label {
+	color:black;
+	width:35px;
+	font-family:Tahoma,Arial,Helvetica,Sans-Serif;
+	font-size:11px;
+}
+.tooltip .header1 {
+	color:black;
+	width:55px;
+	font-family:Tahoma,Arial,Helvetica,Sans-Serif;
+	font-size:11px;
+	font-weight:bold;
+}
+
+</style>
+
 <script type="text/javascript" language="javascript">
     //If someone closes the browser on data entry stage, the following request should be
     //sent to the server to make this CRF available for data entry.
@@ -36,6 +62,20 @@ var closing = true;
            closing = false;
         });
      });
+     
+     
+    function genToolTip(newNo,updatedNo,resNo,closedNo,naNO)
+       {
+           var htmlgen = 
+               '<div class=\"tooltip\"><table style=\"margin=0\"><tr><td class=\"header1\"> Discrepancy Notes:</td></tr></table><table><tr><br/></tr></table><table>  <tr> <td class=\"label\">New: </td><td  class=\"label\">'+newNo+'</td></tr><tr> <td class=\"label\">Updated: </td><td  class=\"label\">'+updatedNo+'</td></tr><tr> <td class=\"label\">Resolved: </td><td  class=\"label\">'+resNo+'</td></tr><tr> <td class=\"label\">Closed: </td><td  class=\"label\">'+closedNo+'</td></tr><tr> <td class=\"label\">Not Applicable: </td><td  class=\"label\">'+naNO+'</td></tr></table></div>';
+          // var htmlgen = 'new:'+newNo;
+          return htmlgen;
+}
+function callTip(html)
+{
+	Tip(html,BGCOLOR,'#FFFFE5',BORDERCOLOR,''  );
+}
+
 </script>
 
 <%--<c:set var="inputVal" value="input${itemId}" />--%>
@@ -377,13 +417,15 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
                 </c:choose>
 
                 <c:choose>
-                <c:when test="${hasNameNote eq 'yes'}">
-                <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySubject.id}&itemId=${itemId}&id=${InterviewerNameNote.eventCRFId}&name=${InterviewerNameNote.entityType}&field=interviewer&column=${InterviewerNameNote.column}&enterData=${enterData}&monitor=${monitor}&blank=${blank}','spanAlert-interviewDate'); return false;">
-                    <img id="flag_interviewer" name="flag_interviewer" src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
+                 <c:when test="${hasNameNote eq 'yes'}">
+                <a href="#" onmouseover="callTip(genToolTip(${intNew}, ${intUpdated},${intRes},${intClosed},${intNA }))";
+           onmouseout="UnTip()"  onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySubject.id}&itemId=${itemId}&id=${InterviewerNameNote.eventCRFId}&name=${InterviewerNameNote.entityType}&field=interviewer&column=${InterviewerNameNote.column}&enterData=${enterData}&monitor=${monitor}&blank=${blank}','spanAlert-interviewDate'); return false;">
+                    <img id="flag_interviewer" name="flag_interviewer" src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                     </c:when>
                     <c:otherwise>
-                    <a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${studySubject.id}&viewData=y&id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewer&column=interviewer_name&writeToDB=1&new=${isNewDN}','spanAlert-interviewer'); return false;">
-                        <img id="flag_interviewer" name="flag_interviewer" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
+                    <a href="#" onmouseover="callTip(genToolTip(${intNew},${intUpdated},${intRes},${intClosed},${intNA}))";
+           onmouseout="UnTip()"  onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${studySubject.id}&viewData=y&id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewer&column=interviewer_name&writeToDB=1&new=${isNewDN}','spanAlert-interviewer'); return false;">
+                        <img id="flag_interviewer" name="flag_interviewer" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
                         </c:otherwise>
                         </c:choose>
                     </a>
@@ -491,12 +533,14 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
 
                 <c:choose>
                 <c:when test="${hasDateNote eq 'yes'}">
-                <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySubject.id}&itemId=${itemId}&id=${InterviewerDateNote.eventCRFId}&name=${InterviewerDateNote.entityType}&field=interviewDate&column=${InterviewerDateNote.column}&enterData=${enterData}&monitor=${monitor}&blank=${blank}','spanAlert-interviewDate'); return false;">
-                    <img id="flag_interviewDate" name="flag_interviewDate" src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+                <a href="#"  onmouseover="callTip(genToolTip(${dateNew},${dateUpdated},${dateRes},${dateClosed},${dateNA} ) )";
+           onmouseout="UnTip()"  onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySubject.id}&itemId=${itemId}&id=${InterviewerDateNote.eventCRFId}&name=${InterviewerDateNote.entityType}&field=interviewDate&column=${InterviewerDateNote.column}&enterData=${enterData}&monitor=${monitor}&blank=${blank}','spanAlert-interviewDate'); return false;">
+                    <img id="flag_interviewDate" name="flag_interviewDate" src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"  >
                     </c:when>
                     <c:otherwise>
-                    <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?subjectId=${studySubject.id}&id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewDate&column=date_interviewed&writeToDB=1&new=${isNewDNDate}','spanAlert-interviewDate'); return false;">
-                        <img id="flag_interviewDate" name="flag_interviewDate" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+                    <a href="#"  onmouseover="callTip(genToolTip(${dateNew},${dateUpdated},${dateRes},${dateClosed},${dateNA}) )";
+           onmouseout="UnTip()" onClick="openDNoteWindow('CreateDiscrepancyNote?subjectId=${studySubject.id}&id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewDate&column=date_interviewed&writeToDB=1&new=${isNewDNDate}','spanAlert-interviewDate'); return false;">
+                        <img id="flag_interviewDate" name="flag_interviewDate" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"  >
                         </c:otherwise>
                         </c:choose>
                     </a>

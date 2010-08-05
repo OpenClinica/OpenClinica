@@ -21,6 +21,12 @@
 <%-- What is the including JSP (e.g., doubleDataEntry)--%>
 <c:set var="originJSP" value="${param.originJSP}" />
 <c:set var="isForcedRFC" value="${param.isForcedRFC}" />
+
+<c:set var="totNew" value="${displayItem.totNew}"/>
+<c:set var="totUpdated" value="${displayItem.totUpdated}"/>
+<c:set var="totRes" value="${displayItem.totRes}"/>
+<c:set var="totClosed" value="${displayItem.totClosed}"/>
+<c:set var="totNA" value="${displayItem.totNA}"/>
 <%-- A boolean request attribute set in DataEntryServlet...--%>
 <c:set var="hasDataFlag" value="${hasDataFlag}" />
 <c:set var="ddeEntered" value="${requestScope['ddeEntered']}" />
@@ -712,31 +718,34 @@ include the default value first in the select list --%>
    <c:choose>
     <c:when test="${(displayItem.numDiscrepancyNotes > 0) && (isForcedRFC eq 'false')}">
 
-       <td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#" onClick=
+       <td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"   onmouseover="callTip(genToolTip(${totNew},${totUpdated},${totRes},${totClosed},${totNA}) )";
+           onmouseout="UnTip()" onClick=
     "openDNoteWindow('ViewDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&isRfc=0&itemId=<c:out value="${itemId}" />&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=input<c:out value="${itemId}"/>&column=value&monitor=1&writeToDB=1','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
     ><img id="flag_input<c:out value="${itemId}" />" name="flag_input<c:out value="${itemId}" />" src=
     "images/<c:out value="${imageFileName}"/>.gif" border="0" alt=
-    "<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"
+    "<fmt:message key="discrepancy_note" bundle="${resword}"/>" 
      ></a></td>
 
     </c:when>
 	<c:when test="${isForcedRFC eq 'true'}">
 	
-		<td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#" onClick=
+		<td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"   o onmouseover="callTip(genToolTip(${totNew},${totUpdated},${totRes},${totClosed},${totNA})  )";
+           onmouseout="UnTip()" onClick=
     "openDNWindow('CreateDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&isRfc=1&itemId=<c:out value="${itemId}" />&groupLabel=<c:out value="${displayItem.metadata.groupLabel}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=input<c:out value="${itemId}" />&column=value&enterData=1&writeToDB=0&errorFlag=<c:out value="${errorFlag}"/>','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
     ><img id="flag_input<c:out value="${itemId}" />" name="flag_input<c:out value="${itemId}" />" src=
     "images/<c:out value="${imageFileName}"/>.gif" border="0" alt=
-    "<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"
+    "<fmt:message key="discrepancy_note" bundle="${resword}"/>" 
       ></a></td>
 
 	</c:when>
     <c:otherwise>
 
-       <td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#" onClick=
+       <td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"   onmouseover="callTip(genToolTip(${totNew},${totUpdated},${totRes},${totClosed},${totNA})  )";
+           onmouseout="UnTip()" onClick=
     "openDNWindow('CreateDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&groupLabel=<c:out value="${displayItem.metadata.groupLabel}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=input<c:out value="${itemId}" />&column=value&enterData=1&writeToDB=1&errorFlag=<c:out value="${errorFlag}"/>','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
     ><img id="flag_input<c:out value="${itemId}" />" name="flag_input<c:out value="${itemId}" />" src=
     "images/<c:out value="${imageFileName}"/>.gif" border="0" alt=
-    "<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"
+    "<fmt:message key="discrepancy_note" bundle="${resword}"/>" 
       ></a></td>
 
     </c:otherwise>
@@ -745,11 +754,12 @@ include the default value first in the select list --%>
     </c:when>
     <c:otherwise>
 
-    <td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#" onClick=
+    <td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"   onmouseover="callTip(genToolTip(${totNew},${totUpdated},${totRes},${totClosed},${totNA}))";
+           onmouseout="UnTip()" onClick=
     "openDNWindow('CreateDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&groupLabel=<c:out value="${displayItem.metadata.groupLabel}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=input<c:out value="${itemId}" />&column=value&enterData=1&errorFlag=<c:out value="${errorFlag}"/>','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
     ><img id="flag_input<c:out value="${itemId}" />" name="flag_input<c:out value="${itemId}" />" src=
     "images/<c:out value="${imageFileName}"/>.gif" border="0" alt=
-    "<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"
+    "<fmt:message key="discrepancy_note" bundle="${resword}"/>"
     ></a></td>
     </c:otherwise>
     </c:choose>

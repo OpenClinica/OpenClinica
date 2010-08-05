@@ -3425,12 +3425,22 @@ public abstract class DataEntryServlet extends SecureController {
         ArrayList<DiscrepancyNoteBean> ecNotes = dndao.findEventCRFDNotesFromEventCRF(ecb);
         ArrayList<DiscrepancyNoteBean> existingNameNotes = new ArrayList();
         ArrayList<DiscrepancyNoteBean> existingIntrvDateNotes = new ArrayList();
+        int intNew = 0,intRes = 0,intUpdated=0,intClosed=0,intNA = 0;
+        int dateNew = 0,dateRes = 0,dateUpdated=0,dateClosed=0,dateNA=0 ;
         for (int i = 0; i < ecNotes.size(); i++) {
             DiscrepancyNoteBean dn = ecNotes.get(i);
             if (INTERVIEWER_NAME.equalsIgnoreCase(dn.getColumn())) {
                 discNotes.setNumExistingFieldNotes(INPUT_INTERVIEWER, 1);
                 request.setAttribute("hasNameNote", "yes");
                 request.setAttribute(INTERVIEWER_NAME_NOTE, dn);
+                if(dn.getParentDnId()==0)
+                {
+                if(dn.getResolutionStatusId()==ResolutionStatus.OPEN.getId()) intNew++;
+                else if(dn.getResolutionStatusId()==ResolutionStatus.UPDATED.getId())intUpdated++;
+                else if(dn.getResolutionStatusId()==ResolutionStatus.RESOLVED.getId())intRes++;//Resolution proposed count
+                else if(dn.getResolutionStatusId()==ResolutionStatus.CLOSED.getId())intClosed++;
+                else if(dn.getResolutionStatusId()==ResolutionStatus.NOT_APPLICABLE.getId())intNA++;
+                }
                 existingNameNotes.add(dn);
             }
 
@@ -3438,13 +3448,32 @@ public abstract class DataEntryServlet extends SecureController {
                 discNotes.setNumExistingFieldNotes(INPUT_INTERVIEW_DATE, 1);
                 request.setAttribute("hasDateNote", "yes");
                 request.setAttribute(INTERVIEWER_DATE_NOTE, dn);
+                if(dn.getParentDnId()==0)
+                {
+                if(dn.getResolutionStatusId()==ResolutionStatus.OPEN.getId()) dateNew++;
+                else if(dn.getResolutionStatusId()==ResolutionStatus.UPDATED.getId())dateUpdated++;
+                else if(dn.getResolutionStatusId()==ResolutionStatus.RESOLVED.getId())dateRes++;//Resolution proposed count
+                else if(dn.getResolutionStatusId()==ResolutionStatus.CLOSED.getId())dateClosed++;
+                else if(dn.getResolutionStatusId()==ResolutionStatus.NOT_APPLICABLE.getId())dateNA++;
+                }
                 existingIntrvDateNotes.add(dn);
             }
         }
 
         request.setAttribute("nameNoteResStatus", getDiscrepancyNoteResolutionStatus(existingNameNotes));
         request.setAttribute("IntrvDateNoteResStatus", getDiscrepancyNoteResolutionStatus(existingIntrvDateNotes));
-
+        request.setAttribute("intNew",intNew);
+        request.setAttribute("intUpdated",intUpdated);
+        request.setAttribute("intRes",intRes);
+        request.setAttribute("intClosed",intClosed);
+        request.setAttribute("intNA",intNA);
+        
+        request.setAttribute("dateNew",dateNew);
+        request.setAttribute("dateUpdated",dateUpdated);
+        request.setAttribute("dateRes",dateRes);
+        request.setAttribute("dateClosed",dateClosed);
+        request.setAttribute("dateNA",dateNA);
+///===add here...
         List<DisplayItemWithGroupBean> allItems = section.getDisplayItemGroups();
         logger.debug("start to populate notes: " + section.getDisplayItemGroups().size());
         this.output(allItems);
@@ -3493,7 +3522,7 @@ public abstract class DataEntryServlet extends SecureController {
                         //                        }
                         dib.setNumDiscrepancyNotes(numNotes + notes.size());// + notes2.size());
                         dib.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(itemDataId, notes));
-
+                        dib =  setTotals(dib,itemDataId,notes);
                         logger.debug("dib note size:" + dib.getNumDiscrepancyNotes() + " " + dib.getData().getId() + " " + inputName);
                         items.set(j, dib);
                     }
@@ -3520,6 +3549,7 @@ public abstract class DataEntryServlet extends SecureController {
                 discNotes.setNumExistingFieldNotes(inputFieldName, numNotes);
                 dib.setNumDiscrepancyNotes(numNotes + discNotes.getNotes(inputFieldName).size());
                 dib.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(itemDataId, discNotes.getNotes(inputFieldName)));
+               dib =  setTotals(dib,itemDataId,discNotes.getNotes(inputFieldName));
 
                 ArrayList childItems = dib.getChildren();
                 for (int j = 0; j < childItems.size(); j++) {
@@ -3533,6 +3563,7 @@ public abstract class DataEntryServlet extends SecureController {
                     discNotes.setNumExistingFieldNotes(childInputFieldName, childNumNotes);
                     child.setNumDiscrepancyNotes(childNumNotes + discNotes.getNotes(childInputFieldName).size());
                     child.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(childItemDataId, discNotes.getNotes(childInputFieldName)));
+                    child = setTotals(child,childItemDataId,discNotes.getNotes(childInputFieldName));
                     childItems.set(j, child);
                 }
                 dib.setChildren(childItems);
@@ -3546,6 +3577,50 @@ public abstract class DataEntryServlet extends SecureController {
         return section;
     }
 
+    /**
+     * To set the totals of each resolution status on the DisplayItemBean for each item.
+     * @param dib
+     * @param notes
+     */
+    private DisplayItemBean setTotals(DisplayItemBean dib,int itemDataId,ArrayList<DiscrepancyNoteBean> notes)
+    {
+    	int resolutionStatus;
+    	int totNew = 0,totRes = 0,totClosed = 0,totUpdated =0,totNA = 0;
+    	boolean hasOtherThread = false;
+    	 ArrayList<DiscrepancyNoteBean> existingNotes = dndao.findExistingNotesForItemData(itemDataId);
+         for (DiscrepancyNoteBean obj : existingNotes) {
+             DiscrepancyNoteBean note =  obj;
+             /*We would only take the resolution status of the parent note of any note thread. If there
+             * are more than one note thread, the thread with the worst resolution status will be taken.*/
+             if (note.getParentDnId() == 0) {
+                	 resolutionStatus = note.getResolutionStatusId();
+                 if(resolutionStatus==ResolutionStatus.OPEN.getId()) totNew++;
+                 else if(resolutionStatus==ResolutionStatus.UPDATED.getId())totUpdated++;
+                 else if(resolutionStatus==ResolutionStatus.RESOLVED.getId())totRes++;//Resolution proposed count
+                 else if(resolutionStatus==ResolutionStatus.CLOSED.getId())totClosed++;
+                 else if(resolutionStatus==ResolutionStatus.NOT_APPLICABLE.getId())totNA++;
+             }
+         }
+         
+    	for (Object obj : notes) {
+              DiscrepancyNoteBean note = (DiscrepancyNoteBean) obj;
+              if (note.getParentDnId() == 0) {
+                      resolutionStatus = note.getResolutionStatusId();
+                      if(resolutionStatus==ResolutionStatus.OPEN.getId()) totNew++;
+                      else if(resolutionStatus==ResolutionStatus.UPDATED.getId())totUpdated++;
+                      else if(resolutionStatus==ResolutionStatus.RESOLVED.getId())totRes++;//Resolution proposed count
+                      else if(resolutionStatus==ResolutionStatus.CLOSED.getId())totClosed++;
+                      else if(resolutionStatus==ResolutionStatus.NOT_APPLICABLE.getId())totNA++;
+              }
+          }
+    	dib.setTotNew(totNew);
+    	dib.setTotRes(totRes);
+    	dib.setTotUpdated(totUpdated);
+    	dib.setTotClosed(totClosed);
+    	dib.setTotNA(totNA);
+    	return dib;
+    }
+    
     /**
      * The following methods are for 'mark CRF complete'
      * 

@@ -22,6 +22,19 @@ public class DisplayItemBean implements Comparable {
     private ItemFormMetadataBean metadata;
     private String editFlag = "";// used for items in a group
     private ItemDataBean dbData; // used for DDE, items in a group
+    
+    
+    //adding totals here for display purposes
+    
+    private int totNew;
+	private int totUpdated;
+    private int totRes;
+    private int totClosed;
+
+
+	private int totNA;
+    
+
 
     // not in the database
 
@@ -396,4 +409,44 @@ public class DisplayItemBean implements Comparable {
     public void setIsSCDtoBeShown(boolean isSCDtoBeShown) {
         this.isSCDtoBeShown = isSCDtoBeShown;
     }
+
+    public int getTotNew() {
+		return totNew;
+	}
+
+	public void setTotNew(int totNew) {
+		this.totNew = totNew;
+	}
+
+	public int getTotUpdated() {
+		return totUpdated;
+	}
+
+	public void setTotUpdated(int totUpdated) {
+		this.totUpdated = totUpdated;
+	}
+
+	public int getTotRes() {
+		return totRes;
+	}
+
+	public void setTotRes(int totRes) {
+		this.totRes = totRes;
+	}
+
+	public int getTotClosed() {
+		return totClosed;
+	}
+
+	public void setTotClosed(int totClosed) {
+		this.totClosed = totClosed;
+	}
+    public int getTotNA() {
+		return totNA;
+	}
+
+	public void setTotNA(int totNA) {
+		this.totNA = totNA;
+	}
+
 }

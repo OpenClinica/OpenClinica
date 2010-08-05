@@ -5,7 +5,7 @@
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
-
+<script type="text/javascript" src="includes/wz_tooltip/wz_tooltip.js"></script>
 
 <jsp:include page="../include/submit-header-inactive.jsp"/>
 
