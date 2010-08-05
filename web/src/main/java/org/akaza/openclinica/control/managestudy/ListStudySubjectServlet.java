@@ -52,6 +52,8 @@ import javax.sql.DataSource;
  */
 public abstract class ListStudySubjectServlet extends SecureController {
 
+    // Shaoyu Su
+    private static final String AUTO_LABEL = "AUTO_ID";
     Locale locale;
     // BWP Issue 3195, 3330 <<
     public static String SUBJECT_PAGE_NUMBER = "ebl_page";
@@ -359,8 +361,10 @@ public abstract class ListStudySubjectServlet extends SecureController {
         // logger.info("subject id setting :" + idSetting);
         // set up auto study subject id
         if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
-            int nextLabel = ssdao.findTheGreatestLabel() + 1;
-            request.setAttribute("label", new Integer(nextLabel).toString());
+            //Shaoyu Su
+            //int nextLabel = ssdao.findTheGreatestLabel() + 1;
+            //request.setAttribute("label", new Integer(nextLabel).toString());
+            request.setAttribute("label", AUTO_LABEL);
         }
 
         FormDiscrepancyNotes discNotes = new FormDiscrepancyNotes();

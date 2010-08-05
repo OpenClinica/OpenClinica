@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Enroll a new subject into system
- *
+ * 
  * @author ssachs
  * @version CVS: $Id: AddNewSubjectServlet.java,v 1.15 2005/07/05 17:20:43 jxu
  *          Exp $
@@ -65,6 +65,9 @@ public class AddNewSubjectServlet extends SecureController {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
+    // Shaoyu Su
+    private Object simpleLockObj = new Object();
+    private static final String AUTO_LABEL = "AUTO_ID";
     public static final String INPUT_UNIQUE_IDENTIFIER = "uniqueIdentifier";// global
     // Id
 
@@ -120,7 +123,7 @@ public class AddNewSubjectServlet extends SecureController {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.akaza.openclinica.control.core.SecureController#processRequest()
      */
     @Override
@@ -185,9 +188,13 @@ public class AddNewSubjectServlet extends SecureController {
                 // YW >>
                 logger.info("subject id setting :" + idSetting);
                 // set up auto study subject id
+                // Shaoyu Su: if idSetting is auto, do not calculate the next
+                // available ID (label) for now
                 if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
-                    int nextLabel = ssd.findTheGreatestLabel() + 1;
-                    fp.addPresetValue(INPUT_LABEL, new Integer(nextLabel).toString());
+                    //Shaoyu Su
+                    // int nextLabel = ssd.findTheGreatestLabel() + 1;
+                    // fp.addPresetValue(INPUT_LABEL, new Integer(nextLabel).toString());
+                    fp.addPresetValue(INPUT_LABEL, AUTO_LABEL);
                 }
 
                 setPresetValues(fp.getPresetValues());
@@ -209,7 +216,7 @@ public class AddNewSubjectServlet extends SecureController {
             // YW >>
 
             discNotes = (FormDiscrepancyNotes) session.getAttribute(FORM_DISCREPANCY_NOTES_NAME);
-            if(discNotes == null) {
+            if (discNotes == null) {
                 discNotes = new FormDiscrepancyNotes();
             }
             DiscrepancyValidator v = new DiscrepancyValidator(request, discNotes);
@@ -359,27 +366,32 @@ public class AddNewSubjectServlet extends SecureController {
             }
 
             String label = fp.getString(INPUT_LABEL);
-            StudySubjectBean subjectWithSameLabel = ssd.findByLabelAndStudy(label, currentStudy);
+            // Shaoyu Su: if the form submitted for field "INPUT_LABEL" has
+            // value of "AUTO_LABEL",
+            // then Study Subject ID should be created when db row is inserted.
+            if (!label.equalsIgnoreCase(AUTO_LABEL)) {
+                StudySubjectBean subjectWithSameLabel = ssd.findByLabelAndStudy(label, currentStudy);
 
-            StudySubjectBean subjectWithSameLabelInParent = new StudySubjectBean();
-            // tbh
-            if (currentStudy.getParentStudyId() > 0) {
-                subjectWithSameLabelInParent = ssd.findSameByLabelAndStudy(label, currentStudy.getParentStudyId(), 0);// <
-                // --
-                // blank
-                // id
-                // since
-                // the
-                // ss
-                // hasn't
-                // been
-                // created
-                // yet,
+                StudySubjectBean subjectWithSameLabelInParent = new StudySubjectBean();
                 // tbh
-            }
-            // tbh
-            if (subjectWithSameLabel.isActive() || subjectWithSameLabelInParent.isActive()) {
-                Validator.addError(errors, INPUT_LABEL, resexception.getString("another_assigned_this_ID_choose_unique"));
+                if (currentStudy.getParentStudyId() > 0) {
+                    subjectWithSameLabelInParent = ssd.findSameByLabelAndStudy(label, currentStudy.getParentStudyId(), 0);// <
+                    // --
+                    // blank
+                    // id
+                    // since
+                    // the
+                    // ss
+                    // hasn't
+                    // been
+                    // created
+                    // yet,
+                    // tbh
+                }
+                // tbh
+                if (subjectWithSameLabel.isActive() || subjectWithSameLabelInParent.isActive()) {
+                    Validator.addError(errors, INPUT_LABEL, resexception.getString("another_assigned_this_ID_choose_unique"));
+                }
             }
 
             if (!classes.isEmpty()) {
@@ -464,7 +476,10 @@ public class AddNewSubjectServlet extends SecureController {
                     }
 
                     // YW <<
-                    fp.addPresetValue(INPUT_LABEL, label);
+                    // Shaoyu Su: delay setting INPUT_LABEL field
+                    if (!label.equalsIgnoreCase(AUTO_LABEL)) {
+                        fp.addPresetValue(INPUT_LABEL, label);
+                    }
                     fp.addPresetValue(INPUT_SECONDARY_LABEL, fp.getString(INPUT_SECONDARY_LABEL));
                     fp.addPresetValue(INPUT_ENROLLMENT_DATE, fp.getString(INPUT_ENROLLMENT_DATE));
                     fp.addPresetValue(INPUT_EVENT_START_DATE, fp.getString(INPUT_EVENT_START_DATE));
@@ -506,10 +521,10 @@ public class AddNewSubjectServlet extends SecureController {
                             updateSubject = subjectWithSameId;
                             updateSubject.setDobCollected(true);
 
-                            if(subjectWithSameId.getDateOfBirth()==null){
+                            if (subjectWithSameId.getDateOfBirth() == null) {
                                 fp.addPresetValue(INPUT_DOB, DOB);
                                 updateSubject.setDateOfBirth(new Date(DOB));
-                            }else{
+                            } else {
                                 String y = String.valueOf(subjectWithSameId.getDateOfBirth()).split("\\-")[0];
                                 String[] d = DOB.split("\\/");
                                 // if year-of-birth in subject table
@@ -526,7 +541,8 @@ public class AddNewSubjectServlet extends SecureController {
                                         updateSubject.setDateOfBirth(sdf.parse(DOB));
                                     }
                                 }
-                                // date-of-birth is not required in subject table
+                                // date-of-birth is not required in subject
+                                // table
                                 else {
                                     fp.addPresetValue(D_WARNING, "emptyD");
                                     fp.addPresetValue(INPUT_DOB, DOB);
@@ -689,7 +705,19 @@ public class AddNewSubjectServlet extends SecureController {
 
                 studySubject.setOwner(ub);
 
-                studySubject = ssd.createWithoutGroup(studySubject);
+                // Shaoyu Su: prevent same label ("Study Subject ID")
+                if (fp.getString(INPUT_LABEL).equalsIgnoreCase(AUTO_LABEL)) {
+                    synchronized (simpleLockObj) {
+                        int nextLabel = ssd.findTheGreatestLabel() + 1;
+                        studySubject.setLabel(nextLabel + "");
+                        studySubject = ssd.createWithoutGroup(studySubject);
+                        if (showExistingRecord && !existingSubShown) {
+                            fp.addPresetValue(INPUT_LABEL, label);
+                        }
+                    }
+                } else {
+                    studySubject = ssd.createWithoutGroup(studySubject);
+                }
                 if (!classes.isEmpty() && studySubject.isActive()) {
                     SubjectGroupMapDAO sgmdao = new SubjectGroupMapDAO(sm.getDataSource());
                     for (int i = 0; i < classes.size(); i++) {
@@ -772,14 +800,16 @@ public class AddNewSubjectServlet extends SecureController {
                     logger.info("subject id setting :" + idSetting);
                     // set up auto study subject id
                     if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
-                        int nextLabel = ssd.findTheGreatestLabel() + 1;
-                        fp.addPresetValue(INPUT_LABEL, new Integer(nextLabel).toString());
+                        //Shaoyu Su
+                        //int nextLabel = ssd.findTheGreatestLabel() + 1;
+                        //fp.addPresetValue(INPUT_LABEL, new Integer(nextLabel).toString());
+                        fp.addPresetValue(INPUT_LABEL, AUTO_LABEL);
                     }
 
                     setPresetValues(fp.getPresetValues());
                     discNotes = new FormDiscrepancyNotes();
                     session.setAttribute(FORM_DISCREPANCY_NOTES_NAME, discNotes);
-                    //End of 4770
+                    // End of 4770
                     forwardPage(Page.ADD_NEW_SUBJECT);
                 } else {
                     // forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
@@ -833,7 +863,7 @@ public class AddNewSubjectServlet extends SecureController {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.akaza.openclinica.control.core.SecureController#mayProceed()
      */
     @Override
@@ -886,7 +916,7 @@ public class AddNewSubjectServlet extends SecureController {
 
     /**
      * Save the discrepancy notes of each field into session in the form
-     *
+     * 
      * @param field
      * @param notes
      * @param dndao
@@ -911,22 +941,19 @@ public class AddNewSubjectServlet extends SecureController {
 
             // updating exsiting note if necessary
             /*
-            if ("itemData".equalsIgnoreCase(entityType)) {
-                System.out.println(" **** find parent note for item data:" + dnb.getEntityId());
-                ArrayList parentNotes = dndao.findExistingNotesForItemData(dnb.getEntityId());
-                for (int j = 0; j < parentNotes.size(); j++) {
-                    DiscrepancyNoteBean parent = (DiscrepancyNoteBean) parentNotes.get(j);
-                    if (parent.getParentDnId() == 0) {
-                        if (dnb.getDiscrepancyNoteTypeId() == parent.getDiscrepancyNoteTypeId()) {
-                            if (dnb.getResolutionStatusId() != parent.getResolutionStatusId()) {
-                                parent.setResolutionStatusId(dnb.getResolutionStatusId());
-                                dndao.update(parent);
-                            }
-                        }
-                    }
-                }
-            }
-            */
+             * if ("itemData".equalsIgnoreCase(entityType)) {
+             * System.out.println(" **** find parent note for item data:" +
+             * dnb.getEntityId()); ArrayList parentNotes =
+             * dndao.findExistingNotesForItemData(dnb.getEntityId()); for (int j
+             * = 0; j < parentNotes.size(); j++) { DiscrepancyNoteBean parent =
+             * (DiscrepancyNoteBean) parentNotes.get(j); if
+             * (parent.getParentDnId() == 0) { if
+             * (dnb.getDiscrepancyNoteTypeId() ==
+             * parent.getDiscrepancyNoteTypeId()) { if
+             * (dnb.getResolutionStatusId() != parent.getResolutionStatusId()) {
+             * parent.setResolutionStatusId(dnb.getResolutionStatusId());
+             * dndao.update(parent); } } } } }
+             */
             if (dnb.getResolutionStatusId() == 0) {
                 dnb.setResStatus(ResolutionStatus.NOT_APPLICABLE);
                 dnb.setResolutionStatusId(ResolutionStatus.NOT_APPLICABLE.getId());
@@ -954,7 +981,7 @@ public class AddNewSubjectServlet extends SecureController {
 
     /**
      * Find study subject id for each subject, and construct displaySubjectBean
-     *
+     * 
      * @param displayArray
      * @param subjects
      */

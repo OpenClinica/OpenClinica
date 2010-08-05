@@ -33,6 +33,8 @@ import java.util.Locale;
  */
 public class ListStudySubjectsServlet extends SecureController {
 
+    // Shaoyu Su
+    private static final String AUTO_LABEL = "AUTO_ID";
     private static final long serialVersionUID = 1L;
     private StudyEventDefinitionDAO studyEventDefinitionDAO;
     private SubjectDAO subjectDAO;
@@ -81,8 +83,10 @@ public class ListStudySubjectsServlet extends SecureController {
         String idSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();
         // set up auto study subject id
         if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
-            int nextLabel = getStudySubjectDAO().findTheGreatestLabel() + 1;
-            request.setAttribute("label", new Integer(nextLabel).toString());
+            //Shaoyu Su
+            // int nextLabel = getStudySubjectDAO().findTheGreatestLabel() + 1;
+            // request.setAttribute("label", new Integer(nextLabel).toString());
+            request.setAttribute("label", AUTO_LABEL);
         }
 
         request.setAttribute("closeInfoShowIcons", true);

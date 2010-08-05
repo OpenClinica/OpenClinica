@@ -34,6 +34,8 @@ import java.util.Locale;
  */
 public class ListEventsForSubjectsServlet extends SecureController {
 
+    // Shaoyu Su
+    private static final String AUTO_LABEL = "AUTO_ID";
     private static final long serialVersionUID = 1L;
     private StudyEventDefinitionDAO studyEventDefinitionDAO;
     private SubjectDAO subjectDAO;
@@ -50,6 +52,7 @@ public class ListEventsForSubjectsServlet extends SecureController {
     private boolean showMoreLink;
     /*
      * (non-Javadoc)
+     * 
      * @see org.akaza.openclinica.control.core.SecureController#mayProceed()
      */
     @Override
@@ -81,10 +84,12 @@ public class ListEventsForSubjectsServlet extends SecureController {
         String idSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();
         // set up auto study subject id
         if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
-            int nextLabel = getStudySubjectDAO().findTheGreatestLabel() + 1;
-            request.setAttribute("label", new Integer(nextLabel).toString());
+            //Shaoyu Su
+            //int nextLabel = getStudySubjectDAO().findTheGreatestLabel() + 1;
+            //request.setAttribute("label", new Integer(nextLabel).toString());
+            request.setAttribute("label", AUTO_LABEL);
         }
-        
+
         // checks which module the requests are from
         String module = fp.getString(MODULE);
         request.setAttribute(MODULE, module);
@@ -116,7 +121,7 @@ public class ListEventsForSubjectsServlet extends SecureController {
         request.setAttribute("listEventsForSubjectsHtml", listEventsForSubjectsHtml);
         request.setAttribute("defId", definitionId);
         // A. Hamid.
-        //For event definitions and group class list in the add subject popup
+        // For event definitions and group class list in the add subject popup
         request.setAttribute("allDefsArray", super.getEventDefinitionsByCurrentStudy());
         request.setAttribute("studyGroupClasses", super.getStudyGroupClassesByCurrentStudy());
         FormDiscrepancyNotes discNotes = new FormDiscrepancyNotes();
