@@ -1,31 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://openclinica.org/ws/event/v1"
-    xmlns:events="http://openclinica.org/ws/event/v1" 
+    targetNamespace="http://openclinica.org/ws/studyEventDefinition/v1"
+    xmlns:subjects="http://openclinica.org/ws/studyEventDefinition/v1" 
     xmlns:beans="http://openclinica.org/ws/beans"
     elementFormDefault="qualified">
     
     <import namespace="http://openclinica.org/ws/beans" schemaLocation="http://svn.akazaresearch.com/oc/schemas/beans.xsd"></import>
     
-    <element name="scheduleRequest">
+    <element name="listAllRequest">
         <complexType>
             <sequence>
-                <element name="event" type="beans:eventType" maxOccurs="unbounded"/>
+                <element name="studyEventDefinitionListAll" type="beans:studyEventDefinitionListAllType"/>
             </sequence>
         </complexType>
     </element>
     
-    <element name="scheduleResponse">
+    <element name="listAllResponse">
         <complexType>
             <sequence>
                 <element name="result" type="string"/>
-                <element name="eventDefinitionOID" type="string"/>
-                <element name="studySubjectOID" type="string"/>
-                <element name="studyEventOrdinal" type="string"/>
                 <element name="warning" type="string" minOccurs="0" maxOccurs="unbounded"/>
                 <element name="error" type="string" minOccurs="0" maxOccurs="unbounded"/>
+                <element name="studyEventDefinitions" type="beans:studyEventDefinitionsType" />
             </sequence>
         </complexType>
     </element>
-    
 </schema>

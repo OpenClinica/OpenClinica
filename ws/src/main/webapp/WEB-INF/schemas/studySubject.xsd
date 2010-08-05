@@ -5,7 +5,7 @@
     xmlns:beans="http://openclinica.org/ws/beans"
     elementFormDefault="qualified">
     
-    <import namespace="http://openclinica.org/ws/beans" schemaLocation="beans.xsd"></import>
+    <import namespace="http://openclinica.org/ws/beans" schemaLocation="http://svn.akazaresearch.com/oc/schemas/beans.xsd"></import>
 
     <element name="createRequest">
         <complexType>
@@ -22,6 +22,20 @@
                 <element name="label" type="string"/>
                 <element name="warning" type="string" minOccurs="0" maxOccurs="unbounded"/>
                 <element name="error" type="string" minOccurs="0" maxOccurs="unbounded"/>
+            </sequence>
+        </complexType>
+    </element>
+    
+    <element name="listStudySubjectsInStudyRequest" type="beans:listStudySubjectsInStudyType"/>
+    
+    <element name="listStudySubjectsInStudyResponse">
+        <complexType>
+            <sequence>
+                <element name="result" type="string"/>
+                <element name="label" type="string"/>
+                <element name="warning" type="string" minOccurs="0" maxOccurs="unbounded"/>
+                <element name="error" type="string" minOccurs="0" maxOccurs="unbounded"/>
+                <element name="studySubjects" type="beans:studySubjectsType" />
             </sequence>
         </complexType>
     </element>

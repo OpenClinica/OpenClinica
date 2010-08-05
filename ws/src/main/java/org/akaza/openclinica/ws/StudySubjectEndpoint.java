@@ -7,14 +7,23 @@
  */
 package org.akaza.openclinica.ws;
 
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
+import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.subject.SubjectServiceInterface;
@@ -26,16 +35,34 @@ import org.springframework.util.xml.DomUtils;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.XPathParam;
+import org.akaza.openclinica.ws.generated.CreateCrfResponse;
+import org.akaza.openclinica.ws.generated.CrfType;
+import org.akaza.openclinica.ws.generated.EventType;
+import org.akaza.openclinica.ws.generated.ListStudySubjectsInStudyType;
+import org.akaza.openclinica.ws.generated.ListStudySubjectsInStudyResponse;
+import org.akaza.openclinica.ws.generated.StudyRefType;
+import org.akaza.openclinica.ws.generated.SiteRefType;
+import org.akaza.openclinica.ws.generated.StudySubjectType;
+import org.akaza.openclinica.ws.generated.StudySubjectsType;
+import org.akaza.openclinica.ws.generated.EventsType;
+import org.akaza.openclinica.ws.generated.StudySubjectWithEventsType;
+import org.akaza.openclinica.ws.generated.GenderType;
+import org.akaza.openclinica.ws.generated.SubjectType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import java.io.FileOutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 
 import javax.sql.DataSource;
+import javax.xml.bind.JAXBElement;
+import javax.xml.datatype.DatatypeFactory;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Source;
@@ -55,6 +82,9 @@ public class StudySubjectEndpoint {
     private String dateFormat;
 
     private final SubjectServiceInterface subjectService;
+    StudyDAO studyDao;
+    UserAccountDAO userAccountDao;
+    SubjectDAO subjectDao;
 
     private final DataSource dataSource;
 
@@ -79,8 +109,7 @@ public class StudySubjectEndpoint {
      * @throws Exception
      */
     @PayloadRoot(localPart = "createRequest", namespace = NAMESPACE_URI_V1)
-    public Source createSubject(@XPathParam("//studySubject:studySubject") NodeList subject,
-            @XPathParam("//studySubject:studySubject/study/@uniqueIdentifier") String studyIdentifier) throws Exception {
+    public Source createSubject(@XPathParam("//studySubject:studySubject") NodeList subject) throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         Element subjectElement = (Element) subject.item(0);
         SubjectTransferBean subjectTransferBean = unMarshallToSubjectTransfer(subjectElement);
@@ -91,6 +120,116 @@ public class StudySubjectEndpoint {
         } else {
             return new DOMSource(mapConfirmation(FAIL_MESSAGE, null));
         }
+    }
+    
+    
+
+    @PayloadRoot(localPart = "listStudySubjectsInStudyRequest", namespace = NAMESPACE_URI_V1)
+    public ListStudySubjectsInStudyResponse listStudySubjectsInStudy(JAXBElement<ListStudySubjectsInStudyType> requestElement) throws Exception {
+        ResourceBundleProvider.updateLocale(new Locale("en_US"));
+        ListStudySubjectsInStudyType listStudySubjectsInStudyType = requestElement.getValue();
+        StudyBean study = null;
+        try {
+            study = validateRequestAndReturnStudy(listStudySubjectsInStudyType.getStudyRef());
+        } catch (Exception e) {
+            ListStudySubjectsInStudyResponse response = new ListStudySubjectsInStudyResponse();
+            response.setResult(FAIL_MESSAGE);
+            response.getError().add(e.getMessage());
+            return response;
+        }
+        //return new DOMSource(mapConfirmation(study, SUCCESS_MESSAGE),listStudySubjectsInStudyType.getStudyRef());
+        return mapConfirmation(study, SUCCESS_MESSAGE, listStudySubjectsInStudyType.getStudyRef());
+    }
+    
+    private ListStudySubjectsInStudyResponse mapConfirmation(StudyBean study, String message, StudyRefType studyRef) throws Exception{
+        ListStudySubjectsInStudyResponse response  = new ListStudySubjectsInStudyResponse();
+        response.setResult(message);
+        StudySubjectsType studySubjectsType = new StudySubjectsType();
+        response.setStudySubjects(studySubjectsType);
+        List<StudySubjectBean> studySubjects = this.subjectService.getStudySubject(study);
+        for (StudySubjectBean studySubjectBean : studySubjects) {
+            StudySubjectWithEventsType studySubjectType = new StudySubjectWithEventsType();
+            SubjectType subjectType = new SubjectType();
+            studySubjectType.setLabel(studySubjectBean.getLabel());
+            studySubjectType.setSecondaryLabel(studySubjectBean.getSecondaryLabel());
+            GregorianCalendar gc = new GregorianCalendar();
+            gc.setTime(studySubjectBean.getEnrollmentDate());
+            DatatypeFactory df = DatatypeFactory.newInstance();
+            df.newXMLGregorianCalendar(gc);
+            studySubjectType.setEnrollmentDate(df.newXMLGregorianCalendar(gc));
+            SubjectBean subjectBean = (SubjectBean)getSubjectDao().findByPK(studySubjectBean.getSubjectId());
+            subjectType.setUniqueIdentifier(subjectBean.getUniqueIdentifier());
+            subjectType.setGender(GenderType.fromValue(String.valueOf(subjectBean.getGender())));
+            studySubjectType.setSubject(subjectType);
+            //studySubjectType.setStudyRef(studyRef);
+            studySubjectType.setEvents(getEvents(studySubjectBean));
+            studySubjectsType.getStudySubject().add(studySubjectType);
+            
+
+        }
+        return response;
+    }
+    
+    private EventsType getEvents(StudySubjectBean studySubject) throws Exception{
+        StudyEventDAO eventDao = new StudyEventDAO(dataSource);
+        StudyEventDefinitionDAO studyEventDefinitionDao = new StudyEventDefinitionDAO(dataSource);
+        EventsType eventsType = new EventsType();
+        List<StudyEventBean> events = eventDao.findAllByStudySubject(studySubject);
+        for (StudyEventBean studyEventBean : events) {
+            EventType eventType = new EventType();
+            eventType.setEventDefinitionOID(studyEventDefinitionDao.findByEventDefinitionCRFId(studyEventBean.getStudyEventDefinitionId()).getOid());
+            eventType.setLocation(studyEventBean.getLocation());
+            GregorianCalendar gc = new GregorianCalendar();
+            gc.setTime(studyEventBean.getDateStarted());
+            DatatypeFactory df = DatatypeFactory.newInstance();
+            df.newXMLGregorianCalendar(gc);
+            eventType.setStartDate(df.newXMLGregorianCalendar(gc));
+            eventsType.getEvent().add(eventType);
+        }
+        return eventsType;
+    }
+    
+    
+    private StudyBean validateRequestAndReturnStudy(StudyRefType studyRef) {
+
+        String studyIdentifier = studyRef == null ? null : studyRef.getIdentifier();
+        String siteIdentifier = studyRef.getSiteRef() == null ? null : studyRef.getSiteRef().getIdentifier();
+
+        if (studyIdentifier == null && siteIdentifier == null) {
+            throw new OpenClinicaSystemException("Provide a valid study");
+        }
+        if (studyIdentifier != null && siteIdentifier == null) {
+            StudyBean study = (StudyBean) getStudyDao().findByName(studyIdentifier);
+            if (study.getId() == 0) {
+                throw new OpenClinicaSystemException("Invalid study");
+            }
+        }
+        if (studyIdentifier != null && siteIdentifier == null) {
+            StudyBean study = (StudyBean) getStudyDao().findByName(studyIdentifier);
+            if (study.getId() == 0) {
+                throw new OpenClinicaSystemException("Invalid study");
+            }
+            StudyUserRoleBean studySur = getUserAccountDao().findRoleByUserNameAndStudyId(getUserAccount().getName(), study.getId());
+            if (studySur.getStatus() != Status.AVAILABLE) {
+                throw new OpenClinicaSystemException("Invalid roles ");
+            }
+            return study;
+        }
+        if (studyIdentifier != null && siteIdentifier != null) {
+            StudyBean study = (StudyBean) getStudyDao().findByName(studyIdentifier);
+            StudyBean site = (StudyBean) getStudyDao().findByName(siteIdentifier);
+            if (study.getId() == 0 || site.getId() == 0 || site.getParentStudyId() != study.getId()) {
+                throw new OpenClinicaSystemException("Invalid study or site");
+            }
+            StudyUserRoleBean siteSur = getUserAccountDao().findRoleByUserNameAndStudyId(getUserAccount().getName(), site.getId());
+            if (siteSur.getStatus() != Status.AVAILABLE) {
+                throw new OpenClinicaSystemException("Invalid roles ");
+            }
+            return site;
+        }
+
+        return null;
+
     }
 
     /**
@@ -247,6 +386,21 @@ public class StudySubjectEndpoint {
      */
     public void setDateFormat(String dateFormat) {
         this.dateFormat = dateFormat;
+    }
+    
+    public StudyDAO getStudyDao() {
+        studyDao = studyDao != null ? studyDao : new StudyDAO(dataSource);
+        return studyDao;
+    }
+
+    public UserAccountDAO getUserAccountDao() {
+        userAccountDao = userAccountDao != null ? userAccountDao : new UserAccountDAO(dataSource);
+        return userAccountDao;
+    }
+    
+    public SubjectDAO getSubjectDao() {
+        subjectDao = subjectDao != null ? subjectDao : new SubjectDAO(dataSource);
+        return subjectDao;
     }
 
 }

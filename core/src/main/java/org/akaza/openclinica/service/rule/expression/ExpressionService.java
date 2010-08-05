@@ -128,8 +128,7 @@ public class ExpressionService {
     }
 
     public boolean ruleSetExpressionChecker(String expression) {
-        int k = expression.split(ESCAPED_SEPERATOR).length;
-        if (checkSyntax(expression) && expression.split(ESCAPED_SEPERATOR).length == 4) {
+        if (checkSyntax(expression)) {
             isExpressionValid(expression);
         } else {
             throw new OpenClinicaSystemException("OCRERR_0032");
@@ -586,7 +585,7 @@ public class ExpressionService {
         // int patternIndex = ?;
         if (!match(splitExpression[splitExpression.length - 1 - expressionIndex], pattern[patternIndex])) {
             if (!match(splitExpression[splitExpression.length - 1 - expressionIndex], ruleActionPattern[patternIndex])) {
-               throw new OpenClinicaSystemException("OCRERR_0019", new String[] { expression });
+                throw new OpenClinicaSystemException("OCRERR_0019", new String[] { expression });
             }
         }
         return splitExpression[splitExpression.length - 1 - expressionIndex];
@@ -811,7 +810,8 @@ public class ExpressionService {
         String[] theOid = oid.split(ESCAPED_SEPERATOR);
         if (theOid.length == 2) {
             ItemGroupBean itemGroup = getItemGroupDao().findByOid(theOid[0]);
-            if (itemGroup != null && itemGroup.getCrfId().equals(ruleSet.getCrfId())) {
+            Boolean isItemGroupBePartOfCrfOrNull = ruleSet.getCrfId() != null ? itemGroup.getCrfId().equals(ruleSet.getCrfId()) : true;
+            if (itemGroup != null && isItemGroupBePartOfCrfOrNull) {
                 if (ruleSet.getCrfId() != null && itemGroup.getCrfId().equals(ruleSet.getCrfId())) {
                     return "OK";
                 }

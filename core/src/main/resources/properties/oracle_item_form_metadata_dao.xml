@@ -83,6 +83,22 @@
 
         </query>
         <query>
+        <name>findAllByItemIdAndHasValidations</name>
+        <sql>
+        SELECT distinct m.*, rs.response_type_id, rs.label, rs.options_text,
+            rs.options_values, cv.name as cvname,
+            ig.name as group_label, igm.repeat_max, sec.title as section_name
+            FROM item_form_metadata m, response_set rs, crf_version cv, item_group_metadata igm, item_group ig, section sec
+            WHERE m.item_id=?
+                AND m.response_set_id = rs.response_set_id
+                AND cv.crf_version_id = m.crf_version_id
+                AND igm.item_id = m.item_id
+                AND ig.item_group_id = igm.item_group_id
+                AND sec.section_id = m.section_id
+                AND m.regexp != ''
+        </sql>
+    </query>
+        <query>
                 <name>findAllBySectionId</name>
                 <sql>
                         SELECT m.*, rs.response_type_id, rs.label, rs.options_text, rs.options_values

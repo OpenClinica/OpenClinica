@@ -10,14 +10,25 @@
 
      
      <!-- WSDL Definitions -->
-     <bean id="subjectWsdl" class="org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition">
-        <property name="schema" ref="schema"/>
+     
+     <bean id="studyEventDefinitionWsdl" class="org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition">
+        <property name="schema" ref="studyEventDefinitionSchema"/>
         <property name="portTypeName" value="ws"/>
-        <property name="locationUri" value="/ws/subject/v1"/>
+        <property name="locationUri" value="/ws/studyEventDefinition/v1"/>
      </bean>
      
-     <bean id="schema" class="org.springframework.xml.xsd.SimpleXsdSchema">
-         <property name="xsd" value="/WEB-INF/schemas/subject.xsd" />
+     <bean id="studyEventDefinitionSchema" class="org.springframework.xml.xsd.SimpleXsdSchema">
+         <property name="xsd" value="/WEB-INF/schemas/studyEventDefinition/studyEventDefinition.xsd" />
+     </bean>
+     
+     <bean id="studyWsdl" class="org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition">
+        <property name="schema" ref="studySchema"/>
+        <property name="portTypeName" value="ws"/>
+        <property name="locationUri" value="/ws/study/v1"/>
+     </bean>
+     
+     <bean id="studySchema" class="org.springframework.xml.xsd.SimpleXsdSchema">
+         <property name="xsd" value="/WEB-INF/schemas/study.xsd" />
      </bean>
      
      <bean id="studySubjectWsdl" class="org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition">
@@ -51,6 +62,9 @@
     </bean>
     
     <!-- Endpoint Mappings  -->
+    
+    <!-- PayloadRootAnnotationMethodEndpointMapping is the mapping that detects and handles the @PayloadRoot  
+         annotations  -->
     <bean class="org.springframework.ws.server.endpoint.mapping.PayloadRootAnnotationMethodEndpointMapping"> 
         <property name="interceptors">
             <list><ref bean="wsSecurityInterceptor"/></list>
@@ -61,28 +75,39 @@
     <bean class="org.springframework.ws.server.endpoint.adapter.XPathParamAnnotationMethodEndpointAdapter">
         <property name="namespaces">
             <props>
-                <prop key="s">http://openclinica.org/ws/subject/v1</prop>
                 <prop key="e">http://openclinica.org/ws/event/v1</prop>
                 <prop key="studySubject">http://openclinica.org/ws/studySubject/v1</prop>
+                <prop key="study">http://openclinica.org/ws/study/v1</prop>
+                <prop key="sed">http://openclinica.org/ws/studyEventDefinition/v1</prop>
             </props>
         </property>
     </bean>
     
+    <!-- The GenericMarshallingMethodEndpointAdapter  converts the incoming XML messages to marshalled 
+         objects used as parameters and return value -->
     <bean class="org.springframework.ws.server.endpoint.adapter.GenericMarshallingMethodEndpointAdapter">
         <constructor-arg ref="jaxb2Marshaller"/>
     </bean>
+    
+    <bean id="dateAdapter" class="org.akaza.openclinica.ws.DateAdapter" />
 
     <bean id="jaxb2Marshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
         <property name="contextPath" value="org.akaza.openclinica.ws.generated"/>
         <property name="mtomEnabled" value="true"/>
+        <property name="adapters">
+            <list><ref bean="dateAdapter"/></list>    
+        </property>
     </bean>
     
-    <!--  Endpoints 
-    <bean id="subjectEndpoint" class="org.akaza.openclinica.ws.SubjectEndpoint">
-        <constructor-arg ref="subjectService"/>
+    <!--  Endpoints -->
+    
+     <bean id="studyEventDefinitionEndpoint" class="org.akaza.openclinica.ws.StudyEventDefinitionEndpoint">
         <constructor-arg ref="dataSource"/>
-        <property name="dateFormat" value="yyyy-MM-dd"/>
-    </bean>-->  
+    </bean>
+    
+    <bean id="studyEndpoint" class="org.akaza.openclinica.ws.StudyEndpoint">
+        <constructor-arg ref="dataSource"/>
+    </bean>
     
     <bean id="studySubjectEndpoint" class="org.akaza.openclinica.ws.StudySubjectEndpoint">
         <constructor-arg ref="subjectService"/>

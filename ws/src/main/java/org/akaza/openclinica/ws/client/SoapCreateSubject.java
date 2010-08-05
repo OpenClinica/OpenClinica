@@ -1,6 +1,7 @@
 package org.akaza.openclinica.ws.client;
 
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.service.subject.SubjectServiceInterface;
@@ -11,6 +12,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -71,6 +73,10 @@ public class SoapCreateSubject extends WebServiceGatewaySupport implements Subje
     public boolean validate(SubjectTransferBean subjectTransferBean) {
         // TODO Auto-generated method stub
         return false;
+    }
+    
+    public List<StudySubjectBean> getStudySubject(StudyBean study){
+        return null;
     }
 
 }

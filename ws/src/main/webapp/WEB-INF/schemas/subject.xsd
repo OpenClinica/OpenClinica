@@ -5,7 +5,7 @@
     xmlns:beans="http://openclinica.org/ws/beans"
     elementFormDefault="qualified">
     
-    <import namespace="http://openclinica.org/ws/beans" schemaLocation="beans.xsd"></import>
+    <import namespace="http://openclinica.org/ws/beans" schemaLocation="http://svn.akazaresearch.com/oc/schemas/beans.xsd"></import>
     
     <element name="creatRequest">
         <complexType>

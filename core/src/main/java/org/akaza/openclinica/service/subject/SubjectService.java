@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -40,6 +41,11 @@ public class SubjectService implements SubjectServiceInterface {
 
     public SubjectService(SessionManager sessionManager) {
         this.dataSource = sessionManager.getDataSource();
+    }
+    
+    public List<StudySubjectBean> getStudySubject(StudyBean study){
+        return getStudySubjectDao().findAllByStudy(study);
+        
     }
 
     public boolean validate(SubjectTransferBean subjectTransferBean) throws OpenClinicaSystemException {
