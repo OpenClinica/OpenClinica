@@ -17,6 +17,11 @@
 <c:set var="numOfDate" value="${param.key}" />
 <c:set var="defValue" value="${param.defaultValue}" />
 <c:set var="respLayout" value="${param.respLayout}" />
+<c:set var="totNew" value="${displayItem.totNew}"/>
+<c:set var="totUpdated" value="${displayItem.totUpdated}"/>
+<c:set var="totRes" value="${displayItem.totRes}"/>
+<c:set var="totClosed" value="${displayItem.totClosed}"/>
+<c:set var="totNA" value="${displayItem.totNA}"/>
 <%-- What is the including JSP (e.g., doubleDataEntry)--%>
 <c:set var="originJSP" value="${param.originJSP}" />
 <%-- A boolean request attribute set in DataEntryServlet...--%>
@@ -350,7 +355,8 @@ form element in red --%>
   <c:choose>
     <c:when test="${displayItem.numDiscrepancyNotes > 0}">
 
-      <td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#" onClick=
+      <td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"  onmouseover="callTip(genToolTip(${totNew},${totUpdated},${totRes},${totClosed},${totNA}) )";
+           onmouseout="UnTip()" onClick=
     "openDNoteWindow('ViewDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=input<c:out value="${itemId}"/>&column=value&monitor=1&writeToDB=1&isLocked=<c:out value="${isLocked}"/>','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
     ><img id="flag_input<c:out value="${itemId}"/>" name="flag_input<c:out value="${itemId}"/>" src=
     "images/<c:out value="${imageFileName}"/>.gif" border="0" alt=
@@ -363,7 +369,8 @@ form element in red --%>
      <c:if test="${isLocked eq 'no'}">
       <c:set var="imageFileName" value="icon_noNote" />
 
-       <td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#" onClick=
+       <td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"  onmouseover="callTip(genToolTip(${totNew},${totUpdated},${totRes},${totClosed},${totNA}) )";
+           onmouseout="UnTip()" onClick=
     "openDNWindow('CreateDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=input<c:out value="${itemId}"/>&column=value&monitor=1&blank=<c:out value="${isBlank}"/>&writeToDB=1&errorFlag=<c:out value="${errorFlag}"/>&isLocked=<c:out value="${isLocked}"/>','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
     ><img id="flag_input<c:out value="${itemId}" />" name="flag_input<c:out value="${itemId}" />" src=
     "images/<c:out value="${imageFileName}"/>.gif" border="0" alt=
