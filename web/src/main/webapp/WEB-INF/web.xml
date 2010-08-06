@@ -12,8 +12,7 @@
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>
-            classpath*:org/akaza/openclinica/applicationContext*.xml,
-   /WEB-INF/pages-servlet.xml
+            classpath*:org/akaza/openclinica/applicationContext*.xml
         </param-value>
         
     </context-param>
