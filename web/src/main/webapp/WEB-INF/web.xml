@@ -12,8 +12,10 @@
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>
-            classpath*:org/akaza/openclinica/applicationContext*.xml
+            classpath*:org/akaza/openclinica/applicationContext*.xml,
+   /WEB-INF/pages-servlet.xml
         </param-value>
+        
     </context-param>
     
     <context-param>
@@ -74,6 +76,7 @@
    <servlet>
         <servlet-name>pages</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <load-on-startup>2</load-on-startup>
     </servlet>
     
     <servlet-mapping>
