@@ -186,27 +186,32 @@
 
 .tooltip {
 		
-	width:100px;
+	width:175px;
 	font-size:11px;
 	color:black; 
 	background-color: #FFFFE5;
-	border-color:Black;
+	border-color:gray;
 	
 }
 .tooltip .label {
 	color:black;
-	width:50px;
+	width:25px;
 	font-family:Tahoma,Arial,Helvetica,Sans-Serif;
 	font-size:11px;
+	border-color:gray;
+
 }
 .tooltip .header1 {
 	color:black;
-	width:60px;
 	font-family:Tahoma,Arial,Helvetica,Sans-Serif;
 	font-size:11px;
 	font-weight:bold;
+	height:30px;
+	
 }
-
+.tooltip.tableborder{
+	border-style:solid;
+}
 
 
 

@@ -17,27 +17,32 @@
 <style type="text/css">
 .tooltip {
 		
-	width:100px;
+	width:175px;
 	font-size:11px;
 	color:black; 
 	background-color: #FFFFE5;
-	border-color:Black;
+	border-color:gray;
 	
 }
 .tooltip .label {
 	color:black;
-	width:35px;
+	width:25px;
 	font-family:Tahoma,Arial,Helvetica,Sans-Serif;
 	font-size:11px;
+	border-color:gray;
+
 }
 .tooltip .header1 {
 	color:black;
-	width:55px;
 	font-family:Tahoma,Arial,Helvetica,Sans-Serif;
 	font-size:11px;
 	font-weight:bold;
+	height:30px;
+	
 }
-
+.tooltip.tableborder{
+	border-style:solid;
+}
 </style>
 
 <script type="text/javascript" language="javascript">
@@ -66,14 +71,24 @@ var closing = true;
      
     function genToolTip(newNo,updatedNo,resNo,closedNo,naNO)
        {
-           var htmlgen = 
-               '<div class=\"tooltip\"><table style=\"margin=0\"><tr><td class=\"header1\"> Discrepancy Notes:</td></tr></table><table><tr><br/></tr></table><table>  <tr> <td class=\"label\">New: </td><td  class=\"label\">'+newNo+'</td></tr><tr> <td class=\"label\">Updated: </td><td  class=\"label\">'+updatedNo+'</td></tr><tr> <td class=\"label\">Resolved: </td><td  class=\"label\">'+resNo+'</td></tr><tr> <td class=\"label\">Closed: </td><td  class=\"label\">'+closedNo+'</td></tr><tr> <td class=\"label\">Not Applicable: </td><td  class=\"label\">'+naNO+'</td></tr></table></div>';
-          // var htmlgen = 'new:'+newNo;
+               var htmlgen = 
+	                     '<div class=\"tooltip\">'+
+	                     '<table ><table width="150">'+
+	                     ' <tr><td  align=\"center\" class=\"header1\">' +
+	                     'Notes and Discrepancies </td></tr><tr></tr>'+
+	                     '</table><table width="180"  class="tableborder" align="left">  <tr>  <td width="66" class="label"><img src="images/icon_Note.gif" width="16" height="13" alt="noNote"></td> <td width="67" align="left" class=\"label\">New: </td><td width="43" class=\"label\">'+newNo+'</td></tr>'+
+	                     '<tr> <td ><img src="images/icon_flagYellow.gif" width="16" height="13" alt="discrepancy"> <td class=\"label\">Updated: </td><td  class=\"label\">'+updatedNo+'</td></tr>'+
+	                     '<tr> <td ><img src="images/icon_flagGreen.gif" width="16" height="13" alt="closed"></td> <td class=\"label\">Res.Proposed: </td> <td  class=\"label\">'+resNo+'</td></tr>'+
+	                     '<tr>  <td ><img src="images/icon_flagBlack.gif" width="16" height="13" alt="NA"></td> <td class=\"label\">Closed: </td><td  class=\"label\">'+closedNo+'</td></tr><tr>'+ 
+	                     '<td><img src="images/icon_flagWhite.gif" width="16" height="13" alt="NA"></td> <td class=\"label\">Not Applicable: </td><td  class=\"label\">'+naNO+'</td></tr></table><table><tr></tr></table>'+
+	                     '<table width="180"><tbody><td height="50" colspan="3"><span class=\"label\">'+
+    'Click on the flag in the main window for more details.</span>'+
+  '</td></tr></tbody></table></table></div>';
           return htmlgen;
 }
 function callTip(html)
 {
-	Tip(html,BGCOLOR,'#FFFFE5',BORDERCOLOR,''  );
+	Tip(html,BGCOLOR,'#FFFFE5',BORDERCOLOR,'' );
 }
 
 </script>
