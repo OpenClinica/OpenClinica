@@ -140,6 +140,12 @@ function setResStatus(resStatusId, destinationUserId) {
 </td>
 </tr>
 </table>
+  <tr>
+<table border="0" cellpadding="0" cellspacing="0" style="float:left;">
+        <td valign="top">
+  <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+
+                <div class="textbox_center">
 <table border="0" cellpadding="0" cellspacing="0">
                         <tbody><tr>
                             <td class="table_cell_noborder" style="color: rgb(120, 158, 197);"><b>Subject:&nbsp;&nbsp;</b></td>
@@ -174,13 +180,17 @@ function setResStatus(resStatusId, destinationUserId) {
                             </td>
                         </tr>
                     </tbody></table>
-</div> 
+  </div>
+
+            </div></div></div></div></div></div></div>
+            
+	            
    <table border="0">
    <tr valign="top">
    <td>
    <br/>
    </td>
-   </tr>
+   </tr><div class="textbox_center">
         <tr valign="top">
             <td  class="table_cell_noborder" style="color: rgb(120, 158, 197);"><fmt:message key="entity_type_field" bundle="${resword}"/></td>
             <td class="table_cell_noborder"><c:out value="${discrepancyNote.entityType}"/>/<c:out value="${discrepancyNote.column}"/>
