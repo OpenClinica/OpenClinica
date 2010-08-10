@@ -110,14 +110,16 @@ function setResStatus(resStatusId, destinationUserId) {
 </head>
 <body class="popup_BG" onload="javascript:setStatus(<c:out value="${discrepancyNote.discrepancyNoteTypeId}"/>);">
 <%-- needs to run at first to possibly gray out the drop down, tbh 02/2010--%>
-<div style="float: left;"><h1 class="table_title_Submit"><fmt:message key="add_discrepancy_note" bundle="${resword}"/></h1></div>
+<div style="float: left;"><h1 class="title_manage"><fmt:message key="add_discrepancy_note" bundle="${resword}"/></h1></div>
 <div style="float: right;"><p><a href="#" onclick="javascript:window.close();"><fmt:message key="close_window" bundle="${resword}"/></a></p></div>
 <br clear="all">
 <div class="alert">
 <c:forEach var="message" items="${pageMessages}">
  <c:out value="${message}" escapeXml="false"/>
 </c:forEach>
+
 </div>
+                   
 <form name="noteForm" method="POST" action="CreateDiscrepancyNote">
 <jsp:include page="../include/showSubmitted.jsp" />
 <input type="hidden" name="name" value="<c:out value="${discrepancyNote.entityType}"/>">
@@ -130,49 +132,76 @@ function setResStatus(resStatusId, destinationUserId) {
 <input type="hidden" name="monitor" value="<c:out value="${monitor}" />">
 <input type="hidden" name="new" value="<c:out value="${new}" />">
 <input type="hidden" name="enterData" value="<c:out value="${enterData}" />">
-
+<div>
+<table border="0" cellpadding="0" cellspacing="0">
+<tr>
+<td>
+&nbsp;
+</td>
+</tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0">
+                        <tbody><tr>
+                            <td class="table_cell_noborder" style="color: rgb(120, 158, 197);"><b>Subject:&nbsp;&nbsp;</b></td>
+                            <td class="table_cell_noborder" style="color: rgb(120, 158, 197);"><c:out value="${discrepancyNote.subjectName}" /></td>
+                            <td class="table_cell_noborder" style="color: rgb(120, 158, 197); padding-left: 40px;"><b>Event:&nbsp;&nbsp;</b></td>
+                            <td class="table_cell_noborder" style="color: rgb(120, 158, 197);">
+                                
+                                    
+                                        <c:out value="${discrepancyNote.eventName}"/>
+                                    
+                                    
+                                
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="table_cell_noborder" style="color: rgb(120, 158, 197);"><b>Event Date:&nbsp;&nbsp;</b></td>
+                            <td class="table_cell_noborder" style="color: rgb(120, 158, 197);">
+                                
+                                    <fmt:formatDate value="${discrepancyNote.eventStart}" pattern="${dteFormat}"/>
+                                    
+                                    
+                                
+                            </td>
+                            <td class="table_cell_noborder" style="color: rgb(120, 158, 197); padding-left: 40px;"><b>CRF:&nbsp;&nbsp;</b></td>
+                            <td class="table_cell_noborder" style="color: rgb(120, 158, 197);">
+                                
+                                    
+                                       <c:out value="${discrepancyNote.crfName}"/>
+                                    
+                                    
+                                
+                            </td>
+                        </tr>
+                    </tbody></table>
+</div> 
    <table border="0">
    <tr valign="top">
-    <td><fmt:message key="subject" bundle="${resword}"/></td>
-    <td><c:out value="${discrepancyNote.subjectName}" />&nbsp;</td>
+   <td>
+   <br/>
+   </td>
    </tr>
-   <c:if test="${discrepancyNote.eventName !=''}">
-   <tr valign="top">
-    <td><fmt:message key="event" bundle="${resword}"/></td>
-    <td><c:out value="${discrepancyNote.eventName}"/>&nbsp;</td>
-   </tr>
-    <tr valign="top">
-    <td><fmt:message key="event_date" bundle="${resword}"/></td>
-    <td><fmt:formatDate value="${discrepancyNote.eventStart}" pattern="${dteFormat}"/></td>
-   </tr>
-   </c:if>
-   <c:if test="${discrepancyNote.crfName !=''}">
-    <tr valign="top">
-    <td><fmt:message key="CRF" bundle="${resword}"/></td>
-    <td><c:out value="${discrepancyNote.crfName}"/>&nbsp;</td>
-   </tr>
-   </c:if>
         <tr valign="top">
-            <td><fmt:message key="entity_type_field" bundle="${resword}"/></td>
-            <td><c:out value="${discrepancyNote.entityType}"/>/<c:out value="${discrepancyNote.column}"/>
+            <td  class="table_cell_noborder" style="color: rgb(120, 158, 197);"><fmt:message key="entity_type_field" bundle="${resword}"/></td>
+            <td class="table_cell_noborder"><c:out value="${discrepancyNote.entityType}"/>/<c:out value="${discrepancyNote.column}"/>
              </td>
         </tr>
         <c:if test="${discrepancyNote.entityType == 'itemData'}">
             <tr valign="top">
-            <td><fmt:message key="item_name" bundle="${resword}"/></td>
-            <td><a href="javascript: openDocWindow('ViewItemDetail?itemId=<c:out value="${item.id}"/>')"><c:out value="${item.name}"/></a></td>
+            <td  class="table_cell_noborder" style="color: rgb(120, 158, 197);"><fmt:message key="item_name" bundle="${resword}"/></td>
+            <td class="table_cell_noborder"><a href="javascript: openDocWindow('ViewItemDetail?itemId=<c:out value="${item.id}"/>')"><c:out value="${item.name}"/></a></td>
             </tr>
          </c:if>
 
        <tr valign="top">
-            <td><fmt:message key="discrepancy_thread_id" bundle="${resword}"/></td>
+            <td  class="table_cell_noborder" style="color: rgb(120, 158, 197);"><fmt:message key="discrepancy_thread_id" bundle="${resword}"/></td>
             <td>
             <c:out value="${parent.id}"/>
             </td>
         </tr>
         <tr valign="top">
-           <td><fmt:message key="type" bundle="${resword}"/></td>
-           <td>
+           <td  class="table_cell_noborder" style="color: rgb(120, 158, 197);"><fmt:message key="type" bundle="${resword}"/></td>
+           <td class="table_cell_noborder">
             <c:set var="typeId1" value="${discrepancyNote.discrepancyNoteTypeId}"/>
                <c:choose>
                  <c:when test="${parent == null || parent.id ==0 }">
@@ -235,15 +264,15 @@ function setResStatus(resStatusId, destinationUserId) {
 
         </tr>
         <tr valign="top">
-            <td><fmt:message key="description" bundle="${resword}"/></td>
-            <td>
+            <td  class="table_cell_noborder" style="color: rgb(120, 158, 197);"><fmt:message key="description" bundle="${resword}"/></td>
+            <td class="table_cell_noborder">
             <div class="formfieldXL_BG"><input type="text" name="description" value="<c:out value="${discrepancyNote.description}"/>" class="formfieldXL"></div>
              <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="description"/></jsp:include>
             </td>
         </tr>
         <tr valign="top">
-            <td><fmt:message key="detailed_note" bundle="${resword}"/></td>
-            <td>
+            <td  class="table_cell_noborder" style="color: rgb(120, 158, 197);"><fmt:message key="detailed_note" bundle="${resword}"/></td>
+            <td class="table_cell_noborder">
             <c:choose>
             <c:when test="${discrepancyNote.detailedNotes !=''}">
              <div class="formtextareaXL4_BG">
@@ -261,8 +290,8 @@ function setResStatus(resStatusId, destinationUserId) {
         </tr>
         <tr valign="top" id="res1">
 
-            <td><fmt:message key="resolution_status" bundle="${resword}"/></td>
-            <td><div class="formfieldL_BG">
+            <td  class="table_cell_noborder" style="color: rgb(120, 158, 197);"><fmt:message key="resolution_status" bundle="${resword}"/></td>
+            <td class="table_cell_noborder"><div class="formfieldL_BG">
 			<c:choose>
 				<c:when test='${strResStatus != ""}'>
 					<c:set var="resStatusId1" value="${strResStatus}"/>
@@ -298,8 +327,8 @@ function setResStatus(resStatusId, destinationUserId) {
       	</c:otherwise>
 		</c:choose>
         <c:if test="${discrepancyNote.discrepancyNoteTypeId != 1 || (discrepancyNote.discrepancyNoteTypeId==1 && discrepancyNote.parentDnId>0)}">
-            <td><fmt:message key="assigned_to" bundle="${resword}"/></td>
-            <td><div class="formfieldL_BG">
+            <td class="table_cell_noborder" style="color: rgb(120, 158, 197);"><fmt:message key="assigned_to" bundle="${resword}"/></td>
+            <td class="table_cell_noborder"><div class="formfieldL_BG">
 			<c:choose>
 				<c:when test='${strUserAccountId != ""}'>
 					<c:set var="userAccountId1" value="${strUserAccountId}"/>
@@ -363,7 +392,7 @@ function setResStatus(resStatusId, destinationUserId) {
       	</c:otherwise>
 		</c:choose>
 
-            <td><fmt:message key="send_to_assigned" bundle="${resword}"/></td>
+            <td  class="table_cell_noborder" style="color: rgb(120, 158, 197);"><fmt:message key="send_to_assigned" bundle="${resword}"/></td>
 			<%-- should be an option for checked, unchecked, disabled--%>
             <td><input name="sendEmail" value="1" type="checkbox"/></td>
         </tr>
@@ -371,12 +400,12 @@ function setResStatus(resStatusId, destinationUserId) {
 
 
 		<tr valign="top">
-            <td><fmt:message key="date" bundle="${resword}"/></td>
+            <td  class="table_cell_noborder" style="color: rgb(120, 158, 197);"><fmt:message key="date" bundle="${resword}"/></td>
             <td><fmt:formatDate value="${discrepancyNote.createdDate}" pattern="${dteFormat}"/></td>
         </tr>
 
         <tr valign="top">
-            <td><fmt:message key="parent_note" bundle="${resword}"/></td>
+            <td  class="table_cell_noborder" style="color: rgb(120, 158, 197);"><fmt:message key="parent_note" bundle="${resword}"/></td>
             <td><c:choose>
              <c:when test="${parent== null || parent.description ==''}">
                <fmt:message key="none" bundle="${resword}"/>
