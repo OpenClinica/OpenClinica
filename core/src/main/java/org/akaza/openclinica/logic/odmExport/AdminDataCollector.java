@@ -44,6 +44,7 @@ public class AdminDataCollector extends OdmDataCollector {
 
     @Override
     public void collectFileData() {
+        this.collectOdmAdminDataMap();
     }
 
     public void collectOdmAdminDataMap() {

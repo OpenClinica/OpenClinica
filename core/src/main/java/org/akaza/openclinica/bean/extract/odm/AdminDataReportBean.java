@@ -14,10 +14,13 @@
 package org.akaza.openclinica.bean.extract.odm;
 
 import java.text.SimpleDateFormat;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 import org.akaza.openclinica.bean.odmbeans.LocationBean;
 import org.akaza.openclinica.bean.odmbeans.MetaDataVersionRefBean;
 import org.akaza.openclinica.bean.odmbeans.OdmAdminDataBean;
+import org.akaza.openclinica.bean.odmbeans.OdmStudyBean;
 import org.akaza.openclinica.bean.odmbeans.UserBean;
 import org.apache.commons.lang.StringEscapeUtils;
 
@@ -30,10 +33,16 @@ import org.apache.commons.lang.StringEscapeUtils;
 
 public class AdminDataReportBean extends OdmXmlReportBean {
     private OdmAdminDataBean adminData;
+    private LinkedHashMap<String, OdmAdminDataBean> odmAdminDataMap;
 
     public AdminDataReportBean(OdmAdminDataBean adminData) {
         super();
         this.adminData = adminData;
+    }
+    
+    public AdminDataReportBean(LinkedHashMap<String, OdmAdminDataBean> odmAdminDataMap) {
+        super();
+        this.odmAdminDataMap = odmAdminDataMap;
     }
 
     private static String nls = System.getProperty("line.separator");
@@ -43,6 +52,34 @@ public class AdminDataReportBean extends OdmXmlReportBean {
      */
     @Override
     public void createOdmXml(boolean isDataset) {
+    }
+    
+    public void createChunkedOdmXml(boolean isDataset) {
+        String ODMVersion = this.getODMVersion();
+        if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
+            Iterator<OdmAdminDataBean> ita = this.odmAdminDataMap.values().iterator();
+            while (ita.hasNext()) {
+                OdmAdminDataBean a = ita.next();
+                addNodeAdminData(a);
+            }
+        }
+    }
+    
+    public void addNodeAdminData(OdmAdminDataBean a) {
+        if(a.getUsers().size()>0) {
+            StringBuffer xml = this.getXmlOutput();
+            String indent = this.getIndent();
+            xml.append(indent + "<AdminData StudyOID=\"" + StringEscapeUtils.escapeXml(a.getStudyOID()) + "\">");
+            xml.append(nls);
+            for(UserBean u : a.getUsers()) {
+                addOneUser(u, indent+indent);
+            }
+            //for(LocationBean l : this.adminData.getLocations()) {
+            //    addOneLocation(l, indent+indent);
+            //}
+            xml.append(indent + "</AdminData>");
+            xml.append(nls);
+        }
     }
     
     public void addNodeAdminData() {

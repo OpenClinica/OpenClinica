@@ -23,6 +23,7 @@ import org.akaza.openclinica.bean.extract.ExtractBean;
 import org.akaza.openclinica.bean.extract.SPSSReportBean;
 import org.akaza.openclinica.bean.extract.TabReportBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -178,8 +179,9 @@ public class ExportDatasetServlet extends SecureController {
             } else if ("odm".equalsIgnoreCase(action)) {
                 String odmVersion = fp.getString("odmVersion");
                 String ODMXMLFileName = "";
+                String studySubjectNumber = ((CoreResources) SpringServletAccess.getApplicationContext(context).getBean("coreResources")).getField("extract.number");
                 // DRY
-                HashMap answerMap = generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, db, this.currentStudy, "");
+                HashMap answerMap = generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, db, this.currentStudy, "", eb, currentstudyid, parentstudy,studySubjectNumber);
                 for (Iterator it = answerMap.entrySet().iterator(); it.hasNext();) {
                     java.util.Map.Entry entry = (java.util.Map.Entry) it.next();
                     Object key = entry.getKey();

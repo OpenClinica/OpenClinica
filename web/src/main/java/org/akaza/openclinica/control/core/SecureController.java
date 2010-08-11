@@ -45,6 +45,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -74,49 +76,32 @@ import javax.sql.DataSource;
  * This class enhances the Controller in several ways.
  * 
  * <ol>
- * <li>The method mayProceed, for which the class is named, is declared abstract
- * and is called before processRequest. This method indicates whether the user
- * may proceed with the action he wishes to perform (as indicated by various
- * attributes or parameters in request or session). Note, howeveer, that the
- * method has a void return, and throws InsufficientPermissionException. The
- * intention is that if the user may not proceed with his desired action, the
- * method should throw an exception. InsufficientPermissionException will accept
- * a Page object which indicates where the user should be redirected in order to
- * be informed that he has insufficient permission, and the process method
- * enforces this redirection by catching an InsufficientPermissionException
- * object.
+ * <li>The method mayProceed, for which the class is named, is declared abstract and is called before processRequest. This method indicates whether the user may
+ * proceed with the action he wishes to perform (as indicated by various attributes or parameters in request or session). Note, howeveer, that the method has a
+ * void return, and throws InsufficientPermissionException. The intention is that if the user may not proceed with his desired action, the method should throw
+ * an exception. InsufficientPermissionException will accept a Page object which indicates where the user should be redirected in order to be informed that he
+ * has insufficient permission, and the process method enforces this redirection by catching an InsufficientPermissionException object.
  * 
- * <li>Four new members, session, request, response, and the UserAccountBean
- * object ub have been declared protected, and are set in the process method.
- * This allows developers to avoid passing these objects between methods, and
- * moreover it accurately encodes the fact that these objects represent the
- * state of the servlet.
+ * <li>Four new members, session, request, response, and the UserAccountBean object ub have been declared protected, and are set in the process method. This
+ * allows developers to avoid passing these objects between methods, and moreover it accurately encodes the fact that these objects represent the state of the
+ * servlet.
  * 
  * <br/>
- * In particular, please note that it is no longer necessary to generate a bean
- * for the session manager, the current user or the current study.
+ * In particular, please note that it is no longer necessary to generate a bean for the session manager, the current user or the current study.
  * 
- * <li>The method processRequest has been declared abstract. This change is
- * unlikely to affect most code, since by custom processRequest is declared in
- * each subclass anyway.
+ * <li>The method processRequest has been declared abstract. This change is unlikely to affect most code, since by custom processRequest is declared in each
+ * subclass anyway.
  * 
- * <li>The standard try-catch block within most processRequest methods has been
- * included in the process method, which calls the processRequest method.
- * Therefore, subclasses may throw an Exception in the processRequest method
- * without having to handle it.
+ * <li>The standard try-catch block within most processRequest methods has been included in the process method, which calls the processRequest method.
+ * Therefore, subclasses may throw an Exception in the processRequest method without having to handle it.
  * 
- * <li>The addPageMessage method has been declared to streamline the process of
- * setting page-level messages. The accompanying showPageMessages.jsp file in
- * jsp/include/ automatically displays all of the page messages; the developer
- * need only include this file in the jsp.
+ * <li>The addPageMessage method has been declared to streamline the process of setting page-level messages. The accompanying showPageMessages.jsp file in
+ * jsp/include/ automatically displays all of the page messages; the developer need only include this file in the jsp.
  * 
- * <li>The addEntityList method makes it easy to add a Collection of EntityBeans
- * to the request. Note that this method should only be used for Collections
- * from which one EntityBean must be selected by the user. If the Collection is
- * empty, this method will throw an InconsistentStateException, taking the user
- * to an error page and settting a page message indicating that the user may not
- * proceed because no entities are present. Note that the error page and the
- * error message must be specified.
+ * <li>The addEntityList method makes it easy to add a Collection of EntityBeans to the request. Note that this method should only be used for Collections from
+ * which one EntityBean must be selected by the user. If the Collection is empty, this method will throw an InconsistentStateException, taking the user to an
+ * error page and settting a page message indicating that the user may not proceed because no entities are present. Note that the error page and the error
+ * message must be specified.
  * </ol>
  * 
  * @author ssachs, modified by ywang
@@ -166,7 +151,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     public static final String POP_UP_URL = "popUpURL";
 
-    //public static String DATASET_HOME_DIR = "OpenClinica";
+    // public static String DATASET_HOME_DIR = "OpenClinica";
 
     // Use this variable as the key for the support url
     public static final String SUPPORT_URL = "supportURL";
@@ -221,7 +206,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     @Override
     public void init() throws ServletException {
         context = getServletContext();
-        //DATASET_HOME_DIR = context.getInitParameter("datasetHomeDir");
+        // DATASET_HOME_DIR = context.getInitParameter("datasetHomeDir");
     }
 
     /**
@@ -294,13 +279,11 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             // from the perspective of
             // JUnit servlets tests
             /*
-             * if(sm==null && (!StringUtil.isBlank(userName))) {//check if user
-             * logged in, then create a new sessionmanger to get ub //create a
-             * new sm in order to get a new ub object sm = new
-             * SessionManager(ub, userName); }
+             * if(sm==null && (!StringUtil.isBlank(userName))) {//check if user logged in, then create a new sessionmanger to get ub //create a new sm in order
+             * to get a new ub object sm = new SessionManager(ub, userName); }
              */
             // BWP 01/08 >>
-            //sm = new SessionManager(ub, userName);
+            // sm = new SessionManager(ub, userName);
             sm = new SessionManager(ub, userName, SpringServletAccess.getApplicationContext(context));
             ub = sm.getUserBean();
             session.setAttribute("userBean", ub);
@@ -329,14 +312,9 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                     // set up the panel here, tbh
                     panel.reset();
                     /*
-                     * panel.setData("Study", currentStudy.getName());
-                     * panel.setData("Summary", currentStudy.getSummary());
-                     * panel.setData("Start Date",
-                     * sdf.format(currentStudy.getDatePlannedStart()));
-                     * panel.setData("End Date",
-                     * sdf.format(currentStudy.getDatePlannedEnd()));
-                     * panel.setData("Principal Investigator",
-                     * currentStudy.getPrincipalInvestigator());
+                     * panel.setData("Study", currentStudy.getName()); panel.setData("Summary", currentStudy.getSummary()); panel.setData("Start Date",
+                     * sdf.format(currentStudy.getDatePlannedStart())); panel.setData("End Date", sdf.format(currentStudy.getDatePlannedEnd()));
+                     * panel.setData("Principal Investigator", currentStudy.getPrincipalInvestigator());
                      */
                     session.setAttribute(STUDY_INFO_PANEL, panel);
                 } else {
@@ -354,8 +332,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
             if (currentStudy.getParentStudyId() > 0) {
                 /*
-                 * The Role decription will be set depending on whether the user
-                 * logged in at study lever or site level. issue-2422
+                 * The Role decription will be set depending on whether the user logged in at study lever or site level. issue-2422
                  */
                 List roles = Role.toArrayList();
                 for (Iterator it = roles.iterator(); it.hasNext();) {
@@ -382,8 +359,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 }
             } else {
                 /*
-                 * If the current study is a site, we will change the role
-                 * description. issue-2422
+                 * If the current study is a site, we will change the role description. issue-2422
                  */
                 List roles = Role.toArrayList();
                 for (Iterator it = roles.iterator(); it.hasNext();) {
@@ -454,7 +430,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             // ss_names += " - " + en_session.nextElement();
             // }
             // logger.info(ss_names);
-            //			
+            //
             // // also added tbh, 102007
             // String rq_names = "request names: ";
             // while (en_request.hasMoreElements()) {
@@ -479,11 +455,20 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             // addPageMessage(ipe.getOpenClinicaMessage());
             forwardPage(ipe.getGoTo());
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.warn("OpenClinicaException:: org.akaza.openclinica.control.SecureController:: " + e.getMessage());
+            // e.printStackTrace();
+            logger.error(SecureController.getStackTrace(e));
 
             forwardPage(Page.ERROR);
         }
+    }
+
+    public static String getStackTrace(Throwable t) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw, true);
+        t.printStackTrace(pw);
+        pw.flush();
+        sw.flush();
+        return sw.toString();
     }
 
     /**
@@ -524,10 +509,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     /**
      * <P>
-     * Forwards to a jsp page. Additions to the forwardPage() method involve
-     * checking the session for the bread crumb trail and setting it, if
-     * necessary. Setting it here allows the developer to only have to update
-     * the <code>BreadcrumbTrail</code> class.
+     * Forwards to a jsp page. Additions to the forwardPage() method involve checking the session for the bread crumb trail and setting it, if necessary.
+     * Setting it here allows the developer to only have to update the <code>BreadcrumbTrail</code> class.
      * 
      * @param jspPage
      *            The page to go to.
@@ -585,17 +568,13 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     }
 
     /**
-     * This method supports functionality of the type "if a list of entities is
-     * empty, then jump to some page and display an error message." This
-     * prevents users from seeing empty drop-down lists and being given error
-     * messages when they can't choose an entity from the drop-down list. Use,
-     * e.g.:
+     * This method supports functionality of the type "if a list of entities is empty, then jump to some page and display an error message." This prevents users
+     * from seeing empty drop-down lists and being given error messages when they can't choose an entity from the drop-down list. Use, e.g.:
      * <code>addEntityList("groups", allGroups, "There are no groups to display, so you cannot add a subject to this Study.",
      * Page.SUBMIT_DATA)</code>
      * 
      * @param beanName
-     *            The name of the entity list as it should be stored in the
-     *            request object.
+     *            The name of the entity list as it should be stored in the request object.
      * @param list
      *            The Collection of entities.
      * @param messageIfEmpty
@@ -613,8 +592,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     }
 
     /**
-     * @return A blank String if this servlet is not an Administer System
-     *         servlet. SecureController.ADMIN_SERVLET_CODE otherwise.
+     * @return A blank String if this servlet is not an Administer System servlet. SecureController.ADMIN_SERVLET_CODE otherwise.
      */
     protected String getAdminServlet() {
         return "";
@@ -629,8 +607,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     }
 
     /**
-     * Check if an entity with passed entity id is included in studies of
-     * current user.
+     * Check if an entity with passed entity id is included in studies of current user.
      * 
      * @author ywang 10-18-2007
      * @param entityId
@@ -769,18 +746,18 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     }
 
     public Boolean sendEmail(String to, String subject, String body, Boolean htmlEmail, Boolean sendMessage) throws Exception {
-        return sendEmail(to, EmailEngine.getAdminEmail(), subject, body, htmlEmail, respage.getString("your_message_sent_succesfully"), respage
-                .getString("mail_cannot_be_sent_to_admin"), sendMessage);
+        return sendEmail(to, EmailEngine.getAdminEmail(), subject, body, htmlEmail, respage.getString("your_message_sent_succesfully"),
+                respage.getString("mail_cannot_be_sent_to_admin"), sendMessage);
     }
 
     public Boolean sendEmail(String to, String subject, String body, Boolean htmlEmail) throws Exception {
-        return sendEmail(to, EmailEngine.getAdminEmail(), subject, body, htmlEmail, respage.getString("your_message_sent_succesfully"), respage
-                .getString("mail_cannot_be_sent_to_admin"), true);
+        return sendEmail(to, EmailEngine.getAdminEmail(), subject, body, htmlEmail, respage.getString("your_message_sent_succesfully"),
+                respage.getString("mail_cannot_be_sent_to_admin"), true);
     }
 
     public Boolean sendEmail(String to, String from, String subject, String body, Boolean htmlEmail) throws Exception {
-        return sendEmail(to, from, subject, body, htmlEmail, respage.getString("your_message_sent_succesfully"), respage
-                .getString("mail_cannot_be_sent_to_admin"), true);
+        return sendEmail(to, from, subject, body, htmlEmail, respage.getString("your_message_sent_succesfully"),
+                respage.getString("mail_cannot_be_sent_to_admin"), true);
     }
 
     public Boolean sendEmail(String to, String from, String subject, String body, Boolean htmlEmail, String successMessage, String failMessage,
@@ -881,9 +858,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     }
 
     /**
-     * A inner class designed to allow the implementation of a JUnit test case
-     * for abstract SecureController. The inner class allows the test case to
-     * call the outer class' private process() method.
+     * A inner class designed to allow the implementation of a JUnit test case for abstract SecureController. The inner class allows the test case to call the
+     * outer class' private process() method.
      * 
      * @author Bruce W. Perry 01/2008
      * @see org.akaza.openclinica.servlettests.SecureControllerServletTest

@@ -6,9 +6,11 @@ import org.akaza.openclinica.bean.extract.ExtractBean;
 import org.akaza.openclinica.bean.extract.SPSSReportBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.OpenClinicaMailSender;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -87,6 +89,7 @@ public class ExampleSpringJob extends QuartzJobBean {
         SimpleTrigger trigger = (SimpleTrigger) context.getTrigger();
         try {
             ApplicationContext appContext = (ApplicationContext) context.getScheduler().getContext().get("applicationContext");
+            String studySubjectNumber = ((CoreResources) appContext.getBean("coreResources")).getField("extract.number");
             dataSource = (DataSource) appContext.getBean("dataSource");
             mailSender = (OpenClinicaMailSender) appContext.getBean("openClinicaMailSender");
             AuditEventDAO auditEventDAO = new AuditEventDAO(dataSource);
@@ -227,11 +230,9 @@ public class ExampleSpringJob extends QuartzJobBean {
 
                 if ("1".equals(cdisc)) {
                     String odmVersion = "oc1.2";
-                    /*
                     fileName =
                         generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, datasetBean, activeStudy, generalFileDirCopy, eb,
-                                activeStudy.getId(), parentStudy.getId());
-                                */
+                                activeStudy.getId(), parentStudy.getId(),studySubjectNumber);
                     logger.debug("-- gen odm file");
                     message.append("<p>" + pageMessages.getString("html_email_body_4") + " " + getFileNameStr(fileName)
                         + pageMessages.getString("html_email_body_4_5") + SQLInitServlet.getField("sysURL.base") + "AccessFile?fileId="
@@ -252,11 +253,9 @@ public class ExampleSpringJob extends QuartzJobBean {
 
                 if ("1".equals(cdisc12)) {
                     String odmVersion = "1.2";
-                    /*
                     fileName =
                         generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, datasetBean, activeStudy, generalFileDirCopy, eb,
-                                activeStudy.getId(), parentStudy.getId());
-                                */
+                                activeStudy.getId(), parentStudy.getId(),studySubjectNumber);
                     logger.debug("-- gen odm file 1.2 default");
                     message.append("<p>" + pageMessages.getString("html_email_body_4") + " " + getFileNameStr(fileName)
                         + pageMessages.getString("html_email_body_4_5") + SQLInitServlet.getField("sysURL.base") + "AccessFile?fileId="
@@ -274,11 +273,9 @@ public class ExampleSpringJob extends QuartzJobBean {
 
                 if ("1".equals(cdisc13)) {
                     String odmVersion = "1.3";
-                    /*
                     fileName =
                         generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, datasetBean, activeStudy, generalFileDirCopy, eb,
-                                activeStudy.getId(), parentStudy.getId());
-                                */
+                                activeStudy.getId(), parentStudy.getId(),studySubjectNumber);
                     logger.debug("-- gen odm file 1.3");
                     message.append("<p>" + pageMessages.getString("html_email_body_4") + " " + getFileNameStr(fileName)
                         + pageMessages.getString("html_email_body_4_5") + SQLInitServlet.getField("sysURL.base") + "AccessFile?fileId="
@@ -298,11 +295,9 @@ public class ExampleSpringJob extends QuartzJobBean {
 
                 if ("1".equals(cdisc13oc)) {
                     String odmVersion = "oc1.3";
-                    /*
                     fileName =
                         generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, datasetBean, activeStudy, generalFileDirCopy, eb,
-                                activeStudy.getId(), parentStudy.getId());
-                                */
+                                activeStudy.getId(), parentStudy.getId(),studySubjectNumber);
                     logger.debug("-- gen odm file 1.3 oc");
                     message.append("<p>" + pageMessages.getString("html_email_body_4") + " " + getFileNameStr(fileName)
                         + pageMessages.getString("html_email_body_4_5") + SQLInitServlet.getField("sysURL.base") + "AccessFile?fileId="
