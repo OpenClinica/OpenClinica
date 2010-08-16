@@ -12,11 +12,17 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.EventServiceInterface;
+import org.akaza.openclinica.ws.bean.StudyEventTransferBean;
+import org.akaza.openclinica.ws.validator.StudyEventTransferValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.xml.DomUtils;
+import org.springframework.validation.DataBinder;
+import org.springframework.validation.Errors;
+import org.springframework.validation.ObjectError;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.XPathParam;
@@ -48,8 +54,9 @@ public class EventEndpoint {
     private String dateFormat;
 
     private final EventServiceInterface eventService;
+    private final MessageSource messages;
     private final DataSource dataSource;
-    private final String SUCCESS_MESSAGE = "success";
+    Locale locale;
 
     /**
      * Constructor
@@ -57,9 +64,11 @@ public class EventEndpoint {
      * @param subjectService
      * @param cctsService
      */
-    public EventEndpoint(EventServiceInterface eventService, DataSource dataSource) {
+    public EventEndpoint(EventServiceInterface eventService, DataSource dataSource, MessageSource messages) {
         this.eventService = eventService;
+        this.messages = messages;
         this.dataSource = dataSource;
+        this.locale = new Locale("en_US");
     }
 
     /**
@@ -99,20 +108,40 @@ public class EventEndpoint {
         endDate = endDateElement == null ? null : DomUtils.getTextValue(endDateElement);
         endTime = endTimeElement == null ? null : DomUtils.getTextValue(endTimeElement);
 
-        HashMap<String, String> result =
-            eventService.validateAndSchedule(studySubjectId, studyIdentifier, siteIdentifier, eventDefinitionOID, location, getDate(startDate, startTime),
-                    getDate(endDate, endTime), getUserAccount());
-        return new DOMSource(mapConfirmation(result));
+        StudyEventTransferBean studyEventTransferBean =
+            new StudyEventTransferBean(studySubjectId, studyIdentifier, siteIdentifier, eventDefinitionOID, location, getDate(startDate, startTime), getDate(
+                    endDate, endTime), getUserAccount());
+
+        DataBinder dataBinder = new DataBinder((studyEventTransferBean));
+        Errors errors = dataBinder.getBindingResult();
+        StudyEventTransferValidator studyEventTransferValidator = new StudyEventTransferValidator(dataSource);
+        studyEventTransferValidator.validate((studyEventTransferBean), errors);
+
+        if (!errors.hasErrors()) {
+
+            try {
+                HashMap<String, String> h =
+                    getEventService().scheduleEvent(studyEventTransferBean.getUser(), studyEventTransferBean.getStartDateTime(),
+                            studyEventTransferBean.getEndDateTime(), location, studyEventTransferBean.getStudyUniqueId(),
+                            studyEventTransferBean.getSiteUniqueId(), eventDefinitionOID, studyEventTransferBean.getStudySubjectId());
+                return new DOMSource(mapSuccessConfirmation(h));
+            } catch (OpenClinicaSystemException ose) {
+                errors.reject("eventEndpoint.cannot_schedule", "Cannot schedule an event for this Subject.");
+                return new DOMSource(mapFailConfirmation(errors));
+            }
+        } else {
+            return new DOMSource(mapFailConfirmation(errors));
+        }
     }
 
     /**
-     * Create Response
+     * Create Success Response
      * 
      * @param confirmation
      * @return
      * @throws Exception
      */
-    private Element mapConfirmation(HashMap<String, String> confirmation) throws Exception {
+    private Element mapSuccessConfirmation(HashMap<String, String> confirmation) throws Exception {
         DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
         Document document = docBuilder.newDocument();
@@ -122,7 +151,7 @@ public class EventEndpoint {
         Element eventDefinitionOID = document.createElementNS(NAMESPACE_URI_V1, "eventDefinitionOID");
         Element studySubjectOID = document.createElementNS(NAMESPACE_URI_V1, "studySubjectOID");
         Element eventOrdinal = document.createElementNS(NAMESPACE_URI_V1, "studyEventOrdinal");
-        resultElement.setTextContent(SUCCESS_MESSAGE);
+        resultElement.setTextContent(messages.getMessage("eventEndpoint.success", null, "Success", locale));
         eventDefinitionOID.setTextContent(confirmation.get("eventDefinitionOID"));
         studySubjectOID.setTextContent(confirmation.get("studySubjectOID"));
         eventOrdinal.setTextContent(confirmation.get("studyEventOrdinal"));
@@ -130,6 +159,32 @@ public class EventEndpoint {
         responseElement.appendChild(eventDefinitionOID);
         responseElement.appendChild(studySubjectOID);
         responseElement.appendChild(eventOrdinal);
+        return responseElement;
+
+    }
+
+    /**
+     * Create Error Response
+     * 
+     * @param confirmation
+     * @return
+     * @throws Exception
+     */
+    private Element mapFailConfirmation(Errors errors) throws Exception {
+        DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
+        Document document = docBuilder.newDocument();
+
+        Element responseElement = document.createElementNS(NAMESPACE_URI_V1, "scheduleResponse");
+        Element resultElement = document.createElementNS(NAMESPACE_URI_V1, "result");
+        resultElement.setTextContent(messages.getMessage("eventEndpoint.fail", null, "Fail", locale));
+        responseElement.appendChild(resultElement);
+        for (ObjectError error : errors.getAllErrors()) {
+            Element errorElement = document.createElementNS(NAMESPACE_URI_V1, "error");
+            String theMessage = messages.getMessage(error.getCode(), error.getArguments(), locale);
+            errorElement.setTextContent(theMessage);
+            responseElement.appendChild(errorElement);
+        }
         return responseElement;
 
     }
@@ -186,6 +241,10 @@ public class EventEndpoint {
      */
     public void setDateFormat(String dateFormat) {
         this.dateFormat = dateFormat;
+    }
+
+    public EventServiceInterface getEventService() {
+        return eventService;
     }
 
 }

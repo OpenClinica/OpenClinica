@@ -9,9 +9,9 @@
             <element name="eventDefinitionOID" type="beans:customStringType"/>
             <element name="location" type="beans:customStringType"/>
             <element name="startDate" type="date"/>
-            <element name="startTime" type="beans:customTimeType" minOccurs="0"/>
+            <element name="startTime" type="time" minOccurs="0"/>
             <element name="endDate" type="date" minOccurs="0"/>
-            <element name="endTime" type="beans:customTimeType" minOccurs="0"/>
+            <element name="endTime" type="time" minOccurs="0"/>
         </sequence>
     </complexType>
     

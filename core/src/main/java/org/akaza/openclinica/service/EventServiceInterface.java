@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 public interface EventServiceInterface {
 
-    public HashMap<String, String> validateAndSchedule(String studySubjectId, String studyUniqueId, String siteUniqueId, String eventDefinitionOID,
-            String location, Date startDateTime, Date endDateTime, UserAccountBean user) throws OpenClinicaSystemException;
+    public HashMap<String, String> scheduleEvent(UserAccountBean user, Date startDateTime, Date endDateTime, String location, String studyUniqueId,
+            String siteUniqueId, String eventDefinitionOID, String studySubjectId) throws OpenClinicaSystemException;
 
 }

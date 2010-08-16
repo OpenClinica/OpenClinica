@@ -18,7 +18,7 @@
      </bean>
      
      <bean id="studyEventDefinitionSchema" class="org.springframework.xml.xsd.SimpleXsdSchema">
-         <property name="xsd" value="/WEB-INF/schemas/studyEventDefinition/studyEventDefinition.xsd" />
+         <property name="xsd" value="/WEB-INF/schemas/studyEventDefinition.xsd" />
      </bean>
      
      <bean id="studyWsdl" class="org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition">
@@ -92,7 +92,13 @@
     <bean id="dateAdapter" class="org.akaza.openclinica.ws.DateAdapter" />
 
     <bean id="jaxb2Marshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
-        <property name="contextPath" value="org.akaza.openclinica.ws.generated"/>
+        <property name="contextPaths">
+            <list>
+                <value>org.openclinica.ws.beans</value>
+                <value>org.openclinica.ws.crf.v1</value>
+                <value>org.openclinica.ws.studysubject.v1</value>
+            </list>    
+        </property>
         <property name="mtomEnabled" value="true"/>
         <property name="adapters">
             <list><ref bean="dateAdapter"/></list>    
@@ -112,12 +118,14 @@
     <bean id="studySubjectEndpoint" class="org.akaza.openclinica.ws.StudySubjectEndpoint">
         <constructor-arg ref="subjectService"/>
         <constructor-arg ref="dataSource"/>
+        <constructor-arg ref="messageSource"/>
         <property name="dateFormat" value="yyyy-MM-dd"/>
     </bean>
     
     <bean id="eventEndpoint" class="org.akaza.openclinica.ws.EventEndpoint">
         <constructor-arg ref="eventService"/>
         <constructor-arg ref="dataSource"/>
+        <constructor-arg ref="messageSource"/>
         <property name="dateFormat" value="yyyy-MM-dd"/>
     </bean>
     

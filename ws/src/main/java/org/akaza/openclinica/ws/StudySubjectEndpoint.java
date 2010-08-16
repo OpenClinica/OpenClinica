@@ -15,54 +15,54 @@ import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
-import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.subject.SubjectServiceInterface;
+import org.akaza.openclinica.validator.SubjectTransferValidator;
+import org.openclinica.ws.beans.EventType;
+import org.openclinica.ws.beans.EventsType;
+import org.openclinica.ws.beans.GenderType;
+import org.openclinica.ws.beans.ListStudySubjectsInStudyType;
+import org.openclinica.ws.beans.StudyRefType;
+import org.openclinica.ws.beans.StudySubjectWithEventsType;
+import org.openclinica.ws.beans.StudySubjectsType;
+import org.openclinica.ws.beans.SubjectType;
+import org.openclinica.ws.studysubject.v1.ListAllByStudyResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.xml.DomUtils;
+import org.springframework.validation.DataBinder;
+import org.springframework.validation.Errors;
+import org.springframework.validation.ObjectError;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.XPathParam;
-import org.akaza.openclinica.ws.generated.CreateCrfResponse;
-import org.akaza.openclinica.ws.generated.CrfType;
-import org.akaza.openclinica.ws.generated.EventType;
-import org.akaza.openclinica.ws.generated.ListStudySubjectsInStudyType;
-import org.akaza.openclinica.ws.generated.ListStudySubjectsInStudyResponse;
-import org.akaza.openclinica.ws.generated.StudyRefType;
-import org.akaza.openclinica.ws.generated.SiteRefType;
-import org.akaza.openclinica.ws.generated.StudySubjectType;
-import org.akaza.openclinica.ws.generated.StudySubjectsType;
-import org.akaza.openclinica.ws.generated.EventsType;
-import org.akaza.openclinica.ws.generated.StudySubjectWithEventsType;
-import org.akaza.openclinica.ws.generated.GenderType;
-import org.akaza.openclinica.ws.generated.SubjectType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import java.io.FileOutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Locale;
 
 import javax.sql.DataSource;
 import javax.xml.bind.JAXBElement;
+import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Source;
@@ -77,72 +77,89 @@ public class StudySubjectEndpoint {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     private final String NAMESPACE_URI_V1 = "http://openclinica.org/ws/studySubject/v1";
-    private final String SUCCESS_MESSAGE = "success";
-    private final String FAIL_MESSAGE = "fail";
     private String dateFormat;
 
     private final SubjectServiceInterface subjectService;
+    private final DataSource dataSource;
+    private final MessageSource messages;
     StudyDAO studyDao;
     UserAccountDAO userAccountDao;
     SubjectDAO subjectDao;
-
-    private final DataSource dataSource;
+    private final Locale locale;
 
     /**
      * Constructor
      * 
      * @param subjectService
-     * @param cctsService
+     * @param dataSource
      */
-    public StudySubjectEndpoint(SubjectServiceInterface subjectService, DataSource dataSource) {
+    public StudySubjectEndpoint(SubjectServiceInterface subjectService, DataSource dataSource, MessageSource messages) {
         this.subjectService = subjectService;
         this.dataSource = dataSource;
+        this.messages = messages;
+        this.locale = new Locale("en_US");
     }
 
     /**
-     * if NAMESPACE_URI_V1:commitRequest execute this method
+     * Use this method to create new study subjects in OpenClinica.
      * 
-     * @param gridId
      * @param subject
-     * @param studyOid
-     * @return
+     * @return Source
      * @throws Exception
      */
     @PayloadRoot(localPart = "createRequest", namespace = NAMESPACE_URI_V1)
-    public Source createSubject(@XPathParam("//studySubject:studySubject") NodeList subject) throws Exception {
-        ResourceBundleProvider.updateLocale(new Locale("en_US"));
+    public Source createStudySubject(@XPathParam("//studySubject:studySubject") NodeList subject) throws Exception {
+        ResourceBundleProvider.updateLocale(locale);
         Element subjectElement = (Element) subject.item(0);
         SubjectTransferBean subjectTransferBean = unMarshallToSubjectTransfer(subjectElement);
-        // TODO: Add Logic
-        if (subjectService.validate(subjectTransferBean)) {
+
+        DataBinder dataBinder = new DataBinder((subjectTransferBean));
+        Errors errors = dataBinder.getBindingResult();
+        SubjectTransferValidator subjectTransferValidator = new SubjectTransferValidator(dataSource);
+        subjectTransferValidator.validate((subjectTransferBean), errors);
+        if (!errors.hasErrors()) {
             String label = create(subjectTransferBean);
-            return new DOMSource(mapConfirmation(SUCCESS_MESSAGE, label));
+            return new DOMSource(mapConfirmation(messages.getMessage("studySubjectEndpoint.success", null, "Success", locale), label, errors));
         } else {
-            return new DOMSource(mapConfirmation(FAIL_MESSAGE, null));
+            return new DOMSource(mapConfirmation(messages.getMessage("studySubjectEndpoint.fail", null, "Fail", locale), null, errors));
         }
     }
-    
-    
 
-    @PayloadRoot(localPart = "listStudySubjectsInStudyRequest", namespace = NAMESPACE_URI_V1)
-    public ListStudySubjectsInStudyResponse listStudySubjectsInStudy(JAXBElement<ListStudySubjectsInStudyType> requestElement) throws Exception {
+    /**
+     * Use this method to list all study subjects. Scheduled event data will also be show if available.
+     * 
+     * @param requestElement
+     * @return ListAllByStudyResponse
+     * @throws Exception
+     */
+    @PayloadRoot(localPart = "listAllByStudyRequest", namespace = NAMESPACE_URI_V1)
+    public ListAllByStudyResponse listStudySubjectsInStudy(JAXBElement<ListStudySubjectsInStudyType> requestElement) throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         ListStudySubjectsInStudyType listStudySubjectsInStudyType = requestElement.getValue();
         StudyBean study = null;
         try {
             study = validateRequestAndReturnStudy(listStudySubjectsInStudyType.getStudyRef());
-        } catch (Exception e) {
-            ListStudySubjectsInStudyResponse response = new ListStudySubjectsInStudyResponse();
-            response.setResult(FAIL_MESSAGE);
-            response.getError().add(e.getMessage());
+        } catch (OpenClinicaSystemException e) {
+            ListAllByStudyResponse response = new ListAllByStudyResponse();
+            response.setResult(messages.getMessage("studySubjectEndpoint.fail", null, "Fail", locale));
+            response.getError().add(messages.getMessage(e.getErrorCode(), null, e.getErrorCode(), locale));
             return response;
         }
-        //return new DOMSource(mapConfirmation(study, SUCCESS_MESSAGE),listStudySubjectsInStudyType.getStudyRef());
-        return mapConfirmation(study, SUCCESS_MESSAGE, listStudySubjectsInStudyType.getStudyRef());
+        return mapListStudySubjectsInStudyResponse(study, messages.getMessage("studySubjectEndpoint.success", null, "Success", locale),
+                listStudySubjectsInStudyType.getStudyRef());
     }
-    
-    private ListStudySubjectsInStudyResponse mapConfirmation(StudyBean study, String message, StudyRefType studyRef) throws Exception{
-        ListStudySubjectsInStudyResponse response  = new ListStudySubjectsInStudyResponse();
+
+    /**
+     * Build the response for listStudySubjectsInStudy method
+     * 
+     * @param study
+     * @param message
+     * @param studyRef
+     * @return ListAllByStudyResponse
+     * @throws Exception
+     */
+    private ListAllByStudyResponse mapListStudySubjectsInStudyResponse(StudyBean study, String message, StudyRefType studyRef) throws Exception {
+        ListAllByStudyResponse response = new ListAllByStudyResponse();
         response.setResult(message);
         StudySubjectsType studySubjectsType = new StudySubjectsType();
         response.setStudySubjects(studySubjectsType);
@@ -152,25 +169,28 @@ public class StudySubjectEndpoint {
             SubjectType subjectType = new SubjectType();
             studySubjectType.setLabel(studySubjectBean.getLabel());
             studySubjectType.setSecondaryLabel(studySubjectBean.getSecondaryLabel());
-            GregorianCalendar gc = new GregorianCalendar();
-            gc.setTime(studySubjectBean.getEnrollmentDate());
-            DatatypeFactory df = DatatypeFactory.newInstance();
-            df.newXMLGregorianCalendar(gc);
-            studySubjectType.setEnrollmentDate(df.newXMLGregorianCalendar(gc));
-            SubjectBean subjectBean = (SubjectBean)getSubjectDao().findByPK(studySubjectBean.getSubjectId());
+            studySubjectType.setEnrollmentDate(getXMLGregorianCalendarDate(studySubjectBean.getEnrollmentDate()));
+            SubjectBean subjectBean = (SubjectBean) getSubjectDao().findByPK(studySubjectBean.getSubjectId());
             subjectType.setUniqueIdentifier(subjectBean.getUniqueIdentifier());
             subjectType.setGender(GenderType.fromValue(String.valueOf(subjectBean.getGender())));
+            subjectType.setDateOfBirth(getXMLGregorianCalendarDate(subjectBean.getDateOfBirth()));
             studySubjectType.setSubject(subjectType);
-            //studySubjectType.setStudyRef(studyRef);
+            // studySubjectType.setStudyRef(studyRef);
             studySubjectType.setEvents(getEvents(studySubjectBean));
             studySubjectsType.getStudySubject().add(studySubjectType);
-            
 
         }
         return response;
     }
-    
-    private EventsType getEvents(StudySubjectBean studySubject) throws Exception{
+
+    /**
+     * Build Events sub section for ListStudySubjectsInStudyResponse
+     * 
+     * @param studySubject
+     * @return EventsType
+     * @throws Exception
+     */
+    private EventsType getEvents(StudySubjectBean studySubject) throws Exception {
         StudyEventDAO eventDao = new StudyEventDAO(dataSource);
         StudyEventDefinitionDAO studyEventDefinitionDao = new StudyEventDefinitionDAO(dataSource);
         EventsType eventsType = new EventsType();
@@ -179,66 +199,61 @@ public class StudySubjectEndpoint {
             EventType eventType = new EventType();
             eventType.setEventDefinitionOID(studyEventDefinitionDao.findByEventDefinitionCRFId(studyEventBean.getStudyEventDefinitionId()).getOid());
             eventType.setLocation(studyEventBean.getLocation());
-            GregorianCalendar gc = new GregorianCalendar();
-            gc.setTime(studyEventBean.getDateStarted());
-            DatatypeFactory df = DatatypeFactory.newInstance();
-            df.newXMLGregorianCalendar(gc);
-            eventType.setStartDate(df.newXMLGregorianCalendar(gc));
+            eventType.setStartDate(getXMLGregorianCalendarDate(studyEventBean.getDateStarted()));
+            eventType.setStartTime(getXMLGregorianCalendarTime(studyEventBean.getDateStarted()));
             eventsType.getEvent().add(eventType);
         }
         return eventsType;
     }
-    
-    
+
+    /**
+     * Validate the listStudySubjectsInStudy request.
+     * 
+     * @param studyRef
+     * @return StudyBean
+     */
     private StudyBean validateRequestAndReturnStudy(StudyRefType studyRef) {
 
         String studyIdentifier = studyRef == null ? null : studyRef.getIdentifier();
         String siteIdentifier = studyRef.getSiteRef() == null ? null : studyRef.getSiteRef().getIdentifier();
 
         if (studyIdentifier == null && siteIdentifier == null) {
-            throw new OpenClinicaSystemException("Provide a valid study");
+            throw new OpenClinicaSystemException("studySubjectEndpoint.provide_valid_study_site", "Provide a valid study/site.");
         }
         if (studyIdentifier != null && siteIdentifier == null) {
-            StudyBean study = (StudyBean) getStudyDao().findByName(studyIdentifier);
-            if (study.getId() == 0) {
-                throw new OpenClinicaSystemException("Invalid study");
-            }
-        }
-        if (studyIdentifier != null && siteIdentifier == null) {
-            StudyBean study = (StudyBean) getStudyDao().findByName(studyIdentifier);
-            if (study.getId() == 0) {
-                throw new OpenClinicaSystemException("Invalid study");
+            StudyBean study = getStudyDao().findByUniqueIdentifier(studyIdentifier);
+            if (study == null) {
+                throw new OpenClinicaSystemException("studySubjectEndpoint.invalid_study_identifier", "The study identifier you provided is not valid.");
             }
             StudyUserRoleBean studySur = getUserAccountDao().findRoleByUserNameAndStudyId(getUserAccount().getName(), study.getId());
             if (studySur.getStatus() != Status.AVAILABLE) {
-                throw new OpenClinicaSystemException("Invalid roles ");
+                throw new OpenClinicaSystemException("studySubjectEndpoint.insufficient_permissions",
+                        "You do not have sufficient privileges to proceed with this operation.");
             }
             return study;
         }
         if (studyIdentifier != null && siteIdentifier != null) {
-            StudyBean study = (StudyBean) getStudyDao().findByName(studyIdentifier);
-            StudyBean site = (StudyBean) getStudyDao().findByName(siteIdentifier);
-            if (study.getId() == 0 || site.getId() == 0 || site.getParentStudyId() != study.getId()) {
-                throw new OpenClinicaSystemException("Invalid study or site");
+            StudyBean study = getStudyDao().findByUniqueIdentifier(studyIdentifier);
+            StudyBean site = getStudyDao().findByUniqueIdentifier(siteIdentifier);
+            if (study == null || site == null || site.getParentStudyId() != study.getId()) {
+                throw new OpenClinicaSystemException("studySubjectEndpoint.invalid_study_site_identifier",
+                        "The study/site identifier you provided is not valid.");
             }
             StudyUserRoleBean siteSur = getUserAccountDao().findRoleByUserNameAndStudyId(getUserAccount().getName(), site.getId());
             if (siteSur.getStatus() != Status.AVAILABLE) {
-                throw new OpenClinicaSystemException("Invalid roles ");
+                throw new OpenClinicaSystemException("studySubjectEndpoint.insufficient_permissions",
+                        "You do not have sufficient privileges to proceed with this operation.");
             }
             return site;
         }
-
         return null;
-
     }
 
     /**
-     * UnMarshall SubjectTransferBean, aka create SubjectTransferBean from XML
+     * Process createStudySubject request by creating SubjectTransferBean from received payload.
      * 
-     * @param gridId
      * @param subjectElement
-     * @param studyOidValue
-     * @return
+     * @return SubjectTransferBean
      * @throws ParseException
      */
     private SubjectTransferBean unMarshallToSubjectTransfer(Element subjectElement) throws ParseException {
@@ -282,11 +297,17 @@ public class StudySubjectEndpoint {
         subjectTransferBean.setYearOfBirth(yearOfBirthValue);
         subjectTransferBean.setEnrollmentDate(getDate(enrollmentDateValue));
 
-        //subjectTransferBean.setOwner(getUserAccount());
+        // subjectTransferBean.setOwner(getUserAccount());
 
         return subjectTransferBean;
     }
 
+    /**
+     * Create the Subject object if it is not already in the system.
+     * 
+     * @param subjectTransferBean
+     * @return String
+     */
     private String create(SubjectTransferBean subjectTransferBean) {
         boolean isSubjectInMain = doesSubjectExist(subjectTransferBean);
 
@@ -300,6 +321,10 @@ public class StudySubjectEndpoint {
         }
     }
 
+    /**
+     * @param subjectTransferBean
+     * @return
+     */
     private boolean doesSubjectExist(SubjectTransferBean subjectTransferBean) {
         // TODO: Implement this
         StudySubjectDAO ssdao = new StudySubjectDAO(dataSource);
@@ -323,33 +348,77 @@ public class StudySubjectEndpoint {
     }
 
     /**
-     * Create Response
+     * Create createStudySubject request Build the response for createStudySubject method
      * 
      * @param confirmation
-     * @return
+     *            operation result
+     * @param studySubjectLabel
+     *            the studySubject label
+     * @return Element
      * @throws Exception
+     * @see #createStudySubject
      */
-    private Element mapConfirmation(String confirmation, String theLabel) throws Exception {
+    private Element mapConfirmation(String confirmation, String studySubjectLabel, Errors errors) throws Exception {
         DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
         Document document = docBuilder.newDocument();
 
         Element responseElement = document.createElementNS(NAMESPACE_URI_V1, "createResponse");
         Element resultElement = document.createElementNS(NAMESPACE_URI_V1, "result");
-        Element label = document.createElementNS(NAMESPACE_URI_V1, "label");
         resultElement.setTextContent(confirmation);
-        label.setTextContent(theLabel);
+        Element labelElement = document.createElementNS(NAMESPACE_URI_V1, "label");
+        labelElement.setTextContent(studySubjectLabel);
         responseElement.appendChild(resultElement);
-        responseElement.appendChild(label);
+        responseElement.appendChild(labelElement);
+
+        for (ObjectError error : errors.getAllErrors()) {
+            Element errorElement = document.createElementNS(NAMESPACE_URI_V1, "error");
+            String theMessage = messages.getMessage(error.getCode(), error.getArguments(), locale);
+            errorElement.setTextContent(theMessage);
+            responseElement.appendChild(errorElement);
+        }
         return responseElement;
 
     }
 
     /**
-     * Helper Method to resolve dates
+     * Helper method that translates a date object to an XMLGregorianCalendar which is the data type used in jaxb generated classes.
+     * 
+     * @param date
+     * @return XMLGregorianCalendar
+     * @throws Exception
+     */
+    private XMLGregorianCalendar getXMLGregorianCalendarDate(Date date) throws Exception {
+        GregorianCalendar gc = new GregorianCalendar();
+        gc.setTime(date);
+        DatatypeFactory df = DatatypeFactory.newInstance();
+        XMLGregorianCalendar gcDate =
+            df.newXMLGregorianCalendarDate(gc.get(Calendar.YEAR), gc.get(Calendar.MONTH) + 1, gc.get(Calendar.DAY_OF_MONTH), DatatypeConstants.FIELD_UNDEFINED);
+        return gcDate;
+    }
+
+    /**
+     * Helper method that translates a date object (specifically time) to an XMLGregorianCalendar which is the data type used in jaxb generated classes.
+     * 
+     * @param date
+     * @return XMLGregorianCalendar
+     * @throws Exception
+     */
+    private XMLGregorianCalendar getXMLGregorianCalendarTime(Date date) throws Exception {
+        GregorianCalendar gc = new GregorianCalendar();
+        gc.setTime(date);
+        DatatypeFactory df = DatatypeFactory.newInstance();
+        XMLGregorianCalendar gcTime =
+            df.newXMLGregorianCalendarTime(gc.get(Calendar.HOUR_OF_DAY), gc.get(Calendar.MINUTE), gc.get(Calendar.SECOND), null,
+                    DatatypeConstants.FIELD_UNDEFINED);
+        return gcTime;
+    }
+
+    /**
+     * Helper Method to resolve a date provided as a string to a Date object.
      * 
      * @param dateAsString
-     * @return
+     * @return Date
      * @throws ParseException
      */
     private Date getDate(String dateAsString) throws ParseException {
@@ -374,20 +443,14 @@ public class StudySubjectEndpoint {
         return (UserAccountBean) userAccountDao.findByUserName(username);
     }
 
-    /**
-     * @return
-     */
     public String getDateFormat() {
         return dateFormat;
     }
 
-    /**
-     * @param dateFormat
-     */
     public void setDateFormat(String dateFormat) {
         this.dateFormat = dateFormat;
     }
-    
+
     public StudyDAO getStudyDao() {
         studyDao = studyDao != null ? studyDao : new StudyDAO(dataSource);
         return studyDao;
@@ -397,10 +460,14 @@ public class StudySubjectEndpoint {
         userAccountDao = userAccountDao != null ? userAccountDao : new UserAccountDAO(dataSource);
         return userAccountDao;
     }
-    
+
     public SubjectDAO getSubjectDao() {
         subjectDao = subjectDao != null ? subjectDao : new SubjectDAO(dataSource);
         return subjectDao;
+    }
+
+    public MessageSource getMessages() {
+        return messages;
     }
 
 }

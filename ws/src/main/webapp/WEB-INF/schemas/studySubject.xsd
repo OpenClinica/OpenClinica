@@ -26,13 +26,12 @@
         </complexType>
     </element>
     
-    <element name="listStudySubjectsInStudyRequest" type="beans:listStudySubjectsInStudyType"/>
+    <element name="listAllByStudyRequest" type="beans:listStudySubjectsInStudyType"/>
     
-    <element name="listStudySubjectsInStudyResponse">
+    <element name="listAllByStudyResponse">
         <complexType>
             <sequence>
                 <element name="result" type="string"/>
-                <element name="label" type="string"/>
                 <element name="warning" type="string" minOccurs="0" maxOccurs="unbounded"/>
                 <element name="error" type="string" minOccurs="0" maxOccurs="unbounded"/>
                 <element name="studySubjects" type="beans:studySubjectsType" />

@@ -1,9 +1,7 @@
 package org.akaza.openclinica.service;
 
-import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -44,83 +42,17 @@ public class EventService implements EventServiceInterface {
         this.dataSource = sessionManager.getDataSource();
     }
 
-    public HashMap<String, String> validateAndSchedule(String studySubjectId, String studyUniqueId, String siteUniqueId, String eventDefinitionOID,
-            String location, Date startDateTime, Date endDateTime, UserAccountBean user) throws OpenClinicaSystemException {
-
-        // Non Business Validation
-        if (studyUniqueId == null || studyUniqueId.length() < 1) {
-            logger.info("studyUniqueId is required.");
-            throw new OpenClinicaSystemException("studyUniqueId is required.");
-        }
+    public HashMap<String, String> scheduleEvent(UserAccountBean user, Date startDateTime, Date endDateTime, String location, String studyUniqueId,
+            String siteUniqueId, String eventDefinitionOID, String studySubjectId) throws OpenClinicaSystemException {
 
         // Business Validation
         StudyBean study = getStudyDao().findByUniqueIdentifier(studyUniqueId);
-
-        if (study == null) {
-            logger.info("Study Not Found");
-            throw new OpenClinicaSystemException("Study Not Found");
-        }
-
-        Boolean hasPriviledge = true;
         int parentStudyId = study.getId();
-        StudyUserRoleBean role = user.getRoleByStudy(study);
-        if (role.getId() == 0 || role.getRole().equals(Role.MONITOR)) {
-            hasPriviledge = false;
-        }
-
         if (siteUniqueId != null) {
             study = getStudyDao().findSiteByUniqueIdentifier(studyUniqueId, siteUniqueId);
         }
-
-        if (!hasPriviledge) {
-            role = user.getRoleByStudy(study);
-            if (role.getId() == 0 || role.getRole().equals(Role.MONITOR)) {
-                throw new OpenClinicaSystemException("You do not have sufficient priviliges to run this service");
-            }
-        }
-
-        // Non Business Validation
-        if (studySubjectId == null || studySubjectId.length() < 1) {
-            logger.info("studySubjectId is required.");
-            throw new OpenClinicaSystemException("studySubjectId is required.");
-        }
-        StudySubjectBean studySubject = getStudySubjectDao().findByLabelAndStudy(studySubjectId, study);
-        if (studySubject == null) {
-            logger.info("Study Subject Not Found");
-            throw new OpenClinicaSystemException("Study Subject Not Found");
-        }
-
-        // Non Business Validation
-        if (eventDefinitionOID == null || eventDefinitionOID.length() < 1) {
-            logger.info("eventDefinitionOID is required.");
-            throw new OpenClinicaSystemException("eventDefinitionOID is required.");
-        }
         StudyEventDefinitionBean studyEventDefinition = getStudyEventDefinitionDao().findByOidAndStudy(eventDefinitionOID, study.getId(), parentStudyId);
-        if (studyEventDefinition == null) {
-            logger.info("Study Event Definition Not Found");
-            throw new OpenClinicaSystemException("Study Event Definition Not Found");
-        }
-
-        if (startDateTime == null) {
-            logger.info("startDateTime required");
-            throw new OpenClinicaSystemException("startDateTime required");
-        }
-        if (location == null) {
-            logger.info("location required");
-            throw new OpenClinicaSystemException("location required");
-        }
-
-        Integer studyEventOrdinal = scheduleEvent(user, studySubject, studyEventDefinition, study, startDateTime, endDateTime, location);
-        HashMap<String, String> h = new HashMap<String, String>();
-        h.put("eventDefinitionOID", eventDefinitionOID);
-        h.put("studyEventOrdinal", studyEventOrdinal.toString());
-        h.put("studySubjectOID", studySubject.getOid());
-        return h;
-
-    }
-
-    Integer scheduleEvent(UserAccountBean user, StudySubjectBean studySubject, StudyEventDefinitionBean studyEventDefinition, StudyBean study,
-            Date startDateTime, Date endDateTime, String location) throws OpenClinicaSystemException {
+        StudySubjectBean studySubject = getStudySubjectDao().findByLabelAndStudy(studySubjectId, study);
 
         Integer studyEventOrdinal = null;
         if (canSubjectScheduleAnEvent(studyEventDefinition, studySubject)) {
@@ -141,7 +73,12 @@ public class EventService implements EventServiceInterface {
         } else {
             throw new OpenClinicaSystemException("Cannot schedule an event for this Subject");
         }
-        return studyEventOrdinal;
+
+        HashMap<String, String> h = new HashMap<String, String>();
+        h.put("eventDefinitionOID", eventDefinitionOID);
+        h.put("studyEventOrdinal", studyEventOrdinal.toString());
+        h.put("studySubjectOID", studySubject.getOid());
+        return h;
 
     }
 

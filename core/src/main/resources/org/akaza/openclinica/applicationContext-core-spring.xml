@@ -24,7 +24,7 @@
         <property name="dataInfo" ref="dataInfo"/>
      </bean>
      
-     <!-- ENABLING THIS WILL ACTIVATE I18N VIA SPRING  
+     <!-- ENABLING THIS WILL ACTIVATE I18N VIA SPRING -->
      <bean id="messageSource"
         class="org.springframework.context.support.ResourceBundleMessageSource">
         <property name="basenames">
@@ -38,10 +38,10 @@
                 <value>org.akaza.openclinica.i18n.terms</value>
                 <value>org.akaza.openclinica.i18n.words</value>
                 <value>org.akaza.openclinica.i18n.workflow</value>
+                <value>org.akaza.openclinica.i18n.ws_messages</value>
             </list>
         </property>
     </bean>
-     -->
      
      
      

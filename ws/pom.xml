@@ -369,7 +369,6 @@
 					</execution>
 				</executions>
 				<configuration>
-					<generatePackage>org.akaza.openclinica.ws.generated</generatePackage>
 					<schemaDirectory>src/main/webapp/WEB-INF/schemas</schemaDirectory>
 				</configuration>
 			</plugin>
