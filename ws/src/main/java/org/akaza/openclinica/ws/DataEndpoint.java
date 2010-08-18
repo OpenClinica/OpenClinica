@@ -9,6 +9,7 @@ import org.akaza.openclinica.web.crfdata.DataImportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
+import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.XPathParam;
 import org.w3c.dom.Document;
@@ -29,6 +30,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+@Endpoint
 public class DataEndpoint {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -50,7 +52,7 @@ public class DataEndpoint {
      * @return
      * @throws Exception
      */
-    @PayloadRoot(localPart = "importDataRequest", namespace = NAMESPACE_URI_V1)
+    @PayloadRoot(localPart = "importRequest", namespace = NAMESPACE_URI_V1)
     public Source importData(@XPathParam("//ODM") Element odmElement) throws Exception {
 
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
