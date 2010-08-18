@@ -667,9 +667,17 @@ if(!window.RepetitionElement || (
 
       //BROWSER BUG: _cloneNode used with Gecko because Gecko starts to have irratic behavior with a cloned
       //  input's value attribute and value property; furthermore, various MSIE bugs prevent its ise of cloneNode
+
+      //tabindex will hold the value of the tabindex of the last input element of the last row.
+      var tabindex;
       function _cloneNode(node){
         var clone, i, attr, el;
         var rad,check,selectOption,chked,selected,attributeVal;
+        if (typeof(node.name) != "undefined" && node.name.length > 0 && node.getAttribute('tabindex') != null){
+            //alert("node[" + node.name + "] tabindex=" + node.getAttribute('tabindex'));
+            tabindex = node.getAttribute('tabindex');
+        }
+
         if(node.nodeType == 1 /*Node.ELEMENT_NODE*/){
           //BROWSER BUG: MSIE does not allow the setting of the node.name, except when creating the new node
           clone = node.name ?
@@ -784,7 +792,22 @@ if(!window.RepetitionElement || (
         else clone = node.cloneNode(true);
         return clone;
       }
+
+      // We are using this function to update the tabindex of the last row so that the tabs traverses left to right rather
+      // than top to bottom.
+      function _updateTabindex(node) {
+        var i, el;
+        if (typeof(node.name) != "undefined" && node.name.length > 0 && node.getAttribute('tabindex') != null){
+            //alert("tabindex[" + tabindex + "]");
+            node.setAttribute('tabindex', parseInt(tabindex));
+        }
+        for (i = 0; el = node.childNodes[i]; i++) {
+            _updateTabindex(el);
+        }
+      }
+
       block = _cloneNode(this);
+      _updateTabindex(this);
       block._initialized = false;
 
 
