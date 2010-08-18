@@ -11,6 +11,16 @@
      
      <!-- WSDL Definitions -->
      
+     <bean id="dataWsdl" class="org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition">
+        <property name="schema" ref="dataSchema"/>
+        <property name="portTypeName" value="ws"/>
+        <property name="locationUri" value="/ws/data/v1"/>
+     </bean>
+     
+     <bean id="dataSchema" class="org.springframework.xml.xsd.SimpleXsdSchema">
+         <property name="xsd" value="/WEB-INF/schemas/data.xsd" />
+     </bean>
+     
      <bean id="studyEventDefinitionWsdl" class="org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition">
         <property name="schema" ref="studyEventDefinitionSchema"/>
         <property name="portTypeName" value="ws"/>
@@ -79,6 +89,7 @@
                 <prop key="studySubject">http://openclinica.org/ws/studySubject/v1</prop>
                 <prop key="study">http://openclinica.org/ws/study/v1</prop>
                 <prop key="sed">http://openclinica.org/ws/studyEventDefinition/v1</prop>
+                <prop key="data">http://openclinica.org/ws/data/v1</prop>
             </props>
         </property>
     </bean>
@@ -107,12 +118,19 @@
     
     <!--  Endpoints -->
     
+    <bean id="dataEndpoint" class="org.akaza.openclinica.ws.DataEndpoint">
+        <constructor-arg ref="dataSource"/>
+        <constructor-arg ref="messageSource"/>
+    </bean>
+    
      <bean id="studyEventDefinitionEndpoint" class="org.akaza.openclinica.ws.StudyEventDefinitionEndpoint">
         <constructor-arg ref="dataSource"/>
+        <constructor-arg ref="messageSource"/>
     </bean>
     
     <bean id="studyEndpoint" class="org.akaza.openclinica.ws.StudyEndpoint">
         <constructor-arg ref="dataSource"/>
+        <constructor-arg ref="messageSource"/>
     </bean>
     
     <bean id="studySubjectEndpoint" class="org.akaza.openclinica.ws.StudySubjectEndpoint">

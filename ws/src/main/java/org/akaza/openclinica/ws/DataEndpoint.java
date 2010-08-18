@@ -8,6 +8,7 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.web.crfdata.DataImportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.XPathParam;
 import org.w3c.dom.Document;
@@ -31,14 +32,16 @@ import javax.xml.transform.stream.StreamResult;
 public class DataEndpoint {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-    private final String NAMESPACE_URI_V1 = "http://openclinica.org/ws/dataImport/v1";
-    private final String SUCCESS_MESSAGE = "success";
-    private final String FAIL_MESSAGE = "fail";
+    private final String NAMESPACE_URI_V1 = "http://openclinica.org/ws/data/v1";
 
     private final DataSource dataSource;
+    private final MessageSource messages;
+    private final Locale locale;
 
-    public DataEndpoint(DataSource dataSource) {
+    public DataEndpoint(DataSource dataSource, MessageSource messages) {
         this.dataSource = dataSource;
+        this.messages = messages;
+        this.locale = new Locale("en_US");
     }
 
     /**
@@ -52,7 +55,7 @@ public class DataEndpoint {
 
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
 
-        System.out.println("rootElement=" + odmElement);
+        logger.debug("rootElement=" + odmElement);
 
         String xml = null;
         StudyBean studyBean = null;
@@ -66,9 +69,9 @@ public class DataEndpoint {
         }
 
         if (odmElement != null)
-            return new DOMSource(mapConfirmation(xml, studyBean, userBean, SUCCESS_MESSAGE, "Data imported successfuly"));
+            return new DOMSource(mapConfirmation(xml, studyBean, userBean, messages.getMessage("dataEndpoint.success", null, "Success", locale)));
         else
-            return new DOMSource(mapConfirmation(xml, studyBean, userBean, FAIL_MESSAGE, "Failed to import data"));
+            return new DOMSource(mapConfirmation(xml, studyBean, userBean, messages.getMessage("dataEndpoint.fail", null, "Success", locale)));
     }
 
     /**
@@ -78,7 +81,7 @@ public class DataEndpoint {
      * @return
      * @throws Exception
      */
-    private Element mapConfirmation(String xml, StudyBean studyBean, UserAccountBean userBean, String confirmation, String theLabel) throws Exception {
+    private Element mapConfirmation(String xml, StudyBean studyBean, UserAccountBean userBean, String confirmation) throws Exception {
 
         DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
@@ -86,11 +89,8 @@ public class DataEndpoint {
 
         Element responseElement = document.createElementNS(NAMESPACE_URI_V1, "importDataResponse");
         Element resultElement = document.createElementNS(NAMESPACE_URI_V1, "result");
-        Element label = document.createElementNS(NAMESPACE_URI_V1, "label");
         resultElement.setTextContent(confirmation);
-        label.setTextContent(theLabel);
         responseElement.appendChild(resultElement);
-        responseElement.appendChild(label);
 
         List<String> auditMsgs = new DataImportService().importData(dataSource, studyBean, userBean, xml);
 

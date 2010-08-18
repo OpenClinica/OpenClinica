@@ -6,14 +6,14 @@ import java.util.Date;
 
 public class StudyEventTransferBean {
 
-    String studySubjectId;
-    String studyUniqueId;
-    String siteUniqueId;
-    String eventDefinitionOID;
-    String location;
-    Date startDateTime;
-    Date endDateTime;
-    UserAccountBean user;
+    private String studySubjectId;
+    private String studyUniqueId;
+    private String siteUniqueId;
+    private String eventDefinitionOID;
+    private String location;
+    private Date startDateTime;
+    private Date endDateTime;
+    private UserAccountBean user;
 
     public StudyEventTransferBean(String studySubjectId, String studyUniqueId, String siteUniqueId, String eventDefinitionOID, String location,
             Date startDateTime, Date endDateTime, UserAccountBean user) {

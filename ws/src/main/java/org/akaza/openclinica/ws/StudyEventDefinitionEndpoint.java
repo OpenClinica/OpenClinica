@@ -1,8 +1,6 @@
 package org.akaza.openclinica.ws;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -14,13 +12,18 @@ import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.ws.bean.StudyEventDefinitionRequestBean;
+import org.akaza.openclinica.ws.validator.StudyEventDefinitionRequestValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.xml.DomUtils;
+import org.springframework.validation.DataBinder;
+import org.springframework.validation.Errors;
+import org.springframework.validation.ObjectError;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.XPathParam;
@@ -42,10 +45,9 @@ public class StudyEventDefinitionEndpoint {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     private final String NAMESPACE_URI_V1 = "http://openclinica.org/ws/studyEventDefinition/v1";
-    private final String SUCCESS_MESSAGE = "success";
-    private final String FAIL_MESSAGE = "fail";
-
     private final DataSource dataSource;
+    private final MessageSource messages;
+    private final Locale locale;
     StudyDAO studyDao;
     UserAccountDAO userAccountDao;
     CRFDAO crfDao;
@@ -53,8 +55,10 @@ public class StudyEventDefinitionEndpoint {
     StudyEventDefinitionDAO studyEventDefinitionDao;
     EventDefinitionCRFDAO eventDefinitionCRFDao;
 
-    public StudyEventDefinitionEndpoint(DataSource dataSource) {
+    public StudyEventDefinitionEndpoint(DataSource dataSource, MessageSource messages) {
         this.dataSource = dataSource;
+        this.messages = messages;
+        this.locale = new Locale("en_US");
     }
 
     /**
@@ -67,13 +71,31 @@ public class StudyEventDefinitionEndpoint {
     public Source getStudyList(@XPathParam("//sed:studyEventDefinitionListAll") NodeList studyNodeList) throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         Element studyRefElement = (Element) studyNodeList.item(0);
-        StudyBean study = null;
-        try {
-            study = unMarshallRequest(studyRefElement);
-        } catch (Exception e) {
-            return new DOMSource(mapFailConfirmation(FAIL_MESSAGE, e.getMessage()));
+
+        StudyEventDefinitionRequestBean studyEventDefinitionRequestBean = unMarshallRequest(studyRefElement);
+        DataBinder dataBinder = new DataBinder((studyEventDefinitionRequestBean));
+        Errors errors = dataBinder.getBindingResult();
+        StudyEventDefinitionRequestValidator studyEventDefinitionRequestValidator = new StudyEventDefinitionRequestValidator(dataSource);
+        studyEventDefinitionRequestValidator.validate((studyEventDefinitionRequestBean), errors);
+        if (!errors.hasErrors()) {
+
+            return new DOMSource(mapConfirmation(getStudy(studyEventDefinitionRequestBean),
+                    messages.getMessage("studyEventDefinitionEndpoint.success", null, "Success", locale)));
+        } else {
+            return new DOMSource(mapFailConfirmation(messages.getMessage("studyEventDefinitionEndpoint.fail", null, "Fail", locale), errors));
         }
-        return new DOMSource(mapConfirmation(study, SUCCESS_MESSAGE));
+    }
+
+    StudyBean getStudy(StudyEventDefinitionRequestBean studyEventDefinitionRequestBean) {
+        StudyBean study = null;
+        if (studyEventDefinitionRequestBean.getStudyUniqueId() != null && studyEventDefinitionRequestBean.getSiteUniqueId() == null) {
+            study = getStudyDao().findByUniqueIdentifier(studyEventDefinitionRequestBean.getStudyUniqueId());
+        }
+        if (studyEventDefinitionRequestBean.getStudyUniqueId() != null && studyEventDefinitionRequestBean.getSiteUniqueId() != null) {
+            study = getStudyDao().findByUniqueIdentifier(studyEventDefinitionRequestBean.getSiteUniqueId());
+        }
+        return study;
+
     }
 
     /**
@@ -92,7 +114,7 @@ public class StudyEventDefinitionEndpoint {
         return (UserAccountBean) getUserAccountDao().findByUserName(username);
     }
 
-    private StudyBean unMarshallRequest(Element studyEventDefinitionListAll) {
+    private StudyEventDefinitionRequestBean unMarshallRequest(Element studyEventDefinitionListAll) {
 
         Element studyRefElement = DomUtils.getChildElementByTagName(studyEventDefinitionListAll, "studyRef");
         Element studyIdentifierElement = DomUtils.getChildElementByTagName(studyRefElement, "identifier");
@@ -102,40 +124,9 @@ public class StudyEventDefinitionEndpoint {
         String studyIdentifier = studyIdentifierElement == null ? null : DomUtils.getTextValue(studyIdentifierElement);
         String siteIdentifier = siteIdentifierElement == null ? null : DomUtils.getTextValue(siteIdentifierElement);
 
-        if (studyIdentifier == null && siteIdentifier == null) {
-            throw new OpenClinicaSystemException("Provide a valid study");
-        }
-        if (studyIdentifier != null && siteIdentifier == null) {
-            StudyBean study = (StudyBean) getStudyDao().findByName(studyIdentifier);
-            if (study.getId() == 0) {
-                throw new OpenClinicaSystemException("Invalid study");
-            }
-        }
-        if (studyIdentifier != null && siteIdentifier == null) {
-            StudyBean study = (StudyBean) getStudyDao().findByName(studyIdentifier);
-            if (study.getId() == 0) {
-                throw new OpenClinicaSystemException("Invalid study");
-            }
-            StudyUserRoleBean studySur = getUserAccountDao().findRoleByUserNameAndStudyId(getUserAccount().getName(), study.getId());
-            if (studySur.getStatus() != Status.AVAILABLE) {
-                throw new OpenClinicaSystemException("Invalid roles ");
-            }
-            return study;
-        }
-        if (studyIdentifier != null && siteIdentifier != null) {
-            StudyBean study = (StudyBean) getStudyDao().findByName(studyIdentifier);
-            StudyBean site = (StudyBean) getStudyDao().findByName(siteIdentifier);
-            if (study.getId() == 0 || site.getId() == 0 || site.getParentStudyId() != study.getId()) {
-                throw new OpenClinicaSystemException("Invalid study or site");
-            }
-            StudyUserRoleBean siteSur = getUserAccountDao().findRoleByUserNameAndStudyId(getUserAccount().getName(), site.getId());
-            if (siteSur.getStatus() != Status.AVAILABLE) {
-                throw new OpenClinicaSystemException("Invalid roles ");
-            }
-            return site;
-        }
-
-        return null;
+        StudyEventDefinitionRequestBean studyEventDefinitionRequestBean =
+            new StudyEventDefinitionRequestBean(studyIdentifier, siteIdentifier, getUserAccount());
+        return studyEventDefinitionRequestBean;
 
     }
 
@@ -237,7 +228,7 @@ public class StudyEventDefinitionEndpoint {
 
     }
 
-    private Element mapFailConfirmation(String confirmation, String message) throws Exception {
+    private Element mapFailConfirmation(String confirmation, Errors errors) throws Exception {
         DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
         Document document = docBuilder.newDocument();
@@ -247,12 +238,19 @@ public class StudyEventDefinitionEndpoint {
         resultElement.setTextContent(confirmation);
         responseElement.appendChild(resultElement);
 
-        Element errorElement = document.createElementNS(NAMESPACE_URI_V1, "error");
-        errorElement.setTextContent(message);
-        responseElement.appendChild(errorElement);
+        for (ObjectError error : errors.getAllErrors()) {
+            Element errorElement = document.createElementNS(NAMESPACE_URI_V1, "error");
+            String theMessage = messages.getMessage(error.getCode(), error.getArguments(), locale);
+            errorElement.setTextContent(theMessage);
+            responseElement.appendChild(errorElement);
+        }
 
         return responseElement;
 
+    }
+
+    public DataSource getDataSource() {
+        return dataSource;
     }
 
     public StudyDAO getStudyDao() {

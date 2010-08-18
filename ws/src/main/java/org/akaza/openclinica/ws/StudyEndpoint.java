@@ -9,6 +9,7 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
@@ -38,10 +39,13 @@ public class StudyEndpoint {
     private final DataSource dataSource;
     StudyDAO studyDao;
     UserAccountDAO userAccountDao;
+    private final MessageSource messages;
+    private final Locale locale;
 
-    public StudyEndpoint(DataSource dataSource) {
+    public StudyEndpoint(DataSource dataSource, MessageSource messages) {
         this.dataSource = dataSource;
-        // TODO Auto-generated constructor stub
+        this.messages = messages;
+        this.locale = new Locale("en_US");
     }
 
     /**
@@ -53,7 +57,7 @@ public class StudyEndpoint {
     @PayloadRoot(localPart = "listAllRequest", namespace = NAMESPACE_URI_V1)
     public Source getStudyList() throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
-        return new DOMSource(mapConfirmation(SUCCESS_MESSAGE));
+        return new DOMSource(mapConfirmation(messages.getMessage("studyEndpoint.success", null, "Success", locale)));
     }
 
     /**
