@@ -71,7 +71,7 @@ public final class SpreadsheetPreviewNw implements Preview {
     /**
      * This method searches for a sheet named "Items" or "Sections" in an Excel Spreadsheet object, then creates a sorted Map whose members represent a row of
      * data for each "Item" or "Section" on the sheet. This method was created primarily to get Items and section data for previewing a CRF.
-     * 
+     *
      * @return A SortedMap implementation (TreeMap) containing row numbers, each pointing to a Map. The Maps represent each Item or section row in a
      *         spreadsheet. The items or sections themselves are in rows 1..N. An example data value from a Section row is: 1: {page_number=1.0,
      *         section_label=Subject Information, section_title=SimpleSection1} Returns an empty Map if the spreadsheet does not contain any sheets named
@@ -192,10 +192,19 @@ public final class SpreadsheetPreviewNw implements Preview {
         HSSFSheet sheet;
         HSSFRow row;
         HSSFCell cell;
+        sheet = workbook.getSheetAt(4);
+        cell = sheet.getRow(1).getCell((short) 0);
+        String version = cell.getStringCellValue();
         // static group headers for a CRF; TODO: change these so they are not
         // static and hard-coded
         // BWP>>remove "group_borders" column
         String[] groupHeaders = { "group_label", "repeating_group", "group_header", "group_repeat_number", "group_repeat_max" };
+        if(version.equalsIgnoreCase("Version: 2.2")
+                || version.equalsIgnoreCase("Version: 2.5")
+                || version.equalsIgnoreCase("Version: 3.0")){
+            groupHeaders = new String[]{ "group_label", "group_header", "group_repeat_number", "group_repeat_max" };
+        }
+
         Map<String, String> rowCells = new HashMap<String, String>();
         SortedMap<Integer, Map<String, String>> allRows = new TreeMap<Integer, Map<String, String>>();
         String str;

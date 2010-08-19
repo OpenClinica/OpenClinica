@@ -192,10 +192,13 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                     .add("The excel spreadsheet doesn't have required valid worksheets. Please check whether it contains"
                         + " sheets of CRF, Sections and Items.");
         }
+        HSSFSheet sheet = wb.getSheetAt(4);
+        HSSFCell insCell = sheet.getRow(1).getCell((short) 0);
+        String versionNo = insCell.toString();
         // check to see if questions are referencing a valid section name, tbh
         // 7/30
         for (int j = 0; j < numSheets; j++) {
-            HSSFSheet sheet = wb.getSheetAt(j);// sheetIndex);
+            sheet = wb.getSheetAt(j);// sheetIndex);
             String sheetName = wb.getSheetName(j);
             if (sheetName.equalsIgnoreCase("Instructions")) {
                 // totally ignore instructions
@@ -1575,17 +1578,17 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             if (dbName.equals("oracle")) {
                                 sqlGroupLabel =
                                     "INSERT INTO ITEM_GROUP_METADATA (" + "item_group_id,HEADER," + "subheader, layout, repeat_number, repeat_max,"
-                                        + " repeat_array,row_start_number, crf_version_id," + "item_id , ordinal) VALUES ("
+                                        + " repeat_array,row_start_number, crf_version_id," + "item_id , ordinal, repeating_group) VALUES ("
                                         + "(SELECT MAX(ITEM_GROUP_ID) FROM ITEM_GROUP WHERE NAME='Ungrouped' AND crf_id = " + crfId + " ),'" + "" + "', '" + ""
                                         + "', '" + "" + "', " + 1 + ", " + 1 + ", '', 1," + versionIdString + "," + selectCorrectItemQueryOracle + "," + k
-                                        + ")";
+                                        + ", 0)";
                             } else {
                                 sqlGroupLabel =
                                     "INSERT INTO ITEM_GROUP_METADATA (" + "item_group_id,header," + "subheader, layout, repeat_number, repeat_max,"
-                                        + " repeat_array,row_start_number, crf_version_id," + "item_id , ordinal) VALUES ("
+                                        + " repeat_array,row_start_number, crf_version_id," + "item_id , ordinal, repeating_group) VALUES ("
                                         + "(SELECT ITEM_GROUP_ID FROM ITEM_GROUP WHERE NAME='Ungrouped' AND crf_id = " + crfId
                                         + " ORDER BY OID DESC LIMIT 1),'" + "" + "', '" + "" + "', '" + "" + "', " + 1 + ", " + 1 + ", '', 1,"
-                                        + versionIdString + "," + selectCorrectItemQueryPostgres + "," + k + ")";
+                                        + versionIdString + "," + selectCorrectItemQueryPostgres + "," + k + ", false)";
 
                             }
                             // >>>>>>> .r10888
@@ -1685,21 +1688,23 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         }
                         // removed reference to 'groupLayout' here, tbh 102007
 
-//                        RAPEATING_GROUP
-                        cell = sheet.getRow(gk).getCell((short) 1);
-                        String repeatingGroup = cell.toString();
                         boolean isRepeatingGroup = true;
-                        if (!StringUtil.isBlank(repeatingGroup)) {
+                        boolean newVersionCrf = false;
+                        int cellNo = 0;
+                        if(!(versionNo.equalsIgnoreCase("Version: 2.2")
+                               || versionNo.equalsIgnoreCase("Version: 2.5")
+                               || versionNo.equalsIgnoreCase("Version: 3.0"))){
+                            cellNo = 1;
+                            cell = sheet.getRow(gk).getCell((short) cellNo);
                             try {
-                                isRepeatingGroup = "false".equalsIgnoreCase(repeatingGroup) ? false : true;
+                                isRepeatingGroup = cell.getBooleanCellValue();
+                                newVersionCrf = true;
                             } catch (Exception eee) {
                                 errors.add(resPageMsg.getString("repeating_group_error"));
                             }
-                        }else{
-                            errors.add(resPageMsg.getString("repeating_group_error"));
                         }
 
-                        cell = sheet.getRow(gk).getCell((short) 2);
+                        cell = sheet.getRow(gk).getCell((short) ++cellNo);
                         String groupHeader = getValue(cell);
                         // replace any apostrophes in groupHeader: issue 3277
                         groupHeader = org.akaza.openclinica.core.form.StringUtil.escapeSingleQuote(groupHeader);
@@ -1707,11 +1712,11 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             errors.add(resPageMsg.getString("group_header_length_error"));
                         }
 
-                        cell = sheet.getRow(gk).getCell((short) 3);
+                        cell = sheet.getRow(gk).getCell((short) ++cellNo);
                         String groupRepeatNumber = getValue(cell);
                         // to be switched to int, tbh
                         // adding clause to convert to int, tbh, 06/07
-                        if (!isRepeatingGroup && !StringUtil.isBlank(groupRepeatNumber)){
+                        if (newVersionCrf && !isRepeatingGroup && !StringUtil.isBlank(groupRepeatNumber)){
                             errors.add(resPageMsg.getString("repeat_number_none_repeating"));    
                         } else if (!isRepeatingGroup && StringUtil.isBlank(groupRepeatNumber)) {
                                 groupRepeatNumber = "1";
@@ -1728,11 +1733,11 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             }
                         }
 
-                        cell = sheet.getRow(gk).getCell((short) 4);
+                        cell = sheet.getRow(gk).getCell((short) ++cellNo);
                         String groupRepeatMax = getValue(cell);
                         // to be switched to int, tbh
                         // adding clause to convert to int, tbh 06/07
-                        if (!isRepeatingGroup && !StringUtil.isBlank(groupRepeatMax)){
+                        if (newVersionCrf && !isRepeatingGroup && !StringUtil.isBlank(groupRepeatMax)){
                             errors.add(resPageMsg.getString("repeat_max_none_repeating"));    
                         } else if (!isRepeatingGroup && StringUtil.isBlank(groupRepeatMax)) {
                             groupRepeatMax = "1";
@@ -1758,7 +1763,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             }
                         }
                         // >> tbh 02/2010 adding show_hide for Dynamics
-                        cell = sheet.getRow(gk).getCell((short) 5);
+                        cell = sheet.getRow(gk).getCell((short) ++cellNo);
                         String showGroup = getValue(cell);
                         boolean isShowGroup = true;
                         if (!StringUtil.isBlank(showGroup)) {
