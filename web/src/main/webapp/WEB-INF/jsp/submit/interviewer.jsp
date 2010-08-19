@@ -157,7 +157,7 @@ var closing = true;
       
 function callTip(html)
 {
-	Tip(html,BGCOLOR,'#FFFFE5',BORDERCOLOR,'',STICKY,true );
+	Tip(html,BGCOLOR,'#FFFFE5',BORDERCOLOR,'' );
 }
 
 </script>
