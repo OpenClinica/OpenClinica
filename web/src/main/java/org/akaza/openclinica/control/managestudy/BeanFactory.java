@@ -278,9 +278,11 @@ public class BeanFactory {
                 tempValue = groupValues.get("group_repeat_number");
                 // This line is necessary because "0" will not throw an
                 // exception, but is still unacceptable
-                if(StringUtil.isBlank(tempValue)){
+                if(igMetaBean.isRepeatingGroup() && StringUtil.isBlank(tempValue)){
+                    tempValue = "1";
+                }else if(StringUtil.isBlank(tempValue)){
                     tempValue = "0";
-                } else if ("0.0".equalsIgnoreCase(tempValue)) {
+                }else if ("0.0".equalsIgnoreCase(tempValue)) {
                     tempValue = "1";
                 }
                 try {

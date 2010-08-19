@@ -133,7 +133,7 @@ public class HorizontalFormBuilder extends DefaultFormBuilder {
             // repeated rows
             // in the database?
             boolean hasStoredRepeatedRows = false;
-            boolean unGroupedTable = displayItemGroup.getItemGroupBean().getName().equalsIgnoreCase(BeanFactory.UNGROUPED);
+            boolean unGroupedTable = displayItemGroup.getItemGroupBean().getName().equalsIgnoreCase(BeanFactory.UNGROUPED) || !displayItemGroup.getGroupMetaBean().isRepeatingGroup();
             // Load any database values into the DisplayItemBeans
             if (hasDbFormValues) {
                 currentDisplayItems = persistanceHandler.loadDataIntoDisplayBeans(currentDisplayItems, (!unGroupedTable));
