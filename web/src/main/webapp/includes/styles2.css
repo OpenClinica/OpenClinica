@@ -195,11 +195,11 @@
 }
 .tooltip .label {
 	color:black;
-	width:25px;
 	font-family:Tahoma,Arial,Helvetica,Sans-Serif;
 	font-size:11px;
 	border-color:gray;
-
+	width:0px;
+	
 }
 .tooltip .header1 {
 	color:black;
@@ -213,6 +213,25 @@
 	border-style:solid;
 }
 
+.tooltip .borderlabel {
+	color:black;
+	font-family:Tahoma,Arial,Helvetica,Sans-Serif;
+	font-size:11px;
+	border-color:gray;
+	width:0px;
+	border-color:gray;
+	border-bottom:dotted;
+	border-bottom-width:thin;
+	border-bottom-color:gray;
+}
 
+.tooltip .note {
+	color:black;
+	
+	font-family:Tahoma,Arial,Helvetica,Sans-Serif;
+	font-size:11px;
+	border-color:gray;
+	
+}
 
 

@@ -19,6 +19,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
@@ -101,14 +104,24 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.form.FormBeanUtil;
 import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.stereotype.Controller;
 
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.*;
 /**
  * @author ssachs
  * 
  *         Enabled scoring feature - ywang (Jan. 2008)
  * 
  */
+
 public abstract class DataEntryServlet extends SecureController {
 
     Locale locale;
@@ -277,8 +290,9 @@ public abstract class DataEntryServlet extends SecureController {
         return "";
     }
 
+    
     @Override
-    protected void processRequest() throws Exception {
+    protected  void processRequest() throws Exception {
 
         locale = request.getLocale();
 
@@ -3418,61 +3432,113 @@ public abstract class DataEntryServlet extends SecureController {
     /*
      * change to explicitly re-set the section bean after reviewing the disc note counts, tbh 01/2010
      */
+    
     protected DisplaySectionBean populateNotesWithDBNoteCounts(FormDiscrepancyNotes discNotes, DisplaySectionBean section) {
         dndao = new DiscrepancyNoteDAO(sm.getDataSource());
-
-        // ArrayList items = section.getItems();
+       // ArrayList items = section.getItems();
         ArrayList<DiscrepancyNoteBean> ecNotes = dndao.findEventCRFDNotesFromEventCRF(ecb);
-        ArrayList<DiscrepancyNoteBean> existingNameNotes = new ArrayList();
-        ArrayList<DiscrepancyNoteBean> existingIntrvDateNotes = new ArrayList();
+        ArrayList<DiscrepancyNoteBean> existingNameNotes = new ArrayList(),nameNotes = new ArrayList();
+        ArrayList<DiscrepancyNoteBean> existingIntrvDateNotes = new ArrayList(),dateNotes = new ArrayList();
+       
         int intNew = 0,intRes = 0,intUpdated=0,intClosed=0,intNA = 0;
         int dateNew = 0,dateRes = 0,dateUpdated=0,dateClosed=0,dateNA=0 ;
+        boolean hasMoreThreads = false;
         for (int i = 0; i < ecNotes.size(); i++) {
             DiscrepancyNoteBean dn = ecNotes.get(i);
             if (INTERVIEWER_NAME.equalsIgnoreCase(dn.getColumn())) {
                 discNotes.setNumExistingFieldNotes(INPUT_INTERVIEWER, 1);
                 request.setAttribute("hasNameNote", "yes");
                 request.setAttribute(INTERVIEWER_NAME_NOTE, dn);
-                if(dn.getParentDnId()==0)
+                if(hasMoreThreads)
                 {
-                if(dn.getResolutionStatusId()==ResolutionStatus.OPEN.getId()) intNew++;
-                else if(dn.getResolutionStatusId()==ResolutionStatus.UPDATED.getId())intUpdated++;
-                else if(dn.getResolutionStatusId()==ResolutionStatus.RESOLVED.getId())intRes++;//Resolution proposed count
-                else if(dn.getResolutionStatusId()==ResolutionStatus.CLOSED.getId())intClosed++;
-                else if(dn.getResolutionStatusId()==ResolutionStatus.NOT_APPLICABLE.getId())intNA++;
+                if(dn.getParentDnId()!=0)
+                {
+             /*   if(dn.getResolutionStatusId()==ResolutionStatus.OPEN.getId()) {
+                	intNew++;
+                	nameNotes.add(dn);}
+                else if(dn.getResolutionStatusId()==ResolutionStatus.UPDATED.getId()){
+                	intUpdated++;
+                	nameNotes.add(dn);
                 }
+                else if(dn.getResolutionStatusId()==ResolutionStatus.RESOLVED.getId()){
+                	intRes++;//Resolution proposed count
+                	nameNotes.add(dn);
+                }
+                else if(dn.getResolutionStatusId()==ResolutionStatus.CLOSED.getId()){
+                	intClosed++;
+                	nameNotes.add(dn);
+                }
+                else if(dn.getResolutionStatusId()==ResolutionStatus.NOT_APPLICABLE.getId()){
+                	intNA++;*/
+                	nameNotes.add(dn);
+               // }
+                }
+                }
+                hasMoreThreads = true;
                 existingNameNotes.add(dn);
+                
             }
 
             if (DATE_INTERVIEWED.equalsIgnoreCase(dn.getColumn())) {
                 discNotes.setNumExistingFieldNotes(INPUT_INTERVIEW_DATE, 1);
                 request.setAttribute("hasDateNote", "yes");
                 request.setAttribute(INTERVIEWER_DATE_NOTE, dn);
-                if(dn.getParentDnId()==0)
+                if(hasMoreThreads)
+                if(dn.getParentDnId()!=0)
                 {
-                if(dn.getResolutionStatusId()==ResolutionStatus.OPEN.getId()) dateNew++;
-                else if(dn.getResolutionStatusId()==ResolutionStatus.UPDATED.getId())dateUpdated++;
-                else if(dn.getResolutionStatusId()==ResolutionStatus.RESOLVED.getId())dateRes++;//Resolution proposed count
-                else if(dn.getResolutionStatusId()==ResolutionStatus.CLOSED.getId())dateClosed++;
-                else if(dn.getResolutionStatusId()==ResolutionStatus.NOT_APPLICABLE.getId())dateNA++;
+                
+              /*  if(dn.getResolutionStatusId()==ResolutionStatus.OPEN.getId()) {
+                	dateNew++;
+                	dateNotes.add(dn);
                 }
+                else if(dn.getResolutionStatusId()==ResolutionStatus.UPDATED.getId()){
+                	dateUpdated++;
+                	dateNotes.add(dn);
+                }
+                else if(dn.getResolutionStatusId()==ResolutionStatus.RESOLVED.getId()){
+                	dateRes++;//Resolution proposed count
+                	dateNotes.add(dn);
+                }
+                
+                else if(dn.getResolutionStatusId()==ResolutionStatus.CLOSED.getId()){
+                	dateClosed++;
+                	dateNotes.add(dn);
+                }
+                else if(dn.getResolutionStatusId()==ResolutionStatus.NOT_APPLICABLE.getId()){
+                	dateNA++;*/
+                	dateNotes.add(dn);
+              //  }
+                }
+                hasMoreThreads = true;
                 existingIntrvDateNotes.add(dn);
             }
         }
 
         request.setAttribute("nameNoteResStatus", getDiscrepancyNoteResolutionStatus(existingNameNotes));
         request.setAttribute("IntrvDateNoteResStatus", getDiscrepancyNoteResolutionStatus(existingIntrvDateNotes));
-        request.setAttribute("intNew",intNew);
+       /* request.setAttribute("intNew",intNew);
         request.setAttribute("intUpdated",intUpdated);
         request.setAttribute("intRes",intRes);
-        request.setAttribute("intClosed",intClosed);
-        request.setAttribute("intNA",intNA);
+        request.setAttribute("intClosed",intClosed);	
+        request.setAttribute("intNA",intNA);*/
+        request.setAttribute("nameNotes", nameNotes);
+        request.setAttribute("existingNameNotes", existingNameNotes);
         
-        request.setAttribute("dateNew",dateNew);
+       /* request.setAttribute("dateNew",dateNew);
         request.setAttribute("dateUpdated",dateUpdated);
         request.setAttribute("dateRes",dateRes);
         request.setAttribute("dateClosed",dateClosed);
-        request.setAttribute("dateNA",dateNA);
+        request.setAttribute("dateNA",dateNA);*/
+        request.setAttribute("intrvDates", dateNotes);
+        request.setAttribute("existingIntrvDateNotes", existingIntrvDateNotes);
+//        JSONObject jsonObject = new JSONObject();
+//        JSONArray jExistingNames = JSONArray.fromObject(existingNameNotes);
+//       jsonObject.put("nameNotes",jExistingNames);
+//       
+//       
+//        request.setAttribute("jnameNodes", jsonObject.toString());
+        
+        //sendJSONNames(existingNameNotes);
 ///===add here...
         List<DisplayItemWithGroupBean> allItems = section.getDisplayItemGroups();
         logger.debug("start to populate notes: " + section.getDisplayItemGroups().size());
@@ -3577,7 +3643,20 @@ public abstract class DataEntryServlet extends SecureController {
         return section;
     }
 
-    /**
+    /*@RequestMapping(value="/{nameNotes}", method=RequestMethod.GET)
+    public @ResponseBody ArrayList<DiscrepancyNoteBean> sendJSONNames(ArrayList<DiscrepancyNoteBean> existingNameNotes) {
+		return existingNameNotes;
+	}*/
+    
+    @RequestMapping(value="/discrepancyNote",method=RequestMethod.GET)
+    public @ResponseBody DiscrepancyNoteBean getDiscrepancyNoteBean(int i) {
+	
+    	DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
+    	dnb.setResolutionStatusId(1);
+    	return dnb;
+	}
+
+	/**
      * To set the totals of each resolution status on the DisplayItemBean for each item.
      * @param dib
      * @param notes
@@ -3588,10 +3667,11 @@ public abstract class DataEntryServlet extends SecureController {
     	int totNew = 0,totRes = 0,totClosed = 0,totUpdated =0,totNA = 0;
     	boolean hasOtherThread = false;
     	 ArrayList<DiscrepancyNoteBean> existingNotes = dndao.findExistingNotesForItemData(itemDataId);
+    	 dib.setDiscrepancyNotes(existingNotes);
          for (DiscrepancyNoteBean obj : existingNotes) {
              DiscrepancyNoteBean note =  obj;
-             /*We would only take the resolution status of the parent note of any note thread. If there
-             * are more than one note thread, the thread with the worst resolution status will be taken.*/
+            
+            
              if (note.getParentDnId() == 0) {
                 	 resolutionStatus = note.getResolutionStatusId();
                  if(resolutionStatus==ResolutionStatus.OPEN.getId()) totNew++;

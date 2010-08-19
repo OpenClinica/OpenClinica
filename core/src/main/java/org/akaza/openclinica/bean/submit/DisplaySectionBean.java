@@ -24,7 +24,7 @@ public class DisplaySectionBean {
     private EventCRFBean eventCRF;
     private EventDefinitionCRFBean eventDefinitionCRF;
     private SectionBean section;
-    private ArrayList items; // an array of DisplayItemBeans which belong to
+    private ArrayList<DisplayItemBean> items; // an array of DisplayItemBeans which belong to
     // this section
     private final boolean checkInputs;
     private boolean firstSection;
@@ -129,7 +129,7 @@ public class DisplaySectionBean {
     /**
      * @return Returns the items.
      */
-    public ArrayList getItems() {
+    public ArrayList<DisplayItemBean> getItems() {
         return items;
     }
 
@@ -137,7 +137,7 @@ public class DisplaySectionBean {
      * @param items
      *            The items to set.
      */
-    public void setItems(ArrayList items) {
+    public void setItems(ArrayList<DisplayItemBean> items) {
         this.items = items;
     }
 

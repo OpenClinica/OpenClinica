@@ -1,10 +1,16 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+
 <jsp:useBean scope="request" id="section" class="org.akaza.openclinica.bean.submit.DisplaySectionBean" />
 <jsp:useBean scope="request" id="displayItem" class="org.akaza.openclinica.bean.submit.DisplayItemBean" />
 <jsp:useBean scope='request' id='formMessages' class='java.util.HashMap'/>
 <jsp:useBean scope='request' id='exitTo' class='java.lang.String'/>
+<jsp:useBean scope='request' id='nameNotes' class='java.util.ArrayList'/>
+<jsp:useBean scope='request' id='intrvDates' class='java.util.ArrayList'/>
+
+
+
 <script type="text/javascript" src="includes/wz_tooltip/wz_tooltip.js"></script>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
@@ -14,38 +20,13 @@
 <c:set var="interviewDate" value="${toc.eventCRF.dateInterviewed}" />
 <c:set var="itemId" value="${displayItem.item.id}" />
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
-<style type="text/css">
-.tooltip {
-		
-	width:175px;
-	font-size:11px;
-	color:black; 
-	background-color: #FFFFE5;
-	border-color:gray;
-	
-}
-.tooltip .label {
-	color:black;
-	width:25px;
-	font-family:Tahoma,Arial,Helvetica,Sans-Serif;
-	font-size:11px;
-	border-color:gray;
 
-}
-.tooltip .header1 {
-	color:black;
-	font-family:Tahoma,Arial,Helvetica,Sans-Serif;
-	font-size:11px;
-	font-weight:bold;
-	height:30px;
-	
-}
-.tooltip.tableborder{
-	border-style:solid;
-}
-</style>
+
 
 <script type="text/javascript" language="javascript">
+
+
+
     //If someone closes the browser on data entry stage, the following request should be
     //sent to the server to make this CRF available for data entry.
 var closing = true;
@@ -66,9 +47,16 @@ var closing = true;
        jQuery("select").click(function(event){
            closing = false;
         });
-     });
+      
+     //  jQuery('#nameNote1').mouseover(function(event){
+       //  jQuery.getJSON("InitialDataEntry",{ name:0 },function(discrepancyNote){
+    	//		alert('w'+discrepancyNote);
+        //});
+       // });
+      
+       });
      
-     
+
     function genToolTip(newNo,updatedNo,resNo,closedNo,naNO)
        {
                var htmlgen = 
@@ -86,9 +74,90 @@ var closing = true;
   '</td></tr></tbody></table></table></div>';
           return htmlgen;
 }
+
+
+
+   
+      function genToolTipFromArray(flag){
+    	  var resStatus = new Array();
+    	  var detailedNotes= new Array();
+    	  var discrepancyType = new Array();
+    	  var updatedDates = new Array();
+    	  var i=0;
+    	  var discNotes = new Array();
+    	  	if(flag =='interviewNotes')
+    	     	{
+    	     	<c:forEach var="discrepancyNoteBeans" items="${nameNotes}">
+    	     		resStatus[i]=<c:out value="${discrepancyNoteBeans.resolutionStatusId}"/>;
+    	     		detailedNotes[i]= '<c:out value="${discrepancyNoteBeans.description}"/>';   			
+    	  			discrepancyType[i] = '<c:out value="${discrepancyNoteBeans.disType.name}"/>';
+    	  			updatedDates[i]= '<c:out value="${discrepancyNoteBeans.createdDate}"/>';
+    	  			i++;
+    	  	 	</c:forEach>
+    	     	}
+    	   	else if(flag =='dateNotes')
+    	     {
+    	     	<c:forEach var="discrepancyNoteBeans" items="${intrvDates}">
+    	     		resStatus[i]=<c:out value="${discrepancyNoteBeans.resolutionStatusId}"/>;
+    	     		detailedNotes[i]= '<c:out value="${discrepancyNoteBeans.description}"/>';   			
+    	  			discrepancyType[i] = '<c:out value="${discrepancyNoteBeans.disType.name}"/>';
+    	  			updatedDates[i]= '<c:out value="${discrepancyNoteBeans.createdDate}"/>';
+    	  			i++;
+    	     	</c:forEach>
+    	   	}
+    	
+    		   var htmlgen = 
+		 	          '<div class=\"tooltip\">'+
+		 	          '<table  width="170">'+
+		 	          ' <tr><td  align=\"center\" class=\"header1\">' +
+		 	          'Notes and Discrepancies </td></tr><tr></tr></table><table  style="border-collapse:collapse" cellspacing="0" cellpadding="0" width="175" >'+
+		 	          drawRows(i,resStatus,detailedNotes,discrepancyType,updatedDates)+
+		 	          '</table><table width="200"  class="tableborder" align="left">'+  	
+		 	          '</table><table><tr></tr></table>'+
+		 	          '<table width="180"><tbody><td height="50" colspan="3"><span class=\"note\">'+
+		 	          'Click on the flag in the main window for more details. </span>'+
+		 	          '</td></tr></tbody></table></table></div>';
+		  return htmlgen;
+    }
+    
+      function drawRows(i,resStatus,detailedNotes,discrepancyType,updatedDates)
+      {
+     	var row = '';
+     	var noteType = '';
+     		for(var x=0;x<i;x++)
+     		{
+     		
+     		
+     			if(resStatus[x]=='1')
+     			{
+     				row+='<tr> <td class=\"label\"><img src="images/icon_Note.gif" width="16" height="13" alt="Note"></td>'+'<td  width="120" align="left" class=\"label\">New: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td class=\"borderlabel\">'+detailedNotes[x].substring(0,20)+'...</td></tr>';
+     			}
+     			else if(resStatus[x]=='2')
+     			{
+     				row+='<tr > <td  class=\"label\"><img src="images/icon_flagYellow.gif" width="16" height="13" alt="Note"></td>'+'<td width="120"  align="left" class=\"label\">Updated: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td  class=\"borderlabel\">'+detailedNotes[x].substring(0,20)+'...</td></tr>';
+     			}
+     			else if(resStatus[x]=='3')
+     			{
+     				row+='<tr> <td class=\"label\"><img src="images/icon_flagGreen.gif" width="16" height="13" alt="Note"></td>'+'<td  width="120"  align="left" class=\"label\">Res.Proposed: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td  class=\"borderlabel\">'+detailedNotes[x].substring(0,20)+'...</td></tr>';
+     			}
+     			else if(resStatus[x]=='4')
+     			{
+     				row+='<tr> <td  class=\"label\"><img src="images/icon_flagBlack.gif" width="16" height="13" alt="Note"></td>'+'<td  width="120" align="left" class=\"label\">Closed: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td class=\"borderlabel\">'+detailedNotes[x].substring(0,20)+'...</td></tr>';
+     			}
+     			else if(resStatus[x]=='5')
+     		{
+     			row+='<tr> <td width="16"  class=\"label\"><img src="images/icon_flagWhite.gif" width="16" height="13" alt="Note"></td>'+'<td width="120"  align="left" class=\"label\">N/A: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td class=\"borderlabel\">'+detailedNotes[x].substring(0,20)+'...</td></tr>';
+     			}
+     			
+     			
+     		}
+     	
+     	return row;
+     }
+      
 function callTip(html)
 {
-	Tip(html,BGCOLOR,'#FFFFE5',BORDERCOLOR,'' );
+	Tip(html,BGCOLOR,'#FFFFE5',BORDERCOLOR,'',STICKY,true );
 }
 
 </script>
@@ -135,7 +204,6 @@ function callTip(html)
     </td>
 </tr>
 <tr>
-
 <td valign="top">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
@@ -357,6 +425,7 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
     <c:choose>
         <c:when test="${isInError_Int}">
             <fmt:message key="interviewer_name" bundle="${resword}"/>: <span class="aka_exclaim_error">! </span> &nbsp;
+            
         </c:when>
 
         <c:otherwise>
@@ -433,13 +502,13 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
 
                 <c:choose>
                  <c:when test="${hasNameNote eq 'yes'}">
-                <a href="#" onmouseover="callTip(genToolTip(${intNew}, ${intUpdated},${intRes},${intClosed},${intNA }))";
-           onmouseout="UnTip()"  onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySubject.id}&itemId=${itemId}&id=${InterviewerNameNote.eventCRFId}&name=${InterviewerNameNote.entityType}&field=interviewer&column=${InterviewerNameNote.column}&enterData=${enterData}&monitor=${monitor}&blank=${blank}','spanAlert-interviewDate'); return false;">
+                <a href="#" id="nameNote1"
+           onmouseout="UnTip()"  onmouseover="callTip(genToolTipFromArray('interviewNotes'))"; onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySubject.id}&itemId=${itemId}&id=${InterviewerNameNote.eventCRFId}&name=${InterviewerNameNote.entityType}&field=interviewer&column=${InterviewerNameNote.column}&enterData=${enterData}&monitor=${monitor}&blank=${blank}','spanAlert-interviewDate'); return false;">
                     <img id="flag_interviewer" name="flag_interviewer" src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                     </c:when>
                     <c:otherwise>
-                    <a href="#" onmouseover="callTip(genToolTip(${intNew},${intUpdated},${intRes},${intClosed},${intNA}))";
-           onmouseout="UnTip()"  onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${studySubject.id}&viewData=y&id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewer&column=interviewer_name&writeToDB=1&new=${isNewDN}','spanAlert-interviewer'); return false;">
+                    <a id="nameNote1" href="#"
+           onmouseout="UnTip()"  onmouseover="callTip(genToolTipFromArray('interviewNotes'))"; onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${studySubject.id}&viewData=y&id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewer&column=interviewer_name&writeToDB=1&new=${isNewDN}','spanAlert-interviewer'); return false;">
                         <img id="flag_interviewer" name="flag_interviewer" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
                         </c:otherwise>
                         </c:choose>
@@ -548,12 +617,12 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
 
                 <c:choose>
                 <c:when test="${hasDateNote eq 'yes'}">
-                <a href="#"  onmouseover="callTip(genToolTip(${dateNew},${dateUpdated},${dateRes},${dateClosed},${dateNA} ) )";
+                <a href="#"  onmouseover="callTip(genToolTipFromArray('dateNotes') )";
            onmouseout="UnTip()"  onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySubject.id}&itemId=${itemId}&id=${InterviewerDateNote.eventCRFId}&name=${InterviewerDateNote.entityType}&field=interviewDate&column=${InterviewerDateNote.column}&enterData=${enterData}&monitor=${monitor}&blank=${blank}','spanAlert-interviewDate'); return false;">
                     <img id="flag_interviewDate" name="flag_interviewDate" src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"  >
                     </c:when>
                     <c:otherwise>
-                    <a href="#"  onmouseover="callTip(genToolTip(${dateNew},${dateUpdated},${dateRes},${dateClosed},${dateNA}) )";
+                    <a href="#"  onmouseover="callTip(genToolTipFromArray('dateNotes') )";
            onmouseout="UnTip()" onClick="openDNoteWindow('CreateDiscrepancyNote?subjectId=${studySubject.id}&id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewDate&column=date_interviewed&writeToDB=1&new=${isNewDNDate}','spanAlert-interviewDate'); return false;">
                         <img id="flag_interviewDate" name="flag_interviewDate" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"  >
                         </c:otherwise>
@@ -569,7 +638,7 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
             </td>
         </tr>
     </table>
-
+	
 </td>
 </tr>
 </table>

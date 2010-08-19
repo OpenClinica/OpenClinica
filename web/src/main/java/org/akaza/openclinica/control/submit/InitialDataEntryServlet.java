@@ -29,9 +29,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.*;
+
+import org.springframework.stereotype.Controller;
+
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+
 /**
  * @author ssachs
  */
+@Controller
+@RequestMapping(value="/InitialDataEntry")
 public class InitialDataEntryServlet extends DataEntryServlet {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     Locale locale;

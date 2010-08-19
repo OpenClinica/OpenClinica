@@ -11,6 +11,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import org.akaza.openclinica.bean.core.NullValue;
+import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 
 /**
@@ -35,10 +36,13 @@ public class DisplayItemBean implements Comparable {
 	private int totNA;
     
 
+	private ArrayList<DiscrepancyNoteBean> discrepancyNotes;
 
     // not in the database
 
-    /**
+
+
+	/**
      * Not a database column. The elements are DisplayItemBeans whose
      * metadata.parentId property equals the item.id property of this bean.
      * Furthermore, they must be ordered in increasing value of their
@@ -448,5 +452,13 @@ public class DisplayItemBean implements Comparable {
 	public void setTotNA(int totNA) {
 		this.totNA = totNA;
 	}
+    public ArrayList<DiscrepancyNoteBean> getDiscrepancyNotes() {
+		return discrepancyNotes;
+	}
+
+	public void setDiscrepancyNotes(ArrayList<DiscrepancyNoteBean> discrepancyNotes) {
+		this.discrepancyNotes = discrepancyNotes;
+	}
+	
 
 }

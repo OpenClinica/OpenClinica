@@ -10,7 +10,46 @@
 <jsp:useBean scope="request" id="section" class="org.akaza.openclinica.bean.submit.DisplaySectionBean" />
 <jsp:useBean scope="request" id="displayItem" class="org.akaza.openclinica.bean.submit.DisplayItemBean" />
 <jsp:useBean scope='request' id='formMessages' class='java.util.HashMap'/>
+<script lang="Javascript">
+function genToolTips(itemId){
+	var resStatus = new Array();
+	var detailedNotes= new Array();
+	var discrepancyType = new Array();
+	var updatedDates = new Array();
+	var i=0;
+	var discNotes = new Array();
 
+	 		<c:set var="discrepancyNotes" value="1"/>
+		<c:forEach var="itemsSection" items="${section.items}">
+	   			if("${itemsSection.item.id}"== itemId)
+	   			{
+	   				<c:set  var="discrepancyNotes" value="${itemsSection.discrepancyNotes}"/>
+	        		<c:forEach var="discrepancyNotes" items="${discrepancyNotes}">  	
+		           	<c:if test="${discrepancyNotes.parentDnId == 0}">
+			           	resStatus[i] =<c:out value="${discrepancyNotes.resolutionStatusId}"/>;
+			      	    detailedNotes[i] ="<c:out value="${discrepancyNotes.description}"/>";
+			      	    discrepancyType[i] = "<c:out value="${discrepancyNotes.disType.name}"/>";
+			      	    updatedDates[i] = "<c:out value="${discrepancyNotes.createdDate}"/>";
+			   		    i++;
+		       		</c:if>
+	        	   </c:forEach>
+	   			}
+	    </c:forEach>
+	 	
+		  var htmlgen = 
+	          '<div class=\"tooltip\">'+
+	          '<table  width="170">'+
+	          ' <tr><td  align=\"center\" class=\"header1\">' +
+	          'Notes and Discrepancies </td></tr><tr></tr></table><table  style="border-collapse:collapse" cellspacing="0" cellpadding="0" width="180" >'+
+	          drawRows(i,resStatus,detailedNotes,discrepancyType,updatedDates)+
+	          '</table><table width="200"  class="tableborder" align="left">'+  	
+	          '</table><table><tr></tr></table>'+
+	          '<table width="180"><tbody><td height="50" colspan="3"><span class=\"note\">'+
+	          'Click on the flag in the main window for more details. </span>'+
+	          '</td></tr></tbody></table></table></div>';
+		  return htmlgen;
+	}
+  </script>
 <c:set var="inputType" value="${displayItem.metadata.responseSet.responseType.name}" />
 <c:set var="itemId" value="${displayItem.item.id}" />
 <c:set var="inputVal" value="input${itemId}" />
@@ -355,7 +394,7 @@ form element in red --%>
   <c:choose>
     <c:when test="${displayItem.numDiscrepancyNotes > 0}">
 
-      <td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"  onmouseover="callTip(genToolTip(${totNew},${totUpdated},${totRes},${totClosed},${totNA}) )";
+      <td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"  onmouseover="callTip(genToolTips(${itemId}))";
            onmouseout="UnTip()" onClick=
     "openDNoteWindow('ViewDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=input<c:out value="${itemId}"/>&column=value&monitor=1&writeToDB=1&isLocked=<c:out value="${isLocked}"/>','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
     ><img id="flag_input<c:out value="${itemId}"/>" name="flag_input<c:out value="${itemId}"/>" src=
@@ -369,7 +408,7 @@ form element in red --%>
      <c:if test="${isLocked eq 'no'}">
       <c:set var="imageFileName" value="icon_noNote" />
 
-       <td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"  onmouseover="callTip(genToolTip(${totNew},${totUpdated},${totRes},${totClosed},${totNA}) )";
+       <td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"  onmouseover="callTip(genToolTips(${itemId}))";
            onmouseout="UnTip()" onClick=
     "openDNWindow('CreateDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=input<c:out value="${itemId}"/>&column=value&monitor=1&blank=<c:out value="${isBlank}"/>&writeToDB=1&errorFlag=<c:out value="${errorFlag}"/>&isLocked=<c:out value="${isLocked}"/>','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
     ><img id="flag_input<c:out value="${itemId}" />" name="flag_input<c:out value="${itemId}" />" src=
