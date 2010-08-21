@@ -1,21 +1,31 @@
 package org.akaza.openclinica.ws;
 
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.extract.odm.MetaDataReportBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.logic.odmExport.MetadataUnit;
+import org.akaza.openclinica.ws.bean.StudyMetadataRequestBean;
+import org.akaza.openclinica.ws.validator.StudyMetadataRequestValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.util.xml.DomUtils;
+import org.springframework.validation.DataBinder;
+import org.springframework.validation.Errors;
+import org.springframework.validation.ObjectError;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
+import org.springframework.ws.server.endpoint.annotation.XPathParam;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,9 +42,7 @@ import javax.xml.transform.dom.DOMSource;
 public class StudyEndpoint {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-    private final String NAMESPACE_URI_V1 = "http://openclinica.org/ws/study/v1";
-    private final String SUCCESS_MESSAGE = "success";
-    private final String FAIL_MESSAGE = "fail";
+    private static final String NAMESPACE_URI_V1 = "http://openclinica.org/ws/study/v1";
 
     private final DataSource dataSource;
     StudyDAO studyDao;
@@ -46,6 +54,99 @@ public class StudyEndpoint {
         this.dataSource = dataSource;
         this.messages = messages;
         this.locale = new Locale("en_US");
+    }
+
+    /**
+     * if NAMESPACE_URI_V1:getStudyListRequest execute this method
+     * 
+     * @return
+     * @throws Exception
+     */
+    @PayloadRoot(localPart = "getMetadataRequest", namespace = NAMESPACE_URI_V1)
+    public Source getStudyMetadata(@XPathParam("//study:studyMetadata") NodeList studyNodeList) throws Exception {
+        ResourceBundleProvider.updateLocale(new Locale("en_US"));
+        Element studyRefElement = (Element) studyNodeList.item(0);
+
+        StudyMetadataRequestBean studyMetadataRequestBean = unMarshallRequest(studyRefElement);
+        DataBinder dataBinder = new DataBinder((studyMetadataRequestBean));
+        Errors errors = dataBinder.getBindingResult();
+        StudyMetadataRequestValidator studyMetadataRequestValidator = new StudyMetadataRequestValidator(dataSource);
+        studyMetadataRequestValidator.validate((studyMetadataRequestBean), errors);
+        if (!errors.hasErrors()) {
+
+            return new DOMSource(mapSuccessConfirmation(getStudy(studyMetadataRequestBean),
+                    messages.getMessage("studyEndpoint.success", null, "Success", locale)));
+        } else {
+            return new DOMSource(mapConfirmation(messages.getMessage("studyEndpoint.fail", null, "Fail", locale), errors));
+        }
+    }
+
+    private Element mapSuccessConfirmation(StudyBean study, String confirmation) throws Exception {
+        DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
+        Document document = docBuilder.newDocument();
+
+        Element responseElement = document.createElementNS(NAMESPACE_URI_V1, "createResponse");
+        Element resultElement = document.createElementNS(NAMESPACE_URI_V1, "result");
+        resultElement.setTextContent(confirmation);
+        responseElement.appendChild(resultElement);
+        MetadataUnit mdc = new MetadataUnit(dataSource, study, 0);
+        mdc.collectOdmStudy();
+        MetaDataReportBean meta = new MetaDataReportBean(mdc.getOdmStudy());
+        meta.addNodeStudy(Boolean.FALSE);
+        Element odmElement = document.createElementNS(NAMESPACE_URI_V1, "odm");
+        odmElement.setTextContent(meta.getXmlOutput().toString());
+        responseElement.appendChild(odmElement);
+
+        return responseElement;
+
+    }
+
+    private Element mapConfirmation(String confirmation, Errors errors) throws Exception {
+        DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
+        Document document = docBuilder.newDocument();
+
+        Element responseElement = document.createElementNS(NAMESPACE_URI_V1, "createResponse");
+        Element resultElement = document.createElementNS(NAMESPACE_URI_V1, "result");
+        resultElement.setTextContent(confirmation);
+        responseElement.appendChild(resultElement);
+
+        for (ObjectError error : errors.getAllErrors()) {
+            Element errorElement = document.createElementNS(NAMESPACE_URI_V1, "error");
+            String theMessage = messages.getMessage(error.getCode(), error.getArguments(), locale);
+            errorElement.setTextContent(theMessage);
+            responseElement.appendChild(errorElement);
+        }
+        return responseElement;
+
+    }
+
+    private StudyMetadataRequestBean unMarshallRequest(Element studyEventDefinitionListAll) {
+
+        Element studyRefElement = DomUtils.getChildElementByTagName(studyEventDefinitionListAll, "studyRef");
+        Element studyIdentifierElement = DomUtils.getChildElementByTagName(studyRefElement, "identifier");
+        Element siteRef = DomUtils.getChildElementByTagName(studyRefElement, "siteRef");
+        Element siteIdentifierElement = siteRef == null ? null : DomUtils.getChildElementByTagName(siteRef, "identifier");
+
+        String studyIdentifier = studyIdentifierElement == null ? null : DomUtils.getTextValue(studyIdentifierElement);
+        String siteIdentifier = siteIdentifierElement == null ? null : DomUtils.getTextValue(siteIdentifierElement);
+
+        StudyMetadataRequestBean studyMetadataRequest = new StudyMetadataRequestBean(studyIdentifier, siteIdentifier, getUserAccount());
+        return studyMetadataRequest;
+
+    }
+
+    StudyBean getStudy(StudyMetadataRequestBean studyMetadataRequest) {
+        StudyBean study = null;
+        if (studyMetadataRequest.getStudyUniqueId() != null && studyMetadataRequest.getSiteUniqueId() == null) {
+            study = getStudyDao().findByUniqueIdentifier(studyMetadataRequest.getStudyUniqueId());
+        }
+        if (studyMetadataRequest.getStudyUniqueId() != null && studyMetadataRequest.getSiteUniqueId() != null) {
+            study = getStudyDao().findByUniqueIdentifier(studyMetadataRequest.getSiteUniqueId());
+        }
+        return study;
+
     }
 
     /**

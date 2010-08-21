@@ -77,7 +77,10 @@
          annotations  -->
     <bean class="org.springframework.ws.server.endpoint.mapping.PayloadRootAnnotationMethodEndpointMapping"> 
         <property name="interceptors">
-            <list><ref bean="wsSecurityInterceptor"/></list>
+            <list>
+                <ref bean="wsSecurityInterceptor"/>
+                <ref bean="userPermissionInterceptor"/>
+            </list>
         </property>
     </bean>
     
@@ -155,6 +158,11 @@
     </bean>
     
     <!-- Security -->
+    
+    <bean id="userPermissionInterceptor" class="org.akaza.openclinica.ws.UserPermissionInterceptor">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+    
     <bean id="wsSecurityInterceptor" class="org.springframework.ws.soap.security.xwss.XwsSecurityInterceptor">
         <property name="secureResponse" value="false"/>
         <property name="policyConfiguration" value="classpath:securityPolicy.xml"/>

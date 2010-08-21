@@ -20,5 +20,23 @@
                 
         </complexType>
     </element>
+    
+    <element name="getMetadataRequest">
+        <complexType>
+            <sequence>
+                <element name="studyMetadata" type="beans:studyMetadataType"/>
+            </sequence>
+        </complexType>
+    </element>
+    
+    <element name="getMetadataResponse">
+        <complexType>
+            <sequence>
+                <element name="result" type="string"/>
+                <element name="warning" type="string" minOccurs="0" maxOccurs="unbounded"/>
+                <element name="error" type="string" minOccurs="0" maxOccurs="unbounded"/>
+            </sequence>
+        </complexType>
+    </element>
 
 </schema>

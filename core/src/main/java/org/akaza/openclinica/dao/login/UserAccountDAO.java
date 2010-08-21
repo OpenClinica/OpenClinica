@@ -98,6 +98,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         this.setTypeExpected(20, TypeNames.BOOL);
         this.setTypeExpected(21, TypeNames.BOOL);
         this.setTypeExpected(22, TypeNames.INT);
+        this.setTypeExpected(23, TypeNames.BOOL);
     }
 
     public void setPrivilegeTypesExpected() {
@@ -173,8 +174,9 @@ public class UserAccountDAO extends AuditableEntityDAO {
 
         variables.put(new Integer(16), uab.getAccountNonLocked());
         variables.put(new Integer(17), uab.getLockCounter());
+        variables.put(new Integer(18), uab.getRunWebservices());
 
-        variables.put(new Integer(18), new Integer(uab.getId()));
+        variables.put(new Integer(19), new Integer(uab.getId()));
 
         String sql = digester.getQuery("update");
         this.execute(sql, variables, nullVars);
@@ -273,6 +275,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
         } else {
             variables.put(new Integer(14), new Integer(UserType.USER.getId()));
         }
+
+        variables.put(new Integer(15), uab.getRunWebservices());
 
         boolean success = true;
         this.execute(digester.getQuery("insert"), variables);
@@ -382,6 +386,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         eb.setEnabled(((Boolean) hm.get("enabled")).booleanValue());
         eb.setAccountNonLocked(((Boolean) hm.get("account_non_locked")).booleanValue());
         eb.setLockCounter(((Integer) hm.get("lock_counter")));
+        eb.setRunWebservices(((Boolean) hm.get("run_webservices")).booleanValue());
         // for testing, tbh
         if (eb.isTechAdmin()) {
             // logger.warn("&&& is TECH ADMIN &&&");
@@ -960,6 +965,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
     public Collection findAllByRole(String role) {
         return this.findAllByRole(role, "");
     }
+
     public Collection findAllByRole(String role1, String role2) {
         this.setTypesExpected();
         HashMap variables = new HashMap();

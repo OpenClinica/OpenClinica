@@ -10,27 +10,27 @@
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
-		<td class="sidebar_tab">
+        <td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
+        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
 
-		<b><fmt:message key="instructions" bundle="${resword}"/></b>
+        <b><fmt:message key="instructions" bundle="${resword}"/></b>
 
-		<div class="sidebar_tab_content">
+        <div class="sidebar_tab_content">
 
-		</div>
+        </div>
 
-		</td>
+        </td>
 
-	</tr>
-	<tr id="sidebar_Instructions_closed" style="display: all">
-		<td class="sidebar_tab">
+    </tr>
+    <tr id="sidebar_Instructions_closed" style="display: all">
+        <td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
+        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
 
-		<b><fmt:message key="instructions" bundle="${resword}"/></b>
+        <b><fmt:message key="instructions" bundle="${resword}"/></b>
 
-		</td>
+        </td>
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
@@ -49,27 +49,30 @@
 <c:set var="displayPwd" value="no" />
 
 <c:forEach var="presetValue" items="${presetValues}">
-	<c:if test='${presetValue.key == "firstName"}'>
-		<c:set var="firstName" value="${presetValue.value}" />
-	</c:if>
-	<c:if test='${presetValue.key == "lastName"}'>
-		<c:set var="lastName" value="${presetValue.value}" />
-	</c:if>
-	<c:if test='${presetValue.key == "email"}'>
-		<c:set var="email" value="${presetValue.value}" />
-	</c:if>
-	<c:if test='${presetValue.key == "institutionalAffiliation"}'>
-		<c:set var="institutionalAffiliation" value="${presetValue.value}" />
-	</c:if>
-	<c:if test='${presetValue.key == "userType"}'>
-		<c:set var="userTypeId" value="${presetValue.value}" />
-	</c:if>
-	<c:if test='${presetValue.key == "resetPassword"}'>
-		<c:set var="resetPassword" value="${presetValue.value}" />
-	</c:if>
-	<c:if test='${presetValue.key == "displayPwd"}'>
-		<c:set var="displayPwd" value="${presetValue.value}" />
-	</c:if>
+    <c:if test='${presetValue.key == "firstName"}'>
+        <c:set var="firstName" value="${presetValue.value}" />
+    </c:if>
+    <c:if test='${presetValue.key == "lastName"}'>
+        <c:set var="lastName" value="${presetValue.value}" />
+    </c:if>
+    <c:if test='${presetValue.key == "email"}'>
+        <c:set var="email" value="${presetValue.value}" />
+    </c:if>
+    <c:if test='${presetValue.key == "institutionalAffiliation"}'>
+        <c:set var="institutionalAffiliation" value="${presetValue.value}" />
+    </c:if>
+    <c:if test='${presetValue.key == "userType"}'>
+        <c:set var="userTypeId" value="${presetValue.value}" />
+    </c:if>
+    <c:if test='${presetValue.key == "resetPassword"}'>
+        <c:set var="resetPassword" value="${presetValue.value}" />
+    </c:if>
+    <c:if test='${presetValue.key == "displayPwd"}'>
+        <c:set var="displayPwd" value="${presetValue.value}" />
+    </c:if>
+    <c:if test='${presetValue.key == "runWebServices"}'>
+        <c:set var="runWebServices" value="${presetValue.value}" />
+    </c:if>
 </c:forEach>
 <script type="text/JavaScript" language="JavaScript">
   <!--
@@ -101,148 +104,185 @@
 
 <!-- These DIVs define shaded box borders -->
 
-	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+    <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
-		<div class="tablebox_center">
+        <div class="tablebox_center">
 
 
-		<!-- Table Contents -->
+        <!-- Table Contents -->
 
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
-	<tr>
-		<td class="table_header_column_top"><fmt:message key="user_name" bundle="${resword}"/>:</td>
-		<td valign="top">
-			<table border="0" cellpadding="0" cellspacing="0">
-				<tr>
-					<td valign="top"><div class="formfieldM_BG">
-						<c:out value="${userName}"/>
-					</div></td>
-					<td>*</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<tr>
-		<td class="table_header_column_top"><fmt:message key="first_name" bundle="${resword}"/>:</td>
-		<td valign="top">
-			<table border="0" cellpadding="0" cellspacing="0">
-				<tr>
-					<td valign="top"><div class="formfieldM_BG">
-						<input type="text" name="firstName" value="<c:out value="${firstName}"/>" size="20" class="formfieldM" />
-					</div></td>
-					<td>*</td>
-				</tr>
-				<tr>
-					<td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="firstName" /></jsp:include></td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-
-	<tr valign="top">
-		<td class="table_header_column"><fmt:message key="last_name" bundle="${resword}"/>:</td>
-		<td valign="top">
-			<table border="0" cellpadding="0" cellspacing="0">
-				<tr>
-					<td valign="top"><div class="formfieldM_BG">
-						<input type="text" name="lastName" value="<c:out value="${lastName}"/>" size="20" class="formfieldM"/>
-					</div></td>
-					<td>*</td>
-				</tr>
-				<tr>
-					<td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="lastName" /></jsp:include>
-				</tr>
-			</table>
-		</td>
-	</tr>
-
-
-	<tr valign="top">
-		<td class="table_header_column"><fmt:message key="email" bundle="${resword}"/>:</td>
-		<td valign="top">
-			<table border="0" cellpadding="0" cellspacing="0">
-				<tr>
-					<td valign="top"><div class="formfieldM_BG">
-						<input type="text" name="email" value="<c:out value="${email}"/>" size="20" class="formfieldM"/>
-					</div></td>
-					<td>(<fmt:message key="username@institution" bundle="${resword}"/>) *</td>
-				</tr>
-				<tr>
-					<td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="email" /></jsp:include></td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-
-
-	<tr valign="top">
-		<td class="table_header_column"><fmt:message key="institutional_affiliation" bundle="${resword}"/>:</td>
-		<td valign="top">
-			<table border="0" cellpadding="0" cellspacing="0">
-				<tr>
-					<td valign="top"><div class="formfieldM_BG">
-						<input type="text" name="institutionalAffiliation" value="<c:out value="${institutionalAffiliation}"/>" size="20" class="formfieldM" />
-					</div></td>
-					<td>*</td>
-				</tr>
-				<tr>
-					<td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="institutionalAffiliation" /></jsp:include></td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-
-	<tr valign="top">
-	  	<td class="table_header_column"><fmt:message key="user_type" bundle="${resword}"/>:</td>
-		<td valign="top">
-			<table border="0" cellpadding="0" cellspacing="0">
-				<tr>
-					<td valign="top"><div class="formfieldM_BG">
-						<select name="userType" class="formfieldM">
-							<c:forEach var="type" items="${userTypes}">
-								<c:choose>
-									<c:when test="${userTypeId == type.id}">
-										<option value='<c:out value="${type.id}" />' selected><c:out value="${type.name}" /></option>
-									</c:when>
-									<c:otherwise>
-										<option value='<c:out value="${type.id}" />'><c:out value="${type.name}" /></option>
-									</c:otherwise>
-								</c:choose>
-							</c:forEach>
-						</select>
-					</div></td>
-					<td>*</td>
-				</tr>
-				<tr>
-					<td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="userType" /></jsp:include></td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<SCRIPT LANGUAGE="JavaScript">
-	 function a() {
-	   if (document.getElementById('resetPassword').checked){
-	     document.getElementById('displayPwd0').disabled=false
-	     document.getElementById('displayPwd1').disabled=false
-	   } else {
-	     document.getElementById('displayPwd0').disabled=true
-	     document.getElementById('displayPwd1').disabled=true
-	   }
-	 }
-	</SCRIPT>
-	<tr>
-		<td colspan=2 class="table_header_column">
-			<input type="checkbox" name="resetPassword" id="resetPassword" value="1"
-					<c:if test="${resetPassword != 0}">
-						checked
-					</c:if>
-			onclick="javascript:a()">
-			<fmt:message key="reset_password" bundle="${resword}"/>
-		</td>
-	</tr>
     <tr>
-	<td colspan="2">
-	  	<c:choose>
+        <td class="table_header_column_top"><fmt:message key="user_name" bundle="${resword}"/>:</td>
+        <td valign="top">
+            <table border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td valign="top"><div class="formfieldM_BG">
+                        <c:out value="${userName}"/>
+                    </div></td>
+                    <td>*</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td class="table_header_column_top"><fmt:message key="first_name" bundle="${resword}"/>:</td>
+        <td valign="top">
+            <table border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td valign="top"><div class="formfieldM_BG">
+                        <input type="text" name="firstName" value="<c:out value="${firstName}"/>" size="20" class="formfieldM" />
+                    </div></td>
+                    <td>*</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="firstName" /></jsp:include></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td class="table_header_column"><fmt:message key="last_name" bundle="${resword}"/>:</td>
+        <td valign="top">
+            <table border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td valign="top"><div class="formfieldM_BG">
+                        <input type="text" name="lastName" value="<c:out value="${lastName}"/>" size="20" class="formfieldM"/>
+                    </div></td>
+                    <td>*</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="lastName" /></jsp:include>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+
+    <tr valign="top">
+        <td class="table_header_column"><fmt:message key="email" bundle="${resword}"/>:</td>
+        <td valign="top">
+            <table border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td valign="top"><div class="formfieldM_BG">
+                        <input type="text" name="email" value="<c:out value="${email}"/>" size="20" class="formfieldM"/>
+                    </div></td>
+                    <td>(<fmt:message key="username@institution" bundle="${resword}"/>) *</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="email" /></jsp:include></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+
+    <tr valign="top">
+        <td class="table_header_column"><fmt:message key="institutional_affiliation" bundle="${resword}"/>:</td>
+        <td valign="top">
+            <table border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td valign="top"><div class="formfieldM_BG">
+                        <input type="text" name="institutionalAffiliation" value="<c:out value="${institutionalAffiliation}"/>" size="20" class="formfieldM" />
+                    </div></td>
+                    <td>*</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="institutionalAffiliation" /></jsp:include></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td class="table_header_column"><fmt:message key="user_type" bundle="${resword}"/>:</td>
+        <td valign="top">
+            <table border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td valign="top"><div class="formfieldM_BG">
+                        <select name="userType" class="formfieldM">
+                            <c:forEach var="type" items="${userTypes}">
+                                <c:choose>
+                                    <c:when test="${userTypeId == type.id}">
+                                        <option value='<c:out value="${type.id}" />' selected><c:out value="${type.name}" /></option>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <option value='<c:out value="${type.id}" />'><c:out value="${type.name}" /></option>
+                                    </c:otherwise>
+                                </c:choose>
+                            </c:forEach>
+                        </select>
+                    </div></td>
+                    <td>*</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="userType" /></jsp:include></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    
+    <tr valign="top">
+        <td class="table_header_column"><fmt:message key="institutional_affiliation" bundle="${resword}"/>:</td>
+        <td valign="top">
+            <table border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td valign="top"><div class="formfieldM_BG">
+                        <input type="text" name="institutionalAffiliation" value="<c:out value="${institutionalAffiliation}"/>" size="20" class="formfieldM" />
+                    </div></td>
+                    <td>*</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="institutionalAffiliation" /></jsp:include></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    
+    <tr valign="top">
+        <td class="table_header_column"><fmt:message key="can_run_web_services" bundle="${resword}"/>:</td>
+        <td valign="top">
+            <table border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td valign="top">
+                        <input type="checkbox" name="runWebServices" id="runWebServices" value="1"
+                            <c:if test="${runWebServices != 0}">checked</c:if>
+                        >
+                    </td>
+                    <td> </td>
+                </tr>
+                <tr>
+                    <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="runWebServices" /></jsp:include></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    
+    <SCRIPT LANGUAGE="JavaScript">
+     function a() {
+       if (document.getElementById('resetPassword').checked){
+         document.getElementById('displayPwd0').disabled=false
+         document.getElementById('displayPwd1').disabled=false
+       } else {
+         document.getElementById('displayPwd0').disabled=true
+         document.getElementById('displayPwd1').disabled=true
+       }
+     }
+    </SCRIPT>
+    <tr>
+        <td colspan=2 class="table_header_column">
+            <input type="checkbox" name="resetPassword" id="resetPassword" value="1"
+                    <c:if test="${resetPassword != 0}">
+                        checked
+                    </c:if>
+            onclick="javascript:a()">
+            <fmt:message key="reset_password" bundle="${resword}"/>
+        </td>
+    </tr>
+    <tr>
+    <td colspan="2">
+        <c:choose>
          <c:when test="${displayPwd == 'no'}">
             <input type="radio" checked name="displayPwd" id="displayPwd0" value="no" disabled="true"><fmt:message key="send_user_password_via_email" bundle="${resword}"/>
             <input type="radio" name="displayPwd" id="displayPwd1" value="yes" disabled="true" ><fmt:message key="show_user_password_to_admin" bundle="${resword}"/>
@@ -254,13 +294,13 @@
          </c:otherwise>
        </c:choose>
       </td>
-	</tr>
-	</table>
-	</div>
+    </tr>
+    </table>
+    </div>
 
-	</div></div></div></div></div></div></div></div>
+    </div></div></div></div></div></div></div></div>
 
-	</div>
+    </div>
 
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>

@@ -82,6 +82,9 @@
 	<c:if test='${presetValue.key == "displayPwd"}'>
 		<c:set var="displayPwd" value="${presetValue.value}" />
 	</c:if>
+	<c:if test='${presetValue.key == "runWebServices"}'>
+        <c:set var="runWebServices" value="${presetValue.value}" />
+    </c:if>
 </c:forEach>
 
 <script type="text/JavaScript" language="JavaScript">
@@ -317,6 +320,24 @@ int selectedValue;
 			</table>
 		</td>
 	</tr>
+	<tr valign="top">
+        <td class="formlabel"><fmt:message key="can_run_web_services" bundle="${resword}"/>:</td>
+        <td valign="top">
+            <table border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td valign="top">
+                        <input type="checkbox" name="runWebServices" id="runWebServices" value="1"
+                            <c:if test="${runWebServices != 0}">checked</c:if>
+                        >
+                    </td>
+                    <td> </td>
+                </tr>
+                <tr>
+                    <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="runWebServices" /></jsp:include></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
     <tr valign="top">
 	  <td class="formlabel"><fmt:message key="user_password_generated" bundle="${resword}"/>:</td>
 	  	<td>

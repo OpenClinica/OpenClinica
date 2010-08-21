@@ -40,6 +40,7 @@ public class UserAccountBean extends AuditableEntityBean {
     private Boolean enabled;
     private Boolean accountNonLocked;
     private Integer lockCounter;
+    private Boolean runWebservices;
 
     /**
      * Counts the number of times the user visited Main Menu servlet.
@@ -112,6 +113,7 @@ public class UserAccountBean extends AuditableEntityBean {
         enabled = true;
         accountNonLocked = true;
         lockCounter = 0;
+        runWebservices = false;
 
     }
 
@@ -506,4 +508,13 @@ public class UserAccountBean extends AuditableEntityBean {
     public void setNotes(String notes) {
         this.notes = notes;
     }
+
+    public Boolean getRunWebservices() {
+        return runWebservices;
+    }
+
+    public void setRunWebservices(Boolean runWebservices) {
+        this.runWebservices = runWebservices;
+    }
+
 }

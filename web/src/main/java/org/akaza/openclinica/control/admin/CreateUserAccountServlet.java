@@ -55,6 +55,7 @@ public class CreateUserAccountServlet extends SecureController {
     public static final String INPUT_ROLE = "role";
     public static final String INPUT_TYPE = "type";
     public static final String INPUT_DISPLAY_PWD = "displayPwd";
+    public static final String INPUT_RUN_WEBSERVICES = "runWebServices";
 
     /*
      * (non-Javadoc)
@@ -96,7 +97,7 @@ public class CreateUserAccountServlet extends SecureController {
             roleMap.put(role.getId(), role.getDescription());
         }
 
-        //addEntityList("roles", getRoles(), respage.getString("a_user_cannot_be_created_no_roles_as_role"), Page.ADMIN_SYSTEM);
+        // addEntityList("roles", getRoles(), respage.getString("a_user_cannot_be_created_no_roles_as_role"), Page.ADMIN_SYSTEM);
         request.setAttribute("roles", roleMap);
 
         ArrayList types = UserType.toArrayList();
@@ -117,10 +118,10 @@ public class CreateUserAccountServlet extends SecureController {
                 for (Iterator it = getRoles().iterator(); it.hasNext();) {
                     Role role = (Role) it.next();
                     switch (role.getId()) {
-                    //                        case 2: roleMap.put(role.getId(), resterm.getString("site_Study_Coordinator").trim());
-                    //                            break;
-                    //                        case 3: roleMap.put(role.getId(), resterm.getString("site_Study_Director").trim());
-                    //                            break;
+                    // case 2: roleMap.put(role.getId(), resterm.getString("site_Study_Coordinator").trim());
+                    // break;
+                    // case 3: roleMap.put(role.getId(), resterm.getString("site_Study_Director").trim());
+                    // break;
                     case 4:
                         roleMap.put(role.getId(), resterm.getString("site_investigator").trim());
                         break;
@@ -165,7 +166,7 @@ public class CreateUserAccountServlet extends SecureController {
             String textFields[] = { INPUT_USERNAME, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_EMAIL, INPUT_INSTITUTION, INPUT_DISPLAY_PWD };
             fp.setCurrentStringValuesAsPreset(textFields);
 
-            String ddlbFields[] = { INPUT_STUDY, INPUT_ROLE, INPUT_TYPE };
+            String ddlbFields[] = { INPUT_STUDY, INPUT_ROLE, INPUT_TYPE, INPUT_RUN_WEBSERVICES };
             fp.setCurrentIntValuesAsPreset(ddlbFields);
 
             HashMap presetValues = fp.getPresetValues();
@@ -224,6 +225,7 @@ public class CreateUserAccountServlet extends SecureController {
                 createdUserAccountBean.setPasswdChallengeAnswer("");
                 createdUserAccountBean.setPhone("");
                 createdUserAccountBean.setOwner(ub);
+                createdUserAccountBean.setRunWebservices(fp.getBoolean(INPUT_RUN_WEBSERVICES));
 
                 int studyId = fp.getInt(INPUT_STUDY);
                 Role r = Role.get(fp.getInt(INPUT_ROLE));
@@ -264,7 +266,7 @@ public class CreateUserAccountServlet extends SecureController {
                 String textFields[] = { INPUT_USERNAME, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_EMAIL, INPUT_INSTITUTION, INPUT_DISPLAY_PWD };
                 fp.setCurrentStringValuesAsPreset(textFields);
 
-                String ddlbFields[] = { INPUT_STUDY, INPUT_ROLE, INPUT_TYPE };
+                String ddlbFields[] = { INPUT_STUDY, INPUT_ROLE, INPUT_TYPE, INPUT_RUN_WEBSERVICES };
                 fp.setCurrentIntValuesAsPreset(ddlbFields);
 
                 HashMap presetValues = fp.getPresetValues();
@@ -311,7 +313,7 @@ public class CreateUserAccountServlet extends SecureController {
         body += restext.getString("please_test_your_login_information_and_let") + "\n";
         body += SQLInitServlet.getField("sysURL");
         body += " . ";
-        //body += restext.getString("openclinica_system_administrator");
+        // body += restext.getString("openclinica_system_administrator");
 
         sendEmail(createdUserAccountBean.getEmail().trim(), restext.getString("your_new_openclinica_account"), body, false);
     }

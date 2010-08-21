@@ -159,6 +159,12 @@
             <element name="studyRef" type="beans:studyRefType"/>
         </sequence>
     </complexType>
+    
+    <complexType name="studyMetadataType">
+        <sequence>
+            <element name="studyRef" type="beans:studyRefType"/>
+        </sequence>
+    </complexType>
 
     <complexType name="studyRefType">
         <sequence>

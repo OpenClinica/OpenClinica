@@ -53,6 +53,8 @@ public class EditUserAccountServlet extends SecureController {
 
     public static final String ARG_STEPNUM = "stepNum";
 
+    public static final String INPUT_RUN_WEBSERVICES = "runWebServices";
+
     // possible values of ARG_STEPNUM
     public static final int EDIT_STEP = 1;
 
@@ -161,6 +163,7 @@ public class EditUserAccountServlet extends SecureController {
                 user.setEmail(fp.getString(INPUT_EMAIL));
                 user.setInstitutionalAffiliation(fp.getString(INPUT_INSTITUTION));
                 user.setUpdater(ub);
+                user.setRunWebservices(fp.getBoolean(INPUT_RUN_WEBSERVICES));
 
                 UserType ut = UserType.get(fp.getInt(INPUT_USER_TYPE));
                 if (ut.equals(UserType.SYSADMIN)) {
@@ -251,6 +254,7 @@ public class EditUserAccountServlet extends SecureController {
         // UserType.USER.getId();
         fp.addPresetValue(INPUT_USER_TYPE, userTypeId);
         fp.addPresetValue(ARG_USERID, user.getId());
+        fp.addPresetValue(INPUT_RUN_WEBSERVICES, user.getRunWebservices() == true ? 1 : 0);
     }
 
     private void loadPresetValuesFromForm(FormProcessor fp) {
@@ -259,7 +263,7 @@ public class EditUserAccountServlet extends SecureController {
         String textFields[] = { ARG_USERID, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_EMAIL, INPUT_INSTITUTION, INPUT_DISPLAY_PWD };
         fp.setCurrentStringValuesAsPreset(textFields);
 
-        String ddlbFields[] = { INPUT_USER_TYPE, INPUT_RESET_PASSWORD };
+        String ddlbFields[] = { INPUT_USER_TYPE, INPUT_RESET_PASSWORD, INPUT_RUN_WEBSERVICES };
         fp.setCurrentIntValuesAsPreset(ddlbFields);
 
         // String chkFields[] = { };

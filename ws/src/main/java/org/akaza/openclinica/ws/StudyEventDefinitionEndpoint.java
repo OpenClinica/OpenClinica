@@ -200,7 +200,7 @@ public class StudyEventDefinitionEndpoint {
                 Element crfElement = document.createElementNS(NAMESPACE_URI_V1, "crf");
                 eventDefinitionCrfElement.appendChild(crfElement);
 
-                CRFBean crfBean = (CRFBean) crfDao.findByPK(eventCrf.getCrfId());
+                CRFBean crfBean = (CRFBean) getCrfDao().findByPK(eventCrf.getCrfId());
 
                 element = document.createElementNS(NAMESPACE_URI_V1, "oid");
                 element.setTextContent(crfBean.getOid());

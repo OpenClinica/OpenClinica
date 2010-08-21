@@ -129,6 +129,17 @@
 		<td class="table_header_column"><fmt:message key="updated_by" bundle="${resword}"/>:</td>
 		<td class="table_cell"><c:out value="${user.updater.name}" />&nbsp;</td>
 	</tr>
+	<tr>
+        <td class="table_header_column"><fmt:message key="authorized_run_web_services" bundle="${resword}"/>:</td>
+        <c:choose>
+            <c:when test="${user.runWebservices}">
+                <td class="table_cell"><fmt:message key="yes" bundle="${resword}"/></td>
+            </c:when>
+            <c:otherwise>
+                <td class="table_cell"><fmt:message key="no" bundle="${resword}"/></td>
+            </c:otherwise>
+        </c:choose>
+    </tr>
 <!-- TODO:
 for each study user is in, show:
 �	Role
