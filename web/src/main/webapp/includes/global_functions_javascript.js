@@ -1102,7 +1102,7 @@ function openDocWindow(inURL) {
     		'',
             'directories=no,location=no,menubar=yes,scrollbars=yes,toolbar=no,status=no,resizable=yes',
             'medium');
-
+    //Name changed to blank because it shows error on IE7 and IE8. Mantis issue: 5553.
 }
 
 //-------------------------------------------------------------------------

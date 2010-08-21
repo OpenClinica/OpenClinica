@@ -60,6 +60,7 @@ public class FileUploadHelper {
 
         // Create a factory for disk-based file items
         DiskFileItemFactory factory = new DiskFileItemFactory();
+        // factory.setSizeThreshold(20 * 1024 * 1024); //size in bytes?
 
         // Create a new file upload handler
         ServletFileUpload upload = new ServletFileUpload(factory);
@@ -76,6 +77,7 @@ public class FileUploadHelper {
                     request.setAttribute(item.getFieldName(), item.getString());
                     // DO NOTHING , THIS SHOULD NOT BE Handled here
                 } else {
+                    // System.out.println("found " + dirToSaveUploadedFileIn + " and item " + item.getName());
                     files.add(processUploadedFile(item, dirToSaveUploadedFileIn));
                 }
             }

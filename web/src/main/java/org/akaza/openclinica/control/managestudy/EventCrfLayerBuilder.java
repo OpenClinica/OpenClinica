@@ -483,7 +483,7 @@ public class EventCrfLayerBuilder {
             StudyEventBean studyEvent) {
         String href =
             "InitialDataEntry?eventDefinitionCRFId=" + eventDefinitionCrf.getId() + "&studyEventId=" + studyEvent.getId() + "&subjectId="
-                + studySubject.getId() + "&eventCRFId=" + eventCrf.getId() + "&crfVersionId=" + eventCrf.getCRFVersionId()+"&exitTo=ListStudySubjects";
+                + studySubject.getSubjectId() + "&eventCRFId=" + eventCrf.getId() + "&crfVersionId=" + eventDefinitionCrf.getDefaultVersionId()+"&exitTo=ListStudySubjects";
         builder.a().href(href).close();
         builder.img().src("images/bt_Edit.gif").border("0").align("left").close();
         builder.aEnd();
@@ -493,7 +493,7 @@ public class EventCrfLayerBuilder {
             StudyEventBean studyEvent, String link) {
         String href =
             "InitialDataEntry?eventDefinitionCRFId=" + eventDefinitionCrf.getId() + "&studyEventId=" + studyEvent.getId() + "&subjectId="
-                + studySubject.getId() + "&eventCRFId=" + eventCrf.getId() + "&crfVersionId=" + eventCrf.getCRFVersionId()+"&exitTo=ListStudySubjects";
+                + studySubject.getSubjectId() + "&eventCRFId=" + eventCrf.getId() + "&crfVersionId=" + eventDefinitionCrf.getDefaultVersionId()+"&exitTo=ListStudySubjects";
         builder.a().href(href).close();
         builder.append(link);
         builder.aEnd();

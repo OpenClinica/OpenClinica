@@ -27,9 +27,10 @@
   <tr valign="top">
       <td class="formlabel"><fmt:message key="password_challenge_question" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG">
         <select name="passwdChallengeQuestion" class="formfieldXL">
-            <option value="Mother's Maiden Name" ><fmt:message key="mother_maiden_name" bundle="${resword}"/></option>
-            <option value="Favorite Pet" ><fmt:message key="favourite_pet" bundle="${resword}"/></option>
-            <option value="City of Birth" ><fmt:message key="city_of_birth" bundle="${resword}"/></option>
+            <option><fmt:message key="favourite_pet" bundle="${resword}"/></option>
+            <option><fmt:message key="city_of_birth" bundle="${resword}"/></option>
+            <option><fmt:message key="mother_maiden_name" bundle="${resword}"/></option>
+            <option><fmt:message key="favorite_color" bundle="${resword}"/></option>
         </select></div></td>
   </tr>
   <tr valign="top"><td class="formlabel"><fmt:message key="password_challenge_answer" bundle="${resword}"/>:</td>

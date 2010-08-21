@@ -155,6 +155,8 @@ public class ListEventDefinitionServlet extends SecureController {
         // }
 
         table.setRows(allStudyRows);
+        
+        table.setPaginated(false);
         table.computeDisplay();
 
         request.setAttribute("table", table);

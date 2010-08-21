@@ -26,4 +26,5 @@
     <include file="migration/3.0/2010-05-31-5009.xml"/>
     <include file="migration/3.0/2010-05-27-5095.xml"/>
     <include file="migration/3.0/2010-07-16-NA01.xml"/>
+    <include file="migration/3.0/2010-07-30-5255.xml"/>
 </databaseChangeLog>

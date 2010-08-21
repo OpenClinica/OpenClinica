@@ -7,6 +7,13 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.rule.FileUploadHelper;
 import org.akaza.openclinica.control.core.SecureController;
@@ -14,13 +21,6 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 
 public class UploadFileServlet extends SecureController {
     Locale locale;
@@ -54,8 +54,8 @@ public class UploadFileServlet extends SecureController {
                 request.setAttribute("uploadFileStauts", "failed");
                 this.forwardPage(Page.FILE_UPLOAD);
             } else {
-                if (!(new File(dir)).isDirectory()) {
-                    (new File(dir)).mkdirs();
+                if (!new File(dir).isDirectory()) {
+                    new File(dir).mkdirs();
                     logger.info("Made the directory " + dir);
                 }
                 request.setAttribute("attachedFilePath", dir);
@@ -72,8 +72,10 @@ public class UploadFileServlet extends SecureController {
                             fileName = "";
                         } else {
                             fileName = temp.getName();
+                            logger.info("fileName="+fileName);
                         }
                     }
+                    logger.info("===== fileName="+fileName);
                     request.setAttribute("fileName", fileName);
                     request.setAttribute("uploadFileStatus", "successed");
                     String key = "";
@@ -124,7 +126,26 @@ public class UploadFileServlet extends SecureController {
             // here, File f has been validated as a valid File.
             String pathAndName = f.getPath();
             int p = pathAndName.lastIndexOf('.');
-            String newName = pathAndName.substring(0, p) + (new SimpleDateFormat("yyyyMMddHHmmssZ")).format(new Date()) + pathAndName.substring(p);
+            int n = pathAndName.lastIndexOf(File.separatorChar);
+            logger.debug("found n: " + n);
+            logger.debug("found p: " + p);
+            String fileName = pathAndName.substring(n, p);
+            logger.debug("found file name: " + fileName);
+            if (Utils.isWithinRegexp(fileName, "\\W+")) {
+                logger.debug("found non word characters");
+                fileName = fileName.replaceAll("\\W+", "_");
+            }
+            String newName = pathAndName.substring(0, n) + 
+            	File.separator + 
+            	fileName + new SimpleDateFormat("yyyyMMddHHmmssZ").format(new Date()) + pathAndName.substring(p);
+            // >> tbh 5545 remove all html-symbol characters here
+            //            if (!Utils.isMatchingRegexp(newName, "[a-zA-Z_0-9/\\\\:.+-\\s]")) {
+            //                logger.debug("found non word characters");
+            //                newName = newName.replaceAll("[^a-zA-Z_0-9/\\\\:.+-\\s]", "_");
+            //            }
+            
+            // << tbh 5545 replace all non-words with the underscore
+            logger.debug("-- > returning: " + newName);
             return new File(newName);
         }
     }

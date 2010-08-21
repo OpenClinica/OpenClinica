@@ -12,18 +12,18 @@ public class ViewRuleAssignmentSort implements CriteriaCommand {
 
     public ViewRuleAssignmentSort() {
         columnMapping.put("studyId", "rs.study_id");
-        columnMapping.put("targetValue", "re.value");
-        columnMapping.put("studyEventDefinitionName", "sed.name");
-        columnMapping.put("crfName", "c.name");
-        columnMapping.put("crfVersionName", "cv.name");
-        columnMapping.put("groupLabel", "ig.name");
-        columnMapping.put("itemName", "i.name");
-        columnMapping.put("ruleExpressionValue", "rer.value");
-        columnMapping.put("ruleOid", "r.oc_oid");
-        columnMapping.put("ruleDescription", "r.description");
-        columnMapping.put("ruleName", "r.name");
+        columnMapping.put("targetValue", "revalue");
+        columnMapping.put("studyEventDefinitionName", "sedname");
+        columnMapping.put("crfName", "cname");
+        columnMapping.put("crfVersionName", "cvname");
+        columnMapping.put("groupLabel", "igname");
+        columnMapping.put("itemName", "iname");
+        columnMapping.put("ruleExpressionValue", "rervalue");
+        columnMapping.put("ruleOid", "rocoid");
+        columnMapping.put("ruleDescription", "rdescription");
+        columnMapping.put("ruleName", "rname");
         columnMapping.put("ruleSetRuleStatus", "rsr.status_id");
-        //columnMapping.put("validations", "validations");
+        // columnMapping.put("validations", "validations");
         columnMapping.put("actionExecuteOn", "ra.expression_evaluates_to");
         columnMapping.put("actionType", "ra.action_type");
         columnMapping.put("actionSummary", "ra.message");

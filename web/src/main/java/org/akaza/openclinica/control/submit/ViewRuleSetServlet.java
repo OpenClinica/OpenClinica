@@ -17,6 +17,9 @@ import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Krikor Krumlian
  */
@@ -67,9 +70,26 @@ public class ViewRuleSetServlet extends SecureController {
 
             }
             request.setAttribute("validRuleSetRuleIds", validRuleSetRuleIds);
+            request.setAttribute("ruleSetRuleBeans", orderRuleSetRulesByStatus(ruleSetBean));
             request.setAttribute(RULESET, ruleSetBean);
             forwardPage(Page.VIEW_RULES);
         }
+    }
+
+    List<RuleSetRuleBean> orderRuleSetRulesByStatus(RuleSetBean ruleSet) {
+        ArrayList<RuleSetRuleBean> availableRuleSetRules = new ArrayList<RuleSetRuleBean>();
+        ArrayList<RuleSetRuleBean> nonAvailableRuleSetRules = new ArrayList<RuleSetRuleBean>();
+        for (RuleSetRuleBean ruleSetRuleBean : ruleSet.getRuleSetRules()) {
+            if (ruleSetRuleBean.getStatus() == Status.AVAILABLE) {
+                availableRuleSetRules.add(ruleSetRuleBean);
+            } else {
+                nonAvailableRuleSetRules.add(ruleSetRuleBean);
+            }
+        }
+
+        availableRuleSetRules.addAll(nonAvailableRuleSetRules);
+        return availableRuleSetRules;
+
     }
 
     @Override

@@ -20,7 +20,7 @@
 <jsp:include page="../include/sideAlert.jsp"/>
 
 <!-- then instructions-->
-<tr id="sidebar_Instructions_open" style="display: none">
+<tr id="sidebar_Instructions_open" style="display: all">
         <td class="sidebar_tab">
 
         <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
@@ -28,13 +28,13 @@
         <b><fmt:message key="instructions" bundle="${resword}"/></b>
 
         <div class="sidebar_tab_content">
-
+            <fmt:message key="rule_execute_rule_bottom_message" bundle="${resword}"/>
         </div>
 
         </td>
 
     </tr>
-    <tr id="sidebar_Instructions_closed" style="display: all">
+    <tr id="sidebar_Instructions_closed" style="display: none">
         <td class="sidebar_tab">
 
         <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
@@ -75,10 +75,10 @@
 
 <div class="tablebox_center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
-  <tr valign="top"><td class="table_header_column"><fmt:message key="rule_expression" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${ruleSet.originalTarget.value}"/>
+  <tr valign="top"><td class="table_header_column"><fmt:message key="view_executed_rules_target_oid" bundle="${resword}"/>:</td><td class="table_cell">
+  <c:out value="${ruleSet.target.value}"/>
   </td></tr>
-  <tr valign="top"><td class="table_header_column_top"><fmt:message key="rule_study_event_definition" bundle="${resword}"/>:</td><td class="table_cell">
+  <tr valign="top"><td class="table_header_column"><fmt:message key="rule_study_event_definition" bundle="${resword}"/>:</td><td class="table_cell">
   <c:out value="${ruleSet.studyEventDefinitionNameWithOID}"/>
    </td></tr>
   <tr valign="top"><td class="table_header_column"><fmt:message key="CRF_name" bundle="${resword}"/>:</td><td class="table_cell">
@@ -88,7 +88,7 @@
   <c:out value="${ruleSet.groupLabelWithOid}"/>
   </td></tr>
   <tr valign="top"><td class="table_header_column"><fmt:message key="rule_item_name" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${ruleSet.itemNameWithOid}"/>
+  <a href="javascript: openDocWindow('ViewItemDetail?itemId=${ruleSet.itemId}')"><c:out value="${ruleSet.itemNameWithOid}"/></a>
   </td></tr>
 </table>
 </div>
@@ -104,13 +104,14 @@
 <span class="table_title_Manage">
 </c:otherwise>
 </c:choose>
+<c:if test="${fn:length(ruleSetResult) > 0}">
 <div style="width: 850px">
  <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-
 <div class="tablebox_center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
   <tr valign="top">
     <td class="table_header_row_left"><fmt:message key="rule_name" bundle="${resword}"/></td>
+    <td class="table_header_row"><fmt:message key="view_executed_rules_oid" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="rule_expression" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="rule_execute_on" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="rule_action_type" bundle="${resword}"/></td>
@@ -120,6 +121,7 @@
   <c:forEach var ="result" items="${ruleSetResult}" varStatus="status">
     <tr valign="top">
     <td  class="table_cell_left"><c:out value="${result.ruleName}"/></td>
+    <td  class="table_cell"><c:out value="${result.ruleOid}"/></td>
     <td  class="table_cell"><c:out value="${result.expression}"/></td>
     <td class="table_cell"><c:out value="${result.executeOn}"/></td>
     <td class="table_cell"><c:out value="${result.actionType}"/></td>
@@ -141,13 +143,14 @@
 
 </div>
 
-
-<p><fmt:message key="rule_execute_rule_bottom_message" bundle="${resword}"/></p>
+</c:if>
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>
+<c:if test="${fn:length(ruleSetResult) > 0}">
 <td>
 <input type="button" name="Submit" id="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_long" onClick="window.location.href='RunRuleSet?ruleSetId=${ruleSet.id}&dryRun=no';"/></td>
 </td>
+</c:if>
 <td>
 <input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_long" onClick="window.location.href='ViewRuleAssignment';"/></td>
 </tr></table>

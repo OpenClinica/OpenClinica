@@ -2,6 +2,44 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
+<style>
+
+.sidebar_tab_kk {
+background-color:#FFFFFF;
+background-image:url("../images/sidebar_tab.gif");
+background-position:right top;
+background-repeat:no-repeat;
+border-bottom-color:#B2B2B2;
+border-bottom-style:solid;
+border-bottom-width:1px;
+border-left-color-ltr-source:physical;
+border-left-color-rtl-source:physical;
+border-left-color-value:#B2B2B2;
+border-left-style-ltr-source:physical;
+border-left-style-rtl-source:physical;
+border-left-style-value:solid;
+border-left-width-ltr-source:physical;
+border-left-width-rtl-source:physical;
+border-left-width-value:0;
+border-right-color-ltr-source:physical;
+border-right-color-rtl-source:physical;
+border-right-color-value:#B2B2B2;
+border-right-style-ltr-source:physical;
+border-right-style-rtl-source:physical;
+border-right-style-value:solid;
+border-right-width-ltr-source:physical;
+border-right-width-rtl-source:physical;
+border-right-width-value:0;
+border-top-color:#B2B2B2;
+border-top-style:solid;
+border-top-width:0;
+padding-bottom:4px;
+padding-left:6px;
+padding-right:8px;
+padding-top:4px;
+width:160px;
+}
+</style>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/> 
 
 
@@ -26,10 +64,17 @@
             
       <c:if test="${panel.studyInfoShown}">
                 <c:import url="/WEB-INF/jsp/include/viewRuleAssignmentStudySideInfo.jsp"/>
-        <br><br>
+        <br>
         </c:if>       
 
       <c:if test="${panel.createDataset}">   
+        <!--
+        <table cellspacing="0" cellpadding="0" border="0" width="142">
+            <tr id="sidebar_Info_open">
+            <td class="sidebar_tab_kk">&nbsp;</td>
+            </tr>
+        </table>
+        -->
 
         <c:import url="../include/viewRuleAssignmentSide.jsp"/>
         <br><br>
@@ -92,5 +137,5 @@
                 <br><img src="images/spacer.gif" width="120" height="1">
 
                 </td>
+               
                 <td class="content" valign="top">
-

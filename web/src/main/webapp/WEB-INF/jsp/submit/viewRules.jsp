@@ -78,15 +78,21 @@
   </td></tr>
   <tr valign="top"><td class="table_header_column"><fmt:message key="actions" bundle="${resword}"/>:</td><td class="table_cell">
     <a href="RunRuleSet?ruleSetId=<c:out value="${ruleSet.id}"/>"
-       onmouseover="Tip('<fmt:message key="view_rules_run_tip" bundle="${resword}"/>')" 
+       onmouseover="Tip('<fmt:message key="view_rules_run_all_tip" bundle="${resword}"/>')" 
        onmouseout="UnTip()"><fmt:message key="view_rules_run_all" bundle="${resword}"/></a> ,
     <a href="UpdateRuleSetRule?action=remove&ruleSetId=<c:out value="${ruleSet.id}"/>&source=ViewRuleSet"
-       onClick='return confirm("<fmt:message key="rule_if_you_remove_this_all" bundle="${resword}"/>");'><fmt:message key="view_rules_remove_all" bundle="${resword}"/></a> ,
+       onClick='return confirm("<fmt:message key="rule_if_you_remove_this_all" bundle="${resword}"/>");'
+       onmouseover="Tip('<fmt:message key="view_rules_remove_all_tip" bundle="${resword}"/>')" 
+       onmouseout="UnTip()">
+                            <fmt:message key="view_rules_remove_all" bundle="${resword}"/></a> ,
     <a href="DownloadRuleSetXml?ruleSetRuleIds=<c:out value="${validRuleSetRuleIds}"/>"
-       onmouseover="Tip('<fmt:message key="view_rules_download_tip" bundle="${resword}"/>')" 
-       onmouseout="UnTip()"
-    ><fmt:message key="view_rules_get_xml" bundle="${resword}"/></a> , 
-    <a href="ViewRuleSetAudit?ruleSetId=<c:out value="${ruleSet.id}"/>"><fmt:message key="view_rules_audit" bundle="${resword}"/></a>
+       onmouseover="Tip('<fmt:message key="view_rules_get_xml_tip" bundle="${resword}"/>')" 
+       onmouseout="UnTip()">
+                            <fmt:message key="view_rules_get_xml" bundle="${resword}"/></a> , 
+    <a href="ViewRuleSetAudit?ruleSetId=<c:out value="${ruleSet.id}"/>"
+       onmouseover="Tip('<fmt:message key="view_rules_audit_tip" bundle="${resword}"/>')" 
+       onmouseout="UnTip()">
+                            <fmt:message key="view_rules_audit" bundle="${resword}"/></a>
     
   </td></tr>
 </table>
@@ -103,7 +109,7 @@
 <span class="table_title_Manage">
 </c:otherwise>
 </c:choose>
-<div style="width: 900px">
+<div style="width: 1000px">
  <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
 <div class="tablebox_center">
@@ -118,7 +124,7 @@
     <td class="table_header_row"><fmt:message key="rule_action_summary" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="action" bundle="${resword}"/></td>
     </tr>
-  <c:forEach var ="ruleSetRule" items="${ruleSet.ruleSetRules}">
+  <c:forEach var ="ruleSetRule" items="${ruleSetRuleBeans}">
     <c:choose>
      <c:when test="${ruleSetRule.status.name eq 'AVAILABLE'}">
         <c:set var="className" value="aka_green_highlight"/>

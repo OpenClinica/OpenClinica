@@ -7,19 +7,25 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.DataInputStream;
+import java.util.ArrayList;
+import java.util.Locale;
+
 import org.akaza.openclinica.bean.core.Utils;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
-import java.io.File;
-import java.util.Locale;
+import javax.servlet.ServletOutputStream;
 
 /**
  * @author ywang (Dec., 2008)
- *
  */
 public class DownloadAttachedFileServlet extends SecureController {
 
@@ -65,21 +71,74 @@ public class DownloadAttachedFileServlet extends SecureController {
         String fileName = fp.getString("fileName");
         File f = new File(fileName);
         if (fileName != null && fileName.length() > 0) {
-            attachedFilePath = Utils.getAttachedFilePath(currentStudy);
-            filePathName = attachedFilePath + f.getName();
+            int parentStudyId = currentStudy.getParentStudyId();
+            String testPath = Utils.getAttachedFileRootPath();
+            String tail = File.separator + f.getName();
+            String testName = testPath + currentStudy.getIdentifier() + tail;
+            File temp = new File(testName);
+            if (temp.exists()) {
+                filePathName = testName;
+                logger.info(currentStudy.getName() + " existing filePathName=" + filePathName);
+            } else {
+                if (currentStudy.isSite(parentStudyId)) {
+                    testName = testPath + ((StudyBean) new StudyDAO(sm.getDataSource()).findByPK(parentStudyId)).getIdentifier() + tail;
+                    temp = new File(testName);
+                    if (temp.exists()) {
+                        filePathName = testName;
+                        logger.info("parent existing filePathName=" + filePathName);
+                    }
+                } else {
+                    ArrayList<StudyBean> sites = (ArrayList<StudyBean>) new StudyDAO(sm.getDataSource()).findAllByParent(currentStudy.getId());
+                    for (StudyBean s : sites) {
+                        testPath = Utils.getAttachedFilePath(s);
+                        testName = testPath + tail;//+ s.getIdentifier() + tail;
+                        File test = new File(testName);
+                        if (test.exists()) {
+                            filePathName = testName;
+                            logger.info("site of currentStudy existing filePathName=" + filePathName);
+                            break;
+                        }
+                    }
+                }
+            }
         }
+        logger.info("filePathName=" + filePathName + " fileName=" + fileName);
         File file = new File(filePathName);
         if (!file.exists() || file.length() <= 0) {
-            addPageMessage("File " + filePathName + " " + respage.getString("not_exist."));
+            addPageMessage("File " + filePathName + " " + respage.getString("not_exist"));
         } else {
-            request.setAttribute("downloadStatus", "true");
-            response.setContentType("application/octet-stream");
             response.setHeader("Content-disposition", "attachment; filename=\"" + fileName + "\";");
+            response.setContentType("application/vnd.ms-excel");
+            response.setHeader("Pragma", "public");
 
-            response.setHeader("Pragma", "public");
-            request.setAttribute("generate", filePathName);
-            response.setHeader("Pragma", "public");
+            ServletOutputStream outStream = response.getOutputStream();
+            DataInputStream inStream = null;
+            try {
+                response.setContentType("application/vnd.ms-excel");
+                response.setHeader("Pragma", "public");
+                response.setContentLength((int) file.length());
+
+                byte[] bbuf = new byte[(int) file.length()];
+                inStream = new DataInputStream(new FileInputStream(file));
+                int length;
+                while ((inStream != null) && ((length = inStream.read(bbuf)) != -1)) {
+                    outStream.write(bbuf, 0, length);
+                }
+
+                inStream.close();
+                outStream.flush();
+                outStream.close();
+            } catch (Exception ee) {
+                ee.printStackTrace();
+            } finally {
+                if (inStream != null) {
+                    inStream.close();
+                }
+                if (outStream != null) {
+                    outStream.close();
+                }
+            }
         }
-        forwardPage(Page.DOWNLOAD_ATTACHED_FILE);
     }
+
 }

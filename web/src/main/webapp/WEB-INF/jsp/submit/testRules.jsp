@@ -4,6 +4,49 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 
 
+
+
+<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword" />
+<fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+
+
+<c:choose>
+    <c:when test="${userBean.sysAdmin && module=='admin'}">
+        <c:import url="../include/admin-header.jsp" />
+    </c:when>
+    <c:otherwise>
+        <c:import url="../include/managestudy-header.jsp" />
+    </c:otherwise>
+</c:choose>
+
+
+<!-- move the alert message to the sidebar-->
+<jsp:include page="../include/sideAlert.jsp" />
+
+<!-- then instructions-->
+<tr id="sidebar_Instructions_open" style="display: all">
+    <td class="sidebar_tab"><a
+        href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img
+        src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
+
+    <b><fmt:message key="instructions" bundle="${resword}" /></b>
+
+    <div class="sidebar_tab_content"></div>
+        <fmt:message key="test_rules_instructions_1" bundle="${resword}" />
+
+    </td>
+
+</tr>
+<tr id="sidebar_Instructions_closed" style="display: none">
+    <td class="sidebar_tab"><a
+        href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img
+        src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
+
+    <b><fmt:message key="instructions" bundle="${resword}" /></b></td>
+</tr>
+<jsp:include page="../include/sideInfo.jsp" />
+
+
 <STYLE TYPE="text/css">
 .formValue {
     padding-left: 6px;
@@ -29,45 +72,6 @@
         
     }
 </script>
-
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword" />
-<fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
-
-
-<c:choose>
-    <c:when test="${userBean.sysAdmin && module=='admin'}">
-        <c:import url="../include/admin-header.jsp" />
-    </c:when>
-    <c:otherwise>
-        <c:import url="../include/managestudy-header.jsp" />
-    </c:otherwise>
-</c:choose>
-
-
-<!-- move the alert message to the sidebar-->
-<jsp:include page="../include/sideAlert.jsp" />
-
-<!-- then instructions-->
-<tr id="sidebar_Instructions_open" style="display: none">
-    <td class="sidebar_tab"><a
-        href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img
-        src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
-
-    <b><fmt:message key="instructions" bundle="${resword}" /></b>
-
-    <div class="sidebar_tab_content"></div>
-
-    </td>
-
-</tr>
-<tr id="sidebar_Instructions_closed" style="display: all">
-    <td class="sidebar_tab"><a
-        href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img
-        src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
-
-    <b><fmt:message key="instructions" bundle="${resword}" /></b></td>
-</tr>
-<jsp:include page="../include/sideInfo.jsp" />
 
 <jsp:useBean scope='session' id='userBean'
     class='org.akaza.openclinica.bean.login.UserAccountBean' />
@@ -99,9 +103,7 @@
     </c:otherwise>
 </c:choose><fmt:message key="test_rules_title" bundle="${resword}" /></span></h1>
 
-<div style="width: 650px"><fmt:message
-    key="test_rules_instructions_1" bundle="${resword}" /></div>
-<br>
+
 <form action="TestRule?action=${action}" method="post">
 <h3><fmt:message key="test_rules_step_1" bundle="${resword}" /></h3>
 <div style="width: 650px"><!-- These DIVs define shaded box borders -->

@@ -17,15 +17,17 @@ import java.util.Set;
 public class RuleSetBasedViewContainer {
 
     String ruleName;
+    String ruleOid;
     String expression;
     String executeOn;
     String actionType;
     String actionSummary;
     Set<String> subjects;
 
-    public RuleSetBasedViewContainer(String ruleName, String expression, String executeOn, String actionType, String actionSummary) {
+    public RuleSetBasedViewContainer(String ruleName, String ruleOid, String expression, String executeOn, String actionType, String actionSummary) {
         super();
         this.ruleName = ruleName;
+        this.ruleOid = ruleOid;
         this.expression = expression;
         this.executeOn = executeOn;
         this.actionType = actionType;
@@ -51,6 +53,20 @@ public class RuleSetBasedViewContainer {
      */
     public void setRuleName(String ruleName) {
         this.ruleName = ruleName;
+    }
+
+    /**
+     * @return the ruleOid
+     */
+    public String getRuleOid() {
+        return ruleOid;
+    }
+
+    /**
+     * @param ruleOid
+     */
+    public void setRuleOid(String ruleOid) {
+        this.ruleOid = ruleOid;
     }
 
     /**
@@ -134,6 +150,7 @@ public class RuleSetBasedViewContainer {
         result = prime * result + (executeOn == null ? 0 : executeOn.hashCode());
         result = prime * result + (expression == null ? 0 : expression.hashCode());
         result = prime * result + (ruleName == null ? 0 : ruleName.hashCode());
+        result = prime * result + (ruleOid == null ? 0 : ruleOid.hashCode());
         return result;
     }
 
@@ -168,6 +185,11 @@ public class RuleSetBasedViewContainer {
             if (other.ruleName != null)
                 return false;
         } else if (!ruleName.equals(other.ruleName))
+            return false;
+        if (ruleOid == null) {
+            if (other.ruleOid != null)
+                return false;
+        } else if (!ruleOid.equals(other.ruleOid))
             return false;
         return true;
     }

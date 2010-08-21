@@ -68,6 +68,12 @@ public class RunRuleSetServlet extends SecureController {
                 List<RuleSetBasedViewContainer> resultOfRunningRules = getRuleSetService().runRulesInBulk(ruleSets, true, currentStudy, ub);
                 request.setAttribute(RULESET, ruleSetBean);
                 request.setAttribute(RULESET_RESULT, resultOfRunningRules);
+                if (resultOfRunningRules.size() > 0) {
+                    addPageMessage(resword.getString("view_executed_rules_affected_subjects"));
+                } else {
+                    addPageMessage(resword.getString("view_executed_rules_no_affected_subjects"));
+                }
+
                 forwardPage(Page.VIEW_EXECUTED_RULES);
 
             }

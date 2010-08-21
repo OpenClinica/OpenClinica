@@ -1,6 +1,7 @@
 package org.akaza.openclinica.control.admin;
 
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
@@ -88,6 +89,9 @@ public class UpdateJobExportServlet extends SecureController {
         // how to find out the period of time???
         request.setAttribute(ExampleSpringJob.PERIOD, period);
         request.setAttribute(ExampleSpringJob.DATASET_ID, dsId);
+        // DatasetBean dataset = (DatasetBean)dsdao.findByPK(dsId);
+        // >> tbh 5639: collate the correct study id
+        // request.setAttribute("study_id", dataset.getStudyId());
         Date jobDate = trigger.getNextFireTime();
         HashMap presetValues = new HashMap();
         Calendar calendar = new GregorianCalendar();
@@ -115,7 +119,7 @@ public class UpdateJobExportServlet extends SecureController {
         scheduler = getScheduler();
         System.out.println("found trigger name " + triggerName);
         Trigger trigger = scheduler.getTrigger(triggerName.trim(), "DEFAULT");
-        System.out.println("found trigger from the other side " + trigger.getFullName());
+        // System.out.println("found trigger from the other side " + trigger.getFullName());
         if (StringUtil.isBlank(action)) {
             setUpServlet(trigger);
             forwardPage(Page.UPDATE_JOB_EXPORT);

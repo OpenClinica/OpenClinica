@@ -69,10 +69,13 @@
 					<c:choose>
 						<c:when test="${empty table.rows}"> <fmt:message key="no_pages" bundle="${resword}"/> </c:when>
 						<c:otherwise>
-						<fmt:message key="page_x_de_y" bundle="${resword}">
-							<fmt:param><c:out value="${table.currPageNumber}" /></fmt:param>
-							<fmt:param><c:out value="${table.totalPageNumbers}" /></fmt:param>
-						</fmt:message>
+						<c:if test="${table.paginated}">
+							<fmt:message key="page_x_de_y" bundle="${resword}">
+								<fmt:param><c:out value="${table.currPageNumber}" /></fmt:param>
+								<fmt:param><c:out value="${table.totalPageNumbers}" /></fmt:param>
+							</fmt:message>
+						</c:if>
+						Found <%= table.getRows().size() %> Definitions
 						</td></c:otherwise>
 					</c:choose>
 				<td valign="top" class="table_tools">

@@ -604,6 +604,19 @@
   </td>
   </tr>
 
+  <tr valign="top"><td class="table_header_column"><fmt:message key="forced_reason_for_change" bundle="${resword}"/></td>
+  <td class="table_cell">
+   <c:choose>
+   <c:when test="${studyToView.studyParameterConfig.adminForcedReasonForChange == 'true'}">
+  <fmt:message key="yes" bundle="${resword}"/>
+   </c:when>
+   <c:otherwise>
+   <fmt:message key="no" bundle="${resword}"/>
+   </c:otherwise>
+  </c:choose>
+  </td>
+  </tr>
+
   <tr valign="top"><td class="table_header_column"><fmt:message key="interview_date_required" bundle="${restext}"/></td>
   <td class="table_cell">
    <c:choose>

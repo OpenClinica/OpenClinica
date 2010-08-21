@@ -5,6 +5,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="respage"/>
 
 <c:choose>
 <c:when test="${userBean.sysAdmin && module=='admin'}">
@@ -20,7 +21,7 @@
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->
 
-<tr id="sidebar_Instructions_open" style="display: inherit">
+<tr id="sidebar_Instructions_open" style="display: all">
 
 		<td class="sidebar_tab">
 
@@ -31,6 +32,18 @@
 		<b><fmt:message key="instructions" bundle="${resword}"/></b>
 
 		<div class="sidebar_tab_content">
+		  <b><fmt:message key="create_CRF" bundle="${resword}"/> : </b>
+		  <fmt:message key="br_create_new_CRF_entering" bundle="${respage}"/><br/><br/>
+		  <b><fmt:message key="create_CRF_version" bundle="${resword}"/> : </b>
+		  <fmt:message key="br_create_new_CRF_uploading" bundle="${respage}"/><br/><br/>
+		  <b><fmt:message key="revise_CRF_version" bundle="${resword}"/> : </b>
+		  <fmt:message key="br_if_you_owner_CRF_version" bundle="${respage}"/><br/><br/>
+		  <b><fmt:message key="CRF_spreadsheet_template" bundle="${resword}"/> : </b>
+		  <fmt:message key="br_download_blank_CRF_spreadsheet_from" bundle="${respage}"/><br/><br/>
+		  <b><fmt:message key="example_CRF_br_spreadsheets" bundle="${resword}"/> : </b>
+          <fmt:message key="br_download_example_CRF_instructions_from" bundle="${respage}"/><br/>
+		  
+		
 		</div>
 
 		</td>

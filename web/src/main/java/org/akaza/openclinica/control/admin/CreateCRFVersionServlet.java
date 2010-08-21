@@ -81,15 +81,14 @@ public class CreateCRFVersionServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
         resetPanel();
-        panel.setStudyInfoShown(false);
-        panel.setOrderedData(true);
+        panel.setStudyInfoShown(true);
+        //panel.setOrderedData(true);
 
-        setToPanel(resword.getString("create_CRF"), respage.getString("br_create_new_CRF_entering"));
-
-        setToPanel(resword.getString("create_CRF_version"), respage.getString("br_create_new_CRF_uploading"));
-        setToPanel(resword.getString("revise_CRF_version"), respage.getString("br_if_you_owner_CRF_version"));
-        setToPanel(resword.getString("CRF_spreadsheet_template"), respage.getString("br_download_blank_CRF_spreadsheet_from"));
-        setToPanel(resword.getString("example_CRF_br_spreadsheets"), respage.getString("br_download_example_CRF_instructions_from"));
+        //setToPanel(resword.getString("create_CRF"), respage.getString("br_create_new_CRF_entering"));
+        //setToPanel(resword.getString("create_CRF_version"), respage.getString("br_create_new_CRF_uploading"));
+        //setToPanel(resword.getString("revise_CRF_version"), respage.getString("br_if_you_owner_CRF_version"));
+        //setToPanel(resword.getString("CRF_spreadsheet_template"), respage.getString("br_download_blank_CRF_spreadsheet_from"));
+        //setToPanel(resword.getString("example_CRF_br_spreadsheets"), respage.getString("br_download_example_CRF_instructions_from"));
 
         CRFDAO cdao = new CRFDAO(sm.getDataSource());
         CRFVersionDAO vdao = new CRFVersionDAO(sm.getDataSource());

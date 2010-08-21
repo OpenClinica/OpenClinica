@@ -31,8 +31,6 @@ public class ViewRuleAssignmentTableToolbar extends DefaultToolbar {
         addToolbarItem(createCustomItem(new ShowMoreItem()));
         addToolbarItem(ToolbarItemType.SEPARATOR);
         addToolbarItem(createCustomItem(new TestRuleItem()));
-        addToolbarItem(ToolbarItemType.SEPARATOR);
-        addToolbarItem(createCustomItem(new InfoItem()));
     }
 
     private ToolbarItem createCustomItem(AbstractItem item) {
@@ -42,23 +40,6 @@ public class ViewRuleAssignmentTableToolbar extends DefaultToolbar {
         item.setToolbarItemRenderer(renderer);
 
         return item;
-    }
-
-    private class InfoItem extends AbstractItem {
-
-        @Override
-        public String disabled() {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public String enabled() {
-            HtmlBuilder html = new HtmlBuilder();
-            html.nbsp().append(reswords.getString("view_rules_default_filter_sort"));
-
-            return html.toString();
-        }
     }
 
     private class TestRuleItem extends AbstractItem {

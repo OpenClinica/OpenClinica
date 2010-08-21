@@ -55,6 +55,9 @@ public class ResetPasswordServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         String mustChangePwd = request.getParameter("mustChangePwd");
         String newPwd = fp.getString("passwd");
+        String passwdChallengeQ = fp.getString("passwdChallengeQ");
+        String passwdChallengeA = fp.getString("passwdChallengeA");
+
 
         if ("yes".equalsIgnoreCase(mustChangePwd)) {
             addPageMessage(respage.getString("your_password_has_expired_must_change"));
@@ -74,6 +77,8 @@ public class ResetPasswordServlet extends SecureController {
             if (mustChangePwd.equalsIgnoreCase("yes")) {
                 v.addValidation("passwd", Validator.NO_BLANKS);
                 v.addValidation("passwd1", Validator.NO_BLANKS);
+                v.addValidation("passwdChallengeQ", Validator.NO_BLANKS);
+                v.addValidation("passwdChallengeA", Validator.NO_BLANKS);
                 v.addValidation("passwd", Validator.CHECK_DIFFERENT, "oldPasswd");
             }
             if (!StringUtil.isBlank(newPwd)) {
@@ -98,6 +103,8 @@ public class ResetPasswordServlet extends SecureController {
                 }
                 ub.setOwner(ub);
                 ub.setUpdater(ub);// when update ub, updator id is required
+                ub.setPasswdChallengeQuestion(passwdChallengeQ);
+                ub.setPasswdChallengeAnswer(passwdChallengeA);
                 udao.update(ub);
 
                 ArrayList<String> pageMessages = new ArrayList<String>();

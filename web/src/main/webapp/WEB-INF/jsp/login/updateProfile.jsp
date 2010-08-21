@@ -83,21 +83,30 @@
   <select name="passwdChallengeQuestion" class="formfieldXL">
   <c:set var="question1" value="Mother's Maiden Name"/>
   <c:choose>
-   <c:when test="${userBean1.passwdChallengeQuestion == question1}">
-    <option value="Mother's Maiden Name" selected><fmt:message key="mother_maiden_name" bundle="${resword}"/></option>
-    <option value="Favorite Pet"><fmt:message key="favourite_pet" bundle="${resword}"/></option>
-    <option value="City of Birth"><fmt:message key="city_of_birth" bundle="${resword}"/></option>
-   </c:when>
-    <c:when test="${userBean1.passwdChallengeQuestion == 'Favorite Pet'}">
-    <option value="Mother's Maiden Name"><fmt:message key="mother_maiden_name" bundle="${resword}"/></option>
-    <option value="Favorite Pet" selected><fmt:message key="favourite_pet" bundle="${resword}"/></option>
-    <option value="City of Birth"><fmt:message key="city_of_birth" bundle="${resword}"/></option>
-   </c:when>
-   <c:otherwise>
-    <option value="Mother's Maiden Name"><fmt:message key="mother_maiden_name" bundle="${resword}"/></option>
-    <option value="Favorite Pet"><fmt:message key="favourite_pet" bundle="${resword}"/></option>
-    <option value="City of Birth" selected><fmt:message key="city_of_birth" bundle="${resword}"/></option>
-   </c:otherwise>
+       <c:when test="${userBean1.passwdChallengeQuestion == question1}">
+            <option selected><fmt:message key="mother_maiden_name" bundle="${resword}"/></option>
+            <option><fmt:message key="favourite_pet" bundle="${resword}"/></option>
+            <option><fmt:message key="city_of_birth" bundle="${resword}"/></option>
+            <option><fmt:message key="favorite_color" bundle="${resword}"/></option>
+        </c:when>
+        <c:when test="${userBean1.passwdChallengeQuestion == 'Favorite Animal'}">
+            <option selected><fmt:message key="favourite_pet" bundle="${resword}"/></option>
+            <option><fmt:message key="city_of_birth" bundle="${resword}"/></option>
+            <option><fmt:message key="mother_maiden_name" bundle="${resword}"/></option>
+            <option><fmt:message key="favorite_color" bundle="${resword}"/></option>
+        </c:when>
+        <c:when test="${userBean1.passwdChallengeQuestion == 'City of Birth'}">
+               <option><fmt:message key="favourite_pet" bundle="${resword}"/></option>
+               <option selected><fmt:message key="city_of_birth" bundle="${resword}"/></option>
+               <option><fmt:message key="mother_maiden_name" bundle="${resword}"/></option>
+               <option><fmt:message key="favorite_color" bundle="${resword}"/></option>
+        </c:when>
+        <c:otherwise>
+               <option><fmt:message key="favourite_pet" bundle="${resword}"/></option>
+               <option><fmt:message key="city_of_birth" bundle="${resword}"/></option>
+               <option><fmt:message key="mother_maiden_name" bundle="${resword}"/></option>
+               <option selected><fmt:message key="favorite_color" bundle="${resword}"/></option>
+        </c:otherwise>
    </c:choose>
    </select>
    </div></td><td class="formlabel">*</td></tr>

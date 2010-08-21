@@ -37,7 +37,7 @@
         </a>
         <b><fmt:message key="instructions" bundle="${restext}"/></b>
         <div class="sidebar_tab_content">
-            <fmt:message key="import_rule_instructions" bundle="${restext}"/>
+            <fmt:message key="verify_import_rule_instructions" bundle="${restext}"/>
         </div>
     </td>
 </tr>
@@ -73,23 +73,12 @@
     </c:otherwise>
 </c:choose>
 
-<fmt:message key="import_rule_data" bundle="${resworkflow}"/>
+<fmt:message key="import_rule_data" bundle="${resworkflow}"/> ${study.name}
 <a href="javascript:openDocWindow('help/5_5_rules_Help.html')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${restext}"/>" title="<fmt:message key="help" bundle="${restext}"/>"></a>
 </h1>
-<p><fmt:message key="verify_import_rule_instructions" bundle="${restext}"/></p>
 
 <form action="VerifyImportedRule?action=save" name="verifyImportedRule" method="POST">
 <input type="hidden" name="crfId" value="<c:out value="${version.crfId}"/>">
-<p>
-<c:choose>
-<c:when test="${fn:length(importedData.inValidRuleDefs) > 0 || fn:length(importedData.inValidRuleSetDefs) > 0 }"></c:when>
-<c:otherwise>
-    <input type="button" onClick="proceed()" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_long"> 
-</c:otherwise>
-</c:choose>
-<input type="button" onclick="goBack()"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
-
-</p>
 
 <div style="width: 500px">
 
@@ -135,6 +124,16 @@
 </div>
 <br/>
 
+<p>
+<c:choose>
+<c:when test="${fn:length(importedData.inValidRuleDefs) > 0 || fn:length(importedData.inValidRuleSetDefs) > 0 }"></c:when>
+<c:otherwise>
+    <input type="button" onClick="proceed()" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_long"> 
+</c:otherwise>
+</c:choose>
+<input type="button" onclick="goBack()"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
+
+</p>
 
 <h3><fmt:message key="rule_verify_import_valid_rules" bundle="${resword}"/></h3>
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">

@@ -63,7 +63,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 
     @Override
     public TableFacade getTableFacadeImpl(HttpServletRequest request, HttpServletResponse response) {
-        return new OCTableFacadeImpl(getTableName(), request, response, "xxx");
+        return new OCTableFacadeImpl(getTableName(), request, response, "rules" + currentStudy.getOid() + "-");
     }
 
     @Override
@@ -76,22 +76,26 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         tableFacade.setColumnProperties(columnNames);
         Row row = tableFacade.getTable().getRow();
         int index = 0;
-        configureColumn(row.getColumn(columnNames[index++]), "Target", null, null);
-        configureColumn(row.getColumn(columnNames[index++]), "Study Event", null, null);
-        configureColumn(row.getColumn(columnNames[index++]), "CRF", null, null);
-        configureColumn(row.getColumn(columnNames[index++]), "Version", null, null);
-        configureColumn(row.getColumn(columnNames[index++]), "Group", null, null);
-        configureColumn(row.getColumn(columnNames[index++]), "Item Name", new ItemCellEditor(), null);
-        configureColumn(row.getColumn(columnNames[index++]), "Rule Name", null, null);
-        configureColumn(row.getColumn(columnNames[index++]), "Rule OID", null, null);
-        configureColumn(row.getColumn(columnNames[index++]), "Rule Status", new StatusCellEditor(), new StatusDroplistFilterEditor());
-        configureColumn(row.getColumn(columnNames[index++]), "Rule Description", null, null);
-        configureColumn(row.getColumn(columnNames[index++]), "Expression", null, null);
-        configureColumn(row.getColumn(columnNames[index++]), "CRF Validations", new ValidationsValueCellEditor(false), null, false, false);
-        configureColumn(row.getColumn(columnNames[index++]), "Execute On", new ExecuteOnCellEditor(false), new ExpressionEvaluatesToDroplistFilterEditor(),
-                true, false);
-        configureColumn(row.getColumn(columnNames[index++]), "Action Type", new ActionTypeCellEditor(false), new ActionTypeDroplistFilterEditor(), true, false);
-        configureColumn(row.getColumn(columnNames[index++]), "Action Summary", new ActionSummaryCellEditor(false), null, true, false);
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_target"), null, null);
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_study_event"), null, null);
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_crf") + "&#160;&#160;&#160;&#160;&#160;", null, null);
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_version"), null, null);
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_group"), null, null);
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_item_name"), new ItemCellEditor(), null);
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_rule_name"), null, null);
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_rule_oid"), null, null);
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_rule_status"), new StatusCellEditor(),
+                new StatusDroplistFilterEditor());
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_rule_description"), null, null);
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_expression"), null, null);
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_crf_br_validations"),
+                new ValidationsValueCellEditor(false), null, false, false);
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_execute_on"), new ExecuteOnCellEditor(false),
+                new ExpressionEvaluatesToDroplistFilterEditor(), true, false);
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_action_type"), new ActionTypeCellEditor(false),
+                new ActionTypeDroplistFilterEditor(), true, false);
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_action_summary"), new ActionSummaryCellEditor(false),
+                null, true, false);
         String actionsHeader =
             resword.getString("actions") + "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;"
                 + "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;"
@@ -105,22 +109,26 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         tableFacade.setColumnProperties(columnNames);
         Row row = tableFacade.getTable().getRow();
         int index = 0;
-        configureColumn(row.getColumn(columnNames[index++]), "Target", null, null);
-        configureColumn(row.getColumn(columnNames[index++]), "Study Event", null, null);
-        configureColumn(row.getColumn(columnNames[index++]), "CRF", null, null);
-        configureColumn(row.getColumn(columnNames[index++]), "Version", null, null);
-        configureColumn(row.getColumn(columnNames[index++]), "Group", null, null);
-        configureColumn(row.getColumn(columnNames[index++]), "Item Name", null, null);
-        configureColumn(row.getColumn(columnNames[index++]), "Rule Name", null, null);
-        configureColumn(row.getColumn(columnNames[index++]), "Rule OID", null, null);
-        configureColumn(row.getColumn(columnNames[index++]), "Rule Status", null, null);
-        configureColumn(row.getColumn(columnNames[index++]), "Rule Description", null, null);
-        configureColumn(row.getColumn(columnNames[index++]), "Expression", null, null);
-        configureColumn(row.getColumn(columnNames[index++]), "CRF <br/> Validations", new ValidationsValueCellEditor(true), null, false, false);
-        configureColumn(row.getColumn(columnNames[index++]), "Execute On", new ExecuteOnCellEditor(true), new ExpressionEvaluatesToDroplistFilterEditor(),
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_target"), null, null);
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_study_event"), null, null);
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_crf") + "&#160;&#160;&#160;&#160;&#160;", null, null);
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_version"), null, null);
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_group"), null, null);
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_item_name"), new ItemCellEditor(), null);
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_rule_name"), null, null);
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_rule_oid"), null, null);
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_rule_status"), new StatusCellEditor(),
+                new StatusDroplistFilterEditor());
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_rule_description"), null, null);
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_expression"), null, null);
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_crf_validations"), new ValidationsValueCellEditor(true),
+                null, false, false);
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_execute_on"), new ExecuteOnCellEditor(true),
+                new ExpressionEvaluatesToDroplistFilterEditor(), true, false);
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_action_type"), new ActionTypeCellEditor(true),
+                new ActionTypeDroplistFilterEditor(), true, false);
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_action_summary"), new ActionSummaryCellEditor(true), null,
                 true, false);
-        configureColumn(row.getColumn(columnNames[index++]), "Action Type", new ActionTypeCellEditor(true), new ActionTypeDroplistFilterEditor(), true, false);
-        configureColumn(row.getColumn(columnNames[index++]), "Action Summary", new ActionSummaryCellEditor(true), null, true, false);
     }
 
     @Override
@@ -664,8 +672,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         @Override
         protected List<Option> getOptions() {
             List<Option> options = new ArrayList<Option>();
-            options.add(new Option(String.valueOf(Status.AVAILABLE.getCode()), Status.AVAILABLE.name()));
-            options.add(new Option(String.valueOf(Status.DELETED.getCode()), Status.DELETED.name()));
+            options.add(new Option(String.valueOf(Status.AVAILABLE.getCode()), Status.AVAILABLE.toString()));
+            options.add(new Option(String.valueOf(Status.DELETED.getCode()), Status.DELETED.toString()));
             return options;
         }
     }
@@ -721,7 +729,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         actionLink.a().href("DownloadRuleSetXml?ruleSetRuleIds=" + ruleSetRuleId);
         actionLink.append("onMouseDown=\"javascript:setImage('bt_Download','images/bt_Download_d.gif');\"");
         actionLink.append("onMouseUp=\"javascript:setImage('bt_Download','images/bt_Download.gif');\"").close();
-        actionLink.img().name("bt_Download").src("images/bt_Download.gif").border("0").alt("Download").title("Download").append("hspace=\"2\"").end().aEnd();
+        actionLink.img().name("bt_Download").src("images/bt_Download.gif").border("0").alt("Download XML").title("Download XML").append("hspace=\"2\"").end()
+                .aEnd();
         actionLink.append("&nbsp;&nbsp;&nbsp;");
         return actionLink.toString();
 

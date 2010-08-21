@@ -30,7 +30,8 @@
 		</a>
 		<b><fmt:message key="instructions" bundle="${restext}"/></b>
 		<div class="sidebar_tab_content">
-			<fmt:message key="import_rule_side_bar_instructions" bundle="${restext}"/>
+			<!--<fmt:message key="import_rule_side_bar_instructions" bundle="${restext}"/>-->
+            <fmt:message key="rules_Import_info" bundle="${respage}"/>
 		</div>
 	</td>
 </tr>
@@ -68,19 +69,18 @@
 <fmt:message key="import_rule_data" bundle="${resworkflow}"/> ${study.name}
 <a href="javascript:openDocWindow('help/5_5_rules_Help.html')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${restext}"/>" title="<fmt:message key="help" bundle="${restext}"/>"></a>
 </h1>
-<p><fmt:message key="import_rule_instructions" bundle="${restext}"/></p>
 
 
 
 <form action="ImportRule?action=confirm" method="post" ENCTYPE="multipart/form-data">
-<div style="width: 400px">
+<div style="width: 600px">
 
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 <div class="textbox_center">
 <table border="0" cellpadding="0" cellspacing="0">
 
 <tr>
-	<td class="formlabel"><fmt:message key="xml_file_to_upload" bundle="${resterm}"/> </td>
+	<td class="formlabel"><fmt:message key="xml_file_to_upload" bundle="${resterm}"/>: </td>
 	<td>
 		<div class="formfieldFile_BG"><input type="file" name="xml_file" > </div>
 		<br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="xml_file"/></jsp:include>
@@ -93,32 +93,32 @@
 </div>
 </div></div></div></div></div></div></div></div>
 </div>
-<p>
-<fmt:message key="rules_Import_info" bundle="${respage}"/>
-</p>
+
+<br clear="all">
+<input type="submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_long">
+<p><a href="pages/studymodule"/><fmt:message key="import_rules_back_to_study_build" bundle="${resword}"/></a></p>
+</form>
+
+
 
 <span class="table_title_Admin"><fmt:message key="rule_import_getting_started" bundle="${resterm}"/></span>
 <div>&nbsp;</div>
 <div class="homebox_bullets"><a href="javascript:openDocWindow('help/5_5_rules_Help.html')"><fmt:message key="rule_import_rules_documentation" bundle="${resterm}"/></a></div><br/>
-
+<!-- 
 <span class="table_title_Admin"><fmt:message key="rule_import_example_rules" bundle="${resterm}"/></span>
 <div>&nbsp;</div>
 <div class="homebox_bullets"><a href="ImportRule?action=downloadrulesxsd"><fmt:message key="rule_import_cross_field_email" bundle="${resterm}"/></a></div><br/>
-<div class="homebox_bullets"><a href="ImportRule?action=downloadrulesxsd"><fmt:message key="rule_import_cross_field_dn" bundle="${resterm}"/></a></div><br/>
-
+<div class="homebox_bullets"><a href="ImportRule?action=downloadrulesxsd"><fmt:message key="rule_import_generic" bundle="${resterm}"/></a></div><br/>
+ -->
 <span class="table_title_Admin"><fmt:message key="rule_import_templates" bundle="${resterm}"/></span>
 <div>&nbsp;</div>
-<div class="homebox_bullets"><a href="ImportRule?action=downloadrulesxsd"><fmt:message key="rule_import_all_actions_with_notes" bundle="${resterm}"/></a></div><br/>
-<div class="homebox_bullets"><a href="ImportRule?action=downloadrulesxsd"><fmt:message key="rule_import_all_actions_without_notes" bundle="${resterm}"/></a></div><br/>
+<div class="homebox_bullets"><a href="ImportRule?action=downloadtemplateWithNotes"><fmt:message key="rule_import_all_actions_with_notes" bundle="${resterm}"/></a></div><br/>
+<div class="homebox_bullets"><a href="ImportRule?action=downloadtemplate"><fmt:message key="rule_import_all_actions_without_notes" bundle="${resterm}"/></a></div><br/>
 
 <span class="table_title_Admin"><fmt:message key="rule_import_resources" bundle="${resterm}"/></span>
 <div>&nbsp;</div>
 <div class="homebox_bullets"><a href="ImportRule?action=downloadrulesxsd"><fmt:message key="rule_import_download_rules_xsd" bundle="${resterm}"/></a></div><br/>
 
-<br clear="all">
-<input type="submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_long">
-<input type="button" onclick="goBack()"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
-</form>
 
 <c:choose>
     <c:when test="${userBean.sysAdmin && module=='admin'}">

@@ -3,10 +3,12 @@ package org.akaza.openclinica.control.admin;
 import org.akaza.openclinica.bean.admin.TriggerBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.DatasetBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
@@ -23,8 +25,7 @@ import java.util.HashMap;
 
 /**
  * 
- * @author thickerson purpose: to generate the list of jobs and allow us to view
- *         them
+ * @author thickerson purpose: to generate the list of jobs and allow us to view them
  */
 public class ViewJobServlet extends SecureController {
 
@@ -100,6 +101,7 @@ public class ViewJobServlet extends SecureController {
             // setting: frequency, dataset name
             JobDataMap dataMap = new JobDataMap();
             DatasetDAO datasetDAO = new DatasetDAO(sm.getDataSource());
+            StudyDAO studyDao = new StudyDAO(sm.getDataSource());
             if (trigger.getJobDataMap().size() > 0) {
                 dataMap = trigger.getJobDataMap();
                 int dsId = dataMap.getInt(ExampleSpringJob.DATASET_ID);
@@ -108,7 +110,9 @@ public class ViewJobServlet extends SecureController {
                 DatasetBean dataset = (DatasetBean) datasetDAO.findByPK(dsId);
                 triggerBean.setDataset(dataset);
                 triggerBean.setDatasetName(dataset.getName());
-                triggerBean.setStudyName(dataMap.getString(ExampleSpringJob.STUDY_NAME));
+                StudyBean study = (StudyBean) studyDao.findByPK(dataset.getStudyId());
+                triggerBean.setStudyName(study.getName());
+                // triggerBean.setStudyName(dataMap.getString(ExampleSpringJob.STUDY_NAME));
             }
             logger.debug("Trigger Priority: " + trigger.getName() + " " + trigger.getPriority());
             if (scheduler.getTriggerState(triggerName, "DEFAULT") == Trigger.STATE_PAUSED) {
@@ -125,7 +129,9 @@ public class ViewJobServlet extends SecureController {
         ArrayList allRows = TriggerRow.generateRowsFromBeans(triggerBeans);
 
         EntityBeanTable table = fp.getEntityBeanTable();
-        String[] columns = { resword.getString("name"), resword.getString("previous_fire_time"), resword.getString("next_fire_time"), resword.getString("description"), resword.getString("period_to_run"), resword.getString("dataset"), resword.getString("study"), resword.getString("actions") };
+        String[] columns =
+            { resword.getString("name"), resword.getString("previous_fire_time"), resword.getString("next_fire_time"), resword.getString("description"),
+                resword.getString("period_to_run"), resword.getString("dataset"), resword.getString("study"), resword.getString("actions") };
         table.setColumns(new ArrayList(Arrays.asList(columns)));
         table.hideColumnLink(3);
         table.hideColumnLink(7);

@@ -30,6 +30,7 @@ import org.akaza.openclinica.bean.core.ApplicationConstants;
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.ResponseType;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.oid.MeasurementUnitOidGenerator;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
@@ -264,6 +265,14 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         HSSFCell cell = sheet.getRow(k).getCell((short) 0);
                         String itemName = getValue(cell);
                         itemName = itemName.replaceAll("<[^>]*>", "");
+                        
+                     // regexp to make sure it is all word characters, '\w+' in regexp terms
+                        if (!Utils.isMatchingRegexp(itemName, "\\w+")) {
+                            // different item error to go here
+                            errors.add(resPageMsg.getString("item_name_column") + " " + resPageMsg.getString("was_invalid_at_row") + " " + k + ", "
+                                    + resPageMsg.getString("items_worksheet") + ". " + resPageMsg.getString("you_can_only_use_letters_or_numbers"));
+                                htmlErrors.put(j + "," + k + ",0", resPageMsg.getString("INVALID_FIELD"));
+                        }
                         if (StringUtil.isBlank(itemName)) {
                             errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("item_name_column") + " "
                                 + resPageMsg.getString("was_blank_at_row") + k + ", " + resPageMsg.getString("items_worksheet") + ".");

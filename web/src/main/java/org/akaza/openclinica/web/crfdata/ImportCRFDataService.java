@@ -69,6 +69,8 @@ public class ImportCRFDataService {
 
     private final DataSource ds;
 
+    private ItemDataDAO itemDataDao;
+
     public static ResourceBundle respage;
 
     public ImportCRFDataService(DataSource ds, Locale locale) {
@@ -78,9 +80,8 @@ public class ImportCRFDataService {
     }
 
     /*
-     * purpose: look up EventCRFBeans by the following: Study Subject, Study
-     * Event, CRF Version, using the findByEventSubjectVersion method in
-     * EventCRFDAO. May return more than one, hmm.
+     * purpose: look up EventCRFBeans by the following: Study Subject, Study Event, CRF Version, using the findByEventSubjectVersion method in EventCRFDAO. May
+     * return more than one, hmm.
      */
     public List<EventCRFBean> fetchEventCRFBeans(ODMContainer odmContainer, UserAccountBean ub) {
         ArrayList<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();
@@ -145,12 +146,12 @@ public class ImportCRFDataService {
                                 }
                             } else {
                                 // we need to update the event crf that already exists
-                                //                              for (EventCRFBean ecb : eventCrfBeans) {
-                                //                                  ecb.setDateInterviewed(new Date());
-                                //                                  ecb.setInterviewerName(ub.getName());
-                                //                                  ecb = (EventCRFBean) eventCrfDAO.update(ecb);
-                                //                                  logger.info("    updated event crf");
-                                //                              }
+                                // for (EventCRFBean ecb : eventCrfBeans) {
+                                // ecb.setDateInterviewed(new Date());
+                                // ecb.setInterviewerName(ub.getName());
+                                // ecb = (EventCRFBean) eventCrfDAO.update(ecb);
+                                // logger.info("    updated event crf");
+                                // }
                                 // right now not doing this, since bug was not able to be replicated, tbh
                             }
 
@@ -225,6 +226,8 @@ public class ImportCRFDataService {
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
         StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(ds);
         int maxOrdinal = 1;
+        HashMap<String, ItemDataBean> blankCheck = new HashMap<String, ItemDataBean>();
+        // << TBH #5548, checking for blank item datas
         String hardValidatorErrorMsgs = "";
 
         ArrayList<SubjectDataBean> subjectDataBeans = odmContainer.getCrfDataPostImportContainer().getSubjectData();
@@ -242,6 +245,7 @@ public class ImportCRFDataService {
             StudySubjectBean studySubjectBean = studySubjectDAO.findByOidAndStudy(subjectDataBean.getSubjectOID(), studyBean.getId());
 
             for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
+
                 int parentStudyId = studyBean.getParentStudyId();
                 StudyEventDefinitionBean sedBean = sedDao.findByOidAndStudy(studyEventDataBean.getStudyEventOID(), studyBean.getId(), parentStudyId);
                 ArrayList<FormDataBean> formDataBeans = studyEventDataBean.getFormData();
@@ -296,6 +300,9 @@ public class ImportCRFDataService {
                         // also need to create a group name checker here for
                         // correctness, tbh
                         for (ImportItemGroupDataBean itemGroupDataBean : itemGroupDataBeans) {
+
+                            ArrayList<ItemBean> blankCheckItems = new ArrayList<ItemBean>();
+                            // << TBH reset of the blank checks
                             ArrayList<ImportItemDataBean> itemDataBeans = itemGroupDataBean.getItemData();
                             logger.debug("iterating through group beans: " + itemGroupDataBean.getItemGroupOID());
                             // put a checker in here
@@ -314,11 +321,12 @@ public class ImportCRFDataService {
                                 // your_item_group_oid_for_form_oid
                             }
                             totalItemDataBeanCount += itemDataBeans.size();
+
                             for (ImportItemDataBean importItemDataBean : itemDataBeans) {
                                 logger.debug("   iterating through item data beans: " + importItemDataBean.getItemOID());
                                 ItemDAO itemDAO = new ItemDAO(ds);
                                 ItemFormMetadataDAO itemFormMetadataDAO = new ItemFormMetadataDAO(ds);
-                                ItemDataDAO itemDataDAO = new ItemDataDAO(ds);
+                                // ItemDataDAO itemDataDAO = new ItemDataDAO(ds);
 
                                 List<ItemBean> itemBeans = itemDAO.findByOid(importItemDataBean.getItemOID());
                                 if (!itemBeans.isEmpty()) {
@@ -351,10 +359,15 @@ public class ImportCRFDataService {
                                             // looking for a number format
                                             // exception
                                             // from the above.
-                                            System.out.println("found npe for group ordinals, line 344!");
+                                            logger.debug("found npe for group ordinals, line 344!");
                                         }
                                     }
                                     ItemDataBean itemDataBean = createItemDataBean(itemBean, eventCRFBean, importItemDataBean.getValue(), ub, groupOrdinal);
+                                    blankCheckItems.add(itemBean);
+                                    String newKey =
+                                        groupOrdinal + "_" + itemGroupDataBean.getItemGroupOID() + "_" + itemBean.getOid() + "_"
+                                            + subjectDataBean.getSubjectOID();
+                                    blankCheck.put(newKey, itemDataBean);
                                     if (!metadataBeans.isEmpty()) {
                                         ItemFormMetadataBean metadataBean = metadataBeans.get(0);
                                         // also
@@ -395,8 +408,41 @@ public class ImportCRFDataService {
                                     // be found with the key " +
                                     // importItemDataBean.getItemOID(), "");
                                 }
+                            }// end item data beans
+                            logger.debug(".. found blank check: " + blankCheck.toString());
+                            logger.debug(".. and found blank check items: " + blankCheckItems.toString());
+                            // >> TBH #5548 did we create any repeated blank spots? If so, fill them in with an Item Data Bean
+                            for (int i = 1; i <= maxOrdinal; i++) {
+                                for (ItemBean itemBean : blankCheckItems) {
+                                    String newKey =
+                                        i + "_" + itemGroupDataBean.getItemGroupOID() + "_" + itemBean.getOid() + "_" + subjectDataBean.getSubjectOID();
+                                    if (blankCheck.get(newKey) == null) {
+                                        // if it already exists, Do Not Add It.
+                                        ItemDataBean itemDataCheck =
+                                            getItemDataDao().findByItemIdAndEventCRFIdAndOrdinal(itemBean.getId(), eventCRFBean.getId(), i);
+                                        logger.debug("found item data bean id: " + itemDataCheck.getId() + " for ordinal " + i);
+                                        if (itemDataCheck.getId() == 0) {
+                                            ItemDataBean blank = createItemDataBean(itemBean, eventCRFBean, "", ub, i);
+                                            DisplayItemBean displayItemBean = new DisplayItemBean();
+                                            displayItemBean.setItem(itemBean);
+                                            displayItemBean.setData(blank);
+                                            // displayItemBean.setMetadata(metadataBean);
+                                            // set event def crf?
+                                            displayItemBean.setEventDefinitionCRF(eventDefinitionCRF);
+                                            String eventCRFRepeatKey = studyEventDataBean.getStudyEventRepeatKey();
+                                            // if you do indeed leave off this in the XML it will pass but return 'null' tbh
+
+                                            displayItemBeans.add(displayItemBean);
+                                            logger.debug("... adding display item bean");
+                                        }
+                                    }
+                                    logger.debug("found a blank at " + i + ", adding " + blankCheckItems.size() + " blank items");
+                                }
                             }
-                        }
+                            // << tbh #5548
+                            blankCheckItems = new ArrayList<ItemBean>();
+                        }// end item group data beans
+
                     }
 
                     CRFDAO crfDAO = new CRFDAO(ds);
@@ -452,9 +498,9 @@ public class ImportCRFDataService {
 
                     // summary stats added tbh 05/2008
                     displayItemBeanWrapper =
-                        new DisplayItemBeanWrapper(displayItemBeans, true, overwrite, validationErrors, studyEventId, crfVersionId, studyEventDataBean
-                                .getStudyEventOID(), studySubjectBean.getLabel(), eventCRFBean.getCreatedDate(), crfBean.getName(), crfVersion.getName(),
-                                studySubjectBean.getOid(), studyEventDataBean.getStudyEventRepeatKey());
+                        new DisplayItemBeanWrapper(displayItemBeans, true, overwrite, validationErrors, studyEventId, crfVersionId,
+                                studyEventDataBean.getStudyEventOID(), studySubjectBean.getLabel(), eventCRFBean.getCreatedDate(), crfBean.getName(),
+                                crfVersion.getName(), studySubjectBean.getOid(), studyEventDataBean.getStudyEventRepeatKey());
                     validationErrors = new HashMap();
                     discValidator = new DiscrepancyValidator(request, discNotes);
                     // reset to allow for new errors...
@@ -512,21 +558,24 @@ public class ImportCRFDataService {
             // what if it's a date? parse if out so that we go from iso 8601 to
             // mm/dd/yyyy
             if (displayItemBean.getItem().getDataType().equals(ItemDataType.DATE)) {
-                String dateValue = displayItemBean.getData().getValue();
-                SimpleDateFormat sdf_sqldate = new SimpleDateFormat("yyyy-MM-dd");
-                try {
-                    Date originalDate = sdf_sqldate.parse(dateValue);
-                    String replacementValue = new SimpleDateFormat("MM/dd/yyyy").format(originalDate);
-                    displayItemBean.getData().setValue(replacementValue);
-                } catch (ParseException pe1) {
+                // pass it if it is blank, tbh
+                if (!"".equals(displayItemBean.getData().getValue())) {
+                    String dateValue = displayItemBean.getData().getValue();
+                    SimpleDateFormat sdf_sqldate = new SimpleDateFormat("yyyy-MM-dd");
+                    try {
+                        Date originalDate = sdf_sqldate.parse(dateValue);
+                        String replacementValue = new SimpleDateFormat("MM/dd/yyyy").format(originalDate);
+                        displayItemBean.getData().setValue(replacementValue);
+                    } catch (ParseException pe1) {
 
-                    // next version; fail if it does not pass iso 8601
-                    MessageFormat mf = new MessageFormat("");
-                    mf.applyPattern(respage.getString("you_have_a_date_value_which_is_not"));
-                    Object[] arguments = { displayItemBean.getItem().getOid() };
+                        // next version; fail if it does not pass iso 8601
+                        MessageFormat mf = new MessageFormat("");
+                        mf.applyPattern(respage.getString("you_have_a_date_value_which_is_not"));
+                        Object[] arguments = { displayItemBean.getItem().getOid() };
 
-                    hardv.put(itemOid, mf.format(arguments));
+                        hardv.put(itemOid, mf.format(arguments));
 
+                    }
                 }
 
             } else if (displayItemBean.getItem().getDataType().equals(ItemDataType.ST)) {
@@ -545,7 +594,10 @@ public class ImportCRFDataService {
                     }
                     // now, didn't check decimal for testInt.
                 } catch (Exception e) {// should be a sub class
-                    hardv.put(itemOid, "This value is not an integer.");
+                    // pass if blank, tbh 07/2010
+                    if (!"".equals(displayItemBean.getData().getValue())) {
+                        hardv.put(itemOid, "This value is not an integer.");
+                    }
                 }
             }
             // what if it's a float? should be only numbers
@@ -561,7 +613,10 @@ public class ImportCRFDataService {
                         hardv.put(itemOid, "This value exceeds required decimal=" + decimal);
                     }
                 } catch (Exception ee) {
-                    hardv.put(itemOid, "This value is not a real number.");
+                    // pass if blank, tbh
+                    if (!"".equals(displayItemBean.getData().getValue())) {
+                        hardv.put(itemOid, "This value is not a real number.");
+                    }
                 }
             }
             // what if it's a phone number? how often does that happen?
@@ -582,7 +637,9 @@ public class ImportCRFDataService {
                             hardv.put(itemOid, "This value exceeds required decimal=" + decimal);
                         }
                     } catch (Exception e) {
-                        hardv.put(itemOid, "This value is not a real number.");
+                        if (!"".equals(displayItemBean.getData().getValue())) {
+                            hardv.put(itemOid, "This value is not a real number.");
+                        }
                     }
                 }
             }
@@ -642,9 +699,8 @@ public class ImportCRFDataService {
     }
 
     /*
-     * difference from the above is only a 'contains' in the place of an
-     * 'equals'. and a few other switches...also need to keep in mind that there
-     * are non-null values that need to be taken into account
+     * difference from the above is only a 'contains' in the place of an 'equals'. and a few other switches...also need to keep in mind that there are non-null
+     * values that need to be taken into account
      */
     private String matchValueWithManyOptions(DisplayItemBean displayItemBean, String value, List options) {
         String returnedValue = null;
@@ -704,11 +760,8 @@ public class ImportCRFDataService {
     }
 
     /*
-     * meant to answer the following questions 3.a. is that study subject in
-     * that study? 3.b. is that study event def in that study? 3.c. is that site
-     * in that study? 3.d. is that crf version in that study event def? 3.e. are
-     * those item groups in that crf version? 3.f. are those items in that item
-     * group?
+     * meant to answer the following questions 3.a. is that study subject in that study? 3.b. is that study event def in that study? 3.c. is that site in that
+     * study? 3.d. is that crf version in that study event def? 3.e. are those item groups in that crf version? 3.f. are those items in that item group?
      */
     public List<String> validateStudyMetadata(ODMContainer odmContainer, int currentStudyId) {
         List<String> errors = new ArrayList<String>();
@@ -931,6 +984,11 @@ public class ImportCRFDataService {
         }
         // if errors == null you pass, if not you fail
         return errors;
+    }
+
+    private ItemDataDAO getItemDataDao() {
+        itemDataDao = this.itemDataDao != null ? itemDataDao : new ItemDataDAO(ds);
+        return itemDataDao;
     }
 
 }

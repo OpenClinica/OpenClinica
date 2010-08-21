@@ -235,294 +235,267 @@
 	</c:when>
 
 	<c:otherwise>
-	<%-- place everything else here --%>
-	<%-- validation errors here --%>
+		<%-- place everything else here --%>
+		<%-- validation errors here --%>
 		<c:if test="${not empty validationErrors}">
-		<fmt:message key="validation_error_generated" bundle="${resword}"/>
+			<fmt:message key="validation_error_generated" bundle="${resword}" />
 
-		<div style="width: 600px">
+			<div style="width: 600px">
 
-		<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-		<div class="textbox_center">
-		<table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<div class="box_T">
+			<div class="box_L">
+			<div class="box_R">
+			<div class="box_B">
+			<div class="box_TL">
+			<div class="box_TR">
+			<div class="box_BL">
+			<div class="box_BR">
+			<div class="textbox_center">
+			<table border="0" cellpadding="0" cellspacing="0" width="100%">
 
-			<c:forEach var="subjectDataBean" items="${subjectData}" >
-				<tr valign="top">
-					<td class="table_header_row" colspan="4"><fmt:message key="study_subject" bundle="${resword}"/>: <c:out value="${subjectDataBean.subjectOID}"/></td>
-				</tr>
-				<c:forEach var="studyEventData" items="${subjectDataBean.studyEventData}">
+				<c:forEach var="subjectDataBean" items="${subjectData}">
 					<tr valign="top">
-			    		<td class="table_header_row"><fmt:message key="event_CRF_OID" bundle="${resword}"/></td>
-			    		<td class="table_header_row" colspan="3"></td>
+						<td class="table_header_row" colspan="4"><fmt:message
+							key="study_subject" bundle="${resword}" />: <c:out
+							value="${subjectDataBean.subjectOID}" /></td>
 					</tr>
-					<tr valign="top">
-			    		<td class="table_cell_left"><c:out value="${studyEventData.studyEventOID}"/>
-			    		<c:choose>
-			    			<c:when test="${studyEventData.studyEventRepeatKey != null}">
+					<c:forEach var="studyEventData"
+						items="${subjectDataBean.studyEventData}">
+						<tr valign="top">
+							<td class="table_header_row"><fmt:message
+								key="event_CRF_OID" bundle="${resword}" /></td>
+							<td class="table_header_row" colspan="3"></td>
+						</tr>
+						<tr valign="top">
+							<td class="table_cell_left"><c:out
+								value="${studyEventData.studyEventOID}" /> <c:choose>
+								<c:when test="${studyEventData.studyEventRepeatKey != null}">
 			    				(<fmt:message key="repeated_key" bundle="${resword}">
-		    						 	<fmt:param><c:out value="${studyEventData.studyEventRepeatKey}"/></fmt:param>
-		    						 </fmt:message> )
-			    				<c:set var="studyEventRepeatKey" value="${studyEventData.studyEventRepeatKey}"/>
-			    			</c:when>
-			    			<c:otherwise>
-			    				<c:set var="studyEventRepeatKey" value="${1}"/>
-			    			</c:otherwise>
-			    			</c:choose>
-			    		</td>
-			    		<td class="table_cell" colspan="3"></td>
-					</tr>
-					<c:forEach var="formData" items="${studyEventData.formData}">
-						<tr valign="top">
-				    		<td class="table_header_row"></td>
-				    		<td class="table_header_row"><fmt:message key="CRF_version_OID" bundle="${resword}"/></td>
-				    		<td class="table_header_row" colspan="2"></td>
+										<fmt:param>
+											<c:out value="${studyEventData.studyEventRepeatKey}" />
+										</fmt:param>
+									</fmt:message> )
+			    				<c:set var="studyEventRepeatKey"
+										value="${studyEventData.studyEventRepeatKey}" />
+								</c:when>
+								<c:otherwise>
+									<c:set var="studyEventRepeatKey" value="${1}" />
+								</c:otherwise>
+							</c:choose></td>
+							<td class="table_cell" colspan="3"></td>
 						</tr>
-						<tr valign="top">
-			    			<td class="table_cell_left"></td>
-			    			<td class="table_cell"><c:out value="${formData.formOID}"/></td>
-			    			<td class="table_cell" colspan="2"></td>
-						</tr>
-						<c:forEach var="itemGroupData" items="${formData.itemGroupData}">
+						<c:forEach var="formData" items="${studyEventData.formData}">
 							<tr valign="top">
-					    		<td class="table_header_row"></td>
-					    		<td class="table_header_row"></td>
-					    		<td class="table_header_row" colspan="2"><c:out value="${itemGroupData.itemGroupOID}"/>
-					    		<c:choose>
-					    			<c:when test="${itemGroupData.itemGroupRepeatKey != null}">
-					    				(<fmt:message key="repeated_key" bundle="${resword}">
-		    						 	<fmt:param> <c:out value="${itemGroupData.itemGroupRepeatKey}"/></fmt:param>
-		    						 </fmt:message> )
-					    				<c:set var="groupRepeatKey" value="${itemGroupData.itemGroupRepeatKey}"/>
-					    			</c:when>
-					    			<c:otherwise>
-					    				<c:set var="groupRepeatKey" value="${1}"/>
-					    			</c:otherwise>
-					    		</c:choose>
-					    		</td>
-					    		<%-- add repeat key here? --%>
+								<td class="table_header_row"></td>
+								<td class="table_header_row"><fmt:message
+									key="CRF_version_OID" bundle="${resword}" /></td>
+								<td class="table_header_row" colspan="2"></td>
 							</tr>
-							<c:forEach var="itemData" items="${itemGroupData.itemData}">
-							<c:set var="oidKey" value="${itemData.itemOID}_${studyEventRepeatKey}_${groupRepeatKey}_${subjectDataBean.subjectOID}"/>
-							<c:if test="${not empty validationErrors[oidKey]}">
+							<tr valign="top">
+								<td class="table_cell_left"></td>
+								<td class="table_cell"><c:out value="${formData.formOID}" /></td>
+								<td class="table_cell" colspan="2"></td>
+							</tr>
+							<c:forEach var="itemGroupData" items="${formData.itemGroupData}">
 								<tr valign="top">
-						    		<td class="table_cell_left"></td>
-						    		<td class="table_cell"></td>
-						    		<td class="table_cell"><font color="red"><c:out value="${itemData.itemOID}"/></font></td>
-						    		<%-- or add it here? --%>
-						    		<td class="table_cell">
-						    			<c:out value="${itemData.value}"/><br/>
-						    			<c:out value="${validationErrors[oidKey]}"/>
-						    		</td>
+									<td class="table_header_row"></td>
+									<td class="table_header_row"></td>
+									<td class="table_header_row" colspan="2"><c:out
+										value="${itemGroupData.itemGroupOID}" /> <c:choose>
+										<c:when test="${itemGroupData.itemGroupRepeatKey != null}">
+					    				(<fmt:message key="repeated_key" bundle="${resword}">
+												<fmt:param>
+													<c:out value="${itemGroupData.itemGroupRepeatKey}" />
+												</fmt:param>
+											</fmt:message> )
+					    				<c:set var="groupRepeatKey"
+												value="${itemGroupData.itemGroupRepeatKey}" />
+										</c:when>
+										<c:otherwise>
+											<c:set var="groupRepeatKey" value="${1}" />
+										</c:otherwise>
+									</c:choose></td>
+									<%-- add repeat key here? --%>
 								</tr>
-							</c:if>
+								<c:forEach var="itemData" items="${itemGroupData.itemData}">
+									<c:set var="oidKey"
+										value="${itemData.itemOID}_${studyEventRepeatKey}_${groupRepeatKey}_${subjectDataBean.subjectOID}" />
+									<c:if test="${not empty validationErrors[oidKey]}">
+										<tr valign="top">
+											<td class="table_cell_left"></td>
+											<td class="table_cell"></td>
+											<td class="table_cell"><font color="red"><c:out
+												value="${itemData.itemOID}" /></font></td>
+											<%-- or add it here? --%>
+											<td class="table_cell"><c:out value="${itemData.value}" /><br />
+											<c:out value="${validationErrors[oidKey]}" /></td>
+										</tr>
+									</c:if>
+								</c:forEach>
 							</c:forEach>
 						</c:forEach>
 					</c:forEach>
 				</c:forEach>
-			</c:forEach>
 
 
 
-		</table>
-		</div>
-		</div></div></div></div></div></div></div></div>
-		</div>
+			</table>
+			</div>
+			</div>
+			</div>
+			</div>
+			</div>
+			</div>
+			</div>
+			</div>
+			</div>
+			</div>
 		</c:if>
-		<br/>
+		<br />
 
 
 
 		<!--  valid data section, show all valid data -->
-		<fmt:message key="valid_data_imported" bundle="${resword}">
+		<fmt:message key="valid_data_imported" bundle="${resword}"/>
 
-		<div style="width: 600px">
+			<div style="width: 600px">
 
-		<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-		<div class="textbox_center">
-		<table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<div class="box_T">
+			<div class="box_L">
+			<div class="box_R">
+			<div class="box_B">
+			<div class="box_TL">
+			<div class="box_TR">
+			<div class="box_BL">
+			<div class="box_BR">
+			<div class="textbox_center">
+			<table border="0" cellpadding="0" cellspacing="0" width="100%">
 
-			<c:forEach var="subjectDataBean" items="${subjectData}" >
-				<tr valign="top">
-					<td class="table_header_row" colspan="4"><fmt:message key="study_subject" bundle="${resword}"/>: <c:out value="${subjectDataBean.subjectOID}"/></td>
-				</tr>
-				<c:forEach var="studyEventData" items="${subjectDataBean.studyEventData}">
+				<c:forEach var="subjectDataBean" items="${subjectData}">
 					<tr valign="top">
-			    		<td class="table_header_row"><fmt:message key="event_CRF_OID" bundle="${resword}"/></td>
-			    		<td class="table_header_row" colspan="3"></td>
+						<td class="table_header_row" colspan="4"><fmt:message
+							key="study_subject" bundle="${resword}" />: <c:out
+							value="${subjectDataBean.subjectOID}" /></td>
 					</tr>
-					<tr valign="top">
-			    		<td class="table_cell_left"><c:out value="${studyEventData.studyEventOID}"/>
-			    		<c:choose>
-			    			<c:when test="${studyEventData.studyEventRepeatKey != null}">
+					<c:forEach var="studyEventData"
+						items="${subjectDataBean.studyEventData}">
+						<tr valign="top">
+							<td class="table_header_row"><fmt:message
+								key="event_CRF_OID" bundle="${resword}" /></td>
+							<td class="table_header_row" colspan="3"></td>
+						</tr>
+						<tr valign="top">
+							<td class="table_cell_left"><c:out
+								value="${studyEventData.studyEventOID}" /> <c:choose>
+								<c:when test="${studyEventData.studyEventRepeatKey != null}">
 			    				(<fmt:message key="repeated_key" bundle="${resword}">
-		    						 	<fmt:param> <c:out value="${studyEventData.studyEventRepeatKey}"/></fmt:param>
-		    						 </fmt:message>)
-			    				<c:set var="studyEventRepeatKey" value="${studyEventData.studyEventRepeatKey}"/>
-			    			</c:when>
-			    			<c:otherwise>
-			    				<c:set var="studyEventRepeatKey" value="${1}"/>
-			    			</c:otherwise>
-			    			</c:choose>
-			    		</td>
-			    		<td class="table_cell" colspan="3"></td>
-					</tr>
-					<c:forEach var="formData" items="${studyEventData.formData}">
-						<tr valign="top">
-				    		<td class="table_header_row"></td>
-				    		<td class="table_header_row"><fmt:message key="CRF_version_OID" bundle="${resword}"/></td>
-				    		<td class="table_header_row" colspan="2"></td>
+										<fmt:param>
+											<c:out value="${studyEventData.studyEventRepeatKey}" />
+										</fmt:param>
+									</fmt:message>)
+			    				<c:set var="studyEventRepeatKey"
+										value="${studyEventData.studyEventRepeatKey}" />
+								</c:when>
+								<c:otherwise>
+									<c:set var="studyEventRepeatKey" value="${1}" />
+								</c:otherwise>
+							</c:choose></td>
+							<td class="table_cell" colspan="3"></td>
 						</tr>
-						<tr valign="top">
-			    			<td class="table_cell_left"></td>
-			    			<td class="table_cell"><c:out value="${formData.formOID}"/></td>
-			    			<td class="table_cell" colspan="2"></td>
-						</tr>
-						<c:forEach var="itemGroupData" items="${formData.itemGroupData}">
+						<c:forEach var="formData" items="${studyEventData.formData}">
 							<tr valign="top">
-					    		<td class="table_header_row"></td>
-					    		<td class="table_header_row"></td>
-					    		<td class="table_header_row" colspan="2"><c:out value="${itemGroupData.itemGroupOID}"/>
-					    		<c:choose>
-					    			<c:when test="${itemGroupData.itemGroupRepeatKey != null}">
-					    				(<fmt:message key="repeated_key" bundle="${resword}">
-		    						 	<fmt:param> <c:out value="${itemGroupData.itemGroupRepeatKey}"/></fmt:param>
-		    						 </fmt:message> )
-					    				<c:set var="groupRepeatKey" value="${itemGroupData.itemGroupRepeatKey}"/>
-					    			</c:when>
-					    			<c:otherwise>
-					    				<c:set var="groupRepeatKey" value="${1}"/>
-					    			</c:otherwise>
-					    		</c:choose>
-					    		</td>
-					    		<%-- add repeat key here? --%>
+								<td class="table_header_row"></td>
+								<td class="table_header_row"><fmt:message
+									key="CRF_version_OID" bundle="${resword}" /></td>
+								<td class="table_header_row" colspan="2"></td>
 							</tr>
-							<c:forEach var="itemData" items="${itemGroupData.itemData}">
-							<c:set var="oidKey" value="${itemData.itemOID}_${studyEventRepeatKey}_${groupRepeatKey}_${subjectDataBean.subjectOID}"/>
-							<c:if test="${empty validationErrors[oidKey]}">
+							<tr valign="top">
+								<td class="table_cell_left"></td>
+								<td class="table_cell"><c:out value="${formData.formOID}" /></td>
+								<td class="table_cell" colspan="2"></td>
+							</tr>
+							<c:forEach var="itemGroupData" items="${formData.itemGroupData}">
 								<tr valign="top">
-						    		<td class="table_cell_left"></td>
-						    		<td class="table_cell"></td>
-						    		<td class="table_cell"><c:out value="${itemData.itemOID}"/></td>
-						    		<%-- or add it here? --%>
-						    		<td class="table_cell"><c:out value="${itemData.value}"/></td>
+									<td class="table_header_row"></td>
+									<td class="table_header_row"></td>
+									<td class="table_header_row" colspan="2"><c:out
+										value="${itemGroupData.itemGroupOID}" /> <c:choose>
+										<c:when test="${itemGroupData.itemGroupRepeatKey != null}">
+					    				(<fmt:message key="repeated_key" bundle="${resword}">
+												<fmt:param>
+													<c:out value="${itemGroupData.itemGroupRepeatKey}" />
+												</fmt:param>
+											</fmt:message> )
+					    				<c:set var="groupRepeatKey"
+												value="${itemGroupData.itemGroupRepeatKey}" />
+										</c:when>
+										<c:otherwise>
+											<c:set var="groupRepeatKey" value="${1}" />
+										</c:otherwise>
+									</c:choose></td>
+									<%-- add repeat key here? --%>
 								</tr>
-							</c:if>
+								<c:forEach var="itemData" items="${itemGroupData.itemData}">
+									<c:set var="oidKey"
+										value="${itemData.itemOID}_${studyEventRepeatKey}_${groupRepeatKey}_${subjectDataBean.subjectOID}" />
+									<c:if test="${empty validationErrors[oidKey]}">
+										<tr valign="top">
+											<td class="table_cell_left"></td>
+											<td class="table_cell"></td>
+											<td class="table_cell"><c:out
+												value="${itemData.itemOID}" /></td>
+											<%-- or add it here? --%>
+											<td class="table_cell"><c:out value="${itemData.value}" /></td>
+										</tr>
+									</c:if>
+								</c:forEach>
 							</c:forEach>
 						</c:forEach>
 					</c:forEach>
 				</c:forEach>
-			</c:forEach>
 
 
 
-		</table>
-		</div>
-		</div></div></div></div></div></div></div></div>
-		</div>
-		<br/>
+			</table>
+			</div>
+			</div>
+			</div>
+			</div>
+			</div>
+			</div>
+			</div>
+			</div>
+			</div>
+			</div>
+			<br />
 
-	<form action="VerifyImportedCRFData?action=save" method="POST">
+			<form action="VerifyImportedCRFData?action=save" method="POST">
 
-	<input type="hidden" name="crfId" value="<c:out value="${version.crfId}"/>">
+			<input type="hidden" name="crfId"
+				value="<c:out value="${version.crfId}"/>"> <c:set
+				var="overwriteCount" value="${0}" /> <c:forEach
+				var="displayItemBeanWrapper" items="${importedData}">
+				<c:if test="${displayItemBeanWrapper.overwrite}">
+					<c:set var="overwriteCount" value="${overwriteCount + 1}" />
+				</c:if>
+			</c:forEach> <c:if test="${overwriteCount == 0}">
+				<input type="submit"
+					value="<fmt:message key="continue" bundle="${resword}"/>"
+					class="button_long">
+			</c:if> <c:if test="${overwriteCount > 0 }">
+				<input type="submit"
+					value="<fmt:message key="continue" bundle="${resword}"/>"
+					class="button_long" onClick="return checkOverwriteStatus();">
+			</c:if></form>
 
-	<c:set var="overwriteCount" value="${0}" />
+			<%-- added an alert above --%>
 
-	<c:forEach var="displayItemBeanWrapper" items="${importedData}" >
-		<c:if test="${displayItemBeanWrapper.overwrite}">
-			<c:set var="overwriteCount" value="${overwriteCount + 1}" />
-		</c:if>
-	</c:forEach>
-
-	<c:if test="${overwriteCount == 0}">
-		<input type="submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_long">
-	</c:if>
-	<c:if test="${overwriteCount > 0 }">
-		<input type="submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_long" onClick="return checkOverwriteStatus();">
-	</c:if>
-
-	</form>
-
-	<%-- added an alert above --%>
-
-	<form action="ListStudySubjects">
-		<input type="submit" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_long">
-	</form>
-	<%-- end of the other loop --%>
+			<form action="ListStudySubjects"><input type="submit"
+				value="<fmt:message key="cancel" bundle="${resword}"/>"
+				class="button_long"></form>
+			<%-- end of the other loop --%>
 	</c:otherwise>
 </c:choose>
-
-<%-- <form action="VerifyImportedCRFData?action=save" method="POST"> --%>
-
-<%--  <div class="box_T"><div class="box_L">
-<div class="box_R"><div class="box_B">
-<div class="box_TL"><div class="box_TR">
-<div class="box_BL"><div class="box_BR">
-<div class="tablebox_center">
-
-<table border="0" cellpadding="0" cellspacing="0">
-
-
-<tr valign="top">
-	<td class="table_header_row_left">
-	<fmt:message key="study_event_ID" bundle="${resword}"/>
-	Study Event Name</td>
-	<td class="table_header_row"><fmt:message key="CRF_version" bundle="${resword}"/></td>
-	<td class="table_header_row"><fmt:message key="study_subject" bundle="${resword}"/></td>
-	<td class="table_header_row"><fmt:message key="date_started" bundle="${resword}"/></td>
-	<td class="table_header_row"><fmt:message key="import_error" bundle="${resword}"/></td>
-</tr>
-
-<c:set var="overwriteCount" value="${0}" />
-<c:forEach var="displayItemBeanWrapper" items="${importedData}" >
-<c:set var="rowCount" value="${0}" />
-
-<c:if test="${displayItemBeanWrapper.overwrite}">
-	<c:set var="overwriteCount" value="${overwriteCount + 1}" />
-</c:if>
-
-<tr valign="top">
-	<td class="table_cell_left">
-		<c:out value="${displayItemBeanWrapper.studyEventId}" />
-	</td>
-	<td class="table_cell">
-		<c:out value="${displayItemBeanWrapper.crfName}" />&nbsp;<c:out value="${displayItemBeanWrapper.crfVersionName}" />
-	</td>
-	<td class="table_cell">
-		<c:out value="${displayItemBeanWrapper.studySubjectName}" />
-	</td>
-	<td class="table_cell">
-		<fmt:formatDate value="${displayItemBeanWrapper.dateOfEvent}" dateStyle="short"/>
-	</td>
-	<td class="table_cell">
-		<c:forEach var="validationErrorKey" items="${displayItemBeanWrapper.validationErrors}" varStatus="status">
-			<font color="red"><c:out value="${validationErrorKey.key}" />:</font> <c:out value="${validationErrorKey.value}" /><br/>
-			<c:set var="rowCount" value="${rowCount + 1}" />
-		</c:forEach>
-		<c:if test="${rowCount == 0}">
-			<font color="green">Valid</font>
-		</c:if>
-	</td>
-</tr>
-</c:forEach>
-
-
-
-
-
-</table>
-
-</div>
-</div></div>
-</div></div>
-</div></div>
-</div></div>
-
- --%>
-
-
-
-
-
 
 <c:choose>
   <c:when test="${userBean.sysAdmin && module=='admin'}">

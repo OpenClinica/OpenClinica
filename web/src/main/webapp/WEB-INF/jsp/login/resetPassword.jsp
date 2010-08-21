@@ -42,6 +42,22 @@
         <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="passwd1"/></jsp:include></td></tr>
     </c:otherwise>
   </c:choose>
+    <c:if test="${mustChangePass=='yes'}">
+        <tr><td class="formlabel"><fmt:message key="password_challenge_question" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG">
+            <select name="passwdChallengeQ" class="formfieldXL">
+                <option value="" >Please Select One</option>
+                <option><fmt:message key="favourite_pet" bundle="${resword}"/></option>
+                <option><fmt:message key="city_of_birth" bundle="${resword}"/></option>
+                <option><fmt:message key="mother_maiden_name" bundle="${resword}"/></option>
+                <option><fmt:message key="favorite_color" bundle="${resword}"/></option>
+            </select>
+        </div>
+            <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="passwdChallengeQ"/></jsp:include></td><td class="formlabel">*</td>
+        </tr>
+        <tr><td class="formlabel"><fmt:message key="password_challenge_answer" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG"><input type="text" name="passwdChallengeA" value="" class="formfieldXL"></div>
+            <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="passwdChallengeA"/></jsp:include></td><td class="formlabel">*</td>
+        </tr>
+     </c:if>
 </table>
 </div>
 

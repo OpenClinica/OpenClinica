@@ -253,6 +253,7 @@ public class ImportCRFDataServlet extends SecureController {
                 }
 
             }
+            System.out.println("passed error check");
             // TODO ADD many validation steps before we get to the
             // session-setting below
             // 4. is the event in the correct status to accept data import?
@@ -269,7 +270,7 @@ public class ImportCRFDataServlet extends SecureController {
             List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
             HashMap<String, String> totalValidationErrors = new HashMap<String, String>();
             HashMap<String, String> hardValidationErrors = new HashMap<String, String>();
-
+            System.out.println("found event crfs " + eventCRFBeans.size());
             // -- does the event already exist? if not, fail
             if (!eventCRFBeans.isEmpty()) {
                 for (EventCRFBean eventCRFBean : eventCRFBeans) {
@@ -335,7 +336,8 @@ public class ImportCRFDataServlet extends SecureController {
                     tempDisplayItemBeanWrappers =
                         getImportCRFDataService().lookupValidationErrors(request, odmContainer, ub, totalValidationErrors, hardValidationErrors,
                                 permittedEventCRFIds);
-                    logger.debug("size of total validation errors: " + totalValidationErrors.size());
+                    System.out.println("generated display item bean wrappers " + tempDisplayItemBeanWrappers.size());
+                    System.out.println("size of total validation errors: " + totalValidationErrors.size());
                     displayItemBeanWrappers.addAll(tempDisplayItemBeanWrappers);
                 } catch (NullPointerException npe1) {
                     // what if you have 2 event crfs but the third is a fake?
@@ -363,6 +365,7 @@ public class ImportCRFDataServlet extends SecureController {
             //
             // }
             if (fail) {
+                System.out.println("failed here - forwarding...");
                 forwardPage(Page.IMPORT_CRF_DATA);
             } else {
                 addPageMessage(respage.getString("passing_crf_edit_checks"));
@@ -373,12 +376,13 @@ public class ImportCRFDataServlet extends SecureController {
                 // generated the wrappers; soon the only thing we will use
                 // wrappers for is the 'overwrite' flag
 
-                logger.debug("found total validation errors: " + totalValidationErrors.size());
+                System.out.println("found total validation errors: " + totalValidationErrors.size());
                 logger.debug("+++ content of total validation errors: " + totalValidationErrors.toString());
                 SummaryStatsBean ssBean = getImportCRFDataService().generateSummaryStatsBean(odmContainer, displayItemBeanWrappers);
                 session.setAttribute("summaryStats", ssBean);
                 // will have to set hard edit checks here as well
                 session.setAttribute("subjectData", odmContainer.getCrfDataPostImportContainer().getSubjectData());
+                System.out.println("did not fail - forwarding...");
                 forwardPage(Page.VERIFY_IMPORT_SERVLET);
             }
         }

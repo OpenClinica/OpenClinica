@@ -1,0 +1,38 @@
+<!-- This "template" contains comments about each of the elements contained in this file. 
+
+Created by: [[Your Name]]
+Date: [[Created date]]
+Case report form: [[CRF Name]]
+Translated variables: [[Key to variables and/or reference document]] -->
+
+
+<!-- Each file should contain only 1 RuleImport -->
+<RuleImport>
+<!-- Rule Assignment contains one target with one or mor RuleRefs. This is where you define which variable you want to apply your Rule to and when executed, which actions you want to take place -->
+	<RuleAssignment>
+	<!-- Target is where you define which variable you want the error message to appear on. This is also the variable that the discrepancy note or email will be tied to. Within the target, the attribute Context is always required. The context is always giong to be Context="OC_RULES_V1" -->
+	<Target Context="OC_RULES_V1"></Target>
+		<!-- RuleRef is where you reference an existing RuleDef. This is how you define what expression to apply to your target and what actions should take place. -->
+		<RuleRef OID="">
+		<!-- Discrepancy note action means that a discrepancy note can be logged automatically when the referenced expression evaluates to a result. You can define if you want the action to occur if it evaluates to "true" or "false" -->
+			<DiscrepancyNoteAction IfExpressionEvaluates="">
+			<!-- Message is the error message that the data entry person would see. This is also the message that gets pre-populated in the detailed notes in the discrepancy note that gets logged -->
+				<Message></Message>
+			</DiscrepancyNoteAction>
+<!-- Email action means that an email can be sent automatically when the referenced expression evaluates to a result. You can define if you want the action to occur if it evaluates to "true" or "false" -->			
+			<EmailAction IfExpressionEvaluates="">
+			<!-- Message is the error message that the data entry person would see. This is also the message that gets pre-populated in the email that gets sent -->
+				<Message></Message>
+				<!-- To allows you to specify an email account that the email will be sent to. You can specify more than one email by using comma separated values: e.g. usera@example.com,userb@example.com -->
+				<To></To>
+			</EmailAction>
+		</RuleRef>
+	</RuleAssignment>
+	<!-- RuleDef is where you define your expression and description. In the RuleDef tag, there are two attributes that must be defined: OID and Name. OID must be uniqe, all UPPERCASE and can not contain whitespace. Name should be a descriptive name for anyone that might be managing the rules through the rules interface. -->
+	<RuleDef OID="" Name="">
+	<!-- Description should be a detailed description of what the expresison is supposed to be evaluating. This should be useful to anyone who might be working with the XML files to help them better understand the context and the expression -->
+		<Description></Description>
+		<!-- The expression is the mathmatical definition of whats being evaluated -->
+		<Expression></Expression>
+	</RuleDef>
+</RuleImport>

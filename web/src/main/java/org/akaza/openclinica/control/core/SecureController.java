@@ -779,6 +779,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             }
             logger.debug("Email sent successfully on {}", new Date());
         } catch (MailException me) {
+            me.printStackTrace();
             if (failMessage != null && sendMessage) {
                 addPageMessage(failMessage);
             }

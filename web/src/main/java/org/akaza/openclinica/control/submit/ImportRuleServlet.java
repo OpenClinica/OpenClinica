@@ -64,6 +64,14 @@ public class ImportRuleServlet extends SecureController {
             File xsdFile = new File(SpringServletAccess.getPropertiesDir(context) + "rules.xsd");
             dowloadFile(xsdFile, "text/xml");
         }
+        if ("downloadtemplate".equalsIgnoreCase(action)) {
+            File file = new File(SpringServletAccess.getPropertiesDir(context) + "rules_template.xml");
+            dowloadFile(file, "text/xml");
+        }
+        if ("downloadtemplateWithNotes".equalsIgnoreCase(action)) {
+            File file = new File(SpringServletAccess.getPropertiesDir(context) + "rules_template_with_notes.xml");
+            dowloadFile(file, "text/xml");
+        }
         if ("confirm".equalsIgnoreCase(action)) {
 
             try {

@@ -14,6 +14,7 @@ import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
+import org.apache.commons.lang.StringEscapeUtils;
 
 import com.lowagie.text.BadElementException;
 import com.lowagie.text.Cell;
@@ -506,6 +507,8 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
     private String escapeQuotesInCSV(String csvValue){
 
         if(csvValue == null) return "";
+        //Escaping special characters in the String.
+        csvValue = StringEscapeUtils.escapeJava(csvValue);
         if(csvValue.contains(",")){
 
             return new StringBuilder("\"").append(csvValue).append("\"").toString();

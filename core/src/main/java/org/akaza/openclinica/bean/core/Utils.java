@@ -19,6 +19,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -42,9 +44,8 @@ public class Utils {
     }
 
     /**
-     * This Method will compare the two Dates and return a String with number of
-     * years , weeks and days.
-     *
+     * This Method will compare the two Dates and return a String with number of years , weeks and days.
+     * 
      * @author Krikor Krumlian 10/20/2006
      * @param eventStartDate
      *            The event start date
@@ -116,10 +117,10 @@ public class Utils {
 
     /**
      * Convert string with from_pattern to string with to_pattern
-     *
+     * 
      * @param value
      * @return
-     *
+     * 
      * @author ywang 12-06-2007
      */
     public static String convertedItemDateValue(String itemValue, String from_pattern, String to_pattern) {
@@ -140,11 +141,11 @@ public class Utils {
 
     /**
      * Zip StringBuffer to a file
-     *
+     * 
      * @param fileName
      * @param filePath
      * @param content
-     *
+     * 
      * @author ywang (07-2008)
      */
     public static boolean createZipFile(String fileName, String filePath, StringBuffer content) {
@@ -168,7 +169,7 @@ public class Utils {
 
     /**
      * age = the_year_of_controlDate - the_year_of_birthDate
-     *
+     * 
      * @param birthDate
      * @param controlDate
      * @return
@@ -200,5 +201,29 @@ public class Utils {
             attachedFilePath += study.getIdentifier() + File.separator;
         }
         return attachedFilePath;
+    }
+
+    public static String getAttachedFileRootPath() {
+        String rootPath = CoreResources.getField("attached_file_location");
+        if (rootPath == null || rootPath.length() <= 0) {
+            rootPath = CoreResources.getField("filePath") + "attached_files" + File.separator;
+        }
+        return rootPath;
+    }
+
+    /*
+     * see if a regular expression fits
+     * @author thickerson August 5th 2010
+     */
+    public static boolean isMatchingRegexp(String input, String regexp) {
+        Pattern p = Pattern.compile(regexp);
+        Matcher m = p.matcher(input);
+        return m.matches();
+    }
+
+    public static boolean isWithinRegexp(String input, String regexp) {
+        Pattern p = Pattern.compile(regexp);
+        Matcher m = p.matcher(input);
+        return m.find();
     }
 }
