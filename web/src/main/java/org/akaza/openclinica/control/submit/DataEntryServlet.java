@@ -19,8 +19,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
@@ -104,17 +103,9 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.form.FormBeanUtil;
 import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.springframework.stereotype.Controller;
 
 import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.mvc.*;
 /**
  * @author ssachs
  * 
@@ -3648,13 +3639,7 @@ public abstract class DataEntryServlet extends SecureController {
 		return existingNameNotes;
 	}*/
     
-    @RequestMapping(value="/discrepancyNote",method=RequestMethod.GET)
-    public @ResponseBody DiscrepancyNoteBean getDiscrepancyNoteBean(int i) {
-	
-    	DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
-    	dnb.setResolutionStatusId(1);
-    	return dnb;
-	}
+
 
 	/**
      * To set the totals of each resolution status on the DisplayItemBean for each item.
