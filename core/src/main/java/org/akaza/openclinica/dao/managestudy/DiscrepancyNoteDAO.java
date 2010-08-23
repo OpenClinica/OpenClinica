@@ -1079,6 +1079,29 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         return returnedNotelist;
 
     }
+    public ArrayList<DiscrepancyNoteBean> findEventCRFDNotesToolTips(EventCRFBean eventCRFBean) {
+
+        this.setTypesExpected();
+        this.setTypeExpected(12, TypeNames.STRING);
+        ArrayList dNotelist = new ArrayList();
+
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(eventCRFBean.getId()));
+        variables.put(new Integer(2), new Integer(eventCRFBean.getId()));
+        dNotelist = this.select(digester.getQuery("findEventCRFDNotesForToolTips"), variables);
+
+        ArrayList<DiscrepancyNoteBean> returnedNotelist = new ArrayList<DiscrepancyNoteBean>();
+        Iterator it = dNotelist.iterator();
+        while (it.hasNext()) {
+            HashMap hm = (HashMap) it.next();
+            DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
+            eb.setColumn((String) hm.get("column_name"));
+            eb.setEventCRFId(eventCRFBean.getId());
+            returnedNotelist.add(eb);
+        }
+        return returnedNotelist;
+
+    }
 
     public ArrayList<DiscrepancyNoteBean> findAllDNotesByItemNameAndEventCRF(EventCRFBean eventCRFBean, String itemName) {
         this.setTypesExpected();
@@ -1704,6 +1727,25 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(itemDataId));
         alist = this.select(digester.getQuery("findExistingNotesForItemData"), variables);
+        ArrayList<DiscrepancyNoteBean> al = new ArrayList<DiscrepancyNoteBean>();
+        Iterator it = alist.iterator();
+        while (it.hasNext()) {
+            HashMap hm = (HashMap) it.next();
+            DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
+            al.add(eb);
+        }
+        return al;
+
+    }
+    public ArrayList findExistingNotesForToolTip(int itemDataId) {
+        this.setTypesExpected();
+        ArrayList alist = new ArrayList();
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(itemDataId));
+        variables.put(new Integer(2), new Integer(itemDataId));
+        variables.put(new Integer(3), new Integer(itemDataId));
+        variables.put(new Integer(4), new Integer(itemDataId));
+        alist = this.select(digester.getQuery("findExistingNotesForToolTip"), variables);
         ArrayList<DiscrepancyNoteBean> al = new ArrayList<DiscrepancyNoteBean>();
         Iterator it = alist.iterator();
         while (it.hasNext()) {

@@ -90,14 +90,16 @@ function genToolTips(itemId){
 	   			{
 	   				<c:set  var="discrepancyNotes" value="${itemsSection.discrepancyNotes}"/>
 	        		<c:forEach var="discrepancyNotes" items="${discrepancyNotes}">  	
-		           	<c:if test="${discrepancyNotes.parentDnId == 0}">
-			           	resStatus[i] =<c:out value="${discrepancyNotes.resolutionStatusId}"/>;
+		           	
+		           	
+				    resStatus[i] =<c:out value="${discrepancyNotes.resolutionStatusId}"/>;
 			      	    detailedNotes[i] ="<c:out value="${discrepancyNotes.description}"/>";
 			      	    discrepancyType[i] = "<c:out value="${discrepancyNotes.disType.name}"/>";
 			      	    updatedDates[i] = "<c:out value="${discrepancyNotes.createdDate}"/>";
-			   		    i++;
-		       		</c:if>
-	        	   </c:forEach>
+			   	    i++;
+			   	    
+		       		
+		       		</c:forEach>
 	   			}
 	    </c:forEach>
 	 	

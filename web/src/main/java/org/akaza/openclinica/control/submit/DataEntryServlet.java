@@ -3440,32 +3440,6 @@ public abstract class DataEntryServlet extends SecureController {
                 discNotes.setNumExistingFieldNotes(INPUT_INTERVIEWER, 1);
                 request.setAttribute("hasNameNote", "yes");
                 request.setAttribute(INTERVIEWER_NAME_NOTE, dn);
-                if(hasMoreThreads)
-                {
-                if(dn.getParentDnId()!=0)
-                {
-             /*   if(dn.getResolutionStatusId()==ResolutionStatus.OPEN.getId()) {
-                	intNew++;
-                	nameNotes.add(dn);}
-                else if(dn.getResolutionStatusId()==ResolutionStatus.UPDATED.getId()){
-                	intUpdated++;
-                	nameNotes.add(dn);
-                }
-                else if(dn.getResolutionStatusId()==ResolutionStatus.RESOLVED.getId()){
-                	intRes++;//Resolution proposed count
-                	nameNotes.add(dn);
-                }
-                else if(dn.getResolutionStatusId()==ResolutionStatus.CLOSED.getId()){
-                	intClosed++;
-                	nameNotes.add(dn);
-                }
-                else if(dn.getResolutionStatusId()==ResolutionStatus.NOT_APPLICABLE.getId()){
-                	intNA++;*/
-                	nameNotes.add(dn);
-               // }
-                }
-                }
-                hasMoreThreads = true;
                 existingNameNotes.add(dn);
                 
             }
@@ -3474,61 +3448,20 @@ public abstract class DataEntryServlet extends SecureController {
                 discNotes.setNumExistingFieldNotes(INPUT_INTERVIEW_DATE, 1);
                 request.setAttribute("hasDateNote", "yes");
                 request.setAttribute(INTERVIEWER_DATE_NOTE, dn);
-                if(hasMoreThreads)
-                if(dn.getParentDnId()!=0)
-                {
-                
-              /*  if(dn.getResolutionStatusId()==ResolutionStatus.OPEN.getId()) {
-                	dateNew++;
-                	dateNotes.add(dn);
-                }
-                else if(dn.getResolutionStatusId()==ResolutionStatus.UPDATED.getId()){
-                	dateUpdated++;
-                	dateNotes.add(dn);
-                }
-                else if(dn.getResolutionStatusId()==ResolutionStatus.RESOLVED.getId()){
-                	dateRes++;//Resolution proposed count
-                	dateNotes.add(dn);
-                }
-                
-                else if(dn.getResolutionStatusId()==ResolutionStatus.CLOSED.getId()){
-                	dateClosed++;
-                	dateNotes.add(dn);
-                }
-                else if(dn.getResolutionStatusId()==ResolutionStatus.NOT_APPLICABLE.getId()){
-                	dateNA++;*/
-                	dateNotes.add(dn);
-              //  }
-                }
-                hasMoreThreads = true;
+             
                 existingIntrvDateNotes.add(dn);
             }
         }
-
+        setToolTipEventNotes();
         request.setAttribute("nameNoteResStatus", getDiscrepancyNoteResolutionStatus(existingNameNotes));
         request.setAttribute("IntrvDateNoteResStatus", getDiscrepancyNoteResolutionStatus(existingIntrvDateNotes));
-       /* request.setAttribute("intNew",intNew);
-        request.setAttribute("intUpdated",intUpdated);
-        request.setAttribute("intRes",intRes);
-        request.setAttribute("intClosed",intClosed);	
-        request.setAttribute("intNA",intNA);*/
-        request.setAttribute("nameNotes", nameNotes);
+       
         request.setAttribute("existingNameNotes", existingNameNotes);
         
-       /* request.setAttribute("dateNew",dateNew);
-        request.setAttribute("dateUpdated",dateUpdated);
-        request.setAttribute("dateRes",dateRes);
-        request.setAttribute("dateClosed",dateClosed);
-        request.setAttribute("dateNA",dateNA);*/
-        request.setAttribute("intrvDates", dateNotes);
+   
+      
         request.setAttribute("existingIntrvDateNotes", existingIntrvDateNotes);
-//        JSONObject jsonObject = new JSONObject();
-//        JSONArray jExistingNames = JSONArray.fromObject(existingNameNotes);
-//       jsonObject.put("nameNotes",jExistingNames);
-//       
-//       
-//        request.setAttribute("jnameNodes", jsonObject.toString());
-        
+
         //sendJSONNames(existingNameNotes);
 ///===add here...
         List<DisplayItemWithGroupBean> allItems = section.getDisplayItemGroups();
@@ -3634,7 +3567,32 @@ public abstract class DataEntryServlet extends SecureController {
         return section;
     }
 
-    /*@RequestMapping(value="/{nameNotes}", method=RequestMethod.GET)
+    private void setToolTipEventNotes() {
+		
+
+        ArrayList<DiscrepancyNoteBean> ecNotes = dndao.findEventCRFDNotesToolTips(ecb);
+        ArrayList<DiscrepancyNoteBean> nameNotes = new ArrayList();
+        ArrayList<DiscrepancyNoteBean> dateNotes = new ArrayList();
+        for (int i = 0; i < ecNotes.size(); i++) {
+            DiscrepancyNoteBean dn = ecNotes.get(i);
+            if (INTERVIEWER_NAME.equalsIgnoreCase(dn.getColumn())) {
+               
+          
+                	nameNotes.add(dn);
+            
+                
+            }
+
+            if (DATE_INTERVIEWED.equalsIgnoreCase(dn.getColumn())) {
+                             	dateNotes.add(dn);
+            }
+            
+        }
+        request.setAttribute("nameNotes", nameNotes);
+        request.setAttribute("intrvDates", dateNotes);
+	}
+
+	/*@RequestMapping(value="/{nameNotes}", method=RequestMethod.GET)
     public @ResponseBody ArrayList<DiscrepancyNoteBean> sendJSONNames(ArrayList<DiscrepancyNoteBean> existingNameNotes) {
 		return existingNameNotes;
 	}*/
@@ -3651,7 +3609,7 @@ public abstract class DataEntryServlet extends SecureController {
     	int resolutionStatus;
     	int totNew = 0,totRes = 0,totClosed = 0,totUpdated =0,totNA = 0;
     	boolean hasOtherThread = false;
-    	 ArrayList<DiscrepancyNoteBean> existingNotes = dndao.findExistingNotesForItemData(itemDataId);
+    	 ArrayList<DiscrepancyNoteBean> existingNotes = dndao.findExistingNotesForToolTip(itemDataId);
     	 dib.setDiscrepancyNotes(existingNotes);
          for (DiscrepancyNoteBean obj : existingNotes) {
              DiscrepancyNoteBean note =  obj;

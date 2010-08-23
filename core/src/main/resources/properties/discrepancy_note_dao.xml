@@ -812,6 +812,43 @@
             FROM discrepancy_note dn, dn_item_data_map dsm
             where dsm.item_data_id=?
             AND dn.discrepancy_note_id=dsm.discrepancy_note_id
+                   </sql>
+    </query>
+        <query>
+        <name>findExistingNotesForToolTip</name>
+        <sql>
+ (SELECT dn.*
+					    FROM discrepancy_note dn, dn_item_data_map dsm,item_data id
+					    where 
+					dsm.item_data_id= ?           AND
+					 dn.discrepancy_note_id=dsm.discrepancy_note_id and
+						dsm.item_data_id = id.item_data_id
+				            and dn.date_created in (select max(dn2.date_created)  FROM discrepancy_note dn2, dn_item_data_map dsms,item_data id
+					    where 
+					dsm.item_data_id= ?            AND
+					 dn.discrepancy_note_id=dsm.discrepancy_note_id and
+						dsm.item_data_id = id.item_data_id
+						and dn2.parent_dn_id = dn.parent_dn_id 
+) )
+UNION
+ (SELECT dn.*
+					    FROM discrepancy_note dn, dn_item_data_map dsm,item_data id
+					    where 
+					dsm.item_data_id= ?           AND
+					 dn.discrepancy_note_id=dsm.discrepancy_note_id and
+						dsm.item_data_id = id.item_data_id
+				            and dn.date_created in (select min(dn2.date_created)  FROM discrepancy_note dn2, dn_item_data_map dsms,item_data id
+					    where 
+					dsm.item_data_id= ?            AND
+					 dn.discrepancy_note_id=dsm.discrepancy_note_id and
+						dsm.item_data_id = id.item_data_id
+							and dn2.parent_dn_id = dn.parent_dn_id 
+							 
+)
+)
+
+
+
         </sql>
     </query>
     <query>
@@ -845,6 +882,28 @@
             AND
             eventcrf.event_crf_id=eventcrf_map.event_crf_id
             AND eventcrf_map.discrepancy_note_id=dn.discrepancy_note_id
+        </sql>
+    </query>
+        <query>
+        <name>findEventCRFDNotesForToolTips</name>
+        <sql>
+          (
+SELECT dn.*, eventcrf_map.column_name FROM discrepancy_note dn, dn_event_crf_map eventcrf_map,
+            event_crf eventcrf WHERE eventcrf.event_crf_id =?
+            AND
+            eventcrf.event_crf_id=eventcrf_map.event_crf_id
+            AND eventcrf_map.discrepancy_note_id=dn.discrepancy_note_id
+		and dn.parent_dn_id !=0
+		and dn.date_created = (select max(date_created) from discrepancy_note dn2 where dn2.parent_dn_id = dn.parent_dn_id)
+)
+union		
+(SELECT dn.*, eventcrf_map.column_name FROM discrepancy_note dn, dn_event_crf_map eventcrf_map,
+            event_crf eventcrf WHERE eventcrf.event_crf_id = ?
+            AND
+            eventcrf.event_crf_id=eventcrf_map.event_crf_id
+            AND eventcrf_map.discrepancy_note_id=dn.discrepancy_note_id
+		and dn.parent_dn_id !=0
+		and dn.date_created = (select min(date_created) from discrepancy_note dn2 where dn2.parent_dn_id = dn.parent_dn_id))
         </sql>
     </query>
     <query>

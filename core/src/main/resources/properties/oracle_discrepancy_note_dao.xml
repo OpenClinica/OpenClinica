@@ -295,6 +295,7 @@
 		    AND ((dn.parent_dn_id IS NULL) or (dn.parent_dn_id = 0))
 		</sql>
 	</query>
+	
 	<query>
         <name>findAllEventCRFByStudyAndParent</name>
         <sql>
@@ -887,6 +888,81 @@
             AND dn.discrepancy_note_id=dsm.discrepancy_note_id
             AND dsm.item_data_id = id.item_data_id
             order by dn.date_created desc
+        </sql>
+    </query>
+            <query>
+        <name>findExistingNotesForToolTip</name>
+        <sql>
+ (SELECT dn.*
+					    FROM discrepancy_note dn, dn_item_data_map dsm,item_data id
+					    where 
+					dsm.item_data_id= ?           AND
+					 dn.discrepancy_note_id=dsm.discrepancy_note_id and
+						dsm.item_data_id = id.item_data_id
+				            and dn.date_created in (select max(dn2.date_created)  FROM discrepancy_note dn2, dn_item_data_map dsms,item_data id
+					    where 
+					dsm.item_data_id= ?            AND
+					 dn.discrepancy_note_id=dsm.discrepancy_note_id and
+						dsm.item_data_id = id.item_data_id
+						and dn2.parent_dn_id = dn.parent_dn_id 
+) )
+UNION
+ (SELECT dn.*
+					    FROM discrepancy_note dn, dn_item_data_map dsm,item_data id
+					    where 
+					dsm.item_data_id= ?           AND
+					 dn.discrepancy_note_id=dsm.discrepancy_note_id and
+						dsm.item_data_id = id.item_data_id
+				            and dn.date_created in (select min(dn2.date_created)  FROM discrepancy_note dn2, dn_item_data_map dsms,item_data id
+					    where 
+					dsm.item_data_id= ?            AND
+					 dn.discrepancy_note_id=dsm.discrepancy_note_id and
+						dsm.item_data_id = id.item_data_id
+							and dn2.parent_dn_id = dn.parent_dn_id 
+							 
+)
+)
+
+
+
+        </sql>
+    </query>
+    
+       <query>
+        <name>findExistingNotesForToolTip</name>
+        <sql>
+ (SELECT dn.*
+					    FROM discrepancy_note dn, dn_item_data_map dsm,item_data id
+					    where 
+					dsm.item_data_id= ?           AND
+					 dn.discrepancy_note_id=dsm.discrepancy_note_id and
+						dsm.item_data_id = id.item_data_id
+				            and dn.date_created in (select max(dn2.date_created)  FROM discrepancy_note dn2, dn_item_data_map dsms,item_data id
+					    where 
+					dsm.item_data_id= ?            AND
+					 dn.discrepancy_note_id=dsm.discrepancy_note_id and
+						dsm.item_data_id = id.item_data_id
+						and dn2.parent_dn_id = dn.parent_dn_id 
+) )
+UNION
+ (SELECT dn.*
+					    FROM discrepancy_note dn, dn_item_data_map dsm,item_data id
+					    where 
+					dsm.item_data_id= ?           AND
+					 dn.discrepancy_note_id=dsm.discrepancy_note_id and
+						dsm.item_data_id = id.item_data_id
+				            and dn.date_created in (select min(dn2.date_created)  FROM discrepancy_note dn2, dn_item_data_map dsms,item_data id
+					    where 
+					dsm.item_data_id= ?            AND
+					 dn.discrepancy_note_id=dsm.discrepancy_note_id and
+						dsm.item_data_id = id.item_data_id
+							and dn2.parent_dn_id = dn.parent_dn_id 
+							 
+)
+)
+
+
+
         </sql>
     </query>
     <!--<query>-->
