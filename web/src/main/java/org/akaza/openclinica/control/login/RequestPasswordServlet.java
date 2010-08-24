@@ -114,6 +114,7 @@ public class RequestPasswordServlet extends SecureController {
                     OpenClinicaJdbcService ocService =
                         ((OpenClinicaJdbcService) SpringServletAccess.getApplicationContext(context).getBean("ocUserDetailsService"));
                     String newDigestPass = sm.encrytPassword(newPass, ocService.loadUserByUsername(ubForm.getName()));
+                    System.out.println("New Password[" + newDigestPass + "]");
                     ubDB.setPasswd(newDigestPass);
 
                     // passwdtimestamp should be null ,fix
@@ -123,7 +124,7 @@ public class RequestPasswordServlet extends SecureController {
                     //Date date = local_df.parse("01/01/1900");
                     //cal.setTime(date);
                     //ubDB.setPasswdTimestamp(cal.getTime());
-                    ubDB.setPasswdTimestamp(new Date());
+                    ubDB.setPasswdTimestamp(null);
                     ubDB.setUpdater(updater);
                     ubDB.setLastVisitDate(new Date());
 
