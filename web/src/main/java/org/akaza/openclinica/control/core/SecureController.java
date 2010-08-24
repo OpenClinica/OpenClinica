@@ -455,7 +455,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             // addPageMessage(ipe.getOpenClinicaMessage());
             forwardPage(ipe.getGoTo());
         } catch (Exception e) {
-            // e.printStackTrace();
+            e.printStackTrace();
             logger.error(SecureController.getStackTrace(e));
 
             forwardPage(Page.ERROR);
