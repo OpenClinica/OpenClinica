@@ -412,11 +412,12 @@ public class ItemFormMetadataDAO extends EntityDAO {
         this.setTypesExpected();
         // BWP: changed from 25 to 26 when added response_layout?
         // YW: now added width_decimal
-        this.setTypeExpected(28, TypeNames.STRING);// version name
+        // tbh: compensated for simple_conditional_display column, 08/2010
+        this.setTypeExpected(29, TypeNames.STRING);// version name
         // add more here for display, tbh 082007
-        this.setTypeExpected(29, TypeNames.STRING);// group_label
-        this.setTypeExpected(30, TypeNames.INT);// repeat_max
-        this.setTypeExpected(31, TypeNames.STRING);// section_name
+        this.setTypeExpected(30, TypeNames.STRING);// group_label
+        this.setTypeExpected(31, TypeNames.INT);// repeat_max
+        this.setTypeExpected(32, TypeNames.STRING);// section_name
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(itemId));
 
