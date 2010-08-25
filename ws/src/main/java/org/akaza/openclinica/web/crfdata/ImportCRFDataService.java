@@ -925,8 +925,9 @@ public class ImportCRFDataService {
                 }
             }
         } catch (OpenClinicaException oce) {
-
+            oce.printStackTrace();
         } catch (NullPointerException npe) {
+            npe.printStackTrace();
             logger.debug("found a nullpointer here");
         }
         // if errors == null you pass, if not you fail
