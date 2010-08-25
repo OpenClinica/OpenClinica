@@ -20,7 +20,15 @@
 <c:set var="interviewDate" value="${toc.eventCRF.dateInterviewed}" />
 <c:set var="itemId" value="${displayItem.item.id}" />
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
+<style type="text/css">
 
+.tooltip {
+		
+	width:100%;
+	
+}
+
+</style>
 
 
 <script type="text/javascript" language="javascript">
@@ -64,7 +72,7 @@ var closing = true;
 	                     '<table ><table width="150">'+
 	                     ' <tr><td  align=\"center\" class=\"header1\">' +
 	                     'Notes and Discrepancies </td></tr><tr></tr>'+
-	                     '</table><table width="180"  class="tableborder" align="left">  <tr>  <td width="66" class="label"><img src="images/icon_Note.gif" width="16" height="13" alt="noNote"></td> <td width="67" align="left" class=\"label\">New: </td><td width="43" class=\"label\">'+newNo+'</td></tr>'+
+	                     '</table><table width="180"  class="tableborder" align="left">  <tr>  <td width="66" class="label"><img src="images/icon_Note.gif" width="16" height="13" alt="noNote"></td> <td width="67" align="center" class=\"label\" nowrap>New: </td><td width="43" class=\"label\">'+newNo+'</td></tr>'+
 	                     '<tr> <td ><img src="images/icon_flagYellow.gif" width="16" height="13" alt="discrepancy"> <td class=\"label\">Updated: </td><td  class=\"label\">'+updatedNo+'</td></tr>'+
 	                     '<tr> <td ><img src="images/icon_flagGreen.gif" width="16" height="13" alt="closed"></td> <td class=\"label\">Res.Proposed: </td> <td  class=\"label\">'+resNo+'</td></tr>'+
 	                     '<tr>  <td ><img src="images/icon_flagBlack.gif" width="16" height="13" alt="NA"></td> <td class=\"label\">Closed: </td><td  class=\"label\">'+closedNo+'</td></tr><tr>'+ 
@@ -85,6 +93,7 @@ var closing = true;
     	  var updatedDates = new Array();
     	  var i=0;
     	  var discNotes = new Array();
+    	  var title = 'Notes and Discrepancies';
     	  	if(flag =='interviewNotes')
     	     	{
     	     	<c:forEach var="discrepancyNoteBeans" items="${nameNotes}">
@@ -94,6 +103,7 @@ var closing = true;
     	  			updatedDates[i]= '<c:out value="${discrepancyNoteBeans.createdDate}"/>';
     	  			i++;
     	  	 	</c:forEach>
+    	  	 	title = "Interviewer Name";
     	     	}
     	   	else if(flag =='dateNotes')
     	     {
@@ -104,17 +114,18 @@ var closing = true;
     	  			updatedDates[i]= '<c:out value="${discrepancyNoteBeans.createdDate}"/>';
     	  			i++;
     	     	</c:forEach>
-    	   	}
+    	   title = "Interview Date";
+    	   }
     	
     		   var htmlgen = 
 		 	          '<div class=\"tooltip\">'+
-		 	          '<table  width="170">'+
-		 	          ' <tr><td  align=\"center\" class=\"header1\">' +
-		 	          'Notes and Discrepancies </td></tr><tr></tr></table><table  style="border-collapse:collapse" cellspacing="0" cellpadding="0" width="175" >'+
+		 	          '<table  width="250">'+
+		 	          ' <tr><td  align=\"center\" class=\"header1\">'+title +
+		 	          ' </td></tr><tr></tr></table><table  style="border-collapse:collapse" cellspacing="0" cellpadding="0" width="225" >'+
 		 	          drawRows(i,resStatus,detailedNotes,discrepancyType,updatedDates)+
-		 	          '</table><table width="200"  class="tableborder" align="left">'+  	
+		 	          '</table><table width="250"  class="tableborder" align="left">'+  	
 		 	          '</table><table><tr></tr></table>'+
-		 	          '<table width="180"><tbody><td height="50" colspan="3"><span class=\"note\">'+
+		 	          '<table width="200"><tbody><td height="50" colspan="3"><span class=\"note\">'+
 		 	          'Click on the flag in the main window for more details. </span>'+
 		 	          '</td></tr></tbody></table></table></div>';
 		  return htmlgen;
@@ -130,23 +141,23 @@ var closing = true;
      		
      			if(resStatus[x]=='1')
      			{
-     				row+='<tr> <td class=\"label\"><img src="images/icon_Note.gif" width="16" height="13" alt="Note"></td>'+'<td  width="120" align="left" class=\"label\">New: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td class=\"borderlabel\">'+detailedNotes[x].substring(0,20)+'...</td></tr>';
+     				row+='<tr> <td class=\"label\"><img src="images/icon_Note.gif" width="16" height="13" alt="Note"></td>'+'<td  width="180" align="left" class=\"label\" nowrap>&nbsp;New: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td class=\"borderlabel\" nowrap >&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
      			}
      			else if(resStatus[x]=='2')
      			{
-     				row+='<tr > <td  class=\"label\"><img src="images/icon_flagYellow.gif" width="16" height="13" alt="Note"></td>'+'<td width="120"  align="left" class=\"label\">Updated: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td  class=\"borderlabel\">'+detailedNotes[x].substring(0,20)+'...</td></tr>';
+     				row+='<tr > <td  class=\"label\"><img src="images/icon_flagYellow.gif" width="16" height="13" alt="Note"></td>'+'<td width="180"  align="left" class=\"label\" nowrap>&nbsp;Updated: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td  class=\"borderlabel\" nowrap>&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
      			}
      			else if(resStatus[x]=='3')
      			{
-     				row+='<tr> <td class=\"label\"><img src="images/icon_flagGreen.gif" width="16" height="13" alt="Note"></td>'+'<td  width="120"  align="left" class=\"label\">Res.Proposed: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td  class=\"borderlabel\">'+detailedNotes[x].substring(0,20)+'...</td></tr>';
+     				row+='<tr> <td class=\"label\"><img src="images/icon_flagGreen.gif" width="16" height="13" alt="Note"></td>'+'<td  width="180"  align="left" class=\"label\" nowrap>&nbsp;Res.Proposed: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td  class=\"borderlabel\" nowrap>&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
      			}
      			else if(resStatus[x]=='4')
      			{
-     				row+='<tr> <td  class=\"label\"><img src="images/icon_flagBlack.gif" width="16" height="13" alt="Note"></td>'+'<td  width="120" align="left" class=\"label\">Closed: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td class=\"borderlabel\">'+detailedNotes[x].substring(0,20)+'...</td></tr>';
+     				row+='<tr> <td  class=\"label\"><img src="images/icon_flagBlack.gif" width="16" height="13" alt="Note"></td>'+'<td  width="180" align="left" class=\"label\" nowrap>&nbsp;Closed: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td class=\"borderlabel\" nowrap>&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
      			}
      			else if(resStatus[x]=='5')
      		{
-     			row+='<tr> <td width="16"  class=\"label\"><img src="images/icon_flagWhite.gif" width="16" height="13" alt="Note"></td>'+'<td width="120"  align="left" class=\"label\">N/A: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td class=\"borderlabel\">'+detailedNotes[x].substring(0,20)+'...</td></tr>';
+     			row+='<tr> <td width="16"  class=\"label\"><img src="images/icon_flagWhite.gif" width="16" height="13" alt="Note"></td>'+'<td width="180"  align="left" class=\"label\" nowrap>&nbsp;N/A: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td class=\"borderlabel\" nowrap>&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
      			}
      			
      			

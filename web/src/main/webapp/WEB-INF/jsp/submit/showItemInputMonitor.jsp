@@ -18,33 +18,38 @@ function genToolTips(itemId){
 	var updatedDates = new Array();
 	var i=0;
 	var discNotes = new Array();
+	var title = "Notes and Discrepancies";
 
 	 		<c:set var="discrepancyNotes" value="1"/>
 		<c:forEach var="itemsSection" items="${section.items}">
+	   			
 	   			if("${itemsSection.item.id}"== itemId)
 	   			{
+	   			title = "<c:out value="${itemsSection.item.name}"/>";
 	   				<c:set  var="discrepancyNotes" value="${itemsSection.discrepancyNotes}"/>
 	        		<c:forEach var="discrepancyNotes" items="${discrepancyNotes}">  	
-		           	<c:if test="${discrepancyNotes.parentDnId == 0}">
-			           	resStatus[i] =<c:out value="${discrepancyNotes.resolutionStatusId}"/>;
+		           	
+		           	
+				    resStatus[i] =<c:out value="${discrepancyNotes.resolutionStatusId}"/>;
 			      	    detailedNotes[i] ="<c:out value="${discrepancyNotes.description}"/>";
 			      	    discrepancyType[i] = "<c:out value="${discrepancyNotes.disType.name}"/>";
 			      	    updatedDates[i] = "<c:out value="${discrepancyNotes.createdDate}"/>";
-			   		    i++;
-		       		</c:if>
-	        	   </c:forEach>
+			   	    i++;
+			   	    
+		       		
+		       		</c:forEach>
 	   			}
 	    </c:forEach>
 	 	
 		  var htmlgen = 
 	          '<div class=\"tooltip\">'+
-	          '<table  width="170">'+
-	          ' <tr><td  align=\"center\" class=\"header1\">' +
-	          'Notes and Discrepancies </td></tr><tr></tr></table><table  style="border-collapse:collapse" cellspacing="0" cellpadding="0" width="180" >'+
+	          '<table  width="95%">'+
+	          ' <tr><td  align=\"center\" class=\"header1\">' +title+
+	          ' </td></tr><tr></tr></table><table  style="border-collapse:collapse" cellspacing="0" cellpadding="0" width="95%" >'+
 	          drawRows(i,resStatus,detailedNotes,discrepancyType,updatedDates)+
-	          '</table><table width="200"  class="tableborder" align="left">'+  	
+	          '</table><table width="95%"  class="tableborder" align="left">'+  	
 	          '</table><table><tr></tr></table>'+
-	          '<table width="180"><tbody><td height="50" colspan="3"><span class=\"note\">'+
+	          '<table width="95%"><tbody><td height="30" colspan="3"><span class=\"note\">'+
 	          'Click on the flag in the main window for more details. </span>'+
 	          '</td></tr></tbody></table></table></div>';
 		  return htmlgen;
@@ -56,11 +61,7 @@ function genToolTips(itemId){
 <c:set var="numOfDate" value="${param.key}" />
 <c:set var="defValue" value="${param.defaultValue}" />
 <c:set var="respLayout" value="${param.respLayout}" />
-<c:set var="totNew" value="${displayItem.totNew}"/>
-<c:set var="totUpdated" value="${displayItem.totUpdated}"/>
-<c:set var="totRes" value="${displayItem.totRes}"/>
-<c:set var="totClosed" value="${displayItem.totClosed}"/>
-<c:set var="totNA" value="${displayItem.totNA}"/>
+
 <%-- What is the including JSP (e.g., doubleDataEntry)--%>
 <c:set var="originJSP" value="${param.originJSP}" />
 <%-- A boolean request attribute set in DataEntryServlet...--%>

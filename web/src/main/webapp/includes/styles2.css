@@ -186,11 +186,12 @@
 
 .tooltip {
 		
-	width:175px;
+	width:170px;
 	font-size:11px;
 	color:black; 
 	background-color: #FFFFE5;
 	border-color:gray;
+	margin-right:auto;
 	
 }
 .tooltip .label {
@@ -198,7 +199,7 @@
 	font-family:Tahoma,Arial,Helvetica,Sans-Serif;
 	font-size:11px;
 	border-color:gray;
-	width:0px;
+	width:5px;
 	
 }
 .tooltip .header1 {
@@ -207,24 +208,26 @@
 	font-size:11px;
 	font-weight:bold;
 	height:30px;
+	margin-right:auto;
 	
 }
 .tooltip.tableborder{
 	border-style:solid;
 }
 
+
+
 .tooltip .borderlabel {
 	color:black;
 	font-family:Tahoma,Arial,Helvetica,Sans-Serif;
 	font-size:11px;
 	border-color:gray;
-	width:0px;
+	width:10px;
 	border-color:gray;
 	border-bottom:dotted;
 	border-bottom-width:thin;
 	border-bottom-color:gray;
 }
-
 .tooltip .note {
 	color:black;
 	

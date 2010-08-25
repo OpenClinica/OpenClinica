@@ -1087,7 +1087,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(eventCRFBean.getId()));
-        variables.put(new Integer(2), new Integer(eventCRFBean.getId()));
+        
         dNotelist = this.select(digester.getQuery("findEventCRFDNotesForToolTips"), variables);
 
         ArrayList<DiscrepancyNoteBean> returnedNotelist = new ArrayList<DiscrepancyNoteBean>();
@@ -1743,8 +1743,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(itemDataId));
         variables.put(new Integer(2), new Integer(itemDataId));
-        variables.put(new Integer(3), new Integer(itemDataId));
-        variables.put(new Integer(4), new Integer(itemDataId));
+       
         alist = this.select(digester.getQuery("findExistingNotesForToolTip"), variables);
         ArrayList<DiscrepancyNoteBean> al = new ArrayList<DiscrepancyNoteBean>();
         Iterator it = alist.iterator();
