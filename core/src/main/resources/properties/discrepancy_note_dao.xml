@@ -823,7 +823,7 @@
 					dsm.item_data_id= ?           AND
 					 dn.discrepancy_note_id=dsm.discrepancy_note_id and
 						dsm.item_data_id = id.item_data_id
-				            and dn.date_created in (select max(dn2.date_created)  FROM discrepancy_note dn2, dn_item_data_map dsms,item_data id
+				            and dn.discrepancy_note_id in (select max(dn2.discrepancy_note_id)  FROM discrepancy_note dn2, dn_item_data_map dsms,item_data id
 					    where 
 					dsm.item_data_id= ?            AND
 					 dn.discrepancy_note_id=dsm.discrepancy_note_id and
@@ -878,7 +878,7 @@ SELECT dn.*, eventcrf_map.column_name FROM discrepancy_note dn, dn_event_crf_map
             eventcrf.event_crf_id=eventcrf_map.event_crf_id
             AND eventcrf_map.discrepancy_note_id=dn.discrepancy_note_id
 		and dn.parent_dn_id !=0
-		and dn.date_created = (select max(date_created) from discrepancy_note dn2 where dn2.parent_dn_id = dn.parent_dn_id)
+		and dn.discrepancy_note_id = (select max(discrepancy_note_id) from discrepancy_note dn2 where dn2.parent_dn_id = dn.parent_dn_id)
 		        </sql>
     </query>
     <query>
