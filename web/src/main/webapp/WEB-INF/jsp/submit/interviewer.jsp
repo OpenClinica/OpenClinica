@@ -433,6 +433,7 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
 
 <tr>
 <td class="table_cell_left" nowrap>
+    <c:if test="${study.studyParameterConfig.interviewerNameRequired != 'not_used'}">
     <c:choose>
         <c:when test="${isInError_Int}">
             <fmt:message key="interviewer_name" bundle="${resword}"/>: <span class="aka_exclaim_error">! </span> &nbsp;
@@ -441,14 +442,16 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
 
         <c:otherwise>
             <fmt:message key="interviewer_name" bundle="${resword}"/>:
-            <c:if test="${study.studyParameterConfig.interviewerNameRequired=='true'}">
+            <c:if test="${study.studyParameterConfig.interviewerNameRequired=='yes'}">
                 *
             </c:if>
             &nbsp;
         </c:otherwise>
     </c:choose>
+    </c:if>
 </td>
 <td class="table_cell_left">
+    <c:if test="${study.studyParameterConfig.interviewerNameRequired != 'not_used'}">
     <table border="0" cellpadding="0" cellspacing="0">
         <tr>
 
@@ -534,9 +537,11 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
             </td>
         </tr>
     </table>
+    </c:if>
 </td>
 
 <td class="table_cell" nowrap>
+    <c:if test="${study.studyParameterConfig.interviewDateRequired != 'not_used'}">
     <c:choose>
         <c:when test="${isInError_Dat}">
             <fmt:message key="interview_date" bundle="${resword}"/>: <span class="aka_exclaim_error">! </span>&nbsp;<br />
@@ -544,14 +549,16 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
         </c:when>
         <c:otherwise>
             <fmt:message key="interview_date" bundle="${resword}"/>:
-            <c:if test="${study.studyParameterConfig.interviewDateRequired=='true'}">
+            <c:if test="${study.studyParameterConfig.interviewDateRequired=='yes'}">
                 *
             </c:if>&nbsp;<br />
             <%--(<fmt:message key="date_format" bundle="${resformat}"/>)--%>
         </c:otherwise>
     </c:choose>
+    </c:if>
 </td><!--</a>-->
-<td class="table_cell_left">
+<td class="table_cell_left"> 
+    <c:if test="${study.studyParameterConfig.interviewDateRequired != 'not_used'}">
     <table border="0" cellpadding="0" cellspacing="0">
 
         <tr>
@@ -649,7 +656,7 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
             </td>
         </tr>
     </table>
-	
+	</c:if>
 </td>
 </tr>
 </table>
