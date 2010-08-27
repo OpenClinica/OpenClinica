@@ -532,7 +532,7 @@
   </tr>
 
   <!--
-   <tr valign="top"><td class="table_header_column"><fmt:message key="generate_study_subject_ID_automatically" bundle="${resword}"/>:</td>
+   <tr valign="top"><td class="table_header_column"><fmt:message key="generate_study_subject_ID_automatically" bundle="${resword}"/></td>
    <td class="table_cell">
    <c:choose>
    <c:when test="${studyToView.studyParameterConfig.subjectIdPrefixSuffix == 'true'}">
@@ -558,18 +558,15 @@
   </c:choose>
   </td>
   </tr>
-
-
-
    <tr valign="top">
-       <td class="table_header_column"><fmt:message key="when_entering_data_entry_interviewer" bundle="${resword}"/>:</td>
+       <td class="table_header_column"><fmt:message key="when_entering_data_entry_interviewer" bundle="${resword}"/></td>
        <td class="table_cell">
            <fmt:message key="${studyToView.studyParameterConfig.interviewerNameRequired}" bundle="${resword}"/>
       </td>
-  </tr>
+   </tr>
 
 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="interviewer_name_default_as_blank" bundle="${restext}"/>:</td>
+  <tr valign="top"><td class="table_header_column"><fmt:message key="interviewer_name_default_as_blank" bundle="${restext}"/></td>
 
   <td class="table_cell">
    <c:choose>
@@ -642,7 +639,13 @@
   </c:choose>
   </td>
   </tr>
-
+    <tr valign="top">
+        <td class="table_header_column"><fmt:message key="event_location_required" bundle="${resword}"/></td>
+        <td class="table_cell">
+            <fmt:message key="${studyToView.studyParameterConfig.eventLocationRequired}" bundle="${resword}"/>
+       </td>
+    </tr>
+    
 </table>
 
 </div>

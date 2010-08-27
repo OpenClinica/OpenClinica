@@ -136,6 +136,8 @@ public class StudyConfigService {
                     spc.setSecondaryLabelViewable(spv.getValue());
                 } else if (handle.equalsIgnoreCase("adminForcedReasonForChange")) {
                     spc.setAdminForcedReasonForChange(spv.getValue());
+                } else if (handle.equalsIgnoreCase("eventLocationRequired")) {
+                    spc.setEventLocationRequired(spv.getValue());
                 }
             }
         }

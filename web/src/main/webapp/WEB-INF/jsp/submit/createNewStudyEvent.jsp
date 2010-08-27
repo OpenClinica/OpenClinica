@@ -293,7 +293,7 @@
 			</table>
 		</td>
 	</tr>
-
+    <c:if test="${study.studyParameterConfig.eventLocationRequired != 'not_used'}">
     <tr>
         <td class="formlabel"><fmt:message key="location" bundle="${resword}"/>:</td>
           <td valign="top">
@@ -313,7 +313,7 @@
             </table>
         </td>
     </tr>
-    
+    </c:if>
 </table>
 
 </div>
@@ -374,6 +374,7 @@
 			</table>
 		</td>
 	</tr>
+    <c:if test="${study.studyParameterConfig.eventLocationRequired != 'not_used'}">
 	<tr>
 		<td class="formlabel"><fmt:message key="location" bundle="${resword}"/>:</td>
 	  	<td valign="top">
@@ -393,6 +394,7 @@
 			</table>
 		</td>
 	</tr>
+    </c:if>
 	<tr>
 		<td class="formlabel"><fmt:message key="start_date_time" bundle="${resword}"/>:</td>
 	  	<td valign="top">
@@ -488,6 +490,7 @@
 			</table>
 		</td>
 	</tr>
+    <c:if test="${study.studyParameterConfig.eventLocationRequired != 'not_used'}">
 	<tr>
 		<td class="formlabel"><fmt:message key="location" bundle="${resword}"/>:</td>
 	  	<td valign="top">
@@ -507,6 +510,7 @@
 			</table>
 		</td>
 	</tr>
+    </c:if>
 	<tr>
 		<td class="formlabel"><fmt:message key="start_date_time" bundle="${resword}"/>:</td>
 	  	<td valign="top">
@@ -603,6 +607,7 @@
 			</table>
 		</td>
 	</tr>
+    <c:if test="${study.studyParameterConfig.eventLocationRequired != 'not_used'}">
 	<tr>
 		<td class="formlabel"><fmt:message key="location" bundle="${resword}"/>:</td>
 	  	<td valign="top">
@@ -622,6 +627,7 @@
 			</table>
 		</td>
 	</tr>
+    </c:if>
 	<tr>
 		<td class="formlabel"><fmt:message key="start_date_time" bundle="${resword}"/>:</td>
 	  	<td valign="top">
@@ -718,6 +724,8 @@
 			</table>
 		</td>
 	</tr>
+    <c:choose>
+    <c:when test="${study.studyParameterConfig.eventLocationRequired == 'required'}">
 	<tr>
 		<td class="formlabel"><fmt:message key="location" bundle="${resword}"/>:</td>
 	  	<td valign="top">
@@ -737,6 +745,32 @@
 			</table>
 		</td>
 	</tr>
+    </c:when>
+     <c:when test="${study.studyParameterConfig.eventLocationRequired == 'optional'}">
+        <tr>
+            <td class="formlabel"><fmt:message key="location" bundle="${resword}"/>:</td>
+              <td valign="top">
+                  <table border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td valign="top">
+                    <div class="formfieldXL_BG">
+                        <input type="text" name="locationScheduled3" value="<c:out value="${locationScheduled3}"/>" size="50" class="formfieldXL">
+                    </div>
+                    </td>
+                    <td><c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=schLocation&column=location','spanAlert-locationScheduled3'); return false;">
+                    <img name="flag_schLocation" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
+                </tr>
+                <tr>
+                    <td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="locationScheduled3"/></jsp:include></td>
+                </tr>
+                </table>
+            </td>
+        </tr>
+     </c:when>
+     <c:otherwise>
+         <input name="location" type="hidden" value=""/>
+     </c:otherwise>
+    </c:choose>
 	<tr>
 		<td class="formlabel"><fmt:message key="start_date_time" bundle="${resword}"/>:</td>
 	  	<td valign="top">

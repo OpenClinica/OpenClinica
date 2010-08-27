@@ -47,16 +47,18 @@ public class StudyParameterConfig {
 
     private String adminForcedReasonForChange;//Administrative editing will not allow changes without a DN added 'reason for change'
 
+    private String eventLocationRequired;
+
     public StudyParameterConfig() {
         collectDob = "1";
         discrepancyManagement = "true";
         genderRequired = "true";
         subjectPersonIdRequired = "required";
-        interviewerNameRequired = "true";
+        interviewerNameRequired = "yes";
 
         interviewerNameDefault = "blank";
         interviewerNameEditable = "true";
-        interviewDateRequired = "true";
+        interviewDateRequired = "yes";
         interviewDateDefault = "blank"; // blank, pre-populated
         interviewDateEditable = "true";// editable or not
         subjectIdGeneration = "manual";// manual, auto non-editable, auto
@@ -65,6 +67,7 @@ public class StudyParameterConfig {
         personIdShownOnCRF = "false";
         secondaryLabelViewable = "false";
         adminForcedReasonForChange = "true";
+        eventLocationRequired = "not_used";
     }
 
     /**
@@ -277,4 +280,12 @@ public class StudyParameterConfig {
 	public void setAdminForcedReasonForChange(String adminForcedReasonForChange) {
 		this.adminForcedReasonForChange = adminForcedReasonForChange;
 	}
+
+    public String getEventLocationRequired() {
+        return eventLocationRequired;
+    }
+
+    public void setEventLocationRequired(String eventLocationRequired) {
+        this.eventLocationRequired = eventLocationRequired;
+    }
 }
