@@ -167,6 +167,13 @@ public class DataEndpoint {
                 Element msgElement = document.createElementNS(NAMESPACE_URI_V1, "error");
                 msgElement.setTextContent(auditMsgs.get(1));
                 responseElement.appendChild(msgElement);
+            } else if ("warn".equals(status)){
+                String confirmation = messages.getMessage("dataEndpoint.success", null, "Success", locale);
+                resultElement.setTextContent(confirmation);
+                responseElement.appendChild(resultElement);
+                Element msgElement = document.createElementNS(NAMESPACE_URI_V1, "warning");
+                msgElement.setTextContent(auditMsgs.get(1));
+                responseElement.appendChild(msgElement);
             } else {
                 // plain success no warnings
                 String confirmation = messages.getMessage("dataEndpoint.success", null, "Success", locale);

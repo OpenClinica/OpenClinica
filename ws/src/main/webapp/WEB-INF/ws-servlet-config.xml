@@ -93,6 +93,7 @@
                 <prop key="study">http://openclinica.org/ws/study/v1</prop>
                 <prop key="sed">http://openclinica.org/ws/studyEventDefinition/v1</prop>
                 <prop key="data">http://openclinica.org/ws/data/v1</prop>
+                <prop key="odm13">http://www.cdisc.org/ns/odm/v1.3</prop>
             </props>
         </property>
     </bean>
@@ -124,6 +125,7 @@
     <bean id="dataEndpoint" class="org.akaza.openclinica.ws.DataEndpoint">
         <constructor-arg ref="dataSource"/>
         <constructor-arg ref="messageSource"/>
+        <constructor-arg ref="coreResources"/>
     </bean>
     
      <bean id="studyEventDefinitionEndpoint" class="org.akaza.openclinica.ws.StudyEventDefinitionEndpoint">

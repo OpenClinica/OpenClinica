@@ -311,12 +311,13 @@ public class DataImportService {
             // throw new Exception(msg.toString());
             return getFailReturnList(msg.toString(), auditMsg.toString());
         }
-
+        boolean discNotesGenerated = false;
         if (fail) {
             // in place of nulls, need to return a message
             return getFailReturnList(msg.toString(), auditMsg.toString());
             
         } else {
+            
             msg.append(respage.getString("passing_crf_edit_checks") + " ");
             auditMsg.append(respage.getString("passing_crf_edit_checks") + " ");
             // session.setAttribute("importedData",
@@ -409,6 +410,7 @@ public class DataImportService {
                                 DiscrepancyNoteBean parentDn =
                                     createDiscrepancyNote(ibean, message, eventCrfBean, displayItemBean, null, userBean, dataSource, studyBean);
                                 createDiscrepancyNote(ibean, message, eventCrfBean, displayItemBean, parentDn.getId(), userBean, dataSource, studyBean);
+                                discNotesGenerated = true;
                                 System.out.println("*** created disc note with message: " + message);
                                 // displayItemBean);
                             }
@@ -435,8 +437,11 @@ public class DataImportService {
         }
 
 
-        
-        return getSuccessReturnList(msg.toString(), auditMsg.toString());// msg.toString();
+        if (!discNotesGenerated) {
+            return getSuccessReturnList(msg.toString(), auditMsg.toString());
+        } else {
+            return getWarningReturnList(msg.toString(), auditMsg.toString());
+        }
     }
     
     public ArrayList<String> getFailReturnList(String msg, String auditMsg) {
@@ -450,6 +455,14 @@ public class DataImportService {
     public ArrayList<String> getSuccessReturnList(String msg, String auditMsg) {
         ArrayList<String> retList = new ArrayList<String>();
         retList.add("success");
+        retList.add(msg.toString());
+        retList.add(auditMsg.toString());
+        return retList;
+    }
+    
+    public ArrayList<String> getWarningReturnList(String msg, String auditMsg) {
+        ArrayList<String> retList = new ArrayList<String>();
+        retList.add("warn");
         retList.add(msg.toString());
         retList.add(auditMsg.toString());
         return retList;
