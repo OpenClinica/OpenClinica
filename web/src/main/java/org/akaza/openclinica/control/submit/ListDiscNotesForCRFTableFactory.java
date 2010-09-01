@@ -84,8 +84,8 @@ public class ListDiscNotesForCRFTableFactory extends AbstractTableFactory {
     private ArrayList<StudyGroupClassBean> studyGroupClasses;
     private StudyUserRoleBean currentRole;
     private UserAccountBean currentUser;
-    private ResourceBundle resword=ResourceBundleProvider.getWordsBundle();
-    private ResourceBundle resformat=ResourceBundleProvider.getFormatBundle();
+    private ResourceBundle resword = ResourceBundleProvider.getWordsBundle();
+    private ResourceBundle resformat = ResourceBundleProvider.getFormatBundle();
     private StudyEventDefinitionBean selectedStudyEventDefinition;
     private String module;
     private Integer resolutionStatus;
@@ -116,11 +116,17 @@ public class ListDiscNotesForCRFTableFactory extends AbstractTableFactory {
         crfColumnImageIconPaths.put(6, "images/icon_DEcomplete.gif");
         crfColumnImageIconPaths.put(7, "images/icon_Locked.gif");
 
-        discNoteIconPaths.put(1, "<img name='icon_Note' src='images/icon_Note.gif' border='0' alt='"+resword.getString("open")+"' title='"+resword.getString("open")+"'/>");
-        discNoteIconPaths.put(2, "<img name='icon_flagYellow' src='images/icon_flagYellow.gif' border='0' alt='"+resword.getString("updated")+"' title='"+resword.getString("updated")+"' />");
-        discNoteIconPaths.put(3, "<img name='icon_flagGreen' src='images/icon_flagGreen.gif' border='0' alt='"+resword.getString("resolved")+"' title='"+resword.getString("resolved")+"'/>");
-        discNoteIconPaths.put(4, "<img name='icon_flagBlack' src='images/icon_flagBlack.gif' border='0' alt='"+resword.getString("closed")+"' title='"+resword.getString("closed")+"'/>");
-        discNoteIconPaths.put(5, "<img name='icon_flagWhite' src='images/icon_flagWhite.gif' border='0' alt='"+resword.getString("not_applicable")+"' title='"+resword.getString("not_applicable")+"'/>");
+        discNoteIconPaths.put(1,
+                "<img name='icon_Note' src='images/icon_Note.gif' border='0' alt='" + resword.getString("open") + "' title='" + resword.getString("open")
+                    + "'/>");
+        discNoteIconPaths.put(2, "<img name='icon_flagYellow' src='images/icon_flagYellow.gif' border='0' alt='" + resword.getString("updated") + "' title='"
+            + resword.getString("updated") + "' />");
+        discNoteIconPaths.put(3, "<img name='icon_flagGreen' src='images/icon_flagGreen.gif' border='0' alt='" + resword.getString("resolved") + "' title='"
+            + resword.getString("resolved") + "'/>");
+        discNoteIconPaths.put(4, "<img name='icon_flagBlack' src='images/icon_flagBlack.gif' border='0' alt='" + resword.getString("closed") + "' title='"
+            + resword.getString("closed") + "'/>");
+        discNoteIconPaths.put(5, "<img name='icon_flagWhite' src='images/icon_flagWhite.gif' border='0' alt='" + resword.getString("not_applicable")
+            + "' title='" + resword.getString("not_applicable") + "'/>");
 
     }
 
@@ -136,13 +142,14 @@ public class ListDiscNotesForCRFTableFactory extends AbstractTableFactory {
         tableFacade.setColumnProperties(columnNames);
         Row row = tableFacade.getTable().getRow();
         configureColumn(row.getColumn(columnNames[0]), resword.getString("study_subject_ID"), null, null);
-        configureColumn(row.getColumn(columnNames[1]), resword.getString("event_status"), new EventStatusCellEditor(), new SubjectEventStatusDroplistFilterEditor(), true, false);
+        configureColumn(row.getColumn(columnNames[1]), resword.getString("event_status"), new EventStatusCellEditor(),
+                new SubjectEventStatusDroplistFilterEditor(), true, false);
         configureColumn(row.getColumn(columnNames[2]), resword.getString("event_date"), new EventStartDateCellEditor(), null);
 
         // crf columns
         for (int i = 3; i < columnNames.length - 1; i++) {
             CRFBean crfBean = crfBeans.get(i - 3);
-            configureColumn(row.getColumn(columnNames[i]), crfBean.getName(), new EventCrfCellEditor(), new SubjectEventCRFStatusDroplistFilterEditor(), true,
+            configureColumn(row.getColumn(columnNames[i]), crfBean.getName(), new EventCrfCellEditor(), new SubjectEventCRFStatusDroplistFilterEditor(), false,
                     false);
         }
 
@@ -761,11 +768,8 @@ public class ListDiscNotesForCRFTableFactory extends AbstractTableFactory {
                 }
 
                 /*
-                 * EventCrfLayerBuilder eventCrfLayerBuilder = new
-                 * EventCrfLayerBuilder(subject, Integer.valueOf(rowcount +
-                 * String.valueOf(i)), studyEvents, dataEntryStage, eventCrf,
-                 * studySubjectBean, studyBean, currentRole, currentUser,
-                 * eventDefintionCrf, crf);
+                 * EventCrfLayerBuilder eventCrfLayerBuilder = new EventCrfLayerBuilder(subject, Integer.valueOf(rowcount + String.valueOf(i)), studyEvents,
+                 * dataEntryStage, eventCrf, studySubjectBean, studyBean, currentRole, currentUser, eventDefintionCrf, crf);
                  */
 
                 // url.append(eventCrfLayerBuilder.buid());
@@ -822,16 +826,16 @@ public class ListDiscNotesForCRFTableFactory extends AbstractTableFactory {
                         + "&listNotes_f_studySubject.label=" + studySubject.getLabel());
             actionLink.append("onMouseDown=\"javascript:setImage('bt_View1','images/bt_View_d.gif');\"");
             actionLink.append("onMouseUp=\"javascript:setImage('bt_View1','images/bt_View.gif');\"").close();
-            actionLink.img().name("bt_View1").src("images/bt_View.gif").border("0").alt(resword.getString("view")).title(resword.getString("view")).append(
-                    "hspace=\"2\" style=\"float:left\" align=\"left\"").end().aEnd();
+            actionLink.img().name("bt_View1").src("images/bt_View.gif").border("0").alt(resword.getString("view")).title(resword.getString("view"))
+                    .append("hspace=\"2\" style=\"float:left\" align=\"left\"").end().aEnd();
             actionLink.append("&nbsp;&nbsp;&nbsp;");
         } else {
             actionLink.a().href(
                     "ViewNotes?viewForOne=y&id=" + studySubject.getId() + "&module=" + module + "&listNotes_f_studySubject.label=" + studySubject.getLabel());
             actionLink.append("onMouseDown=\"javascript:setImage('bt_View1','images/bt_View_d.gif');\"");
             actionLink.append("onMouseUp=\"javascript:setImage('bt_View1','images/bt_View.gif');\"").close();
-            actionLink.img().name("bt_View1").src("images/bt_View.gif").border("0").alt(resword.getString("view")).title(resword.getString("view")).append(
-                    "hspace=\"2\" style=\"float:left\" align=\"left\"").end().aEnd();
+            actionLink.img().name("bt_View1").src("images/bt_View.gif").border("0").alt(resword.getString("view")).title(resword.getString("view"))
+                    .append("hspace=\"2\" style=\"float:left\" align=\"left\"").end().aEnd();
             actionLink.append("&nbsp;&nbsp;&nbsp;");
         }
         return actionLink.toString();
@@ -844,15 +848,15 @@ public class ListDiscNotesForCRFTableFactory extends AbstractTableFactory {
                 actionLink.a().href(
                         "javascript:openDocWindow('ChooseDownloadFormat?subjectId=" + studySubject.getId() + "&discNoteType=" + discNoteType
                             + "&resolutionStatus=" + resolutionStatus + "')");
-                actionLink.img().name("bt_View1").src("images/bt_Download.gif").border("0").alt(resword.getString("download_discrepancy_notes")).title(
-                        resword.getString("download_discrepancy_notes")).append("hspace=\"2\"").end().aEnd();
+                actionLink.img().name("bt_View1").src("images/bt_Download.gif").border("0").alt(resword.getString("download_discrepancy_notes"))
+                        .title(resword.getString("download_discrepancy_notes")).append("hspace=\"2\"").end().aEnd();
                 actionLink.append("&nbsp;&nbsp;&nbsp;");
             } else {
                 actionLink.a().href(
                         "javascript:openDocWindow('ChooseDownloadFormat?discNoteType=" + discNoteType + "&module=" + module + "&subjectId="
                             + studySubject.getId() + "')");
-                actionLink.img().name("bt_View1").src("images/bt_Download.gif").border("0").alt(resword.getString("download_discrepancy_notes")).title(
-                        resword.getString("download_discrepancy_notes")).append("hspace=\"2\"").end().aEnd();
+                actionLink.img().name("bt_View1").src("images/bt_Download.gif").border("0").alt(resword.getString("download_discrepancy_notes"))
+                        .title(resword.getString("download_discrepancy_notes")).append("hspace=\"2\"").end().aEnd();
                 actionLink.append("&nbsp;&nbsp;&nbsp;");
             }
         }
@@ -866,7 +870,8 @@ public class ListDiscNotesForCRFTableFactory extends AbstractTableFactory {
                     + studySubject.getStudyId());
         actionLink.append("onMouseDown=\"javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');\"");
         actionLink.append("onMouseUp=\"javascript:setImage('bt_Remove1','images/bt_Remove.gif');\"").close();
-        actionLink.img().name("bt_Remove1").src("images/bt_Remove.gif").border("0").alt(resword.getString("remove")).title(resword.getString("remove")).append("hspace=\"2\"").end().aEnd();
+        actionLink.img().name("bt_Remove1").src("images/bt_Remove.gif").border("0").alt(resword.getString("remove")).title(resword.getString("remove"))
+                .append("hspace=\"2\"").end().aEnd();
         actionLink.append("&nbsp;&nbsp;&nbsp;");
         return actionLink.toString();
     }
@@ -876,7 +881,8 @@ public class ListDiscNotesForCRFTableFactory extends AbstractTableFactory {
         actionLink.a().href("ReassignStudySubject?id=" + studySubject.getId());
         actionLink.append("onMouseDown=\"javascript:setImage('bt_Reassign1','images/bt_Reassign_d.gif');\"");
         actionLink.append("onMouseUp=\"javascript:setImage('bt_Reassign1','images/bt_Reassign.gif');\"").close();
-        actionLink.img().name("bt_Reassign1").src("images/bt_Reassign.gif").border("0").alt(resword.getString("reassign")).title(resword.getString("reassign")).append("hspace=\"2\"").end().aEnd();
+        actionLink.img().name("bt_Reassign1").src("images/bt_Reassign.gif").border("0").alt(resword.getString("reassign")).title(resword.getString("reassign"))
+                .append("hspace=\"2\"").end().aEnd();
         actionLink.append("&nbsp;&nbsp;&nbsp;");
         return actionLink.toString();
     }
@@ -888,8 +894,8 @@ public class ListDiscNotesForCRFTableFactory extends AbstractTableFactory {
                     + studySubject.getStudyId());
         actionLink.append("onMouseDown=\"javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');\"");
         actionLink.append("onMouseUp=\"javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');\"").close();
-        actionLink.img().name("bt_Restore1").src("images/bt_Remove.gif").border("0").alt(resword.getString("restore")).title(resword.getString("restore")).align("left").append("hspace=\"6\"").end()
-                .aEnd();
+        actionLink.img().name("bt_Restore1").src("images/bt_Remove.gif").border("0").alt(resword.getString("restore")).title(resword.getString("restore"))
+                .align("left").append("hspace=\"6\"").end().aEnd();
         return actionLink.toString();
     }
 
@@ -904,15 +910,15 @@ public class ListDiscNotesForCRFTableFactory extends AbstractTableFactory {
 
         eventDiv.table(0).border("0").cellpadding("0").cellspacing("0").close();
         // Lock Div
-        eventDiv.div().id("Lock_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount).style(
-                "position: absolute; visibility: hidden; z-index: 3; width: 50px; height: 30px; top: 0px;").close();
+        eventDiv.div().id("Lock_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount)
+                .style("position: absolute; visibility: hidden; z-index: 3; width: 50px; height: 30px; top: 0px;").close();
         lockLinkBuilder(eventDiv, studySubjectLabel, rowCount, studyEvents, sed);
         eventDiv.divEnd();
 
         eventDiv.tr(0).valign("top").close().td(0).close();
         // Event Div
-        eventDiv.div().id("Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount).style(
-                "position: absolute; visibility: hidden; z-index: 3;width:" + divWidth + "px; top: 0px; float: left;").close();
+        eventDiv.div().id("Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount)
+                .style("position: absolute; visibility: hidden; z-index: 3;width:" + divWidth + "px; top: 0px; float: left;").close();
         eventDiv.div().styleClass("box_T").close().div().styleClass("box_L").close().div().styleClass("box_R").close().div().styleClass("box_B").close().div()
                 .styleClass("box_TL").close().div().styleClass("box_TR").close().div().styleClass("box_BL").close().div().styleClass("box_BR").close();
 
@@ -933,11 +939,15 @@ public class ListDiscNotesForCRFTableFactory extends AbstractTableFactory {
         String tableHeaderRowLeftStyleClass = "table_header_row_left";
         String click_for_more_options = resword.getString("click_for_more_options");
         String schedule = resword.getString("schedule");
-        String view = resword.getString("view")+"/"+resword.getString("enter_data");
-        String edit = resword.getString("edit");;
-        String remove = resword.getString("remove");;
-        String subjectText = resword.getString("subject");;
-        String eventText = resword.getString("event");;
+        String view = resword.getString("view") + "/" + resword.getString("enter_data");
+        String edit = resword.getString("edit");
+        ;
+        String remove = resword.getString("remove");
+        ;
+        String subjectText = resword.getString("subject");
+        ;
+        String eventText = resword.getString("event");
+        ;
 
         SubjectEventStatus eventStatus = studyEvents.size() == 0 ? SubjectEventStatus.NOT_SCHEDULED : studyEvents.get(0).getSubjectEventStatus();
         // String studyEventName = studyEvents.size() == 0 ? "" :

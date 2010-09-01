@@ -519,26 +519,26 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         variables.put(new Integer(9), currentStudy.getId());
         variables.put(new Integer(10), currentStudy.getId());
         String sql = digester.getQuery("findAllSubjectDNByStudy");
-        sql = sql + filter.execute("");
+//        sql = sql + filter.execute("");
         sql += " UNION ";
         sql += digester.getQuery("findAllStudySubjectDNByStudy");
-        sql += filter.execute("");
+//        sql += filter.execute("");
         sql += " UNION ";
         sql += digester.getQuery("findAllStudyEventDNByStudy");
-        sql += filter.execute("");
+//        sql += filter.execute("");
         sql += " UNION ";
         sql += digester.getQuery("findAllEventCrfDNByStudy");
         if (currentStudy.isSite(currentStudy.getParentStudyId())) {
             sql += " and ec.event_crf_id not in ( " + this.findSiteHiddenEventCrfIdsString(currentStudy) + " ) ";
         }
-        sql += filter.execute("");
+//        sql += filter.execute("");
         sql += " UNION ";
         sql += digester.getQuery("findAllItemDataDNByStudy");
         if (currentStudy.isSite(currentStudy.getParentStudyId())) {
             sql += " and ec.event_crf_id not in ( " + this.findSiteHiddenEventCrfIdsString(currentStudy) + " ) ";
         }
-        sql += filter.execute("");
-        sql += sort.execute("");
+//        sql += filter.execute("");
+        sql += " order by label, discrepancy_note_id";
 
         ArrayList rows = select(sql, variables);
 

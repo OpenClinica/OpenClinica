@@ -12,8 +12,11 @@ import javax.servlet.ServletOutputStream;
 
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.core.SessionManager;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import com.lowagie.text.BadElementException;
@@ -189,79 +192,94 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
 
     public String serializeToString(EntityBean bean, boolean includeHeaderRow,
                                     int threadNumber){
-
         DiscrepancyNoteBean discNoteBean = (DiscrepancyNoteBean) bean;
         StringBuilder writer  = new StringBuilder("");
         //If includeHeaderRow = true, the first row of the output consists of header names, only
         //for CSV format
         if(includeHeaderRow) {
-            writer.append("id");
+            writer.append("Study Subject ID");
             writer.append(",");
-            writer.append("Subject name");
+            writer.append("Subject Status");
             writer.append(",");
-            writer.append("CRF name");
+            writer.append("Study/Site OID");
             writer.append(",");
-            writer.append("Description");
+            //we're adding a thread number row
+            writer.append("Thread ID");
+            writer.append(",");
+
+            writer.append("Note ID");
+            writer.append(",");
+
+            writer.append("Parent Note ID");
+            writer.append(",");
+
+            writer.append("Date Created");
+            writer.append(",");
+            writer.append("Date Update");
             writer.append(",");
             if(discNoteBean.getDisType() != null)  {
-                writer.append("Discrepancy type");
+                writer.append("Discrepancy Type");
                 writer.append(",");
             }
-
-            writer.append("Event name");
+            writer.append("Resolution Status");
             writer.append(",");
-            writer.append("Parent note ID");
+            writer.append("Event Name");
             writer.append(",");
-            writer.append("Resolution status");
-            writer.append(",");
-            writer.append("Detailed notes");
+            writer.append("CRF Name");
             writer.append(",");
             writer.append("Entity name");
             writer.append(",");
             writer.append("Entity value");
             writer.append(",");
-            writer.append("Date created");
+            writer.append("Description");
             writer.append(",");
-            writer.append("Date updated");
+            writer.append("Detailed Notes");
             writer.append(",");
-            writer.append("Study id");
+            writer.append("Assigned User");
             writer.append(",");
-            //we're adding a thread number row
-            writer.append("Thread Number");
+            writer.append("Study Id");
 
             writer.append("\n");
         }
 
         //Fields with embedded commas must be
         // delimited with double-quote characters.
+        writer.append(escapeQuotesInCSV(discNoteBean.getStudySub().getLabel()));
+        writer.append(",");
+
+        writer.append(escapeQuotesInCSV(discNoteBean.getStudySub().getStatus().getName()));
+        writer.append(",");
+
+        writer.append(escapeQuotesInCSV(discNoteBean.getStudy().getOid()));
+        writer.append(",");
+
+        writer.append(escapeQuotesInCSV(threadNumber+""));
+        writer.append(",");
+
         writer.append(escapeQuotesInCSV(discNoteBean.getId()+""));
-        writer.append(",");
-
-        writer.append(escapeQuotesInCSV(discNoteBean.getSubjectName()));
-        writer.append(",");
-
-        writer.append(escapeQuotesInCSV(discNoteBean.getCrfName()));
-        writer.append(",");
-
-        writer.append(escapeQuotesInCSV(discNoteBean.getDescription()+""));
-        writer.append(",");
-        if(discNoteBean.getDisType() != null)  {
-            writer.append(escapeQuotesInCSV(discNoteBean.getDisType().getName()));
-            writer.append(",");
-        }
-
-
-        writer.append(escapeQuotesInCSV(discNoteBean.getEventName()));
         writer.append(",");
 
         writer.append(discNoteBean.getParentDnId()>0?discNoteBean.getParentDnId():"");
         writer.append(",");
 
-        writer.append(escapeQuotesInCSV(
-          RESOLUTION_STATUS_MAP.get(discNoteBean.getResolutionStatusId())+""));
+        writer.append(escapeQuotesInCSV(discNoteBean.getCreatedDateString()+""));
         writer.append(",");
 
-        writer.append(escapeQuotesInCSV(discNoteBean.getDetailedNotes()+""));
+        writer.append(escapeQuotesInCSV(discNoteBean.getUpdatedDateString()+""));
+        writer.append(",");
+        
+        if(discNoteBean.getDisType() != null)  {
+            writer.append(escapeQuotesInCSV(discNoteBean.getDisType().getName()));
+            writer.append(",");
+        }
+
+        writer.append(escapeQuotesInCSV(RESOLUTION_STATUS_MAP.get(discNoteBean.getResolutionStatusId())+""));
+        writer.append(",");
+
+        writer.append(escapeQuotesInCSV(discNoteBean.getEventName()));
+        writer.append(",");
+
+        writer.append(escapeQuotesInCSV(discNoteBean.getCrfName()));
         writer.append(",");
 
         writer.append(escapeQuotesInCSV(discNoteBean.getEntityName()));
@@ -270,15 +288,18 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
         writer.append(escapeQuotesInCSV(discNoteBean.getEntityValue()));
         writer.append(",");
 
-        writer.append(escapeQuotesInCSV(discNoteBean.getCreatedDateString()+""));
+        writer.append(escapeQuotesInCSV(discNoteBean.getDescription()+""));
         writer.append(",");
 
-        writer.append(escapeQuotesInCSV(discNoteBean.getUpdatedDateString()+""));
+        writer.append(escapeQuotesInCSV(discNoteBean.getDetailedNotes()+""));
+        writer.append(",");
+
+        writer.append(escapeQuotesInCSV(discNoteBean.getAssignedUser().getName()));
         writer.append(",");
 
         writer.append(escapeQuotesInCSV(discNoteBean.getStudyId()+""));
-        writer.append(",");
-        writer.append(escapeQuotesInCSV(threadNumber+""));
+
+
         writer.append("\n");
         return writer.toString();
 
@@ -470,8 +491,6 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
 
                     singleBeanContent = counter == 1 ? serializeToString(discNoteBean, true, threadCounter) : serializeToString(discNoteBean, false, threadCounter);
                     allContent.append(singleBeanContent);
-                    allContent.append("\n");
-
                }
             }
         }

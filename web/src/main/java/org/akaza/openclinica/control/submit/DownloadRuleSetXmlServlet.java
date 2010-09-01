@@ -1,9 +1,9 @@
 /* OpenClinica is distributed under the
-* GNU Lesser General Public License (GNU LGPL).
+ * GNU Lesser General Public License (GNU LGPL).
 
-* For details see: http://www.openclinica.org/license
-* copyright 2003-2005 Akaza Research
-*/
+ * For details see: http://www.openclinica.org/license
+ * copyright 2003-2005 Akaza Research
+ */
 package org.akaza.openclinica.control.submit;
 
 import org.akaza.openclinica.bean.core.Role;
@@ -13,6 +13,7 @@ import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
+import org.akaza.openclinica.domain.rule.action.RuleActionComparator;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.Page;
@@ -33,6 +34,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -112,6 +114,7 @@ public class DownloadRuleSetXmlServlet extends SecureController {
         String[] splitExpression = ruleSetRuleIds.split(",");
         for (String string : splitExpression) {
             RuleSetRuleBean rsr = getRuleSetService().getRuleSetRuleDao().findById(Integer.valueOf(string));
+            Collections.sort(rsr.getActions(), new RuleActionComparator());
             Integer key = rsr.getRuleSetBean().getId();
             if (ruleSets.containsKey(key)) {
                 RuleSetBean rs = ruleSets.get(key);
@@ -138,7 +141,7 @@ public class DownloadRuleSetXmlServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
 
-        //String ruleSetId = request.getParameter("ruleSetId");
+        // String ruleSetId = request.getParameter("ruleSetId");
         String ruleSetRuleIds = request.getParameter("ruleSetRuleIds");
 
         String dir = SQLInitServlet.getField("filePath") + "rules" + File.separator;

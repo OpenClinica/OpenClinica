@@ -11,13 +11,13 @@ package org.akaza.openclinica.bean.admin;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.oid.CrfOidGenerator;
 import org.akaza.openclinica.bean.oid.OidGenerator;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 import java.util.ArrayList;
 
 /**
  * <P>
- * CRFBean.java, the object for instruments in the database. Each one of these
- * is linked to a version, and are associated with studies through study events.
+ * CRFBean.java, the object for instruments in the database. Each one of these is linked to a version, and are associated with studies through study events.
  * 
  * @author thickerson
  * 
@@ -30,6 +30,7 @@ public class CRFBean extends AuditableEntityBean {
     private boolean selected = false; // not in DB
 
     private String oid;
+    @JsonIgnore
     private OidGenerator oidGenerator;
     private int studyId;
 

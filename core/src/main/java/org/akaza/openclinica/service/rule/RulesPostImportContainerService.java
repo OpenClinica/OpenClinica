@@ -223,7 +223,7 @@ public class RulesPostImportContainerService {
                 if (importContainer.getValidRules().get(ruleDefOid) == null) {
                     RuleBean rule = getRuleDao().findByOid(ruleDefOid, ruleSetBeanWrapper.getAuditableBean().getStudyId());
                     AuditableBeanWrapper<RuleBean> r = new AuditableBeanWrapper<RuleBean>(rule);
-                    if (!isRuleExpressionValid(r, ruleSetBeanWrapper.getAuditableBean()))
+                    if (rule == null || !isRuleExpressionValid(r, ruleSetBeanWrapper.getAuditableBean()))
                         ruleSetBeanWrapper.error(createError("OCRERR_0027"));
                 }
 

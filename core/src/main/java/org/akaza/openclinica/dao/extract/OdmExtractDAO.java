@@ -236,8 +236,8 @@ public class OdmExtractDAO extends DatasetDAO {
     public void setNullValueCVsTypesExpected() {
         this.unsetTypeExpected();
         int i = 1;
-        this.setTypeExpected(i, TypeNames.STRING); // study_event_definition
-        // oc_oid
+
+        this.setTypeExpected(i, TypeNames.STRING); // study_event_definition oc_oid
         ++i;
         this.setTypeExpected(i, TypeNames.STRING); // crf_version oc_oid
         ++i;
@@ -247,15 +247,15 @@ public class OdmExtractDAO extends DatasetDAO {
     public void setItemCVOIDsTypesExpected() {
         this.unsetTypeExpected();
         int i = 1;
-        this.setTypeExpected(i, TypeNames.INT); //crf_id
+        this.setTypeExpected(i, TypeNames.INT); // crf_id
         ++i;
-        this.setTypeExpected(i, TypeNames.INT); //crf_version_id
+        this.setTypeExpected(i, TypeNames.INT); // crf_version_id
         ++i;
-        this.setTypeExpected(i, TypeNames.INT); //item_id
+        this.setTypeExpected(i, TypeNames.INT); // item_id
         ++i;
-        this.setTypeExpected(i, TypeNames.STRING); //cv_oid
+        this.setTypeExpected(i, TypeNames.STRING); // cv_oid
         ++i;
-        this.setTypeExpected(i, TypeNames.STRING); //item_oid
+        this.setTypeExpected(i, TypeNames.STRING); // item_oid
     }
 
     public void setStudyUsersTypesExpected() {
@@ -289,7 +289,7 @@ public class OdmExtractDAO extends DatasetDAO {
         ++i;
         this.setTypeExpected(i, TypeNames.STRING); // new_value
         ++i;
-        this.setTypeExpected(i, TypeNames.INT); //audit_log_event_type_id
+        this.setTypeExpected(i, TypeNames.INT); // audit_log_event_type_id
     }
 
     public void setOCEventDataAuditsTypesExpected() {
@@ -313,7 +313,7 @@ public class OdmExtractDAO extends DatasetDAO {
         ++i;
         this.setTypeExpected(i, TypeNames.STRING); // new_value
         ++i;
-        this.setTypeExpected(i, TypeNames.INT); //audit_log_event_type_id
+        this.setTypeExpected(i, TypeNames.INT); // audit_log_event_type_id
     }
 
     public void setOCFormDataAuditsTypesExpected() {
@@ -335,7 +335,7 @@ public class OdmExtractDAO extends DatasetDAO {
         ++i;
         this.setTypeExpected(i, TypeNames.STRING); // new_value
         ++i;
-        this.setTypeExpected(i, TypeNames.INT); //audit_log_event_type_id
+        this.setTypeExpected(i, TypeNames.INT); // audit_log_event_type_id
     }
 
     public void setOCItemDataAuditsTypesExpected() {
@@ -357,7 +357,7 @@ public class OdmExtractDAO extends DatasetDAO {
         ++i;
         this.setTypeExpected(i, TypeNames.STRING); // new_value
         ++i;
-        this.setTypeExpected(i, TypeNames.INT); //audit_log_event_type_id
+        this.setTypeExpected(i, TypeNames.INT); // audit_log_event_type_id
     }
 
     public void setOCSubjectDataDNsTypesExpected() {
@@ -689,7 +689,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 itemGroupRefs = (ArrayList<ElementRefBean>) formDef.getItemGroupRefs();
             }
 
-            //mandatory is based on the last crf-version
+            // mandatory is based on the last crf-version
             String igDefKey = igId + "";
             ItemGroupDefBean igdef = new ItemGroupDefBean();
             if (igdprev.equals(igDefKey)) {
@@ -703,7 +703,7 @@ public class OdmExtractDAO extends DatasetDAO {
                     igMandatories.put(igdprev, itMandatory);
                     isLatest = true;
                     igdef.setOid(igOID);
-                    //igdef.setName("ungrouped".equalsIgnoreCase(igName) ? cvOID + "-" + igName : igName);
+                    // igdef.setName("ungrouped".equalsIgnoreCase(igName) ? cvOID + "-" + igName : igName);
                     igdef.setName(igName);
                     igdef.setRepeating("ungrouped".equalsIgnoreCase(igName) ? "No" : "Yes");
                     igdef.setComment(igHeader);
@@ -750,10 +750,8 @@ public class OdmExtractDAO extends DatasetDAO {
             LinkedHashMap<String, String> codes = new LinkedHashMap<String, String>();
             if (hasCode) {
                 /*
-                 * //null value will not be added to codelist if
-                 * (nullMap.containsKey(cvId)) { codes =
-                 * MetadataUnit.parseCode(rsText, rsValue, nullMap.get(cvId)); }
-                 * else { codes = MetadataUnit.parseCode(rsText, rsValue); }
+                 * //null value will not be added to codelist if (nullMap.containsKey(cvId)) { codes = MetadataUnit.parseCode(rsText, rsValue,
+                 * nullMap.get(cvId)); } else { codes = MetadataUnit.parseCode(rsText, rsValue); }
                  */
                 codes = MetadataUnit.parseCode(rsText, rsValue);
                 // no action has been taken if rsvalue/rstext go wrong,
@@ -826,7 +824,7 @@ public class OdmExtractDAO extends DatasetDAO {
                     } else {
                         // idef.setLength(hasCode ?
                         // MetadataUnit.getDataTypeLength(codes.keySet()) : 32);
-                        idef.setLength(hasCode ? MetadataUnit.getDataTypeLength(codes.keySet()) : 25);
+                       idef.setLength(hasCode ? MetadataUnit.getDataTypeLength(codes.keySet()) : 25);
                     }
                 } else {
                     idef.setLength(0);
@@ -885,7 +883,7 @@ public class OdmExtractDAO extends DatasetDAO {
         }
 
         if (odmVersion.startsWith("oc")) {
-            //add CRFVersions that itemDef belong to
+            // add CRFVersions that itemDef belong to
             HashMap<String, String> itDefCVs = new HashMap<String, String>();
             this.setItemCVOIDsTypesExpected();
             ArrayList al = this.select(this.getItemCVOIDsSql(cvIds));
@@ -1009,15 +1007,15 @@ public class OdmExtractDAO extends DatasetDAO {
             user.setOrganization(organization);
             data.getUsers().add(user);
         }
-        //LocationBean loc = new LocationBean();
-        //loc.setOid("LOC_"+study.getOid());
-        //loc.setName(study.getName());
+        // LocationBean loc = new LocationBean();
+        // loc.setOid("LOC_"+study.getOid());
+        // loc.setName(study.getName());
         MetaDataVersionRefBean meta = new MetaDataVersionRefBean();
         meta.setElementDefOID(data.getMetaDataVersionOID());
         meta.setStudyOID(study.getOid());
         meta.setEffectiveDate(study.getCreatedDate());
-        //loc.setMetaDataVersionRef(meta);
-        //data.getLocations().add(loc);
+        // loc.setMetaDataVersionRef(meta);
+        // data.getLocations().add(loc);
     }
 
     protected HashMap<String, String> getNullValueCVs(StudyBean study) {
@@ -1159,8 +1157,9 @@ public class OdmExtractDAO extends DatasetDAO {
 
         this.setEventGroupItemDataWithUnitTypesExpected();
         logger.debug("Begin to GetEventGroupItemWithUnitSql");
-        ArrayList viewRows = select(getEventGroupItemWithUnitSql(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId));
-        logger.error("getEventGroupItemWithUnitSql : " + getEventGroupItemWithUnitSql(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId));
+        ArrayList viewRows = select(getEventGroupItemWithUnitSql(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds));
+        logger.error("getEventGroupItemWithUnitSql : "
+            + getEventGroupItemWithUnitSql(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds));
         String idataIds = "";
         if (viewRows.size() > 0) {
             Iterator iter = viewRows.iterator();
@@ -1173,6 +1172,7 @@ public class OdmExtractDAO extends DatasetDAO {
             String itprev = "";
             // HashMap<String, String> nullValueMap =
             // ClinicalDataUnit.getNullValueMap();
+
             HashMap<String, String> nullValueCVs = this.getNullValueCVs(study);
             HashSet<Integer> itemDataIds = new HashSet<Integer>();
             String yearMonthFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString("date_format_year_month"));
@@ -1235,6 +1235,7 @@ public class OdmExtractDAO extends DatasetDAO {
                             // {
                             // itValue =
                             // nullValueMap.get(itValue.trim().toUpperCase());
+
                             it.setIsNull("Yes");
                             it.setReasonForNull(itValue.trim());
                         } else {
@@ -1688,8 +1689,8 @@ public class OdmExtractDAO extends DatasetDAO {
                     int p1 = Integer.parseInt(poses[1]);
                     int p2 = Integer.parseInt(poses[2]);
                     String entityID = data.getExportSubjectData().get(p0).getExportStudyEventData().get(p1).getExportFormData().get(p2).getFormOID();
-                    data.getExportSubjectData().get(p0).getExportStudyEventData().get(p1).getExportFormData().get(p2).getDiscrepancyNotes().setEntityID(
-                            entityID);
+                    data.getExportSubjectData().get(p0).getExportStudyEventData().get(p1).getExportFormData().get(p2).getDiscrepancyNotes()
+                            .setEntityID(entityID);
                     data.getExportSubjectData().get(p0).getExportStudyEventData().get(p1).getExportFormData().get(p2).getDiscrepancyNotes()
                             .getDiscrepancyNotes().add(dn);
                 }
@@ -1925,8 +1926,8 @@ public class OdmExtractDAO extends DatasetDAO {
                     form.setCrfVersion((String) row.get("crf_version"));
                 }
                 if (dataset.isShowCRFstatus()) {
-                    form.setStatus(this.getCrfVersionStatus(se.getStatus(), (Integer) row.get("cv_status_id"), (Integer) row.get("ec_status_id"), (Integer) row
-                            .get("validator_id")));
+                    form.setStatus(this.getCrfVersionStatus(se.getStatus(), (Integer) row.get("cv_status_id"), (Integer) row.get("ec_status_id"),
+                            (Integer) row.get("validator_id")));
                 }
                 if (dataset.isShowCRFinterviewerName()) {
                     form.setInterviewerName((String) row.get("interviewer_name"));
@@ -2175,6 +2176,43 @@ public class OdmExtractDAO extends DatasetDAO {
             + " and edc.crf_id = cv.crf_id and ec.crf_version_id = cv.crf_version_id order by ss.oc_oid, sed.ordinal, se.sample_ordinal, edc.ordinal, ss.sgc_id";
     }
 
+    protected String getEventGroupItemSqlSS(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId,
+            String studySubjectIds) {
+        String ecStatusConstraint = this.getECStatusConstraint(datasetItemStatusId);
+        String itStatusConstraint = this.getItemDataStatusConstraint(datasetItemStatusId);
+        return "select cvidata.event_crf_id, ig.item_group_id, ig.oc_oid as item_group_oid, ig.name as item_group_name,"
+            + " cvidata.item_id, cvidata.item_oid, cvidata.item_data_ordinal, cvidata.value, cvidata.item_data_type_id"
+            + " from (select ec.event_crf_id, ec.crf_version_id, item.item_id, item.oc_oid as item_oid,"
+            + " idata.ordinal as item_data_ordinal, idata.value as value, item.item_data_type_id from item,"
+            + " (select event_crf_id, item_id, ordinal, value from item_data where (status_id "
+            + itStatusConstraint
+            + ")"
+            + " and event_crf_id in (select distinct event_crf_id from event_crf where study_subject_id in (select distinct"
+            + " ss.study_subject_id from study_subject ss where ss.study_subject_id in ("
+            + studySubjectIds
+            + ") "
+            + dateConstraint
+            + ") and study_event_id"
+            + " in (select distinct study_event_id from study_event"
+            + " where study_event_definition_id in "
+            + sedIds
+            + " and study_subject_id in ("
+            + " select distinct ss.study_subject_id from study_subject ss where ss.study_subject_id in ("
+            + studySubjectIds
+            + ") "
+            + dateConstraint
+            + "))))idata,"
+            + " (select event_crf_id, crf_version_id from event_crf where status_id "
+            + ecStatusConstraint
+            + ")ec"
+            + " where item.item_id in "
+            + itemIds
+            + " and length(idata.value) > 0 and item.item_id = idata.item_id and idata.event_crf_id = ec.event_crf_id"
+            + " order by ec.event_crf_id, ec.crf_version_id, item.item_id, idata.ordinal) cvidata, item_group_metadata igm,"
+            + " item_group ig where cvidata.crf_version_id = igm.crf_version_id and cvidata.item_id = igm.item_id"
+            + " and igm.item_group_id = ig.item_group_id order by cvidata.event_crf_id, ig.item_group_id, cvidata.item_id, cvidata.item_data_ordinal";
+    }
+
     protected String getEventGroupItemSql(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId) {
         String ecStatusConstraint = this.getECStatusConstraint(datasetItemStatusId);
         String itStatusConstraint = this.getItemDataStatusConstraint(datasetItemStatusId);
@@ -2254,8 +2292,10 @@ public class OdmExtractDAO extends DatasetDAO {
             + " and upper(item.units) = upper(mu.name) order by mu.oc_oid";
     }
 
-    protected String getEventGroupItemWithUnitSql(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId) {
-        return "select cvit.*, mu.oc_oid as mu_oid from (" + this.getEventGroupItemSql(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId)
+    protected String getEventGroupItemWithUnitSql(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId,
+            String studySubjectIds) {
+        return "select cvit.*, mu.oc_oid as mu_oid from ("
+            + this.getEventGroupItemSqlSS(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds)
             + " )cvit left join (select item.item_id, mu.oc_oid from versioning_map vm, item, measurement_unit mu where vm.item_id in " + itemIds
             + " and vm.item_id = item.item_id and item.units = mu.name )mu on cvit.item_id = mu.item_id";
     }
@@ -2377,6 +2417,7 @@ public class OdmExtractDAO extends DatasetDAO {
             + " and dn.resolution_status_id = rs.resolution_status_id"
             + " and dn.discrepancy_note_type_id = dnt.discrepancy_note_type_id" + " order by dnidm.item_data_id, dn.parent_dn_id, dn.discrepancy_note_id";
     }
+
 
     protected String getItemCVOIDsSql(String crfVersionIds) {
         return "select cv.crf_id, cv.crf_version_id, item.item_id, cv.oc_oid as cv_oid, item.oc_oid as item_oid"

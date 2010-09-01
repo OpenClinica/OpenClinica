@@ -24,12 +24,7 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.managestudy.ListNotesFilter;
-import org.akaza.openclinica.dao.managestudy.ListNotesSort;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
@@ -161,6 +156,8 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
         ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
         ItemDAO idao = new ItemDAO(sm.getDataSource());
+        StudyDAO studyDao = new StudyDAO(sm.getDataSource());
+
         ArrayList<DiscrepancyNoteBean> allNotes = new ArrayList<DiscrepancyNoteBean>();
 
         for (int i = 0; i < noteRows.size(); i++) {
@@ -202,7 +199,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
                 AuditableEntityBean aeb = dndao.findEntity(dnb);
                 dnb.setEntityName(aeb.getName());
                 if (entityType.equalsIgnoreCase("subject")) {
-                    allNotes.add(dnb);
+//                    allNotes.add(dnb);
                     SubjectBean sb = (SubjectBean) aeb;
                     StudySubjectBean ssb = studySubjectDAO.findBySubjectIdAndStudy(sb.getId(), currentStudy);
                     dnb.setStudySub(ssb);
@@ -224,7 +221,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
                         }
                     }
                 } else if (entityType.equalsIgnoreCase("studySub")) {
-                    allNotes.add(dnb);
+//                    allNotes.add(dnb);
                     StudySubjectBean ssb = (StudySubjectBean) aeb;
                     dnb.setStudySub(ssb);
                     dnb.setSubjectName(ssb.getLabel());
@@ -273,7 +270,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
                     }
                     // }
                 } else if (entityType.equalsIgnoreCase("studyEvent")) {
-                    allNotes.add(dnb);
+//                    allNotes.add(dnb);
                     StudyEventBean se = (StudyEventBean) sedao.findByPK(dnb.getEntityId());
                     StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(se.getStudyEventDefinitionId());
                     se.setName(sedb.getName());
@@ -309,7 +306,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
                     CRFVersionBean cvb = (CRFVersionBean) cvdao.findByPK(ec.getCRFVersionId());
                     CRFBean cb = (CRFBean) cdao.findByPK(cvb.getCrfId());
 
-                    allNotes.add(dnb);
+//                    allNotes.add(dnb);
                     dnb.setStageId(ec.getStage().getId());
                     dnb.setEntityName(ib.getName());
                     dnb.setEntityValue(idb.getValue());
@@ -329,6 +326,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
                 }
             }
 
+            dnb.setStudy((StudyBean)studyDao.findByPK(dnb.getStudyId()));
             if(dnb.getParentDnId()==0 && dnb.getChildren().size()>0) {
                 ArrayList<DiscrepancyNoteBean> children = dnb.getChildren();
                 int childrenSize = children.size();
@@ -339,8 +337,11 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
                     child.setCrfName(dnb.getCrfName());
                     child.setEntityName(dnb.getEntityName());
                     child.setEntityValue(dnb.getEntityValue());
+                    child.setStudySub(dnb.getStudySub());
+                    child.setStudy(dnb.getStudy());
                 }
             }
+            allNotes.add(dnb);
         }
         return allNotes;
     }

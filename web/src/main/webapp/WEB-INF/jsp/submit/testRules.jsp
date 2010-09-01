@@ -263,7 +263,7 @@
         <c:forEach items="${sessionScope.testValues}" var="mapEntry">
             <c:set var="tooltipKey" value="${mapEntry.key}-tooltip" />
             <c:set var="dibKey" value="${mapEntry.key}-dib" />
-            <c:set var="dibItemDataType" value ="<%= ((org.akaza.openclinica.bean.submit.DisplayItemBean)request.getAttribute((String)pageContext.getAttribute("dibKey"))).getItem().getItemDataTypeId() %>" />
+            <c:set var="dibItemDataType" value ='<%= ((org.akaza.openclinica.bean.submit.DisplayItemBean)request.getAttribute((String)pageContext.getAttribute("dibKey"))).getItem().getItemDataTypeId() %>' />
             <tr valign="top">
                 <td class="formlabel"><a
                     href="javascript: displayLink('${mapEntry.key}')"

@@ -91,7 +91,7 @@ public class OpenClinicaExpressionParser {
         if (getTextIO().peek() != '\n')
             throw new OpenClinicaSystemException(ERROR_MESSAGE_KEY);
         setTestValues(h);
-        //HashMap<String, String> theTestValues = getTestValues();
+        // HashMap<String, String> theTestValues = getTestValues();
         HashMap<String, String> theTestValues = getResponseTestValues();
         theTestValues.put("result", exp.testValue());
         return theTestValues;
@@ -99,40 +99,43 @@ public class OpenClinicaExpressionParser {
     }
 
     /**
-     * Reads an expression from the current line of input and builds an
-     * expression tree that represents the expression.
+     * Reads an expression from the current line of input and builds an expression tree that represents the expression.
      * 
-     * @return an ExpNode which is a pointer to the root node of the expression
-     *         tree
+     * @return an ExpNode which is a pointer to the root node of the expression tree
      * @throws OpenClinicaSystemException
      *             if a syntax error is found in the input
      */
     private ExpressionNode expressionTree() throws OpenClinicaSystemException {
-        textIO.skipBlanks();
-        boolean negative; // True if there is a leading minus sign.
-        negative = false;
-        if (textIO.peek() == '-') {
-            textIO.getAnyChar();
-            negative = true;
-        }
-        ExpressionNode exp; // The expression tree for the expression.
-        exp = termTree3(); // Start with the first term.
-        if (negative)
-            exp = new UnaryMinusNode(exp);
-        textIO.skipBlanks();
-
-        while (textIO.peek() == 'o' && textIO.peek(3).matches("or ") || textIO.peek() == 'a' && textIO.peek(4).matches("and ")) {
-            // Read the next term and combine it with the
-            // previous terms into a bigger expression tree.
-            // char op = textIO.getAnyChar();
-            String op = textIO.peek() == 'o' ? textIO.getAnyString(3) : textIO.getAnyString(4);
-            logger.info("Operator" + op);
-            ExpressionNode nextTerm = termTree3();
-            exp = ExpressionNodeFactory.getExpNode(Operator.getByDescription(op), exp, nextTerm);
+        try {
             textIO.skipBlanks();
-        }
+            boolean negative; // True if there is a leading minus sign.
+            negative = false;
+            if (textIO.peek() == '-') {
+                textIO.getAnyChar();
+                negative = true;
+            }
+            ExpressionNode exp; // The expression tree for the expression.
+            exp = termTree3(); // Start with the first term.
+            if (negative)
+                exp = new UnaryMinusNode(exp);
+            textIO.skipBlanks();
 
-        return exp;
+            while (textIO.peek() == 'o' && textIO.peek(3).matches("or ") || textIO.peek() == 'a' && textIO.peek(4).matches("and ")) {
+                // Read the next term and combine it with the
+                // previous terms into a bigger expression tree.
+                // char op = textIO.getAnyChar();
+                String op = textIO.peek() == 'o' ? textIO.getAnyString(3) : textIO.getAnyString(4);
+                logger.info("Operator" + op);
+                ExpressionNode nextTerm = termTree3();
+                exp = ExpressionNodeFactory.getExpNode(Operator.getByDescription(op), exp, nextTerm);
+                textIO.skipBlanks();
+            }
+            return exp;
+        } catch (NullPointerException e) {
+            throw new OpenClinicaSystemException(ERROR_MESSAGE_KEY);
+        } catch (OpenClinicaSystemException e) {
+            throw e;
+        }
     } // end expressionTree()
 
     private ExpressionNode termTree3() throws OpenClinicaSystemException {
@@ -179,11 +182,9 @@ public class OpenClinicaExpressionParser {
     } // end termValue()
 
     /**
-     * Reads a term from the current line of input and builds an expression tree
-     * that represents the expression.
+     * Reads a term from the current line of input and builds an expression tree that represents the expression.
      * 
-     * @return an ExpNode which is a pointer to the root node of the expression
-     *         tree
+     * @return an ExpNode which is a pointer to the root node of the expression tree
      * @throws OpenClinicaSystemException
      *             if a syntax error is found in the input
      */
@@ -208,11 +209,9 @@ public class OpenClinicaExpressionParser {
     } // end termValue()
 
     /**
-     * Reads a factor from the current line of input and builds an expression
-     * tree that represents the expression.
+     * Reads a factor from the current line of input and builds an expression tree that represents the expression.
      * 
-     * @return an ExpNode which is a pointer to the root node of the expression
-     *         tree
+     * @return an ExpNode which is a pointer to the root node of the expression tree
      * @throws OpenClinicaSystemException
      *             if a syntax error is found in the input
      */
@@ -272,20 +271,12 @@ public class OpenClinicaExpressionParser {
     }
 
     /*
-     * public static void main(String[] args) {
-     * 
-     * SimpleParser4 smp4 = new SimpleParser4(); // textIO.putln("\n\nEnter an
-     * expression, or press return to end."); // textIO.put("\n? ");
-     * smp4.getTextIO().fillBuffer(" ((2 +2 * 4+2 *2 gte 15) or false or false
-     * or 3+4 * 2 lt 10) and yellow eq \"yellow\" "); //
-     * smp4.getTextIO().fillBuffer(" \"yellow\" eq yellow ");
-     * smp4.getTextIO().skipBlanks();
-     * 
-     * try { ExpNode exp = smp4.expressionTree(); logger.info("\nValue 1 is " +
-     * exp.value()); logger.info("\nOrder of postfix evaluation is:\n");
-     * exp.printStackCommands(); } catch (OpenClinicaSystemException e) {
-     * logger.info("\n*** Error in input: " + e.getMessage()); logger.info("***
-     * Discarding input: " + smp4.getTextIO().getln()); } } // end main()
+     * public static void main(String[] args) { SimpleParser4 smp4 = new SimpleParser4(); // textIO.putln("\n\nEnter an expression, or press return to
+     * end."); // textIO.put("\n? "); smp4.getTextIO().fillBuffer(" ((2 +2 * 4+2 *2 gte 15) or false or false or 3+4 * 2 lt 10) and yellow eq \"yellow\" "); //
+     * smp4.getTextIO().fillBuffer(" \"yellow\" eq yellow "); smp4.getTextIO().skipBlanks(); try { ExpNode exp = smp4.expressionTree();
+     * logger.info("\nValue 1 is " + exp.value()); logger.info("\nOrder of postfix evaluation is:\n"); exp.printStackCommands(); } catch
+     * (OpenClinicaSystemException e) { logger.info("\n*** Error in input: " + e.getMessage()); logger.info("*** Discarding input: " +
+     * smp4.getTextIO().getln()); } } // end main()
      */
 
 }

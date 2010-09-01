@@ -39,7 +39,7 @@
 	<td class="table_header_row"><fmt:message key="entity_value" bundle="${resword}"/></td>		
 	<td class="table_header_row"><fmt:message key="description" bundle="${resword}"/></td>	
 	<td class="table_header_row"><fmt:message key="detailed_notes" bundle="${resword}"/></td>
-	<td class="table_header_row"><fmt:message key="description" bundle="${resword}"/></td>
+	<td class="table_header_row"><fmt:message key="children" bundle="${resword}"/></td>
 	<td class="table_header_row"><fmt:message key="resolution_status" bundle="${resword}"/></td>
 	<td class="table_header_row"><fmt:message key="type" bundle="${resword}"/></td>						
 	<td class="table_header_row"><fmt:message key="entity_type" bundle="${resword}"/></td>						

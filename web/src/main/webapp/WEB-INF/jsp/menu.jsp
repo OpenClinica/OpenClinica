@@ -6,7 +6,6 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="resmessages"/>
-
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='session' id='study' class='org.akaza.openclinica.bean.managestudy.StudyBean' />
 <jsp:useBean scope='session' id='userRole' class='org.akaza.openclinica.bean.login.StudyUserRoleBean' />

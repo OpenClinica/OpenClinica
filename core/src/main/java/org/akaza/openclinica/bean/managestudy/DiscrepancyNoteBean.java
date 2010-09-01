@@ -78,6 +78,9 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
     private int days = 0;
     private int age = 0;
 
+
+    private StudyBean study = new StudyBean();
+
     public String getCreatedDateString() {
         return createdDateString;
     }
@@ -556,5 +559,13 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
 
     public void setAge(int age) {
         this.age = age;
+    }
+
+    public StudyBean getStudy() {
+        return study;
+    }
+
+    public void setStudy(StudyBean study) {
+        this.study = study;
     }
 }

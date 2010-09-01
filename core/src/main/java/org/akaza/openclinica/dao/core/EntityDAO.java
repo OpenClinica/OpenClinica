@@ -1382,7 +1382,8 @@ public abstract class EntityDAO implements DAOInterface {
 
                 String vitemvalue = rs.getString("itemvalue");
                 // store the
-                vitemvalue = Utils.convertedItemDateValue(vitemvalue, oc_df_string, local_df_string);
+                // vitemvalue = Utils.convertedItemDateValue(vitemvalue, oc_df_string, local_df_string);
+                // << should not need the above since we convert upon input, tbh 08/2010 #5312
                 if (rs.wasNull()) {
                     vitemvalue = Utils.convertedItemDateValue("", oc_df_string, local_df_string);
                 }
