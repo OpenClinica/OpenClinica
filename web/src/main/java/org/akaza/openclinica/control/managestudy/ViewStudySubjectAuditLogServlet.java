@@ -18,6 +18,7 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
@@ -31,6 +32,7 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
+import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -148,6 +150,14 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
                     // Get the event crf audits
                     eventCRFAudits.addAll(adao.findEventCRFAuditEventsWithItemDataType(eventCRF.getId()));
                     logger.info("eventCRFAudits size [" + eventCRFAudits.size() + "] eventCRF id [" + eventCRF.getId() + "]");
+                }
+            }
+            ItemDataDAO itemDataDao = new ItemDataDAO(sm.getDataSource());
+            for (Object o :eventCRFAudits) {
+                AuditBean ab = (AuditBean)o;
+                if (ab.getAuditTable().equalsIgnoreCase("item_data")) {
+                    ItemDataBean idBean = (ItemDataBean)itemDataDao.findByPK(ab.getEntityId());
+                    ab.setOrdinal(idBean.getOrdinal());
                 }
             }
             request.setAttribute("events", events);

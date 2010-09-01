@@ -286,7 +286,7 @@
                             <td class="table_header_column"><c:out value="${eventCRFAudit.auditEventTypeName}"/>&nbsp;</td>
                             <td class="table_header_column"><fmt:formatDate value="${eventCRFAudit.auditDate}" type="both" pattern="${dtetmeFormat}" timeStyle="short"/>&nbsp;</td>
                             <td class="table_header_column"><c:out value="${eventCRFAudit.userName}"/>&nbsp;</td>
-                            <td class="table_header_column"><c:out value="${eventCRFAudit.entityName}"/>&nbsp;</td>
+                            <td class="table_header_column"><c:out value="${eventCRFAudit.entityName}"/> (<c:out value="${eventCRFAudit.ordinal}"/>)</td>
                             <td class="table_header_column">
                                 <c:choose>
                                     <c:when test='${eventCRFAudit.auditEventTypeId == 12 or eventCRFAudit.entityName eq "Status"}'>

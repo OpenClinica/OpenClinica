@@ -28,6 +28,7 @@ public class AuditBean extends EntityBean {
     private int studyEventId;
 
     private int itemDataTypeId;
+    private int ordinal;
 
     public int getItemDataTypeId() {
         return this.itemDataTypeId;
@@ -139,6 +140,14 @@ public class AuditBean extends EntityBean {
 
     public void setStudyEventId(int studyEventId) {
         this.studyEventId = studyEventId;
+    }
+
+    public int getOrdinal() {
+        return ordinal;
+    }
+
+    public void setOrdinal(int ordinal) {
+        this.ordinal = ordinal;
     }
 
     @Override
