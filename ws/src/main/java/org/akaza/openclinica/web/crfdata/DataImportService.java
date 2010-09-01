@@ -121,7 +121,7 @@ public class DataImportService {
     /**
      * Import Data, the logic which imports the data for our data service.  Note that
      * we will return three strings
-     * string 0: status, either 'success' or 'fail'.
+     * string 0: status, either 'success', 'fail', or 'warn'.
      * string 1: the message string which will be returned in our soap response
      * string 2: the audit message, currently not used but will be saved in the event of a success.
      * 
@@ -340,7 +340,9 @@ public class DataImportService {
             // message into two parts
             // a shorter version for the audit and
             // a longer version for the email
-            msg.append(triggerService.generateSummaryStatsMessage(ssBean, respage) + " ");
+            // resetting the msg, since we don't need messages up until now
+            msg = new StringBuffer("");
+            msg.append(triggerService.generateSummaryStatsMessage(ssBean, respage, totalValidationErrors) + " ");
             // session.setAttribute("summaryStats", ssBean);
             // will have to set hard edit checks here as well
             // session.setAttribute("subjectData",
@@ -350,6 +352,7 @@ public class DataImportService {
             // message at the end
 
             if (!hardValidationErrors.isEmpty()) {
+                
                 msg.append(triggerService.generateHardValidationErrorMessage(subjectData, hardValidationErrors, false));
             } else {
                 if (!totalValidationErrors.isEmpty()) {
@@ -364,27 +367,27 @@ public class DataImportService {
                 int eventCrfBeanId = -1;
                 EventCRFBean eventCrfBean = new EventCRFBean();
 
-                System.out.println("right before we check to make sure it is savable: " + wrapper.isSavable());
+                // System.out.println("right before we check to make sure it is savable: " + wrapper.isSavable());
                 if (wrapper.isSavable()) {
                     ArrayList<Integer> eventCrfInts = new ArrayList<Integer>();
-                    System.out.println("wrapper problems found : " + wrapper.getValidationErrors().toString());
+                    // System.out.println("wrapper problems found : " + wrapper.getValidationErrors().toString());
                     for (DisplayItemBean displayItemBean : wrapper.getDisplayItemBeans()) {
                         eventCrfBeanId = displayItemBean.getData().getEventCRFId();
                         eventCrfBean = (EventCRFBean) eventCrfDao.findByPK(eventCrfBeanId);
-                        System.out.println("found value here: " + displayItemBean.getData().getValue());
-                        System.out.println("found status here: " + eventCrfBean.getStatus().getName());
+                        // System.out.println("found value here: " + displayItemBean.getData().getValue());
+                        // System.out.println("found status here: " + eventCrfBean.getStatus().getName());
                         ItemDataBean itemDataBean = new ItemDataBean();
                         itemDataBean =
                             itemDataDao.findByItemIdAndEventCRFIdAndOrdinal(displayItemBean.getItem().getId(), eventCrfBean.getId(), displayItemBean
                                     .getData().getOrdinal());
                         if (wrapper.isOverwrite() && itemDataBean.getStatus() != null) {
-                            System.out.println("just tried to find item data bean on item name " + displayItemBean.getItem().getName());
+                            // System.out.println("just tried to find item data bean on item name " + displayItemBean.getItem().getName());
                             itemDataBean.setUpdatedDate(new Date());
                             itemDataBean.setUpdater(userBean);
                             itemDataBean.setValue(displayItemBean.getData().getValue());
                             // set status?
                             itemDataDao.update(itemDataBean);
-                            System.out.println("updated: " + itemDataBean.getItemId());
+                            // System.out.println("updated: " + itemDataBean.getItemId());
                             // need to set pk here in order to create dn
                             displayItemBean.getData().setId(itemDataBean.getId());
                         } else {
@@ -393,15 +396,16 @@ public class DataImportService {
                             ItemDataBean itemDataBean2 =
                                 itemDataDao.findByItemIdAndEventCRFIdAndOrdinal(displayItemBean.getItem().getId(), eventCrfBean.getId(), displayItemBean
                                         .getData().getOrdinal());
-                            System.out.println("found: id " + itemDataBean2.getId() + " name " + itemDataBean2.getName());
+                            // System.out.println("found: id " + itemDataBean2.getId() + " name " + itemDataBean2.getName());
                             displayItemBean.getData().setId(itemDataBean2.getId());
                         }
                         ItemDAO idao = new ItemDAO(dataSource);
                         ItemBean ibean = (ItemBean) idao.findByPK(displayItemBean.getData().getItemId());
-                        System.out.println("*** checking for validation errors: " + ibean.getName());
+                        // System.out.println("*** checking for validation errors: " + ibean.getName());
                         String itemOid =
                             displayItemBean.getItem().getOid() + "_" + wrapper.getStudyEventRepeatKey() + "_" + displayItemBean.getData().getOrdinal()
                             + "_" + wrapper.getStudySubjectOid();
+                        // System.out.println("+++ found validation errors hash map: " + wrapper.getValidationErrors().toString());
                         if (wrapper.getValidationErrors().containsKey(itemOid)) {
                             ArrayList messageList = (ArrayList) wrapper.getValidationErrors().get(itemOid);
                             for (int iter = 0; iter < messageList.size(); iter++) {
@@ -412,26 +416,25 @@ public class DataImportService {
                                 createDiscrepancyNote(ibean, message, eventCrfBean, displayItemBean, parentDn.getId(), userBean, dataSource, studyBean);
                                 discNotesGenerated = true;
                                 System.out.println("*** created disc note with message: " + message);
+                                msg.append(ibean.getOid() + ": " + message + " ");
                                 // displayItemBean);
                             }
                         }
                         if (!eventCrfInts.contains(new Integer(eventCrfBean.getId()))) {
                             crfBusinessLogicHelper.markCRFComplete(eventCrfBean, userBean);
-                            System.out.println("*** just updated event crf bean: " + eventCrfBean.getId());
+                            // System.out.println("*** just updated event crf bean: " + eventCrfBean.getId());
                             eventCrfInts.add(new Integer(eventCrfBean.getId()));
                         }
                     }
-
                 }
-
             }
             // msg.append("===+");
-            msg.append(respage.getString("data_has_been_successfully_import") + " ");
+            // msg.append(respage.getString("data_has_been_successfully_import") + " ");
             auditMsg.append(respage.getString("data_has_been_successfully_import") + " ");
 
-//            MessageFormat mf = new MessageFormat("");
-//            mf.applyPattern(respage.getString("you_can_review_the_data"));
-//            Object[] arguments = { SQLInitServlet.getField("sysURL.base") };
+            //            MessageFormat mf = new MessageFormat("");
+            //            mf.applyPattern(respage.getString("you_can_review_the_data"));
+            //            Object[] arguments = { SQLInitServlet.getField("sysURL.base") };
             // msg.append(mf.format(arguments));
             // auditMsg.append(mf.format(arguments));
         }

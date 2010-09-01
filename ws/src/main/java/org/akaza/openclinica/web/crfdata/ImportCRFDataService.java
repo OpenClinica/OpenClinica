@@ -369,6 +369,7 @@ public class ImportCRFDataService {
                                         // if you do indeed leave off this in the XML it will pass but return 'null' tbh
                                         attachValidator(displayItemBean, importHelper, discValidator, hardValidator, request, eventCRFRepeatKey,
                                                 studySubjectBean.getOid());
+                                        // System.out.println("+++ just attached validator: " + hardValidator.toString());
                                         displayItemBeans.add(displayItemBean);
 
                                     } else {
@@ -419,7 +420,7 @@ public class ImportCRFDataService {
                         logger.debug(errorKey.toString() + " -- " + hardValidator.get(errorKey));
                         hardValidationErrors.put(errorKey.toString(), hardValidator.get(errorKey));
                         // updating here 'statically' tbh 06/2008
-                        hardValidatorErrorMsgs += hardValidator.get(errorKey) + "<br/><br/>";
+                        hardValidatorErrorMsgs += hardValidator.get(errorKey) + " ";
                     }
 
                     String studyEventId = studyEvent.getId() + "";
@@ -595,7 +596,7 @@ public class ImportCRFDataService {
             String theValue =
                 matchValueWithOptions(displayItemBean, displayItemBean.getData().getValue(), displayItemBean.getMetadata().getResponseSet().getOptions());
             request.setAttribute(itemOid, theValue);
-            logger.debug("        found the value for radio/single: " + theValue);
+            // System.out.println("        found the value for radio/single: " + theValue);
             if (theValue == null && displayItemBean.getData().getValue() != null) {
                 // fail it here
                 logger.debug("-- theValue was NULL, the real value was " + displayItemBean.getData().getValue());
@@ -622,6 +623,7 @@ public class ImportCRFDataService {
             displayItemBean = importHelper.validateDisplayItemBeanMultipleCV(v, displayItemBean, itemOid);
             // errors = v.validate();
         }
+        // System.out.println("=== setting hard v: " + hardv.toString());
     }
 
     private String matchValueWithOptions(DisplayItemBean displayItemBean, String value, List options) {
