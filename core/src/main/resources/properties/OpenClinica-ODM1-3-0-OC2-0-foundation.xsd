@@ -2,10 +2,12 @@
 <xs:schema targetNamespace="http://www.openclinica.org/ns/openclinica_odm/v1.3"
            xmlns="http://www.openclinica.org/ns/openclinica_odm/v1.3"
            xmlns:odm="http://www.cdisc.org/ns/odm/v1.3"
+           xmlns:rules="http://openclinica.org/ns/rules"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
            elementFormDefault="qualified" attributeFormDefault="unqualified">
   <xs:import schemaLocation="http://www.w3.org/2001/03/xml.xsd" namespace="http://www.w3.org/XML/1998/namespace" />
   <xs:import schemaLocation="ODM1-3-0.xsd" namespace="http://www.cdisc.org/ns/odm/v1.3" />
+	<xs:import schemaLocation="rules-ODM.xsd" namespace="http://openclinica.org/ns/rules" />
     <xs:simpleType name="dateOrDatetime">
           <xs:restriction base="xs:string">
             <xs:pattern   value="[0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9](T[0-2][0-9]:[0-5][0-9]:[0-5][0-9](\.[0-9]+)?)?((\+|-)[0-2][0-9]:[0-5][0-9])?"/>
@@ -70,6 +72,14 @@
 		</xs:sequence>
 		<xs:attributeGroup ref="StudyDetailsAttributeDefinition"/>
 		<xs:attributeGroup ref="StudyDetailsAttributeExtension"/>
+	</xs:complexType>
+	
+	<xs:complexType name="OCodmComplexTypeDefinition-Rules">
+		<xs:sequence>
+			<xs:element ref="rules:RuleAssignment" maxOccurs="unbounded" />
+			<xs:element ref="rules:RuleDef" maxOccurs="unbounded" />
+		</xs:sequence>
+		<xs:attributeGroup ref="StudyDetailsAttributeDefinition"/>
 	</xs:complexType>
 	
 	<xs:complexType name="OCodmComplexTypeDefinition-StudyDescriptionAndStatus">
@@ -339,6 +349,7 @@
 	</xs:element>
 	<xs:element name="StudyGroupItem" type="OCodmComplexTypeDefinition-StudyGroupItem"/>
 	<xs:element name="StudyDetails" type="OCodmComplexTypeDefinition-StudyDetails"/>
+	<xs:element name="Rules" type="OCodmComplexTypeDefinition-Rules"/>
 	<xs:element name="StudyDescriptionAndStatus" type="OCodmComplexTypeDefinition-StudyDescriptionAndStatus"/>
 	<xs:element name="ConditionsAndEligibility" type="OCodmComplexTypeDefinition-ConditionsAndEligibility"/>
 	<xs:element name="Age" type="OCodmComplexTypeDefinition-Age"/>
