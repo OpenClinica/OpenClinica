@@ -342,7 +342,8 @@ public class DataImportService {
             // a longer version for the email
             // resetting the msg, since we don't need messages up until now
             msg = new StringBuffer("");
-            msg.append(triggerService.generateSummaryStatsMessage(ssBean, respage, totalValidationErrors) + " ");
+            auditMsg = new StringBuffer("");
+            msg.append(triggerService.generateSummaryStatsMessage(ssBean, respage, totalValidationErrors));
             // session.setAttribute("summaryStats", ssBean);
             // will have to set hard edit checks here as well
             // session.setAttribute("subjectData",
@@ -416,7 +417,8 @@ public class DataImportService {
                                 createDiscrepancyNote(ibean, message, eventCrfBean, displayItemBean, parentDn.getId(), userBean, dataSource, studyBean);
                                 discNotesGenerated = true;
                                 System.out.println("*** created disc note with message: " + message);
-                                msg.append(ibean.getOid() + ": " + message + " ");
+                                auditMsg.append(wrapper.getStudySubjectOid()+ ": " + ibean.getOid() + ": " + message + "---");
+                                // split by this ? later, tbh
                                 // displayItemBean);
                             }
                         }
@@ -430,7 +432,7 @@ public class DataImportService {
             }
             // msg.append("===+");
             // msg.append(respage.getString("data_has_been_successfully_import") + " ");
-            auditMsg.append(respage.getString("data_has_been_successfully_import") + " ");
+            // auditMsg.append(respage.getString("data_has_been_successfully_import") + " ");
 
             //            MessageFormat mf = new MessageFormat("");
             //            mf.applyPattern(respage.getString("you_can_review_the_data"));

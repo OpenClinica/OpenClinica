@@ -168,12 +168,20 @@ public class DataEndpoint {
                 msgElement.setTextContent(auditMsgs.get(1));
                 responseElement.appendChild(msgElement);
             } else if ("warn".equals(status)){
+                // set a summary here, and set individual warnings for each DN
                 String confirmation = messages.getMessage("dataEndpoint.success", null, "Success", locale);
                 resultElement.setTextContent(confirmation);
                 responseElement.appendChild(resultElement);
-                Element msgElement = document.createElementNS(NAMESPACE_URI_V1, "warning");
+                Element msgElement = document.createElementNS(NAMESPACE_URI_V1, "summary");
                 msgElement.setTextContent(auditMsgs.get(1));
                 responseElement.appendChild(msgElement);
+                String listOfDns = auditMsgs.get(2);
+                String[] splitListOfDns = listOfDns.split("---");
+                for (String dn : splitListOfDns) {
+                    Element warning = document.createElementNS(NAMESPACE_URI_V1, "warning");
+                    warning.setTextContent(dn);
+                    responseElement.appendChild(warning);
+                }
             } else {
                 // plain success no warnings
                 String confirmation = messages.getMessage("dataEndpoint.success", null, "Success", locale);
