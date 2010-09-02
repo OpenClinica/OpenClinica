@@ -17,6 +17,8 @@ import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
+import org.akaza.openclinica.control.DefaultView;
+import org.akaza.openclinica.control.ListStudyView;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.FindSubjectsFilter;
 import org.akaza.openclinica.dao.managestudy.FindSubjectsSort;
@@ -44,6 +46,7 @@ import org.jmesa.view.editor.BasicCellEditor;
 import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
+import org.omg.CORBA.Request;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -98,7 +101,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     protected String getTableName() {
         return "findSubjects";
     }
-
+    @Override
+    public void configureTableFacadeCustomView(TableFacade tableFacade) {
+        tableFacade.setView(new ListStudyView(getLocale()));
+    }
     @Override
     protected void configureColumns(TableFacade tableFacade, Locale locale) {
         resword = ResourceBundleProvider.getWordsBundle(locale);

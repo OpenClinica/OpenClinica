@@ -56,6 +56,7 @@ public class ListSubjectServlet extends SecureController {
         factory.setUserAccountDao(uadao);
         factory.setStudyDao(studyDao);
         factory.setCurrentStudy(currentStudy);
+        
 
         String auditLogsHtml = factory.createTable(request, response).render();
         request.setAttribute("listSubjectsHtml", auditLogsHtml);

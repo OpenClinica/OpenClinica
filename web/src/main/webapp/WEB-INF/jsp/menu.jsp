@@ -79,7 +79,7 @@
 
 
 <h1> 
-    <span class="title_manage">
+    <span class="title_manage" style="line-height:5px;">
         <fmt:message key="welcome_to" bundle="${restext}"/>
             <c:choose>
                 <c:when test='${study.parentStudyId > 0}'>
@@ -113,23 +113,10 @@
 <c:set var="studyidentifier">
    <span class="alert"><c:out value="${study.identifier}"/></span>
 </c:set>
-<p>
-<fmt:message key="you_are_logged_in_as" bundle="${restext}">
-    <fmt:param value="${userRole.role.description}"/>
-</fmt:message>
-<c:if test="${study.parentStudyId>0}">
-    <c:set var="siteInfo">
-        <a href="ViewSite?id=<c:out value="${study.id}"/>"><c:out value="${study.name}"/></a>    
-    </c:set>
-    <fmt:message key="for_current_site" bundle="${restext}">
-        <fmt:param value="${siteInfo}"/>
-    </fmt:message>
-</c:if>
-</p>
 
 </c:if>
-<span class="table_title_Admin">
-<a href="ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=<c:out value='${userBean.name}' />"><span style="color: #D4A718;">${assignedDiscrepancies}</span>&nbsp;<fmt:message key="notes_assigned_to_me" bundle="${restext}"/></a><br /><br />
+<span class="table_title_Admin" style="line-height:15px;">
+<a href="ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=<c:out value='${userBean.name}' />"><fmt:message key="notes_assigned_to_me" bundle="${restext}"/><span>${assignedDiscrepancies}</span>&nbsp;</a><br /><br />
 </span>
 
 <c:if test="${userRole.investigator || userRole.researchAssistant}">
@@ -189,7 +176,6 @@
 
     </script>
 
-<p>
 <table>
 <tr>
     <td valign="top">
@@ -204,8 +190,8 @@
     </td>
 </tr>
 </table>
-</p>
-<p>
+
+
 <table>
 <tr>
     <td valign="top">
@@ -221,7 +207,7 @@
     </td>
 </tr>
 </table>
-</p>
+
 </c:if>
 
 <c:if test="${userRole.monitor}">

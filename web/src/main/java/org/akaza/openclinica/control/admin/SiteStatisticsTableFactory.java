@@ -2,6 +2,7 @@ package org.akaza.openclinica.control.admin;
 
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
+import org.akaza.openclinica.control.GroupView;
 import org.akaza.openclinica.control.StatisticsView;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -40,7 +41,7 @@ public class SiteStatisticsTableFactory extends AbstractTableFactory {
 
     @Override
     public void configureTableFacadeCustomView(TableFacade tableFacade) {
-        tableFacade.setView(new StatisticsView());
+        tableFacade.setView(new StatisticsView(getLocale()));
     }
 
     @Override

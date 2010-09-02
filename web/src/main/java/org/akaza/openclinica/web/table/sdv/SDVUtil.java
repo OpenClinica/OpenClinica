@@ -732,6 +732,7 @@ public class SDVUtil {
         //format column dates
         formatColumns(table, new String[] { "eventDate", "enrollmentDate", "lastUpdatedDate" }, request);
 
+        
         table.getTableRenderer().setWidth("800");
         return tableFacade.render();
     }
@@ -1419,6 +1420,7 @@ public class SDVUtil {
             html.append(snippets.themeStart());
             html.append(snippets.tableStart());
             html.append(snippets.theadStart());
+            html.append(customHeader());
             html.append(snippets.toolbar());
             html.append(selectAll());
             html.append(snippets.header());
@@ -1447,6 +1449,16 @@ public class SDVUtil {
             html.tdEnd().trEnd(1);
             return html.toString();
         }
+        private String customHeader()
+        {
+       	 HtmlBuilder html = new HtmlBuilder();
+	        
+	        html.thead(0).tr(0).styleClass("header").close();
+	        html.td(0).style("border-bottom: 1px solid white;background-color:white;color:black;font-size:12px;").align("left").close().append(resword.getString("source_data_verification")).tdEnd();
+	        
+	        html.theadEnd(0);
+	        return html.toString();
+        }
     }
 
     class NoEscapeHtmlCellEditor extends HtmlCellEditor {
@@ -1456,5 +1468,8 @@ public class SDVUtil {
             return ItemUtils.getItemValue(item, property);
         }
     }
+    
+    
+    
 
 }

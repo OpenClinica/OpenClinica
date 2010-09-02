@@ -34,14 +34,9 @@
 						dsm.item_data_id = id.item_data_id
 						and dn2.parent_dn_id = dn.parent_dn_id 
 ) 
-
-
-
-
         </sql>
-    </query>
-    
-       <query>
+  </query>
+  <query>
         <name>findEventCRFDNotesForToolTips</name>
         <sql>          
 SELECT dn.*, eventcrf_map.column_name FROM discrepancy_note dn, dn_event_crf_map eventcrf_map,
