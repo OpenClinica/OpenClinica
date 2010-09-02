@@ -252,7 +252,11 @@ public class BeanFactory {
                 formGroupBean.setName(groupLabel);
                 igMetaBean.setHeader(groupValues.get("group_header"));
                 //Hamid repeating group or not
-                igMetaBean.setRepeatingGroup(Boolean.parseBoolean(groupValues.get("repeating_group")));
+                if(groupValues.get("repeating_group") != null){
+                    igMetaBean.setRepeatingGroup(Boolean.parseBoolean(groupValues.get("repeating_group")));
+//                System.out.println("=============" + groupValues.get("repeating_group"));
+                }
+
                 // YW 10-04-2007 <<
                 // BWP changed to try/catch block
                 tempValue = groupValues.get("group_repeat_max");
