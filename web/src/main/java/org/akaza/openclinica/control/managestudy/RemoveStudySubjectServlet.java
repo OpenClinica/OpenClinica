@@ -151,11 +151,11 @@ public class RemoveStudySubjectServlet extends SecureController {
                         + ".";
 
                 addPageMessage(emailBody);
-                try{
-                    sendEmail(emailBody);    
-                }catch(Exception ex){
-                    addPageMessage(respage.getString("mail_cannot_be_sent_to_admin"));
-                }
+//                try{
+//                    sendEmail(emailBody);    
+//                }catch(Exception ex){
+//                    addPageMessage(respage.getString("mail_cannot_be_sent_to_admin"));
+//                }
                 forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
             }
         }

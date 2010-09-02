@@ -150,11 +150,11 @@ public class RestoreStudySubjectServlet extends SecureController {
                     respage.getString("the_subject") + " " + subject.getName() + " " + respage.getString("has_been_restored_to_the_study") + " "
                         + study.getName() + ".";
                     addPageMessage(emailBody);
-                try{
-                    sendEmail(emailBody);
-                }catch (Exception ex){
-                    addPageMessage(respage.getString("mail_cannot_be_sent_to_admin"));                    
-                }
+//                try{
+//                    sendEmail(emailBody);
+//                }catch (Exception ex){
+//                    addPageMessage(respage.getString("mail_cannot_be_sent_to_admin"));
+//                }
                 forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
             }
         }

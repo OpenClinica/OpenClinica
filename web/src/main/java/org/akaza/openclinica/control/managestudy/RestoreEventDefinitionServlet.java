@@ -161,7 +161,7 @@ public class RestoreEventDefinitionServlet extends SecureController {
 
                 addPageMessage(emailBody);
 
-                sendEmail(emailBody);
+//                sendEmail(emailBody);
                 forwardPage(Page.LIST_DEFINITION_SERVLET);
             }
 

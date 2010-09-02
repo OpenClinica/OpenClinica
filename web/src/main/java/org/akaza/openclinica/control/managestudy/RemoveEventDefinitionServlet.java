@@ -161,7 +161,7 @@ public class RemoveEventDefinitionServlet extends SecureController {
                     respage.getString("the_SED") + sed.getName() + " " + respage.getString("has_been_removed_from_the_study") + currentStudy.getName() + ".";
 
                 addPageMessage(emailBody);
-                sendEmail(emailBody);
+//                sendEmail(emailBody);
                 forwardPage(Page.LIST_DEFINITION_SERVLET);
             }
 

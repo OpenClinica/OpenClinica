@@ -135,7 +135,7 @@ public class RestoreSubjectServlet extends SecureController {
                 String emailBody = respage.getString("the_subject") + subject.getName() + " " + respage.getString("has_been_restored_succesfully");
 
                 addPageMessage(emailBody);
-                sendEmail(emailBody);
+//                sendEmail(emailBody);
 
                 forwardPage(Page.SUBJECT_LIST_SERVLET);
 
