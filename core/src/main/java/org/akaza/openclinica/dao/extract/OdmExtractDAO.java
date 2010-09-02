@@ -214,8 +214,9 @@ public class OdmExtractDAO extends DatasetDAO {
         this.setTypeExpected(7, TypeNames.INT);// item_data_ordinal
         this.setTypeExpected(8, TypeNames.STRING);// value
         this.setTypeExpected(9, TypeNames.INT);// item_data_type_id
-        this.setTypeExpected(10, TypeNames.INT);// item_data_id
-        this.setTypeExpected(11, TypeNames.STRING);// mu_oid
+        // this.setTypeExpected(10, TypeNames.INT);// item_data_id
+        // this.setTypeExpected(11, TypeNames.INT); // ???
+        this.setTypeExpected(10, TypeNames.STRING);// mu_oid
     }
 
     public void setEventCrfIdsByItemDataTypesExpected() {
