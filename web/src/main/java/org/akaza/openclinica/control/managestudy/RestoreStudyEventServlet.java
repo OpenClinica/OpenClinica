@@ -171,7 +171,7 @@ public class RestoreStudyEventServlet extends SecureController {
                         + " " + study.getName() + ".";
 
                 addPageMessage(emailBody);
-                sendEmail(emailBody);
+//                sendEmail(emailBody);
                 request.setAttribute("id", new Integer(studySubId).toString());
                 forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
             }

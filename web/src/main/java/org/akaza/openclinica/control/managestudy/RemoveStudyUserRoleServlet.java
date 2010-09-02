@@ -85,7 +85,9 @@ public class RemoveStudyUserRoleServlet extends SecureController {
                 sur.setUpdater(ub);
                 sur.setUpdatedDate(new Date());
                 udao.updateStudyUserRole(sur, userName);
+
                 addPageMessage(sendEmail(user, sur));
+
                 forwardPage(Page.LIST_USER_IN_STUDY_SERVLET);
 
             }
@@ -108,10 +110,10 @@ public class RemoveStudyUserRoleServlet extends SecureController {
             u.getFirstName() + " " + u.getLastName() + "(" + resword.getString("username") + ": " + u.getName() + ") "
                 + respage.getString("has_been_removed_from_the_study_site") + study.getName() + " " + respage.getString("with_role") + " " + sub.getRoleName()
                 + ". " + respage.getString("the_user_will_no_longer_access_to_the_study");
-
-        sendEmail(u.getEmail().trim(), respage.getString("remove_user_role"), body, false);
-        sendEmail(ub.getEmail().trim(), respage.getString("remove_user_role"), body, false);
-        sendEmail(EmailEngine.getAdminEmail(), respage.getString("remove_user_role"), body, false);
+        //Mantis Issue: 5768. Email Notification Removed
+//        sendEmail(u.getEmail().trim(), respage.getString("remove_user_role"), body, false);
+//        sendEmail(ub.getEmail().trim(), respage.getString("remove_user_role"), body, false);
+//        sendEmail(EmailEngine.getAdminEmail(), respage.getString("remove_user_role"), body, false);
 
         return body;
 

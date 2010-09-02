@@ -136,11 +136,11 @@ public class SetStudyUserRoleServlet extends SecureController {
                 + respage.getString("has_been_granted_the_role") + " " + sub.getRoleName() + " " + respage.getString("in_the_study_site") + " "
                 + study.getName() + ".";
 
-        boolean emailSent = sendEmail(u.getEmail().trim(), respage.getString("set_user_role"), body, false);
-        if (emailSent) {
-            sendEmail(ub.getEmail().trim(), respage.getString("set_user_role"), body, false);
-            sendEmail(EmailEngine.getAdminEmail(), respage.getString("set_user_role"), body, false);
-        }
+//        boolean emailSent = sendEmail(u.getEmail().trim(), respage.getString("set_user_role"), body, false);
+//        if (emailSent) {
+//            sendEmail(ub.getEmail().trim(), respage.getString("set_user_role"), body, false);
+//            sendEmail(EmailEngine.getAdminEmail(), respage.getString("set_user_role"), body, false);
+//        }
         return body;
 
     }
