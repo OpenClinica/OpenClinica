@@ -94,7 +94,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     @Override
     protected void configureColumns(TableFacade tableFacade, Locale locale) {
 
-        tableFacade.setColumnProperties("studySubject.label", "discrepancyNoteBean.disType", "discrepancyNoteBean.resolutionStatus", "discrepancyNoteBean.age", "discrepancyNoteBean.days",
+        tableFacade.setColumnProperties("studySubject.label", "discrepancyNoteBean.disType", "discrepancyNoteBean.resolutionStatus", "age", "days",
                 "siteId", "discrepancyNoteBean.createdDate", "discrepancyNoteBean.updatedDate", "eventName",
                 "eventStartDate", "crfName", "entityName", "entityValue", "discrepancyNoteBean.description", "discrepancyNoteBean.detailedNotes",
                 "numberOfNotes", "discrepancyNoteBean.user",
@@ -136,8 +136,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "crfName"), new StringFilterMatcher());
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "entityName"), new StringFilterMatcher());
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "entityValue"), new StringFilterMatcher());
-        tableFacade.addFilterMatcher(new MatcherKey(String.class, "discrepancyNoteBean.age"), new AgeDaysFilterMatcher());
-        tableFacade.addFilterMatcher(new MatcherKey(String.class, "discrepancyNoteBean.days"), new AgeDaysFilterMatcher());
+        tableFacade.addFilterMatcher(new MatcherKey(String.class, "age"), new AgeDaysFilterMatcher());
+        tableFacade.addFilterMatcher(new MatcherKey(String.class, "days"), new AgeDaysFilterMatcher());
     }
 
     @Override
@@ -188,8 +188,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             h.put("studySubject.label", discrepancyNoteBean.getStudySub().getLabel());
             h.put("discrepancyNoteBean.disType", discrepancyNoteBean.getDisType());
             h.put("discrepancyNoteBean.resolutionStatus", discrepancyNoteBean.getResStatus());
-            h.put("discrepancyNoteBean.age", discrepancyNoteBean.getAge());
-            h.put("discrepancyNoteBean.days", discrepancyNoteBean.getDays()==0?null:discrepancyNoteBean.getDays());
+            h.put("age", discrepancyNoteBean.getAge());
+            h.put("days", discrepancyNoteBean.getDays()==0?null:discrepancyNoteBean.getDays());
             h.put("siteId", ((StudyBean) getStudyDao().findByPK(discrepancyNoteBean.getStudySub().getStudyId())).getIdentifier());
             h.put("discrepancyNoteBean", discrepancyNoteBean);
             h.put("discrepancyNoteBean.createdDate", discrepancyNoteBean.getCreatedDate());
@@ -554,7 +554,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 //        @SuppressWarnings("unchecked")
 //        public Object getValue(Object item, String property, int rowcount) {
 //            String value = "";
-//            int age = (Integer) ((HashMap<Object, Object>) item).get("discrepancyNoteBean.age");
+//            int age = (Integer) ((HashMap<Object, Object>) item).get("age");
 //
 //            if (age != 0) {
 //                value = age + "";
@@ -566,7 +566,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 //        @SuppressWarnings("unchecked")
 //        public Object getValue(Object item, String property, int rowcount) {
 //            String value = "";
-//            int days = (Integer) ((HashMap<Object, Object>) item).get("discrepancyNoteBean.days");
+//            int days = (Integer) ((HashMap<Object, Object>) item).get("days");
 //
 //            if (days != 0) {
 //                value = days + "";
