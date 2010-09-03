@@ -16,6 +16,8 @@ public class ListNotesSort implements CriteriaCommand {
         columnMapping.put("discrepancyNoteBean.disType", "dn.discrepancy_note_type_id");
         columnMapping.put("discrepancyNoteBean.resolutionStatus", "dn.resolution_status_id");
         columnMapping.put("discrepancyNoteBean.entityType", "dn.entity_type");
+        columnMapping.put("age", "age");
+        columnMapping.put("days", "days");
     }
 
     public void addSort(String property, String order) {
