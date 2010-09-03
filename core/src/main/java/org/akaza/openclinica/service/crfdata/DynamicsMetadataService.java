@@ -56,17 +56,12 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
     private StudyEventDAO studyEventDAO;
     private EventDefinitionCRFDAO eventDefinitionCRFDAO;
     private ExpressionService expressionService;
-    private ArrayList<Integer> itemsAlreadyShown;
 
     public DynamicsMetadataService(DataSource ds) {
-    	itemsAlreadyShown = new ArrayList<Integer>();
+    	// itemsAlreadyShown = new ArrayList<Integer>();
         this.ds = ds;
     }
     
-    public void resetItemCounter() {
-    	itemsAlreadyShown = new ArrayList<Integer>();
-    }
-
     public boolean hide(Object metadataBean, EventCRFBean eventCrfBean) {
         // TODO -- interesting problem, where is the SpringServletAccess object going to live now? tbh 03/2010
         ItemFormMetadataBean itemFormMetadataBean = (ItemFormMetadataBean) metadataBean;
@@ -657,7 +652,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                     DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataBean(itemFormMetadataBean, eventCrfBeanA, oidBasedItemData);
                     if (dynamicsMetadataBean == null && oidBasedItemData.getValue().equals("")) {
                         hideItem(itemFormMetadataBean, eventCrfBeanA, oidBasedItemData);
-                    } else if (dynamicsMetadataBean != null && dynamicsMetadataBean.isShowItem() && oidBasedItemData.getValue().equals("") && !itemsAlreadyShown.contains(new Integer(oidBasedItemData.getItemId()))) {
+                    } else if (dynamicsMetadataBean != null && dynamicsMetadataBean.isShowItem() && oidBasedItemData.getValue().equals("")) {
                         // tbh #5287: add an additional check here to see if it should be hidden
                         dynamicsMetadataBean.setShowItem(false);
                         getDynamicsItemFormMetadataDao().saveOrUpdate(dynamicsMetadataBean);
@@ -696,7 +691,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
             }
         }
         // tbh #5287: reset the check to make sure items that have been shown are not re-hidden
-        resetItemCounter();
+        // resetItemCounter();
     }
 
     public void showNew(Integer itemDataId, List<PropertyBean> properties, UserAccountBean ub, RuleSetBean ruleSet) {
@@ -763,11 +758,11 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                     DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataBean(itemFormMetadataBean, eventCrfBeanA, oidBasedItemData);
                     if (dynamicsMetadataBean == null) {
                         showItem(itemFormMetadataBean, eventCrfBeanA, oidBasedItemData);
-                        itemsAlreadyShown.add(new Integer(oidBasedItemData.getItemId()));
+                        // itemsAlreadyShown.add(new Integer(oidBasedItemData.getId()));
                     } else if (dynamicsMetadataBean != null && !dynamicsMetadataBean.isShowItem()) {
                         dynamicsMetadataBean.setShowItem(true);
                         getDynamicsItemFormMetadataDao().saveOrUpdate(dynamicsMetadataBean);
-                        itemsAlreadyShown.add(new Integer(oidBasedItemData.getItemId()));
+                        // itemsAlreadyShown.add(new Integer(oidBasedItemData.getId()));
                     } else if (eventCrfBeanA.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
                         logger.debug("hit DDE here: idb " + oidBasedItemData.getId());
                         // need a guard clause to guarantee DDE

@@ -5,6 +5,9 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public class DynamicsItemFormMetadataDao extends AbstractDomainDao<DynamicsItemFormMetadataBean> {
 
     @Override
@@ -45,5 +48,6 @@ public class DynamicsItemFormMetadataDao extends AbstractDomainDao<DynamicsItemF
         getCurrentSession().flush();
         return domainObject;
     }
+    
 
 }
