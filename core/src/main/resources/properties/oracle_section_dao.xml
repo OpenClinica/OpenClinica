@@ -110,7 +110,7 @@
 	<query>
 		<name>countSCDItemBySectionId</name>
 		<sql>
-			select count(item_form_metadata) as count from item_form_metadata 
+			select count(*) as count from item_form_metadata
 			where section_id = ? and length(simple_conditional_display) > 0
 		</sql>
 	</query>

@@ -18,24 +18,6 @@
                 AND dn.discrepancy_note_id = dad.discrepancy_note_id
     	</sql>
     </query>
-            <query>
-        <name>findExistingNotesForToolTip</name>
-        <sql>
- SELECT dn.*
-					    FROM discrepancy_note dn, dn_item_data_map dsm,item_data id
-					    where 
-					dsm.item_data_id= ?           AND
-					 dn.discrepancy_note_id=dsm.discrepancy_note_id and
-						dsm.item_data_id = id.item_data_id
-				            and dn.discrepancy_note_id in (select max(dn2.discrepancy_note_id)  FROM discrepancy_note dn2, dn_item_data_map dsms,item_data id
-					    where 
-					dsm.item_data_id= ?            AND
-					 dn.discrepancy_note_id=dsm.discrepancy_note_id and
-						dsm.item_data_id = id.item_data_id
-						and dn2.parent_dn_id = dn.parent_dn_id 
-) 
-        </sql>
-  </query>
   <query>
         <name>findEventCRFDNotesForToolTips</name>
         <sql>          
@@ -849,6 +831,21 @@ SELECT dn.*, eventcrf_map.column_name FROM discrepancy_note dn, dn_event_crf_map
         </sql>
     </query>
     <query>
+        <name>findExistingNotesForToolTip</name>
+        <sql>
+            SELECT dn.*FROM discrepancy_note dn, dn_item_data_map dsm,item_data id
+			where dsm.item_data_id= ? AND dn.discrepancy_note_id=dsm.discrepancy_note_id and
+			dsm.item_data_id = id.item_data_id
+            and dn.discrepancy_note_id in (select max(dn2.discrepancy_note_id)
+                FROM discrepancy_note dn2, dn_item_data_map dsms,item_data id where
+					dsm.item_data_id= ? AND dn.discrepancy_note_id=dsm.discrepancy_note_id and
+						dsm.item_data_id = id.item_data_id
+						and dn2.parent_dn_id = dn.parent_dn_id) 
+        </sql>
+  </query>
+
+
+    <query>
         <name>findItemDataDNotesFromEventCRF</name>
         <sql>
             SELECT dn.* FROM discrepancy_note dn, dn_item_data_map dn_idmap,
@@ -920,90 +917,5 @@ SELECT dn.*, eventcrf_map.column_name FROM discrepancy_note dn, dn_event_crf_map
             order by dn.date_created desc
         </sql>
     </query>
-            <query>
-        <name>findExistingNotesForToolTip</name>
-        <sql>
- (SELECT dn.*
-					    FROM discrepancy_note dn, dn_item_data_map dsm,item_data id
-					    where 
-					dsm.item_data_id= ?           AND
-					 dn.discrepancy_note_id=dsm.discrepancy_note_id and
-						dsm.item_data_id = id.item_data_id
-				            and dn.date_created in (select max(dn2.date_created)  FROM discrepancy_note dn2, dn_item_data_map dsms,item_data id
-					    where 
-					dsm.item_data_id= ?            AND
-					 dn.discrepancy_note_id=dsm.discrepancy_note_id and
-						dsm.item_data_id = id.item_data_id
-						and dn2.parent_dn_id = dn.parent_dn_id 
-) )
-UNION
- (SELECT dn.*
-					    FROM discrepancy_note dn, dn_item_data_map dsm,item_data id
-					    where 
-					dsm.item_data_id= ?           AND
-					 dn.discrepancy_note_id=dsm.discrepancy_note_id and
-						dsm.item_data_id = id.item_data_id
-				            and dn.date_created in (select min(dn2.date_created)  FROM discrepancy_note dn2, dn_item_data_map dsms,item_data id
-					    where 
-					dsm.item_data_id= ?            AND
-					 dn.discrepancy_note_id=dsm.discrepancy_note_id and
-						dsm.item_data_id = id.item_data_id
-							and dn2.parent_dn_id = dn.parent_dn_id 
-							 
-)
-)
-
-
-
-        </sql>
-    </query>
-    
-       <query>
-        <name>findExistingNotesForToolTip</name>
-        <sql>
- (SELECT dn.*
-					    FROM discrepancy_note dn, dn_item_data_map dsm,item_data id
-					    where 
-					dsm.item_data_id= ?           AND
-					 dn.discrepancy_note_id=dsm.discrepancy_note_id and
-						dsm.item_data_id = id.item_data_id
-				            and dn.date_created in (select max(dn2.date_created)  FROM discrepancy_note dn2, dn_item_data_map dsms,item_data id
-					    where 
-					dsm.item_data_id= ?            AND
-					 dn.discrepancy_note_id=dsm.discrepancy_note_id and
-						dsm.item_data_id = id.item_data_id
-						and dn2.parent_dn_id = dn.parent_dn_id 
-) )
-UNION
- (SELECT dn.*
-					    FROM discrepancy_note dn, dn_item_data_map dsm,item_data id
-					    where 
-					dsm.item_data_id= ?           AND
-					 dn.discrepancy_note_id=dsm.discrepancy_note_id and
-						dsm.item_data_id = id.item_data_id
-				            and dn.date_created in (select min(dn2.date_created)  FROM discrepancy_note dn2, dn_item_data_map dsms,item_data id
-					    where 
-					dsm.item_data_id= ?            AND
-					 dn.discrepancy_note_id=dsm.discrepancy_note_id and
-						dsm.item_data_id = id.item_data_id
-							and dn2.parent_dn_id = dn.parent_dn_id 
-							 
-)
-)
-
-
-
-        </sql>
-    </query>
-    <!--<query>-->
-        <!--<name>findLatestChildByParent</name>-->
-        <!--<sql>-->
-            <!--SELECT dn.*-->
-            <!--FROM discrepancy_note dn-->
-            <!--WHERE parent_dn_id=?-->
-            <!--and dn.discrepancy_note_id =-->
-            <!--(select max(discrepancy_note_id) from discrepancy_note where parent_dn_id = ?)-->
-        <!--</sql>-->
-    <!--</query>-->
 </queries>
 
