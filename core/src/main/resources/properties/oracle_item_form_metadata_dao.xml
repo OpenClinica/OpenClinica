@@ -240,4 +240,11 @@
 		where section_id = ? and length(simple_conditional_display) > 0
 		</sql>
 	</query>
+    <query>
+        <name>findSCDItemsBySectionId</name>
+        <sql>select * from item_form_metadata
+        where section_id = ? and length(simple_conditional_display) > 0
+        </sql>
+    </query>
+    
 </queries>
