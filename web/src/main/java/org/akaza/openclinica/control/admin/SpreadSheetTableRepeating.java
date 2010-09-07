@@ -1389,8 +1389,14 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                     + "', "
                                     + (isRequired ? 1 : 0)
                                     + ", '"
-                                    + stripQuotes(default_value) + "','" + stripQuotes(responseLayout) + "','" + widthDecimal + ", " + isShowItem 
-                                    + "', '" + stripQuotes(display) + "')";
+                                    + stripQuotes(default_value)
+                                    + "','"
+                                    + stripQuotes(responseLayout)
+                                    + "','"
+                                    + widthDecimal
+                                    + "', "
+                                    + (isShowItem ? 1 : 0) 
+                                    + ", '" + stripQuotes(display) + "')";
                             logger.warn(sql2);
 
                         } else {
@@ -1494,13 +1500,13 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                         "INSERT INTO ITEM_GROUP_METADATA (" + "item_group_id,HEADER," + "subheader, layout, repeat_number, repeat_max,"
                                             + " repeat_array,row_start_number, crf_version_id," + "item_id , ordinal, show_group, repeating_group) VALUES ("
                                             + "(SELECT MAX(ITEM_GROUP_ID) FROM ITEM_GROUP WHERE NAME='"
-                                            + itemGroup.getName()
+                                            + stripQuotes(itemGroup.getName())
                                             + "' AND crf_id = "
                                             + crfId
                                             + " ),'"
-                                            + igMeta.getHeader()
+                                            + stripQuotes(igMeta.getHeader())
                                             + "', '"
-                                            + igMeta.getSubheader()
+                                            + stripQuotes(igMeta.getSubheader())
                                             + "', '"
                                             +
                                             // above removed?
@@ -1521,10 +1527,12 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                             + versionIdString
                                             + ","
                                             + "(SELECT MAX(ITEM.ITEM_ID) FROM ITEM,ITEM_FORM_METADATA,CRF_VERSION WHERE ITEM.NAME='"
-                                            + itemName
+                                            + stripQuotes(itemName)
                                             + "' "
                                             + "AND ITEM.ITEM_ID = ITEM_FORM_METADATA.ITEM_ID and ITEM_FORM_METADATA.CRF_VERSION_ID=CRF_VERSION.CRF_VERSION_ID "
-                                            + "AND CRF_VERSION.CRF_ID= " + crfId + " )," + k + ", " + igMeta.isShowGroup() + ", " + igMeta.isRepeatingGroup() + ")";
+                                            + "AND CRF_VERSION.CRF_ID= " + crfId + " ),"
+                                            + k + ", "
+                                            + (igMeta.isShowGroup() ? 1 : 0) + ", " + (igMeta.isRepeatingGroup() ? 1 : 0) + ")";
 
                                 } else {
                                     sqlGroupLabel =
