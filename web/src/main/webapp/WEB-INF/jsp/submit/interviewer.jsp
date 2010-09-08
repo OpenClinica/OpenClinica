@@ -320,7 +320,7 @@ function callTip(html)
         <b><fmt:message key="event" bundle="${resword}"/>:</b>
     </td>
     <td style="color: #789EC5">
-      <c:out value="${toc.studyEventDefinition.name}" />(<fmt:formatDate
+      <c:out value="${toc.studyEventDefinition.name}" />&nbsp;(<fmt:formatDate
       value="${toc.studyEvent.dateStarted}" pattern="${dteFormat}" />)
     </td>
 
