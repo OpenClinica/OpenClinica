@@ -65,23 +65,6 @@ var closing = true;
        });
      
 
-    function genToolTip(newNo,updatedNo,resNo,closedNo,naNO)
-       {
-               var htmlgen = 
-	                     '<div class=\"tooltip\">'+
-	                     '<table ><table width="150">'+
-	                     ' <tr><td  align=\"center\" class=\"header1\">' +
-	                     'Notes and Discrepancies </td></tr><tr></tr>'+
-	                     '</table><table width="180"  class="tableborder" align="left">  <tr>  <td width="66" class="label"><img src="images/icon_Note.gif" width="16" height="13" alt="noNote"></td> <td width="67" align="center" class=\"label\" nowrap>New: </td><td width="43" class=\"label\">'+newNo+'</td></tr>'+
-	                     '<tr> <td ><img src="images/icon_flagYellow.gif" width="16" height="13" alt="discrepancy"> <td class=\"label\">Updated: </td><td  class=\"label\">'+updatedNo+'</td></tr>'+
-	                     '<tr> <td ><img src="images/icon_flagGreen.gif" width="16" height="13" alt="closed"></td> <td class=\"label\">Res.Proposed: </td> <td  class=\"label\">'+resNo+'</td></tr>'+
-	                     '<tr>  <td ><img src="images/icon_flagBlack.gif" width="16" height="13" alt="NA"></td> <td class=\"label\">Closed: </td><td  class=\"label\">'+closedNo+'</td></tr><tr>'+ 
-	                     '<td><img src="images/icon_flagWhite.gif" width="16" height="13" alt="NA"></td> <td class=\"label\">Not Applicable: </td><td  class=\"label\">'+naNO+'</td></tr></table><table><tr></tr></table>'+
-	                     '<table width="180"><tbody><td height="50" colspan="3"><span class=\"label\">'+
-    'Click on the flag in the main window for more details.</span>'+
-  '</td></tr></tbody></table></table></div>';
-          return htmlgen;
-}
 
 
 
@@ -220,8 +203,8 @@ function callTip(html)
 
 <div class="tablebox_center">
 
-<table border="0" cellpadding="0" cellspacing="0" width="500">
-<tr>
+<table border="0" cellpadding="0" cellspacing="0" width="700">
+<!-- <tr>
     <td colspan="2" class="table_header_row_left">
         <b> <c:out value="${toc.crf.name}" /> <c:out value="${toc.crfVersion.name}" />
          <c:choose>
@@ -254,7 +237,7 @@ function callTip(html)
                 <img src="images/icon_Invalid.gif" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>">
             </c:when>
             <c:otherwise>
-                <!-- leave blank -->
+               --> <!-- leave blank --><!-- 
             </c:otherwise>
         </c:choose></b>
 
@@ -264,8 +247,8 @@ function callTip(html)
         <br><font color="#000000"><c:out value="${closedNum}"/> <fmt:message key="closed" bundle="${resword}"/></font>, <font color="#000000"><c:out value="${notAppNum}"/> <fmt:message key="not_applicable" bundle="${resword}"/></font>
     </td>
 
-</tr>
-<tr>
+</tr> -->
+<!-- <tr>
     <td class="table_cell_left" style="color: #789EC5">
         <b><fmt:message key="study_subject_ID" bundle="${resword}"/>:</b><br />
     </td>
@@ -288,7 +271,7 @@ function callTip(html)
         </c:otherwise>
     </c:choose>
 </tr>
-
+--><!-- 
 <tr>
     <c:choose>
         <c:when test="${study.studyParameterConfig.secondaryLabelViewable == 'true'}">
@@ -307,29 +290,36 @@ function callTip(html)
             <td class="table_cell" style="color: #789EC5"><b></td>
             <td class="table_cell_left" style="color: #789EC5"></td>
 </tr>
+-->
 <tr>
-    <td class="table_cell_noborder" style="color: #789EC5">
+<td class="table_cell_noborder" style="color: #789EC5">
+<span><b><fmt:message key="gender" bundle="${resword}"/>:</b></span>
+        
+        </td>
+         <td class="table_cell_noborder" style="color: #789EC5;padding-left:3px">
+	       <c:choose>
+	                   <c:when test="${subject.gender==109}"><fmt:message key="M" bundle="${resword}"/></c:when>
+	                   <c:when test="${subject.gender==102}"><fmt:message key="F" bundle="${resword}"/></c:when>
+	                   <c:otherwise>
+	                       <c:out value="${subject.gender}" />
+	                   </c:otherwise>
+        </c:choose>
+    </td>
+    <td class="table_cell_top" style="color: #789EC5">
 
         <b><fmt:message key="study_site" bundle="${resword}"/>:</b><br>
     </td>
     <td class="table_cell_noborder" style="color: #789EC5">
      <c:out value="${studyTitle}" /><br>
     </td>
-    <td class="table_cell_top" style="color: #789EC5">
-
-        <b><fmt:message key="age_at_enrollment" bundle="${resword}"/>:</b><br>
-
-    </td>
-    <td class="table_cell_noborder" style="color: #789EC5">
-        <c:out value="${age}" /><br>
-    </td>
+   
 </tr>
 
 <tr>
     <td class="table_cell_noborder" style="color: #789EC5">
         <b><fmt:message key="event" bundle="${resword}"/>:</b>
     </td>
-    <td class="table_cell_noborder" style="color: #789EC5">
+    <td style="color: #789EC5">
       <c:out value="${toc.studyEventDefinition.name}" />(<fmt:formatDate
       value="${toc.studyEvent.dateStarted}" pattern="${dteFormat}" />)
     </td>
@@ -346,60 +336,50 @@ function callTip(html)
             </c:choose>
         </c:if>
     </td>
+     <td class="table_cell_noborder" style="color: #789EC5">
+          <c:if test="${study.studyParameterConfig.collectDob != '3'}">
+                    <%-- BWP 3105>> Until the SubjectBean uses the Calendar object to represent
+         the date of birth, we will have to use the Date.getYear() deprecated method.--%>
+    
+                <c:choose>
+                    <c:when test="${study.studyParameterConfig.collectDob == '2' && subject.dateOfBirth.year != null}">${subject.dateOfBirth.year + 1900}</c:when>
+                    <c:otherwise> <fmt:formatDate value="${subject.dateOfBirth}" pattern="${dteFormat}" /></c:otherwise>
+                </c:choose>
+                <%-->> --%>
+            </c:if>
+    
+            
+            <br />
+        </td>
 
+    </tr>
+<tr>
     <td class="table_cell_noborder" style="color: #789EC5">
-        <c:if test="${study.studyParameterConfig.collectDob != '3'}">
-                <%-- BWP 3105>> Until the SubjectBean uses the Calendar object to represent
-     the date of birth, we will have to use the Date.getYear() deprecated method.--%>
 
-            <c:choose>
-                <c:when test="${study.studyParameterConfig.collectDob == '2' && subject.dateOfBirth.year != null}">${subject.dateOfBirth.year + 1900}</c:when>
-                <c:otherwise> <fmt:formatDate value="${subject.dateOfBirth}" pattern="${dteFormat}" /></c:otherwise>
-            </c:choose>
-            <%-->> --%>
-        </c:if>
+        <b><fmt:message key="age_at_enrollment" bundle="${resword}"/>:</b><br>
 
-        <span style="padding-left:6px;padding-right:6px"><b><fmt:message key="gender" bundle="${resword}"/>:</b></span>
-        <c:choose>
-            <c:when test="${subject.gender==109}"><fmt:message key="M" bundle="${resword}"/></c:when>
-            <c:when test="${subject.gender==102}"><fmt:message key="F" bundle="${resword}"/></c:when>
-            <c:otherwise>
-                <c:out value="${subject.gender}" />
-            </c:otherwise>
-        </c:choose>
-        <br />
+    </td>
+     <td class="table_cell_noborder" style="color: #789EC5">
+        <c:out value="${age}" /><br>
     </td>
 
-    <td class="table_cell_noborder" style="color: #789EC5">
-        <!--<b>Gender:</b>-->
-    </td>
+    
 
-    <td class="table_cell_noborder" style="color: #789EC5;padding-left:3px">
-        <%--<c:choose>
-          <c:when test="${subject.gender==109}">M</c:when>
-          <c:when test="${subject.gender==102}">F</c:when>
-          <c:otherwise>
-            <c:out value="${subject.gender}" />
-          </c:otherwise>
-        </c:choose>--%>
-    </td>
-</tr>
+   
+
+        <td class="table_cell_top" style="color: #789EC5">
 <c:if test="${toc.studyEventDefinition.repeating}">
-    <tr>
-        <td class="table_cell_noborder" style="color: #789EC5">
+   
             <b><fmt:message key="occurrence_number" bundle="${resword}"/>:</b>
         </td>
         <td class="table_cell_noborder" style="color: #789EC5">
             <c:out value="${toc.studyEvent.sampleOrdinal}" />
-        </td>
-        <td class="table_cell_top" style="color: #789EC5">
+   </c:if>
+   </td>
+       
+    
 
-        </td>
-        <td class="table_cell_noborder" style="color: #789EC5">
-        </td>
-
-    </tr>
-</c:if>
+</tr>
 <%--<tr>
   <td class="table_cell_noborder" style="color: #789EC5">
 
@@ -659,6 +639,32 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
 	</c:if>
 </td>
 </tr>
+
+<tr>
+
+  <td colspan="5" valign="top" class="table_cell_left"  style="color: #789EC5"><b>Discrepancy Notes on this CRF:</b></td>
+ 
+</tr>
+
+<tr>
+<table border="0" cellspacing="1" cellpadding="0" width="100%">
+  <tr>
+  <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:#CC0000;"><fmt:message key="open" bundle="${resword}"/></td>
+  <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:#D4A718;"><fmt:message key="updated" bundle="${resword}"/></td>
+  <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:#7CB98F;"> <fmt:message key="resolved" bundle="${resword}"/></td>
+  <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:black;"><fmt:message key="closed" bundle="${resword}"/></td>
+  <td valign="top" align="center" class="table_cell_left"  style="border-right:1px solid #E6E6E6;color:black"> <fmt:message key="not_applicable" bundle="${resword}"/></td>
+  </tr>
+  <tr>
+  <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:#CC0000;"><c:out value="${openNum}"/></td>
+    <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:#D4A718;"><c:out value="${updatedNum}"/></td>
+    <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:#7CB98F;;"><c:out value="${resolvedNum}"/></td>
+    <td valign="top" align="center" class="table_cell_left" style="border-right:1px solid #E6E6E6;color:black;"><c:out value="${closedNum}"/></td>
+  <td valign="top" align="center" class="table_cell_left"  style="border-right:1px solid #E6E6E6;color:black"><c:out value="${notAppNum}"/></td>
+  </tr>
+  </table>
+</tr>
+
 </table>
 
 </div>
@@ -669,8 +675,5 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
 </td>
 </tr>
 
-</table>
 
-</td>
-</tr>
 </table>

@@ -69,8 +69,41 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
     </c:otherwise>
 </c:choose>
 
-<h1><span class="title_manage"><fmt:message key="administrative_editing_for" bundle="${resword}"/> <c:out value="${section.crf.name}" /> <c:out value="${section.crfVersion.name}" /></span></h1>
-<%--</div>--%>
+<h1><span class="title_manage"> <b> <c:out value="${toc.crf.name}" /> <c:out value="${toc.crfVersion.name}" />
+         <c:choose>
+            <c:when test="${eventCRF.stage.initialDE}">
+                <img src="images/icon_InitialDE.gif" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>"
+                     title="<fmt:message key="initial_data_entry" bundle="${resword}"/>">
+            </c:when>
+            <c:when
+              test="${eventCRF.stage.initialDE_Complete}">
+                <img src="images/icon_InitialDEcomplete.gif"
+                     alt="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>"
+                     title="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>">
+            </c:when>
+            <c:when test="${eventCRF.stage.doubleDE}">
+                <img src="images/icon_DDE.gif" alt="<fmt:message key="double_data_entry" bundle="${resword}"/>"
+                     title="<fmt:message key="double_data_entry" bundle="${resword}"/>">
+            </c:when>
+            <c:when test="${eventCRF.stage.doubleDE_Complete}">
+                <img src="images/icon_DEcomplete.gif" alt="<fmt:message key="data_entry_complete" bundle="${resword}"/>"
+                     title="<fmt:message key="data_entry_complete" bundle="${resword}"/>">
+            </c:when>
+            <c:when test="${eventCRF.stage.admin_Editing}">
+                <img src="images/icon_AdminEdit.gif"
+                     alt="<fmt:message key="administrative_editing" bundle="${resword}"/>" title="<fmt:message key="administrative_editing" bundle="${resword}"/>">
+            </c:when>
+            <c:when test="${eventCRF.stage.locked}">
+                <img src="images/icon_Locked.gif" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>">
+            </c:when>
+            <c:when test="${eventCRF.stage.invalid}">
+                <img src="images/icon_Invalid.gif" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>">
+            </c:when>
+            <c:otherwise>
+              
+            </c:otherwise>
+        </c:choose></b> &nbsp;&nbsp; <c:out value="${studySubject.label}" />&nbsp;&nbsp; <c:out value="${studyTitle}" /></span></h1>
+	<%--</div>--%>
 
 <form id="mainForm" name="crfForm" method="POST" action="AdministrativeEditing">
 <input type="hidden" name="eventCRFId" value="<c:out value="${section.eventCRF.id}"/>" />
