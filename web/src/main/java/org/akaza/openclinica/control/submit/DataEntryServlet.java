@@ -1111,11 +1111,11 @@ public abstract class DataEntryServlet extends SecureController {
             section = populateNotesWithDBNoteCounts(discNotes, section);
             // logger.debug("+++ try to populate notes, got count of field notes: " + discNotes.getFieldNotes().toString());
 
-            if (currentStudy.getStudyParameterConfig().getInterviewerNameRequired().equals("true")) {
+            if (currentStudy.getStudyParameterConfig().getInterviewerNameRequired().equals("yes")) {
                 v.addValidation(INPUT_INTERVIEWER, Validator.NO_BLANKS);
             }
 
-            if (currentStudy.getStudyParameterConfig().getInterviewDateRequired().equals("true")) {
+            if (currentStudy.getStudyParameterConfig().getInterviewDateRequired().equals("yes")) {
                 v.addValidation(INPUT_INTERVIEW_DATE, Validator.NO_BLANKS);
             }
 
