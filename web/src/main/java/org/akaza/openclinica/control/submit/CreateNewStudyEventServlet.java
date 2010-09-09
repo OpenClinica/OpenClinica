@@ -275,6 +275,10 @@ public class CreateNewStudyEventServlet extends SecureController {
             //v.addValidation(INPUT_LOCATION, Validator.NO_BLANKS);
             v.addValidation(INPUT_STUDY_SUBJECT_LABEL, Validator.NO_BLANKS);
             v.addValidation(INPUT_LOCATION, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
+            if(currentStudy.getStudyParameterConfig().getEventLocationRequired().equalsIgnoreCase("required")){
+                v.addValidation(INPUT_LOCATION, Validator.NO_BLANKS);
+            }
+
             v.alwaysExecuteLastValidation(INPUT_LOCATION);
 
             boolean hasScheduledEvent = false;
