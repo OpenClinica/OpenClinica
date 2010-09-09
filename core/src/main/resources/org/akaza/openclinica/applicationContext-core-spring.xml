@@ -17,11 +17,13 @@
      />
      
      <util:properties id="dataInfo" location="classpath:datainfo.properties"/>
+     <util:properties id="extractInfo" location="classpath:extract.properties"/>
      <util:properties id="oracle" location="classpath:oracle.properties"/>
      <util:properties id="enterpriseInfo" location="classpath:enterprise.properties"/>
      
      <bean id="coreResources" class="org.akaza.openclinica.dao.core.CoreResources">
         <property name="dataInfo" ref="dataInfo"/>
+        <property name="extractInfo" ref="extractInfo"/>
      </bean>
      
      <!-- ENABLING THIS WILL ACTIVATE I18N VIA SPRING -->
