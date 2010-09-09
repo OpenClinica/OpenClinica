@@ -94,11 +94,13 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     @Override
     protected void configureColumns(TableFacade tableFacade, Locale locale) {
 
-        tableFacade.setColumnProperties("studySubject.label", "discrepancyNoteBean.disType", "discrepancyNoteBean.resolutionStatus", "age", "days",
-                "siteId", "discrepancyNoteBean.createdDate", "discrepancyNoteBean.updatedDate", "eventName",
-                "eventStartDate", "crfName", "entityName", "entityValue", "discrepancyNoteBean.description", "discrepancyNoteBean.detailedNotes",
+        tableFacade.setColumnProperties("studySubject.label", "discrepancyNoteBean.disType",
+                "discrepancyNoteBean.resolutionStatus", "siteId", "discrepancyNoteBean.createdDate",
+                "discrepancyNoteBean.updatedDate", "age", "days", "eventName",
+                "eventStartDate", "crfName", "entityName", "entityValue", "discrepancyNoteBean.entityType",
+                "discrepancyNoteBean.description", "discrepancyNoteBean.detailedNotes",
                 "numberOfNotes", "discrepancyNoteBean.user",
-                "discrepancyNoteBean.entityType", "discrepancyNoteBean.owner", "actions");
+                 "discrepancyNoteBean.owner", "actions");
         Row row = tableFacade.getTable().getRow();
         configureColumn(row.getColumn("studySubject.label"), resword.getString("study_subject_ID"), null, null, true, true);
         configureColumn(row.getColumn("discrepancyNoteBean.createdDate"), resword.getString("date_created"), new DateCellEditor(getDateFormat()), null, true,
