@@ -45,7 +45,7 @@
 </head>
 <body class="aka_bodywidth" onload="
         <c:if test='${popUpURL != ""}'>
-        openDNoteWindow('<c:out value="${popUpURL}" />');</c:if>" onunload="javascript:clsWin();">
+        openDNoteWindow('<c:out value="${popUpURL}" />');</c:if>document.getElementById('CRF_infobox_closed').style.display='block';document.getElementById('CRF_infobox_open').style.display='none'" onunload="javascript:clsWin();">
 
 <%-- BWP:
  onload=
@@ -103,9 +103,9 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
               
             </c:otherwise>
         </c:choose></b> &nbsp;&nbsp; <c:out value="${studySubject.label}" />&nbsp;&nbsp; <c:out value="${studyTitle}" /></span></h1>
-	<%--</div>--%>
+<%--</div>--%>
 
-<form id="mainForm" name="crfForm" method="POST" action="AdministrativeEditing">
+<form id="mainForm" name="crfForm" method="POST" action="AdministrativeEditing" onLoad="javascript:leftnavExpand('CRF_infobox_open');"> 
 <input type="hidden" name="eventCRFId" value="<c:out value="${section.eventCRF.id}"/>" />
 <input type="hidden" name="sectionId" value="<c:out value="${section.section.id}"/>" />
 <input type="hidden" name="checkInputs" value="<c:out value="${checkInputsValue}"/>" />
