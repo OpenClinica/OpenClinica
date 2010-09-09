@@ -271,6 +271,9 @@ public class AddNewSubjectServlet extends SecureController {
             if (fp.getBoolean("addWithEvent")) {
                 v.addValidation(INPUT_EVENT_START_DATE, Validator.IS_A_DATE);
                 v.alwaysExecuteLastValidation(INPUT_EVENT_START_DATE);
+                if(currentStudy.getStudyParameterConfig().getEventLocationRequired().equalsIgnoreCase("required")){
+                    v.addValidation("location", Validator.NO_BLANKS);
+                }
             }
 
             HashMap errors = v.validate();
