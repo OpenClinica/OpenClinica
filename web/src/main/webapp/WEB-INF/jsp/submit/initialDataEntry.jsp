@@ -53,6 +53,7 @@
 	</c:otherwise>
 </c:choose>
 
+<table width="75%"><tr><td>
 <h1><span class="title_manage"> <b> <c:out value="${toc.crf.name}" /> <c:out value="${toc.crfVersion.name}" />
          <c:choose>
             <c:when test="${eventCRF.stage.initialDE}">
@@ -84,12 +85,13 @@
                 <img src="images/icon_Invalid.gif" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>">
             </c:when>
             <c:otherwise>
- 
+              
             </c:otherwise>
-        </c:choose></b> &nbsp;&nbsp; <c:out value="${studySubject.label}" />&nbsp;&nbsp; <c:out value="${studyTitle}" /></span></h1>
+        </c:choose></b>  &nbsp;&nbsp;</span> </h1> </td><td>
+		<h1><span class="title_manage"> <c:out value="${studySubject.label}" />&nbsp;&nbsp; </span></h1></td></tr></table>
 </div>
 
-<form name="crfForm" method="POST" action="InitialDataEntry">
+<form name="crfForm" method="POST" action="InitialDataEntry" onLoad = document.getElementById('CRF_infobox_closed').style.display='block';document.getElementById('CRF_infobox_open').style.display='none'" >
 <input type="hidden" name="eventCRFId" value="<c:out value="${section.eventCRF.id}"/>" />
 <input type="hidden" name="sectionId" value="<c:out value="${section.section.id}"/>" />
 <input type="hidden" name="checkInputs" value="<c:out value="${checkInputsValue}"/>" />

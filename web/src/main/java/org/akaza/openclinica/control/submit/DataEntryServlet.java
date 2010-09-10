@@ -503,7 +503,8 @@ public abstract class DataEntryServlet extends SecureController {
         if (study.getParentStudyId() > 0) {
             // this is a site,find parent
             StudyBean parentStudy = (StudyBean) studydao.findByPK(study.getParentStudyId());
-            request.setAttribute("studyTitle", parentStudy.getName() + " - " + study.getName());
+            request.setAttribute("studyTitle", study.getName());
+            request.setAttribute("siteTitle",parentStudy.getName() );
         } else {
             request.setAttribute("studyTitle", study.getName());
         }

@@ -68,7 +68,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
         <c:set var="checkInputsValue" value="0" />
     </c:otherwise>
 </c:choose>
-
+<table width="75%"><tr><td>
 <h1><span class="title_manage"> <b> <c:out value="${toc.crf.name}" /> <c:out value="${toc.crfVersion.name}" />
          <c:choose>
             <c:when test="${eventCRF.stage.initialDE}">
@@ -102,7 +102,8 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
             <c:otherwise>
               
             </c:otherwise>
-        </c:choose></b> &nbsp;&nbsp; <c:out value="${studySubject.label}" />&nbsp;&nbsp; <c:out value="${studyTitle}" /></span></h1>
+        </c:choose></b>  &nbsp;&nbsp;</span> </h1> </td><td>
+		<h1><span class="title_manage"> <c:out value="${studySubject.label}" />&nbsp;&nbsp; </span></h1></td></tr></table>
 <%--</div>--%>
 
 <form id="mainForm" name="crfForm" method="POST" action="AdministrativeEditing" onLoad="javascript:leftnavExpand('CRF_infobox_open');"> 

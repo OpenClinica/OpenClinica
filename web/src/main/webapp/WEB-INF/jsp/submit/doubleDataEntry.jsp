@@ -48,7 +48,7 @@
     <script type="text/JavaScript" language="JavaScript" src="includes/effects.js"></script>
 
 </head>
-<body class="aka_bodywidth" onunload="javascript:clsWin();">
+<body class="aka_bodywidth" onload=document.getElementById('CRF_infobox_closed').style.display='block';document.getElementById('CRF_infobox_open').style.display='none'"  onunload="javascript:clsWin();">
 <%-- BWP:  onload=
   "if(! detectFirefoxWindows(navigator.userAgent)){document.getElementById('centralContainer').style.display='none';new Effect.Appear('centralContainer', {duration:1});} TabsForwardByNum(<c:out value="${tabId}"/>);"
   alert(self.screen.availWidth);
@@ -69,6 +69,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
     </c:otherwise>
 </c:choose>
 
+<table width="75%"><tr><td>
 <h1><span class="title_manage"> <b> <c:out value="${toc.crf.name}" /> <c:out value="${toc.crfVersion.name}" />
          <c:choose>
             <c:when test="${eventCRF.stage.initialDE}">
@@ -100,9 +101,10 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                 <img src="images/icon_Invalid.gif" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>">
             </c:when>
             <c:otherwise>
-            
+              
             </c:otherwise>
-        </c:choose></b> &nbsp;&nbsp; <c:out value="${studySubject.label}" />&nbsp;&nbsp; <c:out value="${studyTitle}" /></span></h1>
+        </c:choose></b>  &nbsp;&nbsp;</span> </h1> </td><td>
+		<h1><span class="title_manage"> <c:out value="${studySubject.label}" />&nbsp;&nbsp; </span></h1></td></tr></table>
 <%--</div>--%>
 
 <form id="mainForm" name="crfForm" method="POST" action="DoubleDataEntry">
