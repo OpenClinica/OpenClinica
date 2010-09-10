@@ -66,17 +66,31 @@ public class CoreResources implements ResourceLoaderAware {
         int i = 1;
         while (!getExtractField("xsl.file." + i).equals("")) {
             epbean.setFileName(getExtractField("xsl.file." + i));
+            // file name of the xslt stylesheet
             epbean.setFiledescription(getExtractField("xsl.file.description." + i));
+            // description of the choice of format
             epbean.setHelpText(getExtractField("xsl.helptext." + i));
+            // help text, currently in the alt-text of the link
             epbean.setLinkText(getExtractField("xsl.link.text." + i));
+            // link text of the choice of format
             epbean.setRolesAllowed(getExtractField("xsl.allowed." + i).split(","));
+            // which roles are allowed to see the choice?
             epbean.setFileLocation(getExtractField("xsl.location." + i));
+            // destination of the copied files
             epbean.setExportFileName(getExtractField("xsl.exportname." + i));
+            // destination file name of the copied files
             String whichFunction = getExtractField("xsl.post." + i).toLowerCase();
+            // post-processing event after the creation
             // System.out.println("found post function: " + whichFunction);
             if ("sql".equals(whichFunction)) {
-                // should we set the bean within, so that we can access the file locations etc?
-                epbean.setPostProcessing(new SqlProcessingFunction());
+                // set the bean within, so that we can access the file locations etc
+            	SqlProcessingFunction function = new SqlProcessingFunction(epbean);
+            	function.setDatabaseType(getExtractField("xsl.dataBase." + i));
+            	function.setDatabaseUrl(getExtractField("xsl.url." + i));
+            	function.setDatabaseUsername(getExtractField("xsl.username." + i));
+            	function.setDatabasePassword(getExtractField("xsl.password." + i));
+            	// also pre-set the database connection stuff
+                epbean.setPostProcessing(function);
             } else if ("pdf".equals(whichFunction)) {
                 // TODO add other functions here
                 epbean.setPostProcessing(new PdfProcessingFunction());
