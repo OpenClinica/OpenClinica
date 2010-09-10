@@ -65,6 +65,8 @@ public class CoreResources implements ResourceLoaderAware {
         ExtractPropertyBean epbean = new ExtractPropertyBean();
         int i = 1;
         while (!getExtractField("xsl.file." + i).equals("")) {
+        	epbean.setId(i);
+        	// we will implement a find by id function in the front end
             epbean.setFileName(getExtractField("xsl.file." + i));
             // file name of the xslt stylesheet
             epbean.setFiledescription(getExtractField("xsl.file.description." + i));

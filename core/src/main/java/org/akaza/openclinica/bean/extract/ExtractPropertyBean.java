@@ -22,6 +22,7 @@ public class ExtractPropertyBean {
     private String fileLocation;
     private String exportFileName;
     private String[] rolesAllowed;
+    private int id;
     private ProcessingFunction postProcessing;
     
     public ExtractPropertyBean() {
@@ -31,6 +32,7 @@ public class ExtractPropertyBean {
         helpText = "";
         fileLocation = "";
         exportFileName = "";
+        id = 0;
     }
     
     public String getFileName() {
@@ -39,7 +41,15 @@ public class ExtractPropertyBean {
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
-    public String getFiledescription() {
+    public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getFiledescription() {
         return filedescription;
     }
     public void setFiledescription(String filedescription) {

@@ -28,21 +28,22 @@ public class SqlProcessingFunction extends ProcessingFunction {
      * the run function will find the file name, run the SQL on the assigned
      * db, and make sure the datamart is assembled correctly.
      * 
-     * now theres the thing, do we send the datasource into the object?
-     * probably not since it could be a separate DB
+     * 
+     * 
      */
     public void run() {
     	try {
     		// load the proper database class below
     		if ("postgres".equals(databaseType)) {
-    			Class.forName("");
+    			Class.forName("org.postgresql.Driver");
     		} else {
-    			Class.forName("");
+    			Class.forName("oracle.jdbc.driver.OracleDriver");
     		}
     		Connection conn = 
     			DriverManager.getConnection(databaseUrl, databaseUsername, databasePassword);
     		Statement stmt = conn.createStatement();
     		// and then execute the statement here
+    		
     	} catch (Exception e) {
 
     	}
