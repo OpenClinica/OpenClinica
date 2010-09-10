@@ -87,12 +87,18 @@ public class CoreResources implements ResourceLoaderAware {
             if ("sql".equals(whichFunction)) {
                 // set the bean within, so that we can access the file locations etc
             	SqlProcessingFunction function = new SqlProcessingFunction(epbean);
-            	function.setDatabaseType(getExtractField("xsl.dataBase." + i));
-            	function.setDatabaseUrl(getExtractField("xsl.url." + i));
-            	function.setDatabaseUsername(getExtractField("xsl.username." + i));
-            	function.setDatabasePassword(getExtractField("xsl.password." + i));
+            	String whichSettings = getExtractField("xsl.post." + i + ".sql");
+            	if (!"".equals(whichSettings)) { 
+            		function.setDatabaseType(getExtractField(whichSettings + ".dataBase"));
+            		function.setDatabaseUrl(getExtractField(whichSettings + ".url"));
+            		function.setDatabaseUsername(getExtractField(whichSettings + ".username"));
+            		function.setDatabasePassword(getExtractField(whichSettings + ".password"));
+            	} else {
+            		// set default db settings here, somehow
+            	}
             	// also pre-set the database connection stuff
                 epbean.setPostProcessing(function);
+                // System.out.println("found db password: " + function.getDatabasePassword());
             } else if ("pdf".equals(whichFunction)) {
                 // TODO add other functions here
                 epbean.setPostProcessing(new PdfProcessingFunction());
