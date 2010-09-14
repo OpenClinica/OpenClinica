@@ -5,6 +5,7 @@ import org.akaza.openclinica.bean.service.SqlProcessingFunction;
 import org.akaza.openclinica.bean.service.PdfProcessingFunction;
 import org.akaza.openclinica.bean.service.SasProcessingFunction;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.springframework.context.MessageSource;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -29,7 +30,8 @@ public class CoreResources implements ResourceLoaderAware {
 
     private Properties dataInfo;
     private Properties extractInfo;
-    private ArrayList<ExtractPropertyBean> extractProperties;
+    private MessageSource messageSource;
+    private static ArrayList<ExtractPropertyBean> extractProperties;
 
     public void setResourceLoader(ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
@@ -51,7 +53,15 @@ public class CoreResources implements ResourceLoaderAware {
         return resourceLoader;
     }
 
-    public ArrayList<ExtractPropertyBean> getExtractProperties() {
+    public MessageSource getMessageSource() {
+        return messageSource;
+    }
+
+    public void setMessageSource(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
+
+    public static ArrayList<ExtractPropertyBean> getExtractProperties() {
         return extractProperties;
     }
 
@@ -62,9 +72,10 @@ public class CoreResources implements ResourceLoaderAware {
     private ArrayList<ExtractPropertyBean> findExtractProperties() {
         ArrayList<ExtractPropertyBean> ret = new ArrayList<ExtractPropertyBean>();
         
-        ExtractPropertyBean epbean = new ExtractPropertyBean();
+        // ExtractPropertyBean epbean = new ExtractPropertyBean();
         int i = 1;
         while (!getExtractField("xsl.file." + i).equals("")) {
+            ExtractPropertyBean epbean = new ExtractPropertyBean();
         	epbean.setId(i);
         	// we will implement a find by id function in the front end
             epbean.setFileName(getExtractField("xsl.file." + i));
@@ -106,12 +117,13 @@ public class CoreResources implements ResourceLoaderAware {
                 epbean.setPostProcessing(new SasProcessingFunction());
             } else {
                 // add a null here?
+                epbean.setPostProcessing(null);
             }
             ret.add(epbean);
             i++;
         }
 
-        // System.out.println("found " + ret.size() + " records in extract.properties");
+        System.out.println("found " + ret.size() + " records in extract.properties");
         return ret;
     }
 
@@ -175,12 +187,22 @@ public class CoreResources implements ResourceLoaderAware {
 
     }
     
+    // TODO internationalize
     public static String getExtractField(String key) {
         String value = EXTRACTINFO.getProperty(key);
         if (value != null) {
             value = value.trim();
         }
         return value == null ? "" : value;
+    }
+    
+    public ExtractPropertyBean findExtractPropertyBeanById(int id) {
+        for (ExtractPropertyBean epbean : extractProperties) {
+            if (epbean.getId() == id) {
+                return epbean;
+            }
+        }
+        return null;
     }
 
     public Properties getDataInfo() {
