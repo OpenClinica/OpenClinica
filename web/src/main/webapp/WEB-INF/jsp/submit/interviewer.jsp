@@ -1,6 +1,9 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions"
+    prefix="fn" %>
+
 
 <jsp:useBean scope="request" id="section" class="org.akaza.openclinica.bean.submit.DisplaySectionBean" />
 <jsp:useBean scope="request" id="displayItem" class="org.akaza.openclinica.bean.submit.DisplayItemBean" />
@@ -8,7 +11,8 @@
 <jsp:useBean scope='request' id='exitTo' class='java.lang.String'/>
 <jsp:useBean scope='request' id='nameNotes' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='intrvDates' class='java.util.ArrayList'/>
-
+<jsp:useBean scope='request' id='existingNameNotes' class='java.util.ArrayList'/>
+<jsp:useBean scope='request' id='existingIntrvDateNotes' class='java.util.ArrayList'/>
 
 
 <script type="text/javascript" src="includes/wz_tooltip/wz_tooltip.js"></script>
@@ -55,7 +59,7 @@ var closing = true;
        jQuery("select").click(function(event){
            closing = false;
         });
-       jquery('.CRF_infobox_closed').show();
+       //jquery('.CRF_infobox_closed').show();
       
      //  jQuery('#nameNote1').mouseover(function(event){
        //  jQuery.getJSON("InitialDataEntry",{ name:0 },function(discrepancyNote){
@@ -75,6 +79,9 @@ var closing = true;
     	  var detailedNotes= new Array();
     	  var discrepancyType = new Array();
     	  var updatedDates = new Array();
+		   var parentDnids = new Array();
+		   var totNotes = 0;
+		   var footNote = "Click on main window to create Discrepancy Notes";
     	  var i=0;
     	  var discNotes = new Array();
     	  var title = 'Notes and Discrepancies';
@@ -85,9 +92,12 @@ var closing = true;
     	     		detailedNotes[i]= '<c:out value="${discrepancyNoteBeans.description}"/>';   			
     	  			discrepancyType[i] = '<c:out value="${discrepancyNoteBeans.disType.name}"/>';
     	  			updatedDates[i]= '<c:out value="${discrepancyNoteBeans.createdDate}"/>';
+					parentDnids[i] = '<c:out value="${discrepancyNoteBeans.parentDnId}"/>';
     	  			i++;
     	  	 	</c:forEach>
     	  	 	title = "Interviewer Name";
+				totNotes = ${fn:length(existingNameNotes)};
+				if(totNotes >0) footNote = 'Click on the flag in the main window to view '+ totNotes+' Notes ' ;
     	     	}
     	   	else if(flag =='dateNotes')
     	     {
@@ -96,51 +106,85 @@ var closing = true;
     	     		detailedNotes[i]= '<c:out value="${discrepancyNoteBeans.description}"/>';   			
     	  			discrepancyType[i] = '<c:out value="${discrepancyNoteBeans.disType.name}"/>';
     	  			updatedDates[i]= '<c:out value="${discrepancyNoteBeans.createdDate}"/>';
+					parentDnids[i] = '<c:out value="${discrepancyNoteBeans.parentDnId}"/>';
     	  			i++;
     	     	</c:forEach>
     	   title = "Interview Date";
+		   totNotes = ${fn:length(existingIntrvDateNotes)};
+		   
+	if(totNotes >0) footNote = 'Click on the flag in the main window to view '+ totNotes+' Notes ' ;
     	   }
     	
+	
     		   var htmlgen = 
 		 	          '<div class=\"tooltip\">'+
 		 	          '<table  width="250">'+
 		 	          ' <tr><td  align=\"center\" class=\"header1\">'+title +
 		 	          ' </td></tr><tr></tr></table><table  style="border-collapse:collapse" cellspacing="0" cellpadding="0" width="225" >'+
-		 	          drawRows(i,resStatus,detailedNotes,discrepancyType,updatedDates)+
+		 	          drawRows(i,resStatus,detailedNotes,discrepancyType,updatedDates,parentDnids)+
 		 	          '</table><table width="250"  class="tableborder" align="left">'+  	
 		 	          '</table><table><tr></tr></table>'+
-		 	          '<table width="200"><tbody><td height="50" colspan="3"><span class=\"note\">'+
-		 	          'Click on the flag in the main window for more details. </span>'+
+		 	          '<table width="200"><tbody><td height="50" colspan="3">'+						
+						'<span class=\"note\">'+footNote +'</span>'+
+						
+						
+		 	          
+		 	         
 		 	          '</td></tr></tbody></table></table></div>';
 		  return htmlgen;
     }
     
-      function drawRows(i,resStatus,detailedNotes,discrepancyType,updatedDates)
+      function drawRows(i,resStatus,detailedNotes,discrepancyType,updatedDates,parentDnIds)
       {
      	var row = '';
      	var noteType = '';
      		for(var x=0;x<i;x++)
      		{
      		
-     		
+     	
      			if(resStatus[x]=='1')
      			{
+				if(parentDnIds[x] == '0')
+					{
+						row+='<tr> <td class=\"label\"></td><td colspan = "3" class=\"borderlabel\" nowrap >&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
+					}
+				else
      				row+='<tr> <td class=\"label\"><img src="images/icon_Note.gif" width="16" height="13" alt="Note"></td>'+'<td  width="180" align="left" class=\"label\" nowrap>&nbsp;New: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td class=\"borderlabel\" nowrap >&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
      			}
      			else if(resStatus[x]=='2')
      			{
+				if(parentDnIds[x] == '0')
+					{
+						row+='<tr> <td class=\"label\"></td><td colspan = "3" class=\"borderlabel\" nowrap >&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
+					}
+				else
      				row+='<tr > <td  class=\"label\"><img src="images/icon_flagYellow.gif" width="16" height="13" alt="Note"></td>'+'<td width="180"  align="left" class=\"label\" nowrap>&nbsp;Updated: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td  class=\"borderlabel\" nowrap>&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
      			}
      			else if(resStatus[x]=='3')
      			{
-     				row+='<tr> <td class=\"label\"><img src="images/icon_flagGreen.gif" width="16" height="13" alt="Note"></td>'+'<td  width="180"  align="left" class=\"label\" nowrap>&nbsp;Res.Proposed: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td  class=\"borderlabel\" nowrap>&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
+     				if(parentDnIds[x] == '0')
+					{
+						row+='<tr> <td class=\"label\"></td><td colspan = "3" class=\"borderlabel\" nowrap >&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
+					}
+				else
+					row+='<tr> <td class=\"label\"><img src="images/icon_flagGreen.gif" width="16" height="13" alt="Note"></td>'+'<td  width="180"  align="left" class=\"label\" nowrap>&nbsp;Res.Proposed: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td  class=\"borderlabel\" nowrap>&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
      			}
      			else if(resStatus[x]=='4')
      			{
+				if(parentDnIds[x] == '0')
+					{
+						row+='<tr> <td class=\"label\"></td><td colspan = "3" class=\"borderlabel\" nowrap >&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
+					}
+				else
      				row+='<tr> <td  class=\"label\"><img src="images/icon_flagBlack.gif" width="16" height="13" alt="Note"></td>'+'<td  width="180" align="left" class=\"label\" nowrap>&nbsp;Closed: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td class=\"borderlabel\" nowrap>&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
      			}
      			else if(resStatus[x]=='5')
      		{
+			if(parentDnIds[x] == '0')
+					{
+						row+='<tr> <td class=\"label\"></td><td colspan = "3" class=\"borderlabel\" nowrap >&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
+					}
+				else
      			row+='<tr> <td width="16"  class=\"label\"><img src="images/icon_flagWhite.gif" width="16" height="13" alt="Note"></td>'+'<td width="180"  align="left" class=\"label\" nowrap>&nbsp;N/A: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td class=\"borderlabel\" nowrap>&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
      			}
      			
