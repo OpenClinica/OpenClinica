@@ -112,6 +112,7 @@
   <td class="table_header_row"><fmt:message key="repeat_number" bundle="${resword}"/></td>
   <td class="table_header_row"><fmt:message key="repeat_max" bundle="${resword}"/></td>
   <td class="table_header_row">Is shown?</td>
+  <td class="table_header_row"><fmt:message key="group_layout" bundle="${resword}"/></td>    
  </tr>
  <c:forEach var ="group" items="${section.groups}">
   <tr valign="top">
@@ -130,6 +131,16 @@
       </c:otherwise>
       </c:choose>
    </td>
+      <td class="table_cell">
+         <c:choose>
+         <c:when test="${group.meta.repeatingGroup==true}">
+          <fmt:message key="repeating" bundle="${resword}"/>
+         </c:when>
+         <c:otherwise>
+           <fmt:message key="non_repeating" bundle="${resword}"/>
+         </c:otherwise>
+         </c:choose>
+      </td>
   </tr>
   </c:forEach>
  </table>
