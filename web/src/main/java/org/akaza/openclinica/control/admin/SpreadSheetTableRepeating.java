@@ -1714,7 +1714,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             cellNo = 1;
                             cell = sheet.getRow(gk).getCell((short) cellNo);
                             try {
-                                isRepeatingGroup = cell.getBooleanCellValue();
+                                isRepeatingGroup = getValue(cell).equalsIgnoreCase("grid");
                                 newVersionCrf = true;
                             } catch (Exception eee) {
                                 errors.add(resPageMsg.getString("repeating_group_error"));
