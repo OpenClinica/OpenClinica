@@ -34,7 +34,7 @@ public class OdmUnit {
     protected static HashMap<String, String> nullValueMap = new HashMap<String, String>();
     private String parentMetaDataVersionOid;
     private String parentOdmStudyOid; // ODM Study element OID
-    // 0: default; 1: one Study Element; 2: one parent study and its sites
+    // 0: one Study Element; 1: one parent study and its sites
     private int category;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());

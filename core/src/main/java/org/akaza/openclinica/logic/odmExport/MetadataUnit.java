@@ -31,6 +31,7 @@ import org.akaza.openclinica.bean.odmbeans.RangeCheckBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.dao.extract.OdmExtractDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 
 /**
@@ -108,7 +109,10 @@ public class MetadataUnit extends OdmUnit {
         }
 
         StudyBean study = studyBase.getStudy();
+        StudyConfigService studyConfig = new StudyConfigService(this.ds);
+        study = studyConfig.setParametersForStudy(study);
         MetaDataVersionBean metadata = this.odmStudy.getMetaDataVersion();
+        metadata.setStudy(study);
 
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(this.ds);
         int parentId = study.getParentStudyId()>0 ? study.getParentStudyId() : study.getId();

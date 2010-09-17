@@ -9,15 +9,15 @@
 
 package org.akaza.openclinica.logic.odmExport;
 
-import org.akaza.openclinica.bean.extract.DatasetBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.odmbeans.MetaDataVersionProtocolBean;
-import org.akaza.openclinica.bean.odmbeans.OdmStudyBean;
-
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import javax.sql.DataSource;
+
+import org.akaza.openclinica.bean.extract.DatasetBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.odmbeans.MetaDataVersionProtocolBean;
+import org.akaza.openclinica.bean.odmbeans.OdmStudyBean;
 
 /**
  * Populate metadata for a ODM XML file. It supports:
@@ -71,6 +71,7 @@ public class MetaDataCollector extends OdmDataCollector {
             meta.collectOdmStudy();
             if (this.getCategory() == 1) {
                 if (study.isSite(study.getParentStudyId())) {
+                    meta.getOdmStudy().setParentStudyOID(meta.getParentOdmStudyOid());
                     MetaDataVersionProtocolBean p = meta.getOdmStudy().getMetaDataVersion().getProtocol();
                     if (p != null && p.getStudyEventRefs().size() > 0) {
                     } else {
