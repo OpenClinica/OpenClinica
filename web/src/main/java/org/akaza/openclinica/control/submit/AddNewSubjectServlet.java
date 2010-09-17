@@ -268,11 +268,13 @@ public class AddNewSubjectServlet extends SecureController {
             v.alwaysExecuteLastValidation(INPUT_ENROLLMENT_DATE);
             v.addValidation(INPUT_ENROLLMENT_DATE, Validator.DATE_IN_PAST);
 
+            boolean locationError = false;
             if (fp.getBoolean("addWithEvent")) {
                 v.addValidation(INPUT_EVENT_START_DATE, Validator.IS_A_DATE);
                 v.alwaysExecuteLastValidation(INPUT_EVENT_START_DATE);
                 if(currentStudy.getStudyParameterConfig().getEventLocationRequired().equalsIgnoreCase("required")){
                     v.addValidation("location", Validator.NO_BLANKS);
+                    locationError = true;
                 }
             }
 
@@ -417,6 +419,10 @@ public class AddNewSubjectServlet extends SecureController {
             if (!errors.isEmpty()) {
 
                 addPageMessage(respage.getString("there_were_some_errors_submission"));
+                if(locationError){
+                    addPageMessage(respage.getString("location_blank_error"));
+                }
+                
                 setInputMessages(errors);
                 fp.addPresetValue(INPUT_DOB, fp.getString(INPUT_DOB));
                 fp.addPresetValue(INPUT_YOB, fp.getString(INPUT_YOB));

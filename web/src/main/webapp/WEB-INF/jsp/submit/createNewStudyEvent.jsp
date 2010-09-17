@@ -315,6 +315,9 @@
         </td>
     </tr>
     </c:if>
+    <c:if test="${study.studyParameterConfig.eventLocationRequired == 'not_used'}">
+        <input type="hidden" name="location" value="">
+    </c:if>
 </table>
 
 </div>
@@ -398,6 +401,9 @@
 			</table>
 		</td>
 	</tr>
+    </c:if>
+    <c:if test="${study.studyParameterConfig.eventLocationRequired == 'not_used'}">
+        <input type="hidden" name="location" value="">
     </c:if>
 	<tr>
 		<td class="formlabel"><fmt:message key="start_date_time" bundle="${resword}"/>:</td>
@@ -517,6 +523,10 @@
 		</td>
 	</tr>
     </c:if>
+    <c:if test="${study.studyParameterConfig.eventLocationRequired == 'not_used'}">
+        <input type="hidden" name="location" value="">
+    </c:if>
+    
 	<tr>
 		<td class="formlabel"><fmt:message key="start_date_time" bundle="${resword}"/>:</td>
 	  	<td valign="top">
@@ -636,6 +646,10 @@
 		</td>
 	</tr>
     </c:if>
+    <c:if test="${study.studyParameterConfig.eventLocationRequired == 'not_used'}">
+        <input type="hidden" name="location" value="">
+    </c:if>
+
 	<tr>
 		<td class="formlabel"><fmt:message key="start_date_time" bundle="${resword}"/>:</td>
 	  	<td valign="top">
@@ -756,6 +770,10 @@
 		</td>
 	</tr>
     </c:if>
+    <c:if test="${study.studyParameterConfig.eventLocationRequired == 'not_used'}">
+        <input type="hidden" name="location" value="">
+    </c:if>
+
 	<tr>
 		<td class="formlabel"><fmt:message key="start_date_time" bundle="${resword}"/>:</td>
 	  	<td valign="top">
