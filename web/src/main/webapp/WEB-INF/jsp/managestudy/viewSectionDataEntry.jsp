@@ -52,8 +52,9 @@
 </head>
 <body class="aka_bodywidth" onload=
   "if(! detectFirefoxWindows(navigator.userAgent)){$document.getElementById('centralContainer').style.display='none';new Effect.Appear('centralContainer', {duration:1});};
-        document.getElementById('CRF_infobox_closed').style.display='block';document.getElementById('CRF_infobox_open').style.display='none'" <c:if test='${popUpURL != ""}'>
-		openDNoteWindow('<c:out value="${popUpURL}" />');</c:if>">
+        document.getElementById('CRF_infobox_closed').style.display='block';document.getElementById('CRF_infobox_open').style.display='none'
+        <c:if test='${popUpURL != ""}'>openDNoteWindow('<c:out value="${popUpURL}" />');</c:if>"
+
 <%-- BWP: TabsForwardByNum(<c:out value="${tabId}"/>)alert(self.screen.availWidth);
 margin-top:20px;margin-top:10px;document.getElementById('centralContainer').style.display='none';new Effect.Appear('centralContainer', {duration:1});updateTabs(<c:out value="${tabId}"/>);--%>
 
