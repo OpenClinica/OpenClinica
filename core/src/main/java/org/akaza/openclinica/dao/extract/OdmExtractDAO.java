@@ -7,7 +7,20 @@
  */
 package org.akaza.openclinica.dao.extract;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Set;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.DataEntryStage;
+import org.akaza.openclinica.bean.core.ResponseType;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.core.Utils;
@@ -21,9 +34,16 @@ import org.akaza.openclinica.bean.odmbeans.CodeListBean;
 import org.akaza.openclinica.bean.odmbeans.CodeListItemBean;
 import org.akaza.openclinica.bean.odmbeans.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.odmbeans.ElementRefBean;
+import org.akaza.openclinica.bean.odmbeans.EventDefinitionDetailsBean;
 import org.akaza.openclinica.bean.odmbeans.FormDefBean;
+import org.akaza.openclinica.bean.odmbeans.FormDetailsBean;
 import org.akaza.openclinica.bean.odmbeans.ItemDefBean;
+import org.akaza.openclinica.bean.odmbeans.ItemDetailsBean;
 import org.akaza.openclinica.bean.odmbeans.ItemGroupDefBean;
+import org.akaza.openclinica.bean.odmbeans.ItemGroupDetailsBean;
+import org.akaza.openclinica.bean.odmbeans.ItemGroupRepeatBean;
+import org.akaza.openclinica.bean.odmbeans.ItemPresentInFormBean;
+import org.akaza.openclinica.bean.odmbeans.ItemResponseBean;
 import org.akaza.openclinica.bean.odmbeans.MeasurementUnitBean;
 import org.akaza.openclinica.bean.odmbeans.MetaDataVersionBean;
 import org.akaza.openclinica.bean.odmbeans.MetaDataVersionProtocolBean;
@@ -32,6 +52,7 @@ import org.akaza.openclinica.bean.odmbeans.MultiSelectListBean;
 import org.akaza.openclinica.bean.odmbeans.MultiSelectListItemBean;
 import org.akaza.openclinica.bean.odmbeans.OdmAdminDataBean;
 import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
+import org.akaza.openclinica.bean.odmbeans.PresentInFormBean;
 import org.akaza.openclinica.bean.odmbeans.StudyEventDefBean;
 import org.akaza.openclinica.bean.odmbeans.StudyGroupClassListBean;
 import org.akaza.openclinica.bean.odmbeans.StudyGroupItemBean;
@@ -51,22 +72,11 @@ import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.logic.odmExport.ClinicalDataUnit;
 import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
 import org.akaza.openclinica.logic.odmExport.MetadataUnit;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Set;
-
-import javax.sql.DataSource;
 
 /**
  * Fetch odm data from database and load odm related classes.
@@ -114,6 +124,44 @@ public class OdmExtractDAO extends DatasetDAO {
         this.setTypeExpected(12, TypeNames.STRING);// null_values
         this.setTypeExpected(13, TypeNames.STRING);// crf_name
     }
+    
+    public void setStudyEventAndFormMetaOC1_3TypesExpected() {
+        this.unsetTypeExpected();
+        int i=1;
+        this.setTypeExpected(i, TypeNames.INT);// definition_order
+        ++i;
+        this.setTypeExpected(i, TypeNames.INT); // crf_order
+        ++i;
+        this.setTypeExpected(i, TypeNames.INT); // edc.crf_id
+        ++i;
+        this.setTypeExpected(i, TypeNames.INT); // cv.crf_version_id
+        ++i;
+        this.setTypeExpected(i, TypeNames.STRING);// definition_oid
+        ++i;
+        this.setTypeExpected(i, TypeNames.STRING);// cv_oid
+        ++i;
+        this.setTypeExpected(i, TypeNames.STRING);// description
+        ++i;
+        this.setTypeExpected(i, TypeNames.STRING);// category
+        ++i;
+        this.setTypeExpected(i, TypeNames.STRING);// version_description
+        ++i;
+        this.setTypeExpected(i, TypeNames.STRING);// revision_notes
+        ++i;
+        this.setTypeExpected(i, TypeNames.STRING);// crf_oid
+        ++i;
+        this.setTypeExpected(i, TypeNames.STRING);// null_values
+        ++i;
+        this.setTypeExpected(i, TypeNames.INT); //default_version_id
+        ++i;
+        this.setTypeExpected(i, TypeNames.BOOL); //electronic_signature
+        ++i;
+        this.setTypeExpected(i, TypeNames.BOOL);// double_entry
+        ++i;
+        this.setTypeExpected(i, TypeNames.BOOL);// hide_crf
+        ++i;
+        this.setTypeExpected(i, TypeNames.INT);// source_data_verification_code
+    }
 
     public void setItemDataMaxLengthTypesExpected() {
         this.unsetTypeExpected();
@@ -147,7 +195,35 @@ public class OdmExtractDAO extends DatasetDAO {
         this.setTypeExpected(22, TypeNames.STRING);// response_label
         this.setTypeExpected(23, TypeNames.STRING);// item_group_header
         this.setTypeExpected(24, TypeNames.STRING);// item_description
-        this.setTypeExpected(25, TypeNames.STRING);// mu_oid
+        this.setTypeExpected(25, TypeNames.INT);// section_id
+        this.setTypeExpected(26, TypeNames.STRING); // question_number_label
+        this.setTypeExpected(27, TypeNames.STRING);// mu_oid
+    }
+    
+    public void setItemGroupAndItemMetaOC1_3TypesExpected() {
+        this.unsetTypeExpected();
+        int i=1;    this.setTypeExpected(i, TypeNames.INT);// crf_id
+        ++i;    this.setTypeExpected(i, TypeNames.INT);// crf_version_id
+        ++i;    this.setTypeExpected(i, TypeNames.INT);// item_group_id
+        ++i;    this.setTypeExpected(i, TypeNames.INT);// item_id
+        ++i;    this.setTypeExpected(i, TypeNames.INT);// response_set_id
+        ++i;    this.setTypeExpected(i, TypeNames.STRING);// crf_version_oid
+        ++i;    this.setTypeExpected(i, TypeNames.STRING);// item_group_oid
+        ++i;    this.setTypeExpected(i, TypeNames.STRING);// item_oid
+        ++i;    this.setTypeExpected(i, TypeNames.STRING);// item_header
+        ++i;    this.setTypeExpected(i, TypeNames.STRING);// subheader
+        ++i;    this.setTypeExpected(i, TypeNames.INT);// section_id
+        ++i;    this.setTypeExpected(i, TypeNames.STRING);// left_item_text
+        ++i;    this.setTypeExpected(i, TypeNames.STRING);// right_item_text
+        ++i;    this.setTypeExpected(i, TypeNames.INT);// parent_id
+        ++i;    this.setTypeExpected(i, TypeNames.INT);// column_number
+        ++i;    this.setTypeExpected(i, TypeNames.STRING);// page_number_label
+        ++i;    this.setTypeExpected(i, TypeNames.STRING);// response_layout
+        ++i;    this.setTypeExpected(i, TypeNames.STRING);// default_value
+        ++i;    this.setTypeExpected(i, TypeNames.BOOL);// phi_status
+        ++i;    this.setTypeExpected(i, TypeNames.INT);// response_type_id
+        ++i;    this.setTypeExpected(i, TypeNames.INT);// repeat_number
+        ++i;    this.setTypeExpected(i, TypeNames.INT);// repeat_max
     }
 
     public void setSubjectEventFormDataTypesExpected() {
@@ -214,8 +290,6 @@ public class OdmExtractDAO extends DatasetDAO {
         this.setTypeExpected(7, TypeNames.INT);// item_data_ordinal
         this.setTypeExpected(8, TypeNames.STRING);// value
         this.setTypeExpected(9, TypeNames.INT);// item_data_type_id
-        // this.setTypeExpected(10, TypeNames.INT);// item_data_id
-        // this.setTypeExpected(11, TypeNames.INT); // ???
         this.setTypeExpected(10, TypeNames.STRING);// mu_oid
     }
 
@@ -450,6 +524,22 @@ public class OdmExtractDAO extends DatasetDAO {
         ++i;
         this.setTypeExpected(i, TypeNames.STRING); // discrepancy_note_type.name
     }
+    
+    public void setSectionLabelsTypesExpected() {
+        this.unsetTypeExpected();
+        int i = 1;
+        this.setTypeExpected(i, TypeNames.INT); // section_id
+        ++i;
+        this.setTypeExpected(i, TypeNames.STRING); // label
+    }
+    
+    public void setParentItemOIDsTypesExpected() {
+        this.unsetTypeExpected();
+        int i = 1;
+        this.setTypeExpected(i, TypeNames.INT); // item_id
+        ++i;
+        this.setTypeExpected(i, TypeNames.STRING); // item oc_oid
+    }
 
     public void getBasicDefinitions(int studyId, BasicDefinitionsBean basicDef) {
         ArrayList<MeasurementUnitBean> units = basicDef.getMeasurementUnits();
@@ -539,8 +629,26 @@ public class OdmExtractDAO extends DatasetDAO {
             }
         }
     }
+    
 
     public void getMetadata(int parentStudyId, int studyId, MetaDataVersionBean metadata, String odmVersion) {
+        if("oc1.3".equals(odmVersion)) {
+            if(metadata.getStudy().getParentStudyId() > 0) {
+                this.getOCMetadata(parentStudyId, studyId, metadata, odmVersion);
+            } else {
+                this.getMetadataOC1_3(parentStudyId, studyId, metadata, odmVersion);
+            }
+        } else if("oc1.2".equals(odmVersion)) {
+            this.getOCMetadata(parentStudyId, studyId, metadata, odmVersion);
+        } else {
+            this.getODMMetadata(parentStudyId, studyId, metadata, odmVersion);
+        }
+    }
+    
+    /**
+     * metadata for ODM extraction only
+     */
+    public void getODMMetadata(int parentStudyId, int studyId, MetaDataVersionBean metadata, String odmVersion) {
         String cvIds = "";
         HashMap<Integer, Integer> cvIdPoses = new HashMap<Integer, Integer>();
         this.setStudyEventAndFormMetaTypesExpected();
@@ -606,6 +714,7 @@ public class OdmExtractDAO extends DatasetDAO {
             }
         }
         cvIds = cvIds.substring(0, cvIds.length() - 1);
+        metadata.setCvIds(cvIds);
 
         HashMap<Integer, Integer> maxLengths = new HashMap<Integer, Integer>();
         this.setItemDataMaxLengthTypesExpected();
@@ -644,6 +753,7 @@ public class OdmExtractDAO extends DatasetDAO {
         String itMandatory = "No";
         int itOrder = 0;
         Integer igId = -1;
+        String sectionIds = ",";
         while (it.hasNext()) {
             HashMap row = (HashMap) it.next();
             Integer cId = (Integer) row.get("crf_id");
@@ -657,6 +767,7 @@ public class OdmExtractDAO extends DatasetDAO {
             String igName = (String) row.get("item_group_name");
             String itName = (String) row.get("item_name");
             Integer dataTypeId = (Integer) row.get("item_data_type_id");
+            Integer secId = (Integer) row.get("section_id");
             String header = (String) row.get("item_header");
             String left = (String) row.get("left_item_text");
             String right = (String) row.get("right_item_text");
@@ -670,6 +781,7 @@ public class OdmExtractDAO extends DatasetDAO {
             String rsLabel = (String) row.get("response_label");
             String igHeader = (String) row.get("item_group_header");
             String itDesc = (String) row.get("item_description");
+            String itQuesNum = (String) row.get("question_number_label");
             String muOid = (String) row.get("mu_oid");
             if (cvprev != cvId) {
                 // at this point, itemGroupRefs is for old cvId
@@ -768,6 +880,10 @@ public class OdmExtractDAO extends DatasetDAO {
             }
 
             String datatype = MetadataUnit.getOdmItemDataType(rsTypeId, dataTypeId, odmVersion);
+            if(sectionIds.contains(","+secId+",")) {
+            }else {
+                sectionIds += secId+",";
+            }
 
             if (!itdset.contains(itId)) {
                 itdset.add(itId);
@@ -789,7 +905,8 @@ public class OdmExtractDAO extends DatasetDAO {
                 }
                 // if(nullMap.containsKey(cvId)) {
                 // }
-                idef.getQuestion().setText(MetadataUnit.getItemQuestionText(header, left, right));
+                idef.getQuestion().setQuestionNumber(itQuesNum);
+                idef.getQuestion().getQuestion().setText(MetadataUnit.getItemQuestionText(header, left, right));
                 if (regexp != null && regexp.startsWith("func:")) {
                     idef.setRangeCheck(MetadataUnit.getItemRangeCheck(regexp.substring(5).trim(), metadata.getSoftHard(), regexpErr, muOid));
                 }
@@ -882,7 +999,21 @@ public class OdmExtractDAO extends DatasetDAO {
             String last = igMandatories.containsKey(igId + "") ? igMandatories.get(igId + "") : itMandatory;
             itemGroupRefs.get(itemGroupRefs.size() - 1).setMandatory(last);
         }
-
+        sectionIds = sectionIds.length()>0?sectionIds.substring(1, sectionIds.length()-1):"";
+        metadata.setSectionIds(sectionIds);
+    }
+    
+    /**
+     * Metadata for ODM_1.2 OpenClinica extension and partial ODM_1.3 OpenClinica extension 
+     * 
+     * @param parentStudyId
+     * @param studyId
+     * @param metadata
+     * @param odmVersion
+     */
+    public void getOCMetadata(int parentStudyId, int studyId, MetaDataVersionBean metadata, String odmVersion) {    
+        this.getODMMetadata(parentStudyId, studyId, metadata, odmVersion);
+        String cvIds = metadata.getCvIds();
         if (odmVersion.startsWith("oc")) {
             // add CRFVersions that itemDef belong to
             HashMap<String, String> itDefCVs = new HashMap<String, String>();
@@ -916,11 +1047,10 @@ public class OdmExtractDAO extends DatasetDAO {
 
             // add StudyGroupClassList
             this.setStudyGroupClassTypesExpected();
-            rows.clear();
             logger.debug("Begin to execute GetStudyGroupClassSql");
             logger.error("getStudyGroupClassSql=" + getStudyGroupClassSql(parentStudyId));
-            rows = select(this.getStudyGroupClassSql(parentStudyId));
-            it = rows.iterator();
+            ArrayList rows = select(this.getStudyGroupClassSql(parentStudyId));
+            Iterator it = rows.iterator();
             ArrayList<StudyGroupClassListBean> sgcLists = (ArrayList<StudyGroupClassListBean>) metadata.getStudyGroupClassLists();
             String sgcprev = "";
             while (it.hasNext()) {
@@ -956,6 +1086,161 @@ public class OdmExtractDAO extends DatasetDAO {
             }
         }
         // return nullClSet;
+    }
+    
+    public void getStudyEventAndFormMetaOC1_3(int parentStudyId, int studyId, MetaDataVersionBean metadata, String odmVersion, boolean isIncludedSite) {
+        ArrayList<StudyEventDefBean> seds = (ArrayList<StudyEventDefBean>)metadata.getStudyEventDefs();
+        ArrayList<FormDefBean> forms = (ArrayList<FormDefBean>)metadata.getFormDefs();
+        HashMap<String, EventDefinitionDetailsBean> sedDetails = new HashMap<String, EventDefinitionDetailsBean>();
+        HashMap<String, FormDetailsBean> formDetails = new HashMap<String, FormDetailsBean>();
+        this.setStudyEventAndFormMetaOC1_3TypesExpected();
+        logger.debug("Begin to execute GetStudyEventAndFormMetaOC1_3Sql");
+        logger.error("getStudyEventAndFormMetaOC1_3SQl= " + this.getStudyEventAndFormMetaOC1_3Sql(parentStudyId, studyId, isIncludedSite));
+        ArrayList rows = this.select(this.getStudyEventAndFormMetaOC1_3Sql(parentStudyId, studyId, isIncludedSite));
+        Iterator iter = rows.iterator();
+        while (iter.hasNext()) {
+            HashMap row = (HashMap) iter.next();
+            Integer cvId = (Integer) row.get("crf_version_id");
+            String sedOID = (String) row.get("definition_oid");
+            String cvOID = (String) row.get("cv_oid");
+            String sedDesc = (String) row.get("description");
+            String category = (String) row.get("category");
+            String cvDesc = (String) row.get("version_description");
+            String notes = (String) row.get("revision_notes");
+            String cOID = (String) row.get("crf_oid");
+            String nullValue = (String) row.get("null_values");
+            Integer dvId = (Integer) row.get("default_version_id");
+            Boolean pwdRequired = (Boolean) row.get("electronic_signature");
+            Boolean doubleEntry = (Boolean) row.get("double_entry");
+            Boolean hideCrf = (Boolean) row.get("hide_crf");
+            Integer sdvId = (Integer) row.get("source_data_verification_code");
+            
+            if(sedDetails.containsKey(sedOID)) {
+            } else {
+                EventDefinitionDetailsBean sedDetail = new EventDefinitionDetailsBean();
+                sedDetail.setOid(sedOID);
+                sedDetail.setCategory(category);
+                sedDetail.setDescription(sedDesc);
+                sedDetails.put(sedOID, sedDetail);
+            }
+            
+            if(formDetails.containsKey(cvOID)) {
+            }else {
+                FormDetailsBean formDetail = new FormDetailsBean();
+                formDetail.setOid(cvOID);
+                formDetail.setDoubleDataEntry(doubleEntry==false?"No":"Yes");
+                formDetail.setHideCrf(hideCrf==false?"No":"Yes");
+                formDetail.setIsDefaultVersion(cvId.equals(dvId)?"Yes":"No");
+                formDetail.setNullValues(nullValue);
+                formDetail.setParentFormOid(cOID);
+                formDetail.setPasswordRequired(pwdRequired==false?"No":"Yes");
+                formDetail.setRevisionNotes(notes);
+                formDetail.setSourceDataVerification(SourceDataVerification.getByCode(sdvId > 0 ? sdvId : 3).getDescription());
+                formDetail.setVersionDescription(cvDesc);
+                formDetails.put(cvOID, formDetail);
+            }
+        }
+        for(StudyEventDefBean sedef : seds) {
+            sedef.setEventDefinitionDetais(sedDetails.get(sedef.getOid()));
+        }
+        for(FormDefBean formdef : forms) {
+            formdef.setFormDetails(formDetails.get(formdef.getOid()));
+        }
+    }
+    
+    public void getMetadataOC1_3(int parentStudyId, int studyId, MetaDataVersionBean metadata, String odmVersion) {
+        this.getOCMetadata(parentStudyId, studyId, metadata, odmVersion);
+        
+        //StudyBean study = metadata.getStudy();
+        //if(study.getId()>0) {
+        //} else {
+        //    StudyDAO sdao = new StudyDAO(this.ds);
+        //    study = (StudyBean)sdao.findByPK(studyId);
+        //}
+        //StudyConfigService studyConfig = new StudyConfigService(this.ds);
+        //study = studyConfig.setParametersForStudy(study);
+        
+        
+        this.getStudyEventAndFormMetaOC1_3(parentStudyId, studyId, metadata, odmVersion, false);
+
+        String cvIds = metadata.getCvIds();
+        ArrayList<ItemGroupDefBean> igs = (ArrayList<ItemGroupDefBean>)metadata.getItemGroupDefs();
+        HashMap<String,Integer> igPoses = getItemGroupOIDPos(metadata);
+        ArrayList<ItemDefBean> its = (ArrayList<ItemDefBean>)metadata.getItemDefs();
+        HashMap<String,Integer> itPoses = getItemOIDPos(metadata);
+        ItemGroupDefBean ig = new ItemGroupDefBean();
+        ItemDefBean it = new ItemDefBean();
+        String prevCvIg = "";
+        HashMap<Integer,String> sectionLabels = this.getSectionLabels(metadata.getSectionIds());
+        HashMap<Integer,String> parentItemOIDs = this.getParentItemOIDs(cvIds);
+        this.setItemGroupAndItemMetaOC1_3TypesExpected();
+        logger.debug("Begin to execute GetItemGroupAndItemMetaWithUnitSql");
+        logger.error("getItemGroupandItemMetaWithUnitsql= " + this.getItemGroupAndItemMetaOC1_3Sql(cvIds));
+        ArrayList rows = select(this.getItemGroupAndItemMetaOC1_3Sql(cvIds));
+        Iterator iter = rows.iterator();
+        while (iter.hasNext()) {
+            HashMap row = (HashMap) iter.next();
+            Integer cId = (Integer) row.get("crf_id");
+            Integer cvId = (Integer) row.get("crf_version_id");
+            Integer igId = (Integer) row.get("item_group_id");
+            Integer itId = (Integer) row.get("item_id");
+            Integer rsId = (Integer) row.get("response_set_id");
+            String cvOID = (String) row.get("crf_version_oid");
+            String igOID = (String) row.get("item_group_oid");
+            String itOID = (String) row.get("item_oid");
+            
+            Integer igRepeatNum = (Integer) row.get("repeat_number");
+            Integer igRepeatMax = (Integer) row.get("repeat_max");
+            
+            String itHeader = (String) row.get("item_header");
+            String left = (String) row.get("left_item_text");
+            String right = (String) row.get("right_item_text");
+            String itSubheader = (String) row.get("subheader");
+            Integer itSecId = (Integer) row.get("section_id");
+            Integer itPId = (Integer) row.get("parent_id");
+            Integer itColNum = (Integer) row.get("column_number");
+            String itpgNum = (String) row.get("page_number_label");
+            String layout = (String) row.get("response_layout");
+            Integer rsTypeId = (Integer) row.get("response_type_id");
+            String dfValue = (String) row.get("default_value");  
+            Boolean phi = (Boolean) row.get("phi_status");
+            
+            if((cvId+"-"+igId).equals(prevCvIg)) {
+            } else {
+                prevCvIg = cvId+"-"+igId;
+                ig = igs.get(igPoses.get(igOID));
+                ItemGroupDetailsBean igDetail = ig.getItemGroupDetails();
+                igDetail.setOid(igOID);
+                PresentInFormBean inForm = new PresentInFormBean();
+                inForm.setFormOid(cvOID);
+                ItemGroupRepeatBean igr = new ItemGroupRepeatBean();
+                igr.setRepeatMax(igRepeatMax);
+                igr.setRepeatNumber(igRepeatNum);
+                inForm.setItemGroupRepeatBean(igr);
+                igDetail.getPresentInForms().add(inForm);
+            }
+            
+            it = its.get(itPoses.get(itOID));
+            ItemDetailsBean itDetail = it.getItemDetails();
+            itDetail.setOid(itOID);
+            ItemPresentInFormBean itInForm = new ItemPresentInFormBean();
+            itInForm.setFormOid(cvOID);
+            itInForm.setColumnNumber(itColNum);
+            itInForm.setDefaultValue(dfValue);
+            itInForm.setItemHeader(itHeader);
+            itInForm.setLeftItemText(left);
+            itInForm.setRightItemText(right);
+            itInForm.setItemSubHeader(itSubheader);
+            itInForm.setPageNumber(itpgNum);
+            itInForm.setParentItemOid(parentItemOIDs.get(itPId));
+            itInForm.setSectionLabel(sectionLabels.get(itSecId));
+            itInForm.setPhi(phi==false?"No":"Yes");
+            ItemResponseBean itemResponse = new ItemResponseBean();
+            itemResponse.setResponseLayout(layout);
+            itemResponse.setResponseType(ResponseType.get(rsTypeId).getName());
+            itInForm.setItemResponse(itemResponse);
+            itDetail.getItemPresentInForm().add(itInForm);
+        }
     }
 
     public int parseWidth(String widthDecimal) {
@@ -2022,11 +2307,67 @@ public class OdmExtractDAO extends DatasetDAO {
 
         return stage.getName();
     }
-
+    
     protected void setStudyParemeterConfig(StudyBean study) {
         StudyParameterValueBean param = new StudyParameterValueDAO(this.ds).findByHandleAndStudy(study.getId(), "collectDob");
         study.getStudyParameterConfig().setCollectDob(param.getValue());
     }
+    
+    protected HashMap<String,Integer> getItemGroupOIDPos(MetaDataVersionBean metadata){
+        HashMap<String,Integer> igPoses = new HashMap<String,Integer>();
+        ArrayList<ItemGroupDefBean> igs = (ArrayList<ItemGroupDefBean>)metadata.getItemGroupDefs();
+        for(int i=0; i<igs.size();++i) {
+            igPoses.put(igs.get(i).getOid(), i);
+        }
+        return igPoses;
+    }
+    
+    protected HashMap<String,Integer> getItemOIDPos(MetaDataVersionBean metadata){
+        HashMap<String,Integer> itPoses = new HashMap<String,Integer>();
+        ArrayList<ItemDefBean> its = (ArrayList<ItemDefBean>)metadata.getItemDefs();
+        for(int i=0; i<its.size();++i) {
+            itPoses.put(its.get(i).getOid(), i);
+        }
+        return itPoses;
+    }
+    
+    protected HashMap<Integer,String> getSectionLabels(String sectionIds) {
+        HashMap<Integer,String> labels = new HashMap<Integer,String>();
+        this.setSectionLabelsTypesExpected();
+        ArrayList rows = this.select(this.getSectionLabelsSql(sectionIds));
+        Iterator it = rows.iterator();
+        while(it.hasNext()) {
+            HashMap row = (HashMap) it.next();
+            Integer secId = (Integer) row.get("section_id");
+            String label = (String) row.get("label");
+            labels.put(secId, label);
+        }
+        return labels;
+    }
+    
+    protected HashMap<Integer,String> getParentItemOIDs(String crfVersionIds) {
+        HashMap<Integer,String> oids = new HashMap<Integer,String>();
+        this.setParentItemOIDsTypesExpected();
+        ArrayList rows = this.select(this.getParentItemOIDsSql(crfVersionIds));
+        Iterator it = rows.iterator();
+        while(it.hasNext()) {
+            HashMap row = (HashMap) it.next();
+            Integer itId = (Integer) row.get("item_id");
+            String oid = (String) row.get("oc_oid");
+            oids.put(itId, oid);
+        }
+        return oids;
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+ 
 
     protected String getStudyGroupClassSql(int studyId) {
         return "select sgc.study_group_class_id, sgc.name as sgc_name, gct.name as sgc_type, sgc.status_id,"
@@ -2040,15 +2381,34 @@ public class OdmExtractDAO extends DatasetDAO {
             + " sed.oc_oid as definition_oid, sed.name as definition_name, sed.repeating as definition_repeating,"
             + " sed.type as definition_type, cv.oc_oid as cv_oid,"
             + " cv.name as cv_name, edc.required_crf as cv_required, edc.null_values, crf.name as crf_name"
-            + " from study_event_definition sed, event_definition_crf edc, crf, crf_version cv where sed.study_id = "
-            + parentStudyId
-            + " and sed.status_id not in (5,7) and "
-            + this.eventDefinitionCrfCondition(studyId, parentStudyId, isIncludedSite)
-            + " and sed.study_event_definition_id = edc.study_event_definition_id"
-            + " and edc.status_id not in (5,7) and edc.crf_id = crf.crf_id and crf.status_id not in (5,7) and crf.crf_id = cv.crf_id and (cv.status_id not in (5,7))"
-            + " and exists (select ifm.crf_version_id from item_form_metadata ifm, item_group_metadata igm"
-            + " where cv.crf_version_id = ifm.crf_version_id and cv.crf_version_id = igm.crf_version_id and ifm.item_id = igm.item_id)"
-            + " order by sed.ordinal, edc.ordinal, edc.crf_id, cv.crf_version_id desc";
+            + " from " + this.studyEventAndFormMetaTables()
+            + this.studyEventAndFormMetaCondition(parentStudyId, studyId, isIncludedSite);
+    }
+    
+    protected String getStudyEventAndFormMetaOC1_3Sql(int parentStudyId, int studyId, boolean isIncludedSite) {
+        return "select sed.ordinal as definition_order, edc.ordinal as crf_order, edc.crf_id, cv.crf_version_id,"
+            + " sed.oc_oid as definition_oid, cv.oc_oid as cv_oid,"
+            + " sed.description, sed.category, cv.description as version_description, cv.revision_notes,"
+            + " crf.oc_oid as crf_oid, edc.null_values, edc.default_version_id, edc.electronic_signature,"
+            + " edc.double_entry, edc.hide_crf, edc.source_data_verification_code"
+            + " from " + this.studyEventAndFormMetaTables()
+            + this.studyEventAndFormMetaCondition(parentStudyId, studyId, isIncludedSite);
+    }
+    
+    protected String studyEventAndFormMetaTables() {
+        return "study_event_definition sed, event_definition_crf edc, crf, crf_version cv ";
+    }
+    
+    protected String studyEventAndFormMetaCondition(int parentStudyId, int studyId, boolean isIncludedSite) {
+        return " where sed.study_id = "
+        + parentStudyId
+        + " and sed.status_id not in (5,7) and "
+        + this.getEventDefinitionCrfCondition(studyId, parentStudyId, isIncludedSite)
+        + " and sed.study_event_definition_id = edc.study_event_definition_id"
+        + " and edc.status_id not in (5,7) and edc.crf_id = crf.crf_id and crf.status_id not in (5,7) and crf.crf_id = cv.crf_id and (cv.status_id not in (5,7))"
+        + " and exists (select ifm.crf_version_id from item_form_metadata ifm, item_group_metadata igm"
+        + " where cv.crf_version_id = ifm.crf_version_id and cv.crf_version_id = igm.crf_version_id and ifm.item_id = igm.item_id)"
+        + " order by sed.ordinal, edc.ordinal, edc.crf_id, cv.crf_version_id desc";
     }
 
     protected String getItemDataMaxLengths(String crfVersionIds) {
@@ -2063,14 +2423,33 @@ public class OdmExtractDAO extends DatasetDAO {
             + " ig.name as item_group_name, item.name as item_name, item.item_data_type_id, ifm.item_header, ifm.left_item_text,"
             + " ifm.right_item_text, ifm.required as item_required, ifm.regexp, ifm.regexp_error_msg, ifm.width_decimal,"
             + " rs.response_type_id, rs.options_text, rs.options_values, rs.label as response_label,"
-            + " igm.item_group_header, item.description as item_description from crf_version cv,"
+            + " igm.item_group_header, item.description as item_description, ifm.section_id, ifm.question_number_label from crf_version cv,"
             + " (select crf_version_id, item_id, response_set_id, header as item_header, left_item_text, right_item_text, required, regexp,"
-            + " regexp_error_msg, width_decimal from item_form_metadata where crf_version_id in (" + crfVersionIds + "))ifm, item, response_set rs,"
+            + " regexp_error_msg, width_decimal, section_id, question_number_label from item_form_metadata where crf_version_id in (" + crfVersionIds + "))ifm, item, response_set rs,"
             + " (select crf_version_id, item_group_id, item_id, header as item_group_header from item_group_metadata where crf_version_id in (" + crfVersionIds
-            + "))igm," + " item_group ig where cv.crf_version_id in (" + crfVersionIds + ") and cv.crf_version_id = ifm.crf_version_id"
-            + " and ifm.item_id = item.item_id and ifm.response_set_id = rs.response_set_id"
-            + " and ifm.item_id = igm.item_id and cv.crf_version_id = igm.crf_version_id and igm.item_group_id = ig.item_group_id"
-            + " order by cv.crf_id, cv.crf_version_id desc, ig.item_group_id, item.item_id, rs.response_set_id";
+            + "))igm," + " item_group ig " 
+            + this.getItemGroupAndItemMetaCondition(crfVersionIds);
+    }
+    
+    protected String getItemGroupAndItemMetaOC1_3Sql(String crfVersionIds) {
+        return "select cv.crf_id, cv.crf_version_id,"
+            + " ig.item_group_id, item.item_id, rs.response_set_id, cv.oc_oid as crf_version_oid, ig.oc_oid as item_group_oid, item.oc_oid as item_oid,"
+            + " ifm.item_header, ifm.subheader, ifm.section_id, ifm.left_item_text, ifm.right_item_text,"
+            + " ifm.parent_id, ifm.column_number, ifm.page_number_label, ifm.response_layout, ifm.default_value, item.phi_status, " 
+            + " rs.response_type_id, igm.repeat_number, igm.repeat_max from crf_version cv, (select crf_version_id, item_id, response_set_id,"
+            + " header as item_header, subheader, section_id, left_item_text, right_item_text,"
+            + " parent_id, column_number, page_number_label, response_layout," 
+            + " default_value from item_form_metadata where crf_version_id in (" + crfVersionIds + "))ifm, item, response_set rs,"
+            + " (select crf_version_id, item_group_id, item_id, header as item_group_header, repeat_number, repeat_max from item_group_metadata where crf_version_id in (" 
+            + crfVersionIds + "))igm," + " item_group ig " 
+            + this.getItemGroupAndItemMetaCondition(crfVersionIds);
+    }
+    
+    protected String getItemGroupAndItemMetaCondition(String crfVersionIds) {
+        return " where cv.crf_version_id in (" + crfVersionIds + ") and cv.crf_version_id = ifm.crf_version_id"
+        + " and ifm.item_id = item.item_id and ifm.response_set_id = rs.response_set_id"
+        + " and ifm.item_id = igm.item_id and cv.crf_version_id = igm.crf_version_id and igm.item_group_id = ig.item_group_id"
+        + " order by cv.crf_id, cv.crf_version_id desc, ig.item_group_id, item.item_id, rs.response_set_id";
     }
 
     protected String getSubjectEventFormSql(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId) {
@@ -2274,7 +2653,7 @@ public class OdmExtractDAO extends DatasetDAO {
             + " and (status_id " + ecStatusConstraint + ")) and length(value) > 0";
     }
 
-    protected String eventDefinitionCrfCondition(int studyId, int parentStudyId, boolean isIncludedSite) {
+    protected String getEventDefinitionCrfCondition(int studyId, int parentStudyId, boolean isIncludedSite) {
         if (isIncludedSite) {
             return "edc.study_id = " + studyId;
         } else {
@@ -2303,8 +2682,9 @@ public class OdmExtractDAO extends DatasetDAO {
 
     protected String getItemGroupAndItemMetaWithUnitSql(String crfVersionIds) {
         return "select cv.*, mu.oc_oid as mu_oid from (" + this.getItemGroupAndItemMetaSql(crfVersionIds) + ")cv left join"
-            + " (select item.item_id, mu.oc_oid from versioning_map vm, item, measurement_unit mu" + " where vm.crf_version_id in (" + crfVersionIds
-            + ") and vm.item_id = item.item_id" + " and item.units = mu.name )mu on cv.item_id = mu.item_id ";
+            + " (select item.item_id, mu.oc_oid from item, measurement_unit mu where item.item_id in (select vm.item_id from versioning_map vm"
+            + " where vm.crf_version_id in (" + crfVersionIds + "))"
+            + " and item.units = mu.name )mu on cv.item_id = mu.item_id ";
     }
 
     protected String getNullValueCVsSql(String studyId) {
@@ -2419,10 +2799,18 @@ public class OdmExtractDAO extends DatasetDAO {
             + " and dn.discrepancy_note_type_id = dnt.discrepancy_note_type_id" + " order by dnidm.item_data_id, dn.parent_dn_id, dn.discrepancy_note_id";
     }
 
-
     protected String getItemCVOIDsSql(String crfVersionIds) {
         return "select cv.crf_id, cv.crf_version_id, item.item_id, cv.oc_oid as cv_oid, item.oc_oid as item_oid"
             + " from crf_version cv, versioning_map vm, item" + " where vm.crf_version_id in (" + crfVersionIds + ")"
             + " and vm.crf_version_id = cv.crf_version_id and vm.item_id = item.item_id" + " order by cv.crf_id, cv.crf_version_id desc, item.item_id";
+    }
+    
+    protected String getSectionLabelsSql(String sectionIds) {
+        return "select section_id, label from section where section_id in ("+sectionIds+")";
+    }
+    
+    protected String getParentItemOIDsSql(String crfVersionIds) {
+        return "select item_id, oc_oid from item where item_id in (select distinct parent_id from item_form_metadata ifm"
+            + " where crf_version_id in (" + crfVersionIds + ") and ifm.parent_id > 0 )";
     }
 }
