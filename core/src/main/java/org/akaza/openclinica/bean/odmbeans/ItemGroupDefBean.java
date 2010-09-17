@@ -22,9 +22,12 @@ public class ItemGroupDefBean extends ElementDefBean {
     private String preSASDatasetName;
     private String comment;
     private List<ElementRefBean> itemRefs;
+    //openclinica extension
+    private ItemGroupDetailsBean itemGroupDetails;
 
     public ItemGroupDefBean() {
         itemRefs = new ArrayList<ElementRefBean>();
+        itemGroupDetails = new ItemGroupDetailsBean();
     }
 
     public void setPreSASDatasetName(String sasname) {
@@ -49,5 +52,13 @@ public class ItemGroupDefBean extends ElementDefBean {
 
     public String getComment() {
         return this.comment;
+    }
+
+    public ItemGroupDetailsBean getItemGroupDetails() {
+        return itemGroupDetails;
+    }
+
+    public void setItemGroupDetails(ItemGroupDetailsBean itemGroupDetails) {
+        this.itemGroupDetails = itemGroupDetails;
     }
 }

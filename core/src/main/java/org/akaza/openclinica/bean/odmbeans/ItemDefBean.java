@@ -24,7 +24,7 @@ public class ItemDefBean extends ElementOIDBean {
     private int length;
     private int significantDigits;
     private String preSASFieldName;
-    private TranslatedTextBean question;
+    private QuestionBean question;
     private ElementRefBean measurementUnitRef;
     private List<RangeCheckBean> rangeChecks;
     private String codeListOID;
@@ -32,11 +32,14 @@ public class ItemDefBean extends ElementOIDBean {
     private ElementRefBean multiSelectListRef;
     //openclinica extension: which crf-versions this item belong to
     private String formOIDs;
+    private ItemDetailsBean itemDetails;
+    
 
     public ItemDefBean() {
-        question = new TranslatedTextBean();
+        question = new QuestionBean();
         measurementUnitRef = new ElementRefBean();
         rangeChecks = new ArrayList<RangeCheckBean>();
+        itemDetails = new ItemDetailsBean();
     }
 
     public void setName(String name) {
@@ -79,12 +82,12 @@ public class ItemDefBean extends ElementOIDBean {
         return this.preSASFieldName;
     }
 
-    public void setQuestion(TranslatedTextBean question) {
-        this.question = question;
+    public QuestionBean getQuestion() {
+        return question;
     }
 
-    public TranslatedTextBean getQuestion() {
-        return this.question;
+    public void setQuestion(QuestionBean question) {
+        this.question = question;
     }
 
     public void setRangeCheck(List<RangeCheckBean> ranges) {
@@ -133,5 +136,13 @@ public class ItemDefBean extends ElementOIDBean {
 
     public void setFormOIDs(String formOIDs) {
         this.formOIDs = formOIDs;
+    }
+
+    public ItemDetailsBean getItemDetails() {
+        return itemDetails;
+    }
+
+    public void setItemDetails(ItemDetailsBean itemDetails) {
+        this.itemDetails = itemDetails;
     }
 }

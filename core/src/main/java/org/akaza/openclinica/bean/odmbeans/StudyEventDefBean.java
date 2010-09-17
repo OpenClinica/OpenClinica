@@ -21,9 +21,12 @@ import java.util.List;
 public class StudyEventDefBean extends ElementDefBean {
     private String type;
     private List<ElementRefBean> formRefs;
+    //OpenClinica extension
+    private EventDefinitionDetailsBean eventDefinitionDetais;
     
     public StudyEventDefBean() {
         formRefs = new ArrayList<ElementRefBean>();
+        this.eventDefinitionDetais = new EventDefinitionDetailsBean();
     }
 
     public void setType(String type) {
@@ -40,5 +43,13 @@ public class StudyEventDefBean extends ElementDefBean {
 
     public List<ElementRefBean> getFormRefs() {
         return this.formRefs;
+    }
+
+    public EventDefinitionDetailsBean getEventDefinitionDetais() {
+        return eventDefinitionDetais;
+    }
+
+    public void setEventDefinitionDetais(EventDefinitionDetailsBean eventDefinitionDetais) {
+        this.eventDefinitionDetais = eventDefinitionDetais;
     }
 }

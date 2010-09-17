@@ -18,6 +18,8 @@ public class OdmStudyBean extends ElementOIDBean {
     private GlobalVariablesBean globalVariables;
     private BasicDefinitionsBean basicDefinitions;
     private MetaDataVersionBean metaDataVersion;
+    
+    private String parentStudyOID;
 
     public OdmStudyBean() {
         globalVariables = new GlobalVariablesBean();
@@ -47,5 +49,13 @@ public class OdmStudyBean extends ElementOIDBean {
 
     public void setBasicDefinitions(BasicDefinitionsBean basicDefinitions) {
         this.basicDefinitions = basicDefinitions;
+    }
+
+    public String getParentStudyOID() {
+        return parentStudyOID;
+    }
+
+    public void setParentStudyOID(String parentStudyOID) {
+        this.parentStudyOID = parentStudyOID;
     }
 }

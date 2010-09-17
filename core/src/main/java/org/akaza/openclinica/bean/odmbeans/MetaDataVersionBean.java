@@ -12,6 +12,8 @@ package org.akaza.openclinica.bean.odmbeans;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+
 /**
  * 
  * @author ywang (May, 2008)
@@ -27,10 +29,17 @@ public class MetaDataVersionBean extends ElementOIDBean {
     private List<ItemGroupDefBean> itemGroupDefs;
     private List<ItemDefBean> itemDefs;
     private List<CodeListBean> codeLists;
-    private List<StudyGroupClassListBean> studyGroupClassLists;
     // OpenClinica system has set softhard constraint on study level
     private String softhard;
+    
+    //openclinica extension
+    private List<StudyGroupClassListBean> studyGroupClassLists;
     private List<MultiSelectListBean> multiSelectLists;
+    private StudyBean study;
+    
+    //
+    String cvIds;
+    String sectionIds;
 
     public MetaDataVersionBean() {
         include = new MetaDataVersionIncludeBean();
@@ -42,6 +51,7 @@ public class MetaDataVersionBean extends ElementOIDBean {
         codeLists = new ArrayList<CodeListBean>();
         studyGroupClassLists = new ArrayList<StudyGroupClassListBean>();
         multiSelectLists = new ArrayList<MultiSelectListBean>();
+        study = new StudyBean();
     }
 
     public void setName(String metadataVersionName) {
@@ -138,5 +148,29 @@ public class MetaDataVersionBean extends ElementOIDBean {
 
     public void setMultiSelectLists(List<MultiSelectListBean> multiSelectLists) {
         this.multiSelectLists = multiSelectLists;
+    }
+
+    public String getCvIds() {
+        return cvIds;
+    }
+
+    public void setCvIds(String cvIds) {
+        this.cvIds = cvIds;
+    }
+
+    public String getSectionIds() {
+        return sectionIds;
+    }
+
+    public void setSectionIds(String sectionIds) {
+        this.sectionIds = sectionIds;
+    }
+
+    public StudyBean getStudy() {
+        return study;
+    }
+
+    public void setStudy(StudyBean study) {
+        this.study = study;
     }
 }

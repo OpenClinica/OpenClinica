@@ -20,9 +20,12 @@ import java.util.List;
 
 public class FormDefBean extends ElementDefBean {
     private List<ElementRefBean> itemGroupRefs;
+    //openclinica extension
+    private FormDetailsBean formDetails;
 
     public FormDefBean() {
         itemGroupRefs = new ArrayList<ElementRefBean>();
+        formDetails = new FormDetailsBean();
     }
 
     public void setItemGroupRefs(List<ElementRefBean> igRefs) {
@@ -31,5 +34,13 @@ public class FormDefBean extends ElementDefBean {
 
     public List<ElementRefBean> getItemGroupRefs() {
         return this.itemGroupRefs;
+    }
+
+    public FormDetailsBean getFormDetails() {
+        return formDetails;
+    }
+
+    public void setFormDetails(FormDetailsBean formDetails) {
+        this.formDetails = formDetails;
     }
 }
