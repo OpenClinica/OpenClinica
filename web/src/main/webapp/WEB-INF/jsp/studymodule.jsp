@@ -140,6 +140,8 @@
            </c:choose>
         </c:forEach>
       </select>
+      &nbsp;
+      <input type="submit" name="saveStudyStatus" value="Save Status" class="button_medium">
   </div>
   &nbsp;&nbsp;&nbsp;
   <table width="78%" class="contenttable" cellspacing="0" cellpadding="2">

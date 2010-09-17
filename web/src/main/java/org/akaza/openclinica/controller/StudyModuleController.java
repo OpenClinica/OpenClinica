@@ -195,22 +195,23 @@ public class StudyModuleController {
     public String processSubmit(@ModelAttribute("studyModuleStatus") StudyModuleStatus studyModuleStatus, BindingResult result, SessionStatus status,
             HttpServletRequest request) {
         StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
-        studyModuleStatusDao.saveOrUpdate(studyModuleStatus);
-        status.setComplete();
-        //A. Hamid.
-        currentStudy.setOldStatus(currentStudy.getStatus());
-        currentStudy.setStatus(Status.get(studyModuleStatus.getStudyStatus()));
-        if (currentStudy.getParentStudyId() > 0) {
-            studyDao.updateStudyStatus(currentStudy);
+        if (request.getParameter("saveStudyStatus") == null){
+            studyModuleStatusDao.saveOrUpdate(studyModuleStatus);
+            status.setComplete();
         } else {
-            studyDao.updateStudyStatus(currentStudy);
-        }
+            currentStudy.setOldStatus(currentStudy.getStatus());
+            currentStudy.setStatus(Status.get(studyModuleStatus.getStudyStatus()));
+            if (currentStudy.getParentStudyId() > 0) {
+                studyDao.updateStudyStatus(currentStudy);
+            } else {
+                studyDao.updateStudyStatus(currentStudy);
+            }
 
-        ArrayList siteList = (ArrayList) studyDao.findAllByParent(currentStudy.getId());
-        if (siteList.size() > 0) {
-            studyDao.updateSitesStatus(currentStudy);
+            ArrayList siteList = (ArrayList) studyDao.findAllByParent(currentStudy.getId());
+            if (siteList.size() > 0) {
+                studyDao.updateSitesStatus(currentStudy);
+            }
         }
-
         return "redirect:studymodule";
     }
 
