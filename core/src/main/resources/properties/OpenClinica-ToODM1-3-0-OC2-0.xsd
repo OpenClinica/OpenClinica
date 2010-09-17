@@ -13,7 +13,6 @@
 						<xs:element ref="OpenClinica:MultiSelectList" minOccurs="0" maxOccurs="unbounded"/>
 						<xs:element ref="OpenClinica:StudyGroupClassList" minOccurs="0" maxOccurs="unbounded"/>
 						<xs:element ref="OpenClinica:StudyDetails" minOccurs="0" maxOccurs="unbounded"/>
-						<xs:element ref="OpenClinica:Rules" minOccurs="0" maxOccurs="1"/>
 					</xs:sequence>
 				</xs:extension>
 			</xs:complexContent>
@@ -97,10 +96,6 @@
 				</xs:extension>
 			</xs:complexContent>
 		</xs:complexType>
-		<xs:attributeGroup name="FormRefAttributeExtension">
-	      <xs:attributeGroup ref="FormRefAttributeExtension" />
-	      <xs:attributeGroup ref="OpenClinica:FormRefAttributeDefinition" />
-	    </xs:attributeGroup>
 		<xs:attributeGroup name="ItemDefAttributeExtension">
 	      <xs:attributeGroup ref="ItemDefAttributeExtension" />
 	      <xs:attributeGroup ref="OpenClinica:ItemDefAttributeDefinition" />

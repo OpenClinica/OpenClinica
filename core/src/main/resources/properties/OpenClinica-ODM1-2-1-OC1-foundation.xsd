@@ -3,7 +3,7 @@
            xmlns="http://www.openclinica.org/ns/openclinica_odm/v1.2"
            xmlns:odm="http://www.cdisc.org/ns/odm/v1.2"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           elementFormDefault="qualified" attributeFormDefault="qualified">
+           elementFormDefault="qualified" attributeFormDefault="unqualified">
   <xs:import schemaLocation="http://www.w3.org/2001/03/xml.xsd" namespace="http://www.w3.org/XML/1998/namespace" />
   <xs:import schemaLocation="ODM1-2-1.xsd" namespace="http://www.cdisc.org/ns/odm/v1.2" />
     <xs:simpleType name="dateOrDatetime">
@@ -158,7 +158,7 @@
         </xs:attributeGroup>  
         
     <xs:attributeGroup name="ItemDefAttributeDefinition">
-		<xs:attribute name="FormOIDs" type="odm:text"/>
+		<xs:attribute name="FormOIDs" type="odm:text" form="qualified"/>
 	</xs:attributeGroup>
 	
 	<xs:attributeGroup name="StudyGroupClassListAttributeDefinition">
@@ -181,32 +181,32 @@
 	</xs:attributeGroup>
 
 	<xs:attributeGroup name="SubjectDataAttributeDefinition">
-		<xs:attribute name="StudySubjectId" type="odm:oid" />
-		<xs:attribute name="UniqueIdentifier" type="odm:text" />
-		<xs:attribute name="Status" type="odm:text" />
-		<xs:attribute name="SecondaryID" type="odm:text" />
-		<xs:attribute name="DateOfBirth" type="odm:date" />
-		<xs:attribute name="YearOfBirth" type="odm:integer" />
-		<xs:attribute name="Sex" type="odm:text" />
+		<xs:attribute name="StudySubjectId" type="odm:oid" form="qualified" />
+		<xs:attribute name="UniqueIdentifier" type="odm:text" form="qualified" />
+		<xs:attribute name="Status" type="odm:text" form="qualified" />
+		<xs:attribute name="SecondaryID" type="odm:text" form="qualified" />
+		<xs:attribute name="DateOfBirth" type="odm:date" form="qualified" />
+		<xs:attribute name="YearOfBirth" type="odm:integer" form="qualified" />
+		<xs:attribute name="Sex" type="odm:text" form="qualified" />
 	</xs:attributeGroup>
 
 	<xs:attributeGroup name="StudyEventDataAttributeDefinition">
-		<xs:attribute name="StudyEventLocation" type="odm:text" />
-		<xs:attribute name="StartDate" type="dateOrDatetime" />
-		<xs:attribute name="EndDate" type="dateOrDatetime" />
-		<xs:attribute name="Status" type="odm:text" />
-		<xs:attribute name="SubjectAgeAtEvent" type="odm:integer" />
+		<xs:attribute name="StudyEventLocation" type="odm:text" form="qualified" />
+		<xs:attribute name="StartDate" type="dateOrDatetime" form="qualified" />
+		<xs:attribute name="EndDate" type="dateOrDatetime" form="qualified" />
+		<xs:attribute name="Status" type="odm:text" form="qualified" />
+		<xs:attribute name="SubjectAgeAtEvent" type="odm:integer" form="qualified" />
 	</xs:attributeGroup>
 
 	<xs:attributeGroup name="FormDataAttributeDefinition">
-		<xs:attribute name="Version" type="odm:text" />
-		<xs:attribute name="InterviewerName" type="odm:text" />
-		<xs:attribute name="InterviewDate" type="odm:date" />
-		<xs:attribute name="Status" type="odm:text" />
+		<xs:attribute name="Version" type="odm:text" form="qualified" />
+		<xs:attribute name="InterviewerName" type="odm:text" form="qualified" />
+		<xs:attribute name="InterviewDate" type="odm:date" form="qualified" />
+		<xs:attribute name="Status" type="odm:text" form="qualified" />
 	</xs:attributeGroup>
 	
 	<xs:attributeGroup name="ItemDataAttributeDefinition">
-		<xs:attribute name="ReasonForNull" type="odm:text" />
+		<xs:attribute name="ReasonForNull" type="odm:text" form="qualified" />
 	</xs:attributeGroup>
 	
 	<xs:attributeGroup name="AuditLogsAttributeDefinition">
