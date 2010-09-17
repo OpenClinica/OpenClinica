@@ -2358,15 +2358,6 @@ public class OdmExtractDAO extends DatasetDAO {
         }
         return oids;
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
  
 
     protected String getStudyGroupClassSql(int studyId) {
