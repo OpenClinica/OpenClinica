@@ -155,7 +155,8 @@ public class GenerateExtractFileService {
             } else if ("oc1.3".equals(odmVersion)) {
                 ODMBean odmb = mdc.getODMBean();
                 //odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0.xsd");
-                odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC1.xsd");
+                //odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC1.xsd");
+                odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC2-0.xsd");
                 ArrayList<String> xmlnsList = new ArrayList<String>();
                 xmlnsList.add("xmlns=\"http://www.cdisc.org/ns/odm/v1.3\"");
                 xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/openclinica_odm/v1.3\"");
