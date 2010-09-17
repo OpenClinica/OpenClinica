@@ -102,7 +102,7 @@ function genToolTips(itemId){
 	   			if("${itemsSection.item.id}"== itemId)
 	   			{
 			
-				<c:set var="notesSize" value="${itemsSection.numDiscrepancyNotes}"/>
+				<c:set var="notesSize" value="${itemsSection.totNew}"/>
 	   			title = "<c:out value="${itemsSection.item.name}"/>";
 	   				<c:set  var="discrepancyNotes" value="${itemsSection.discrepancyNotes}"/>
 	        		<c:forEach var="discrepancyNotes" items="${discrepancyNotes}">  	

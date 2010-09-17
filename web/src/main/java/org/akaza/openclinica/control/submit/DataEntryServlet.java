@@ -3441,6 +3441,7 @@ public abstract class DataEntryServlet extends SecureController {
                 discNotes.setNumExistingFieldNotes(INPUT_INTERVIEWER, 1);
                 request.setAttribute("hasNameNote", "yes");
                 request.setAttribute(INTERVIEWER_NAME_NOTE, dn);
+               if(dn.getParentDnId()==0)
                 existingNameNotes.add(dn);
                 
             }
@@ -3449,7 +3450,7 @@ public abstract class DataEntryServlet extends SecureController {
                 discNotes.setNumExistingFieldNotes(INPUT_INTERVIEW_DATE, 1);
                 request.setAttribute("hasDateNote", "yes");
                 request.setAttribute(INTERVIEWER_DATE_NOTE, dn);
-             
+             if(dn.getParentDnId()==0)
                 existingIntrvDateNotes.add(dn);
             }
         }
@@ -3612,32 +3613,40 @@ public abstract class DataEntryServlet extends SecureController {
     	boolean hasOtherThread = false;
     	 ArrayList<DiscrepancyNoteBean> existingNotes = dndao.findExistingNotesForToolTip(itemDataId);
     	 dib.setDiscrepancyNotes(existingNotes);
-         for (DiscrepancyNoteBean obj : existingNotes) {
+    	 
+         for (DiscrepancyNoteBean obj : dib.getDiscrepancyNotes()) {
              DiscrepancyNoteBean note =  obj;
             
             
              if (note.getParentDnId() == 0) {
                 	 resolutionStatus = note.getResolutionStatusId();
-                 if(resolutionStatus==ResolutionStatus.OPEN.getId()) totNew++;
-                 else if(resolutionStatus==ResolutionStatus.UPDATED.getId())totUpdated++;
+                 totNew++;//using totNew to show the total parent threads
+                 /* if(resolutionStatus==ResolutionStatus.UPDATED.getId())totUpdated++;
                  else if(resolutionStatus==ResolutionStatus.RESOLVED.getId())totRes++;//Resolution proposed count
                  else if(resolutionStatus==ResolutionStatus.CLOSED.getId())totClosed++;
-                 else if(resolutionStatus==ResolutionStatus.NOT_APPLICABLE.getId())totNA++;
+                 else if(resolutionStatus==ResolutionStatus.NOT_APPLICABLE.getId())totNA++;*/// not needed any more
              }
          }
-         
-    	for (Object obj : notes) {
-              DiscrepancyNoteBean note = (DiscrepancyNoteBean) obj;
-              if (note.getParentDnId() == 0) {
-                      resolutionStatus = note.getResolutionStatusId();
-                      if(resolutionStatus==ResolutionStatus.OPEN.getId()) totNew++;
-                      else if(resolutionStatus==ResolutionStatus.UPDATED.getId())totUpdated++;
-                      else if(resolutionStatus==ResolutionStatus.RESOLVED.getId())totRes++;//Resolution proposed count
-                      else if(resolutionStatus==ResolutionStatus.CLOSED.getId())totClosed++;
-                      else if(resolutionStatus==ResolutionStatus.NOT_APPLICABLE.getId())totNA++;
-              }
-          }
-    	dib.setTotNew(totNew);
+
+         ArrayList parentNotes = dndao.findExistingNotesForItemData(itemDataId);
+         //Adding this to show the value of only parent threads on discrepancy notes tool tip
+         for (Object obj : parentNotes) {
+             DiscrepancyNoteBean note = (DiscrepancyNoteBean) obj;
+             /*We would only take the resolution status of the parent note of any note thread. If there
+             * are more than one note thread, the thread with the worst resolution status will be taken.*/
+           
+             if(note.getParentDnId()==0)
+             {
+            	 if(hasOtherThread)
+            	 {
+            		 totNew++;
+            	 }
+            	 hasOtherThread = true;
+             }
+                
+                
+         }
+    	dib.setTotNew(totNew);//totNew is used for parent thread count
     	dib.setTotRes(totRes);
     	dib.setTotUpdated(totUpdated);
     	dib.setTotClosed(totClosed);
@@ -4779,6 +4788,7 @@ public abstract class DataEntryServlet extends SecureController {
     private int getDiscrepancyNoteResolutionStatus(int itemDataId, ArrayList formNotes) {
         int resolutionStatus = 0;
         boolean hasOtherThread = false;
+        int parentNotesNum = 0;
         ArrayList existingNotes = dndao.findExistingNotesForItemData(itemDataId);
         for (Object obj : existingNotes) {
             DiscrepancyNoteBean note = (DiscrepancyNoteBean) obj;
@@ -4813,6 +4823,8 @@ public abstract class DataEntryServlet extends SecureController {
                 hasOtherThread = true;
             }
         }
+      
+   
         return resolutionStatus;
     }
 
