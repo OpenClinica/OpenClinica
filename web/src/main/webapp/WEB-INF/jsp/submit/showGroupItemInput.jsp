@@ -17,17 +17,17 @@ function genToolTips(itemId){
 	var updatedDates = new Array();
 	var i=0;
 	var discNotes = new Array();
-	var title = "Notes and Discrepancies";
+	var title = '<fmt:message key="tooltip_title1" bundle="${resword}"/>';
 	var parentDnIds = new Array();
    var totNotes = 0;
-		   var footNote = "Click on main window to create Discrepancy Notes";
+		   var footNote = '<fmt:message key="footNote" bundle="${resword}"/>';
 	 		<c:set var="discrepancyNotes" value="1"/>
 		<c:forEach var="itemsSection" items="${section.items}">
 	   			
 	   			if("${itemsSection.item.id}"== itemId)
 	   			{
 			
-				<c:set var="notesSize" value="${itemsSection.totNew}}"/>
+				<c:set var="notesSize" value="${itemsSection.totNew}"/>
 	   			title = "<c:out value="${itemsSection.item.name}"/>";
 	   				<c:set  var="discrepancyNotes" value="${itemsSection.discrepancyNotes}"/>
 	        		<c:forEach var="discrepancyNotes" items="${discrepancyNotes}">  	
@@ -40,7 +40,7 @@ function genToolTips(itemId){
 					
 			   	 	</c:forEach>
 					totNotes = 	 ${notesSize};
-				if(totNotes >0) footNote = 'Click on the flag in the main window to view '+ totNotes+' Notes ' ;
+				if(totNotes >0) footNote = '<fmt:message key="footNote_threads" bundle="${resword}"/>'+ totNotes+ '<fmt:message key="foot_threads" bundle="${resword}"/>' ;
 	   			}
 	    </c:forEach>
 	 	
@@ -56,6 +56,7 @@ function genToolTips(itemId){
 	          '</td></tr></tbody></table></table></div>';
 		  return htmlgen;
 	}
+  
 </script>
 <c:set var="inputType" value="${displayItem.metadata.responseSet.responseType.name}" />
 <c:set var="itemId" value="${displayItem.item.id}" />
