@@ -92,10 +92,10 @@ function genToolTips(itemId){
 	var updatedDates = new Array();
 	var i=0;
 	var discNotes = new Array();
-	var title = "Notes and Discrepancies";
+	var title = '<fmt:message key="tooltip_title1" bundle="${resword}"/>';
 	var parentDnIds = new Array();
    var totNotes = 0;
-		   var footNote = "Click on main window to create Discrepancy Notes";
+		   var footNote = '<fmt:message key="footNote" bundle="${resword}"/>';
 	 		<c:set var="discrepancyNotes" value="1"/>
 		<c:forEach var="itemsSection" items="${section.items}">
 	   			
@@ -115,7 +115,7 @@ function genToolTips(itemId){
 					
 			   	 	</c:forEach>
 					totNotes = 	 ${notesSize};
-				if(totNotes >0) footNote = 'Click on the flag in the main window to view '+ totNotes+' Notes ' ;
+				if(totNotes >0) footNote = '<fmt:message key="footNote_threads" bundle="${resword}"/>'+ totNotes+ '<fmt:message key="foot_threads" bundle="${resword}"/>' ;
 	   			}
 	    </c:forEach>
 	 	

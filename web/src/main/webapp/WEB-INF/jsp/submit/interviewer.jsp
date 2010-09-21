@@ -81,10 +81,10 @@ var closing = true;
     	  var updatedDates = new Array();
 		   var parentDnids = new Array();
 		   var totNotes = 0;
-		   var footNote = "Click on main window to create Discrepancy Notes";
+		   var footNote = '<fmt:message key="footNote" bundle="${resword}"/>';
     	  var i=0;
     	  var discNotes = new Array();
-    	  var title = 'Notes and Discrepancies';
+    	  var title = '<fmt:message key="tooltip_title1" bundle="${resword}"/>';
     	  	if(flag =='interviewNotes')
     	     	{
     	     	<c:forEach var="discrepancyNoteBeans" items="${nameNotes}">
@@ -95,9 +95,9 @@ var closing = true;
 					parentDnids[i] = '<c:out value="${discrepancyNoteBeans.parentDnId}"/>';
     	  			i++;
     	  	 	</c:forEach>
-    	  	 	title = "Interviewer Name";
+    	  	 	title = '<fmt:message key="tooltip_name_title" bundle="${resword}"/>';
 				totNotes = ${fn:length(existingNameNotes)};
-				if(totNotes >0) footNote = 'Click on the flag in the main window to view '+ totNotes+' Notes ' ;
+				if(totNotes >0) footNote = '<fmt:message key="footNote_threads" bundle="${resword}"/>'+ totNotes+ '<fmt:message key="threads" bundle="${resword}"/>' ;
     	     	}
     	   	else if(flag =='dateNotes')
     	     {
@@ -109,10 +109,10 @@ var closing = true;
 					parentDnids[i] = '<c:out value="${discrepancyNoteBeans.parentDnId}"/>';
     	  			i++;
     	     	</c:forEach>
-    	   title = "Interview Date";
+    	   title = '<fmt:message key="tooltip_name_title" bundle="${resword}"/>';
 		   totNotes = ${fn:length(existingIntrvDateNotes)};
 		   
-	if(totNotes >0) footNote = 'Click on the flag in the main window to view '+ totNotes+' Notes ' ;
+	if(totNotes >0) footNote = '<fmt:message key="footNote_threads" bundle="${resword}"/>'+ totNotes+ '<fmt:message key="foot_threads" bundle="${resword}"/>' ;
     	   }
     	
 	
@@ -149,7 +149,7 @@ var closing = true;
 						row+='<tr> <td class=\"label\"></td><td colspan = "3" class=\"borderlabel\" nowrap >&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
 					}
 				else
-     				row+='<tr> <td class=\"label\"><img src="images/icon_Note.gif" width="16" height="13" alt="Note"></td>'+'<td  width="180" align="left" class=\"label\" nowrap>&nbsp;New: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td class=\"borderlabel\" nowrap >&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
+     				row+='<tr> <td class=\"label\"><img src="images/icon_Note.gif" width="16" height="13" alt="Note"></td>'+'<td  width="180" align="left" class=\"label\" nowrap>&nbsp;<fmt:message key="open" bundle="${resword}"/>: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td class=\"borderlabel\" nowrap >&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
      			}
      			else if(resStatus[x]=='2')
      			{
@@ -158,7 +158,7 @@ var closing = true;
 						row+='<tr> <td class=\"label\"></td><td colspan = "3" class=\"borderlabel\" nowrap >&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
 					}
 				else
-     				row+='<tr > <td  class=\"label\"><img src="images/icon_flagYellow.gif" width="16" height="13" alt="Note"></td>'+'<td width="180"  align="left" class=\"label\" nowrap>&nbsp;Updated: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td  class=\"borderlabel\" nowrap>&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
+     				row+='<tr > <td  class=\"label\"><img src="images/icon_flagYellow.gif" width="16" height="13" alt="Note"></td>'+'<td width="180"  align="left" class=\"label\" nowrap>&nbsp;<fmt:message key="updated" bundle="${resword}"/>: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td  class=\"borderlabel\" nowrap>&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
      			}
      			else if(resStatus[x]=='3')
      			{
@@ -167,7 +167,7 @@ var closing = true;
 						row+='<tr> <td class=\"label\"></td><td colspan = "3" class=\"borderlabel\" nowrap >&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
 					}
 				else
-					row+='<tr> <td class=\"label\"><img src="images/icon_flagGreen.gif" width="16" height="13" alt="Note"></td>'+'<td  width="180"  align="left" class=\"label\" nowrap>&nbsp;Res.Proposed: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td  class=\"borderlabel\" nowrap>&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
+					row+='<tr> <td class=\"label\"><img src="images/icon_flagGreen.gif" width="16" height="13" alt="Note"></td>'+'<td  width="180"  align="left" class=\"label\" nowrap>&nbsp;<fmt:message key="resolved" bundle="${resword}"/>: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td  class=\"borderlabel\" nowrap>&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
      			}
      			else if(resStatus[x]=='4')
      			{
@@ -176,7 +176,7 @@ var closing = true;
 						row+='<tr> <td class=\"label\"></td><td colspan = "3" class=\"borderlabel\" nowrap >&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
 					}
 				else
-     				row+='<tr> <td  class=\"label\"><img src="images/icon_flagBlack.gif" width="16" height="13" alt="Note"></td>'+'<td  width="180" align="left" class=\"label\" nowrap>&nbsp;Closed: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td class=\"borderlabel\" nowrap>&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
+     				row+='<tr> <td  class=\"label\"><img src="images/icon_flagBlack.gif" width="16" height="13" alt="Note"></td>'+'<td  width="180" align="left" class=\"label\" nowrap>&nbsp;<fmt:message key="closed" bundle="${resword}"/>: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td class=\"borderlabel\" nowrap>&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
      			}
      			else if(resStatus[x]=='5')
      		{
@@ -185,7 +185,7 @@ var closing = true;
 						row+='<tr> <td class=\"label\"></td><td colspan = "3" class=\"borderlabel\" nowrap >&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
 					}
 				else
-     			row+='<tr> <td width="16"  class=\"label\"><img src="images/icon_flagWhite.gif" width="16" height="13" alt="Note"></td>'+'<td width="180"  align="left" class=\"label\" nowrap>&nbsp;N/A: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td class=\"borderlabel\" nowrap>&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
+     			row+='<tr> <td width="16"  class=\"label\"><img src="images/icon_flagWhite.gif" width="16" height="13" alt="Note"></td>'+'<td width="180"  align="left" class=\"label\" nowrap>&nbsp; <fmt:message key="not_applicable" bundle="${resword}"/>: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td class=\"borderlabel\" nowrap>&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
      			}
      			
      			
