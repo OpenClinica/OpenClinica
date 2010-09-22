@@ -164,6 +164,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
         xml.append(nls);
     }
 
+    /*
     public void addStudyMetaDataVersion(boolean isDataset) {
         StringBuffer xml = this.getXmlOutput();
         String indent = this.getIndent();
@@ -201,6 +202,67 @@ public class MetaDataReportBean extends OdmXmlReportBean {
             xml.append(currentIndent + "<MetaDataVersion>");
             xml.append(nls);
         }
+        //
+        addProtocol(currentIndent + indent);
+        boolean isStudy = meta.getStudy().getParentStudyId()>0 ? false : true;
+        if (meta.getStudyEventDefs().size() > 0) {
+            addStudyEventDef(isStudy, currentIndent + indent);
+            if (meta.getItemGroupDefs().size() > 0) {
+                addFormDef(isStudy, currentIndent + indent);
+                addItemGroupDef(isStudy, currentIndent + indent);
+                addItemDef(isStudy, currentIndent + indent);
+                addCodeList(currentIndent + indent);
+                if ("oc1.2".equalsIgnoreCase(ODMVersion)) {
+                    addMultiSelectList(currentIndent + indent);
+                    addStudyGroupClassList(currentIndent + indent);
+                } else if ("oc1.3".equalsIgnoreCase(ODMVersion)) {
+                    addMultiSelectList(currentIndent + indent);
+                    addStudyGroupClassList(currentIndent + indent);
+                    if(meta.getStudy().getParentStudyId()>0) {
+                    } else {
+                        this.addStudyDetails(currentIndent+indent);
+                    }
+                }
+            }
+        }
+        xml.append(currentIndent + "</MetaDataVersion>");
+        xml.append(nls);
+    }
+    */
+    public void addStudyMetaDataVersion(boolean isDataset) {
+        StringBuffer xml = this.getXmlOutput();
+        String indent = this.getIndent();
+        String currentIndent = indent + indent;
+        String ODMVersion = this.getODMVersion();
+        MetaDataVersionBean meta = odmstudy.getMetaDataVersion();
+        
+        xml.append(currentIndent + "<MetaDataVersion OID=\"" + StringEscapeUtils.escapeXml(meta.getOid()) + "\" Name=\""
+            + StringEscapeUtils.escapeXml(meta.getName()) + "\">");
+        xml.append(nls);
+        // for <Include>,
+        // 1. In order to have <Include>, previous metadataversionOID must
+        // be
+        // given.
+        // 2. If there is no previous study, then previous study OID is as
+        // the
+        // same as the current study OID
+        // 3. there is no Include if both previous study and previous
+        // metadataversionOID are empty
+        if (meta.getInclude() != null) {
+            String pmOid = meta.getInclude().getMetaDataVersionOID();
+            if (pmOid != null && pmOid.length() > 0) {
+                xml.append(currentIndent + indent);
+                String psOid = meta.getInclude().getStudyOID();
+                if (psOid != null && psOid.length() > 0) {
+                    xml.append("<Include StudyOID =\"" + StringEscapeUtils.escapeXml(psOid) + "\"");
+                } else {
+                    xml.append("<Include StudyOID =\"" + StringEscapeUtils.escapeXml(odmstudy.getOid()) + "\"");
+                }
+                xml.append(" MetaDataVersionOID=\"" + StringEscapeUtils.escapeXml(pmOid) + "\"/>");
+                xml.append(nls);
+            }
+        }
+            
         //
         addProtocol(currentIndent + indent);
         boolean isStudy = meta.getStudy().getParentStudyId()>0 ? false : true;

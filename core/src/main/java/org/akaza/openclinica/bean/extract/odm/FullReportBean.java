@@ -7,12 +7,12 @@
  */
 package org.akaza.openclinica.bean.extract.odm;
 
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+
 import org.akaza.openclinica.bean.odmbeans.OdmAdminDataBean;
 import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
 import org.akaza.openclinica.bean.odmbeans.OdmStudyBean;
-
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 
 /**
  * Create one ODM XML file.
@@ -65,6 +65,32 @@ public class FullReportBean extends OdmXmlReportBean {
         this.addRootEndLine();
     }
 
+    /**
+     * Currently, it incudes <MetadataVersion> and <AdminData>
+     * 
+     * @param isDataset
+     */
+    public void createStudyMetaOdmXml(boolean isDataset) {
+        this.addHeading();
+        this.addRootStartLine();
+
+        // add the contents here in order
+        // 1) the information about Study
+        Iterator<OdmStudyBean> itm = this.odmStudyMap.values().iterator();
+        while (itm.hasNext()) {
+            OdmStudyBean s = itm.next();
+            addNodeStudy(s, isDataset);
+        }
+        // 2) the information about administrative data
+        Iterator<OdmAdminDataBean> ita = this.adminDataMap.values().iterator();
+        while (ita.hasNext()) {
+            OdmAdminDataBean a = ita.next();
+            addNodeAdminData(a);
+        }
+
+        this.addRootEndLine();
+    }
+    
     public void createChunkedOdmXml(boolean isDataset, boolean header, boolean footer) {
         ClinicalDataReportBean data = new ClinicalDataReportBean(this.clinicaldata);
         data.setXmlOutput(this.getXmlOutput());
