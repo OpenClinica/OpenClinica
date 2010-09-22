@@ -32,6 +32,11 @@ import org.akaza.openclinica.bean.odmbeans.OdmAdminDataBean;
 public class AdminDataCollector extends OdmDataCollector {
     private LinkedHashMap<String, OdmAdminDataBean> odmAdminDataMap;
 
+    public AdminDataCollector(DataSource ds, StudyBean currentStudy) {
+        super(ds, currentStudy);
+        this.odmAdminDataMap = new LinkedHashMap<String, OdmAdminDataBean>();
+    }
+    
     /**
      * 
      * @param ds

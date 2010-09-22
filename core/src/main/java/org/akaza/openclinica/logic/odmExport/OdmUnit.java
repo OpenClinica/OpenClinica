@@ -55,7 +55,7 @@ public class OdmUnit {
 
     public OdmUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, StudyBean study, int category) {
         this.ds = ds;
-        this.dataset = dataset;
+        this.dataset = dataset.getId()>0 ? dataset : new DatasetBean();
         this.studyBase = new OdmStudyBase(this.ds, study);
         this.odmBean = odmBean;
         nullValueMap = initialNullValueMap();

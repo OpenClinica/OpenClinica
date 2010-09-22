@@ -9,13 +9,6 @@
 
 package org.akaza.openclinica.logic.odmExport;
 
-import org.akaza.openclinica.bean.extract.DatasetBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.odmbeans.ODMBean;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -25,6 +18,13 @@ import java.util.LinkedHashMap;
 import java.util.TimeZone;
 
 import javax.sql.DataSource;
+
+import org.akaza.openclinica.bean.extract.DatasetBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.odmbeans.ODMBean;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Prepare data for one ODM XML file.
@@ -48,7 +48,9 @@ public abstract class OdmDataCollector {
 
     /**
      * Constructor for an ODM XML file containing information of the passed
-     * StudyBean only.
+     * StudyBean. If it is a site, 
+     * only contains information of this site. If it is a study,
+     * contains information of this study and its sites if appliable.
      * 
      * @param ds
      * @param study
@@ -65,8 +67,16 @@ public abstract class OdmDataCollector {
         }
         dataset = new DatasetBean();
         odmbean = new ODMBean();
-        this.studyBaseMap = this.populateStudyBaseMap(study.getId());
-        category = 0;
+
+        if (study.isSite(study.getParentStudyId())) {
+            this.studyBaseMap = new LinkedHashMap<String, OdmStudyBase>();
+            this.studyBaseMap.put(study.getOid(), new OdmStudyBase(ds, study));
+            this.category = 0;
+        } else {
+            int parentStudyId = study.getParentStudyId() > 0 ? study.getParentStudyId() : study.getId();
+            this.studyBaseMap = populateCompletedStudyBaseMap(parentStudyId);
+            category = 1;
+        }
     }
 
     /**
@@ -152,9 +162,14 @@ public abstract class OdmDataCollector {
         int hours = offset / 3600000;
         int minutes = (offset - hours * 3600000) / 60000;
         DecimalFormat twoDigits = new DecimalFormat("00");
-        odmbean.setFileOID(this.dataset.getName() + "D" + (new SimpleDateFormat("yyyyMMddHHmmssZ")).format(creationDatetime));
-        odmbean.setDescription(this.dataset.getDescription().trim());
-        odmbean.setCreationDateTime((new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss" + sign + twoDigits.format(hours) + ":" + twoDigits.format(minutes)))
+        if(dataset.getId()>0) {
+            odmbean.setFileOID(this.dataset.getName() + "D" + new SimpleDateFormat("yyyyMMddHHmmssZ").format(creationDatetime));
+            odmbean.setDescription(this.dataset.getDescription().trim());
+        } else {
+            odmbean.setFileOID( "Study-Meta"+ "D" + new SimpleDateFormat("yyyyMMddHHmmssZ").format(creationDatetime));
+            odmbean.setDescription("Study Metadata");
+        }
+        odmbean.setCreationDateTime(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss" + sign + twoDigits.format(hours) + ":" + twoDigits.format(minutes))
                 .format(creationDatetime));
 
     }

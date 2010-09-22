@@ -52,7 +52,7 @@ public class AdminDataUnit extends OdmUnit {
         OdmExtractDAO oedao = new OdmExtractDAO(this.ds);
         if (this.getCategory() == 1 && study.isSite(study.getParentStudyId())) {
             String mvoid = "";
-            if (this.dataset != null) {
+            if (this.dataset != null && this.dataset.getId() > 0) {
                 mvoid = this.dataset.getODMMetaDataVersionOid();
             }
             if (mvoid.length() > 0) {
