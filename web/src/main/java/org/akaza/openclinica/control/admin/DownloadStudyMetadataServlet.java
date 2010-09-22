@@ -7,21 +7,21 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import org.akaza.openclinica.bean.core.Utils;
+import java.util.ArrayList;
+
+import org.akaza.openclinica.bean.extract.odm.AdminDataReportBean;
+import org.akaza.openclinica.bean.extract.odm.FullReportBean;
 import org.akaza.openclinica.bean.extract.odm.MetaDataReportBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.odmbeans.ODMBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.logic.odmExport.MetadataUnit;
+import org.akaza.openclinica.logic.odmExport.AdminDataCollector;
+import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.akaza.openclinica.web.SQLInitServlet;
-
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * @author ywang
@@ -59,25 +59,44 @@ public class DownloadStudyMetadataServlet extends SecureController {
             studyName += ((StudyBean) sdao.findByPK(study.getParentStudyId())).getName() + "_";
         }
         studyName += study.getName();
-        MetadataUnit mdc = new MetadataUnit(sm.getDataSource(), study, 0);
-        mdc.collectOdmStudy();
-        MetaDataReportBean meta = new MetaDataReportBean(mdc.getOdmStudy());
-        meta.addNodeStudy(Boolean.FALSE);
-        String creationTime = (new SimpleDateFormat("yyyyMMddHHmmss")).format(new Date());
-        String fileName = studyName + "_" + creationTime + ".txt";
-        String filePath = SQLInitServlet.getField("filePath") + "studyMeta" + File.separator + study.getId() + File.separator + creationTime + File.separator;
-        if (Utils.createZipFile(fileName, filePath, meta.getXmlOutput())) {
-            response.setContentType("application/zip");
-            response.setHeader("Content-disposition", "attachment; filename=\"" + fileName + ".zip\";");
-            response.setHeader("Pragma", "public");
-            request.setAttribute("generate", filePath + fileName + ".zip");
-            response.setHeader("Pragma", "public");
-            Page finalTarget = Page.EXPORT_DATA_CUSTOM;
-            finalTarget.setFileName("/WEB-INF/jsp/extract/generatedFileDataset.jsp");
-            forwardPage(finalTarget);
-        } else {
-            addPageMessage(respage.getString("metadata_unavailable_see_log"));
-            forwardPage(Page.VIEW_FULL_STUDY);
-        }
+        
+
+        MetaDataCollector mdc = new MetaDataCollector(sm.getDataSource(), currentStudy);
+        AdminDataCollector adc = new AdminDataCollector(sm.getDataSource(), currentStudy);
+        MetaDataCollector.setTextLength(200);
+
+        ODMBean odmb = mdc.getODMBean();
+        odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC2-0.xsd");
+        ArrayList<String> xmlnsList = new ArrayList<String>();
+        xmlnsList.add("xmlns=\"http://www.cdisc.org/ns/odm/v1.3\"");
+        xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/openclinica_odm/v1.3\"");
+        odmb.setXmlnsList(xmlnsList);
+        odmb.setODMVersion("oc1.3");
+        mdc.setODMBean(odmb);
+        adc.setOdmbean(odmb);
+
+        mdc.collectFileData();
+        MetaDataReportBean metaReport = new MetaDataReportBean(mdc.getOdmStudyMap());
+        metaReport.setODMVersion("oc1.3");
+        metaReport.setOdmBean(mdc.getODMBean());
+        metaReport.createChunkedOdmXml(Boolean.FALSE);
+        
+        adc.collectFileData();
+        AdminDataReportBean adminReport = new AdminDataReportBean(adc.getOdmAdminDataMap());
+        adminReport.setODMVersion("oc1.3");
+        adminReport.setOdmBean(mdc.getODMBean());
+        adminReport.createChunkedOdmXml(Boolean.FALSE);
+        
+        FullReportBean report = new FullReportBean();
+        report.setAdminDataMap(adc.getOdmAdminDataMap());
+        report.setOdmStudyMap(mdc.getOdmStudyMap());
+        report.setOdmBean(mdc.getODMBean());
+        report.setODMVersion("oc1.3");
+        report.createStudyMetaOdmXml(Boolean.FALSE);
+       
+        request.setAttribute("generate", report.getXmlOutput().toString().trim());
+        Page finalTarget = Page.EXPORT_DATA_CUSTOM;
+        finalTarget.setFileName("/WEB-INF/jsp/extract/downloadStudyMetadata.jsp");
+        forwardPage(finalTarget);
     }
 }
