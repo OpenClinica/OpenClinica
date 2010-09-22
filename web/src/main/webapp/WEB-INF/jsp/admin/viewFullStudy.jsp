@@ -78,7 +78,7 @@
 
 
 <strong><fmt:message key="download_study_meta" bundle="${restext}"/>
-<a href="javascript:openDocWindow('http://localhost:8080/OpenClinica-web-SNAPSHOT/DownloadStudyMetadata?studyId=2');"> 
+<a href="javascript:openDocWindow('DownloadStudyMetadata?studyId=<c:out value="${studyToView.id}"/>');"> 
 <fmt:message key="here" bundle="${restext}"/></a>.  
 <fmt:message key="opening_finished_may_save" bundle="${restext}"/>
  </strong>
