@@ -77,8 +77,11 @@
 <h1><span class="title_manage"><c:out value="${studyToView.name}"/></span></h1>
 
 
-<strong><fmt:message key="download_oid_in_odm_format_by_click" bundle="${restext}"/>
- <a href="DownloadStudyMetadata?studyId=<c:out value="${studyToView.id}"/>"> <fmt:message key="here" bundle="${restext}"/></a>.</strong>
+<strong><fmt:message key="download_study_meta" bundle="${restext}"/>
+<a href="javascript:openDocWindow('http://localhost:8080/OpenClinica-web-SNAPSHOT/DownloadStudyMetadata?studyId=2');"> 
+<fmt:message key="here" bundle="${restext}"/></a>.  
+<fmt:message key="opening_finished_may_save" bundle="${restext}"/>
+ </strong>
 <fmt:message key="get_subject_oid_from_matrix_show_more" bundle="${restext}"/>
 <br><br>
 <a href="javascript:leftnavExpand('overview');">
