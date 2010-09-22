@@ -642,7 +642,7 @@ public class SDVUtil {
         // if(totalRowCount > 0){
         sDVToolbar.setMaxRowsIncrements(new int[] { 15, 25, 50 });
         tableFacade.setToolbar(sDVToolbar);
-        tableFacade.setView(new SDVView(request.getLocale()));
+        tableFacade.setView(new SDVView(request.getLocale(), request));
 
         //Fix column titles
         HtmlTable table = (HtmlTable) tableFacade.getTable();
@@ -1409,26 +1409,36 @@ public class SDVUtil {
     class SDVView extends AbstractHtmlView {
 
         private final ResourceBundle resword;
+        private boolean showTitle= false;
 
-        public SDVView(Locale locale) {
+        public SDVView(Locale locale, HttpServletRequest request) {
             resword = ResourceBundleProvider.getWordsBundle(locale);
+            if(request.getRequestURI().contains("MainMenu"))
+            	showTitle = true;
         }
 
         public Object render() {
             HtmlSnippets snippets = getHtmlSnippets();
             HtmlBuilder html = new HtmlBuilder();
             html.append(snippets.themeStart());
+            
             html.append(snippets.tableStart());
+          
             html.append(snippets.theadStart());
+           // html.append(snippets.tableStart());
             html.append(customHeader());
             html.append(snippets.toolbar());
             html.append(selectAll());
+          
             html.append(snippets.header());
             html.append(snippets.filter());
-            html.append(snippets.theadEnd());
+          
+            
             html.append(snippets.tbodyStart());
+          
             html.append(snippets.body());
-            html.append(snippets.tbodyEnd());
+            
+            html.append(snippets.theadEnd());
             html.append(snippets.footer());
             html.append(snippets.statusBar());
             html.append(snippets.tableEnd());
@@ -1451,13 +1461,17 @@ public class SDVUtil {
         }
         private String customHeader()
         {
-       	 HtmlBuilder html = new HtmlBuilder();
+        	if(showTitle)
+        	{
+        	HtmlBuilder html = new HtmlBuilder();
 	        
-	        html.thead(0).tr(0).styleClass("header").close();
-	        html.td(0).style("border-bottom: 1px solid white;background-color:white;color:black;font-size:12px;").align("left").close().append(resword.getString("source_data_verification")).tdEnd();
+        	 html.tr(0).styleClass("header").width("100%").close();
+	        html.td(0).colspan("100%").style("border-bottom: 1px solid white;background-color:white;color:black;font-size:12px;").align("left").close().append(resword.getString("source_data_verification")).tdEnd().trEnd(0);
 	        
-	        html.theadEnd(0);
+
 	        return html.toString();
+        	}
+        	else return "";
         }
     }
 

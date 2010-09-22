@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.jmesa.view.component.Column;
 import org.jmesa.view.editor.CellEditor;
@@ -15,11 +17,14 @@ public class ListStudyView  extends DefaultView{
 	
 	
 	   private final ResourceBundle resword;
-    
+	   private boolean showTitle= false;
 
-	public ListStudyView(Locale locale)
+	public ListStudyView(Locale locale,HttpServletRequest request)
 	{
 		 resword = ResourceBundleProvider.getWordsBundle(locale);
+		 if(request.getRequestURI().contains("MainMenu"))
+         	showTitle = true;
+		 
 	}
 	
 	public Object render() {
@@ -56,10 +61,11 @@ public class ListStudyView  extends DefaultView{
 	     
 	    }
 	        private String customHeader(){
+	        		
 	        	HtmlBuilder html = new HtmlBuilder();
 	        	
 	        		        html.tr(1).styleClass("header").width("100%").close();
-	        		      
+	        		        if(showTitle)
 	        		        html.td(0).style("border-bottom: 1px solid white;background-color:white;color:black;").align("center").close().append(resword.getString("subject_matrix")).tdEnd();
 	        		        
 	        		        html.trEnd(1);

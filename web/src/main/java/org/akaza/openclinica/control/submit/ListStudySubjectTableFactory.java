@@ -57,6 +57,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public class ListStudySubjectTableFactory extends AbstractTableFactory {
@@ -85,6 +86,25 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
     final HashMap<Integer, String> imageIconPaths = new HashMap<Integer, String>(8);
 
+    @Override
+//To avoid showing title in other pages, the request element is used to determine where the request came from.
+    public TableFacade createTable(HttpServletRequest request, HttpServletResponse response) {
+         locale = request.getLocale();
+        TableFacade tableFacade = getTableFacadeImpl(request, response);
+        tableFacade.setStateAttr("restore");
+        setDataAndLimitVariables(tableFacade);
+        configureTableFacade(response, tableFacade);
+        if (!tableFacade.getLimit().isExported()) {
+            configureColumns(tableFacade, locale);
+            tableFacade.setMaxRowsIncrements(getMaxRowIncrements());
+            configureTableFacadePostColumnConfiguration(tableFacade);
+            configureTableFacadeCustomView(tableFacade,request);
+            configureUnexportedTable(tableFacade, locale);
+        } else {
+            configureExportColumns(tableFacade, locale);
+        }
+        return tableFacade;
+    }
     public ListStudySubjectTableFactory(boolean showMoreLink) {
         imageIconPaths.put(1, "images/icon_Scheduled.gif");
         imageIconPaths.put(2, "images/icon_NotStarted.gif");
@@ -101,9 +121,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     protected String getTableName() {
         return "findSubjects";
     }
-    @Override
-    public void configureTableFacadeCustomView(TableFacade tableFacade) {
-        tableFacade.setView(new ListStudyView(getLocale()));
+
+    public void configureTableFacadeCustomView(TableFacade tableFacade,HttpServletRequest request) {
+        tableFacade.setView(new ListStudyView(getLocale(),request));
     }
     @Override
     protected void configureColumns(TableFacade tableFacade, Locale locale) {

@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 
 public abstract class AbstractTableFactory {
 
-    private Locale locale;
+    protected Locale locale;
 
     protected abstract String getTableName();
 
