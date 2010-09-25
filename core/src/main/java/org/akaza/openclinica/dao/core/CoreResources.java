@@ -30,7 +30,7 @@ public class CoreResources implements ResourceLoaderAware {
 
     private Properties dataInfo;
     private Properties extractInfo;
-    private MessageSource messageSource;
+    // private MessageSource messageSource;
     private static ArrayList<ExtractPropertyBean> extractProperties;
 
     public void setResourceLoader(ResourceLoader resourceLoader) {
@@ -53,13 +53,13 @@ public class CoreResources implements ResourceLoaderAware {
         return resourceLoader;
     }
 
-    public MessageSource getMessageSource() {
-        return messageSource;
-    }
-
-    public void setMessageSource(MessageSource messageSource) {
-        this.messageSource = messageSource;
-    }
+//    public MessageSource getMessageSource() {
+//        return messageSource;
+//    }
+//
+//    public void setMessageSource(MessageSource messageSource) {
+//        this.messageSource = messageSource;
+//    }
 
     public static ArrayList<ExtractPropertyBean> getExtractProperties() {
         return extractProperties;
@@ -196,7 +196,7 @@ public class CoreResources implements ResourceLoaderAware {
         return value == null ? "" : value;
     }
     
-    public ExtractPropertyBean findExtractPropertyBeanById(int id) {
+    public static ExtractPropertyBean findExtractPropertyBeanById(int id) {
         for (ExtractPropertyBean epbean : extractProperties) {
             if (epbean.getId() == id) {
                 return epbean;

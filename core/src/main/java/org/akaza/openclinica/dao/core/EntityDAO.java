@@ -543,8 +543,7 @@ public abstract class EntityDAO implements DAOInterface {
                 for (int i = 1; i <= rsmd.getColumnCount(); i++) {
                     String column = rsmd.getColumnName(i).toLowerCase();
                     Integer type = (Integer) setTypes.get(new Integer(i));
-                    // logger.warn("column name: "+column+" type #
-                    // "+type.intValue()+" row # "+i);
+                    // logger.warn("column name: "+column+" type # "+type.intValue()+" row # "+i);
                     switch (type.intValue()) {
                     // just putting the top five in here for now, tbh
                     // put in statements to catch nulls in the db, tbh
@@ -630,6 +629,7 @@ public abstract class EntityDAO implements DAOInterface {
                 // adding a row gotten from the database
             }
         } catch (SQLException sqle) {
+            // System.out.println("exception at column ");
             if (logger.isWarnEnabled()) {
                 logger.warn("Exception while processing result rows, EntityDAO.select: " + ": " + sqle.getMessage() + ": array length: " + al.size());
                 sqle.printStackTrace();
@@ -1230,6 +1230,7 @@ public abstract class EntityDAO implements DAOInterface {
             }
             ps = con.createStatement();
             ps.setFetchSize(50);
+
             rs = ps.executeQuery(query);
             if (logger.isInfoEnabled()) {
                 logger.info("Executing static query, GenericDAO.select: " + query);
@@ -1290,6 +1291,7 @@ public abstract class EntityDAO implements DAOInterface {
             }
             ps = con.createStatement();
             ps.setFetchSize(50);
+
             rs = ps.executeQuery(query);
             if (logger.isInfoEnabled()) {
                 logger.info("Executing static query, GenericDAO.select: " + query);

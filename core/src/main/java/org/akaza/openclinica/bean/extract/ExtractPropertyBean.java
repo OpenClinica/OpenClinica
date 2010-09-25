@@ -70,6 +70,14 @@ public class ExtractPropertyBean {
     public String getFileLocation() {
         return fileLocation;
     }
+    /*
+     * we need to set the file location and generate a unique name for the output.
+     * unique tags include: $date, $type, $datetime
+     * however, if we generate it here, we run the risk of generating a file name
+     * before other variables are set, i.e. type.
+     * also, we can't run the risk of generating two datestamps which may be different.
+     * tbh, 9/22/2010
+     */
     public void setFileLocation(String fileLocation) {
         this.fileLocation = fileLocation;
     }

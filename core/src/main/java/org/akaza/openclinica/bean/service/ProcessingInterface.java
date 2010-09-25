@@ -10,6 +10,6 @@ package org.akaza.openclinica.bean.service;
  *
  */
 public interface ProcessingInterface {
-    void run();
+    String run();
 
 }

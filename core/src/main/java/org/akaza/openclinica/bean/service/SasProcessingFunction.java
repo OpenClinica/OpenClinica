@@ -9,10 +9,11 @@ package org.akaza.openclinica.bean.service;
 public class SasProcessingFunction extends ProcessingFunction {
 
     public SasProcessingFunction() {
-        
+        fileType = "sas";
     }
     
-    public void run() {
-        
+    public String run() {
+        return null;
     }
+    
 }

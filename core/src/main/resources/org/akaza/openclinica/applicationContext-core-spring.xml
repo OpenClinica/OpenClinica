@@ -24,7 +24,7 @@
      <bean id="coreResources" class="org.akaza.openclinica.dao.core.CoreResources">
         <property name="dataInfo" ref="dataInfo"/>
         <property name="extractInfo" ref="extractInfo"/>
-        <property name="messageSource" ref="messageSource"/>
+        <!--  <property name="messageSource" ref="messageSource"/> -->
      </bean>
      
      <!-- ENABLING THIS WILL ACTIVATE I18N VIA SPRING -->
