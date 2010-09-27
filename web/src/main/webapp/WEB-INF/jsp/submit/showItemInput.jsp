@@ -469,7 +469,19 @@ function radioControlShow(element,scdPairStr) {
     <label for="input<c:out value="${itemId}"/>"></label>
     <c:choose>
       <c:when test="${isInError && !hasShown}">
-        <span class="<c:out value="${exclaim}"/>">! </span><input class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="checkbox" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
+        <span class="<c:out value="${exclaim}"/>">! </span>
+        <c:choose>
+		<c:when test="${fn:length(displayItem.SCDPairs)>0}">
+			<c:set var="scdPairStr" value=""/>
+			<c:forEach var="aPair" items="${displayItem.SCDPairs}">
+				<c:set var="scdPairStr" value="${scdPairStr}-----${aPair.SCDItemId}-----${aPair.optionValue}"/>
+	    	</c:forEach>
+	    	<input class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onClick="javascript:checkControlShow(this, '<c:out value="${scdPairStr}"/>');" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="checkbox" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
+       	</c:when>
+		<c:otherwise>
+			<input class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="checkbox" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
+      	</c:otherwise>
+		</c:choose>
       </c:when>
       <c:otherwise>
       	<c:choose>
@@ -499,7 +511,19 @@ function radioControlShow(element,scdPairStr) {
         <label for="input<c:out value="${itemId}"/>"></label>
         <c:choose>
             <c:when test="${isInError && !hasShown}">
-                <span class="<c:out value="${exclaim}"/>">! </span><input class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="radio" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
+                <span class="<c:out value="${exclaim}"/>">! </span>
+            	<c:choose>
+            	<c:when test="${fn:length(displayItem.SCDPairs)>0}">
+            		<c:set var="scdPairStr" value=""/>
+					<c:forEach var="aPair" items="${displayItem.SCDPairs}">
+						<c:set var="scdPairStr" value="${scdPairStr}-----${aPair.SCDItemId}-----${aPair.optionValue}"/>
+	    			</c:forEach>
+	    			<input class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onClick="javascript:radioControlShow(this, '<c:out value="${scdPairStr}"/>');"  onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="radio" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
+		        </c:when>
+		        <c:otherwise>
+		        	<input class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="radio" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
+		        </c:otherwise>
+	        	</c:choose>
             </c:when>
             <c:otherwise>
             	<c:choose>
@@ -522,8 +546,7 @@ function radioControlShow(element,scdPairStr) {
 <%-- adding some spacing to make this more readable, tbh --%>
 
 <c:if test='${inputType == "single-select"}'>
-
-  <label for="input<c:out value="${itemId}"/>"></label>
+	<label for="input<c:out value="${itemId}"/>"></label>
     <c:choose>
         <c:when test="${displayItem.metadata.defaultValue != '' &&
                 displayItem.metadata.defaultValue != null}">
@@ -545,13 +568,21 @@ include the default value first in the select list --%>
         </c:forEach>
     </c:if>
   <c:choose>
-
     <c:when test="${isInError && !hasShown}">
-      <span class="<c:out value="${exclaim}"/>">! </span>
-      <select class="<c:out value="${input}"/> formfield" id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" name="input<c:out value="${itemId}"/>">
-
-
-          <c:if test="${printDefaultFirst}">
+		<span class="<c:out value="${exclaim}"/>">! </span>
+		<c:choose>
+		<c:when test="${fn:length(displayItem.SCDPairs)>0}">
+			<c:set var="scdPairStr" value=""/>
+			<c:forEach var="aPair" items="${displayItem.SCDPairs}">
+				<c:set var="scdPairStr" value="${scdPairStr}-----${aPair.SCDItemId}-----${aPair.optionValue}"/>
+			</c:forEach>
+			<select class="<c:out value="${input}"/> formfield" id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="javascript:selectControlShow(this, '<c:out value="${scdPairStr}"/>'); javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" name="input<c:out value="${itemId}"/>">
+		</c:when>
+		<c:otherwise>
+			<select class="<c:out value="${input}"/> formfield" id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" name="input<c:out value="${itemId}"/>">
+		</c:otherwise>
+		</c:choose>
+		<c:if test="${printDefaultFirst}">
              <option value="<c:out value="" />" selected="selected"
                             <c:out value=""/> ><c:out value="${displayItem.metadata.defaultValue}" />
              </option>
@@ -564,9 +595,8 @@ include the default value first in the select list --%>
         <c:set var="count" value="${count+1}"/>
     </c:forEach>
     </select>
-</c:when>
-
-<c:otherwise>
+	</c:when>
+	<c:otherwise>
 
     <%--This code was placed at ln 149:    <c:choose>
         <c:when test="${displayItem.metadata.defaultValue != '' &&
@@ -635,22 +665,29 @@ include the default value first in the select list --%>
             <c:set var="count" value="${count+1}"/>
           </c:forEach>
         </c:otherwise>
-
       </c:choose>
-
     </select>
-
   </c:otherwise>
-
   </c:choose>
-
 </c:if>
 
 <c:if test='${inputType == "multi-select"}'>
   <label for="input<c:out value="${itemId}"/>"></label>
   <c:choose>
     <c:when test="${isInError && !hasShown}">
-      <span class="<c:out value="${exclaim}"/>">! </span><select class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" multiple  tabindex="<c:out value="${tabNum}"/>" name="input<c:out value="${itemId}"/>" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');">
+      	<span class="<c:out value="${exclaim}"/>">! </span>
+		<c:choose>
+		<c:when test="${fn:length(displayItem.SCDPairs)>0}">
+			<c:set var="scdPairStr" value=""/>
+			<c:forEach var="aPair" items="${displayItem.SCDPairs}">
+				<c:set var="scdPairStr" value="${scdPairStr}-----${aPair.SCDItemId}-----${aPair.optionValue}"/>
+			</c:forEach>
+      		<select class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" multiple  tabindex="<c:out value="${tabNum}"/>" name="input<c:out value="${itemId}"/>" onChange="javascript:selectControlShow(this, '<c:out value="${scdPairStr}"/>'); javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');">
+		</c:when>
+		<c:otherwise>
+      		<select class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" multiple  tabindex="<c:out value="${tabNum}"/>" name="input<c:out value="${itemId}"/>" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');">
+  		</c:otherwise>
+		</c:choose>
     </c:when>
     <c:otherwise>
     	<c:choose>
