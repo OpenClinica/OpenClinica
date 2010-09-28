@@ -19,8 +19,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
@@ -103,7 +101,6 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.form.FormBeanUtil;
 import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 /**
@@ -2544,12 +2541,13 @@ public abstract class DataEntryServlet extends SecureController {
         ItemDataBean idb = dib.getData();
         if (StringUtil.isBlank(idb.getValue())) {
             //if (ibMeta.isRequired() && showSCDItemIds.contains(ibMeta.getItemId())) {
-            if (ibMeta.isRequired()) {
-                if(dib.getIsSCDtoBeShown()) {
+            if (ibMeta.isRequired() && dib.getIsSCDtoBeShown()) {
+                v.addValidation(this.getInputName(dib), Validator.IS_REQUIRED);
+                /*if(dib.getIsSCDtoBeShown()) {
                     v.addValidation(this.getInputName(dib), Validator.IS_REQUIRED);
                 } else {
                     validateShownSCDToBeHiddenSingle(v,dib);
-                }
+                }*/
             }
         } else {
             validateShownSCDToBeHiddenSingle(v,dib);
@@ -2770,7 +2768,8 @@ public abstract class DataEntryServlet extends SecureController {
     //validate simple-conditional-display item to be changed from shown to hidden
     protected void validateShownSCDToBeHiddenSingle(DiscrepancyValidator v, DisplayItemBean dib) {
         ItemFormMetadataBean ifmb = dib.getMetadata();
-        if(SimpleConditionalDisplayPair.isCurrentShownItem(dib.getData()) && !dib.getIsSCDtoBeShown()) {
+        boolean hasDN = dib.getDiscrepancyNotes() != null && dib.getDiscrepancyNotes().size()>0 ? true : false;
+        if(SimpleConditionalDisplayPair.isCurrentShownItem(dib.getData()) && !dib.getIsSCDtoBeShown() && !hasDN) {
             String message = ifmb.getConditionalDisplay().replaceAll("\\\\,", "##").split(",")[2].trim();
             message = message.replaceAll("##", "\\,");
             Validation vl = new Validation(Validator.TO_HIDE_CONDITIONAL_DISPLAY);
@@ -2885,7 +2884,8 @@ public abstract class DataEntryServlet extends SecureController {
             return this.writeToDB(idb, dib, iddao, ordinal);
         } else {
             idb.setStatus(Status.DELETED);
-            iddao.updateStatus(idb);
+            idb.setUpdater(ub);
+            iddao.updateValue(idb);
             return idb.isActive();
         }
     }
@@ -4914,21 +4914,24 @@ public abstract class DataEntryServlet extends SecureController {
         //a conditional display item will be always after its control item.
         ArrayList<SimpleConditionalDisplayPair> cds = dib.getSCDPairs();
         if(cds.size()>0) {
-            String chosenOption = dib.getData().getValue().replaceAll("\\\\,", "##");
-            if(chosenOption.contains(",")) {
-                String[] ss = chosenOption.split(",");
-                for(SimpleConditionalDisplayPair cd : cds) {
-                    for(int i=0; i<ss.length; ++i) {
-                        if(ss[i].replaceAll("##", "\\\\,").trim().equalsIgnoreCase(cd.getOptionValue())) {
-                            showCDSet.add(cd.getSCDItemId());
+            String chosenOption = dib.getData().getValue();
+            if(chosenOption != null && chosenOption.length()>0) {
+                chosenOption = chosenOption.replaceAll("\\\\,", "##");
+                if(chosenOption.contains(",")) {
+                    String[] ss = chosenOption.split(",");
+                    for(SimpleConditionalDisplayPair cd : cds) {
+                        for(int i=0; i<ss.length; ++i) {
+                            if(ss[i].replaceAll("##", "\\\\,").trim().equalsIgnoreCase(cd.getOptionValue())) {
+                                showCDSet.add(cd.getSCDItemId());
+                            }
                         }
                     }
-                }
-            } else {
-                chosenOption.replaceAll("##", "\\,");
-                for(SimpleConditionalDisplayPair cd : cds) {
-                    if(chosenOption.equalsIgnoreCase(cd.getOptionValue())) {
-                        showCDSet.add(cd.getSCDItemId());
+                } else {
+                    chosenOption.replaceAll("##", "\\,");
+                    for(SimpleConditionalDisplayPair cd : cds) {
+                        if(chosenOption.equalsIgnoreCase(cd.getOptionValue())) {
+                            showCDSet.add(cd.getSCDItemId());
+                        }
                     }
                 }
             }
