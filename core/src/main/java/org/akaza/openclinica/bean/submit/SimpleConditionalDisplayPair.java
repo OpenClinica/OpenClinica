@@ -88,6 +88,6 @@ public class SimpleConditionalDisplayPair {
      */
     public static Boolean isCurrentShownItem(ItemDataBean simpleConditionalDisplayItemData) {
         Status itemDataStatus = simpleConditionalDisplayItemData.getStatus();
-        return itemDataStatus!=null && itemDataStatus.getId()>0 && itemDataStatus.getId()!=5 ? true : false;
+        return itemDataStatus!=null && itemDataStatus.getId()>0 && (itemDataStatus.getId()!=5||itemDataStatus.getId()!=7  ? true : false);
     }
 }
