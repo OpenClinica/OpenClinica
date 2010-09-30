@@ -35,7 +35,7 @@ public class SqlProcessingFunction extends ProcessingFunction {
      * 
      * 
      */
-    public String run() {
+    public ProcessingResultType run() {
     	try {
     		// load the proper database class below
     		if ("postgres".equals(databaseType)) {
@@ -53,7 +53,7 @@ public class SqlProcessingFunction extends ProcessingFunction {
     		    // and then execute the statement here
     		    // convert the translated file to a string and then tries an execute
 
-    		    System.out.println("-- > about to run " + statement);
+    		    // System.out.println("-- > about to run " + statement);
 
     		    stmt.executeUpdate(statement);
     		    
@@ -66,9 +66,19 @@ public class SqlProcessingFunction extends ProcessingFunction {
     	} catch (Exception e) {
     	    e.printStackTrace();
     	    System.out.println(" -- > found an exception : " + e.getMessage());
+    	    ProcessingResultType resultError = ProcessingResultType.FAIL;
+            resultError.setUrl(""); // TODO view datasets page
+            resultError.setArchiveMessage("Failure thrown: " + e.getMessage());
+            resultError.setDescription("Your job failed with the message of: " + e.getMessage());
+            return resultError;
     	}
     	// set up the reply object
-    	return null;
+    	ProcessingResultType result = ProcessingResultType.SUCCESS;
+        result.setUrl(""); // TODO no url required
+        result.setArchiveMessage("Successfully run");
+        result.setDescription("Your job ran successfully.");// replace with something from extract prop bean?
+        return result;
+    	// return null;
     }
     
 

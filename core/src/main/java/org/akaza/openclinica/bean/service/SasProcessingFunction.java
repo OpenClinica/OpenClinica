@@ -12,7 +12,7 @@ public class SasProcessingFunction extends ProcessingFunction {
         fileType = "sas";
     }
     
-    public String run() {
+    public ProcessingResultType run() {
         return null;
     }
     

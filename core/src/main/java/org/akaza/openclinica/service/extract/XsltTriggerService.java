@@ -1,6 +1,7 @@
 package org.akaza.openclinica.service.extract;
 
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.quartz.JobDataMap;
 import org.quartz.SimpleTrigger;
 
@@ -22,10 +23,10 @@ public class XsltTriggerService {
     
     public static String TRIGGER_GROUP_NAME = "XsltTriggers";
     
-    public SimpleTrigger generateXsltTrigger(String xslFile, String xmlFile, String endFilePath, String endFile, int datasetId, ExtractPropertyBean epBean) {
+    public SimpleTrigger generateXsltTrigger(String xslFile, String xmlFile, String endFilePath, String endFile, int datasetId, ExtractPropertyBean epBean, UserAccountBean userAccountBean) {
         Date startDateTime = new Date(System.currentTimeMillis());
         String jobName = xmlFile + datasetId;
-        SimpleTrigger trigger = new SimpleTrigger(jobName, TRIGGER_GROUP_NAME, 1, 1);
+        SimpleTrigger trigger = new SimpleTrigger(jobName, TRIGGER_GROUP_NAME, 0, 1);
         
         trigger.setStartTime(startDateTime);
         trigger.setName(jobName);// + datasetId);
@@ -34,13 +35,14 @@ public class XsltTriggerService {
         // set job data map
         JobDataMap jobDataMap = new JobDataMap();
 
-        // jobDataMap.put(EMAIL, email);
-        // jobDataMap.put(USER_ID, userAccount.getId());
         jobDataMap.put(XSL_FILE_PATH, xslFile);
         jobDataMap.put(XML_FILE_PATH, xmlFile);
         jobDataMap.put(POST_FILE_PATH, endFilePath);
         jobDataMap.put(POST_FILE_NAME, endFile);
         jobDataMap.put(EXTRACT_PROPERTY, epBean.getId());
+        jobDataMap.put(USER_ID, userAccountBean.getId());
+        jobDataMap.put(DATASET_ID, datasetId);
+        jobDataMap.put(EMAIL, userAccountBean.getEmail());
         // jobDataMap.put(DIRECTORY, directory);
         // jobDataMap.put(ExampleSpringJob.LOCALE, locale);
         

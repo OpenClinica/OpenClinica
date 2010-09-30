@@ -105,7 +105,7 @@ public class CoreResources implements ResourceLoaderAware {
             		function.setDatabaseUsername(getExtractField(whichSettings + ".username"));
             		function.setDatabasePassword(getExtractField(whichSettings + ".password"));
             	} else {
-            		// set default db settings here, somehow
+            		// set default db settings here
             	}
             	// also pre-set the database connection stuff
                 epbean.setPostProcessing(function);
@@ -116,7 +116,7 @@ public class CoreResources implements ResourceLoaderAware {
             } else if ("sas".equals(whichFunction)) {
                 epbean.setPostProcessing(new SasProcessingFunction());
             } else {
-                // add a null here?
+                // add a null here
                 epbean.setPostProcessing(null);
             }
             ret.add(epbean);

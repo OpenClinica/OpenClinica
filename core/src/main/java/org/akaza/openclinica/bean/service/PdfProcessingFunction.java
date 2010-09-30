@@ -34,7 +34,7 @@ public class PdfProcessingFunction extends ProcessingFunction {
         fileType = "pdf";
     }
     
-    public String run() {
+    public ProcessingResultType run() {
         
         OutputStream out = null;    
         try
@@ -73,10 +73,22 @@ public class PdfProcessingFunction extends ProcessingFunction {
             out.close();
         } catch (Exception e) {
             e.printStackTrace();
+            ProcessingResultType resultError = ProcessingResultType.FAIL;
+            resultError.setUrl(""); // TODO view datasets page
+            resultError.setArchiveMessage("Failure thrown: " + e.getMessage());
+            resultError.setDescription("Your job failed with the message of: " + e.getMessage());
+            return resultError;
         } finally {
             
         }
-        return null;
+        // otherwise return a success with the URL link
+        ProcessingResultType resultSuccess = ProcessingResultType.SUCCESS;
+        resultSuccess.setUrl(""); // TODO to the pdf
+        resultSuccess.setArchiveMessage("Success");
+        resultSuccess.setDescription("Your job succeeded please find the URL below");
+        return resultSuccess;
+        
+        
     }
     
     
