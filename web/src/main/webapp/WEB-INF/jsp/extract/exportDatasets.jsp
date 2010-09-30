@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
@@ -76,14 +77,49 @@
 <table border="0" cellpadding="5" width="525">
 <tr valign="top">
     <td class="text">
-	<ul><li><a href="ExportDataset?action=html&datasetId=<c:out value="${dataset.id}"/>"><fmt:message key="view_as_HTML" bundle="${resword}"/></a></li>
-	<li><fmt:message key="download_a_file" bundle="${resword}"/>:
+	<ul><%-- <li><a href="ExportDataset?action=html&datasetId=<c:out value="${dataset.id}"/>"><fmt:message key="view_as_HTML" bundle="${resword}"/></a></li> --%>
+	<c:forEach var="extract" items="${extractProperties}">
+			<%-- possibly use fn:startsWith(extract.filedescription, '&') here, for i18n --%>
+			<li>
+				<c:choose>
+					<c:when test="${fn:startsWith(extract.filedescription, '&')==true}">
+						<fmt:message key="${fn:substringAfter(extract.filedescription, '&')}" bundle="${restext}"/>&nbsp;
+					</c:when>
+					<c:otherwise>
+						<c:out value="${extract.filedescription}"/>&nbsp;
+					</c:otherwise>
+				</c:choose>
+				<a title='<c:out value="${extract.helpText}"/>' href='pages/extract?id=<c:out value="${extract.id}"/>&datasetId=<c:out value="${dataset.id}"/>'>
+				<c:choose>
+					<c:when test="${fn:startsWith(extract.linkText, '&')==true}">
+						<fmt:message key="${fn:substringAfter(extract.linkText, '&')}" bundle="${restext}"/>&nbsp;
+					</c:when>
+					<c:otherwise>
+						<c:out value="${extract.linkText}"/>&nbsp;
+					</c:otherwise>
+				</c:choose>
+				</a>
+				<%--<c:out value="${extract.linkText}"/>--%>
+			</li>
+    </c:forEach>	
+	<%--<li><fmt:message key="download_a_file" bundle="${resword}"/>:
 		<ul>
 		<li><a href="javascript:openDoc('ExportDataset?action=txt&datasetId=<c:out value="${dataset.id}"/>')"><fmt:message key="tab_delimited_text" bundle="${resword}"/></a></li>
+		--%>
 		<%--<li><a href="javascript:openDocWindow('ExportDataset?action=csv&datasetId=<c:out value="${dataset.id}"/>')"><fmt:message key="comma_delimited_text" bundle="${resword}"/></a></li>--%>
+		<%-- 
 		<li><a href="javascript:openDoc('ExportDataset?action=spss&datasetId=<c:out value="${dataset.id}"/>')"><fmt:message key="SPSS_syntax_and_data" bundle="${resword}"/></a>&nbsp;<a href="javascript:openDocWindow('help/4_4_spssSpec_Help.html')"><img src="images/bt_Help_Extract.gif" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>" border="0"></a></li>
 		<li><a href="javascript:openDoc('ExportDataset?action=odm&datasetId=<c:out value="${dataset.id}"/>&odmVersion=1.3')"><fmt:message key="CDISC_ODM_XML_format" bundle="${resword}"/>&nbsp;1.3</a></li>
+		<li><a href="javascript:openDoc('ExportDataset?action=odm&datasetId=<c:out value="${dataset.id}"/>&odmVersion=1.3&xalan=1')">Generate the 1.3 XML and SQL Dataset with XSLT</a></li>
 		<li><a href="javascript:openDoc('ExportDataset?action=odm&datasetId=<c:out value="${dataset.id}"/>&odmVersion=1.2')"><fmt:message key="CDISC_ODM_XML_format" bundle="${resword}"/>&nbsp;1.2</a></li>
+		<c:forEach var="extract" items="${extractProperties}">
+			<li><a href='<c:out value="${extract.id}"/>'><c:out value="${extract.linkText}"/></a></li>
+		</c:forEach>
+		--%>
+		<%--
+		<li><a href="javascript:openDoc('ExportDataset?action=odm&datasetId=<c:out value="${dataset.id}"/>&odmVersion=1.2&xalan=1')">Generate the 1.2 XML and SQL Dataset with XSLT</a></li>
+		--%>
+		<%-- 
 			<ul><li><fmt:message key="import_CDISC_ODM_XML_into_SAS" bundle="${resword}"/>&nbsp;<a href="javascript:openDoc('help/4_5_sasSpec_Help.html')"><img src="images/bt_Help_Extract.gif" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>" border="0"></a></li></ul></li>
 		<li><fmt:message key="odm_openclinica_extension" bundle="${resword}"/></li>
 			<ul>
@@ -91,7 +127,7 @@
 			<li><a href="javascript:openDoc('ExportDataset?action=odm&datasetId=<c:out value="${dataset.id}"/>&odmVersion=oc1.2')">OpenClinica-Extension-1.2</a></li>
 			</ul
 		</ul>
-	</li>
+	</li>--%>
 	</ul>
 	</td>
 </tr>

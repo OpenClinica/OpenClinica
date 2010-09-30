@@ -36,6 +36,9 @@ import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.quartz.SchedulerException;
+import org.quartz.Trigger;
+import org.quartz.impl.StdScheduler;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -121,6 +124,10 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     protected StudyBean currentStudy;
     protected StudyUserRoleBean currentRole;
     protected HashMap errors = new HashMap();
+    
+    private static String SCHEDULER = "schedulerFactoryBean";
+    
+    private StdScheduler scheduler;
     /**
      * local_df is set to the client locale in each request.
      */
@@ -231,6 +238,40 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 forwardPage(Page.RESET_PASSWORD);
             }
         }
+    }
+    
+    private void pingJobServer(HttpServletRequest request) {
+        String jobName = (String)request.getSession().getAttribute("jobName");
+        String groupName = (String)request.getSession().getAttribute("groupName");
+        Integer datasetId = (Integer)request.getSession().getAttribute("datasetId");
+        try {
+            if (jobName != null && groupName != null) {
+                System.out.println("trying to retrieve status on " + jobName + " " + groupName);
+                int state = getScheduler(request).getTriggerState(jobName, groupName);
+                System.out.println("found state: " + state);
+                if (state == Trigger.STATE_NONE) {
+                    // add the message here that your export is done
+                    System.out.println("adding a message!");
+                    // TODO make absolute paths in the message, for example a link from /pages/* would break
+                    // TODO i18n
+                    addPageMessage("Your Extract is now completed. Please go to review them at <a href='ViewDatasets'>View Datasets</a> or <a href='ExportDataset?datasetId=" + 
+                            datasetId + "'>View Specific Dataset</a>.");
+                    request.getSession().removeAttribute("jobName");
+                    request.getSession().removeAttribute("groupName");
+                    request.getSession().removeAttribute("datasetId");
+                } else {
+                    
+                }
+            }
+        } catch (SchedulerException se) {
+            se.printStackTrace();
+        }
+        
+    }
+    
+    private StdScheduler getScheduler(HttpServletRequest request) {
+        scheduler = this.scheduler != null ? scheduler : (StdScheduler) SpringServletAccess.getApplicationContext(request.getSession().getServletContext()).getBean(SCHEDULER);
+        return scheduler;
     }
 
     private void process(HttpServletRequest request, HttpServletResponse response) throws OpenClinicaException, UnsupportedEncodingException {
@@ -441,6 +482,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 passwdTimeOut();
             }
             mayProceed();
+            pingJobServer(request);
             processRequest();
         } catch (InconsistentStateException ise) {
             ise.printStackTrace();

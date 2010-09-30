@@ -8,11 +8,17 @@
 package org.akaza.openclinica.control.extract;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipEntry;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
@@ -24,6 +30,7 @@ import org.akaza.openclinica.bean.extract.SPSSReportBean;
 import org.akaza.openclinica.bean.extract.TabReportBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.SpringServletAccess;
+// import org.akaza.openclinica.control.admin.StdScheduler;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -37,6 +44,12 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.bean.ArchivedDatasetFileRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.akaza.openclinica.web.job.XalanTriggerService;
+
+import org.quartz.SchedulerException;
+import org.quartz.SimpleTrigger;
+import org.quartz.impl.StdScheduler;
+import org.springframework.scheduling.quartz.JobDetailBean;
 
 /**
  * Take a dataset and show it in different formats,<BR/> Detect whether or not
@@ -56,7 +69,10 @@ public class ExportDatasetServlet extends SecureController {
     public static String getLink(int dsId) {
         return "ExportDataset?datasetId=" + dsId;
     }
+    
+    private StdScheduler scheduler;
 
+    private static String SCHEDULER = "schedulerFactoryBean";
     private static final String DATASET_DIR = SQLInitServlet.getField("filePath") + "datasets" + File.separator;
 
     private static String WEB_DIR = "/WEB-INF/datasets/";
@@ -179,9 +195,10 @@ public class ExportDatasetServlet extends SecureController {
             } else if ("odm".equalsIgnoreCase(action)) {
                 String odmVersion = fp.getString("odmVersion");
                 String ODMXMLFileName = "";
-                String studySubjectNumber = ((CoreResources) SpringServletAccess.getApplicationContext(context).getBean("coreResources")).getField("extract.number");
                 // DRY
-                HashMap answerMap = generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, db, this.currentStudy, "", eb, currentstudyid, parentstudy,studySubjectNumber);
+                // HashMap answerMap = generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, db, this.currentStudy, "");
+                HashMap answerMap = generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, db, this.currentStudy, "", eb, currentStudy.getId(), currentStudy.getParentStudyId(), "99", true);
+                
                 for (Iterator it = answerMap.entrySet().iterator(); it.hasNext();) {
                     java.util.Map.Entry entry = (java.util.Map.Entry) it.next();
                     Object key = entry.getKey();
@@ -193,6 +210,37 @@ public class ExportDatasetServlet extends SecureController {
                 fileName = ODMXMLFileName;
                 request.setAttribute("generate", generalFileDir + ODMXMLFileName);
                 System.out.println("+++ set the following: " + generalFileDir + ODMXMLFileName);
+                // >> tbh #xslt working group
+                // put an extra flag here, where we generate the XML, and then find the XSL, run a job and 
+                // send a link with the SQL file? put the generated SQL file with the dataset?
+                if (fp.getString("xalan") != null) {
+                    XalanTriggerService xts = new XalanTriggerService();
+                    
+                    String propertiesPath = SQLInitServlet.getField("filePath");
+                    
+                    // the trick there, we need to open up the zipped file and get at the XML
+                    openZipFile(generalFileDir + ODMXMLFileName + ".zip");
+                    // need to find out how to copy this xml file from /bin to the generalFileDir
+                    SimpleTrigger simpleTrigger = xts.generateXalanTrigger(propertiesPath + File.separator + "ODMReportStylesheet.xsl", 
+                            ODMXMLFileName, 
+                            generalFileDir + "output.sql", db.getId());
+                    scheduler = getScheduler();
+                    
+                    JobDetailBean jobDetailBean = new JobDetailBean();
+                    jobDetailBean.setGroup(xts.TRIGGER_GROUP_NAME);
+                    jobDetailBean.setName(simpleTrigger.getName());
+                    jobDetailBean.setJobClass(org.akaza.openclinica.web.job.XalanStatefulJob.class);
+                    jobDetailBean.setJobDataMap(simpleTrigger.getJobDataMap());
+                    jobDetailBean.setDurability(true); // need durability?
+                    jobDetailBean.setVolatility(false);
+                    
+                    try {
+                        Date dateStart = scheduler.scheduleJob(jobDetailBean, simpleTrigger);
+                        logger.info("== found job date: " + dateStart.toString());
+                    } catch (SchedulerException se) {
+                        se.printStackTrace();
+                    }
+                }
             } else if ("txt".equalsIgnoreCase(action)) {
                 // generateReport =
                 // dsdao.generateDataset(db,
@@ -414,11 +462,44 @@ public class ExportDatasetServlet extends SecureController {
         adfb.setDateCreated(new java.util.Date(datasetFile.lastModified()));
         return adfb;
     }
+    
+    private void openZipFile(String fileName) {
+        try {
+            ZipFile zipFile = new ZipFile(fileName);
 
+            java.util.Enumeration entries = zipFile.entries();
+
+            while(entries.hasMoreElements()) {
+              ZipEntry entry = (ZipEntry)entries.nextElement();
+
+              if(entry.isDirectory()) {
+                // Assume directories are stored parents first then children.
+                System.out.println("Extracting directory: " + entry.getName());
+                // This is not robust, just for demonstration purposes.
+                (new File(entry.getName())).mkdir();
+                // no dirs necessary?
+                continue;
+              }
+
+              System.out.println("Extracting file: " + entry.getName());
+              // System.out.println("Writing to dir " + targetDir);
+              copyInputStream(zipFile.getInputStream(entry),
+                 new java.io.BufferedOutputStream(new java.io.FileOutputStream(entry.getName())));
+            }
+
+            zipFile.close();
+          } catch (java.io.IOException ioe) {
+            System.err.println("Unhandled exception:");
+            ioe.printStackTrace();
+            return;
+          }
+    }
+    
     public void loadList(DatasetBean db, ArchivedDatasetFileDAO asdfdao, int datasetId, FormProcessor fp, ExtractBean eb) {
         logger.info("action is blank");
         request.setAttribute("dataset", db);
         logger.info("just set dataset to request");
+        request.setAttribute("extractProperties", CoreResources.getExtractProperties());
         // find out if there are any files here:
         File currentDir = new File(DATASET_DIR + db.getId() + File.separator);
         if (!currentDir.isDirectory()) {
@@ -484,5 +565,23 @@ public class ExportDatasetServlet extends SecureController {
 
         logger.warn("just set file list to request, sending to page");
 
+    }
+    
+    private StdScheduler getScheduler() {
+        scheduler = this.scheduler != null ? scheduler : (StdScheduler) SpringServletAccess.getApplicationContext(context).getBean(SCHEDULER);
+        return scheduler;
+    }
+    
+    private static final void copyInputStream(InputStream in, OutputStream out)
+    throws IOException
+    {
+      byte[] buffer = new byte[1024];
+      int len = 0;
+
+      while((len = in.read(buffer)) > 0)
+        out.write(buffer, 0, len);
+
+      in.close();
+      out.close();
     }
 }
