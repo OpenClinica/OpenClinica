@@ -1,5 +1,6 @@
 package org.akaza.openclinica.bean.service;
 
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FOPException;
@@ -82,8 +83,10 @@ public class PdfProcessingFunction extends ProcessingFunction {
             
         }
         // otherwise return a success with the URL link
+        
         ProcessingResultType resultSuccess = ProcessingResultType.SUCCESS;
-        resultSuccess.setUrl(""); // TODO to the pdf
+        resultSuccess.setUrl(CoreResources.getField("sysURL.base") + 
+                "AccessFile?fileId="); // TODO to the pdf
         resultSuccess.setArchiveMessage("Success");
         resultSuccess.setDescription("Your job succeeded please find the URL below");
         return resultSuccess;

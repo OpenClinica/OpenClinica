@@ -1,6 +1,8 @@
 package org.akaza.openclinica.job;
 
+import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.extract.DatasetBean;
+import org.akaza.openclinica.bean.extract.ExportFormatBean;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.service.ProcessingFunction;
@@ -9,6 +11,7 @@ import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.OpenClinicaMailSender;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.quartz.JobDataMap;
@@ -19,6 +22,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.JobDetailBean;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
+import java.util.Date;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.io.File;
@@ -66,6 +70,7 @@ public class XsltTransformJob extends QuartzJobBean {
         // get the file information from the job
         String alertEmail = dataMap.getString(EMAIL);
         try {
+            int userAccountId = dataMap.getInt(USER_ID);
             // create dirs 
             String outputPath = dataMap.getString(POST_FILE_PATH);
             File output = new File(outputPath);
@@ -112,9 +117,16 @@ public class XsltTransformJob extends QuartzJobBean {
                 final long done2 = System.currentTimeMillis() - start;
                 System.out.println("--> postprocessing completed in " + done2 + " ms, found result type " + message.getCode());
                 emailBody = message.getDescription();
-                if (!("").equals(message.getUrl())) {
-                    emailBody = emailBody + "<p><a href='" + message.getUrl() + "'>" + epBean.getLinkText() + "</a><br/>";
+                // if the process was a pdf, generate a link to the file
+                if (!("").equals(message.getUrl()) && function.getClass().equals(org.akaza.openclinica.bean.service.PdfProcessingFunction.class)) {
+                    ArchivedDatasetFileBean fbFinal = generateFileRecord(dataMap.getString(POST_FILE_NAME) + ".pdf", 
+                            outputPath, 
+                            datasetBean, 
+                            done, new File(endFile).length(), ExportFormatBean.PDFFILE,
+                            userAccountId);
+                    emailBody = emailBody + "<p><a href='" + message.getUrl() + fbFinal.getId() + "'>" + epBean.getLinkText() + "</a><br/>";
                 }
+                // otherwise don't do it
                 if (message.getCode().intValue() == 1) {
                     subject = "Success: " + datasetBean.getName(); 
                 } else if (message.getCode().intValue() == 2) { 
@@ -127,12 +139,21 @@ public class XsltTransformJob extends QuartzJobBean {
             } else {
                 // extract ran but no post-processing - we send an email with success and url to link to
                 // generate archived dataset file bean here, and use the id to build the URL
+                ArchivedDatasetFileBean fbFinal = generateFileRecord(dataMap.getString(POST_FILE_NAME), 
+                        outputPath, 
+                        datasetBean, 
+                        done, new File(endFile).length(), ExportFormatBean.TXTFILE,
+                        userAccountId);
                 subject = "Job Ran: " + datasetBean.getName();
-                emailBody = datasetBean.getName() + " has run and you can access it here: ";// add url here
+                emailBody = datasetBean.getName() + " has run and you can access it ";// add url here
+                emailBody = emailBody + "<a href='" + 
+                    CoreResources.getField("sysURL.base") + 
+                    "AccessFile?fileId=" + 
+                    fbFinal.getId() + "'>here</a>.";
             }
             // email the message to the user
             // TODO do we need user id?
-            int userAccountId = dataMap.getInt(USER_ID);
+            
             // UserAccountBean userAccount = (UserAccountBean);
             String email = dataMap.getString(EMAIL);
             
@@ -167,6 +188,41 @@ public class XsltTransformJob extends QuartzJobBean {
         }
         
         
+    }
+    
+    private ArchivedDatasetFileBean generateFileRecord(String name, 
+            String dir,  
+            DatasetBean datasetBean, 
+            long time, long fileLength, ExportFormatBean efb, 
+            int userBeanId) {
+        ArchivedDatasetFileBean fbFinal = new ArchivedDatasetFileBean();
+        
+        ArchivedDatasetFileBean fbInitial = new ArchivedDatasetFileBean();
+        
+        fbInitial.setName(name);
+        fbInitial.setFileReference(dir + name);
+        
+        fbInitial.setFileSize((int) fileLength);
+        // logger.info("ODM setFileSize: " + (int)newFile.length() );
+        // set the above to compressed size?
+        fbInitial.setRunTime((int) time);
+        // logger.info("ODM setRunTime: " + (int)time );
+        // need to set this in milliseconds, get it passed from above
+        // methods?
+        fbInitial.setDatasetId(datasetBean.getId());
+        // logger.info("ODM setDatasetid: " + ds.getId() );
+        fbInitial.setExportFormatBean(efb);
+        // logger.info("ODM setExportFormatBean: success" );
+        fbInitial.setExportFormatId(efb.getId());
+        // logger.info("ODM setExportFormatId: " + efb.getId());
+        // fbInitial.setOwner(userBean);
+        // logger.info("ODM setOwner: " + sm.getUserBean());
+        fbInitial.setOwnerId(userBeanId);
+        // logger.info("ODM setOwnerId: " + sm.getUserBean().getId() );
+        fbInitial.setDateCreated(new Date(System.currentTimeMillis()));
+        ArchivedDatasetFileDAO asdfDAO = new ArchivedDatasetFileDAO(dataSource);
+        fbFinal = (ArchivedDatasetFileBean)asdfDAO.create(fbInitial);
+        return fbFinal;
     }
     private void sendErrorEmail(String message, JobExecutionContext context) {
         String subject = "Warning: " + message;

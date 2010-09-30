@@ -22,6 +22,8 @@ public class ExportFormatBean extends Term {
     // To allow this type, another data type (an addition row) is added
     // as "text/plain" in the table export_format
     public static final ExportFormatBean XMLFILE = new ExportFormatBean(4, "text/plain");
+    public static final ExportFormatBean PDFFILE = new ExportFormatBean(5, "application/pdf");
+    // may have to add a #6 to export formats, tbh
     private int exportFormatId;
     private String mimeType;
 
