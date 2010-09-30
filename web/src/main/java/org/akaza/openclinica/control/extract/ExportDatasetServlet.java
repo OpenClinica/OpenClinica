@@ -413,6 +413,8 @@ public class ExportDatasetServlet extends SecureController {
                 request.setAttribute("dataset", db);
                 request.setAttribute("file", asdfBean);
                 table.setRows(filterRows);
+                table.setSortingColumnExplicitlySet(true);
+                table.setSortingColumnInd(3);
                 table.computeDisplay();
 
                 request.setAttribute("table", table);
