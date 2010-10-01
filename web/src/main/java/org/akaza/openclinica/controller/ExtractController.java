@@ -148,6 +148,7 @@ public class ExtractController {
         } catch (SchedulerException se) {
             se.printStackTrace();
         }
+        request.setAttribute("datasetId", datasetId);
         // set the job name here in the user's session, so that we can ping the scheduler to pull it out later
         request.getSession().setAttribute("jobName", jobDetailBean.getName());
         request.getSession().setAttribute("groupName", simpleTrigger.getGroup());

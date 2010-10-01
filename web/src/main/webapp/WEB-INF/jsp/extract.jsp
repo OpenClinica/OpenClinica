@@ -53,7 +53,7 @@ when the extract is complete.</P>
 
 <ul>
 	<li><a href="../ViewDatasets">Back to View All Datasets</a></li>
-	<li><a href="">Back to Dataset</a></li>
+	<li><a href="../ExportDataset?datasetId=${param.datasetId}">Back to Dataset</a></li>
 </ul>
 </div>
 </div>
