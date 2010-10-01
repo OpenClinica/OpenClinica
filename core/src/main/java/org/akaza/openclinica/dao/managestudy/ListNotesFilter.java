@@ -59,6 +59,22 @@ public class ListNotesFilter implements CriteriaCommand {
                     criteria = criteria + " and ";
                     criteria = criteria + " days " + value.toString();
                 }
+            } else if ("discrepancyNoteBean.disType".equalsIgnoreCase(property)) {
+                if("31".equals(value.toString())) {
+                    criteria = criteria + " and ";
+                    criteria = criteria + " (dn.discrepancy_note_type_id = 1 or dn.discrepancy_note_type_id = 3)";
+                } else {
+                    criteria = criteria + " and ";
+                    criteria = criteria + " " + columnMapping.get(property) + " = '" + value.toString() + "' ";
+                }
+            } else if ("discrepancyNoteBean.resolutionStatus".equalsIgnoreCase(property)) {
+                if("21".equals(value.toString())) {
+                    criteria = criteria + " and ";
+                    criteria = criteria + " (dn.resolution_status_id = 1 or dn.resolution_status_id = 2)";
+                } else {
+                    criteria = criteria + " and ";
+                    criteria = criteria + " " + columnMapping.get(property) + " = '" + value.toString() + "' ";
+                }
             } else {
                 criteria = criteria + " and ";
                 criteria = criteria + " " + columnMapping.get(property) + " = '" + value.toString() + "' ";
