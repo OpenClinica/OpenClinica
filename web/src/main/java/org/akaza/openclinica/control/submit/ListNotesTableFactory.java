@@ -1,5 +1,16 @@
 package org.akaza.openclinica.control.submit;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
@@ -36,8 +47,10 @@ import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.apache.commons.lang.StringUtils;
-import org.jmesa.core.filter.*;
+import org.jmesa.core.filter.DateFilterMatcher;
+import org.jmesa.core.filter.FilterMatcher;
+import org.jmesa.core.filter.MatcherKey;
+import org.jmesa.core.filter.StringFilterMatcher;
 import org.jmesa.facade.TableFacade;
 import org.jmesa.limit.Filter;
 import org.jmesa.limit.FilterSet;
@@ -49,11 +62,6 @@ import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.editor.DateCellEditor;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
-
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import javax.servlet.http.HttpServletResponse;
 
 public class ListNotesTableFactory extends AbstractTableFactory {
 
@@ -80,7 +88,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     private Integer resolutionStatus;
     private Integer discNoteType;
     private Boolean studyHasDiscNotes = new Boolean(false);
-    private boolean showMoreLink;
+    private final boolean showMoreLink;
 
     public ListNotesTableFactory(boolean showMoreLink){
         this.showMoreLink = showMoreLink;
@@ -140,6 +148,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "entityValue"), new StringFilterMatcher());
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "age"), new AgeDaysFilterMatcher());
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "days"), new AgeDaysFilterMatcher());
+        tableFacade.addFilterMatcher(new MatcherKey(String.class, "discrepancyNoteBean.disType"), new DNTypeFilterMatcher());
+        tableFacade.addFilterMatcher(new MatcherKey(String.class, "discrepancyNoteBean.resolutionStatus"), new DNResolutionStatusFilterMatcher());
     }
 
     @Override
@@ -163,7 +173,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
         Limit limit = tableFacade.getLimit();
         ListNotesFilter listNotesFilter = getListNoteFilter(limit);
-
         if (!limit.isComplete()) {
             int totalRows = getDiscrepancyNoteDao().getViewNotesCountWithFilter(listNotesFilter, getCurrentStudy());
             tableFacade.setTotalRows(totalRows);
@@ -467,6 +476,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             for (Object status : ResolutionStatus.toArrayList()) {
                 options.add(new Option(String.valueOf(((ResolutionStatus) status).getId()), ((ResolutionStatus) status).getName()));
             }
+            options.add(new Option("21", "New and Updated"));
             return options;
         }
     }
@@ -478,6 +488,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             for (Object type : DiscrepancyNoteType.toArrayList()) {
                 options.add(new Option(String.valueOf(((DiscrepancyNoteType) type).getId()), ((DiscrepancyNoteType) type).getName()));
             }
+            options.add(new Option("31", "Query and Failed Validation Check"));
             return options;
         }
     }
@@ -499,7 +510,30 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             return true;
         }
     }
+    
+    private class DNTypeFilterMatcher implements FilterMatcher {
+        public boolean evaluate(Object itemValue, String filterValue) {
+            Integer itemDNTypeId = ((DiscrepancyNoteType)itemValue).getId();
+            Integer filterDNTypeId = Integer.valueOf(filterValue);
+            if(filterDNTypeId==31) {
+                return itemDNTypeId==1 || itemDNTypeId==3;
+            } else {
+                return itemDNTypeId==filterDNTypeId;
+            }
+        }
+    }
 
+    private class DNResolutionStatusFilterMatcher implements FilterMatcher {
+        public boolean evaluate(Object itemValue, String filterValue) {
+            Integer itemDNTypeId = ((ResolutionStatus)itemValue).getId();
+            Integer filterDNTypeId = Integer.valueOf(filterValue);
+            if(filterDNTypeId==21) {
+                return itemDNTypeId==1 || itemDNTypeId==2;
+            } else {
+                return itemDNTypeId==filterDNTypeId;
+            }
+        }
+    }
     private class ResolutionStatusCellEditor implements CellEditor {
         @SuppressWarnings("unchecked")
         public Object getValue(Object item, String property, int rowcount) {
