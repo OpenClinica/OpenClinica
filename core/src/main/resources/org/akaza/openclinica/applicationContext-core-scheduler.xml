@@ -17,8 +17,8 @@
 				<prop key="org.quartz.jobStore.useProperties">s[org.quartz.jobStore.useProperties]</prop>
         		<prop key="org.quartz.jobStore.tablePrefix">s[org.quartz.jobStore.tablePrefix]</prop>
         		<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
-				<prop key="org.quartz.threadPool.threadCount">2</prop>
-				<prop key="org.quartz.threadPool.threadPriority">5</prop>
+				<prop key="org.quartz.threadPool.threadCount">s[org.quartz.threadPool.threadCount]</prop>
+				<prop key="org.quartz.threadPool.threadPriority">s[org.quartz.threadPool.threadPriority]</prop>
         		
         	</props>
         </property>
