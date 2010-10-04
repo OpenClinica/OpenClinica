@@ -518,10 +518,10 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             Integer itemDNTypeId = ((DiscrepancyNoteType)itemValue).getId();
             Integer filterDNTypeId = Integer.valueOf(filterValue);
             System.out.println("itemDNTypeId="+itemDNTypeId+" filetDNTypeId="+filterDNTypeId);
-            if(filterDNTypeId==31) {
+            if(Integer.valueOf(filterDNTypeId)==31) {
                 return itemDNTypeId==1 || itemDNTypeId==3;
             } else {
-                if(itemDNTypeId == filterDNTypeId) {
+                if(Integer.valueOf(itemDNTypeId) == Integer.valueOf(filterDNTypeId)) {
                     System.out.println("return true");
                     return true;
                 } else { 
