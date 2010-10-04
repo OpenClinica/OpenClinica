@@ -3,16 +3,21 @@ package org.akaza.openclinica.job;
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.ExportFormatBean;
+import org.akaza.openclinica.bean.extract.ExtractBean;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.ProcessingFunction;
 import org.akaza.openclinica.bean.service.ProcessingResultType;
+import org.akaza.openclinica.service.extract.GenerateExtractFileService;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.OpenClinicaMailSender;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -23,6 +28,8 @@ import org.springframework.scheduling.quartz.JobDetailBean;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.io.File;
@@ -58,6 +65,9 @@ public class XsltTransformJob extends QuartzJobBean {
     
     private OpenClinicaMailSender mailSender;
     private DataSource dataSource;
+    private GenerateExtractFileService generateFileService;
+    private StudyDAO studyDao;
+    private UserAccountDAO userAccountDao;
     
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
         // need to generate a Locale so that user beans and other things will
@@ -70,9 +80,51 @@ public class XsltTransformJob extends QuartzJobBean {
         // get the file information from the job
         String alertEmail = dataMap.getString(EMAIL);
         try {
+            ApplicationContext appContext = (ApplicationContext) context.getScheduler().getContext().get("applicationContext");
+            mailSender = (OpenClinicaMailSender) appContext.getBean("openClinicaMailSender");
+            dataSource = (DataSource) appContext.getBean("dataSource");
+            DatasetDAO dsdao = new DatasetDAO(dataSource);
+            
+            // init all fields from the data map
             int userAccountId = dataMap.getInt(USER_ID);
-            // create dirs 
             String outputPath = dataMap.getString(POST_FILE_PATH);
+            // get all user info, generate xml
+            
+            String generalFileDir = dataMap.getString(XML_FILE_PATH);
+            
+            long sysTimeBegin = System.currentTimeMillis();
+            userAccountDao = new UserAccountDAO(dataSource);
+            UserAccountBean userBean = (UserAccountBean)userAccountDao.findByPK(userAccountId);
+            generateFileService = new GenerateExtractFileService(dataSource, userBean);
+            studyDao = new StudyDAO(dataSource);
+            StudyBean currentStudy = (StudyBean)studyDao.findByPK(userBean.getActiveStudyId());
+            StudyBean parentStudy = (StudyBean)studyDao.findByPK(currentStudy.getParentStudyId());
+            // TODO need to get the current study and parent study, somehow
+            // DatasetBean dsBean = (DatasetBean)datasetDao.findByPK(new Integer(datasetId).intValue());
+            int dsId = dataMap.getInt(DATASET_ID);
+            DatasetBean datasetBean = (DatasetBean) dsdao.findByPK(dsId);
+            ExtractBean eb = generateFileService.generateExtractBean(datasetBean, currentStudy, parentStudy);
+            
+            // generate file directory for file service
+            
+            datasetBean.setName(datasetBean.getName().replaceAll(" ", "_"));
+            System.out.println("--> job starting: ");
+            HashMap answerMap = generateFileService.createODMFile("oc1.3", sysTimeBegin, generalFileDir, datasetBean, 
+                    currentStudy, "", eb, currentStudy.getId(), currentStudy.getParentStudyId(), "99", false);
+            // won't be a zipped file, so that we can submit it for transformation
+            String ODMXMLFileName = "";
+            int fId = 0;
+            for (Iterator it = answerMap.entrySet().iterator(); it.hasNext();) {
+                java.util.Map.Entry entry = (java.util.Map.Entry) it.next();
+                Object key = entry.getKey();
+                Object value = entry.getValue();
+                ODMXMLFileName = (String) key;
+                Integer fileID = (Integer) value;
+                fId = fileID.intValue();
+            }
+            
+            // create dirs 
+            
             File output = new File(outputPath);
             if (!output.isDirectory()) {
                 output.mkdirs();
@@ -83,16 +135,14 @@ public class XsltTransformJob extends QuartzJobBean {
             // the stylesheet you specify. This method call also processes the stylesheet
             // into a compiled Templates object.
             java.io.InputStream in = new java.io.FileInputStream(dataMap.getString(XSL_FILE_PATH));
-            // tFactory.setAttribute("use-classpath", Boolean.TRUE);
-            // tFactory.setErrorListener(new ListingErrorHandler());
+            
             Transformer transformer = tFactory.newTransformer(new StreamSource(in));
 
-            // Use the Transformer to apply the associated Templates object to an XML document
-            // (foo.xml) and write the output to a file (foo.out).
-            System.out.println("--> job starting: ");
+            // move xml generation here, tbh
+            String xmlFilePath = generalFileDir + ODMXMLFileName;
             String endFile = outputPath + File.separator + dataMap.getString(POST_FILE_NAME);
             final long start = System.currentTimeMillis();
-            transformer.transform(new StreamSource(dataMap.getString(XML_FILE_PATH)), 
+            transformer.transform(new StreamSource(xmlFilePath), 
                     new StreamResult(new FileOutputStream(endFile)));
             final long done = System.currentTimeMillis() - start;
             System.out.println("--> job completed in " + done + " ms");
@@ -102,13 +152,7 @@ public class XsltTransformJob extends QuartzJobBean {
             ProcessingFunction function = epBean.getPostProcessing();
             String subject = "";
             String emailBody = "";
-            int dsId = dataMap.getInt(DATASET_ID);
-            ApplicationContext appContext = (ApplicationContext) context.getScheduler().getContext().get("applicationContext");
             
-            mailSender = (OpenClinicaMailSender) appContext.getBean("openClinicaMailSender");
-            dataSource = (DataSource) appContext.getBean("dataSource");
-            DatasetDAO dsdao = new DatasetDAO(dataSource);
-            DatasetBean datasetBean = (DatasetBean) dsdao.findByPK(dsId);
             if (function != null) {
                 function.setTransformFileName(outputPath + File.separator + dataMap.getString(POST_FILE_NAME));
                 function.setODMXMLFileName(endFile);
