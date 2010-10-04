@@ -334,7 +334,6 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         }
 
         ArrayList rows = select(sql, variables);
-        System.out.println("row.size="+rows.size());
         Iterator it = rows.iterator();
         if (it.hasNext()) {
             Integer count = (Integer) ((HashMap) it.next()).get("count");
