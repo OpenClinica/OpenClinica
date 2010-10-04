@@ -110,6 +110,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                 "numberOfNotes", "discrepancyNoteBean.user",
                  "discrepancyNoteBean.owner", "actions");
         Row row = tableFacade.getTable().getRow();
+        System.out.println("table filtereditems size="+tableFacade.getCoreContext().getFilteredItems().size()+ " items="+tableFacade.getCoreContext().getAllItems());
         configureColumn(row.getColumn("studySubject.label"), resword.getString("study_subject_ID"), null, null, true, true);
         configureColumn(row.getColumn("discrepancyNoteBean.createdDate"), resword.getString("date_created"), new DateCellEditor(getDateFormat()), null, true,
                 true);
@@ -184,6 +185,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
         ArrayList<DiscrepancyNoteBean> items =
             getDiscrepancyNoteDao().getViewNotesWithFilterAndSort(getCurrentStudy(), listNotesFilter, listNotesSort, rowStart, rowEnd);
+        System.out.println("items.size="+items.size());
         Collection<HashMap<Object, Object>> theItems = new ArrayList<HashMap<Object, Object>>();
         this.setAllNotes(populateRowsWithAttachedData(items));
 
@@ -515,6 +517,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         public boolean evaluate(Object itemValue, String filterValue) {
             Integer itemDNTypeId = ((DiscrepancyNoteType)itemValue).getId();
             Integer filterDNTypeId = Integer.valueOf(filterValue);
+            System.out.println("itemDNTypeId="+itemDNTypeId+" filetDNTypeId="+filterDNTypeId);
             if(filterDNTypeId==31) {
                 return itemDNTypeId==1 || itemDNTypeId==3;
             } else {
