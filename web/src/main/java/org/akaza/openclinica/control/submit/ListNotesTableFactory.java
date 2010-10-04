@@ -110,7 +110,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                 "numberOfNotes", "discrepancyNoteBean.user",
                  "discrepancyNoteBean.owner", "actions");
         Row row = tableFacade.getTable().getRow();
-        System.out.println("table filtereditems size="+tableFacade.getCoreContext().getFilteredItems().size()+ " items.size="+tableFacade.getCoreContext().getAllItems().size());
         configureColumn(row.getColumn("studySubject.label"), resword.getString("study_subject_ID"), null, null, true, true);
         configureColumn(row.getColumn("discrepancyNoteBean.createdDate"), resword.getString("date_created"), new DateCellEditor(getDateFormat()), null, true,
                 true);
@@ -185,7 +184,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
         ArrayList<DiscrepancyNoteBean> items =
             getDiscrepancyNoteDao().getViewNotesWithFilterAndSort(getCurrentStudy(), listNotesFilter, listNotesSort, rowStart, rowEnd);
-        System.out.println("items.size="+items.size());
         Collection<HashMap<Object, Object>> theItems = new ArrayList<HashMap<Object, Object>>();
         this.setAllNotes(populateRowsWithAttachedData(items));
 
@@ -318,6 +316,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                     // if (currentStudy.getParentStudyId() > 0 &&
                     // hiddenCrfIds.contains(cb.getId())) {
                     // } else {
+                    allNotes.add(dnb);
                     dnb.setStageId(ecb.getStage().getId());
                     dnb.setEntityName(cb.getName() + " (" + cvb.getName() + ")");
 
@@ -517,7 +516,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         public boolean evaluate(Object itemValue, String filterValue) {
             int itemDNTypeId = ((DiscrepancyNoteType)itemValue).getId();
             int filterDNTypeId = Integer.valueOf(filterValue).intValue();
-            System.out.println("itemDNTypeId="+itemDNTypeId+" filetDNTypeId="+filterDNTypeId);
             if(filterDNTypeId==31) {
                 return itemDNTypeId==1 || itemDNTypeId==3;
             } else {
@@ -528,8 +526,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
     private class DNResolutionStatusFilterMatcher implements FilterMatcher {
         public boolean evaluate(Object itemValue, String filterValue) {
-            Integer itemDNTypeId = ((ResolutionStatus)itemValue).getId();
-            Integer filterDNTypeId = Integer.valueOf(filterValue);
+            int itemDNTypeId = ((ResolutionStatus)itemValue).getId();
+            int filterDNTypeId = Integer.valueOf(filterValue).intValue();
             if(filterDNTypeId==21) {
                 return itemDNTypeId==1 || itemDNTypeId==2;
             } else {
