@@ -55,15 +55,34 @@ public class AccessFileServlet extends SecureController {
          * finalTarget.setFileName(asdfBean.getWebPath()); finalTarget =
          * Page.GENERATE_EXCEL_DATASET; } else {
          */
+        System.out.println("found file reference: " + asdfBean.getFileReference() + " and file name: " + asdfBean.getName());
         if (asdfBean.getFileReference().endsWith(".zip")) {
-            response.setContentType("application/zip");
             response.setHeader("Content-disposition", "attachment; filename=\"" + asdfBean.getName() + "\";");
-
-            response.setHeader("Pragma", "public");
+            response.setContentType("application/zip");
+            // response.setContentType("application/download");
+        } else if (asdfBean.getFileReference().endsWith(".pdf")) {
+            response.setHeader("Content-disposition", "attachment; filename=\"" + asdfBean.getName() + "\";");
+            response.setContentType("application/pdf");
+            // response.setContentType("application/download; application/pdf");
+        } else if (asdfBean.getFileReference().endsWith(".csv")) {
+            response.setHeader("Content-disposition", "attachment; filename=\"" + asdfBean.getName() + "\";");
+            response.setContentType("text/csv");
+            // response.setContentType("application/download; text/csv");
+        } else if (asdfBean.getFileReference().endsWith(".xml")) {
+            response.setHeader("Content-disposition", "attachment; filename=\"" + asdfBean.getName() + "\";");
+            response.setContentType("text/xml");
+            // response.setContentType("application/download; text/xml");
+        } else if (asdfBean.getFileReference().endsWith(".html")) {
+            response.setHeader("Content-disposition", "filename=\"" + asdfBean.getName() + "\";");
+            response.setContentType("text/html; charset=utf-8");
         } else {
-            response.setContentType("text/plain");
+            
+            // response.setContentType("text/plain");
             // to ensure backwards compatability to text files shown on server
+            // not needed anymore? tbh 10/2010
         }
+        
+        System.out.println("just set content type: " + response.getContentType());
         finalTarget.setFileName("/WEB-INF/jsp/extract/generatedFileDataset.jsp");
         // }
         // finalTarget.setFileName(asdfBean.getWebPath());

@@ -403,7 +403,7 @@ public class ExportDatasetServlet extends SecureController {
                 table.hideColumnLink(0);
                 table.hideColumnLink(1);
                 table.hideColumnLink(2);
-                table.hideColumnLink(3);
+                // table.hideColumnLink(3);
                 table.hideColumnLink(4);
 
                 // table.setQuery("ExportDataset?datasetId=" +db.getId(), new
@@ -535,6 +535,7 @@ public class ExportDatasetServlet extends SecureController {
 
         ArrayList filterRows = ArchivedDatasetFileRow.generateRowsFromBeans(fileList);
         EntityBeanTable table = fp.getEntityBeanTable();
+        table.setSortingIfNotExplicitlySet(3, false);// sort by date
         String[] columns =
             { resword.getString("file_name"), resword.getString("run_time"), resword.getString("file_size"), resword.getString("created_date"),
                 resword.getString("created_by"), resword.getString("action") };
@@ -542,7 +543,7 @@ public class ExportDatasetServlet extends SecureController {
         table.hideColumnLink(0);
         table.hideColumnLink(1);
         table.hideColumnLink(2);
-        table.hideColumnLink(3);
+        // table.hideColumnLink(3);
         table.hideColumnLink(4);
         table.hideColumnLink(5);
 
@@ -563,7 +564,12 @@ public class ExportDatasetServlet extends SecureController {
         setToPanel(resword.getString("dataset_name"), db.getName());
         setToPanel(resword.getString("created_date"), local_df.format(db.getCreatedDate()));
         setToPanel(resword.getString("dataset_owner"), db.getOwner().getName());
-        setToPanel(resword.getString("date_last_run"), local_df.format(db.getDateLastRun()));
+        try {
+            // do we not set this or is it null b/c we come to the page with no session?
+            setToPanel(resword.getString("date_last_run"), local_df.format(db.getDateLastRun()));
+        } catch (NullPointerException npe) {
+            System.out.println("exception: " + npe.getMessage());
+        }
 
         logger.warn("just set file list to request, sending to page");
 

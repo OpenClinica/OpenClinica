@@ -79,7 +79,7 @@
     <td class="text">
 	<ul><%-- <li><a href="ExportDataset?action=html&datasetId=<c:out value="${dataset.id}"/>"><fmt:message key="view_as_HTML" bundle="${resword}"/></a></li> --%>
 	<c:forEach var="extract" items="${extractProperties}">
-			<%-- possibly use fn:startsWith(extract.filedescription, '&') here, for i18n --%>
+			<%-- use fn:startsWith(extract.filedescription, '&') here, for i18n --%>
 			<li>
 				<c:choose>
 					<c:when test="${fn:startsWith(extract.filedescription, '&')==true}">
@@ -89,7 +89,14 @@
 						<c:out value="${extract.filedescription}"/>&nbsp;
 					</c:otherwise>
 				</c:choose>
-				<a title='<c:out value="${extract.helpText}"/>' href='pages/extract?id=<c:out value="${extract.id}"/>&datasetId=<c:out value="${dataset.id}"/>'>
+				<a title='
+					<c:choose>
+						<c:when test="${fn:startsWith(extract.helpText, '&')==true}">
+							<fmt:message key="${fn:substringAfter(extract.helpText, '&')}" bundle="${restext}"/>&nbsp;
+						</c:when>
+						<c:otherwise><c:out value="${extract.helpText}"/></c:otherwise>
+					</c:choose>
+				' href='pages/extract?id=<c:out value="${extract.id}"/>&datasetId=<c:out value="${dataset.id}"/>'>
 				<c:choose>
 					<c:when test="${fn:startsWith(extract.linkText, '&')==true}">
 						<fmt:message key="${fn:substringAfter(extract.linkText, '&')}" bundle="${restext}"/>&nbsp;

@@ -10,7 +10,9 @@
   	InputStream is = null;
   	BufferedInputStream bis = null;
     try {
-      response.setContentType("application/download");
+        if (!path.endsWith(".html")) {
+      		response.setContentType("application/download");
+        }
       response.setHeader("Pragma", "public");
       //response.setHeader("Content-disposition",
       //                   "attachment; filename=\"" + path + "\"");

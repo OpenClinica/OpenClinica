@@ -10,7 +10,7 @@ import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.service.extract.GenerateExtractFileService;
+
 import org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,9 +47,9 @@ public class ExtractController {
     
     private DatasetDAO datasetDao;
     
-    private StudyDAO studyDao;
     
-    private GenerateExtractFileService generateFileService;
+    
+    
     
     private StdScheduler scheduler;
 
@@ -76,7 +76,7 @@ public class ExtractController {
         // get dataset id
         // if id is a number and dataset id is a number ...
         datasetDao = new DatasetDAO(dataSource);
-        studyDao = new StudyDAO(dataSource);
+        UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
         
         ExtractPropertyBean epBean = CoreResources.findExtractPropertyBeanById(new Integer(id).intValue());
         
@@ -85,48 +85,23 @@ public class ExtractController {
         
         XsltTriggerService xsltService = new XsltTriggerService();
         // TODO get a user bean somehow?
-        generateFileService = new GenerateExtractFileService(dataSource, request, new UserAccountBean());
         String generalFileDir = SQLInitServlet.getField("filePath");
-        long sysTimeBegin = System.currentTimeMillis();
-        
-        UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
-        
-        StudyBean currentStudy = (StudyBean)studyDao.findByPK(userBean.getActiveStudyId());
-        StudyBean parentStudy = (StudyBean)studyDao.findByPK(currentStudy.getParentStudyId());
-        // TODO need to get the current study and parent study, somehow
-        ExtractBean eb = generateFileService.generateExtractBean(dsBean, currentStudy, parentStudy);
-        
-        // generate file directory for file service
         String pattern = "yyyy" + File.separator + "MM" + File.separator + "dd" + File.separator + "HHmmssSSS" + File.separator;
         SimpleDateFormat sdfDir = new SimpleDateFormat(pattern);
         generalFileDir = generalFileDir + "datasets" + File.separator + dsBean.getId() + File.separator + sdfDir.format(new java.util.Date());
         
         dsBean.setName(dsBean.getName().replaceAll(" ", "_"));
-        
-        HashMap answerMap = generateFileService.createODMFile("oc1.3", sysTimeBegin, generalFileDir, dsBean, 
-                currentStudy, "", eb, currentStudy.getId(), currentStudy.getParentStudyId(), "99", false);
-        // won't be a zipped file, so that we can submit it for transformation
-        String ODMXMLFileName = "";
-        int fId = 0;
-        for (Iterator it = answerMap.entrySet().iterator(); it.hasNext();) {
-            java.util.Map.Entry entry = (java.util.Map.Entry) it.next();
-            Object key = entry.getKey();
-            Object value = entry.getValue();
-            ODMXMLFileName = (String) key;
-            Integer fileID = (Integer) value;
-            fId = fileID.intValue();
-        }
         // need to set the dataset path here, tbh
-        System.out.println("found odm xml file name " + generalFileDir + ODMXMLFileName);
+        System.out.println("found odm xml file path " + generalFileDir);
         // next, can already run jobs, translations, and then add a message to be notified later
         String xsltPath = SQLInitServlet.getField("filePath") + "xslt" + File.separator + epBean.getFileName();
         // also need to add the status fields discussed w/ cc:
         // result code, user message, optional URL, archive message, log file message
         // asdf table: sort most recent at top
         System.out.println("found xslt file name " + xsltPath);
-        String xmlFilePath = generalFileDir + ODMXMLFileName;
+        // String xmlFilePath = generalFileDir + ODMXMLFileName;
         SimpleTrigger simpleTrigger = xsltService.generateXsltTrigger(xsltPath, 
-                xmlFilePath, // next, generate output file path then name
+                generalFileDir, // xml_file_path
                 generalFileDir + epBean.getFileLocation() + File.separator, 
                 resolveExportFilePath(epBean), 
                 dsBean.getId(), 

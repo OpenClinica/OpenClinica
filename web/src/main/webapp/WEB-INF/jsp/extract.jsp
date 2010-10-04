@@ -48,6 +48,7 @@
 <div class="box_BL">
 <div class="box_BR">
 <div class="textbox_center">
+<%-- TODO I18N --%>
 <P>Your extract is running. You will receive an email and message
 when the extract is complete.</P>
 
