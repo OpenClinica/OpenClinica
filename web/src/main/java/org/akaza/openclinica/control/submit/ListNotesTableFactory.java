@@ -110,7 +110,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                 "numberOfNotes", "discrepancyNoteBean.user",
                  "discrepancyNoteBean.owner", "actions");
         Row row = tableFacade.getTable().getRow();
-        System.out.println("table filtereditems size="+tableFacade.getCoreContext().getFilteredItems().size()+ " items="+tableFacade.getCoreContext().getAllItems());
+        System.out.println("table filtereditems size="+tableFacade.getCoreContext().getFilteredItems().size()+ " items.size="+tableFacade.getCoreContext().getAllItems().size());
         configureColumn(row.getColumn("studySubject.label"), resword.getString("study_subject_ID"), null, null, true, true);
         configureColumn(row.getColumn("discrepancyNoteBean.createdDate"), resword.getString("date_created"), new DateCellEditor(getDateFormat()), null, true,
                 true);
@@ -521,7 +521,13 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             if(filterDNTypeId==31) {
                 return itemDNTypeId==1 || itemDNTypeId==3;
             } else {
-                return itemDNTypeId==filterDNTypeId;
+                if(itemDNTypeId == filterDNTypeId) {
+                    System.out.println("return true");
+                    return true;
+                } else { 
+                    System.out.println("return false");
+                    return false;
+                }
             }
         }
     }
