@@ -142,7 +142,6 @@ public abstract class EntityDAO implements DAOInterface {
             rs = ps.executeQuery(query);
             if (logger.isInfoEnabled()) {
                 logger.info("Executing static query, GenericDAO.select: " + query);
-                System.out.println("query="+query);
                 // logger.info("fond information about result set: was null: "+
                 // rs.wasNull());
             }
@@ -186,6 +185,7 @@ public abstract class EntityDAO implements DAOInterface {
             rs = ps.executeQuery();
             if (logger.isInfoEnabled()) {
                 logger.info("Executing dynamic query, EntityDAO.select:query " + query);
+                System.out.println("===query="+query);
             }
             signalSuccess();
             results = this.processResultRows(rs);
