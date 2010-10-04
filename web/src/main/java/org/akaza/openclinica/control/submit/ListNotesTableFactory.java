@@ -515,19 +515,13 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     
     private class DNTypeFilterMatcher implements FilterMatcher {
         public boolean evaluate(Object itemValue, String filterValue) {
-            Integer itemDNTypeId = ((DiscrepancyNoteType)itemValue).getId();
-            Integer filterDNTypeId = Integer.valueOf(filterValue);
+            int itemDNTypeId = ((DiscrepancyNoteType)itemValue).getId();
+            int filterDNTypeId = Integer.valueOf(filterValue).intValue();
             System.out.println("itemDNTypeId="+itemDNTypeId+" filetDNTypeId="+filterDNTypeId);
-            if(Integer.valueOf(filterDNTypeId)==31) {
+            if(filterDNTypeId==31) {
                 return itemDNTypeId==1 || itemDNTypeId==3;
             } else {
-                if(Integer.valueOf(itemDNTypeId) == Integer.valueOf(filterDNTypeId)) {
-                    System.out.println("return true");
-                    return true;
-                } else { 
-                    System.out.println("return false");
-                    return false;
-                }
+                return itemDNTypeId == filterDNTypeId;
             }
         }
     }
