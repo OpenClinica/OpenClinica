@@ -7,6 +7,16 @@
  */
 package org.akaza.openclinica.dao.managestudy;
 
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.EntityBean;
@@ -25,16 +35,6 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
-
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
-
-import javax.sql.DataSource;
 
 /**
  * @author jxu
@@ -334,6 +334,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         }
 
         ArrayList rows = select(sql, variables);
+        System.out.println("row.size="+rows.size());
         Iterator it = rows.iterator();
         if (it.hasNext()) {
             Integer count = (Integer) ((HashMap) it.next()).get("count");
