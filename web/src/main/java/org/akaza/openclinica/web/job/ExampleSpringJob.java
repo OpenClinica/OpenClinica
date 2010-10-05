@@ -78,7 +78,6 @@ public class ExampleSpringJob extends QuartzJobBean {
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
         // need to generate a Locale so that user beans and other things will
         // generate normally
-        // TODO make dynamic?
         Locale locale = new Locale("en-US");
         ResourceBundleProvider.updateLocale(locale);
         ResourceBundle pageMessages = ResourceBundleProvider.getPageMessagesBundle();

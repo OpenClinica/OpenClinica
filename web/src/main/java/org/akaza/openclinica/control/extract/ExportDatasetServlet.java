@@ -395,6 +395,7 @@ public class ExportDatasetServlet extends SecureController {
 
                 ArrayList filterRows = ArchivedDatasetFileRow.generateRowsFromBeans(newFileList);
                 EntityBeanTable table = fp.getEntityBeanTable();
+                table.setSortingIfNotExplicitlySet(3, false);// sort by date
                 String[] columns =
                     { resword.getString("file_name"), resword.getString("run_time"), resword.getString("file_size"), resword.getString("created_date"),
                         resword.getString("created_by") };
@@ -403,7 +404,7 @@ public class ExportDatasetServlet extends SecureController {
                 table.hideColumnLink(0);
                 table.hideColumnLink(1);
                 table.hideColumnLink(2);
-                // table.hideColumnLink(3);
+                table.hideColumnLink(3);
                 table.hideColumnLink(4);
 
                 // table.setQuery("ExportDataset?datasetId=" +db.getId(), new
@@ -413,8 +414,7 @@ public class ExportDatasetServlet extends SecureController {
                 request.setAttribute("dataset", db);
                 request.setAttribute("file", asdfBean);
                 table.setRows(filterRows);
-                table.setSortingColumnExplicitlySet(true);
-                table.setSortingColumnInd(3);
+                
                 table.computeDisplay();
 
                 request.setAttribute("table", table);
@@ -543,7 +543,7 @@ public class ExportDatasetServlet extends SecureController {
         table.hideColumnLink(0);
         table.hideColumnLink(1);
         table.hideColumnLink(2);
-        // table.hideColumnLink(3);
+        table.hideColumnLink(3);
         table.hideColumnLink(4);
         table.hideColumnLink(5);
 
