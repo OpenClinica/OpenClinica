@@ -70,8 +70,7 @@ public class XsltTransformJob extends QuartzJobBean {
     private UserAccountDAO userAccountDao;
     
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-        // need to generate a Locale so that user beans and other things will
-        // generate normally
+        // need to generate a Locale for emailing users with i18n
         // TODO make dynamic?
         Locale locale = new Locale("en-US");
         ResourceBundleProvider.updateLocale(locale);
@@ -152,6 +151,7 @@ public class XsltTransformJob extends QuartzJobBean {
             ProcessingFunction function = epBean.getPostProcessing();
             String subject = "";
             String emailBody = "";
+            StringBuffer emailBuffer = new StringBuffer("");
             
             if (function != null) {
                 function.setTransformFileName(outputPath + File.separator + dataMap.getString(POST_FILE_NAME));
@@ -161,6 +161,12 @@ public class XsltTransformJob extends QuartzJobBean {
                 final long done2 = System.currentTimeMillis() - start;
                 System.out.println("--> postprocessing completed in " + done2 + " ms, found result type " + message.getCode());
                 emailBody = message.getDescription();
+                emailBuffer.append("<p>" + pageMessages.getString("email_header_1") + " " + EmailEngine.getAdminEmail() + " "
+                        + pageMessages.getString("email_header_2") + " Job Execution " + pageMessages.getString("email_header_3") + "</p>");
+                    emailBuffer.append("<P>Dataset: " + datasetBean.getName() + "</P>");
+                    emailBuffer.append("<P>Study: " + currentStudy.getName() + "</P>");
+                    emailBuffer.append("<p>" + pageMessages.getString("html_email_body_1") + datasetBean.getName() + pageMessages.getString("html_email_body_2")
+                        + CoreResources.getField("sysURL") + pageMessages.getString("html_email_body_3") + "</p>");
                 // if the process was a pdf, generate a link to the file
                 if (!("").equals(message.getUrl()) && function.getClass().equals(org.akaza.openclinica.bean.service.PdfProcessingFunction.class)) {
                     ArchivedDatasetFileBean fbFinal = generateFileRecord(dataMap.getString(POST_FILE_NAME) + ".pdf", 
@@ -194,6 +200,9 @@ public class XsltTransformJob extends QuartzJobBean {
                     CoreResources.getField("sysURL.base") + 
                     "AccessFile?fileId=" + 
                     fbFinal.getId() + "'>here</a>.";
+                emailBuffer.append("<p>" + pageMessages.getString("html_email_body_4") + " " + ODMXMLFileName
+                        + pageMessages.getString("html_email_body_4_5") + CoreResources.getField("sysURL.base") + "AccessFile?fileId="
+                        + fId + pageMessages.getString("html_email_body_3") + "</p>");
             }
             // email the message to the user
             // TODO do we need user id?
@@ -202,10 +211,11 @@ public class XsltTransformJob extends QuartzJobBean {
             String email = dataMap.getString(EMAIL);
             
             try {
-                mailSender.sendEmail(email, EmailEngine.getAdminEmail(), subject, emailBody, true);
+                mailSender.sendEmail(email, EmailEngine.getAdminEmail(), subject, emailBuffer.toString(), true);
             } catch (OpenClinicaSystemException ose) {
                 // Do Nothing, In the future we might want to have an email
                 // status added to system.
+                System.out.println("exception sending mail: " + ose.getMessage());
             }
             
             System.out.println("just sent email to " + email + ", from " + EmailEngine.getAdminEmail());
