@@ -21,7 +21,7 @@
 
         <div class="sidebar_tab_content">
 
-            <fmt:message key="design_implement_sdv" bundle="${restext}"/>
+            <fmt:message key="extract_instructions" bundle="${restext}"/>
 
         </div>
 
@@ -49,12 +49,11 @@
 <div class="box_BR">
 <div class="textbox_center">
 <%-- TODO I18N --%>
-<P>Your extract is running. You will receive an email and message
-when the extract is complete.</P>
+<P><fmt:message key="extract_is_running" bundle="${restext}"/></P>
 
 <ul>
-	<li><a href="../ViewDatasets">Back to View All Datasets</a></li>
-	<li><a href="../ExportDataset?datasetId=${param.datasetId}">Back to Dataset</a></li>
+	<li><a href="../ViewDatasets"><fmt:message key="back_to_datasets" bundle="${restext}"/></a></li>
+	<li><a href="../ExportDataset?datasetId=${param.datasetId}"><fmt:message key="back_to_dataset" bundle="${restext}"/></a></li>
 </ul>
 </div>
 </div>

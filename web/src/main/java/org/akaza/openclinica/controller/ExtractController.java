@@ -46,11 +46,7 @@ public class ExtractController {
     private BasicDataSource dataSource;
     
     private DatasetDAO datasetDao;
-    
-    
-    
-    
-    
+
     private StdScheduler scheduler;
 
     private static String SCHEDULER = "schedulerFactoryBean";
