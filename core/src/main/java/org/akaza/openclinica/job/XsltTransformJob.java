@@ -88,7 +88,7 @@ public class XsltTransformJob extends QuartzJobBean {
             int userAccountId = dataMap.getInt(USER_ID);
             String outputPath = dataMap.getString(POST_FILE_PATH);
             // get all user info, generate xml
-            
+            System.out.println("found output path: " + outputPath);
             String generalFileDir = dataMap.getString(XML_FILE_PATH);
             
             long sysTimeBegin = System.currentTimeMillis();
@@ -109,8 +109,10 @@ public class XsltTransformJob extends QuartzJobBean {
             datasetBean.setName(datasetBean.getName().replaceAll(" ", "_"));
             System.out.println("--> job starting: ");
             HashMap answerMap = generateFileService.createODMFile("oc1.3", sysTimeBegin, generalFileDir, datasetBean, 
-                    currentStudy, "", eb, currentStudy.getId(), currentStudy.getParentStudyId(), "99", false);
+                    currentStudy, "", eb, currentStudy.getId(), currentStudy.getParentStudyId(), "99", false, false);
+            // won't save a record of the XML to db
             // won't be a zipped file, so that we can submit it for transformation
+            // this will have to be toggled by the export data format? no, the export file will have to be zipped/not zipped
             String ODMXMLFileName = "";
             int fId = 0;
             for (Iterator it = answerMap.entrySet().iterator(); it.hasNext();) {
@@ -120,6 +122,7 @@ public class XsltTransformJob extends QuartzJobBean {
                 ODMXMLFileName = (String) key;
                 Integer fileID = (Integer) value;
                 fId = fileID.intValue();
+                System.out.println("found " + fId + " and " + ODMXMLFileName);
             }
             
             // create dirs 

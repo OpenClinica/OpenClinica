@@ -8,7 +8,7 @@
 	<query>
 		<name>findByDatasetId</name>
 		<sql>SELECT * FROM ARCHIVED_DATASET_FILE WHERE 
-		DATASET_ID = ?</sql>
+		DATASET_ID = ? ORDER BY archived_dataset_file_id desc</sql>
 	</query>
 	<query>
 		<name>update</name>

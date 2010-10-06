@@ -124,7 +124,8 @@ public class GenerateExtractFileService {
             StudyBean currentStudy, String generalFileDirCopy,ExtractBean eb, 
             Integer currentStudyId, Integer parentStudyId, String studySubjectNumber) {
         // default zipped - true
-        return createODMFile(odmVersion, sysTimeBegin, generalFileDir, datasetBean, currentStudy, generalFileDirCopy, eb, currentStudyId, parentStudyId, studySubjectNumber, true);
+        return createODMFile(odmVersion, sysTimeBegin, generalFileDir, datasetBean, 
+                currentStudy, generalFileDirCopy, eb, currentStudyId, parentStudyId, studySubjectNumber, true, true);
     }
     /**
      * createODMfile, added by tbh, 01/2009
@@ -132,7 +133,7 @@ public class GenerateExtractFileService {
 
     public HashMap<String, Integer> createODMFile(String odmVersion, long sysTimeBegin, String generalFileDir, DatasetBean datasetBean, 
     		StudyBean currentStudy, String generalFileDirCopy,ExtractBean eb, 
-    		Integer currentStudyId, Integer parentStudyId, String studySubjectNumber, boolean zipped) {
+    		Integer currentStudyId, Integer parentStudyId, String studySubjectNumber, boolean zipped, boolean saveToDB) {
         
         Integer ssNumber = getStudySubjectNumber(studySubjectNumber);
         MetaDataCollector mdc = new MetaDataCollector(ds, datasetBean, currentStudy);
@@ -281,7 +282,7 @@ public class GenerateExtractFileService {
         }
 
         sysTimeEnd = System.currentTimeMillis() - sysTimeBegin;
-        fId = this.createFileK(ODMXMLFileName, generalFileDir, "</ODM>", datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE, true, zipped);
+        fId = this.createFileK(ODMXMLFileName, generalFileDir, "</ODM>", datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE, saveToDB, zipped);
         if (!"".equals(generalFileDirCopy)) {
             int fId2 = this.createFileK(ODMXMLFileName, generalFileDirCopy, "</ODM>", datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE, false, zipped);
         }
@@ -517,7 +518,9 @@ public class GenerateExtractFileService {
         return fbFinal.getId();
     }
     
-    public int createFileK(String name, String dir, String content, DatasetBean datasetBean, long time, ExportFormatBean efb, boolean saveToDB, boolean zipped) {
+    public int createFileK(String name, String dir, String content, 
+            DatasetBean datasetBean, long time, ExportFormatBean efb, 
+            boolean saveToDB, boolean zipped) {
         ArchivedDatasetFileBean fbFinal = new ArchivedDatasetFileBean();
         // >> tbh 04/2010 #4915 replace all names' spaces with underscores
         name = name.replaceAll(" ", "_");
