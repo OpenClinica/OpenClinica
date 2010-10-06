@@ -96,10 +96,12 @@ public class ExtractController {
         // next, can already run jobs, translations, and then add a message to be notified later
         String xsltPath = SQLInitServlet.getField("filePath") + "xslt" + File.separator + epBean.getFileName();
         String endFilePath = epBean.getFileLocation();
-        if(endFilePath.contains("$filePath"))
-        endFilePath = 	endFilePath.replace("$filePath\\", SQLInitServlet.getField("filePath")+File.separator);
-        if(endFilePath.contains("&datetime"))
+        if(endFilePath.contains("$filePath")) {
+            endFilePath = 	endFilePath.replace("$filePath\\", SQLInitServlet.getField("filePath"));// was + File.separator, tbh
+        }
+        if(endFilePath.contains("&datetime")) {
         	endFilePath = endFilePath.replace("&datetime",  sdfDir.format(new java.util.Date()));
+        }
         // also need to add the status fields discussed w/ cc:
         // result code, user message, optional URL, archive message, log file message
         // asdf table: sort most recent at top
@@ -107,7 +109,7 @@ public class ExtractController {
         // String xmlFilePath = generalFileDir + ODMXMLFileName;
         SimpleTrigger simpleTrigger = xsltService.generateXsltTrigger(xsltPath, 
                 generalFileDir, // xml_file_path
-                endFilePath, 
+                endFilePath + File.separator, 
                 resolveExportFilePath(epBean), 
                 dsBean.getId(), 
                 epBean, userBean);
