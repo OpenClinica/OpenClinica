@@ -225,22 +225,22 @@ public class XsltTransformJob extends QuartzJobBean {
               
         } catch (TransformerConfigurationException e) {
             // TODO Auto-generated catch block
-            sendErrorEmail(e.getMessage(), context);
+            sendErrorEmail(e.getMessage(), context, alertEmail);
             e.printStackTrace();
         } catch (FileNotFoundException e) {
-            sendErrorEmail(e.getMessage(), context);
+            sendErrorEmail(e.getMessage(), context, alertEmail);
             // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (TransformerFactoryConfigurationError e) {
-            sendErrorEmail(e.getMessage(), context);
+            sendErrorEmail(e.getMessage(), context, alertEmail);
             // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (TransformerException e) {
-            sendErrorEmail(e.getMessage(), context);
+            sendErrorEmail(e.getMessage(), context, alertEmail);
             // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (Exception ee) {
-            sendErrorEmail(ee.getMessage(), context);
+            sendErrorEmail(ee.getMessage(), context, alertEmail);
             ee.printStackTrace();
         }
         
@@ -281,15 +281,16 @@ public class XsltTransformJob extends QuartzJobBean {
         fbFinal = (ArchivedDatasetFileBean)asdfDAO.create(fbInitial);
         return fbFinal;
     }
-    private void sendErrorEmail(String message, JobExecutionContext context) {
+    
+    private void sendErrorEmail(String message, JobExecutionContext context, String target) {
         String subject = "Warning: " + message;
         String emailBody = "An exception was thrown while running an extract job on your server, please see the logs for more details.";
         try {
             ApplicationContext appContext = (ApplicationContext) context.getScheduler().getContext().get("applicationContext");
             mailSender = (OpenClinicaMailSender) appContext.getBean("openClinicaMailSender");
             
-            mailSender.sendEmail(EmailEngine.getAdminEmail(), EmailEngine.getAdminEmail(), subject, emailBody, false);
-            
+            mailSender.sendEmail(target, EmailEngine.getAdminEmail(), subject, emailBody, false);
+            System.out.println("sending an email to " + target + " from " + EmailEngine.getAdminEmail());
         } catch (SchedulerException se) {
             se.printStackTrace();
         } catch (OpenClinicaSystemException ose) {
