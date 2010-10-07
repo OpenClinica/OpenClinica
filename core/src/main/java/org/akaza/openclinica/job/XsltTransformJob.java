@@ -155,7 +155,7 @@ public class XsltTransformJob extends QuartzJobBean {
             ExtractPropertyBean epBean = CoreResources.findExtractPropertyBeanById(epBeanId);
             ProcessingFunction function = epBean.getPostProcessing();
             String subject = "";
-            String emailBody = "";
+            // String emailBody = "";
             StringBuffer emailBuffer = new StringBuffer("");
             emailBuffer.append("<p>" + pageMessages.getString("email_header_1") + " " + EmailEngine.getAdminEmail() + " "
                     + pageMessages.getString("email_header_2") + " Job Execution " + pageMessages.getString("email_header_3") + "</p>");
@@ -170,7 +170,7 @@ public class XsltTransformJob extends QuartzJobBean {
                 ProcessingResultType message = function.run();
                 final long done2 = System.currentTimeMillis() - start;
                 System.out.println("--> postprocessing completed in " + done2 + " ms, found result type " + message.getCode());
-                emailBody = message.getDescription();
+                // emailBody = message.getDescription();
                 //                emailBuffer.append("<p>" + pageMessages.getString("email_header_1") + " " + EmailEngine.getAdminEmail() + " "
                 //                        + pageMessages.getString("email_header_2") + " Job Execution " + pageMessages.getString("email_header_3") + "</p>");
                 //                    emailBuffer.append("<P>Dataset: " + datasetBean.getName() + "</P>");
@@ -184,7 +184,7 @@ public class XsltTransformJob extends QuartzJobBean {
                             datasetBean, 
                             done, new File(endFile).length(), ExportFormatBean.PDFFILE,
                             userAccountId);
-                    emailBody = emailBody + "<p><a href='" + message.getUrl() + fbFinal.getId() + "'>" + epBean.getLinkText() + "</a><br/>";
+                    emailBuffer.append("<p><a href='" + message.getUrl() + fbFinal.getId() + "'>" + epBean.getLinkText() + "</a><br/>");
                 }
                 // otherwise don't do it
                 if (message.getCode().intValue() == 1) {
@@ -206,14 +206,14 @@ public class XsltTransformJob extends QuartzJobBean {
                         done, new File(endFile).length(), ExportFormatBean.TXTFILE,
                         userAccountId);
                 subject = "Job Ran: " + datasetBean.getName();
-                emailBody = datasetBean.getName() + " has run and you can access it ";// add url here
-                emailBody = emailBody + "<a href='" + 
-                    CoreResources.getField("sysURL.base") + 
-                    "AccessFile?fileId=" + 
-                    fbFinal.getId() + "'>here</a>.";
-                emailBuffer.append("<p>" + pageMessages.getString("html_email_body_4") + " " + ODMXMLFileName
+                //                emailBody = datasetBean.getName() + " has run and you can access it ";// add url here
+                //                emailBody = emailBody + "<a href='" + 
+                //                    CoreResources.getField("sysURL.base") + 
+                //                    "AccessFile?fileId=" + 
+                //                    fbFinal.getId() + "'>here</a>.";
+                emailBuffer.append("<p>" + pageMessages.getString("html_email_body_4") + " " + fbFinal.getName()
                         + pageMessages.getString("html_email_body_4_5") + CoreResources.getField("sysURL.base") + "AccessFile?fileId="
-                        + fId + pageMessages.getString("html_email_body_3") + "</p>");
+                        + fbFinal.getId() + pageMessages.getString("html_email_body_3") + "</p>");
             }
             // email the message to the user
             // String email = dataMap.getString(EMAIL);

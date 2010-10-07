@@ -86,7 +86,7 @@ public class CoreResources implements ResourceLoaderAware {
             // help text, currently in the alt-text of the link
             epbean.setLinkText(getExtractField("xsl.link.text." + i));
             // link text of the choice of format
-            epbean.setRolesAllowed(getExtractField("xsl.allowed." + i).split(","));
+            // epbean.setRolesAllowed(getExtractField("xsl.allowed." + i).split(","));
             // which roles are allowed to see the choice?
             epbean.setFileLocation(getExtractField("xsl.location." + i));
             // destination of the copied files
@@ -100,12 +100,16 @@ public class CoreResources implements ResourceLoaderAware {
             	SqlProcessingFunction function = new SqlProcessingFunction(epbean);
             	String whichSettings = getExtractField("xsl.post." + i + ".sql");
             	if (!"".equals(whichSettings)) { 
-            		function.setDatabaseType(getExtractField(whichSettings + ".dataBase"));
+            		function.setDatabaseType(getExtractField(whichSettings + ".dataBase").toLowerCase());
             		function.setDatabaseUrl(getExtractField(whichSettings + ".url"));
             		function.setDatabaseUsername(getExtractField(whichSettings + ".username"));
             		function.setDatabasePassword(getExtractField(whichSettings + ".password"));
             	} else {
             		// set default db settings here
+            	    function.setDatabaseType(getField("dataBase"));
+                    function.setDatabaseUrl(getField("url"));
+                    function.setDatabaseUsername(getField("username"));
+                    function.setDatabasePassword(getField("password"));
             	}
             	// also pre-set the database connection stuff
                 epbean.setPostProcessing(function);
