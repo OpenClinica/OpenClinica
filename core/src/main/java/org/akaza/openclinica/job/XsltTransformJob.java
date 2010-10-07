@@ -20,9 +20,11 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.quartz.JobDataMap;
+import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.SchedulerException;
+import org.quartz.impl.StdScheduler;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.JobDetailBean;
 import org.springframework.scheduling.quartz.QuartzJobBean;
@@ -155,7 +157,12 @@ public class XsltTransformJob extends QuartzJobBean {
             String subject = "";
             String emailBody = "";
             StringBuffer emailBuffer = new StringBuffer("");
-            
+            emailBuffer.append("<p>" + pageMessages.getString("email_header_1") + " " + EmailEngine.getAdminEmail() + " "
+                    + pageMessages.getString("email_header_2") + " Job Execution " + pageMessages.getString("email_header_3") + "</p>");
+                emailBuffer.append("<P>Dataset: " + datasetBean.getName() + "</P>");
+                emailBuffer.append("<P>Study: " + currentStudy.getName() + "</P>");
+                emailBuffer.append("<p>" + pageMessages.getString("html_email_body_1") + datasetBean.getName() + pageMessages.getString("html_email_body_2")
+                    + CoreResources.getField("sysURL") + pageMessages.getString("html_email_body_3") + "</p>");
             if (function != null) {
                 function.setTransformFileName(outputPath + File.separator + dataMap.getString(POST_FILE_NAME));
                 function.setODMXMLFileName(endFile);
@@ -164,12 +171,12 @@ public class XsltTransformJob extends QuartzJobBean {
                 final long done2 = System.currentTimeMillis() - start;
                 System.out.println("--> postprocessing completed in " + done2 + " ms, found result type " + message.getCode());
                 emailBody = message.getDescription();
-                emailBuffer.append("<p>" + pageMessages.getString("email_header_1") + " " + EmailEngine.getAdminEmail() + " "
-                        + pageMessages.getString("email_header_2") + " Job Execution " + pageMessages.getString("email_header_3") + "</p>");
-                    emailBuffer.append("<P>Dataset: " + datasetBean.getName() + "</P>");
-                    emailBuffer.append("<P>Study: " + currentStudy.getName() + "</P>");
-                    emailBuffer.append("<p>" + pageMessages.getString("html_email_body_1") + datasetBean.getName() + pageMessages.getString("html_email_body_2")
-                        + CoreResources.getField("sysURL") + pageMessages.getString("html_email_body_3") + "</p>");
+                //                emailBuffer.append("<p>" + pageMessages.getString("email_header_1") + " " + EmailEngine.getAdminEmail() + " "
+                //                        + pageMessages.getString("email_header_2") + " Job Execution " + pageMessages.getString("email_header_3") + "</p>");
+                //                    emailBuffer.append("<P>Dataset: " + datasetBean.getName() + "</P>");
+                //                    emailBuffer.append("<P>Study: " + currentStudy.getName() + "</P>");
+                //                    emailBuffer.append("<p>" + pageMessages.getString("html_email_body_1") + datasetBean.getName() + pageMessages.getString("html_email_body_2")
+                //                        + CoreResources.getField("sysURL") + pageMessages.getString("html_email_body_3") + "</p>");
                 // if the process was a pdf, generate a link to the file
                 if (!("").equals(message.getUrl()) && function.getClass().equals(org.akaza.openclinica.bean.service.PdfProcessingFunction.class)) {
                     ArchivedDatasetFileBean fbFinal = generateFileRecord(dataMap.getString(POST_FILE_NAME) + ".pdf", 
@@ -184,6 +191,7 @@ public class XsltTransformJob extends QuartzJobBean {
                     subject = "Success: " + datasetBean.getName(); 
                 } else if (message.getCode().intValue() == 2) { 
                     subject = "Failure: " + datasetBean.getName();
+                    postErrorMessage(message.getDescription(), context);
                 } else if (message.getCode().intValue() == 3) {
                     subject = "Update: " + datasetBean.getName();
                 }
@@ -208,43 +216,59 @@ public class XsltTransformJob extends QuartzJobBean {
                         + fId + pageMessages.getString("html_email_body_3") + "</p>");
             }
             // email the message to the user
-            // TODO do we need user id?
-            
-            // UserAccountBean userAccount = (UserAccountBean);
-            String email = dataMap.getString(EMAIL);
+            // String email = dataMap.getString(EMAIL);
             
             try {
-                mailSender.sendEmail(email, EmailEngine.getAdminEmail(), subject, emailBuffer.toString(), true);
+                mailSender.sendEmail(alertEmail, EmailEngine.getAdminEmail(), subject, emailBuffer.toString(), true);
             } catch (OpenClinicaSystemException ose) {
                 // Do Nothing, In the future we might want to have an email
                 // status added to system.
                 System.out.println("exception sending mail: " + ose.getMessage());
             }
             
-            System.out.println("just sent email to " + email + ", from " + EmailEngine.getAdminEmail());
+            System.out.println("just sent email to " + alertEmail + ", from " + EmailEngine.getAdminEmail());
               
         } catch (TransformerConfigurationException e) {
-            // TODO Auto-generated catch block
             sendErrorEmail(e.getMessage(), context, alertEmail);
+            postErrorMessage(e.getMessage(), context);
+
             e.printStackTrace();
         } catch (FileNotFoundException e) {
             sendErrorEmail(e.getMessage(), context, alertEmail);
-            // TODO Auto-generated catch block
+            postErrorMessage(e.getMessage(), context);
             e.printStackTrace();
         } catch (TransformerFactoryConfigurationError e) {
             sendErrorEmail(e.getMessage(), context, alertEmail);
-            // TODO Auto-generated catch block
+            postErrorMessage(e.getMessage(), context);
             e.printStackTrace();
         } catch (TransformerException e) {
             sendErrorEmail(e.getMessage(), context, alertEmail);
-            // TODO Auto-generated catch block
+            postErrorMessage(e.getMessage(), context);
             e.printStackTrace();
         } catch (Exception ee) {
             sendErrorEmail(ee.getMessage(), context, alertEmail);
+            postErrorMessage(ee.getMessage(), context);
             ee.printStackTrace();
         }
         
         
+    }
+    
+    private void postErrorMessage(String message, JobExecutionContext context) {
+        String SCHEDULER = "schedulerFactoryBean";
+        try {
+            ApplicationContext appContext = (ApplicationContext) context.getScheduler().getContext().get("applicationContext");
+            StdScheduler scheduler = (StdScheduler) appContext.getBean(SCHEDULER);
+            JobDetail jobDetail = context.getJobDetail();
+            JobDataMap dataMap = jobDetail.getJobDataMap();
+            dataMap.put("failMessage", message);
+            jobDetail.setJobDataMap(dataMap);
+            // replace the job with the extra data
+            scheduler.addJob(jobDetail, true);
+            
+        } catch (Exception e) {
+            
+        }
     }
     
     private ArchivedDatasetFileBean generateFileRecord(String name, 
