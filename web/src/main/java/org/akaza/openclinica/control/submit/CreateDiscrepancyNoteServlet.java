@@ -7,6 +7,14 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+
+import javax.servlet.http.HttpSession;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
@@ -44,14 +52,6 @@ import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
-
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-
-import javax.servlet.http.HttpSession;
 
 /**
  * Create a discrepancy note for a data entity
@@ -570,7 +570,8 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                 } else {
                     // if not creating a new thread(note), update exsiting notes
                     // if necessary
-                    if ("itemData".equalsIgnoreCase(entityType) && !isNew) {
+                    //if ("itemData".equalsIgnoreCase(entityType) && !isNew) {
+                    if(!isNew) {
                         System.out.println("Create:find parent note for item data:" + note.getEntityId());
 
                         DiscrepancyNoteBean pNote = (DiscrepancyNoteBean) dndao.findByPK(note.getParentDnId());
