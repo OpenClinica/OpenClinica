@@ -162,8 +162,7 @@ public class XsltTransformJob extends QuartzJobBean {
                     + pageMessages.getString("email_header_2") + " Job Execution " + pageMessages.getString("email_header_3") + "</p>");
                 emailBuffer.append("<P>Dataset: " + datasetBean.getName() + "</P>");
                 emailBuffer.append("<P>Study: " + currentStudy.getName() + "</P>");
-                emailBuffer.append("<p>" + pageMessages.getString("html_email_body_1") + datasetBean.getName() + pageMessages.getString("html_email_body_2")
-                    + CoreResources.getField("sysURL") + pageMessages.getString("html_email_body_3") + "</p>");
+                emailBuffer.append("<p>" + pageMessages.getString("html_email_body_1") + datasetBean.getName() + pageMessages.getString("html_email_body_2_2") + "</p>");
             if (function != null) {
                 function.setTransformFileName(outputPath + File.separator + dataMap.getString(POST_FILE_NAME));
                 function.setODMXMLFileName(endFile);
@@ -179,20 +178,24 @@ public class XsltTransformJob extends QuartzJobBean {
                 //                    emailBuffer.append("<p>" + pageMessages.getString("html_email_body_1") + datasetBean.getName() + pageMessages.getString("html_email_body_2")
                 //                        + CoreResources.getField("sysURL") + pageMessages.getString("html_email_body_3") + "</p>");
                 // if the process was a pdf, generate a link to the file
-                if (!("").equals(message.getUrl()) && function.getClass().equals(org.akaza.openclinica.bean.service.PdfProcessingFunction.class)) {
-                    ArchivedDatasetFileBean fbFinal = generateFileRecord(dataMap.getString(POST_FILE_NAME) + ".pdf", 
+                // if the process is anything but SQL, generate a link to the file
+                if (!function.getClass().equals(org.akaza.openclinica.bean.service.SqlProcessingFunction.class)) {
+                    ArchivedDatasetFileBean fbFinal = generateFileRecord(dataMap.getString(POST_FILE_NAME) + "." + function.getFileType(), 
                             outputPath, 
                             datasetBean, 
                             done, new File(endFile).length(), 
                             ExportFormatBean.PDFFILE,
                             userAccountId);
-                    emailBuffer.append("<p><a href='" + message.getUrl() + fbFinal.getId() + "'>" + epBean.getLinkText() + "</a><br/>");
+                    emailBuffer.append("<p>" + pageMessages.getString("html_email_body_4") + " " + fbFinal.getName()
+                            + pageMessages.getString("html_email_body_4_5") + CoreResources.getField("sysURL.base") + "AccessFile?fileId="
+                            + fbFinal.getId() + pageMessages.getString("html_email_body_3") + "</p>");
                 }
                 // otherwise don't do it
                 if (message.getCode().intValue() == 1) {
                     subject = "Success: " + datasetBean.getName(); 
                 } else if (message.getCode().intValue() == 2) { 
                     subject = "Failure: " + datasetBean.getName();
+                    emailBuffer.append("<P>" + message.getDescription());
                     postErrorMessage(message.getDescription(), context);
                 } else if (message.getCode().intValue() == 3) {
                     subject = "Update: " + datasetBean.getName();
@@ -220,7 +223,7 @@ public class XsltTransformJob extends QuartzJobBean {
             }
             // email the message to the user
             // String email = dataMap.getString(EMAIL);
-            
+            emailBuffer.append("<p>" + pageMessages.getString("html_email_body_5") + "</p>");
             try {
                 mailSender.sendEmail(alertEmail, EmailEngine.getAdminEmail(), subject, emailBuffer.toString(), true);
             } catch (OpenClinicaSystemException ose) {

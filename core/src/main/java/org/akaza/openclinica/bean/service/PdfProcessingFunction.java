@@ -75,7 +75,7 @@ public class PdfProcessingFunction extends ProcessingFunction {
         } catch (Exception e) {
             e.printStackTrace();
             ProcessingResultType resultError = ProcessingResultType.FAIL;
-            resultError.setUrl(""); // TODO view datasets page
+            resultError.setUrl(CoreResources.getField("sysURL.base") + "ViewDatasets"); // view datasets page
             resultError.setArchiveMessage("Failure thrown: " + e.getMessage());
             resultError.setDescription("Your job failed with the message of: " + e.getMessage());
             return resultError;
@@ -86,7 +86,7 @@ public class PdfProcessingFunction extends ProcessingFunction {
         
         ProcessingResultType resultSuccess = ProcessingResultType.SUCCESS;
         resultSuccess.setUrl(CoreResources.getField("sysURL.base") + 
-                "AccessFile?fileId="); // TODO to the pdf
+                "AccessFile?fileId="); // to the pdf
         resultSuccess.setArchiveMessage("Success");
         resultSuccess.setDescription("Your job succeeded please find the URL below");
         return resultSuccess;

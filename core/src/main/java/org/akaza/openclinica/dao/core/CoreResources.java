@@ -90,11 +90,11 @@ public class CoreResources implements ResourceLoaderAware {
             // which roles are allowed to see the choice?
             epbean.setFileLocation(getExtractField("xsl.location." + i));
             // destination of the copied files
-            epbean.setFormat(getExtractField("xsl.format." + i));
-            if (("").equals(epbean.getFormat())) {
-                epbean.setFormat("oc1.3");
-            }
-            // formatting choice.  note that it can be blank, in which case we use oc1.3
+            // epbean.setFormat(getExtractField("xsl.format." + i));
+            // if (("").equals(epbean.getFormat())) {
+            epbean.setFormat("oc1.3");
+            // }
+            // formatting choice.  currently permenantly set at oc1.3
             epbean.setExportFileName(getExtractField("xsl.exportname." + i));
             // destination file name of the copied files
             String whichFunction = getExtractField("xsl.post." + i).toLowerCase();
