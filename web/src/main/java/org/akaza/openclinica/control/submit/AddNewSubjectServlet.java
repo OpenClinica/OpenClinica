@@ -66,7 +66,7 @@ public class AddNewSubjectServlet extends SecureController {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     // Shaoyu Su
-    private Object simpleLockObj = new Object();
+    private final Object simpleLockObj = new Object();
     private static final String AUTO_LABEL = "AUTO_ID";
     public static final String INPUT_UNIQUE_IDENTIFIER = "uniqueIdentifier";// global
     // Id
@@ -984,6 +984,12 @@ public class AddNewSubjectServlet extends SecureController {
                 dnb.setParentDnId(dnb.getId());
                 dnb = (DiscrepancyNoteBean) dndao.create(dnb);
                 dndao.createMapping(dnb);
+            } else if(dnb.getParentDnId()>0){
+                DiscrepancyNoteBean parentNote = (DiscrepancyNoteBean)dndao.findByPK(dnb.getParentDnId());
+                if(dnb.getDiscrepancyNoteTypeId()==parentNote.getDiscrepancyNoteTypeId() && dnb.getResolutionStatusId()!=parentNote.getResolutionStatusId()) {
+                    parentNote.setResolutionStatusId(dnb.getResolutionStatusId());
+                    dndao.update(parentNote);
+                }
             }
         }
     }
