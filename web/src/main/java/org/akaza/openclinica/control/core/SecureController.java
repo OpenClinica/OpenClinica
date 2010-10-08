@@ -273,8 +273,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                         // The extract data job failed with the message:
                         // ERROR: relation "demographics" already exists
                         // More information may be available in the log files.
-                        addPageMessage("The extract data job failed with the message: <p>" + 
-                                failMessage + "<p>More information may be available in the log files.");
+                        addPageMessage("The extract data job failed with the message: <br/><br/>" + 
+                                failMessage + "<br/><br/>More information may be available in the log files.");
                     } else {
                         addPageMessage("Your Extract is now completed. Please go to review them at <a href='ViewDatasets'>View Datasets</a> or <a href='ExportDataset?datasetId=" + 
                             datasetId + "'>View Specific Dataset</a>.");
