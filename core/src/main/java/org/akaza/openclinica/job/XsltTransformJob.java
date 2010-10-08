@@ -92,6 +92,8 @@ public class XsltTransformJob extends QuartzJobBean {
             // get all user info, generate xml
             System.out.println("found output path: " + outputPath);
             String generalFileDir = dataMap.getString(XML_FILE_PATH);
+            int epBeanId = dataMap.getInt(EXTRACT_PROPERTY);
+            ExtractPropertyBean epBean = CoreResources.findExtractPropertyBeanById(epBeanId);
             
             long sysTimeBegin = System.currentTimeMillis();
             userAccountDao = new UserAccountDAO(dataSource);
@@ -110,7 +112,7 @@ public class XsltTransformJob extends QuartzJobBean {
             
             datasetBean.setName(datasetBean.getName().replaceAll(" ", "_"));
             System.out.println("--> job starting: ");
-            HashMap answerMap = generateFileService.createODMFile("oc1.3", sysTimeBegin, generalFileDir, datasetBean, 
+            HashMap answerMap = generateFileService.createODMFile(epBean.getFormat(), sysTimeBegin, generalFileDir, datasetBean, 
                     currentStudy, "", eb, currentStudy.getId(), currentStudy.getParentStudyId(), "99", false, false);
             // won't save a record of the XML to db
             // won't be a zipped file, so that we can submit it for transformation
@@ -151,8 +153,7 @@ public class XsltTransformJob extends QuartzJobBean {
             final long done = System.currentTimeMillis() - start;
             System.out.println("--> job completed in " + done + " ms");
             // run post processing
-            int epBeanId = dataMap.getInt(EXTRACT_PROPERTY);
-            ExtractPropertyBean epBean = CoreResources.findExtractPropertyBeanById(epBeanId);
+            
             ProcessingFunction function = epBean.getPostProcessing();
             String subject = "";
             // String emailBody = "";
@@ -182,7 +183,8 @@ public class XsltTransformJob extends QuartzJobBean {
                     ArchivedDatasetFileBean fbFinal = generateFileRecord(dataMap.getString(POST_FILE_NAME) + ".pdf", 
                             outputPath, 
                             datasetBean, 
-                            done, new File(endFile).length(), ExportFormatBean.PDFFILE,
+                            done, new File(endFile).length(), 
+                            ExportFormatBean.PDFFILE,
                             userAccountId);
                     emailBuffer.append("<p><a href='" + message.getUrl() + fbFinal.getId() + "'>" + epBean.getLinkText() + "</a><br/>");
                 }
@@ -203,7 +205,8 @@ public class XsltTransformJob extends QuartzJobBean {
                 ArchivedDatasetFileBean fbFinal = generateFileRecord(dataMap.getString(POST_FILE_NAME), 
                         outputPath, 
                         datasetBean, 
-                        done, new File(endFile).length(), ExportFormatBean.TXTFILE,
+                        done, new File(endFile).length(), 
+                        ExportFormatBean.TXTFILE,
                         userAccountId);
                 subject = "Job Ran: " + datasetBean.getName();
                 //                emailBody = datasetBean.getName() + " has run and you can access it ";// add url here

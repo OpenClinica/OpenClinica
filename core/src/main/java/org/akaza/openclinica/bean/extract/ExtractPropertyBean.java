@@ -23,6 +23,7 @@ public class ExtractPropertyBean {
     private String exportFileName;
     private String[] rolesAllowed;
     private int id;
+    private String format;
     private ProcessingFunction postProcessing;
     
     public ExtractPropertyBean() {
@@ -38,9 +39,19 @@ public class ExtractPropertyBean {
     public String getFileName() {
         return fileName;
     }
+    
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
+    
+    public String getFormat() {
+        return format;
+    }
+
+    public void setFormat(String format) {
+        this.format = format;
+    }
+
     public int getId() {
 		return id;
 	}
