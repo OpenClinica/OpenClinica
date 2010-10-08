@@ -233,7 +233,8 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             }
             dndao.setFetchMapping(false);
         } else {
-            if (!isNew) {// not a new note, so try to find the parent note
+            //if (!isNew) {// not a new note, so try to find the parent note
+            if(notes.size()>0) {//a child note could be new.
                 for (int i = 0; i < notes.size(); i++) {
                     DiscrepancyNoteBean note1 = (DiscrepancyNoteBean) notes.get(i);
                     if (note1.getParentDnId() == 0) {
@@ -571,10 +572,11 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                     // if not creating a new thread(note), update exsiting notes
                     // if necessary
                     //if ("itemData".equalsIgnoreCase(entityType) && !isNew) {
-                    if(!isNew) {
+                    int pdnId = note!=null?note.getParentDnId():0;
+                    if(pdnId > 0) {
                         System.out.println("Create:find parent note for item data:" + note.getEntityId());
 
-                        DiscrepancyNoteBean pNote = (DiscrepancyNoteBean) dndao.findByPK(note.getParentDnId());
+                        DiscrepancyNoteBean pNote = (DiscrepancyNoteBean) dndao.findByPK(pdnId);
 
                         System.out.println("setting owner id: " + pNote.getOwnerId());
 
