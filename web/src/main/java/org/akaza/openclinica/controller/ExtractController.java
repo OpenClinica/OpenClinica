@@ -108,7 +108,8 @@ public class ExtractController {
                 endFilePath + File.separator, 
                 resolveExportFilePath(epBean), 
                 dsBean.getId(), 
-                epBean, userBean);
+                epBean, userBean, request.getLocale().getLanguage());
+        // System.out.println("just set locale: " + request.getLocale().getLanguage());
         scheduler = getScheduler(request);
         
         JobDetailBean jobDetailBean = new JobDetailBean();

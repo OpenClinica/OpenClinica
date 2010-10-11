@@ -63,6 +63,7 @@ public class ExampleSpringJob extends QuartzJobBean {
     public static final String EMAIL = "contactEmail";
     public static final String USER_ID = "user_id";
     public static final String STUDY_NAME = "study_name";
+    public static final String STUDY_ID = "studyId";
     public static final String LOCALE = "locale";
 
     private static final String DATASET_DIR = SQLInitServlet.getField("filePath") + "datasets" + File.separator;
@@ -128,6 +129,7 @@ public class ExampleSpringJob extends QuartzJobBean {
             }
             String spss = dataMap.getString(SPSS);
             int userId = dataMap.getInt(USER_ID);
+            int studyId = dataMap.getInt(STUDY_ID);
 
             // String datasetId = dataMap.getString(DATASET_ID);
             // int dsId = new Integer(datasetId).intValue();
@@ -177,9 +179,10 @@ public class ExampleSpringJob extends QuartzJobBean {
 
                 // logger.debug("-- gen tab file 00");
 
-                StudyBean activeStudy = (StudyBean) studyDao.findByPK(userBean.getActiveStudyId());
+                // tbh #5796 - covers a bug when the user changes studies, 10/2010
+                StudyBean activeStudy = (StudyBean) studyDao.findByPK(studyId);
                 StudyBean parentStudy = new StudyBean();
-                logger.debug("active study: " + userBean.getActiveStudyId() + " parent study: " + activeStudy.getParentStudyId());
+                logger.debug("active study: " + studyId + " parent study: " + activeStudy.getParentStudyId());
                 if (activeStudy.getParentStudyId() > 0) {
                     // StudyDAO sdao = new StudyDAO(sm.getDataSource());
                     parentStudy = (StudyBean) studyDao.findByPK(activeStudy.getParentStudyId());

@@ -40,6 +40,7 @@ public class TriggerService {
     public static final String STUDY_NAME = "study_name";
     public static final String STUDY_OID = "study_oid";
     public static final String DIRECTORY = "filePathDir";
+    public static final String STUDY_ID = "studyId";
 
     private static String IMPORT_TRIGGER = "importTrigger";
 
@@ -109,6 +110,7 @@ public class TriggerService {
         jobDataMap.put(SPSS, spss);
         jobDataMap.put(USER_ID, userAccount.getId());
         // StudyDAO studyDAO = new StudyDAO();
+        jobDataMap.put(STUDY_ID, study.getId());
         jobDataMap.put(STUDY_NAME, study.getName());
         jobDataMap.put(STUDY_OID, study.getOid());
 
