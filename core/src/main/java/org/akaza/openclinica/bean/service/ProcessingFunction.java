@@ -2,6 +2,9 @@ package org.akaza.openclinica.bean.service;
 
 /**
  * Superclass for processing functions, by Tom Hickerson 09/2010
+ * Note that this function is run by the XsltTransformJob when an extract is
+ * run.  When the run() function is executed, it is assumed that all of the below
+ * private getters/setters have been loaded by the job. 
  * @author thickerson
  *
  */

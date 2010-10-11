@@ -64,6 +64,8 @@ public class XsltTransformJob extends QuartzJobBean {
     public static final String POST_FILE_PATH = "postFilePath";
     public static final String POST_FILE_NAME = "postFileName";
     public static final String EXTRACT_PROPERTY = "extractProperty";
+    public static final String LOCALE = "locale";
+    public static final String STUDY_ID = "studyId";
     
     private OpenClinicaMailSender mailSender;
     private DataSource dataSource;
@@ -77,7 +79,14 @@ public class XsltTransformJob extends QuartzJobBean {
         Locale locale = new Locale("en-US");
         ResourceBundleProvider.updateLocale(locale);
         ResourceBundle pageMessages = ResourceBundleProvider.getPageMessagesBundle();
+        
         JobDataMap dataMap = context.getMergedJobDataMap();
+        String localeStr = dataMap.getString(LOCALE);
+        if (localeStr != null) {
+            locale = new Locale(localeStr);
+            ResourceBundleProvider.updateLocale(locale);
+            pageMessages = ResourceBundleProvider.getPageMessagesBundle();
+        }
         // get the file information from the job
         String alertEmail = dataMap.getString(EMAIL);
         try {
@@ -88,6 +97,7 @@ public class XsltTransformJob extends QuartzJobBean {
             
             // init all fields from the data map
             int userAccountId = dataMap.getInt(USER_ID);
+            int studyId = dataMap.getInt(STUDY_ID);
             String outputPath = dataMap.getString(POST_FILE_PATH);
             // get all user info, generate xml
             System.out.println("found output path: " + outputPath);
@@ -100,9 +110,9 @@ public class XsltTransformJob extends QuartzJobBean {
             UserAccountBean userBean = (UserAccountBean)userAccountDao.findByPK(userAccountId);
             generateFileService = new GenerateExtractFileService(dataSource, userBean);
             studyDao = new StudyDAO(dataSource);
-            StudyBean currentStudy = (StudyBean)studyDao.findByPK(userBean.getActiveStudyId());
+            StudyBean currentStudy = (StudyBean)studyDao.findByPK(studyId);
             StudyBean parentStudy = (StudyBean)studyDao.findByPK(currentStudy.getParentStudyId());
-            // TODO need to get the current study and parent study, somehow
+            
             // DatasetBean dsBean = (DatasetBean)datasetDao.findByPK(new Integer(datasetId).intValue());
             int dsId = dataMap.getInt(DATASET_ID);
             DatasetBean datasetBean = (DatasetBean) dsdao.findByPK(dsId);

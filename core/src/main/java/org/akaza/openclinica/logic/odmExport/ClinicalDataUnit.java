@@ -91,7 +91,8 @@ public class ClinicalDataUnit extends OdmUnit {
         if (nullValueCVs.containsKey(key)) {
             String[] nullvalues = nullValueCVs.get(key).split(",");
             for (String n : nullvalues) {
-                if (itValue.contains(n)) {
+                // if (itValue.contains(n)) {
+                if (itValue.equals(n)) {
                     return true;
                 }
             }

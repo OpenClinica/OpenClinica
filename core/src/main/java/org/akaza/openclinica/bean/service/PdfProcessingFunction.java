@@ -35,6 +35,16 @@ public class PdfProcessingFunction extends ProcessingFunction {
         fileType = "pdf";
     }
     
+    /*
+     * The run() method.  Note that we will assume that all variables (i.e. file
+     * paths) are set here.
+     * 
+     * Running this will open a file stream, perform a transform with the *.fo 
+     * file (note, does not necessarily have to have a *.fo suffix) and then 
+     * return a success/fail message.
+     * (non-Javadoc)
+     * @see org.akaza.openclinica.bean.service.ProcessingInterface#run()
+     */
     public ProcessingResultType run() {
         
         OutputStream out = null;    

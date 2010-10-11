@@ -20,10 +20,13 @@ public class XsltTriggerService {
     public static final String POST_FILE_PATH = "postFilePath";
     public static final String POST_FILE_NAME = "postFileName";
     public static final String EXTRACT_PROPERTY = "extractProperty";
+    public static final String LOCALE = "locale";
+    public static final String STUDY_ID = "studyId";
     
     public static String TRIGGER_GROUP_NAME = "XsltTriggers";
     
-    public SimpleTrigger generateXsltTrigger(String xslFile, String xmlFile, String endFilePath, String endFile, int datasetId, ExtractPropertyBean epBean, UserAccountBean userAccountBean) {
+    public SimpleTrigger generateXsltTrigger(String xslFile, String xmlFile, String endFilePath, 
+            String endFile, int datasetId, ExtractPropertyBean epBean, UserAccountBean userAccountBean, String locale) {
         Date startDateTime = new Date(System.currentTimeMillis());
         String jobName = xmlFile + datasetId;
         SimpleTrigger trigger = new SimpleTrigger(jobName, TRIGGER_GROUP_NAME, 0, 1);
@@ -41,6 +44,8 @@ public class XsltTriggerService {
         jobDataMap.put(POST_FILE_NAME, endFile);
         jobDataMap.put(EXTRACT_PROPERTY, epBean.getId());
         jobDataMap.put(USER_ID, userAccountBean.getId());
+        jobDataMap.put(STUDY_ID, userAccountBean.getActiveStudyId());
+        jobDataMap.put(LOCALE, locale);
         jobDataMap.put(DATASET_ID, datasetId);
         jobDataMap.put(EMAIL, userAccountBean.getEmail());
         // jobDataMap.put(DIRECTORY, directory);

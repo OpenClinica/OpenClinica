@@ -29,10 +29,14 @@ public class SqlProcessingFunction extends ProcessingFunction {
     }
     
     /**
-     * the run function will find the file name, run the SQL on the assigned
-     * db, and make sure the datamart is assembled correctly.
+     * The run() method will find the file name, runs the SQL on the assigned
+     * db, and returns a success/fail message.
      * 
-     * 
+     * This method assumes all variables are set in the XsltTransformJob, and
+     * that the database variables are correctly set in either extract.properties
+     * or datainfo.properties
+     * NOTE that if variables are set in extract, we do not try datainfo (it has to
+     * be correct somewhere)
      * 
      */
     public ProcessingResultType run() {
@@ -47,14 +51,13 @@ public class SqlProcessingFunction extends ProcessingFunction {
     			DriverManager.getConnection(databaseUrl, databaseUsername, databasePassword);
     		conn.setAutoCommit(false);
     		File sqlFile = new File(getTransformFileName());
-    		String[] statements = getFileContents(sqlFile); // ???
+    		String[] statements = getFileContents(sqlFile); 
     		for (String statement : statements) {
     		    Statement stmt = conn.createStatement();
     		    // and then execute the statement here
     		    // convert the translated file to a string and then tries an execute
 
     		    // System.out.println("-- > about to run " + statement);
-
     		    stmt.executeUpdate(statement);
     		    
     		    stmt.close();
@@ -67,18 +70,19 @@ public class SqlProcessingFunction extends ProcessingFunction {
     	    e.printStackTrace();
     	    System.out.println(" -- > found an exception : " + e.getMessage());
     	    ProcessingResultType resultError = ProcessingResultType.FAIL;
-            resultError.setUrl(""); // TODO view datasets page
+            resultError.setUrl(""); // no url required
             resultError.setArchiveMessage("Failure thrown: " + e.getMessage());
             resultError.setDescription("Your job failed with the message of: " + e.getMessage());
             return resultError;
     	}
     	// set up the reply object
     	ProcessingResultType result = ProcessingResultType.SUCCESS;
-        result.setUrl(""); // TODO no url required
+        result.setUrl(""); // no url required
         result.setArchiveMessage("Successfully run");
-        result.setDescription("Your job ran successfully.");// replace with something from extract prop bean?
+        result.setDescription("Your job ran successfully.");
+        // replace with something from extract prop bean?
         return result;
-    	// return null;
+    	
     }
     
 
@@ -122,6 +126,11 @@ public class SqlProcessingFunction extends ProcessingFunction {
 		this.databaseType = databaseType;
 	}
 	
+	/*
+	 * getFileContents(sqlFile):
+	 * pulls out all the contents and assembles a string with all the SQL
+	 * statements to be executed on the datamart.
+	 */
 	private String[] getFileContents(File sqlFile) throws Exception {
 	    String value = "";
 	    StringBuffer sb = new StringBuffer();
