@@ -133,7 +133,7 @@
 				<!-- hide more columns or not-->
 				<td class="table_tools" nowrap><b>
 		        <!-- These Numbers represent the tab/table number, number of columns needs to hide, and number of data rows in each table -->
-			    <a href="javascript:HideGroups(0,11,10);">
+			    <a href="javascript:HideGroups(0,11,<c:out value="${defSize}"/> );">
 							<div id="HideGroups" style="display: none">&nbsp;&nbsp;<fmt:message key="hide" bundle="${resword}"/></div>
 							<div id="ShowGroups" style="display: all">&nbsp;&nbsp;<fmt:message key="show_more" bundle="${resword}"/></div>
 							</a></b></td>

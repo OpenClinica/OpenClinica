@@ -10,7 +10,7 @@
 <c:set var="eblRowCount" value="${param.eblRowCount}" />
 
 <jsp:useBean scope="request" id="currRow" class="org.akaza.openclinica.web.bean.StudyEventDefinitionRow" />
-<jsp:useBean scope="request" id="defSize" type="java.lang.Integer" />
+
 <c:set var="last" value="${defSize-1}" />
  <c:choose>
   <c:when test="${count==last}">
