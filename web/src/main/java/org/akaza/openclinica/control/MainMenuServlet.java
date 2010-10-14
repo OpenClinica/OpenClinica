@@ -197,8 +197,6 @@ public class MainMenuServlet extends SecureController {
                 + "<a href=\"UpdateProfile\">" + respage.getString("user_profile") + " </a>");
 
             if (pwdChangeRequired == 1) {
-                request.setAttribute("mustChangePass", "yes");
-                forwardPage(Page.RESET_PASSWORD);
             } else {
                 forwardPage(Page.MENU);
             }
