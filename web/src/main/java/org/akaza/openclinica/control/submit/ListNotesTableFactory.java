@@ -436,6 +436,17 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         for (Filter filter : filters) {
             String property = filter.getProperty();
             String value = filter.getValue();
+            //Checking if the given date format is valid
+            if("discrepancyNoteBean.createdDate".equalsIgnoreCase(property)
+                    || "discrepancyNoteBean.updatedDate".equalsIgnoreCase(property)){
+                 try{
+                    String date = formatDate(new Date(value));
+                     value = date;
+                   }catch(Exception ex){
+                     value = "01-Jan-1700";
+                   }
+            }
+            //
             listNotesFilter.addFilter(property, value);
         }
 
