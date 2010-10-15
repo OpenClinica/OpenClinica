@@ -153,16 +153,17 @@
 </div>
 <br>
 <table border="0" cellpadding="0" cellspacing="0">
-    <tr><td>
-        <form action="UpdateEventDefinition" method="POST">
-            <input type="hidden" name="action" value="cancel">
-            <input type="submit" name="submit" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium">
-        </form>
-    </td>
+   <tr>
         <td>
             <form action="UpdateEventDefinition" method="POST">
                 <input type="hidden" name="action" value="submit">
                 <input type="submit" name="submit" value="<fmt:message key="confirm_and_finish" bundle="${resword}"/>" class="button_long">
+            </form>
+        </td>
+        <td>
+            <form action="UpdateEventDefinition" method="POST">
+                <input type="hidden" name="action" value="cancel">
+                <input type="submit" name="submit" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium">
             </form>
         </td>
     </tr>
