@@ -37,7 +37,7 @@ public class Status extends Term implements Comparable {
     private static final Status[] activeMembers = { AVAILABLE, PENDING, PRIVATE, UNAVAILABLE, LOCKED, SIGNED };
     private static List activeList = Arrays.asList(activeMembers);
 
-    private static final Status[] studySubjectDropDownMembers = { AVAILABLE, SIGNED, DELETED };
+    private static final Status[] studySubjectDropDownMembers = { AVAILABLE, UNAVAILABLE };
     private static List studySubjectDropDownList = Arrays.asList(studySubjectDropDownMembers);
 
     private static final Status[] studyUpdateMembers = { PENDING, AVAILABLE, FROZEN, LOCKED };
