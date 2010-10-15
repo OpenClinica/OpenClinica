@@ -78,6 +78,9 @@
 			onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img 
 		    name="bt_View1" src="images/bt_View.gif" border="0"  alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
 		  </td>
-          <%-- Mantis Issue: 5919. the Remove/Restore icons for sites are removed. --%>
+          <td>&nbsp;</td>  
+        </tr>
+	   </table>
+      </td>
      </tr>
      </c:forEach>
