@@ -14,7 +14,6 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
-import javax.validation.Valid;
 
 @Entity
 @DiscriminatorValue("3")
@@ -22,7 +21,6 @@ public class ShowActionBean extends RuleActionBean {
 
     private String message;
     private List<PropertyBean> properties;
-    @Valid
     private List<PropertyBean> lazyProperties = LazyList.decorate(new ArrayList<PropertyBean>(), FactoryUtils.instantiateFactory(PropertyBean.class));
 
     public ShowActionBean() {
