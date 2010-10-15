@@ -175,12 +175,16 @@
 					</td>
 				</c:when>
 
-				<c:when test="${studySub.status.name != 'removed' && studySub.status.name != 'auto-removed'}">
-					<td class="table_cell" bgcolor="#F5F5F5" align="center" width="20">
-						<img src="images/icon_NotStarted.gif" alt="<fmt:message key="not_started" bundle="${resword}"/>" title="<fmt:message key="not_started" bundle="${resword}"/>">
-					</td>
-				</c:when>
-
+                <c:when test="${studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed'}">
+                    <c:choose>
+                        <c:when test="${dedc.eventCRF.id>0}">
+                            <td class="table_cell" bgcolor="#F5F5F5" align="center"><img src="images/icon_InitialDE.gif" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry" bundle="${resword}"/>"></td>
+                        </c:when>
+                        <c:otherwise>
+                            <td class="table_cell" bgcolor="#F5F5F5" align="center"><img src="images/icon_NotStarted.gif" alt="<fmt:message key="not_started" bundle="${resword}"/>" title="<fmt:message key="not_started" bundle="${resword}"/>"></td>
+                        </c:otherwise>
+                    </c:choose>
+                </c:when>
 				<c:otherwise>
 					<td class="table_cell" bgcolor="#F5F5F5" align="center" width="20">
 						<img src="images/icon_Invalid.gif" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>">
