@@ -38,8 +38,7 @@ import java.text.MessageFormat;
 import java.util.Locale;
 
 /**
- * Verify the Rule import , show records that have Errors as well as records
- * that will be saved.
+ * Verify the Rule import , show records that have Errors as well as records that will be saved.
  * 
  * @author Krikor krumlian
  */
@@ -61,23 +60,26 @@ public class ImportRuleServlet extends SecureController {
 
         }
         if ("downloadrulesxsd".equalsIgnoreCase(action)) {
-            File xsdFile = new File(SpringServletAccess.getPropertiesDir(context) + "rules.xsd");
+            // File xsdFile = new File(SpringServletAccess.getPropertiesDir(context) + "rules.xsd");
+            File xsdFile = getCoreResources().getFile("rules.xsd");
             dowloadFile(xsdFile, "text/xml");
         }
         if ("downloadtemplate".equalsIgnoreCase(action)) {
-            File file = new File(SpringServletAccess.getPropertiesDir(context) + "rules_template.xml");
+            // File file = new File(SpringServletAccess.getPropertiesDir(context) + "rules_template.xml");
+            File file = getCoreResources().getFile("rules_template.xml");
             dowloadFile(file, "text/xml");
         }
         if ("downloadtemplateWithNotes".equalsIgnoreCase(action)) {
-            File file = new File(SpringServletAccess.getPropertiesDir(context) + "rules_template_with_notes.xml");
+            // File file = new File(SpringServletAccess.getPropertiesDir(context) + "rules_template_with_notes.xml");
+            File file = getCoreResources().getFile("rules_template_with_notes.xml");
             dowloadFile(file, "text/xml");
         }
         if ("confirm".equalsIgnoreCase(action)) {
 
             try {
                 File f = uploadHelper.returnFiles(request, context, getDirToSaveUploadedFileIn()).get(0);
-                //File xsdFile = new File(getServletContext().getInitParameter("propertiesDir") + "rules.xsd");
-                //File xsdFile = new File(SpringServletAccess.getPropertiesDir(context) + "rules.xsd");
+                // File xsdFile = new File(getServletContext().getInitParameter("propertiesDir") + "rules.xsd");
+                // File xsdFile = new File(SpringServletAccess.getPropertiesDir(context) + "rules.xsd");
                 InputStream xsdFile = getCoreResources().getInputStream("rules.xsd");
 
                 schemaValidator.validateAgainstSchema(f, xsdFile);
@@ -89,7 +91,7 @@ public class ImportRuleServlet extends SecureController {
                 provideMessage(importedRules);
                 forwardPage(Page.VERIFY_RULES_IMPORT_SERVLET);
             } catch (OpenClinicaSystemException re) {
-            	// re.printStackTrace();
+                // re.printStackTrace();
                 MessageFormat mf = new MessageFormat("");
                 mf.applyPattern(respage.getString("OCRERR_0016"));
                 Object[] arguments = { re.getMessage() };
@@ -136,7 +138,7 @@ public class ImportRuleServlet extends SecureController {
             XMLContext xmlContext = new XMLContext();
             // create and set a Mapping instance
             Mapping mapping = xmlContext.createMapping();
-            //mapping.loadMapping(SpringServletAccess.getPropertiesDir(context) + "mapping.xml");
+            // mapping.loadMapping(SpringServletAccess.getPropertiesDir(context) + "mapping.xml");
             mapping.loadMapping(getCoreResources().getURL("mapping.xml"));
 
             xmlContext.addMapping(mapping);

@@ -9,6 +9,7 @@ package org.akaza.openclinica.control.submit;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
@@ -70,7 +71,7 @@ public class DownloadRuleSetXmlServlet extends SecureController {
         try {
             // Create Mapping
             Mapping mapping = new Mapping();
-            mapping.loadMapping(SpringServletAccess.getPropertiesDir(context) + "mappingMarshaller.xml");
+            mapping.loadMapping(getCoreResources().getURL("mappingMarshaller.xml"));
             // Create XMLContext
             XMLContext xmlContext = new XMLContext();
             xmlContext.addMapping(mapping);
@@ -191,5 +192,9 @@ public class DownloadRuleSetXmlServlet extends SecureController {
                     "ruleSetService");
         // TODO: Add getRequestURLMinusServletPath(),getContextPath()
         return ruleSetService;
+    }
+
+    private CoreResources getCoreResources() {
+        return (CoreResources) SpringServletAccess.getApplicationContext(context).getBean("coreResources");
     }
 }

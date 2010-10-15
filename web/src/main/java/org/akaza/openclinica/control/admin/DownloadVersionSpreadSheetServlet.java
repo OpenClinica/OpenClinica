@@ -1,9 +1,9 @@
 /* OpenClinica is distributed under the
-* GNU Lesser General Public License (GNU LGPL).
+ * GNU Lesser General Public License (GNU LGPL).
 
-* For details see: http://www.openclinica.org/license
-* copyright 2003-2005 Akaza Research
-*/
+ * For details see: http://www.openclinica.org/license
+ * copyright 2003-2005 Akaza Research
+ */
 package org.akaza.openclinica.control.admin;
 
 import org.akaza.openclinica.bean.core.Role;
@@ -82,8 +82,8 @@ public class DownloadVersionSpreadSheetServlet extends SecureController {
         File excelFile = null;
         String oldExcelFileName = crfIdString + version.getName() + ".xls";
         if (isTemplate) {
-            //excelFile = new File(dir + CRF_VERSION_TEMPLATE);
-            excelFile = getCoreResources().getTemplateFile(dir, CRF_VERSION_TEMPLATE);
+            // excelFile = new File(dir + CRF_VERSION_TEMPLATE);
+            excelFile = getCoreResources().getFile(dir + CRF_VERSION_TEMPLATE);
             excelFileName = CRF_VERSION_TEMPLATE;
             // FileOutputStream fos = new FileOutputStream(excelFile);
             // IOUtils.copy(getCoreResources().getInputStream(CRF_VERSION_TEMPLATE), fos);

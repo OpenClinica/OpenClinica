@@ -11,6 +11,8 @@ import org.akaza.openclinica.domain.AbstractMutableDomainObject;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
+import java.util.ArrayList;
+
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -90,6 +92,42 @@ public class RuleActionRunBean extends AbstractMutableDomainObject {
 
     public void setBatch(Boolean batch) {
         this.batch = batch;
+    }
+
+    @Transient
+    public String getRunActionRunsForDisplay() {
+
+        ArrayList<String> r = new ArrayList<String>();
+        if (getAdministrativeDataEntry() == true)
+            r.add("Administrative Data Entry");
+        if (getInitialDataEntry() == true)
+            r.add("Initial Data Entry");
+        if (getDoubleDataEntry() == true)
+            r.add("Double Data Entry");
+        if (getImportDataEntry() == true)
+            r.add("Import Data Entry");
+        if (getBatch() == true)
+            r.add("Batch");
+        return seperateStringBasedListBy(r, ", ", "");
+
+    }
+
+    @Transient
+    private String seperateStringBasedListBy(ArrayList<String> list, String seperator, String terminator) {
+        StringBuffer sb = new StringBuffer();
+        if (list.size() == 0)
+            return sb.toString();
+        if (list.size() == 1) {
+            sb.append(list.get(0));
+        } else {
+            for (int i = 0; i < list.size() - 1; i++) {
+                sb.append(list.get(i) + seperator);
+            }
+            sb.append(list.get(list.size() - 1));
+        }
+        sb.append(terminator);
+        return sb.toString();
+
     }
 
     @Transient

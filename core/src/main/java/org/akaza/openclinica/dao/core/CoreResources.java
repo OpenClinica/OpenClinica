@@ -1,13 +1,11 @@
 package org.akaza.openclinica.dao.core;
 
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
-import org.akaza.openclinica.bean.service.SqlProcessingFunction;
 import org.akaza.openclinica.bean.service.PdfProcessingFunction;
 import org.akaza.openclinica.bean.service.SasProcessingFunction;
+import org.akaza.openclinica.bean.service.SqlProcessingFunction;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
-import org.springframework.context.MessageSource;
 import org.springframework.context.ResourceLoaderAware;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
@@ -36,7 +34,7 @@ public class CoreResources implements ResourceLoaderAware {
     public void setResourceLoader(ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
         try {
-            //setPROPERTIES_DIR();
+            // setPROPERTIES_DIR();
             String dbName = dataInfo.getProperty("dataBase");
             DATAINFO = dataInfo;
             EXTRACTINFO = extractInfo;
@@ -45,21 +43,21 @@ public class CoreResources implements ResourceLoaderAware {
             SQLFactory factory = SQLFactory.getInstance();
             factory.run(dbName, resourceLoader);
         } catch (OpenClinicaSystemException e) {
-            //throw new OpenClinicaSystemException(e.getMessage(), e.fillInStackTrace());
+            // throw new OpenClinicaSystemException(e.getMessage(), e.fillInStackTrace());
         }
     }
-    
+
     public ResourceLoader getResourceLoader() {
         return resourceLoader;
     }
 
-//    public MessageSource getMessageSource() {
-//        return messageSource;
-//    }
-//
-//    public void setMessageSource(MessageSource messageSource) {
-//        this.messageSource = messageSource;
-//    }
+    // public MessageSource getMessageSource() {
+    // return messageSource;
+    // }
+    //
+    // public void setMessageSource(MessageSource messageSource) {
+    // this.messageSource = messageSource;
+    // }
 
     public static ArrayList<ExtractPropertyBean> getExtractProperties() {
         return extractProperties;
@@ -68,16 +66,16 @@ public class CoreResources implements ResourceLoaderAware {
     public void setExtractProperties(ArrayList extractProperties) {
         this.extractProperties = extractProperties;
     }
-    
+
     private ArrayList<ExtractPropertyBean> findExtractProperties() {
         ArrayList<ExtractPropertyBean> ret = new ArrayList<ExtractPropertyBean>();
-        
+
         // ExtractPropertyBean epbean = new ExtractPropertyBean();
         int i = 1;
         while (!getExtractField("xsl.file." + i).equals("")) {
             ExtractPropertyBean epbean = new ExtractPropertyBean();
-        	epbean.setId(i);
-        	// we will implement a find by id function in the front end
+            epbean.setId(i);
+            // we will implement a find by id function in the front end
             epbean.setFileName(getExtractField("xsl.file." + i));
             // file name of the xslt stylesheet
             epbean.setFiledescription(getExtractField("xsl.file.description." + i));
@@ -94,7 +92,7 @@ public class CoreResources implements ResourceLoaderAware {
             // if (("").equals(epbean.getFormat())) {
             epbean.setFormat("oc1.3");
             // }
-            // formatting choice.  currently permenantly set at oc1.3
+            // formatting choice. currently permenantly set at oc1.3
             epbean.setExportFileName(getExtractField("xsl.exportname." + i));
             // destination file name of the copied files
             String whichFunction = getExtractField("xsl.post." + i).toLowerCase();
@@ -102,21 +100,21 @@ public class CoreResources implements ResourceLoaderAware {
             // System.out.println("found post function: " + whichFunction);
             if ("sql".equals(whichFunction)) {
                 // set the bean within, so that we can access the file locations etc
-            	SqlProcessingFunction function = new SqlProcessingFunction(epbean);
-            	String whichSettings = getExtractField("xsl.post." + i + ".sql");
-            	if (!"".equals(whichSettings)) { 
-            		function.setDatabaseType(getExtractField(whichSettings + ".dataBase").toLowerCase());
-            		function.setDatabaseUrl(getExtractField(whichSettings + ".url"));
-            		function.setDatabaseUsername(getExtractField(whichSettings + ".username"));
-            		function.setDatabasePassword(getExtractField(whichSettings + ".password"));
-            	} else {
-            		// set default db settings here
-            	    function.setDatabaseType(getField("dataBase"));
+                SqlProcessingFunction function = new SqlProcessingFunction(epbean);
+                String whichSettings = getExtractField("xsl.post." + i + ".sql");
+                if (!"".equals(whichSettings)) {
+                    function.setDatabaseType(getExtractField(whichSettings + ".dataBase").toLowerCase());
+                    function.setDatabaseUrl(getExtractField(whichSettings + ".url"));
+                    function.setDatabaseUsername(getExtractField(whichSettings + ".username"));
+                    function.setDatabasePassword(getExtractField(whichSettings + ".password"));
+                } else {
+                    // set default db settings here
+                    function.setDatabaseType(getField("dataBase"));
                     function.setDatabaseUrl(getField("url"));
                     function.setDatabaseUsername(getField("username"));
                     function.setDatabasePassword(getField("password"));
-            	}
-            	// also pre-set the database connection stuff
+                }
+                // also pre-set the database connection stuff
                 epbean.setPostProcessing(function);
                 // System.out.println("found db password: " + function.getDatabasePassword());
             } else if ("pdf".equals(whichFunction)) {
@@ -144,10 +142,10 @@ public class CoreResources implements ResourceLoaderAware {
         return resourceLoader.getResource("classpath:properties/" + fileName).getURL();
     }
 
-    public File getTemplateFile(String dir, String fileName) {
+    public File getFile(String fileName) {
         try {
             InputStream inputStream = getInputStream(fileName);
-            File f = new File(dir + fileName);
+            File f = new File(fileName);
             OutputStream outputStream = new FileOutputStream(f);
             byte buf[] = new byte[1024];
             int len;
@@ -195,7 +193,7 @@ public class CoreResources implements ResourceLoaderAware {
         return value == null ? "" : value;
 
     }
-    
+
     // TODO internationalize
     public static String getExtractField(String key) {
         String value = EXTRACTINFO.getProperty(key);
@@ -204,7 +202,7 @@ public class CoreResources implements ResourceLoaderAware {
         }
         return value == null ? "" : value;
     }
-    
+
     public static ExtractPropertyBean findExtractPropertyBeanById(int id) {
         for (ExtractPropertyBean epbean : extractProperties) {
             if (epbean.getId() == id) {

@@ -158,15 +158,15 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 
     @Override
     public void configureTableFacadePostColumnConfiguration(TableFacade tableFacade) {
-        //Role r = currentRole.getRole();
-        //boolean addSubjectLinkShow = studyBean.getStatus().isAvailable() && !r.equals(Role.MONITOR);
+        // Role r = currentRole.getRole();
+        // boolean addSubjectLinkShow = studyBean.getStatus().isAvailable() && !r.equals(Role.MONITOR);
 
-        tableFacade.setToolbar(new ViewRuleAssignmentTableToolbar(showMoreLink, ruleSetRuleIds));
+        tableFacade.setToolbar(new ViewRuleAssignmentTableToolbar(ruleSetRuleIds, showMoreLink));
     }
 
     @Override
     public void setDataAndLimitVariables(TableFacade tableFacade) {
-        // initialize i18n 
+        // initialize i18n
         resword = ResourceBundleProvider.getWordsBundle(getLocale());
 
         Limit limit = tableFacade.getLimit();
@@ -187,12 +187,9 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         }
 
         /*
-         * Because we are using the State feature (via stateAttr) we can do a
-         * check to see if we have a complete limit already. See the State
-         * feature for more details Very important to set the totalRow before
-         * trying to get the row start and row end variables. Very important to
-         * set the totalRow before trying to get the row start and row end
-         * variables.
+         * Because we are using the State feature (via stateAttr) we can do a check to see if we have a complete limit already. See the State feature for more
+         * details Very important to set the totalRow before trying to get the row start and row end variables. Very important to set the totalRow before trying
+         * to get the row start and row end variables.
          */
         if (!limit.isComplete()) {
             int totalRows = getRuleSetService().getCountWithFilter(viewRuleAssignmentFilter);
@@ -273,8 +270,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
     }
 
     /**
-     * A very custom way to filter the items. The AuditUserLoginFilter acts as a
-     * command for the Hibernate criteria object. Take the Limit information and
+     * A very custom way to filter the items. The AuditUserLoginFilter acts as a command for the Hibernate criteria object. Take the Limit information and
      * filter the rows.
      * 
      * @param limit
@@ -294,9 +290,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
     }
 
     /**
-     * A very custom way to sort the items. The AuditUserLoginSort acts as a
-     * command for the Hibernate criteria object. Take the Limit information and
-     * sort the rows.
+     * A very custom way to sort the items. The AuditUserLoginSort acts as a command for the Hibernate criteria object. Take the Limit information and sort the
+     * rows.
      * 
      * @param limit
      *            The Limit to use.
@@ -500,12 +495,12 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
             HtmlBuilder builder = new HtmlBuilder();
             actions = (List<RuleActionBean>) ((HashMap<Object, Object>) item).get("theActions");
 
-            //builder.table(1).close();
+            // builder.table(1).close();
             for (RuleActionBean ruleAction : actions) {
                 builder.append(ruleAction.getExpressionEvaluatesTo() + "<br/>");
-                //builder.tr(1).close().td(1).close().append(ruleAction.getExpressionEvaluatesTo()).tdEnd().trEnd(1);
+                // builder.tr(1).close().td(1).close().append(ruleAction.getExpressionEvaluatesTo()).tdEnd().trEnd(1);
             }
-            //builder.tableEnd(1);
+            // builder.tableEnd(1);
 
             return builder.toString();
         }
@@ -547,12 +542,12 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
             HtmlBuilder builder = new HtmlBuilder();
             actions = (List<RuleActionBean>) ((HashMap<Object, Object>) item).get("theActions");
 
-            //builder.table(1).close();
+            // builder.table(1).close();
             for (RuleActionBean ruleAction : actions) {
                 builder.append(ruleAction.getActionType().getDescription() + "<br/>");
-                //builder.tr(1).close().td(1).close().append(ruleAction.getActionType().getDescription()).tdEnd().trEnd(1);
+                // builder.tr(1).close().td(1).close().append(ruleAction.getActionType().getDescription()).tdEnd().trEnd(1);
             }
-            //builder.tableEnd(1);
+            // builder.tableEnd(1);
 
             return builder.toString();
         }
@@ -595,9 +590,9 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
             builder.table(1).close();
             for (RuleActionBean ruleAction : actions) {
                 for (Map.Entry<String, Object> entry : ruleAction.getPropertiesForDisplay().entrySet()) {
-                    //builder.append("<i>" + resword.getString(entry.getKey()) + "</i>" + "&nbsp;&nbsp;" + entry.getValue());
-                    builder.tr(1).close().td(1).close().append("<i>" + resword.getString(entry.getKey()) + "</i>").tdEnd().td(1).close().append(
-                            entry.getValue()).tdEnd().trEnd(1);
+                    // builder.append("<i>" + resword.getString(entry.getKey()) + "</i>" + "&nbsp;&nbsp;" + entry.getValue());
+                    builder.tr(1).close().td(1).close().append("<i>" + resword.getString(entry.getKey()) + "</i>").tdEnd().td(1).close()
+                            .append(entry.getValue()).tdEnd().trEnd(1);
                 }
 
             }

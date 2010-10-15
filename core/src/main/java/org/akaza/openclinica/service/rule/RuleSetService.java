@@ -44,9 +44,9 @@ import org.akaza.openclinica.domain.rule.RuleSetAuditBean;
 import org.akaza.openclinica.domain.rule.RuleSetBasedViewContainer;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
+import org.akaza.openclinica.domain.rule.RuleSetRuleBean.RuleSetRuleBeanImportStatus;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
-import org.akaza.openclinica.domain.rule.RuleSetRuleBean.RuleSetRuleBeanImportStatus;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.logic.rulerunner.CrfBulkRuleRunner;
 import org.akaza.openclinica.logic.rulerunner.DataEntryRuleRunner;
@@ -70,7 +70,7 @@ import javax.sql.DataSource;
 
 /**
  * @author krikor
- *
+ * 
  */
 public class RuleSetService implements RuleSetServiceInterface {
 
@@ -101,17 +101,17 @@ public class RuleSetService implements RuleSetServiceInterface {
     private DynamicsMetadataService dynamicsMetadataService;
     private RuleActionRunLogDao ruleActionRunLogDao;
 
-    /* public RuleSetService(DataSource ds, String requestURLMinusServletPath, String contextPath) {
-         this.dataSource = ds;
-         this.requestURLMinusServletPath = requestURLMinusServletPath;
-         this.contextPath = contextPath;
-     }*/
+    /*
+     * public RuleSetService(DataSource ds, String requestURLMinusServletPath, String contextPath) { this.dataSource = ds; this.requestURLMinusServletPath =
+     * requestURLMinusServletPath; this.contextPath = contextPath; }
+     */
 
     public RuleSetService(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#saveRuleSet(org.akaza.openclinica.domain.rule.RuleSetBean)
      */
 
@@ -120,7 +120,8 @@ public class RuleSetService implements RuleSetServiceInterface {
         return persistentRuleSetBean;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#saveImport(org.akaza.openclinica.domain.rule.RulesPostImportContainer)
      */
     @Transactional
@@ -143,8 +144,16 @@ public class RuleSetService implements RuleSetServiceInterface {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#updateRuleSet(org.akaza.openclinica.domain.rule.RuleSetBean, org.akaza.openclinica.bean.login.UserAccountBean, org.akaza.openclinica.domain.Status)
+    @Transactional
+    public void saveImport(RuleSetRuleBean ruleSetRule) {
+        getRuleDao().saveOrUpdate(ruleSetRule.getRuleBean());
+        getRuleSetDao().saveOrUpdate(ruleSetRule.getRuleSetBean());
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#updateRuleSet(org.akaza.openclinica.domain.rule.RuleSetBean,
+     * org.akaza.openclinica.bean.login.UserAccountBean, org.akaza.openclinica.domain.Status)
      */
     public RuleSetBean updateRuleSet(RuleSetBean ruleSetBean, UserAccountBean user, Status status) {
         ruleSetBean.setStatus(status);
@@ -167,7 +176,8 @@ public class RuleSetService implements RuleSetServiceInterface {
         return ruleSetAuditBean;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#loadRuleSetRuleWithPersistentRules(org.akaza.openclinica.domain.rule.RuleSetBean)
      */
     public void loadRuleSetRuleWithPersistentRules(RuleSetBean ruleSetBean) {
@@ -180,27 +190,15 @@ public class RuleSetService implements RuleSetServiceInterface {
     }
 
     /*
-    public RuleSetBean replaceRuleSet(RuleSetBean ruleSetBean) {
-        RuleSetBean persistentRuleSetBean = ruleSetBean;
+     * public RuleSetBean replaceRuleSet(RuleSetBean ruleSetBean) { RuleSetBean persistentRuleSetBean = ruleSetBean; // Invalidate Previous RuleSetRules
+     * logger.info("RuleSet Id " + persistentRuleSetBean.getId()); getRuleSetRuleDao().removeByRuleSet(persistentRuleSetBean); // Save RuleSetRules for
+     * (RuleSetRuleBean ruleSetRule : persistentRuleSetBean.getRuleSetRules()) { ruleSetRule.setRuleSetBean(persistentRuleSetBean);
+     * getRuleSetRuleDao().saveOrUpdate(ruleSetRule); // Save Actions for (RuleActionBean action : ruleSetRule.getActions()) {
+     * action.setRuleSetRule(ruleSetRule); getRuleActionDao().saveOrUpdate(action); } } return persistentRuleSetBean; }
+     */
 
-        // Invalidate Previous RuleSetRules
-        logger.info("RuleSet Id " + persistentRuleSetBean.getId());
-        getRuleSetRuleDao().removeByRuleSet(persistentRuleSetBean);
-
-        // Save RuleSetRules
-        for (RuleSetRuleBean ruleSetRule : persistentRuleSetBean.getRuleSetRules()) {
-            ruleSetRule.setRuleSetBean(persistentRuleSetBean);
-            getRuleSetRuleDao().saveOrUpdate(ruleSetRule);
-            // Save Actions
-            for (RuleActionBean action : ruleSetRule.getActions()) {
-                action.setRuleSetRule(ruleSetRule);
-                getRuleActionDao().saveOrUpdate(action);
-            }
-        }
-        return persistentRuleSetBean;
-    }*/
-
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#replaceRuleSet(org.akaza.openclinica.domain.rule.RuleSetBean)
      */
     public RuleSetBean replaceRuleSet(RuleSetBean ruleSetBean) {
@@ -214,8 +212,10 @@ public class RuleSetService implements RuleSetServiceInterface {
         return getRuleSetDao().saveOrUpdate(detachedRuleSetBean);
     }
 
-    /* (non-Javadoc)
-     * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#runRulesInBulk(java.lang.String, java.lang.Boolean, org.akaza.openclinica.bean.managestudy.StudyBean, org.akaza.openclinica.bean.login.UserAccountBean)
+    /*
+     * (non-Javadoc)
+     * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#runRulesInBulk(java.lang.String, java.lang.Boolean,
+     * org.akaza.openclinica.bean.managestudy.StudyBean, org.akaza.openclinica.bean.login.UserAccountBean)
      */
     public HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> runRulesInBulk(String crfId, ExecutionMode executionMode,
             StudyBean currentStudy, UserAccountBean ub) {
@@ -233,8 +233,10 @@ public class RuleSetService implements RuleSetServiceInterface {
         // return runRulesBulk(ruleSets, dryRun, currentStudy, null, ub);
     }
 
-    /* (non-Javadoc)
-     * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#runRulesInBulk(java.lang.String, java.lang.String, java.lang.Boolean, org.akaza.openclinica.bean.managestudy.StudyBean, org.akaza.openclinica.bean.login.UserAccountBean)
+    /*
+     * (non-Javadoc)
+     * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#runRulesInBulk(java.lang.String, java.lang.String, java.lang.Boolean,
+     * org.akaza.openclinica.bean.managestudy.StudyBean, org.akaza.openclinica.bean.login.UserAccountBean)
      */
     public HashMap<RuleBulkExecuteContainer, HashMap<RuleBulkExecuteContainerTwo, Set<String>>> runRulesInBulk(String ruleSetRuleId, String crfVersionId,
             ExecutionMode executionMode, StudyBean currentStudy, UserAccountBean ub) {
@@ -255,8 +257,10 @@ public class RuleSetService implements RuleSetServiceInterface {
         // return runRulesBulk(ruleSets, dryRun, currentStudy, null, ub);
     }
 
-    /* (non-Javadoc)
-     * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#runRulesInBulk(java.util.List, java.lang.Boolean, org.akaza.openclinica.bean.managestudy.StudyBean, org.akaza.openclinica.bean.login.UserAccountBean)
+    /*
+     * (non-Javadoc)
+     * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#runRulesInBulk(java.util.List, java.lang.Boolean,
+     * org.akaza.openclinica.bean.managestudy.StudyBean, org.akaza.openclinica.bean.login.UserAccountBean)
      */
     public List<RuleSetBasedViewContainer> runRulesInBulk(List<RuleSetBean> ruleSets, Boolean dryRun, StudyBean currentStudy, UserAccountBean ub) {
         ruleSets = filterByStatusEqualsAvailable(ruleSets);
@@ -271,8 +275,10 @@ public class RuleSetService implements RuleSetServiceInterface {
         // return runRulesBulkFromRuleSetScreen(ruleSets, dryRun, currentStudy, null, ub);
     }
 
-    /* (non-Javadoc)
-     * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#runRulesInDataEntry(java.util.List, java.lang.Boolean, org.akaza.openclinica.bean.managestudy.StudyBean, org.akaza.openclinica.bean.login.UserAccountBean, java.util.HashMap)
+    /*
+     * (non-Javadoc)
+     * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#runRulesInDataEntry(java.util.List, java.lang.Boolean,
+     * org.akaza.openclinica.bean.managestudy.StudyBean, org.akaza.openclinica.bean.login.UserAccountBean, java.util.HashMap)
      */
     public MessageContainer runRulesInDataEntry(List<RuleSetBean> ruleSets, Boolean dryRun, StudyBean currentStudy, UserAccountBean ub,
             HashMap<String, String> variableAndValue, Phase phase) {
@@ -283,12 +289,15 @@ public class RuleSetService implements RuleSetServiceInterface {
         // TODO: KK return the new object && Pass in the Execution Mode
         ExecutionMode executionMode = dryRun == true ? ExecutionMode.DRY_RUN : ExecutionMode.SAVE;
         return ruleRunner.runRules(ruleSets, executionMode, currentStudy, variableAndValue, ub, phase);
-        //return new HashMap<String, ArrayList<String>>();
+        // return new HashMap<String, ArrayList<String>>();
         // return runRules(ruleSets, dryRun, currentStudy, c.variableAndValue, ub);
     }
 
-    /* (non-Javadoc)
-     * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#getRuleSetsByCrfStudyAndStudyEventDefinition(org.akaza.openclinica.bean.managestudy.StudyBean, org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean, org.akaza.openclinica.bean.submit.CRFVersionBean)
+    /*
+     * (non-Javadoc)
+     * @see
+     * org.akaza.openclinica.service.rule.RuleSetServiceInterface#getRuleSetsByCrfStudyAndStudyEventDefinition(org.akaza.openclinica.bean.managestudy.StudyBean,
+     * org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean, org.akaza.openclinica.bean.submit.CRFVersionBean)
      */
     public List<RuleSetBean> getRuleSetsByCrfStudyAndStudyEventDefinition(StudyBean study, StudyEventDefinitionBean sed, CRFVersionBean crfVersion) {
         CRFBean crf = getCrfDao().findByVersionId(crfVersion.getId());
@@ -311,21 +320,21 @@ public class RuleSetService implements RuleSetServiceInterface {
     public List<RuleSetRuleBean> getWithFilterAndSort(ViewRuleAssignmentFilter viewRuleAssignmentFilter, ViewRuleAssignmentSort viewRuleAssignmentSort,
             int rowStart, int rowEnd) {
 
-        //List<RuleSetBean> ruleSets = getRuleSetDao().getWithFilterAndSort(viewRuleAssignmentFilter, viewRuleAssignmentSort, rowStart, rowEnd);
+        // List<RuleSetBean> ruleSets = getRuleSetDao().getWithFilterAndSort(viewRuleAssignmentFilter, viewRuleAssignmentSort, rowStart, rowEnd);
         List<RuleSetRuleBean> ruleSetRules = getRuleSetRuleDao().getWithFilterAndSort(viewRuleAssignmentFilter, viewRuleAssignmentSort, rowStart, rowEnd);
-        //for (RuleSetBean ruleSetBean : ruleSets) {
-        //    getObjects(ruleSetBean);
-        //}
-        //logger.info("getRuleSetsByStudy() : ruleSets Size : {}", ruleSets.size());
+        // for (RuleSetBean ruleSetBean : ruleSets) {
+        // getObjects(ruleSetBean);
+        // }
+        // logger.info("getRuleSetsByStudy() : ruleSets Size : {}", ruleSets.size());
         return ruleSetRules;
 
     }
 
     /*
      * Used to Manage RuleSets ,Hence will return all RuleSets whether removed or not
-     * 
      */
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#getRuleSetsByStudy(org.akaza.openclinica.bean.managestudy.StudyBean)
      */
     public List<RuleSetBean> getRuleSetsByStudy(StudyBean study) {
@@ -340,7 +349,8 @@ public class RuleSetService implements RuleSetServiceInterface {
     }
 
     // . TODO: why are we including study but not using it in query
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#getRuleSetById(org.akaza.openclinica.bean.managestudy.StudyBean, java.lang.String)
      */
     public RuleSetBean getRuleSetById(StudyBean study, String id) {
@@ -353,8 +363,10 @@ public class RuleSetService implements RuleSetServiceInterface {
 
     }
 
-    /* (non-Javadoc)
-     * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#getRuleSetById(org.akaza.openclinica.bean.managestudy.StudyBean, java.lang.String, org.akaza.openclinica.domain.rule.RuleBean)
+    /*
+     * (non-Javadoc)
+     * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#getRuleSetById(org.akaza.openclinica.bean.managestudy.StudyBean, java.lang.String,
+     * org.akaza.openclinica.domain.rule.RuleBean)
      */
     public List<RuleSetRuleBean> getRuleSetById(StudyBean study, String id, RuleBean ruleBean) {
         logger.debug(" Study Id {} ", study.getId());
@@ -362,8 +374,10 @@ public class RuleSetService implements RuleSetServiceInterface {
         return getRuleSetRuleDao().findByRuleSetBeanAndRuleBean(ruleSetBean, ruleBean);
     }
 
-    /* (non-Javadoc)
-     * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#getRuleSetsByCrfAndStudy(org.akaza.openclinica.bean.admin.CRFBean, org.akaza.openclinica.bean.managestudy.StudyBean)
+    /*
+     * (non-Javadoc)
+     * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#getRuleSetsByCrfAndStudy(org.akaza.openclinica.bean.admin.CRFBean,
+     * org.akaza.openclinica.bean.managestudy.StudyBean)
      */
     public List<RuleSetBean> getRuleSetsByCrfAndStudy(CRFBean crfBean, StudyBean study) {
         List<RuleSetBean> ruleSets = getRuleSetDao().findByCrf(crfBean, study);
@@ -390,7 +404,7 @@ public class RuleSetService implements RuleSetServiceInterface {
         if (ruleSetBean.getItemId() != null && ruleSetBean.getItemId() != 0) {
             ruleSetBean.setItem((ItemBean) getItemDao().findByPK(ruleSetBean.getItemId()));
         }
-        //ruleSetBean.setItem(getExpressionService().getItemExpression(ruleSetBean.getTarget().getValue(), ruleSetBean.getItemGroup()));
+        // ruleSetBean.setItem(getExpressionService().getItemExpression(ruleSetBean.getTarget().getValue(), ruleSetBean.getItemGroup()));
 
         return ruleSetBean;
 
@@ -422,7 +436,8 @@ public class RuleSetService implements RuleSetServiceInterface {
         return expression;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#filterByStatusEqualsAvailableOnlyRuleSetRules(java.util.List)
      */
     public List<RuleSetBean> filterByStatusEqualsAvailableOnlyRuleSetRules(List<RuleSetBean> ruleSets) {
@@ -435,7 +450,8 @@ public class RuleSetService implements RuleSetServiceInterface {
         return ruleSets;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#filterByStatusEqualsAvailable(java.util.List)
      */
     public List<RuleSetBean> filterByStatusEqualsAvailable(List<RuleSetBean> ruleSets) {
@@ -453,7 +469,8 @@ public class RuleSetService implements RuleSetServiceInterface {
         return ruleSets;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#filterByRules(org.akaza.openclinica.domain.rule.RuleSetBean, java.lang.Integer)
      */
     public RuleSetBean filterByRules(RuleSetBean ruleSet, Integer ruleBeanId) {
@@ -466,8 +483,10 @@ public class RuleSetService implements RuleSetServiceInterface {
         return ruleSet;
     }
 
-    /* (non-Javadoc)
-     * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#filterRuleSetsByStudyEventOrdinal(java.util.List, org.akaza.openclinica.bean.managestudy.StudyEventBean)
+    /*
+     * (non-Javadoc)
+     * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#filterRuleSetsByStudyEventOrdinal(java.util.List,
+     * org.akaza.openclinica.bean.managestudy.StudyEventBean)
      */
     public List<RuleSetBean> filterRuleSetsByStudyEventOrdinal(List<RuleSetBean> ruleSets, StudyEventBean studyEvent, CRFVersionBean crfVersion,
             StudyEventDefinitionBean studyEventDefinition) {
@@ -494,7 +513,7 @@ public class RuleSetService implements RuleSetServiceInterface {
         logger.debug("Size of RuleSets post filterRuleSetsByStudyEventOrdinal() {} ", validRuleSets.size());
         return validRuleSets;
     }
-    
+
     public List<RuleSetBean> filterRuleSetsByHiddenItems(List<RuleSetBean> ruleSets, EventCRFBean eventCrf, CRFVersionBean crfVersion) {
         ArrayList<RuleSetBean> shownRuleSets = new ArrayList<RuleSetBean>();
         for (RuleSetBean ruleSetBean : ruleSets) {
@@ -517,7 +536,8 @@ public class RuleSetService implements RuleSetServiceInterface {
         return shownRuleSets;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#filterRuleSetsByStudyEventOrdinal(java.util.List)
      */
     @SuppressWarnings("unchecked")
@@ -527,7 +547,7 @@ public class RuleSetService implements RuleSetServiceInterface {
             String studyEventDefinitionOrdinal = getExpressionService().getStudyEventDefinitionOrdninalCurated(ruleSetBean.getTarget().getValue());
             String studyEventDefinitionOid = getExpressionService().getStudyEventDefenitionOid(ruleSetBean.getTarget().getValue());
             String crfOrCrfVersionOid = getExpressionService().getCrfOid(ruleSetBean.getTarget().getValue());
-            //  whole expression is provided in target
+            // whole expression is provided in target
             if (studyEventDefinitionOid != null && crfOrCrfVersionOid != null) {
 
                 List<StudyEventBean> studyEvents = getStudyEventDao().findAllByStudyEventDefinitionAndCrfOids(studyEventDefinitionOid, crfOrCrfVersionOid);
@@ -608,7 +628,8 @@ public class RuleSetService implements RuleSetServiceInterface {
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#solidifyGroupOrdinalsUsingFormProperties(java.util.List, java.util.HashMap)
      */
     public List<RuleSetBean> solidifyGroupOrdinalsUsingFormProperties(List<RuleSetBean> ruleSets, HashMap<String, Integer> grouped) {
@@ -647,7 +668,8 @@ public class RuleSetService implements RuleSetServiceInterface {
         return ruleSets;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#filterRuleSetsBySectionAndGroupOrdinal(java.util.List, java.util.HashMap)
      */
     public List<RuleSetBean> filterRuleSetsBySectionAndGroupOrdinal(List<RuleSetBean> ruleSets, HashMap<String, Integer> grouped) {
@@ -673,7 +695,8 @@ public class RuleSetService implements RuleSetServiceInterface {
         return ruleSetsInThisSection;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#filterRuleSetsByGroupOrdinal(java.util.List)
      */
     public List<RuleSetBean> filterRuleSetsByGroupOrdinal(List<RuleSetBean> ruleSets) {
@@ -712,7 +735,8 @@ public class RuleSetService implements RuleSetServiceInterface {
         return ruleSets;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#getGroupOrdinalPlusItemOids(java.util.List)
      */
     public List<String> getGroupOrdinalPlusItemOids(List<RuleSetBean> ruleSets) {
@@ -725,8 +749,10 @@ public class RuleSetService implements RuleSetServiceInterface {
         return groupOrdinalPlusItemOid;
     }
 
-    /* (non-Javadoc)
-     * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#replaceCrfOidInTargetExpression(org.akaza.openclinica.domain.rule.RuleSetBean, java.lang.String)
+    /*
+     * (non-Javadoc)
+     * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#replaceCrfOidInTargetExpression(org.akaza.openclinica.domain.rule.RuleSetBean,
+     * java.lang.String)
      */
     public RuleSetBean replaceCrfOidInTargetExpression(RuleSetBean ruleSetBean, String replacementCrfOid) {
         String expression = getExpressionService().replaceCRFOidInExpression(ruleSetBean.getTarget().getValue(), replacementCrfOid);
@@ -742,14 +768,16 @@ public class RuleSetService implements RuleSetServiceInterface {
     }
 
     /**
-     * @param contextPath the contextPath to set
+     * @param contextPath
+     *            the contextPath to set
      */
     public void setContextPath(String contextPath) {
         this.contextPath = contextPath;
     }
 
     /**
-     * @param requestURLMinusServletPath the requestURLMinusServletPath to set
+     * @param requestURLMinusServletPath
+     *            the requestURLMinusServletPath to set
      */
     public void setRequestURLMinusServletPath(String requestURLMinusServletPath) {
         this.requestURLMinusServletPath = requestURLMinusServletPath;
@@ -801,7 +829,7 @@ public class RuleSetService implements RuleSetServiceInterface {
         itemDao = this.itemDao != null ? itemDao : new ItemDAO(dataSource);
         return itemDao;
     }
-    
+
     private ItemFormMetadataDAO getItemFormMetadataDao() {
         itemFormMetadataDao = this.itemFormMetadataDao != null ? itemFormMetadataDao : new ItemFormMetadataDAO(dataSource);
         return itemFormMetadataDao;
@@ -831,7 +859,7 @@ public class RuleSetService implements RuleSetServiceInterface {
         crfVersionDao = this.crfVersionDao != null ? crfVersionDao : new CRFVersionDAO(dataSource);
         return crfVersionDao;
     }
-    
+
     public DynamicsItemFormMetadataDao getDynamicsItemFormMetadataDao() {
         return dynamicsItemFormMetadataDao;
     }

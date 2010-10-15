@@ -8,8 +8,15 @@
 package org.akaza.openclinica.domain.rule;
 
 import org.akaza.openclinica.domain.AbstractAuditableMutableDomainObject;
+import org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean;
+import org.akaza.openclinica.domain.rule.action.EmailActionBean;
+import org.akaza.openclinica.domain.rule.action.HideActionBean;
+import org.akaza.openclinica.domain.rule.action.InsertActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
+import org.akaza.openclinica.domain.rule.action.ShowActionBean;
+import org.apache.commons.collections.FactoryUtils;
+import org.apache.commons.collections.list.LazyList;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
@@ -33,6 +40,14 @@ public class RuleSetRuleBean extends AbstractAuditableMutableDomainObject {
     RuleSetBean ruleSetBean;
     RuleBean ruleBean;
     List<RuleActionBean> actions;
+    private List<DiscrepancyNoteActionBean> lazyDiscrepancyNoteActions = LazyList.decorate(new ArrayList<DiscrepancyNoteActionBean>(),
+            FactoryUtils.instantiateFactory(DiscrepancyNoteActionBean.class));
+    private List<EmailActionBean> lazyEmailActions = LazyList
+            .decorate(new ArrayList<EmailActionBean>(), FactoryUtils.instantiateFactory(EmailActionBean.class));
+    private List<ShowActionBean> lazyShowActions = LazyList.decorate(new ArrayList<ShowActionBean>(), FactoryUtils.instantiateFactory(ShowActionBean.class));
+    private List<HideActionBean> lazyHideActions = LazyList.decorate(new ArrayList<HideActionBean>(), FactoryUtils.instantiateFactory(HideActionBean.class));
+    private List<InsertActionBean> lazyInsertActions = LazyList.decorate(new ArrayList<InsertActionBean>(),
+            FactoryUtils.instantiateFactory(InsertActionBean.class));
 
     // Transient
     String oid;
@@ -40,6 +55,15 @@ public class RuleSetRuleBean extends AbstractAuditableMutableDomainObject {
 
     public enum RuleSetRuleBeanImportStatus {
         EXACT_DOUBLE, TO_BE_REMOVED, LINE
+    }
+
+    @Transient
+    public void formToModel() {
+        actions = new ArrayList<RuleActionBean>();
+        actions.addAll(lazyDiscrepancyNoteActions);
+        actions.addAll(lazyEmailActions);
+        actions.addAll(lazyShowActions);
+        actions.addAll(lazyHideActions);
     }
 
     @Transient
@@ -95,8 +119,8 @@ public class RuleSetRuleBean extends AbstractAuditableMutableDomainObject {
     }
 
     /**
-     * Run the rule and pass in the result. Will return all actions 
-     * that match the result. 
+     * Run the rule and pass in the result. Will return all actions that match the result.
+     * 
      * @param actionEvaluatesTo
      * @return
      */
@@ -113,8 +137,8 @@ public class RuleSetRuleBean extends AbstractAuditableMutableDomainObject {
     }
 
     /**
-     * Run the rule and pass in the result. Will return all actions 
-     * that match the result. 
+     * Run the rule and pass in the result. Will return all actions that match the result.
+     * 
      * @param actionEvaluatesTo
      * @return
      */
@@ -193,6 +217,51 @@ public class RuleSetRuleBean extends AbstractAuditableMutableDomainObject {
         this.ruleSetRuleBeanImportStatus = ruleSetRuleBeanImportStatus;
     }
 
+    @Transient
+    public List<DiscrepancyNoteActionBean> getLazyDiscrepancyNoteActions() {
+        return lazyDiscrepancyNoteActions;
+    }
+
+    public void setLazyDiscrepancyNoteActions(List<DiscrepancyNoteActionBean> lazyDiscrepancyNoteActions) {
+        this.lazyDiscrepancyNoteActions = lazyDiscrepancyNoteActions;
+    }
+
+    @Transient
+    public List<EmailActionBean> getLazyEmailActions() {
+        return lazyEmailActions;
+    }
+
+    public void setLazyEmailActions(List<EmailActionBean> lazyEmailActions) {
+        this.lazyEmailActions = lazyEmailActions;
+    }
+
+    @Transient
+    public List<ShowActionBean> getLazyShowActions() {
+        return lazyShowActions;
+    }
+
+    public void setLazyShowActions(List<ShowActionBean> lazyShowActions) {
+        this.lazyShowActions = lazyShowActions;
+    }
+
+    @Transient
+    public List<HideActionBean> getLazyHideActions() {
+        return lazyHideActions;
+    }
+
+    public void setLazyHideActions(List<HideActionBean> lazyHideActions) {
+        this.lazyHideActions = lazyHideActions;
+    }
+
+    @Transient
+    public List<InsertActionBean> getLazyInsertActions() {
+        return lazyInsertActions;
+    }
+
+    public void setLazyInsertActions(List<InsertActionBean> lazyInsertActions) {
+        this.lazyInsertActions = lazyInsertActions;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -214,8 +283,14 @@ public class RuleSetRuleBean extends AbstractAuditableMutableDomainObject {
         if (actions == null) {
             if (other.actions != null)
                 return false;
-        } else if (!actions.equals(other.actions))
-            return false;
+        } else {// if (!actions.equals(other.actions))
+            if (actions.size() != other.actions.size())
+                return false;
+            for (RuleActionBean ruleActionBean : other.actions) {
+                if (!actions.contains(ruleActionBean))
+                    return false;
+            }
+        }
         if (ruleBean == null) {
             if (other.ruleBean != null)
                 return false;

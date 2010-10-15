@@ -1,5 +1,7 @@
 package org.akaza.openclinica.domain.rule.action;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -35,4 +37,44 @@ public class InsertActionBean extends RuleActionBean {
     public String getSummary() {
         return "";
     }
+
+    @Override
+    @Transient
+    public HashMap<String, Object> getPropertiesForDisplay() {
+        LinkedHashMap<String, Object> p = new LinkedHashMap<String, Object>();
+        p.put("rule_action_type", getActionType().getDescription());
+        return p;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((properties == null) ? 0 : properties.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        InsertActionBean other = (InsertActionBean) obj;
+        if (properties == null) {
+            if (other.properties != null)
+                return false;
+        } else {// if (!properties.equals(other.properties))
+            if (properties.size() != other.properties.size())
+                return false;
+            for (PropertyBean propertyBean : other.properties) {
+                if (!properties.contains(propertyBean))
+                    return false;
+            }
+        }
+        return true;
+    }
+
 }

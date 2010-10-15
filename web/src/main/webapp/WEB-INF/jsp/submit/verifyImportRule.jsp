@@ -384,7 +384,7 @@
                 </td>
                 <td class="table_cell_left">
                     <table>
-                    <c:forEach items="${action.ForDisplay}" var="mapEntry" varStatus="status">
+                    <c:forEach items="${action.propertiesForDisplay}" var="mapEntry" varStatus="status">
                             <tr valign="top">
                                 <td class="formlabel"><i><fmt:message key="${mapEntry.key}" bundle="${resword}" /></i></td>
                                 <td class="formValue">${mapEntry.value}</td>

@@ -200,7 +200,7 @@
                         <c:if test='${testRuleAction.expressionEvaluatesTo == "false"}'>SELECTED</c:if>>false</option>
                 </select></td>
             </tr>
-            <c:forEach items="${testRuleAction.properties}" var="mapEntry"
+            <c:forEach items="${testRuleAction.propertiesForDisplay}" var="mapEntry"
                 varStatus="status">
                 <c:choose>
                     <c:when test="${status.count == 1}">

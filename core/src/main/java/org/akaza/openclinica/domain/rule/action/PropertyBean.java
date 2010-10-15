@@ -53,4 +53,41 @@ public class PropertyBean extends AbstractMutableDomainObject {
         return "PropertyBean [oid=" + oid + ", value=" + value + ", valueExpression=" + valueExpression + "]";
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((oid == null) ? 0 : oid.hashCode());
+        result = prime * result + ((value == null) ? 0 : value.hashCode());
+        result = prime * result + ((valueExpression == null) ? 0 : valueExpression.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        PropertyBean other = (PropertyBean) obj;
+        if (oid == null) {
+            if (other.oid != null)
+                return false;
+        } else if (!oid.equals(other.oid))
+            return false;
+        if (value == null) {
+            if (other.value != null)
+                return false;
+        } else if (!value.equals(other.value))
+            return false;
+        if (valueExpression == null) {
+            if (other.valueExpression != null)
+                return false;
+        } else if (!valueExpression.equals(other.valueExpression))
+            return false;
+        return true;
+    }
+
 }

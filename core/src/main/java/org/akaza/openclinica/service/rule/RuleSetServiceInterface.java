@@ -38,26 +38,20 @@ public interface RuleSetServiceInterface {
      * 
      * @param ruleSetBean
      * @return
-    
-    public RuleSetBean saveRuleSet(RuleSetBean ruleSetBean) {
-        RuleSetBean persistentRuleSetBean = (RuleSetBean) getRuleSetDao().saveOrUpdate(ruleSetBean);
-        // Save RuleSetRules
-        for (RuleSetRuleBean ruleSetRule : persistentRuleSetBean.getRuleSetRules()) {
-            ruleSetRule.setRuleSetBean(persistentRuleSetBean);
-            getRuleSetRuleDao().saveOrUpdate(ruleSetRule);
-            // Save Actions
-            for (RuleActionBean action : ruleSetRule.getActions()) {
-                action.setRuleSetRule(ruleSetRule);
-                getRuleActionDao().saveOrUpdate(action);
-            }
-        }
-        return persistentRuleSetBean;
-    }*/
+     * 
+     *         public RuleSetBean saveRuleSet(RuleSetBean ruleSetBean) { RuleSetBean persistentRuleSetBean = (RuleSetBean)
+     *         getRuleSetDao().saveOrUpdate(ruleSetBean); // Save RuleSetRules for (RuleSetRuleBean ruleSetRule : persistentRuleSetBean.getRuleSetRules()) {
+     *         ruleSetRule.setRuleSetBean(persistentRuleSetBean); getRuleSetRuleDao().saveOrUpdate(ruleSetRule); // Save Actions for (RuleActionBean action :
+     *         ruleSetRule.getActions()) { action.setRuleSetRule(ruleSetRule); getRuleActionDao().saveOrUpdate(action); } } return persistentRuleSetBean; }
+     */
 
     public abstract RuleSetBean saveRuleSet(RuleSetBean ruleSetBean);
 
     @Transactional
     public abstract void saveImport(RulesPostImportContainer rulesContainer);
+
+    @Transactional
+    public void saveImport(RuleSetRuleBean ruleSetRule);
 
     public abstract RuleSetBean updateRuleSet(RuleSetBean ruleSetBean, UserAccountBean user, Status status);
 
@@ -80,7 +74,6 @@ public interface RuleSetServiceInterface {
 
     /*
      * Used to Manage RuleSets ,Hence will return all RuleSets whether removed or not
-     * 
      */
     public abstract List<RuleSetBean> getRuleSetsByStudy(StudyBean study);
 
@@ -108,30 +101,28 @@ public interface RuleSetServiceInterface {
      * Use in DataEntry Rule Execution Scenarios
      * 
      * A RuleSet has a Target with Value which is provided by rule Creator. value might be :
-     * SE_TESTINGF[ALL].F_AGEN_8_V204.IG_AGEN_DOSETABLE6[ALL].I_AGEN_DOSEDATE64  
-     * OR SE_TESTINGF[1].F_AGEN_8_V204.IG_AGEN_DOSETABLE6[ALL].I_AGEN_DOSEDATE64
-     * OR SE_TESTINGF.F_AGEN_8_V204.IG_AGEN_DOSETABLE6[ALL].I_AGEN_DOSEDATE64
-     * in which case it would need to be transformed to
+     * SE_TESTINGF[ALL].F_AGEN_8_V204.IG_AGEN_DOSETABLE6[ALL].I_AGEN_DOSEDATE64 OR SE_TESTINGF[1].F_AGEN_8_V204.IG_AGEN_DOSETABLE6[ALL].I_AGEN_DOSEDATE64 OR
+     * SE_TESTINGF.F_AGEN_8_V204.IG_AGEN_DOSETABLE6[ALL].I_AGEN_DOSEDATE64 in which case it would need to be transformed to
      * SE_TESTINGF[x].F_AGEN_8_V204.IG_AGEN_DOSETABLE6[ALL].I_AGEN_DOSEDATE64 where x is the studyEventId.
      * 
      * @param ruleSets
      * @param studyEvent
-     * @param crfVersion TODO
-     * @param studyEventDefinition TODO
+     * @param crfVersion
+     *            TODO
+     * @param studyEventDefinition
+     *            TODO
      * @return
      */
-    public abstract List<RuleSetBean> filterRuleSetsByStudyEventOrdinal(List<RuleSetBean> ruleSets, StudyEventBean studyEvent, CRFVersionBean crfVersion, StudyEventDefinitionBean studyEventDefinition);
+    public abstract List<RuleSetBean> filterRuleSetsByStudyEventOrdinal(List<RuleSetBean> ruleSets, StudyEventBean studyEvent, CRFVersionBean crfVersion,
+            StudyEventDefinitionBean studyEventDefinition);
 
     @SuppressWarnings("unchecked")
     public abstract List<RuleSetBean> filterRuleSetsByStudyEventOrdinal(List<RuleSetBean> ruleSets, String crfVersionId);
 
     /**
-     * Iterate over ruleSet.getExpressions(). Given the following expression
-     * SE_TESTINGF[studyEventId].F_AGEN_8_V204.IG_AGEN_DOSETABLE6[X].I_AGEN_DOSEDATE64
-     * X could be : ALL , "" , Number
-     * if ALL or "" then iterate over all group ordinals if they exist and add.
-     * if Number just add the number 
-     *  
+     * Iterate over ruleSet.getExpressions(). Given the following expression SE_TESTINGF[studyEventId].F_AGEN_8_V204.IG_AGEN_DOSETABLE6[X].I_AGEN_DOSEDATE64 X
+     * could be : ALL , "" , Number if ALL or "" then iterate over all group ordinals if they exist and add. if Number just add the number
+     * 
      * @param ruleSets
      * @param grouped
      * @return
@@ -144,13 +135,11 @@ public interface RuleSetServiceInterface {
      * Iterate over rulesets and remove those which are currently hidden.
      */
     public abstract List<RuleSetBean> filterRuleSetsByHiddenItems(List<RuleSetBean> ruleSets, EventCRFBean eventCrf, CRFVersionBean crfVersion);
+
     /**
-     * Iterate over ruleSet.getExpressions(). Given the following expression
-     * SE_TESTINGF[studyEventId].F_AGEN_8_V204.IG_AGEN_DOSETABLE6[X].I_AGEN_DOSEDATE64
-     * X could be : ALL , "" , Number
-     * case 1 : if "" then iterate over itemDatas if they exist add.
-     * case 2 : if Number just add the number 
-     *  
+     * Iterate over ruleSet.getExpressions(). Given the following expression SE_TESTINGF[studyEventId].F_AGEN_8_V204.IG_AGEN_DOSETABLE6[X].I_AGEN_DOSEDATE64 X
+     * could be : ALL , "" , Number case 1 : if "" then iterate over itemDatas if they exist add. case 2 : if Number just add the number
+     * 
      * @param ruleSets
      * @param grouped
      * @return
@@ -175,12 +164,14 @@ public interface RuleSetServiceInterface {
     public abstract RuleSetDao getRuleSetDao();
 
     /**
-     * @param ruleSetDao the ruleSetDao to set
+     * @param ruleSetDao
+     *            the ruleSetDao to set
      */
     public abstract void setRuleSetDao(RuleSetDao ruleSetDao);
 
     /**
-     * @param ruleSetRuleDao the ruleSetRuleDao to set
+     * @param ruleSetRuleDao
+     *            the ruleSetRuleDao to set
      */
     public abstract void setRuleSetRuleDao(RuleSetRuleDao ruleSetRuleDao);
 
@@ -195,7 +186,8 @@ public interface RuleSetServiceInterface {
     public abstract RuleDao getRuleDao();
 
     /**
-     * @param ruleDao the ruleDao to set
+     * @param ruleDao
+     *            the ruleDao to set
      */
     public abstract void setRuleDao(RuleDao ruleDao);
 

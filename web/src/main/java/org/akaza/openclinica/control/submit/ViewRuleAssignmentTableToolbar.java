@@ -18,19 +18,20 @@ public class ViewRuleAssignmentTableToolbar extends DefaultToolbar {
     List<Integer> ruleSetRuleIds;
     private final ResourceBundle reswords = ResourceBundleProvider.getWordsBundle();
 
-    public ViewRuleAssignmentTableToolbar(boolean addSubjectLinkShow, List<Integer> ruleSetRuleIds) {
+    public ViewRuleAssignmentTableToolbar(List<Integer> ruleSetRuleIds, boolean showMoreLink) {
         super();
         this.ruleSetRuleIds = ruleSetRuleIds;
-
+        this.showMoreLink = showMoreLink;
     }
 
     @Override
     protected void addToolbarItems() {
-        //addToolbarItem(createCustomItem(new XmlExportItem(ruleSetRuleIds)));
+        // addToolbarItem(createCustomItem(new XmlExportItem(ruleSetRuleIds)));
         addToolbarItem(ToolbarItemType.SEPARATOR);
         addToolbarItem(createCustomItem(new ShowMoreItem()));
         addToolbarItem(ToolbarItemType.SEPARATOR);
         addToolbarItem(createCustomItem(new TestRuleItem()));
+        addToolbarItem(createCustomItem(new NewHiddenItem()));
     }
 
     private ToolbarItem createCustomItem(AbstractItem item) {
@@ -106,23 +107,28 @@ public class ViewRuleAssignmentTableToolbar extends DefaultToolbar {
         @Override
         public String enabled() {
             HtmlBuilder html = new HtmlBuilder();
-            html.a().id("showMore").href("javascript:hideCols('ruleAssignments',[" + getIndexes() + "],true);").close();
-            html.div().close().nbsp().append(reswords.getString("show_more")).nbsp().divEnd().aEnd();
-            html.a().id("hide").style("display: none;").href("javascript:hideCols('ruleAssignments',[" + getIndexes() + "],false);").close();
-            html.div().close().nbsp().append(reswords.getString("hide")).nbsp().divEnd().aEnd();
+            if (showMoreLink) {
+                html.a().id("showMore").href("javascript:hideCols('ruleAssignments',[" + getIndexes() + "],true);").close();
+                html.div().close().nbsp().append(reswords.getString("show_more")).nbsp().divEnd().aEnd();
+                html.a().id("hide").style("display: none;").href("javascript:hideCols('ruleAssignments',[" + getIndexes() + "],false);").close();
+                html.div().close().nbsp().append(reswords.getString("hide")).nbsp().divEnd().aEnd();
 
-            html.script().type("text/javascript").close().append(
-                    "$j = jQuery.noConflict(); $j(document).ready(function(){ " + "hideCols('ruleAssignments',[" + getIndexes() + "],false);});").scriptEnd();
-
+                html.script().type("text/javascript").close()
+                        .append("$j = jQuery.noConflict(); $j(document).ready(function(){ " + "hideCols('ruleAssignments',[" + getIndexes() + "],false);});")
+                        .scriptEnd();
+            } else {
+                html.a().id("hide").href("javascript:hideCols('ruleAssignments',[" + getIndexes() + "],false);").close();
+                html.div().close().nbsp().append(reswords.getString("hide")).nbsp().divEnd().aEnd();
+                html.a().id("showMore").style("display: none;").href("javascript:hideCols('ruleAssignments',[" + getIndexes() + "],true);").close();
+                html.div().close().nbsp().append(reswords.getString("show_more")).nbsp().divEnd().aEnd();
+            }
             return html.toString();
         }
 
         /**
-         * @return Dynamically generate the indexes of studyGroupClasses. It
-         *         starts from 4 because there are 4 columns before study group
-         *         columns that will require to be hidden.
-         * @see ListStudySubjectTableFactory#configureColumns(org.jmesa.facade.TableFacade,
-         *      java.util.Locale)
+         * @return Dynamically generate the indexes of studyGroupClasses. It starts from 4 because there are 4 columns before study group columns that will
+         *         require to be hidden.
+         * @see ListStudySubjectTableFactory#configureColumns(org.jmesa.facade.TableFacade, java.util.Locale)
          */
         String getIndexes() {
             String result = "0,1,3,4,8,9,11,13";

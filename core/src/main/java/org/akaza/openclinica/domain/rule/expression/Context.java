@@ -8,10 +8,8 @@
 package org.akaza.openclinica.domain.rule.expression;
 
 import org.akaza.openclinica.domain.enumsupport.CodedEnum;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
 import java.util.HashMap;
-import java.util.ResourceBundle;
 
 /*
  * @Author Krikor Krumlian
@@ -22,7 +20,8 @@ public enum Context implements CodedEnum {
 
     private int code;
     private String description;
-    private static final ResourceBundle resterm = ResourceBundleProvider.getTermsBundle();
+
+    // private static final ResourceBundle resterm = ResourceBundleProvider.getTermsBundle();
 
     /*
      * Default Constructor
@@ -49,13 +48,10 @@ public enum Context implements CodedEnum {
         return Context.valueOf(Context.class, name);
     }
 
-    /*public Context getByContextName(String name) {
-        HashMap<String, Context> operators = new HashMap<String, Context>();
-        for (Context operator : Context.values()) {
-            operators.put(operator.name(), operator);
-        }
-        return operators.get(name);
-    }*/
+    /*
+     * public Context getByContextName(String name) { HashMap<String, Context> operators = new HashMap<String, Context>(); for (Context operator :
+     * Context.values()) { operators.put(operator.name(), operator); } return operators.get(name); }
+     */
 
     public static Context getByCode(Integer code) {
         HashMap<Integer, Context> operators = new HashMap<Integer, Context>();

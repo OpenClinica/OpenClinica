@@ -19,8 +19,8 @@ import org.akaza.openclinica.domain.rule.AuditableBeanWrapper;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
-import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean.RuleSetRuleBeanImportStatus;
+import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import org.akaza.openclinica.domain.rule.action.EmailActionBean;
 import org.akaza.openclinica.domain.rule.action.HideActionBean;
 import org.akaza.openclinica.domain.rule.action.InsertActionBean;
@@ -75,6 +75,53 @@ public class RulesPostImportContainerService {
         this.ds = ds;
     }
 
+    public RulesPostImportContainer validateRuleSetRuleDefs(RulesPostImportContainer importContainer, RuleSetRuleBean ruleSetRuleForm) {
+        RuleSetBean ruleSetBean = ruleSetRuleForm.getRuleSetBean();
+        RuleSetRuleBean ruleSetRuleBean = ruleSetRuleForm;
+        AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper = new AuditableBeanWrapper<RuleSetBean>(ruleSetBean);
+        ruleSetBeanWrapper.getAuditableBean().setStudy(currentStudy);
+        if (isRuleSetExpressionValid(ruleSetBeanWrapper)) {
+            RuleSetBean persistentRuleSetBean = getRuleSetDao().findByExpression(ruleSetBean);
+
+            if (persistentRuleSetBean != null) {
+                List<RuleSetRuleBean> importedRuleSetRules = ruleSetBeanWrapper.getAuditableBean().getRuleSetRules();
+                persistentRuleSetBean.setUpdaterAndDate(getUserAccount());
+                ruleSetBeanWrapper.setAuditableBean(persistentRuleSetBean);
+                for (RuleSetRuleBean persistentruleSetRuleBean : persistentRuleSetBean.getRuleSetRules()) {
+                    if (persistentruleSetRuleBean.getStatus() != Status.DELETED && ruleSetRuleBean.equals(persistentruleSetRuleBean)) {
+                        persistentruleSetRuleBean.setRuleSetRuleBeanImportStatus(RuleSetRuleBeanImportStatus.EXACT_DOUBLE);
+                        // TODO : DO SOMETHING HERE
+                        // itr.remove();
+                        break;
+                    } else if (persistentruleSetRuleBean.getStatus() != Status.DELETED && ruleSetRuleBean.getRuleBean() != null
+                        && ruleSetRuleBean.getRuleBean().equals(persistentruleSetRuleBean.getRuleBean())) {
+                        // persistentruleSetRuleBean.setActions(ruleSetRuleBean.getActions());
+                        persistentruleSetRuleBean.setRuleSetRuleBeanImportStatus(RuleSetRuleBeanImportStatus.TO_BE_REMOVED);
+                        // itr.remove();
+                        break;
+                    }
+                    ruleSetRuleBean.setRuleSetRuleBeanImportStatus(RuleSetRuleBeanImportStatus.LINE);
+                }
+                ruleSetBeanWrapper.getAuditableBean().addRuleSetRules(importedRuleSetRules);
+                // ruleSetBeanWrapper.getAuditableBean().setId(persistentRuleSetBean.getId());
+            } else {
+                ruleSetBeanWrapper.getAuditableBean().setOwner(getUserAccount());
+                ruleSetBeanWrapper.getAuditableBean().setStudyEventDefinition(
+                        getExpressionService().getStudyEventDefinitionFromExpression(ruleSetBean.getTarget().getValue()));
+                ruleSetBeanWrapper.getAuditableBean().setCrf(getExpressionService().getCRFFromExpression(ruleSetBean.getTarget().getValue()));
+                ruleSetBeanWrapper.getAuditableBean().setCrfVersion(getExpressionService().getCRFVersionFromExpression(ruleSetBean.getTarget().getValue()));
+                ruleSetBeanWrapper.getAuditableBean().setItem(getExpressionService().getItemBeanFromExpression(ruleSetBean.getTarget().getValue()));
+                ruleSetBeanWrapper.getAuditableBean().setItemGroup(getExpressionService().getItemGroupExpression(ruleSetBean.getTarget().getValue()));
+            }
+            isRuleSetRuleValid(importContainer, ruleSetBeanWrapper);
+        }
+        putRuleSetInCorrectContainer(ruleSetBeanWrapper, importContainer);
+        logger.info("# of Valid RuleSetDefs : " + importContainer.getValidRuleSetDefs().size());
+        logger.info("# of InValid RuleSetDefs : " + importContainer.getInValidRuleSetDefs().size());
+        logger.info("# of Overwritable RuleSetDefs : " + importContainer.getDuplicateRuleSetDefs().size());
+        return importContainer;
+    }
+
     public RulesPostImportContainer validateRuleSetDefs(RulesPostImportContainer importContainer) {
         for (RuleSetBean ruleSetBean : importContainer.getRuleSets()) {
             AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper = new AuditableBeanWrapper<RuleSetBean>(ruleSetBean);
@@ -90,7 +137,7 @@ public class RulesPostImportContainerService {
                     while (itr.hasNext()) {
                         RuleSetRuleBean ruleSetRuleBean = itr.next();
                         ruleSetRuleBean.setRuleBean(getRuleDao().findByOid(ruleSetRuleBean.getOid(), persistentRuleSetBean.getStudyId()));
-                        //ruleSetRuleBean.setRuleSetBean(ruleSetBeanWrapper.getAuditableBean());
+                        // ruleSetRuleBean.setRuleSetBean(ruleSetBeanWrapper.getAuditableBean());
                         for (RuleSetRuleBean persistentruleSetRuleBean : persistentRuleSetBean.getRuleSetRules()) {
                             if (persistentruleSetRuleBean.getStatus() != Status.DELETED && ruleSetRuleBean.equals(persistentruleSetRuleBean)) {
                                 persistentruleSetRuleBean.setRuleSetRuleBeanImportStatus(RuleSetRuleBeanImportStatus.EXACT_DOUBLE);
@@ -98,9 +145,9 @@ public class RulesPostImportContainerService {
                                 break;
                             } else if (persistentruleSetRuleBean.getStatus() != Status.DELETED && ruleSetRuleBean.getRuleBean() != null
                                 && ruleSetRuleBean.getRuleBean().equals(persistentruleSetRuleBean.getRuleBean())) {
-                                //persistentruleSetRuleBean.setActions(ruleSetRuleBean.getActions());
+                                // persistentruleSetRuleBean.setActions(ruleSetRuleBean.getActions());
                                 persistentruleSetRuleBean.setRuleSetRuleBeanImportStatus(RuleSetRuleBeanImportStatus.TO_BE_REMOVED);
-                                //itr.remove();
+                                // itr.remove();
                                 break;
                             }
                             ruleSetRuleBean.setRuleSetRuleBeanImportStatus(RuleSetRuleBeanImportStatus.LINE);
@@ -135,8 +182,8 @@ public class RulesPostImportContainerService {
             AuditableBeanWrapper<RuleBean> ruleBeanWrapper = new AuditableBeanWrapper<RuleBean>(ruleBean);
             ruleBeanWrapper.getAuditableBean().setStudy(currentStudy);
             // Remove illegal characters from expression value
-            ruleBeanWrapper.getAuditableBean().getExpression().setValue(
-                    ruleBeanWrapper.getAuditableBean().getExpression().getValue().trim().replaceAll("(\n|\t|\r)", " "));
+            ruleBeanWrapper.getAuditableBean().getExpression()
+                    .setValue(ruleBeanWrapper.getAuditableBean().getExpression().getValue().trim().replaceAll("(\n|\t|\r)", " "));
 
             if (isRuleOidValid(ruleBeanWrapper) && isRuleExpressionValid(ruleBeanWrapper, null)) {
                 RuleBean persistentRuleBean = getRuleDao().findByOid(ruleBeanWrapper.getAuditableBean());
@@ -194,10 +241,8 @@ public class RulesPostImportContainerService {
     }
 
     /**
-     * If the RuleSet contains any RuleSetRule object with an invalid RuleRef
-     * OID (OID that is not in DB or in the Valid Rule Lists) , Then add an
-     * error to the ruleSetBeanWrapper, which in terms will make the RuleSet
-     * inValid.
+     * If the RuleSet contains any RuleSetRule object with an invalid RuleRef OID (OID that is not in DB or in the Valid Rule Lists) , Then add an error to the
+     * ruleSetBeanWrapper, which in terms will make the RuleSet inValid.
      * 
      * @param importContainer
      * @param ruleSetBeanWrapper
@@ -227,6 +272,10 @@ public class RulesPostImportContainerService {
                         ruleSetBeanWrapper.error(createError("OCRERR_0027"));
                 }
 
+                if (ruleSetRuleBean.getActions().size() == 0) {
+                    ruleSetBeanWrapper.error(createError("OCRERR_0027"));
+                }
+
                 for (RuleActionBean ruleActionBean : ruleSetRuleBean.getActions()) {
                     isRuleActionValid(ruleActionBean, ruleSetBeanWrapper, eventDefinitionCRFBean);
                 }
@@ -245,7 +294,7 @@ public class RulesPostImportContainerService {
             }
             for (PropertyBean propertyBean : properties) {
                 String result = getExpressionService().checkValidityOfItemOrItemGroupOidInCrf(propertyBean.getOid(), ruleSetBeanWrapper.getAuditableBean());
-                //String result = getExpressionService().isExpressionValid(oid, ruleSetBeanWrapper.getAuditableBean(), 2) ? "OK" : "";
+                // String result = getExpressionService().isExpressionValid(oid, ruleSetBeanWrapper.getAuditableBean(), 2) ? "OK" : "";
                 if (!result.equals("OK")) {
                     ruleSetBeanWrapper.error("ShowAction OID " + result + " is not Valid. ");
                 }
@@ -259,7 +308,7 @@ public class RulesPostImportContainerService {
             }
             for (PropertyBean propertyBean : properties) {
                 String result = getExpressionService().checkValidityOfItemOrItemGroupOidInCrf(propertyBean.getOid(), ruleSetBeanWrapper.getAuditableBean());
-                //String result = getExpressionService().isExpressionValid(oid, ruleSetBeanWrapper.getAuditableBean(), 2) ? "OK" : "";
+                // String result = getExpressionService().isExpressionValid(oid, ruleSetBeanWrapper.getAuditableBean(), 2) ? "OK" : "";
                 if (!result.equals("OK")) {
                     ruleSetBeanWrapper.error("HideAction OID " + result + " is not Valid. ");
                 }
@@ -366,7 +415,8 @@ public class RulesPostImportContainerService {
     }
 
     /**
-     * @param ruleDao the ruleDao to set
+     * @param ruleDao
+     *            the ruleDao to set
      */
     public void setRuleDao(RuleDao ruleDao) {
         this.ruleDao = ruleDao;
@@ -380,7 +430,8 @@ public class RulesPostImportContainerService {
     }
 
     /**
-     * @param ruleSetDao the ruleSetDao to set
+     * @param ruleSetDao
+     *            the ruleSetDao to set
      */
     public void setRuleSetDao(RuleSetDao ruleSetDao) {
         this.ruleSetDao = ruleSetDao;
@@ -394,7 +445,8 @@ public class RulesPostImportContainerService {
     }
 
     /**
-     * @param currentStudy the currentStudy to set
+     * @param currentStudy
+     *            the currentStudy to set
      */
     public void setCurrentStudy(StudyBean currentStudy) {
         this.currentStudy = currentStudy;
