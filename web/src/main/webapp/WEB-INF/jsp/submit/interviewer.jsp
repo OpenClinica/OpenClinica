@@ -218,7 +218,10 @@ function callTip(html)
 <table border="0" cellpadding="0" cellspacing="0" onLoad="">
 <tr id="CRF_infobox_closed">
     <td style="padding-top: 3px; padding-left: 6px; width: 250px;" nowrap>
-        <a href="javascript:leftnavExpand('CRF_infobox_closed'); leftnavExpand('CRF_infobox_open');"><b><fmt:message key="CRF_info" bundle="${resword}"/></b></a>
+        <a href="javascript:leftnavExpand('CRF_infobox_closed'); leftnavExpand('CRF_infobox_open');">
+            <img src="images/sidebar_expand.gif" align="left" border="0" hspace="10">
+            <b><fmt:message key="CRF_info" bundle="${resword}"/></b>
+        </a>
     </td>
 </tr>
 <tr id="CRF_infobox_open" style="display: none;">
@@ -230,9 +233,12 @@ function callTip(html)
         <table border="0" cellpadding="0" cellspacing="0" width="100">
             <tr>
                 <td nowrap>
-                    <div class="tab_BG_h"><div class="tab_R_h" style="padding-right: 0px;"><div class="tab_L_h" style="padding: 3px 11px 0px 6px; text-align: left;">
-                        <a href="javascript:leftnavExpand('CRF_infobox_closed'); leftnavExpand('CRF_infobox_open');"><b><fmt:message key="CRF_info" bundle="${resword}"/></b></a>
-                    </div></div></div>
+                    <%--<div class="tab_BG_h"><div class="tab_R_h" style="padding-right: 0px;"><div class="tab_L_h" style="padding: 3px 11px 0px 6px; text-align: left;">--%>
+                        <a href="javascript:leftnavExpand('CRF_infobox_closed'); leftnavExpand('CRF_infobox_open');">
+                            <img src="images/sidebar_collapse.gif" align="left" border="0" hspace="10">
+                            <b><fmt:message key="CRF_info" bundle="${resword}"/></b>
+                        </a>
+                    <%--</div></div></div>--%>
                 </td>
             </tr>
         </table>
