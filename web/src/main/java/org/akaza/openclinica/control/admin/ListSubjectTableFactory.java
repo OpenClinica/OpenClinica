@@ -196,7 +196,7 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
         @Override
         protected List<Option> getOptions() {
             List<Option> options = new ArrayList<Option>();
-            for (Object status : Status.toActiveArrayList()) {
+            for (Object status : Status.toSubjectDropDownArrayList()) {
                 options.add(new Option(String.valueOf(((Status) status).getId()), ((Status) status).getName()));
             }
             return options;
