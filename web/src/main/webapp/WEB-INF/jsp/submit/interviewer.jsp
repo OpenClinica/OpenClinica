@@ -216,14 +216,12 @@ function callTip(html)
 </c:forEach>
 <!-- End of Alert Box -->
 <table border="0" cellpadding="0" cellspacing="0" onLoad="">
-<tr id="CRF_infobox_closed"  style="display: none;">
+<tr id="CRF_infobox_closed">
     <td style="padding-top: 3px; padding-left: 6px; width: 250px;" nowrap>
-        <a href="javascript:leftnavExpand('CRF_infobox_closed'); leftnavExpand('CRF_infobox_open');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
-
-        <b><fmt:message key="crf_more_info" bundle="${resword}"/></b>
+        <a href="javascript:leftnavExpand('CRF_infobox_closed'); leftnavExpand('CRF_infobox_open');"><b><fmt:message key="CRF_info" bundle="${resword}"/></b></a>
     </td>
 </tr>
-<tr id="CRF_infobox_open">
+<tr id="CRF_infobox_open" style="display: none;">
 
 <td>
 <table border="0" cellpadding="0" cellspacing="0">
@@ -233,9 +231,7 @@ function callTip(html)
             <tr>
                 <td nowrap>
                     <div class="tab_BG_h"><div class="tab_R_h" style="padding-right: 0px;"><div class="tab_L_h" style="padding: 3px 11px 0px 6px; text-align: left;">
-                        <a href="javascript:leftnavExpand('CRF_infobox_closed'); leftnavExpand('CRF_infobox_open');"><img src="images/sidebar_collapse.gif" border="0" align="right"></a>
-
-                        <b><fmt:message key="CRF_info" bundle="${resword}"/></b>
+                        <a href="javascript:leftnavExpand('CRF_infobox_closed'); leftnavExpand('CRF_infobox_open');"><b><fmt:message key="CRF_info" bundle="${resword}"/></b></a>
                     </div></div></div>
                 </td>
             </tr>
@@ -338,18 +334,18 @@ function callTip(html)
 -->
 <tr>
 <!--event-->
-  <td class="table_cell_noborder" style="color: #789EC5">
+  <td class="table_cell_noborder" >
         <b><fmt:message key="event" bundle="${resword}"/>:</b>
     </td>
-    <td style="color: #789EC5">
+    <td >
       <c:out value="${toc.studyEventDefinition.name}" />&nbsp;(<fmt:formatDate
       value="${toc.studyEvent.dateStarted}" pattern="${dteFormat}" />)
     </td>
-	<td class="table_cell_top" style="color: #789EC5">
+	<td class="table_cell_top" >
 <span><b><fmt:message key="gender" bundle="${resword}"/>:</b></span>
         
         </td>
-         <td class="table_cell_noborder" style="color: #789EC5;padding-left:3px">
+         <td class="table_cell_noborder" style="padding-left:3px">
 	       <c:choose>
 	                   <c:when test="${subject.gender==109}"><fmt:message key="M" bundle="${resword}"/></c:when>
 	                   <c:when test="${subject.gender==102}"><fmt:message key="F" bundle="${resword}"/></c:when>
@@ -365,14 +361,14 @@ function callTip(html)
 
 <tr>
   <!-- Occurence id-->
-        <td class="table_cell_noborder" style="color: #789EC5">
+        <td class="table_cell_noborder" >
 <c:if test="${toc.studyEventDefinition.repeating}">
    
             <b><fmt:message key="occurrence_number" bundle="${resword}"/>:</b>
 </c:if>     
 	 </td>
 		
-        <td class="table_cell_noborder" style="color: #789EC5">
+        <td class="table_cell_noborder" >
 <c:if test="${toc.studyEventDefinition.repeating}">         
 		 <c:out value="${toc.studyEvent.sampleOrdinal}" />
    </c:if> 
@@ -381,12 +377,12 @@ function callTip(html)
 
 
    <!-- Age at Enrollment-->
-   <td class="table_cell_top" style="color: #789EC5">
+   <td class="table_cell_top" >
 
         <b><fmt:message key="age_at_enrollment" bundle="${resword}"/>:</b><br>
 
     </td>
-     <td class="table_cell_noborder" style="color: #789EC5">
+     <td class="table_cell_noborder" >
         <c:out value="${age}" /><br>
     </td>
 	
@@ -394,15 +390,15 @@ function callTip(html)
 	
 	<tr>
 		<!--study-->
-	 <td class="table_cell_noborder" style="color: #789EC5">
+	 <td class="table_cell_noborder" >
 
         <b><fmt:message key="study" bundle="${resword}"/>:</b><br>
     </td>
 	
-    <td class="table_cell_noborder" style="color: #789EC5">
+    <td class="table_cell_noborder" >
      <c:out value="${studyTitle}" /><br>
     </td>
-    <td class="table_cell_top" style="color: #789EC5">
+    <td class="table_cell_top" >
         <c:if test="${study.studyParameterConfig.collectDob != '3'}">
             <c:choose>
                 <c:when test="${study.studyParameterConfig.collectDob =='1'}">
@@ -414,7 +410,7 @@ function callTip(html)
             </c:choose>
         </c:if>
     </td>
-     <td class="table_cell_noborder" style="color: #789EC5">
+     <td class="table_cell_noborder" >
           <c:if test="${study.studyParameterConfig.collectDob != '3'}">
                     <%-- BWP 3105 Until the SubjectBean uses the Calendar object to represent
          the date of birth, we will have to use the Date.getYear() deprecated method.--%>
@@ -433,30 +429,30 @@ function callTip(html)
     </tr>
 	<tr>
 	<!--site to be implemented -->
-	          <td class="table_cell_noborder" style="color: #789EC5">
+	          <td class="table_cell_noborder" >
 
         <b><fmt:message key="site" bundle="${resword}"/>:</b><br>
     </td>
 	
-    <td class="table_cell_noborder" style="color: #789EC5">
+    <td class="table_cell_noborder" >
 <c:if test="${study.parentStudyId > '0'}">    
 	<c:out value="${siteTitle}" /><br>
 	</c:if>
     </td>
 	<!--person id todo -->
-	           <c:choose>
+       <c:choose>
         <c:when test="${study.studyParameterConfig.personIdShownOnCRF == 'true'}">
-            <td class="table_cell_top" style="color: #789EC5">
+            <td class="table_cell_top">
                 <b><fmt:message key="person_ID" bundle="${resword}"/>:</b><br />
             </td>
-            <td class="table_cell_noborder" style="color: #789EC5">
+            <td class="table_cell_noborder">
                 <c:out value="${subject.uniqueIdentifier}" /><br />
             </td>
 
         </c:when>
         <c:otherwise>
-            <td class="table_cell" style="color: #789EC5"><b></td>
-            <td class="table_cell_left" style="color: #789EC5"></td>
+            <td class="table_cell"></td>
+            <td class="table_cell_left" ></td>
         </c:otherwise>
     </c:choose>
 	</tr>
@@ -585,12 +581,12 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
                 <c:choose>
                  <c:when test="${hasNameNote eq 'yes'}">
                 <a href="#" id="nameNote1"
-           onmouseout="UnTip()"  onmouseover="callTip(genToolTipFromArray('interviewNotes'))"; onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySubject.id}&itemId=${itemId}&id=${InterviewerNameNote.eventCRFId}&name=${InterviewerNameNote.entityType}&field=interviewer&column=${InterviewerNameNote.column}&enterData=${enterData}&monitor=${monitor}&blank=${blank}','spanAlert-interviewDate'); return false;">
+           onmouseout="UnTip();onmouseover=callTip(genToolTipFromArray('interviewNotes')); onClick=openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySubject.id}&itemId=${itemId}&id=${InterviewerNameNote.eventCRFId}&name=${InterviewerNameNote.entityType}&field=interviewer&column=${InterviewerNameNote.column}&enterData=${enterData}&monitor=${monitor}&blank=${blank}','spanAlert-interviewDate'); return false;">
                     <img id="flag_interviewer" name="flag_interviewer" src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                     </c:when>
                     <c:otherwise>
                     <a id="nameNote1" href="#"
-           onmouseout="UnTip()"  onmouseover="callTip(genToolTipFromArray('interviewNotes'))"; onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${studySubject.id}&viewData=y&id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewer&column=interviewer_name&writeToDB=1&new=${isNewDN}','spanAlert-interviewer'); return false;">
+           onmouseout="UnTip();onmouseover=callTip(genToolTipFromArray('interviewNotes')); onClick=openDSNoteWindow('CreateDiscrepancyNote?subjectId=${studySubject.id}&viewData=y&id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewer&column=interviewer_name&writeToDB=1&new=${isNewDN}','spanAlert-interviewer'); return false;">
                         <img id="flag_interviewer" name="flag_interviewer" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
                         </c:otherwise>
                         </c:choose>
@@ -703,13 +699,13 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
 
                 <c:choose>
                 <c:when test="${hasDateNote eq 'yes'}">
-                <a href="#"  onmouseover="callTip(genToolTipFromArray('dateNotes') )";
-           onmouseout="UnTip()"  onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySubject.id}&itemId=${itemId}&id=${InterviewerDateNote.eventCRFId}&name=${InterviewerDateNote.entityType}&field=interviewDate&column=${InterviewerDateNote.column}&enterData=${enterData}&monitor=${monitor}&blank=${blank}','spanAlert-interviewDate'); return false;">
+                <a href="#"  onmouseover="callTip(genToolTipFromArray('dateNotes') );
+           onmouseout=UnTip();  onClick=openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySubject.id}&itemId=${itemId}&id=${InterviewerDateNote.eventCRFId}&name=${InterviewerDateNote.entityType}&field=interviewDate&column=${InterviewerDateNote.column}&enterData=${enterData}&monitor=${monitor}&blank=${blank}','spanAlert-interviewDate'); return false;">
                     <img id="flag_interviewDate" name="flag_interviewDate" src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"  >
                     </c:when>
                     <c:otherwise>
-                    <a href="#"  onmouseover="callTip(genToolTipFromArray('dateNotes') )";
-           onmouseout="UnTip()" onClick="openDNoteWindow('CreateDiscrepancyNote?subjectId=${studySubject.id}&id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewDate&column=date_interviewed&writeToDB=1&new=${isNewDNDate}','spanAlert-interviewDate'); return false;">
+                    <a href="#"  onmouseover="callTip(genToolTipFromArray('dateNotes') );
+           onmouseout=UnTip(); onClick=openDNoteWindow('CreateDiscrepancyNote?subjectId=${studySubject.id}&id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewDate&column=date_interviewed&writeToDB=1&new=${isNewDNDate}','spanAlert-interviewDate'); return false;">
                         <img id="flag_interviewDate" name="flag_interviewDate" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"  >
                         </c:otherwise>
                         </c:choose>
@@ -730,7 +726,7 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
 
 <tr>
 
-  <td colspan="5" valign="top" class="table_cell_left"  style="color: #789EC5"><b>Discrepancy Notes on this CRF:</b></td>
+  <td colspan="5" valign="top" class="table_cell_left"  ><b>Discrepancy Notes on this CRF:</b></td>
  
 </tr>
 
