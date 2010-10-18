@@ -132,7 +132,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         configureColumn(row.getColumn("discrepancyNoteBean.owner"), resword.getString("owner"), new OwnerCellEditor(), null, false, false);
         String actionsHeader = resword.getString("actions") + "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;";
         configureColumn(row.getColumn("actions"), actionsHeader, new ActionsCellEditor(), new DefaultActionsEditor(locale), true, false);
-
+        configureColumn(row.getColumn("age"), resword.getString("days_open"), null, null);
+        configureColumn(row.getColumn("days"), resword.getString("days_since_updated"), null, null);
     }
 
     @Override
@@ -199,7 +200,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             h.put("studySubject.label", discrepancyNoteBean.getStudySub().getLabel());
             h.put("discrepancyNoteBean.disType", discrepancyNoteBean.getDisType());
             h.put("discrepancyNoteBean.resolutionStatus", discrepancyNoteBean.getResStatus());
-            h.put("age", discrepancyNoteBean.getAge());
+            h.put("age", discrepancyNoteBean.getResolutionStatusId()==5?null:discrepancyNoteBean.getAge());
             h.put("days", discrepancyNoteBean.getDays()==0?null:discrepancyNoteBean.getDays());
             h.put("siteId", ((StudyBean) getStudyDao().findByPK(discrepancyNoteBean.getStudySub().getStudyId())).getIdentifier());
             h.put("discrepancyNoteBean", discrepancyNoteBean);
