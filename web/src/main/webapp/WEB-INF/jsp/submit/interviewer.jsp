@@ -589,12 +589,12 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
                 <c:choose>
                  <c:when test="${hasNameNote eq 'yes'}">
                 <a href="#" id="nameNote1"
-           onmouseout="UnTip();onmouseover=callTip(genToolTipFromArray('interviewNotes')); onClick=openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySubject.id}&itemId=${itemId}&id=${InterviewerNameNote.eventCRFId}&name=${InterviewerNameNote.entityType}&field=interviewer&column=${InterviewerNameNote.column}&enterData=${enterData}&monitor=${monitor}&blank=${blank}','spanAlert-interviewDate'); return false;">
+           onmouseout="UnTip();"onmouseover="callTip(genToolTipFromArray('interviewNotes'));" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySubject.id}&itemId=${itemId}&id=${InterviewerNameNote.eventCRFId}&name=${InterviewerNameNote.entityType}&field=interviewer&column=${InterviewerNameNote.column}&enterData=${enterData}&monitor=${monitor}&blank=${blank}','spanAlert-interviewDate'); return false;">
                     <img id="flag_interviewer" name="flag_interviewer" src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                     </c:when>
                     <c:otherwise>
                     <a id="nameNote1" href="#"
-           onmouseout="UnTip();onmouseover=callTip(genToolTipFromArray('interviewNotes')); onClick=openDSNoteWindow('CreateDiscrepancyNote?subjectId=${studySubject.id}&viewData=y&id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewer&column=interviewer_name&writeToDB=1&new=${isNewDN}','spanAlert-interviewer'); return false;">
+           onmouseout="UnTip();"onmouseover="callTip(genToolTipFromArray('interviewNotes'));" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${studySubject.id}&viewData=y&id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewer&column=interviewer_name&writeToDB=1&new=${isNewDN}','spanAlert-interviewer'); return false;">
                         <img id="flag_interviewer" name="flag_interviewer" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
                         </c:otherwise>
                         </c:choose>
@@ -707,13 +707,13 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
 
                 <c:choose>
                 <c:when test="${hasDateNote eq 'yes'}">
-                <a href="#"  onmouseover="callTip(genToolTipFromArray('dateNotes') );
-           onmouseout=UnTip();  onClick=openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySubject.id}&itemId=${itemId}&id=${InterviewerDateNote.eventCRFId}&name=${InterviewerDateNote.entityType}&field=interviewDate&column=${InterviewerDateNote.column}&enterData=${enterData}&monitor=${monitor}&blank=${blank}','spanAlert-interviewDate'); return false;">
+                <a href="#"  onmouseover="callTip(genToolTipFromArray('dateNotes') );"
+           onmouseout="UnTip();"  onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySubject.id}&itemId=${itemId}&id=${InterviewerDateNote.eventCRFId}&name=${InterviewerDateNote.entityType}&field=interviewDate&column=${InterviewerDateNote.column}&enterData=${enterData}&monitor=${monitor}&blank=${blank}','spanAlert-interviewDate'); return false;">
                     <img id="flag_interviewDate" name="flag_interviewDate" src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"  >
                     </c:when>
                     <c:otherwise>
-                    <a href="#"  onmouseover="callTip(genToolTipFromArray('dateNotes') );
-           onmouseout=UnTip(); onClick=openDNoteWindow('CreateDiscrepancyNote?subjectId=${studySubject.id}&id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewDate&column=date_interviewed&writeToDB=1&new=${isNewDNDate}','spanAlert-interviewDate'); return false;">
+                    <a href="#"  onmouseover="callTip(genToolTipFromArray('dateNotes') );"
+           onmouseout="UnTip();" onClick="openDNoteWindow('CreateDiscrepancyNote?subjectId=${studySubject.id}&id=<c:out value="${toc.eventCRF.id}"/>&name=eventCrf&field=interviewDate&column=date_interviewed&writeToDB=1&new=${isNewDNDate}','spanAlert-interviewDate'); return false;">
                         <img id="flag_interviewDate" name="flag_interviewDate" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"  >
                         </c:otherwise>
                         </c:choose>
