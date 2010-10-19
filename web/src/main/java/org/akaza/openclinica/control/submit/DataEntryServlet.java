@@ -679,6 +679,9 @@ public abstract class DataEntryServlet extends SecureController {
                                 //for scd item
                                 //a control item is always before its scd item
                                 dib.setIsSCDtoBeShown(section.getShowSCDItemIds().contains(dib.getMetadata().getItemId()));
+                                if(!dib.getIsSCDtoBeShown()) {
+                                    dib.setIsSCDtoBeShown(this.shouldSCDBeShown(dib));
+                                }
                                 validateSCDItemBean(v, dib);
                             }
                         }
@@ -718,6 +721,9 @@ public abstract class DataEntryServlet extends SecureController {
                                     //for scd item
                                     //a control item is always before its scd item
                                     child.setIsSCDtoBeShown(section.getShowSCDItemIds().contains(child.getMetadata().getItemId()));
+                                    if(!child.getIsSCDtoBeShown()) {
+                                        child.setIsSCDtoBeShown(this.shouldSCDBeShown(child));
+                                    }
                                     validateSCDItemBean(v, child);
                                 }
                             }
@@ -934,7 +940,7 @@ public abstract class DataEntryServlet extends SecureController {
                     ordinalset.add(1);
                     itemOrdinals.put(itemId, ordinalset);
                     scoreItemdata.put(itemId + "_" + 1, value);
-                    if (isChanged(idb, oldItemdata)) {
+                    if (isChanged(idb, oldItemdata, dib)) {
                         changedItems.add(itemName);
                         changedItemsList.add(dib);
                         // changedItemsMap.put(dib.getItem().getName(), new
@@ -950,7 +956,7 @@ public abstract class DataEntryServlet extends SecureController {
                         cordinalset.add(1);
                         itemOrdinals.put(itemId, cordinalset);
                         scoreItemdata.put(cib.getId() + "_" + 1, child.getData().getValue());
-                        if (isChanged(child.getData(), oldItemdata)) {
+                        if (isChanged(child.getData(), oldItemdata, child)) {
                             changedItems.add(itemName);
                             changedItemsList.add(child);
                             // changedItemsMap.put(itemName, new
@@ -1037,7 +1043,7 @@ public abstract class DataEntryServlet extends SecureController {
                         }
                         dib.loadFormValue(value);
 
-                        if (isChanged(dib.getData(), oldItemdata)) {
+                        if (isChanged(dib.getData(), oldItemdata, dib)) {
                             changedItems.add(dib.getItem().getName());
                             changedItemsList.add(dib);
                             // changedItemsMap.put(dib.getItem().getName(), new
@@ -1074,7 +1080,7 @@ public abstract class DataEntryServlet extends SecureController {
                                 cvalue = sc.doCalculation(child, scoreItems, scoreItemdata, itemOrdinals, cerr, 1);
                             }
                             child.loadFormValue(cvalue);
-                            if (isChanged(child.getData(), oldItemdata)) {
+                            if (isChanged(child.getData(), oldItemdata, child)) {
                                 changedItems.add(child.getItem().getName());
                                 changedItemsList.add(child);
                                 // changedItemsMap.put(child.getItem().getName(),
@@ -2875,19 +2881,28 @@ public abstract class DataEntryServlet extends SecureController {
         
     protected boolean writeConditionalDisplayItemToDB(DisplayItemBean dib, ItemDataDAO iddao, int ordinal, boolean isDisplay) {
         ItemDataBean idb = dib.getData();
-        if(isDisplay || idb.getValue().length()>0 || dib.getNumDiscrepancyNotes()>0) {
+        ItemDataBean dbdata = dib.getDbData();
+        boolean display = isDisplay ? true : false;
+        if(!display && idb.getId()>0) {
+            Status s = dbdata.getStatus();
+            int id = s == null ? -1 : s.getId(); 
+            display = id>0 && (id!=5 || id!=7)? dbdata.getValue().length()>0?true:dib.getNumDiscrepancyNotes()>0?true:false : false;
+        }
+        if(display) {
             if (idb.getValue().equals("")) {
                 idb.setStatus(getBlankItemStatus());
             } else {
                 idb.setStatus(getNonBlankItemStatus());
             }
             return this.writeToDB(idb, dib, iddao, ordinal);
-        } else {
+        } else if(idb.getId()>0){
             idb.setStatus(Status.DELETED);
             idb.setUpdater(ub);
             iddao.updateValue(idb);
             return idb.isActive();
         }
+        //if no need written to database, back with true
+        return true;
     }
     
     protected boolean writeToDB(ItemDataBean itemData, DisplayItemBean dib, ItemDataDAO iddao, int ordinal) {
@@ -4341,6 +4356,14 @@ public abstract class DataEntryServlet extends SecureController {
         }
         return false;
     }
+    
+    protected boolean isChanged(ItemDataBean idb, HashMap<Integer, String> oldItemdata, DisplayItemBean dib) {
+        if(dib.getMetadata().isConditionalDisplayItem() && !dib.getIsSCDtoBeShown()) {
+            return false;
+        } else {
+            return isChanged(idb, oldItemdata);
+        }
+    }
 
     /**
      * Output, just logs all contents of the allItems list. tbh, 01/2010
@@ -4937,5 +4960,20 @@ public abstract class DataEntryServlet extends SecureController {
             }
         }
         return showCDSet;
+    }
+    
+    protected boolean shouldSCDBeShown(DisplayItemBean dib) {
+        boolean shown = dib.getIsSCDtoBeShown();
+        if(!shown) {
+            if(dib.getNumDiscrepancyNotes()>0) {
+                shown = true;
+            } else {
+                ItemDataBean dbdata = dib.getDbData();
+                Status status = dbdata.isActive()?dbdata.getStatus():null;
+                int sid = status==null?0:status.getId();
+                shown = sid>0&&(sid!=5||sid!=7)?(dbdata.getValue().length()>0?true:false):false;
+            }
+        }
+        return shown;
     }
 }
