@@ -1874,4 +1874,25 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         return eb;
     }
 
+    public int getResolutionStatusIdForSubjectDNFlag(int subjectId, String column) {
+        int id = 0;
+        unsetTypeExpected();
+        setTypeExpected(1, TypeNames.INT);
+
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(subjectId));
+        variables.put(new Integer(2), new String(column));
+        
+        String sql = digester.getQuery("getResolutionStatusIdForSubjectDNFlag");
+        ArrayList alist = this.select(sql, variables);
+        Iterator it = alist.iterator();
+        if (it.hasNext()) {
+            HashMap hm = (HashMap) it.next();
+            try {
+                id = ((Integer) hm.get("resolution_status_id")).intValue();
+            } catch (Exception e) {
+            }
+        }
+        return id;
+    }
 }
