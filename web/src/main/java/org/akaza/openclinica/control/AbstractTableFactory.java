@@ -1,5 +1,14 @@
 package org.akaza.openclinica.control;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.jmesa.facade.TableFacade;
 import org.jmesa.facade.TableFacadeImpl;
 import org.jmesa.limit.ExportType;
@@ -12,15 +21,6 @@ import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.editor.FilterEditor;
 import org.jmesa.view.html.component.HtmlColumn;
 import org.jmesa.view.html.component.HtmlTable;
-
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 public abstract class AbstractTableFactory {
 
@@ -182,5 +182,34 @@ public abstract class AbstractTableFactory {
                 htmlColumn.getFilterRenderer().setFilterEditor(filterEditor);
             }
         }
+    }
+    
+    public static String getDNFlagIconName(int dnResolutionStatusId) {
+        String name = "";
+        switch (dnResolutionStatusId) {
+        case 0:
+            name = "icon_noNote";
+            break;
+        case 1:
+            name = "icon_Note";
+            break;
+        case 2:
+            name = "icon_flagYellow";
+            break;
+        case 3:
+            name = "icon_flagGreen";
+            break;
+        case 4:
+            name = "icon_flagBlack";
+            break;
+        case 5:
+            name = "icon_flagWhite";
+            break;
+        default:
+            name = "icon_noNote";
+            break;
+        }
+        
+        return name;
     }
 }

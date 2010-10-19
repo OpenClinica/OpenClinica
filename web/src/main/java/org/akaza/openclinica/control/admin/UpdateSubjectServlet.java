@@ -7,11 +7,17 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.DisplaySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
+import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
@@ -26,11 +32,6 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 
 /**
  * @author jxu
@@ -66,6 +67,7 @@ public class UpdateSubjectServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
         SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
+        DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(sm.getDataSource());
         FormProcessor fp = new FormProcessor(request);
         FormDiscrepancyNotes discNotes = null;
         
@@ -137,6 +139,31 @@ public class UpdateSubjectServlet extends SecureController {
 
                 discNotes = new FormDiscrepancyNotes();
                 session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
+                
+                /*
+                ArrayList<DiscrepancyNoteBean> dns = dndao.findAllSubjectByStudyAndId(currentStudy, subjectId);
+                if(dns.size()>0) {
+                    for(DiscrepancyNoteBean dn : dns) {
+                        if("gender".equalsIgnoreCase(dn.getColumn())) {
+                            session.setAttribute("genderDNFlag", AbstractTableFactory.getDNFlagIconName(dn.getResolutionStatusId()));
+                        } else if("date_of_birth".equalsIgnoreCase(dn.getColumn())) {
+                            session.setAttribute("birthDNFlag", AbstractTableFactory.getDNFlagIconName(dn.getResolutionStatusId()));
+                        }
+                    }
+                    */
+                int flagRStatusId = dndao.getResolutionStatusIdForSubjectDNFlag(subjectId, "gender");
+                if(flagRStatusId > 0) {
+                    session.setAttribute("genderDNFlag",AbstractTableFactory.getDNFlagIconName(flagRStatusId));
+                }else {
+                    session.setAttribute("genderDNFlag","icon_noNote");
+                }
+                flagRStatusId = dndao.getResolutionStatusIdForSubjectDNFlag(subjectId, "date_of_birth");
+                if(flagRStatusId > 0) {
+                    session.setAttribute("birthDNFlag",AbstractTableFactory.getDNFlagIconName(flagRStatusId));
+                }else {
+                    session.setAttribute("birthDNFlag","icon_noNote");
+                }
+                
                 forwardPage(Page.UPDATE_SUBJECT);
             } else if ("confirm".equalsIgnoreCase(action)) {
                 request.setAttribute(BEAN_FATHERS, dsFathers);
@@ -149,7 +176,6 @@ public class UpdateSubjectServlet extends SecureController {
 
                 // save discrepancy notes into DB
                 FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
-                DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(sm.getDataSource());
                 AddNewSubjectServlet.saveFieldNotes("gender", fdn, dndao, subject.getId(), "subject", currentStudy);
                 AddNewSubjectServlet.saveFieldNotes(YEAR_DOB, fdn, dndao, subject.getId(), "subject", currentStudy);
                 AddNewSubjectServlet.saveFieldNotes(DATE_DOB, fdn, dndao, subject.getId(), "subject", currentStudy);
@@ -157,6 +183,8 @@ public class UpdateSubjectServlet extends SecureController {
                 session.removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
                 addPageMessage(respage.getString("subject_updated_succcesfully"));
                 session.removeAttribute("subjectToUpdate");
+                session.removeAttribute("genderDNFlag");
+                session.removeAttribute("birthDNFlag");
                 if (studySubId > 0) {
                     request.setAttribute("id", new Integer(studySubId).toString());
                     forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);

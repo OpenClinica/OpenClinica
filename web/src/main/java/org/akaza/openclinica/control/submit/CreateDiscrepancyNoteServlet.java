@@ -233,8 +233,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             }
             dndao.setFetchMapping(false);
         } else {
-            //if (!isNew) {// not a new note, so try to find the parent note
-            if(notes.size()>0) {//a child note could be new.
+            if (!isNew) {// not a new note, so try to find the parent note
                 for (int i = 0; i < notes.size(); i++) {
                     DiscrepancyNoteBean note1 = (DiscrepancyNoteBean) notes.get(i);
                     if (note1.getParentDnId() == 0) {
