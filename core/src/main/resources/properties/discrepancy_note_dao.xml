@@ -1011,4 +1011,14 @@ and column_name='interviewer_name'
             (select max(discrepancy_note_id) from discrepancy_note where parent_dn_id = ?)
         </sql>
     </query>
+    <query>
+    	<name>getResolutionStatusIdForSubjectDNFlag</name>
+    	<sql>select min(a.resolution_status_id) as resolution_status_id from (
+				select dn.discrepancy_note_id, dn.resolution_status_id from discrepancy_note dn 
+				where dn.parent_dn_id is NULL
+				      and dn.discrepancy_note_id in (
+					select dsm.discrepancy_note_id from dn_subject_map dsm where dsm.subject_id=? and dsm.column_name=?
+				) )as a
+    	</sql>
+    </query>
 </queries>
