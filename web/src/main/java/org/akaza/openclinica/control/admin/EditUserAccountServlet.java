@@ -65,6 +65,8 @@ public class EditUserAccountServlet extends SecureController {
 
     public static final String BUTTON_BACK_VALUE = "Back";
 
+    public static final String USER_ACCOUNT_NOTIFICATION = "notifyPassword";
+
     private ArrayList getAllStudies() {
         StudyDAO sdao = new StudyDAO(sm.getDataSource());
         return (ArrayList) sdao.findAll();
@@ -255,6 +257,9 @@ public class EditUserAccountServlet extends SecureController {
         fp.addPresetValue(INPUT_USER_TYPE, userTypeId);
         fp.addPresetValue(ARG_USERID, user.getId());
         fp.addPresetValue(INPUT_RUN_WEBSERVICES, user.getRunWebservices() == true ? 1 : 0);
+
+        String sendPwd = SQLInitServlet.getField("user_account_notification");
+        fp.addPresetValue(USER_ACCOUNT_NOTIFICATION, sendPwd);
     }
 
     private void loadPresetValuesFromForm(FormProcessor fp) {

@@ -73,6 +73,9 @@
     <c:if test='${presetValue.key == "runWebServices"}'>
         <c:set var="runWebServices" value="${presetValue.value}" />
     </c:if>
+    <c:if test='${presetValue.key == "notifyPassword"}'>
+        <c:set var="notifyPassword" value="${presetValue.value}" />
+    </c:if>
 </c:forEach>
 <script type="text/JavaScript" language="JavaScript">
   <!--
@@ -262,10 +265,14 @@
     <SCRIPT LANGUAGE="JavaScript">
      function a() {
        if (document.getElementById('resetPassword').checked){
-         document.getElementById('displayPwd0').disabled=false
+         <c:if test="${notifyPassword eq 'email'}">
+            document.getElementById('displayPwd0').disabled=false
+         </c:if>    
          document.getElementById('displayPwd1').disabled=false
        } else {
-         document.getElementById('displayPwd0').disabled=true
+         <c:if test="${notifyPassword eq 'email'}">
+             document.getElementById('displayPwd0').disabled=true
+         </c:if>    
          document.getElementById('displayPwd1').disabled=true
        }
      }
@@ -284,13 +291,16 @@
     <td colspan="2">
         <c:choose>
          <c:when test="${displayPwd == 'no'}">
-            <input type="radio" checked name="displayPwd" id="displayPwd0" value="no" disabled="true"><fmt:message key="send_user_password_via_email" bundle="${resword}"/>
-            <input type="radio" name="displayPwd" id="displayPwd1" value="yes" disabled="true" ><fmt:message key="show_user_password_to_admin" bundle="${resword}"/>
+            <c:if test="${notifyPassword eq 'email'}">
+                <input type="radio" name="displayPwd" id="displayPwd0" value="no" disabled="true"><fmt:message key="send_user_password_via_email" bundle="${resword}"/>
+            </c:if>
+            <input type="radio" checked name="displayPwd" id="displayPwd1" value="yes" disabled="true" ><fmt:message key="show_user_password_to_admin" bundle="${resword}"/>
          </c:when>
          <c:otherwise>
-            <input type="radio" name="displayPwd" id="displayPwd0" value="no" disabled="true"><fmt:message key="send_user_password_via_email" bundle="${resword}"/>
+             <c:if test="${notifyPassword eq 'email'}">
+                <input type="radio" name="displayPwd" id="displayPwd0" value="no" disabled="true"><fmt:message key="send_user_password_via_email" bundle="${resword}"/>
+             </c:if>
             <input type="radio" checked name="displayPwd" id="displayPwd1" value="yes" disabled="true"><fmt:message key="show_user_password_to_admin" bundle="${resword}"/>
-
          </c:otherwise>
        </c:choose>
       </td>
