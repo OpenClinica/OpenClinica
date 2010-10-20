@@ -8,6 +8,7 @@
 package org.akaza.openclinica.control.submit;
 
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.rule.FileProperties;
 import org.akaza.openclinica.bean.rule.FileUploadHelper;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
 import org.akaza.openclinica.control.SpringServletAccess;
@@ -47,7 +48,7 @@ public class ImportRuleServlet extends SecureController {
     protected final Logger log = LoggerFactory.getLogger(ImportRuleServlet.class);
 
     Locale locale;
-    FileUploadHelper uploadHelper = new FileUploadHelper();
+    FileUploadHelper uploadHelper = new FileUploadHelper(new FileProperties("xml"));
     XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
     RulesPostImportContainerService rulesPostImportContainerService;
 
@@ -93,8 +94,11 @@ public class ImportRuleServlet extends SecureController {
             } catch (OpenClinicaSystemException re) {
                 // re.printStackTrace();
                 MessageFormat mf = new MessageFormat("");
-                mf.applyPattern(respage.getString("OCRERR_0016"));
+                mf.applyPattern(re.getErrorCode() == null ? respage.getString("OCRERR_0016") : respage.getString(re.getErrorCode()));
                 Object[] arguments = { re.getMessage() };
+                if (re.getErrorCode() != null) {
+                    arguments = re.getErrorParams();
+                }
                 addPageMessage(mf.format(arguments));
                 forwardPage(Page.IMPORT_RULES);
             }

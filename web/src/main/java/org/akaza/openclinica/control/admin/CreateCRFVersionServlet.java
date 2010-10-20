@@ -414,11 +414,7 @@ public class CreateCRFVersionServlet extends SecureController {
                 return tempFile;
             } else if (f.getName().indexOf(".xls") < 0 && f.getName().indexOf(".XLS") < 0) {
                 logger.info("file name:" + f.getName());
-
-                addPageMessage(respage.getString("file_you_uploaded_not_seem_excel_spreadsheet"));
-                // Validator.addError(errors, "excel_file", "The file you
-                // uploaded does not seem to be an Excel spreadsheet. Please
-                // upload again.");
+                Validator.addError(errors, "excel_file", respage.getString("file_you_uploaded_not_seem_excel_spreadsheet"));
                 session.setAttribute("version", version);
                 return tempFile;
 

@@ -7,24 +7,28 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import org.akaza.openclinica.bean.core.Utils;
+import org.akaza.openclinica.bean.rule.FileProperties;
+import org.akaza.openclinica.bean.rule.FileUploadHelper;
+import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.view.Page;
+import org.akaza.openclinica.web.InsufficientPermissionException;
+
 import java.io.File;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-import org.akaza.openclinica.bean.core.Utils;
-import org.akaza.openclinica.bean.rule.FileUploadHelper;
-import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.exception.OpenClinicaSystemException;
-import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.web.InsufficientPermissionException;
-
 public class UploadFileServlet extends SecureController {
     Locale locale;
-    FileUploadHelper uploadHelper = new FileUploadHelper();
+    FileUploadHelper uploadHelper = new FileUploadHelper(new FileProperties(CoreResources.getField("crf.file.extensions"),
+            CoreResources.getField("crf.file.extensionSettings")));
 
     @Override
     protected void mayProceed() throws InsufficientPermissionException {
@@ -100,8 +104,11 @@ public class UploadFileServlet extends SecureController {
                     }
                     session.setAttribute("newUploadedFiles", newUploadedFiles);
                 } catch (OpenClinicaSystemException e) {
-                    request.setAttribute("uploadFileStauts", "failed");
-                    addPageMessage(respage.getString("file_uploading_failed_please_check_logs_and_upload_again"));
+                	request.setAttribute("uploadFileStauts", "failed");
+                    MessageFormat mf = new MessageFormat("");
+                    mf.applyPattern(respage.getString(e.getErrorCode()));
+                    Object[] arguments = e.getErrorParams();
+                    addPageMessage(respage.getString("file_uploading_failed_please_check_logs_and_upload_again") + mf.format(arguments));
                     e.printStackTrace();
                 }
                 this.forwardPage(Page.FILE_UPLOAD);

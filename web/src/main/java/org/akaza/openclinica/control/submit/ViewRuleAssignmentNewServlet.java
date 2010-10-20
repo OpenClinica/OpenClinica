@@ -11,7 +11,6 @@ import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.rule.FileUploadHelper;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
@@ -47,7 +46,6 @@ public class ViewRuleAssignmentNewServlet extends SecureController {
     protected final Logger log = LoggerFactory.getLogger(ViewRuleAssignmentNewServlet.class);
 
     Locale locale;
-    FileUploadHelper uploadHelper = new FileUploadHelper();
     XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
     RuleSetServiceInterface ruleSetService;
     RulesPostImportContainerService rulesPostImportContainerService;

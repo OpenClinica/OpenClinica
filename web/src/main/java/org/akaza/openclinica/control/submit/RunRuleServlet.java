@@ -8,7 +8,6 @@
 package org.akaza.openclinica.control.submit;
 
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.rule.FileUploadHelper;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
@@ -38,7 +37,6 @@ public class RunRuleServlet extends SecureController {
     protected final Logger log = LoggerFactory.getLogger(RunRuleServlet.class);
 
     Locale locale;
-    FileUploadHelper uploadHelper = new FileUploadHelper();
     XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
     RuleSetServiceInterface ruleSetService;
     RulesPostImportContainerService rulesPostImportContainerService;

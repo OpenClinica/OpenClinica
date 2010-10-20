@@ -11,7 +11,6 @@ import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.core.ResponseType;
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.rule.FileUploadHelper;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
@@ -67,7 +66,6 @@ public class TestRuleServlet extends SecureController {
     protected final Logger log = LoggerFactory.getLogger(TestRuleServlet.class);
 
     Locale locale;
-    FileUploadHelper uploadHelper = new FileUploadHelper();
     XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
     RuleSetRuleDao ruleSetRuleDao;
     RuleSetDao ruleSetDao;

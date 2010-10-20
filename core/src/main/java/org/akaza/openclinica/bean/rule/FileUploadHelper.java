@@ -1,7 +1,15 @@
+/*
+ * OpenClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: http://www.openclinica.org/license
+ * copyright 2003-2010 Akaza Research
+ */
 package org.akaza.openclinica.bean.rule;
 
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -19,7 +27,18 @@ import javax.servlet.http.HttpServletRequest;
 public class FileUploadHelper {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    FileProperties fileProperties;
     FileRenamePolicy fileRenamePolicy;
+    
+
+    public FileUploadHelper() {
+        fileProperties = new FileProperties();
+	}
+
+    public FileUploadHelper(FileProperties fileProperties) {
+        super();
+        this.fileProperties = fileProperties;
+    }
 
     public List<File> returnFiles(HttpServletRequest request, ServletContext context) {
 
@@ -60,10 +79,10 @@ public class FileUploadHelper {
 
         // Create a factory for disk-based file items
         DiskFileItemFactory factory = new DiskFileItemFactory();
-        // factory.setSizeThreshold(20 * 1024 * 1024); //size in bytes?
 
         // Create a new file upload handler
         ServletFileUpload upload = new ServletFileUpload(factory);
+        upload.setFileSizeMax(getFileProperties().getFileSizeMax());
         try {
             // Parse the request
             List<FileItem> items = upload.parseRequest(request);
@@ -77,19 +96,21 @@ public class FileUploadHelper {
                     request.setAttribute(item.getFieldName(), item.getString());
                     // DO NOTHING , THIS SHOULD NOT BE Handled here
                 } else {
-                    // System.out.println("found " + dirToSaveUploadedFileIn + " and item " + item.getName());
-                    files.add(processUploadedFile(item, dirToSaveUploadedFileIn));
+                    getFileProperties().isValidExtension(item.getName());
+                	files.add(processUploadedFile(item, dirToSaveUploadedFileIn));
+                		
                 }
             }
             return files;
-        } catch (FileUploadException fue) {
-            throw new OpenClinicaSystemException(fue.getMessage(), fue.getCause());
-        } catch (Exception e) {
-            throw new OpenClinicaSystemException(e.getMessage(), e.getCause());
+        }catch (FileSizeLimitExceededException slee) {
+            throw new OpenClinicaSystemException("exceeds_permitted_file_size", new Object[] { String.valueOf(getFileProperties().getFileSizeMaxInMb()) },
+                    slee.getMessage());
+		}catch (FileUploadException fue) {
+            throw new OpenClinicaSystemException("file_upload_error_occured", new Object[] { fue.getMessage() }, fue.getMessage());
         }
     }
 
-    private File processUploadedFile(FileItem item, String dirToSaveUploadedFileIn) throws Exception {
+    private File processUploadedFile(FileItem item, String dirToSaveUploadedFileIn) {
         dirToSaveUploadedFileIn = dirToSaveUploadedFileIn == null ? System.getProperty("java.io.tmpdir") : dirToSaveUploadedFileIn;
         String fileName = item.getName();
         // Some browsers IE 6,7 getName returns the whole path
@@ -102,7 +123,11 @@ public class FileUploadHelper {
         if (fileRenamePolicy != null) {
             uploadedFile = fileRenamePolicy.rename(uploadedFile);
         }
-        item.write(uploadedFile);
+        try {
+			item.write(uploadedFile);
+		} catch (Exception e) {
+			throw new OpenClinicaSystemException(e.getMessage());
+		}
         return uploadedFile;
 
     }
@@ -112,6 +137,14 @@ public class FileUploadHelper {
             new File(theDir).mkdirs();
         }
         return new File(theDir).toString();
+    }
+
+    public FileProperties getFileProperties() {
+        return fileProperties;
+    }
+
+    public void setFileProperties(FileProperties fileProperties) {
+        this.fileProperties = fileProperties;
     }
 
 }

@@ -43,6 +43,12 @@ public class OpenClinicaSystemException extends RuntimeException {
         this.errorParams = errorParams;
     }
 
+    public OpenClinicaSystemException(String code, Object[] errorParams, String message) {
+        this(message);
+        this.errorCode = code;
+        this.errorParams = errorParams;
+    }
+
     public String getErrorCode() {
         return errorCode;
     }
