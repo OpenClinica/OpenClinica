@@ -814,7 +814,7 @@ include the default value first in the select list --%>
    <c:choose>
     <c:when test="${(displayItem.numDiscrepancyNotes > 0) && (isForcedRFC eq 'false')}">
 
-       <td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"   onmouseover="callTip(genToolTips(${itemId}))";
+       <td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"   onmouseover="callTip(genToolTips(${itemId}));"
            onmouseout="UnTip()" onClick=
     "openDNoteWindow('ViewDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&isRfc=0&itemId=<c:out value="${itemId}" />&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=input<c:out value="${itemId}"/>&column=value&monitor=1&writeToDB=1','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
     ><img id="flag_input<c:out value="${itemId}" />" name="flag_input<c:out value="${itemId}" />" src=
@@ -825,7 +825,7 @@ include the default value first in the select list --%>
     </c:when>
 	<c:when test="${isForcedRFC eq 'true'}">
 	
-		<td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"    onmouseover="callTip(genToolTips(${itemId}))";
+		<td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"    onmouseover="callTip(genToolTips(${itemId}));"
            onmouseout="UnTip()" onClick=
     "openDNWindow('CreateDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&isRfc=1&itemId=<c:out value="${itemId}" />&groupLabel=<c:out value="${displayItem.metadata.groupLabel}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=input<c:out value="${itemId}" />&column=value&enterData=1&writeToDB=0&errorFlag=<c:out value="${errorFlag}"/>','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
     ><img id="flag_input<c:out value="${itemId}" />" name="flag_input<c:out value="${itemId}" />" src=
@@ -836,7 +836,7 @@ include the default value first in the select list --%>
 	</c:when>
     <c:otherwise>
 
-       <td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"   onmouseover="callTip(genToolTips(${itemId}))";
+       <td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"   onmouseover="callTip(genToolTips(${itemId}));"
            onmouseout="UnTip()" onClick=
     "openDNWindow('CreateDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&groupLabel=<c:out value="${displayItem.metadata.groupLabel}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=input<c:out value="${itemId}" />&column=value&enterData=1&writeToDB=1&errorFlag=<c:out value="${errorFlag}"/>','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
     ><img id="flag_input<c:out value="${itemId}" />" name="flag_input<c:out value="${itemId}" />" src=
@@ -850,7 +850,7 @@ include the default value first in the select list --%>
     </c:when>
     <c:otherwise>
 
-    <td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"   onmouseover="callTip(genToolTips(${itemId}))";
+    <td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"   onmouseover="callTip(genToolTips(${itemId}));"
            onmouseout="UnTip()" onClick=
     "openDNWindow('CreateDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&groupLabel=<c:out value="${displayItem.metadata.groupLabel}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=input<c:out value="${itemId}" />&column=value&enterData=1&errorFlag=<c:out value="${errorFlag}"/>','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
     ><img id="flag_input<c:out value="${itemId}" />" name="flag_input<c:out value="${itemId}" />" src=

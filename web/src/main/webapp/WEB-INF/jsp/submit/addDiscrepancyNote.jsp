@@ -350,6 +350,7 @@ function setResStatus(resStatusId, destinationUserId) {
 			<c:choose>
 			<c:when test="${parent == null || parent.id ==0 }">
 			<%-- or when the user is not a CDC? --%>
+                <span id="xxx" disabled>
             <select name="userAccountId" id="userAccountId" class="formfieldL">
 
               <c:forEach var="user" items="${userAccounts}">
@@ -363,6 +364,7 @@ function setResStatus(resStatusId, destinationUserId) {
                </c:choose>
              </c:forEach>
             </select>
+                    </span>
             <input type="hidden" name="userAccountId" value="<c:out value="${userAccountId1}"/>"/>
 			</c:when>
 			<c:otherwise>
