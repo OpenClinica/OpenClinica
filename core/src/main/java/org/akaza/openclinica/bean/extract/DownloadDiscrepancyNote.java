@@ -12,11 +12,8 @@ import javax.servlet.ServletOutputStream;
 
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.core.SessionManager;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import com.lowagie.text.BadElementException;
@@ -301,6 +298,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
 
 
         writer.append("\n");
+//        System.out.println(writer.toString());
         return writer.toString();
 
 
@@ -526,12 +524,21 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
     private String escapeQuotesInCSV(String csvValue){
 
         if(csvValue == null) return "";
+
+        if(csvValue.contains("\u2018")){
+            csvValue = csvValue.replaceAll("\u2018", "'");
+        }
+
+        if(csvValue.contains("\u201C")){
+            csvValue = csvValue.replaceAll("\u201C", "\"");
+        }
+
         //Escaping special characters in the String.
         csvValue = StringEscapeUtils.escapeJava(csvValue);
+
+
         if(csvValue.contains(",")){
-
             return new StringBuilder("\"").append(csvValue).append("\"").toString();
-
         }  else {
             return csvValue;
         }
@@ -693,5 +700,12 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
         return table;
 
     }
+
+//    public static void main (String arg[]){
+//        String s = "test‘ “ & $ % +";
+//        System.out.println(StringEscapeUtils.escapeJava(s));
+//        s = s.replaceAll("\u201C","\"");
+//        System.out.println(s);
+//    }
 
 }
