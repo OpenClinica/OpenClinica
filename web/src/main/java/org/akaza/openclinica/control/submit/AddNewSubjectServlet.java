@@ -444,7 +444,13 @@ public class AddNewSubjectServlet extends SecureController {
                 boolean existingSubShown = fp.getBoolean(EXISTING_SUB_SHOWN);
 
                 if (!existingSubShown) {
-                    forwardPage(Page.ADD_NEW_SUBJECT);
+                    Object isSubjectOverlay = fp.getRequest().getParameter("subjectOverlay");
+                    if (isSubjectOverlay != null){
+                        request.setAttribute("showOverlay", true);
+                        forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
+                    } else {
+                        forwardPage(Page.ADD_NEW_SUBJECT);
+                    }
                 } else {
                     forwardPage(Page.ADD_EXISTING_SUBJECT);
                 }

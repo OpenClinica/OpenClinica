@@ -85,7 +85,6 @@
         ${findSubjectsHtml}
     </form>
 </div>
-
 <div id="addSubjectForm" style="display:none;">
       <c:import url="../submit/addNewSubjectExpressNew.jsp">
       </c:import>
@@ -93,3 +92,9 @@
 
 <br>
 <jsp:include page="../include/footer.jsp"/>
+
+<script type="text/javascript">
+    <c:if test="${showOverlay}">
+        jQuery.blockUI({ message: jQuery('#addSubjectForm'), css:{left: "300px", top:"10px" } });
+    </c:if>
+</script>

@@ -15,7 +15,9 @@
 <jsp:useBean scope="request" id="label" class="java.lang.String"/>
 
 <form name="subjectForm" action="AddNewSubject" method="post">
-<div style="width: 475px; height: 478px; overflow: scroll; background:#FFFFFF;">
+<input type="hidden" name="subjectOverlay" value="true">
+
+<div style="width: 500px; height: 550px; overflow: scroll; background:#FFFFFF;">
 <table border="0" cellpadding="0" >
     <tr style="height:10px;">
         <td width="35%"><h3><fmt:message key="add_new_subject" bundle="${resword}"/></h3></td>
@@ -42,6 +44,10 @@
                     </div></td>
                     <td>*</td>
                 </tr>
+                <tr>
+                    <td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="label"/></jsp:include></td>
+                </tr>
+                
             </table>
         </td>
     </tr>
@@ -57,6 +63,7 @@
                     </div></td>
                     <td>*</td>
                 </tr>
+                <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueIdentifier"/></jsp:include></td>
             </table>
         </td>
     </tr>
@@ -71,6 +78,9 @@
                         <input onfocus="this.select()" type="text" name="uniqueIdentifier" value="<c:out value="${uniqueIdentifier}"/>" size="50" class="formfieldXL">
                     </div></td>
                     <td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueIdentifier"/></jsp:include></td>
                 </tr>
             </table>
         </td>
@@ -103,6 +113,9 @@
                     </a>
                         *
                     </td>
+                </tr>
+                <tr>
+                    <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="enrollmentDate"/></jsp:include></td>
                 </tr>
             </table>
         </td>
@@ -149,6 +162,10 @@
         </td>
     </c:if>
     </tr>
+    <tr>
+        <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="gender"/></jsp:include></td>
+    </tr>
+
 
     <c:choose>
     <c:when test="${study.studyParameterConfig.collectDob == '1'}">
@@ -173,6 +190,10 @@
             </table>
         </td>
     </tr>
+    <tr>
+        <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dob"/></jsp:include></td>
+    </tr>
+
     </c:when>
     <c:when test="${study.studyParameterConfig.collectDob == '2'}">
     <tr valign="top">
@@ -188,6 +209,10 @@
             </table>
         </td>
     </tr>
+    <tr>
+        <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="yob"/></jsp:include></td>
+    </tr>
+
   </c:when>
   <c:otherwise>
     <input type="hidden" name="dob" value="" />
@@ -209,6 +234,8 @@
                     <option value="<c:out value="${studyGroup.id}"/>"><c:out value="${studyGroup.name}"/></option>
                   </c:forEach>
               </select></div>
+             <c:import url="../showMessage.jsp"><c:param name="key" value="studyGroupId${count}" /></c:import>
+
               </td>
               <c:if test="${group.subjectAssignment=='Required'}">
                 <td align="left">*</td>
