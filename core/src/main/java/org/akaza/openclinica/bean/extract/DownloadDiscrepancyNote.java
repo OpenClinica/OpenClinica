@@ -533,6 +533,14 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
             csvValue = csvValue.replaceAll("\u201C", "\"");
         }
 
+        if(csvValue.contains("\r\n")){
+            csvValue = csvValue.replaceAll("\r\n", "");
+        }
+
+        if(csvValue.contains("\n")){
+            csvValue = csvValue.replaceAll("\n", "");
+        }
+
         //Escaping special characters in the String.
         csvValue = StringEscapeUtils.escapeJava(csvValue);
 
