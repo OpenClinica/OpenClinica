@@ -56,6 +56,7 @@ public class CreateUserAccountServlet extends SecureController {
     public static final String INPUT_TYPE = "type";
     public static final String INPUT_DISPLAY_PWD = "displayPwd";
     public static final String INPUT_RUN_WEBSERVICES = "runWebServices";
+    public static final String USER_ACCOUNT_NOTIFICATION = "notifyPassword";
 
     /*
      * (non-Javadoc)
@@ -170,8 +171,11 @@ public class CreateUserAccountServlet extends SecureController {
             fp.setCurrentIntValuesAsPreset(ddlbFields);
 
             HashMap presetValues = fp.getPresetValues();
+            // Mantis Issue 6058.
+            String sendPwd = SQLInitServlet.getField("user_account_notification");
+            fp.addPresetValue(USER_ACCOUNT_NOTIFICATION, sendPwd);
+            // 
             setPresetValues(presetValues);
-
             forwardPage(Page.CREATE_ACCOUNT);
         } else {
             UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());

@@ -85,6 +85,9 @@
 	<c:if test='${presetValue.key == "runWebServices"}'>
         <c:set var="runWebServices" value="${presetValue.value}" />
     </c:if>
+    <c:if test='${presetValue.key == "notifyPassword"}'>
+        <c:set var="notifyPassword" value="${presetValue.value}" />
+    </c:if>
 </c:forEach>
 
 <script type="text/JavaScript" language="JavaScript">
@@ -326,7 +329,7 @@ int selectedValue;
             <table border="0" cellpadding="0" cellspacing="0">
                 <tr>
                     <td valign="top">
-                        <input type="checkbox" name="runWebServices" id="runWebServices" value="1"
+                        <br><input type="checkbox" name="runWebServices" id="runWebServices" value="1"
                             <c:if test="${runWebServices != 0}">checked</c:if>
                         >
                     </td>
@@ -342,13 +345,13 @@ int selectedValue;
 	  <td class="formlabel"><fmt:message key="user_password_generated" bundle="${resword}"/>:</td>
 	  	<td>
 	  	<c:choose>
-         <c:when test="${displayPwd == 'no'}">
+         <c:when test="${notifyPassword eq 'email'}">
             <input type="radio" id="displayPwd0" checked name="displayPwd" value="no"><fmt:message key="send_user_password_via_email" bundle="${resword}"/>
             <br><input type="radio" id="displayPwd1" name="displayPwd" value="yes"><fmt:message key="show_user_password_to_admin" bundle="${resword}"/>
          </c:when>
          <c:otherwise>
-            <input type="radio" id="displayPwd0" name="displayPwd" value="no"><fmt:message key="send_user_password_via_email" bundle="${resword}"/>
-            <br><input type="radio" id="displayPwd1" checked name="displayPwd" value="yes"><fmt:message key="show_user_password_to_admin" bundle="${resword}"/>
+            <%--<input type="radio" id="displayPwd0" name="displayPwd" value="no"><fmt:message key="send_user_password_via_email" bundle="${resword}"/>--%>
+            <br><input type="radio" checked id="displayPwd1" checked name="displayPwd" value="yes"><fmt:message key="show_user_password_to_admin" bundle="${resword}"/>
          </c:otherwise>
        </c:choose>
       </td>
