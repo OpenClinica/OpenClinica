@@ -676,5 +676,9 @@ public class Page {
     public void setFileName(String newFileName) {
         this.fileName = newFileName;
     }
+    
+    public static Page setNewPage(String fileName, String title) {
+        return new Page(fileName, title);
+    }
 
 }
