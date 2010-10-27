@@ -14,6 +14,8 @@
 <jsp:useBean scope='request' id='crfId' class='java.lang.String'/>
 <jsp:useBean scope='request' id='eventId' class='java.lang.String'/>
 <jsp:useBean scope='request' id='exitTo' class='java.lang.String'/>
+<jsp:useBean scope="request" id="fromViewNotes" class="java.lang.String"/>
+<jsp:useBean scope="session" id="viewNotesURL" class="java.lang.String"/>
 
 <jsp:useBean scope="request" id="section" class=
   "org.akaza.openclinica.bean.submit.DisplaySectionBean"/>
@@ -153,6 +155,11 @@ http://svn.akazaresearch.com:8080/OpenClinica-2.2/EnterDataForStudyEvent?eventId
 <p><fmt:message key="enter_note_for_item" bundle="${restext}"/></p>
 
 <c:choose>
+<c:when test="${fn:length(fromViewNotes)>0 && !empty viewNotesURL}">
+	<input type="button" onclick="window.location = '<c:out value="${viewNotesURL}"/>'" value="<fmt:message key="exit" bundle="${resword}"/>" class="button"/>
+</c:when>
+<c:otherwise>
+<c:choose>
     <c:when test="${!empty window_location}">
         <input type="button" onclick="window.location = '<c:out value="${window_location}"/>'" value="<fmt:message key="exit" bundle="${resword}"/>" class="button"/>
     </c:when>
@@ -175,6 +182,8 @@ http://svn.akazaresearch.com:8080/OpenClinica-2.2/EnterDataForStudyEvent?eventId
             </c:otherwise>
         </c:choose>
     </c:otherwise>
+</c:choose>
+</c:otherwise>
 </c:choose>
 <br/>
 
