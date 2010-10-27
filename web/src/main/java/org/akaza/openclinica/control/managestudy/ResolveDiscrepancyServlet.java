@@ -253,12 +253,20 @@ public class ResolveDiscrepancyServlet extends SecureController {
         boolean goNext = prepareRequestForResolution(request, sm.getDataSource(), currentStudy, discrepancyNoteBean, isCompleted);
 
         Page p = getPageForForwarding(discrepancyNoteBean, isCompleted);
+        
 
         // logger.info("found page for forwarding: " + p.getFileName());
         if (p == null) {
             throw new InconsistentStateException(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_SERVLET, resexception
                     .getString("the_discrepancy_note_triying_resolve_has_invalid_type"));
         } else {
+            if(p.getFileName().contains("?")) {
+                if(!p.getFileName().contains("fromViewNotes=1")) {
+                    p.setFileName(p.getFileName()+"&fromViewNotes=1");
+                }
+            } else {
+                p.setFileName(p.getFileName()+"?fromViewNotes=1");
+            }
             String createNoteURL = CreateDiscrepancyNoteServlet.getAddChildURL(discrepancyNoteBean, ResolutionStatus.CLOSED, true);
             setPopUpURL(createNoteURL);
         }

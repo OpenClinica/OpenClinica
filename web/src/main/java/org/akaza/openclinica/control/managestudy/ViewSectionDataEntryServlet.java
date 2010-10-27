@@ -7,6 +7,18 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -54,18 +66,6 @@ import org.akaza.openclinica.service.DiscrepancyNoteThread;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 /**
  * @author jxu <p/> View a CRF version section data entry
@@ -456,6 +456,12 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
         super.populateNotesWithDBNoteCounts(discNotes, dsb);
 
+        if(fp.getString("fromViewNotes")!=null && "1".equals(fp.getString("fromViewNotes"))) {
+            request.setAttribute("fromViewNotes", fp.getString("fromViewNotes"));
+        } else {
+            session.removeAttribute("viewNotesURL");
+        }
+        
         if ("saveNotes".equalsIgnoreCase(action)) {
             logger.info("33333how many group rows:" + dsb.getDisplayItemGroups().size());
 

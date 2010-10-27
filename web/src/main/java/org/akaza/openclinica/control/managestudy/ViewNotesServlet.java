@@ -9,6 +9,13 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
@@ -42,9 +49,6 @@ import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.DiscrepancyNoteRow;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-
-import java.util.*;
 
 /**
  * 
@@ -206,7 +210,12 @@ public class ViewNotesServlet extends SecureController {
 
         String viewNotesHtml = factory.createTable(request, response).render();
         request.setAttribute("viewNotesHtml", viewNotesHtml);
-
+        
+        String viewNotesURL = this.getPageURL();
+        session.setAttribute("viewNotesURL", viewNotesURL);
+        String viewNotesPageFileName = this.getPageServletFileName();
+        session.setAttribute("viewNotesPageFileName", viewNotesPageFileName);
+        
         if ("yes".equalsIgnoreCase(fp.getString(PRINT))) {
             List allNotes = dndao.findAllDiscrepancyNotesDataByStudy(currentStudy);
             request.setAttribute("allNotes", factory.populateDataInNote(allNotes));
