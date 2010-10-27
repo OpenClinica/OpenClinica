@@ -8,44 +8,6 @@
 
 package org.akaza.openclinica.control.core;
 
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
-import org.akaza.openclinica.bean.service.ProcessingResultType;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.core.EmailEngine;
-import org.akaza.openclinica.core.SessionManager;
-import org.akaza.openclinica.dao.core.AuditableEntityDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
-import org.akaza.openclinica.dao.service.StudyConfigService;
-import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.akaza.openclinica.exception.OpenClinicaException;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.view.BreadcrumbTrail;
-import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.view.StudyInfoPanel;
-import org.akaza.openclinica.view.StudyInfoPanelLine;
-import org.akaza.openclinica.web.InconsistentStateException;
-import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.akaza.openclinica.web.SQLInitServlet;
-import org.akaza.openclinica.web.bean.EntityBeanTable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.quartz.SchedulerException;
-import org.quartz.Trigger;
-import org.quartz.impl.StdScheduler;
-import org.springframework.mail.MailException;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -75,6 +37,43 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
+
+import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
+import org.akaza.openclinica.control.SpringServletAccess;
+import org.akaza.openclinica.core.EmailEngine;
+import org.akaza.openclinica.core.SessionManager;
+import org.akaza.openclinica.dao.core.AuditableEntityDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
+import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
+import org.akaza.openclinica.dao.service.StudyConfigService;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import org.akaza.openclinica.exception.OpenClinicaException;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.view.BreadcrumbTrail;
+import org.akaza.openclinica.view.Page;
+import org.akaza.openclinica.view.StudyInfoPanel;
+import org.akaza.openclinica.view.StudyInfoPanelLine;
+import org.akaza.openclinica.web.InconsistentStateException;
+import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.akaza.openclinica.web.SQLInitServlet;
+import org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.quartz.SchedulerException;
+import org.quartz.Trigger;
+import org.quartz.impl.StdScheduler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.mail.MailException;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * This class enhances the Controller in several ways.
@@ -623,6 +622,20 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             // above added 01/19/2005, tbh
             context.getRequestDispatcher(jspPage.getFileName()).forward(request, response);
         } catch (Exception se) {
+            if("View Notes".equals(jspPage.getTitle())) {
+                String viewNotesURL = jspPage.getFileName();
+                if(viewNotesURL != null && viewNotesURL.contains("listNotes_p_=")) {
+                    String[] ps = viewNotesURL.split("listNotes_p_=");
+                    String t = ps[1].split("&")[0];
+                    int p = t.length()>0 ? Integer.valueOf(t).intValue() : -1;
+                    if(p>1) {
+                        viewNotesURL = viewNotesURL.replace("listNotes_p_="+p, "listNotes_p_="+(p-1));
+                        forwardPage(Page.setNewPage(viewNotesURL, "View Notes"));
+                    }else if(p<=0) {
+                        forwardPage(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY);
+                    }
+                }
+            }
             se.printStackTrace();
         }
 
@@ -904,7 +917,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             byte[] bbuf = new byte[(int) f.length()];
             in = new DataInputStream(new FileInputStream(f));
             int length;
-            while ((in != null) && ((length = in.read(bbuf)) != -1)) {
+            while (in != null && (length = in.read(bbuf)) != -1) {
                 op.write(bbuf, 0, length);
             }
 
@@ -921,6 +934,28 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 op.close();
             }
         }
+    }
+    
+    public String getPageServletFileName() {
+        String fileName = request.getServletPath();  
+        String temp = request.getPathInfo();
+        if(temp != null) {
+            fileName += temp;
+        }
+        temp = request.getQueryString();  
+        if(temp != null && temp.length()>0) {
+            fileName += "?" + temp;
+        }
+        return fileName;
+    }
+    
+    public String getPageURL() {
+        String url = request.getRequestURL().toString();
+        String query = request.getQueryString();
+        if(url != null && url.length()>0 && query != null) {
+            url += "?" + query;
+        }
+        return url;
     }
 
     /**
