@@ -7,6 +7,11 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -19,11 +24,6 @@ import org.akaza.openclinica.control.managestudy.ViewNotesServlet;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * @author jxu
@@ -52,7 +52,60 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
             return Page.ADMIN_EDIT_SERVLET;
         } else {
             Page target = Page.ADMIN_EDIT_SERVLET;
-            target.setFileName(target.getFileName() + "?eventCRFId=" + eventCRFId + "&sectionId=" + sectionId + "&tab=" + tabId);
+            String s = target.getFileName().trim();
+            if(s.contains("?")) {
+                String[] t = s.split("\\?");
+                String x = "";
+                String y = t[0] + "?";
+                if(t.length>1) {
+                    if(t[1].contains("&")) {
+                        String[] ts = t[1].split("&");
+                        for(int i=0; i<ts.length; ++i) {
+                            if(ts[i].contains("eventCRFId=")) {
+                                ts[i] = "eventCRFId=" + eventCRFId;
+                                x += "e";
+                            } else if(ts[i].contains("sectionId=")) {
+                                ts[i] = "sectionId=" + sectionId;
+                                x += "s";
+                            } else if(ts[i].contains("tab=")) {
+                                ts[i] = "tab=" + tabId;
+                                x += "t";
+                            }
+                            y += ts[i] + "&";
+                        }
+                    } else {
+                        if(t[1].contains("eventCRFId=")) {
+                            t[1] = "eventCRFId=" + eventCRFId;
+                            x += "e";
+                        } else if(t[1].contains("sectionId=")) {
+                            t[1] = "sectionId=" + sectionId;
+                            x += "s";
+                        } else if(t[1].contains("tab=")) {
+                            t[1] = "tab=" + tabId;
+                            x += "t";
+                        }
+                        y += t[1]+"&";
+                    }
+                    if(x.length()<3) {
+                        if(!x.contains("e")) {
+                            y += "eventCRFId=" + eventCRFId + "&";
+                        } 
+                        if(!x.contains("s")) {
+                            y += "sectionId=" + sectionId + "&";
+                        } 
+                        if(!x.contains("t")) {
+                            y += "tab=" + tabId + "&"; 
+                        }
+                    }
+                    y = y.substring(0,y.length()-1);
+                    target.setFileName(y);
+                } else {
+                    logger.info("It's a wrong servlet page:" + s);
+                }
+            }else {
+                target.setFileName(target.getFileName() + "?eventCRFId=" + eventCRFId + "&sectionId=" + sectionId + "&tab=" + tabId);
+            }
+            //target.setFileName(target.getFileName() + "?eventCRFId=" + eventCRFId + "&sectionId=" + sectionId + "&tab=" + tabId);
             return target;
         }
 

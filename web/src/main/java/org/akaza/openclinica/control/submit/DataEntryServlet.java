@@ -285,7 +285,7 @@ public abstract class DataEntryServlet extends SecureController {
         locale = request.getLocale();
 
         FormDiscrepancyNotes discNotes;
-
+        
         panel.setStudyInfoShown(false);
         String age = "";
         if (fp.getString(GO_EXIT).equals("") && !isSubmitted && fp.getString("tabId").equals("") && fp.getString("sectionId").equals("")) {
@@ -358,6 +358,11 @@ public abstract class DataEntryServlet extends SecureController {
         request.setAttribute("closedNum", closedNum + "");
         request.setAttribute("resolvedNum", resolvedNum + "");
         request.setAttribute("notAppNum", notAppNum + "");
+        
+        String fromViewNotes = fp.getString("fromViewNotes");
+        if(fromViewNotes!=null && "1".equals(fromViewNotes)) {
+            request.setAttribute("fromViewNotes", fromViewNotes);
+        }
 
         // Not necessary: } catch (NullPointerException npe) {
         // temp fix, jun please address the above problems
@@ -414,6 +419,13 @@ public abstract class DataEntryServlet extends SecureController {
             // addPageMessage("You chose to exit the data entry page.");
             // changed bu jxu 03/06/2007- we should use redirection to go to
             // another servlet
+            if(fromViewNotes!=null && "1".equals(fromViewNotes)) {
+                String viewNotesURL = (String)session.getAttribute("viewNotesURL");
+                if(viewNotesURL!=null && viewNotesURL.length()>0) {
+                    response.sendRedirect(response.encodeRedirectURL(viewNotesURL));
+                }
+                return;
+            }
             String fromResolvingNotes = fp.getString("fromResolvingNotes", true);
             String winLocation = (String) session.getAttribute(ViewNotesServlet.WIN_LOCATION);
             if (!StringUtil.isBlank(fromResolvingNotes) && !StringUtil.isBlank(winLocation)) {
@@ -1799,6 +1811,14 @@ public abstract class DataEntryServlet extends SecureController {
                                     session.removeAttribute("mayProcessUploading");
 
                                     request.setAttribute("eventId", new Integer(ecb.getStudyEventId()).toString());
+                                    if(fromViewNotes != null && "1".equals(fromViewNotes)) {
+                                        String viewNotesPageFileName = (String)session.getAttribute("viewNotesPageFileName");
+                                        session.removeAttribute("viewNotesPageFileName");
+                                        session.removeAttribute("viewNotesURL");
+                                        if(viewNotesPageFileName!=null && viewNotesPageFileName.length()>0) {
+                                            forwardPage(Page.setNewPage(viewNotesPageFileName, "View Notes"));
+                                        }
+                                    }
                                     forwardPage(Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET);
                                     return;
 
