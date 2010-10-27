@@ -214,6 +214,12 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
             writer.append(",");
             writer.append("Date Update");
             writer.append(",");
+            writer.append("Days Open");
+            writer.append(",");
+            writer.append("Days Since Updated");
+            writer.append(",");
+
+
             if(discNoteBean.getDisType() != null)  {
                 writer.append("Discrepancy Type");
                 writer.append(",");
@@ -264,7 +270,13 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
 
         writer.append(escapeQuotesInCSV(discNoteBean.getUpdatedDateString()+""));
         writer.append(",");
-        
+
+        writer.append(escapeQuotesInCSV(discNoteBean.getAge()+""));
+        writer.append(",");
+
+        writer.append(escapeQuotesInCSV(discNoteBean.getDays()+""));
+        writer.append(",");
+
         if(discNoteBean.getDisType() != null)  {
             writer.append(escapeQuotesInCSV(discNoteBean.getDisType().getName()));
             writer.append(",");
@@ -627,6 +639,12 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
             cell = createCell("Discrepancy Note ID",dnBean.getId()+"");
             table.addCell(cell);
 
+            cell = createCell("Days Open",dnBean.getAge()+"");
+            table.addCell(cell);
+
+            cell = createCell("Days Since Updated",dnBean.getDays()+"");
+            table.addCell(cell);
+            
         }
 
         return table;
