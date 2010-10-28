@@ -10,6 +10,7 @@ package org.akaza.openclinica.core.form;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.regex.Pattern;
 
@@ -104,6 +105,7 @@ public class StringUtil {
     }
 
     /**
+     * Allow only 4 digits, no more, no less
      * 
      * @param s
      * @param yearFormat
@@ -112,11 +114,16 @@ public class StringUtil {
      * @author ywang (Nov., 2008)
      */
     public static boolean isPartialYear(String s, String yearFormat) {
+        int dn = 0;
         char[] cyear = s.toCharArray();
         for (char c : cyear) {
             if (!Character.isDigit(c)) {
                 return false;
             }
+            ++dn;
+        }
+        if(dn != 4) {
+            return false;
         }
         String yearformat = parseDateFormat(yearFormat) + "-MM-dd";
         SimpleDateFormat sdf_y = new SimpleDateFormat(yearformat);
@@ -131,6 +138,7 @@ public class StringUtil {
     }
 
     /**
+     * The year can only between 1000 and 9999.
      * 
      * @param s
      * @param yearMonthFormat
@@ -163,7 +171,7 @@ public class StringUtil {
 
     /**
      * Return true if a date String is the same day when it is parsed by two
-     * different dateFormats.
+     * different dateFormats. The year can only between 1000 and 9999.
      * 
      * @param dateFormat1
      * @param dateFormat2
@@ -180,6 +188,12 @@ public class StringUtil {
             try {
                 String temp = sdf2.format(d1);
                 if (temp.equals(dateStr)) {
+                    Calendar c = Calendar.getInstance();
+                    c.setTime(d1);
+                    int year = c.get(Calendar.YEAR);
+                    if(year>9999 || year<1000) {
+                        return false;
+                    }
                     return true;
                 } else {
                     return false;
