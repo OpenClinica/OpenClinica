@@ -25,6 +25,8 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
 import java.util.Locale;
+import java.util.Date;
+import java.util.HashMap;
 
 /**
  * Servlet for creating a table.
@@ -87,6 +89,17 @@ public class ListStudySubjectsServlet extends SecureController {
             // int nextLabel = getStudySubjectDAO().findTheGreatestLabel() + 1;
             // request.setAttribute("label", new Integer(nextLabel).toString());
             request.setAttribute("label", AUTO_LABEL);
+        }
+
+        if (fp.getRequest().getParameter("subjectOverlay") == null){
+            Date today = new Date(System.currentTimeMillis());
+            String todayFormatted = local_df.format(today);
+            if (request.getAttribute(PRESET_VALUES) != null) {
+                fp.setPresetValues((HashMap)request.getAttribute(PRESET_VALUES));
+            }
+            fp.addPresetValue(AddNewSubjectServlet.INPUT_ENROLLMENT_DATE, todayFormatted);
+            fp.addPresetValue(AddNewSubjectServlet.INPUT_EVENT_START_DATE, todayFormatted);
+            setPresetValues(fp.getPresetValues());
         }
 
         request.setAttribute("closeInfoShowIcons", true);

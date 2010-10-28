@@ -109,6 +109,9 @@ public class AddNewSubjectServlet extends SecureController {
 
     public static final String FORM_DISCREPANCY_NOTES_NAME = "fdnotes";
 
+    public static final String STUDY_EVENT_DEFINITION = "studyEventDefinition";
+    public static final String LOCATION = "location";
+
     // YW <<
     String DOB = "";
     String YOB = "";
@@ -432,6 +435,8 @@ public class AddNewSubjectServlet extends SecureController {
                 fp.addPresetValue(INPUT_SECONDARY_LABEL, fp.getString(INPUT_SECONDARY_LABEL));
                 fp.addPresetValue(INPUT_ENROLLMENT_DATE, fp.getString(INPUT_ENROLLMENT_DATE));
                 fp.addPresetValue(INPUT_EVENT_START_DATE, fp.getString(INPUT_EVENT_START_DATE));
+                fp.addPresetValue(STUDY_EVENT_DEFINITION, fp.getInt(STUDY_EVENT_DEFINITION));
+                fp.addPresetValue(LOCATION, fp.getString(LOCATION));
 
                 if (currentStudy.isGenetic()) {
                     String intFields[] = { INPUT_GROUP, INPUT_FATHER, INPUT_MOTHER };
@@ -446,6 +451,14 @@ public class AddNewSubjectServlet extends SecureController {
                 if (!existingSubShown) {
                     Object isSubjectOverlay = fp.getRequest().getParameter("subjectOverlay");
                     if (isSubjectOverlay != null){
+                        int eventId = fp.getInt("studyEventDefinition");
+                        if (eventId < 1) {
+                             Validator.addError(errors, STUDY_EVENT_DEFINITION, resexception.getString("input_not_acceptable_option"));
+                        }
+                        String location = fp.getString(LOCATION);
+                        if (location == null && location.length() == 0) {
+                            Validator.addError(errors, LOCATION, resexception.getString("field_not_blank"));
+                        }
                         request.setAttribute("showOverlay", true);
                         forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
                     } else {

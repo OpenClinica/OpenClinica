@@ -14,6 +14,71 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <jsp:useBean scope="request" id="label" class="java.lang.String"/>
 
+<jsp:useBean scope="session" id="study" class="org.akaza.openclinica.bean.managestudy.StudyBean" />
+<jsp:useBean scope="request" id="pageMessages" class="java.util.ArrayList" />
+<jsp:useBean scope="request" id="presetValues" class="java.util.HashMap" />
+
+<jsp:useBean scope="request" id="groups" class="java.util.ArrayList" />
+<jsp:useBean scope="request" id="fathers" class="java.util.ArrayList" />
+<jsp:useBean scope="request" id="mothers" class="java.util.ArrayList" />
+
+<c:set var="uniqueIdentifier" value="" />
+<c:set var="chosenGender" value="" />
+<c:set var="label" value="" />
+<c:set var="secondaryLabel" value="" />
+<c:set var="enrollmentDate" value="" />
+<c:set var="startDate" value=""/>
+<c:set var="dob" value="" />
+<c:set var="yob" value="" />
+<c:set var="groupId" value="${0}" />
+<c:set var="fatherId" value="${0}" />
+<c:set var="motherId" value="${0}" />
+<c:set var="studyEventDefinition" value=""/>
+<c:set var="location" value=""/>
+
+<c:forEach var="presetValue" items="${presetValues}">
+	<c:if test='${presetValue.key == "uniqueIdentifier"}'>
+		<c:set var="uniqueIdentifier" value="${presetValue.value}" />
+	</c:if>
+	<c:if test='${presetValue.key == "gender"}'>
+		<c:set var="chosenGender" value="${presetValue.value}" />
+	</c:if>
+	<c:if test='${presetValue.key == "label"}'>
+		<c:set var="label" value="${presetValue.value}" />
+	</c:if>
+	<c:if test='${presetValue.key == "secondaryLabel"}'>
+		<c:set var="secondaryLabel" value="${presetValue.value}" />
+	</c:if>
+	<c:if test='${presetValue.key == "enrollmentDate"}'>
+		<c:set var="enrollmentDate" value="${presetValue.value}" />
+	</c:if>
+	<c:if test='${presetValue.key == "startDate"}'>
+		<c:set var="startDate" value="${presetValue.value}" />
+	</c:if>
+	<c:if test='${presetValue.key == "dob"}'>
+		<c:set var="dob" value="${presetValue.value}" />
+	</c:if>
+	<c:if test='${presetValue.key == "yob"}'>
+		<c:set var="yob" value="${presetValue.value}" />
+	</c:if>
+	<c:if test='${presetValue.key == "group"}'>
+		<c:set var="groupId" value="${presetValue.value}" />
+	</c:if>
+	<c:if test='${presetValue.key == "mother"}'>
+		<c:set var="motherId" value="${presetValue.value}" />
+	</c:if>
+	<c:if test='${presetValue.key == "father"}'>
+		<c:set var="fatherId" value="${presetValue.value}" />
+	</c:if>
+	<c:if test='${presetValue.key == "studyEventDefinition"}'>
+		<c:set var="studyEventDefinition" value="${presetValue.value}" />
+	</c:if>
+	<c:if test='${presetValue.key == "location"}'>
+		<c:set var="location" value="${presetValue.value}" />
+	</c:if>
+</c:forEach>
+
+
 <form name="subjectForm" action="AddNewSubject" method="post">
 <input type="hidden" name="subjectOverlay" value="true">
 
@@ -102,7 +167,7 @@
                     <td valign="top">
             <!--layer-background-color:white;-->
             <div class="formfieldM_BG">
-                        <input onfocus="this.select()" type="text" name="enrollmentDate" size="15" value="<fmt:message key="date_format" bundle="${resformat}"/>" class="formfieldM" id="enrollmentDateField" />
+                        <input onfocus="this.select()" type="text" name="enrollmentDate" size="15" value="<c:out value="${enrollmentDate}" />" class="formfieldM" id="enrollmentDateField" />
                     </td>
                     <td>
                     <A HREF="#">
@@ -175,7 +240,7 @@
             <table border="0" cellpadding="0" cellspacing="0">
                 <tr>
                     <td valign="top"><div class="formfieldM_BG">
-                        <input onfocus="this.select()" type="text" name="dob" size="15" value="<fmt:message key="date_format" bundle="${resformat}"/>" class="formfieldM" id="dobField" />
+                        <input onfocus="this.select()" type="text" name="dob" size="15" value="<c:out value="${dob}" />" class="formfieldM" id="dobField" />
                     </td>
                     <td>
                     <A HREF="#">
@@ -257,13 +322,18 @@
                         <select name="studyEventDefinition" class="formfieldS">
                             <option value="">-<fmt:message key="select" bundle="${resword}"/>-</option>
                             <c:forEach var="event" items="${allDefsArray}">
-                                <option value="<c:out value="${event.id}"/>"><c:out value="${event.name}"/></option>
+                                <option <c:if test="${studyEventDefinition == event.id}">SELECTED</c:if> value="<c:out value="${event.id}"/>"><c:out value="${event.name}" />
+                                </option>
                             </c:forEach>
                         </select>
                     </div>
                     </td>
                     <td><span class="formlabel">*</span></td>
                 </tr>
+                <tr>
+                    <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="studyEventDefinition"/></jsp:include></td>
+                </tr>
+
             </table>
         </td>
     </tr>
@@ -277,7 +347,7 @@
                 <tr>
                     <td valign="top">
                         <div class="formfieldM_BG">
-                        <input type="text" name="startDate" size="15" value="<fmt:message key="date_format" bundle="${resformat}"/>" class="formfieldM" id="enrollmentDateField2" />
+                        <input type="text" name="startDate" size="15" value="<c:out value="${startDate}" />" class="formfieldM" id="enrollmentDateField2" />
                     </td>
                     <td>
                         <A HREF="#" >
@@ -287,6 +357,10 @@
                          </script>
                     </td>
                 </tr>
+                <tr>
+                    <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="startDate"/></jsp:include></td>
+                </tr>
+
             </table>
           </td>
     </tr>
@@ -298,13 +372,17 @@
             <table border="0" cellpadding="0" cellspacing="0">
                 <tr>
                     <td valign="top"><div class="formfieldXL_BG">
-                       <input type="text" name="location"size="50" class="formfieldXL">
+                       <input type="text" name="location"size="50" value="<c:out value="${location}"/>" class="formfieldXL">
                     </div></td>
                     <td>*</td>
                 </tr>
             </table>
         </td>
     </tr>
+    <tr>
+        <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="location"/></jsp:include></td>
+    </tr>
+
     </c:when>
     <c:when test="${study.studyParameterConfig.eventLocationRequired == 'optional'}">
     <tr valign="top">
