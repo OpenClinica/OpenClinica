@@ -720,9 +720,6 @@ include the default value first in the select list --%>
 </c:if>
 
 
-<c:if test="${displayItem.metadata.required}">
-  <td valign="top"><span class="alert">*</span></td>
-</c:if>
 <c:if test='${inputType == "calculation" || inputType == "group-calculation"}'>
         <%-- need to test for coding function here, tbh  --%>
         <c:set var="isAnExternalValue" value="0"/>
@@ -741,7 +738,7 @@ include the default value first in the select list --%>
                                 {
                                         window.attachEvent("onmessage", receiver<c:out value="${itemId}"/>); // for IE
                                 }
-                                else 
+                                else
                                 {
                                         window.addEventListener("message", receiver<c:out value="${itemId}"/>, false); // for FF
                                 }
@@ -754,7 +751,7 @@ include the default value first in the select list --%>
                                         // document.crfForm.input<c:out value="${itemId}"/>.value = e.data;
                                 }
                         </script>
-                        <%-- 
+                        <%--
                         <input type="hidden" name="input<c:out value="${itemId}"/>" id="input<c:out value="${itemId}"/>" value="<c:out value="${inputTxtValue}"/>" />
                         --%>
                     <c:choose>
@@ -784,6 +781,10 @@ include the default value first in the select list --%>
         </c:otherwise>
         </c:choose>
 </c:if>
+<c:if test="${displayItem.metadata.required}">
+  <td valign="top"><span class="alert">*</span></td>
+</c:if>
+
 <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
     <c:choose>
       <c:when test="${displayItem.discrepancyNoteStatus == 0}">
