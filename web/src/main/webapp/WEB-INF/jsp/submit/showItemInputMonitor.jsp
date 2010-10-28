@@ -356,9 +356,6 @@ form element in red --%>
   </c:forEach>
   </select>
 </c:if>
-<c:if test="${displayItem.metadata.required}">
-  <td valign="top"><span class="alert">*</span></td>
-</c:if>
 <c:if test='${inputType == "calculation" || inputType == "group-calculation"}'>
 <label for="input<c:out value="${itemId}"/>"></label>
 	<input type="hidden" name="input<c:out value="${itemId}"/>" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
@@ -373,6 +370,10 @@ form element in red --%>
     </c:otherwise>
   </c:choose>
 </c:if>
+<c:if test="${displayItem.metadata.required}">
+  <td valign="top"><span class="alert">*</span></td>
+</c:if>
+
 <c:if test="${study.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
     <c:choose>
     <c:when test="${displayItem.discrepancyNoteStatus == 0}">
