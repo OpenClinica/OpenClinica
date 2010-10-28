@@ -271,13 +271,18 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
         writer.append(escapeQuotesInCSV(discNoteBean.getUpdatedDateString()+""));
         writer.append(",");
 
-        writer.append(escapeQuotesInCSV(discNoteBean.getAge()+""));
-        writer.append(",");
+        if (discNoteBean.getParentDnId() == 0){
+            writer.append(escapeQuotesInCSV(discNoteBean.getAge()+""));
+            writer.append(",");
 
-        writer.append(escapeQuotesInCSV(discNoteBean.getDays()+""));
-        writer.append(",");
+            writer.append(escapeQuotesInCSV(discNoteBean.getDays()+""));
+            writer.append(",");
+        } else {
+            writer.append(",");
+            writer.append(",");
+        }
 
-        if(discNoteBean.getDisType() != null)  {
+        if (discNoteBean.getDisType() != null)  {
             writer.append(escapeQuotesInCSV(discNoteBean.getDisType().getName()));
             writer.append(",");
         }
