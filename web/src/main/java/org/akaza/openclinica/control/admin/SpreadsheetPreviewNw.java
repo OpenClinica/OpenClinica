@@ -102,7 +102,7 @@ public final class SpreadsheetPreviewNw implements Preview {
         String[] itemHeaders =
             { "item_name", "description_label", "left_item_text", "units", "right_item_text", "section_label", "group_label", "header", "subheader",
                 "parent_item", "column_number", "page_number", "question_number", "response_type", "response_label", "response_options_text",
-                "response_values", "response_layout", "default_value", "data_type", "validation", "validation_error_message", "phi", "required" };
+                "response_values", "response_layout", "default_value", "data_type", "width_decimal", "validation", "validation_error_message", "phi", "required" };
         String[] sectionHeaders = { "section_label", "section_title", "subtitle", "instructions", "page_number", "parent_section", "borders" };
         Map<String, String> rowCells = new HashMap<String, String>();
         SortedMap<Integer, Map<String, String>> allRows = new TreeMap<Integer, Map<String, String>>();
