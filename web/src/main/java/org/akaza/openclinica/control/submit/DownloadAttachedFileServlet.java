@@ -107,15 +107,15 @@ public class DownloadAttachedFileServlet extends SecureController {
         if (!file.exists() || file.length() <= 0) {
             addPageMessage("File " + filePathName + " " + respage.getString("not_exist"));
         } else {
+//            response.setContentType("application/octet-stream");
             response.setHeader("Content-disposition", "attachment; filename=\"" + fileName + "\";");
-            response.setContentType("application/vnd.ms-excel");
             response.setHeader("Pragma", "public");
 
             ServletOutputStream outStream = response.getOutputStream();
             DataInputStream inStream = null;
             try {
-                response.setContentType("application/vnd.ms-excel");
-                response.setHeader("Pragma", "public");
+                response.setContentType("application/download");
+                response.setHeader("Cache-Control", "max-age=0");
                 response.setContentLength((int) file.length());
 
                 byte[] bbuf = new byte[(int) file.length()];
