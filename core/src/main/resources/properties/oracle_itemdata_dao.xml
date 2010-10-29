@@ -17,9 +17,9 @@
         </query>
         <query>
                 <name>update</name>
-                <sql>UPDATE ITEM_DATA SET EVENT_CRF_ID=?,ITEM_ID=?,STATUS_ID=?,
-                VALUE=?,DATE_UPDATED=sysdate,UPDATE_ID=?, ORDINAL =? WHERE
-                ITEM_DATA_ID=?</sql>
+            <sql>UPDATE ITEM_DATA SET EVENT_CRF_ID=?,ITEM_ID=?,STATUS_ID=?,
+            VALUE=?,DATE_UPDATED=NOW(),UPDATE_ID=?, ORDINAL =?, OLD_STATUS_ID=? WHERE
+            ITEM_DATA_ID=?</sql>
         </query>
         <!-- added tbh 09/03/2008 -->
 		<query>

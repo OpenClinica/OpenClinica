@@ -46,6 +46,8 @@ public class AuditableEntityBean extends EntityBean {
 
     protected Status status;
 
+    protected Status oldStatus;
+
     // used to retrieve the owner and updater when needed
     protected UserAccountDAO udao;
 
@@ -221,5 +223,13 @@ public class AuditableEntityBean extends EntityBean {
      */
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public Status getOldStatus() {
+        return oldStatus;
+    }
+
+    public void setOldStatus(Status oldStatus) {
+        this.oldStatus = oldStatus;
     }
 }
