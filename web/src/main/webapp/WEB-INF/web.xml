@@ -180,12 +180,12 @@
         <servlet-class>org.akaza.openclinica.control.managestudy.ListDiscNotesForCRFServlet</servlet-class>
     </servlet>
 
-    <servlet>
+<!--    <servlet>
         <servlet-name>ListDiscNotesSubjectServlet</servlet-name>
         <display-name>ListDiscNotesSubjectServlet</display-name>
         <description>ListDiscNotesSubjectServlet</description>
         <servlet-class>org.akaza.openclinica.control.managestudy.ListDiscNotesSubjectServlet</servlet-class>
-    </servlet>
+    </servlet>-->
     <servlet>
         <servlet-name>ViewJobServlet</servlet-name>
         <display-name>ViewJobServlet</display-name>
@@ -1186,11 +1186,11 @@
         <url-pattern>/ListDiscNotesForCRFServlet</url-pattern>
     </servlet-mapping>
 
-    <servlet-mapping>
+<!--    <servlet-mapping>
         <servlet-name>ListDiscNotesSubjectServlet</servlet-name>
         <url-pattern>/ListDiscNotesSubjectServlet</url-pattern>
     </servlet-mapping>
-    
+-->    
     <servlet-mapping>
         <servlet-name>ViewJobServlet</servlet-name>
         <url-pattern>/ViewJob</url-pattern>

@@ -31,8 +31,8 @@ public class ListNotesTableToolbar extends DefaultToolbar {
         if (this.studyHasDiscNotes) {
             addToolbarItem(createDownloadLinkItem());
         }
-        addToolbarItem(ToolbarItemType.SEPARATOR);
-        addToolbarItem(createBackToNotesMatrixListItem());
+//        addToolbarItem(ToolbarItemType.SEPARATOR);
+//        addToolbarItem(createBackToNotesMatrixListItem());
         addToolbarItem(createCustomItem(new NewHiddenItem()));
 
     }
