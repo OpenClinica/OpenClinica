@@ -132,9 +132,6 @@
 		</c:forEach>
 	</select>
 </c:if>
-<c:if test="${displayItem.metadata.required}">
-<td valign="top"><span class="alert">*</span></td>
-</c:if>
 <c:if test='${inputType == "calculation" || inputType == "group-calculation"}'>
 	<input type="hidden" name="input<c:out value="${itemId}"/>" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" /><input type="text" disabled="disabled" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
 </c:if>
@@ -151,4 +148,7 @@
    <%-- <a tabindex="<c:out value="${tabNum + 1000}"/>" href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=input<c:out value="${itemId}" />&column=value','spanAlert-input<c:out value="${itemId}"/>'); return false;"
 		>--%><img name="flag_input<c:out value="${itemId}" />" src="images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"
 		><!--</a>--></td>
+</c:if>
+<c:if test="${displayItem.metadata.required}">
+    <td valign="top"><span class="alert">*</span></td>
 </c:if>
