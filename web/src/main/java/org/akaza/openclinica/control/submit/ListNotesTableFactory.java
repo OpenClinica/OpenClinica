@@ -116,10 +116,10 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         configureColumn(row.getColumn("discrepancyNoteBean.updatedDate"), resword.getString("date_updated"), new DateCellEditor(getDateFormat()), null, true,
                 true);
         configureColumn(row.getColumn("eventStartDate"), resword.getString("event_date"), new DateCellEditor(getDateFormat()), null, false, false);
-        configureColumn(row.getColumn("eventName"), resword.getString("event_name"), null, null, false, false);
-        configureColumn(row.getColumn("crfName"), resword.getString("CRF"), null, null, false, false);
-        configureColumn(row.getColumn("entityName"), resword.getString("entity_name"), null, null, false, false);
-        configureColumn(row.getColumn("entityValue"), resword.getString("entity_value"), null, null, false, false);
+        configureColumn(row.getColumn("eventName"), resword.getString("event_name"), null, null, true, true);
+        configureColumn(row.getColumn("crfName"), resword.getString("CRF"), null, null, true, true);
+        configureColumn(row.getColumn("entityName"), resword.getString("entity_name"), null, null, true, true);
+        configureColumn(row.getColumn("entityValue"), resword.getString("entity_value"), null, null, true, true);
         configureColumn(row.getColumn("discrepancyNoteBean.description"), resword.getString("description"), null, null, true, false);
         configureColumn(row.getColumn("discrepancyNoteBean.detailedNotes"), resword.getString("detailed_notes"), null, null, false, false);
         configureColumn(row.getColumn("numberOfNotes"), resword.getString("of_notes"), null, null, false, false);
@@ -317,7 +317,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                     // if (currentStudy.getParentStudyId() > 0 &&
                     // hiddenCrfIds.contains(cb.getId())) {
                     // } else {
-                    allNotes.add(dnb);
                     dnb.setStageId(ecb.getStage().getId());
                     dnb.setEntityName(cb.getName() + " (" + cvb.getName() + ")");
 
