@@ -58,6 +58,149 @@ function genToolTips(itemId){
 	}
   
 </script>
+<%-- Some javascript functions for handling file data type -- ywang Dec.,2008 --%>
+<script lang="Javascript">
+function replaceSwitch(eventCRFId,itemId,id,attribute,str1,str2,filename,filePathName,status) {
+	var rp = document.getElementById(id+itemId);
+	var div = document.getElementById('div'+itemId);
+	var a = document.getElementById('a'+itemId);
+	var ft = document.getElementById('ft'+itemId);
+	var up = document.getElementById('up'+itemId);
+	<%-- uploadLink is different from showItemInput.jsp --%>
+	var uploadLink = 'UploadFile?submitted=no&inputName=' + itemId;
+	var downloadLink = 'DownloadAttachedFile?eventCRFId=' + eventCRFId + '&fileName=' + filePathName;
+	if(rp.getAttribute('value')=="<fmt:message key="replace" bundle="${resword}"/>") {
+		if(a) {
+			div.appendChild(a);
+			div.removeChild(a);
+		}
+		if(!ft) {
+			var new_ft = document.createElement('input');
+			new_ft.setAttribute("id","ft"+itemId);
+			new_ft.setAttribute("type","text");
+			new_ft.setAttribute("name","fileText"+itemId);
+			new_ft.setAttribute("disabled","disabled");
+			div.appendChild(new_ft);
+			var new_up = document.createElement('input');
+			new_up.setAttribute("id", "up"+itemId);
+			new_up.setAttribute("type", "button");
+			new_up.setAttribute("name", "uploadFile"+itemId);
+			new_up.setAttribute("value", '<fmt:message key="click_to_upload" bundle="${resword}"/>');
+			new_up.onclick = function(){var itemid=itemId; javascript:openDocWindow(uploadLink)};
+			div.appendChild(new_up);
+		}
+		var fa = document.getElementById('fa'+itemId);
+		fa.setAttribute("value","upload");
+		div.appendChild(fa);
+		switchStr(itemId,"rm","value",'<fmt:message key="cancel_remove" bundle="${resword}"/>','<fmt:message key="remove" bundle="${resword}"/>');
+	} else if(rp.getAttribute('value')=='<fmt:message key="cancel_replace" bundle="${resword}"/>') {
+		if(ft) {
+			div.appendChild(ft);
+			div.appendChild(up);
+			div.removeChild(ft);
+			div.removeChild(up);
+		}
+		if(!a) {
+			if(status=='found') {
+				var new_a = document.createElement('a');
+				new_a.href = downloadLink;
+				new_a.setAttribute("id","a"+itemId);
+				new_a.appendChild(document.createTextNode(filename));
+				div.appendChild(new_a);
+			} else if(status=='notFound') {
+				var new_a = document.createElement('del');
+				new_a.setAttribute("id","a"+itemId);
+				new_a.innerHTML = filename;
+				div.appendChild(new_a);
+			}
+		}
+		var fa = document.getElementById('fa'+itemId);
+		fa.setAttribute("value","noAction");
+		div.appendChild(fa);
+	}
+	switchAttribute(itemId,id,attribute,str1,str2);
+}
+
+function removeSwitch(eventCRFId,itemId,id,attribute,str1,str2,filename,filePathName,status) {
+	var rm = document.getElementById(id+itemId);
+	var div = document.getElementById('div'+itemId);
+	var a = document.getElementById('a'+itemId);
+	var ft = document.getElementById('ft'+itemId);
+	var up = document.getElementById('up'+itemId);
+	var input = document.getElementById(itemId);
+	if(!input) {
+		//which means this is a single item with itemId being a number
+		input = document.getElementById('input'+itemId);
+	}
+	var downloadLink = 'DownloadAttachedFile?eventCRFId=' + eventCRFId + '&fileName=' + filePathName;
+	if(rm.getAttribute('value')=='<fmt:message key="remove" bundle="${resword}"/>') {
+		input.setAttribute("value","");
+		if(a) {
+			div.appendChild(a);
+			div.removeChild(a);
+		}
+		if(ft) {
+			div.appendChild(ft);
+			div.appendChild(up);
+			div.removeChild(ft);
+			div.removeChild(up);
+			switchStr(itemId,"rp","value",'<fmt:message key="cancel_replace" bundle="${resword}"/>','<fmt:message key="replace" bundle="${resword}"/>');
+		}
+		var new_a = document.createElement('del');
+		new_a.setAttribute("id","a"+itemId);
+		if(navigator.appName=="Microsoft Internet Explorer") {
+			new_a.style.setAttribute("color","red");
+		} else {
+			new_a.setAttribute("style","color:red");
+		}
+		new_a.innerHTML = filename;
+		div.appendChild(new_a);
+		var fa = document.getElementById('fa'+itemId);
+		fa.setAttribute("value","erase");
+		div.appendChild(fa);
+	} else if(rm.getAttribute('value')=='<fmt:message key="cancel_remove" bundle="${resword}"/>') {
+		input.setAttribute("value",filename);
+		if(a) {
+			div.appendChild(a);
+			div.removeChild(a);
+			if(status=='found') {
+				var new_a = document.createElement('a');
+				new_a.href = downloadLink;
+				new_a.setAttribute("id","a"+itemId);
+				new_a.appendChild(document.createTextNode(filename));
+				div.appendChild(new_a);
+			} else if(status=='notFound') {
+				var new_a = document.createElement('del');
+				new_a.setAttribute("id","a"+itemId);
+				new_a.innerHTML = filename;
+				div.appendChild(new_a);
+			}
+		}
+		var fa = document.getElementById('fa'+itemId);
+		fa.setAttribute("value","noAction");
+		div.appendChild(fa);
+	}
+
+	switchAttribute(itemId,id,attribute,str1,str2);
+}
+
+function switchAttribute(itemId, id, attribute, str1, str2) {
+	var e = document.getElementById(id+itemId);
+	if(e.getAttribute(attribute)==str1) {
+		e.setAttribute(attribute,str2);
+	}else if(e.getAttribute(attribute)==str2) {
+		e.setAttribute(attribute,str1);
+	}
+}
+
+function switchStr(itemId, id,attribute,str1,str2) {
+	var e = document.getElementById(id+itemId);
+	if(e.getAttribute(attribute)==str1) {
+		e.setAttribute(attribute,str2);
+	}
+}
+</script>
+
 <c:set var="inputType" value="${displayItem.metadata.responseSet.responseType.name}" />
 <c:set var="itemId" value="${displayItem.item.id}" />
 <c:set var="numOfDate" value="${param.key}" />
@@ -124,23 +267,40 @@ function genToolTips(itemId){
 
 <c:if test='${inputType=="file"}'>
 	<label for="<c:out value="${inputName}"/>"></label>
+	<c:set var="pathAndName" value="${displayItem.data.value}"/>
 	<c:choose>
-	<c:when test="${empty displayItem.data.value}">
-		<input type="text" id="ft<c:out value="${inputName}"/>" name="fileText<c:out value="${inputName}"/>" value="">
-		<input type="button" id="up<c:out value="${inputName}"/>" name="uploadFile<c:out value="${inputName}"/>" value="<fmt:message key="click_to_upload" bundle="${resword}"/>">
+	<c:when test="${inputTxtValue==null || empty inputTxtValue}">
+		<div id="div<c:out value="${inputName}"/>" name="myDiv">
+			<input type="text" id="ft<c:out value="${inputName}"/>" name="fileText<c:out value="${inputName}"/>" disabled class="disabled">
+			<input type="button" id="up<c:out value="${inputName}"/>" name="uploadFile<c:out value="${inputName}"/>" value="<fmt:message key="click_to_upload" bundle="${resword}"/>" onClick="javascript:openDocWindow('UploadFile?submitted=no&itemId=<c:out value="${itemId}"/>&inputName=<c:out value="${inputName}"/>')">
+			<input type="hidden" id="fa<c:out value="${inputName}"/>" name="fileAction<c:out value="${inputName}"/>" value="upload">
+		</div>
+		<input type="hidden" id="<c:out value="${inputName}"/>" name="<c:out value="${inputName}"/>" value="<c:out value="${inputTxtValue}"/>">
 	</c:when>
 	<c:otherwise>
+		<div id="div<c:out value="${inputName}"/>" name="myDiv">
 		<c:choose>
 		<c:when test="${fn:contains(inputTxtValue, 'fileNotFound#')}">
-			<del><c:out value="${fn:substringAfter(inputTxtValue,'fileNotFound#')}"/></del>
+			<c:set var="inputTxtValue" value="${fn:substringAfter(inputTxtValue,'fileNotFound#')}"/>
+			<del id="a<c:out value="${inputName}"/>"><c:out value="${inputTxtValue}"/></del>
+			<input type="hidden" id="hidft<c:out value="${inputName}"/>" name="fileText<c:out value="${inputName}"/>" disabled class="disabled">
+			<input type="hidden" id="hidup<c:out value="${inputName}"/>" name="uploadFile<c:out value="${inputName}"/>" value="<fmt:message key="click_to_upload" bundle="${resword}"/>" onClick="javascript:openDocWindow('UploadFile?submitted=no&itemId=<c:out value="${itemId}"/>&inputName=<c:out value="${inputName}"/>')">
+		</div><br>
+		<input id="rp<c:out value="${inputName}"/>" type="button" value="<fmt:message key="replace" bundle="${resword}"/>" onClick="replaceSwitch('<c:out value="${section.eventCRF.id}"/>','<c:out value="${inputName}"/>','rp','value','Replace','Cancel Replace','<c:out value="${inputTxtValue}"/>','<c:out value="${fn:replace(pathAndName,'+','%2B')}"/>','notFound')">
+		<input id="rm<c:out value="${inputName}"/>" type="button" value="<fmt:message key="remove" bundle="${resword}"/>" onClick="removeSwitch('<c:out value="${section.eventCRF.id}"/>','<c:out value="${inputName}"/>','rm','value','Remove','Cancel Remove','<c:out value="${inputTxtValue}"/>','<c:out value="${fn:replace(pathAndName,'+','%2B')}"/>','notFound')">
 		</c:when>
 		<c:otherwise>
-			<c:set var="filename" value="${displayItem.data.value}"/>
-			<c:set var="sep" value="\\"/>
-            <c:set var="sep2" value="\\\\"/>
-			<a href="DownloadAttachedFile?eventCRFId=<c:out value="${section.eventCRF.id}"/>&fileName=${fn:replace(fn:replace(filename,'+','%2B'),sep,sep2)}" id="a<c:out value="${itemId}"/>"><c:out value="${inputTxtValue}"/></a>
+			<c:set var="prefilename" value="${displayItem.data.value}"/>
+			<a href="DownloadAttachedFile?eventCRFId=<c:out value="${section.eventCRF.id}"/>&fileName=<c:out value="${fn:replace(prefilename,'+','%2B')}"/>" id="a<c:out value="${inputName}"/>"><c:out value="${inputTxtValue}"/></a>
+			<input type="hidden" id="hidft<c:out value="${inputName}"/>" name="fileText<c:out value="${inputName}"/>" disabled class="disabled">
+			<input type="hidden" id="hidup<c:out value="${inputName}"/>" name="uploadFile<c:out value="${inputName}"/>" value="<fmt:message key="click_to_upload" bundle="${resword}"/>" onClick="javascript:openDocWindow('UploadFile?submitted=no&itemId=<c:out value="${itemId}"/>&inputName=<c:out value="${inputName}"/>')">
+		</div><br>
+		<input id="rp<c:out value="${inputName}"/>" type="button" value="<fmt:message key="replace" bundle="${resword}"/>" onClick="replaceSwitch('<c:out value="${section.eventCRF.id}"/>','<c:out value="${inputName}"/>','rp','value','Replace','Cancel Replace','<c:out value="${inputTxtValue}"/>','<c:out value="${fn:replace(pathAndName,'+','%2B')}"/>','found')">
+		<input id="rm<c:out value="${inputName}"/>" type="button" value="<fmt:message key="remove" bundle="${resword}"/>" onClick="removeSwitch('<c:out value="${section.eventCRF.id}"/>','<c:out value="${inputName}"/>','rm','value','Remove','Cancel Remove','<c:out value="${inputTxtValue}"/>','<c:out value="${fn:replace(pathAndName,'+','%2B')}"/>','found')">
 		</c:otherwise>
 		</c:choose>
+		<input type="hidden" id="<c:out value="${inputName}"/>" name="<c:out value="${inputName}"/>" value="<c:out value="${inputTxtValue}"/>">
+		<input type="hidden" id="fa<c:out value="${inputName}"/>" name="fileAction<c:out value="${inputName}"/>" value="noAction">
 	</c:otherwise>
 	</c:choose>
 </c:if>
