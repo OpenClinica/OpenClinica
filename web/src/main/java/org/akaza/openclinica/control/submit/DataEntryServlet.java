@@ -3028,11 +3028,11 @@ public abstract class DataEntryServlet extends SecureController {
             } else {
                 File f = new File(dbValue);
                 fileName = f.getName();
-                if (fileName.equals(itemDataValue)) {
-                    // since filename is unique by timestamp, re-upload will
-                    // append
-                    // another timestamp to the same filename
-                    idb.setValue(dib.getDbData().getValue());
+                if (fileName.equals(itemDataValue) && dbValue.length()>itemDataValue.length()) {
+                // since filename is unique by timestamp, re-upload will
+                // append
+                // another timestamp to the same filename
+                    idb.setValue(dbValue);
                 } else {
                     idb.setValue(attachedFilePath + itemDataValue);
                     fileName = itemDataValue;
