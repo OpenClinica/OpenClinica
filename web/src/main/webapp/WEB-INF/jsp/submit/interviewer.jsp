@@ -97,7 +97,7 @@ var closing = true;
     	  	 	</c:forEach>
     	  	 	title = '<fmt:message key="tooltip_name_title" bundle="${resword}"/>';
 				totNotes = ${fn:length(existingNameNotes)};
-				if(totNotes >0) footNote = '<fmt:message key="footNote_threads" bundle="${resword}"/>'+ totNotes+ '<fmt:message key="foot_threads" bundle="${resword}"/>' ;
+				if(totNotes >0) footNote = totNotes + " " + '<fmt:message key="foot_threads" bundle="${resword}"/>' + '<fmt:message key="footNote_threads" bundle="${resword}"/>';
     	     	}
     	   	else if(flag =='dateNotes')
     	     {
@@ -112,7 +112,7 @@ var closing = true;
     	   title = '<fmt:message key="tooltip_name_title" bundle="${resword}"/>';
 		   totNotes = ${fn:length(existingIntrvDateNotes)};
 		   
-	if(totNotes >0) footNote = '<fmt:message key="footNote_threads" bundle="${resword}"/>'+ totNotes+ '<fmt:message key="foot_threads" bundle="${resword}"/>' ;
+	if(totNotes >0) footNote = totNotes + " " + '<fmt:message key="foot_threads" bundle="${resword}"/>' + '<fmt:message key="footNote_threads" bundle="${resword}"/>';
     	   }
     	
 	

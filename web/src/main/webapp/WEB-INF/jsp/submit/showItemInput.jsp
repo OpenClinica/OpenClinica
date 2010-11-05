@@ -94,9 +94,9 @@ function genToolTips(itemId){
 	var discNotes = new Array();
 	var title = '<fmt:message key="tooltip_title1" bundle="${resword}"/>';
 	var parentDnIds = new Array();
-   var totNotes = 0;
-		   var footNote = '<fmt:message key="footNote" bundle="${resword}"/>';
-	 		<c:set var="discrepancyNotes" value="1"/>
+    var totNotes = 0;
+    var footNote = '<fmt:message key="footNote" bundle="${resword}"/>';
+	<c:set var="discrepancyNotes" value="1"/>
 		<c:forEach var="itemsSection" items="${section.items}">
 	   			
 	   			if("${itemsSection.item.id}"== itemId)
@@ -115,7 +115,8 @@ function genToolTips(itemId){
 					
 			   	 	</c:forEach>
 					totNotes = 	 ${notesSize};
-				if(totNotes >0) footNote = '<fmt:message key="footNote_threads" bundle="${resword}"/>'+ totNotes+ '<fmt:message key="foot_threads" bundle="${resword}"/>' ;
+				if(totNotes >0) footNote = totNotes + " " + '<fmt:message key="foot_threads" bundle="${resword}"/>' + '<fmt:message key="footNote_threads" bundle="${resword}"/>';
+				<%--if(totNotes >0) footNote = '<fmt:message key="footNote_threads" bundle="${resword}"/>'+ totNotes+ '<fmt:message key="foot_threads" bundle="${resword}"/>' ;--%>
 	   			}
 	    </c:forEach>
 	 	
