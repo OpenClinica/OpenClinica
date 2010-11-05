@@ -193,7 +193,7 @@ public class MainMenuServlet extends SecureController {
             studies = (ArrayList) sdao.findAllByUser(ub.getName());
             request.setAttribute("studies", studies);
             session.setAttribute("userBean1", ub);
-            addPageMessage(respage.getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName() + ". " + respage.getString("password_set"));
+//            addPageMessage(respage.getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName() + ". " + respage.getString("password_set"));
 //                + "<a href=\"UpdateProfile\">" + respage.getString("user_profile") + " </a>");
 
             if (pwdChangeRequired == 1) {
