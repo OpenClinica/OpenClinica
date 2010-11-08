@@ -460,10 +460,70 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         return discNotes;
     }
 
+    public ArrayList<DiscrepancyNoteBean> getViewNotesWithFilterAndSort(StudyBean currentStudy, ListNotesFilter filter, ListNotesSort sort) {
+        ArrayList<DiscrepancyNoteBean> discNotes = new ArrayList<DiscrepancyNoteBean>();
+        setTypesExpected();
+        this.setTypeExpected(12, TypeNames.STRING);
+        this.setTypeExpected(13, TypeNames.INT);
+        this.setTypeExpected(14, TypeNames.INT);
+        this.setTypeExpected(15, TypeNames.INT);
+
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), currentStudy.getId());
+        variables.put(new Integer(2), currentStudy.getId());
+        variables.put(new Integer(3), currentStudy.getId());
+        variables.put(new Integer(4), currentStudy.getId());
+        variables.put(new Integer(5), currentStudy.getId());
+        variables.put(new Integer(6), currentStudy.getId());
+        variables.put(new Integer(7), currentStudy.getId());
+        variables.put(new Integer(8), currentStudy.getId());
+        variables.put(new Integer(9), currentStudy.getId());
+        variables.put(new Integer(10), currentStudy.getId());
+
+        String sql = "";
+        if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
+            sql = sql + "SELECT * FROM ( SELECT x.*, ROWNUM as rnum FROM (";
+        }
+        sql = sql + digester.getQuery("findAllSubjectDNByStudy");
+        sql = sql + filter.execute("");
+        sql += " UNION ";
+        sql += digester.getQuery("findAllStudySubjectDNByStudy");
+        sql += filter.execute("");
+        sql += " UNION ";
+        sql += digester.getQuery("findAllStudyEventDNByStudy");
+        sql += filter.execute("");
+        sql += " UNION ";
+        sql += digester.getQuery("findAllEventCrfDNByStudy");
+        if (currentStudy.isSite(currentStudy.getParentStudyId())) {
+            sql += " and ec.event_crf_id not in ( " + this.findSiteHiddenEventCrfIdsString(currentStudy) + " ) ";
+        }
+        sql += filter.execute("");
+        sql += " UNION ";
+        sql += digester.getQuery("findAllItemDataDNByStudy");
+        if (currentStudy.isSite(currentStudy.getParentStudyId())) {
+            sql += " and ec.event_crf_id not in ( " + this.findSiteHiddenEventCrfIdsString(currentStudy) + " ) ";
+        }
+        sql += filter.execute("");
+
+        //System.out.println(sql);
+        ArrayList rows = select(sql, variables);
+
+        Iterator it = rows.iterator();
+        while (it.hasNext()) {
+            DiscrepancyNoteBean discBean = (DiscrepancyNoteBean) this.getEntityFromHashMap((HashMap) it.next());
+            discBean = findSingleMapping(discBean);
+            discNotes.add(discBean);
+        }
+        return discNotes;
+    }
+
+
     public ArrayList<DiscrepancyNoteBean> findAllDiscrepancyNotesDataByStudy(StudyBean currentStudy) {
         ArrayList<DiscrepancyNoteBean> discNotes = new ArrayList<DiscrepancyNoteBean>();
         setTypesExpected();
         this.setTypeExpected(12, TypeNames.STRING);
+        this.setTypeExpected(13, TypeNames.INT);
+        this.setTypeExpected(14, TypeNames.INT);
 
         HashMap variables = new HashMap();
         variables.put(new Integer(1), currentStudy.getId());

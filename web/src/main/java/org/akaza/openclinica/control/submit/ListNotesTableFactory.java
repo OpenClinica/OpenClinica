@@ -89,6 +89,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     private Integer discNoteType;
     private Boolean studyHasDiscNotes = new Boolean(false);
     private final boolean showMoreLink;
+    public static List notesForPrintPop;
 
     public ListNotesTableFactory(boolean showMoreLink){
         this.showMoreLink = showMoreLink;
@@ -187,6 +188,9 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             getDiscrepancyNoteDao().getViewNotesWithFilterAndSort(getCurrentStudy(), listNotesFilter, listNotesSort, rowStart, rowEnd);
         Collection<HashMap<Object, Object>> theItems = new ArrayList<HashMap<Object, Object>>();
         this.setAllNotes(populateRowsWithAttachedData(items));
+
+        //Keeping all notes without pagination to be shown in print popup.
+        notesForPrintPop = getDiscrepancyNoteDao().getViewNotesWithFilterAndSort(getCurrentStudy(), listNotesFilter, listNotesSort);
 
         // for (DiscrepancyNoteBean discrepancyNoteBean : items) {
         for (DiscrepancyNoteBean discrepancyNoteBean : allNotes) {
@@ -938,4 +942,11 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         return populateRowsWithAttachedData((ArrayList) notes);
     }
 
+    public static List getNotesForPrintPop() {
+        return notesForPrintPop;
+    }
+
+    public static void setNotesForPrintPop(List notesForPrintPop) {
+        ListNotesTableFactory.notesForPrintPop = notesForPrintPop;
+    }
 }

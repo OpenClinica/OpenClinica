@@ -30,6 +30,7 @@ public class ListNotesTableToolbar extends DefaultToolbar {
         addToolbarItem(createCustomItem(new ShowMoreItem()));
         if (this.studyHasDiscNotes) {
             addToolbarItem(createDownloadLinkItem());
+            addToolbarItem(createNotePopupLinkItem());
         }
 //        addToolbarItem(ToolbarItemType.SEPARATOR);
 //        addToolbarItem(createBackToNotesMatrixListItem());
@@ -39,6 +40,15 @@ public class ListNotesTableToolbar extends DefaultToolbar {
 
     public ToolbarItem createDownloadLinkItem() {
         DownloadLinkItem item = new DownloadLinkItem();
+        item.setCode(ToolbarItemType.CLEAR_ITEM.toCode());
+        ToolbarItemRenderer renderer = new ClearItemRenderer(item, getCoreContext());
+        renderer.setOnInvokeAction("onInvokeAction");
+        item.setToolbarItemRenderer(renderer);
+        return item;
+    }
+
+    public ToolbarItem createNotePopupLinkItem() {
+        NotePopupLinkItem item = new NotePopupLinkItem();
         item.setCode(ToolbarItemType.CLEAR_ITEM.toCode());
         ToolbarItemRenderer renderer = new ClearItemRenderer(item, getCoreContext());
         renderer.setOnInvokeAction("onInvokeAction");
@@ -159,6 +169,26 @@ public class ListNotesTableToolbar extends DefaultToolbar {
             html.quote().close();
             html.img().name("bt_View1").src("images/bt_Download.gif").border("0").alt(resword.getString("download_all_discrepancy_notes")).title(
                     resword.getString("download_all_discrepancy_notes")).append("class=\"downloadAllDNotes\" width=\"24 \" height=\"15\"").end().aEnd();
+            return html.toString();
+        }
+    }
+
+    private class NotePopupLinkItem extends AbstractItem {
+        @Override
+        public String disabled() {
+            return null;
+        }
+
+        @Override
+        public String enabled() {
+            HtmlBuilder html = new HtmlBuilder();
+            html.a().href("#");
+            html.onclick("javascript:openPopup()");
+            html.quote();
+            html.append(getAction());
+            html.quote().close();
+            html.img().name("bt_View1").src("images/bt_Print.gif").border("0").alt(resword.getString("print")).title(
+                    resword.getString("print")).append("class=\"downloadAllDNotes\" width=\"24 \" height=\"15\"").end().aEnd();
             return html.toString();
         }
     }

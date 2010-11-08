@@ -30,6 +30,9 @@
         var parameterString = createParameterStringForLimit(id);
         location.href = '${pageContext.request.contextPath}/ViewNotes?'+ parameterString;
     }
+    function openPopup() {
+        openDocWindow(window.location.href +'&print=yes')
+    }
 </script>
 
 
@@ -73,10 +76,11 @@
 <a href="javascript:openDocWindow('help/2_3_discrepancyNotes_Help.html')"><c:choose>
         <c:when test="${module eq 'manage'}"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></c:when>
         <c:otherwise><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></c:otherwise></c:choose></a>
- <a href="javascript:openDocWindow('ViewNotes?print=yes')"
-	onMouseDown="javascript:setImage('bt_Print0','images/bt_Print_d.gif');"
-	onMouseUp="javascript:setImage('bt_Print0','images/bt_Print.gif');">
-	<img name="bt_Print0" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>"></a>
+ <%--<a href="javascript:openDocWindow('ViewNotes?print=yes')"--%>
+<%--<a href="javascript:onInvokeAction('listNotes','filter')"--%>
+	<%--onMouseDown="javascript:setImage('bt_Print0','images/bt_Print_d.gif');"--%>
+	<%--onMouseUp="javascript:setImage('bt_Print0','images/bt_Print.gif');">--%>
+	<%--<img name="bt_Print0" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>"></a>--%>
 </span></h1>
 <%--
 <div class="dnKey"><strong><fmt:message key="Filter_by_status" bundle="${resword}"/>

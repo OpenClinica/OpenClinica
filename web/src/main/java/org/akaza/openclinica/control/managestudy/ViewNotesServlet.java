@@ -217,7 +217,7 @@ public class ViewNotesServlet extends SecureController {
         session.setAttribute("viewNotesPageFileName", viewNotesPageFileName);
         
         if ("yes".equalsIgnoreCase(fp.getString(PRINT))) {
-            List allNotes = dndao.findAllDiscrepancyNotesDataByStudy(currentStudy);
+            List allNotes = ListNotesTableFactory.getNotesForPrintPop();
             request.setAttribute("allNotes", factory.populateDataInNote(allNotes));
             forwardPage(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_PRINT);
         } else {
