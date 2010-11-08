@@ -10,10 +10,13 @@ import org.apache.fop.apps.MimeConstants;
 import org.apache.fop.apps.PageSequenceResults;
 
 import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.OutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -47,15 +50,38 @@ public class PdfProcessingFunction extends ProcessingFunction {
      */
     public ProcessingResultType run() {
         
-        OutputStream out = null;    
+        OutputStream out = null;   
+        File outputFile =null;
+        
         try
         {
             FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
             //set the renderer to be PDF
             // the expected sequence here will be xml -> xslt -> fo -> pdf
             // where fo is the transformed file
-            File outputFile = new File(this.getODMXMLFileName() + ".pdf");
-            File xslFile = new File(this.getTransformFileName());
+            
+            File procExportDirectory;
+            File oldFiles[] = null;
+            String zipName = "_";
+            if(this.getExportFileName()!=null && this.getLocation()!=null)
+            {
+
+            	procExportDirectory = new File(this.getLocation());
+            		if(!procExportDirectory.isDirectory())
+            		{
+            			procExportDirectory.mkdir();
+            		}
+            	outputFile = new File(procExportDirectory+File.separator+this.getExportFileName()+".pdf");
+            	zipName = (procExportDirectory+File.separator+this.getExportFileName()+".zip");
+            }
+            else
+            {
+            	outputFile = new File(this.getODMXMLFileName() + ".pdf");//getODMFILENAme is a path of .fo object
+            	zipName = this.getODMXMLFileName() + ".zip";
+            }
+            
+            
+            File xslFile = new File(this.getTransformFileName());//transformfilename is abs path+file name(.fo) transformFileName and odmxmlfile name are same?
             out = new FileOutputStream(outputFile);
             out = new BufferedOutputStream(out);
             Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, out);
@@ -82,6 +108,36 @@ public class PdfProcessingFunction extends ProcessingFunction {
             }
             System.out.println("Generated " + foResults.getPageCount() + " pages in total.");
             out.close();
+            if(isZip())
+            {
+            	
+            	if(outputFile!=null)
+            	{
+            		ZipOutputStream zipOut = null;
+            		FileInputStream fis = null;
+            		try{
+            		 fis = new FileInputStream(outputFile);
+            	
+            		 zipOut = new ZipOutputStream(new FileOutputStream(new File( zipName)));
+            		zipOut.putNextEntry(new ZipEntry(outputFile.getName()));
+            		int bytesRead;
+                    byte[] buff = new byte[512];
+                    while ((bytesRead = fis.read(buff)) != -1) {
+                    	zipOut.write(buff, 0, bytesRead);
+                    }
+                    
+                    zipOut.closeEntry();
+                    zipOut.finish();
+            		}catch(Exception e){
+            			e.printStackTrace();
+            		}finally{
+            			if(zipOut!=null)zipOut.close();
+                      	if(fis!=null)fis.close();
+            		}
+              
+            	}
+            	
+            }
         } catch (Exception e) {
             e.printStackTrace();
             ProcessingResultType resultError = ProcessingResultType.FAIL;
@@ -90,10 +146,17 @@ public class PdfProcessingFunction extends ProcessingFunction {
             resultError.setDescription("Your job failed with the message of: " + e.getMessage());
             return resultError;
         } finally {
-            
+        	  
+              
+              
+        }
+       
+        if(isDeleteOld())
+        {
+        	//delete old pdfs
         }
         // otherwise return a success with the URL link
-        
+       
         ProcessingResultType resultSuccess = ProcessingResultType.SUCCESS;
         resultSuccess.setUrl(CoreResources.getField("sysURL.base") + 
                 "AccessFile?fileId="); // to the pdf

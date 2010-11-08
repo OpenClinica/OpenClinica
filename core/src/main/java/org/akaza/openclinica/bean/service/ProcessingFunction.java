@@ -13,6 +13,12 @@ public abstract class ProcessingFunction implements ProcessingInterface {
     private String xslFileName;
     private String transformFileName;
     public String fileType;
+    // the following is for the properties of custom-post processing. Some of them could be redundant.
+    private String location;
+    private String exportFileName;
+    private boolean deleteOld;
+    private boolean zip;
+    
     
     public String getODMXMLFileName() {
         return ODMXMLFileName;
@@ -45,5 +51,37 @@ public abstract class ProcessingFunction implements ProcessingInterface {
     public void setFileType(String fileType) {
         this.fileType = fileType;
     }
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
+	}
+
+	public String getExportFileName() {
+		return exportFileName;
+	}
+
+	public void setExportFileName(String exportFileName) {
+		this.exportFileName = exportFileName;
+	}
+
+	public boolean isDeleteOld() {
+		return deleteOld;
+	}
+
+	public void setDeleteOld(boolean deleteOld) {
+		this.deleteOld = deleteOld;
+	}
+
+	public boolean isZip() {
+		return zip;
+	}
+
+	public void setZip(boolean zip) {
+		this.zip = zip;
+	}
     
 }

@@ -66,12 +66,21 @@ public class XsltTransformJob extends QuartzJobBean {
     public static final String EXTRACT_PROPERTY = "extractProperty";
     public static final String LOCALE = "locale";
     public static final String STUDY_ID = "studyId";
-    
+    public static final String ZIPPED = "zipped";
+    public static final String DELETE_OLD="deleteOld";
+    public static final String SUCCESS_MESSAGE="SUCCESS_MESSAGE";
+    public static final String FAILURE_MESSAGE="FAILURE_MESSAGE";
     private OpenClinicaMailSender mailSender;
     private DataSource dataSource;
     private GenerateExtractFileService generateFileService;
     private StudyDAO studyDao;
     private UserAccountDAO userAccountDao;
+    
+    //POST PROCESSING VARIABLES
+    public static final String POST_PROC_DELETE_OLD="postProcDeleteOld";
+    public static final String POST_PROC_ZIP="postProcZip";
+    public static final String POST_PROC_LOCATION="postProcLocation";
+    public static final String POST_PROC_EXPORT_NAME="postProcExportName";
     
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
         // need to generate a Locale for emailing users with i18n
@@ -89,6 +98,7 @@ public class XsltTransformJob extends QuartzJobBean {
         }
         // get the file information from the job
         String alertEmail = dataMap.getString(EMAIL);
+        
         try {
             ApplicationContext appContext = (ApplicationContext) context.getScheduler().getContext().get("applicationContext");
             mailSender = (OpenClinicaMailSender) appContext.getBean("openClinicaMailSender");
@@ -112,7 +122,9 @@ public class XsltTransformJob extends QuartzJobBean {
             studyDao = new StudyDAO(dataSource);
             StudyBean currentStudy = (StudyBean)studyDao.findByPK(studyId);
             StudyBean parentStudy = (StudyBean)studyDao.findByPK(currentStudy.getParentStudyId());
-            
+            String successMsg = epBean.getSuccessMessage();
+            String failureMsg = epBean.getFailureMessage();
+        
             // DatasetBean dsBean = (DatasetBean)datasetDao.findByPK(new Integer(datasetId).intValue());
             int dsId = dataMap.getInt(DATASET_ID);
             DatasetBean datasetBean = (DatasetBean) dsdao.findByPK(dsId);
@@ -122,8 +134,9 @@ public class XsltTransformJob extends QuartzJobBean {
             
             datasetBean.setName(datasetBean.getName().replaceAll(" ", "_"));
             System.out.println("--> job starting: ");
+            
             HashMap answerMap = generateFileService.createODMFile(epBean.getFormat(), sysTimeBegin, generalFileDir, datasetBean, 
-                    currentStudy, "", eb, currentStudy.getId(), currentStudy.getParentStudyId(), "99", false, false);
+                    currentStudy, "", eb, currentStudy.getId(), currentStudy.getParentStudyId(), "99",(Boolean) dataMap.get(ZIPPED), false, (Boolean) dataMap.get(DELETE_OLD));
             // won't save a record of the XML to db
             // won't be a zipped file, so that we can submit it for transformation
             // this will have to be toggled by the export data format? no, the export file will have to be zipped/not zipped
@@ -177,18 +190,20 @@ public class XsltTransformJob extends QuartzJobBean {
                 function.setTransformFileName(outputPath + File.separator + dataMap.getString(POST_FILE_NAME));
                 function.setODMXMLFileName(endFile);
                 function.setXslFileName(dataMap.getString(XSL_FILE_PATH));
+                function.setDeleteOld((Boolean)dataMap.get(POST_PROC_DELETE_OLD));
+                function.setZip((Boolean)dataMap.get(POST_PROC_ZIP));
+                function.setLocation(dataMap.getString(POST_PROC_LOCATION));
+                function.setExportFileName(dataMap.getString(POST_PROC_EXPORT_NAME));
+                File oldFiles[] = getOldFiles(outputPath,dataMap.getString(POST_PROC_LOCATION));
                 ProcessingResultType message = function.run();
                 final long done2 = System.currentTimeMillis() - start;
                 System.out.println("--> postprocessing completed in " + done2 + " ms, found result type " + message.getCode());
-                // emailBody = message.getDescription();
-                //                emailBuffer.append("<p>" + pageMessages.getString("email_header_1") + " " + EmailEngine.getAdminEmail() + " "
-                //                        + pageMessages.getString("email_header_2") + " Job Execution " + pageMessages.getString("email_header_3") + "</p>");
-                //                    emailBuffer.append("<P>Dataset: " + datasetBean.getName() + "</P>");
-                //                    emailBuffer.append("<P>Study: " + currentStudy.getName() + "</P>");
-                //                    emailBuffer.append("<p>" + pageMessages.getString("html_email_body_1") + datasetBean.getName() + pageMessages.getString("html_email_body_2")
-                //                        + CoreResources.getField("sysURL") + pageMessages.getString("html_email_body_3") + "</p>");
-                // if the process was a pdf, generate a link to the file
-                // if the process is anything but SQL, generate a link to the file
+              
+                if((Boolean)dataMap.get(POST_PROC_DELETE_OLD))
+                {
+                	deleteOldFiles(oldFiles);
+                }
+                
                 if (!function.getClass().equals(org.akaza.openclinica.bean.service.SqlProcessingFunction.class)) {
                     ArchivedDatasetFileBean fbFinal = generateFileRecord(dataMap.getString(POST_FILE_NAME) + "." + function.getFileType(), 
                             outputPath, 
@@ -196,15 +211,31 @@ public class XsltTransformJob extends QuartzJobBean {
                             done, new File(endFile).length(), 
                             ExportFormatBean.PDFFILE,
                             userAccountId);
-                    emailBuffer.append("<p>" + pageMessages.getString("html_email_body_4") + " " + fbFinal.getName()
-                            + pageMessages.getString("html_email_body_4_5") + CoreResources.getField("sysURL.base") + "AccessFile?fileId="
-                            + fbFinal.getId() + pageMessages.getString("html_email_body_3") + "</p>");
+               
+                    if(successMsg==null || successMsg.isEmpty())
+                    {
+                    	emailBuffer.append("<p>" + pageMessages.getString("html_email_body_4") + " " + fbFinal.getName()
+                                + pageMessages.getString("html_email_body_4_5") + CoreResources.getField("sysURL.base") + "AccessFile?fileId="
+                                + fbFinal.getId() + pageMessages.getString("html_email_body_3") + "</p>");
+                    	 
+                    }
+                    else if(!successMsg.isEmpty()){
+                     	if(successMsg.contains("$linkURL"))
+                	  {
+                     		successMsg =		successMsg.replace("$linkURL", "<a href=\""+CoreResources.getField("sysURL.base") + "AccessFile?fileId="+ fbFinal.getId()+"\">here </a>");
+                	  }
+                     	emailBuffer.append("<p>" + successMsg + "</p>");
+                    }
                 }
                 // otherwise don't do it
                 if (message.getCode().intValue() == 1) {
                     subject = "Success: " + datasetBean.getName(); 
                 } else if (message.getCode().intValue() == 2) { 
                     subject = "Failure: " + datasetBean.getName();
+                    if(failureMsg!=null || !failureMsg.equals(""))
+                    {
+                    	emailBuffer.append(failureMsg);
+                    }
                     emailBuffer.append("<P>" + message.getDescription());
                     postErrorMessage(message.getDescription(), context);
                 } else if (message.getCode().intValue() == 3) {
@@ -227,9 +258,18 @@ public class XsltTransformJob extends QuartzJobBean {
                 //                    CoreResources.getField("sysURL.base") + 
                 //                    "AccessFile?fileId=" + 
                 //                    fbFinal.getId() + "'>here</a>.";
+            
+                if(successMsg!=null || !successMsg.equals(""))
+                {
+                	  	if(successMsg.contains("$linkURL"))
+                	  		successMsg =		successMsg.replace("$linkURL", "<a href="+CoreResources.getField("sysURL.base") + "AccessFile?fileId="+ fbFinal.getId()+">here </a>");
+                	emailBuffer.append("<p>" + successMsg+ pageMessages.getString("html_email_body_3") + "</p>");
+                }
+                else{
                 emailBuffer.append("<p>" + pageMessages.getString("html_email_body_4") + " " + fbFinal.getName()
                         + pageMessages.getString("html_email_body_4_5") + CoreResources.getField("sysURL.base") + "AccessFile?fileId="
                         + fbFinal.getId() + pageMessages.getString("html_email_body_3") + "</p>");
+                }
             }
             // email the message to the user
             // String email = dataMap.getString(EMAIL);
@@ -269,8 +309,39 @@ public class XsltTransformJob extends QuartzJobBean {
         
         
     }
-    
-    private void postErrorMessage(String message, JobExecutionContext context) {
+    //A stub to delete old files.
+    private void deleteOldFiles(File[] oldFiles) {
+    	//File[] files = complete.listFiles();
+		for(int i=0;i<oldFiles.length;i++)
+		{
+
+			oldFiles[i].delete();
+		}
+		
+	}
+    /**
+     * Stub to get the list of all old files.
+     * @param outputPath
+     * @param postProcLoc
+     * @return
+     */
+	private File[] getOldFiles(String outputPath, String postProcLoc) {
+    	File exisitingFiles[] = null;
+    	File temp = null;
+    	if(postProcLoc!=null)
+    		{
+    		temp = new File(postProcLoc);
+    		if(temp.isDirectory())exisitingFiles = temp.listFiles();
+    		}
+    	else{
+    		temp = new File(outputPath);
+    		if(temp.isDirectory())exisitingFiles = temp.listFiles();
+    	}
+    	
+    	return exisitingFiles;
+	}
+
+	private void postErrorMessage(String message, JobExecutionContext context) {
         String SCHEDULER = "schedulerFactoryBean";
         try {
             ApplicationContext appContext = (ApplicationContext) context.getScheduler().getContext().get("applicationContext");

@@ -15,32 +15,48 @@ import org.akaza.openclinica.bean.service.ProcessingFunction;
 public class ExtractPropertyBean {
 
     protected Logger logger = LoggerFactory.getLogger(getClass().getName());
-    private String fileName;
+    private String[] fileName;
     private String filedescription;
     private String linkText;
     private String helpText;
     private String fileLocation;
-    private String exportFileName;
+    private String[] exportFileName;
     private String[] rolesAllowed;
     private int id;
     private String format;
     private ProcessingFunction postProcessing;
+    private boolean zipFormat;
+    private boolean deleteOld;
+    private String successMessage;
     
+	private String failureMessage;
+    
+	//Post Processing Parameters
+	private String postProcLocation;
+	private String postProcExportName;
+	private boolean postProcDeleteOld;
+	private boolean postProcZip;
+	
     public ExtractPropertyBean() {
-        fileName = "";
+        fileName = new String[10];
         filedescription = "";
         linkText = "";
         helpText = "";
         fileLocation = "";
-        exportFileName = "";
+        exportFileName =new String[10];
         id = 0;
+        zipFormat = true;
+        deleteOld = true;
+        successMessage=null;
+        failureMessage=null;
     }
     
-    public String getFileName() {
+    
+    public String[] getFileName() {
         return fileName;
     }
     
-    public void setFileName(String fileName) {
+    public void setFileName(String[] fileName) {
         this.fileName = fileName;
     }
     
@@ -92,10 +108,10 @@ public class ExtractPropertyBean {
     public void setFileLocation(String fileLocation) {
         this.fileLocation = fileLocation;
     }
-    public String getExportFileName() {
+    public String[] getExportFileName() {
         return exportFileName;
     }
-    public void setExportFileName(String exportFileName) {
+    public void setExportFileName(String[] exportFileName) {
         this.exportFileName = exportFileName;
     }
     public String[] getRolesAllowed() {
@@ -110,4 +126,78 @@ public class ExtractPropertyBean {
     public void setPostProcessing(ProcessingFunction postProcessing) {
         this.postProcessing = postProcessing;
     }
+    public void setZipFormat(boolean zipFormat)
+    {
+    	this.zipFormat = zipFormat;
+    }
+    public boolean getZipFormat()
+    {
+    	return zipFormat;
+    }
+    public void setDeleteOld(boolean deleteOld)
+    {
+    	this.deleteOld = deleteOld;
+    }
+    public boolean getDeleteOld()
+    {
+    	return deleteOld;
+    }
+    public String getSuccessMessage() {
+		return successMessage;
+	}
+
+
+	public void setSuccessMessage(String successMessage) {
+		this.successMessage = successMessage;
+	}
+
+
+	public String getFailureMessage() {
+		return failureMessage;
+	}
+
+
+	public void setFailureMessage(String failureMessage) {
+		this.failureMessage = failureMessage;
+	}
+
+
+	public String getPostProcLocation() {
+		return postProcLocation;
+	}
+
+
+	public void setPostProcLocation(String postProcLocation) {
+		this.postProcLocation = postProcLocation;
+	}
+
+
+	public String getPostProcExportName() {
+		return postProcExportName;
+	}
+
+
+	public void setPostProcExportName(String postProcExportName) {
+		this.postProcExportName = postProcExportName;
+	}
+
+
+	public boolean getPostProcDeleteOld() {
+		return postProcDeleteOld;
+	}
+
+
+	public void setPostProcDeleteOld(boolean postProcDeleteOld) {
+		this.postProcDeleteOld = postProcDeleteOld;
+	}
+
+
+	public boolean getPostProcZip() {
+		return postProcZip;
+	}
+
+
+	public void setPostProcZip(boolean postProcZip) {
+		this.postProcZip = postProcZip;
+	}
 }

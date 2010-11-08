@@ -72,32 +72,40 @@ public class CoreResources implements ResourceLoaderAware {
 
         // ExtractPropertyBean epbean = new ExtractPropertyBean();
         int i = 1;
-        while (!getExtractField("xsl.file." + i).equals("")) {
+        while (!getExtractField("extract." + i+".file").equals("")) {
             ExtractPropertyBean epbean = new ExtractPropertyBean();
             epbean.setId(i);
             // we will implement a find by id function in the front end
-            epbean.setFileName(getExtractField("xsl.file." + i));
+            epbean.setFileName(getExtractFields("extract." + i+".file"));
             // file name of the xslt stylesheet
-            epbean.setFiledescription(getExtractField("xsl.file.description." + i));
+            epbean.setFiledescription(getExtractField("extract." + i+".fileDescription"));
             // description of the choice of format
-            epbean.setHelpText(getExtractField("xsl.helptext." + i));
+            epbean.setHelpText(getExtractField("extract." + i+".helptext"));
             // help text, currently in the alt-text of the link
-            epbean.setLinkText(getExtractField("xsl.link.text." + i));
+            epbean.setLinkText(getExtractField("extract." + i+".linkText"));
             // link text of the choice of format
             // epbean.setRolesAllowed(getExtractField("xsl.allowed." + i).split(","));
             // which roles are allowed to see the choice?
-            epbean.setFileLocation(getExtractField("xsl.location." + i));
+            epbean.setFileLocation(getExtractField("extract." + i+".location"));
             // destination of the copied files
             // epbean.setFormat(getExtractField("xsl.format." + i));
             // if (("").equals(epbean.getFormat())) {
+            
             epbean.setFormat("oc1.3");
             // }
             // formatting choice. currently permenantly set at oc1.3
-            epbean.setExportFileName(getExtractField("xsl.exportname." + i));
+            epbean.setExportFileName(getExtractFields("extract." + i+".exportname"));
             // destination file name of the copied files
-            String whichFunction = getExtractField("xsl.post." + i).toLowerCase();
+            String whichFunction = getExtractField("extract."+i+".post").toLowerCase();
             // post-processing event after the creation
             // System.out.println("found post function: " + whichFunction);
+   
+            //added by JN: Zipformat comes from extract properties returns true by default
+            epbean.setZipFormat(getExtractFieldBoolean("extract."+i+".zip"));
+            epbean.setDeleteOld(getExtractFieldBoolean("extract."+i+".deleteOld"));
+            epbean.setSuccessMessage(getExtractField("extract."+i+".success"));
+            epbean.setFailureMessage(getExtractField("extract."+i+".failure"));
+            
             if ("sql".equals(whichFunction)) {
                 // set the bean within, so that we can access the file locations etc
                 SqlProcessingFunction function = new SqlProcessingFunction(epbean);
@@ -122,7 +130,21 @@ public class CoreResources implements ResourceLoaderAware {
                 epbean.setPostProcessing(new PdfProcessingFunction());
             } else if ("sas".equals(whichFunction)) {
                 epbean.setPostProcessing(new SasProcessingFunction());
-            } else {
+            }else if(!whichFunction.isEmpty()){
+            	String postProcessorName = getExtractField(whichFunction+".postProcessor");
+            	if(postProcessorName.equals("pdf")){
+            		epbean.setPostProcessing(new PdfProcessingFunction());
+            		epbean.setPostProcDeleteOld(getExtractFieldBoolean(whichFunction+".deleteOld"));
+            		epbean.setPostProcZip(getExtractFieldBoolean(whichFunction+".zip"));
+            		epbean.setPostProcLocation(getExtractField(whichFunction+".location"));
+            		epbean.setPostProcExportName(getExtractField(whichFunction+".exportName"));
+            	}
+            	else if(postProcessorName.equals("sql")){
+            		
+            	}
+            	 
+            }
+            else {
                 // add a null here
                 epbean.setPostProcessing(null);
             }
@@ -203,6 +225,27 @@ public class CoreResources implements ResourceLoaderAware {
         return value == null ? "" : value;
     }
 
+    //JN:The following method returns default of true when converting from string
+    public static boolean getExtractFieldBoolean(String key) {
+        String value = EXTRACTINFO.getProperty(key);
+        if (value != null) {
+            value = value.trim();
+        }
+        if(value==null)
+        	return true;//Defaulting to true
+        if(value.equalsIgnoreCase("false"))
+        return false;
+        else
+        	return true;//defaulting to true
+        
+    }
+    public static String[] getExtractFields(String key) {
+        String value = EXTRACTINFO.getProperty(key);
+        if (value != null) {
+            value = value.trim();
+        }
+        return value.split(",");
+    }
     public static ExtractPropertyBean findExtractPropertyBeanById(int id) {
         for (ExtractPropertyBean epbean : extractProperties) {
             if (epbean.getId() == id) {

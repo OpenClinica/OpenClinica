@@ -22,8 +22,18 @@ public class XsltTriggerService {
     public static final String EXTRACT_PROPERTY = "extractProperty";
     public static final String LOCALE = "locale";
     public static final String STUDY_ID = "studyId";
+    public static final String ZIPPED="zipped";
+    public static final String DELETE_OLD="deleteOld";
+    public static final String SUCCESS_MESSAGE="SUCCESS_MESSAGE";
+    public static final String FAILURE_MESSAGE="FAILURE_MESSAGE";
     
     public static String TRIGGER_GROUP_NAME = "XsltTriggers";
+    
+    //POST PROCESSING VARIABLES
+    public static final String POST_PROC_DELETE_OLD="postProcDeleteOld";
+    public static final String POST_PROC_ZIP="postProcZip";
+    public static final String POST_PROC_LOCATION="postProcLocation";
+    public static final String POST_PROC_EXPORT_NAME="postProcExportName";
     
     public SimpleTrigger generateXsltTrigger(String xslFile, String xmlFile, String endFilePath, 
             String endFile, int datasetId, ExtractPropertyBean epBean, UserAccountBean userAccountBean, String locale) {
@@ -39,7 +49,7 @@ public class XsltTriggerService {
         JobDataMap jobDataMap = new JobDataMap();
 
         jobDataMap.put(XSL_FILE_PATH, xslFile);
-        jobDataMap.put(XML_FILE_PATH, xmlFile);
+        jobDataMap.put(XML_FILE_PATH, endFilePath);
         jobDataMap.put(POST_FILE_PATH, endFilePath);
         jobDataMap.put(POST_FILE_NAME, endFile);
         jobDataMap.put(EXTRACT_PROPERTY, epBean.getId());
@@ -48,6 +58,15 @@ public class XsltTriggerService {
         jobDataMap.put(LOCALE, locale);
         jobDataMap.put(DATASET_ID, datasetId);
         jobDataMap.put(EMAIL, userAccountBean.getEmail());
+        jobDataMap.put(ZIPPED,epBean.getZipFormat());
+        jobDataMap.put(DELETE_OLD,epBean.getDeleteOld());
+        jobDataMap.put(SUCCESS_MESSAGE,epBean.getSuccessMessage());
+        jobDataMap.put(FAILURE_MESSAGE,epBean.getFailureMessage());
+        
+        jobDataMap.put(POST_PROC_DELETE_OLD, epBean.getPostProcDeleteOld());
+        jobDataMap.put(POST_PROC_ZIP, epBean.getPostProcZip());
+        jobDataMap.put(POST_PROC_LOCATION, epBean.getPostProcLocation());
+        jobDataMap.put(POST_PROC_EXPORT_NAME, epBean.getPostProcExportName());
         // jobDataMap.put(DIRECTORY, directory);
         // jobDataMap.put(ExampleSpringJob.LOCALE, locale);
         
