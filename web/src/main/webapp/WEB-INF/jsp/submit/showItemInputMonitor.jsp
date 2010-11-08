@@ -41,7 +41,7 @@ function genToolTips(itemId){
 					
 			   	 	</c:forEach>
 					totNotes = 	 ${notesSize};
-				if(totNotes >0) footNote = totNotes + " " + '<fmt:message key="foot_threads" bundle="${resword}"/>' + '<fmt:message key="footNote_threads" bundle="${resword}"/>';
+				if(totNotes >0) footNote = totNotes + " " + '<fmt:message key="foot_threads" bundle="${resword}"/>' + " " + '<fmt:message key="footNote_threads" bundle="${resword}"/>';
 	   			}
 	    </c:forEach>
 	 	
