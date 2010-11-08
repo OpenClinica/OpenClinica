@@ -72,6 +72,7 @@ function setStatus(typeId) {
 	  	objtr2.disabled = true;
 	} else if (typeId == 3) { //query
 		objtr2.value=1; //new
+		objtr2.disabled = false;
 	} else {
   		if (objtr2.value ==5 && objtr2.disabled) {
    			objtr2.value=1;
