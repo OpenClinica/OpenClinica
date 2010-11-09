@@ -12,10 +12,12 @@ import java.util.Date;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -23,6 +25,7 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -133,6 +136,16 @@ public class RemoveCRFVersionServlet extends SecureController {
                     }
                 }
 
+                ArrayList versionList = (ArrayList)cvdao.findAllByCRF(version.getCrfId());
+                if(versionList.size() > 0){
+                    EventDefinitionCRFDAO edCRFDao = new EventDefinitionCRFDAO(sm.getDataSource());
+                    ArrayList edcList = (ArrayList)edCRFDao.findAllByCRF(version.getCrfId());
+                    for(int i = 0; i < edcList.size(); i++){
+                        EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean)edcList.get(i);
+                        updateEventDef(edcBean, edCRFDao, versionList);
+                    }
+                }
+
                 addPageMessage(respage.getString("the_CRF") + version.getName() + " " + respage.getString("has_been_removed_succesfully"));
                 forwardPage(Page.CRF_LIST_SERVLET);
 
@@ -149,5 +162,26 @@ public class RemoveCRFVersionServlet extends SecureController {
             return "";
         }
     }
-
+    public static void updateEventDef(EventDefinitionCRFBean edcBean, EventDefinitionCRFDAO edcDao, ArrayList versionList){
+        ArrayList<Integer> idList = new ArrayList<Integer>();
+        CRFVersionBean temp = (CRFVersionBean)versionList.get(0);
+        if (StringUtil.isBlank(edcBean.getSelectedVersionIds())){
+            edcBean.setDefaultVersionId(temp.getId());
+            edcDao.update(edcBean);
+        } else {
+            String sversionIds = edcBean.getSelectedVersionIds();
+            String[] ids = sversionIds.split("\\,");
+            for (String id : ids) {
+                idList.add(Integer.valueOf(id));
+            }
+            for(int i = 0; i < versionList.size(); i++){
+                CRFVersionBean versionBean = (CRFVersionBean)versionList.get(i);
+                if (idList.contains(versionBean.getId())){
+                    edcBean.setDefaultVersionId(versionBean.getId());
+                    edcDao.update(edcBean);
+                    break;
+                }
+            }
+        }
+    }
 }

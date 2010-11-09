@@ -13,11 +13,14 @@ import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.control.admin.RemoveCRFVersionServlet;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.view.Page;
@@ -79,6 +82,17 @@ public class LockCRFVersionServlet extends SecureController {
            version.setStatus(Status.LOCKED);
            version.setUpdater(ub);
            cvdao.update(version);
+
+           ArrayList versionList = (ArrayList)cvdao.findAllByCRF(version.getCrfId());
+           if(versionList.size() > 0){
+               EventDefinitionCRFDAO edCRFDao = new EventDefinitionCRFDAO(sm.getDataSource());
+               ArrayList edcList = (ArrayList)edCRFDao.findAllByCRF(version.getCrfId());
+               for(int i = 0; i < edcList.size(); i++){
+                   EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean)edcList.get(i);
+                   RemoveCRFVersionServlet.updateEventDef(edcBean, edCRFDao, versionList);
+               }
+           }
+
            addPageMessage(respage.getString("crf_version_archived_successfully"));
            forwardPage(Page.CRF_LIST_SERVLET);
        }
