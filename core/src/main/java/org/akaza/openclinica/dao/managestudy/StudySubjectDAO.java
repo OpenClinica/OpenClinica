@@ -106,7 +106,7 @@ public class StudySubjectDAO extends AuditableEntityDAO {
         ind++; // oc oid
         this.setTypeExpected(ind, TypeNames.STRING);
         ind++; //
-        this.setTypeExpected(ind, TypeNames.INT);
+        this.setTypeExpected(ind, TypeNames.TIMESTAMP);
         ind++; //
     }
 
@@ -207,6 +207,7 @@ public class StudySubjectDAO extends AuditableEntityDAO {
         eb.setEnrollmentDate((Date) hm.get("enrollment_date"));
         eb.setSecondaryLabel((String) hm.get("secondary_label"));
         eb.setOid((String) hm.get("oc_oid"));
+        eb.setEventStartDate((Date) hm.get("date_start"));
         // eb.setActive(true);
         return eb;
     }

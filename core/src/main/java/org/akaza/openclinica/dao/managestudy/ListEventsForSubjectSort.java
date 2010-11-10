@@ -12,7 +12,7 @@ public class ListEventsForSubjectSort implements CriteriaCommand {
         columnMapping.put("studySubject.label", "label");
         columnMapping.put("studySubject.status", "status_id");
         columnMapping.put("enrolledAt", "ST.unique_identifier");
-        columnMapping.put("event.startDate", "se.date_start");
+        columnMapping.put("studySubject.eventStartDate", "se.date_start");
     }
 
     public void addSort(String property, String order) {
