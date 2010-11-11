@@ -105,9 +105,9 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 /**
  * @author ssachs
- * 
+ *
  *         Enabled scoring feature - ywang (Jan. 2008)
- * 
+ *
  */
 
 public abstract class DataEntryServlet extends SecureController {
@@ -278,14 +278,14 @@ public abstract class DataEntryServlet extends SecureController {
         return "";
     }
 
-    
+
     @Override
     protected  void processRequest() throws Exception {
 
         locale = request.getLocale();
 
         FormDiscrepancyNotes discNotes;
-        
+
         panel.setStudyInfoShown(false);
         String age = "";
         if (fp.getString(GO_EXIT).equals("") && !isSubmitted && fp.getString("tabId").equals("") && fp.getString("sectionId").equals("")) {
@@ -358,7 +358,7 @@ public abstract class DataEntryServlet extends SecureController {
         request.setAttribute("closedNum", closedNum + "");
         request.setAttribute("resolvedNum", resolvedNum + "");
         request.setAttribute("notAppNum", notAppNum + "");
-        
+
         String fromViewNotes = fp.getString("fromViewNotes");
         if(fromViewNotes!=null && "1".equals(fromViewNotes)) {
             request.setAttribute("fromViewNotes", fromViewNotes);
@@ -681,7 +681,7 @@ public abstract class DataEntryServlet extends SecureController {
                         // otherwise,
                         // DDE not
                         // working-jxu
-                        
+
                         if(section.getSection().hasSCDItem()) {
                             if(dib.getSCDPairs().size()>0) {
                                 //for control item
@@ -723,7 +723,7 @@ public abstract class DataEntryServlet extends SecureController {
                             // false);
                             child = validateDisplayItemBean(v, child, itemName);
                             // was null changed value 092007 tbh
-                            
+
                             if(section.getSection().hasSCDItem()) {
                                 if(child.getSCDPairs().size()>0) {
                                     //for control item
@@ -739,7 +739,7 @@ public abstract class DataEntryServlet extends SecureController {
                                     validateSCDItemBean(v, child);
                                 }
                             }
-                            
+
                         } else {
                             // child.loadFormValue(itemName);
                             child = loadFormValue(child);
@@ -1365,7 +1365,7 @@ public abstract class DataEntryServlet extends SecureController {
                 // If the Study Subject's Satus is signed and we save a section
                 // , change status to available
                 logger.debug("Status of Study Subject {}", ssb.getStatus().getName());
-                if (ssb.getStatus() == Status.SIGNED) {
+                if (ssb.getStatus() == Status.SIGNED && changedItemsList.size() > 0) {
                     logger.debug("Status of Study Subject is Signed we are updating");
                     StudySubjectDAO studySubjectDao = new StudySubjectDAO(sm.getDataSource());
                     ssb.setStatus(Status.AVAILABLE);
@@ -1373,7 +1373,7 @@ public abstract class DataEntryServlet extends SecureController {
                     ssb.setUpdatedDate(new Date());
                     studySubjectDao.update(ssb);
                 }
-                if (ecb.isSdvStatus()) {
+                if (ecb.isSdvStatus() && changedItemsList.size() > 0) {
                     logger.debug("Status of Study Subject is SDV we are updating");
                     StudySubjectDAO studySubjectDao = new StudySubjectDAO(sm.getDataSource());
                     ssb.setStatus(Status.AVAILABLE);
@@ -1525,7 +1525,7 @@ public abstract class DataEntryServlet extends SecureController {
                     }
                 }
                 System.out.println("running rules: " + phase2.name());
-                
+
                 HashMap<String, ArrayList<String>> rulesPostDryRun = runRules(allItems, ruleSets, false, shouldRunRules(), MessageType.WARNING, phase2);
                 System.out.println("found rules post dry run: " + rulesPostDryRun.toString());
                 HashMap<String, ArrayList<String>> errorsPostDryRun = new HashMap<String, ArrayList<String>>();
@@ -1628,7 +1628,7 @@ public abstract class DataEntryServlet extends SecureController {
 
                         // section.setItems(displayItems);
                         section.setDisplayItemGroups(displayGroupsWithItems);
-                        
+
                         // section.setDisplayFormGroups(newDisplayBean.getDisplayFormGroups());
 
                     }
@@ -1998,7 +1998,7 @@ public abstract class DataEntryServlet extends SecureController {
 
     /**
      * Tries to check if a seciton has item groups
-     * 
+     *
      * @return
      */
     protected boolean checkGroups() {
@@ -2029,7 +2029,7 @@ public abstract class DataEntryServlet extends SecureController {
     /**
      * Creates a new Event CRF or update the exsiting one, that is, an event CRF can be created but not item data yet, in this case, still consider it is not
      * started(called uncompleted before)
-     * 
+     *
      * @return
      * @throws Exception
      */
@@ -2181,7 +2181,7 @@ public abstract class DataEntryServlet extends SecureController {
      * Read in form values and write them to a display item bean. Note that this results in the form value being written to both the response set bean and the
      * item data bean. The ResponseSetBean is used to display preset values on the form in the event of error, and the ItemDataBean is used to send values to
      * the database.
-     * 
+     *
      * @param dib
      *            The DisplayItemBean to write data into.
      * @return The DisplayItemBean, with form data loaded.
@@ -2208,7 +2208,7 @@ public abstract class DataEntryServlet extends SecureController {
 
     /**
      * This methods will create an array of DisplayItemGroupBean, which contains multiple rows for an item group on the data entry form.
-     * 
+     *
      * @param digb
      *            The Item group which has multiple data rows
      * @param dbGroups
@@ -2553,7 +2553,7 @@ public abstract class DataEntryServlet extends SecureController {
      * The loadFormValue method should be used for this purpose.
      * <p/>
      * validateDisplayItemBeanText, validateDisplayItemBeanSingleCV, and validateDisplayItemBeanMultipleCV are provided to make implementing this method easy.
-     * 
+     *
      * @param v
      *            The Validator to add validations to.
      * @param dib
@@ -2625,7 +2625,7 @@ public abstract class DataEntryServlet extends SecureController {
         }
         return metadataBean;
     }
-    
+
     private DisplayItemBean runDynamicsItemCheck(DisplayItemBean dib) {
         try {
             // System.out.println("trying run dynamics item check: item id " + dib.getItem().getId() + " item data id " + dib.getData().getId());
@@ -2639,7 +2639,7 @@ public abstract class DataEntryServlet extends SecureController {
         }
 
         return dib;
-        
+
     }
 
     /*
@@ -2656,7 +2656,7 @@ public abstract class DataEntryServlet extends SecureController {
     /**
      * Peform validation on a item which has a TEXT or TEXTAREA response type. If the item has a null value, it's automatically validated. Otherwise, it's
      * checked against its data type.
-     * 
+     *
      * @param v
      *            The Validator to add validations to.
      * @param dib
@@ -2767,7 +2767,7 @@ public abstract class DataEntryServlet extends SecureController {
     /**
      * Peform validation on a item which has a RADIO or SINGLESELECTresponse type. This function checks that the input isn't blank, and that its value comes
      * from the controlled vocabulary (ResponseSetBean) in the DisplayItemBean.
-     * 
+     *
      * @param v
      *            The Validator to add validations to.
      * @param dib
@@ -2790,7 +2790,7 @@ public abstract class DataEntryServlet extends SecureController {
         customValidation(v, dib, inputName);
         return dib;
     }
-    
+
     //validate simple-conditional-display item to be changed from shown to hidden
     protected void validateShownSCDToBeHiddenSingle(DiscrepancyValidator v, DisplayItemBean dib) {
         ItemFormMetadataBean ifmb = dib.getMetadata();
@@ -2807,7 +2807,7 @@ public abstract class DataEntryServlet extends SecureController {
     /**
      * Peform validation on a item which has a RADIO or SINGLESELECT response type. This function checks that the input isn't blank, and that its value comes
      * from the controlled vocabulary (ResponseSetBean) in the DisplayItemBean.
-     * 
+     *
      * @param v
      *            The Validator to add validations to.
      * @param dib
@@ -2844,7 +2844,7 @@ public abstract class DataEntryServlet extends SecureController {
 
     /**
      * Creates an input name for an item data entry in an item group
-     * 
+     *
      * @param digb
      * @param ordinal
      * @param dib
@@ -2866,7 +2866,7 @@ public abstract class DataEntryServlet extends SecureController {
     /**
      * Writes data from the DisplayItemBean to the database. Note that if the bean contains an inactive ItemDataBean, the ItemDataBean is created; otherwise,
      * the ItemDataBean is updated.
-     * 
+     *
      * @param dib
      *            The DisplayItemBean from which to write data.
      * @param iddao
@@ -2876,15 +2876,15 @@ public abstract class DataEntryServlet extends SecureController {
     protected boolean writeToDB(DisplayItemBean dib, ItemDataDAO iddao, int ordinal) {
         ItemDataBean idb = dib.getData();
         if (getServletPage().equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
-        	if (!dib.getMetadata().isShowItem() && 
-        			idb.getValue().equals("") && 
+        	if (!dib.getMetadata().isShowItem() &&
+        			idb.getValue().equals("") &&
         			!getItemMetadataService().hasPassedDDE(dib.getMetadata(), ecb, idb)) {//(dib.getItem().getId(), ecb, idb)) {// && !getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getData())) {
         		logger.debug("*** not shown - not writing for idb id " + dib.getData().getId() + " and item id " + dib.getItem().getId());
         		return true;
         	}
         } else {
-        	if (!dib.getMetadata().isShowItem() && 
-            		idb.getValue().equals("") && 
+        	if (!dib.getMetadata().isShowItem() &&
+            		idb.getValue().equals("") &&
             		!getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getData())) {
                 logger.debug("*** not shown - not writing for idb id " + dib.getData().getId() + " and item id " + dib.getItem().getId());
                 return true;
@@ -2898,14 +2898,14 @@ public abstract class DataEntryServlet extends SecureController {
         }
         return writeToDB(idb,dib,iddao,ordinal);
     }
-        
+
     protected boolean writeConditionalDisplayItemToDB(DisplayItemBean dib, ItemDataDAO iddao, int ordinal, boolean isDisplay) {
         ItemDataBean idb = dib.getData();
         ItemDataBean dbdata = dib.getDbData();
         boolean display = isDisplay ? true : false;
         if(!display && idb.getId()>0) {
             Status s = dbdata.getStatus();
-            int id = s == null ? -1 : s.getId(); 
+            int id = s == null ? -1 : s.getId();
             display = id>0 && (id!=5 || id!=7)? dbdata.getValue().length()>0?true:dib.getNumDiscrepancyNotes()>0?true:false : false;
         }
         if(display) {
@@ -2924,13 +2924,13 @@ public abstract class DataEntryServlet extends SecureController {
         //if no need written to database, back with true
         return true;
     }
-    
+
     protected boolean writeToDB(ItemDataBean itemData, DisplayItemBean dib, ItemDataDAO iddao, int ordinal) {
         ItemDataBean idb = itemData;
-        
+
         idb.setItemId(dib.getItem().getId());
         idb.setEventCRFId(ecb.getId());
-        
+
         if (StringUtil.isBlank(dib.getEditFlag())) {
 
             if (!idb.isActive()) {
@@ -3111,9 +3111,9 @@ public abstract class DataEntryServlet extends SecureController {
         hasUngroupedItems = formBeanUtil.sectionHasUngroupedItems(sm.getDataSource(), sb.getId(), itemGroups);
         sdao = new SectionDAO(sm.getDataSource());
         sb.setHasSCDItem(hasUngroupedItems?this.sdao.hasSCDItem(sb.getId()):false);
-        
+
         section.setEventCRF(ecb);
-        
+
         if (sb.getParentId() > 0) {
             SectionBean parent = (SectionBean) sdao.findByPK(sb.getParentId());
             sb.setParent(parent);
@@ -3170,7 +3170,7 @@ public abstract class DataEntryServlet extends SecureController {
 
             displayItems.set(i, dib);
         }
-        
+
         if(sb.hasSCDItem()) {
             Map<String,DisplayItemBean> displayItemMap = new HashMap<String,DisplayItemBean>();
             for(int i=0; i<displayItems.size(); ++i) {
@@ -3179,9 +3179,9 @@ public abstract class DataEntryServlet extends SecureController {
             List<ItemFormMetadataBean> sectionSCDMeta = ifmdao.findSCDItemsBySectionId(sb.getId());
             Map<String,String> childParentNameMap = idao.mapAllChildAndParentNameInSection(sb.getId());
             displayItems = this.gainConditionalDisplayPairs(displayItemMap, sectionSCDMeta, childParentNameMap);
-            
+
         }
-        
+
         section.setItems(displayItems);
 
         return section;
@@ -3256,7 +3256,7 @@ public abstract class DataEntryServlet extends SecureController {
     /**
      * For each single item in this section which is a parent, get a DisplayItemBean corresponding to that item. Note that an item is a parent iff its parentId
      * == 0.
-     * 
+     *
      * @param sb
      *            The section whose items we are retrieving.
      * @param hasUngroupedItems
@@ -3367,7 +3367,7 @@ public abstract class DataEntryServlet extends SecureController {
 
     /**
      * Get the DisplayItemBean objects corresponding to the items which are children of the specified parent.
-     * 
+     *
      * @param parent
      *            The item whose children are to be retrieved.
      * @return An array of DisplayItemBean objects corresponding to the items which are children of parent, and are sorted by column number (ascending), then
@@ -3459,14 +3459,14 @@ public abstract class DataEntryServlet extends SecureController {
     /*
      * change to explicitly re-set the section bean after reviewing the disc note counts, tbh 01/2010
      */
-    
+
     protected DisplaySectionBean populateNotesWithDBNoteCounts(FormDiscrepancyNotes discNotes, DisplaySectionBean section) {
         dndao = new DiscrepancyNoteDAO(sm.getDataSource());
        // ArrayList items = section.getItems();
         ArrayList<DiscrepancyNoteBean> ecNotes = dndao.findEventCRFDNotesFromEventCRF(ecb);
         ArrayList<DiscrepancyNoteBean> existingNameNotes = new ArrayList(),nameNotes = new ArrayList();
         ArrayList<DiscrepancyNoteBean> existingIntrvDateNotes = new ArrayList(),dateNotes = new ArrayList();
-       
+
         int intNew = 0,intRes = 0,intUpdated=0,intClosed=0,intNA = 0;
         int dateNew = 0,dateRes = 0,dateUpdated=0,dateClosed=0,dateNA=0 ;
         boolean hasMoreThreads = false;
@@ -3478,7 +3478,7 @@ public abstract class DataEntryServlet extends SecureController {
                 request.setAttribute(INTERVIEWER_NAME_NOTE, dn);
                if(dn.getParentDnId()==0)
                 existingNameNotes.add(dn);
-                
+
             }
 
             if (DATE_INTERVIEWED.equalsIgnoreCase(dn.getColumn())) {
@@ -3492,11 +3492,11 @@ public abstract class DataEntryServlet extends SecureController {
         setToolTipEventNotes();
         request.setAttribute("nameNoteResStatus", getDiscrepancyNoteResolutionStatus(existingNameNotes));
         request.setAttribute("IntrvDateNoteResStatus", getDiscrepancyNoteResolutionStatus(existingIntrvDateNotes));
-       
+
         request.setAttribute("existingNameNotes", existingNameNotes);
-        
-   
-      
+
+
+
         request.setAttribute("existingIntrvDateNotes", existingIntrvDateNotes);
 
         //sendJSONNames(existingNameNotes);
@@ -3605,7 +3605,7 @@ public abstract class DataEntryServlet extends SecureController {
     }
 
     private void setToolTipEventNotes() {
-		
+
 
         ArrayList<DiscrepancyNoteBean> ecNotes = dndao.findEventCRFDNotesToolTips(ecb);
         ArrayList<DiscrepancyNoteBean> nameNotes = new ArrayList();
@@ -3613,17 +3613,17 @@ public abstract class DataEntryServlet extends SecureController {
         for (int i = 0; i < ecNotes.size(); i++) {
             DiscrepancyNoteBean dn = ecNotes.get(i);
             if (INTERVIEWER_NAME.equalsIgnoreCase(dn.getColumn())) {
-               
-          
+
+
                 	nameNotes.add(dn);
-            
-                
+
+
             }
 
             if (DATE_INTERVIEWED.equalsIgnoreCase(dn.getColumn())) {
                              	dateNotes.add(dn);
             }
-            
+
         }
         request.setAttribute("nameNotes", nameNotes);
         request.setAttribute("intrvDates", dateNotes);
@@ -3633,7 +3633,7 @@ public abstract class DataEntryServlet extends SecureController {
     public @ResponseBody ArrayList<DiscrepancyNoteBean> sendJSONNames(ArrayList<DiscrepancyNoteBean> existingNameNotes) {
 		return existingNameNotes;
 	}*/
-    
+
 
 
 	/**
@@ -3648,11 +3648,11 @@ public abstract class DataEntryServlet extends SecureController {
     	boolean hasOtherThread = false;
     	 ArrayList<DiscrepancyNoteBean> existingNotes = dndao.findExistingNotesForToolTip(itemDataId);
     	 dib.setDiscrepancyNotes(existingNotes);
-    	 
+
          for (DiscrepancyNoteBean obj : dib.getDiscrepancyNotes()) {
              DiscrepancyNoteBean note =  obj;
-            
-            
+
+
              if (note.getParentDnId() == 0) {
                 	 resolutionStatus = note.getResolutionStatusId();
                  totNew++;//using totNew to show the total parent threads
@@ -3669,7 +3669,7 @@ public abstract class DataEntryServlet extends SecureController {
              DiscrepancyNoteBean note = (DiscrepancyNoteBean) obj;
              /*We would only take the resolution status of the parent note of any note thread. If there
              * are more than one note thread, the thread with the worst resolution status will be taken.*/
-           
+
              if(note.getParentDnId()==0)
              {
             	 if(hasOtherThread)
@@ -3678,8 +3678,8 @@ public abstract class DataEntryServlet extends SecureController {
             	 }
             	 hasOtherThread = true;
              }
-                
-                
+
+
          }
     	dib.setTotNew(totNew);//totNew is used for parent thread count
     	dib.setTotRes(totRes);
@@ -3688,10 +3688,10 @@ public abstract class DataEntryServlet extends SecureController {
     	dib.setTotNA(totNA);
     	return dib;
     }
-    
+
     /**
      * The following methods are for 'mark CRF complete'
-     * 
+     *
      * @return
      */
 
@@ -3944,7 +3944,7 @@ public abstract class DataEntryServlet extends SecureController {
 
     /**
      * Checks if a section is reviewed at least once by user
-     * 
+     *
      * @param sb
      * @return
      */
@@ -3979,7 +3979,7 @@ public abstract class DataEntryServlet extends SecureController {
 
     /**
      * Checks if all the sections in an event crf are reviewed once
-     * 
+     *
      * @return
      */
     protected boolean isEachSectionReviewedOnce() {
@@ -4022,7 +4022,7 @@ public abstract class DataEntryServlet extends SecureController {
 
     /**
      * Constructs a list of DisplayItemWithGroupBean, which is used for display a section of items on the UI
-     * 
+     *
      * @param dsb
      * @param hasItemGroup
      * @return
@@ -4376,7 +4376,7 @@ public abstract class DataEntryServlet extends SecureController {
         }
         return false;
     }
-    
+
     protected boolean isChanged(ItemDataBean idb, HashMap<Integer, String> oldItemdata, DisplayItemBean dib) {
         if(dib.getMetadata().isConditionalDisplayItem() && !dib.getIsSCDtoBeShown()) {
             return false;
@@ -4387,7 +4387,7 @@ public abstract class DataEntryServlet extends SecureController {
 
     /**
      * Output, just logs all contents of the allItems list. tbh, 01/2010
-     * 
+     *
      * @param displayItemWithGroups
      */
     protected void output(List<DisplayItemWithGroupBean> displayItemWithGroups) {
@@ -4490,7 +4490,7 @@ public abstract class DataEntryServlet extends SecureController {
 
     /**
      * Customized validation for item input
-     * 
+     *
      * @param v
      * @param dib
      * @param inputName
@@ -4539,7 +4539,7 @@ public abstract class DataEntryServlet extends SecureController {
     /**
      * This method will populate grouped and variableAndValue HashMaps grouped : Used to correctly populate group ordinals variableAndValue : Holds itemOID ,
      * value (in Form ) pairs passed in to rule processor
-     * 
+     *
      * @param allItems
      */
     private Container populateRuleSpecificHashMaps(List<DisplayItemWithGroupBean> allItems, Container c, Boolean dryRun) {
@@ -4595,10 +4595,10 @@ public abstract class DataEntryServlet extends SecureController {
         return c;
     }
 
-    private List<RuleSetBean> createAndInitializeRuleSet(StudyBean currentStudy, 
-            StudyEventDefinitionBean studyEventDefinition, 
+    private List<RuleSetBean> createAndInitializeRuleSet(StudyBean currentStudy,
+            StudyEventDefinitionBean studyEventDefinition,
             CRFVersionBean crfVersionBean,
-            StudyEventBean studyEventBean, 
+            StudyEventBean studyEventBean,
             EventCRFBean eventCrfBean,
             Boolean shouldRunRules) {
         if (shouldRunRules) {
@@ -4866,8 +4866,8 @@ public abstract class DataEntryServlet extends SecureController {
                 hasOtherThread = true;
             }
         }
-      
-   
+
+
         return resolutionStatus;
     }
 
@@ -4892,7 +4892,7 @@ public abstract class DataEntryServlet extends SecureController {
         return resolutionStatus;
     }
 
-    private HashMap<String, DisplayItemBean> gainConditionalDisplayPairs(HashMap<String, DisplayItemBean> displayItems, 
+    private HashMap<String, DisplayItemBean> gainConditionalDisplayPairs(HashMap<String, DisplayItemBean> displayItems,
             ArrayList<ItemFormMetadataBean> conditionalDisplayMeta, HashMap<String,Integer>sectionItemNameIdMap) {
         HashMap<String, DisplayItemBean> displayitems = displayItems;
         for(ItemFormMetadataBean ifmb : conditionalDisplayMeta) {
@@ -4909,21 +4909,21 @@ public abstract class DataEntryServlet extends SecureController {
             cd.setIsCurrentShown(SimpleConditionalDisplayPair.isCurrentShownItem(dib.getData()));
             displayItem.getSCDPairs().add(cd);
         }
-        
+
         return displayitems;
     }
-    
-    private ArrayList<DisplayItemBean> gainConditionalDisplayPairs(Map<String, DisplayItemBean> sectionDisplayItemMap, 
+
+    private ArrayList<DisplayItemBean> gainConditionalDisplayPairs(Map<String, DisplayItemBean> sectionDisplayItemMap,
             List<ItemFormMetadataBean> sectionSCDMeta, Map<String,String> childParentNameMap) {
         for(ItemFormMetadataBean ifmb : sectionSCDMeta) {
             Integer cdId = ifmb.getItemId();
             String[] ss = ifmb.getConditionalDisplay().replaceAll("\\\\,", "##").split(",");
-            
+
             SimpleConditionalDisplayPair cd = new SimpleConditionalDisplayPair();
             cd.setSCDItemId(cdId);
             cd.setOptionValue(ss[1].trim());
             cd.setMessage(ss[2].replaceAll("##", "\\\\,"));
-            
+
             DisplayItemBean controlItem = new DisplayItemBean();
             if(childParentNameMap.containsKey(ss[0].trim())) {
                 //among child items
@@ -4951,7 +4951,7 @@ public abstract class DataEntryServlet extends SecureController {
         displayitems.addAll(sectionDisplayItemMap.values());
         return displayitems;
     }
-    
+
     protected Set<Integer> conditionalDisplayToBeShown (DisplayItemBean dib, Set<Integer> showConditionalDisplaySet) {
         Set<Integer> showCDSet = showConditionalDisplaySet;
         //a conditional display item will be always after its control item.
@@ -4981,7 +4981,7 @@ public abstract class DataEntryServlet extends SecureController {
         }
         return showCDSet;
     }
-    
+
     protected boolean shouldSCDBeShown(DisplayItemBean dib) {
         boolean shown = dib.getIsSCDtoBeShown();
         if(!shown) {
