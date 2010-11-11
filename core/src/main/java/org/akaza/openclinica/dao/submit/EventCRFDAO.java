@@ -155,8 +155,8 @@ public class EventCRFDAO extends AuditableEntityDAO {
         variables.put(new Integer(16), new Boolean(ecb.isElectronicSignatureStatus()));
 
         variables.put(new Integer(17), new Boolean(ecb.isSdvStatus()));
-        if (ecb.getPrevStatus() != null && ecb.getPrevStatus().getId() > 0) {
-            variables.put(new Integer(18), new Integer(ecb.getPrevStatus().getId()));
+        if (ecb.getOldStatus() != null && ecb.getOldStatus().getId() > 0) {
+            variables.put(new Integer(18), new Integer(ecb.getOldStatus().getId()));
         } else {
             variables.put(new Integer(18), new Integer(0));
         }
@@ -235,7 +235,7 @@ public class EventCRFDAO extends AuditableEntityDAO {
         eb.setSdvStatus((Boolean) hm.get("sdv_status"));
         Integer prevStatusId = (Integer) hm.get("prev_status");
         if (prevStatusId != null && prevStatusId > 0) {
-            eb.setPrevStatus(Status.getFromMap(prevStatusId));
+            eb.setOldStatus(Status.getFromMap(prevStatusId));
         }
 
         // eb.setStatus(Status.get((Integer) hm.get("status_id"))

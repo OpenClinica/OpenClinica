@@ -302,13 +302,22 @@ public class UpdateStudyEventServlet extends SecureController {
             DiscrepancyValidator v = new DiscrepancyValidator(request, discNotes);
             SubjectEventStatus ses = SubjectEventStatus.get(fp.getInt(SUBJECT_EVENT_STATUS_ID));
             studyEvent.setSubjectEventStatus(ses);
+            EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+            ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(studyEvent);
             if (ses.equals(SubjectEventStatus.SKIPPED) || ses.equals(SubjectEventStatus.STOPPED)) {
                 studyEvent.setStatus(Status.UNAVAILABLE);
-                EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-                ArrayList eventCRFs = ecdao.findAllByStudyEvent(studyEvent);
                 for (int i = 0; i < eventCRFs.size(); i++) {
                     EventCRFBean ecb = (EventCRFBean) eventCRFs.get(i);
+                    ecb.setOldStatus(ecb.getStatus());
                     ecb.setStatus(Status.UNAVAILABLE);
+                    ecb.setUpdater(ub);
+                    ecb.setUpdatedDate(new Date());
+                    ecdao.update(ecb);
+                }
+            } else {
+                for (int i = 0; i < eventCRFs.size(); i++) {
+                    EventCRFBean ecb = (EventCRFBean) eventCRFs.get(i);
+                    ecb.setStatus(ecb.getOldStatus());
                     ecb.setUpdater(ub);
                     ecb.setUpdatedDate(new Date());
                     ecdao.update(ecb);
@@ -385,8 +394,8 @@ public class UpdateStudyEventServlet extends SecureController {
                 ssdao = new StudySubjectDAO(sm.getDataSource());
                 StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(studyEvent.getStudySubjectId());
 
-                EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-                ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(studyEvent);
+                ecdao = new EventCRFDAO(sm.getDataSource());
+                eventCRFs = ecdao.findAllByStudyEvent(studyEvent);
                 ArrayList<Boolean> doRuleSetsExist = new ArrayList<Boolean>();
                 RuleSetDAO ruleSetDao = new RuleSetDAO(sm.getDataSource());
 

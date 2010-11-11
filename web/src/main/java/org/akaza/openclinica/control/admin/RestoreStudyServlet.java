@@ -227,7 +227,7 @@ public class RestoreStudyServlet extends SecureController {
                                 for (int k = 0; k < eventCRFs.size(); k++) {
                                     EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(k);
                                     if (eventCRF.getStatus().equals(Status.AUTO_DELETED)) {
-                                        eventCRF.setStatus(eventCRF.getPrevStatus());
+                                        eventCRF.setStatus(eventCRF.getOldStatus());
                                         eventCRF.setUpdater(ub);
                                         eventCRF.setUpdatedDate(new Date());
                                         ecdao.update(eventCRF);

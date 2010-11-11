@@ -206,7 +206,7 @@ public class RestoreSiteServlet extends SecureController {
                                     EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(k);
                                     // >> YW
                                     if (eventCRF.getStatus().equals(Status.AUTO_DELETED)) {
-                                        eventCRF.setStatus(eventCRF.getPrevStatus());
+                                        eventCRF.setStatus(eventCRF.getOldStatus());
                                         eventCRF.setUpdater(ub);
                                         eventCRF.setUpdatedDate(new Date());
                                         ecdao.update(eventCRF);

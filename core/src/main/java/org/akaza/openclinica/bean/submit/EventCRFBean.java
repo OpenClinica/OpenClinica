@@ -40,7 +40,6 @@ public class EventCRFBean extends AuditableEntityBean {
     private int studySubjectId = 0;
     private boolean electronicSignatureStatus = false;
     private boolean sdvStatus = false;
-    private Status prevStatus;
 
     //the following are not in the table
     private String studySubjectName = "";
@@ -79,7 +78,6 @@ public class EventCRFBean extends AuditableEntityBean {
         this.studySubjectId = eventCRFBean.getStudySubjectId();
         this.electronicSignatureStatus = eventCRFBean.isElectronicSignatureStatus();
         this.sdvStatus = eventCRFBean.isSdvStatus();
-        this.prevStatus = eventCRFBean.getPrevStatus();
         this.studySubjectName = eventCRFBean.getStudySubjectName();
         this.eventName = eventCRFBean.getEventName();
         this.studyName = eventCRFBean.getStudyName();
@@ -501,11 +499,4 @@ public class EventCRFBean extends AuditableEntityBean {
         return this.eventOrdinal;
     }
 
-    public Status getPrevStatus() {
-        return prevStatus;
-    }
-
-    public void setPrevStatus(Status prevStatus) {
-        this.prevStatus = prevStatus;
-    }
 }
