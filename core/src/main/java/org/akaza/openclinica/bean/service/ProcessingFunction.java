@@ -1,5 +1,7 @@
 package org.akaza.openclinica.bean.service;
 
+import java.io.File;
+
 /**
  * Superclass for processing functions, by Tom Hickerson 09/2010
  * Note that this function is run by the XsltTransformJob when an extract is
@@ -18,9 +20,17 @@ public abstract class ProcessingFunction implements ProcessingInterface {
     private String exportFileName;
     private boolean deleteOld;
     private boolean zip;
+    private File[] oldFiles;
     
-    
-    public String getODMXMLFileName() {
+    public File[] getOldFiles() {
+		return oldFiles;
+	}
+
+	public void setOldFiles(File[] oldFiles) {
+		this.oldFiles = oldFiles;
+	}
+
+	public String getODMXMLFileName() {
         return ODMXMLFileName;
     }
 

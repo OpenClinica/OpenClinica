@@ -108,6 +108,10 @@ public class PdfProcessingFunction extends ProcessingFunction {
             }
             System.out.println("Generated " + foResults.getPageCount() + " pages in total.");
             out.close();
+          
+            
+           
+            
             if(isZip())
             {
             	
@@ -153,7 +157,7 @@ public class PdfProcessingFunction extends ProcessingFunction {
        
         if(isDeleteOld())
         {
-        	//delete old pdfs
+        	deleteOldFiles(this.getOldFiles(),outputFile);
         }
         // otherwise return a success with the URL link
        
@@ -166,6 +170,14 @@ public class PdfProcessingFunction extends ProcessingFunction {
         
         
     }
-    
+    private void deleteOldFiles(File[] oldFiles,File outputFile) {
+	    	//File[] files = complete.listFiles();
+			for(int i=0;i<oldFiles.length;i++)
+			{
+				if(!outputFile.getName().equals(oldFiles[i].getName()))
+				oldFiles[i].delete();
+			}
+			
+		}
     
 }

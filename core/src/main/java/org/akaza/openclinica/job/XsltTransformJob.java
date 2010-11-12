@@ -196,14 +196,15 @@ public class XsltTransformJob extends QuartzJobBean {
                 function.setLocation(dataMap.getString(POST_PROC_LOCATION));
                 function.setExportFileName(dataMap.getString(POST_PROC_EXPORT_NAME));
                 File oldFiles[] = getOldFiles(outputPath,dataMap.getString(POST_PROC_LOCATION));
+                function.setOldFiles(oldFiles);
                 ProcessingResultType message = function.run();
                 final long done2 = System.currentTimeMillis() - start;
                 System.out.println("--> postprocessing completed in " + done2 + " ms, found result type " + message.getCode());
               
-                if((Boolean)dataMap.get(POST_PROC_DELETE_OLD))
+              /*  if((Boolean)dataMap.get(POST_PROC_DELETE_OLD))
                 {
                 	deleteOldFiles(oldFiles);
-                }
+                }*/
                 
                 if (!function.getClass().equals(org.akaza.openclinica.bean.service.SqlProcessingFunction.class)) {
                     ArchivedDatasetFileBean fbFinal = generateFileRecord(dataMap.getString(POST_FILE_NAME) + "." + function.getFileType(), 

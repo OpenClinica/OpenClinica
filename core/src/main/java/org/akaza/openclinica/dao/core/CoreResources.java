@@ -5,6 +5,7 @@ import org.akaza.openclinica.bean.service.PdfProcessingFunction;
 import org.akaza.openclinica.bean.service.SasProcessingFunction;
 import org.akaza.openclinica.bean.service.SqlProcessingFunction;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
