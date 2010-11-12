@@ -69,6 +69,14 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
         ruleSetRuleBean.setRuleSetBean(this);
         ruleSetRules.add(ruleSetRuleBean);
     }
+    
+    @Transient
+    public void addRuleSetRuleForDisplay(RuleSetRuleBean ruleSetRuleBean) {
+        if (this.ruleSetRules == null)
+            this.ruleSetRules = new ArrayList<RuleSetRuleBean>();
+        //ruleSetRuleBean.setRuleSetBean(this); Need to comment this so no bi direction established
+        ruleSetRules.add(ruleSetRuleBean);
+    }
 
     @Transient
     public void addRuleSetRule(RuleBean ruleBean) {

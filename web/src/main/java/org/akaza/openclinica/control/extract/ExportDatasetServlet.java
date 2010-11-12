@@ -7,19 +7,6 @@
  */
 package org.akaza.openclinica.control.extract;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipEntry;
-
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.extract.CommaReportBean;
@@ -30,7 +17,6 @@ import org.akaza.openclinica.bean.extract.SPSSReportBean;
 import org.akaza.openclinica.bean.extract.TabReportBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.SpringServletAccess;
-// import org.akaza.openclinica.control.admin.StdScheduler;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -45,11 +31,23 @@ import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.bean.ArchivedDatasetFileRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.job.XalanTriggerService;
-
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
 import org.quartz.impl.StdScheduler;
 import org.springframework.scheduling.quartz.JobDetailBean;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 /**
  * Take a dataset and show it in different formats,<BR/> Detect whether or not
@@ -93,7 +91,7 @@ public class ExportDatasetServlet extends SecureController {
         ArchivedDatasetFileDAO asdfdao = new ArchivedDatasetFileDAO(sm.getDataSource());
         FormProcessor fp = new FormProcessor(request);
 
-        GenerateExtractFileService generateFileService = new GenerateExtractFileService(sm.getDataSource(), request, sm.getUserBean());
+        GenerateExtractFileService generateFileService = new GenerateExtractFileService(sm.getDataSource(), request, sm.getUserBean(),(CoreResources) SpringServletAccess.getApplicationContext(context).getBean("coreResources"));
         String action = fp.getString("action");
         int datasetId = fp.getInt("datasetId");
         int adfId = fp.getInt("adfId");

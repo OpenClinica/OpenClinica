@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema targetNamespace="http://www.cdisc.org/ns/odm/v1.3" xmlns="http://www.cdisc.org/ns/odm/v1.3"
-           xmlns:OpenClinica="http://www.openclinica.org/ns/openclinica_odm/v1.3"
+           xmlns:OpenClinica="http://www.openclinica.org/ns/odm_ext_v130/v3.1"
+           xmlns:OpenClinicaRules="http://www.openclinica.org/ns/rules/v3.1"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
            elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xs:import schemaLocation="OpenClinica-ODM1-3-0-OC2-0-foundation.xsd"
-	           namespace="http://www.openclinica.org/ns/openclinica_odm/v1.3" />
+	           namespace="http://www.openclinica.org/ns/odm_ext_v130/v3.1" />
+	<xs:import schemaLocation="rules-ODM.xsd" namespace="http://www.openclinica.org/ns/rules/v3.1" />           
 	<xs:redefine schemaLocation="ODM1-3-0-foundation.xsd">
 		<xs:complexType name="ODMcomplexTypeDefinition-MetaDataVersion">
 			<xs:complexContent>
@@ -13,6 +15,8 @@
 						<xs:element ref="OpenClinica:MultiSelectList" minOccurs="0" maxOccurs="unbounded"/>
 						<xs:element ref="OpenClinica:StudyGroupClassList" minOccurs="0" maxOccurs="unbounded"/>
 						<xs:element ref="OpenClinica:StudyDetails" minOccurs="0" maxOccurs="unbounded"/>
+						<!--<xs:element name="Rules" type="OpenClinica-Rules:RuleImportType" minOccurs="0"/>  -->
+						<xs:element ref="OpenClinicaRules:Rules" minOccurs="0" maxOccurs="unbounded"/>
 					</xs:sequence>
 				</xs:extension>
 			</xs:complexContent>

@@ -7,11 +7,6 @@
  */
 package org.akaza.openclinica.bean.extract.odm;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.BasicDefinitionsBean;
 import org.akaza.openclinica.bean.odmbeans.CodeListBean;
@@ -41,7 +36,25 @@ import org.akaza.openclinica.bean.odmbeans.StudyGroupItemBean;
 import org.akaza.openclinica.bean.odmbeans.SymbolBean;
 import org.akaza.openclinica.bean.odmbeans.TranslatedTextBean;
 import org.akaza.openclinica.bean.service.StudyParameterConfig;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.castor.xml.XMLConfiguration;
+import org.exolab.castor.mapping.Mapping;
+import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.xml.MarshalException;
+import org.exolab.castor.xml.Marshaller;
+import org.exolab.castor.xml.ValidationException;
+import org.exolab.castor.xml.XMLContext;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 /**
  * Create ODM XML Study Element for a study.
@@ -52,15 +65,23 @@ import org.apache.commons.lang.StringEscapeUtils;
 public class MetaDataReportBean extends OdmXmlReportBean {
     private OdmStudyBean odmstudy;
     private LinkedHashMap<String, OdmStudyBean> odmStudyMap;
+    private CoreResources coreResources;
 
     public MetaDataReportBean(OdmStudyBean odmstudy) {
         super();
         this.odmstudy = odmstudy;
     }
 
-    public MetaDataReportBean(LinkedHashMap<String, OdmStudyBean> odmStudyMap) {
+    public MetaDataReportBean(OdmStudyBean odmstudy, CoreResources coreResources) {
+        super();
+        this.odmstudy = odmstudy;
+        this.coreResources = coreResources;
+    }
+
+    public MetaDataReportBean(LinkedHashMap<String, OdmStudyBean> odmStudyMap, CoreResources coreResources) {
         super();
         this.odmStudyMap = odmStudyMap;
+        this.coreResources = coreResources;
     }
 
     private static String nls = System.getProperty("line.separator");
@@ -97,6 +118,52 @@ public class MetaDataReportBean extends OdmXmlReportBean {
         addStudyMetaDataVersion(isDataset);
         xml.append(indent + "</Study>");
         xml.append(nls);
+    }
+
+    private String handleLoadCastor(RulesPostImportContainer rpic) {
+
+        try {
+            // Create Mapping
+            Mapping mapping = new Mapping();
+            mapping.loadMapping(getCoreResources().getURL("mappingMarshaller.xml"));
+            // Create XMLContext
+            XMLContext xmlContext = new XMLContext();
+            xmlContext.setProperty(XMLConfiguration.NAMESPACES, "true");
+            xmlContext.addMapping(mapping);
+
+            StringWriter writer = new StringWriter();
+            Marshaller marshaller = xmlContext.createMarshaller();
+            // marshaller.setNamespaceMapping("castor", "http://castor.org/sample/mapping/");
+            marshaller.setWriter(writer);
+            marshaller.marshal(rpic);
+            String result = writer.toString();
+            String newResult = result.replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", "");
+            return newResult;
+
+        } catch (FileNotFoundException ex) {
+            throw new OpenClinicaSystemException(ex.getMessage(), ex.getCause());
+        } catch (IOException ex) {
+            throw new OpenClinicaSystemException(ex.getMessage(), ex.getCause());
+        } catch (MarshalException e) {
+            throw new OpenClinicaSystemException(e.getMessage(), e.getCause());
+        } catch (ValidationException e) {
+            throw new OpenClinicaSystemException(e.getMessage(), e.getCause());
+        } catch (MappingException e) {
+            throw new OpenClinicaSystemException(e.getMessage(), e.getCause());
+        } catch (Exception e) {
+            throw new OpenClinicaSystemException(e.getMessage(), e.getCause());
+        }
+    }
+
+    public void addNodeRulesData(MetaDataVersionBean a) {
+
+        RulesPostImportContainer rpic = new RulesPostImportContainer();
+        rpic.populate(a.getRuleSetRules());
+
+        if (rpic.getRuleSets() != null && rpic.getRuleSets().size() > 0) {
+            StringBuffer xml = this.getXmlOutput();
+            xml.append(handleLoadCastor(rpic));
+        }
     }
 
     public void addStudyGlobalVariables() {
@@ -165,77 +232,31 @@ public class MetaDataReportBean extends OdmXmlReportBean {
     }
 
     /*
+     * public void addStudyMetaDataVersion(boolean isDataset) { StringBuffer xml = this.getXmlOutput(); String indent = this.getIndent(); String currentIndent =
+     * indent + indent; String ODMVersion = this.getODMVersion(); MetaDataVersionBean meta = odmstudy.getMetaDataVersion(); if (isDataset) {
+     * xml.append(currentIndent + "<MetaDataVersion OID=\"" + StringEscapeUtils.escapeXml(meta.getOid()) + "\" Name=\"" +
+     * StringEscapeUtils.escapeXml(meta.getName()) + "\">"); xml.append(nls); // for <Include>, // 1. In order to have <Include>, previous metadataversionOID
+     * must // be // given. // 2. If there is no previous study, then previous study OID is as // the // same as the current study OID // 3. there is no Include
+     * if both previous study and previous // metadataversionOID are empty if (meta.getInclude() != null) { String pmOid =
+     * meta.getInclude().getMetaDataVersionOID(); if (pmOid != null && pmOid.length() > 0) { xml.append(currentIndent + indent); String psOid =
+     * meta.getInclude().getStudyOID(); if (psOid != null && psOid.length() > 0) { xml.append("<Include StudyOID =\"" + StringEscapeUtils.escapeXml(psOid) +
+     * "\""); } else { xml.append("<Include StudyOID =\"" + StringEscapeUtils.escapeXml(odmstudy.getOid()) + "\""); } xml.append(" MetaDataVersionOID=\"" +
+     * StringEscapeUtils.escapeXml(pmOid) + "\"/>"); xml.append(nls); } } } else { xml.append(currentIndent + "<MetaDataVersion>"); xml.append(nls); } //
+     * addProtocol(currentIndent + indent); boolean isStudy = meta.getStudy().getParentStudyId()>0 ? false : true; if (meta.getStudyEventDefs().size() > 0) {
+     * addStudyEventDef(isStudy, currentIndent + indent); if (meta.getItemGroupDefs().size() > 0) { addFormDef(isStudy, currentIndent + indent);
+     * addItemGroupDef(isStudy, currentIndent + indent); addItemDef(isStudy, currentIndent + indent); addCodeList(currentIndent + indent); if
+     * ("oc1.2".equalsIgnoreCase(ODMVersion)) { addMultiSelectList(currentIndent + indent); addStudyGroupClassList(currentIndent + indent); } else if
+     * ("oc1.3".equalsIgnoreCase(ODMVersion)) { addMultiSelectList(currentIndent + indent); addStudyGroupClassList(currentIndent + indent);
+     * if(meta.getStudy().getParentStudyId()>0) { } else { this.addStudyDetails(currentIndent+indent); } } } } xml.append(currentIndent + "</MetaDataVersion>");
+     * xml.append(nls); }
+     */
     public void addStudyMetaDataVersion(boolean isDataset) {
         StringBuffer xml = this.getXmlOutput();
         String indent = this.getIndent();
         String currentIndent = indent + indent;
         String ODMVersion = this.getODMVersion();
         MetaDataVersionBean meta = odmstudy.getMetaDataVersion();
-        if (isDataset) {
-            xml.append(currentIndent + "<MetaDataVersion OID=\"" + StringEscapeUtils.escapeXml(meta.getOid()) + "\" Name=\""
-                + StringEscapeUtils.escapeXml(meta.getName()) + "\">");
-            xml.append(nls);
-            // for <Include>,
-            // 1. In order to have <Include>, previous metadataversionOID must
-            // be
-            // given.
-            // 2. If there is no previous study, then previous study OID is as
-            // the
-            // same as the current study OID
-            // 3. there is no Include if both previous study and previous
-            // metadataversionOID are empty
-            if (meta.getInclude() != null) {
-                String pmOid = meta.getInclude().getMetaDataVersionOID();
-                if (pmOid != null && pmOid.length() > 0) {
-                    xml.append(currentIndent + indent);
-                    String psOid = meta.getInclude().getStudyOID();
-                    if (psOid != null && psOid.length() > 0) {
-                        xml.append("<Include StudyOID =\"" + StringEscapeUtils.escapeXml(psOid) + "\"");
-                    } else {
-                        xml.append("<Include StudyOID =\"" + StringEscapeUtils.escapeXml(odmstudy.getOid()) + "\"");
-                    }
-                    xml.append(" MetaDataVersionOID=\"" + StringEscapeUtils.escapeXml(pmOid) + "\"/>");
-                    xml.append(nls);
-                }
-            }
-        } else {
-            xml.append(currentIndent + "<MetaDataVersion>");
-            xml.append(nls);
-        }
-        //
-        addProtocol(currentIndent + indent);
-        boolean isStudy = meta.getStudy().getParentStudyId()>0 ? false : true;
-        if (meta.getStudyEventDefs().size() > 0) {
-            addStudyEventDef(isStudy, currentIndent + indent);
-            if (meta.getItemGroupDefs().size() > 0) {
-                addFormDef(isStudy, currentIndent + indent);
-                addItemGroupDef(isStudy, currentIndent + indent);
-                addItemDef(isStudy, currentIndent + indent);
-                addCodeList(currentIndent + indent);
-                if ("oc1.2".equalsIgnoreCase(ODMVersion)) {
-                    addMultiSelectList(currentIndent + indent);
-                    addStudyGroupClassList(currentIndent + indent);
-                } else if ("oc1.3".equalsIgnoreCase(ODMVersion)) {
-                    addMultiSelectList(currentIndent + indent);
-                    addStudyGroupClassList(currentIndent + indent);
-                    if(meta.getStudy().getParentStudyId()>0) {
-                    } else {
-                        this.addStudyDetails(currentIndent+indent);
-                    }
-                }
-            }
-        }
-        xml.append(currentIndent + "</MetaDataVersion>");
-        xml.append(nls);
-    }
-    */
-    public void addStudyMetaDataVersion(boolean isDataset) {
-        StringBuffer xml = this.getXmlOutput();
-        String indent = this.getIndent();
-        String currentIndent = indent + indent;
-        String ODMVersion = this.getODMVersion();
-        MetaDataVersionBean meta = odmstudy.getMetaDataVersion();
-        
+
         xml.append(currentIndent + "<MetaDataVersion OID=\"" + StringEscapeUtils.escapeXml(meta.getOid()) + "\" Name=\""
             + StringEscapeUtils.escapeXml(meta.getName()) + "\">");
         xml.append(nls);
@@ -262,10 +283,10 @@ public class MetaDataReportBean extends OdmXmlReportBean {
                 xml.append(nls);
             }
         }
-            
+
         //
         addProtocol(currentIndent + indent);
-        boolean isStudy = meta.getStudy().getParentStudyId()>0 ? false : true;
+        boolean isStudy = meta.getStudy().getParentStudyId() > 0 ? false : true;
         if (meta.getStudyEventDefs().size() > 0) {
             addStudyEventDef(isStudy, currentIndent + indent);
             if (meta.getItemGroupDefs().size() > 0) {
@@ -279,13 +300,16 @@ public class MetaDataReportBean extends OdmXmlReportBean {
                 } else if ("oc1.3".equalsIgnoreCase(ODMVersion)) {
                     addMultiSelectList(currentIndent + indent);
                     addStudyGroupClassList(currentIndent + indent);
-                    if(meta.getStudy().getParentStudyId()>0) {
+                    if (meta.getStudy().getParentStudyId() > 0) {
                     } else {
-                        this.addStudyDetails(currentIndent+indent);
+                        this.addStudyDetails(currentIndent + indent);
                     }
                 }
             }
         }
+
+        addNodeRulesData(meta);
+
         xml.append(currentIndent + "</MetaDataVersion>");
         xml.append(nls);
     }
@@ -321,9 +345,9 @@ public class MetaDataReportBean extends OdmXmlReportBean {
                     + form.getMandatory() + "\"/>");
                 xml.append(nls);
             }
-            //add EventDefinitionDetails for oc1.3
-            if("oc1.3".equals(this.getODMVersion()) && isStudy) {
-                this.addEventDefinitionDetails(sed.getEventDefinitionDetais(),currentIndent+indent);
+            // add EventDefinitionDetails for oc1.3
+            if ("oc1.3".equals(this.getODMVersion()) && isStudy) {
+                this.addEventDefinitionDetails(sed.getEventDefinitionDetais(), currentIndent + indent);
             }
             xml.append(currentIndent + "</StudyEventDef>");
             xml.append(nls);
@@ -344,9 +368,9 @@ public class MetaDataReportBean extends OdmXmlReportBean {
                     + ig.getMandatory() + "\"/>");
                 xml.append(nls);
             }
-            //add FormDetails for oc1.3
-            if("oc1.3".equals(this.getODMVersion()) && isStudy) {
-                this.addFormDetails(form.getFormDetails(),currentIndent+indent);
+            // add FormDetails for oc1.3
+            if ("oc1.3".equals(this.getODMVersion()) && isStudy) {
+                this.addFormDetails(form.getFormDetails(), currentIndent + indent);
             }
             xml.append(currentIndent + "</FormDef>");
             xml.append(nls);
@@ -375,9 +399,9 @@ public class MetaDataReportBean extends OdmXmlReportBean {
                     + item.getOrderNumber() + "\" Mandatory=\"" + item.getMandatory() + "\"/>");
                 xml.append(nls);
             }
-            //add ItemGroupDetails for oc1.3
-            if("oc1.3".equals(this.getODMVersion()) && isStudy) {
-                this.addItemGroupDetails(ig.getItemGroupDetails(),currentIndent+indent);
+            // add ItemGroupDetails for oc1.3
+            if ("oc1.3".equals(this.getODMVersion()) && isStudy) {
+                this.addItemGroupDetails(ig.getItemGroupDetails(), currentIndent + indent);
             }
             xml.append(currentIndent + "</ItemGroupDef>");
             xml.append(nls);
@@ -405,7 +429,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
                 xml.append(" Comment=\"" + StringEscapeUtils.escapeXml(item.getComment()) + "\"");
             }
             if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
-                xml.append(" OpenClinica:FormOIDs=\""+item.getFormOIDs()+"\"");
+                xml.append(" OpenClinica:FormOIDs=\"" + item.getFormOIDs() + "\"");
             }
             boolean hasNode = false;
             // add question
@@ -416,9 +440,9 @@ public class MetaDataReportBean extends OdmXmlReportBean {
                     xml.append(">");
                     xml.append(nls);
                 }
-                if("oc1.3".equalsIgnoreCase(ODMVersion)) {
+                if ("oc1.3".equalsIgnoreCase(ODMVersion)) {
                     String qn = item.getQuestion().getQuestionNumber();
-                    if(qn != null && qn.length()>0) {
+                    if (qn != null && qn.length() > 0) {
                         xml.append(currentIndent + indent + "<Question OpenClinica:QuestionNumber=\"" + item.getQuestion().getQuestionNumber() + "\">");
                     } else {
                         xml.append(currentIndent + indent + "<Question>");
@@ -497,16 +521,16 @@ public class MetaDataReportBean extends OdmXmlReportBean {
                             xml.append(">");
                             xml.append(nls);
                         }
-                        //xml.append(currentIndent + indent + "<OpenClinica:MultiSelectListRef OpenClinica:MultiSelectListID=\""
-                        xml.append(currentIndent + indent + "<OpenClinica:MultiSelectListRef MultiSelectListID=\""
-                            + StringEscapeUtils.escapeXml(mslOid) + "\"/>");
+                        // xml.append(currentIndent + indent + "<OpenClinica:MultiSelectListRef OpenClinica:MultiSelectListID=\""
+                        xml.append(currentIndent + indent + "<OpenClinica:MultiSelectListRef MultiSelectListID=\"" + StringEscapeUtils.escapeXml(mslOid)
+                            + "\"/>");
                         xml.append(nls);
                     }
                 }
             }
-            //add ItemDetails for oc1.3
-            if("oc1.3".equals(ODMVersion) && isStudy) {
-                this.addItemDetails(item.getItemDetails(),currentIndent+indent);
+            // add ItemDetails for oc1.3
+            if ("oc1.3".equals(ODMVersion) && isStudy) {
+                this.addItemDetails(item.getItemDetails(), currentIndent + indent);
                 hasNode = true;
             }
             if (hasNode) {
@@ -611,409 +635,347 @@ public class MetaDataReportBean extends OdmXmlReportBean {
             }
         }
     }
-    
+
     /*
-    public void addMultiSelectList(String currentIndent) {
-        StringBuffer xml = this.getXmlOutput();
-        String indent = this.getIndent();
-        ArrayList<MultiSelectListBean> lists = (ArrayList<MultiSelectListBean>) odmstudy.getMetaDataVersion().getMultiSelectLists();
-        if (lists != null) {
-            if (lists.size() > 0) {
-                for (MultiSelectListBean l : lists) {
-                    xml.append(currentIndent + "<OpenClinica:MultiSelectList OpenClinica:ID=\"" + StringEscapeUtils.escapeXml(l.getOid()) + "\" ");
-                    if (l.getName() != null) {
-                        xml.append("OpenClinica:Name=\"" + StringEscapeUtils.escapeXml(l.getName()) + "\" ");
-                    }
-                    if (l.getDataType() != null) {
-                        xml.append("OpenClinica:DataType=\"" + l.getDataType() + "\" ");
-                    }
-                    if (l.getActualDataType() != null) {
-                        xml.append("OpenClinica:ActualDataType=\"" + StringEscapeUtils.escapeXml(l.getActualDataType()) + "\" ");
-                    }
-                    xml.append(">");
-                    xml.append(nls);
+     * public void addMultiSelectList(String currentIndent) { StringBuffer xml = this.getXmlOutput(); String indent = this.getIndent();
+     * ArrayList<MultiSelectListBean> lists = (ArrayList<MultiSelectListBean>) odmstudy.getMetaDataVersion().getMultiSelectLists(); if (lists != null) { if
+     * (lists.size() > 0) { for (MultiSelectListBean l : lists) { xml.append(currentIndent + "<OpenClinica:MultiSelectList OpenClinica:ID=\"" +
+     * StringEscapeUtils.escapeXml(l.getOid()) + "\" "); if (l.getName() != null) { xml.append("OpenClinica:Name=\"" + StringEscapeUtils.escapeXml(l.getName())
+     * + "\" "); } if (l.getDataType() != null) { xml.append("OpenClinica:DataType=\"" + l.getDataType() + "\" "); } if (l.getActualDataType() != null) {
+     * xml.append("OpenClinica:ActualDataType=\"" + StringEscapeUtils.escapeXml(l.getActualDataType()) + "\" "); } xml.append(">"); xml.append(nls);
+     * ArrayList<MultiSelectListItemBean> mslis = (ArrayList<MultiSelectListItemBean>) l.getMultiSelectListItems(); if (mslis != null && mslis.size() > 0) { for
+     * (MultiSelectListItemBean msli : mslis) { xml.append(currentIndent + indent + "<OpenClinica:MultiSelectListItem OpenClinica:CodedOptionValue=\"" +
+     * StringEscapeUtils.escapeXml(msli.getCodedOptionValue()) + "\">"); xml.append(nls); xml.append(currentIndent + indent + indent + "<Decode>");
+     * xml.append(nls); TranslatedTextBean tt = msli.getDecode(); if (tt.getXmlLang().length() > 0) { xml.append(currentIndent + indent + indent + indent +
+     * "<TranslatedText xml:lang=\"" + tt.getXmlLang() + "\">" + StringEscapeUtils.escapeXml(msli.getDecode().getText()) + "</TranslatedText>"); } else {
+     * xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + StringEscapeUtils.escapeXml(msli.getDecode().getText()) +
+     * "</TranslatedText>"); } xml.append(nls); xml.append(currentIndent + indent + indent + "</Decode>"); xml.append(nls); xml.append(currentIndent + indent +
+     * "</OpenClinica:MultiSelectListItem>"); xml.append(nls); } } xml.append(currentIndent + "</OpenClinica:MultiSelectList>"); xml.append(nls); } } } }
+     */
 
-                    ArrayList<MultiSelectListItemBean> mslis = (ArrayList<MultiSelectListItemBean>) l.getMultiSelectListItems();
-                    if (mslis != null && mslis.size() > 0) {
-                        for (MultiSelectListItemBean msli : mslis) {
-                            xml.append(currentIndent + indent + "<OpenClinica:MultiSelectListItem OpenClinica:CodedOptionValue=\""
-                                + StringEscapeUtils.escapeXml(msli.getCodedOptionValue()) + "\">");
-                            xml.append(nls);
-                            xml.append(currentIndent + indent + indent + "<Decode>");
-                            xml.append(nls);
-                            TranslatedTextBean tt = msli.getDecode();
-                            if (tt.getXmlLang().length() > 0) {
-                                xml.append(currentIndent + indent + indent + indent + "<TranslatedText xml:lang=\"" + tt.getXmlLang() + "\">"
-                                    + StringEscapeUtils.escapeXml(msli.getDecode().getText()) + "</TranslatedText>");
-                            } else {
-                                xml.append(currentIndent + indent + indent + indent + "<TranslatedText>"
-                                    + StringEscapeUtils.escapeXml(msli.getDecode().getText()) + "</TranslatedText>");
-                            }
-                            xml.append(nls);
-                            xml.append(currentIndent + indent + indent + "</Decode>");
-                            xml.append(nls);
-                            xml.append(currentIndent + indent + "</OpenClinica:MultiSelectListItem>");
-                            xml.append(nls);
-                        }
-                    }
-
-                    xml.append(currentIndent + "</OpenClinica:MultiSelectList>");
-                    xml.append(nls);
-                }
-            }
-        }
-    }
-    */
-    
     public void addStudyDetails(String currentIndent) {
         StringBuffer xml = this.getXmlOutput();
         String indent = this.getIndent();
         StudyBean study = odmstudy.getMetaDataVersion().getStudy();
         String temp = "";
-        if(study.getId()>0) {
-            xml.append(currentIndent + "<OpenClinica:StudyDetails StudyOID=\""+StringEscapeUtils.escapeXml(study.getOid())+"\">");
+        if (study.getId() > 0) {
+            xml.append(currentIndent + "<OpenClinica:StudyDetails StudyOID=\"" + StringEscapeUtils.escapeXml(study.getOid()) + "\">");
             xml.append(nls);
-            xml.append(currentIndent+indent+ "<OpenClinica:StudyDescriptionAndStatus");
+            xml.append(currentIndent + indent + "<OpenClinica:StudyDescriptionAndStatus");
             temp = study.getOfficialTitle();
-            if(temp!=null&&temp.length()>0) {
-                    xml.append(" OfficialTitle=\""+StringEscapeUtils.escapeXml(temp)+"\"");
+            if (temp != null && temp.length() > 0) {
+                xml.append(" OfficialTitle=\"" + StringEscapeUtils.escapeXml(temp) + "\"");
             }
             temp = study.getSecondaryIdentifier();
-            if(temp!=null&&temp.length()>0) {
-                    xml.append(" SecondaryIDs=\"" + StringEscapeUtils.escapeXml(temp)+"\"");
+            if (temp != null && temp.length() > 0) {
+                xml.append(" SecondaryIDs=\"" + StringEscapeUtils.escapeXml(temp) + "\"");
             }
-            xml.append(" DateCreated=\"" + new SimpleDateFormat("yyyy-MM-dd").format(study.getCreatedDate())+"\"");
-            xml.append(" StartDate=\"" + new SimpleDateFormat("yyyy-MM-dd").format(study.getDatePlannedStart())+"\"");
-            if(study.getDatePlannedEnd()!=null) {
-                    xml.append(" StudyCompletionDate=\"" + new SimpleDateFormat("yyyy-MM-dd").format(study.getDatePlannedEnd())+"\"");
+            xml.append(" DateCreated=\"" + new SimpleDateFormat("yyyy-MM-dd").format(study.getCreatedDate()) + "\"");
+            xml.append(" StartDate=\"" + new SimpleDateFormat("yyyy-MM-dd").format(study.getDatePlannedStart()) + "\"");
+            if (study.getDatePlannedEnd() != null) {
+                xml.append(" StudyCompletionDate=\"" + new SimpleDateFormat("yyyy-MM-dd").format(study.getDatePlannedEnd()) + "\"");
             }
             xml.append(">");
             xml.append(nls);
-            temp = study.getStatus()==null?"":study.getStatus().getName();
-            if(temp!=null&&temp.length()>0) {
-                xml.append(currentIndent+indent+indent+ "<OpenClinica:StudySytemStatus>"+StringEscapeUtils.escapeXml(temp)
-                        +"</OpenClinica:StudySytemStatus>");
+            temp = study.getStatus() == null ? "" : study.getStatus().getName();
+            if (temp != null && temp.length() > 0) {
+                xml.append(currentIndent + indent + indent + "<OpenClinica:StudySytemStatus>" + StringEscapeUtils.escapeXml(temp)
+                    + "</OpenClinica:StudySytemStatus>");
                 xml.append(nls);
             }
-            xml.append(currentIndent+indent+indent+"<OpenClinica:PrincipalInvestigator>"+StringEscapeUtils.escapeXml(study.getPrincipalInvestigator())
-                    +"</OpenClinica:PrincipalInvestigator>");
+            xml.append(currentIndent + indent + indent + "<OpenClinica:PrincipalInvestigator>" + StringEscapeUtils.escapeXml(study.getPrincipalInvestigator())
+                + "</OpenClinica:PrincipalInvestigator>");
             xml.append(nls);
             temp = study.getProtocolDescription();
-            if(temp!=null&&temp.length()>0) {
-                xml.append(currentIndent+indent+indent+"<OpenClinica:DetailedDescription>"+StringEscapeUtils.escapeXml(temp)
-                    +"</OpenClinica:DetailedDescription>");
+            if (temp != null && temp.length() > 0) {
+                xml.append(currentIndent + indent + indent + "<OpenClinica:DetailedDescription>" + StringEscapeUtils.escapeXml(temp)
+                    + "</OpenClinica:DetailedDescription>");
                 xml.append(nls);
             }
-            xml.append(currentIndent+indent+indent+"<OpenClinica:Sponsor>"+StringEscapeUtils.escapeXml(study.getSponsor())+"</OpenClinica:Sponsor>");
+            xml.append(currentIndent + indent + indent + "<OpenClinica:Sponsor>" + StringEscapeUtils.escapeXml(study.getSponsor()) + "</OpenClinica:Sponsor>");
             xml.append(nls);
             temp = study.getCollaborators();
-            if(temp!=null&&temp.length()>0) {
-                xml.append(currentIndent+indent+indent+"<OpenClinica:Collaborators>"+StringEscapeUtils.escapeXml(temp)
-                        +"</OpenClinica:Collaborators>");
+            if (temp != null && temp.length() > 0) {
+                xml.append(currentIndent + indent + indent + "<OpenClinica:Collaborators>" + StringEscapeUtils.escapeXml(temp) + "</OpenClinica:Collaborators>");
                 xml.append(nls);
             }
-            xml.append(currentIndent+indent+indent+"<OpenClinica:StudyPhase>"+StringEscapeUtils.escapeXml(study.getPhase())
-                    +"</OpenClinica:StudyPhase>");
+            xml.append(currentIndent + indent + indent + "<OpenClinica:StudyPhase>" + StringEscapeUtils.escapeXml(study.getPhase())
+                + "</OpenClinica:StudyPhase>");
             xml.append(nls);
             temp = study.getProtocolType();
-            if(temp!=null&&temp.length()>0) {
-                xml.append(currentIndent+indent+indent+"<OpenClinica:ProtocolType>"+StringEscapeUtils.escapeXml(temp)
-                        +"</OpenClinica:ProtocolType>");
+            if (temp != null && temp.length() > 0) {
+                xml.append(currentIndent + indent + indent + "<OpenClinica:ProtocolType>" + StringEscapeUtils.escapeXml(temp) + "</OpenClinica:ProtocolType>");
                 xml.append(nls);
             }
-            if(study.getProtocolDateVerification()!=null) {
-                xml.append(currentIndent+indent+indent+"<OpenClinica:ProtocolVerificationDate>"+new SimpleDateFormat("yyyy-MM-dd").format(study.getProtocolDateVerification())
-                        +"</OpenClinica:ProtocolVerificationDate>");
+            if (study.getProtocolDateVerification() != null) {
+                xml.append(currentIndent + indent + indent + "<OpenClinica:ProtocolVerificationDate>"
+                    + new SimpleDateFormat("yyyy-MM-dd").format(study.getProtocolDateVerification()) + "</OpenClinica:ProtocolVerificationDate>");
                 xml.append(nls);
             }
-            xml.append(currentIndent+indent+indent+"<OpenClinica:Purpose>"+StringEscapeUtils.escapeXml(study.getPurpose())
-                    +"</OpenClinica:Purpose>");
+            xml.append(currentIndent + indent + indent + "<OpenClinica:Purpose>" + StringEscapeUtils.escapeXml(study.getPurpose()) + "</OpenClinica:Purpose>");
             xml.append(nls);
             temp = study.getDuration();
-            if(temp!=null&&temp.length()>0) {
-                xml.append(currentIndent+indent+indent+"<OpenClinica:Duration>"+StringEscapeUtils.escapeXml(temp)
-                        +"</OpenClinica:Duration>");
+            if (temp != null && temp.length() > 0) {
+                xml.append(currentIndent + indent + indent + "<OpenClinica:Duration>" + StringEscapeUtils.escapeXml(temp) + "</OpenClinica:Duration>");
                 xml.append(nls);
             }
             temp = study.getSelection();
-            if(temp!=null&&temp.length()>0) {
-                xml.append(currentIndent+indent+indent+"<OpenClinica:Selection>"+StringEscapeUtils.escapeXml(temp)
-                        +"</OpenClinica:Selection>");
+            if (temp != null && temp.length() > 0) {
+                xml.append(currentIndent + indent + indent + "<OpenClinica:Selection>" + StringEscapeUtils.escapeXml(temp) + "</OpenClinica:Selection>");
                 xml.append(nls);
             }
             temp = study.getTiming();
-            if(temp!=null&&temp.length()>0) {
-                xml.append(currentIndent+indent+indent+"<OpenClinica:Timing>"+StringEscapeUtils.escapeXml(temp)
-                        +"</OpenClinica:Timing>");
+            if (temp != null && temp.length() > 0) {
+                xml.append(currentIndent + indent + indent + "<OpenClinica:Timing>" + StringEscapeUtils.escapeXml(temp) + "</OpenClinica:Timing>");
                 xml.append(nls);
             }
             temp = study.getAllocation();
-            if(temp!=null&&temp.length()>0) {
-                xml.append(currentIndent+indent+indent+"<OpenClinica:Allocation>"+StringEscapeUtils.escapeXml(temp)+
-                        "</OpenClinica:Allocation>");
+            if (temp != null && temp.length() > 0) {
+                xml.append(currentIndent + indent + indent + "<OpenClinica:Allocation>" + StringEscapeUtils.escapeXml(temp) + "</OpenClinica:Allocation>");
                 xml.append(nls);
             }
             temp = study.getMasking();
-            if(temp!=null&&temp.length()>0) {
-                xml.append(currentIndent+indent+indent+"<OpenClinica:Masking>"+StringEscapeUtils.escapeXml(temp)
-                        +"</OpenClinica:Masking>");
+            if (temp != null && temp.length() > 0) {
+                xml.append(currentIndent + indent + indent + "<OpenClinica:Masking>" + StringEscapeUtils.escapeXml(temp) + "</OpenClinica:Masking>");
                 xml.append(nls);
             }
             temp = study.getControl();
-            if(temp!=null&&temp.length()>0) {
-                xml.append(currentIndent+indent+indent+"<OpenClinica:Control>"+StringEscapeUtils.escapeXml(temp)
-                        +"</OpenClinica:Control>");
+            if (temp != null && temp.length() > 0) {
+                xml.append(currentIndent + indent + indent + "<OpenClinica:Control>" + StringEscapeUtils.escapeXml(temp) + "</OpenClinica:Control>");
                 xml.append(nls);
             }
             temp = study.getAssignment();
-            if(temp!=null&&temp.length()>0) {
-                xml.append(currentIndent+indent+indent+"<OpenClinica:InterventionModel>"+StringEscapeUtils.escapeXml(temp)
-                        +"</OpenClinica:InterventionModel>");
+            if (temp != null && temp.length() > 0) {
+                xml.append(currentIndent + indent + indent + "<OpenClinica:InterventionModel>" + StringEscapeUtils.escapeXml(temp)
+                    + "</OpenClinica:InterventionModel>");
                 xml.append(nls);
             }
             temp = study.getEndpoint();
-            if(temp!=null&&temp.length()>0) {
-                xml.append(currentIndent+indent+indent+"<OpenClinica:StudyClassification>"+StringEscapeUtils.escapeXml(temp)
-                        +"</OpenClinica:StudyClassification>");
+            if (temp != null && temp.length() > 0) {
+                xml.append(currentIndent + indent + indent + "<OpenClinica:StudyClassification>" + StringEscapeUtils.escapeXml(temp)
+                    + "</OpenClinica:StudyClassification>");
                 xml.append(nls);
             }
             xml.append(currentIndent + indent + "</OpenClinica:StudyDescriptionAndStatus>");
             xml.append(nls);
-            
+
             xml.append(currentIndent + indent + "<OpenClinica:ConditionsAndEligibility>");
             xml.append(nls);
             temp = study.getConditions();
-            if(temp!=null&&temp.length()>0) {
-                xml.append(currentIndent+indent+indent+"<OpenClinica:Conditions>"+StringEscapeUtils.escapeXml(temp)
-                        +"/<OpenClinica:Conditions>");
+            if (temp != null && temp.length() > 0) {
+                xml.append(currentIndent + indent + indent + "<OpenClinica:Conditions>" + StringEscapeUtils.escapeXml(temp) + "/<OpenClinica:Conditions>");
                 xml.append(nls);
             }
             temp = study.getKeywords();
-            if(temp!=null&&temp.length()>0) {
-                xml.append(currentIndent+indent+indent+"<OpenClinica:Keywords>"+StringEscapeUtils.escapeXml(temp)
-                        +"</OpenClinica:Keywords>");
+            if (temp != null && temp.length() > 0) {
+                xml.append(currentIndent + indent + indent + "<OpenClinica:Keywords>" + StringEscapeUtils.escapeXml(temp) + "</OpenClinica:Keywords>");
                 xml.append(nls);
             }
             temp = study.getEligibility();
-            if(temp!=null&&temp.length()>0) {
-                xml.append(currentIndent+indent+indent+"<OpenClinica:EligibilityCriteria>"+StringEscapeUtils.escapeXml(temp)
-                        +"</OpenClinica:EligibilityCriteria>");
+            if (temp != null && temp.length() > 0) {
+                xml.append(currentIndent + indent + indent + "<OpenClinica:EligibilityCriteria>" + StringEscapeUtils.escapeXml(temp)
+                    + "</OpenClinica:EligibilityCriteria>");
                 xml.append(nls);
             }
             temp = study.getGender();
-            if(temp!=null&&temp.length()>0) {
-                xml.append(currentIndent+indent+indent+"<OpenClinica:Sex>"+temp+"</OpenClinica:Sex>");
+            if (temp != null && temp.length() > 0) {
+                xml.append(currentIndent + indent + indent + "<OpenClinica:Sex>" + temp + "</OpenClinica:Sex>");
                 xml.append(nls);
             }
             temp = study.getAgeMin();
             String temp2 = study.getAgeMax();
-            if(temp!=null&&temp.length()>0) {
-                xml.append(currentIndent+indent+indent+"<OpenClinica:Age MinimumAge=\""+temp+"\"");
-                if(temp2!=null&&temp2.length()>0) {
-                    xml.append(" MaximumAge=\""+temp2+"\"");
+            if (temp != null && temp.length() > 0) {
+                xml.append(currentIndent + indent + indent + "<OpenClinica:Age MinimumAge=\"" + temp + "\"");
+                if (temp2 != null && temp2.length() > 0) {
+                    xml.append(" MaximumAge=\"" + temp2 + "\"");
                 }
                 xml.append("/>");
                 xml.append(nls);
-            } else if(temp2!=null&&temp2.length()>0) {
-                xml.append(currentIndent+indent+indent+"<OpenClinica:Age  MaximumAge=\""+temp2+"\"");
+            } else if (temp2 != null && temp2.length() > 0) {
+                xml.append(currentIndent + indent + indent + "<OpenClinica:Age  MaximumAge=\"" + temp2 + "\"");
                 xml.append("/>");
                 xml.append(nls);
             }
-            xml.append(currentIndent+indent+indent+"<OpenClinica:HealthyVolunteersAccepted>");
-            xml.append(study.getHealthyVolunteerAccepted()?"Yes":"No");
+            xml.append(currentIndent + indent + indent + "<OpenClinica:HealthyVolunteersAccepted>");
+            xml.append(study.getHealthyVolunteerAccepted() ? "Yes" : "No");
             xml.append("</OpenClinica:HealthyVolunteersAccepted>");
             xml.append(nls);
-            xml.append(currentIndent+indent+indent+"<OpenClinica:ExpectedTotalEnrollment>"+study.getExpectedTotalEnrollment()
-                    +"</OpenClinica:ExpectedTotalEnrollment>");
+            xml.append(currentIndent + indent + indent + "<OpenClinica:ExpectedTotalEnrollment>" + study.getExpectedTotalEnrollment()
+                + "</OpenClinica:ExpectedTotalEnrollment>");
             xml.append(nls);
             xml.append(currentIndent + indent + "</OpenClinica:ConditionsAndEligibility>");
             xml.append(nls);
-            
+
             StringBuffer facility = new StringBuffer();
             temp = study.getFacilityName();
-            facility.append(temp!=null&&temp.length()>0 ? 
-                currentIndent+indent+indent+"<OpenClinica:FacilityName>"+StringEscapeUtils.escapeXml(temp)
-                +"</OpenClinica:FacilityName>"+nls : "");
+            facility.append(temp != null && temp.length() > 0 ? currentIndent + indent + indent + "<OpenClinica:FacilityName>"
+                + StringEscapeUtils.escapeXml(temp) + "</OpenClinica:FacilityName>" + nls : "");
             temp = study.getFacilityCity();
-            facility.append(temp!=null&&temp.length()>0 ? 
-                currentIndent+indent+indent+"<OpenClinica:FacilityCity>"+StringEscapeUtils.escapeXml(temp)
-                +"</OpenClinica:FacilityCity>"+nls : "");
+            facility.append(temp != null && temp.length() > 0 ? currentIndent + indent + indent + "<OpenClinica:FacilityCity>"
+                + StringEscapeUtils.escapeXml(temp) + "</OpenClinica:FacilityCity>" + nls : "");
             temp = study.getFacilityState();
-            facility.append(temp!=null&&temp.length()>0 ? 
-                currentIndent+indent+indent+"<OpenClinica:FacilityState>"+StringEscapeUtils.escapeXml(temp)
-                        +"</OpenClinica:FacilityState>"+nls : "");
+            facility.append(temp != null && temp.length() > 0 ? currentIndent + indent + indent + "<OpenClinica:FacilityState>"
+                + StringEscapeUtils.escapeXml(temp) + "</OpenClinica:FacilityState>" + nls : "");
             temp = study.getFacilityZip();
-            facility.append(temp!=null&&temp.length()>0 ? 
-                currentIndent+indent+indent+"<OpenClinica:PostalCode>"+StringEscapeUtils.escapeXml(temp)
-                +"</OpenClinica:PostalCode>"+nls : "");
+            facility.append(temp != null && temp.length() > 0 ? currentIndent + indent + indent + "<OpenClinica:PostalCode>"
+                + StringEscapeUtils.escapeXml(temp) + "</OpenClinica:PostalCode>" + nls : "");
             temp = study.getFacilityCountry();
-            facility.append(temp!=null&&temp.length()>0 ? 
-                currentIndent+indent+indent+"<OpenClinica:FacilityCountry>"+StringEscapeUtils.escapeXml(temp)
-                +"</OpenClinica:FacilityCountry>"+nls : "");
+            facility.append(temp != null && temp.length() > 0 ? currentIndent + indent + indent + "<OpenClinica:FacilityCountry>"
+                + StringEscapeUtils.escapeXml(temp) + "</OpenClinica:FacilityCountry>" + nls : "");
             temp = study.getFacilityContactName();
-            facility.append(temp!=null&&temp.length()>0 ? 
-                currentIndent+indent+indent+"<OpenClinica:FacilityContactName>"+StringEscapeUtils.escapeXml(temp)
-                +"</OpenClinica:FacilityContactName>"+nls : "");
+            facility.append(temp != null && temp.length() > 0 ? currentIndent + indent + indent + "<OpenClinica:FacilityContactName>"
+                + StringEscapeUtils.escapeXml(temp) + "</OpenClinica:FacilityContactName>" + nls : "");
             temp = study.getFacilityContactDegree();
-            facility.append(temp!=null&&temp.length()>0 ? 
-                currentIndent+indent+indent+"<OpenClinica:FacilityContactDegree>"+StringEscapeUtils.escapeXml(temp)
-                +"</OpenClinica:FacilityContactDegree>"+nls : "");
+            facility.append(temp != null && temp.length() > 0 ? currentIndent + indent + indent + "<OpenClinica:FacilityContactDegree>"
+                + StringEscapeUtils.escapeXml(temp) + "</OpenClinica:FacilityContactDegree>" + nls : "");
             temp = study.getFacilityContactPhone();
-            facility.append(temp!=null&&temp.length()>0 ? 
-                currentIndent+indent+indent+"<OpenClinica:FacilityContactPhone>"+StringEscapeUtils.escapeXml(temp)
-                +"</OpenClinica:FacilityContactPhone>"+nls : "");
+            facility.append(temp != null && temp.length() > 0 ? currentIndent + indent + indent + "<OpenClinica:FacilityContactPhone>"
+                + StringEscapeUtils.escapeXml(temp) + "</OpenClinica:FacilityContactPhone>" + nls : "");
             temp = study.getFacilityContactEmail();
-            facility.append(temp!=null&&temp.length()>0 ? 
-                currentIndent+indent+indent+"<OpenClinica:FacilityContactEmail>"+StringEscapeUtils.escapeXml(temp)
-                +"</OpenClinica:FacilityContactEmail>"+nls : "");
-            if(facility.length()>0) {
+            facility.append(temp != null && temp.length() > 0 ? currentIndent + indent + indent + "<OpenClinica:FacilityContactEmail>"
+                + StringEscapeUtils.escapeXml(temp) + "</OpenClinica:FacilityContactEmail>" + nls : "");
+            if (facility.length() > 0) {
                 xml.append(currentIndent + indent + "<OpenClinica:FacilityInformation>");
                 xml.append(nls);
                 xml.append(facility);
                 xml.append(currentIndent + indent + "</OpenClinica:FacilityInformation>");
                 xml.append(nls);
             }
-            
+
             facility = new StringBuffer();
             temp = study.getMedlineIdentifier();
-            facility.append(temp!=null&&temp.length()>0 ? 
-                currentIndent+indent+indent+"<OpenClinica:MEDLINEIdentifier>"+StringEscapeUtils.escapeXml(temp)
-                +"</OpenClinica:MEDLINEIdentifier>"+nls : "");
-            facility.append(currentIndent+indent+indent+"<OpenClinica:ResultsReference>"+ (study.isResultsReference()?"Yes":"No")
-                    +"</OpenClinica:ResultsReference>"+nls);
+            facility.append(temp != null && temp.length() > 0 ? currentIndent + indent + indent + "<OpenClinica:MEDLINEIdentifier>"
+                + StringEscapeUtils.escapeXml(temp) + "</OpenClinica:MEDLINEIdentifier>" + nls : "");
+            facility.append(currentIndent + indent + indent + "<OpenClinica:ResultsReference>" + (study.isResultsReference() ? "Yes" : "No")
+                + "</OpenClinica:ResultsReference>" + nls);
             temp = study.getUrl();
-            facility.append(temp!=null&&temp.length()>0 ? 
-                currentIndent+indent+indent+"<OpenClinica:URLReference>"+StringEscapeUtils.escapeXml(temp)
-                +"</OpenClinica:URLReference>"+nls : "");
+            facility.append(temp != null && temp.length() > 0 ? currentIndent + indent + indent + "<OpenClinica:URLReference>"
+                + StringEscapeUtils.escapeXml(temp) + "</OpenClinica:URLReference>" + nls : "");
             temp = study.getUrlDescription();
-            facility.append(temp!=null&&temp.length()>0 ? 
-                currentIndent+indent+indent+"<OpenClinica:URLDescription>"+StringEscapeUtils.escapeXml(temp)
-                +"</OpenClinica:URLDescription>"+nls : "");
+            facility.append(temp != null && temp.length() > 0 ? currentIndent + indent + indent + "<OpenClinica:URLDescription>"
+                + StringEscapeUtils.escapeXml(temp) + "</OpenClinica:URLDescription>" + nls : "");
             xml.append(currentIndent + indent + "<OpenClinica:RelatedInformation>");
             xml.append(nls);
             xml.append(facility);
             xml.append(currentIndent + indent + "</OpenClinica:RelatedInformation>");
             xml.append(nls);
-            
+
             StudyParameterConfig spc = study.getStudyParameterConfig();
             xml.append(currentIndent + indent + "<OpenClinica:StudyParameterConfiguration>");
             xml.append(nls);
-            xml.append(currentIndent+indent+indent+"<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_collectDob\""
-                    + " Value=\""+spc.getCollectDob()+"\"/>"+nls);
-            xml.append(currentIndent+indent+indent+"<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_discrepancyManagement\""
-                    + " Value=\""+spc.getDiscrepancyManagement()+"\"/>"+nls);
-            xml.append(currentIndent+indent+indent+"<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_subjectPersonIdRequired\""
-                    + " Value=\""+spc.getSubjectPersonIdRequired()+"\"/>"+nls);
-            xml.append(currentIndent+indent+indent+"<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_genderRequired\""
-                    + " Value=\""+spc.getGenderRequired()+"\"/>"+nls);
-            xml.append(currentIndent+indent+indent+"<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_subjectIdGeneration\""
-                    + " Value=\""+spc.getSubjectIdGeneration()+"\"/>"+nls);
-            xml.append(currentIndent+indent+indent+"<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_interviewerNameRequired\""
-                    + " Value=\""+spc.getInterviewerNameRequired()+"\"/>"+nls);
-            xml.append(currentIndent+indent+indent+"<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_interviewerNameDefault\""
-                    + " Value=\""+spc.getInterviewerNameDefault()+"\"/>"+nls);
-            xml.append(currentIndent+indent+indent+"<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_interviewerNameEditable\""
-                    + " Value=\""+spc.getInterviewerNameEditable()+"\"/>"+nls);
-            xml.append(currentIndent+indent+indent+"<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_interviewDateRequired\""
-                    + " Value=\""+spc.getInterviewDateRequired()+"\"/>"+nls);
-            xml.append(currentIndent+indent+indent+"<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_interviewDateDefault\""
-                    + " Value=\""+spc.getInterviewDateDefault()+"\"/>"+nls);
-            xml.append(currentIndent+indent+indent+"<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_interviewDateEditable\""
-                    + " Value=\""+spc.getInterviewDateEditable()+"\"/>"+nls);
-            xml.append(currentIndent+indent+indent+"<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_personIdShownOnCRF\""
-                    + " Value=\""+spc.getPersonIdShownOnCRF()+"\"/>"+nls);
-            xml.append(currentIndent+indent+indent+"<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_secondaryLabelViewable\""
-                    + " Value=\""+spc.getSecondaryLabelViewable()+"\"/>"+nls);
-            xml.append(currentIndent+indent+indent+"<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_adminForcedReasonForChange\""
-                    + " Value=\""+spc.getAdminForcedReasonForChange()+"\"/>"+nls);
-            xml.append(currentIndent+indent+indent+"<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_eventLocationRequired\""
-                    + " Value=\""+spc.getEventLocationRequired()+"\"/>"+nls);
-            
-            addStudyParameterLists(currentIndent+indent+indent);
-            
+            xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_collectDob\"" + " Value=\""
+                + spc.getCollectDob() + "\"/>" + nls);
+            xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_discrepancyManagement\"" + " Value=\""
+                + spc.getDiscrepancyManagement() + "\"/>" + nls);
+            xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_subjectPersonIdRequired\""
+                + " Value=\"" + spc.getSubjectPersonIdRequired() + "\"/>" + nls);
+            xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_genderRequired\"" + " Value=\""
+                + spc.getGenderRequired() + "\"/>" + nls);
+            xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_subjectIdGeneration\"" + " Value=\""
+                + spc.getSubjectIdGeneration() + "\"/>" + nls);
+            xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_interviewerNameRequired\""
+                + " Value=\"" + spc.getInterviewerNameRequired() + "\"/>" + nls);
+            xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_interviewerNameDefault\"" + " Value=\""
+                + spc.getInterviewerNameDefault() + "\"/>" + nls);
+            xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_interviewerNameEditable\""
+                + " Value=\"" + spc.getInterviewerNameEditable() + "\"/>" + nls);
+            xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_interviewDateRequired\"" + " Value=\""
+                + spc.getInterviewDateRequired() + "\"/>" + nls);
+            xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_interviewDateDefault\"" + " Value=\""
+                + spc.getInterviewDateDefault() + "\"/>" + nls);
+            xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_interviewDateEditable\"" + " Value=\""
+                + spc.getInterviewDateEditable() + "\"/>" + nls);
+            xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_personIdShownOnCRF\"" + " Value=\""
+                + spc.getPersonIdShownOnCRF() + "\"/>" + nls);
+            xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_secondaryLabelViewable\"" + " Value=\""
+                + spc.getSecondaryLabelViewable() + "\"/>" + nls);
+            xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_adminForcedReasonForChange\""
+                + " Value=\"" + spc.getAdminForcedReasonForChange() + "\"/>" + nls);
+            xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_eventLocationRequired\"" + " Value=\""
+                + spc.getEventLocationRequired() + "\"/>" + nls);
+
+            addStudyParameterLists(currentIndent + indent + indent);
+
             xml.append(currentIndent + indent + "</OpenClinica:StudyParameterConfiguration>");
             xml.append(nls);
-                    
+
             xml.append(currentIndent + "</OpenClinica:StudyDetails>");
             xml.append(nls);
         }
     }
-    
+
     public void addEventDefinitionDetails(EventDefinitionDetailsBean detail, String currentIndent) {
         StringBuffer xml = this.getXmlOutput();
         String indent = this.getIndent();
         String temp = "";
-        xml.append(currentIndent + "<OpenClinica:EventDefinitionDetails StudyEventOID=\""+StringEscapeUtils.escapeXml(detail.getOid())
-                +"\">");
+        xml.append(currentIndent + "<OpenClinica:EventDefinitionDetails StudyEventOID=\"" + StringEscapeUtils.escapeXml(detail.getOid()) + "\">");
         xml.append(nls);
         temp = detail.getDescription();
-        xml.append(temp!=null&&temp.length()>0 ? currentIndent+indent+ "<OpenClinica:Description>"
-            +StringEscapeUtils.escapeXml(temp)+"</OpenClinica:Description>"+nls : "");
+        xml.append(temp != null && temp.length() > 0 ? currentIndent + indent + "<OpenClinica:Description>" + StringEscapeUtils.escapeXml(temp)
+            + "</OpenClinica:Description>" + nls : "");
         temp = detail.getCategory();
-        xml.append(temp!=null&&temp.length()>0 ? currentIndent+indent+ "<OpenClinica:Category>"
-            +StringEscapeUtils.escapeXml(temp)+"</OpenClinica:Category>"+nls : "");
+        xml.append(temp != null && temp.length() > 0 ? currentIndent + indent + "<OpenClinica:Category>" + StringEscapeUtils.escapeXml(temp)
+            + "</OpenClinica:Category>" + nls : "");
         xml.append(currentIndent + "</OpenClinica:EventDefinitionDetails>");
         xml.append(nls);
     }
-    
+
     public void addFormDetails(FormDetailsBean detail, String currentIndent) {
         StringBuffer xml = this.getXmlOutput();
         String indent = this.getIndent();
         String temp = "";
-        xml.append(currentIndent + "<OpenClinica:FormDetails FormOID=\""+StringEscapeUtils.escapeXml(detail.getOid())
-                +"\" ParentFormOID=\"" + StringEscapeUtils.escapeXml(detail.getParentFormOid())
-                +"\" IsDefaultVersion=\""+detail.getIsDefaultVersion() + "\"");
+        xml.append(currentIndent + "<OpenClinica:FormDetails FormOID=\"" + StringEscapeUtils.escapeXml(detail.getOid()) + "\" ParentFormOID=\""
+            + StringEscapeUtils.escapeXml(detail.getParentFormOid()) + "\" IsDefaultVersion=\"" + detail.getIsDefaultVersion() + "\"");
         temp = detail.getNullValues();
-        xml.append(temp!=null&&temp.length()>0?" NullValues=\""+StringEscapeUtils.escapeXml(temp)+"\"":"");
-        xml.append(" PasswordRequired=\""+detail.getPasswordRequired()+"\"");
+        xml.append(temp != null && temp.length() > 0 ? " NullValues=\"" + StringEscapeUtils.escapeXml(temp) + "\"" : "");
+        xml.append(" PasswordRequired=\"" + detail.getPasswordRequired() + "\"");
         temp = detail.getDoubleDataEntry();
-        xml.append(temp!=null&&temp.length()>0?" DoubleDataEntry=\""+temp+"\"":""
-                +" HideCRF=\""+detail.getHideCrf()+"\"");
+        xml.append(temp != null && temp.length() > 0 ? " DoubleDataEntry=\"" + temp + "\"" : "" + " HideCRF=\"" + detail.getHideCrf() + "\"");
         temp = detail.getSourceDataVerification();
-        xml.append(temp!=null&&temp.length()>0?" SourceDataVerification=\""+StringEscapeUtils.escapeXml(temp)+"\"":"");
+        xml.append(temp != null && temp.length() > 0 ? " SourceDataVerification=\"" + StringEscapeUtils.escapeXml(temp) + "\"" : "");
         xml.append(">");
         xml.append(nls);
         temp = detail.getVersionDescription();
-        xml.append(temp!=null&&temp.length()>0 ? currentIndent+indent+ "<OpenClinica:VersionDescription>"
-            +StringEscapeUtils.escapeXml(temp)+"</OpenClinica:VersionDescription>"+nls : "");
+        xml.append(temp != null && temp.length() > 0 ? currentIndent + indent + "<OpenClinica:VersionDescription>" + StringEscapeUtils.escapeXml(temp)
+            + "</OpenClinica:VersionDescription>" + nls : "");
         temp = detail.getRevisionNotes();
-        xml.append(temp!=null&&temp.length()>0 ? currentIndent+indent+ "<OpenClinica:RevisionNotes>"
-            +StringEscapeUtils.escapeXml(temp)+"</OpenClinica:RevisionNotes>"+nls : "");
+        xml.append(temp != null && temp.length() > 0 ? currentIndent + indent + "<OpenClinica:RevisionNotes>" + StringEscapeUtils.escapeXml(temp)
+            + "</OpenClinica:RevisionNotes>" + nls : "");
         xml.append(currentIndent + "</OpenClinica:FormDetails>");
         xml.append(nls);
     }
-    
+
     public void addItemGroupDetails(ItemGroupDetailsBean detail, String currentIndent) {
         StringBuffer xml = this.getXmlOutput();
         String indent = this.getIndent();
         String temp = "";
         Integer itemp = -1;
         Integer itemp2 = -1;
-        ArrayList<PresentInFormBean> informs = (ArrayList<PresentInFormBean>)detail.getPresentInForms();
-        xml.append(currentIndent + "<OpenClinica:ItemGroupDetails ItemGroupOID=\""+StringEscapeUtils.escapeXml(detail.getOid())+"\">");
+        ArrayList<PresentInFormBean> informs = (ArrayList<PresentInFormBean>) detail.getPresentInForms();
+        xml.append(currentIndent + "<OpenClinica:ItemGroupDetails ItemGroupOID=\"" + StringEscapeUtils.escapeXml(detail.getOid()) + "\">");
         xml.append(nls);
-        for(PresentInFormBean inform : informs) {
-            xml.append(currentIndent+indent+ "<OpenClinica:PresentInForm FormOID=\""+inform.getFormOid()+"\">");
+        for (PresentInFormBean inform : informs) {
+            xml.append(currentIndent + indent + "<OpenClinica:PresentInForm FormOID=\"" + inform.getFormOid() + "\">");
             xml.append(nls);
             ItemGroupRepeatBean repeat = inform.getItemGroupRepeatBean();
             itemp = repeat.getRepeatNumber();
             itemp2 = repeat.getRepeatMax();
-            if(itemp!=null&&itemp>0) {
-                xml.append(currentIndent+indent+indent+"<OpenClinica:ItemGroupRepeat RepeatNumber=\""+itemp);
-                if(itemp2!=null&&itemp2>0) {
-                    xml.append("\" RepeatMax=\""+itemp2+"\"/>"); 
+            if (itemp != null && itemp > 0) {
+                xml.append(currentIndent + indent + indent + "<OpenClinica:ItemGroupRepeat RepeatNumber=\"" + itemp);
+                if (itemp2 != null && itemp2 > 0) {
+                    xml.append("\" RepeatMax=\"" + itemp2 + "\"/>");
                 } else {
                     xml.append("\"/>");
                 }
                 xml.append(nls);
-            } else if(itemp2!=null&&itemp2>0) {
-                xml.append(currentIndent+indent+indent+"<OpenClinica:ItemGroupRepeat RepeatMax=\""+itemp2+"\"/>");
+            } else if (itemp2 != null && itemp2 > 0) {
+                xml.append(currentIndent + indent + indent + "<OpenClinica:ItemGroupRepeat RepeatMax=\"" + itemp2 + "\"/>");
                 xml.append(nls);
             }
             temp = inform.getItemGroupHeader();
-            xml.append(temp!=null&&temp.length()>0 ? currentIndent+indent+indent+"<OpenClinica:ItemGroupHeader>"
-                +StringEscapeUtils.escapeXml(temp) + "</OpenClinica:ItemGroupHeader>" + nls : "");
-            xml.append(currentIndent+indent+ "</OpenClinica:PresentInForm>");
+            xml.append(temp != null && temp.length() > 0 ? currentIndent + indent + indent + "<OpenClinica:ItemGroupHeader>"
+                + StringEscapeUtils.escapeXml(temp) + "</OpenClinica:ItemGroupHeader>" + nls : "");
+            xml.append(currentIndent + indent + "</OpenClinica:PresentInForm>");
             xml.append(nls);
         }
         xml.append(currentIndent + "</OpenClinica:ItemGroupDetails>");
@@ -1025,52 +987,52 @@ public class MetaDataReportBean extends OdmXmlReportBean {
         String indent = this.getIndent();
         String temp = "";
         Integer itemp = -1;
-        ArrayList<ItemPresentInFormBean> informs = (ArrayList<ItemPresentInFormBean>)detail.getItemPresentInForm();
-        xml.append(currentIndent + "<OpenClinica:ItemDetails ItemOID=\""+StringEscapeUtils.escapeXml(detail.getOid())+"\">");
+        ArrayList<ItemPresentInFormBean> informs = (ArrayList<ItemPresentInFormBean>) detail.getItemPresentInForm();
+        xml.append(currentIndent + "<OpenClinica:ItemDetails ItemOID=\"" + StringEscapeUtils.escapeXml(detail.getOid()) + "\">");
         xml.append(nls);
-        for(ItemPresentInFormBean inform : informs) {
-            xml.append(currentIndent+indent+ "<OpenClinica:ItemPresentInForm FormOID=\""+inform.getFormOid()+"\"");
+        for (ItemPresentInFormBean inform : informs) {
+            xml.append(currentIndent + indent + "<OpenClinica:ItemPresentInForm FormOID=\"" + inform.getFormOid() + "\"");
             temp = inform.getParentItemOid();
-            xml.append(temp!=null&&temp.length()>0 ? " ParentItemOID=\""+temp+"\"" : "");
+            xml.append(temp != null && temp.length() > 0 ? " ParentItemOID=\"" + temp + "\"" : "");
             itemp = inform.getColumnNumber();
-            xml.append(itemp!=null&&itemp>0 ? " ColumnNumber=\""+itemp+"\"" : "");
+            xml.append(itemp != null && itemp > 0 ? " ColumnNumber=\"" + itemp + "\"" : "");
             temp = inform.getPageNumber();
-            xml.append(temp!=null&&temp.length()>0 ? " PageNumber=\""+StringEscapeUtils.escapeXml(temp)+"\"" : "");
+            xml.append(temp != null && temp.length() > 0 ? " PageNumber=\"" + StringEscapeUtils.escapeXml(temp) + "\"" : "");
             temp = inform.getDefaultValue();
-            xml.append(temp!=null&&temp.length()>0 ? " DefaultValue=\""+StringEscapeUtils.escapeXml(temp)+"\"" : "");
-            xml.append(" PHI=\""+inform.getPhi() + "\">");
+            xml.append(temp != null && temp.length() > 0 ? " DefaultValue=\"" + StringEscapeUtils.escapeXml(temp) + "\"" : "");
+            xml.append(" PHI=\"" + inform.getPhi() + "\">");
             xml.append(nls);
             temp = inform.getLeftItemText();
-            xml.append(temp!=null&&temp.length()>0 ? currentIndent+indent+indent+"<OpenClinica:LeftItem>"
-                +StringEscapeUtils.escapeXml(temp) + "</OpenClinica:LeftItem>" + nls : "");
+            xml.append(temp != null && temp.length() > 0 ? currentIndent + indent + indent + "<OpenClinica:LeftItem>" + StringEscapeUtils.escapeXml(temp)
+                + "</OpenClinica:LeftItem>" + nls : "");
             temp = inform.getRightItemText();
-            xml.append(temp!=null&&temp.length()>0 ? currentIndent+indent+indent+"<OpenClinica:RightItemText>"
-                +StringEscapeUtils.escapeXml(temp) + "</OpenClinica:RightItemText>"+nls : "");
+            xml.append(temp != null && temp.length() > 0 ? currentIndent + indent + indent + "<OpenClinica:RightItemText>" + StringEscapeUtils.escapeXml(temp)
+                + "</OpenClinica:RightItemText>" + nls : "");
             temp = inform.getItemHeader();
-            xml.append(temp!=null&&temp.length()>0 ? currentIndent+indent+indent+"<OpenClinica:ItemHeader>"
-                +StringEscapeUtils.escapeXml(temp) + "</OpenClinica:ItemHeader>"+nls : "");
+            xml.append(temp != null && temp.length() > 0 ? currentIndent + indent + indent + "<OpenClinica:ItemHeader>" + StringEscapeUtils.escapeXml(temp)
+                + "</OpenClinica:ItemHeader>" + nls : "");
             temp = inform.getItemSubHeader();
-            xml.append(temp!=null&&temp.length()>0 ? currentIndent+indent+indent+"<OpenClinica:ItemSubHeader>"
-                +StringEscapeUtils.escapeXml(temp) + "</OpenClinica:ItemSubHeader>"+nls : "");
+            xml.append(temp != null && temp.length() > 0 ? currentIndent + indent + indent + "<OpenClinica:ItemSubHeader>" + StringEscapeUtils.escapeXml(temp)
+                + "</OpenClinica:ItemSubHeader>" + nls : "");
             temp = inform.getSectionLabel();
-            xml.append(temp!=null&&temp.length()>0 ? currentIndent+indent+indent+"<OpenClinica:SectionLabel>"
-                +StringEscapeUtils.escapeXml(temp)  + "</OpenClinica:SectionLabel>"+nls : "");
+            xml.append(temp != null && temp.length() > 0 ? currentIndent + indent + indent + "<OpenClinica:SectionLabel>" + StringEscapeUtils.escapeXml(temp)
+                + "</OpenClinica:SectionLabel>" + nls : "");
             ItemResponseBean response = inform.getItemResponse();
-            xml.append(currentIndent+indent+indent+"<OpenClinica:ItemResponse ResponseType=\""+StringEscapeUtils.escapeXml(response.getResponseType()));
+            xml.append(currentIndent + indent + indent + "<OpenClinica:ItemResponse ResponseType=\"" + StringEscapeUtils.escapeXml(response.getResponseType()));
             temp = response.getResponseLayout();
-            if(temp!=null&&temp.length()>0) {
-                xml.append("\" ResponseLayout=\""+StringEscapeUtils.escapeXml(temp)+"\"/>");
+            if (temp != null && temp.length() > 0) {
+                xml.append("\" ResponseLayout=\"" + StringEscapeUtils.escapeXml(temp) + "\"/>");
             } else {
                 xml.append("\"/>");
             }
             xml.append(nls);
-            xml.append(currentIndent+indent+ "</OpenClinica:ItemPresentInForm>");
+            xml.append(currentIndent + indent + "</OpenClinica:ItemPresentInForm>");
             xml.append(nls);
         }
         xml.append(currentIndent + "</OpenClinica:ItemDetails>");
         xml.append(nls);
     }
-    
+
     public void addStudyGroupClassList(String currentIndent) {
         StringBuffer xml = this.getXmlOutput();
         String indent = this.getIndent();
@@ -1111,293 +1073,262 @@ public class MetaDataReportBean extends OdmXmlReportBean {
             }
         }
     }
-    
-    /*
-    public void addStudyGroupClassList(String currentIndent) {
-        StringBuffer xml = this.getXmlOutput();
-        String indent = this.getIndent();
-        ArrayList<StudyGroupClassListBean> lists = (ArrayList<StudyGroupClassListBean>) odmstudy.getMetaDataVersion().getStudyGroupClassLists();
-        if (lists != null) {
-            if (lists.size() > 0) {
-                for (StudyGroupClassListBean l : lists) {
-                    xml.append(currentIndent + "<OpenClinica:StudyGroupClassList OpenClinica:ID=\"" + StringEscapeUtils.escapeXml(l.getId()) + "\" ");
-                    if (l.getName() != null) {
-                        xml.append("OpenClinica:Name=\"" + StringEscapeUtils.escapeXml(l.getName()) + "\" ");
-                    }
-                    if (l.getStatus() != null) {
-                        xml.append("OpenClinica:Status=\"" + l.getStatus() + "\" ");
-                    }
-                    if (l.getType() != null) {
-                        xml.append("OpenClinica:Type=\"" + StringEscapeUtils.escapeXml(l.getType()) + "\" ");
-                    }
-                    if (l.getSubjectAssignment() != null) {
-                        xml.append("OpenClinica:SubjectAssignment=\"" + StringEscapeUtils.escapeXml(l.getSubjectAssignment()) + "\" ");
-                    }
-                    xml.append(">");
-                    xml.append(nls);
-                    for (StudyGroupItemBean i : (ArrayList<StudyGroupItemBean>) l.getStudyGroupItems()) {
-                        xml.append(currentIndent + indent + "<OpenClinica:StudyGroupItem ");
-                        if (i.getName() != null) {
-                            xml.append("OpenClinica:Name=\"" + StringEscapeUtils.escapeXml(i.getName()) + "\" ");
-                        }
-                        if (i.getDescription() != null) {
-                            xml.append("OpenClinica:Description=\"" + StringEscapeUtils.escapeXml(i.getDescription()) + "\" ");
-                        }
-                        xml.append("/>");
-                        xml.append(nls);
-                    }
 
-                    xml.append(currentIndent + "</OpenClinica:StudyGroupClassList>");
-                    xml.append(nls);
-                }
-            }
-        }
-    }
-    */
-    
+    /*
+     * public void addStudyGroupClassList(String currentIndent) { StringBuffer xml = this.getXmlOutput(); String indent = this.getIndent();
+     * ArrayList<StudyGroupClassListBean> lists = (ArrayList<StudyGroupClassListBean>) odmstudy.getMetaDataVersion().getStudyGroupClassLists(); if (lists !=
+     * null) { if (lists.size() > 0) { for (StudyGroupClassListBean l : lists) { xml.append(currentIndent + "<OpenClinica:StudyGroupClassList OpenClinica:ID=\""
+     * + StringEscapeUtils.escapeXml(l.getId()) + "\" "); if (l.getName() != null) { xml.append("OpenClinica:Name=\"" + StringEscapeUtils.escapeXml(l.getName())
+     * + "\" "); } if (l.getStatus() != null) { xml.append("OpenClinica:Status=\"" + l.getStatus() + "\" "); } if (l.getType() != null) {
+     * xml.append("OpenClinica:Type=\"" + StringEscapeUtils.escapeXml(l.getType()) + "\" "); } if (l.getSubjectAssignment() != null) {
+     * xml.append("OpenClinica:SubjectAssignment=\"" + StringEscapeUtils.escapeXml(l.getSubjectAssignment()) + "\" "); } xml.append(">"); xml.append(nls); for
+     * (StudyGroupItemBean i : (ArrayList<StudyGroupItemBean>) l.getStudyGroupItems()) { xml.append(currentIndent + indent + "<OpenClinica:StudyGroupItem "); if
+     * (i.getName() != null) { xml.append("OpenClinica:Name=\"" + StringEscapeUtils.escapeXml(i.getName()) + "\" "); } if (i.getDescription() != null) {
+     * xml.append("OpenClinica:Description=\"" + StringEscapeUtils.escapeXml(i.getDescription()) + "\" "); } xml.append("/>"); xml.append(nls); }
+     * xml.append(currentIndent + "</OpenClinica:StudyGroupClassList>"); xml.append(nls); } } } }
+     */
+
     public void addStudyParameterLists(String currentIndent) {
         StringBuffer xml = this.getXmlOutput();
         String indent = this.getIndent();
-        
+
         //
-        xml.append(currentIndent+"<OpenClinica:StudyParameterList ID=\"" + "SPL_collectDob" 
-                + "\" Name=\"" + "Collect Subject Date Of Birth" + "\">"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "1" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "Yes" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "2" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "Only Year of Birth" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "3" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "Not Used" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+"</OpenClinica:StudyParameterList>"+nls);
+        xml.append(currentIndent + "<OpenClinica:StudyParameterList ID=\"" + "SPL_collectDob" + "\" Name=\"" + "Collect Subject Date Of Birth" + "\">" + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "1" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "Yes" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "2" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "Only Year of Birth" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "3" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "Not Used" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + "</OpenClinica:StudyParameterList>" + nls);
         //
-        xml.append(currentIndent+"<OpenClinica:StudyParameterList ID=\"" + "SPL_discrepancyManagement" 
-                + "\" Name=\"" + "Allow Discrepancy Management" + "\">"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "true" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "Yes" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "false" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "No" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+"</OpenClinica:StudyParameterList>"+nls);
+        xml.append(currentIndent + "<OpenClinica:StudyParameterList ID=\"" + "SPL_discrepancyManagement" + "\" Name=\"" + "Allow Discrepancy Management"
+            + "\">" + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "true" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "Yes" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "false" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "No" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + "</OpenClinica:StudyParameterList>" + nls);
         //
-        xml.append(currentIndent+"<OpenClinica:StudyParameterList ID=\"" + "SPL_subjectPersonIdRequired" 
-                + "\" Name=\"" + "Person ID Required" + "\">"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "required" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "Required" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "optional" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "Optional" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "not used" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "Not Used" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+"</OpenClinica:StudyParameterList>"+nls);
+        xml.append(currentIndent + "<OpenClinica:StudyParameterList ID=\"" + "SPL_subjectPersonIdRequired" + "\" Name=\"" + "Person ID Required" + "\">" + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "required" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "Required" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "optional" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "Optional" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "not used" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "Not Used" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + "</OpenClinica:StudyParameterList>" + nls);
         //
-        xml.append(currentIndent+"<OpenClinica:StudyParameterList ID=\"" + "SPL_genderRequired" + "\" Name=\"" + "Sex Required" + "\">"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "true" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "Yes" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "false" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "No" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+"</OpenClinica:StudyParameterList>"+nls);
+        xml.append(currentIndent + "<OpenClinica:StudyParameterList ID=\"" + "SPL_genderRequired" + "\" Name=\"" + "Sex Required" + "\">" + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "true" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "Yes" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "false" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "No" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + "</OpenClinica:StudyParameterList>" + nls);
         //
-        xml.append(currentIndent+"<OpenClinica:StudyParameterList ID=\"" + "SPL_subjectIdGeneration" 
-                + "\" Name=\"" + "How To Generate Study SubjectID" + "\">"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "manual" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "Manual Entry" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "auto editable" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "Auto-generated and Editable" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "auto non-editable" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "Auto-generated and Non-editable" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+"</OpenClinica:StudyParameterList>"+nls);
+        xml.append(currentIndent + "<OpenClinica:StudyParameterList ID=\"" + "SPL_subjectIdGeneration" + "\" Name=\"" + "How To Generate Study SubjectID"
+            + "\">" + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "manual" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "Manual Entry" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "auto editable" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "Auto-generated and Editable" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "auto non-editable" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "Auto-generated and Non-editable" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + "</OpenClinica:StudyParameterList>" + nls);
         //
-        xml.append(currentIndent+"<OpenClinica:StudyParameterList ID=\"" + "SPL_interviewerNameRequired" 
-                + "\" Name=\"" + "When Performing Data Entry, Interviewer Name Required For Data Entry" + "\">"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "yes" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "Yes" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "no" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "No" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "not_used" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "Not Used" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+"</OpenClinica:StudyParameterList>"+nls);
+        xml.append(currentIndent + "<OpenClinica:StudyParameterList ID=\"" + "SPL_interviewerNameRequired" + "\" Name=\""
+            + "When Performing Data Entry, Interviewer Name Required For Data Entry" + "\">" + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "yes" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "Yes" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "no" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "No" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "not_used" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "Not Used" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + "</OpenClinica:StudyParameterList>" + nls);
         //
-        xml.append(currentIndent+"<OpenClinica:StudyParameterList ID=\"" + "SPL_interviewerNameDefault" 
-                + "\" Name=\"" + "When Performing Data Entry, Interviewer Name Default as Blank" + "\">"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "blank" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "Blank" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "pre-populated" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "Pre-Populated from active user" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+"</OpenClinica:StudyParameterList>"+nls);
+        xml.append(currentIndent + "<OpenClinica:StudyParameterList ID=\"" + "SPL_interviewerNameDefault" + "\" Name=\""
+            + "When Performing Data Entry, Interviewer Name Default as Blank" + "\">" + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "blank" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "Blank" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "pre-populated" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "Pre-Populated from active user" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + "</OpenClinica:StudyParameterList>" + nls);
         //
-        xml.append(currentIndent+"<OpenClinica:StudyParameterList ID=\"" + "SPL_interviewerNameEditable" 
-                + "\" Name=\"" + "When Performing Data Entry, Interviewer Name Editable" + "\">"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "true" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "Yes" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "false" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "No" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+"</OpenClinica:StudyParameterList>"+nls);
+        xml.append(currentIndent + "<OpenClinica:StudyParameterList ID=\"" + "SPL_interviewerNameEditable" + "\" Name=\""
+            + "When Performing Data Entry, Interviewer Name Editable" + "\">" + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "true" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "Yes" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "false" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "No" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + "</OpenClinica:StudyParameterList>" + nls);
         //
-        xml.append(currentIndent+"<OpenClinica:StudyParameterList ID=\"" + "SPL_interviewDateRequired" 
-                + "\" Name=\"" + "When Performing Data Entry, Interview Date Required" + "\">"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "true" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "Yes" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "false" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "No" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "not_used" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "Not Used" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+"</OpenClinica:StudyParameterList>"+nls);
+        xml.append(currentIndent + "<OpenClinica:StudyParameterList ID=\"" + "SPL_interviewDateRequired" + "\" Name=\""
+            + "When Performing Data Entry, Interview Date Required" + "\">" + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "true" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "Yes" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "false" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "No" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "not_used" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "Not Used" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + "</OpenClinica:StudyParameterList>" + nls);
         //
-        xml.append(currentIndent+"<OpenClinica:StudyParameterList ID=\"" + "SPL_interviewDateDefault" 
-                + "\" Name=\"" + "When Performing Data Entry, Interview Date Default as Blank" + "\">"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "blank" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "Blank" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "pre-populated" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "Pre-Populated from Study Event" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+"</OpenClinica:StudyParameterList>"+nls);
+        xml.append(currentIndent + "<OpenClinica:StudyParameterList ID=\"" + "SPL_interviewDateDefault" + "\" Name=\""
+            + "When Performing Data Entry, Interview Date Default as Blank" + "\">" + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "blank" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "Blank" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "pre-populated" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "Pre-Populated from Study Event" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + "</OpenClinica:StudyParameterList>" + nls);
         //
-        xml.append(currentIndent+"<OpenClinica:StudyParameterList ID=\"" + "SPL_interviewDateEditable" 
-                + "\" Name=\"" + "When Performing Data Entry, Interview Date Editable" + "\">"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "true" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "Yes" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "false" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "No" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+"</OpenClinica:StudyParameterList>"+nls);
+        xml.append(currentIndent + "<OpenClinica:StudyParameterList ID=\"" + "SPL_interviewDateEditable" + "\" Name=\""
+            + "When Performing Data Entry, Interview Date Editable" + "\">" + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "true" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "Yes" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "false" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "No" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + "</OpenClinica:StudyParameterList>" + nls);
         //
-        xml.append(currentIndent+"<OpenClinica:StudyParameterList ID=\"" + "SPL_personIdShownOnCRF" 
-                + "\" Name=\"" + "Show Person ID on CRF Header" + "\">"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "true" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "Yes" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "false" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "No" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+"</OpenClinica:StudyParameterList>"+nls);
+        xml.append(currentIndent + "<OpenClinica:StudyParameterList ID=\"" + "SPL_personIdShownOnCRF" + "\" Name=\"" + "Show Person ID on CRF Header" + "\">"
+            + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "true" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "Yes" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "false" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "No" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + "</OpenClinica:StudyParameterList>" + nls);
         //
-        xml.append(currentIndent+"<OpenClinica:StudyParameterList ID=\"" + "SPL_secondaryLabelViewable" 
-                + "\" Name=\"" + "Secondary Label Viewable" + "\">"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "true" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "Yes" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "false" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "No" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+"</OpenClinica:StudyParameterList>"+nls);
+        xml.append(currentIndent + "<OpenClinica:StudyParameterList ID=\"" + "SPL_secondaryLabelViewable" + "\" Name=\"" + "Secondary Label Viewable" + "\">"
+            + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "true" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "Yes" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "false" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "No" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + "</OpenClinica:StudyParameterList>" + nls);
         //
-        xml.append(currentIndent+"<OpenClinica:StudyParameterList ID=\"" + "SPL_adminForcedReasonForChange" 
-                + "\" Name=\"" + "Forced Reason For Change in Administrative Editing" + "\">"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "true" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "Yes" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "false" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "No" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+"</OpenClinica:StudyParameterList>"+nls);
+        xml.append(currentIndent + "<OpenClinica:StudyParameterList ID=\"" + "SPL_adminForcedReasonForChange" + "\" Name=\""
+            + "Forced Reason For Change in Administrative Editing" + "\">" + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "true" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "Yes" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "false" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "No" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + "</OpenClinica:StudyParameterList>" + nls);
         //
-        xml.append(currentIndent+"<OpenClinica:StudyParameterList ID=\"" + "SPL_eventLocationRequired" 
-                + "\" Name=\"" + "Event Location Required" + "\">"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "required" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "Required" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "optional" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "Optional" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+indent+"<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "not_used" + "\">"+nls);
-        xml.append(currentIndent+indent+indent+"<Decode>"+nls);
-        xml.append(currentIndent+indent+indent+indent+"<TranslatedText>" + "Not Used" + "</TranslatedText>"+nls);
-        xml.append(currentIndent+indent+indent+"</Decode>"+nls);
-        xml.append(currentIndent+indent+"</OpenClinica:StudyParameterListItem>"+nls);
-        xml.append(currentIndent+"</OpenClinica:StudyParameterList>"+nls);
+        xml.append(currentIndent + "<OpenClinica:StudyParameterList ID=\"" + "SPL_eventLocationRequired" + "\" Name=\"" + "Event Location Required" + "\">"
+            + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "required" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "Required" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "optional" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "Optional" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "not_used" + "\">" + nls);
+        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
+        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "Not Used" + "</TranslatedText>" + nls);
+        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
+        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+        xml.append(currentIndent + "</OpenClinica:StudyParameterList>" + nls);
     }
 
     public void setOdmStudy(OdmStudyBean odmstudy) {
@@ -1414,6 +1345,14 @@ public class MetaDataReportBean extends OdmXmlReportBean {
 
     public void setOdmStudyMap(LinkedHashMap<String, OdmStudyBean> odmStudyMap) {
         this.odmStudyMap = odmStudyMap;
+    }
+
+    public CoreResources getCoreResources() {
+        return coreResources;
+    }
+
+    public void setCoreResources(CoreResources coreResources) {
+        this.coreResources = coreResources;
     }
 
     protected String measurementUnitRefString(String muRefOid) {

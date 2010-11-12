@@ -9,16 +9,16 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.ProcessingFunction;
 import org.akaza.openclinica.bean.service.ProcessingResultType;
-import org.akaza.openclinica.service.extract.GenerateExtractFileService;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.OpenClinicaMailSender;
-import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.extract.GenerateExtractFileService;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -26,19 +26,18 @@ import org.quartz.JobExecutionException;
 import org.quartz.SchedulerException;
 import org.quartz.impl.StdScheduler;
 import org.springframework.context.ApplicationContext;
-import org.springframework.scheduling.quartz.JobDetailBean;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.ResourceBundle;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
+import javax.sql.DataSource;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -46,8 +45,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-
-import javax.sql.DataSource;
 
 /**
  * Xalan Transform Job, an XSLT transform job using the Xalan classes
@@ -75,6 +72,7 @@ public class XsltTransformJob extends QuartzJobBean {
     private GenerateExtractFileService generateFileService;
     private StudyDAO studyDao;
     private UserAccountDAO userAccountDao;
+    private CoreResources coreResources;
     
     //POST PROCESSING VARIABLES
     public static final String POST_PROC_DELETE_OLD="postProcDeleteOld";
@@ -82,6 +80,7 @@ public class XsltTransformJob extends QuartzJobBean {
     public static final String POST_PROC_LOCATION="postProcLocation";
     public static final String POST_PROC_EXPORT_NAME="postProcExportName";
     
+    @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
         // need to generate a Locale for emailing users with i18n
         // TODO make dynamic?
@@ -103,6 +102,8 @@ public class XsltTransformJob extends QuartzJobBean {
             ApplicationContext appContext = (ApplicationContext) context.getScheduler().getContext().get("applicationContext");
             mailSender = (OpenClinicaMailSender) appContext.getBean("openClinicaMailSender");
             dataSource = (DataSource) appContext.getBean("dataSource");
+            coreResources = (CoreResources) appContext.getBean("coreResources");
+            
             DatasetDAO dsdao = new DatasetDAO(dataSource);
             
             // init all fields from the data map
@@ -118,7 +119,7 @@ public class XsltTransformJob extends QuartzJobBean {
             long sysTimeBegin = System.currentTimeMillis();
             userAccountDao = new UserAccountDAO(dataSource);
             UserAccountBean userBean = (UserAccountBean)userAccountDao.findByPK(userAccountId);
-            generateFileService = new GenerateExtractFileService(dataSource, userBean);
+            generateFileService = new GenerateExtractFileService(dataSource, userBean,coreResources);
             studyDao = new StudyDAO(dataSource);
             StudyBean currentStudy = (StudyBean)studyDao.findByPK(studyId);
             StudyBean parentStudy = (StudyBean)studyDao.findByPK(currentStudy.getParentStudyId());

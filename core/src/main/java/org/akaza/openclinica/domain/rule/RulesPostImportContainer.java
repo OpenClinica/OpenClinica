@@ -7,8 +7,14 @@
  */
 package org.akaza.openclinica.domain.rule;
 
+import org.akaza.openclinica.domain.rule.action.RuleActionComparator;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 public class RulesPostImportContainer {
 
@@ -28,6 +34,44 @@ public class RulesPostImportContainer {
     private ArrayList<AuditableBeanWrapper<RuleSetBean>> inValidRuleSetDefs = new ArrayList<AuditableBeanWrapper<RuleSetBean>>();
 
     private ArrayList<String> validRuleSetExpressionValues = new ArrayList<String>();
+
+    /**
+     * 
+     * Take the given a list of Rule Set Rules and populate ruleSets & ruleDefs so that this object could be marshalled.
+     * 
+     * @param ruleSetRules
+     */
+    public void populate(List<RuleSetRuleBean> ruleSetRules) {
+        HashMap<Integer, RuleSetBean> ruleSets = new HashMap<Integer, RuleSetBean>();
+        HashSet<RuleBean> rules = new HashSet<RuleBean>();
+
+        for (RuleSetRuleBean rsr : ruleSetRules) {
+            if (rsr.getActions().size() > 0) {
+                Collections.sort(rsr.getActions(), new RuleActionComparator());
+            }
+            Integer key = rsr.getRuleSetBean().getId();
+            if (ruleSets.containsKey(key)) {
+                RuleSetBean rs = ruleSets.get(key);
+                rs.setTarget(rsr.getRuleSetBean().getTarget());
+                rs.addRuleSetRuleForDisplay(rsr);
+            } else {
+                RuleSetBean rs = new RuleSetBean();
+                rs.setTarget(rsr.getRuleSetBean().getTarget());
+                rs.addRuleSetRuleForDisplay(rsr);
+                ruleSets.put(key, rs);
+            }
+            rules.add(rsr.getRuleBean());
+        }
+
+        for (Map.Entry<Integer, RuleSetBean> entry : ruleSets.entrySet()) {
+            this.addRuleSet(entry.getValue());
+        }
+        for (RuleBean theRule : rules) {
+            this.addRuleDef(theRule);
+        }
+    }
+
+    // GETTERS & SETTERS
 
     public ArrayList<String> getValidRuleSetExpressionValues() {
         return validRuleSetExpressionValues;

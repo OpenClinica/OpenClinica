@@ -9,15 +9,16 @@
 
 package org.akaza.openclinica.logic.odmExport;
 
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.MetaDataVersionProtocolBean;
 import org.akaza.openclinica.bean.odmbeans.OdmStudyBean;
+import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
+
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+
+import javax.sql.DataSource;
 
 /**
  * Populate metadata for a ODM XML file. It supports:
@@ -38,12 +39,14 @@ import org.akaza.openclinica.bean.odmbeans.OdmStudyBean;
 public class MetaDataCollector extends OdmDataCollector {
     private LinkedHashMap<String, OdmStudyBean> odmStudyMap;
     private static int textLength = 4000;
+    private RuleSetRuleDao ruleSetRuleDao;
 
     // protected final Logger logger =
     // LoggerFactory.getLogger(getClass().getName());
 
-    public MetaDataCollector(DataSource ds, StudyBean study) {
+    public MetaDataCollector(DataSource ds, StudyBean study,RuleSetRuleDao ruleSetRuleDao) {
         super(ds, study);
+        this.ruleSetRuleDao = ruleSetRuleDao;
         odmStudyMap = new LinkedHashMap<String, OdmStudyBean>();
     }
 
@@ -67,7 +70,7 @@ public class MetaDataCollector extends OdmDataCollector {
         while (it.hasNext()) {
             OdmStudyBase u = it.next();
             StudyBean study = u.getStudy();
-            MetadataUnit meta = new MetadataUnit(this.ds, this.dataset, this.getOdmbean(), study, this.getCategory());
+            MetadataUnit meta = new MetadataUnit(this.ds, this.dataset, this.getOdmbean(), study, this.getCategory(),getRuleSetRuleDao());
             meta.collectOdmStudy();
             if (this.getCategory() == 1) {
                 if (study.isSite(study.getParentStudyId())) {
@@ -80,6 +83,7 @@ public class MetaDataCollector extends OdmDataCollector {
                     }
                 } else {
                     protocol = meta.getOdmStudy().getMetaDataVersion().getProtocol();
+                    
 
                 }
             }
@@ -101,5 +105,13 @@ public class MetaDataCollector extends OdmDataCollector {
 
     public static int getTextLength() {
         return textLength;
+    }
+
+    public RuleSetRuleDao getRuleSetRuleDao() {
+        return ruleSetRuleDao;
+    }
+
+    public void setRuleSetRuleDao(RuleSetRuleDao ruleSetRuleDao) {
+        this.ruleSetRuleDao = ruleSetRuleDao;
     }
 }

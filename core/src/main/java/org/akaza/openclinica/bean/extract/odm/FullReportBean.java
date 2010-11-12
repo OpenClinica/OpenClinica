@@ -7,12 +7,14 @@
  */
 package org.akaza.openclinica.bean.extract.odm;
 
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-
 import org.akaza.openclinica.bean.odmbeans.OdmAdminDataBean;
 import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
+import org.akaza.openclinica.bean.odmbeans.OdmRulesDataBean;
 import org.akaza.openclinica.bean.odmbeans.OdmStudyBean;
+import org.akaza.openclinica.dao.core.CoreResources;
+
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 /**
  * Create one ODM XML file.
@@ -24,7 +26,9 @@ public class FullReportBean extends OdmXmlReportBean {
     private LinkedHashMap<String, OdmStudyBean> odmStudyMap;
     private LinkedHashMap<String, OdmClinicalDataBean> clinicalDataMap;
     private LinkedHashMap<String, OdmAdminDataBean> adminDataMap;
+    private LinkedHashMap<String, OdmRulesDataBean> rulesDataMap;
     private OdmClinicalDataBean clinicaldata;
+    private CoreResources coreResources;
 
     /**
      * Create one ODM XML This method is still under construction. Right now it
@@ -99,7 +103,7 @@ public class FullReportBean extends OdmXmlReportBean {
     }
 
     public void addNodeStudy(OdmStudyBean odmstudy, boolean isDataset) {
-        MetaDataReportBean meta = new MetaDataReportBean(odmstudy);
+        MetaDataReportBean meta = new MetaDataReportBean(odmstudy,getCoreResources());
         meta.setODMVersion(this.getODMVersion());
         meta.setXmlOutput(this.getXmlOutput());
         meta.addNodeStudy(isDataset);
@@ -113,6 +117,13 @@ public class FullReportBean extends OdmXmlReportBean {
         admin.setODMVersion(this.getODMVersion());
         admin.setXmlOutput(this.getXmlOutput());
         admin.addNodeAdminData();
+    }
+    
+    private void addNodeRulesData(OdmRulesDataBean rulesData) {
+        RulesDataReportBean rules = new RulesDataReportBean(rulesData,getCoreResources());
+        rules.setODMVersion(this.getODMVersion());
+        rules.setXmlOutput(this.getXmlOutput());
+        rules.addNodeRulesData();
     }
 
     public void addNodeClinicalData(OdmClinicalDataBean clinicaldata) {
@@ -149,4 +160,21 @@ public class FullReportBean extends OdmXmlReportBean {
     public void setClinicalData(OdmClinicalDataBean clinicaldata) {
         this.clinicaldata = clinicaldata;
     }
+
+    public LinkedHashMap<String, OdmRulesDataBean> getRulesDataMap() {
+        return rulesDataMap;
+    }
+
+    public void setRulesDataMap(LinkedHashMap<String, OdmRulesDataBean> rulesDataMap) {
+        this.rulesDataMap = rulesDataMap;
+    }
+
+    public CoreResources getCoreResources() {
+        return coreResources;
+    }
+
+    public void setCoreResources(CoreResources coreResources) {
+        this.coreResources = coreResources;
+    }
+    
 }

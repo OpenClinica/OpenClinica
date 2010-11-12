@@ -9,15 +9,6 @@
 
 package org.akaza.openclinica.logic.odmExport;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Set;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
@@ -30,9 +21,19 @@ import org.akaza.openclinica.bean.odmbeans.OdmStudyBean;
 import org.akaza.openclinica.bean.odmbeans.RangeCheckBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.dao.extract.OdmExtractDAO;
+import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Set;
+
+import javax.sql.DataSource;
 
 /**
  * A class for ODM metadata of one study.
@@ -43,6 +44,7 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 public class MetadataUnit extends OdmUnit {
     private OdmStudyBean odmStudy;
     private StudyBean parentStudy;
+    private RuleSetRuleDao ruleSetRuleDao;
 
     public MetadataUnit() {
     }
@@ -57,9 +59,10 @@ public class MetadataUnit extends OdmUnit {
         }
     }
 
-    public MetadataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, StudyBean study, int category) {
+    public MetadataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, StudyBean study, int category,RuleSetRuleDao ruleSetRuleDao) {
         super(ds, dataset, odmBean, study, category);
         this.odmStudy = new OdmStudyBean();
+        this.ruleSetRuleDao = ruleSetRuleDao;
         if (study.getParentStudyId() > 0) {
             this.parentStudy = (StudyBean) new StudyDAO(ds).findByPK(study.getParentStudyId());
         } else {
@@ -177,6 +180,7 @@ public class MetadataUnit extends OdmUnit {
             // metadata, this.getODMBean().getODMVersion());
             // studyBase.setNullClSet(nullCodeSet);
             oedao.getMetadata(parentStudyId, studyId, metadata, this.odmBean.getODMVersion());
+            metadata.setRuleSetRules(getRuleSetRuleDao().findByRuleSetStudyIdAndStatusAvail(parentStudyId));
         }
     }
 
@@ -460,5 +464,13 @@ public class MetadataUnit extends OdmUnit {
 
     public void setOdmStudy(OdmStudyBean odmStudy) {
         this.odmStudy = odmStudy;
+    }
+
+    public RuleSetRuleDao getRuleSetRuleDao() {
+        return ruleSetRuleDao;
+    }
+
+    public void setRuleSetRuleDao(RuleSetRuleDao ruleSetRuleDao) {
+        this.ruleSetRuleDao = ruleSetRuleDao;
     }
 }

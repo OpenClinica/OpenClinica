@@ -10,11 +10,8 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.domain.rule.RuleBean;
-import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
-import org.akaza.openclinica.domain.rule.action.RuleActionComparator;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.Page;
@@ -35,10 +32,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletOutputStream;
 
@@ -96,46 +91,16 @@ public class DownloadRuleSetXmlServlet extends SecureController {
         }
     }
 
-    private RulesPostImportContainer prepareRulesPostImportRuleSetContainer(String ruleSetId) {
-        RulesPostImportContainer rpic = new RulesPostImportContainer();
-
-        RuleSetBean ruleSet = getRuleSetService().getRuleSetDao().findById(Integer.valueOf(ruleSetId), currentStudy);
-        rpic.addRuleSet(ruleSet);
-        for (RuleSetRuleBean ruleSetRule : ruleSet.getRuleSetRules()) {
-            rpic.addRuleDef(ruleSetRule.getRuleBean());
-        }
-        return rpic;
-    }
-
     private RulesPostImportContainer prepareRulesPostImportRuleSetRuleContainer(String ruleSetRuleIds) {
-        HashMap<Integer, RuleSetBean> ruleSets = new HashMap<Integer, RuleSetBean>();
-        HashSet<RuleBean> rules = new HashSet<RuleBean>();
+        List<RuleSetRuleBean> ruleSetRules = new ArrayList<RuleSetRuleBean>();
         RulesPostImportContainer rpic = new RulesPostImportContainer();
 
         String[] splitExpression = ruleSetRuleIds.split(",");
         for (String string : splitExpression) {
             RuleSetRuleBean rsr = getRuleSetService().getRuleSetRuleDao().findById(Integer.valueOf(string));
-            Collections.sort(rsr.getActions(), new RuleActionComparator());
-            Integer key = rsr.getRuleSetBean().getId();
-            if (ruleSets.containsKey(key)) {
-                RuleSetBean rs = ruleSets.get(key);
-                rs.setTarget(rsr.getRuleSetBean().getTarget());
-                rs.addRuleSetRule(rsr);
-            } else {
-                RuleSetBean rs = new RuleSetBean();
-                rs.setTarget(rsr.getRuleSetBean().getTarget());
-                rs.addRuleSetRule(rsr);
-                ruleSets.put(key, rs);
-            }
-            rules.add(rsr.getRuleBean());
+            ruleSetRules.add(rsr);
         }
-
-        for (Map.Entry<Integer, RuleSetBean> entry : ruleSets.entrySet()) {
-            rpic.addRuleSet(entry.getValue());
-        }
-        for (RuleBean theRule : rules) {
-            rpic.addRuleDef(theRule);
-        }
+        rpic.populate(ruleSetRules);
         return rpic;
     }
 

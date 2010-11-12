@@ -1,22 +1,5 @@
 package org.akaza.openclinica.service.extract;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.zip.ZipOutputStream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.DisplayItemHeaderBean;
@@ -47,6 +30,23 @@ import org.akaza.openclinica.logic.odmExport.OdmStudyBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.zip.ZipOutputStream;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
+
 public class GenerateExtractFileService {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -55,16 +55,19 @@ public class GenerateExtractFileService {
     private DatasetDAO datasetDao;
     public static ResourceBundle resword;
     private final UserAccountBean userBean;
+    private final CoreResources coreResources;
 
-    public GenerateExtractFileService(DataSource ds, HttpServletRequest request, UserAccountBean userBean) {
+    public GenerateExtractFileService(DataSource ds, HttpServletRequest request, UserAccountBean userBean,CoreResources coreResources) {
         this.ds = ds;
         this.request = request;
         this.userBean = userBean;
+        this.coreResources = coreResources;
     }
 
-    public GenerateExtractFileService(DataSource ds, UserAccountBean userBean) {
+    public GenerateExtractFileService(DataSource ds, UserAccountBean userBean, CoreResources coreResources) {
         this.ds = ds;
         this.userBean = userBean;
+        this.coreResources = coreResources;
     }
 
     public void setUpResourceBundles() {
@@ -167,7 +170,9 @@ public class GenerateExtractFileService {
                 odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.2 OpenClinica-ODM1-2-1-OC1.xsd");
                 ArrayList<String> xmlnsList = new ArrayList<String>();
                 xmlnsList.add("xmlns=\"http://www.cdisc.org/ns/odm/v1.2\"");
-                xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/openclinica_odm/v1.2\"");
+                //xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/openclinica_odm/v1.2\"");
+                xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/odm_ext_v121/v3.1\"");
+                xmlnsList.add("xmlns:OpenClinicaRules=\"http://www.openclinica.org/ns/rules/v3.1\"");
                 odmb.setXmlnsList(xmlnsList);
                 odmb.setODMVersion("oc1.2");
                 mdc.setODMBean(odmb);
@@ -180,7 +185,9 @@ public class GenerateExtractFileService {
                 odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC2-0.xsd");
                 ArrayList<String> xmlnsList = new ArrayList<String>();
                 xmlnsList.add("xmlns=\"http://www.cdisc.org/ns/odm/v1.3\"");
-                xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/openclinica_odm/v1.3\"");
+                //xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/openclinica_odm/v1.3\"");
+                xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/odm_ext_v130/v3.1\"");
+                xmlnsList.add("xmlns:OpenClinicaRules=\"http://www.openclinica.org/ns/rules/v3.1\"");
                 odmb.setXmlnsList(xmlnsList);
                 odmb.setODMVersion("oc1.3");
                 mdc.setODMBean(odmb);
@@ -192,7 +199,7 @@ public class GenerateExtractFileService {
         //////////////////////////////////////////
         ////////// MetaData Extraction //////////
         mdc.collectFileData();
-        MetaDataReportBean metaReport = new MetaDataReportBean(mdc.getOdmStudyMap());
+        MetaDataReportBean metaReport = new MetaDataReportBean(mdc.getOdmStudyMap(),coreResources);
         metaReport.setODMVersion(odmVersion);
         metaReport.setOdmBean(mdc.getODMBean());
         metaReport.createChunkedOdmXml(Boolean.TRUE);

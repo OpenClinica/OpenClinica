@@ -1,98 +1,97 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:tns="http://openclinica.org/ns/rules"
-    targetNamespace="http://openclinica.org/ns/rules"
+    xmlns="http://www.openclinica.org/ns/rules/v3.1"
+    targetNamespace="http://www.openclinica.org/ns/rules/v3.1"
     elementFormDefault="qualified"
     attributeFormDefault="unqualified">
     
-    <xs:element name="RuleImport">
+    <xs:element name="Rules" type="RuleImportType"/>
+    <xs:complexType name="RuleImportType">
         <xs:annotation>
             <xs:documentation> The top level root element. Allows the definition of default values
                 for all nested bean definitions. </xs:documentation>
         </xs:annotation>
-        <xs:complexType>
             <xs:sequence>
-                <xs:element ref="tns:RuleAssignment" maxOccurs="unbounded"/>
-                <xs:element ref="tns:RuleDef"  minOccurs="0"  maxOccurs="unbounded"/>
+                <xs:element ref="RuleAssignment" maxOccurs="unbounded"/>
+                <xs:element ref="RuleDef"  minOccurs="0"  maxOccurs="unbounded"/>
             </xs:sequence>
-        </xs:complexType>
-    </xs:element>
+    </xs:complexType>
     
-    <xs:element name="RuleAssignment" type="tns:RuleAssignmentType"/>
+    <xs:element name="RuleAssignment" type="RuleAssignmentType"/>
     <xs:complexType name="RuleAssignmentType">
         <xs:sequence>
-            <xs:element ref="tns:Target"/>
-            <xs:element ref="tns:RuleRef" maxOccurs="unbounded"/>
+            <xs:element ref="Target"/>
+            <xs:element ref="RuleRef" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
     
-    <xs:element name="RuleRef" type="tns:RuleRefType"/>
+    <xs:element name="RuleRef" type="RuleRefType"/>
     <xs:complexType name="RuleRefType">
         <xs:sequence>
-            <xs:element ref="tns:DiscrepancyNoteAction" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element ref="tns:EmailAction" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element ref="tns:ShowAction" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element ref="tns:HideAction" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element ref="tns:InsertAction" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="DiscrepancyNoteAction" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="EmailAction" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="ShowAction" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="HideAction" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="InsertAction" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
-        <xs:attributeGroup ref="tns:RuleRefAttributeType"/>
+        <xs:attributeGroup ref="RuleRefAttributeType"/>
     </xs:complexType>
     
-    <xs:element name="RuleDef" type="tns:RuleDefType"/>
+    <xs:element name="RuleDef" type="RuleDefType"/>
     <xs:complexType name="RuleDefType">
         <xs:sequence>
             <xs:element name="Description" type="xs:string"/>
-            <xs:element name="Expression" type="tns:TargetType"/>
+            <xs:element name="Expression" type="TargetType"/>
         </xs:sequence>
-        <xs:attributeGroup ref="tns:RuleDefAttributeType"/>
+        <xs:attributeGroup ref="RuleDefAttributeType"/>
     </xs:complexType>
     
-    <xs:element name="DiscrepancyNoteAction" type="tns:DiscrepancyNoteActionType"/>
+    <xs:element name="DiscrepancyNoteAction" type="DiscrepancyNoteActionType"/>
     <xs:complexType name="DiscrepancyNoteActionType">
         <xs:sequence>
-            <xs:element name="Run" type="tns:ActionRunType" minOccurs="0"/>
+            <xs:element name="Run" type="ActionRunType" minOccurs="0"/>
             <xs:element name="Message" type="xs:string"/>
         </xs:sequence>
-        <xs:attributeGroup ref="tns:DiscrepancyNoteActionAttributeType"/>
+        <xs:attributeGroup ref="DiscrepancyNoteActionAttributeType"/>
     </xs:complexType>
     
-    <xs:element name="EmailAction" type="tns:EmailActionType"/>
+    <xs:element name="EmailAction" type="EmailActionType"/>
     <xs:complexType name="EmailActionType">
         <xs:sequence>
-            <xs:element name="Run" type="tns:ActionRunType" minOccurs="0"/>
+            <xs:element name="Run" type="ActionRunType" minOccurs="0"/>
             <xs:element name="Message" type="xs:string"/>
             <xs:element name="To" type="xs:string"/>
         </xs:sequence>
-        <xs:attributeGroup ref="tns:DiscrepancyNoteActionAttributeType"/>
+        <xs:attributeGroup ref="DiscrepancyNoteActionAttributeType"/>
     </xs:complexType>
     
-    <xs:element name="ShowAction" type="tns:ShowActionType"/>
+    <xs:element name="ShowAction" type="ShowActionType"/>
     <xs:complexType name="ShowActionType">
         <xs:sequence>
-            <xs:element name="Run" type="tns:ActionRunType" minOccurs="0"/>
+            <xs:element name="Run" type="ActionRunType" minOccurs="0"/>
             <xs:element name="Message" type="xs:string"/>
-            <xs:element name="DestinationProperty" type="tns:PropertyType" maxOccurs="unbounded"/>
+            <xs:element name="DestinationProperty" type="PropertyType" maxOccurs="unbounded"/>
         </xs:sequence>
-        <xs:attributeGroup ref="tns:DiscrepancyNoteActionAttributeType"/>
+        <xs:attributeGroup ref="DiscrepancyNoteActionAttributeType"/>
     </xs:complexType>
     
-    <xs:element name="HideAction" type="tns:HideActionType"/>
+    <xs:element name="HideAction" type="HideActionType"/>
     <xs:complexType name="HideActionType">
         <xs:sequence>
-            <xs:element name="Run" type="tns:ActionRunType" minOccurs="0"/>
+            <xs:element name="Run" type="ActionRunType" minOccurs="0"/>
             <xs:element name="Message" type="xs:string"/>
-            <xs:element name="DestinationProperty" type="tns:PropertyType" maxOccurs="unbounded"/>
+            <xs:element name="DestinationProperty" type="PropertyType" maxOccurs="unbounded"/>
         </xs:sequence>
-        <xs:attributeGroup ref="tns:DiscrepancyNoteActionAttributeType"/>
+        <xs:attributeGroup ref="DiscrepancyNoteActionAttributeType"/>
     </xs:complexType>
     
-    <xs:element name="InsertAction" type="tns:InsertActionType"/>
+    <xs:element name="InsertAction" type="InsertActionType"/>
     <xs:complexType name="InsertActionType">
         <xs:sequence>
-            <xs:element name="Run" type="tns:ActionRunType" minOccurs="0"/>
-            <xs:element name="DestinationProperty" type="tns:PropertyType"/>
+            <xs:element name="Run" type="ActionRunType" minOccurs="0"/>
+            <xs:element name="DestinationProperty" type="PropertyType"/>
         </xs:sequence>
-        <xs:attributeGroup ref="tns:DiscrepancyNoteActionAttributeType"/>
+        <xs:attributeGroup ref="DiscrepancyNoteActionAttributeType"/>
     </xs:complexType>
     
     <xs:attributeGroup name="DiscrepancyNoteActionAttributeType">
@@ -121,26 +120,26 @@
         <xs:attribute name="Batch" type="xs:boolean" use="required"/>
     </xs:attributeGroup>
     
-    <xs:element name="Target" type="tns:TargetType"/>
+    <xs:element name="Target" type="TargetType"/>
     <xs:complexType name="TargetType">
         <xs:simpleContent>
             <xs:extension base="xs:string">
-                <xs:attribute name="Context" type="tns:contextType" use="optional"/>
+                <xs:attribute name="Context" type="contextType" use="optional"/>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
     
     <xs:complexType name="PropertyType">
         <xs:sequence>
-            <xs:element name="ValueExpression" type="tns:TargetType" minOccurs="0"/>
+            <xs:element name="ValueExpression" type="TargetType" minOccurs="0"/>
         </xs:sequence>
-        <xs:attributeGroup ref="tns:PropertyAttributeType"/>
+        <xs:attributeGroup ref="PropertyAttributeType"/>
     </xs:complexType>
     
     <xs:complexType name="ActionRunType">
         <xs:sequence>
         </xs:sequence>
-        <xs:attributeGroup ref="tns:ActionRunAttributeType"/>
+        <xs:attributeGroup ref="ActionRunAttributeType"/>
     </xs:complexType>
     
     <xs:simpleType name="contextType">

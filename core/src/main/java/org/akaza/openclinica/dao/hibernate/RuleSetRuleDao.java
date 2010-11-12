@@ -24,6 +24,15 @@ public class RuleSetRuleDao extends AbstractDomainDao<RuleSetRuleBean> {
         q.setParameter("ruleBean", ruleBean);
         return (ArrayList<RuleSetRuleBean>) q.list();
     }
+    
+    @SuppressWarnings("unchecked")
+    public ArrayList<RuleSetRuleBean> findByRuleSetStudyIdAndStatusAvail(Integer studyId) {
+        String query = "from " + getDomainClassName() + " ruleSetRule  where ruleSetRule.ruleSetBean.studyId = :studyId and status = :status ";
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setInteger("studyId", studyId);
+        q.setParameter("status", org.akaza.openclinica.domain.Status.AVAILABLE);
+        return (ArrayList<RuleSetRuleBean>) q.list();
+    }
 
     public int getCountWithFilter(final ViewRuleAssignmentFilter filter) {
 
