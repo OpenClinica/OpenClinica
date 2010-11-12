@@ -89,7 +89,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     private Integer discNoteType;
     private Boolean studyHasDiscNotes = new Boolean(false);
     private final boolean showMoreLink;
-    public static List notesForPrintPop;
+    public static ArrayList notesForPrintPop;
 
     public ListNotesTableFactory(boolean showMoreLink){
         this.showMoreLink = showMoreLink;
@@ -942,11 +942,11 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         return populateRowsWithAttachedData((ArrayList) notes);
     }
 
-    public static List getNotesForPrintPop() {
+    public static ArrayList getNotesForPrintPop() {
         return notesForPrintPop;
     }
 
-    public static void setNotesForPrintPop(List notesForPrintPop) {
+    public static void setNotesForPrintPop(ArrayList notesForPrintPop) {
         ListNotesTableFactory.notesForPrintPop = notesForPrintPop;
     }
 }

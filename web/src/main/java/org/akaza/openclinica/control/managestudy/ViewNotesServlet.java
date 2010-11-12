@@ -215,10 +215,11 @@ public class ViewNotesServlet extends SecureController {
         session.setAttribute("viewNotesURL", viewNotesURL);
         String viewNotesPageFileName = this.getPageServletFileName();
         session.setAttribute("viewNotesPageFileName", viewNotesPageFileName);
-        
+        ArrayList allNotes = ListNotesTableFactory.getNotesForPrintPop();
+        factory.populateDataInNote(allNotes);
+        session.setAttribute("allNotes", allNotes);
         if ("yes".equalsIgnoreCase(fp.getString(PRINT))) {
-            List allNotes = ListNotesTableFactory.getNotesForPrintPop();
-            request.setAttribute("allNotes", factory.populateDataInNote(allNotes));
+            request.setAttribute("allNotes", allNotes);
             forwardPage(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_PRINT);
         } else {
             forwardPage(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY);
