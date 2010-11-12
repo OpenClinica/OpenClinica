@@ -14,6 +14,7 @@ import org.akaza.openclinica.core.OpenClinicaMailSender;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
+import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
@@ -73,6 +74,7 @@ public class XsltTransformJob extends QuartzJobBean {
     private StudyDAO studyDao;
     private UserAccountDAO userAccountDao;
     private CoreResources coreResources;
+    private RuleSetRuleDao ruleSetRuleDao;
     
     //POST PROCESSING VARIABLES
     public static final String POST_PROC_DELETE_OLD="postProcDeleteOld";
@@ -103,6 +105,7 @@ public class XsltTransformJob extends QuartzJobBean {
             mailSender = (OpenClinicaMailSender) appContext.getBean("openClinicaMailSender");
             dataSource = (DataSource) appContext.getBean("dataSource");
             coreResources = (CoreResources) appContext.getBean("coreResources");
+            ruleSetRuleDao = (RuleSetRuleDao) appContext.getBean("ruleSetRuleDao");
             
             DatasetDAO dsdao = new DatasetDAO(dataSource);
             
@@ -119,7 +122,7 @@ public class XsltTransformJob extends QuartzJobBean {
             long sysTimeBegin = System.currentTimeMillis();
             userAccountDao = new UserAccountDAO(dataSource);
             UserAccountBean userBean = (UserAccountBean)userAccountDao.findByPK(userAccountId);
-            generateFileService = new GenerateExtractFileService(dataSource, userBean,coreResources);
+            generateFileService = new GenerateExtractFileService(dataSource, userBean,coreResources,ruleSetRuleDao);
             studyDao = new StudyDAO(dataSource);
             StudyBean currentStudy = (StudyBean)studyDao.findByPK(studyId);
             StudyBean parentStudy = (StudyBean)studyDao.findByPK(currentStudy.getParentStudyId());

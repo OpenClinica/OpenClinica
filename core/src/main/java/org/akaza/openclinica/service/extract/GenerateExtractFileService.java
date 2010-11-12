@@ -19,6 +19,7 @@ import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
+import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -56,18 +57,21 @@ public class GenerateExtractFileService {
     public static ResourceBundle resword;
     private final UserAccountBean userBean;
     private final CoreResources coreResources;
+    private final RuleSetRuleDao ruleSetRuleDao;
 
-    public GenerateExtractFileService(DataSource ds, HttpServletRequest request, UserAccountBean userBean,CoreResources coreResources) {
+    public GenerateExtractFileService(DataSource ds, HttpServletRequest request, UserAccountBean userBean,CoreResources coreResources,RuleSetRuleDao ruleSetRuleDao) {
         this.ds = ds;
         this.request = request;
         this.userBean = userBean;
         this.coreResources = coreResources;
+        this.ruleSetRuleDao = ruleSetRuleDao;
     }
 
-    public GenerateExtractFileService(DataSource ds, UserAccountBean userBean, CoreResources coreResources) {
+    public GenerateExtractFileService(DataSource ds, UserAccountBean userBean, CoreResources coreResources,RuleSetRuleDao ruleSetRuleDao) {
         this.ds = ds;
         this.userBean = userBean;
         this.coreResources = coreResources;
+        this.ruleSetRuleDao = ruleSetRuleDao;
     }
 
     public void setUpResourceBundles() {
@@ -140,7 +144,7 @@ public class GenerateExtractFileService {
     		Integer currentStudyId, Integer parentStudyId, String studySubjectNumber, boolean zipped, boolean saveToDB, boolean deleteOld) {
         
         Integer ssNumber = getStudySubjectNumber(studySubjectNumber);
-        MetaDataCollector mdc = new MetaDataCollector(ds, datasetBean, currentStudy);
+        MetaDataCollector mdc = new MetaDataCollector(ds, datasetBean, currentStudy,ruleSetRuleDao);
         AdminDataCollector adc = new AdminDataCollector(ds, datasetBean, currentStudy);
         ClinicalDataCollector cdc = new ClinicalDataCollector(ds, datasetBean, currentStudy);
         File files[]=null;

@@ -110,7 +110,6 @@ public class DownloadStudyMetadataServlet extends SecureController {
         report.createStudyMetaOdmXml(Boolean.FALSE);
        
         request.setAttribute("generate", report.getXmlOutput().toString().trim());
-        System.out.println(report.getXmlOutput().toString());
         Page finalTarget = Page.EXPORT_DATA_CUSTOM;
         finalTarget.setFileName("/WEB-INF/jsp/extract/downloadStudyMetadata.jsp");
         forwardPage(finalTarget);

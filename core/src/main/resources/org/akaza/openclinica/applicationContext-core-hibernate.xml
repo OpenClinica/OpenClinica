@@ -63,6 +63,18 @@
   <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
     <property name="sessionFactory" ref="sessionFactory"/>
   </bean>
+ 
+    
+  <bean id="transactionInterceptor" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+		<property name="transactionManager">
+    		<ref bean="transactionManager"/>
+    	</property>
+    	<property name="transactionAttributes">
+    		<props>
+    			<prop key="*">PROPAGATION_REQUIRED, ISOLATION_READ_COMMITTED</prop>
+    		</props>
+    	</property>
+    </bean>
 
   <!-- Instructs the container to look for beans with @Transactional and decorate them -->
   <tx:annotation-driven transaction-manager="transactionManager"/>

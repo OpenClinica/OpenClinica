@@ -9,6 +9,7 @@
     
     <bean id="schedulerFactoryBean" class="org.springframework.scheduling.quartz.SchedulerFactoryBean" depends-on="liquibase">
         <property name="dataSource" ref="dataSource"/>
+        <property name="transactionManager" ref="transactionManager"/>
         <property name="quartzProperties">
         	<props>
         		<prop key="org.quartz.jobStore.misfireThreshold">s[org.quartz.jobStore.misfireThreshold]</prop>

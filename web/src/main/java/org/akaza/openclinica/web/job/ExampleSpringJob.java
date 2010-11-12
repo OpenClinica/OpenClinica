@@ -11,6 +11,7 @@ import org.akaza.openclinica.core.OpenClinicaMailSender;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
+import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
@@ -74,6 +75,7 @@ public class ExampleSpringJob extends QuartzJobBean {
     private UserAccountBean userBean;
     private JobDetailBean jobDetailBean;
     private CoreResources coreResources;
+    private RuleSetRuleDao ruleSetRuleDao;
 
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
@@ -91,6 +93,7 @@ public class ExampleSpringJob extends QuartzJobBean {
             ApplicationContext appContext = (ApplicationContext) context.getScheduler().getContext().get("applicationContext");
             String studySubjectNumber = ((CoreResources) appContext.getBean("coreResources")).getField("extract.number");
             coreResources = (CoreResources) appContext.getBean("coreResources");
+            ruleSetRuleDao = (RuleSetRuleDao) appContext.getBean("ruleSetRuleDao");
             dataSource = (DataSource) appContext.getBean("dataSource");
             mailSender = (OpenClinicaMailSender) appContext.getBean("openClinicaMailSender");
             AuditEventDAO auditEventDAO = new AuditEventDAO(dataSource);
@@ -176,7 +179,7 @@ public class ExampleSpringJob extends QuartzJobBean {
                 userBean = (UserAccountBean) userAccountDAO.findByPK(userId);
                 // needs to also be captured by the servlet, tbh
                 // logger.debug("-- gen tab file 00");
-                generateFileService = new GenerateExtractFileService(dataSource, userBean,coreResources);
+                generateFileService = new GenerateExtractFileService(dataSource, userBean,coreResources,ruleSetRuleDao);
 
                 // logger.debug("-- gen tab file 00");
 

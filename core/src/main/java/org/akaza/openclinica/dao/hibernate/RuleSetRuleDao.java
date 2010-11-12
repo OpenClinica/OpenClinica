@@ -4,6 +4,11 @@ import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
+import org.akaza.openclinica.domain.rule.action.HideActionBean;
+import org.akaza.openclinica.domain.rule.action.InsertActionBean;
+import org.akaza.openclinica.domain.rule.action.RuleActionBean;
+import org.akaza.openclinica.domain.rule.action.ShowActionBean;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 
@@ -25,13 +30,35 @@ public class RuleSetRuleDao extends AbstractDomainDao<RuleSetRuleBean> {
         return (ArrayList<RuleSetRuleBean>) q.list();
     }
     
+    /**
+     * Use this method carefully as we force an eager fetch. It is also annotated with 
+     * Transactional so it can be called from Quartz threads. 
+     * @param studyId
+     * @return List of RuleSetRuleBeans 
+     */
     @SuppressWarnings("unchecked")
+    @Transactional
     public ArrayList<RuleSetRuleBean> findByRuleSetStudyIdAndStatusAvail(Integer studyId) {
         String query = "from " + getDomainClassName() + " ruleSetRule  where ruleSetRule.ruleSetBean.studyId = :studyId and status = :status ";
         org.hibernate.Query q = getCurrentSession().createQuery(query);
         q.setInteger("studyId", studyId);
         q.setParameter("status", org.akaza.openclinica.domain.Status.AVAILABLE);
-        return (ArrayList<RuleSetRuleBean>) q.list();
+        ArrayList<RuleSetRuleBean> ruleSetRules = (ArrayList<RuleSetRuleBean>) q.list();
+        // Forcing eager fetch of actions & their properties
+        for (RuleSetRuleBean ruleSetRuleBean : ruleSetRules) {
+            for (RuleActionBean action : ruleSetRuleBean.getActions()) {
+                if (action instanceof InsertActionBean) {
+                    ((InsertActionBean) action).getProperties().size();
+                }
+                if (action instanceof ShowActionBean) {
+                    ((ShowActionBean) action).getProperties().size();
+                }
+                if (action instanceof HideActionBean) {
+                    ((HideActionBean) action).getProperties().size();
+                }
+            }
+        }
+        return ruleSetRules;
     }
 
     public int getCountWithFilter(final ViewRuleAssignmentFilter filter) {
