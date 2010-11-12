@@ -6,7 +6,6 @@ import org.akaza.openclinica.bean.extract.ExtractBean;
 import org.akaza.openclinica.bean.extract.SPSSReportBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.OpenClinicaMailSender;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
@@ -74,6 +73,7 @@ public class ExampleSpringJob extends QuartzJobBean {
     private GenerateExtractFileService generateFileService;
     private UserAccountBean userBean;
     private JobDetailBean jobDetailBean;
+    private CoreResources coreResources;
 
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
@@ -90,6 +90,7 @@ public class ExampleSpringJob extends QuartzJobBean {
         try {
             ApplicationContext appContext = (ApplicationContext) context.getScheduler().getContext().get("applicationContext");
             String studySubjectNumber = ((CoreResources) appContext.getBean("coreResources")).getField("extract.number");
+            coreResources = (CoreResources) appContext.getBean("coreResources");
             dataSource = (DataSource) appContext.getBean("dataSource");
             mailSender = (OpenClinicaMailSender) appContext.getBean("openClinicaMailSender");
             AuditEventDAO auditEventDAO = new AuditEventDAO(dataSource);
@@ -175,7 +176,7 @@ public class ExampleSpringJob extends QuartzJobBean {
                 userBean = (UserAccountBean) userAccountDAO.findByPK(userId);
                 // needs to also be captured by the servlet, tbh
                 // logger.debug("-- gen tab file 00");
-                generateFileService = new GenerateExtractFileService(dataSource, userBean);
+                generateFileService = new GenerateExtractFileService(dataSource, userBean,coreResources);
 
                 // logger.debug("-- gen tab file 00");
 
