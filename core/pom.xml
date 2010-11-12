@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>OpenClinica-core</artifactId>
     <packaging>jar</packaging>
-    <name>core</name>
+    <name>OpenClinica Core</name>
     <parent>
         <groupId>org.akaza.openclinica</groupId>
         <artifactId>OpenClinica</artifactId>
