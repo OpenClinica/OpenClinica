@@ -9,7 +9,6 @@ package org.akaza.openclinica.bean.extract.odm;
 
 import org.akaza.openclinica.bean.odmbeans.OdmAdminDataBean;
 import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
-import org.akaza.openclinica.bean.odmbeans.OdmRulesDataBean;
 import org.akaza.openclinica.bean.odmbeans.OdmStudyBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 
@@ -26,13 +25,11 @@ public class FullReportBean extends OdmXmlReportBean {
     private LinkedHashMap<String, OdmStudyBean> odmStudyMap;
     private LinkedHashMap<String, OdmClinicalDataBean> clinicalDataMap;
     private LinkedHashMap<String, OdmAdminDataBean> adminDataMap;
-    private LinkedHashMap<String, OdmRulesDataBean> rulesDataMap;
     private OdmClinicalDataBean clinicaldata;
     private CoreResources coreResources;
 
     /**
-     * Create one ODM XML This method is still under construction. Right now it
-     * is for Snapshot filetype only.
+     * Create one ODM XML This method is still under construction. Right now it is for Snapshot filetype only.
      */
     @Override
     public void createOdmXml(boolean isDataset) {
@@ -94,7 +91,7 @@ public class FullReportBean extends OdmXmlReportBean {
 
         this.addRootEndLine();
     }
-    
+
     public void createChunkedOdmXml(boolean isDataset, boolean header, boolean footer) {
         ClinicalDataReportBean data = new ClinicalDataReportBean(this.clinicaldata);
         data.setXmlOutput(this.getXmlOutput());
@@ -103,27 +100,20 @@ public class FullReportBean extends OdmXmlReportBean {
     }
 
     public void addNodeStudy(OdmStudyBean odmstudy, boolean isDataset) {
-        MetaDataReportBean meta = new MetaDataReportBean(odmstudy,getCoreResources());
+        MetaDataReportBean meta = new MetaDataReportBean(odmstudy, getCoreResources());
         meta.setODMVersion(this.getODMVersion());
         meta.setXmlOutput(this.getXmlOutput());
         meta.addNodeStudy(isDataset);
     }
 
     /*
-     * Currently, this only be called for OpenClinica ODM extension 
+     * Currently, this only be called for OpenClinica ODM extension
      */
     private void addNodeAdminData(OdmAdminDataBean adminData) {
         AdminDataReportBean admin = new AdminDataReportBean(adminData);
         admin.setODMVersion(this.getODMVersion());
         admin.setXmlOutput(this.getXmlOutput());
         admin.addNodeAdminData();
-    }
-    
-    private void addNodeRulesData(OdmRulesDataBean rulesData) {
-        RulesDataReportBean rules = new RulesDataReportBean(rulesData,getCoreResources());
-        rules.setODMVersion(this.getODMVersion());
-        rules.setXmlOutput(this.getXmlOutput());
-        rules.addNodeRulesData();
     }
 
     public void addNodeClinicalData(OdmClinicalDataBean clinicaldata) {
@@ -161,14 +151,6 @@ public class FullReportBean extends OdmXmlReportBean {
         this.clinicaldata = clinicaldata;
     }
 
-    public LinkedHashMap<String, OdmRulesDataBean> getRulesDataMap() {
-        return rulesDataMap;
-    }
-
-    public void setRulesDataMap(LinkedHashMap<String, OdmRulesDataBean> rulesDataMap) {
-        this.rulesDataMap = rulesDataMap;
-    }
-
     public CoreResources getCoreResources() {
         return coreResources;
     }
@@ -176,5 +158,5 @@ public class FullReportBean extends OdmXmlReportBean {
     public void setCoreResources(CoreResources coreResources) {
         this.coreResources = coreResources;
     }
-    
+
 }
