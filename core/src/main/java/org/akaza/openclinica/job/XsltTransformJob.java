@@ -200,7 +200,9 @@ public class XsltTransformJob extends QuartzJobBean {
                 function.setExportFileName(dataMap.getString(POST_PROC_EXPORT_NAME));
                 File oldFiles[] = getOldFiles(outputPath,dataMap.getString(POST_PROC_LOCATION));
                 function.setOldFiles(oldFiles);
+                File intermediateFiles[] = getInterFiles(dataMap.getString(POST_FILE_PATH)); 
                 ProcessingResultType message = function.run();
+                deleteOldFiles(intermediateFiles);
                 final long done2 = System.currentTimeMillis() - start;
                 System.out.println("--> postprocessing completed in " + done2 + " ms, found result type " + message.getCode());
               
@@ -342,6 +344,20 @@ public class XsltTransformJob extends QuartzJobBean {
     		temp = new File(outputPath);
     		if(temp.isDirectory())exisitingFiles = temp.listFiles();
     	}
+    	
+    	return exisitingFiles;
+	}
+	
+	
+	private File[] getInterFiles( String xmlLoc) {
+    	File exisitingFiles[] = null;
+    	File temp = null;
+    	if(xmlLoc!=null)
+    		{
+    		temp = new File(xmlLoc);
+    		if(temp.isDirectory())exisitingFiles = temp.listFiles();
+    		}
+    	
     	
     	return exisitingFiles;
 	}

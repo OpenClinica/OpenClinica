@@ -52,7 +52,8 @@ public class PdfProcessingFunction extends ProcessingFunction {
         
         OutputStream out = null;   
         File outputFile =null;
-        
+        String zipName = "_";
+        File xslFile = null;
         try
         {
             FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
@@ -62,7 +63,7 @@ public class PdfProcessingFunction extends ProcessingFunction {
             
             File procExportDirectory;
             File oldFiles[] = null;
-            String zipName = "_";
+         
             if(this.getExportFileName()!=null && this.getLocation()!=null)
             {
 
@@ -81,7 +82,7 @@ public class PdfProcessingFunction extends ProcessingFunction {
             }
             
             
-            File xslFile = new File(this.getTransformFileName());//transformfilename is abs path+file name(.fo) transformFileName and odmxmlfile name are same?
+             xslFile = new File(this.getTransformFileName());//transformfilename is abs path+file name(.fo) transformFileName and odmxmlfile name are same?
             out = new FileOutputStream(outputFile);
             out = new BufferedOutputStream(out);
             Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, out);
@@ -157,10 +158,14 @@ public class PdfProcessingFunction extends ProcessingFunction {
        
         if(isDeleteOld())
         {
-        	deleteOldFiles(this.getOldFiles(),outputFile);
+        	deleteOldFiles(this.getOldFiles(),outputFile,zipName);
         }
+        //delete intermediatory .fo file
+        if(xslFile!=null)xslFile.delete();
+        
         // otherwise return a success with the URL link
-       
+        
+        
         ProcessingResultType resultSuccess = ProcessingResultType.SUCCESS;
         resultSuccess.setUrl(CoreResources.getField("sysURL.base") + 
                 "AccessFile?fileId="); // to the pdf
@@ -170,11 +175,11 @@ public class PdfProcessingFunction extends ProcessingFunction {
         
         
     }
-    private void deleteOldFiles(File[] oldFiles,File outputFile) {
+    private void deleteOldFiles(File[] oldFiles,File outputFile, String zipFile) {
 	    	//File[] files = complete.listFiles();
 			for(int i=0;i<oldFiles.length;i++)
 			{
-				if(!outputFile.getName().equals(oldFiles[i].getName()))
+				if(!outputFile.getName().equals(oldFiles[i].getName())||!outputFile.getName().equals(zipFile))
 				oldFiles[i].delete();
 			}
 			

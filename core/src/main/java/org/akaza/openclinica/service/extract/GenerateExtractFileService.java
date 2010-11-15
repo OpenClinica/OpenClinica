@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -57,6 +58,9 @@ public class GenerateExtractFileService {
     public static ResourceBundle resword;
     private final UserAccountBean userBean;
     private final CoreResources coreResources;
+
+	 private static File files[]=null;
+    private static List oldFiles = new LinkedList<File>();
     private final RuleSetRuleDao ruleSetRuleDao;
 
     public GenerateExtractFileService(DataSource ds, HttpServletRequest request, UserAccountBean userBean,CoreResources coreResources,RuleSetRuleDao ruleSetRuleDao) {
@@ -147,7 +151,7 @@ public class GenerateExtractFileService {
         MetaDataCollector mdc = new MetaDataCollector(ds, datasetBean, currentStudy,ruleSetRuleDao);
         AdminDataCollector adc = new AdminDataCollector(ds, datasetBean, currentStudy);
         ClinicalDataCollector cdc = new ClinicalDataCollector(ds, datasetBean, currentStudy);
-        File files[]=null;
+       
         MetaDataCollector.setTextLength(200);
         if(deleteOld){
         	File file = new File(generalFileDir);
@@ -336,7 +340,7 @@ public class GenerateExtractFileService {
         // return ODMXMLFileName;
         HashMap answerMap = new HashMap<String, Integer>();
         answerMap.put(ODMXMLFileName, new Integer(fId));
-        if(deleteOld && files!=null) deleteOldFiles(files);
+        if(deleteOld && files!=null &&oldFiles!=null) deleteOldFiles(oldFiles);
         return answerMap;
     }
     
@@ -559,6 +563,7 @@ public class GenerateExtractFileService {
             if (!complete.isDirectory()) {
                 complete.mkdirs();
             }
+            
 //            else  if(deleteOld)// so directory exists check if the files are there
 //            {
 //            	deleteDirectory(complete);
@@ -571,6 +576,8 @@ public class GenerateExtractFileService {
             File newFile = null;
             if (oldFile.exists()) {
                 newFile = oldFile;
+                if(oldFiles!=null || !oldFiles.isEmpty() )
+                oldFiles.remove(oldFile);
             } else {
                 newFile = new File(complete, name);
             }
@@ -586,6 +593,14 @@ public class GenerateExtractFileService {
                 // now, we write the file to the zip file
                 FileInputStream is = new FileInputStream(newFile);
                 ZipOutputStream z = new ZipOutputStream(new FileOutputStream(new File(complete, name + ".zip")));
+                if(oldFiles!=null || !oldFiles.isEmpty())
+                {
+                	
+                	if(oldFiles.contains(new File(complete, name + ".zip")))
+                	{
+                		oldFiles.remove(new File(complete, name + ".zip"));//Dont delete the files which u r just creating
+                	}
+                }
                 logger.info("created zip output stream...");
                 // we write over the content no matter what
                 // we then check to make sure there are no duplicates
@@ -672,13 +687,14 @@ public class GenerateExtractFileService {
         return fbFinal.getId();
     }
 
-    private void deleteOldFiles(File[] files) {
+    private void deleteOldFiles(List oldFiles2) {
     	
     		//File[] files = complete.listFiles();
-    		for(int i=0;i<files.length;i++)
+    	
+    		Iterator<File> fileIt = oldFiles2.iterator();
+    		while(fileIt.hasNext())
     		{
-
-   				files[i].delete();
+    			fileIt.next().delete();
     		}
     	
 		
