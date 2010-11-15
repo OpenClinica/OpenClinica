@@ -114,13 +114,14 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         ListNotesSort listNotesSort = new ListNotesSort();//getListSubjectSort(limit);
         listNotesSort.addSort("","");
         ArrayList<DiscrepancyNoteBean> allDiscNotes = new DiscrepancyNoteDAO(sm.getDataSource()).getNotesWithFilterAndSort(studyBean, listNotesFilter, listNotesSort);
-        allDiscNotes = populateRowsWithAttachedData(allDiscNotes);
 
         //Downloaded notes will contain only filtered notes.
         ArrayList sessionNotes = (ArrayList)session.getAttribute("allNotes");
         if (sessionNotes != null) {
             allDiscNotes = sessionNotes;
         }
+        allDiscNotes = populateRowsWithAttachedData(allDiscNotes);
+
         // Now we have to package all the discrepancy notes in DiscrepancyNoteThread objects
         // Do the filtering for type or status here
         DiscrepancyNoteUtil discNoteUtil = new DiscrepancyNoteUtil();
