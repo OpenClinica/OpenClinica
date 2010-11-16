@@ -69,6 +69,7 @@ import org.akaza.openclinica.control.managestudy.ViewStudySubjectServlet;
 import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -3663,25 +3664,29 @@ public abstract class DataEntryServlet extends SecureController {
              }
          }
 
-         ArrayList parentNotes = dndao.findExistingNotesForItemData(itemDataId);
-         //Adding this to show the value of only parent threads on discrepancy notes tool tip
-         for (Object obj : parentNotes) {
-             DiscrepancyNoteBean note = (DiscrepancyNoteBean) obj;
-             /*We would only take the resolution status of the parent note of any note thread. If there
-             * are more than one note thread, the thread with the worst resolution status will be taken.*/
+        ArrayList parentNotes = dndao.findExistingNotesForItemData(itemDataId);
+        //Adding this to show the value of only parent threads on discrepancy notes tool tip
+        for (Object obj : parentNotes) {
+            DiscrepancyNoteBean note = (DiscrepancyNoteBean) obj;
+            /*We would only take the resolution status of the parent note of any note thread. If there
+            * are more than one note thread, the thread with the worst resolution status will be taken.*/
 
-             if(note.getParentDnId()==0)
-             {
-            	 if(hasOtherThread)
-            	 {
-            		 totNew++;
-            	 }
-            	 hasOtherThread = true;
+            if(note.getParentDnId()==0)
+            {
+                 if(hasOtherThread)
+                 {
+                     totNew++;
+                 }
+                 hasOtherThread = true;
              }
+        }
 
-
-         }
-    	dib.setTotNew(totNew);//totNew is used for parent thread count
+        AuditDAO adao = new AuditDAO(sm.getDataSource());
+        ArrayList itemAuditEvents = adao.findItemAuditEvents(dib.getItem().getId(), "item_data");
+        if (itemAuditEvents.size() > 0) {
+            dib.getData().setAuditLog(true);    
+        }
+        dib.setTotNew(totNew);//totNew is used for parent thread count
     	dib.setTotRes(totRes);
     	dib.setTotUpdated(totUpdated);
     	dib.setTotClosed(totClosed);

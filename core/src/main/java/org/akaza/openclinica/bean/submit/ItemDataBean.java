@@ -27,12 +27,15 @@ public class ItemDataBean extends AuditableEntityBean {
 
     private boolean selected;// for construct data only
 
+    private boolean auditLog = false;
+
     public ItemDataBean() {
         eventCRFId = 0;
         itemId = 0;
         value = "";
         ordinal = 1;
         selected = false;
+        auditLog = false;
     }
 
     /**
@@ -110,4 +113,11 @@ public class ItemDataBean extends AuditableEntityBean {
         this.ordinal = ordinal;
     }
 
+    public boolean isAuditLog() {
+        return auditLog;
+    }
+
+    public void setAuditLog(boolean auditLog) {
+        this.auditLog = auditLog;
+    }
 }
