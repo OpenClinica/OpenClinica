@@ -307,6 +307,20 @@
 			<artifactId>struts</artifactId>
 			<version>1.2.4</version>
 			<scope>test</scope>
+			<!-- @pgawade 16-NOV-2010 Excluded the antlr library from struts as we need to use that from hibernate -->
+			<exclusions>
+				<exclusion>
+					<artifactId>antlr</artifactId>
+					<groupId>antlr</groupId>
+				</exclusion>				
+			</exclusions>
+		</dependency>
+		<!-- @pgawade 16-NOV-2010 jmesa library for unit tests -->
+		<dependency>
+			<groupId>org.jmesa</groupId>
+			<artifactId>jmesa</artifactId>
+			<version>2.4.2</version>
+			<scope>test</scope>
 		</dependency>
 		<!-- Postgres JDBC driver -->
 		<dependency>
@@ -326,9 +340,35 @@
 			<groupId>org.codehaus.castor</groupId>
 			<artifactId>castor</artifactId>
 			<version>1.2</version>
-		</dependency>
+		</dependency>		
 	</dependencies>
-
+	<!-- @pgawade 16-NOV-2010 unit tests through maven -->
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-report-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</reporting>
+	<properties>
+		<catalina.home>C:\\Java\\tomcat</catalina.home>
+		<test.dbName>postgres</test.dbName>
+		<test.dbDriverClassName>org.postgresql.Driver</test.dbDriverClassName>
+		<test.dbUrl>jdbc:postgresql://localhost:5432/</test.dbUrl>
+		<test.dbUsername>clinica</test.dbUsername>
+		<test.dbPassword>clinica</test.dbPassword>
+		<test.hibernateDialect>org.hibernate.dialect.PostgreSQLDialect</test.hibernateDialect>
+		<test.locale>en_US</test.locale>
+		<scm.path>scm:svn:http://svn.akazaresearch.com/openclinica/OpenClinica/branches/OpenClinica-3.0-SNAPSHOT</scm.path>
+		<!--  Library Versions -->
+		<!--<spring.version>2.5.6.SEC01</spring.version>-->
+		
+	</properties>
     <build>
         <resources>
             <resource>
@@ -336,6 +376,13 @@
                 <filtering>true</filtering>
             </resource>
         </resources>
+		<!-- @pgawade 16-NOV-2010 filter test resources -->
+        <testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+			</testResource>
+		</testResources>
         <plugins>
             <plugin>
                 <inherited>true</inherited>
@@ -370,6 +417,13 @@
 				</executions>
 				<configuration>
 					<schemaDirectory>src/main/webapp/WEB-INF/schemas</schemaDirectory>
+				</configuration>
+			</plugin>
+			<!-- @pgawade 16-NOV-2010 surefire maven plugin to run the unit tests -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>					
 				</configuration>
 			</plugin>
         </plugins>
