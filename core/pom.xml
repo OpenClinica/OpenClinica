@@ -9,13 +9,26 @@
         <groupId>org.akaza.openclinica</groupId>
         <artifactId>OpenClinica</artifactId>
         <version>SNAPSHOT</version>
-    </parent>
-    <dependencies>
+    </parent>    
+    <dependencies> 
 		<dependency>
 			<groupId>javax.transaction</groupId>
 			<artifactId>transaction-api</artifactId>
 			<version>1.1</version>
-		</dependency>
+		</dependency>		
+		<!--@pgawade 16-NOV-2010 spring security dependency for unit tests -->   	 	
+		<dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-web</artifactId>
+            <version>${spring.version}</version>
+			<scope>test</scope>
+        </dependency>
+		<dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>${spring.version}</version>			
+			<scope>test</scope>
+        </dependency>
 		<dependency>
 			<groupId>org.apache.xmlgraphics</groupId>
 			<artifactId>fop</artifactId>
@@ -49,12 +62,13 @@
 			<version>1.4</version>
 			<scope>test</scope>
 		</dependency>
+		<!--@pgawade 12-NOV-2010 Commented out the JPA API depenedency as it was conflicting with that from the hibernate
 		<dependency>
 			<groupId>javax.persistence</groupId>
 			<artifactId>persistence-api</artifactId>
 			<version>1.0</version>
 			<scope>compile</scope>
-		</dependency>
+		</dependency>-->
 		<!-- end servlet tests -->
 		<dependency>
 			<groupId>commons-beanutils</groupId>
@@ -186,6 +200,13 @@
 			<artifactId>struts</artifactId>
 			<version>1.2.4</version>
 			<scope>test</scope>
+			<!-- @pgawade 16-NOV-2010 Excluded the antlr library from struts as we need to use that from hibernate -->
+			<exclusions>
+				<exclusion>
+					<artifactId>antlr</artifactId>
+					<groupId>antlr</groupId>
+				</exclusion>				
+			</exclusions>
 		</dependency>
 		<!-- Postgres JDBC driver -->
 		<dependency>
@@ -206,8 +227,41 @@
 			<artifactId>castor</artifactId>
 			<version>1.2</version>
 		</dependency>
+		<!-- @pgawade 16-NOV-2010 jmesa library for unit tests -->
+		<dependency>
+			<groupId>org.jmesa</groupId>
+			<artifactId>jmesa</artifactId>
+			<version>2.4.2</version>
+			<scope>test</scope>
+		</dependency>		
 	</dependencies>
-
+	<!-- @pgawade 16-NOV-2010 unit tests through maven -->
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-report-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</reporting>
+	<properties>
+		<catalina.home>C:\\Java\\tomcat</catalina.home>
+		<test.dbName>postgres</test.dbName>
+		<test.dbDriverClassName>org.postgresql.Driver</test.dbDriverClassName>
+		<test.dbUrl>jdbc:postgresql://localhost:5432/</test.dbUrl>
+		<test.dbUsername>clinica</test.dbUsername>
+		<test.dbPassword>clinica</test.dbPassword>
+		<test.hibernateDialect>org.hibernate.dialect.PostgreSQLDialect</test.hibernateDialect>
+		<test.locale>en_US</test.locale>
+		<scm.path>scm:svn:http://svn.akazaresearch.com/openclinica/OpenClinica/branches/OpenClinica-3.0-SNAPSHOT</scm.path>
+		<!--  Library Versions -->
+		<!--<spring.version>2.5.6.SEC01</spring.version>-->
+		
+	</properties>
     <build>
         <resources>
             <resource>
@@ -215,6 +269,13 @@
                 <filtering>true</filtering>
             </resource>
         </resources>
+		<!-- @pgawade 16-NOV-2010 filter test resources -->
+        <testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+			</testResource>
+		</testResources>
         <plugins>
             <plugin>
                 <inherited>true</inherited>
@@ -236,6 +297,13 @@
                     </execution>
                 </executions>
             </plugin>
+			<!-- @pgawade 16-NOV-2010 surefire maven plugin to run the unit tests -->
+            <plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>					
+				</configuration>
+			</plugin>
             <plugin>
                 <groupId>org.liquibase</groupId>
                 <artifactId>liquibase-plugin</artifactId>
