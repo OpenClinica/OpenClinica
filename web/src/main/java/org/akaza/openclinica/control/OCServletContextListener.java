@@ -17,7 +17,7 @@ public class OCServletContextListener implements ServletContextListener {
 	}
 
 	public void contextInitialized(ServletContextEvent event) {
-		// TODO JN:UNCOMMENT ME AFTER FIGURING OUT WHAT TO DO WITH XSLT FILES 
+		//  TODO JN:UNCOMMENT ME AFTER FIGURING OUT WHAT TO DO WITH XSLT FILES 
 		// CoreResources cr = (CoreResources) SpringServletAccess.getApplicationContext(event.getServletContext()).getBean("coreResources");
 	}
 

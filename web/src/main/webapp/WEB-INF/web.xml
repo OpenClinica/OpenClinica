@@ -14,8 +14,7 @@
         <param-value>
             classpath*:org/akaza/openclinica/applicationContext*.xml
         </param-value>
-        
-    </context-param>
+  </context-param>
     
     <context-param>
         <param-name>jmesaMessagesLocation</param-name>
