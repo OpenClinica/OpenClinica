@@ -206,7 +206,9 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                             displayItemBean.getData().setId(itemDataBean.getId());
                         } else {
                             itemDataDao.create(displayItemBean.getData());
-                            logger.info("created: " + displayItemBean.getData().getItemId());
+                            logger.info("created: " + displayItemBean.getData().getItemId()+"event CRF ID = "+eventCrfBean.getId()+"CRF VERSION ID ="+eventCrfBean.getCRFVersionId());
+                            
+                            
                             // does this dao function work for repeating
                             // events/groups?
                             // ItemDataBean itemDataBean =

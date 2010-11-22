@@ -33,6 +33,9 @@
       org.springframework.security.web.session.HttpSessionEventPublisher
     </listener-class>
     </listener>
+      <listener>
+        <listener-class>org.akaza.openclinica.control.OCServletContextListener</listener-class>
+    </listener>
    <filter>
         <filter-name>springSecurityFilterChain</filter-name>
         <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
@@ -72,6 +75,20 @@
         <!--<url-pattern>/*</url-pattern>-->
     <!--</filter-mapping>-->
 
+
+<filter>
+<filter-name>HistoryLog</filter-name>
+	<filter-class>org.akaza.openclinica.history.HistoryLog</filter-class>
+	
+</filter>
+<filter-mapping>
+<filter-name>HistoryLog</filter-name>
+<servlet-name>ViewStudySubjectjsp</servlet-name>
+
+<dispatcher>FORWARD</dispatcher>
+   <url-pattern>/ViewStudySubject1</url-pattern>
+   
+</filter-mapping>
    <servlet>
         <servlet-name>pages</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
@@ -560,6 +577,12 @@
         <display-name>InitialDataEntry</display-name>
         <servlet-class>org.akaza.openclinica.control.submit.InitialDataEntryServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>DataEntryServlet</servlet-name>
+        <display-name>DataEntry</display-name>
+        <servlet-class>org.akaza.openclinica.control.submit.DataEntryServlet</servlet-class>
+    </servlet>
+    
     <servlet>
         <servlet-name>DoubleDataEntryServlet</servlet-name>
         <display-name>DoubleDataEntry</display-name>
@@ -1159,6 +1182,11 @@
         <display-name>ViewItemAuditLogServlet</display-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ViewItemAuditLogServlet</servlet-class>
     </servlet>
+       <servlet>
+        <servlet-name>ViewStudySubjectjsp</servlet-name>
+        <display-name>viewStudySubjectjsp</display-name>
+        <jsp-file>/WEB-INF/jsp/manageStudy/viewStudySubject.jsp</jsp-file>
+    </servlet>
 
     <servlet-mapping>
         <servlet-name>LockCRFVersionServlet</servlet-name>
@@ -1548,6 +1576,11 @@
         <servlet-name>InitialDataEntryServlet</servlet-name>
         <url-pattern>/InitialDataEntry</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DataEntryServlet</servlet-name>
+        <url-pattern>/DataEntry</url-pattern>
+    </servlet-mapping>
+    
     <servlet-mapping>
         <servlet-name>DoubleDataEntryServlet</servlet-name>
         <url-pattern>/DoubleDataEntry</url-pattern>
@@ -1971,6 +2004,10 @@
     <servlet-mapping>
         <servlet-name>UploadFileServlet</servlet-name>
         <url-pattern>/UploadFile</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ViewStudySubjectjsp</servlet-name>
+        <url-pattern>/ViewStudySubject1</url-pattern>
     </servlet-mapping>
     <!-- just for testing purposes -->
     <servlet-mapping>
