@@ -404,5 +404,24 @@ public class AuditDAO extends EntityDAO {
 
     }
 
+    public ArrayList checkItemAuditEventsExist(int itemId, String auditTable) {
+        this.setTypesExpected();
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(itemId));
+        variables.put(new Integer(2), auditTable);
 
+        String sql = digester.getQuery("checkItemAuditEventsExist");
+        ArrayList alist = this.select(sql, variables);
+        ArrayList al = new ArrayList();
+        Iterator it = alist.iterator();
+        while (it.hasNext()) {
+            AuditBean eb = (AuditBean) this.getEntityFromHashMap((HashMap) it.next());
+            if(eb.getAuditEventTypeId()==3 || eb.getAuditEventTypeId()==6 || eb.getAuditEventTypeId()==12 || eb.getAuditEventTypeId()==32){
+                eb.setOldValue(Status.get(new Integer(eb.getOldValue())).getName());
+                eb.setNewValue(Status.get(new Integer(eb.getNewValue())).getName());
+            }
+            al.add(eb);
+        }
+        return al;
+    }
 }

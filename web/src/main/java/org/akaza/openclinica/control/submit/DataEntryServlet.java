@@ -3682,7 +3682,7 @@ public abstract class DataEntryServlet extends SecureController {
         }
 
         AuditDAO adao = new AuditDAO(sm.getDataSource());
-        ArrayList itemAuditEvents = adao.findItemAuditEvents(dib.getItem().getId(), "item_data");
+        ArrayList itemAuditEvents = adao.checkItemAuditEventsExist(dib.getItem().getId(), "item_data");
         if (itemAuditEvents.size() > 0) {
             dib.getData().setAuditLog(true);    
         }

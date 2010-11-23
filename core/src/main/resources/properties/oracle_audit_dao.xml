@@ -107,4 +107,13 @@
             WHERE ale.entity_id = ? and ale.audit_table = ?
         </sql>
     </query>
+    <query>
+        <name>checkItemAuditEventsExist</name>
+        <sql>
+            select ae.* from audit_log_event ae, item it, item_data itd
+            where it.item_id = ? and it.item_id = itd.item_id
+            and itd.item_data_id = ae.entity_id
+            and ae.audit_table = ?
+        </sql>
+    </query>
 </queries>
