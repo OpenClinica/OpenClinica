@@ -243,7 +243,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
                 DisplayBean d = new DisplayBean();
                 d.getProps().put("event", null);
                 d.getProps().put("event.status", SubjectEventStatus.NOT_SCHEDULED);
-                d.getProps().put("studySubject.eventStartDate", null);
+                d.getProps().put("studySubject.createdDate", null);
                 for (int i = 0; i < getCrfs(selectedStudyEventDefinition).size(); i++) {
                     CRFBean crf = getCrfs(selectedStudyEventDefinition).get(i);
                     d.getProps().put("crf_" + crf.getId(), DataEntryStage.UNCOMPLETED);
@@ -261,9 +261,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
                 DisplayBean d = new DisplayBean();
                 d.getProps().put("event", studyEventBean);
                 d.getProps().put("event.status", studyEventBean.getSubjectEventStatus());
-                d.getProps().put("studySubject.eventStartDate", studyEventBean.getDateStarted());
-
-                //d.getProps().put("event.startDate", studySubjectBean.getEventStartDate());
+                d.getProps().put("studySubject.createdDate", studyEventBean.getDateStarted());
                 for (int i = 0; i < getCrfs(selectedStudyEventDefinition).size(); i++) {
                     CRFBean crf = getCrfs(selectedStudyEventDefinition).get(i);
                     EventCRFBean eventCRFBean = crfAsKeyEventCrfAsValue.get(crf.getId() + "_" + studyEventBean.getId());
@@ -286,7 +284,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
             }
             theItem.put("events", events);
             theItem.put("event.status", "");
-            theItem.put("studySubject.eventStartDate", "");
+            theItem.put("studySubject.createdDate", "");
             theItems.add(theItem);
         }
 
@@ -315,7 +313,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
             columnNamesList.add("sgc_" + studyGroupClass.getId());
         }
         columnNamesList.add("event.status");
-        columnNamesList.add("studySubject.eventStartDate");
+        columnNamesList.add("studySubject.createdDate");
 
         for (CRFBean crfBean : getCrfs(selectedStudyEventDefinition)) {
             columnNamesList.add("crf_" + crfBean.getId());
@@ -696,7 +694,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
             StringBuilder url = new StringBuilder();
 
             for (DisplayBean display : events) {
-                eventStartDate = (Date) display.getProps().get("studySubject.eventStartDate");
+                eventStartDate = (Date) display.getProps().get("studySubject.createdDate");
                 url.append("<table border='0'  cellpadding='0'  cellspacing='0' ><tr valign='top' ><td>");
                 url.append(eventStartDate == null ? "" : formatDate(eventStartDate));
                 url.append("</td></tr></table>");

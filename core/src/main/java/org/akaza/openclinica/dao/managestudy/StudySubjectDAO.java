@@ -207,7 +207,7 @@ public class StudySubjectDAO extends AuditableEntityDAO {
         eb.setEnrollmentDate((Date) hm.get("enrollment_date"));
         eb.setSecondaryLabel((String) hm.get("secondary_label"));
         eb.setOid((String) hm.get("oc_oid"));
-        eb.setEventStartDate((Date) hm.get("date_start"));
+//        eb.setEventStartDate((Date) hm.get("date_start"));
         // eb.setActive(true);
         return eb;
     }
