@@ -150,8 +150,7 @@
     </form>
 </div>
     <div id="addSubjectForm" style="display:none;">
-          <c:import url="submit/addNewSubjectExpressNew.jsp">
-          </c:import>
+         <c:import url="addSubjectMonitor.jsp"/>
     </div>
 
 
