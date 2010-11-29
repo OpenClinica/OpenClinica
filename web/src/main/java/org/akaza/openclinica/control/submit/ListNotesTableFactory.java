@@ -422,6 +422,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                     // }
                 }
             }
+            dnb.setSiteId(((StudyBean) getStudyDao().findByPK(dnb.getStudySub().getStudyId())).getIdentifier());
         }
         return allNotes;
     }

@@ -60,6 +60,7 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
     private StudySubjectBean studySub = new StudySubjectBean();
 
     private int subjectId = 0;
+    private String siteId;
 
     // indicates whether a note is in the db or
     // not
@@ -567,5 +568,13 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
 
     public void setStudy(StudyBean study) {
         this.study = study;
+    }
+
+    public String getSiteId() {
+        return siteId;
+    }
+
+    public void setSiteId(String siteId) {
+        this.siteId = siteId;
     }
 }
