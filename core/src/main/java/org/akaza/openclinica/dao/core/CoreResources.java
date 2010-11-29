@@ -24,6 +24,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Properties;
 
+import javax.servlet.ServletContext;
+
 public class CoreResources implements ResourceLoaderAware   {
 
     private ResourceLoader resourceLoader;
@@ -35,7 +37,8 @@ public class CoreResources implements ResourceLoaderAware   {
     private Properties dataInfo;
     private Properties extractInfo;
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    private String webAppContext;
+    protected final static Logger logger = LoggerFactory.getLogger("CoreResources");
     // private MessageSource messageSource;
     private static ArrayList<ExtractPropertyBean> extractProperties;
 
@@ -43,8 +46,11 @@ public class CoreResources implements ResourceLoaderAware   {
         this.resourceLoader = resourceLoader;
         try {
             // setPROPERTIES_DIR();
+        	
             String dbName = dataInfo.getProperty("dataBase");
             DATAINFO = dataInfo;
+            //JN:TODO undo-comment after the datainfo part is done. 
+            //DATAINFO = setDataInfoProperties();
             EXTRACTINFO = extractInfo;
 
             
@@ -63,11 +69,30 @@ public class CoreResources implements ResourceLoaderAware   {
 		}
     }
 
-    private void copyBaseToDest(ResourceLoader resourceLoader)  {
+    private Properties setDataInfoProperties() {
+    	String filePath = DATAINFO.getProperty("filePath");
+		
+    	
+    	if(DATAINFO.getProperty("filePath").contains("${catalina.home}"))
+		{
+			
+			filePath = filePath.replace("${catalina.home}", System.getenv("catalina.home"));
+			DATAINFO.setProperty("filePath", filePath);
+		}
+    	if(DATAINFO.getProperty("filePath").contains("${WEBAPP}"))
+		{
+			
+			filePath = filePath.replace("${catalina.home}", System.getenv("catalina.home"));
+			DATAINFO.setProperty("filePath", filePath);
+		}
+		return DATAINFO;
+	}
+
+	private void copyBaseToDest(ResourceLoader resourceLoader)  {
     //	System.out.println("Properties directory?"+resourceLoader.getResource("properties/xslt"));
     
     	ByteArrayInputStream listSrcFiles[] = new ByteArrayInputStream[10];
-    	String[] fileNames =  {"odm_spss_dat.xsl","ODMToTAB.xsl","odm_to_html.xsl","odm_to_xslfo.xsl","ODMReportStylesheet.xsl","ODMReportStylesheet.xsl","ODMToCSV.xsl","ODM-XSLFO-Stylesheet.xsl","odm_spss_sps.xsl"};
+    	String[] fileNames =  {"odm_spss_dat.xsl","ODMToTAB.xsl","odm_to_html.xsl","odm_to_xslfo.xsl","ODMReportStylesheet.xsl","ODMReportStylesheet.xsl","ODMToCSV.xsl","ODM-XSLFO-Stylesheet.xsl","odm_spss_sps.xsl","copyXML.xsl"};
     	try{
     listSrcFiles[0] = (ByteArrayInputStream) resourceLoader.getResource("classpath:properties"+File.separator+"xslt"+File.separator+fileNames[0]).getInputStream();
     listSrcFiles[1] = (ByteArrayInputStream)resourceLoader.getResource("classpath:properties"+File.separator+"xslt"+File.separator+fileNames[1]).getInputStream();
@@ -78,6 +103,7 @@ public class CoreResources implements ResourceLoaderAware   {
     listSrcFiles[6] = (ByteArrayInputStream)resourceLoader.getResource("classpath:properties"+File.separator+"xslt"+File.separator+fileNames[6]).getInputStream();
     listSrcFiles[7] = (ByteArrayInputStream)resourceLoader.getResource("classpath:properties"+File.separator+"xslt"+File.separator+fileNames[7]).getInputStream();
     listSrcFiles[8] = (ByteArrayInputStream)resourceLoader.getResource("classpath:properties"+File.separator+"xslt"+File.separator+fileNames[8]).getInputStream();
+    listSrcFiles[9] = (ByteArrayInputStream)resourceLoader.getResource("classpath:properties"+File.separator+"xslt"+File.separator+fileNames[9]).getInputStream();
     	}catch(IOException ioe){
     		OpenClinicaSystemException oe = new OpenClinicaSystemException("Unable to read source files");
     		oe.initCause(ioe);
@@ -85,17 +111,13 @@ public class CoreResources implements ResourceLoaderAware   {
     		logger.debug(ioe.getMessage());
     		throw oe;
     	}
-    //File src = resourceLoader.getResource("classpath:properties/xslt/odm_spss_dat.xsl").getFile().getParentFile();
 	File dest = new File(getField("filePath")+"xslt");
-//if(src.isDirectory()){
 		if(!dest.exists()){
 			if(!dest.mkdirs()){
 				throw new OpenClinicaSystemException("Copying files, Could not create direcotry: " + dest.getAbsolutePath() + ".");
 			}
 		}
-	//}
-	 //String list[] = listSrcFiles;
-	              //copy all the files in the list.
+
                 for (int i = 0; i < fileNames.length; i++)
                 {
                         File dest1 = new File(dest,fileNames[i]);
@@ -108,13 +130,11 @@ public class CoreResources implements ResourceLoaderAware   {
 	}
 
     private void copyFiles(ByteArrayInputStream fis,File dest){
-    	//FileInputStream fis = null;
     	FileOutputStream fos = null;
     	byte[] buffer = new byte[512]; //Buffer 4K at a time (you can change this).
     	int bytesRead;
     	logger.debug("fis?"+fis);
     	try{
-    		//fis = new FileInputStream(src);
     		fos = new FileOutputStream(dest);
     		 while (( bytesRead = fis.read(buffer)) >= 0) {
     			                                 fos.write(buffer,0,bytesRead);
@@ -152,13 +172,6 @@ public class CoreResources implements ResourceLoaderAware   {
         return resourceLoader;
     }
 
-    // public MessageSource getMessageSource() {
-    // return messageSource;
-    // }
-    //
-    // public void setMessageSource(MessageSource messageSource) {
-    // this.messageSource = messageSource;
-    // }
 
     public static ArrayList<ExtractPropertyBean> getExtractProperties() {
         return extractProperties;
@@ -241,7 +254,7 @@ public class CoreResources implements ResourceLoaderAware   {
             		epbean.setPostProcDeleteOld(getExtractFieldBoolean(whichFunction+".deleteOld"));
             		epbean.setPostProcZip(getExtractFieldBoolean(whichFunction+".zip"));
             		epbean.setPostProcLocation(getExtractField(whichFunction+".location"));
-            		epbean.setPostProcExportName(getExtractField(whichFunction+".exportName"));
+            		epbean.setPostProcExportName(getExtractField(whichFunction+".exportname"));
             	}
             	else if(postProcessorName.equals("sql")){
             		
@@ -363,6 +376,9 @@ public class CoreResources implements ResourceLoaderAware   {
     }
     public static String[] getExtractFields(String key) {
         String value = EXTRACTINFO.getProperty(key);
+        
+        System.out.println("key?"+key+"value = "+value);
+        logger.debug("key??"+key+"value = "+value);
         if (value != null) {
             value = value.trim();
         }
@@ -391,6 +407,15 @@ public class CoreResources implements ResourceLoaderAware   {
 
     public void setExtractInfo(Properties extractInfo) {
         this.extractInfo = extractInfo;
+    }
+    
+    //getters and setters for web application context name
+    public void setWebAppContextName(String webAppContext)
+    {
+    	this.webAppContext = webAppContext;
+    }
+    public String getWebAppContextName(){
+    	return webAppContext;
     }
 
 }
