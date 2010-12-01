@@ -20,8 +20,10 @@ import java.util.Set;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
+import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -37,6 +39,7 @@ import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -73,7 +76,36 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
     public static final String DIS_NOTE = "discrepancyNote";
 
     public static final String LOCKED_FLAG = "isLocked";// if an event crf is
+    
+    public static final String RES_STATUSES = "resolutionStatuses";
+    
+    public static final String RES_STATUSES2 = "resolutionStatuses2";
+    
+    public static final String DIS_TYPES = "discrepancyTypes";
+    
+    public static final String DIS_TYPES2 = "discrepancyTypes2";
+    
+    public static final String WHICH_RES_STATUSES = "whichResStatus";
+    
+    public static final String USER_ACCOUNTS = "userAccounts";
+    
+    public static final String BOX_DN_MAP = "boxDNMap";
 
+    public static final String BOX_TO_SHOW = "boxToShow";
+    
+    public static final String VIEW_DN_LINK = "viewDNLink";
+    
+    //public static final String USER_ACCOUNT_ID = "strUserAccountId"; // use to provide a
+    // single user id, to whom the query is assigned, tbh 02/2009
+
+    public static final String FORM_DISCREPANCY_NOTES_NAME = "fdnotes";
+    
+    public static final String IS_REASON_FOR_CHANGE = "isRfc";
+    public static final String CAN_MONITOR = "canMonitor";
+    public static final String NEW_NOTE = "new";
+    public static final String ERROR_FLAG = "errorFlag";
+    
+    
     // locked, so don't
     // allow to enter notes
 
@@ -101,12 +133,120 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
         addPageMessage(noAccessMessage);
         throw new InsufficientPermissionException(Page.MENU, exceptionName, "1");
     }
-
+ 
     @Override
     @SuppressWarnings("unchecked")
     protected void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
+        
+        //logic from CreateDiscrepancyNoteServlet
+        if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) && currentStudy.getId() != currentStudy.getParentStudyId()
+                || currentRole.getRole().equals(Role.INVESTIGATOR)) {  
+            request.setAttribute(WHICH_RES_STATUSES, "2");
+            //it's for query type and parentDNId > 0.
+            ArrayList resStatuses = new ArrayList(); // ResolutionStatus.toArrayList();
+            resStatuses.add(ResolutionStatus.UPDATED);
+            resStatuses.add(ResolutionStatus.RESOLVED);//resolution proposed
+            request.setAttribute(RES_STATUSES2, resStatuses); 
+            //it's for parentDNId is null or 0
+            ArrayList types2 = DiscrepancyNoteType.toArrayList();
+            types2.remove(DiscrepancyNoteType.QUERY);
+            request.setAttribute(DIS_TYPES2, types2);
+        } else {
+            request.setAttribute(RES_STATUSES, ResolutionStatus.toArrayList());  
+            request.setAttribute(WHICH_RES_STATUSES, "1");
+            request.setAttribute(DIS_TYPES, DiscrepancyNoteType.toArrayList());
+        }
+        request.setAttribute("unlock", "0");
+        boolean isReasonForChange = fp.getBoolean(IS_REASON_FOR_CHANGE);
+        boolean isInError = fp.getBoolean(ERROR_FLAG);
+        String monitor = fp.getString("monitor");
+        String enterData = fp.getString("enterData");
+        request.setAttribute("enterData", enterData);
+        boolean enteringData = false;
+        if (enterData != null && "1".equalsIgnoreCase(enterData)) {
+            // variables are not set in JSP, so not from viewing data and from
+            // entering data
+            request.setAttribute(CAN_MONITOR, "1");
+            request.setAttribute("monitor", monitor);
+            enteringData = true;
+        } else if ("1".equalsIgnoreCase(monitor)) {// change to allow user to
+            // enter note for all items,
+            // not just blank items
+            request.setAttribute(CAN_MONITOR, "1");
+            request.setAttribute("monitor", monitor);
+        } else {
+            request.setAttribute(CAN_MONITOR, "0");
+        }
+        
+        HashMap<Integer, DiscrepancyNoteBean> boxDNMap = (HashMap<Integer, DiscrepancyNoteBean>)session.getAttribute(BOX_DN_MAP);
+        if(boxDNMap==null) {
+            boxDNMap = new HashMap<Integer, DiscrepancyNoteBean>();
+            //initialize dn for a new thread
+            DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
+            // When a user is performing Data Entry, Initial Data Entry or
+            // Double Data Entry and
+            // have not received any validation warnings or messages for a
+            // particular item,
+            // they will see Annotation as the default type in the Add
+            // Discrepancy note window.
 
+            // When a user is performing Data Entry, Initial Data Entry or
+            // Double Data Entry and they
+            // have received a validation warning or message for a particular
+            // item,
+            // they can click on the flag and the default type should be Failed
+            // Validation Check
+
+            // When a user is viewing a CRF and they click on the flag icon, the
+            // default type should be query.
+
+            // when the type is query, we should also get the user id for the
+            // person who completed data entry
+
+            /* Mantis issue: tbh 08/31/2009
+             * 0004092: CRCs and Investigators should only be allowed to choose Updated or Resolution Proposed.
+             */
+            if (enteringData) {
+                if (isInError) {
+                    dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.FAILEDVAL.getId());
+                } else {
+                    dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.ANNOTATION.getId());
+                    dnb.setResolutionStatusId(ResolutionStatus.NOT_APPLICABLE.getId());
+                }
+                if (isReasonForChange) {
+                    dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.REASON_FOR_CHANGE.getId());
+                    dnb.setResolutionStatusId(ResolutionStatus.NOT_APPLICABLE.getId());
+                }
+                // << tbh 02/2010, trumps failed evaluation error checks
+                // can we put this in admin editing 
+                request.setAttribute("autoView", "0");
+                // above set to automatically open up the user panel
+            } else {
+                // when the user is a CRC and is adding a note to the thread
+                // it should default to Resolution Proposed,
+                // and the assigned should be the user who logged the query,
+                // NOT the one who is proposing the solution, tbh 02/2009
+                // if (currentRole.getRole().equals(Role.COORDINATOR)) {
+                // dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.
+                // REASON_FOR_CHANGE.getId());
+                // request.setAttribute("autoView", "1");
+                // // above set to automatically open up the user panel
+                // } else {
+                dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.QUERY.getId());
+                // remove this option for CRCs and Investigators
+                if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) && currentStudy.getId() != currentStudy.getParentStudyId()
+                    || currentRole.getRole().equals(Role.INVESTIGATOR)) {
+                    request.setAttribute("autoView", "0");
+                } else {
+                    request.setAttribute("autoView", "1");
+                }
+                // above set to automatically open up the user panel
+                // }
+            }
+            boxDNMap.put(0, dnb);
+        }
+        
         DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(sm.getDataSource());
         int entityId = fp.getInt(ENTITY_ID, true);
         String name = fp.getString(ENTITY_TYPE, true);
@@ -274,9 +414,6 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
         }
         boolean writeToDB = fp.getBoolean(CreateDiscrepancyNoteServlet.WRITE_TO_DB, true);
 
-        String monitor = fp.getString("monitor");
-        String enterData = fp.getString("enterData");
-
         request.setAttribute("enterData", enterData);
         request.setAttribute("monitor", monitor);
         request.setAttribute(ENTITY_ID, entityId + "");
@@ -292,7 +429,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
         // on the status of child notes
         //new DiscrepancyNoteUtil().updateStatusOfParents(notes, sm.getDataSource(), currentStudy);
 
-        FormDiscrepancyNotes newNotes = (FormDiscrepancyNotes) session.getAttribute(CreateDiscrepancyNoteServlet.FORM_DISCREPANCY_NOTES_NAME);
+        FormDiscrepancyNotes newNotes = (FormDiscrepancyNotes) session.getAttribute(FORM_DISCREPANCY_NOTES_NAME);
 
         HashMap<Integer, DiscrepancyNoteBean> noteTree = new HashMap<Integer, DiscrepancyNoteBean>();
 
@@ -405,7 +542,36 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
             DiscrepancyNoteBean note = noteTree.get(key);
             note.setNumChildren(note.getChildren().size());
             note.setEntityType(name);
+            
+            if(!boxDNMap.containsKey(key)) {
+                DiscrepancyNoteBean dn = new DiscrepancyNoteBean();
+                dn.setId(key);
+                dn.setDiscrepancyNoteTypeId(note.getDiscrepancyNoteTypeId());
+                //logic copied from CreateDiscrepancyNoteServlet
+                if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) && currentStudy.getId() != currentStudy.getParentStudyId()) {
+                    dn.setResolutionStatusId(ResolutionStatus.RESOLVED.getId());
+                    request.setAttribute("autoView", "0");
+                    // hide the panel, tbh
+                } else {
+                    dn.setResolutionStatusId(ResolutionStatus.UPDATED.getId());
+                }
+                if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) && currentStudy.getId() != currentStudy.getParentStudyId()) {
+                    dn.setAssignedUserId(note.getOwner().getId());
+                    // assigning back to OP, tbh
+                    //request.setAttribute(USER_ACCOUNT_ID, new Integer(parent.getOwnerId()).toString());
+                    //System.out.println("assigned owner id: " + parent.getOwnerId());
+                } else if (note.getEventCRFId() > 0) {
+                    //System.out.println("found a event crf id: " + dnb.getEventCRFId());
+                    EventCRFDAO eventCrfDAO = new EventCRFDAO(sm.getDataSource());
+                    EventCRFBean eventCrfBean = new EventCRFBean();
+                    eventCrfBean = (EventCRFBean) eventCrfDAO.findByPK(note.getEventCRFId());
+                    dn.setAssignedUserId(eventCrfBean.getOwner().getId());
+                    //request.setAttribute(USER_ACCOUNT_ID, new Integer(eventCrfBean.getOwnerId()).toString());
+                    //System.out.println("assigned owner id: " + eventCrfBean.getOwnerId());
+                } 
+            }
         }
+        session.setAttribute(BOX_DN_MAP, boxDNMap);
         // noteTree is a Hashmap mapping note id to a parent note, with all the
         // child notes
         // stored in the children List.
@@ -414,6 +580,22 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
         // updated date
         fixStatusUpdatedDate(noteTree);
         request.setAttribute(DIS_NOTES, noteTree);
+        
+        //copied from CreatediscrepancyNoteServlet generateUserAccounts
+        StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
+        StudyBean subjectStudy = studyDAO.findByStudySubjectId(subjectId);
+        int studyId = currentStudy.getId();
+        ArrayList<UserAccountBean> userAccounts = new ArrayList();
+        if (currentStudy.getParentStudyId() > 0) {
+            userAccounts = udao.findAllUsersByStudyOrSite(studyId, currentStudy.getParentStudyId(), subjectId);
+        } else if (subjectStudy.getParentStudyId() > 0) {
+            userAccounts = udao.findAllUsersByStudyOrSite(subjectStudy.getId(), subjectStudy.getParentStudyId(), subjectId);
+        } else {
+            userAccounts = udao.findAllUsersByStudyOrSite(studyId, 0, subjectId);
+        }
+        request.setAttribute(USER_ACCOUNTS, userAccounts);
+        request.setAttribute(VIEW_DN_LINK, this.getPageServletFileName());
+        
         forwardPage(Page.VIEW_DISCREPANCY_NOTE);
     }
 

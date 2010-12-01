@@ -64,6 +64,9 @@ public class ViewNotesServlet extends SecureController {
     public static final String WIN_LOCATION = "window_location";
     public static final String NOTES_TABLE = "notesTable";
     public static final String DISCREPANCY_NOTE_TYPE = "discrepancyNoteType";
+    public static final String BOX_DN_MAP = "boxDNMap";
+    public static final String BOX_TO_SHOW = "boxToShow";
+    public static final String CLOSE_WINDOW = "closeWindow";
     private boolean showMoreLink;
 
     /*
@@ -144,6 +147,10 @@ public class ViewNotesServlet extends SecureController {
             session.removeAttribute(WIN_LOCATION);
             session.removeAttribute(NOTES_TABLE);
         }
+        
+        session.removeAttribute(BOX_DN_MAP);
+        session.removeAttribute(BOX_TO_SHOW);
+        session.removeAttribute(CLOSE_WINDOW);
 
         // after resolving a note, user wants to go back to view notes page, we
         // save the current URL
