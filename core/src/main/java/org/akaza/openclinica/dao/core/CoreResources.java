@@ -62,7 +62,7 @@ public class CoreResources implements ResourceLoaderAware   {
            
             DATAINFO = dataInfo;
             setDataInfoProperties();
-            setDataInfoPath();
+          //  setDataInfoPath();
             //JN:TODO undo-comment after the datainfo part is done. 
             EXTRACTINFO = extractInfo;
 
@@ -82,6 +82,8 @@ public class CoreResources implements ResourceLoaderAware   {
 		}
     }
 
+    
+    //For future
     private void setDataInfoPath() {
 	
     	Enumeration<String> properties =  (Enumeration<String>) DATAINFO.propertyNames();
@@ -133,7 +135,8 @@ public class CoreResources implements ResourceLoaderAware   {
     		DATAINFO.setProperty("filePath", filePath);
     	}
     	
-    	
+    	filePath = replacePaths(DATAINFO.getProperty("filePath"));
+    	DATAINFO.setProperty("filePath", filePath);
     	logger.debug("DataInfo..."+DATAINFO);
 		return DATAINFO;
 	}
