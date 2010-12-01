@@ -166,11 +166,11 @@ public class ExtractController {
     	
          
          if(endFilePath.contains("$exportFilePath")) {
-             endFilePath = 	endFilePath.replace("$exportFilePath", SQLInitServlet.getField("filePath")+File.separator+"datasets"+File.separator+"transformations");// was + File.separator, tbh
+             endFilePath = 	endFilePath.replace("$exportFilePath", SQLInitServlet.getField("filePath")+"datasets");// was + File.separator, tbh
          }
       
           if(endFilePath.contains("${exportFilePath}")) {
-             endFilePath = 	endFilePath.replace("${exportFilePath}", SQLInitServlet.getField("filePath")+File.separator+"datasets"+File.separator+"transformations");// was + File.separator, tbh
+             endFilePath = 	endFilePath.replace("${exportFilePath}", SQLInitServlet.getField("filePath")+"datasets");// was + File.separator, tbh
          }
          if(endFilePath.contains("$datasetId")) {
          	endFilePath = endFilePath.replace("$datasetId", dsBean.getId()+"");

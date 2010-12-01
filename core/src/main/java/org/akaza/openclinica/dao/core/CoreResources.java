@@ -37,23 +37,31 @@ public class CoreResources implements ResourceLoaderAware   {
     private Properties dataInfo;
     private Properties extractInfo;
 
-    private String webAppContext;
+    private static String webapp;
     protected final static Logger logger = LoggerFactory.getLogger("CoreResources");
     // private MessageSource messageSource;
     private static ArrayList<ExtractPropertyBean> extractProperties;
-
+//TODO:Clean up all system outs
+    //default no arg constructor
+    public CoreResources()
+    {
+    	
+    }
+ 
+    
+   
+    
     public void setResourceLoader(ResourceLoader resourceLoader)  {
         this.resourceLoader = resourceLoader;
         try {
             // setPROPERTIES_DIR();
-        	
+        	webapp = getWebAppName(resourceLoader.getResource("/").getURI().getPath());
+        
             String dbName = dataInfo.getProperty("dataBase");
             DATAINFO = dataInfo;
+            setDataInfoProperties();
             //JN:TODO undo-comment after the datainfo part is done. 
-            //DATAINFO = setDataInfoProperties();
             EXTRACTINFO = extractInfo;
-
-            
             DB_NAME = dbName;
             SQLFactory factory = SQLFactory.getInstance();
             factory.run(dbName, resourceLoader);
@@ -72,7 +80,7 @@ public class CoreResources implements ResourceLoaderAware   {
     private Properties setDataInfoProperties() {
     	String filePath = DATAINFO.getProperty("filePath");
 		
-    	
+    	logger.debug("DataInfo..."+DATAINFO);
     	if(DATAINFO.getProperty("filePath").contains("${catalina.home}"))
 		{
 			
@@ -82,9 +90,16 @@ public class CoreResources implements ResourceLoaderAware   {
     	if(DATAINFO.getProperty("filePath").contains("${WEBAPP}"))
 		{
 			
-			filePath = filePath.replace("${catalina.home}", System.getenv("catalina.home"));
+			filePath = filePath.replace("${WEBAPP}", webapp);
 			DATAINFO.setProperty("filePath", filePath);
 		}
+    	else if(DATAINFO.getProperty("filePath").contains("${WEBAPP.lower}")){
+    		filePath = filePath.replace("${WEBAPP.lower}", webapp.toLowerCase());
+    		DATAINFO.setProperty("filePath", filePath);
+    	}
+    	
+    	
+    	logger.debug("DataInfo..."+DATAINFO);
 		return DATAINFO;
 	}
 
@@ -408,14 +423,25 @@ public class CoreResources implements ResourceLoaderAware   {
     public void setExtractInfo(Properties extractInfo) {
         this.extractInfo = extractInfo;
     }
+    //Pradnya G code added by Jamuna
+    public String getWebAppName(String servletCtxRealPath) {
+        String webAppName = null;
+        if (null != servletCtxRealPath) {
+            String[] tokens = servletCtxRealPath.split("/");
+            webAppName = tokens[(tokens.length - 1)].trim();
+        }
+        return webAppName;
+    }
     
     //getters and setters for web application context name
-    public void setWebAppContextName(String webAppContext)
-    {
-    	this.webAppContext = webAppContext;
-    }
-    public String getWebAppContextName(){
-    	return webAppContext;
-    }
+//    public void setWebAppContextName(ServletContext webAppContext)
+//    {
+//    	logger.debug("Web application context"+webAppContext);
+//    	System.out.println("Web application context"+webAppContext);
+//    	this.webAppContext = webAppContext;
+//    }
+//    public ServletContext getWebAppContextName(){
+//    	return webAppContext;
+//    }
 
 }
