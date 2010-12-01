@@ -973,6 +973,11 @@
         <servlet-class>org.akaza.openclinica.control.submit.ViewDiscrepancyNoteServlet</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>CreateOneDiscrepancyNoteServlet</servlet-name>
+        <display-name>CreateOneDiscrepancyNote</display-name>
+        <servlet-class>org.akaza.openclinica.control.submit.CreateOneDiscrepancyNoteServlet</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>DownloadStudyMetadataServlet</servlet-name>
         <display-name>DownloadStudyMetadata</display-name>
         <servlet-class>org.akaza.openclinica.control.admin.DownloadStudyMetadataServlet</servlet-class>
@@ -1933,6 +1938,10 @@
         <url-pattern>/ViewDiscrepancyNote</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
+        <servlet-name>CreateOneDiscrepancyNoteServlet</servlet-name>
+        <url-pattern>/CreateOneDiscrepancyNote</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
         <servlet-name>DownloadStudyMetadataServlet</servlet-name>
         <url-pattern>/DownloadStudyMetadata</url-pattern>
     </servlet-mapping>
@@ -2584,6 +2593,10 @@
         <web-resource-collection>
             <web-resource-name>OpenClinica View Discrepancy Note</web-resource-name>
             <url-pattern>/ViewDiscrepancyNote</url-pattern>
+        </web-resource-collection>
+        <web-resource-collection>
+            <web-resource-name>OpenClinica Create One Discrepancy Note</web-resource-name>
+            <url-pattern>/CreateOneDiscrepancyNote</url-pattern>
         </web-resource-collection>
         <web-resource-collection>
             <web-resource-name>OpenClinica Download Study Metadata</web-resource-name>
