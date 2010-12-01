@@ -1,12 +1,19 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
+
 <jsp:useBean id="id" scope="request" class="java.lang.String"/>
 <jsp:useBean id="name" scope="request" class="java.lang.String"/>
+<jsp:useBean id="field" scope="request" class="java.lang.String"/>
+<jsp:useBean id="column" scope="request" class="java.lang.String"/>
+<jsp:useBean id="viewDNLink" scope="request" class="java.lang.String"/>
+<jsp:useBean id="boxDNMap" scope="session" class="java.util.HashMap"/>
+<jsp:useBean id="closeWindow" scope="session" class="java.lang.String"/>
 
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 <html>
@@ -14,6 +21,8 @@
     <title><fmt:message key="openclinica" bundle="${resword}"/>- <fmt:message key="view_discrepancy_note" bundle="${resword}"/></title>
     <link rel="stylesheet" href="includes/styles.css" type="text/css">
     <script language="JavaScript" src="includes/global_functions_javascript.js"></script>
+    
+    
     <style type="text/css">
 
         .popup_BG { background-image: url(images/main_BG.gif);
@@ -26,7 +35,7 @@
     </style>
 
 </head>
-<body class="popup_BG" style="margin: 0px 12px 0px 12px;">
+<body class="popup_BG" style="margin: 0px 12px 0px 12px;" onload="javascript:window.timeOutWindow('<c:out value="${closeWindow}"/>',3000);">
 
 
 <!-- Alert Box -->
@@ -231,30 +240,61 @@
                                 </c:if>
 
                             </c:forEach>
+                            <c:set var="showDNBox" value="n"/>
                             <c:if test="${isLocked eq 'no'}">
                                 <tr>
+                                	<td class="table_cell_left">
+                                	<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="newChildAdded${note.value.id}"/></jsp:include>	
+                                	</td>
                                     <td class="table_cell_left" colspan="4" align="right">
                                         <c:if test="${note.value.id>0 && note.value.resStatus.id != 5}">
-                                            <a href="CreateDiscrepancyNote?subjectId=<c:out value="${noteSubject.id}" />&itemId=<c:out value="${item.id}" />&id=<c:out value='${note.value.entityId}'/>&name=<c:out value='${note.value.entityType}'/>&field=<c:out value='${note.value.field}'/>&column=<c:out value='${note.value.column}'/>&parentId=<c:out value='${note.value.id}'/>&enterData=<c:out value='${enterData}'/>&monitor=<c:out value='${monitor}'/>&writeToDB=<c:out value='${writeToDB}'/>">
-                                                <fmt:message key="reply_to_thread" bundle="${resword}"/></a>
+                                            <a href="javascript:showOnly('box<c:out value="${note.value.id}"/>');"><fmt:message key="reply_to_thread" bundle="${resword}"/></a>
+                                            <br>
+                                            <c:set var="showDNBox" value="y"/>
                                         </c:if>
                                     </td>
                                 </tr>
                             </c:if>
                         </table>
-
                     </div>
                 </div></div></div></div></div></div></div></div>
+                
             </td>
         </tr>
+             
+        
+		<c:if test="${showDNBox eq 'y'}">
+			<c:import url="./discrepancyNote.jsp">
+        		<c:param name="parentId" value="${note.value.id}"/>
+				<c:param name="entityId" value="${id}"/>				
+				<c:param name="entityType" value="${name}"/>				
+				<c:param name="field" value="${field}"/>				
+				<c:param name="column" value="${column}"/>
+				<c:param name="boxId" value="box${note.value.id}"/>
+				<c:param name="typeId" value="${note.value.discrepancyNoteTypeId}"/>
+				<c:param name="typeName" value="${note.value.disType.name}"/>
+			</c:import>
+		</c:if>
     </tbody>
 </table>
 <c:set var="count" value="${count+1}"/>
-<br>
 </c:forEach>
+
 <c:if test="${isLocked eq 'no'}">
-    <p><a href="CreateDiscrepancyNote?subjectId=<c:out value="${noteSubject.id}" />&itemId=<c:out value="${item.id}" />&id=<c:out value='${id}'/>&name=<c:out value='${name}'/>&field=<c:out value='${field}'/>&column=<c:out value='${column}'/>&parentId=0&enterData=<c:out value='${enterData}'/>&monitor=<c:out value='${monitor}'/>&writeToDB=<c:out value="${writeToDB}"/>&new=1"><b><fmt:message key="begin_new_thread" bundle="${resword}"/></b></a></p>
-</c:if>
+	<div style="clear:both;"></div>
+	<p><a href="javascript:showOnly('box<c:out value="${0}"/>New');"><b><fmt:message key="begin_new_thread" bundle="${resword}"/></b></a></p>
+	<table><tbody>
+	<c:import url="./discrepancyNote.jsp">
+        <c:param name="parentId" value="0"/>
+		<c:param name="entityId" value="${id}"/>				
+		<c:param name="entityType" value="${name}"/>				
+		<c:param name="field" value="${field}"/>				
+		<c:param name="column" value="${column}"/>
+		<c:param name="boxId" value="box${0}New"/>
+	</c:import>
+	</tbody></table>
+</c:if>  
+
 </body>
 </html>
 
