@@ -7,6 +7,14 @@
  */
 package org.akaza.openclinica.bean.extract.odm;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.BasicDefinitionsBean;
 import org.akaza.openclinica.bean.odmbeans.CodeListBean;
@@ -47,14 +55,6 @@ import org.exolab.castor.xml.MarshalException;
 import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.ValidationException;
 import org.exolab.castor.xml.XMLContext;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 
 /**
  * Create ODM XML Study Element for a study.
@@ -530,8 +530,12 @@ public class MetaDataReportBean extends OdmXmlReportBean {
             }
             // add ItemDetails for oc1.3
             if ("oc1.3".equals(ODMVersion) && isStudy) {
+                if (!hasNode) {
+                    hasNode = true;
+                    xml.append(">");
+                    xml.append(nls);
+                }
                 this.addItemDetails(item.getItemDetails(), currentIndent + indent);
-                hasNode = true;
             }
             if (hasNode) {
                 xml.append(currentIndent + "</ItemDef>");
