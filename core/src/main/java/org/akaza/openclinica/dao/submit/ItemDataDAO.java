@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.text.SimpleDateFormat;
 
 import javax.sql.DataSource;
 
@@ -29,7 +30,8 @@ import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
-import org.akaza.openclinica.dao.submit.ItemDAO;
+import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
 /**
  * <P>
@@ -118,7 +120,10 @@ public class ItemDataDAO extends AuditableEntityDAO {
         // inserting into database
         if (isADateType(idb.getItemId())) {
         	idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string));
+        } else if (isPDateType(idb.getItemId())) {
+            idb.setValue(formatPDate(idb.getValue()));
         }
+
         // YW >>
 
         idb.setActive(false);
@@ -154,6 +159,8 @@ public class ItemDataDAO extends AuditableEntityDAO {
         // inserting into database
         if (isADateType(idb.getItemId())) {
         	idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string));
+        } else if (isPDateType(idb.getItemId())) {
+            idb.setValue(formatPDate(idb.getValue()));
         }
         // YW >>
 
@@ -227,7 +234,10 @@ public class ItemDataDAO extends AuditableEntityDAO {
         // inserting into database
         if (isADateType(idb.getItemId())) {
         	idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string));
+        } else if (isPDateType(idb.getItemId())) {
+            idb.setValue(formatPDate(idb.getValue()));
         }
+
         // YW >>
 
         HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
@@ -254,7 +264,10 @@ public class ItemDataDAO extends AuditableEntityDAO {
         // inserting into database
         if (isADateType(idb.getItemId())) {
         	idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string));
+        } else if (isPDateType(idb.getItemId())) {
+            idb.setValue(formatPDate(idb.getValue()));
         }
+
         // YW >>
 
         HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
@@ -288,6 +301,34 @@ public class ItemDataDAO extends AuditableEntityDAO {
     	
     }
 
+    public boolean isPDateType(int itemId) {
+    	ItemDAO itemDAO = new ItemDAO(this.getDs());
+    	ItemBean itemBean = (ItemBean)itemDAO.findByPK(itemId);
+    	if (itemBean.getDataType().equals(ItemDataType.PDATE)) {
+    		return true;
+    	}
+    	return false;
+
+    }
+
+    public String formatPDate (String pDate) {
+        String temp = "";
+        String yearMonthFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString("date_format_year_month"));
+        String yearFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString("date_format_year"));
+        try{
+            if (StringUtil.isPartialYear(pDate, yearFormat)) {
+                temp = new SimpleDateFormat("yyyy").format(new SimpleDateFormat(yearMonthFormat).parse(pDate));
+            } else if (StringUtil.isPartialYearMonth(pDate, yearMonthFormat)) {
+                temp = new SimpleDateFormat("yyyy-MM").format(new SimpleDateFormat(yearMonthFormat).parse(pDate));
+            }
+        } catch (Exception ex) {
+            logger.warn("Parsial Date Parsing Exception........");
+        }
+
+        return temp;
+    }
+
+
     public Object getEntityFromHashMap(HashMap hm) {
         ItemDataBean eb = new ItemDataBean();
         this.setEntityAuditInformation(eb, hm);
@@ -302,6 +343,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
         if (isADateType(eb.getItemId())) {
         	eb.setValue(Utils.convertedItemDateValue(eb.getValue(), oc_df_string, local_df_string));
         }
+
         // YW >>
         eb.setStatus(Status.get(((Integer) hm.get("status_id")).intValue()));
         eb.setOrdinal(((Integer) hm.get("ordinal")).intValue());
