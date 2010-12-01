@@ -22,7 +22,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.Properties;
+import java.util.StringTokenizer;
 
 import javax.servlet.ServletContext;
 
@@ -47,10 +51,7 @@ public class CoreResources implements ResourceLoaderAware   {
     {
     	
     }
- 
-    
-   
-    
+     
     public void setResourceLoader(ResourceLoader resourceLoader)  {
         this.resourceLoader = resourceLoader;
         try {
@@ -58,15 +59,19 @@ public class CoreResources implements ResourceLoaderAware   {
         	webapp = getWebAppName(resourceLoader.getResource("/").getURI().getPath());
         
             String dbName = dataInfo.getProperty("dataBase");
+           
             DATAINFO = dataInfo;
             setDataInfoProperties();
+            setDataInfoPath();
             //JN:TODO undo-comment after the datainfo part is done. 
             EXTRACTINFO = extractInfo;
+
             DB_NAME = dbName;
             SQLFactory factory = SQLFactory.getInstance();
             factory.run(dbName, resourceLoader);
             copyBaseToDest(resourceLoader);
             extractProperties = findExtractProperties();
+           
         } catch (OpenClinicaSystemException e) {
         	logger.debug(e.getMessage());
         	logger.debug(e.toString());
@@ -77,7 +82,37 @@ public class CoreResources implements ResourceLoaderAware   {
 		}
     }
 
-    private Properties setDataInfoProperties() {
+    private void setDataInfoPath() {
+	
+    	Enumeration<String> properties =  (Enumeration<String>) DATAINFO.propertyNames();
+    	String vals,key;
+    	while(properties.hasMoreElements()){
+		key = properties.nextElement();
+    		vals = DATAINFO.getProperty(key);
+    		replacePaths(vals);
+    	
+    	DATAINFO.setProperty(key, vals);
+    	}
+    	
+	}
+
+    private static String replacePaths(String vals)
+    {
+    	if(vals!=null){
+		if(vals.contains("/"))
+		{
+		vals =	vals.replace("/", File.separator);
+		}
+		else if (vals.contains("\\")){
+		vals = 	vals.replace("\\", File.separator);
+		}
+		else if(vals.contains("\\\\")){
+		vals = 	vals.replace("\\\\", File.separator);
+		}
+	}
+    return vals;	
+    }
+	private Properties setDataInfoProperties() {
     	String filePath = DATAINFO.getProperty("filePath");
 		
     	logger.debug("DataInfo..."+DATAINFO);
@@ -372,6 +407,7 @@ public class CoreResources implements ResourceLoaderAware   {
         if (value != null) {
             value = value.trim();
         }
+        value = replacePaths(value);
         return value == null ? "" : value;
     }
 
@@ -423,6 +459,9 @@ public class CoreResources implements ResourceLoaderAware   {
     public void setExtractInfo(Properties extractInfo) {
         this.extractInfo = extractInfo;
     }
+  
+    
+    
     //Pradnya G code added by Jamuna
     public String getWebAppName(String servletCtxRealPath) {
         String webAppName = null;
