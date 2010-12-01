@@ -315,11 +315,34 @@ public class ItemDataDAO extends AuditableEntityDAO {
         String temp = "";
         String yearMonthFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString("date_format_year_month"));
         String yearFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString("date_format_year"));
+        String dateFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString("date_format_string"));
         try{
-            if (StringUtil.isPartialYear(pDate, yearFormat)) {
-                temp = new SimpleDateFormat("yyyy").format(new SimpleDateFormat(yearMonthFormat).parse(pDate));
+            if (StringUtil.isFormatDate(pDate, dateFormat)) {
+                temp = new SimpleDateFormat(oc_df_string).format(new SimpleDateFormat(dateFormat).parse(pDate));
+            } else if (StringUtil.isPartialYear(pDate, yearFormat)) {
+                temp = pDate;
             } else if (StringUtil.isPartialYearMonth(pDate, yearMonthFormat)) {
                 temp = new SimpleDateFormat("yyyy-MM").format(new SimpleDateFormat(yearMonthFormat).parse(pDate));
+            }
+        } catch (Exception ex) {
+            logger.warn("Parsial Date Parsing Exception........");
+        }
+
+        return temp;
+    }
+
+    public String reFormatPDate (String pDate) {
+        String temp = "";
+        String yearMonthFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString("date_format_year_month"));
+        String yearFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString("date_format_year"));
+        String dateFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString("date_format_string"));
+        try{
+            if (StringUtil.isFormatDate(pDate, oc_df_string)) {
+                temp = new SimpleDateFormat(dateFormat).format(new SimpleDateFormat(oc_df_string).parse(pDate));
+            } else if (StringUtil.isPartialYear(pDate, "yyyy")) {
+                temp = pDate;
+            } else if (StringUtil.isPartialYearMonth(pDate, "yyyy-MM")) {
+                temp = new SimpleDateFormat(yearMonthFormat).format(new SimpleDateFormat("yyyy-MM").parse(pDate));
             }
         } catch (Exception ex) {
             logger.warn("Parsial Date Parsing Exception........");
@@ -342,7 +365,10 @@ public class ItemDataDAO extends AuditableEntityDAO {
         // fetching out from database
         if (isADateType(eb.getItemId())) {
         	eb.setValue(Utils.convertedItemDateValue(eb.getValue(), oc_df_string, local_df_string));
+        } else if (isPDateType(eb.getItemId())) {
+            eb.setValue(reFormatPDate(eb.getValue()));
         }
+
 
         // YW >>
         eb.setStatus(Status.get(((Integer) hm.get("status_id")).intValue()));
