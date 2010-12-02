@@ -62,6 +62,14 @@ public class ShowActionBean extends RuleActionBean {
     }
 
     @Transient
+    public void addProperty(PropertyBean property) {
+        if (properties == null) {
+            properties = new ArrayList<PropertyBean>();
+        }
+        properties.add(property);
+    }
+
+    @Transient
     public List<PropertyBean> getLazyProperties() {
         return lazyProperties;
     }

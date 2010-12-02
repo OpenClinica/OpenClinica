@@ -15,7 +15,7 @@
 		</repository>
 		<repository>
 			<id>Jboss Repository</id>
-			<url>http://repository.jboss.org/maven2</url>
+			<url>http://repository.jboss.org/nexus/content/groups/public-jboss</url>
 		</repository>
 		<repository>
 			<id>codehaus-snapshots</id>
@@ -57,7 +57,7 @@
 		<test.locale>en_US</test.locale>
 		<scm.path>scm:svn:http://svn.akazaresearch.com/openclinica/OpenClinica/trunk2/projects</scm.path>
 		<!--  Library Versions -->
-		<spring.version>3.0.2.RELEASE</spring.version>
+		<spring.version>3.0.5.RELEASE</spring.version>
 	</properties>
 	<profiles>
 		<profile>
@@ -114,6 +114,12 @@
 
     <!-- These dependencies are used by _all_ child projects -->
     <dependencies>
+    	<!-- Jackson JSON Mapper -->
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>1.5.3</version>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -213,7 +219,29 @@
 			<artifactId>spring-security-config</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
+		<dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-oxm</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <!--
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>oauth-kk</artifactId>
+			<version>1.0</version>
+		</dependency>
+		-->
 		<!-- HIBERNATE -->
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<version>1.0.0.GA</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>4.0.2.GA</version>
+		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>

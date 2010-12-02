@@ -1,5 +1,6 @@
 package org.akaza.openclinica.domain.rule.action;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -54,6 +55,14 @@ public class HideActionBean extends RuleActionBean {
 
     public void setProperties(List<PropertyBean> properties) {
         this.properties = properties;
+    }
+
+    @Transient
+    public void addProperty(PropertyBean property) {
+        if (properties == null) {
+            properties = new ArrayList<PropertyBean>();
+        }
+        properties.add(property);
     }
 
     @Override

@@ -98,6 +98,11 @@
         <servlet-name>pages</servlet-name>
         <url-pattern>/pages/*</url-pattern>
     </servlet-mapping>
+    
+    <servlet-mapping>
+    <servlet-name>pages</servlet-name>
+    <url-pattern>/oauth/*</url-pattern>
+  </servlet-mapping>
    
     <servlet>
         <servlet-name>ws</servlet-name>
