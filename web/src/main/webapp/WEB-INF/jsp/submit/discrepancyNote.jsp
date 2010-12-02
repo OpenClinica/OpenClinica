@@ -316,7 +316,7 @@ function timeOutWindow(close,duration) {
 		<c:set var= "noteEntityType" value="${discrepancyNote.entityType}"/>
 		<c:if test="${enterData == '1' || canMonitor == '1' || noteEntityType != 'itemData' }">
 			<td><input type="submit" name="Submit${parentId}" value="Submit" class="button_medium" style="width:80px"></td>
-			<td><input type="submit" name="SubmitExit${parentId}" value="Submit & Exit" class="button_medium" style="width:90px" onclick="javascript:setTrue('close<c:out value="${parentId}"/>','true');"></td>
+			<td><input type="submit" name="SubmitExit${parentId}" value="Submit & Exit" class="button_medium" style="width:90px" onclick="javascript:setValue('close<c:out value="${parentId}"/>','true');"></td>
 		</c:if>
 		</tr>
 		
