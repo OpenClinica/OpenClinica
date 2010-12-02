@@ -119,7 +119,6 @@ function timeOutWindow(close,duration) {
 	<c:set var="displayAll" value="all"/>
 </c:if>
 <form name="oneDNForm" method="POST" action="CreateOneDiscrepancyNote" id="form${boxId}"> 
-<jsp:include page="../include/showSubmitted.jsp" />
 <table border="0" cellpadding="0" cellspacing="0" style="float:left;display:<c:out value="${displayAll}"/>" id="${boxId}">
 	<input type="hidden" name="parentId" value="${parentId}"/>
 	<input type="hidden" name="viewDNLink${parentId}" value="${viewDNLink}"/>
