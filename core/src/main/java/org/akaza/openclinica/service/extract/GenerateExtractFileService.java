@@ -37,6 +37,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -158,6 +159,7 @@ public class GenerateExtractFileService {
         	if(file.isDirectory())
         	{
         		files = file.listFiles();
+        		oldFiles = Arrays.asList(files);
         	}
         }
         if (odmVersion != null) {
