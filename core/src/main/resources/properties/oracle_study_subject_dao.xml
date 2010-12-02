@@ -79,7 +79,7 @@
         <name>getWithFilterAndSort</name>
         <sql>
         SELECT * from (
-            SELECT x.*, rownum as r from(select DISTINCT ss.*, ST.unique_identifier, se.date_start 
+            SELECT x.*, rownum as r from(select DISTINCT ss.*, ST.unique_identifier 
                 FROM study_subject ss LEFT JOIN study_event se ON
                 ss.study_subject_id = se.study_subject_id,STUDY ST,SUBJECT S
                 where
