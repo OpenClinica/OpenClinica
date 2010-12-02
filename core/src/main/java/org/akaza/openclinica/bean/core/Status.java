@@ -31,7 +31,7 @@ public class Status extends Term implements Comparable {
     public static final Status SOURCE_DATA_VERIFICATION = new Status(10, "source_data_verification");
 
     private static final Status[] members =
-        { AVAILABLE, PENDING, PRIVATE, UNAVAILABLE, LOCKED, DELETED, AUTO_DELETED, SIGNED, FROZEN, SOURCE_DATA_VERIFICATION };
+        { INVALID, AVAILABLE, PENDING, PRIVATE, UNAVAILABLE, LOCKED, DELETED, AUTO_DELETED, SIGNED, FROZEN, SOURCE_DATA_VERIFICATION };
     private static List list = Arrays.asList(members);
 
     private static final Status[] activeMembers = { AVAILABLE, PENDING, PRIVATE, UNAVAILABLE, LOCKED, SIGNED };

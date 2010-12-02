@@ -235,9 +235,8 @@ public class EventCRFDAO extends AuditableEntityDAO {
         eb.setSdvStatus((Boolean) hm.get("sdv_status"));
         Integer prevStatusId = (Integer) hm.get("prev_status");
         if (prevStatusId != null && prevStatusId > 0) {
-            eb.setOldStatus(Status.getFromMap(prevStatusId));
+            eb.setOldStatus(Status.get(prevStatusId));
         }
-
         // eb.setStatus(Status.get((Integer) hm.get("status_id"))
         return eb;
     }
