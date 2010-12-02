@@ -226,20 +226,20 @@ public class XsltTransformJob extends QuartzJobBean {
                                 + fbFinal.getId() + pageMessages.getString("html_email_body_3") + "</p>");
                     	 
                     }
-                    else if(!successMsg.isEmpty()){
+                    
                      	if(successMsg.contains("$linkURL"))
                 	  {
                      		successMsg =		successMsg.replace("$linkURL", "<a href=\""+CoreResources.getField("sysURL.base") + "AccessFile?fileId="+ fbFinal.getId()+"\">here </a>");
                 	  }
                      	emailBuffer.append("<p>" + successMsg + "</p>");
-                    }
+                    
                 }
                 // otherwise don't do it
                 if (message.getCode().intValue() == 1) {
                     subject = "Success: " + datasetBean.getName(); 
                 } else if (message.getCode().intValue() == 2) { 
                     subject = "Failure: " + datasetBean.getName();
-                    if(failureMsg!=null || !failureMsg.equals(""))
+                    if(failureMsg!=null && !failureMsg.isEmpty())
                     {
                     	emailBuffer.append(failureMsg);
                     }
@@ -265,17 +265,20 @@ public class XsltTransformJob extends QuartzJobBean {
                 //                    CoreResources.getField("sysURL.base") + 
                 //                    "AccessFile?fileId=" + 
                 //                    fbFinal.getId() + "'>here</a>.";
-            
-                if(successMsg!=null || !successMsg.equals(""))
+                if(successMsg==null || successMsg.isEmpty())
                 {
-                	  	if(successMsg.contains("$linkURL"))
-                	  		successMsg =		successMsg.replace("$linkURL", "<a href="+CoreResources.getField("sysURL.base") + "AccessFile?fileId="+ fbFinal.getId()+">here </a>");
-                	emailBuffer.append("<p>" + successMsg+ pageMessages.getString("html_email_body_3") + "</p>");
+                	emailBuffer.append("<p>" + pageMessages.getString("html_email_body_4") + " " + fbFinal.getName()
+                            + pageMessages.getString("html_email_body_4_5") + CoreResources.getField("sysURL.base") + "AccessFile?fileId="
+                            + fbFinal.getId() + pageMessages.getString("html_email_body_3") + "</p>");
+                	System.out.println("Name??"+emailBuffer);
+                	 
                 }
                 else{
-                emailBuffer.append("<p>" + pageMessages.getString("html_email_body_4") + " " + fbFinal.getName()
-                        + pageMessages.getString("html_email_body_4_5") + CoreResources.getField("sysURL.base") + "AccessFile?fileId="
-                        + fbFinal.getId() + pageMessages.getString("html_email_body_3") + "</p>");
+                 	if(successMsg.contains("$linkURL"))
+            	  {
+                 		successMsg =		successMsg.replace("$linkURL", "<a href=\""+CoreResources.getField("sysURL.base") + "AccessFile?fileId="+ fbFinal.getId()+"\">here </a>");
+            	  }
+                 	emailBuffer.append("<p>" + successMsg + "</p>");
                 }
             }
             // email the message to the user
