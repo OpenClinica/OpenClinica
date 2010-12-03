@@ -29,14 +29,26 @@ import org.quartz.impl.StdScheduler;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 import javax.sql.DataSource;
 import javax.xml.transform.Transformer;
@@ -89,7 +101,8 @@ public class XsltTransformJob extends QuartzJobBean {
         Locale locale = new Locale("en-US");
         ResourceBundleProvider.updateLocale(locale);
         ResourceBundle pageMessages = ResourceBundleProvider.getPageMessagesBundle();
-        
+        List<File> markForDelete = new LinkedList<File>();
+        Boolean zipped = true;
         JobDataMap dataMap = context.getMergedJobDataMap();
         String localeStr = dataMap.getString(LOCALE);
         if (localeStr != null) {
@@ -118,6 +131,7 @@ public class XsltTransformJob extends QuartzJobBean {
             String generalFileDir = dataMap.getString(XML_FILE_PATH);
             int epBeanId = dataMap.getInt(EXTRACT_PROPERTY);
             ExtractPropertyBean epBean = CoreResources.findExtractPropertyBeanById(epBeanId);
+            zipped = epBean.getZipFormat();
             
             long sysTimeBegin = System.currentTimeMillis();
             userAccountDao = new UserAccountDAO(dataSource);
@@ -150,17 +164,23 @@ public class XsltTransformJob extends QuartzJobBean {
                 java.util.Map.Entry entry = (java.util.Map.Entry) it.next();
                 Object key = entry.getKey();
                 Object value = entry.getValue();
-                ODMXMLFileName = (String) key;
+                ODMXMLFileName = (String) key;// JN: Since there is a logic to delete all the intermittent files, this file could be a zip file. 
                 Integer fileID = (Integer) value;
                 fId = fileID.intValue();
                 System.out.println("found " + fId + " and " + ODMXMLFileName);
             }
-            
+          
+           
             // create dirs 
             
             File output = new File(outputPath);
             if (!output.isDirectory()) {
                 output.mkdirs();
+            }
+            File oldFilesPath = new File(generalFileDir);
+            if(oldFilesPath.isDirectory())
+            {
+            	markForDelete = Arrays.asList(oldFilesPath.listFiles());
             }
             TransformerFactory tFactory = TransformerFactory.newInstance();
             
@@ -170,16 +190,22 @@ public class XsltTransformJob extends QuartzJobBean {
             java.io.InputStream in = new java.io.FileInputStream(dataMap.getString(XSL_FILE_PATH));
             
             Transformer transformer = tFactory.newTransformer(new StreamSource(in));
-
+            
+            
             // move xml generation here, tbh
             String xmlFilePath = generalFileDir + ODMXMLFileName;
             String endFile = outputPath + File.separator + dataMap.getString(POST_FILE_NAME);
             final long start = System.currentTimeMillis();
+            FileOutputStream endFileStream  = new FileOutputStream(endFile);
             transformer.transform(new StreamSource(xmlFilePath), 
-                    new StreamResult(new FileOutputStream(endFile)));
+                    new StreamResult(endFileStream ));
+            //JN...CLOSE THE STREAM...HMMMM
+            in.close();
+            endFileStream.close();
             final long done = System.currentTimeMillis() - start;
             System.out.println("--> job completed in " + done + " ms");
             // run post processing
+            
             
             ProcessingFunction function = epBean.getPostProcessing();
             String subject = "";
@@ -281,6 +307,21 @@ public class XsltTransformJob extends QuartzJobBean {
                  	emailBuffer.append("<p>" + successMsg + "</p>");
                 }
             }
+            
+            //delete old files now
+            List<File> intermediateFiles = generateFileService.getOldFiles();
+            if(zipped){
+            	markForDelete = 	zipxmls(markForDelete,endFile);
+                //Actually deleting all the xml files which are produced since its zipped
+            	 FilenameFilter xmlFilter = new XMLFileFilter();
+            	 File tempFile = new File(generalFileDir);
+            	 deleteOldFiles(tempFile.listFiles(xmlFilter));
+            }
+            deleteIntermFiles(intermediateFiles);
+            
+           deleteIntermFiles(markForDelete);
+
+            
             // email the message to the user
             // String email = dataMap.getString(EMAIL);
             emailBuffer.append("<p>" + pageMessages.getString("html_email_body_5") + "</p>");
@@ -319,12 +360,70 @@ public class XsltTransformJob extends QuartzJobBean {
         
         
     }
-    //A stub to delete old files.
+    //zips up the resultant xml file and then deletes xml.
+    private List<File> zipxmls(List<File>deleteFilesList,String endFile) throws IOException{
+    	final int BUFFER = 2048;
+    	BufferedInputStream orgin = null;
+    	File EndFile = new File(endFile);
+    	FileInputStream fis =null;
+    	FileOutputStream fos = null;
+    	ZipOutputStream zos =null;
+    	File tempFile = new File(endFile+".zip");
+    try{
+    	 fis = new FileInputStream(EndFile);
+    	
+    	 fos = new FileOutputStream(endFile+".zip");
+    	 zos = new ZipOutputStream(fos);
+    	
+    	byte data[] = new byte[BUFFER];
+    	orgin = new BufferedInputStream(fis,BUFFER);
+    	ZipEntry entry = new ZipEntry(endFile);
+    	zos.putNextEntry(entry);
+    	int cnt = 0;
+    	while((cnt = orgin.read(data,0,BUFFER))!=-1)
+    	{
+    		zos.write(data,0,cnt);
+    	}
+    	
+    	
+    }catch(IOException ioe)
+    {
+    	ioe.printStackTrace();
+    }finally{
+    if(fis!=null)    	fis.close();
+    	if(orgin!=null)orgin.close();
+    	if(zos!=null)zos.close();
+    	if(fos!=null) fos.close();
+    
+    }
+    if(deleteFilesList.contains(tempFile)){
+    	deleteFilesList.remove(tempFile);
+    }
+	//since zip is successful, deleting the endfile.
+	System.out.println("About to delete file"+EndFile.getName());
+	boolean deleted = EndFile.delete();
+	System.out.println("deleted?"+deleted);
+	System.out.println("Does the file exist still?"+EndFile.exists());	
+    return deleteFilesList;
+		
+	}
+	private void deleteIntermFiles(List<File> intermediateFiles) {
+
+		Iterator<File> fileIt = intermediateFiles.iterator();
+		File temp;
+		while(fileIt.hasNext())
+		{
+			temp = fileIt.next();
+			if(temp.exists())
+					temp.delete();
+		}
+	}
+	//A stub to delete old files.
     private void deleteOldFiles(File[] oldFiles) {
     	//File[] files = complete.listFiles();
 		for(int i=0;i<oldFiles.length;i++)
 		{
-
+			if(oldFiles[i].exists())
 			oldFiles[i].delete();
 		}
 		
@@ -434,4 +533,5 @@ public class XsltTransformJob extends QuartzJobBean {
         
         
     }
+
 }

@@ -28,14 +28,17 @@ import org.akaza.openclinica.logic.odmExport.ClinicalDataCollector;
 import org.akaza.openclinica.logic.odmExport.ClinicalDataUnit;
 import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
 import org.akaza.openclinica.logic.odmExport.OdmStudyBase;
+import org.apache.poi.util.TempFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -61,7 +64,7 @@ public class GenerateExtractFileService {
     private final CoreResources coreResources;
 
 	 private static File files[]=null;
-    private static List oldFiles = new LinkedList<File>();
+    private static List<File> oldFiles = new LinkedList<File>();
     private final RuleSetRuleDao ruleSetRuleDao;
 
     public GenerateExtractFileService(DataSource ds, HttpServletRequest request, UserAccountBean userBean,CoreResources coreResources,RuleSetRuleDao ruleSetRuleDao) {
@@ -338,17 +341,33 @@ public class GenerateExtractFileService {
         if (!"".equals(generalFileDirCopy)) {
         	int fId2 = this.createFile(ODMXMLFileName, generalFileDirCopy, report.getXmlOutput().toString(), datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE, false);
         } */
+    	HashMap answerMap = new HashMap<String, Integer>();
+		
+        if(zipped)
+        {	try {
+				zipFile(ODMXMLFileName,generalFileDir);
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				logger.error(e.getMessage());
+				e.printStackTrace();
+			}
+		
+        }   // return ODMXMLFileName;
         
-        // return ODMXMLFileName;
-        HashMap answerMap = new HashMap<String, Integer>();
         answerMap.put(ODMXMLFileName, new Integer(fId));
-        if(deleteOld && files!=null &&oldFiles!=null) deleteOldFiles(oldFiles);
+    //    if(deleteOld && files!=null &&oldFiles!=null) setOldFiles(oldFiles);
         return answerMap;
     }
     
     
 
-    /**
+    
+    public List<File> getOldFiles(){
+    	return oldFiles;
+    }
+
+	/**
      * createSPSSFile, added by tbh, 01/2009
      * 
      * @param db
@@ -591,7 +610,7 @@ public class GenerateExtractFileService {
             w.write(content);
             w.close();
             logger.info("finished writing the text file...");
-            if (zipped) {
+/*            if (zipped) {
                 // now, we write the file to the zip file
                 FileInputStream is = new FileInputStream(newFile);
                 ZipOutputStream z = new ZipOutputStream(new FileOutputStream(new File(complete, name + ".zip")));
@@ -635,7 +654,7 @@ public class GenerateExtractFileService {
                     }
                 }
                 logger.info("finished zipping up file...");
-            }
+            }*/
             // set up the zip to go into the database
             if (saveToDB) {
                 ArchivedDatasetFileBean fb = new ArchivedDatasetFileBean();
@@ -811,4 +830,82 @@ public class GenerateExtractFileService {
         return eb;
     }
 
+    /**
+     * To zip the xml files and delete the intermediate files.
+     * @param name
+     * @param dir
+     * @throws IOException
+     */
+    
+    public void zipFile(String name, String dir) throws IOException
+    {
+        //if (zipped) {
+    	String zipFileName = null;
+    	File complete = new File(dir);
+        if (!complete.isDirectory()) {
+            complete.mkdirs();
+        }
+        
+        File[] interXMLS = complete.listFiles();
+        List<File> temp  = new LinkedList<File>(Arrays.asList(interXMLS));
+      
+        	
+        File oldFile = new File(complete, name);
+       
+        File newFile = null;
+        if (oldFile.exists()) {
+            newFile = oldFile;
+           
+        } else {
+            newFile = new File(complete, name);
+        }
+            // now, we write the file to the zip file
+            FileInputStream is = new FileInputStream(newFile);
+            ZipOutputStream z = new ZipOutputStream(new FileOutputStream(new File(complete, name + ".zip")));
+            if(oldFiles!=null || !oldFiles.isEmpty())
+            {
+            	
+            	if(oldFiles.contains(new File(complete, name + ".zip")))
+            	{
+            		oldFiles.remove(new File(complete, name + ".zip"));//Dont delete the files which u r just creating
+            		
+            	}
+            }
+            logger.info("created zip output stream...");
+            // we write over the content no matter what
+            // we then check to make sure there are no duplicates
+            // TODO need to change the above -- save all content!
+            // z.write(content);
+            z.putNextEntry(new java.util.zip.ZipEntry(name));
+            // int length = (int) newFile.length();
+            int bytesRead;
+            byte[] buff = new byte[512];
+            // read from buffered input stream and put into zip file
+            // while (-1 != (bytesRead = bis.read(buff, 0, buff.length))) {
+            while ((bytesRead = is.read(buff)) != -1) {
+                z.write(buff, 0, bytesRead);
+            }
+            logger.info("writing buffer...");
+            // }
+            
+            z.closeEntry();
+            z.finish();
+            // newFile = new File(complete, name+".zip");
+            // newFile.setLastModified(System.currentTimeMillis());
+            //
+            // BufferedWriter w2 = new BufferedWriter(new FileWriter(newFile));
+            // w2.write(newOut.toString());
+            // w2.close();
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (java.io.IOException ie) {
+                    ie.printStackTrace();
+                }
+            }
+           //Adding the logic to delete the intermediate xmls
+           oldFiles = temp;
+            logger.info("finished zipping up file...");
+       // }
+    }
 }
