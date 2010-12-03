@@ -18,7 +18,7 @@
     <!-- 
     <bean id="accessConfirmationController" class="org.akaza.openclinica.controller.AccessConfirmationController">
         <property name="clientDetailsService" ref="clientDetails"/>
-    </bean> -->
+    </bean> 
     
     <bean id="urlMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
     <property name="mappings">
@@ -28,6 +28,7 @@
     </property>
     <property name="alwaysUseFullPath" value="true"/>
   </bean>
+  -->
 
 
     <!-- Simple redirects to internal resources; URL path substring becomes view name (e.g. '/login.htm' -> 'login') -->
