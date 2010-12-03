@@ -103,6 +103,7 @@ public class XsltTransformJob extends QuartzJobBean {
         ResourceBundle pageMessages = ResourceBundleProvider.getPageMessagesBundle();
         List<File> markForDelete = new LinkedList<File>();
         Boolean zipped = true;
+        Boolean deleteOld = true;
         JobDataMap dataMap = context.getMergedJobDataMap();
         String localeStr = dataMap.getString(LOCALE);
         if (localeStr != null) {
@@ -132,7 +133,7 @@ public class XsltTransformJob extends QuartzJobBean {
             int epBeanId = dataMap.getInt(EXTRACT_PROPERTY);
             ExtractPropertyBean epBean = CoreResources.findExtractPropertyBeanById(epBeanId);
             zipped = epBean.getZipFormat();
-            
+            deleteOld = epBean.getDeleteOld();
             long sysTimeBegin = System.currentTimeMillis();
             userAccountDao = new UserAccountDAO(dataSource);
             UserAccountBean userBean = (UserAccountBean)userAccountDao.findByPK(userAccountId);
@@ -177,11 +178,7 @@ public class XsltTransformJob extends QuartzJobBean {
             if (!output.isDirectory()) {
                 output.mkdirs();
             }
-            File oldFilesPath = new File(generalFileDir);
-            if(oldFilesPath.isDirectory())
-            {
-            	markForDelete = Arrays.asList(oldFilesPath.listFiles());
-            }
+         
             TransformerFactory tFactory = TransformerFactory.newInstance();
             
             // Use the TransformerFactory to instantiate a Transformer that will work with  
@@ -195,6 +192,17 @@ public class XsltTransformJob extends QuartzJobBean {
             // move xml generation here, tbh
             String xmlFilePath = generalFileDir + ODMXMLFileName;
             String endFile = outputPath + File.separator + dataMap.getString(POST_FILE_NAME);
+            File oldFilesPath = new File(generalFileDir);
+            
+        
+            if(oldFilesPath.isDirectory())
+            {
+            	
+            	
+            	markForDelete = Arrays.asList(oldFilesPath.listFiles());
+            	//logic to prevent deleting the file being created.
+            
+            }
             final long start = System.currentTimeMillis();
             FileOutputStream endFileStream  = new FileOutputStream(endFile);
             transformer.transform(new StreamSource(xmlFilePath), 
@@ -291,6 +299,10 @@ public class XsltTransformJob extends QuartzJobBean {
                 //                    CoreResources.getField("sysURL.base") + 
                 //                    "AccessFile?fileId=" + 
                 //                    fbFinal.getId() + "'>here</a>.";
+                
+                
+                
+                
                 if(successMsg==null || successMsg.isEmpty())
                 {
                 	emailBuffer.append("<p>" + pageMessages.getString("html_email_body_4") + " " + fbFinal.getName()
@@ -306,20 +318,30 @@ public class XsltTransformJob extends QuartzJobBean {
             	  }
                  	emailBuffer.append("<p>" + successMsg + "</p>");
                 }
+                
+                
+                //delete old files now
+                List<File> intermediateFiles = generateFileService.getOldFiles();
+                
+                if(zipped){
+                	markForDelete = 	zipxmls(markForDelete,endFile);
+                	endFile = endFile+".zip";
+                	//Actually deleting all the xml files which are produced since its zipped
+                	 FilenameFilter xmlFilter = new XMLFileFilter();
+                	 File tempFile = new File(generalFileDir);
+                	 deleteOldFiles(tempFile.listFiles(xmlFilter));
+                }
+                if(deleteOld)
+                { 
+                	deleteIntermFiles(intermediateFiles, endFile);      
+                	//JN:The following is superfluous and can be deleted.
+                	deleteIntermFiles(markForDelete, endFile);
+                
+                }
+                
             }
             
-            //delete old files now
-            List<File> intermediateFiles = generateFileService.getOldFiles();
-            if(zipped){
-            	markForDelete = 	zipxmls(markForDelete,endFile);
-                //Actually deleting all the xml files which are produced since its zipped
-            	 FilenameFilter xmlFilter = new XMLFileFilter();
-            	 File tempFile = new File(generalFileDir);
-            	 deleteOldFiles(tempFile.listFiles(xmlFilter));
-            }
-            deleteIntermFiles(intermediateFiles);
-            
-           deleteIntermFiles(markForDelete);
+        
 
             
             // email the message to the user
@@ -377,7 +399,7 @@ public class XsltTransformJob extends QuartzJobBean {
     	
     	byte data[] = new byte[BUFFER];
     	orgin = new BufferedInputStream(fis,BUFFER);
-    	ZipEntry entry = new ZipEntry(endFile);
+    	ZipEntry entry = new ZipEntry(new ZipEntry(EndFile.getName()));
     	zos.putNextEntry(entry);
     	int cnt = 0;
     	while((cnt = orgin.read(data,0,BUFFER))!=-1)
@@ -396,9 +418,7 @@ public class XsltTransformJob extends QuartzJobBean {
     	if(fos!=null) fos.close();
     
     }
-    if(deleteFilesList.contains(tempFile)){
-    	deleteFilesList.remove(tempFile);
-    }
+  
 	//since zip is successful, deleting the endfile.
 	System.out.println("About to delete file"+EndFile.getName());
 	boolean deleted = EndFile.delete();
@@ -407,15 +427,20 @@ public class XsltTransformJob extends QuartzJobBean {
     return deleteFilesList;
 		
 	}
-	private void deleteIntermFiles(List<File> intermediateFiles) {
+	private void deleteIntermFiles(List<File> intermediateFiles, String dontDeleteFile) {
 
 		Iterator<File> fileIt = intermediateFiles.iterator();
-		File temp;
+		File temp =null;
+		File DontDelFile = new File(dontDeleteFile);
+		
 		while(fileIt.hasNext())
 		{
 			temp = fileIt.next();
+			if(!temp.getName().equals(DontDelFile.getName()))
+			{
 			if(temp.exists())
 					temp.delete();
+			}
 		}
 	}
 	//A stub to delete old files.

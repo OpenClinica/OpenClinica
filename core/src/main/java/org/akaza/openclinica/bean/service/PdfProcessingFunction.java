@@ -160,6 +160,10 @@ public class PdfProcessingFunction extends ProcessingFunction {
         {
         	deleteOldFiles(this.getOldFiles(),outputFile,zipName);
         }
+        if(isZip())
+        {
+        	outputFile.delete();
+        }
         //delete intermediatory .fo file
         if(xslFile!=null)xslFile.delete();
         
@@ -177,9 +181,10 @@ public class PdfProcessingFunction extends ProcessingFunction {
     }
     private void deleteOldFiles(File[] oldFiles,File outputFile, String zipFile) {
 	    	//File[] files = complete.listFiles();
+    		File zip= new File(zipFile);
 			for(int i=0;i<oldFiles.length;i++)
 			{
-				if(!outputFile.getName().equals(oldFiles[i].getName())||!outputFile.getName().equals(zipFile))
+				if(!outputFile.getName().equals(oldFiles[i].getName())&& outputFile.getName().equals(zip.getName()))
 				oldFiles[i].delete();
 			}
 			

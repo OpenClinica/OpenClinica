@@ -423,11 +423,11 @@ public class ExportDatasetServlet extends SecureController {
             logger.info("set first part of 'generate' to :" + generalFileDir);
             logger.info("found file name: " + finalTarget.getFileName());
 
-            String del = CoreResources.getField("dataset_file_delete");
-            if (del.equalsIgnoreCase("true") || del.equals("")) {
-                File deleteFile = new File(generalFileDir + fileName);
-                deleteFile.delete();
-            }
+//            String del = CoreResources.getField("dataset_file_delete");
+//            if (del.equalsIgnoreCase("true") || del.equals("")) {
+//                File deleteFile = new File(generalFileDir + fileName);
+//                deleteFile.delete();
+//            }
 
             forwardPage(finalTarget);
         }

@@ -342,18 +342,18 @@ public class GenerateExtractFileService {
         	int fId2 = this.createFile(ODMXMLFileName, generalFileDirCopy, report.getXmlOutput().toString(), datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE, false);
         } */
     	HashMap answerMap = new HashMap<String, Integer>();
-		
-        if(zipped)
-        {	try {
-				zipFile(ODMXMLFileName,generalFileDir);
-				
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				logger.error(e.getMessage());
-				e.printStackTrace();
-			}
-		
-        }   // return ODMXMLFileName;
+		//JN: Zipped in the next stage as thats where the ODM file is named and copied over in default categories.
+//        if(zipped)
+//        {	try {
+//				zipFile(ODMXMLFileName,generalFileDir);
+//				
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				logger.error(e.getMessage());
+//				e.printStackTrace();
+//			}
+//		
+//        }   // return ODMXMLFileName;
         
         answerMap.put(ODMXMLFileName, new Integer(fId));
     //    if(deleteOld && files!=null &&oldFiles!=null) setOldFiles(oldFiles);
@@ -890,6 +890,7 @@ public class GenerateExtractFileService {
             
             z.closeEntry();
             z.finish();
+            if(z!=null)z.close();
             // newFile = new File(complete, name+".zip");
             // newFile.setLastModified(System.currentTimeMillis());
             //
