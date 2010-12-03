@@ -115,9 +115,10 @@
 <div class="homebox_bullets"><a href="ImportRule?action=downloadtemplateWithNotes"><fmt:message key="rule_import_all_actions_with_notes" bundle="${resterm}"/></a></div><br/>
 <div class="homebox_bullets"><a href="ImportRule?action=downloadtemplate"><fmt:message key="rule_import_all_actions_without_notes" bundle="${resterm}"/></a></div><br/>
 
-<span class="table_title_Admin"><fmt:message key="rule_import_resources" bundle="${resterm}"/></span>
+
+<span class="table_title_Admin">Designer</span>
 <div>&nbsp;</div>
-<div class="homebox_bullets"><a href="ImportRule?action=downloadrulesxsd"><fmt:message key="rule_import_download_rules_xsd" bundle="${resterm}"/></a></div><br/>
+<div class="homebox_bullets"><a href="http://192.168.15.213:8080/Designer/ruleBuilder">Designer</a></div><br/>
 
 
 <c:choose>
