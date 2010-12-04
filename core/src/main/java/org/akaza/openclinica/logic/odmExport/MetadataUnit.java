@@ -252,8 +252,9 @@ public class MetadataUnit extends OdmUnit {
                 switch (OCDataTypeId) {
                 case 1:
                     return "boolean";
-                case 10:
-                    return "partialDate";
+                //not be supported in openclinica-3.0.4.1
+                //case 10:
+                    //return "partialDate";
                 default:
                     return getOdmItemDataType(OCDataTypeId);
                 }

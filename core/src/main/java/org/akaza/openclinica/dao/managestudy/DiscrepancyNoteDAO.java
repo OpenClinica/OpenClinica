@@ -38,9 +38,8 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 
 /**
  * @author jxu
- *
- * TODO To change the template for this generated type comment go to Window -
- * Preferences - Java - Code Style - Code Templates
+ * 
+ *         TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style - Code Templates
  */
 public class DiscrepancyNoteDAO extends AuditableEntityDAO {
     // if true, we fetch the mapping along with the bean
@@ -120,8 +119,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
     /**
      * <p>
-     * getEntityFromHashMap, the method that gets the object from the database
-     * query.
+     * getEntityFromHashMap, the method that gets the object from the database query.
      */
     public Object getEntityFromHashMap(HashMap hm) {
         DiscrepancyNoteBean eb = new DiscrepancyNoteBean();
@@ -186,6 +184,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         variables.put(new Integer(1), new Integer(parentId));
         variables.put(new Integer(2), new Integer(study.getId()));
         variables.put(new Integer(3), new Integer(study.getId()));
+        variables.put(new Integer(4), new Integer(study.getId()));
         return this.executeFindAllQuery("findAllByStudyAndParent", variables);
     }
 
@@ -448,7 +447,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
             sql += sort.execute("");
             sql += " LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
         }
-        //System.out.println(sql);
+        // System.out.println(sql);
         ArrayList rows = select(sql, variables);
 
         Iterator it = rows.iterator();
@@ -582,26 +581,26 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         variables.put(new Integer(9), currentStudy.getId());
         variables.put(new Integer(10), currentStudy.getId());
         String sql = digester.getQuery("findAllSubjectDNByStudy");
-//        sql = sql + filter.execute("");
+        sql = sql + filter.execute("");
         sql += " UNION ";
         sql += digester.getQuery("findAllStudySubjectDNByStudy");
-//        sql += filter.execute("");
+        sql += filter.execute("");
         sql += " UNION ";
         sql += digester.getQuery("findAllStudyEventDNByStudy");
-//        sql += filter.execute("");
+        sql += filter.execute("");
         sql += " UNION ";
         sql += digester.getQuery("findAllEventCrfDNByStudy");
         if (currentStudy.isSite(currentStudy.getParentStudyId())) {
             sql += " and ec.event_crf_id not in ( " + this.findSiteHiddenEventCrfIdsString(currentStudy) + " ) ";
         }
-//        sql += filter.execute("");
+        sql += filter.execute("");
         sql += " UNION ";
         sql += digester.getQuery("findAllItemDataDNByStudy");
         if (currentStudy.isSite(currentStudy.getParentStudyId())) {
             sql += " and ec.event_crf_id not in ( " + this.findSiteHiddenEventCrfIdsString(currentStudy) + " ) ";
         }
-//        sql += filter.execute("");
-        sql += " order by label, discrepancy_note_id";
+        sql += filter.execute("");
+        sql += " order by label";
 
         ArrayList rows = select(sql, variables);
 
@@ -942,9 +941,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
     }
 
     /**
-     * Find all DiscrepancyNoteBeans associated with a certain Study Subject and
-     * Study.
-     *
+     * Find all DiscrepancyNoteBeans associated with a certain Study Subject and Study.
+     * 
      * @param study
      *            A StudyBean, whose id property is checked.
      * @param studySubjectId

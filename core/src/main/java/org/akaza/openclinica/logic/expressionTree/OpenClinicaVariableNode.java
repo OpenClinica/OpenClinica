@@ -73,6 +73,7 @@ public class OpenClinicaVariableNode extends ExpressionNode {
     @Override
     String testCalculate() throws OpenClinicaSystemException {
 
+    	validate();
         String variableValue = testCalculateVariable();
         if (variableValue != null) {
             return variableValue;

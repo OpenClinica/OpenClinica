@@ -53,7 +53,6 @@
     <name>getNextPK</name>
     <sql>select nextval('item_form_metadata_item_form_metadata_id_seq') as key</sql>
   </query>
-  
   <query>
   <!-- YW 08-22-2007, try to check if a crf_version_id exists in item_group_metadata or not -->
   	<name>findThisCrfVersionId</name>

@@ -8,7 +8,12 @@
 package org.akaza.openclinica.control.admin;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.managestudy.*;
+import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
@@ -16,7 +21,12 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.managestudy.*;
+import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
@@ -28,8 +38,7 @@ import java.util.ArrayList;
 /**
  * @author jxu
  * 
- * TODO To change the template for this generated type comment go to Window -
- * Preferences - Java - Code Style - Code Templates
+ *         TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style - Code Templates
  */
 public class DeleteEventCRFServlet extends SecureController {
     public static String STUDY_SUB_ID = "ssId";
@@ -120,12 +129,14 @@ public class DeleteEventCRFServlet extends SecureController {
                 // delete all the item data first
                 for (int a = 0; a < itemData.size(); a++) {
                     ItemDataBean item = (ItemDataBean) itemData.get(a);
-                    ArrayList discrepancyList = dnDao.findExistingNotesForItemData(item.getId());   
+                    ArrayList discrepancyList = dnDao.findExistingNotesForItemData(item.getId());
                     iddao.deleteDnMap(item.getId());
-                    for(int b = 0; b < discrepancyList.size(); b++){
+                    for (int b = 0; b < discrepancyList.size(); b++) {
                         DiscrepancyNoteBean noteBean = (DiscrepancyNoteBean) discrepancyList.get(b);
                         dnDao.deleteNotes(noteBean.getId());
                     }
+                    item.setUpdater(ub);
+                    iddao.updateUser(item);
                     iddao.delete(item.getId());
                 }
                 // delete event crf

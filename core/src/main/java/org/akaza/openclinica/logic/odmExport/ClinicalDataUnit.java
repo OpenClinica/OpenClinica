@@ -90,10 +90,13 @@ public class ClinicalDataUnit extends OdmUnit {
     public static Boolean isNull(String itValue, String key, HashMap<String, String> nullValueCVs) {
         if (nullValueCVs.containsKey(key)) {
             String[] nullvalues = nullValueCVs.get(key).split(",");
-            for (String n : nullvalues) {
-                // if (itValue.contains(n)) {
-                if (itValue.equals(n)) {
-                    return true;
+            String[] values = itValue.split(",");
+            for(String v : values) {
+                v = v.trim();
+                for (String n : nullvalues) {
+                    if (v.equals(n)) {
+                        return true;
+                    }
                 }
             }
         }

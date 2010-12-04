@@ -95,7 +95,9 @@
             OR study_id in
             (SELECT study_id
             FROM study
-            WHERE parent_study_id=?)) ORDER BY date_created
+            WHERE parent_study_id=?)
+            OR study_id in (SELECT parent_study_id FROM study WHERE study_id=?)
+            ) ORDER BY date_created
         </sql>
     </query>
     <query>

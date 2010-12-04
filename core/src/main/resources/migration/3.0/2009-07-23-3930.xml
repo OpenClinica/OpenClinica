@@ -160,7 +160,7 @@
 		/* / */
 		</sql>
 	</changeSet>
-		<changeSet author="ywang" id="2009-07-23-3930-4" dbms="oracle">
+		<changeSet author="ywang" id="2009-07-23-3930-4" dbms="oracle" runOnChange="true">
 		<comment>modify clinica_table_api for event_crf_triger adding event crf sdv status</comment>
 	<sql splitStatements="false">
 		CREATE OR REPLACE package body clinica_table_api is
@@ -431,11 +431,7 @@
 			    crf_version_id := null;
 			end;
 			/* -- */
-				IF (OLDREC.update_id <![CDATA[<]]>1) THEN
-			  luser_id := oldrec.update_id;
-			else
-			  luser_id := oldrec.owner_id;
-			end if;
+			luser_id := oldrec.update_id;
 			/* -- */
 			INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, event_crf_id,study_event_id,event_crf_version_id)
 			    VALUES (audit_log_event_audit_id_seq.nextval , '13', sysdate, luser_id, 'item_data', OLDREC.item_data_id, entity_name_value, OLDREC.value, OLDREC.event_crf_id,std_evnt_id,crf_version_id);

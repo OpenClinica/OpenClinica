@@ -356,4 +356,42 @@ public class ItemGroupDAO extends AuditableEntityDAO {
         variables.put(new Integer(1), name);
         this.execute(digester.getQuery("deleteTestGroup"), variables);
     }
+    
+    public Boolean isItemGroupRepeatingBasedOnAllCrfVersions(String groupOid) {
+    	Boolean result = false;
+        setTypesExpected();
+        HashMap<Integer, String> variables = new HashMap<Integer, String>();
+        variables.put(1, groupOid);
+
+        String sql = digester.getQuery("isItemGroupRepeatingBasedOnAllCrfVersions");
+
+        ArrayList rows = this.select(sql,variables);
+        Iterator it = rows.iterator();
+
+        if (it.hasNext()) {
+            Integer count = (Integer) ((HashMap) it.next()).get("count");
+            result = count > 0 ? true : false;
+        } 
+        return result;
+    }
+    
+    public Boolean isItemGroupRepeatingBasedOnCrfVersion(String groupOid,Integer crfVersion) {
+    	Boolean result = false;
+        setTypesExpected();
+        HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
+        variables.put(1, groupOid);
+        variables.put(2, crfVersion);
+
+        String sql = digester.getQuery("isItemGroupRepeatingBasedOnCrfVersion");
+
+        ArrayList rows = this.select(sql,variables);
+        Iterator it = rows.iterator();
+
+        if (it.hasNext()) {
+            Integer count = (Integer) ((HashMap) it.next()).get("count");
+            result = count > 0 ? true : false;
+        } 
+        return result;
+    }
+    
 }

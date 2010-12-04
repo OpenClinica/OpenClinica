@@ -12,6 +12,7 @@ public class ListNotesFilter implements CriteriaCommand {
     public ListNotesFilter() {
         columnMapping.put("studySubject.label", "ss.label");
         columnMapping.put("siteId", "ss.label");
+        columnMapping.put("studySubject.labelExact", "ss.label");
         columnMapping.put("discrepancyNoteBean.createdDate", "dn.date_created");
         columnMapping.put("discrepancyNoteBean.updatedDate", "dn.date_created");
         columnMapping.put("discrepancyNoteBean.description", "dn.description");
@@ -40,8 +41,10 @@ public class ListNotesFilter implements CriteriaCommand {
 
     private String buildCriteria(String criteria, String property, Object value) {
         if (value != null) {
-            if (property.equals("studySubject.label") || property.equals("discrepancyNoteBean.description")
-                    || property.equals("discrepancyNoteBean.user")) {
+			if (property.equals("studySubject.labelExact")){
+                criteria = criteria + " and ";
+                criteria = criteria + " UPPER(" + columnMapping.get(property) + ") = UPPER('" + value.toString() + "')" + " ";
+            }else if (property.equals("studySubject.label") || property.equals("discrepancyNoteBean.description") || property.equals("discrepancyNoteBean.user")) {
                 criteria = criteria + " and ";
                 criteria = criteria + " UPPER(" + columnMapping.get(property) + ") like UPPER('%" + value.toString() + "%')" + " ";
             } else if (property.equals("siteId")) {

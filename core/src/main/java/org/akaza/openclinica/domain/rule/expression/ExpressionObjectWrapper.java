@@ -1,6 +1,7 @@
 package org.akaza.openclinica.domain.rule.expression;
 
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 
 import java.util.HashMap;
@@ -13,6 +14,7 @@ public class ExpressionObjectWrapper {
     StudyBean studyBean;
     ExpressionBean expressionBean;
     RuleSetBean ruleSet;
+    EventCRFBean eventCrf; // used only in data entry based rule executions
 
     // This will carry item/value pairs used in DataEntry Rule Execution
     HashMap<String, String> itemsAndTheirValues = new HashMap<String, String>();
@@ -40,6 +42,17 @@ public class ExpressionObjectWrapper {
         this.expressionBean = expressionBean;
         this.ruleSet = ruleSet;
         this.itemsAndTheirValues = itemsAndTheirValues;
+    }
+    
+    public ExpressionObjectWrapper(DataSource ds, StudyBean studyBean, ExpressionBean expressionBean, RuleSetBean ruleSet,
+            HashMap<String, String> itemsAndTheirValues,EventCRFBean eventCrfBean) {
+        super();
+        this.ds = ds;
+        this.studyBean = studyBean;
+        this.expressionBean = expressionBean;
+        this.ruleSet = ruleSet;
+        this.itemsAndTheirValues = itemsAndTheirValues;
+        this.eventCrf = eventCrfBean;
     }
 
     /**
@@ -117,4 +130,11 @@ public class ExpressionObjectWrapper {
         this.itemsAndTheirValues = itemsAndTheirValues;
     }
 
+	public EventCRFBean getEventCrf() {
+		return eventCrf;
+	}
+
+	public void setEventCrf(EventCRFBean eventCrf) {
+		this.eventCrf = eventCrf;
+	}
 }

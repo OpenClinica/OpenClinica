@@ -1,12 +1,5 @@
 package org.akaza.openclinica.control.extract;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.extract.DownloadDiscrepancyNote;
@@ -24,7 +17,13 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.managestudy.*;
+import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import org.akaza.openclinica.dao.managestudy.ListNotesFilter;
+import org.akaza.openclinica.dao.managestudy.ListNotesSort;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
@@ -33,6 +32,13 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 /**
  * A servlet that sends via HTTP a file containing Discrepancy-Note related data.
@@ -101,7 +107,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         StudySubjectBean studySubject = new StudySubjectBean();
         if(subjectId>0) {
             studySubject = (StudySubjectBean) new StudySubjectDAO(sm.getDataSource()).findByPK(subjectId);
-            listNotesFilter.addFilter("studySubject.label", studySubject.getLabel());
+            listNotesFilter.addFilter("studySubject.labelExact", studySubject.getLabel());
         }
         if(discNoteType >= 1 && discNoteType <= 5) {
             listNotesFilter.addFilter("discrepancyNoteBean.disType", discNoteType);

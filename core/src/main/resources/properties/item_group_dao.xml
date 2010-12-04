@@ -100,4 +100,22 @@
     <name>deleteTestGroup</name>
     <sql>delete from item_group where name=?</sql>
   </query>
+   <query>
+        <name>isItemGroupRepeatingBasedOnAllCrfVersions</name>
+        <sql>
+           select count(igm.item_group_metadata_id) from item_group ig,item_group_metadata igm where 
+				ig.item_group_id = igm.item_group_id AND
+				oc_oid=?
+				and (repeat_number > 1 or repeat_max > 1)
+        </sql>
+    </query>
+   <query>
+        <name>isItemGroupRepeatingBasedOnCrfVersion</name>
+        <sql>
+           select count(igm.item_group_metadata_id) from item_group ig,item_group_metadata igm where 
+				ig.item_group_id = igm.item_group_id AND
+				oc_oid=? and crf_version_id = ?
+				and (repeat_number > 1 or repeat_max > 1)
+        </sql>
+    </query>
 </queries>

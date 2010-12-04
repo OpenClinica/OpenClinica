@@ -43,14 +43,15 @@
 		    Select fix_rule_referencing_cross_study();
         </sql>
     </changeSet>
-    <changeSet author="kkrumlian" id="2010-07-16-NA01-4" dbms="oracle">
+    <changeSet author="kkrumlian" id="2010-07-16-NA01-4" dbms="oracle" runOnChange="true">
         <comment>update study_id to rule table</comment>
         <sql>
             update rule set study_id = (
-                    SELECT rs.study_id FROM rule_set_rule rsr,rule_set rs, rule r WHERE
-                        ( SELECT COUNT(*) FROM rule_set_rule rsr2 WHERE rsr.id > rsr2.id ) >0 
-                             and rsr.rule_set_id = rs.id and rule_id = r.id and r.id = rule.id 
-                        )
+			SELECT rs.study_id FROM rule_set_rule rsr,rule_set rs where rsr.rule_set_id = rs.id and rsr.id = 
+			(select max(rsr.id) from rule_set_rule rsr,rule_set rs, rule r 
+			where 
+			rsr.rule_set_id = rs.id and rule_id = r.id and r.id = rule.id 
+            ))
         </sql>
     </changeSet>
     <changeSet author="kkrumlian" id="2010-07-16-NA01-5" dbms="oracle">

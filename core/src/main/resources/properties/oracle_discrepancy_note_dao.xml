@@ -107,7 +107,9 @@ SELECT dn.*, eventcrf_map.column_name FROM discrepancy_note dn, dn_event_crf_map
 					OR study_id in
 						(SELECT study_id
 						FROM study
-						WHERE parent_study_id=?)) ORDER BY date_created
+						WHERE parent_study_id=?)
+						OR study_id in (SELECT parent_study_id FROM study WHERE study_id=?)
+						) ORDER BY date_created
 		</sql>
 	</query>
 	<query>

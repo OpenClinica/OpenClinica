@@ -4,6 +4,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
@@ -28,9 +29,12 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 public class DataEntryRuleRunner extends RuleRunner {
+	
+	EventCRFBean ecb;
 
-    public DataEntryRuleRunner(DataSource ds, String requestURLMinusServletPath, String contextPath, JavaMailSenderImpl mailSender) {
+    public DataEntryRuleRunner(DataSource ds, String requestURLMinusServletPath, String contextPath, JavaMailSenderImpl mailSender, EventCRFBean ecb) {
         super(ds, requestURLMinusServletPath, contextPath, mailSender);
+        this.ecb = ecb;
     }
 
     public MessageContainer runRules(List<RuleSetBean> ruleSets, ExecutionMode executionMode, StudyBean currentStudy, HashMap<String, String> variableAndValue,
@@ -60,7 +64,7 @@ public class DataEntryRuleRunner extends RuleRunner {
                 for (RuleSetRuleBean ruleSetRule : ruleSet.getRuleSetRules()) {
                     String result = null;
                     RuleBean rule = ruleSetRule.getRuleBean();
-                    ExpressionObjectWrapper eow = new ExpressionObjectWrapper(ds, currentStudy, rule.getExpression(), ruleSet, variableAndValue);
+                    ExpressionObjectWrapper eow = new ExpressionObjectWrapper(ds, currentStudy, rule.getExpression(), ruleSet, variableAndValue,ecb);
                     try {
                         OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(eow);
                         result = oep.parseAndEvaluateExpression(rule.getExpression().getValue());

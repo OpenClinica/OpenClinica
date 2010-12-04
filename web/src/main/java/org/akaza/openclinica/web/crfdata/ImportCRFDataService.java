@@ -102,72 +102,83 @@ public class ImportCRFDataService {
             for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
                 ArrayList<FormDataBean> formDataBeans = studyEventDataBean.getFormData();
 
+                String sampleOrdinal = studyEventDataBean.getStudyEventRepeatKey() == null ? "1" : studyEventDataBean.getStudyEventRepeatKey();
+
                 StudyEventDefinitionBean studyEventDefinitionBean =
                     studyEventDefinitionDAO.findByOidAndStudy(studyEventDataBean.getStudyEventOID(), studyBean.getId(), studyBean.getParentStudyId());
                 logger.info("find all by def and subject " + studyEventDefinitionBean.getName() + " study subject " + studySubjectBean.getName());
-                ArrayList<StudyEventBean> studyEventBeans = studyEventDAO.findAllByDefinitionAndSubject(studyEventDefinitionBean, studySubjectBean);
+                // ArrayList<StudyEventBean> studyEventBeans = studyEventDAO.findAllByDefinitionAndSubject(studyEventDefinitionBean, studySubjectBean);
+
                 for (FormDataBean formDataBean : formDataBeans) {
 
                     CRFVersionDAO crfVersionDAO = new CRFVersionDAO(ds);
 
                     ArrayList<CRFVersionBean> crfVersionBeans = crfVersionDAO.findAllByOid(formDataBean.getFormOID());
+                    // StudyEventBean studyEventBean = (StudyEventBean)
+                    // studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studyEventDefinitionBean.getId(),
+                    // studySubjectBean.getId(),Integer.parseInt(sampleOrdinal));
                     for (CRFVersionBean crfVersionBean : crfVersionBeans) {
+
                         // iterate the studyeventbeans here
-                        for (StudyEventBean studyEventBean : studyEventBeans) {
-                            ArrayList<EventCRFBean> eventCrfBeans = eventCrfDAO.findByEventSubjectVersion(studyEventBean, studySubjectBean, crfVersionBean);
-                            // what if we have begun with creating a study
-                            // event, but haven't entered data yet? this would
-                            // have us with a study event, but no corresponding
-                            // event crf, yet.
-                            if (eventCrfBeans.isEmpty()) {
-                                logger.debug("   found no event crfs from Study Event id " + studyEventBean.getId() + ", location "
-                                    + studyEventBean.getLocation());
-                                // spell out criteria and create a bean if
-                                // necessary, avoiding false-positives
-                                if (studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED)
-                                    || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.DATA_ENTRY_STARTED)
-                                    || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED)) {
-                                    EventCRFBean newEventCrfBean = new EventCRFBean();
-                                    newEventCrfBean.setStudyEventId(studyEventBean.getId());
-                                    newEventCrfBean.setStudySubjectId(studySubjectBean.getId());
-                                    newEventCrfBean.setCRFVersionId(crfVersionBean.getId());
-                                    newEventCrfBean.setDateInterviewed(new Date());
-                                    newEventCrfBean.setOwner(ub);
-                                    newEventCrfBean.setInterviewerName(ub.getName());
-                                    newEventCrfBean.setCompletionStatusId(1);// place
-                                    // filler
-                                    newEventCrfBean.setStatus(Status.AVAILABLE);
-                                    newEventCrfBean.setStage(DataEntryStage.INITIAL_DATA_ENTRY);
-                                    // these will be updated later in the
-                                    // workflow
-                                    newEventCrfBean = (EventCRFBean) eventCrfDAO.create(newEventCrfBean);
-                                    eventCrfBeans.add(newEventCrfBean);
-                                    logger.debug("   created and added new event crf");
-                                }
-                            } else {
-                                // we need to update the event crf that already exists
-                                // for (EventCRFBean ecb : eventCrfBeans) {
-                                // ecb.setDateInterviewed(new Date());
-                                // ecb.setInterviewerName(ub.getName());
-                                // ecb = (EventCRFBean) eventCrfDAO.update(ecb);
-                                // logger.info("    updated event crf");
-                                // }
-                                // right now not doing this, since bug was not able to be replicated, tbh
+                        // for (StudyEventBean studyEventBean : studyEventBeans) {
+
+                        StudyEventBean studyEventBean =
+                            (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(),
+                                    studyEventDefinitionBean.getId(), Integer.parseInt(sampleOrdinal));
+
+                        ArrayList<EventCRFBean> eventCrfBeans = eventCrfDAO.findByEventSubjectVersion(studyEventBean, studySubjectBean, crfVersionBean);
+                        // what if we have begun with creating a study
+                        // event, but haven't entered data yet? this would
+                        // have us with a study event, but no corresponding
+                        // event crf, yet.
+                        if (eventCrfBeans.isEmpty()) {
+                            logger.debug("   found no event crfs from Study Event id " + studyEventBean.getId() + ", location " + studyEventBean.getLocation());
+                            // spell out criteria and create a bean if
+                            // necessary, avoiding false-positives
+                            if (studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED)
+                                || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.DATA_ENTRY_STARTED)
+                                || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED)) {
+                                EventCRFBean newEventCrfBean = new EventCRFBean();
+                                newEventCrfBean.setStudyEventId(studyEventBean.getId());
+                                newEventCrfBean.setStudySubjectId(studySubjectBean.getId());
+                                newEventCrfBean.setCRFVersionId(crfVersionBean.getId());
+                                newEventCrfBean.setDateInterviewed(new Date());
+                                newEventCrfBean.setOwner(ub);
+                                newEventCrfBean.setInterviewerName(ub.getName());
+                                newEventCrfBean.setCompletionStatusId(1);// place
+                                // filler
+                                newEventCrfBean.setStatus(Status.AVAILABLE);
+                                newEventCrfBean.setStage(DataEntryStage.INITIAL_DATA_ENTRY);
+                                // these will be updated later in the
+                                // workflow
+                                newEventCrfBean = (EventCRFBean) eventCrfDAO.create(newEventCrfBean);
+                                eventCrfBeans.add(newEventCrfBean);
+                                logger.debug("   created and added new event crf");
                             }
-
-                            // below to prevent duplicates
-
-                            for (EventCRFBean ecb : eventCrfBeans) {
-                                Integer ecbId = new Integer(ecb.getId());
-
-                                if (!eventCRFBeanIds.contains(ecbId)) {
-                                    eventCRFBeans.add(ecb);
-                                    eventCRFBeanIds.add(ecbId);
-                                }
-                            }
-                            // place to review statuses here? not sure, 09/2008
-                            // eventCRFBeans.addAll(eventCrfBeans);
+                        } else {
+                            // we need to update the event crf that already exists
+                            // for (EventCRFBean ecb : eventCrfBeans) {
+                            // ecb.setDateInterviewed(new Date());
+                            // ecb.setInterviewerName(ub.getName());
+                            // ecb = (EventCRFBean) eventCrfDAO.update(ecb);
+                            // logger.info("    updated event crf");
+                            // }
+                            // right now not doing this, since bug was not able to be replicated, tbh
                         }
+
+                        // below to prevent duplicates
+
+                        for (EventCRFBean ecb : eventCrfBeans) {
+                            Integer ecbId = new Integer(ecb.getId());
+
+                            if (!eventCRFBeanIds.contains(ecbId)) {
+                                eventCRFBeans.add(ecb);
+                                eventCRFBeanIds.add(ecbId);
+                            }
+                        }
+                        // place to review statuses here? not sure, 09/2008
+                        // eventCRFBeans.addAll(eventCrfBeans);
+                        // }
                         //
                         //
                     }
@@ -245,7 +256,10 @@ public class ImportCRFDataService {
             StudySubjectBean studySubjectBean = studySubjectDAO.findByOidAndStudy(subjectDataBean.getSubjectOID(), studyBean.getId());
 
             for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
-
+                // resetting max ordinal here, to try and stop 'multiple item creation'
+                // 5975, tbh 10/2010
+                maxOrdinal = 1;
+                // << 5975, tbh 2010
                 int parentStudyId = studyBean.getParentStudyId();
                 StudyEventDefinitionBean sedBean = sedDao.findByOidAndStudy(studyEventDataBean.getStudyEventOID(), studyBean.getId(), parentStudyId);
                 ArrayList<FormDataBean> formDataBeans = studyEventDataBean.getFormData();
@@ -265,6 +279,7 @@ public class ImportCRFDataService {
                 // INIT here instead, tbh 08/2008
 
                 for (FormDataBean formDataBean : formDataBeans) {
+                    maxOrdinal = 1;// JN:Moving maxOrdinal here, so max ordinal is there per form rather than per study eventData bean
 
                     // displayItemBeans = new ArrayList<DisplayItemBean>();
                     // list initialized in only one place above, tbh 08/2008
@@ -288,7 +303,7 @@ public class ImportCRFDataService {
                     // instead work on sections
                     EventCRFBean eventCRFBean = eventCRFDAO.findByEventCrfVersion(studyEvent, crfVersion);
                     // >>tbh, 09/2008
-                    // System.out.println("found event crf bean: using study event " + studyEvent.getId() + " crf version name: " + crfVersion.getOid());
+                    // logger.debug("found event crf bean: using study event " + studyEvent.getId() + " crf version name: " + crfVersion.getOid());
                     // >>
                     EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(ds);
                     EventDefinitionCRFBean eventDefinitionCRF =
@@ -310,7 +325,7 @@ public class ImportCRFDataService {
                             ItemGroupBean testBean = itemGroupDAO.findByOid(itemGroupDataBean.getItemGroupOID());
                             if (testBean == null) {
                                 // TODO i18n of message
-                                // System.out.println("hit the exception for item groups! " + itemGroupDataBean.getItemGroupOID());
+                                // logger.debug("hit the exception for item groups! " + itemGroupDataBean.getItemGroupOID());
                                 MessageFormat mf = new MessageFormat("");
                                 mf.applyPattern(respage.getString("your_item_group_oid_for_form_oid"));
                                 Object[] arguments = { itemGroupDataBean.getItemGroupOID(), formDataBean.getFormOID() };
@@ -368,6 +383,7 @@ public class ImportCRFDataService {
                                         groupOrdinal + "_" + itemGroupDataBean.getItemGroupOID() + "_" + itemBean.getOid() + "_"
                                             + subjectDataBean.getSubjectOID();
                                     blankCheck.put(newKey, itemDataBean);
+                                    logger.info("adding " + newKey + " to blank checks");
                                     if (!metadataBeans.isEmpty()) {
                                         ItemFormMetadataBean metadataBean = metadataBeans.get(0);
                                         // also
@@ -410,8 +426,12 @@ public class ImportCRFDataService {
                                 }
                             }// end item data beans
                             logger.debug(".. found blank check: " + blankCheck.toString());
-                            logger.debug(".. and found blank check items: " + blankCheckItems.toString());
+                            // logger.debug(".. and found blank check items: " + blankCheckItems.toString());
                             // >> TBH #5548 did we create any repeated blank spots? If so, fill them in with an Item Data Bean
+
+                            // JN: this max Ordinal can cause problems as it assumes the latest values, and when there is an entry with nongroup towards the
+                            // end. Refer: MANTIS 6113
+
                             for (int i = 1; i <= maxOrdinal; i++) {
                                 for (ItemBean itemBean : blankCheckItems) {
                                     String newKey =
@@ -454,8 +474,10 @@ public class ImportCRFDataService {
                     // totalValidationErrors.
                     // totalValidationErrors.addAll(validationErrors);
                     for (Object errorKey : validationErrors.keySet()) {
-                        // System.out.println(errorKey.toString() + " -- " + validationErrors.get(errorKey));
-                        totalValidationErrors.put(errorKey.toString(), validationErrors.get(errorKey).toString());
+                        // logger.debug(errorKey.toString() + " -- " + validationErrors.get(errorKey));
+                        // JN: to avoid duplicate errors
+                        if (!totalValidationErrors.containsKey(errorKey.toString()))
+                            totalValidationErrors.put(errorKey.toString(), validationErrors.get(errorKey).toString());
                         // assuming that this will be put back in to the core
                         // method's hashmap, updating statically, tbh 06/2008
                         logger.debug("+++ adding " + errorKey.toString());
@@ -481,9 +503,10 @@ public class ImportCRFDataService {
                     Status eventCRFStatus = eventCRFBean.getStatus();
                     boolean overwrite = false;
                     // tbh >>
-                    if (eventCRFStatus.equals(Status.UNAVAILABLE) || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE)
-                        || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE) || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY)
-                        || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
+                    // //JN: Commenting out the following 2 lines, coz the prompt should come in the cases on
+                    if (// eventCRFStatus.equals(Status.UNAVAILABLE) ||
+                    dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)
+                        || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY) || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
                         overwrite = true;
                     }
                     // << tbh, adding extra statuses to prevent appending, 06/2009
@@ -497,15 +520,21 @@ public class ImportCRFDataService {
                     // tbh
 
                     // summary stats added tbh 05/2008
+                    // JN: Changed from validationErrors to totalValidationErrors to create discrepancy notes for all the
                     displayItemBeanWrapper =
                         new DisplayItemBeanWrapper(displayItemBeans, true, overwrite, validationErrors, studyEventId, crfVersionId,
                                 studyEventDataBean.getStudyEventOID(), studySubjectBean.getLabel(), eventCRFBean.getCreatedDate(), crfBean.getName(),
                                 crfVersion.getName(), studySubjectBean.getOid(), studyEventDataBean.getStudyEventRepeatKey());
+
+                    // JN: Commenting out the following code, since we shouldn't re-initialize at this point, as validationErrors would get overwritten and the
+                    // older errors will be overriden. Moving it after the form.
+                    // Removing the comments for now, since it seems to be creating duplicate Discrepancy Notes.
                     validationErrors = new HashMap();
                     discValidator = new DiscrepancyValidator(request, discNotes);
                     // reset to allow for new errors...
                 }// after forms
-
+                 // validationErrors = new HashMap();
+                 // discValidator = new DiscrepancyValidator(request, discNotes);
                 wrappers.add(displayItemBeanWrapper);
             }// after study events
 
@@ -644,6 +673,7 @@ public class ImportCRFDataService {
                 }
             }
         }
+        // JN commenting out the following as we dont need hard edits for these cases, they need to be soft stops and DN should be filed REF MANTIS 6271
 
         else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.RADIO) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECT)) {
             // logger.info(itemOid + "is a RADIO or
@@ -653,7 +683,7 @@ public class ImportCRFDataService {
                 matchValueWithOptions(displayItemBean, displayItemBean.getData().getValue(), displayItemBean.getMetadata().getResponseSet().getOptions());
             request.setAttribute(itemOid, theValue);
             logger.debug("        found the value for radio/single: " + theValue);
-            if (theValue == null && displayItemBean.getData().getValue() != null) {
+            if (theValue == null && displayItemBean.getData().getValue() != null && !displayItemBean.getData().getValue().isEmpty()) {
                 // fail it here
                 logger.debug("-- theValue was NULL, the real value was " + displayItemBean.getData().getValue());
                 hardv.put(itemOid, "This is not in the correct response set.");
@@ -670,10 +700,10 @@ public class ImportCRFDataService {
             String theValue =
                 matchValueWithManyOptions(displayItemBean, displayItemBean.getData().getValue(), displayItemBean.getMetadata().getResponseSet().getOptions());
             request.setAttribute(itemOid, theValue);
-            // System.out.println("        found the value for checkbx/multi: " + theValue);
-            if (theValue == null && displayItemBean.getData().getValue() != null) {
+            // logger.debug("        found the value for checkbx/multi: " + theValue);
+            if (theValue == null && displayItemBean.getData().getValue() != null && !displayItemBean.getData().getValue().isEmpty()) {
                 // fail it here? found an 0,1 in the place of a NULL
-                // System.out.println("--  theValue was NULL, the real value was " + displayItemBean.getData().getValue());
+                // logger.debug("--  theValue was NULL, the real value was " + displayItemBean.getData().getValue());
                 hardv.put(itemOid, "This is not in the correct response set.");
             }
             displayItemBean = importHelper.validateDisplayItemBeanMultipleCV(v, displayItemBean, itemOid);
@@ -717,13 +747,13 @@ public class ImportCRFDataService {
         if (!options.isEmpty()) {
             for (Object responseOption : options) {
                 ResponseOptionBean responseOptionBean = (ResponseOptionBean) responseOption;
-                // System.out.println("testing response option bean get value: " + responseOptionBean.getValue());
+                // logger.debug("testing response option bean get value: " + responseOptionBean.getValue());
                 // entireOptions += responseOptionBean.getValue() + "{0,1}|";//
                 // once, or not at all
                 entireOptions += responseOptionBean.getValue();
                 // trying smth new, tbh 01/2009
 
-                // System.out.println("checking on this string: " +
+                // logger.debug("checking on this string: " +
                 // entireOptions + " versus this value " + simValue);
                 // checkComplete = Pattern.matches(entireOptions, simValue); //
                 // switch values, tbh
@@ -742,12 +772,12 @@ public class ImportCRFDataService {
             for (Object nullValue : nullValues) {
                 NullValue nullValueTerm = (NullValue) nullValue;
                 entireOptions += nullValueTerm.getName();
-                // System.out.println("found and added " + nullValueTerm.getName());
+                // logger.debug("found and added " + nullValueTerm.getName());
             }
 
             for (String sim : simValues) {
                 sim = sim.replace(" ", "");
-                // System.out.println("checking on this string: " + entireOptions + " versus this value " + sim);
+                // logger.debug("checking on this string: " + entireOptions + " versus this value " + sim);
                 checkComplete = entireOptions.contains(sim);// Pattern.matches(
                 // entireOptions,
                 // sim);

@@ -10,6 +10,7 @@
 package org.akaza.openclinica.bean.extract;
 
 import java.sql.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -2394,14 +2395,14 @@ public class ExtractBean {
      * @param pitemId
      * @param pcrfVersionId
      */
-    public void addEntryBASE_ITEMGROUPSIDE(Integer pitemDataId, Integer pitemdataordinal, Integer pitemGroupId, String pitemGroupName, String pitemDescription,
+    public void addEntryBASE_ITEMGROUPSIDE(Integer pitemDataId, Integer pitemdataordinal, Integer pitemGroupId, String pitemGroupName, Integer pitemDatatypeId, String pitemDescription,
             String pitemName, String pitemValue, String pitemUnits, String pcrfVersionName, Integer pcrfVersionStatusId, Date pdateInterviewed,
             String pinterviewerName, Timestamp peventCrfDateCompleted, Timestamp peventCrfDateValidateCompleted, Integer peventCrfCompletionStatusId,
             Integer pitemGroupRepeatNumber, Integer pcrfId, Integer pstudySubjectId, Integer peventCrfId, Integer pitemId, Integer pcrfVersionId,
             Integer eventcrfStatusId) {
         extractDataset_ITEMGROUPSIDE obj = new extractDataset_ITEMGROUPSIDE();
 
-        obj.setSQLDatasetBASE_ITEMGROUPSIDE(pitemDataId, pitemdataordinal, pitemGroupId, pitemGroupName, pitemDescription, pitemName, pitemValue, pitemUnits,
+        obj.setSQLDatasetBASE_ITEMGROUPSIDE(pitemDataId, pitemdataordinal, pitemGroupId, pitemGroupName, pitemDatatypeId, pitemDescription, pitemName, pitemValue, pitemUnits,
                 pcrfVersionName, pcrfVersionStatusId, pdateInterviewed, pinterviewerName, peventCrfDateCompleted, peventCrfDateValidateCompleted,
                 peventCrfCompletionStatusId, pitemGroupRepeatNumber, pcrfId, pstudySubjectId, peventCrfId, pitemId, pcrfVersionId, eventcrfStatusId);
 
@@ -2658,10 +2659,6 @@ public class ExtractBean {
      *
      * //and ids studysubjectid, eventcrfid, itemid, crfversionid
      *
-     * for value apply: // YW 12-06-2007 << do convert for date data-type item.
-     * String itemValue = Utils.convertedItemDateValue((String)
-     * row.get("value"), oc_df_string, local_df_string);
-     *
      *
      *
      * @author vbcoman
@@ -2705,7 +2702,7 @@ public class ExtractBean {
         }
 
         public void setSQLDatasetBASE_ITEMGROUPSIDE(Integer pitemDataId, Integer pitemdataordinal, Integer pitemGroupId, String pitemGroupName,
-                String pitemDescription, String pitemName, String pitemValue, String pitemUnits, String pcrfVersionName, Integer pcrfVersionStatusId,
+                Integer pitemDatatypeId, String pitemDescription, String pitemName, String pitemValue, String pitemUnits, String pcrfVersionName, Integer pcrfVersionStatusId,
                 Date pdateInterviewed, String pinterviewerName, Timestamp peventCrfDateCompleted, Timestamp peventCrfDateValidateCompleted,
                 Integer peventCrfCompletionStatusId, Integer pitemGroupMetatdatrepeatNumber, Integer pcrfId, Integer pstudySubjectId, Integer peventCrfId,
                 Integer pitemId, Integer pcrfVersionId, Integer eventcrfStatusId) {
@@ -2716,10 +2713,19 @@ public class ExtractBean {
             itemDescription = pitemDescription;
             itemName = pitemName;
 
-            // don't forget conversion
-            // Utils.convertedItemDateValue((String) itemValue, oc_df_string,
-            // local_df_string);;
-            itemValue = pitemValue;
+            if(pitemDatatypeId==9) {
+                SimpleDateFormat sdf = new SimpleDateFormat(ApplicationConstants.getDateFormatInItemData());
+                sdf.setLenient(false);
+                try {
+                    java.util.Date date = sdf.parse(pitemValue);
+                    itemValue = new SimpleDateFormat("yyyy-MM-dd").format(date);
+                } catch (ParseException fe) {
+                    itemValue = pitemValue;
+                    logger.info("Failed date format for: item-data-id="+pitemDataId+" with data-type-id="+pitemDatatypeId+" and item-data-value="+pitemValue);
+                }
+            } else {
+                itemValue = pitemValue;
+            }
 
             itemUnits = pitemUnits;
             crfVersionName = pcrfVersionName;

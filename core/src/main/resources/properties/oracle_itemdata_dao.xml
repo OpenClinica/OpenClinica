@@ -36,6 +36,10 @@
                 ITEM_DATA_ID=?</sql>
         </query>
         <query>
+                <name>updateUser</name>
+                <sql>UPDATE ITEM_DATA SET DATE_UPDATED=sysdate,UPDATE_ID=? WHERE ITEM_DATA_ID=?</sql>
+        </query>
+        <query>
                 <name>delete</name>
                 <sql>Delete FROM ITEM_DATA WHERE item_data_id=?</sql>
         </query>

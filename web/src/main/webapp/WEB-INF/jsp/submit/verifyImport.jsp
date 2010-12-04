@@ -115,11 +115,11 @@
 <c:choose>
 	<c:when test="${not empty hardValidationErrors}">
 	<fmt:message key="hard_validation_error_checks" bundle="${resword}"/>
-	<div style="width: 600px">
+	<div style="width: 100%">
 
 	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 	<div class="textbox_center">
-	<table border="0" cellpadding="0" cellspacing="0" width="100%">
+	<table border="0" cellpadding="0" cellspacing="0" width="90%">
 
 		<c:forEach var="subjectDataBean" items="${subjectData}" >
 			<tr valign="top">

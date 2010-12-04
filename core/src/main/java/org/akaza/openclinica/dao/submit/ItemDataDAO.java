@@ -35,9 +35,8 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
 /**
  * <P>
- * ItemDataDAO.java, the equivalent to AnswerDAO in the original code base.
- * Modified by ywang (12-07-2007) to convert date_format string pattern of item
- * value when item data type is date
+ * ItemDataDAO.java, the equivalent to AnswerDAO in the original code base. Modified by ywang (12-07-2007) to convert date_format string pattern of item value
+ * when item data type is date
  * 
  * @author thickerson
  * 
@@ -119,7 +118,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
         // YW 12-06-2007 << convert to oc_date_format_string pattern before
         // inserting into database
         if (isADateType(idb.getItemId())) {
-        	idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string));
+            idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string));
         } else if (isPDateType(idb.getItemId())) {
             idb.setValue(formatPDate(idb.getValue()));
         }
@@ -158,7 +157,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
         // YW 12-06-2007 << convert to oc_date_format_string pattern before
         // inserting into database
         if (isADateType(idb.getItemId())) {
-        	idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string));
+            idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string));
         } else if (isPDateType(idb.getItemId())) {
             idb.setValue(formatPDate(idb.getValue()));
         }
@@ -228,12 +227,29 @@ public class ItemDataDAO extends AuditableEntityDAO {
         return idb;
     }
 
+    public EntityBean updateUser(EntityBean eb) {
+        ItemDataBean idb = (ItemDataBean) eb;
+
+        idb.setActive(false);
+
+        HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
+        variables.put(new Integer(1), new Integer(idb.getUpdaterId()));
+        variables.put(new Integer(2), new Integer(idb.getId()));
+        this.execute(digester.getQuery("updateUser"), variables);
+
+        if (isQuerySuccessful()) {
+            idb.setActive(true);
+        }
+
+        return idb;
+    }
+
     public EntityBean create(EntityBean eb) {
         ItemDataBean idb = (ItemDataBean) eb;
         // YW 12-06-2007 << convert to oc_date_format_string pattern before
         // inserting into database
         if (isADateType(idb.getItemId())) {
-        	idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string));
+            idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string));
         } else if (isPDateType(idb.getItemId())) {
             idb.setValue(formatPDate(idb.getValue()));
         }
@@ -263,7 +279,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
         // YW 12-06-2007 << convert to oc_date_format_string pattern before
         // inserting into database
         if (isADateType(idb.getItemId())) {
-        	idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string));
+            idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string));
         } else if (isPDateType(idb.getItemId())) {
             idb.setValue(formatPDate(idb.getValue()));
         }
@@ -288,17 +304,18 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
         return idb;
     }
+
     /*
      * Small check to make sure the type is a date, tbh
      */
     public boolean isADateType(int itemId) {
-    	ItemDAO itemDAO = new ItemDAO(this.getDs());
-    	ItemBean itemBean = (ItemBean)itemDAO.findByPK(itemId);
-    	if (itemBean.getDataType().equals(ItemDataType.DATE)) {
-    		return true;
-    	}
-    	return false;
-    	
+        ItemDAO itemDAO = new ItemDAO(this.getDs());
+        ItemBean itemBean = (ItemBean) itemDAO.findByPK(itemId);
+        if (itemBean.getDataType().equals(ItemDataType.DATE) || itemBean.getDataType().equals(ItemDataType.PDATE)) {
+            return true;
+        }
+        return false;
+
     }
 
     public boolean isPDateType(int itemId) {
@@ -364,7 +381,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
         // convert item date value to local_date_format_string pattern once
         // fetching out from database
         if (isADateType(eb.getItemId())) {
-        	eb.setValue(Utils.convertedItemDateValue(eb.getValue(), oc_df_string, local_df_string));
+            eb.setValue(Utils.convertedItemDateValue(eb.getValue(), oc_df_string, local_df_string));
         } else if (isPDateType(eb.getItemId())) {
             eb.setValue(reFormatPDate(eb.getValue()));
         }
@@ -576,8 +593,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
     }
 
     /**
-     * Gets the maximum ordinal for item data in a given item group in a given
-     * section and event crf
+     * Gets the maximum ordinal for item data in a given item group in a given section and event crf
      * 
      * @param ecb
      * @param sb

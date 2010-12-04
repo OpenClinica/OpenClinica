@@ -7,16 +7,6 @@
  */
 package org.akaza.openclinica.dao.core;
 
-import org.akaza.openclinica.bean.core.ApplicationConstants;
-import org.akaza.openclinica.bean.core.EntityBean;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.Utils;
-import org.akaza.openclinica.bean.extract.ExtractBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -31,6 +21,16 @@ import java.util.Iterator;
 import java.util.Locale;
 
 import javax.sql.DataSource;
+
+import org.akaza.openclinica.bean.core.ApplicationConstants;
+import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.Utils;
+import org.akaza.openclinica.bean.extract.ExtractBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p/>
@@ -1476,6 +1476,7 @@ public abstract class EntityDAO implements DAOInterface {
                 }
 
                 Integer eventcrfstatusid = new Integer(rs.getInt("eventcrfstatusid"));
+                Integer itemdatatypeid = new Integer(rs.getInt("itemDataTypeId"));
 
                 // add it to the HashMap
                 eb.addEntryBASE_ITEMGROUPSIDE(
@@ -1483,6 +1484,7 @@ public abstract class EntityDAO implements DAOInterface {
                 /* Integer vitemdataordinal */vitemdataordinal,
                 /* Integer pitemGroupId */vitem_group_id,
                 /* String pitemGroupName */vitemgroupname,
+                itemdatatypeid,
                 /* String pitemDescription */vitemdesc,
                 /* String pitemName */vitemname,
                 /* String pitemValue */vitemvalue,
@@ -2148,13 +2150,13 @@ public abstract class EntityDAO implements DAOInterface {
         if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
             return " SELECT  "
                 + " itemdataid,  itemdataordinal,"
-                + " item_group_metadata.item_group_id , item_group.name, itemdesc, itemname, itemvalue, itemunits, "
+                + " item_group_metadata.item_group_id , item_group.name, itemdatatypeid, itemdesc, itemname, itemvalue, itemunits, "
                 + " crfversioname, crfversionstatusid, crfid, item_group_metadata.repeat_number, "
                 + " dateinterviewed, interviewername, eventcrfdatevalidatecompleted, eventcrfdatecompleted, eventcrfcompletionstatusid, "
                 + " studysubjectid, eventcrfid, itemid, crfversionid, eventcrfstatusid "
                 + " FROM "
                 + " ( "
-                + " 	SELECT item_data.item_data_id AS itemdataid, item_data.item_id AS itemid, item_data.value AS itemvalue, item_data.ordinal AS itemdataordinal, item.name AS itemname, item.description AS itemdesc,  "
+                + " 	SELECT item_data.item_data_id AS itemdataid, item_data.item_id AS itemid, item_data.value AS itemvalue, item_data.ordinal AS itemdataordinal, item.item_data_type_id As itemdatatypeid, item.name AS itemname, item.description AS itemdesc,  "
                 + " 	item.units AS itemunits, event_crf.event_crf_id AS eventcrfid, crf_version.name AS crfversioname, crf_version.crf_version_id AS crfversionid,  "
                 + " 	event_crf.study_subject_id as studysubjectid, crf_version.status_id AS crfversionstatusid, crf_version.crf_id AS crfid, "
                 + "   event_crf.date_interviewed AS dateinterviewed, event_crf.interviewer_name AS interviewername, event_crf.date_completed AS eventcrfdatecompleted, "
@@ -2285,13 +2287,13 @@ public abstract class EntityDAO implements DAOInterface {
 
             return " SELECT  "
                 + " itemdataid,  itemdataordinal,"
-                + " item_group_metadata.item_group_id , item_group.name, itemdesc, itemname, itemvalue, itemunits, "
+                + " item_group_metadata.item_group_id , item_group.name, itemdatatypeid, itemdesc, itemname, itemvalue, itemunits, "
                 + " crfversioname, crfversionstatusid, crfid, item_group_metadata.repeat_number, "
                 + " dateinterviewed, interviewername, eventcrfdatevalidatecompleted, eventcrfdatecompleted, eventcrfcompletionstatusid, "
                 + " studysubjectid, eventcrfid, itemid, crfversionid, eventcrfstatusid "
                 + " FROM "
                 + " ( "
-                + "   SELECT item_data.item_data_id AS itemdataid, item_data.item_id AS itemid, item_data.value AS itemvalue, item_data.ordinal AS itemdataordinal, item.name AS itemname, item.description AS itemdesc,  "
+                + "   SELECT item_data.item_data_id AS itemdataid, item_data.item_id AS itemid, item_data.value AS itemvalue, item_data.ordinal AS itemdataordinal, item.item_data_type_id AS itemdatatypeid, item.name AS itemname, item.description AS itemdesc,  "
                 + "   item.units AS itemunits, event_crf.event_crf_id AS eventcrfid, crf_version.name AS crfversioname, crf_version.crf_version_id AS crfversionid,  "
                 + "   event_crf.study_subject_id as studysubjectid, crf_version.status_id AS crfversionstatusid, crf_version.crf_id AS crfid, "
                 + "   event_crf.date_interviewed AS dateinterviewed, event_crf.interviewer_name AS interviewername, event_crf.date_completed AS eventcrfdatecompleted, "

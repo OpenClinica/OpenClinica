@@ -626,6 +626,7 @@ public abstract class DataEntryServlet extends SecureController {
 
             // all items- inlcude items in item groups and other single items
             List<DisplayItemWithGroupBean> allItems = section.getDisplayItemGroups();
+            String attachedFilePath = Utils.getAttachedFilePath(currentStudy);
 
             DiscrepancyValidator v = new DiscrepancyValidator(request, discNotes);
             RuleValidator ruleValidator = new RuleValidator(request);
@@ -766,7 +767,7 @@ public abstract class DataEntryServlet extends SecureController {
                 phase2 = Phase.ADMIN_EDITING;
             }
             // this.getItemMetadataService().resetItemCounter();
-            HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid = runRules(allItems, ruleSets, true, shouldRunRules(), MessageType.ERROR, phase2);
+            HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid = runRules(allItems, ruleSets, true, shouldRunRules(), MessageType.ERROR, phase2,ecb);
             System.out.println("first run of rules : " + groupOrdinalPLusItemOid.toString());
             for (int i = 0; i < allItems.size(); i++) {
                 DisplayItemWithGroupBean diwg = allItems.get(i);
@@ -920,7 +921,7 @@ public abstract class DataEntryServlet extends SecureController {
                                 ordinalSet.add(ordinal);
                                 itemOrdinals.put(itemId, ordinalSet);
                             }
-                            if (isChanged(idb, oldItemdata)) {
+                            if (isChanged(displayItem, oldItemdata, attachedFilePath)) {
                                 changedItems.add(itemName);
                                 changedItemsList.add(displayItem);
                                 String formName = displayItem.getItem().getName();
@@ -953,7 +954,7 @@ public abstract class DataEntryServlet extends SecureController {
                     ordinalset.add(1);
                     itemOrdinals.put(itemId, ordinalset);
                     scoreItemdata.put(itemId + "_" + 1, value);
-                    if (isChanged(idb, oldItemdata, dib)) {
+                    if (isChanged(idb, oldItemdata, dib, attachedFilePath)) {
                         changedItems.add(itemName);
                         changedItemsList.add(dib);
                         // changedItemsMap.put(dib.getItem().getName(), new
@@ -969,7 +970,7 @@ public abstract class DataEntryServlet extends SecureController {
                         cordinalset.add(1);
                         itemOrdinals.put(itemId, cordinalset);
                         scoreItemdata.put(cib.getId() + "_" + 1, child.getData().getValue());
-                        if (isChanged(child.getData(), oldItemdata, child)) {
+                        if (isChanged(child.getData(), oldItemdata, child, attachedFilePath)) {
                             changedItems.add(itemName);
                             changedItemsList.add(child);
                             // changedItemsMap.put(itemName, new
@@ -1021,8 +1022,10 @@ public abstract class DataEntryServlet extends SecureController {
                                     value = sc.doCalculation(displayItem, scoreItems, scoreItemdata, itemOrdinals, err, displayItem.getData().getOrdinal());
                                 }
                                 displayItem.loadFormValue(value);
-                                if (isChanged(displayItem.getData(), oldItemdata))
+                                if (isChanged(displayItem, oldItemdata, attachedFilePath)) {
                                     changedItems.add(displayItem.getItem().getName());
+                                    changedItemsList.add(displayItem);
+                                }
 
                                 request.setAttribute(inputName, value);
                                 if (validate) {
@@ -1055,8 +1058,7 @@ public abstract class DataEntryServlet extends SecureController {
                             value = sc.doCalculation(dib, scoreItems, scoreItemdata, itemOrdinals, err, 1);
                         }
                         dib.loadFormValue(value);
-
-                        if (isChanged(dib.getData(), oldItemdata, dib)) {
+                        if (isChanged(dib.getData(), oldItemdata, dib, attachedFilePath)) {
                             changedItems.add(dib.getItem().getName());
                             changedItemsList.add(dib);
                             // changedItemsMap.put(dib.getItem().getName(), new
@@ -1093,7 +1095,7 @@ public abstract class DataEntryServlet extends SecureController {
                                 cvalue = sc.doCalculation(child, scoreItems, scoreItemdata, itemOrdinals, cerr, 1);
                             }
                             child.loadFormValue(cvalue);
-                            if (isChanged(child.getData(), oldItemdata, child)) {
+                            if (isChanged(child.getData(), oldItemdata, child, attachedFilePath)) {
                                 changedItems.add(child.getItem().getName());
                                 changedItemsList.add(child);
                                 // changedItemsMap.put(child.getItem().getName(),
@@ -1399,8 +1401,7 @@ public abstract class DataEntryServlet extends SecureController {
                 logger.debug("all items before saving into DB" + allItems.size());
                 this.output(allItems);
 
-                String attachedFilePath = Utils.getAttachedFilePath(currentStudy);
-
+                
                 for (int i = 0; i < allItems.size(); i++) {
                     DisplayItemWithGroupBean diwb = allItems.get(i);
 
@@ -1527,7 +1528,7 @@ public abstract class DataEntryServlet extends SecureController {
                 }
                 System.out.println("running rules: " + phase2.name());
 
-                HashMap<String, ArrayList<String>> rulesPostDryRun = runRules(allItems, ruleSets, false, shouldRunRules(), MessageType.WARNING, phase2);
+                HashMap<String, ArrayList<String>> rulesPostDryRun = runRules(allItems, ruleSets, false, shouldRunRules(), MessageType.WARNING, phase2,ecb);
                 System.out.println("found rules post dry run: " + rulesPostDryRun.toString());
                 HashMap<String, ArrayList<String>> errorsPostDryRun = new HashMap<String, ArrayList<String>>();
                 // additional step needed, run rules and see if any items are 'shown' AFTER saving data
@@ -1955,9 +1956,11 @@ public abstract class DataEntryServlet extends SecureController {
                     }
                     // }
                 } catch (InconsistentStateException ie) {
+                    ie.printStackTrace();
                     addPageMessage(ie.getOpenClinicaMessage());
                     throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET, ie.getOpenClinicaMessage(), "1");
                 } catch (NullPointerException ne) {
+                    ne.printStackTrace();
                     addPageMessage(ne.getMessage());
                     throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET, ne.getMessage(), "1");
                 }
@@ -2942,8 +2945,9 @@ public abstract class DataEntryServlet extends SecureController {
                 idb = (ItemDataBean) iddao.create(idb);
             } else {
                 idb.setUpdater(ub);
-                logger.trace("string util is blank: update an item data " + idb.getId() + ":" + idb.getValue());
-                logger.trace("update item update_id " + idb.getUpdater().getId());
+                // tbh 5990: should we update the logic here for nonrepeats?
+                // System.out.println("string util is blank: update an item data " + idb.getId() + " :" + idb.getValue());
+                logger.info("update item update_id " + idb.getUpdater().getId());
                 idb = (ItemDataBean) iddao.updateValue(idb);
             }
         } else {
@@ -2962,15 +2966,23 @@ public abstract class DataEntryServlet extends SecureController {
                 idb = (ItemDataBean) iddao.upsert(idb);
                 // <<tbh
             } else if ("edit".equalsIgnoreCase(dib.getEditFlag())) {
-                idb.setUpdater(ub);
-                // tbh>>
-                // idb.setUpdaterId(ub.getId());
-                idb.setUpdatedDate(new Date());
-                // not setting id with just Updater() trying UpdaterId() <<tbh
-                // 08/2008
-                logger.debug("update an item data " + idb.getId() + ":" + idb.getValue());
-                logger.trace("update item update_id " + idb.getUpdater().getId());
-                idb = (ItemDataBean) iddao.updateValue(idb);
+  				idb.setUpdater(ub);
+                
+                // System.out.println("update an item data - running update value " + idb.getId() + " :" + idb.getValue());
+                logger.info("update item update_id " + idb.getUpdater().getId());
+                // update tbh #5999, #5998; if an item_data was not included in 
+                // an import data, it won't exist; we need to check on item_data_id
+                // to make sure we are running the correct command on the db
+                if (idb.getId() != 0) {
+                    idb.setUpdatedDate(new Date());
+                    idb = (ItemDataBean) iddao.updateValue(idb);
+                } else {
+                    idb.setCreatedDate(new Date());
+                    idb.setOrdinal(ordinal);
+                    idb.setOwner(ub);
+                    idb = (ItemDataBean) iddao.upsert(idb);
+                    logger.debug("just ran upsert! " + idb.getId());
+                }
 
             } else if ("remove".equalsIgnoreCase(dib.getEditFlag())) {
                 logger.debug("REMOVE an item data" + idb.getItemId() + idb.getValue());
@@ -4381,15 +4393,38 @@ public abstract class DataEntryServlet extends SecureController {
         }
         return false;
     }
+    
+    protected boolean isChanged(DisplayItemBean dib, HashMap<Integer, String> oldItemdata, String attachedFilePath) {
+        ItemDataBean idb = dib.getData();
+        String value = idb.getValue();
+        // if(value != null && value.length()>0 && dib.getItem().getDataType().getId()==11) {
+        // value = attachedFilePath + value;
+        // }
+        if (!oldItemdata.containsKey(idb.getId()))
+            return true;
+        else {
+            String oldValue = oldItemdata.get(idb.getId());
+            if (oldValue != null) {
+                if (value == null)
+                    return true;
+                else if (dib.getItem().getDataType().getId() == 11) {
+                    String theOldValue = oldValue.split("(/|\\\\)")[oldValue.split("(/|\\\\)").length - 1].trim();
+                    return !value.equals(theOldValue);
+                } else if (!oldValue.equals(value))
+                    return true;
+            } else if (value != null)
+                return true;
+        }
+        return false;
+    }
 
-    protected boolean isChanged(ItemDataBean idb, HashMap<Integer, String> oldItemdata, DisplayItemBean dib) {
+    protected boolean isChanged(ItemDataBean idb, HashMap<Integer, String> oldItemdata, DisplayItemBean dib,String attachedFilePath) {
         if(dib.getMetadata().isConditionalDisplayItem() && !dib.getIsSCDtoBeShown()) {
             return false;
         } else {
-            return isChanged(idb, oldItemdata);
+            return isChanged(dib, oldItemdata, attachedFilePath);
         }
     }
-
     /**
      * Output, just logs all contents of the allItems list. tbh, 01/2010
      *
@@ -4618,7 +4653,7 @@ public abstract class DataEntryServlet extends SecureController {
     }
 
     private HashMap<String, ArrayList<String>> runRules(List<DisplayItemWithGroupBean> allItems, List<RuleSetBean> ruleSets, Boolean dryRun,
-            Boolean shouldRunRules, MessageType mt, Phase phase) {
+            Boolean shouldRunRules, MessageType mt, Phase phase,EventCRFBean ecb) {
         if (shouldRunRules) {
             Container c = new Container();
             try {
@@ -4634,7 +4669,7 @@ public abstract class DataEntryServlet extends SecureController {
             // return getRuleSetService().runRules(ruleSets, dryRun,
             // currentStudy, c.variableAndValue, ub);
             logger.debug("running rules ... rule sets size is " + ruleSets.size());
-            return getRuleSetService().runRulesInDataEntry(ruleSets, dryRun, currentStudy, ub, c.variableAndValue, phase).getByMessageType(mt);
+            return getRuleSetService().runRulesInDataEntry(ruleSets, dryRun, currentStudy, ub, c.variableAndValue, phase,ecb).getByMessageType(mt);
         } else {
             return new HashMap<String, ArrayList<String>>();
         }

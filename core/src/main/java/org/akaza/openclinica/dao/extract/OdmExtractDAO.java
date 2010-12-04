@@ -739,13 +739,13 @@ public class OdmExtractDAO extends DatasetDAO {
         ArrayList<MultiSelectListBean> multiSelectLists = (ArrayList<MultiSelectListBean>) metadata.getMultiSelectLists();
         ArrayList<ElementRefBean> itemGroupRefs = new ArrayList<ElementRefBean>();
         Set<String> igset = new HashSet<String>();
-        Set<String> igdset = new HashSet<String>();
+        HashMap<String,Integer> igdPos = new HashMap<String,Integer>();
         Set<String> itset = new HashSet<String>();
         Set<Integer> itdset = new HashSet<Integer>();
         Set<Integer> clset = new HashSet<Integer>();
         Set<Integer> mslset = new HashSet<Integer>();
+        ItemGroupDefBean igdef = new ItemGroupDefBean();
         HashMap<String, String> igMandatories = new HashMap<String, String>();
-        int cprev = -1;
         boolean isLatest = false;
         int cvprev = -1;
         String igrprev = "";
@@ -804,15 +804,15 @@ public class OdmExtractDAO extends DatasetDAO {
 
             // mandatory is based on the last crf-version
             String igDefKey = igId + "";
-            ItemGroupDefBean igdef = new ItemGroupDefBean();
-            if (igdprev.equals(igDefKey)) {
-                igdef = itemGroupDefs.get(itemGroupDefs.size() - 1);
-            } else {
-                itOrder = 0;
-                if (igdset.contains(igDefKey)) {
+            
+            if (!igdprev.equals(igDefKey)) {
+                if(igdPos.containsKey(igDefKey)) {
+                    igdef = itemGroupDefs.get(igdPos.get(igDefKey));
                     isLatest = false;
+                    itOrder = igdef.getItemRefs().size();
                 } else {
-                    igdset.add(igDefKey);
+                    igdef = new ItemGroupDefBean();
+                    itOrder = 0;
                     igMandatories.put(igdprev, itMandatory);
                     isLatest = true;
                     igdef.setOid(igOID);
@@ -822,6 +822,7 @@ public class OdmExtractDAO extends DatasetDAO {
                     igdef.setComment(igHeader);
                     igdef.setPreSASDatasetName(igName.toUpperCase());
                     itemGroupDefs.add(igdef);
+                    igdPos.put(igDefKey, itemGroupDefs.size()-1);
                 }
                 igdprev = igDefKey;
             }
@@ -847,9 +848,9 @@ public class OdmExtractDAO extends DatasetDAO {
             }
 
             String mandatory = itRequired ? "Yes" : "No";
-            if (!itset.contains(igDefKey + itId)) {
+            if (!itset.contains(igDefKey + "-" + itId)) {
                 ++itOrder;
-                itset.add(igDefKey + itId);
+                itset.add(igDefKey + "-" + itId);
                 ElementRefBean itemRef = new ElementRefBean();
                 itemRef.setElementDefOID(itOID);
                 if (itemRef.getMandatory() == null || itemRef.getMandatory().length() <= 0) {
@@ -1531,7 +1532,9 @@ public class OdmExtractDAO extends DatasetDAO {
                                 } catch (Exception fe) {
                                     logger.info("Item -" + itOID + " value " + itValue + " might not be ODM date format yyyy-MM-dd.");
                                 }
-                            } else if (datatypeid == 10 && odmVersion.contains("1.3")) {
+                            }
+                            /* not be supported in openclinica-3.0.40.1 
+                            else if (datatypeid == 10 && odmVersion.contains("1.3")) {
                                 if (StringUtil.isFormatDate(itValue, oc_df_string)) {
                                     try {
                                         itValue = new SimpleDateFormat("yyyy-MM-dd").format(new SimpleDateFormat(oc_df_string).parse(itValue));
@@ -1554,6 +1557,7 @@ public class OdmExtractDAO extends DatasetDAO {
                                     }
                                 }
                             }
+                            */
                             it.setValue(itValue);
                         }
                         if (muOid != null && muOid.length() > 0) {

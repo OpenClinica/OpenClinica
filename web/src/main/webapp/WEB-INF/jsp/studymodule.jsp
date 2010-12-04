@@ -183,8 +183,8 @@
             <c:url var="updateStudy" value="/UpdateStudyNew?id=${studyId}"/>
             <c:url var="viewStudy" value="/ViewStudy?id=${studyId}&viewFull=yes"/>
             <td>
-                <a href="${viewStudy}"><img src="../images/bt_Details.gif" border="0"/></a>
-                <a href="${updateStudy}"><img src="../images/bt_Edit.gif" border="0"/></a>
+                <a href="${viewStudy}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
+                <a href="${updateStudy}"><img src="../images/bt_Edit.gif" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>"/></a>
             </td>
         </tr>
         <tr>
@@ -224,17 +224,17 @@
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.crf == 1}">
-                        <a href="${crfCreateUrl}"><img src="../images/create_new.gif" border="0"/></a>
+                        <a href="${crfCreateUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                     </c:when>
                     <c:when test="${studyModuleStatus.crf == 2}">
-                        <a href="${crfListUrl}"><img src="../images/bt_Details.gif" border="0"/></a>
-                        <a href="${crfCreateUrl}"><img src="../images/create_new.gif" border="0"/></a>
+                        <a href="${crfListUrl}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
+                        <a href="${crfCreateUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${crfListUrl}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
                         
                     </c:when>
                     <c:otherwise>
-                        <a href="${crfListUrl}"><img src="../images/bt_Details.gif" border="0"/></a>
-                        <a href="${crfCreateUrl}"><img src="../images/create_new.gif" border="0"/></a>
+                        <a href="${crfListUrl}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
+                        <a href="${crfCreateUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${crfListUrl}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
                         
                     </c:otherwise>
@@ -279,17 +279,17 @@
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.eventDefinition == 1}">
-                        <a href="${eventUrl}"><img src="../images/create_new.gif" border="0"/></a>
+                        <a href="${eventUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                     </c:when>
                     <c:when test="${studyModuleStatus.eventDefinition == 2}">
-                        <a href="${edListUrl}"><img src="../images/bt_Details.gif" border="0"/></a>
-                        <a href="${eventUrl}"><img src="../images/create_new.gif" border="0"/></a>
+                        <a href="${edListUrl}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
+                        <a href="${eventUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${edListUrl}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
                         
                     </c:when>
                     <c:otherwise>
-                        <a href="${edListUrl}"><img src="../images/bt_Details.gif" border="0"/></a>
-                        <a href="${eventUrl}"><img src="../images/create_new.gif" border="0"/></a>
+                        <a href="${edListUrl}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
+                        <a href="${eventUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${edListUrl}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
                         
                     </c:otherwise>
@@ -334,17 +334,17 @@
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.subjectGroup == 1}">
-                        <a href="${createSubGroupUrl}"><img src="../images/create_new.gif" border="0"/></a>
+                        <a href="${createSubGroupUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                     </c:when>
                     <c:when test="${studyModuleStatus.subjectGroup == 2}">
-                        <a href="${listSubGroupUrl}"><img src="../images/bt_Details.gif" border="0"/></a>
-                        <a href="${createSubGroupUrl}"><img src="../images/create_new.gif" border="0"/></a>
+                        <a href="${listSubGroupUrl}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
+                        <a href="${createSubGroupUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${listSubGroupUrl}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
                         
                     </c:when>
                     <c:otherwise>
-                        <a href="${listSubGroupUrl}"><img src="../images/bt_Details.gif" border="0"/></a>
-                        <a href="${createSubGroupUrl}"><img src="../images/create_new.gif" border="0"/></a>
+                        <a href="${listSubGroupUrl}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
+                        <a href="${createSubGroupUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${listSubGroupUrl}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
                         
                     </c:otherwise>
@@ -387,17 +387,17 @@
 
                 <c:choose>
                     <c:when test="${studyModuleStatus.rule == 1}">
-                        <a href="${createRule}"><img src="../images/create_new.gif" border="0"/></a>
+                        <a href="${createRule}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                     </c:when>
                     <c:when test="${studyModuleStatus.rule == 2}">
-                        <a href="${viewRule}"><img src="../images/bt_Details.gif" border="0"/></a>
-                        <a href="${createRule}"><img src="../images/create_new.gif" border="0"/></a>
+                        <a href="${viewRule}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
+                        <a href="${createRule}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${viewRule}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
                         
                     </c:when>
                     <c:otherwise>
-                        <a href="${viewRule}"><img src="../images/bt_Details.gif" border="0"/></a>
-                        <a href="${createRule}"><img src="../images/create_new.gif" border="0"/></a>
+                        <a href="${viewRule}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
+                        <a href="${createRule}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${viewRule}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
                  
                     </c:otherwise>
@@ -455,17 +455,17 @@
 
                 <c:choose>
                     <c:when test="${studyModuleStatus.site == 1}">
-                        <a href="${subGroupUrl}"><img src="../images/create_new.gif" border="0"/></a>
+                        <a href="${subGroupUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                     </c:when>
                     <c:when test="${studyModuleStatus.site == 2}">
-                        <a href="${siteList}"><img src="../images/bt_Details.gif" border="0"/></a>
-                        <a href="${subGroupUrl}"><img src="../images/create_new.gif" border="0"/></a>
+                        <a href="${siteList}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
+                        <a href="${subGroupUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${siteList}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
                         
                     </c:when>
                     <c:otherwise>
-                        <a href="${siteList}"><img src="../images/bt_Details.gif" border="0"/></a>
-                        <a href="${subGroupUrl}"><img src="../images/create_new.gif" border="0"/></a>
+                        <a href="${siteList}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
+                        <a href="${subGroupUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${siteList}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
                         
                     </c:otherwise>
@@ -528,17 +528,17 @@
                 <c:url var="listStudyUser" value="/ListStudyUser"/>
                 <c:choose>
                     <c:when test="${studyModuleStatus.users == 1}">
-                        <a href="${assignUrl}"><img src="../images/create_new.gif" border="0"/></a>
+                        <a href="${assignUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                     </c:when>
                     <c:when test="${studyModuleStatus.users == 2}">
-                        <a href="${listStudyUser}"><img src="../images/bt_Details.gif" border="0"/></a>
-                        <a href="${assignUrl}"><img src="../images/create_new.gif" border="0"/></a>
+                        <a href="${listStudyUser}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
+                        <a href="${assignUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${listStudyUser}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
                         
                     </c:when>
                     <c:otherwise>
-                        <a href="${listStudyUser}"><img src="../images/bt_Details.gif" border="0"/></a>
-                        <a href="${assignUrl}"><img src="../images/create_new.gif" border="0"/></a>
+                        <a href="${listStudyUser}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
+                        <a href="${assignUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${listStudyUser}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
                         
                     </c:otherwise>

@@ -68,7 +68,7 @@ public interface RuleSetServiceInterface {
     public abstract List<RuleSetBasedViewContainer> runRulesInBulk(List<RuleSetBean> ruleSets, Boolean dryRun, StudyBean currentStudy, UserAccountBean ub);
 
     public abstract MessageContainer runRulesInDataEntry(List<RuleSetBean> ruleSets, Boolean dryRun, StudyBean currentStudy, UserAccountBean ub,
-            HashMap<String, String> variableAndValue, Phase phase);
+            HashMap<String, String> variableAndValue, Phase phase,EventCRFBean ecb);
 
     public abstract List<RuleSetBean> getRuleSetsByCrfStudyAndStudyEventDefinition(StudyBean study, StudyEventDefinitionBean sed, CRFVersionBean crfVersion);
 

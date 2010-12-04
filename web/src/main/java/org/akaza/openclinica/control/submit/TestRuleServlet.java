@@ -55,8 +55,7 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * Verify the Rule import , show records that have Errors as well as records
- * that will be saved.
+ * Verify the Rule import , show records that have Errors as well as records that will be saved.
  * 
  * @author Krikor krumlian
  */
@@ -89,14 +88,21 @@ public class TestRuleServlet extends SecureController {
 
     void populteFormFields(FormProcessor fp) {
 
-        if (session.getAttribute("testRulesTarget") != null && !fp.getString(TARGET).equals(session.getAttribute("testRulesTarget"))) {
-            putDummyActionInSession();
-            session.removeAttribute("testRulesTarget");
+        String targetForm = fp.getString(TARGET).trim().replaceAll("(\n|\t|\r)", "");
+        String testRulesTarget = (String) session.getAttribute("testRulesTarget");
+        if (testRulesTarget != null) {
+            // above added to avoid NPEs, tbh #6012
+            String targetSess = testRulesTarget.trim().replaceAll("(\n|\t|\r)", "");
+            if (!targetForm.equals(targetSess)) {
+                putDummyActionInSession();
+                session.removeAttribute("testRulesTarget");
+            }
         }
         String textFields[] = { TARGET, RULE, RULE_SET_RULE_ID };
         fp.setCurrentStringValuesAsPreset(textFields);
         HashMap presetValues = fp.getPresetValues();
         setPresetValues(presetValues);
+
     }
 
     @Override
@@ -120,6 +126,7 @@ public class TestRuleServlet extends SecureController {
                 setPresetValues(presetValues);
                 session.setAttribute("testRuleActions", rsr.getActions());
                 session.setAttribute("testRulesTarget", rsr.getRuleSetBean().getTarget().getValue());
+                System.out.println("trying to set: " + rsr.getRuleSetBean().getTarget().getValue());
                 request.setAttribute("ruleSetRuleId", ruleSetRuleId);
                 request.setAttribute("ruleSetId", rsr.getRuleSetBean().getId());
                 ItemBean item = getExpressionService().getItemBeanFromExpression(rsr.getRuleSetBean().getTarget().getValue());
@@ -172,8 +179,8 @@ public class TestRuleServlet extends SecureController {
                 }
                 request.setAttribute("ruleValidation", result.get("ruleValidation"));
                 request.setAttribute("validate", "on");
-                request.setAttribute("ruleEvaluatesTo", resword.getString("test_rules_rule_fail_invalid_data_type") + " "
-                    + resword.getString("test_rules_rule_fail_invalid_data_type_desc"));
+                request.setAttribute("ruleEvaluatesTo",
+                        resword.getString("test_rules_rule_fail_invalid_data_type") + " " + resword.getString("test_rules_rule_fail_invalid_data_type_desc"));
                 request.setAttribute("ruleValidationFailMessage", result.get("ruleValidationFailMessage"));
                 request.setAttribute("action", "test");
 
@@ -261,7 +268,7 @@ public class TestRuleServlet extends SecureController {
         String targetString = fp.getString("target");
         String ruleString = fp.getString("rule");
         ruleString = ruleString.trim().replaceAll("(\n|\t|\r)", " ");
-        targetString = targetString.trim().replaceAll("(\n|\t|\r)", " ");
+        targetString = targetString.trim().replaceAll("(\n|\t|\r)", "");
 
         HashMap<String, String> p =
             session.getAttribute("testValues") != null ? (HashMap<String, String>) session.getAttribute("testValues") : new HashMap<String, String>();
