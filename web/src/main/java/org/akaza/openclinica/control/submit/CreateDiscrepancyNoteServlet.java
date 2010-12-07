@@ -7,6 +7,7 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,6 +33,7 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
+import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -49,6 +51,7 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
+import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
@@ -220,6 +223,94 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
         if ("itemData".equalsIgnoreCase(entityType) && enteringData) {
             request.setAttribute("enterItemData", "yes");
         }
+        
+        DateFormat dateFormatter = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
+        if (!StringUtil.isBlank(entityType)) {
+            if ("itemData".equalsIgnoreCase(entityType)||"itemdata".equalsIgnoreCase(entityType)) {
+                ItemBean item = (ItemBean) new ItemDAO(sm.getDataSource()).findByPK(itemId);
+                ItemDataBean itemData = (ItemDataBean) new ItemDataDAO(sm.getDataSource()).findByPK(entityId);
+                request.setAttribute("entityValue", itemData.getValue());
+                request.setAttribute("entityName", item.getName());
+            } else if ("studySub".equalsIgnoreCase(entityType)) {
+                StudySubjectBean ssub = (StudySubjectBean) new StudySubjectDAO(sm.getDataSource()).findByPK(entityId);
+                SubjectBean sub = (SubjectBean)new SubjectDAO(sm.getDataSource()).findByPK(ssub.getSubjectId());
+                if (!StringUtil.isBlank(column)) {
+                    if ("enrollment_date".equalsIgnoreCase(column)) {
+                        if (ssub.getEnrollmentDate() != null) {
+                            request.setAttribute("entityValue", dateFormatter.format(ssub.getEnrollmentDate()));
+                        }
+                        request.setAttribute("entityName", resword.getString("enrollment_date"));
+                    } else if ("gender".equalsIgnoreCase(column)) {
+                        request.setAttribute("entityValue", sub.getGender() + "");
+                        request.setAttribute("entityName", resword.getString("gender"));
+                    } else if ("date_of_birth".equalsIgnoreCase(column)) {
+                        if (sub.getDateOfBirth() != null) {
+                            request.setAttribute("entityValue", dateFormatter.format(sub.getDateOfBirth()));
+                        }
+                        request.setAttribute("entityName", resword.getString("date_of_birth"));
+                    } else if ("unique_identifier".equalsIgnoreCase(column)) {
+                        if (sub.getUniqueIdentifier() != null) {
+                            request.setAttribute("entityValue", sub.getUniqueIdentifier());
+                        }
+                        request.setAttribute("entityName", resword.getString("unique_identifier"));
+                    }
+                }
+            } else if ("subject".equalsIgnoreCase(entityType)) {
+                SubjectBean sub = (SubjectBean) new SubjectDAO(sm.getDataSource()).findByPK(entityId);
+                if (!StringUtil.isBlank(column)) {
+                    if ("gender".equalsIgnoreCase(column)) {
+                        request.setAttribute("entityValue", sub.getGender() + "");
+                        request.setAttribute("entityName", resword.getString("gender"));
+                    } else if ("date_of_birth".equalsIgnoreCase(column)) {
+                        if (sub.getDateOfBirth() != null) {
+                            request.setAttribute("entityValue", dateFormatter.format(sub.getDateOfBirth()));
+                        }
+                        request.setAttribute("entityName", resword.getString("date_of_birth"));
+                    } else if ("unique_identifier".equalsIgnoreCase(column)) {
+                        request.setAttribute("entityValue", sub.getUniqueIdentifier());
+                        request.setAttribute("entityName", resword.getString("unique_identifier"));
+                    }
+                }
+            } else if ("studyEvent".equalsIgnoreCase(entityType)) {
+                StudyEventBean se = (StudyEventBean)new StudyEventDAO(sm.getDataSource()).findByPK(entityId);
+                if (!StringUtil.isBlank(column)) {
+                    if ("location".equalsIgnoreCase(column)) {
+                        request.setAttribute("entityValue", se.getLocation());
+                        request.setAttribute("entityName", resword.getString("location"));
+                    } else if ("date_start".equalsIgnoreCase(column)) {
+                        if (se.getDateStarted() != null) {
+                            request.setAttribute("entityValue", dateFormatter.format(se.getDateStarted()));
+                        }
+                        request.setAttribute("entityName", resword.getString("start_date"));
+                    } else if ("date_end".equalsIgnoreCase(column)) {
+                        if (se.getDateEnded() != null) {
+                            request.setAttribute("entityValue", dateFormatter.format(se.getDateEnded()));
+                        }
+                        request.setAttribute("entityName", resword.getString("end_date"));
+                    }
+                }
+            } else if ("eventCrf".equalsIgnoreCase(entityType)) {
+                EventCRFBean ec = (EventCRFBean) new EventCRFDAO(sm.getDataSource()).findByPK(entityId);
+                if (!StringUtil.isBlank(column)) {
+                    if ("date_interviewed".equals(column)) {
+                        if (ec.getDateInterviewed() != null) {
+                            request.setAttribute("entityValue", dateFormatter.format(ec.getDateInterviewed()));
+                        }
+                        request.setAttribute("entityName", resword.getString("date_interviewed"));
+                    } else if ("interviewer_name".equals(column)) {
+                        request.setAttribute("entityValue", ec.getInterviewerName());
+                        request.setAttribute("entityName", resword.getString("interviewer_name"));
+                    }
+                }
+            }
+
+        }
+        
+        
+        
+        
+        
+        
 
         // finds all the related notes
         ArrayList notes = (ArrayList) dndao.findAllByEntityAndColumn(entityType, entityId, column);
@@ -294,8 +385,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                 dnb.setStudySub(ssub);
             }
             if (itemId > 0) {
-                ItemDAO idao = new ItemDAO(sm.getDataSource());
-                ItemBean item = (ItemBean) idao.findByPK(itemId);
+                ItemBean item = (ItemBean) new ItemDAO(sm.getDataSource()).findByPK(itemId);
                 dnb.setEntityName(item.getName());
                 request.setAttribute("item", item);
             }

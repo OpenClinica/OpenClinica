@@ -180,7 +180,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
         }
         
         HashMap<Integer, DiscrepancyNoteBean> boxDNMap = (HashMap<Integer, DiscrepancyNoteBean>)session.getAttribute(BOX_DN_MAP);
-        if(boxDNMap==null) {
+        if(boxDNMap==null || !boxDNMap.containsKey(0)) {
             boxDNMap = new HashMap<Integer, DiscrepancyNoteBean>();
             //initialize dn for a new thread
             DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
@@ -245,6 +245,12 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
                 // }
             }
             boxDNMap.put(0, dnb);
+        }
+        if(boxDNMap.containsKey(0)) {
+            int dnTypeId0 = boxDNMap.get(0).getDiscrepancyNoteTypeId();
+            if(dnTypeId0==2||dnTypeId0==4) {
+                request.setAttribute("typeID0", dnTypeId0+"");
+            }
         }
         
         DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(sm.getDataSource());
