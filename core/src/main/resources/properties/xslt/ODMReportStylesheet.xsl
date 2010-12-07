@@ -47,7 +47,8 @@
 		<xsl:variable name="now" select="current-dateTime()"/>
 		<!-- <xsl:for-each select="/odm:ODM/odm:Study"> -->
 		<!-- *********** study start ***************  -->
-		<xsl:variable name="formNameNVersionSeparator" select="'-'"/>
+		<!-- 10/15/2010 Corrected the separator between parent CRF name and its version name from '-' to ' - ' -->
+		<xsl:variable name="formNameNVersionSeparator" select="' - '"/>
 		<xsl:variable name="FileOID" select="/odm:ODM/@FileOID"/>
 		<xsl:variable name="Study" select="/odm:ODM/odm:Study[1]"/>
 		<xsl:variable name="studyOID" select="$Study/@OID"/>
@@ -190,8 +191,15 @@
 			<xsl:variable name="formVersionName" select="@Name"/>
 			<!-- ******** formVersionName <xsl:value-of select="normalize-space($formVersionName)"></xsl:value-of> ******** -->
 			<!-- calculate the parent CRF OID until parent CRF OID is dumped into this xml by OC team -->
-			<xsl:variable name="pFormNameFromVersion" select="substring-before($formVersionName,$formNameNVersionSeparator)">
-			</xsl:variable>
+			<!-- 10/15/2010 Corrected the fetching of parent CRF name to be the string before last occurence of ' - ' in the value of 'Name' attribute of 'FormDef' element name -->
+			<!--<xsl:variable name="pFormNameFromVersion" select="substring-before($formVersionName,$formNameNVersionSeparator)">
+			</xsl:variable>-->
+			<xsl:variable name="pFormNameFromVersion">
+				<xsl:call-template name="get-substring-before-last-occurance">
+					<xsl:with-param name="text" select="$formVersionName"/>
+					<xsl:with-param name="token" select="$formNameNVersionSeparator" />
+				</xsl:call-template>
+			</xsl:variable> 
 			<xsl:variable name="formVersion" select="substring-after($formVersionName,$formNameNVersionSeparator)"/>
 			<!--	<xsl:variable name="prevFormDefName" select="preceding-sibling::FormDef[1]/@Name" />-->
 			<xsl:variable name="positionIndex">
@@ -882,6 +890,24 @@
 	<xsl:template name="create-schema_for_study">
 		<xsl:param name="schema-name"/>
 			CREATE SCHEMA <xsl:value-of select="$schema-name"/>;
+			
+			CREATE OR REPLACE FUNCTION public.create_plpgsql_language ()
+			RETURNS TEXT
+			AS $$
+            CREATE LANGUAGE plpgsql;
+            SELECT 'language plpgsql created'::TEXT;
+			$$
+			LANGUAGE 'sql';
+			
+			SELECT CASE WHEN
+            (SELECT true::BOOLEAN FROM pg_language WHERE lanname='plpgsql')
+            THEN
+            (SELECT 'language already installed'::TEXT)
+            ELSE
+            (SELECT public.create_plpgsql_language())
+            END;
+            
+			DROP FUNCTION public.create_plpgsql_language ();
 			
 			create or replace function <xsl:value-of select="$schema-name"/>.add_table_field (p_table text, p_field text, p_datatype text) 
 			returns bool as '
@@ -2171,7 +2197,7 @@
 		<xsl:param name="colName"/>
 		<xsl:param name="colDataType"/>
 		<!-- @ccollins 5/11/10 added special add column function that checks for existing column of same name before adding; as a (temporary?) fix to duplicates bug -->
-			SELECT <xsl:value-of select="$schemaName"/>.add_table_field('<xsl:value-of select="normalize-space($tableName)"/>', '<xsl:value-of select="$colName"/>', '<xsl:value-of select="$colDataType"/>');
+			SELECT <xsl:value-of select="$schemaName"/>.add_table_field('<xsl:value-of select="normalize-space($tableName)"/>', '<xsl:value-of select="normalize-space($colName)"/>', '<xsl:value-of select="normalize-space($colDataType)"/>');
 <!-- old code:
 			Alter table <xsl:value-of select="normalize-space($tableName)"/> add column								  
 			<xsl:value-of select="$colName"/><xsl:text> </xsl:text> <xsl:value-of select="$colDataType"/>;
@@ -2960,7 +2986,7 @@
 			<xsl:text> boolean</xsl:text> default false;');
 			-->
 			<!-- new code start -->
-			SELECT <xsl:value-of select="$schemaName"/>.add_table_field('<xsl:value-of select="$tableName"/>', '<!--<xsl:value-of select="$itemOID"/>--><xsl:value-of select="$itemName"/>
+			SELECT <xsl:value-of select="$schemaName"/>.add_table_field('<xsl:value-of select="normalize-space($tableName)"/>', '<!--<xsl:value-of select="$itemOID"/>--><xsl:value-of select="normalize-space($itemName)"/>
 			<xsl:text>_</xsl:text>
 			<xsl:call-template name="escape-special-sql-chars">
 				<xsl:with-param name="dataValue" select="$label"/>
