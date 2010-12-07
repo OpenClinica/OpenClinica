@@ -14,6 +14,7 @@
 <jsp:useBean id="viewDNLink" scope="request" class="java.lang.String"/>
 <jsp:useBean id="boxDNMap" scope="session" class="java.util.HashMap"/>
 <jsp:useBean id="closeWindow" scope="session" class="java.lang.String"/>
+<jsp:useBean id="typeID0" scope="request" class="java.lang.String"/>
 
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 <html>
@@ -35,7 +36,7 @@
     </style>
 
 </head>
-<body class="popup_BG" style="margin: 0px 12px 0px 12px;" onload="javascript:window.timeOutWindow('<c:out value="${closeWindow}"/>',3000);">
+<body class="popup_BG" style="margin: 0px 12px 0px 12px;" onload="javascript:window.timeOutWindow('<c:out value="${closeWindow}"/>',3000);javascript:setStatusWithId('<c:out value="${typeID0}"/>','0');">
 
 
 <!-- Alert Box -->

@@ -80,8 +80,8 @@ function hide(strLeftNavRowElementName){
 	        }
 	    }
 	    
-function setElements(typeId, user1, user2) {
-	setStatus(typeId);
+function setElements(typeId, user1, user2, id) {
+	setStatusWithId(typeId,id);
 	if(typeId == 3) {//query
 		leftnavExpand(user1);
 		leftnavExpand(user2);	
@@ -101,6 +101,25 @@ function setValue(elementName, value) {
 function timeOutWindow(close,duration) {
 	if(close == 'true') {
 		window.setTimeout('window.close()', duration);	
+	}
+}
+
+function setStatusWithId(typeId, id) {
+	objtr1=document.getElementById('res1'+id);
+	objtr2=document.getElementById('resStatusId'+id);
+	if (typeId == 2|| typeId ==4) {//annotation or reason for change
+	  	objtr2.value=5;
+	  	objtr2.disabled = true;
+	} else if (typeId == 3) { //query
+		objtr2.value=1; //new
+		objtr2.disabled = false;
+	} else {
+  		if (objtr2.value ==5 && objtr2.disabled) {
+   			objtr2.value=1;
+  		}
+
+  		objtr2.disabled = false;
+
 	}
 }
 //-->
@@ -131,9 +150,9 @@ function timeOutWindow(close,duration) {
 	<td valign="top">
 	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 	<div class="textbox_center">
-	<table border="0">
+	<table border="0" width="580">
 		<div style="float: right;">
-			<p><a href="#" onclick="javascript:leftnavExpand('<c:out value="${boxId}"/>');"><img name="close_box" alt="close_box" src="images/bt_Remove.gif"></a></p>
+			<p><a href="#" onclick="javascript:leftnavExpand('<c:out value="${boxId}"/>');"><img name="close_box" alt="close_box" src="images/bt_Remove.gif" style="width:18px"></a></p>
 		</div>
 		<tr valign="top">
 		<td class="table_cell_noborder"><fmt:message key="description" bundle="${resword}"/>:</td>
@@ -141,10 +160,11 @@ function timeOutWindow(close,duration) {
 		<div class="formfieldL_BG"><input type="text" name="description${parentId}" value="<c:out value="${discrepancyNote.description}"/>" class="formfieldL"></div>
 		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="description${parentId}"/></jsp:include>
 		</td>
+		
 		<td class="table_cell_noborder">
 		<table>
 			<td  class="table_cell_noborder"><fmt:message key="type" bundle="${resword}"/>:</td>
-			<td class="table_cell_noborder"><div class="formfieldL_BG">
+			<td class="table_cell_noborder" width="60%"><div class="formfieldL_BG">
 			<c:choose>
 			<c:when test="${parentId > 0}">
 				<input type="hidden" name="typeId${parentId}" value="${param.typeId}"/>
@@ -156,7 +176,7 @@ function timeOutWindow(close,duration) {
 				<c:set var="typeId1" value="${discrepancyNote.discrepancyNoteTypeId}"/>
 				<c:choose>
 				<c:when test="${whichResStatus == 2}">
-					<select name="typeId${parentId}" id="typeId${parentId}" class="formfieldL" onchange ="javascript:setElements(this.options[selectedIndex].value, 'user1', 'user2');">
+					<select name="typeId${parentId}" id="typeId${parentId}" class="formfieldL" onchange ="javascript:setElements(this.options[selectedIndex].value, 'user1', 'user2','<c:out value="${parentId}"/>');">
 						<c:forEach var="type" items="${discrepancyTypes2}">
 						<c:choose>
 						<c:when test="${typeId1 == type.id}">
@@ -184,7 +204,7 @@ function timeOutWindow(close,duration) {
 					</select>
 				</c:when>
 				<c:otherwise>
-					<select name="typeId${parentId}" id="typeId${parentId}" class="formfieldL" onchange ="javascript:setElements(this.options[selectedIndex].value, 'user1', 'user2');">
+					<select name="typeId${parentId}" id="typeId${parentId}" class="formfieldL" onchange ="javascript:setElements(this.options[selectedIndex].value, 'user1', 'user2', '<c:out value="${parentId}"/>');">
 						<c:forEach var="type" items="${discrepancyTypes}">
 						<c:choose>
 						<c:when test="${typeId1 == type.id}">
@@ -231,7 +251,7 @@ function timeOutWindow(close,duration) {
 		
 		<td class="table_cell_noborder">
 		<table border="0" cellpadding="0" cellspacing="0">
-		<tr valign="top" id="res1">
+		<tr valign="top" id="res1${parentId}">
 		    <td  class="table_cell_noborder"><fmt:message key="resolution_status" bundle="${resword}"/>:</td>
 		    <td class="table_cell_noborder"><div class="formfieldL_BG">
 			<c:set var="resStatusId1" value="${discrepancyNote.resolutionStatusId}"/>
@@ -247,10 +267,11 @@ function timeOutWindow(close,duration) {
 				<c:forEach var="status" items="${resStatuses}">
 					<c:choose>
 					<c:when test="${resStatusId1 == status.id}">
-					   <option value="<c:out value="${status.id}"/>" selected ><c:out value="${status.name}"/>
+						
+						   <option value="<c:out value="${status.id}"/>" selected ><c:out value="${status.name}"/>
 					</c:when>
 					<c:otherwise>
-					   <option value="<c:out value="${status.id}"/>" ><c:out value="${status.name}"/>
+							<option value="<c:out value="${status.id}"/>" ><c:out value="${status.name}"/>
 					</c:otherwise>
 					</c:choose>
 				</c:forEach>
@@ -315,8 +336,8 @@ function timeOutWindow(close,duration) {
 		<tr>
 		<c:set var= "noteEntityType" value="${discrepancyNote.entityType}"/>
 		<c:if test="${enterData == '1' || canMonitor == '1' || noteEntityType != 'itemData' }">
-			<td><input type="submit" name="Submit${parentId}" value="Submit" class="button_medium" style="width:80px"></td>
-			<td><input type="submit" name="SubmitExit${parentId}" value="Submit & Exit" class="button_medium" style="width:90px" onclick="javascript:setValue('close<c:out value="${parentId}"/>','true');"></td>
+			<td><input type="submit" name="Submit${parentId}" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" style="width:70px"></td>
+			<td><input type="submit" name="SubmitExit${parentId}" value="<fmt:message key="submit_exit" bundle="${resword}"/>" class="button_medium" style="width:80px" onclick="javascript:setValue('close<c:out value="${parentId}"/>','true');"></td>
 		</c:if>
 		</tr>
 		

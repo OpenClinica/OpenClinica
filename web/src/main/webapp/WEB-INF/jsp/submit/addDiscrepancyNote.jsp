@@ -61,9 +61,7 @@
 
 <script language="JavaScript">
 <!--
-
 function setStatus(typeId) {
-
 	objtr1=document.getElementById('res1');
 	objtr2=document.getElementById('resStatusId');
 	if (typeId == 2|| typeId ==4) {//annotation or reason for change
@@ -106,21 +104,30 @@ function setResStatus(resStatusId, destinationUserId) {
 }
 
 
+function setElements(typeId, user1, user2) {
+	setStatus(typeId);
+	if(typeId == 3) {//query
+		leftnavExpand(user1);
+		leftnavExpand(user2);	
+	}else {
+		hide(user1);
+		hide(user2);
+	}
+}
 //-->
 </script>
 </head>
 <body class="popup_BG" onload="javascript:setStatus(<c:out value="${discrepancyNote.discrepancyNoteTypeId}"/>);">
 <%-- needs to run at first to possibly gray out the drop down, tbh 02/2010--%>
 <div style="float: left;"><h1 class="title_manage"><fmt:message key="add_discrepancy_note" bundle="${resword}"/></h1></div>
-<div style="float: right;"><p><a href="#" onclick="javascript:window.close();"><fmt:message key="close_window" bundle="${resword}"/></a></p></div>
+<div style="float: right;"><p><a href="#" onclick="javascript:window.close();"><img name="close_window" alt="close_window" src="images/bt_Remove.gif" style="width:18px"></a></a></p></div>
 <br clear="all">
 <div class="alert">
 <c:forEach var="message" items="${pageMessages}">
  <c:out value="${message}" escapeXml="false"/>
 </c:forEach>
 
-</div>
-                   
+</div>         
 <form name="noteForm" method="POST" action="CreateDiscrepancyNote">
 <jsp:include page="../include/showSubmitted.jsp" />
 <input type="hidden" name="name" value="<c:out value="${discrepancyNote.entityType}"/>">
@@ -141,313 +148,271 @@ function setResStatus(resStatusId, destinationUserId) {
 </td>
 </tr>
 </table>
-  <tr>
-<table border="0" cellpadding="0" cellspacing="0" style="float:left;">
-        <td valign="top">
-  <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-
-                <div class="textbox_center">
-<table border="0" cellpadding="0" cellspacing="0">
-                        <tbody><tr>
-                            <td class="table_cell_noborder" style="color: rgb(120, 158, 197);"><b>Subject:&nbsp;&nbsp;</b></td>
-                            <td class="table_cell_noborder" style="color: rgb(120, 158, 197);"><c:out value="${discrepancyNote.subjectName}" /></td>
-                            <td class="table_cell_noborder" style="color: rgb(120, 158, 197); padding-left: 40px;"><b>Event:&nbsp;&nbsp;</b></td>
-                            <td class="table_cell_noborder" style="color: rgb(120, 158, 197);">
-                                
-                                    
-                                        <c:out value="${discrepancyNote.eventName}"/>
-                                    
-                                    
-                                
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="table_cell_noborder" style="color: rgb(120, 158, 197);"><b>Event Date:&nbsp;&nbsp;</b></td>
-                            <td class="table_cell_noborder" style="color: rgb(120, 158, 197);">
-                                
-                                    <fmt:formatDate value="${discrepancyNote.eventStart}" pattern="${dteFormat}"/>
-                                    
-                                    
-                                
-                            </td>
-                            <td class="table_cell_noborder" style="color: rgb(120, 158, 197); padding-left: 40px;"><b>CRF:&nbsp;&nbsp;</b></td>
-                            <td class="table_cell_noborder" style="color: rgb(120, 158, 197);">
-                                
-                                    
-                                       <c:out value="${discrepancyNote.crfName}"/>
-                                    
-                                    
-                                
-                            </td>
-                        </tr>
-                    </tbody></table>
-  </div>
-
-            </div></div></div></div></div></div></div>
+           
             
-	            
-   <table border="0">
-   <tr valign="top">
-   <td>
-   <br/>
-   </td>
-   </tr><div class="textbox_center">
-        <tr valign="top">
-            <td  class="table_cell_noborder" style="color: rgb(120, 158, 197);"><fmt:message key="entity_type_field" bundle="${resword}"/></td>
-            <td class="table_cell_noborder"><c:out value="${discrepancyNote.entityType}"/>/<c:out value="${discrepancyNote.column}"/>
-             </td>
-        </tr>
-        <c:if test="${discrepancyNote.entityType == 'itemData'}">
-            <tr valign="top">
-            <td  class="table_cell_noborder" style="color: rgb(120, 158, 197);"><fmt:message key="item_name" bundle="${resword}"/></td>
-            <td class="table_cell_noborder"><a href="javascript: openDocWindow('ViewItemDetail?itemId=<c:out value="${item.id}"/>')"><c:out value="${item.name}"/></a></td>
-            </tr>
-         </c:if>
-
-       <tr valign="top">
-            <td  class="table_cell_noborder" style="color: rgb(120, 158, 197);"><fmt:message key="discrepancy_thread_id" bundle="${resword}"/></td>
-            <td>
-            <c:out value="${parent.id}"/>
-            </td>
-        </tr>
-        <tr valign="top">
-           <td  class="table_cell_noborder" style="color: rgb(120, 158, 197);"><fmt:message key="type" bundle="${resword}"/></td>
-           <td class="table_cell_noborder">
-            <c:set var="typeId1" value="${discrepancyNote.discrepancyNoteTypeId}"/>
-               <c:choose>
-                 <c:when test="${parent == null || parent.id ==0 }">
-                    <c:forEach var="type" items="${discrepancyTypes}">
-                        <c:choose>
-                			 <c:when test="${typeId1 == type.id}">
-                			 <%-- need to create a special case for Queries, tbh --%>
-			                  <c:choose>
-			                    <c:when test="${type.id == 3}">
-				                   <input type="radio" name="typeId" id="typeId" value="<c:out value="${type.id}"/>" checked  onclick ="javascript:setStatus(<c:out value="${type.id}"/>);javascript:leftnavExpand('user1');javascript:leftnavExpand('user2');"><c:out value="${type.name}"/><br>
-			                    </c:when>
-			                    <c:otherwise>
-                                    <c:choose>
-                                    <c:when test="${study.status.frozen && (type.id==2 || type.id==4)}">
-				                        <input type="radio" name="typeId" id="typeId" value="<c:out value="${type.id}"/>" disabled="true" checked  onclick ="javascript:setStatus(<c:out value="${type.id}"/>);javascript:hide('user1');javascript:hide('user2');"><c:out value="${type.name}"/><br>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <input type="radio" name="typeId" id="typeId" value="<c:out value="${type.id}"/>" checked  onclick ="javascript:setStatus(<c:out value="${type.id}"/>);javascript:hide('user1');javascript:hide('user2');"><c:out value="${type.name}"/><br>
-                                    </c:otherwise>
-                                    </c:choose>
-			                    </c:otherwise>
-			                  </c:choose>
-        		              </c:when>
-                              <c:otherwise>
-        		                <c:choose>
-		    	                <c:when test="${type.id == 3}">
-			        	            <input type="radio" name="typeId" id="typeId" value="<c:out value="${type.id}"/>" onclick ="javascript:setStatus(<c:out value="${type.id}"/>);javascript:leftnavExpand('user1');javascript:leftnavExpand('user2');"><c:out value="${type.name}"/><br>
-			                    </c:when>
-			                    <c:otherwise>
-                                    <c:choose>
-                                    <c:when test="${study.status.frozen && (type.id==2 || type.id==4)}">
-				                        <input type="radio" name="typeId" id="typeId" disabled="true" value="<c:out value="${type.id}"/>" onclick ="javascript:setStatus(<c:out value="${type.id}"/>);javascript:hide('user1');javascript:hide('user2');"><c:out value="${type.name}"/><br>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <input type="radio" name="typeId" id="typeId" value="<c:out value="${type.id}"/>" onclick ="javascript:setStatus(<c:out value="${type.id}"/>);javascript:hide('user1');javascript:hide('user2');"><c:out value="${type.name}"/><br>
-                                    </c:otherwise>
-                                    </c:choose>
-			                    </c:otherwise>
-			                    </c:choose>
-    		                  </c:otherwise>
-                            </c:choose>
-                    </c:forEach>
-                    <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="typeId"/></jsp:include>
-                        </c:when>
-                    <c:otherwise>
-            <input type="hidden" name="typeId" value="${discrepancyNote.discrepancyNoteTypeId}"/>
-            <c:forEach var="type" items="${discrepancyTypes}">
-                <c:choose>
-                    <c:when test="${typeId1 == type.id}">
-                        <input type="radio" name="typeId" id="typeId" value="<c:out value="${type.id}"/>" checked disabled><c:out value="${type.name}"/><br>
-                    </c:when>
-                    <c:otherwise>
-                        <input type="radio" name="typeId" id="typeId" value="<c:out value="${type.id}"/>" disabled><c:out value="${type.name}"/><br>
-                    </c:otherwise>
-                </c:choose>
-            </c:forEach>
-          </c:otherwise>
-          </c:choose>
-              </td>
-
-        </tr>
-        <tr valign="top">
-            <td  class="table_cell_noborder" style="color: rgb(120, 158, 197);"><fmt:message key="description" bundle="${resword}"/></td>
-            <td class="table_cell_noborder">
-            <div class="formfieldXL_BG"><input type="text" name="description" value="<c:out value="${discrepancyNote.description}"/>" class="formfieldXL"></div>
-             <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="description"/></jsp:include>
-            </td>
-        </tr>
-        <tr valign="top">
-            <td  class="table_cell_noborder" style="color: rgb(120, 158, 197);"><fmt:message key="detailed_note" bundle="${resword}"/></td>
-            <td class="table_cell_noborder">
-            <c:choose>
-            <c:when test="${discrepancyNote.detailedNotes !=''}">
-             <div class="formtextareaXL4_BG">
-              <textarea name="detailedDes" rows="4" cols="50" class="formtextareaXL4"><c:out value="${discrepancyNote.detailedNotes}"/></textarea>
-             </div>
-            </c:when>
-            <c:otherwise>
-             <div class="formtextareaXL4_BG">
-              <textarea name="detailedDes" rows="4" cols="50" class="formtextareaXL4"><%--<c:out value="${param.strErrMsg}"/>--%></textarea>
-             </div>
-            </c:otherwise>
-            </c:choose>
-             <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="detailedDes"/></jsp:include>
-            </td>
-        </tr>
-        <tr valign="top" id="res1">
-
-            <td  class="table_cell_noborder" style="color: rgb(120, 158, 197);"><fmt:message key="resolution_status" bundle="${resword}"/></td>
-            <td class="table_cell_noborder"><div class="formfieldL_BG">
+<c:set var="name" value="${discrepancyNote.entityType}"/>
+<!-- Entity box -->
+<table border="0" cellpadding="0" cellspacing="0" style="float:left;">
+	<tr><td valign="bottom">
+	<table border="0" cellpadding="0" cellspacing="0">
+    	<tr><td nowrap style="padding-right: 20px;">
+            <div class="tab_BG_h"><div class="tab_R_h" style="padding-right: 0px;"><div class="tab_L_h" style="padding: 3px 11px 0px 6px; text-align: left;">
+			<b>
 			<c:choose>
-				<c:when test='${strResStatus != ""}'>
-					<c:set var="resStatusId1" value="${strResStatus}"/>
-				</c:when>
-				<c:otherwise>
-					<c:set var="resStatusId1" value="${discrepancyNote.resolutionStatusId}"/>
-				</c:otherwise>
+			    <c:when test="${name eq 'itemData' ||name eq 'ItemData'}">
+			        <a href="javascript: openDocWindow('ViewItemDetail?itemId=<c:out value="${item.id}"/>')"><c:out value="${item.name}"/></a>
+			    </c:when>
+			    <c:otherwise>
+			        <c:choose>
+			            <c:when test="${entityName != '' && entityName != null }">
+			                  <c:out value="${entityName}"/>  =  <c:out value="${entityValue}"/>
+			            </c:when>
+			            <c:otherwise>
+			                <%-- nothing here; if entityName is blank --%>
+			            </c:otherwise>
+			        </c:choose>
+			    </c:otherwise>
 			</c:choose>
-            <select name="resStatusId" id="resStatusId" class="formfieldL" onchange="javascript:setResStatus(3, <c:out value="${discrepancyNote.ownerId}"/>);">
-              <c:forEach var="status" items="${resolutionStatuses}">
-               <c:choose>
-                 <c:when test="${resStatusId1 == status.id}">
-                   <option value="<c:out value="${status.id}"/>" selected ><c:out value="${status.name}"/>
-                 </c:when>
-                 <c:otherwise>
-                   <option value="<c:out value="${status.id}"/>" ><c:out value="${status.name}"/>
-                 </c:otherwise>
-               </c:choose>
-             </c:forEach>
-            </select></div>
-              <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="resStatusId"/></jsp:include></td>
-
+			</b>
+			</div></div></div>
+			</td></tr>
+    </table>
+    </td></tr>
+    <tr><td valign="top">
+		<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+		<div class="textbox_center">
+		<table border="0" cellpadding="0" cellspacing="0">
+        <tr>
+	        <td class="table_cell_noborder" style="color: #789EC5"><b><fmt:message key="subject" bundle="${resword}"/>:&nbsp;&nbsp;</b></td>
+	        <td class="table_cell_noborder" style="color: #789EC5"><c:out value="${discrepancyNote.subjectName}" /></td>
+	        <td class="table_cell_noborder" style="color: #789EC5; padding-left: 40px;"><b><fmt:message key="event" bundle="${resword}"/>:&nbsp;&nbsp;</b></td>
+	        <td class="table_cell_noborder" style="color: #789EC5"><c:out value="${discrepancyNote.eventName}"/></td>
+    	</tr>
+        <tr>
+            <td class="table_cell_noborder" style="color: #789EC5"><b><fmt:message key="event_date" bundle="${resword}"/>:&nbsp;&nbsp;</b></td>
+            <td class="table_cell_noborder" style="color: #789EC5"><fmt:formatDate value="${discrepancyNote.eventStart}" pattern="${dteFormat}"/></td>
+            <td class="table_cell_noborder" style="color: #789EC5; padding-left: 40px;"><b><fmt:message key="CRF" bundle="${resword}"/>:&nbsp;&nbsp;</b></td>
+            <td class="table_cell_noborder" style="color: #789EC5"><c:out value="${discrepancyNote.crfName}"/></td>
         </tr>
+        </table>
+        </div>
+        </div></div></div></div></div></div></div>
+	</td></tr>
+</table>
 
+<br><br><br><br><br>
+<h3 class="title_manage"><fmt:message key="add_note" bundle="${resword}"/></h3>
 
-
-		<c:choose>
-		<c:when test="${(parent == null || parent.id ==0 || unlock == 1) && autoView == 0}">
-        <tr valign="top" id="user1" style="display:none">
-		</c:when>
-		<c:otherwise>
+<!-- dn table -->
+    <table border="0" cellpadding="0" cellspacing="0" style="float:left;">
+	<td valign="top">
+	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+	<div class="textbox_center">
+	<table border="0">
 		<tr valign="top">
-      	</c:otherwise>
-		</c:choose>
-        <c:if test="${discrepancyNote.discrepancyNoteTypeId != 1 || (discrepancyNote.discrepancyNoteTypeId==1 && discrepancyNote.parentDnId>0)}">
-            <td class="table_cell_noborder" style="color: rgb(120, 158, 197);"><fmt:message key="assigned_to" bundle="${resword}"/></td>
-            <td class="table_cell_noborder"><div class="formfieldL_BG">
+		<td class="table_cell_noborder"><fmt:message key="description" bundle="${resword}"/>:</td>
+		<td class="table_cell_noborder">
+		<div class="formfieldL_BG"><input type="text" name="description" value="<c:out value="${discrepancyNote.description}"/>" class="formfieldL"></div>
+		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="description"/></jsp:include>
+		</td>
+		
+		<td class="table_cell_noborder">
+		<table>
+			<td class="table_cell_noborder"><fmt:message key="type" bundle="${resword}"/>:</td>
+			<td class="table_cell_noborder" width="60%"><div class="formfieldL_BG">
 			<c:choose>
-				<c:when test='${strUserAccountId != ""}'>
-					<c:set var="userAccountId1" value="${strUserAccountId}"/>
-				</c:when>
-				<c:otherwise>
-					<c:set var="userAccountId1" value="0"/>
-				</c:otherwise>
-			</c:choose>
-			<c:choose>
-			<c:when test="${parent == null || parent.id ==0 }">
-			<%-- or when the user is not a CDC? --%>
-                <span id="xxx" disabled>
-            <select name="userAccountId" id="userAccountId" class="formfieldL">
-
-              <c:forEach var="user" items="${userAccounts}">
-               <c:choose>
-                 <c:when test="${userAccountId1 == user.userAccountId}">
-                   <option value="<c:out value="${user.userAccountId}"/>" selected><c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/> (<c:out value="${user.userName}"/>)
-                 </c:when>
-                 <c:otherwise>
-                   <option value="<c:out value="${user.userAccountId}"/>"><c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/> (<c:out value="${user.userName}"/>)
-                 </c:otherwise>
-               </c:choose>
-             </c:forEach>
-            </select>
-                    </span>
-            <input type="hidden" name="userAccountId" value="<c:out value="${userAccountId1}"/>"/>
+			<c:when test="${parentId > 0}">
+				<input type="hidden" name="typeId" value="${param.typeId}"/>
+				<select name="pTypeId" id="pTypeId" class="formfieldL" disabled>
+					<option value="<c:out value="${param.typeId}"/>" selected><c:out value="${param.typeName}"/>
+				</select>
 			</c:when>
 			<c:otherwise>
-			<span id="xxx" disabled>
-			<select name="userAccountId" id="userAccountId" class="formfieldL" > <%-- will eventually take away select, tbh --%>
-
-              <c:forEach var="user" items="${userAccounts}">
-               <c:choose>
-                 <c:when test="${userAccountId1 == user.userAccountId}">
-                   <option value="<c:out value="${user.userAccountId}"/>" selected><c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/> (<c:out value="${user.userName}"/>)
-                 </c:when>
-                 <c:otherwise>
-                   <option value="<c:out value="${user.userAccountId}"/>"><c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/> (<c:out value="${user.userName}"/>)
-                 </c:otherwise>
-               </c:choose>
-             </c:forEach>
-            </select>
-            </span>
-
-			<input type="hidden" name="userAccountId" value="<c:out value="${userAccountId1}"/>"/>
+				<c:set var="typeId1" value="${discrepancyNote.discrepancyNoteTypeId}"/>
+				<c:choose>
+				<c:when test="${whichResStatus == 2}">
+					<select name="typeId" id="typeId" class="formfieldL" onchange ="javascript:setElements(this.options[selectedIndex].value, 'user1', 'user2');">
+						<c:forEach var="type" items="${discrepancyTypes2}">
+						<c:choose>
+						<c:when test="${typeId1 == type.id}">
+						 	<c:choose>
+						    <c:when test="${study.status.frozen && (type.id==2 || type.id==4)}">
+									<option value="<c:out value="${type.id}"/>" disabled="true" selected ><c:out value="${type.name}"/>
+						    </c:when>
+						    <c:otherwise>
+						   		<option value="<c:out value="${type.id}"/>" selected ><c:out value="${type.name}"/>
+						    </c:otherwise>
+						    </c:choose>
+						 </c:when>
+						 <c:otherwise>
+							<c:choose>
+							<c:when test="${study.status.frozen && (type.id==2 || type.id==4)}">
+								<option value="<c:out value="${type.id}"/>" disabled="true"><c:out value="${type.name}"/>
+							</c:when>
+							<c:otherwise>
+								<option value="<c:out value="${type.id}"/>"><c:out value="${type.name}"/>
+							</c:otherwise>
+							</c:choose>
+						 </c:otherwise>
+						</c:choose>
+						</c:forEach>
+					</select>
+				</c:when>
+				<c:otherwise>
+					<select name="typeId" id="typeId" class="formfieldL" onchange ="javascript:setElements(this.options[selectedIndex].value, 'user1', 'user2');">
+						<c:forEach var="type" items="${discrepancyTypes}">
+						<c:choose>
+						<c:when test="${typeId1 == type.id}">
+						 	<c:choose>
+						    <c:when test="${study.status.frozen && (type.id==2 || type.id==4)}">
+									<option value="<c:out value="${type.id}"/>" disabled="true" selected ><c:out value="${type.name}"/>
+						    </c:when>
+						    <c:otherwise>
+						   		<option value="<c:out value="${type.id}"/>" selected ><c:out value="${type.name}"/>
+						    </c:otherwise>
+						    </c:choose>
+						 </c:when>
+						 <c:otherwise>
+							<c:choose>
+							<c:when test="${study.status.frozen && (type.id==2 || type.id==4)}">
+								<option value="<c:out value="${type.id}"/>" disabled="true"><c:out value="${type.name}"/>
+							</c:when>
+							<c:otherwise>
+								<option value="<c:out value="${type.id}"/>"><c:out value="${type.name}"/>
+							</c:otherwise>
+							</c:choose>
+						 </c:otherwise>
+						</c:choose>
+						</c:forEach>
+					</select>
+				</c:otherwise>
+				</c:choose>
+				<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="typeId"/></jsp:include>
 			</c:otherwise>
 			</c:choose>
-
-
-			<c:out value="${userAccountId}"/>
-			</div>
-              <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="userAccountId"/></jsp:include></td>
-
-        </tr>
-
+			</div></td>
+		</table>
+		</td>
+		</tr>
+		
+		<tr valign="top">
+		<td  class="table_cell_noborder"><fmt:message key="detailed_note" bundle="${resword}"/>:</td>
+		<td class="table_cell_noborder">
+		<div class="formtextareaL4_BG">
+		  <textarea name="detailedDes" rows="4" cols="50" class="formtextareaL4"><c:out value="${discrepancyNote.detailedNotes}"/></textarea>
+		</div>
+		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="detailedDes"/></jsp:include>
+		&nbsp;</td>
+		
+		<td class="table_cell_noborder">
+		<table border="0" cellpadding="0" cellspacing="0">
+		<tr valign="top" id="res1">
+		    <td  class="table_cell_noborder"><fmt:message key="resolution_status" bundle="${resword}"/>:</td>
+		    <td class="table_cell_noborder"><div class="formfieldL_BG">
+			<c:set var="resStatusId1" value="${discrepancyNote.resolutionStatusId}"/>
+		    <select name="resStatusId" id="resStatusId" class="formfieldL" onchange="javascript:setResStatus(3, <c:out value="${discrepancyNote.ownerId}"/>);">
+				<c:choose>
+				<c:when test="${whichResStatus == 2 && param.typeId == 3 && parentId > 0}">
+					<c:set var="resStatuses" value="${resolutionStatuses2}"/>
+				</c:when>
+				<c:otherwise>
+					<c:set var="resStatuses" value="${resolutionStatuses}"/>
+				</c:otherwise>
+				</c:choose>
+				<c:forEach var="status" items="${resStatuses}">
+					<c:choose>
+					<c:when test="${resStatusId1 == status.id}">
+					   <option value="<c:out value="${status.id}"/>" selected ><c:out value="${status.name}"/>
+					</c:when>
+					<c:otherwise>
+					   <option value="<c:out value="${status.id}"/>" ><c:out value="${status.name}"/>
+					</c:otherwise>
+					</c:choose>
+				</c:forEach>
+			</select></div>
+		    <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="resStatusId"/></jsp:include></td>
+		</tr>
+		
+		
 		<c:choose>
 		<c:when test="${(parent == null || parent.id ==0 || unlock == 1) && autoView == 0}">
-        <tr valign="top" id="user2" style="display:none">
+        	<tr valign="top" id="user1" style="display:none">
 		</c:when>
 		<c:otherwise>
-		<tr valign="top">
+			<tr valign="top">
       	</c:otherwise>
 		</c:choose>
-
-            <td  class="table_cell_noborder" style="color: rgb(120, 158, 197);"><fmt:message key="send_to_assigned" bundle="${resword}"/></td>
+		<c:if test="${discrepancyNote.discrepancyNoteTypeId != 1 || (discrepancyNote.discrepancyNoteTypeId==1 && discrepancyNote.parentDnId>0)}">
+			<td class="table_cell_noborder"><fmt:message key="assign_to_user" bundle="${resword}"/>:</td>
+			<td class="table_cell_noborder"><div class="formfieldL_BG">
+			<c:choose>
+			<c:when test='${discrepancyNote.assignedUserId != ""}'>
+				<c:set var="userAccountId1" value="${discrepancyNote.assignedUserId}"/>
+			</c:when>
+			<c:otherwise>
+				<c:set var="userAccountId1" value="0"/>
+			</c:otherwise>
+			</c:choose>
+			<span id="xxx" disabled>
+			<select name="userAccountId" id="userAccountId" class="formfieldL" >
+		  		<c:forEach var="user" items="${userAccounts}">
+		   		<c:choose>
+		     	<c:when test="${userAccountId1 == user.userAccountId}">
+		       		<option value="<c:out value="${user.userAccountId}"/>" selected><c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/> (<c:out value="${user.userName}"/>)
+		     	</c:when>
+		     	<c:otherwise>
+		       		<option value="<c:out value="${user.userAccountId}"/>"><c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/> (<c:out value="${user.userName}"/>)
+		     	</c:otherwise>
+		   		</c:choose>
+		 		</c:forEach>
+			</select>
+			</span>
+			<input type="hidden" name="userAccountId" value="<c:out value="${userAccountId1}"/>"/>		
+			<c:out value="${userAccountId}"/>
+			</div>
+		  	<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="userAccountId"/></jsp:include></td>
+			</tr>
+		
+			<c:choose>
+			<c:when test="${(parent == null || parent.id ==0 || unlock == 1) && autoView == 0}">
+				<tr valign="top" id="user2" style="display:none">
+			</c:when>
+			<c:otherwise>
+				<tr valign="top">
+			</c:otherwise>
+			</c:choose>
 			<%-- should be an option for checked, unchecked, disabled--%>
-            <td><input name="sendEmail" value="1" type="checkbox"/></td>
-        </tr>
-        </c:if>
-
-
-		<tr valign="top">
-            <td  class="table_cell_noborder" style="color: rgb(120, 158, 197);"><fmt:message key="date" bundle="${resword}"/></td>
-            <td><fmt:formatDate value="${discrepancyNote.createdDate}" pattern="${dteFormat}"/></td>
-        </tr>
-
-        <tr valign="top">
-            <td  class="table_cell_noborder" style="color: rgb(120, 158, 197);"><fmt:message key="parent_note" bundle="${resword}"/></td>
-            <td><c:choose>
-             <c:when test="${parent== null || parent.description ==''}">
-               <fmt:message key="none" bundle="${resword}"/>
-             </c:when>
-             <c:otherwise>
-             <c:out value="${parent.description}"/>
-             </c:otherwise>
-             </c:choose>
-            </td>
-        </tr>
-        <%-- Only show the View Parent link if the note has a parent id --%>
-        <c:if test="${discrepancyNote.parentDnId > 0 && hasNotes == 'yes'}">
-        <tr valign="top">
-            <td colspan="2"><a href="ViewDiscrepancyNote?writeToDB=1&subjectId=<c:out value="${discrepancyNote.subjectId}"/>&itemId=<c:out value="${item.id}"/>&id=<c:out value="${discrepancyNote.entityId}"/>&name=<c:out value="${discrepancyNote.entityType}"/>&field=<c:out value="${discrepancyNote.field}"/>&column=<c:out value="${discrepancyNote.column}"/>&enterData=<c:out value="${enterData}"/>&monitor=<c:out value="${monitor}"/>&blank=<c:out value="${blank}"/>">
-            <fmt:message key="view_parent_and_related_note" bundle="${resword}"/></a>
-           </td>
-        </tr>
-       </c:if>
-    </table>
-    <table border="0">
-    <tr>
-    <c:set var= "noteEntityType" value="${discrepancyNote.entityType}"/>
-      <c:if test="${enterData == '1' || canMonitor == '1' || noteEntityType != 'itemData' }">
-       <td> <input type="submit" name="B1" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium"></td>
-       </c:if>
-
-
-    </tr>
-    </table>
+			<td><input name="sendEmail" value="1" type="checkbox"/></td>
+			<td  class="table_cell_noborder"><fmt:message key="email_assigned_user" bundle="${resword}"/></td>		
+			</tr>
+		</c:if>
+		
+		<tr>
+		<c:set var= "noteEntityType" value="${discrepancyNote.entityType}"/>
+		<c:if test="${enterData == '1' || canMonitor == '1' || noteEntityType != 'itemData' }">
+			<c:choose>
+			<c:when test="${writeToDB eq '1'}">
+				<td><input type="submit" name="SubmitExit" value="<fmt:message key="submit_close" bundle="${resword}"/>" class="button_medium" style="width:90px" onclick="javascript:setValue('close<c:out value="${parentId}"/>','true');"></td>
+			</c:when>
+			<c:otherwise>
+				<td><input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" style="width:80px"></td>
+			</c:otherwise>
+			</c:choose>
+		</c:if>
+		</tr>
+		
+		<c:if test="${parentId==0}">
+			<tr valign="top">
+				<td class="table_cell_left">
+                	<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="newChildAdded"/></jsp:include>	
+                </td>
+			</tr>
+		</c:if>
+	</table>
+    </div>
+	</div></div></div></div></div></div></div>
+	</td>
+</table>
 </form>
 </body>
 </html>

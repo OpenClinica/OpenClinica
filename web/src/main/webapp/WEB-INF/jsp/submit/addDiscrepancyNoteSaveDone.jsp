@@ -3,6 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <jsp:useBean scope='request' id='strResStatus' class='java.lang.String' />
 <jsp:useBean scope='request' id='writeToDB' class='java.lang.String' />
+<jsp:useBean scope='request' id='submitClose' class='java.lang.String' />
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>    
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/> 
@@ -25,7 +26,7 @@
 
 </style>
 </head>
-<body class="popup_BG">
+<body class="popup_BG" onload="javascript:window.setTimeout('window.close()',3000);">
 <div style="float: left;"><h1 class="table_title_Submit"><fmt:message key="add_discrepancy_note" bundle="${resword}"/></h1></div>
 <div style="float: right;"><p><a href="#" onclick="javascript:window.close();"><fmt:message key="close_window" bundle="${resword}"/></a></p></div>
 <br clear="all">
@@ -51,29 +52,5 @@
         </tr>
        </c:if> 
     </table>
-    <br/>
-    <br/>
-    <br/>
-    <br/>
-    <br/>
-    <br/>
-    <br/>
-    <br/>
-    <br/>
-    <br/>
-    <br/>
-    <br/>
-    <br/>
-    <br/>
-    <br/>
-    <br/>
-    <br/>
-    <br/>
-    <br/>
-    <br/>
-    <table border="0"> 
-     <tr>     
-      <td><input type="submit" name="B1" value="<fmt:message key="close" bundle="${resword}"/>" class="button_medium" onclick="javascript:window.close();"></td> 
-    </tr>
-    </table>  
+    
 </html>
