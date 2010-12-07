@@ -6,6 +6,9 @@ import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
+import java.util.Properties;
+
+import javax.xml.transform.TransformerConfigurationException;
 
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 
@@ -42,13 +45,12 @@ public class SqlProcessingFunction extends ProcessingFunction {
     public ProcessingResultType run() {
     	try {
     		// load the proper database class below
-    		if ("postgres".equals(databaseType)) {
-    			Class.forName("org.postgresql.Driver");
-    		} else {
-    			Class.forName("oracle.jdbc.driver.OracleDriver");
-    		}
-    		Connection conn = 
-    			DriverManager.getConnection(databaseUrl, databaseUsername, databasePassword);
+    		Properties props = new Properties();
+    		props.setProperty("user",databaseUsername);
+    		props.setProperty("password",databasePassword);
+    	//	props.setProperty("ssl","true");
+    		Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost/OC_test", props);
+
     		conn.setAutoCommit(false);
     		File sqlFile = new File(getTransformFileName());
     		String[] statements = getFileContents(sqlFile); 
@@ -73,7 +75,9 @@ public class SqlProcessingFunction extends ProcessingFunction {
             resultError.setUrl(""); // no url required
             resultError.setArchiveMessage("Failure thrown: " + e.getMessage());
             resultError.setDescription("Your job failed with the message of: " + e.getMessage());
+         
             return resultError;
+          
     	}
     	// set up the reply object
     	ProcessingResultType result = ProcessingResultType.SUCCESS;

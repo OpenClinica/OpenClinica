@@ -116,6 +116,7 @@ public class PdfProcessingFunction extends ProcessingFunction {
             if(isZip())
             {
             	
+            	
             	if(outputFile!=null)
             	{
             		ZipOutputStream zipOut = null;
@@ -141,8 +142,10 @@ public class PdfProcessingFunction extends ProcessingFunction {
             		}
               
             	}
-            	
+            	setArchivedFileName(new File(zipName).getName());
             }
+            else
+            	setArchivedFileName(outputFile.getName());
         } catch (Exception e) {
             e.printStackTrace();
             ProcessingResultType resultError = ProcessingResultType.FAIL;
@@ -184,7 +187,7 @@ public class PdfProcessingFunction extends ProcessingFunction {
     		File zip= new File(zipFile);
 			for(int i=0;i<oldFiles.length;i++)
 			{
-				if(!outputFile.getName().equals(oldFiles[i].getName())&& outputFile.getName().equals(zip.getName()))
+				if(!outputFile.getName().equals(oldFiles[i].getName())&& !zip.getName().equals(oldFiles[i].getName()))
 				oldFiles[i].delete();
 			}
 			

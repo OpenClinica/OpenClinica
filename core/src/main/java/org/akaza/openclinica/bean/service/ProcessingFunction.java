@@ -22,7 +22,17 @@ public abstract class ProcessingFunction implements ProcessingInterface {
     private boolean zip;
     private File[] oldFiles;
     
-    public File[] getOldFiles() {
+    private String archivedFileName;
+    
+    public String getArchivedFileName() {
+		return archivedFileName;
+	}
+
+	public void setArchivedFileName(String archivedFileName) {
+		this.archivedFileName = archivedFileName;
+	}
+
+	public File[] getOldFiles() {
 		return oldFiles;
 	}
 

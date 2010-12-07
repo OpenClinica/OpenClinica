@@ -281,10 +281,10 @@ public class CoreResources implements ResourceLoaderAware   {
                 SqlProcessingFunction function = new SqlProcessingFunction(epbean);
                 String whichSettings = getExtractField("xsl.post." + i + ".sql");
                 if (!"".equals(whichSettings)) {
-                    function.setDatabaseType(getExtractField(whichSettings + ".dataBase").toLowerCase());
-                    function.setDatabaseUrl(getExtractField(whichSettings + ".url"));
-                    function.setDatabaseUsername(getExtractField(whichSettings + ".username"));
-                    function.setDatabasePassword(getExtractField(whichSettings + ".password"));
+                    function.setDatabaseType(getExtractFieldNoRep(whichSettings + ".dataBase").toLowerCase());
+                    function.setDatabaseUrl(getExtractFieldNoRep(whichSettings + ".url"));
+                    function.setDatabaseUsername(getExtractFieldNoRep(whichSettings + ".username"));
+                    function.setDatabasePassword(getExtractFieldNoRep(whichSettings + ".password"));
                 } else {
                     // set default db settings here
                     function.setDatabaseType(getField("dataBase"));
@@ -309,8 +309,15 @@ public class CoreResources implements ResourceLoaderAware   {
             		epbean.setPostProcLocation(getExtractField(whichFunction+".location"));
             		epbean.setPostProcExportName(getExtractField(whichFunction+".exportname"));
             	}
-            	else if(postProcessorName.equals("sql")){
-            		
+            	//since the database is the last option TODO: think about custom post processing options
+            	else {
+            		  SqlProcessingFunction function = new SqlProcessingFunction(epbean);
+            		  
+                    function.setDatabaseType(getExtractFieldNoRep(whichFunction + ".dataBase").toLowerCase());
+                    function.setDatabaseUrl(getExtractFieldNoRep(whichFunction + ".url"));
+                    function.setDatabaseUsername(getExtractFieldNoRep(whichFunction + ".username"));
+                    function.setDatabasePassword(getExtractFieldNoRep(whichFunction + ".password"));
+                    epbean.setPostProcessing(function);
             	}
             	 
             }
@@ -326,7 +333,16 @@ public class CoreResources implements ResourceLoaderAware   {
         return ret;
     }
 
-    private void checkForFile(String[] extractFields) throws OpenClinicaSystemException{
+    private String getExtractFieldNoRep(String key) {
+    	 String value = EXTRACTINFO.getProperty(key);
+         if (value != null) {
+             value = value.trim();
+         }
+       
+         return value == null ? "" : value;
+	}
+
+	private void checkForFile(String[] extractFields) throws OpenClinicaSystemException{
 	
 		int cnt = extractFields.length;
 		int i = 0;

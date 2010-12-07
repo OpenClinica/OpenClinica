@@ -26,6 +26,8 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.SchedulerException;
 import org.quartz.impl.StdScheduler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
@@ -93,11 +95,13 @@ public class XsltTransformJob extends QuartzJobBean {
     public static final String POST_PROC_ZIP="postProcZip";
     public static final String POST_PROC_LOCATION="postProcLocation";
     public static final String POST_PROC_EXPORT_NAME="postProcExportName";
-    
+
+    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
         // need to generate a Locale for emailing users with i18n
         // TODO make dynamic?
+    	
         Locale locale = new Locale("en-US");
         ResourceBundleProvider.updateLocale(locale);
         ResourceBundle pageMessages = ResourceBundleProvider.getPageMessagesBundle();
@@ -128,7 +132,8 @@ public class XsltTransformJob extends QuartzJobBean {
             int studyId = dataMap.getInt(STUDY_ID);
             String outputPath = dataMap.getString(POST_FILE_PATH);
             // get all user info, generate xml
-            System.out.println("found output path: " + outputPath);
+           // System.out.println("found output path: " + outputPath);
+            logger.debug("found output path: " + outputPath);
             String generalFileDir = dataMap.getString(XML_FILE_PATH);
             int epBeanId = dataMap.getInt(EXTRACT_PROPERTY);
             ExtractPropertyBean epBean = CoreResources.findExtractPropertyBeanById(epBeanId);
@@ -152,7 +157,7 @@ public class XsltTransformJob extends QuartzJobBean {
             // generate file directory for file service
             
             datasetBean.setName(datasetBean.getName().replaceAll(" ", "_"));
-            System.out.println("--> job starting: ");
+            logger.debug("--> job starting: ");
             
             HashMap answerMap = generateFileService.createODMFile(epBean.getFormat(), sysTimeBegin, generalFileDir, datasetBean, 
                     currentStudy, "", eb, currentStudy.getId(), currentStudy.getParentStudyId(), "99",(Boolean) dataMap.get(ZIPPED), false, (Boolean) dataMap.get(DELETE_OLD));
@@ -168,7 +173,7 @@ public class XsltTransformJob extends QuartzJobBean {
                 ODMXMLFileName = (String) key;// JN: Since there is a logic to delete all the intermittent files, this file could be a zip file. 
                 Integer fileID = (Integer) value;
                 fId = fileID.intValue();
-                System.out.println("found " + fId + " and " + ODMXMLFileName);
+                logger.debug("found " + fId + " and " + ODMXMLFileName);
             }
           
            
@@ -211,7 +216,7 @@ public class XsltTransformJob extends QuartzJobBean {
             in.close();
             endFileStream.close();
             final long done = System.currentTimeMillis() - start;
-            System.out.println("--> job completed in " + done + " ms");
+            logger.info("--> job completed in " + done + " ms");
             // run post processing
             
             
@@ -236,17 +241,26 @@ public class XsltTransformJob extends QuartzJobBean {
                 function.setOldFiles(oldFiles);
                 File intermediateFiles[] = getInterFiles(dataMap.getString(POST_FILE_PATH)); 
                 ProcessingResultType message = function.run();
-                deleteOldFiles(intermediateFiles);
+                //Delete these files only in case when there is no failure
+                if (message.getCode().intValue() != 2)            deleteOldFiles(intermediateFiles);
                 final long done2 = System.currentTimeMillis() - start;
                 System.out.println("--> postprocessing completed in " + done2 + " ms, found result type " + message.getCode());
-              
+                logger.info("--> postprocessing completed in " + done2 + " ms, found result type " + message.getCode());
               /*  if((Boolean)dataMap.get(POST_PROC_DELETE_OLD))
                 {
                 	deleteOldFiles(oldFiles);
                 }*/
                 
                 if (!function.getClass().equals(org.akaza.openclinica.bean.service.SqlProcessingFunction.class)) {
-                    ArchivedDatasetFileBean fbFinal = generateFileRecord(dataMap.getString(POST_FILE_NAME) + "." + function.getFileType(), 
+                	String archivedFile = dataMap.getString(POST_FILE_NAME) + "." + function.getFileType();
+                	//JN: if the properties is set to zip the output file, download the zip file
+                	if(function.isZip())
+                		archivedFile = archivedFile+".zip";
+                	//JN: The above 2 lines code is useless, it should be removed..added it only for the sake of custom processing but it will produce erroneous results in case of custom post processing as well.
+                	if(function.getClass().equals(org.akaza.openclinica.bean.service.PdfProcessingFunction.class))
+                		archivedFile = function.getArchivedFileName();
+                	
+                    ArchivedDatasetFileBean fbFinal = generateFileRecord(archivedFile, 
                             outputPath, 
                             datasetBean, 
                             done, new File(endFile).length(), 
@@ -287,7 +301,11 @@ public class XsltTransformJob extends QuartzJobBean {
             } else {
                 // extract ran but no post-processing - we send an email with success and url to link to
                 // generate archived dataset file bean here, and use the id to build the URL
-                ArchivedDatasetFileBean fbFinal = generateFileRecord(dataMap.getString(POST_FILE_NAME), 
+            	String archivedFilename = dataMap.getString(POST_FILE_NAME);
+             	//JN: if the properties is set to zip the output file, download the zip file
+            	if(zipped)
+            		archivedFilename = dataMap.getString(POST_FILE_NAME)+".zip";
+                ArchivedDatasetFileBean fbFinal = generateFileRecord( archivedFilename, 
                         outputPath, 
                         datasetBean, 
                         done, new File(endFile).length(), 
@@ -308,7 +326,7 @@ public class XsltTransformJob extends QuartzJobBean {
                 	emailBuffer.append("<p>" + pageMessages.getString("html_email_body_4") + " " + fbFinal.getName()
                             + pageMessages.getString("html_email_body_4_5") + CoreResources.getField("sysURL.base") + "AccessFile?fileId="
                             + fbFinal.getId() + pageMessages.getString("html_email_body_3") + "</p>");
-                	System.out.println("Name??"+emailBuffer);
+                	logger.info("email buffer??"+emailBuffer);
                 	 
                 }
                 else{
@@ -353,31 +371,37 @@ public class XsltTransformJob extends QuartzJobBean {
                 // Do Nothing, In the future we might want to have an email
                 // status added to system.
                 System.out.println("exception sending mail: " + ose.getMessage());
+                logger.error("exception sending mail: " + ose.getMessage());
             }
             
-            System.out.println("just sent email to " + alertEmail + ", from " + EmailEngine.getAdminEmail());
+  logger.info("just sent email to " + alertEmail + ", from " + EmailEngine.getAdminEmail());
               
         } catch (TransformerConfigurationException e) {
             sendErrorEmail(e.getMessage(), context, alertEmail);
             postErrorMessage(e.getMessage(), context);
 
             e.printStackTrace();
+            logger.error(e.getStackTrace().toString());
         } catch (FileNotFoundException e) {
             sendErrorEmail(e.getMessage(), context, alertEmail);
             postErrorMessage(e.getMessage(), context);
             e.printStackTrace();
+            logger.error(e.getStackTrace().toString());
         } catch (TransformerFactoryConfigurationError e) {
             sendErrorEmail(e.getMessage(), context, alertEmail);
             postErrorMessage(e.getMessage(), context);
             e.printStackTrace();
+            logger.error(e.getStackTrace().toString());
         } catch (TransformerException e) {
             sendErrorEmail(e.getMessage(), context, alertEmail);
             postErrorMessage(e.getMessage(), context);
             e.printStackTrace();
+            logger.error(e.getStackTrace().toString());
         } catch (Exception ee) {
             sendErrorEmail(ee.getMessage(), context, alertEmail);
             postErrorMessage(ee.getMessage(), context);
             ee.printStackTrace();
+            logger.error(ee.getStackTrace().toString());
         }
         
         
