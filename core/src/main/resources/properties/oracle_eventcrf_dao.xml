@@ -323,7 +323,7 @@
             , UPDATE_ID=?
             , ELECTRONIC_SIGNATURE_STATUS=?
             , SDV_STATUS=?
-            , PREV_STATUS=?
+            , OLD_STATUS_ID=?
             WHERE EVENT_CRF_ID=?
         </sql>
     </query>

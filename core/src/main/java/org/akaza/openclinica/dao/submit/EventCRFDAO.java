@@ -233,10 +233,9 @@ public class EventCRFDAO extends AuditableEntityDAO {
         eb.setValidateString((String) hm.get("validate_string"));
         eb.setStudySubjectId(((Integer) hm.get("study_subject_id")).intValue());
         eb.setSdvStatus((Boolean) hm.get("sdv_status"));
-        Integer prevStatusId = (Integer) hm.get("prev_status");
-        if (prevStatusId != null && prevStatusId > 0) {
-            eb.setOldStatus(Status.get(prevStatusId));
-        }
+        Integer oldStatusId = (Integer) hm.get("old_status_id");
+        eb.setOldStatus(Status.get(oldStatusId));
+
         // eb.setStatus(Status.get((Integer) hm.get("status_id"))
         return eb;
     }
