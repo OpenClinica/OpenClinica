@@ -36,6 +36,7 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
@@ -104,6 +105,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
     public static final String CAN_MONITOR = "canMonitor";
     public static final String NEW_NOTE = "new";
     public static final String ERROR_FLAG = "errorFlag";
+    public static final String FROM_BOX = "fromBox";
     
     
     // locked, so don't
@@ -253,6 +255,11 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
             }
         }
         
+        Boolean fromBox = fp.getBoolean(FROM_BOX);
+        if(fromBox==null || !fromBox) {
+            session.removeAttribute(BOX_TO_SHOW);
+        }
+        
         DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(sm.getDataSource());
         int entityId = fp.getInt(ENTITY_ID, true);
         String name = fp.getString(ENTITY_TYPE, true);
@@ -274,7 +281,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 
         int subjectId = fp.getInt(CreateDiscrepancyNoteServlet.SUBJECT_ID, true);
         int itemId = fp.getInt(CreateDiscrepancyNoteServlet.ITEM_ID, true);
-
+        
         StudySubjectBean ssub = new StudySubjectBean();
         if (subjectId > 0) {
             StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
@@ -601,6 +608,21 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
         }
         request.setAttribute(USER_ACCOUNTS, userAccounts);
         request.setAttribute(VIEW_DN_LINK, this.getPageServletFileName());
+        
+        
+        //audit log items (from ViewItemAuditLogServlet.java)
+        AuditDAO adao = new AuditDAO(sm.getDataSource());
+        if(name.equalsIgnoreCase("studysub")){
+            name = "study_subject";
+        }else if(name.equalsIgnoreCase("eventcrf")){
+            name = "event_crf";
+        }else if(name.equalsIgnoreCase("studyevent")){
+            name = "study_event";
+        }else if(name.equalsIgnoreCase("itemdata")){
+            name = "item_data";
+        }
+        ArrayList itemAuditEvents = adao.findItemAuditEvents(entityId, name);
+        request.setAttribute("itemAudits", itemAuditEvents);
         
         forwardPage(Page.VIEW_DISCREPANCY_NOTE);
     }

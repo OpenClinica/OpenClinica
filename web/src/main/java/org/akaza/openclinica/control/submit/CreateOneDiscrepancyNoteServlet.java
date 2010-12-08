@@ -322,7 +322,7 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
             session.setAttribute(BOX_TO_SHOW, parentId+"");
         }
         session.setAttribute(BOX_DN_MAP, boxDNMap);
-        forwardPage(Page.setNewPage(viewNoteLink, Page.VIEW_DISCREPANCY_NOTE.getTitle()));
+        forwardPage(Page.setNewPage(viewNoteLink+"&fromBox=1", Page.VIEW_DISCREPANCY_NOTE.getTitle()));
     }
 
 
