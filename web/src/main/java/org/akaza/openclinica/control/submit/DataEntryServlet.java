@@ -1358,7 +1358,7 @@ public abstract class DataEntryServlet extends SecureController {
                  */
 
                 // for Administrative editing
-                if (studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SIGNED)) {
+                if (studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SIGNED) && changedItemsList.size() > 0) {
                     studyEventBean.setSubjectEventStatus(SubjectEventStatus.COMPLETED);
                     studyEventBean.setUpdater(ub);
                     studyEventBean.setUpdatedDate(new Date());
