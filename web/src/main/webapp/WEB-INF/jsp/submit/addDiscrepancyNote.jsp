@@ -382,7 +382,7 @@ function setElements(typeId, user1, user2) {
 			</c:otherwise>
 			</c:choose>
 			<%-- should be an option for checked, unchecked, disabled--%>
-			<td><input name="sendEmail" value="1" type="checkbox"/></td>
+			<td align="right"><input name="sendEmail" value="1" type="checkbox"/></td>
 			<td  class="table_cell_noborder"><fmt:message key="email_assigned_user" bundle="${resword}"/></td>		
 			</tr>
 		</c:if>

@@ -164,7 +164,7 @@ function setStatusWithId(typeId, id) {
 		<td class="table_cell_noborder">
 		<table>
 			<td  class="table_cell_noborder"><fmt:message key="type" bundle="${resword}"/>:</td>
-			<td class="table_cell_noborder" width="60%"><div class="formfieldL_BG">
+			<td class="table_cell_noborder" width="75%"><div class="formfieldL_BG">
 			<c:choose>
 			<c:when test="${parentId > 0}">
 				<input type="hidden" name="typeId${parentId}" value="${param.typeId}"/>
@@ -290,7 +290,7 @@ function setStatusWithId(typeId, id) {
 		</c:choose>
 		<c:if test="${discrepancyNote.discrepancyNoteTypeId != 1 || (discrepancyNote.discrepancyNoteTypeId==1 && discrepancyNote.parentDnId>0)}">
 			<td class="table_cell_noborder"><fmt:message key="assign_to_user" bundle="${resword}"/>:</td>
-			<td class="table_cell_noborder"><div class="formfieldL_BG">
+			<td class="table_cell_noborder" width="80%"><div class="formfieldL_BG">
 			<c:choose>
 			<c:when test='${discrepancyNote.assignedUserId != ""}'>
 				<c:set var="userAccountId1" value="${discrepancyNote.assignedUserId}"/>
@@ -328,7 +328,7 @@ function setStatusWithId(typeId, id) {
 			</c:otherwise>
 			</c:choose>
 			<%-- should be an option for checked, unchecked, disabled--%>
-			<td><input name="sendEmail${parentId}" value="1" type="checkbox"/></td>
+			<td align="right"><input name="sendEmail${parentId}" value="1" type="checkbox"/></td>
 			<td  class="table_cell_noborder"><fmt:message key="email_assigned_user" bundle="${resword}"/></td>		
 			</tr>
 		</c:if>
@@ -336,7 +336,7 @@ function setStatusWithId(typeId, id) {
 		<tr>
 		<c:set var= "noteEntityType" value="${discrepancyNote.entityType}"/>
 		<c:if test="${enterData == '1' || canMonitor == '1' || noteEntityType != 'itemData' }">
-			<td><input type="submit" name="Submit${parentId}" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" style="width:70px"></td>
+			<td><input type="submit" name="Submit${parentId}" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" style="width:65px"></td>
 			<td><input type="submit" name="SubmitExit${parentId}" value="<fmt:message key="submit_exit" bundle="${resword}"/>" class="button_medium" style="width:80px" onclick="javascript:setValue('close<c:out value="${parentId}"/>','true');"></td>
 		</c:if>
 		</tr>
