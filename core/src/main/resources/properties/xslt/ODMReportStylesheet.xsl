@@ -891,24 +891,6 @@
 		<xsl:param name="schema-name"/>
 			CREATE SCHEMA <xsl:value-of select="$schema-name"/>;
 			
-			CREATE OR REPLACE FUNCTION public.create_plpgsql_language ()
-			RETURNS TEXT
-			AS $$
-            CREATE LANGUAGE plpgsql;
-            SELECT 'language plpgsql created'::TEXT;
-			$$
-			LANGUAGE 'sql';
-			
-			SELECT CASE WHEN
-            (SELECT true::BOOLEAN FROM pg_language WHERE lanname='plpgsql')
-            THEN
-            (SELECT 'language already installed'::TEXT)
-            ELSE
-            (SELECT public.create_plpgsql_language())
-            END;
-            
-			DROP FUNCTION public.create_plpgsql_language ();
-			
 			create or replace function <xsl:value-of select="$schema-name"/>.add_table_field (p_table text, p_field text, p_datatype text) 
 			returns bool as '
 			DECLARE
