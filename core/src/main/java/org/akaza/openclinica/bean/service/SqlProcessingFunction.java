@@ -5,12 +5,12 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Properties;
+
+import javax.xml.transform.TransformerConfigurationException;
 
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Class to implement the datamart in SQL.
@@ -25,80 +25,68 @@ public class SqlProcessingFunction extends ProcessingFunction {
 	private String databaseUsername;
 	private String databasePassword;
 	private String databaseType;
-    protected final static Logger logger = LoggerFactory.getLogger("SqlProcessingFunction");
+	
     public SqlProcessingFunction(ExtractPropertyBean extractPropertyBean) {
     	this.extractPropertyBean = extractPropertyBean;
     	fileType = "sql";
     }
     
     /**
-     * the run function will find the file name, run the SQL on the assigned
-     * db, and make sure the datamart is assembled correctly.
+     * The run() method will find the file name, runs the SQL on the assigned
+     * db, and returns a success/fail message.
      * 
-     * 
+     * This method assumes all variables are set in the XsltTransformJob, and
+     * that the database variables are correctly set in either extract.properties
+     * or datainfo.properties
+     * NOTE that if variables are set in extract, we do not try datainfo (it has to
+     * be correct somewhere)
      * 
      */
     public ProcessingResultType run() {
-    	ProcessingResultType resultError =null ;
-    	Connection conn =null;
     	try {
-    		
-    		
     		// load the proper database class below
-    		
-    		if ("postgres".equals(databaseType)) {
-    			Class.forName("org.postgresql.Driver");
-    		} else {
-    			Class.forName("oracle.jdbc.driver.OracleDriver");
-    		}
-    		 conn = 
-    			DriverManager.getConnection(databaseUrl, databaseUsername, databasePassword);
+    		Properties props = new Properties();
+    		props.setProperty("user",databaseUsername);
+    		props.setProperty("password",databasePassword);
+    	//	props.setProperty("ssl","true");
+    		Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost/OC_test", props);
+
     		conn.setAutoCommit(false);
     		File sqlFile = new File(getTransformFileName());
-    		String[] statements = getFileContents(sqlFile); // ???
+    		String[] statements = getFileContents(sqlFile); 
     		for (String statement : statements) {
     		    Statement stmt = conn.createStatement();
     		    // and then execute the statement here
     		    // convert the translated file to a string and then tries an execute
 
-    		   logger.debug("-- > about to run " + statement);
-
+    		    // System.out.println("-- > about to run " + statement);
     		    stmt.executeUpdate(statement);
     		    
     		    stmt.close();
     		    
     		}
-    	
+    		conn.commit();
+    		conn.setAutoCommit(false);
+    		conn.close();
     	} catch (Exception e) {
     	    e.printStackTrace();
     	    System.out.println(" -- > found an exception : " + e.getMessage());
-    	    resultError= ProcessingResultType.FAIL;
-            resultError.setUrl(""); // TODO view datasets page
+    	    ProcessingResultType resultError = ProcessingResultType.FAIL;
+            resultError.setUrl(""); // no url required
             resultError.setArchiveMessage("Failure thrown: " + e.getMessage());
             resultError.setDescription("Your job failed with the message of: " + e.getMessage());
-            
-    	}
-    	finally{
-    		try {
-			if(conn!=null){
-    		conn.commit();
-					conn.setAutoCommit(false);
-    		conn.close();
-			}
-			if(resultError!=null)
-				return resultError;
-    		} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+         
+            return resultError;
+          
     	}
     	// set up the reply object
     	ProcessingResultType result = ProcessingResultType.SUCCESS;
-        result.setUrl(""); // TODO no url required
+        result.setUrl(""); // no url required
         result.setArchiveMessage("Successfully run");
-        result.setDescription("Your job ran successfully.");// replace with something from extract prop bean?
+        result.setDescription("Your job ran successfully.");
+        // replace with something from extract prop bean?
         return result;
-    	// return null;
+    	
     }
     
 
@@ -142,6 +130,11 @@ public class SqlProcessingFunction extends ProcessingFunction {
 		this.databaseType = databaseType;
 	}
 	
+	/*
+	 * getFileContents(sqlFile):
+	 * pulls out all the contents and assembles a string with all the SQL
+	 * statements to be executed on the datamart.
+	 */
 	private String[] getFileContents(File sqlFile) throws Exception {
 	    String value = "";
 	    StringBuffer sb = new StringBuffer();
