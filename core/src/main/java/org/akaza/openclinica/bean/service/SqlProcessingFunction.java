@@ -49,7 +49,7 @@ public class SqlProcessingFunction extends ProcessingFunction {
     		props.setProperty("user",databaseUsername);
     		props.setProperty("password",databasePassword);
     	//	props.setProperty("ssl","true");
-    		Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost/OC_test", props);
+    		Connection conn = DriverManager.getConnection(databaseUrl, props);
 
     		conn.setAutoCommit(false);
     		File sqlFile = new File(getTransformFileName());
