@@ -317,7 +317,6 @@ public class UpdateStudyEventServlet extends SecureController {
             } else {
                 for (int i = 0; i < eventCRFs.size(); i++) {
                     EventCRFBean ecb = (EventCRFBean) eventCRFs.get(i);
-                    ecb.setStatus(ecb.getOldStatus());
                     ecb.setUpdater(ub);
                     ecb.setUpdatedDate(new Date());
                     ecdao.update(ecb);
