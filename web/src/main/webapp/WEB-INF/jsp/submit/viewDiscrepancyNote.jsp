@@ -142,11 +142,6 @@
 
 </table>
 
-<div style="width:200px; float:right;">
-    <p><b>
-        <a href="#" onclick="window.openNewWindow('ViewItemAuditLog?entityId=<c:out value="${id}"/>&auditTable=<c:out value="${name}"/>','','no','dn')"><fmt:message key="audit_log_item" bundle="${resword}"/></a>
-    </b></p>
-</div>
 <div style="clear:both;"></div>
 <h3 class="title_manage"><fmt:message key="note_details" bundle="${resword}"/></h3>
 
@@ -296,6 +291,10 @@
 	</tbody></table>
 </c:if>  
 
+<br clear="all">
+<h3 class="title_manage"><fmt:message key="audit_log_item" bundle="${resword}"/></h3>
+<c:import url="../admin/auditItem.jsp"/>
+<br clear="all">
 </body>
 </html>
 
