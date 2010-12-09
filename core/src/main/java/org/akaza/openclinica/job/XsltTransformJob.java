@@ -340,10 +340,20 @@ public class XsltTransformJob extends QuartzJobBean {
                 
                 //delete old files now
                 List<File> intermediateFiles = generateFileService.getOldFiles();
-                
+                String[] dontDelFiles = epBean.getDoNotDelFiles();
                 if(zipped){
                 	markForDelete = 	zipxmls(markForDelete,endFile);
                 	endFile = endFile+".zip";
+                	
+                	String[] temp = new String[dontDelFiles.length];
+                	int i = 0;
+                	while(i<dontDelFiles.length)
+                	{
+                		temp[i] = dontDelFiles[i]+".zip";
+                		i++;
+                	}
+                	dontDelFiles = temp;
+                	
                 	//Actually deleting all the xml files which are produced since its zipped
                 	 FilenameFilter xmlFilter = new XMLFileFilter();
                 	 File tempFile = new File(generalFileDir);
@@ -351,9 +361,9 @@ public class XsltTransformJob extends QuartzJobBean {
                 }
                 if(deleteOld)
                 { 
-                	deleteIntermFiles(intermediateFiles, endFile);      
+                	deleteIntermFiles(intermediateFiles, endFile,dontDelFiles);      
                 	//JN:The following is superfluous and can be deleted.
-                	deleteIntermFiles(markForDelete, endFile);
+                	deleteIntermFiles(markForDelete, endFile,dontDelFiles);
                 
                 }
                 
@@ -451,19 +461,35 @@ public class XsltTransformJob extends QuartzJobBean {
     return deleteFilesList;
 		
 	}
-	private void deleteIntermFiles(List<File> intermediateFiles, String dontDeleteFile) {
+	private void deleteIntermFiles(List<File> intermediateFiles, String dontDeleteFile, String[] dontDelFiles) {
 
 		Iterator<File> fileIt = intermediateFiles.iterator();
 		File temp =null;
 		File DontDelFile = new File(dontDeleteFile);
-		
+		int i = 0;
+		boolean del=true;
 		while(fileIt.hasNext())
 		{
 			temp = fileIt.next();
 			if(!temp.getName().equals(DontDelFile.getName()))
 			{
-			if(temp.exists())
-					temp.delete();
+			i=0;
+			del=true;
+			System.out.println("File Name?"+temp.getName());
+				
+			while(i< dontDelFiles.length && del)
+			{
+			
+				if(temp.getName().equals(dontDelFiles[i]))
+				{System.out.println("file to deleted:"+temp.getName()+"File Not to deleted:"+dontDelFiles[i]);
+					
+				del = false;//file name contained in doNotDelete list, break;
+				
+				}
+				i++;
+			}
+			if(del)temp.delete();
+			
 			}
 		}
 	}

@@ -297,16 +297,14 @@ public class CoreResources implements ResourceLoaderAware   {
             // destination of the copied files
             // epbean.setFormat(getExtractField("xsl.format." + i));
             // if (("").equals(epbean.getFormat())) {
-            
-            epbean.setFormat("oc1.3");
             // }
             // formatting choice. currently permenantly set at oc1.3
-            epbean.setExportFileName(getExtractFields("extract." + i+".exportname"));
+            epbean.setFormat("oc1.3");
             // destination file name of the copied files
-            String whichFunction = getExtractField("extract."+i+".post").toLowerCase();
+            epbean.setExportFileName(getExtractFields("extract." + i+".exportname"));
             // post-processing event after the creation
             // System.out.println("found post function: " + whichFunction);
-   
+            String whichFunction = getExtractField("extract."+i+".post").toLowerCase();
             //added by JN: Zipformat comes from extract properties returns true by default
             epbean.setZipFormat(getExtractFieldBoolean("extract."+i+".zip"));
             epbean.setDeleteOld(getExtractFieldBoolean("extract."+i+".deleteOld"));

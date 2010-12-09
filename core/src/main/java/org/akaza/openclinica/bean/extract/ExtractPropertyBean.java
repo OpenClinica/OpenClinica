@@ -36,8 +36,18 @@ public class ExtractPropertyBean {
 	private String postProcExportName;
 	private boolean postProcDeleteOld;
 	private boolean postProcZip;
-	
-    public ExtractPropertyBean() {
+	private String[] doNotDelFiles;
+    public String[] getDoNotDelFiles() {
+		return doNotDelFiles;
+	}
+
+
+	public void setDoNotDelFiles(String[] doNotDelFiles) {
+		this.doNotDelFiles = doNotDelFiles;
+	}
+
+
+	public ExtractPropertyBean() {
         fileName = new String[10];
         filedescription = "";
         linkText = "";
