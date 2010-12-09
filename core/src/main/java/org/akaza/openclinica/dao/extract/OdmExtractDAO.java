@@ -290,7 +290,8 @@ public class OdmExtractDAO extends DatasetDAO {
         this.setTypeExpected(7, TypeNames.INT);// item_data_ordinal
         this.setTypeExpected(8, TypeNames.STRING);// value
         this.setTypeExpected(9, TypeNames.INT);// item_data_type_id
-        this.setTypeExpected(10, TypeNames.STRING);// mu_oid
+        this.setTypeExpected(10, TypeNames.INT);// item_data_id
+        this.setTypeExpected(11, TypeNames.STRING);// mu_oid
     }
 
     public void setEventCrfIdsByItemDataTypesExpected() {
@@ -2556,10 +2557,10 @@ public class OdmExtractDAO extends DatasetDAO {
         String ecStatusConstraint = this.getECStatusConstraint(datasetItemStatusId);
         String itStatusConstraint = this.getItemDataStatusConstraint(datasetItemStatusId);
         return "select cvidata.event_crf_id, ig.item_group_id, ig.oc_oid as item_group_oid, ig.name as item_group_name,"
-            + " cvidata.item_id, cvidata.item_oid, cvidata.item_data_ordinal, cvidata.value, cvidata.item_data_type_id"
+            + " cvidata.item_id, cvidata.item_oid, cvidata.item_data_ordinal, cvidata.value, cvidata.item_data_type_id, cvidata.item_data_id"
             + " from (select ec.event_crf_id, ec.crf_version_id, item.item_id, item.oc_oid as item_oid,"
-            + " idata.ordinal as item_data_ordinal, idata.value as value, item.item_data_type_id from item,"
-            + " (select event_crf_id, item_id, ordinal, value from item_data where (status_id "
+            + " idata.ordinal as item_data_ordinal, idata.value as value, item.item_data_type_id, idata.item_data_id as item_data_id from item,"
+            + " (select event_crf_id, item_id, ordinal, value, item_data_id from item_data where (status_id "
             + itStatusConstraint
             + ")"
             + " and event_crf_id in (select distinct event_crf_id from event_crf where study_subject_id in (select distinct"
