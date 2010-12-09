@@ -116,7 +116,7 @@ public class CoreResources implements ResourceLoaderAware   {
     }
 	private Properties setDataInfoProperties() {
     	String filePath = DATAINFO.getProperty("filePath");
-		
+		String database = DATAINFO.getProperty("dataBase");
     	logger.debug("DataInfo..."+DATAINFO);
     	if(DATAINFO.getProperty("filePath").contains("${catalina.home}"))
 		{
@@ -137,15 +137,53 @@ public class CoreResources implements ResourceLoaderAware   {
     	
     	filePath = replacePaths(DATAINFO.getProperty("filePath"));
     	DATAINFO.setProperty("filePath", filePath);
+    	
+    	String sysURL = DATAINFO.getProperty("sysURL");
+
+    	if(sysURL.contains("${WEBAPP}"))
+		{
+			
+			sysURL = sysURL.replace("${WEBAPP}", webapp);
+			DATAINFO.setProperty("sysURL", sysURL);
+		}
+    	
+    	
+    	//sysURL.base 
+    	String sysURLBase  = DATAINFO.getProperty("sysURL").replace("/MainMenu","");
+    	DATAINFO.setProperty("sysURL.base", sysURLBase);
+    	
+    	DATAINFO.setProperty("org.quartz.jobStore.misfireThreshold", "60000");
+    	DATAINFO.setProperty("org.quartz.jobStore.class","org.quartz.impl.jdbcjobstore.JobStoreTX");
+   
+    	if(database.equalsIgnoreCase("oracle"))
+    	{
+    		DATAINFO.setProperty("org.quartz.jobStore.driverDelegateClass","org.quartz.impl.jdbcjobstore.oracle.OracleDelegate");
+    	}
+    	else if(database.equalsIgnoreCase("postgres"))
+    	{
+    		DATAINFO.setProperty("org.quartz.jobStore.driverDelegateClass","org.quartz.impl.jdbcjobstore.PostgreSQLDelegate");
+    	}
+    		
+    	
+    	
+     	DATAINFO.setProperty("org.quartz.jobStore.useProperties", "false");
+     	DATAINFO.setProperty("org.quartz.jobStore.tablePrefix", "oc_qrtz_");
+     	DATAINFO.setProperty("org.quartz.threadPool.threadCount","1");
+     	DATAINFO.setProperty("org.quartz.threadPool.threadPriority", "5");
+     	
     	logger.debug("DataInfo..."+DATAINFO);
 		return DATAINFO;
 	}
 
+	private void replaceVars(String var){
+		
+		
+	}
 	private void copyBaseToDest(ResourceLoader resourceLoader)  {
     //	System.out.println("Properties directory?"+resourceLoader.getResource("properties/xslt"));
     
     	ByteArrayInputStream listSrcFiles[] = new ByteArrayInputStream[10];
-    	String[] fileNames =  {"odm_spss_dat.xsl","ODMToTAB.xsl","odm_to_html.xsl","odm_to_xslfo.xsl","ODMReportStylesheet.xsl","ODMReportStylesheet.xsl","ODMToCSV.xsl","ODM-XSLFO-Stylesheet.xsl","odm_spss_sps.xsl","copyXML.xsl"};
+    	String[] fileNames =  {"odm_spss_dat.xsl","ODMToTAB.xsl","odm_to_html.xsl","odm_to_xslfo.xsl","ODMToCSV.xsl","ODM-XSLFO-Stylesheet.xsl","odm_spss_sps.xsl","copyXML.xsl"};
     	try{
     listSrcFiles[0] = (ByteArrayInputStream) resourceLoader.getResource("classpath:properties"+File.separator+"xslt"+File.separator+fileNames[0]).getInputStream();
     listSrcFiles[1] = (ByteArrayInputStream)resourceLoader.getResource("classpath:properties"+File.separator+"xslt"+File.separator+fileNames[1]).getInputStream();
@@ -155,8 +193,7 @@ public class CoreResources implements ResourceLoaderAware   {
     listSrcFiles[5] = (ByteArrayInputStream)resourceLoader.getResource("classpath:properties"+File.separator+"xslt"+File.separator+fileNames[5]).getInputStream();
     listSrcFiles[6] = (ByteArrayInputStream)resourceLoader.getResource("classpath:properties"+File.separator+"xslt"+File.separator+fileNames[6]).getInputStream();
     listSrcFiles[7] = (ByteArrayInputStream)resourceLoader.getResource("classpath:properties"+File.separator+"xslt"+File.separator+fileNames[7]).getInputStream();
-    listSrcFiles[8] = (ByteArrayInputStream)resourceLoader.getResource("classpath:properties"+File.separator+"xslt"+File.separator+fileNames[8]).getInputStream();
-    listSrcFiles[9] = (ByteArrayInputStream)resourceLoader.getResource("classpath:properties"+File.separator+"xslt"+File.separator+fileNames[9]).getInputStream();
+
     	}catch(IOException ioe){
     		OpenClinicaSystemException oe = new OpenClinicaSystemException("Unable to read source files");
     		oe.initCause(ioe);
