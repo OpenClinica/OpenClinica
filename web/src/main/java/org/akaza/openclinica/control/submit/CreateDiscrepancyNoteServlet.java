@@ -323,7 +323,8 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                 request.setAttribute("parent", parent);
             }
             dndao.setFetchMapping(false);
-        } else {
+        } /* 
+        else {
             if (!isNew) {// not a new note, so try to find the parent note
                 for (int i = 0; i < notes.size(); i++) {
                     DiscrepancyNoteBean note1 = (DiscrepancyNoteBean) notes.get(i);
@@ -337,7 +338,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                     }
                 }
             }
-        }
+        }*/
         FormDiscrepancyNotes newNotes = (FormDiscrepancyNotes) session.getAttribute(FORM_DISCREPANCY_NOTES_NAME);
 
         if (newNotes == null) {
