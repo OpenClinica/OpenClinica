@@ -5,6 +5,7 @@ import org.akaza.openclinica.bean.service.PdfProcessingFunction;
 import org.akaza.openclinica.bean.service.SasProcessingFunction;
 import org.akaza.openclinica.bean.service.SqlProcessingFunction;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.aspectj.weaver.patterns.ThisOrTargetAnnotationPointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -42,7 +43,7 @@ public class CoreResources implements ResourceLoaderAware   {
     private Properties extractInfo;
 
     private static String webapp;
-    protected final static Logger logger = LoggerFactory.getLogger("CoreResources");
+    protected final  Logger logger = LoggerFactory.getLogger(getClass().getName());
     // private MessageSource messageSource;
     private static ArrayList<ExtractPropertyBean> extractProperties;
 //TODO:Clean up all system outs
@@ -483,7 +484,7 @@ public class CoreResources implements ResourceLoaderAware   {
         String value = EXTRACTINFO.getProperty(key);
         
         System.out.println("key?"+key+"value = "+value);
-        logger.debug("key??"+key+"value = "+value);
+       
         if (value != null) {
             value = value.trim();
         }
@@ -526,15 +527,6 @@ public class CoreResources implements ResourceLoaderAware   {
         return webAppName;
     }
     
-    //getters and setters for web application context name
-//    public void setWebAppContextName(ServletContext webAppContext)
-//    {
-//    	logger.debug("Web application context"+webAppContext);
-//    	System.out.println("Web application context"+webAppContext);
-//    	this.webAppContext = webAppContext;
-//    }
-//    public ServletContext getWebAppContextName(){
-//    	return webAppContext;
-//    }
+ 
 
 }
