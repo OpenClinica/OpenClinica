@@ -22,7 +22,9 @@
     </context-param>
 
     <listener>
-        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+        <!--@pgawade 01-DEC-2010 Replaced the listener with the extended class
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>-->
+        <listener-class>org.akaza.openclinica.dao.core.OCContextLoaderListener</listener-class>
     </listener>
     <listener>
         <listener-class>org.akaza.openclinica.control.OCSessionListener</listener-class>
