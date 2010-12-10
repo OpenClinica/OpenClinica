@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
@@ -43,13 +44,15 @@ public class SqlProcessingFunction extends ProcessingFunction {
      * 
      */
     public ProcessingResultType run() {
+    	Connection conn = null;
+    	ProcessingResultType resultError =null ;
     	try {
     		// load the proper database class below
     		Properties props = new Properties();
     		props.setProperty("user",databaseUsername);
     		props.setProperty("password",databasePassword);
     	//	props.setProperty("ssl","true");
-    		Connection conn = DriverManager.getConnection(databaseUrl, props);
+    		conn = DriverManager.getConnection(databaseUrl, props);
 
     		conn.setAutoCommit(false);
     		File sqlFile = new File(getTransformFileName());
@@ -71,13 +74,27 @@ public class SqlProcessingFunction extends ProcessingFunction {
     	} catch (Exception e) {
     	    e.printStackTrace();
     	    System.out.println(" -- > found an exception : " + e.getMessage());
-    	    ProcessingResultType resultError = ProcessingResultType.FAIL;
+    	    resultError = ProcessingResultType.FAIL;
             resultError.setUrl(""); // no url required
             resultError.setArchiveMessage("Failure thrown: " + e.getMessage());
             resultError.setDescription("Your job failed with the message of: " + e.getMessage());
          
             return resultError;
           
+    	}
+    	finally{
+    		try {
+			if(conn!=null){
+    		conn.commit();
+			conn.setAutoCommit(false);
+    		conn.close();
+			}
+			if(resultError!=null)
+				return resultError;
+    		} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
     	}
     	// set up the reply object
     	ProcessingResultType result = ProcessingResultType.SUCCESS;
