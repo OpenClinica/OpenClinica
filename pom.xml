@@ -154,6 +154,12 @@
 			<version>1.5.6</version>
 			<scope>test</scope>
 		</dependency>
+		<!--@pgawade 02-DEC-2010 Added jul-to-slf4j-1.5.6.jar to get liquibase logs using SLF4JBridgeHandler -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jul-to-slf4j</artifactId>
+			<version>1.5.6</version>
+		</dependency>
 		<!-- We have added this to see logging from SpringFramework it uses JCL -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -161,18 +167,30 @@
 			<version>1.5.6</version>
 			<scope>runtime</scope>
 		</dependency>
+<!-- @pgawade 22-Nov-2010 Changed the logback dependency to default scope; it is needed to compile log filters -->
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-core</artifactId>
 			<version>0.9.20</version>
-			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-			<version>0.9.20</version>
-			<scope>runtime</scope>
+			<version>0.9.20</version>			
 		</dependency>
+		<!-- @pgawade 22-Nov-2010 Added the logback access; it will be needed to get the web application usage pattern data --> 
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-access</artifactId>
+			<version>0.9.20</version>
+		</dependency>
+
+		<dependency>
+			<groupId>janino</groupId>
+			<artifactId>janino</artifactId>
+			<version>2.5.10</version>
+		</dependency>
+
 		<!-- SPRING -->
 		<dependency>
             <groupId>org.springframework</groupId>
@@ -219,6 +237,13 @@
 			<artifactId>spring-security-config</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
+		<!--@pgawade 10-DEC-2010 Added to get spring ContextLoaderListener class in core -->
+		<dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
 		<dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-oxm</artifactId>
@@ -231,6 +256,7 @@
 			<version>1.0</version>
 		</dependency>
 		-->
+
 		<!-- HIBERNATE -->
 		<dependency>
 			<groupId>javax.validation</groupId>
