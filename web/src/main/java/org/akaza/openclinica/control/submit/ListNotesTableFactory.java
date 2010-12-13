@@ -662,8 +662,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             String value = "";
             DiscrepancyNoteBean dnb = (DiscrepancyNoteBean) ((HashMap<Object, Object>) item).get("discrepancyNoteBean");
             HtmlBuilder builder = new HtmlBuilder();
-            builder.a().href("#");
-            builder.onclick("openVNoteWindow('ViewNote?id=" + dnb.getId() + "')");
+            //for "view" as action
+            builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId()+"&viewAction=1");
             builder.close();
             builder.img().name("bt_View1").src("images/bt_View_d.gif").border("0").alt(resword.getString("view")).title(resword.getString("view"))
                     .align("left").append("hspace=\"6\"").close();
