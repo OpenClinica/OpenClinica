@@ -17,48 +17,6 @@
 <script language="JavaScript" src="includes/global_functions_javascript.js"></script>
 <script language="JavaScript">
 <!--
-function setStatus(typeId) {
-	objtr1=document.getElementById('res1');
-	objtr2=document.getElementById('resStatusId');
-	if (typeId == 2|| typeId ==4) {//annotation or reason for change
-
-	  	objtr2.value=5;
-	  	objtr2.disabled = true;
-	} else if (typeId == 3) { //query
-		objtr2.value=1; //new
-		objtr2.disabled = false;
-	} else {
-  		if (objtr2.value ==5 && objtr2.disabled) {
-   			objtr2.value=1;
-  		}
-
-  		objtr2.disabled = false;
-
-	}
-}
-
-function setResStatus(resStatusId, destinationUserId) {
-	objtr1=document.getElementById('resStatusId');
-	objtr2=document.getElementById('userAccountId');
-	objtr3=document.getElementById('xxx');
-	objtr4=document.getElementById('typeId');
-
-	if (resStatusId == 3 || resStatusId == 4) { //Resolutiuon proposed or Closed
-		// objtr2.disabled = false;
-		objtr2.value = destinationUserId;
-		// disable?
-		objtr2.disabled = false;
-		objtr3.removeAttribute('disabled');
-		//objtr3.value = destinationUserId;
-		// disable?
-		//objtr3.disabled = false;
-	}
-
-	if (resStatusId == 5 && objtr4.value == 4) { // Not applicable AND Reason for Change
-		objtr1.disabled = true;
-	}
-}
-
 function showOnly(strLeftNavRowElementName){
     var objLeftNavRowElement;
 
@@ -120,6 +78,28 @@ function setStatusWithId(typeId, id) {
 
   		objtr2.disabled = false;
 
+	}
+}
+
+function setResStatusWithId(id, resStatusId, destinationUserId) {
+	objtr1=document.getElementById('resStatusId'+id);
+	objtr2=document.getElementById('userAccountId'+id);
+	objtr3=document.getElementById('xxx'+id);
+	objtr4=document.getElementById('typeId'+id);
+
+	if (resStatusId == 3 || resStatusId == 4) { //Resolutiuon proposed or Closed
+		// objtr2.disabled = false;
+		objtr2.value = destinationUserId;
+		// disable?
+		objtr2.disabled = false;
+		objtr3.removeAttribute('disabled');
+		//objtr3.value = destinationUserId;
+		// disable?
+		//objtr3.disabled = false;
+	}
+
+	if (resStatusId == 5 && objtr4.value == 4) { // Not applicable AND Reason for Change
+		objtr1.disabled = true;
 	}
 }
 //-->
@@ -255,7 +235,7 @@ function setStatusWithId(typeId, id) {
 		    <td  class="table_cell_noborder"><fmt:message key="resolution_status" bundle="${resword}"/>:</td>
 		    <td class="table_cell_noborder"><div class="formfieldL_BG">
 			<c:set var="resStatusId1" value="${discrepancyNote.resolutionStatusId}"/>
-		    <select name="resStatusId${parentId}" id="resStatusId${parentId}" class="formfieldL" onchange="javascript:setResStatus(3, <c:out value="${discrepancyNote.ownerId}"/>);">
+		    <select name="resStatusId${parentId}" id="resStatusId${parentId}" class="formfieldL" onchange="javascript:setResStatusWithId(<c:out value="${parentId}"/>, 3, <c:out value="${discrepancyNote.ownerId}"/>);">
 				<c:choose>
 				<c:when test="${whichResStatus == 2 && param.typeId == 3 && parentId > 0}">
 					<c:set var="resStatuses" value="${resolutionStatuses2}"/>
@@ -299,7 +279,7 @@ function setStatusWithId(typeId, id) {
 				<c:set var="userAccountId1" value="0"/>
 			</c:otherwise>
 			</c:choose>
-			<span id="xxx" disabled>
+			<span id="xxx${parentId}">
 			<select name="userAccountId${parentId}" id="userAccountId${parentId}" class="formfieldL" >
 		  		<c:forEach var="user" items="${userAccounts}">
 		   		<c:choose>

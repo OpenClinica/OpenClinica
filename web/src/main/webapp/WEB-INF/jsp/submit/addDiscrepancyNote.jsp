@@ -353,7 +353,7 @@ function setElements(typeId, user1, user2) {
 				<c:set var="userAccountId1" value="0"/>
 			</c:otherwise>
 			</c:choose>
-			<span id="xxx" disabled>
+			<span id="xxx">
 			<select name="userAccountId" id="userAccountId" class="formfieldL" >
 		  		<c:forEach var="user" items="${userAccounts}">
 		   		<c:choose>
