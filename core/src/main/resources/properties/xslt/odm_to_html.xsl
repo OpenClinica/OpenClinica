@@ -54,10 +54,10 @@
                         <tr valign="top">
                             <td class="table_header_column_top">Database Export Header Metadata</td>
                             <td class="table_cell_top">
-                                <xsl:text> </xsl:text>
+                                <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
                             </td>
                             <td class="table_cell_top">
-                                <xsl:text> </xsl:text>
+                                <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
                             </td>
                         </tr>
                         <tr>
@@ -66,7 +66,7 @@
                                 <xsl:value-of select="$datasetName"/>
                             </td>
                             <td class="table_cell">
-                                <xsl:text> </xsl:text>
+                                <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
                             </td>
                         </tr>
                         <tr>
@@ -75,7 +75,7 @@
                                 <xsl:value-of select="$desc"/>
                             </td>
                             <td class="table_cell">
-                                <xsl:text> </xsl:text>
+                                <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
                             </td>
                         </tr>
                         <tr>
@@ -84,7 +84,7 @@
                                 <xsl:value-of select="$study/odm:GlobalVariables/odm:StudyName"/>
                             </td>
                             <td class="table_cell">
-                                <xsl:text> </xsl:text>
+                                <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
                             </td>
                         </tr>
                         <tr>
@@ -93,7 +93,7 @@
                                 <xsl:value-of select="$protocolNameStudy"/>
                             </td>
                             <td class="table_cell">
-                                <xsl:text> </xsl:text>
+                                <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
                             </td>
                         </tr>
                         <tr>
@@ -104,7 +104,7 @@
                                 </xsl:call-template>
                             </td>
                             <td class="table_cell">
-                                <xsl:text> </xsl:text>
+                                <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
                             </td>
                         </tr>
                         <tr>
@@ -113,7 +113,7 @@
                                 <xsl:value-of select="$subject_count"/>
                             </td>
                             <td class="table_cell">
-                                <xsl:text> </xsl:text>
+                                <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
                             </td>
                         </tr>
                         <tr>
@@ -122,7 +122,7 @@
                                 <xsl:value-of select="$eventDefCount"/>
                             </td>
                             <td class="table_cell">
-                                <xsl:text> </xsl:text>
+                                <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
                             </td>
                         </tr>
 
@@ -469,13 +469,34 @@
                         <xsl:value-of select="@OpenClinica:StudySubjectId"></xsl:value-of>
                     </td>
                     <td class="table_cell">
-                        <xsl:value-of select="@OpenClinica:UniqueIdentifier"></xsl:value-of>
+                        <xsl:choose>
+                            <xsl:when test="@OpenClinica:UniqueIdentifier">
+                                <xsl:value-of select="@OpenClinica:UniqueIdentifier"></xsl:value-of>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </td>
                     <td class="table_cell">
-                        <xsl:value-of select="@OpenClinica:Status"></xsl:value-of>
+                        <xsl:choose>
+                            <xsl:when test="@OpenClinica:Status">
+                                <xsl:value-of select="@OpenClinica:Status"></xsl:value-of>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </td>
                     <td class="table_cell">
-                        <xsl:value-of select="@OpenClinica:Sex"></xsl:value-of>
+                        <xsl:choose>
+                            <xsl:when test="@OpenClinica:Sex">
+                                <xsl:value-of select="@OpenClinica:Sex"></xsl:value-of>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </td>
                     <xsl:variable name="subjectEvents" select="./odm:StudyEventData"/>
                     <xsl:for-each select="//odm:StudyEventData[generate-id() = generate-id(key('studyEvents',@StudyEventOID))]">
@@ -493,19 +514,40 @@
                                             <xsl:choose>
                                                 <xsl:when test="$subjectEvent/node()">
                                                 <td class="table_cell">
-                                                    <xsl:value-of select="@OpenClinica:StudyEventLocation"></xsl:value-of>
+                                                    <xsl:choose>
+                                                        <xsl:when test="@OpenClinica:StudyEventLocation">
+                                                            <xsl:value-of select="@OpenClinica:StudyEventLocation"></xsl:value-of>
+                                                        </xsl:when>
+                                                        <xsl:otherwise>
+                                                            <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+                                                        </xsl:otherwise>
+                                                    </xsl:choose>
                                                 </td>
                                                 <td class="table_cell">
-                                                    <xsl:value-of select="@OpenClinica:StartDate"></xsl:value-of>
+                                                    <xsl:choose>
+                                                        <xsl:when test="@OpenClinica:StartDate">
+                                                            <xsl:value-of select="@OpenClinica:StartDate"></xsl:value-of>
+                                                        </xsl:when>
+                                                        <xsl:otherwise>
+                                                            <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+                                                        </xsl:otherwise>
+                                                    </xsl:choose>
                                                 </td>
                                                 <td class="table_cell">
-                                                    <xsl:value-of select="@OpenClinica:Status"></xsl:value-of>
+                                                    <xsl:choose>
+                                                        <xsl:when test="@OpenClinica:Status">
+                                                            <xsl:value-of select="@OpenClinica:Status"></xsl:value-of>
+                                                        </xsl:when>
+                                                        <xsl:otherwise>
+                                                            <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+                                                        </xsl:otherwise>
+                                                    </xsl:choose>
                                                 </td>
                                                 </xsl:when>
                                                 <xsl:otherwise>
-                                                    <td class="table_cell"><xsl:text> </xsl:text></td>
-                                                    <td class="table_cell"><xsl:text> </xsl:text></td>
-                                                    <td class="table_cell"><xsl:text> </xsl:text></td>
+                                                    <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
+                                                    <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
+                                                    <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
                                                 </xsl:otherwise>
                                             </xsl:choose>
                                         </xsl:when>
@@ -515,19 +557,40 @@
                                                 <xsl:choose>
                                                     <xsl:when test="$subjectEvent/node()">
                                                         <td class="table_cell">
-                                                            <xsl:value-of select="@OpenClinica:StudyEventLocation"></xsl:value-of>
+                                                            <xsl:choose>
+                                                                <xsl:when test="@OpenClinica:StudyEventLocation">
+                                                                    <xsl:value-of select="@OpenClinica:StudyEventLocation"></xsl:value-of>
+                                                                </xsl:when>
+                                                                <xsl:otherwise>
+                                                                    <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+                                                                </xsl:otherwise>
+                                                            </xsl:choose>
                                                         </td>
                                                         <td class="table_cell">
-                                                            <xsl:value-of select="@OpenClinica:StartDate"></xsl:value-of>
+                                                            <xsl:choose>
+                                                                <xsl:when test="@OpenClinica:StartDate">
+                                                                    <xsl:value-of select="@OpenClinica:StartDate"></xsl:value-of>
+                                                                </xsl:when>
+                                                                <xsl:otherwise>
+                                                                    <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+                                                                </xsl:otherwise>
+                                                            </xsl:choose>
                                                         </td>
                                                         <td class="table_cell">
-                                                            <xsl:value-of select="@OpenClinica:Status"></xsl:value-of>
+                                                            <xsl:choose>
+                                                                <xsl:when test="@OpenClinica:Status">
+                                                                    <xsl:value-of select="@OpenClinica:Status"></xsl:value-of>
+                                                                </xsl:when>
+                                                                <xsl:otherwise>
+                                                                    <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+                                                                </xsl:otherwise>
+                                                            </xsl:choose>
                                                         </td>
                                                     </xsl:when>
                                                     <xsl:otherwise>
-                                                        <td class="table_cell"><xsl:text> </xsl:text></td>
-                                                        <td class="table_cell"><xsl:text> </xsl:text></td>
-                                                        <td class="table_cell"><xsl:text> </xsl:text></td>
+                                                        <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
+                                                        <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
+                                                        <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
                                                     </xsl:otherwise>
                                                 </xsl:choose>
                                             </xsl:if>
@@ -540,19 +603,40 @@
                                 <xsl:choose>
                                     <xsl:when test="$subjectEvent/node()">
                                         <td class="table_cell">
-                                            <xsl:value-of select="@OpenClinica:StudyEventLocation"></xsl:value-of>
+                                            <xsl:choose>
+                                                <xsl:when test="@OpenClinica:StudyEventLocation">
+                                                    <xsl:value-of select="@OpenClinica:StudyEventLocation"></xsl:value-of>
+                                                </xsl:when>
+                                                <xsl:otherwise>
+                                                    <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+                                                </xsl:otherwise>
+                                            </xsl:choose>
                                         </td>
                                         <td class="table_cell">
-                                            <xsl:value-of select="@OpenClinica:StartDate"></xsl:value-of>
+                                            <xsl:choose>
+                                                <xsl:when test="@OpenClinica:StartDate">
+                                                    <xsl:value-of select="@OpenClinica:StartDate"></xsl:value-of>
+                                                </xsl:when>
+                                                <xsl:otherwise>
+                                                    <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+                                                </xsl:otherwise>
+                                            </xsl:choose>
                                         </td>
                                         <td class="table_cell">
-                                            <xsl:value-of select="@OpenClinica:Status"></xsl:value-of>
+                                            <xsl:choose>
+                                                <xsl:when test="@OpenClinica:Status">
+                                                    <xsl:value-of select="@OpenClinica:Status"></xsl:value-of>
+                                                </xsl:when>
+                                                <xsl:otherwise>
+                                                    <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+                                                </xsl:otherwise>
+                                            </xsl:choose>
                                         </td>
                                     </xsl:when>
                                     <xsl:otherwise>
-                                        <td class="table_cell"><xsl:text> </xsl:text></td>
-                                        <td class="table_cell"><xsl:text> </xsl:text></td>
-                                        <td class="table_cell"><xsl:text> </xsl:text></td>
+                                        <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
+                                        <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
+                                        <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
                                     </xsl:otherwise>
                                 </xsl:choose>
                             </xsl:otherwise>
@@ -578,23 +662,51 @@
                                                     <xsl:choose>
                                                         <xsl:when test="$subjectFormData/node()">
                                                             <td class="table_cell">
-                                                                <xsl:value-of select="$currentForm/@OpenClinica:InterviewerName"></xsl:value-of>
+                                                                <xsl:choose>
+                                                                    <xsl:when test="$currentForm/@OpenClinica:InterviewerName">
+                                                                        <xsl:value-of select="$currentForm/@OpenClinica:InterviewerName"></xsl:value-of>
+                                                                    </xsl:when>
+                                                                    <xsl:otherwise>
+                                                                        <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+                                                                    </xsl:otherwise>
+                                                                </xsl:choose>
                                                             </td>
                                                             <td class="table_cell">
-                                                                <xsl:value-of select="$currentForm/@OpenClinica:StartDate"></xsl:value-of>
+                                                                <xsl:choose>
+                                                                    <xsl:when test="$currentForm/@OpenClinica:StartDate">
+                                                                        <xsl:value-of select="$currentForm/@OpenClinica:StartDate"></xsl:value-of>
+                                                                    </xsl:when>
+                                                                    <xsl:otherwise>
+                                                                        <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+                                                                    </xsl:otherwise>
+                                                                </xsl:choose>
                                                             </td>
                                                             <td class="table_cell">
-                                                                <xsl:value-of select="$currentForm/@OpenClinica:Status"></xsl:value-of>
+                                                                <xsl:choose>
+                                                                    <xsl:when test="$currentForm/@OpenClinica:Status">
+                                                                        <xsl:value-of select="$currentForm/@OpenClinica:Status"></xsl:value-of>
+                                                                    </xsl:when>
+                                                                    <xsl:otherwise>
+                                                                        <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+                                                                    </xsl:otherwise>
+                                                                </xsl:choose>
                                                             </td>
                                                             <td class="table_cell">
-                                                                <xsl:value-of select="$currentForm/@OpenClinica:Version"></xsl:value-of>
+                                                                <xsl:choose>
+                                                                    <xsl:when test="$currentForm/@OpenClinica:Version">
+                                                                        <xsl:value-of select="$currentForm/@OpenClinica:Version"></xsl:value-of>
+                                                                    </xsl:when>
+                                                                    <xsl:otherwise>
+                                                                        <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+                                                                    </xsl:otherwise>
+                                                                </xsl:choose>
                                                             </td>
                                                         </xsl:when>
                                                         <xsl:otherwise>
-                                                            <td class="table_cell"><xsl:text> </xsl:text></td>
-                                                            <td class="table_cell"><xsl:text> </xsl:text></td>
-                                                            <td class="table_cell"><xsl:text> </xsl:text></td>
-                                                            <td class="table_cell"><xsl:text> </xsl:text></td>
+                                                            <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
+                                                            <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
+                                                            <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
+                                                            <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
                                                         </xsl:otherwise>
                                                     </xsl:choose>
                                                 </xsl:when>
@@ -604,23 +716,51 @@
                                                         <xsl:choose>
                                                             <xsl:when test="$subjectFormData/node()">
                                                                 <td class="table_cell">
-                                                                    <xsl:value-of select="$currentForm/@OpenClinica:InterviewerName"></xsl:value-of>
+                                                                    <xsl:choose>
+                                                                        <xsl:when test="$currentForm/@OpenClinica:InterviewerName">
+                                                                            <xsl:value-of select="$currentForm/@OpenClinica:InterviewerName"></xsl:value-of>
+                                                                        </xsl:when>
+                                                                        <xsl:otherwise>
+                                                                            <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+                                                                        </xsl:otherwise>
+                                                                    </xsl:choose>
                                                                 </td>
                                                                 <td class="table_cell">
-                                                                    <xsl:value-of select="$currentForm/@OpenClinica:StartDate"></xsl:value-of>
+                                                                    <xsl:choose>
+                                                                        <xsl:when test="$currentForm/@OpenClinica:StartDate">
+                                                                            <xsl:value-of select="$currentForm/@OpenClinica:StartDate"></xsl:value-of>
+                                                                        </xsl:when>
+                                                                        <xsl:otherwise>
+                                                                            <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+                                                                        </xsl:otherwise>
+                                                                    </xsl:choose>
                                                                 </td>
                                                                 <td class="table_cell">
-                                                                    <xsl:value-of select="$currentForm/@OpenClinica:Status"></xsl:value-of>
+                                                                    <xsl:choose>
+                                                                        <xsl:when test="$currentForm/@OpenClinica:Status">
+                                                                            <xsl:value-of select="$currentForm/@OpenClinica:Status"></xsl:value-of>
+                                                                        </xsl:when>
+                                                                        <xsl:otherwise>
+                                                                            <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+                                                                        </xsl:otherwise>
+                                                                    </xsl:choose>
                                                                 </td>
                                                                 <td class="table_cell">
-                                                                    <xsl:value-of select="$currentForm/@OpenClinica:Version"></xsl:value-of>
+                                                                    <xsl:choose>
+                                                                        <xsl:when test="$currentForm/@OpenClinica:Version">
+                                                                            <xsl:value-of select="$currentForm/@OpenClinica:Version"></xsl:value-of>
+                                                                        </xsl:when>
+                                                                        <xsl:otherwise>
+                                                                            <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+                                                                        </xsl:otherwise>
+                                                                    </xsl:choose>
                                                                 </td>
                                                             </xsl:when>
                                                             <xsl:otherwise>
-                                                                <td class="table_cell"><xsl:text> </xsl:text></td>
-                                                                <td class="table_cell"><xsl:text> </xsl:text></td>
-                                                                <td class="table_cell"><xsl:text> </xsl:text></td>
-                                                                <td class="table_cell"><xsl:text> </xsl:text></td>
+                                                                <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
+                                                                <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
+                                                                <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
+                                                                <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
                                                             </xsl:otherwise>
                                                         </xsl:choose>
                                                     </xsl:if>
@@ -632,23 +772,51 @@
                                         <xsl:choose>
                                             <xsl:when test="$subjectFormData/node()">
                                                 <td class="table_cell">
-                                                    <xsl:value-of select="$currentForm/@OpenClinica:InterviewerName"></xsl:value-of>
+                                                    <xsl:choose>
+                                                        <xsl:when test="$currentForm/@OpenClinica:InterviewerName">
+                                                            <xsl:value-of select="$currentForm/@OpenClinica:InterviewerName"></xsl:value-of>
+                                                        </xsl:when>
+                                                        <xsl:otherwise>
+                                                            <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+                                                        </xsl:otherwise>
+                                                    </xsl:choose>
                                                 </td>
                                                 <td class="table_cell">
-                                                    <xsl:value-of select="$currentForm/@OpenClinica:StartDate"></xsl:value-of>
+                                                    <xsl:choose>
+                                                        <xsl:when test="$currentForm/@OpenClinica:StartDate">
+                                                            <xsl:value-of select="$currentForm/@OpenClinica:StartDate"></xsl:value-of>
+                                                        </xsl:when>
+                                                        <xsl:otherwise>
+                                                            <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+                                                        </xsl:otherwise>
+                                                    </xsl:choose>
                                                 </td>
                                                 <td class="table_cell">
-                                                    <xsl:value-of select="$currentForm/@OpenClinica:Status"></xsl:value-of>
+                                                    <xsl:choose>
+                                                        <xsl:when test="$currentForm/@OpenClinica:Status">
+                                                            <xsl:value-of select="$currentForm/@OpenClinica:Status"></xsl:value-of>
+                                                        </xsl:when>
+                                                        <xsl:otherwise>
+                                                            <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+                                                        </xsl:otherwise>
+                                                    </xsl:choose>
                                                 </td>
                                                 <td class="table_cell">
-                                                    <xsl:value-of select="$currentForm/@OpenClinica:Version"></xsl:value-of>
+                                                    <xsl:choose>
+                                                        <xsl:when test="$currentForm/@OpenClinica:Version">
+                                                            <xsl:value-of select="$currentForm/@OpenClinica:Version"></xsl:value-of>
+                                                        </xsl:when>
+                                                        <xsl:otherwise>
+                                                            <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+                                                        </xsl:otherwise>
+                                                    </xsl:choose>
                                                 </td>
                                             </xsl:when>
                                             <xsl:otherwise>
-                                                <td class="table_cell"><xsl:text> </xsl:text></td>
-                                                <td class="table_cell"><xsl:text> </xsl:text></td>
-                                                <td class="table_cell"><xsl:text> </xsl:text></td>
-                                                <td class="table_cell"><xsl:text> </xsl:text></td>
+                                                <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
+                                                <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
+                                                <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
+                                                <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
                                             </xsl:otherwise>
                                         </xsl:choose>
                                     </xsl:otherwise>
@@ -675,7 +843,7 @@
                                             </td>
                                         </xsl:when>
                                         <xsl:otherwise>
-                                            <td class="table_cell"><xsl:text> </xsl:text></td>
+                                            <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
                                         </xsl:otherwise>
                                     </xsl:choose>
                                 </xsl:if>
@@ -866,10 +1034,10 @@
                                                                     </td>
                                                                 </xsl:for-each>
                                                                 <td class="table_cell">
-                                                                    <xsl:text> </xsl:text>
+                                                                    <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
                                                                 </td>
                                                                 <td class="table_cell">
-                                                                    <xsl:text> </xsl:text>
+                                                                    <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
                                                                 </td>
                                                                 <xsl:for-each
                                                                         select="$groupDetails/odm:ItemRef[@ItemOID=$OID_Item]">
