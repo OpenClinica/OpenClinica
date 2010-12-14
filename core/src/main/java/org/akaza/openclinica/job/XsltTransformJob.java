@@ -136,7 +136,7 @@ public class XsltTransformJob extends QuartzJobBean {
             int studyId = dataMap.getInt(STUDY_ID);
             String outputPath = dataMap.getString(POST_FILE_PATH);
             // get all user info, generate xml
-           // System.out.println("found output path: " + outputPath);
+           // logger.info("found output path: " + outputPath);
             logger.debug("found output path: " + outputPath);
             String generalFileDir = dataMap.getString(XML_FILE_PATH);
             int epBeanId = dataMap.getInt(EXTRACT_PROPERTY);
@@ -248,7 +248,7 @@ public class XsltTransformJob extends QuartzJobBean {
                 //Delete these files only in case when there is no failure
                 if (message.getCode().intValue() != 2)            deleteOldFiles(intermediateFiles);
                 final long done2 = System.currentTimeMillis() - start;
-                System.out.println("--> postprocessing completed in " + done2 + " ms, found result type " + message.getCode());
+                logger.info("--> postprocessing completed in " + done2 + " ms, found result type " + message.getCode());
                 logger.info("--> postprocessing completed in " + done2 + " ms, found result type " + message.getCode());
               /*  if((Boolean)dataMap.get(POST_PROC_DELETE_OLD))
                 {
@@ -390,7 +390,7 @@ public class XsltTransformJob extends QuartzJobBean {
             } catch (OpenClinicaSystemException ose) {
                 // Do Nothing, In the future we might want to have an email
                 // status added to system.
-                System.out.println("exception sending mail: " + ose.getMessage());
+                logger.info("exception sending mail: " + ose.getMessage());
                 logger.error("exception sending mail: " + ose.getMessage());
             }
             
@@ -459,7 +459,10 @@ public class XsltTransformJob extends QuartzJobBean {
         
     }
     
-    
+    /**
+     * To go through all the existing archived datasets and delete off the records whose file references do not exist any more.
+     * @param datasetId
+     */
     private void resetArchiveDataset(int datasetId)
     {
       //  ArchivedDatasetFileBean fbExisting= new ArchivedDatasetFileBean();
@@ -514,10 +517,10 @@ public class XsltTransformJob extends QuartzJobBean {
     }
   
 	//since zip is successful, deleting the endfile.
-	System.out.println("About to delete file"+EndFile.getName());
+	logger.info("About to delete file"+EndFile.getName());
 	boolean deleted = EndFile.delete();
-	System.out.println("deleted?"+deleted);
-	System.out.println("Does the file exist still?"+EndFile.exists());	
+	logger.info("deleted?"+deleted);
+	logger.info("Does the file exist still?"+EndFile.exists());	
     return deleteFilesList;
 		
 	}
@@ -535,13 +538,13 @@ public class XsltTransformJob extends QuartzJobBean {
 			{
 			i=0;
 			del=true;
-			System.out.println("File Name?"+temp.getName());
+			logger.info("File Name?"+temp.getName());
 				
 			while(i< dontDelFiles.length && del)
 			{
 			
 				if(temp.getName().equals(dontDelFiles[i]))
-				{System.out.println("file to deleted:"+temp.getName()+"File Not to deleted:"+dontDelFiles[i]);
+				{logger.info("file to deleted:"+temp.getName()+"File Not to deleted:"+dontDelFiles[i]);
 					
 				del = false;//file name contained in doNotDelete list, break;
 				
@@ -553,9 +556,10 @@ public class XsltTransformJob extends QuartzJobBean {
 			}
 		}
 	}
-	 public static float bytesToKilo(long bytes) {
-		System.out.println("output bytes?"+bytes+"divided by 1024"+bytes/KILOBYTE);
-		System.out.println("output bytes?"+bytes+"divided by 1024"+(float)bytes/KILOBYTE);
+	//Utility method, might be useful in the future to convert to kilobytes.
+	 public  float bytesToKilo(long bytes) {
+		logger.info("output bytes?"+bytes+"divided by 1024"+bytes/KILOBYTE);
+		logger.info("output bytes?"+bytes+"divided by 1024"+(float)bytes/KILOBYTE);
 		 return (float)bytes/KILOBYTE ;
 		 }
 
@@ -673,7 +677,7 @@ public class XsltTransformJob extends QuartzJobBean {
             mailSender = (OpenClinicaMailSender) appContext.getBean("openClinicaMailSender");
             
             mailSender.sendEmail(target, EmailEngine.getAdminEmail(), subject, emailBody, false);
-            System.out.println("sending an email to " + target + " from " + EmailEngine.getAdminEmail());
+            logger.info("sending an email to " + target + " from " + EmailEngine.getAdminEmail());
         } catch (SchedulerException se) {
             se.printStackTrace();
         } catch (OpenClinicaSystemException ose) {
@@ -682,11 +686,12 @@ public class XsltTransformJob extends QuartzJobBean {
         
         
     }
+    // Utility method to format upto 3 decimals. 
     private float setFormat(float number)
     {
     	DecimalFormat df = new DecimalFormat("0.000");
-    	System.out.println("Number is"+Double.parseDouble(df.format(number)));
-    	System.out.println("Number is"+(float)Double.parseDouble(df.format(number)));
+    	logger.info("Number is"+Double.parseDouble(df.format(number)));
+    	logger.info("Number is"+(float)Double.parseDouble(df.format(number)));
     	return (float)Double.parseDouble(df.format(number));
     }
 
