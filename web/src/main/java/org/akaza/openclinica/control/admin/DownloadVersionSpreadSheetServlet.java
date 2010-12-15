@@ -83,7 +83,7 @@ public class DownloadVersionSpreadSheetServlet extends SecureController {
         String oldExcelFileName = crfIdString + version.getName() + ".xls";
         if (isTemplate) {
             // excelFile = new File(dir + CRF_VERSION_TEMPLATE);
-            excelFile = getCoreResources().getFile(dir + CRF_VERSION_TEMPLATE);
+            excelFile = getCoreResources().getFile(CRF_VERSION_TEMPLATE);
             excelFileName = CRF_VERSION_TEMPLATE;
             // FileOutputStream fos = new FileOutputStream(excelFile);
             // IOUtils.copy(getCoreResources().getInputStream(CRF_VERSION_TEMPLATE), fos);
