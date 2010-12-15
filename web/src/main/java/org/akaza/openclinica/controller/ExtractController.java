@@ -73,8 +73,9 @@ public class ExtractController {
         // if id is a number and dataset id is a number ...
         datasetDao = new DatasetDAO(dataSource);
         UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
+        CoreResources cr =  new CoreResources();
         
-        ExtractPropertyBean epBean = CoreResources.findExtractPropertyBeanById(new Integer(id).intValue());
+        ExtractPropertyBean epBean = cr.findExtractPropertyBeanById(new Integer(id).intValue(),datasetId);
         
         DatasetBean dsBean = (DatasetBean)datasetDao.findByPK(new Integer(datasetId).intValue());
         // set the job in motion
@@ -91,6 +92,7 @@ public class ExtractController {
          SimpleDateFormat sdfDir = new SimpleDateFormat(pattern);
     	int i =0;
     	String[] temp = new String[exportFiles.length];
+    	//JN: The following logic is for comma separated variables, to avoid the second file be treated as a old file and deleted.
     	while(i<exportFiles.length)
     	{
     		temp[i] = resolveVars(exportFiles[i],dsBean,sdfDir);

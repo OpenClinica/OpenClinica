@@ -46,6 +46,7 @@ public class CoreResources implements ResourceLoaderAware   {
     protected final  Logger logger = LoggerFactory.getLogger(getClass().getName());
     // private MessageSource messageSource;
     private static ArrayList<ExtractPropertyBean> extractProperties;
+    
 //TODO:Clean up all system outs
     //default no arg constructor
     public CoreResources()
@@ -150,7 +151,7 @@ public class CoreResources implements ResourceLoaderAware   {
     	
     	
     	//sysURL.base 
-    	String sysURLBase  = DATAINFO.getProperty("sysURL").replace("/MainMenu","");
+    	String sysURLBase  = DATAINFO.getProperty("sysURL").replace("MainMenu","");
     	DATAINFO.setProperty("sysURL.base", sysURLBase);
     	
     	DATAINFO.setProperty("org.quartz.jobStore.misfireThreshold", "60000");
@@ -311,6 +312,8 @@ public class CoreResources implements ResourceLoaderAware   {
             epbean.setDeleteOld(getExtractFieldBoolean("extract."+i+".deleteOld"));
             epbean.setSuccessMessage(getExtractField("extract."+i+".success"));
             epbean.setFailureMessage(getExtractField("extract."+i+".failure"));
+            if(epbean.getFileName().length!=epbean.getExportFileName().length)
+            	throw new OpenClinicaSystemException("The comma seperated values of file names and export file names should correspond 1 on 1 for the property number"+i);
             
             if ("sql".equals(whichFunction)) {
                 // set the bean within, so that we can access the file locations etc
@@ -490,13 +493,27 @@ public class CoreResources implements ResourceLoaderAware   {
         }
         return value.split(",");
     }
-    public static ExtractPropertyBean findExtractPropertyBeanById(int id) {
-        for (ExtractPropertyBean epbean : extractProperties) {
-            if (epbean.getId() == id) {
-                return epbean;
-            }
+ //JN:  by using static when u click same export link from 2 different datasets the first one stays in tact and is saved in there.
+    
+    /**
+     * 
+     */
+    public  ExtractPropertyBean findExtractPropertyBeanById(int id,String datasetId) {
+    	boolean notDone=true;
+    	ArrayList<ExtractPropertyBean> epBeans = findExtractProperties();
+    	ExtractPropertyBean returnBean = null;
+        for ( ExtractPropertyBean  epbean : epBeans) {
+        
+        	
+        		if (epbean.getId() == id) {
+        			epbean.setDatasetId(datasetId);
+        			notDone=false;
+        			//returnBean = epbean;
+        			return epbean;
+            	}
+        	        
         }
-        return null;
+        return returnBean;
     }
 
     public Properties getDataInfo() {

@@ -26,7 +26,7 @@ public class XsltTriggerService {
     public static final String DELETE_OLD="deleteOld";
     public static final String SUCCESS_MESSAGE="SUCCESS_MESSAGE";
     public static final String FAILURE_MESSAGE="FAILURE_MESSAGE";
-    
+    public static final String EP_BEAN="epBean";
     public static String TRIGGER_GROUP_NAME = "XsltTriggers";
     
     //POST PROCESSING VARIABLES
@@ -52,6 +52,7 @@ public class XsltTriggerService {
         jobDataMap.put(XML_FILE_PATH, endFilePath);
         jobDataMap.put(POST_FILE_PATH, endFilePath);
         jobDataMap.put(POST_FILE_NAME, endFile);
+        
         jobDataMap.put(EXTRACT_PROPERTY, epBean.getId());
         jobDataMap.put(USER_ID, userAccountBean.getId());
         jobDataMap.put(STUDY_ID, userAccountBean.getActiveStudyId());
@@ -69,6 +70,7 @@ public class XsltTriggerService {
         jobDataMap.put(POST_PROC_EXPORT_NAME, epBean.getPostProcExportName());
         // jobDataMap.put(DIRECTORY, directory);
         // jobDataMap.put(ExampleSpringJob.LOCALE, locale);
+        jobDataMap.put(EP_BEAN, epBean);
         
         trigger.setJobDataMap(jobDataMap);
         trigger.setVolatility(false);

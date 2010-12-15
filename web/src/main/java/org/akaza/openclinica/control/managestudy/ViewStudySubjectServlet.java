@@ -372,8 +372,9 @@ public class ViewStudySubjectServlet extends SecureController {
             }
             // logger.warning("^^^ finished iteration");
             request.setAttribute("eventLogs", eventLogs);
-
-            forwardPage(Page.VIEW_STUDY_SUBJECT);
+            request.setAttribute("titleName",resword.getString("view_subject2")+studySub.getLabel());
+       //     forwardPage(Page.VIEW_STUDY_SUBJECT);
+            getServletContext().getNamedDispatcher("ViewStudySubjectjsp").forward(request, response);
 
         }
     }

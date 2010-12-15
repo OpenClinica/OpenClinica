@@ -183,6 +183,24 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
         return al;
     }
 
+    public ArrayList findByDatasetIdByDate(int did) {
+        // ArchivedDatasetFileBean fb = new ArchivedDatasetFileBean();
+        this.setTypesExpected();
+        ArrayList al = new ArrayList();
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(did));
+
+        String sql = digester.getQuery("findByDatasetIdByDate");
+        ArrayList alist = this.select(sql, variables);
+        Iterator it = alist.iterator();
+
+        while (it.hasNext()) {
+            ArchivedDatasetFileBean fb = (ArchivedDatasetFileBean) this.getEntityFromHashMap((HashMap) it.next());
+            al.add(fb);
+        }
+
+        return al;
+    }
     public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
         ArrayList al = new ArrayList();
 

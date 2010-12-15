@@ -89,6 +89,7 @@ public class XsltTransformJob extends QuartzJobBean {
     private UserAccountDAO userAccountDao;
     private CoreResources coreResources;
     private RuleSetRuleDao ruleSetRuleDao;
+    public static final String EP_BEAN="epBean";
     
     //POST PROCESSING VARIABLES
     public static final String POST_PROC_DELETE_OLD="postProcDeleteOld";
@@ -103,7 +104,7 @@ public class XsltTransformJob extends QuartzJobBean {
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
         // need to generate a Locale for emailing users with i18n
         // TODO make dynamic?
-    	
+    	CoreResources cr = new CoreResources();
         Locale locale = new Locale("en-US");
         ResourceBundleProvider.updateLocale(locale);
         ResourceBundle pageMessages = ResourceBundleProvider.getPageMessagesBundle();
@@ -140,7 +141,9 @@ public class XsltTransformJob extends QuartzJobBean {
             logger.debug("found output path: " + outputPath);
             String generalFileDir = dataMap.getString(XML_FILE_PATH);
             int epBeanId = dataMap.getInt(EXTRACT_PROPERTY);
-            ExtractPropertyBean epBean = CoreResources.findExtractPropertyBeanById(epBeanId);
+            int dsId = dataMap.getInt(DATASET_ID);
+            //JN: Change from earlier versions, cannot get static reference 
+            ExtractPropertyBean epBean = (ExtractPropertyBean)dataMap.get(EP_BEAN);
             zipped = epBean.getZipFormat();
             deleteOld = epBean.getDeleteOld();
             long sysTimeBegin = System.currentTimeMillis();
@@ -154,7 +157,7 @@ public class XsltTransformJob extends QuartzJobBean {
             String failureMsg = epBean.getFailureMessage();
         
             // DatasetBean dsBean = (DatasetBean)datasetDao.findByPK(new Integer(datasetId).intValue());
-            int dsId = dataMap.getInt(DATASET_ID);
+         
              datasetBean = (DatasetBean) dsdao.findByPK(dsId);
             ExtractBean eb = generateFileService.generateExtractBean(datasetBean, currentStudy, parentStudy);
             

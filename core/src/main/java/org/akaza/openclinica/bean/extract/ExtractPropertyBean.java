@@ -1,5 +1,7 @@
 package org.akaza.openclinica.bean.extract;
 
+import java.io.Serializable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +14,8 @@ import org.akaza.openclinica.bean.service.ProcessingFunction;
  * @author thickerson
  *
  */
-public class ExtractPropertyBean {
+//JN: added serializable, as this bean needs be to passed over in -non-static manner over to job. 
+public class ExtractPropertyBean implements Serializable{
 
     protected Logger logger = LoggerFactory.getLogger(getClass().getName());
     private String[] fileName;
@@ -28,16 +31,29 @@ public class ExtractPropertyBean {
     private boolean zipFormat;
     private boolean deleteOld;
     private String successMessage;
-    
-	private String failureMessage;
-    
-	//Post Processing Parameters
+    private String failureMessage;
+    //Post Processing Parameters
 	private String postProcLocation;
 	private String postProcExportName;
 	private boolean postProcDeleteOld;
 	private boolean postProcZip;
 	private String[] doNotDelFiles;
-    public String[] getDoNotDelFiles() {
+	
+	private String datasetId;
+	
+	
+	//Associating epBean with datasetId, since core resources to get around with coreResources.findExtractPropertyBeanById, to overcome the problems of static method
+    public String getDatasetId() {
+		return datasetId;
+	}
+
+
+	public void setDatasetId(String datasetId) {
+		this.datasetId = datasetId;
+	}
+
+
+	public String[] getDoNotDelFiles() {
 		return doNotDelFiles;
 	}
 
@@ -59,6 +75,7 @@ public class ExtractPropertyBean {
         deleteOld = true;
         successMessage=null;
         failureMessage=null;
+        datasetId = null;
     }
     
     

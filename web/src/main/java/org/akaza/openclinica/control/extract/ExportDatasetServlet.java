@@ -504,9 +504,11 @@ public class ExportDatasetServlet extends SecureController {
         request.setAttribute("extractProperties", CoreResources.getExtractProperties());
         // find out if there are any files here:
         File currentDir = new File(DATASET_DIR + db.getId() + File.separator);
-        if (!currentDir.isDirectory()) {
-            currentDir.mkdirs();
-        }
+       
+        //JN: Commenting out this, as its creating directories without any reason. TODO: Check why was this added.
+       // if (!currentDir.isDirectory()) {
+      //      currentDir.mkdirs();
+      //  }
 
         ArrayList fileListRaw = new ArrayList();
         fileListRaw = asdfdao.findByDatasetId(datasetId);

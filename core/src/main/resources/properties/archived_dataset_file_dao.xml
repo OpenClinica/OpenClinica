@@ -10,6 +10,11 @@
 		<sql>SELECT * FROM ARCHIVED_DATASET_FILE WHERE 
 		DATASET_ID = ? ORDER BY archived_dataset_file_id desc</sql>
 	</query>
+		<query>
+		<name>findByDatasetIdByDate</name>
+		<sql>SELECT * FROM ARCHIVED_DATASET_FILE WHERE 
+		DATASET_ID = ? ORDER BY date_created desc</sql>
+	</query>
 	<query>
 		<name>update</name>
 		<sql>UPDATE ARCHIVED_DATASET_FILE SET NAME=?,DATASET_ID=?,

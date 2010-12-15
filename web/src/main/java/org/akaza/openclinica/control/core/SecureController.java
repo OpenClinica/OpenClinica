@@ -40,6 +40,7 @@ import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -48,6 +49,8 @@ import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
@@ -63,6 +66,7 @@ import org.akaza.openclinica.view.StudyInfoPanelLine;
 import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
+import org.akaza.openclinica.web.bean.ArchivedDatasetFileRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
@@ -180,6 +184,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         }
 
         pageMessages.add(message);
+        logger.debug(message);
         request.setAttribute(PAGE_MESSAGE, pageMessages);
     }
 
@@ -275,9 +280,15 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                         addPageMessage("The extract data job failed with the message: <br/><br/>" + 
                                 failMessage + "<br/><br/>More information may be available in the log files.");
                     } else {
-                    String	successMsg = dataMap.getString("successMsg");
+                    String	successMsg = dataMap.getString("SUCCESS_MESSAGE");
                     if(successMsg!=null)
-                        {	addPageMessage("Your Extract is now completed. Please go to review them at <a href='ViewDatasets'>View Datasets</a> or <a href='ExportDataset?datasetId=" + 
+                        {
+                    	if(successMsg.contains("$linkURL"))
+                    	{
+                    		successMsg = decodeLINKURL(successMsg,datasetId);
+                    	}
+                    	
+                    		addPageMessage("Your Extract is now completed. Please go to review them at <a href='ViewDatasets'>View Datasets</a> or <a href='ExportDataset?datasetId=" + 
                         		datasetId + "'>View Specific Dataset</a>."+successMsg);
                         }
                     else
@@ -299,7 +310,19 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         
     }
     
-    private StdScheduler getScheduler(HttpServletRequest request) {
+    private String decodeLINKURL(String successMsg, Integer datasetId) {
+    	
+    	ArchivedDatasetFileDAO asdfDAO = new ArchivedDatasetFileDAO(sm.getDataSource());
+    	
+    	ArrayList<ArchivedDatasetFileBean> fileBeans = asdfDAO.findByDatasetId(datasetId);
+    	
+    	successMsg = successMsg.replace("$linkURL", "<a href=\""+CoreResources.getField("sysURL.base") + "AccessFile?fileId="+ fileBeans.get(0).getId()+"\">here </a>");
+    	
+    	
+		return successMsg;
+	}
+
+	private StdScheduler getScheduler(HttpServletRequest request) {
         scheduler = this.scheduler != null ? scheduler : (StdScheduler) SpringServletAccess.getApplicationContext(request.getSession().getServletContext()).getBean(SCHEDULER);
         return scheduler;
     }
