@@ -15,7 +15,7 @@
         </addColumn>
 	</changeSet>
     <changeSet author="ahamid" id="2010-10-29-5930-3">
-        <addForeignKeyConstraint constraintName="fk_old_status_id"
+        <addForeignKeyConstraint constraintName="fk_item_data_old_status_id"
                                  referencedTableName="status"
                                  baseColumnNames="old_status_id"
                                  baseTableName="item_data"

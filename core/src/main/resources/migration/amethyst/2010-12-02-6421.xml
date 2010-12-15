@@ -12,14 +12,19 @@
         <!--</modifyColumn>-->
     <!--</changeSet>-->
 
-    <changeSet author="ahamid" id="2010-12-02-6421-2">
+    <changeSet author="ahamid" id="2010-12-02-6421-2" dbms="postgresql">
 		<comment>Update null values</comment>
 		<sql>ALTER TABLE event_crf
             ALTER COLUMN old_status_id SET DEFAULT 1
         </sql>
 	</changeSet>
 
-    <changeSet author="ahamid" id="2010-12-02-6421-3">
+    <changeSet author="ahamid" id="2010-12-02-6421-3" dbms="oracle">
+		<comment>Update null values</comment>
+		<sql>ALTER TABLE event_crf MODIFY old_status_id DEFAULT 1</sql>
+	</changeSet>
+
+    <changeSet author="ahamid" id="2010-12-02-6421-4">
 		<comment>Update null values</comment>
 		<sql>UPDATE event_crf set old_status_id=1 where old_status_id=null or old_status_id=0</sql>
 	</changeSet>
