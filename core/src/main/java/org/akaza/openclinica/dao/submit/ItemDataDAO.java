@@ -134,8 +134,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
         variables.put(new Integer(4), idb.getValue());
         variables.put(new Integer(5), new Integer(idb.getUpdaterId()));
         variables.put(new Integer(6), new Integer(idb.getOrdinal()));
-        variables.put(new Integer(7), new Integer(idb.getOldStatus().getId()));
-        variables.put(new Integer(8), new Integer(idb.getId()));
+        variables.put(new Integer(7), new Integer(idb.getId()));
         this.execute(digester.getQuery("update"), variables);
 
         if (isQuerySuccessful()) {
@@ -385,12 +384,10 @@ public class ItemDataDAO extends AuditableEntityDAO {
         } else if (isPDateType(eb.getItemId())) {
             eb.setValue(reFormatPDate(eb.getValue()));
         }
-
-
         // YW >>
         eb.setStatus(Status.get(((Integer) hm.get("status_id")).intValue()));
         eb.setOrdinal(((Integer) hm.get("ordinal")).intValue());
-        eb.setOldStatus(Status.get(((Integer) hm.get("old_status_id")).intValue()));
+        
         return eb;
     }
 
