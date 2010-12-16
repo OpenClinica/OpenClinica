@@ -616,7 +616,7 @@
 			    /* -- */
 			    END IF;
 			IF(OLDREC.status_id <![CDATA[<>]]> NEWREC.status_id) THEN
-			    IF(NEWREC.status_id = '5') THEN
+			    IF(NEWREC.status_id = '5' or NEWREC.status_id = '1') THEN
 			      /* -- */
 			      entity_name_value := 'Status';
 			      event_type_id := '23';

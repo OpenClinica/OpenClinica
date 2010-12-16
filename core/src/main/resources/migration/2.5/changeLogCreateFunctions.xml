@@ -273,7 +273,7 @@
 		    LANGUAGE plpgsql;
 	 </sql>
     </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-362">
+    <changeSet author="pgawade (generated)" id="1235684743487-362" runOnChange="true">
     	 <preConditions onFail="MARK_RAN">
 	 	 <dbms type="postgresql" />
 		 <!--<runningAs username="clinica" />-->
@@ -318,7 +318,7 @@
 				    END IF;
 			    END IF;
 		        IF(OLD.status_id <![CDATA[<>]]> NEW.status_id) THEN
-		            IF(NEW.status_id = ''5'') THEN
+		            IF(NEW.status_id = ''5'' or NEW.status_id = ''1'') THEN
 		                SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
 		                INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
 		                VALUES (pk, ''23'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Status'', OLD.status_id, NEW.status_id);
