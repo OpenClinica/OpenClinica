@@ -9,7 +9,6 @@ package org.akaza.openclinica.control.managestudy;
 
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.control.submit.DiscNotesSubjectStatisticsFactory;
 import org.akaza.openclinica.control.submit.ListDiscNotesSubjectTableFactory;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
@@ -162,27 +161,6 @@ public class ListDiscNotesSubjectServlet extends SecureController {
         // !allDiscNotes.isEmpty());
         factory.setResolutionStatus(resolutionStatus);
         factory.setResolutionStatusIds(resolutionStatusIds);
-        
-        DiscNotesSubjectStatisticsFactory summaryFactory = new DiscNotesSubjectStatisticsFactory();
-        //summaryFactory.setStudyEventDefinitionDao(seddao);
-        summaryFactory.setStudyEventDefinitionDao(seddao);
-        summaryFactory.setSubjectDAO(subdao);
-        summaryFactory.setStudySubjectDAO(sdao);
-        summaryFactory.setStudyEventDAO(sedao);
-        summaryFactory.setStudyBean(currentStudy);
-        summaryFactory.setStudyGroupClassDAO(sgcdao);
-        summaryFactory.setSubjectGroupMapDAO(sgmdao);
-        summaryFactory.setStudyDAO(studyDAO);
-        summaryFactory.setCurrentRole(currentRole);
-        summaryFactory.setCurrentUser(ub);
-        summaryFactory.setEventCRFDAO(edao);
-        summaryFactory.setEventDefintionCRFDAO(eddao);
-        summaryFactory.setStudyGroupDAO(sgdao);
-        summaryFactory.setDiscrepancyNoteDAO(dnDAO);
-        summaryFactory.setDiscrepancyMap(stats);
-        //request.setAttribute("summaryMapHtml", summaryFactory.createTable(request, response).render());
-        String summaryNotesHtml = summaryFactory.createTable(request,response).render();
-        request.setAttribute("summaryDiscNotesHtml",summaryNotesHtml);
         factory.setResword(ResourceBundleProvider.getWordsBundle(locale));
         String listDiscNotesHtml = factory.createTable(request, response).render();
         request.setAttribute("listDiscNotesHtml", listDiscNotesHtml);
