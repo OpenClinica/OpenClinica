@@ -61,8 +61,6 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
     private static final String RESOLVING_NOTE = "resolving_note";
     private static final String RETURN_FROM_PROCESS_REQUEST = "returnFromProcess";
-    
-    private static final String VIEW_ACTION="viewAction";
 
     public Page getPageForForwarding(DiscrepancyNoteBean note, boolean isCompleted) {
         String entityType = note.getEntityType().toLowerCase();
@@ -188,8 +186,6 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
         FormProcessor fp = new FormProcessor(request);
         int noteId = fp.getInt(INPUT_NOTE_ID);
-        Boolean viewAction = fp.getBoolean(VIEW_ACTION);
-        viewAction = viewAction != null? viewAction : Boolean.FALSE; 
         String module = (String) session.getAttribute("module");
         // Integer subjectId = (Integer) session.getAttribute("subjectId");
 
@@ -256,8 +252,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
         // System.out.println("set up pop up url: " + createNoteURL);
         boolean goNext = prepareRequestForResolution(request, sm.getDataSource(), currentStudy, discrepancyNoteBean, isCompleted);
 
-        String viewNotesPageFileName = viewAction? (String)session.getAttribute("viewNotesPageFileName") : "";
-        Page p = viewNotesPageFileName.length()>0? Page.setNewPage(viewNotesPageFileName, "View Notes") : getPageForForwarding(discrepancyNoteBean, isCompleted);
+        Page p =  getPageForForwarding(discrepancyNoteBean, isCompleted);
 
         // logger.info("found page for forwarding: " + p.getFileName());
         if (p == null) {
