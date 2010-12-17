@@ -15,6 +15,8 @@
 <script language="JavaScript" src="includes/global_functions_javascript.js"></script>
 
 <script language="JavaScript" src="includes/CalendarPopup.js"></script>
+<script language="JavaScript" src="includes/global_functions_javascript.js"></script>
+
 <style type="text/css">
 
 .popup_BG { background-image: url(images/main_BG.gif);
@@ -26,31 +28,13 @@
 
 </style>
 </head>
-<body class="popup_BG" onload="javascript:window.setTimeout('window.close()',3000);">
+<body class="popup_BG" style="margin: 25px;" onload="javascript:refreshSource('true','/ViewNotes?');javascript:window.setTimeout('window.close()',3000);">
 <div style="float: left;"><h1 class="table_title_Submit"><fmt:message key="add_discrepancy_note" bundle="${resword}"/></h1></div>
 <div style="float: right;"><p><a href="#" onclick="javascript:window.close();"><fmt:message key="close_window" bundle="${resword}"/></a></p></div>
 <br clear="all">
-<div class="alert">    
+<p class="alert" style="font-size: 14px; margin: 120px 50px;" >    
 <c:forEach var="message" items="${pageMessages}">
- <c:out value="${message}" escapeXml="false"/> 
+ <c:out value="${message}" escapeXml="false"/><br><br>
 </c:forEach>
-</div>
-    <table border="0">   
-     <c:if test="${parent.id>0}">    
-       <tr valign="top">
-            <td><fmt:message key="discrepancy_thread_id" bundle="${resword}"/></td>
-            <td>
-            <c:out value="${parent.id}"/>
-            </td>
-       </tr>  
-       </c:if>
-        <c:if test="${hasNotes == 'yes'}">
-        <tr valign="top">
-            <td colspan="2"><a href="ViewDiscrepancyNote?id=<c:out value="${discrepancyNote.entityId}"/>&name=<c:out value="${discrepancyNote.entityType}"/>&field=<c:out value="${discrepancyNote.field}"/>&column=<c:out value="${discrepancyNote.column}"/>">
-            <fmt:message key="view_parent_and_related_note" bundle="${resword}"/></a> 
-           </td>         
-        </tr>
-       </c:if> 
-    </table>
-    
+</p>
 </html>

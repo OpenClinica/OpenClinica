@@ -1527,6 +1527,20 @@ function numberGroupRows(){
     }
 }
 
+/**
+ * Refresh source page of the current page when "isRefresh" is "true" and source url match "pattern"
+ */
+function refreshSource(isRefresh, pattern) {
+	if(isRefresh=="true") {
+		if(window.opener && !window.opener.closed) {
+			var v = window.opener.location.href;
+			if(v.indexOf(pattern)>0) {
+				window.opener.location.href = v;
+			}
+		}
+	}	
+}
+
 
 
 

@@ -27,6 +27,43 @@ function showOnly(strLeftNavRowElementName){
     }
 }
 
+function removeLinkText(id) {
+	var a = document.getElementById(id);
+	if(a!=null) {
+		a.innerHTML = "";	
+	}
+}
+
+function addLinkText(id,text) {
+	var a = document.getElementById(id);
+	if(a!=null) {
+		a.innerHTML = text;	
+	}
+}
+
+function removeText(id,text) {
+	var a = document.getElementById(id);
+	if(a!=null) {
+		a.innerHTML = "";	
+	}
+	var p = document.getElementById('p');
+	if(p!=null) {
+		p.innerHTML = text;	
+	}
+}
+
+function addText(id,text) {
+	var p = document.getElementById('p');
+	if(p!=null) {
+		p.innerHTML = "<a id='a0'></a>";
+		var a = document.getElementById(id);
+		if(a!=null) {	
+			a.innerHTML = text;
+			a.href = "javascript:showOnly('box0New');javascript:removeText('a0','"+ text + "');";
+		}
+	}
+}
+
 function hide(strLeftNavRowElementName){
 	
 	        var objLeftNavRowElement;
@@ -53,7 +90,7 @@ function setValue(elementName, value) {
 	var element = MM_findObj(elementName);
 	if(element != null) {
 		element.value = value;
-	}	
+	}
 }
 
 function timeOutWindow(close,duration) {
@@ -102,6 +139,23 @@ function setResStatusWithId(id, resStatusId, destinationUserId) {
 		objtr1.disabled = true;
 	}
 }
+  
+function scrollToY(id) {
+	var element = MM_findObj(id);
+	var ypos= 0;
+	while(element != null) {
+		ypos += element.offsetTop;
+		element = element.offsetParent;	
+	}
+  	window.scrollTo(0,ypos);
+}
+
+function setYPos(id) {
+	var y = window.pageYOffset ? 
+			window.pageYOffset : document.documentElement.scrollTop ? 
+			document.documentElement.scrollTop : document.body.scrollTop;
+	setValue("ypos"+id,y);
+}
 //-->
 </script>
 
@@ -126,17 +180,25 @@ function setResStatusWithId(id, resStatusId, destinationUserId) {
 	<input type="hidden" name="field" value="${param.field}"/>
 	<input type="hidden" name="column" value="${param.column}"/>
 	<input type="hidden" name="close${parentId}" value=""/>
+	<input type="hidden" name="ypos${parentId}" value="0"/>
 
 	<td valign="top">
 	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 	<div class="textbox_center">
 	<table border="0" width="580">
 		<div style="float: right;">
-			<p><a href="#" onclick="javascript:leftnavExpand('<c:out value="${boxId}"/>');"><img name="close_box" alt="close_box" src="images/bt_Remove.gif" style="width:18px"></a></p>
+			<c:choose>
+			<c:when test="${parentId==0}">
+				<p><a href="javascript:scrollToY('p');" onclick="javascript:leftnavExpand('<c:out value="${boxId}"/>');javascript:addText('a0','<b><fmt:message key="begin_new_thread" bundle="${resword}"/></b>');"><img name="close_box" alt="close_box" src="images/bt_Remove.gif" style="width:18px"></a></p>
+			</c:when>
+			<c:otherwise>
+				<p><a href="javascript:scrollToY('msg<c:out value="${parentId}"/>');" onclick="javascript:leftnavExpand('<c:out value="${boxId}"/>');javascript:addLinkText('a<c:out value="${parentId}"/>','<fmt:message key="reply_to_thread" bundle="${resword}"/>');"><img name="close_box" alt="close_box" src="images/bt_Remove.gif" style="width:18px"></a></p>
+			</c:otherwise>
+			</c:choose>
 		</div>
 		<tr valign="top">
 		<td class="table_cell_noborder"><fmt:message key="description" bundle="${resword}"/>:</td>
-		<td class="table_cell_noborder">
+		<td class="table_cell_noborder" id="description${parentId}">
 		<div class="formfieldL_BG"><input type="text" name="description${parentId}" value="<c:out value="${discrepancyNote.description}"/>" class="formfieldL"></div>
 		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="description${parentId}"/></jsp:include>
 		</td>
@@ -316,8 +378,8 @@ function setResStatusWithId(id, resStatusId, destinationUserId) {
 		<tr>
 		<c:set var= "noteEntityType" value="${discrepancyNote.entityType}"/>
 		<c:if test="${enterData == '1' || canMonitor == '1' || noteEntityType != 'itemData' }">
-			<td><input type="submit" name="Submit${parentId}" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" style="width:65px"></td>
-			<td><input type="submit" name="SubmitExit${parentId}" value="<fmt:message key="submit_exit" bundle="${resword}"/>" class="button_medium" style="width:80px" onclick="javascript:setValue('close<c:out value="${parentId}"/>','true');"></td>
+			<td><input type="submit" name="Submit${parentId}" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" style="width:65px" onclick="javascript:setYPos('<c:out value="${parentId}"/>');"></td>
+			<td><input type="submit" name="SubmitExit${parentId}" value="<fmt:message key="submit_exit" bundle="${resword}"/>" class="button_medium" style="width:80px" onclick="javascript:setValue('close<c:out value="${parentId}"/>','true');javascript:setYPos('<c:out value="${parentId}"/>');"></td>
 		</c:if>
 		</tr>
 		

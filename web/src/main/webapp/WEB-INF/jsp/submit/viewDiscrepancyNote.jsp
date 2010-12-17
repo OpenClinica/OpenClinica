@@ -13,8 +13,11 @@
 <jsp:useBean id="column" scope="request" class="java.lang.String"/>
 <jsp:useBean id="viewDNLink" scope="request" class="java.lang.String"/>
 <jsp:useBean id="boxDNMap" scope="session" class="java.util.HashMap"/>
-<jsp:useBean id="closeWindow" scope="session" class="java.lang.String"/>
+<jsp:useBean scope='session' id='boxToShow'  class="java.lang.String"/>
 <jsp:useBean id="typeID0" scope="request" class="java.lang.String"/>
+<jsp:useBean id="y" scope="request" class="java.lang.String"/>
+<jsp:useBean id="refresh" scope="request" class="java.lang.String"/>
+
 
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 <html>
@@ -36,15 +39,15 @@
     </style>
 
 </head>
-<body class="popup_BG" style="margin: 0px 12px 0px 12px;" onload="javascript:window.timeOutWindow('<c:out value="${closeWindow}"/>',3000);javascript:setStatusWithId('<c:out value="${typeID0}"/>','0');">
+
+<body class="popup_BG" style="margin: 0px 12px 0px 12px;" onload="window.scrollTo(0,<c:out value="${y}"/>);javascript:setStatusWithId('<c:out value="${typeID0}"/>','0');javascript:refreshSource('<c:out value="${refresh}"/>', '/ViewNotes?');">
 
 
 <!-- Alert Box -->
 
 <!-- These DIVs define shaded box borders -->
 
-
-<jsp:include page="../include/alertbox.jsp"/>
+<%-- <jsp:include page="../include/alertbox.jsp"/> --%>
 
 <!-- End Alert Box -->
 
@@ -65,7 +68,8 @@
                             <b>
                                 <c:choose>
                                     <c:when test="${name eq 'itemData' ||name eq 'ItemData'}">
-                                        <a href="javascript: openDocWindow('ViewItemDetail?itemId=<c:out value="${item.id}"/>')"><c:out value="${entityName}"/></a>
+                                        <a href="javascript: openDocWindow('ViewItemDetail?itemId=<c:out value="${item.id}"/>')">
+                                        <c:out value="${entityName}"/> =  <c:out value="${entityValue}"/> </a>
                                     </c:when>
                                     <c:otherwise>
                                         <c:choose>
@@ -142,8 +146,18 @@
 
 </table>
 
+<div style="width:200px; float:right;">
+    <p><b>
+        <a href="javascript:scrollToY('audit');"><fmt:message key="audit_log_item" bundle="${resword}"/></a>
+    </b></p>
+</div>
 <div style="clear:both;"></div>
 <h3 class="title_manage"><fmt:message key="note_details" bundle="${resword}"/></h3>
+
+<div class="alert">    
+<c:forEach var="message" items="${pageMessages}">
+ <c:out value="${message}" escapeXml="false"/><br><br>
+</c:forEach>
 
 <c:set var="count" value="${1}"/>
 <!-- Thread Heading -->
@@ -239,12 +253,19 @@
                             <c:set var="showDNBox" value="n"/>
                             <c:if test="${isLocked eq 'no'}">
                                 <tr>
-                                	<td class="table_cell_left">
+                                	<td class="table_cell_left" id="msg${note.value.id}">
                                 	<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="newChildAdded${note.value.id}"/></jsp:include>	
                                 	</td>
                                     <td class="table_cell_left" colspan="4" align="right">
                                         <c:if test="${note.value.id>0 && note.value.resStatus.id != 5}">
-                                            <a href="javascript:showOnly('box<c:out value="${note.value.id}"/>');"><fmt:message key="reply_to_thread" bundle="${resword}"/></a>
+                                        	<c:choose>
+                                        	<c:when test="${note.value.id == boxToShow}">
+                                        		<a href="javascript:showOnly('box<c:out value="${note.value.id}"/>');javascript:removeLinkText('a<c:out value="${note.value.id}"/>');" id="a${note.value.id}"></a>	
+                                        	</c:when>
+                                        	<c:otherwise>
+                                            	<a href="javascript:showOnly('box<c:out value="${note.value.id}"/>');javascript:removeLinkText('a<c:out value="${note.value.id}"/>');" id="a${note.value.id}"><fmt:message key="reply_to_thread" bundle="${resword}"/></a>
+                                            </c:otherwise>
+                                            </c:choose>
                                             <br>
                                             <c:set var="showDNBox" value="y"/>
                                         </c:if>
@@ -278,7 +299,18 @@
 
 <c:if test="${isLocked eq 'no'}">
 	<div style="clear:both;"></div>
-	<p><a href="javascript:showOnly('box<c:out value="${0}"/>New');"><b><fmt:message key="begin_new_thread" bundle="${resword}"/></b></a></p>
+	<c:choose>
+    <c:when test="${boxToShow==0}">
+    	<p id="p">
+			<b><fmt:message key="begin_new_thread" bundle="${resword}"/></b>
+		</p>
+    </c:when>
+    <c:otherwise>
+		<p id="p">
+			<a href="javascript:showOnly('box<c:out value="${0}"/>New');javascript:removeText('a0','<b><fmt:message key="begin_new_thread" bundle="${resword}"/></b>');" id="a0"><b><fmt:message key="begin_new_thread" bundle="${resword}"/></b></a>
+		</p>
+	</c:otherwise>
+	</c:choose>
 	<table><tbody>
 	<c:import url="./discrepancyNote.jsp">
         <c:param name="parentId" value="0"/>
@@ -292,8 +324,10 @@
 </c:if>  
 
 <br clear="all">
+<div id="audit">
 <h3 class="title_manage"><fmt:message key="audit_log_item" bundle="${resword}"/></h3>
 <c:import url="../admin/auditItem.jsp"/>
+</div>
 <br clear="all">
 </body>
 </html>
