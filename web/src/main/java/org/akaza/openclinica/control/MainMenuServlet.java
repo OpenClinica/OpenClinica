@@ -49,8 +49,6 @@ import org.akaza.openclinica.web.table.sdv.SDVUtil;
 public class MainMenuServlet extends SecureController {
 
     //Shaoyu Su
-    private static final String AUTO_LABEL = "AUTO_ID";
-    
     Locale locale;
     private StudyEventDefinitionDAO studyEventDefinitionDAO;
     private SubjectDAO subjectDAO;
@@ -164,7 +162,7 @@ public class MainMenuServlet extends SecureController {
                     //Shaoyu Su
                     //int nextLabel = this.getStudySubjectDAO().findTheGreatestLabel() + 1;
                     //request.setAttribute("label", new Integer(nextLabel).toString());
-                    request.setAttribute("label", AUTO_LABEL);
+                    request.setAttribute("label", resword.getString("id_generated_Save_Add"));
                 }
                 
                 if (currentRole.isInvestigator() || currentRole.isResearchAssistant()) {

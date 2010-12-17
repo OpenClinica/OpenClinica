@@ -36,7 +36,6 @@ import java.util.HashMap;
 public class ListStudySubjectsServlet extends SecureController {
 
     // Shaoyu Su
-    private static final String AUTO_LABEL = "AUTO_ID";
     private static final long serialVersionUID = 1L;
     private StudyEventDefinitionDAO studyEventDefinitionDAO;
     private SubjectDAO subjectDAO;
@@ -88,7 +87,7 @@ public class ListStudySubjectsServlet extends SecureController {
             //Shaoyu Su
             // int nextLabel = getStudySubjectDAO().findTheGreatestLabel() + 1;
             // request.setAttribute("label", new Integer(nextLabel).toString());
-            request.setAttribute("label", AUTO_LABEL);
+            request.setAttribute("label", resword.getString("id_generated_Save_Add"));
         }
 
         if (fp.getRequest().getParameter("subjectOverlay") == null){

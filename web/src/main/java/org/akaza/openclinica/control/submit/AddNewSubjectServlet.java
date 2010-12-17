@@ -67,7 +67,6 @@ public class AddNewSubjectServlet extends SecureController {
 
     // Shaoyu Su
     private final Object simpleLockObj = new Object();
-    private static final String AUTO_LABEL = "AUTO_ID";
     public static final String INPUT_UNIQUE_IDENTIFIER = "uniqueIdentifier";// global
     // Id
 
@@ -197,7 +196,7 @@ public class AddNewSubjectServlet extends SecureController {
                     //Shaoyu Su
                     // int nextLabel = ssd.findTheGreatestLabel() + 1;
                     // fp.addPresetValue(INPUT_LABEL, new Integer(nextLabel).toString());
-                    fp.addPresetValue(INPUT_LABEL, AUTO_LABEL);
+                    fp.addPresetValue(INPUT_LABEL, resword.getString("id_generated_Save_Add"));
                 }
 
                 setPresetValues(fp.getPresetValues());
@@ -226,7 +225,10 @@ public class AddNewSubjectServlet extends SecureController {
 
             v.addValidation(INPUT_LABEL, Validator.NO_BLANKS);
 
-            v.addValidation(INPUT_LABEL, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 30);
+            String subIdSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();
+            if (!subIdSetting.equalsIgnoreCase("auto non-editable") && !subIdSetting.equalsIgnoreCase("auto editable")) {
+                v.addValidation(INPUT_LABEL, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 30);
+            }
 
             if (currentStudy.getStudyParameterConfig().getSubjectPersonIdRequired().equals("required")) {
                 v.addValidation(INPUT_UNIQUE_IDENTIFIER, Validator.NO_BLANKS);
@@ -377,7 +379,7 @@ public class AddNewSubjectServlet extends SecureController {
             // Shaoyu Su: if the form submitted for field "INPUT_LABEL" has
             // value of "AUTO_LABEL",
             // then Study Subject ID should be created when db row is inserted.
-            if (!label.equalsIgnoreCase(AUTO_LABEL)) {
+            if (!label.equalsIgnoreCase(resword.getString("id_generated_Save_Add"))) {
                 StudySubjectBean subjectWithSameLabel = ssd.findByLabelAndStudy(label, currentStudy);
 
                 StudySubjectBean subjectWithSameLabelInParent = new StudySubjectBean();
@@ -505,7 +507,7 @@ public class AddNewSubjectServlet extends SecureController {
 
                     // YW <<
                     // Shaoyu Su: delay setting INPUT_LABEL field
-                    if (!label.equalsIgnoreCase(AUTO_LABEL)) {
+                    if (!label.equalsIgnoreCase(resword.getString("id_generated_Save_Add"))) {
                         fp.addPresetValue(INPUT_LABEL, label);
                     }
                     fp.addPresetValue(INPUT_SECONDARY_LABEL, fp.getString(INPUT_SECONDARY_LABEL));
@@ -734,7 +736,7 @@ public class AddNewSubjectServlet extends SecureController {
                 studySubject.setOwner(ub);
 
                 // Shaoyu Su: prevent same label ("Study Subject ID")
-                if (fp.getString(INPUT_LABEL).equalsIgnoreCase(AUTO_LABEL)) {
+                if (fp.getString(INPUT_LABEL).equalsIgnoreCase(resword.getString("id_generated_Save_Add"))) {
                     synchronized (simpleLockObj) {
                         int nextLabel = ssd.findTheGreatestLabel() + 1;
                         studySubject.setLabel(nextLabel + "");
@@ -831,7 +833,7 @@ public class AddNewSubjectServlet extends SecureController {
                         //Shaoyu Su
                         //int nextLabel = ssd.findTheGreatestLabel() + 1;
                         //fp.addPresetValue(INPUT_LABEL, new Integer(nextLabel).toString());
-                        fp.addPresetValue(INPUT_LABEL, AUTO_LABEL);
+                        fp.addPresetValue(INPUT_LABEL, resword.getString("id_generated_Save_Add"));
                     }
 
                     setPresetValues(fp.getPresetValues());
