@@ -404,6 +404,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                     dnb.setStageId(ec.getStage().getId());
                     dnb.setEntityName(ib.getName());
                     dnb.setEntityValue(idb.getValue());
+                    dnb.setItemId(ib.getId());
 
                     StudyEventDAO sed = getStudyEventDao();
                     StudyEventBean se = (StudyEventBean) sed.findByPK(ec.getStudyEventId());
@@ -421,6 +422,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                     dnb.setCrfName(cb.getName());
                     // }
                 }
+                //Because all places set DiscrepancyNoteBean subjectId  as its studySub's Id.
+                dnb.setSubjectId(dnb.getStudySub().getId());
             }
             dnb.setSiteId(((StudyBean) getStudyDao().findByPK(dnb.getStudySub().getStudyId())).getIdentifier());
         }
@@ -663,7 +666,9 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             DiscrepancyNoteBean dnb = (DiscrepancyNoteBean) ((HashMap<Object, Object>) item).get("discrepancyNoteBean");
             HtmlBuilder builder = new HtmlBuilder();
             //for "view" as action
-            builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId()+"&viewAction=1");
+            //This createNoteURL uses the same method as in ResolveDiscrepancyServlet
+            String createNoteURL = CreateDiscrepancyNoteServlet.getAddChildURL(dnb, ResolutionStatus.CLOSED, true);
+            builder.a().href("javascript:openDNWindow('" + createNoteURL + "&viewAction=1" + "');");
             builder.close();
             builder.img().name("bt_View1").src("images/bt_View_d.gif").border("0").alt(resword.getString("view")).title(resword.getString("view"))
                     .align("left").append("hspace=\"6\"").close();

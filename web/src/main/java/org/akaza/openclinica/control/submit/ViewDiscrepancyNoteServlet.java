@@ -259,6 +259,10 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
         if(fromBox==null || !fromBox) {
             session.removeAttribute(BOX_TO_SHOW);
         }
+        Boolean refresh = fp.getBoolean("refresh");
+        request.setAttribute("refresh", refresh+"");
+        String ypos = fp.getString("y");
+        request.setAttribute("y", ypos);
         
         DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(sm.getDataSource());
         int entityId = fp.getInt(ENTITY_ID, true);

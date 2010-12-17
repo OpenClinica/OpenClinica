@@ -784,6 +784,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                     // addPageMessage(
                     // "Your discrepancy note has been saved into database.");
                     addPageMessage(respage.getString("note_saved_into_db"));
+                    addPageMessage(respage.getString("page_close_automatically"));
                     System.out.println("forwarding on line 637");
                     forwardPage(Page.ADD_DISCREPANCY_NOTE_SAVE_DONE);
                 }

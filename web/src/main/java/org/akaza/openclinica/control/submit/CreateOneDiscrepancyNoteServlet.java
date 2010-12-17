@@ -67,13 +67,13 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
     public static final String FORM_DISCREPANCY_NOTES_NAME = "fdnotes";
     public static final String DIS_NOTE = "discrepancyNote";
     public static final String RES_STATUS_ID = "resStatusId";
-    public static final String USER_ACCOUNTS = "userAccounts";//a list of user accounts
+    public static final String USER_ACCOUNTS = "userAccounts";// a list of user
+                                                              // accounts
     public static final String SUBMITTED_USER_ACCOUNT_ID = "userAccountId";
     public static final String PRESET_USER_ACCOUNT_ID = "preUserAccountId";
     public static final String EMAIL_USER_ACCOUNT = "sendEmail";
     public static final String BOX_DN_MAP = "boxDNMap";
     public static final String BOX_TO_SHOW = "boxToShow";
-    public static final String CLOSE_WINDOW = "closeWindow";
 
     /*
      * (non-Javadoc)
@@ -104,6 +104,7 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
         int parentId = fp.getInt(PARENT_ID);
         DiscrepancyNoteBean parent = parentId > 0 ? (DiscrepancyNoteBean) dndao.findByPK(parentId) : new DiscrepancyNoteBean();
         HashMap<Integer, DiscrepancyNoteBean> boxDNMap = (HashMap<Integer, DiscrepancyNoteBean>) session.getAttribute(BOX_DN_MAP);
+        boxDNMap = boxDNMap == null ? new HashMap<Integer, DiscrepancyNoteBean>() : boxDNMap;
         DiscrepancyNoteBean dn =
             boxDNMap.size() > 0 && boxDNMap.containsKey(Integer.valueOf(parentId)) ? boxDNMap.get(Integer.valueOf(parentId)) : new DiscrepancyNoteBean();
         int entityId = fp.getInt(ENTITY_ID, true);
@@ -118,7 +119,8 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
         if (noteTree == null) {
             noteTree = new FormDiscrepancyNotes();
         }
-        session.removeAttribute(CLOSE_WINDOW);
+        String ypos = fp.getString("ypos"+parentId);
+        int refresh = 0;
 
         String description = fp.getString("description" + parentId);
         int typeId = fp.getInt("typeId" + parentId);
@@ -126,6 +128,7 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
         int resStatusId = fp.getInt(RES_STATUS_ID + parentId);
         int assignedUserAccountId = fp.getInt(SUBMITTED_USER_ACCOUNT_ID + parentId);
         String viewNoteLink = fp.getString("viewDNLink" + parentId);
+        viewNoteLink = this.appendPageFileName(viewNoteLink, "fromBox", "1");
 
         Validator v = new Validator(request);
         v.addValidation("description" + parentId, Validator.NO_BLANKS);
@@ -199,11 +202,14 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
                         }
                     }
                 }
+            } else {
+                ypos = "0";
             }
             
             dn = (DiscrepancyNoteBean)dndao.create(dn);
             boolean success = dn.getId()>0 ? true : false;
             if(success) {
+                refresh = 1;
                 dndao.createMapping(dn);
                 success = dndao.isQuerySuccessful();
                 if(success == false) {
@@ -240,16 +246,6 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
                     boxDNMap.remove(parentId);
                 }
                 session.removeAttribute(BOX_TO_SHOW);
-                if(parentId == dn.getParentDnId()) {
-                    mess.add(restext.getString("a_new_child_dn_added")+". ");
-                    results.put("newChildAdded" + parentId, mess);
-                } else {
-                    mess.add(restext.getString("a_new_dn_thread_added")+". ");
-                    results.put("newChildAdded" + dn.getParentDnId(), mess);
-                }
-                setInputMessages(results);
-                String close = fp.getString("close"+parentId);
-                session.setAttribute(CLOSE_WINDOW, "true".equals(close)?"true":"");
                 /*
                  * Copied from CreateDiscrepancyNoteServlet
                  * Setting a marker to check
@@ -312,6 +308,24 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
                     sendEmail(alertEmail.trim(), EmailEngine.getAdminEmail(), MessageFormat.format(respage.getString("mailDNSubject"), dn.getDescription()),
                             emailBodyString, true, null, null, true);
                 }
+                
+                String close = fp.getString("close"+parentId);
+                //session.setAttribute(CLOSE_WINDOW, "true".equals(close)?"true":"");
+                if("true".equals(close)) {
+                    addPageMessage(respage.getString("note_saved_into_db"));
+                    addPageMessage(respage.getString("page_close_automatically"));
+                    forwardPage(Page.ADD_DISCREPANCY_NOTE_SAVE_DONE);
+                    logger.info("Should forwardPage to ADD_DISCREPANCY_NOTE_SAVE_DONE.");
+                } else {
+                    if(parentId == dn.getParentDnId()) {
+                        mess.add(restext.getString("a_new_child_dn_added"));
+                        results.put("newChildAdded" + parentId, mess);
+                        setInputMessages(results);
+                    } else {
+                        addPageMessage(restext.getString("a_new_dn_thread_added"));
+                    }
+                }
+                
             } else {
                 session.setAttribute(BOX_TO_SHOW, parentId+"");
             }
@@ -322,10 +336,10 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
             session.setAttribute(BOX_TO_SHOW, parentId+"");
         }
         session.setAttribute(BOX_DN_MAP, boxDNMap);
-        forwardPage(Page.setNewPage(viewNoteLink+"&fromBox=1", Page.VIEW_DISCREPANCY_NOTE.getTitle()));
+        viewNoteLink = this.appendPageFileName(viewNoteLink, "refresh", refresh+"");
+        viewNoteLink = this.appendPageFileName(viewNoteLink, "y", ypos!=null&&ypos.length()>0 ? ypos : "0");
+        forwardPage(Page.setNewPage(viewNoteLink, Page.VIEW_DISCREPANCY_NOTE.getTitle()));
     }
-
-
 
     private void updateStudySubjectStatus(String entityType, int entityId) {
         if ("itemData".equalsIgnoreCase(entityType)) {
@@ -394,6 +408,41 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
         }
         noteSubmitted.put(itemDataBeanId, Boolean.TRUE);
         session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, noteSubmitted);
+    }
+    
+    private String appendPageFileName(String origin, String parameterName, String parameterValue) {
+        String parameter = parameterName + "=" + parameterValue;
+        String[] a = origin.split("\\?");
+        if (a.length == 2) { 
+            if(("&"+a[1]).contains("&"+parameterName+"=")) {
+                String result = a[0]+"?";
+                String[] b = ("&"+a[1]).split("&"+parameterName+"=");
+                if(b.length==2) {
+                    result += b[0].substring(1) + "&" + parameter 
+                           + (b[1].contains("&") ? b[1].substring(b[1].indexOf("&")) : "");
+                    return result;
+                } else if(b.length>2) {
+                    result += b[0].substring(1) + "&" + parameter;
+                    for(int i=2; i<b.length-2; ++i) {
+                        result += b[i].substring(b[i].indexOf("&"));
+                    }
+                    int j = b.length - 1;
+                    result += b[j].contains("&")?b[j].substring(b[j].indexOf("&")) : "";
+                    return result;
+                }
+                
+            } else {
+                return origin + "&" + parameter;
+            }
+        } else if(a.length==1) {
+            if(origin.endsWith("?")) {
+                return origin + parameter;
+            } else {
+                return origin + "?" + parameter;
+            }
+        }
+        logger.info("Original pageFileName: "+origin);
+        return origin;
     }
 
 }
