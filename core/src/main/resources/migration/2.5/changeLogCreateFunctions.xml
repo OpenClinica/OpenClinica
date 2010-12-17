@@ -180,7 +180,6 @@
 				SELECT INTO entity_name_value item.name FROM item WHERE item.item_id = NEW.item_id;
 				INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id)
 					VALUES (pk, ''1'', now(), NEW.update_id, ''item_data'', NEW.item_data_id, entity_name_value, OLD.value, NEW.value, NEW.event_crf_id);
-				DELETE FROM rule_action_run_log where item_data_id = NEW.item_data_id;	
 				/*---------------*/
 				END IF;
 				RETURN NULL;  /*return values ignored for ''after'' triggers*/
@@ -2568,7 +2567,6 @@
 			/* -- */
 			INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id)
 			    VALUES (audit_log_event_audit_id_seq.nextval , '1', sysdate, NEWREC.update_id, 'item_data', NEWREC.item_data_id, entity_name_value, OLDREC.value, NEWREC.value, NEWREC.event_crf_id);
-            DELETE FROM rule_action_run_log where item_data_id = NEWREC.item_data_id;			    
 			/* --------------- */
 			END IF;
 		    END IF;
