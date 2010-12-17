@@ -73,7 +73,7 @@ public class CoreResources implements ResourceLoaderAware   {
             factory.run(dbName, resourceLoader);
             copyBaseToDest(resourceLoader);
             extractProperties = findExtractProperties();
-           
+            copyAdditionalFile(resourceLoader,"CRF_Design_Template_v3.1.xls");
         } catch (OpenClinicaSystemException e) {
         	logger.debug(e.getMessage());
         	logger.debug(e.toString());
@@ -181,11 +181,27 @@ public class CoreResources implements ResourceLoaderAware   {
 		
 		
 	}
+	private void copyAdditionalFile(ResourceLoader resourceLoader, String fileName){
+		ByteArrayInputStream fileStream = null;
+		try {
+			 fileStream = (ByteArrayInputStream)resourceLoader.getResource("classpath:properties"+File.separator+fileName).getInputStream();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		File dest = new File(getField("filePath")+"crf");
+		if(!dest.exists())
+			dest.mkdirs();
+		  File dest1 = new File(dest,fileName);
+		copyFiles(fileStream,dest1);
+		
+		
+	}
 	private void copyBaseToDest(ResourceLoader resourceLoader)  {
     //	System.out.println("Properties directory?"+resourceLoader.getResource("properties/xslt"));
     
     	ByteArrayInputStream listSrcFiles[] = new ByteArrayInputStream[10];
-    	String[] fileNames =  {"odm_spss_dat.xsl","ODMToTAB.xsl","odm_to_html.xsl","odm_to_xslfo.xsl","ODMToCSV.xsl","ODM-XSLFO-Stylesheet.xsl","odm_spss_sps.xsl","copyXML.xsl"};
+    	String[] fileNames =  {"odm_spss_dat.xsl","ODMToTAB.xsl","odm_to_html.xsl","odm_to_xslfo.xsl","ODM-XSLFO-Stylesheet.xsl","odm_spss_sps.xsl","copyXML.xsl"};
     	try{
     listSrcFiles[0] = (ByteArrayInputStream) resourceLoader.getResource("classpath:properties"+File.separator+"xslt"+File.separator+fileNames[0]).getInputStream();
     listSrcFiles[1] = (ByteArrayInputStream)resourceLoader.getResource("classpath:properties"+File.separator+"xslt"+File.separator+fileNames[1]).getInputStream();
@@ -194,7 +210,8 @@ public class CoreResources implements ResourceLoaderAware   {
     listSrcFiles[4] = (ByteArrayInputStream)resourceLoader.getResource("classpath:properties"+File.separator+"xslt"+File.separator+fileNames[4]).getInputStream();
     listSrcFiles[5] = (ByteArrayInputStream)resourceLoader.getResource("classpath:properties"+File.separator+"xslt"+File.separator+fileNames[5]).getInputStream();
     listSrcFiles[6] = (ByteArrayInputStream)resourceLoader.getResource("classpath:properties"+File.separator+"xslt"+File.separator+fileNames[6]).getInputStream();
-    listSrcFiles[7] = (ByteArrayInputStream)resourceLoader.getResource("classpath:properties"+File.separator+"xslt"+File.separator+fileNames[7]).getInputStream();
+  
+    
 
     	}catch(IOException ioe){
     		OpenClinicaSystemException oe = new OpenClinicaSystemException("Unable to read source files");
