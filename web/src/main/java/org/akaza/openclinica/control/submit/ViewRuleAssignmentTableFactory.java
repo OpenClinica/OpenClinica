@@ -366,11 +366,15 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 
             String value = null;
             HtmlBuilder builder = new HtmlBuilder();
+            String mouseOver = "this.style.textDecoration='underline';";
+            String mouseOut = "this.style.textDecoration='none';";
             theItem = (ItemBean) ((HashMap<Object, Object>) item).get("item");
 
             value =
-                builder.a().href("javascript: openDocWindow('ViewItemDetail?itemId=" + theItem.getId() + "')").close().append(theItem.getName()).aEnd()
-                        .toString();
+            builder.a().href("javascript: openDocWindow('ViewItemDetail?itemId=" + theItem.getId() + "')")
+                        .style("color: #789EC5;text-decoration: none;").onmouseover(mouseOver).onmouseout(mouseOut)
+                    .close().append(theItem.getName()).aEnd().toString();
+
             return value;
         }
     }
