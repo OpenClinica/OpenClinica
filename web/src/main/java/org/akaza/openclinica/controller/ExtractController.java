@@ -144,7 +144,7 @@ public class ExtractController {
                 endFilePath + File.separator, 
                 exportFileName, 
                 dsBean.getId(), 
-                epBean, userBean, request.getLocale().getLanguage());
+                epBean, userBean, request.getLocale().getLanguage(),cnt);
         // System.out.println("just set locale: " + request.getLocale().getLanguage());
         scheduler = getScheduler(request);
         
@@ -186,7 +186,7 @@ public class ExtractController {
     	epBean.setFailureMessage(resolveVars(epBean.getFailureMessage(),dsBean,sdfDir));
     	epBean.setSuccessMessage(resolveVars(epBean.getSuccessMessage(),dsBean,sdfDir));
     	
-    
+    	epBean.setZipName(resolveVars(epBean.getZipName(),dsBean,sdfDir));
     	return epBean;
     	
 		

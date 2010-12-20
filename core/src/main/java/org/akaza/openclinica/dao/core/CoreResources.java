@@ -329,6 +329,7 @@ public class CoreResources implements ResourceLoaderAware   {
             epbean.setDeleteOld(getExtractFieldBoolean("extract."+i+".deleteOld"));
             epbean.setSuccessMessage(getExtractField("extract."+i+".success"));
             epbean.setFailureMessage(getExtractField("extract."+i+".failure"));
+            epbean.setZipName(getExtractField("extract."+i+".zipName"));
             if(epbean.getFileName().length!=epbean.getExportFileName().length)
             	throw new OpenClinicaSystemException("The comma seperated values of file names and export file names should correspond 1 on 1 for the property number"+i);
             

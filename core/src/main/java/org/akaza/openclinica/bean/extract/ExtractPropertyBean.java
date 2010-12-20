@@ -40,8 +40,18 @@ public class ExtractPropertyBean implements Serializable{
 	private String[] doNotDelFiles;
 	
 	private String datasetId;
+	private String zipName;
 	
-	
+	public String getZipName() {
+		return zipName;
+	}
+
+
+	public void setZipName(String zipName) {
+		this.zipName = zipName;
+	}
+
+
 	//Associating epBean with datasetId, since core resources to get around with coreResources.findExtractPropertyBeanById, to overcome the problems of static method
     public String getDatasetId() {
 		return datasetId;

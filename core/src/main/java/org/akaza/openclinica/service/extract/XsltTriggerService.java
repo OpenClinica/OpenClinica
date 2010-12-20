@@ -34,9 +34,9 @@ public class XsltTriggerService {
     public static final String POST_PROC_ZIP="postProcZip";
     public static final String POST_PROC_LOCATION="postProcLocation";
     public static final String POST_PROC_EXPORT_NAME="postProcExportName";
-    
+    public static final String COUNT="count";
     public SimpleTrigger generateXsltTrigger(String xslFile, String xmlFile, String endFilePath, 
-            String endFile, int datasetId, ExtractPropertyBean epBean, UserAccountBean userAccountBean, String locale) {
+            String endFile, int datasetId, ExtractPropertyBean epBean, UserAccountBean userAccountBean, String locale,int cnt) {
         Date startDateTime = new Date(System.currentTimeMillis());
         String jobName = xmlFile + datasetId;
         SimpleTrigger trigger = new SimpleTrigger(jobName, TRIGGER_GROUP_NAME, 0, 1);
@@ -68,6 +68,7 @@ public class XsltTriggerService {
         jobDataMap.put(POST_PROC_ZIP, epBean.getPostProcZip());
         jobDataMap.put(POST_PROC_LOCATION, epBean.getPostProcLocation());
         jobDataMap.put(POST_PROC_EXPORT_NAME, epBean.getPostProcExportName());
+        jobDataMap.put(COUNT,cnt);
         // jobDataMap.put(DIRECTORY, directory);
         // jobDataMap.put(ExampleSpringJob.LOCALE, locale);
         jobDataMap.put(EP_BEAN, epBean);

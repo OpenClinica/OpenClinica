@@ -322,8 +322,32 @@ public class XsltTransformJob extends QuartzJobBean {
                 //delete old files now
                 List<File> intermediateFiles = generateFileService.getOldFiles();
                 String[] dontDelFiles = epBean.getDoNotDelFiles();
-              
-            	  if(zipped){
+              int cnt = dataMap.getInt("count");
+          if(dontDelFiles.length>1 && zipped )
+           {
+            	//unzip(dontDelFiles);
+           logMe("count ====="+cnt+"dontDelFiles length==---"+dontDelFiles.length);
+        	  
+        	  if(cnt == dontDelFiles.length-1)
+        	  {
+        		  logMe("Entering this?"+cnt+"dontDelFiles"+dontDelFiles);
+        		  File temp = new File (endFile);
+        		  String path = outputPath + File.separator;
+        		  logMe("path = "+path);
+        		  logMe("zipName?? = "+epBean.getZipName());
+        		  
+        		  String zipName = (epBean.getZipName()==null||epBean.getZipName().isEmpty())?endFile+".zip":path+epBean.getZipName()+".zip";
+        		  
+        		  archivedFilename = new File(zipName).getName();
+        		  zipAll(path,epBean.getDoNotDelFiles(),zipName);
+        		   String[] tempArray = {archivedFilename};
+        		 dontDelFiles =tempArray ;
+        		  
+        	  }
+            	
+                  	 
+           }
+          else  if(zipped){
                   	markForDelete = 	zipxmls(markForDelete,endFile);
                   	endFile = endFile+".zip";
                   	
@@ -341,7 +365,12 @@ public class XsltTransformJob extends QuartzJobBean {
                   	 File tempFile = new File(generalFileDir);
                   	 deleteOldFiles(tempFile.listFiles(xmlFilter));
                   }
-                ArchivedDatasetFileBean fbFinal = generateFileRecord( archivedFilename, 
+           
+      
+          
+          
+          
+          ArchivedDatasetFileBean fbFinal = generateFileRecord( archivedFilename, 
                         outputPath, 
                         datasetBean, 
                         done, new File( outputPath + File.separator+archivedFilename).length(), 
@@ -461,8 +490,52 @@ public class XsltTransformJob extends QuartzJobBean {
         
         
     }
+    private void logMe(String message)
+    {
+    	logger.debug(message);
+    	//System.out.println(message);
+    }
     
-    /**
+    private void zipAll(String path, String[] files,String zipname)throws IOException {
+    	final int BUFFER = 2048;
+    	BufferedInputStream orgin = null;
+    	
+    	FileInputStream fis =null;
+    	FileOutputStream fos = null;
+    	ZipOutputStream zos =null;
+    	File tempFile = new File(zipname);
+    try{
+    	 fos = new FileOutputStream(zipname);
+    	 zos = new ZipOutputStream(fos);
+    	 byte data[] = new byte[BUFFER];
+    	 
+    	for(int i=0;i<files.length;i++)
+    	{
+    		logMe("Path = "+path+"zipName = "+zipname);
+    		fis = new FileInputStream(path+files[i]);
+    	
+    	orgin = new BufferedInputStream(fis,BUFFER);
+    	ZipEntry entry = new ZipEntry(files[i]);
+    	zos.putNextEntry(entry);
+    	int cnt = 0;
+    	while((cnt = orgin.read(data,0,BUFFER))!=-1)
+    	{
+    		zos.write(data,0,cnt);
+    	}
+    	}
+    	
+    }catch(IOException ioe)
+    {
+    	ioe.printStackTrace();
+    }finally{
+    if(fis!=null)    	fis.close();
+    	if(orgin!=null)orgin.close();
+    	if(zos!=null)zos.close();
+    	if(fos!=null) fos.close();
+		
+	}
+    }
+	/**
      * To go through all the existing archived datasets and delete off the records whose file references do not exist any more.
      * @param datasetId
      */
@@ -474,11 +547,17 @@ public class XsltTransformJob extends QuartzJobBean {
             ArrayList<ArchivedDatasetFileBean> al =    asdfDAO.findByDatasetId(datasetId);
             for(ArchivedDatasetFileBean fbExisting :al)
             {
+            	logMe("The file to checking?"+fbExisting.getFileReference()+"Does the file exist?"+new File(fbExisting.getFileReference()).exists());
+            	logMe("check if it still exists in archive set before"+asdfDAO.findByDatasetId(fbExisting.getDatasetId()).size());
             	if( !new File(fbExisting.getFileReference()).exists())
             		{
-            			asdfDAO.deleteArchiveDataset(fbExisting);
+            		logMe(fbExisting.getFileReference()+"Doesnt exist,deleting it from archiveset data");
+            		asdfDAO.deleteArchiveDataset(fbExisting);
+            		
             		}
+            	logMe("check if it still exists in archive set after"+asdfDAO.findByDatasetId(fbExisting.getDatasetId()).size());	
             }
+            
     	
     }
     
