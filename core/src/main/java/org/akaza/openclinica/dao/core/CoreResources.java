@@ -73,7 +73,7 @@ public class CoreResources implements ResourceLoaderAware   {
             factory.run(dbName, resourceLoader);
             copyBaseToDest(resourceLoader);
             extractProperties = findExtractProperties();
-            copyAdditionalFile(resourceLoader,"CRF_Design_Template_v3.1.xls");
+           
         } catch (OpenClinicaSystemException e) {
         	logger.debug(e.getMessage());
         	logger.debug(e.toString());
@@ -177,26 +177,6 @@ public class CoreResources implements ResourceLoaderAware   {
 		return DATAINFO;
 	}
 
-	private void replaceVars(String var){
-		
-		
-	}
-	private void copyAdditionalFile(ResourceLoader resourceLoader, String fileName){
-		ByteArrayInputStream fileStream = null;
-		try {
-			 fileStream = (ByteArrayInputStream)resourceLoader.getResource("classpath:properties"+File.separator+fileName).getInputStream();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		File dest = new File(getField("filePath")+"crf");
-		if(!dest.exists())
-			dest.mkdirs();
-		  File dest1 = new File(dest,fileName);
-		copyFiles(fileStream,dest1);
-		
-		
-	}
 	private void copyBaseToDest(ResourceLoader resourceLoader)  {
     //	System.out.println("Properties directory?"+resourceLoader.getResource("properties/xslt"));
     
