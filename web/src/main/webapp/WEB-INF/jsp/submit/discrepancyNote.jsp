@@ -197,11 +197,12 @@ function setYPos(id) {
 			</c:choose>
 		</div>
 		<tr valign="top">
-		<td class="table_cell_noborder"><fmt:message key="description" bundle="${resword}"/>:</td>
-		<td class="table_cell_noborder" id="description${parentId}">
+		<td><fmt:message key="description" bundle="${resword}"/>:</td>
+		<td id="description${parentId}">
 		<div class="formfieldL_BG"><input type="text" name="description${parentId}" value="<c:out value="${discrepancyNote.description}"/>" class="formfieldL"></div>
 		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="description${parentId}"/></jsp:include>
 		</td>
+		<td valign="top"><span class="alert">*</span></td>
 		
 		<td class="table_cell_noborder">
 		<table>
@@ -283,13 +284,14 @@ function setYPos(id) {
 		</tr>
 		
 		<tr valign="top">
-		<td  class="table_cell_noborder"><fmt:message key="detailed_note" bundle="${resword}"/>:</td>
-		<td class="table_cell_noborder">
+		<td><fmt:message key="detailed_note" bundle="${resword}"/>:</td>
+		<td>
 		<div class="formtextareaL4_BG">
 		  <textarea name="detailedDes${parentId}" rows="4" cols="50" class="formtextareaL4"><c:out value="${discrepancyNote.detailedNotes}"/></textarea>
 		</div>
 		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="detailedDes${parentId}"/></jsp:include>
 		</td>
+		<td valign="top"><span class="alert"></span></td>
 		
 		<td class="table_cell_noborder">
 		<table border="0" cellpadding="0" cellspacing="0">

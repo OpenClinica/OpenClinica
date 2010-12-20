@@ -215,6 +215,7 @@ function setElements(typeId, user1, user2) {
 		<div class="formfieldL_BG"><input type="text" name="description" value="<c:out value="${discrepancyNote.description}"/>" class="formfieldL"></div>
 		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="description"/></jsp:include>
 		</td>
+		<td valign="top"><span class="alert">*</span></td>
 		
 		<td class="table_cell_noborder">
 		<table>
@@ -303,6 +304,7 @@ function setElements(typeId, user1, user2) {
 		</div>
 		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="detailedDes"/></jsp:include>
 		&nbsp;</td>
+		<td valign="top"><span class="alert"></span></td>
 		
 		<td class="table_cell_noborder">
 		<table border="0" cellpadding="0" cellspacing="0">
