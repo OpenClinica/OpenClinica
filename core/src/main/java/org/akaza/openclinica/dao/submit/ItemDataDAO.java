@@ -117,9 +117,10 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
         // YW 12-06-2007 << convert to oc_date_format_string pattern before
         // inserting into database
-        if (isADateType(idb.getItemId())) {
+        ItemDataType dataType = getDataType(idb.getItemId()); 
+        if (dataType.equals(ItemDataType.DATE)) {
             idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string));
-        } else if (isPDateType(idb.getItemId())) {
+        } else if (dataType.equals(ItemDataType.PDATE)) {
             idb.setValue(formatPDate(idb.getValue()));
         }
 
@@ -155,9 +156,10 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
         // YW 12-06-2007 << convert to oc_date_format_string pattern before
         // inserting into database
-        if (isADateType(idb.getItemId())) {
+        ItemDataType dataType = getDataType(idb.getItemId());
+        if (dataType.equals(ItemDataType.DATE)) {
             idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string));
-        } else if (isPDateType(idb.getItemId())) {
+        } else if (dataType.equals(ItemDataType.PDATE)) {
             idb.setValue(formatPDate(idb.getValue()));
         }
         // YW >>
@@ -247,9 +249,10 @@ public class ItemDataDAO extends AuditableEntityDAO {
         ItemDataBean idb = (ItemDataBean) eb;
         // YW 12-06-2007 << convert to oc_date_format_string pattern before
         // inserting into database
-        if (isADateType(idb.getItemId())) {
+        ItemDataType dataType = getDataType(idb.getItemId());
+        if (dataType.equals(ItemDataType.DATE)) {
             idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string));
-        } else if (isPDateType(idb.getItemId())) {
+        } else if (dataType.equals(ItemDataType.PDATE)) {
             idb.setValue(formatPDate(idb.getValue()));
         }
 
@@ -277,9 +280,10 @@ public class ItemDataDAO extends AuditableEntityDAO {
         ItemDataBean idb = (ItemDataBean) eb;
         // YW 12-06-2007 << convert to oc_date_format_string pattern before
         // inserting into database
-        if (isADateType(idb.getItemId())) {
+        ItemDataType dataType = getDataType(idb.getItemId());
+        if (dataType.equals(ItemDataType.DATE)) {
             idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string));
-        } else if (isPDateType(idb.getItemId())) {
+        } else if (dataType.equals(ItemDataType.PDATE)) {
             idb.setValue(formatPDate(idb.getValue()));
         }
 
@@ -307,25 +311,21 @@ public class ItemDataDAO extends AuditableEntityDAO {
     /*
      * Small check to make sure the type is a date, tbh
      */
-    public boolean isADateType(int itemId) {
+    public ItemDataType getDataType(int itemId) {
         ItemDAO itemDAO = new ItemDAO(this.getDs());
         ItemBean itemBean = (ItemBean) itemDAO.findByPK(itemId);
-        if (itemBean.getDataType().equals(ItemDataType.DATE) || itemBean.getDataType().equals(ItemDataType.PDATE)) {
-            return true;
-        }
-        return false;
-
+        return itemBean.getDataType();
     }
 
-    public boolean isPDateType(int itemId) {
-    	ItemDAO itemDAO = new ItemDAO(this.getDs());
-    	ItemBean itemBean = (ItemBean)itemDAO.findByPK(itemId);
-    	if (itemBean.getDataType().equals(ItemDataType.PDATE)) {
-    		return true;
-    	}
-    	return false;
-
-    }
+//    public boolean isPDateType(int itemId) {
+//    	ItemDAO itemDAO = new ItemDAO(this.getDs());
+//    	ItemBean itemBean = (ItemBean)itemDAO.findByPK(itemId);
+//    	if (itemBean.getDataType().equals(ItemDataType.PDATE)) {
+//    		return true;
+//    	}
+//    	return false;
+//
+//    }
 
     public String formatPDate (String pDate) {
         String temp = "";
@@ -379,9 +379,10 @@ public class ItemDataDAO extends AuditableEntityDAO {
         // right now,
         // convert item date value to local_date_format_string pattern once
         // fetching out from database
-        if (isADateType(eb.getItemId())) {
+        ItemDataType dataType = getDataType(eb.getItemId());
+        if (dataType.equals(ItemDataType.DATE)) {
             eb.setValue(Utils.convertedItemDateValue(eb.getValue(), oc_df_string, local_df_string));
-        } else if (isPDateType(eb.getItemId())) {
+        } else if (dataType.equals(ItemDataType.PDATE)) {
             eb.setValue(reFormatPDate(eb.getValue()));
         }
         // YW >>
