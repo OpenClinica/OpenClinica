@@ -1,12 +1,32 @@
 package org.akaza.openclinica.service.extract;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.zip.ZipOutputStream;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.DisplayItemHeaderBean;
 import org.akaza.openclinica.bean.extract.ExportFormatBean;
 import org.akaza.openclinica.bean.extract.ExtractBean;
 import org.akaza.openclinica.bean.extract.SPSSReportBean;
-import org.akaza.openclinica.bean.extract.SPSSVariableNameValidationBean;
+import org.akaza.openclinica.bean.extract.SPSSVariableNameValidator;
 import org.akaza.openclinica.bean.extract.TabReportBean;
 import org.akaza.openclinica.bean.extract.odm.AdminDataReportBean;
 import org.akaza.openclinica.bean.extract.odm.FullReportBean;
@@ -28,30 +48,8 @@ import org.akaza.openclinica.logic.odmExport.ClinicalDataCollector;
 import org.akaza.openclinica.logic.odmExport.ClinicalDataUnit;
 import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
 import org.akaza.openclinica.logic.odmExport.OdmStudyBase;
-import org.apache.poi.util.TempFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.zip.ZipOutputStream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
 
 public class GenerateExtractFileService {
 
@@ -384,7 +382,7 @@ public class GenerateExtractFileService {
         String DDLFileName = db.getName() + "_ddl_spss.sps";
         String ZIPFileName = db.getName() + "_spss";
 
-        SPSSVariableNameValidationBean svnvbean = new SPSSVariableNameValidationBean();
+        SPSSVariableNameValidator svnv = new SPSSVariableNameValidator();
         answer.setDatFileName(SPSSFileName);
         // DatasetDAO dsdao = new DatasetDAO(ds);
 
@@ -436,11 +434,11 @@ public class GenerateExtractFileService {
         ArrayList generatedReports = new ArrayList<String>();
         try {
         	// YW <<
-        	generatedReports.add(answer.getMetadataFile(svnvbean, eb2).toString());
+        	generatedReports.add(answer.getMetadataFile(svnv, eb2).toString());
         	generatedReports.add(answer.getDataFile().toString());
         	// YW >>
         } catch (IndexOutOfBoundsException i) {
-        	generatedReports.add(answer.getMetadataFile(svnvbean, eb2).toString());
+        	generatedReports.add(answer.getMetadataFile(svnv, eb2).toString());
         	logger.debug("throw the error here");
         }
 
