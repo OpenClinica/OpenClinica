@@ -1,7 +1,7 @@
 /* OpenClinica is distributed under the GNU Lesser General Public License (GNU
  * LGPL).
  *
- * For details see: http://www.openclinica.org/license copyright 2003-2005 Akaza
+ * For details see: http://www.openclinica.org/license copyright 2003-2010 Akaza
  * Research
  *
  */
@@ -385,12 +385,12 @@ public class MetaDataReportBean extends OdmXmlReportBean {
             if (ig.getComment().length() > 0) {
                 xml.append(currentIndent + "<ItemGroupDef OID=\"" + StringEscapeUtils.escapeXml(ig.getOid()) + "\" Name=\""
                     + StringEscapeUtils.escapeXml(ig.getName()) + "\" Repeating=\"" + ig.getRepeating() + "\" SASDatasetName=\""
-                    + this.getSasNameValidatory().getValidSasName(ig.getPreSASDatasetName()) + "\" Comment=\"" + StringEscapeUtils.escapeXml(ig.getComment())
+                    + this.getSasNameValidator().getValidName(ig.getPreSASDatasetName()) + "\" Comment=\"" + StringEscapeUtils.escapeXml(ig.getComment())
                     + "\">");
             } else {
                 xml.append(currentIndent + "<ItemGroupDef OID=\"" + StringEscapeUtils.escapeXml(ig.getOid()) + "\" Name=\""
                     + StringEscapeUtils.escapeXml(ig.getName()) + "\" Repeating=\"" + ig.getRepeating() + "\" SASDatasetName=\""
-                    + this.getSasNameValidatory().getValidSasName(ig.getPreSASDatasetName()) + "\">");
+                    + this.getSasNameValidator().getValidName(ig.getPreSASDatasetName()) + "\">");
             }
             xml.append(nls);
             ArrayList<ElementRefBean> items = (ArrayList<ElementRefBean>) ig.getItemRefs();
@@ -424,7 +424,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
             if (len > 0) {
                 xml.append(" SignificantDigits=\"" + len + "\"");
             }
-            xml.append(" SASFieldName=\"" + this.getSasNameValidatory().getValidSasName(item.getPreSASFieldName()) + "\"");
+            xml.append(" SASFieldName=\"" + this.getSasNameValidator().getValidName(item.getPreSASFieldName()) + "\"");
             if (item.getComment().length() > 0) {
                 xml.append(" Comment=\"" + StringEscapeUtils.escapeXml(item.getComment()) + "\"");
             }

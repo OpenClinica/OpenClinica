@@ -3,7 +3,7 @@
  * GNU Lesser General Public License (GNU LGPL).
 
  * For details see: http://www.openclinica.org/license
- * copyright 2003-2005 Akaza Research
+ * copyright 2003-2010 Akaza Research
  */
 package org.akaza.openclinica.bean.extract;
 
@@ -119,7 +119,7 @@ public class SPSSReportBean extends ReportBean {
         return "";
     }
 
-    public StringBuffer getMetadataFile(SPSSVariableNameValidationBean svnvbean, ExtractBean eb) {
+    public StringBuffer getMetadataFile(SPSSVariableNameValidator svnv, ExtractBean eb) {
         itemNames.clear();
         String[] attributes = createAttributes(eb); // Is it necessary to
         // validate
@@ -158,7 +158,7 @@ public class SPSSReportBean extends ReportBean {
                 // removed, because:
                 // This "V_" exists in .sps file but not exists in .dat file.
                 // String varLabel = "V_" + itemName;
-                String varLabel = svnvbean.getValidSPSSVariableName(itemName);
+                String varLabel = svnv.getValidName(itemName);
                 itemNames.add(varLabel);
                 // builtin attributes
                 if (i < startItem) {
@@ -446,7 +446,7 @@ public class SPSSReportBean extends ReportBean {
 
     // YW 10-31-2007
     private String[] createAttributes(ExtractBean eb) {
-        SPSSVariableNameValidationBean svnvbean = new SPSSVariableNameValidationBean();
+        SPSSVariableNameValidator svnv = new SPSSVariableNameValidator();
         ArrayList<StudyGroupClassBean> studyGroupClasses = eb.getStudyGroupClasses();
         int size = studyGroupClasses.size();
         String[] atts = new String[size + builtin.length];
@@ -455,7 +455,7 @@ public class SPSSReportBean extends ReportBean {
             // System.out.println(atts[i]);
         }
         for (int i = 7; i < 7 + size; ++i) {
-            atts[i] = svnvbean.getValidSPSSVariableName(studyGroupClasses.get(i - 7).getName());
+            atts[i] = svnv.getValidName(studyGroupClasses.get(i - 7).getName());
             // System.out.println(atts[i]);
         }
         for (int i = 7 + size; i < size + builtin.length; ++i) {

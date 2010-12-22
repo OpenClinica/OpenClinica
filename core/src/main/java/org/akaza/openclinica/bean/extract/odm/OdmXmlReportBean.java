@@ -7,14 +7,14 @@
  */
 package org.akaza.openclinica.bean.extract.odm;
 
+import java.util.TreeSet;
+
 import org.akaza.openclinica.bean.extract.ODMSASFormatNameValidator;
-import org.akaza.openclinica.bean.extract.SasNameValidationBean;
+import org.akaza.openclinica.bean.extract.SasNameValidator;
 import org.akaza.openclinica.bean.odmbeans.ODMBean;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.TreeSet;
 
 /**
  * Create ODM XML document.
@@ -29,7 +29,7 @@ public abstract class OdmXmlReportBean {
     private ODMBean odmbean;
 
     private String indent;
-    private SasNameValidationBean sasNameValidator;
+    private SasNameValidator sasNameValidator;
     private ODMSASFormatNameValidator sasFormatValidator;
     private TreeSet<String> uniqueNameTable;
 
@@ -48,7 +48,7 @@ public abstract class OdmXmlReportBean {
         // locale_df_string =
         // ResourceBundleProvider.getFormatBundle().getString("date_format_string");
         uniqueNameTable = new TreeSet<String>();
-        sasNameValidator = new SasNameValidationBean();
+        sasNameValidator = new SasNameValidator();
         sasNameValidator.setUniqueNameTable(this.uniqueNameTable);
         sasFormatValidator = new ODMSASFormatNameValidator();
         sasFormatValidator.setUniqueNameTable(this.uniqueNameTable);
@@ -113,11 +113,11 @@ public abstract class OdmXmlReportBean {
         return this.odmbean;
     }
 
-    public void setSasNameValidator(SasNameValidationBean validator) {
+    public void setSasNameValidator(SasNameValidator validator) {
         this.sasNameValidator = validator;
     }
 
-    public SasNameValidationBean getSasNameValidatory() {
+    public SasNameValidator getSasNameValidator() {
         return this.sasNameValidator;
     }
 
