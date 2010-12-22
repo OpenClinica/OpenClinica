@@ -106,7 +106,7 @@ public class StudySubjectDAO extends AuditableEntityDAO {
         ind++; // oc oid
         this.setTypeExpected(ind, TypeNames.STRING);
         ind++; //
-        this.setTypeExpected(ind, TypeNames.TIMESTAMP);
+        this.setTypeExpected(ind, TypeNames.INT);
         ind++; //
     }
 
