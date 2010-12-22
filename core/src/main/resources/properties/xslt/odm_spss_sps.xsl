@@ -7,7 +7,7 @@
                 xmlns:fn="http://www.w3.org/2005/02/xpath-functions"
                 xsi:schemaLocation="http://www.cdisc.org/ns/odm/v1.3 ">
     <xsl:output method="text" version="4.0" encoding="utf-8" indent="no"/>
-    <xsl:variable name="delimiter" select="','"/>
+    <xsl:variable name="delimiter" select="'&#x09;'"/>
     <!--E to represent Events-->
     <xsl:variable name="E" select="'E'"/>
     <!--C to represent CRFS-->
