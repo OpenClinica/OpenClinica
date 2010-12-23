@@ -77,10 +77,10 @@ public class CoreResources implements ResourceLoaderAware   {
         	logMe("is web app name null?"+webapp);
         	
         	
-            String dbName = dataInfo.getProperty("dataBase");
+            String dbName = dataInfo.getProperty("dbType");
            
             DATAINFO = dataInfo;
-            setDataInfoProperties();
+        dataInfo =  setDataInfoProperties();//weird, but there are references to dataInfo...MainMenuServlet  for instance
           //  setDataInfoPath();
             EXTRACTINFO = extractInfo;
 
@@ -93,7 +93,7 @@ public class CoreResources implements ResourceLoaderAware   {
         } catch (OpenClinicaSystemException e) {
         	logger.debug(e.getMessage());
         	logger.debug(e.toString());
-             throw new OpenClinicaSystemException(e.getMessage(), e.fillInStackTrace());
+             throw new OpenClinicaSystemException(e.getMessage(), e.fillInStackTrace());  
         } catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -173,7 +173,7 @@ public class CoreResources implements ResourceLoaderAware   {
     return vals;	
     }
 	private Properties setDataInfoProperties() {
-    	String filePath = DATAINFO.getProperty("filePath");
+   	String filePath = DATAINFO.getProperty("filePath");
 		if(filePath==null|| filePath.isEmpty()) filePath="$catalina.home/$WEBAPP.lower.data";
     	String database = DATAINFO.getProperty("dbType");
 		
@@ -233,7 +233,7 @@ public class CoreResources implements ResourceLoaderAware   {
      		DATAINFO.setProperty("dataset_file_delete", "true");;//TODO:Revisit me!
      	String password_expiration_time = DATAINFO.getProperty("passwdExpirationTime");
      	if(password_expiration_time!=null)
-     	DATAINFO.setProperty("password_expiration_time",password_expiration_time);
+     	DATAINFO.setProperty("passwd_expiration_time",password_expiration_time);
      	
      	if(DATAINFO.getProperty("maxInactiveInterval")!=null)
      	DATAINFO.setProperty("max_inactive_interval",DATAINFO.getProperty("maxInactiveInterval"));
@@ -250,11 +250,11 @@ public class CoreResources implements ResourceLoaderAware   {
      	String rss_url = DATAINFO.getProperty("rssUrl");
      	if(rss_url==null ||rss_url.isEmpty())
      		rss_url = "http://clinicalresearch.wordpress.com/feed/";
-     	DATAINFO.setProperty("rss_url", rss_url);
+     	DATAINFO.setProperty("rss.url", rss_url);
      	String rss_more = DATAINFO.getProperty("rssMore");
      	if(rss_more==null || rss_more.isEmpty())
      		rss_more = "http://clinicalresearch.wordpress.com/";
-     	DATAINFO.setProperty("rss_more",rss_more);
+     	DATAINFO.setProperty("rss.more",rss_more);
      	
      	String supportURL = DATAINFO.getProperty("supportURL");
      	if(supportURL==null||supportURL.isEmpty())
@@ -305,6 +305,7 @@ public class CoreResources implements ResourceLoaderAware   {
 			driver= "oracle.jdbc.driver.OracleDriver";
 			hibernateDialect = "org.hibernate.dialect.OracleDialect";
 		}
+		DATAINFO.setProperty("dataBase",database);
 		DATAINFO.setProperty("url", url);
 		DATAINFO.setProperty("hibernate.dialect", hibernateDialect);
 		DATAINFO.setProperty("driver", driver);
