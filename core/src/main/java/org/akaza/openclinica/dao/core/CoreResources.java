@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.context.ResourceLoaderAware;
+import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
@@ -43,7 +44,7 @@ public class CoreResources implements ResourceLoaderAware   {
     private Properties extractInfo;
 
     private static String webapp;
-    protected final  Logger logger = LoggerFactory.getLogger(getClass().getName());
+    protected final static  Logger logger = LoggerFactory.getLogger("org.akaza.openclinica.dao.core.CoreResources");
     // private MessageSource messageSource;
     private static ArrayList<ExtractPropertyBean> extractProperties;
     
@@ -53,19 +54,34 @@ public class CoreResources implements ResourceLoaderAware   {
     {
     	
     }
-     
+   /**
+    * TODO: Delete me! 
+    * @param dataInfoProps
+    * @throws IOException
+    */
+    public CoreResources(Properties dataInfoProps) throws IOException
+    {
+    	this.dataInfo = dataInfoProps;
+    	if(resourceLoader==null)
+    		resourceLoader = new DefaultResourceLoader();
+    	webapp = getWebAppName(resourceLoader.getResource("/").getURI().getPath());
+    	
+    }
+    
+    
     public void setResourceLoader(ResourceLoader resourceLoader)  {
         this.resourceLoader = resourceLoader;
         try {
             // setPROPERTIES_DIR();
         	webapp = getWebAppName(resourceLoader.getResource("/").getURI().getPath());
-        
+        	logMe("is web app name null?"+webapp);
+        	
+        	
             String dbName = dataInfo.getProperty("dataBase");
            
             DATAINFO = dataInfo;
             setDataInfoProperties();
           //  setDataInfoPath();
-            //JN:TODO undo-comment after the datainfo part is done. 
             EXTRACTINFO = extractInfo;
 
             DB_NAME = dbName;
@@ -84,21 +100,61 @@ public class CoreResources implements ResourceLoaderAware   {
 		}
     }
 
-    
-    //For future
-    private void setDataInfoPath() {
+   /**
+    * For changing values which are applicable to all properties, for ex webapp name can be used in any properties 
+    */
+       private void setDataInfoVals() {
 	
     	Enumeration<String> properties =  (Enumeration<String>) DATAINFO.propertyNames();
     	String vals,key;
     	while(properties.hasMoreElements()){
 		key = properties.nextElement();
     		vals = DATAINFO.getProperty(key);
-    		replacePaths(vals);
-    	
-    	DATAINFO.setProperty(key, vals);
+    		//replacePaths(vals);
+    		logMe("key:"+key+"vals:"+vals);
+    		vals = replaceWebapp(vals);
+    		vals = replaceCatHome(vals);
+    		logMe("key:"+key+"vals:"+vals);
+    		DATAINFO.setProperty(key, vals);
     	}
     	
 	}
+    private static String replaceWebapp(String value)
+    {
+    	logMe(value);
+    	
+    	if(value.contains("${WEBAPP}")){
+    		value = value.replace("${WEBAPP}",webapp );
+    	}
+   
+    	else if(value.contains("${WEBAPP.lower}")){
+    		value = value.replace("${WEBAPP.lower}", webapp.toLowerCase());
+    	  }
+    	if(value.contains("$WEBAPP.lower")){
+    		value = value.replace("$WEBAPP.lower",webapp.toLowerCase() );
+    	}
+    	else if (value.contains("$WEBAPP")){
+    		value = value.replace("$WEBAPP",webapp );
+    	}
+    	
+    	return value;
+    }
+    private static String replaceCatHome(String value)
+    {
+    	logMe(value);
+    	
+    	if(value.contains("${catalina.home}")){
+    		value = value.replace("${catalina.home}",System.getenv("CATALINA_HOME") );
+    	}
+   
+    	
+    	if(value.contains("$catalina.home")){
+    		value = value.replace("$catalina.home",System.getenv("CATALINA_HOME") );
+    	}
+    	
+    	return value;
+    }
+  
 
     private static String replacePaths(String vals)
     {
@@ -118,38 +174,16 @@ public class CoreResources implements ResourceLoaderAware   {
     }
 	private Properties setDataInfoProperties() {
     	String filePath = DATAINFO.getProperty("filePath");
-		String database = DATAINFO.getProperty("dataBase");
-    	logger.debug("DataInfo..."+DATAINFO);
-    	if(DATAINFO.getProperty("filePath").contains("${catalina.home}"))
-		{
-			
-			filePath = filePath.replace("${catalina.home}", System.getenv("catalina.home"));
-			DATAINFO.setProperty("filePath", filePath);
-		}
-    	if(DATAINFO.getProperty("filePath").contains("${WEBAPP}"))
-		{
-			
-			filePath = filePath.replace("${WEBAPP}", webapp);
-			DATAINFO.setProperty("filePath", filePath);
-		}
-    	else if(DATAINFO.getProperty("filePath").contains("${WEBAPP.lower}")){
-    		filePath = filePath.replace("${WEBAPP.lower}", webapp.toLowerCase());
-    		DATAINFO.setProperty("filePath", filePath);
-    	}
+		if(filePath==null|| filePath.isEmpty()) filePath="$catalina.home/$WEBAPP.lower.data";
+    	String database = DATAINFO.getProperty("dbType");
+		
+    	setDatabaseProperties(database);
     	
-    	filePath = replacePaths(DATAINFO.getProperty("filePath"));
-    	DATAINFO.setProperty("filePath", filePath);
+    	logMe("DataInfo..."+DATAINFO);
+    	logMe("filePath = "+filePath);
+    	 	setDataInfoVals();
     	
-    	String sysURL = DATAINFO.getProperty("sysURL");
-
-    	if(sysURL.contains("${WEBAPP}"))
-		{
-			
-			sysURL = sysURL.replace("${WEBAPP}", webapp);
-			DATAINFO.setProperty("sysURL", sysURL);
-		}
-    	
-    	
+    	DATAINFO.setProperty("changeLogFile", "src/main/resources/migration/master.xml");
     	//sysURL.base 
     	String sysURLBase  = DATAINFO.getProperty("sysURL").replace("MainMenu","");
     	DATAINFO.setProperty("sysURL.base", sysURLBase);
@@ -173,9 +207,110 @@ public class CoreResources implements ResourceLoaderAware   {
      	DATAINFO.setProperty("org.quartz.threadPool.threadCount","1");
      	DATAINFO.setProperty("org.quartz.threadPool.threadPriority", "5");
      	
-    	logger.debug("DataInfo..."+DATAINFO);
+    	
+     	String attached_file_location= DATAINFO.getProperty("attached_file_location");
+     	if(attached_file_location == null || attached_file_location.isEmpty())
+     		{
+     			attached_file_location = DATAINFO.getProperty(filePath)+File.separator+"attached_files";
+     			DATAINFO.setProperty("attached_file_location",attached_file_location);
+     		}
+     	
+     	String change_passwd_required = DATAINFO.getProperty("change_passwd_required");
+     	if(change_passwd_required==null || change_passwd_required.isEmpty())
+     		{
+     			change_passwd_required = "1";
+     			DATAINFO.setProperty("change_passwd_required",change_passwd_required);
+     			
+     		}
+     	setMailProps();
+     	if(DATAINFO.getProperty("crfFileExtensions")!=null)
+     	DATAINFO.setProperty("crf_file_extensions",DATAINFO.getProperty("crfFileExtensions"));
+     	if(DATAINFO.getProperty("crfFileExtensionSettings")!=null)
+     	DATAINFO.setProperty("crf_file_extension_settings",DATAINFO.getProperty("crfFileExtensionSettings"));
+     	
+     	String dataset_file_delete = DATAINFO.getProperty("dataset_file_delete");
+     	if(dataset_file_delete==null)
+     		DATAINFO.setProperty("dataset_file_delete", "true");;//TODO:Revisit me!
+     	String password_expiration_time = DATAINFO.getProperty("passwdExpirationTime");
+     	if(password_expiration_time!=null)
+     	DATAINFO.setProperty("password_expiration_time",password_expiration_time);
+     	
+     	if(DATAINFO.getProperty("maxInactiveInterval")!=null)
+     	DATAINFO.setProperty("max_inactive_interval",DATAINFO.getProperty("maxInactiveInterval"));
+     	
+     	DATAINFO.setProperty("ra", "Data_Entry_Person");
+     	DATAINFO.setProperty("investigator","Investigator");
+     	DATAINFO.setProperty("director","Study_Director");
+     	
+     	DATAINFO.setProperty("coordinator","Study_Coordinator");
+     	DATAINFO.setProperty("monitor","Monitor");
+     	DATAINFO.setProperty("ccts.waitBeforeCommit","6000");
+     	
+     	
+     	String rss_url = DATAINFO.getProperty("rssUrl");
+     	if(rss_url==null ||rss_url.isEmpty())
+     		rss_url = "http://clinicalresearch.wordpress.com/feed/";
+     	DATAINFO.setProperty("rss_url", rss_url);
+     	String rss_more = DATAINFO.getProperty("rssMore");
+     	if(rss_more==null || rss_more.isEmpty())
+     		rss_more = "http://clinicalresearch.wordpress.com/";
+     	DATAINFO.setProperty("rss_more",rss_more);
+     	
+     	String supportURL = DATAINFO.getProperty("supportURL");
+     	if(supportURL==null||supportURL.isEmpty())
+     		supportURL = "http://www.openclinica.org/OpenClinica/3.0/support/";
+     	DATAINFO.setProperty("supportURL", supportURL);
+     	
+     	DATAINFO.setProperty("show_unique_id","1");
+     	
+     	DATAINFO.setProperty("auth_mode","password");
+     	if(DATAINFO.getProperty("userAccountNotification")!=null)
+     	DATAINFO.setProperty("user_account_notification", DATAINFO.getProperty("userAccountNotification"));
+     	logger.debug("DataInfo..."+DATAINFO);
 		return DATAINFO;
 	}
+
+	private void setMailProps() {
+	
+		
+		DATAINFO.setProperty("mail.host",DATAINFO.getProperty("mailHost"));
+		DATAINFO.setProperty("mail.port",DATAINFO.getProperty("mailPort"));
+		DATAINFO.setProperty("mail.protocol", DATAINFO.getProperty("mailProtocol"));
+		DATAINFO.setProperty("mail.username", DATAINFO.getProperty("mailUsername"));
+		DATAINFO.setProperty("mail.password", DATAINFO.getProperty("mailPassword"));
+		DATAINFO.setProperty("mail.smtp.auth", DATAINFO.getProperty("mailSmtpAuth"));
+		DATAINFO.setProperty("mail.smtp.starttls.enable", DATAINFO.getProperty("mailSmtpStarttls.enable"));
+		DATAINFO.setProperty("mail.smtps.auth", DATAINFO.getProperty("mailSmtpsAuth"));
+		DATAINFO.setProperty("mail.smtps.starttls.enable", DATAINFO.getProperty("mailSmtpsStarttls.enable"));
+		DATAINFO.setProperty("mail.smtp.connectiontimeout", DATAINFO.getProperty("mailSmtpConnectionTimeout"));
+		DATAINFO.setProperty("mail.errormsg", DATAINFO.getProperty("mailErrorMsg"));
+		
+		
+	}
+
+	private void setDatabaseProperties(String database) {
+
+	DATAINFO.setProperty("username", DATAINFO.getProperty("dbUser"));
+	DATAINFO.setProperty("password", DATAINFO.getProperty("dbPass"));
+	String url = null,driver = null,hibernateDialect = null;
+		if(database.equalsIgnoreCase("postgres"))
+		{
+			url="jdbc:postgresql:"+"//"+DATAINFO.getProperty("dbHost")+":"+DATAINFO.getProperty("dbPort")+"/"+DATAINFO.getProperty("db");
+			driver = "org.postgresql.Driver";
+			hibernateDialect = "org.hibernate.dialect.PostgreSQLDialect"; 
+		}
+		else if(database.equalsIgnoreCase("oracle"))
+		{
+			url="jdbc:oracle:thin:"+"@"+DATAINFO.getProperty("dbHost")+":"+DATAINFO.getProperty("dbPort")+":"+DATAINFO.getProperty("db");
+			driver= "oracle.jdbc.driver.OracleDriver";
+			hibernateDialect = "org.hibernate.dialect.OracleDialect";
+		}
+		DATAINFO.setProperty("url", url);
+		DATAINFO.setProperty("hibernate.dialect", hibernateDialect);
+		DATAINFO.setProperty("driver", driver);
+		
+	}
+
 
 	private void copyBaseToDest(ResourceLoader resourceLoader)  {
     //	System.out.println("Properties directory?"+resourceLoader.getResource("properties/xslt"));
@@ -515,7 +650,7 @@ public class CoreResources implements ResourceLoaderAware   {
     }
 
     public Properties getDataInfo() {
-        return dataInfo;
+        return DATAINFO;
     }
 
     public void setDataInfo(Properties dataInfo) {
@@ -542,6 +677,11 @@ public class CoreResources implements ResourceLoaderAware   {
         return webAppName;
     }
     
- 
-
+ //TODO comment out system out after dev
+    private static void  logMe(String message){
+    	System.out.println(message);
+    	logger.debug(message);
+    }
+    
+    
 }

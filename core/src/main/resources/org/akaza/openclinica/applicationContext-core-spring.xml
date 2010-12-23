@@ -10,22 +10,29 @@
                         http://www.springframework.org/schema/util 
                         http://www.springframework.org/schema/util/spring-util-3.0.xsd">
     
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
-        p:properties-ref="dataInfo"
-        p:placeholderPrefix="s["
-        p:placeholderSuffix="]"
-     />
+
      
      <util:properties id="dataInfo" location="classpath:datainfo.properties"/>
      <util:properties id="extractInfo" location="classpath:extract.properties"/>
      <util:properties id="oracle" location="classpath:oracle.properties"/>
      <util:properties id="enterpriseInfo" location="classpath:enterprise.properties"/>
+  <!--    
      
+  <bean id="ocSessionContext" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+	 <property name="targetClass"><value>org.akaza.openclinica.control.ApplicationContextHelper</value></property>
+	   <property name="targetMethod"><value>getContext</value></property>
+  </bean>
+  -->
      <bean id="coreResources" class="org.akaza.openclinica.dao.core.CoreResources">
+           
         <property name="dataInfo" ref="dataInfo"/>
+  			
         <property name="extractInfo" ref="extractInfo"/>
+       
         <!--  <property name="messageSource" ref="messageSource"/> -->
      </bean>
+    
+    <bean id="dataInfoProperties" factory-bean="coreResources" factory-method="getDataInfo"/>
      
      <!-- ENABLING THIS WILL ACTIVATE I18N VIA SPRING -->
      <bean id="messageSource"
@@ -46,6 +53,13 @@
         </property>
     </bean>
      
+         <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
+        
+        p:placeholderPrefix="s["
+        p:placeholderSuffix="]"
+     >
+     <property name="properties"><ref bean="dataInfoProperties"/></property>
      
+     </bean>
      
 </beans>

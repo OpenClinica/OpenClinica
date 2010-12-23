@@ -22,7 +22,7 @@
     </bean>
      -->
 
-    <bean id="liquibase" class="liquibase.spring.SpringLiquibase">
+    <bean id="liquibase" class="liquibase.spring.SpringLiquibase" depends-on="coreResources">
       <property name="dataSource" ref="dataSource" />
       <property name="changeLog" value="classpath:migration/master.xml" />
     </bean>
