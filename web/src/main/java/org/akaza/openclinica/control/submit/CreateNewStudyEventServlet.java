@@ -286,9 +286,11 @@ public class CreateNewStudyEventServlet extends SecureController {
                 if (!StringUtil.isBlank(fp.getString(this.INPUT_STUDY_EVENT_DEFINITION_SCHEDULED[i]))) {
                     // logger.info("has scheduled definition******");
                     v.addValidation(this.INPUT_STUDY_EVENT_DEFINITION_SCHEDULED[i], Validator.ENTITY_EXISTS_IN_STUDY, seddao, studyWithEventDefinitions);
-                    v.addValidation(INPUT_SCHEDULED_LOCATION[i], Validator.NO_BLANKS);
-                    v.addValidation(INPUT_SCHEDULED_LOCATION[i], Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
-                    v.alwaysExecuteLastValidation(INPUT_SCHEDULED_LOCATION[i]);
+                    if(currentStudy.getStudyParameterConfig().getEventLocationRequired().equalsIgnoreCase("required")){
+                        v.addValidation(INPUT_SCHEDULED_LOCATION[i], Validator.NO_BLANKS);
+                        v.addValidation(INPUT_SCHEDULED_LOCATION[i], Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
+                        v.alwaysExecuteLastValidation(INPUT_SCHEDULED_LOCATION[i]);
+                    }
                     v.addValidation(INPUT_STARTDATE_PREFIX_SCHEDULED[i], Validator.IS_DATE_TIME);
                     v.alwaysExecuteLastValidation(INPUT_STARTDATE_PREFIX_SCHEDULED[i]);
                     if (!strEndScheduled[i].equals("")) {
