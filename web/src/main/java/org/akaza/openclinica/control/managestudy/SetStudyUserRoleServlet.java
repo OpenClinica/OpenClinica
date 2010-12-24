@@ -133,7 +133,7 @@ public class SetStudyUserRoleServlet extends SecureController {
         logger.info("Sending email...");
         String body =
             u.getFirstName() + " " + u.getLastName() + " (" + resword.getString("username") + ": " + u.getName() + ") "
-                + respage.getString("has_been_granted_the_role") + " " + sub.getRoleName() + " " + respage.getString("in_the_study_site") + " "
+                + respage.getString("has_been_granted_the_role") + " " + sub.getRole().getDescription() + " " + respage.getString("in_the_study_site") + " "
                 + study.getName() + ".";
 
 //        boolean emailSent = sendEmail(u.getEmail().trim(), respage.getString("set_user_role"), body, false);
