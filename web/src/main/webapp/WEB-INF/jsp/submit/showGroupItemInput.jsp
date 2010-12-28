@@ -278,7 +278,14 @@ function switchStr(itemId, id,attribute,str1,str2) {
 	<c:choose>
 	<c:when test="${inputTxtValue==null || empty inputTxtValue}">
 		<div id="div<c:out value="${inputName}"/>" name="myDiv">
+		<c:choose>
+    	<c:when test="${isInError}">
+      		<span class="aka_exclaim_error">! </span><input class="aka_input_error" type="text" id="ft<c:out value="${inputName}"/>" name="fileText<c:out value="${inputName}"/>" disabled class="disabled">
+		</c:when>
+		<c:otherwise>	
 			<input type="text" id="ft<c:out value="${inputName}"/>" name="fileText<c:out value="${inputName}"/>" disabled class="disabled">
+		</c:otherwise>
+		</c:choose>	
 			<input type="button" id="up<c:out value="${inputName}"/>" name="uploadFile<c:out value="${inputName}"/>" value="<fmt:message key="click_to_upload" bundle="${resword}"/>" onClick="javascript:openDocWindow('UploadFile?submitted=no&itemId=<c:out value="${itemId}"/>&inputName=<c:out value="${inputName}"/>')">
 			<input type="hidden" id="fa<c:out value="${inputName}"/>" name="fileAction<c:out value="${inputName}"/>" value="upload">
 		</div>
@@ -286,6 +293,9 @@ function switchStr(itemId, id,attribute,str1,str2) {
 	</c:when>
 	<c:otherwise>
 		<div id="div<c:out value="${inputName}"/>" name="myDiv">
+		<c:if test="${isInError}">
+      		<span class="<c:out value="aka_exclaim_error"/>">! </span>
+      	</c:if>
 		<c:choose>
 		<c:when test="${fn:contains(inputTxtValue, 'fileNotFound#')}">
 			<c:set var="inputTxtValue" value="${fn:substringAfter(inputTxtValue,'fileNotFound#')}"/>

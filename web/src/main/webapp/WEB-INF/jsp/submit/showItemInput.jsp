@@ -380,6 +380,19 @@ function radioControlShow(element,scdPairStr) {
 </script>
 
 <%-- A way to deal with the lack of 'break' out of forEach loop--%>
+
+<c:choose>
+	<c:when test="${hasShown}">
+		<c:set var="exclaim" value="aka_exclaim_show"/>
+		<c:set var="input" value="aka_input_show"/>
+
+	</c:when>
+	<c:otherwise>
+		<c:set var="exclaim" value="aka_exclaim_error"/>
+		<c:set var="input" value="aka_input_error"/>
+	</c:otherwise>
+</c:choose>
+
 <c:if test='${inputType=="file"}'>
 	<label for="input<c:out value="${itemId}"/>"></label>
 	<c:set var="pathAndName" value="${displayItem.data.value}"/>
@@ -387,13 +400,24 @@ function radioControlShow(element,scdPairStr) {
 	<c:when test="${inputTxtValue==null || empty inputTxtValue}">
 		<input type="hidden" id="input<c:out value="${itemId}"/>" name="input<c:out value="${itemId}"/>" value="<c:out value="${inputTxtValue}"/>">
 		<div id="div<c:out value="${itemId}"/>" name="myDiv">
-			<input type="text" id="ft<c:out value="${itemId}"/>" name="fileText<c:out value="${itemId}"/>" disabled>
+			<c:choose>
+			<c:when test="${isInError && !hasShown}">
+      			<span class="<c:out value="${exclaim}"/>">! </span>
+				<input type="text" class="<c:out value="${input}"/>" id="ft<c:out value="${itemId}"/>" name="fileText<c:out value="${itemId}"/>" disabled>
+			</c:when>
+			<c:otherwise>
+				<input type="text" id="ft<c:out value="${itemId}"/>" name="fileText<c:out value="${itemId}"/>" disabled>
+			</c:otherwise>
+			</c:choose>
 			<input type="button" id="up<c:out value="${itemId}"/>" name="uploadFile<c:out value="${itemId}"/>" value="<fmt:message key="click_to_upload" bundle="${resword}"/>" onClick="javascript:openDocWindow('UploadFile?submitted=no&itemId=<c:out value="${itemId}"/>')">
 			<input type="hidden" id="fa<c:out value="${itemId}"/>" name="fileAction<c:out value="${itemId}"/>" value="upload">
 		</div>
 	</c:when>
 	<c:otherwise>
 		<div id="div<c:out value="${itemId}"/>" name="myDiv">
+		<c:if test="${isInError && !hasShown}">
+      		<span class="<c:out value="${exclaim}"/>">! </span>
+      	</c:if>
 		<c:choose>
 		<c:when test="${fn:contains(inputTxtValue, 'fileNotFound#')}">
 			<c:set var="inputTxtValue" value="${fn:substringAfter(inputTxtValue,'fileNotFound#')}"/>
@@ -415,18 +439,6 @@ function radioControlShow(element,scdPairStr) {
 	</c:otherwise>
 	</c:choose>
 </c:if>
-
-<c:choose>
-	<c:when test="${hasShown}">
-		<c:set var="exclaim" value="aka_exclaim_show"/>
-		<c:set var="input" value="aka_input_show"/>
-
-	</c:when>
-	<c:otherwise>
-		<c:set var="exclaim" value="aka_exclaim_error"/>
-		<c:set var="input" value="aka_input_error"/>
-	</c:otherwise>
-</c:choose>
 
 <c:if test='${inputType == "text"}'>
   <label for="input<c:out value="${itemId}"/>"></label>
