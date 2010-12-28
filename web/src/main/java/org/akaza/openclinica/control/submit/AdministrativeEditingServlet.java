@@ -255,7 +255,8 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
         }
 
         // types TEL and ED are not supported yet
-        if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXT) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXTAREA)) {
+        if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXT) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXTAREA) ||
+                rt.equals(org.akaza.openclinica.bean.core.ResponseType.FILE)) {
             dib = validateDisplayItemBeanText(v, dib, inputName);
         } else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.RADIO) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECT)) {
             dib = validateDisplayItemBeanSingleCV(v, dib, inputName);
