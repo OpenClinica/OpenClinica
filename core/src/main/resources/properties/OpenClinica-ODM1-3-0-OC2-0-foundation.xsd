@@ -242,7 +242,7 @@
 	<xs:complexType name="OCodmComplexTypeDefinition-ItemPresentInForm">
 		<xs:sequence>
 			<xs:element name="LeftItemText" type="odm:text" minOccurs="0" maxOccurs="1"/>
-			<xs:element name="RightItemtext" type="odm:text" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="RightItemText" type="odm:text" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="ItemHeader" type="odm:text" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="ItemSubHeader" type="odm:text" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="SectionLabel" type="odm:text" minOccurs="1" maxOccurs="1"/>
