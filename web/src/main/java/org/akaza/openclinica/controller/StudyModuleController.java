@@ -14,6 +14,7 @@ import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.rule.RuleDAO;
 import org.akaza.openclinica.domain.managestudy.StudyModuleStatus;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -79,6 +80,8 @@ public class StudyModuleController {
     public ModelMap handleMainPage(HttpServletRequest request) {
         ModelMap map = new ModelMap();
         //setUpSidebar(request);
+        ResourceBundleProvider.updateLocale(request.getLocale());
+
         StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 
         eventDefinitionCRFDao = new EventDefinitionCRFDAO(dataSource);

@@ -11,6 +11,7 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
 import org.akaza.openclinica.web.table.sdv.SubjectIdSDVFactory;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.jmesa.facade.TableFacade;
 import org.jmesa.view.html.component.HtmlColumn;
 import org.jmesa.view.html.component.HtmlRow;
@@ -125,6 +126,7 @@ public class SDVController {
 
     @RequestMapping("/viewAllSubjectSDVtmp")
     public ModelMap viewAllSubjectHandler(HttpServletRequest request, @RequestParam("studyId") int studyId) {
+        ResourceBundleProvider.updateLocale(request.getLocale());
        
         ModelMap gridMap = new ModelMap();
         //set up request attributes for sidebar
