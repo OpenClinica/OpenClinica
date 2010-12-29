@@ -439,8 +439,8 @@ public class CreateSubStudyServlet extends SecureController {
         this.submitSiteEventDefinitions(study);
 
         // switch user to the newly created site
-        session.setAttribute("study", session.getAttribute("newStudy"));
-        currentStudy = (StudyBean) session.getAttribute("study");
+        //session.setAttribute("study", session.getAttribute("newStudy"));
+        //currentStudy = (StudyBean) session.getAttribute("study");
 
         session.removeAttribute("newStudy");
         addPageMessage(respage.getString("the_new_site_created_succesfully_current"));
