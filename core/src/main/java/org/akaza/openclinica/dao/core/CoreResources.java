@@ -188,6 +188,9 @@ public class CoreResources implements ResourceLoaderAware   {
     	String sysURLBase  = DATAINFO.getProperty("sysURL").replace("MainMenu","");
     	DATAINFO.setProperty("sysURL.base", sysURLBase);
     	
+    	
+    	
+    	if(DATAINFO.getProperty("org.quartz.jobStore.misfireThreshold")==null)
     	DATAINFO.setProperty("org.quartz.jobStore.misfireThreshold", "60000");
     	DATAINFO.setProperty("org.quartz.jobStore.class","org.quartz.impl.jdbcjobstore.JobStoreTX");
    
@@ -204,7 +207,9 @@ public class CoreResources implements ResourceLoaderAware   {
     	
      	DATAINFO.setProperty("org.quartz.jobStore.useProperties", "false");
      	DATAINFO.setProperty("org.quartz.jobStore.tablePrefix", "oc_qrtz_");
+     	if(DATAINFO.getProperty("org.quartz.threadPool.threadCount")==null)
      	DATAINFO.setProperty("org.quartz.threadPool.threadCount","1");
+     	if(DATAINFO.getProperty("org.quartz.threadPool.threadPriority")==null)
      	DATAINFO.setProperty("org.quartz.threadPool.threadPriority", "5");
      	
     	
