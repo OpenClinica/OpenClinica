@@ -992,10 +992,10 @@
                                                             </tr>
                                                             <tr valign="top">
                                                                 <td class="table_cell_left">
-                                                                    <xsl:value-of select="./OpenClinica:LeftItem"/>
+                                                                    <xsl:value-of select="./OpenClinica:LeftItemText"/>
                                                                 </td>
                                                                 <td class="table_cell">
-                                                                    <xsl:value-of select="./OpenClinica:RightItemText"/>
+                                                                    <xsl:value-of select="./OpenClinica:RightItemTextText"/>
                                                                 </td>
                                                                 <td class="table_cell">
                                                                     <xsl:value-of select="@DefaultValue"/>
