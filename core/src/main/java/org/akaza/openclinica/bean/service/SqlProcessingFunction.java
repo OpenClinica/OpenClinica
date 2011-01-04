@@ -3,6 +3,7 @@ package org.akaza.openclinica.bean.service;
 import java.io.File;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -19,7 +20,7 @@ import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
  * @author thickerson
  *
  */
-public class SqlProcessingFunction extends ProcessingFunction {
+public class SqlProcessingFunction extends ProcessingFunction implements Serializable{
 
 	private ExtractPropertyBean extractPropertyBean;
 	private String databaseUrl;
