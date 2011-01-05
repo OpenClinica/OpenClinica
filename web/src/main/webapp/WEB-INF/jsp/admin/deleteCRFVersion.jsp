@@ -73,14 +73,14 @@
 <div class="tablebox_center" align="center">
  <table border="0" cellpadding="0" cellspacing="0" width="100%">
    <tr valign="top">
-    <td class="table_header_row_left"><fmt:message key="definition_id" bundle="${resword}"/></td>
+    <td class="table_header_row_left"><fmt:message key="SE" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="study_ID" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="date_created" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="owner" bundle="${resword}"/></td>
    </tr>
   <c:forEach var="eventDefinitionCRF" items="${definitions}">
     <tr valign="top">
-    <td class="table_cell_left"><c:out value="${eventDefinitionCRF.studyEventDefinitionId}"/></td>
+    <td class="table_cell_left"><c:out value="${eventDefinitionCRF.eventName}"/></td>
       <td class="table_cell"><c:out value="${eventDefinitionCRF.studyId}"/></td>
     <td class="table_cell">
       <c:if test="${eventDefinitionCRF.createdDate != null}">

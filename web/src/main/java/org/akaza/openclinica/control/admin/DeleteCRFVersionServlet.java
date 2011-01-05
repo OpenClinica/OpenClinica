@@ -9,9 +9,15 @@ package org.akaza.openclinica.control.admin;
 
 import org.akaza.openclinica.bean.admin.NewCRFBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.view.Page;
@@ -55,8 +61,14 @@ public class DeleteCRFVersionServlet extends SecureController {
             CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
             CRFVersionBean version = (CRFVersionBean) cvdao.findByPK(versionId);
             EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
+            StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(sm.getDataSource());
+
             // find definitions using this version
             ArrayList definitions = edcdao.findByDefaultVersion(version.getId());
+            for (Object edcBean: definitions) {
+                StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean)sedDao.findByPK(((EventDefinitionCRFBean)edcBean).getStudyEventDefinitionId());
+                ((EventDefinitionCRFBean)edcBean).setEventName(sedBean.getName());
+            }
 
             // find event crfs using this version
             EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());

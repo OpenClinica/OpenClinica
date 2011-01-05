@@ -11,6 +11,8 @@ import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
@@ -19,6 +21,8 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
@@ -80,6 +84,13 @@ public class RemoveCRFServlet extends SecureController {
 
             EventCRFDAO evdao = new EventCRFDAO(sm.getDataSource());
             ArrayList eventCRFs = evdao.findAllByCRF(crfId);
+            StudyEventDAO seDao = new StudyEventDAO(sm.getDataSource());
+            StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(sm.getDataSource());
+            for (Object ecBean: eventCRFs) {
+                StudyEventBean seBean = (StudyEventBean) seDao.findByPK(((EventCRFBean)ecBean).getStudyEventId());
+                StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean)sedDao.findByPK(seBean.getStudyEventDefinitionId());
+                ((EventCRFBean)ecBean).setEventName(sedBean.getName());
+            }
             if ("confirm".equalsIgnoreCase(action)) {
                 request.setAttribute("crfToRemove", crf);
                 request.setAttribute("eventCRFs", eventCRFs);

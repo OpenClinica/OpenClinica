@@ -78,6 +78,7 @@
 <div class="textbox_center" align="center">
  <table border="0" cellpadding="0" cellspacing="0" width="100%">
   <tr valign="top">
+    <td class="table_header_column_top"><fmt:message key="CRF_name" bundle="${resword}"/></td>
     <td class="table_header_column_top"><fmt:message key="version_name" bundle="${resword}"/></td>
 
     <td class="table_header_column_top"><fmt:message key="description" bundle="${resword}"/></td>
@@ -88,6 +89,7 @@
     </tr>
   <c:forEach var ="version" items="${crfToRemove.versions}">
     <tr valign="top">
+    <td class="table_cell"><c:out value="${crfToRemove.name}"/></td>
     <td class="table_cell"><c:out value="${version.name}"/></td>
 
     <td class="table_cell"><c:out value="${version.description}"/></td>
@@ -117,13 +119,13 @@
 <div class="textbox_center" align="center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
  <tr valign="top">
-    <td class="table_header_column_top"><fmt:message key="SE_ID" bundle="${resword}"/></td>
+    <td class="table_header_column_top"><fmt:message key="SE" bundle="${resword}"/></td>
     <td class="table_header_column_top"><fmt:message key="date_interviewed" bundle="${resword}"/></td>
      <td class="table_header_column_top"><fmt:message key="status" bundle="${resword}"/></td>
     </tr>
   <c:forEach var="eventCRF" items="${eventCRFs}">
     <tr valign="top">
-    <td class="table_cell"><c:out value="${eventCRF.studyEventId}"/></td>
+    <td class="table_cell"><c:out value="${eventCRF.eventName}"/></td>
     <td class="table_cell"><c:out value="${eventCRF.dateInterviewed}"/></td>
     <td class="table_cell"><c:out value="${eventCRF.status.name}"/></td>
     </tr>

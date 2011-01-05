@@ -49,6 +49,9 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
     private String selectedVersionIds = "";
     private int parentId = 0;
 
+    //Not in db
+    private String eventName;
+
     public String getSelectedVersionIds() {
         return selectedVersionIds;
     }
@@ -431,5 +434,13 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 
     public void setSelectedVersionIdList(ArrayList<Integer> selectedVersionIdList) {
         this.selectedVersionIdList = selectedVersionIdList;
+    }
+
+    public String getEventName() {
+        return eventName;
+    }
+
+    public void setEventName(String eventName) {
+        this.eventName = eventName;
     }
 }
