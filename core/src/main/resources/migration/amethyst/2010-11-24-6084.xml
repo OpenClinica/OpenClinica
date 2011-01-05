@@ -9,8 +9,8 @@
             update item_data set value=  substring(item_data.value from 7 for 4) || '-'  || substring(item_data.value from 1 for 2) || '-' || substring(item_data.value from 4 for 2)
              from item where 
             item_data.item_id = item.item_id and 
-            item_data_type_id = 9 or
-            (item_data_type_id = 10  and upper(value) ~* '[0-9][0-9]/[0-9][0-9]/[0-9][0-9][0-9][0-9]'); 
+            (item_data_type_id = 9 or item_data_type_id = 10)
+            and upper(value) ~* '[0-9][0-9]/[0-9][0-9]/[0-9][0-9][0-9][0-9]'; 
             
         </sql>
     </changeSet>
