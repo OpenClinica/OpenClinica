@@ -1553,3 +1553,11 @@ akaza_logo{
     height:81px;
     float: left;
 }
+table.summaryTable{
+    border-top:1px #000000 solid;
+    border-left:1px #000000 solid;
+}
+.summaryTable tbody tr td{
+    border-right:1px #000000 solid;
+    border-bottom:1px #000000 solid;
+}

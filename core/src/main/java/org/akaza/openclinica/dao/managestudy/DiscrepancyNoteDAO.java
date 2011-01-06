@@ -1955,4 +1955,24 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         }
         return id;
     }
+
+    public Integer getViewNotesCountSummary(String filter, StudyBean currentStudy) {
+        this.unsetTypeExpected();
+        this.setTypeExpected(1, TypeNames.INT);
+
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), currentStudy.getId());
+        String sql =  digester.getQuery("getViewNotesCountSummary");
+        sql += filter;
+
+        ArrayList rows = select(sql, variables);
+        Iterator it = rows.iterator();
+        if (it.hasNext()) {
+            Integer count = (Integer) ((HashMap) it.next()).get("count");
+            return count;
+        } else {
+            return null;
+        }
+    }
+
 }

@@ -166,11 +166,11 @@ public class ViewNotesServlet extends SecureController {
         }
 
         DiscrepancyNoteUtil discNoteUtil = new DiscrepancyNoteUtil();
-        Map stats = discNoteUtil.generateDiscNoteSummaryRefactored(sm.getDataSource(), currentStudy, resolutionStatusIds, discNoteType);
+        Map stats = discNoteUtil.generateDiscNoteSummary(sm.getDataSource(), currentStudy, resolutionStatusIds, discNoteType);
         request.setAttribute("summaryMap", stats);
         Set mapKeys = stats.keySet();
         request.setAttribute("mapKeys", mapKeys);
-
+        request.setAttribute("typeKeys", discNoteUtil.generateDiscNoteTotal(sm.getDataSource(), currentStudy, resolutionStatusIds, discNoteType));
 
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
         StudyDAO studyDao = new StudyDAO(sm.getDataSource());

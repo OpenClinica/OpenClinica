@@ -129,23 +129,48 @@
 <br><br>
 --%>
 
-<div><a id="sumBoxParent" href="javascript:void(0)" onclick="showSummaryBox('sumBox',document.getElementById('sumBoxParent'),'<fmt:message key="show_summary_statistics" bundle="${resword}"/>','<fmt:message key="hide_summary_statistics" bundle="${resword}"/>')"> <img name="ExpandGroup1" src="images/bt_Expand.gif" border="0"><fmt:message key="show_summary_statistics" bundle="${resword}"/></a> </div>
-<div id="sumBox" class="summaryBox" style="display:none;">
-    <h3>Summary statistics</h3>
+<div><a id="sumBoxParent" href="javascript:void(0)"
+        onclick="showSummaryBox('sumBox',document.getElementById('sumBoxParent'),
+        '<fmt:message key="hide_summary_statistics" bundle="${resword}"/>',
+        '<fmt:message key="show_summary_statistics" bundle="${resword}"/>')">
+    <img name="ExpandGroup1" src="images/bt_Collapse.gif" border="0">
+    <fmt:message key="show_summary_statistics" bundle="${resword}"/></a>
+</div>
+<div id="sumBox" style="display:block;">
+    <%--<h3>Summary statistics</h3>--%>
     <c:if test="${empty summaryMap}"><fmt:message key="There_are_no_discrepancy_notes" bundle="${resword}"/></c:if>
-    <c:forEach var="mapkey"  varStatus="status" items="${mapKeys}">
-        <c:if test="${summaryMap[mapkey]['Total'] > 0}">
-            <span style="float:left;margin:5px">
-            <strong> ${mapkey}</strong>:  ${summaryMap[mapkey]["Total"]} <br />
-
-            <c:forEach var="statusType" items="${summaryMap[mapkey]}">
-                <c:if test="${! ('Total' eq statusType.key)}">
-                    ${statusType.key}: ${statusType.value} <br />
-                </c:if>
+    <!-- NEW Summary-->
+    <table width="50%" cellspacing="0" class="summaryTable">
+        <tr><td>&nbsp;</td>
+            <c:forEach var="typekey"  varStatus="type" items="${typeKeys}">
+                <td align="center"><strong>${typekey.key}</strong></td>
             </c:forEach>
-        </c:if>
-        </span>
-    </c:forEach>
+            <td align="center"><strong>Total</strong></td>
+        </tr>
+            <c:forEach var="mapkey"  varStatus="status" items="${mapKeys}">
+                <tr>
+                <td> <strong>${mapkey}</strong></td>
+                <c:forEach var="statusType" items="${summaryMap[mapkey]}">
+                    <c:if test="${ !('Total' eq statusType.key)}">
+                        <td align="center">${statusType.value}</td>
+                    </c:if>
+                    <c:if test="${('Total' eq statusType.key)}">
+                        <c:set var="tempTotal" value="${statusType.value}" />
+                    </c:if>
+                </c:forEach>
+                <td align="center"> ${tempTotal}</td>
+
+                </tr>
+            </c:forEach>
+        <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>        
+        <tr><td><strong>Total</strong></td>
+            <c:forEach var="typekey"  varStatus="type" items="${typeKeys}">
+                <td align="center">${typekey.value}</td>
+            </c:forEach>
+            <td>&nbsp;</td>
+        </tr>
+    </table>
+    <!-- End Of New Summary -->
 </div>
 
 <form  action="${pageContext.request.contextPath}/ViewNotes" style="clear:left; float:left;">
