@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
@@ -47,6 +48,7 @@ public class SqlProcessingFunction extends ProcessingFunction implements Seriali
     public ProcessingResultType run() {
     	Connection conn = null;
     	ProcessingResultType resultError =null ;
+    	Statement stmt = null;
     	try {
     		// load the proper database class below
     		Properties props = new Properties();
@@ -55,23 +57,35 @@ public class SqlProcessingFunction extends ProcessingFunction implements Seriali
     	//	props.setProperty("ssl","true");
     		conn = DriverManager.getConnection(databaseUrl, props);
 
-    		conn.setAutoCommit(false);
+    		conn.setAutoCommit(true);
     		File sqlFile = new File(getTransformFileName());
-    		String[] statements = getFileContents(sqlFile); 
+    		//String[] statements = getFileContents(sqlFile); 
+    	
+    		ScriptRunner runner = new ScriptRunner(conn, true, false);
+    		runner.runScript(new BufferedReader(new FileReader(sqlFile)));
+
+    		
+    		/*stmt = conn.createStatement();
     		for (String statement : statements) {
-    		    Statement stmt = conn.createStatement();
+    		 
     		    // and then execute the statement here
     		    // convert the translated file to a string and then tries an execute
 
     		    // System.out.println("-- > about to run " + statement);
-    		    stmt.executeUpdate(statement);
-    		    
-    		    stmt.close();
+    			
+    			 System.out.println("Stament prepared"+statement);
+    			 stmt.executeUpdate(statement);
+    		    //stmt.close();
     		    
     		}
-    		conn.commit();
-    		conn.setAutoCommit(false);
-    		conn.close();
+    	//	stmt.executeBatch();
+    		*/
+    		if(conn!=null)
+    		{
+    			conn.commit();
+    		conn.setAutoCommit(true);
+    	    		conn.close();
+    		}
     	} catch (Exception e) {
     	    e.printStackTrace();
     	    System.out.println(" -- > found an exception : " + e.getMessage());
@@ -85,9 +99,11 @@ public class SqlProcessingFunction extends ProcessingFunction implements Seriali
     	}
     	finally{
     		try {
-			if(conn!=null){
+			if(stmt!=null)stmt.close();
+    			if(conn!=null){
     		conn.commit();
 			conn.setAutoCommit(false);
+			
     		conn.close();
 			}
 			if(resultError!=null)
@@ -170,8 +186,9 @@ public class SqlProcessingFunction extends ProcessingFunction implements Seriali
 	    // in quotes
 	    
 	    // return sb.toString().split(";[^as \'.*\']");
-	    String[] ret = new String[1];
-	    ret[0] = sb.toString();
+	   //JN: Changing this to use tokenizer
+	    //String[] ret = new String[1];
+	    String[] ret = sb.toString().split(";");
 	    return ret;
 	}
 }
