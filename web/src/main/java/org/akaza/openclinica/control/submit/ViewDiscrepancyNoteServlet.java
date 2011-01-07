@@ -63,47 +63,28 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
     // < ResourceBundleresexception,respage;
 
     public static final String ENTITY_ID = "id";
-
     public static final String PARENT_ID = "parentId";
-
     public static final String ENTITY_TYPE = "name";
-
     public static final String ENTITY_COLUMN = "column";
-
     public static final String ENTITY_FIELD = "field";
-
     public static final String DIS_NOTES = "discrepancyNotes";
-
     public static final String DIS_NOTE = "discrepancyNote";
-
     public static final String LOCKED_FLAG = "isLocked";// if an event crf is
-    
     public static final String RES_STATUSES = "resolutionStatuses";
-    
     public static final String RES_STATUSES2 = "resolutionStatuses2";
-    
     public static final String DIS_TYPES = "discrepancyTypes";
-    
     public static final String DIS_TYPES2 = "discrepancyTypes2";
-    
     public static final String WHICH_RES_STATUSES = "whichResStatus";
-    
     public static final String USER_ACCOUNTS = "userAccounts";
-    
     public static final String BOX_DN_MAP = "boxDNMap";
-
+    public static final String AUTOVIEWS = "autoViews";
     public static final String BOX_TO_SHOW = "boxToShow";
-    
     public static final String VIEW_DN_LINK = "viewDNLink";
-    
     //public static final String USER_ACCOUNT_ID = "strUserAccountId"; // use to provide a
     // single user id, to whom the query is assigned, tbh 02/2009
-
     public static final String FORM_DISCREPANCY_NOTES_NAME = "fdnotes";
-    
     public static final String IS_REASON_FOR_CHANGE = "isRfc";
     public static final String CAN_MONITOR = "canMonitor";
-    public static final String NEW_NOTE = "new";
     public static final String ERROR_FLAG = "errorFlag";
     public static final String FROM_BOX = "fromBox";
     
@@ -141,38 +122,58 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
     protected void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
         
-        //logic from CreateDiscrepancyNoteServlet
-        if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) && currentStudy.getId() != currentStudy.getParentStudyId()
-                || currentRole.getRole().equals(Role.INVESTIGATOR)) {  
-            request.setAttribute(WHICH_RES_STATUSES, "2");
-            //it's for query type and parentDNId > 0.
-            ArrayList resStatuses = new ArrayList(); // ResolutionStatus.toArrayList();
+        request.setAttribute(DIS_TYPES, DiscrepancyNoteType.toArrayList());
+        if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.INVESTIGATOR)) { 
+            ArrayList<ResolutionStatus> resStatuses = new ArrayList();
             resStatuses.add(ResolutionStatus.UPDATED);
-            resStatuses.add(ResolutionStatus.RESOLVED);//resolution proposed
-            request.setAttribute(RES_STATUSES2, resStatuses); 
+            resStatuses.add(ResolutionStatus.RESOLVED);
+            request.setAttribute(RES_STATUSES, resStatuses);  
             //it's for parentDNId is null or 0
+            request.setAttribute(WHICH_RES_STATUSES, "22");
+            ArrayList<ResolutionStatus> resStatuses2 = new ArrayList<ResolutionStatus>(); 
+            resStatuses2.add(ResolutionStatus.OPEN);
+            resStatuses2.add(ResolutionStatus.RESOLVED);
+            request.setAttribute(RES_STATUSES2, resStatuses2); 
             ArrayList types2 = DiscrepancyNoteType.toArrayList();
             types2.remove(DiscrepancyNoteType.QUERY);
             request.setAttribute(DIS_TYPES2, types2);
-        } else {
-            request.setAttribute(RES_STATUSES, ResolutionStatus.toArrayList());  
+        } else if(currentRole.getRole().equals(Role.MONITOR)){
+            ArrayList<ResolutionStatus> resStatuses = new ArrayList();
+            resStatuses.add(ResolutionStatus.OPEN);
+            resStatuses.add(ResolutionStatus.UPDATED);
+            resStatuses.add(ResolutionStatus.CLOSED);
+            request.setAttribute(RES_STATUSES, resStatuses);  
             request.setAttribute(WHICH_RES_STATUSES, "1");
-            request.setAttribute(DIS_TYPES, DiscrepancyNoteType.toArrayList());
+            ArrayList<DiscrepancyNoteType> types2 = new ArrayList<DiscrepancyNoteType>();
+            types2.add(DiscrepancyNoteType.QUERY);
+            request.setAttribute(DIS_TYPES2, types2);
+        } else {//Role.STUDYDIRECTOR Role.COORDINATOR  
+            ArrayList<ResolutionStatus> resStatuses = ResolutionStatus.toArrayList();
+            resStatuses.remove(ResolutionStatus.NOT_APPLICABLE);
+            request.setAttribute(RES_STATUSES, resStatuses); ;  
+            //it's for parentDNId is null or 0 and FVC  
+            request.setAttribute(WHICH_RES_STATUSES, "2");
+            ArrayList<ResolutionStatus> resStatuses2 = new ArrayList<ResolutionStatus>(); 
+            resStatuses2.add(ResolutionStatus.OPEN);
+            resStatuses2.add(ResolutionStatus.RESOLVED);
+            request.setAttribute(RES_STATUSES2, resStatuses2);
         }
+        //logic from CreateDiscrepancyNoteServlet
         request.setAttribute("unlock", "0");
         boolean isReasonForChange = fp.getBoolean(IS_REASON_FOR_CHANGE);
         boolean isInError = fp.getBoolean(ERROR_FLAG);
         String monitor = fp.getString("monitor");
-        String enterData = fp.getString("enterData");
-        request.setAttribute("enterData", enterData);
-        boolean enteringData = false;
-        if (enterData != null && "1".equalsIgnoreCase(enterData)) {
+        //String enterData = fp.getString("enterData");
+        //request.setAttribute("enterData", enterData);
+        //boolean enteringData = false;
+        //if (enterData != null && "1".equalsIgnoreCase(enterData)) {
             // variables are not set in JSP, so not from viewing data and from
             // entering data
-            request.setAttribute(CAN_MONITOR, "1");
-            request.setAttribute("monitor", monitor);
-            enteringData = true;
-        } else if ("1".equalsIgnoreCase(monitor)) {// change to allow user to
+            //request.setAttribute(CAN_MONITOR, "1");
+            //request.setAttribute("monitor", monitor);
+            //enteringData = true;
+        //} else if ("1".equalsIgnoreCase(monitor)) {// change to allow user to
+        if ("1".equalsIgnoreCase(monitor)) {// change to allow user to
             // enter note for all items,
             // not just blank items
             request.setAttribute(CAN_MONITOR, "1");
@@ -181,84 +182,13 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
             request.setAttribute(CAN_MONITOR, "0");
         }
         
-        HashMap<Integer, DiscrepancyNoteBean> boxDNMap = (HashMap<Integer, DiscrepancyNoteBean>)session.getAttribute(BOX_DN_MAP);
-        if(boxDNMap==null || !boxDNMap.containsKey(0)) {
-            boxDNMap = new HashMap<Integer, DiscrepancyNoteBean>();
-            //initialize dn for a new thread
-            DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
-            // When a user is performing Data Entry, Initial Data Entry or
-            // Double Data Entry and
-            // have not received any validation warnings or messages for a
-            // particular item,
-            // they will see Annotation as the default type in the Add
-            // Discrepancy note window.
-
-            // When a user is performing Data Entry, Initial Data Entry or
-            // Double Data Entry and they
-            // have received a validation warning or message for a particular
-            // item,
-            // they can click on the flag and the default type should be Failed
-            // Validation Check
-
-            // When a user is viewing a CRF and they click on the flag icon, the
-            // default type should be query.
-
-            // when the type is query, we should also get the user id for the
-            // person who completed data entry
-
-            /* Mantis issue: tbh 08/31/2009
-             * 0004092: CRCs and Investigators should only be allowed to choose Updated or Resolution Proposed.
-             */
-            if (enteringData) {
-                if (isInError) {
-                    dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.FAILEDVAL.getId());
-                } else {
-                    dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.ANNOTATION.getId());
-                    dnb.setResolutionStatusId(ResolutionStatus.NOT_APPLICABLE.getId());
-                }
-                if (isReasonForChange) {
-                    dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.REASON_FOR_CHANGE.getId());
-                    dnb.setResolutionStatusId(ResolutionStatus.NOT_APPLICABLE.getId());
-                }
-                // << tbh 02/2010, trumps failed evaluation error checks
-                // can we put this in admin editing 
-                request.setAttribute("autoView", "0");
-                // above set to automatically open up the user panel
-            } else {
-                // when the user is a CRC and is adding a note to the thread
-                // it should default to Resolution Proposed,
-                // and the assigned should be the user who logged the query,
-                // NOT the one who is proposing the solution, tbh 02/2009
-                // if (currentRole.getRole().equals(Role.COORDINATOR)) {
-                // dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.
-                // REASON_FOR_CHANGE.getId());
-                // request.setAttribute("autoView", "1");
-                // // above set to automatically open up the user panel
-                // } else {
-                dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.QUERY.getId());
-                // remove this option for CRCs and Investigators
-                if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) && currentStudy.getId() != currentStudy.getParentStudyId()
-                    || currentRole.getRole().equals(Role.INVESTIGATOR)) {
-                    request.setAttribute("autoView", "0");
-                } else {
-                    request.setAttribute("autoView", "1");
-                }
-                // above set to automatically open up the user panel
-                // }
-            }
-            boxDNMap.put(0, dnb);
-        }
-        if(boxDNMap.containsKey(0)) {
-            int dnTypeId0 = boxDNMap.get(0).getDiscrepancyNoteTypeId();
-            if(dnTypeId0==2||dnTypeId0==4) {
-                request.setAttribute("typeID0", dnTypeId0+"");
-            }
-        }
-        
         Boolean fromBox = fp.getBoolean(FROM_BOX);
         if(fromBox==null || !fromBox) {
             session.removeAttribute(BOX_TO_SHOW);
+            session.removeAttribute(BOX_DN_MAP);
+            session.removeAttribute(AUTOVIEWS);
         }
+        
         Boolean refresh = fp.getBoolean("refresh");
         request.setAttribute("refresh", refresh+"");
         String ypos = fp.getString("y");
@@ -300,6 +230,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
             request.setAttribute("entityName", item.getName());
         }
         ItemDataBean itemData = new ItemDataBean();
+        int preUserId = 0;
         if (!StringUtil.isBlank(name)) {
             if ("itemData".equalsIgnoreCase(name)) {
                 ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
@@ -309,6 +240,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 
                 EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
                 EventCRFBean ec = (EventCRFBean) ecdao.findByPK(itemData.getEventCRFId());
+                preUserId = ec.getOwnerId()>0 ? ec.getOwnerId() : 0;
 
                 StudyEventDAO sed = new StudyEventDAO(sm.getDataSource());
                 StudyEventBean se = (StudyEventBean) sed.findByPK(ec.getStudyEventId());
@@ -354,6 +286,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
                         request.setAttribute("entityName", resword.getString("unique_identifier"));
                     }
                 }
+                preUserId = ssub.getOwnerId()>0 ? ssub.getOwnerId() : 0;
 
             } else if ("subject".equalsIgnoreCase(name)) {
 
@@ -378,6 +311,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
                         request.setAttribute("entityName", resword.getString("unique_identifier"));
                     }
                 }
+                preUserId = sub.getOwnerId()>0 ? sub.getOwnerId() : 0;
 
             } else if ("studyEvent".equalsIgnoreCase(name)) {
 
@@ -408,6 +342,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 
                     }
                 }
+                preUserId = se.getOwnerId()>0 ? se.getOwnerId() : 0;
 
             } else if ("eventCrf".equalsIgnoreCase(name)) {
                 EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
@@ -426,12 +361,41 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 
                 setupStudyEventCRFAttributes(ec);
 
+                preUserId = ec.getOwnerId()>0 ? ec.getOwnerId() : 0;
             }
 
         }
         boolean writeToDB = fp.getBoolean(CreateDiscrepancyNoteServlet.WRITE_TO_DB, true);
+        
 
-        request.setAttribute("enterData", enterData);
+        HashMap<Integer,Integer> autoviews = (HashMap<Integer,Integer>)session.getAttribute(AUTOVIEWS);
+        autoviews = autoviews==null ? new HashMap<Integer,Integer>() : autoviews;
+        HashMap<Integer, DiscrepancyNoteBean> boxDNMap = (HashMap<Integer, DiscrepancyNoteBean>)session.getAttribute(BOX_DN_MAP);
+        if(boxDNMap==null || !boxDNMap.containsKey(0)) {
+            boxDNMap = new HashMap<Integer, DiscrepancyNoteBean>();
+            //initialize dn for a new thread
+            DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
+            if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.INVESTIGATOR)) {
+                dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.ANNOTATION.getId());
+                dnb.setResolutionStatusId(ResolutionStatus.NOT_APPLICABLE.getId());
+                autoviews.put(0, 0);
+                //request.setAttribute("autoView", "0");
+            } else {
+                dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.QUERY.getId());
+                dnb.setAssignedUserId(preUserId);
+                autoviews.put(0, 1);
+                //request.setAttribute("autoView", "1");
+            }
+            boxDNMap.put(0, dnb);
+        }
+        if(boxDNMap.containsKey(0)) {
+            int dnTypeId0 = boxDNMap.get(0).getDiscrepancyNoteTypeId();
+            if(dnTypeId0==2||dnTypeId0==4) {
+                request.setAttribute("typeID0", dnTypeId0+"");
+            }
+        }
+
+        //request.setAttribute("enterData", enterData);
         request.setAttribute("monitor", monitor);
         request.setAttribute(ENTITY_ID, entityId + "");
         request.setAttribute(ENTITY_TYPE, name);
@@ -449,7 +413,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
         FormDiscrepancyNotes newNotes = (FormDiscrepancyNotes) session.getAttribute(FORM_DISCREPANCY_NOTES_NAME);
 
         HashMap<Integer, DiscrepancyNoteBean> noteTree = new HashMap<Integer, DiscrepancyNoteBean>();
-
+        
         if (newNotes != null && !newNotes.getNotes(field).isEmpty()) {
             ArrayList newFieldNotes = newNotes.getNotes(field);
             // System.out.println("how many notes:" + newFieldNotes.size());
@@ -497,7 +461,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
         }
 
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-
+        HashMap<Integer,String> fvcInitAssigns = new HashMap<Integer,String>();
         for (int i = 0; i < notes.size(); i++) {
             DiscrepancyNoteBean note = (DiscrepancyNoteBean) notes.get(i);
             note.setColumn(column);
@@ -530,14 +494,6 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
             Date lastUpdatedDate = note.getCreatedDate();
             UserAccountBean lastUpdator = (UserAccountBean) udao.findByPK(note.getOwnerId());
             note.setLastUpdator(lastUpdator);
-            // if (note.getAssignedUserId() > 0) {
-            // System.out.println("found assigned user id: " +
-            // note.getAssignedUserId());
-            // UserAccountBean assignedUser = (UserAccountBean)
-            // udao.findByPK(note.getAssignedUserId());
-            // note.setAssignedUser(assignedUser);
-            // // setting it twice? tbh
-            // }
             note.setLastDateUpdated(lastUpdatedDate);
             note.setDisType(DiscrepancyNoteType.get(note.getDiscrepancyNoteTypeId()));
             note.setResStatus(ResolutionStatus.get(note.getResolutionStatusId()));
@@ -547,6 +503,19 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
                     parent.getChildren().add(note);
                     if (!note.getCreatedDate().before(parent.getLastDateUpdated())) {
                         parent.setLastDateUpdated(note.getCreatedDate());
+                    }
+                    
+                    if(note.getDiscrepancyNoteTypeId()==1 && note.getAssignedUserId()>0) {
+                        int ownerId = note.getOwnerId();
+                        if(fvcInitAssigns.containsKey(pId)) {
+                            String f = fvcInitAssigns.get(pId);
+                            String fn = note.getId()+"."+ownerId;
+                            if(fn.compareTo(f)<0) {
+                                fvcInitAssigns.put(pId,fn);
+                            }
+                        } else {
+                            fvcInitAssigns.put(pId, note.getId()+"."+ownerId);
+                        }
                     }
                 }
             }
@@ -563,32 +532,69 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
             if(!boxDNMap.containsKey(key)) {
                 DiscrepancyNoteBean dn = new DiscrepancyNoteBean();
                 dn.setId(key);
-                dn.setDiscrepancyNoteTypeId(note.getDiscrepancyNoteTypeId());
-                //logic copied from CreateDiscrepancyNoteServlet
-                if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) && currentStudy.getId() != currentStudy.getParentStudyId()) {
-                    dn.setResolutionStatusId(ResolutionStatus.RESOLVED.getId());
-                    request.setAttribute("autoView", "0");
+                int dnTypeId = note.getDiscrepancyNoteTypeId();
+                dn.setDiscrepancyNoteTypeId(dnTypeId);
+                if(dnTypeId == 3) {//Query
+                    dn.setAssignedUserId(note.getOwnerId());
+                } else if(dnTypeId == 1) {//FVC
+                    if(fvcInitAssigns.containsKey(key)) {
+                        String[] s = fvcInitAssigns.get(key).split("\\.");
+                        int i = Integer.parseInt(s.length==2 ? s[1].trim() : "0");
+                        dn.setAssignedUserId(i);
+                    }
+                }
+                Role r = currentRole.getRole();
+                //if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) && currentStudy.getId() != currentStudy.getParentStudyId()) {
+                if (r.equals(Role.RESEARCHASSISTANT)||r.equals(Role.INVESTIGATOR)) { 
+                    if(dn.getDiscrepancyNoteTypeId()==DiscrepancyNoteType.QUERY.getId() && note.getResStatus().getId()==ResolutionStatus.UPDATED.getId()) {
+                        dn.setResolutionStatusId(ResolutionStatus.UPDATED.getId());
+                    } else {
+                        dn.setResolutionStatusId(ResolutionStatus.RESOLVED.getId());
+                    }
+                    if(dn.getAssignedUserId()>0) {
+                        autoviews.put(key, 1);
+                    } else {
+                        autoviews.put(key, 0);
+                    }
+                    //copied from CreateDiscrepancyNoteServlet
+                    //request.setAttribute("autoView", "0");
                     // hide the panel, tbh
                 } else {
-                    dn.setResolutionStatusId(ResolutionStatus.UPDATED.getId());
+                    if(note.getResStatus().getId()==ResolutionStatus.RESOLVED.getId()) {
+                        dn.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
+                    } else if(note.getResStatus().getId()==ResolutionStatus.CLOSED.getId()) {
+                        dn.setResolutionStatusId(ResolutionStatus.UPDATED.getId());
+                    } else if(r.equals(Role.MONITOR)){
+                        dn.setResolutionStatusId(ResolutionStatus.UPDATED.getId());
+                    } else if(dn.getDiscrepancyNoteTypeId()==1) {
+                        dn.setResolutionStatusId(ResolutionStatus.RESOLVED.getId());
+                    } else {
+                        dn.setResolutionStatusId(ResolutionStatus.UPDATED.getId());
+                    }
+                    autoviews.put(key, 1);
+                    if(dn.getAssignedUserId()>0) {
+                    } else {
+                        dn.setAssignedUserId(preUserId);
+                    }
                 }
-                if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) && currentStudy.getId() != currentStudy.getParentStudyId()) {
-                    dn.setAssignedUserId(note.getOwner().getId());
-                    // assigning back to OP, tbh
-                    //request.setAttribute(USER_ACCOUNT_ID, new Integer(parent.getOwnerId()).toString());
-                    //System.out.println("assigned owner id: " + parent.getOwnerId());
-                } else if (note.getEventCRFId() > 0) {
-                    //System.out.println("found a event crf id: " + dnb.getEventCRFId());
-                    EventCRFDAO eventCrfDAO = new EventCRFDAO(sm.getDataSource());
-                    EventCRFBean eventCrfBean = new EventCRFBean();
-                    eventCrfBean = (EventCRFBean) eventCrfDAO.findByPK(note.getEventCRFId());
-                    dn.setAssignedUserId(eventCrfBean.getOwner().getId());
-                    //request.setAttribute(USER_ACCOUNT_ID, new Integer(eventCrfBean.getOwnerId()).toString());
-                    //System.out.println("assigned owner id: " + eventCrfBean.getOwnerId());
-                } 
+                //if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) && currentStudy.getId() != currentStudy.getParentStudyId()) {
+                    //dn.setAssignedUserId(note.getOwner().getId());
+                    //// assigning back to OP, tbh
+                    ////request.setAttribute(USER_ACCOUNT_ID, new Integer(parent.getOwnerId()).toString());
+                    ////System.out.println("assigned owner id: " + parent.getOwnerId());
+                //} else if (note.getEventCRFId() > 0) {
+                    ////System.out.println("found a event crf id: " + dnb.getEventCRFId());
+                    //EventCRFDAO eventCrfDAO = new EventCRFDAO(sm.getDataSource());
+                    //EventCRFBean eventCrfBean = new EventCRFBean();
+                    //eventCrfBean = (EventCRFBean) eventCrfDAO.findByPK(note.getEventCRFId());
+                    //dn.setAssignedUserId(eventCrfBean.getOwner().getId());
+                    ////request.setAttribute(USER_ACCOUNT_ID, new Integer(eventCrfBean.getOwnerId()).toString());
+                    ////System.out.println("assigned owner id: " + eventCrfBean.getOwnerId());
+                boxDNMap.put(key, dn);
             }
         }
         session.setAttribute(BOX_DN_MAP, boxDNMap);
+        session.setAttribute(AUTOVIEWS, autoviews);
         // noteTree is a Hashmap mapping note id to a parent note, with all the
         // child notes
         // stored in the children List.

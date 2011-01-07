@@ -55,8 +55,8 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
     Locale locale;
     // < ResourceBundleresexception,respage;
 
-    public static final String DIS_TYPES = "discrepancyTypes";
-    public static final String RES_STATUSES = "resolutionStatuses";
+    //public static final String DIS_TYPES = "discrepancyTypes";
+    //public static final String RES_STATUSES = "resolutionStatuses";
     public static final String ENTITY_ID = "id";
     public static final String SUBJECT_ID = "subjectId";
     public static final String ITEM_ID = "itemId";
@@ -65,7 +65,7 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
     public static final String ENTITY_COLUMN = "column";
     public static final String ENTITY_FIELD = "field";
     public static final String FORM_DISCREPANCY_NOTES_NAME = "fdnotes";
-    public static final String DIS_NOTE = "discrepancyNote";
+    //public static final String DIS_NOTE = "discrepancyNote";
     public static final String RES_STATUS_ID = "resStatusId";
     public static final String USER_ACCOUNTS = "userAccounts";// a list of user
                                                               // accounts
@@ -255,7 +255,7 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
                  */
                 manageReasonForChangeState(session, entityId);
                 String email = fp.getString(EMAIL_USER_ACCOUNT+parentId);
-                if (dn.getAssignedUserId() > 0 && "1".equals(email.trim()) && DiscrepancyNoteType.QUERY.getId() == dn.getDiscrepancyNoteTypeId()) {
+                if (dn.getAssignedUserId() > 0 && "1".equals(email.trim())) {
                     logger.info("++++++ found our way here");
                     // generate email for user here
                     StringBuffer message = new StringBuffer();
