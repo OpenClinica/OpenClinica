@@ -468,6 +468,7 @@ public class GenerateExtractFileService {
         // >> tbh #4915
         zipName = zipName.replaceAll(" ", "_");
         fbFinal.setId(0);
+        BufferedWriter w = null;
         try {
             File complete = new File(dir);
             if (!complete.isDirectory()) {
@@ -485,7 +486,7 @@ public class GenerateExtractFileService {
                 // totalSize = totalSize + (int)newFile.length();
                 newFile.setLastModified(System.currentTimeMillis());
 
-                BufferedWriter w = new BufferedWriter(new FileWriter(newFile));
+                 w = new BufferedWriter(new FileWriter(newFile));
                 w.write(content);
                 w.close();
                 logger.info("finished writing the text file...");
@@ -564,6 +565,15 @@ public class GenerateExtractFileService {
             System.out.println("-- exception at create file: " + e.getMessage());
             e.printStackTrace();
         }
+        finally{
+        	if(w!=null)
+				try {
+					w.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+        }
         return fbFinal.getId();
     }
     
@@ -574,6 +584,7 @@ public class GenerateExtractFileService {
         // >> tbh 04/2010 #4915 replace all names' spaces with underscores
         name = name.replaceAll(" ", "_");
         fbFinal.setId(0);
+        BufferedWriter w =null;
         try {
           
         	
@@ -604,7 +615,7 @@ public class GenerateExtractFileService {
             //File 
             newFile.setLastModified(System.currentTimeMillis());
 
-            BufferedWriter w = new BufferedWriter(new FileWriter(newFile, true));
+            w = new BufferedWriter(new FileWriter(newFile, true));
             w.write(content);
             w.close();
             logger.info("finished writing the text file...");
@@ -702,7 +713,15 @@ public class GenerateExtractFileService {
             logger.info("-- exception thrown at createFile: " + e.getMessage());
             e.printStackTrace();
         }
-
+        finally{
+        	if(w!=null)
+				try {
+					w.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+        }
         return fbFinal.getId();
     }
 

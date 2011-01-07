@@ -122,7 +122,8 @@ public class XsltTransformJob extends QuartzJobBean {
         }
         // get the file information from the job
         String alertEmail = dataMap.getString(EMAIL);
-        
+        java.io.InputStream in = null;
+        FileOutputStream endFileStream = null;
         try {
             ApplicationContext appContext = (ApplicationContext) context.getScheduler().getContext().get("applicationContext");
             mailSender = (OpenClinicaMailSender) appContext.getBean("openClinicaMailSender");
@@ -196,7 +197,7 @@ public class XsltTransformJob extends QuartzJobBean {
             // Use the TransformerFactory to instantiate a Transformer that will work with  
             // the stylesheet you specify. This method call also processes the stylesheet
             // into a compiled Templates object.
-            java.io.InputStream in = new java.io.FileInputStream(dataMap.getString(XSL_FILE_PATH));
+             in = new java.io.FileInputStream(dataMap.getString(XSL_FILE_PATH));
             
             Transformer transformer = tFactory.newTransformer(new StreamSource(in));
             
@@ -216,7 +217,7 @@ public class XsltTransformJob extends QuartzJobBean {
             
             }
             final long start = System.currentTimeMillis();
-            FileOutputStream endFileStream  = new FileOutputStream(endFile);
+            endFileStream  = new FileOutputStream(endFile);
             transformer.transform(new StreamSource(xmlFilePath), 
                     new StreamResult(endFileStream ));
             //JN...CLOSE THE STREAM...HMMMM
@@ -460,6 +461,22 @@ public class XsltTransformJob extends QuartzJobBean {
             logger.error(ee.getStackTrace().toString());
             exceptions = true;
         }finally{
+        	
+        	if(in!=null)
+				try {
+					in.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+        	if( endFileStream!=null)
+				try {
+					endFileStream.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+        	
         	if(exceptions)
         	{
         		logger.debug("EXCEPTIONS... EVEN TEHN DELETING OFF OLD FILES");
