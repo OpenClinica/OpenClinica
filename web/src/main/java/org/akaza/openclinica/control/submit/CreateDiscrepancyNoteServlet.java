@@ -125,6 +125,8 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
     public static final String PRESET_USER_ACCOUNT_ID = "preUserAccountId";
 
     public static final String EMAIL_USER_ACCOUNT = "sendEmail";
+    
+    public static final String WHICH_RES_STATUSES = "whichResStatus";
 
     /*
      * (non-Javadoc)
@@ -225,15 +227,20 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
         }
         
         DateFormat dateFormatter = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
+        int preUserId = 0;
         if (!StringUtil.isBlank(entityType)) {
             if ("itemData".equalsIgnoreCase(entityType)||"itemdata".equalsIgnoreCase(entityType)) {
                 ItemBean item = (ItemBean) new ItemDAO(sm.getDataSource()).findByPK(itemId);
                 ItemDataBean itemData = (ItemDataBean) new ItemDataDAO(sm.getDataSource()).findByPK(entityId);
                 request.setAttribute("entityValue", itemData.getValue());
                 request.setAttribute("entityName", item.getName());
+                EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+                EventCRFBean ec = (EventCRFBean) ecdao.findByPK(itemData.getEventCRFId());
+                preUserId = ec.getOwnerId();
             } else if ("studySub".equalsIgnoreCase(entityType)) {
                 StudySubjectBean ssub = (StudySubjectBean) new StudySubjectDAO(sm.getDataSource()).findByPK(entityId);
                 SubjectBean sub = (SubjectBean)new SubjectDAO(sm.getDataSource()).findByPK(ssub.getSubjectId());
+                preUserId = ssub.getOwnerId();
                 if (!StringUtil.isBlank(column)) {
                     if ("enrollment_date".equalsIgnoreCase(column)) {
                         if (ssub.getEnrollmentDate() != null) {
@@ -257,6 +264,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                 }
             } else if ("subject".equalsIgnoreCase(entityType)) {
                 SubjectBean sub = (SubjectBean) new SubjectDAO(sm.getDataSource()).findByPK(entityId);
+                preUserId = sub.getOwnerId();
                 if (!StringUtil.isBlank(column)) {
                     if ("gender".equalsIgnoreCase(column)) {
                         request.setAttribute("entityValue", sub.getGender() + "");
@@ -273,6 +281,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                 }
             } else if ("studyEvent".equalsIgnoreCase(entityType)) {
                 StudyEventBean se = (StudyEventBean)new StudyEventDAO(sm.getDataSource()).findByPK(entityId);
+                preUserId = se.getOwnerId();
                 if (!StringUtil.isBlank(column)) {
                     if ("location".equalsIgnoreCase(column)) {
                         request.setAttribute("entityValue", se.getLocation());
@@ -291,6 +300,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                 }
             } else if ("eventCrf".equalsIgnoreCase(entityType)) {
                 EventCRFBean ec = (EventCRFBean) new EventCRFDAO(sm.getDataSource()).findByPK(entityId);
+                preUserId = ec.getOwnerId();
                 if (!StringUtil.isBlank(column)) {
                     if ("date_interviewed".equals(column)) {
                         if (ec.getDateInterviewed() != null) {
@@ -305,12 +315,6 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             }
 
         }
-        
-        
-        
-        
-        
-        
 
         // finds all the related notes
         ArrayList notes = (ArrayList) dndao.findAllByEntityAndColumn(entityType, entityId, column);
@@ -353,6 +357,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             logger.info("has notes:" + "no");
         }
 
+        /*
         if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) && currentStudy.getId() != currentStudy.getParentStudyId()
             || currentRole.getRole().equals(Role.INVESTIGATOR)) {
             if (parent.getId() > 0 && parent.getDisType().equals(DiscrepancyNoteType.QUERY)) {
@@ -370,6 +375,37 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                 System.out.println("reset discrepancy types");
             }
 
+        }*/
+        //only for adding a new thread
+        if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.INVESTIGATOR)) { 
+            ArrayList<ResolutionStatus> resStatuses = new ArrayList<ResolutionStatus>(); 
+            resStatuses.add(ResolutionStatus.OPEN);
+            resStatuses.add(ResolutionStatus.RESOLVED);
+            request.setAttribute(RES_STATUSES, resStatuses); 
+            ArrayList types2 = DiscrepancyNoteType.toArrayList();
+            types2.remove(DiscrepancyNoteType.QUERY);
+            request.setAttribute(DIS_TYPES, types2);
+            request.setAttribute(WHICH_RES_STATUSES, "22");
+        } else if(currentRole.getRole().equals(Role.MONITOR)){
+            ArrayList<ResolutionStatus> resStatuses = new ArrayList();
+            resStatuses.add(ResolutionStatus.OPEN);
+            resStatuses.add(ResolutionStatus.UPDATED);
+            resStatuses.add(ResolutionStatus.CLOSED);
+            request.setAttribute(RES_STATUSES, resStatuses);  
+            request.setAttribute(WHICH_RES_STATUSES, "1"); 
+            ArrayList<DiscrepancyNoteType> types2 = new ArrayList<DiscrepancyNoteType>();
+            types2.add(DiscrepancyNoteType.QUERY);
+            request.setAttribute(DIS_TYPES, types2);
+        } else {//Role.STUDYDIRECTOR Role.COORDINATOR  
+            ArrayList<ResolutionStatus> resStatuses = ResolutionStatus.toArrayList();
+            resStatuses.remove(ResolutionStatus.NOT_APPLICABLE);
+            request.setAttribute(RES_STATUSES, resStatuses); ;   
+            request.setAttribute(WHICH_RES_STATUSES, "2");
+            //it's for parentDNId is null or 0 and FVC  
+            //ArrayList<ResolutionStatus> resStatuses = new ArrayList<ResolutionStatus>(); 
+            //resStatuses.add(ResolutionStatus.OPEN);
+            //resStatuses.add(ResolutionStatus.RESOLVED);
+            //request.setAttribute(RES_STATUSES, resStatuses);
         }
 
         if (!fp.isSubmitted()) {
@@ -428,28 +464,34 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 
             if (parent.getId() == 0 || isNew) {// no parent, new note thread
                 if (enteringData) {
-                    if (isInError) {
-                        dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.FAILEDVAL.getId());
-
-                    } else {
-                        dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.ANNOTATION.getId());
-                        dnb.setResolutionStatusId(ResolutionStatus.NOT_APPLICABLE.getId());
-                        // >> tbh WHO bug: set an assigned user for the parent
-                        // note
-                        // dnb.setAssignedUser(ub);
-                        // dnb.setAssignedUserId(ub.getId());
-                        // << tbh 08/2009
-
+                    if(currentRole.getRole().equals(Role.MONITOR)) {
+                        //Ideally, it should not get in this block because Monitor is not allowed to enter data. No?
+                        request.setAttribute("autoView", "1");
+                        logger.info("A Monitor is logging discrepancy note from data enter.");
+                    }else {
+                        if (isInError) {
+                            dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.FAILEDVAL.getId());
+    
+                        } else {
+                            dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.ANNOTATION.getId());
+                            dnb.setResolutionStatusId(ResolutionStatus.NOT_APPLICABLE.getId());
+                            // >> tbh WHO bug: set an assigned user for the parent
+                            // note
+                            // dnb.setAssignedUser(ub);
+                            // dnb.setAssignedUserId(ub.getId());
+                            // << tbh 08/2009
+    
+                        }
+                        if (isReasonForChange) {
+                            dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.REASON_FOR_CHANGE.getId());
+                            dnb.setResolutionStatusId(ResolutionStatus.NOT_APPLICABLE.getId());
+                            // request.setAttribute(PRESET_RES_STATUS, new Integer(ResolutionStatus.NOT_APPLICABLE.getId()).toString());
+                        }
+                        // << tbh 02/2010, trumps failed evaluation error checks
+                        // can we put this in admin editing 
+                        request.setAttribute("autoView", "0");
+                        // above set to automatically open up the user panel
                     }
-                    if (isReasonForChange) {
-                        dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.REASON_FOR_CHANGE.getId());
-                        dnb.setResolutionStatusId(ResolutionStatus.NOT_APPLICABLE.getId());
-                        // request.setAttribute(PRESET_RES_STATUS, new Integer(ResolutionStatus.NOT_APPLICABLE.getId()).toString());
-                    }
-                    // << tbh 02/2010, trumps failed evaluation error checks
-                    // can we put this in admin editing 
-                    request.setAttribute("autoView", "0");
-                    // above set to automatically open up the user panel
                 } else {
                     // when the user is a CRC and is adding a note to the thread
                     // it should default to Resolution Proposed,
@@ -463,11 +505,13 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                     // } else {
                     dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.QUERY.getId());
                     // remove this option for CRCs and Investigators
-                    if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) && currentStudy.getId() != currentStudy.getParentStudyId()
+                    //if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) && currentStudy.getId() != currentStudy.getParentStudyId()
+                    if (currentRole.getRole().equals(Role.RESEARCHASSISTANT)    
                         || currentRole.getRole().equals(Role.INVESTIGATOR)) {
                         request.setAttribute("autoView", "0");
                     } else {
                         request.setAttribute("autoView", "1");
+                        dnb.setAssignedUserId(preUserId);
                     }
                     // above set to automatically open up the user panel
                     // }
@@ -790,6 +834,17 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                 }
 
             } else {
+                if(parentId>0) {
+                    if(note.getResolutionStatusId() == ResolutionStatus.NOT_APPLICABLE.getId()) {
+                        request.setAttribute("autoView", "0");
+                    }
+                }else {
+                    if(note.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.QUERY.getId()) {
+                        request.setAttribute("autoView", "1");
+                    } else {
+                        request.setAttribute("autoView", "0");
+                    }
+                }
                 setInputMessages(errors);
                 forwardPage(Page.ADD_DISCREPANCY_NOTE);
             }
