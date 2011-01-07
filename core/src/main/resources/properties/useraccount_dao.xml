@@ -27,6 +27,11 @@
 			values(?,?,?,?,?,now())
 		</sql>
 	</query>
+		<query>
+		<name>findStudyUserRole</name>
+		<sql>select * from study_user_role where role_name=? and study_id=? and status_id=? and user_name=?
+		</sql>
+	</query>
 	<query>
 		<name>update</name>
 		<sql>update user_account set user_name=?, passwd=?, first_name=?, last_name=?,

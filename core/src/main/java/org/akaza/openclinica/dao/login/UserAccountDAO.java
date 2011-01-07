@@ -316,6 +316,31 @@ public class UserAccountDAO extends AuditableEntityDAO {
         ResourceBundleProvider.updateLocale(currentLocale);
         return studyRole;
     }
+    public UserAccountBean findStudyUserRole(UserAccountBean user, StudyUserRoleBean studyRole) {
+        this.setTypesExpected();
+        this.setTypeExpected(1, TypeNames.STRING);
+        this.setTypeExpected(2, TypeNames.INT);
+        this.setTypeExpected(3, TypeNames.INT);
+        this.setTypeExpected(4, TypeNames.INT);
+        this.setTypeExpected(5, TypeNames.DATE);
+        this.setTypeExpected(6, TypeNames.DATE);
+        this.setTypeExpected(7, TypeNames.INT);
+        this.setTypeExpected(8, TypeNames.STRING);
+        HashMap variables = new HashMap();
+
+        variables.put(new Integer(1),  studyRole.getRoleName());
+        variables.put(new Integer(2),  new Integer(studyRole.getStudyId()));
+        variables.put(new Integer(3), new Integer(studyRole.getStatus().getId()));
+        variables.put(new Integer(4), user.getName());
+        
+        ArrayList alist = this.select(digester.getQuery("findStudyUserRole"), variables);
+        UserAccountBean eb = new UserAccountBean();
+        Iterator it = alist.iterator();
+        if (it.hasNext()) {
+        eb.setName((String) ((HashMap) it.next()).get("user_name"));
+        }
+        return eb;
+    }
 
     public Object getEntityFromHashMap(HashMap hm) {
         UserAccountBean uab = (UserAccountBean) this.getEntityFromHashMap(hm, true);
@@ -510,6 +535,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
         }
         return eb;
     }
+    
+
 
     /**
      * Finds all the studies with roles for a user

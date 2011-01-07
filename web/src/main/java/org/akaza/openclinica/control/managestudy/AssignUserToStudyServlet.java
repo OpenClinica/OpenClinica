@@ -138,7 +138,8 @@ public class AssignUserToStudyServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         Map tmpSelectedUsersMap = (HashMap) session.getAttribute("tmpSelectedUsersMap");
         Set addedUsers = new HashSet();
-        for (int i = 0; i < users.size(); i++) {
+        boolean continueLoop = true;
+        for (int i = 0; i < users.size()&& continueLoop; i++) {
             int id = fp.getInt("id" + i);
             String firstName = fp.getString("firstName" + i);
             String lastName = fp.getString("lastName" + i);
@@ -147,6 +148,7 @@ public class AssignUserToStudyServlet extends SecureController {
             int roleId = fp.getInt("activeStudyRoleId" + i);
             String checked = fp.getString("selected" + i);
             // logger.info("selected:" + checked);
+            
             if (!StringUtil.isBlank(checked) && "yes".equalsIgnoreCase(checked.trim())) {
                 logger.info("one user selected");
                 UserAccountBean u = new UserAccountBean();
@@ -164,7 +166,13 @@ public class AssignUserToStudyServlet extends SecureController {
                 sub.setStudyId(currentStudy.getId());
                 sub.setStatus(Status.AVAILABLE);
                 sub.setOwner(ub);
-                udao.createStudyUserRole(u, sub);
+               if(udao.findStudyUserRole(u,sub).getName()!=null && udao.findStudyUserRole(u,sub).getName().isEmpty())//create only when it doesn't exist in database
+            	   udao.createStudyUserRole(u, sub);
+               else
+               {
+            	   continueLoop = false;
+            	   break;
+               }
                 logger.info("one user added");
                 pageMass = pageMass + sendEmail(u, sub);
 
@@ -174,6 +182,8 @@ public class AssignUserToStudyServlet extends SecureController {
                 }
             }
         }
+      //  if(!continueLoop) forwardPage(Page.STUDY_USER_LIST);
+        
         /* Assigning users which might have been selected during list navigation */
         if (tmpSelectedUsersMap != null) {// try to fix the null pointer
             // exception
