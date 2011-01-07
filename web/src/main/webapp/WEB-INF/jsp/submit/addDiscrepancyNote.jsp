@@ -9,6 +9,7 @@
 <jsp:useBean scope='session' id='study' class='org.akaza.openclinica.bean.managestudy.StudyBean' />
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
 <html>
@@ -61,24 +62,29 @@
 
 <script language="JavaScript">
 <!--
-function setStatus(typeId) {
+function setStatus(typeId,filter1,nw,ud,rs,cl,na) {
 	objtr1=document.getElementById('res1');
 	objtr2=document.getElementById('resStatusId');
+	
 	if (typeId == 2|| typeId ==4) {//annotation or reason for change
-
-	  	objtr2.value=5;
-	  	objtr2.disabled = true;
-	} else if (typeId == 3) { //query
-		objtr2.value=1; //new
-		objtr2.disabled = false;
+  		objtr2.disabled = true;
+  		objtr2.options.length = 0;
+  		objtr2.options[0]=new Option(na, '5');
 	} else {
-  		if (objtr2.value ==5 && objtr2.disabled) {
-   			objtr2.value=1;
-  		}
-
-  		objtr2.disabled = false;
-
-	}
+		objtr2.disabled = false;
+		objtr2.options.length = 0;
+		objtr2.options[0]=new Option(nw, '1');
+		if(filter1=="22" || (filter1=="2" && typeId==1)) {
+	  		objtr2.options[1]=new Option(rs, '3');
+		} else if(filter1=="1") {
+			objtr2.options[1]=new Option(ud,'2');
+			objtr2.options[2]=new Option(cl,'4');
+		} else {
+			objtr2.options[1]=new Option(ud,'2');
+			objtr2.options[2]=new Option(rs,'3');
+			objtr2.options[3]=new Option(cl,'4');
+		}
+	} 
 }
 
 function setResStatus(resStatusId, destinationUserId) {
@@ -104,8 +110,8 @@ function setResStatus(resStatusId, destinationUserId) {
 }
 
 
-function setElements(typeId, user1, user2) {
-	setStatus(typeId);
+function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
+	setStatus(typeId,filter1,nw,ud,rs,cl,na);
 	if(typeId == 3) {//query
 		leftnavExpand(user1);
 		leftnavExpand(user2);	
@@ -117,7 +123,7 @@ function setElements(typeId, user1, user2) {
 //-->
 </script>
 </head>
-<body class="popup_BG" onload="javascript:setStatus(<c:out value="${discrepancyNote.discrepancyNoteTypeId}"/>);">
+<body class="popup_BG" onload="javascript:setStatus('<c:out value="${discrepancyNote.discrepancyNoteTypeId}"/>','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Resolution_Proposed" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>');">
 <%-- needs to run at first to possibly gray out the drop down, tbh 02/2010--%>
 <div style="float: left;"><h1 class="title_manage"><fmt:message key="add_discrepancy_note" bundle="${resword}"/></h1></div>
 <div style="float: right;"><p><a href="#" onclick="javascript:window.close();"><img name="close_window" alt="close_window" src="images/bt_Remove.gif" style="width:18px"></a></a></p></div>
@@ -230,64 +236,32 @@ function setElements(typeId, user1, user2) {
 			</c:when>
 			<c:otherwise>
 				<c:set var="typeId1" value="${discrepancyNote.discrepancyNoteTypeId}"/>
-				<c:choose>
-				<c:when test="${whichResStatus == 2}">
-					<select name="typeId" id="typeId" class="formfieldL" onchange ="javascript:setElements(this.options[selectedIndex].value, 'user1', 'user2');">
-						<c:forEach var="type" items="${discrepancyTypes2}">
+				<select name="typeId" id="typeId" class="formfieldL" onchange ="javascript:setElements(this.options[selectedIndex].value, 'user1', 'user2','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Resolution_Proposed" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>');">
+					<c:forEach var="type" items="${discrepancyTypes}">
+					<c:choose>
+					<c:when test="${typeId1 == type.id}">
+					 	<c:choose>
+					    <c:when test="${study.status.frozen && (type.id==2 || type.id==4)}">
+								<option value="<c:out value="${type.id}"/>" disabled="true" selected ><c:out value="${type.name}"/>
+					    </c:when>
+					    <c:otherwise>
+					   		<option value="<c:out value="${type.id}"/>" selected ><c:out value="${type.name}"/>
+					    </c:otherwise>
+					    </c:choose>
+					 </c:when>
+					 <c:otherwise>
 						<c:choose>
-						<c:when test="${typeId1 == type.id}">
-						 	<c:choose>
-						    <c:when test="${study.status.frozen && (type.id==2 || type.id==4)}">
-									<option value="<c:out value="${type.id}"/>" disabled="true" selected ><c:out value="${type.name}"/>
-						    </c:when>
-						    <c:otherwise>
-						   		<option value="<c:out value="${type.id}"/>" selected ><c:out value="${type.name}"/>
-						    </c:otherwise>
-						    </c:choose>
-						 </c:when>
-						 <c:otherwise>
-							<c:choose>
-							<c:when test="${study.status.frozen && (type.id==2 || type.id==4)}">
-								<option value="<c:out value="${type.id}"/>" disabled="true"><c:out value="${type.name}"/>
-							</c:when>
-							<c:otherwise>
-								<option value="<c:out value="${type.id}"/>"><c:out value="${type.name}"/>
-							</c:otherwise>
-							</c:choose>
-						 </c:otherwise>
+						<c:when test="${study.status.frozen && (type.id==2 || type.id==4)}">
+							<option value="<c:out value="${type.id}"/>" disabled="true"><c:out value="${type.name}"/>
+						</c:when>
+						<c:otherwise>
+							<option value="<c:out value="${type.id}"/>"><c:out value="${type.name}"/>
+						</c:otherwise>
 						</c:choose>
-						</c:forEach>
-					</select>
-				</c:when>
-				<c:otherwise>
-					<select name="typeId" id="typeId" class="formfieldL" onchange ="javascript:setElements(this.options[selectedIndex].value, 'user1', 'user2');">
-						<c:forEach var="type" items="${discrepancyTypes}">
-						<c:choose>
-						<c:when test="${typeId1 == type.id}">
-						 	<c:choose>
-						    <c:when test="${study.status.frozen && (type.id==2 || type.id==4)}">
-									<option value="<c:out value="${type.id}"/>" disabled="true" selected ><c:out value="${type.name}"/>
-						    </c:when>
-						    <c:otherwise>
-						   		<option value="<c:out value="${type.id}"/>" selected ><c:out value="${type.name}"/>
-						    </c:otherwise>
-						    </c:choose>
-						 </c:when>
-						 <c:otherwise>
-							<c:choose>
-							<c:when test="${study.status.frozen && (type.id==2 || type.id==4)}">
-								<option value="<c:out value="${type.id}"/>" disabled="true"><c:out value="${type.name}"/>
-							</c:when>
-							<c:otherwise>
-								<option value="<c:out value="${type.id}"/>"><c:out value="${type.name}"/>
-							</c:otherwise>
-							</c:choose>
-						 </c:otherwise>
-						</c:choose>
-						</c:forEach>
-					</select>
-				</c:otherwise>
-				</c:choose>
+					 </c:otherwise>
+					</c:choose>
+					</c:forEach>
+				</select>
 				<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="typeId"/></jsp:include>
 			</c:otherwise>
 			</c:choose>
@@ -311,19 +285,12 @@ function setElements(typeId, user1, user2) {
 		<tr valign="top" id="res1">
 		    <td  class="table_cell_noborder"><fmt:message key="resolution_status" bundle="${resword}"/>:</td>
 		    <td class="table_cell_noborder"><div class="formfieldL_BG">
-			<c:set var="resStatusId1" value="${discrepancyNote.resolutionStatusId}"/>
-		    <select name="resStatusId" id="resStatusId" class="formfieldL" onchange="javascript:setResStatus(3, <c:out value="${discrepancyNote.ownerId}"/>);">
-				<c:choose>
-				<c:when test="${whichResStatus == 2 && param.typeId == 3 && parentId > 0}">
-					<c:set var="resStatuses" value="${resolutionStatuses2}"/>
-				</c:when>
-				<c:otherwise>
-					<c:set var="resStatuses" value="${resolutionStatuses}"/>
-				</c:otherwise>
-				</c:choose>
+			<c:set var="resStatusIdl" value="${discrepancyNote.resolutionStatusId}"/>
+		    <select name="resStatusId" id="resStatusId" class="formfieldL">
+				<c:set var="resStatuses" value="${resolutionStatuses}"/>
 				<c:forEach var="status" items="${resStatuses}">
 					<c:choose>
-					<c:when test="${resStatusId1 == status.id}">
+					<c:when test="${resStatusIdl == status.id}">
 					   <option value="<c:out value="${status.id}"/>" selected ><c:out value="${status.name}"/>
 					</c:when>
 					<c:otherwise>
@@ -341,7 +308,7 @@ function setElements(typeId, user1, user2) {
         	<tr valign="top" id="user1" style="display:none">
 		</c:when>
 		<c:otherwise>
-			<tr valign="top">
+			<tr valign="top" id="user1" style="display:all">
       	</c:otherwise>
 		</c:choose>
 		<c:if test="${discrepancyNote.discrepancyNoteTypeId != 1 || (discrepancyNote.discrepancyNoteTypeId==1 && discrepancyNote.parentDnId>0)}">
@@ -380,7 +347,7 @@ function setElements(typeId, user1, user2) {
 				<tr valign="top" id="user2" style="display:none">
 			</c:when>
 			<c:otherwise>
-				<tr valign="top">
+				<tr valign="top" id="user2" style="display:all">
 			</c:otherwise>
 			</c:choose>
 			<%-- should be an option for checked, unchecked, disabled--%>
