@@ -787,23 +787,6 @@
 
                 </td>
             </tr>
-            <c:if test="${subjectStudy.genetic == true}">
-                <tr>
-                    <td class="table_header_column"><fmt:message key="mother" bundle="${resword}"/></td>
-                    <td class="table_cell"><c:out value="${mother.uniqueIdentifier}"/>&nbsp;</td>
-                </tr>
-                <tr>
-                    <td class="table_header_column"><fmt:message key="father" bundle="${resword}"/></td>
-                    <td class="table_cell"><c:out value="${father.uniqueIdentifier}"/>&nbsp;</td>
-                </tr>
-                <tr>
-                    <td class="table_header_column"><fmt:message key="children" bundle="${resword}"/></td>
-                    <td class="table_cell">
-                        <c:forEach var="child" items="${children}">
-                            <c:out value="${child.uniqueIdentifier}"/>,
-                        </c:forEach>&nbsp;</td>
-                </tr>
-            </c:if>
         </table>
 
         <!-- End Table Contents -->
