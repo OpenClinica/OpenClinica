@@ -131,8 +131,8 @@
 
 <div><a id="sumBoxParent" href="javascript:void(0)"
         onclick="showSummaryBox('sumBox',document.getElementById('sumBoxParent'),
-        '<fmt:message key="hide_summary_statistics" bundle="${resword}"/>',
-        '<fmt:message key="show_summary_statistics" bundle="${resword}"/>')">
+        '<fmt:message key="show_summary_statistics" bundle="${resword}"/>',
+        '<fmt:message key="hide_summary_statistics" bundle="${resword}"/>')">
     <img name="ExpandGroup1" src="images/bt_Collapse.gif" border="0">
     <fmt:message key="hide_summary_statistics" bundle="${resword}"/></a>
 </div>
@@ -140,7 +140,7 @@
     <%--<h3>Summary statistics</h3>--%>
     <c:if test="${empty summaryMap}"><fmt:message key="There_are_no_discrepancy_notes" bundle="${resword}"/></c:if>
     <!-- NEW Summary-->
-    <table width="50%" cellspacing="0" class="summaryTable">
+    <table cellspacing="0" class="summaryTable" style="width:600px;">
         <tr><td>&nbsp;</td>
             <c:forEach var="typekey"  varStatus="type" items="${typeKeys}">
                 <td align="center"><strong>${typekey.key}</strong></td>
