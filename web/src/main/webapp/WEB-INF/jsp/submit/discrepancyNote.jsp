@@ -5,10 +5,8 @@
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 
-
-<jsp:useBean scope='request' id='resolutionStatus' class='java.lang.String' />
-<jsp:useBean scope='request' id='resolutionStatus2' class='java.lang.String' />
 <jsp:useBean scope='request' id='whichResStatus' class='java.lang.String' />
 <jsp:useBean scope='session' id='boxDNMap'  class="java.util.HashMap"/>
 <jsp:useBean scope='session' id='boxToShow'  class="java.lang.String"/>
@@ -67,7 +65,7 @@ function addText(id,text) {
 function hide(strLeftNavRowElementName){
 	
 	        var objLeftNavRowElement;
-	
+	        
 	        objLeftNavRowElement = MM_findObj(strLeftNavRowElementName);
 	        if (objLeftNavRowElement != null) {
 	            if (objLeftNavRowElement.style) { objLeftNavRowElement = objLeftNavRowElement.style; }
@@ -75,14 +73,14 @@ function hide(strLeftNavRowElementName){
 	        }
 	    }
 	    
-function setElements(typeId, user1, user2, id) {
-	setStatusWithId(typeId,id);
+function setElements(typeId,user1,user2,id,filter1,nw,ud,rs,cl,na) {
+	setStatusWithId(typeId,id,filter1,nw,ud,rs,cl,na);
 	if(typeId == 3) {//query
-		leftnavExpand(user1);
-		leftnavExpand(user2);	
+		leftnavExpand(user1+id);
+		leftnavExpand(user2+id);	
 	}else {
-		hide(user1);
-		hide(user2);
+		hide(user1+id);
+		hide(user2+id);
 	}
 }
 
@@ -99,45 +97,31 @@ function timeOutWindow(close,duration) {
 	}
 }
 
-function setStatusWithId(typeId, id) {
+function setStatusWithId(typeId,id,filter1,nw,ud,rs,cl,na) {
 	objtr1=document.getElementById('res1'+id);
 	objtr2=document.getElementById('resStatusId'+id);
 	if (typeId == 2|| typeId ==4) {//annotation or reason for change
-	  	objtr2.value=5;
-	  	objtr2.disabled = true;
-	} else if (typeId == 3) { //query
-		objtr2.value=1; //new
-		objtr2.disabled = false;
+  		objtr2.disabled = true;
+  		objtr2.options.length = 0;
+  		objtr2.options[0]=new Option(na, '5');
 	} else {
-  		if (objtr2.value ==5 && objtr2.disabled) {
-   			objtr2.value=1;
-  		}
-
-  		objtr2.disabled = false;
-
-	}
-}
-
-function setResStatusWithId(id, resStatusId, destinationUserId) {
-	objtr1=document.getElementById('resStatusId'+id);
-	objtr2=document.getElementById('userAccountId'+id);
-	objtr3=document.getElementById('xxx'+id);
-	objtr4=document.getElementById('typeId'+id);
-
-	if (resStatusId == 3 || resStatusId == 4) { //Resolutiuon proposed or Closed
-		// objtr2.disabled = false;
-		objtr2.value = destinationUserId;
-		// disable?
 		objtr2.disabled = false;
-		objtr3.removeAttribute('disabled');
-		//objtr3.value = destinationUserId;
-		// disable?
-		//objtr3.disabled = false;
-	}
-
-	if (resStatusId == 5 && objtr4.value == 4) { // Not applicable AND Reason for Change
-		objtr1.disabled = true;
-	}
+		if(id > 0 ) {
+		} else {
+  			objtr2.options.length = 0;
+			objtr2.options[0]=new Option(nw, '1');
+			if(filter1=="22" || (filter1=="2" && typeId==1)) {
+		  		objtr2.options[1]=new Option(rs, '3');
+			} else if(filter1=="1") {
+				objtr2.options[1]=new Option(ud,'2');
+				objtr2.options[2]=new Option(cl,'4');
+			} else {
+				objtr2.options[1]=new Option(ud,'2');
+				objtr2.options[2]=new Option(rs,'3');
+				objtr2.options[3]=new Option(cl,'4');
+			}
+		}
+	} 
 }
   
 function scrollToY(id) {
@@ -163,9 +147,15 @@ function setYPos(id) {
 <c:set var="boxId" value="${param.boxId}"/>
 <c:set var="displayAll" value="none" />
 <c:set var="discrepancyNote" value="${boxDNMap[parentId]}"/>
+<c:set var="autoView" value=""/>
 <c:forEach var="boxDN" items="${boxDNMap}">
 	<c:if test="${parentId==boxDN.key}">
 		<c:set var="discrepancyNote" value="${boxDNMap[boxDN.key]}"/>
+	</c:if>
+</c:forEach>
+<c:forEach var="av" items="${autoViews}">
+	<c:if test="${parentId==av.key}">
+		<c:set var="autoView" value="${autoViews[av.key]}"/>
 	</c:if>
 </c:forEach>
 <c:if test="${parentId==boxToShow}">
@@ -216,13 +206,13 @@ function setYPos(id) {
 				</select>
 			</c:when>
 			<c:otherwise>
-				<c:set var="typeId1" value="${discrepancyNote.discrepancyNoteTypeId}"/>
+				<c:set var="typeIdl" value="${discrepancyNote.discrepancyNoteTypeId}"/>
 				<c:choose>
-				<c:when test="${whichResStatus == 2}">
-					<select name="typeId${parentId}" id="typeId${parentId}" class="formfieldL" onchange ="javascript:setElements(this.options[selectedIndex].value, 'user1', 'user2','<c:out value="${parentId}"/>');">
+				<c:when test="${whichResStatus == 22 || whichResStatus == 1}">
+					<select name="typeId${parentId}" id="typeId${parentId}" class="formfieldL" onchange ="javascript:setElements(this.options[selectedIndex].value, 'user1', 'user2','<c:out value="${parentId}"/>','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Resolution_Proposed" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>');">
 						<c:forEach var="type" items="${discrepancyTypes2}">
 						<c:choose>
-						<c:when test="${typeId1 == type.id}">
+						<c:when test="${typeIdl == type.id}">
 						 	<c:choose>
 						    <c:when test="${study.status.frozen && (type.id==2 || type.id==4)}">
 									<option value="<c:out value="${type.id}"/>" disabled="true" selected ><c:out value="${type.name}"/>
@@ -247,10 +237,10 @@ function setYPos(id) {
 					</select>
 				</c:when>
 				<c:otherwise>
-					<select name="typeId${parentId}" id="typeId${parentId}" class="formfieldL" onchange ="javascript:setElements(this.options[selectedIndex].value, 'user1', 'user2', '<c:out value="${parentId}"/>');">
+					<select name="typeId${parentId}" id="typeId${parentId}" class="formfieldL" onchange ="javascript:setElements(this.options[selectedIndex].value, 'user1', 'user2', '<c:out value="${parentId}"/>','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Resolution_Proposed" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>');">
 						<c:forEach var="type" items="${discrepancyTypes}">
 						<c:choose>
-						<c:when test="${typeId1 == type.id}">
+						<c:when test="${typeIdl == type.id}">
 						 	<c:choose>
 						    <c:when test="${study.status.frozen && (type.id==2 || type.id==4)}">
 									<option value="<c:out value="${type.id}"/>" disabled="true" selected ><c:out value="${type.name}"/>
@@ -298,20 +288,20 @@ function setYPos(id) {
 		<tr valign="top" id="res1${parentId}">
 		    <td  class="table_cell_noborder"><fmt:message key="resolution_status" bundle="${resword}"/>:</td>
 		    <td class="table_cell_noborder"><div class="formfieldL_BG">
-			<c:set var="resStatusId1" value="${discrepancyNote.resolutionStatusId}"/>
-		    <select name="resStatusId${parentId}" id="resStatusId${parentId}" class="formfieldL" onchange="javascript:setResStatusWithId(<c:out value="${parentId}"/>, 3, <c:out value="${discrepancyNote.ownerId}"/>);">
+			<c:set var="resStatusIdl" value="${discrepancyNote.resolutionStatusId}"/>
+		    <select name="resStatusId${parentId}" id="resStatusId${parentId}" class="formfieldL">
 				<c:choose>
-				<c:when test="${whichResStatus == 2 && param.typeId == 3 && parentId > 0}">
-					<c:set var="resStatuses" value="${resolutionStatuses2}"/>
+				<c:when test="${(parentId>0 || whichResStatus==2 && discrepancyNote.discrepancyNoteTypeId==3) || whichResStatus==1}">
+					<c:set var="resStatuses" value="${resolutionStatuses}"/>
 				</c:when>
 				<c:otherwise>
-					<c:set var="resStatuses" value="${resolutionStatuses}"/>
+					<%-- for FVC; for Query, it will be set per setElements function --%>
+					<c:set var="resStatuses" value="${resolutionStatuses2}"/>
 				</c:otherwise>
 				</c:choose>
 				<c:forEach var="status" items="${resStatuses}">
 					<c:choose>
-					<c:when test="${resStatusId1 == status.id}">
-						
+					<c:when test="${resStatusIdl == status.id}">
 						   <option value="<c:out value="${status.id}"/>" selected ><c:out value="${status.name}"/>
 					</c:when>
 					<c:otherwise>
@@ -322,17 +312,16 @@ function setYPos(id) {
 			</select></div>
 		    <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="resStatusId${parentId}"/></jsp:include></td>
 		</tr>
-		
-		
+	
 		<c:choose>
-		<c:when test="${(parent == null || parent.id ==0 || unlock == 1) && autoView == 0}">
-        	<tr valign="top" id="user1" style="display:none">
+		<c:when test="${autoView == 0}">
+        	<tr valign="top" id="user1${parentId}" style="display:none">
 		</c:when>
 		<c:otherwise>
-			<tr valign="top">
+			<tr valign="top" id="user1${parentId}" style="display:all">
       	</c:otherwise>
 		</c:choose>
-		<c:if test="${discrepancyNote.discrepancyNoteTypeId != 1 || (discrepancyNote.discrepancyNoteTypeId==1 && discrepancyNote.parentDnId>0)}">
+		<c:if test="${discrepancyNote.discrepancyNoteTypeId == 3 || (discrepancyNote.discrepancyNoteTypeId==1 && parentId>0)}">
 			<td class="table_cell_noborder"><fmt:message key="assign_to_user" bundle="${resword}"/>:</td>
 			<td class="table_cell_noborder" width="80%"><div class="formfieldL_BG">
 			<c:choose>
@@ -364,11 +353,11 @@ function setYPos(id) {
 			</tr>
 		
 			<c:choose>
-			<c:when test="${(parent == null || parent.id ==0 || unlock == 1) && autoView == 0}">
-				<tr valign="top" id="user2" style="display:none">
+			<c:when test="${autoView == 0}">
+				<tr valign="top" id="user2${parentId}" style="display:none">
 			</c:when>
 			<c:otherwise>
-				<tr valign="top">
+				<tr valign="top" id="user2${parentId}" style="display:all">
 			</c:otherwise>
 			</c:choose>
 			<%-- should be an option for checked, unchecked, disabled--%>

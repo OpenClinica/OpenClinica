@@ -5,6 +5,7 @@
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 
 
 <jsp:useBean id="id" scope="request" class="java.lang.String"/>
@@ -40,7 +41,7 @@
 
 </head>
 
-<body class="popup_BG" style="margin: 0px 12px 0px 12px;" onload="window.scrollTo(0,<c:out value="${y}"/>);javascript:setStatusWithId('<c:out value="${typeID0}"/>','0');javascript:refreshSource('<c:out value="${refresh}"/>', '/ViewNotes?');">
+<body class="popup_BG" style="margin: 0px 12px 0px 12px;" onload="window.scrollTo(0,'<c:out value="${y}"/>');javascript:setStatusWithId('<c:out value="${typeID0}"/>','0','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Resolution_Proposed" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>');javascript:refreshSource('<c:out value="${refresh}"/>', '/ViewNotes?');">
 
 
 <!-- Alert Box -->
@@ -257,8 +258,8 @@
                                 	<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="newChildAdded${note.value.id}"/></jsp:include>	
                                 	</td>
                                     <td class="table_cell_left" colspan="4" align="right">
-                                        <c:if test="${note.value.id>0 && note.value.resStatus.id != 5}">
-                                        	<c:choose>
+                                        <c:if test="${(note.value.id>0 && note.value.resStatus.id != 5) && !(note.value.resStatus.id == 4 && whichResStatus == '22')}">
+											<c:choose>
                                         	<c:when test="${note.value.id == boxToShow}">
                                         		<a href="javascript:showOnly('box<c:out value="${note.value.id}"/>');javascript:removeLinkText('a<c:out value="${note.value.id}"/>');" id="a${note.value.id}"></a>	
                                         	</c:when>
