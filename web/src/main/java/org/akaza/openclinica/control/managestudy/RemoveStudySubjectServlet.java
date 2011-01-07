@@ -12,6 +12,7 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
@@ -83,8 +84,8 @@ public class RemoveStudySubjectServlet extends SecureController {
 
             // find study events
             StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
-            ArrayList events = sedao.findAllByStudyAndStudySubjectId(study, studySubId);
-
+//            ArrayList events = sedao.findAllByStudyAndStudySubjectId(study, studySubId);
+            ArrayList<DisplayStudyEventBean> displayEvents = ViewStudySubjectServlet.getDisplayStudyEventsForStudySubject(studySub, sm.getDataSource(), ub, currentRole);
             String action = request.getParameter("action");
             if ("confirm".equalsIgnoreCase(action)) {
                 if (!studySub.getStatus().equals(Status.AVAILABLE)) {
@@ -97,7 +98,7 @@ public class RemoveStudySubjectServlet extends SecureController {
                 request.setAttribute("subject", subject);
                 request.setAttribute("study", study);
                 request.setAttribute("studySub", studySub);
-                request.setAttribute("events", events);
+                request.setAttribute("events", displayEvents);
 
                 forwardPage(Page.REMOVE_STUDY_SUBJECT);
             } else {
@@ -112,8 +113,9 @@ public class RemoveStudySubjectServlet extends SecureController {
                 // remove all event crfs
                 EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
 
-                for (int j = 0; j < events.size(); j++) {
-                    StudyEventBean event = (StudyEventBean) events.get(j);
+                for (int j = 0; j < displayEvents.size(); j++) {
+                    DisplayStudyEventBean dispEvent = displayEvents.get(j);
+                    StudyEventBean event = dispEvent.getStudyEvent();
                     if (!event.getStatus().equals(Status.DELETED)) {
                         event.setStatus(Status.AUTO_DELETED);
                         event.setUpdater(ub);
