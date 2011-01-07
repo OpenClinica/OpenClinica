@@ -134,7 +134,7 @@
         '<fmt:message key="hide_summary_statistics" bundle="${resword}"/>',
         '<fmt:message key="show_summary_statistics" bundle="${resword}"/>')">
     <img name="ExpandGroup1" src="images/bt_Collapse.gif" border="0">
-    <fmt:message key="show_summary_statistics" bundle="${resword}"/></a>
+    <fmt:message key="hide_summary_statistics" bundle="${resword}"/></a>
 </div>
 <div id="sumBox" style="display:block;">
     <%--<h3>Summary statistics</h3>--%>

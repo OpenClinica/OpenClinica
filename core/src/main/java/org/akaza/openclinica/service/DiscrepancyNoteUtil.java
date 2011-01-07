@@ -20,10 +20,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 
 /**
@@ -1019,47 +1016,24 @@ public class DiscrepancyNoteUtil {
         return summaryMap;
     }
 
-    public Map generateDiscNoteSummary(DataSource ds, StudyBean currentStudy, Set<Integer> resolutionStatusIds, int discNoteType) {
+    public Map generateDiscNoteSummary(DataSource ds, StudyBean currentStudy, ListNotesFilter listNotesFilter) {
 
         DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(ds);
-        boolean filterforDiscNoteType = discNoteType >= 1 && discNoteType <= 4;
-        boolean filterDiscNotes = checkResolutionStatus(resolutionStatusIds);
         Map<String, Map> summaryMap = new HashMap<String, Map>();
         Map<String, String> tempMap = null;
         int tempType = 0;
         String tempTotal = "--";
-        Set<String> p = new HashSet<String>();
-        if (filterforDiscNoteType) {
-            String[] discNoteTypeNames = { "Failed Validation Check", "Annotation", "Query", "Reason for Change" };
-            p.add(discNoteTypeNames[discNoteType - 1]);
-        } else {
-            p = TYPES.keySet();
-        }
-
-        String q = "";
-        if (filterDiscNotes) {
-            q += " AND ( ";
-            int i = 0;
-            for (Integer resolutionStatusId : resolutionStatusIds) {
-                if (i > 0) {
-                    q += " OR ";
-                }
-                q += " resolution_status_id = " + resolutionStatusId;
-                i++;
-            }
-            q += " ) ";
-        }
-        
+        Set<String> p = TYPES.keySet();
         for (String statusName : RESOLUTION_STATUS.keySet()) {
             tempMap = new HashMap<String, String>();
             summaryMap.put(statusName, tempMap);
             tempTotal =
-                 discrepancyNoteDAO.getViewNotesCountSummary(q + " AND resolution_status_id = " + RESOLUTION_STATUS.get(statusName), currentStudy).toString();
+                 discrepancyNoteDAO.getViewNotesCountWithFilter(" AND dn.resolution_status_id = " + RESOLUTION_STATUS.get(statusName) + listNotesFilter.execute(""), currentStudy).toString();
             tempMap.put("Total", tempTotal.equals("0")?"--":tempTotal);
             for (String discNoteTypeName : p) {
                 tempType = TYPES.get(discNoteTypeName);
-                String number = discrepancyNoteDAO.getViewNotesCountSummary(q + " AND discrepancy_note_type_id =" + tempType
-                        +" AND resolution_status_id = " + RESOLUTION_STATUS.get(statusName), currentStudy).toString();
+                String number = discrepancyNoteDAO.getViewNotesCountWithFilter(" AND dn.discrepancy_note_type_id =" + tempType
+                        +" AND resolution_status_id = " + RESOLUTION_STATUS.get(statusName) + listNotesFilter.execute(""), currentStudy).toString();
                 tempMap.put(discNoteTypeName, number.equals("0")?"--":number);
             }
         }
@@ -1067,6 +1041,21 @@ public class DiscrepancyNoteUtil {
         return summaryMap;
     }
 
+    public Map generateDiscNoteTotal(DataSource ds, StudyBean currentStudy, ListNotesFilter listNotesFilter) {
+
+        DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(ds);
+        Map<String, String> summaryMap = new HashMap<String, String>();
+        int tempType = 0;
+        Set<String> p = TYPES.keySet();
+
+        for (String discNoteTypeName : p) {
+            tempType = TYPES.get(discNoteTypeName);
+            String tempTotal = discrepancyNoteDAO.getViewNotesCountWithFilter(" AND dn.discrepancy_note_type_id =" + tempType + listNotesFilter.execute(""), currentStudy).toString();
+            summaryMap.put(discNoteTypeName, tempTotal.equals("0")?"--":tempTotal);
+        }
+        return summaryMap;
+    }
+    
     /**
      * Generate a summary of statistics for a collection of discrepancy notes.
      *
@@ -1114,45 +1103,6 @@ public class DiscrepancyNoteUtil {
 
         return summaryMap;
     }
-
-    public Map generateDiscNoteTotal(DataSource ds, StudyBean currentStudy, Set<Integer> resolutionStatusIds, int discNoteType) {
-
-        DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(ds);
-        boolean filterDiscNotes = checkResolutionStatus(resolutionStatusIds);
-        boolean filterforDiscNoteType = discNoteType >= 1 && discNoteType <= 4;
-        Map<String, String> summaryMap = new HashMap<String, String>();
-        int tempType = 0;
-        Set<String> p = new HashSet<String>();
-        if (filterforDiscNoteType) {
-            String[] discNoteTypeNames = { "Failed Validation Check", "Annotation", "Query", "Reason for Change" };
-            p.add(discNoteTypeNames[discNoteType - 1]);
-        } else {
-            p = TYPES.keySet();
-        }
-
-        String q = "";
-        if (filterDiscNotes) {
-            q += " AND ( ";
-            int i = 0;
-            for (Integer resolutionStatusId : resolutionStatusIds) {
-                if (i > 0) {
-                    q += " OR ";
-                }
-                q += " dn.resolution_status_id = " + resolutionStatusId;
-                i++;
-            }
-            q += " ) ";
-        }
-
-        for (String discNoteTypeName : p) {
-            tempType = TYPES.get(discNoteTypeName);
-            String tempTotal = discrepancyNoteDAO.getViewNotesCountWithFilter(q + " AND dn.discrepancy_note_type_id =" + tempType, currentStudy).toString();
-            summaryMap.put(discNoteTypeName, tempTotal.equals("0")?"--":tempTotal);
-        }
-        return summaryMap;
-    }
-
-
 
     /**
      * Generate a HashMap containing data on the type of discrepancy note and

@@ -34,12 +34,7 @@ import org.akaza.openclinica.control.submit.ListNotesTableFactory;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
@@ -49,6 +44,8 @@ import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.DiscrepancyNoteRow;
+import org.jmesa.facade.TableFacade;
+import org.jmesa.limit.Limit;
 
 /**
  * 
@@ -165,13 +162,6 @@ public class ViewNotesServlet extends SecureController {
             session.setAttribute(RESOLUTION_STATUS, resolutionStatusIds);
         }
 
-        DiscrepancyNoteUtil discNoteUtil = new DiscrepancyNoteUtil();
-        Map stats = discNoteUtil.generateDiscNoteSummary(sm.getDataSource(), currentStudy, resolutionStatusIds, discNoteType);
-        request.setAttribute("summaryMap", stats);
-        Set mapKeys = stats.keySet();
-        request.setAttribute("mapKeys", mapKeys);
-        request.setAttribute("typeKeys", discNoteUtil.generateDiscNoteTotal(sm.getDataSource(), currentStudy, resolutionStatusIds, discNoteType));
-
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
         StudyDAO studyDao = new StudyDAO(sm.getDataSource());
 
@@ -207,10 +197,10 @@ public class ViewNotesServlet extends SecureController {
         factory.setResolutionStatus(resolutionStatus);
         //factory.setResolutionStatusIds(resolutionStatusIds);
 
+        TableFacade tf = factory.createTable(request, response);
+        String viewNotesHtml = tf.render();
 
-        String viewNotesHtml = factory.createTable(request, response).render();
         request.setAttribute("viewNotesHtml", viewNotesHtml);
-        
         String viewNotesURL = this.getPageURL();
         session.setAttribute("viewNotesURL", viewNotesURL);
         String viewNotesPageFileName = this.getPageServletFileName();
@@ -218,6 +208,18 @@ public class ViewNotesServlet extends SecureController {
         ArrayList allNotes = ListNotesTableFactory.getNotesForPrintPop();
         factory.populateDataInNote(allNotes);
         session.setAttribute("allNotes", allNotes);
+
+        // For Summary Stats Mantis Issue: 5915
+        Limit limit = tf.getLimit();
+        ListNotesFilter listNotesFilter = factory.getListNoteFilter(limit);
+
+        DiscrepancyNoteUtil discNoteUtil = new DiscrepancyNoteUtil();
+        Map stats = discNoteUtil.generateDiscNoteSummary(sm.getDataSource(), currentStudy, listNotesFilter);
+        request.setAttribute("summaryMap", stats);
+        Set mapKeys = stats.keySet();
+        request.setAttribute("mapKeys", mapKeys);
+        request.setAttribute("typeKeys", discNoteUtil.generateDiscNoteTotal(sm.getDataSource(), currentStudy, listNotesFilter));
+        // End of Summary Stats
         if ("yes".equalsIgnoreCase(fp.getString(PRINT))) {
             request.setAttribute("allNotes", allNotes);
             forwardPage(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_PRINT);

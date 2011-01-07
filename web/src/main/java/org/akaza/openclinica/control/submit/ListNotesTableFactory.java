@@ -437,7 +437,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
      * @param limit
      *            The Limit to use.
      */
-    protected ListNotesFilter getListNoteFilter(Limit limit) {
+    public ListNotesFilter getListNoteFilter(Limit limit) {
         ListNotesFilter listNotesFilter = new ListNotesFilter();
         FilterSet filterSet = limit.getFilterSet();
         Collection<Filter> filters = filterSet.getFilters();
