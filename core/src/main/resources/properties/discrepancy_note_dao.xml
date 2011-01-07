@@ -1023,9 +1023,4 @@ and column_name='interviewer_name'
 				) )as a
     	</sql>
     </query>
-    <query>
-    	<name>getViewNotesCountSummary</name>
-    	<sql>select count(*) from discrepancy_note where study_id=? 
-    	</sql>
-    </query>
 </queries>
