@@ -1,4 +1,4 @@
-package org.akaza.openclinica.bean.service;
+package org.akaza.openclinica.core.util;
 
 /*
  * Slightly modified version of the com.ibatis.common.jdbc.ScriptRunner class

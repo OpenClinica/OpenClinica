@@ -49,7 +49,7 @@ public class ExtractController {
 
     private StdScheduler scheduler;
 
-    private static String SCHEDULER = "schedulerFactoryBean";
+    private  String SCHEDULER = "schedulerFactoryBean";
     
     public ExtractController() {
         
@@ -100,9 +100,10 @@ public class ExtractController {
     	}
     	epBean.setDoNotDelFiles(temp);
     	epBean.setExportFileName(temp);
+    	   scheduler = getScheduler(request);
        while(cnt < fileSize)
        {
-        
+    	 
         XsltTriggerService xsltService = new XsltTriggerService();
         
         // TODO get a user bean somehow?
@@ -146,8 +147,8 @@ public class ExtractController {
                 dsBean.getId(), 
                 epBean, userBean, request.getLocale().getLanguage(),cnt);
         // System.out.println("just set locale: " + request.getLocale().getLanguage());
-        scheduler = getScheduler(request);
-        
+     
+        cnt++;
         jobDetailBean = new JobDetailBean();
         jobDetailBean.setGroup(xsltService.TRIGGER_GROUP_NAME);
         jobDetailBean.setName(simpleTrigger.getName());
@@ -163,7 +164,7 @@ public class ExtractController {
         } catch (SchedulerException se) {
             se.printStackTrace();
         }
-       cnt++;
+    
        }
         request.setAttribute("datasetId", datasetId);
         // set the job name here in the user's session, so that we can ping the scheduler to pull it out later
