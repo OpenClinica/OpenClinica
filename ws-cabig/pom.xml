@@ -355,20 +355,6 @@
 			</plugin>
 		</plugins>
 	</reporting>
-	<properties>
-		<catalina.home>/usr/local/tomcat</catalina.home>
-		<test.dbName>postgres</test.dbName>
-		<test.dbDriverClassName>org.postgresql.Driver</test.dbDriverClassName>
-		<test.dbUrl>jdbc:postgresql://localhost:5432/</test.dbUrl>
-		<test.dbUsername>clinica</test.dbUsername>
-		<test.dbPassword>clinica</test.dbPassword>
-		<test.hibernateDialect>org.hibernate.dialect.PostgreSQLDialect</test.hibernateDialect>
-		<test.locale>en_US</test.locale>
-		<scm.path>https://svn.akazaresearch.com/openclinica/OpenClinica/trunk2/projects/ws-cabig</scm.path>
-		<!--  Library Versions -->
-		<!--<spring.version>2.5.6.SEC01</spring.version>-->
-		
-	</properties>
     <build>
         <resources>
             <resource>
