@@ -101,10 +101,10 @@
 
                     <table border="0" cellpadding="0" cellspacing="0">
                         <tr>
-                            <td class="table_cell_noborder" style="color: #789EC5"><b><fmt:message key="subject" bundle="${resword}"/>:&nbsp;&nbsp;</b></td>
-                            <td class="table_cell_noborder" style="color: #789EC5"><c:out value="${noteSubject.label}"/></td>
-                            <td class="table_cell_noborder" style="color: #789EC5; padding-left: 40px;"><b><fmt:message key="event" bundle="${resword}"/>:&nbsp;&nbsp;</b></td>
-                            <td class="table_cell_noborder" style="color: #789EC5">
+                            <td class="table_cell_noborder"><b><fmt:message key="subject" bundle="${resword}"/>:&nbsp;&nbsp;</b></td>
+                            <td class="table_cell_noborder"><c:out value="${noteSubject.label}"/></td>
+                            <td class="table_cell_noborder" padding-left: 40px;"><b><fmt:message key="event" bundle="${resword}"/>:&nbsp;&nbsp;</b></td>
+                            <td class="table_cell_noborder">
                                 <c:choose>
                                     <c:when test="${studyEvent != null}">
                                         <c:out value="${studyEvent.name}"/>
@@ -115,8 +115,8 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="table_cell_noborder" style="color: #789EC5"><b><fmt:message key="event_date" bundle="${resword}"/>:&nbsp;&nbsp;</b></td>
-                            <td class="table_cell_noborder" style="color: #789EC5">
+                            <td class="table_cell_noborder"><b><fmt:message key="event_date" bundle="${resword}"/>:&nbsp;&nbsp;</b></td>
+                            <td class="table_cell_noborder">
                                 <c:choose>
                                     <c:when test="${studyEvent != null}">
                                         <fmt:formatDate value="${studyEvent.dateStarted}" pattern="${dteFormat}"/>&nbsp;
@@ -125,8 +125,8 @@
                                     </c:otherwise>
                                 </c:choose>
                             </td>
-                            <td class="table_cell_noborder" style="color: #789EC5; padding-left: 40px;"><b><fmt:message key="CRF" bundle="${resword}"/>:&nbsp;&nbsp;</b></td>
-                            <td class="table_cell_noborder" style="color: #789EC5">
+                            <td class="table_cell_noborder" padding-left: 40px;"><b><fmt:message key="CRF" bundle="${resword}"/>:&nbsp;&nbsp;</b></td>
+                            <td class="table_cell_noborder">
                                 <c:choose>
                                     <c:when test="${crf != null}">
                                         <c:out value="${crf.name}"/>
@@ -149,7 +149,7 @@
 
 <div style="width:200px; float:right;">
     <p><b>
-        <a href="javascript:scrollToY('audit');"><fmt:message key="audit_log_item" bundle="${resword}"/></a>
+        <a href="javascript:scrollToY('audit');"><fmt:message key="Item_Audit_Log" bundle="${resword}"/></a>
     </b></p>
 </div>
 <div style="clear:both;"></div>
@@ -253,24 +253,23 @@
                             </c:forEach>
                             <c:set var="showDNBox" value="n"/>
                             <c:if test="${isLocked eq 'no'}">
+                            	<tr>
+                            	<td class="table_cell_left" colspan="4" align="right">
+                            		<c:if test="${(note.value.id>0 && note.value.resStatus.id != 5) && !(note.value.resStatus.id == 4 && whichResStatus == '22')}">
+										<c:set var="sindex" value="0"/>
+                            			<c:forEach var="status" items="${resolutionStatuses}">
+                            				<input class="button_medium" type="button" id="resStatus${status.id}${note.value.id}" value="<c:out value="${status.name}"/>" onclick="javascript:boxShowWithDefault('<c:out value="${note.value.id}"/>','<c:out value="${sindex}"/>','<c:out value="${status.id}"/>','<c:out value="${status.name}"/>');"/>
+                            				<c:set var="sindex" value="${sindex+1}"/>
+                            			</c:forEach>
+                            			<br>
+                            			<c:set var="showDNBox" value="y"/>
+                            		</c:if>
+                            	</td>
+                            	</tr>
                                 <tr>
                                 	<td class="table_cell_left" id="msg${note.value.id}">
                                 	<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="newChildAdded${note.value.id}"/></jsp:include>	
                                 	</td>
-                                    <td class="table_cell_left" colspan="4" align="right">
-                                        <c:if test="${(note.value.id>0 && note.value.resStatus.id != 5) && !(note.value.resStatus.id == 4 && whichResStatus == '22')}">
-											<c:choose>
-                                        	<c:when test="${note.value.id == boxToShow}">
-                                        		<a href="javascript:showOnly('box<c:out value="${note.value.id}"/>');javascript:removeLinkText('a<c:out value="${note.value.id}"/>');" id="a${note.value.id}"></a>	
-                                        	</c:when>
-                                        	<c:otherwise>
-                                            	<a href="javascript:showOnly('box<c:out value="${note.value.id}"/>');javascript:removeLinkText('a<c:out value="${note.value.id}"/>');" id="a${note.value.id}"><fmt:message key="reply_to_thread" bundle="${resword}"/></a>
-                                            </c:otherwise>
-                                            </c:choose>
-                                            <br>
-                                            <c:set var="showDNBox" value="y"/>
-                                        </c:if>
-                                    </td>
                                 </tr>
                             </c:if>
                         </table>
@@ -326,8 +325,10 @@
 
 <br clear="all">
 <div id="audit">
-<h3 class="title_manage"><fmt:message key="audit_log_item" bundle="${resword}"/></h3>
-<c:import url="../admin/auditItem.jsp"/>
+<h3 class="title_manage"><fmt:message key="Item_Audit_Log" bundle="${resword}"/></h3>
+<c:import url="../admin/auditItem.jsp">
+	<c:param name="entityCreatedDate" value="${entityCreatedDate}"/>
+</c:import>
 </div>
 <br clear="all">
 </body>

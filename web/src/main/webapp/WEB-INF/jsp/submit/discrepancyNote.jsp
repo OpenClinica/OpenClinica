@@ -25,6 +25,16 @@ function showOnly(strLeftNavRowElementName){
     }
 }
 
+function boxShowWithDefault(id, index, defaultId, defaultValue){
+	showOnly("box"+id);
+	var objSelect = MM_findObj("resStatusId"+id);
+	if(objSelect != null) {
+		objSelect.selectedIndex = index;
+		objSelect.options[selectedIndex].value = defaultId;
+		objSelect.options[selectedIndex].text = defaultValue;	
+	}
+}
+
 function removeLinkText(id) {
 	var a = document.getElementById(id);
 	if(a!=null) {
@@ -139,6 +149,19 @@ function setYPos(id) {
 			window.pageYOffset : document.documentElement.scrollTop ? 
 			document.documentElement.scrollTop : document.body.scrollTop;
 	setValue("ypos"+id,y);
+}
+
+function addButtons() {
+	
+}
+
+function setDisabled(strLeftNavRowElementName,disabledValue) {
+	alert(strLeftNavRowElementName);
+	var objLeftNavRowElement = MM_findObj(strLeftNavRowElementName);
+	if (objLeftNavRowElement != null) {	
+	alert("setDisabled called");
+		objLeftNavRowElement.disabled = disabledValue;
+	}
 }
 //-->
 </script>
