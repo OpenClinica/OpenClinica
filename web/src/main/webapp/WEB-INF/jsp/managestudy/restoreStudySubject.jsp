@@ -89,17 +89,32 @@
         <td class="table_header_row"><fmt:message key="update_by" bundle="${resword}"/></td>
         <td class="table_header_row"><fmt:message key="status" bundle="${resword}"/></td>
       </tr>
-    <c:forEach var="event" items="${events}">
-    <tr>      
-        <td class="table_cell"><fmt:formatDate value="${event.updatedDate}" pattern="${dteFormat}"/></td>
-        <td class="table_cell"><c:out value="${event.studyEventDefinition.name}"/></td>
-        <td class="table_cell"><fmt:formatDate value="${event.dateStarted}" pattern="${dteFormat}"/></td>
-        <td class="table_cell"><fmt:formatDate value="${event.dateEnded}" pattern="${dteFormat}"/></td>
-        <td class="table_cell"><c:out value="${event.location}"/></td>
-        <td class="table_cell"><c:out value="${event.updater.name}"/></td>
-        <td class="table_cell"><c:out value="${event.status.name}"/></td>
-     </tr>
-     </c:forEach>  
+    <%--<c:forEach var="event" items="${events}">--%>
+    <%--<tr>      --%>
+        <%--<td class="table_cell"><fmt:formatDate value="${event.updatedDate}" pattern="${dteFormat}"/></td>--%>
+        <%--<td class="table_cell"><c:out value="${event.studyEventDefinition.name}"/></td>--%>
+        <%--<td class="table_cell"><fmt:formatDate value="${event.dateStarted}" pattern="${dteFormat}"/></td>--%>
+        <%--<td class="table_cell"><fmt:formatDate value="${event.dateEnded}" pattern="${dteFormat}"/></td>--%>
+        <%--<td class="table_cell"><c:out value="${event.location}"/></td>--%>
+        <%--<td class="table_cell"><c:out value="${event.updater.name}"/></td>--%>
+        <%--<td class="table_cell"><c:out value="${event.status.name}"/></td>--%>
+     <%--</tr>--%>
+     <%--</c:forEach>  --%>
+       <c:forEach var="displayEvents" items="${events}">
+       <tr>
+           <td class="table_cell"><fmt:formatDate value="${displayEvents.studyEvent.updatedDate}" pattern="${dteFormat}"/></td>
+           <td class="table_cell"><c:out value="${displayEvents.studyEvent.studyEventDefinition.name}"/>
+           <c:if test="${displayEvents.studyEvent.studyEventDefinition.repeating}">
+               (<c:out value="${displayEvents.studyEvent.sampleOrdinal}"/>)
+           </c:if>
+           </td>
+           <td class="table_cell"><fmt:formatDate value="${displayEvents.studyEvent.dateStarted}" pattern="${dteFormat}"/></td>
+           <td class="table_cell"><fmt:formatDate value="${displayEvents.studyEvent.dateEnded}" pattern="${dteFormat}"/></td>
+           <td class="table_cell"><c:out value="${displayEvents.studyEvent.location}"/></td>
+           <td class="table_cell"><c:out value="${displayEvents.studyEvent.updater.name}"/></td>
+           <td class="table_cell"><c:out value="${displayEvents.studyEvent.status.name}"/></td>
+        </tr>
+        </c:forEach>
    </table>  
 </div>
 </div></div></div></div></div></div></div></div>
