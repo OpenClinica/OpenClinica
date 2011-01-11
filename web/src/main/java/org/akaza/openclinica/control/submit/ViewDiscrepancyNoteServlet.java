@@ -7,16 +7,6 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
@@ -51,6 +41,17 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author jxu
@@ -230,6 +231,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
             request.setAttribute("entityName", item.getName());
         }
         ItemDataBean itemData = new ItemDataBean();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy");
         int preUserId = 0;
         if (!StringUtil.isBlank(name)) {
             if ("itemData".equalsIgnoreCase(name)) {
@@ -241,6 +243,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
                 EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
                 EventCRFBean ec = (EventCRFBean) ecdao.findByPK(itemData.getEventCRFId());
                 preUserId = ec.getOwnerId()>0 ? ec.getOwnerId() : 0;
+                request.setAttribute("entityCreatedDate", sdf.format(ec.getCreatedDate()));
 
                 StudyEventDAO sed = new StudyEventDAO(sm.getDataSource());
                 StudyEventBean se = (StudyEventBean) sed.findByPK(ec.getStudyEventId());
@@ -287,6 +290,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
                     }
                 }
                 preUserId = ssub.getOwnerId()>0 ? ssub.getOwnerId() : 0;
+                request.setAttribute("entityCreatedDate", sdf.format(ssub.getCreatedDate()));
 
             } else if ("subject".equalsIgnoreCase(name)) {
 
@@ -312,6 +316,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
                     }
                 }
                 preUserId = sub.getOwnerId()>0 ? sub.getOwnerId() : 0;
+                request.setAttribute("entityCreatedDate", sdf.format(sub.getCreatedDate()));
 
             } else if ("studyEvent".equalsIgnoreCase(name)) {
 
@@ -343,6 +348,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
                     }
                 }
                 preUserId = se.getOwnerId()>0 ? se.getOwnerId() : 0;
+                request.setAttribute("entityCreatedDate", sdf.format(se.getCreatedDate()));
 
             } else if ("eventCrf".equalsIgnoreCase(name)) {
                 EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
@@ -362,6 +368,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
                 setupStudyEventCRFAttributes(ec);
 
                 preUserId = ec.getOwnerId()>0 ? ec.getOwnerId() : 0;
+                request.setAttribute("entityCreatedDate", sdf.format(ec.getCreatedDate()));
             }
 
         }
