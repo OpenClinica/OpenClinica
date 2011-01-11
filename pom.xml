@@ -87,6 +87,7 @@
         <module>core</module>
         <module>web</module>
         <module>ws</module>
+        <module>ws-cabig</module>
     </modules>
 
     <!-- Specify versions once for commonly-used deps -->

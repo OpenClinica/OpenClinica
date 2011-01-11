@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://openclinica.org/ws/study/v1"
+    xmlns:studySubjects="http://openclinica.org/ws/study/v1" 
+    xmlns:beans="http://openclinica.org/ws/beans"
+    elementFormDefault="qualified">
+    
+    <import namespace="http://openclinica.org/ws/beans" schemaLocation="http://svn.akazaresearch.com/oc/schemas/beans.xsd"></import>
+
+    <element name="listAllRequest"/>
+
+    <element name="listAllResponse">
+        <complexType>
+            <sequence>
+                <element name="result" type="string"/>
+                <element name="warning" type="string" minOccurs="0" maxOccurs="unbounded"/>
+                <element name="error" type="string" minOccurs="0" maxOccurs="unbounded"/>
+                <element name="studies" type="beans:studiesType" />
+            </sequence>
+                
+        </complexType>
+    </element>
+    
+    <element name="getMetadataRequest">
+        <complexType>
+            <sequence>
+                <element name="studyMetadata" type="beans:studyMetadataType"/>
+            </sequence>
+        </complexType>
+    </element>
+    
+    <element name="getMetadataResponse">
+        <complexType>
+            <sequence>
+                <element name="result" type="string"/>
+                <element name="warning" type="string" minOccurs="0" maxOccurs="unbounded"/>
+                <element name="error" type="string" minOccurs="0" maxOccurs="unbounded"/>
+            </sequence>
+        </complexType>
+    </element>
+
+</schema>

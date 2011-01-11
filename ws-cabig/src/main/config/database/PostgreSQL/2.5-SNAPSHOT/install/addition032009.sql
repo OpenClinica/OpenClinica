@@ -1,0 +1,2 @@
+INSERT INTO response_type (response_type_id, name, description) VALUES (10, 'coding', 'interact with a third-party application');
+update response_type set name = 'text(non-editable)' where response_type_id = 10;
