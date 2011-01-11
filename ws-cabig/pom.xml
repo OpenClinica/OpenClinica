@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>OpenClinica-ws-cabig</artifactId>
     <packaging>war</packaging>
-    <name>OpenClinica Web Services</name>
+    <name>OpenClinica Web Services - caBIG</name>
     <parent>
         <groupId>org.akaza.openclinica</groupId>
         <artifactId>OpenClinica</artifactId>
