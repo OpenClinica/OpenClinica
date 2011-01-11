@@ -11,6 +11,7 @@ import org.akaza.openclinica.bean.service.ProcessingFunction;
 import org.akaza.openclinica.bean.service.ProcessingResultType;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.OpenClinicaMailSender;
+import org.akaza.openclinica.core.util.XMLFileFilter;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.extract.DatasetDAO;

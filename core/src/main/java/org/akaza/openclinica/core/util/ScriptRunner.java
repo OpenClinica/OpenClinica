@@ -29,6 +29,16 @@ import java.sql.*;
 
 /**
  * Tool to run database scripts
+ * 
+ */
+/** Rules to Follow to add classes/methods to Util package:
+ * No repeating the code. 
+ * Make a class/method do just one thing. 
+ * No business logic code. 
+ * Don't write code that isn't needed. 
+ * No Coupling. 
+ * Be more Modular 
+ * Write code like your code is an External API 
  */
 public class ScriptRunner {
 
