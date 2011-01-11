@@ -428,4 +428,8 @@
 			</plugin>
         </plugins>
     </build>
+    <scm>
+		<connection>${scm.path}/ws</connection>
+		<developerConnection>${scm.path}/ws</developerConnection>
+	</scm>
 </project>

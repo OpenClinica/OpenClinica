@@ -414,4 +414,8 @@
 			</plugin>
         </plugins>
     </build>
+    <scm>
+		<connection>${scm.path}/ws-cabig</connection>
+		<developerConnection>${scm.path}/ws-cabig</developerConnection>
+	</scm>
 </project>

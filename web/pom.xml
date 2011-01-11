@@ -338,4 +338,8 @@
             </plugin>
         </plugins>
     </build>
+    <scm>
+		<connection>${scm.path}/web</connection>
+		<developerConnection>${scm.path}/web</developerConnection>
+	</scm>
 </project>
