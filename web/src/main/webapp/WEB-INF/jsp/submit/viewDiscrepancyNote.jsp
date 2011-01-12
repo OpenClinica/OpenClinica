@@ -258,8 +258,18 @@
                             		<c:if test="${(note.value.id>0 && note.value.resStatus.id != 5) && !(note.value.resStatus.id == 4 && whichResStatus == '22')}">
 										<c:set var="sindex" value="0"/>
                             			<c:forEach var="status" items="${resolutionStatuses}">
-                            				<input class="button_medium" type="button" id="resStatus${status.id}${note.value.id}" value="<c:out value="${status.name}"/>" onclick="javascript:boxShowWithDefault('<c:out value="${note.value.id}"/>','<c:out value="${sindex}"/>','<c:out value="${status.id}"/>','<c:out value="${status.name}"/>');"/>
-                            				<c:set var="sindex" value="${sindex+1}"/>
+                        					<c:choose>
+                        					<c:when test="${status.id == 2}">
+                        						<input class="button_medium" type="button" id="resStatus${status.id}${note.value.id}" value="<fmt:message key="Update" bundle="${resterm}"/>" onclick="javascript:boxShowWithDefault('<c:out value="${note.value.id}"/>','<c:out value="${sindex}"/>','<c:out value="${status.id}"/>','<c:out value="${status.name}"/>');"/>
+            								</c:when>
+            								<c:when test="${status.id == 3}">
+                        						<input class="button_medium" type="button" id="resStatus${status.id}${note.value.id}" value="<fmt:message key="Propose_Resolution" bundle="${resterm}"/>" onclick="javascript:boxShowWithDefault('<c:out value="${note.value.id}"/>','<c:out value="${sindex}"/>','<c:out value="${status.id}"/>','<c:out value="${status.name}"/>');"/>
+            								</c:when>
+            								<c:when test="${status.id == 4}">
+                        						<input class="button_medium" type="button" id="resStatus${status.id}${note.value.id}" value="<fmt:message key="Close" bundle="${resterm}"/>" onclick="javascript:boxShowWithDefault('<c:out value="${note.value.id}"/>','<c:out value="${sindex}"/>','<c:out value="${status.id}"/>','<c:out value="${status.name}"/>');"/>
+            								</c:when>
+                        					</c:choose>
+                        					<c:set var="sindex" value="${sindex+1}"/>
                             			</c:forEach>
                             			<br>
                             			<c:set var="showDNBox" value="y"/>
