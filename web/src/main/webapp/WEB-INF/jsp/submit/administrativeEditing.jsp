@@ -267,7 +267,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
             window.location = document.crfForm.sectionName.options[OptionIndex].value;
         }
     }
-
+    function $(x){return document.getElementById(x);}
 
     //-->
 </script>
