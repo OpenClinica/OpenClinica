@@ -307,7 +307,7 @@ function checkDataStatus() {
         window.location = document.crfForm.sectionSelect.options[OptionIndex].value;
     }
 
-
+ function $(x){return document.getElementById(x);}
     //-->
 </script>
 
