@@ -10,11 +10,52 @@
 
      
      <!-- WSDL Definitions -->
+     <bean id="DataCaptureService" class="org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition"> 
+     <!-- changing to org.springframework.ws.wsdl.wsdl11.SimpleWsdl11Definition -->
+     <!-- was org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition -->
+     	<!-- <constructor-arg value="/WEB-INF/schemas/clinicalConnector/DataCaptureService.wsdl"/> -->
+     	<property name="schema" ref="dataCaptureSchema"/>
+     	<property name="portTypeName" value="ws"/>
+        <property name="locationUri" value="/ws/cabig/v1"/>
+        
+     </bean> 
+     
+     <bean id="StudyManagementService" class="org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition"> 
+     	<!-- <constructor-arg value="/WEB-INF/schemas/clinicalConnector/StudyManagementService.wsdl"/> -->
+     	<property name="schema" ref="studyManagementSchema"/>
+     	<property name="portTypeName" value="ws"/>
+        <property name="locationUri" value="/ws/cabig/v1"/>
+     </bean> 
+     
+     <bean id="SubjectRegistrationService" class="org.springframework.ws.wsdl.wsdl11.SimpleWsdl11Definition">
+     	<constructor-arg value="/WEB-INF/schemas/clinicalConnector/SubjectRegistrationService.wsdl"/> 
+     	<!--  <property name="schema" ref="registerSubjectSchema"/> -->
+     	<!--  <property name="requestSuffix" value="RegisterSubjectRequest"/> -->
+     	<!--  <property name="portTypeName" value="ws"/>
+        <property name="locationUri" value="/ws/cabig/v1"/> -->
+     </bean>
      
      <bean id="dataWsdl" class="org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition">
         <property name="schema" ref="dataSchema"/>
         <property name="portTypeName" value="ws"/>
         <property name="locationUri" value="/ws/data/v1"/>
+        <property name="createSoap12Binding" value="true" />
+     </bean>
+     
+     <bean id="connectorSchema" class="org.springframework.xml.xsd.SimpleXsdSchema">
+     	<property name="xsd" value="/WEB-INF/schemas/clinicalConnector/ClinicalConnector.xsd"/>
+     </bean>
+     
+     <bean id="dataCaptureSchema" class="org.springframework.xml.xsd.SimpleXsdSchema">
+     	<property name="xsd" value="/WEB-INF/schemas/clinicalConnector/dataCapture.xsd"/>
+     </bean>
+     
+     <bean id="studyManagementSchema" class="org.springframework.xml.xsd.SimpleXsdSchema">
+     	<property name="xsd" value="/WEB-INF/schemas/clinicalConnector/studyManagement.xsd"/>
+     </bean>
+     
+     <bean id="registerSubjectSchema" class="org.springframework.xml.xsd.SimpleXsdSchema">
+     	<property name="xsd" value="/WEB-INF/schemas/clinicalConnector/registerSubject.xsd"/>
      </bean>
      
      <bean id="dataSchema" class="org.springframework.xml.xsd.SimpleXsdSchema">
@@ -72,6 +113,33 @@
     </bean>
     
     <!-- Endpoint Mappings  -->
+    <bean id="subjectEndpointMapping" class="org.springframework.ws.soap.server.endpoint.mapping.SoapActionEndpointMapping">
+    <!-- org.springframework.ws.soap.server.endpoint.mapping.SoapActionEndpointMapping -->
+    <!-- org.springframework.ws.soap.addressing.server.SimpleActionEndpointMapping -->
+        <property name="mappings">
+            <props>
+                <prop key="registerSubject">registerSubjectEndpoint</prop>
+                <prop key="rollbackRegisterSubject">rollbackRegisterSubjectEndpoint</prop>
+            </props>
+        </property>
+        <!-- always remember to add the security interceptors here, otherwise they will break -->
+        <property name="interceptors">
+			<list>
+				<ref local="loggingInterceptor"/>
+				<ref bean="wsSecurityInterceptor"/>
+                <ref bean="userPermissionInterceptor"/>
+			</list>
+		</property>
+    </bean>  
+    
+    <!-- change the SAAJ to accept only SOAP 1.2 handlers, for CABIG, tbh 02/2011 -->
+    <bean id="messageFactory" class="org.springframework.ws.soap.axiom.AxiomSoapMessageFactory">
+    <!-- was SaajSoapMessageFactory, tbh -->
+        <property name="soapVersion">
+            <util:constant static-field="org.springframework.ws.soap.SoapVersion.SOAP_12"/>
+        </property>
+    </bean> 
+     
     
     <!-- PayloadRootAnnotationMethodEndpointMapping is the mapping that detects and handles the @PayloadRoot  
          annotations  -->
@@ -94,6 +162,8 @@
                 <prop key="sed">http://openclinica.org/ws/studyEventDefinition/v1</prop>
                 <prop key="data">http://openclinica.org/ws/data/v1</prop>
                 <prop key="odm13">http://www.cdisc.org/ns/odm/v1.3</prop>
+                <prop key="cabig">http://openclinica.org/ws/cabig/v1</prop>
+                <prop key="connector">http://clinicalconnector.nci.nih.gov</prop>
             </props>
         </property>
     </bean>
@@ -103,6 +173,10 @@
     <bean class="org.springframework.ws.server.endpoint.adapter.GenericMarshallingMethodEndpointAdapter">
         <constructor-arg ref="jaxb2Marshaller"/>
     </bean>
+    
+    <!-- adding the payload adapter b/c the above GenericMarshallingMethodEndpointAdapter overrides all default endpoint
+    adapters, tbh 01/2011 -->
+    <bean id="payloadAdapter" class="org.springframework.ws.server.endpoint.adapter.PayloadEndpointAdapter" />
     
     <bean id="dateAdapter" class="org.akaza.openclinica.ws.DateAdapter" />
 
@@ -114,13 +188,26 @@
                 <value>org.openclinica.ws.studysubject.v1</value>
             </list>    
         </property>
+        
         <property name="mtomEnabled" value="true"/>
         <property name="adapters">
             <list><ref bean="dateAdapter"/></list>    
         </property>
-    </bean>
+    </bean> 
     
     <!--  Endpoints -->
+    <bean id="registerSubjectEndpoint" class="org.akaza.openclinica.ws.cabig.RegisterSubjectEndpoint">
+        <constructor-arg ref="dataSource"/>
+        <constructor-arg ref="messageSource"/>
+        <constructor-arg ref="coreResources"/>
+        <!--  <constructor-arg ref="jaxb2Marshaller"/> -->  
+    </bean>
+    
+    <bean id="rollbackRegisterSubjectEndpoint" class="org.akaza.openclinica.ws.cabig.RollbackRegisterSubjectEndpoint">
+        <constructor-arg ref="dataSource"/>
+        <constructor-arg ref="messageSource"/>
+        <constructor-arg ref="coreResources"/>
+    </bean> 
     
     <bean id="dataEndpoint" class="org.akaza.openclinica.ws.DataEndpoint">
         <constructor-arg ref="dataSource"/>
@@ -165,11 +252,17 @@
         <constructor-arg ref="dataSource"/>
     </bean>
     
-    <bean id="wsSecurityInterceptor" class="org.springframework.ws.soap.security.xwss.XwsSecurityInterceptor">
+    <!-- had to remove XWS security since it is only compliant with SAAJ, not Axiom, tbh 01/2011 -->
+    <!--  <bean id="wsSecurityInterceptor" class="org.springframework.ws.soap.security.xwss.XwsSecurityInterceptor">
         <property name="secureResponse" value="false"/>
         <property name="policyConfiguration" value="classpath:securityPolicy.xml"/>
         <property name="callbackHandlers" ref="springSecurityHandler"/>
-    </bean>
+    </bean> --> 
+    <bean id="wsSecurityInterceptor" class="org.springframework.ws.soap.security.wss4j.Wss4jSecurityInterceptor">
+		<property name="validationCallbackHandler" ref="springSecurityHandler"/>
+		<property name="validationActions" value="UsernameToken"/>
+		<property name="securementActions" value="NoSecurity"/> <!-- was Encrypt -->
+	</bean> 
     
     <bean id="authenticationManager" class="org.springframework.security.authentication.ProviderManager">
       <property name="providers">
@@ -178,11 +271,29 @@
           </bean>
       </property>
     </bean>
+    
+    <bean id="loggingInterceptor" class="org.springframework.ws.server.endpoint.interceptor.PayloadLoggingInterceptor">
+		<description>
+		This interceptor logs the message payload.
+		</description>
+	</bean>
   
-    <bean id="springSecurityHandler"
-      class="org.akaza.openclinica.ws.SpringPlainTextPasswordValidationCallbackHandler">
+  	<!--  -->
+  	<!-- org.springframework.ws.soap.security.wss4j.callback.SpringPlainTextPasswordValidationCallbackHandler
+  		  class="org.akaza.openclinica.ws.SpringPlainTextPasswordValidationCallbackHandler"> -->
+    <!--  <bean id="springSecurityHandler" 
+     class="org.akaza.openclinica.ws.SpringPlainTextPasswordValidationCallbackHandler">
     <property name="authenticationManager" ref="authenticationManager"/>
-    </bean>
+    </bean> -->
+    <bean id="springSecurityHandler"
+      class="org.springframework.ws.soap.security.wss4j.callback.SpringPlainTextPasswordValidationCallbackHandler">
+    	<property name="authenticationManager" ref="authenticationManager"/>
+  	</bean> 
+  	<!--  <bean id="springSecurityHandler" class="org.springframework.ws.soap.security.wss4j.callback.SpringDigestPasswordValidationCallbackHandler">
+        <property name="userDetailsService" ref="ocUserDetailsService"/>
+    </bean> -->
+  	
+    
 </beans>
     
     
