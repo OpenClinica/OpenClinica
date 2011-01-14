@@ -151,7 +151,7 @@ public final class SpreadsheetPreviewNw implements Preview {
                         if (headers[k].equalsIgnoreCase("left_item_text") || headers[k].equalsIgnoreCase("right_item_text")
                                 || headers[k].equalsIgnoreCase("header") || headers[k].equalsIgnoreCase("subheader")
                                 || headers[k].equalsIgnoreCase("question_number")|| headers[k].equalsIgnoreCase("section_title")
-                                || headers[k].equalsIgnoreCase("subtitle")|| headers[k].equalsIgnoreCase("instructions")) {
+                                || headers[k].equalsIgnoreCase("subtitle")|| headers[k].equalsIgnoreCase("instructions")|| headers[k].equalsIgnoreCase("response_options_text")) {
                             rowCells.put(headers[k], getCellValue(cell).replaceAll("\\\\,", "\\,"));
                         } else {
                             rowCells.put(headers[k], getCellValue(cell).replaceAll("\\\\,", "\\,").replaceAll("<[^>]*>", ""));
