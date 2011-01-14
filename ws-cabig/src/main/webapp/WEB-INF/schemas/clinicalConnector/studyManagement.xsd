@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:iso="uri:iso.org:21090" xmlns:domain="http://clinicalconnector.nci.nih.gov" targetNamespace="http://clinicalconnector.nci.nih.gov" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:import namespace="uri:iso.org:21090" schemaLocation="http://svn.akazaresearch.com/oc/schemas/ISO_datatypes_Narrative.xsd"/>
+	<xs:element name="CreateStudyRequest">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="studyProtocol" type="domain:StudyProtocol"/>
+				<xs:element name="studyCoordinatingCenter" type="domain:StudyCoordinatingCenter"/>
+				<xs:element name="studyInvestigator" type="domain:StudyInvestigator"/>
+				<xs:element name="studySites" type="domain:StudySite" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element name="requestorID" type="xs:string" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="CreateStudyResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="indicator" type="iso:BL"/>
+				<xs:element name="message" type="domain:Message" minOccurs="0"/>
+				<xs:element name="studyIdentifier" type="iso:II"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="StudyProtocol">
+		<xs:sequence>
+			<xs:element name="identifier" type="iso:II"/>
+			<xs:element name="coordinatingCenterStudyStatusCode" type="iso:CD"/>
+			<xs:element name="dataEntryStatusCode" type="iso:CD"/>
+			<xs:element name="multiInstitutionIndicator" type="iso:BL"/>
+			<xs:element name="officialTitle" type="iso:ST"/>
+			<xs:element name="phaseCode" type="iso:CD"/>
+			<xs:element name="primaryPurposeCode" type="iso:CD"/>
+			<xs:element name="publicDescription" type="iso:ST"/>
+			<xs:element name="publicTitle" type="iso:ST"/>
+			<xs:element name="targetAccrualNumberRange" type="iso:IVL_INT"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="StudyCoordinatingCenter">
+		<xs:sequence>
+			<xs:element name="identifier" type="iso:II"/>
+			<xs:element name="postalAddress" type="iso:AD"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="StudyInvestigator">
+		<xs:sequence>
+			<xs:element name="educationLevelCode" type="iso:CD"/>
+			<xs:element name="identifier" type="iso:II"/>
+			<xs:element name="name" type="iso:EN.PN"/>
+			<xs:element name="postalAddress" type="iso:AD"/>
+			<xs:element name="primaryIndicator" type="iso:BL"/>
+			<xs:element name="roleCode" type="iso:CD"/>
+			<xs:element name="statusCode" type="iso:CD"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="StudySite">
+		<xs:sequence>
+			<xs:element name="dateRange" type="iso:IVL_TS"/>
+			<xs:element name="identifier" type="iso:II"/>
+			<xs:element name="leadOrganizationIndicator" type="iso:BL"/>
+			<xs:element name="name" type="iso:ST"/>
+			<xs:element name="postalAddress" type="iso:AD"/>
+			<xs:element name="reviewBoardApprovalDate" type="iso:TS"/>
+			<xs:element name="targetAccrualNumber" type="iso:INT"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!-- Types used for response and error conditions -->
+	<xs:element name="CCBusinessFault" type="domain:CCBusinessError"/>
+	<xs:element name="CCSystemFault" type="domain:CCSystemError"/>
+	<xs:element name="CCDataValidationFault" type="domain:CCDataValidationError"/>
+	<xs:element name="CCLoadLabsFault" type="domain:CCLoadLabsError"/>
+	<xs:complexType name="Message">
+		<xs:sequence>
+			<xs:element name="code" type="xs:int"/>
+			<xs:element name="reason" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CCBaseError" abstract="true">
+		<xs:sequence>
+			<xs:element name="message" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="businessErrorCode">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="CC10100"/>
+			<xs:enumeration value="CC10110"/>
+			<xs:enumeration value="CC10120"/>
+			<xs:enumeration value="CC10130"/>
+			<xs:enumeration value="CC10200"/>
+			<xs:enumeration value="CC10210"/>
+			<xs:enumeration value="CC10220"/>
+			<xs:enumeration value="CC10230"/>
+			<xs:enumeration value="CC10300"/>
+			<xs:enumeration value="CC10310"/>
+			<xs:enumeration value="CC10320"/>
+			<xs:enumeration value="CC10330"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="systemErrorCode">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="CC10000"/>
+			<xs:enumeration value="CC10010"/>
+			<xs:enumeration value="CC10020"/>
+			<xs:enumeration value="CC10030"/>			
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="CCBusinessError">
+		<xs:complexContent>
+			<xs:extension base="domain:CCBaseError">
+				<xs:sequence>
+					<xs:element name="code" type="domain:businessErrorCode"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="CCSystemError">
+		<xs:complexContent>
+			<xs:extension base="domain:CCBaseError">
+				<xs:sequence>
+					<xs:element name="code" type="domain:systemErrorCode"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ValidationError">
+		<xs:sequence>
+			<xs:element name="inputName" type="xs:string"/>
+			<xs:element name="attributeName" type="xs:string" minOccurs="0"/>
+			<xs:element name="message" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CCDataValidationError">
+		<xs:complexContent>
+			<xs:extension base="domain:CCBusinessError">
+				<xs:sequence>
+					<xs:element name="ValidationError" type="domain:ValidationError" maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="LoadLabError">
+		<xs:sequence>
+			<xs:element name="performedClinicalResult" type="domain:PerformedClinicalResult"/>
+			<xs:choice>
+				<xs:element name="businessError" type="domain:CCBusinessError"/>
+				<xs:element name="dataValidationError" type="domain:CCDataValidationError"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CCLoadLabsError">
+		<xs:complexContent>
+			<xs:extension base="domain:CCBaseError">
+				<xs:sequence>
+					<xs:element name="LoadLabError" type="domain:LoadLabError" maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="EN.PN.IN">
+		<xs:complexContent>
+			<xs:restriction base="iso:EN.PN"/>
+		</xs:complexContent>
+	</xs:complexType>
+</xs:schema>
