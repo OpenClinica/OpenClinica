@@ -20,6 +20,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 
@@ -1016,9 +1017,7 @@ public class DiscrepancyNoteUtil {
         return summaryMap;
     }
 
-    public Map generateDiscNoteSummary(DataSource ds, StudyBean currentStudy, ListNotesFilter listNotesFilter) {
-
-        DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(ds);
+    public Map generateDiscNoteSummary(ArrayList<DiscrepancyNoteBean> discList) {
         Map<String, Map> summaryMap = new HashMap<String, Map>();
         Map<String, String> tempMap = null;
         int tempType = 0;
@@ -1027,13 +1026,11 @@ public class DiscrepancyNoteUtil {
         for (String statusName : RESOLUTION_STATUS.keySet()) {
             tempMap = new HashMap<String, String>();
             summaryMap.put(statusName, tempMap);
-            tempTotal =
-                 discrepancyNoteDAO.getViewNotesCountWithFilter(" AND dn.resolution_status_id = " + RESOLUTION_STATUS.get(statusName) + listNotesFilter.execute(""), currentStudy).toString();
+            tempTotal = countNotes(discList, RESOLUTION_STATUS.get(statusName), 0);
             tempMap.put("Total", tempTotal.equals("0")?"--":tempTotal);
             for (String discNoteTypeName : p) {
                 tempType = TYPES.get(discNoteTypeName);
-                String number = discrepancyNoteDAO.getViewNotesCountWithFilter(" AND dn.discrepancy_note_type_id =" + tempType
-                        +" AND resolution_status_id = " + RESOLUTION_STATUS.get(statusName) + listNotesFilter.execute(""), currentStudy).toString();
+                String number = countNotes(discList, RESOLUTION_STATUS.get(statusName), tempType);
                 tempMap.put(discNoteTypeName, number.equals("0")?"--":number);
             }
         }
@@ -1041,21 +1038,66 @@ public class DiscrepancyNoteUtil {
         return summaryMap;
     }
 
-    public Map generateDiscNoteTotal(DataSource ds, StudyBean currentStudy, ListNotesFilter listNotesFilter) {
+    public Map generateDiscNoteTotal(ArrayList<DiscrepancyNoteBean> discList) {
 
-        DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(ds);
         Map<String, String> summaryMap = new HashMap<String, String>();
         int tempType = 0;
         Set<String> p = TYPES.keySet();
-
         for (String discNoteTypeName : p) {
             tempType = TYPES.get(discNoteTypeName);
-            String tempTotal = discrepancyNoteDAO.getViewNotesCountWithFilter(" AND dn.discrepancy_note_type_id =" + tempType + listNotesFilter.execute(""), currentStudy).toString();
+            String tempTotal = countNotes(discList, 0, tempType);
             summaryMap.put(discNoteTypeName, tempTotal.equals("0")?"--":tempTotal);
         }
         return summaryMap;
     }
     
+    public String countNotes(ArrayList<DiscrepancyNoteBean> discList, int statusId, int typeId){
+        Integer count = 0;
+        for(int i = 0; i < discList.size(); i++){
+            DiscrepancyNoteBean discBean = discList.get(i);
+            if(typeId == 0 && statusId != 0) {
+                if (discBean.getResStatus() == ResolutionStatus.get(statusId)){
+                    count++;
+                }
+            } else if(statusId == 0 && typeId != 0) {
+                if (discBean.getDiscrepancyNoteTypeId() == typeId){
+                    count++;
+                }
+            }else {
+                if (discBean.getResStatus() == ResolutionStatus.get(statusId)
+                        && discBean.getDiscrepancyNoteTypeId() == typeId){
+                    count++;
+                }
+            }
+        }
+        return count.toString();
+    }
+
+    public static ArrayList<DiscrepancyNoteBean> customFilter(ArrayList<DiscrepancyNoteBean> mainList, ListNotesFilter discFilter) {
+        String eventName = "";
+        String crfName = "";
+        String entityName = "";
+        String entityValue = "";
+        for(int i=0; i < discFilter.getFilters().size(); i++) {
+            ListNotesFilter.Filter filter = discFilter.getFilters().get(i);
+            eventName = filter.getProperty().equals("eventName") ? filter.getValue().toString() : eventName;
+            crfName = filter.getProperty().equals("crfName") ? filter.getValue().toString() : crfName;
+            entityName = filter.getProperty().equals("entityName") ? filter.getValue().toString() : entityName;
+            entityValue = filter.getProperty().equals("entityValue") ? filter.getValue().toString() : entityValue;
+        }
+
+        ArrayList newList = new ArrayList<DiscrepancyNoteBean>();
+        for(DiscrepancyNoteBean dnBean: mainList){
+            if(dnBean.getEventName().toLowerCase().indexOf(eventName.toLowerCase())>=0
+                    && dnBean.getCrfName().toLowerCase().indexOf(crfName.toLowerCase())>=0
+                    && dnBean.getEntityName().toLowerCase().indexOf(entityName.toLowerCase())>=0
+                    && dnBean.getEntityValue().toLowerCase().indexOf(entityValue.toLowerCase())>=0){
+                newList.add(dnBean);
+            }
+        }
+
+        return newList;
+    }
     /**
      * Generate a summary of statistics for a collection of discrepancy notes.
      *

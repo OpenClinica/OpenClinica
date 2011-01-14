@@ -86,7 +86,7 @@ public class ListNotesFilter implements CriteriaCommand {
         return criteria;
     }
 
-    private static class Filter {
+    public static class Filter {
         private final String property;
         private final Object value;
 
@@ -104,4 +104,8 @@ public class ListNotesFilter implements CriteriaCommand {
         }
     }
 
+    public List<Filter> getFilters() {
+        return filters;
+    }
+    
 }

@@ -206,20 +206,21 @@ public class ViewNotesServlet extends SecureController {
         String viewNotesPageFileName = this.getPageServletFileName();
         session.setAttribute("viewNotesPageFileName", viewNotesPageFileName);
         ArrayList allNotes = ListNotesTableFactory.getNotesForPrintPop();
-        factory.populateDataInNote(allNotes);
-        session.setAttribute("allNotes", allNotes);
 
-        // For Summary Stats Mantis Issue: 5915
         Limit limit = tf.getLimit();
         ListNotesFilter listNotesFilter = factory.getListNoteFilter(limit);
 
+        factory.populateDataInNote(allNotes);
+        allNotes = DiscrepancyNoteUtil.customFilter(allNotes, listNotesFilter);
+        session.setAttribute("allNotes", allNotes);
+
         DiscrepancyNoteUtil discNoteUtil = new DiscrepancyNoteUtil();
-        Map stats = discNoteUtil.generateDiscNoteSummary(sm.getDataSource(), currentStudy, listNotesFilter);
+        Map stats = discNoteUtil.generateDiscNoteSummary(allNotes);
         request.setAttribute("summaryMap", stats);
         Set mapKeys = stats.keySet();
         request.setAttribute("mapKeys", mapKeys);
-        request.setAttribute("typeKeys", discNoteUtil.generateDiscNoteTotal(sm.getDataSource(), currentStudy, listNotesFilter));
-        // End of Summary Stats
+        request.setAttribute("typeKeys", discNoteUtil.generateDiscNoteTotal(allNotes));
+
         if ("yes".equalsIgnoreCase(fp.getString(PRINT))) {
             request.setAttribute("allNotes", allNotes);
             forwardPage(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_PRINT);

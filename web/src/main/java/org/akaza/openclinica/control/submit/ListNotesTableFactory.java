@@ -226,7 +226,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             theItems.add(h);
             setStudyHasDiscNotes(true);
         }
-
         tableFacade.setItems(theItems);
 
     }
