@@ -7,16 +7,6 @@
  */
 package org.akaza.openclinica.dao.managestudy;
 
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.EntityBean;
@@ -35,6 +25,16 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
+
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
+
+import javax.sql.DataSource;
 
 /**
  * @author jxu
@@ -1470,17 +1470,14 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
         if (isQuerySuccessful()) {
             dnb.setActive(true);
-        }
+        } 
 
         return dnb;
     }
 
     public EntityBean updateAssignedUser(EntityBean eb) {
         // update discrepancy_note set
-        // description =?,
-        // discrepancy_note_type_id =? ,
-        // resolution_status_id =? ,
-        // detailed_notes =?
+        // assigned_user_id = ?
         // where discrepancy_note_id=?
         DiscrepancyNoteBean dnb = (DiscrepancyNoteBean) eb;
         dnb.setActive(false);
@@ -1497,6 +1494,26 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
         return dnb;
     }
+    
+    public EntityBean updateAssignedUserToNull(EntityBean eb) {
+        // update discrepancy_note set
+        // assigned_user_id = null
+        // where discrepancy_note_id=?
+        DiscrepancyNoteBean dnb = (DiscrepancyNoteBean) eb;
+        dnb.setActive(false);
+
+        HashMap variables = new HashMap();
+
+        variables.put(new Integer(1), new Integer(dnb.getId()));
+        this.execute(digester.getQuery("updateAssignedUserToNull"), variables);
+
+        if (isQuerySuccessful()) {
+            dnb.setActive(true);
+        }
+
+        return dnb;
+    }
+
 
     public void deleteNotes(int id) {
         HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
