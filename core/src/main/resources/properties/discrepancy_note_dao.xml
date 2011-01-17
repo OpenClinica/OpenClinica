@@ -709,6 +709,14 @@
         </sql>
     </query>
     <query>
+        <name>updateAssignedUserToNull</name>
+        <sql>
+            update discrepancy_note set
+            assigned_user_id = null
+            where discrepancy_note_id=?
+        </sql>
+    </query>
+    <query>
         <name>deleteNotes</name>
         <sql>
             delete from discrepancy_note where discrepancy_note_id = ?

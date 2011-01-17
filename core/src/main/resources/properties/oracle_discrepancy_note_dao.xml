@@ -721,7 +721,14 @@ SELECT dn.*, eventcrf_map.column_name FROM discrepancy_note dn, dn_event_crf_map
             update discrepancy_note set
             assigned_user_id = ?
             where discrepancy_note_id=?
-
+        </sql>
+    </query>
+    <query>
+        <name>updateAssignedUserToNull</name>
+        <sql>
+            update discrepancy_note set
+            assigned_user_id = NULL
+            where discrepancy_note_id=?
         </sql>
     </query>
     <query>
