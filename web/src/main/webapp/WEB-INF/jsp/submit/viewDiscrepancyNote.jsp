@@ -73,7 +73,7 @@
                                 <%-- nothing here; if entityName is blank --%>
                             </c:otherwise>
                         </c:choose>
-                        Properties:</b>
+                        <fmt:message key="Properties" bundle="${resword}"/>:</b>
                         </div></div></div>
                     </td>
                 </tr>
@@ -131,7 +131,7 @@
                 <c:choose>
                 <c:when test="${name eq 'itemData' ||name eq 'ItemData'}">
                     <a href="javascript: openDocWindow('ViewItemDetail?itemId=<c:out value="${item.id}"/>')">
-                    Data Dictionary</a>
+                    <fmt:message key="Data_Dictionary" bundle="${resword}"/></a>
                 </c:when>
                 <c:otherwise>
                     <a href="javascript:scrollToY('audit');"><fmt:message key="Audit_History" bundle="${resword}"/></a>
@@ -197,8 +197,8 @@
                                             </c:if></b>
                                     </div>
                                     <div style="float: right; padding-left: 30px;">
-                                    	Last updated: <b><fmt:formatDate value="${note.value.lastDateUpdated}" pattern="${dteFormat}"/> by <c:out value="${note.value.owner.name}"/></b><br>
-                                    	Assigned to:&nbsp;&nbsp;  <b> <c:out value="${note.value.assignedUser.firstName}"/> <c:out value="${note.value.assignedUser.lastName}"/> (<c:out value ="${note.value.assignedUser.name}"/>)
+                                    	<fmt:message key="Last_updated" bundle="${resword}"/>: <b><fmt:formatDate value="${note.value.lastDateUpdated}" pattern="${dteFormat}"/> by <c:out value="${note.value.owner.name}"/></b><br>
+                                    	<fmt:message key="Assigned_to" bundle="${resword}"/>:&nbsp;&nbsp;  <b> <c:out value="${note.value.assignedUser.firstName}"/> <c:out value="${note.value.assignedUser.lastName}"/> (<c:out value ="${note.value.assignedUser.name}"/>)
                                     </div>
                                 </td>
                             </tr>
@@ -225,7 +225,7 @@
                                     <td class="table_cell" bgcolor="#f5f5f5" width="25%" align="right" valign="top" nowrap>
                                     	<fmt:formatDate value="${child.createdDate}" pattern="${dteFormat}"/> by <c:out value="${child.owner.name}"/><br>
                                     	<c:if test="${child.assignedUserId > 0}">
-                                        Assigned to: <c:out value="${child.assignedUser.firstName}"/> <c:out value="${child.assignedUser.lastName}"/> (<c:out value ="${child.assignedUser.name}"/>)
+                                        <fmt:message key="Assigned_to" bundle="${resword}"/>: <c:out value="${child.assignedUser.firstName}"/> <c:out value="${child.assignedUser.lastName}"/> (<c:out value ="${child.assignedUser.name}"/>)
                                 </tr>
                                 </c:if>
                                     </td>
