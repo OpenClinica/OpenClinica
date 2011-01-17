@@ -190,24 +190,23 @@ function setYPos(id) {
 		<c:if test="${parentId>0}">
 			<div Style="float:left"><fmt:message key="respond_this_Discrepancy_Note" bundle="${restext}"/></div>
 		</c:if>
-		<div Style="float:right">
+		<div style="float:right">
 			<a href="javascript:openDocWindow('help/2_3_discrepancyNotes_Help.html')"><img src="images/bt_Help_Home.gif" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>" class="icon_dnBox"></a>
 			<c:choose>
 			<c:when test="${parentId==0}">
 				<a href="javascript:scrollToY('p');" onclick="javascript:leftnavExpand('<c:out value="${boxId}"/>');javascript:addText('a0','<b><fmt:message key="begin_new_thread" bundle="${resword}"/></b>');"><img name="close_box" alt="<fmt:message key="Close_Box" bundle="${resword}"/>" src="images/bt_Remove.gif" class="icon_dnBox"></a>
 			</c:when>
 			<c:otherwise>
-				<a href="javascript:scrollToY('msg<c:out value="${parentId}"/>');" onclick="javascript:leftnavExpand('<c:out value="${boxId}"/>');javascript:addLinkText('a<c:out value="${parentId}"/>','<fmt:message key="reply_to_thread" bundle="${resword}"/>');"><img name="close_box" alt="<fmt:message key="Close_Box" bundle="${resword}"/>" src="images/bt_Remove.gif" class="icon_dnBox"></a>
+				<a href="javascript:scrollToY('msg<c:out value="${parentId}"/>');" onclick="javascript:leftnavExpand('<c:out value="${boxId}"/>');"><img name="close_box" alt="<fmt:message key="Close_Box" bundle="${resword}"/>" src="images/bt_Remove.gif" class="icon_dnBox"></a>
 			</c:otherwise>
 			</c:choose>
 		</div>
 		<div style="clear:both;"></div> 
 		<div id="dnBoxCol1-1"><fmt:message key="description" bundle="${resword}"/>:<span class="alert">*</span></div>
 		<div id="dnBoxCol2-1">
-			<span id="description${parentId}">
 				<div class="formfieldXL_BG"><input type="text" name="description${parentId}" value="<c:out value="${discrepancyNote.description}"/>" class="formfieldXL"></div>
 				<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="description${parentId}"/></jsp:include>
-			</span>
+			
 		</div>
 		<div id="dnBoxCol1"><fmt:message key="detailed_note" bundle="${resword}"/>:</div>
 		<div id="dnBoxCol2">
@@ -215,7 +214,6 @@ function setYPos(id) {
 		  		<textarea name="detailedDes${parentId}" rows="4" cols="50" class="formtextareaXL4"><c:out value="${discrepancyNote.detailedNotes}"/></textarea>
 			</div>
 			<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="detailedDes${parentId}"/></jsp:include>
-			</span>
 		</div>
 		
 		<c:choose>

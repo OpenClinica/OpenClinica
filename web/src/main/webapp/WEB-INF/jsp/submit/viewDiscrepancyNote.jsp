@@ -122,11 +122,9 @@
                 </td>
             	</tr>
             	<tr>
-            	<td class="table_cell_noborder">Current Value:&nbsp;&nbsp;</td>
-                <td class="table_cell_noborder">
-                	<b><c:out value="${entityValue}"/>&nbsp;</b>
-                </td>
-                <td class="table_cell_noborder" padding-left: 40px;">More:&nbsp;&nbsp;</td>
+            	<td class="table_cell_noborder"><fmt:message key="Current_Value" bundle="${resword}"/>:&nbsp;&nbsp;</td>
+                <td class="table_cell_noborder"><b><c:out value="${entityValue}"/>&nbsp;</b></td>
+                <td class="table_cell_noborder" padding-left: 40px;"><fmt:message key="More" bundle="${resword}"/>:&nbsp;&nbsp;</td>
                 <td class="table_cell_noborder">
                 <c:choose>
                 <c:when test="${name eq 'itemData' ||name eq 'ItemData'}">
