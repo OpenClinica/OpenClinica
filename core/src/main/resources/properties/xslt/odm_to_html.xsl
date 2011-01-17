@@ -673,8 +673,8 @@
                                                             </td>
                                                             <td class="table_cell">
                                                                 <xsl:choose>
-                                                                    <xsl:when test="$currentForm/@OpenClinica:StartDate">
-                                                                        <xsl:value-of select="$currentForm/@OpenClinica:StartDate"></xsl:value-of>
+                                                                    <xsl:when test="$currentForm/@OpenClinica:InterviewDate">
+                                                                        <xsl:value-of select="$currentForm/@OpenClinica:InterviewDate"></xsl:value-of>
                                                                     </xsl:when>
                                                                     <xsl:otherwise>
                                                                         <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
@@ -727,8 +727,8 @@
                                                                 </td>
                                                                 <td class="table_cell">
                                                                     <xsl:choose>
-                                                                        <xsl:when test="$currentForm/@OpenClinica:StartDate">
-                                                                            <xsl:value-of select="$currentForm/@OpenClinica:StartDate"></xsl:value-of>
+                                                                        <xsl:when test="$currentForm/@OpenClinica:InterviewDate">
+                                                                            <xsl:value-of select="$currentForm/@OpenClinica:InterviewDate"></xsl:value-of>
                                                                         </xsl:when>
                                                                         <xsl:otherwise>
                                                                             <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
@@ -783,8 +783,8 @@
                                                 </td>
                                                 <td class="table_cell">
                                                     <xsl:choose>
-                                                        <xsl:when test="$currentForm/@OpenClinica:StartDate">
-                                                            <xsl:value-of select="$currentForm/@OpenClinica:StartDate"></xsl:value-of>
+                                                        <xsl:when test="$currentForm/@OpenClinica:InterviewDate">
+                                                            <xsl:value-of select="$currentForm/@OpenClinica:InterviewDate"></xsl:value-of>
                                                         </xsl:when>
                                                         <xsl:otherwise>
                                                             <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
