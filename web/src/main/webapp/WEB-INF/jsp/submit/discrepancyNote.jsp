@@ -6,6 +6,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 
 <jsp:useBean scope='request' id='whichResStatus' class='java.lang.String' />
 <jsp:useBean scope='session' id='boxDNMap'  class="java.util.HashMap"/>
@@ -21,7 +22,7 @@ function showOnly(strLeftNavRowElementName){
     objLeftNavRowElement = MM_findObj(strLeftNavRowElementName);
     if (objLeftNavRowElement != null) {
         if (objLeftNavRowElement.style) { objLeftNavRowElement = objLeftNavRowElement.style; }
-        objLeftNavRowElement.display = (objLeftNavRowElement.display == "none" ) ? "" : "all";
+        objLeftNavRowElement.display = "block";
     }
 }
 
@@ -150,19 +151,6 @@ function setYPos(id) {
 			document.documentElement.scrollTop : document.body.scrollTop;
 	setValue("ypos"+id,y);
 }
-
-function addButtons() {
-	
-}
-
-function setDisabled(strLeftNavRowElementName,disabledValue) {
-	alert(strLeftNavRowElementName);
-	var objLeftNavRowElement = MM_findObj(strLeftNavRowElementName);
-	if (objLeftNavRowElement != null) {	
-	alert("setDisabled called");
-		objLeftNavRowElement.disabled = disabledValue;
-	}
-}
 //-->
 </script>
 
@@ -182,9 +170,9 @@ function setDisabled(strLeftNavRowElementName,disabledValue) {
 	</c:if>
 </c:forEach>
 <c:if test="${parentId==boxToShow}">
-	<c:set var="displayAll" value="all"/>
+	<c:set var="displayAll" value="block"/>
 </c:if>
-<form name="oneDNForm" method="POST" action="CreateOneDiscrepancyNote" id="form${boxId}"> 
+<form name="oneDNForm" method="POST" action="CreateOneDiscrepancyNote"> 
 <table border="0" cellpadding="0" cellspacing="0" style="float:left;display:<c:out value="${displayAll}"/>" id="${boxId}">
 	<input type="hidden" name="parentId" value="${parentId}"/>
 	<input type="hidden" name="viewDNLink${parentId}" value="${viewDNLink}"/>
@@ -199,36 +187,42 @@ function setDisabled(strLeftNavRowElementName,disabledValue) {
 	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 	<div class="textbox_center">
 	<table border="0" width="580">
-		<div style="float: right;">
+		<div Style="float:left"><fmt:message key="respond_this_Discrepancy_Note" bundle="${restext}"/></div>
+		<div Style="float:right">
+			<a href="javascript:openDocWindow('help/2_3_discrepancyNotes_Help.html')"><img src="images/bt_Help_Home.gif" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>" class="icon_dnBox"></a>
 			<c:choose>
 			<c:when test="${parentId==0}">
-				<p><a href="javascript:scrollToY('p');" onclick="javascript:leftnavExpand('<c:out value="${boxId}"/>');javascript:addText('a0','<b><fmt:message key="begin_new_thread" bundle="${resword}"/></b>');"><img name="close_box" alt="close_box" src="images/bt_Remove.gif" style="width:18px"></a></p>
+				<a href="javascript:scrollToY('p');" onclick="javascript:leftnavExpand('<c:out value="${boxId}"/>');javascript:addText('a0','<b><fmt:message key="begin_new_thread" bundle="${resword}"/></b>');"><img name="close_box" alt="<fmt:message key="Close_Box" bundle="${resword}"/>" src="images/bt_Remove.gif" class="icon_dnBox"></a>
 			</c:when>
 			<c:otherwise>
-				<p><a href="javascript:scrollToY('msg<c:out value="${parentId}"/>');" onclick="javascript:leftnavExpand('<c:out value="${boxId}"/>');javascript:addLinkText('a<c:out value="${parentId}"/>','<fmt:message key="reply_to_thread" bundle="${resword}"/>');"><img name="close_box" alt="close_box" src="images/bt_Remove.gif" style="width:18px"></a></p>
+				<a href="javascript:scrollToY('msg<c:out value="${parentId}"/>');" onclick="javascript:leftnavExpand('<c:out value="${boxId}"/>');javascript:addLinkText('a<c:out value="${parentId}"/>','<fmt:message key="reply_to_thread" bundle="${resword}"/>');"><img name="close_box" alt="<fmt:message key="Close_Box" bundle="${resword}"/>" src="images/bt_Remove.gif" class="icon_dnBox"></a>
 			</c:otherwise>
 			</c:choose>
 		</div>
-		<tr valign="top">
-		<td><fmt:message key="description" bundle="${resword}"/>:</td>
-		<td id="description${parentId}">
-		<div class="formfieldL_BG"><input type="text" name="description${parentId}" value="<c:out value="${discrepancyNote.description}"/>" class="formfieldL"></div>
-		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="description${parentId}"/></jsp:include>
-		</td>
-		<td valign="top"><span class="alert">*</span></td>
+		<div style="clear:both;"></div> 
+		<div id="dnBoxCol1-1"><fmt:message key="description" bundle="${resword}"/>:<span class="alert">*</span></div>
+		<div id="dnBoxCol2-1">
+			<span id="description${parentId}">
+				<div class="formfieldXL_BG"><input type="text" name="description${parentId}" value="<c:out value="${discrepancyNote.description}"/>" class="formfieldXL"></div>
+				<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="description${parentId}"/></jsp:include>
+			</span>
+		</div>
+		<div id="dnBoxCol1"><fmt:message key="detailed_note" bundle="${resword}"/>:</div>
+		<div id="dnBoxCol2">
+			<div class="formtextareaXL4_BG">
+		  		<textarea name="detailedDes${parentId}" rows="4" cols="50" class="formtextareaXL4"><c:out value="${discrepancyNote.detailedNotes}"/></textarea>
+			</div>
+			<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="detailedDes${parentId}"/></jsp:include>
+			</span>
+		</div>
 		
-		<td class="table_cell_noborder">
-		<table>
-			<td  class="table_cell_noborder"><fmt:message key="type" bundle="${resword}"/>:</td>
-			<td class="table_cell_noborder" width="75%"><div class="formfieldL_BG">
-			<c:choose>
-			<c:when test="${parentId > 0}">
-				<input type="hidden" name="typeId${parentId}" value="${param.typeId}"/>
-				<select name="pTypeId<c:out value="${parentId}"/>" id="pTypeId<c:out value="${parentId}"/>" class="formfieldL" disabled>
-					<option value="<c:out value="${param.typeId}"/>" selected><c:out value="${param.typeName}"/>
-				</select>
-			</c:when>
-			<c:otherwise>
+		<c:choose>
+		<c:when test="${parentId > 0}">
+			<input type="hidden" name="typeId${parentId}" value="${param.typeId}"/>
+		</c:when>
+		<c:otherwise>
+			<div id="dnBoxCol1"><fmt:message key="type" bundle="${resword}"/>:<span class="alert">*</span></div>
+			<div id="dnBoxCol2"><div class="formfieldL_BG">
 				<c:set var="typeIdl" value="${discrepancyNote.discrepancyNoteTypeId}"/>
 				<c:choose>
 				<c:when test="${whichResStatus == 22 || whichResStatus == 1}">
@@ -238,7 +232,7 @@ function setDisabled(strLeftNavRowElementName,disabledValue) {
 						<c:when test="${typeIdl == type.id}">
 						 	<c:choose>
 						    <c:when test="${study.status.frozen && (type.id==2 || type.id==4)}">
-									<option value="<c:out value="${type.id}"/>" disabled="true" selected ><c:out value="${type.name}"/>
+								<option value="<c:out value="${type.id}"/>" disabled="true" selected ><c:out value="${type.name}"/>
 						    </c:when>
 						    <c:otherwise>
 						   		<option value="<c:out value="${type.id}"/>" selected ><c:out value="${type.name}"/>
@@ -266,7 +260,7 @@ function setDisabled(strLeftNavRowElementName,disabledValue) {
 						<c:when test="${typeIdl == type.id}">
 						 	<c:choose>
 						    <c:when test="${study.status.frozen && (type.id==2 || type.id==4)}">
-									<option value="<c:out value="${type.id}"/>" disabled="true" selected ><c:out value="${type.name}"/>
+								<option value="<c:out value="${type.id}"/>" disabled="true" selected ><c:out value="${type.name}"/>
 						    </c:when>
 						    <c:otherwise>
 						   		<option value="<c:out value="${type.id}"/>" selected ><c:out value="${type.name}"/>
@@ -289,120 +283,108 @@ function setDisabled(strLeftNavRowElementName,disabledValue) {
 				</c:otherwise>
 				</c:choose>
 				<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="typeId${parentId}"/></jsp:include>
-			</c:otherwise>
-			</c:choose>
-			</div></td>
-		</table>
-		</td>
-		</tr>
+			</div></div>
+		</c:otherwise>
+		</c:choose>
 		
-		<tr valign="top">
-		<td><fmt:message key="detailed_note" bundle="${resword}"/>:</td>
-		<td>
-		<div class="formtextareaL4_BG">
-		  <textarea name="detailedDes${parentId}" rows="4" cols="50" class="formtextareaL4"><c:out value="${discrepancyNote.detailedNotes}"/></textarea>
-		</div>
-		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="detailedDes${parentId}"/></jsp:include>
-		</td>
-		<td valign="top"><span class="alert"></span></td>
-		
-		<td class="table_cell_noborder">
-		<table border="0" cellpadding="0" cellspacing="0">
-		<tr valign="top" id="res1${parentId}">
-		    <td  class="table_cell_noborder"><fmt:message key="resolution_status" bundle="${resword}"/>:</td>
-		    <td class="table_cell_noborder"><div class="formfieldL_BG">
-			<c:set var="resStatusIdl" value="${discrepancyNote.resolutionStatusId}"/>
-		    <select name="resStatusId${parentId}" id="resStatusId${parentId}" class="formfieldL">
-				<c:choose>
-				<c:when test="${(parentId>0 || whichResStatus==2 && discrepancyNote.discrepancyNoteTypeId==3) || whichResStatus==1}">
-					<c:set var="resStatuses" value="${resolutionStatuses}"/>
-				</c:when>
-				<c:otherwise>
-					<%-- for FVC; for Query, it will be set per setElements function --%>
-					<c:set var="resStatuses" value="${resolutionStatuses2}"/>
-				</c:otherwise>
-				</c:choose>
-				<c:forEach var="status" items="${resStatuses}">
+		<span id="res1${parentId}">
+			<div id="dnBoxCol1"><fmt:message key="Set_to_Status" bundle="${resword}"/>:<span class="alert">*</span></div>
+			<div id="dnBoxCol2">
+				<div class="formfieldL_BG">
+				<c:set var="resStatusIdl" value="${discrepancyNote.resolutionStatusId}"/>
+			    <select name="resStatusId${parentId}" id="resStatusId${parentId}" class="formfieldL">
 					<c:choose>
-					<c:when test="${resStatusIdl == status.id}">
-						   <option value="<c:out value="${status.id}"/>" selected ><c:out value="${status.name}"/>
+					<c:when test="${(parentId>0 || whichResStatus==2 && discrepancyNote.discrepancyNoteTypeId==3) || whichResStatus==1}">
+						<c:set var="resStatuses" value="${resolutionStatuses}"/>
 					</c:when>
 					<c:otherwise>
-							<option value="<c:out value="${status.id}"/>" ><c:out value="${status.name}"/>
+						<%-- for FVC; for Query, it will be set per setElements function --%>
+						<c:set var="resStatuses" value="${resolutionStatuses2}"/>
 					</c:otherwise>
 					</c:choose>
-				</c:forEach>
-			</select></div>
-		    <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="resStatusId${parentId}"/></jsp:include></td>
-		</tr>
-	
+					<c:forEach var="status" items="${resStatuses}">
+						<c:choose>
+						<c:when test="${resStatusIdl == status.id}">
+							   <option value="<c:out value="${status.id}"/>" selected ><c:out value="${status.name}"/>
+						</c:when>
+						<c:otherwise>
+								<option value="<c:out value="${status.id}"/>" ><c:out value="${status.name}"/>
+						</c:otherwise>
+						</c:choose>
+					</c:forEach>
+				</select>
+				</div>
+			</div>
+		</span>
+		
+		<c:set var="assign" value="0"/>
+		<c:if test="${discrepancyNote.discrepancyNoteTypeId == 3 || (discrepancyNote.discrepancyNoteTypeId==1 && parentId>0)}">
+			<c:set var="assign" value="1"/>
+		</c:if>
 		<c:choose>
 		<c:when test="${autoView == 0}">
-        	<tr valign="top" id="user1${parentId}" style="display:none">
+        	<span id="user1${parentId}" style="display:none">
 		</c:when>
 		<c:otherwise>
-			<tr valign="top" id="user1${parentId}" style="display:all">
+			<span id="user1${parentId}" style="display:block">
       	</c:otherwise>
 		</c:choose>
-		<c:if test="${discrepancyNote.discrepancyNoteTypeId == 3 || (discrepancyNote.discrepancyNoteTypeId==1 && parentId>0)}">
-			<td class="table_cell_noborder"><fmt:message key="assign_to_user" bundle="${resword}"/>:</td>
-			<td class="table_cell_noborder" width="80%"><div class="formfieldL_BG">
-			<c:choose>
-			<c:when test='${discrepancyNote.assignedUserId != ""}'>
-				<c:set var="userAccountId1" value="${discrepancyNote.assignedUserId}"/>
-			</c:when>
-			<c:otherwise>
-				<c:set var="userAccountId1" value="0"/>
-			</c:otherwise>
-			</c:choose>
-			<span id="xxx${parentId}">
-			<select name="userAccountId${parentId}" id="userAccountId${parentId}" class="formfieldL" >
-		  		<c:forEach var="user" items="${userAccounts}">
-		   		<c:choose>
-		     	<c:when test="${userAccountId1 == user.userAccountId}">
-		       		<option value="<c:out value="${user.userAccountId}"/>" selected><c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/> (<c:out value="${user.userName}"/>)
-		     	</c:when>
-		     	<c:otherwise>
-		       		<option value="<c:out value="${user.userAccountId}"/>"><c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/> (<c:out value="${user.userName}"/>)
-		     	</c:otherwise>
-		   		</c:choose>
-		 		</c:forEach>
-			</select>
-			</span>
-			<input type="hidden" name="userAccountId" value="<c:out value="${userAccountId1}"/>"/>		
-			<c:out value="${userAccountId}"/>
+		<c:if test="${assign == 1}">
+			<div id="dnBoxCol1"><fmt:message key="assign_to_user" bundle="${resword}"/>:</div>
+			<div id="dnBoxCol2" class="formfieldL_BG">
+				<div class="formfieldL_BG">
+					<c:choose>
+					<c:when test='${discrepancyNote.assignedUserId != ""}'>
+						<c:set var="userAccountId1" value="${discrepancyNote.assignedUserId}"/>
+					</c:when>
+					<c:otherwise>
+						<c:set var="userAccountId1" value="0"/>
+					</c:otherwise>
+					</c:choose>
+					<select name="userAccountId${parentId}" id="userAccountId${parentId}" class="formfieldL" >
+						<option value="0">
+				  		<c:forEach var="user" items="${userAccounts}">
+				   		<c:choose>
+				     	<c:when test="${userAccountId1 == user.userAccountId}">
+				       		<option value="<c:out value="${user.userAccountId}"/>" selected><c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/> (<c:out value="${user.userName}"/>)
+				     	</c:when>
+				     	<c:otherwise>
+				       		<option value="<c:out value="${user.userAccountId}"/>"><c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/> (<c:out value="${user.userName}"/>)
+				     	</c:otherwise>
+				   		</c:choose>
+				 		</c:forEach>
+					</select>
+				</div>
+		  		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="userAccountId${parentId}"/></jsp:include>
 			</div>
-		  	<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="userAccountId${parentId}"/></jsp:include></td>
-			</tr>
-		
-			<c:choose>
-			<c:when test="${autoView == 0}">
-				<tr valign="top" id="user2${parentId}" style="display:none">
-			</c:when>
-			<c:otherwise>
-				<tr valign="top" id="user2${parentId}" style="display:all">
-			</c:otherwise>
-			</c:choose>
-			<%-- should be an option for checked, unchecked, disabled--%>
-			<td align="right"><input name="sendEmail${parentId}" value="1" type="checkbox"/></td>
-			<td  class="table_cell_noborder"><fmt:message key="email_assigned_user" bundle="${resword}"/></td>		
-			</tr>
 		</c:if>
+		</span>
 		
-		<tr>
+		<c:choose>
+		<c:when test="${autoView == 0}">
+			<span id="user2${parentId}" style="display:none">
+		</c:when>
+		<c:otherwise>
+			<span id="user2${parentId}" style="display:block">
+		</c:otherwise>
+		</c:choose>
+		<c:if test="${assign == 1}">
+			<div id="dnBoxCol1"><fmt:message key="email_assigned_user" bundle="${resword}"/>:</div>
+			<div id="dnBoxCol2"><input name="sendEmail${parentId}" value="1" type="checkbox"/></div>		
+		</c:if>
+		</span>
+		
 		<c:set var= "noteEntityType" value="${discrepancyNote.entityType}"/>
 		<c:if test="${enterData == '1' || canMonitor == '1' || noteEntityType != 'itemData' }">
-			<td><input type="submit" name="Submit${parentId}" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" style="width:65px" onclick="javascript:setYPos('<c:out value="${parentId}"/>');"></td>
-			<td><input type="submit" name="SubmitExit${parentId}" value="<fmt:message key="submit_exit" bundle="${resword}"/>" class="button_medium" style="width:80px" onclick="javascript:setValue('close<c:out value="${parentId}"/>','true');javascript:setYPos('<c:out value="${parentId}"/>');"></td>
+			<div id="dnBoxCol3">
+				<input type="submit" name="Submit${parentId}" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onclick="javascript:setYPos('<c:out value="${parentId}"/>');">
+				<input type="submit" name="SubmitExit${parentId}" value="<fmt:message key="submit_exit" bundle="${resword}"/>" class="button_medium" onclick="javascript:setValue('close<c:out value="${parentId}"/>','true');javascript:setYPos('<c:out value="${parentId}"/>');">
+			</div>
 		</c:if>
-		</tr>
-		
 		<c:if test="${parentId==0}">
-			<tr valign="top">
-				<td class="table_cell_left">
+				<div style="float:left">
                 	<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="newChildAdded${parentId}"/></jsp:include>	
-                </td>
-			</tr>
+                </div>
 		</c:if>
 	</table>
     </div>
