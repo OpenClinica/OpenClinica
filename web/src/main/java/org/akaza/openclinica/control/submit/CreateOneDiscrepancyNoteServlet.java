@@ -6,14 +6,6 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-
-import javax.servlet.http.HttpSession;
-
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
@@ -46,6 +38,14 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+
+import javax.servlet.http.HttpSession;
+
 /**
  * Create a discrepancy note
  * 
@@ -67,8 +67,6 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
     public static final String FORM_DISCREPANCY_NOTES_NAME = "fdnotes";
     //public static final String DIS_NOTE = "discrepancyNote";
     public static final String RES_STATUS_ID = "resStatusId";
-    public static final String USER_ACCOUNTS = "userAccounts";// a list of user
-                                                              // accounts
     public static final String SUBMITTED_USER_ACCOUNT_ID = "userAccountId";
     public static final String PRESET_USER_ACCOUNT_ID = "preUserAccountId";
     public static final String EMAIL_USER_ACCOUNT = "sendEmail";
@@ -142,15 +140,8 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
         dn.setDiscrepancyNoteTypeId(typeId);
         dn.setDetailedNotes(detailedDes);
         dn.setResolutionStatusId(resStatusId);
-        // dn.setAssignedUserId(assignedUserAccountId);
-        // logic from CreateDiscrepancyNoteServlet
-        if (typeId != DiscrepancyNoteType.ANNOTATION.getId() && typeId != DiscrepancyNoteType.FAILEDVAL.getId()
-            && typeId != DiscrepancyNoteType.REASON_FOR_CHANGE.getId()) {
-            if (assignedUserAccountId > 0) {
-                dn.setAssignedUserId(assignedUserAccountId);
-            } else {
-                dn.setAssignedUserId(parent.getOwnerId());
-            }
+        if (typeId != DiscrepancyNoteType.ANNOTATION.getId() && typeId != DiscrepancyNoteType.REASON_FOR_CHANGE.getId()) {
+            dn.setAssignedUserId(assignedUserAccountId);
         }
         if (DiscrepancyNoteType.ANNOTATION.getId() == dn.getDiscrepancyNoteTypeId()) {
             updateStudyEvent(entityType, entityId);
@@ -185,8 +176,6 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
             dn.setField(field);
 
             if(parentId > 0) {
-                //dn.setOwnerId(parent.getOwnerId());
-                if (dn.getDiscrepancyNoteTypeId() == parent.getDiscrepancyNoteTypeId()) {
                     if (dn.getResolutionStatusId() != parent.getResolutionStatusId()) {
                         parent.setResolutionStatusId(dn.getResolutionStatusId());
                         dndao.update(parent);
@@ -194,14 +183,17 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
                             logger.info("Failed to update resolution status ID for the parent dn ID = " + parentId + ". ");
                         }
                     }
-                    if (dn.getAssignedUserId() != parent.getAssignedUserId() && dn.getAssignedUserId() != 0) {
+                    if (dn.getAssignedUserId() != parent.getAssignedUserId()) {
                         parent.setAssignedUserId(dn.getAssignedUserId());
-                        dndao.updateAssignedUser(parent);
+                        if(parent.getAssignedUserId()>0) {
+                            dndao.updateAssignedUser(parent);
+                        } else {
+                            dndao.updateAssignedUserToNull(parent);
+                        }
                         if(!parent.isActive()) {
                             logger.info("Failed to update assigned user ID for the parent dn ID= " + parentId + ". ");
                         }
                     }
-                }
             } else {
                 ypos = "0";
             }
