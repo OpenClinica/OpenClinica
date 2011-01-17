@@ -193,6 +193,7 @@ function giveFirstElementFocus(){
     }
 
 }
+function $(x){return document.getElementById(x);}
 /**
  * Display a sequence of three tabs (implemented as TD elements) in a JSP view;
  * by selecting only the tabs or TD elements that have a certain class name.
@@ -250,10 +251,27 @@ function selectTabs(tabNumber,totalNumberOfTabs,tabClassName) {
         if(! allTabs[tabNumber]){ return;}
 
         allTabs[tabNumber].style.display = "";
-
-        //cycle through all the tabs; the first sibling of the selected tab
+      //cycle through all the tabs; the first sibling of the selected tab
         //will have number tabNumber - 1, the next sibling with have
         //tabNumber + 1; all others should be display = "none"
+        
+    	if(tabNumber==2)
+    	{
+    		 for(var i = 0; i < tdCount; i++) {
+    	
+    	   if(i == tabNumber)  continue;  //already displayed
+
+                if(i == tabNumber - 2 || i == tabNumber - 1){ //prev sibling or next sibling
+
+                 continue;
+
+                } else {
+                    allTabs[i].style.display = "none";
+
+                }
+            }
+    	}
+    	else{
         for(var i = 0; i < tdCount; i++) {
             if(i == tabNumber)  continue;  //already displayed
 
@@ -266,6 +284,7 @@ function selectTabs(tabNumber,totalNumberOfTabs,tabClassName) {
 
             }
         }
+    	}
 
     }   // if(tDcount > 2)
 }
