@@ -187,7 +187,9 @@ function setYPos(id) {
 	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 	<div class="textbox_center">
 	<table border="0" width="580">
-		<div Style="float:left"><fmt:message key="respond_this_Discrepancy_Note" bundle="${restext}"/></div>
+		<c:if test="${parentId>0}">
+			<div Style="float:left"><fmt:message key="respond_this_Discrepancy_Note" bundle="${restext}"/></div>
+		</c:if>
 		<div Style="float:right">
 			<a href="javascript:openDocWindow('help/2_3_discrepancyNotes_Help.html')"><img src="images/bt_Help_Home.gif" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>" class="icon_dnBox"></a>
 			<c:choose>
