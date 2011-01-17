@@ -243,4 +243,11 @@
                         SELECT event_definition_crf_id_seq.nextval AS key from dual
                 </sql>
         </query>
+        <query>
+            <name>findAllByEventDefinitionIdAndOrdinal</name>
+            <sql>SELECT * FROM event_definition_crf
+             WHERE study_event_definition_id=? AND ordinal=?
+             order by ordinal asc
+            </sql>
+        </query>
 </queries>
