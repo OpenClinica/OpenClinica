@@ -188,7 +188,7 @@ function setYPos(id) {
 	<div class="textbox_center">
 	<table border="0" width="580">
 		<c:if test="${parentId>0}">
-			<div Style="float:left"><fmt:message key="respond_this_Discrepancy_Note" bundle="${restext}"/></div>
+			<div style="float:left"><fmt:message key="respond_this_Discrepancy_Note" bundle="${restext}"/></div>
 		</c:if>
 		<div style="float:right">
 			<a href="javascript:openDocWindow('help/2_3_discrepancyNotes_Help.html')"><img src="images/bt_Help_Home.gif" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>" class="icon_dnBox"></a>
@@ -202,14 +202,15 @@ function setYPos(id) {
 			</c:choose>
 		</div>
 		<div style="clear:both;"></div> 
-		<div id="dnBoxCol1-1"><fmt:message key="description" bundle="${resword}"/>:<span class="alert">*</span></div>
-		<div id="dnBoxCol2-1">
+		<div class="dnBoxCol1-1"><fmt:message key="description" bundle="${resword}"/>:<span class="alert">*</span></div>
+		<div class="dnBoxCol2-1">
+			<span id="description${parentId}">
 				<div class="formfieldXL_BG"><input type="text" name="description${parentId}" value="<c:out value="${discrepancyNote.description}"/>" class="formfieldXL"></div>
 				<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="description${parentId}"/></jsp:include>
-			
+			</span>
 		</div>
-		<div id="dnBoxCol1"><fmt:message key="detailed_note" bundle="${resword}"/>:</div>
-		<div id="dnBoxCol2">
+		<div class="dnBoxCol1"><fmt:message key="detailed_note" bundle="${resword}"/>:</div>
+		<div class="dnBoxCol2">
 			<div class="formtextareaXL4_BG">
 		  		<textarea name="detailedDes${parentId}" rows="4" cols="50" class="formtextareaXL4"><c:out value="${discrepancyNote.detailedNotes}"/></textarea>
 			</div>
@@ -221,8 +222,8 @@ function setYPos(id) {
 			<input type="hidden" name="typeId${parentId}" value="${param.typeId}"/>
 		</c:when>
 		<c:otherwise>
-			<div id="dnBoxCol1"><fmt:message key="type" bundle="${resword}"/>:<span class="alert">*</span></div>
-			<div id="dnBoxCol2"><div class="formfieldL_BG">
+			<div class="dnBoxCol1"><fmt:message key="type" bundle="${resword}"/>:<span class="alert">*</span></div>
+			<div class="dnBoxCol2"><div class="formfieldL_BG">
 				<c:set var="typeIdl" value="${discrepancyNote.discrepancyNoteTypeId}"/>
 				<c:choose>
 				<c:when test="${whichResStatus == 22 || whichResStatus == 1}">
@@ -288,8 +289,8 @@ function setYPos(id) {
 		</c:choose>
 		
 		<span id="res1${parentId}">
-			<div id="dnBoxCol1"><fmt:message key="Set_to_Status" bundle="${resword}"/>:<span class="alert">*</span></div>
-			<div id="dnBoxCol2">
+			<div class="dnBoxCol1"><fmt:message key="Set_to_Status" bundle="${resword}"/>:<span class="alert">*</span></div>
+			<div class="dnBoxCol2">
 				<div class="formfieldL_BG">
 				<c:set var="resStatusIdl" value="${discrepancyNote.resolutionStatusId}"/>
 			    <select name="resStatusId${parentId}" id="resStatusId${parentId}" class="formfieldL">
@@ -317,10 +318,6 @@ function setYPos(id) {
 			</div>
 		</span>
 		
-		<c:set var="assign" value="0"/>
-		<c:if test="${discrepancyNote.discrepancyNoteTypeId == 3 || (discrepancyNote.discrepancyNoteTypeId==1 && parentId>0)}">
-			<c:set var="assign" value="1"/>
-		</c:if>
 		<c:choose>
 		<c:when test="${autoView == 0}">
         	<span id="user1${parentId}" style="display:none">
@@ -329,9 +326,8 @@ function setYPos(id) {
 			<span id="user1${parentId}" style="display:block">
       	</c:otherwise>
 		</c:choose>
-		<c:if test="${assign == 1}">
-			<div id="dnBoxCol1"><fmt:message key="assign_to_user" bundle="${resword}"/>:</div>
-			<div id="dnBoxCol2" class="formfieldL_BG">
+			<div class="dnBoxCol1"><fmt:message key="assign_to_user" bundle="${resword}"/>:</div>
+			<div class="dnBoxCol2" class="formfieldL_BG">
 				<div class="formfieldL_BG">
 					<c:choose>
 					<c:when test='${discrepancyNote.assignedUserId != ""}'>
@@ -357,7 +353,6 @@ function setYPos(id) {
 				</div>
 		  		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="userAccountId${parentId}"/></jsp:include>
 			</div>
-		</c:if>
 		</span>
 		
 		<c:choose>
@@ -368,15 +363,13 @@ function setYPos(id) {
 			<span id="user2${parentId}" style="display:block">
 		</c:otherwise>
 		</c:choose>
-		<c:if test="${assign == 1}">
-			<div id="dnBoxCol1"><fmt:message key="email_assigned_user" bundle="${resword}"/>:</div>
-			<div id="dnBoxCol2"><input name="sendEmail${parentId}" value="1" type="checkbox"/></div>		
-		</c:if>
+			<div class="dnBoxCol1"><fmt:message key="email_assigned_user" bundle="${resword}"/>:</div>
+			<div class="dnBoxCol2"><input name="sendEmail${parentId}" value="1" type="checkbox"/></div>
 		</span>
 		
 		<c:set var= "noteEntityType" value="${discrepancyNote.entityType}"/>
 		<c:if test="${enterData == '1' || canMonitor == '1' || noteEntityType != 'itemData' }">
-			<div id="dnBoxCol3">
+			<div class="dnBoxCol3">
 				<input type="submit" name="Submit${parentId}" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onclick="javascript:setYPos('<c:out value="${parentId}"/>');">
 				<input type="submit" name="SubmitExit${parentId}" value="<fmt:message key="submit_exit" bundle="${resword}"/>" class="button_medium" onclick="javascript:setValue('close<c:out value="${parentId}"/>','true');javascript:setYPos('<c:out value="${parentId}"/>');">
 			</div>
