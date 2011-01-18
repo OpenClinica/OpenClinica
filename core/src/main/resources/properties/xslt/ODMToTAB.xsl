@@ -464,7 +464,7 @@
                                                 <xsl:when test="$subjectFormData/node()">
                                                     <xsl:value-of select="$currentForm/@OpenClinica:InterviewerName"></xsl:value-of>
                                                     <xsl:value-of select="$delimiter" />
-                                                    <xsl:value-of select="$currentForm/@OpenClinica:StartDate"></xsl:value-of>
+                                                    <xsl:value-of select="$currentForm/@OpenClinica:InterviewDate"></xsl:value-of>
                                                     <xsl:value-of select="$delimiter" />
                                                     <xsl:value-of select="$currentForm/@OpenClinica:Status"></xsl:value-of>
                                                     <xsl:value-of select="$delimiter" />
@@ -486,7 +486,7 @@
                                                     <xsl:when test="$subjectFormData/node()">
                                                         <xsl:value-of select="$currentForm/@OpenClinica:InterviewerName"></xsl:value-of>
                                                         <xsl:value-of select="$delimiter" />
-                                                        <xsl:value-of select="$currentForm/@OpenClinica:StartDate"></xsl:value-of>
+                                                        <xsl:value-of select="$currentForm/@OpenClinica:InterviewDate"></xsl:value-of>
                                                         <xsl:value-of select="$delimiter" />
                                                         <xsl:value-of select="$currentForm/@OpenClinica:Status"></xsl:value-of>
                                                         <xsl:value-of select="$delimiter" />
@@ -510,7 +510,7 @@
                                     <xsl:when test="$subjectFormData/node()">
                                         <xsl:value-of select="$currentForm/@OpenClinica:InterviewerName"></xsl:value-of>
                                         <xsl:value-of select="$delimiter" />
-                                        <xsl:value-of select="$currentForm/@OpenClinica:StartDate"></xsl:value-of>
+                                        <xsl:value-of select="$currentForm/@OpenClinica:InterviewDate"></xsl:value-of>
                                         <xsl:value-of select="$delimiter" />
                                         <xsl:value-of select="$currentForm/@OpenClinica:Status"></xsl:value-of>
                                         <xsl:value-of select="$delimiter" />
