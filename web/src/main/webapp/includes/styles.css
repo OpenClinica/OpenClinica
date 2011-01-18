@@ -1553,20 +1553,16 @@ akaza_logo{
     height:81px;
     float: left;
 }
-table.summaryTable{
-    border-top:1px #000000 solid;
-    border-left:1px #000000 solid;
-}
-.summaryTable tbody tr td{
-    border-right:1px #000000 solid;
-    border-bottom:1px #000000 solid;
-}
 
 /* initially created for creating new or child dn box */
-div#dnBoxCol1 {	float: left; width: 120; }
-div#dnBoxCol1-1 {	float: left; width: 120; margin-top:10}
-div#dnBoxCol2 { margin: 0 120 0 120; width: 260;/* 0 right 0 left*/ }
-div#dnBoxCol2-1 { margin: 0 120 0 120; width: 260; margin-top:10}
-div#dnBoxCol3 {	float: right; }
-div#dnBoxSpace {br}
+.dnBoxCol1 { float:left; width:120; }
+.dnBoxCol1-1 { float:left; width:120; margin-top:10; }
+.dnBoxCol2 { margin: 0 0 0 120; /* 0 right 0 left*/	width: 260; }
+.dnBoxCol2-1 { margin: 0 0 0 120; width: 260; margin-top:10 }
+.dnBoxCol3 { float: right; }
 .icon_dnBox { width: 23px; height: 13px; border: 0px; }
+.dnBoxText {
+	font-family: Tahoma Arial, Helvetica, sans-serif;
+    font-size: 11px;
+    color: #4D4D4D;
+}
