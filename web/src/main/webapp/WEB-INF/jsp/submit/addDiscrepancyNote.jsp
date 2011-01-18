@@ -302,6 +302,7 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
 			</c:otherwise>
 			</c:choose>
 			<select name="userAccountId" id="userAccountId" class="formfieldL" >
+				<option value="0">
 		  		<c:forEach var="user" items="${userAccounts}">
 		   		<c:choose>
 		     	<c:when test="${userAccountId1 == user.userAccountId}">
