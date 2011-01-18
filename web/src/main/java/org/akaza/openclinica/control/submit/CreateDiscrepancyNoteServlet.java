@@ -7,15 +7,6 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import java.text.DateFormat;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-
-import javax.servlet.http.HttpSession;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
@@ -55,6 +46,15 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
+
+import java.text.DateFormat;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+
+import javax.servlet.http.HttpSession;
 
 /**
  * Create a discrepancy note for a data entity
@@ -723,9 +723,13 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                                 dndao.update(pNote);
                             }
 
-                            if (note.getAssignedUserId() != pNote.getAssignedUserId() && note.getAssignedUserId() != 0) {
+                            if (note.getAssignedUserId() != pNote.getAssignedUserId()) {
                                 pNote.setAssignedUserId(note.getAssignedUserId());
-                                dndao.updateAssignedUser(pNote);
+                                if(pNote.getAssignedUserId()>0) {
+                                    dndao.updateAssignedUser(pNote);
+                                } else {
+                                    dndao.updateAssignedUserToNull(pNote);
+                                }
                             }
 
                         }
