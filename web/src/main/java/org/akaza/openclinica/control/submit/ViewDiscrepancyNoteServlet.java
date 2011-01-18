@@ -394,6 +394,9 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
                 //request.setAttribute("autoView", "1");
             }
             boxDNMap.put(0, dnb);
+        } else if(boxDNMap.containsKey(0)) {
+            int dnTypeId = boxDNMap.get(0).getDiscrepancyNoteTypeId();
+            autoviews.put(0, (dnTypeId==3 ? 1 : 0));
         }
         if(boxDNMap.containsKey(0)) {
             int dnTypeId0 = boxDNMap.get(0).getDiscrepancyNoteTypeId();
