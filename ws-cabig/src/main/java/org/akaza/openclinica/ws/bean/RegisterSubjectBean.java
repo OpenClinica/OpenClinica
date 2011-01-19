@@ -14,6 +14,13 @@ public class RegisterSubjectBean {
     private Date enrollmentDate;
     private String studySubjectLabel;
     private String requestorId;
+    public UserAccountBean getUser() {
+        return user;
+    }
+
+    public void setUser(UserAccountBean user) {
+        this.user = user;
+    }
     private UserAccountBean user; // auditing
     
     public RegisterSubjectBean(UserAccountBean user) {

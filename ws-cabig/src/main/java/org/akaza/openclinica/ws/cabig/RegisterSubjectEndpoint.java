@@ -2,7 +2,14 @@ package org.akaza.openclinica.ws.cabig;
 
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.submit.SubjectDAO;
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.ws.bean.RegisterSubjectBean;
 import org.akaza.openclinica.ws.logic.RegisterSubjectService;
 import org.slf4j.Logger;
@@ -42,6 +49,9 @@ public class RegisterSubjectEndpoint extends AbstractDomPayloadEndpoint {
     private final CoreResources coreResources;// TODO keep or toss?
     private final Locale locale;
     private final RegisterSubjectService subjectService;
+    SubjectDAO subjectDao;
+    StudyDAO studyDao;
+    StudySubjectDAO studySubjectDao;
     
     public RegisterSubjectEndpoint(DataSource dataSource, MessageSource messages, CoreResources coreResources) {
         
@@ -58,30 +68,70 @@ public class RegisterSubjectEndpoint extends AbstractDomPayloadEndpoint {
             Element requestElement,
             Document document) throws Exception {
         System.out.println("Request text ");
-        
+        SubjectBean finalSubjectBean = new SubjectBean();
+        finalSubjectBean.setLabel("");
         NodeList subjects = requestElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "studySubject");
-        if (subjects.getLength() > 0) {
-            System.out.println("found study subject: " + subjects.getLength());
-            logNodeList(subjects);
-            for (int i=0; i < subjects.getLength(); i++) {
-                Node childNode = subjects.item(i);
-                System.out.println("found birthday: " + getBirthdate(childNode));
-                // get user account bean from security here
-                UserAccountBean user = this.getUserAccount();
-                RegisterSubjectBean subjectBean = subjectService.generateSubjectBean(user, childNode);
-                // performedSubjectMilestone
-                NodeList performedMilestones = requestElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "performedSubjectMilestone");
-                if (performedMilestones.getLength() > 0) {
-                    for (int j = 0; j < performedMilestones.getLength(); j++) {
-                        Node performedMilestoneNode = performedMilestones.item(j);
-                        // TODO attach identifiers to subjectBean
+        try {
+            if (subjects.getLength() > 0) {
+                System.out.println("found study subject: " + subjects.getLength());
+                logNodeList(subjects);
+                for (int i=0; i < subjects.getLength(); i++) {
+                    Node childNode = subjects.item(i);
+                    System.out.println("found birthday: " + getBirthdate(childNode));
+                    // get user account bean from security here
+                    UserAccountBean user = this.getUserAccount();
+                    RegisterSubjectBean subjectBean = subjectService.generateSubjectBean(user, childNode);
+                    // performedSubjectMilestone
+                    NodeList performedMilestones = requestElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "performedSubjectMilestone");
+                    if (performedMilestones.getLength() > 0) {
+                        for (int j = 0; j < performedMilestones.getLength(); j++) {
+                            Node milestone = performedMilestones.item(j);
+                            subjectBean = subjectService.attachStudyIdentifiers(subjectBean, milestone);
+                        }
                     }
+                    finalSubjectBean = subjectService.generateSubjectBean(subjectBean);
+                    finalSubjectBean = getSubjectDao().create(finalSubjectBean);
+                    
+                    StudyBean studyBean = new StudyBean();
+                    if (subjectBean.getSiteUniqueIdentifier() != null) {
+                        studyBean = getStudyDao().findByUniqueIdentifier(subjectBean.getSiteUniqueIdentifier());
+                    } else {
+                        studyBean = getStudyDao().findByUniqueIdentifier(subjectBean.getStudyUniqueIdentifier());
+                    }
+                    StudySubjectBean studySubjectBean = new StudySubjectBean();
+                    studySubjectBean.setEnrollmentDate(subjectBean.getEnrollmentDate());
+                    studySubjectBean.setStatus(Status.AVAILABLE);
+                    studySubjectBean.setLabel(subjectBean.getStudySubjectLabel());
+                    studySubjectBean.setSubjectId(finalSubjectBean.getId());
+                    studySubjectBean.setStudyId(studyBean.getId());
+                    studySubjectBean.setSecondaryLabel(subjectBean.getStudySubjectLabel());
+                    studySubjectBean.setOwner(subjectBean.getUser());
+                    
+                    studySubjectBean = getStudySubjectDao().create(studySubjectBean, false);
+                    System.out.println("finished creation");
                 }
             }
-
+        } catch (NullPointerException npe) {
+            npe.printStackTrace();
         }
         
-        return mapConfirmation();
+        return mapConfirmation(finalSubjectBean.getLabel());
+        //TODO is it actually primary key? nta
+    }
+    
+    public SubjectDAO getSubjectDao() {
+        subjectDao = subjectDao != null ? subjectDao : new SubjectDAO(dataSource);
+        return subjectDao;
+    }
+    
+    public StudyDAO getStudyDao() {
+        studyDao = studyDao != null ? studyDao : new StudyDAO(dataSource);
+        return studyDao;
+    }
+    
+    public StudySubjectDAO getStudySubjectDao() {
+        studySubjectDao = studySubjectDao != null ? studySubjectDao : new StudySubjectDAO(dataSource);
+        return studySubjectDao;
     }
     
     /**
@@ -152,7 +202,7 @@ public class RegisterSubjectEndpoint extends AbstractDomPayloadEndpoint {
     }
 
     
-    private Element mapConfirmation() throws Exception {
+    private Element mapConfirmation(String studySubjectId) throws Exception {
         DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
         Document document = docBuilder.newDocument();
@@ -176,7 +226,7 @@ public class RegisterSubjectEndpoint extends AbstractDomPayloadEndpoint {
         typeAttr2.setNodeValue("II");
         patientIdentifier.setAttributeNode(typeAttr2);
         // extension="503" identifierName="Patient Position" displayable="false"
-        patientIdentifier.setAttribute("extension", "XXX");
+        patientIdentifier.setAttribute("extension", studySubjectId);
         // TODO set id number above
         patientIdentifier.setAttribute("identifierName", "Patient Position");
         patientIdentifier.setAttribute("displayable", "false");

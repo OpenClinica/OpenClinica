@@ -1,6 +1,8 @@
 package org.akaza.openclinica.ws.logic;
 
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.ws.bean.RegisterSubjectBean;
 
 import org.w3c.dom.Node;
@@ -16,6 +18,7 @@ public class RegisterSubjectService {
     public RegisterSubjectService() {
         
     }
+    
     public RegisterSubjectBean generateSubjectBean(UserAccountBean user, Node subject) {
         RegisterSubjectBean subjectBean = new RegisterSubjectBean(user);
         DomParsingService xmlService = new DomParsingService();
@@ -42,6 +45,48 @@ public class RegisterSubjectService {
             // do nothing here
         }
         return subjectBean;
+    }
+    
+    public RegisterSubjectBean attachStudyIdentifiers(RegisterSubjectBean rsbean, Node milestone) {
+        DomParsingService xmlService = new DomParsingService();
+        // <ns2:informedConsentDate value="20080101"/>
+        // <ns2:registrationDate xsi:type="ns1:TS" value="20080825"/>
+        // <ns2:registrationSiteIdentifier extension
+//        String consentDateStr = xmlService.getElementValue(milestone, 
+//                CONNECTOR_NAMESPACE_V1, "informedConsentDate", "value");
+        String registrationDateStr = xmlService.getElementValue(milestone, 
+                CONNECTOR_NAMESPACE_V1, "registrationDate", "value");
+        String registrationSiteIdentifier = xmlService.getElementValue(milestone, 
+                CONNECTOR_NAMESPACE_V1, "registrationSiteIdentifier", "extension");
+        
+        SimpleDateFormat local_df = new SimpleDateFormat("yyyyMMdd");
+        try {
+            Date enrollmentDate = local_df.parse(registrationDateStr);
+            rsbean.setEnrollmentDate(enrollmentDate);
+        } catch (ParseException pe) {
+            // do nothing here
+        }
+        rsbean.setStudySubjectLabel(registrationSiteIdentifier);
+        return rsbean;
+    }
+    public SubjectBean generateSubjectBean(RegisterSubjectBean rsbean) {
+        SubjectBean sbean = new SubjectBean();
+        sbean.setStatus(Status.AVAILABLE);
+        if (rsbean.getDateOfBirth() != null) {
+            sbean.setDateOfBirth(rsbean.getDateOfBirth());
+            sbean.setDobCollected(true);
+        } else {
+            sbean.setDobCollected(false);
+        }
+        sbean.setCreatedDate(new Date(System.currentTimeMillis()));
+        char gender = rsbean.getGender().charAt(0);
+        sbean.setGender(gender);
+        sbean.setLabel(rsbean.getUniqueIdentifier());
+        sbean.setName(rsbean.getUniqueIdentifier());
+        sbean.setOwner(rsbean.getUser());
+        sbean.setStudyIdentifier(rsbean.getStudyUniqueIdentifier());
+        sbean.setUniqueIdentifier(rsbean.getUniqueIdentifier());
+        return sbean;
     }
 
 }
