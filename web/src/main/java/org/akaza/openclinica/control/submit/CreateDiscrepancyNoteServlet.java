@@ -464,34 +464,26 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 
             if (parent.getId() == 0 || isNew) {// no parent, new note thread
                 if (enteringData) {
-                    if(currentRole.getRole().equals(Role.MONITOR)) {
-                        //Ideally, it should not get in this block because Monitor is not allowed to enter data. No?
-                        request.setAttribute("autoView", "1");
-                        logger.info("A Monitor is logging discrepancy note from data enter.");
-                    }else {
-                        if (isInError) {
-                            dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.FAILEDVAL.getId());
-    
-                        } else {
-                            dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.ANNOTATION.getId());
-                            dnb.setResolutionStatusId(ResolutionStatus.NOT_APPLICABLE.getId());
-                            // >> tbh WHO bug: set an assigned user for the parent
-                            // note
-                            // dnb.setAssignedUser(ub);
-                            // dnb.setAssignedUserId(ub.getId());
-                            // << tbh 08/2009
-    
-                        }
-                        if (isReasonForChange) {
-                            dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.REASON_FOR_CHANGE.getId());
-                            dnb.setResolutionStatusId(ResolutionStatus.NOT_APPLICABLE.getId());
-                            // request.setAttribute(PRESET_RES_STATUS, new Integer(ResolutionStatus.NOT_APPLICABLE.getId()).toString());
-                        }
-                        // << tbh 02/2010, trumps failed evaluation error checks
-                        // can we put this in admin editing 
-                        request.setAttribute("autoView", "0");
-                        // above set to automatically open up the user panel
+                    if (isInError) {
+                        dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.FAILEDVAL.getId());
+                    } else {
+                        dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.ANNOTATION.getId());
+                        dnb.setResolutionStatusId(ResolutionStatus.NOT_APPLICABLE.getId());
+                        // >> tbh WHO bug: set an assigned user for the parent
+                        // note
+                        // dnb.setAssignedUser(ub);
+                        // dnb.setAssignedUserId(ub.getId());
+                        // << tbh 08/2009
                     }
+                    if (isReasonForChange) {
+                        dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.REASON_FOR_CHANGE.getId());
+                        dnb.setResolutionStatusId(ResolutionStatus.NOT_APPLICABLE.getId());
+                        // request.setAttribute(PRESET_RES_STATUS, new Integer(ResolutionStatus.NOT_APPLICABLE.getId()).toString());
+                    }
+                    // << tbh 02/2010, trumps failed evaluation error checks
+                    // can we put this in admin editing 
+                    request.setAttribute("autoView", "0");
+                    // above set to automatically open up the user panel
                 } else {
                     // when the user is a CRC and is adding a note to the thread
                     // it should default to Resolution Proposed,
