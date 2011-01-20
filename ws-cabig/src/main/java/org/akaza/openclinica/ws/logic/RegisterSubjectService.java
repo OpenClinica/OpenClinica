@@ -2,8 +2,11 @@ package org.akaza.openclinica.ws.logic;
 
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.ws.bean.RegisterSubjectBean;
+import org.akaza.openclinica.ws.cabig.exception.CCDataValidationFaultException;
 
 import org.w3c.dom.Node;
 
@@ -19,7 +22,7 @@ public class RegisterSubjectService {
         
     }
     
-    public RegisterSubjectBean generateSubjectBean(UserAccountBean user, Node subject) {
+    public RegisterSubjectBean generateSubjectBean(UserAccountBean user, Node subject) throws CCDataValidationFaultException {
         RegisterSubjectBean subjectBean = new RegisterSubjectBean(user);
         DomParsingService xmlService = new DomParsingService();
         String subjectDOB = xmlService.getElementValue(subject, CONNECTOR_NAMESPACE_V1, "birthDate", "value");
@@ -27,8 +30,8 @@ public class RegisterSubjectService {
         String identifier = xmlService.getElementValue(subject, CONNECTOR_NAMESPACE_V1, "identifier", "extension");
         String studyIdentifier = xmlService.getElementValue(subject, CONNECTOR_NAMESPACE_V1, "studyIdentifier", "extension");
         String studySiteIdentifier = xmlService.getElementValue(subject, CONNECTOR_NAMESPACE_V1, "studySiteIdentifier", "extension");
-        System.out.println("dob: " + subjectDOB + " gender " + subjectGender + 
-                " identifier " + identifier + " study " + studyIdentifier + " studysite " + studySiteIdentifier);
+//        System.out.println("dob: " + subjectDOB + " gender " + subjectGender + 
+//                " identifier " + identifier + " study " + studyIdentifier + " studysite " + studySiteIdentifier);
         subjectBean.setSiteUniqueIdentifier(studySiteIdentifier);
         subjectBean.setStudyUniqueIdentifier(studyIdentifier);
         subjectBean.setUniqueIdentifier(identifier);
@@ -42,12 +45,13 @@ public class RegisterSubjectService {
             Date dateOfBirth = local_df.parse(subjectDOB);
             subjectBean.setDateOfBirth(dateOfBirth);
         } catch (ParseException pe) {
-            // do nothing here
+            // throw the data fault exception
+            throw new CCDataValidationFaultException("Problem parsing date, it should be in YYYYMMDD format.");
         }
         return subjectBean;
     }
     
-    public RegisterSubjectBean attachStudyIdentifiers(RegisterSubjectBean rsbean, Node milestone) {
+    public RegisterSubjectBean attachStudyIdentifiers(RegisterSubjectBean rsbean, Node milestone) throws CCDataValidationFaultException {
         DomParsingService xmlService = new DomParsingService();
         // <ns2:informedConsentDate value="20080101"/>
         // <ns2:registrationDate xsi:type="ns1:TS" value="20080825"/>
@@ -64,7 +68,8 @@ public class RegisterSubjectService {
             Date enrollmentDate = local_df.parse(registrationDateStr);
             rsbean.setEnrollmentDate(enrollmentDate);
         } catch (ParseException pe) {
-            // do nothing here
+            // throw the data fault exception
+            throw new CCDataValidationFaultException("Problem parsing date, it should be in YYYYMMDD format.");
         }
         rsbean.setStudySubjectLabel(registrationSiteIdentifier);
         return rsbean;
@@ -87,6 +92,19 @@ public class RegisterSubjectService {
         sbean.setStudyIdentifier(rsbean.getStudyUniqueIdentifier());
         sbean.setUniqueIdentifier(rsbean.getUniqueIdentifier());
         return sbean;
+    }
+    
+    public StudySubjectBean generateStudySubjectBean(RegisterSubjectBean subjectBean, SubjectBean finalSubjectBean, StudyBean studyBean) {
+        StudySubjectBean studySubjectBean = new StudySubjectBean();
+        studySubjectBean.setEnrollmentDate(subjectBean.getEnrollmentDate());
+        studySubjectBean.setStatus(Status.AVAILABLE);
+        studySubjectBean.setLabel(subjectBean.getStudySubjectLabel());
+        studySubjectBean.setSubjectId(finalSubjectBean.getId());
+        studySubjectBean.setStudyId(studyBean.getId());
+        // studySubjectBean.setSecondaryLabel(subjectBean.getStudySubjectLabel());
+        studySubjectBean.setSecondaryLabel("");
+        studySubjectBean.setOwner(subjectBean.getUser());
+        return studySubjectBean;
     }
 
 }

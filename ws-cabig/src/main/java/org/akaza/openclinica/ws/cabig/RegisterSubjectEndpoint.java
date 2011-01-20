@@ -10,6 +10,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
+import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.ws.bean.RegisterSubjectBean;
 import org.akaza.openclinica.ws.logic.RegisterSubjectService;
 import org.slf4j.Logger;
@@ -76,10 +77,13 @@ public class RegisterSubjectEndpoint extends AbstractDomPayloadEndpoint {
                 System.out.println("found study subject: " + subjects.getLength());
                 logNodeList(subjects);
                 for (int i=0; i < subjects.getLength(); i++) {
+                    // will subjects always be sent one at a time? nta
                     Node childNode = subjects.item(i);
-                    System.out.println("found birthday: " + getBirthdate(childNode));
+                    // System.out.println("found birthday: " + getBirthdate(childNode));
                     // get user account bean from security here
                     UserAccountBean user = this.getUserAccount();
+                    // is this user allowed to create subjects? if not, throw a ccsystem fault exception
+                    
                     RegisterSubjectBean subjectBean = subjectService.generateSubjectBean(user, childNode);
                     // performedSubjectMilestone
                     NodeList performedMilestones = requestElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "performedSubjectMilestone");
@@ -89,34 +93,48 @@ public class RegisterSubjectEndpoint extends AbstractDomPayloadEndpoint {
                             subjectBean = subjectService.attachStudyIdentifiers(subjectBean, milestone);
                         }
                     }
+                    // will there ever be more than one subject-study pair sent in a message? tba
+                    StudyBean studyBean = new StudyBean();
+                    StudyBean siteBean = new StudyBean();
+                    
+                    if (subjectBean.getSiteUniqueIdentifier() != null) {
+                        siteBean = getStudyDao().findByUniqueIdentifier(subjectBean.getSiteUniqueIdentifier());
+                    } 
+                    studyBean = getStudyDao().findByUniqueIdentifier(subjectBean.getStudyUniqueIdentifier());
+                    
+                    if (siteBean.getId() > 0) {
+                        // if there is a site bean, the study bean should be its parent, otherwise there is an error
+                        studyBean = siteBean;
+                    }
+                    // are there errors here? if so, throw a ccbusiness fault
+                    
+                    // below is point of no return - we have caught all the error and are committing to the database
                     finalSubjectBean = subjectService.generateSubjectBean(subjectBean);
                     finalSubjectBean = getSubjectDao().create(finalSubjectBean);
                     
-                    StudyBean studyBean = new StudyBean();
-                    if (subjectBean.getSiteUniqueIdentifier() != null) {
-                        studyBean = getStudyDao().findByUniqueIdentifier(subjectBean.getSiteUniqueIdentifier());
-                    } else {
-                        studyBean = getStudyDao().findByUniqueIdentifier(subjectBean.getStudyUniqueIdentifier());
-                    }
-                    StudySubjectBean studySubjectBean = new StudySubjectBean();
-                    studySubjectBean.setEnrollmentDate(subjectBean.getEnrollmentDate());
-                    studySubjectBean.setStatus(Status.AVAILABLE);
-                    studySubjectBean.setLabel(subjectBean.getStudySubjectLabel());
-                    studySubjectBean.setSubjectId(finalSubjectBean.getId());
-                    studySubjectBean.setStudyId(studyBean.getId());
-                    studySubjectBean.setSecondaryLabel(subjectBean.getStudySubjectLabel());
-                    studySubjectBean.setOwner(subjectBean.getUser());
+                    StudySubjectBean studySubjectBean = subjectService.generateStudySubjectBean(subjectBean, finalSubjectBean, studyBean);
                     
                     studySubjectBean = getStudySubjectDao().create(studySubjectBean, false);
                     System.out.println("finished creation");
                 }
             }
-        } catch (NullPointerException npe) {
+            // return success message here
+            return mapConfirmation(finalSubjectBean.getLabel());
+            //TODO is it actually primary key? nta
+        } catch (Exception npe) {
             npe.printStackTrace();
+            // TODO figure out exception and send response
+            if (npe.getClass().getName().startsWith("org.akaza.openclinica.ws.cabig.exception")) {
+                System.out.println("found " + npe.getClass().getName());
+                OpenClinicaException ope = (OpenClinicaException) npe;
+                return mapErrorConfirmation("", ope);
+            } else {
+                System.out.println(" did not find openclinica exception, found " + npe.getClass().getName());
+                return mapErrorConfirmation(npe.getMessage());
+            }
         }
         
-        return mapConfirmation(finalSubjectBean.getLabel());
-        //TODO is it actually primary key? nta
+        
     }
     
     public SubjectDAO getSubjectDao() {
@@ -200,6 +218,60 @@ public class RegisterSubjectEndpoint extends AbstractDomPayloadEndpoint {
         return ret;
         
     }
+    
+    private Element mapErrorConfirmation(String message, OpenClinicaException exception) throws Exception {
+        DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
+        Document document = docBuilder.newDocument();
+        
+        Element responseElement = document.createElementNS(CONNECTOR_NAMESPACE_V1, "RegisterSubjectResponse");
+        Element indicator = document.createElementNS(CONNECTOR_NAMESPACE_V1, "indicator");
+        Attr typeAttr = document.createAttributeNS(XSL_NAMESPACE, "type");
+        typeAttr.setNodeValue("BL");
+        // indicator.setAttributeNS(XSL_NAMESPACE, "type", "II");
+        indicator.setAttributeNode(typeAttr);
+        indicator.setAttribute("value", "false");
+        responseElement.appendChild(indicator);
+        // append message here
+        Element errormessage = document.createElementNS(CONNECTOR_NAMESPACE_V1, "message");
+        //String confirmation = messages.getMessage("dataEndpoint.success", null, "Success", locale);
+        Element code = document.createElementNS(CONNECTOR_NAMESPACE_V1, "code");
+        code.setTextContent(exception.errorID);
+        errormessage.appendChild(code);
+        Element reason = document.createElementNS(CONNECTOR_NAMESPACE_V1, "reason");
+        reason.setTextContent(exception.message);
+        errormessage.appendChild(reason);
+        responseElement.appendChild(errormessage);
+        // add subject message here?
+        return responseElement;
+    }
+    
+    private Element mapErrorConfirmation(String message) throws Exception {
+        DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
+        Document document = docBuilder.newDocument();
+        
+        Element responseElement = document.createElementNS(CONNECTOR_NAMESPACE_V1, "RegisterSubjectResponse");
+        Element indicator = document.createElementNS(CONNECTOR_NAMESPACE_V1, "indicator");
+        Attr typeAttr = document.createAttributeNS(XSL_NAMESPACE, "type");
+        typeAttr.setNodeValue("BL");
+        // indicator.setAttributeNS(XSL_NAMESPACE, "type", "II");
+        indicator.setAttributeNode(typeAttr);
+        indicator.setAttribute("value", "false");
+        responseElement.appendChild(indicator);
+        // append message here
+        Element errormessage = document.createElementNS(CONNECTOR_NAMESPACE_V1, "message");
+        //String confirmation = messages.getMessage("dataEndpoint.success", null, "Success", locale);
+        Element code = document.createElementNS(CONNECTOR_NAMESPACE_V1, "code");
+        code.setTextContent("CCSystemFault");
+        errormessage.appendChild(code);
+        Element reason = document.createElementNS(CONNECTOR_NAMESPACE_V1, "reason");
+        reason.setTextContent(message);
+        errormessage.appendChild(reason);
+        responseElement.appendChild(errormessage);
+        // add subject message here?
+        return responseElement;
+    }
 
     
     private Element mapConfirmation(String studySubjectId) throws Exception {
@@ -218,7 +290,7 @@ public class RegisterSubjectEndpoint extends AbstractDomPayloadEndpoint {
         // indicator.setAttributeNS(XSL_NAMESPACE, "type", "II");
         indicator.setAttributeNode(typeAttr);
         indicator.setAttribute("value", "true");
-        // TODO add attributes here
+        
         responseElement.appendChild(indicator);
         Element patientIdentifier = document.createElementNS(CONNECTOR_NAMESPACE_V1, "patientIdentifier");
         patientIdentifier.setAttribute("root", "2.16.840.1.113883.3.26.7.6");
@@ -227,7 +299,7 @@ public class RegisterSubjectEndpoint extends AbstractDomPayloadEndpoint {
         patientIdentifier.setAttributeNode(typeAttr2);
         // extension="503" identifierName="Patient Position" displayable="false"
         patientIdentifier.setAttribute("extension", studySubjectId);
-        // TODO set id number above
+        
         patientIdentifier.setAttribute("identifierName", "Patient Position");
         patientIdentifier.setAttribute("displayable", "false");
         responseElement.appendChild(patientIdentifier);
