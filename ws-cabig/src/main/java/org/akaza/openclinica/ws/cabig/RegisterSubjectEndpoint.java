@@ -5,6 +5,7 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
+import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -13,6 +14,9 @@ import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.ws.bean.RegisterSubjectBean;
 import org.akaza.openclinica.ws.logic.RegisterSubjectService;
+import org.akaza.openclinica.ws.cabig.exception.CCDataValidationFaultException;
+import org.akaza.openclinica.ws.cabig.exception.CCSystemFaultException;
+import org.akaza.openclinica.ws.cabig.exception.CCBusinessFaultException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.oxm.Marshaller;
@@ -83,6 +87,13 @@ public class RegisterSubjectEndpoint extends AbstractDomPayloadEndpoint {
                     // get user account bean from security here
                     UserAccountBean user = this.getUserAccount();
                     // is this user allowed to create subjects? if not, throw a ccsystem fault exception
+                    Role r = user.getActiveStudyRole();
+                    if (r != null && (r.equals(Role.COORDINATOR) || r.equals(Role.STUDYDIRECTOR) ||
+                            r.equals(Role.INVESTIGATOR) || r.equals(Role.RESEARCHASSISTANT) || r.equals(Role.ADMIN))) {
+                        // you may pass
+                    } else {
+                        throw new CCSystemFaultException("You do not possess the correct privileges to create a subject.");
+                    }
                     
                     RegisterSubjectBean subjectBean = subjectService.generateSubjectBean(user, childNode);
                     // performedSubjectMilestone
@@ -102,14 +113,29 @@ public class RegisterSubjectEndpoint extends AbstractDomPayloadEndpoint {
                     } 
                     studyBean = getStudyDao().findByUniqueIdentifier(subjectBean.getStudyUniqueIdentifier());
                     
+                    if (studyBean.getId() <= 0) {
+                        // if no study exists with that name, there is an error
+                        throw new CCBusinessFaultException("No study exists with that name, please review your information and re-submit the request.");
+                    }
                     if (siteBean.getId() > 0) {
                         // if there is a site bean, the study bean should be its parent, otherwise there is an error
+                        if ((siteBean.getParentStudyId() != studyBean.getId()) && (siteBean.getParentStudyId() != 0)) {
+                            throw new CCBusinessFaultException("Your parent and child study relationship is mismatched." + 
+                                    "  Please enter correct study and site information.");
+                        }
                         studyBean = siteBean;
                     }
-                    // are there errors here? if so, throw a ccbusiness fault
                     
-                    // below is point of no return - we have caught all the error and are committing to the database
+                    // are there errors here? if so, throw a ccbusiness fault
                     finalSubjectBean = subjectService.generateSubjectBean(subjectBean);
+                    
+                    SubjectBean testSubjectBean = getSubjectDao().findByUniqueIdentifier(subjectBean.getUniqueIdentifier());
+                    if (testSubjectBean.getId() > 0) {
+                        throw new CCBusinessFaultException("You already have a subject in the database with the unique identifier of " + 
+                                subjectBean.getUniqueIdentifier() + ".  Please review your data and re-submit your request.");
+                    }
+                    // below is point of no return - we have caught all the error and are committing to the database
+                    
                     finalSubjectBean = getSubjectDao().create(finalSubjectBean);
                     
                     StudySubjectBean studySubjectBean = subjectService.generateStudySubjectBean(subjectBean, finalSubjectBean, studyBean);
