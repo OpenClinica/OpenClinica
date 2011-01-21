@@ -1,6 +1,7 @@
 package org.akaza.openclinica.ws.cabig;
 
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -41,10 +42,12 @@ public class RollbackRegisterSubjectEndpoint extends AbstractCabigDomEndpoint {
             Document document) throws Exception {
         System.out.println("hit rollback");
         NodeList subjects = requestElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "studySubject");
+        SubjectBean finalSubjectBean = new SubjectBean();
+        finalSubjectBean.setLabel("");
         try {
             if (subjects.getLength() > 0) {
                 System.out.println("found study subject: " + subjects.getLength());
-                logNodeList(subjects);
+                // logNodeList(subjects);
                 for (int i=0; i < subjects.getLength(); i++) {
                     // will subjects always be sent one at a time? nta
                     Node childNode = subjects.item(i);
@@ -66,27 +69,67 @@ public class RollbackRegisterSubjectEndpoint extends AbstractCabigDomEndpoint {
                         }
                     }
                     // check to make sure the subject is already created
-                    SubjectBean finalSubjectBean = subjectService.generateSubjectBean(subjectBean);
+                    finalSubjectBean = subjectService.generateSubjectBean(subjectBean);
                     SubjectBean checkSubjectBean = getSubjectDao().findByUniqueIdentifier(finalSubjectBean.getUniqueIdentifier());
                     // does the subject already exist? if so, continue, otherwise, exit out
                     if (checkSubjectBean.getId() <= 0) {
                         throw new CCBusinessFaultException("This subject does not exist in the database.  " +
-                                "Please check your data and re-submit");
+                                "Please check your data and re-submit.");
                         
                     }
+                    StudyBean studyBean = getStudyDao().findByUniqueIdentifier(subjectBean.getStudyUniqueIdentifier());
+                    StudyBean siteBean = getStudyDao().findByUniqueIdentifier(subjectBean.getSiteUniqueIdentifier());
+                    // should it be findSiteByUniqueIdentifier?
+                    // dry
+                    if (studyBean.getId() <= 0) {
+                        // if no study exists with that name, there is an error
+                        throw new CCBusinessFaultException("No study exists with that name, please review your information and re-submit the request.");
+                    }
+                    if (siteBean.getId() > 0) {
+                        // if there is a site bean, the study bean should be its parent, otherwise there is an error
+                        if ((siteBean.getParentStudyId() != studyBean.getId()) && (siteBean.getParentStudyId() != 0)) {
+                            throw new CCBusinessFaultException("Your parent and child study relationship is mismatched." + 
+                                    "  Please enter correct study and site information.");
+                        }
+                        studyBean = siteBean;
+                    }
+                    // dry
+                    StudySubjectBean studySubjectBean = subjectService.generateStudySubjectBean(subjectBean, finalSubjectBean, studyBean);
+                    StudySubjectBean checkStudySubjectBean = getStudySubjectDao().findByLabelAndStudy(studySubjectBean.getLabel(), studyBean);
+                    if (checkStudySubjectBean.getId() <= 0) {
+                        throw new CCBusinessFaultException("No relationship with this SSID currently exists.  " + 
+                                "Please check your information and re-submit the form.");
+                    }
+                    // point of no return
+                    checkStudySubjectBean.setStatus(Status.DELETED);
+                    checkStudySubjectBean.setUpdater(this.getUserAccount());
+                    // will need to delete crfs too, per discussed logic:
+                    // Removing a study subject will set the status of all of the subject's CRFs to Removed.
+                    // Creating a new study subject with the same unique identifiers as a rolled-back subject will cause OpenClinica to Restore and Update the subject's CRFs.
+                    checkSubjectBean.setStatus(Status.DELETED);
+                    checkSubjectBean.setUpdater(this.getUserAccount());
+                    checkStudySubjectBean = (StudySubjectBean)getStudySubjectDao().update(checkStudySubjectBean);
+                    checkSubjectBean = (SubjectBean)getSubjectDao().update(checkSubjectBean);
+                    System.out.println("completed updates to deleted");
+                    
                 }
             }
+            return this.mapRegisterSubjectConfirmation(finalSubjectBean.getLabel());
+            // may have to switch it to primary key
         } catch (Exception npe) {
             if (npe.getClass().getName().startsWith("org.akaza.openclinica.ws.cabig.exception")) {
+                npe.printStackTrace();
                 System.out.println("found " + npe.getClass().getName());
+                
                 OpenClinicaException ope = (OpenClinicaException) npe;
                 return mapSubjectErrorConfirmation("", ope);
             } else {
+                npe.printStackTrace();
                 System.out.println(" did not find openclinica exception, found " + npe.getClass().getName());
                 return mapSubjectErrorConfirmation(npe.getMessage());
             }
         }
-        return this.mapRegisterSubjectConfirmation("test");
+        
     }
      
     /**

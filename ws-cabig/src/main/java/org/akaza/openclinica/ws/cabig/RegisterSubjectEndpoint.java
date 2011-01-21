@@ -113,6 +113,7 @@ public class RegisterSubjectEndpoint extends AbstractDomPayloadEndpoint {
                     } 
                     studyBean = getStudyDao().findByUniqueIdentifier(subjectBean.getStudyUniqueIdentifier());
                     
+                    // dry
                     if (studyBean.getId() <= 0) {
                         // if no study exists with that name, there is an error
                         throw new CCBusinessFaultException("No study exists with that name, please review your information and re-submit the request.");
@@ -125,6 +126,7 @@ public class RegisterSubjectEndpoint extends AbstractDomPayloadEndpoint {
                         }
                         studyBean = siteBean;
                     }
+                    // dry
                     
                     // are there errors here? if so, throw a ccbusiness fault
                     finalSubjectBean = subjectService.generateSubjectBean(subjectBean);
