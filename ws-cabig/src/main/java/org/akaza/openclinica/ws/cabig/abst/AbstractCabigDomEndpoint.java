@@ -134,7 +134,7 @@ public class AbstractCabigDomEndpoint extends AbstractDomPayloadEndpoint {
         return responseElement;
     }
     
-    private Element mapSubjectErrorConfirmation(String message, OpenClinicaException exception) throws Exception {
+    public Element mapSubjectErrorConfirmation(String message, OpenClinicaException exception) throws Exception {
         DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
         Document document = docBuilder.newDocument();
@@ -162,7 +162,7 @@ public class AbstractCabigDomEndpoint extends AbstractDomPayloadEndpoint {
         return responseElement;
     }
     
-    private Element mapSubjectErrorConfirmation(String message) throws Exception {
+    public Element mapSubjectErrorConfirmation(String message) throws Exception {
         DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
         Document document = docBuilder.newDocument();

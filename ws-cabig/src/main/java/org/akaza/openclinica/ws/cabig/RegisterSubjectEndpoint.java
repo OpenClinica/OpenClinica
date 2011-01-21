@@ -134,12 +134,18 @@ public class RegisterSubjectEndpoint extends AbstractDomPayloadEndpoint {
                         throw new CCBusinessFaultException("You already have a subject in the database with the unique identifier of " + 
                                 subjectBean.getUniqueIdentifier() + ".  Please review your data and re-submit your request.");
                     }
+                    // StudySubjectBean studySubjectBean = subjectService.generateStudySubjectBean(subjectBean, finalSubjectBean, studyBean);
+                    StudySubjectBean testStudySubjectBean = getStudySubjectDao().findByLabelAndStudy(subjectBean.getStudySubjectLabel(), studyBean);
+                    if (testStudySubjectBean.getId() > 0) {
+                        throw new CCBusinessFaultException("You already have a study subject in the database with the SSID of " + subjectBean.getStudySubjectLabel()
+                                + 
+                                ".  Please change it and try your request again.");
+                    }
                     // below is point of no return - we have caught all the error and are committing to the database
                     
                     finalSubjectBean = getSubjectDao().create(finalSubjectBean);
-                    
                     StudySubjectBean studySubjectBean = subjectService.generateStudySubjectBean(subjectBean, finalSubjectBean, studyBean);
-                    
+                    // needs to be generated with an id, which is why we recreate, tbh
                     studySubjectBean = getStudySubjectDao().create(studySubjectBean, false);
                     System.out.println("finished creation");
                 }

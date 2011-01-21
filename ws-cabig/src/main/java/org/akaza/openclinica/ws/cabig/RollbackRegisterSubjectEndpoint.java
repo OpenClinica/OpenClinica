@@ -9,9 +9,11 @@ import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
+import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.ws.bean.RegisterSubjectBean;
 import org.akaza.openclinica.ws.cabig.abst.AbstractCabigDomEndpoint;
 import org.akaza.openclinica.ws.cabig.exception.CCSystemFaultException;
+import org.akaza.openclinica.ws.cabig.exception.CCBusinessFaultException;
 import org.akaza.openclinica.ws.logic.RegisterSubjectService;
 import org.springframework.context.MessageSource;
 import org.w3c.dom.Document;
@@ -65,10 +67,24 @@ public class RollbackRegisterSubjectEndpoint extends AbstractCabigDomEndpoint {
                     }
                     // check to make sure the subject is already created
                     SubjectBean finalSubjectBean = subjectService.generateSubjectBean(subjectBean);
+                    SubjectBean checkSubjectBean = getSubjectDao().findByUniqueIdentifier(finalSubjectBean.getUniqueIdentifier());
+                    // does the subject already exist? if so, continue, otherwise, exit out
+                    if (checkSubjectBean.getId() <= 0) {
+                        throw new CCBusinessFaultException("This subject does not exist in the database.  " +
+                                "Please check your data and re-submit");
+                        
+                    }
                 }
             }
         } catch (Exception npe) {
-            
+            if (npe.getClass().getName().startsWith("org.akaza.openclinica.ws.cabig.exception")) {
+                System.out.println("found " + npe.getClass().getName());
+                OpenClinicaException ope = (OpenClinicaException) npe;
+                return mapSubjectErrorConfirmation("", ope);
+            } else {
+                System.out.println(" did not find openclinica exception, found " + npe.getClass().getName());
+                return mapSubjectErrorConfirmation(npe.getMessage());
+            }
         }
         return this.mapRegisterSubjectConfirmation("test");
     }
