@@ -10,6 +10,7 @@ import org.akaza.openclinica.ws.cabig.exception.CCDataValidationFaultException;
 
 import org.w3c.dom.Node;
 
+import java.lang.CharSequence;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.text.ParseException;
@@ -35,10 +36,18 @@ public class RegisterSubjectService {
         subjectBean.setSiteUniqueIdentifier(studySiteIdentifier);
         subjectBean.setStudyUniqueIdentifier(studyIdentifier);
         subjectBean.setUniqueIdentifier(identifier);
+        // throw an error if we dont get male or female as an answer
+        if (!"male".equals(subjectGender.toLowerCase()) && ! "female".equals(subjectGender.toLowerCase())) {
+            throw new CCDataValidationFaultException("Problem parsing sex, it should be either 'Male' or 'Female'.");
+        }
         if ("Male".equals(subjectGender) || "male".equals(subjectGender)) {
             subjectBean.setGender("m");
         } else {
             subjectBean.setGender("f");
+        }
+        // no dases in dates?
+        if (subjectDOB.contains("-")) {
+            throw new CCDataValidationFaultException("Problem parsing date. Please remove all dashes and re-submit your data.");
         }
         SimpleDateFormat local_df = new SimpleDateFormat("yyyyMMdd");
         try {

@@ -1,64 +1,95 @@
 package org.akaza.openclinica.ws.cabig;
 
+import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.ws.server.endpoint.annotation.Endpoint;
-import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
-import org.springframework.ws.server.endpoint.annotation.XPathParam;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.submit.SubjectDAO;
+import org.akaza.openclinica.ws.bean.RegisterSubjectBean;
+import org.akaza.openclinica.ws.cabig.abst.AbstractCabigDomEndpoint;
+import org.akaza.openclinica.ws.cabig.exception.CCSystemFaultException;
+import org.akaza.openclinica.ws.logic.RegisterSubjectService;
 import org.springframework.context.MessageSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.util.Locale;
-
 import javax.sql.DataSource;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Source;
-import javax.xml.transform.dom.DOMSource;
 
-@Endpoint 
-public class RollbackRegisterSubjectEndpoint {
+public class RollbackRegisterSubjectEndpoint extends AbstractCabigDomEndpoint {
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-    private final String NAMESPACE_URI_V1 = "http://openclinica.org/ws/cabig/v1";
-    private final String CONNECTOR_NAMESPACE_V1 = "http://clinicalconnector.nci.nih.gov";
-
-    private final DataSource dataSource;
-    private final MessageSource messages;
-    private final CoreResources coreResources;
-    private final Locale locale;
+    private final RegisterSubjectService subjectService;
+    SubjectDAO subjectDao;
+    StudyDAO studyDao;
+    StudySubjectDAO studySubjectDao;
+    // private final RegisterSubjectService subjectService;
     
     public RollbackRegisterSubjectEndpoint(DataSource dataSource, MessageSource messages, CoreResources coreResources) {
-        this.dataSource = dataSource;
-        this.messages = messages;
-        this.coreResources = coreResources;
-        
-        this.locale = new Locale("en_US");
+        super(dataSource, messages, coreResources);
+        this.subjectService = new RegisterSubjectService();
     }
     
-    //@PayloadRoot(localPart = "RegisterSubjectRequest", namespace = CONNECTOR_NAMESPACE_V1)
-    public Source registerSubject(@XPathParam("//connector:studySubject") NodeList subjects, 
-            @XPathParam("//connector:studySubject/birthDate/@value") String birthdate) throws Exception {
-    
-        Element subjectElement = (Element) (subjects.item(0));
-        System.out.println("rootElement=");
-        logger.debug("rootElement=");
-        System.out.println("rootElement=" + subjectElement.toString());
-        
-        return new DOMSource(mapConfirmation());
+    protected Element invokeInternal(
+            Element requestElement,
+            Document document) throws Exception {
+        System.out.println("hit rollback");
+        NodeList subjects = requestElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "studySubject");
+        try {
+            if (subjects.getLength() > 0) {
+                System.out.println("found study subject: " + subjects.getLength());
+                logNodeList(subjects);
+                for (int i=0; i < subjects.getLength(); i++) {
+                    // will subjects always be sent one at a time? nta
+                    Node childNode = subjects.item(i);
+                    
+                    // get user account bean from security here
+                    UserAccountBean user = this.getUserAccount();
+                    // is this user allowed to create subjects? if not, throw a ccsystem fault exception
+                    Role r = user.getActiveStudyRole();
+                    if (!this.canUserRegisterSubject(user)) {
+                        throw new CCSystemFaultException("You do not possess the correct privileges to create a subject.");
+                    }
+                    RegisterSubjectBean subjectBean = subjectService.generateSubjectBean(user, childNode);
+                    // performedSubjectMilestone
+                    NodeList performedMilestones = requestElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "performedSubjectMilestone");
+                    if (performedMilestones.getLength() > 0) {
+                        for (int j = 0; j < performedMilestones.getLength(); j++) {
+                            Node milestone = performedMilestones.item(j);
+                            subjectBean = subjectService.attachStudyIdentifiers(subjectBean, milestone);
+                        }
+                    }
+                    // check to make sure the subject is already created
+                    SubjectBean finalSubjectBean = subjectService.generateSubjectBean(subjectBean);
+                }
+            }
+        } catch (Exception npe) {
+            
+        }
+        return this.mapRegisterSubjectConfirmation("test");
+    }
+     
+    /**
+     * the three dao getters, have not put this into the abstract class as each endpoint
+     * will have different dao accessors.
+     * @return
+     */
+    public SubjectDAO getSubjectDao() {
+        subjectDao = subjectDao != null ? subjectDao : new SubjectDAO(dataSource);
+        return subjectDao;
     }
     
-    private Element mapConfirmation() throws Exception {
-        DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
-        Document document = docBuilder.newDocument();
-        
-        Element responseElement = document.createElementNS(CONNECTOR_NAMESPACE_V1, "importDataResponse");
-        
-        return responseElement;
+    public StudyDAO getStudyDao() {
+        studyDao = studyDao != null ? studyDao : new StudyDAO(dataSource);
+        return studyDao;
     }
     
+    public StudySubjectDAO getStudySubjectDao() {
+        studySubjectDao = studySubjectDao != null ? studySubjectDao : new StudySubjectDAO(dataSource);
+        return studySubjectDao;
+    }
 }

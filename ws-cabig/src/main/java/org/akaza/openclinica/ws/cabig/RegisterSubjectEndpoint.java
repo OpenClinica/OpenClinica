@@ -83,7 +83,7 @@ public class RegisterSubjectEndpoint extends AbstractDomPayloadEndpoint {
                 for (int i=0; i < subjects.getLength(); i++) {
                     // will subjects always be sent one at a time? nta
                     Node childNode = subjects.item(i);
-                    // System.out.println("found birthday: " + getBirthdate(childNode));
+                    
                     // get user account bean from security here
                     UserAccountBean user = this.getUserAccount();
                     // is this user allowed to create subjects? if not, throw a ccsystem fault exception
@@ -223,26 +223,6 @@ public class RegisterSubjectEndpoint extends AbstractDomPayloadEndpoint {
                 }
             }
         }
-    }
-    
-    /**
-     * returns a birthday, just a test class
-     * TODO delete
-     * @param subject
-     * @return
-     */
-    private String getBirthdate(Node subject) {
-        String ret = "";
-        Element subjectElement = (Element) subject;
-        NodeList birthDate = subjectElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "birthDate");
-        Node birthDateValue = birthDate.item(0);
-        if (birthDateValue.hasAttributes()) {
-            NamedNodeMap nodeMap = birthDateValue.getAttributes();
-            Node nodeValue = nodeMap.getNamedItem("value");
-            ret = nodeValue.getNodeValue();//birthDateValue.getAttributes().getNamedItemNS(CONNECTOR_NAMESPACE_V1, "value").getNodeValue();
-        }
-        return ret;
-        
     }
     
     private Element mapErrorConfirmation(String message, OpenClinicaException exception) throws Exception {
