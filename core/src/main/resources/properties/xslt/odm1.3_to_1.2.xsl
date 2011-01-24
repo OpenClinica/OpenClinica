@@ -1,4 +1,4 @@
-<xsl:stylesheet version="1.0"
+<xsl:stylesheet version="2.0"
 	xmlns:odm="http://www.cdisc.org/ns/odm/v1.3" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 	xmlns:xsi="http://www.w3c.org/2001/XMLSchema-instance" xmlns:def="http://www.cdisc.org/ns/def/v1.0"
 	xmlns:xlink="http://www.w3c.org/1999/xlink" xmlns:OpenClinica="http://www.openclinica.org/ns/odm_ext_v130/v3.1"
@@ -25,17 +25,21 @@
 
 
 	<xsl:template priority="3"
-		match="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:ItemDef[@DataType='partialDate']">
+		match="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:ItemDef">
 
 
 		<!--<xsl:call-template name="toText"> -->
 		<!--<xsl:with-param name="toDataType" select="'text'"></xsl:with-param> -->
 		<!--</xsl:call-template> -->
-		<xsl:attribute name="DataType">
+		<xsl:variable name="datatype" select="@DataType" />
+		<xsl:if test="$datatype='partialDate'">
+			<xsl:element name="{local-name()}">
+				<xsl:attribute name="DataType">
                         
-                        <xsl:value-of select="'text'"></xsl:value-of>
-                </xsl:attribute>
-
+<xsl:value-of select="'text'"></xsl:value-of>
+</xsl:attribute>
+			</xsl:element>
+		</xsl:if>
 	</xsl:template>
 
 
