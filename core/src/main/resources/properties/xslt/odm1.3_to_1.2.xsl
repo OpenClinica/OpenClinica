@@ -8,7 +8,7 @@
 <!--XSL sheet to convert ODM 1.3 to ODM 1.2 without extensions. -->
 <!-- ****************************************************************************************************** -->
 	<!-- File: odm1.3_to_1.2.xsl -->
-	<!-- Date: 2010-03-15 -->
+	<!-- Date: 2010-01-25 -->
 	<!-- Version: 1.0.0 -->
 	<!-- Author: Jamuna Nyayapathi(Akaza) -->
 	<!-- Organization: Akaza Research -->

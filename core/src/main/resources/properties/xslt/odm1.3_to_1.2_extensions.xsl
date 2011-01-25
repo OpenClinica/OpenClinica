@@ -6,6 +6,30 @@
 	exclude-result-prefixes="xlink" xmlns:exsl="http://exslt.org/common">
 
 
+
+<!-- ****************************************************************************************************** -->
+	<!-- File: odm1.3_to_1.2_extensions.xsl -->
+	<!-- Date: 2011-01-25 -->
+	<!-- Version: 1.0.0 -->
+	<!-- Author: Jamuna Nyayapathi(Akaza) -->
+	<!-- Organization: Akaza Research -->
+	<!-- Description: <!--XSL sheet to convert ODM 1.3 to ODM 1.2 with extensions. -->
+	<!-- Notes:  none yet	-->
+	<!-- Source Location:  SVN repository  -->
+	<!-- Release Notes for version 1.0.0: -->
+	<!--   1. TBD	-->
+	<!-- ****************************************************************************************************** -->
+
+
+
+
+
+
+
+
+
+
+
 	<!-- standard copy template -->
 
 
