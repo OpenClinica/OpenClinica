@@ -4,16 +4,15 @@
     xmlns:p="http://www.springframework.org/schema/p"
     xmlns:util="http://www.springframework.org/schema/util"
     xmlns:security="http://www.springframework.org/schema/security"
+    xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
     xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
                            http://www.springframework.org/schema/util
                            http://www.springframework.org/schema/util/spring-util-3.0.xsd
                            http://www.springframework.org/schema/security
-                           http://www.springframework.org/schema/security/spring-security-3.0.xsd">
-                           <!-- 
-                           xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
+                           http://www.springframework.org/schema/security/spring-security-3.0.xsd
                            http://www.springframework.org/schema/security/oauth2 
-                           http://www.springframework.org/schema/security/spring-security-oauth2.xsd  -->
+                           http://www.springframework.org/schema/security/spring-security-oauth2.xsd">
     
   <security:authentication-manager alias="authenticationManager">
     <security:authentication-provider user-service-ref="ocUserDetailsService">
@@ -64,8 +63,14 @@
     -->
     
     
-    <!-- 
+     
     <bean id="tokenServices" class="org.springframework.security.oauth2.provider.token.InMemoryOAuth2ProviderTokenServices">
+        <property name="supportRefreshToken" value="true"/>
+    </bean>
+    <bean id="tokenServicesJdbc" class="org.springframework.security.oauth2.provider.token.JdbcOAuth2ProviderTokenServices">
+        <constructor-arg>
+               <ref bean="dataSource"/>
+        </constructor-arg> 
         <property name="supportRefreshToken" value="true"/>
     </bean>
 
@@ -76,8 +81,7 @@
     <oauth:client-details-service id="clientDetails">
         <oauth:client clientId="my-trusted-client" authorizedGrantTypes="password,authorization_code,refresh_token"/>
         <oauth:client clientId="my-less-trusted-client" authorizedGrantTypes="authorization_code"/>
-        <oauth:client clientId="tonr" authorizedGrantTypes="authorization_code"/>
+        <oauth:client clientId="designer" authorizedGrantTypes="authorization_code,refresh_token"/>
     </oauth:client-details-service>
-     -->
     
 </beans>

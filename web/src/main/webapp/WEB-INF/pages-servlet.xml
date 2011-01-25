@@ -15,7 +15,7 @@
             http://www.springframework.org/schema/oxm http://www.springframework.org/schema/oxm/spring-oxm-3.0.xsd">
 
 
-    <!-- 
+     
     <bean id="accessConfirmationController" class="org.akaza.openclinica.controller.AccessConfirmationController">
         <property name="clientDetailsService" ref="clientDetails"/>
     </bean> 
@@ -28,7 +28,6 @@
     </property>
     <property name="alwaysUseFullPath" value="true"/>
   </bean>
-  -->
 
 
     <!-- Simple redirects to internal resources; URL path substring becomes view name (e.g. '/login.htm' -> 'login') -->
@@ -55,23 +54,22 @@
     	<property name="dataSource" ref="dataSource"/>
     </bean>
           
-    <bean id="htmlMediaType" class="org.springframework.http.MediaType">
-  		<constructor-arg value="text" />
-  		<constructor-arg value="html" />
-	</bean>
 	
     <bean id="castorMarshaller" class="org.springframework.oxm.castor.CastorMarshaller" >
         <property name="mappingLocation" value="classpath:properties/mappingMarshaller.xml" />
     </bean>
     
-    <oxm:jaxb2-marshaller id="jaxbMarshaller" contextPath="org.cdisc.ns.odm.v130:org.openclinica.ns.odm_ext_v130.v31:org.openclinica.ns.rules.v31:org.openclinica.ns.response.v31"/>
+    <oxm:jaxb2-marshaller id="jaxbMarshaller" contextPath="org.cdisc.ns.odm.v130:org.openclinica.ns.odm_ext_v130.v31:org.openclinica.ns.rules.v31:org.openclinica.ns.response.v31:org.openclinica.ns.rules_test.v31"/>
     
     <bean id="marshallingHttpMessageConverter"  class="org.springframework.http.converter.xml.MarshallingHttpMessageConverter">
         <property name="marshaller" ref="jaxbMarshaller" />
         <property name="unmarshaller" ref="jaxbMarshaller" />
+        <property name="supportedMediaTypes" value="application/xml"/>
     </bean>
     
     <bean id="stringHttpMessageConverter" class="org.springframework.http.converter.StringHttpMessageConverter"/>
+    
+    <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"/>
     
     <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
         <property name="messageConverters">
@@ -80,36 +78,20 @@
             </util:list>
         </property>
     </bean>
-	
-	
-	<bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
-		<property name="order" value="0" />
-	  	<property name="mediaTypes">
-	    	<map>
-	      		<entry key="json" value="application/json" />
-	      		<entry key="xml" value="application/xml" />
-	    	</map>
-	  	</property>
-	  	<property name="defaultViews">
-	    	<list>
-	      		<bean class="org.springframework.web.servlet.view.json.MappingJacksonJsonView" />
-	      		<bean class="org.springframework.web.servlet.view.xml.MarshallingView">
-	        		<property name="marshaller"><ref bean="jaxbMarshaller" /></property>
-	      		</bean>
-	    	</list>
-	  	</property>
-	  	<property name="viewResolvers"><ref bean="internalViewResolver" /></property>
-	</bean>
+    
+    <!-- This tag registers the DefaultAnnotationHandlerMapping and AnnotationMethodHandlerAdapter 
+         beans that are required for Spring MVC to dispatch requests to @Controllers.
+         KK - commented this out and manually created the beans to configure converters. 
+    <mvc:annotation-driven />  
+    --> 
 	
 	<bean class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping"/>
+	
     
     <!-- Resolves logical view names to JSP views -->
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" id="internalViewResolver"
           p:prefix="/WEB-INF/jsp/" p:suffix=".jsp" />
-          
-          
-    <!-- Configures the @Controller programming model -->
-    <mvc:annotation-driven />      
+         
      
 
 </beans>

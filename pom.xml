@@ -37,6 +37,13 @@
 			<name>Spring repo-ext</name>
 			<url>https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext/</url>
 		</repository>
+		<!-- Spring's milestone repository -->
+		<repository>
+		    <id>org.springframework.maven.milestone</id>
+		    <name>Spring Maven Milestone Repository</name>
+		    <url>http://maven.springframework.org/milestone</url>
+		    <snapshots><enabled>false</enabled></snapshots>		
+		</repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
@@ -257,7 +264,11 @@
 			<version>1.0</version>
 		</dependency>
 		-->
-
+		<dependency>
+			<groupId>org.springframework.security.oauth</groupId>
+			<artifactId>spring-security-oauth</artifactId>
+			<version>1.0.0.M2</version>
+		</dependency>
 		<!-- HIBERNATE -->
 		<dependency>
 			<groupId>javax.validation</groupId>
