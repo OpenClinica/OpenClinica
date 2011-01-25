@@ -439,7 +439,17 @@ public class CoreResources implements ResourceLoaderAware   {
             // if (("").equals(epbean.getFormat())) {
             // }
             // formatting choice. currently permenantly set at oc1.3
+            String clinica =    getExtractField("extract."+i+".odmType");
+            if(clinica!=null)
+            {
+             
+                if(clinica.equalsIgnoreCase("clinical_data"))
+                    epbean.setFormat("clinical_data");
+                else epbean.setFormat("oc1.3");
+            }
+            else
             epbean.setFormat("oc1.3");
+            
             // destination file name of the copied files
             epbean.setExportFileName(getExtractFields("extract." + i+".exportname"));
             // post-processing event after the creation

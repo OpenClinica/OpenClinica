@@ -205,6 +205,22 @@ public class GenerateExtractFileService {
                 adc.setOdmbean(odmb);
                 cdc.setODMBean(odmb);
             }
+            else if ("clinical_data".equals(odmVersion)) {
+                ODMBean odmb = mdc.getODMBean();
+                //odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0.xsd");
+                //odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC1.xsd");
+                odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC2-0.xsd");
+                ArrayList<String> xmlnsList = new ArrayList<String>();
+                xmlnsList.add("xmlns=\"http://www.cdisc.org/ns/odm/v1.3\"");
+                //xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/openclinica_odm/v1.3\"");
+                xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/odm_ext_v130/v3.1\"");
+                xmlnsList.add("xmlns:OpenClinicaRules=\"http://www.openclinica.org/ns/rules/v3.1\"");
+                odmb.setXmlnsList(xmlnsList);
+                odmb.setODMVersion("clinica_data");
+                mdc.setODMBean(odmb);
+                adc.setOdmbean(odmb);
+                cdc.setODMBean(odmb);
+            }
         }
         
         //////////////////////////////////////////
@@ -253,7 +269,7 @@ public class GenerateExtractFileService {
         DatasetDAO dsdao = new DatasetDAO(ds);
         String sql = eb.getDataset().getSQLStatement();
         String st_sed_in = dsdao.parseSQLDataset(sql, true, true);
-        String st_itemid_in = dsdao.parseSQLDataset(sql, false, true);
+        String st_itemid_in = dsdao.parseSQLDataset(sql, false, true);  
         int datasetItemStatusId = eb.getDataset().getDatasetItemStatus().getId();
         String ecStatusConstraint = dsdao.getECStatusConstraint(datasetItemStatusId);
         String itStatusConstraint = dsdao.getItemDataStatusConstraint(datasetItemStatusId);
