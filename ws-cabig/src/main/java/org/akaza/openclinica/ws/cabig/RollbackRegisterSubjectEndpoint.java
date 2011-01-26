@@ -104,8 +104,12 @@ public class RollbackRegisterSubjectEndpoint extends AbstractCabigDomEndpoint {
                     checkStudySubjectBean.setStatus(Status.DELETED);
                     checkStudySubjectBean.setUpdater(this.getUserAccount());
                     // will need to delete crfs too, per discussed logic:
-                    // Removing a study subject will set the status of all of the subject's CRFs to Removed.
-                    // Creating a new study subject with the same unique identifiers as a rolled-back subject will cause OpenClinica to Restore and Update the subject's CRFs.
+                    // Removing a study subject will set the status of all 
+                    // of the subject's CRFs to Removed.
+                    
+                    // Creating a new study subject with the 
+                    // same unique identifiers as a rolled-back 
+                    // subject will cause OpenClinica to Restore and Update the subject's CRFs.
                     checkSubjectBean.setStatus(Status.DELETED);
                     checkSubjectBean.setUpdater(this.getUserAccount());
                     checkStudySubjectBean = (StudySubjectBean)getStudySubjectDao().update(checkStudySubjectBean);

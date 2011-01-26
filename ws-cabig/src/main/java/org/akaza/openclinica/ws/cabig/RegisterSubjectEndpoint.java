@@ -74,12 +74,13 @@ public class RegisterSubjectEndpoint extends AbstractDomPayloadEndpoint {
             Document document) throws Exception {
         System.out.println("Request text ");
         SubjectBean finalSubjectBean = new SubjectBean();
-        finalSubjectBean.setLabel("");
+        finalSubjectBean.setUniqueIdentifier("");
+        // the above line is for the return statement
         NodeList subjects = requestElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "studySubject");
         try {
             if (subjects.getLength() > 0) {
                 System.out.println("found study subject: " + subjects.getLength());
-                logNodeList(subjects);
+                // logNodeList(subjects);
                 for (int i=0; i < subjects.getLength(); i++) {
                     // will subjects always be sent one at a time? nta
                     Node childNode = subjects.item(i);
@@ -132,28 +133,63 @@ public class RegisterSubjectEndpoint extends AbstractDomPayloadEndpoint {
                     finalSubjectBean = subjectService.generateSubjectBean(subjectBean);
                     
                     SubjectBean testSubjectBean = getSubjectDao().findByUniqueIdentifier(subjectBean.getUniqueIdentifier());
+                    
+                    boolean updateMe = false;
                     if (testSubjectBean.getId() > 0) {
-                        throw new CCBusinessFaultException("You already have a subject in the database with the unique identifier of " + 
+                        // if its identical, restore and renew
+                        if (subjectService.isSubjectIdentical(subjectBean, testSubjectBean)) {
+                            testSubjectBean.setUpdater(user);
+                            testSubjectBean.setDobCollected(true);// change?
+                            testSubjectBean.setStatus(Status.AVAILABLE);
+                            updateMe = true;
+                            finalSubjectBean = testSubjectBean;
+                         // reset the final subject bean with test subject bean 
+                            // set a boolean flag to update instead of creation
+                        } else {
+                        // otherwise, throw an error
+                            throw new CCBusinessFaultException("You already have a subject in the database with the unique identifier of " + 
                                 subjectBean.getUniqueIdentifier() + ".  Please review your data and re-submit your request.");
+                        }
                     }
-                    // StudySubjectBean studySubjectBean = subjectService.generateStudySubjectBean(subjectBean, finalSubjectBean, studyBean);
+                    StudySubjectBean studySubjectBean = subjectService.generateStudySubjectBean(subjectBean, finalSubjectBean, studyBean);
+                    
                     StudySubjectBean testStudySubjectBean = getStudySubjectDao().findByLabelAndStudy(subjectBean.getStudySubjectLabel(), studyBean);
+                    boolean updateStudySubject = false;
                     if (testStudySubjectBean.getId() > 0) {
-                        throw new CCBusinessFaultException("You already have a study subject in the database with the SSID of " + subjectBean.getStudySubjectLabel()
+                        // same check here, if its identical, restore and renew, otherwise throw the error
+                        if (subjectService.isStudySubjectIdentical(subjectBean, finalSubjectBean, testStudySubjectBean, studyBean)) {
+                            testStudySubjectBean.setUpdater(user);
+                            testStudySubjectBean.setStatus(Status.AVAILABLE);
+                            updateStudySubject = true;
+                            studySubjectBean = testStudySubjectBean;
+                        } else {
+                        // also renew all the CRFs and Items? 
+                        
+                            throw new CCBusinessFaultException("You already have a study subject in the database with the SSID of " + subjectBean.getStudySubjectLabel()
                                 + 
                                 ".  Please change it and try your request again.");
+                        }
                     }
                     // below is point of no return - we have caught all the error and are committing to the database
+                    if (updateMe) {
+                        finalSubjectBean = (SubjectBean)getSubjectDao().update(finalSubjectBean);
+                    } else {
+                        finalSubjectBean = getSubjectDao().create(finalSubjectBean);
+                    }
                     
-                    finalSubjectBean = getSubjectDao().create(finalSubjectBean);
-                    StudySubjectBean studySubjectBean = subjectService.generateStudySubjectBean(subjectBean, finalSubjectBean, studyBean);
-                    // needs to be generated with an id, which is why we recreate, tbh
-                    studySubjectBean = getStudySubjectDao().create(studySubjectBean, false);
+                    // needs to be generated with an id, so we set it here, for creation purposes
+                    studySubjectBean.setSubjectId(finalSubjectBean.getId());
+                    
+                    if (updateStudySubject) {
+                        studySubjectBean = (StudySubjectBean)getStudySubjectDao().update(studySubjectBean);
+                    } else {
+                        studySubjectBean = getStudySubjectDao().create(studySubjectBean, false);
+                    }
                     System.out.println("finished creation");
                 }
             }
             // return success message here
-            return mapConfirmation(finalSubjectBean.getLabel());
+            return mapConfirmation(finalSubjectBean.getUniqueIdentifier());
             //TODO is it actually primary key? nta
         } catch (Exception npe) {
             npe.printStackTrace();

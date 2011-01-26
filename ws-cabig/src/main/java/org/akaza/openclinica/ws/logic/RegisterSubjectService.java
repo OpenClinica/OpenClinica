@@ -115,5 +115,47 @@ public class RegisterSubjectService {
         studySubjectBean.setOwner(subjectBean.getUser());
         return studySubjectBean;
     }
+    
+    public boolean isSubjectIdentical(RegisterSubjectBean registerBean, SubjectBean subjectBean) {
+        char gender = registerBean.getGender().charAt(0);
+        if (subjectBean.getGender() != gender) {
+            System.out.println("gender fail");
+            return false;
+        }
+        // is below necessary?
+//        if (!subjectBean.getLabel().equals(registerBean.getUniqueIdentifier())) {
+//            System.out.println("label fail");
+//            return false;
+//        }
+        if (!subjectBean.getUniqueIdentifier().equals(registerBean.getUniqueIdentifier())) {
+            System.out.println("ident fail");
+            return false;
+        }
+        if (!subjectBean.getDateOfBirth().equals(registerBean.getDateOfBirth())) {
+            System.out.println("dob fail");
+            return false;
+        }
+        return true;
+    }
+    
+    public boolean isStudySubjectIdentical(RegisterSubjectBean subjectBean, SubjectBean finalSubjectBean, StudySubjectBean studySubjectBean, StudyBean studyBean) {
+        if (!studySubjectBean.getEnrollmentDate().equals(subjectBean.getEnrollmentDate())) {
+            System.out.println("enroll fail");
+            return false;
+        }
+        if (studySubjectBean.getSubjectId() != finalSubjectBean.getId()) {
+            System.out.println("subj id fail");
+            return false;
+        }
+        if (!studySubjectBean.getLabel().equals(subjectBean.getStudySubjectLabel())) {
+            System.out.println("ss label fail");
+            return false;
+        }
+        if (studySubjectBean.getStudyId() != studyBean.getId()) {
+            System.out.println("study fail");
+            return false;
+        }
+        return true;
+    }
 
 }
