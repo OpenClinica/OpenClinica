@@ -216,7 +216,7 @@ public class GenerateExtractFileService {
                 xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/odm_ext_v130/v3.1\"");
                 xmlnsList.add("xmlns:OpenClinicaRules=\"http://www.openclinica.org/ns/rules/v3.1\"");
                 odmb.setXmlnsList(xmlnsList);
-                odmb.setODMVersion("clinica_data");
+                odmb.setODMVersion("occlinical_data");
                 mdc.setODMBean(odmb);
                 adc.setOdmbean(odmb);
                 cdc.setODMBean(odmb);

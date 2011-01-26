@@ -1575,7 +1575,10 @@ public class OdmExtractDAO extends DatasetDAO {
             }
         }
 
-        if (odmVersion.startsWith("oc")) {
+          if (odmVersion.startsWith("occlinical_data")) {
+          System.out.println("Do not create discrepancy notes");
+          }
+          else if (odmVersion.startsWith("oc")) {
             idataIds = idataIds.length() > 0 ? idataIds.substring(0, idataIds.length() - 2) : idataIds;
             setOCItemDataAuditLogs(study, data, idataIds, idataOidPoses);
             setOCItemDataDNs(data, idataIds, idataOidPoses);

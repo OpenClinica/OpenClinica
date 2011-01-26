@@ -445,7 +445,7 @@ public class CoreResources implements ResourceLoaderAware   {
             {
              
                 if(clinica.equalsIgnoreCase("clinical_data"))
-                    epbean.setFormat("clinical_data");
+                    epbean.setFormat("occlinical_data");
                 else epbean.setFormat("oc1.3");
             }
             else
