@@ -239,6 +239,7 @@ public class OdmExtractDAO extends DatasetDAO {
     }
 
     public void setSubjectEventFormDataTypesExpected(String odmVersion) {
+        if(odmVersion.equalsIgnoreCase("occlinical_data"))odmVersion="oc1.3";
         if ("1.2".equals(odmVersion) || "1.3".equals(odmVersion)) {
             setSubjectEventFormDataTypesExpected();
         } else if ("oc1.2".equals(odmVersion) || "oc1.3".equals(odmVersion)) {
@@ -633,6 +634,8 @@ public class OdmExtractDAO extends DatasetDAO {
     
 
     public void getMetadata(int parentStudyId, int studyId, MetaDataVersionBean metadata, String odmVersion) {
+      if(odmVersion.equalsIgnoreCase("occlinical_data"))odmVersion = "oc1.3";
+        
         if("oc1.3".equals(odmVersion)) {
             if(metadata.getStudy().getParentStudyId() > 0) {
                 this.getOCMetadata(parentStudyId, studyId, metadata, odmVersion);
