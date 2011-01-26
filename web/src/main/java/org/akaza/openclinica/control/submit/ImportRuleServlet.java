@@ -55,6 +55,8 @@ public class ImportRuleServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
         String action = request.getParameter("action");
+        request.setAttribute("contextPath", getContextPath());
+        request.setAttribute("hostPath", getHostPath());
 
         if (StringUtil.isBlank(action)) {
             forwardPage(Page.IMPORT_RULES);
