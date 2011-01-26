@@ -5,14 +5,14 @@
 	xmlns:fn="http://www.w3.org/2005/02/xpath-functions"
 	exclude-result-prefixes="xlink" xmlns:exsl="http://exslt.org/common">
 
-<!--XSL sheet to convert ODM 1.3 to ODM 1.2 without extensions. -->
+
 <!-- ****************************************************************************************************** -->
 	<!-- File: odm1.3_to_1.2.xsl -->
 	<!-- Date: 2010-01-25 -->
 	<!-- Version: 1.0.0 -->
 	<!-- Author: Jamuna Nyayapathi(Akaza) -->
 	<!-- Organization: Akaza Research -->
-	<!-- Description: <!--XSL sheet to convert ODM 1.3 to ODM 1.2 without extensions. -->
+	<!-- Description: XSL sheet to convert ODM 1.3 to ODM 1.2 without extensions.-->
 	<!-- Notes:  none yet	-->
 	<!-- Source Location:  SVN repository  -->
 	<!-- Release Notes for version 1.0.0: -->

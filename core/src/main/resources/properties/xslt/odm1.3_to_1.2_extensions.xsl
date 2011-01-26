@@ -13,7 +13,7 @@
 	<!-- Version: 1.0.0 -->
 	<!-- Author: Jamuna Nyayapathi(Akaza) -->
 	<!-- Organization: Akaza Research -->
-	<!-- Description: <!--XSL sheet to convert ODM 1.3 to ODM 1.2 with extensions. -->
+	<!-- Description: XSL sheet to convert ODM 1.3 to ODM 1.2 with extensions. -->
 	<!-- Notes:  none yet	-->
 	<!-- Source Location:  SVN repository  -->
 	<!-- Release Notes for version 1.0.0: -->
