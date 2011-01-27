@@ -197,7 +197,7 @@ public class ExportDatasetServlet extends SecureController {
                 String ODMXMLFileName = "";
                 // DRY
                 // HashMap answerMap = generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, db, this.currentStudy, "");
-                HashMap answerMap = generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, db, this.currentStudy, "", eb, currentStudy.getId(), currentStudy.getParentStudyId(), "99", true, true, true);
+                HashMap answerMap = generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, db, this.currentStudy, "", eb, currentStudy.getId(), currentStudy.getParentStudyId(), "99", true, true, true, null);
                 
                 for (Iterator it = answerMap.entrySet().iterator(); it.hasNext();) {
                     java.util.Map.Entry entry = (java.util.Map.Entry) it.next();

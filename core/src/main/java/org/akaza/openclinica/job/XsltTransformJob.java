@@ -176,7 +176,7 @@ public class XsltTransformJob extends QuartzJobBean {
 
             HashMap answerMap =
                 generateFileService.createODMFile(epBean.getFormat(), sysTimeBegin, generalFileDir, datasetBean, currentStudy, "", eb, currentStudy.getId(),
-                        currentStudy.getParentStudyId(), "99", (Boolean) dataMap.get(ZIPPED), false, (Boolean) dataMap.get(DELETE_OLD));
+                        currentStudy.getParentStudyId(), "99", (Boolean) dataMap.get(ZIPPED), false, (Boolean) dataMap.get(DELETE_OLD), epBean.getOdmType());
             // won't save a record of the XML to db
             // won't be a zipped file, so that we can submit it for
             // transformation

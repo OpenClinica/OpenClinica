@@ -440,7 +440,7 @@ public class CoreResources implements ResourceLoaderAware   {
             // if (("").equals(epbean.getFormat())) {
             // }
             // formatting choice. currently permenantly set at oc1.3
-            String clinica =    getExtractField("extract."+i+".odmType");
+           /* String clinica =    getExtractField("extract."+i+".odmType");
             if(clinica!=null)
             {
              
@@ -448,7 +448,10 @@ public class CoreResources implements ResourceLoaderAware   {
                     epbean.setFormat("occlinical_data");
                 else epbean.setFormat("oc1.3");
             }
-            else
+            else*/
+            
+            epbean.setOdmType(getExtractField("extract." + i+".odmType"));
+            
             epbean.setFormat("oc1.3");
             
             // destination file name of the copied files

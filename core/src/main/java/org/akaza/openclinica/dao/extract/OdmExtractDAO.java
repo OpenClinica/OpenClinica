@@ -1333,7 +1333,7 @@ public class OdmExtractDAO extends DatasetDAO {
         return nullValueCVs;
     }
 
-    public void getClinicalData(StudyBean study, DatasetBean dataset, OdmClinicalDataBean data, String odmVersion, String studySubjectIds) {
+    public void getClinicalData(StudyBean study, DatasetBean dataset, OdmClinicalDataBean data, String odmVersion, String studySubjectIds, String odmType) {
         String dbName = CoreResources.getDBName();
         String subprev = "";
         HashMap<String, Integer> sepos = new HashMap<String, Integer>();
@@ -1578,7 +1578,7 @@ public class OdmExtractDAO extends DatasetDAO {
             }
         }
 
-          if (odmVersion.startsWith("occlinical_data")) {
+          if (odmType!=null && odmType.equalsIgnoreCase("clinical_data")) {
           System.out.println("Do not create discrepancy notes");
           }
           else if (odmVersion.startsWith("oc")) {

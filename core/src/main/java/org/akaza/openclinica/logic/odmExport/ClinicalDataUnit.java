@@ -76,7 +76,7 @@ public class ClinicalDataUnit extends OdmUnit {
                 odmClinicalData.setMetaDataVersionOID("v1.0.0");
             }
         }
-        oedao.getClinicalData(study, this.dataset, odmClinicalData, this.odmBean.getODMVersion(), studySubjectIds);
+        oedao.getClinicalData(study, this.dataset, odmClinicalData, this.odmBean.getODMVersion(), studySubjectIds, null);
     }
 
     public OdmClinicalDataBean getOdmClinicalData() {

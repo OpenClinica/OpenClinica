@@ -138,16 +138,17 @@ public class GenerateExtractFileService {
             Integer currentStudyId, Integer parentStudyId, String studySubjectNumber) {
         // default zipped - true
         return createODMFile(odmVersion, sysTimeBegin, generalFileDir, datasetBean, 
-                currentStudy, generalFileDirCopy, eb, currentStudyId, parentStudyId, studySubjectNumber, true, true, true);
+                currentStudy, generalFileDirCopy, eb, currentStudyId, parentStudyId, studySubjectNumber, true, true, true, null);
     }
     /**
      * createODMfile, added by tbh, 01/2009
      * @param deleteOld TODO
+     * @param odmType TODO
      */
 
     public HashMap<String, Integer> createODMFile(String odmVersion, long sysTimeBegin, String generalFileDir, DatasetBean datasetBean, 
     		StudyBean currentStudy, String generalFileDirCopy,ExtractBean eb, 
-    		Integer currentStudyId, Integer parentStudyId, String studySubjectNumber, boolean zipped, boolean saveToDB, boolean deleteOld) {
+    		Integer currentStudyId, Integer parentStudyId, String studySubjectNumber, boolean zipped, boolean saveToDB, boolean deleteOld, String odmType) {
         
         Integer ssNumber = getStudySubjectNumber(studySubjectNumber);
         MetaDataCollector mdc = new MetaDataCollector(ds, datasetBean, currentStudy,ruleSetRuleDao);
@@ -201,26 +202,12 @@ public class GenerateExtractFileService {
                 xmlnsList.add("xmlns:OpenClinicaRules=\"http://www.openclinica.org/ns/rules/v3.1\"");
                 odmb.setXmlnsList(xmlnsList);
                 odmb.setODMVersion("oc1.3");
+                odmb.setOdmType(odmType);
                 mdc.setODMBean(odmb);
                 adc.setOdmbean(odmb);
                 cdc.setODMBean(odmb);
             }
-            else if ("clinical_data".equals(odmVersion)) {
-                ODMBean odmb = mdc.getODMBean();
-                //odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0.xsd");
-                //odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC1.xsd");
-                odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC2-0.xsd");
-                ArrayList<String> xmlnsList = new ArrayList<String>();
-                xmlnsList.add("xmlns=\"http://www.cdisc.org/ns/odm/v1.3\"");
-                //xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/openclinica_odm/v1.3\"");
-                xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/odm_ext_v130/v3.1\"");
-                xmlnsList.add("xmlns:OpenClinicaRules=\"http://www.openclinica.org/ns/rules/v3.1\"");
-                odmb.setXmlnsList(xmlnsList);
-                odmb.setODMVersion("occlinical_data");
-                mdc.setODMBean(odmb);
-                adc.setOdmbean(odmb);
-                cdc.setODMBean(odmb);
-            }
+          
         }
         
         //////////////////////////////////////////

@@ -42,7 +42,22 @@ public class ExtractPropertyBean implements Serializable{
 	private String datasetId;
 	private String zipName;
 	
-	public String getZipName() {
+	
+	private String odmType;
+	
+	
+	
+	public String getOdmType() {
+        return odmType;
+    }
+
+
+    public void setOdmType(String odmType) {
+        this.odmType = odmType;
+    }
+
+
+    public String getZipName() {
 		return zipName;
 	}
 

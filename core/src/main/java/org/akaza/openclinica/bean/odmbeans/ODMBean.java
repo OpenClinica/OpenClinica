@@ -28,6 +28,18 @@ public class ODMBean {
     private ArrayList<String> xmlnsList;
     private String xsi;
     private String schemaLocation;
+    
+    //JN: to get only the clinical data
+    private String odmType;
+    
+
+    public String getOdmType() {
+        return odmType;
+    }
+
+    public void setOdmType(String odmType) {
+        this.odmType = odmType;
+    }
 
     /**
      * In default constructor, xmlns = "http://www.cdisc.org/ns/odm/v1.2",
@@ -42,6 +54,7 @@ public class ODMBean {
         schemaLocation = "http://www.cdisc.org/ns/odm/v1.2 ODM1-2-1.xsd";
         fileType = "Snapshot";
         ODMVersion = "1.2";
+        odmType="Full";
     }
 
     public void setDescription(String description) {
