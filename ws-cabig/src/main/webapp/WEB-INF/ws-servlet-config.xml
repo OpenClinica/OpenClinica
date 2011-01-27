@@ -10,29 +10,34 @@
 
      
      <!-- WSDL Definitions -->
-     <bean id="DataCaptureService" class="org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition"> 
+     
+     <!--  <bean id="DataCaptureService" class="org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition"> --> 
      <!-- changing to org.springframework.ws.wsdl.wsdl11.SimpleWsdl11Definition -->
      <!-- was org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition -->
      	<!-- <constructor-arg value="/WEB-INF/schemas/clinicalConnector/DataCaptureService.wsdl"/> -->
-     	<property name="schema" ref="dataCaptureSchema"/>
+     	<!-- <property name="schema" ref="dataCaptureSchema"/>
      	<property name="portTypeName" value="ws"/>
         <property name="locationUri" value="/ws/cabig/v1"/>
         
-     </bean> 
+     </bean> -->
      
-     <bean id="StudyManagementService" class="org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition"> 
+     <!--  <bean id="StudyManagementService" class="org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition"> --> 
      	<!-- <constructor-arg value="/WEB-INF/schemas/clinicalConnector/StudyManagementService.wsdl"/> -->
-     	<property name="schema" ref="studyManagementSchema"/>
+     	<!--  <property name="schema" ref="studyManagementSchema"/>
      	<property name="portTypeName" value="ws"/>
         <property name="locationUri" value="/ws/cabig/v1"/>
-     </bean> 
+     </bean> -->
      
      <bean id="SubjectRegistrationService" class="org.springframework.ws.wsdl.wsdl11.SimpleWsdl11Definition">
      	<constructor-arg value="/WEB-INF/schemas/clinicalConnector/SubjectRegistrationService.wsdl"/> 
-     	<!--  <property name="schema" ref="registerSubjectSchema"/> -->
-     	<!--  <property name="requestSuffix" value="RegisterSubjectRequest"/> -->
-     	<!--  <property name="portTypeName" value="ws"/>
-        <property name="locationUri" value="/ws/cabig/v1"/> -->
+     </bean>
+     
+     <bean id="StudyManagementService" class="org.springframework.ws.wsdl.wsdl11.SimpleWsdl11Definition">
+     	<constructor-arg value="/WEB-INF/schemas/clinicalConnector/StudyManagementService.wsdl"/> 
+     </bean>
+     
+     <bean id="DataCaptureService" class="org.springframework.ws.wsdl.wsdl11.SimpleWsdl11Definition">
+     	<constructor-arg value="/WEB-INF/schemas/clinicalConnector/DataCaptureService.wsdl"/> 
      </bean>
      
      <bean id="dataWsdl" class="org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition">
@@ -120,6 +125,8 @@
             <props>
                 <prop key="registerSubject">registerSubjectEndpoint</prop>
                 <prop key="rollbackRegisterSubject">rollbackRegisterSubjectEndpoint</prop>
+                <prop key="createStudy">createStudyEndpoint</prop>
+                <prop key="rollbackCreateStudy">rollbackCreateStudyEndpoint</prop>
             </props>
         </property>
         <!-- always remember to add the security interceptors here, otherwise they will break -->
@@ -208,6 +215,18 @@
         <constructor-arg ref="messageSource"/>
         <constructor-arg ref="coreResources"/>
     </bean> 
+    
+    <bean id="createStudyEndpoint" class="org.akaza.openclinica.ws.cabig.CreateStudyEndpoint">
+        <constructor-arg ref="dataSource"/>
+        <constructor-arg ref="messageSource"/>
+        <constructor-arg ref="coreResources"/>
+    </bean>
+    
+    <bean id="rollbackCreateStudyEndpoint" class="org.akaza.openclinica.ws.cabig.RollbackCreateStudyEndpoint">
+        <constructor-arg ref="dataSource"/>
+        <constructor-arg ref="messageSource"/>
+        <constructor-arg ref="coreResources"/>
+    </bean>
     
     <bean id="dataEndpoint" class="org.akaza.openclinica.ws.DataEndpoint">
         <constructor-arg ref="dataSource"/>

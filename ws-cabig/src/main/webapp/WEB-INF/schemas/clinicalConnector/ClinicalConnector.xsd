@@ -4,11 +4,11 @@
 	<xs:element name="RegisterSubjectRequest">
 		<xs:complexType>
 			<xs:sequence>
+				<xs:element name="requestorID" type="iso:ST" minOccurs="0"/>
 				<xs:element name="studySubject" type="domain:StudySubject"/>
 				<xs:element name="performedSubjectMilestone" type="domain:PerformedSubjectMilestone"/>
 				<xs:element name="scheduledEpoch" type="domain:ScheduledEpoch" minOccurs="0"/>
 				<xs:element name="scheduledArm" type="domain:ScheduledArm" minOccurs="0"/>
-				<xs:element name="requestorID" type="xs:string" minOccurs="0"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -58,8 +58,8 @@
 	<xs:element name="LoadLabsRequest">
 		<xs:complexType>
 			<xs:sequence>
+				<xs:element name="requestorID" type="iso:ST" minOccurs="0"/>
 				<xs:element name="performedClinicalResult" type="domain:PerformedClinicalResult" maxOccurs="unbounded"/>
-				<xs:element name="requestorID" type="xs:string" minOccurs="0"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -97,11 +97,8 @@
 	<xs:element name="CreateStudyRequest">
 		<xs:complexType>
 			<xs:sequence>
+				<xs:element name="requestorID" type="iso:ST" minOccurs="0"/>
 				<xs:element name="studyProtocol" type="domain:StudyProtocol"/>
-				<xs:element name="studyCoordinatingCenter" type="domain:StudyCoordinatingCenter"/>
-				<xs:element name="studyInvestigator" type="domain:StudyInvestigator"/>
-				<xs:element name="studySites" type="domain:StudySite" minOccurs="0" maxOccurs="unbounded"/>
-				<xs:element name="requestorID" type="xs:string" minOccurs="0"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -117,43 +114,141 @@
 	<xs:complexType name="StudyProtocol">
 		<xs:sequence>
 			<xs:element name="identifier" type="iso:II"/>
+			<xs:element name="allocationCode" type="iso:CD"/>
+			<xs:element name="blindingSchemaCode" type="iso:CD"/>
 			<xs:element name="coordinatingCenterStudyStatusCode" type="iso:CD"/>
-			<xs:element name="dataEntryStatusCode" type="iso:CD"/>
+			<xs:element name="dataEntryStatusCode" type="iso:CD" minOccurs="0"/>
 			<xs:element name="multiInstitutionIndicator" type="iso:BL"/>
-			<xs:element name="officialTitle" type="iso:ST"/>
-			<xs:element name="phaseCode" type="iso:CD"/>
-			<xs:element name="primaryPurposeCode" type="iso:CD"/>
+			<xs:element name="officialTitle" type="iso:ST" minOccurs="0"/>
+			<xs:element name="phaseCode" type="iso:CD" minOccurs="0"/>
+			<xs:element name="primaryPurposeCode" type="iso:CD" minOccurs="0"/>
 			<xs:element name="publicDescription" type="iso:ST"/>
 			<xs:element name="publicTitle" type="iso:ST"/>
+			<xs:element name="scientificDescription" type="iso:ST" minOccurs="0"/>
 			<xs:element name="targetAccrualNumberRange" type="iso:IVL_INT"/>
+			<xs:element name="studyCoordinatingCenter" type="domain:StudyCoordinatingCenter"/>
+			<xs:element name="studyInvestigator" type="domain:StudyInvestigator"/>
+			<xs:element name="studyFundingSponsor" type="domain:StudyResourceProvider" minOccurs="0"/>
+			<xs:element name="studySite" type="domain:StudySite" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="studyProtocolIdentification" type="domain:StudyProtocolIdentification" maxOccurs="unbounded"/>
+			<xs:element name="epoch" type="domain:Epoch" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="StudyResourceProvider">
+		<xs:complexContent>
+			<xs:extension base="domain:ResourceProvider">
+				<xs:sequence>
+					<xs:element name="primaryIndicator" type="iso:BL" minOccurs="0"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ResourceProvider">
+		<xs:sequence>
+			<xs:element name="identifier" type="iso:II"/>
+			<xs:element name="statusCode" type="iso:CD" minOccurs="0"/>
+			<xs:element name="statusDateRange" type="iso:IVL_TS" minOccurs="0"/>
+			<xs:element name="studyInvestigator" type="domain:StudyInvestigator" minOccurs="0"/>
+			<xs:element name="organization" type="domain:Organization" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="StudyCoordinatingCenter">
-		<xs:sequence>
-			<xs:element name="identifier" type="iso:II"/>
-			<xs:element name="postalAddress" type="iso:AD"/>
-		</xs:sequence>
+		<xs:complexContent>
+			<xs:extension base="domain:Organization">
+				<xs:sequence>
+					<xs:element name="responsibilityCode" type="iso:DSET_CD" minOccurs="0"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="StudyInvestigator">
-		<xs:sequence>
-			<xs:element name="educationLevelCode" type="iso:CD"/>
-			<xs:element name="identifier" type="iso:II"/>
-			<xs:element name="name" type="iso:EN.PN"/>
-			<xs:element name="postalAddress" type="iso:AD"/>
-			<xs:element name="primaryIndicator" type="iso:BL"/>
-			<xs:element name="roleCode" type="iso:CD"/>
-			<xs:element name="statusCode" type="iso:CD"/>
-		</xs:sequence>
+		<xs:complexContent>
+			<xs:extension base="domain:Person">
+				<xs:sequence>
+					<xs:element name="identifier" type="iso:II"/>
+					<xs:element name="roleCode" type="iso:CD"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="HealthCareProvider">
+		<xs:complexContent>
+			<xs:extension base="domain:Person">
+				<xs:sequence>
+					<xs:element name="certificateLicenseText" type="iso:ST"/>
+					<xs:element name="identifier" type="iso:II"/>
+					<xs:element name="postalAddress" type="iso:AD"/>
+					<xs:element name="statusCode" type="iso:CD"/>
+					<xs:element name="statusDateRange" type="iso:IVL_TS"/>
+					<xs:element name="telecomAddress" type="iso:DSET_TEL"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="StudySite">
 		<xs:sequence>
-			<xs:element name="dateRange" type="iso:IVL_TS"/>
+			<xs:element name="dateRange" type="iso:IVL_TS" minOccurs="0"/>
 			<xs:element name="identifier" type="iso:II"/>
-			<xs:element name="leadOrganizationIndicator" type="iso:BL"/>
+			<xs:element name="leadOrganizationIndicator" type="iso:BL" minOccurs="0"/>
+			<xs:element name="reviewBoardApprovalDate" type="iso:TS" minOccurs="0"/>
+			<xs:element name="statusCode" type="iso:CD" minOccurs="0"/>
+			<xs:element name="statusDateRange" type="iso:IVL_TS"  minOccurs="0"/>
+			<xs:element name="targetAccrualNumber" type="iso:INT" minOccurs="0"/>
+			<xs:element name="studySiteInvestigator" type="domain:HealthCareProvider" minOccurs="0"/>
+			<xs:element name="organization" type="domain:Organization" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="StudyProtocolIdentification">
+		<xs:sequence>
+			<xs:element name="assignedDate" type="iso:TS"/>
+			<xs:element name="identifier" type="iso:II"/>
+			<xs:element name="primaryIndicator" type="iso:BL"/>
+			<xs:element name="typeCode" type="iso:CD"/>
+			<xs:element name="identifierAssigner" type="domain:Organization" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Epoch">
+		<xs:sequence>
+			<xs:element name="description" type="iso:ST"/>
+			<xs:element name="firstEpochIndicator" type="iso:BL" minOccurs="0"/>
+			<xs:element name="name" type="iso:ST"/>
+			<xs:element name="typeCode" type="iso:CD"/>
+			<xs:element name="studySegment" type="domain:StudySegment" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="StudySegment">
+		<xs:sequence>
+			<xs:element name="description" type="iso:ST"/>
+			<xs:element name="firstStudySegmentIndicator" type="iso:BL" minOccurs="0"/>
+			<xs:element name="name" type="iso:ST"/>
+			<xs:element name="targetAccrualNumberRange" type="iso:IVL_INT"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Person">
+		<xs:sequence>
+			<xs:element name="academicDegree" type="iso:DSET_CD" minOccurs="0"/>
+			<xs:element name="deathIndicator" type="iso:BL" minOccurs="0"/>
+			<xs:element name="educationLevelCode" type="iso:CD" minOccurs="0"/>
+			<xs:element name="ethnicGroupCode" type="iso:DSET_CD" minOccurs="0"/>
+			<xs:element name="initials" type="iso:ST" minOccurs="0"/>
+			<xs:element name="maritalStatusCode" type="iso:CD" minOccurs="0"/>
+			<xs:element name="name" type="iso:EN.PN"/>
+			<xs:element name="occupationDateRange" type="iso:IVL_TS" minOccurs="0"/>
+			<xs:element name="postalAddress" type="iso:AD" minOccurs="0"/>
+			<xs:element name="primaryOccupationCode" type="iso:CD" minOccurs="0"/>
+			<xs:element name="raceCode" type="iso:DSET_CD" minOccurs="0"/>
+			<xs:element name="statusCode" type="iso:CD"/>
+			<xs:element name="statusDateRange" type="iso:IVL_TS" minOccurs="0"/>
+			<xs:element name="telecomAddress" type="iso:DSET_TEL" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Organization">
+		<xs:sequence>
+			<xs:element name="description" type="iso:ST" minOccurs="0"/>
+			<xs:element name="identifier" type="iso:II"/>
 			<xs:element name="name" type="iso:ST"/>
 			<xs:element name="postalAddress" type="iso:AD"/>
-			<xs:element name="reviewBoardApprovalDate" type="iso:TS"/>
-			<xs:element name="targetAccrualNumber" type="iso:INT"/>
+			<xs:element name="telecomAddress" type="iso:DSET_TEL" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
 	<!-- Types used for response and error conditions -->
@@ -174,15 +269,12 @@
 	</xs:complexType>
 	<xs:simpleType name="businessErrorCode">
 		<xs:restriction base="xs:string">
-			<xs:enumeration value="CC10100"/>
 			<xs:enumeration value="CC10110"/>
 			<xs:enumeration value="CC10120"/>
 			<xs:enumeration value="CC10130"/>
-			<xs:enumeration value="CC10200"/>
 			<xs:enumeration value="CC10210"/>
 			<xs:enumeration value="CC10220"/>
 			<xs:enumeration value="CC10230"/>
-			<xs:enumeration value="CC10300"/>
 			<xs:enumeration value="CC10310"/>
 			<xs:enumeration value="CC10320"/>
 			<xs:enumeration value="CC10330"/>
@@ -190,10 +282,10 @@
 	</xs:simpleType>
 	<xs:simpleType name="systemErrorCode">
 		<xs:restriction base="xs:string">
-			<xs:enumeration value="CC10000"/>
 			<xs:enumeration value="CC10010"/>
 			<xs:enumeration value="CC10020"/>
-			<xs:enumeration value="CC10030"/>			
+			<xs:enumeration value="CC10030"/>
+			<xs:enumeration value="CC10000"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:complexType name="CCBusinessError">
@@ -246,11 +338,6 @@
 					<xs:element name="LoadLabError" type="domain:LoadLabError" maxOccurs="unbounded"/>
 				</xs:sequence>
 			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
-	<xs:complexType name="EN.PN.IN">
-		<xs:complexContent>
-			<xs:restriction base="iso:EN.PN"/>
 		</xs:complexContent>
 	</xs:complexType>
 </xs:schema>

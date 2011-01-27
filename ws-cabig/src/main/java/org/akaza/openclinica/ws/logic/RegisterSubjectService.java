@@ -4,8 +4,12 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.service.StudyParamsConfig;
 import org.akaza.openclinica.bean.submit.SubjectBean;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.ws.bean.RegisterSubjectBean;
+import org.akaza.openclinica.ws.cabig.exception.CCBusinessFaultException;
 import org.akaza.openclinica.ws.cabig.exception.CCDataValidationFaultException;
 
 import org.w3c.dom.Node;
@@ -13,6 +17,7 @@ import org.w3c.dom.Node;
 import java.lang.CharSequence;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.text.ParseException;
 
 public class RegisterSubjectService {
@@ -23,7 +28,7 @@ public class RegisterSubjectService {
         
     }
     
-    public RegisterSubjectBean generateSubjectBean(UserAccountBean user, Node subject) throws CCDataValidationFaultException {
+    public RegisterSubjectBean generateSubjectBean(UserAccountBean user, Node subject, StudyDAO studyDao) throws Exception {
         RegisterSubjectBean subjectBean = new RegisterSubjectBean(user);
         DomParsingService xmlService = new DomParsingService();
         String subjectDOB = xmlService.getElementValue(subject, CONNECTOR_NAMESPACE_V1, "birthDate", "value");
@@ -31,10 +36,37 @@ public class RegisterSubjectService {
         String identifier = xmlService.getElementValue(subject, CONNECTOR_NAMESPACE_V1, "identifier", "extension");
         String studyIdentifier = xmlService.getElementValue(subject, CONNECTOR_NAMESPACE_V1, "studyIdentifier", "extension");
         String studySiteIdentifier = xmlService.getElementValue(subject, CONNECTOR_NAMESPACE_V1, "studySiteIdentifier", "extension");
-//        System.out.println("dob: " + subjectDOB + " gender " + subjectGender + 
-//                " identifier " + identifier + " study " + studyIdentifier + " studysite " + studySiteIdentifier);
         subjectBean.setSiteUniqueIdentifier(studySiteIdentifier);
         subjectBean.setStudyUniqueIdentifier(studyIdentifier);
+        // lookup study here, get parameters to affect birthday
+        StudyBean studyBean = new StudyBean();
+        StudyBean siteBean = new StudyBean();
+        
+        if (subjectBean.getSiteUniqueIdentifier() != null) {
+            siteBean = studyDao.findByUniqueIdentifier(subjectBean.getSiteUniqueIdentifier());
+        } 
+        studyBean = studyDao.findByUniqueIdentifier(subjectBean.getStudyUniqueIdentifier());
+        
+        // dry
+        if (studyBean.getId() <= 0) {
+            // if no study exists with that name, there is an error
+            throw new CCBusinessFaultException("No study exists with that name, please review your information and re-submit the request.");
+        }
+        if (siteBean.getId() > 0) {
+            // if there is a site bean, the study bean should be its parent, otherwise there is an error
+            if ((siteBean.getParentStudyId() != studyBean.getId()) && (siteBean.getParentStudyId() != 0)) {
+                throw new CCBusinessFaultException("Your parent and child study relationship is mismatched." + 
+                        "  Please enter correct study and site information.");
+            }
+            studyBean = siteBean;
+        }
+        // dry
+        
+        List<StudyParamsConfig> parentConfigs = studyBean.getStudyParameters();
+        for (StudyParamsConfig scg : parentConfigs) {
+            System.out.println(scg.getParameter().getName() + " -> " + scg.getValue().getName() + " : " + scg.getValue().getValue());
+        }
+        subjectBean.setStudyBean(studyBean);
         subjectBean.setUniqueIdentifier(identifier);
         // throw an error if we dont get male or female as an answer
         if (!"male".equals(subjectGender.toLowerCase()) && ! "female".equals(subjectGender.toLowerCase())) {
@@ -50,6 +82,7 @@ public class RegisterSubjectService {
             throw new CCDataValidationFaultException("Problem parsing date. Please remove all dashes and re-submit your data.");
         }
         SimpleDateFormat local_df = new SimpleDateFormat("yyyyMMdd");
+        // figure out the study params here; date only? no date?
         try {
             Date dateOfBirth = local_df.parse(subjectDOB);
             subjectBean.setDateOfBirth(dateOfBirth);
@@ -83,6 +116,7 @@ public class RegisterSubjectService {
         rsbean.setStudySubjectLabel(registrationSiteIdentifier);
         return rsbean;
     }
+    
     public SubjectBean generateSubjectBean(RegisterSubjectBean rsbean) {
         SubjectBean sbean = new SubjectBean();
         sbean.setStatus(Status.AVAILABLE);

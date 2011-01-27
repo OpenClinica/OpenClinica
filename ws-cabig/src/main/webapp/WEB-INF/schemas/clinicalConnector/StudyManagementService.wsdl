@@ -2,7 +2,7 @@
 <wsdl:definitions xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://clinicalconnector.nci.nih.gov" xmlns:iso="uri:iso.org:21090" xmlns:intf="http://clinicalconnector.nci.nih.gov" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://clinicalconnector.nci.nih.gov">
 	<wsdl:types>
 		<schema elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema">
-			<import namespace="http://clinicalconnector.nci.nih.gov" schemaLocation="./ClinicalConnector.xsd"/>
+			<import namespace="http://clinicalconnector.nci.nih.gov" schemaLocation="http://svn.akazaresearch.com/oc/schemas/ClinicalConnector.xsd"/>
 		</schema>
 	</wsdl:types>
 	<wsdl:message name="CreateStudyRequestMessage">
@@ -45,6 +45,7 @@
 	<wsdl:binding name="StudyManagementSoapBinding" type="impl:StudyManagementPortType">
 		<soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
 		<wsdl:operation name="createStudy">
+		        <soap:operation soapAction="createStudy" style="document"/>
 			<wsdl:input>
 				<soap:body use="literal"/>
 			</wsdl:input>
@@ -62,6 +63,7 @@
 			</wsdl:fault>
 		</wsdl:operation>
 		<wsdl:operation name="rollbackCreateStudy">
+		        <soap:operation soapAction="rollbackCreateStudy" style="document"/>
 			<wsdl:input>
 				<soap:body use="literal"/>
 			</wsdl:input>

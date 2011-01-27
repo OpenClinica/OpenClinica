@@ -4,6 +4,9 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.ws.cabig.exception.CCSystemFaultException;
 import org.slf4j.Logger;
@@ -32,6 +35,10 @@ public class AbstractCabigDomEndpoint extends AbstractDomPayloadEndpoint {
     public final String XSL_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance";
     public final String ISO_21090_NAMESPACE = "uri:iso.org:21090";
 
+    SubjectDAO subjectDao;
+    StudyDAO studyDao;
+    StudySubjectDAO studySubjectDao;
+    
     public DataSource dataSource;
     public MessageSource messages;
     public CoreResources coreResources;// TODO keep or toss?
@@ -50,6 +57,25 @@ public class AbstractCabigDomEndpoint extends AbstractDomPayloadEndpoint {
             Element requestElement,
             Document document) throws Exception {
         return requestElement;
+    }
+    
+    /**
+     * the dao getters.
+     * @return
+     */
+    public SubjectDAO getSubjectDao() {
+        subjectDao = subjectDao != null ? subjectDao : new SubjectDAO(dataSource);
+        return subjectDao;
+    }
+    
+    public StudyDAO getStudyDao() {
+        studyDao = studyDao != null ? studyDao : new StudyDAO(dataSource);
+        return studyDao;
+    }
+    
+    public StudySubjectDAO getStudySubjectDao() {
+        studySubjectDao = studySubjectDao != null ? studySubjectDao : new StudySubjectDAO(dataSource);
+        return studySubjectDao;
     }
     
     /**

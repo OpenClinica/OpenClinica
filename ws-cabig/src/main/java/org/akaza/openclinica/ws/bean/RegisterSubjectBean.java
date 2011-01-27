@@ -1,7 +1,7 @@
 package org.akaza.openclinica.ws.bean;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
-
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import java.util.Date;
 
 public class RegisterSubjectBean {
@@ -14,6 +14,22 @@ public class RegisterSubjectBean {
     private Date enrollmentDate;
     private String studySubjectLabel;
     private String requestorId;
+    private StudyBean studyBean;
+    private UserAccountBean user; // auditing
+    
+    public RegisterSubjectBean(UserAccountBean user) {
+        this.user = user;
+        studyBean = new StudyBean();
+    }
+    
+    public StudyBean getStudyBean() {
+        return studyBean;
+    }
+
+    public void setStudyBean(StudyBean studyBean) {
+        this.studyBean = studyBean;
+    }
+
     public UserAccountBean getUser() {
         return user;
     }
@@ -21,12 +37,7 @@ public class RegisterSubjectBean {
     public void setUser(UserAccountBean user) {
         this.user = user;
     }
-    private UserAccountBean user; // auditing
-    
-    public RegisterSubjectBean(UserAccountBean user) {
-        this.user = user;
-    }
-    
+   
     public Date getDateOfBirth() {
         return dateOfBirth;
     }

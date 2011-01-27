@@ -27,9 +27,7 @@ import javax.sql.DataSource;
 public class RollbackRegisterSubjectEndpoint extends AbstractCabigDomEndpoint {
 
     private final RegisterSubjectService subjectService;
-    SubjectDAO subjectDao;
-    StudyDAO studyDao;
-    StudySubjectDAO studySubjectDao;
+    
     // private final RegisterSubjectService subjectService;
     
     public RollbackRegisterSubjectEndpoint(DataSource dataSource, MessageSource messages, CoreResources coreResources) {
@@ -59,7 +57,7 @@ public class RollbackRegisterSubjectEndpoint extends AbstractCabigDomEndpoint {
                     if (!this.canUserRegisterSubject(user)) {
                         throw new CCSystemFaultException("You do not possess the correct privileges to create a subject.");
                     }
-                    RegisterSubjectBean subjectBean = subjectService.generateSubjectBean(user, childNode);
+                    RegisterSubjectBean subjectBean = subjectService.generateSubjectBean(user, childNode, getStudyDao());
                     // performedSubjectMilestone
                     NodeList performedMilestones = requestElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "performedSubjectMilestone");
                     if (performedMilestones.getLength() > 0) {
@@ -77,25 +75,9 @@ public class RollbackRegisterSubjectEndpoint extends AbstractCabigDomEndpoint {
                                 "Please check your data and re-submit.");
                         
                     }
-                    StudyBean studyBean = getStudyDao().findByUniqueIdentifier(subjectBean.getStudyUniqueIdentifier());
-                    StudyBean siteBean = getStudyDao().findByUniqueIdentifier(subjectBean.getSiteUniqueIdentifier());
-                    // should it be findSiteByUniqueIdentifier?
-                    // dry
-                    if (studyBean.getId() <= 0) {
-                        // if no study exists with that name, there is an error
-                        throw new CCBusinessFaultException("No study exists with that name, please review your information and re-submit the request.");
-                    }
-                    if (siteBean.getId() > 0) {
-                        // if there is a site bean, the study bean should be its parent, otherwise there is an error
-                        if ((siteBean.getParentStudyId() != studyBean.getId()) && (siteBean.getParentStudyId() != 0)) {
-                            throw new CCBusinessFaultException("Your parent and child study relationship is mismatched." + 
-                                    "  Please enter correct study and site information.");
-                        }
-                        studyBean = siteBean;
-                    }
-                    // dry
-                    StudySubjectBean studySubjectBean = subjectService.generateStudySubjectBean(subjectBean, finalSubjectBean, studyBean);
-                    StudySubjectBean checkStudySubjectBean = getStudySubjectDao().findByLabelAndStudy(studySubjectBean.getLabel(), studyBean);
+                    
+                    StudySubjectBean studySubjectBean = subjectService.generateStudySubjectBean(subjectBean, finalSubjectBean, subjectBean.getStudyBean());
+                    StudySubjectBean checkStudySubjectBean = getStudySubjectDao().findByLabelAndStudy(studySubjectBean.getLabel(), subjectBean.getStudyBean());
                     if (checkStudySubjectBean.getId() <= 0) {
                         throw new CCBusinessFaultException("No relationship with this SSID currently exists.  " + 
                                 "Please check your information and re-submit the form.");
@@ -135,24 +117,5 @@ public class RollbackRegisterSubjectEndpoint extends AbstractCabigDomEndpoint {
         }
         
     }
-     
-    /**
-     * the three dao getters, have not put this into the abstract class as each endpoint
-     * will have different dao accessors.
-     * @return
-     */
-    public SubjectDAO getSubjectDao() {
-        subjectDao = subjectDao != null ? subjectDao : new SubjectDAO(dataSource);
-        return subjectDao;
-    }
-    
-    public StudyDAO getStudyDao() {
-        studyDao = studyDao != null ? studyDao : new StudyDAO(dataSource);
-        return studyDao;
-    }
-    
-    public StudySubjectDAO getStudySubjectDao() {
-        studySubjectDao = studySubjectDao != null ? studySubjectDao : new StudySubjectDAO(dataSource);
-        return studySubjectDao;
-    }
+
 }

@@ -14,6 +14,7 @@ import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.ws.bean.RegisterSubjectBean;
 import org.akaza.openclinica.ws.logic.RegisterSubjectService;
+import org.akaza.openclinica.ws.cabig.abst.AbstractCabigDomEndpoint;
 import org.akaza.openclinica.ws.cabig.exception.CCDataValidationFaultException;
 import org.akaza.openclinica.ws.cabig.exception.CCSystemFaultException;
 import org.akaza.openclinica.ws.cabig.exception.CCBusinessFaultException;
@@ -41,31 +42,26 @@ import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 
 
-public class RegisterSubjectEndpoint extends AbstractDomPayloadEndpoint {
+public class RegisterSubjectEndpoint extends AbstractCabigDomEndpoint {
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-    private final String NAMESPACE_URI_V1 = "http://openclinica.org/ws/cabig/v1";// TODO keep or toss?
-    private final String CONNECTOR_NAMESPACE_V1 = "http://clinicalconnector.nci.nih.gov";
-    private final String XSL_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance";
-    private final String ISO_21090_NAMESPACE = "uri:iso.org:21090";
-
-    private final DataSource dataSource;
-    private final MessageSource messages;
-    private final CoreResources coreResources;// TODO keep or toss?
-    private final Locale locale;
+//    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+//    private final String NAMESPACE_URI_V1 = "http://openclinica.org/ws/cabig/v1";// TODO keep or toss?
+//    private final String CONNECTOR_NAMESPACE_V1 = "http://clinicalconnector.nci.nih.gov";
+//    private final String XSL_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance";
+//    private final String ISO_21090_NAMESPACE = "uri:iso.org:21090";
+//
+//    private final DataSource dataSource;
+//    private final MessageSource messages;
+//    private final CoreResources coreResources;// TODO keep or toss?
+//    private final Locale locale;
     private final RegisterSubjectService subjectService;
-    SubjectDAO subjectDao;
-    StudyDAO studyDao;
-    StudySubjectDAO studySubjectDao;
+//    SubjectDAO subjectDao;
+//    StudyDAO studyDao;
+//    StudySubjectDAO studySubjectDao;
     
     public RegisterSubjectEndpoint(DataSource dataSource, MessageSource messages, CoreResources coreResources) {
         
-        this.dataSource = dataSource;
-        this.messages = messages;
-        this.coreResources = coreResources;
-        
-        this.locale = new Locale("en_US");
-        this.setAlwaysTransform(true);
+        super(dataSource, messages, coreResources);
         this.subjectService = new RegisterSubjectService();
     }
     
@@ -96,7 +92,7 @@ public class RegisterSubjectEndpoint extends AbstractDomPayloadEndpoint {
                         throw new CCSystemFaultException("You do not possess the correct privileges to create a subject.");
                     }
                     
-                    RegisterSubjectBean subjectBean = subjectService.generateSubjectBean(user, childNode);
+                    RegisterSubjectBean subjectBean = subjectService.generateSubjectBean(user, childNode, getStudyDao());
                     // performedSubjectMilestone
                     NodeList performedMilestones = requestElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "performedSubjectMilestone");
                     if (performedMilestones.getLength() > 0) {
@@ -106,28 +102,7 @@ public class RegisterSubjectEndpoint extends AbstractDomPayloadEndpoint {
                         }
                     }
                     // will there ever be more than one subject-study pair sent in a message? tba
-                    StudyBean studyBean = new StudyBean();
-                    StudyBean siteBean = new StudyBean();
                     
-                    if (subjectBean.getSiteUniqueIdentifier() != null) {
-                        siteBean = getStudyDao().findByUniqueIdentifier(subjectBean.getSiteUniqueIdentifier());
-                    } 
-                    studyBean = getStudyDao().findByUniqueIdentifier(subjectBean.getStudyUniqueIdentifier());
-                    
-                    // dry
-                    if (studyBean.getId() <= 0) {
-                        // if no study exists with that name, there is an error
-                        throw new CCBusinessFaultException("No study exists with that name, please review your information and re-submit the request.");
-                    }
-                    if (siteBean.getId() > 0) {
-                        // if there is a site bean, the study bean should be its parent, otherwise there is an error
-                        if ((siteBean.getParentStudyId() != studyBean.getId()) && (siteBean.getParentStudyId() != 0)) {
-                            throw new CCBusinessFaultException("Your parent and child study relationship is mismatched." + 
-                                    "  Please enter correct study and site information.");
-                        }
-                        studyBean = siteBean;
-                    }
-                    // dry
                     
                     // are there errors here? if so, throw a ccbusiness fault
                     finalSubjectBean = subjectService.generateSubjectBean(subjectBean);
@@ -151,13 +126,13 @@ public class RegisterSubjectEndpoint extends AbstractDomPayloadEndpoint {
                                 subjectBean.getUniqueIdentifier() + ".  Please review your data and re-submit your request.");
                         }
                     }
-                    StudySubjectBean studySubjectBean = subjectService.generateStudySubjectBean(subjectBean, finalSubjectBean, studyBean);
+                    StudySubjectBean studySubjectBean = subjectService.generateStudySubjectBean(subjectBean, finalSubjectBean, subjectBean.getStudyBean());
                     
-                    StudySubjectBean testStudySubjectBean = getStudySubjectDao().findByLabelAndStudy(subjectBean.getStudySubjectLabel(), studyBean);
+                    StudySubjectBean testStudySubjectBean = getStudySubjectDao().findByLabelAndStudy(subjectBean.getStudySubjectLabel(), subjectBean.getStudyBean());
                     boolean updateStudySubject = false;
                     if (testStudySubjectBean.getId() > 0) {
                         // same check here, if its identical, restore and renew, otherwise throw the error
-                        if (subjectService.isStudySubjectIdentical(subjectBean, finalSubjectBean, testStudySubjectBean, studyBean)) {
+                        if (subjectService.isStudySubjectIdentical(subjectBean, finalSubjectBean, testStudySubjectBean, subjectBean.getStudyBean())) {
                             testStudySubjectBean.setUpdater(user);
                             testStudySubjectBean.setStatus(Status.AVAILABLE);
                             updateStudySubject = true;
@@ -165,12 +140,14 @@ public class RegisterSubjectEndpoint extends AbstractDomPayloadEndpoint {
                         } else {
                         // also renew all the CRFs and Items? 
                         
-                            throw new CCBusinessFaultException("You already have a study subject in the database with the SSID of " + subjectBean.getStudySubjectLabel()
-                                + 
+                            throw new CCBusinessFaultException("You already have a study subject in the database with the SSID of " + 
+                                    subjectBean.getStudySubjectLabel() + 
                                 ".  Please change it and try your request again.");
                         }
                     }
-                    // below is point of no return - we have caught all the error and are committing to the database
+                    /////////////////////////////////////////////////////////////////////////////////////////////////
+                    // below is point of no return - we have caught all the errors and are committing to the database
+                    /////////////////////////////////////////////////////////////////////////////////////////////////
                     if (updateMe) {
                         finalSubjectBean = (SubjectBean)getSubjectDao().update(finalSubjectBean);
                     } else {
@@ -189,7 +166,7 @@ public class RegisterSubjectEndpoint extends AbstractDomPayloadEndpoint {
                 }
             }
             // return success message here
-            return mapConfirmation(finalSubjectBean.getUniqueIdentifier());
+            return mapRegisterSubjectConfirmation(finalSubjectBean.getUniqueIdentifier());
             //TODO is it actually primary key? nta
         } catch (Exception npe) {
             npe.printStackTrace();
@@ -197,30 +174,30 @@ public class RegisterSubjectEndpoint extends AbstractDomPayloadEndpoint {
             if (npe.getClass().getName().startsWith("org.akaza.openclinica.ws.cabig.exception")) {
                 System.out.println("found " + npe.getClass().getName());
                 OpenClinicaException ope = (OpenClinicaException) npe;
-                return mapErrorConfirmation("", ope);
+                return mapSubjectErrorConfirmation("", ope);
             } else {
                 System.out.println(" did not find openclinica exception, found " + npe.getClass().getName());
-                return mapErrorConfirmation(npe.getMessage());
+                return mapSubjectErrorConfirmation(npe.getMessage());
             }
         }
         
         
     }
     
-    public SubjectDAO getSubjectDao() {
-        subjectDao = subjectDao != null ? subjectDao : new SubjectDAO(dataSource);
-        return subjectDao;
-    }
-    
-    public StudyDAO getStudyDao() {
-        studyDao = studyDao != null ? studyDao : new StudyDAO(dataSource);
-        return studyDao;
-    }
-    
-    public StudySubjectDAO getStudySubjectDao() {
-        studySubjectDao = studySubjectDao != null ? studySubjectDao : new StudySubjectDAO(dataSource);
-        return studySubjectDao;
-    }
+//    public SubjectDAO getSubjectDao() {
+//        subjectDao = subjectDao != null ? subjectDao : new SubjectDAO(dataSource);
+//        return subjectDao;
+//    }
+//    
+//    public StudyDAO getStudyDao() {
+//        studyDao = studyDao != null ? studyDao : new StudyDAO(dataSource);
+//        return studyDao;
+//    }
+//    
+//    public StudySubjectDAO getStudySubjectDao() {
+//        studySubjectDao = studySubjectDao != null ? studySubjectDao : new StudySubjectDAO(dataSource);
+//        return studySubjectDao;
+//    }
     
     /**
      * Helper Method to get the user account
@@ -228,46 +205,46 @@ public class RegisterSubjectEndpoint extends AbstractDomPayloadEndpoint {
      * 
      * @return UserAccountBean
      */
-    private UserAccountBean getUserAccount() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username = null;
-        if (principal instanceof UserDetails) {
-            username = ((UserDetails) principal).getUsername();
-        } else {
-            username = principal.toString();
-        }
-        UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
-        return (UserAccountBean) userAccountDao.findByUserName(username);
-    }
+//    private UserAccountBean getUserAccount() {
+//        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        String username = null;
+//        if (principal instanceof UserDetails) {
+//            username = ((UserDetails) principal).getUsername();
+//        } else {
+//            username = principal.toString();
+//        }
+//        UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
+//        return (UserAccountBean) userAccountDao.findByUserName(username);
+//    }
     
     /**
      * simple helper method to figure out structure of node list passed to it
      * TODO: place in a superclass, so we don't clutter up the endpoint
      * @param nlist
      */
-    private void logNodeList(NodeList nlist) {
-        if (nlist.getLength() > 0) {
-            for (int i=0; i < nlist.getLength(); i++) {
-                try {
-                    Node childNode = nlist.item(i);
-                    System.out.println("node: " + childNode.getNodeName() + 
-                            " -> " + childNode.getNodeValue() +
-                            " : " + childNode.getTextContent());
-                    if (childNode.getChildNodes().getLength() > 0) {
-                        System.out.println("found child nodes: " + childNode.getChildNodes().getLength());
-                        logNodeList(childNode.getChildNodes());
-                    }
-                    if (childNode.hasAttributes()) {
-                        System.out.print("found attributes " + childNode.getAttributes().getLength());
-                        System.out.println(": " + childNode.getAttributes().item(0).getNodeName());
-                    }
-                } catch (Exception ee) {
-                    // trying to catch all NPEs here, tbh
-                    System.out.println("found a nullpointer");
-                }
-            }
-        }
-    }
+//    private void logNodeList(NodeList nlist) {
+//        if (nlist.getLength() > 0) {
+//            for (int i=0; i < nlist.getLength(); i++) {
+//                try {
+//                    Node childNode = nlist.item(i);
+//                    System.out.println("node: " + childNode.getNodeName() + 
+//                            " -> " + childNode.getNodeValue() +
+//                            " : " + childNode.getTextContent());
+//                    if (childNode.getChildNodes().getLength() > 0) {
+//                        System.out.println("found child nodes: " + childNode.getChildNodes().getLength());
+//                        logNodeList(childNode.getChildNodes());
+//                    }
+//                    if (childNode.hasAttributes()) {
+//                        System.out.print("found attributes " + childNode.getAttributes().getLength());
+//                        System.out.println(": " + childNode.getAttributes().item(0).getNodeName());
+//                    }
+//                } catch (Exception ee) {
+//                    // trying to catch all NPEs here, tbh
+//                    System.out.println("found a nullpointer");
+//                }
+//            }
+//        }
+//    }
     
     private Element mapErrorConfirmation(String message, OpenClinicaException exception) throws Exception {
         DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
