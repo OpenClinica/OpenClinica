@@ -1083,7 +1083,8 @@ window.onload = initmb;
 
 <c:set var="currPage" value="${displayItem.singleItem.metadata.pageNumberLabel}" />
 
-<c:if test="${displayItem.singleItem.metadata.showItem || fn:length(displayItem.singleItem.metadata.conditionalDisplay)>0}">
+<c:set var="cdisplay" value="${fn:length(displayItem.singleItem.metadata.conditionalDisplay)}"/>
+<c:if test="${displayItem.singleItem.metadata.showItem || cdisplay>0}">
     <%-- SHOW THE PARENT FIRST --%>
 <c:if test="${displayItem.singleItem.metadata.parentId == 0}">
 
@@ -1100,16 +1101,19 @@ window.onload = initmb;
 </c:if>
 <c:set var="numOfTr" value="${numOfTr+1}"/>
 <c:if test="${!empty displayItem.singleItem.metadata.header}">
-    <c:choose>
-	<c:when test="${fn:length(displayItem.singleItem.metadata.conditionalDisplay)>0}">
+	<c:choose>
+	<c:when test="${cdisplay>0}">
+		<c:set var="scdShowStatus" value="${displayItem.singleItem.scdDisplayInfo.scdShowStatus}"/>
 		<c:set var="cdId" value="${displayItem.singleItem.item.id}"/>
-		<c:set var="statusId" value="${displayItem.singleItem.data.status.id}"/>
 		<c:choose>
-		<c:when test="${statusId>0&&statusId!=5 || displayItem.singleItem.isSCDtoBeShown}">
-    		<tr class="aka_stripes">
+		<c:when test="${scdShowStatus == 1}">
+    		<tr class="aka_stripes" id="<c:out value="hd${cdId}"/>">
+		</c:when>
+		<c:when test="${scdShowStatus == 2}">
+			<tr class="aka_stripes" id="<c:out value="hd${cdId}"/>" style="display:none">
 		</c:when>
 		<c:otherwise>
-			<tr class="aka_stripes" id="<c:out value="hd${cdId}"/>" style="display:none">
+    		<tr class="aka_stripes">
 		</c:otherwise>
 		</c:choose>
 	</c:when>
@@ -1123,16 +1127,19 @@ window.onload = initmb;
     </tr>
 </c:if>
 <c:if test="${!empty displayItem.singleItem.metadata.subHeader}">
-    <c:choose>
-	<c:when test="${fn:length(displayItem.singleItem.metadata.conditionalDisplay)>0}">
+	<c:choose>
+	<c:when test="${cdisplay>0}">
+		<c:set var="scdShowStatus" value="${displayItem.singleItem.scdDisplayInfo.scdShowStatus}"/>
 		<c:set var="cdId" value="${displayItem.singleItem.item.id}"/>
-		<c:set var="statusId" value="${displayItem.singleItem.data.status.id}"/>
 		<c:choose>
-		<c:when test="${statusId>0&&statusId!=5 || displayItem.singleItem.isSCDtoBeShown}">
-    		<tr class="aka_stripes">
+		<c:when test="${scdShowStatus == 1}">
+    		<tr class="aka_stripes" id="<c:out value="sub${cdId}"/>">
+		</c:when>
+		<c:when test="${scdShowStatus == 2}">
+			<tr class="aka_stripes" id="<c:out value="sub${cdId}"/>" style="display:none">
 		</c:when>
 		<c:otherwise>
-			<tr class="aka_stripes" id="<c:out value="sub${cdId}"/>" style="display:none">
+    		<tr class="aka_stripes">
 		</c:otherwise>
 		</c:choose>
 	</c:when>
@@ -1144,32 +1151,48 @@ window.onload = initmb;
           "false"/></td>
     </tr>
 </c:if>
+
+<c:set var="rowDisplay" value="${displayItem.singleItem.scdDisplayInfo.rowDisplayStatus}"/>
+<c:set var="rowSCDShowIDStr" value="${displayItem.singleItem.scdDisplayInfo.rowSCDShowIDStr}"/>
+<input type="hidden" id="rowSCDShowIDs${numOfTr}" value="${rowSCDShowIDStr}" />
 <c:choose>
-<c:when test="${fn:length(displayItem.singleItem.metadata.conditionalDisplay)>0}">
-	<c:set var="cdId" value="${displayItem.singleItem.item.id}"/>
-	<c:set var="statusId" value="${displayItem.singleItem.data.status.id}"/><c:out value="${statusId}"/>
-	<c:choose>
-	<c:when test="${statusId>0&&statusId!=5 || displayItem.singleItem.isSCDtoBeShown}">
-		<tr>
-	</c:when>
-	<c:otherwise>
-		<tr id="<c:out value="t${cdId}"/>" style="display:none">
-	</c:otherwise>
-	</c:choose>
+<c:when test="${rowDisplay == 0}">
+	<tr>
+</c:when>
+<c:when test="${rowDisplay == 1}">
+	<tr id="tr${numOfTr}">
 </c:when>
 <c:otherwise>
-	<tr>
+	<tr id="tr${numOfTr}" style="display:none">
 </c:otherwise>
 </c:choose>
     <td class="table_cell_left">
         <table border="0" >
             <tr>
-                <td valign="top">
-                    </c:if>
+                </c:if>
 
-                    <c:if test="${displayItem.singleItem.metadata.columnNumber >1}">
-                <td valign="top">
-                    </c:if>
+                		<c:choose>
+						<c:when test="${cdisplay > 0}">
+							<c:set var="scdShowStatus" value="${displayItem.singleItem.scdDisplayInfo.scdShowStatus}"/>
+							<c:set var="cdId" value="${displayItem.singleItem.item.id}"/>
+							<input type="hidden" id="col${cdId}" value="${numOfTr}"/>
+							<c:choose>
+							<c:when test="${scdShowStatus == 1}"> 
+		                		<td valign="top" id="t${cdId}">
+					    	</c:when>
+					    	<c:when test="${scdShowStatus == 2}">
+		                		<td valign="top" id="t${cdId}" style="display:none">
+		                	</c:when>
+		                	<c:otherwise>
+		    					<td valign="top">
+		                	</c:otherwise>
+		                	</c:choose>
+		                </c:when>
+		                <c:otherwise>
+		                	<td valign="top">
+		                </c:otherwise>
+		                </c:choose>
+                
                     
 						<c:set var="isItemShown" value="false"/>
 						<c:forEach var="formMsg" items="${formMessages}">
@@ -1258,14 +1281,34 @@ window.onload = initmb;
             <table border="0">
                 <c:set var="notFirstRow" value="${0}" />
                 <c:forEach var="childItem" items="${displayItem.singleItem.children}">
-				<c:if test="${childItem.metadata.showItem}">
+                <c:set var="ccdisplay" value="${fn:length(childItem.metadata.conditionalDisplay)}"/>
+				<c:if test="${childItem.metadata.showItem || ccdisplay>0}">
 
                 <c:set var="currColumn" value="${childItem.metadata.columnNumber}" />
                 <c:if test="${currColumn == 1}">
                 <c:if test="${notFirstRow != 0}">
                     </tr>
                 </c:if>
-                <tr>
+                <c:choose>
+				<c:when test="${ccdisplay > 0}">
+					<c:set var="scdShowStatus" value="${childItem.scdDisplayInfo.scdShowStatus}"/>
+					<c:set var="cdId" value="${childItem.item.id}"/>
+					<c:choose>
+					<c:when test="${scdShowStatus == 1}"> 
+                		<tr id="t${cdId}">
+			    	</c:when>
+			    	<c:when test="${scdShowStatus == 2}">
+                		<tr id="t${cdId}" style="display:none">
+                	</c:when>
+                	<c:otherwise>
+    					<tr>
+                	</c:otherwise>
+                	</c:choose>
+                </c:when>
+                <c:otherwise>
+                	<tr>
+                </c:otherwise>
+                </c:choose>
                     <c:set var="notFirstRow" value="${1}" />
                         <%-- indentation --%>
                     <td valign="top">&nbsp;</td>
