@@ -1,18 +1,17 @@
 /*
  * OpenClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
-
  * For details see: http://www.openclinica.org/license
  * copyright 2003-2005 Akaza Research
  */
 package org.akaza.openclinica.bean.submit;
 
-import java.io.File;
-import java.util.ArrayList;
-
 import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+
+import java.io.File;
+import java.util.ArrayList;
 
 /**
  * @author ssachs
@@ -80,11 +79,19 @@ public class DisplayItemBean implements Comparable {
      */
     private int discrepancyNoteStatus;
     
-    //this is for a item which controlls scd item
+    /**
+     * held by Item which controls SCD item 
+     */
     private ArrayList<SimpleConditionalDisplayPair> SCDPairs = new ArrayList<SimpleConditionalDisplayPair> ();
-
-    //this is for a scd item to be shown at display. This is not a status of database, it is a status at display
+    /**
+     * It is true if a scd item will display because of chosen options. 
+     */
     private boolean isSCDtoBeShown = false;
+    private SCDItemDisplayInfo scdDisplayInfo = new SCDItemDisplayInfo(); 
+    /**
+     * Records ItemDataBean value stored in database only, may not always available. 
+     */
+    private String dbValue = "";
     
     private void setProperties() {
         data = new ItemDataBean();
@@ -96,6 +103,8 @@ public class DisplayItemBean implements Comparable {
         dbData = new ItemDataBean();
         SCDPairs = new ArrayList<SimpleConditionalDisplayPair>();
         isSCDtoBeShown = false;
+        scdDisplayInfo = new SCDItemDisplayInfo();
+        dbValue = "";
     }
 
     public DisplayItemBean() {
@@ -402,7 +411,7 @@ public class DisplayItemBean implements Comparable {
         return SCDPairs;
     }
 
-    public void setConditionalDisplayPairs(ArrayList<SimpleConditionalDisplayPair> SCDPairs) {
+    public void setSCDPairs(ArrayList<SimpleConditionalDisplayPair> SCDPairs) {
         this.SCDPairs = SCDPairs;
     }
 
@@ -459,6 +468,20 @@ public class DisplayItemBean implements Comparable {
 	public void setDiscrepancyNotes(ArrayList<DiscrepancyNoteBean> discrepancyNotes) {
 		this.discrepancyNotes = discrepancyNotes;
 	}
-	
 
+    public SCDItemDisplayInfo getScdDisplayInfo() {
+        return scdDisplayInfo;
+    }
+
+    public void setScdDisplayInfo(SCDItemDisplayInfo scdDisplayInfo) {
+        this.scdDisplayInfo = scdDisplayInfo;
+    }
+
+    public String getDbValue() {
+        return dbValue;
+    }
+
+    public void setDbValue(String dbValue) {
+        this.dbValue = dbValue;
+    }
 }

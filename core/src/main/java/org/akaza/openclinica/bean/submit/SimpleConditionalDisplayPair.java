@@ -7,22 +7,21 @@
  */
 package org.akaza.openclinica.bean.submit;
 
-import org.akaza.openclinica.bean.core.Status;
 
 /**
- * This class collects information for one pair of a simple conditional display item and one control option value
+ * This class collects information for one pair of a simple conditional display
  * 
  * @author ywang (Jun., 2010)
  *
  */
 public class SimpleConditionalDisplayPair {
-    private Integer SCDItemId;
-    private String SCDItemName;
-    private String optionValue;
-    private String controlItemName;
-    private Integer controlItemId;
-    private String message;
-    private Boolean isCurrentShown = false; //shown status that has been saved in database
+    private Integer SCDItemId = 0;
+    private String SCDItemName = "";
+    private String optionValue = "";
+    private String controlItemName = "";
+    private Integer controlItemId = 0;
+    private String message = "";
+    private Integer SCDItemFormMetadataId = 0;
     
     
     public Integer getSCDItemId() {
@@ -73,21 +72,11 @@ public class SimpleConditionalDisplayPair {
         this.controlItemId = controlItemId;
     }
 
-    public Boolean isCurrentShown() {
-        return isCurrentShown;
+    public Integer getSCDItemFormMetadataId() {
+        return SCDItemFormMetadataId;
     }
 
-    public void setIsCurrentShown(Boolean isCurrentShown) {
-        this.isCurrentShown = isCurrentShown;
-    }
-    
-    /**
-     * Determined by item data status of a simple conditional display item
-     * @param simpleConditionalDisplayItemData
-     * @return
-     */
-    public static Boolean isCurrentShownItem(ItemDataBean simpleConditionalDisplayItemData) {
-        Status itemDataStatus = simpleConditionalDisplayItemData.getStatus();
-        return itemDataStatus!=null && itemDataStatus.getId()>0 && (itemDataStatus.getId()!=5||itemDataStatus.getId()!=7  ? true : false);
+    public void setSCDItemFormMetadataId(Integer sCDItemFormMetadataId) {
+        SCDItemFormMetadataId = sCDItemFormMetadataId;
     }
 }
