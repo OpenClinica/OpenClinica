@@ -82,9 +82,8 @@ form element in red --%>
 
 <script language="JavaScript" src="includes/global_functions_javascript.js"></script>
 
-
-<%-- Some javascript functions for handling file data type -- ywang Dec.,2008 --%>
 <script lang="Javascript">
+<!--
 function genToolTips(itemId){
 	var resStatus = new Array();
 	var detailedNotes= new Array();
@@ -277,42 +276,66 @@ function switchStr(itemId, id,attribute,str1,str2) {
 
 function conditionalShow(strLeftNavRowElementName){
     var objLeftNavRowElement;
+    var toShow = "false";
 
     objLeftNavRowElement = MM_findObj("t"+strLeftNavRowElementName);
     if (objLeftNavRowElement != null) {
         if (objLeftNavRowElement.style) { objLeftNavRowElement = objLeftNavRowElement.style; }
-		if (objLeftNavRowElement.display = "none") { objLeftNavRowElement.display = "";}
+		if (objLeftNavRowElement.display == "none") { 
+			objLeftNavRowElement.display = "";	toShow = "true";
+			showRow(strLeftNavRowElementName); 
+		}
     }
-    objLeftNavRowElement1 = MM_findObj("hd"+strLeftNavRowElementName);
-    if (objLeftNavRowElement1 != null) {
-        if (objLeftNavRowElement1.style) { objLeftNavRowElement1 = objLeftNavRowElement1.style; }
-		if (objLeftNavRowElement1.display = "none") { objLeftNavRowElement1.display = "";}
-    }
-    objLeftNavRowElement2 = MM_findObj("sub"+strLeftNavRowElementName);
-    if (objLeftNavRowElement2 != null) {
-        if (objLeftNavRowElement2.style) { objLeftNavRowElement2 = objLeftNavRowElement2.style; }
-		if (objLeftNavRowElement2.display = "none") { objLeftNavRowElement2.display = "";}
+    if(toShow == "true") {
+	    var objLeftNavRowElement1 = MM_findObj("hd"+strLeftNavRowElementName);
+	    if (objLeftNavRowElement1 != null) {
+	        if (objLeftNavRowElement1.style) { objLeftNavRowElement1 = objLeftNavRowElement1.style; }
+			if (objLeftNavRowElement1.display == "none") { objLeftNavRowElement1.display = "";}
+	    }
+	    var objLeftNavRowElement2 = MM_findObj("sub"+strLeftNavRowElementName);
+	    if (objLeftNavRowElement2 != null) {
+	        if (objLeftNavRowElement2.style) { objLeftNavRowElement2 = objLeftNavRowElement2.style; }
+			if (objLeftNavRowElement2.display == "none") { objLeftNavRowElement2.display = "";}
+	    }
     }
 }
 
 function conditionalHide(strLeftNavRowElementName){
     var objLeftNavRowElement;
+    var toHide = "true";
 
     objLeftNavRowElement = MM_findObj("t"+strLeftNavRowElementName);
     if (objLeftNavRowElement != null) {
-        if (objLeftNavRowElement.style) { objLeftNavRowElement = objLeftNavRowElement.style; }
-        objLeftNavRowElement.display = "none";
+	    var obj = MM_findObj("ft"+strLeftNavRowElementName);
+	    if(obj != null) { if(obj.value != "") { toHide = "false";  }
+	    } else { 
+		    obj = MM_findObj("a"+strLeftNavRowElementName);
+		    if(obj != null) { if(obj.value != "") { toHide = "false";  }
+	    	} else {
+			    obj = MM_findObj("input"+strLeftNavRowElementName);
+				var type = obj.type;
+				if(obj.value != "" && (type=="textarea" || type=="text" || type=="select-one" || type=="select-multiple")) { toHide = "false"; 
+				}else if(obj.length > 0) { for(var i=0; i<obj.length; ++i) { if(obj[i].checked && obj[i].value != "") { toHide = "false"; break;}}} 
+	    	}
+    	}
+		if(toHide == "true") {
+	        if (objLeftNavRowElement.style) { objLeftNavRowElement = objLeftNavRowElement.style; }
+	        if (objLeftNavRowElement.display == "none") { toHide = "false"; 
+        	} else { objLeftNavRowElement.display = "none";		hideRow(strLeftNavRowElementName); }
+    	}
     }
-    objLeftNavRowElement1 = MM_findObj("hd"+strLeftNavRowElementName);
-    if (objLeftNavRowElement1 != null) {
-        if (objLeftNavRowElement1.style) { objLeftNavRowElement1 = objLeftNavRowElement1.style; }
-        objLeftNavRowElement1.display = "none";
-    }
-    objLeftNavRowElement2 = MM_findObj("sub"+strLeftNavRowElementName);
-    if (objLeftNavRowElement2 != null) {
-        if (objLeftNavRowElement2.style) { objLeftNavRowElement2 = objLeftNavRowElement2.style; }
-        objLeftNavRowElement2.display = "none";
-    }
+    if(toHide == "true") {
+	    var objLeftNavRowElement1 = MM_findObj("hd"+strLeftNavRowElementName);
+	    if (objLeftNavRowElement1 != null) {
+	        if (objLeftNavRowElement1.style) { objLeftNavRowElement1 = objLeftNavRowElement1.style; }
+	        objLeftNavRowElement1.display = "none";
+	    }
+	    var objLeftNavRowElement2 = MM_findObj("sub"+strLeftNavRowElementName);
+	    if (objLeftNavRowElement2 != null) {
+	        if (objLeftNavRowElement2.style) { objLeftNavRowElement2 = objLeftNavRowElement2.style; }
+	        objLeftNavRowElement2.display = "none";
+	    }
+	}
 }
 
 function selectControlShow(element,scdPairStr) {
@@ -324,7 +347,7 @@ function selectControlShow(element,scdPairStr) {
 	for(var j=1; j<arr.length; j+=2) {
 		hideIds[m] = arr[j];
 	    for(var i = 0; i < element.options.length; i++){
-	        if(element.options[i].selected) {
+			if(element.options[i].selected) {
 		        if(element.options[i].value==arr[j+1]){
 			        showIds[n] = arr[j]; 
 			        hideIds[m] = -1;
@@ -377,6 +400,35 @@ function radioControlShow(element,scdPairStr) {
 		}
 	}
 }
+
+function showRow(itemId) {
+	var objCol = MM_findObj("col" + itemId);
+	if(objCol != null) {
+		var numOfTr = objCol.value;
+		var objIDs = MM_findObj("rowSCDShowIDs" + numOfTr); 	var ids = objIDs.value;
+		if(ids.length > 1) {
+			if(ids.indexOf("-"+itemId+"-") == -1) { ids = ids + itemId + "-"; objIDs.value = ids;}
+		} else { ids = "-" + itemId + "-";	objIDs.value = ids;		} 
+		var objTr = MM_findObj("tr"+numOfTr); 
+		if(objTr != null && objTr.style.display == "none") { objTr.style.display = "";	}
+	}		
+}
+
+function hideRow(itemId) {
+	var objCol = MM_findObj("col" + itemId);
+	if(objCol != null) {
+		var numOfTr = objCol.value;
+		var objIDs = MM_findObj("rowSCDShowIDs" + numOfTr); 	var ids = objIDs.value;
+		if(ids.length > 1) { 
+			if(ids.indexOf("-"+itemId+"-") != -1) { ids = ids.replace(itemId + "-", ""); objIDs.value = ids;	}
+		} 
+		if(ids.length <= 1) { 
+			var objTr = MM_findObj("tr"+numOfTr); 
+			if(objTr != null) { objTr.style.display = "none";	} 
+		}
+	}
+}
+//-->
 </script>
 
 <%-- A way to deal with the lack of 'break' out of forEach loop--%>
