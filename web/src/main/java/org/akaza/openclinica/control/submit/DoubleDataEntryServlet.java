@@ -7,13 +7,6 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-
-import javax.servlet.http.HttpSession;
-
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -31,6 +24,13 @@ import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+
+import javax.servlet.http.HttpSession;
 
 /**
  * @author ssachs
@@ -207,13 +207,17 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
         }
         boolean showOriginalItem = getItemMetadataService().isShown(dib.getItem().getId(), ecb, valueToCompare);// was dib.getData()
         boolean showItem = dib.getMetadata().isShowItem();
+        if(dib.getMetadata().isConditionalDisplayItem()) {
+            showItem = true;
+            dib = loadFormValue(dib);
+        }
         boolean showDuplicateItem = getItemMetadataService().hasPassedDDE(dib.getMetadata(), ecb, valueToCompare);//.isShown(dib.getItem().getId(), ecb, dib.getDbData());// where is the set db data? 
         logger.debug("*** show original item has value " + dib.getData().getValue() + " and show item has value " + valueToCompare.getValue());
         logger.debug("--- show original: " + showOriginalItem + " show duplicate: " + showDuplicateItem + " and just show item: " + showItem);
         logger.debug("VALIDATION COUNT " + validationCount);
         if (showOriginalItem && showDuplicateItem || showItem) {
             // it should either be shown already, OR shown in the database?
-            // logger.debug("=== we passed, adding validation here");
+            // logger.debug("=== we passed, adding validation here");  
             Integer indValidationCount = (Integer) session.getAttribute(COUNT_VALIDATE + keyId + dib.getMetadata().getId());
             if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXT) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXTAREA)
                     || rt.equals(org.akaza.openclinica.bean.core.ResponseType.FILE)) {

@@ -7,18 +7,6 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
@@ -52,6 +40,7 @@ import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.bean.submit.ResponseOptionBean;
 import org.akaza.openclinica.bean.submit.ResponseSetBean;
+import org.akaza.openclinica.bean.submit.SCDItemDisplayInfo;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.bean.submit.SimpleConditionalDisplayPair;
 import org.akaza.openclinica.bean.submit.SubjectBean;
@@ -68,8 +57,8 @@ import org.akaza.openclinica.control.managestudy.ViewNotesServlet;
 import org.akaza.openclinica.control.managestudy.ViewStudySubjectServlet;
 import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.admin.AuditDAO;
+import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -104,11 +93,20 @@ import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
 /**
  * @author ssachs
- *
- *         Enabled scoring feature - ywang (Jan. 2008)
- *
  */
 
 public abstract class DataEntryServlet extends SecureController {
@@ -250,6 +248,8 @@ public abstract class DataEntryServlet extends SecureController {
     protected boolean isSubmitted = false;
 
     protected boolean hasGroup = false;
+    
+    protected String rowDisplay = "";
 
     /*
      * (non-Javadoc)
@@ -479,6 +479,8 @@ public abstract class DataEntryServlet extends SecureController {
 
         List<RuleSetBean> ruleSets = createAndInitializeRuleSet(currentStudy, studyEventDefinition, crfVersionBean, studyEventBean, ecb, shouldRunRules());
         DisplaySectionBean section = getDisplayBean(hasGroup, false);
+        
+        
 
         // 2790: Find out the id of the section's first field
         String firstFieldId = getSectionFirstFieldId(section.getSection().getId());
@@ -566,8 +568,12 @@ public abstract class DataEntryServlet extends SecureController {
             logger.debug("+++ just ran populateNotes, printing field notes: " + discNotes.getFieldNotes().toString());
             logger.debug("found disc notes: " + discNotes.getNumExistingFieldNotes().toString());
             session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
+            
+            if(section.getSection().hasSCDItem()) {
+                section = SCDItemDisplayInfo.generateSCDDisplayInfo(section,this.getServletPage().equals(Page.INITIAL_DATA_ENTRY));
+            }
 
-            int keyId = ecb.getId();
+            int keyId = ecb.getId(); 
             session.removeAttribute(DoubleDataEntryServlet.COUNT_VALIDATE + keyId);
 
             setUpPanel(section);
@@ -668,8 +674,6 @@ public abstract class DataEntryServlet extends SecureController {
                 } else {// other single items
                     DisplayItemBean dib = diwg.getSingleItem();
                     // dib = (DisplayItemBean) allItems.get(i);
-                    boolean hasSCDItemInSection = section.getSection().hasSCDItem();
-                    Set<Integer> showSCDItemIds = section.getShowSCDItemIds();
                     if (validate) {
                         // generate input name here?
                         // DisplayItemGroupBean dgb = diwg.getItemGroup();
@@ -683,22 +687,6 @@ public abstract class DataEntryServlet extends SecureController {
                         // otherwise,
                         // DDE not
                         // working-jxu
-
-                        if(section.getSection().hasSCDItem()) {
-                            if(dib.getSCDPairs().size()>0) {
-                                //for control item
-                                //dib has to loadFormValue first. Here loadFormValue has been done in validateDisplayItemBean(v, dib, "")
-                                section.setShowSCDItemIds(this.conditionalDisplayToBeShown(dib, section.getShowSCDItemIds()));
-                            } else if(dib.getMetadata().isConditionalDisplayItem()) {
-                                //for scd item
-                                //a control item is always before its scd item
-                                dib.setIsSCDtoBeShown(section.getShowSCDItemIds().contains(dib.getMetadata().getItemId()));
-                                if(!dib.getIsSCDtoBeShown()) {
-                                    dib.setIsSCDtoBeShown(this.shouldSCDBeShown(dib));
-                                }
-                                validateSCDItemBean(v, dib);
-                            }
-                        }
 
                         logger.debug("&&& found name: " + itemName);
                         logger.debug("input VALIDATE " + itemName + ": " + fp.getString(itemName));
@@ -725,23 +713,6 @@ public abstract class DataEntryServlet extends SecureController {
                             // false);
                             child = validateDisplayItemBean(v, child, itemName);
                             // was null changed value 092007 tbh
-
-                            if(section.getSection().hasSCDItem()) {
-                                if(child.getSCDPairs().size()>0) {
-                                    //for control item
-                                    //dib has to loadFormValue first. Here loadFormValue has been done in validateDisplayItemBean(v, dib, "")
-                                    section.setShowSCDItemIds(this.conditionalDisplayToBeShown(child, section.getShowSCDItemIds()));
-                                } else if(child.getMetadata().isConditionalDisplayItem()) {
-                                    //for scd item
-                                    //a control item is always before its scd item
-                                    child.setIsSCDtoBeShown(section.getShowSCDItemIds().contains(child.getMetadata().getItemId()));
-                                    if(!child.getIsSCDtoBeShown()) {
-                                        child.setIsSCDtoBeShown(this.shouldSCDBeShown(child));
-                                    }
-                                    validateSCDItemBean(v, child);
-                                }
-                            }
-
                         } else {
                             // child.loadFormValue(itemName);
                             child = loadFormValue(child);
@@ -760,6 +731,38 @@ public abstract class DataEntryServlet extends SecureController {
 
                 }
             }
+            
+            if(validate && section.getSection().hasSCDItem()) {
+                for (int i = 0; i < allItems.size(); ++i) {
+                    DisplayItemBean dib = allItems.get(i).getSingleItem();
+                    if(dib.getSCDPairs().size()>0 && dib.getMetadata().getParentId()==0) {
+                        //for control item
+                        //dib has to loadFormValue first. Here loadFormValue has been done in validateDisplayItemBean(v, dib, "")
+                        section.setShowSCDItemIds(this.conditionalDisplayToBeShown(dib, section.getShowSCDItemIds()));
+                    } else if(dib.getMetadata().isConditionalDisplayItem() && dib.getMetadata().getParentId()==0) {
+                        //for scd item
+                        //a control item is always before its scd item
+                        dib.setIsSCDtoBeShown(section.getShowSCDItemIds().contains(dib.getMetadata().getItemId()));
+                        validateSCDItemBean(v, dib);
+                    } 
+                    
+                    ArrayList<DisplayItemBean> children = dib.getChildren();
+                    for (int j = 0; j < children.size(); j++) {
+                        DisplayItemBean child = children.get(j);
+                        if(child.getSCDPairs().size()>0) {
+                            //for control item
+                            //dib has to loadFormValue first. Here loadFormValue has been done in validateDisplayItemBean(v, dib, "")
+                            section.setShowSCDItemIds(this.conditionalDisplayToBeShown(child, section.getShowSCDItemIds()));
+                        } else if(child.getMetadata().isConditionalDisplayItem()) {
+                            //for scd item
+                            //a control item is always before its scd item
+                            child.setIsSCDtoBeShown(section.getShowSCDItemIds().contains(child.getMetadata().getItemId()));
+                            validateSCDItemBean(v, child);
+                        }
+                    }
+                }
+            }
+            
             Phase phase2 = Phase.INITIAL_DATA_ENTRY;
             if (getServletPage().equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
                 phase2 = Phase.DOUBLE_DATA_ENTRY;
@@ -1142,6 +1145,10 @@ public abstract class DataEntryServlet extends SecureController {
                 v.addValidation(INPUT_INTERVIEW_DATE, Validator.IS_A_DATE);
                 v.alwaysExecuteLastValidation(INPUT_INTERVIEW_DATE);
             }
+            
+            if(section.getSection().hasSCDItem()) {
+                section = SCDItemDisplayInfo.generateSCDDisplayInfo(section,this.getServletPage().equals(Page.INITIAL_DATA_ENTRY));
+            }
 
             // logger.debug("about to validate: " + v.getKeySet());
             errors = v.validate();
@@ -1487,11 +1494,7 @@ public abstract class DataEntryServlet extends SecureController {
                         // TODO work on this line
 
                         this.addAttachedFilePath(dib, attachedFilePath);
-                        if(dib.getMetadata().isConditionalDisplayItem()){
-                            temp=this.writeConditionalDisplayItemToDB(dib,iddao,1,section.getShowSCDItemIds().contains(dib.getMetadata().getItemId()));
-                        } else {
-                            temp = writeToDB(dib, iddao, 1);
-                        }
+                        temp = writeToDB(dib, iddao, 1);
                         logger.debug("just executed writeToDB - 3");
                         if (temp && newUploadedFiles.containsKey(dib.getItem().getId() + "")) {
                             // so newUploadedFiles will contain only failed file
@@ -1509,11 +1512,7 @@ public abstract class DataEntryServlet extends SecureController {
                         for (int j = 0; j < childItems.size(); j++) {
                             DisplayItemBean child = (DisplayItemBean) childItems.get(j);
                             this.addAttachedFilePath(child, attachedFilePath);
-                            if(child.getMetadata().isConditionalDisplayItem()){
-                                temp=this.writeConditionalDisplayItemToDB(child,iddao,1,section.getShowSCDItemIds().contains(child.getMetadata().getItemId()));
-                            } else {
-                                temp = writeToDB(child, iddao, 1);
-                            }
+                            temp = writeToDB(child, iddao, 1);
                             logger.debug("just executed writeToDB - 4");
                             if (temp && newUploadedFiles.containsKey(child.getItem().getId() + "")) {
                                 // so newUploadedFiles will contain only failed
@@ -2798,8 +2797,9 @@ public abstract class DataEntryServlet extends SecureController {
     //validate simple-conditional-display item to be changed from shown to hidden
     protected void validateShownSCDToBeHiddenSingle(DiscrepancyValidator v, DisplayItemBean dib) {
         ItemFormMetadataBean ifmb = dib.getMetadata();
+        String value = dib.getData().getValue();
         boolean hasDN = dib.getDiscrepancyNotes() != null && dib.getDiscrepancyNotes().size()>0 ? true : false;
-        if(SimpleConditionalDisplayPair.isCurrentShownItem(dib.getData()) && !dib.getIsSCDtoBeShown() && !hasDN) {
+        if(value != null && value.length()>0 && !dib.getIsSCDtoBeShown() && !hasDN) {
             String message = ifmb.getConditionalDisplay().replaceAll("\\\\,", "##").split(",")[2].trim();
             message = message.replaceAll("##", "\\,");
             Validation vl = new Validation(Validator.TO_HIDE_CONDITIONAL_DISPLAY);
@@ -2880,7 +2880,7 @@ public abstract class DataEntryServlet extends SecureController {
     protected boolean writeToDB(DisplayItemBean dib, ItemDataDAO iddao, int ordinal) {
         ItemDataBean idb = dib.getData();
         if (getServletPage().equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
-        	if (!dib.getMetadata().isShowItem() &&
+        	if (!dib.getMetadata().isShowItem() && !dib.getMetadata().isConditionalDisplayItem() &&
         			idb.getValue().equals("") &&
         			!getItemMetadataService().hasPassedDDE(dib.getMetadata(), ecb, idb)) {//(dib.getItem().getId(), ecb, idb)) {// && !getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getData())) {
         		logger.debug("*** not shown - not writing for idb id " + dib.getData().getId() + " and item id " + dib.getItem().getId());
@@ -2889,44 +2889,14 @@ public abstract class DataEntryServlet extends SecureController {
         } else {
         	if (!dib.getMetadata().isShowItem() &&
             		idb.getValue().equals("") &&
-            		!getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getData())) {
+            		!getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getData()) &&
+            		!dib.getMetadata().isConditionalDisplayItem()) {
                 logger.debug("*** not shown - not writing for idb id " + dib.getData().getId() + " and item id " + dib.getItem().getId());
                 return true;
             }
         }
 
-        if (idb.getValue().equals("")) {
-            idb.setStatus(getBlankItemStatus());
-        } else {
-            idb.setStatus(getNonBlankItemStatus());
-        }
         return writeToDB(idb,dib,iddao,ordinal);
-    }
-
-    protected boolean writeConditionalDisplayItemToDB(DisplayItemBean dib, ItemDataDAO iddao, int ordinal, boolean isDisplay) {
-        ItemDataBean idb = dib.getData();
-        ItemDataBean dbdata = dib.getDbData();
-        boolean display = isDisplay ? true : false;
-        if(!display && idb.getId()>0) {
-            Status s = dbdata.getStatus();
-            int id = s == null ? -1 : s.getId();
-            display = id>0 && (id!=5 || id!=7)? dbdata.getValue().length()>0?true:dib.getNumDiscrepancyNotes()>0?true:false : false;
-        }
-        if(display) {
-            if (idb.getValue().equals("")) {
-                idb.setStatus(getBlankItemStatus());
-            } else {
-                idb.setStatus(getNonBlankItemStatus());
-            }
-            return this.writeToDB(idb, dib, iddao, ordinal);
-        } else if(idb.getId()>0){
-            idb.setStatus(Status.DELETED);
-            idb.setUpdater(ub);
-            iddao.updateValue(idb);
-            return idb.isActive();
-        }
-        //if no need written to database, back with true
-        return true;
     }
 
     protected boolean writeToDB(ItemDataBean itemData, DisplayItemBean dib, ItemDataDAO iddao, int ordinal) {
@@ -2934,7 +2904,12 @@ public abstract class DataEntryServlet extends SecureController {
 
         idb.setItemId(dib.getItem().getId());
         idb.setEventCRFId(ecb.getId());
-
+        
+        if (idb.getValue().equals("")) {
+            idb.setStatus(getBlankItemStatus());
+        } else {
+            idb.setStatus(getNonBlankItemStatus());
+        }
         if (StringUtil.isBlank(dib.getEditFlag())) {
 
             if (!idb.isActive()) {
@@ -3186,13 +3161,23 @@ public abstract class DataEntryServlet extends SecureController {
 
         if(sb.hasSCDItem()) {
             Map<String,DisplayItemBean> displayItemMap = new HashMap<String,DisplayItemBean>();
+            Map<Integer,String> displayItemIdNameMap = new HashMap<Integer,String>();
             for(int i=0; i<displayItems.size(); ++i) {
-                displayItemMap.put(((DisplayItemBean)displayItems.get(i)).getItem().getName(),(DisplayItemBean)displayItems.get(i));
+                DisplayItemBean displayItem = (DisplayItemBean)displayItems.get(i);
+                ItemBean it = displayItem.getItem();
+                displayItemMap.put(it.getName(),displayItem);
+                displayItemIdNameMap.put(it.getId(),it.getName());
+                ArrayList<DisplayItemBean> childs = displayItem.getChildren();
+                if(childs.size()>0) {
+                    for(DisplayItemBean child : childs) {
+                        it = child.getItem();
+                        displayItemMap.put(it.getName(),child); 
+                        displayItemIdNameMap.put(it.getId(),it.getName());
+                    }
+                }
             }
             List<ItemFormMetadataBean> sectionSCDMeta = ifmdao.findSCDItemsBySectionId(sb.getId());
-            Map<String,String> childParentNameMap = idao.mapAllChildAndParentNameInSection(sb.getId());
-            displayItems = this.gainConditionalDisplayPairs(displayItemMap, sectionSCDMeta, childParentNameMap);
-
+            displayItems = this.initConditionalDisplays(displayItemMap, sectionSCDMeta, displayItemIdNameMap);
         }
 
         section.setItems(displayItems);
@@ -4419,11 +4404,12 @@ public abstract class DataEntryServlet extends SecureController {
     }
 
     protected boolean isChanged(ItemDataBean idb, HashMap<Integer, String> oldItemdata, DisplayItemBean dib,String attachedFilePath) {
-        if(dib.getMetadata().isConditionalDisplayItem() && !dib.getIsSCDtoBeShown()) {
-            return false;
-        } else {
+        //if(dib.getMetadata().isConditionalDisplayItem() && !dib.getIsSCDtoBeShown()) {
+            //return false;
+            
+        //} else {
             return isChanged(dib, oldItemdata, attachedFilePath);
-        }
+        //}
     }
     /**
      * Output, just logs all contents of the allItems list. tbh, 01/2010
@@ -4931,60 +4917,56 @@ public abstract class DataEntryServlet extends SecureController {
         }
         return resolutionStatus;
     }
-
-    private HashMap<String, DisplayItemBean> gainConditionalDisplayPairs(HashMap<String, DisplayItemBean> displayItems,
-            ArrayList<ItemFormMetadataBean> conditionalDisplayMeta, HashMap<String,Integer>sectionItemNameIdMap) {
-        HashMap<String, DisplayItemBean> displayitems = displayItems;
-        for(ItemFormMetadataBean ifmb : conditionalDisplayMeta) {
-            Integer cdId = ifmb.getItemId();
-            String[] ss = ifmb.getConditionalDisplay().replaceAll("\\\\,", "##").split(",");
-            DisplayItemBean displayItem = displayitems.get(sectionItemNameIdMap.get(ss[0].trim()));
-            SimpleConditionalDisplayPair cd = new SimpleConditionalDisplayPair();
-            cd.setSCDItemId(cdId);
-            cd.setControlItemId(displayItem.getItem().getId());
-            cd.setControlItemName(displayItem.getItem().getName());
-            cd.setOptionValue(ss[1].trim());
-            cd.setMessage(ss[2].replaceAll("##", "\\\\,"));
-            DisplayItemBean dib = displayItems.get(new Integer(ifmb.getItemId()));
-            cd.setIsCurrentShown(SimpleConditionalDisplayPair.isCurrentShownItem(dib.getData()));
-            displayItem.getSCDPairs().add(cd);
-        }
-
-        return displayitems;
-    }
-
-    private ArrayList<DisplayItemBean> gainConditionalDisplayPairs(Map<String, DisplayItemBean> sectionDisplayItemMap,
-            List<ItemFormMetadataBean> sectionSCDMeta, Map<String,String> childParentNameMap) {
+    
+    /*
+     * Set SimpleConditionalDisplayPair for controlItems of a section; 
+     * and set isSCDToBeShown for simple conditional display items of a section.
+     * Precondition: DisplayItemBean getData() is the ItemDataBean from database.
+     * 
+     * @param sectionDisplayItemMap - <itemName,DisplayItemBean>
+     * @param sectionSCDMeta
+     * @param displayItemIdNameMap
+     * @return
+     */
+    private ArrayList<DisplayItemBean> initConditionalDisplays(Map<String, DisplayItemBean> sectionDisplayItemMap,
+              List<ItemFormMetadataBean> sectionSCDMeta, Map<Integer,String> displayItemIdNameMap) {
         for(ItemFormMetadataBean ifmb : sectionSCDMeta) {
             Integer cdId = ifmb.getItemId();
             String[] ss = ifmb.getConditionalDisplay().replaceAll("\\\\,", "##").split(",");
 
             SimpleConditionalDisplayPair cd = new SimpleConditionalDisplayPair();
+            cd.setSCDItemFormMetadataId(ifmb.getId());
             cd.setSCDItemId(cdId);
+            cd.setSCDItemName(displayItemIdNameMap.containsKey(cdId)?displayItemIdNameMap.get(cdId):"");
+            DisplayItemBean scdItem = sectionDisplayItemMap.get(cd.getSCDItemName());
+            scdItem.setDbValue(scdItem.getData().getValue());
             cd.setOptionValue(ss[1].trim());
-            cd.setMessage(ss[2].replaceAll("##", "\\\\,"));
+            cd.setMessage(ss[2].trim().replaceAll("##", "\\\\,"));
 
             DisplayItemBean controlItem = new DisplayItemBean();
-            if(childParentNameMap.containsKey(ss[0].trim())) {
-                //among child items
-                DisplayItemBean pItem = sectionDisplayItemMap.get(childParentNameMap.get(ss[0]).trim());
-                ArrayList<DisplayItemBean> children = pItem.getChildren();
-                for(int i=0; i<children.size(); ++i) {
-                    controlItem = children.get(i);
-                    if(ss[0].trim().equalsIgnoreCase(controlItem.getItem().getName())) {
-                        ItemBean item = controlItem.getItem();
-                        cd.setControlItemId(item.getId());
-                        cd.setControlItemName(item.getName());
-                        controlItem.getSCDPairs().add(cd);
-                    }
+            controlItem = sectionDisplayItemMap.containsKey(ss[0].trim()) ? 
+                sectionDisplayItemMap.get(ss[0].trim()) : new DisplayItemBean();
+            ItemBean item = controlItem.getItem();
+            cd.setControlItemId(item.getId());
+            cd.setControlItemName(item.getName());
+            controlItem.getSCDPairs().add(cd);
+            
+            String chosenOption = controlItem.getData().getValue();
+            if(chosenOption != null && chosenOption.length()>0) {
+                if(chosenOption.equals(cd.getOptionValue())) {
+                    scdItem.setIsSCDtoBeShown(true);
                 }
             } else {
-                //among parent items
-                controlItem = sectionDisplayItemMap.get(ss[0].trim());
-                ItemBean item = controlItem.getItem();
-                cd.setControlItemId(item.getId());
-                cd.setControlItemName(item.getName());
-                controlItem.getSCDPairs().add(cd);
+                chosenOption = controlItem.getMetadata().getDefaultValue();
+                if(chosenOption != null && chosenOption.length()>0) {
+                    scdItem.setIsSCDtoBeShown(chosenOption.equals(cd.getOptionValue()));
+                }else {
+                    ResponseSetBean rs = controlItem.getMetadata().getResponseSet();
+                    chosenOption = ((ResponseOptionBean) rs.getOptions().get(0)).getValue();
+                    if(chosenOption != null && chosenOption.length()>0) {
+                        scdItem.setIsSCDtoBeShown(chosenOption.equals(cd.getOptionValue()));
+                    }
+                }
             }
         }
         ArrayList<DisplayItemBean> displayitems = new ArrayList<DisplayItemBean>();
@@ -4992,48 +4974,52 @@ public abstract class DataEntryServlet extends SecureController {
         return displayitems;
     }
 
+    /*
+     * Return Set of scd item ids which will display because of chosen option in a section.
+     * 
+     * @param dib
+     * @param showConditionalDisplaySet
+     * @return
+     */
     protected Set<Integer> conditionalDisplayToBeShown (DisplayItemBean dib, Set<Integer> showConditionalDisplaySet) {
         Set<Integer> showCDSet = showConditionalDisplaySet;
         //a conditional display item will be always after its control item.
         ArrayList<SimpleConditionalDisplayPair> cds = dib.getSCDPairs();
         if(cds.size()>0) {
-            String chosenOption = dib.getData().getValue();
-            if(chosenOption != null && chosenOption.length()>0) {
-                chosenOption = chosenOption.replaceAll("\\\\,", "##");
-                if(chosenOption.contains(",")) {
-                    String[] ss = chosenOption.split(",");
-                    for(SimpleConditionalDisplayPair cd : cds) {
-                        for(int i=0; i<ss.length; ++i) {
-                            if(ss[i].replaceAll("##", "\\\\,").trim().equalsIgnoreCase(cd.getOptionValue())) {
-                                showCDSet.add(cd.getSCDItemId());
-                            }
-                        }
-                    }
-                } else {
-                    chosenOption.replaceAll("##", "\\,");
-                    for(SimpleConditionalDisplayPair cd : cds) {
-                        if(chosenOption.equalsIgnoreCase(cd.getOptionValue())) {
-                            showCDSet.add(cd.getSCDItemId());
-                        }
-                    }
+            for(SimpleConditionalDisplayPair cd : cds) {
+                Integer id = this.conditionalDisplayToBeShown(dib.getData().getValue(), cd);
+                if(id>0) {
+                    showCDSet.add(id);
                 }
             }
         }
         return showCDSet;
     }
-
-    protected boolean shouldSCDBeShown(DisplayItemBean dib) {
-        boolean shown = dib.getIsSCDtoBeShown();
-        if(!shown) {
-            if(dib.getNumDiscrepancyNotes()>0) {
-                shown = true;
+    
+    /*
+     * Return ID of a scd item which will display because of chosen option
+     *  
+     * @param chosenOption
+     * @param cds
+     * @return
+     */
+    protected int conditionalDisplayToBeShown (String chosenOption, SimpleConditionalDisplayPair cd) {
+        if(chosenOption != null && chosenOption.length()>0) {
+            chosenOption = chosenOption.replaceAll("\\\\,", "##");
+            if(chosenOption.contains(",")) {
+                String[] ss = chosenOption.split(",");
+                for(int i=0; i<ss.length; ++i) {
+                    if(ss[i].replaceAll("##", "\\\\,").trim().equalsIgnoreCase(cd.getOptionValue())) {
+                        return cd.getSCDItemId();
+                    }
+                }
             } else {
-                ItemDataBean dbdata = dib.getDbData();
-                Status status = dbdata.isActive()?dbdata.getStatus():null;
-                int sid = status==null?0:status.getId();
-                shown = sid>0&&(sid!=5||sid!=7)?(dbdata.getValue().length()>0?true:false):false;
+                chosenOption.replaceAll("##", "\\,");
+                if(chosenOption.equalsIgnoreCase(cd.getOptionValue())) {
+                    return cd.getSCDItemId();
+                }
             }
         }
-        return shown;
+        return 0;
     }
 }
