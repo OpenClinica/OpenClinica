@@ -1380,7 +1380,7 @@ public class OdmExtractDAO extends DatasetDAO {
             this.setSubjectEventFormDataTypesExpected(odmVersion);
             ArrayList viewRows = select(getOCSubjectEventFormSqlSS(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds));
             Iterator iter = viewRows.iterator();
-            this.setDataWithOCAttributes(study, dataset, data, odmVersion, iter, oidPoses);
+            this.setDataWithOCAttributes(study, dataset, data, odmVersion, iter, oidPoses, odmType);
         } else {
             logger.error("getSubjectEventFormSql=" + getSubjectEventFormSqlSS(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds));
             this.setSubjectEventFormDataTypesExpected();
@@ -2062,7 +2062,7 @@ public class OdmExtractDAO extends DatasetDAO {
     }
 
     protected void setDataWithOCAttributes(StudyBean study, DatasetBean dataset, OdmClinicalDataBean data, String odmVersion, Iterator iter,
-            HashMap<Integer, String> oidPoses) {
+            HashMap<Integer, String> oidPoses, String odmType) {
         String subprev = "";
         HashMap<String, Integer> sepos = new HashMap<String, Integer>();
         String seprev = "";
@@ -2250,6 +2250,11 @@ public class OdmExtractDAO extends DatasetDAO {
         sedOids = sedOids.length() > 0 ? sedOids.substring(0, sedOids.length() - 2).trim() : sedOids;
         ecIds = ecIds.length() > 0 ? ecIds.substring(0, ecIds.length() - 2).trim() : ecIds;
 
+        if(odmType!=null && odmType.equalsIgnoreCase("clinical_data"))
+        {
+            System.out.println("No Audit logs or discrepancy Notes");
+        }
+        else{
         this.setOCSubjectDataAuditLogs(parentStudy, data, studySubjectOids, subOidPoses);
 
         this.setOCEventDataAuditLogs(parentStudy, data, studySubjectOids, evnOidPoses);
@@ -2261,6 +2266,7 @@ public class OdmExtractDAO extends DatasetDAO {
         this.setOCEventDataDNs(data, sedOids, studySubjectOids, evnOidPoses);
 
         this.setOCFormDataDNs(data, ecIds, oidPoses);
+        }
     }
 
     private String getCrfVersionStatus(String seSubjectEventStatus, int cvStatusId, int ecStatusId, int validatorId) {
