@@ -570,7 +570,8 @@ public abstract class DataEntryServlet extends SecureController {
             session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
             
             if(section.getSection().hasSCDItem()) {
-                section = SCDItemDisplayInfo.generateSCDDisplayInfo(section,this.getServletPage().equals(Page.INITIAL_DATA_ENTRY));
+                section = SCDItemDisplayInfo.generateSCDDisplayInfo(section,this.getServletPage().equals(Page.INITIAL_DATA_ENTRY)
+                        || this.getServletPage().equals(Page.ADMIN_EDIT_SERVLET) && !this.isAdminForcedReasonForChange());
             }
 
             int keyId = ecb.getId(); 
@@ -1147,7 +1148,8 @@ public abstract class DataEntryServlet extends SecureController {
             }
             
             if(section.getSection().hasSCDItem()) {
-                section = SCDItemDisplayInfo.generateSCDDisplayInfo(section,this.getServletPage().equals(Page.INITIAL_DATA_ENTRY));
+                section = SCDItemDisplayInfo.generateSCDDisplayInfo(section,this.getServletPage().equals(Page.INITIAL_DATA_ENTRY)
+                        || this.getServletPage().equals(Page.ADMIN_EDIT_SERVLET) && !this.isAdminForcedReasonForChange() );
             }
 
             // logger.debug("about to validate: " + v.getKeySet());
