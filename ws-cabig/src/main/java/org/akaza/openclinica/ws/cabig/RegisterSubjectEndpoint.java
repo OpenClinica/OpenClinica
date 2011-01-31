@@ -1,3 +1,18 @@
+/*
+ * OpenClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: http://www.openclinica.org/license
+ * copyright 2010-2011 Akaza Research
+
+ * Development of this web service or portions thereof has been funded
+ * by Federal Funds from the National Cancer Institute, 
+ * National Institutes of Health, under Contract No. HHSN261200800001E.
+ * In addition to the GNU LGPL license, this code is also available
+ * from NCI CBIIT repositories under the terms of the caBIG Software License. 
+ * For details see: https://cabig.nci.nih.gov/adopt/caBIGModelLicense
+ */
+
 package org.akaza.openclinica.ws.cabig;
 
 import org.akaza.openclinica.dao.core.CoreResources;
@@ -128,7 +143,8 @@ public class RegisterSubjectEndpoint extends AbstractCabigDomEndpoint {
                     }
                     StudySubjectBean studySubjectBean = subjectService.generateStudySubjectBean(subjectBean, finalSubjectBean, subjectBean.getStudyBean());
                     
-                    StudySubjectBean testStudySubjectBean = getStudySubjectDao().findByLabelAndStudy(subjectBean.getStudySubjectLabel(), subjectBean.getStudyBean());
+                    StudySubjectBean testStudySubjectBean = //getStudySubjectDao().findTheGreatestLabel() 
+                        getStudySubjectDao().findByLabelAndStudy(subjectBean.getStudySubjectLabel(), subjectBean.getStudyBean());
                     boolean updateStudySubject = false;
                     if (testStudySubjectBean.getId() > 0) {
                         // same check here, if its identical, restore and renew, otherwise throw the error
