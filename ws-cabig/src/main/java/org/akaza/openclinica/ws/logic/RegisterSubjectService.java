@@ -18,9 +18,10 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.service.StudyParamsConfig;
+import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.ws.bean.RegisterSubjectBean;
 import org.akaza.openclinica.ws.cabig.exception.CCBusinessFaultException;
 import org.akaza.openclinica.ws.cabig.exception.CCDataValidationFaultException;
@@ -28,8 +29,8 @@ import org.w3c.dom.Node;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class RegisterSubjectService {
 
@@ -39,12 +40,10 @@ public class RegisterSubjectService {
 
     }
 
-    public RegisterSubjectBean generateSubjectBean(UserAccountBean user, Node subject, StudyDAO studyDao) throws Exception {
+    public RegisterSubjectBean generateSubjectBean(UserAccountBean user, Node subject, StudyDAO studyDao, StudyParameterValueDAO studyParamDao)
+            throws Exception {
         RegisterSubjectBean subjectBean = new RegisterSubjectBean(user);
         DomParsingService xmlService = new DomParsingService();
-        String subjectDOB = xmlService.getElementValue(subject, CONNECTOR_NAMESPACE_V1, "birthDate", "value");
-        String subjectGender = xmlService.getElementValue(subject, CONNECTOR_NAMESPACE_V1, "sexCode", "code");
-        String identifier = xmlService.getElementValue(subject, CONNECTOR_NAMESPACE_V1, "identifier", "extension");
         String studyIdentifier = xmlService.getElementValue(subject, CONNECTOR_NAMESPACE_V1, "studyIdentifier", "extension");
         String studySiteIdentifier = xmlService.getElementValue(subject, CONNECTOR_NAMESPACE_V1, "studySiteIdentifier", "extension");
         subjectBean.setSiteUniqueIdentifier(studySiteIdentifier);
@@ -78,36 +77,70 @@ public class RegisterSubjectService {
             throw new CCBusinessFaultException("No study or site exists with that name, " + "please review your information and re-submit the request",
                     "CC10110");
         }
-        // dry
-
-        List<StudyParamsConfig> parentConfigs = studyBean.getStudyParameters();
-        for (StudyParamsConfig scg : parentConfigs) {
-            System.out.println(scg.getParameter().getName() + " -> " + scg.getValue().getName() + " : " + scg.getValue().getValue());
+        // bugs 7441, 7440, 7438 - need to check to see if the study requires this data before checking the xml node
+        ArrayList<StudyParameterValueBean> valueBeans = studyParamDao.findAllParameterValuesByStudy(studyBean);
+        for (StudyParameterValueBean spvBean : valueBeans) {
+            System.out.println("found value " + spvBean.getValue() + " for bean " + spvBean.getParameter());
         }
+        StudyParameterValueBean subjectDOBRequired = studyParamDao.findByHandleAndStudy(studyBean.getId(), "collectDOB");
+        if ("1".equals(subjectDOBRequired.getValue())) {
+            // dry
+            String subjectDOB = xmlService.getElementValue(subject, CONNECTOR_NAMESPACE_V1, "birthDate", "value");
+            // no dashes in dates?
+            if (subjectDOB.contains("-")) {
+                throw new CCDataValidationFaultException("Problem parsing subject date of birth. " + "Please remove all dashes from " + subjectDOB
+                    + " and re-submit your data.", "CC10210");
+            }
+            SimpleDateFormat local_df = new SimpleDateFormat("yyyyMMdd");
+            // figure out the study params here; date only? no date?
+            try {
+                Date dateOfBirth = local_df.parse(subjectDOB);
+                subjectBean.setDateOfBirth(dateOfBirth);
+            } catch (ParseException pe) {
+                // throw the data fault exception
+                throw new CCDataValidationFaultException("Problem parsing subject date of birth, it should be in YYYYMMDD format and not " + subjectDOB + ".",
+                        "CC10210");
+            }
+        } else if ("2".equals(subjectDOBRequired.getValue())) {
+            // dry
+            String subjectDOB = xmlService.getElementValue(subject, CONNECTOR_NAMESPACE_V1, "birthDate", "value");
+            // no dashes in dates?
+            if (subjectDOB.contains("-")) {
+                throw new CCDataValidationFaultException("Problem parsing subject date of birth. " + "Please remove all dashes from " + subjectDOB
+                    + " and re-submit your data.", "CC10210");
+            }
+            SimpleDateFormat local_df = new SimpleDateFormat("yyyy");
+            // figure out the study params here; date only? no date?
+            try {
+                Date dateOfBirth = local_df.parse(subjectDOB);
+                subjectBean.setDateOfBirth(dateOfBirth);
+            } catch (ParseException pe) {
+                // throw the data fault exception
+                throw new CCDataValidationFaultException("Problem parsing subject date of birth, it should be in YYYY format and not " + subjectDOB + ".",
+                        "CC10210");
+            }
+        } // else, no date is set
+
+        StudyParameterValueBean genderRequired = studyParamDao.findByHandleAndStudy(studyBean.getId(), "genderRequired");
+        if ("true".equals(genderRequired.getValue())) {
+            String subjectGender = xmlService.getElementValue(subject, CONNECTOR_NAMESPACE_V1, "sexCode", "code");
+            if (!"male".equals(subjectGender.toLowerCase()) && !"female".equals(subjectGender.toLowerCase())) {
+                throw new CCDataValidationFaultException("Problem parsing sex, it should be either 'Male' or 'Female'.", "CC10210");
+            }
+            if ("Male".equals(subjectGender) || "male".equals(subjectGender)) {
+                subjectBean.setGender("m");
+            } else {
+                subjectBean.setGender("f");
+            }
+
+        }
+        // subjectPersonIdRequired = required, or nothing
+        String identifier = xmlService.getElementValue(subject, CONNECTOR_NAMESPACE_V1, "identifier", "extension");
+
         subjectBean.setStudyBean(studyBean);
         subjectBean.setUniqueIdentifier(identifier);
         // throw an error if we dont get male or female as an answer
-        if (!"male".equals(subjectGender.toLowerCase()) && !"female".equals(subjectGender.toLowerCase())) {
-            throw new CCDataValidationFaultException("Problem parsing sex, it should be either 'Male' or 'Female'.", "CC10210");
-        }
-        if ("Male".equals(subjectGender) || "male".equals(subjectGender)) {
-            subjectBean.setGender("m");
-        } else {
-            subjectBean.setGender("f");
-        }
-        // no dases in dates?
-        if (subjectDOB.contains("-")) {
-            throw new CCDataValidationFaultException("Problem parsing date. " + "Please remove all dashes and re-submit your data.", "CC10210");
-        }
-        SimpleDateFormat local_df = new SimpleDateFormat("yyyyMMdd");
-        // figure out the study params here; date only? no date?
-        try {
-            Date dateOfBirth = local_df.parse(subjectDOB);
-            subjectBean.setDateOfBirth(dateOfBirth);
-        } catch (ParseException pe) {
-            // throw the data fault exception
-            throw new CCDataValidationFaultException("Problem parsing date, it should be in YYYYMMDD format.", "CC10210");
-        }
+
         return subjectBean;
     }
 
@@ -143,8 +176,10 @@ public class RegisterSubjectService {
             sbean.setDobCollected(false);
         }
         sbean.setCreatedDate(new Date(System.currentTimeMillis()));
-        char gender = rsbean.getGender().charAt(0);
-        sbean.setGender(gender);
+        if (rsbean.getGender() != null) {
+            char gender = rsbean.getGender().charAt(0);
+            sbean.setGender(gender);
+        }
         sbean.setLabel(rsbean.getUniqueIdentifier());
         sbean.setName(rsbean.getUniqueIdentifier());
         sbean.setOwner(rsbean.getUser());

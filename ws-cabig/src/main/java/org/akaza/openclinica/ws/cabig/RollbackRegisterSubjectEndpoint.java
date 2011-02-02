@@ -65,7 +65,7 @@ public class RollbackRegisterSubjectEndpoint extends AbstractCabigDomEndpoint {
                     if (!this.canUserRegisterSubject(user)) {
                         throw new CCSystemFaultException("You do not possess the correct privileges to create a subject.");
                     }
-                    RegisterSubjectBean subjectBean = subjectService.generateSubjectBean(user, childNode, getStudyDao());
+                    RegisterSubjectBean subjectBean = subjectService.generateSubjectBean(user, childNode, getStudyDao(), getStudyParamValueDao());
                     // performedSubjectMilestone
                     NodeList performedMilestones = requestElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "performedSubjectMilestone");
                     if (performedMilestones.getLength() > 0) {
