@@ -29,7 +29,6 @@ import org.w3c.dom.Node;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 
 public class RegisterSubjectService {
@@ -78,13 +77,13 @@ public class RegisterSubjectService {
                     "CC10110");
         }
         // bugs 7441, 7440, 7438 - need to check to see if the study requires this data before checking the xml node
-        ArrayList<StudyParameterValueBean> valueBeans = studyParamDao.findAllParameterValuesByStudy(studyBean);
-        for (StudyParameterValueBean spvBean : valueBeans) {
-            System.out.println("found value " + spvBean.getValue() + " for bean " + spvBean.getParameter());
-        }
+        // ArrayList<StudyParameterValueBean> valueBeans = studyParamDao.findAllParameterValuesByStudy(studyBean);
+
         StudyParameterValueBean subjectDOBRequired = studyParamDao.findByHandleAndStudy(studyBean.getId(), "collectDOB");
-        if ("1".equals(subjectDOBRequired.getValue())) {
+        System.out.println("found dob: " + subjectDOBRequired.getValue());
+        if ("1".equals(subjectDOBRequired.getValue()) || ("".equals(subjectDOBRequired.getValue()))) {
             // dry
+            System.out.println("got to 1");
             String subjectDOB = xmlService.getElementValue(subject, CONNECTOR_NAMESPACE_V1, "birthDate", "value");
             // no dashes in dates?
             if (subjectDOB.contains("-")) {
@@ -103,6 +102,7 @@ public class RegisterSubjectService {
             }
         } else if ("2".equals(subjectDOBRequired.getValue())) {
             // dry
+            System.out.println("got to 2");
             String subjectDOB = xmlService.getElementValue(subject, CONNECTOR_NAMESPACE_V1, "birthDate", "value");
             // no dashes in dates?
             if (subjectDOB.contains("-")) {

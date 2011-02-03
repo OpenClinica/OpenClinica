@@ -109,7 +109,10 @@ public class RegisterSubjectEndpoint extends AbstractCabigDomEndpoint {
                         // if its identical, restore and renew
                         if (subjectService.isSubjectIdentical(subjectBean, testSubjectBean)) {
                             testSubjectBean.setUpdater(user);
-                            testSubjectBean.setDobCollected(true);// change?
+                            if (finalSubjectBean.getDateOfBirth() != null) {
+                                testSubjectBean.setDobCollected(true);// change?
+                                testSubjectBean.setDateOfBirth(finalSubjectBean.getDateOfBirth());
+                            }
                             testSubjectBean.setStatus(Status.AVAILABLE);
                             updateMe = true;
                             finalSubjectBean = testSubjectBean;
