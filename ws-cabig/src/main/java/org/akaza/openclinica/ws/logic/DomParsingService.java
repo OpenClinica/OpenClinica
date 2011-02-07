@@ -20,6 +20,8 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.util.ArrayList;
+
 public class DomParsingService {
 
     private final String CONNECTOR_NAMESPACE_V1 = "http://clinicalconnector.nci.nih.gov";
@@ -114,17 +116,21 @@ public class DomParsingService {
             facilityName = nodeValue.getNodeValue();
         }
         NodeList nlist3 = nlistNodeElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "postalAddress");
-        for (int i = 0; i < nlist3.getLength(); i++) {
-            Node nlist3Node = nlist3.item(i);
+        Node nlistAddr = nlist3.item(0);
+        Element nlistAddrElement = (Element) nlistAddr;
+        NodeList nlistParts = nlistAddrElement.getElementsByTagNameNS(this.ISO_21090, "part");
+        for (int i = 0; i < nlistParts.getLength(); i++) {
+            Node nlist3Node = nlistParts.item(i);
             NamedNodeMap nodeMap = nlist3Node.getAttributes();
             Node nodeType = nodeMap.getNamedItem("type");
             Node nodeValue = nodeMap.getNamedItem("value");
+            Node nodeCode = nodeMap.getNamedItem("code");
             if ("CTY".equals(nodeType.getNodeValue())) {
                 facilityCity = nodeValue.getNodeValue();
             } else if ("CNT".equals(nodeType.getNodeValue())) {
-                facilityCountry = nodeValue.getNodeValue();
+                facilityCountry = nodeCode.getNodeValue();// nodeValue.getNodeValue();
             } else if ("STA".equals(nodeType.getNodeValue())) {
-                facilityState = nodeValue.getNodeValue();
+                facilityState = nodeCode.getNodeValue(); // nodeValue.getNodeValue();
             }
             // case nodeType.getNodeValue():
         }
@@ -187,5 +193,40 @@ public class DomParsingService {
         study.setFacilityContactPhone(facilityContactPhone);
         System.out.println("found email " + facilityContactEmail + " phone " + facilityContactPhone);
         return study;
+    }
+
+    public StudyBean getSponsorName(StudyBean study, Node studyNode) {
+        String sponsorName = "";
+        Element studyElement = (Element) studyNode;
+        NodeList nlist = studyElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "studyFundingSponsor");
+        Node nlistNode = nlist.item(0);
+        Element nlistNodeElement = (Element) nlistNode;
+        NodeList nlist2 = nlistNodeElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "organization");
+        Node nameNode = nlist2.item(0);
+        Element nameNodeElement = (Element) nameNode;
+        NodeList nlistNames = nameNodeElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "name");
+        Node sponsorNameNode = nlistNames.item(0);
+        NamedNodeMap nodeMap = sponsorNameNode.getAttributes();
+        Node nodeValue = nodeMap.getNamedItem("value");
+        sponsorName = nodeValue.getNodeValue();
+
+        study.setSponsor(sponsorName);
+        System.out.println("found sponsor: " + sponsorName);
+        return study;
+    }
+
+    public ArrayList<StudyBean> getSites(StudyBean study, Node studyNode) {
+        ArrayList<StudyBean> siteList = new ArrayList<StudyBean>();
+        Element studyElement = (Element) studyNode;
+        NodeList nlist = studyElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "studySite");
+        System.out.println("found " + nlist.getLength() + " sites");
+        for (int j = 0; j < nlist.getLength(); j++) {
+            Node siteNode = nlist.item(j);
+            Element siteElement = (Element) siteNode;
+            String siteIdentifier = this.getElementValue(siteNode, CONNECTOR_NAMESPACE_V1, "identifier", "extension");
+            NodeList orgNodeList = siteElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "organization");
+
+        }
+        return siteList;
     }
 }

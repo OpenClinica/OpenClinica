@@ -19,6 +19,8 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.w3c.dom.Node;
 
+import java.util.ArrayList;
+
 public class CreateStudyService {
 
     private final String CONNECTOR_NAMESPACE_V1 = "http://clinicalconnector.nci.nih.gov";
@@ -29,6 +31,7 @@ public class CreateStudyService {
 
     public StudyBean generateStudyBean(UserAccountBean user, Node study) {
         StudyBean studyBean = new StudyBean();
+        studyBean.setOwner(user);
         DomParsingService xmlService = new DomParsingService();
         studyBean.setIdentifier(xmlService.getElementValue(study, CONNECTOR_NAMESPACE_V1, "identifier", "extension"));
         studyBean.setStatus(Status.AVAILABLE);// coordinatingCenterStudyStatusCode?
@@ -42,6 +45,9 @@ public class CreateStudyService {
         System.out.println("found enrollment " + enrollment);
         studyBean = xmlService.getStudyInvestigator(studyBean, study);
         studyBean = xmlService.getStudyCenter(studyBean, study);
+        studyBean = xmlService.getSponsorName(studyBean, study);
+        ArrayList<StudyBean> sites = xmlService.getSites(studyBean, study);
         return studyBean;
     }
+
 }

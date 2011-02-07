@@ -46,6 +46,7 @@ public class CreateStudyEndpoint extends AbstractCabigDomEndpoint {
 
                 Node study = nlist.item(i);
                 StudyBean studyBean = studyService.generateStudyBean(getUserAccount(), study);
+                studyBean = (StudyBean) getStudyDao().create(studyBean);
             }
             return mapRegisterSubjectConfirmation("null");
         } catch (Exception npe) {
