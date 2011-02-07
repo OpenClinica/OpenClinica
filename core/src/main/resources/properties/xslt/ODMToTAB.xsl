@@ -331,7 +331,7 @@
                 </xsl:if>
             </xsl:for-each>
         </xsl:for-each>
-
+        <!-- Selecting Item Headers -->
         <xsl:for-each select="//odm:FormData[generate-id() = generate-id(key('eventCRFs',@FormOID))]">
             <xsl:variable name="crfPosition" select="position()"/>
             <xsl:variable name="currentFormOID" select="@FormOID"/>
@@ -375,6 +375,8 @@
             <xsl:value-of select="$delimiter" />
             <xsl:value-of select="@OpenClinica:Sex"></xsl:value-of>
             <xsl:value-of select="$delimiter" />
+
+            <!-- Subject Event Values -->
             <xsl:variable name="subjectEvents" select="./odm:StudyEventData"/>
             <xsl:for-each select="//odm:StudyEventData[generate-id() = generate-id(key('studyEvents',@StudyEventOID))]">
                 <xsl:variable name="eventOID" select="@StudyEventOID"/>
@@ -451,7 +453,7 @@
                 </xsl:choose>
 
             </xsl:for-each>
-
+            <!-- Event CRF Values -->
             <xsl:variable name="subjectForms" select="./odm:StudyEventData/odm:FormData"/>
             <xsl:for-each select="//odm:FormData[generate-id() = generate-id(key('eventCRFs',@FormOID))]">
                 <xsl:variable name="currentForm" select="current()"/>
@@ -544,7 +546,7 @@
                     </xsl:if>
                 </xsl:for-each>
             </xsl:for-each>
-            
+            <!-- Item Values -->            
             <xsl:variable name="subjectItems" select="./odm:StudyEventData/odm:FormData/odm:ItemGroupData/odm:ItemData"/>
             <xsl:for-each select="//odm:FormData[generate-id() = generate-id(key('eventCRFs',@FormOID))]">
                 <xsl:variable name="currentFormOID" select="@FormOID"/>

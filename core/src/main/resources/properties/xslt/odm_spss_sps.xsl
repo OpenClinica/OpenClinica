@@ -3,6 +3,7 @@
 <xsl:stylesheet version="1.0" xmlns:odm="http://www.cdisc.org/ns/odm/v1.3"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsi="http://www.w3c.org/2001/XMLSchema-instance"
                 xmlns:def="http://www.cdisc.org/ns/def/v1.0" xmlns:xlink="http://www.w3c.org/1999/xlink"
+                xmlns:exsl="http://exslt.org/common" extension-element-prefixes="exsl"
                 xmlns:OpenClinica="http://www.openclinica.org/ns/odm_ext_v130/v3.1"
                 xmlns:fn="http://www.w3.org/2005/02/xpath-functions"
                 xsi:schemaLocation="http://www.cdisc.org/ns/odm/v1.3 ">
@@ -531,9 +532,13 @@
             <xsl:variable name="eventName" select="//odm:StudyEventDef[@OID=$eventOID]/@Name"/>
             <xsl:choose>
                 <xsl:when test="@StudyEventRepeatKey">
-                    <xsl:variable name="repeatedEvents" select="//odm:StudyEventData[@StudyEventOID=$eventOID]"/>
-                    <xsl:for-each select="//odm:StudyEventData[@StudyEventOID=$eventOID]">
-                        <xsl:sort select="@StudyEventRepeatKey" data-type="number"/>
+                    <xsl:variable name="allStudyEvents">
+                        <xsl:for-each select="//odm:StudyEventData[@StudyEventOID=$eventOID]">
+                            <xsl:sort select="@StudyEventRepeatKey" data-type="number"/>
+                            <xsl:copy-of select="."/>
+                        </xsl:for-each>
+                    </xsl:variable>
+                    <xsl:for-each select="exsl:node-set($allStudyEvents)/odm:StudyEventData">
                         <xsl:choose>
                             <xsl:when test="position()=1">
                                 <xsl:text>Location_</xsl:text>
@@ -582,9 +587,7 @@
                                 <xsl:text>&#xa;</xsl:text>
                             </xsl:when>
                             <xsl:otherwise>
-                                <xsl:variable name="prevIndex" select="position()-1"/>
-                                <xsl:if test="$repeatedEvents[$prevIndex]/@StudyEventRepeatKey != @StudyEventRepeatKey">
-                                    <xsl:text>Location_</xsl:text>
+                                <xsl:if test="preceding-sibling::odm:StudyEventData[1]/@StudyEventRepeatKey != @StudyEventRepeatKey">                                    <xsl:text>Location_</xsl:text>
                                     <xsl:value-of select="$E"/>
                                     <xsl:value-of select="$eventPosition"/>
                                     <xsl:text>_repeat</xsl:text>
@@ -672,18 +675,22 @@
 
         <xsl:for-each select="//odm:FormData[generate-id() = generate-id(key('eventCRFs',@FormOID))]">
             <xsl:variable name="crfPosition" select="position()"/>
-            <xsl:variable name="parentEvent" select="//odm:StudyEventData[odm:FormData[@FormOID=@FormOID]]"/>
-
+            <xsl:variable name="parentEvent" select=".."/>
             <xsl:for-each select="//odm:StudyEventData[generate-id() = generate-id(key('studyEvents',@StudyEventOID))]">
                 <xsl:variable name="eventOID" select="@StudyEventOID"/>
                 <xsl:variable name="eventPosition" select="position()"/>
                 <xsl:variable name="eventName" select="//odm:StudyEventDef[@OID=$eventOID]/@Name"/>
+
                 <xsl:if test="@StudyEventOID = $parentEvent/@StudyEventOID">
                     <xsl:choose>
                         <xsl:when test="@StudyEventRepeatKey">
-                            <xsl:variable name="repeatedEvents" select="//odm:StudyEventData[@StudyEventOID=$eventOID]"/>
-                            <xsl:for-each select="//odm:StudyEventData[@StudyEventOID=$eventOID]">
-                                <xsl:sort select="@StudyEventRepeatKey" data-type="number"/>
+                            <xsl:variable name="allStudyEvents">
+                                <xsl:for-each select="//odm:StudyEventData">
+                                    <xsl:sort select="@StudyEventRepeatKey" data-type="number"/>
+                                    <xsl:copy-of select="."/>
+                                </xsl:for-each>
+                            </xsl:variable>
+                            <xsl:for-each select="exsl:node-set($allStudyEvents)/odm:StudyEventData">
                                 <xsl:choose>
                                     <xsl:when test="position()=1">
                                         <xsl:text>Interviewer_</xsl:text>
@@ -768,9 +775,7 @@
                                         <xsl:text>&#xa;</xsl:text>
                                     </xsl:when>
                                     <xsl:otherwise>
-                                        <xsl:variable name="prevIndex" select="position()-1"/>
-                                        <xsl:if test="$repeatedEvents[$prevIndex]/@StudyEventRepeatKey != @StudyEventRepeatKey">
-                                            <xsl:text>Interviewer_</xsl:text>
+                                        <xsl:if test="preceding-sibling::odm:StudyEventData[1]/@StudyEventRepeatKey != @StudyEventRepeatKey">                                            <xsl:text>Interviewer_</xsl:text>
                                             <xsl:value-of select="$E"/>
                                             <xsl:value-of select="$eventPosition"/>
                                             <xsl:if test="@StudyEventRepeatKey">
@@ -930,9 +935,8 @@
             <xsl:for-each select="//odm:ItemData">
                 <xsl:variable name="itemData" select="."/>
                 <xsl:variable name="itemOID" select="@ItemOID"/>
-                <xsl:variable name="valueLength" select="string-length(@Value)"/>
                 <xsl:for-each select="//odm:ItemDef[@OID=$itemOID]">
-                    <xsl:variable name="formOID" select="@OpenClinica:FormOIDs"/>
+                   <xsl:variable name="formOID" select="OpenClinica:ItemDetails/OpenClinica:ItemPresentInForm[@FormOID = $itemData/../../@FormOID]/@FormOID"/>
                     <xsl:if test="$currentFormOID = $formOID">
                         <xsl:value-of select="@Name"/>
                         <xsl:text>_</xsl:text>
@@ -974,9 +978,8 @@
             <xsl:for-each select="//odm:ItemData">
                 <xsl:variable name="itemData" select="."/>
                 <xsl:variable name="itemOID" select="@ItemOID"/>
-                <xsl:variable name="valueLength" select="string-length(@Value)"/>
                 <xsl:for-each select="//odm:ItemDef[@OID=$itemOID]">
-                    <xsl:variable name="formOID" select="@OpenClinica:FormOIDs"/>
+                    <xsl:variable name="formOID" select="OpenClinica:ItemDetails/OpenClinica:ItemPresentInForm[@FormOID = $itemData/../../@FormOID]/@FormOID"/>
                     <xsl:if test="$currentFormOID = $formOID">
                         <xsl:value-of select="@Name"/>
                         <xsl:text>_</xsl:text>
