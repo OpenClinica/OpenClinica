@@ -16,6 +16,7 @@ package org.akaza.openclinica.ws.cabig;
 
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.ws.cabig.abst.AbstractCabigDomEndpoint;
 import org.akaza.openclinica.ws.logic.CreateStudyService;
 import org.springframework.context.MessageSource;
@@ -38,14 +39,27 @@ public class CreateStudyEndpoint extends AbstractCabigDomEndpoint {
 
     protected Element invokeInternal(Element requestElement, Document document) throws Exception {
         System.out.println("Request text create study ");
-        NodeList nlist = requestElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "studyProtocol");
-        this.logNodeList(nlist);
-        for (int i = 0; i < nlist.getLength(); i++) {
+        try {
+            NodeList nlist = requestElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "studyProtocol");
+            this.logNodeList(nlist);
+            for (int i = 0; i < nlist.getLength(); i++) {
 
-            Node study = nlist.item(i);
-            StudyBean studyBean = studyService.generateStudyBean(getUserAccount(), study);
+                Node study = nlist.item(i);
+                StudyBean studyBean = studyService.generateStudyBean(getUserAccount(), study);
+            }
+            return mapRegisterSubjectConfirmation("null");
+        } catch (Exception npe) {
+            npe.printStackTrace();
+            // TODO figure out exception and send response
+            if (npe.getClass().getName().startsWith("org.akaza.openclinica.ws.cabig.exception")) {
+                System.out.println("found " + npe.getClass().getName());
+                OpenClinicaException ope = (OpenClinicaException) npe;
+                return mapSubjectErrorConfirmation("", ope);
+            } else {
+                System.out.println(" did not find openclinica exception, found " + npe.getClass().getName());
+                return mapSubjectErrorConfirmation(npe.getMessage());
+            }
         }
-        return mapRegisterSubjectConfirmation("null");
     }
 
 }

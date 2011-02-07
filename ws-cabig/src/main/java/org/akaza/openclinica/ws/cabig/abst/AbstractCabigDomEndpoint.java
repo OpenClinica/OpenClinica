@@ -125,7 +125,8 @@ public class AbstractCabigDomEndpoint extends AbstractDomPayloadEndpoint {
             for (int i = 0; i < nlist.getLength(); i++) {
                 try {
                     Node childNode = nlist.item(i);
-                    System.out.println("node: " + childNode.getNodeName() + " -> " + childNode.getNodeValue() + " : " + childNode.getTextContent());
+                    System.out.println("node: " + childNode.getNodeName() + " -> " + childNode.getNodeValue());
+                    // + " : " + childNode.getTextContent());
                     if (childNode.getChildNodes().getLength() > 0) {
                         System.out.println("found child nodes: " + childNode.getChildNodes().getLength());
                         logNodeList(childNode.getChildNodes());
