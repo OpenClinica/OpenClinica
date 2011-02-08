@@ -274,6 +274,8 @@ public class RuleController {
         Role r = getRole(userAccount, study).getRole();
         if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR)) {
             return;
+        } else {
+            throw new Exception("Insufficient Permission");
         }
     }
 
@@ -300,17 +302,15 @@ public class RuleController {
 
     @RequestMapping(value = "/studies/{study}/validateRule", method = RequestMethod.POST)
     public @ResponseBody
-    Response create(@RequestBody org.openclinica.ns.rules.v31.Rules rules, Model model, HttpSession session, @PathVariable("study") String studyOid) {
+    Response create(@RequestBody org.openclinica.ns.rules.v31.Rules rules, Model model, HttpSession session, @PathVariable("study") String studyOid)
+            throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         RulesPostImportContainer rpic = mapRulesToRulesPostImportContainer(rules);
-        StudyBean currentStudy = (StudyBean) session.getAttribute("study");
-        UserAccountBean userAccount = (UserAccountBean) session.getAttribute("userBean");
-
-        UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
-        userAccount = (UserAccountBean) userAccountDao.findByUserName("root");
-
         StudyDAO studyDao = new StudyDAO(dataSource);
-        currentStudy = studyDao.findByOid(studyOid);
+        StudyBean currentStudy = studyDao.findByOid(studyOid);
+
+        UserAccountBean userAccount = getUserAccount();
+        mayProceed(userAccount, currentStudy);
 
         getRulePostImportContainerService(currentStudy, userAccount);
         rpic = getRulePostImportContainerService(currentStudy, userAccount).validateRuleDefs(rpic);
@@ -340,17 +340,15 @@ public class RuleController {
 
     @RequestMapping(value = "/studies/{study}/validateAndSaveRule", method = RequestMethod.POST)
     public @ResponseBody
-    Response validateAndSave(@RequestBody org.openclinica.ns.rules.v31.Rules rules, Model model, HttpSession session, @PathVariable("study") String studyOid) {
+    Response validateAndSave(@RequestBody org.openclinica.ns.rules.v31.Rules rules, Model model, HttpSession session, @PathVariable("study") String studyOid)
+            throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         RulesPostImportContainer rpic = mapRulesToRulesPostImportContainer(rules);
-        StudyBean currentStudy = (StudyBean) session.getAttribute("study");
-        UserAccountBean userAccount = (UserAccountBean) session.getAttribute("userBean");
-
-        UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
-        userAccount = (UserAccountBean) userAccountDao.findByUserName("root");
-
         StudyDAO studyDao = new StudyDAO(dataSource);
-        currentStudy = studyDao.findByOid(studyOid);
+        StudyBean currentStudy = studyDao.findByOid(studyOid);
+
+        UserAccountBean userAccount = getUserAccount();
+        mayProceed(userAccount, currentStudy);
 
         getRulePostImportContainerService(currentStudy, userAccount);
         rpic = getRulePostImportContainerService(currentStudy, userAccount).validateRuleDefs(rpic);
@@ -383,17 +381,14 @@ public class RuleController {
     @RequestMapping(value = "/studies/{study}/validateAndTestRule", method = RequestMethod.POST)
     public @ResponseBody
     org.openclinica.ns.rules_test.v31.RulesTest create(@RequestBody org.openclinica.ns.rules_test.v31.RulesTest ruleTest, Model model, HttpSession session,
-            @PathVariable("study") String studyOid) {
+            @PathVariable("study") String studyOid) throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         RulesPostImportContainer rpic = mapRulesToRulesPostImportContainer(ruleTest.getRules());
-        StudyBean currentStudy = (StudyBean) session.getAttribute("study");
-        UserAccountBean userAccount = (UserAccountBean) session.getAttribute("userBean");
-
-        UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
-        userAccount = (UserAccountBean) userAccountDao.findByUserName("root");
-
         StudyDAO studyDao = new StudyDAO(dataSource);
-        currentStudy = studyDao.findByOid(studyOid);
+        StudyBean currentStudy = studyDao.findByOid(studyOid);
+
+        UserAccountBean userAccount = getUserAccount();
+        mayProceed(userAccount, currentStudy);
 
         getRulePostImportContainerService(currentStudy, userAccount);
         rpic = getRulePostImportContainerService(currentStudy, userAccount).validateRuleDefs(rpic);
