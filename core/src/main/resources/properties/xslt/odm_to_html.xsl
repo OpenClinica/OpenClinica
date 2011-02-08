@@ -437,10 +437,7 @@
                                 <xsl:variable name="formOID" select="OpenClinica:ItemDetails/OpenClinica:ItemPresentInForm[@FormOID = $itemData/../../@FormOID]/@FormOID"/>
                                 <xsl:if test="$currentFormOID = $formOID">
                                     <td class="table_header_row">
-                                        <a>
-                                            <xsl:attribute name="href">
-                                            javascript: void(0)
-                                            </xsl:attribute>
+                                        <a href="javascript: void(0)">
                                             <xsl:attribute name="onclick">
                                             openWin('<xsl:value-of select="$itemOID"/>'); return
                                             false;
