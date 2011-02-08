@@ -137,7 +137,7 @@
     </security:global-method-security>
     -->
     
-    <bean id="tokenServices" class="org.akaza.openclinica.oauth.InMemoryOAuth2ProviderTokenServices">
+    <bean id="tokenServices" class="org.springframework.security.oauth2.provider.token.InMemoryOAuth2ProviderTokenServices">
         <property name="supportRefreshToken" value="true"/>
     </bean>
     <bean id="tokenServicesJdbc" class="org.springframework.security.oauth2.provider.token.JdbcOAuth2ProviderTokenServices">
