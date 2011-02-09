@@ -247,7 +247,7 @@ public class CoreResources implements ResourceLoaderAware {
         logger.debug("DataInfo..." + DATAINFO);
         String designerURL = DATAINFO.getProperty("designerURL");
         if (designerURL == null || designerURL.isEmpty())
-            designerURL = "http://localhost:8080/Designer-0.1.0.BUILD-SNAPSHOT/";
+            designerURL = "http://svn.akazaresearch.com:8081/Designer-0.1.0.BUILD-SNAPSHOT/";
         DATAINFO.setProperty("designer.url", designerURL);
         return DATAINFO;
     }

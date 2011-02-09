@@ -117,7 +117,7 @@
 
 <span class="table_title_Admin">Build Rules</span>
 <div>&nbsp;</div>
-<div class="homebox_bullets"><a href="http://localhost:8080/Designer-0.1.0.BUILD-SNAPSHOT/access?host=${hostPath}&app=${contextPath}&study_oid=${study.oid}&provider_user=${userBean.name}">Designer</a></div><br/>
+<div class="homebox_bullets"><a href="${designerURL}access?host=${hostPath}&app=${contextPath}&study_oid=${study.oid}&provider_user=${userBean.name}">Designer</a></div><br/>
 
 <c:choose>
     <c:when test="${userBean.sysAdmin && module=='admin'}">
