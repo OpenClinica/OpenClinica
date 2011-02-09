@@ -7,18 +7,6 @@
  */
 package org.akaza.openclinica.dao.extract;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Set;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.ResponseType;
 import org.akaza.openclinica.bean.core.Status;
@@ -77,6 +65,18 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.logic.odmExport.ClinicalDataUnit;
 import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
 import org.akaza.openclinica.logic.odmExport.MetadataUnit;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Set;
+
+import javax.sql.DataSource;
 
 /**
  * Fetch odm data from database and load odm related classes.
@@ -820,8 +820,8 @@ public class OdmExtractDAO extends DatasetDAO {
                     igMandatories.put(igdprev, itMandatory);
                     isLatest = true;
                     igdef.setOid(igOID);
-                    // igdef.setName("ungrouped".equalsIgnoreCase(igName) ? cvOID + "-" + igName : igName);
-                    igdef.setName(igName);
+                    igdef.setName("ungrouped".equalsIgnoreCase(igName) ? igOID : igName);
+                    //igdef.setName(igName);
                     igdef.setRepeating("ungrouped".equalsIgnoreCase(igName) ? "No" : "Yes");
                     igdef.setComment(igHeader);
                     igdef.setPreSASDatasetName(igName.toUpperCase());
