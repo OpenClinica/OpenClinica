@@ -35,7 +35,7 @@
 <input type="hidden" name="crfId" value="0">
 <input type="hidden" name="subAttr" value="1">
 
- 	<c:if test="${subjectAgeAtEvent == 1}">
+ 	<%--<c:if test="${subjectAgeAtEvent == 1}">--%>
    <p>
    <c:choose>
      <c:when test="${newDataset.showSubjectDob}">
@@ -58,7 +58,7 @@
     </c:otherwise> 
    </c:choose>
    </p>
-	</c:if>
+	<%--</c:if>--%>
 
    <p>
    <c:choose>
