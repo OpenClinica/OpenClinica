@@ -54,6 +54,7 @@ public class CreateStudyEndpoint extends AbstractCabigDomEndpoint {
                     throw new CCBusinessFaultException("The study with the identifier " + studyBean.getIdentifier()
                         + " already exists in the database.  Please use another identfier.", "CC10110");
                 }
+                // but what if we rolled back? and what if we are updating?
                 studyBean = (StudyBean) getStudyDao().create(studyBean);
                 // create all sites
 
