@@ -235,6 +235,93 @@ public class AbstractCabigDomEndpoint extends AbstractDomPayloadEndpoint {
         return responseElement;
     }
 
+    public Element mapCreateStudyConfirmation(String studyIdentifierStr) throws Exception {
+        DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
+        Document document = docBuilder.newDocument();
+
+        Element responseElement = document.createElementNS(CONNECTOR_NAMESPACE_V1, "CreateStudyResponse");
+        // dry
+        Element indicator = document.createElementNS(CONNECTOR_NAMESPACE_V1, "indicator");
+        Attr typeAttr = document.createAttributeNS(XSL_NAMESPACE, "type");
+        typeAttr.setNodeValue("BL");
+        // indicator.setAttributeNS(XSL_NAMESPACE, "type", "II");
+        indicator.setAttributeNode(typeAttr);
+        indicator.setAttribute("value", "true");
+
+        responseElement.appendChild(indicator);
+        // dry
+        Element studyIdentifier = document.createElementNS(CONNECTOR_NAMESPACE_V1, "studyIdentifier");
+        studyIdentifier.setAttribute("root", "2.16.840.1.113883.3.26.7.6");
+        Attr typeAttr2 = document.createAttributeNS(XSL_NAMESPACE, "type");
+        typeAttr2.setNodeValue("II");
+        studyIdentifier.setAttributeNode(typeAttr2);
+        // extension="503" identifierName="Patient Position" displayable="false"
+        studyIdentifier.setAttribute("extension", studyIdentifierStr);
+
+        studyIdentifier.setAttribute("identifierName", "Study Identifier");
+        studyIdentifier.setAttribute("displayable", "false");
+        responseElement.appendChild(studyIdentifier);
+        return responseElement;
+    }
+
+    public Element mapStudyErrorConfirmation(String message) throws Exception {
+        // dry
+        DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
+        Document document = docBuilder.newDocument();
+
+        Element responseElement = document.createElementNS(CONNECTOR_NAMESPACE_V1, "CreateStudyResponse");
+        Element indicator = document.createElementNS(CONNECTOR_NAMESPACE_V1, "indicator");
+        Attr typeAttr = document.createAttributeNS(XSL_NAMESPACE, "type");
+        typeAttr.setNodeValue("BL");
+        // indicator.setAttributeNS(XSL_NAMESPACE, "type", "II");
+        indicator.setAttributeNode(typeAttr);
+        indicator.setAttribute("value", "false");
+        responseElement.appendChild(indicator);
+        // append message here
+        Element errormessage = document.createElementNS(CONNECTOR_NAMESPACE_V1, "message");
+        // String confirmation = messages.getMessage("dataEndpoint.success", null, "Success", locale);
+        Element code = document.createElementNS(CONNECTOR_NAMESPACE_V1, "code");
+        code.setTextContent("CCSystemFault");
+        // TODO change to accept error codes
+        errormessage.appendChild(code);
+        Element reason = document.createElementNS(CONNECTOR_NAMESPACE_V1, "reason");
+        reason.setTextContent(message);
+        errormessage.appendChild(reason);
+        responseElement.appendChild(errormessage);
+        // add subject message here?
+        return responseElement;
+    }
+
+    public Element mapStudyErrorConfirmation(String message, OpenClinicaException exception) throws Exception {
+        DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
+        Document document = docBuilder.newDocument();
+
+        Element responseElement = document.createElementNS(CONNECTOR_NAMESPACE_V1, "CreateStudyResponse");
+        Element indicator = document.createElementNS(CONNECTOR_NAMESPACE_V1, "indicator");
+        Attr typeAttr = document.createAttributeNS(XSL_NAMESPACE, "type");
+        typeAttr.setNodeValue("BL");
+        // indicator.setAttributeNS(XSL_NAMESPACE, "type", "II");
+        indicator.setAttributeNode(typeAttr);
+        indicator.setAttribute("value", "false");
+        responseElement.appendChild(indicator);
+        // append message here
+        Element errormessage = document.createElementNS(CONNECTOR_NAMESPACE_V1, "message");
+        // String confirmation = messages.getMessage("dataEndpoint.success", null, "Success", locale);
+        Element code = document.createElementNS(CONNECTOR_NAMESPACE_V1, "code");
+        code.setTextContent(exception.errorID);
+        // TODO change to accept error codes
+        errormessage.appendChild(code);
+        Element reason = document.createElementNS(CONNECTOR_NAMESPACE_V1, "reason");
+        reason.setTextContent(exception.message);
+        errormessage.appendChild(reason);
+        responseElement.appendChild(errormessage);
+        // add subject message here?
+        return responseElement;
+    }
+
     public boolean canUserRegisterSubject(UserAccountBean user) {
         Role r = user.getActiveStudyRole();
         if (r != null

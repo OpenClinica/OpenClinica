@@ -18,6 +18,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.ws.cabig.abst.AbstractCabigDomEndpoint;
+import org.akaza.openclinica.ws.cabig.exception.CCBusinessFaultException;
 import org.akaza.openclinica.ws.logic.CreateStudyService;
 import org.springframework.context.MessageSource;
 import org.w3c.dom.Document;
@@ -39,26 +40,35 @@ public class CreateStudyEndpoint extends AbstractCabigDomEndpoint {
 
     protected Element invokeInternal(Element requestElement, Document document) throws Exception {
         System.out.println("Request text create study ");
+        StudyBean studyBean = new StudyBean();
+        studyBean.setIdentifier("null");
         try {
             NodeList nlist = requestElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "studyProtocol");
             this.logNodeList(nlist);
             for (int i = 0; i < nlist.getLength(); i++) {
 
                 Node study = nlist.item(i);
-                StudyBean studyBean = studyService.generateStudyBean(getUserAccount(), study);
+                studyBean = studyService.generateStudyBean(getUserAccount(), study);
+                StudyBean testStudyBean = getStudyDao().findByUniqueIdentifier(studyBean.getIdentifier());
+                if (testStudyBean.getId() > 0) {
+                    throw new CCBusinessFaultException("The study with the identifier " + studyBean.getIdentifier()
+                        + " already exists in the database.  Please use another identfier.", "CC10110");
+                }
                 studyBean = (StudyBean) getStudyDao().create(studyBean);
+                // create all sites
+
             }
-            return mapRegisterSubjectConfirmation("null");
+            return mapCreateStudyConfirmation(studyBean.getIdentifier());
         } catch (Exception npe) {
             npe.printStackTrace();
             // TODO figure out exception and send response
             if (npe.getClass().getName().startsWith("org.akaza.openclinica.ws.cabig.exception")) {
                 System.out.println("found " + npe.getClass().getName());
                 OpenClinicaException ope = (OpenClinicaException) npe;
-                return mapSubjectErrorConfirmation("", ope);
+                return mapStudyErrorConfirmation("", ope);
             } else {
                 System.out.println(" did not find openclinica exception, found " + npe.getClass().getName());
-                return mapSubjectErrorConfirmation(npe.getMessage());
+                return mapStudyErrorConfirmation(npe.getMessage());
             }
         }
     }
