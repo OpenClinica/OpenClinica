@@ -29,10 +29,26 @@
     <xsl:variable name="desc" select="/odm:ODM/@Description"/>
     <xsl:variable name="subject_count" select="count(/odm:ODM/odm:ClinicalData/odm:SubjectData)"/>
 
-
     <xsl:key name="studyEvents" match="odm:StudyEventData" use="@StudyEventOID"></xsl:key>
     <xsl:key name="eventCRFs" match="odm:FormData" use="@FormOID"></xsl:key>
     <xsl:key name="itemDataKey" match="odm:ItemData" use="@ItemOID"></xsl:key>
+
+    <xsl:variable name="sexExist" select="//odm:SubjectData/@OpenClinica:Sex"/>
+    <xsl:variable name="uniqueIdExist" select="//odm:SubjectData/@OpenClinica:UniqueIdentifier"/>
+    <xsl:variable name="dobExist" select="//odm:SubjectData/@OpenClinica:DateOfBirth"/>
+    <xsl:variable name="subjectStatusExist" select="//odm:SubjectData/@OpenClinica:Status"/>
+
+    <xsl:variable name="eventLocationExist" select="//odm:StudyEventData/@OpenClinica:StudyEventLocation"/>
+    <xsl:variable name="eventStartDateExist" select="//odm:StudyEventData/@OpenClinica:StartDate"/>
+    <xsl:variable name="eventEndDateExist" select="//odm:StudyEventData/@OpenClinica:EndDate"/>
+    <xsl:variable name="eventStatusExist" select="//odm:StudyEventData/@OpenClinica:Status"/>
+    <xsl:variable name="ageExist" select="//odm:StudyEventData/@OpenClinica:SubjectAgeAtEvent"/>
+
+    <xsl:variable name="crfVersionExist" select="//odm:FormData/@OpenClinica:Version"/>
+    <xsl:variable name="interviewerNameExist" select="//odm:FormData/@OpenClinica:InterviewerName"/>
+    <xsl:variable name="interviewDateExist" select="//odm:FormData/@OpenClinica:InterviewDate"/>
+    <xsl:variable name="crfStatusExist" select="//odm:FormData/@OpenClinica:Status"/>
+
 
     <xsl:template match="/">
         <html>
@@ -180,10 +196,11 @@
                     <table border="1" cellpadding="0" cellspacing="0">
                         <tr valign="top">
                         <td class="table_header_row"><xsl:text>Subject ID</xsl:text></td>
-                        <td class="table_header_row"><xsl:text>Unique ID</xsl:text></td>
-                        <td class="table_header_row"><xsl:text>Subject Status</xsl:text></td>
-                        <td class="table_header_row"><xsl:text>Sex</xsl:text></td>
-
+                        <xsl:if test="$uniqueIdExist"><td class="table_header_row"><xsl:text>Unique ID</xsl:text></td></xsl:if>
+                        <xsl:if test="$subjectStatusExist"><td class="table_header_row"><xsl:text>Subject Status</xsl:text></td></xsl:if>
+                        <xsl:if test="$sexExist"><td class="table_header_row"><xsl:text>Sex</xsl:text></td></xsl:if>
+                        <xsl:if test="$dobExist"><td class="table_header_row"><xsl:text>Date of Birth</xsl:text></td></xsl:if>
+                <!--Starting Study Event Column Headers -->
                 <xsl:for-each select="//odm:StudyEventData[generate-id() = generate-id(key('studyEvents',@StudyEventOID))]">
                     <xsl:variable name="eventOID" select="@StudyEventOID"/>
                     <xsl:variable name="eventPosition" select="position()"/>
@@ -199,17 +216,29 @@
                             <xsl:for-each select="exsl:node-set($allStudyEvents)/odm:StudyEventData">
                                 <xsl:choose>
                                     <xsl:when test="position()=1">
+                                        <xsl:if test="$eventLocationExist">
                                         <td class="table_header_row"><xsl:text>Location_</xsl:text>
                                             <xsl:value-of select="$E"/>
                                             <xsl:value-of select="$eventPosition"/>
                                             <xsl:text>_repeat</xsl:text>
                                             <xsl:value-of select="@StudyEventRepeatKey"/>
                                         </td>
+                                        </xsl:if>
+                                        <xsl:if test="$eventStartDateExist">
                                         <td class="table_header_row"><xsl:text>StartDate_</xsl:text>
                                             <xsl:value-of select="$E"/>
                                             <xsl:value-of select="$eventPosition"/>
                                             <xsl:text>_repeat</xsl:text>
                                             <xsl:value-of select="@StudyEventRepeatKey"/></td>
+                                        </xsl:if>
+                                        <xsl:if test="$eventEndDateExist">
+                                        <td class="table_header_row"><xsl:text>EndDate_</xsl:text>
+                                            <xsl:value-of select="$E"/>
+                                            <xsl:value-of select="$eventPosition"/>
+                                            <xsl:text>_repeat</xsl:text>
+                                            <xsl:value-of select="@StudyEventRepeatKey"/></td>
+                                        </xsl:if>
+                                        <xsl:if test="$eventStatusExist">
                                         <td class="table_header_row">
                                             <xsl:text>Event Status_</xsl:text>
                                             <xsl:value-of select="$E"/>
@@ -217,51 +246,93 @@
                                             <xsl:text>_repeat</xsl:text>
                                             <xsl:value-of select="@StudyEventRepeatKey"/>
                                         </td>
+                                        </xsl:if>
+                                        <xsl:if test="$ageExist">
+                                        <td class="table_header_row"><xsl:text>Age at Event_</xsl:text>
+                                            <xsl:value-of select="$E"/>
+                                            <xsl:value-of select="$eventPosition"/>
+                                            <xsl:text>_repeat</xsl:text>
+                                            <xsl:value-of select="@StudyEventRepeatKey"/></td>
+                                        </xsl:if>
+
                                     </xsl:when>
                                     <xsl:otherwise>
                                          <xsl:if test="preceding-sibling::odm:StudyEventData[1]/@StudyEventRepeatKey != @StudyEventRepeatKey">
-                                            <td class="table_header_row">
-                                                <xsl:text>Location_</xsl:text>
-                                                <xsl:value-of select="$E"/>
-                                                <xsl:value-of select="$eventPosition"/>
-                                                <xsl:text>_repeat</xsl:text>
-                                                <xsl:value-of select="@StudyEventRepeatKey"/>
-                                            </td>
-                                            <td class="table_header_row">
-                                                <xsl:text>StartDate_</xsl:text>
-                                                <xsl:value-of select="$E"/>
-                                                <xsl:value-of select="$eventPosition"/>
-                                                <xsl:text>_repeat</xsl:text>
-                                                <xsl:value-of select="@StudyEventRepeatKey"/>
-                                            </td>
-                                            <td class="table_header_row">
-                                                <xsl:text>Event Status_</xsl:text>
-                                                <xsl:value-of select="$E"/>
-                                                <xsl:value-of select="$eventPosition"/>
-                                                <xsl:text>_repeat</xsl:text>
-                                                <xsl:value-of select="@StudyEventRepeatKey"/>
-                                            </td>
+                                             <xsl:if test="$eventLocationExist">
+                                             <td class="table_header_row"><xsl:text>Location_</xsl:text>
+                                                 <xsl:value-of select="$E"/>
+                                                 <xsl:value-of select="$eventPosition"/>
+                                                 <xsl:text>_repeat</xsl:text>
+                                                 <xsl:value-of select="@StudyEventRepeatKey"/>
+                                             </td>
+                                             </xsl:if>
+                                             <xsl:if test="$eventStartDateExist">
+                                             <td class="table_header_row"><xsl:text>StartDate_</xsl:text>
+                                                 <xsl:value-of select="$E"/>
+                                                 <xsl:value-of select="$eventPosition"/>
+                                                 <xsl:text>_repeat</xsl:text>
+                                                 <xsl:value-of select="@StudyEventRepeatKey"/></td>
+                                             </xsl:if>
+                                             <xsl:if test="$eventEndDateExist">
+                                             <td class="table_header_row"><xsl:text>EndDate_</xsl:text>
+                                                 <xsl:value-of select="$E"/>
+                                                 <xsl:value-of select="$eventPosition"/>
+                                                 <xsl:text>_repeat</xsl:text>
+                                                 <xsl:value-of select="@StudyEventRepeatKey"/></td>
+                                             </xsl:if>
+                                             <xsl:if test="$eventStatusExist">
+                                             <td class="table_header_row">
+                                                 <xsl:text>Event Status_</xsl:text>
+                                                 <xsl:value-of select="$E"/>
+                                                 <xsl:value-of select="$eventPosition"/>
+                                                 <xsl:text>_repeat</xsl:text>
+                                                 <xsl:value-of select="@StudyEventRepeatKey"/>
+                                             </td>
+                                             </xsl:if>
+                                             <xsl:if test="$ageExist">
+                                             <td class="table_header_row"><xsl:text>Age at Event_</xsl:text>
+                                                 <xsl:value-of select="$E"/>
+                                                 <xsl:value-of select="$eventPosition"/>
+                                                 <xsl:text>_repeat</xsl:text>
+                                                 <xsl:value-of select="@StudyEventRepeatKey"/></td>
+                                             </xsl:if>
                                         </xsl:if>
                                     </xsl:otherwise>
                                 </xsl:choose>
                             </xsl:for-each>
                         </xsl:when>
                         <xsl:otherwise>
-                            <td class="table_header_row">
-                                <xsl:text>Location_</xsl:text>
+                            <xsl:if test="$eventLocationExist">
+                            <td class="table_header_row"><xsl:text>Location_</xsl:text>
                                 <xsl:value-of select="$E"/>
                                 <xsl:value-of select="$eventPosition"/>
                             </td>
-                            <td class="table_header_row">
-                                <xsl:text>StartDate_</xsl:text>
+                            </xsl:if>
+                            <xsl:if test="$eventStartDateExist">
+                            <td class="table_header_row"><xsl:text>StartDate_</xsl:text>
                                 <xsl:value-of select="$E"/>
                                 <xsl:value-of select="$eventPosition"/>
                             </td>
+                            </xsl:if>
+                            <xsl:if test="$eventEndDateExist">
+                            <td class="table_header_row"><xsl:text>EndDate_</xsl:text>
+                                <xsl:value-of select="$E"/>
+                                <xsl:value-of select="$eventPosition"/>
+                            </td>
+                            </xsl:if>
+                            <xsl:if test="$eventStatusExist">
                             <td class="table_header_row">
                                 <xsl:text>Event Status_</xsl:text>
                                 <xsl:value-of select="$E"/>
                                 <xsl:value-of select="$eventPosition"/>
                             </td>
+                            </xsl:if>
+                            <xsl:if test="$ageExist">
+                            <td class="table_header_row"><xsl:text>Age at Event_</xsl:text>
+                                <xsl:value-of select="$E"/>
+                                <xsl:value-of select="$eventPosition"/>
+                            </td>
+                            </xsl:if>
                         </xsl:otherwise>
                     </xsl:choose>
 
@@ -284,111 +355,112 @@
                                     <xsl:for-each select="exsl:node-set($allStudyEvents)/odm:StudyEventData">
                                         <xsl:choose>
                                             <xsl:when test="position()=1">
+                                                <xsl:if test="$interviewerNameExist">
                                                 <td class="table_header_row">
                                                     <xsl:text>Interviewer_</xsl:text>
                                                     <xsl:value-of select="$E"/>
                                                     <xsl:value-of select="$eventPosition"/>
-                                                    <xsl:if test="@StudyEventRepeatKey">
-                                                        <xsl:text>_repeat</xsl:text>
-                                                        <xsl:value-of select="@StudyEventRepeatKey"/>
-                                                    </xsl:if>
+                                                    <xsl:text>_repeat</xsl:text>
+                                                    <xsl:value-of select="@StudyEventRepeatKey"/>
                                                     <xsl:text>_</xsl:text>
                                                     <xsl:value-of select="$C"/>
                                                     <xsl:value-of select="$crfPosition"/>
                                                 </td>
+                                                </xsl:if>
+                                                <xsl:if test="$interviewDateExist">
                                                 <td class="table_header_row">
                                                     <xsl:text>Interview date_</xsl:text>
                                                     <xsl:value-of select="$E"/>
                                                     <xsl:value-of select="$eventPosition"/>
-                                                    <xsl:if test="@StudyEventRepeatKey">
-                                                        <xsl:text>_repeat</xsl:text>
-                                                        <xsl:value-of select="@StudyEventRepeatKey"/>
-                                                    </xsl:if>
+                                                    <xsl:text>_repeat</xsl:text>
+                                                    <xsl:value-of select="@StudyEventRepeatKey"/>
                                                     <xsl:text>_</xsl:text>
                                                     <xsl:value-of select="$C"/>
                                                     <xsl:value-of select="$crfPosition"/>
                                                 </td>
+                                                </xsl:if>
+                                                <xsl:if test="$crfStatusExist">
                                                 <td class="table_header_row">
                                                     <xsl:text>CRF Version Status_</xsl:text>
                                                     <xsl:value-of select="$E"/>
                                                     <xsl:value-of select="$eventPosition"/>
-                                                    <xsl:if test="@StudyEventRepeatKey">
-                                                        <xsl:text>_repeat</xsl:text>
-                                                        <xsl:value-of select="@StudyEventRepeatKey"/>
-                                                    </xsl:if>
+                                                    <xsl:text>_repeat</xsl:text>
+                                                    <xsl:value-of select="@StudyEventRepeatKey"/>
                                                     <xsl:text>_</xsl:text>
                                                     <xsl:value-of select="$C"/>
                                                     <xsl:value-of select="$crfPosition"/>
                                                 </td>
+                                                </xsl:if>
+                                                <xsl:if test="$crfVersionExist">
                                                 <td class="table_header_row">
                                                     <xsl:text>Version Name_</xsl:text>
                                                     <xsl:value-of select="$E"/>
                                                     <xsl:value-of select="$eventPosition"/>
-                                                    <xsl:if test="@StudyEventRepeatKey">
-                                                        <xsl:text>_repeat</xsl:text>
-                                                        <xsl:value-of select="@StudyEventRepeatKey"/>
-                                                    </xsl:if>
+                                                    <xsl:text>_repeat</xsl:text>
+                                                    <xsl:value-of select="@StudyEventRepeatKey"/>
                                                     <xsl:text>_</xsl:text>
                                                     <xsl:value-of select="$C"/>
                                                     <xsl:value-of select="$crfPosition"/>
                                                 </td>
+                                                </xsl:if>
                                             </xsl:when>
                                             <xsl:otherwise>
                                                 <xsl:if test="preceding-sibling::odm:StudyEventData[1]/@StudyEventRepeatKey != @StudyEventRepeatKey">
+                                                    <xsl:if test="$interviewerNameExist">
                                                     <td class="table_header_row">
                                                         <xsl:text>Interviewer_</xsl:text>
                                                         <xsl:value-of select="$E"/>
                                                         <xsl:value-of select="$eventPosition"/>
-                                                        <xsl:if test="@StudyEventRepeatKey">
-                                                            <xsl:text>_repeat_</xsl:text>
-                                                            <xsl:value-of select="@StudyEventRepeatKey"/>
-                                                        </xsl:if>
+                                                        <xsl:text>_repeat</xsl:text>
+                                                        <xsl:value-of select="@StudyEventRepeatKey"/>
                                                         <xsl:text>_</xsl:text>
                                                         <xsl:value-of select="$C"/>
                                                         <xsl:value-of select="$crfPosition"/>
                                                     </td>
+                                                    </xsl:if>
+                                                    <xsl:if test="$interviewDateExist">
                                                     <td class="table_header_row">
                                                         <xsl:text>Interview date_</xsl:text>
                                                         <xsl:value-of select="$E"/>
                                                         <xsl:value-of select="$eventPosition"/>
-                                                        <xsl:if test="@StudyEventRepeatKey">
-                                                            <xsl:text>_repeat</xsl:text>
-                                                            <xsl:value-of select="@StudyEventRepeatKey"/>
-                                                        </xsl:if>
+                                                        <xsl:text>_repeat</xsl:text>
+                                                        <xsl:value-of select="@StudyEventRepeatKey"/>
                                                         <xsl:text>_</xsl:text>
                                                         <xsl:value-of select="$C"/>
                                                         <xsl:value-of select="$crfPosition"/>
                                                     </td>
+                                                    </xsl:if>
+                                                    <xsl:if test="$crfStatusExist">
                                                     <td class="table_header_row">
                                                         <xsl:text>CRF Version Status_</xsl:text>
                                                         <xsl:value-of select="$E"/>
                                                         <xsl:value-of select="$eventPosition"/>
-                                                        <xsl:if test="@StudyEventRepeatKey">
-                                                            <xsl:text>_repeat</xsl:text>
-                                                            <xsl:value-of select="@StudyEventRepeatKey"/>
-                                                        </xsl:if>
+                                                        <xsl:text>_repeat</xsl:text>
+                                                        <xsl:value-of select="@StudyEventRepeatKey"/>
                                                         <xsl:text>_</xsl:text>
                                                         <xsl:value-of select="$C"/>
                                                         <xsl:value-of select="$crfPosition"/>
                                                     </td>
+                                                    </xsl:if>
+                                                    <xsl:if test="$crfVersionExist">
                                                     <td class="table_header_row">
                                                         <xsl:text>Version Name_</xsl:text>
                                                         <xsl:value-of select="$E"/>
                                                         <xsl:value-of select="$eventPosition"/>
-                                                        <xsl:if test="@StudyEventRepeatKey">
-                                                            <xsl:text>_repeat</xsl:text>
-                                                            <xsl:value-of select="@StudyEventRepeatKey"/>
-                                                        </xsl:if>
+                                                        <xsl:text>_repeat</xsl:text>
+                                                        <xsl:value-of select="@StudyEventRepeatKey"/>
                                                         <xsl:text>_</xsl:text>
                                                         <xsl:value-of select="$C"/>
                                                         <xsl:value-of select="$crfPosition"/>
                                                     </td>
+                                                    </xsl:if>
                                                 </xsl:if>
                                             </xsl:otherwise>
                                         </xsl:choose>
                                     </xsl:for-each>
                                 </xsl:when>
                                 <xsl:otherwise>
+                                    <xsl:if test="$interviewerNameExist">
                                     <td class="table_header_row">
                                         <xsl:text>Interviewer_</xsl:text>
                                         <xsl:value-of select="$E"/>
@@ -397,6 +469,8 @@
                                         <xsl:value-of select="$C"/>
                                         <xsl:value-of select="$crfPosition"/>
                                     </td>
+                                    </xsl:if>
+                                    <xsl:if test="$interviewDateExist">
                                     <td class="table_header_row">
                                         <xsl:text>Interview date_</xsl:text>
                                         <xsl:value-of select="$E"/>
@@ -405,6 +479,8 @@
                                         <xsl:value-of select="$C"/>
                                         <xsl:value-of select="$crfPosition"/>
                                     </td>
+                                    </xsl:if>
+                                    <xsl:if test="$crfStatusExist">
                                     <td class="table_header_row">
                                         <xsl:text>CRF Version Status_</xsl:text>
                                         <xsl:value-of select="$E"/>
@@ -413,6 +489,8 @@
                                         <xsl:value-of select="$C"/>
                                         <xsl:value-of select="$crfPosition"/>
                                     </td>
+                                    </xsl:if>
+                                    <xsl:if test="$crfVersionExist">
                                     <td class="table_header_row">
                                         <xsl:text>Version Name_</xsl:text>
                                         <xsl:value-of select="$E"/>
@@ -421,6 +499,7 @@
                                         <xsl:value-of select="$C"/>
                                         <xsl:value-of select="$crfPosition"/>
                                     </td>
+                                    </xsl:if>
                                 </xsl:otherwise>
                             </xsl:choose>
                         </xsl:if>
@@ -469,6 +548,7 @@
                     <td class="table_cell_left">
                         <xsl:value-of select="@OpenClinica:StudySubjectId"></xsl:value-of>
                     </td>
+                    <xsl:if test="$uniqueIdExist">
                     <td class="table_cell">
                         <xsl:choose>
                             <xsl:when test="@OpenClinica:UniqueIdentifier">
@@ -479,6 +559,8 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </td>
+                    </xsl:if>
+                    <xsl:if test="$subjectStatusExist">
                     <td class="table_cell">
                         <xsl:choose>
                             <xsl:when test="@OpenClinica:Status">
@@ -489,6 +571,8 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </td>
+                    </xsl:if>
+                    <xsl:if test="$sexExist">
                     <td class="table_cell">
                         <xsl:choose>
                             <xsl:when test="@OpenClinica:Sex">
@@ -499,6 +583,20 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </td>
+                    </xsl:if>
+                    <xsl:if test="$dobExist">
+                    <td class="table_cell">
+                        <xsl:choose>
+                            <xsl:when test="@OpenClinica:DateOfBirth">
+                                <xsl:value-of select="@OpenClinica:DateOfBirth"></xsl:value-of>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </td>
+                    </xsl:if>
+
                     <xsl:variable name="subjectEvents" select="./odm:StudyEventData"/>
                     <xsl:for-each select="//odm:StudyEventData[generate-id() = generate-id(key('studyEvents',@StudyEventOID))]">
                         <xsl:variable name="eventOID" select="@StudyEventOID"/>
@@ -518,7 +616,8 @@
                                         <xsl:when test="position()=1">
                                             <xsl:choose>
                                                 <xsl:when test="$subjectEvent/node()">
-                                                <td class="table_cell">
+                                                    <xsl:if test="$eventLocationExist">
+                                                    <td class="table_cell">
                                                     <xsl:choose>
                                                         <xsl:when test="$subjectEvent/@OpenClinica:StudyEventLocation">
                                                             <xsl:value-of select="$subjectEvent/@OpenClinica:StudyEventLocation"></xsl:value-of>
@@ -528,6 +627,8 @@
                                                         </xsl:otherwise>
                                                     </xsl:choose>
                                                 </td>
+                                                </xsl:if>
+                                                <xsl:if test="$eventStartDateExist">
                                                 <td class="table_cell">
                                                     <xsl:choose>
                                                         <xsl:when test="$subjectEvent/@OpenClinica:StartDate">
@@ -538,6 +639,20 @@
                                                         </xsl:otherwise>
                                                     </xsl:choose>
                                                 </td>
+                                                </xsl:if>
+                                                    <xsl:if test="$eventEndDateExist">
+                                                    <td class="table_cell">
+                                                        <xsl:choose>
+                                                            <xsl:when test="$subjectEvent/@OpenClinica:EndDate">
+                                                                <xsl:value-of select="$subjectEvent/@OpenClinica:EndDate"></xsl:value-of>
+                                                            </xsl:when>
+                                                            <xsl:otherwise>
+                                                                <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+                                                            </xsl:otherwise>
+                                                        </xsl:choose>
+                                                    </td>
+                                                    </xsl:if>
+                                                <xsl:if test="$eventStatusExist">
                                                 <td class="table_cell">
                                                     <xsl:choose>
                                                         <xsl:when test="$subjectEvent/@OpenClinica:Status">
@@ -548,11 +663,26 @@
                                                         </xsl:otherwise>
                                                     </xsl:choose>
                                                 </td>
+                                                </xsl:if>
+                                                    <xsl:if test="$ageExist">
+                                                    <td class="table_cell">
+                                                        <xsl:choose>
+                                                            <xsl:when test="$subjectEvent/@OpenClinica:SubjectAgeAtEvent">
+                                                                <xsl:value-of select="$subjectEvent/@OpenClinica:SubjectAgeAtEvent"></xsl:value-of>
+                                                            </xsl:when>
+                                                            <xsl:otherwise>
+                                                                <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+                                                            </xsl:otherwise>
+                                                        </xsl:choose>
+                                                    </td>
+                                                    </xsl:if>
                                                 </xsl:when>
                                                 <xsl:otherwise>
-                                                    <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
-                                                    <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
-                                                    <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
+                                                    <xsl:if test="$eventLocationExist"><td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td></xsl:if>
+                                                    <xsl:if test="$eventStartDateExist"><td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td></xsl:if>
+                                                    <xsl:if test="$eventEndDateExist"><td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td></xsl:if>
+                                                    <xsl:if test="$eventStatusExist"><td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td></xsl:if>
+                                                    <xsl:if test="$ageExist"><td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td></xsl:if>
                                                 </xsl:otherwise>
                                             </xsl:choose>
                                         </xsl:when>
@@ -560,41 +690,73 @@
                                             <xsl:if test="preceding-sibling::odm:StudyEventData[1]/@StudyEventRepeatKey != @StudyEventRepeatKey">
                                                 <xsl:choose>
                                                     <xsl:when test="$subjectEvent/node()">
+                                                        <xsl:if test="$eventLocationExist">
+                                                        <td class="table_cell">
+                                                        <xsl:choose>
+                                                            <xsl:when test="$subjectEvent/@OpenClinica:StudyEventLocation">
+                                                                <xsl:value-of select="$subjectEvent/@OpenClinica:StudyEventLocation"></xsl:value-of>
+                                                            </xsl:when>
+                                                            <xsl:otherwise>
+                                                                <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+                                                            </xsl:otherwise>
+                                                        </xsl:choose>
+                                                    </td>
+                                                    </xsl:if>
+                                                    <xsl:if test="$eventStartDateExist">
+                                                    <td class="table_cell">
+                                                        <xsl:choose>
+                                                            <xsl:when test="$subjectEvent/@OpenClinica:StartDate">
+                                                                <xsl:value-of select="$subjectEvent/@OpenClinica:StartDate"></xsl:value-of>
+                                                            </xsl:when>
+                                                            <xsl:otherwise>
+                                                                <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+                                                            </xsl:otherwise>
+                                                        </xsl:choose>
+                                                    </td>
+                                                    </xsl:if>
+                                                        <xsl:if test="$eventEndDateExist">
                                                         <td class="table_cell">
                                                             <xsl:choose>
-                                                                <xsl:when test="$subjectEvent/@OpenClinica:StudyEventLocation">
-                                                                    <xsl:value-of select="$subjectEvent/@OpenClinica:StudyEventLocation"></xsl:value-of>
+                                                                <xsl:when test="$subjectEvent/@OpenClinica:EndDate">
+                                                                    <xsl:value-of select="$subjectEvent/@OpenClinica:EndDate"></xsl:value-of>
                                                                 </xsl:when>
                                                                 <xsl:otherwise>
                                                                     <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
                                                                 </xsl:otherwise>
                                                             </xsl:choose>
                                                         </td>
+                                                        </xsl:if>
+                                                    <xsl:if test="$eventStatusExist">
+                                                    <td class="table_cell">
+                                                        <xsl:choose>
+                                                            <xsl:when test="$subjectEvent/@OpenClinica:Status">
+                                                                <xsl:value-of select="$subjectEvent/@OpenClinica:Status"></xsl:value-of>
+                                                            </xsl:when>
+                                                            <xsl:otherwise>
+                                                                <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+                                                            </xsl:otherwise>
+                                                        </xsl:choose>
+                                                    </td>
+                                                    </xsl:if>
+                                                        <xsl:if test="$ageExist">
                                                         <td class="table_cell">
                                                             <xsl:choose>
-                                                                <xsl:when test="$subjectEvent/@OpenClinica:StartDate">
-                                                                    <xsl:value-of select="$subjectEvent/@OpenClinica:StartDate"></xsl:value-of>
+                                                                <xsl:when test="$subjectEvent/@OpenClinica:SubjectAgeAtEvent">
+                                                                    <xsl:value-of select="$subjectEvent/@OpenClinica:SubjectAgeAtEvent"></xsl:value-of>
                                                                 </xsl:when>
                                                                 <xsl:otherwise>
                                                                     <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
                                                                 </xsl:otherwise>
                                                             </xsl:choose>
                                                         </td>
-                                                        <td class="table_cell">
-                                                            <xsl:choose>
-                                                                <xsl:when test="$subjectEvent/@OpenClinica:Status">
-                                                                    <xsl:value-of select="$subjectEvent/@OpenClinica:Status"></xsl:value-of>
-                                                                </xsl:when>
-                                                                <xsl:otherwise>
-                                                                    <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
-                                                                </xsl:otherwise>
-                                                            </xsl:choose>
-                                                        </td>
+                                                        </xsl:if>
                                                     </xsl:when>
                                                     <xsl:otherwise>
-                                                        <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
-                                                        <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
-                                                        <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
+                                                        <xsl:if test="$eventLocationExist"><td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td></xsl:if>
+                                                        <xsl:if test="$eventStartDateExist"><td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td></xsl:if>
+                                                        <xsl:if test="$eventEndDateExist"><td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td></xsl:if>
+                                                        <xsl:if test="$eventStatusExist"><td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td></xsl:if>
+                                                        <xsl:if test="$ageExist"><td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td></xsl:if>
                                                     </xsl:otherwise>
                                                 </xsl:choose>
                                             </xsl:if>
@@ -606,41 +768,73 @@
                                 <xsl:variable name="subjectEvent" select="$subjectEvents[@StudyEventOID=$eventOID]"/>
                                 <xsl:choose>
                                     <xsl:when test="$subjectEvent/node()">
+                                        <xsl:if test="$eventLocationExist">
+                                        <td class="table_cell">
+                                        <xsl:choose>
+                                            <xsl:when test="$subjectEvent/@OpenClinica:StudyEventLocation">
+                                                <xsl:value-of select="$subjectEvent/@OpenClinica:StudyEventLocation"></xsl:value-of>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </td>
+                                    </xsl:if>
+                                    <xsl:if test="$eventStartDateExist">
+                                    <td class="table_cell">
+                                        <xsl:choose>
+                                            <xsl:when test="$subjectEvent/@OpenClinica:StartDate">
+                                                <xsl:value-of select="$subjectEvent/@OpenClinica:StartDate"></xsl:value-of>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </td>
+                                    </xsl:if>
+                                        <xsl:if test="$eventEndDateExist">
                                         <td class="table_cell">
                                             <xsl:choose>
-                                                <xsl:when test="$subjectEvents/@OpenClinica:StudyEventLocation">
-                                                    <xsl:value-of select="$subjectEvents/@OpenClinica:StudyEventLocation"></xsl:value-of>
+                                                <xsl:when test="$subjectEvent/@OpenClinica:EndDate">
+                                                    <xsl:value-of select="$subjectEvent/@OpenClinica:EndDate"></xsl:value-of>
                                                 </xsl:when>
                                                 <xsl:otherwise>
                                                     <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
                                                 </xsl:otherwise>
                                             </xsl:choose>
                                         </td>
+                                        </xsl:if>
+                                    <xsl:if test="$eventStatusExist">
+                                    <td class="table_cell">
+                                        <xsl:choose>
+                                            <xsl:when test="$subjectEvent/@OpenClinica:Status">
+                                                <xsl:value-of select="$subjectEvent/@OpenClinica:Status"></xsl:value-of>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </td>
+                                    </xsl:if>
+                                        <xsl:if test="$ageExist">
                                         <td class="table_cell">
                                             <xsl:choose>
-                                                <xsl:when test="$subjectEvents/@OpenClinica:StartDate">
-                                                    <xsl:value-of select="$subjectEvents/@OpenClinica:StartDate"></xsl:value-of>
+                                                <xsl:when test="$subjectEvent/@OpenClinica:SubjectAgeAtEvent">
+                                                    <xsl:value-of select="$subjectEvent/@OpenClinica:SubjectAgeAtEvent"></xsl:value-of>
                                                 </xsl:when>
                                                 <xsl:otherwise>
                                                     <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
                                                 </xsl:otherwise>
                                             </xsl:choose>
                                         </td>
-                                        <td class="table_cell">
-                                            <xsl:choose>
-                                                <xsl:when test="$subjectEvents/@OpenClinica:Status">
-                                                    <xsl:value-of select="$subjectEvents/@OpenClinica:Status"></xsl:value-of>
-                                                </xsl:when>
-                                                <xsl:otherwise>
-                                                    <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
-                                                </xsl:otherwise>
-                                            </xsl:choose>
-                                        </td>
+                                        </xsl:if>
                                     </xsl:when>
                                     <xsl:otherwise>
-                                        <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
-                                        <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
-                                        <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
+                                        <xsl:if test="$eventLocationExist"><td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td></xsl:if>
+                                        <xsl:if test="$eventStartDateExist"><td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td></xsl:if>
+                                        <xsl:if test="$eventEndDateExist"><td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td></xsl:if>
+                                        <xsl:if test="$eventStatusExist"><td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td></xsl:if>
+                                        <xsl:if test="$ageExist"><td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td></xsl:if>
                                     </xsl:otherwise>
                                 </xsl:choose>
                             </xsl:otherwise>
@@ -672,6 +866,7 @@
                                                         <xsl:when test="$subjectFormData/node()
                                                             and $subjectEvent/@StudyEventOID=@StudyEventOID
                                                             and $subjectEvent/@StudyEventRepeatKey=@StudyEventRepeatKey">
+                                                            <xsl:if test="$interviewerNameExist">
                                                             <td class="table_cell">
                                                                 <xsl:choose>
                                                                     <xsl:when test="$subjectFormData/@OpenClinica:InterviewerName">
@@ -682,6 +877,8 @@
                                                                     </xsl:otherwise>
                                                                 </xsl:choose>
                                                             </td>
+                                                            </xsl:if>
+                                                            <xsl:if test="$interviewDateExist">
                                                             <td class="table_cell">
                                                                 <xsl:choose>
                                                                     <xsl:when test="$subjectFormData/@OpenClinica:InterviewDate">
@@ -692,6 +889,8 @@
                                                                     </xsl:otherwise>
                                                                 </xsl:choose>
                                                             </td>
+                                                            </xsl:if>
+                                                            <xsl:if test="$crfStatusExist">
                                                             <td class="table_cell">
                                                                 <xsl:choose>
                                                                     <xsl:when test="$subjectFormData/@OpenClinica:Status">
@@ -702,6 +901,8 @@
                                                                     </xsl:otherwise>
                                                                 </xsl:choose>
                                                             </td>
+                                                            </xsl:if>
+                                                            <xsl:if test="$crfVersionExist">
                                                             <td class="table_cell">
                                                                 <xsl:choose>
                                                                     <xsl:when test="$subjectFormData/@OpenClinica:Version">
@@ -712,12 +913,13 @@
                                                                     </xsl:otherwise>
                                                                 </xsl:choose>
                                                             </td>
+                                                            </xsl:if>
                                                         </xsl:when>
                                                         <xsl:otherwise>
-                                                            <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
-                                                            <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
-                                                            <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
-                                                            <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
+                                                            <xsl:if test="$interviewerNameExist"><td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td></xsl:if>
+                                                            <xsl:if test="$interviewDateExist"><td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td></xsl:if>
+                                                            <xsl:if test="$crfStatusExist"><td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td></xsl:if>
+                                                            <xsl:if test="$crfVersionExist"><td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td></xsl:if>
                                                         </xsl:otherwise>
                                                     </xsl:choose>
                                                 </xsl:when>
@@ -727,6 +929,7 @@
                                                             <xsl:when test="$subjectFormData/node()
                                                                 and $subjectEvent/@StudyEventOID=@StudyEventOID
                                                                 and $subjectEvent/@StudyEventRepeatKey=@StudyEventRepeatKey">
+                                                                <xsl:if test="$interviewerNameExist">
                                                                 <td class="table_cell">
                                                                     <xsl:choose>
                                                                         <xsl:when test="$subjectFormData/@OpenClinica:InterviewerName">
@@ -737,6 +940,8 @@
                                                                         </xsl:otherwise>
                                                                     </xsl:choose>
                                                                 </td>
+                                                                </xsl:if>
+                                                                <xsl:if test="$interviewDateExist">
                                                                 <td class="table_cell">
                                                                     <xsl:choose>
                                                                         <xsl:when test="$subjectFormData/@OpenClinica:InterviewDate">
@@ -747,6 +952,8 @@
                                                                         </xsl:otherwise>
                                                                     </xsl:choose>
                                                                 </td>
+                                                                </xsl:if>
+                                                                <xsl:if test="$crfStatusExist">
                                                                 <td class="table_cell">
                                                                     <xsl:choose>
                                                                         <xsl:when test="$subjectFormData/@OpenClinica:Status">
@@ -757,22 +964,25 @@
                                                                         </xsl:otherwise>
                                                                     </xsl:choose>
                                                                 </td>
+                                                                </xsl:if>
+                                                                <xsl:if test="$crfVersionExist">
                                                                 <td class="table_cell">
                                                                     <xsl:choose>
                                                                         <xsl:when test="$subjectFormData/@OpenClinica:Version">
-                                                                            <xsl:value-of select="$subjectFormData/@OpenClinica:Version"></xsl:value-of>
+                                                                            <xsl:value-of select="$currentForm/@OpenClinica:Version"></xsl:value-of>
                                                                         </xsl:when>
                                                                         <xsl:otherwise>
                                                                             <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
                                                                         </xsl:otherwise>
                                                                     </xsl:choose>
                                                                 </td>
+                                                                </xsl:if>
                                                             </xsl:when>
                                                             <xsl:otherwise>
-                                                                <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
-                                                                <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
-                                                                <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
-                                                                <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
+                                                                <xsl:if test="$interviewerNameExist"><td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td></xsl:if>
+                                                                <xsl:if test="$interviewDateExist"><td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td></xsl:if>
+                                                                <xsl:if test="$crfStatusExist"><td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td></xsl:if>
+                                                                <xsl:if test="$crfVersionExist"><td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td></xsl:if>
                                                             </xsl:otherwise>
                                                         </xsl:choose>
                                                     </xsl:if>
@@ -783,6 +993,7 @@
                                     <xsl:otherwise>
                                         <xsl:choose>
                                             <xsl:when test="$subjectFormData/node()">
+                                                <xsl:if test="$interviewerNameExist">
                                                 <td class="table_cell">
                                                     <xsl:choose>
                                                         <xsl:when test="$subjectFormData/@OpenClinica:InterviewerName">
@@ -793,6 +1004,8 @@
                                                         </xsl:otherwise>
                                                     </xsl:choose>
                                                 </td>
+                                                </xsl:if>
+                                                <xsl:if test="$interviewDateExist">
                                                 <td class="table_cell">
                                                     <xsl:choose>
                                                         <xsl:when test="$subjectFormData/@OpenClinica:InterviewDate">
@@ -803,6 +1016,8 @@
                                                         </xsl:otherwise>
                                                     </xsl:choose>
                                                 </td>
+                                                </xsl:if>
+                                                <xsl:if test="$crfStatusExist">
                                                 <td class="table_cell">
                                                     <xsl:choose>
                                                         <xsl:when test="$subjectFormData/@OpenClinica:Status">
@@ -813,22 +1028,25 @@
                                                         </xsl:otherwise>
                                                     </xsl:choose>
                                                 </td>
+                                                </xsl:if>
+                                                <xsl:if test="$crfVersionExist">
                                                 <td class="table_cell">
                                                     <xsl:choose>
                                                         <xsl:when test="$subjectFormData/@OpenClinica:Version">
-                                                            <xsl:value-of select="$subjectFormData/@OpenClinica:Version"></xsl:value-of>
+                                                            <xsl:value-of select="$currentForm/@OpenClinica:Version"></xsl:value-of>
                                                         </xsl:when>
                                                         <xsl:otherwise>
                                                             <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
                                                         </xsl:otherwise>
                                                     </xsl:choose>
                                                 </td>
+                                                </xsl:if>
                                             </xsl:when>
                                             <xsl:otherwise>
-                                                <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
-                                                <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
-                                                <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
-                                                <td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td>
+                                                <xsl:if test="$interviewerNameExist"><td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td></xsl:if>
+                                                <xsl:if test="$interviewDateExist"><td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td></xsl:if>
+                                                <xsl:if test="$crfStatusExist"><td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td></xsl:if>
+                                                <xsl:if test="$crfVersionExist"><td class="table_cell"><xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text></td></xsl:if>
                                             </xsl:otherwise>
                                         </xsl:choose>
                                     </xsl:otherwise>
