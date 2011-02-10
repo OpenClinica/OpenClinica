@@ -216,36 +216,74 @@ function callTip(html)
 </c:forEach>
 <!-- End of Alert Box -->
 <table border="0" cellpadding="0" cellspacing="0" onLoad="">
-<tr id="CRF_infobox_closed">
-    <td style="padding-top: 3px; padding-left: 6px; width: 250px;" nowrap>
-        <a href="javascript:leftnavExpand('CRF_infobox_closed'); leftnavExpand('CRF_infobox_open');">
-            <img src="images/sidebar_expand.gif" align="left" border="0" hspace="10">
-            <b><fmt:message key="CRF_info" bundle="${resword}"/></b>
-        </a>
-    </td>
-</tr>
-<tr id="CRF_infobox_open" style="display: none;">
 
-<td>
-<table border="0" cellpadding="0" cellspacing="0">
-<tr>
-    <td valign="bottom">
-        <table border="0" cellpadding="0" cellspacing="0" width="100">
-            <tr>
-                <td nowrap>
-                    <div class="tab_BG_h">
-                        <div class="tab_R_h" style="padding-right: 40px;">
-                        <div class="tab_L_h" style="padding: 3px 11px 0px 6px; text-align: left;">
-                        <a href="javascript:leftnavExpand('CRF_infobox_closed'); leftnavExpand('CRF_infobox_open');">
-                            <img src="images/sidebar_collapse.gif" align="left" border="0" hspace="10">
-                            <b><fmt:message key="CRF_info" bundle="${resword}"/></b>
-                        </a>
-                    </div></div></div>
-                </td>
-            </tr>
-        </table>
-    </td>
-</tr>
+<c:choose>
+    <c:when test="${study.studyParameterConfig.interviewerNameRequired == 'yes' || study.studyParameterConfig.interviewDateRequired == 'yes'}">
+        <tr id="CRF_infobox_closed" style="display:none;">
+            <td style="padding-top: 3px; padding-left: 6px; width: 250px;" nowrap>
+                <a href="javascript:leftnavExpand('CRF_infobox_closed'); leftnavExpand('CRF_infobox_open');">
+                    <img src="images/sidebar_expand.gif" align="left" border="0" hspace="10">
+                    <b><fmt:message key="CRF_info" bundle="${resword}"/></b>
+                </a>
+            </td>
+        </tr>
+        <tr id="CRF_infobox_open">
+        <td>
+        <table border="0" cellpadding="0" cellspacing="0">
+        <tr>
+            <td valign="bottom">
+                <table border="0" cellpadding="0" cellspacing="0" width="100">
+                    <tr>
+                        <td nowrap>
+                            <div class="tab_BG_h">
+                                <div class="tab_R_h" style="padding-right: 40px;">
+                                <div class="tab_L_h" style="padding: 3px 11px 0px 6px; text-align: left;">
+
+                                <a href="javascript:leftnavExpand('CRF_infobox_closed'); leftnavExpand('CRF_infobox_open');">
+                                    <img src="images/sidebar_collapse.gif" align="left" border="0" hspace="10">
+                                    <b><fmt:message key="CRF_info" bundle="${resword}"/></b>
+                                </a>
+
+                            </div></div></div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </c:when>
+    <c:otherwise>
+        <tr id="CRF_infobox_closed">
+            <td style="padding-top: 3px; padding-left: 6px; width: 250px;" nowrap>
+                <a href="javascript:leftnavExpand('CRF_infobox_closed'); leftnavExpand('CRF_infobox_open');">
+                    <img src="images/sidebar_expand.gif" align="left" border="0" hspace="10">
+                    <b><fmt:message key="CRF_info" bundle="${resword}"/></b>
+                </a>
+            </td>
+        </tr>
+        <tr id="CRF_infobox_open" style="display: none;">
+        <td>
+        <table border="0" cellpadding="0" cellspacing="0">
+        <tr>
+            <td valign="bottom">
+                <table border="0" cellpadding="0" cellspacing="0" width="100">
+                    <tr>
+                        <td nowrap>
+                            <div class="tab_BG_h">
+                                <div class="tab_R_h" style="padding-right: 40px;">
+                                <div class="tab_L_h" style="padding: 3px 11px 0px 6px; text-align: left;">
+
+                                <a href="javascript:leftnavExpand('CRF_infobox_closed'); leftnavExpand('CRF_infobox_open');">
+                                    <img src="images/sidebar_collapse.gif" align="left" border="0" hspace="10">
+                                    <b><fmt:message key="CRF_info" bundle="${resword}"/></b>
+                                </a>
+                            </div></div></div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </c:otherwise>
+</c:choose>
 <tr>
 <td valign="top">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TR"><div class="box_BL"><div class="box_BR">
