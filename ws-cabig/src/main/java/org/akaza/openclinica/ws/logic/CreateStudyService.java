@@ -29,7 +29,7 @@ public class CreateStudyService {
 
     }
 
-    public StudyBean generateStudyBean(UserAccountBean user, Node study) {
+    public StudyBean generateStudyBean(UserAccountBean user, Node study) throws Exception {
         StudyBean studyBean = new StudyBean();
         studyBean.setOwner(user);
         DomParsingService xmlService = new DomParsingService();
@@ -50,7 +50,7 @@ public class CreateStudyService {
         return studyBean;
     }
 
-    public ArrayList<StudyBean> generateSites(UserAccountBean user, StudyBean parent, Node study) {
+    public ArrayList<StudyBean> generateSites(UserAccountBean user, StudyBean parent, Node study) throws Exception {
         DomParsingService xmlService = new DomParsingService();
         // above dry?
         ArrayList<StudyBean> sites = xmlService.getSites(parent, study);

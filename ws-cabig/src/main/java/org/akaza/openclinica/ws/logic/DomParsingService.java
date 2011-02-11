@@ -15,6 +15,7 @@
 package org.akaza.openclinica.ws.logic;
 
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.ws.cabig.exception.CCDataValidationFaultException;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -44,23 +45,28 @@ public class DomParsingService {
      *            , the attribute we want to grab, could be 'value' or 'code' or something generic like that
      * @return
      */
-    public String getElementValue(Node subject, String namespace, String xmlLine, String attrName) {
+    public String getElementValue(Node subject, String namespace, String xmlLine, String attrName) throws CCDataValidationFaultException {
         String ret = "";
-        Element subjectElement = (Element) subject;
-        NodeList xmlNode = subjectElement.getElementsByTagNameNS(namespace, xmlLine);
-        Node xmlNodeValue = xmlNode.item(0);
         try {
-            if (xmlNodeValue.hasAttributes()) {
+            Element subjectElement = (Element) subject;
+            NodeList xmlNode = subjectElement.getElementsByTagNameNS(namespace, xmlLine);
+            Node xmlNodeValue = xmlNode.item(0);
+            try {
+                if (xmlNodeValue.hasAttributes()) {
+                    NamedNodeMap nodeMap = xmlNodeValue.getAttributes();
+                    Node nodeValue = nodeMap.getNamedItem(attrName);
+                    ret = nodeValue.getNodeValue();
+                }
+            } catch (NullPointerException npe) {
+                System.out.println("null pointer found");
+                // catch a null pointer, look for the null flavor instead
                 NamedNodeMap nodeMap = xmlNodeValue.getAttributes();
-                Node nodeValue = nodeMap.getNamedItem(attrName);
+                Node nodeValue = nodeMap.getNamedItem("nullFlavor");
                 ret = nodeValue.getNodeValue();
             }
-        } catch (NullPointerException npe) {
-            System.out.println("null pointer found");
-            // catch a null pointer, look for the null flavor instead
-            NamedNodeMap nodeMap = xmlNodeValue.getAttributes();
-            Node nodeValue = nodeMap.getNamedItem("nullFlavor");
-            ret = nodeValue.getNodeValue();
+        } catch (Exception ee) {
+            throw new CCDataValidationFaultException("Could not find tag for value " + xmlLine
+                + ", please review that you have this tag in your file and try your response again", "CC10030");
         }
         return ret;
 
@@ -102,7 +108,7 @@ public class DomParsingService {
      * @param studyNode
      * @return
      */
-    public StudyBean getStudyCenter(StudyBean study, Node studyNode) {
+    public StudyBean getStudyCenter(StudyBean study, Node studyNode) throws CCDataValidationFaultException {
         String facilityCity = "", facilityCountry = "", facilityName = "", facilityState = "";
         Element studyElement = (Element) studyNode;
         NodeList nlist = studyElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "studyCoordinatingCenter");
@@ -202,7 +208,7 @@ public class DomParsingService {
         return study;
     }
 
-    public StudyBean getSponsorName(StudyBean study, Node studyNode) {
+    public StudyBean getSponsorName(StudyBean study, Node studyNode) throws CCDataValidationFaultException {
         String sponsorName = "";
         Element studyElement = (Element) studyNode;
         NodeList nlist = studyElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "studyFundingSponsor");
@@ -239,7 +245,7 @@ public class DomParsingService {
      * @param studyNode
      * @return
      */
-    public ArrayList<StudyBean> getSites(StudyBean study, Node studyNode) {
+    public ArrayList<StudyBean> getSites(StudyBean study, Node studyNode) throws CCDataValidationFaultException {
         ArrayList<StudyBean> siteList = new ArrayList<StudyBean>();
         Element studyElement = (Element) studyNode;
         NodeList nlist = studyElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "studySite");
