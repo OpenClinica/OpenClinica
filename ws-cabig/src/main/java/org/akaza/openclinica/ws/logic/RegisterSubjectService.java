@@ -162,7 +162,8 @@ public class RegisterSubjectService {
             // throw the data fault exception
             throw new CCDataValidationFaultException("Problem parsing date, it should be in YYYYMMDD format.", "CC10200");
         }
-        rsbean.setStudySubjectLabel(registrationSiteIdentifier);
+        // rsbean.setStudySubjectLabel(registrationSiteIdentifier);
+
         return rsbean;
     }
 
