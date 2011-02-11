@@ -1091,7 +1091,7 @@ but the custom tag uses that, not this jstl code--%>
 <c:set var="currPage" value="${displayItem.singleItem.metadata.pageNumberLabel}" />
 
 <!--  found show item <c:out value="${displayItem.singleItem.metadata.showItem}"/> -->
-<c:set var="cdisplay" value="${fn:length(displayItem.singleItem.metadata.conditionalDisplay)}"/>
+<c:set var="cdisplay" value="${displayItem.singleItem.scdItemMetadataBean.id}"/>
 <c:if test="${displayItem.singleItem.metadata.showItem || cdisplay>0}">
     <%-- SHOW THE PARENT FIRST --%>
 <c:if test="${displayItem.singleItem.metadata.parentId == 0}">
@@ -1296,7 +1296,7 @@ but the custom tag uses that, not this jstl code--%>
             <table border="0">
                 <c:set var="notFirstRow" value="${0}" />
                 <c:forEach var="childItem" items="${displayItem.singleItem.children}">
-                <c:set var="ccdisplay" value="${fn:length(childItem.metadata.conditionalDisplay)}"/>
+                <c:set var="ccdisplay" value="${childItem.scdItemMetadataBean.id}"/>
 				<c:if test="${childItem.metadata.showItem || ccdisplay>0}">
 
                 <c:set var="currColumn" value="${childItem.metadata.columnNumber}" />
