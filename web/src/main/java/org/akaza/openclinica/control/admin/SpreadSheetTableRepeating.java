@@ -7,23 +7,6 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.admin.NewCRFBean;
 import org.akaza.openclinica.bean.core.ApplicationConstants;
@@ -45,7 +28,7 @@ import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.MeasurementUnitDao;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.exception.CRFReadingException;
 import org.akaza.openclinica.logic.score.ScoreValidator;
@@ -56,6 +39,23 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * <P>
@@ -170,14 +170,12 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 
         CRFDAO cdao = new CRFDAO(ds);
         CRFBean crf = (CRFBean) cdao.findByPK(crfId);
-
-        ItemDataDAO iddao = new ItemDataDAO(ds);
         ItemDAO idao = new ItemDAO(ds);
         CRFVersionDAO cvdao = new CRFVersionDAO(ds);
         ItemGroupDAO itemGroupDao = new ItemGroupDAO(ds);
-        // YW 1-30-2008
         HashMap<String, String> allItems = new HashMap<String, String>();
         Map<String, String[]> parentValues = new HashMap<String, String[]>();
+        int maxItemFormMetadataId = new ItemFormMetadataDAO(ds).findMaxId();
         
 
         int validSheetNum = 0;
@@ -1071,6 +1069,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         ++cellIndex;
                         cell = sheet.getRow(k).getCell((short) cellIndex);
                         String display = getValue(cell);
+                        String controlItemName = "",optionValue="", message="";
                         if (!StringUtil.isBlank(display)) {
                             if(isShowItem != false) {
                                 errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("ITEM_DISPLAY_STATUS_column") + " "
@@ -1089,6 +1088,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                 String p2 = par[2].trim();
                                 if(p0.length()>0 && p1.length()>0 && p2.length()>0) {
                                     if(repeats.contains(p0)) {
+                                        controlItemName = p0; optionValue = p1; message = p2;
                                         pvKey+=p0;
                                         if(parentValues.containsKey(pvKey)) {
                                             String[] pvs = parentValues.get(pvKey);
@@ -1100,6 +1100,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                                 }
                                             }
                                             if(!existing){
+                                                optionValue = "";
                                                 errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("SIMPLE_CONDITIONAL_DISPLAY_column") + " "
                                                         + resPageMsg.getString("was_invalid_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet") + ". "
                                                         + resPageMsg.getString("control_response_value_invalid") + " " + p1.replace("##", "\\\\,"));
@@ -1213,7 +1214,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                     openQueries.put(itemName, upSql);
                                 } else {
                                	 String upSql = "";
-                             	if((oldItem.getDataType() == oldItem.getDataType().DATE) && (ib.getDataType() == ib.getDataType().PDATE))//New Feature allow date to pdate even if the data is entered
+                             	if(oldItem.getDataType() == oldItem.getDataType().DATE && ib.getDataType() == ib.getDataType().PDATE)//New Feature allow date to pdate even if the data is entered
                              	{
                              		  
                                         if (dbName.equals("oracle")) {
@@ -1348,7 +1349,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             sql2 =
                                 "INSERT INTO ITEM_FORM_METADATA (CRF_VERSION_ID, RESPONSE_SET_ID," + "ITEM_ID,SUBHEADER,HEADER,LEFT_ITEM_TEXT,"
                                     + "RIGHT_ITEM_TEXT,PARENT_ID,SECTION_ID,ORDINAL,PARENT_LABEL,COLUMN_NUMBER,PAGE_NUMBER_LABEL,question_number_label,"
-                                    + "REGEXP,REGEXP_ERROR_MSG,REQUIRED,DEFAULT_VALUE,RESPONSE_LAYOUT,WIDTH_DECIMAL, show_item, simple_conditional_display)" + " VALUES ("
+                                    + "REGEXP,REGEXP_ERROR_MSG,REQUIRED,DEFAULT_VALUE,RESPONSE_LAYOUT,WIDTH_DECIMAL, show_item)" + " VALUES ("
                                     + versionIdString
                                     + ",(SELECT RESPONSE_SET_ID FROM RESPONSE_SET WHERE LABEL='"
                                     + stripQuotes(responseLabel)
@@ -1396,14 +1397,14 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                     + widthDecimal
                                     + "', "
                                     + (isShowItem ? 1 : 0) 
-                                    + ", '" + stripQuotes(display) + "')";
+                                    + ")";
                             logger.warn(sql2);
 
                         } else {
                             sql2 =
                                 "INSERT INTO ITEM_FORM_METADATA (CRF_VERSION_ID, RESPONSE_SET_ID," + "ITEM_ID,SUBHEADER,HEADER,LEFT_ITEM_TEXT,"
                                     + "RIGHT_ITEM_TEXT,PARENT_ID,SECTION_ID,ORDINAL,PARENT_LABEL,COLUMN_NUMBER,PAGE_NUMBER_LABEL,question_number_label,"
-                                    + "REGEXP,REGEXP_ERROR_MSG,REQUIRED,DEFAULT_VALUE,RESPONSE_LAYOUT,WIDTH_DECIMAL, show_item, simple_conditional_display)" + " VALUES ("
+                                    + "REGEXP,REGEXP_ERROR_MSG,REQUIRED,DEFAULT_VALUE,RESPONSE_LAYOUT,WIDTH_DECIMAL, show_item)" + " VALUES ("
                                     + versionIdString
                                     + ",(SELECT RESPONSE_SET_ID FROM RESPONSE_SET WHERE LABEL='"
                                     + stripQuotes(responseLabel)
@@ -1447,11 +1448,40 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                     + stripQuotes(default_value)
                                     + "','"
                                     + stripQuotes(responseLayout) + "','" + widthDecimal + "'," + isShowItem 
-                                    + ", '" + stripQuotes(display) + "')";
+                                    + ")";
 
                         }
-
                         queries.add(sql2);
+                        
+                        String sql2_1 = "";
+                        if(display.length() > 0) {
+                            if(controlItemName.length()>0 && optionValue.length()>0 && message.length()>0) {
+                                if (dbName.equals("oracle")) {
+                                    sql2_1 = "insert into scd_item_metadata (scd_item_form_metadata_id,control_item_form_metadata_id,control_item_name," 
+                                        + "option_value,message) values(" 
+                                        + "(select ifm.item_form_metadata_id from item_form_metadata ifm where ifm.item_id=" + selectCorrectItemQueryOracle + "),"
+                                        + "(select cifm.item_form_metadata_id from item, item_form_metadata cifm"
+                                        + " where item.item_id = (select max(item_id) from item where name = '" + controlItemName +"')" 
+                                        + " and item.owner_id = " + ownerId + " and cifm.item_id = item.item_id and cifm.item_form_metadata_id > " + maxItemFormMetadataId
+                                        + "), '" + controlItemName + "', '" + stripQuotes(optionValue) + "', '" + stripQuotes(message) + "'"
+                                        + ")";
+                                } else {
+                                    sql2_1 = "insert into scd_item_metadata (scd_item_form_metadata_id,control_item_form_metadata_id,control_item_name," 
+                                    	+ "option_value,message) values(" 
+                                    	+ "(select ifm.item_form_metadata_id from item_form_metadata ifm where ifm.item_id=" + selectCorrectItemQueryPostgres + "),"
+                                    	+ "(select cifm.item_form_metadata_id from item, item_form_metadata cifm"
+                                    	+ " where item.item_id = (select max(item_id) from item where name = '" + controlItemName +"')" 
+                                    	+ " and item.owner_id = " + ownerId + " and cifm.item_id = item.item_id and cifm.item_form_metadata_id > " + maxItemFormMetadataId
+                                    	+ "), '" + controlItemName + "', '" + stripQuotes(optionValue) + "', '" + stripQuotes(message) + "'"
+                                    	+ ")";
+                                }
+                                queries.add(sql2_1);
+                            } else {
+                                logger.info("No insert into scd_item_metadata for item name = " + itemName + 
+                                        "with Simple_Conditional_Display = \"" + display + "\".");
+                            }
+                        }
+                        
                         // link version with items now
                         String sql3 = "";
                         if (dbName.equals("oracle")) {
