@@ -11,19 +11,18 @@ import java.util.List;
 
 /**
  * For displaying simple conditional display items.
- *
+ * @author ywang
  */
 public class SCDItemDisplayInfo {
     /**
      * No status class for this so far, but follow the rule below:
-     * 
      * 0: row always display; 
      * 1: current display but changable; 
      * 2: current no display but changable; 
      */
     private int rowDisplayStatus = 0;
     /**
-     * String pattern: -ItemID-, e.g. -11-12-
+     * String pattern: -ItemFormMetadataID-, e.g. -11-12-
      */
     private String rowSCDShowIDStr = ""; 
     
@@ -31,7 +30,6 @@ public class SCDItemDisplayInfo {
     private int rowFirstColIndex = 0;
     /**
      * No status class for this so far, but follow the rule below:
-     * 
      * 0: always display; 
      * 1: display but changable; 
      * 2: no display but changable; 
@@ -46,7 +44,7 @@ public class SCDItemDisplayInfo {
 
         DisplayItemBean dib = allItems.get(0).getSingleItem();
         if(dib.getMetadata().getParentId()==0) {
-            if(dib.getMetadata().isConditionalDisplayItem()) {
+            if(SCDItemDisplayInfo.isSCDItem(dib)) {
                 int scdShowStatus0 = -1;
                 if(noValueComparison) {
                     scdShowStatus0 = dib.getNumDiscrepancyNotes() > 0 ? 0 : 
@@ -66,7 +64,7 @@ public class SCDItemDisplayInfo {
             ArrayList<DisplayItemBean> childItems0 = dib.getChildren();
             for (int j = 0; j < childItems0.size(); ++j) {
                 DisplayItemBean child = childItems0.get(j);
-                if(child.getMetadata().isConditionalDisplayItem()) {
+                if(SCDItemDisplayInfo.isSCDItem(child)) {
                     int scdShowStatus = child.getNumDiscrepancyNotes() > 0 ? 0 : 
                         child.getData().getValue().length()>0 || child.getIsSCDtoBeShown() ? 1 : 2;
                      child.getScdDisplayInfo().setScdShowStatus(scdShowStatus);
@@ -88,7 +86,7 @@ public class SCDItemDisplayInfo {
                     rowStatus = -1;
                     ++rowIndex;
                 }
-                if(ifmb.isConditionalDisplayItem()) {
+                if(SCDItemDisplayInfo.isSCDItem(dib)) {
                     int scdShowStatus = -1;
                     if(noValueComparison) {
                         scdShowStatus = dib.getNumDiscrepancyNotes() > 0 ? 0 : 
@@ -110,7 +108,7 @@ public class SCDItemDisplayInfo {
                 ArrayList childItems = dib.getChildren();
                 for (int j = 0; j < childItems.size(); ++j) {
                     DisplayItemBean child = (DisplayItemBean)childItems.get(j);
-                    if(child.getMetadata().isConditionalDisplayItem()) {
+                    if(SCDItemDisplayInfo.isSCDItem(child)) {
                         int scdShowStatus = child.getNumDiscrepancyNotes() > 0 ? 0 : 
                             child.getData().getValue().length()>0 || child.getIsSCDtoBeShown() ? 1 : 2;
                          child.getScdDisplayInfo().setScdShowStatus(scdShowStatus);
@@ -127,8 +125,13 @@ public class SCDItemDisplayInfo {
         }
         return section;
     }
-
     
+    
+    
+    public static boolean isSCDItem(DisplayItemBean displayItemBean) {
+        int scdId = displayItemBean.getScdItemMetadataBean().getScdItemFormMetadataId();
+        return scdId>0 && scdId == displayItemBean.getMetadata().getId() ? true : false;
+    }
     
     public int getRowDisplayStatus() {
         return rowDisplayStatus;

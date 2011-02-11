@@ -58,8 +58,11 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
      * although ItemFormDAO should take care of that correspondence.
      */
     private ResponseSetBean responseSet;
-    
+    /**
+     * Not in the table. Text in simple_conditional_display field
+     */
     private String conditionalDisplay; //simple_conditional_display
+    
     
     public ItemFormMetadataBean() {
         itemId = 0;
@@ -515,6 +518,10 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
         this.conditionalDisplay = conditionalDisplay;
     }
     
+    /**
+     * Return true if conditionalDisplay String length > 0
+     * @return
+     */
     public boolean isConditionalDisplayItem() {
         if(this.conditionalDisplay!=null && this.conditionalDisplay.length()>0) {
             return true;

@@ -150,7 +150,6 @@ public class ItemFormMetadataDAO extends EntityDAO {
         // answer.setShowItem(((Boolean) hm.get("show_item")).booleanValue());
         answer.setShowItem(getBooleanFromRow(hm, "show_item"));
         // System.out.println("found show item: " + getBooleanFromRow(hm, "show_item"));
-        answer.setConditionalDisplay(getStringFromRow(hm, "simple_conditional_display"));
         // now get the response set
         ResponseSetBean rsb = new ResponseSetBean();
 
@@ -216,9 +215,7 @@ public class ItemFormMetadataDAO extends EntityDAO {
         ind++;
         // will need to set the boolean value here, tbh 23
         this.setTypeExpected(ind, TypeNames.BOOL);
-        ind++; // show_item
-        this.setTypeExpected(ind, TypeNames.STRING); // simple_conditional_display 24
-        ind++;
+        ind++; // show_item 24
         this.setTypeExpected(ind, TypeNames.INT);
         ind++; // response_set.response_type_id 25
         this.setTypeExpected(ind, TypeNames.STRING);
@@ -226,7 +223,7 @@ public class ItemFormMetadataDAO extends EntityDAO {
         this.setTypeExpected(ind, TypeNames.STRING);
         ind++; // response_set.options_text 27
         this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; // response_set.options_values 28
+        ind++; // response_set.options_values 
     }
 
     /*
@@ -412,12 +409,11 @@ public class ItemFormMetadataDAO extends EntityDAO {
         this.setTypesExpected();
         // BWP: changed from 25 to 26 when added response_layout?
         // YW: now added width_decimal
-        // tbh: compensated for simple_conditional_display column, 08/2010
-        this.setTypeExpected(29, TypeNames.STRING);// version name
+        this.setTypeExpected(28, TypeNames.STRING);// version name
         // add more here for display, tbh 082007
-        this.setTypeExpected(30, TypeNames.STRING);// group_label
-        this.setTypeExpected(31, TypeNames.INT);// repeat_max
-        this.setTypeExpected(32, TypeNames.STRING);// section_name
+        this.setTypeExpected(29, TypeNames.STRING);// group_label
+        this.setTypeExpected(30, TypeNames.INT);// repeat_max
+        this.setTypeExpected(31, TypeNames.STRING);// section_name
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(itemId));
 
@@ -607,8 +603,6 @@ public class ItemFormMetadataDAO extends EntityDAO {
         variables.put(new Integer(ind), ifmb.getWidthDecimal());
         ind++;
         variables.put(new Integer(ind), new Boolean(ifmb.isShowItem()));
-        ind++;
-        variables.put(new Integer(ind), ifmb.getConditionalDisplay());
 
         execute("create", variables);
 
@@ -676,8 +670,6 @@ public class ItemFormMetadataDAO extends EntityDAO {
         ind++;
         variables.put(new Integer(ind), new Boolean(ifmb.isShowItem()));
         ind++;
-        variables.put(new Integer(ind), ifmb.getConditionalDisplay());
-        ind++;
         variables.put(new Integer(ind), ifmb.getId());
 
         execute("update", variables);
@@ -716,11 +708,11 @@ public class ItemFormMetadataDAO extends EntityDAO {
     public ItemFormMetadataBean findByItemIdAndCRFVersionId(int itemId, int crfVersionId) {
         this.setTypesExpected();
         // TODO note to come back here, tbh
-        this.setTypeExpected(29, TypeNames.STRING);// version name
+        this.setTypeExpected(28, TypeNames.STRING);// version name
         // add more here for display, tbh 082007
-        this.setTypeExpected(30, TypeNames.STRING);// group_label
-        this.setTypeExpected(31, TypeNames.INT);// repeat_max
-        this.setTypeExpected(32, TypeNames.STRING);// section_name
+        this.setTypeExpected(29, TypeNames.STRING);// group_label
+        this.setTypeExpected(30, TypeNames.INT);// repeat_max
+        this.setTypeExpected(31, TypeNames.STRING);// section_name
 
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(itemId));
@@ -804,7 +796,12 @@ public class ItemFormMetadataDAO extends EntityDAO {
 
         return (ResponseSetBean) this.executeFindByPKQuery("findResponseSetByPK", variables);
     }
-
+    
+    /**
+     * Find all ItemFormMetadataBean which is simple_conditional_display 
+     * @param sectionId
+     * @return
+     */
     public ArrayList<ItemFormMetadataBean> findSCDItemsBySectionId(Integer sectionId) {
         ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
         this.unsetTypeExpected();
@@ -819,6 +816,20 @@ public class ItemFormMetadataDAO extends EntityDAO {
             ItemFormMetadataBean ifmb = (ItemFormMetadataBean) this.getEntityFromHashMap((HashMap) it.next());
             answer.add(ifmb);
         }
+        return answer;
+    }
+    
+    public int findMaxId() {
+        int answer = 0;
+        this.unsetTypeExpected();
+        this.setTypeExpected(1, TypeNames.INT);
+        String sql = "select max(ifm.item_form_metadata_id) as max_id from item_form_metadata ifm";
+        ArrayList rows = this.select(sql);
+        if (rows.size() > 0) {
+            HashMap row = (HashMap) rows.get(0);
+            answer = ((Integer) row.get("max_id")).intValue();
+        }
+
         return answer;
     }
 }

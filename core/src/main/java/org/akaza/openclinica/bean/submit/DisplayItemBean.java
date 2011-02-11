@@ -9,6 +9,7 @@ package org.akaza.openclinica.bean.submit;
 import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.domain.crfdata.SCDItemMetadataBean;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -80,14 +81,18 @@ public class DisplayItemBean implements Comparable {
     private int discrepancyNoteStatus;
     
     /**
-     * held by Item which controls SCD item 
-     */
-    private ArrayList<SimpleConditionalDisplayPair> SCDPairs = new ArrayList<SimpleConditionalDisplayPair> ();
-    /**
      * It is true if a scd item will display because of chosen options. 
      */
     private boolean isSCDtoBeShown = false;
     private SCDItemDisplayInfo scdDisplayInfo = new SCDItemDisplayInfo(); 
+    /**
+     * held by a control displayItemBean
+     */
+    private ArrayList<SCDItemMetadataBean> scdSetsForControl = new ArrayList<SCDItemMetadataBean>();
+    /**
+     * held by a scd item
+     */
+    private SCDItemMetadataBean scdItemMetadataBean = new SCDItemMetadataBean();
     /**
      * Records ItemDataBean value stored in database only, may not always available. 
      */
@@ -101,10 +106,11 @@ public class DisplayItemBean implements Comparable {
         numChildren = 0;
         numColumns = 0;
         dbData = new ItemDataBean();
-        SCDPairs = new ArrayList<SimpleConditionalDisplayPair>();
         isSCDtoBeShown = false;
         scdDisplayInfo = new SCDItemDisplayInfo();
         dbValue = "";
+        scdItemMetadataBean = new SCDItemMetadataBean();
+        scdSetsForControl = new ArrayList<SCDItemMetadataBean>();
     }
 
     public DisplayItemBean() {
@@ -407,12 +413,20 @@ public class DisplayItemBean implements Comparable {
         this.discrepancyNoteStatus = discrepancyNoteStatus;
     }
 
-    public ArrayList<SimpleConditionalDisplayPair> getSCDPairs() {
-        return SCDPairs;
+    public ArrayList<SCDItemMetadataBean> getScdSetsForControl() {
+        return scdSetsForControl;
     }
 
-    public void setSCDPairs(ArrayList<SimpleConditionalDisplayPair> SCDPairs) {
-        this.SCDPairs = SCDPairs;
+    public void setScdSetsForControl(ArrayList<SCDItemMetadataBean> scdSetsForControl) {
+        this.scdSetsForControl = scdSetsForControl;
+    }
+
+    public SCDItemMetadataBean getScdItemMetadataBean() {
+        return scdItemMetadataBean;
+    }
+
+    public void setScdItemMetadataBean(SCDItemMetadataBean scdItemMetadataBean) {
+        this.scdItemMetadataBean = scdItemMetadataBean;
     }
 
     public boolean getIsSCDtoBeShown() {

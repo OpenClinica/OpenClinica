@@ -9,10 +9,7 @@ package org.akaza.openclinica.bean.submit;
 
 
 /**
- * This class collects information for one pair of a simple conditional display
- * 
- * @author ywang (Jun., 2010)
- *
+ * This class collects a set of information for a simple conditional display
  */
 public class SimpleConditionalDisplayPair {
     private Integer SCDItemId = 0;
