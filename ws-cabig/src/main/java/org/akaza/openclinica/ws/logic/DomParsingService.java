@@ -107,14 +107,23 @@ public class DomParsingService {
         Element studyElement = (Element) studyNode;
         NodeList nlist = studyElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "studyCoordinatingCenter");
         Node nlistNode = nlist.item(0);
-        Element nlistNodeElement = (Element) nlistNode;
-        NodeList nlist2 = nlistNodeElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "name");
-        Node nlist2Node = nlist2.item(0);
-        if (nlist2Node.hasAttributes()) {
-            NamedNodeMap nodeMap = nlist2Node.getAttributes();
-            Node nodeValue = nodeMap.getNamedItem("value");
-            facilityName = nodeValue.getNodeValue();
-        }
+
+        facilityName = this.getElementValue(nlistNode, CONNECTOR_NAMESPACE_V1, "name", "value");
+        // NodeList nlist2 = nlistNodeElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "name");
+        // Node nlist2Node = nlist2.item(0);
+        // if (nlist2Node.hasAttributes()) {
+        // NamedNodeMap nodeMap = nlist2Node.getAttributes();
+        // Node nodeValue = nodeMap.getNamedItem("value");
+        // facilityName = nodeValue.getNodeValue();
+        // }
+
+        study.setFacilityName(facilityName);
+        study = this.getPostalAddress(study, nlistNode);
+        return study;
+    }
+
+    public StudyBean getPostalAddress(StudyBean study, Node studyNode) {
+        Element nlistNodeElement = (Element) studyNode;
         NodeList nlist3 = nlistNodeElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "postalAddress");
         Node nlistAddr = nlist3.item(0);
         Element nlistAddrElement = (Element) nlistAddr;
@@ -126,19 +135,17 @@ public class DomParsingService {
             Node nodeValue = nodeMap.getNamedItem("value");
             Node nodeCode = nodeMap.getNamedItem("code");
             if ("CTY".equals(nodeType.getNodeValue())) {
-                facilityCity = nodeValue.getNodeValue();
+                String facilityCity = nodeValue.getNodeValue();
+                study.setFacilityCity(facilityCity);
             } else if ("CNT".equals(nodeType.getNodeValue())) {
-                facilityCountry = nodeCode.getNodeValue();// nodeValue.getNodeValue();
+                String facilityCountry = nodeCode.getNodeValue();
+                study.setFacilityCountry(facilityCountry);
             } else if ("STA".equals(nodeType.getNodeValue())) {
-                facilityState = nodeCode.getNodeValue(); // nodeValue.getNodeValue();
+                String facilityState = nodeCode.getNodeValue();
+                study.setFacilityState(facilityState);// nodeValue.getNodeValue();
             }
             // case nodeType.getNodeValue():
         }
-
-        study.setFacilityCity(facilityCity);
-        study.setFacilityCountry(facilityCountry);
-        study.setFacilityName(facilityName);
-        study.setFacilityState(facilityState);
         return study;
     }
 
@@ -203,29 +210,59 @@ public class DomParsingService {
         Element nlistNodeElement = (Element) nlistNode;
         NodeList nlist2 = nlistNodeElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "organization");
         Node nameNode = nlist2.item(0);
-        Element nameNodeElement = (Element) nameNode;
-        NodeList nlistNames = nameNodeElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "name");
-        Node sponsorNameNode = nlistNames.item(0);
-        NamedNodeMap nodeMap = sponsorNameNode.getAttributes();
-        Node nodeValue = nodeMap.getNamedItem("value");
-        sponsorName = nodeValue.getNodeValue();
+        sponsorName = this.getElementValue(nameNode, CONNECTOR_NAMESPACE_V1, "name", "value");
+        // Element nameNodeElement = (Element) nameNode;
+        // NodeList nlistNames = nameNodeElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "name");
+        // Node sponsorNameNode = nlistNames.item(0);
+        // NamedNodeMap nodeMap = sponsorNameNode.getAttributes();
+        // Node nodeValue = nodeMap.getNamedItem("value");
+        // sponsorName = nodeValue.getNodeValue();
 
         study.setSponsor(sponsorName);
         System.out.println("found sponsor: " + sponsorName);
         return study;
     }
 
+    /**
+     * creation of sites: we have to parse the following. <ns2:studySite> <ns2:identifier xmlns:ns1="uri:iso.org:21090"
+     * xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns1:II" nullFlavor="NI" displayable="false"/> <ns2:statusCode
+     * xmlns:ns1="uri:iso.org:21090" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns1:CD" code="ACTIVE"/> <ns2:organization> <ns2:description
+     * xmlns:ns1="uri:iso.org:21090" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns1:ST" nullFlavor="NI"/> <ns2:identifier
+     * xmlns:ns1="uri:iso.org:21090" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns1:II" root="2.16.840.1.113883.3.26.7.10"
+     * extension="47012" identifierName="Clinical Connector Organization Identifier" displayable="false"/> <ns2:name xmlns:ns1="uri:iso.org:21090"
+     * xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns1:ST" value="Duke-NUS Graduate Medical School Singapore"/> <ns2:postalAddress
+     * xmlns:ns1="uri:iso.org:21090" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns1:AD" isNotOrdered="false"> <ns1:part
+     * value="2 Jalan Bukit Merah" type="SAL"/> <ns1:part value="Singapore" type="CTY"/> <ns1:part code="Singapore" type="CNT"/> </ns2:postalAddress>
+     * </ns2:organization> </ns2:studySite>
+     * 
+     * @param study
+     * @param studyNode
+     * @return
+     */
     public ArrayList<StudyBean> getSites(StudyBean study, Node studyNode) {
         ArrayList<StudyBean> siteList = new ArrayList<StudyBean>();
         Element studyElement = (Element) studyNode;
         NodeList nlist = studyElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "studySite");
         System.out.println("found " + nlist.getLength() + " sites");
         for (int j = 0; j < nlist.getLength(); j++) {
+            StudyBean site = new StudyBean();
+            site.setParentStudyId(study.getId());
+            site.setParentStudyName(study.getName());
             Node siteNode = nlist.item(j);
             Element siteElement = (Element) siteNode;
             String siteIdentifier = this.getElementValue(siteNode, CONNECTOR_NAMESPACE_V1, "identifier", "extension");
             NodeList orgNodeList = siteElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "organization");
-
+            Node orgNode = orgNodeList.item(0);
+            String summary = this.getElementValue(orgNode, CONNECTOR_NAMESPACE_V1, "description", "value");
+            site.setSummary(summary);
+            String name = this.getElementValue(orgNode, CONNECTOR_NAMESPACE_V1, "name", "value");
+            site.setName(name);
+            site.setFacilityName(name);
+            String orgIdentifier = this.getElementValue(orgNode, CONNECTOR_NAMESPACE_V1, "identifier", "extension");
+            site.setIdentifier(orgIdentifier);
+            // site or org?
+            site = this.getPostalAddress(site, orgNode);
+            siteList.add(site);
         }
         return siteList;
     }

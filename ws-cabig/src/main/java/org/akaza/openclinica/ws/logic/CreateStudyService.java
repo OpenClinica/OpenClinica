@@ -46,8 +46,19 @@ public class CreateStudyService {
         studyBean = xmlService.getStudyInvestigator(studyBean, study);
         studyBean = xmlService.getStudyCenter(studyBean, study);
         studyBean = xmlService.getSponsorName(studyBean, study);
-        ArrayList<StudyBean> sites = xmlService.getSites(studyBean, study);
+        // ArrayList<StudyBean> sites = xmlService.getSites(studyBean, study);
         return studyBean;
+    }
+
+    public ArrayList<StudyBean> generateSites(UserAccountBean user, StudyBean parent, Node study) {
+        DomParsingService xmlService = new DomParsingService();
+        // above dry?
+        ArrayList<StudyBean> sites = xmlService.getSites(parent, study);
+        for (StudyBean site : sites) {
+            site.setOwner(user);
+            site.setStatus(Status.AVAILABLE);
+        }
+        return sites;
     }
 
 }

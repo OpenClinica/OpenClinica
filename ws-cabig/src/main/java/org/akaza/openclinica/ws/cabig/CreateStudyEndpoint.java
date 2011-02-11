@@ -15,6 +15,7 @@
 package org.akaza.openclinica.ws.cabig;
 
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.service.StudyParamsConfig;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.ws.cabig.abst.AbstractCabigDomEndpoint;
@@ -26,6 +27,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.util.ArrayList;
+
 import javax.sql.DataSource;
 
 public class CreateStudyEndpoint extends AbstractCabigDomEndpoint {
@@ -36,6 +39,32 @@ public class CreateStudyEndpoint extends AbstractCabigDomEndpoint {
         super(dataSource, messages, coreResources);
 
         studyService = new CreateStudyService();
+    }
+
+    private StudyBean generateStudyParameters(StudyBean newStudy) {
+        // this.getStudyParamValueDao().findParameterByHandle(handle);
+        newStudy.getStudyParameterConfig().setCollectDob(getStudyParamValueDao().findParameterByHandle("collectDob").getDefaultValue());
+        newStudy.getStudyParameterConfig().setDiscrepancyManagement(getStudyParamValueDao().findParameterByHandle("discrepancyManagement").getDefaultValue());
+        newStudy.getStudyParameterConfig().setGenderRequired(getStudyParamValueDao().findParameterByHandle("genderRequired").getDefaultValue());
+
+        newStudy.getStudyParameterConfig().setInterviewerNameRequired(
+                getStudyParamValueDao().findParameterByHandle("interviewerNameRequired").getDefaultValue());
+        newStudy.getStudyParameterConfig().setInterviewerNameDefault(getStudyParamValueDao().findParameterByHandle("interviewerNameDefault").getDefaultValue());
+        newStudy.getStudyParameterConfig().setInterviewDateEditable(getStudyParamValueDao().findParameterByHandle("interviewDateEditable").getDefaultValue());
+        newStudy.getStudyParameterConfig().setInterviewDateRequired(getStudyParamValueDao().findParameterByHandle("interviewDateRequired").getDefaultValue());
+        newStudy.getStudyParameterConfig().setInterviewerNameEditable(
+                getStudyParamValueDao().findParameterByHandle("interviewerNameEditable").getDefaultValue());
+        newStudy.getStudyParameterConfig().setInterviewDateDefault(getStudyParamValueDao().findParameterByHandle("interviewDateDefault").getDefaultValue());
+
+        newStudy.getStudyParameterConfig().setSubjectIdGeneration("non-editable");
+        newStudy.getStudyParameterConfig().setSubjectPersonIdRequired(
+                getStudyParamValueDao().findParameterByHandle("subjectPersonIdRequired").getDefaultValue());
+        newStudy.getStudyParameterConfig().setSubjectIdPrefixSuffix(getStudyParamValueDao().findParameterByHandle("subjectIdPrefixSuffix").getDefaultValue());
+        newStudy.getStudyParameterConfig().setPersonIdShownOnCRF(getStudyParamValueDao().findParameterByHandle("personIdShownOnCRF").getDefaultValue());
+        newStudy.getStudyParameterConfig().setSecondaryLabelViewable(getStudyParamValueDao().findParameterByHandle("secondaryLabelViewable").getDefaultValue());
+        newStudy.getStudyParameterConfig().setAdminForcedReasonForChange(
+                getStudyParamValueDao().findParameterByHandle("adminForcedReasonForChange").getDefaultValue());
+        return newStudy;
     }
 
     protected Element invokeInternal(Element requestElement, Document document) throws Exception {
@@ -50,13 +79,24 @@ public class CreateStudyEndpoint extends AbstractCabigDomEndpoint {
                 Node study = nlist.item(i);
                 studyBean = studyService.generateStudyBean(getUserAccount(), study);
                 StudyBean testStudyBean = getStudyDao().findByUniqueIdentifier(studyBean.getIdentifier());
-                if (testStudyBean.getId() > 0) {
+                // note: this returns null if there is nothing in the db. not that cool. tbh
+                if (testStudyBean != null) {
                     throw new CCBusinessFaultException("The study with the identifier " + studyBean.getIdentifier()
                         + " already exists in the database.  Please use another identfier.", "CC10110");
                 }
                 // but what if we rolled back? and what if we are updating?
+                studyBean = this.generateStudyParameters(studyBean);
                 studyBean = (StudyBean) getStudyDao().create(studyBean);
+
                 // create all sites
+                ArrayList<StudyBean> sites = studyService.generateSites(getUserAccount(), studyBean, study);
+                for (StudyBean site : sites) {
+                    // what about site params?
+                    ArrayList<StudyParamsConfig> parentConfigs = studyBean.getStudyParameters();
+                    site.setStudyParameters(parentConfigs);
+
+                    site = (StudyBean) getStudyDao().create(site);
+                }
 
             }
             return mapCreateStudyConfirmation(studyBean.getIdentifier());
