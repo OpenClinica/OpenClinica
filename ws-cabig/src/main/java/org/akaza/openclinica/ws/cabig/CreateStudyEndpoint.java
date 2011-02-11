@@ -156,7 +156,7 @@ public class CreateStudyEndpoint extends AbstractCabigDomEndpoint {
                 StudyConfigService configService = new StudyConfigService(dataSource);
                 // studyBean = this.generateStudyParameters(studyBean);
                 studyBean = configService.setParametersForStudy(studyBean);
-                studyBean.getStudyParameterConfig().setSubjectIdGeneration("non-editable");
+                studyBean.getStudyParameterConfig().setSubjectIdGeneration("auto non-editable");
                 studyBean = (StudyBean) getStudyDao().create(studyBean);
                 studyBean = this.createStudyParameters(studyBean);
 
@@ -165,7 +165,7 @@ public class CreateStudyEndpoint extends AbstractCabigDomEndpoint {
                 for (StudyBean site : sites) {
                     // what about site params?
                     site = configService.setParametersForSite(site);
-                    site.getStudyParameterConfig().setSubjectIdGeneration("non-editable");
+                    site.getStudyParameterConfig().setSubjectIdGeneration("auto non-editable");
                     site = (StudyBean) getStudyDao().create(site);
                     site = this.createStudyParameters(site);
                 }
