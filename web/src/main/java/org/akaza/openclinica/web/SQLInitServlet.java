@@ -56,6 +56,14 @@ public class SQLInitServlet extends HttpServlet {
         String theDir = getField("filePath");
         String dir1 = "crf" + File.separator;
         String dir2 = "original" + File.separator;
+        String dirRules = "rules";
+
+        // Creating rules directory if not exist mantis issue 6584.
+        if (!(new File(theDir)).isDirectory() || !(new File(dirRules)).isDirectory()) {
+            (new File(theDir + dirRules)).mkdirs();
+        }
+
+
         if (!(new File(theDir)).isDirectory() || !(new File(dir1)).isDirectory()
                 || !(new File(dir2)).isDirectory()) {
             (new File(theDir + dir1 + dir2)).mkdirs();
