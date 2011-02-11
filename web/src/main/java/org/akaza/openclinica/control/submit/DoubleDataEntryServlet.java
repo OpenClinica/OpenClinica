@@ -207,9 +207,8 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
         }
         boolean showOriginalItem = getItemMetadataService().isShown(dib.getItem().getId(), ecb, valueToCompare);// was dib.getData()
         boolean showItem = dib.getMetadata().isShowItem();
-        if(dib.getMetadata().isConditionalDisplayItem()) {
+        if(dib.getScdItemMetadataBean().getScdItemFormMetadataId()>0) {
             showItem = true;
-            dib = loadFormValue(dib);
         }
         boolean showDuplicateItem = getItemMetadataService().hasPassedDDE(dib.getMetadata(), ecb, valueToCompare);//.isShown(dib.getItem().getId(), ecb, dib.getDbData());// where is the set db data? 
         logger.debug("*** show original item has value " + dib.getData().getValue() + " and show item has value " + valueToCompare.getValue());
