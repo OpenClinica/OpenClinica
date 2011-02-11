@@ -97,6 +97,17 @@
      return true;
 
   }
+
+function submitform(){
+    var crfUpload = document.getElementById('excel_file_path');
+    //Does the user browse or select a file or not
+    if (crfUpload.value =='' )
+    {
+        alert("Select a file to upload!");
+        return false;
+    }
+}
+
    //-->
 </script>
 
@@ -122,7 +133,7 @@
 
 <tr>
 <td class="formlabel"><fmt:message key="ms_excel_file_to_upload" bundle="${resword}"/>:</td>
-<td><div class="formfieldFile_BG"><input type="file" name="excel_file"></div>
+<td><div class="formfieldFile_BG"><input type="file" name="excel_file" id="excel_file_path"></div>
 <br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="excel_file"/></jsp:include></td>
 </tr>
 <input type="hidden" name="crfId" value="<c:out value="${version.crfId}"/>">
@@ -139,7 +150,7 @@
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>
 <td>
-<input type="submit" value="<fmt:message key="preview_CRF_version" bundle="${resword}"/>" class="button_long">
+<input type="submit" onclick="return submitform();" value="<fmt:message key="preview_CRF_version" bundle="${resword}"/>" class="button_long">
 </td>
 <td>
 <input type="button" onclick="confirmExit('ListCRF?module=<c:out value="${module}"/>')" name="exit" value="<fmt:message key="exit" bundle="${resword}"/>   "class="button_medium"/>
