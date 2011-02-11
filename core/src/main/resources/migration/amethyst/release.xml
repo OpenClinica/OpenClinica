@@ -5,7 +5,6 @@
     <include file="migration/amethyst/2010-03-03-4618.xml"/>
     <include file="migration/amethyst/2010-03-30-4618.xml"/>
     <include file="migration/amethyst/2010-05-27-5095.xml"/>
-    <include file="migration/amethyst/2010-05-28-5051.xml"/>
     <include file="migration/amethyst/2010-07-01-5245.xml"/>
     <include file="migration/amethyst/2010-07-07-5429.xml"/>
     <include file="migration/amethyst/2010-07-14-5265.xml"/>
@@ -18,4 +17,6 @@
     <include file="migration/amethyst/2010-11-24-6084.xml"/>
     <include file="migration/amethyst/2010-12-02-6421.xml"/>
     <include file="migration/amethyst/2010-12-17-NA01.xml"/>
+    <include file="migration/amethyst/2011-02-07-7181.xml"/>
+    <include file="migration/amethyst/2011-02-08-7181.xml"/>
 </databaseChangeLog>
