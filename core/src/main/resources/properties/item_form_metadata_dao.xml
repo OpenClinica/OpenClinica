@@ -156,8 +156,8 @@
                     default_value,
                     response_layout,
                     width_decimal,
-                    show_item, simple_conditional_display  )
-			VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                    show_item  )
+			VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 		</sql>
 	</query>
 	<query>
@@ -186,8 +186,7 @@
                     default_value =?,
                     response_layout =?,
                     width_decimal =?,
-                    show_item =?,
-                    simple_conditional_display = ?
+                    show_item =?
 			WHERE item_form_metadata_id = ?
 		</sql>
 	</query>
@@ -232,7 +231,8 @@
 	</query>
 	<query>
 		<name>findByItemIdAndCRFVersionIdNotInIGM</name>
-		<!-- YW 08-22-2007, keep this for items of a crf_version which doesn't exist in item_group_metadata -->
+		<!-- YW 08-22-2007, keep this for items of a crf_version which doesn't exist in item_group_metadata
+-->
 		<sql>
 			SELECT m.*, rs.response_type_id, rs.label, rs.options_text, rs.options_values
 			FROM item_form_metadata m, response_set rs
@@ -251,8 +251,10 @@
 	</query>
 	<query>
 		<name>findSCDItemsBySectionId</name>
-		<sql>select * from item_form_metadata 
-		where section_id = ? and length(simple_conditional_display) > 0
+		<sql>
+		select ifm.* from item_form_metadata ifm
+		where section_id = ? and exists (select s.scd_item_form_metadata_id from scd_item_metadata s
+		where s.scd_item_form_metadata_id = ifm.item_form_metadata_id);
 		</sql>
 	</query>
 </queries>

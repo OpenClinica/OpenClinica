@@ -142,8 +142,8 @@
                     default_value,
                     response_layout,
                     width_decimal,
-                    show_item, simple_conditional_display  )
-                        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                    show_item  )
+                        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                 </sql>
         </query>
         <query>
@@ -171,8 +171,7 @@
                     required =?,
                     default_value =?,
                     response_layout =?,
-                    width_decimal =?, show_item =?,
-                    simple_conditional_display = ?
+                    width_decimal =?, show_item =?
                         WHERE item_form_metadata_id = ?
                 </sql>
         </query>
@@ -234,17 +233,12 @@
                 <name>getNextPK</name>
                 <sql> select item_form_metadata_id_seq.nextval as key from dual </sql>
         </query>
-	<query>
-		<name>findSCDItemsInSectionBySectionId</name>
-		<sql>select * from item_form_metadata 
-		where section_id = ? and length(simple_conditional_display) > 0
+    <query>
+		<name>findSCDItemsBySectionId</name>
+		<sql>
+		select ifm.* from item_form_metadata ifm
+		where section_id = ? and exists (select s.scd_item_form_metadata_id from scd_item_metadata s
+		where s.scd_item_form_metadata_id = ifm.item_form_metadata_id);
 		</sql>
 	</query>
-    <query>
-        <name>findSCDItemsBySectionId</name>
-        <sql>select * from item_form_metadata
-        where section_id = ? and length(simple_conditional_display) > 0
-        </sql>
-    </query>
-    
 </queries>
