@@ -45,6 +45,7 @@
                 <value>org.akaza.openclinica.domain.admin.MeasurementUnit</value>
                 <value>org.akaza.openclinica.domain.crfdata.DynamicsItemGroupMetadataBean</value>
                 <value>org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean</value>
+                <value>org.akaza.openclinica.domain.crfdata.SCDItemMetadataBean</value>
             </list>
         </property>
         <property name="hibernateProperties">
@@ -98,5 +99,6 @@
   <bean id="configurationDao" class="org.akaza.openclinica.dao.hibernate.ConfigurationDao" parent="abstractDomainDao" autowire="byName" />
 
   <bean id="measurementUnitDao" class="org.akaza.openclinica.dao.hibernate.MeasurementUnitDao" parent="abstractDomainDao" autowire="byName" />
-
+  <bean id="scdItemMetadataDao" class="org.akaza.openclinica.dao.hibernate.SCDItemMetadataDao" parent="abstractDomainDao" autowire="byName" />
+  
 </beans>
