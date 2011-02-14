@@ -29,6 +29,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import javax.sql.DataSource;
 
@@ -141,33 +142,70 @@ public class CreateStudyEndpoint extends AbstractCabigDomEndpoint {
         studyBean.setIdentifier("null");
         try {
             NodeList nlist = requestElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "studyProtocol");
-            this.logNodeList(nlist);
+            // this.logNodeList(nlist);
             for (int i = 0; i < nlist.getLength(); i++) {
 
                 Node study = nlist.item(i);
                 studyBean = studyService.generateStudyBean(getUserAccount(), study);
-                StudyBean testStudyBean = getStudyDao().findByUniqueIdentifier(studyBean.getIdentifier());
                 // note: this returns null if there is nothing in the db. not that cool. tbh
+                StudyBean testStudyBean = getStudyDao().findByUniqueIdentifier(studyBean.getIdentifier());
+                boolean updateMe = false;
+                int testStudyBeanId = testStudyBean != null ? testStudyBean.getId() : 0;
+                // create all sites, moved up here to help with updates, tbh
+                ArrayList<StudyBean> sites = studyService.generateSites(getUserAccount(), studyBean, study);
+                // have to check site identifiers to protect uniqueness here, tbh
+                for (StudyBean site : sites) {
+                    StudyBean testSite = getStudyDao().findByUniqueIdentifier(site.getIdentifier());
+                    if ((testSite != null) && (testSite.getParentStudyId() != testStudyBeanId)) {
+                        throw new CCBusinessFaultException("The site with the identifier " + site.getIdentifier()
+                            + " already exists and has a different relationship in the database.", "CC10110");
+
+                    }
+                }
                 if (testStudyBean != null) {
-                    throw new CCBusinessFaultException("The study with the identifier " + studyBean.getIdentifier()
-                        + " already exists in the database.  Please use another identfier.", "CC10110");
+                    // we need to check if it's identical. if it is, refresh all the info
+                    // ArrayList<StudyBean> testSites = (ArrayList<StudyBean>) getStudyDao().findAllByParent(studyBean.getId());
+                    // for (StudyBean site : sites) {
+                    // StudyBean testSite = getStudyDao().findByUniqueIdentifier(site.getIdentifier());
+                    //                        
+                    // }
+                    if (!studyBean.getIdentifier().equals(testStudyBean.getIdentifier())) {
+                        // if not. AND if SITES are not the same, throw an error
+                        throw new CCBusinessFaultException("The study with the identifier " + studyBean.getIdentifier()
+                            + " already exists in the database.  Please use another identfier.", "CC10110");
+                    } else {
+                        updateMe = true;
+                        studyBean.setUpdater(getUserAccount());
+                        studyBean.setUpdatedDate(new Date(System.currentTimeMillis()));
+                        studyBean.setId(testStudyBean.getId());
+                        // set status here, as in the register subject?
+                    }
                 }
                 // but what if we rolled back? and what if we are updating?
                 StudyConfigService configService = new StudyConfigService(dataSource);
                 // studyBean = this.generateStudyParameters(studyBean);
                 studyBean = configService.setParametersForStudy(studyBean);
                 studyBean.getStudyParameterConfig().setSubjectIdGeneration("auto non-editable");
-                studyBean = (StudyBean) getStudyDao().create(studyBean);
+                if (!updateMe) {
+                    studyBean = (StudyBean) getStudyDao().create(studyBean);
+                } else {
+                    studyBean = (StudyBean) getStudyDao().update(studyBean);
+                }
                 studyBean = this.createStudyParameters(studyBean);
 
-                // create all sites
-                ArrayList<StudyBean> sites = studyService.generateSites(getUserAccount(), studyBean, study);
-                for (StudyBean site : sites) {
-                    // what about site params?
-                    site = configService.setParametersForSite(site);
-                    site.getStudyParameterConfig().setSubjectIdGeneration("auto non-editable");
-                    site = (StudyBean) getStudyDao().create(site);
-                    site = this.createStudyParameters(site);
+                if (!updateMe) {
+                    for (StudyBean site : sites) {
+                        // what about site params?
+                        site = configService.setParametersForSite(site);
+                        site.getStudyParameterConfig().setSubjectIdGeneration("auto non-editable");
+                        // what about site updates?
+                        site.setParentStudyId(studyBean.getId());
+                        System.out.println("set parent study: " + studyBean.getId());
+                        site = (StudyBean) getStudyDao().create(site);
+                        site = this.createStudyParameters(site);
+                    }
+                } else {
+                    // do we update sites?
                 }
 
             }

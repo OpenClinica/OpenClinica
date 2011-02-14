@@ -26,6 +26,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.util.ArrayList;
+import java.util.Date;
+
 import javax.sql.DataSource;
 
 public class RollbackCreateStudyEndpoint extends AbstractCabigDomEndpoint {
@@ -45,7 +48,7 @@ public class RollbackCreateStudyEndpoint extends AbstractCabigDomEndpoint {
 
         try {
             NodeList nlist = requestElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "studyProtocol");
-            this.logNodeList(nlist);
+            // this.logNodeList(nlist);
             for (int i = 0; i < nlist.getLength(); i++) {
 
                 Node study = nlist.item(i);
@@ -56,7 +59,16 @@ public class RollbackCreateStudyEndpoint extends AbstractCabigDomEndpoint {
                 testStudyBean.setStatus(Status.DELETED);
                 testStudyBean = (StudyBean) getStudyDao().updateStudyStatus(testStudyBean);
                 // rollback all sites
-                testStudyBean = (StudyBean) getStudyDao().updateSitesStatus(testStudyBean);
+                // testStudyBean = (StudyBean) getStudyDao().updateSitesStatus(testStudyBean);
+                // above doesn't work, trying something else
+                ArrayList<StudyBean> sites = (ArrayList<StudyBean>) getStudyDao().findAllByParent(testStudyBean.getId());
+                for (StudyBean site : sites) {
+                    site.setUpdater(getUserAccount());
+                    site.setUpdatedDate(new Date(System.currentTimeMillis()));
+                    site.setOldStatus(Status.AVAILABLE);
+                    site.setStatus(Status.DELETED);
+                    site = (StudyBean) getStudyDao().update(site);
+                }
             }
             return mapCreateStudyConfirmation(studyBean.getIdentifier());
         } catch (Exception npe) {
@@ -73,5 +85,4 @@ public class RollbackCreateStudyEndpoint extends AbstractCabigDomEndpoint {
         }
 
     }
-
 }
