@@ -117,9 +117,9 @@
 
         jQuery(document).ready(function() {
 
-        	$.get("../../RssReader", function(data){
-                //alert("Data Loaded: " + data);
-                $("#newsBox").html(data);
+        	jQuery.get("../../RssReader", function(data){
+//                alert("Data Loaded: " + data);
+                jQuery("#newsBox").html(data);
             });
 
 
