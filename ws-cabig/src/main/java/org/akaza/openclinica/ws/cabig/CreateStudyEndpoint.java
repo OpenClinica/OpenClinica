@@ -162,7 +162,7 @@ public class CreateStudyEndpoint extends AbstractCabigDomEndpoint {
                         throw new CCBusinessFaultException("The site with the identifier " + site.getIdentifier()
                             + " already exists and has a different relationship in the database.", "CC10110");
 
-                    } else {
+                    } else if (testSite != null) {
                         site.setId(testSite.getId());
                         // add it to a new list
                         testSites.add(site);
@@ -197,6 +197,7 @@ public class CreateStudyEndpoint extends AbstractCabigDomEndpoint {
                 if (!updateMe) {
                     studyBean = (StudyBean) getStudyDao().create(studyBean);
                 } else {
+                    studyBean.setOldStatus(Status.DELETED);
                     studyBean = (StudyBean) getStudyDao().update(studyBean);
                 }
                 studyBean = this.createStudyParameters(studyBean);
@@ -208,6 +209,7 @@ public class CreateStudyEndpoint extends AbstractCabigDomEndpoint {
                         site.getStudyParameterConfig().setSubjectIdGeneration("auto non-editable");
                         // what about site updates?
                         site.setParentStudyId(studyBean.getId());
+                        site.setParentStudyName(studyBean.getName());
                         System.out.println("set parent study: " + studyBean.getId());
                         site = (StudyBean) getStudyDao().create(site);
                         site = this.createStudyParameters(site);
@@ -216,6 +218,9 @@ public class CreateStudyEndpoint extends AbstractCabigDomEndpoint {
                     // do we update sites?
                     for (StudyBean site : sites) {
                         site.setStatus(Status.AVAILABLE);
+                        site.setOldStatus(Status.DELETED);
+                        site.setParentStudyId(studyBean.getId());
+                        site.setParentStudyName(studyBean.getName());
                         site.setUpdatedDate(new Date(System.currentTimeMillis()));
                         site.setUpdater(getUserAccount());
                         site = (StudyBean) getStudyDao().update(site);
