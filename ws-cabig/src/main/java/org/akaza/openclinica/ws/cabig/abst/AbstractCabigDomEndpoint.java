@@ -322,6 +322,53 @@ public class AbstractCabigDomEndpoint extends AbstractDomPayloadEndpoint {
         return responseElement;
     }
 
+    public Element mapLoadLabsConfirmation() throws Exception {
+        DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
+        Document document = docBuilder.newDocument();
+
+        Element responseElement = document.createElementNS(CONNECTOR_NAMESPACE_V1, "LoadLabsResponse");
+        // dry
+        Element indicator = document.createElementNS(CONNECTOR_NAMESPACE_V1, "indicator");
+        Attr typeAttr = document.createAttributeNS(XSL_NAMESPACE, "type");
+        typeAttr.setNodeValue("BL");
+        // indicator.setAttributeNS(XSL_NAMESPACE, "type", "II");
+        indicator.setAttributeNode(typeAttr);
+        indicator.setAttribute("value", "true");
+
+        responseElement.appendChild(indicator);
+        // dry
+        return responseElement;
+    }
+
+    public Element mapLoadLabsErrorConfirmation(String message, OpenClinicaException exception) throws Exception {
+        DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
+        Document document = docBuilder.newDocument();
+
+        Element responseElement = document.createElementNS(CONNECTOR_NAMESPACE_V1, "LoadLabsResponse");
+        Element indicator = document.createElementNS(CONNECTOR_NAMESPACE_V1, "indicator");
+        Attr typeAttr = document.createAttributeNS(XSL_NAMESPACE, "type");
+        typeAttr.setNodeValue("BL");
+        // indicator.setAttributeNS(XSL_NAMESPACE, "type", "II");
+        indicator.setAttributeNode(typeAttr);
+        indicator.setAttribute("value", "false");
+        responseElement.appendChild(indicator);
+        // append message here
+        Element errormessage = document.createElementNS(CONNECTOR_NAMESPACE_V1, "message");
+        // String confirmation = messages.getMessage("dataEndpoint.success", null, "Success", locale);
+        Element code = document.createElementNS(CONNECTOR_NAMESPACE_V1, "code");
+        code.setTextContent(exception.errorID);
+        // TODO change to accept error codes
+        errormessage.appendChild(code);
+        Element reason = document.createElementNS(CONNECTOR_NAMESPACE_V1, "reason");
+        reason.setTextContent(exception.message);
+        errormessage.appendChild(reason);
+        responseElement.appendChild(errormessage);
+        // add subject message here?
+        return responseElement;
+    }
+
     public boolean canUserRegisterSubject(UserAccountBean user) {
         Role r = user.getActiveStudyRole();
         if (r != null

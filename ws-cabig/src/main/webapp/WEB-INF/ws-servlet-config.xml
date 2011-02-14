@@ -11,22 +11,7 @@
      
      <!-- WSDL Definitions -->
      
-     <!--  <bean id="DataCaptureService" class="org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition"> --> 
-     <!-- changing to org.springframework.ws.wsdl.wsdl11.SimpleWsdl11Definition -->
-     <!-- was org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition -->
-     	<!-- <constructor-arg value="/WEB-INF/schemas/clinicalConnector/DataCaptureService.wsdl"/> -->
-     	<!-- <property name="schema" ref="dataCaptureSchema"/>
-     	<property name="portTypeName" value="ws"/>
-        <property name="locationUri" value="/ws/cabig/v1"/>
-        
-     </bean> -->
      
-     <!--  <bean id="StudyManagementService" class="org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition"> --> 
-     	<!-- <constructor-arg value="/WEB-INF/schemas/clinicalConnector/StudyManagementService.wsdl"/> -->
-     	<!--  <property name="schema" ref="studyManagementSchema"/>
-     	<property name="portTypeName" value="ws"/>
-        <property name="locationUri" value="/ws/cabig/v1"/>
-     </bean> -->
      
      <bean id="SubjectRegistrationService" class="org.springframework.ws.wsdl.wsdl11.SimpleWsdl11Definition">
      	<constructor-arg value="/WEB-INF/schemas/clinicalConnector/SubjectRegistrationService.wsdl"/> 
@@ -127,6 +112,8 @@
                 <prop key="rollbackRegisterSubject">rollbackRegisterSubjectEndpoint</prop>
                 <prop key="createStudy">createStudyEndpoint</prop>
                 <prop key="rollbackCreateStudy">rollbackCreateStudyEndpoint</prop>
+                <prop key="loadLabs">loadLabsEndpoint</prop>
+                <prop key="rollbackLoadLabs">rollbackLoadLabsEndpoint</prop>
             </props>
         </property>
         <!-- always remember to add the security interceptors here, otherwise they will break -->
@@ -223,6 +210,18 @@
     </bean>
     
     <bean id="rollbackCreateStudyEndpoint" class="org.akaza.openclinica.ws.cabig.RollbackCreateStudyEndpoint">
+        <constructor-arg ref="dataSource"/>
+        <constructor-arg ref="messageSource"/>
+        <constructor-arg ref="coreResources"/>
+    </bean>
+    
+    <bean id="loadLabsEndpoint" class="org.akaza.openclinica.ws.cabig.LoadLabsEndpoint">
+        <constructor-arg ref="dataSource"/>
+        <constructor-arg ref="messageSource"/>
+        <constructor-arg ref="coreResources"/>
+    </bean>
+    
+    <bean id="rollbackLoadLabsEndpoint" class="org.akaza.openclinica.ws.cabig.RollbackLoadLabsEndpoint">
         <constructor-arg ref="dataSource"/>
         <constructor-arg ref="messageSource"/>
         <constructor-arg ref="coreResources"/>

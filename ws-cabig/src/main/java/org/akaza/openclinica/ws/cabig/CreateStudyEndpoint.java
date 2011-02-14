@@ -14,6 +14,7 @@
  */
 package org.akaza.openclinica.ws.cabig;
 
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.dao.core.CoreResources;
@@ -154,12 +155,17 @@ public class CreateStudyEndpoint extends AbstractCabigDomEndpoint {
                 // create all sites, moved up here to help with updates, tbh
                 ArrayList<StudyBean> sites = studyService.generateSites(getUserAccount(), studyBean, study);
                 // have to check site identifiers to protect uniqueness here, tbh
+                ArrayList<StudyBean> testSites = new ArrayList<StudyBean>();
                 for (StudyBean site : sites) {
                     StudyBean testSite = getStudyDao().findByUniqueIdentifier(site.getIdentifier());
                     if ((testSite != null) && (testSite.getParentStudyId() != testStudyBeanId)) {
                         throw new CCBusinessFaultException("The site with the identifier " + site.getIdentifier()
                             + " already exists and has a different relationship in the database.", "CC10110");
 
+                    } else {
+                        site.setId(testSite.getId());
+                        // add it to a new list
+                        testSites.add(site);
                     }
                 }
                 if (testStudyBean != null) {
@@ -179,6 +185,8 @@ public class CreateStudyEndpoint extends AbstractCabigDomEndpoint {
                         studyBean.setUpdatedDate(new Date(System.currentTimeMillis()));
                         studyBean.setId(testStudyBean.getId());
                         // set status here, as in the register subject?
+                        sites = testSites;
+                        // set the sites above, since we are updating and not creating
                     }
                 }
                 // but what if we rolled back? and what if we are updating?
@@ -206,6 +214,12 @@ public class CreateStudyEndpoint extends AbstractCabigDomEndpoint {
                     }
                 } else {
                     // do we update sites?
+                    for (StudyBean site : sites) {
+                        site.setStatus(Status.AVAILABLE);
+                        site.setUpdatedDate(new Date(System.currentTimeMillis()));
+                        site.setUpdater(getUserAccount());
+                        site = (StudyBean) getStudyDao().update(site);
+                    }
                 }
 
             }
