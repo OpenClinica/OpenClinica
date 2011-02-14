@@ -208,7 +208,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 </span><br>
     <div style="text-align:center; width:100%;">
         <input align="center" type="password" name="password" id="passwordId"/>
-        <button onclick="hm('box');requestSignatureFromCheckbox(document.getElementById('passwordId').value, checkboxObject);">OK</button>
+        <input type="button" onclick="hm('box');requestSignatureFromCheckbox(document.getElementById('passwordId').value, checkboxObject);" value="OK"/>
     </div>
 </div>
 
