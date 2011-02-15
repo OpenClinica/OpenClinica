@@ -173,7 +173,7 @@ public class AbstractCabigDomEndpoint extends AbstractDomPayloadEndpoint {
         // extension="503" identifierName="Patient Position" displayable="false"
         patientIdentifier.setAttribute("extension", studySubjectId);
 
-        patientIdentifier.setAttribute("identifierName", "Patient Position");
+        patientIdentifier.setAttribute("identifierName", "Study Subject Identifier");
         patientIdentifier.setAttribute("displayable", "false");
         responseElement.appendChild(patientIdentifier);
         return responseElement;

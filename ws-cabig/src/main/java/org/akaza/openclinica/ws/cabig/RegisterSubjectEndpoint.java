@@ -48,6 +48,7 @@ public class RegisterSubjectEndpoint extends AbstractCabigDomEndpoint {
     protected Element invokeInternal(Element requestElement, Document document) throws Exception {
         // System.out.println("Request text ");
         SubjectBean finalSubjectBean = new SubjectBean();
+        StudySubjectBean studySubjectBean = new StudySubjectBean();
         finalSubjectBean.setUniqueIdentifier("");
         // the above line is for the return statement
         NodeList subjects = requestElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "studySubject");
@@ -110,7 +111,7 @@ public class RegisterSubjectEndpoint extends AbstractCabigDomEndpoint {
                                 + subjectBean.getUniqueIdentifier() + ".  Please review your data and re-submit your request.");
                         }
                     }
-                    StudySubjectBean studySubjectBean = subjectService.generateStudySubjectBean(subjectBean, finalSubjectBean, subjectBean.getStudyBean());
+                    studySubjectBean = subjectService.generateStudySubjectBean(subjectBean, finalSubjectBean, subjectBean.getStudyBean());
 
                     StudySubjectBean testStudySubjectBean = // getStudySubjectDao().findTheGreatestLabel()
                         getStudySubjectDao().findByLabelAndStudy(subjectBean.getStudySubjectLabel(), subjectBean.getStudyBean());
@@ -150,7 +151,8 @@ public class RegisterSubjectEndpoint extends AbstractCabigDomEndpoint {
                 }
             }
             // return success message here
-            return mapRegisterSubjectConfirmation(finalSubjectBean.getUniqueIdentifier());
+            // return mapRegisterSubjectConfirmation(finalSubjectBean.getUniqueIdentifier());
+            return mapRegisterSubjectConfirmation(studySubjectBean.getLabel());
             // TODO is it actually primary key? nta
         } catch (Exception npe) {
             npe.printStackTrace();
