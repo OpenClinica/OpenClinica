@@ -37,7 +37,8 @@ public class CreateStudyService {
         studyBean.setStatus(Status.AVAILABLE);// coordinatingCenterStudyStatusCode?
         studyBean.setName(xmlService.getElementValue(study, this.CONNECTOR_NAMESPACE_V1, "officialTitle", "value"));
         studyBean.setPhase(xmlService.getElementValue(study, this.CONNECTOR_NAMESPACE_V1, "phaseCode", "code"));
-        studyBean.setPurpose(xmlService.getElementValue(study, this.CONNECTOR_NAMESPACE_V1, "primaryPurposeCode", "code"));
+        // tbh 7619
+        // studyBean.setPurpose(xmlService.getElementValue(study, this.CONNECTOR_NAMESPACE_V1, "primaryPurposeCode", "code"));
         studyBean.setSummary(xmlService.getElementValue(study, this.CONNECTOR_NAMESPACE_V1, "publicDescription", "value"));
         studyBean.setSecondaryIdentifier(xmlService.getElementValue(study, this.CONNECTOR_NAMESPACE_V1, "publicTitle", "value"));
         int enrollment = xmlService.getTargetAccrualNumberRange(study);// xmlService.getElementValue(study, this.CONNECTOR_NAMESPACE_V1, xmlLine, attrName)
