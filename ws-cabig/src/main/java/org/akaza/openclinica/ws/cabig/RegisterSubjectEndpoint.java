@@ -84,7 +84,7 @@ public class RegisterSubjectEndpoint extends AbstractCabigDomEndpoint {
                             subjectBean.setStudySubjectLabel(new Integer(nextLabel).toString());
                         }
                     }
-                    // will there ever be more than one subject-study pair sent in a message? tba
+                    // will there ever be more than one subject-study pair sent in a message? no
 
                     // are there errors here? if so, throw a ccbusiness fault
                     finalSubjectBean = subjectService.generateSubjectBean(subjectBean);
@@ -113,8 +113,15 @@ public class RegisterSubjectEndpoint extends AbstractCabigDomEndpoint {
                     }
                     studySubjectBean = subjectService.generateStudySubjectBean(subjectBean, finalSubjectBean, subjectBean.getStudyBean());
 
+                    // we only really examine study subject bean for duplicates if the subject is a duplicate itself
+
                     StudySubjectBean testStudySubjectBean = // getStudySubjectDao().findTheGreatestLabel()
                         getStudySubjectDao().findByLabelAndStudy(subjectBean.getStudySubjectLabel(), subjectBean.getStudyBean());
+                    if (updateMe) {
+                        testStudySubjectBean = getStudySubjectDao().findBySubjectIdAndStudy(finalSubjectBean.getId(), subjectBean.getStudyBean());
+                        subjectBean.setStudySubjectLabel(testStudySubjectBean.getLabel());
+                        System.out.println("set ssid to " + testStudySubjectBean.getLabel());
+                    }
                     boolean updateStudySubject = false;
                     if (testStudySubjectBean.getId() > 0) {
                         // same check here, if its identical, restore and renew, otherwise throw the error
@@ -144,6 +151,7 @@ public class RegisterSubjectEndpoint extends AbstractCabigDomEndpoint {
 
                     if (updateStudySubject) {
                         studySubjectBean = (StudySubjectBean) getStudySubjectDao().update(studySubjectBean);
+                        System.out.println("just updated ssid");
                     } else {
                         studySubjectBean = getStudySubjectDao().create(studySubjectBean, false);
                     }
