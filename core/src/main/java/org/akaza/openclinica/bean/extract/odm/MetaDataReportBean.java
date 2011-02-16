@@ -7,14 +7,6 @@
  */
 package org.akaza.openclinica.bean.extract.odm;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.BasicDefinitionsBean;
 import org.akaza.openclinica.bean.odmbeans.CodeListBean;
@@ -36,8 +28,10 @@ import org.akaza.openclinica.bean.odmbeans.MetaDataVersionBean;
 import org.akaza.openclinica.bean.odmbeans.MultiSelectListBean;
 import org.akaza.openclinica.bean.odmbeans.MultiSelectListItemBean;
 import org.akaza.openclinica.bean.odmbeans.OdmStudyBean;
+import org.akaza.openclinica.bean.odmbeans.PresentInEventDefinitionBean;
 import org.akaza.openclinica.bean.odmbeans.PresentInFormBean;
 import org.akaza.openclinica.bean.odmbeans.RangeCheckBean;
+import org.akaza.openclinica.bean.odmbeans.SimpleConditionalDisplayBean;
 import org.akaza.openclinica.bean.odmbeans.StudyEventDefBean;
 import org.akaza.openclinica.bean.odmbeans.StudyGroupClassListBean;
 import org.akaza.openclinica.bean.odmbeans.StudyGroupItemBean;
@@ -55,6 +49,14 @@ import org.exolab.castor.xml.MarshalException;
 import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.ValidationException;
 import org.exolab.castor.xml.XMLContext;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 /**
  * Create ODM XML Study Element for a study.
@@ -911,32 +913,29 @@ public class MetaDataReportBean extends OdmXmlReportBean {
     public void addEventDefinitionDetails(EventDefinitionDetailsBean detail, String currentIndent) {
         StringBuffer xml = this.getXmlOutput();
         String indent = this.getIndent();
-        String temp = "";
-        xml.append(currentIndent + "<OpenClinica:EventDefinitionDetails StudyEventOID=\"" + StringEscapeUtils.escapeXml(detail.getOid()) + "\">");
-        xml.append(nls);
-        temp = detail.getDescription();
-        xml.append(temp != null && temp.length() > 0 ? currentIndent + indent + "<OpenClinica:Description>" + StringEscapeUtils.escapeXml(temp)
-            + "</OpenClinica:Description>" + nls : "");
+        String temp = detail.getDescription();
+        String des = temp != null && temp.length() > 0 ? currentIndent + indent + "<OpenClinica:Description>" + StringEscapeUtils.escapeXml(temp)
+            + "</OpenClinica:Description>" + nls : "";
         temp = detail.getCategory();
-        xml.append(temp != null && temp.length() > 0 ? currentIndent + indent + "<OpenClinica:Category>" + StringEscapeUtils.escapeXml(temp)
-            + "</OpenClinica:Category>" + nls : "");
-        xml.append(currentIndent + "</OpenClinica:EventDefinitionDetails>");
-        xml.append(nls);
+        String cat = temp != null && temp.length() > 0 ? currentIndent + indent + "<OpenClinica:Category>" + StringEscapeUtils.escapeXml(temp)
+            + "</OpenClinica:Category>" + nls : "";
+        if(des.length()>1 || cat.length()>1) {
+            xml.append(currentIndent + "<OpenClinica:EventDefinitionDetails StudyEventOID=\"" + StringEscapeUtils.escapeXml(detail.getOid()) + "\">");
+            xml.append(nls);
+            xml.append(des);
+            temp = detail.getCategory();
+            xml.append(cat);
+            xml.append(currentIndent + "</OpenClinica:EventDefinitionDetails>");
+            xml.append(nls);
+        }
     }
 
     public void addFormDetails(FormDetailsBean detail, String currentIndent) {
         StringBuffer xml = this.getXmlOutput();
         String indent = this.getIndent();
         String temp = "";
-        xml.append(currentIndent + "<OpenClinica:FormDetails FormOID=\"" + StringEscapeUtils.escapeXml(detail.getOid()) + "\" ParentFormOID=\""
-            + StringEscapeUtils.escapeXml(detail.getParentFormOid()) + "\" IsDefaultVersion=\"" + detail.getIsDefaultVersion() + "\"");
-        temp = detail.getNullValues();
-        xml.append(temp != null && temp.length() > 0 ? " NullValues=\"" + StringEscapeUtils.escapeXml(temp) + "\"" : "");
-        xml.append(" PasswordRequired=\"" + detail.getPasswordRequired() + "\"");
-        temp = detail.getDoubleDataEntry();
-        xml.append(temp != null && temp.length() > 0 ? " DoubleDataEntry=\"" + temp + "\"" : "" + " HideCRF=\"" + detail.getHideCrf() + "\"");
-        temp = detail.getSourceDataVerification();
-        xml.append(temp != null && temp.length() > 0 ? " SourceDataVerification=\"" + StringEscapeUtils.escapeXml(temp) + "\"" : "");
+        xml.append(currentIndent + "<OpenClinica:FormDetails FormOID=\"" + StringEscapeUtils.escapeXml(detail.getOid()) 
+                + "\" ParentFormOID=\"" + StringEscapeUtils.escapeXml(detail.getParentFormOid())+"\"");
         xml.append(">");
         xml.append(nls);
         temp = detail.getVersionDescription();
@@ -945,8 +944,33 @@ public class MetaDataReportBean extends OdmXmlReportBean {
         temp = detail.getRevisionNotes();
         xml.append(temp != null && temp.length() > 0 ? currentIndent + indent + "<OpenClinica:RevisionNotes>" + StringEscapeUtils.escapeXml(temp)
             + "</OpenClinica:RevisionNotes>" + nls : "");
+        //
+        this.addPresentInEventDefinitions(detail, currentIndent+indent);
         xml.append(currentIndent + "</OpenClinica:FormDetails>");
         xml.append(nls);
+    }
+    
+    public void addPresentInEventDefinitions(FormDetailsBean detail, String currentIndent) {
+        StringBuffer xml = this.getXmlOutput();
+        String temp = "";
+        ArrayList<PresentInEventDefinitionBean> plist = detail.getPresentInEventDefinitions();
+        if(plist==null || plist.size()<1) {
+            logger.debug("No presentInEventDefinitions in FormDetails with formOID="+detail.getOid());
+        } else {
+            for(PresentInEventDefinitionBean p : plist) {
+                xml.append(currentIndent+"<OpenClinica:PresentInEventDefinition StudyEventOID=\""+p.getStudyEventOid()+"\""
+                        +" IsDefaultVersion=\""+p.getIsDefaultVersion()+"\"");
+                temp = p.getNullValues();
+                xml.append(temp != null && temp.length() > 0 ? " NullValues=\"" + StringEscapeUtils.escapeXml(temp) + "\"" : "");
+                xml.append(" PasswordRequired=\"" + p.getPasswordRequired() + "\"");
+                temp = p.getDoubleDataEntry();
+                xml.append(temp != null && temp.length() > 0 ? " DoubleDataEntry=\"" + temp + "\"" : "" + " HideCRF=\"" + p.getHideCrf() + "\"");
+                temp = p.getSourceDataVerification();
+                xml.append(temp != null && temp.length() > 0 ? " SourceDataVerification=\"" + StringEscapeUtils.escapeXml(temp) + "\"" : "");
+                xml.append("/>");
+                xml.append(nls);
+            }
+        }
     }
 
     public void addItemGroupDetails(ItemGroupDetailsBean detail, String currentIndent) {
@@ -1004,7 +1028,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
             xml.append(temp != null && temp.length() > 0 ? " PageNumber=\"" + StringEscapeUtils.escapeXml(temp) + "\"" : "");
             temp = inform.getDefaultValue();
             xml.append(temp != null && temp.length() > 0 ? " DefaultValue=\"" + StringEscapeUtils.escapeXml(temp) + "\"" : "");
-            xml.append(" PHI=\"" + inform.getPhi() + "\">");
+            xml.append(" PHI=\"" + inform.getPhi() + "\" ShowItem=\"" + inform.getShowItem()+"\">");
             xml.append(nls);
             temp = inform.getLeftItemText();
             xml.append(temp != null && temp.length() > 0 ? currentIndent + indent + indent + "<OpenClinica:LeftItemText>" + StringEscapeUtils.escapeXml(temp)
@@ -1030,6 +1054,9 @@ public class MetaDataReportBean extends OdmXmlReportBean {
                 xml.append("\"/>");
             }
             xml.append(nls);
+            if("no".equalsIgnoreCase(inform.getShowItem())) {
+                addSimpleConditionalDisplay(inform, currentIndent + indent + indent);
+            }
             xml.append(currentIndent + indent + "</OpenClinica:ItemPresentInForm>");
             xml.append(nls);
         }
@@ -1037,6 +1064,29 @@ public class MetaDataReportBean extends OdmXmlReportBean {
         xml.append(nls);
     }
 
+    public void addSimpleConditionalDisplay(ItemPresentInFormBean inform, String currentIndent) {
+        StringBuffer xml = this.getXmlOutput();
+        String indent = this.getIndent();
+        SimpleConditionalDisplayBean scd = inform.getSimpleConditionalDisplay();
+        String name=scd.getControlItemName(),option=scd.getOptionValue(),message=scd.getMessage();
+        //only SimpleConditionalDisplayBean with controlItemName, option and message has been set for ItemDetails 
+        if(name != null && name.length()>0) {
+            xml.append(currentIndent + "<OpenClinica:SimpleConditionalDisplay>");
+            xml.append(nls);
+            xml.append(currentIndent+indent+"<OpenClinica:ControlItemName>"
+                    +StringEscapeUtils.escapeXml(name)+"</OpenClinica:ControlItemName>");
+            xml.append(nls);
+            xml.append(currentIndent+indent+"<OpenClinica:OptionValue>"+StringEscapeUtils.escapeXml(option)
+                    +"</OpenClinica:OptionValue>");
+            xml.append(nls);
+            xml.append(currentIndent+indent+"<OpenClinica:Message>"+StringEscapeUtils.escapeXml(message)
+                    +"</OpenClinica:Message>");
+            xml.append(nls);
+            xml.append(currentIndent + "</OpenClinica:SimpleConditionalDisplay>");
+            xml.append(nls);
+        }
+    }
+    
     public void addStudyGroupClassList(String currentIndent) {
         StringBuffer xml = this.getXmlOutput();
         String indent = this.getIndent();

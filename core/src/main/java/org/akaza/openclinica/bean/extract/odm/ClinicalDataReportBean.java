@@ -7,10 +7,6 @@
  */
 package org.akaza.openclinica.bean.extract.odm;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-
 import org.akaza.openclinica.bean.odmbeans.AuditLogBean;
 import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
 import org.akaza.openclinica.bean.odmbeans.ChildNoteBean;
@@ -24,6 +20,10 @@ import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.SubjectGroupDataBean;
 import org.apache.commons.lang.StringEscapeUtils;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Create ODM XML ClinicalData Element for a study.
@@ -65,7 +65,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
         for (ExportSubjectDataBean sub : subs) {
             xml.append(indent + indent + "<SubjectData SubjectKey=\"" + StringEscapeUtils.escapeXml(sub.getSubjectOID()));
             if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
-                xml.append("\" OpenClinica:StudySubjectId=\"" + StringEscapeUtils.escapeXml(sub.getStudySubjectId()));
+                xml.append("\" OpenClinica:StudySubjectID=\"" + StringEscapeUtils.escapeXml(sub.getStudySubjectId()));
                 String uniqueIdentifier = sub.getUniqueIdentifier();
                 if (uniqueIdentifier != null && uniqueIdentifier.length() > 0) {
                     xml.append("\" OpenClinica:UniqueIdentifier=\"" + StringEscapeUtils.escapeXml(uniqueIdentifier));
@@ -76,7 +76,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                 }
                 String secondaryId = sub.getSecondaryId();
                 if (secondaryId != null && secondaryId.length() > 0) {
-                    xml.append("\"  OpenClinica:SecondaryId=\"" + StringEscapeUtils.escapeXml(secondaryId));
+                    xml.append("\"  OpenClinica:SecondaryID=\"" + StringEscapeUtils.escapeXml(secondaryId));
                 }
                 Integer year = sub.getYearOfBirth();
                 if (year != null) {
