@@ -22,7 +22,7 @@ public class SCDItemDisplayInfo {
      */
     private int rowDisplayStatus = 0;
     /**
-     * String pattern: -ItemFormMetadataID-, e.g. -11-12-
+     * String pattern: -ItemID-, e.g. -11-12-
      */
     private String rowSCDShowIDStr = ""; 
     
