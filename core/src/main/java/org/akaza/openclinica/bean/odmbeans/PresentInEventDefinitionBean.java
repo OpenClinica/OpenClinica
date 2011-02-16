@@ -8,34 +8,25 @@
 
 package org.akaza.openclinica.bean.odmbeans;
 
-import java.util.ArrayList;
 
 
-
-public class FormDetailsBean extends ElementDefBean {
+public class PresentInEventDefinitionBean {
     //attributes
-    private String parentFormOid;
-    /*
+    private String studyEventOid;
     private String isDefaultVersion;
     private String nullValues;
     private String passwordRequired;
     private String doubleDataEntry;
     private String hideCrf;
     private String sourceDataVerification;
-    */
-    //elements
-    private String versionDescription;
-    private String revisionNotes;
-    private ArrayList<PresentInEventDefinitionBean> presentInEventDefinitions = new ArrayList<PresentInEventDefinitionBean>();
     
-    
-    public String getParentFormOid() {
-        return parentFormOid;
+  
+    public String getStudyEventOid() {
+        return studyEventOid;
     }
-    public void setParentFormOid(String parentFormOid) {
-        this.parentFormOid = parentFormOid;
+    public void setStudyEventOid(String studyEventOid) {
+        this.studyEventOid = studyEventOid;
     }
-    /*
     public String getIsDefaultVersion() {
         return isDefaultVersion;
     }
@@ -71,24 +62,5 @@ public class FormDetailsBean extends ElementDefBean {
     }
     public void setSourceDataVerification(String sourceDataVerification) {
         this.sourceDataVerification = sourceDataVerification;
-    }
-    */
-    public String getVersionDescription() {
-        return versionDescription;
-    }
-    public void setVersionDescription(String versionDescription) {
-        this.versionDescription = versionDescription;
-    }
-    public String getRevisionNotes() {
-        return revisionNotes;
-    }
-    public void setRevisionNotes(String revisionNotes) {
-        this.revisionNotes = revisionNotes;
-    }
-    public ArrayList<PresentInEventDefinitionBean> getPresentInEventDefinitions() {
-        return presentInEventDefinitions;
-    }
-    public void setPresentInEventDefinitions(ArrayList<PresentInEventDefinitionBean> presentInEventDefinitions) {
-        this.presentInEventDefinitions = presentInEventDefinitions;
     }
 }

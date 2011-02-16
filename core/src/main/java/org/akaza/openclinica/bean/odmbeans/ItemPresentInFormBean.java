@@ -9,11 +9,7 @@
 package org.akaza.openclinica.bean.odmbeans;
 
 
-/**
- *
- * @author ywang (Augest, 2010)
- *
- */
+
 
 public class ItemPresentInFormBean {
     //attributes
@@ -23,6 +19,7 @@ public class ItemPresentInFormBean {
     private String pageNumber;
     private String defaultValue;
     private String phi;
+    private String showItem;
     //elements (since they're simple now, not set classes for them)
     private String leftItemText;
     private String rightItemText;
@@ -30,9 +27,11 @@ public class ItemPresentInFormBean {
     private String itemSubHeader;
     private String sectionLabel;
     private ItemResponseBean itemResponse;
+    private SimpleConditionalDisplayBean simpleConditionalDisplay;
     
     public ItemPresentInFormBean() {
         itemResponse = new ItemResponseBean();
+        simpleConditionalDisplay = new SimpleConditionalDisplayBean();
     }
     
     public String getFormOid() {
@@ -106,5 +105,17 @@ public class ItemPresentInFormBean {
     }
     public void setItemResponse(ItemResponseBean itemResponse) {
         this.itemResponse = itemResponse;
+    }
+    public String getShowItem() {
+        return showItem;
+    }
+    public void setShowItem(String showItem) {
+        this.showItem = showItem;
+    }
+    public SimpleConditionalDisplayBean getSimpleConditionalDisplay() {
+        return simpleConditionalDisplay;
+    }
+    public void setSimpleConditionalDisplay(SimpleConditionalDisplayBean simpleConditionalDisplay) {
+        this.simpleConditionalDisplay = simpleConditionalDisplay;
     }
 }
