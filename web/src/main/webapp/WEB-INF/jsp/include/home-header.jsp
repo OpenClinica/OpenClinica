@@ -43,7 +43,7 @@
 
     <script language="JavaScript">
         function reportBug() {
-            var bugtrack = "https://www.openclinica.org/OpenClinica/bug.php?version=<fmt:message key="version_number" bundle="${resword}"/>&user=";
+            var bugtrack = "https://www.openclinica.com/OpenClinica/bug.php?version=<fmt:message key="version_number" bundle="${resword}"/>&user=";
             var user= "<c:out value="${userBean.name}"/>";
             bugtrack = bugtrack + user+ "&url=" + window.location.href;
             openDocWindow(bugtrack);
