@@ -20,10 +20,12 @@ public class CCSystemFaultException extends OpenClinicaException {
 
     public CCSystemFaultException(String message) {
         super(message, "CCSystemFault");
+        this.className = "CCSystem";
     }
 
     public CCSystemFaultException(String message, String idcode) {
         super(message, idcode);
+        this.className = "CCSystem";
     }
 
 }

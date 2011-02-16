@@ -20,10 +20,12 @@ public class CCBusinessFaultException extends OpenClinicaException {
 
     public CCBusinessFaultException(String message) {
         super(message, "CCBusinessFault");
+        this.className = "CCBusiness";
     }
 
     public CCBusinessFaultException(String message, String idcode) {
         super(message, idcode);
+        this.className = "CCBusiness";
     }
 
 }

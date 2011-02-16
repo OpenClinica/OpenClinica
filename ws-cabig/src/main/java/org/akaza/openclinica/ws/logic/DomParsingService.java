@@ -115,13 +115,6 @@ public class DomParsingService {
         Node nlistNode = nlist.item(0);
 
         facilityName = this.getElementValue(nlistNode, CONNECTOR_NAMESPACE_V1, "name", "value");
-        // NodeList nlist2 = nlistNodeElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "name");
-        // Node nlist2Node = nlist2.item(0);
-        // if (nlist2Node.hasAttributes()) {
-        // NamedNodeMap nodeMap = nlist2Node.getAttributes();
-        // Node nodeValue = nodeMap.getNamedItem("value");
-        // facilityName = nodeValue.getNodeValue();
-        // }
 
         study.setFacilityName(facilityName);
         study = this.getPostalAddress(study, nlistNode);
@@ -168,12 +161,12 @@ public class DomParsingService {
         for (int i = 0; i < nlistNames.getLength(); i++) {
             Node nlist2Node = nlistNames.item(i);
             NamedNodeMap nodeMap = nlist2Node.getAttributes();
-            System.out.println("found node map: " + nodeMap.toString() + " " + nodeMap.getLength());
-            for (int x = 0; x < nodeMap.getLength(); x++) {
-                Node something = nodeMap.item(x);
-                System.out.println(x + ": " + something.getLocalName() + " -> " + something.getNodeName() + " -> " // + something.getAttributes().getLength()
-                    + " " + something.getNodeValue());
-            }
+            // System.out.println("found node map: " + nodeMap.toString() + " " + nodeMap.getLength());
+            // for (int x = 0; x < nodeMap.getLength(); x++) {
+            // Node something = nodeMap.item(x);
+            // System.out.println(x + ": " + something.getLocalName() + " -> " + something.getNodeName() + " -> " // + something.getAttributes().getLength()
+            // + " " + something.getNodeValue());
+            // }
             Node nodeType = nodeMap.getNamedItem("type");
             Node nodeValue = nodeMap.getNamedItem("value");
             if ("GIV".equals(nodeType.getNodeValue())) {
@@ -204,7 +197,7 @@ public class DomParsingService {
         }
         study.setFacilityContactEmail(facilityContactEmail);
         study.setFacilityContactPhone(facilityContactPhone);
-        System.out.println("found email " + facilityContactEmail + " phone " + facilityContactPhone);
+        // System.out.println("found email " + facilityContactEmail + " phone " + facilityContactPhone);
         return study;
     }
 
@@ -217,15 +210,9 @@ public class DomParsingService {
         NodeList nlist2 = nlistNodeElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "organization");
         Node nameNode = nlist2.item(0);
         sponsorName = this.getElementValue(nameNode, CONNECTOR_NAMESPACE_V1, "name", "value");
-        // Element nameNodeElement = (Element) nameNode;
-        // NodeList nlistNames = nameNodeElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "name");
-        // Node sponsorNameNode = nlistNames.item(0);
-        // NamedNodeMap nodeMap = sponsorNameNode.getAttributes();
-        // Node nodeValue = nodeMap.getNamedItem("value");
-        // sponsorName = nodeValue.getNodeValue();
 
         study.setSponsor(sponsorName);
-        System.out.println("found sponsor: " + sponsorName);
+        // System.out.println("found sponsor: " + sponsorName);
         return study;
     }
 

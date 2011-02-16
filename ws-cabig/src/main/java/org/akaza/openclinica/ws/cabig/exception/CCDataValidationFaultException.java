@@ -20,10 +20,12 @@ public class CCDataValidationFaultException extends OpenClinicaException {
 
     public CCDataValidationFaultException(String message) {
         super(message, "CCDataValidationFault");
+        this.className = "CCDataValidation";
     }
 
     public CCDataValidationFaultException(String message, String idcode) {
         super(message, idcode);
+        this.className = "CCDataValidation";
     }
 
 }

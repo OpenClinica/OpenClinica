@@ -23,6 +23,7 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
+import org.akaza.openclinica.ws.cabig.exception.CCSystemFaultException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
@@ -35,7 +36,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilder;
@@ -48,6 +51,7 @@ public class AbstractCabigDomEndpoint extends AbstractDomPayloadEndpoint {
     public final String CONNECTOR_NAMESPACE_V1 = "http://clinicalconnector.nci.nih.gov";
     public final String XSL_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance";
     public final String ISO_21090_NAMESPACE = "uri:iso.org:21090";
+    public final String SOAP_NAMESPACE = "http://www.w3.org/2003/05/soap-envelope";
 
     SubjectDAO subjectDao;
     StudyDAO studyDao;
@@ -56,7 +60,7 @@ public class AbstractCabigDomEndpoint extends AbstractDomPayloadEndpoint {
 
     public DataSource dataSource;
     public MessageSource messages;
-    public CoreResources coreResources;// TODO keep or toss?
+    public CoreResources coreResources;
     public Locale locale;
 
     public AbstractCabigDomEndpoint(DataSource dataSource, MessageSource messages, CoreResources coreResources) {
@@ -179,20 +183,39 @@ public class AbstractCabigDomEndpoint extends AbstractDomPayloadEndpoint {
         return responseElement;
     }
 
-    public Element mapSubjectErrorConfirmation(String message, OpenClinicaException exception) throws Exception {
+    public Element mapGenericErrorConfirmation(String message, OpenClinicaException exception, HashMap<String, String> validations) throws Exception {
         DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
         Document document = docBuilder.newDocument();
 
-        Element responseElement = document.createElementNS(CONNECTOR_NAMESPACE_V1, "RegisterSubjectResponse");
-        Element indicator = document.createElementNS(CONNECTOR_NAMESPACE_V1, "indicator");
-        Attr typeAttr = document.createAttributeNS(XSL_NAMESPACE, "type");
-        typeAttr.setNodeValue("BL");
-        // indicator.setAttributeNS(XSL_NAMESPACE, "type", "II");
-        indicator.setAttributeNode(typeAttr);
-        indicator.setAttribute("value", "false");
-        responseElement.appendChild(indicator);
+        // Element responseElement = document.createElementNS(CONNECTOR_NAMESPACE_V1, "RegisterSubjectResponse");
+        // Element indicator = document.createElementNS(CONNECTOR_NAMESPACE_V1, "indicator");
+        // Attr typeAttr = document.createAttributeNS(XSL_NAMESPACE, "type");
+        // typeAttr.setNodeValue("BL");
+        // // indicator.setAttributeNS(XSL_NAMESPACE, "type", "II");
+        // indicator.setAttributeNode(typeAttr);
+        // indicator.setAttribute("value", "false");
+        // responseElement.appendChild(indicator);
         // append message here
+        // 7520, changing the error messages to show the error types
+
+        Element faultElement = document.createElementNS(this.SOAP_NAMESPACE, "Fault");
+        Element faultCode = document.createElementNS(SOAP_NAMESPACE, "Code");
+        Element faultValue = document.createElementNS(SOAP_NAMESPACE, "Value");
+        faultValue.setTextContent("Receiver");
+        faultCode.appendChild(faultValue);
+        faultElement.appendChild(faultCode);
+
+        Element faultReason = document.createElementNS(SOAP_NAMESPACE, "Reason");
+        Element faultText = document.createElementNS(SOAP_NAMESPACE, "Text");
+        faultText.setTextContent(exception.className + "FaultMessage");// to be revised
+        faultReason.appendChild(faultText);
+        faultElement.appendChild(faultReason);
+
+        Element faultDetail = document.createElementNS(SOAP_NAMESPACE, "Detail");
+        Element faultDetailMessage = document.createElementNS(CONNECTOR_NAMESPACE_V1, exception.className + "Fault"); // to be revised
+        // add type
+        faultDetailMessage.setAttributeNS(this.XSL_NAMESPACE, "type", exception.className + "Error");
         Element errormessage = document.createElementNS(CONNECTOR_NAMESPACE_V1, "message");
         // String confirmation = messages.getMessage("dataEndpoint.success", null, "Success", locale);
         Element code = document.createElementNS(CONNECTOR_NAMESPACE_V1, "code");
@@ -202,37 +225,59 @@ public class AbstractCabigDomEndpoint extends AbstractDomPayloadEndpoint {
         Element reason = document.createElementNS(CONNECTOR_NAMESPACE_V1, "reason");
         reason.setTextContent(exception.message);
         errormessage.appendChild(reason);
-        responseElement.appendChild(errormessage);
+        faultDetailMessage.appendChild(errormessage);
+        // append validation messages here
+        java.util.Iterator itValidations = validations.entrySet().iterator();
+        while (itValidations.hasNext()) {
+            Map.Entry pair = (Map.Entry) itValidations.next();
+            Element validationMessage = document.createElementNS(CONNECTOR_NAMESPACE_V1, "ValidationError");
+            Element inputName = document.createElementNS(CONNECTOR_NAMESPACE_V1, "inputName");
+            inputName.setTextContent((String) pair.getKey());
+            validationMessage.appendChild(inputName);
+            Element inputMessage = document.createElementNS(CONNECTOR_NAMESPACE_V1, "message");
+            inputMessage.setTextContent((String) pair.getValue());
+            validationMessage.appendChild(inputMessage);
+            faultDetailMessage.appendChild(validationMessage);
+        }
+        faultDetail.appendChild(faultDetailMessage);
+        faultElement.appendChild(faultDetail);
+        // responseElement.appendChild(errormessage);
         // add subject message here?
-        return responseElement;
+        // return responseElement;
+        return faultElement;
+    }
+
+    public Element mapSubjectErrorConfirmation(String message, OpenClinicaException exception) throws Exception {
+        return mapGenericErrorConfirmation(message, exception, new HashMap<String, String>());
     }
 
     public Element mapSubjectErrorConfirmation(String message) throws Exception {
-        DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
-        Document document = docBuilder.newDocument();
-
-        Element responseElement = document.createElementNS(CONNECTOR_NAMESPACE_V1, "RegisterSubjectResponse");
-        Element indicator = document.createElementNS(CONNECTOR_NAMESPACE_V1, "indicator");
-        Attr typeAttr = document.createAttributeNS(XSL_NAMESPACE, "type");
-        typeAttr.setNodeValue("BL");
-        // indicator.setAttributeNS(XSL_NAMESPACE, "type", "II");
-        indicator.setAttributeNode(typeAttr);
-        indicator.setAttribute("value", "false");
-        responseElement.appendChild(indicator);
-        // append message here
-        Element errormessage = document.createElementNS(CONNECTOR_NAMESPACE_V1, "message");
-        // String confirmation = messages.getMessage("dataEndpoint.success", null, "Success", locale);
-        Element code = document.createElementNS(CONNECTOR_NAMESPACE_V1, "code");
-        code.setTextContent("CCSystemFault");
-        // TODO change to accept error codes
-        errormessage.appendChild(code);
-        Element reason = document.createElementNS(CONNECTOR_NAMESPACE_V1, "reason");
-        reason.setTextContent(message);
-        errormessage.appendChild(reason);
-        responseElement.appendChild(errormessage);
-        // add subject message here?
-        return responseElement;
+        // DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
+        // DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
+        // Document document = docBuilder.newDocument();
+        //
+        // Element responseElement = document.createElementNS(CONNECTOR_NAMESPACE_V1, "RegisterSubjectResponse");
+        // Element indicator = document.createElementNS(CONNECTOR_NAMESPACE_V1, "indicator");
+        // Attr typeAttr = document.createAttributeNS(XSL_NAMESPACE, "type");
+        // typeAttr.setNodeValue("BL");
+        // // indicator.setAttributeNS(XSL_NAMESPACE, "type", "II");
+        // indicator.setAttributeNode(typeAttr);
+        // indicator.setAttribute("value", "false");
+        // responseElement.appendChild(indicator);
+        // // append message here
+        // Element errormessage = document.createElementNS(CONNECTOR_NAMESPACE_V1, "message");
+        // // String confirmation = messages.getMessage("dataEndpoint.success", null, "Success", locale);
+        // Element code = document.createElementNS(CONNECTOR_NAMESPACE_V1, "code");
+        // code.setTextContent("CCSystemFault");
+        // // TODO change to accept error codes
+        // errormessage.appendChild(code);
+        // Element reason = document.createElementNS(CONNECTOR_NAMESPACE_V1, "reason");
+        // reason.setTextContent(message);
+        // errormessage.appendChild(reason);
+        // responseElement.appendChild(errormessage);
+        // // add subject message here?
+        // return responseElement;
+        return mapGenericErrorConfirmation(message, new CCSystemFaultException(""), new HashMap<String, String>());
     }
 
     public Element mapCreateStudyConfirmation(String studyIdentifierStr) throws Exception {
@@ -266,60 +311,62 @@ public class AbstractCabigDomEndpoint extends AbstractDomPayloadEndpoint {
     }
 
     public Element mapStudyErrorConfirmation(String message) throws Exception {
-        // dry
-        DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
-        Document document = docBuilder.newDocument();
-
-        Element responseElement = document.createElementNS(CONNECTOR_NAMESPACE_V1, "CreateStudyResponse");
-        Element indicator = document.createElementNS(CONNECTOR_NAMESPACE_V1, "indicator");
-        Attr typeAttr = document.createAttributeNS(XSL_NAMESPACE, "type");
-        typeAttr.setNodeValue("BL");
-        // indicator.setAttributeNS(XSL_NAMESPACE, "type", "II");
-        indicator.setAttributeNode(typeAttr);
-        indicator.setAttribute("value", "false");
-        responseElement.appendChild(indicator);
-        // append message here
-        Element errormessage = document.createElementNS(CONNECTOR_NAMESPACE_V1, "message");
-        // String confirmation = messages.getMessage("dataEndpoint.success", null, "Success", locale);
-        Element code = document.createElementNS(CONNECTOR_NAMESPACE_V1, "code");
-        code.setTextContent("CCSystemFault");
-        // TODO change to accept error codes
-        errormessage.appendChild(code);
-        Element reason = document.createElementNS(CONNECTOR_NAMESPACE_V1, "reason");
-        reason.setTextContent(message);
-        errormessage.appendChild(reason);
-        responseElement.appendChild(errormessage);
-        // add subject message here?
-        return responseElement;
+        // // dry
+        // DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
+        // DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
+        // Document document = docBuilder.newDocument();
+        //
+        // Element responseElement = document.createElementNS(CONNECTOR_NAMESPACE_V1, "CreateStudyResponse");
+        // Element indicator = document.createElementNS(CONNECTOR_NAMESPACE_V1, "indicator");
+        // Attr typeAttr = document.createAttributeNS(XSL_NAMESPACE, "type");
+        // typeAttr.setNodeValue("BL");
+        // // indicator.setAttributeNS(XSL_NAMESPACE, "type", "II");
+        // indicator.setAttributeNode(typeAttr);
+        // indicator.setAttribute("value", "false");
+        // responseElement.appendChild(indicator);
+        // // append message here
+        // Element errormessage = document.createElementNS(CONNECTOR_NAMESPACE_V1, "message");
+        // // String confirmation = messages.getMessage("dataEndpoint.success", null, "Success", locale);
+        // Element code = document.createElementNS(CONNECTOR_NAMESPACE_V1, "code");
+        // code.setTextContent("CCSystemFault");
+        // // TODO change to accept error codes
+        // errormessage.appendChild(code);
+        // Element reason = document.createElementNS(CONNECTOR_NAMESPACE_V1, "reason");
+        // reason.setTextContent(message);
+        // errormessage.appendChild(reason);
+        // responseElement.appendChild(errormessage);
+        // // add subject message here?
+        // return responseElement;
+        return mapGenericErrorConfirmation(message, new CCSystemFaultException(""), new HashMap<String, String>());
     }
 
     public Element mapStudyErrorConfirmation(String message, OpenClinicaException exception) throws Exception {
-        DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
-        Document document = docBuilder.newDocument();
-
-        Element responseElement = document.createElementNS(CONNECTOR_NAMESPACE_V1, "CreateStudyResponse");
-        Element indicator = document.createElementNS(CONNECTOR_NAMESPACE_V1, "indicator");
-        Attr typeAttr = document.createAttributeNS(XSL_NAMESPACE, "type");
-        typeAttr.setNodeValue("BL");
-        // indicator.setAttributeNS(XSL_NAMESPACE, "type", "II");
-        indicator.setAttributeNode(typeAttr);
-        indicator.setAttribute("value", "false");
-        responseElement.appendChild(indicator);
-        // append message here
-        Element errormessage = document.createElementNS(CONNECTOR_NAMESPACE_V1, "message");
-        // String confirmation = messages.getMessage("dataEndpoint.success", null, "Success", locale);
-        Element code = document.createElementNS(CONNECTOR_NAMESPACE_V1, "code");
-        code.setTextContent(exception.errorID);
-        // TODO change to accept error codes
-        errormessage.appendChild(code);
-        Element reason = document.createElementNS(CONNECTOR_NAMESPACE_V1, "reason");
-        reason.setTextContent(exception.message);
-        errormessage.appendChild(reason);
-        responseElement.appendChild(errormessage);
-        // add subject message here?
-        return responseElement;
+        // DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
+        // DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
+        // Document document = docBuilder.newDocument();
+        //
+        // Element responseElement = document.createElementNS(CONNECTOR_NAMESPACE_V1, "CreateStudyResponse");
+        // Element indicator = document.createElementNS(CONNECTOR_NAMESPACE_V1, "indicator");
+        // Attr typeAttr = document.createAttributeNS(XSL_NAMESPACE, "type");
+        // typeAttr.setNodeValue("BL");
+        // // indicator.setAttributeNS(XSL_NAMESPACE, "type", "II");
+        // indicator.setAttributeNode(typeAttr);
+        // indicator.setAttribute("value", "false");
+        // responseElement.appendChild(indicator);
+        // // append message here
+        // Element errormessage = document.createElementNS(CONNECTOR_NAMESPACE_V1, "message");
+        // // String confirmation = messages.getMessage("dataEndpoint.success", null, "Success", locale);
+        // Element code = document.createElementNS(CONNECTOR_NAMESPACE_V1, "code");
+        // code.setTextContent(exception.errorID);
+        // // TODO change to accept error codes
+        // errormessage.appendChild(code);
+        // Element reason = document.createElementNS(CONNECTOR_NAMESPACE_V1, "reason");
+        // reason.setTextContent(exception.message);
+        // errormessage.appendChild(reason);
+        // responseElement.appendChild(errormessage);
+        // // add subject message here?
+        // return responseElement;
+        return mapGenericErrorConfirmation(message, exception, new HashMap<String, String>());
     }
 
     public Element mapLoadLabsConfirmation() throws Exception {
@@ -342,31 +389,32 @@ public class AbstractCabigDomEndpoint extends AbstractDomPayloadEndpoint {
     }
 
     public Element mapLoadLabsErrorConfirmation(String message, OpenClinicaException exception) throws Exception {
-        DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
-        Document document = docBuilder.newDocument();
-
-        Element responseElement = document.createElementNS(CONNECTOR_NAMESPACE_V1, "LoadLabsResponse");
-        Element indicator = document.createElementNS(CONNECTOR_NAMESPACE_V1, "indicator");
-        Attr typeAttr = document.createAttributeNS(XSL_NAMESPACE, "type");
-        typeAttr.setNodeValue("BL");
-        // indicator.setAttributeNS(XSL_NAMESPACE, "type", "II");
-        indicator.setAttributeNode(typeAttr);
-        indicator.setAttribute("value", "false");
-        responseElement.appendChild(indicator);
-        // append message here
-        Element errormessage = document.createElementNS(CONNECTOR_NAMESPACE_V1, "message");
-        // String confirmation = messages.getMessage("dataEndpoint.success", null, "Success", locale);
-        Element code = document.createElementNS(CONNECTOR_NAMESPACE_V1, "code");
-        code.setTextContent(exception.errorID);
-        // TODO change to accept error codes
-        errormessage.appendChild(code);
-        Element reason = document.createElementNS(CONNECTOR_NAMESPACE_V1, "reason");
-        reason.setTextContent(exception.message);
-        errormessage.appendChild(reason);
-        responseElement.appendChild(errormessage);
-        // add subject message here?
-        return responseElement;
+        // DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
+        // DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
+        // Document document = docBuilder.newDocument();
+        //
+        // Element responseElement = document.createElementNS(CONNECTOR_NAMESPACE_V1, "LoadLabsResponse");
+        // Element indicator = document.createElementNS(CONNECTOR_NAMESPACE_V1, "indicator");
+        // Attr typeAttr = document.createAttributeNS(XSL_NAMESPACE, "type");
+        // typeAttr.setNodeValue("BL");
+        // // indicator.setAttributeNS(XSL_NAMESPACE, "type", "II");
+        // indicator.setAttributeNode(typeAttr);
+        // indicator.setAttribute("value", "false");
+        // responseElement.appendChild(indicator);
+        // // append message here
+        // Element errormessage = document.createElementNS(CONNECTOR_NAMESPACE_V1, "message");
+        // // String confirmation = messages.getMessage("dataEndpoint.success", null, "Success", locale);
+        // Element code = document.createElementNS(CONNECTOR_NAMESPACE_V1, "code");
+        // code.setTextContent(exception.errorID);
+        // // TODO change to accept error codes
+        // errormessage.appendChild(code);
+        // Element reason = document.createElementNS(CONNECTOR_NAMESPACE_V1, "reason");
+        // reason.setTextContent(exception.message);
+        // errormessage.appendChild(reason);
+        // responseElement.appendChild(errormessage);
+        // // add subject message here?
+        // return responseElement;
+        return mapGenericErrorConfirmation(message, exception, new HashMap<String, String>());
     }
 
     public boolean canUserRegisterSubject(UserAccountBean user) {

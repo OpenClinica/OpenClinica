@@ -43,7 +43,7 @@ public class CreateStudyService {
         studyBean.setSecondaryIdentifier(xmlService.getElementValue(study, this.CONNECTOR_NAMESPACE_V1, "publicTitle", "value"));
         int enrollment = xmlService.getTargetAccrualNumberRange(study);// xmlService.getElementValue(study, this.CONNECTOR_NAMESPACE_V1, xmlLine, attrName)
         studyBean.setExpectedTotalEnrollment(enrollment);
-        System.out.println("found enrollment " + enrollment);
+        // System.out.println("found enrollment " + enrollment);
         studyBean = xmlService.getStudyInvestigator(studyBean, study);
         studyBean = xmlService.getStudyCenter(studyBean, study);
         studyBean = xmlService.getSponsorName(studyBean, study);
