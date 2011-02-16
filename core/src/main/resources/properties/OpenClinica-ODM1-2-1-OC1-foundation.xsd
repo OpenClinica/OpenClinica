@@ -181,7 +181,7 @@
 	</xs:attributeGroup>
 
 	<xs:attributeGroup name="SubjectDataAttributeDefinition">
-		<xs:attribute name="StudySubjectId" type="odm:oid" form="qualified" />
+		<xs:attribute name="StudySubjectID" type="odm:oid" form="qualified" />
 		<xs:attribute name="UniqueIdentifier" type="odm:text" form="qualified" />
 		<xs:attribute name="Status" type="odm:text" form="qualified" />
 		<xs:attribute name="SecondaryID" type="odm:text" form="qualified" />

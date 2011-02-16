@@ -183,7 +183,7 @@
 	</xs:attributeGroup>
 
 	<xs:attributeGroup name="SubjectDataAttributeDefinition">
-		<xs:attribute name="StudySubjectId" type="odm:text" />
+		<xs:attribute name="StudySubjectID" type="odm:text" />
 		<xs:attribute name="UniqueIdentifier" type="odm:text" />
 		<xs:attribute name="Status" type="odm:text" />
 		<xs:attribute name="SecondaryID" type="odm:text" />
