@@ -11,7 +11,6 @@ import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.DisplaySectionBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.ResponseOptionBean;
-import org.akaza.openclinica.bean.submit.ResponseSetBean;
 import org.akaza.openclinica.dao.hibernate.SCDItemMetadataDao;
 import org.akaza.openclinica.domain.crfdata.SCDItemMetadataBean;
 import org.slf4j.Logger;
@@ -191,11 +190,13 @@ public class SimpleConditionalDisplayService {
                     return true;
                 }
             }else {
-                ResponseSetBean rs = controlItem.getMetadata().getResponseSet();
-                chosenOption = ((ResponseOptionBean) rs.getOptions().get(0)).getValue();
-                if(chosenOption != null && chosenOption.length()>0) {
-                    if(chosenOption.equals(cd.getOptionValue())) {
-                        return true;
+                if(controlItem.getMetadata().getResponseSet().getResponseTypeId()==6) {
+                    //single-select
+                    chosenOption = ((ResponseOptionBean) controlItem.getMetadata().getResponseSet().getOptions().get(0)).getValue();
+                    if(chosenOption != null && chosenOption.length()>0) {
+                        if(chosenOption.equals(cd.getOptionValue())) {
+                            return true;
+                        }
                     }
                 }
             }
