@@ -1062,7 +1062,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         
                         if (!StringUtil.isBlank(showItem)) {
                             isShowItem = "0".equals(showItem) ? false : true;
-                            isShowItem = "Hide".equals(showItem) ? false : true;
+                            isShowItem = "Hide".equalsIgnoreCase(showItem) ? false : true;
                             // supporting both, tbh 03/2010
                         }
                       
