@@ -1817,7 +1817,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                          
                             try {
                                 isShowGroup = "0".equals(showGroup) ? false : true;
-                                isShowGroup = "Hide".equals(showGroup) ? false : true;
+                                isShowGroup = "Hide".equalsIgnoreCase(showGroup) ? false : true;
                             } catch (Exception eee) {
                                 logger.debug("caught an exception with the boolean value for groups");
                             }
