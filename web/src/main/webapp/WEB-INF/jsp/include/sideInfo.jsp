@@ -92,12 +92,12 @@
 	</c:if>
 	<c:if test="${iconInfoShown}">
 
-	 	<c:import url="include/sideIconsSubject.jsp"/> 
+	 	<c:import url="/WEB-INF/jsp/include/sideIconsSubject.jsp"/>
 
 	</c:if>
   <%-- BWP 3098: show icons by default; added   || closeInfoShowIcons--%>
     <c:if test="${(!panel.iconInfoShown && panel.manageSubject) || closeInfoShowIcons}">
-	 <c:import url="../include/sideIconsSubject.jsp"/>
+	 <c:import url="/WEB-INF/jsp/include/sideIconsSubject.jsp"/>
 	</c:if>
 	
   </table>         
