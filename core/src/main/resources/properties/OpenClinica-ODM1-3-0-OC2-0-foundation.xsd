@@ -172,16 +172,6 @@
 		<xs:attributeGroup ref="StudyParameterListItemAttributeExtension"/>
 	</xs:complexType>
 	
-	<!--
-	<xs:complexType name="OCodmComplexTypeDefinition-EventDefinitionDetailsRef">
-		<xs:sequence>
-			<xs:group ref="EventDefinitionDetailsRefElementExtension" minOccurs="0" maxOccurs="unbounded"/>
-		</xs:sequence>
-		<xs:attributeGroup ref="EventDefinitionDetailsRefAttributeDefinition"/>
-		<xs:attributeGroup ref="EventDefinitionDetailsRefAttributeExtension"/>
-	</xs:complexType>
--->
-	
 	<xs:complexType name="OCodmComplexTypeDefinition-EventDefinitionDetails">
 		<xs:sequence>
 			<xs:element name="Description" type="odm:text" minOccurs="0" maxOccurs="1"/>
@@ -502,12 +492,6 @@
 		<xs:attribute name="MaximumAge" type="odm:text"/>
 	</xs:attributeGroup>
 	
-	<!--
-	<xs:attributeGroup name="EventDefinitionDetailsRefAttributeDefinition">
-		<xs:attribute name="EventDefinitionDetailsID" type="odm:oidref" use="required"/>
-	</xs:attributeGroup>
--->
-	
 	<xs:attributeGroup name="EventDefinitionDetailsAttributeDefinition">
 		<xs:attribute name="StudyEventOID" type="odm:oidref" use="required"/>
 	</xs:attributeGroup>
@@ -532,6 +516,7 @@
 	
 	<xs:attributeGroup name="PresentInFormAttributeDefinition">
 		<xs:attribute name="FormOID" type="odm:oidref" use="required"/>
+		<xs:attribute name="ShowGroup" type="odm:text" />
 	</xs:attributeGroup>
 	
 	<xs:attributeGroup name="ItemGroupRepeatAttributeDefinition">
