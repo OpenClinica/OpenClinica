@@ -983,7 +983,8 @@ public class MetaDataReportBean extends OdmXmlReportBean {
         xml.append(currentIndent + "<OpenClinica:ItemGroupDetails ItemGroupOID=\"" + StringEscapeUtils.escapeXml(detail.getOid()) + "\">");
         xml.append(nls);
         for (PresentInFormBean inform : informs) {
-            xml.append(currentIndent + indent + "<OpenClinica:PresentInForm FormOID=\"" + inform.getFormOid() + "\">");
+            xml.append(currentIndent + indent + "<OpenClinica:PresentInForm FormOID=\"" + inform.getFormOid() 
+                    + "\" ShowGroup=\"" + inform.getShowGroup() + "\">");
             xml.append(nls);
             ItemGroupRepeatBean repeat = inform.getItemGroupRepeatBean();
             itemp = repeat.getRepeatNumber();

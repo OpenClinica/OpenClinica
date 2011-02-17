@@ -227,6 +227,7 @@ public class OdmExtractDAO extends DatasetDAO {
         ++i;    this.setTypeExpected(i, TypeNames.INT);// response_type_id
         ++i;    this.setTypeExpected(i, TypeNames.INT);// repeat_number
         ++i;    this.setTypeExpected(i, TypeNames.INT);// repeat_max
+        ++i;    this.setTypeExpected(i, TypeNames.BOOL);// show_group
     }
 
     public void setSubjectEventFormDataTypesExpected() {
@@ -1217,6 +1218,7 @@ public class OdmExtractDAO extends DatasetDAO {
             
             Integer igRepeatNum = (Integer) row.get("repeat_number");
             Integer igRepeatMax = (Integer) row.get("repeat_max");
+            Boolean showGroup = (Boolean) row.get("show_group");
             
             String itHeader = (String) row.get("item_header");
             String left = (String) row.get("left_item_text");
@@ -1244,6 +1246,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 igr.setRepeatMax(igRepeatMax);
                 igr.setRepeatNumber(igRepeatNum);
                 inForm.setItemGroupRepeatBean(igr);
+                inForm.setShowGroup(showGroup==true?"Yes":"No");
                 igDetail.getPresentInForms().add(inForm);
             }
             
@@ -2504,11 +2507,12 @@ public class OdmExtractDAO extends DatasetDAO {
             + " ig.item_group_id, item.item_id, rs.response_set_id, cv.oc_oid as crf_version_oid, ig.oc_oid as item_group_oid, item.oc_oid as item_oid,"
             + " ifm.item_header, ifm.subheader, ifm.section_id, ifm.left_item_text, ifm.right_item_text,"
             + " ifm.parent_id, ifm.column_number, ifm.page_number_label, ifm.response_layout, ifm.default_value, item.phi_status, ifm.show_item, " 
-            + " rs.response_type_id, igm.repeat_number, igm.repeat_max from crf_version cv, (select crf_version_id, item_id, response_set_id,"
+            + " rs.response_type_id, igm.repeat_number, igm.repeat_max, igm.show_group from crf_version cv, (select crf_version_id, item_id, response_set_id,"
             + " header as item_header, subheader, section_id, left_item_text, right_item_text,"
             + " parent_id, column_number, page_number_label, response_layout," 
             + " default_value, show_item from item_form_metadata where crf_version_id in (" + crfVersionIds + "))ifm, item, response_set rs,"
-            + " (select crf_version_id, item_group_id, item_id, header as item_group_header, repeat_number, repeat_max from item_group_metadata where crf_version_id in (" 
+            + " (select crf_version_id, item_group_id, item_id, header as item_group_header," 
+            + " repeat_number, repeat_max, show_group from item_group_metadata where crf_version_id in (" 
             + crfVersionIds + "))igm," + " item_group ig " 
             + this.getItemGroupAndItemMetaCondition(crfVersionIds);
     }
@@ -2889,6 +2893,6 @@ public class OdmExtractDAO extends DatasetDAO {
             + " from item_form_metadata im, scd_item_metadata scd where im.crf_version_id in ("
             + crfVersionIds + ") and im.item_form_metadata_id = scd.scd_item_form_metadata_id)ifm, item"
             + " where cv.crf_version_id in ("+ crfVersionIds + ") and cv.crf_version_id = ifm.crf_version_id"
-            + " and ifm.item_id = item.item_id order by cv.crf_id, cv.crf_version_id, item.item_id";
+            + " and ifm.item_id = item.item_id order by cv.crf_id, cv.crf_version_id desc, item.item_id";
     }
 }

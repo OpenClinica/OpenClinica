@@ -19,6 +19,7 @@ package org.akaza.openclinica.bean.odmbeans;
 public class PresentInFormBean {
     //attributes
     private String formOid;
+    private String showGroup;
     //elements
     private String itemGroupHeader;
     private ItemGroupRepeatBean itemGroupRepeatBean;
@@ -44,5 +45,13 @@ public class PresentInFormBean {
     }
     public void setItemGroupRepeatBean(ItemGroupRepeatBean itemGroupRepeatBean) {
         this.itemGroupRepeatBean = itemGroupRepeatBean;
+    }
+
+    public String getShowGroup() {
+        return showGroup;
+    }
+
+    public void setShowGroup(String showGroup) {
+        this.showGroup = showGroup;
     }
 }
