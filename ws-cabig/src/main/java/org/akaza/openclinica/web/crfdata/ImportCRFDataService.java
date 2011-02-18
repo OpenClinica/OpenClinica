@@ -118,13 +118,14 @@ public class ImportCRFDataService {
                     // studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studyEventDefinitionBean.getId(),
                     // studySubjectBean.getId(),Integer.parseInt(sampleOrdinal));
                     for (CRFVersionBean crfVersionBean : crfVersionBeans) {
-
+                        System.out.println("about to see study event dao: " + studySubjectBean.getId() + " sed " + studyEventDefinitionBean.getId() + " ord "
+                            + sampleOrdinal);
                         // iterate the studyeventbeans here
                         // for (StudyEventBean studyEventBean : studyEventBeans) {
 
                         StudyEventBean studyEventBean =
-                            (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(),
-                                    studyEventDefinitionBean.getId(), Integer.parseInt(sampleOrdinal));
+                            (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(), studyEventDefinitionBean
+                                    .getId(), Integer.parseInt(sampleOrdinal));
 
                         ArrayList<EventCRFBean> eventCrfBeans = eventCrfDAO.findByEventSubjectVersion(studyEventBean, studySubjectBean, crfVersionBean);
                         // what if we have begun with creating a study
@@ -522,9 +523,9 @@ public class ImportCRFDataService {
                     // summary stats added tbh 05/2008
                     // JN: Changed from validationErrors to totalValidationErrors to create discrepancy notes for all the
                     displayItemBeanWrapper =
-                        new DisplayItemBeanWrapper(displayItemBeans, true, overwrite, validationErrors, studyEventId, crfVersionId,
-                                studyEventDataBean.getStudyEventOID(), studySubjectBean.getLabel(), eventCRFBean.getCreatedDate(), crfBean.getName(),
-                                crfVersion.getName(), studySubjectBean.getOid(), studyEventDataBean.getStudyEventRepeatKey());
+                        new DisplayItemBeanWrapper(displayItemBeans, true, overwrite, validationErrors, studyEventId, crfVersionId, studyEventDataBean
+                                .getStudyEventOID(), studySubjectBean.getLabel(), eventCRFBean.getCreatedDate(), crfBean.getName(), crfVersion.getName(),
+                                studySubjectBean.getOid(), studyEventDataBean.getStudyEventRepeatKey());
 
                     // JN: Commenting out the following code, since we shouldn't re-initialize at this point, as validationErrors would get overwritten and the
                     // older errors will be overriden. Moving it after the form.
@@ -533,8 +534,8 @@ public class ImportCRFDataService {
                     discValidator = new DiscrepancyValidator(request, discNotes);
                     // reset to allow for new errors...
                 }// after forms
-                 // validationErrors = new HashMap();
-                 // discValidator = new DiscrepancyValidator(request, discNotes);
+                // validationErrors = new HashMap();
+                // discValidator = new DiscrepancyValidator(request, discNotes);
                 wrappers.add(displayItemBeanWrapper);
             }// after study events
 

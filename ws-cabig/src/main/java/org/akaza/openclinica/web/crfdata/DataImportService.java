@@ -1,20 +1,5 @@
 package org.akaza.openclinica.web.crfdata;
 
-import java.io.File;
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.StringReader;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-
-import javax.sql.DataSource;
-import org.xml.sax.InputSource;
-
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
@@ -32,7 +17,6 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
 import org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.SummaryStatsBean;
-import org.akaza.openclinica.control.form.SpringServletAccess;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -40,26 +24,33 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
-import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.web.crfdata.ImportCRFDataService;
 import org.akaza.openclinica.web.job.CrfBusinessLogicHelper;
 import org.akaza.openclinica.web.job.TriggerService;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Unmarshaller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.xml.sax.InputSource;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
+import javax.sql.DataSource;
 
 /**
  * 
  * @author thickerson, daniel
- *
+ * 
  */
 public class DataImportService {
 
@@ -71,35 +62,33 @@ public class DataImportService {
 
     private ImportCRFDataService dataService;
 
-//    private ResourceLoader resourceLoader;
-//    
-//    public static String PROPERTIES_DIR;
-//    
-//    public void setPROPERTIES_DIR() {
-//        String resource = "classpath:properties/placeholder.properties";
-//        System.out.println("Resource " + resource);
-//        Resource scr = resourceLoader.getResource(resource);
-//        String absolutePath = null;
-//        try {
-//            System.out.println("Resource" + resource);
-//            absolutePath = scr.getFile().getAbsolutePath();
-//            System.out.println("Resource" + ((ClassPathResource) scr).getPath());
-//            System.out.println("Resource" + resource);
-//            PROPERTIES_DIR = absolutePath.replaceAll("placeholder.properties", "");
-//            System.out.println("Resource" + PROPERTIES_DIR);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            throw new OpenClinicaSystemException(e.getMessage(), e.fillInStackTrace());
-//        }
-//
-//    }
+    // private ResourceLoader resourceLoader;
+    //    
+    // public static String PROPERTIES_DIR;
+    //    
+    // public void setPROPERTIES_DIR() {
+    // String resource = "classpath:properties/placeholder.properties";
+    // System.out.println("Resource " + resource);
+    // Resource scr = resourceLoader.getResource(resource);
+    // String absolutePath = null;
+    // try {
+    // System.out.println("Resource" + resource);
+    // absolutePath = scr.getFile().getAbsolutePath();
+    // System.out.println("Resource" + ((ClassPathResource) scr).getPath());
+    // System.out.println("Resource" + resource);
+    // PROPERTIES_DIR = absolutePath.replaceAll("placeholder.properties", "");
+    // System.out.println("Resource" + PROPERTIES_DIR);
+    // } catch (IOException e) {
+    // e.printStackTrace();
+    // throw new OpenClinicaSystemException(e.getMessage(), e.fillInStackTrace());
+    // }
+    //
+    // }
 
     public String convertStreamToString(InputStream is) throws IOException {
         /*
-         * To convert the InputStream to String we use the BufferedReader.readLine()
-         * method. We iterate until the BufferedReader return null which means
-         * there's no more data to read. Each line will appended to a StringBuilder
-         * and returned as String.
+         * To convert the InputStream to String we use the BufferedReader.readLine() method. We iterate until the BufferedReader return null which means there's
+         * no more data to read. Each line will appended to a StringBuilder and returned as String.
          */
         if (is != null) {
             StringBuilder sb = new StringBuilder();
@@ -114,94 +103,22 @@ public class DataImportService {
                 is.close();
             }
             return sb.toString();
-        } else {       
+        } else {
             return "";
         }
     }
-    /**
-     * Import Data, the logic which imports the data for our data service.  Note that
-     * we will return three strings
-     * string 0: status, either 'success', 'fail', or 'warn'.
-     * string 1: the message string which will be returned in our soap response
-     * string 2: the audit message, currently not used but will be saved in the event of a success.
-     * 
-     * @author thickerson
-     * @param dataSource
-     * @param resources
-     * @param studyBean
-     * @param userBean
-     * @param xml
-     * @return
-     * @throws Exception
-     */
-    public ArrayList<String> importData(DataSource dataSource, CoreResources resources, StudyBean studyBean, UserAccountBean userBean, String xml)  throws Exception {
+
+    public ArrayList<String> importProcessedData(DataSource dataSource, CoreResources resources, StudyBean studyBean, UserAccountBean userBean,
+            ODMContainer odmContainer, StringBuffer msg, StringBuffer auditMsg, boolean checkEventCrf) throws Exception {
+        List<String> errors = new ArrayList<String>();
+        TriggerService triggerService = new TriggerService();
         locale = new Locale("en-US");
         ResourceBundleProvider.updateLocale(locale);
         respage = ResourceBundleProvider.getPageMessagesBundle();
-        TriggerService triggerService = new TriggerService();
 
         ItemDataDAO itemDataDao = new ItemDataDAO(dataSource);
         EventCRFDAO eventCrfDao = new EventCRFDAO(dataSource);
-
-        StringBuffer msg = new StringBuffer();
-        StringBuffer auditMsg = new StringBuffer();
-        Mapping myMap = new Mapping();
-
-        InputStream xsdFile = resources.getInputStream("ODM1-3-0.xsd");//new File(propertiesPath + File.separator + "ODM1-3-0.xsd");
-        InputStream xsdFile2 = resources.getInputStream("ODM1-2-1.xsd");//new File(propertiesPath + File.separator + "ODM1-2-1.xsd");
         boolean fail = false;
-        InputStream mapInputStream = resources.getInputStream("cd_odm_mapping.xml");
-        
-        myMap.loadMapping(new InputSource(mapInputStream));
-        Unmarshaller um1 = new Unmarshaller(myMap);
-        ODMContainer odmContainer = new ODMContainer();
-        // checking to see what we get
-        // System.out.println(this.convertStreamToString(xsdFile));
-        if (xml != null) {
-            msg.append(" ");
-        } else {
-            msg.append(" " + respage.getString("unreadable_file") + ": ");
-        }
-
-        try {
-            // System.out.println("working on the following xml");
-            System.out.println(xml);
-            // System.out.println("xsd File: " + xsdFile.toString());
-            // File xsdFileFinal = new File(xsdFile);
-            // schemaValidator.validateAgainstSchema(xml, xsdFile);
-            // removing schema validation since we are presented with the chicken v egg error problem
-            odmContainer = (ODMContainer) um1.unmarshal(new StringReader(xml));
-
-            System.out.println("Found crf data container for study oid: " + odmContainer.getCrfDataPostImportContainer().getStudyOID());
-            System.out.println("found length of subject list: " + odmContainer.getCrfDataPostImportContainer().getSubjectData().size());
-        } catch (Exception me1) {
-            // fail against one, try another
-            me1.printStackTrace();
-            System.out.println("failed in unmarshaling, trying another version = "+me1.getMessage());
-            try {
-                // schemaValidator.validateAgainstSchema(xml, xsdFile2);
-                // for backwards compatibility, we also try to validate vs
-                // 1.2.1 ODM 06/2008
-                odmContainer = (ODMContainer) um1.unmarshal(new StringReader(xml));
-            } catch (Exception me2) {
-                // not sure if we want to report me2
-                me2.printStackTrace();
-                
-                MessageFormat mf = new MessageFormat("");
-                mf.applyPattern(respage.getString("your_xml_is_not_well_formed"));
-                Object[] arguments = { me1.getMessage() };
-                msg.append(mf.format(arguments) + " ");
-                auditMsg.append(mf.format(arguments) + " ");
-                // break here with an exception
-                System.out.println("found an error with XML: " + msg.toString());
-                // throw new Exception(msg.toString());
-                // instead of breaking the entire operation, we should
-                // continue looping
-                return getFailReturnList(msg.toString(), auditMsg.toString());
-            }
-        }
-        // next: check, then import
-        List<String> errors = new ArrayList<String>();
         try {
             System.out.println("passing an odm container and study bean id: " + studyBean.getId());
             errors = getImportCRFDataService(dataSource).validateStudyMetadata(odmContainer, studyBean.getId());
@@ -219,7 +136,7 @@ public class DataImportService {
                 msg.append(error + " ");
             }
             if (errors.size() > 0) {
-                
+
                 return getFailReturnList(msg.toString(), auditMsg.toString());
             } else {
                 msg.append(respage.getString("passed_study_check") + " ");
@@ -229,6 +146,8 @@ public class DataImportService {
             }
 
         }
+        // end cut here, skip event crf validation, since we create it, tbh 02/2011
+        // the below creates the event crf, apparently, so let's go with it
         // validation errors, the same as in the ImportCRFDataServlet. DRY?
         List<EventCRFBean> eventCRFBeans = getImportCRFDataService(dataSource).fetchEventCRFBeans(odmContainer, userBean);
 
@@ -246,10 +165,10 @@ public class DataImportService {
                 Status eventCRFStatus = eventCRFBean.getStatus();
 
                 System.out.println("Event CRF Bean: id " + eventCRFBean.getId() + ", data entry stage " + dataEntryStage.getName() + ", status "
-                        + eventCRFStatus.getName());
+                    + eventCRFStatus.getName());
                 if (eventCRFStatus.equals(Status.AVAILABLE) || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY)
-                        || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)
-                        || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
+                    || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE) || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE)
+                    || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
                     permittedEventCRFIds.add(new Integer(eventCRFBean.getId()));
                 } else {
                     // break out here with an exception
@@ -281,6 +200,7 @@ public class DataImportService {
             // create a 'fake' request to generate the validation errors
             // here, tbh 05/2009
 
+            // split here? tbh 02/2011
             MockHttpServletRequest request = new MockHttpServletRequest();
             // Locale locale = new Locale("en-US");
             request.addPreferredLocale(locale);
@@ -311,13 +231,14 @@ public class DataImportService {
             // throw new Exception(msg.toString());
             return getFailReturnList(msg.toString(), auditMsg.toString());
         }
+        // split here? tbh 02/2011
         boolean discNotesGenerated = false;
         if (fail) {
             // in place of nulls, need to return a message
             return getFailReturnList(msg.toString(), auditMsg.toString());
-            
+
         } else {
-            
+
             msg.append(respage.getString("passing_crf_edit_checks") + " ");
             auditMsg.append(respage.getString("passing_crf_edit_checks") + " ");
             // session.setAttribute("importedData",
@@ -353,7 +274,7 @@ public class DataImportService {
             // message at the end
 
             if (!hardValidationErrors.isEmpty()) {
-                
+
                 msg.append(triggerService.generateHardValidationErrorMessage(subjectData, hardValidationErrors, false));
             } else {
                 if (!totalValidationErrors.isEmpty()) {
@@ -379,8 +300,8 @@ public class DataImportService {
                         // System.out.println("found status here: " + eventCrfBean.getStatus().getName());
                         ItemDataBean itemDataBean = new ItemDataBean();
                         itemDataBean =
-                            itemDataDao.findByItemIdAndEventCRFIdAndOrdinal(displayItemBean.getItem().getId(), eventCrfBean.getId(), displayItemBean
-                                    .getData().getOrdinal());
+                            itemDataDao.findByItemIdAndEventCRFIdAndOrdinal(displayItemBean.getItem().getId(), eventCrfBean.getId(), displayItemBean.getData()
+                                    .getOrdinal());
                         if (wrapper.isOverwrite() && itemDataBean.getStatus() != null) {
                             // System.out.println("just tried to find item data bean on item name " + displayItemBean.getItem().getName());
                             itemDataBean.setUpdatedDate(new Date());
@@ -404,8 +325,8 @@ public class DataImportService {
                         ItemBean ibean = (ItemBean) idao.findByPK(displayItemBean.getData().getItemId());
                         // System.out.println("*** checking for validation errors: " + ibean.getName());
                         String itemOid =
-                            displayItemBean.getItem().getOid() + "_" + wrapper.getStudyEventRepeatKey() + "_" + displayItemBean.getData().getOrdinal()
-                            + "_" + wrapper.getStudySubjectOid();
+                            displayItemBean.getItem().getOid() + "_" + wrapper.getStudyEventRepeatKey() + "_" + displayItemBean.getData().getOrdinal() + "_"
+                                + wrapper.getStudySubjectOid();
                         // System.out.println("+++ found validation errors hash map: " + wrapper.getValidationErrors().toString());
                         if (wrapper.getValidationErrors().containsKey(itemOid)) {
                             ArrayList messageList = (ArrayList) wrapper.getValidationErrors().get(itemOid);
@@ -417,12 +338,13 @@ public class DataImportService {
                                 createDiscrepancyNote(ibean, message, eventCrfBean, displayItemBean, parentDn.getId(), userBean, dataSource, studyBean);
                                 discNotesGenerated = true;
                                 System.out.println("*** created disc note with message: " + message);
-                                auditMsg.append(wrapper.getStudySubjectOid()+ ": " + ibean.getOid() + ": " + message + "---");
+                                auditMsg.append(wrapper.getStudySubjectOid() + ": " + ibean.getOid() + ": " + message + "---");
                                 // split by this ? later, tbh
                                 // displayItemBean);
                             }
                         }
                         if (!eventCrfInts.contains(new Integer(eventCrfBean.getId()))) {
+                            // do we need to mark complete, yes we probably do
                             crfBusinessLogicHelper.markCRFComplete(eventCrfBean, userBean);
                             // System.out.println("*** just updated event crf bean: " + eventCrfBean.getId());
                             eventCrfInts.add(new Integer(eventCrfBean.getId()));
@@ -434,13 +356,12 @@ public class DataImportService {
             // msg.append(respage.getString("data_has_been_successfully_import") + " ");
             // auditMsg.append(respage.getString("data_has_been_successfully_import") + " ");
 
-            //            MessageFormat mf = new MessageFormat("");
-            //            mf.applyPattern(respage.getString("you_can_review_the_data"));
-            //            Object[] arguments = { SQLInitServlet.getField("sysURL.base") };
+            // MessageFormat mf = new MessageFormat("");
+            // mf.applyPattern(respage.getString("you_can_review_the_data"));
+            // Object[] arguments = { SQLInitServlet.getField("sysURL.base") };
             // msg.append(mf.format(arguments));
             // auditMsg.append(mf.format(arguments));
         }
-
 
         if (!discNotesGenerated) {
             return getSuccessReturnList(msg.toString(), auditMsg.toString());
@@ -448,7 +369,93 @@ public class DataImportService {
             return getWarningReturnList(msg.toString(), auditMsg.toString());
         }
     }
-    
+
+    /**
+     * Import Data, the logic which imports the data for our data service. Note that we will return three strings string 0: status, either 'success', 'fail', or
+     * 'warn'. string 1: the message string which will be returned in our soap response string 2: the audit message, currently not used but will be saved in the
+     * event of a success.
+     * 
+     * @author thickerson
+     * @param dataSource
+     * @param resources
+     * @param studyBean
+     * @param userBean
+     * @param xml
+     * @return
+     * @throws Exception
+     */
+    public ArrayList<String> importData(DataSource dataSource, CoreResources resources, StudyBean studyBean, UserAccountBean userBean, String xml)
+            throws Exception {
+        locale = new Locale("en-US");
+        ResourceBundleProvider.updateLocale(locale);
+        respage = ResourceBundleProvider.getPageMessagesBundle();
+
+        StringBuffer msg = new StringBuffer();
+        StringBuffer auditMsg = new StringBuffer();
+        Mapping myMap = new Mapping();
+
+        InputStream xsdFile = resources.getInputStream("ODM1-3-0.xsd");// new File(propertiesPath + File.separator + "ODM1-3-0.xsd");
+        InputStream xsdFile2 = resources.getInputStream("ODM1-2-1.xsd");// new File(propertiesPath + File.separator + "ODM1-2-1.xsd");
+
+        InputStream mapInputStream = resources.getInputStream("cd_odm_mapping.xml");
+
+        myMap.loadMapping(new InputSource(mapInputStream));
+        Unmarshaller um1 = new Unmarshaller(myMap);
+        ODMContainer odmContainer = new ODMContainer();
+        // checking to see what we get
+        // System.out.println(this.convertStreamToString(xsdFile));
+        if (xml != null) {
+            msg.append(" ");
+        } else {
+            msg.append(" " + respage.getString("unreadable_file") + ": ");
+        }
+
+        try {
+            // System.out.println("working on the following xml");
+            System.out.println(xml);
+            // System.out.println("xsd File: " + xsdFile.toString());
+            // File xsdFileFinal = new File(xsdFile);
+            // schemaValidator.validateAgainstSchema(xml, xsdFile);
+            // removing schema validation since we are presented with the chicken v egg error problem
+            odmContainer = (ODMContainer) um1.unmarshal(new StringReader(xml));
+
+            System.out.println("Found crf data container for study oid: " + odmContainer.getCrfDataPostImportContainer().getStudyOID());
+            System.out.println("found length of subject list: " + odmContainer.getCrfDataPostImportContainer().getSubjectData().size());
+        } catch (Exception me1) {
+            // fail against one, try another
+            me1.printStackTrace();
+            System.out.println("failed in unmarshaling, trying another version = " + me1.getMessage());
+            try {
+                // schemaValidator.validateAgainstSchema(xml, xsdFile2);
+                // for backwards compatibility, we also try to validate vs
+                // 1.2.1 ODM 06/2008
+                odmContainer = (ODMContainer) um1.unmarshal(new StringReader(xml));
+            } catch (Exception me2) {
+                // not sure if we want to report me2
+                me2.printStackTrace();
+
+                MessageFormat mf = new MessageFormat("");
+                mf.applyPattern(respage.getString("your_xml_is_not_well_formed"));
+                Object[] arguments = { me1.getMessage() };
+                msg.append(mf.format(arguments) + " ");
+                auditMsg.append(mf.format(arguments) + " ");
+                // break here with an exception
+                System.out.println("found an error with XML: " + msg.toString());
+                // throw new Exception(msg.toString());
+                // instead of breaking the entire operation, we should
+                // continue looping
+                return getFailReturnList(msg.toString(), auditMsg.toString());
+            }
+        }
+        /*
+         * tbh 02/2011: perform a split-up of the code so that we can use this in the caBIG Load Labs interface
+         */
+        // next: check, then import
+        // first cut here, tbh 02/2011
+        // cut all the way to the end and pass it an odm container and a generated event crf? just a thought
+        return importProcessedData(dataSource, resources, studyBean, userBean, odmContainer, msg, auditMsg, true);
+    }
+
     public ArrayList<String> getFailReturnList(String msg, String auditMsg) {
         ArrayList<String> retList = new ArrayList<String>();
         retList.add("fail");
@@ -456,7 +463,7 @@ public class DataImportService {
         retList.add(auditMsg.toString());
         return retList;
     }
-    
+
     public ArrayList<String> getSuccessReturnList(String msg, String auditMsg) {
         ArrayList<String> retList = new ArrayList<String>();
         retList.add("success");
@@ -464,7 +471,7 @@ public class DataImportService {
         retList.add(auditMsg.toString());
         return retList;
     }
-    
+
     public ArrayList<String> getWarningReturnList(String msg, String auditMsg) {
         ArrayList<String> retList = new ArrayList<String>();
         retList.add("warn");
@@ -473,10 +480,9 @@ public class DataImportService {
         return retList;
     }
 
-
     public static DiscrepancyNoteBean createDiscrepancyNote(ItemBean itemBean, String message, EventCRFBean eventCrfBean, DisplayItemBean displayItemBean,
             Integer parentId, UserAccountBean uab, DataSource ds, StudyBean study) {
-        
+
         DiscrepancyNoteBean note = new DiscrepancyNoteBean();
         StudySubjectDAO ssdao = new StudySubjectDAO(ds);
         note.setDescription(message);
@@ -514,14 +520,12 @@ public class DataImportService {
         return note;
     }
 
-
     private ImportCRFDataService getImportCRFDataService(DataSource dataSource) {
         dataService = this.dataService != null ? dataService : new ImportCRFDataService(dataSource, locale);
         return dataService;
     }
-    
-//    private CoreResources getCoreResources() {
-//        return (CoreResources) SpringServletAccess.getApplicationContext(context).getBean("coreResources");
-//    }
-}
 
+    // private CoreResources getCoreResources() {
+    // return (CoreResources) SpringServletAccess.getApplicationContext(context).getBean("coreResources");
+    // }
+}

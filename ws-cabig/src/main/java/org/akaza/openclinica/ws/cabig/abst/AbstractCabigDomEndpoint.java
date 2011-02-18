@@ -19,8 +19,13 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.dao.submit.ItemDAO;
+import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.ws.cabig.exception.CCSystemFaultException;
@@ -57,6 +62,11 @@ public class AbstractCabigDomEndpoint extends AbstractDomPayloadEndpoint {
     StudyDAO studyDao;
     StudySubjectDAO studySubjectDao;
     StudyParameterValueDAO studyParamValueDao;
+    ItemDAO itemDao;
+    ItemGroupDAO itemGroupDao;
+    CRFVersionDAO crfVersionDao;
+    StudyEventDefinitionDAO studyEventDefinitionDao;
+    StudyEventDAO studyEventDao;
 
     public DataSource dataSource;
     public MessageSource messages;
@@ -99,6 +109,31 @@ public class AbstractCabigDomEndpoint extends AbstractDomPayloadEndpoint {
     public StudyParameterValueDAO getStudyParamValueDao() {
         studyParamValueDao = studyParamValueDao != null ? studyParamValueDao : new StudyParameterValueDAO(dataSource);
         return studyParamValueDao;
+    }
+
+    public ItemDAO getItemDao() {
+        itemDao = itemDao != null ? itemDao : new ItemDAO(dataSource);
+        return itemDao;
+    }
+
+    public ItemGroupDAO getItemGroupDao() {
+        itemGroupDao = itemGroupDao != null ? itemGroupDao : new ItemGroupDAO(dataSource);
+        return itemGroupDao;
+    }
+
+    public CRFVersionDAO getCrfVersionDao() {
+        crfVersionDao = crfVersionDao != null ? crfVersionDao : new CRFVersionDAO(dataSource);
+        return crfVersionDao;
+    }
+
+    public StudyEventDefinitionDAO getStudyEventDefinitionDao() {
+        studyEventDefinitionDao = studyEventDefinitionDao != null ? studyEventDefinitionDao : new StudyEventDefinitionDAO(dataSource);
+        return studyEventDefinitionDao;
+    }
+
+    public StudyEventDAO getStudyEventDao() {
+        studyEventDao = studyEventDao != null ? studyEventDao : new StudyEventDAO(dataSource);
+        return studyEventDao;
     }
 
     /**

@@ -259,4 +259,18 @@ public class DomParsingService {
         }
         return siteList;
     }
+
+    public String getReferenceRangeValue(Node data, String name) throws Exception {
+        Element studyElement = (Element) data;
+        NodeList nlist = studyElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "referenceRange");
+        Node nlistNode = nlist.item(0);
+        return this.getElementValue(nlistNode, this.ISO_21090, name, "value");
+    }
+
+    public String getPerformedObservationValue(Node data, String name, String value) throws Exception {
+        Element studyElement = (Element) data;
+        NodeList nlist = studyElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "performedObservation");
+        Node nlistNode = nlist.item(0);
+        return this.getElementValue(nlistNode, this.CONNECTOR_NAMESPACE_V1, name, value);
+    }
 }
