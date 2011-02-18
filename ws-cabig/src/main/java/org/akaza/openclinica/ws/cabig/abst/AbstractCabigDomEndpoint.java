@@ -71,6 +71,7 @@ public class AbstractCabigDomEndpoint extends AbstractDomPayloadEndpoint {
     StudyEventDAO studyEventDao;
     EventCRFDAO eventCrfDao;
     ItemDataDAO itemDataDao;
+    UserAccountDAO userAccountDao;
 
     public DataSource dataSource;
     public MessageSource messages;
@@ -148,6 +149,11 @@ public class AbstractCabigDomEndpoint extends AbstractDomPayloadEndpoint {
     public ItemDataDAO getItemDataDao() {
         itemDataDao = itemDataDao != null ? itemDataDao : new ItemDataDAO(dataSource);
         return itemDataDao;
+    }
+
+    public UserAccountDAO getUserAccountDao() {
+        userAccountDao = userAccountDao != null ? userAccountDao : new UserAccountDAO(dataSource);
+        return userAccountDao;
     }
 
     /**

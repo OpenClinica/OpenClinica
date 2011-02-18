@@ -14,7 +14,9 @@
  */
 package org.akaza.openclinica.ws.cabig;
 
+import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.dao.core.CoreResources;
@@ -196,11 +198,20 @@ public class CreateStudyEndpoint extends AbstractCabigDomEndpoint {
                 studyBean.getStudyParameterConfig().setSubjectIdGeneration("auto non-editable");
                 if (!updateMe) {
                     studyBean = (StudyBean) getStudyDao().create(studyBean);
+                    studyBean = this.createStudyParameters(studyBean);
+                    // 7670 create a user role for this study
+                    StudyUserRoleBean sub = new StudyUserRoleBean();
+                    sub.setRole(Role.COORDINATOR);
+                    sub.setStudyId(studyBean.getId());
+                    sub.setStatus(Status.AVAILABLE);
+                    sub.setOwner(getUserAccount());
+                    getUserAccountDao().createStudyUserRole(getUserAccount(), sub);
+                    System.out.println("just created study and role for user " + getUserAccount().getName());
                 } else {
                     studyBean.setOldStatus(Status.DELETED);
                     studyBean = (StudyBean) getStudyDao().update(studyBean);
+                    // do we add the user? no
                 }
-                studyBean = this.createStudyParameters(studyBean);
 
                 if (!updateMe) {
                     for (StudyBean site : sites) {
