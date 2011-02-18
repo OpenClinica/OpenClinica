@@ -43,7 +43,6 @@ public class LoadLabsEndpoint extends AbstractCabigDomEndpoint {
             // ^ unlike the other two request endpoints this will take the whole document and parse it in the service
             // push the odm container into the database using the data import service
             StudyBean studyBean = getStudyDao().findByOid(odmContainer.getCrfDataPostImportContainer().getStudyOID());
-            // String uniquIdentifier = xmlService.getPerformedObservationValue(data, "studySubjectIdentifier", "extension");
 
             SubjectBean subjectBean = getSubjectDao().findByUniqueIdentifier(odmContainer.getSubjectUniqueIdentifier());
             StudySubjectBean studySubjectBean = getStudySubjectDao().findBySubjectIdAndStudy(subjectBean.getId(), studyBean);
@@ -53,8 +52,10 @@ public class LoadLabsEndpoint extends AbstractCabigDomEndpoint {
                 getStudyEventDefinitionDao().findByOid(
                         odmContainer.getCrfDataPostImportContainer().getSubjectData().get(0).getStudyEventData().get(0).getStudyEventOID());
             StudyEventBean newStudyEventBean = createNewStudyEventBean(studyEventDefBean, studySubjectBean);
-            // or do we update instead if it exists?
-            ArrayList<String> messages = labService.importData(dataSource, coreResources, studyBean, getUserAccount(), odmContainer);
+            System.out.println("created new study event bean " + newStudyEventBean.getId() + " sed " + newStudyEventBean.getStudyEventDefinitionId() + " ord "
+                + newStudyEventBean.getSampleOrdinal());
+            // or do we update instead if it exists? no, because we delete on rollback
+            ArrayList<String> messages = labService.importData(dataSource, coreResources, studyBean, getUserAccount(), odmContainer, newStudyEventBean);
             if ("fail".equals(messages.get(0))) {
                 return this.mapLoadLabsErrorConfirmation(messages.get(1), new CCBusinessFaultException("Invalid Lab Data", "CC10310"));
             } else {
@@ -78,22 +79,29 @@ public class LoadLabsEndpoint extends AbstractCabigDomEndpoint {
     }
 
     private StudyEventBean createNewStudyEventBean(StudyEventDefinitionBean sedBean, StudySubjectBean studySubjectBean) {
-        StudyEventBean newStudyEventBean = new StudyEventBean();
-        newStudyEventBean.setCreatedDate(new Date(System.currentTimeMillis()));
-        // set date started
-        newStudyEventBean.setDateStarted(new Date(System.currentTimeMillis()));
-        newStudyEventBean.setStudyEventDefinition(sedBean);
-        newStudyEventBean.setStudyEventDefinitionId(sedBean.getId());
-        newStudyEventBean.setSampleOrdinal(getStudyEventDao().getMaxSampleOrdinal(sedBean, studySubjectBean));// to be updated
-        newStudyEventBean.setStartTimeFlag(true);
-        newStudyEventBean.setEndTimeFlag(false);
-        newStudyEventBean.setOwner(getUserAccount());
-        newStudyEventBean.setStatus(Status.AVAILABLE);
-        newStudyEventBean.setSubjectEventStatus(SubjectEventStatus.DATA_ENTRY_STARTED);
-        // StudySubjectBean studySubject = getStudySubjectDao().findBySubjectIdAndStudy(subjectId, study)
-        newStudyEventBean.setStudySubject(studySubjectBean);
-        newStudyEventBean.setStudySubjectId(studySubjectBean.getId());
-        newStudyEventBean = (StudyEventBean) getStudyEventDao().create(newStudyEventBean);
-        return newStudyEventBean;
+        int ordinal = getStudyEventDao().getMaxSampleOrdinal(sedBean, studySubjectBean);
+        StudyEventBean testStudyEventBean =
+            (StudyEventBean) getStudyEventDao().findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(), sedBean.getId(), ordinal);
+        if (testStudyEventBean != null && testStudyEventBean.getId() > 0) {
+            return testStudyEventBean;
+        } else {
+            StudyEventBean newStudyEventBean = new StudyEventBean();
+            newStudyEventBean.setCreatedDate(new Date(System.currentTimeMillis()));
+            // set date started
+            newStudyEventBean.setDateStarted(new Date(System.currentTimeMillis()));
+            newStudyEventBean.setStudyEventDefinition(sedBean);
+            newStudyEventBean.setStudyEventDefinitionId(sedBean.getId());
+            newStudyEventBean.setSampleOrdinal(ordinal);// to be updated
+            newStudyEventBean.setStartTimeFlag(true);
+            newStudyEventBean.setEndTimeFlag(false);
+            newStudyEventBean.setOwner(getUserAccount());
+            newStudyEventBean.setStatus(Status.AVAILABLE);
+            newStudyEventBean.setSubjectEventStatus(SubjectEventStatus.DATA_ENTRY_STARTED);
+            // StudySubjectBean studySubject = getStudySubjectDao().findBySubjectIdAndStudy(subjectId, study)
+            newStudyEventBean.setStudySubject(studySubjectBean);
+            newStudyEventBean.setStudySubjectId(studySubjectBean.getId());
+            newStudyEventBean = (StudyEventBean) getStudyEventDao().create(newStudyEventBean);
+            return newStudyEventBean;
+        }
     }
 }

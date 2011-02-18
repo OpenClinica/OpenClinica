@@ -24,7 +24,9 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
+import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
@@ -67,6 +69,8 @@ public class AbstractCabigDomEndpoint extends AbstractDomPayloadEndpoint {
     CRFVersionDAO crfVersionDao;
     StudyEventDefinitionDAO studyEventDefinitionDao;
     StudyEventDAO studyEventDao;
+    EventCRFDAO eventCrfDao;
+    ItemDataDAO itemDataDao;
 
     public DataSource dataSource;
     public MessageSource messages;
@@ -134,6 +138,16 @@ public class AbstractCabigDomEndpoint extends AbstractDomPayloadEndpoint {
     public StudyEventDAO getStudyEventDao() {
         studyEventDao = studyEventDao != null ? studyEventDao : new StudyEventDAO(dataSource);
         return studyEventDao;
+    }
+
+    public EventCRFDAO getEventCrfDao() {
+        eventCrfDao = eventCrfDao != null ? eventCrfDao : new EventCRFDAO(dataSource);
+        return eventCrfDao;
+    }
+
+    public ItemDataDAO getItemDataDao() {
+        itemDataDao = itemDataDao != null ? itemDataDao : new ItemDataDAO(dataSource);
+        return itemDataDao;
     }
 
     /**

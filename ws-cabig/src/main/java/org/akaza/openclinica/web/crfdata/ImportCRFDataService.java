@@ -83,7 +83,7 @@ public class ImportCRFDataService {
      * purpose: look up EventCRFBeans by the following: Study Subject, Study Event, CRF Version, using the findByEventSubjectVersion method in EventCRFDAO. May
      * return more than one, hmm.
      */
-    public List<EventCRFBean> fetchEventCRFBeans(ODMContainer odmContainer, UserAccountBean ub) {
+    public List<EventCRFBean> fetchEventCRFBeans(ODMContainer odmContainer, UserAccountBean ub, StudyEventBean studyEventBean) {
         ArrayList<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();
         ArrayList<Integer> eventCRFBeanIds = new ArrayList<Integer>();
         EventCRFDAO eventCrfDAO = new EventCRFDAO(ds);
@@ -122,10 +122,11 @@ public class ImportCRFDataService {
                             + sampleOrdinal);
                         // iterate the studyeventbeans here
                         // for (StudyEventBean studyEventBean : studyEventBeans) {
-
-                        StudyEventBean studyEventBean =
-                            (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(), studyEventDefinitionBean
-                                    .getId(), Integer.parseInt(sampleOrdinal));
+                        if (studyEventBean == null) {
+                            studyEventBean =
+                                (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(), studyEventDefinitionBean
+                                        .getId(), Integer.parseInt(sampleOrdinal));
+                        }
 
                         ArrayList<EventCRFBean> eventCrfBeans = eventCrfDAO.findByEventSubjectVersion(studyEventBean, studySubjectBean, crfVersionBean);
                         // what if we have begun with creating a study
@@ -220,8 +221,8 @@ public class ImportCRFDataService {
     }
 
     public List<DisplayItemBeanWrapper> lookupValidationErrors(HttpServletRequest request, ODMContainer odmContainer, UserAccountBean ub,
-            HashMap<String, String> totalValidationErrors, HashMap<String, String> hardValidationErrors, ArrayList<Integer> permittedEventCRFIds)
-            throws OpenClinicaException {
+            HashMap<String, String> totalValidationErrors, HashMap<String, String> hardValidationErrors, ArrayList<Integer> permittedEventCRFIds,
+            StudyEventBean studyEvent) throws OpenClinicaException {
 
         DisplayItemBeanWrapper displayItemBeanWrapper = null;
         HashMap validationErrors = new HashMap();
@@ -273,8 +274,10 @@ public class ImportCRFDataService {
                     // trying to catch NPEs, because tags can be without the
                     // repeat key
                 }
-                StudyEventBean studyEvent =
-                    (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(), sedBean.getId(), ordinal);
+                if (studyEvent == null) {
+                    studyEvent =
+                        (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(), sedBean.getId(), ordinal);
+                }
 
                 displayItemBeans = new ArrayList<DisplayItemBean>();
                 // INIT here instead, tbh 08/2008
@@ -304,7 +307,7 @@ public class ImportCRFDataService {
                     // instead work on sections
                     EventCRFBean eventCRFBean = eventCRFDAO.findByEventCrfVersion(studyEvent, crfVersion);
                     // >>tbh, 09/2008
-                    // logger.debug("found event crf bean: using study event " + studyEvent.getId() + " crf version name: " + crfVersion.getOid());
+                    System.out.println("found event crf bean: using study event " + studyEvent.getId() + " crf version oid: " + crfVersion.getOid());
                     // >>
                     EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(ds);
                     EventDefinitionCRFBean eventDefinitionCRF =

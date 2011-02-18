@@ -7,6 +7,7 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
@@ -109,7 +110,7 @@ public class DataImportService {
     }
 
     public ArrayList<String> importProcessedData(DataSource dataSource, CoreResources resources, StudyBean studyBean, UserAccountBean userBean,
-            ODMContainer odmContainer, StringBuffer msg, StringBuffer auditMsg, boolean checkEventCrf) throws Exception {
+            ODMContainer odmContainer, StringBuffer msg, StringBuffer auditMsg, boolean checkEventCrf, StudyEventBean studyEventBean) throws Exception {
         List<String> errors = new ArrayList<String>();
         TriggerService triggerService = new TriggerService();
         locale = new Locale("en-US");
@@ -149,7 +150,7 @@ public class DataImportService {
         // end cut here, skip event crf validation, since we create it, tbh 02/2011
         // the below creates the event crf, apparently, so let's go with it
         // validation errors, the same as in the ImportCRFDataServlet. DRY?
-        List<EventCRFBean> eventCRFBeans = getImportCRFDataService(dataSource).fetchEventCRFBeans(odmContainer, userBean);
+        List<EventCRFBean> eventCRFBeans = getImportCRFDataService(dataSource).fetchEventCRFBeans(odmContainer, userBean, studyEventBean);
 
         ArrayList<Integer> permittedEventCRFIds = new ArrayList<Integer>();
         System.out.println("found a list of eventCRFBeans: " + eventCRFBeans.toString());
@@ -208,7 +209,7 @@ public class DataImportService {
                 List<DisplayItemBeanWrapper> tempDisplayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
                 tempDisplayItemBeanWrappers =
                     getImportCRFDataService(dataSource).lookupValidationErrors(request, odmContainer, userBean, totalValidationErrors, hardValidationErrors,
-                            permittedEventCRFIds);
+                            permittedEventCRFIds, studyEventBean);
                 System.out.println("size of total validation errors: " + totalValidationErrors.size());
                 displayItemBeanWrappers.addAll(tempDisplayItemBeanWrappers);
             } catch (NullPointerException npe1) {
@@ -453,7 +454,7 @@ public class DataImportService {
         // next: check, then import
         // first cut here, tbh 02/2011
         // cut all the way to the end and pass it an odm container and a generated event crf? just a thought
-        return importProcessedData(dataSource, resources, studyBean, userBean, odmContainer, msg, auditMsg, true);
+        return importProcessedData(dataSource, resources, studyBean, userBean, odmContainer, msg, auditMsg, true, null);
     }
 
     public ArrayList<String> getFailReturnList(String msg, String auditMsg) {

@@ -2,6 +2,7 @@ package org.akaza.openclinica.ws.logic;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
@@ -120,10 +121,10 @@ public class LoadLabsService {
         return odmContainer;
     }
 
-    public ArrayList<String> importData(DataSource dataSource, CoreResources resources, StudyBean studyBean, UserAccountBean userBean, ODMContainer odmContainer)
-            throws Exception {
+    public ArrayList<String> importData(DataSource dataSource, CoreResources resources, StudyBean studyBean, UserAccountBean userBean,
+            ODMContainer odmContainer, StudyEventBean studyEventBean) throws Exception {
         return new DataImportService().importProcessedData(dataSource, resources, studyBean, userBean, odmContainer, new StringBuffer(), new StringBuffer(),
-                false);
+                false, studyEventBean);
     }
 
     private ArrayList<ImportItemDataBean> generateItemDataList(Node data, ItemDAO itemDao) throws Exception {
