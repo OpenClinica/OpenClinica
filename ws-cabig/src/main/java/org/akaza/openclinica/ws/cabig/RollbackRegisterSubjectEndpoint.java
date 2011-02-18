@@ -103,6 +103,10 @@ public class RollbackRegisterSubjectEndpoint extends AbstractCabigDomEndpoint {
                     checkSubjectBean.setUpdater(this.getUserAccount());
                     checkStudySubjectBean = (StudySubjectBean) getStudySubjectDao().update(checkStudySubjectBean);
                     checkSubjectBean = (SubjectBean) getSubjectDao().update(checkSubjectBean);
+                    // update everything else associated with the subject
+                    checkSubjectBean =
+                        subjectService.changeStatus(Status.AVAILABLE, Status.AUTO_DELETED, checkSubjectBean, user, getSubjectDao(), getStudySubjectDao(),
+                                getEventCrfDao(), getItemDataDao(), getStudyEventDao());
                     System.out.println("completed updates to deleted");
 
                 }

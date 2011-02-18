@@ -142,6 +142,10 @@ public class RegisterSubjectEndpoint extends AbstractCabigDomEndpoint {
                     // ///////////////////////////////////////////////////////////////////////////////////////////////
                     if (updateMe) {
                         finalSubjectBean = (SubjectBean) getSubjectDao().update(finalSubjectBean);
+                        // if it is an update, update all events that are previously taken away too
+                        finalSubjectBean =
+                            subjectService.changeStatus(Status.AUTO_DELETED, Status.AVAILABLE, finalSubjectBean, user, getSubjectDao(), getStudySubjectDao(),
+                                    getEventCrfDao(), getItemDataDao(), getStudyEventDao());
                     } else {
                         finalSubjectBean = getSubjectDao().create(finalSubjectBean);
                     }

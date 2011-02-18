@@ -87,28 +87,28 @@ public class LoadLabsEndpoint extends AbstractCabigDomEndpoint {
      */
     private StudyEventBean createNewStudyEventBean(StudyEventDefinitionBean sedBean, StudySubjectBean studySubjectBean) {
         int ordinal = getStudyEventDao().getMaxSampleOrdinal(sedBean, studySubjectBean);
-        StudyEventBean testStudyEventBean =
-            (StudyEventBean) getStudyEventDao().findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(), sedBean.getId(), ordinal);
-        if (testStudyEventBean != null && testStudyEventBean.getId() > 0) {
-            return testStudyEventBean;
-        } else {
-            StudyEventBean newStudyEventBean = new StudyEventBean();
-            newStudyEventBean.setCreatedDate(new Date(System.currentTimeMillis()));
-            // set date started
-            newStudyEventBean.setDateStarted(new Date(System.currentTimeMillis()));
-            newStudyEventBean.setStudyEventDefinition(sedBean);
-            newStudyEventBean.setStudyEventDefinitionId(sedBean.getId());
-            newStudyEventBean.setSampleOrdinal(ordinal + 1);// to be updated
-            newStudyEventBean.setStartTimeFlag(true);
-            newStudyEventBean.setEndTimeFlag(false);
-            newStudyEventBean.setOwner(getUserAccount());
-            newStudyEventBean.setStatus(Status.AVAILABLE);
-            newStudyEventBean.setSubjectEventStatus(SubjectEventStatus.DATA_ENTRY_STARTED);
-            // StudySubjectBean studySubject = getStudySubjectDao().findBySubjectIdAndStudy(subjectId, study)
-            newStudyEventBean.setStudySubject(studySubjectBean);
-            newStudyEventBean.setStudySubjectId(studySubjectBean.getId());
-            newStudyEventBean = (StudyEventBean) getStudyEventDao().create(newStudyEventBean);
-            return newStudyEventBean;
-        }
+        // StudyEventBean testStudyEventBean =
+        // (StudyEventBean) getStudyEventDao().findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(), sedBean.getId(), ordinal);
+        // if (testStudyEventBean != null && testStudyEventBean.getId() > 0) {
+        // return testStudyEventBean;
+        // } else {
+        StudyEventBean newStudyEventBean = new StudyEventBean();
+        newStudyEventBean.setCreatedDate(new Date(System.currentTimeMillis()));
+        // set date started
+        newStudyEventBean.setDateStarted(new Date(System.currentTimeMillis()));
+        newStudyEventBean.setStudyEventDefinition(sedBean);
+        newStudyEventBean.setStudyEventDefinitionId(sedBean.getId());
+        newStudyEventBean.setSampleOrdinal(ordinal + 1);// to be updated
+        newStudyEventBean.setStartTimeFlag(true);
+        newStudyEventBean.setEndTimeFlag(false);
+        newStudyEventBean.setOwner(getUserAccount());
+        newStudyEventBean.setStatus(Status.AVAILABLE);
+        newStudyEventBean.setSubjectEventStatus(SubjectEventStatus.DATA_ENTRY_STARTED);
+        // StudySubjectBean studySubject = getStudySubjectDao().findBySubjectIdAndStudy(subjectId, study)
+        newStudyEventBean.setStudySubject(studySubjectBean);
+        newStudyEventBean.setStudySubjectId(studySubjectBean.getId());
+        newStudyEventBean = (StudyEventBean) getStudyEventDao().create(newStudyEventBean);
+        return newStudyEventBean;
+        // }
     }
 }
