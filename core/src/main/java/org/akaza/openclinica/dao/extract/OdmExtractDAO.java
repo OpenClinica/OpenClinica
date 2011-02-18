@@ -77,6 +77,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.sql.DataSource;
 
@@ -1271,7 +1272,7 @@ public class OdmExtractDAO extends DatasetDAO {
             itemResponse.setResponseType(ResponseType.get(rsTypeId).getName());
             itInForm.setItemResponse(itemResponse);
             itDetail.getItemPresentInForm().add(itInForm);
-            inPoses.put(cvOID, itDetail.getItemPresentInForm().size()-1);
+            inPoses.put(itOID+"-"+cvOID, itDetail.getItemPresentInForm().size()-1);
         }
         
         this.getSCDs(cvIds, its, itPoses, inPoses);
@@ -1299,10 +1300,10 @@ public class OdmExtractDAO extends DatasetDAO {
                     scd.setControlItemName(controlItemName);
                     scd.setOptionValue(option);
                     scd.setMessage(message);
-                    if(itPoses.containsKey(itOID)) {
-                        its.get(itPoses.get(itOID)).getItemDetails().getItemPresentInForm().get(inFormPoses.get(cvOID)).setSimpleConditionalDisplay(scd);
+                    if(itPoses.containsKey(itOID) && inFormPoses.containsKey(itOID+"-"+cvOID)) {
+                        its.get(itPoses.get(itOID)).getItemDetails().getItemPresentInForm().get(inFormPoses.get(itOID+"-"+cvOID)).setSimpleConditionalDisplay(scd);
                     } else {
-                        logger.info("There is no <ItemDef> with item_oid="+itOID+".");
+                        logger.info("There is no <ItemDef> with item_oid="+itOID+" or has <ItemPresentInForm> with FormOID="+cvOID+".");
                     }
                 }else {
                     logger.info("No Simple Conditional Display added for <ItemDef> with crf_version_oid="+cvOID+" and item_oid="+itOID);
@@ -1583,7 +1584,8 @@ public class OdmExtractDAO extends DatasetDAO {
                         ImportItemDataBean it = new ImportItemDataBean();
                         it.setItemOID(itOID);
                         it.setTransactionType("Insert");
-                        if (ClinicalDataUnit.isNull(itValue, study.getId() + "-" + se.getStudyEventOID() + "-" + form.getFormOID(), nullValueCVs)) {
+                        String nullKey = study.getId() + "-" + se.getStudyEventOID() + "-" + form.getFormOID();
+                        if (ClinicalDataUnit.isNull(itValue, nullKey, nullValueCVs)) {
                             // if
                             // (nullValueMap.containsKey(itValue.trim().toUpperCase()))
                             // {
@@ -1591,7 +1593,15 @@ public class OdmExtractDAO extends DatasetDAO {
                             // nullValueMap.get(itValue.trim().toUpperCase());
 
                             it.setIsNull("Yes");
-                            it.setReasonForNull(itValue.trim());
+                            TreeSet<String> nulls = ClinicalDataUnit.genNullSet(nullValueCVs.get(nullKey));
+                            boolean hasValueWithNull = ClinicalDataUnit.isValueWithNull(itValue, nulls);
+                            it.setHasValueWithNull(hasValueWithNull);
+                            if(hasValueWithNull) {
+                                it.setValue(itValue);
+                                it.setReasonForNull(ClinicalDataUnit.getNullsInValue(itValue, nulls));
+                            }else {
+                                it.setReasonForNull(itValue.trim());
+                            }
                         } else {
                             if (datatypeid == 9) {
                                 try {
@@ -1646,8 +1656,12 @@ public class OdmExtractDAO extends DatasetDAO {
           }
           else if (odmVersion.startsWith("oc")) {
             idataIds = idataIds.length() > 0 ? idataIds.substring(0, idataIds.length() - 2) : idataIds;
-            setOCItemDataAuditLogs(study, data, idataIds, idataOidPoses);
-            setOCItemDataDNs(data, idataIds, idataOidPoses);
+            if(idataIds.length()>0) {
+                setOCItemDataAuditLogs(study, data, idataIds, idataOidPoses);
+                setOCItemDataDNs(data, idataIds, idataOidPoses);
+            } else {
+                logger.info("OdmExtractDAO.setOCItemDataAuditLogs & setOCItemDataDNs weren't called because of empty idataIds");
+            }
         }
     }
 
@@ -2318,17 +2332,29 @@ public class OdmExtractDAO extends DatasetDAO {
             System.out.println("No Audit logs or discrepancy Notes");
         }
         else{
-        this.setOCSubjectDataAuditLogs(parentStudy, data, studySubjectOids, subOidPoses);
-
-        this.setOCEventDataAuditLogs(parentStudy, data, studySubjectOids, evnOidPoses);
-
-        this.setOCFormDataAuditLogs(parentStudy, data, studySubjectOids, ecIds, oidPoses);
-
-        this.setOCSubjectDataDNs(data, studySubjectOids, subOidPoses);
-
-        this.setOCEventDataDNs(data, sedOids, studySubjectOids, evnOidPoses);
-
-        this.setOCFormDataDNs(data, ecIds, oidPoses);
+            if(studySubjectOids.length()>0) {
+                this.setOCSubjectDataAuditLogs(parentStudy, data, studySubjectOids, subOidPoses);
+                this.setOCEventDataAuditLogs(parentStudy, data, studySubjectOids, evnOidPoses);
+                if(ecIds.length()>0) {
+                    this.setOCFormDataAuditLogs(parentStudy, data, studySubjectOids, ecIds, oidPoses);
+                } else{
+                    logger.info("OdmExtractDAO.setOCFormDataAuditLogs wasn't called because of empty ecIds");
+                }
+                this.setOCSubjectDataDNs(data, studySubjectOids, subOidPoses);
+                if(sedOids.length()>0) {
+                    this.setOCEventDataDNs(data, sedOids, studySubjectOids, evnOidPoses);
+                } else {
+                    logger.info("OdmExtractDAO.setOCEventDataDNs wasn't called because of empty sedOids");
+                }
+            } else {
+                logger.info("OdmExtractDAO methods(setOCSubjectDataAuditLogs,setOCEventDataAuditLogs,setOCFormDataAuditLogs,"
+                        + "setOCSubjectDataDNs,setOCEventDataDNs) weren't called because of empty studySubjectOids");
+            }
+            if(ecIds.length()>0) {
+                this.setOCFormDataDNs(data, ecIds, oidPoses);
+            } else {
+                logger.info("OdmExtractDAO.setOCFormDataDNs wasn't called because of empty ecIds");
+            }
         }
     }
 

@@ -157,18 +157,25 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                         }
                         xml.append("TransactionType=\"Insert\">");
                         xml.append(nls);
+                        boolean printValue = true;
                         ArrayList<ImportItemDataBean> items = ig.getItemData();
                         for (ImportItemDataBean item : items) {
+                            xml.append(indent + indent + indent + indent + indent + indent + "<ItemData ItemOID=\""
+                                    + StringEscapeUtils.escapeXml(item.getItemOID()) + "\" ");
                             if ("Yes".equals(item.getIsNull())) {
-                                xml.append(indent + indent + indent + indent + indent + indent + "<ItemData ItemOID=\""
-                                    + StringEscapeUtils.escapeXml(item.getItemOID()) + "\" IsNull=\"Yes\"");
+                                xml.append("IsNull=\"Yes\"");
                                 if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
-                                    xml.append(" OpenClinica:ReasonForNull=\"" + StringEscapeUtils.escapeXml(item.getReasonForNull()) + "\"/>");
+                                    xml.append(" OpenClinica:ReasonForNull=\"" + StringEscapeUtils.escapeXml(item.getReasonForNull()) + "\" ");
+                                    if(!item.isHasValueWithNull()) {
+                                        printValue = false;
+                                        xml.append("/>");
+                                        xml.append(nls);
+                                    }
                                 }
-                            } else {
+                            } 
+                            if(printValue) {
                                 Boolean hasElm = false;
-                                xml.append(indent + indent + indent + indent + indent + indent + "<ItemData ItemOID=\""
-                                    + StringEscapeUtils.escapeXml(item.getItemOID()) + "\" Value=\"" + StringEscapeUtils.escapeXml(item.getValue()) + "\"");
+                                xml.append("Value=\"" + StringEscapeUtils.escapeXml(item.getValue()) + "\"");
 
                                 String muRefOid = item.getMeasurementUnitRef().getElementDefOID();
                                 if (muRefOid != null && muRefOid.length() > 0) {
@@ -217,6 +224,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                         }
                         xml.append(indent + indent + indent + indent + indent + "</ItemGroupData>");
                         xml.append(nls);
+                        System.out.println("Here is xml="+xml.toString());
                     }
                     //
                     if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {

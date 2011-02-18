@@ -13,6 +13,8 @@ public class ImportItemDataBean {
     private String reasonForNull;
     private AuditLogsBean auditLogs = new AuditLogsBean();
     private DiscrepancyNotesBean discrepancyNotes = new DiscrepancyNotesBean();
+    
+    private boolean hasValueWithNull; //this is just a flag, it is not an attribute/element
 
     public String getItemOID() {
         return itemOID;
@@ -76,5 +78,13 @@ public class ImportItemDataBean {
 
     public void setDiscrepancyNotes(DiscrepancyNotesBean discrepancyNotes) {
         this.discrepancyNotes = discrepancyNotes;
+    }
+
+    public boolean isHasValueWithNull() {
+        return hasValueWithNull;
+    }
+
+    public void setHasValueWithNull(boolean hasValueWithNull) {
+        this.hasValueWithNull = hasValueWithNull;
     }
 }
