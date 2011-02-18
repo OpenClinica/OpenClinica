@@ -17,11 +17,19 @@ package org.akaza.openclinica.ws.logic;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.ws.bean.RegisterSubjectBean;
 import org.akaza.openclinica.ws.cabig.exception.CCBusinessFaultException;
 import org.akaza.openclinica.ws.cabig.exception.CCDataValidationFaultException;
@@ -29,6 +37,7 @@ import org.w3c.dom.Node;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class RegisterSubjectService {
@@ -253,4 +262,70 @@ public class RegisterSubjectService {
         return true;
     }
 
+    /**
+     * changeStatus, which will allow us to change from AVAILABLE to AUTO_DELETED and vice versa.
+     * 
+     * @param oldStatus
+     * @param newStatus
+     * @param subjectBean
+     * @param user
+     *            , the updater
+     * @param subjectDao
+     * @param studySubjectDao
+     * @param eventCrfDao
+     * @param itemDataDao
+     * @param studyEventDao
+     * @return
+     */
+    public SubjectBean changeStatus(Status oldStatus, Status newStatus, SubjectBean subjectBean, UserAccountBean user, SubjectDAO subjectDao,
+            StudySubjectDAO studySubjectDao, EventCRFDAO eventCrfDao, ItemDataDAO itemDataDao, StudyEventDAO studyEventDao) {
+        ArrayList<StudySubjectBean> studySubs = studySubjectDao.findAllBySubjectId(subjectBean.getId());
+        for (int i = 0; i < studySubs.size(); i++) {
+            StudySubjectBean studySub = (StudySubjectBean) studySubs.get(i);
+            if (studySub.getStatus().equals(oldStatus)) {
+                studySub.setStatus(newStatus);
+                studySub.setUpdater(user);
+                studySub.setUpdatedDate(new Date());
+                studySubjectDao.update(studySub);
+            }
+        }
+        ArrayList<StudyEventBean> events = studyEventDao.findAllBySubjectId(subjectBean.getId());
+        // EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+
+        for (int j = 0; j < events.size(); j++) {
+            StudyEventBean event = (StudyEventBean) events.get(j);
+            if (event.getStatus().equals(oldStatus)) {
+                event.setStatus(newStatus);
+                event.setUpdater(user);
+                event.setUpdatedDate(new Date());
+                studyEventDao.update(event);
+
+                ArrayList eventCRFs = eventCrfDao.findAllByStudyEvent(event);
+
+                // ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
+                for (int k = 0; k < eventCRFs.size(); k++) {
+                    EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(k);
+                    if (eventCRF.getStatus().equals(oldStatus)) {
+                        eventCRF.setStatus(newStatus);
+                        eventCRF.setUpdater(user);
+                        eventCRF.setUpdatedDate(new Date());
+                        eventCrfDao.update(eventCRF);
+                        // restore all the item data
+                        ArrayList<ItemDataBean> itemDatas = itemDataDao.findAllByEventCRFId(eventCRF.getId());
+                        for (int a = 0; a < itemDatas.size(); a++) {
+                            ItemDataBean item = (ItemDataBean) itemDatas.get(a);
+                            if (item.getStatus().equals(oldStatus)) {
+                                item.setStatus(newStatus);
+                                item.setUpdater(user);
+                                item.setUpdatedDate(new Date());
+                                itemDataDao.update(item);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return subjectBean;
+    }
 }

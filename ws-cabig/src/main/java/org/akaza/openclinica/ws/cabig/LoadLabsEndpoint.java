@@ -78,6 +78,13 @@ public class LoadLabsEndpoint extends AbstractCabigDomEndpoint {
 
     }
 
+    /**
+     * generates our study event bean TODO try EventService instead?
+     * 
+     * @param sedBean
+     * @param studySubjectBean
+     * @return
+     */
     private StudyEventBean createNewStudyEventBean(StudyEventDefinitionBean sedBean, StudySubjectBean studySubjectBean) {
         int ordinal = getStudyEventDao().getMaxSampleOrdinal(sedBean, studySubjectBean);
         StudyEventBean testStudyEventBean =
@@ -91,7 +98,7 @@ public class LoadLabsEndpoint extends AbstractCabigDomEndpoint {
             newStudyEventBean.setDateStarted(new Date(System.currentTimeMillis()));
             newStudyEventBean.setStudyEventDefinition(sedBean);
             newStudyEventBean.setStudyEventDefinitionId(sedBean.getId());
-            newStudyEventBean.setSampleOrdinal(ordinal);// to be updated
+            newStudyEventBean.setSampleOrdinal(ordinal + 1);// to be updated
             newStudyEventBean.setStartTimeFlag(true);
             newStudyEventBean.setEndTimeFlag(false);
             newStudyEventBean.setOwner(getUserAccount());
