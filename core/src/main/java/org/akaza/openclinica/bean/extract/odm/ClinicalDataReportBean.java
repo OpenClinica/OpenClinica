@@ -224,7 +224,6 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                         }
                         xml.append(indent + indent + indent + indent + indent + "</ItemGroupData>");
                         xml.append(nls);
-                        System.out.println("Here is xml="+xml.toString());
                     }
                     //
                     if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
