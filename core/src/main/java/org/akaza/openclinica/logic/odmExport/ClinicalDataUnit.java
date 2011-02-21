@@ -16,8 +16,6 @@ import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
 import org.akaza.openclinica.dao.extract.OdmExtractDAO;
 
 import java.util.HashMap;
-import java.util.Set;
-import java.util.TreeSet;
 
 import javax.sql.DataSource;
 
@@ -103,37 +101,6 @@ public class ClinicalDataUnit extends OdmUnit {
             }
         }
         return false;
-    }
-    
-    public static TreeSet<String> genNullSet(String nullValueStr) {
-        TreeSet<String> nulls = new TreeSet<String>();
-        String[] ns = nullValueStr.split(",");
-        for(String s: ns) {
-            nulls.add(s.trim());
-        }
-        return nulls;
-    }
-    
-    public static boolean isValueWithNull(String itValue, Set<String> nulls) {
-        String[] values = itValue.split(",");
-        for(String v : values) {
-            if(!nulls.contains(v.trim())) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    public static String getNullsInValue(String itValue, Set<String> nulls) {
-        String vnull = ",";
-        String[] values = itValue.split(",");
-        for(String v : values) {
-            v = v.trim();
-            if(nulls.contains(v) && !vnull.contains(","+v+",")) {
-                vnull += v + ",";
-            }
-        }
-        return vnull.substring(1, vnull.length()-1);
     }
 
     public String getStudySubjectIds() {

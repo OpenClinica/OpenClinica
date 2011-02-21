@@ -64,7 +64,7 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.logic.odmExport.ClinicalDataUnit;
+import org.akaza.openclinica.logic.odmExport.ClinicalDataUtil;
 import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
 import org.akaza.openclinica.logic.odmExport.MetadataUnit;
 
@@ -77,7 +77,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.sql.DataSource;
 
@@ -1585,7 +1584,7 @@ public class OdmExtractDAO extends DatasetDAO {
                         it.setItemOID(itOID);
                         it.setTransactionType("Insert");
                         String nullKey = study.getId() + "-" + se.getStudyEventOID() + "-" + form.getFormOID();
-                        if (ClinicalDataUnit.isNull(itValue, nullKey, nullValueCVs)) {
+                        if (ClinicalDataUtil.isNull(itValue, nullKey, nullValueCVs)) {
                             // if
                             // (nullValueMap.containsKey(itValue.trim().toUpperCase()))
                             // {
@@ -1593,12 +1592,12 @@ public class OdmExtractDAO extends DatasetDAO {
                             // nullValueMap.get(itValue.trim().toUpperCase());
 
                             it.setIsNull("Yes");
-                            TreeSet<String> nulls = ClinicalDataUnit.genNullSet(nullValueCVs.get(nullKey));
-                            boolean hasValueWithNull = ClinicalDataUnit.isValueWithNull(itValue, nulls);
+                            String nullvalues = ClinicalDataUtil.presetNullValueStr(nullValueCVs.get(nullKey));
+                            boolean hasValueWithNull = ClinicalDataUtil.isValueWithNull(itValue, nullvalues);
                             it.setHasValueWithNull(hasValueWithNull);
                             if(hasValueWithNull) {
                                 it.setValue(itValue);
-                                it.setReasonForNull(ClinicalDataUnit.getNullsInValue(itValue, nulls));
+                                it.setReasonForNull(ClinicalDataUtil.getNullsInValue(itValue, nullvalues));
                             }else {
                                 it.setReasonForNull(itValue.trim());
                             }
