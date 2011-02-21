@@ -271,16 +271,17 @@ public class AbstractCabigDomEndpoint extends AbstractDomPayloadEndpoint {
         Element faultDetailMessage = document.createElementNS(CONNECTOR_NAMESPACE_V1, exception.className + "Fault"); // to be revised
         // add type
         faultDetailMessage.setAttributeNS(this.XSL_NAMESPACE, "type", exception.className + "Error");
-        Element errormessage = document.createElementNS(CONNECTOR_NAMESPACE_V1, "message");
+        // Element errormessage = document.createElementNS(CONNECTOR_NAMESPACE_V1, "message");
         // String confirmation = messages.getMessage("dataEndpoint.success", null, "Success", locale);
         Element code = document.createElementNS(CONNECTOR_NAMESPACE_V1, "code");
         code.setTextContent(exception.errorID);
         // TODO change to accept error codes
-        errormessage.appendChild(code);
-        Element reason = document.createElementNS(CONNECTOR_NAMESPACE_V1, "reason");
+        // errormessage.appendChild(code);
+        Element reason = document.createElementNS(CONNECTOR_NAMESPACE_V1, "message");
         reason.setTextContent(exception.message);
-        errormessage.appendChild(reason);
-        faultDetailMessage.appendChild(errormessage);
+        // errormessage.appendChild(reason);
+        faultDetailMessage.appendChild(code);
+        faultDetailMessage.appendChild(reason);
         // append validation messages here
         java.util.Iterator itValidations = validations.entrySet().iterator();
         while (itValidations.hasNext()) {
