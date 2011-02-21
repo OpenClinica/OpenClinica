@@ -164,10 +164,12 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                     + StringEscapeUtils.escapeXml(item.getItemOID()) + "\" ");
                             if ("Yes".equals(item.getIsNull())) {
                                 xml.append("IsNull=\"Yes\"");
+                                if(!item.isHasValueWithNull()) {
+                                    printValue = false;
+                                }
                                 if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
                                     xml.append(" OpenClinica:ReasonForNull=\"" + StringEscapeUtils.escapeXml(item.getReasonForNull()) + "\" ");
-                                    if(!item.isHasValueWithNull()) {
-                                        printValue = false;
+                                    if(!printValue) {
                                         xml.append("/>");
                                         xml.append(nls);
                                     }
