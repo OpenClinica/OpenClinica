@@ -84,7 +84,9 @@ public class RollbackRegisterSubjectEndpoint extends AbstractCabigDomEndpoint {
                     }
 
                     StudySubjectBean studySubjectBean = subjectService.generateStudySubjectBean(subjectBean, finalSubjectBean, subjectBean.getStudyBean());
-                    StudySubjectBean checkStudySubjectBean = getStudySubjectDao().findByLabelAndStudy(studySubjectBean.getLabel(), subjectBean.getStudyBean());
+                    // StudySubjectBean checkStudySubjectBean = getStudySubjectDao().findByLabelAndStudy(studySubjectBean.getLabel(),
+                    // subjectBean.getStudyBean());
+                    StudySubjectBean checkStudySubjectBean = getStudySubjectDao().findBySubjectIdAndStudy(checkSubjectBean.getId(), subjectBean.getStudyBean());
                     if (checkStudySubjectBean.getId() <= 0) {
                         throw new CCBusinessFaultException("No relationship with this SSID currently exists.  "
                             + "Please check your information and re-submit the form.");

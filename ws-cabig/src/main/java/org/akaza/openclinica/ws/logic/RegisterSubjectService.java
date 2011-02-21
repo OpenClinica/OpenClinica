@@ -60,8 +60,9 @@ public class RegisterSubjectService {
         StudyBean studyBean = new StudyBean();
         StudyBean siteBean = new StudyBean();
 
+        // change tbh 02/2011, was just site identifier
         if (subjectBean.getSiteUniqueIdentifier() != null) {
-            siteBean = studyDao.findByUniqueIdentifier(subjectBean.getSiteUniqueIdentifier());
+            siteBean = studyDao.findByUniqueIdentifier(subjectBean.getStudyUniqueIdentifier() + "_" + subjectBean.getSiteUniqueIdentifier());
         }
         studyBean = studyDao.findByUniqueIdentifier(subjectBean.getStudyUniqueIdentifier());
 
@@ -70,12 +71,14 @@ public class RegisterSubjectService {
         try {
             if (studyBean.getId() <= 0) {
                 // if no study exists with that name, there is an error
-                throw new CCBusinessFaultException("No study exists with that name, " + "please review your information and re-submit the request.", "CC10110");
+                throw new CCBusinessFaultException("No study exists with the name " + subjectBean.getStudyUniqueIdentifier() + ", "
+                    + "please review your information and re-submit the request.", "CC10110");
             }
             if (siteBean.getId() > 0) {
                 // if there is a site bean, the study bean should be its parent, otherwise there is an error
                 if ((siteBean.getParentStudyId() != studyBean.getId()) && (siteBean.getParentStudyId() != 0)) {
-                    throw new CCBusinessFaultException("Your parent and child study relationship is mismatched."
+                    throw new CCBusinessFaultException("Your parent and child study relationship is mismatched for the identifiers "
+                        + subjectBean.getStudyUniqueIdentifier() + " and " + subjectBean.getSiteUniqueIdentifier() + "."
                         + "  Please enter correct study and site information.", "CC10110");
                 }
                 studyBean = siteBean;

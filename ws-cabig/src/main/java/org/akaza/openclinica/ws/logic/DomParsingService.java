@@ -243,7 +243,7 @@ public class DomParsingService {
             site.setParentStudyName(study.getName());
             Node siteNode = nlist.item(j);
             Element siteElement = (Element) siteNode;
-            String siteIdentifier = this.getElementValue(siteNode, CONNECTOR_NAMESPACE_V1, "identifier", "extension");
+            // String siteIdentifier = this.getElementValue(siteNode, CONNECTOR_NAMESPACE_V1, "identifier", "extension");
             NodeList orgNodeList = siteElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "organization");
             Node orgNode = orgNodeList.item(0);
             String summary = this.getElementValue(orgNode, CONNECTOR_NAMESPACE_V1, "description", "value");
@@ -252,7 +252,9 @@ public class DomParsingService {
             site.setName(name);
             site.setFacilityName(name);
             String orgIdentifier = this.getElementValue(orgNode, CONNECTOR_NAMESPACE_V1, "identifier", "extension");
-            site.setIdentifier(orgIdentifier);
+            // updated tbh 02/2011, setting to STUDY_ID plus SITE_ID
+            site.setIdentifier(study.getIdentifier() + "_" + orgIdentifier);
+            System.out.println("setting identifier " + site.getIdentifier());
             // site or org?
             site = this.getPostalAddress(site, orgNode);
             siteList.add(site);
