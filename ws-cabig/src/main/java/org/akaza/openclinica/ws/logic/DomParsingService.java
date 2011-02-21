@@ -262,6 +262,32 @@ public class DomParsingService {
         return siteList;
     }
 
+    /**
+     * <ns2:studyProtocolIdentification> <ns2:assignedDate xmlns:ns1="uri:iso.org:21090" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns1:TS"
+     * nullFlavor="NI"/> <ns2:identifier xmlns:ns1="uri:iso.org:21090" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns1:II"
+     * root="2.16.840.1.113883.3.26.7.7" extension="AU-67001" identifierName="Study Protocol" displayable="false"/>
+     * 
+     * @param study
+     * @param studyNode
+     * @return
+     */
+    public StudyBean getStudyIdentifier(StudyBean study, Node studyNode) throws Exception {
+        Element studyElement = (Element) studyNode;
+        NodeList nlist = studyElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "studyFundingSponsor");
+        Node nlistNode = nlist.item(0);
+        Element nlistNodeElement = (Element) nlistNode;
+        NodeList nlist2 = nlistNodeElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "organization");
+        Node nameNode = nlist2.item(0);
+        String identifier = this.getElementValue(nameNode, CONNECTOR_NAMESPACE_V1, "identifier", "extension");
+
+        study.setIdentifier(identifier);
+        return study;
+    }
+
+    // /////////////////////////////////////////////////
+    // load labs-specific mappings
+    // /////////////////////////////////////////////////
+
     public String getReferenceRangeValue(Node data, String name) throws Exception {
         Element studyElement = (Element) data;
         NodeList nlist = studyElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "referenceRange");

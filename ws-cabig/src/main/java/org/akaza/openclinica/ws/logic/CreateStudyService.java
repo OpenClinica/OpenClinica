@@ -33,7 +33,7 @@ public class CreateStudyService {
         StudyBean studyBean = new StudyBean();
         studyBean.setOwner(user);
         DomParsingService xmlService = new DomParsingService();
-        studyBean.setIdentifier(xmlService.getElementValue(study, CONNECTOR_NAMESPACE_V1, "identifier", "extension"));
+        // studyBean.setIdentifier(xmlService.getElementValue(study, CONNECTOR_NAMESPACE_V1, "identifier", "extension"));
         studyBean.setStatus(Status.AVAILABLE);// coordinatingCenterStudyStatusCode?
         studyBean.setName(xmlService.getElementValue(study, this.CONNECTOR_NAMESPACE_V1, "officialTitle", "value"));
         studyBean.setPhase(xmlService.getElementValue(study, this.CONNECTOR_NAMESPACE_V1, "phaseCode", "code"));
@@ -48,6 +48,7 @@ public class CreateStudyService {
         studyBean = xmlService.getStudyInvestigator(studyBean, study);
         studyBean = xmlService.getStudyCenter(studyBean, study);
         studyBean = xmlService.getSponsorName(studyBean, study);
+        studyBean = xmlService.getStudyIdentifier(studyBean, study);
         // ArrayList<StudyBean> sites = xmlService.getSites(studyBean, study);
         return studyBean;
     }
