@@ -15,7 +15,7 @@
 
 	<!-- Parameterized separator/end of line characters for flexibility -->
 	<xsl:param name="sep" select="'&#x09;'" />
-	<xsl:param name="eol" select="'&#10;&#10;'" />
+	<xsl:param name="eol" select="'&#10;'" />
 	<!--E to represent Events -->
 	<xsl:variable name="E" select="'E'" />
 	<xsl:variable name="C" select="'C'" />
@@ -153,13 +153,14 @@
 		</xsl:if>
 
 
-		 <xsl:apply-templates 
-		 select="/odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData[generate-id() 
-			= generate-id(key('studyEvents',@StudyEventOID)[1])]" 
-		 mode="studyEventHeader" /> 
-<!--		<xsl:apply-templates-->
-<!--			select="//odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData/odm:FormData[generate-id() = generate-id(key('eventCRFs',@FormOID)[1])]"-->
-<!--			mode="formDataHeader"></xsl:apply-templates>-->
+		<xsl:apply-templates
+			select="/odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData[generate-id() 
+			= generate-id(key('studyEvents',@StudyEventOID)[1])]"
+			mode="studyEventHeader" />
+		<!-- <xsl:apply-templates -->
+		<!-- select="//odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData/odm:FormData[generate-id() 
+			= generate-id(key('eventCRFs',@FormOID)[1])]" -->
+		<!-- mode="formDataHeader"></xsl:apply-templates> -->
 
 
 		<!-- <xsl:apply-templates -->
@@ -252,7 +253,7 @@
 			select="odm:FormData[generate-id() = generate-id(key('eventCRFs',@FormOID)[1])]"
 			mode="formDataHeader">
 			<xsl:with-param name="eventPosition" select="$eventPosition" />
-			</xsl:apply-templates>
+		</xsl:apply-templates>
 	</xsl:template>
 
 
@@ -341,7 +342,7 @@
 
 	<xsl:template match="/odm:ODM/odm:ClinicalData/odm:SubjectData"
 		mode="allSubjectData">
-		<xsl:apply-templates select="@OpenClinica:StudySubjectId" />
+		<xsl:apply-templates select="@OpenClinica:StudySubjectID" />
 		<xsl:value-of select="$sep"></xsl:value-of>
 		<xsl:if test="$uniqueIdExist">
 			<xsl:value-of select="@OpenClinica:UniqueIdentifier"></xsl:value-of>
@@ -552,7 +553,7 @@
 			select="/odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData[generate-id() 	= generate-id(key('studyEvents',@StudyEventOID)[1])]">
 			<xsl:with-param name="crfPosition" select="$crfPosition" />
 			<xsl:with-param name="parentEvent" select="$parentEvent" />
-			<xsl:with-param name="eventPosition" select="$eventPosition"/>
+			<xsl:with-param name="eventPosition" select="$eventPosition" />
 		</xsl:apply-templates>
 		<xsl:apply-templates select="odm:ItemGroupData/odm:ItemData"
 			mode="itemDataColumnHeaders">
@@ -1351,44 +1352,56 @@
 			<xsl:value-of select="substring($DateTime, 1, 4)" />
 		</xsl:variable>
 
-		<xsl:value-of select="$year_of_date" />
+		<xsl:value-of select="$year_of_date"
+			disable-output-escaping="yes" />
 		<xsl:value-of select="'-'" />
 		<xsl:choose>
 			<xsl:when test="$month = '01'">
-				Jan
+				<xsl:text>Jan</xsl:text>
 			</xsl:when>
 			<xsl:when test="$month = '02'">
-				Feb
+				<xsl:text>Feb</xsl:text>
+
 			</xsl:when>
 			<xsl:when test="$month = '03'">
-				Mar
+				<xsl:text>Mar</xsl:text>
+
 			</xsl:when>
 			<xsl:when test="$month = '04'">
-				Apr
+				<xsl:text>Apr</xsl:text>
+
 			</xsl:when>
 			<xsl:when test="$month = '05'">
-				May
+
+				<xsl:text>May</xsl:text>
 			</xsl:when>
 			<xsl:when test="$month = '06'">
-				Jun
+
+				<xsl:text>Jun</xsl:text>
 			</xsl:when>
 			<xsl:when test="$month = '07'">
-				Jul
+
+				<xsl:text>Jul</xsl:text>
 			</xsl:when>
 			<xsl:when test="$month = '08'">
-				Aug
+
+				<xsl:text>Aug</xsl:text>
 			</xsl:when>
 			<xsl:when test="$month = '09'">
-				Sep
+
+				<xsl:text>Sep</xsl:text>
 			</xsl:when>
 			<xsl:when test="$month = '10'">
-				Oct
+
+				<xsl:text>Oct</xsl:text>
 			</xsl:when>
 			<xsl:when test="$month = '11'">
-				Nov
+
+				<xsl:text>Nov</xsl:text>
 			</xsl:when>
 			<xsl:when test="$month = '12'">
-				Dec
+
+				<xsl:text>Dec</xsl:text>
 			</xsl:when>
 		</xsl:choose>
 
