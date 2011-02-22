@@ -769,7 +769,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
             xml.append(nls);
             temp = study.getConditions();
             if (temp != null && temp.length() > 0) {
-                xml.append(currentIndent + indent + indent + "<OpenClinica:Conditions>" + StringEscapeUtils.escapeXml(temp) + "/<OpenClinica:Conditions>");
+                xml.append(currentIndent + indent + indent + "<OpenClinica:Conditions>" + StringEscapeUtils.escapeXml(temp) + "</OpenClinica:Conditions>");
                 xml.append(nls);
             }
             temp = study.getKeywords();
