@@ -559,6 +559,12 @@ public class OdmExtractDAO extends DatasetDAO {
         ++i; this.setTypeExpected(i, TypeNames.STRING); // option_value
         ++i; this.setTypeExpected(i, TypeNames.STRING); // message
     }
+    
+    public void setErasedScoreItemDataIdsTypesExpected() {
+        this.unsetTypeExpected();
+        int i=1; 
+        this.setTypeExpected(i, TypeNames.INT); // item_data_id
+    }
 
     public void getBasicDefinitions(int studyId, BasicDefinitionsBean basicDef) {
         ArrayList<MeasurementUnitBean> units = basicDef.getMeasurementUnits();
@@ -1650,16 +1656,47 @@ public class OdmExtractDAO extends DatasetDAO {
             }
         }
 
+        idataIds = idataIds.length() > 0 ? idataIds.substring(0, idataIds.length() - 2) : idataIds;
+        if(idataIds.length()>0 && itemIds.length()>0) {
+            this.setErasedScoreItemDataValues(data, itemIds, idataIds, idataOidPoses, odmVersion);
+        } else {
+            logger.info("OdmExtractDAO.setScoreItemDataNullValues was not called because of empty item_data_ids or/and item_ids");
+        }
+        
           if (odmType!=null && odmType.equalsIgnoreCase("clinical_data")) {
           System.out.println("Do not create discrepancy notes");
           }
           else if (odmVersion.startsWith("oc")) {
-            idataIds = idataIds.length() > 0 ? idataIds.substring(0, idataIds.length() - 2) : idataIds;
             if(idataIds.length()>0) {
                 setOCItemDataAuditLogs(study, data, idataIds, idataOidPoses);
                 setOCItemDataDNs(data, idataIds, idataOidPoses);
             } else {
                 logger.info("OdmExtractDAO.setOCItemDataAuditLogs & setOCItemDataDNs weren't called because of empty idataIds");
+            }
+        }
+    }
+    
+    protected void setErasedScoreItemDataValues(OdmClinicalDataBean data, String itemIds, String itemDataIds, HashMap<Integer,String> idataOidPoses, String odmVersion) {
+        this.setErasedScoreItemDataIdsTypesExpected();
+        ArrayList<Integer> rows = this.select(this.getErasedScoreItemDataIdsSql(itemIds, itemDataIds));
+        if(rows==null || rows.size()<1) {
+            logger.debug("OdmExtractDAO.getErasedScoreItemDataIdsSql return no erased score item_data_id" );
+        }else {
+            Iterator iter = rows.iterator();
+            while(iter.hasNext()) {
+                HashMap row = (HashMap) iter.next();
+                Integer idataId = (Integer) row.get("item_data_id");
+                if(idataOidPoses.containsKey(idataId)) {
+                    String[] poses = idataOidPoses.get(idataId).split("---");
+                    ImportItemDataBean idata =
+                        data.getExportSubjectData().get(Integer.parseInt(poses[0])).getExportStudyEventData().get(Integer.parseInt(poses[1])).getExportFormData()
+                                .get(Integer.parseInt(poses[2])).getItemGroupData().get(Integer.parseInt(poses[3])).getItemData().get(Integer.parseInt(poses[4]));
+                    idata.setIsNull("Yes");
+                    idata.setValue("");
+                    idata.setReasonForNull("Erased");
+                } else {
+                    logger.info("There is no erased score item data with item_data_id =" + idataId + " found in OdmClinicalData" );
+                }
             }
         }
     }
@@ -2919,5 +2956,13 @@ public class OdmExtractDAO extends DatasetDAO {
             + crfVersionIds + ") and im.item_form_metadata_id = scd.scd_item_form_metadata_id)ifm, item"
             + " where cv.crf_version_id in ("+ crfVersionIds + ") and cv.crf_version_id = ifm.crf_version_id"
             + " and ifm.item_id = item.item_id order by cv.crf_id, cv.crf_version_id desc, item.item_id";
+    }
+    
+    protected String getErasedScoreItemDataIdsSql(String itemIds, String idataIds) {
+        return "select idata.item_data_id from item_data idata where idata.value='<erased>'"
+            + " and idata.item_data_id in (" + idataIds + ") and idata.item_id in ("
+            + " select distinct ifm.item_id from item_form_metadata ifm where ifm.response_set_id in ("
+            + " select rs.response_set_id from response_set rs where rs.response_type_id in (8,9))"
+            + "      and ifm.item_id in " + itemIds + ")";
     }
 }
