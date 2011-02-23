@@ -154,8 +154,7 @@
 
 
 		<xsl:apply-templates
-			select="/odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData[generate-id() 
-			= generate-id(key('studyEvents',@StudyEventOID)[1])]"
+			select="/odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData"
 			mode="studyEventHeader" />
 		<!-- <xsl:apply-templates -->
 		<!-- select="//odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData/odm:FormData[generate-id() 
@@ -250,7 +249,7 @@
 			= generate-id(key('eventCRFs',@FormOID)[1])]" mode="formDataHeader"></xsl:apply-templates> 
 			</xsl:otherwise> </xsl:choose> -->
 		<xsl:apply-templates
-			select="odm:FormData[generate-id() = generate-id(key('eventCRFs',@FormOID)[1])]"
+			select="odm:FormData"
 			mode="formDataHeader">
 			<xsl:with-param name="eventPosition" select="$eventPosition" />
 		</xsl:apply-templates>
@@ -372,7 +371,7 @@
 		<xsl:variable name="subjectItems"
 			select="./odm:StudyEventData/odm:FormData/odm:ItemGroupData/odm:ItemData" />
 		<xsl:apply-templates
-			select="/odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData/odm:FormData[generate-id() = generate-id(key('eventCRFs',@FormOID)[1])]"
+			select="/odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData/odm:FormData"
 			mode="eventCRFData">
 			<xsl:with-param name="subjectForms"
 				select="/odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData/odm:FormData"></xsl:with-param>

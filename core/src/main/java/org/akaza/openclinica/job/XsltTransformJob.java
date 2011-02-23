@@ -21,6 +21,7 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.extract.GenerateExtractFileService;
+
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -84,6 +85,7 @@ public class XsltTransformJob extends QuartzJobBean {
     public static final String DELETE_OLD = "deleteOld";
     public static final String SUCCESS_MESSAGE = "SUCCESS_MESSAGE";
     public static final String FAILURE_MESSAGE = "FAILURE_MESSAGE";
+    public static final String XSLT_PATH="XSLT_PATH";
     private OpenClinicaMailSender mailSender;
     private DataSource dataSource;
     private GenerateExtractFileService generateFileService;
@@ -117,6 +119,7 @@ public class XsltTransformJob extends QuartzJobBean {
         Boolean exceptions = false;
         JobDataMap dataMap = context.getMergedJobDataMap();
         String localeStr = dataMap.getString(LOCALE);
+        int cnt = dataMap.getInt("count");
         DatasetBean datasetBean = null;
         if (localeStr != null) {
             locale = new Locale(localeStr);
@@ -135,7 +138,7 @@ public class XsltTransformJob extends QuartzJobBean {
             ruleSetRuleDao = (RuleSetRuleDao) appContext.getBean("ruleSetRuleDao");
 
             DatasetDAO dsdao = new DatasetDAO(dataSource);
-
+            
             // init all fields from the data map
             int userAccountId = dataMap.getInt(USER_ID);
             int studyId = dataMap.getInt(STUDY_ID);
@@ -177,6 +180,9 @@ public class XsltTransformJob extends QuartzJobBean {
             HashMap answerMap =
                 generateFileService.createODMFile(epBean.getFormat(), sysTimeBegin, generalFileDir, datasetBean, currentStudy, "", eb, currentStudy.getId(),
                         currentStudy.getParentStudyId(), "99", (Boolean) dataMap.get(ZIPPED), false, (Boolean) dataMap.get(DELETE_OLD), epBean.getOdmType());
+            
+            
+            
             // won't save a record of the XML to db
             // won't be a zipped file, so that we can submit it for
             // transformation
@@ -211,27 +217,44 @@ public class XsltTransformJob extends QuartzJobBean {
             // the stylesheet you specify. This method call also processes the
             // stylesheet
             // into a compiled Templates object.
-            in = new java.io.FileInputStream(dataMap.getString(XSL_FILE_PATH));
+            
+            
+            int numXLS = epBean.getFileName().length;
+            int fileCntr = 0;
+            final long start = System.currentTimeMillis();
+            String xmlFilePath = generalFileDir + ODMXMLFileName;
+            String endFile =null;
+           File oldFilesPath = new File(generalFileDir);
+            while(fileCntr<numXLS)
+            {
+                String xsltPath = dataMap.getString(XSLT_PATH)+ File.separator +epBean.getFileName()[fileCntr];
+           // in = new java.io.FileInputStream(dataMap.getString(XSL_FILE_PATH));
+                in = new java.io.FileInputStream(xsltPath);
 
             Transformer transformer = tFactory.newTransformer(new StreamSource(in));
 
-            // move xml generation here, tbh
-            String xmlFilePath = generalFileDir + ODMXMLFileName;
-            String endFile = outputPath + File.separator + dataMap.getString(POST_FILE_NAME);
-            File oldFilesPath = new File(generalFileDir);
+            
+           // String endFile = outputPath + File.separator + dataMap.getString(POST_FILE_NAME);
+           endFile = outputPath + File.separator + epBean.getExportFileName()[fileCntr];
+             
 
+          
+           
+            endFileStream = new FileOutputStream(endFile);
+            transformer.transform(new StreamSource(xmlFilePath), new StreamResult(endFileStream));
+            
+            // JN...CLOSE THE STREAM...HMMMM
+            in.close();
+            endFileStream.close();
+            
+            fileCntr++;
+            }
             if (oldFilesPath.isDirectory()) {
 
                 markForDelete = Arrays.asList(oldFilesPath.listFiles());
                 // logic to prevent deleting the file being created.
 
             }
-            final long start = System.currentTimeMillis();
-            endFileStream = new FileOutputStream(endFile);
-            transformer.transform(new StreamSource(xmlFilePath), new StreamResult(endFileStream));
-            // JN...CLOSE THE STREAM...HMMMM
-            in.close();
-            endFileStream.close();
             final long done = System.currentTimeMillis() - start;
             logger.info("--> job completed in " + done + " ms");
             // run post processing
@@ -350,12 +373,12 @@ public class XsltTransformJob extends QuartzJobBean {
                 // delete old files now
                 List<File> intermediateFiles = generateFileService.getOldFiles();
                 String[] dontDelFiles = epBean.getDoNotDelFiles();
-                int cnt = dataMap.getInt("count");
+              //JN: The following is the code for zipping up the files, in case of more than one xsl being provided.
                 if (dontDelFiles.length > 1 && zipped) {
                     // unzip(dontDelFiles);
                     logMe("count =====" + cnt + "dontDelFiles length==---" + dontDelFiles.length);
-
-                    if (cnt == dontDelFiles.length - 1) {
+                    
+                  //  if (cnt == dontDelFiles.length - 1) {
                         logMe("Entering this?" + cnt + "dontDelFiles" + dontDelFiles);
                         File temp = new File(endFile);
                         String path = outputPath + File.separator;
@@ -370,7 +393,7 @@ public class XsltTransformJob extends QuartzJobBean {
                         String[] tempArray = { archivedFilename };
                         dontDelFiles = tempArray;
 
-                    }
+                   // }
 
                 } else if (zipped) {
                     markForDelete = zipxmls(markForDelete, endFile);
@@ -641,12 +664,12 @@ public class XsltTransformJob extends QuartzJobBean {
             if (!temp.getName().equals(DontDelFile.getName())) {
                 i = 0;
                 del = true;
-                logger.info("File Name?" + temp.getName());
+                logMe("File Name?" + temp.getName());
 
                 while (i < dontDelFiles.length && del) {
 
                     if (temp.getName().equals(dontDelFiles[i])) {
-                        logger.info("file to deleted:" + temp.getName() + "File Not to deleted:" + dontDelFiles[i]);
+                        logMe("file to deleted:" + temp.getName() + "File Not to deleted:" + dontDelFiles[i]);
 
                         del = false;// file name contained in doNotDelete list,
                                     // break;

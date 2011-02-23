@@ -101,7 +101,7 @@ public class ExtractController {
     	epBean.setDoNotDelFiles(temp);
     	epBean.setExportFileName(temp);
     	   scheduler = getScheduler(request);
-       while(cnt < fileSize)
+      // while(cnt < fileSize)
        {
     	 
         XsltTriggerService xsltService = new XsltTriggerService();
@@ -145,7 +145,7 @@ public class ExtractController {
                 endFilePath + File.separator, 
                 exportFileName, 
                 dsBean.getId(), 
-                epBean, userBean, request.getLocale().getLanguage(),cnt);
+                epBean, userBean, request.getLocale().getLanguage(),cnt,  SQLInitServlet.getField("filePath") + "xslt");
         // System.out.println("just set locale: " + request.getLocale().getLanguage());
      
         cnt++;

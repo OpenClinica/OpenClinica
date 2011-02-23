@@ -26,6 +26,7 @@ public class XsltTriggerService {
     public static final String DELETE_OLD="deleteOld";
     public static final String SUCCESS_MESSAGE="SUCCESS_MESSAGE";
     public static final String FAILURE_MESSAGE="FAILURE_MESSAGE";
+    public static final String XSLT_PATH="XSLT_PATH";
     public static final String EP_BEAN="epBean";
     public static String TRIGGER_GROUP_NAME = "XsltTriggers";
     
@@ -35,8 +36,9 @@ public class XsltTriggerService {
     public static final String POST_PROC_LOCATION="postProcLocation";
     public static final String POST_PROC_EXPORT_NAME="postProcExportName";
     public static final String COUNT="count";
+    
     public SimpleTrigger generateXsltTrigger(String xslFile, String xmlFile, String endFilePath, 
-            String endFile, int datasetId, ExtractPropertyBean epBean, UserAccountBean userAccountBean, String locale,int cnt) {
+            String endFile, int datasetId, ExtractPropertyBean epBean, UserAccountBean userAccountBean, String locale,int cnt, String xsltPath) {
         Date startDateTime = new Date(System.currentTimeMillis());
         String jobName = xmlFile + datasetId;
         SimpleTrigger trigger = new SimpleTrigger(jobName, TRIGGER_GROUP_NAME, 0, 1);
@@ -69,6 +71,7 @@ public class XsltTriggerService {
         jobDataMap.put(POST_PROC_LOCATION, epBean.getPostProcLocation());
         jobDataMap.put(POST_PROC_EXPORT_NAME, epBean.getPostProcExportName());
         jobDataMap.put(COUNT,cnt);
+        jobDataMap.put(XSLT_PATH,xsltPath);
         // jobDataMap.put(DIRECTORY, directory);
         // jobDataMap.put(ExampleSpringJob.LOCALE, locale);
         jobDataMap.put(EP_BEAN, epBean);
