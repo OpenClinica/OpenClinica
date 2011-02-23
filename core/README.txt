@@ -89,21 +89,18 @@ Software License
 OpenClinica is distributed under the GNU Lesser General Public License (GNU LGPL). For details see: http://www.openclinica.org/license or LICENSE.txt distributed with this distribution.
 
 Developer and Contact Information
-
-Akaza Research provides clinical trials informatics solutions based on OpenClinica, the world's most widely used open source clinical trials software.
+--------------------------------------------------------------
+Akaza Research, based in Waltham, MA, provides clinical trials informatics solutions based on OpenClinica, the world's most widely used open source clinical trials software.
 
 Akaza Research
-460 Totten Pond Road
-Suite 200
-Waltham, MA  02451
+460 Totten Pond Rd, Suite 200
+Waltham, MA 02451
 phone: 617.621.8585
 fax: 617.621.0065
 email: contact@akazaresearch.com
 
 For more about Akaza’s products and services see:
-http://www.akazaresearch.com/
-and
-http://www.OpenClinica.org/ 
+http://www.OpenClinica.com/ [^] [^]
 
 
 --------------------------------------------------------------

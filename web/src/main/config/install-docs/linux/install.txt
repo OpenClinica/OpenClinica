@@ -340,17 +340,14 @@ Please contact contact@akazaresearch.com for services to assist with on-site or 
 
 Developer and Contact Information
 --------------------------------------------------------------
-Akaza Research, based in Cambridge, MA, provides clinical trials informatics solutions based on OpenClinica, the world's most widely used open source clinical trials software.
+Akaza Research, based in Waltham, MA, provides clinical trials informatics solutions based on OpenClinica, the world's most widely used open source clinical trials software.
 
 Akaza Research
-One Kendall Square
-Bldg. 400, 4th Floor
-Cambridge, MA 02139
+460 Totten Pond Rd, Suite 200
+Waltham, MA 02451
 phone: 617.621.8585
 fax: 617.621.0065
 email: contact@akazaresearch.com
 
 For more about Akaza’s products and services see:
-http://www.akazaresearch.com/
-and
-http://www.OpenClinica.org/
+http://www.OpenClinica.com/ [^] [^]
