@@ -26,6 +26,7 @@ import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.web.crfdata.DataImportService;
 import org.akaza.openclinica.ws.cabig.exception.CCBusinessFaultException;
+import org.akaza.openclinica.ws.cabig.exception.CCDataValidationFaultException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -100,7 +101,20 @@ public class LoadLabsService {
         formDataBean.setItemGroupData(itemGroupData);
         formData.add(formDataBean);
 
-        StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) studyEventDefDao.findByName("LoadLabsEvent");
+        StudyEventDefinitionBean sedBean = new StudyEventDefinitionBean();
+        ArrayList<StudyEventDefinitionBean> sedBeans = studyEventDefDao.findAllByStudy(studyDao.findByOid(studyOID));
+        for (StudyEventDefinitionBean sed : sedBeans) {
+            if ("LoadLabsEvent".equals(sed.getName())) {
+                sedBean = sed;
+                // studyEventOID = sedBean.getOid();
+                break;
+            }
+            if (sedBean.getId() == 0) {
+                throw new CCDataValidationFaultException("No proper Study Event entitled 'LoadLabsEvent' was defined for the Study OID " + studyOID + ".",
+                        "CC10310");
+            }
+        }
+        // StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) studyEventDefDao.findAllB//.findByName("LoadLabsEvent");
         studyEventOID = sedBean.getOid();
         // int studyEventRepeatKey = studyEventDefDao.findNextKey();
         StudyEventDataBean studyEventDataBean = new StudyEventDataBean();
