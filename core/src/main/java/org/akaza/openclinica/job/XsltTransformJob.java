@@ -392,7 +392,7 @@ public class XsltTransformJob extends QuartzJobBean {
                         zipAll(path, epBean.getDoNotDelFiles(), zipName);
                         String[] tempArray = { archivedFilename };
                         dontDelFiles = tempArray;
-
+                         endFile = archivedFilename;
                    // }
 
                 } else if (zipped) {
