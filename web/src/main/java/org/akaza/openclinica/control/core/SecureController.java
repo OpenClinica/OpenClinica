@@ -719,8 +719,11 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     }
 
     /**
-     * Check if an entity with passed entity id is included in studies of current user.
+     * <p>Check if an entity with passed entity id is included in studies of current user.</p>
      * 
+     * <p>Note: This method called AuditableEntityDAO.findByPKAndStudy which required 
+     * "The subclass must define findByPKAndStudyName before calling this
+     * method. Otherwise an inactive AuditableEntityBean will be returned."</p>
      * @author ywang 10-18-2007
      * @param entityId int
      * @param userName String
