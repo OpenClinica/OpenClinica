@@ -371,7 +371,7 @@
 		<xsl:variable name="subjectItems"
 			select="./odm:StudyEventData/odm:FormData/odm:ItemGroupData/odm:ItemData" />
 		<xsl:apply-templates
-			select="/odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData/odm:FormData"
+			select="odm:StudyEventData/odm:FormData"
 			mode="eventCRFData">
 			<xsl:with-param name="subjectForms"
 				select="/odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData/odm:FormData"></xsl:with-param>
