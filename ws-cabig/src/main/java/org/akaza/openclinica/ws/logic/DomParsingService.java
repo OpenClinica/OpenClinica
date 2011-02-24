@@ -273,12 +273,12 @@ public class DomParsingService {
      */
     public StudyBean getStudyIdentifier(StudyBean study, Node studyNode) throws Exception {
         Element studyElement = (Element) studyNode;
-        NodeList nlist = studyElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "studyFundingSponsor");
+        NodeList nlist = studyElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "studyProtocolIdentification");
         Node nlistNode = nlist.item(0);
-        Element nlistNodeElement = (Element) nlistNode;
-        NodeList nlist2 = nlistNodeElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "organization");
-        Node nameNode = nlist2.item(0);
-        String identifier = this.getElementValue(nameNode, CONNECTOR_NAMESPACE_V1, "identifier", "extension");
+        // Element nlistNodeElement = (Element) nlistNode;
+        // NodeList nlist2 = nlistNodeElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "organization");
+        // Node nameNode = nlist2.item(0);
+        String identifier = this.getElementValue(nlistNode, CONNECTOR_NAMESPACE_V1, "identifier", "extension");
 
         study.setIdentifier(identifier);
         return study;
