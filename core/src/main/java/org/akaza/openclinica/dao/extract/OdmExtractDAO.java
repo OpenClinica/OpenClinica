@@ -7,6 +7,18 @@
  */
 package org.akaza.openclinica.dao.extract;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Set;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.ResponseType;
 import org.akaza.openclinica.bean.core.Status;
@@ -67,18 +79,6 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.logic.odmExport.ClinicalDataUtil;
 import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
 import org.akaza.openclinica.logic.odmExport.MetadataUnit;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Set;
-
-import javax.sql.DataSource;
 
 /**
  * Fetch odm data from database and load odm related classes.
@@ -680,7 +680,7 @@ public class OdmExtractDAO extends DatasetDAO {
         HashMap<Integer, Integer> cvIdPoses = new HashMap<Integer, Integer>();
         this.setStudyEventAndFormMetaTypesExpected();
         logger.debug("Begin to execute GetStudyEventAndFormMetaSql");
-        logger.error("getStudyEventAndFormMetaSQl= " + this.getStudyEventAndFormMetaSql(parentStudyId, studyId, false));
+        logger.debug("getStudyEventAndFormMetaSQl= " + this.getStudyEventAndFormMetaSql(parentStudyId, studyId, false));
         ArrayList rows = this.select(this.getStudyEventAndFormMetaSql(parentStudyId, studyId, false));
         Iterator it = rows.iterator();
         String sedprev = "";
@@ -757,7 +757,7 @@ public class OdmExtractDAO extends DatasetDAO {
         this.setItemGroupAndItemMetaWithUnitTypesExpected();
         rows.clear();
         logger.debug("Begin to execute GetItemGroupAndItemMetaWithUnitSql");
-        logger.error("getItemGroupandItemMetaWithUnitsql= " + this.getItemGroupAndItemMetaWithUnitSql(cvIds));
+        logger.debug("getItemGroupandItemMetaWithUnitsql= " + this.getItemGroupAndItemMetaWithUnitSql(cvIds));
         rows = select(this.getItemGroupAndItemMetaWithUnitSql(cvIds));
         it = rows.iterator();
         ArrayList<ItemGroupDefBean> itemGroupDefs = (ArrayList<ItemGroupDefBean>) metadata.getItemGroupDefs();
@@ -1076,7 +1076,7 @@ public class OdmExtractDAO extends DatasetDAO {
             // add StudyGroupClassList
             this.setStudyGroupClassTypesExpected();
             logger.debug("Begin to execute GetStudyGroupClassSql");
-            logger.error("getStudyGroupClassSql=" + getStudyGroupClassSql(parentStudyId));
+            logger.debug("getStudyGroupClassSql=" + getStudyGroupClassSql(parentStudyId));
             ArrayList rows = select(this.getStudyGroupClassSql(parentStudyId));
             Iterator it = rows.iterator();
             ArrayList<StudyGroupClassListBean> sgcLists = (ArrayList<StudyGroupClassListBean>) metadata.getStudyGroupClassLists();
@@ -1123,7 +1123,7 @@ public class OdmExtractDAO extends DatasetDAO {
         HashMap<String, FormDetailsBean> formDetails = new HashMap<String, FormDetailsBean>();
         this.setStudyEventAndFormMetaOC1_3TypesExpected();
         logger.debug("Begin to execute GetStudyEventAndFormMetaOC1_3Sql");
-        logger.error("getStudyEventAndFormMetaOC1_3SQl= " + this.getStudyEventAndFormMetaOC1_3Sql(parentStudyId, studyId, isIncludedSite));
+        logger.debug("getStudyEventAndFormMetaOC1_3SQl= " + this.getStudyEventAndFormMetaOC1_3Sql(parentStudyId, studyId, isIncludedSite));
         ArrayList rows = this.select(this.getStudyEventAndFormMetaOC1_3Sql(parentStudyId, studyId, isIncludedSite));
         Iterator iter = rows.iterator();
         String sedOIDs = "";
@@ -1208,7 +1208,7 @@ public class OdmExtractDAO extends DatasetDAO {
         HashMap<Integer,String> parentItemOIDs = this.getParentItemOIDs(cvIds);
         this.setItemGroupAndItemMetaOC1_3TypesExpected();
         logger.debug("Begin to execute GetItemGroupAndItemMetaWithUnitSql");
-        logger.error("getItemGroupandItemMetaWithUnitsql= " + this.getItemGroupAndItemMetaOC1_3Sql(cvIds));
+        logger.debug("getItemGroupandItemMetaWithUnitsql= " + this.getItemGroupAndItemMetaOC1_3Sql(cvIds));
         ArrayList rows = select(this.getItemGroupAndItemMetaOC1_3Sql(cvIds));
         Iterator iter = rows.iterator();
         while (iter.hasNext()) {
@@ -1444,14 +1444,14 @@ public class OdmExtractDAO extends DatasetDAO {
         }
         logger.debug("Begin to GetSubjectEventFormSql");
         if (odmVersion.startsWith("oc")) {
-            logger.error("getOCSubjectEventFormSql="
+            logger.debug("getOCSubjectEventFormSql="
                 + getOCSubjectEventFormSqlSS(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds));
             this.setSubjectEventFormDataTypesExpected(odmVersion);
             ArrayList viewRows = select(getOCSubjectEventFormSqlSS(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds));
             Iterator iter = viewRows.iterator();
             this.setDataWithOCAttributes(study, dataset, data, odmVersion, iter, oidPoses, odmType);
         } else {
-            logger.error("getSubjectEventFormSql=" + getSubjectEventFormSqlSS(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds));
+            logger.debug("getSubjectEventFormSql=" + getSubjectEventFormSqlSS(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds));
             this.setSubjectEventFormDataTypesExpected();
             ArrayList viewRows = select(getSubjectEventFormSqlSS(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds));
             Iterator iter = viewRows.iterator();
@@ -1518,7 +1518,7 @@ public class OdmExtractDAO extends DatasetDAO {
         this.setEventGroupItemDataWithUnitTypesExpected();
         logger.debug("Begin to GetEventGroupItemWithUnitSql");
         ArrayList viewRows = select(getEventGroupItemWithUnitSql(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds));
-        logger.error("getEventGroupItemWithUnitSql : "
+        logger.debug("getEventGroupItemWithUnitSql : "
             + getEventGroupItemWithUnitSql(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds));
         String idataIds = "";
         if (viewRows.size() > 0) {
@@ -1552,7 +1552,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 String muOid = (String) row.get("mu_oid");
                 String key = "";
                 if (ecId != ecprev) {
-                    logger.error("Found ecId=" + ecId + " in subjectEventFormSql is:" + oidPoses.containsKey(ecId));
+                    logger.debug("Found ecId=" + ecId + " in subjectEventFormSql is:" + oidPoses.containsKey(ecId));
                     if (oidPoses.containsKey(ecId)) {
                         goon = true;
                         String[] poses = oidPoses.get(ecId).split("---");
@@ -1612,7 +1612,7 @@ public class OdmExtractDAO extends DatasetDAO {
                                 try {
                                     itValue = new SimpleDateFormat("yyyy-MM-dd").format(new SimpleDateFormat(oc_df_string).parse(itValue));
                                 } catch (Exception fe) {
-                                    logger.info("Item -" + itOID + " value " + itValue + " might not be ODM date format yyyy-MM-dd.");
+                                    logger.debug("Item -" + itOID + " value " + itValue + " might not be ODM date format yyyy-MM-dd.");
                                 }
                             }
                             /* not be supported in openclinica-3.0.40.1 
@@ -1664,7 +1664,7 @@ public class OdmExtractDAO extends DatasetDAO {
         }
         
           if (odmType!=null && odmType.equalsIgnoreCase("clinical_data")) {
-          System.out.println("Do not create discrepancy notes");
+            logger.debug("Do not create discrepancy notes");
           }
           else if (odmVersion.startsWith("oc")) {
             if(idataIds.length()>0) {
@@ -1704,7 +1704,7 @@ public class OdmExtractDAO extends DatasetDAO {
     protected void setOCSubjectDataAuditLogs(StudyBean study, OdmClinicalDataBean data, String studySubjectOids, HashMap<String, String> subOidPoses) {
         this.setOCSubjectDataAuditsTypesExpected();
         logger.debug("Begin to execute GetOCSubjectDataAuditsSql");
-        logger.error("getOCSubjectDataAuditsSql= " + this.getOCSubjectDataAuditsSql(studySubjectOids));
+        logger.debug("getOCSubjectDataAuditsSql= " + this.getOCSubjectDataAuditsSql(studySubjectOids));
         ArrayList rows = select(this.getOCSubjectDataAuditsSql(studySubjectOids));
         Iterator iter = rows.iterator();
         while (iter.hasNext()) {
@@ -1725,7 +1725,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 AuditLogBean auditLog = new AuditLogBean();
                 auditLog.setOid("AL_" + auditId);
                 auditLog.setUserId("USR_" + userId);
-                System.out.println("datatime=" + auditDate + " or " + new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(auditDate));
+                logger.debug("datatime=" + auditDate + " or " + new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(auditDate));
                 auditLog.setDatetimeStamp(auditDate);
                 auditLog.setType(type);
                 auditLog.setReasonForChange(auditReason);
@@ -1757,7 +1757,7 @@ public class OdmExtractDAO extends DatasetDAO {
     protected void setOCEventDataAuditLogs(StudyBean study, OdmClinicalDataBean data, String studySubjectOids, HashMap<String, String> evnOidPoses) {
         this.setOCEventDataAuditsTypesExpected();
         logger.debug("Begin to execute GetOCEventDataAuditsSql");
-        logger.error("getOCEventDataAuditsSql= " + this.getOCEventDataAuditsSql(studySubjectOids));
+        logger.debug("getOCEventDataAuditsSql= " + this.getOCEventDataAuditsSql(studySubjectOids));
         ArrayList rows = select(this.getOCEventDataAuditsSql(studySubjectOids));
         Iterator iter = rows.iterator();
         while (iter.hasNext()) {
@@ -1812,7 +1812,7 @@ public class OdmExtractDAO extends DatasetDAO {
             HashMap<Integer, String> formOidPoses) {
         this.setOCFormDataAuditsTypesExpected();
         logger.debug("Begin to execute GetOCFormDataAuditsSql");
-        logger.error("getOCFormDataAuditsSql= " + this.getOCFormDataAuditsSql(studySubjectOids, ecIds));
+        logger.debug("getOCFormDataAuditsSql= " + this.getOCFormDataAuditsSql(studySubjectOids, ecIds));
         ArrayList rows = select(this.getOCFormDataAuditsSql(studySubjectOids, ecIds));
         Iterator iter = rows.iterator();
         while (iter.hasNext()) {
@@ -1877,7 +1877,7 @@ public class OdmExtractDAO extends DatasetDAO {
     protected void setOCItemDataAuditLogs(StudyBean study, OdmClinicalDataBean data, String idataIds, HashMap<Integer, String> idataOidPoses) {
         this.setOCItemDataAuditsTypesExpected();
         logger.debug("Begin to execute GetOCItemDataAuditsSql");
-        logger.error("getOCItemDataAuditsSql= " + this.getOCItemDataAuditsSql(idataIds));
+        logger.debug("getOCItemDataAuditsSql= " + this.getOCItemDataAuditsSql(idataIds));
         ArrayList rows = select(this.getOCItemDataAuditsSql(idataIds));
         Iterator iter = rows.iterator();
         while (iter.hasNext()) {
@@ -1933,7 +1933,7 @@ public class OdmExtractDAO extends DatasetDAO {
         HashMap<String, ArrayList<ChildNoteBean>> pDNs = new HashMap<String, ArrayList<ChildNoteBean>>();
         HashMap<String, ArrayList<DiscrepancyNoteBean>> sDNs = new HashMap<String, ArrayList<DiscrepancyNoteBean>>();
         logger.debug("Begin to execute GetOCSubjectDataDNsSql");
-        logger.error("getOCSubjectDataDNsSql= " + this.getOCSubjectDataDNsSql(studySubjectOids));
+        logger.debug("getOCSubjectDataDNsSql= " + this.getOCSubjectDataDNsSql(studySubjectOids));
         ArrayList rows = select(this.getOCSubjectDataDNsSql(studySubjectOids));
         Iterator iter = rows.iterator();
         while (iter.hasNext()) {
@@ -1990,7 +1990,7 @@ public class OdmExtractDAO extends DatasetDAO {
         HashMap<String, ArrayList<ChildNoteBean>> pDNs = new HashMap<String, ArrayList<ChildNoteBean>>();
         HashMap<String, ArrayList<DiscrepancyNoteBean>> sDNs = new HashMap<String, ArrayList<DiscrepancyNoteBean>>();
         logger.debug("Begin to execute GetOCEventDataDNsSql");
-        logger.error("getOCEventDataDNsSql= " + this.getOCEventDataDNsSql(definitionOids, studySubjectOids));
+        logger.debug("getOCEventDataDNsSql= " + this.getOCEventDataDNsSql(definitionOids, studySubjectOids));
         ArrayList rows = select(this.getOCEventDataDNsSql(definitionOids, studySubjectOids));
         Iterator iter = rows.iterator();
         while (iter.hasNext()) {
@@ -2051,7 +2051,7 @@ public class OdmExtractDAO extends DatasetDAO {
         HashMap<String, ArrayList<ChildNoteBean>> pDNs = new HashMap<String, ArrayList<ChildNoteBean>>();
         HashMap<String, ArrayList<DiscrepancyNoteBean>> sDNs = new HashMap<String, ArrayList<DiscrepancyNoteBean>>();
         logger.debug("Begin to execute GetOCEventDataDNsSql");
-        logger.error("getOCFormDataDNsSql= " + this.getOCFormDataDNsSql(ecIds));
+        logger.debug("getOCFormDataDNsSql= " + this.getOCFormDataDNsSql(ecIds));
         ArrayList rows = select(this.getOCFormDataDNsSql(ecIds));
         Iterator iter = rows.iterator();
         while (iter.hasNext()) {
@@ -2113,7 +2113,7 @@ public class OdmExtractDAO extends DatasetDAO {
         HashMap<String, ArrayList<ChildNoteBean>> pDNs = new HashMap<String, ArrayList<ChildNoteBean>>();
         HashMap<String, ArrayList<DiscrepancyNoteBean>> sDNs = new HashMap<String, ArrayList<DiscrepancyNoteBean>>();
         logger.debug("Begin to execute GetOCItemDataDNsSql");
-        logger.error("getOCItemDataDNsSql= " + this.getOCItemDataDNsSql(idataIds));
+        logger.debug("getOCItemDataDNsSql= " + this.getOCItemDataDNsSql(idataIds));
         ArrayList rows = select(this.getOCItemDataDNsSql(idataIds));
         Iterator iter = rows.iterator();
         while (iter.hasNext()) {
@@ -2365,7 +2365,7 @@ public class OdmExtractDAO extends DatasetDAO {
 
         if(odmType!=null && odmType.equalsIgnoreCase("clinical_data"))
         {
-            System.out.println("No Audit logs or discrepancy Notes");
+            logger.debug("No Audit logs or discrepancy Notes");
         }
         else{
             if(studySubjectOids.length()>0) {
@@ -2374,7 +2374,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 if(ecIds.length()>0) {
                     this.setOCFormDataAuditLogs(parentStudy, data, studySubjectOids, ecIds, oidPoses);
                 } else{
-                    logger.info("OdmExtractDAO.setOCFormDataAuditLogs wasn't called because of empty ecIds");
+                    logger.debug("OdmExtractDAO.setOCFormDataAuditLogs wasn't called because of empty ecIds");
                 }
                 this.setOCSubjectDataDNs(data, studySubjectOids, subOidPoses);
                 if(sedOids.length()>0) {
@@ -2383,13 +2383,13 @@ public class OdmExtractDAO extends DatasetDAO {
                     logger.info("OdmExtractDAO.setOCEventDataDNs wasn't called because of empty sedOids");
                 }
             } else {
-                logger.info("OdmExtractDAO methods(setOCSubjectDataAuditLogs,setOCEventDataAuditLogs,setOCFormDataAuditLogs,"
+                logger.debug("OdmExtractDAO methods(setOCSubjectDataAuditLogs,setOCEventDataAuditLogs,setOCFormDataAuditLogs,"
                         + "setOCSubjectDataDNs,setOCEventDataDNs) weren't called because of empty studySubjectOids");
             }
             if(ecIds.length()>0) {
                 this.setOCFormDataDNs(data, ecIds, oidPoses);
             } else {
-                logger.info("OdmExtractDAO.setOCFormDataDNs wasn't called because of empty ecIds");
+                logger.debug("OdmExtractDAO.setOCFormDataDNs wasn't called because of empty ecIds");
             }
         }
     }
@@ -2445,7 +2445,7 @@ public class OdmExtractDAO extends DatasetDAO {
             System.out.println("caught NPE here");
         }
 
-        logger.info("returning " + stage.getName());
+        logger.debug("returning " + stage.getName());
 
         return stage.getName();
     }
