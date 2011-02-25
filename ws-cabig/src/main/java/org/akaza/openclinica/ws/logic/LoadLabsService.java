@@ -78,6 +78,7 @@ public class LoadLabsService {
                 studyOID = studyBean.getOid();
                 SubjectBean subjectBean = subjectDao.findByUniqueIdentifier(studySubjectIdentifier);
                 ssBean = studySubjectDao.findBySubjectIdAndStudy(subjectBean.getId(), studyBean);
+                System.out.println("study subject " + ssBean.getOid() + " found by subject id " + subjectBean.getId() + " and study oid " + studyOID);
             } catch (Exception eee) {
                 throw new CCBusinessFaultException("Could not find study or subject in the request.", "CC10310");
             }

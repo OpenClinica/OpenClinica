@@ -247,7 +247,11 @@ public class DomParsingService {
             NodeList orgNodeList = siteElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "organization");
             Node orgNode = orgNodeList.item(0);
             String summary = this.getElementValue(orgNode, CONNECTOR_NAMESPACE_V1, "description", "value");
+            // in case of null, reset to zero
             site.setSummary(summary);
+            if (site.getSummary().length() <= 2) {
+                site.setSummary("");
+            }
             String name = this.getElementValue(orgNode, CONNECTOR_NAMESPACE_V1, "name", "value");
             site.setName(name);
             site.setFacilityName(name);
@@ -267,6 +271,8 @@ public class DomParsingService {
      * nullFlavor="NI"/> <ns2:identifier xmlns:ns1="uri:iso.org:21090" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns1:II"
      * root="2.16.840.1.113883.3.26.7.7" extension="AU-67001" identifierName="Study Protocol" displayable="false"/>
      * 
+     * Keep in mind that there are multiple elements here, so we should only grab the identifier where primaryIndicator = true.
+     * 
      * @param study
      * @param studyNode
      * @return
@@ -274,13 +280,20 @@ public class DomParsingService {
     public StudyBean getStudyIdentifier(StudyBean study, Node studyNode) throws Exception {
         Element studyElement = (Element) studyNode;
         NodeList nlist = studyElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "studyProtocolIdentification");
-        Node nlistNode = nlist.item(0);
-        // Element nlistNodeElement = (Element) nlistNode;
-        // NodeList nlist2 = nlistNodeElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "organization");
-        // Node nameNode = nlist2.item(0);
-        String identifier = this.getElementValue(nlistNode, CONNECTOR_NAMESPACE_V1, "identifier", "extension");
-
+        String identifier = "";
+        System.out.println("found " + nlist.getLength() + " identifiers");
+        for (int j = 0; j < nlist.getLength(); j++) {
+            Node nlistNode = nlist.item(j);
+            // Element nlistNodeElement = (Element) nlistNode;
+            // NodeList nlist2 = nlistNodeElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "organization");
+            // Node nameNode = nlist2.item(0);
+            String isPrimaryIdentifier = this.getElementValue(nlistNode, CONNECTOR_NAMESPACE_V1, "primaryIndicator", "value");
+            if ("true".equals(isPrimaryIdentifier)) {
+                identifier = this.getElementValue(nlistNode, CONNECTOR_NAMESPACE_V1, "identifier", "extension");
+            }
+        }
         study.setIdentifier(identifier);
+        study.setSecondaryIdentifier(identifier);
         return study;
     }
 

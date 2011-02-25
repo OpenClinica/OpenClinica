@@ -35,12 +35,20 @@ public class CreateStudyService {
         DomParsingService xmlService = new DomParsingService();
         // studyBean.setIdentifier(xmlService.getElementValue(study, CONNECTOR_NAMESPACE_V1, "identifier", "extension"));
         studyBean.setStatus(Status.AVAILABLE);// coordinatingCenterStudyStatusCode?
-        studyBean.setName(xmlService.getElementValue(study, this.CONNECTOR_NAMESPACE_V1, "officialTitle", "value"));
+        studyBean.setName(xmlService.getElementValue(study, this.CONNECTOR_NAMESPACE_V1, "publicTitle", "value"));
+        studyBean.setOfficialTitle(xmlService.getElementValue(study, this.CONNECTOR_NAMESPACE_V1, "officialTitle", "value"));
+        // set secondary identifier below, in getStudyIdentifier
+        studyBean.setProtocolDescription(xmlService.getElementValue(study, this.CONNECTOR_NAMESPACE_V1, "scientificDescription", "value"));
         studyBean.setPhase(xmlService.getElementValue(study, this.CONNECTOR_NAMESPACE_V1, "phaseCode", "code"));
         // tbh 7619
-        // studyBean.setPurpose(xmlService.getElementValue(study, this.CONNECTOR_NAMESPACE_V1, "primaryPurposeCode", "code"));
+        studyBean.setPurpose(xmlService.getElementValue(study, this.CONNECTOR_NAMESPACE_V1, "primaryPurposeCode", "code"));
         // going back to this one
         studyBean.setSummary(xmlService.getElementValue(study, this.CONNECTOR_NAMESPACE_V1, "publicDescription", "value"));
+        // if there is a null value, set to null instead of the value code
+        if (studyBean.getSummary().length() <= 2) {
+            // assumes two-character code
+            studyBean.setSummary("");
+        }
         studyBean.setSecondaryIdentifier(xmlService.getElementValue(study, this.CONNECTOR_NAMESPACE_V1, "publicTitle", "value"));
         int enrollment = xmlService.getTargetAccrualNumberRange(study);// xmlService.getElementValue(study, this.CONNECTOR_NAMESPACE_V1, xmlLine, attrName)
         studyBean.setExpectedTotalEnrollment(enrollment);
