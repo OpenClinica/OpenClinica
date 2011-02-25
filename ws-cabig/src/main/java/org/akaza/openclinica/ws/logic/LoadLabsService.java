@@ -61,6 +61,7 @@ public class LoadLabsService {
         String formOID, itemGroupOID, studyEventOID, studyOID = "";
         String subjectOID = "";
         NodeList nlist = requestElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "performedClinicalResult");
+        CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByFullName("v1", "Clinical Connector Lab Data");
         for (int i = 0; i < nlist.getLength(); i++) {
             Node data = nlist.item(i);
             // HashMap parsedAnswers = new HashMap<String, String>();
@@ -83,7 +84,7 @@ public class LoadLabsService {
                 throw new CCBusinessFaultException("Could not find study or subject in the request.", "CC10310");
             }
             subjectOID = ssBean.getOid();// we actually need to put study subject OID here
-            itemData = generateItemDataList(data, itemDao);
+            itemData = generateItemDataList(data, itemDao, crfVersionBean.getCrfId());// pass crf id here too
             ItemGroupBean itemGroupBean = (ItemGroupBean) itemGroupDao.findByName("RepeatingLabData");
             itemGroupOID = itemGroupBean.getOid();
             // this runs once per loop, so repeat key = i, essentially
@@ -94,7 +95,7 @@ public class LoadLabsService {
 
             itemGroupData.add(itemGroupDataBean);
         }
-        CRFVersionBean crfVersionBean = (CRFVersionBean) crfVersionDao.findByFullName("v1", "Clinical Connector Lab Data");
+
         formOID = crfVersionBean.getOid();
         // this runs once a request
         FormDataBean formDataBean = new FormDataBean();
@@ -121,7 +122,8 @@ public class LoadLabsService {
         StudyEventDataBean studyEventDataBean = new StudyEventDataBean();
         studyEventDataBean.setFormData(formData);
         studyEventDataBean.setStudyEventOID(studyEventOID); // study event definition dao
-        studyEventDataBean.setStudyEventRepeatKey("1");// new Integer(studyEventRepeatKey).toString());
+        studyEventDataBean.setStudyEventRepeatKey(null);// new Integer(studyEventRepeatKey).toString());
+        // force it to auto-generate? was "1", tbh
         // need to find the max number of events we've seen on that subject
         studyEventData.add(studyEventDataBean);
 
@@ -142,13 +144,14 @@ public class LoadLabsService {
                 false, studyEventBean);
     }
 
-    private ArrayList<ImportItemDataBean> generateItemDataList(Node data, ItemDAO itemDao) throws Exception {
+    private ArrayList<ImportItemDataBean> generateItemDataList(Node data, ItemDAO itemDao, int crfId) throws Exception {
         ArrayList<ImportItemDataBean> itemData = new ArrayList<ImportItemDataBean>();
-        itemData.add(generateItemData("asCollectedIndicator", "value", data, (ItemBean) itemDao.findByName("coInd")));
-        itemData.add(generateItemData("comment", "value", data, (ItemBean) itemDao.findByName("comment")));
-        itemData.add(generateItemData("confidentialityCode", "code", data, (ItemBean) itemDao.findByName("confCode")));
-        itemData.add(generateItemData("numericalResult", "value", data, (ItemBean) itemDao.findByName("numRes")));
-        itemData.add(generateItemData("numericalResult", "unit", data, (ItemBean) itemDao.findByName("numResMeasUnit")));
+        itemData.add(generateItemData("asCollectedIndicator", "value", data, (ItemBean) itemDao.findByNameAndCRFId("coInd", crfId)));// .findByName("coInd")));
+        itemData.add(generateItemData("comment", "value", data, (ItemBean) itemDao.findByNameAndCRFId("comment", crfId)));// .findByName("comment")));
+        itemData.add(generateItemData("confidentialityCode", "code", data, (ItemBean) itemDao.findByNameAndCRFId("confCode", crfId)));//.findByName("confCode"))
+                                                                                                                                      // );
+        itemData.add(generateItemData("numericalResult", "value", data, (ItemBean) itemDao.findByNameAndCRFId("numRes", crfId)));
+        itemData.add(generateItemData("numericalResult", "unit", data, (ItemBean) itemDao.findByNameAndCRFId("numResMeasUnit", crfId)));
         // String asCollectedIndicator = xmlService.getElementValue(data, this.CONNECTOR_NAMESPACE_V1, "asCollectedIndicator", "value");
         // String comment = xmlService.getElementValue(data, CONNECTOR_NAMESPACE_V1, "comment", "value");
         // String confidentialityCode = xmlService.getElementValue(data, CONNECTOR_NAMESPACE_V1, "confidentialityCode", "code");
@@ -162,25 +165,25 @@ public class LoadLabsService {
             referenceRangeHighValue = xmlService.getReferenceRangeValue(data, "high");
             referenceRangeLowValue = xmlService.getReferenceRangeValue(data, "low");
             referenceRangeComment = xmlService.getElementValue(data, CONNECTOR_NAMESPACE_V1, "referenceRangeComment", "value");
-            itemData.add(generateItemData(referenceRangeHighValue, (ItemBean) itemDao.findByName("refRangeHigh")));
-            itemData.add(generateItemData(referenceRangeLowValue, (ItemBean) itemDao.findByName("refRangeLow")));
-            itemData.add(generateItemData(referenceRangeComment, (ItemBean) itemDao.findByName("refRangeCom")));
+            itemData.add(generateItemData(referenceRangeHighValue, (ItemBean) itemDao.findByNameAndCRFId("refRangeHigh", crfId)));
+            itemData.add(generateItemData(referenceRangeLowValue, (ItemBean) itemDao.findByNameAndCRFId("refRangeLow", crfId)));
+            itemData.add(generateItemData(referenceRangeComment, (ItemBean) itemDao.findByNameAndCRFId("refRangeCom", crfId)));
             // reported result status code is also optional
             String reportedResultStatusCode = xmlService.getElementValue(data, CONNECTOR_NAMESPACE_V1, "reportedResultStatusCode", "code");
-            itemData.add(generateItemData(reportedResultStatusCode, (ItemBean) itemDao.findByName("repResStatCode")));
+            itemData.add(generateItemData(reportedResultStatusCode, (ItemBean) itemDao.findByNameAndCRFId("repResStatCode", crfId)));
         } catch (Exception npe) {
             System.out.println("did not find reference range here");
         }
         String reportedDateTimeStr = xmlService.getElementValue(data, CONNECTOR_NAMESPACE_V1, "reportedDate", "value");
         // parse the date?
-        itemData.add(generateItemData(reportedDateTimeStr, (ItemBean) itemDao.findByName("repDate")));
+        itemData.add(generateItemData(reportedDateTimeStr, (ItemBean) itemDao.findByNameAndCRFId("repDate", crfId)));
 
         String textResult = xmlService.getElementValue(data, CONNECTOR_NAMESPACE_V1, "textResult", "value");
-        itemData.add(generateItemData(textResult, (ItemBean) itemDao.findByName("textRes")));
+        itemData.add(generateItemData(textResult, (ItemBean) itemDao.findByNameAndCRFId("textRes", crfId)));
         String uncertaintyCode = xmlService.getElementValue(data, CONNECTOR_NAMESPACE_V1, "uncertaintyCode", "code");
-        itemData.add(generateItemData(uncertaintyCode, (ItemBean) itemDao.findByName("uncertCode")));
+        itemData.add(generateItemData(uncertaintyCode, (ItemBean) itemDao.findByNameAndCRFId("uncertCode", crfId)));
         String activityNameCode = xmlService.getPerformedObservationValue(data, "activityNameCode", "code");
-        itemData.add(generateItemData(activityNameCode, (ItemBean) itemDao.findByName("perObsActNameCode")));
+        itemData.add(generateItemData(activityNameCode, (ItemBean) itemDao.findByNameAndCRFId("perObsActNameCode", crfId)));
         return itemData;
     }
 

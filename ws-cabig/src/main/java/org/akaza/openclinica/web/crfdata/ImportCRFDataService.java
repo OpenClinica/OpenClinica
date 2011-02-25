@@ -102,13 +102,15 @@ public class ImportCRFDataService {
             for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
                 ArrayList<FormDataBean> formDataBeans = studyEventDataBean.getFormData();
 
-                String sampleOrdinal = studyEventDataBean.getStudyEventRepeatKey() == null ? "1" : studyEventDataBean.getStudyEventRepeatKey();
-
                 StudyEventDefinitionBean studyEventDefinitionBean =
                     studyEventDefinitionDAO.findByOidAndStudy(studyEventDataBean.getStudyEventOID(), studyBean.getId(), studyBean.getParentStudyId());
                 logger.info("find all by def and subject " + studyEventDefinitionBean.getName() + " study subject " + studySubjectBean.getName());
                 // ArrayList<StudyEventBean> studyEventBeans = studyEventDAO.findAllByDefinitionAndSubject(studyEventDefinitionBean, studySubjectBean);
+                int ordinal = studyEventDAO.getMaxSampleOrdinal(studyEventDefinitionBean, studySubjectBean);
 
+                String sampleOrdinal =
+                    studyEventDataBean.getStudyEventRepeatKey() == null ? new Integer(ordinal).toString() : studyEventDataBean.getStudyEventRepeatKey();
+                // was just "1", tbh
                 for (FormDataBean formDataBean : formDataBeans) {
 
                     CRFVersionDAO crfVersionDAO = new CRFVersionDAO(ds);
@@ -126,6 +128,7 @@ public class ImportCRFDataService {
                             studyEventBean =
                                 (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(), studyEventDefinitionBean
                                         .getId(), Integer.parseInt(sampleOrdinal));
+                            System.out.println("just got it from the db");
                         }
 
                         ArrayList<EventCRFBean> eventCrfBeans = eventCrfDAO.findByEventSubjectVersion(studyEventBean, studySubjectBean, crfVersionBean);
