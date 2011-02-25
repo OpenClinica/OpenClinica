@@ -20,7 +20,12 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.extract.DatasetDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
+import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
 import org.akaza.openclinica.dao.service.StudyConfigService;
+import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.ws.cabig.abst.AbstractCabigDomEndpoint;
 import org.akaza.openclinica.ws.cabig.exception.CCBusinessFaultException;
@@ -38,12 +43,43 @@ import javax.sql.DataSource;
 
 public class CreateStudyEndpoint extends AbstractCabigDomEndpoint {
     public CreateStudyService studyService;
+    private StudyGroupDAO studyGroupDao;
+    private DatasetDAO datasetDao;
+
+    private StudyGroupClassDAO studyGroupClassDao;
+    private SubjectGroupMapDAO subjectGroupMapDao;
+    private EventDefinitionCRFDAO eventDefinitionCrfDao;
 
     public CreateStudyEndpoint(DataSource dataSource, MessageSource messages, CoreResources coreResources) {
 
         super(dataSource, messages, coreResources);
 
         studyService = new CreateStudyService();
+    }
+
+    public StudyGroupDAO getStudyGroupDao() {
+        studyGroupDao = studyGroupDao != null ? studyGroupDao : new StudyGroupDAO(dataSource);
+        return studyGroupDao;
+    }
+
+    public DatasetDAO getDatasetDao() {
+        datasetDao = datasetDao != null ? datasetDao : new DatasetDAO(dataSource);
+        return datasetDao;
+    }
+
+    public StudyGroupClassDAO getStudyGroupClassDao() {
+        studyGroupClassDao = studyGroupClassDao != null ? studyGroupClassDao : new StudyGroupClassDAO(dataSource);
+        return studyGroupClassDao;
+    }
+
+    public SubjectGroupMapDAO getSubjectGroupMapDao() {
+        subjectGroupMapDao = subjectGroupMapDao != null ? subjectGroupMapDao : new SubjectGroupMapDAO(dataSource);
+        return subjectGroupMapDao;
+    }
+
+    public EventDefinitionCRFDAO getEventDefinitionCrfDao() {
+        eventDefinitionCrfDao = eventDefinitionCrfDao != null ? eventDefinitionCrfDao : new EventDefinitionCRFDAO(dataSource);
+        return eventDefinitionCrfDao;
     }
 
     private StudyBean createStudyParameters(StudyBean newStudy) {
@@ -112,32 +148,6 @@ public class CreateStudyEndpoint extends AbstractCabigDomEndpoint {
         logger.info("study parameters created done");
         return newStudy;
     }
-
-    // private StudyBean generateStudyParameters(StudyBean newStudy) {
-    // // this.getStudyParamValueDao().findParameterByHandle(handle);
-    // newStudy.getStudyParameterConfig().setCollectDob(getStudyParamValueDao().findParameterByHandle("collectDob").getDefaultValue());
-    // newStudy.getStudyParameterConfig().setDiscrepancyManagement(getStudyParamValueDao().findParameterByHandle("discrepancyManagement").getDefaultValue());
-    // newStudy.getStudyParameterConfig().setGenderRequired(getStudyParamValueDao().findParameterByHandle("genderRequired").getDefaultValue());
-    //
-    // newStudy.getStudyParameterConfig().setInterviewerNameRequired(
-    // getStudyParamValueDao().findParameterByHandle("interviewerNameRequired").getDefaultValue());
-    // newStudy.getStudyParameterConfig().setInterviewerNameDefault(getStudyParamValueDao().findParameterByHandle("interviewerNameDefault").getDefaultValue());
-    // newStudy.getStudyParameterConfig().setInterviewDateEditable(getStudyParamValueDao().findParameterByHandle("interviewDateEditable").getDefaultValue());
-    // newStudy.getStudyParameterConfig().setInterviewDateRequired(getStudyParamValueDao().findParameterByHandle("interviewDateRequired").getDefaultValue());
-    // newStudy.getStudyParameterConfig().setInterviewerNameEditable(
-    // getStudyParamValueDao().findParameterByHandle("interviewerNameEditable").getDefaultValue());
-    // newStudy.getStudyParameterConfig().setInterviewDateDefault(getStudyParamValueDao().findParameterByHandle("interviewDateDefault").getDefaultValue());
-    //
-    // newStudy.getStudyParameterConfig().setSubjectIdGeneration("non-editable");
-    // newStudy.getStudyParameterConfig().setSubjectPersonIdRequired(
-    // getStudyParamValueDao().findParameterByHandle("subjectPersonIdRequired").getDefaultValue());
-    // newStudy.getStudyParameterConfig().setSubjectIdPrefixSuffix(getStudyParamValueDao().findParameterByHandle("subjectIdPrefixSuffix").getDefaultValue());
-    // newStudy.getStudyParameterConfig().setPersonIdShownOnCRF(getStudyParamValueDao().findParameterByHandle("personIdShownOnCRF").getDefaultValue());
-    // newStudy.getStudyParameterConfig().setSecondaryLabelViewable(getStudyParamValueDao().findParameterByHandle("secondaryLabelViewable").getDefaultValue());
-    // newStudy.getStudyParameterConfig().setAdminForcedReasonForChange(
-    // getStudyParamValueDao().findParameterByHandle("adminForcedReasonForChange").getDefaultValue());
-    // return newStudy;
-    // }
 
     protected Element invokeInternal(Element requestElement, Document document) throws Exception {
         System.out.println("Request text create study ");
@@ -211,6 +221,10 @@ public class CreateStudyEndpoint extends AbstractCabigDomEndpoint {
                     studyBean.setOldStatus(Status.DELETED);
                     studyBean = (StudyBean) getStudyDao().update(studyBean);
                     // do we add the user? no
+                    studyBean =
+                        studyService.changeStatus(Status.AUTO_DELETED, Status.AVAILABLE, studyBean, getUserAccount(), getUserAccountDao(),
+                                getStudySubjectDao(), getStudyGroupDao(), getStudyGroupClassDao(), getSubjectGroupMapDao(), getEventDefinitionCrfDao(),
+                                getStudyEventDefinitionDao(), getStudyEventDao(), getEventCrfDao(), getItemDataDao(), getDatasetDao());
                 }
 
                 if (!updateMe) {
@@ -226,7 +240,7 @@ public class CreateStudyEndpoint extends AbstractCabigDomEndpoint {
                         site = this.createStudyParameters(site);
                     }
                 } else {
-                    // do we update sites?
+                    // do we update sites? yes
                     for (StudyBean site : sites) {
                         site.setStatus(Status.AVAILABLE);
                         site.setOldStatus(Status.DELETED);
@@ -253,5 +267,4 @@ public class CreateStudyEndpoint extends AbstractCabigDomEndpoint {
             }
         }
     }
-
 }

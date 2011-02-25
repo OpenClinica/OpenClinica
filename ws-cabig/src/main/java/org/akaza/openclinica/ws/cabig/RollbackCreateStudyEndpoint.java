@@ -17,6 +17,11 @@ package org.akaza.openclinica.ws.cabig;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.extract.DatasetDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
+import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
+import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.ws.cabig.abst.AbstractCabigDomEndpoint;
 import org.akaza.openclinica.ws.logic.CreateStudyService;
@@ -33,12 +38,43 @@ import javax.sql.DataSource;
 
 public class RollbackCreateStudyEndpoint extends AbstractCabigDomEndpoint {
     public CreateStudyService studyService;
+    private StudyGroupDAO studyGroupDao;
+    private DatasetDAO datasetDao;
+    // getStudyGroupClassDao(), getSubjectGroupMapDao(), getEventDefinitionCrfDao(),
+    private StudyGroupClassDAO studyGroupClassDao;
+    private SubjectGroupMapDAO subjectGroupMapDao;
+    private EventDefinitionCRFDAO eventDefinitionCrfDao;
 
     public RollbackCreateStudyEndpoint(DataSource dataSource, MessageSource messages, CoreResources coreResources) {
 
         super(dataSource, messages, coreResources);
         studyService = new CreateStudyService();
 
+    }
+
+    public StudyGroupDAO getStudyGroupDao() {
+        studyGroupDao = studyGroupDao != null ? studyGroupDao : new StudyGroupDAO(dataSource);
+        return studyGroupDao;
+    }
+
+    public DatasetDAO getDatasetDao() {
+        datasetDao = datasetDao != null ? datasetDao : new DatasetDAO(dataSource);
+        return datasetDao;
+    }
+
+    public StudyGroupClassDAO getStudyGroupClassDao() {
+        studyGroupClassDao = studyGroupClassDao != null ? studyGroupClassDao : new StudyGroupClassDAO(dataSource);
+        return studyGroupClassDao;
+    }
+
+    public SubjectGroupMapDAO getSubjectGroupMapDao() {
+        subjectGroupMapDao = subjectGroupMapDao != null ? subjectGroupMapDao : new SubjectGroupMapDAO(dataSource);
+        return subjectGroupMapDao;
+    }
+
+    public EventDefinitionCRFDAO getEventDefinitionCrfDao() {
+        eventDefinitionCrfDao = eventDefinitionCrfDao != null ? eventDefinitionCrfDao : new EventDefinitionCRFDAO(dataSource);
+        return eventDefinitionCrfDao;
     }
 
     protected Element invokeInternal(Element requestElement, Document document) throws Exception {
@@ -69,6 +105,10 @@ public class RollbackCreateStudyEndpoint extends AbstractCabigDomEndpoint {
                     site.setStatus(Status.DELETED);
                     site = (StudyBean) getStudyDao().update(site);
                 }
+                testStudyBean =
+                    studyService.changeStatus(Status.AVAILABLE, Status.AUTO_DELETED, testStudyBean, getUserAccount(), getUserAccountDao(),
+                            getStudySubjectDao(), getStudyGroupDao(), getStudyGroupClassDao(), getSubjectGroupMapDao(), getEventDefinitionCrfDao(),
+                            getStudyEventDefinitionDao(), getStudyEventDao(), getEventCrfDao(), getItemDataDao(), getDatasetDao());
             }
             return mapCreateStudyConfirmation(studyBean.getIdentifier());
         } catch (Exception npe) {
@@ -83,6 +123,6 @@ public class RollbackCreateStudyEndpoint extends AbstractCabigDomEndpoint {
                 return mapStudyErrorConfirmation(npe.getMessage());
             }
         }
-
     }
+
 }
