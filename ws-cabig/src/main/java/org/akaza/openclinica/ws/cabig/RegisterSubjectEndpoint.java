@@ -90,6 +90,9 @@ public class RegisterSubjectEndpoint extends AbstractCabigDomEndpoint {
 
                     // are there errors here? if so, throw a ccbusiness fault
                     finalSubjectBean = subjectService.generateSubjectBean(subjectBean);
+                    if ("".equals(finalSubjectBean.getUniqueIdentifier())) {
+                        throw new CCSystemFaultException("Your subject does not have a proper Unique Identifier.", "CC10200");
+                    }
 
                     SubjectBean testSubjectBean = getSubjectDao().findByUniqueIdentifier(subjectBean.getUniqueIdentifier());
 
@@ -110,7 +113,7 @@ public class RegisterSubjectEndpoint extends AbstractCabigDomEndpoint {
                         } else {
                             // otherwise, throw an error
                             throw new CCBusinessFaultException("You already have a subject in the database with the unique identifier of "
-                                + subjectBean.getUniqueIdentifier() + ".  Please review your data and re-submit your request.");
+                                + subjectBean.getUniqueIdentifier() + ".  Please review your data and re-submit your request.", "CC10200");
                         }
                     }
                     studySubjectBean = subjectService.generateStudySubjectBean(subjectBean, finalSubjectBean, subjectBean.getStudyBean());
