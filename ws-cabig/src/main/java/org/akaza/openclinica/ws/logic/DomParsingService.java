@@ -281,6 +281,7 @@ public class DomParsingService {
         Element studyElement = (Element) studyNode;
         NodeList nlist = studyElement.getElementsByTagNameNS(CONNECTOR_NAMESPACE_V1, "studyProtocolIdentification");
         String identifier = "";
+        String secondaryIdentifier = "";
         System.out.println("found " + nlist.getLength() + " identifiers");
         for (int j = 0; j < nlist.getLength(); j++) {
             Node nlistNode = nlist.item(j);
@@ -290,10 +291,13 @@ public class DomParsingService {
             String isPrimaryIdentifier = this.getElementValue(nlistNode, CONNECTOR_NAMESPACE_V1, "primaryIndicator", "value");
             if ("true".equals(isPrimaryIdentifier)) {
                 identifier = this.getElementValue(nlistNode, CONNECTOR_NAMESPACE_V1, "identifier", "extension");
+            } else {
+                secondaryIdentifier = this.getElementValue(nlistNode, CONNECTOR_NAMESPACE_V1, "identifier", "extension");
+                System.out.println("found secondary " + secondaryIdentifier);
             }
         }
         study.setIdentifier(identifier);
-        study.setSecondaryIdentifier(identifier);
+        study.setSecondaryIdentifier(secondaryIdentifier);
         return study;
     }
 
