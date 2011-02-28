@@ -1,5 +1,6 @@
 package org.akaza.openclinica.ws.logic;
 
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -106,15 +107,17 @@ public class LoadLabsService {
         StudyEventDefinitionBean sedBean = new StudyEventDefinitionBean();
         ArrayList<StudyEventDefinitionBean> sedBeans = studyEventDefDao.findAllByStudy(studyDao.findByOid(studyOID));
         for (StudyEventDefinitionBean sed : sedBeans) {
-            if ("LoadLabsEvent".equals(sed.getName())) {
+            if ("LoadLabsEvent".equals(sed.getName()) && sed.getStatus().equals(Status.AVAILABLE)) {
                 sedBean = sed;
                 // studyEventOID = sedBean.getOid();
                 break;
             }
-            if (sedBean.getId() == 0) {
-                throw new CCDataValidationFaultException("No proper Study Event entitled 'LoadLabsEvent' was defined for the Study OID " + studyOID + ".",
-                        "CC10310");
-            }
+
+        }
+        // if you dont have a valid sed by now, after the loop, you are outta here, tbh
+        if (sedBean.getId() == 0) {
+            throw new CCDataValidationFaultException("No proper Study Event entitled 'LoadLabsEvent' was defined for the Study OID " + studyOID + ".",
+                    "CC10310");
         }
         // StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) studyEventDefDao.findAllB//.findByName("LoadLabsEvent");
         studyEventOID = sedBean.getOid();
@@ -149,7 +152,7 @@ public class LoadLabsService {
         itemData.add(generateItemData("asCollectedIndicator", "value", data, (ItemBean) itemDao.findByNameAndCRFId("coInd", crfId)));// .findByName("coInd")));
         itemData.add(generateItemData("comment", "value", data, (ItemBean) itemDao.findByNameAndCRFId("comment", crfId)));// .findByName("comment")));
         itemData.add(generateItemData("confidentialityCode", "code", data, (ItemBean) itemDao.findByNameAndCRFId("confCode", crfId)));//.findByName("confCode"))
-                                                                                                                                      // );
+        // );
         itemData.add(generateItemData("numericalResult", "value", data, (ItemBean) itemDao.findByNameAndCRFId("numRes", crfId)));
         itemData.add(generateItemData("numericalResult", "unit", data, (ItemBean) itemDao.findByNameAndCRFId("numResMeasUnit", crfId)));
         // String asCollectedIndicator = xmlService.getElementValue(data, this.CONNECTOR_NAMESPACE_V1, "asCollectedIndicator", "value");

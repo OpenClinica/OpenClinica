@@ -303,8 +303,9 @@ public class AbstractCabigDomEndpoint extends AbstractDomPayloadEndpoint {
         } else {
             // default code + message combination
             // errormessage.appendChild(reason);
-            faultDetailMessage.appendChild(code);
             faultDetailMessage.appendChild(reason);
+            faultDetailMessage.appendChild(code);
+
         }
         // append validation messages here
 
