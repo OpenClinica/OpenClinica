@@ -292,11 +292,11 @@ public class AbstractCabigDomEndpoint extends AbstractDomPayloadEndpoint {
                 Element inputName = document.createElementNS(CONNECTOR_NAMESPACE_V1, "inputName");
                 inputName.setTextContent((String) pair.getKey());
                 validationMessage.appendChild(inputName);
-                Element attributeName = document.createElementNS(CONNECTOR_NAMESPACE_V1, "attributeName");
-                attributeName.setTextContent((String) pair.getKey());
-                validationMessage.appendChild(attributeName);
+                // Element attributeName = document.createElementNS(CONNECTOR_NAMESPACE_V1, "attributeName");
+                // attributeName.setTextContent((String) pair.getKey());
+                // validationMessage.appendChild(attributeName);
                 Element inputMessage = document.createElementNS(CONNECTOR_NAMESPACE_V1, "message");
-                inputMessage.setTextContent((String) pair.getValue());
+                inputMessage.setTextContent((String) pair.getValue());// was pair.getValue()
                 validationMessage.appendChild(inputMessage);
                 faultDetailMessage.appendChild(validationMessage);
             }
@@ -316,8 +316,8 @@ public class AbstractCabigDomEndpoint extends AbstractDomPayloadEndpoint {
         return faultElement;
     }
 
-    public Element mapSubjectErrorConfirmation(String message, OpenClinicaException exception) throws Exception {
-        return mapGenericErrorConfirmation(message, exception, new HashMap<String, String>());
+    public Element mapSubjectErrorConfirmation(String message, OpenClinicaException exception, HashMap<String, String> validations) throws Exception {
+        return mapGenericErrorConfirmation(message, exception, validations);
     }
 
     public Element mapSubjectErrorConfirmation(String message) throws Exception {
@@ -360,9 +360,9 @@ public class AbstractCabigDomEndpoint extends AbstractDomPayloadEndpoint {
         return mapGenericErrorConfirmation(message, new CCSystemFaultException(""), new HashMap<String, String>());
     }
 
-    public Element mapStudyErrorConfirmation(String message, OpenClinicaException exception) throws Exception {
+    public Element mapStudyErrorConfirmation(String message, OpenClinicaException exception, HashMap<String, String> validations) throws Exception {
 
-        return mapGenericErrorConfirmation(message, exception, new HashMap<String, String>());
+        return mapGenericErrorConfirmation(message, exception, validations);
     }
 
     public Element mapLoadLabsConfirmation() throws Exception {
@@ -384,9 +384,9 @@ public class AbstractCabigDomEndpoint extends AbstractDomPayloadEndpoint {
         return responseElement;
     }
 
-    public Element mapLoadLabsErrorConfirmation(String message, OpenClinicaException exception) throws Exception {
+    public Element mapLoadLabsErrorConfirmation(String message, OpenClinicaException exception, HashMap<String, String> validations) throws Exception {
 
-        return mapGenericErrorConfirmation(message, exception, new HashMap<String, String>());
+        return mapGenericErrorConfirmation(message, exception, validations);
     }
 
     public boolean canUserRegisterSubject(UserAccountBean user) {

@@ -33,6 +33,7 @@ import org.w3c.dom.NodeList;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 import javax.sql.DataSource;
 
@@ -117,7 +118,9 @@ public class RollbackCreateStudyEndpoint extends AbstractCabigDomEndpoint {
             if (npe.getClass().getName().startsWith("org.akaza.openclinica.ws.cabig.exception")) {
                 System.out.println("found " + npe.getClass().getName());
                 OpenClinicaException ope = (OpenClinicaException) npe;
-                return mapStudyErrorConfirmation("", ope);
+                HashMap<String, String> validations = new HashMap<String, String>();
+                validations.put("Study Creation Request", ope.message);
+                return mapStudyErrorConfirmation("", ope, validations);
             } else {
                 System.out.println(" did not find openclinica exception, found " + npe.getClass().getName());
                 return mapStudyErrorConfirmation(npe.getMessage());

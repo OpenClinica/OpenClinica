@@ -20,6 +20,7 @@ import org.w3c.dom.NodeList;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 import javax.sql.DataSource;
 
@@ -57,7 +58,9 @@ public class LoadLabsEndpoint extends AbstractCabigDomEndpoint {
             // or do we update instead if it exists? no, because we delete on rollback
             ArrayList<String> messages = labService.importData(dataSource, coreResources, studyBean, getUserAccount(), odmContainer, newStudyEventBean);
             if ("fail".equals(messages.get(0))) {
-                return this.mapLoadLabsErrorConfirmation(messages.get(1), new CCBusinessFaultException("Invalid Lab Data", "CC10310"));
+                HashMap<String, String> validation = new HashMap<String, String>();
+                validation.put("Load Labs Request", messages.get(1));
+                return this.mapLoadLabsErrorConfirmation(messages.get(1), new CCBusinessFaultException("Invalid Lab Data", "CC10310"), validation);
             } else {
                 // include warnings, include other error codes
                 return this.mapLoadLabsConfirmation();
@@ -68,10 +71,13 @@ public class LoadLabsEndpoint extends AbstractCabigDomEndpoint {
             if (e.getClass().getName().startsWith("org.akaza.openclinica.ws.cabig.exception")) {
                 System.out.println("found " + e.getClass().getName());
                 OpenClinicaException ope = (OpenClinicaException) e;
-                return mapLoadLabsErrorConfirmation("", ope);
+                HashMap<String, String> validations = new HashMap<String, String>();
+                validations.put("Load Labs Request", ope.message);
+                return mapLoadLabsErrorConfirmation("", ope, validations);
             } else {
                 System.out.println(" did not find openclinica exception, found " + e.getClass().getName());
-                return mapLoadLabsErrorConfirmation(e.getMessage(), new CCBusinessFaultException("Error with Data Capture Operations", "CC10300"));
+                return mapLoadLabsErrorConfirmation(e.getMessage(), new CCBusinessFaultException("Error with Data Capture Operations", "CC10300"),
+                        new HashMap<String, String>());
             }
         }
         // return this.mapLoadLabsErrorConfirmation(message, exception)

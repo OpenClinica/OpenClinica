@@ -22,6 +22,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.sql.DataSource;
 
@@ -88,10 +89,13 @@ public class RollbackLoadLabsEndpoint extends AbstractCabigDomEndpoint {
             if (e.getClass().getName().startsWith("org.akaza.openclinica.ws.cabig.exception")) {
                 System.out.println("found " + e.getClass().getName());
                 OpenClinicaException ope = (OpenClinicaException) e;
-                return mapLoadLabsErrorConfirmation("", ope);
+                HashMap<String, String> validations = new HashMap<String, String>();
+                validations.put("Load Labs Request", ope.message);
+                return mapLoadLabsErrorConfirmation("", ope, validations);
             } else {
                 System.out.println(" did not find openclinica exception, found " + e.getClass().getName());
-                return mapLoadLabsErrorConfirmation(e.getMessage(), new CCBusinessFaultException("Error with Data Rollback Operations", "CC10300"));
+                return mapLoadLabsErrorConfirmation(e.getMessage(), new CCBusinessFaultException("Error with Data Rollback Operations", "CC10300"),
+                        new HashMap<String, String>());
             }
         }
         return this.mapLoadLabsConfirmation();

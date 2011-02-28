@@ -32,6 +32,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.util.HashMap;
+
 import javax.sql.DataSource;
 
 public class RollbackRegisterSubjectEndpoint extends AbstractCabigDomEndpoint {
@@ -121,7 +123,9 @@ public class RollbackRegisterSubjectEndpoint extends AbstractCabigDomEndpoint {
                 System.out.println("found " + npe.getClass().getName());
 
                 OpenClinicaException ope = (OpenClinicaException) npe;
-                return mapSubjectErrorConfirmation("", ope);
+                HashMap<String, String> validations = new HashMap<String, String>();
+                validations.put("Subject Registration Request", ope.message);
+                return mapSubjectErrorConfirmation("", ope, validations);
             } else {
                 npe.printStackTrace();
                 System.out.println(" did not find openclinica exception, found " + npe.getClass().getName());
