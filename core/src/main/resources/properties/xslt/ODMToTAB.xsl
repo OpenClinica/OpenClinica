@@ -297,6 +297,7 @@
 		<xsl:variable name="OID" select="@OID" />
 		<xsl:variable name="formName" select="@Name" />
 		<xsl:variable name="oid" select="$OID" />
+		<xsl:variable name="crfPosition" select="position()"/>
 		<xsl:value-of select="position()" />
 
 		<xsl:apply-templates
@@ -304,6 +305,7 @@
 			mode="CrfInfo">
 			<xsl:with-param name="oid" select="$oid" />
 			<xsl:with-param name="formName" select="$formName" />
+			<xsl:with-param name="crfPosition" select="$crfPosition"/>
 		</xsl:apply-templates>
 	</xsl:template>
 
@@ -312,9 +314,10 @@
 		match="//odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData/odm:FormData">
 		<xsl:param name="oid"></xsl:param>
 		<xsl:param name="formName"></xsl:param>
+		<xsl:param name="crfPosition"></xsl:param>
 		<xsl:variable name="formOid" select="@FormOID" />
 
-		<xsl:variable name="crfPosition" select="position()" />
+		
 
 		<xsl:for-each
 			select="//odm:FormData[generate-id() = generate-id(key('eventCRFs',$formOid)[1])]">
@@ -327,7 +330,7 @@
 			<xsl:value-of select="$delimiter" />
 			<xsl:value-of select="$C" />
 			<xsl:value-of select="$crfPosition" />
-
+			
 			<xsl:text>&#xa;</xsl:text>
 
 
@@ -529,12 +532,13 @@
 			<xsl:text>_</xsl:text>
 			<xsl:variable name="group" select="$itemData/parent::node()" />
 			<xsl:variable name="groupOID" select="$group/@ItemGroupOID" />
-			<xsl:for-each select="//odm:ItemGroupDef[@OID=$groupOID]">
+			<!-- JN: Commenting out the logic for now, not sure if this is right as per Paul's suggestion -->
+			<!--<xsl:for-each select="//odm:ItemGroupDef[@OID=$groupOID]">
 				<xsl:if test="@Name !='Ungrouped'">
 					<xsl:value-of select="@Name" />
 				</xsl:if>
 			</xsl:for-each>
-			<xsl:if test="$group/@ItemGroupRepeatKey">
+			--><xsl:if test="$group/@ItemGroupRepeatKey">
 				<xsl:text>_</xsl:text>
 				<xsl:value-of select="$group/@ItemGroupRepeatKey" />
 			</xsl:if>
