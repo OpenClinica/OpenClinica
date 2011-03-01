@@ -93,6 +93,11 @@ public class PrintEventCRFServlet extends DataEntryServlet {
                 }
 
                 CRFVersionBean defaultVersion = (CRFVersionBean) cvdao.findByPK(edc.getDefaultVersionId());
+                //There could be separate EventDefinitionCRF objects with same default version id.
+                if (defaultVersions.contains(defaultVersion)) {
+                    continue;
+                }
+
                 edc.setDefaultVersionName(defaultVersion.getName());
                 if (edc.getStatus().isAvailable()) {
                     defaultVersions.add(defaultVersion);

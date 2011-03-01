@@ -99,7 +99,7 @@ public class DisplaySectionBeanHandler {
             // for the purposes of null values, try to obtain a valid
             // eventCrfDefinition id
             EventDefinitionCRFBean eventDefBean = null;
-            EventCRFBean eventCRFBean = null;
+            EventCRFBean eventCRFBean = new EventCRFBean();
             if (eventCRFId > 0) {
                 EventCRFDAO ecdao = new EventCRFDAO(dataSource);
                 eventCRFBean = (EventCRFBean) ecdao.findByPK(eventCRFId);
