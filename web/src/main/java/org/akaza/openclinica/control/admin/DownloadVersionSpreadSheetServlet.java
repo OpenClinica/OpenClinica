@@ -61,7 +61,7 @@ public class DownloadVersionSpreadSheetServlet extends SecureController {
 
     @Override
     public void processRequest() throws Exception {
-        String dir = SQLInitServlet.getField("filePath") + "crf" + File.separator + "original" + File.separator;
+        String dir = SQLInitServlet.getField("filePath") + "crf" + File.separator + "new" + File.separator;
         // YW 09-10-2007 << Now CRF_Design_Template_v2.xls is located at
         // $CATALINA_HOME/webapps/OpenClinica-instanceName/properties
         FormProcessor fp = new FormProcessor(request);
