@@ -218,7 +218,7 @@
             <div class="formfieldM_BG">
 						<input onfocus="this.select()" type="text" name="enrollmentDate" size="15" value="<c:out value="${enrollmentDate}" />" class="formfieldM" id="enrollmentDateField" />
 					</td>
-					<td>
+					<td><span class="formlabel">*</span>
 					<A HREF="#">
   					  <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger" />
                         <script type="text/javascript">
