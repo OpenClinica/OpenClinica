@@ -21,10 +21,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.HttpSessionRequiredException;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 
 import java.util.ArrayList;
@@ -33,6 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author: sshamim
@@ -216,6 +215,20 @@ public class StudyModuleController {
             }
         }
         return "redirect:studymodule";
+    }
+
+    @ExceptionHandler(HttpSessionRequiredException.class)
+    public String handleSessionRequiredException(HttpSessionRequiredException ex, HttpServletRequest request) {
+        return "redirect:/MainMenu";
+    }
+
+    @ExceptionHandler(NullPointerException.class)
+    public String handleNullPointerException(NullPointerException ex, HttpServletRequest request, HttpServletResponse response) {
+        StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
+        if (currentStudy == null) {
+            return "redirect:/MainMenu";
+        }
+        throw ex;
     }
 
     private void setUpSidebar(HttpServletRequest request) {
