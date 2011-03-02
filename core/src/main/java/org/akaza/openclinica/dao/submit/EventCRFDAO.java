@@ -408,10 +408,11 @@ public class EventCRFDAO extends AuditableEntityDAO {
 
     }
 
-    public void setSDVStatus(boolean sdvStatus, int eventCRFId) {
+    public void setSDVStatus(boolean sdvStatus, int userId, int eventCRFId) {
         HashMap variables = new HashMap();
         variables.put(new Integer(1), sdvStatus);
-        variables.put(new Integer(2), eventCRFId);
+        variables.put(new Integer(2), userId);
+        variables.put(new Integer(3), eventCRFId);
 
         this.execute(digester.getQuery("setSDVStatus"), variables);
     }

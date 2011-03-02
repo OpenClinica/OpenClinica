@@ -40,7 +40,7 @@ public class EventCRFBean extends AuditableEntityBean {
     private int studySubjectId = 0;
     private boolean electronicSignatureStatus = false;
     private boolean sdvStatus = false;
-
+    private int sdvUpdateId = 0;
     //the following are not in the table
     private String studySubjectName = "";
     private String eventName = "";
@@ -499,4 +499,11 @@ public class EventCRFBean extends AuditableEntityBean {
         return this.eventOrdinal;
     }
 
+    public int getSdvUpdateId() {
+        return sdvUpdateId;
+    }
+
+    public void setSdvUpdateId(int sdvUpdateId) {
+        this.sdvUpdateId = sdvUpdateId;
+    }
 }
