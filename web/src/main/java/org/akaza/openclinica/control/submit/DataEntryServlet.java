@@ -3686,7 +3686,7 @@ public abstract class DataEntryServlet extends SecureController {
      * @return
      */
 
-    protected boolean markCRFComplete() throws Exception {
+   protected boolean markCRFComplete() throws Exception {
         locale = request.getLocale();
         // < respage =
         // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",
@@ -3748,7 +3748,16 @@ public abstract class DataEntryServlet extends SecureController {
             ecb.setUpdatedDate(new Date());
             ecb.setDateCompleted(new Date());
             ecb.setDateValidateCompleted(new Date());
-        } else if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE) || stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
+        } else if (stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) && edcb.isDoubleEntry()) {
+            newStatus = Status.UNAVAILABLE;
+            ecb.setUpdaterId(ub.getId());
+            ecb.setUpdater(ub);
+            ecb.setUpdatedDate(new Date());
+            ecb.setDateCompleted(new Date());
+            ecb.setDateValidateCompleted(new Date());
+            ide=false;
+        }
+        else if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE) || stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
             newStatus = Status.UNAVAILABLE;
             ecb.setDateValidateCompleted(new Date());
             ide = false;
@@ -3790,6 +3799,8 @@ public abstract class DataEntryServlet extends SecureController {
 
         boolean eventCompleted = true;
         boolean allRequired = true;
+        //JN Adding another flag
+        boolean allCrfsCompleted = true;
         int allEDCsize = allEDCs.size();
         ArrayList nonRequiredCrfIds = new ArrayList();
         // go through the list and find out if all are required, tbh
@@ -3817,6 +3828,22 @@ public abstract class DataEntryServlet extends SecureController {
                 logger.trace("just rejected eventCompleted looking at a CRF: " + ec.getName());
                 break;
             }
+            
+        }
+        //JN: The following logic is to iterate through all crfs to see if all are marked as done, if not allcrfsflag will be set to false.
+        for (int i = 0; i < allCRFs.size(); i++) {
+            EventCRFBean ec = (EventCRFBean) allCRFs.get(i);
+            logger.trace("-- looking at a CRF: " + ec.getName() + " " + ec.getCrf().getName() + " " + ec.getCrf().getId());
+            // if clause kind of not right since none of the above fields are
+            // set in the dao, tbh
+            if (!ec.getStatus().equals(Status.UNAVAILABLE)) { // &&
+                // (!nonRequiredCrfIds.contains(new
+                // Integer(ec.getCrf().getId())))) {
+                allCrfsCompleted = false;
+                logger.trace("just rejected eventCompleted looking at a CRF: " + ec.getName());
+                break;
+            }
+            
         }
 
         if (!allRequired) {
@@ -3826,11 +3853,16 @@ public abstract class DataEntryServlet extends SecureController {
         if (eventCompleted && allCRFs.size() >= allEDCsize) {// was
             // allEDCs.size(),
             // tbh
-            if (!allRequired && allEDCsize != 0) {// what if there are no
+            //JN: all crfs are completed and not all are required then set the subject event status as complete
+            if (allCrfsCompleted && !allRequired && allEDCsize != 0)
+            {
+                seb.setSubjectEventStatus(SubjectEventStatus.COMPLETED);
+            }
+            else if (!allRequired && allEDCsize != 0) {// what if there are no// TODO:
                 // required CRFs, and all
                 // CRFs have been finished?
                 addPageMessage(respage.getString("CRF_completed"));
-            } else if (!edcb.isDoubleEntry()){
+            } else if (!edcb.isDoubleEntry()){ //TODO: perhaps this logic can go... JN check later
                 logger.trace("just set subj event status to -- COMPLETED --");
                 seb.setSubjectEventStatus(SubjectEventStatus.COMPLETED);
             }
@@ -3840,7 +3872,6 @@ public abstract class DataEntryServlet extends SecureController {
 
         return true;
     }
-
     private void getEventCRFBean() {
         fp = new FormProcessor(request);
         int eventCRFId = fp.getInt(INPUT_EVENT_CRF_ID);
