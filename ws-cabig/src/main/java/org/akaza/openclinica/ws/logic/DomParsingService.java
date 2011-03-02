@@ -64,10 +64,15 @@ public class DomParsingService {
                 Node nodeValue = nodeMap.getNamedItem("nullFlavor");
                 ret = nodeValue.getNodeValue();
             }
+
         } catch (Exception ee) {
             throw new CCDataValidationFaultException("Could not find tag for value " + xmlLine
                 + ", please review that you have this tag in your file and try your response again", "CC10030");
         }
+        // if ("".equals(ret)) {
+        // throw new CCDataValidationFaultException("Could not find value for " + xmlLine
+        // + ", please fill in this value in your file and try your response again", "CC10030");
+        // }
         return ret;
 
     }
@@ -295,6 +300,14 @@ public class DomParsingService {
                 secondaryIdentifier = this.getElementValue(nlistNode, CONNECTOR_NAMESPACE_V1, "identifier", "extension");
                 System.out.println("found secondary " + secondaryIdentifier);
             }
+        }
+        if ("".equals(identifier)) {
+            throw new CCDataValidationFaultException("Could not find value for study identifier"
+                + ", please fill in this value in your file and try your response again", "CC10030");
+        }
+        if ("".equals(secondaryIdentifier)) {
+            throw new CCDataValidationFaultException("Could not find value for secondary study identifier"
+                + ", please fill in this value in your file and try your response again", "CC10030");
         }
         study.setIdentifier(identifier);
         study.setSecondaryIdentifier(secondaryIdentifier);
