@@ -248,7 +248,7 @@ public abstract class DataEntryServlet extends SecureController {
     protected boolean isSubmitted = false;
 
     protected boolean hasGroup = false;
-    
+   
     protected String rowDisplay = "";
 
     /*
@@ -572,13 +572,13 @@ public abstract class DataEntryServlet extends SecureController {
             logger.debug("+++ just ran populateNotes, printing field notes: " + discNotes.getFieldNotes().toString());
             logger.debug("found disc notes: " + discNotes.getNumExistingFieldNotes().toString());
             session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
-            
+           
             if(section.getSection().hasSCDItem()) {
                 section = SCDItemDisplayInfo.generateSCDDisplayInfo(section,this.getServletPage().equals(Page.INITIAL_DATA_ENTRY)
                         || this.getServletPage().equals(Page.ADMIN_EDIT_SERVLET) && !this.isAdminForcedReasonForChange());
             }
 
-            int keyId = ecb.getId(); 
+            int keyId = ecb.getId();
             session.removeAttribute(DoubleDataEntryServlet.COUNT_VALIDATE + keyId);
 
             setUpPanel(section);
@@ -736,7 +736,7 @@ public abstract class DataEntryServlet extends SecureController {
 
                 }
             }
-            
+           
             if(validate && section.getSection().hasSCDItem()) {
                 for (int i = 0; i < allItems.size(); ++i) {
                     DisplayItemBean dib = allItems.get(i).getSingleItem();
@@ -764,12 +764,12 @@ public abstract class DataEntryServlet extends SecureController {
                                 //a control item is always before its scd item
                                 child.setIsSCDtoBeShown(section.getShowSCDItemIds().contains(child.getMetadata().getItemId()));
                                 validateSCDItemBean(v, child);
-                            } 
+                            }
                         }
                     }
                 }
             }
-            
+           
             Phase phase2 = Phase.INITIAL_DATA_ENTRY;
             if (getServletPage().equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
                 phase2 = Phase.DOUBLE_DATA_ENTRY;
@@ -1152,7 +1152,7 @@ public abstract class DataEntryServlet extends SecureController {
                 v.addValidation(INPUT_INTERVIEW_DATE, Validator.IS_A_DATE);
                 v.alwaysExecuteLastValidation(INPUT_INTERVIEW_DATE);
             }
-            
+           
             if(section.getSection().hasSCDItem()) {
                 section = SCDItemDisplayInfo.generateSCDDisplayInfo(section,this.getServletPage().equals(Page.INITIAL_DATA_ENTRY)
                         || this.getServletPage().equals(Page.ADMIN_EDIT_SERVLET) && !this.isAdminForcedReasonForChange() );
@@ -1416,7 +1416,7 @@ public abstract class DataEntryServlet extends SecureController {
                 logger.debug("all items before saving into DB" + allItems.size());
                 this.output(allItems);
 
-                
+               
                 for (int i = 0; i < allItems.size(); i++) {
                     DisplayItemWithGroupBean diwb = allItems.get(i);
 
@@ -2614,8 +2614,8 @@ public abstract class DataEntryServlet extends SecureController {
             if (!metadataBean.isShowGroup()) {
                 // set isShown here, tbh 04/2010
                 boolean showGroup = getItemMetadataService().isGroupShown(metadataBean.getId(), ecb);
-                // logger.debug("found show group for group meta bean " + metadataBean.getId() + ": " + 
-                //        metadataBean.getItemGroupId() + 
+                // logger.debug("found show group for group meta bean " + metadataBean.getId() + ": " +
+                //        metadataBean.getItemGroupId() +
                 //        ": " + ecb.getId() + ": " + showGroup);
 
                 if (getServletPage().equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
@@ -2889,17 +2889,17 @@ public abstract class DataEntryServlet extends SecureController {
     protected boolean writeToDB(DisplayItemBean dib, ItemDataDAO iddao, int ordinal) {
         ItemDataBean idb = dib.getData();
         if (getServletPage().equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
-        	if (!dib.getMetadata().isShowItem() && !(dib.getScdItemMetadataBean().getScdItemFormMetadataId()>0) &&
-        			idb.getValue().equals("") &&
-        			!getItemMetadataService().hasPassedDDE(dib.getMetadata(), ecb, idb)) {//(dib.getItem().getId(), ecb, idb)) {// && !getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getData())) {
-        		logger.debug("*** not shown - not writing for idb id " + dib.getData().getId() + " and item id " + dib.getItem().getId());
-        		return true;
-        	}
+                if (!dib.getMetadata().isShowItem() && !(dib.getScdItemMetadataBean().getScdItemFormMetadataId()>0) &&
+                                idb.getValue().equals("") &&
+                                !getItemMetadataService().hasPassedDDE(dib.getMetadata(), ecb, idb)) {//(dib.getItem().getId(), ecb, idb)) {// && !getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getData())) {
+                        logger.debug("*** not shown - not writing for idb id " + dib.getData().getId() + " and item id " + dib.getItem().getId());
+                        return true;
+                }
         } else {
-        	if (!dib.getMetadata().isShowItem() &&
-            		idb.getValue().equals("") &&
-            		!getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getData()) &&
-            		!(dib.getScdItemMetadataBean().getScdItemFormMetadataId()>0)) {
+                if (!dib.getMetadata().isShowItem() &&
+                        idb.getValue().equals("") &&
+                        !getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getData()) &&
+                        !(dib.getScdItemMetadataBean().getScdItemFormMetadataId()>0)) {
                 logger.debug("*** not shown - not writing for idb id " + dib.getData().getId() + " and item id " + dib.getItem().getId());
                 return true;
             }
@@ -2913,7 +2913,7 @@ public abstract class DataEntryServlet extends SecureController {
 
         idb.setItemId(dib.getItem().getId());
         idb.setEventCRFId(ecb.getId());
-        
+       
         if (idb.getValue().equals("")) {
             idb.setStatus(getBlankItemStatus());
         } else {
@@ -2950,11 +2950,11 @@ public abstract class DataEntryServlet extends SecureController {
                 idb = (ItemDataBean) iddao.upsert(idb);
                 // <<tbh
             } else if ("edit".equalsIgnoreCase(dib.getEditFlag())) {
-  				idb.setUpdater(ub);
-                
+                                idb.setUpdater(ub);
+               
                 // System.out.println("update an item data - running update value " + idb.getId() + " :" + idb.getValue());
                 logger.info("update item update_id " + idb.getUpdater().getId());
-                // update tbh #5999, #5998; if an item_data was not included in 
+                // update tbh #5999, #5998; if an item_data was not included in
                 // an import data, it won't exist; we need to check on item_data_id
                 // to make sure we are running the correct command on the db
                 if (idb.getId() != 0) {
@@ -3070,7 +3070,7 @@ public abstract class DataEntryServlet extends SecureController {
         DisplaySectionBean section = new DisplaySectionBean();
         FormProcessor fp = new FormProcessor(request);
         StudyBean study = (StudyBean) session.getAttribute("study");
-        
+       
         // Find out whether there are ungrouped items in this section
         boolean hasUngroupedItems = false;
         int eventDefinitionCRFId = fp.getInt("eventDefinitionCRFId");
@@ -3107,7 +3107,7 @@ public abstract class DataEntryServlet extends SecureController {
         // Find out whether any display items are *not* grouped; see issue 1689
         hasUngroupedItems = formBeanUtil.sectionHasUngroupedItems(sm.getDataSource(), sb.getId(), itemGroups);
         sdao = new SectionDAO(sm.getDataSource());
-        
+       
         sb.setHasSCDItem(hasUngroupedItems?this.sdao.hasSCDItem(sb.getId()):false);
 
         section.setEventCRF(ecb);
@@ -3278,8 +3278,8 @@ public abstract class DataEntryServlet extends SecureController {
             }
             // however, if we have true:true, we exclude all grouped items
             //            items.addAll(
-            //            		idao.findAllGroupedParentsBySectionId(
-            //            				sb.getId(), sb.getCRFVersionId()));
+            //                          idao.findAllGroupedParentsBySectionId(
+            //                                          sb.getId(), sb.getCRFVersionId()));
         } else {
             logger.trace("no item groups");
             items = idao.findAllParentsBySectionId(sb.getId());
@@ -3602,46 +3602,46 @@ public abstract class DataEntryServlet extends SecureController {
             if (INTERVIEWER_NAME.equalsIgnoreCase(dn.getColumn())) {
 
 
-                	nameNotes.add(dn);
+                        nameNotes.add(dn);
 
 
             }
 
             if (DATE_INTERVIEWED.equalsIgnoreCase(dn.getColumn())) {
-                             	dateNotes.add(dn);
+                                dateNotes.add(dn);
             }
 
         }
         request.setAttribute("nameNotes", nameNotes);
         request.setAttribute("intrvDates", dateNotes);
-	}
+        }
 
-	/*@RequestMapping(value="/{nameNotes}", method=RequestMethod.GET)
+        /*@RequestMapping(value="/{nameNotes}", method=RequestMethod.GET)
     public @ResponseBody ArrayList<DiscrepancyNoteBean> sendJSONNames(ArrayList<DiscrepancyNoteBean> existingNameNotes) {
-		return existingNameNotes;
-	}*/
+                return existingNameNotes;
+        }*/
 
 
 
-	/**
+        /**
      * To set the totals of each resolution status on the DisplayItemBean for each item.
      * @param dib
      * @param notes
      */
     private DisplayItemBean setTotals(DisplayItemBean dib,int itemDataId,ArrayList<DiscrepancyNoteBean> notes)
     {
-    	int resolutionStatus;
-    	int totNew = 0,totRes = 0,totClosed = 0,totUpdated =0,totNA = 0;
-    	boolean hasOtherThread = false;
-    	 ArrayList<DiscrepancyNoteBean> existingNotes = dndao.findExistingNotesForToolTip(itemDataId);
-    	 dib.setDiscrepancyNotes(existingNotes);
+        int resolutionStatus;
+        int totNew = 0,totRes = 0,totClosed = 0,totUpdated =0,totNA = 0;
+        boolean hasOtherThread = false;
+         ArrayList<DiscrepancyNoteBean> existingNotes = dndao.findExistingNotesForToolTip(itemDataId);
+         dib.setDiscrepancyNotes(existingNotes);
 
          for (DiscrepancyNoteBean obj : dib.getDiscrepancyNotes()) {
              DiscrepancyNoteBean note =  obj;
 
 
              if (note.getParentDnId() == 0) {
-                	 resolutionStatus = note.getResolutionStatusId();
+                         resolutionStatus = note.getResolutionStatusId();
                  totNew++;//using totNew to show the total parent threads
                  /* if(resolutionStatus==ResolutionStatus.UPDATED.getId())totUpdated++;
                  else if(resolutionStatus==ResolutionStatus.RESOLVED.getId())totRes++;//Resolution proposed count
@@ -3673,11 +3673,11 @@ public abstract class DataEntryServlet extends SecureController {
             dib.getData().setAuditLog(true);    
         }
         dib.setTotNew(totNew);//totNew is used for parent thread count
-    	dib.setTotRes(totRes);
-    	dib.setTotUpdated(totUpdated);
-    	dib.setTotClosed(totClosed);
-    	dib.setTotNA(totNA);
-    	return dib;
+        dib.setTotRes(totRes);
+        dib.setTotUpdated(totUpdated);
+        dib.setTotClosed(totClosed);
+        dib.setTotNA(totNA);
+        return dib;
     }
 
     /**
@@ -3748,16 +3748,7 @@ public abstract class DataEntryServlet extends SecureController {
             ecb.setUpdatedDate(new Date());
             ecb.setDateCompleted(new Date());
             ecb.setDateValidateCompleted(new Date());
-        } else if (stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) && edcb.isDoubleEntry()) {
-            newStatus = Status.UNAVAILABLE;
-            ecb.setUpdaterId(ub.getId());
-            ecb.setUpdater(ub);
-            ecb.setUpdatedDate(new Date());
-            ecb.setDateCompleted(new Date());
-            ecb.setDateValidateCompleted(new Date());
-            ide=false;
-        }
-        else if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE) || stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
+        } else if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE) || stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
             newStatus = Status.UNAVAILABLE;
             ecb.setDateValidateCompleted(new Date());
             ide = false;
@@ -3799,8 +3790,6 @@ public abstract class DataEntryServlet extends SecureController {
 
         boolean eventCompleted = true;
         boolean allRequired = true;
-		//JN Adding another flag
-        boolean allCrfsCompleted = true;
         int allEDCsize = allEDCs.size();
         ArrayList nonRequiredCrfIds = new ArrayList();
         // go through the list and find out if all are required, tbh
@@ -3828,23 +3817,8 @@ public abstract class DataEntryServlet extends SecureController {
                 logger.trace("just rejected eventCompleted looking at a CRF: " + ec.getName());
                 break;
             }
-            
         }
-        //JN: The following logic is to iterate through all crfs to see if all are marked as done, if not allcrfsflag will be set to false.
-        for (int i = 0; i < allCRFs.size(); i++) {
-            EventCRFBean ec = (EventCRFBean) allCRFs.get(i);
-            logger.trace("-- looking at a CRF: " + ec.getName() + " " + ec.getCrf().getName() + " " + ec.getCrf().getId());
-            // if clause kind of not right since none of the above fields are
-            // set in the dao, tbh
-            if (!ec.getStatus().equals(Status.UNAVAILABLE)) { // &&
-                // (!nonRequiredCrfIds.contains(new
-                // Integer(ec.getCrf().getId())))) {
-                allCrfsCompleted = false;
-                logger.trace("just rejected eventCompleted looking at a CRF: " + ec.getName());
-                break;
-            }
-            
-        }
+
         if (!allRequired) {
             logger.trace("SEB contains some nonrequired CRFs: " + allEDCsize + " vs " + allEDCs.size());
         }
@@ -3852,12 +3826,6 @@ public abstract class DataEntryServlet extends SecureController {
         if (eventCompleted && allCRFs.size() >= allEDCsize) {// was
             // allEDCs.size(),
             // tbh
-            //JN: all crfs are completed and not all are required then set the subject event status as complete
-            if (allCrfsCompleted && !allRequired && allEDCsize != 0)
-            {
-                seb.setSubjectEventStatus(SubjectEventStatus.COMPLETED);
-            }
-            else if (!allRequired && allEDCsize != 0) {// what if there are no// TODO:			
             if (!allRequired && allEDCsize != 0) {// what if there are no
                 // required CRFs, and all
                 // CRFs have been finished?
@@ -4101,7 +4069,7 @@ public abstract class DataEntryServlet extends SecureController {
                 DisplayItemBean checkItem = firstItem;
                 // does not work if there is not any data in the first item of the group
                 // i.e. imports.
-                // does it make a difference if we take a last item? 
+                // does it make a difference if we take a last item?
                 boolean noNeedToSwitch = false;
                 for (int i = 0; i < data.size(); i++) {
                     ItemDataBean idb = (ItemDataBean) data.get(i);
@@ -4399,7 +4367,7 @@ public abstract class DataEntryServlet extends SecureController {
         }
         return false;
     }
-    
+   
     protected boolean isChanged(DisplayItemBean dib, HashMap<Integer, String> oldItemdata, String attachedFilePath) {
         ItemDataBean idb = dib.getData();
         String value = idb.getValue();
@@ -4427,7 +4395,7 @@ public abstract class DataEntryServlet extends SecureController {
     protected boolean isChanged(ItemDataBean idb, HashMap<Integer, String> oldItemdata, DisplayItemBean dib,String attachedFilePath) {
         //if(dib.getMetadata().isConditionalDisplayItem() && !dib.getIsSCDtoBeShown()) {
             //return false;
-            
+           
         //} else {
             return isChanged(dib, oldItemdata, attachedFilePath);
         //}
@@ -4939,3 +4907,4 @@ public abstract class DataEntryServlet extends SecureController {
         return resolutionStatus;
     }
 }
+  
