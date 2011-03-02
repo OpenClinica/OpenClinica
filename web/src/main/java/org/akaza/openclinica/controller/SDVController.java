@@ -42,7 +42,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
-import com.sun.deploy.net.HttpRequest;
 
 /**
  * Implement the functionality for displaying a table of Event CRFs for Source Data
