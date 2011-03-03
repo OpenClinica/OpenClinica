@@ -3796,13 +3796,15 @@ public abstract class DataEntryServlet extends SecureController {
         ArrayList allCRFs = ecdao.findAllByStudyEvent(seb);
         StudyBean study = (StudyBean) session.getAttribute("study");
         ArrayList allEDCs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study, seb.getStudyEventDefinitionId());
-
+        CRFVersionDAO crfversionDao=  new CRFVersionDAO(sm.getDataSource());
         boolean eventCompleted = true;
         boolean allRequired = true;
         //JN Adding another flag
-        boolean allCrfsCompleted = true;
+        boolean allCrfsCompleted = false;
         int allEDCsize = allEDCs.size();
         ArrayList nonRequiredCrfIds = new ArrayList();
+        ArrayList requiredCrfIds = new ArrayList();
+        
         // go through the list and find out if all are required, tbh
         for (int ii = 0; ii < allEDCs.size(); ii++) {
             EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) allEDCs.get(ii);
@@ -3812,7 +3814,17 @@ public abstract class DataEntryServlet extends SecureController {
                 nonRequiredCrfIds.add(new Integer(edcBean.getCrfId()));
                 allEDCsize--;
             }
+            if (edcBean.isRequiredCRF()) {
+                logger.trace("found one non required CRF: " + edcBean.getCrfName() + " " + edcBean.getCrfId() + " " + edcBean.getDefaultVersionName());
+                            requiredCrfIds.add(new Integer(edcBean.getCrfId()));
+              
+            }
+            
         }
+        
+        //JN: Add another loop to get list of all required crfs
+        
+        
         logger.trace("non required crf ids: " + nonRequiredCrfIds.toString());
         // go through all the crfs and check their status
         // add an additional check to see if it is required or not, tbh
@@ -3830,22 +3842,29 @@ public abstract class DataEntryServlet extends SecureController {
             }
             
         }
+        int reqCRFCNTR = 0;
         //JN: The following logic is to iterate through all crfs to see if all are marked as done, if not allcrfsflag will be set to false.
         for (int i = 0; i < allCRFs.size(); i++) {
             EventCRFBean ec = (EventCRFBean) allCRFs.get(i);
             logger.trace("-- looking at a CRF: " + ec.getName() + " " + ec.getCrf().getName() + " " + ec.getCrf().getId());
+            System.out.println("-- looking at a CRF: " + ec.getName() + " " + ec.getCrf().getName() + " " + ec.getCrf().getId());
             // if clause kind of not right since none of the above fields are
             // set in the dao, tbh
-            if (!ec.getStatus().equals(Status.UNAVAILABLE)) { // &&
-                // (!nonRequiredCrfIds.contains(new
-                // Integer(ec.getCrf().getId())))) {
-                allCrfsCompleted = false;
+           CRFVersionBean crfVersionBean = (CRFVersionBean) crfversionDao.findByPK(ec.getCRFVersionId());
+           int crfId = crfVersionBean.getCrfId();
+           
+            
+            if (ec.getStatus().equals(Status.UNAVAILABLE)&& requiredCrfIds.contains(new Integer(crfId)) ) { // &&
+                allCrfsCompleted = true;
                 logger.trace("just rejected eventCompleted looking at a CRF: " + ec.getName());
-                break;
+                reqCRFCNTR++;
+           //     break;
             }
             
         }
-
+        if (requiredCrfIds.size()==0) allCrfsCompleted = true;// Incase none of the crfs are required.
+        else if(reqCRFCNTR!=requiredCrfIds.size()) allCrfsCompleted = false;
+        
         if (!allRequired) {
             logger.trace("SEB contains some nonrequired CRFs: " + allEDCsize + " vs " + allEDCs.size());
         }
