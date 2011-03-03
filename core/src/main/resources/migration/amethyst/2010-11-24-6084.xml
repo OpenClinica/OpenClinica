@@ -3,6 +3,20 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
     
+    <changeSet author="kkrumlian" id="2010-11-24-6084-1-1" dbms="postgresql">
+        <comment>Disable item_data triggers</comment>
+        <sql>
+            alter table item_data DISABLE TRIGGER item_data_update;
+            alter table item_data DISABLE TRIGGER repeating_data_insert;
+        </sql>
+    </changeSet>
+    <changeSet author="kkrumlian" id="2010-11-24-6084-1-2" dbms="oracle">
+        <comment>Disable item_data triggers</comment>
+        <sql>
+            alter trigger item_data_update disable;
+            alter trigger repeating_data_insert disable;
+        </sql>
+    </changeSet>
     <changeSet author="kkrumlian" id="2010-11-24-6084-1" dbms="postgresql">
         <comment>Change date format for dataype date,pdate (MM/dd/YYYY) to ISO-8601</comment>
         <sql>
@@ -251,6 +265,20 @@
                 idx.item_id = i.item_id and
                 idx.item_data_id = ITEM_DATA.item_data_id and
                 i.item_data_type_id = idt.item_data_type_id and  idt.item_data_type_id = 10 );
+        </sql>
+    </changeSet>
+    <changeSet author="kkrumlian" id="2010-11-24-6084-5" dbms="postgresql">
+        <comment>Disable item_data triggers</comment>
+        <sql>
+            alter table item_data ENABLE TRIGGER item_data_update;
+            alter table item_data ENABLE TRIGGER repeating_data_insert;
+        </sql>
+    </changeSet>
+    <changeSet author="kkrumlian" id="2010-11-24-6084-6" dbms="oracle">
+        <comment>Disable item_data triggers</comment>
+        <sql>
+            alter trigger item_data_update enable;
+            alter trigger repeating_data_insert enable;
         </sql>
     </changeSet>
 </databaseChangeLog>
