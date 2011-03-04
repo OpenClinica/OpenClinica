@@ -547,21 +547,21 @@
                  <a href="#"
                     onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
                     onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');"
-                    onclick="checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>&<c:out value="${getQuery}"/>');">
+                    onclick="checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
                     <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="begin_double_data_entry" bundle="${resword}"/>" title="<fmt:message key="begin_double_data_entry" bundle="${resword}"/>" align="left" hspace="6"></a>
                 </c:if>
                 <c:if test="${dec.continueDoubleDataEntryPermitted}">
                   <a href="#"
                     onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
                     onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');"
-                    onclick="checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>&<c:out value="${getQuery}"/>');">
+                    onclick="checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
                     <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="continue_entering_data" bundle="${resword}"/>" title="<fmt:message key="continue_entering_data" bundle="${resword}"/>" align="left" hspace="6"></a>
                 </c:if>
                 <c:if test="${dec.performAdministrativeEditingPermitted}">
                  <a href="#"
                     onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
                     onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');"
-                    onclick="checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>&<c:out value="${getQuery}"/>');">
+                    onclick="checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
                     <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="administrative_editing" bundle="${resword}"/>" title="<fmt:message key="administrative_editing" bundle="${resword}"/>" align="left" hspace="6">
                     </a>
                 </c:if>
