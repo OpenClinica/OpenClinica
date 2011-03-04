@@ -19,6 +19,6 @@
     <include file="migration/amethyst/2010-12-02-6421.xml"/>
     <include file="migration/amethyst/2010-12-17-NA01.xml"/>
     <include file="migration/amethyst/2011-02-07-7181.xml"/>
-    <include file="migration/amethyst/2011-02-08-7181.xml"/>
+    <include file="migration/amethyst/2011-03-01-6567.xml"/>
     <include file="migration/amethyst/2011-03-01-7700.xml"/>
 </databaseChangeLog>
