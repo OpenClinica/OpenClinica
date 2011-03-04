@@ -328,7 +328,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             String muSql = "";
                             if (this.existingUnits.size() > 0) {
                             } else {
-                                this.existingUnits = this.measurementUnitDao.findAllNamesInUpperCase();
+                                this.existingUnits = this.measurementUnitDao.findAllNames();
                                 if (this.existingUnits == null) {
                                     this.existingUnits = new TreeSet<String>();
                                 }
@@ -340,12 +340,12 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                     this.existingOIDs = new TreeSet<String>();
                                 }
                             }
-                            if (this.existingUnits.contains(unit.toUpperCase())) {
-                                this.logger.error("unit=" + unit + " existed.");
+                            if (this.existingUnits.contains(unit)) {
+                                this.logger.debug("unit=" + unit + " existed.");
                             } else {
                                 String oid = "";
                                 try {
-                                    oid = new MeasurementUnitOidGenerator().generateOidNoValidation(unit);
+                                    oid = new MeasurementUnitOidGenerator().generateOid(unit);
                                 } catch (Exception e) {
                                     throw new RuntimeException("CANNOT GENERATE OID");
                                 }
@@ -356,7 +356,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                     oid = new MeasurementUnitOidGenerator().randomizeOid(oid);
                                 }
                                 this.existingOIDs.add(oid);
-                                this.existingUnits.add(unit.toUpperCase());
+                                this.existingUnits.add(unit);
                                 muSql = this.getMUInsertSql(oid, unit, ub.getId(), dbName);
                                 queries.add(muSql);
                             }
