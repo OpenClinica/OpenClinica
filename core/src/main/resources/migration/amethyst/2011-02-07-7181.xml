@@ -1,8 +1,5 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
 	<changeSet author="ywang" id="2011-02-07-7181-1">
-		<preConditions onFail="MARK_RAN">
-  			<not><tableExists tableName="scd_item_metadata" schemaName="public"/></not>
-		</preConditions>
 		<comment>Create table scd_item_metadata</comment>
 		<createTable tableName="scd_item_metadata">
 			<column autoIncrement="true" name="id" type="int">
@@ -42,9 +39,6 @@
 		</sql>
 	</changeSet>
 	<changeSet author="ywang" id="2011-02-07-7181-4">
-		<preConditions onFail="MARK_RAN">
-			<not><foreignKeyConstraintExists foreignKeyName="scd_meta_fk_scd_form_meta_id" schemaName="public"/></not>
-		</preConditions>
 		<comment>Add foreign key for scd_item_metadata</comment>
     	<addForeignKeyConstraint constraintName="scd_meta_fk_scd_form_meta_id"
     	                         baseColumnNames="scd_item_form_metadata_id" 
@@ -54,9 +48,6 @@
     	                         referencedTableName="item_form_metadata"/>
     </changeSet>
     <changeSet author="ywang" id="2011-02-07-7181-5">
-    	<preConditions onFail="MARK_RAN">
-			<not><foreignKeyConstraintExists foreignKeyName="scd_meta_fk_control_meta_id" schemaName="public"/></not>
-		</preConditions>
 		<comment>Add foreign key for scd_item_metadata</comment>
     	<addForeignKeyConstraint constraintName="scd_meta_fk_control_meta_id"
     	                         baseColumnNames="control_item_form_metadata_id" 
