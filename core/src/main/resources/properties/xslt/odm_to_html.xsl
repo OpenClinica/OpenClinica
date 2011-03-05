@@ -247,23 +247,18 @@
 	</xsl:template>
 	
 	<xsl:template match="/odm:ODM/odm:ClinicalData" mode="clinicalMetadata">
-	<xsl:text>here1</xsl:text>
 	<xsl:apply-templates select="odm:SubjectData" mode="SubjectMetaData"/>
 	</xsl:template>
 	<xsl:template match="/odm:ODM/odm:ClinicalData/odm:SubjectData" mode="SubjectMetaData">
-		<xsl:text>here2</xsl:text>
 	<xsl:apply-templates select="odm:StudyEventData" mode="studyEventMetadata"/>
 	</xsl:template>
 	<xsl:template match="/odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData" mode="studyEventMetadata">
-		<xsl:text>here3</xsl:text>
 	<xsl:apply-templates select="odm:FormData" mode="FormMetaData"/>
 	</xsl:template>
 	<xsl:template match="/odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData/odm:FormData" mode="FormMetaData">
-		<xsl:text>here4</xsl:text>
 	<xsl:apply-templates select="odm:ItemGroupData" mode="itemGroupMetadata"/>
 	</xsl:template>
 	<xsl:template match="/odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData/odm:FormData/odm:ItemGroupData" mode="itemGroupMetadata">
-		<xsl:text>here5</xsl:text>
 	<xsl:apply-templates select="odm:ItemData" mode="itemDataMetadata"/>
 	</xsl:template>
 	<xsl:template match="/odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData/odm:FormData/odm:ItemGroupData/odm:ItemData" mode="itemDataMetadata">
