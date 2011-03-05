@@ -72,7 +72,7 @@
 		<html>
 			<script language="JavaScript1.2">
 				function openWin(ele) {
-				alert("here?"+ele);
+				
 				newwin =
 				window.open('', 'windowname1', 'width=900', 'height=500','scrollbars=1');
 				var divTxt = document.getElementById(ele);
