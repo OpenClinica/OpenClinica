@@ -95,6 +95,8 @@
 
 				<div class="tablebox_center" align="left">
 					<table border="1" cellpadding="0" cellspacing="0">
+					<!-- Fix for 0007973 -->
+					<!--
 						<tr valign="top">
 							<td class="table_header_column_top">Database Export Header Metadata</td>
 							<td class="table_cell_top">
@@ -104,7 +106,7 @@
 								<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
 							</td>
 						</tr>
-						<tr>
+						--><tr>
 							<td class="table_header_column">Dataset Name:</td>
 							<td class="table_cell">
 								<xsl:value-of select="$datasetName" />
