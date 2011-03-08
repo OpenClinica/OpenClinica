@@ -82,6 +82,7 @@
         <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="study_events" bundle="${resword}"/></b><br></td>
         <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="location" bundle="${resword}"/></b><br></td>
         <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="date" bundle="${resword}"/></b><br></td>
+        <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="occurrence_number" bundle="${resword}"/></b><br></td>
     </tr>
     <c:forEach var="event" items="${events}">
         <tr>
@@ -95,6 +96,7 @@
                     <td class="table_header_column"><fmt:formatDate value="${event.dateStarted}" type="both" pattern="${dteFormat}" timeStyle="short"/>&nbsp;</td>
                 </c:otherwise>
             </c:choose>
+            <td class="table_header_column"><c:out value="${event.sampleOrdinal}"/>&nbsp;</td>
         </tr>
     </c:forEach>
 </table>
@@ -124,6 +126,10 @@
 <tr>
     <td class="table_header_column"><c:out value="Status"/></td>
     <td class="table_header_column"><c:out value="${event.subjectEventStatus.name}"/>&nbsp;</td>
+</tr>
+<tr>
+    <td class="table_header_column"><fmt:message key="occurrence_number" bundle="${resword}"/></td>
+    <td class="table_header_column"><c:out value="${event.sampleOrdinal}"/>&nbsp;</td>
 </tr>
 <tr>
 <tr><td colspan="2">&nbsp;</td></tr>
