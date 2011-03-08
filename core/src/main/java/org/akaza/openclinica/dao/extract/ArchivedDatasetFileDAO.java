@@ -76,7 +76,7 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
         variables.put(new Integer(3), new Integer(fb.getExportFormatId()));
         variables.put(new Integer(4), fb.getFileReference());
         variables.put(new Integer(5), new Integer(fb.getFileSize()));
-        variables.put(new Integer(6), new Integer(fb.getRunTime()));
+        variables.put(new Integer(6), new Double(fb.getRunTime()));
         variables.put(new Integer(7), new Integer(fb.getOwnerId()));
         this.executeWithPK(digester.getQuery("create"), variables, nullVars);
         if (isQuerySuccessful()) {
@@ -94,7 +94,7 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
         variables.put(new Integer(3), new Integer(fb.getExportFormatId()));
         variables.put(new Integer(4), fb.getFileReference());
         variables.put(new Integer(5), new Integer(fb.getFileSize()));
-        variables.put(new Integer(6), new Integer(fb.getRunTime()));
+        variables.put(new Integer(6), new Double(fb.getRunTime()));
         variables.put(new Integer(7), new Integer(fb.getOwnerId()));
         variables.put(new Integer(8), new Integer(fb.getId()));
         this.execute(digester.getQuery("update"), variables, nullVars);
@@ -111,7 +111,7 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
         fb.setDatasetId(((Integer) hm.get("dataset_id")).intValue());
         fb.setExportFormatId(((Integer) hm.get("export_format_id")).intValue());
         fb.setFileReference((String) hm.get("file_reference"));
-        fb.setRunTime(((Integer) hm.get("run_time")).intValue());
+        fb.setRunTime(((Integer) hm.get("run_time")).longValue());
         fb.setFileSize(((Integer) hm.get("file_size")).intValue());
         fb.setOwnerId(((Integer) hm.get("owner_id")).intValue());
         UserAccountDAO uaDAO = new UserAccountDAO(this.ds);

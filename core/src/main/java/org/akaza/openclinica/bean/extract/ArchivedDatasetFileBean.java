@@ -38,7 +38,7 @@ public class ArchivedDatasetFileBean extends EntityBean {
     private int fileSize;
     private String webPath;
     private String fileReference;
-    private int runTime;
+    private long runTime;
     private Date dateCreated;
     private int ownerId;
 
@@ -129,7 +129,7 @@ public class ArchivedDatasetFileBean extends EntityBean {
     /**
      * @return Returns the runTime.
      */
-    public int getRunTime() {
+    public long getRunTime() {
         return runTime;
     }
 
@@ -137,7 +137,7 @@ public class ArchivedDatasetFileBean extends EntityBean {
      * @param runTime
      *            The runTime to set.
      */
-    public void setRunTime(int runTime) {
+    public void setRunTime(long runTime) {
         this.runTime = runTime;
     }
 

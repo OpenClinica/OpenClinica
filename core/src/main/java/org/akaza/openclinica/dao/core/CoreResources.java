@@ -128,8 +128,12 @@ public class CoreResources implements ResourceLoaderAware {
     }
 
     private static String replaceCatHome(String value) {
-        logMe(value);
-
+        logMe("catalina home - "+value);
+        logMe("CATALINA_HOME system variable is"+System.getProperty("CATALINA_HOME"));
+        logMe("CATALINA_HOME system env variable is"+System.getenv("CATALINA_HOME"));
+        if (value.contains("${catalina.home}")) {
+            value = value.replace("${catalina.home}", System.getProperty("CATALINA_HOME"));
+        }
         if (value.contains("${catalina.home}")) {
             value = value.replace("${catalina.home}", System.getenv("CATALINA_HOME"));
         }
@@ -137,7 +141,7 @@ public class CoreResources implements ResourceLoaderAware {
         if (value.contains("$catalina.home")) {
             value = value.replace("$catalina.home", System.getenv("CATALINA_HOME"));
         }
-
+        logMe("catalina home is.."+value);
         return value;
     }
 
@@ -689,7 +693,7 @@ public class CoreResources implements ResourceLoaderAware {
 
     // TODO comment out system out after dev
     private static void logMe(String message) {
-        // System.out.println(message);
+        System.out.println(message);
         logger.debug(message);
     }
 
