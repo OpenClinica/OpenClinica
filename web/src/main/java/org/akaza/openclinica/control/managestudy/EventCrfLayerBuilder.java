@@ -171,12 +171,16 @@ public class EventCrfLayerBuilder {
         html.td(0).colspan("2").close();
         html.table(0).border("0").cellpadding("0").cellspacing("0").close();
         if (eventCrfStatus == DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE || eventCrfStatus == DataEntryStage.ADMINISTRATIVE_EDITING) {
-            html.tr(0).valign("top").close();
-            html.td(0).styleClass(table_cell_left).close();
-            viewEventCrfContentLink(html, studySubject, eventCrfBean, getStudyEvent());
-            html.nbsp().nbsp();
-            viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf);
-            html.tdEnd().trEnd(0);
+
+            if (! hiddenCrf()) {
+                html.tr(0).valign("top").close();
+                html.td(0).styleClass(table_cell_left).close();
+                viewEventCrfContentLink(html, studySubject, eventCrfBean, getStudyEvent());
+                html.nbsp().nbsp();
+                viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf);
+                html.tdEnd().trEnd(0);
+            }
+
             html.tr(0).valign("top").close();
             html.td(0).styleClass(table_cell_left).close();
             printDataEntry(html, eventCrfBean);
@@ -184,12 +188,14 @@ public class EventCrfLayerBuilder {
             printDataEntry(html, eventCrfBean, reswords.getString("print"));
             html.tdEnd().trEnd(0);
             if (currentStudy.getStatus() == Status.AVAILABLE && (currentRole.isDirector() || currentUser.isSysAdmin())) {
-                html.tr(0).valign("top").close();
-                html.td(0).styleClass(table_cell_left).close();
-                administrativeEditing(html, eventCrfBean);
-                html.nbsp().nbsp();
-                administrativeEditing(html, eventCrfBean, reswords.getString("edit"));
-                html.tdEnd().trEnd(0);
+                if (! hiddenCrf()) {
+                    html.tr(0).valign("top").close();
+                    html.td(0).styleClass(table_cell_left).close();
+                    administrativeEditing(html, eventCrfBean);
+                    html.nbsp().nbsp();
+                    administrativeEditing(html, eventCrfBean, reswords.getString("edit"));
+                    html.tdEnd().trEnd(0);
+                }
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 removeEventCrf(html, eventCrfBean, studySubject);
@@ -206,12 +212,14 @@ public class EventCrfLayerBuilder {
                 html.tdEnd().trEnd(0);
             }
         } else if (eventCrfStatus == DataEntryStage.LOCKED) {
-            html.tr(0).valign("top").close();
-            html.td(0).styleClass(table_cell_left).close();
-            viewEventCrfContentLink(html, studySubject, eventCrfBean, getStudyEvent());
-            html.nbsp().nbsp();
-            viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf);
-            html.tdEnd().trEnd(0);
+            if (! hiddenCrf()) {
+                html.tr(0).valign("top").close();
+                html.td(0).styleClass(table_cell_left).close();
+                viewEventCrfContentLink(html, studySubject, eventCrfBean, getStudyEvent());
+                html.nbsp().nbsp();
+                viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf);
+                html.tdEnd().trEnd(0);
+            }
             html.tr(0).valign("top").close();
             html.td(0).styleClass(table_cell_left).close();
             viewEventCrfContentLinkPrint(html, studySubject, eventCrfBean, getStudyEvent());
@@ -228,20 +236,25 @@ public class EventCrfLayerBuilder {
             }
         } else if (eventCrfStatus == DataEntryStage.UNCOMPLETED) {
             if (getStudyEvent() != null && !currentRole.isMonitor() && currentStudy.getStatus() == Status.AVAILABLE) {
+                if (! hiddenCrf()) {
+                    html.tr(0).valign("top").close();
+                    html.td(0).styleClass(table_cell_left).close();
+                    initialDataEntryLink(html, eventCrfBean == null ? new EventCRFBean() : eventCrfBean, studySubject, eventDefinitionCrf, getStudyEvent());
+                    html.nbsp().nbsp();
+                    initialDataEntryLink(html, eventCrfBean == null ? new EventCRFBean() : eventCrfBean, studySubject, eventDefinitionCrf, getStudyEvent(),
+                            reswords.getString("enter_data"));
+                    html.tdEnd().trEnd(0);
+                }
+            }
+
+            if (! hiddenCrf()) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
-                initialDataEntryLink(html, eventCrfBean == null ? new EventCRFBean() : eventCrfBean, studySubject, eventDefinitionCrf, getStudyEvent());
+                viewSectionDataEntryParameterized(html, eventDefinitionCrf);
                 html.nbsp().nbsp();
-                initialDataEntryLink(html, eventCrfBean == null ? new EventCRFBean() : eventCrfBean, studySubject, eventDefinitionCrf, getStudyEvent(),
-                        reswords.getString("enter_data"));
+                viewSectionDataEntryParameterized(html, eventDefinitionCrf, reswords.getString("view"));
                 html.tdEnd().trEnd(0);
             }
-            html.tr(0).valign("top").close();
-            html.td(0).styleClass(table_cell_left).close();
-            viewSectionDataEntryParameterized(html, eventDefinitionCrf);
-            html.nbsp().nbsp();
-            viewSectionDataEntryParameterized(html, eventDefinitionCrf, reswords.getString("view"));
-            html.tdEnd().trEnd(0);
             html.tr(0).valign("top").close();
             html.td(0).styleClass(table_cell_left).close();
             printCrf(html, eventDefinitionCrf);
@@ -249,12 +262,14 @@ public class EventCrfLayerBuilder {
             printCrf(html, eventDefinitionCrf, reswords.getString("print"));
             html.tdEnd().trEnd(0);
         } else if (eventCrfStatus == DataEntryStage.INVALID) {
-            html.tr(0).valign("top").close();
-            html.td(0).styleClass(table_cell_left).close();
-            viewSectionDataEntry(html, eventCrfBean, eventDefinitionCrf);
-            html.nbsp().nbsp();
-            viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf);
-            html.tdEnd().trEnd(0);
+            if (! hiddenCrf()) {
+                html.tr(0).valign("top").close();
+                html.td(0).styleClass(table_cell_left).close();
+                viewSectionDataEntry(html, eventCrfBean, eventDefinitionCrf);
+                html.nbsp().nbsp();
+                viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf);
+                html.tdEnd().trEnd(0);
+            }
             html.tr(0).valign("top").close();
             html.td(0).styleClass(table_cell_left).close();
             printDataEntry(html, eventCrfBean);
@@ -273,27 +288,33 @@ public class EventCrfLayerBuilder {
         } else {
             if (!currentRole.isMonitor() && currentStudy.getStatus() == Status.AVAILABLE) {
                 if (eventCrfStatus == DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE || eventCrfStatus == DataEntryStage.DOUBLE_DATA_ENTRY) {
-                    html.tr(0).valign("top").close();
-                    html.td(0).styleClass(table_cell_left).close();
-                    doubleDataEntryLink(html, eventCrfBean);
-                    html.nbsp().nbsp();
-                    doubleDataEntryLink(html, eventCrfBean, reswords.getString("enter_data"));
-                    html.tdEnd().trEnd(0);
+                    if (! hiddenCrf()) {
+                        html.tr(0).valign("top").close();
+                        html.td(0).styleClass(table_cell_left).close();
+                        doubleDataEntryLink(html, eventCrfBean);
+                        html.nbsp().nbsp();
+                        doubleDataEntryLink(html, eventCrfBean, reswords.getString("enter_data"));
+                        html.tdEnd().trEnd(0);
+                    }
                 } else {
-                    html.tr(0).valign("top").close();
-                    html.td(0).styleClass(table_cell_left).close();
-                    initialDataEntryParameterizedLink(html, eventCrfBean);
-                    html.nbsp().nbsp();
-                    initialDataEntryParameterizedLink(html, eventCrfBean, reswords.getString("enter_data"));
-                    html.tdEnd().trEnd(0);
+                    if (! hiddenCrf()) {
+                        html.tr(0).valign("top").close();
+                        html.td(0).styleClass(table_cell_left).close();
+                        initialDataEntryParameterizedLink(html, eventCrfBean);
+                        html.nbsp().nbsp();
+                        initialDataEntryParameterizedLink(html, eventCrfBean, reswords.getString("enter_data"));
+                        html.tdEnd().trEnd(0);
+                    }
                 }
             }
-            html.tr(0).valign("top").close();
-            html.td(0).styleClass(table_cell_left).close();
-            viewSectionDataEntry(html, eventCrfBean, eventDefinitionCrf);
-            html.nbsp().nbsp();
-            viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf);
-            html.tdEnd().trEnd(0);
+            if (! hiddenCrf()) {
+                html.tr(0).valign("top").close();
+                html.td(0).styleClass(table_cell_left).close();
+                viewSectionDataEntry(html, eventCrfBean, eventDefinitionCrf);
+                html.nbsp().nbsp();
+                viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf);
+                html.tdEnd().trEnd(0);
+            }
             html.tr(0).valign("top").close();
             html.td(0).styleClass(table_cell_left).close();
             printDataEntry(html, eventCrfBean);
@@ -573,5 +594,11 @@ public class EventCrfLayerBuilder {
         builder.close();
 
     }
+    private boolean hiddenCrf() {
+        if (currentStudy.getParentStudyId() > 0 && eventDefinitionCrf.isHideCrf()) {
+            return true;
+        }
 
+        return false;
+    }
 }
