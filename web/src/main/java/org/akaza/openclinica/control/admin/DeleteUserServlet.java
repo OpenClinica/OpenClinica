@@ -16,6 +16,7 @@ import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.akaza.openclinica.web.SQLInitServlet;
 
 import java.util.Locale;
 
@@ -135,6 +136,8 @@ public class DeleteUserServlet extends SecureController {
         body += resword.getString("user_name")+ " "  + u.getName() + "\n";
         body += resword.getString("password")+ " "  + password + "\n\n";
         body += restext.getString("please_test_your_login_information_and_let") + "\n";
+        body += SQLInitServlet.getField("sysURL");
+        body += " . ";
         body += restext.getString("openclinica_system_administrator");
 
         logger.info("Sending email...begin");
