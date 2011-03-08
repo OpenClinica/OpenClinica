@@ -53,12 +53,16 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
     private StudyBean currentStudy;
     private ResourceBundle resword;
     private final boolean showMoreLink;
+    private final boolean isDesignerRequest;
     private ItemFormMetadataDAO itemFormMetadataDAO;
     private List<Integer> ruleSetRuleIds;
+    private final String designerURL;
     private String[] columnNames = new String[] {};
 
-    public ViewRuleAssignmentTableFactory(boolean showMoreLink) {
+    public ViewRuleAssignmentTableFactory(boolean showMoreLink, String designerURL, boolean isDesignerRequest) {
         this.showMoreLink = showMoreLink;
+        this.designerURL = designerURL;
+        this.isDesignerRequest = isDesignerRequest;
     }
 
     @Override
@@ -133,6 +137,9 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 
     @Override
     protected ExportType[] getExportTypes() {
+        if (isDesignerRequest) {
+            return new ExportType[] {};
+        }
         return new ExportType[] { ExportType.CSV, ExportType.EXCEL, ExportType.PDF };
     }
 
@@ -161,7 +168,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         // Role r = currentRole.getRole();
         // boolean addSubjectLinkShow = studyBean.getStatus().isAvailable() && !r.equals(Role.MONITOR);
 
-        tableFacade.setToolbar(new ViewRuleAssignmentTableToolbar(ruleSetRuleIds, showMoreLink));
+        tableFacade.setToolbar(new ViewRuleAssignmentTableToolbar(ruleSetRuleIds, showMoreLink, isDesignerRequest));
     }
 
     @Override
@@ -187,9 +194,10 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         }
 
         /*
-         * Because we are using the State feature (via stateAttr) we can do a check to see if we have a complete limit already. See the State feature for more
-         * details Very important to set the totalRow before trying to get the row start and row end variables. Very important to set the totalRow before trying
-         * to get the row start and row end variables.
+         * Because we are using the State feature (via stateAttr) we can do a check to see if we have a complete limit
+         * already. See the State feature for more details Very important to set the totalRow before trying to get the row
+         * start and row end variables. Very important to set the totalRow before trying to get the row start and row end
+         * variables.
          */
         if (!limit.isComplete()) {
             int totalRows = getRuleSetService().getCountWithFilter(viewRuleAssignmentFilter);
@@ -270,11 +278,10 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
     }
 
     /**
-     * A very custom way to filter the items. The AuditUserLoginFilter acts as a command for the Hibernate criteria object. Take the Limit information and
-     * filter the rows.
+     * A very custom way to filter the items. The AuditUserLoginFilter acts as a command for the Hibernate criteria object.
+     * Take the Limit information and filter the rows.
      * 
-     * @param limit
-     *            The Limit to use.
+     * @param limit The Limit to use.
      */
     protected ViewRuleAssignmentFilter getViewRuleAssignmentFilter(Limit limit) {
         ViewRuleAssignmentFilter viewRuleAssignmentFilter = new ViewRuleAssignmentFilter();
@@ -290,11 +297,10 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
     }
 
     /**
-     * A very custom way to sort the items. The AuditUserLoginSort acts as a command for the Hibernate criteria object. Take the Limit information and sort the
-     * rows.
+     * A very custom way to sort the items. The AuditUserLoginSort acts as a command for the Hibernate criteria object. Take
+     * the Limit information and sort the rows.
      * 
-     * @param limit
-     *            The Limit to use.
+     * @param limit The Limit to use.
      */
     protected ViewRuleAssignmentSort getViewRuleAssignmentSort(Limit limit) {
         ViewRuleAssignmentSort viewRuleAssignmentSort = new ViewRuleAssignmentSort();
@@ -371,9 +377,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
             theItem = (ItemBean) ((HashMap<Object, Object>) item).get("item");
 
             value =
-            builder.a().href("javascript: openDocWindow('ViewItemDetail?itemId=" + theItem.getId() + "')")
-                        .style("color: #789EC5;text-decoration: none;").onmouseover(mouseOver).onmouseout(mouseOut)
-                    .close().append(theItem.getName()).aEnd().toString();
+                builder.a().href("javascript: openDocWindow('ViewItemDetail?itemId=" + theItem.getId() + "')").style("color: #789EC5;text-decoration: none;")
+                        .onmouseover(mouseOver).onmouseout(mouseOut).close().append(theItem.getName()).aEnd().toString();
 
             return value;
         }
@@ -646,8 +651,12 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
             Integer ruleSetRuleId = (Integer) ((HashMap<Object, Object>) item).get("ruleSetRuleId");
             Integer ruleId = (Integer) ((HashMap<Object, Object>) item).get("ruleId");
             RuleSetRuleBean ruleSetRule = (RuleSetRuleBean) ((HashMap<Object, Object>) item).get("ruleSetRule");
+            String target = (String) ((HashMap<Object, Object>) item).get("targetValue");
+            String ruleOid = (String) ((HashMap<Object, Object>) item).get("ruleOid");
 
-            if (ruleSetRule.getStatus() != Status.DELETED) {
+            if (isDesignerRequest) {
+                value += testEditByDesignerBuilder(target, ruleOid);
+            } else if (ruleSetRule.getStatus() != Status.DELETED) {
                 value +=
                     viewLinkBuilder(ruleSetId) + executeLinkBuilder(ruleSetId, ruleId) + removeLinkBuilder(ruleSetRuleId, ruleSetId)
                         + extractXmlLinkBuilder(ruleSetRuleId) + testLinkBuilder(ruleSetRuleId);
@@ -749,6 +758,19 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
     private String testLinkBuilder(Integer ruleSetRuleId) {
         HtmlBuilder actionLink = new HtmlBuilder();
         actionLink.a().href("TestRule?ruleSetRuleId=" + ruleSetRuleId);
+        actionLink.append("onMouseDown=\"javascript:setImage('bt_test','images/bt_EnterData_d.gif');\"");
+        actionLink.append("onMouseUp=\"javascript:setImage('bt_test','images/bt_EnterData.gif');\"").close();
+        actionLink.img().name("bt_test").src("images/bt_EnterData.gif").border("0").alt("Test").title("Test").append("hspace=\"2\"").end().aEnd();
+        actionLink.append("&nbsp;&nbsp;&nbsp;");
+        return actionLink.toString();
+
+    }
+
+    private String testEditByDesignerBuilder(String target, String ruleOid) {
+        HtmlBuilder actionLink = new HtmlBuilder();
+        // String designerURL = "http://localhost:8080/Designer-0.1.0.BUILD-SNAPSHOT/";
+        actionLink.a().href(designerURL + "ruleBuilder?" + "target=" + target + "&ruleOid=" + ruleOid);
+        actionLink.append("target=\"_parent\"");
         actionLink.append("onMouseDown=\"javascript:setImage('bt_test','images/bt_EnterData_d.gif');\"");
         actionLink.append("onMouseUp=\"javascript:setImage('bt_test','images/bt_EnterData.gif');\"").close();
         actionLink.img().name("bt_test").src("images/bt_EnterData.gif").border("0").alt("Test").title("Test").append("hspace=\"2\"").end().aEnd();

@@ -16,6 +16,7 @@ import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
@@ -35,8 +36,7 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 
 /**
- * Verify the Rule import , show records that have Errors as well as records
- * that will be saved.
+ * Verify the Rule import , show records that have Errors as well as records that will be saved.
  * 
  * @author Krikor krumlian
  */
@@ -52,10 +52,16 @@ public class ViewRuleAssignmentNewServlet extends SecureController {
     ItemFormMetadataDAO itemFormMetadataDAO;
 
     private boolean showMoreLink;
+    private boolean isDesigner;
 
     @Override
     public void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
+        if (fp.getString("designer").equals("")) {
+            isDesigner = false;
+        } else {
+            isDesigner = Boolean.parseBoolean(fp.getString("designer"));
+        }
         if (fp.getString("showMoreLink").equals("")) {
             showMoreLink = true;
         } else {
@@ -104,7 +110,7 @@ public class ViewRuleAssignmentNewServlet extends SecureController {
 
     private void createTable() {
 
-        ViewRuleAssignmentTableFactory factory = new ViewRuleAssignmentTableFactory(showMoreLink);
+        ViewRuleAssignmentTableFactory factory = new ViewRuleAssignmentTableFactory(showMoreLink, getCoreResources().getField("designer.url"), isDesigner);
         factory.setRuleSetService(getRuleSetService());
         factory.setItemFormMetadataDAO(getItemFormMetadataDAO());
         factory.setCurrentStudy(currentStudy);
@@ -112,7 +118,12 @@ public class ViewRuleAssignmentNewServlet extends SecureController {
         request.setAttribute("ruleAssignmentsHtml", ruleAssignmentsHtml);
         createStudyEventForInfoPanel();
         if (ruleAssignmentsHtml != null) {
-            forwardPage(Page.VIEW_RULE_SETS2);
+            if (isDesigner) {
+                forwardPage(Page.VIEW_RULE_SETS_DESIGNER);
+            } else {
+                forwardPage(Page.VIEW_RULE_SETS2);
+            }
+
         }
 
     }
@@ -151,6 +162,10 @@ public class ViewRuleAssignmentNewServlet extends SecureController {
     public ItemFormMetadataDAO getItemFormMetadataDAO() {
         itemFormMetadataDAO = this.itemFormMetadataDAO == null ? new ItemFormMetadataDAO(sm.getDataSource()) : itemFormMetadataDAO;
         return itemFormMetadataDAO;
+    }
+
+    private CoreResources getCoreResources() {
+        return (CoreResources) SpringServletAccess.getApplicationContext(context).getBean("coreResources");
     }
 
 }

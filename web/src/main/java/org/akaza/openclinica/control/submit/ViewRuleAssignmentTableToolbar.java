@@ -17,11 +17,13 @@ public class ViewRuleAssignmentTableToolbar extends DefaultToolbar {
 
     List<Integer> ruleSetRuleIds;
     private final ResourceBundle reswords = ResourceBundleProvider.getWordsBundle();
+    private final boolean isDesignerRequest;
 
-    public ViewRuleAssignmentTableToolbar(List<Integer> ruleSetRuleIds, boolean showMoreLink) {
+    public ViewRuleAssignmentTableToolbar(List<Integer> ruleSetRuleIds, boolean showMoreLink, boolean isDesignerRequest) {
         super();
         this.ruleSetRuleIds = ruleSetRuleIds;
         this.showMoreLink = showMoreLink;
+        this.isDesignerRequest = isDesignerRequest;
     }
 
     @Override
@@ -29,9 +31,12 @@ public class ViewRuleAssignmentTableToolbar extends DefaultToolbar {
         // addToolbarItem(createCustomItem(new XmlExportItem(ruleSetRuleIds)));
         addToolbarItem(ToolbarItemType.SEPARATOR);
         addToolbarItem(createCustomItem(new ShowMoreItem()));
-        addToolbarItem(ToolbarItemType.SEPARATOR);
-        addToolbarItem(createCustomItem(new TestRuleItem()));
+        if (!isDesignerRequest) {
+            addToolbarItem(ToolbarItemType.SEPARATOR);
+            addToolbarItem(createCustomItem(new TestRuleItem()));
+        }
         addToolbarItem(createCustomItem(new NewHiddenItem()));
+
     }
 
     private ToolbarItem createCustomItem(AbstractItem item) {
@@ -126,8 +131,8 @@ public class ViewRuleAssignmentTableToolbar extends DefaultToolbar {
         }
 
         /**
-         * @return Dynamically generate the indexes of studyGroupClasses. It starts from 4 because there are 4 columns before study group columns that will
-         *         require to be hidden.
+         * @return Dynamically generate the indexes of studyGroupClasses. It starts from 4 because there are 4 columns before
+         *         study group columns that will require to be hidden.
          * @see ListStudySubjectTableFactory#configureColumns(org.jmesa.facade.TableFacade, java.util.Locale)
          */
         String getIndexes() {

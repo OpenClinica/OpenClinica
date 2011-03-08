@@ -127,7 +127,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
         try {
             // Create Mapping
             Mapping mapping = new Mapping();
-            mapping.loadMapping(getCoreResources().getURL("mappingMarshaller.xml"));
+            mapping.loadMapping(getCoreResources().getURL("mappingMarshallerMetadata.xml"));
             // Create XMLContext
             XMLContext xmlContext = new XMLContext();
             xmlContext.setProperty(XMLConfiguration.NAMESPACES, "true");
@@ -234,23 +234,27 @@ public class MetaDataReportBean extends OdmXmlReportBean {
     }
 
     /*
-     * public void addStudyMetaDataVersion(boolean isDataset) { StringBuffer xml = this.getXmlOutput(); String indent = this.getIndent(); String currentIndent =
-     * indent + indent; String ODMVersion = this.getODMVersion(); MetaDataVersionBean meta = odmstudy.getMetaDataVersion(); if (isDataset) {
-     * xml.append(currentIndent + "<MetaDataVersion OID=\"" + StringEscapeUtils.escapeXml(meta.getOid()) + "\" Name=\"" +
-     * StringEscapeUtils.escapeXml(meta.getName()) + "\">"); xml.append(nls); // for <Include>, // 1. In order to have <Include>, previous metadataversionOID
-     * must // be // given. // 2. If there is no previous study, then previous study OID is as // the // same as the current study OID // 3. there is no Include
-     * if both previous study and previous // metadataversionOID are empty if (meta.getInclude() != null) { String pmOid =
-     * meta.getInclude().getMetaDataVersionOID(); if (pmOid != null && pmOid.length() > 0) { xml.append(currentIndent + indent); String psOid =
-     * meta.getInclude().getStudyOID(); if (psOid != null && psOid.length() > 0) { xml.append("<Include StudyOID =\"" + StringEscapeUtils.escapeXml(psOid) +
-     * "\""); } else { xml.append("<Include StudyOID =\"" + StringEscapeUtils.escapeXml(odmstudy.getOid()) + "\""); } xml.append(" MetaDataVersionOID=\"" +
-     * StringEscapeUtils.escapeXml(pmOid) + "\"/>"); xml.append(nls); } } } else { xml.append(currentIndent + "<MetaDataVersion>"); xml.append(nls); } //
-     * addProtocol(currentIndent + indent); boolean isStudy = meta.getStudy().getParentStudyId()>0 ? false : true; if (meta.getStudyEventDefs().size() > 0) {
-     * addStudyEventDef(isStudy, currentIndent + indent); if (meta.getItemGroupDefs().size() > 0) { addFormDef(isStudy, currentIndent + indent);
-     * addItemGroupDef(isStudy, currentIndent + indent); addItemDef(isStudy, currentIndent + indent); addCodeList(currentIndent + indent); if
-     * ("oc1.2".equalsIgnoreCase(ODMVersion)) { addMultiSelectList(currentIndent + indent); addStudyGroupClassList(currentIndent + indent); } else if
-     * ("oc1.3".equalsIgnoreCase(ODMVersion)) { addMultiSelectList(currentIndent + indent); addStudyGroupClassList(currentIndent + indent);
-     * if(meta.getStudy().getParentStudyId()>0) { } else { this.addStudyDetails(currentIndent+indent); } } } } xml.append(currentIndent + "</MetaDataVersion>");
-     * xml.append(nls); }
+     * public void addStudyMetaDataVersion(boolean isDataset) { StringBuffer xml = this.getXmlOutput(); String indent =
+     * this.getIndent(); String currentIndent = indent + indent; String ODMVersion = this.getODMVersion(); MetaDataVersionBean
+     * meta = odmstudy.getMetaDataVersion(); if (isDataset) { xml.append(currentIndent + "<MetaDataVersion OID=\"" +
+     * StringEscapeUtils.escapeXml(meta.getOid()) + "\" Name=\"" + StringEscapeUtils.escapeXml(meta.getName()) + "\">");
+     * xml.append(nls); // for <Include>, // 1. In order to have <Include>, previous metadataversionOID must // be // given.
+     * // 2. If there is no previous study, then previous study OID is as // the // same as the current study OID // 3. there
+     * is no Include if both previous study and previous // metadataversionOID are empty if (meta.getInclude() != null) {
+     * String pmOid = meta.getInclude().getMetaDataVersionOID(); if (pmOid != null && pmOid.length() > 0) {
+     * xml.append(currentIndent + indent); String psOid = meta.getInclude().getStudyOID(); if (psOid != null && psOid.length()
+     * > 0) { xml.append("<Include StudyOID =\"" + StringEscapeUtils.escapeXml(psOid) + "\""); } else {
+     * xml.append("<Include StudyOID =\"" + StringEscapeUtils.escapeXml(odmstudy.getOid()) + "\""); }
+     * xml.append(" MetaDataVersionOID=\"" + StringEscapeUtils.escapeXml(pmOid) + "\"/>"); xml.append(nls); } } } else {
+     * xml.append(currentIndent + "<MetaDataVersion>"); xml.append(nls); } // addProtocol(currentIndent + indent); boolean
+     * isStudy = meta.getStudy().getParentStudyId()>0 ? false : true; if (meta.getStudyEventDefs().size() > 0) {
+     * addStudyEventDef(isStudy, currentIndent + indent); if (meta.getItemGroupDefs().size() > 0) { addFormDef(isStudy,
+     * currentIndent + indent); addItemGroupDef(isStudy, currentIndent + indent); addItemDef(isStudy, currentIndent + indent);
+     * addCodeList(currentIndent + indent); if ("oc1.2".equalsIgnoreCase(ODMVersion)) { addMultiSelectList(currentIndent +
+     * indent); addStudyGroupClassList(currentIndent + indent); } else if ("oc1.3".equalsIgnoreCase(ODMVersion)) {
+     * addMultiSelectList(currentIndent + indent); addStudyGroupClassList(currentIndent + indent);
+     * if(meta.getStudy().getParentStudyId()>0) { } else { this.addStudyDetails(currentIndent+indent); } } } }
+     * xml.append(currentIndent + "</MetaDataVersion>"); xml.append(nls); }
      */
     public void addStudyMetaDataVersion(boolean isDataset) {
         StringBuffer xml = this.getXmlOutput();
@@ -523,7 +527,8 @@ public class MetaDataReportBean extends OdmXmlReportBean {
                             xml.append(">");
                             xml.append(nls);
                         }
-                        // xml.append(currentIndent + indent + "<OpenClinica:MultiSelectListRef OpenClinica:MultiSelectListID=\""
+                        // xml.append(currentIndent + indent +
+                        // "<OpenClinica:MultiSelectListRef OpenClinica:MultiSelectListID=\""
                         xml.append(currentIndent + indent + "<OpenClinica:MultiSelectListRef MultiSelectListID=\"" + StringEscapeUtils.escapeXml(mslOid)
                             + "\"/>");
                         xml.append(nls);
@@ -643,20 +648,25 @@ public class MetaDataReportBean extends OdmXmlReportBean {
     }
 
     /*
-     * public void addMultiSelectList(String currentIndent) { StringBuffer xml = this.getXmlOutput(); String indent = this.getIndent();
-     * ArrayList<MultiSelectListBean> lists = (ArrayList<MultiSelectListBean>) odmstudy.getMetaDataVersion().getMultiSelectLists(); if (lists != null) { if
-     * (lists.size() > 0) { for (MultiSelectListBean l : lists) { xml.append(currentIndent + "<OpenClinica:MultiSelectList OpenClinica:ID=\"" +
-     * StringEscapeUtils.escapeXml(l.getOid()) + "\" "); if (l.getName() != null) { xml.append("OpenClinica:Name=\"" + StringEscapeUtils.escapeXml(l.getName())
-     * + "\" "); } if (l.getDataType() != null) { xml.append("OpenClinica:DataType=\"" + l.getDataType() + "\" "); } if (l.getActualDataType() != null) {
-     * xml.append("OpenClinica:ActualDataType=\"" + StringEscapeUtils.escapeXml(l.getActualDataType()) + "\" "); } xml.append(">"); xml.append(nls);
-     * ArrayList<MultiSelectListItemBean> mslis = (ArrayList<MultiSelectListItemBean>) l.getMultiSelectListItems(); if (mslis != null && mslis.size() > 0) { for
-     * (MultiSelectListItemBean msli : mslis) { xml.append(currentIndent + indent + "<OpenClinica:MultiSelectListItem OpenClinica:CodedOptionValue=\"" +
-     * StringEscapeUtils.escapeXml(msli.getCodedOptionValue()) + "\">"); xml.append(nls); xml.append(currentIndent + indent + indent + "<Decode>");
-     * xml.append(nls); TranslatedTextBean tt = msli.getDecode(); if (tt.getXmlLang().length() > 0) { xml.append(currentIndent + indent + indent + indent +
-     * "<TranslatedText xml:lang=\"" + tt.getXmlLang() + "\">" + StringEscapeUtils.escapeXml(msli.getDecode().getText()) + "</TranslatedText>"); } else {
-     * xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + StringEscapeUtils.escapeXml(msli.getDecode().getText()) +
-     * "</TranslatedText>"); } xml.append(nls); xml.append(currentIndent + indent + indent + "</Decode>"); xml.append(nls); xml.append(currentIndent + indent +
-     * "</OpenClinica:MultiSelectListItem>"); xml.append(nls); } } xml.append(currentIndent + "</OpenClinica:MultiSelectList>"); xml.append(nls); } } } }
+     * public void addMultiSelectList(String currentIndent) { StringBuffer xml = this.getXmlOutput(); String indent =
+     * this.getIndent(); ArrayList<MultiSelectListBean> lists = (ArrayList<MultiSelectListBean>)
+     * odmstudy.getMetaDataVersion().getMultiSelectLists(); if (lists != null) { if (lists.size() > 0) { for
+     * (MultiSelectListBean l : lists) { xml.append(currentIndent + "<OpenClinica:MultiSelectList OpenClinica:ID=\"" +
+     * StringEscapeUtils.escapeXml(l.getOid()) + "\" "); if (l.getName() != null) { xml.append("OpenClinica:Name=\"" +
+     * StringEscapeUtils.escapeXml(l.getName()) + "\" "); } if (l.getDataType() != null) {
+     * xml.append("OpenClinica:DataType=\"" + l.getDataType() + "\" "); } if (l.getActualDataType() != null) {
+     * xml.append("OpenClinica:ActualDataType=\"" + StringEscapeUtils.escapeXml(l.getActualDataType()) + "\" "); }
+     * xml.append(">"); xml.append(nls); ArrayList<MultiSelectListItemBean> mslis = (ArrayList<MultiSelectListItemBean>)
+     * l.getMultiSelectListItems(); if (mslis != null && mslis.size() > 0) { for (MultiSelectListItemBean msli : mslis) {
+     * xml.append(currentIndent + indent + "<OpenClinica:MultiSelectListItem OpenClinica:CodedOptionValue=\"" +
+     * StringEscapeUtils.escapeXml(msli.getCodedOptionValue()) + "\">"); xml.append(nls); xml.append(currentIndent + indent +
+     * indent + "<Decode>"); xml.append(nls); TranslatedTextBean tt = msli.getDecode(); if (tt.getXmlLang().length() > 0) {
+     * xml.append(currentIndent + indent + indent + indent + "<TranslatedText xml:lang=\"" + tt.getXmlLang() + "\">" +
+     * StringEscapeUtils.escapeXml(msli.getDecode().getText()) + "</TranslatedText>"); } else { xml.append(currentIndent +
+     * indent + indent + indent + "<TranslatedText>" + StringEscapeUtils.escapeXml(msli.getDecode().getText()) +
+     * "</TranslatedText>"); } xml.append(nls); xml.append(currentIndent + indent + indent + "</Decode>"); xml.append(nls);
+     * xml.append(currentIndent + indent + "</OpenClinica:MultiSelectListItem>"); xml.append(nls); } }
+     * xml.append(currentIndent + "</OpenClinica:MultiSelectList>"); xml.append(nls); } } } }
      */
 
     public void addStudyDetails(String currentIndent) {
@@ -1130,17 +1140,21 @@ public class MetaDataReportBean extends OdmXmlReportBean {
     }
 
     /*
-     * public void addStudyGroupClassList(String currentIndent) { StringBuffer xml = this.getXmlOutput(); String indent = this.getIndent();
-     * ArrayList<StudyGroupClassListBean> lists = (ArrayList<StudyGroupClassListBean>) odmstudy.getMetaDataVersion().getStudyGroupClassLists(); if (lists !=
-     * null) { if (lists.size() > 0) { for (StudyGroupClassListBean l : lists) { xml.append(currentIndent + "<OpenClinica:StudyGroupClassList OpenClinica:ID=\""
-     * + StringEscapeUtils.escapeXml(l.getId()) + "\" "); if (l.getName() != null) { xml.append("OpenClinica:Name=\"" + StringEscapeUtils.escapeXml(l.getName())
-     * + "\" "); } if (l.getStatus() != null) { xml.append("OpenClinica:Status=\"" + l.getStatus() + "\" "); } if (l.getType() != null) {
-     * xml.append("OpenClinica:Type=\"" + StringEscapeUtils.escapeXml(l.getType()) + "\" "); } if (l.getSubjectAssignment() != null) {
-     * xml.append("OpenClinica:SubjectAssignment=\"" + StringEscapeUtils.escapeXml(l.getSubjectAssignment()) + "\" "); } xml.append(">"); xml.append(nls); for
-     * (StudyGroupItemBean i : (ArrayList<StudyGroupItemBean>) l.getStudyGroupItems()) { xml.append(currentIndent + indent + "<OpenClinica:StudyGroupItem "); if
-     * (i.getName() != null) { xml.append("OpenClinica:Name=\"" + StringEscapeUtils.escapeXml(i.getName()) + "\" "); } if (i.getDescription() != null) {
-     * xml.append("OpenClinica:Description=\"" + StringEscapeUtils.escapeXml(i.getDescription()) + "\" "); } xml.append("/>"); xml.append(nls); }
-     * xml.append(currentIndent + "</OpenClinica:StudyGroupClassList>"); xml.append(nls); } } } }
+     * public void addStudyGroupClassList(String currentIndent) { StringBuffer xml = this.getXmlOutput(); String indent =
+     * this.getIndent(); ArrayList<StudyGroupClassListBean> lists = (ArrayList<StudyGroupClassListBean>)
+     * odmstudy.getMetaDataVersion().getStudyGroupClassLists(); if (lists != null) { if (lists.size() > 0) { for
+     * (StudyGroupClassListBean l : lists) { xml.append(currentIndent + "<OpenClinica:StudyGroupClassList OpenClinica:ID=\"" +
+     * StringEscapeUtils.escapeXml(l.getId()) + "\" "); if (l.getName() != null) { xml.append("OpenClinica:Name=\"" +
+     * StringEscapeUtils.escapeXml(l.getName()) + "\" "); } if (l.getStatus() != null) { xml.append("OpenClinica:Status=\"" +
+     * l.getStatus() + "\" "); } if (l.getType() != null) { xml.append("OpenClinica:Type=\"" +
+     * StringEscapeUtils.escapeXml(l.getType()) + "\" "); } if (l.getSubjectAssignment() != null) {
+     * xml.append("OpenClinica:SubjectAssignment=\"" + StringEscapeUtils.escapeXml(l.getSubjectAssignment()) + "\" "); }
+     * xml.append(">"); xml.append(nls); for (StudyGroupItemBean i : (ArrayList<StudyGroupItemBean>) l.getStudyGroupItems()) {
+     * xml.append(currentIndent + indent + "<OpenClinica:StudyGroupItem "); if (i.getName() != null) {
+     * xml.append("OpenClinica:Name=\"" + StringEscapeUtils.escapeXml(i.getName()) + "\" "); } if (i.getDescription() != null)
+     * { xml.append("OpenClinica:Description=\"" + StringEscapeUtils.escapeXml(i.getDescription()) + "\" "); }
+     * xml.append("/>"); xml.append(nls); } xml.append(currentIndent + "</OpenClinica:StudyGroupClassList>"); xml.append(nls);
+     * } } } }
      */
 
     public void addStudyParameterLists(String currentIndent) {

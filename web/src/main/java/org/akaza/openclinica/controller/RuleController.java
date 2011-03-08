@@ -414,6 +414,9 @@ public class RuleController {
         }
 
         HashMap<String, String> p = new HashMap<String, String>();
+        for (ParameterType parameterType : ruleTest.getParameters()) {
+            p.put(parameterType.getKey(), parameterType.getValue());
+        }
         ExpressionObjectWrapper eow =
             new ExpressionObjectWrapper(dataSource, currentStudy, rpic.getRuleDefs().get(0).getExpression(), rpic.getRuleSets().get(0));
         ExpressionProcessor ep = ExpressionProcessorFactory.createExpressionProcessor(eow);
@@ -431,6 +434,7 @@ public class RuleController {
         // using illegal test values will cause invalidity
         HashMap<String, String> k = new HashMap<String, String>();
         HashMap<String, String> theResult = ep.testEvaluateExpression(k);
+        ruleTest.getParameters().clear();
         for (Map.Entry<String, String> entry : result.entrySet()) {
             ParameterType parameterType = new ParameterType();
             parameterType.setKey(entry.getKey());

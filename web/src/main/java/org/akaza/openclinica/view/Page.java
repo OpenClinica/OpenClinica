@@ -27,8 +27,8 @@ public class Page {
      * Page for logging in
      */
     public final static Page LOGIN = new Page("/WEB-INF/jsp/login/login.jsp", "OpenClinica Login");
-    public final static Page LOGIN_USER_ACCOUNT_DELETED =
-        new Page("/WEB-INF/jsp/login/login.jsp" + "?action=userAccountDeleted", "Unsuccessful Login Due to Account Deletion");
+    public final static Page LOGIN_USER_ACCOUNT_DELETED = new Page("/WEB-INF/jsp/login/login.jsp" + "?action=userAccountDeleted",
+            "Unsuccessful Login Due to Account Deletion");
     public final static Page ENTERPRISE = new Page("/WEB-INF/jsp/login/enterprise.jsp", "OpenClinica Enterprise");
     /**
      * Page for logging out
@@ -246,11 +246,11 @@ public class Page {
     public final static Page SUBJECT_GROUP_CLASS_LIST = new Page("/WEB-INF/jsp/managestudy/subjectGroupClassList.jsp", "View All Group Class");
     public final static Page SUBJECT_GROUP_CLASS_LIST_SERVLET = new Page("/ListSubjectGroupClass", "View Subject Group Class Servlet");
     public final static Page CREATE_SUBJECT_GROUP_CLASS = new Page("/WEB-INF/jsp/managestudy/createSubjectGroupClass.jsp", "Create Subject Group Class");
-    public final static Page CREATE_SUBJECT_GROUP_CLASS_CONFIRM =
-        new Page("/WEB-INF/jsp/managestudy/createSubjectGroupClassConfirm.jsp", "Create Subject Group Class Confirm");
+    public final static Page CREATE_SUBJECT_GROUP_CLASS_CONFIRM = new Page("/WEB-INF/jsp/managestudy/createSubjectGroupClassConfirm.jsp",
+            "Create Subject Group Class Confirm");
     public final static Page UPDATE_SUBJECT_GROUP_CLASS = new Page("/WEB-INF/jsp/managestudy/updateSubjectGroupClass.jsp", "Update Subject Group Class");
-    public final static Page UPDATE_SUBJECT_GROUP_CLASS_CONFIRM =
-        new Page("/WEB-INF/jsp/managestudy/updateSubjectGroupClassConfirm.jsp", "Update Subject Group Class Confirm");
+    public final static Page UPDATE_SUBJECT_GROUP_CLASS_CONFIRM = new Page("/WEB-INF/jsp/managestudy/updateSubjectGroupClassConfirm.jsp",
+            "Update Subject Group Class Confirm");
     public final static Page VIEW_SUBJECT_GROUP_CLASS = new Page("/WEB-INF/jsp/managestudy/viewSubjectGroupClass.jsp", "View Subject Group Class");
     public final static Page REMOVE_SUBJECT_GROUP_CLASS = new Page("/WEB-INF/jsp/managestudy/removeSubjectGroupClass.jsp", "Remove Subject Group Class");
     public final static Page RESTORE_SUBJECT_GROUP_CLASS = new Page("/WEB-INF/jsp/managestudy/restoreSubjectGroupClass.jsp", "Restore Subject Group Class");
@@ -268,8 +268,8 @@ public class Page {
      */
     public final static Page UPDATE_EVENT_DEFINITION1 = new Page("/WEB-INF/jsp/managestudy/updateEventDefinition1.jsp", "Update Event Definition");
     public final static Page UPDATE_EVENT_DEFINITION2 = new Page("/WEB-INF/jsp/managestudy/updateEventDefinition2.jsp", "Update Event Definition");
-    public final static Page UPDATE_EVENT_DEFINITION_CONFIRM =
-        new Page("/WEB-INF/jsp/managestudy/updateEventDefinitionConfirm.jsp", "Update Event Definition Confirm");
+    public final static Page UPDATE_EVENT_DEFINITION_CONFIRM = new Page("/WEB-INF/jsp/managestudy/updateEventDefinitionConfirm.jsp",
+            "Update Event Definition Confirm");
 
     /**
      * Page for viewing definition
@@ -364,6 +364,7 @@ public class Page {
     public final static Page IMPORT_RULES = new Page("/WEB-INF/jsp/submit/importRules.jsp", "Import Rules");
     public final static Page VIEW_RULE_SETS = new Page("/WEB-INF/jsp/submit/listRuleSets.jsp", "List Rule Assignments");
     public final static Page VIEW_RULE_SETS2 = new Page("/WEB-INF/jsp/submit/listRuleSets2.jsp", "List Rule Assignments");
+    public final static Page VIEW_RULE_SETS_DESIGNER = new Page("/WEB-INF/jsp/submit/listRuleSetsDesigner.jsp", "List Rule Assignments");
     public final static Page VERIFY_RULES_IMPORT_SERVLET = new Page("/VerifyImportedRule", "Verify Imported Rule Servlet");
     public final static Page VERIFY_RULES_IMPORT = new Page("/WEB-INF/jsp/submit/verifyImportRule.jsp", "Verify Imported Rules");
     public final static Page VIEW_RULES = new Page("/WEB-INF/jsp/submit/viewRules.jsp", "View Rules");
@@ -383,8 +384,8 @@ public class Page {
      * Page for confirming crf version.
      */
     public final static Page CREATE_CRF_VERSION_CONFIRM = new Page("/WEB-INF/jsp/admin/createCRFVersionConfirm.jsp", "Create a new CRF Version Confirm");
-    public final static Page CREATE_CRF_VERSION_CONFIRMSQL =
-        new Page("/WEB-INF/jsp/admin/createCRFVersionConfirmSQL.jsp", "Create a new CRF Version Confirm SQL");
+    public final static Page CREATE_CRF_VERSION_CONFIRMSQL = new Page("/WEB-INF/jsp/admin/createCRFVersionConfirmSQL.jsp",
+            "Create a new CRF Version Confirm SQL");
     public final static Page CREATE_CRF_VERSION_DONE = new Page("/WEB-INF/jsp/admin/createCRFVersionDone.jsp", "Create a new CRF Version Done");
     public final static Page REMOVE_CRF_VERSION_CONFIRM = new Page("/WEB-INF/jsp/admin/removeCRFVersionConfirm.jsp", "Remove CRF Version Confirm");
     public final static Page CREATE_CRF_VERSION_NODELETE =
@@ -395,7 +396,7 @@ public class Page {
     public final static Page AUDIT_LOG_USER = new Page("/WEB-INF/jsp/admin/auditLogUser.jsp", "Audit Log display by User");
     public final static Page AUDIT_LOG_STUDY = new Page("/WEB-INF/jsp/admin/auditLogStudy.jsp", "Audit Log display by Study");
     public final static Page AUDIT_LOGS_STUDY = new Page("/WEB-INF/jsp/admin/studyAuditLog.jsp", "Audit Log display by Study");
-    
+
     public final static Page AUDIT_LOGS_ITEMS = new Page("/WEB-INF/jsp/admin/auditItem.jsp", "Audit Log for Item");
 
     /**
@@ -608,16 +609,16 @@ public class Page {
 
     public final static Page VIEW_DISCREPANCY_NOTE = new Page("/WEB-INF/jsp/submit/viewDiscrepancyNote.jsp", "View Discrepancy Note");
     public final static Page VIEW_DISCREPANCY_NOTES_IN_STUDY = new Page("/WEB-INF/jsp/managestudy/viewNotes.jsp", "View Discrepancy Notes in Study");
-    public final static Page VIEW_DISCREPANCY_NOTES_IN_STUDY_PRINT =
-        new Page("/WEB-INF/jsp/managestudy/viewNotesPrint.jsp", "View Discrepancy Notes in Study Print");
+    public final static Page VIEW_DISCREPANCY_NOTES_IN_STUDY_PRINT = new Page("/WEB-INF/jsp/managestudy/viewNotesPrint.jsp",
+            "View Discrepancy Notes in Study Print");
     public final static Page VIEW_DISCREPANCY_NOTES_IN_STUDY_SERVLET = new Page("/ViewNotes", "View Discrepancy Notes in Study");
     public final static Page VIEW_SINGLE_NOTE = new Page("/WEB-INF/jsp/managestudy/viewNote.jsp", "View Single Note");
 
     public final static Page LIST_EVENTS_FOR_SUBJECT = new Page("/WEB-INF/jsp/submit/listEventsForSubject.jsp", "List Events For Subject");
     public final static Page LIST_EVENTS_FOR_SUBJECTS = new Page("/WEB-INF/jsp/managestudy/listEventsForSubjects.jsp", "List Events For Subject");
     public final static Page INITIAL_DATA_ENTRY_NW = new Page("/WEB-INF/jsp/submit/initialDataEntryNw.jsp", "Data Entry");
-    public final static Page VIEW_SECTION_DATA_ENTRY_PRINT_GROUPS =
-        new Page("/WEB-INF/jsp/managestudy/viewGroupSectionsPrint.jsp", "Print View for Group Tables");
+    public final static Page VIEW_SECTION_DATA_ENTRY_PRINT_GROUPS = new Page("/WEB-INF/jsp/managestudy/viewGroupSectionsPrint.jsp",
+            "Print View for Group Tables");
     public final static Page LIST_SUBJECT_DISC_NOTE = new Page("/WEB-INF/jsp/managestudy/listSubjectDiscNote.jsp", "List Disc Notes By Subject");
     public final static Page LIST_DNOTES_FOR_CRF = new Page("/WEB-INF/jsp/submit/listDNotesForCRF.jsp", "List Disc Notes By Subject and CRF");
     public final static Page CHOOSE_DOWNLOAD_FORMAT = new Page("/WEB-INF/jsp/submit/chooseDownloadFormat.jsp", "Choose download format");
@@ -628,27 +629,25 @@ public class Page {
     public final static Page DOWNLOAD_ATTACHED_FILE = new Page("/WEB-INF/jsp/submit/downloadAttachedFile.jsp", "Download Attached File");
 
     public final static Page CONFIRM_LOCKING_CRF_VERSION = new Page("/WEB-INF/jsp/managestudy/confirmLockingCRFVersion.jsp", "confirm locking crf version");
-    public final static Page CONFIRM_UNLOCKING_CRF_VERSION =
-        new Page("/WEB-INF/jsp/managestudy/confirmUnlockingCRFVersion.jsp", "confirm unlocking crf version");
+    public final static Page CONFIRM_UNLOCKING_CRF_VERSION = new Page("/WEB-INF/jsp/managestudy/confirmUnlockingCRFVersion.jsp",
+            "confirm unlocking crf version");
 
     // public final static Page MANAGE_STUDY_MODULE = new
     // Page("pages/studymodule", "Manage study");
     public final static String MANAGE_STUDY_MODULE = "/pages/studymodule";
 
-    public final static Page VIEW_ALL_SITE_DEFAULT_CRF_VERSIONS_PRINT =
-        new Page("/WEB-INF/jsp/managestudy/defaultAllSiteCrfVersionPrint.jsp", "View default crf versions print");
-    public final static Page VIEW_DEFAULT_CRF_VERSIONS_PRINT =
-        new Page("/WEB-INF/jsp/managestudy/defaultCrfVersionPrint.jsp", "View default crf versions print");
-    public final static Page VIEW_ALL_DEFAULT_CRF_VERSIONS_PRINT =
-        new Page("/WEB-INF/jsp/managestudy/defaultAllCrfVersionPrint.jsp", "View default crf versions print");
+    public final static Page VIEW_ALL_SITE_DEFAULT_CRF_VERSIONS_PRINT = new Page("/WEB-INF/jsp/managestudy/defaultAllSiteCrfVersionPrint.jsp",
+            "View default crf versions print");
+    public final static Page VIEW_DEFAULT_CRF_VERSIONS_PRINT = new Page("/WEB-INF/jsp/managestudy/defaultCrfVersionPrint.jsp",
+            "View default crf versions print");
+    public final static Page VIEW_ALL_DEFAULT_CRF_VERSIONS_PRINT = new Page("/WEB-INF/jsp/managestudy/defaultAllCrfVersionPrint.jsp",
+            "View default crf versions print");
 
     /**
      * Constructs the JSP Page instance
      * 
-     * @param fileName
-     *            The filename of the JSP page
-     * @param title
-     *            The title of the JSP page
+     * @param fileName The filename of the JSP page
+     * @param title The title of the JSP page
      */
     private Page(String fileName, String title) {
         this.fileName = fileName;
@@ -676,7 +675,7 @@ public class Page {
     public void setFileName(String newFileName) {
         this.fileName = newFileName;
     }
-    
+
     public static Page setNewPage(String fileName, String title) {
         return new Page(fileName, title);
     }

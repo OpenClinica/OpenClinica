@@ -10,11 +10,16 @@
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
   <title>OpenClinica</title>
   <link type="text/css" rel="stylesheet" href="<c:url value="/style.css"/>"/>
+  <script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery-1.3.2.min.js"></script>
+  <script type="text/javascript">
+      $(document).ready( function() {
+          $('#confirmationForm').submit();
+      });
+  </script>
 </head>
-
 <body>
 
-  <h1>OpenClinica</h1>
+  <!--<h1>OpenClinica</h1>-->
 
   <div id="content">
 
@@ -30,17 +35,21 @@
     <c:remove scope="session" var="SPRING_SECURITY_LAST_EXCEPTION"/>
 
     <authz:authorize ifAllGranted="ROLE_USER">
+        <!--
       <h2>Please Confirm</h2>
-
+        
       <p>You hereby authorize "<c:out value="${client.clientId}"/>" to access your protected resources.</p>
+      -->
+      <p>Loading Rule Designer ...</p>
+      
 
       <form id="confirmationForm" name="confirmationForm" action="<%=request.getContextPath() + VerificationCodeFilter.DEFAULT_PROCESSING_URL%>" method="POST">
         <input name="<%=BasicUserApprovalFilter.DEFAULT_APPROVAL_REQUEST_PARAMETER%>" value="<%=BasicUserApprovalFilter.DEFAULT_APPROVAL_PARAMETER_VALUE%>" type="hidden"/>
-        <label><input name="authorize" value="Authorize" type="submit"></label>
+        <!--<label><input name="authorize" value="Authorize" type="submit"></label>-->
       </form>
       <form id="denialForm" name="denialForm" action="<%=request.getContextPath() + VerificationCodeFilter.DEFAULT_PROCESSING_URL%>" method="POST">
         <input name="<%=BasicUserApprovalFilter.DEFAULT_APPROVAL_REQUEST_PARAMETER%>" value="not_<%=BasicUserApprovalFilter.DEFAULT_APPROVAL_PARAMETER_VALUE%>" type="hidden"/>
-        <label><input name="deny" value="Deny" type="submit"></label>
+        <!--<label><input name="deny" value="Deny" type="submit"></label>-->
       </form>
     </authz:authorize>
   </div>
