@@ -205,7 +205,7 @@ giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%>
        <strong><label for="formElementName">formElementName</label></strong>.<br/>-->
     </div>
 </c:if><%-- error messages are not null --%>
-<div id="box" class="dialog">
+<div id="box" class="dialog" style="display:none;">
 <span id="mbm">
 <c:choose>
   <c:when test="${section.eventDefinitionCRF.electronicSignature == true}">

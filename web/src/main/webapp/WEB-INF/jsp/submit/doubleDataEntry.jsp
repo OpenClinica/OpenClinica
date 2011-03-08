@@ -202,7 +202,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
     </div> --%>
 	<%-- tbh << 04/2010 --%>
 </c:if><%-- error messages are not null --%>
-<div id="box" class="dialog">
+<div id="box" class="dialog" style="display:none;">
 <span id="mbm">
     <fmt:message key="crf_data_entry_password_required" bundle="${restext}"/>
 </span><br>
