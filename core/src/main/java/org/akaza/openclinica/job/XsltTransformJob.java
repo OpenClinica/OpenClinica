@@ -165,7 +165,7 @@ public class XsltTransformJob extends QuartzJobBean {
             StudyBean parentStudy = (StudyBean) studyDao.findByPK(currentStudy.getParentStudyId());
             String successMsg = epBean.getSuccessMessage();
             String failureMsg = epBean.getFailureMessage();
-
+            final long start = System.currentTimeMillis();
             // DatasetBean dsBean = (DatasetBean)datasetDao.findByPK(new
             // Integer(datasetId).intValue());
 
@@ -221,7 +221,7 @@ public class XsltTransformJob extends QuartzJobBean {
             
             int numXLS = epBean.getFileName().length;
             int fileCntr = 0;
-            final long start = System.currentTimeMillis();
+           
             String xmlFilePath = generalFileDir + ODMXMLFileName;
             String endFile =null;
            File oldFilesPath = new File(generalFileDir);
@@ -255,7 +255,7 @@ public class XsltTransformJob extends QuartzJobBean {
                 // logic to prevent deleting the file being created.
 
             }
-            final long done = System.currentTimeMillis() - start;
+            final double done = setFormat((new Double(System.currentTimeMillis() - start))/60000);
             logger.info("--> job completed in " + done + " ms");
             // run post processing
 
@@ -337,10 +337,14 @@ public class XsltTransformJob extends QuartzJobBean {
                                 + "\">here </a>");
                     }
                     emailBuffer.append("<p>" + successMsg + "</p>");
-                    long sysTimeEnd = System.currentTimeMillis() - sysTimeBegin;
+                    logMe("System time begining.."+sysTimeBegin);
+                    logMe("System time end.."+System.currentTimeMillis());
+                    double sysTimeEnd = setFormat((System.currentTimeMillis() - sysTimeBegin)/60000);
+                    logMe("difference"+sysTimeEnd);
+                    
                     if (fbFinal != null) {
                         fbFinal.setFileSize((int) bytesToKilo(new File(archivedFile).length()));
-                        fbFinal.setRunTime((int) sysTimeEnd);
+                        fbFinal.setRunTime( sysTimeEnd);
                     }
 
                 }
@@ -753,7 +757,7 @@ public class XsltTransformJob extends QuartzJobBean {
         }
     }
 
-    private ArchivedDatasetFileBean generateFileRecord(String name, String dir, DatasetBean datasetBean, long time, long fileLength, ExportFormatBean efb,
+    private ArchivedDatasetFileBean generateFileRecord(String name, String dir, DatasetBean datasetBean, double time, long fileLength, ExportFormatBean efb,
             int userBeanId) {
         ArchivedDatasetFileBean fbFinal = new ArchivedDatasetFileBean();
 
@@ -776,7 +780,7 @@ public class XsltTransformJob extends QuartzJobBean {
         // secs
         // fbInitial.setRunTime(setFormat((float)time/1000));// to convert to
         // seconds
-        fbInitial.setRunTime((int) time);// to convert to seconds
+        fbInitial.setRunTime( time);// to convert to seconds
         // logger.info("ODM setRunTime: " + (int)time );
         // need to set this in milliseconds, get it passed from above
         // methods?
@@ -814,11 +818,11 @@ public class XsltTransformJob extends QuartzJobBean {
     }
 
     // Utility method to format upto 3 decimals.
-    private float setFormat(float number) {
-        DecimalFormat df = new DecimalFormat("0.000");
+    private double setFormat(double number) {
+        DecimalFormat df = new DecimalFormat("#.###");
         logger.info("Number is" + Double.parseDouble(df.format(number)));
         logger.info("Number is" + (float) Double.parseDouble(df.format(number)));
-        return (float) Double.parseDouble(df.format(number));
+        return  Double.valueOf(df.format(number));
     }
 
 }

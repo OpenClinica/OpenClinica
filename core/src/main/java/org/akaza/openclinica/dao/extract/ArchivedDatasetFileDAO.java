@@ -111,7 +111,7 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
         fb.setDatasetId(((Integer) hm.get("dataset_id")).intValue());
         fb.setExportFormatId(((Integer) hm.get("export_format_id")).intValue());
         fb.setFileReference((String) hm.get("file_reference"));
-        fb.setRunTime(((Integer) hm.get("run_time")).longValue());
+        fb.setRunTime(((Integer) hm.get("run_time")).doubleValue());
         fb.setFileSize(((Integer) hm.get("file_size")).intValue());
         fb.setOwnerId(((Integer) hm.get("owner_id")).intValue());
         UserAccountDAO uaDAO = new UserAccountDAO(this.ds);

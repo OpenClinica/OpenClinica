@@ -15,6 +15,7 @@ import java.io.FileOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -30,7 +31,7 @@ import javax.xml.transform.sax.SAXResult;
  * @author thickerson
  *
  */
-public class PdfProcessingFunction extends ProcessingFunction {
+public class PdfProcessingFunction extends ProcessingFunction implements Serializable {
 
     private FopFactory fopFactory = FopFactory.newInstance();
     
