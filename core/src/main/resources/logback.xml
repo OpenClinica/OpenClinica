@@ -382,20 +382,7 @@
 		</then>
 	</if>
   </logger>
-  <!-- Show All Spring framework log messages -->
-  <logger additivity="false" name="org.springframework">
-    <level value="INFO" />
-	<if condition='property("logLocation").equalsIgnoreCase("local") || property("logLocation").equalsIgnoreCase("both")'>
-		<then>
-			<appender-ref ref="LOGFILE-OTHER"/>
-		</then>
-	</if>    
-	<if condition='property("logLocation").equalsIgnoreCase("syslog") || property("logLocation").equalsIgnoreCase("both")'>
-		<then>
-			<appender-ref ref="SYSLOG-OTHER"/>
-		</then>
-	</if>
-  </logger>
+  
   <!-- Show All Spring Web Services Messages -->
   <logger additivity="false" name="org.springframework.ws.server.MessageTracing.sent">
     <level value="TRACE" />    
