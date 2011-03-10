@@ -305,7 +305,7 @@ public abstract class DataEntryServlet extends SecureController {
 
     private void logMe(String message)
     {
-        System.out.println(message);
+       // //System.out.println(message);
         logger.trace(message);
     }
     
@@ -832,7 +832,7 @@ public abstract class DataEntryServlet extends SecureController {
             }
             // this.getItemMetadataService().resetItemCounter();
             HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid = runRules(allItems, ruleSets, true, shouldRunRules(), MessageType.ERROR, phase2,ecb);
-            System.out.println("first run of rules : " + groupOrdinalPLusItemOid.toString());
+            ////System.out.println("first run of rules : " + groupOrdinalPLusItemOid.toString());
             logMe("allItems  Loop begin  "+System.currentTimeMillis());
             for (int i = 0; i < allItems.size(); i++) {
                 DisplayItemWithGroupBean diwg = allItems.get(i);
@@ -1599,10 +1599,10 @@ public abstract class DataEntryServlet extends SecureController {
                     }
                 }
                 logMe("DisplayItemWithGroupBean allitems4 end "+System.currentTimeMillis());
-                System.out.println("running rules: " + phase2.name());
+                //System.out.println("running rules: " + phase2.name());
                 logMe("DisplayItemWithGroupBean dryrun  start"+System.currentTimeMillis());
                 HashMap<String, ArrayList<String>> rulesPostDryRun = runRules(allItems, ruleSets, false, shouldRunRules(), MessageType.WARNING, phase2,ecb);
-                System.out.println("found rules post dry run: " + rulesPostDryRun.toString());
+                //System.out.println("found rules post dry run: " + rulesPostDryRun.toString());
                 HashMap<String, ArrayList<String>> errorsPostDryRun = new HashMap<String, ArrayList<String>>();
                 // additional step needed, run rules and see if any items are 'shown' AFTER saving data
                 logMe("DisplayItemWithGroupBean dryrun  end"+System.currentTimeMillis());
@@ -1662,8 +1662,8 @@ public abstract class DataEntryServlet extends SecureController {
                                 DisplayItemBean displayItemBean = itemWithGroup.getSingleItem();
                                 ItemBean itemBean = displayItemBean.getItem();
                                 if (newFieldName.equals(itemBean.getOid())) {
-                                    System.out.println("is show item for " + displayItemBean.getItem().getId() + ": " + displayItemBean.getMetadata().isShowItem());
-                                    System.out.println("check run dynamics item check " + runDynamicsItemCheck(displayItemBean).getMetadata().isShowItem());
+                                    //System.out.println("is show item for " + displayItemBean.getItem().getId() + ": " + displayItemBean.getMetadata().isShowItem());
+                                    //System.out.println("check run dynamics item check " + runDynamicsItemCheck(displayItemBean).getMetadata().isShowItem());
                                     if (!displayItemBean.getMetadata().isShowItem() && !runDynamicsItemCheck(displayItemBean).getMetadata().isShowItem()) {
                                         // double check there?
                                         inSameSection = true;
@@ -1718,7 +1718,7 @@ public abstract class DataEntryServlet extends SecureController {
 
                     // if so, stay at this section
                     logger.debug(" in same section: " + inSameSection);
-                    System.out.println(" in same section: " + inSameSection);
+                    //System.out.println(" in same section: " + inSameSection);
                     if (inSameSection) {
                         // copy of one line from early on around line 400, forcing a re-show of the items
                         // section = getDisplayBean(hasGroup, true);// include all items, tbh
@@ -2708,11 +2708,11 @@ public abstract class DataEntryServlet extends SecureController {
 
     private DisplayItemBean runDynamicsItemCheck(DisplayItemBean dib) {
         try {
-            // System.out.println("trying run dynamics item check: item id " + dib.getItem().getId() + " item data id " + dib.getData().getId());
+            // //System.out.println("trying run dynamics item check: item id " + dib.getItem().getId() + " item data id " + dib.getData().getId());
             if (!dib.getMetadata().isShowItem()) {
                 boolean showItem = getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getData());
                 dib.getMetadata().setShowItem(showItem);
-                // System.out.println("returning " + showItem);
+                // //System.out.println("returning " + showItem);
             }
         } catch (NullPointerException npe) {
             logger.debug("found NPE! item id " + dib.getItem().getId());
@@ -2999,7 +2999,7 @@ public abstract class DataEntryServlet extends SecureController {
             } else {
                 idb.setUpdater(ub);
                 // tbh 5990: should we update the logic here for nonrepeats?
-                // System.out.println("string util is blank: update an item data " + idb.getId() + " :" + idb.getValue());
+                // //System.out.println("string util is blank: update an item data " + idb.getId() + " :" + idb.getValue());
                 logger.info("update item update_id " + idb.getUpdater().getId());
                 idb = (ItemDataBean) iddao.updateValue(idb);
             }
@@ -3021,7 +3021,7 @@ public abstract class DataEntryServlet extends SecureController {
             } else if ("edit".equalsIgnoreCase(dib.getEditFlag())) {
                                 idb.setUpdater(ub);
                
-                // System.out.println("update an item data - running update value " + idb.getId() + " :" + idb.getValue());
+                // //System.out.println("update an item data - running update value " + idb.getId() + " :" + idb.getValue());
                 logger.info("update item update_id " + idb.getUpdater().getId());
                 // update tbh #5999, #5998; if an item_data was not included in
                 // an import data, it won't exist; we need to check on item_data_id
@@ -3916,7 +3916,7 @@ public abstract class DataEntryServlet extends SecureController {
         for (int i = 0; i < allCRFs.size(); i++) {
             EventCRFBean ec = (EventCRFBean) allCRFs.get(i);
             logger.trace("-- looking at a CRF: " + ec.getName() + " " + ec.getCrf().getName() + " " + ec.getCrf().getId());
-            System.out.println("-- looking at a CRF: " + ec.getName() + " " + ec.getCrf().getName() + " " + ec.getCrf().getId());
+            //System.out.println("-- looking at a CRF: " + ec.getName() + " " + ec.getCrf().getName() + " " + ec.getCrf().getId());
             // if clause kind of not right since none of the above fields are
             // set in the dao, tbh
            CRFVersionBean crfVersionBean = (CRFVersionBean) crfversionDao.findByPK(ec.getCRFVersionId());
