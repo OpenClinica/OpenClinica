@@ -7,6 +7,11 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import javax.naming.NamingException;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
@@ -55,6 +60,7 @@ import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.managestudy.ViewNotesServlet;
 import org.akaza.openclinica.control.managestudy.ViewStudySubjectServlet;
 import org.akaza.openclinica.core.SecurityManager;
+import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -237,6 +243,8 @@ public abstract class DataEntryServlet extends SecureController {
     protected ExpressionService expressionService;
     protected DiscrepancyNoteService discrepancyNoteService;
     DynamicsMetadataService itemMetadataService;
+    
+    private DataSource dataSource;
 
     /**
      * Determines whether the form was submitted. Calculated once in processRequest. The reason we don't use the normal means to determine if the form was
@@ -251,6 +259,22 @@ public abstract class DataEntryServlet extends SecureController {
    
     protected String rowDisplay = "";
 
+    @Override
+    public void init(ServletConfig config) throws ServletException
+    {
+        super.init(config); 
+        try{
+        context = getServletContext();
+         sm = new SessionManager(SpringServletAccess.getApplicationContext(context));
+        dataSource = sm.getDataSource();
+        }catch(Exception ne){
+            ne.printStackTrace();
+        }
+    }
+    
+    private DataSource getDataSource(){
+        return dataSource;
+    }
     /*
      * (non-Javadoc)
      * @see org.akaza.openclinica.control.core.SecureController#mayProceed()
@@ -271,7 +295,7 @@ public abstract class DataEntryServlet extends SecureController {
 
     private String getSectionFirstFieldId(int sectionId) {
 
-        ItemDAO itemDAO = new ItemDAO(sm.getDataSource());
+        ItemDAO itemDAO = new ItemDAO(getDataSource());
         List<ItemBean> items = itemDAO.findAllBySectionId(sectionId);
         if (!items.isEmpty()) {
             return new Integer(items.get(0).getId()).toString();
@@ -279,20 +303,28 @@ public abstract class DataEntryServlet extends SecureController {
         return "";
     }
 
-
+    private void logMe(String message)
+    {
+        System.out.println(message);
+        logger.trace(message);
+    }
+    
     @Override
     protected  void processRequest() throws Exception {
 
+        logMe("Enterting DataEntry Servlet"+System.currentTimeMillis());
+        
         locale = request.getLocale();
 
         FormDiscrepancyNotes discNotes;
 
         panel.setStudyInfoShown(false);
         String age = "";
+        
         if (fp.getString(GO_EXIT).equals("") && !isSubmitted && fp.getString("tabId").equals("") && fp.getString("sectionId").equals("")) {
             if (getUnavailableCRFList().containsKey(ecb.getId())) {
                 int userId = (Integer) getUnavailableCRFList().get(ecb.getId());
-                UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
+                UserAccountDAO udao = new UserAccountDAO(getDataSource());
                 UserAccountBean ubean = (UserAccountBean) udao.findByPK(userId);
                 addPageMessage(resword.getString("CRF_unavailable") + " " + ubean.getName() + " " + resword.getString("Currently_entering_data") + " "
                     + resword.getString("Leave_the_CRF"));
@@ -302,27 +334,28 @@ public abstract class DataEntryServlet extends SecureController {
                 lockThisEventCRF(ecb.getId(), ub.getId());
             }
         }
-
+       
         if (!ecb.isActive()) {
             throw new InconsistentStateException(Page.LIST_STUDY_SUBJECTS_SERVLET, resexception.getString("event_not_exists"));
         }
-
+        logMe("Enterting DataEntry Get the status/number of item discrepancy notes"+System.currentTimeMillis());
         // Get the status/number of item discrepancy notes
-        DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(sm.getDataSource());
+        DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
         ArrayList<DiscrepancyNoteBean> allNotes = new ArrayList<DiscrepancyNoteBean>();
         List<DiscrepancyNoteBean> eventCrfNotes = new ArrayList<DiscrepancyNoteBean>();
         List<DiscrepancyNoteThread> noteThreads = new ArrayList<DiscrepancyNoteThread>();
         // BWP: this try block is not necessary try {
-        dndao = new DiscrepancyNoteDAO(sm.getDataSource());
+        dndao = new DiscrepancyNoteDAO(getDataSource());
         allNotes = dndao.findAllTopNotesByEventCRF(ecb.getId());
         eventCrfNotes = dndao.findOnlyParentEventCRFDNotesFromEventCRF(ecb);
         if (!eventCrfNotes.isEmpty()) {
             allNotes.addAll(eventCrfNotes);
 
         }
+        logMe("Entering DataEntry Create disc note threads out of the various notes"+System.currentTimeMillis());
         // Create disc note threads out of the various notes
         DiscrepancyNoteUtil dNoteUtil = new DiscrepancyNoteUtil();
-        noteThreads = dNoteUtil.createThreadsOfParents(allNotes, sm.getDataSource(), currentStudy, null, -1, true);
+        noteThreads = dNoteUtil.createThreadsOfParents(allNotes, getDataSource(), currentStudy, null, -1, true);
         // variables that provide values for the CRF discrepancy note header
         int updatedNum = 0;
         int openNum = 0;
@@ -354,6 +387,7 @@ public abstract class DataEntryServlet extends SecureController {
             }
 
         }
+        logMe("Entering DataEntry Create disc note threads out of the various notes DONE"+System.currentTimeMillis());
         request.setAttribute("updatedNum", updatedNum + "");
         request.setAttribute("openNum", openNum + "");
         request.setAttribute("closedNum", closedNum + "");
@@ -374,7 +408,8 @@ public abstract class DataEntryServlet extends SecureController {
          * request.setAttribute("resolvedNum", "0"); request.setAttribute("notAppNum", "0");
          */
         // }
-        StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
+        logMe("Entering Create studySubjDao.. ++++stuff"+System.currentTimeMillis());
+        StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
         StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(ecb.getStudySubjectId());
         // YW 11-07-2007, data entry could not be performed if its study subject
         // has been removed.
@@ -397,6 +432,8 @@ public abstract class DataEntryServlet extends SecureController {
         if (!fp.getString("exitTo").equals("")) {
             request.setAttribute("exitTo", fp.getString("exitTo"));
         }
+        //some EVENT CRF CHECK
+        logMe("Entering some EVENT CRF CHECK"+System.currentTimeMillis());
         if (!fp.getString(GO_EXIT).equals("")) {
             session.removeAttribute(GROUP_HAS_DATA);
             session.removeAttribute("to_create_crf");
@@ -440,7 +477,7 @@ public abstract class DataEntryServlet extends SecureController {
             // forwardPage(Page.SUBMIT_DATA_SERVLET);
             return;
         }
-
+        logMe("Entering some EVENT CRF CHECK DONE"+System.currentTimeMillis());
         // checks if the section has items in item group
         // for repeating items
         // hasGroup = getInputBeans();
@@ -458,23 +495,25 @@ public abstract class DataEntryServlet extends SecureController {
         // constructs the list of items used on UI
         // tbh>>
         // logger.trace("trying event def crf id: "+eventDefinitionCRFId);
-        edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
+        logMe("Entering some EVENT DEF CRF CHECK "+System.currentTimeMillis());
+        edcdao = new EventDefinitionCRFDAO(getDataSource());
         if (eventDefinitionCRFId <= 0) {
             // TODO we have to get that id before we can continue
             EventDefinitionCRFBean edcBean = edcdao.findByStudyEventIdAndCRFVersionId(study, ecb.getStudyEventId(), ecb.getCRFVersionId());
             eventDefinitionCRFId = edcBean.getId();
         }
-
-        StudyEventDAO seDao = new StudyEventDAO(sm.getDataSource());
+        logMe("Entering some EVENT DEF CRF CHECK DONE "+System.currentTimeMillis());
+        logMe("Entering some Study EVENT DEF CRF CHECK  "+System.currentTimeMillis());
+        StudyEventDAO seDao = new StudyEventDAO(getDataSource());
         EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) edcdao.findByPK(eventDefinitionCRFId);
         edcb = (EventDefinitionCRFBean) edcdao.findByPK(eventDefinitionCRFId);
         StudyEventBean studyEventBean = (StudyEventBean) seDao.findByPK(ecb.getStudyEventId());
         edcBean.setId(eventDefinitionCRFId);
 
-        StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+        StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(getDataSource());
         StudyEventDefinitionBean studyEventDefinition = (StudyEventDefinitionBean) seddao.findByPK(edcBean.getStudyEventDefinitionId());
 
-        CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
+        CRFVersionDAO cvdao = new CRFVersionDAO(getDataSource());
         CRFVersionBean crfVersionBean = (CRFVersionBean) cvdao.findByPK(ecb.getCRFVersionId());
 
         List<RuleSetBean> ruleSets = createAndInitializeRuleSet(currentStudy, studyEventDefinition, crfVersionBean, studyEventBean, ecb, shouldRunRules());
@@ -485,6 +524,7 @@ public abstract class DataEntryServlet extends SecureController {
             "simpleConditionalDisplayService");
             section = cds0.initConditionalDisplays(section);
         }
+        logMe("Entering  Find out the id of the section's first field "+System.currentTimeMillis());
 
         // 2790: Find out the id of the section's first field
         String firstFieldId = getSectionFirstFieldId(section.getSection().getId());
@@ -494,8 +534,9 @@ public abstract class DataEntryServlet extends SecureController {
         // above is necessary to give us null values during DDE
         // ironically, this only covers vertical null value result sets
         // horizontal ones are covered in FormBeanUtil, tbh 112007
+        logMe("Entering  displayItemWithGroups "+System.currentTimeMillis());
         List<DisplayItemWithGroupBean> displayItemWithGroups = createItemWithGroups(section, hasGroup, eventDefinitionCRFId);
-
+        logMe("Entering  displayItemWithGroups end "+System.currentTimeMillis());
         section.setDisplayItemGroups(displayItemWithGroups);
 
         // why do we get previousSec and nextSec here, rather than in
@@ -503,19 +544,21 @@ public abstract class DataEntryServlet extends SecureController {
         // so that we can use them in forwarding the user to the previous/next
         // section
         // if the validation was successful
+        logMe("Entering  displayItemWithGroups sdao.findPrevious  "+System.currentTimeMillis());
         SectionBean previousSec = sdao.findPrevious(ecb, sb);
+        logMe("Entering  displayItemWithGroups sdao.findPrevious  end "+System.currentTimeMillis());
         SectionBean nextSec = sdao.findNext(ecb, sb);
         section.setFirstSection(!previousSec.isActive());
         section.setLastSection(!nextSec.isActive());
 
         // this is for generating side info panel
         // and the information panel under the Title
-        SubjectDAO subjectDao = new SubjectDAO(sm.getDataSource());
-        StudyDAO studydao = new StudyDAO(sm.getDataSource());
+        SubjectDAO subjectDao = new SubjectDAO(getDataSource());
+        StudyDAO studydao = new StudyDAO(getDataSource());
         SubjectBean subject = (SubjectBean) subjectDao.findByPK(ssb.getSubjectId());
 
         // Get the study then the parent study
-
+        logMe("Entering  Get the study then the parent study   "+System.currentTimeMillis());
         if (study.getParentStudyId() > 0) {
             // this is a site,find parent
             StudyBean parentStudy = (StudyBean) studydao.findByPK(study.getParentStudyId());
@@ -524,14 +567,14 @@ public abstract class DataEntryServlet extends SecureController {
         } else {
             request.setAttribute("studyTitle", study.getName());
         }
-
+        logMe("Entering  Get the study then the parent study end  "+System.currentTimeMillis());
         // Let us process the age
         if (currentStudy.getStudyParameterConfig().getCollectDob().equals("1")) {
             // YW 11-16-2007 erollment-date is used for calculating age.
             Date enrollmentDate = ssb.getEnrollmentDate();
             age = Utils.getInstacne().processAge(enrollmentDate, subject.getDateOfBirth());
         }
-        ArrayList beans = ViewStudySubjectServlet.getDisplayStudyEventsForStudySubject(ssb, sm.getDataSource(), ub, currentRole);
+        ArrayList beans = ViewStudySubjectServlet.getDisplayStudyEventsForStudySubject(ssb, getDataSource(), ub, currentRole);
         request.setAttribute("studySubject", ssb);
         request.setAttribute("subject", subject);
         request.setAttribute("beans", beans);
@@ -551,11 +594,13 @@ public abstract class DataEntryServlet extends SecureController {
             fp.addPresetValue(INPUT_INTERVIEW_DATE, "");
         }
         setPresetValues(fp.getPresetValues());
-
+        logMe("Entering Checks !submitted  "+System.currentTimeMillis());
         if (!isSubmitted) {
             // TODO: prevent data enterer from seeing results of first round of
             // data
             // entry, if this is second round
+// FLAG--SLOW HERE WHEN LOADING
+            logMe("Entering Checks !submitted entered  "+System.currentTimeMillis());
             request.setAttribute(BEAN_DISPLAY, section);
             request.setAttribute(BEAN_ANNOTATIONS, getEventCRFAnnotations());
             session.setAttribute("shouldRunValidation", null);
@@ -563,11 +608,13 @@ public abstract class DataEntryServlet extends SecureController {
             session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, null);
 
             discNotes = new FormDiscrepancyNotes();
+            
             //            discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
             //            if (discNotes == null) {
             //                discNotes = new FormDiscrepancyNotes();
             //            }
             // << tbh 01/2010
+            
             section = populateNotesWithDBNoteCounts(discNotes, section);
             logger.debug("+++ just ran populateNotes, printing field notes: " + discNotes.getFieldNotes().toString());
             logger.debug("found disc notes: " + discNotes.getNumExistingFieldNotes().toString());
@@ -582,7 +629,7 @@ public abstract class DataEntryServlet extends SecureController {
             session.removeAttribute(DoubleDataEntryServlet.COUNT_VALIDATE + keyId);
 
             setUpPanel(section);
-            if (newUploadedFiles.size() > 0) {
+            if (newUploadedFiles.size() > 0) { 
                 if (this.unloadFiles(newUploadedFiles)) {
 
                 } else {
@@ -594,8 +641,10 @@ public abstract class DataEntryServlet extends SecureController {
                     addPageMessage(respage.getString("uploaded_files_not_deleted_or_not_exist") + ": " + missed);
                 }
             }
+            logMe("Entering Checks !submitted entered end forwarding page "+System.currentTimeMillis());
             forwardPage(getJSPPage());
         } else {
+            logMe("Entering Checks !submitted not entered  "+System.currentTimeMillis());
             //
             // VALIDATION / LOADING DATA
             //
@@ -642,6 +691,7 @@ public abstract class DataEntryServlet extends SecureController {
             DiscrepancyValidator v = new DiscrepancyValidator(request, discNotes);
             RuleValidator ruleValidator = new RuleValidator(request);
             logger.debug("SZE 1  :: " + allItems.size());
+            logMe("Looping inside !submitted  "+System.currentTimeMillis());
             for (int i = 0; i < allItems.size(); i++) {
                 logger.trace("===itering through items: " + i);
                 DisplayItemWithGroupBean diwg = allItems.get(i);
@@ -736,8 +786,10 @@ public abstract class DataEntryServlet extends SecureController {
 
                 }
             }
-           
+            logMe("Loop ended  "+System.currentTimeMillis());
+          
             if(validate && section.getSection().hasSCDItem()) {
+                logMe(" Validate and Loop  "+System.currentTimeMillis());
                 for (int i = 0; i < allItems.size(); ++i) {
                     DisplayItemBean dib = allItems.get(i).getSingleItem();
                     ItemFormMetadataBean ifmb = dib.getMetadata();
@@ -768,7 +820,9 @@ public abstract class DataEntryServlet extends SecureController {
                         }
                     }
                 }
+                logMe(" Validate and Loop end  "+System.currentTimeMillis());
             }
+            logMe(" Validate and Loop end  "+System.currentTimeMillis());
            
             Phase phase2 = Phase.INITIAL_DATA_ENTRY;
             if (getServletPage().equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
@@ -779,6 +833,7 @@ public abstract class DataEntryServlet extends SecureController {
             // this.getItemMetadataService().resetItemCounter();
             HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid = runRules(allItems, ruleSets, true, shouldRunRules(), MessageType.ERROR, phase2,ecb);
             System.out.println("first run of rules : " + groupOrdinalPLusItemOid.toString());
+            logMe("allItems  Loop begin  "+System.currentTimeMillis());
             for (int i = 0; i < allItems.size(); i++) {
                 DisplayItemWithGroupBean diwg = allItems.get(i);
                 if (diwg.isInGroup()) {
@@ -834,7 +889,7 @@ public abstract class DataEntryServlet extends SecureController {
                     allItems.set(i, diwg);
                 }
             }
-
+            logMe("allItems  Loop end  "+System.currentTimeMillis());
             // YW, 2-1-2008 <<
             // A map from item name to item bean object.
             HashMap<String, ItemBean> scoreItems = new HashMap<String, ItemBean>();
@@ -855,6 +910,7 @@ public abstract class DataEntryServlet extends SecureController {
             section.setDisplayItemGroups(allItems);
             scoreItems = prepareScoreItems();
             scoreItemdata = prepareScoreItemdata();
+            logMe("allItems 2 Loop begin  "+System.currentTimeMillis());
             for (int i = 0; i < allItems.size(); i++) {
                 DisplayItemWithGroupBean diwb = allItems.get(i);
                 if (diwb.isInGroup()) {
@@ -989,13 +1045,15 @@ public abstract class DataEntryServlet extends SecureController {
                     }
                 }
             }
-
+            logMe("allItems 2 Loop end  "+System.currentTimeMillis());
             // do calculation for 'calculation' and 'group-calculation' type
             // items
             // and write the result in DisplayItemBean's ItemDateBean - data
             ScoreItemValidator sv = new ScoreItemValidator(request, discNotes);
             // *** doing calc here, load it where? ***
+            
             ScoreCalculator sc = new ScoreCalculator(sm, ecb, ub);
+            logMe("allItems 3 Loop begin  "+System.currentTimeMillis());
             for (int i = 0; i < allItems.size(); i++) {
                 DisplayItemWithGroupBean diwb = allItems.get(i);
                 if (diwb.isInGroup()) {
@@ -1126,6 +1184,8 @@ public abstract class DataEntryServlet extends SecureController {
                     }
                 }
             }
+            
+            logMe("allItems 3 Loop end  "+System.currentTimeMillis());
             // YW >>
 
             // we have to do this since we loaded all the form values into the
@@ -1175,7 +1235,7 @@ public abstract class DataEntryServlet extends SecureController {
                 if (changedItemsList.size() > 0) {
                     logger.debug("found admin force reason for change: changed items " + changedItems.toString() + " and changed items list: "
                         + changedItemsList.toString() + " changed items map: " + changedItemsMap.toString());
-
+                    logMe("DisplayItemBean  Loop begin  "+System.currentTimeMillis());
                     for (DisplayItemBean displayItem : changedItemsList) {
                         String formName = getInputName(displayItem);
 
@@ -1221,6 +1281,7 @@ public abstract class DataEntryServlet extends SecureController {
                             logger.debug("form name added: " + formName);
                         }
                     }
+                    logMe("DisplayItemBean  Loop end  "+System.currentTimeMillis());
                 }
                 if (nonforcedChanges > 0) {
                     // do smething here?
@@ -1228,6 +1289,7 @@ public abstract class DataEntryServlet extends SecureController {
             }
             logger.debug("errors here: " + errors.toString());
             // <<
+            logMe("error check  Loop begin  "+System.currentTimeMillis());
             if (errors.isEmpty() && shouldRunRules()) {
                 logger.debug("Errors was empty");
                 if (session.getAttribute("rulesErrors") != null) {
@@ -1277,7 +1339,9 @@ public abstract class DataEntryServlet extends SecureController {
                 fp.setCurrentStringValuesAsPreset(textFields);
                 setPresetValues(fp.getPresetValues());
                 // YW, 2-4-2008 <<
+                logMe("!errors if  Loop begin  "+System.currentTimeMillis());
                 HashMap<String, ArrayList<String>> siErrors = sv.validate();
+                
                 if (siErrors != null && !siErrors.isEmpty()) {
                     Iterator iter = siErrors.keySet().iterator();
                     while (iter.hasNext()) {
@@ -1346,7 +1410,8 @@ public abstract class DataEntryServlet extends SecureController {
                 forwardPage(getJSPPage());
             } else {
                 logger.debug("Do we hit this in save ?????");
-                ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
+                logMe("Do we hit this in save ????  "+System.currentTimeMillis());
+                ItemDataDAO iddao = new ItemDataDAO(getDataSource());
                 boolean success = true;
                 boolean temp = true;
 
@@ -1359,7 +1424,7 @@ public abstract class DataEntryServlet extends SecureController {
                 }
 
                 if (ecdao == null) {
-                    ecdao = new EventCRFDAO(sm.getDataSource());
+                    ecdao = new EventCRFDAO(getDataSource());
                 }
                 // set validator id for DDE
                 DataEntryStage stage = ecb.getStage();
@@ -1385,7 +1450,7 @@ public abstract class DataEntryServlet extends SecureController {
                 logger.debug("Status of Study Subject {}", ssb.getStatus().getName());
                 if (ssb.getStatus() == Status.SIGNED && changedItemsList.size() > 0) {
                     logger.debug("Status of Study Subject is Signed we are updating");
-                    StudySubjectDAO studySubjectDao = new StudySubjectDAO(sm.getDataSource());
+                    StudySubjectDAO studySubjectDao = new StudySubjectDAO(getDataSource());
                     ssb.setStatus(Status.AVAILABLE);
                     ssb.setUpdater(ub);
                     ssb.setUpdatedDate(new Date());
@@ -1393,7 +1458,7 @@ public abstract class DataEntryServlet extends SecureController {
                 }
                 if (ecb.isSdvStatus() && changedItemsList.size() > 0) {
                     logger.debug("Status of Study Subject is SDV we are updating");
-                    StudySubjectDAO studySubjectDao = new StudySubjectDAO(sm.getDataSource());
+                    StudySubjectDAO studySubjectDao = new StudySubjectDAO(getDataSource());
                     ssb.setStatus(Status.AVAILABLE);
                     ssb.setUpdater(ub);
                     ssb.setUpdatedDate(new Date());
@@ -1405,7 +1470,7 @@ public abstract class DataEntryServlet extends SecureController {
 
                 // save discrepancy notes into DB
                 FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
-                dndao = new DiscrepancyNoteDAO(sm.getDataSource());
+                dndao = new DiscrepancyNoteDAO(getDataSource());
 
                 AddNewSubjectServlet.saveFieldNotes(INPUT_INTERVIEWER, fdn, dndao, ecb.getId(), "EventCRF", currentStudy);
                 AddNewSubjectServlet.saveFieldNotes(INPUT_INTERVIEW_DATE, fdn, dndao, ecb.getId(), "EventCRF", currentStudy);
@@ -1416,10 +1481,10 @@ public abstract class DataEntryServlet extends SecureController {
                 logger.debug("all items before saving into DB" + allItems.size());
                 this.output(allItems);
 
-               
+                logMe("DisplayItemWithGroupBean allitems4 "+System.currentTimeMillis());
                 for (int i = 0; i < allItems.size(); i++) {
                     DisplayItemWithGroupBean diwb = allItems.get(i);
-
+                  
                     // we don't write success = success && writeToDB here
                     // since the short-circuit mechanism may prevent Java
                     // from executing writeToDB.
@@ -1533,13 +1598,16 @@ public abstract class DataEntryServlet extends SecureController {
                         }
                     }
                 }
+                logMe("DisplayItemWithGroupBean allitems4 end "+System.currentTimeMillis());
                 System.out.println("running rules: " + phase2.name());
-
+                logMe("DisplayItemWithGroupBean dryrun  start"+System.currentTimeMillis());
                 HashMap<String, ArrayList<String>> rulesPostDryRun = runRules(allItems, ruleSets, false, shouldRunRules(), MessageType.WARNING, phase2,ecb);
                 System.out.println("found rules post dry run: " + rulesPostDryRun.toString());
                 HashMap<String, ArrayList<String>> errorsPostDryRun = new HashMap<String, ArrayList<String>>();
                 // additional step needed, run rules and see if any items are 'shown' AFTER saving data
+                logMe("DisplayItemWithGroupBean dryrun  end"+System.currentTimeMillis());
                 boolean inSameSection = false;
+                logMe("DisplayItemWithGroupBean allitems4 "+System.currentTimeMillis());
                 if (!rulesPostDryRun.isEmpty()) {
                     // in same section?
 
@@ -1612,7 +1680,7 @@ public abstract class DataEntryServlet extends SecureController {
                             }
                             displayGroupsWithItems.set(i, itemWithGroup);
                         }
-
+                        logMe("DisplayItemWithGroupBean allitems4  end,begin"+System.currentTimeMillis());
                         // check groups
                         List<DisplayItemGroupBean> itemGroups = new ArrayList<DisplayItemGroupBean>();
                         itemGroups = section.getDisplayFormGroups();
@@ -1633,6 +1701,7 @@ public abstract class DataEntryServlet extends SecureController {
                             }
                             // newItemGroups.add(displayGroup);
                         }
+                        logMe("DisplayItemWithGroupBean allitems4  end,end"+System.currentTimeMillis());
                         // trying to reset the display form groups here, tbh
 
                         // section.setItems(displayItems);
@@ -1707,7 +1776,7 @@ public abstract class DataEntryServlet extends SecureController {
                     ecb = (EventCRFBean) ecdao.update(ecb);
                     success = success && ecb.isActive();
 
-                    StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
+                    StudyEventDAO sedao = new StudyEventDAO(getDataSource());
                     StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
                     seb.setUpdatedDate(now);
                     seb.setUpdater(ub);
@@ -1862,7 +1931,7 @@ public abstract class DataEntryServlet extends SecureController {
      * @param error
      */
     protected void setReasonForChangeError(ItemDataBean idb, String formName, String error) {
-        DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(sm.getDataSource());
+        DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
         FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
         HashMap idNotes = fdn.getIdNotes();
         int existingNotes = dndao.findNumExistingNotesForItem(idb.getId());
@@ -1909,8 +1978,8 @@ public abstract class DataEntryServlet extends SecureController {
     protected void getInputBeans() throws InsufficientPermissionException {
 
         fp = new FormProcessor(request);
-        ecdao = new EventCRFDAO(sm.getDataSource());
-        sdao = new SectionDAO(sm.getDataSource());
+        ecdao = new EventCRFDAO(getDataSource());
+        sdao = new SectionDAO(getDataSource());
         // BWP >>we should have the correct crfVersionId, in order to acquire
         // the correct
         // section IDs
@@ -1934,7 +2003,7 @@ public abstract class DataEntryServlet extends SecureController {
                 // will not be updated to database.
                 int studyEventId = fp.getInt(INPUT_STUDY_EVENT_ID);
                 if (studyEventId > 0) {
-                    StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
+                    StudyEventDAO sedao = new StudyEventDAO(getDataSource());
                     StudyEventBean sEvent = (StudyEventBean) sedao.findByPK(studyEventId);
                     ecb = updateECB(sEvent);
                 }
@@ -1975,13 +2044,13 @@ public abstract class DataEntryServlet extends SecureController {
         }
         // added to allow sections shown on this page
         DisplayTableOfContentsBean displayBean = new DisplayTableOfContentsBean();
-        displayBean = TableOfContentsServlet.getDisplayBean(ecb, sm.getDataSource(), currentStudy);
+        displayBean = TableOfContentsServlet.getDisplayBean(ecb, getDataSource(), currentStudy);
         request.setAttribute(TOC_DISPLAY, displayBean);
 
         int sectionId = fp.getInt(INPUT_SECTION_ID, true);
         ArrayList sections;
         if (sectionId <= 0) {
-            StudyEventDAO studyEventDao = new StudyEventDAO(sm.getDataSource());
+            StudyEventDAO studyEventDao = new StudyEventDAO(getDataSource());
             int maximumSampleOrdinal = studyEventDao.getMaxSampleOrdinal(displayBean.getStudyEventDefinition(), displayBean.getStudySubject());
             request.setAttribute("maximumSampleOrdinal", maximumSampleOrdinal);
 
@@ -2026,7 +2095,7 @@ public abstract class DataEntryServlet extends SecureController {
 
         // we will look into db to see if any repeating items for this CRF
         // section
-        ItemGroupDAO igdao = new ItemGroupDAO(sm.getDataSource());
+        ItemGroupDAO igdao = new ItemGroupDAO(getDataSource());
         // find any item group which doesn't equal to 'Ungrouped'
         List<ItemGroupBean> itemGroups = igdao.findLegitGroupBySectionId(sectionId);
         if (!itemGroups.isEmpty()) {
@@ -2056,7 +2125,7 @@ public abstract class DataEntryServlet extends SecureController {
         // "org.akaza.openclinica.i18n.exceptions",locale);
 
         EventCRFBean ecb;
-        ecdao = new EventCRFDAO(sm.getDataSource());
+        ecdao = new EventCRFDAO(getDataSource());
 
         int crfVersionId = fp.getInt(INPUT_CRF_VERSION_ID);
 
@@ -2071,7 +2140,7 @@ public abstract class DataEntryServlet extends SecureController {
         logger.trace("Creating event CRF.  Study id: " + currentStudy.getId() + "; CRF Version id: " + crfVersionId + "; Study Event id: " + studyEventId
             + "; Event Definition CRF id: " + eventDefinitionCRFId + "; Subject: " + subjectId);
 
-        StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
+        StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
         StudySubjectBean ssb = ssdao.findBySubjectIdAndStudy(subjectId, currentStudy);
 
         if (ssb.getId() <= 0) {
@@ -2081,7 +2150,7 @@ public abstract class DataEntryServlet extends SecureController {
             throw new InconsistentStateException(Page.LIST_STUDY_SUBJECTS_SERVLET, resexception.getString("begin_data_entry_without_event_but_subject"));
         }
 
-        StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+        StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(getDataSource());
         StudyEventDefinitionBean sedb = seddao.findByEventDefinitionCRFId(eventDefinitionCRFId);
         // logger.trace("study event definition:" + sedb.getId());
         if (sedb.getId() <= 0) {
@@ -2089,7 +2158,7 @@ public abstract class DataEntryServlet extends SecureController {
             throw new InconsistentStateException(Page.LIST_STUDY_SUBJECTS_SERVLET, resexception.getString("begin_data_entry_without_event_but_study"));
         }
 
-        CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
+        CRFVersionDAO cvdao = new CRFVersionDAO(getDataSource());
         EntityBean eb = cvdao.findByPK(crfVersionId);
 
         if (eb.getId() <= 0) {
@@ -2097,7 +2166,7 @@ public abstract class DataEntryServlet extends SecureController {
             throw new InconsistentStateException(Page.LIST_STUDY_SUBJECTS_SERVLET, resexception.getString("begin_data_entry_without_event_but_CRF"));
         }
 
-        StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
+        StudyEventDAO sedao = new StudyEventDAO(getDataSource());
         StudyEventBean sEvent = (StudyEventBean) sedao.findByPK(studyEventId);
 
         StudyBean studyWithSED = currentStudy;
@@ -2244,7 +2313,7 @@ public abstract class DataEntryServlet extends SecureController {
         List<String> nullValuesList = new ArrayList<String>();
         // BWP>> Get a List<String> of any null values such as NA or NI
         // method returns null values as a List<String>
-        nullValuesList = formBeanUtil.getNullValuesByEventCRFDefId(eventDefCRFId, sm.getDataSource());
+        nullValuesList = formBeanUtil.getNullValuesByEventCRFDefId(eventDefCRFId, getDataSource());
         // >>BWP
         // logger.trace("+++ starting to review groups 2: " + repeatMax);
         long two = System.currentTimeMillis() - timeCheck;
@@ -2261,7 +2330,7 @@ public abstract class DataEntryServlet extends SecureController {
 
             // want to do deep copy here, so always get a fresh copy for items,
             // may use other better way to do, like clone
-            List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, sm.getDataSource(), ecb, sb.getId(), nullValuesList, context);
+            List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb, sb.getId(), nullValuesList, context);
 
             // get the values from the manually created rows first- not from the
             // rep model
@@ -2314,7 +2383,7 @@ public abstract class DataEntryServlet extends SecureController {
         // be the same for all display beans
         // nullValuesList = formBeanUtil.getNullValuesByEventCRFDefId(
         // eventDefCRFId,
-        // sm.getDataSource());
+        // getDataSource());
         /*
          * logger.trace("+++ count for null values list: " + nullValuesList.size()); logger.trace(nullValuesList.toString() + " found with " + eventDefCRFId);
          */
@@ -2353,7 +2422,7 @@ public abstract class DataEntryServlet extends SecureController {
             // may use other better way to do, like clone
 
             // moved it back down here to fix another bug, tbh 12-3-2007
-            List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, sm.getDataSource(), ecb, sb.getId(), nullValuesList, context);
+            List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb, sb.getId(), nullValuesList, context);
             logger.trace("+++count for dibs after deep copy: " + dibs.size());
             two = System.currentTimeMillis() - timeCheck;
             // logger.trace("time 3.dibs: " + two + "ms");
@@ -2974,7 +3043,7 @@ public abstract class DataEntryServlet extends SecureController {
                 idb.setStatus(Status.DELETED);
                 idb = (ItemDataBean) iddao.updateValue(idb);
 
-                DiscrepancyNoteDAO dnDao = new DiscrepancyNoteDAO(sm.getDataSource());
+                DiscrepancyNoteDAO dnDao = new DiscrepancyNoteDAO(getDataSource());
                 List dnNotesOfRemovedItem = dnDao.findExistingNotesForItemData(idb.getId());
                 if (!dnNotesOfRemovedItem.isEmpty()) {
                     DiscrepancyNoteBean itemParentNote = null;
@@ -3077,7 +3146,7 @@ public abstract class DataEntryServlet extends SecureController {
 
         if (eventDefinitionCRFId <= 0) { // TODO: this block of code repeats
             // many times, need to clean up
-            edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
+            edcdao = new EventDefinitionCRFDAO(getDataSource());
             EventDefinitionCRFBean edcBean = edcdao.findByStudyEventIdAndCRFVersionId(study, ecb.getStudyEventId(), ecb.getCRFVersionId());
             eventDefinitionCRFId = edcBean.getId();
         }
@@ -3092,7 +3161,7 @@ public abstract class DataEntryServlet extends SecureController {
                 // Null values: this method adds null values to the
                 // displayitembeans
                 newDisplayBean =
-                    formBeanUtil.createDisplaySectionBWithFormGroups(sb.getId(), ecb.getCRFVersionId(), sm.getDataSource(), eventDefinitionCRFId, ecb, context);
+                    formBeanUtil.createDisplaySectionBWithFormGroups(sb.getId(), ecb.getCRFVersionId(), getDataSource(), eventDefinitionCRFId, ecb, context);
             } else {
                 newDisplayBean =
                     formBeanUtil.createDisplaySectionWithItemGroups(study, sb.getId(), ecb, ecb.getStudyEventId(), sm, eventDefinitionCRFId, context);
@@ -3105,8 +3174,8 @@ public abstract class DataEntryServlet extends SecureController {
         }
 
         // Find out whether any display items are *not* grouped; see issue 1689
-        hasUngroupedItems = formBeanUtil.sectionHasUngroupedItems(sm.getDataSource(), sb.getId(), itemGroups);
-        sdao = new SectionDAO(sm.getDataSource());
+        hasUngroupedItems = formBeanUtil.sectionHasUngroupedItems(getDataSource(), sb.getId(), itemGroups);
+        sdao = new SectionDAO(getDataSource());
        
         sb.setHasSCDItem(hasUngroupedItems?this.sdao.hasSCDItem(sb.getId()):false);
 
@@ -3119,24 +3188,24 @@ public abstract class DataEntryServlet extends SecureController {
 
         section.setSection(sb);
 
-        CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
+        CRFVersionDAO cvdao = new CRFVersionDAO(getDataSource());
         CRFVersionBean cvb = (CRFVersionBean) cvdao.findByPK(ecb.getCRFVersionId());
         section.setCrfVersion(cvb);
 
-        CRFDAO cdao = new CRFDAO(sm.getDataSource());
+        CRFDAO cdao = new CRFDAO(getDataSource());
         CRFBean cb = (CRFBean) cdao.findByPK(cvb.getCrfId());
         section.setCrf(cb);
 
-        edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
+        edcdao = new EventDefinitionCRFDAO(getDataSource());
         // EventDefinitionCRFBean edcb =
         // edcdao.findByStudyEventIdAndCRFVersionId(study,
         // ecb.getStudyEventId(), cvb.getId());
         section.setEventDefinitionCRF(edcb);
 
         // setup DAO's here to avoid creating too many objects
-        idao = new ItemDAO(sm.getDataSource());
-        ifmdao = new ItemFormMetadataDAO(sm.getDataSource());
-        iddao = new ItemDataDAO(sm.getDataSource());
+        idao = new ItemDAO(getDataSource());
+        ifmdao = new ItemFormMetadataDAO(getDataSource());
+        iddao = new ItemDataDAO(getDataSource());
 
         // Use itemGroups to determine if there are any ungrouped items
 
@@ -3196,22 +3265,22 @@ public abstract class DataEntryServlet extends SecureController {
 
             section.setSection(sb);
 
-            CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
+            CRFVersionDAO cvdao = new CRFVersionDAO(getDataSource());
             CRFVersionBean cvb = (CRFVersionBean) cvdao.findByPK(ecb.getCRFVersionId());
             section.setCrfVersion(cvb);
 
-            CRFDAO cdao = new CRFDAO(sm.getDataSource());
+            CRFDAO cdao = new CRFDAO(getDataSource());
             CRFBean cb = (CRFBean) cdao.findByPK(cvb.getCrfId());
             section.setCrf(cb);
 
-            edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
+            edcdao = new EventDefinitionCRFDAO(getDataSource());
             edcb = edcdao.findByStudyEventIdAndCRFVersionId(study, ecb.getStudyEventId(), cvb.getId());
             section.setEventDefinitionCRF(edcb);
 
             // setup DAO's here to avoid creating too many objects
-            idao = new ItemDAO(sm.getDataSource());
-            ifmdao = new ItemFormMetadataDAO(sm.getDataSource());
-            iddao = new ItemDataDAO(sm.getDataSource());
+            idao = new ItemDAO(getDataSource());
+            ifmdao = new ItemFormMetadataDAO(getDataSource());
+            iddao = new ItemDataDAO(getDataSource());
 
             // get all the display item beans
             ArrayList displayItems = getParentDisplayItems(false, sb, edcb, idao, ifmdao, iddao, false);
@@ -3448,7 +3517,7 @@ public abstract class DataEntryServlet extends SecureController {
      */
 
     protected DisplaySectionBean populateNotesWithDBNoteCounts(FormDiscrepancyNotes discNotes, DisplaySectionBean section) {
-        dndao = new DiscrepancyNoteDAO(sm.getDataSource());
+        dndao = new DiscrepancyNoteDAO(getDataSource());
        // ArrayList items = section.getItems();
         ArrayList<DiscrepancyNoteBean> ecNotes = dndao.findEventCRFDNotesFromEventCRF(ecb);
         ArrayList<DiscrepancyNoteBean> existingNameNotes = new ArrayList(),nameNotes = new ArrayList();
@@ -3667,7 +3736,7 @@ public abstract class DataEntryServlet extends SecureController {
              }
         }
 
-        AuditDAO adao = new AuditDAO(sm.getDataSource());
+        AuditDAO adao = new AuditDAO(getDataSource());
         ArrayList itemAuditEvents = adao.checkItemAuditEventsExist(dib.getItem().getId(), "item_data");
         if (itemAuditEvents.size() > 0) {
             dib.getData().setAuditLog(true);    
@@ -3787,16 +3856,16 @@ public abstract class DataEntryServlet extends SecureController {
         iddao.updateStatusByEventCRF(ecb, newStatus);
 
         // change status for study event
-        StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
+        StudyEventDAO sedao = new StudyEventDAO(getDataSource());
         StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
         seb.setUpdatedDate(new Date());
         seb.setUpdater(ub);
 
-        EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
+        EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(getDataSource());
         ArrayList allCRFs = ecdao.findAllByStudyEvent(seb);
         StudyBean study = (StudyBean) session.getAttribute("study");
         ArrayList allEDCs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study, seb.getStudyEventDefinitionId());
-        CRFVersionDAO crfversionDao=  new CRFVersionDAO(sm.getDataSource());
+        CRFVersionDAO crfversionDao=  new CRFVersionDAO(getDataSource());
         boolean eventCompleted = true;
         boolean allRequired = true;
         //JN Adding another flag
@@ -3895,15 +3964,15 @@ public abstract class DataEntryServlet extends SecureController {
         fp = new FormProcessor(request);
         int eventCRFId = fp.getInt(INPUT_EVENT_CRF_ID);
 
-        ecdao = new EventCRFDAO(sm.getDataSource());
+        ecdao = new EventCRFDAO(getDataSource());
         ecb = (EventCRFBean) ecdao.findByPK(eventCRFId);
     }
 
     protected boolean isEachRequiredFieldFillout() {
         // need to update this method to accomodate dynamics, tbh
-        ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
-        ItemDAO idao = new ItemDAO(sm.getDataSource());
-        ItemFormMetadataDAO itemFormMetadataDao = new ItemFormMetadataDAO(sm.getDataSource());
+        ItemDataDAO iddao = new ItemDataDAO(getDataSource());
+        ItemDAO idao = new ItemDAO(getDataSource());
+        ItemFormMetadataDAO itemFormMetadataDao = new ItemFormMetadataDAO(getDataSource());
         int allRequiredNum = idao.findAllRequiredByCRFVersionId(ecb.getCRFVersionId());
         int allRequiredFilledOut = iddao.findAllRequiredByEventCRFId(ecb);
         int allRequiredButHidden = itemFormMetadataDao.findCountAllHiddenByCRFVersionId(ecb.getCRFVersionId());
@@ -3990,7 +4059,7 @@ public abstract class DataEntryServlet extends SecureController {
      * @return
      */
     protected boolean isSectionReviewedOnce(SectionBean sb) {
-        SectionDAO sdao = new SectionDAO(sm.getDataSource());
+        SectionDAO sdao = new SectionDAO(getDataSource());
 
         DataEntryStage stage = ecb.getStage();
 
@@ -4024,7 +4093,7 @@ public abstract class DataEntryServlet extends SecureController {
      * @return
      */
     protected boolean isEachSectionReviewedOnce() {
-        SectionDAO sdao = new SectionDAO(sm.getDataSource());
+        SectionDAO sdao = new SectionDAO(getDataSource());
 
         DataEntryStage stage = ecb.getStage();
 
@@ -4056,7 +4125,7 @@ public abstract class DataEntryServlet extends SecureController {
     }
 
     protected void getEventDefinitionCRFBean() {
-        edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
+        edcdao = new EventDefinitionCRFDAO(getDataSource());
         StudyBean study = (StudyBean) session.getAttribute("study");
         edcb = edcdao.findByStudyEventIdAndCRFVersionId(study, ecb.getStudyEventId(), ecb.getCRFVersionId());
     }
@@ -4077,7 +4146,7 @@ public abstract class DataEntryServlet extends SecureController {
         List<String> nullValuesList = new ArrayList<String>();
         // BWP>> Get a List<String> of any null values such as NA or NI
         // method returns null values as a List<String>
-        nullValuesList = formBeanUtil.getNullValuesByEventCRFDefId(eventCRFDefId, sm.getDataSource());
+        nullValuesList = formBeanUtil.getNullValuesByEventCRFDefId(eventCRFDefId, getDataSource());
         // >>BWP
         ArrayList items = dsb.getItems();
         logger.trace("single items size: " + items.size());
@@ -4094,7 +4163,7 @@ public abstract class DataEntryServlet extends SecureController {
         }
 
         if (hasItemGroup) {
-            ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
+            ItemDataDAO iddao = new ItemDataDAO(getDataSource());
             ArrayList data = iddao.findAllActiveBySectionIdAndEventCRFId(sb.getId(), ecb.getId());
             // BWP 12/2/07>> set a flag signaling to data entry JSPs that data
             // is involved
@@ -4157,7 +4226,7 @@ public abstract class DataEntryServlet extends SecureController {
                         // always get a fresh copy for items, may use other
                         // better way to
                         // do deep copy, like clone
-                        List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, sm.getDataSource(), ecb, sb.getId(), edcb, 0, context);
+                        List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb, sb.getId(), edcb, 0, context);
 
                         digb.setItems(dibs);
                         logger.trace("set with dibs list of : " + dibs.size());
@@ -4201,7 +4270,7 @@ public abstract class DataEntryServlet extends SecureController {
                     session.setAttribute(GROUP_HAS_DATA, Boolean.FALSE);
                     // no data, still add a blank row for displaying
                     DisplayItemGroupBean digb2 = new DisplayItemGroupBean();
-                    List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, sm.getDataSource(), ecb, sb.getId(), nullValuesList, context);
+                    List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb, sb.getId(), nullValuesList, context);
                     digb2.setItems(dibs);
                     logger.trace("set with nullValuesList of : " + nullValuesList);
                     digb2.setEditFlag("initial");

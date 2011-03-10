@@ -85,7 +85,11 @@ public class SessionManager {
         staticDataSource = ds;
         setupUser(userFromSession, userName);
     }
-
+    public SessionManager( ApplicationContext applicationContext) throws SQLException {
+        this.ds = (DataSource) applicationContext.getBean("dataSource");
+        staticDataSource = ds;
+       
+    }
     public void setupUser(UserAccountBean userFromSession, String userName) {
         if (userFromSession == null || StringUtil.isBlank(userFromSession.getName())) {
             // create a new user account bean form database
@@ -103,6 +107,8 @@ public class SessionManager {
         }
     }
 
+ 
+    
     public void setupDataSource() {
         // begin remove later
         // logger.info("***** BEGIN LISTING PROPERTIES *****");
