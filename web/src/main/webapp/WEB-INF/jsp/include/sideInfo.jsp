@@ -103,7 +103,7 @@
   </table>         
   <c:choose> 
   <c:when test="${panel.createDataset}">
-     <c:import url="../include/createDatasetSide.jsp"/>
+     <c:import url="/WEB-INF/jsp/include/createDatasetSide.jsp"/>
   </c:when>
   <c:when test="${panel.extractData}">
      
@@ -177,7 +177,7 @@
   </c:when>
   
   <c:when test="${panel.submitDataModule}">      
-     <c:import url="../include/submitDataSide.jsp"/>	  
+     <c:import url="/WEB-INF/jsp/include/submitDataSide.jsp"/>
   </c:when> 
 	
   </c:choose>	
