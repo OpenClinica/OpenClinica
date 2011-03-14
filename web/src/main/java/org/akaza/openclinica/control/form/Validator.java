@@ -1637,6 +1637,9 @@ public class Validator {
             fieldValues = new String[1];
             String fieldValue = getFieldValue(fieldName);
             fieldValues[0] = fieldValue == null ? "" : fieldValue;
+            if (fieldValues[0].equals("")) {
+                return true;
+            }
         }
 
         // this means the user didn't fill in anything - and nothing is still,
