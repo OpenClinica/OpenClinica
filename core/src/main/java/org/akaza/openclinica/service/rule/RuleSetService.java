@@ -317,6 +317,12 @@ public class RuleSetService implements RuleSetServiceInterface {
 
     }
 
+    public int getCountByStudy(StudyBean study) {
+        int count = getRuleSetRuleDao().getCountByStudy(study);
+        return count;
+
+    }
+
     public List<RuleSetRuleBean> getWithFilterAndSort(ViewRuleAssignmentFilter viewRuleAssignmentFilter, ViewRuleAssignmentSort viewRuleAssignmentSort,
             int rowStart, int rowEnd) {
 

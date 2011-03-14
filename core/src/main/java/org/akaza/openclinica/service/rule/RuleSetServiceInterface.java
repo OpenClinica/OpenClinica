@@ -79,6 +79,8 @@ public interface RuleSetServiceInterface {
 
     public int getCountWithFilter(ViewRuleAssignmentFilter viewRuleAssignmentFilter);
 
+    public int getCountByStudy(StudyBean study);
+
     public List<RuleSetRuleBean> getWithFilterAndSort(ViewRuleAssignmentFilter viewRuleAssignmentFilter, ViewRuleAssignmentSort viewRuleAssignmentSort,
             int rowStart, int rowEnd);
 

@@ -55,9 +55,9 @@ public class StudyModuleController {
     @Qualifier("ruleSetService")
     private RuleSetServiceInterface ruleSetService;
 
-    @Autowired
-    @Qualifier("ruleSetDao")
-    private RuleSetDao ruleSetDao;
+//    @Autowired
+//    @Qualifier("ruleSetDao")
+//    private RuleSetDao ruleSetDao;
 
     @Autowired
     @Qualifier("dataSource")
@@ -108,7 +108,7 @@ public class StudyModuleController {
         //List<RuleSetBean> ruleSets = ruleSetService.getRuleSetsByStudy(currentStudy);
         //ruleSets = ruleSetService.filterByStatusEqualsAvailableOnlyRuleSetRules(ruleSets);
 
-        int ruleCount = ruleSetDao.getCountByStudy(currentStudy).intValue();
+        int ruleCount = ruleSetService.getCountByStudy(currentStudy);
 
         int siteCount = studyDao.findOlnySiteIdsByStudy(currentStudy).size();
         int userCount = userDao.findAllUsersByStudy(currentStudy.getId()).size();

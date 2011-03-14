@@ -8,6 +8,7 @@ import org.akaza.openclinica.domain.rule.action.HideActionBean;
 import org.akaza.openclinica.domain.rule.action.InsertActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.rule.action.ShowActionBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -104,6 +105,20 @@ public class RuleSetRuleDao extends AbstractDomainDao<RuleSetRuleBean> {
         q.setMaxResults(rowEnd - rowStart);
         return (ArrayList<RuleSetRuleBean>) q.list();
     }
+
+    public int getCountByStudy(StudyBean study) {
+        String query =
+            "select COUNT(*) from rule_set_rule rsr " + " join rule_set rs on rs.id = rsr.rule_set_id "
+                + " left outer join study_event_definition sed on rs.study_event_definition_id = sed.study_event_definition_id "
+                + " left outer join crf_version cv on rs.crf_version_id = cv.crf_version_id " + " left outer join crf c on rs.crf_id = c.crf_id "
+                + " left outer join item i on rs.item_id = i.item_id " + " left outer join item_group ig on rs.item_group_id = ig.item_group_id "
+                + " join rule_expression re on rs.rule_expression_id = re.id " + " join rule r on r.id = rsr.rule_id "
+                + " join rule_expression rer on r.rule_expression_id = rer.id " + " join rule_action ra on ra.rule_set_rule_id = rsr.id " + " where rs.study_id = " + study.getId() + "  AND  rsr.status_id = 1";
+
+        org.hibernate.Query q = getCurrentSession().createSQLQuery(query);
+        return ((Number) q.uniqueResult()).intValue();
+    }
+
 
     public CoreResources getCoreResources() {
         return coreResources;
