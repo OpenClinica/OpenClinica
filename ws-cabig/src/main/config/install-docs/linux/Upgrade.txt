@@ -1,18 +1,18 @@
 --------------------------------------------------------------
 OPENCLINICA RELEASE NOTES
-OpenClinica Version 3.0
+OpenClinica Version 3.1-beta2
 Document Version 1
 --------------------------------------------------------------
 
 --------------------------------------------------------------
-Updated: September 18th 2009 Paul Galvin pgalvin@akazaresearch.com
+Updated: March 10, 2011 Paul Galvin pgalvin@akazaresearch.com
 --------------------------------------------------------------
 
 --------------------------------------------------------------
 OVERVIEW
 --------------------------------------------------------------
 
-Please see the README.txt for an Overview of OpenClinica 3.0.
+Please see the README.txt for an Overview of OpenClinica 3.1-beta2.
 
 --------------------------------------------------------------
 CONTENTS OF THIS DOCUMENT
@@ -21,14 +21,14 @@ CONTENTS OF THIS DOCUMENT
 I.   KEY FEATURES
 II.  SOFTWARE DEPENDENCIES AND SYSTEM REQUIREMENTS
 III. CONTENTS OF THIS PACKAGE
-IV.  2.5.X TO 3.0 : BACKUP & UPGRADE
-V.   2.5.X TO 3.0 : VERIFY
+IV.  3.1-beta2 : BACKUP & UPGRADE
+V.   3.1-beta2 : VERIFY
 VI.  ABOUT OPENCLINICA
 
 --------------------------------------------------------------
 I. KEY FEATURES
 --------------------------------------------------------------
-The new features of OpenClinica 3.0 can be found at http://www.openclinica.org/dokuwiki/doku.php?id=ocfeatures:start.
+The new features of OpenClinica 3.1-beta2 can be found at http://www.openclinica.org/dokuwiki/doku.php?id=ocfeatures:start.
 
 
 
@@ -37,33 +37,30 @@ II. SOFTWARE DEPENDENCIES AND SYSTEM REQUIREMENTS
 --------------------------------------------------------------
 The pre-requisites below are the same software pieces used to run OpenClinica 2.5.x.  If you would like to use Java 6, Tomcat 6 and PostgreSQL 8.4.1, you may follow their upgrade procedures.  This document is for upgrading OpenClinica only.
 
-OpenClinica 3.0 will run on either version of the software stack.
+OpenClinica 3.1-beta2 will run on either version of the software stack.
 
 
 Pre-requisites (versions):
     Operating system(s): Redhat Enterprise Linux 4.0+, Redhat Linux 8.0
-    Browsers: Internet Explorer 6.0 and 7.0, Mozilla Firefox 1.5 and 2.0
-    JDK : 1.5.0_16
-    Application server : Tomcat 5.5.25
-    NOTE: If you are running an earlier version of Tomcat, please upgrade to 5.5.25. If you want to continue using an earlier version of Tomcat, you must configure the smtp host correctly, or the system will hang when trying to send email notifications. If you don't want to use outgoing mail features, a workaround would be to set this value to a mail server with a short timeout. This has been noted a a Known Issue and will be resolved in a future release.
-    Database server : PostgreSQL 8.2.9
-    OpenClinica version : OpenClinica 2.5.x
+    Browsers: Internet Explorer 7.0 and higher, Mozilla Firefox 3.0 and higher
+    JDK : 1.6
+    Application server : Tomcat 6
+    Database server : PostgreSQL 8.4
+    OpenClinica version : OpenClinica 3.0.x
 
 --------------------------------------------------------------
 III. CONTENTS OF THIS PACKAGE
 --------------------------------------------------------------
 
 --------------------------------------------------------------
-IV.  2.5.X TO 3.0 : BACKUP & UPGRADE
+IV.  3.1-beta2 : BACKUP & UPGRADE
 --------------------------------------------------------------
     * Verify pre-requisites
     * Shutdown Tomcat (/usr/share/tomcat/bin/shutdown.sh)
     * Backup the application’s database
     * Shutdown the postgres DBMS
-    * Backup the web application configuration file
-      * CATALINA_HOME/conf/Catalina/localhost/OpenClinica.xml for Linux 
     * Backup the web application properties file
-	* CATALINA_HOME/webapps/OpenClinica/properties/datainfo.properties
+	* CATALINA_HOME/webapps/OpenClinica/WEB-INF/classes/datainfo.properties
     * Backup the web application’s war file
 	* CATALINA_HOME/webapps/OpenClinica.war
     * Undeploy the web application (the Tomcat manager does not correctly undeploy the application, so do a manual undeploy)
@@ -72,32 +69,29 @@ IV.  2.5.X TO 3.0 : BACKUP & UPGRADE
     	* Delete the work/Catalina/localhost/OpenClinica directory
     * Start Tomcat (/usr/share/tomcat/bin/startup.sh)
     * Create a new directory - /var/oc
-    * Untar the OpenClinica-3.0 package to /var/oc
-    * Deploy OpenClinica.war located in the directory oc/OpenClinica-3.0/distribution using the Tomcat Manager
+    * Untar the OpenClinica-3.1-beta2 package to /var/oc
+    * Deploy OpenClinica.war located in the directory oc/OpenClinica-3.1-beta2/distribution using the Tomcat Manager
     * You will need to update only a single file.  /usr/local/tomcat/webapps/OpenClinica/WEB-INF/classes/datainfo.properties
     * Update the new file with the database configuration from OpenClinica.xml.
 
-		An example of the 2- Database Configuration:
-			username=clinica
-			password=clinica
-			url=jdbc:postgresql://localhost:5432/openclinica
-			dataBase=postgres
-			driver=org.postgresql.Driver
-			hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+		An example of the 1- Database Configuration:
+			dbType=postgres
+			dbUser=clinica
+			dbPass=clinica
+			db=openclinica
+			dbPort=5432
+			dbHost=localhost
 
     * Update the new file with other configurations from the datainfo.properties.
     * Configuration of log file locations has to be done in the new datainfo.properties. look for  log.dir
+    * Restore the files from the openclinica.data folder you backed up in a previous step to the new openclinica.data folder
     * Restart Tomcat
-    * Update database tables
-       * Execute the upgrade .sql command (psql -d openclinica -U postgres -f <<enter .sql file name>>) - This command requires a superuser.  
-            * Users who want to upgrade from 2.5.xto 3.0 
-			  Execute: 
-			  	schema_patch_2.5_to_3.0.sql (This file is located in /var/oc/OpenClinica-3.0/config/database/PostgreSQL/3.0/upgrade)
+
 
    * Restart Tomcat
    * Verify patch for the OpenClinica web application
 --------------------------------------------------------------
-V.   2.5.X TO 3.0 : VERIFY
+V.   3.1-beta2 : VERIFY
 --------------------------------------------------------------
 
  * Test database connection and basic authentication
@@ -105,7 +99,7 @@ V.   2.5.X TO 3.0 : VERIFY
 	* Verify that tomcat is running
 	* Open a web browser on the server to http://<<server url>>:8080/OpenClinica - You should see the login page
 	* Login to the system
- * Verify version number is upgraded to 3.0
+ * Verify version number is upgraded to 3.1-beta2
 
 --------------------------------------------------------------
 VI. ABOUT OPENCLINICA
@@ -118,11 +112,11 @@ OpenClinica: Open Source Software Platform for Managing Clinical Research Studie
 
 OpenClinica is a free, open source clinical trial software platform for Electronic Data Capture (EDC) clinical data management in clinical research. The software is web-based and designed to support all types of clinical studies in diverse research settings. From the ground up, OpenClinica is built on leading independent standards to achieve high levels of interoperability. Its modular architecture and transparent, collaborative development model offer outstanding flexibility while supporting a robust, enterprise-quality solution.
 
-More about OpenClinica: http://www.OpenClinica.org [^]
+More about OpenClinica: https://www.OpenClinica.com [^]
 
 Software License
 
-OpenClinica is distributed under the GNU Lesser General Public License (GNU LGPL). For details see: http://www.openclinica.org/license [^] or LICENSE.txt distributed with this distribution.
+OpenClinica is distributed under the GNU Lesser General Public License (GNU LGPL). For details see: https://www.openclinica.com/gnu-lgpl-open-source-license [^] or LICENSE.txt distributed with this distribution.
 -------------------------------------------------------------------
 
 ****ORACLE USERS****
@@ -131,20 +125,14 @@ If you previously installed OpenClinica on an Oracle 10g database, you may follo
 
 The only difference is to set up your database configuration differently in the datainfo.properties file.  It should look something like:
 
-	username=clinica
-	password=clinica
-	url=jdbc:oracle:thin:@localhost:1521:XE
-	dataBase=oracle
-	driver=oracle.jdbc.driver.OracleDriver
-	hibernate.dialect=org.hibernate.dialect.OracleDialect
+			dbType=oracle
+			dbUser=clinica
+			dbPass=clinica
+			db=openclinica
+			dbPort=5432
+			dbHost=localhost
 
-In order for scheduled jobs to run successfully, you must configure 15- Quartz Scheduler Configuration as follows:
 
-	org.quartz.jobStore.misfireThreshold=60000
-	org.quartz.jobStore.class=org.quartz.impl.jdbcjobstore.JobStoreTX
-	org.quartz.jobStore.driverDelegateClass=org.quartz.impl.jdbcjobstore.oracle.OracleDelegate
-	org.quartz.jobStore.useProperties=false
-org.quartz.jobStore.tablePrefix=oc_qrtz_
 
 
 

@@ -1,5 +1,5 @@
 
-    OpenClinica, copyright (C) 2005-2009 Akaza Research, is distributed 
+    OpenClinica, copyright (C) 2005-2011 Akaza Research, is distributed 
     under the GNU Lesser General Public License (GNU LGPL). OpenClinica 
     is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public

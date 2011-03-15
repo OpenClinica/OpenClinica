@@ -1,14 +1,14 @@
 OPENCLINICA INSTALLATION GUIDE for RED HAT LINUX
-OpenClinica Version 3.0
+OpenClinica Version 3.1-beta2
 Document Version 1.0 
 --------------------------------------------------------------
-Updated: September 18, 2009 smartin@akazaresearch.com, pgalvin@akazaresearch.com
+Updated: September 10, 2010 smartin@akazaresearch.com, pgalvin@akazaresearch.com
 
 This installation guide assumes that OpenClinica will be installed on a Linux-based server running Redhat ES 5 or compatible.
 
 Please contact contact@akazaresearch.com for services to assist with on-site or remote installation, validation and QA testing of OpenClinica to assure complete deployment.
 
-OpenClinica 3.0 can be configured to run on Oracle (NOT PART OF THIS ALPHA RELEASE).  Please go to http://www.openclinica.org/dokuwiki/doku.php?id=ocoracleinstall:start for instructions on how to configure Oracle for OpenClinica 3.0
+OpenClinica 3.1-beta2 can be configured to run on Oracle (NOT PART OF THIS ALPHA RELEASE).  Please go to http://www.openclinica.org/dokuwiki/doku.php?id=ocoracleinstall:start for instructions on how to configure Oracle for OpenClinica 3.1-beta2
 
 
 About OpenClinica
@@ -42,8 +42,8 @@ NOTE: This installation guide is intended to get OpenClinica up and running as e
 *) Install Java 2 SDK 1.6 Update 16
 *) Install Tomcat 6.0.20
 *) Install PostgreSQL 8.4.1
-*) Install OpenClinica 3.0
-*) Configure OpenClinica 3.0
+*) Install OpenClinica 3.1-beta2
+*) Configure OpenClinica 3.1-beta2
 
 Install Java 2 SDK 1.6 Update 16
 --------------------------------------------------------------
@@ -66,17 +66,17 @@ ln -s jdk1.6.0_16 java
 echo "export JAVA_HOME=/usr/local/java" >> /etc/profile
 
 
-Install OpenClinica 3.0 Package
+Install OpenClinica 3.1-beta2 Package
 ----------------------------------------------------
-Create a user account and download OpenClinica 3.0 from 
-http://www.openclinica.org/section.php?sid=3
+Create a user account and download OpenClinica 3.1-beta2 from 
+https://www.openclinica.com
 
 <as user>
 cd TO SAVE LOCATION OF DOWNLOADED FILE
-tar -xzvf OpenClinica-3.0.tar.gz
+tar -xzvf OpenClinica-3.1-beta2.tar.gz
 <as root>
 mkdir /usr/local/oc
-mv OpenClinica-3.0 /usr/local/oc/
+mv OpenClinica-3.1-beta2 /usr/local/oc/
 
 Install Apache Tomcat 6.0.20
 --------------------------------------------------------------
@@ -99,7 +99,7 @@ echo "export CATALINA_HOME=/usr/local/tomcat" >> /etc/profile
 To install Tomcat as a standalone service (one that stops and starts with the system) you must install a daemon. 
 
 <as root>
-cp /usr/local/oc/OpenClinica-3.0/install-docs/linux/tomcatd /etc/init.d/
+cp /usr/local/oc/OpenClinica-3.1-beta2/install-docs/linux/tomcatd /etc/init.d/
 cd /etc/init.d
 chmod 755 tomcatd
 /sbin/chkconfig --del tomcatd
@@ -123,7 +123,7 @@ This installion assumes that the development libraries are properly installed, i
 
 NOTE: Many Linux distributions come with postgres already installed. For those systems you can probably skip this section and go to "Create the OpenClinica Database". You will need to modify those commands to fit your postgres installation.
 
-Go to http://svn.akazaresearch.com/oc/software/OpenClinica-3.0/linux
+Go to http://svn.akazaresearch.com/oc/software/OpenClinica-3.1-beta2/linux
 
 <as user>
 cd TO SAVE LOCATION OF DOWNLOADED FILE
@@ -143,7 +143,7 @@ Now setup postgres to run as a daemon
 
 <as root>
 cd /etc/init.d
-cp /usr/local/oc/OpenClinica-3.0/install-docs/linux/postgresqld /etc/init.d/postgresql
+cp /usr/local/oc/OpenClinica-3.1-beta2/install-docs/linux/postgresqld /etc/init.d/postgresql
 Type "y" to confirm the overwrite of postgresql
 chmod 755 postgresql
 /sbin/chkconfig --levels 2345 postgresql on
@@ -158,7 +158,7 @@ More detailed installation instructions for Postgres can be found at http://www.
 Create the Clinica User and openclinica Database
 --------------------------------------------------------------
 <as postgres>
-/usr/local/pgsql/bin/psql -f /usr/local/oc/OpenClinica-3.0/config/database/PostgreSQL/3.0/install/create_User_and_db_3.0.sql
+/usr/local/pgsql/bin/psql -f /usr/local/oc/OpenClinica-3.1-beta2/config/database/PostgreSQL/3.1-beta2/install/create_User_and_db_3.1-beta2.sql
 
 NOTE: This step will fail if the clinica user has already been created. In this case you can skip this step.
 
@@ -195,53 +195,38 @@ NOTE: Make sure the tomcat user has write permissions on all of these directorie
 The next step is to copy the configuration files and the web application file (war) to the tomcat folders. Since tomcat is running, it will "hot-deploy" the application, creating the rest of the web application file structure.
 
 <as tomcat>
-cp /usr/local/oc/OpenClinica-3.0/distribution/OpenClinica.war /usr/local/tomcat/webapps 
+cp /usr/local/oc/OpenClinica-3.1-beta2/distribution/OpenClinica.war /usr/local/tomcat/webapps 
 NOTE: If you do not see the expanded file structure after a minute (/usr/local/tomcat/webapps/OpenClinica), you can manually deploy the war file using the Tomcat Manager (http://localhost:8080/manager/html) 
 
 There is one configuration files that needs to be changed.
 
 Edit /usr/local/tomcat/webapps/OpenClinica/WEB-INF/classes/datainfo.properties and change the properties to suit your server environment as needed.  The initial datainfo.properties file looks something like this:
 
-###############################################################
-# 1- filePath
+#############################################################################
+# 1 - Database Configuration
 #
-# File Path is the string which declares the
-# repository for all uploaded and generated
-# files in the system, including CRFs and
-# data sets.  The directory should NOT be
-# accessible by the web server.
+# Database configuration is done with the following 6 properties
+# The dbType options are either postgres or oracle.
+# Enter the user name and password to access the database in 
+# dbUser and dbPass.
+# The db field is for the name of the database and provide the port
+# in dbPort.
+# dbHost can be a URL, IP address or localhost
 #
-# REQUIRED.  Note the difference between
-# Windows and Linux file systems.
-###############################################################
-#filePath=c:\\tomcat5.5\\openclinica.data\\
-filePath=/usr/local/tomcat/openclinica.data/
-###############################################################
-# 2- Database Configuration
-#
-# Data Base is a text string which declares
-# which type of database the system is using
-# on the back end.
-# REQUIRED.  Default is 'postgres', 'oracle' is also an option.
-###############################################################
-username=clinica
-password=clinica
-url=jdbc:postgresql://localhost:5432/openclinica
-#url=jdbc:oracle:thin:@localhost:1521:XE
-dataBase=postgres
-#dataBase=oracle
-driver=org.postgresql.Driver
-#driver=oracle.jdbc.driver.OracleDriver
-hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
-#hibernate.dialect=org.hibernate.dialect.OracleDialect
-# Maven Only 
-changeLogFile=src/main/resources/migration/master.xml
+# REQUIRED
+#############################################################################
+dbType=postgres
+dbUser=clinica
+dbPass=clinica
+db=openclinica
+dbPort=5432
+dbHost=localhost
 
 filePath: The path that files will be written to in the course of daily operations.  Note that this is a separate directory because the webapps/OpenClinica directory can be erased and rebuilt when you deploy a new version of the system.  This directory will hold sensitive information such as CRFs, datasets, etc. so it should be on a secured machine. This directory, and its structure, must be preserved during any backup/restore operations, along with the application database.
 
 export data file path:  Export Data File Path is the string which (optionally) declares a specific file path for file extracts to be saved.  Note that if it is set, files from Jobs only will be saved to two places: this directory and under the above file path declared in the 'filePath' property. NOT REQUIRED.  Please comment out if you want Jobs to generate one file/files only, in the directory structure under 'filePath'.
 
-dataBase configuration: Currently 'postgres' is the default database; There is an option for an 'oracle' version of OpenClinica 3.0.  Please make sure this information is correct by commenting and uncommenting out information.
+dataBase configuration: Currently 'postgres' is the default database; There is an option for an 'oracle' version of OpenClinica 3.1-beta2.  Please make sure this information is correct.
 
 passwd_expiration_time: Number of days before you are prompted to change your password.  Lower numbers (30, 60, 90) will encourage users to change their passwords more often.
 
@@ -265,26 +250,6 @@ show_unique_id: Show Unique ID is a flag where we allow a column in Extract Data
 
 max_inactive_interval: This is maximum time interval between client requests. That is, if users leave any page open without sending request to server, after this time interval, when users attempt sending request they will be directed to login page.
 
-
-The next settings are for your facility's name, address, state, etc that will be treated as the 'default' location and contact information for users and subjects.
-
-	FacName=Default GCRC
-	FacCity=Boston
-	FacState=MA
-	FacZIP=02139
-	FacCountry=USA
-	FacContactName=John Smith
-	FacContactDegree=PhD, MD
-	FacContactPhone=617-123-1234
-	FacContactEmail=aaa@aaa.org
-	
-	ra=Data_Entry_Person
-	investigator=Investigator
-	director=Study_Director
-	coordinator=Study_Coordinator
-	monitor=Monitor
-	
-User Role Information:  Leave these values alone.
 
 Quartz Scheduler Configuration: Configure the Scheduler to run asynchronous jobs.
 
@@ -352,15 +317,12 @@ Developer and Contact Information
 --------------------------------------------------------------
 Akaza Research, based in Cambridge, MA, provides clinical trials informatics solutions based on OpenClinica, the world's most widely used open source clinical trials software.
 
-Akaza Research
-One Kendall Square
-Bldg. 400, 4th Floor
-Cambridge, MA 02139
-phone: 617.621.8585
-fax: 617.621.0065
+460 Totten Pond Road
+Waltham, MA 02451
+USA
+phone: 617-621-8585
+fax: 617-621-0065
 email: contact@akazaresearch.com
 
 For more about Akaza’s products and services see:
-http://www.akazaresearch.com/ [^]
-and
-http://www.OpenClinica.org/ [^]
+https://www.openclinica.com[^]
