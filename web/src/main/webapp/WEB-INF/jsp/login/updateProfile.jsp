@@ -4,7 +4,10 @@
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 
-<jsp:include page="../include/home-header.jsp"/>
+<%--<jsp:include page="../include/home-header.jsp"/>--%>
+<c:import url="../include/home-header.jsp">
+    <c:param name="profilePage" value="yes"/>
+</c:import>
 
 
 <!-- move the alert message to the sidebar-->
