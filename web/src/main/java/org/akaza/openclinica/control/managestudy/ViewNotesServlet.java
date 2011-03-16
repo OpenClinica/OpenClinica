@@ -217,8 +217,8 @@ public class ViewNotesServlet extends SecureController {
         DiscrepancyNoteUtil discNoteUtil = new DiscrepancyNoteUtil();
         Map stats = discNoteUtil.generateDiscNoteSummary(allNotes);
         request.setAttribute("summaryMap", stats);
-        Set mapKeys = stats.keySet();
-        request.setAttribute("mapKeys", mapKeys);
+        request.setAttribute("mapKeys", discNoteUtil.getStatusNames());
+        request.setAttribute("typeNames", discNoteUtil.getTypeNames());
         request.setAttribute("typeKeys", discNoteUtil.generateDiscNoteTotal(allNotes));
 
         if ("yes".equalsIgnoreCase(fp.getString(PRINT))) {

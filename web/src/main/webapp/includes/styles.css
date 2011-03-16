@@ -1578,3 +1578,37 @@ table.summaryTable{
 }
 
 
+div#sumBox { -moz-border-radius: 3px 3px 3px 3px;
+	border: 1px solid #b2b2b2;
+	display: inline-block;
+	margin-bottom: 18px;
+	margin-top: 6px;
+	-moz-box-shadow: 4px 4px 4px #CACACA;
+	-webkit-box-shadow: 4px 4px 4px #CACACA;
+	box-shadow: 4px 4px 4px #CACACA;
+	/* For IE 8 */
+	-ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#CACACA')";
+	/* For IE 5.5 - 7 */
+	filter: progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#CACACA');
+	}
+	}
+
+div#sumBox table { border-style: none; }
+
+div#sumBox table td { border-style: solid;
+	border-width: 1px 0px 0px 1px;
+	border-color: #E6E6E6;
+	}
+
+div#sumBox table tr td:first-child { border-left-width: 0px;
+	border-right-width: 1px;
+	border-right-color: #cccccc;
+	background-color: #fafafa;
+	}
+
+div#sumBox table tr:first-child td { border-top-width: 0px;
+	border-bottom-width: 1px;
+	border-bottom-color: #cccccc;
+	background-color: #efefef;
+	}
+

@@ -33,10 +33,10 @@ public class DiscrepancyNoteUtil {
     // TODO: initialize these static members from the database.
     public static final Map<String, Integer> TYPES = new HashMap<String, Integer>();
     static {
-        TYPES.put("Failed Validation Check", 1);
         TYPES.put("Annotation", 2);
-        TYPES.put("Query", 3);
         TYPES.put("Reason for Change", 4);
+        TYPES.put("Failed Validation Check", 1);
+        TYPES.put("Query", 3);
     }
     public static final Map<String, Integer> RESOLUTION_STATUS = new HashMap<String, Integer>();
     static {
@@ -46,6 +46,18 @@ public class DiscrepancyNoteUtil {
         RESOLUTION_STATUS.put("Closed", 4);
         RESOLUTION_STATUS.put("Not Applicable", 5);
     }
+
+    // These two variables are to arrange the Summary Statistics accordingly
+    // Mantis Issue: 7771
+    public static final String[] TYPE_NAMES = {"Query", "Failed Validation Check", "Reason for Change", "Annotation"};
+    public static final String[] STATUS_NAMES = {"New", "Updated", "Resolution Proposed", "Closed", "Not Applicable"};
+    public static String[] getStatusNames() {
+        return STATUS_NAMES;
+    }
+    public static String[] getTypeNames() {
+        return TYPE_NAMES;
+    }
+
 
     /**
      * This method links discrepancy notes to the study event and study subject
@@ -1022,16 +1034,15 @@ public class DiscrepancyNoteUtil {
         Map<String, String> tempMap = null;
         int tempType = 0;
         String tempTotal = "--";
-        Set<String> p = TYPES.keySet();
-        for (String statusName : RESOLUTION_STATUS.keySet()) {
+        for (String statusName: STATUS_NAMES) {
             tempMap = new HashMap<String, String>();
             summaryMap.put(statusName, tempMap);
             tempTotal = countNotes(discList, RESOLUTION_STATUS.get(statusName), 0);
             tempMap.put("Total", tempTotal.equals("0")?"--":tempTotal);
-            for (String discNoteTypeName : p) {
-                tempType = TYPES.get(discNoteTypeName);
+            for (String typeName: TYPE_NAMES) {
+                tempType = TYPES.get(typeName);
                 String number = countNotes(discList, RESOLUTION_STATUS.get(statusName), tempType);
-                tempMap.put(discNoteTypeName, number.equals("0")?"--":number);
+                tempMap.put(typeName, number.equals("0")?"--":number);
             }
         }
 
@@ -1042,15 +1053,14 @@ public class DiscrepancyNoteUtil {
 
         Map<String, String> summaryMap = new HashMap<String, String>();
         int tempType = 0;
-        Set<String> p = TYPES.keySet();
-        for (String discNoteTypeName : p) {
-            tempType = TYPES.get(discNoteTypeName);
+        for (String typeName: TYPE_NAMES) {
+            tempType = TYPES.get(typeName);
             String tempTotal = countNotes(discList, 0, tempType);
-            summaryMap.put(discNoteTypeName, tempTotal.equals("0")?"--":tempTotal);
+            summaryMap.put(typeName, tempTotal.equals("0")?"--":tempTotal);
         }
         return summaryMap;
     }
-    
+
     public String countNotes(ArrayList<DiscrepancyNoteBean> discList, int statusId, int typeId){
         Integer count = 0;
         for(int i = 0; i < discList.size(); i++){
@@ -1514,7 +1524,7 @@ public class DiscrepancyNoteUtil {
                         // <<
                         tempDNThread.setLatestResolutionStatus(this.getResolutionStatusName(childBean.getResolutionStatusId()));
                     }
-                    */   
+                    */
                     tempDNThread.getLinkedNoteList().offer(childBean);
                 }
             }
@@ -1557,4 +1567,10 @@ public class DiscrepancyNoteUtil {
         */
         return dnThreads;
     }
+//    public static void main (String arg[]) {
+//        for (String name: TYPE_NAMES) {
+//            System.out.println (name);
+//        }
+//    }
+
 }
