@@ -176,7 +176,7 @@ public class FormProcessor {
             String name = names.nextElement();
             // System.out.println("*** Comparing " + name + " and " + seq.toString() );
             if (name.contains(seq)) {
-                System.out.println("*** FOUND " + seq.toString());
+            //    System.out.println("*** FOUND " + seq.toString());
                 return true;
             }
 

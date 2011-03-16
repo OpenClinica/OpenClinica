@@ -7,16 +7,23 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
+import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.RuleValidator;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.view.Page;
@@ -44,12 +51,13 @@ public class InitialDataEntryServlet extends DataEntryServlet {
      */
 
     @Override
-    protected void mayProceed() throws InsufficientPermissionException {
-        checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"));
-        checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"));
-
+    protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
+        checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"), request, response);
+        HttpSession session = request.getSession();
         locale = request.getLocale();
-        this.session.setAttribute("mayProcessUploading", "true");
+        
+        session.setAttribute("mayProcessUploading", "true");
         // <
         // resexception=ResourceBundle.getBundle(
         // "org.akaza.openclinica.i18n.exceptions",locale);
@@ -57,7 +65,7 @@ public class InitialDataEntryServlet extends DataEntryServlet {
         // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",
         // locale);
 
-        getInputBeans();
+        getInputBeans(request);
 
 //        DataEntryStage stage = ecb.getStage();
 //        Role r = currentRole.getRole();
@@ -106,7 +114,7 @@ public class InitialDataEntryServlet extends DataEntryServlet {
 
     @Override
     protected DisplayItemBean validateDisplayItemBean(DiscrepancyValidator v, DisplayItemBean dib, String inputName, RuleValidator rv,
-            HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid, Boolean fireRuleValidation, ArrayList<String> messages) {
+            HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid, Boolean fireRuleValidation, ArrayList<String> messages, HttpServletRequest request) {
 
         ItemBean ib = dib.getItem();
         org.akaza.openclinica.bean.core.ResponseType rt = dib.getMetadata().getResponseSet().getResponseType();
@@ -116,7 +124,7 @@ public class InitialDataEntryServlet extends DataEntryServlet {
         // and sending the data to the database, in the event of no error
         if (StringUtil.isBlank(inputName)) {// not an item from group, doesn't
             // need to get data from form again
-            dib = loadFormValue(dib);
+            dib = loadFormValue(dib, request);
         }
 
         // types TEL and ED are not supported yet
@@ -135,9 +143,11 @@ public class InitialDataEntryServlet extends DataEntryServlet {
 
     @Override
     protected List<DisplayItemGroupBean> validateDisplayItemGroupBean(DiscrepancyValidator v, DisplayItemGroupBean digb, List<DisplayItemGroupBean> digbs,
-            List<DisplayItemGroupBean> formGroups, RuleValidator rv, HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid) {
+            List<DisplayItemGroupBean> formGroups, RuleValidator rv, HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid, HttpServletRequest request, HttpServletResponse response) {
 
-        formGroups = loadFormValueForItemGroup(digb, digbs, formGroups, edcb.getId());
+        EventDefinitionCRFBean edcb = (EventDefinitionCRFBean)request.getAttribute(EVENT_DEF_CRF_BEAN);
+                
+        formGroups = loadFormValueForItemGroup(digb, digbs, formGroups, edcb.getId(), request);
         String inputName = "";
         for (int i = 0; i < formGroups.size(); i++) {
             DisplayItemGroupBean displayGroup = formGroups.get(i);
@@ -163,9 +173,9 @@ public class InitialDataEntryServlet extends DataEntryServlet {
                     logger.debug("IN : " + String.valueOf(displayGroup.getIndex() + 1) + displayItem.getItem().getOid());
                     validateDisplayItemBean(v, displayItem, inputName, rv, groupOrdinalPLusItemOid, true, groupOrdinalPLusItemOid.get(String
                             .valueOf(displayGroup.getIndex() + 1)
-                        + displayItem.getItem().getOid()));
+                        + displayItem.getItem().getOid()), request);
                 } else {
-                    validateDisplayItemBean(v, displayItem, inputName, rv, groupOrdinalPLusItemOid, false, null);
+                    validateDisplayItemBean(v, displayItem, inputName, rv, groupOrdinalPLusItemOid, false, null, request);
                 }
             }
         }
@@ -182,7 +192,7 @@ public class InitialDataEntryServlet extends DataEntryServlet {
      * org.akaza.openclinica.bean.submit.DisplayItemBean)
      */
     @Override
-    protected DisplayItemBean validateDisplayItemBean(DiscrepancyValidator v, DisplayItemBean dib, String inputName) {
+    protected DisplayItemBean validateDisplayItemBean(DiscrepancyValidator v, DisplayItemBean dib, String inputName, HttpServletRequest request) {
 
         ItemBean ib = dib.getItem();
         org.akaza.openclinica.bean.core.ResponseType rt = dib.getMetadata().getResponseSet().getResponseType();
@@ -192,13 +202,13 @@ public class InitialDataEntryServlet extends DataEntryServlet {
         // and sending the data to the database, in the event of no error
         if (StringUtil.isBlank(inputName)) {// not an item from group, doesn't
             // need to get data from form again
-            dib = loadFormValue(dib);
+            dib = loadFormValue(dib, request);
         }
 
         // types TEL and ED are not supported yet
         if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXT) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXTAREA) || 
                 rt.equals(org.akaza.openclinica.bean.core.ResponseType.FILE)) {
-            dib = validateDisplayItemBeanText(v, dib, inputName);
+            dib = validateDisplayItemBeanText(v, dib, inputName, request);
         } else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.RADIO) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECT)) {
             dib = validateDisplayItemBeanSingleCV(v, dib, inputName);
         } else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)) {
@@ -211,9 +221,9 @@ public class InitialDataEntryServlet extends DataEntryServlet {
 
     @Override
     protected List<DisplayItemGroupBean> validateDisplayItemGroupBean(DiscrepancyValidator v, DisplayItemGroupBean digb, List<DisplayItemGroupBean> digbs,
-            List<DisplayItemGroupBean> formGroups) {
-
-        formGroups = loadFormValueForItemGroup(digb, digbs, formGroups, edcb.getId());
+            List<DisplayItemGroupBean> formGroups, HttpServletRequest request, HttpServletResponse response) {
+        EventDefinitionCRFBean edcb = (EventDefinitionCRFBean)request.getAttribute(EVENT_DEF_CRF_BEAN);
+        formGroups = loadFormValueForItemGroup(digb, digbs, formGroups, edcb.getId(), request);
         String inputName = "";
         for (int i = 0; i < formGroups.size(); i++) {
             DisplayItemGroupBean displayGroup = formGroups.get(i);
@@ -229,7 +239,7 @@ public class InitialDataEntryServlet extends DataEntryServlet {
                 } else {
                     inputName = getGroupItemManualInputName(displayGroup, order, displayItem);
                 }
-                validateDisplayItemBean(v, displayItem, inputName);
+                validateDisplayItemBean(v, displayItem, inputName, request);
             }
         }
         return formGroups;
@@ -256,7 +266,8 @@ public class InitialDataEntryServlet extends DataEntryServlet {
      * ()
      */
     @Override
-    protected Status getNonBlankItemStatus() {
+    protected Status getNonBlankItemStatus(HttpServletRequest request) {
+        EventDefinitionCRFBean edcb = (EventDefinitionCRFBean)request.getAttribute(EVENT_DEF_CRF_BEAN);
         return edcb.isDoubleEntry() ? Status.PENDING : Status.UNAVAILABLE;
     }
 
@@ -268,7 +279,8 @@ public class InitialDataEntryServlet extends DataEntryServlet {
      * ()
      */
     @Override
-    protected String getEventCRFAnnotations() {
+    protected String getEventCRFAnnotations(HttpServletRequest request) {
+        EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
         return ecb.getAnnotations();
     }
 
@@ -280,7 +292,8 @@ public class InitialDataEntryServlet extends DataEntryServlet {
      * (java.lang.String)
      */
     @Override
-    protected void setEventCRFAnnotations(String annotations) {
+    protected void setEventCRFAnnotations(String annotations, HttpServletRequest request) {
+        EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
         ecb.setAnnotations(annotations);
     }
 
@@ -303,7 +316,8 @@ public class InitialDataEntryServlet extends DataEntryServlet {
      * org.akaza.openclinica.control.submit.DataEntryServlet#getServletPage()
      */
     @Override
-    protected Page getServletPage() {
+    protected Page getServletPage(HttpServletRequest request) {
+        FormProcessor fp = new FormProcessor(request);
         String tabId = fp.getString("tab", true);
         String sectionId = fp.getString(DataEntryServlet.INPUT_SECTION_ID, true);
         String eventCRFId = fp.getString(INPUT_EVENT_CRF_ID, true);
@@ -337,7 +351,7 @@ public class InitialDataEntryServlet extends DataEntryServlet {
     }
 
     @Override
-    protected boolean isAdminForcedReasonForChange() {
+    protected boolean isAdminForcedReasonForChange(HttpServletRequest request) {
         return false;
     }
 

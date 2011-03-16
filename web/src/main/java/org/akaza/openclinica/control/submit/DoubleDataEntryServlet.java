@@ -10,17 +10,23 @@ package org.akaza.openclinica.control.submit;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ResponseOptionBean;
+import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.RuleValidator;
 import org.akaza.openclinica.control.form.ScoreItemValidator;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -30,6 +36,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 /**
@@ -44,7 +52,11 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
     public static final String DDE_ENTERED = "ddeEntered";
     public static final String DDE_PROGESS = "doubleDataProgress";
 
-    private boolean userIsOwnerAndLessThanTwelveHoursHavePassed() {
+    private boolean userIsOwnerAndLessThanTwelveHoursHavePassed(HttpServletRequest request) {
+        UserAccountBean ub =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
+        StudyUserRoleBean  currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
+        EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
+        
         boolean userIsOwner = ub.getId() == ecb.getOwnerId();
         boolean lessThanTwelveHoursHavePassed = !DisplayEventCRFBean.initialDataEntryCompletedMoreThanTwelveHoursAgo(ecb);
 
@@ -57,11 +69,15 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
      * @see org.akaza.openclinica.control.core.SecureController#mayProceed()
      */
     @Override
-    protected void mayProceed() throws InsufficientPermissionException {
-        checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"));
-        checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"));
-
+    protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
+        checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"), request, response);
+        UserAccountBean ub =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
+        StudyUserRoleBean  currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
+        HttpSession session = request.getSession();
         locale = request.getLocale();
+
+        
         // < respage =
         // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",
         // locale);
@@ -73,7 +89,10 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
         // < resword =
         // ResourceBundle.getBundle("org.akaza.openclinica.i18n.words",locale);
 
-        getInputBeans();
+        getInputBeans(request);
+        EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
+        FormProcessor fp = new FormProcessor(request);
+        SectionBean sb = (SectionBean)request.getAttribute(SECTION_BEAN);
 
         // BWP 12/2/07>> The following COUNT_VALIDATE session attribute is not
         // accessible,
@@ -99,7 +118,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
                 tabNumber = fp.getInt("tab");
             }
         }
-        SectionDAO sectionDao = new SectionDAO(sm.getDataSource());
+        SectionDAO sectionDao = new SectionDAO(getDataSource());
         int crfVersionId = ecb.getCRFVersionId();
         int eventCRFId = ecb.getId();
         ArrayList sections = sectionDao.findAllByCRFVersionId(crfVersionId);
@@ -141,7 +160,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
         mySession.setAttribute("doubleDataProgress", doubleDataProgress);
         // StudyEventStatus status =
         Role r = currentRole.getRole();
-        this.session.setAttribute("mayProcessUploading", "true");
+        session.setAttribute("mayProcessUploading", "true");
 
         //        if (!SubmitDataServlet.maySubmitData(ub, currentRole)) {
         //            this.session.setAttribute("mayProcessUploading", "false");
@@ -186,10 +205,12 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
     }
 
     @Override
-    protected DisplayItemBean validateDisplayItemBean(DiscrepancyValidator v, DisplayItemBean dib, String inputName) {
+    protected DisplayItemBean validateDisplayItemBean(DiscrepancyValidator v, DisplayItemBean dib, String inputName, HttpServletRequest request) {
 
         org.akaza.openclinica.bean.core.ResponseType rt = dib.getMetadata().getResponseSet().getResponseType();
-
+        HttpSession session = request.getSession();
+        EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
+        
         boolean isSingleItem = false;
         if (StringUtil.isBlank(inputName)) {// for single items
             inputName = getInputName(dib);
@@ -217,7 +238,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
         if (showOriginalItem && showDuplicateItem || showItem) {
             if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXT) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXTAREA)
                     || rt.equals(org.akaza.openclinica.bean.core.ResponseType.FILE)) {
-                dib = validateDisplayItemBeanText(v, dib, inputName);
+                dib = validateDisplayItemBeanText(v, dib, inputName, request);
                 if (validationCount == null || validationCount.intValue() == 0) {
                     v.addValidation(inputName, Validator.MATCHES_INITIAL_DATA_ENTRY_VALUE, valueToCompare, false);
                     v.setErrorMessage(respage.getString("value_you_specified") + " " + valueToCompare.getValue() + " "
@@ -277,7 +298,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
         // if in group, the value is already loaded
         // see formGroups = loadFormValueForItemGroup(digb,digbs,formGroups);
         if (isSingleItem) {
-            dib = loadFormValue(dib);
+            dib = loadFormValue(dib, request);
         }
 
         return dib;
@@ -298,13 +319,16 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
     // should be from the db, we check here for a difference
     @Override
     protected List<DisplayItemGroupBean> validateDisplayItemGroupBean(DiscrepancyValidator v, DisplayItemGroupBean digb, List<DisplayItemGroupBean> digbs,
-            List<DisplayItemGroupBean> formGroups) {
-
+            List<DisplayItemGroupBean> formGroups, HttpServletRequest request, HttpServletResponse response) {
+        EventDefinitionCRFBean edcb = (EventDefinitionCRFBean)request.getAttribute(EVENT_DEF_CRF_BEAN);
+        HttpSession session = request.getSession();
         logger.info("===got this far");
+        EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
+        
         int keyId = ecb.getId();
         Integer validationCount = (Integer) session.getAttribute(COUNT_VALIDATE + keyId);
 
-        formGroups = loadFormValueForItemGroup(digb, digbs, formGroups, edcb.getId());
+        formGroups = loadFormValueForItemGroup(digb, digbs, formGroups, edcb.getId(), request);
         logger
                 .info("found formgroups size for " + digb.getGroupMetaBean().getName() + ": " + formGroups.size() + " compare to db groups size: "
                     + digbs.size());
@@ -324,7 +348,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
                 } else {
                     inputName = getGroupItemManualInputName(displayGroup, order, displayItem);
                 }
-                validateDisplayItemBean(v, displayItem, inputName);
+                validateDisplayItemBean(v, displayItem, inputName, request);
             }
 
             // if (validationCount == null || validationCount.intValue() == 0) {
@@ -345,15 +369,18 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
     }
 
     @Override
-    protected DisplayItemBean validateCalcTypeDisplayItemBean(ScoreItemValidator sv, DisplayItemBean dib, String inputName) {
+    protected DisplayItemBean validateCalcTypeDisplayItemBean(ScoreItemValidator sv, DisplayItemBean dib, String inputName, HttpServletRequest request) {
 
         org.akaza.openclinica.bean.core.ResponseType rt = dib.getMetadata().getResponseSet().getResponseType();
-
+        ItemDataDAO iddao = new ItemDataDAO(getDataSource());
         boolean isSingleItem = false;
+        HttpSession session = request.getSession();
         if (StringUtil.isBlank(inputName)) {// for single items
             inputName = getInputName(dib);
             isSingleItem = true;
         }
+        EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
+        
         // we only give warning to user if data entered in DDE is different from
         // IDE when the first
         // time user hits 'save'
@@ -364,7 +391,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
         if (isSingleItem) {
             int idId = dib.getData().getId();
             if (idId > 0) {
-                valueToCompare = (ItemDataBean) iddao.findByPK(idId);
+                               valueToCompare = (ItemDataBean) iddao.findByPK(idId);
             }
         } else {
             valueToCompare = dib.getDbData();
@@ -374,7 +401,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
             boolean showItem = dib.getMetadata().isShowItem();
             boolean showDuplicateItem = getItemMetadataService().hasPassedDDE(dib.getMetadata(), ecb, valueToCompare);//.isShown(dib.getItem().getId(), ecb, dib.getDbData());
             if (showOriginalItem && showDuplicateItem || showItem) {
-                dib = validateDisplayItemBeanText(sv, dib, inputName);
+                dib = validateDisplayItemBeanText(sv, dib, inputName, request);
             }
             if (showOriginalItem && showDuplicateItem || showItem) {
                 sv.addValidation(inputName, Validator.MATCHES_INITIAL_DATA_ENTRY_VALUE, valueToCompare, false);
@@ -406,7 +433,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
      * ()
      */
     @Override
-    protected Status getNonBlankItemStatus() {
+    protected Status getNonBlankItemStatus(HttpServletRequest request) {
         return Status.UNAVAILABLE;
     }
 
@@ -418,7 +445,9 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
      * ()
      */
     @Override
-    protected String getEventCRFAnnotations() {
+    protected String getEventCRFAnnotations(HttpServletRequest request) {
+        EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
+        
         return ecb.getValidatorAnnotations();
     }
 
@@ -430,7 +459,9 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
      * (java.lang.String)
      */
     @Override
-    protected void setEventCRFAnnotations(String annotations) {
+    protected void setEventCRFAnnotations(String annotations, HttpServletRequest request) {
+        EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
+        
         ecb.setValidatorAnnotations(annotations);
     }
 
@@ -451,7 +482,8 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
      * org.akaza.openclinica.control.submit.DataEntryServlet#getServletPage()
      */
     @Override
-    protected Page getServletPage() {
+    protected Page getServletPage(HttpServletRequest request) {
+        FormProcessor fp = new FormProcessor(request);
         String tabId = fp.getString("tab", true);
         String sectionId = fp.getString(DataEntryServlet.INPUT_SECTION_ID, true);
         String eventCRFId = fp.getString(INPUT_EVENT_CRF_ID, true);
@@ -503,10 +535,11 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
 
     @Override
     protected DisplayItemBean validateDisplayItemBean(DiscrepancyValidator v, DisplayItemBean dib, String inputName, RuleValidator rv,
-            HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid, Boolean fireRuleValidation, ArrayList<String> messages) {
+            HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid, Boolean fireRuleValidation, ArrayList<String> messages, HttpServletRequest request) {
 
         org.akaza.openclinica.bean.core.ResponseType rt = dib.getMetadata().getResponseSet().getResponseType();
-
+        EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
+        
         boolean isSingleItem = false;
         if (StringUtil.isBlank(inputName)) {// for single items
             inputName = getInputName(dib);
@@ -516,7 +549,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
         // IDE when the first
         // time user hits 'save'
         int keyId = ecb.getId();
-        Integer validationCount = (Integer) session.getAttribute(COUNT_VALIDATE + keyId);
+        Integer validationCount = (Integer) request.getSession().getAttribute(COUNT_VALIDATE + keyId);
 
         ItemDataBean valueToCompare = dib.getData();
         if (!isSingleItem) {
@@ -524,7 +557,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
         }
 
         if (isSingleItem) {
-            dib = loadFormValue(dib);
+            dib = loadFormValue(dib, request);
         }
         if (groupOrdinalPLusItemOid.containsKey(dib.getItem().getOid()) || fireRuleValidation) {
             messages = messages == null ? groupOrdinalPLusItemOid.get(dib.getItem().getOid()) : messages;
@@ -537,13 +570,14 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
 
     @Override
     protected List<DisplayItemGroupBean> validateDisplayItemGroupBean(DiscrepancyValidator v, DisplayItemGroupBean digb, List<DisplayItemGroupBean> digbs,
-            List<DisplayItemGroupBean> formGroups, RuleValidator rv, HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid) {
-
+            List<DisplayItemGroupBean> formGroups, RuleValidator rv, HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid, HttpServletRequest request, HttpServletResponse response) {
+        EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
+        EventDefinitionCRFBean edcb = (EventDefinitionCRFBean)request.getAttribute(EVENT_DEF_CRF_BEAN);
         // logger.info("===got this far");
         int keyId = ecb.getId();
-        Integer validationCount = (Integer) session.getAttribute(COUNT_VALIDATE + keyId);
+        Integer validationCount = (Integer) request.getSession().getAttribute(COUNT_VALIDATE + keyId);
 
-        formGroups = loadFormValueForItemGroup(digb, digbs, formGroups, edcb.getId());
+        formGroups = loadFormValueForItemGroup(digb, digbs, formGroups, edcb.getId(), request);
         logger
                 .info("found formgroups size for " + digb.getGroupMetaBean().getName() + ": " + formGroups.size() + " compare to db groups size: "
                     + digbs.size());
@@ -570,9 +604,9 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
                         System.out.println("IN : " + String.valueOf(order + 1) + displayItem.getItem().getOid());
                         validateDisplayItemBean(v, displayItem, inputName, rv, groupOrdinalPLusItemOid, true, groupOrdinalPLusItemOid.get(String
                                 .valueOf(order + 1)
-                            + displayItem.getItem().getOid()));
+                            + displayItem.getItem().getOid()), request);
                     } else {
-                        validateDisplayItemBean(v, displayItem, inputName, rv, groupOrdinalPLusItemOid, false, null);
+                        validateDisplayItemBean(v, displayItem, inputName, rv, groupOrdinalPLusItemOid, false, null, request);
                     }
                 } else {
                     System.out.println("OUT : " + String.valueOf(order + 1) + displayItem.getItem().getOid());
@@ -595,7 +629,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
     }
 
     @Override
-    protected boolean isAdminForcedReasonForChange() {
+    protected boolean isAdminForcedReasonForChange(HttpServletRequest request) {
         return false;
     }
 }

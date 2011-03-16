@@ -7,9 +7,15 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.Utils;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
@@ -61,9 +67,10 @@ public class PrintDataEntryServlet extends DataEntryServlet {
      * Checks whether the user has the correct privilege
      */
     @Override
-    public void mayProceed() throws InsufficientPermissionException {
-
+    public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
+        StudyUserRoleBean  currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
         locale = request.getLocale();
+        UserAccountBean ub =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
         // <
         // resexception=ResourceBundle.getBundle("org.akaza.openclinica.i18n.exceptions",locale);
         // < respage =
@@ -76,20 +83,23 @@ public class PrintDataEntryServlet extends DataEntryServlet {
             return;
         }
 
-        addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
+        addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"), request);
         throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_director"), "1");
 
     }
 
     @Override
-    public void processRequest() throws Exception {
+    public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
         FormProcessor fp = new FormProcessor(request);
         int eventCRFId = fp.getInt("ecId");
-        SectionDAO sdao = new SectionDAO(sm.getDataSource());
-        allSectionBeans = new ArrayList();
+        //JN:The following were the the global variables, moved as local.
+        EventCRFBean ecb ;
+        SectionDAO sdao = new SectionDAO(getDataSource());
+       ArrayList<SectionBean> allSectionBeans = new ArrayList<SectionBean>();
         ArrayList sectionBeans = new ArrayList();
         String age = "";
-
+        StudyBean currentStudy =    (StudyBean)  request.getSession().getAttribute("study");
+        SectionBean sb = (SectionBean)request.getAttribute(SECTION_BEAN);
         // Whether IE6 or IE7 is involved
         String isIE = fp.getString("ie");
         if ("y".equalsIgnoreCase(isIE)) {
@@ -97,33 +107,33 @@ public class PrintDataEntryServlet extends DataEntryServlet {
         }
 
         if (eventCRFId == 0) {
-            super.ecb = new EventCRFBean();
+            ecb = new EventCRFBean();
             // super.ecb.setCRFVersionId(sb.getCRFVersionId());
         } else {
-            EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-            super.ecb = (EventCRFBean) ecdao.findByPK(eventCRFId);
+            EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
+            ecb = (EventCRFBean) ecdao.findByPK(eventCRFId);
 
             // Get all the SectionBeans attached to this ECB
             ArrayList sects = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
             for (int i = 0; i < sects.size(); i++) {
-                SectionBean sb = (SectionBean) sects.get(i);
-                super.sb = sb;
+                 sb = (SectionBean) sects.get(i);
+//                super.sb = sb;
                 int sectId = sb.getId();
                 if (sectId > 0) {
                     allSectionBeans.add((SectionBean) sdao.findByPK(sectId));
                 }
             }
             // This is the StudySubjectBean
-            StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
-            StudySubjectBean sub = (StudySubjectBean) ssdao.findByPK(super.ecb.getStudySubjectId());
+            StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
+            StudySubjectBean sub = (StudySubjectBean) ssdao.findByPK(ecb.getStudySubjectId());
             // This is the SubjectBean
-            SubjectDAO subjectDao = new SubjectDAO(sm.getDataSource());
+            SubjectDAO subjectDao = new SubjectDAO(getDataSource());
             int subjectId = sub.getSubjectId();
             int studyId = sub.getStudyId();
             SubjectBean subject = (SubjectBean) subjectDao.findByPK(subjectId);
-            StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
-            StudyEventBean se = (StudyEventBean) sedao.findByPK(super.ecb.getStudyEventId());
-            StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+            StudyEventDAO sedao = new StudyEventDAO(getDataSource());
+            StudyEventBean se = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
+            StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(getDataSource());
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(se.getStudyEventDefinitionId());
             se.setStudyEventDefinition(sed);
             // Let us process the age
@@ -132,7 +142,7 @@ public class PrintDataEntryServlet extends DataEntryServlet {
                 age = Utils.getInstacne().processAge(sub.getEnrollmentDate(), subject.getDateOfBirth());
             }
             // Get the study then the parent study
-            StudyDAO studydao = new StudyDAO(sm.getDataSource());
+            StudyDAO studydao = new StudyDAO(getDataSource());
             StudyBean study = (StudyBean) studydao.findByPK(studyId);
 
             if (study.getParentStudyId() > 0) {
@@ -147,16 +157,19 @@ public class PrintDataEntryServlet extends DataEntryServlet {
             request.setAttribute("subject", subject);
             request.setAttribute("studyEvent", se);
             request.setAttribute("age", age);
+            request.setAttribute(INPUT_EVENT_CRF,ecb);
+            request.setAttribute(SECTION_BEAN,sb);
+            request.setAttribute(ALL_SECTION_BEANS, allSectionBeans);
             // Get the section beans from super
-            sectionBeans = super.getAllDisplayBeans();
+            sectionBeans = super.getAllDisplayBeans(request);
 
         }
 
         // Find out whether the sections involve groups
-        ItemGroupDAO itemGroupDao = new ItemGroupDAO(sm.getDataSource());
+        ItemGroupDAO itemGroupDao = new ItemGroupDAO(getDataSource());
         // Find truely grouped tables, not groups with a name of 'Ungrouped'
         // CRF VERSION ID WILL BE 0 IF "ecId" IS NOT IN THE QUERYSTRING
-        int crfVersionId = super.ecb.getCRFVersionId();
+        int crfVersionId = ecb.getCRFVersionId();
         List<ItemGroupBean> itemGroupBeans = itemGroupDao.findOnlyGroupsByCRFVersionID(crfVersionId);
         boolean sectionsHaveGroups = false;
 
@@ -168,14 +181,14 @@ public class PrintDataEntryServlet extends DataEntryServlet {
             // handler takes
             // a boolean value depending on whether an event or data is involved
             // or not
-            DisplaySectionBeanHandler handler = new DisplaySectionBeanHandler(true, sm.getDataSource(), context);
+            DisplaySectionBeanHandler handler = new DisplaySectionBeanHandler(true, getDataSource(), getServletContext());
 
             handler.setCrfVersionId(crfVersionId);
             handler.setEventCRFId(eventCRFId);
             List<DisplaySectionBean> displaySectionBeans = handler.getDisplaySectionBeans();
 
-            CRFVersionDAO crfVersionDAO = new CRFVersionDAO(sm.getDataSource());
-            CRFDAO crfDao = new CRFDAO(sm.getDataSource());
+            CRFVersionDAO crfVersionDAO = new CRFVersionDAO(getDataSource());
+            CRFDAO crfDao = new CRFDAO(getDataSource());
 
             request.setAttribute("listOfDisplaySectionBeans", displaySectionBeans);
             // Make available the CRF names and versions for
@@ -188,19 +201,21 @@ public class PrintDataEntryServlet extends DataEntryServlet {
             request.setAttribute("dataInvolved", "true");
         }
         request.setAttribute(BEAN_ANNOTATIONS, ecb.getAnnotations());
-        request.setAttribute("EventCRFBean", super.ecb);
+        request.setAttribute("EventCRFBean", ecb);
         // We do not need most of these attributes if groups are involved
         if (!sectionsHaveGroups) {
-            DisplaySectionBean dsb = super.getDisplayBean(false, false);
+            request.setAttribute(INPUT_EVENT_CRF,ecb);
+            request.setAttribute(SECTION_BEAN,sb);
+            DisplaySectionBean dsb = super.getDisplayBean(false, false, request);
             request.setAttribute("allSections", sectionBeans);
             request.setAttribute("displayAll", "1");
             request.setAttribute(BEAN_DISPLAY, dsb);
 
             request.setAttribute("sec", sb);
 
-            forwardPage(Page.VIEW_SECTION_DATA_ENTRY_PRINT);
+            forwardPage(Page.VIEW_SECTION_DATA_ENTRY_PRINT, request, response);
         } else { // end if(! sectionsHaveGroups)
-            forwardPage(Page.VIEW_SECTION_DATA_ENTRY_PRINT_GROUPS);
+            forwardPage(Page.VIEW_SECTION_DATA_ENTRY_PRINT_GROUPS, request, response);
         }
     }
 
@@ -220,7 +235,8 @@ public class PrintDataEntryServlet extends DataEntryServlet {
      * @see org.akaza.openclinica.control.submit.DataEntryServlet#getNonBlankItemStatus()
      */
     @Override
-    protected Status getNonBlankItemStatus() {
+    protected Status getNonBlankItemStatus(HttpServletRequest request) {
+        EventDefinitionCRFBean edcb = (EventDefinitionCRFBean)request.getAttribute(EVENT_DEF_CRF_BEAN);
         return edcb.isDoubleEntry() ? Status.PENDING : Status.UNAVAILABLE;
     }
 
@@ -230,7 +246,9 @@ public class PrintDataEntryServlet extends DataEntryServlet {
      * @see org.akaza.openclinica.control.submit.DataEntryServlet#getEventCRFAnnotations()
      */
     @Override
-    protected String getEventCRFAnnotations() {
+    protected String getEventCRFAnnotations(HttpServletRequest request) {
+        //JN:The following were the the global variables, moved as local.
+        EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
         return ecb.getAnnotations();
     }
 
@@ -240,7 +258,9 @@ public class PrintDataEntryServlet extends DataEntryServlet {
      * @see org.akaza.openclinica.control.submit.DataEntryServlet#setEventCRFAnnotations(java.lang.String)
      */
     @Override
-    protected void setEventCRFAnnotations(String annotations) {
+    protected void setEventCRFAnnotations(String annotations, HttpServletRequest request) {
+        //JN:The following were the the global variables, moved as local.
+        EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
         ecb.setAnnotations(annotations);
     }
 
@@ -260,7 +280,7 @@ public class PrintDataEntryServlet extends DataEntryServlet {
      * @see org.akaza.openclinica.control.submit.DataEntryServlet#getServletPage()
      */
     @Override
-    protected Page getServletPage() {
+    protected Page getServletPage(HttpServletRequest request) {
         return Page.VIEW_SECTION_DATA_ENTRY_SERVLET;
     }
 
@@ -281,18 +301,18 @@ public class PrintDataEntryServlet extends DataEntryServlet {
      *      org.akaza.openclinica.bean.submit.DisplayItemBean)
      */
     @Override
-    protected DisplayItemBean validateDisplayItemBean(DiscrepancyValidator v, DisplayItemBean dib, String inputName) {
+    protected DisplayItemBean validateDisplayItemBean(DiscrepancyValidator v, DisplayItemBean dib, String inputName, HttpServletRequest request) {
         ItemBean ib = dib.getItem();
         org.akaza.openclinica.bean.core.ResponseType rt = dib.getMetadata().getResponseSet().getResponseType();
 
         // note that this step sets us up both for
         // displaying the data on the form again, in the event of an error
         // and sending the data to the database, in the event of no error
-        dib = loadFormValue(dib);
+        dib = loadFormValue(dib, request);
 
         // types TEL and ED are not supported yet
         if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXT) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXTAREA)) {
-            dib = validateDisplayItemBeanText(v, dib, inputName);
+            dib = validateDisplayItemBeanText(v, dib, inputName, request);
         } else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.RADIO) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECT)) {
             dib = validateDisplayItemBeanSingleCV(v, dib, inputName);
         } else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)) {
@@ -301,7 +321,7 @@ public class PrintDataEntryServlet extends DataEntryServlet {
             || rt.equals(org.akaza.openclinica.bean.core.ResponseType.GROUP_CALCULATION)) {
             // for now, treat calculation like any other text input --
             // eventually this might need to be customized
-            dib = validateDisplayItemBeanText(v, dib, inputName);
+            dib = validateDisplayItemBeanText(v, dib, inputName, request);
         }
 
         return dib;
@@ -309,7 +329,7 @@ public class PrintDataEntryServlet extends DataEntryServlet {
 
     @Override
     protected List<DisplayItemGroupBean> validateDisplayItemGroupBean(DiscrepancyValidator v, DisplayItemGroupBean digb, List<DisplayItemGroupBean> digbs,
-            List<DisplayItemGroupBean> formGroups) {
+            List<DisplayItemGroupBean> formGroups, HttpServletRequest request, HttpServletResponse response) {
 
         return formGroups;
 
@@ -334,7 +354,7 @@ public class PrintDataEntryServlet extends DataEntryServlet {
     	return false;
     }
     
-    protected boolean isAdminForcedReasonForChange() {
+    protected boolean isAdminForcedReasonForChange(HttpServletRequest request) {
     	return false;
     }
 }

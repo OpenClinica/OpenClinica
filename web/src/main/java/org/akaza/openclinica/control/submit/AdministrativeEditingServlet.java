@@ -7,6 +7,10 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,10 +19,16 @@ import java.util.Locale;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
+import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.RuleValidator;
 import org.akaza.openclinica.control.managestudy.ViewNotesServlet;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -44,7 +54,8 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
      * org.akaza.openclinica.control.submit.DataEntryServlet#getServletPage()
      */
     @Override
-    protected Page getServletPage() {
+    protected Page getServletPage(HttpServletRequest request) {
+        FormProcessor fp = new FormProcessor(request);
         String tabId = fp.getString("tab", true);
         String sectionId = fp.getString(DataEntryServlet.INPUT_SECTION_ID, true);
         String eventCRFId = fp.getString(INPUT_EVENT_CRF_ID, true);
@@ -138,10 +149,15 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
      * @see org.akaza.openclinica.control.core.SecureController#mayProceed()
      */
     @Override
-    protected void mayProceed() throws InsufficientPermissionException {
+    protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
 
         locale = request.getLocale();
-
+        HttpSession session = request.getSession();
+        FormProcessor fp = new FormProcessor(request);
+        UserAccountBean ub =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
+        StudyUserRoleBean  currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
+      
+        
         // <
         // resexception=ResourceBundle.getBundle(
         // "org.akaza.openclinica.i18n.exceptions",locale);
@@ -149,15 +165,15 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
         // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",
         // locale);
 
-        getInputBeans();
-
+        getInputBeans(request);
+        EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
         String fromResolvingNotes = fp.getString("fromResolvingNotes", true);
 
         if (StringUtil.isBlank(fromResolvingNotes)) {
             session.removeAttribute(ViewNotesServlet.WIN_LOCATION);
             session.removeAttribute(ViewNotesServlet.NOTES_TABLE);
-            checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"));
-            checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"));
+            checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
+            checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"), request, response);
         }
         request.setAttribute("fromResolvingNotes", fromResolvingNotes);
         System.out.println(" +++++++++++++++++++ " + ecb.getStudyEventId());
@@ -173,14 +189,14 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
         // }
         DataEntryStage stage = ecb.getStage();
         Role r = currentRole.getRole();
-        this.session.setAttribute("mayProcessUploading", "true");
+        session.setAttribute("mayProcessUploading", "true");
 
         if (!SubmitDataServlet.maySubmitData(ub, currentRole)) {
-            this.session.setAttribute("mayProcessUploading", "false");
+            session.setAttribute("mayProcessUploading", "false");
             String exceptionName = resexception.getString("no_permission_validation");
             String noAccessMessage = respage.getString("not_perform_administrative_editing_CRF");
 
-            addPageMessage(noAccessMessage);
+            addPageMessage(noAccessMessage, request);
             throw new InsufficientPermissionException(Page.MENU, exceptionName, "1");
         }
         logger.info("stage name:" + stage.getName());
@@ -188,15 +204,15 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
             // if (!r.equals(Role.STUDYDIRECTOR) && !r.equals(Role.COORDINATOR))
             // {
             if (r.equals(Role.MONITOR)) {
-                this.session.setAttribute("mayProcessUploading", "false");
-                addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
+                session.setAttribute("mayProcessUploading", "false");
+                addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"), request);
                 throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET, resexception.getString("no_permission_administrative_editing"), "1");
             }
         }
 
         else {
-            this.session.setAttribute("mayProcessUploading", "false");
-            addPageMessage(respage.getString("not_perform_administrative_editing_because"));
+            session.setAttribute("mayProcessUploading", "false");
+            addPageMessage(respage.getString("not_perform_administrative_editing_because"), request);
             throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET, resexception.getString("not_correct_stage"), "1");
         }
         return;
@@ -210,7 +226,9 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
      * (java.lang.String)
      */
     @Override
-    protected void setEventCRFAnnotations(String annotations) {
+    protected void setEventCRFAnnotations(String annotations, HttpServletRequest request) {
+        EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
+        
         ecb.setAnnotations(annotations);
     }
 
@@ -241,7 +259,7 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
      * org.akaza.openclinica.bean.submit.DisplayItemBean)
      */
     @Override
-    protected DisplayItemBean validateDisplayItemBean(DiscrepancyValidator v, DisplayItemBean dib, String inputName) {
+    protected DisplayItemBean validateDisplayItemBean(DiscrepancyValidator v, DisplayItemBean dib, String inputName, HttpServletRequest request) {
 
         ItemBean ib = dib.getItem();
         org.akaza.openclinica.bean.core.ResponseType rt = dib.getMetadata().getResponseSet().getResponseType();
@@ -251,13 +269,13 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
         // and sending the data to the database, in the event of no error
         if (StringUtil.isBlank(inputName)) {// not an item from group, doesn't
             // need to get data from form again
-            dib = loadFormValue(dib);
+            dib = loadFormValue(dib, request);
         }
 
         // types TEL and ED are not supported yet
         if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXT) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXTAREA) ||
                 rt.equals(org.akaza.openclinica.bean.core.ResponseType.FILE)) {
-            dib = validateDisplayItemBeanText(v, dib, inputName);
+            dib = validateDisplayItemBeanText(v, dib, inputName, request);
         } else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.RADIO) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECT)) {
             dib = validateDisplayItemBeanSingleCV(v, dib, inputName);
         } else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)) {
@@ -269,9 +287,9 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
 
     @Override
     protected List<DisplayItemGroupBean> validateDisplayItemGroupBean(DiscrepancyValidator v, DisplayItemGroupBean digb, List<DisplayItemGroupBean> digbs,
-            List<DisplayItemGroupBean> formGroups) {
-
-        formGroups = loadFormValueForItemGroup(digb, digbs, formGroups, edcb.getId());
+            List<DisplayItemGroupBean> formGroups, HttpServletRequest request, HttpServletResponse response) {
+        EventDefinitionCRFBean edcb = (EventDefinitionCRFBean)request.getAttribute(EVENT_DEF_CRF_BEAN);
+        formGroups = loadFormValueForItemGroup(digb, digbs, formGroups, edcb.getId(), request);
         String inputName = "";
         for (int i = 0; i < formGroups.size(); i++) {
             DisplayItemGroupBean displayGroup = formGroups.get(i);
@@ -287,7 +305,7 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
                 } else {
                     inputName = getGroupItemManualInputName(displayGroup, order, displayItem);
                 }
-                validateDisplayItemBean(v, displayItem, inputName);
+                validateDisplayItemBean(v, displayItem, inputName, request);
             }
         }
         return formGroups;
@@ -296,20 +314,21 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
 
     @Override
     protected DisplayItemBean validateDisplayItemBean(DiscrepancyValidator v, DisplayItemBean dib, String inputName, RuleValidator rv,
-            HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid, Boolean fireRuleValidation, ArrayList<String> messages) {
+            HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid, Boolean fireRuleValidation, ArrayList<String> messages, HttpServletRequest request) {
         if (StringUtil.isBlank(inputName)) {// we pass a blank inputName,which
             // means if not an item from group,
             // doesn't
             // need to get data from form again
-            dib = loadFormValue(dib);
+            dib = loadFormValue(dib, request);
         }
         return dib;
     }
 
     @Override
     protected List<DisplayItemGroupBean> validateDisplayItemGroupBean(DiscrepancyValidator v, DisplayItemGroupBean digb, List<DisplayItemGroupBean> digbs,
-            List<DisplayItemGroupBean> formGroups, RuleValidator rv, HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid) {
-        formGroups = loadFormValueForItemGroup(digb, digbs, formGroups, edcb.getId());
+            List<DisplayItemGroupBean> formGroups, RuleValidator rv, HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid, HttpServletRequest request, HttpServletResponse response) {
+        EventDefinitionCRFBean edcb = (EventDefinitionCRFBean)request.getAttribute(EVENT_DEF_CRF_BEAN);
+        formGroups = loadFormValueForItemGroup(digb, digbs, formGroups, edcb.getId(), request);
         return formGroups;
     }
 
@@ -333,7 +352,7 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
      * ()
      */
     @Override
-    protected Status getNonBlankItemStatus() {
+    protected Status getNonBlankItemStatus(HttpServletRequest request) {
         return Status.UNAVAILABLE;
     }
 
@@ -345,7 +364,9 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
      * ()
      */
     @Override
-    protected String getEventCRFAnnotations() {
+    protected String getEventCRFAnnotations(HttpServletRequest request) {
+        EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
+        
         return ecb.getAnnotations();
     }
 
@@ -360,7 +381,7 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
     }
 
     @Override
-    protected boolean isAdminForcedReasonForChange() {
+    protected boolean isAdminForcedReasonForChange(HttpServletRequest request) {
         // StudyParameterValueDAO spvdao = new
         // StudyParameterValueDAO(sm.getDataSource());
         // ArrayList studyParameters =
@@ -368,6 +389,7 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
 
         // currentStudy.setStudyParameters(studyParameters);
         // refresh study params here, tbh 06/2009
+        StudyBean currentStudy =    (StudyBean) request.getSession().getAttribute("study");
         if (currentStudy.getStudyParameterConfig().getAdminForcedReasonForChange().equals("true")) {
             System.out.println("returning true for forced reason for change");
             return true;

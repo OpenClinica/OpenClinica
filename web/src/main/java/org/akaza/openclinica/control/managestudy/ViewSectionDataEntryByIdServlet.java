@@ -7,6 +7,9 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -28,7 +31,7 @@ public class ViewSectionDataEntryByIdServlet extends ViewSectionDataEntryServlet
      * @see org.akaza.openclinica.control.managestudy.ViewSectionDataEntryServlet#mayProceed()
      */
     @Override
-    public void mayProceed() throws InsufficientPermissionException {
+    public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
         return;
     }
 
@@ -37,20 +40,22 @@ public class ViewSectionDataEntryByIdServlet extends ViewSectionDataEntryServlet
      * @see org.akaza.openclinica.control.managestudy.ViewSectionDataEntryServlet#processRequest()
      */
     @Override
-    public void processRequest() throws Exception {
-        StudyDAO studyDao = new StudyDAO(sm.getDataSource());
-        currentStudy = (StudyBean) studyDao.findByPK(1);
-        CRFVersionDAO crfVersionDao = new CRFVersionDAO(sm.getDataSource());
+    public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        StudyDAO studyDao = new StudyDAO(getDataSource());
+       
+        StudyBean  currentStudy = (StudyBean) studyDao.findByPK(1);
+        CRFVersionDAO crfVersionDao = new CRFVersionDAO(getDataSource());
         if (request.getParameter("id") == null) {
-            forwardPage(Page.LOGIN);
+            forwardPage(Page.LOGIN, request, response);
         }
+        request.setAttribute("study", currentStudy);
         CRFVersionBean crfVersion = crfVersionDao.findByOid(request.getParameter("id"));
         if (crfVersion != null) {
             request.setAttribute("crfVersionId", String.valueOf(crfVersion.getId()));
             request.setAttribute("crfId", String.valueOf(crfVersion.getCrfId()));
-            super.processRequest();
+            super.processRequest(request, response);
         } else {
-            forwardPage(Page.LOGIN);
+            forwardPage(Page.LOGIN, request, response);
         }
     }
 }

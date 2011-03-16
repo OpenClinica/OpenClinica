@@ -49,10 +49,14 @@ public class ViewStudyUserServlet extends SecureController {
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
         String name = request.getParameter("name");
         String studyIdString = request.getParameter("studyId");
-        if (StringUtil.isBlank(name) || StringUtil.isBlank(studyIdString)) {
+       
+     //if(request.getParameter("submit")!=null)
+     {     
+    	 
+    	 if (StringUtil.isBlank(name) || StringUtil.isBlank(studyIdString)) {
             addPageMessage(respage.getString("please_choose_a_user_to_view"));
             forwardPage(Page.LIST_USER_IN_STUDY_SERVLET);
-        } else {
+     	} else {
             int studyId = Integer.valueOf(studyIdString.trim()).intValue();
             UserAccountBean user = (UserAccountBean) udao.findByUserName(name);
 
@@ -70,9 +74,11 @@ public class ViewStudyUserServlet extends SecureController {
             String pattn = "";
             pattn = ResourceBundleProvider.getFormatBundle().getString("date_format_string");
             request.setAttribute("dateFormatPattern", pattn);
+            request.setAttribute("action","");
             forwardPage(Page.VIEW_USER_IN_STUDY);
 
         }
+     }
     }
 
 }
