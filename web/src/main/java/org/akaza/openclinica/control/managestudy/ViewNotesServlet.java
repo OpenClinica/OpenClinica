@@ -9,12 +9,7 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
@@ -216,10 +211,19 @@ public class ViewNotesServlet extends SecureController {
 
         DiscrepancyNoteUtil discNoteUtil = new DiscrepancyNoteUtil();
         Map stats = discNoteUtil.generateDiscNoteSummary(allNotes);
+        Map<String, String> totalMap = discNoteUtil.generateDiscNoteTotal(allNotes);
+
+        int grandTotal = 0;
+        for (String typeName: totalMap.keySet()) {
+            String total = totalMap.get(typeName); 
+            grandTotal = total.equals("--") ? grandTotal + 0 : grandTotal + Integer.parseInt(total);
+        }
+
         request.setAttribute("summaryMap", stats);
         request.setAttribute("mapKeys", discNoteUtil.getStatusNames());
         request.setAttribute("typeNames", discNoteUtil.getTypeNames());
-        request.setAttribute("typeKeys", discNoteUtil.generateDiscNoteTotal(allNotes));
+        request.setAttribute("typeKeys", totalMap);
+        request.setAttribute("grandTotal", grandTotal);
 
         if ("yes".equalsIgnoreCase(fp.getString(PRINT))) {
             request.setAttribute("allNotes", allNotes);

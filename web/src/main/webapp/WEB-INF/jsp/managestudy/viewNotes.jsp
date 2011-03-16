@@ -161,7 +161,7 @@
             <c:forEach var="typeName"  items="${typeNames}">
                 <td align="center">${typeKeys[typeName]}</td>
             </c:forEach>
-            <td>&nbsp;</td>
+            <td align="center">${grandTotal}</td>
         </tr>
     </table>
     <!-- End Of New Summary -->
