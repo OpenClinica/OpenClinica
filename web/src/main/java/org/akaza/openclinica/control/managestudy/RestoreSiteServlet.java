@@ -215,7 +215,7 @@ public class RestoreSiteServlet extends SecureController {
                                         for (int a = 0; a < itemDatas.size(); a++) {
                                             ItemDataBean item = (ItemDataBean) itemDatas.get(a);
                                             if (item.getStatus().equals(Status.AUTO_DELETED)) {
-                                                item.setStatus(Status.AVAILABLE);
+                                                item.setStatus(item.getOldStatus());
                                                 item.setUpdater(ub);
                                                 item.setUpdatedDate(new Date());
                                                 iddao.update(item);

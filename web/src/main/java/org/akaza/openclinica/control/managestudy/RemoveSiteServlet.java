@@ -199,6 +199,7 @@ public class RemoveSiteServlet extends SecureController {
                                         for (int a = 0; a < itemDatas.size(); a++) {
                                             ItemDataBean item = (ItemDataBean) itemDatas.get(a);
                                             if (!item.getStatus().equals(Status.DELETED)) {
+                                                item.setOldStatus(item.getStatus());
                                                 item.setStatus(Status.AUTO_DELETED);
                                                 item.setUpdater(ub);
                                                 item.setUpdatedDate(new Date());

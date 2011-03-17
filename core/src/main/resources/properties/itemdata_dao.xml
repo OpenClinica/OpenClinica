@@ -12,13 +12,13 @@
 	<query>
 		<name>create</name>
 		<sql>INSERT INTO ITEM_DATA (ITEM_DATA_ID,EVENT_CRF_ID, ITEM_ID, STATUS_ID, VALUE,
-		OWNER_ID, DATE_CREATED,ORDINAL)
-		VALUES (?,?,?,?,?,?,NOW(),?)</sql>
+		OWNER_ID, DATE_CREATED,ORDINAL,OLD_STATUS_ID)
+		VALUES (?,?,?,?,?,?,NOW(),?,?)</sql>
 	</query>
 	<query>
 		<name>update</name>
 		<sql>UPDATE ITEM_DATA SET EVENT_CRF_ID=?,ITEM_ID=?,STATUS_ID=?,
-		VALUE=?,DATE_UPDATED=NOW(),UPDATE_ID=?, ORDINAL =? WHERE
+		VALUE=?,DATE_UPDATED=NOW(),UPDATE_ID=?, ORDINAL =?, OLD_STATUS_ID=? WHERE
 		ITEM_DATA_ID=?</sql>
 	</query>
 	<!-- added tbh 09/03/2008 -->
