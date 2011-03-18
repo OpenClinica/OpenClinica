@@ -5,7 +5,7 @@
 	<changeSet author="ahamid" id="2011-03-16-5930-1">
 		<comment>Item_Data (old_status)</comment>
 		<addColumn tableName="item_data">
-			<column name="old_status_id" type="int" defaultValueNumeric="1"/>
+			<column name="old_status_id" type="int"/>
 		</addColumn>
 	</changeSet>
     <changeSet author="ahamid" id="2011-03-16-5930-2">

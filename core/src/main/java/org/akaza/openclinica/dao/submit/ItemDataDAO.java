@@ -390,7 +390,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
         // YW >>
         eb.setStatus(Status.get(((Integer) hm.get("status_id")).intValue()));
         eb.setOrdinal(((Integer) hm.get("ordinal")).intValue());
-        eb.setOldStatus(Status.get(((Integer) hm.get("old_status_id")).intValue()));
+        eb.setOldStatus(Status.get(hm.get("old_status_id") == null ? 1 : ((Integer) hm.get("old_status_id")).intValue()));
         return eb;
     }
 
