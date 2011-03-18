@@ -556,6 +556,10 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
             // addPageMessage(ipe.getOpenClinicaMessage());
             forwardPage(ipe.getGoTo());
+        } catch (OutOfMemoryError ome) {
+            ome.printStackTrace();
+            long heapSize = Runtime.getRuntime().totalMemory();
+            session.setAttribute("ome", "yes");
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(SecureController.getStackTrace(e));

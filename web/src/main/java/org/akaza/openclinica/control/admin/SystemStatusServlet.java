@@ -36,7 +36,9 @@ public class SystemStatusServlet extends SecureController {
 
         Long databaseChangelLogCount = getDatabaseChangeLogDao().count();
         String applicationStatus = "OK";
-
+        if (session.getAttribute("ome")!=null) {
+            applicationStatus = "OutOfMemory.";
+        }
 //        request.setAttribute("databaseChangeLogCount", String.valueOf(databaseChangelLogCount));
 //        request.setAttribute("applicationStatus", applicationStatus);
 //        forwardPage(Page.SYSTEM_STATUS);
