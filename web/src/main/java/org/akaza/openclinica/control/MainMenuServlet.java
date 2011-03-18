@@ -114,7 +114,7 @@ public class MainMenuServlet extends SecureController {
             long days = difference / (1000 * 60 * 60 * 24);
             session.setAttribute("passwordExpired", "no");
 
-            if (days > pwdExpireDay) {// password expired, need to be changed
+            if (days >= pwdExpireDay) {// password expired, need to be changed
                 studies = (ArrayList) sdao.findAllByUser(ub.getName());
                 request.setAttribute("studies", studies);
                 session.setAttribute("userBean1", ub);
