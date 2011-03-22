@@ -29,6 +29,103 @@ public class ItemBean extends AuditableEntityBean implements Comparable {
 
     private int itemDataTypeId = 0;
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((crfName == null) ? 0 : crfName.hashCode());
+        result = prime * result + ((dataType == null) ? 0 : dataType.hashCode());
+        result = prime * result + ((datasetItemMapKey == null) ? 0 : datasetItemMapKey.hashCode());
+        result = prime * result + defId;
+        result = prime * result + ((defName == null) ? 0 : defName.hashCode());
+        result = prime * result + ((description == null) ? 0 : description.hashCode());
+        result = prime * result + itemDataTypeId;
+        result = prime * result + ((itemMeta == null) ? 0 : itemMeta.hashCode());
+        result = prime * result + ((itemMetas == null) ? 0 : itemMetas.hashCode());
+        result = prime * result + itemReferenceTypeId;
+        result = prime * result + ((oid == null) ? 0 : oid.hashCode());
+        result = prime * result + ((oidGenerator == null) ? 0 : oidGenerator.hashCode());
+        result = prime * result + (phiStatus ? 1231 : 1237);
+        result = prime * result + (selected ? 1231 : 1237);
+        result = prime * result + statusId;
+        result = prime * result + ((units == null) ? 0 : units.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        ItemBean other = (ItemBean) obj;
+        if (crfName == null) {
+            if (other.crfName != null)
+                return false;
+        } else if (!crfName.equals(other.crfName))
+            return false;
+        if (dataType == null) {
+            if (other.dataType != null)
+                return false;
+        } else if (!dataType.equals(other.dataType))
+            return false;
+        if (datasetItemMapKey == null) {
+            if (other.datasetItemMapKey != null)
+                return false;
+        } else if (!datasetItemMapKey.equals(other.datasetItemMapKey))
+            return false;
+        if (defId != other.defId)
+            return false;
+        if (defName == null) {
+            if (other.defName != null)
+                return false;
+        } else if (!defName.equals(other.defName))
+            return false;
+        if (description == null) {
+            if (other.description != null)
+                return false;
+        } else if (!description.equals(other.description))
+            return false;
+        if (itemDataTypeId != other.itemDataTypeId)
+            return false;
+        if (itemMeta == null) {
+            if (other.itemMeta != null)
+                return false;
+        } else if (!itemMeta.equals(other.itemMeta))
+            return false;
+        if (itemMetas == null) {
+            if (other.itemMetas != null)
+                return false;
+        } else if (!itemMetas.equals(other.itemMetas))
+            return false;
+        if (itemReferenceTypeId != other.itemReferenceTypeId)
+            return false;
+        if (oid == null) {
+            if (other.oid != null)
+                return false;
+        } else if (!oid.equals(other.oid))
+            return false;
+        if (oidGenerator == null) {
+            if (other.oidGenerator != null)
+                return false;
+        } else if (!oidGenerator.equals(other.oidGenerator))
+            return false;
+        if (phiStatus != other.phiStatus)
+            return false;
+        if (selected != other.selected)
+            return false;
+        if (statusId != other.statusId)
+            return false;
+        if (units == null) {
+            if (other.units != null)
+                return false;
+        } else if (!units.equals(other.units))
+            return false;
+        return true;
+    }
+
     private ItemDataType dataType;
 
     private int itemReferenceTypeId = 0;

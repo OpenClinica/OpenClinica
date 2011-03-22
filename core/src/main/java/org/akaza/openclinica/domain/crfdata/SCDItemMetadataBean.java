@@ -25,6 +25,50 @@ import javax.persistence.Transient;
 @Table(name="scd_item_metadata")
 @GenericGenerator(name="id-generator", strategy="native", parameters={ @Parameter(name="sequence", value="scd_item_metadata_id_seq") })
 public class SCDItemMetadataBean extends AbstractMutableDomainObject {
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + controlItemFormMetadataId;
+        result = prime * result + ((controlItemName == null) ? 0 : controlItemName.hashCode());
+        result = prime * result + ((message == null) ? 0 : message.hashCode());
+        result = prime * result + ((optionValue == null) ? 0 : optionValue.hashCode());
+        result = prime * result + scdItemFormMetadataId;
+        result = prime * result + scdItemId;
+        return result;
+    }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        SCDItemMetadataBean other = (SCDItemMetadataBean) obj;
+        if (controlItemFormMetadataId != other.controlItemFormMetadataId)
+            return false;
+        if (controlItemName == null) {
+            if (other.controlItemName != null)
+                return false;
+        } else if (!controlItemName.equals(other.controlItemName))
+            return false;
+        if (message == null) {
+            if (other.message != null)
+                return false;
+        } else if (!message.equals(other.message))
+            return false;
+        if (optionValue == null) {
+            if (other.optionValue != null)
+                return false;
+        } else if (!optionValue.equals(other.optionValue))
+            return false;
+        if (scdItemFormMetadataId != other.scdItemFormMetadataId)
+            return false;
+        if (scdItemId != other.scdItemId)
+            return false;
+        return true;
+    }
     private int scdItemFormMetadataId = 0;
     private int controlItemFormMetadataId = 0;
     private String controlItemName = "";

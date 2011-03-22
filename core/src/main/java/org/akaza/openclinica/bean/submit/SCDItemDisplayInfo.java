@@ -128,6 +128,47 @@ public class SCDItemDisplayInfo {
     
     
     
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + rowDisplayStatus;
+        result = prime * result + rowFirstColIndex;
+        result = prime * result + rowNum;
+        result = prime * result + ((rowSCDShowIDStr == null) ? 0 : rowSCDShowIDStr.hashCode());
+        result = prime * result + scdShowStatus;
+        return result;
+    }
+
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        SCDItemDisplayInfo other = (SCDItemDisplayInfo) obj;
+        if (rowDisplayStatus != other.rowDisplayStatus)
+            return false;
+        if (rowFirstColIndex != other.rowFirstColIndex)
+            return false;
+        if (rowNum != other.rowNum)
+            return false;
+        if (rowSCDShowIDStr == null) {
+            if (other.rowSCDShowIDStr != null)
+                return false;
+        } else if (!rowSCDShowIDStr.equals(other.rowSCDShowIDStr))
+            return false;
+        if (scdShowStatus != other.scdShowStatus)
+            return false;
+        return true;
+    }
+
+
+
     public static boolean isSCDItem(DisplayItemBean displayItemBean) {
         int scdId = displayItemBean.getScdItemMetadataBean().getScdItemFormMetadataId();
         return scdId>0 && scdId == displayItemBean.getMetadata().getId() ? true : false;

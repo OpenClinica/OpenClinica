@@ -28,6 +28,34 @@ import java.util.regex.Pattern;
 
 public abstract class OidGenerator {
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((logger == null) ? 0 : logger.hashCode());
+        result = prime * result + oidLength;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        OidGenerator other = (OidGenerator) obj;
+        if (logger == null) {
+            if (other.logger != null)
+                return false;
+        } else if (!logger.equals(other.logger))
+            return false;
+        if (oidLength != other.oidLength)
+            return false;
+        return true;
+    }
+
     private final int oidLength = 40;
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 

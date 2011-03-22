@@ -214,45 +214,12 @@ public abstract class DataEntryServlet extends CoreSecureController {
     public static final String NOTE_SUBMITTED = "note_submitted";
     
     
-//JN:Cleaning up the code, to prepare for synchronizing the blocks for global variables.
-  //  protected String SCOREITEMS;
-  //  protected String SCOREITEMDATA;
-
-  //  protected FormProcessor fp;
-    // the input beans
-    //protected EventCRFBean ecb;
-//    protected SectionBean sb;
     public static final String SECTION_BEAN = "section_bean";
-   // protected ArrayList<SectionBean> allSectionBeans;
     public static final String ALL_SECTION_BEANS = "all_section_bean";
-    /**
-     * The event definition CRF bean which governs the event CRF bean into which we are entering data. Notice: It should be updated by info of a
-     * siteEventDefinitionCRF if dataEntry is for a site which has its own study_event_definition,
-     */
-  //  protected EventDefinitionCRFBean edcb;
 
     public static final String EVENT_DEF_CRF_BEAN = "event_def_crf_bean"; 
     
-    // DAOs used throughout the c;ass
-    //JN:TODO: revisit later to investigate why dao references are global in the first place?
-   // protected EventCRFDAO ecdao;
-
-   // protected EventDefinitionCRFDAO edcdao;
-
-   // protected SectionDAO sdao;
-
-   // protected ItemDAO idao;
-
- //   protected ItemFormMetadataDAO ifmdao;
-
-  //  protected ItemDataDAO iddao;
-
-  //  protected DiscrepancyNoteDAO dndao;
-
- //   protected RuleSetServiceInterface ruleSetService;
- //   protected ExpressionService expressionService;
- //   protected DiscrepancyNoteService discrepancyNoteService;
- //   DynamicsMetadataService itemMetadataService;
+    public static final String ALL_ITEMS_LIST = "all_items_list";
     
     private DataSource dataSource;
 
@@ -268,6 +235,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
     protected boolean hasGroup = false;
    
     protected String rowDisplay = "";
+    
+    
 
     @Override
     public void init(ServletConfig config) throws ServletException
@@ -385,6 +354,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         int resolvedNum = 0;
         int notAppNum = 0;
         DiscrepancyNoteBean tempBean;
+        
         for (DiscrepancyNoteThread dnThread : noteThreads) {
             /*
              * 3014: do not count parent beans, only the last child disc note of the thread.
@@ -861,7 +831,25 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 phase2 = Phase.ADMIN_EDITING;
             }
             // this.getItemMetadataService().resetItemCounter();
-            HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid = runRules(allItems, ruleSets, true, shouldRunRules(), MessageType.ERROR, phase2,ecb, request);
+            HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid  = null;
+            groupOrdinalPLusItemOid = runRules(allItems, ruleSets, true, shouldRunRules(), MessageType.ERROR, phase2,ecb, request);
+          /*  if(( List<DisplayItemWithGroupBean>)session.getAttribute(ALL_ITEMS_LIST)==null)
+            {
+                 groupOrdinalPLusItemOid = runRules(allItems, ruleSets, true, shouldRunRules(), MessageType.ERROR, phase2,ecb, request);
+                 session.setAttribute(ALL_ITEMS_LIST, allItems);
+                 session.setAttribute("groupOrdinalPLusItemOid", groupOrdinalPLusItemOid);
+            }
+            else {
+                if( ((List<DisplayItemWithGroupBean>)session.getAttribute(ALL_ITEMS_LIST)).equals( allItems)){
+                    groupOrdinalPLusItemOid = (HashMap<String, ArrayList<String>> )session.getAttribute("groupOrdinalPLusItemOid");
+                }
+                else{
+                    groupOrdinalPLusItemOid = runRules(allItems, ruleSets, true, shouldRunRules(), MessageType.ERROR, phase2,ecb, request);
+                    session.setAttribute(ALL_ITEMS_LIST, allItems);
+                    session.setAttribute("groupOrdinalPLusItemOid", groupOrdinalPLusItemOid);
+                }
+                
+            }*/
             ////System.out.println("first run of rules : " + groupOrdinalPLusItemOid.toString());
             logMe("allItems  Loop begin  "+System.currentTimeMillis());
             for (int i = 0; i < allItems.size(); i++) {
@@ -1931,7 +1919,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                     return;
 
                                 }
-                                //JN:not sure when this will execute? so adding the else block
+                       
                              
                                 int tabNum = 0;
                                 if (fp.getString("tab") == null) {
@@ -4920,7 +4908,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
             // return getRuleSetService().runRules(ruleSets, dryRun,
             // currentStudy, c.variableAndValue, ub);
             logger.debug("running rules ... rule sets size is " + ruleSets.size());
-            return getRuleSetService(request).runRulesInDataEntry(ruleSets, dryRun, currentStudy, ub, c.variableAndValue, phase,ecb).getByMessageType(mt);
+            return getRuleSetService(request).runRulesInDataEntry(ruleSets, dryRun, currentStudy, ub, c.variableAndValue, phase,ecb, request).getByMessageType(mt);
         } else {
             return new HashMap<String, ArrayList<String>>();
         }

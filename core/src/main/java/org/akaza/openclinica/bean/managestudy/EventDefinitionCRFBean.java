@@ -29,6 +29,133 @@ public class EventDefinitionCRFBean extends AuditableEntityBean implements Compa
 
     private int studyId = 0;
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((crf == null) ? 0 : crf.hashCode());
+        result = prime * result + crfId;
+        result = prime * result + ((crfName == null) ? 0 : crfName.hashCode());
+        result = prime * result + (decisionCondition ? 1231 : 1237);
+        result = prime * result + defaultVersionId;
+        result = prime * result + ((defaultVersionName == null) ? 0 : defaultVersionName.hashCode());
+        result = prime * result + (doubleEntry ? 1231 : 1237);
+        result = prime * result + (electronicSignature ? 1231 : 1237);
+        result = prime * result + ((eventName == null) ? 0 : eventName.hashCode());
+        result = prime * result + (hidden ? 1231 : 1237);
+        result = prime * result + (hideCrf ? 1231 : 1237);
+        result = prime * result + ((nullFlags == null) ? 0 : nullFlags.hashCode());
+        result = prime * result + ((nullValues == null) ? 0 : nullValues.hashCode());
+        result = prime * result + ((nullValuesList == null) ? 0 : nullValuesList.hashCode());
+        result = prime * result + ordinal;
+        result = prime * result + parentId;
+        result = prime * result + (requireAllTextFilled ? 1231 : 1237);
+        result = prime * result + (requiredCRF ? 1231 : 1237);
+        result = prime * result + ((selectedVersionIdList == null) ? 0 : selectedVersionIdList.hashCode());
+        result = prime * result + ((selectedVersionIds == null) ? 0 : selectedVersionIds.hashCode());
+        result = prime * result + ((selectedVersionNames == null) ? 0 : selectedVersionNames.hashCode());
+        result = prime * result + ((sourceDataVerification == null) ? 0 : sourceDataVerification.hashCode());
+        result = prime * result + studyEventDefinitionId;
+        result = prime * result + studyId;
+        result = prime * result + ((versions == null) ? 0 : versions.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        EventDefinitionCRFBean other = (EventDefinitionCRFBean) obj;
+        if (crf == null) {
+            if (other.crf != null)
+                return false;
+        } else if (!crf.equals(other.crf))
+            return false;
+        if (crfId != other.crfId)
+            return false;
+        if (crfName == null) {
+            if (other.crfName != null)
+                return false;
+        } else if (!crfName.equals(other.crfName))
+            return false;
+        if (decisionCondition != other.decisionCondition)
+            return false;
+        if (defaultVersionId != other.defaultVersionId)
+            return false;
+        if (defaultVersionName == null) {
+            if (other.defaultVersionName != null)
+                return false;
+        } else if (!defaultVersionName.equals(other.defaultVersionName))
+            return false;
+        if (doubleEntry != other.doubleEntry)
+            return false;
+        if (electronicSignature != other.electronicSignature)
+            return false;
+        if (eventName == null) {
+            if (other.eventName != null)
+                return false;
+        } else if (!eventName.equals(other.eventName))
+            return false;
+        if (hidden != other.hidden)
+            return false;
+        if (hideCrf != other.hideCrf)
+            return false;
+        if (nullFlags == null) {
+            if (other.nullFlags != null)
+                return false;
+        } else if (!nullFlags.equals(other.nullFlags))
+            return false;
+        if (nullValues == null) {
+            if (other.nullValues != null)
+                return false;
+        } else if (!nullValues.equals(other.nullValues))
+            return false;
+        if (nullValuesList == null) {
+            if (other.nullValuesList != null)
+                return false;
+        } else if (!nullValuesList.equals(other.nullValuesList))
+            return false;
+        if (ordinal != other.ordinal)
+            return false;
+        if (parentId != other.parentId)
+            return false;
+        if (requireAllTextFilled != other.requireAllTextFilled)
+            return false;
+        if (requiredCRF != other.requiredCRF)
+            return false;
+        if (selectedVersionIdList == null) {
+            if (other.selectedVersionIdList != null)
+                return false;
+        } else if (!selectedVersionIdList.equals(other.selectedVersionIdList))
+            return false;
+        if (selectedVersionIds == null) {
+            if (other.selectedVersionIds != null)
+                return false;
+        } else if (!selectedVersionIds.equals(other.selectedVersionIds))
+            return false;
+        if (selectedVersionNames == null) {
+            if (other.selectedVersionNames != null)
+                return false;
+        } else if (!selectedVersionNames.equals(other.selectedVersionNames))
+            return false;
+        if (sourceDataVerification != other.sourceDataVerification)
+            return false;
+        if (studyEventDefinitionId != other.studyEventDefinitionId)
+            return false;
+        if (studyId != other.studyId)
+            return false;
+        if (versions == null) {
+            if (other.versions != null)
+                return false;
+        } else if (!versions.equals(other.versions))
+            return false;
+        return true;
+    }
+
     private int crfId = 0;
 
     private boolean requiredCRF = true;

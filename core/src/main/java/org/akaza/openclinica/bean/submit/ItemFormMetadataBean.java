@@ -23,6 +23,169 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
     private String parentLabel;
     private int columnNumber;
     private String pageNumberLabel;
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + columnNumber;
+        result = prime * result + ((conditionalDisplay == null) ? 0 : conditionalDisplay.hashCode());
+        result = prime * result + ((crfName == null) ? 0 : crfName.hashCode());
+        result = prime * result + crfVersionId;
+        result = prime * result + ((crfVersionName == null) ? 0 : crfVersionName.hashCode());
+        result = prime * result + ((defaultValue == null) ? 0 : defaultValue.hashCode());
+        result = prime * result + descisionConditionId;
+        result = prime * result + ((groupLabel == null) ? 0 : groupLabel.hashCode());
+        result = prime * result + ((header == null) ? 0 : header.hashCode());
+        result = prime * result + (isHighlighted ? 1231 : 1237);
+        result = prime * result + itemId;
+        result = prime * result + ((leftItemText == null) ? 0 : leftItemText.hashCode());
+        result = prime * result + ordinal;
+        result = prime * result + ((pageNumberLabel == null) ? 0 : pageNumberLabel.hashCode());
+        result = prime * result + parentId;
+        result = prime * result + ((parentLabel == null) ? 0 : parentLabel.hashCode());
+        result = prime * result + ((questionNumberLabel == null) ? 0 : questionNumberLabel.hashCode());
+        result = prime * result + ((regexp == null) ? 0 : regexp.hashCode());
+        result = prime * result + ((regexpErrorMsg == null) ? 0 : regexpErrorMsg.hashCode());
+        result = prime * result + repeatMax;
+        result = prime * result + (required ? 1231 : 1237);
+        result = prime * result + ((responseLayout == null) ? 0 : responseLayout.hashCode());
+        result = prime * result + ((responseSet == null) ? 0 : responseSet.hashCode());
+        result = prime * result + responseSetId;
+        result = prime * result + ((rightItemText == null) ? 0 : rightItemText.hashCode());
+        result = prime * result + sectionId;
+        result = prime * result + ((sectionName == null) ? 0 : sectionName.hashCode());
+        result = prime * result + (showItem ? 1231 : 1237);
+        result = prime * result + ((subHeader == null) ? 0 : subHeader.hashCode());
+        result = prime * result + ((widthDecimal == null) ? 0 : widthDecimal.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        ItemFormMetadataBean other = (ItemFormMetadataBean) obj;
+        if (columnNumber != other.columnNumber)
+            return false;
+        if (conditionalDisplay == null) {
+            if (other.conditionalDisplay != null)
+                return false;
+        } else if (!conditionalDisplay.equals(other.conditionalDisplay))
+            return false;
+        if (crfName == null) {
+            if (other.crfName != null)
+                return false;
+        } else if (!crfName.equals(other.crfName))
+            return false;
+        if (crfVersionId != other.crfVersionId)
+            return false;
+        if (crfVersionName == null) {
+            if (other.crfVersionName != null)
+                return false;
+        } else if (!crfVersionName.equals(other.crfVersionName))
+            return false;
+        if (defaultValue == null) {
+            if (other.defaultValue != null)
+                return false;
+        } else if (!defaultValue.equals(other.defaultValue))
+            return false;
+        if (descisionConditionId != other.descisionConditionId)
+            return false;
+        if (groupLabel == null) {
+            if (other.groupLabel != null)
+                return false;
+        } else if (!groupLabel.equals(other.groupLabel))
+            return false;
+        if (header == null) {
+            if (other.header != null)
+                return false;
+        } else if (!header.equals(other.header))
+            return false;
+        if (isHighlighted != other.isHighlighted)
+            return false;
+        if (itemId != other.itemId)
+            return false;
+        if (leftItemText == null) {
+            if (other.leftItemText != null)
+                return false;
+        } else if (!leftItemText.equals(other.leftItemText))
+            return false;
+        if (ordinal != other.ordinal)
+            return false;
+        if (pageNumberLabel == null) {
+            if (other.pageNumberLabel != null)
+                return false;
+        } else if (!pageNumberLabel.equals(other.pageNumberLabel))
+            return false;
+        if (parentId != other.parentId)
+            return false;
+        if (parentLabel == null) {
+            if (other.parentLabel != null)
+                return false;
+        } else if (!parentLabel.equals(other.parentLabel))
+            return false;
+        if (questionNumberLabel == null) {
+            if (other.questionNumberLabel != null)
+                return false;
+        } else if (!questionNumberLabel.equals(other.questionNumberLabel))
+            return false;
+        if (regexp == null) {
+            if (other.regexp != null)
+                return false;
+        } else if (!regexp.equals(other.regexp))
+            return false;
+        if (regexpErrorMsg == null) {
+            if (other.regexpErrorMsg != null)
+                return false;
+        } else if (!regexpErrorMsg.equals(other.regexpErrorMsg))
+            return false;
+        if (repeatMax != other.repeatMax)
+            return false;
+        if (required != other.required)
+            return false;
+        if (responseLayout == null) {
+            if (other.responseLayout != null)
+                return false;
+        } else if (!responseLayout.equals(other.responseLayout))
+            return false;
+        if (responseSet == null) {
+            if (other.responseSet != null)
+                return false;
+        } else if (!responseSet.equals(other.responseSet))
+            return false;
+        if (responseSetId != other.responseSetId)
+            return false;
+        if (rightItemText == null) {
+            if (other.rightItemText != null)
+                return false;
+        } else if (!rightItemText.equals(other.rightItemText))
+            return false;
+        if (sectionId != other.sectionId)
+            return false;
+        if (sectionName == null) {
+            if (other.sectionName != null)
+                return false;
+        } else if (!sectionName.equals(other.sectionName))
+            return false;
+        if (showItem != other.showItem)
+            return false;
+        if (subHeader == null) {
+            if (other.subHeader != null)
+                return false;
+        } else if (!subHeader.equals(other.subHeader))
+            return false;
+        if (widthDecimal == null) {
+            if (other.widthDecimal != null)
+                return false;
+        } else if (!widthDecimal.equals(other.widthDecimal))
+            return false;
+        return true;
+    }
+
     private String questionNumberLabel;
     private String leftItemText;
     private String rightItemText;

@@ -566,6 +566,9 @@ public abstract class CoreSecureController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, java.io.IOException {
         try {
+        
+            
+            
             logger.debug("Request");
             process(request, response);
         } catch (Exception e) {

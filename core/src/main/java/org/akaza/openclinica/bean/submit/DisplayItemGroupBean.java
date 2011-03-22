@@ -7,6 +7,67 @@ import java.util.List;
  * Created by IntelliJ IDEA. User: bruceperry Date: May 7, 2007
  */
 public class DisplayItemGroupBean implements Comparable {
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((editFlag == null) ? 0 : editFlag.hashCode());
+        result = prime * result + formInputOrdinal;
+        result = prime * result + ((groupMetaBean == null) ? 0 : groupMetaBean.hashCode());
+        result = prime * result + index;
+        result = prime * result + ((inputId == null) ? 0 : inputId.hashCode());
+        result = prime * result + (isAuto ? 1231 : 1237);
+        result = prime * result + ((itemGroupBean == null) ? 0 : itemGroupBean.hashCode());
+        result = prime * result + ((items == null) ? 0 : items.hashCode());
+        result = prime * result + ordinal;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        DisplayItemGroupBean other = (DisplayItemGroupBean) obj;
+        if (editFlag == null) {
+            if (other.editFlag != null)
+                return false;
+        } else if (!editFlag.equals(other.editFlag))
+            return false;
+        if (formInputOrdinal != other.formInputOrdinal)
+            return false;
+        if (groupMetaBean == null) {
+            if (other.groupMetaBean != null)
+                return false;
+        } else if (!groupMetaBean.equals(other.groupMetaBean))
+            return false;
+        if (index != other.index)
+            return false;
+        if (inputId == null) {
+            if (other.inputId != null)
+                return false;
+        } else if (!inputId.equals(other.inputId))
+            return false;
+        if (isAuto != other.isAuto)
+            return false;
+        if (itemGroupBean == null) {
+            if (other.itemGroupBean != null)
+                return false;
+        } else if (!itemGroupBean.equals(other.itemGroupBean))
+            return false;
+        if (items == null) {
+            if (other.items != null)
+                return false;
+        } else if (!items.equals(other.items))
+            return false;
+        if (ordinal != other.ordinal)
+            return false;
+        return true;
+    }
+
     private ItemGroupBean itemGroupBean;
     private ItemGroupMetadataBean groupMetaBean;
     private List<DisplayItemBean> items;

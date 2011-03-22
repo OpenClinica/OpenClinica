@@ -34,6 +34,61 @@ public class DisplayItemWithGroupBean implements Comparable {
         this.pageNumberLabel = "";
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((dbItemGroups == null) ? 0 : dbItemGroups.hashCode());
+        result = prime * result + (inGroup ? 1231 : 1237);
+        result = prime * result + ((itemGroup == null) ? 0 : itemGroup.hashCode());
+        result = prime * result + ((itemGroups == null) ? 0 : itemGroups.hashCode());
+        result = prime * result + ordinal;
+        result = prime * result + ((pageNumberLabel == null) ? 0 : pageNumberLabel.hashCode());
+        result = prime * result + ((singleItem == null) ? 0 : singleItem.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        DisplayItemWithGroupBean other = (DisplayItemWithGroupBean) obj;
+        if (dbItemGroups == null) {
+            if (other.dbItemGroups != null)
+                return false;
+        } else if (!dbItemGroups.equals(other.dbItemGroups))
+            return false;
+        if (inGroup != other.inGroup)
+            return false;
+        if (itemGroup == null) {
+            if (other.itemGroup != null)
+                return false;
+        } else if (!itemGroup.equals(other.itemGroup))
+            return false;
+        if (itemGroups == null) {
+            if (other.itemGroups != null)
+                return false;
+        } else if (!itemGroups.equals(other.itemGroups))
+            return false;
+        if (ordinal != other.ordinal)
+            return false;
+        if (pageNumberLabel == null) {
+            if (other.pageNumberLabel != null)
+                return false;
+        } else if (!pageNumberLabel.equals(other.pageNumberLabel))
+            return false;
+        if (singleItem == null) {
+            if (other.singleItem != null)
+                return false;
+        } else if (!singleItem.equals(other.singleItem))
+            return false;
+        return true;
+    }
+
     /**
      * @return the dbItemGroups
      */

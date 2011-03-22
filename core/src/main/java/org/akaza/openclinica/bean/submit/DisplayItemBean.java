@@ -345,6 +345,127 @@ public class DisplayItemBean implements Comparable {
         metadata.setResponseSet(rsb);
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((children == null) ? 0 : children.hashCode());
+        result = prime * result + ((data == null) ? 0 : data.hashCode());
+        result = prime * result + ((dbData == null) ? 0 : dbData.hashCode());
+        result = prime * result + ((dbValue == null) ? 0 : dbValue.hashCode());
+        result = prime * result + discrepancyNoteStatus;
+        result = prime * result + ((discrepancyNotes == null) ? 0 : discrepancyNotes.hashCode());
+        result = prime * result + ((editFlag == null) ? 0 : editFlag.hashCode());
+        result = prime * result + ((eventDefinitionCRF == null) ? 0 : eventDefinitionCRF.hashCode());
+        result = prime * result + (isSCDtoBeShown ? 1231 : 1237);
+        result = prime * result + ((item == null) ? 0 : item.hashCode());
+        result = prime * result + ((metadata == null) ? 0 : metadata.hashCode());
+        result = prime * result + numChildren;
+        result = prime * result + numColumns;
+        result = prime * result + numDiscrepancyNotes;
+        result = prime * result + ((scdDisplayInfo == null) ? 0 : scdDisplayInfo.hashCode());
+        result = prime * result + ((scdItemMetadataBean == null) ? 0 : scdItemMetadataBean.hashCode());
+        result = prime * result + ((scdSetsForControl == null) ? 0 : scdSetsForControl.hashCode());
+        result = prime * result + totClosed;
+        result = prime * result + totNA;
+        result = prime * result + totNew;
+        result = prime * result + totRes;
+        result = prime * result + totUpdated;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        DisplayItemBean other = (DisplayItemBean) obj;
+        if (children == null) {
+            if (other.children != null)
+                return false;
+        } else if (!children.equals(other.children))
+            return false;
+        if (data == null) {
+            if (other.data != null)
+                return false;
+        } else if (!data.equals(other.data))
+            return false;
+        if (dbData == null) {
+            if (other.dbData != null)
+                return false;
+        } else if (!dbData.equals(other.dbData))
+            return false;
+        if (dbValue == null) {
+            if (other.dbValue != null)
+                return false;
+        } else if (!dbValue.equals(other.dbValue))
+            return false;
+        if (discrepancyNoteStatus != other.discrepancyNoteStatus)
+            return false;
+        if (discrepancyNotes == null) {
+            if (other.discrepancyNotes != null)
+                return false;
+        } else if (!discrepancyNotes.equals(other.discrepancyNotes))
+            return false;
+        if (editFlag == null) {
+            if (other.editFlag != null)
+                return false;
+        } else if (!editFlag.equals(other.editFlag))
+            return false;
+        if (eventDefinitionCRF == null) {
+            if (other.eventDefinitionCRF != null)
+                return false;
+        } else if (!eventDefinitionCRF.equals(other.eventDefinitionCRF))
+            return false;
+        if (isSCDtoBeShown != other.isSCDtoBeShown)
+            return false;
+        if (item == null) {
+            if (other.item != null)
+                return false;
+        } else if (!item.equals(other.item))
+            return false;
+        if (metadata == null) {
+            if (other.metadata != null)
+                return false;
+        } else if (!metadata.equals(other.metadata))
+            return false;
+        if (numChildren != other.numChildren)
+            return false;
+        if (numColumns != other.numColumns)
+            return false;
+        if (numDiscrepancyNotes != other.numDiscrepancyNotes)
+            return false;
+        if (scdDisplayInfo == null) {
+            if (other.scdDisplayInfo != null)
+                return false;
+        } else if (!scdDisplayInfo.equals(other.scdDisplayInfo))
+            return false;
+        if (scdItemMetadataBean == null) {
+            if (other.scdItemMetadataBean != null)
+                return false;
+        } else if (!scdItemMetadataBean.equals(other.scdItemMetadataBean))
+            return false;
+        if (scdSetsForControl == null) {
+            if (other.scdSetsForControl != null)
+                return false;
+        } else if (!scdSetsForControl.equals(other.scdSetsForControl))
+            return false;
+        if (totClosed != other.totClosed)
+            return false;
+        if (totNA != other.totNA)
+            return false;
+        if (totNew != other.totNew)
+            return false;
+        if (totRes != other.totRes)
+            return false;
+        if (totUpdated != other.totUpdated)
+            return false;
+        return true;
+    }
+
     /**
      * @return Returns the eventDefinitionCRF.
      */
