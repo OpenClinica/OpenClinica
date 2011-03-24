@@ -41,6 +41,10 @@ public class DiscrepancyValidator extends Validator {
 
     @Override
     protected HashMap validate(String fieldName, Validation v) {
+        // Mantis Issue 5827: Forse validate if different value from IDE though DNotes present 
+        if (v.getType() == MATCHES_INITIAL_DATA_ENTRY_VALUE) {
+            return super.validate(fieldName, v);
+        }
         if (!v.isAlwaysExecuted()) {
             if (notes.hasNote(fieldName) || notes.getNumExistingFieldNotes(fieldName) > 0) {
                 return errors;
