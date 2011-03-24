@@ -29,6 +29,9 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+<c:set var="formatLocale"><fmt:message key="locale_string" bundle="${resformat}"/></c:set>
+<fmt:setLocale value="${formatLocale}" scope="session"/>
 
 
 <body class="login_BG" onLoad="document.getElementById('username').focus();">

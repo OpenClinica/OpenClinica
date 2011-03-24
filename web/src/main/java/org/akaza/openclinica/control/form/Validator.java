@@ -1199,7 +1199,7 @@ public class Validator {
         if (!StringUtil.isFormatDate(fieldValue, resformat.getString("date_format_string"))) {
             return false;
         }
-        SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_format_string"), ResourceBundleProvider.getLocale());
+        SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_format_string"));
         sdf.setLenient(false);
         try {
             java.util.Date date = sdf.parse(fieldValue);
