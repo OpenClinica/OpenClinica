@@ -12,7 +12,6 @@
 <head>
 <title><fmt:message key="openclinica" bundle="${resword}"/>- <fmt:message key="add_discrepancy_note" bundle="${resword}"/></title>
 <link rel="stylesheet" href="includes/styles.css" type="text/css">
-<script language="JavaScript" src="includes/global_functions_javascript.js"></script>
 
 <script language="JavaScript" src="includes/CalendarPopup.js"></script>
 <script language="JavaScript" src="includes/global_functions_javascript.js"></script>
@@ -27,6 +26,10 @@
 
 
 </style>
+    <script type="text/javascript" language="javascript">
+        setImageInParentWin('flag_<c:out value="${discrepancyNote.field}"/>','images/icon_Note.gif');
+    </script>
+
 </head>
 <body class="popup_BG" style="margin: 25px;" onload="javascript:refreshSource('true','/ViewNotes?');javascript:window.setTimeout('window.close()',3000);">
 <div style="float: left;"><h1 class="table_title_Submit"><fmt:message key="add_discrepancy_note" bundle="${resword}"/></h1></div>

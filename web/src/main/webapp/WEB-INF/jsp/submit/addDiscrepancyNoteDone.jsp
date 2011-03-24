@@ -24,10 +24,11 @@
 
 
 </style>
+    <script type="text/javascript" language="javascript">
+        setImageInParentWin('flag_<c:out value="${discrepancyNote.field}"/>','images/icon_Note.gif');
+    </script>
+
 </head>
-<%--
-javascript:setImageInParentWin('flag_<c:out value="${discrepancyNote.field}"/>','images/icon_Note.gif');
---%>
 <body class="popup_BG" style="margin: 25px;">
 <div style="float: left;"><h1 class="table_title_Submit"><fmt:message key="add_discrepancy_note" bundle="${resword}"/></h1></div>
 <div style="float: right;"><p><a href="#" onclick="javascript:window.close();"><fmt:message key="close_window" bundle="${resword}"/></a></p></div>
