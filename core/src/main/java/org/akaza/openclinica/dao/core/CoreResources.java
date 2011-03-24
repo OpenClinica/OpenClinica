@@ -21,6 +21,7 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.Map;
 import java.util.Properties;
 
 public class CoreResources implements ResourceLoaderAware {
@@ -131,15 +132,21 @@ public class CoreResources implements ResourceLoaderAware {
         logMe("catalina home - "+value);
         logMe("CATALINA_HOME system variable is"+System.getProperty("CATALINA_HOME"));
         logMe("CATALINA_HOME system env variable is"+System.getenv("CATALINA_HOME"));
-        if (value.contains("${catalina.home}")) {
-            value = value.replace("${catalina.home}", System.getProperty("CATALINA_HOME"));
+        logMe(" -Dcatalina.home system property variable is"+System.getProperty(" -Dcatalina.home"));
+        logMe("CATALINA.HOME system env variable is"+System.getenv("catalina.home"));
+        logMe("CATALINA_BASE system env variable is"+System.getenv("CATALINA_BASE"));
+        Map<String, String> env = System.getenv();
+        for (String envName : env.keySet()) {
+            logMe("%s=%s%n"+ envName+ env.get(envName));
         }
-        if (value.contains("${catalina.home}")) {
+
+        
+        if (value.contains("${catalina.home}") &&  System.getenv("CATALINA_HOME")!=null    ) {
             value = value.replace("${catalina.home}", System.getenv("CATALINA_HOME"));
         }
 
-        if (value.contains("$catalina.home")) {
-            value = value.replace("$catalina.home", System.getenv("CATALINA_HOME"));
+        if (value.contains("$catalina.home")&&  System.getenv("CATALINA_BASE")!=null) {
+            value = value.replace("$catalina.home", System.getenv("CATALINA_BASE"));
         }
         logMe("catalina home is.."+value);
         return value;
@@ -693,8 +700,8 @@ public class CoreResources implements ResourceLoaderAware {
 
     // TODO comment out system out after dev
     private static void logMe(String message) {
-        System.out.println(message);
-        logger.debug(message);
+      // System.out.println(message);
+        logger.info(message);
     }
 
 }
