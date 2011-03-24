@@ -126,7 +126,14 @@
                     </tr>
                     <tr>
                         <td class="table_header_column"><fmt:message key="location" bundle="${resword}"/></td>
-                        <td class="table_cell"><span style="float:left"><c:out value="${studyEvent.location}"/></span>
+                        <td class="table_cell">
+                            <c:set var="eventLocation" value="${studyEvent.location}"/>
+                            <c:if test="${studyEvent.location eq ''}">
+                                <c:set var="eventLocation" value="NA"/>
+                            </c:if>
+                            <span style="float:left">
+                                <c:out value="${eventLocation}"/>
+                            </span>
                             <%-- CreateDiscrepancyNote?id=392&name=studyEvent&field=location&column=location&strErrMsg=--%>
                             <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
                                 <c:set var="isNew" value="${hasLocationNote eq 'yes' ? 0 : 1}"/>
@@ -475,7 +482,7 @@
     </c:choose>
 
 </td>
-<td class="table_cell">
+<td class="table_cell" style="width:180px;">
     <c:set var="actionQuery" value="" />
     <c:if test="${study.status.available}">
         <c:if test="${dec.continueInitialDataEntryPermitted}">
