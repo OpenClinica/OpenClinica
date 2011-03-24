@@ -132,7 +132,7 @@ public class RemoveSubjectServlet extends SecureController {
                     }
                 }
 
-                String emailBody = respage.getString("the_subject") + " " + respage.getString("has_been_removed_succesfully");
+                String emailBody = respage.getString("the_subject") + " "+ subject.getUniqueIdentifier() + " " + respage.getString("has_been_removed_succesfully");
 
                 addPageMessage(emailBody);
 //                sendEmail(emailBody);
