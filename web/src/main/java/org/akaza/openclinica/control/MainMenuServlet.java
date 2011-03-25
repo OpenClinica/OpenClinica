@@ -205,6 +205,7 @@ public class MainMenuServlet extends SecureController {
     private void setupSubjectSDVTable() {
 
         request.setAttribute("studyId", currentStudy.getId());
+        request.setAttribute("showMoreLink", "true");
         String sdvMatrix = getSDVUtil().renderEventCRFTableWithLimit(request, currentStudy.getId(), "");
         request.setAttribute("sdvMatrix", sdvMatrix);
     }
