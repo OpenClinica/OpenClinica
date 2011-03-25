@@ -125,8 +125,14 @@ public class DataEntryRuleRunner extends RuleRunner {
                 ActionProcessor ap =
                     ActionProcessorFacade.getActionProcessor(ruleActionContainer.getRuleAction().getActionType(), ds, getMailSender(), dynamicsMetadataService,
                             ruleActionContainer.getRuleSetBean(), getRuleActionRunLogDao(), ruleActionContainer.getRuleAction().getRuleSetRule());
+                
+               
+                ItemDataBean  itemData =            
+                    getExpressionService().getItemDataBeanFromDb(ruleActionContainer.getRuleSetBean().getTarget().getValue());
+                
+                
                 RuleActionBean rab =
-                    ap.execute(RuleRunnerMode.DATA_ENTRY, executionMode, ruleActionContainer.getRuleAction(), ruleActionContainer.getItemDataBean(),
+                    ap.execute(RuleRunnerMode.DATA_ENTRY, executionMode, ruleActionContainer.getRuleAction(), itemData,
                             DiscrepancyNoteBean.ITEM_DATA, currentStudy, ub, prepareEmailContents(ruleActionContainer.getRuleSetBean(), ruleActionContainer
                                     .getRuleAction().getRuleSetRule(), currentStudy, ruleActionContainer.getRuleAction()));
                 if (rab != null) {
