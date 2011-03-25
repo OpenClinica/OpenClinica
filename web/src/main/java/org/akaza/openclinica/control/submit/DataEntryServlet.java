@@ -1405,6 +1405,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     String fieldName = iter3.next().toString();
                     logger.debug("found error after shuffle " + fieldName);
                 }
+                //Mantis Issue: 8116. Parsist the markComplete chebox on error 
+                request.setAttribute("markComplete", fp.getString(INPUT_MARK_COMPLETE));
                 // << tbh, 02/2010
                 // YW >>
                 // copied
@@ -1782,7 +1784,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
                             forwardPage(getJSPPage(), request, response);
                             return;
                         }
-
                     }
 
                     // now write the event crf bean to the database

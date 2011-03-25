@@ -18,6 +18,7 @@
 <jsp:useBean scope="request" id="annotations" class="java.lang.String" />
 <jsp:useBean scope='request' id='pageMessages' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='formMessages' class='java.util.HashMap'/>
+<jsp:useBean scope='request' id='markComplete' class='java.lang.String'/>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -443,13 +444,13 @@ window.onload = initmb;
                                         <c:choose>
                                             <c:when test="${section.eventDefinitionCRF.electronicSignature == true}">
                                                 <td valign="bottom">  <input type="checkbox" id="markCompleteId" name="markComplete" value="Yes"
-                                                                             onclick="sm('box', this, 730,100);">
+                                                                            <c:if test="${markComplete=='Yes'}"> checked </c:if> onclick="sm('box', this, 730,100);">
                                                 </td>
                                                 <td valign="bottom" nowrap="nowrap">&nbsp; <fmt:message key="mark_CRF_complete" bundle="${resword}"/>&nbsp;&nbsp;&nbsp;</td>
                                             </c:when>
                                             <c:otherwise>
                                                 <td valign="bottom">  <input type="checkbox" id="markCompleteId" name="markComplete" value="Yes"
-                                                                             onclick="displayMessageFromCheckbox(this)">
+                                                                            <c:if test="${markComplete=='Yes'}"> checked </c:if> onclick="displayMessageFromCheckbox(this)">
                                                 </td>
                                                 <td valign="bottom" nowrap="nowrap">&nbsp; <fmt:message key="mark_CRF_complete" bundle="${resword}"/>&nbsp;&nbsp;&nbsp;</td>
                                             </c:otherwise>
@@ -502,13 +503,13 @@ window.onload = initmb;
                                         <c:choose>
                                             <c:when test="${section.eventDefinitionCRF.electronicSignature == true}">
                                                 <td valign="bottom">  <input type="checkbox" id="markCompleteId" name="markComplete" value="Yes"
-                                                                             onclick="sm('box', this, 730,100);">
+                                                                            <c:if test="${markComplete=='Yes'}"> checked </c:if> onclick="sm('box', this, 730,100);">
                                                 </td>
                                                 <td valign="bottom" nowrap="nowrap">&nbsp; <fmt:message key="mark_CRF_complete" bundle="${resword}"/>&nbsp;&nbsp;&nbsp;</td>
                                             </c:when>
                                             <c:otherwise>
                                                 <td valign="bottom">  <input type="checkbox" id="markCompleteId" name="markComplete" value="Yes"
-                                                                             onclick="displayMessageFromCheckbox(this)">
+                                                                            <c:if test="${markComplete=='Yes'}"> checked </c:if> onclick="displayMessageFromCheckbox(this)">
                                                 </td>
                                                 <td valign="bottom" nowrap="nowrap">&nbsp; <fmt:message key="mark_CRF_complete" bundle="${resword}"/>&nbsp;&nbsp;&nbsp;</td>
                                             </c:otherwise>
@@ -1413,13 +1414,13 @@ table-->
                             <c:choose>
                                 <c:when test="${section.eventDefinitionCRF.electronicSignature == true}">
                                     <td valign="bottom">  <input type="checkbox" id="markCompleteId" name="markComplete" value="Yes"
-                                                                 onclick="sm('box', this, 730,100);">
+                                                                <c:if test="${markComplete=='Yes'}"> checked </c:if> onclick="sm('box', this, 730,100);">
                                     </td>
                                     <td valign="bottom" nowrap="nowrap">&nbsp; <fmt:message key="mark_CRF_complete" bundle="${resword}"/>&nbsp;&nbsp;&nbsp;</td>
                                 </c:when>
                                 <c:otherwise>
                                     <td valign="bottom">  <input type="checkbox" id="markCompleteId" name="markComplete" value="Yes"
-                                                                 onclick="displayMessageFromCheckbox(this)">
+                                                                <c:if test="${markComplete=='Yes'}"> checked </c:if> onclick="displayMessageFromCheckbox(this)">
                                     </td>
                                     <td valign="bottom" nowrap="nowrap">&nbsp; <fmt:message key="mark_CRF_complete" bundle="${resword}"/>&nbsp;&nbsp;&nbsp;</td>
                                 </c:otherwise>
