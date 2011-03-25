@@ -408,33 +408,25 @@ function updateThis(multiSelEle, count) {
 	</c:when>
 	<c:when test="${config.parameter.handle=='interviewerNameRequired'}">
 		   <tr valign="top"><td class="formlabel"><fmt:message key="when_entering_data_entry_interviewer" bundle="${resword}"/></td><td>
-		   <c:choose>
-		   <c:when test="${config.value.value== 'true'}">
-		    <input type="radio" checked name="interviewerNameRequired" value="true"><fmt:message key="yes" bundle="${resword}"/>
-		    <input type="radio" name="interviewerNameRequired" value="false"><fmt:message key="no" bundle="${resword}"/>
-		   
-		   </c:when>    
-		   <c:otherwise>
-		    <input type="radio" name="interviewerNameRequired" value="true"><fmt:message key="yes" bundle="${resword}"/>
-		    <input type="radio" checked name="interviewerNameRequired" value="false"><fmt:message key="no" bundle="${resword}"/>   
-		   </c:otherwise>
-		  </c:choose>
+               <input type="radio" <c:if test="${newStudy.studyParameterConfig.interviewerNameRequired== 'yes'}">checked</c:if> name="interviewerNameRequired" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+               <input type="radio" <c:if test="${newStudy.studyParameterConfig.interviewerNameRequired== 'no'}">checked</c:if> name="interviewerNameRequired" value="no"><fmt:message key="no" bundle="${resword}"/>
+               <input type="radio" <c:if test="${newStudy.studyParameterConfig.interviewerNameRequired== 'not_used'}">checked</c:if> name="interviewerNameRequired" value="not_used"><fmt:message key="not_used" bundle="${resword}"/>
 		  </td>
 		  </tr>
 	</c:when>
 	<c:when test="${config.parameter.handle=='interviewerNameDefault'}">	  
 		  <tr valign="top"><td class="formlabel"><fmt:message key="interviewer_name_default_as_blank" bundle="${resword}"/></td><td>
-		   <c:choose>
-		   <c:when test="${config.value.value== 'blank'}">
-		    <input type="radio" checked name="interviewerNameDefault" value="blank"><fmt:message key="blank" bundle="${resword}"/>:
-		    <input type="radio" name="interviewerNameDefault" value="pre-populated"><fmt:message key="pre_populated_from_active_user" bundle="${resword}"/>
-		   
-		   </c:when>    
-		   <c:otherwise>
-		    <input type="radio" name="interviewerNameDefault" value="blank"><fmt:message key="blank" bundle="${resword}"/>:
-		    <input type="radio" checked name="interviewerNameDefault" value="pre-populated"><fmt:message key="pre_populated_from_SE" bundle="${resword}"/>
-		   </c:otherwise>
-		  </c:choose>
+              <c:choose>
+              <c:when test="${newStudy.studyParameterConfig.interviewerNameDefault== 'blank'}">
+               <input type="radio" checked name="interviewerNameDefault" value="blank"><fmt:message key="blank" bundle="${resword}"/>
+               <input type="radio" name="interviewerNameDefault" value="pre-populated"><fmt:message key="pre_populated_from_active_user" bundle="${resword}"/>
+
+              </c:when>
+              <c:otherwise>
+               <input type="radio" name="interviewerNameDefault" value="blank"><fmt:message key="blank" bundle="${resword}"/>
+               <input type="radio" checked name="interviewerNameDefault" value="re-populated"><fmt:message key="pre_populated_from_active_user" bundle="${resword}"/>
+              </c:otherwise>
+             </c:choose>
 		  </td>
 		  </tr>
 	</c:when>
@@ -456,33 +448,25 @@ function updateThis(multiSelEle, count) {
 	</c:when>
 	<c:when test="${config.parameter.handle=='interviewDateRequired'}">	  
 		  <tr valign="top"><td class="formlabel"><fmt:message key="interviewer_date_required" bundle="${resword}"/></td><td>
-		   <c:choose>
-		   <c:when test="${config.value.value== 'true'}">
-		    <input type="radio" checked name="interviewDateRequired" value="true"><fmt:message key="yes" bundle="${resword}"/>
-		    <input type="radio" name="interviewDateRequired" value="false"><fmt:message key="no" bundle="${resword}"/>
-		   
-		   </c:when>    
-		   <c:otherwise>
-		    <input type="radio" name="interviewDateRequired" value="true"><fmt:message key="yes" bundle="${resword}"/>
-		    <input type="radio" checked name="interviewDateRequired" value="false"><fmt:message key="no" bundle="${resword}"/>   
-		   </c:otherwise>
-		  </c:choose>
+              <input type="radio" <c:if test="${newStudy.studyParameterConfig.interviewDateRequired== 'yes'}"> checked </c:if> name="interviewDateRequired" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+              <input type="radio" <c:if test="${newStudy.studyParameterConfig.interviewDateRequired== 'no'}"> checked </c:if> name="interviewDateRequired" value="no"><fmt:message key="no" bundle="${resword}"/>
+              <input type="radio" <c:if test="${newStudy.studyParameterConfig.interviewDateRequired== 'not_used'}"> checked </c:if> name="interviewDateRequired" value="not_used"><fmt:message key="not_used" bundle="${resword}"/>
 		  </td>
 		  </tr>
     </c:when>		  
 	<c:when test="${config.parameter.handle=='interviewDateDefault'}">	  
 		  <tr valign="top"><td class="formlabel"><fmt:message key="interviewer_date_default_as_blank" bundle="${resword}"/></td><td>
-		   <c:choose>
-		   <c:when test="${config.value.value== 'blank'}">
-		    <input type="radio" checked name="interviewDateDefault" value="blank"><fmt:message key="blank" bundle="${resword}"/>:
-		    <input type="radio" name="interviewDateDefault" value="pre-populated"><fmt:message key="pre_populated_from_SE" bundle="${resword}"/>
-		   
-		   </c:when>    
-		   <c:otherwise>
-		    <input type="radio" name="interviewDateDefault" value="blank"><fmt:message key="blank" bundle="${resword}"/>:
-		    <input type="radio" checked name="interviewDateDefault" value="pre-populated"><fmt:message key="pre_populated_from_SE" bundle="${resword}"/>   
-		   </c:otherwise>
-		  </c:choose>
+              <c:choose>
+              <c:when test="${newStudy.studyParameterConfig.interviewDateDefault== 'blank'}">
+               <input type="radio" checked name="interviewDateDefault" value="blank"><fmt:message key="blank" bundle="${resword}"/>
+               <input type="radio" name="interviewDateDefault" value="pre-populated"><fmt:message key="pre_populated_from_SE" bundle="${resword}"/>
+
+              </c:when>
+              <c:otherwise>
+               <input type="radio" name="interviewDateDefault" value="blank"><fmt:message key="blank" bundle="${resword}"/>
+               <input type="radio" checked name="interviewDateDefault" value="re-populated"><fmt:message key="pre_populated_from_SE" bundle="${resword}"/>
+              </c:otherwise>
+             </c:choose>
 		  </td>
 		  </tr>
 	 </c:when>

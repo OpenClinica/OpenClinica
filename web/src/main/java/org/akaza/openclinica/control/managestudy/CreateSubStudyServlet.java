@@ -128,15 +128,17 @@ public class CreateSubStudyServlet extends SecureController {
                 newStudy.setStudyParameters(configs);
 
                 // YW 10-12-2007 <<
-                newStudy.getStudyParameterConfig().setInterviewerNameRequired(fp.getString("interviewerNameRequired"));
-                newStudy.getStudyParameterConfig().setInterviewerNameDefault(fp.getString("interviewerNameDefault"));
-                newStudy.getStudyParameterConfig().setInterviewDateRequired(fp.getString("interviewDateRequired"));
-                newStudy.getStudyParameterConfig().setInterviewDateDefault(fp.getString("interviewDateDefault"));
+//                newStudy.getStudyParameterConfig().setInterviewerNameRequired(fp.getString("interviewerNameRequired"));
+//                newStudy.getStudyParameterConfig().setInterviewerNameDefault(fp.getString("interviewerNameDefault"));
+//                newStudy.getStudyParameterConfig().setInterviewDateRequired(fp.getString("interviewDateRequired"));
+//                newStudy.getStudyParameterConfig().setInterviewDateDefault(fp.getString("interviewDateDefault"));
                 // YW >>
 
                 // BWP 3169 1-12-2008 <<
                 newStudy.getStudyParameterConfig().setInterviewerNameEditable(currentStudy.getStudyParameterConfig().getInterviewerNameEditable());
+                newStudy.getStudyParameterConfig().setInterviewerNameDefault(currentStudy.getStudyParameterConfig().getInterviewerNameDefault());
                 newStudy.getStudyParameterConfig().setInterviewDateEditable(currentStudy.getStudyParameterConfig().getInterviewDateEditable());
+                newStudy.getStudyParameterConfig().setInterviewDateDefault(currentStudy.getStudyParameterConfig().getInterviewDateDefault());
                 // >>
 
                 try {
