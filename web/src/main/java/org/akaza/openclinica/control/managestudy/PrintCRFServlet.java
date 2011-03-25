@@ -102,7 +102,7 @@ public class PrintCRFServlet extends DataEntryServlet {
         // The existing application doesn't print null values, even if they are
         // defined in the event definition
         int crfVersionId = fp.getInt("id", true);
-
+        boolean isSubmitted = false;
         if (crfVersionId == 0) {
             addPageMessage(respage.getString("please_choose_a_crf_to_view_details"), request);
             forwardPage(Page.CRF_LIST_SERVLET, request, response);
@@ -161,7 +161,7 @@ public class PrintCRFServlet extends DataEntryServlet {
         request.setAttribute(INPUT_EVENT_CRF,ecb);
         request.setAttribute(SECTION_BEAN,sb);
       
-        DisplaySectionBean dsb = super.getDisplayBean(false, false, request);
+        DisplaySectionBean dsb = super.getDisplayBean(false, false, request, isSubmitted);
         request.setAttribute("allSections", sectionBeans);
         request.setAttribute("displayAllCRF", "1");
         request.setAttribute(BEAN_DISPLAY, dsb);

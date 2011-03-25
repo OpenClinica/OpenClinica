@@ -91,6 +91,7 @@ public class PrintDataEntryServlet extends DataEntryServlet {
     @Override
     public void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
         FormProcessor fp = new FormProcessor(request);
+        boolean isSubmitted = false;
         int eventCRFId = fp.getInt("ecId");
         //JN:The following were the the global variables, moved as local.
         EventCRFBean ecb ;
@@ -206,7 +207,7 @@ public class PrintDataEntryServlet extends DataEntryServlet {
         if (!sectionsHaveGroups) {
             request.setAttribute(INPUT_EVENT_CRF,ecb);
             request.setAttribute(SECTION_BEAN,sb);
-            DisplaySectionBean dsb = super.getDisplayBean(false, false, request);
+            DisplaySectionBean dsb = super.getDisplayBean(false, false, request, isSubmitted);
             request.setAttribute("allSections", sectionBeans);
             request.setAttribute("displayAll", "1");
             request.setAttribute(BEAN_DISPLAY, dsb);

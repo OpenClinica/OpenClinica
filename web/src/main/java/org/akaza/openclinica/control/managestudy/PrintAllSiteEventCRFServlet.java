@@ -90,7 +90,7 @@ public class PrintAllSiteEventCRFServlet extends DataEntryServlet {
 
         CRFVersionDAO cvdao = new CRFVersionDAO(getDataSource());
         CRFDAO cdao = new CRFDAO(getDataSource());
-
+        boolean isSubmitted = false;
         ArrayList<EventDefinitionCRFBean> edcs = new ArrayList();
         for (StudyEventDefinitionBean sed : seds) {
             int defId = sed.getId();
@@ -203,7 +203,7 @@ public class PrintAllSiteEventCRFServlet extends DataEntryServlet {
                 request.setAttribute(ALL_SECTION_BEANS, allSectionBeans);
                 sectionBeans = super.getAllDisplayBeans(request);
              
-                DisplaySectionBean dsb = super.getDisplayBean(false, false, request);
+                DisplaySectionBean dsb = super.getDisplayBean(false, false, request, isSubmitted);
                 PrintCRFBean printCrfBean = new PrintCRFBean();
                 printCrfBean.setAllSections(sectionBeans);
                 printCrfBean.setDisplaySectionBean(dsb);

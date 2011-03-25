@@ -77,7 +77,7 @@ public class PrintAllEventCRFServlet extends DataEntryServlet {
         ArrayList<SectionBean> allSectionBeans;
         // The PrintDataEntry servlet handles this parameter
         int siteId = fp.getInt("siteId");
-
+        boolean isSubmitted = false;
         StudyEventDefinitionDAO sedao = new StudyEventDefinitionDAO(sm.getDataSource());
         EventDefinitionCRFDAO edao = new EventDefinitionCRFDAO(sm.getDataSource());
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
@@ -203,7 +203,7 @@ public class PrintAllEventCRFServlet extends DataEntryServlet {
                 request.setAttribute(ALL_SECTION_BEANS, allSectionBeans);
                 sectionBeans = super.getAllDisplayBeans(request);
            
-                DisplaySectionBean dsb = super.getDisplayBean(false, false, request);
+                DisplaySectionBean dsb = super.getDisplayBean(false, false, request, isSubmitted);
                 PrintCRFBean printCrfBean = new PrintCRFBean();
                 printCrfBean.setAllSections(sectionBeans);
                 printCrfBean.setDisplaySectionBean(dsb);

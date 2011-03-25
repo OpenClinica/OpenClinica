@@ -223,18 +223,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
     
     private DataSource dataSource;
 
-    /**
-     * Determines whether the form was submitted. Calculated once in processRequest. The reason we don't use the normal means to determine if the form was
-     * submitted (ie FormProcessor.isSubmitted) is because when we use forwardPage, Java confuses the inputs from the just-processed form with the inputs for
-     * the forwarded-to page. This is a problem since frequently we're forwarding from one (submitted) section to the next (unsubmitted) section. If we use the
-     * normal means, Java will always think that the unsubmitted section is, in fact, submitted. This member is guaranteed to be calculated before
-     * shouldLoadDBValues() is called.
-     */
-    protected boolean isSubmitted = false;
-
-    protected boolean hasGroup = false;
+ 
    
-    protected String rowDisplay = "";
     
     
 
@@ -299,6 +289,17 @@ public abstract class DataEntryServlet extends CoreSecureController {
         StudyBean currentStudy =    (StudyBean) session.getAttribute("study");
         StudyUserRoleBean  currentRole = (StudyUserRoleBean) session.getAttribute("userRole");
         SectionDAO sdao =  new SectionDAO(getDataSource());
+        /**
+         * Determines whether the form was submitted. Calculated once in processRequest. The reason we don't use the normal means to determine if the form was
+         * submitted (ie FormProcessor.isSubmitted) is because when we use forwardPage, Java confuses the inputs from the just-processed form with the inputs for
+         * the forwarded-to page. This is a problem since frequently we're forwarding from one (submitted) section to the next (unsubmitted) section. If we use the
+         * normal means, Java will always think that the unsubmitted section is, in fact, submitted. This member is guaranteed to be calculated before
+         * shouldLoadDBValues() is called.
+         */
+         boolean isSubmitted = false;
+
+        boolean hasGroup = false;
+        
         EventCRFDAO ecdao = null;
         FormProcessor fp = new FormProcessor(request);
         logMe("Enterting DataEntry Servlet"+System.currentTimeMillis());
@@ -513,7 +514,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         CRFVersionBean crfVersionBean = (CRFVersionBean) cvdao.findByPK(ecb.getCRFVersionId());
 
         List<RuleSetBean> ruleSets = createAndInitializeRuleSet(currentStudy, studyEventDefinition, crfVersionBean, studyEventBean, ecb, shouldRunRules(), request, response);
-        DisplaySectionBean section = getDisplayBean(hasGroup, false, request);
+        DisplaySectionBean section = getDisplayBean(hasGroup, false, request, isSubmitted);
         //hasSCDItem has been initiallized in getDisplayBean() which is online above
         if(section.getSection().hasSCDItem()) {
             SimpleConditionalDisplayService cds0 = (SimpleConditionalDisplayService) SpringServletAccess.getApplicationContext(getServletContext()).getBean(
@@ -3194,8 +3195,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
     /**
      * Retrieve the DisplaySectionBean which will be used to display the Event CRF Section on the JSP, and also is used to controll processRequest.
      * @param request TODO
+     * @param isSubmitted TODO
      */
-    protected DisplaySectionBean getDisplayBean(boolean hasGroup, boolean includeUngroupedItems, HttpServletRequest request) throws Exception {
+    protected DisplaySectionBean getDisplayBean(boolean hasGroup, boolean includeUngroupedItems, HttpServletRequest request, boolean isSubmitted) throws Exception {
         DisplaySectionBean section = new DisplaySectionBean();
         FormProcessor fp = new FormProcessor(request);
         HttpSession session = request.getSession();

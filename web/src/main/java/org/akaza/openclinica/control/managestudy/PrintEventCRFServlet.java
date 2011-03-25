@@ -76,6 +76,7 @@ public class PrintEventCRFServlet extends DataEntryServlet {
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
         StudyEventDefinitionDAO sedao = new StudyEventDefinitionDAO(getDataSource());
         int defId = fp.getInt("id", true);
+        boolean isSubmitted = false;
         ArrayList<SectionBean> allSectionBeans;
         if (defId == 0) {
             addPageMessage(respage.getString("please_choose_a_definition_to_view"), request);
@@ -196,7 +197,7 @@ public class PrintEventCRFServlet extends DataEntryServlet {
                 sectionBeans = super.getAllDisplayBeans(request);
                 request.setAttribute(INPUT_EVENT_CRF,ecb);
                 request.setAttribute(SECTION_BEAN,sb);
-                DisplaySectionBean dsb = super.getDisplayBean(false, false, request);
+                DisplaySectionBean dsb = super.getDisplayBean(false, false, request, isSubmitted);
                 //            request.setAttribute("allSections", sectionBeans);
                 //            request.setAttribute("displayAllCRF", "1");
                 //            request.setAttribute(BEAN_DISPLAY, dsb);

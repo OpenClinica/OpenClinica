@@ -157,7 +157,9 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
         FormProcessor fp = new FormProcessor(request);
         StudyBean currentStudy =    (StudyBean)  request.getSession().getAttribute("study");
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
+        
         SectionBean sb = (SectionBean)request.getAttribute(SECTION_BEAN);
+        boolean isSubmitted = false;
         EventDefinitionCRFBean edcb = (EventDefinitionCRFBean)request.getAttribute(EVENT_DEF_CRF_BEAN);
         if (!fp.getString("exitTo").equals("")) {
             request.setAttribute("exitTo", fp.getString("exitTo"));
@@ -448,7 +450,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
         request.setAttribute(EVENT_DEF_CRF_BEAN,edcb);
         request.setAttribute(INPUT_EVENT_CRF,ecb);
         request.setAttribute(SECTION_BEAN,sb);
-        dsb = super.getDisplayBean(hasItemGroup, false, request);
+        dsb = super.getDisplayBean(hasItemGroup, false, request, isSubmitted);
 
         FormDiscrepancyNotes discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
         if (discNotes == null) {
