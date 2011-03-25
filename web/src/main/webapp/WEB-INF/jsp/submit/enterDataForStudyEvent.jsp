@@ -129,7 +129,7 @@
                         <td class="table_cell">
                             <c:set var="eventLocation" value="${studyEvent.location}"/>
                             <c:if test="${studyEvent.location eq ''}">
-                                <c:set var="eventLocation" value="NA"/>
+                                <c:set var="eventLocation" value="N/A"/>
                             </c:if>
                             <span style="float:left">
                                 <c:out value="${eventLocation}"/>
