@@ -29,6 +29,9 @@ public class XsltTriggerService {
     public static final String XSLT_PATH="XSLT_PATH";
     public static final String EP_BEAN="epBean";
     public static String TRIGGER_GROUP_NAME = "XsltTriggers";
+    public static final String PERIOD = "periodToRun";
+    public static final String EXPORT_FORMAT = "exportFormat";
+
     
     //POST PROCESSING VARIABLES
     public static final String POST_PROC_DELETE_OLD="postProcDeleteOld";

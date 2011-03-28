@@ -35,6 +35,14 @@ public class CoreResources implements ResourceLoaderAware {
     private Properties dataInfo;
     private Properties extractInfo;
 
+    public static final Integer PDF_ID = 10;
+    public static final Integer TAB_ID = 8;
+    public static final Integer CDISC_ODM_1_2_ID = 5;
+    public static final Integer CDISC_ODM_1_2_EXTENSION_ID = 4;
+    public static final Integer CDISC_ODM_1_3_ID = 3;
+    public static final Integer CDISC_ODM_1_3_EXTENSION_ID = 2;
+    public static final Integer SPSS_ID = 9;
+
     private static String webapp;
     protected final static Logger logger = LoggerFactory.getLogger("org.akaza.openclinica.dao.core.CoreResources");
     // private MessageSource messageSource;
