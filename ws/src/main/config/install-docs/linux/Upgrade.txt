@@ -1,18 +1,18 @@
 --------------------------------------------------------------
 OPENCLINICA RELEASE NOTES
-OpenClinica Version 3.1-beta2
+OpenClinica Version 3.1-beta3
 Document Version 1
 --------------------------------------------------------------
 
 --------------------------------------------------------------
-Updated: March 10, 2011 Paul Galvin pgalvin@akazaresearch.com
+Updated: March 28, 2011 Paul Galvin pgalvin@akazaresearch.com
 --------------------------------------------------------------
 
 --------------------------------------------------------------
 OVERVIEW
 --------------------------------------------------------------
 
-Please see the README.txt for an Overview of OpenClinica 3.1-beta2.
+Please see the README.txt for an Overview of OpenClinica 3.1-beta3.
 
 --------------------------------------------------------------
 CONTENTS OF THIS DOCUMENT
@@ -21,14 +21,14 @@ CONTENTS OF THIS DOCUMENT
 I.   KEY FEATURES
 II.  SOFTWARE DEPENDENCIES AND SYSTEM REQUIREMENTS
 III. CONTENTS OF THIS PACKAGE
-IV.  3.1-beta2 : BACKUP & UPGRADE
-V.   3.1-beta2 : VERIFY
+IV.  3.1-beta3 : BACKUP & UPGRADE
+V.   3.1-beta3 : VERIFY
 VI.  ABOUT OPENCLINICA
 
 --------------------------------------------------------------
 I. KEY FEATURES
 --------------------------------------------------------------
-The new features of OpenClinica 3.1-beta2 can be found at http://www.openclinica.org/dokuwiki/doku.php?id=ocfeatures:start.
+The new features of OpenClinica 3.1-beta3 can be found at http://www.openclinica.org/dokuwiki/doku.php?id=ocfeatures:start.
 
 
 
@@ -37,7 +37,7 @@ II. SOFTWARE DEPENDENCIES AND SYSTEM REQUIREMENTS
 --------------------------------------------------------------
 The pre-requisites below are the same software pieces used to run OpenClinica 2.5.x.  If you would like to use Java 6, Tomcat 6 and PostgreSQL 8.4.1, you may follow their upgrade procedures.  This document is for upgrading OpenClinica only.
 
-OpenClinica 3.1-beta2 will run on either version of the software stack.
+OpenClinica 3.1-beta3 will run on either version of the software stack.
 
 
 Pre-requisites (versions):
@@ -53,7 +53,7 @@ III. CONTENTS OF THIS PACKAGE
 --------------------------------------------------------------
 
 --------------------------------------------------------------
-IV.  3.1-beta2 : BACKUP & UPGRADE
+IV.  3.1-beta3 : BACKUP & UPGRADE
 --------------------------------------------------------------
     * Verify pre-requisites
     * Shutdown Tomcat (/usr/share/tomcat/bin/shutdown.sh)
@@ -69,8 +69,8 @@ IV.  3.1-beta2 : BACKUP & UPGRADE
     	* Delete the work/Catalina/localhost/OpenClinica directory
     * Start Tomcat (/usr/share/tomcat/bin/startup.sh)
     * Create a new directory - /var/oc
-    * Untar the OpenClinica-3.1-beta2 package to /var/oc
-    * Deploy OpenClinica.war located in the directory oc/OpenClinica-3.1-beta2/distribution using the Tomcat Manager
+    * Untar the OpenClinica-3.1-beta3 package to /var/oc
+    * Deploy OpenClinica.war located in the directory oc/OpenClinica-3.1-beta3/distribution using the Tomcat Manager
     * You will need to update only a single file.  /usr/local/tomcat/webapps/OpenClinica/WEB-INF/classes/datainfo.properties
     * Update the new file with the database configuration from OpenClinica.xml.
 
@@ -91,7 +91,7 @@ IV.  3.1-beta2 : BACKUP & UPGRADE
    * Restart Tomcat
    * Verify patch for the OpenClinica web application
 --------------------------------------------------------------
-V.   3.1-beta2 : VERIFY
+V.   3.1-beta3 : VERIFY
 --------------------------------------------------------------
 
  * Test database connection and basic authentication
@@ -99,7 +99,7 @@ V.   3.1-beta2 : VERIFY
 	* Verify that tomcat is running
 	* Open a web browser on the server to http://<<server url>>:8080/OpenClinica - You should see the login page
 	* Login to the system
- * Verify version number is upgraded to 3.1-beta2
+ * Verify version number is upgraded to 3.1-beta3
 
 --------------------------------------------------------------
 VI. ABOUT OPENCLINICA
