@@ -271,6 +271,19 @@ public class SectionDAO extends AuditableEntityDAO {
         ArrayList rows = this.select(sql, variables);
         return getNumItemsBySectionIdFromRows(rows);
     }
+    
+    public HashMap getNumItemsBlankBySectionId(EventCRFBean ecb) {
+        this.unsetTypeExpected();
+        this.setTypeExpected(1, TypeNames.INT); // section_id
+        this.setTypeExpected(2, TypeNames.INT); // count
+
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(ecb.getId()));
+        String sql = digester.getQuery("getNumItemsBlankBySectionId");
+
+        ArrayList rows = this.select(sql, variables);
+        return getNumItemsBySectionIdFromRows(rows);
+    }
 
     public SectionBean findNext(EventCRFBean ecb, SectionBean current) {
         this.setTypesExpected();
