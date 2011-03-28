@@ -4173,7 +4173,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
     /**
      * Checks if a section is reviewed at least once by user
-     *
+     * updated tbh 03/2011, to fix duplicates issues
      * @param sb
      * @param request TODO
      * @return
@@ -4187,19 +4187,25 @@ public abstract class DataEntryServlet extends CoreSecureController {
         HashMap numItemsHM = sdao.getNumItemsBySectionId();
         HashMap numItemsPendingHM = sdao.getNumItemsPendingBySectionId(ecb);
         HashMap numItemsCompletedHM = sdao.getNumItemsCompletedBySectionId(ecb);
+        HashMap numItemsBlankHM = sdao.getNumItemsBlankBySectionId(ecb);
 
         Integer key = new Integer(sb.getId());
 
         int numItems = TableOfContentsServlet.getIntById(numItemsHM, key);
         int numItemsPending = TableOfContentsServlet.getIntById(numItemsPendingHM, key);
         int numItemsCompleted = TableOfContentsServlet.getIntById(numItemsCompletedHM, key);
+        int numItemsBlank = TableOfContentsServlet.getIntById(numItemsBlankHM, key);
+        System.out.println(" for " + key + " num items " + numItems + " num items blank " + numItemsBlank + 
+                " num items pending " + numItemsPending + " completed " + numItemsCompleted);
 
         if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY) && edcb.isDoubleEntry()) {
-            if (numItemsPending == 0 && numItems > 0) {
+            if (numItemsPending == 0 && numItemsBlank == 0 && numItems > 0) {
+                System.out.println("returns false on ide loop " + key);
                 return false;
             }
         } else {
-            if (numItemsCompleted == 0 && numItems > 0) {
+            if (numItemsCompleted == 0 && numItemsBlank == 0 && numItems > 0) {
+                System.out.println("returns false on other loop " + key);
                 return false;
             }
         }
@@ -4210,6 +4216,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
     /**
      * Checks if all the sections in an event crf are reviewed once
+     * tbh updated to prevent duplicates, 03/2011
      * @param request TODO
      *
      * @return
@@ -4222,6 +4229,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         ArrayList sections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
         HashMap numItemsHM = sdao.getNumItemsBySectionId();
         HashMap numItemsPendingHM = sdao.getNumItemsPendingBySectionId(ecb);
+        HashMap numItemsBlankHM = sdao.getNumItemsBlankBySectionId(ecb);
         HashMap numItemsCompletedHM = sdao.getNumItemsCompletedBySectionId(ecb);
 
         for (int i = 0; i < sections.size(); i++) {
@@ -4231,13 +4239,14 @@ public abstract class DataEntryServlet extends CoreSecureController {
             int numItems = TableOfContentsServlet.getIntById(numItemsHM, key);
             int numItemsPending = TableOfContentsServlet.getIntById(numItemsPendingHM, key);
             int numItemsCompleted = TableOfContentsServlet.getIntById(numItemsCompletedHM, key);
+            int numItemsBlank = TableOfContentsServlet.getIntById(numItemsBlankHM, key);
 
             if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY) && edcb.isDoubleEntry()) {
-                if (numItemsPending == 0 && numItems > 0) {
+                if (numItemsPending == 0 && numItemsBlank == 0 && numItems > 0) {
                     return false;
                 }
             } else {
-                if (numItemsCompleted == 0 && numItems > 0) {
+                if (numItemsCompleted == 0 && numItemsBlank == 0 && numItems > 0) {
                     return false;
                 }
             }
