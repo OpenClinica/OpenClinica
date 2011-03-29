@@ -7,15 +7,6 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import javax.naming.NamingException;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
@@ -55,7 +46,6 @@ import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.CoreSecureController;
-import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -96,9 +86,7 @@ import org.akaza.openclinica.service.DiscrepancyNoteThread;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.service.crfdata.SimpleConditionalDisplayService;
-import org.akaza.openclinica.service.managestudy.DiscrepancyNoteService;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
-import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.form.FormBeanUtil;
 import org.akaza.openclinica.web.InconsistentStateException;
@@ -116,6 +104,14 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
 
 /**
  * @author ssachs
@@ -214,19 +210,50 @@ public abstract class DataEntryServlet extends CoreSecureController {
     public static final String NOTE_SUBMITTED = "note_submitted";
     
     
+//JN:Cleaning up the code, to prepare for synchronizing the blocks for global variables.
+  //  protected String SCOREITEMS;
+  //  protected String SCOREITEMDATA;
+
+  //  protected FormProcessor fp;
+    // the input beans
+    //protected EventCRFBean ecb;
+//    protected SectionBean sb;
     public static final String SECTION_BEAN = "section_bean";
+   // protected ArrayList<SectionBean> allSectionBeans;
     public static final String ALL_SECTION_BEANS = "all_section_bean";
+    /**
+     * The event definition CRF bean which governs the event CRF bean into which we are entering data. Notice: It should be updated by info of a
+     * siteEventDefinitionCRF if dataEntry is for a site which has its own study_event_definition,
+     */
+  //  protected EventDefinitionCRFBean edcb;
 
     public static final String EVENT_DEF_CRF_BEAN = "event_def_crf_bean"; 
     
-    public static final String ALL_ITEMS_LIST = "all_items_list";
+    // DAOs used throughout the c;ass
+    //JN:TODO: revisit later to investigate why dao references are global in the first place?
+   // protected EventCRFDAO ecdao;
+
+   // protected EventDefinitionCRFDAO edcdao;
+
+   // protected SectionDAO sdao;
+
+   // protected ItemDAO idao;
+
+ //   protected ItemFormMetadataDAO ifmdao;
+
+  //  protected ItemDataDAO iddao;
+
+  //  protected DiscrepancyNoteDAO dndao;
+
+ //   protected RuleSetServiceInterface ruleSetService;
+ //   protected ExpressionService expressionService;
+ //   protected DiscrepancyNoteService discrepancyNoteService;
+ //   DynamicsMetadataService itemMetadataService;
     
     private DataSource dataSource;
 
  
    
-    
-    
 
     @Override
     public void init(ServletConfig config) throws ServletException
@@ -355,7 +382,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
         int resolvedNum = 0;
         int notAppNum = 0;
         DiscrepancyNoteBean tempBean;
-        
         for (DiscrepancyNoteThread dnThread : noteThreads) {
             /*
              * 3014: do not count parent beans, only the last child disc note of the thread.
@@ -534,6 +560,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         logMe("Entering  displayItemWithGroups "+System.currentTimeMillis());
         List<DisplayItemWithGroupBean> displayItemWithGroups = createItemWithGroups(section, hasGroup, eventDefinitionCRFId, request);
         logMe("Entering  displayItemWithGroups end "+System.currentTimeMillis());
+        this.getItemMetadataService().updateRepeatingGroupDynItemsInASection(displayItemWithGroups, section.getSection().getId(), ecb.getCRFVersionId(), ecb.getId());
         section.setDisplayItemGroups(displayItemWithGroups);
 
         // why do we get previousSec and nextSec here, rather than in
@@ -832,25 +859,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 phase2 = Phase.ADMIN_EDITING;
             }
             // this.getItemMetadataService().resetItemCounter();
-            HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid  = null;
-            groupOrdinalPLusItemOid = runRules(allItems, ruleSets, true, shouldRunRules(), MessageType.ERROR, phase2,ecb, request);
-          /*  if(( List<DisplayItemWithGroupBean>)session.getAttribute(ALL_ITEMS_LIST)==null)
-            {
-                 groupOrdinalPLusItemOid = runRules(allItems, ruleSets, true, shouldRunRules(), MessageType.ERROR, phase2,ecb, request);
-                 session.setAttribute(ALL_ITEMS_LIST, allItems);
-                 session.setAttribute("groupOrdinalPLusItemOid", groupOrdinalPLusItemOid);
-            }
-            else {
-                if( ((List<DisplayItemWithGroupBean>)session.getAttribute(ALL_ITEMS_LIST)).equals( allItems)){
-                    groupOrdinalPLusItemOid = (HashMap<String, ArrayList<String>> )session.getAttribute("groupOrdinalPLusItemOid");
-                }
-                else{
-                    groupOrdinalPLusItemOid = runRules(allItems, ruleSets, true, shouldRunRules(), MessageType.ERROR, phase2,ecb, request);
-                    session.setAttribute(ALL_ITEMS_LIST, allItems);
-                    session.setAttribute("groupOrdinalPLusItemOid", groupOrdinalPLusItemOid);
-                }
-                
-            }*/
+            HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid = runRules(allItems, ruleSets, true, shouldRunRules(), MessageType.ERROR, phase2,ecb, request);
             ////System.out.println("first run of rules : " + groupOrdinalPLusItemOid.toString());
             logMe("allItems  Loop begin  "+System.currentTimeMillis());
             for (int i = 0; i < allItems.size(); i++) {
@@ -1621,6 +1630,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 }
                 logMe("DisplayItemWithGroupBean allitems4 end "+System.currentTimeMillis());
                 //System.out.println("running rules: " + phase2.name());
+                ArrayList<Integer> prevShownDynItemDataIds = (ArrayList<Integer>)this.getItemMetadataService().getDynamicsItemFormMetadataDao().findShowItemDataIdsInSection(section.getSection().getId(), ecb.getCRFVersionId(), ecb.getId());
                 logMe("DisplayItemWithGroupBean dryrun  start"+System.currentTimeMillis());
                 HashMap<String, ArrayList<String>> rulesPostDryRun = runRules(allItems, ruleSets, false, shouldRunRules(), MessageType.WARNING, phase2,ecb, request);
                 //System.out.println("found rules post dry run: " + rulesPostDryRun.toString());
@@ -1637,13 +1647,25 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     while (iter3.hasNext()) {
                         String fieldName = iter3.next().toString();
                         logger.debug("found oid after post dry run " + fieldName);
+System.out.println("found oid after post dry run "+fieldName);
                         // set up a listing of OIDs in the section
                         // BUT: Oids can have the group name in them.
+                        int ordinal = -1;
                         String newFieldName = fieldName;
                         String[] fieldNames = fieldName.split("\\.");
                         if (fieldNames.length == 2) {
                             newFieldName = fieldNames[1];
                             // check items in item groups here?
+                            if(fieldNames[0].contains("[")) {
+                                int p1 = fieldNames[0].indexOf("[");
+                                int p2 = fieldNames[0].indexOf("]");
+                                try{
+                                    ordinal = Integer.valueOf(fieldNames[0].substring(p1+1,p2));
+                                }catch(NumberFormatException e) {
+                                    ordinal = -1;
+                                }
+                                fieldNames[0] = fieldNames[0].substring(0,p1);
+                            }
                         }
                         List<DisplayItemWithGroupBean> displayGroupsWithItems = section.getDisplayItemGroups();
                         //ArrayList<DisplayItemBean> displayItems = section.getItems();
@@ -1656,18 +1678,19 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                 logger.debug("digbs size: " + digbs.size());
                                 for (int j = 0; j < digbs.size(); j++) {
                                     DisplayItemGroupBean displayGroup = digbs.get(j);
-                                    if (displayGroup.getItemGroupBean().getOid().equals(fieldNames[0])) {
+System.out.println("ordinal="+ordinal+" group.ordinal="+displayGroup.getOrdinal());
+                                    if (displayGroup.getItemGroupBean().getOid().equals(fieldNames[0])&& displayGroup.getOrdinal()==ordinal-1) {
                                         List<DisplayItemBean> items = displayGroup.getItems();
-
                                         for (int k = 0; k < items.size(); k++) {
                                             DisplayItemBean dib = items.get(k);
                                             if (dib.getItem().getOid().equals(newFieldName)) {
                                                 //inSameSection = true;
-
                                                 if (!dib.getMetadata().isShowItem()) {
                                                     logger.debug("found item in group " + this.getGroupItemInputName(displayGroup, j, dib) + " vs. "
                                                         + fieldName + " and is show item: " + dib.getMetadata().isShowItem());
                                                     dib.getMetadata().setShowItem(true);
+                                                }
+                                                if(prevShownDynItemDataIds==null || !prevShownDynItemDataIds.contains(dib.getData().getId())) {
                                                     inSameSection = true;
                                                     errorsPostDryRun.put(this.getGroupItemInputName(displayGroup, j, dib), rulesPostDryRun.get(fieldName));
                                                 }
@@ -1676,7 +1699,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                         }
                                         displayGroup.setItems(items);
                                         digbs.set(j, displayGroup);
-                                    }
+                                    } 
                                 }
                                 itemWithGroup.setItemGroups(digbs);
                             } else {
@@ -1731,6 +1754,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
                         // section.setDisplayFormGroups(newDisplayBean.getDisplayFormGroups());
 
                     }
+                    //
+                    this.getItemMetadataService().updateRepeatingGroupDynItemsInASection(section.getDisplayItemGroups(), section.getSection().getId(), ecb.getCRFVersionId(), ecb.getId());
+                    //
                     // we need the following for repeating groups, tbh
                     // >> tbh 06/2010
                     // List<DisplayItemWithGroupBean> displayItemWithGroups2 = createItemWithGroups(section, hasGroup, eventDefinitionCRFId);
@@ -1921,7 +1947,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                     return;
 
                                 }
-                       
+                                //JN:not sure when this will execute? so adding the else block
                              
                                 int tabNum = 0;
                                 if (fp.getString("tab") == null) {
@@ -3012,20 +3038,28 @@ public abstract class DataEntryServlet extends CoreSecureController {
     protected boolean writeToDB(DisplayItemBean dib, ItemDataDAO iddao, int ordinal, HttpServletRequest request) {
         ItemDataBean idb = dib.getData();
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
-        if (getServletPage(request).equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
-                if (!dib.getMetadata().isShowItem() && !(dib.getScdItemMetadataBean().getScdItemFormMetadataId()>0) &&
-                                idb.getValue().equals("") &&
-                                !getItemMetadataService().hasPassedDDE(dib.getMetadata(), ecb, idb)) {//(dib.getItem().getId(), ecb, idb)) {// && !getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getData())) {
-                        logger.debug("*** not shown - not writing for idb id " + dib.getData().getId() + " and item id " + dib.getItem().getId());
-                        return true;
-                }
+        
+        if (dib.getEditFlag()!=null && "remove".equalsIgnoreCase(dib.getEditFlag()) 
+                && getItemMetadataService().isShown(idb.getItemId(), ecb, idb)) {
+            writeToDB(idb,dib,iddao,ordinal, request);
+            //TODO: update dynamic_item_form_metadata show_item to false
+            getItemMetadataService().hideItem(dib.getMetadata(), ecb, idb);
         } else {
-                if (!dib.getMetadata().isShowItem() &&
-                        idb.getValue().equals("") &&
-                        !getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getData()) &&
-                        !(dib.getScdItemMetadataBean().getScdItemFormMetadataId()>0)) {
-                logger.debug("*** not shown - not writing for idb id " + dib.getData().getId() + " and item id " + dib.getItem().getId());
-                return true;
+            if (getServletPage(request).equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
+                    if (!dib.getMetadata().isShowItem() && !(dib.getScdItemMetadataBean().getScdItemFormMetadataId()>0) &&
+                                    idb.getValue().equals("") &&
+                                    !getItemMetadataService().hasPassedDDE(dib.getMetadata(), ecb, idb)) {//(dib.getItem().getId(), ecb, idb)) {// && !getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getData())) {
+                            logger.debug("*** not shown - not writing for idb id " + dib.getData().getId() + " and item id " + dib.getItem().getId());
+                            return true;
+                    }
+            } else {
+                    if (!dib.getMetadata().isShowItem() &&
+                            idb.getValue().equals("") &&
+                            !getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getData()) &&
+                            !(dib.getScdItemMetadataBean().getScdItemFormMetadataId()>0)) {
+                    logger.debug("*** not shown - not writing for idb id " + dib.getData().getId() + " and item id " + dib.getItem().getId());
+                    return true;
+                }
             }
         }
 
@@ -4905,7 +4939,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
             Boolean shouldRunRules, MessageType mt, Phase phase,EventCRFBean ecb, HttpServletRequest request) {
         UserAccountBean ub =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);      
         StudyBean currentStudy =    (StudyBean)  request.getSession().getAttribute("study");
- if (shouldRunRules) {
+        if (shouldRunRules) {
             Container c = new Container();
             try {
                 c = populateRuleSpecificHashMaps(allItems, c, dryRun);
@@ -4920,7 +4954,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
             // return getRuleSetService().runRules(ruleSets, dryRun,
             // currentStudy, c.variableAndValue, ub);
             logger.debug("running rules ... rule sets size is " + ruleSets.size());
-            return getRuleSetService(request).runRulesInDataEntry(ruleSets, dryRun, currentStudy, ub, c.variableAndValue, phase,ecb, request).getByMessageType(mt);
+            return getRuleSetService(request).runRulesInDataEntry(ruleSets, dryRun, currentStudy, ub, c.variableAndValue, phase,ecb).getByMessageType(mt);
         } else {
             return new HashMap<String, ArrayList<String>>();
         }
