@@ -27,11 +27,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
 public class DataEntryRuleRunner extends RuleRunner {
-	
-	EventCRFBean ecb;
+    
+    EventCRFBean ecb;
 
     public DataEntryRuleRunner(DataSource ds, String requestURLMinusServletPath, String contextPath, JavaMailSenderImpl mailSender, EventCRFBean ecb) {
         super(ds, requestURLMinusServletPath, contextPath, mailSender);
@@ -39,7 +40,7 @@ public class DataEntryRuleRunner extends RuleRunner {
     }
 
     public MessageContainer runRules(List<RuleSetBean> ruleSets, ExecutionMode executionMode, StudyBean currentStudy, HashMap<String, String> variableAndValue,
-            UserAccountBean ub, Phase phase) {
+            UserAccountBean ub, Phase phase, HttpServletRequest request) {
 
         if (variableAndValue == null || variableAndValue.isEmpty()) {
             logger.warn("You must be executing Rules in Batch");
@@ -48,6 +49,13 @@ public class DataEntryRuleRunner extends RuleRunner {
 
         MessageContainer messageContainer = new MessageContainer();
         HashMap<String, ArrayList<RuleActionContainer>> toBeExecuted = new HashMap<String, ArrayList<RuleActionContainer>>();
+        switch (executionMode) {
+        case SAVE:        {
+            toBeExecuted = (HashMap<String, ArrayList<RuleActionContainer>>)request.getAttribute("toBeExecuted");
+            break;
+        }
+        case DRY_RUN:
+        {
         for (RuleSetBean ruleSet : ruleSets) {
             String key = getExpressionService().getItemOid(ruleSet.getOriginalTarget().getValue());
             List<RuleActionContainer> allActionContainerListBasedOnRuleExecutionResult = null;
@@ -99,7 +107,11 @@ public class DataEntryRuleRunner extends RuleRunner {
                 }
             }
         }
-
+        request.setAttribute("toBeExecuted",toBeExecuted);
+        break;
+        }
+        
+        }
         for (Map.Entry<String, ArrayList<RuleActionContainer>> entry : toBeExecuted.entrySet()) {
             // Sort the list of actions
             Collections.sort(entry.getValue(), new RuleActionContainerComparator());
