@@ -700,7 +700,8 @@ window.onload = initmb;
 <tr id="<c:out value="${repeatParentId}"/>" repeat="template" repeat-start="<c:out value="${repeatNumber}"/>" repeat-max="<c:out value="${repeatMax}"/>">
 
     <c:forEach var="bodyItem" items="${bodyItemGroup.items}">
-    <c:if test="${bodyItem.metadata.showItem}">
+    <c:choose>
+    <c:when test="${bodyItem.metadata.showItem}">
 	<%-- set up highlighting here, tbh 05/2010 --%>
 		<c:set var="isItemShown" value="false"/>
 		
@@ -844,7 +845,9 @@ window.onload = initmb;
             </c:otherwise>
         </c:choose>
         <c:set var="columnNum" value="${columnNum+1}"/>
-        </c:if>
+        </c:when>
+        <c:when test="${bodyItem.blankDwelt}"><td class="aka_padding_norm aka_cellBorders"></c:when>
+    	</c:choose>
     </c:forEach>
     <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">
         <c:choose>
@@ -871,7 +874,8 @@ window.onload = initmb;
 <tr repeat="0">
 <c:set var="columnNum"  value="1"/>
 <c:forEach var="bodyItem" items="${bodyItemGroup.items}">
-<c:if test="${bodyItem.metadata.showItem}">
+<c:choose>
+<c:when test="${bodyItem.metadata.showItem}">
 	<%-- adding more highlighting here, tbh 05/2010 --%>
 	<c:set var="isItemShown" value="false"/>
 		<c:forEach var="formMsg" items="${formMessages}">
@@ -1012,7 +1016,9 @@ window.onload = initmb;
         </c:otherwise>
     </c:choose>
     <c:set var="columnNum" value="${columnNum+1}"/>
-    </c:if>
+    </c:when>
+    <c:when test="${bodyItem.blankDwelt}"><td class="aka_padding_norm aka_cellBorders"></c:when>
+    </c:choose>
 </c:forEach>
 <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">
     <c:choose>

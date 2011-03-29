@@ -617,7 +617,8 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
     <input type="hidden" name="<c:out value="${repeatParentId}"/>_[<c:out value="${repeatParentId}"/>].existing" value="<c:out value="${uniqueId+1}"/>">
 
     <c:forEach var="bodyItem" items="${bodyItemGroup.items}">
-    <c:if test="${bodyItem.metadata.showItem}">
+    <c:choose>
+    <c:when test="${bodyItem.metadata.showItem}">
         <c:set var="itemNum" value="${itemNum + 1}" />
         <c:set var="isHorizontalCellLevel" scope="request" value="${false}"/>
         <c:if test="${bodyItem.metadata.responseLayout eq 'horizontal' ||
@@ -741,7 +742,9 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
             </c:otherwise>
         </c:choose>
         <c:set var="columnNum" value="${columnNum+1}"/>
-        </c:if>
+        </c:when>
+        <c:when test="${bodyItem.blankDwelt}"><td class="aka_padding_norm aka_cellBorders"></c:when>
+    	</c:choose>
     </c:forEach>
     <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">
         <c:choose>
@@ -768,7 +771,8 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 <tr repeat="0">
 <c:set var="columnNum"  value="1"/>
 <c:forEach var="bodyItem" items="${bodyItemGroup.items}">
-<c:if test="${bodyItem.metadata.showItem}">
+<c:choose>
+<c:when test="${bodyItem.metadata.showItem}">
     <c:set var="itemNum" value="${itemNum + 1}" />
     <c:set var="isHorizontalCellLevel" scope="request" value="${false}"/>
     <c:if test="${bodyItem.metadata.responseLayout eq 'horizontal' ||
@@ -893,7 +897,9 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
         </c:otherwise>
     </c:choose>
     <c:set var="columnNum" value="${columnNum+1}"/>
-    </c:if>
+    </c:when>
+    <c:when test="${bodyItem.blankDwelt}"><td class="aka_padding_norm aka_cellBorders"></c:when>
+    </c:choose>
 </c:forEach>
 <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">
     <c:choose>

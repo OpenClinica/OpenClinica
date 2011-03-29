@@ -597,7 +597,7 @@ but the custom tag uses that, not this jstl code--%>
     <c:set var="isHorizontal" scope="request" value="${false}"/>
     <c:forEach var="thItem" items="${displayItem.itemGroup.items}">
 	<!-- found show item: <c:out value="${thItem.metadata.showItem}"/> -->
-    <c:if test="${thItem.metadata.showItem}">
+	<c:if test="${thItem.metadata.showItem}">
         <c:set var="questionNumber" value="${thItem.metadata.questionNumberLabel}"/>
         <%-- We have to add a second row of headers if the response_layout property is
      horizontal for checkboxes. --%>
@@ -637,6 +637,7 @@ but the custom tag uses that, not this jstl code--%>
                 <c:set var="totalColsPlusSubcols" value="${totalColsPlusSubcols + 1}" />
             </c:otherwise>
         </c:choose>
+ 
         <c:choose>
             <c:when test="${thItem.metadata.header == ''}">
                 <c:if test="${! (empty questionNumber)}">
@@ -725,7 +726,8 @@ but the custom tag uses that, not this jstl code--%>
 <tr id="<c:out value="${repeatParentId}"/>" repeat="template" repeat-start="<c:out value="${repeatNumber}"/>" repeat-max="<c:out value="${repeatMax}"/>">
     <c:forEach var="bodyItem" items="${bodyItemGroup.items}">
 	<!-- found show item: <c:out value="${bodyItem.metadata.showItem}"/> -->
-    <c:if test="${bodyItem.metadata.showItem}">
+	<c:choose>
+    <c:when test="${bodyItem.metadata.showItem}">
 		<%-- highlighting for items within item groups, tbh --%>
 		<%-- update td class with aka_group_show if they meet the criteria --%>
 		<c:set var="isItemShown" value="false"/>
@@ -850,7 +852,9 @@ but the custom tag uses that, not this jstl code--%>
             </c:otherwise>
         </c:choose>
         <c:set var="columnNum" value="${columnNum+1}"/>
-        </c:if>
+        </c:when>
+        <c:when test="${bodyItem.blankDwelt}"><td class="aka_padding_norm aka_cellBorders"></c:when>
+    	</c:choose>
     </c:forEach>
     <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">
         <c:choose>
@@ -878,7 +882,8 @@ but the custom tag uses that, not this jstl code--%>
 <c:set var="columnNum"  value="1"/>
 <c:forEach var="bodyItem" items="${bodyItemGroup.items}">
 <!-- found show item: <c:out value="${bodyItem.metadata.showItem}"/> -->
-<c:if test="${bodyItem.metadata.showItem}">
+<c:choose>
+<c:when test="${bodyItem.metadata.showItem}">
 	<%-- highlighting for items within item groups, tbh --%>
 		<%-- update td class with aka_group_show if they meet the criteria --%>
 		<c:set var="isItemShown" value="false"/>
@@ -1018,7 +1023,9 @@ but the custom tag uses that, not this jstl code--%>
         </c:otherwise>
     </c:choose>
     <c:set var="columnNum" value="${columnNum+1}"/>
-    </c:if>
+    </c:when>
+    <c:when test="${bodyItem.blankDwelt}"><td class="aka_padding_norm aka_cellBorders"></c:when>
+    </c:choose>
 </c:forEach>
     <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">
     <c:choose>
