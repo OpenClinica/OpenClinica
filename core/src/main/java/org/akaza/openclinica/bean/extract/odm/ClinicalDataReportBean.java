@@ -157,9 +157,9 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                         }
                         xml.append("TransactionType=\"Insert\">");
                         xml.append(nls);
-                        boolean printValue = true;
                         ArrayList<ImportItemDataBean> items = ig.getItemData();
                         for (ImportItemDataBean item : items) {
+                            boolean printValue = true;
                             xml.append(indent + indent + indent + indent + indent + indent + "<ItemData ItemOID=\""
                                     + StringEscapeUtils.escapeXml(item.getItemOID()) + "\" ");
                             if ("Yes".equals(item.getIsNull())) {
