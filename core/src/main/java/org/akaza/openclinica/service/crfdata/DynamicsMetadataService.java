@@ -7,6 +7,9 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.DisplayItemBean;
+import org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
+import org.akaza.openclinica.bean.submit.DisplayItemWithGroupBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
@@ -219,11 +222,20 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         return true;
     }
 
-    public boolean hideItem(ItemFormMetadataBean metadataBean, EventCRFBean eventCrfBean, ItemDataBean itemDataBean) {
+    public boolean hideNewItem(ItemFormMetadataBean metadataBean, EventCRFBean eventCrfBean, ItemDataBean itemDataBean) {
         ItemFormMetadataBean itemFormMetadataBean = metadataBean;
         DynamicsItemFormMetadataBean dynamicsMetadataBean = new DynamicsItemFormMetadataBean(itemFormMetadataBean, eventCrfBean);
         dynamicsMetadataBean.setItemDataId(itemDataBean.getId());
         dynamicsMetadataBean.setShowItem(false);
+        getDynamicsItemFormMetadataDao().saveOrUpdate(dynamicsMetadataBean);
+        return true;
+    }
+    
+    public boolean hideItem(ItemFormMetadataBean metadataBean, EventCRFBean eventCrfBean, ItemDataBean itemDataBean) {
+        ItemFormMetadataBean itemFormMetadataBean = metadataBean;
+        DynamicsItemFormMetadataBean dynamicsMetadataBean = this.getDynamicsItemFormMetadataDao().findByItemDataBean(itemDataBean);
+        dynamicsMetadataBean = dynamicsMetadataBean != null && dynamicsMetadataBean.getId()>0 ?
+            dynamicsMetadataBean : new DynamicsItemFormMetadataBean(itemFormMetadataBean, eventCrfBean);      dynamicsMetadataBean.setShowItem(false);
         getDynamicsItemFormMetadataDao().saveOrUpdate(dynamicsMetadataBean);
         return true;
     }
@@ -651,7 +663,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                         getItemFormMetadataDAO().findByItemIdAndCRFVersionId(itemOrItemGroup.getItemBean().getId(), eventCrfBeanA.getCRFVersionId());
                     DynamicsItemFormMetadataBean dynamicsMetadataBean = getDynamicsItemFormMetadataBean(itemFormMetadataBean, eventCrfBeanA, oidBasedItemData);
                     if (dynamicsMetadataBean == null && oidBasedItemData.getValue().equals("")) {
-                        hideItem(itemFormMetadataBean, eventCrfBeanA, oidBasedItemData);
+                        hideNewItem(itemFormMetadataBean, eventCrfBeanA, oidBasedItemData);
                     } else if (dynamicsMetadataBean != null && dynamicsMetadataBean.isShowItem() && oidBasedItemData.getValue().equals("")) {
                         // tbh #5287: add an additional check here to see if it should be hidden
                         dynamicsMetadataBean.setShowItem(false);
@@ -832,6 +844,60 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         }
 
         return new ItemOrItemGroupHolder(null, null);
+    }
+    
+    public void updateRepeatingGroupDynItemsInASection(List<DisplayItemWithGroupBean> displayItemWithGroups, int sectionId, int crfVersionId, int eventCrfId) {
+        for (DisplayItemWithGroupBean itemWithGroup : displayItemWithGroups) {
+            if (itemWithGroup.isInGroup()) {
+                DisplayItemGroupBean digb = itemWithGroup.getItemGroup();
+                if(isGroupRepeating(digb.getItemGroupBean().getMeta())) {
+                    int groupId = digb.getItemGroupBean().getId();
+                    ArrayList<Integer> itemIds = (ArrayList<Integer>)this.dynamicsItemFormMetadataDao.findItemIdsForAGroupInSection(groupId, sectionId, crfVersionId, eventCrfId);
+                    if(itemIds!=null && itemIds.size()>0) {
+                        ArrayList<Integer> showItemIds = (ArrayList<Integer>)this.dynamicsItemFormMetadataDao.findShowItemIdsForAGroupInSection(groupId, sectionId, crfVersionId, eventCrfId);
+                        this.updateItemGroupInASection(digb, itemIds, showItemIds);
+                        this.updateGroupDynItemsInASection(itemWithGroup, showItemIds, groupId, sectionId, crfVersionId, eventCrfId);
+                    }
+                }
+            }
+        }
+    }
+    
+    private void updateItemGroupInASection(DisplayItemGroupBean itemGroup, List<Integer> itemIds, List<Integer> showItemIds) {
+        ArrayList<DisplayItemBean> dibs = (ArrayList<DisplayItemBean>) itemGroup.getItems();
+        for(DisplayItemBean dib : dibs) {
+            ItemFormMetadataBean meta = dib.getMetadata();
+            if(showItemIds!=null && showItemIds.contains(dib.getItem().getId())) {
+                meta.setShowItem(true);
+            } else if (itemIds.contains(dib.getItem().getId())){
+                dib.getMetadata().setShowItem(false);
+            } 
+        }
+    }
+
+    private void updateGroupDynItemsInASection(DisplayItemWithGroupBean itemWithGroup, List<Integer> showItemIds, 
+            int groupId, int sectionId, int crfVersionId, int eventCrfId) {
+        List<DisplayItemGroupBean> digbs = itemWithGroup.getItemGroups();
+        ArrayList<Integer> showDataIds = (ArrayList<Integer>)this.dynamicsItemFormMetadataDao.findShowItemDataIdsForAGroupInSection(groupId, sectionId, crfVersionId, eventCrfId);
+        ArrayList<Integer> hideDataIds = (ArrayList<Integer>)this.dynamicsItemFormMetadataDao.findHideItemDataIdsForAGroupInSection(groupId, sectionId, crfVersionId, eventCrfId);
+        for(int n=0; n<digbs.size(); ++n) {
+            DisplayItemGroupBean dg = digbs.get(n);
+            ArrayList<DisplayItemBean> items = (ArrayList<DisplayItemBean>)dg.getItems();
+            for(int m=0; m<items.size(); ++m) {
+                DisplayItemBean dib = items.get(m);
+                ItemFormMetadataBean meta = dib.getMetadata();
+                dib.setBlankDwelt(false);
+                if(hideDataIds!=null && hideDataIds.contains(dib.getData().getId())) {
+                    meta.setShowItem(false);
+                }
+                if(showDataIds!=null && showDataIds.contains(dib.getData().getId())) {
+                    meta.setShowItem(true);
+                }
+                if(!meta.isShowItem() && showItemIds!=null && showItemIds.contains(dib.getItem().getId())) {
+                    dib.setBlankDwelt(true);
+                }
+            }
+        }
     }
 
     public DynamicsItemFormMetadataDao getDynamicsItemFormMetadataDao() {
