@@ -119,8 +119,14 @@ public class ViewRuleAssignmentTableToolbar extends DefaultToolbar {
                 html.div().close().nbsp().append(reswords.getString("hide")).nbsp().divEnd().aEnd();
 
                 html.script().type("text/javascript").close()
-                        .append("$j = jQuery.noConflict(); $j(document).ready(function(){ " + "hideCols('ruleAssignments',[" + getIndexes() + "],false);});")
-                        .scriptEnd();
+                        .append("$j = jQuery.noConflict(); $j(document).ready(function(){ " + "hideCols('ruleAssignments',[" + getIndexes() + "],false);" +
+                            " if($j.browser.msie){" +
+                            " $j('tr.header td div:last').each(function(){" +
+                            " $j(this).click();" +
+                            "var ah = $j(this).height();" +
+                            "$j('tr.header td div').each(function(){"+
+                            "$j(this).css('height',ah);"+
+                            "});" + "});"+ "}"+ "});").scriptEnd();
             } else {
                 html.a().id("hide").href("javascript:hideCols('ruleAssignments',[" + getIndexes() + "],false);").close();
                 html.div().close().nbsp().append(reswords.getString("hide")).nbsp().divEnd().aEnd();
