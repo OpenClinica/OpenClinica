@@ -4,6 +4,7 @@ import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.service.PdfProcessingFunction;
 import org.akaza.openclinica.bean.service.SasProcessingFunction;
 import org.akaza.openclinica.bean.service.SqlProcessingFunction;
+
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,6 +67,22 @@ public class CoreResources implements ResourceLoaderAware {
         webapp = getWebAppName(resourceLoader.getResource("/").getURI().getPath());
 
     }
+    
+    public void reportUrl() {
+        String contHome = System.getProperty("catalina.home");
+        logMe("--> System getProperty catalina.home: " + contHome);
+        logMe("--> results of System.getenv(): " + System.getenv().toString());
+        Properties pros = System.getProperties();
+        Enumeration proEnum = pros.propertyNames();
+        for (; proEnum.hasMoreElements(); ) {
+            // Get property name
+            String propName = (String)proEnum.nextElement();
+
+            // Get property value
+            String propValue = (String)pros.get(propName);
+            logMe("--> property: " + propName + " and value: " + propValue);
+        }
+    }
 
     public void setResourceLoader(ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
@@ -86,6 +103,8 @@ public class CoreResources implements ResourceLoaderAware {
             factory.run(dbName, resourceLoader);
             copyBaseToDest(resourceLoader);
             extractProperties = findExtractProperties();
+            // tbh, following line to be removed
+            // reportUrl();
 
         } catch (OpenClinicaSystemException e) {
             logger.debug(e.getMessage());
@@ -108,10 +127,10 @@ public class CoreResources implements ResourceLoaderAware {
             key = properties.nextElement();
             vals = DATAINFO.getProperty(key);
             // replacePaths(vals);
-            logMe("key:" + key + "vals:" + vals);
+            logMe(" key: " + key + " vals:" + vals);
             vals = replaceWebapp(vals);
             vals = replaceCatHome(vals);
-            logMe("key:" + key + "vals:" + vals);
+            logMe("key: " + key + " vals:" + vals);
             DATAINFO.setProperty(key, vals);
         }
 
@@ -137,26 +156,48 @@ public class CoreResources implements ResourceLoaderAware {
     }
 
     private static String replaceCatHome(String value) {
-        logMe("catalina home - "+value);
-        logMe("CATALINA_HOME system variable is"+System.getProperty("CATALINA_HOME"));
-        logMe("CATALINA_HOME system env variable is"+System.getenv("CATALINA_HOME"));
-        logMe(" -Dcatalina.home system property variable is"+System.getProperty(" -Dcatalina.home"));
-        logMe("CATALINA.HOME system env variable is"+System.getenv("catalina.home"));
-        logMe("CATALINA_BASE system env variable is"+System.getenv("CATALINA_BASE"));
-        Map<String, String> env = System.getenv();
-        for (String envName : env.keySet()) {
-            logMe("%s=%s%n"+ envName+ env.get(envName));
+        String catalina = null;
+        if (catalina == null) {
+            catalina = System.getProperty("CATALINA_HOME");
+            logMe("-set catalina " + catalina);
         }
+        
+        if (catalina == null) {
+            catalina = System.getProperty("catalina.home");
+            logMe("---set catalina " + catalina);
+        }
+        
+        if (catalina == null) {
+            catalina = System.getenv("CATALINA_HOME");
+            logMe("--set catalina " + catalina);
+        }
+        
+        if (catalina == null) {
+            catalina = System.getenv("catalina.home");
+            logMe("----set catalina " + catalina);
+        }
+        //        logMe("catalina home - " + value);
+        //        logMe("CATALINA_HOME system variable is " + System.getProperty("CATALINA_HOME"));
+        //        logMe("CATALINA_HOME system env variable is " + System.getenv("CATALINA_HOME"));
+        //        logMe(" -Dcatalina.home system property variable is"+System.getProperty(" -Dcatalina.home"));
+        //        logMe("CATALINA.HOME system env variable is"+System.getenv("catalina.home"));
+        //        logMe("CATALINA_BASE system env variable is"+System.getenv("CATALINA_BASE"));
+        //        Map<String, String> env = System.getenv();
+        //        for (String envName : env.keySet()) {
+        //            logMe("%s=%s%n"+ envName+ env.get(envName));
+        //        }
 
         
-        if (value.contains("${catalina.home}") &&  System.getenv("CATALINA_HOME")!=null    ) {
-            value = value.replace("${catalina.home}", System.getenv("CATALINA_HOME"));
+        if (value.contains("${catalina.home}") &&  (catalina != null)) {
+            value = value.replace("${catalina.home}", catalina);
+            logMe("replaced ${catalina.home} with " + catalina);
         }
 
-        if (value.contains("$catalina.home")&&  System.getenv("CATALINA_BASE")!=null) {
-            value = value.replace("$catalina.home", System.getenv("CATALINA_BASE"));
+        if (value.contains("$catalina.home") &&  (catalina != null)) {
+            value = value.replace("$catalina.home", catalina);
+            logMe("replaced $catalina.home with " + catalina);
         }
-        logMe("catalina home is.."+value);
+        logMe("--> catalina home set in new property is: " + value);
         return value;
     }
 
@@ -529,8 +570,10 @@ public class CoreResources implements ResourceLoaderAware {
             ret.add(epbean);
             i++;
         }
+        
+        // tbh change to print out properties 
 
-        System.out.println("found " + ret.size() + " records in extract.properties");
+        // System.out.println("found " + ret.size() + " records in extract.properties");
         return ret;
     }
 
@@ -551,7 +594,7 @@ public class CoreResources implements ResourceLoaderAware {
         while (i < cnt) {
 
             File f = new File(getField("filePath") + "xslt" + File.separator + extractFields[i]);
-            System.out.println(getField("filePath") + "xslt" + File.separator + extractFields[i]);
+            // System.out.println(getField("filePath") + "xslt" + File.separator + extractFields[i]);
             if (!f.exists())
                 throw new OpenClinicaSystemException("FileNotFound -- Please make sure" + extractFields[i] + "exists");
 
@@ -592,7 +635,7 @@ public class CoreResources implements ResourceLoaderAware {
 
     public void setPROPERTIES_DIR() {
         String resource = "classpath:properties/placeholder.properties";
-        System.out.println("Resource" + resource);
+        // System.out.println("Resource " + resource);
         Resource scr = resourceLoader.getResource(resource);
         String absolutePath = null;
         try {
@@ -601,7 +644,7 @@ public class CoreResources implements ResourceLoaderAware {
             // System.out.println("Resource" + ((ClassPathResource) scr).getPath());
             // System.out.println("Resource" + resource);
             PROPERTIES_DIR = absolutePath.replaceAll("placeholder.properties", "");
-            System.out.println("Resource" + PROPERTIES_DIR);
+            // System.out.println("Resource " + PROPERTIES_DIR);
         } catch (IOException e) {
             throw new OpenClinicaSystemException(e.getMessage(), e.fillInStackTrace());
         }
@@ -649,7 +692,7 @@ public class CoreResources implements ResourceLoaderAware {
     public static String[] getExtractFields(String key) {
         String value = EXTRACTINFO.getProperty(key);
 
-        System.out.println("key?" + key + "value = " + value);
+        // System.out.println("key? " + key + " value = " + value);
 
         if (value != null) {
             value = value.trim();
@@ -708,7 +751,7 @@ public class CoreResources implements ResourceLoaderAware {
 
     // TODO comment out system out after dev
     private static void logMe(String message) {
-      // System.out.println(message);
+        // System.out.println(message);
         logger.info(message);
     }
 
