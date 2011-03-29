@@ -97,6 +97,12 @@ public class DisplayItemBean implements Comparable {
      * Records ItemDataBean value stored in database only, may not always available. 
      */
     private String dbValue = "";
+    /**
+     * True, when an item should hide but take a blank spot.<br>
+     * False, when an item should show or should hide without taking a spot.
+     * By default, it is false.
+     */
+    private boolean blankDwelt;
     
     private void setProperties() {
         data = new ItemDataBean();
@@ -111,6 +117,7 @@ public class DisplayItemBean implements Comparable {
         dbValue = "";
         scdItemMetadataBean = new SCDItemMetadataBean();
         scdSetsForControl = new ArrayList<SCDItemMetadataBean>();
+        blankDwelt = false;
     }
 
     public DisplayItemBean() {
@@ -349,23 +356,23 @@ public class DisplayItemBean implements Comparable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((children == null) ? 0 : children.hashCode());
-        result = prime * result + ((data == null) ? 0 : data.hashCode());
-        result = prime * result + ((dbData == null) ? 0 : dbData.hashCode());
-        result = prime * result + ((dbValue == null) ? 0 : dbValue.hashCode());
+        result = prime * result + (children == null ? 0 : children.hashCode());
+        result = prime * result + (data == null ? 0 : data.hashCode());
+        result = prime * result + (dbData == null ? 0 : dbData.hashCode());
+        result = prime * result + (dbValue == null ? 0 : dbValue.hashCode());
         result = prime * result + discrepancyNoteStatus;
-        result = prime * result + ((discrepancyNotes == null) ? 0 : discrepancyNotes.hashCode());
-        result = prime * result + ((editFlag == null) ? 0 : editFlag.hashCode());
-        result = prime * result + ((eventDefinitionCRF == null) ? 0 : eventDefinitionCRF.hashCode());
+        result = prime * result + (discrepancyNotes == null ? 0 : discrepancyNotes.hashCode());
+        result = prime * result + (editFlag == null ? 0 : editFlag.hashCode());
+        result = prime * result + (eventDefinitionCRF == null ? 0 : eventDefinitionCRF.hashCode());
         result = prime * result + (isSCDtoBeShown ? 1231 : 1237);
-        result = prime * result + ((item == null) ? 0 : item.hashCode());
-        result = prime * result + ((metadata == null) ? 0 : metadata.hashCode());
+        result = prime * result + (item == null ? 0 : item.hashCode());
+        result = prime * result + (metadata == null ? 0 : metadata.hashCode());
         result = prime * result + numChildren;
         result = prime * result + numColumns;
         result = prime * result + numDiscrepancyNotes;
-        result = prime * result + ((scdDisplayInfo == null) ? 0 : scdDisplayInfo.hashCode());
-        result = prime * result + ((scdItemMetadataBean == null) ? 0 : scdItemMetadataBean.hashCode());
-        result = prime * result + ((scdSetsForControl == null) ? 0 : scdSetsForControl.hashCode());
+        result = prime * result + (scdDisplayInfo == null ? 0 : scdDisplayInfo.hashCode());
+        result = prime * result + (scdItemMetadataBean == null ? 0 : scdItemMetadataBean.hashCode());
+        result = prime * result + (scdSetsForControl == null ? 0 : scdSetsForControl.hashCode());
         result = prime * result + totClosed;
         result = prime * result + totNA;
         result = prime * result + totNew;
@@ -618,5 +625,13 @@ public class DisplayItemBean implements Comparable {
 
     public void setDbValue(String dbValue) {
         this.dbValue = dbValue;
+    }
+
+    public boolean isBlankDwelt() {
+        return blankDwelt;
+    }
+
+    public void setBlankDwelt(boolean blankDwelt) {
+        this.blankDwelt = blankDwelt;
     }
 }
