@@ -3,8 +3,8 @@ package org.akaza.openclinica.logic.rulerunner;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
@@ -12,6 +12,7 @@ import org.akaza.openclinica.domain.rule.action.ActionProcessor;
 import org.akaza.openclinica.domain.rule.action.ActionProcessorFacade;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunLogBean;
+import org.akaza.openclinica.domain.rule.action.ShowActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
@@ -26,7 +27,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
 public class DataEntryRuleRunner extends RuleRunner {
@@ -39,7 +39,7 @@ public class DataEntryRuleRunner extends RuleRunner {
     }
 
     public MessageContainer runRules(List<RuleSetBean> ruleSets, ExecutionMode executionMode, StudyBean currentStudy, HashMap<String, String> variableAndValue,
-            UserAccountBean ub, Phase phase, HttpServletRequest request) {
+            UserAccountBean ub, Phase phase) {
 
         if (variableAndValue == null || variableAndValue.isEmpty()) {
             logger.warn("You must be executing Rules in Batch");
@@ -48,13 +48,6 @@ public class DataEntryRuleRunner extends RuleRunner {
 
         MessageContainer messageContainer = new MessageContainer();
         HashMap<String, ArrayList<RuleActionContainer>> toBeExecuted = new HashMap<String, ArrayList<RuleActionContainer>>();
-        switch (executionMode) {
-        case SAVE:        {
-            toBeExecuted = (HashMap<String, ArrayList<RuleActionContainer>>)request.getAttribute("toBeExecuted");
-            break;
-        }
-        case DRY_RUN:
-        {
         for (RuleSetBean ruleSet : ruleSets) {
             String key = getExpressionService().getItemOid(ruleSet.getOriginalTarget().getValue());
             List<RuleActionContainer> allActionContainerListBasedOnRuleExecutionResult = null;
@@ -106,11 +99,7 @@ public class DataEntryRuleRunner extends RuleRunner {
                 }
             }
         }
-        request.setAttribute("toBeExecuted",toBeExecuted);
-        break;
-        }
-        
-        }
+
         for (Map.Entry<String, ArrayList<RuleActionContainer>> entry : toBeExecuted.entrySet()) {
             // Sort the list of actions
             Collections.sort(entry.getValue(), new RuleActionContainerComparator());
@@ -121,7 +110,7 @@ public class DataEntryRuleRunner extends RuleRunner {
 
                 ruleActionContainer.getRuleSetBean().setTarget(ruleActionContainer.getExpressionBean());
                 ruleActionContainer.getRuleAction().setCuratedMessage(
-                        curateMessage(ruleActionContainer.getRuleAction(), (ruleActionContainer.getRuleAction().getRuleSetRule())));
+                        curateMessage(ruleActionContainer.getRuleAction(), ruleActionContainer.getRuleAction().getRuleSetRule()));
                 ActionProcessor ap =
                     ActionProcessorFacade.getActionProcessor(ruleActionContainer.getRuleAction().getActionType(), ds, getMailSender(), dynamicsMetadataService,
                             ruleActionContainer.getRuleSetBean(), getRuleActionRunLogDao(), ruleActionContainer.getRuleAction().getRuleSetRule());
@@ -136,9 +125,13 @@ public class DataEntryRuleRunner extends RuleRunner {
                             DiscrepancyNoteBean.ITEM_DATA, currentStudy, ub, prepareEmailContents(ruleActionContainer.getRuleSetBean(), ruleActionContainer
                                     .getRuleAction().getRuleSetRule(), currentStudy, ruleActionContainer.getRuleAction()));
                 if (rab != null) {
-                    messageContainer.add(getExpressionService().getGroupOrdninalConcatWithItemOid(ruleActionContainer.getRuleSetBean().getTarget().getValue()),
+                    if(rab instanceof ShowActionBean) {
+                        messageContainer.add(getExpressionService().getGroupOidOrdinal(ruleActionContainer.getRuleSetBean().getTarget().getValue()), rab);
+                    } else {
+                        messageContainer.add(getExpressionService().getGroupOrdninalConcatWithItemOid(ruleActionContainer.getRuleSetBean().getTarget().getValue()),
                             ruleActionContainer.getRuleAction());
-                }
+                    }
+                }  
                 logger.info("END Expression is : {} , RuleAction : {} , ExecutionMode : {} ", new Object[] {
                     ruleActionContainer.getExpressionBean().getValue(), ruleActionContainer.getRuleAction().toString(), executionMode });
             }

@@ -17,17 +17,21 @@ public class MessageContainer {
         // addInternal(groupOrdinalPLusItemOid, ruleActionBean.getSummary(), MessageType.ERROR);
         // System.out.println("just added error : " + ruleActionBean.getSummary());
         if (ruleActionBean instanceof ShowActionBean) {
-            List<PropertyBean> properties = (((ShowActionBean) ruleActionBean).getProperties());
+            String groupOidOrdinal = groupOrdinalPLusItemOid;
+            List<PropertyBean> properties = ((ShowActionBean) ruleActionBean).getProperties();
             for (PropertyBean propertyBean : properties) {
-                addInternal(propertyBean.getOid(), ruleActionBean.getSummary(), MessageType.WARNING);
-                System.out.println("just added warning : " + ruleActionBean.getSummary());
+                String propertyOid = propertyBean.getOid();
+                addInternal(propertyOid.contains(".")? propertyOid : groupOidOrdinal+"."+propertyOid, 
+                        ruleActionBean.getSummary(), MessageType.WARNING);
+                //addInternal(propertyBean.getOid(), ruleActionBean.getSummary(), MessageType.WARNING);
+                //System.out.println("just added warning : " + ruleActionBean.getSummary());
             }
         } else {
         	addInternal(groupOrdinalPLusItemOid, ruleActionBean.getSummary(), MessageType.ERROR);
-            System.out.println("just added error : " + ruleActionBean.getSummary());
+            //System.out.println("just added error : " + ruleActionBean.getSummary());
         }
     }
-
+    
     public void addInternal(String groupOrdinalPLusItemOid, String summary, MessageType messageType) {
         if (groupOrdinalPLusItemOid2.containsKey(groupOrdinalPLusItemOid)) {
             groupOrdinalPLusItemOid2.get(groupOrdinalPLusItemOid).add(new TheContainer(summary, messageType));
