@@ -601,6 +601,12 @@ public class ExpressionService {
         logger.debug("getGroupOidConcatWithItemOid returns : {} ", result);
         return result;
     }
+    
+    public String getGroupOidOrdinal(String expression) {
+        String result = this.getItemGroupOidWithOrdinalFromExpression(expression);
+        logger.debug("getGroupOidOrdinal returns : {} ", result);
+        return result;
+    }
 
     public String replaceGroupOidOrdinalInExpression(String expression, Integer ordinal) {
         String replacement = getStudyEventDefinitionOidWithOrdinalFromExpression(expression) + SEPERATOR + getCrfOidFromExpression(expression) + SEPERATOR;
