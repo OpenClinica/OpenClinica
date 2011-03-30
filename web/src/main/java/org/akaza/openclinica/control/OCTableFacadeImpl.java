@@ -5,6 +5,7 @@ import org.jmesa.core.CoreContext;
 import org.jmesa.facade.TableFacadeImpl;
 import org.jmesa.limit.ExportType;
 import org.jmesa.view.View;
+import org.jmesa.view.csv.CsvViewExporter;
 import org.jmesa.view.excel.ExcelViewExporter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,8 +41,8 @@ public class OCTableFacadeImpl extends TableFacadeImpl {
             CoreContext cc = getCoreContext();
 
             if (exportType == ExportType.CSV) {
-                new OCCsvViewExporter(view, cc, response, fileName).export();
-                // new CsvViewExporter(view, cc, response, fileName + ".txt").export();
+//                new OCCsvViewExporter(view, cc, response, fileName).export();
+                 new CsvViewExporter(view, cc, response, fileName + ".txt").export();
             } else if (exportType == ExportType.EXCEL) {
                 new ExcelViewExporter(view, cc, response, fileName + ".xls").export();
             } else if (exportType == ExportType.PDF) {
