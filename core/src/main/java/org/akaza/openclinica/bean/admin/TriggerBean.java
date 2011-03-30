@@ -11,6 +11,7 @@ public class TriggerBean extends EntityBean {
     private Date previousDate;
     private Date nextDate;
     private String fullName;
+    private String groupName;
     private String description = "";
     private DatasetBean dataset = new DatasetBean();
     private UserAccountBean userAccount = new UserAccountBean();
@@ -18,6 +19,7 @@ public class TriggerBean extends EntityBean {
     private String tab;
     private String cdisc;
     private String spss;
+    private String exportFormat;
     private String contactEmail;
 	private String periodToRun;
 	private String datasetName;
@@ -127,4 +129,19 @@ public class TriggerBean extends EntityBean {
         this.userAccount = userAccount;
     }
 
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    public String getExportFormat() {
+        return exportFormat;
+    }
+
+    public void setExportFormat(String exportFormat) {
+        this.exportFormat = exportFormat;
+    }
 }

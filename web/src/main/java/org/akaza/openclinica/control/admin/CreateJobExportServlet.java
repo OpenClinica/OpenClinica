@@ -37,12 +37,7 @@ import java.util.*;
  */
 public class CreateJobExportServlet extends SecureController {
     public static final String PERIOD = "periodToRun";
-    public static final String TAB = "tab";
-    public static final String CDISC = "cdisc";
-    public static final String CDISC12 = "cdisc12";
-    public static final String CDISC13 = "cdisc13";
-    public static final String CDISC13OC = "cdisc13oc";
-    public static final String SPSS = "spss";
+    public static final String FORMAT_ID = "formatId";
     public static final String DATASET_ID = "dsId";
     public static final String DATE_START_JOB = "job";
     public static final String EMAIL = "contactEmail";
@@ -101,13 +96,9 @@ public class CreateJobExportServlet extends SecureController {
         request.setAttribute("datasets", dsList);
         request.setAttribute(JOB_NAME, fp2.getString(JOB_NAME));
         request.setAttribute(JOB_DESC, fp2.getString(JOB_DESC));
-        request.setAttribute(TAB, fp2.getString(TAB));
-        request.setAttribute(CDISC, fp2.getString(CDISC));
-        request.setAttribute(CDISC12, fp2.getString(CDISC12));
-        request.setAttribute(CDISC13, fp2.getString(CDISC13));
-        request.setAttribute(CDISC13OC, fp2.getString(CDISC13OC));
-        request.setAttribute(SPSS, fp2.getString(SPSS));
+        request.setAttribute("extractProperties", CoreResources.getExtractProperties());
         request.setAttribute(EMAIL, fp2.getString(EMAIL));
+        request.setAttribute(FORMAT_ID, fp2.getInt(FORMAT_ID));
         request.setAttribute(PERIOD, fp2.getString(PERIOD));
         request.setAttribute(DATASET_ID, fp2.getInt(DATASET_ID));
         Date jobDate = (fp2.getDateTime(DATE_START_JOB));
@@ -167,99 +158,102 @@ public class CreateJobExportServlet extends SecureController {
                 String jobDesc = fp.getString(JOB_DESC);
                 Date startDateTime = fp.getDateTime(DATE_START_JOB);
 
-                Map exportFormats = exportFormats(fp);
+                Integer exportFormatId = fp.getInt(FORMAT_ID);
 
-                for (Iterator iterator = exportFormats.keySet().iterator(); iterator.hasNext();) {
-                    Integer exportFormatId = (Integer)iterator.next();
-                    ExtractPropertyBean epBean = cr.findExtractPropertyBeanById(exportFormatId, "" + datasetId);
-                    DatasetBean dsBean = (DatasetBean)datasetDao.findByPK(new Integer(datasetId).intValue());
+                ExtractPropertyBean epBean = cr.findExtractPropertyBeanById(exportFormatId, "" + datasetId);
+                DatasetBean dsBean = (DatasetBean)datasetDao.findByPK(new Integer(datasetId).intValue());
 
-                    // set the job in motion
-                    String[] files = epBean.getFileName();
-                    String exportFileName;
-                    int fileSize = files.length;
-                    int  cnt = 0;
-                    dsBean.setName(dsBean.getName().replaceAll(" ", "_"));
-                    String[] exportFiles= epBean.getExportFileName();
-                     String pattern = "yyyy" + File.separator + "MM" + File.separator + "dd" + File.separator + "HHmmssSSS" + File.separator;
-                     SimpleDateFormat sdfDir = new SimpleDateFormat(pattern);
-                    int i =0;
-                    String[] temp = new String[exportFiles.length];
-                    //JN: The following logic is for comma separated variables, to avoid the second file be treated as a old file and deleted.
-                    while(i<exportFiles.length)
-                    {
-                        temp[i] = resolveVars(exportFiles[i],dsBean,sdfDir);
-                        i++;
-                    }
-                    epBean.setDoNotDelFiles(temp);
-                    epBean.setExportFileName(temp);
+                // set the job in motion
+                String[] files = epBean.getFileName();
+                String exportFileName;
+                int fileSize = files.length;
+                int  cnt = 0;
+                dsBean.setName(dsBean.getName().replaceAll(" ", "_"));
+                String[] exportFiles= epBean.getExportFileName();
+                 String pattern = "yyyy" + File.separator + "MM" + File.separator + "dd" + File.separator + "HHmmssSSS" + File.separator;
+                 SimpleDateFormat sdfDir = new SimpleDateFormat(pattern);
+                int i =0;
+                String[] temp = new String[exportFiles.length];
+                //JN: The following logic is for comma separated variables, to avoid the second file be treated as a old file and deleted.
+                String datasetFilePath = SQLInitServlet.getField("filePath")+"datasets";
 
-                    XsltTriggerService xsltService = new XsltTriggerService();
-                    String generalFileDir = SQLInitServlet.getField("filePath");
+                while(i<exportFiles.length)
+                {
+                    temp[i] = XsltTriggerService.resolveVars(exportFiles[i],dsBean,sdfDir, datasetFilePath);
+                    i++;
+                }
+                epBean.setDoNotDelFiles(temp);
+                epBean.setExportFileName(temp);
 
-                    generalFileDir = generalFileDir + "datasets" + File.separator + dsBean.getId() + File.separator + sdfDir.format(new java.util.Date());
+                XsltTriggerService xsltService = new XsltTriggerService();
+                String generalFileDir = SQLInitServlet.getField("filePath");
 
-                    exportFileName = epBean.getExportFileName()[cnt];
+                generalFileDir = generalFileDir + "datasets" + File.separator + dsBean.getId() + File.separator + sdfDir.format(new java.util.Date());
+
+                exportFileName = epBean.getExportFileName()[cnt];
 
 
-                    // need to set the dataset path here, tbh
-                    // next, can already run jobs, translations, and then add a message to be notified later
-                    //JN all the properties need to have the variables...
-                    String xsltPath = SQLInitServlet.getField("filePath") + "xslt" + File.separator +files[cnt];
-                    String endFilePath = epBean.getFileLocation();
-                    endFilePath  = getEndFilePath(endFilePath,dsBean,sdfDir);
-                  //  exportFileName = resolveVars(exportFileName,dsBean,sdfDir);
-                    if(epBean.getPostProcExportName()!=null)
-                    {
-                        //String preProcExportPathName = getEndFilePath(epBean.getPostProcExportName(),dsBean,sdfDir);
-                        String preProcExportPathName = resolveVars(epBean.getPostProcExportName(),dsBean,sdfDir);
-                        epBean.setPostProcExportName(preProcExportPathName);
-                    }
-                    if(epBean.getPostProcLocation()!=null)
-                    {
-                        String prePocLoc = getEndFilePath(epBean.getPostProcLocation(),dsBean,sdfDir);
-                        epBean.setPostProcLocation(prePocLoc);
-                    }
-                    setAllProps(epBean, dsBean, sdfDir);
-                    SimpleTrigger trigger = null;
+                // need to set the dataset path here, tbh
+                // next, can already run jobs, translations, and then add a message to be notified later
+                //JN all the properties need to have the variables...
+                String xsltPath = SQLInitServlet.getField("filePath") + "xslt" + File.separator +files[cnt];
+                String endFilePath = epBean.getFileLocation();
+                endFilePath  =  XsltTriggerService.getEndFilePath(endFilePath, dsBean, sdfDir, datasetFilePath);
+              //  exportFileName = resolveVars(exportFileName,dsBean,sdfDir);
+                if(epBean.getPostProcExportName()!=null)
+                {
+                    //String preProcExportPathName = getEndFilePath(epBean.getPostProcExportName(),dsBean,sdfDir);
+                    String preProcExportPathName = XsltTriggerService.resolveVars(epBean.getPostProcExportName(),dsBean,sdfDir, datasetFilePath);
+                    epBean.setPostProcExportName(preProcExportPathName);
+                }
+                if(epBean.getPostProcLocation()!=null)
+                {
+                    String prePocLoc = XsltTriggerService.getEndFilePath(epBean.getPostProcLocation(), dsBean, sdfDir, datasetFilePath);
+                    epBean.setPostProcLocation(prePocLoc);
+                }
+                XsltTriggerService.setAllProps(epBean, dsBean, sdfDir, datasetFilePath);
+                SimpleTrigger trigger = null;
 
-                    trigger = xsltService.generateXsltTrigger(xsltPath,
-                            generalFileDir, // xml_file_path
-                            endFilePath + File.separator,
-                            exportFileName,
-                            dsBean.getId(),
-                            epBean, userBean, request.getLocale().getLanguage(),cnt,  SQLInitServlet.getField("filePath") + "xslt");
+                trigger = xsltService.generateXsltTrigger(xsltPath,
+                        generalFileDir, // xml_file_path
+                        endFilePath + File.separator,
+                        exportFileName,
+                        dsBean.getId(),
+                        epBean, userBean, request.getLocale().getLanguage(),cnt,  SQLInitServlet.getField("filePath") + "xslt");
 
-                    //Updating the original trigger with user given inputs
-                    trigger.setRepeatCount(64000);
-                    trigger.setRepeatInterval(getIntervalTime(period));
-                    trigger.setDescription(jobDesc);
-                    // set just the start date
-                    trigger.setStartTime(startDateTime);
-                    trigger.setGroup(jobName);
-                    trigger.setName(jobName + exportFormatId);// + datasetId);
-                    trigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT);
-                    trigger.getJobDataMap().put(XsltTriggerService.EMAIL, email);
-                    trigger.getJobDataMap().put(XsltTriggerService.PERIOD, period);
-                    trigger.getJobDataMap().put(XsltTriggerService.EXPORT_FORMAT, getExportFormatById(exportFormatId));
+                //Updating the original trigger with user given inputs
+                trigger.setRepeatCount(64000);
+                trigger.setRepeatInterval(XsltTriggerService.getIntervalTime(period));
+                trigger.setDescription(jobDesc);
+                // set just the start date
+                trigger.setStartTime(startDateTime);
+                trigger.setName(jobName);// + datasetId);
+                trigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT);
+                trigger.getJobDataMap().put(XsltTriggerService.EMAIL, email);
+                trigger.getJobDataMap().put(XsltTriggerService.PERIOD, period);
+                trigger.getJobDataMap().put(XsltTriggerService.EXPORT_FORMAT, epBean.getFiledescription());
+                trigger.getJobDataMap().put(XsltTriggerService.EXPORT_FORMAT_ID, exportFormatId);
+                trigger.getJobDataMap().put(XsltTriggerService.JOB_NAME, jobName);
 
-                    JobDetailBean jobDetailBean = new JobDetailBean();
-                    jobDetailBean.setGroup(jobName);
-                    jobDetailBean.setName(trigger.getName());
-                    jobDetailBean.setJobClass(org.akaza.openclinica.job.XsltStatefulJob.class);
-                    jobDetailBean.setJobDataMap(trigger.getJobDataMap());
-                    jobDetailBean.setDurability(true); // need durability?
-                    jobDetailBean.setVolatility(false);
+                JobDetailBean jobDetailBean = new JobDetailBean();
+                jobDetailBean.setGroup(xsltService.TRIGGER_GROUP_NAME);
+                jobDetailBean.setName(trigger.getName());
+                jobDetailBean.setJobClass(org.akaza.openclinica.job.XsltStatefulJob.class);
+                jobDetailBean.setJobDataMap(trigger.getJobDataMap());
+                jobDetailBean.setDurability(true); // need durability?
+                jobDetailBean.setVolatility(false);
 
-                    // set to the scheduler
-                    try {
-                        Date dateStart = scheduler.scheduleJob(jobDetailBean, trigger);
-                        logger.info("== found job date: " + dateStart.toString());
-                        // set a success message here
-                    } catch (SchedulerException se) {
-                        se.printStackTrace();
-                        // set a message here with the exception message
-                    }
+                // set to the scheduler
+                try {
+                    Date dateStart = scheduler.scheduleJob(jobDetailBean, trigger);
+                    logger.info("== found job date: " + dateStart.toString());
+                    // set a success message here
+                } catch (SchedulerException se) {
+                    se.printStackTrace();
+                    setUpServlet();
+                    addPageMessage("Error creating Job.");
+                    forwardPage(Page.VIEW_JOB_SERVLET);
+                    return;
                 }
                 setUpServlet();
                 addPageMessage("You have successfully created a new job: " + jobName + " which is now set to run at the time you specified.");
@@ -283,18 +277,13 @@ public class CreateJobExportServlet extends SecureController {
         // v.addValidation(DATE_START_JOB + "Date", new Date(), Validator.DATE_IS_AFTER_OR_EQUAL);
         // TODO job names will have to be unique, tbh
 
-        String tab = fp.getString(TAB);
-        String cdisc = fp.getString(CDISC);
-        String cdisc12 = fp.getString(ExampleSpringJob.CDISC12);
-        String cdisc13 = fp.getString(ExampleSpringJob.CDISC13);
-        String cdisc13oc = fp.getString(ExampleSpringJob.CDISC13OC);
-        String spss = fp.getString(SPSS);
+        int formatId = fp.getInt(FORMAT_ID);
         Date jobDate = fp.getDateTime(DATE_START_JOB);
         HashMap errors = v.validate();
-        if ((tab == "") && (cdisc == "") && (spss == "") && (cdisc12 == "") && (cdisc13 == "") && (cdisc13oc == "")) {
+        if (formatId == 0) {
             // throw an error here, at least one should work
             // errors.put(TAB, "Error Message - Pick one of the below");
-            v.addError(errors, TAB, "Please pick at least one of the below.");
+            v.addError(errors, FORMAT_ID, "Please pick at least one.");
         }
         for (String triggerName : triggerNames) {
             if (triggerName.equals(fp.getString(JOB_NAME)) && (!triggerName.equals(properName))) {
@@ -306,179 +295,4 @@ public class CreateJobExportServlet extends SecureController {
         }
         return errors;
     }
-
-    private String getEndFilePath(String endFilePath,DatasetBean dsBean,SimpleDateFormat sdfDir){
-    	 String simpleDatePattern =  "yyyy" + File.separator + "MM" + File.separator + "dd" + File.separator ;
-         SimpleDateFormat sdpDir = new SimpleDateFormat(simpleDatePattern);
-
-
-         if(endFilePath.contains("$exportFilePath")) {
-             endFilePath = 	endFilePath.replace("$exportFilePath", SQLInitServlet.getField("filePath")+"datasets");// was + File.separator, tbh
-         }
-
-          if(endFilePath.contains("${exportFilePath}")) {
-             endFilePath = 	endFilePath.replace("${exportFilePath}", SQLInitServlet.getField("filePath")+"datasets");// was + File.separator, tbh
-         }
-         if(endFilePath.contains("$datasetId")) {
-         	endFilePath = endFilePath.replace("$datasetId", dsBean.getId()+"");
-         }
-         if(endFilePath.contains("${datasetId}")) {
-          	endFilePath = endFilePath.replace("${datasetId}", dsBean.getId()+"");
-          }
-         if(endFilePath.contains("$datasetName")) {
-         	endFilePath = endFilePath.replace("$datasetName", dsBean.getName());
-         }
-         if(endFilePath.contains("${datasetName}"))
-        		 {
-        	 endFilePath = endFilePath.replace("${datasetName}", dsBean.getName());
-        		 }
-         //TODO change to dateTime
-         if(endFilePath.contains("$datetime")) {
-         	endFilePath = endFilePath.replace("$datetime",  sdfDir.format(new java.util.Date()));
-         }
-         if(endFilePath.contains("${datetime}")){
-        		endFilePath = endFilePath.replace("${datetime}",  sdfDir.format(new java.util.Date()));
-         }
-         if(endFilePath.contains("$dateTime")) {
-          	endFilePath = endFilePath.replace("$dateTime",  sdfDir.format(new java.util.Date()));
-          }
-          if(endFilePath.contains("${dateTime}")){
-         		endFilePath = endFilePath.replace("${dateTime}",  sdfDir.format(new java.util.Date()));
-          }
-         if(endFilePath.contains("$date")) {
-
-         	endFilePath = endFilePath.replace("$date",sdpDir.format(new java.util.Date()) );
-         }
-         if(endFilePath.contains("${date}"))
-         {
-        	 endFilePath = endFilePath.replace("${date}",sdpDir.format(new java.util.Date()) );
-         }
-
-    	return endFilePath;
-    }
-
-    /**
-     * Returns the datetime based on pattern :"yyyy-MM-dd-HHmmssSSS", typically for resolving file name
-     * @param endFilePath
-     * @param dsBean
-     * @param sdfDir
-     * @return
-     */
-    private String resolveVars(String endFilePath,DatasetBean dsBean,SimpleDateFormat sdfDir){
-
-        if(endFilePath.contains("$exportFilePath")) {
-            endFilePath = 	endFilePath.replace("$exportFilePath", SQLInitServlet.getField("filePath")+"datasets");// was + File.separator, tbh
-        }
-
-         if(endFilePath.contains("${exportFilePath}")) {
-            endFilePath = 	endFilePath.replace("${exportFilePath}", SQLInitServlet.getField("filePath")+"datasets");// was + File.separator, tbh
-        }
-        if(endFilePath.contains("$datasetId")) {
-        	endFilePath = endFilePath.replace("$datasetId", dsBean.getId()+"");
-        }
-        if(endFilePath.contains("${datasetId}")) {
-         	endFilePath = endFilePath.replace("${datasetId}", dsBean.getId()+"");
-         }
-        if(endFilePath.contains("$datasetName")) {
-        	endFilePath = endFilePath.replace("$datasetName", dsBean.getName());
-        }
-        if(endFilePath.contains("${datasetName}"))
-       		 {
-       	 endFilePath = endFilePath.replace("${datasetName}", dsBean.getName());
-       		 }
-        if(endFilePath.contains("$datetime")) {
-       	 String simpleDatePattern = "yyyy-MM-dd-HHmmssSSS";
-             sdfDir = new SimpleDateFormat(simpleDatePattern);
-       	endFilePath = endFilePath.replace("$datetime",  sdfDir.format(new java.util.Date()));
-       }
-       if(endFilePath.contains("${datetime}")){
-       	 String simpleDatePattern = "yyyy-MM-dd-HHmmssSSS";
-            sdfDir = new SimpleDateFormat(simpleDatePattern);
-      		endFilePath = endFilePath.replace("${datetime}",  sdfDir.format(new java.util.Date()));
-       }
-       if(endFilePath.contains("$dateTime")) {
-      	 String simpleDatePattern = "yyyy-MM-dd-HHmmssSSS";
-        sdfDir = new SimpleDateFormat(simpleDatePattern);
-        	endFilePath = endFilePath.replace("$dateTime",  sdfDir.format(new java.util.Date()));
-        }
-        if(endFilePath.contains("${dateTime}")){
-       	 String simpleDatePattern = "yyyy-MM-dd-HHmmssSSS";
-            sdfDir = new SimpleDateFormat(simpleDatePattern);
-       		endFilePath = endFilePath.replace("${dateTime}",  sdfDir.format(new java.util.Date()));
-        }
-        if(endFilePath.contains("$date")) {
-        	 String dateFilePattern = "yyyy-MM-dd";
-        	  sdfDir = new SimpleDateFormat(dateFilePattern);
-        	endFilePath = endFilePath.replace("$date",sdfDir.format(new java.util.Date()) );
-        }
-        if(endFilePath.contains("${date}"))
-        {
-        	 String dateFilePattern = "yyyy-MM-dd";
-        	  sdfDir = new SimpleDateFormat(dateFilePattern);
-       	 endFilePath = endFilePath.replace("${date}",sdfDir.format(new java.util.Date()) );
-        }
-        //TODO change to dateTime
-
-   	return endFilePath;
-   }
-
-    private ExtractPropertyBean setAllProps(ExtractPropertyBean epBean,DatasetBean dsBean,SimpleDateFormat sdfDir) {
-    	epBean.setFiledescription(resolveVars(epBean.getFiledescription(),dsBean,sdfDir));
-    	epBean.setLinkText(resolveVars(epBean.getLinkText(),dsBean,sdfDir));
-    	epBean.setHelpText(resolveVars(epBean.getHelpText(),dsBean,sdfDir));
-    	epBean.setFileLocation(resolveVars(epBean.getFileLocation(),dsBean,sdfDir));
-    	epBean.setFailureMessage(resolveVars(epBean.getFailureMessage(),dsBean,sdfDir));
-    	epBean.setSuccessMessage(resolveVars(epBean.getSuccessMessage(),dsBean,sdfDir));
-
-    	epBean.setZipName(resolveVars(epBean.getZipName(),dsBean,sdfDir));
-    	return epBean;
-	}
-
-    private long getIntervalTime(String period) {
-        BigInteger interval = new BigInteger("0");
-        if ("monthly".equalsIgnoreCase(period)) {
-            interval = new BigInteger("2419200000"); // how many
-            // milliseconds in
-            // a month? should
-            // be 24192000000
-        } else if ("weekly".equalsIgnoreCase(period)) {
-            interval = new BigInteger("604800000"); // how many
-            // milliseconds in
-            // a week? should
-            // be 6048000000
-        } else { // daily
-            interval = new BigInteger("86400000");// how many
-            // milliseconds in a
-            // day?
-        }
-        return interval.longValue();
-    }
-
-    private Map exportFormats(FormProcessor fp) {
-        Map map = new HashMap();
-        if (fp.getString(TAB).equals("1")) map.put(CoreResources.TAB_ID, TAB);
-        if (fp.getString(SPSS).equals("1")) map.put(CoreResources.SPSS_ID, SPSS);
-        if (fp.getString(CDISC).equals("1")) map.put(CoreResources.CDISC_ODM_1_2_ID, CDISC);
-        if (fp.getString(CDISC12).equals("1")) map.put(CoreResources.CDISC_ODM_1_2_EXTENSION_ID, CDISC12);
-        if (fp.getString(CDISC13).equals("1")) map.put(CoreResources.CDISC_ODM_1_3_ID, CDISC13);
-        if (fp.getString(CDISC13OC).equals("1")) map.put(CoreResources.CDISC_ODM_1_3_EXTENSION_ID, CDISC13OC);
-
-        return map;
-    }
-
-    private String getExportFormatById(int id) {
-        String format;
-        switch (id) {
-            case 2 : format = CDISC13OC; break;
-            case 3 : format = CDISC13; break;
-            case 4 : format = CDISC12; break;
-            case 5 : format = CDISC; break;
-            case 8 : format = TAB; break;
-            case 9 : format = SPSS; break;
-            default: format = "";
-        }
-        return format;
-    }
-
-
 }

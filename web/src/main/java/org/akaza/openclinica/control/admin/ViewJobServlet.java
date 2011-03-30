@@ -14,6 +14,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.bean.TriggerRow;
 import org.akaza.openclinica.web.job.ExampleSpringJob;
+import org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.quartz.JobDataMap;
 import org.quartz.Trigger;
 import org.quartz.impl.StdScheduler;
@@ -70,17 +71,15 @@ public class ViewJobServlet extends SecureController {
         scheduler = getScheduler();
         // Scheduler sched = sfb.getScheduler();
 
-        String[] triggerNames = scheduler.getTriggerNames("DEFAULT");
+        String[] triggerNames = scheduler.getTriggerNames(XsltTriggerService.TRIGGER_GROUP_NAME);
 
         // logger.info("trigger list: "+triggerNames.length);
         // logger.info("trigger names: "+triggerNames.toString());
 
-        String jobNames[] = scheduler.getJobNames("DEFAULT");
 
         ArrayList triggerBeans = new ArrayList();
         for (String triggerName : triggerNames) {
-            Trigger trigger = scheduler.getTrigger(triggerName, "DEFAULT");
-            System.out.println("found trigger, full name: " + trigger.getFullName());
+            Trigger trigger = scheduler.getTrigger(triggerName, XsltTriggerService.TRIGGER_GROUP_NAME);
             try {
                 logger.debug("prev fire time " + trigger.getPreviousFireTime().toString());
                 logger.debug("next fire time " + trigger.getNextFireTime().toString());
@@ -115,7 +114,7 @@ public class ViewJobServlet extends SecureController {
                 // triggerBean.setStudyName(dataMap.getString(ExampleSpringJob.STUDY_NAME));
             }
             logger.debug("Trigger Priority: " + trigger.getName() + " " + trigger.getPriority());
-            if (scheduler.getTriggerState(triggerName, "DEFAULT") == Trigger.STATE_PAUSED) {
+            if (scheduler.getTriggerState(triggerName, XsltTriggerService.TRIGGER_GROUP_NAME) == Trigger.STATE_PAUSED) {
                 triggerBean.setActive(false);
                 logger.debug("setting active to false for trigger: " + trigger.getName());
             } else {

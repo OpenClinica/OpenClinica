@@ -6,6 +6,7 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.quartz.Trigger;
 import org.quartz.impl.StdScheduler;
 
@@ -57,7 +58,7 @@ public class PauseJobServlet extends SecureController {
         String gName = fp.getString("gname");
         String finalGroupName = "";
         if ("".equals(gName) || "0".equals(gName)) {
-            finalGroupName = groupName;
+            finalGroupName = XsltTriggerService.TRIGGER_GROUP_NAME;
         } else {// should equal 1
             finalGroupName = groupImportName;
         }

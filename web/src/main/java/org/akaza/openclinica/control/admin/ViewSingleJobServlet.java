@@ -16,6 +16,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.AuditEventRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.job.ExampleSpringJob;
+import org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.quartz.JobDataMap;
 import org.quartz.Trigger;
 import org.quartz.impl.StdScheduler;
@@ -67,7 +68,7 @@ public class ViewSingleJobServlet extends SecureController {
         String gName = fp.getString("gname");
         String groupName = "";
         if (gName.equals("") || gName.equals("0")) {
-            groupName = TRIGGER_GROUP;
+            groupName = XsltTriggerService.TRIGGER_GROUP_NAME;
         } else { // if (gName.equals("1")) {
             groupName = TRIGGER_IMPORT_GROUP;
         }
@@ -81,14 +82,14 @@ public class ViewSingleJobServlet extends SecureController {
 
         if (trigger == null) {
             System.out.println("*** reset trigger group name");
-            groupName = TRIGGER_GROUP;
+            groupName = XsltTriggerService.TRIGGER_GROUP_NAME;
             trigger = scheduler.getTrigger(triggerName.trim(), groupName);
         }
         // << tbh 09/03/2009 #4143
         // above is a hack, if we add more trigger groups this will have
         // to be redone
-        System.out.println("found trigger name: " + triggerName);
-        System.out.println("found group name: " + groupName);
+        logger.debug("found trigger name: " + triggerName);
+        logger.debug("found group name: " + groupName);
         // System.out.println("found trigger on the other side, full name: " +
         // trigger.getFullName());
         TriggerBean triggerBean = new TriggerBean();
@@ -102,10 +103,10 @@ public class ViewSingleJobServlet extends SecureController {
             // >> set active here, tbh 10/08/2009
             if (scheduler.getTriggerState(triggerName, groupName) == Trigger.STATE_PAUSED) {
                 triggerBean.setActive(false);
-                System.out.println("setting active to false for trigger: " + trigger.getName());
+                logger.debug("setting active to false for trigger: " + trigger.getName());
             } else {
                 triggerBean.setActive(true);
-                System.out.println("setting active to TRUE for trigger: " + trigger.getName());
+                logger.debug("setting active to TRUE for trigger: " + trigger.getName());
             }
             // <<
             if (trigger.getDescription() != null) {
@@ -113,21 +114,17 @@ public class ViewSingleJobServlet extends SecureController {
             }
             if (trigger.getJobDataMap().size() > 0) {
                 dataMap = trigger.getJobDataMap();
-                String contactEmail = dataMap.getString(ExampleSpringJob.EMAIL);
-                System.out.println("found email: " + contactEmail);
+                String contactEmail = dataMap.getString(XsltTriggerService.EMAIL);
+                logger.debug("found email: " + contactEmail);
                 // String datasetId =
                 // dataMap.getString(ExampleSpringJob.DATASET_ID);
                 // int dsId = new Integer(datasetId).intValue();
                 if (gName.equals("") || gName.equals("0")) {
-                    String tab = dataMap.getString(ExampleSpringJob.TAB);
-                    String cdisc = dataMap.getString(ExampleSpringJob.CDISC);
-                    String spss = dataMap.getString(ExampleSpringJob.SPSS);
+                    String exportFormat = dataMap.getString(XsltTriggerService.EXPORT_FORMAT);
                     String periodToRun = dataMap.getString(ExampleSpringJob.PERIOD);
                     // int userId = new Integer(userAcctId).intValue();
                     int dsId = dataMap.getInt(ExampleSpringJob.DATASET_ID);
-                    triggerBean.setCdisc(cdisc);
-                    triggerBean.setSpss(spss);
-                    triggerBean.setTab(tab);
+                    triggerBean.setExportFormat(exportFormat);
                     triggerBean.setPeriodToRun(periodToRun);
                     DatasetDAO datasetDAO = new DatasetDAO(sm.getDataSource());
                     DatasetBean dataset = (DatasetBean) datasetDAO.findByPK(dsId);
@@ -171,7 +168,7 @@ public class ViewSingleJobServlet extends SecureController {
 
         } catch (NullPointerException e) {
             // TODO Auto-generated catch block
-            System.out.println(" found NPE " + e.getMessage());
+            logger.debug(" found NPE " + e.getMessage());
             e.printStackTrace();
         }
         // need to show the extract for which this runs, which files, etc

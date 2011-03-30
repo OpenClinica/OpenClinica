@@ -21,6 +21,7 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.extract.GenerateExtractFileService;
+import org.akaza.openclinica.service.extract.XsltTriggerService;
 
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -261,6 +262,7 @@ public class XsltTransformJob extends QuartzJobBean {
 
             ProcessingFunction function = epBean.getPostProcessing();
             String subject = "";
+            String jobName = dataMap.getString(XsltTriggerService.JOB_NAME);
             // String emailBody = "";
             StringBuffer emailBuffer = new StringBuffer("");
             emailBuffer.append("<p>" + pageMessages.getString("email_header_1") + " " + EmailEngine.getAdminEmail() + " "
@@ -350,16 +352,28 @@ public class XsltTransformJob extends QuartzJobBean {
                 }
                 // otherwise don't do it
                 if (message.getCode().intValue() == 1) {
-                    subject = "Success: " + datasetBean.getName();
+                    if (jobName != null) {
+                        subject = "Success: " + jobName;
+                    } else {
+                        subject = "Success: " + datasetBean.getName();
+                    }
                 } else if (message.getCode().intValue() == 2) {
-                    subject = "Failure: " + datasetBean.getName();
+                    if (jobName != null) {
+                        subject = "Failure: " + jobName;
+                    } else {
+                        subject = "Failure: " + datasetBean.getName();
+                    }
                     if (failureMsg != null && !failureMsg.isEmpty()) {
                         emailBuffer.append(failureMsg);
                     }
                     emailBuffer.append("<P>" + message.getDescription());
                     postErrorMessage(message.getDescription(), context);
                 } else if (message.getCode().intValue() == 3) {
-                    subject = "Update: " + datasetBean.getName();
+                    if (jobName != null) {
+                        subject = "Update: " + jobName;
+                    } else {
+                        subject = "Update: " + datasetBean.getName();
+                    }
                 }
 
                 // subject = "" + datasetBean.getName();
@@ -421,7 +435,11 @@ public class XsltTransformJob extends QuartzJobBean {
                 ArchivedDatasetFileBean fbFinal =
                     generateFileRecord(archivedFilename, outputPath, datasetBean, done, new File(outputPath + File.separator + archivedFilename).length(),
                             ExportFormatBean.TXTFILE, userAccountId);
-                subject = "Job Ran: " + datasetBean.getName();
+                if (jobName != null) {
+                    subject = "Job Ran: " + jobName;
+                } else {
+                    subject = "Job Ran: " + datasetBean.getName();
+                }
                 // emailBody = datasetBean.getName() +
                 // " has run and you can access it ";// add url here
                 // emailBody = emailBody + "<a href='" +

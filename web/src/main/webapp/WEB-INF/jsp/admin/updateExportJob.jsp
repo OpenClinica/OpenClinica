@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
@@ -146,55 +147,25 @@
 		</td>
 		<td class="text">
 			<table border="0" cellpadding="0" cellspacing="0">
-			<tr>
-				<td class="text"><fmt:message key="tab_delimited" bundle="${resword}"/></td>
-				<td class="text"><input type="checkbox" name="tab" value="1"
-					<c:if test="${tab != ''}">
+            <c:forEach var="extract" items="${extractProperties}">
+            <tr>
+                <td class="text">
+                    <c:choose>
+                        <c:when test="${fn:startsWith(extract.filedescription, '&')==true}">
+                            <fmt:message key="${fn:substringAfter(extract.filedescription, '&')}" bundle="${restext}"/>&nbsp;
+                        </c:when>
+                        <c:otherwise>
+                            <c:out value="${extract.filedescription}"/>&nbsp;
+                        </c:otherwise>
+                    </c:choose>
+                </td>
+                <td class="text"><input type="radio" name="formatId" value="<c:out value="${extract.id}"/>"
+                    <c:if test="${formatId == extract.id}">
 						checked
 					</c:if>
 				/></td>
 			</tr>
-			<tr>
-				<td class="text"><fmt:message key="cdisc_odm" bundle="${resword}"/></td>
-				<td class="text"><input type="checkbox" name="cdisc12" value="1"
-					<c:if test="${cdisc12 != ''}">
-						checked
-					</c:if>
-				/></td>
-			</tr>
-			<tr>
-				<td class="text"><fmt:message key="cdisc_odm12oc" bundle="${resword}"/></td>
-				<td class="text"><input type="checkbox" name="cdisc" value="1"
-					<c:if test="${cdisc != ''}">
-						checked
-					</c:if>
-				/></td>
-			</tr>
-			<tr>
-				<td class="text"><fmt:message key="cdisc_odm13" bundle="${resword}"/></td>
-				<td class="text"><input type="checkbox" name="cdisc13" value="1"
-					<c:if test="${cdisc13 != ''}">
-						checked
-					</c:if>
-				/></td>
-			</tr>
-			<tr>
-				<td class="text"><fmt:message key="cdisc_odm13oc" bundle="${resword}"/></td>
-				<td class="text"><input type="checkbox" name="cdisc13oc" value="1"
-					<c:if test="${cdisc13oc != ''}">
-						checked
-					</c:if>
-				/></td>
-			</tr>
-			<tr>
-				<td class="text"><fmt:message key="spss_syntax_and_data" bundle="${resword}"/></td>
-				<td class="text"><input type="checkbox" name="spss" value="1"
-					<c:if test="${spss != ''}">
-						checked
-					</c:if>
-				/></td>
-			</tr>
-
+            </c:forEach>    
 			</table>
 		</td>
 	</tr>

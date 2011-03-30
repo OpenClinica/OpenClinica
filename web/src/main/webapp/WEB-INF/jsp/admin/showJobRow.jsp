@@ -25,7 +25,7 @@
 	<td class="table_cell">
 	 <table border="0" cellpadding="0" cellspacing="0">
 	 <tr>
-	 	<td><a href="ViewSingleJob?tname=<c:out value="${currRow.bean.fullName}" />&gname=0"><img name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="2"></a></td>
+	 	<td><a href="ViewSingleJob?tname=<c:out value="${currRow.bean.fullName}" />&gname=<c:out value="${currRow.bean.groupName}" />"><img name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="2"></a></td>
 		<td><a href="UpdateJobExport?tname=<c:out value="${currRow.bean.fullName}" />"><img name="bt_Edit1" src="images/bt_Edit.gif" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="2"></a></td>
 		<td>
 		<c:choose>
