@@ -118,7 +118,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_crf") + "&#160;&#160;&#160;&#160;&#160;", null, null);
         configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_version"), null, null);
         configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_group"), null, null);
-        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_item_name"), new ItemCellEditor(), null);
+        configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_item_name"), null, null);
         configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_rule_name"), null, null);
         configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_rule_oid"), null, null);
         configureColumn(row.getColumn(columnNames[index++]), resword.getString("view_rule_assignment_rule_status"), new StatusCellEditor(),
