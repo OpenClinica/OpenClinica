@@ -846,6 +846,33 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         return new ItemOrItemGroupHolder(null, null);
     }
     
+    public void updateGroupDynamicsInSection(List<DisplayItemWithGroupBean> displayItemWithGroups, int sectionId, EventCRFBean eventCrfBean) {
+        for (DisplayItemWithGroupBean itemWithGroup : displayItemWithGroups) {
+            if (itemWithGroup.isInGroup()) {
+                updateDynShowGroupInSection(itemWithGroup.getItemGroup(),eventCrfBean);
+                updateGroupDynItemsInSection(itemWithGroup, sectionId, eventCrfBean.getCRFVersionId(), eventCrfBean.getId());
+            }
+        }
+    }
+    
+    public void updateDynShowGroupInSection(DisplayItemGroupBean itemGroup, EventCRFBean eventCrfBean) {
+        DynamicsItemGroupMetadataBean dgm = dynamicsItemGroupMetadataDao.findByMetadataBean(itemGroup.getGroupMetaBean(), eventCrfBean);
+        if(dgm!=null && dgm.getId()>0) {
+            itemGroup.getGroupMetaBean().setShowGroup(dgm.isShowGroup());
+        }
+    }
+    
+    public void updateGroupDynItemsInSection(DisplayItemWithGroupBean itemWithGroup, int sectionId, int crfVersionId, int eventCrfId) {
+        DisplayItemGroupBean digb = itemWithGroup.getItemGroup();
+        int groupId = digb.getItemGroupBean().getId();
+        ArrayList<Integer> itemIds = (ArrayList<Integer>)this.dynamicsItemFormMetadataDao.findItemIdsForAGroupInSection(groupId, sectionId, crfVersionId, eventCrfId);
+        if(itemIds!=null && itemIds.size()>0) {
+            ArrayList<Integer> showItemIds = (ArrayList<Integer>)this.dynamicsItemFormMetadataDao.findShowItemIdsForAGroupInSection(groupId, sectionId, crfVersionId, eventCrfId);
+            this.updateItemGroupInASection(digb, itemIds, showItemIds);
+            this.updateGroupDynItemsInASection(itemWithGroup, showItemIds, groupId, sectionId, crfVersionId, eventCrfId);
+        }
+    }
+    
     public void updateRepeatingGroupDynItemsInASection(List<DisplayItemWithGroupBean> displayItemWithGroups, int sectionId, int crfVersionId, int eventCrfId) {
         for (DisplayItemWithGroupBean itemWithGroup : displayItemWithGroups) {
             if (itemWithGroup.isInGroup()) {

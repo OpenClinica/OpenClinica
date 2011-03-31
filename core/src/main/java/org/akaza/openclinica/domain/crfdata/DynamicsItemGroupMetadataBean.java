@@ -28,6 +28,7 @@ public class DynamicsItemGroupMetadataBean extends AbstractMutableDomainObject {
         setEventCrfId(eventCrfBean.getId());
         setItemGroupMetadataId(metadataBean.getId());
         setItemGroupId(metadataBean.getItemGroupId());
+        setShowGroup(metadataBean.isShowGroup());
         setPassedDde(0);
     }
 
