@@ -530,7 +530,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         logMe("Entering  displayItemWithGroups "+System.currentTimeMillis());
         List<DisplayItemWithGroupBean> displayItemWithGroups = createItemWithGroups(section, hasGroup, eventDefinitionCRFId, request);
         logMe("Entering  displayItemWithGroups end "+System.currentTimeMillis());
-        this.getItemMetadataService().updateRepeatingGroupDynItemsInASection(displayItemWithGroups, section.getSection().getId(), ecb.getCRFVersionId(), ecb.getId());
+        this.getItemMetadataService().updateGroupDynamicsInSection(displayItemWithGroups, section.getSection().getId(), ecb);
         section.setDisplayItemGroups(displayItemWithGroups);
 
         // why do we get previousSec and nextSec here, rather than in
@@ -1713,11 +1713,14 @@ public abstract class DataEntryServlet extends CoreSecureController {
                         }
                         logMe("DisplayItemWithGroupBean allitems4  end,begin"+System.currentTimeMillis());
                         // check groups
-                        List<DisplayItemGroupBean> itemGroups = new ArrayList<DisplayItemGroupBean>();
-                        itemGroups = section.getDisplayFormGroups();
+                        //List<DisplayItemGroupBean> itemGroups = new ArrayList<DisplayItemGroupBean>();
+                        //itemGroups = section.getDisplayFormGroups();
+                        //   But in jsp: section.displayItemGroups.itemGroup.groupMetaBean.showGroup
+                        List<DisplayItemWithGroupBean> itemGroups = section.getDisplayItemGroups();
                         // List<DisplayItemGroupBean> newItemGroups = new ArrayList<DisplayItemGroupBean>();
-                        for (DisplayItemGroupBean displayGroup : itemGroups) {
-                            if (fieldName.equals(displayGroup.getItemGroupBean().getOid())) {
+                        for (DisplayItemWithGroupBean itemGroup : itemGroups) {
+                            DisplayItemGroupBean displayGroup = itemGroup.getItemGroup();
+                            if (newFieldName.equals(displayGroup.getItemGroupBean().getOid())) {
                                 if (!displayGroup.getGroupMetaBean().isShowGroup()) {
                                     inSameSection = true;
                                     logger.debug("found itemgroup " + displayGroup.getItemGroupBean().getOid() + " vs. " + fieldName + " and is show item: "
@@ -1727,6 +1730,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                     displayGroup.getGroupMetaBean().setShowGroup(true);
                                     // add necessary rows to the display group here????
                                     // we have to set the items in the itemGroup for the displayGroup
+                                    loadItemsWithGroupRows(itemGroup, sb, edcb, ecb, request);
 
                                 }
                             }
@@ -1742,7 +1746,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
                     }
                     //
-                    this.getItemMetadataService().updateRepeatingGroupDynItemsInASection(section.getDisplayItemGroups(), section.getSection().getId(), ecb.getCRFVersionId(), ecb.getId());
+                    this.getItemMetadataService().updateGroupDynamicsInSection(displayItemWithGroups, section.getSection().getId(), ecb);
                     //
                     // we need the following for repeating groups, tbh
                     // >> tbh 06/2010
@@ -3026,8 +3030,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         ItemDataBean idb = dib.getData();
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
         if (dib.getEditFlag()!=null && "remove".equalsIgnoreCase(dib.getEditFlag()) 
-                && getItemMetadataService().isShown(idb.getItemId(), ecb, idb)) {
-            writeToDB(idb,dib,iddao,ordinal, request);
+                && getItemMetadataService().isShown(idb.getItemId(), ecb, idb)) { 
             getItemMetadataService().hideItem(dib.getMetadata(), ecb, idb);
         }else {
             if (getServletPage(request).equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
@@ -4453,6 +4456,121 @@ public abstract class DataEntryServlet extends CoreSecureController {
          * nullValuesList); }
          */
         return displayItemWithGroups;
+    }
+    
+    protected void loadItemsWithGroupRows(DisplayItemWithGroupBean itemWithGroup, SectionBean sb, EventDefinitionCRFBean edcb, EventCRFBean ecb, HttpServletRequest request) {
+        //this method is a copy of the method: createItemWithGroups , 
+        //only modified for load one DisplayItemWithGroupBean.
+        //
+        
+        ItemDAO idao = new ItemDAO(getDataSource());
+        // For adding null values to display items
+        FormBeanUtil formBeanUtil = new FormBeanUtil();
+        List<String> nullValuesList = new ArrayList<String>();
+        // BWP>> Get a List<String> of any null values such as NA or NI
+        // method returns null values as a List<String>
+        nullValuesList = formBeanUtil.getNullValuesByEventCRFDefId(edcb.getId(), getDataSource());
+        // >>BWP
+        ItemDataDAO iddao = new ItemDataDAO(getDataSource());
+        ArrayList data = iddao.findAllActiveBySectionIdAndEventCRFId(sb.getId(), ecb.getId());
+        DisplayItemGroupBean itemGroup = itemWithGroup.getItemGroup();
+        // to arrange item groups and other single items, the ordinal of
+        // a item group will be the ordinal of the first item in this
+        // group
+        DisplayItemBean firstItem = itemGroup.getItems().get(0);
+        DisplayItemBean checkItem = firstItem;
+        // does not work if there is not any data in the first item of the group
+        // i.e. imports.
+        // does it make a difference if we take a last item?
+        boolean noNeedToSwitch = false;
+        for (int i = 0; i < data.size(); i++) {
+            ItemDataBean idb = (ItemDataBean) data.get(i);
+            if (idb.getItemId() == firstItem.getItem().getId()) {
+                noNeedToSwitch = true;
+            }
+        }
+        if (!noNeedToSwitch) {
+            checkItem = itemGroup.getItems().get(itemGroup.getItems().size() - 1);
+        }
+        // so we are either checking the first or the last item, BUT ONLY ONCE
+        itemWithGroup.setPageNumberLabel(firstItem.getMetadata().getPageNumberLabel());
+
+        itemWithGroup.setItemGroup(itemGroup);
+        itemWithGroup.setInGroup(true);
+        itemWithGroup.setOrdinal(itemGroup.getGroupMetaBean().getOrdinal());
+
+        List<ItemBean> itBeans = idao.findAllItemsByGroupId(itemGroup.getItemGroupBean().getId(), sb.getCRFVersionId());
+
+        boolean hasData = false;
+        int checkAllColumns = 0;
+        // if a group has repetitions, the number of data of
+        // first item should be same as the row number
+        for (int i = 0; i < data.size(); i++) {
+            ItemDataBean idb = (ItemDataBean) data.get(i);
+
+            logger.debug("check all columns: " + checkAllColumns);
+            if (idb.getItemId() == checkItem.getItem().getId()) {
+                hasData = true;
+                logger.debug("set has data to --TRUE--");
+                checkAllColumns = 0;
+                // so that we only fire once a row
+                logger.debug("has data set to true");
+                DisplayItemGroupBean digb = new DisplayItemGroupBean();
+                // always get a fresh copy for items, may use other
+                // better way to
+                // do deep copy, like clone
+                List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb, sb.getId(), edcb, 0, getServletContext());
+
+                digb.setItems(dibs);
+                logger.trace("set with dibs list of : " + dibs.size());
+                digb.setGroupMetaBean(runDynamicsCheck(itemGroup.getGroupMetaBean(), request));
+                digb.setItemGroupBean(itemGroup.getItemGroupBean());
+                itemWithGroup.getItemGroups().add(digb);
+                itemWithGroup.getDbItemGroups().add(digb);
+            }
+        }
+
+        List<DisplayItemGroupBean> groupRows = itemWithGroup.getItemGroups();
+        logger.trace("how many group rows:" + groupRows.size());
+        logger.trace("how big is the data:" + data.size());
+        if (hasData) {
+            // iterate through the group rows, set data for each item in
+            // the group
+            for (int i = 0; i < groupRows.size(); i++) {
+                DisplayItemGroupBean displayGroup = groupRows.get(i);
+                for (DisplayItemBean dib : displayGroup.getItems()) {
+                    for (int j = 0; j < data.size(); j++) {
+                        ItemDataBean idb = (ItemDataBean) data.get(j);
+                        if (idb.getItemId() == dib.getItem().getId() && !idb.isSelected()) {
+                            idb.setSelected(true);
+                            dib.setData(idb);
+                            logger.debug("--> set data " + idb.getId() + ": " + idb.getValue());
+
+                            if (shouldLoadDBValues(dib)) {
+                                logger.debug("+++should load db values is true, set value");
+                                dib.loadDBValue();
+                                logger.debug("+++data loaded: " + idb.getName() + ": " + idb.getOrdinal() + " " + idb.getValue());
+                                logger.debug("+++try dib OID: " + dib.getItem().getOid());
+                            }
+                            break;
+                        }
+                    }
+                }
+
+            }
+        } else {
+            // no data, still add a blank row for displaying
+            DisplayItemGroupBean digb2 = new DisplayItemGroupBean();
+            List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb, sb.getId(), nullValuesList, getServletContext());
+            digb2.setItems(dibs);
+            logger.trace("set with nullValuesList of : " + nullValuesList);
+            digb2.setEditFlag("initial");
+            digb2.setGroupMetaBean(itemGroup.getGroupMetaBean());
+            digb2.setItemGroupBean(itemGroup.getItemGroupBean());
+            itemWithGroup.getItemGroups().add(digb2);
+            itemWithGroup.getDbItemGroups().add(digb2);
+
+        }
     }
 
     /**
