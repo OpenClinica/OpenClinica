@@ -5,7 +5,7 @@
 <%@ taglib uri="com.akazaresearch.tags" prefix="aka_frm" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="resnote"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='session' id='study' class='org.akaza.openclinica.bean.managestudy.StudyBean' />
@@ -210,10 +210,10 @@ giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%>
 <span id="mbm">
 <c:choose>
   <c:when test="${section.eventDefinitionCRF.electronicSignature == true}">
-  <fmt:message key="crf_data_entry_password_required" bundle="${resnote}"/>
+  <fmt:message key="crf_data_entry_password_required" bundle="${restext}"/>
   </c:when>
   <c:otherwise>
-  <fmt:message key="marking_CRF_complete_finalize_DE" bundle="${resnote}"/>
+  <fmt:message key="marking_CRF_complete_finalize_DE" bundle="${restext}"/>
   </c:otherwise>
 </c:choose>
 </span><br>
@@ -473,10 +473,10 @@ window.onload = initmb;
                                   "button_medium" onClick="return checkEntryStatus('DataStatus_top');" /></td>
                                 <c:choose>
                                     <c:when test="${! empty formMessages}">
-                                        <td valign="bottom"><img name="DataStatus_top" id="status_top" alt="<fmt:message key="data_status" bundle="${resword}"/>" src="images/icon_UnsavedData.gif"></td>
+                                        <td valign="bottom"><img name="DataStatus_top" id="status_top" alt="<fmt:message key="data_status" bundle="${resword}"/>" title="<fmt:message key="changed_not_saved" bundle="${restext}"/>" src="images/icon_UnsavedData.gif"></td>
                                     </c:when>
                                     <c:otherwise>
-                                        <td valign="bottom"><img name="DataStatus_top" id="status_top" alt="<fmt:message key="data_status" bundle="${resword}"/>" src="images/icon_UnchangedData.gif"></td>
+                                        <td valign="bottom"><img name="DataStatus_top" id="status_top" alt="<fmt:message key="data_status" bundle="${resword}"/>" title="<fmt:message key="not_changed_data" bundle="${restext}"/>" src="images/icon_UnchangedData.gif"></td>
                                     </c:otherwise>
                                 </c:choose>
 
@@ -1464,10 +1464,10 @@ table-->
                     <td><input type="submit" id="sel" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkEntryStatus('DataStatus_bottom');" /></td>
                     <c:choose>
                         <c:when test="${! empty formMessages}">
-                            <td valign="bottom"><img name="DataStatus_bottom" alt="<fmt:message key="data_status" bundle="${resword}"/>" src="images/icon_UnsavedData.gif">&nbsp;</td>
+                            <td valign="bottom"><img name="DataStatus_bottom" alt="<fmt:message key="data_status" bundle="${resword}"/>" title="<fmt:message key="changed_not_saved" bundle="${restext}"/>" src="images/icon_UnsavedData.gif">&nbsp;</td>
                         </c:when>
                         <c:otherwise>
-                            <td valign="bottom"><img name="DataStatus_bottom" alt="<fmt:message key="data_status" bundle="${resword}"/>" src="images/icon_UnchangedData.gif">&nbsp;</td>
+                            <td valign="bottom"><img name="DataStatus_bottom" alt="<fmt:message key="data_status" bundle="${resword}"/>" title="<fmt:message key="not_changed_data" bundle="${restext}"/>" src="images/icon_UnchangedData.gif">&nbsp;</td>
                         </c:otherwise>
                     </c:choose>
                 </tr>

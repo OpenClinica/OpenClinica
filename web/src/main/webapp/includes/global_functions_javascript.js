@@ -1271,6 +1271,13 @@ function setImage(strImageName, strImageFullPath) {
     if (objImage != null) { objImage.src = strImageFullPath; }
 }
 
+function setImageWithTitle(strImageName, strImageFullPath, strTitle) {
+    var objImage;
+
+    objImage = MM_findObj(strImageName);
+    if (objImage != null) { objImage.src = strImageFullPath; objImage.title = strTitle;}
+}
+
 function leftnavExpand(strLeftNavRowElementName){
 
     var objLeftNavRowElement;
