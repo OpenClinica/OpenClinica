@@ -111,4 +111,16 @@
 				and (repeat_number > 1 or repeat_max > 1)
         </sql>
     </query>
+  <query>
+  	<name>findTopOneGroupBySectionId</name>
+  	<sql> select distinct ig.* from item_group ig, item_group_metadata igm,
+      section s, item_form_metadata ifm
+      where ifm.section_id=? and igm.crf_version_id=s.crf_version_id
+      and ig.item_group_id = igm.item_group_id
+      and s.section_id = ifm.section_id
+      and ifm.item_id = igm.item_id
+      and ig.name != 'Ungrouped'
+  	  and rownum = 1
+  </sql>
+  </query>
 </queries>
