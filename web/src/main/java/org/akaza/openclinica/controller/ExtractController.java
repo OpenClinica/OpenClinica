@@ -51,6 +51,8 @@ public class ExtractController {
 
     private  String SCHEDULER = "schedulerFactoryBean";
     
+    public static String TRIGGER_GROUP_NAME = "XsltTriggers";
+    
     public ExtractController() {
         
     }
@@ -141,18 +143,21 @@ public class ExtractController {
         // asdf table: sort most recent at top
         System.out.println("found xslt file name " + xsltPath);
         
+        //JN: Adding dataset name inorder to display on listscheduled jobs page.
+        
+        epBean.setDatasetName(dsBean.getName());
         // String xmlFilePath = generalFileDir + ODMXMLFileName;
          simpleTrigger = xsltService.generateXsltTrigger(xsltPath, 
         		 generalFileDir, // xml_file_path
                 endFilePath + File.separator, 
                 exportFileName, 
                 dsBean.getId(), 
-                epBean, userBean, request.getLocale().getLanguage(),cnt,  SQLInitServlet.getField("filePath") + "xslt");
+                epBean, userBean, request.getLocale().getLanguage(),cnt,  SQLInitServlet.getField("filePath") + "xslt",this.TRIGGER_GROUP_NAME);
         // System.out.println("just set locale: " + request.getLocale().getLanguage());
      
         cnt++;
         jobDetailBean = new JobDetailBean();
-        jobDetailBean.setGroup(xsltService.TRIGGER_GROUP_NAME);
+        jobDetailBean.setGroup(this.TRIGGER_GROUP_NAME);
         jobDetailBean.setName(simpleTrigger.getName());
         jobDetailBean.setJobClass(org.akaza.openclinica.job.XsltStatefulJob.class);
         jobDetailBean.setJobDataMap(simpleTrigger.getJobDataMap());

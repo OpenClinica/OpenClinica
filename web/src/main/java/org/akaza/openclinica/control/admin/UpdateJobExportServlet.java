@@ -51,7 +51,7 @@ public class UpdateJobExportServlet extends SecureController {
     public static final String JOB_DESC = "jobDesc";
     public static final String USER_ID = "user_id";
     public static final String STUDY_NAME = "study_name";
-
+    public static final String TRIGGER_GROUP_JOB = "XsltTriggersExportJobs";
     @Override
     protected void mayProceed() throws InsufficientPermissionException {
         if (ub.isSysAdmin()) {
@@ -206,7 +206,7 @@ public class UpdateJobExportServlet extends SecureController {
                         endFilePath + File.separator,
                         exportFileName,
                         dsBean.getId(),
-                        epBean, userBean, request.getLocale().getLanguage(),cnt,  SQLInitServlet.getField("filePath") + "xslt");
+                        epBean, userBean, request.getLocale().getLanguage(),cnt,  SQLInitServlet.getField("filePath") + "xslt", TRIGGER_GROUP_JOB);
 
                 //Updating the original trigger with user given inputs
                 trigger.setRepeatCount(64000);

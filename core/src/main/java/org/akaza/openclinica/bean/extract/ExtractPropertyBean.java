@@ -45,7 +45,7 @@ public class ExtractPropertyBean implements Serializable{
 	
 	private String odmType;
 	
-	
+	private String datasetName;
 	
 	public String getOdmType() {
         return odmType;
@@ -252,4 +252,14 @@ public class ExtractPropertyBean implements Serializable{
 	public void setPostProcZip(boolean postProcZip) {
 		this.postProcZip = postProcZip;
 	}
+
+
+    public void setDatasetName(String datasetName) {
+        this.datasetName = datasetName;
+    }
+
+
+    public String getDatasetName() {
+        return datasetName;
+    }
 }

@@ -32,7 +32,7 @@ public class XsltTriggerService {
     public static final String FAILURE_MESSAGE="FAILURE_MESSAGE";
     public static final String XSLT_PATH="XSLT_PATH";
     public static final String EP_BEAN="epBean";
-    public static String TRIGGER_GROUP_NAME = "XsltTriggers";
+    public static String TRIGGER_GROUP_NAME = "XsltTriggersExportJobs";
     public static final String PERIOD = "periodToRun";
     public static final String EXPORT_FORMAT = "exportFormat";
     public static final String EXPORT_FORMAT_ID = "exportFormatId";
@@ -46,14 +46,17 @@ public class XsltTriggerService {
     public static final String COUNT="count";
     
     public SimpleTrigger generateXsltTrigger(String xslFile, String xmlFile, String endFilePath, 
-            String endFile, int datasetId, ExtractPropertyBean epBean, UserAccountBean userAccountBean, String locale,int cnt, String xsltPath) {
+            String endFile, int datasetId, ExtractPropertyBean epBean, UserAccountBean userAccountBean, String locale,int cnt, String xsltPath, String triggerGroupName) {
         Date startDateTime = new Date(System.currentTimeMillis());
-        String jobName = xmlFile + datasetId;
-        SimpleTrigger trigger = new SimpleTrigger(jobName, TRIGGER_GROUP_NAME, 0, 1);
+        String jobName =  datasetId+ "_"+epBean.getExportFileName()[0];
+        if(triggerGroupName!=null)
+            TRIGGER_GROUP_NAME = triggerGroupName;
+        
+        SimpleTrigger trigger = new SimpleTrigger(jobName, triggerGroupName, 0, 1);
         
         trigger.setStartTime(startDateTime);
         trigger.setName(jobName);// + datasetId);
-        trigger.setGroup(TRIGGER_GROUP_NAME);// + datasetId);
+        trigger.setGroup(triggerGroupName);// + datasetId);
         trigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT);
         // set job data map
         JobDataMap jobDataMap = new JobDataMap();
@@ -219,6 +222,7 @@ public class XsltTriggerService {
     	epBean.setFailureMessage(XsltTriggerService.resolveVars(epBean.getFailureMessage(), dsBean, sdfDir, filePath));
     	epBean.setSuccessMessage(XsltTriggerService.resolveVars(epBean.getSuccessMessage(), dsBean, sdfDir, filePath));
     	epBean.setZipName(XsltTriggerService.resolveVars(epBean.getZipName(), dsBean, sdfDir, filePath));
+    	epBean.setDatasetName(dsBean.getName());//JN:Adding this line to reflect the dataset name in the scheduled jobs list.
     	return epBean;
 	}
 

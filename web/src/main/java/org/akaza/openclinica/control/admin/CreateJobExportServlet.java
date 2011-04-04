@@ -45,6 +45,7 @@ public class CreateJobExportServlet extends SecureController {
     public static final String JOB_DESC = "jobDesc";
     public static final String USER_ID = "user_id";
     public static final String STUDY_NAME = "study_name";
+    public static final String TRIGGER_GROUP_JOB = "XsltTriggersExportJobs";
 
     private static String SCHEDULER = "schedulerFactoryBean";
     // faking out DRY - should we create a super class, Job Servlet, which
@@ -219,7 +220,7 @@ public class CreateJobExportServlet extends SecureController {
                         endFilePath + File.separator,
                         exportFileName,
                         dsBean.getId(),
-                        epBean, userBean, request.getLocale().getLanguage(),cnt,  SQLInitServlet.getField("filePath") + "xslt");
+                        epBean, userBean, request.getLocale().getLanguage(),cnt,  SQLInitServlet.getField("filePath") + "xslt", TRIGGER_GROUP_JOB);
 
                 //Updating the original trigger with user given inputs
                 trigger.setRepeatCount(64000);

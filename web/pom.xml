@@ -1,101 +1,107 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <artifactId>OpenClinica-web</artifactId>
-    <packaging>war</packaging>
-    <name>OpenClinica Web Application</name>
-    <parent>
-        <groupId>org.akaza.openclinica</groupId>
-        <artifactId>OpenClinica</artifactId>
-        <version>SNAPSHOT</version>
-    </parent>
-    <dependencies>
-    	<dependency>
-            <groupId>${groupId}</groupId>
-            <artifactId>OpenClinica-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>OpenClinica-web</artifactId>
+	<packaging>war</packaging>
+	<name>OpenClinica Web Application</name>
+	<parent>
+		<groupId>org.akaza.openclinica</groupId>
+		<artifactId>OpenClinica</artifactId>
+		<version>SNAPSHOT</version>
+	</parent>
+	<dependencies>
+		<dependency>
+			<groupId>${groupId}</groupId>
+			<artifactId>OpenClinica-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>net.sf.saxon</groupId>
 			<artifactId>saxon</artifactId>
 			<version>8.7</version>
 		</dependency>
-		 <dependency>
-            <groupId>net.sf.saxon</groupId>
-            <artifactId>saxon-dom</artifactId>
-            <version>8.7</version>
-        </dependency>
-        
-	    <dependency>
-            <groupId>rome</groupId>
-            <artifactId>rome-fetcher</artifactId>
-            <version>1.0</version>
-            <scope>compile</scope>
-            <exclusions>
-            	<!-- We are using jdom 1.1 lib below -->
-				<exclusion>
-					<groupId>jdom</groupId>
-					<artifactId>jdom</artifactId>
-				</exclusion>
-			</exclusions>
-        </dependency>
-        <dependency>
-            <groupId>rome</groupId>
-            <artifactId>rome</artifactId>
-            <version>1.0</version>
-            <scope>compile</scope>
-            <exclusions>
-            	<!-- We are using jdom 1.1 lib below -->
+		<dependency>
+			<groupId>net.sf.saxon</groupId>
+			<artifactId>saxon-dom</artifactId>
+			<version>8.7</version>
+		</dependency>
+
+		<dependency>
+			<groupId>rome</groupId>
+			<artifactId>rome-fetcher</artifactId>
+			<version>1.0</version>
+			<scope>compile</scope>
+			<exclusions>
+				<!-- We are using jdom 1.1 lib below -->
 				<exclusion>
 					<groupId>jdom</groupId>
 					<artifactId>jdom</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
-		
-		 <dependency>
-            <groupId>com.mockrunner.jdk15.jee5</groupId>
-            <artifactId>mockrunner</artifactId>
-            <version>0.4.2</version>
-            <scope>test</scope>
-        </dependency>
-			 <dependency>
-            <groupId>com.mockrunner.jdk15.jee5</groupId>
-            <artifactId>mockrunner-servlet</artifactId>
-            <version>0.4.2</version>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>rome</groupId>
+			<artifactId>rome</artifactId>
+			<version>1.0</version>
+			<scope>compile</scope>
+			<exclusions>
+				<!-- We are using jdom 1.1 lib below -->
+				<exclusion>
+					<groupId>jdom</groupId>
+					<artifactId>jdom</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>com.mockrunner.jdk15.jee5</groupId>
+			<artifactId>mockrunner</artifactId>
+			<version>0.4.2</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.mockrunner.jdk15.jee5</groupId>
+			<artifactId>mockrunner-servlet</artifactId>
+			<version>0.4.2</version>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>javax.transaction</groupId>
 			<artifactId>transaction-api</artifactId>
 			<version>1.1</version>
 		</dependency>
 		<dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-web</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-taglibs</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-acl</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.sourceforge.pjl-comp-filter</groupId>
+			<artifactId>pjl-comp-filter</artifactId>
+			<version>1.6.4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-taglibs</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-acl</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>cglib</groupId>
 			<artifactId>cglib-nodep</artifactId>
@@ -122,7 +128,7 @@
 			<version>2.1.2</version>
 			<scope>compile</scope>
 		</dependency>
-		<!-- for servlet tests  -->
+		<!-- for servlet tests -->
 		<dependency>
 			<groupId>javax.j2ee</groupId>
 			<artifactId>j2ee</artifactId>
@@ -135,14 +141,8 @@
 			<version>1.0</version>
 			<scope>compile</scope>
 		</dependency>
-		<!-- 
-		<dependency>
-			<groupId>org.mockejb</groupId>
-			<artifactId>mockejb</artifactId>
-			<version>0.6-beta2</version>
-			<scope>test</scope>
-		</dependency>
-		 -->
+		<!-- <dependency> <groupId>org.mockejb</groupId> <artifactId>mockejb</artifactId> 
+			<version>0.6-beta2</version> <scope>test</scope> </dependency> -->
 		<dependency>
 			<groupId>org.jmesa</groupId>
 			<artifactId>jmesa</artifactId>
@@ -173,7 +173,7 @@
 			<version>1.3.1</version>
 			<scope>compile</scope>
 		</dependency>
-		<!--  Needed by commons-validator -->
+		<!-- Needed by commons-validator -->
 		<dependency>
 			<groupId>oro</groupId>
 			<artifactId>oro</artifactId>
@@ -308,37 +308,37 @@
 		</dependency>
 	</dependencies>
 
-    <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
-        <plugins>
-            <plugin>
-                <inherited>true</inherited>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-    <scm>
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<inherited>true</inherited>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+	<scm>
 		<connection>${scm.path}/web</connection>
 		<developerConnection>${scm.path}/web</developerConnection>
 	</scm>
