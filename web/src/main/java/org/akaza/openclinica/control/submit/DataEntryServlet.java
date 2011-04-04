@@ -2152,8 +2152,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
         // section
         ItemGroupDAO igdao = new ItemGroupDAO(getDataSource());
         // find any item group which doesn't equal to 'Ungrouped'
-        List<ItemGroupBean> itemGroups = igdao.findLegitGroupBySectionId(sectionId);
-        if (!itemGroups.isEmpty()) {
+        ItemGroupBean itemGroup = igdao.findTopOneGroupBySectionId(sectionId);
+        if (itemGroup!=null && itemGroup.getId()>0) {
             logger.trace("This section has group");
             return true;
         }
