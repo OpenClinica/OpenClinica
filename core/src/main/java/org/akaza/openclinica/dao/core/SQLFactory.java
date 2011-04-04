@@ -159,7 +159,7 @@ public class SQLFactory {
             fileList.put(this.DAO_RULESET_AUDIT, "oracle_ruleset_audit_dao.xml");
             fileList.put(this.DAO_RULESETRULE_AUDIT, "oracle_rulesetrule_audit_dao.xml");
             fileList.put(this.DAO_ODM_EXTRACT, "oracle_odm_extract_dao.xml");
-            fileList.put(this.DAO_SUBJECTTRANSFER, "oracle_subjecttransfer_dao.xml");
+//            fileList.put(this.DAO_SUBJECTTRANSFER, "oracle_subjecttransfer_dao.xml");
         } else if ("postgres".equals(dbName)) {
             fileList.put(this.DAO_USERACCOUNT, "useraccount_dao.xml");
             fileList.put(this.DAO_ARCHIVED_DATASET_FILE, "archived_dataset_file_dao.xml");
