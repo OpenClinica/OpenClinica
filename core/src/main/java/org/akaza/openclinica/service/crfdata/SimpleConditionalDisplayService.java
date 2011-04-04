@@ -58,7 +58,7 @@ public class SimpleConditionalDisplayService {
                     if(scdPairMap.containsKey(displayItem.getMetadata().getId())) {
                         //displayItem is control item
                         ArrayList<SCDItemMetadataBean> sets = scdPairMap.get(displayItem.getMetadata().getId());
-                        displayItem.setScdSetsForControl(sets);
+                        displayItem.getScdData().setScdSetsForControl(sets);
                         for(SCDItemMetadataBean scd : sets) {
                             if(SimpleConditionalDisplayService.initConditionalDisplayToBeShown(displayItem, scd)) {
                                 showSCDItemIds.add(scd.getScdItemId());
@@ -66,9 +66,30 @@ public class SimpleConditionalDisplayService {
                         }
                     }
                     //control item is ahead of its scd item(s)
-                    if(displayItem.getScdItemMetadataBean().getScdItemFormMetadataId()>0) {
+                    if(displayItem.getScdData().getScdItemMetadataBean().getScdItemFormMetadataId()>0) {
                         //displayItem is scd item
                         displayItem.setIsSCDtoBeShown(showSCDItemIds.contains(displayItem.getMetadata().getItemId()));
+                    }
+                    
+                    if(displayItem.getChildren().size()>0) {
+                        ArrayList<DisplayItemBean> cs = displayItem.getChildren();
+                        for(DisplayItemBean c : cs) {
+                            if(scdPairMap.containsKey(c.getMetadata().getId())) {
+                                //c is control item
+                                ArrayList<SCDItemMetadataBean> sets = scdPairMap.get(c.getMetadata().getId());
+                                c.getScdData().setScdSetsForControl(sets);
+                                for(SCDItemMetadataBean scd : sets) {
+                                    if(SimpleConditionalDisplayService.initConditionalDisplayToBeShown(c, scd)) {
+                                        showSCDItemIds.add(scd.getScdItemId());
+                                    }
+                                }
+                            }
+                            //control item is ahead of its scd item(s)
+                            if(c.getScdData().getScdItemMetadataBean().getScdItemFormMetadataId()>0) {
+                                //c is scd item
+                                c.setIsSCDtoBeShown(showSCDItemIds.contains(c.getMetadata().getItemId()));
+                            }
+                        }
                     }
                 }
             }
@@ -83,8 +104,19 @@ public class SimpleConditionalDisplayService {
             ItemFormMetadataBean meta = displayItem.getMetadata();
             if(scds.containsKey(meta.getId())) {
                 SCDItemMetadataBean scdItemMetadataBean = scds.get(meta.getId());
-                scdItemMetadataBean.setScdItemId(displayItem.getMetadata().getItemId());
-                displayItem.setScdItemMetadataBean(scdItemMetadataBean);
+                scdItemMetadataBean.setScdItemId(meta.getItemId());
+                displayItem.getScdData().setScdItemMetadataBean(scdItemMetadataBean);
+            }
+            if(meta.getParentId()<1) {
+                ArrayList<DisplayItemBean> cs = displayItem.getChildren();
+                for(DisplayItemBean c : cs) {
+                    ItemFormMetadataBean cmeta = c.getMetadata();
+                    if(scds.containsKey(cmeta.getId())) {
+                        SCDItemMetadataBean scdItemMetadataBean = scds.get(cmeta.getId());
+                        scdItemMetadataBean.setScdItemId(cmeta.getItemId());
+                        c.getScdData().setScdItemMetadataBean(scdItemMetadataBean);
+                    }
+                }
             }
         }
         return dis;
@@ -126,7 +158,7 @@ public class SimpleConditionalDisplayService {
     public static Set<Integer> conditionalDisplayToBeShown (DisplayItemBean dib, Set<Integer> showSCDItemIds) {
         Set<Integer> showIds = showSCDItemIds;
         //a conditional display item will be always after its control item.
-        ArrayList<SCDItemMetadataBean> cds = dib.getScdSetsForControl();
+        ArrayList<SCDItemMetadataBean> cds = dib.getScdData().getScdSetsForControl();
         if(cds.size()>0) {
             for(SCDItemMetadataBean cd : cds) {
                 Integer scdItemId = cd.getScdItemId();
