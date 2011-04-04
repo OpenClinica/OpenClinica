@@ -13,15 +13,15 @@
 			<column name="version" type="int"/>
 		</createTable>
 	</changeSet>
-	<changeSet author="ywang" id="2011-02-07-7181-2">
-		<preConditions onFail="MARK_RAN">
-  			<not><indexExists indexName="i_scd_item_metadata_id" schemaName="public"/></not>
-		</preConditions>
-		<comment>Create index for scd_item_metadata on id column</comment>
-		<createIndex tableName="scd_item_metadata" indexName="i_scd_item_metadata_id">
-    		<column name="id"/>
-		</createIndex>
-	</changeSet>
+	<!--<changeSet author="ywang" id="2011-02-07-7181-2">-->
+		<!--<preConditions onFail="MARK_RAN">-->
+  			<!--<not><indexExists indexName="i_scd_item_metadata_id" schemaName="public"/></not>-->
+		<!--</preConditions>-->
+		<!--<comment>Create index for scd_item_metadata on id column</comment>-->
+		<!--<createIndex tableName="scd_item_metadata" indexName="i_scd_item_metadata_id">-->
+    		<!--<column name="id"/>-->
+		<!--</createIndex>-->
+	<!--</changeSet>-->
 	<changeSet author="ywang" id="2011-02-07-7181-3" dbms="oracle">
 		<preConditions onFail="MARK_RAN">
             <dbms type="oracle"/>

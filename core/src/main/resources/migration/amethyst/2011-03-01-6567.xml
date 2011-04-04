@@ -17,7 +17,7 @@
              (case when length(regexp_replace(units, '[^a-zA-Z0-9]','',1,0)) > 37
                   then 'MU_'||upper(substr(regexp_replace(units, '[^a-zA-Z0-9]','',1,0),0,37))
                else 'MU_'||upper(regexp_replace(units, '[^a-zA-Z0-9]','',1,0)) end)  as temp_oid
-             from item where length(units) >0 ;
+             from item where length(units) >0
 		</createView>	
 	</changeSet>
 	<changeSet author="ywang" id="2011-03-01-6567-3" dbms="postgresql">
