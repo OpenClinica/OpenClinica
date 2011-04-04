@@ -278,7 +278,7 @@ public class ScheduledJobController {
         return null;
         }
     private void logMe(String msg){
-        System.out.println(msg);
+      //  System.out.println(msg);
         logger.info(msg);
     }
     
