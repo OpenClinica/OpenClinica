@@ -174,7 +174,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
         CRFVersionDAO cvdao = new CRFVersionDAO(ds);
         ItemGroupDAO itemGroupDao = new ItemGroupDAO(ds);
         HashMap<String, String> allItems = new HashMap<String, String>();
-        Map<String, String[]> parentValues = new HashMap<String, String[]>();
+        Map<String, String[]> controlValues = new HashMap<String, String[]>();
         int maxItemFormMetadataId = new ItemFormMetadataDAO(ds).findMaxId();
         
 
@@ -684,7 +684,6 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         String[] mapValArray = (String[]) labelWithValues.get(responseLabel);
                         String value1 = resValues.replaceAll("\\\\,", "##");
                         String[] resValArray = value1.split(",");
-                        parentValues.put(secName+"---"+itemName, resValArray);
                         if (labelWithValues.containsKey(responseLabel)) {
                             if (!StringUtil.isBlank(resValues)) {
                                 for (int i = 0; i < resValArray.length; i++) {
@@ -696,8 +695,10 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                     }
                                 }
                             }
+                            controlValues.put(secName+"---"+itemName, mapValArray);
                         } else {
                             labelWithValues.put(responseLabel, resValArray);
+                            controlValues.put(secName+"---"+itemName, resValArray);
                         }
 
                         /*
@@ -1090,8 +1091,8 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                     if(repeats.contains(p0)) {
                                         controlItemName = p0; optionValue = p1; message = p2;
                                         pvKey+=p0;
-                                        if(parentValues.containsKey(pvKey)) {
-                                            String[] pvs = parentValues.get(pvKey);
+                                        if(controlValues.containsKey(pvKey)) {
+                                            String[] pvs = controlValues.get(pvKey);
                                             boolean existing = false;
                                             for(String s: pvs) {
                                                 if(s.trim().equals(p1)) {
