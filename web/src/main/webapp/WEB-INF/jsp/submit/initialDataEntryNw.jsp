@@ -1099,7 +1099,7 @@ but the custom tag uses that, not this jstl code--%>
 <c:set var="currPage" value="${displayItem.singleItem.metadata.pageNumberLabel}" />
 
 <!--  found show item <c:out value="${displayItem.singleItem.metadata.showItem}"/> -->
-<c:set var="cdisplay" value="${displayItem.singleItem.scdItemMetadataBean.id}"/>
+<c:set var="cdisplay" value="${displayItem.singleItem.scdData.scdItemMetadataBean.id}"/>
 <c:if test="${displayItem.singleItem.metadata.showItem || cdisplay>0}">
     <%-- SHOW THE PARENT FIRST --%>
 <c:if test="${displayItem.singleItem.metadata.parentId == 0}">
@@ -1119,7 +1119,7 @@ but the custom tag uses that, not this jstl code--%>
 <c:if test="${!empty displayItem.singleItem.metadata.header}">
     <c:choose>
 	<c:when test="${cdisplay>0}">
-		<c:set var="scdShowStatus" value="${displayItem.singleItem.scdDisplayInfo.scdShowStatus}"/>
+		<c:set var="scdShowStatus" value="${displayItem.singleItem.scdData.scdDisplayInfo.scdShowStatus}"/>
 		<c:set var="cdId" value="${displayItem.singleItem.item.id}"/>
 		<c:choose>
 		<c:when test="${scdShowStatus == 1}">
@@ -1145,7 +1145,7 @@ but the custom tag uses that, not this jstl code--%>
 <c:if test="${!empty displayItem.singleItem.metadata.subHeader}">
 	<c:choose>
 	<c:when test="${cdisplay>0}">
-		<c:set var="scdShowStatus" value="${displayItem.singleItem.scdDisplayInfo.scdShowStatus}"/>
+		<c:set var="scdShowStatus" value="${displayItem.singleItem.scdData.scdDisplayInfo.scdShowStatus}"/>
 		<c:set var="cdId" value="${displayItem.singleItem.item.id}"/>
 		<c:choose>
 		<c:when test="${scdShowStatus == 1}">
@@ -1168,8 +1168,8 @@ but the custom tag uses that, not this jstl code--%>
     </tr>
 </c:if>
 
-<c:set var="rowDisplay" value="${displayItem.singleItem.scdDisplayInfo.rowDisplayStatus}"/>
-<c:set var="rowSCDShowIDStr" value="${displayItem.singleItem.scdDisplayInfo.rowSCDShowIDStr}"/>
+<c:set var="rowDisplay" value="${displayItem.singleItem.scdData.scdDisplayInfo.rowDisplayStatus}"/>
+<c:set var="rowSCDShowIDStr" value="${displayItem.singleItem.scdData.scdDisplayInfo.rowSCDShowIDStr}"/>
 <input type="hidden" id="rowSCDShowIDs${numOfTr}" value="${rowSCDShowIDStr}" />
 <c:choose>
 <c:when test="${rowDisplay == 0}">
@@ -1190,7 +1190,7 @@ but the custom tag uses that, not this jstl code--%>
                     
                 		<c:choose>
 						<c:when test="${cdisplay > 0}">
-							<c:set var="scdShowStatus" value="${displayItem.singleItem.scdDisplayInfo.scdShowStatus}"/>
+							<c:set var="scdShowStatus" value="${displayItem.singleItem.scdData.scdDisplayInfo.scdShowStatus}"/>
 							<c:set var="cdId" value="${displayItem.singleItem.item.id}"/>
 							<input type="hidden" id="col${cdId}" value="${numOfTr}"/>
 							<c:choose>
@@ -1304,7 +1304,7 @@ but the custom tag uses that, not this jstl code--%>
             <table border="0">
                 <c:set var="notFirstRow" value="${0}" />
                 <c:forEach var="childItem" items="${displayItem.singleItem.children}">
-                <c:set var="ccdisplay" value="${childItem.scdItemMetadataBean.id}"/>
+                <c:set var="ccdisplay" value="${childItem.scdData.scdItemMetadataBean.id}"/>
 				<c:if test="${childItem.metadata.showItem || ccdisplay>0}">
 
                 <c:set var="currColumn" value="${childItem.metadata.columnNumber}" />
@@ -1314,7 +1314,7 @@ but the custom tag uses that, not this jstl code--%>
                 </c:if>
                 <c:choose>
 				<c:when test="${ccdisplay > 0}">
-					<c:set var="scdShowStatus" value="${childItem.scdDisplayInfo.scdShowStatus}"/>
+					<c:set var="scdShowStatus" value="${childItem.scdData.scdDisplayInfo.scdShowStatus}"/>
 					<c:set var="cdId" value="${childItem.item.id}"/>
 					<c:choose>
 					<c:when test="${scdShowStatus == 1}"> 
