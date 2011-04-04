@@ -9,7 +9,7 @@ package org.akaza.openclinica.bean.submit;
 import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import org.akaza.openclinica.domain.crfdata.SCDItemMetadataBean;
+import org.akaza.openclinica.service.crfdata.SCDData;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -84,19 +84,7 @@ public class DisplayItemBean implements Comparable {
      * It is true if a scd item will display because of chosen options. 
      */
     private boolean isSCDtoBeShown = false;
-    private SCDItemDisplayInfo scdDisplayInfo = new SCDItemDisplayInfo(); 
-    /**
-     * held by a control displayItemBean
-     */
-    private ArrayList<SCDItemMetadataBean> scdSetsForControl = new ArrayList<SCDItemMetadataBean>();
-    /**
-     * held by a scd item
-     */
-    private SCDItemMetadataBean scdItemMetadataBean = new SCDItemMetadataBean();
-    /**
-     * Records ItemDataBean value stored in database only, may not always available. 
-     */
-    private String dbValue = "";
+    private SCDData scdData;
     /**
      * True, when an item should hide but take a blank spot.<br>
      * False, when an item should show or should hide without taking a spot.
@@ -113,10 +101,7 @@ public class DisplayItemBean implements Comparable {
         numColumns = 0;
         dbData = new ItemDataBean();
         isSCDtoBeShown = false;
-        scdDisplayInfo = new SCDItemDisplayInfo();
-        dbValue = "";
-        scdItemMetadataBean = new SCDItemMetadataBean();
-        scdSetsForControl = new ArrayList<SCDItemMetadataBean>();
+        scdData = new SCDData();
         blankDwelt = false;
     }
 
@@ -356,10 +341,10 @@ public class DisplayItemBean implements Comparable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
+        result = prime * result + (blankDwelt ? 1231 : 1237);
         result = prime * result + (children == null ? 0 : children.hashCode());
         result = prime * result + (data == null ? 0 : data.hashCode());
         result = prime * result + (dbData == null ? 0 : dbData.hashCode());
-        result = prime * result + (dbValue == null ? 0 : dbValue.hashCode());
         result = prime * result + discrepancyNoteStatus;
         result = prime * result + (discrepancyNotes == null ? 0 : discrepancyNotes.hashCode());
         result = prime * result + (editFlag == null ? 0 : editFlag.hashCode());
@@ -370,9 +355,7 @@ public class DisplayItemBean implements Comparable {
         result = prime * result + numChildren;
         result = prime * result + numColumns;
         result = prime * result + numDiscrepancyNotes;
-        result = prime * result + (scdDisplayInfo == null ? 0 : scdDisplayInfo.hashCode());
-        result = prime * result + (scdItemMetadataBean == null ? 0 : scdItemMetadataBean.hashCode());
-        result = prime * result + (scdSetsForControl == null ? 0 : scdSetsForControl.hashCode());
+        result = prime * result + (scdData == null ? 0 : scdData.hashCode());
         result = prime * result + totClosed;
         result = prime * result + totNA;
         result = prime * result + totNew;
@@ -390,6 +373,8 @@ public class DisplayItemBean implements Comparable {
         if (getClass() != obj.getClass())
             return false;
         DisplayItemBean other = (DisplayItemBean) obj;
+        if (blankDwelt != other.blankDwelt)
+            return false;
         if (children == null) {
             if (other.children != null)
                 return false;
@@ -404,11 +389,6 @@ public class DisplayItemBean implements Comparable {
             if (other.dbData != null)
                 return false;
         } else if (!dbData.equals(other.dbData))
-            return false;
-        if (dbValue == null) {
-            if (other.dbValue != null)
-                return false;
-        } else if (!dbValue.equals(other.dbValue))
             return false;
         if (discrepancyNoteStatus != other.discrepancyNoteStatus)
             return false;
@@ -445,20 +425,10 @@ public class DisplayItemBean implements Comparable {
             return false;
         if (numDiscrepancyNotes != other.numDiscrepancyNotes)
             return false;
-        if (scdDisplayInfo == null) {
-            if (other.scdDisplayInfo != null)
+        if (scdData == null) {
+            if (other.scdData != null)
                 return false;
-        } else if (!scdDisplayInfo.equals(other.scdDisplayInfo))
-            return false;
-        if (scdItemMetadataBean == null) {
-            if (other.scdItemMetadataBean != null)
-                return false;
-        } else if (!scdItemMetadataBean.equals(other.scdItemMetadataBean))
-            return false;
-        if (scdSetsForControl == null) {
-            if (other.scdSetsForControl != null)
-                return false;
-        } else if (!scdSetsForControl.equals(other.scdSetsForControl))
+        } else if (!scdData.equals(other.scdData))
             return false;
         if (totClosed != other.totClosed)
             return false;
@@ -479,7 +449,7 @@ public class DisplayItemBean implements Comparable {
     public EventDefinitionCRFBean getEventDefinitionCRF() {
         return eventDefinitionCRF;
     }
-
+    
     /**
      * @param eventDefinitionCRF
      *            The eventDefinitionCRF to set.
@@ -541,22 +511,6 @@ public class DisplayItemBean implements Comparable {
         this.discrepancyNoteStatus = discrepancyNoteStatus;
     }
 
-    public ArrayList<SCDItemMetadataBean> getScdSetsForControl() {
-        return scdSetsForControl;
-    }
-
-    public void setScdSetsForControl(ArrayList<SCDItemMetadataBean> scdSetsForControl) {
-        this.scdSetsForControl = scdSetsForControl;
-    }
-
-    public SCDItemMetadataBean getScdItemMetadataBean() {
-        return scdItemMetadataBean;
-    }
-
-    public void setScdItemMetadataBean(SCDItemMetadataBean scdItemMetadataBean) {
-        this.scdItemMetadataBean = scdItemMetadataBean;
-    }
-
     public boolean getIsSCDtoBeShown() {
         return isSCDtoBeShown;
     }
@@ -611,21 +565,6 @@ public class DisplayItemBean implements Comparable {
 		this.discrepancyNotes = discrepancyNotes;
 	}
 
-    public SCDItemDisplayInfo getScdDisplayInfo() {
-        return scdDisplayInfo;
-    }
-
-    public void setScdDisplayInfo(SCDItemDisplayInfo scdDisplayInfo) {
-        this.scdDisplayInfo = scdDisplayInfo;
-    }
-
-    public String getDbValue() {
-        return dbValue;
-    }
-
-    public void setDbValue(String dbValue) {
-        this.dbValue = dbValue;
-    }
 
     public boolean isBlankDwelt() {
         return blankDwelt;
@@ -633,5 +572,13 @@ public class DisplayItemBean implements Comparable {
 
     public void setBlankDwelt(boolean blankDwelt) {
         this.blankDwelt = blankDwelt;
+    }
+
+    public SCDData getScdData() {
+        return scdData;
+    }
+
+    public void setScdData(SCDData scdData) {
+        this.scdData = scdData;
     }
 }
