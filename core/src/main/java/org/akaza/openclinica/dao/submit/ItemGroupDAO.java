@@ -394,4 +394,21 @@ public class ItemGroupDAO extends AuditableEntityDAO {
         return result;
     }
     
+
+    public ItemGroupBean findTopOneGroupBySectionId(int sectionId) {
+        ItemGroupBean formGroupBean = new ItemGroupBean();
+        this.setTypesExpected();
+
+        HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
+        variables.put(1, sectionId);
+
+        String sql = digester.getQuery("findTopOneGroupBySectionId");
+        ArrayList listofMap = this.select(sql, variables);
+        for (Object map : listofMap) {
+            formGroupBean = (ItemGroupBean) this.getEntityFromHashMap((HashMap) map);
+
+        }
+        return formGroupBean;
+    }
+    
 }
