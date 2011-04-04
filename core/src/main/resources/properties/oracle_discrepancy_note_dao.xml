@@ -18,18 +18,62 @@
                 AND dn.discrepancy_note_id = dad.discrepancy_note_id
     	</sql>
     </query>
-  <query>
-        <name>findEventCRFDNotesForToolTips</name>
-        <sql>          
+    <query>
+    <name>findEventCRFDNotesForToolTips</name>
+    <sql>
 SELECT dn.*, eventcrf_map.column_name FROM discrepancy_note dn, dn_event_crf_map eventcrf_map,
-            event_crf eventcrf WHERE eventcrf.event_crf_id =?
-            AND
-            eventcrf.event_crf_id=eventcrf_map.event_crf_id
-            AND eventcrf_map.discrepancy_note_id=dn.discrepancy_note_id
-		and dn.parent_dn_id !=0
-		and dn.discrepancy_note_id = (select max(discrepancy_note_id) from discrepancy_note dn2 where dn2.parent_dn_id = dn.parent_dn_id)
-		        </sql>
-    </query>
+        event_crf eventcrf WHERE eventcrf.event_crf_id =?
+        AND
+        eventcrf.event_crf_id=eventcrf_map.event_crf_id
+        AND eventcrf_map.discrepancy_note_id=dn.discrepancy_note_id
+    and dn.parent_dn_id !=0
+and column_name='date_interviewed'
+    and dn.discrepancy_note_id = (select max(dn2.discrepancy_note_id) from discrepancy_note dn2,event_crf eventcrf2,dn_event_crf_map eventcrf_map2 where
+        eventcrf2.event_crf_id=eventcrf_map2.event_crf_id and eventcrf2.event_crf_id = ? AND eventcrf_map2.discrepancy_note_id=dn2.discrepancy_note_id and column_name='date_interviewed')
+union
+
+SELECT dn.*, eventcrf_map.column_name FROM discrepancy_note dn, dn_event_crf_map eventcrf_map,
+        event_crf eventcrf WHERE eventcrf.event_crf_id =?
+        AND
+        eventcrf.event_crf_id=eventcrf_map.event_crf_id
+        AND eventcrf_map.discrepancy_note_id=dn.discrepancy_note_id
+    and dn.discrepancy_note_id = (SELECT dn.parent_dn_id FROM discrepancy_note dn, dn_event_crf_map eventcrf_map,
+        event_crf eventcrf WHERE eventcrf.event_crf_id =?
+        AND
+        eventcrf.event_crf_id=eventcrf_map.event_crf_id
+        AND eventcrf_map.discrepancy_note_id=dn.discrepancy_note_id
+    and dn.parent_dn_id !=0
+and column_name='date_interviewed'
+    and dn.discrepancy_note_id = (select max(dn2.discrepancy_note_id) from discrepancy_note dn2,event_crf eventcrf2,dn_event_crf_map eventcrf_map2 where
+        eventcrf2.event_crf_id=eventcrf_map2.event_crf_id and eventcrf2.event_crf_id = ? AND eventcrf_map2.discrepancy_note_id=dn2.discrepancy_note_id and column_name='date_interviewed'))
+union
+SELECT dn.*, eventcrf_map.column_name FROM discrepancy_note dn, dn_event_crf_map eventcrf_map,
+        event_crf eventcrf WHERE eventcrf.event_crf_id =?
+        AND
+        eventcrf.event_crf_id=eventcrf_map.event_crf_id
+        AND eventcrf_map.discrepancy_note_id=dn.discrepancy_note_id
+    and dn.parent_dn_id !=0
+and column_name='interviewer_name'
+    and dn.discrepancy_note_id = (select max(dn2.discrepancy_note_id) from discrepancy_note dn2,event_crf eventcrf2,dn_event_crf_map eventcrf_map2 where
+        eventcrf2.event_crf_id=eventcrf_map2.event_crf_id and eventcrf2.event_crf_id = ? AND eventcrf_map2.discrepancy_note_id=dn2.discrepancy_note_id and column_name='interviewer_name')
+union
+
+SELECT dn.*, eventcrf_map.column_name FROM discrepancy_note dn, dn_event_crf_map eventcrf_map,
+        event_crf eventcrf WHERE eventcrf.event_crf_id =?
+        AND
+        eventcrf.event_crf_id=eventcrf_map.event_crf_id
+        AND eventcrf_map.discrepancy_note_id=dn.discrepancy_note_id
+    and dn.discrepancy_note_id = (SELECT dn.parent_dn_id FROM discrepancy_note dn, dn_event_crf_map eventcrf_map,
+        event_crf eventcrf WHERE eventcrf.event_crf_id =?
+        AND
+        eventcrf.event_crf_id=eventcrf_map.event_crf_id
+        AND eventcrf_map.discrepancy_note_id=dn.discrepancy_note_id
+    and dn.parent_dn_id !=0
+and column_name='interviewer_name'
+    and dn.discrepancy_note_id = (select max(dn2.discrepancy_note_id) from discrepancy_note dn2,event_crf eventcrf2,dn_event_crf_map eventcrf_map2 where
+        eventcrf2.event_crf_id=eventcrf_map2.event_crf_id and eventcrf2.event_crf_id = ? AND eventcrf_map2.discrepancy_note_id=dn2.discrepancy_note_id and column_name='interviewer_name'))
+            </sql>
+</query>
     <query>
     	<name>findAllStudySubjectDNByStudy</name>
     	<sql>SELECT dn.*,ss.label, dad.age, dad.days FROM study_subject ss, dn_study_subject_map dss, dn_age_days dad, discrepancy_note dn left outer join user_account ua on ua.user_id = dn.assigned_user_id
@@ -840,18 +884,38 @@ SELECT dn.*, eventcrf_map.column_name FROM discrepancy_note dn, dn_event_crf_map
         </sql>
     </query>
     <query>
-        <name>findExistingNotesForToolTip</name>
-        <sql>
-            SELECT dn.*FROM discrepancy_note dn, dn_item_data_map dsm,item_data id
-			where dsm.item_data_id= ? AND dn.discrepancy_note_id=dsm.discrepancy_note_id and
-			dsm.item_data_id = id.item_data_id
-            and dn.discrepancy_note_id in (select max(dn2.discrepancy_note_id)
-                FROM discrepancy_note dn2, dn_item_data_map dsms,item_data id where
-					dsm.item_data_id= ? AND dn.discrepancy_note_id=dsm.discrepancy_note_id and
-						dsm.item_data_id = id.item_data_id
-						and dn2.parent_dn_id = dn.parent_dn_id) 
-        </sql>
-  </query>
+    <name>findExistingNotesForToolTip</name>
+    <sql>
+             SELECT dn.*
+                    FROM discrepancy_note dn, dn_item_data_map dsm,item_data id
+                    where
+                dsm.item_data_id= ?           AND
+                 dn.discrepancy_note_id=dsm.discrepancy_note_id and
+                    dsm.item_data_id = id.item_data_id
+                        and dn.discrepancy_note_id in (select max(dn2.discrepancy_note_id)  FROM discrepancy_note dn2, dn_item_data_map dsms,item_data id
+                    where
+                dsms.item_data_id= ?            AND
+                 dn2.discrepancy_note_id=dsms.discrepancy_note_id and
+                    dsms.item_data_id = id.item_data_id
+
+                )
+                union
+             SELECT dnParent.*
+             FROM discrepancy_note dnParent where dnParent.discrepancy_note_id =  ( SELECT dn.parent_dn_id
+                    FROM discrepancy_note dn, dn_item_data_map dsm,item_data id
+                    where
+                dsm.item_data_id= ?           AND
+                 dn.discrepancy_note_id=dsm.discrepancy_note_id and
+                    dsm.item_data_id = id.item_data_id
+                        and dn.discrepancy_note_id in (select max(dn2.discrepancy_note_id)  FROM discrepancy_note dn2, dn_item_data_map dsms,item_data id
+                    where
+                dsms.item_data_id= ?            AND
+                 dn2.discrepancy_note_id=dsms.discrepancy_note_id and
+                    dsms.item_data_id = id.item_data_id
+
+) )
+    </sql>
+</query>
 
 
     <query>

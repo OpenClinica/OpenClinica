@@ -121,7 +121,7 @@
 	<query>
 		<name>countSCDItemBySectionId</name>
 		<sql>
-			select count(scd.id) from scd_item_metadata scd
+			select count(scd.id) as "COUNT" from scd_item_metadata scd
 			where scd.scd_item_form_metadata_id in (select ifm.item_form_metadata_id 
 			from item_form_metadata ifm where ifm.section_id = ?)
 		</sql>
