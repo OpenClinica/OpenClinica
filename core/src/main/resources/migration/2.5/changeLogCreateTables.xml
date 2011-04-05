@@ -717,7 +717,16 @@
             <column name="reference" type="VARCHAR(1000)"/>
         </createTable>
     </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-43">
+	<changeSet author="pgawade (generated)" id="1235684743487-43">
+        <createTable tableName="openclinica_version">
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="test_path" type="VARCHAR(1000)"/>
+        </createTable>
+    </changeSet>
+	<changeSet author="pgawade (generated)" id="1235684743487-43-1">
+		<dropTable tableName="openclinica_version" />
+    </changeSet>
+    <changeSet author="pgawade (generated)" id="1235684743487-43-2">
         <createTable tableName="openclinica_version">
         	<column autoIncrement="true" name="id" type="int">
                 <constraints nullable="false" primaryKey="true"/>
