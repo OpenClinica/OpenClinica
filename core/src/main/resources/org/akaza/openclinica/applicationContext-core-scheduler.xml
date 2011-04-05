@@ -36,7 +36,7 @@
         <property name="jobDetail" ref="legacyJobDetail"/>
         <property name="group" value="legacyJobConverter"/>  
         <!-- 30 seconds -->
-        <property name="startDelay" value="120000"/>
+        <property name="startDelay" value="900000"/>
         <property name="repeatCount" value="0"/>
     </bean>
 
