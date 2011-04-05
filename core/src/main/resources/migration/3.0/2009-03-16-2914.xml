@@ -38,21 +38,4 @@
     <changeSet author="ywang" id="2009-03-16-2914-6">
     	<addForeignKeyConstraint baseColumnNames="dataset_item_status_id" baseTableName="dataset" constraintName="dataset_fk_dataset_item_status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="dataset_item_status_id" referencedTableName="dataset_item_status"/>
     </changeSet>
-    <changeSet author="ywang" id="2009-03-16-2914-7" dbms="oracle">
-        <comment>Create a sequence/trigger to imitate autoIncrement functionality for oracle</comment>
-        <createSequence sequenceName="DATASET_ITEM_STATUS_ID_SEQ"/>
-        <sql splitStatements="false">
-            create or replace trigger dataset_item_status_bef_trg
-                before insert on dataset_item_status
-                    for each row begin
-                        if :new.id is null
-                         then select DATASET_ITEM_STATUS_ID_SEQ.nextval into :new.id from dual;
-                        end if;
-                    end;
-        </sql>
-        <rollback>
-            drop trigger dataset_item_status_bef_trg;
-            drop sequence DATASET_ITEM_STATUS_ID_SEQ;
-        </rollback>
-    </changeSet>
-</databaseChangeLog>
+ </databaseChangeLog>
