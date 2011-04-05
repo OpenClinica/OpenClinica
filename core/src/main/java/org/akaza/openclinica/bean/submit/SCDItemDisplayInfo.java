@@ -42,6 +42,9 @@ public class SCDItemDisplayInfo {
         int rowStartIndex = 0, rowStatus = -1, rowIndex = 1;
         String ids = "";
 
+        if(allItems==null || allItems.size()<1) {
+            return section;
+        }
         DisplayItemBean dib = allItems.get(0).getSingleItem();
         if(dib.getMetadata().getParentId()==0) {
             if(SCDItemDisplayInfo.isSCDItem(dib)) {
