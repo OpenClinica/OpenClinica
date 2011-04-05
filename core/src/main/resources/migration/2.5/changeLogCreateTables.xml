@@ -719,8 +719,13 @@
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-43">
         <createTable tableName="openclinica_version">
+        	<column autoIncrement="true" name="id" type="int">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
             <column name="name" type="VARCHAR(255)"/>
-            <column name="test_path" type="VARCHAR(1000)"/>
+            <column name="build_number" type="VARCHAR(1000)"/>
+            <column name="version" type="int"/>
+            <column name="update_timestamp" type="timestamp"/>
         </createTable>
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-44">
