@@ -17,6 +17,14 @@ import org.akaza.openclinica.bean.service.ProcessingFunction;
 //JN: added serializable, as this bean needs be to passed over in -non-static manner over to job. 
 public class ExtractPropertyBean implements Serializable{
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -2807419666500498114L;
+    /**
+     * 
+     */
+    
     protected Logger logger = LoggerFactory.getLogger(getClass().getName());
     private String[] fileName;
     private String filedescription;
