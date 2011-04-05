@@ -309,9 +309,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
         UserAccountBean ub =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
         
         if (fp.getString(GO_EXIT).equals("") && !isSubmitted && fp.getString("tabId").equals("") && fp.getString("sectionId").equals("")) {
-            HashMap unavailableCRF = getUnavailableCRFList();
-            if (unavailableCRF.containsKey(ecb.getId())) {
-                int userId = (Integer) unavailableCRF.get(ecb.getId());
+            //HashMap unavailableCRF = getUnavailableCRFList();
+            if (getUnavailableCRFList().containsKey(ecb.getId())) {
+                int userId = (Integer) getUnavailableCRFList().get(ecb.getId());
                 UserAccountDAO udao = new UserAccountDAO(getDataSource());
                 UserAccountBean ubean = (UserAccountBean) udao.findByPK(userId);
                 addPageMessage(resword.getString("CRF_unavailable") + " " + ubean.getName() + " " + resword.getString("Currently_entering_data") + " "
@@ -326,6 +326,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         if (!ecb.isActive()) {
             throw new InconsistentStateException(Page.LIST_STUDY_SUBJECTS_SERVLET, resexception.getString("event_not_exists"));
         }
+ 
         logMe("Enterting DataEntry Get the status/number of item discrepancy notes"+System.currentTimeMillis());
         // Get the status/number of item discrepancy notes
         DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
@@ -1621,6 +1622,11 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 ArrayList<Integer> prevShownDynItemDataIds = (ArrayList<Integer>)this.getItemMetadataService().getDynamicsItemFormMetadataDao().findShowItemDataIdsInSection(section.getSection().getId(), ecb.getCRFVersionId(), ecb.getId());
                 logMe("DisplayItemWithGroupBean dryrun  start"+System.currentTimeMillis());
                 HashMap<String, ArrayList<String>> rulesPostDryRun = runRules(allItems, ruleSets, false, shouldRunRules(), MessageType.WARNING, phase2,ecb, request);
+                
+                //JN: After Running rules second time, release the lock
+                getUnavailableCRFList().remove(ecb.getId());
+                
+                
                 //System.out.println("found rules post dry run: " + rulesPostDryRun.toString());
                 HashMap<String, ArrayList<String>> errorsPostDryRun = new HashMap<String, ArrayList<String>>();
                 // additional step needed, run rules and see if any items are 'shown' AFTER saving data
@@ -4250,7 +4256,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
         ArrayList sections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
         HashMap numItemsHM = sdao.getNumItemsBySectionId();
         HashMap numItemsPendingHM = sdao.getNumItemsPendingBySectionId(ecb);
-        HashMap numItemsBlankHM = sdao.getNumItemsBlankBySectionId(ecb);
         HashMap numItemsCompletedHM = sdao.getNumItemsCompletedBySectionId(ecb);
 
         for (int i = 0; i < sections.size(); i++) {
@@ -4260,14 +4265,13 @@ public abstract class DataEntryServlet extends CoreSecureController {
             int numItems = TableOfContentsServlet.getIntById(numItemsHM, key);
             int numItemsPending = TableOfContentsServlet.getIntById(numItemsPendingHM, key);
             int numItemsCompleted = TableOfContentsServlet.getIntById(numItemsCompletedHM, key);
-            int numItemsBlank = TableOfContentsServlet.getIntById(numItemsBlankHM, key);
 
             if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY) && edcb.isDoubleEntry()) {
-                if (numItemsPending == 0 && numItemsBlank == 0 && numItems > 0) {
+                if (numItemsPending == 0 && numItems > 0) {
                     return false;
                 }
             } else {
-                if (numItemsCompleted == 0 && numItemsBlank == 0 && numItems > 0) {
+                if (numItemsCompleted == 0 && numItems > 0) {
                     return false;
                 }
             }

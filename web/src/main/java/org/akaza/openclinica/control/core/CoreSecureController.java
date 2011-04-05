@@ -37,6 +37,7 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.SessionManager;
@@ -117,8 +118,7 @@ public abstract class CoreSecureController extends HttpServlet {
     public static final String SUPPORT_URL = "supportURL";
 
     public static final String MODULE = "module";// to determine which module
-
-    private HashMap unavailableCRFList = new HashMap();
+    private static HashMap unavailableCRFList = new HashMap();
     private DataSource dataSource = null;
 
     // user is in
@@ -529,20 +529,27 @@ public abstract class CoreSecureController extends HttpServlet {
         } catch (InconsistentStateException ise) {
             ise.printStackTrace();
             logger.warn("InconsistentStateException: org.akaza.openclinica.control.CoreSecureController: " + ise.getMessage());
-
+            if(((EventCRFBean)request.getAttribute( "event"))!=null)
+                getUnavailableCRFList().remove(((EventCRFBean)request.getAttribute( "event")).getId());
             addPageMessage(ise.getOpenClinicaMessage(), request);
             forwardPage(ise.getGoTo(), request, response);
         } catch (InsufficientPermissionException ipe) {
             ipe.printStackTrace();
             logger.warn("InsufficientPermissionException: org.akaza.openclinica.control.CoreSecureController: " + ipe.getMessage());
-
+            if(((EventCRFBean)request.getAttribute( "event"))!=null)
+                getUnavailableCRFList().remove(((EventCRFBean)request.getAttribute( "event")).getId());
             // addPageMessage(ipe.getOpenClinicaMessage());
             forwardPage(ipe.getGoTo(), request, response);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(CoreSecureController.getStackTrace(e));
-
+            if(((EventCRFBean)request.getAttribute( "event"))!=null)
+                getUnavailableCRFList().remove(((EventCRFBean)request.getAttribute( "event")).getId());
             forwardPage(Page.ERROR, request, response);
+        }
+        finally{
+            if(((EventCRFBean)request.getAttribute( "event"))!=null)
+                getUnavailableCRFList().remove(((EventCRFBean)request.getAttribute( "event")).getId());
         }
     }
 
@@ -573,6 +580,9 @@ public abstract class CoreSecureController extends HttpServlet {
             process(request, response);
         } catch (Exception e) {
             e.printStackTrace();
+            //UNLOCK user From the request
+            if(((EventCRFBean)request.getAttribute( "event"))!=null)
+            getUnavailableCRFList().remove(((EventCRFBean)request.getAttribute( "event")).getId());
         }
     }
 
@@ -591,6 +601,9 @@ public abstract class CoreSecureController extends HttpServlet {
             process(request, response);
         } catch (Exception e) {
             e.printStackTrace();
+            //UNLOCK EVENTCRF From the request.
+            if(((EventCRFBean)request.getAttribute( "event"))!=null)
+            getUnavailableCRFList().remove(((EventCRFBean)request.getAttribute( "event")).getId());
         }
     }
 
@@ -948,7 +961,7 @@ public abstract class CoreSecureController extends HttpServlet {
     }
 
     // JN:Not sure why these methods are synchronized?
-    public void removeLockedCRF(int userId) {
+    public static synchronized void  removeLockedCRF(int userId) {
         for (Iterator iter = getUnavailableCRFList().entrySet().iterator(); iter.hasNext();) {
             java.util.Map.Entry entry = (java.util.Map.Entry) iter.next();
             int id = (Integer) entry.getValue();
@@ -957,11 +970,13 @@ public abstract class CoreSecureController extends HttpServlet {
         }
     }
 
-    public void lockThisEventCRF(int ecb, int ub) {
+    public synchronized void  lockThisEventCRF(int ecb, int ub) {
+        
         getUnavailableCRFList().put(ecb, ub);
+        
     }
 
-    public HashMap getUnavailableCRFList() {
+    public  synchronized static HashMap getUnavailableCRFList() {
         return unavailableCRFList;
     }
 
