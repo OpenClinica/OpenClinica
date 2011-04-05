@@ -71,7 +71,14 @@ public class LogUsageStatsService {
             while (mapIter.hasNext()) {
                 mapEntry = mapIter.next();
                 if (null != mapEntry) {
-                    bufEventDetails.append(mapEntry.getKey() + ": " + mapEntry.getValue() + "\n");
+                    if ((mapEntry.getKey().equalsIgnoreCase(OC_last_system_start)) && (mapEntry.getValue() == null)) {
+                        bufEventDetails.append(mapEntry.getKey() + ": " + "No Last System start time available; it could be first start of OpenClinica");
+                    }
+ else if ((mapEntry.getKey().equalsIgnoreCase(OC_last_up_time)) && (mapEntry.getValue() == null)) {
+                    }
+ else {
+                        bufEventDetails.append(mapEntry.getKey() + ": " + mapEntry.getValue() + "\n");
+                    }
                 }
             }
         }
