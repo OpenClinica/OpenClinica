@@ -558,7 +558,7 @@ window.onload = initmb;
 </c:forEach>
 <c:choose>
 	<c:when test="${hasShown && isSectionShown}">
-        <td id="<c:out value="${displayItem.itemGroup.itemGroupBean.oid}"/>" class="aka_group_show">
+        <td class="aka_group_show">
 	</c:when>
 	<c:otherwise>
 		<td>
