@@ -488,7 +488,9 @@
 	<logger additivity="false" name="org.akaza.openclinica.service.usageStats.LogUsageStatsService">
 		<level value="INFO" />
 		<if condition='property("collectStats").equalsIgnoreCase("true")'>
-			<appender-ref ref="SYSLOG-USAGESTATS"/>	
+			<then>
+				<appender-ref ref="SYSLOG-USAGESTATS"/>	
+			</then>	
 		</if>	
 	</logger>
   <root>
