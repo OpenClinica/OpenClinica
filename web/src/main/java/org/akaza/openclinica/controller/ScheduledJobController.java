@@ -254,11 +254,11 @@ public class ScheduledJobController {
             
             pageMessages.add("The Job  "+theJobName+" has been cancelled");
         }
-        else if(triggerGroupName.equals(CreateJobExportServlet.TRIGGER_GROUP_JOB))
+        else if(triggerGroupName.equals(XsltTriggerService.TRIGGER_GROUP_NAME))
         {
             
             JobDetailBean jobDetailBean = new JobDetailBean();
-            jobDetailBean.setGroup(CreateJobExportServlet.TRIGGER_GROUP_JOB);
+            jobDetailBean.setGroup(XsltTriggerService.TRIGGER_GROUP_NAME);
             jobDetailBean.setName(newTrigger.getName());
             jobDetailBean.setJobClass(org.akaza.openclinica.job.XsltStatefulJob.class);
             jobDetailBean.setJobDataMap(newTrigger.getJobDataMap());

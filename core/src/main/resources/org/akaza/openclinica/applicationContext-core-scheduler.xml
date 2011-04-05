@@ -25,7 +25,28 @@
         </property>
         
         <property name="applicationContextSchedulerContextKey" value="applicationContext"/>
-        
+        <property name="triggers">
+            <list>
+                <ref bean="legacyJobTrigger"/>
+            </list>
+        </property>
     </bean>
-     
+
+    <bean id="legacyJobTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+        <property name="jobDetail" ref="legacyJobDetail"/>
+        <property name="group" value="legacyJobConverter"/>  
+        <!-- 30 seconds -->
+        <property name="startDelay" value="120000"/>
+        <property name="repeatCount" value="0"/>
+    </bean>
+
+    <bean name="legacyJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
+        <property name="jobClass" value="org.akaza.openclinica.job.LegacyJobConverterJob"/>
+        <property name="jobDataAsMap">
+          <map>
+            <entry key="timeout" value="5"/>
+          </map>
+        </property>
+    </bean>
+
 </beans>
