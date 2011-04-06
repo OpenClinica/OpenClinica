@@ -492,6 +492,9 @@
 				<appender-ref ref="SYSLOG-USAGESTATS"/>	
 			</then>	
 		</if>	
+	</logger>	
+	<logger additivity="false" name="org.akaza.openclinica.dao">
+		<level value="${logLevel}" />
 	</logger>
   <root>
     <!-- <level value="INFO" />
