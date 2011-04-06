@@ -111,7 +111,8 @@ public class SetUserRoleServlet extends SecureController {
                                 break;
                             case 6: roleMap.put(role.getId(), resterm.getString("site_monitor").trim());
                                 break;
-                            default: logger.info("No role matched when setting role description");
+                        default:
+                            // logger.info("No role matched when setting role description");
                         }
                     }
                 } else {
@@ -128,7 +129,8 @@ public class SetUserRoleServlet extends SecureController {
                                 break;
                             case 6: roleMap.put(role.getId(), resterm.getString("Monitor").trim());
                                 break;
-                            default: logger.info("No role matched when setting role description");
+                        default:
+                            // logger.info("No role matched when setting role description");
                         }
                     }
                 }
