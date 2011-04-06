@@ -7,6 +7,7 @@
  */
 package org.akaza.openclinica.control.login;
 
+import org.akaza.openclinica.control.core.CoreSecureController;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -29,6 +30,7 @@ public class LogoutServlet extends SecureController {
         sm = null;// set sm to null after user logs out
         logger.info("User  : {} , email address : {} Logged Out ", ub.getName(), ub.getEmail());
         removeLockedCRF(ub.getId());
+        CoreSecureController.removeLockedCRF(ub.getId());  
         session.removeAttribute("userBean");
         session.removeAttribute("study");
         session.removeAttribute("userRole");

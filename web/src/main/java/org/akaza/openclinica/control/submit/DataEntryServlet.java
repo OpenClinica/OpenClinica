@@ -1624,7 +1624,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 HashMap<String, ArrayList<String>> rulesPostDryRun = runRules(allItems, ruleSets, false, shouldRunRules(), MessageType.WARNING, phase2,ecb, request);
                 
                 //JN: After Running rules second time, release the lock
-                getUnavailableCRFList().remove(ecb.getId());
+             //   getUnavailableCRFList().remove(ecb.getId());
                 
                 
                 //System.out.println("found rules post dry run: " + rulesPostDryRun.toString());

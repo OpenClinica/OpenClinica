@@ -28,6 +28,7 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
+import org.akaza.openclinica.control.core.CoreSecureController;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.CreateNewStudyEventServlet;
@@ -103,6 +104,7 @@ public class ViewStudySubjectServlet extends SecureController {
         // belong to user's studies, it can not be viewed
         mayAccess();
         removeLockedCRF(ub.getId());
+        CoreSecureController.removeLockedCRF(ub.getId());  
         if (ub.isSysAdmin()) {
             return;
         }

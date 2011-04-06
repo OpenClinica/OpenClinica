@@ -1,5 +1,6 @@
 package org.akaza.openclinica.control.submit;
 
+import org.akaza.openclinica.control.core.CoreSecureController;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.OCSessionListener;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -32,6 +33,7 @@ public class CheckCRFLocked extends SecureController {
             return;
         }else if(request.getParameter("userId")!=null) {
             removeLockedCRF(Integer.parseInt(request.getParameter("userId")));
+            CoreSecureController.removeLockedCRF(Integer.parseInt(request.getParameter("userId")));  
             if(request.getParameter("exitTo")!=null){
                 response.sendRedirect(request.getParameter("exitTo"));
             }else{

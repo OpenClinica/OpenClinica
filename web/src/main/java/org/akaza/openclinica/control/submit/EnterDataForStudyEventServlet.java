@@ -24,6 +24,7 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.control.core.CoreSecureController;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.managestudy.ViewStudySubjectServlet;
@@ -114,6 +115,7 @@ public class EnterDataForStudyEventServlet extends SecureController {
     @Override
     protected void processRequest() throws Exception {
         removeLockedCRF(ub.getId());
+        CoreSecureController.removeLockedCRF(ub.getId());
         FormProcessor fp = new FormProcessor(request);
 
         int eventId = fp.getInt(INPUT_EVENT_ID, true);

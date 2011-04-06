@@ -8,6 +8,7 @@
 package org.akaza.openclinica.control.submit;
 
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.control.core.CoreSecureController;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -74,7 +75,7 @@ public class ListStudySubjectsServlet extends SecureController {
 
     @Override
     protected void processRequest() throws Exception {
-        removeLockedCRF(ub.getId());
+        CoreSecureController.removeLockedCRF(ub.getId());
         FormProcessor fp = new FormProcessor(request);
         if(fp.getString("showMoreLink").equals("")){
             showMoreLink = true;

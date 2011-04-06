@@ -17,6 +17,7 @@ package org.akaza.openclinica.web.filter;
 
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.control.core.CoreSecureController;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
@@ -126,6 +127,7 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
             resetLockCounter(username, LoginStatus.SUCCESSFUL_LOGIN, userAccountBean);
             //To remove the locking of Event CRFs previusly locked by this user. 
             SecureController.removeLockedCRF(userAccountBean.getId());
+            CoreSecureController.removeLockedCRF(userAccountBean.getId());
         } catch (LockedException le) {
             auditUserLogin(username, LoginStatus.FAILED_LOGIN_LOCKED, userAccountBean);
             throw le;

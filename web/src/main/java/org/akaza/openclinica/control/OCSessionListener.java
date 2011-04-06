@@ -1,5 +1,6 @@
 package org.akaza.openclinica.control;
 
+import org.akaza.openclinica.control.core.CoreSecureController;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 
@@ -28,6 +29,7 @@ public class OCSessionListener implements HttpSessionListener
       UserAccountBean ub = (UserAccountBean)session.getAttribute("userBean");
       if(ub!=null){
         SecureController.removeLockedCRF(ub.getId());    
+        CoreSecureController.removeLockedCRF(ub.getId());    
       }
 //      System.out.println("=========================="+ub.getName());
   }
