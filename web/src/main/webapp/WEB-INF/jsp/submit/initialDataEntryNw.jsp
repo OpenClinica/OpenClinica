@@ -1395,12 +1395,14 @@ but the custom tag uses that, not this jstl code--%>
                                     </c:import>
                                 </td>
                             </tr>
-                                <%--BWP: try this--%>
+                            <%--BWP: try this--%>
+                            <!-- blocking for Mantis Issue: 7704.        
                             <tr>
                                 <td valign="top" colspan="4" style="text-align:right">
-                                    <c:import url="../showMessage.jsp"><c:param name="key" value=
+                                <c:import url="../showMessage.jsp"><c:param name="key" value=
                                       "input${childItem.item.id}" /></c:import> </td>
                             </tr>
+                            --->
                         </table>
                     </td>
                     </c:if>
