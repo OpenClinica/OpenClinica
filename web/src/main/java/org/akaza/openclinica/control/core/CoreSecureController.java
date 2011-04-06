@@ -547,10 +547,7 @@ public abstract class CoreSecureController extends HttpServlet {
                 getUnavailableCRFList().remove(((EventCRFBean)request.getAttribute( "event")).getId());
             forwardPage(Page.ERROR, request, response);
         }
-        finally{
-            if(((EventCRFBean)request.getAttribute( "event"))!=null)
-                getUnavailableCRFList().remove(((EventCRFBean)request.getAttribute( "event")).getId());
-        }
+       
     }
 
     public static String getStackTrace(Throwable t) {
