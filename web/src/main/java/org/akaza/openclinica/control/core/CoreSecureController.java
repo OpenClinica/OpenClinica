@@ -436,7 +436,7 @@ public abstract class CoreSecureController extends HttpServlet {
                         role.setDescription("site_monitor");
                         break;
                     default:
-                        logger.info("No role matched when setting role description");
+                        // logger.info("No role matched when setting role description");
                     }
                 }
             } else {
@@ -464,7 +464,7 @@ public abstract class CoreSecureController extends HttpServlet {
                         role.setDescription("Monitor");
                         break;
                     default:
-                        logger.info("No role matched when setting role description");
+                        // logger.info("No role matched when setting role description");
                     }
                 }
             }

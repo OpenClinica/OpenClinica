@@ -453,7 +453,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                         role.setDescription("site_monitor");
                         break;
                     default:
-                        logger.info("No role matched when setting role description");
+                        // logger.info("No role matched when setting role description");
                     }
                 }
             } else {
@@ -480,7 +480,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                         role.setDescription("Monitor");
                         break;
                     default:
-                        logger.info("No role matched when setting role description");
+                        // logger.info("No role matched when setting role description");
                     }
                 }
             }
