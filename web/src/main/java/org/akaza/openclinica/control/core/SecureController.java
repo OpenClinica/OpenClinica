@@ -174,8 +174,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     public static final String MODULE = "module";// to determine which module
 
-    private static HashMap unavailableCRFList = new HashMap();
-
     // user is in
 
     // for setting the breadcrumb trail
@@ -939,7 +937,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     }
 
     public synchronized static HashMap getUnavailableCRFList() {
-        return unavailableCRFList;
+        return CoreSecureController.getUnavailableCRFList();
     }
 
     public void dowloadFile(File f, String contentType) throws Exception {
