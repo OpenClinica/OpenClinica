@@ -229,7 +229,7 @@ public class ChangeStudyServlet extends SecureController {
                         role.setDescription("site_monitor");
                         break;
                     default:
-                        logger.info("No role matched when setting role description");
+                        // logger.info("No role matched when setting role description");
                     }
                 }
             } else {
@@ -257,7 +257,7 @@ public class ChangeStudyServlet extends SecureController {
                         role.setDescription("monitor");
                         break;
                     default:
-                        logger.info("No role matched when setting role description");
+                        // logger.info("No role matched when setting role description");
                     }
                 }
             }
