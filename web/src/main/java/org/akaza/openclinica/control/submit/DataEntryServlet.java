@@ -1991,17 +1991,18 @@ public abstract class DataEntryServlet extends CoreSecureController {
              */
             HashMap<Integer, Boolean> noteSubmitted = (HashMap<Integer, Boolean>) session.getAttribute(DataEntryServlet.NOTE_SUBMITTED);
             if (noteSubmitted == null || noteSubmitted.get(idb.getId()) == null || !(Boolean) noteSubmitted.get(idb.getId())) {
-                boolean hasRfcAlready = false;
-                ArrayList<DiscrepancyNoteBean> notes = dndao.findExistingNotesForItemData(idb.getId());
-                for (DiscrepancyNoteBean note : notes) {
-                    if (note.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.REASON_FOR_CHANGE.getId()) {
-                        hasRfcAlready = true;
-                        logger.debug("has Rfc already: " + formName + " note id " + note.getId());
-                    }
-                }
-                if (!hasRfcAlready) {
+                  //There would be no exception for Reason for change discrepancy notes.issue-5056.
+//                boolean hasRfcAlready = false;
+//                ArrayList<DiscrepancyNoteBean> notes = dndao.findExistingNotesForItemData(idb.getId());
+//                for (DiscrepancyNoteBean note : notes) {
+//                    if (note.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.REASON_FOR_CHANGE.getId()) {
+//                        hasRfcAlready = true;
+//                        logger.debug("has Rfc already: " + formName + " note id " + note.getId());
+//                    }
+//                }
+//                if (!hasRfcAlready) {
                     errors.put(formName, error);
-                }
+//                }
             } else {
                 logger.debug("found note in session");
                 logger.debug("has a note in db: entered an error here: " + formName + ": " + errors.toString());
