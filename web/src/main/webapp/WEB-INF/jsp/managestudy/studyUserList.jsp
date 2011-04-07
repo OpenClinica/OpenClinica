@@ -58,7 +58,16 @@
   }
    //-->
 </script>
-<h1><span class="title_manage"><fmt:message key="assign_users_to_current_study" bundle="${resword}"/> <c:out value="${study.name}"/></span></h1>
+<h1><span class="title_manage">
+    <fmt:message key="assign_users_to_current_study" bundle="${resword}"/>
+    <c:out value="${study.name}"/>
+</span>
+</h1>
+
+
+<fmt:message key="assign_study_user_note" bundle="${resword}"/>
+<a href="${pageContext.request.contextPath}/ChangeStudy"><fmt:message key="that_site" bundle="${resword}"/></a>  
+<br><br>
 
 <form name="userForm" action="AssignUserToStudy" method="post">
 <input type="hidden" name="action" value="submit">
