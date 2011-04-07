@@ -3249,4 +3249,10 @@
 	 		</preConditions>             
             <createSequence sequenceName="USAGE_STATISTICS_DATA_ID_SEQ"/>
        </changeSet>	
+	   <changeSet author="pgawade (generated)" id="1236096695424-351">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />			
+	 		</preConditions>             
+            <createSequence sequenceName="OPENCLINICA_VERSION_ID_SEQ"/>
+       </changeSet>
 </databaseChangeLog>
