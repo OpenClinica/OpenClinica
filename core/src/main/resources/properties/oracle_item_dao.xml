@@ -59,7 +59,7 @@
                 <sql>
                         SELECT i.* FROM item i, item_form_metadata m
                         WHERE i.item_id = m.item_id                             
-                        AND m.section_id = ?
+                        AND m.section_id = ? order by i.item_id
                 </sql>
         </query>
         <query>
