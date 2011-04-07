@@ -3242,5 +3242,11 @@
 			<dbms type="oracle" />			
 	 	</preConditions>             
                 <createSequence sequenceName="USER_TYPE_ID_SEQ"/>
-            </changeSet>	
+            </changeSet>
+        <changeSet author="pgawade (generated)" id="1236096695424-350">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />			
+	 		</preConditions>             
+            <createSequence sequenceName="USAGE_STATISTICS_DATA_ID_SEQ"/>
+       </changeSet>	
 </databaseChangeLog>
