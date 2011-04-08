@@ -10,7 +10,6 @@ package org.akaza.openclinica.control.submit;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
-import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.NullValue;
@@ -99,6 +98,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -533,6 +533,11 @@ public abstract class DataEntryServlet extends CoreSecureController {
         logMe("Entering  displayItemWithGroups end "+System.currentTimeMillis());
         this.getItemMetadataService().updateGroupDynamicsInSection(displayItemWithGroups, section.getSection().getId(), ecb);
         section.setDisplayItemGroups(displayItemWithGroups);
+        DisplayTableOfContentsBean toc =
+            TableOfContentsServlet.getDisplayBeanWithShownSections(getDataSource(), (DisplayTableOfContentsBean) request.getAttribute(TOC_DISPLAY),
+                    (DynamicsMetadataService) SpringServletAccess.getApplicationContext(getServletContext()).getBean("dynamicsMetadataService"));
+        request.setAttribute(TOC_DISPLAY, toc);
+        LinkedList<Integer> sectionIdsInToc = TableOfContentsServlet.sectionIdsInToc(toc);
 
         // why do we get previousSec and nextSec here, rather than in
         // getDisplayBeans?
@@ -540,11 +545,12 @@ public abstract class DataEntryServlet extends CoreSecureController {
         // section
         // if the validation was successful
         logMe("Entering  displayItemWithGroups sdao.findPrevious  "+System.currentTimeMillis());
-        SectionBean previousSec = sdao.findPrevious(ecb, sb);
+        SectionBean previousSec = new SectionBean();
         logMe("Entering  displayItemWithGroups sdao.findPrevious  end "+System.currentTimeMillis());
-        SectionBean nextSec = sdao.findNext(ecb, sb);
-        section.setFirstSection(!previousSec.isActive());
-        section.setLastSection(!nextSec.isActive());
+        SectionBean nextSec = new SectionBean();
+        //section.setFirstSection(!previousSec.isActive());
+        //section.setLastSection(!nextSec.isActive());
+        this.updateDisplaySection(section, previousSec, nextSec, toc,  sectionIdsInToc, request);
 
         // this is for generating side info panel
         // and the information panel under the Title
@@ -1753,6 +1759,12 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     }
                     //
                     this.getItemMetadataService().updateGroupDynamicsInSection(displayItemWithGroups, section.getSection().getId(), ecb);
+                    toc =
+                        TableOfContentsServlet.getDisplayBeanWithShownSections(getDataSource(), (DisplayTableOfContentsBean) request.getAttribute(TOC_DISPLAY),
+                                (DynamicsMetadataService) SpringServletAccess.getApplicationContext(getServletContext()).getBean("dynamicsMetadataService"));
+                    request.setAttribute(TOC_DISPLAY, toc);
+                    sectionIdsInToc = TableOfContentsServlet.sectionIdsInToc(toc);
+                    this.updateDisplaySection(section, previousSec, nextSec, toc,  sectionIdsInToc, request);
                     //
                     // we need the following for repeating groups, tbh
                     // >> tbh 06/2010
@@ -5326,6 +5338,66 @@ public abstract class DataEntryServlet extends CoreSecureController {
             }
         }
         return resolutionStatus;
+    }
+    
+    /*
+     * Update DisplaySectionBean's firstSection & lastSection; 
+     */
+    protected void updateDisplaySectionPlace(DisplaySectionBean displaySectionBean, DisplayTableOfContentsBean toc, HttpServletRequest request) {
+        if (toc != null) {
+            ArrayList<SectionBean> sectionBeans = toc.getSections();
+            if (sectionBeans != null && sectionBeans.size() > 0) {
+                int sid = displaySectionBean.getSection().getId();
+                displaySectionBean.setFirstSection(sid == sectionBeans.get(0).getId() ? true : false);
+                displaySectionBean.setLastSection(sid == sectionBeans.get(sectionBeans.size() - 1).getId() ? true : false);
+            }
+        }
+    }
+    
+    protected void updateDisplaySection(DisplaySectionBean section, SectionBean previousSec, SectionBean nextSec,
+            DisplayTableOfContentsBean toc, LinkedList<Integer> sectionIdsInToc, HttpServletRequest request) {
+        SectionBean sb = section.getSection();
+        EventCRFBean ecb = section.getEventCRF();
+        int sIndex = TableOfContentsServlet.sectionIndexInToc(sb, toc, sectionIdsInToc);
+        previousSec = prevSection(sb, ecb, toc, sectionIdsInToc, sIndex);
+        nextSec = nextSection(sb, ecb, toc, sectionIdsInToc, sIndex);
+        section.setFirstSection(!previousSec.isActive());
+        section.setLastSection(!nextSec.isActive());
+    }
+
+    protected SectionBean prevSection(SectionBean sb, EventCRFBean ecb, DisplayTableOfContentsBean toc, LinkedList<Integer> sectionIdsInToc, int sbPos) {
+        SectionBean p = new SectionBean();
+        SectionBean c = sb;
+        ArrayList<SectionBean> sectionBeans = new ArrayList<SectionBean>();
+        if (toc != null) {
+            sectionBeans = toc.getSections();
+            if (sbPos > 0) {
+                while (!sectionIdsInToc.contains(p.getId()) && sbPos > 1) {
+                    p = sectionBeans.get(sbPos - 1);
+                    c = p;
+                    sbPos -= 1;
+                }
+            }
+        } 
+        return p != null && p.getId() > 0 ? p : new SectionBean();
+    }
+
+    protected SectionBean nextSection(SectionBean sb, EventCRFBean ecb, DisplayTableOfContentsBean toc, LinkedList<Integer> sectionIdsInToc, int sbPos) {
+        SectionBean n = new SectionBean();
+        SectionBean c = sb;
+        ArrayList<SectionBean> sectionBeans = new ArrayList<SectionBean>();
+        if (toc != null) {
+            sectionBeans = toc.getSections();
+            int size = sectionIdsInToc.size();
+            if (sbPos >= 0 && size > 1 && sbPos < size-1) {
+                while (!sectionIdsInToc.contains(n.getId()) && sbPos < size - 1) {
+                    n = sectionBeans.get(sbPos + 1);
+                    c = n;
+                    sbPos += 1;
+                }
+            } 
+        }
+        return n != null && n.getId() > 0 ? n : new SectionBean();
     }
 }
   

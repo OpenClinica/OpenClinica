@@ -16,6 +16,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.submit.DisplayTableOfContentsBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -23,6 +24,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
+import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -177,6 +179,8 @@ public class MarkEventCRFCompleteServlet extends SecureController {
 
         if (!fp.isSubmitted()) {
             DisplayTableOfContentsBean toc = TableOfContentsServlet.getDisplayBean(ecb, sm.getDataSource(), currentStudy);
+            toc = TableOfContentsServlet.getDisplayBeanWithShownSections(sm.getDataSource(), toc, 
+                    (DynamicsMetadataService)SpringServletAccess.getApplicationContext(getServletContext()).getBean("dynamicsMetadataService")); 
             request.setAttribute(BEAN_DISPLAY, toc);
 
             resetPanel();

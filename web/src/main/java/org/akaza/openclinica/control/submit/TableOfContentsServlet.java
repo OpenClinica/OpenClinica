@@ -43,25 +43,30 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
+import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.sql.DataSource;
 
 /**
- * @author ssachs, modified by ywang
+ * @author ssachs
  */
 
 // TODO: make it possible to input an event crf bean to this servlet rather than
 // an int
 public class TableOfContentsServlet extends SecureController {
+    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     public static final String BEAN_DISPLAY = "toc";
 
     // these inputs are used when you get here from a jsp page
@@ -656,7 +661,7 @@ public class TableOfContentsServlet extends SecureController {
         CRFBean cb = (CRFBean) cdao.findByPK(cvb.getCrfId());
         answer.setCrf(cb);
 
-        StudyBean studyForStudySubject = (new StudyDAO(ds)).findByStudySubjectId(ssb.getId());
+        StudyBean studyForStudySubject = new StudyDAO(ds).findByStudySubjectId(ssb.getId());
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(ds);
         EventDefinitionCRFBean edcb = edcdao.findByStudyEventDefinitionIdAndCRFId(studyForStudySubject, sedb.getId(), cb.getId());
         answer.setEventDefinitionCRF(edcb);
@@ -664,5 +669,82 @@ public class TableOfContentsServlet extends SecureController {
         answer.setAction(getActionForStage(ecb.getStage()));
 
         return answer;
+    }
+    
+    /**
+     * A section contains all hidden dynamics will be removed from data entry tab and jump box.
+     *
+     * @param ds
+     * @param displayTableOfContentsBean
+     * @param dynamicsMetadataService
+     * @return
+     */
+    public static DisplayTableOfContentsBean getDisplayBeanWithShownSections(DataSource ds, DisplayTableOfContentsBean displayTableOfContentsBean,
+            DynamicsMetadataService dynamicsMetadataService) {
+        if(displayTableOfContentsBean == null) {
+            return displayTableOfContentsBean;
+        }
+        EventCRFBean ecb = displayTableOfContentsBean.getEventCRF();
+        SectionDAO sectionDAO = new SectionDAO(ds);
+        ArrayList<SectionBean> sectionBeans = getSections(ecb, ds);
+        ArrayList<SectionBean> showSections = new ArrayList<SectionBean>();
+        if(sectionBeans != null && sectionBeans.size()>0) {
+            for(SectionBean s : sectionBeans) {
+                if(sectionDAO.containNormalItem(s.getCRFVersionId(), s.getId())) {
+                    showSections.add(s);
+                } else {
+                    //for section contains dynamics, does it contain showing item_group/item?
+                    if(dynamicsMetadataService.hasShowingDynGroupInSection(s.getId(), s.getCRFVersionId(), ecb.getId())) {
+                        showSections.add(s);
+                    } else {
+                        if(dynamicsMetadataService.hasShowingDynItemInSection(s.getId(), s.getCRFVersionId(), ecb.getId())) {
+                            showSections.add(s);
+                        }
+                    }
+                }
+            }
+            if(showSections != null && showSections.size() != sectionBeans.size()) {
+                displayTableOfContentsBean.setSections(showSections);
+            }
+        }
+        return displayTableOfContentsBean;
+    }
+    
+    public static LinkedList<Integer> sectionIdsInToc(DisplayTableOfContentsBean toc) {
+        LinkedList<Integer> ids = new LinkedList<Integer>();
+        if(toc != null) {
+            ArrayList<SectionBean> sectionBeans = toc.getSections();
+            if(sectionBeans!=null && sectionBeans.size()>0) {
+                for(int i=0; i<sectionBeans.size(); ++i) {
+                    SectionBean s = sectionBeans.get(i);
+                    ids.add(s.getId());
+                }
+            }
+        }
+        return ids;
+    }
+    
+    /**
+     * Index starts from 0. If not in, return -1.
+     * @param sb
+     * @param toc
+     * @param sectionIdsInToc
+     * @return
+     */
+    public static int sectionIndexInToc(SectionBean sb, DisplayTableOfContentsBean toc, LinkedList<Integer> sectionIdsInToc) {
+        ArrayList<SectionBean> sectionBeans = new ArrayList<SectionBean>();
+        int index = -1;
+        if(toc!=null) {
+            sectionBeans = toc.getSections();
+        }
+        if(sectionBeans != null && sectionBeans.size()>0) {   
+            for(int i=0; i<sectionIdsInToc.size(); ++i) {
+                if(sb.getId()==sectionIdsInToc.get(i)) {
+                    index = i;
+                    break;
+                }
+            }
+        }
+        return index;
     }
 }
