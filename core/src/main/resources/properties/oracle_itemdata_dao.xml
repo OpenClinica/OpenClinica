@@ -12,7 +12,7 @@
         <query>
                 <name>create</name>
                 <sql>INSERT INTO ITEM_DATA (ITEM_DATA_ID,EVENT_CRF_ID, ITEM_ID, STATUS_ID, VALUE,
-                OWNER_ID, DATE_CREATED,ORDINAL,, OLD_STATUS_ID)
+                OWNER_ID, DATE_CREATED,ORDINAL,OLD_STATUS_ID)
                 VALUES (?,?,?,?,?,?,sysdate,?,?)</sql>
         </query>
         <query>
