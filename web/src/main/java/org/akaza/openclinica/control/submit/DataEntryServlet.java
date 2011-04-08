@@ -1801,6 +1801,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 }
 
                 if (!inSameSection) {// else if not in same section, progress as usual
+                    /*
                     toc =
                         TableOfContentsServlet.getDisplayBeanWithShownSections(getDataSource(), (DisplayTableOfContentsBean) request.getAttribute(TOC_DISPLAY),
                                 (DynamicsMetadataService) SpringServletAccess.getApplicationContext(getServletContext()).getBean("dynamicsMetadataService"));
@@ -1811,7 +1812,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     nextSec = this.nextSection(section.getSection(), ecb, toc, sectionIdsInToc, sIndex);
                     section.setFirstSection(!previousSec.isActive());
                     section.setLastSection(!nextSec.isActive());
-                    
+                    */
                     // can we just forward page or do we actually need an ELSE here?
                     // yes, we do. tbh 05/03/2010
 
