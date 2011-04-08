@@ -2155,7 +2155,7 @@
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<createIndex tableName="rule_set_audit" indexName="">
+			<createIndex tableName="rule_set_audit" indexName="i_rule_set_audit_rule_set_id">
 				<column name="rule_set_id"/>
 			</createIndex>
 	</changeSet>
@@ -2868,7 +2868,7 @@
 				<dbms type="oracle" />
 			</preConditions>
 			<createIndex tableName="study_parameter_value" indexName="i_study_param_value_study_id">
-				<column name="study_parameter_value"/>
+				<column name="study_id"/>
 			</createIndex>
 	</changeSet>
 	<changeSet author="pgawade" id="2011-04-08-8840-241-2">
