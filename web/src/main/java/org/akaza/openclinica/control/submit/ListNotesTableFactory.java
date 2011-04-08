@@ -673,19 +673,19 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                     .align("left").append("hspace=\"6\"").close();
             builder.aEnd();
             if (!getCurrentStudy().getStatus().isLocked()) {
-                if (!dnb.getResStatus().isClosed() && !dnb.getResStatus().isNotApplicable()) {
+                if (!dnb.getResStatus().isNotApplicable()) {
                     if (dnb.getEntityType() != "eventCrf") {
                         builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId());
                         builder.close();
-                        builder.img().name("bt_Reassign1").src("images/bt_Reassign_d.gif").border("0").alt(resword.getString("resolve_discrepancy_note"))
-                                .title(resword.getString("resolve_discrepancy_note")).align("left").append("hspace=\"6\"").close();
+                        builder.img().name("bt_Reassign1").src("images/bt_Reassign_d.gif").border("0").alt(resword.getString("view_within_crf"))
+                                .title(resword.getString("view_within_crf")).align("left").append("hspace=\"6\"").close();
                         builder.aEnd();
                     } else {
                         if (dnb.getStageId() == 5) {
                             builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId());
                             builder.close();
-                            builder.img().name("bt_Reassign1").src("images/bt_Reassign_d.gif").border("0").alt(resword.getString("resolve_discrepancy_note"))
-                                    .title(resword.getString("resolve_discrepancy_note")).align("left").append("hspace=\"6\"").close();
+                            builder.img().name("bt_Reassign1").src("images/bt_Reassign_d.gif").border("0").alt(resword.getString("view_within_crf"))
+                                    .title(resword.getString("view_within_crf")).align("left").append("hspace=\"6\"").close();
                             builder.aEnd();
                         }
                     }
