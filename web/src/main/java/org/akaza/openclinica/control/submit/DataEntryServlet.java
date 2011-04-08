@@ -545,12 +545,12 @@ public abstract class DataEntryServlet extends CoreSecureController {
         // section
         // if the validation was successful
         logMe("Entering  displayItemWithGroups sdao.findPrevious  "+System.currentTimeMillis());
-        SectionBean previousSec = new SectionBean();
+        int sIndex = TableOfContentsServlet.sectionIndexInToc(section.getSection(), toc, sectionIdsInToc);
+        SectionBean previousSec = this.prevSection(section.getSection(), ecb, toc, sectionIdsInToc, sIndex);
         logMe("Entering  displayItemWithGroups sdao.findPrevious  end "+System.currentTimeMillis());
-        SectionBean nextSec = new SectionBean();
-        //section.setFirstSection(!previousSec.isActive());
-        //section.setLastSection(!nextSec.isActive());
-        this.updateDisplaySection(section, previousSec, nextSec, toc,  sectionIdsInToc, request);
+        SectionBean nextSec = this.nextSection(section.getSection(), ecb, toc, sectionIdsInToc, sIndex);
+        section.setFirstSection(!previousSec.isActive());
+        section.setLastSection(!nextSec.isActive());
 
         // this is for generating side info panel
         // and the information panel under the Title
@@ -1764,7 +1764,11 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                 (DynamicsMetadataService) SpringServletAccess.getApplicationContext(getServletContext()).getBean("dynamicsMetadataService"));
                     request.setAttribute(TOC_DISPLAY, toc);
                     sectionIdsInToc = TableOfContentsServlet.sectionIdsInToc(toc);
-                    this.updateDisplaySection(section, previousSec, nextSec, toc,  sectionIdsInToc, request);
+                    sIndex = TableOfContentsServlet.sectionIndexInToc(section.getSection(), toc, sectionIdsInToc);
+                    previousSec = this.prevSection(section.getSection(), ecb, toc, sectionIdsInToc, sIndex);
+                    nextSec = this.nextSection(section.getSection(), ecb, toc, sectionIdsInToc, sIndex);
+                    section.setFirstSection(!previousSec.isActive());
+                    section.setLastSection(!nextSec.isActive());
                     //
                     // we need the following for repeating groups, tbh
                     // >> tbh 06/2010
@@ -1797,7 +1801,17 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 }
 
                 if (!inSameSection) {// else if not in same section, progress as usual
-
+                    toc =
+                        TableOfContentsServlet.getDisplayBeanWithShownSections(getDataSource(), (DisplayTableOfContentsBean) request.getAttribute(TOC_DISPLAY),
+                                (DynamicsMetadataService) SpringServletAccess.getApplicationContext(getServletContext()).getBean("dynamicsMetadataService"));
+                    request.setAttribute(TOC_DISPLAY, toc);
+                    sectionIdsInToc = TableOfContentsServlet.sectionIdsInToc(toc);
+                    sIndex = TableOfContentsServlet.sectionIndexInToc(section.getSection(), toc, sectionIdsInToc);
+                    previousSec = this.prevSection(section.getSection(), ecb, toc, sectionIdsInToc, sIndex);
+                    nextSec = this.nextSection(section.getSection(), ecb, toc, sectionIdsInToc, sIndex);
+                    section.setFirstSection(!previousSec.isActive());
+                    section.setLastSection(!nextSec.isActive());
+                    
                     // can we just forward page or do we actually need an ELSE here?
                     // yes, we do. tbh 05/03/2010
 
