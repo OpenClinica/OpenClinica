@@ -7,14 +7,6 @@
  */
 package org.akaza.openclinica.dao.submit;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
@@ -22,6 +14,14 @@ import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+
+import javax.sql.DataSource;
 
 /**
  * <P>
@@ -344,6 +344,24 @@ public class SectionDAO extends AuditableEntityDAO {
             return (Integer) ((HashMap) rows.iterator().next()).get("count");
         } else {
             return 0;
+        }
+    }
+    
+    public boolean containNormalItem(Integer crfVersionId, Integer sectionId) {
+        this.unsetTypeExpected();
+        this.setTypeExpected(1, TypeNames.INT); //item_id
+        
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), sectionId);
+        variables.put(new Integer(2), crfVersionId);
+        variables.put(new Integer(3), crfVersionId);
+        variables.put(new Integer(4), sectionId);
+        variables.put(new Integer(5), crfVersionId);
+        ArrayList rows = this.select(digester.getQuery("containNormalItem"), variables);
+        if(rows.size()>0) {
+            return (Integer) ((HashMap) rows.iterator().next()).get("item_id") > 0;
+        } else {
+            return false;
         }
     }
 }

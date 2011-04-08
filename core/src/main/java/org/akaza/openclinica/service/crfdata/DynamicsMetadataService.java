@@ -926,6 +926,14 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
             }
         }
     }
+    
+    public Boolean hasShowingDynGroupInSection(int sectionId, int crfVersionId, int eventCrfId) {
+        return dynamicsItemGroupMetadataDao.hasShowingInSection(sectionId, crfVersionId, eventCrfId);
+    }
+    
+    public Boolean hasShowingDynItemInSection(int sectionId, int crfVersionId, int eventCrfId) {
+        return dynamicsItemFormMetadataDao.hasShowingInSection(sectionId, crfVersionId, eventCrfId);
+    }
 
     public DynamicsItemFormMetadataDao getDynamicsItemFormMetadataDao() {
         return dynamicsItemFormMetadataDao;
