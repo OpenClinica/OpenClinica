@@ -30,17 +30,19 @@ public class ResolutionStatus extends Term {
 
     protected static final Logger logger = LoggerFactory.getLogger(ResolutionStatus.class.getName());
 
-    public static final ResolutionStatus INVALID = new ResolutionStatus(0, "invalid", null);
+    public static final ResolutionStatus INVALID = new ResolutionStatus(0, "invalid", null, null);
 
-    public static final ResolutionStatus OPEN = new ResolutionStatus(1, "New", null);
+    public static final ResolutionStatus OPEN = new ResolutionStatus(1, "New", null, "images/icon_Note.gif");
 
-    public static final ResolutionStatus UPDATED = new ResolutionStatus(2, "Updated", null);
+    public static final ResolutionStatus UPDATED = new ResolutionStatus(2, "Updated", null, "images/icon_flagYellow.gif");
 
-    public static final ResolutionStatus RESOLVED = new ResolutionStatus(3, "Resolution_Proposed", null);
+    public static final ResolutionStatus RESOLVED = new ResolutionStatus(3, "Resolution_Proposed", null, "images/icon_flagGreen.gif");
 
-    public static final ResolutionStatus CLOSED = new ResolutionStatus(4, "Closed", null);
+    public static final ResolutionStatus CLOSED = new ResolutionStatus(4, "Closed", null, "images/icon_flagBlack.gif");
 
-    public static final ResolutionStatus NOT_APPLICABLE = new ResolutionStatus(5, "Not_Applicable", null);
+    public static final ResolutionStatus NOT_APPLICABLE = new ResolutionStatus(5, "Not_Applicable", null, "images/icon_flagWhite.gif");
+
+    private String iconFilePath;
 
     public boolean isInvalid() {
         return this == ResolutionStatus.INVALID;
@@ -72,9 +74,9 @@ public class ResolutionStatus extends Term {
 
     private List privileges;
 
-    private ResolutionStatus(int id, String name, Privilege[] myPrivs) {
+    private ResolutionStatus(int id, String name, Privilege[] myPrivs, String path) {
         super(id, name);
-
+        this.iconFilePath = path;
     }
 
     private ResolutionStatus() {
@@ -114,10 +116,18 @@ public class ResolutionStatus extends Term {
         return new ArrayList(list);
     }
 
+    public String getIconFilePath() {
+        return iconFilePath;
+    }
+
+    public void setIconFilePath(String iconFilePath) {
+        this.iconFilePath = iconFilePath;
+    }
+
     public static void main(String[] args) {
         ResourceBundleProvider.updateLocale(new Locale("en"));
 
-        ResolutionStatus test = new ResolutionStatus(1, "New", null);
+        ResolutionStatus test = new ResolutionStatus(1, "New", null, null);
         System.out.println("Test id : " + test.getId());
         System.out.println(test.getName());
         logger.info("Test id : " + test.getId());

@@ -27,7 +27,7 @@
 
 </style>
     <script type="text/javascript" language="javascript">
-        setImageInParentWin('flag_<c:out value="${discrepancyNote.field}"/>','images/icon_Note.gif');
+        setImageInParentWin('flag_<c:out value="${discrepancyNote.field}"/>', '<c:out value="${discrepancyNote.resStatus.iconFilePath}"/>');
     </script>
 
 </head>

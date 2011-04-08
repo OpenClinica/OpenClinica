@@ -302,6 +302,9 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
      */
     public void setResolutionStatusId(int resolutionStatusId) {
         this.resolutionStatusId = resolutionStatusId;
+        if (resolutionStatusId != 0) {
+            this.resStatus = ResolutionStatus.get(resolutionStatusId);
+        }
     }
 
     /**
