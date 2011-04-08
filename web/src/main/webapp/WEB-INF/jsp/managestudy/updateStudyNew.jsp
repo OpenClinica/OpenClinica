@@ -1007,7 +1007,7 @@
 <td>
  <input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_long">
 </td>
-<td><input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium" onClick="javascript:confirmCancel('ListStudy');"/></td>
+<td><input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium" onClick="javascript:confirmCancel('pages/studymodule');"/></td>
 </tr>
 </table>
 
