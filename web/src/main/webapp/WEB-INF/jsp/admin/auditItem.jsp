@@ -43,11 +43,11 @@
 	  </tr>
 	  </table>
 	  <tr>
-	  	<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* <fmt:message key="item_initially_entered_on" bundle="${respage}"/> <c:out value="${param.entityCreatedDate}"/>.</p>
+	  	<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<fmt:message key="item_initially_entered_on" bundle="${respage}"/> <c:out value="${param.entityCreatedDate}"/>.)</p>
 	  </tr>
 	  </c:when>
 	  <c:otherwise>
-	  <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* <fmt:message key="no_changed_made_since_item_initially_entered_on" bundle="${respage}"/> <c:out value="${param.entityCreatedDate}"/>.</p>
+	  <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<fmt:message key="no_changed_made_since_item_initially_entered_on" bundle="${respage}"/> <c:out value="${param.entityCreatedDate}"/>.)</p>
 	  </c:otherwise>
 	  </c:choose>
 	
