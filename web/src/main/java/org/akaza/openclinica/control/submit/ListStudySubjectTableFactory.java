@@ -726,11 +726,12 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
                 url.append(viewStudySubjectLinkBuilder(studySubjectBean));
                 if (getCurrentRole().getRole() != Role.MONITOR) {
-                    if (getStudyBean().getStatus() == Status.AVAILABLE && studySubjectBean.getStatus() != Status.DELETED
-                        && getCurrentRole().getRole() != Role.RESEARCHASSISTANT) {
+                    if (getStudyBean().getStatus() == Status.AVAILABLE && (studySubjectBean.getStatus() != Status.DELETED
+                         || studySubjectBean.getStatus() != Status.AUTO_DELETED) && getCurrentRole().getRole() != Role.RESEARCHASSISTANT) {
                         url.append(removeStudySubjectLinkBuilder(studySubjectBean));
                     }
-                    if (getStudyBean().getStatus() == Status.AVAILABLE && studySubjectBean.getStatus() == Status.DELETED) {
+                    if (getStudyBean().getStatus() == Status.AVAILABLE && (studySubjectBean.getStatus() == Status.DELETED
+                         || studySubjectBean.getStatus() == Status.AUTO_DELETED)) {
                         url.append(restoreStudySubjectLinkBuilder(studySubjectBean));
                     }
                     if (getStudyBean().getStatus() == Status.AVAILABLE && getCurrentRole().getRole() != Role.RESEARCHASSISTANT
