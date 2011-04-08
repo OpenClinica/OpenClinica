@@ -59,14 +59,29 @@
    //-->
 </script>
 <h1><span class="title_manage">
-    <fmt:message key="assign_users_to_current_study" bundle="${resword}"/>
+    <c:choose>
+        <c:when test="${study.parentStudyId > 0}">
+            <fmt:message key="assign_users_to_current_site" bundle="${resword}"/>
+        </c:when>
+        <c:otherwise>
+            <fmt:message key="assign_users_to_current_study" bundle="${resword}"/>
+        </c:otherwise>
+    </c:choose>
     <c:out value="${study.name}"/>
 </span>
 </h1>
 
+<c:choose>
+    <c:when test="${study.parentStudyId > 0}">
+        <fmt:message key="assign_site_user_note" bundle="${resword}"/>
+        <a href="${pageContext.request.contextPath}/ChangeStudy"><fmt:message key="that_study" bundle="${resword}"/></a>
+    </c:when>
+    <c:otherwise>
+        <fmt:message key="assign_study_user_note" bundle="${resword}"/>
+        <a href="${pageContext.request.contextPath}/ChangeStudy"><fmt:message key="that_site" bundle="${resword}"/></a>
+    </c:otherwise>
+</c:choose>
 
-<fmt:message key="assign_study_user_note" bundle="${resword}"/>
-<a href="${pageContext.request.contextPath}/ChangeStudy"><fmt:message key="that_site" bundle="${resword}"/></a>  
 <br><br>
 
 <form name="userForm" action="AssignUserToStudy" method="post">
