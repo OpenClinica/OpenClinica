@@ -481,9 +481,12 @@ function callTip(html)
     </td>
 	
     <td class="table_cell_noborder" >
-<c:if test="${study.parentStudyId > '0'}">    
-	<c:out value="${siteTitle}" /><br>
-	</c:if>
+        <c:if test="${study.parentStudyId > '0'}">
+            <c:out value="${siteTitle}" /><br>
+        </c:if>
+        <c:if test="${study.parentStudyId == '0'}">
+            <fmt:message key="na" bundle="${resword}"/><br>
+        </c:if>
     </td>
 	<!--person id todo -->
        <c:choose>
