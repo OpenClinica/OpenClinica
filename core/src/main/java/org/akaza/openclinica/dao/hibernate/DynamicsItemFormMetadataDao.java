@@ -219,7 +219,7 @@ public class DynamicsItemFormMetadataDao extends AbstractDomainDao<DynamicsItemF
                 + " select ida.item_data_id from item_data ida where ida.event_crf_id = :eventCrfId and ida.item_id in"
                 + "       (select ifm.item_id from item_form_metadata ifm where ifm.section_id = :sectionId and ifm.crf_version_id = :crfVersionId"
                 + "          and ifm.item_id not in  (select distinct igm.item_id from item_group_metadata igm where igm.crf_version_id = :crfVersionId" 
-                + "          and igm.show_group = 0 and igm.name != 'Ungrouped'"
+                + "          and igm.show_group = 0"
                 + "          and igm.item_id in (select im.item_id from item_form_metadata im where im.section_id = :sectionId and im.crf_version_id = :crfVersionId))"
                 + "        )and (ida.status_id != 5 and ida.status_id != 7) ) and di.show_item = 1 and rownum = 1" ;   
         } else {
@@ -227,7 +227,7 @@ public class DynamicsItemFormMetadataDao extends AbstractDomainDao<DynamicsItemF
             + " select ida.item_data_id from item_data ida where ida.event_crf_id = :eventCrfId and ida.item_id in"
             + "       (select ifm.item_id from item_form_metadata ifm where ifm.section_id = :sectionId and ifm.crf_version_id = :crfVersionId"
             + "          and ifm.item_id not in  (select distinct igm.item_id from item_group_metadata igm where igm.crf_version_id = :crfVersionId" 
-            + "          and igm.show_group = 'false' and igm.name != 'Ungrouped'"
+            + "          and igm.show_group = 'false'"
             + "          and igm.item_id in (select im.item_id from item_form_metadata im where im.section_id = :sectionId and im.crf_version_id = :crfVersionId))"
             + "        )and (ida.status_id != 5 and ida.status_id != 7) ) and di.show_item = 'true' limit 1" ;
         }
