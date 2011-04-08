@@ -1164,1055 +1164,1757 @@
 			</sql>
 	</changeSet>
 	<!-- Indexes for Oracle database -->
-	<changeSet author="pgawade" id="2011-04-08-8840-130">
+	<changeSet author="pgawade" id="2011-04-08-8840-130-1">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_audit_log_event_audit_table"/>
 			</preConditions>
-			<dropIndex tableName="audit_log_event" indexName="i_audit_log_event_audit_table"/>
+			<dropIndex tableName="audit_log_event" indexName="i_audit_log_event_audit_table"/>		
+	</changeSet>		
+	<changeSet author="pgawade" id="2011-04-08-8840-131-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_audit_log_event_user_id"/>
+			</preConditions>
+			<dropIndex tableName="audit_log_event" indexName="i_audit_log_event_user_id"/>		
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-132-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_audit_log_event_entity_id"/>
+			</preConditions>
+			<dropIndex tableName="audit_log_event" indexName="i_audit_log_event_entity_id"/>			
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-133-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_audit_log_event_ale_type_id"/>				
+			</preConditions>
+			<dropIndex tableName="audit_log_event" indexName="i_audit_log_event_ale_type_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-134-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_audit_log_event_event_crf_id"/>				
+			</preConditions>
+			<dropIndex tableName="audit_log_event" indexName="i_audit_log_event_event_crf_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-135-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_audit_log_event_se_id"/>				
+			</preConditions>
+			<dropIndex tableName="audit_log_event" indexName="i_audit_log_event_se_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-136-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_audit_log_event_crf_v_id"/>
+			</preConditions>
+			<dropIndex tableName="audit_log_event" indexName="i_audit_log_event_crf_v_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-137-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_null_value_type_code"/>
+			</preConditions>
+			<dropIndex tableName="null_value_type" indexName="i_null_value_type_code"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-138-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_rule_oc_oid"/>
+			</preConditions>
+			<dropIndex tableName="rule" indexName="i_rule_oc_oid"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-139-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_rule_rule_expression_id"/>
+			</preConditions>
+			<dropIndex tableName="rule" indexName="i_rule_rule_expression_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-140-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_rule_status_id"/>
+			</preConditions>
+			<dropIndex tableName="rule" indexName="i_rule_status_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-141-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_rule_action_rule_set_id"/>
+			</preConditions>
+			<dropIndex tableName="rule_action" indexName="i_rule_action_rule_set_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-142-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_rule_action_action_type"/>
+			</preConditions>
+			<dropIndex tableName="rule_action" indexName="i_rule_action_action_type"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-143-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_rule_action_status_id"/>
+			</preConditions>
+			<dropIndex tableName="rule_action" indexName="i_rule_action_status_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-144-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_rule_expression_status_id"/>
+			</preConditions>
+			<dropIndex tableName="rule_expression" indexName="i_rule_expression_status_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-145-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_rule_set_rule_expression_id"/>
+			</preConditions>
+			<dropIndex tableName="rule_set" indexName="i_rule_set_rule_expression_id"/>
+	</changeSet>		
+	<changeSet author="pgawade" id="2011-04-08-8840-146-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_rule_set_se_definition_id"/>
+			</preConditions>
+			<dropIndex tableName="rule_set" indexName="i_rule_set_se_definition_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-147-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_rule_set_crf_id"/>
+			</preConditions>
+			<dropIndex tableName="rule_set" indexName="i_rule_set_crf_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-148-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_rule_set_crf_version_id"/>
+			</preConditions>
+			<dropIndex tableName="rule_set" indexName="i_rule_set_crf_version_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-149-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_rule_set_study_id"/>
+			</preConditions>
+			<dropIndex tableName="rule_set" indexName="i_rule_set_study_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-150-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_rule_set_status_id"/>
+			</preConditions>
+			<dropIndex tableName="rule_set" indexName="i_rule_set_status_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-151-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_rule_set_audit_rule_set_id"/>
+			</preConditions>
+			<dropIndex tableName="rule_set_audit" indexName="i_rule_set_audit_rule_set_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-152-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_rule_set_audit_status_id"/>
+			</preConditions>
+			<dropIndex tableName="rule_set_audit" indexName="i_rule_set_audit_status_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-153-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_rule_set_rule_rule_set_id"/>
+			</preConditions>
+			<dropIndex tableName="rule_set_rule" indexName="i_rule_set_rule_rule_set_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-154-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_rule_set_rule_rule_id"/>
+			</preConditions>
+			<dropIndex tableName="rule_set_rule" indexName="i_rule_set_rule_rule_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-155-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_rule_set_rule_status_id"/>
+			</preConditions>
+			<dropIndex tableName="rule_set_rule" indexName="i_rule_set_rule_status_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-156-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_rule_set_rule_ars_rule_id"/>
+			</preConditions>
+			<dropIndex tableName="rule_set_rule_audit" indexName="i_rule_set_rule_ars_rule_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-157-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_rule_set_rule_audit_st_id"/>
+			</preConditions>
+			<dropIndex tableName="rule_set_rule_audit" indexName="i_rule_set_rule_audit_st_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-158-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_dn_event_crf_map_ecrf_id"/>
+			</preConditions>
+			<dropIndex tableName="dn_event_crf_map" indexName="i_dn_event_crf_map_ecrf_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-159-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_dn_event_crf_map_d_note_id"/>
+			</preConditions>
+			<dropIndex tableName="dn_event_crf_map" indexName="i_dn_event_crf_map_d_note_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-160-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_dn_item_data_map_item_d_id"/>
+			</preConditions>
+			<dropIndex tableName="dn_item_data_map" indexName="i_dn_item_data_map_item_d_id"/>
+	</changeSet>		
+	<changeSet author="pgawade" id="2011-04-08-8840-161-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_dn_item_data_map_d_note_id"/>
+			</preConditions>
+			<dropIndex tableName="dn_item_data_map" indexName="i_dn_item_data_map_d_note_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-162-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_dn_study_e_map_s_event_id"/>
+			</preConditions>
+			<dropIndex tableName="dn_study_event_map" indexName="i_dn_study_e_map_s_event_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-163-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_dn_study_e_map_dis_note_id"/>
+			</preConditions>
+			<dropIndex tableName="dn_study_event_map" indexName="i_dn_study_e_map_dis_note_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-164-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_dn_study_subject_map_ss_id"/>
+			</preConditions>
+			<dropIndex tableName="dn_study_subject_map" indexName="i_dn_study_subject_map_ss_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-165-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_dn_study_subject_map_dn_id"/>
+			</preConditions>
+			<dropIndex tableName="dn_study_subject_map" indexName="i_dn_study_subject_map_dn_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-166-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_disc_note_dn_type_id"/>
+			</preConditions>
+			<dropIndex tableName="discrepancy_note" indexName="i_disc_note_dn_type_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-167-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_disc_note_res_status_id"/>
+			</preConditions>
+			<dropIndex tableName="discrepancy_note" indexName="i_disc_note_res_status_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-168-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_disc_note_owner_id"/>
+			</preConditions>
+			<dropIndex tableName="discrepancy_note" indexName="i_disc_note_owner_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-169-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_disc_note_parent_dn_id"/>
+			</preConditions>
+			<dropIndex tableName="discrepancy_note" indexName="i_disc_note_parent_dn_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-170-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_disc_note_entity_type"/>
+			</preConditions>
+			<dropIndex tableName="discrepancy_note" indexName="i_disc_note_entity_type"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-171-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_disc_note_study_id"/>
+			</preConditions>
+			<dropIndex tableName="discrepancy_note" indexName="i_disc_note_study_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-172-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_dn_subject_map_subject_id"/>
+			</preConditions>
+			<dropIndex tableName="dn_subject_map" indexName="i_dn_subject_map_subject_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-173-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_dn_subject_map_dn_id"/>
+			</preConditions>
+			<dropIndex tableName="dn_subject_map" indexName="i_dn_subject_map_dn_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-174-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_dset_crf_v_map_dataset_id"/>
+			</preConditions>
+			<dropIndex tableName="dataset_crf_version_map" indexName="i_dset_crf_v_map_dataset_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-175-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_dset_crf_version_map_edc_id"/>
+			</preConditions>
+			<dropIndex tableName="dataset_crf_version_map" indexName="i_dset_crf_version_map_edc_id"/>
+	</changeSet>		
+	<changeSet author="pgawade" id="2011-04-08-8840-176-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_dset_sgc_map_dataset_id"/>
+			</preConditions>
+			<dropIndex tableName="dataset_study_group_class_map" indexName="i_dset_sgc_map_dataset_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-177-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_dset_sgc_map_st_gr_cl_id"/>
+			</preConditions>
+			<dropIndex tableName="dataset_study_group_class_map" indexName="i_dset_sgc_map_st_gr_cl_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-178-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_dset_status_id"/>
+			</preConditions>
+			<dropIndex tableName="dataset" indexName="i_dset_status_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-179-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_dset_filter_map_dataset_id"/>
+			</preConditions>
+			<dropIndex tableName="dataset_filter_map" indexName="i_dset_filter_map_dataset_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-180-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_dset_filter_map_filter_id"/>
+			</preConditions>
+			<dropIndex tableName="dataset_filter_map" indexName="i_dset_filter_map_filter_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-181-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_dataset_filter_map_ordinal"/>
+			</preConditions>
+			<dropIndex tableName="dataset_filter_map" indexName="i_dataset_filter_map_ordinal"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-182-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_dc_prim_decision_con_id"/>
+			</preConditions>
+			<dropIndex tableName="dc_primitive" indexName="i_dc_prim_decision_con_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-183-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_dc_prim_item_id"/>
+			</preConditions>
+			<dropIndex tableName="dc_primitive" indexName="i_dc_prim_item_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-184-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_dc_prim_dyn_value_item_id"/>
+			</preConditions>
+			<dropIndex tableName="dc_primitive" indexName="i_dc_prim_dyn_value_item_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-185-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_dc_sec_event_section_id"/>
+			</preConditions>
+			<dropIndex tableName="dc_section_event" indexName="i_dc_sec_event_section_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-186-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_dc_subs_event_item_id"/>
+			</preConditions>
+			<dropIndex tableName="dc_substitution_event" indexName="i_dc_subs_event_item_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-187-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_dc_computed_e_dc_event_id"/>
+			</preConditions>
+			<dropIndex tableName="dc_computed_event" indexName="i_dc_computed_e_dc_event_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-188-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_dc_comp_e_item_target_id"/>
+			</preConditions>
+			<dropIndex tableName="dc_computed_event" indexName="i_dc_comp_e_item_target_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-189-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_dc_summary_item_map_item_id"/>
+			</preConditions>
+			<dropIndex tableName="dc_summary_item_map" indexName="i_dc_summary_item_map_item_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-190-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_decision_con_crfversion_id"/>
+			</preConditions>
+			<dropIndex tableName="decision_condition" indexName="i_decision_con_crfversion_id"/>
+	</changeSet>		
+	<changeSet author="pgawade" id="2011-04-08-8840-191-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_decision_con_status_id"/>
+			</preConditions>
+			<dropIndex tableName="decision_condition" indexName="i_decision_con_status_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-192-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_completion_status_status_id"/>
+			</preConditions>
+			<dropIndex tableName="completion_status" indexName="i_completion_status_status_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-193-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_filter_crfv_map_filter_id"/>
+			</preConditions>
+			<dropIndex tableName="filter_crf_version_map" indexName="i_filter_crfv_map_filter_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-194-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_filter_crfv_map_crfv_id"/>
+			</preConditions>
+			<dropIndex tableName="filter_crf_version_map" indexName="i_filter_crfv_map_crfv_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-195-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_item_group_met_item_gr_id"/>
+			</preConditions>
+			<dropIndex tableName="item_group_metadata" indexName="i_item_group_met_item_gr_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-196-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_item_group_crf_id"/>
+			</preConditions>
+			<dropIndex tableName="item_group" indexName="i_item_group_crf_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-197-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_item_group_status_id"/>
+			</preConditions>
+			<dropIndex tableName="item_group" indexName="i_item_group_status_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-198-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_item_data_ordinal"/>
+			</preConditions>
+			<dropIndex tableName="item_data" indexName="i_item_data_ordinal"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-199-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_response_set_version_id"/>
+			</preConditions>
+			<dropIndex tableName="response_set" indexName="i_response_set_version_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-200-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_item_form_metadata_par_id"/>
+			</preConditions>
+			<dropIndex tableName="item_form_metadata" indexName="i_item_form_metadata_par_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-201-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_item_form_meta_dec_con_id"/>
+			</preConditions>
+			<dropIndex tableName="item_form_metadata" indexName="i_item_form_meta_dec_con_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-202-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_item_form_metadata_ordinal"/>
+			</preConditions>
+			<dropIndex tableName="item_form_metadata" indexName="i_item_form_metadata_ordinal"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-203-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_section_status_id"/>
+			</preConditions>
+			<dropIndex tableName="section" indexName="i_section_status_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-204-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_study_event_def_status_id"/>
+			</preConditions>
+			<dropIndex tableName="study_event_definition" indexName="i_study_event_def_status_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-205-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_study_event_def_update_id"/>
+			</preConditions>
+			<dropIndex tableName="study_event_definition" indexName="i_study_event_def_update_id"/>
+	</changeSet>		
+	<changeSet author="pgawade" id="2011-04-08-8840-206-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_study_event_sample_ordinal"/>
+			</preConditions>
+			<dropIndex tableName="study_event" indexName="i_study_event_sample_ordinal"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-207-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_study_event_date_start"/>
+			</preConditions>
+			<dropIndex tableName="study_event" indexName="i_study_event_date_start"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-208-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_study_event_date_end"/>
+			</preConditions>
+			<dropIndex tableName="study_event" indexName="i_study_event_date_end"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-209-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_study_event_status_id"/>
+			</preConditions>
+			<dropIndex tableName="study_event" indexName="i_study_event_status_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-210-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_study_event_sub_event_st_id"/>
+			</preConditions>
+			<dropIndex tableName="study_event" indexName="i_study_event_sub_event_st_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-211-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_study_gr_class_study_id"/>
+			</preConditions>
+			<dropIndex tableName="study_group_class" indexName="i_study_gr_class_study_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-212-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_study_gr_class_status_id"/>
+			</preConditions>
+			<dropIndex tableName="study_group_class" indexName="i_study_gr_class_status_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-213-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_sub_gr_map_study_gr_cl_id"/>
+			</preConditions>
+			<dropIndex tableName="subject_group_map" indexName="i_sub_gr_map_study_gr_cl_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-214-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_subject_group_map_status_id"/>
+			</preConditions>
+			<dropIndex tableName="subject_group_map" indexName="i_subject_group_map_status_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-215-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_study_subject_label"/>
+			</preConditions>
+			<dropIndex tableName="study_subject" indexName="i_study_subject_label"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-216-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_study_subject_status_id"/>
+			</preConditions>
+			<dropIndex tableName="study_subject" indexName="i_study_subject_status_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-217-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_subject_date_of_birth"/>
+			</preConditions>
+			<dropIndex tableName="subject" indexName="i_subject_date_of_birth"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-218-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_subject_gender"/>
+			</preConditions>
+			<dropIndex tableName="subject" indexName="i_subject_gender"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-219-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_subject_unique_identifier"/>
+			</preConditions>
+			<dropIndex tableName="subject" indexName="i_subject_unique_identifier"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-220-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_subject_date_created"/>
+			</preConditions>
+			<dropIndex tableName="subject" indexName="i_subject_date_created"/>
+	</changeSet>		
+	<changeSet author="pgawade" id="2011-04-08-8840-221-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_event_crf_date_interviewed"/>
+			</preConditions>
+			<dropIndex tableName="event_crf" indexName="i_event_crf_date_interviewed"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-222-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_event_crf_interviewer_name"/>
+			</preConditions>
+			<dropIndex tableName="event_crf" indexName="i_event_crf_interviewer_name"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-223-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_event_crf_comp_status_id"/>
+			</preConditions>
+			<dropIndex tableName="event_crf" indexName="i_event_crf_comp_status_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-224-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_event_crf_validator_id"/>
+			</preConditions>
+			<dropIndex tableName="event_crf" indexName="i_event_crf_validator_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-225-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_event_crf_owner_id"/>
+			</preConditions>
+			<dropIndex tableName="event_crf" indexName="i_event_crf_owner_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-226-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_event_crf_study_subject_id"/>
+			</preConditions>
+			<dropIndex tableName="event_crf" indexName="i_event_crf_study_subject_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-227-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_item_units"/>
+			</preConditions>
+			<dropIndex tableName="item" indexName="i_item_units "/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-228-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_item_item_data_type_id"/>
+			</preConditions>
+			<dropIndex tableName="item" indexName="i_item_item_data_type_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-229-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_item_item_reference_type_id"/>
+			</preConditions>
+			<dropIndex tableName="item" indexName="i_item_item_reference_type_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-230-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_crf_status_id"/>
+			</preConditions>
+			<dropIndex tableName="crf" indexName="i_crf_status_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-231-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_crf_name"/>
+			</preConditions>
+			<dropIndex tableName="crf" indexName="i_crf_name "/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-232-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_crf_owner_id"/>
+			</preConditions>
+			<dropIndex tableName="crf" indexName="i_crf_owner_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-233-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_event_def_crf_study_id"/>
+			</preConditions>
+			<dropIndex tableName="event_definition_crf" indexName="i_event_def_crf_study_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-234-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_edc_default_version_id"/>
+			</preConditions>
+			<dropIndex tableName="event_definition_crf" indexName="i_edc_default_version_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-235-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_event_def_crf_status_id"/>
+			</preConditions>
+			<dropIndex tableName="event_definition_crf" indexName="i_event_def_crf_status_id"/>
+	</changeSet>		
+	<changeSet author="pgawade" id="2011-04-08-8840-236-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_event_def_crf_ordinal"/>
+			</preConditions>
+			<dropIndex tableName="event_definition_crf" indexName="i_event_def_crf_ordinal"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-237-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_event_def_crf_el_signature"/>
+			</preConditions>
+			<dropIndex tableName="event_definition_crf" indexName="i_event_def_crf_el_signature"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-238-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_crf_version_name"/>
+			</preConditions>
+			<dropIndex tableName="crf_version" indexName="i_crf_version_name"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-239-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_crf_version_status_id"/>
+			</preConditions>
+			<dropIndex tableName="crf_version" indexName="i_crf_version_status_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-240-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_study_param_value_study_id"/>
+			</preConditions>
+			<dropIndex tableName="study_parameter_value" indexName="i_study_param_value_study_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-241-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_study_parent_study_id"/>
+			</preConditions>
+			<dropIndex tableName="study" indexName="i_study_parent_study_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-242-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_study_unique_identifier"/>
+			</preConditions>
+			<dropIndex tableName="study" indexName="i_study_unique_identifier"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-243-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_study_name"/>
+			</preConditions>
+			<dropIndex tableName="study" indexName="i_study_name"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-244-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_study_owner_id"/>
+			</preConditions>
+			<dropIndex tableName="study" indexName="i_study_owner_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-245-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_study_type_id"/>
+			</preConditions>
+			<dropIndex tableName="study" indexName="i_study_type_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-246-1">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+				<indexExists schemaName="public" indexName="i_study_status_id"/>
+			</preConditions>
+			<dropIndex tableName="study" indexName="i_study_status_id"/>
+	</changeSet>
+	<changeSet author="pgawade" id="2011-04-08-8840-130-2">
+			<preConditions onFail="MARK_RAN">
+				<dbms type="oracle" />
+			</preConditions>			
 			<createIndex tableName="audit_log_event" indexName="i_audit_log_event_audit_table">
 				<column name="audit_table"/>
 			</createIndex>
 	</changeSet>		
-	<changeSet author="pgawade" id="2011-04-08-8840-131">
+	<changeSet author="pgawade" id="2011-04-08-8840-131-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
-			</preConditions>
-			<dropIndex tableName="audit_log_event" indexName="i_audit_log_event_user_id"/>
+			</preConditions>			
 			<createIndex tableName="audit_log_event" indexName="i_audit_log_event_user_id">
 				<column name="user_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-132">
+	<changeSet author="pgawade" id="2011-04-08-8840-132-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
-			</preConditions>
-			<dropIndex tableName="audit_log_event" indexName="i_audit_log_event_entity_id"/>
+			</preConditions>			
 			<createIndex tableName="audit_log_event" indexName="i_audit_log_event_entity_id">
 				<column name="entity_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-133">
+	<changeSet author="pgawade" id="2011-04-08-8840-133-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="audit_log_event" indexName="i_audit_log_event_ale_type_id"/>
 			<createIndex tableName="audit_log_event" indexName="i_audit_log_event_ale_type_id">
 				<column name="audit_log_event_type_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-134">
+	<changeSet author="pgawade" id="2011-04-08-8840-134-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="audit_log_event" indexName="i_audit_log_event_event_crf_id"/>
 			<createIndex tableName="audit_log_event" indexName="i_audit_log_event_event_crf_id">
 				<column name="event_crf_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-135">
+	<changeSet author="pgawade" id="2011-04-08-8840-135-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="audit_log_event" indexName="i_audit_log_event_se_id"/>
 			<createIndex tableName="audit_log_event" indexName="i_audit_log_event_se_id">
 				<column name="study_event_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-136">
+	<changeSet author="pgawade" id="2011-04-08-8840-136-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
-			</preConditions>
-			<dropIndex tableName="audit_log_event" indexName="i_audit_log_event_crf_v_id"/>
+			</preConditions>			
 			<createIndex tableName="audit_log_event" indexName="i_audit_log_event_crf_v_id">
 				<column name="event_crf_version_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-137">
+	<changeSet author="pgawade" id="2011-04-08-8840-137-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
-			</preConditions>
-			<dropIndex tableName="null_value_type" indexName="i_null_value_type_code"/>
+			</preConditions>			
 			<createIndex tableName="null_value_type" indexName="i_null_value_type_code">
 				<column name="code"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-138">
+	<changeSet author="pgawade" id="2011-04-08-8840-138-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
-			</preConditions>
-			<dropIndex tableName="rule" indexName="i_rule_oc_oid"/>
+			</preConditions>			
 			<createIndex tableName="rule" indexName="i_rule_oc_oid">
 				<column name="oc_oid"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-139">
+	<changeSet author="pgawade" id="2011-04-08-8840-139-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
-			</preConditions>
-			<dropIndex tableName="rule" indexName="i_rule_rule_expression_id"/>
+			</preConditions>			
 			<createIndex tableName="rule" indexName="i_rule_rule_expression_id">
 				<column name="rule_expression_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-140">
+	<changeSet author="pgawade" id="2011-04-08-8840-140-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="rule" indexName="i_rule_status_id"/>
 			<createIndex tableName="rule" indexName="i_rule_status_id">
 				<column name="status_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-141">
+	<changeSet author="pgawade" id="2011-04-08-8840-141-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="rule_action" indexName="i_rule_action_rule_set_id"/>
 			<createIndex tableName="rule_action" indexName="i_rule_action_rule_set_id">
 				<column name="rule_set_rule_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-142">
+	<changeSet author="pgawade" id="2011-04-08-8840-142-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="rule_action" indexName="i_rule_action_action_type"/>
 			<createIndex tableName="rule_action" indexName="i_rule_action_action_type">
 				<column name="action_type"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-143">
+	<changeSet author="pgawade" id="2011-04-08-8840-143-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="rule_action" indexName="i_rule_action_status_id"/>
 			<createIndex tableName="rule_action" indexName="i_rule_action_status_id">
 				<column name="status_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-144">
+	<changeSet author="pgawade" id="2011-04-08-8840-144-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="rule_expression" indexName="i_rule_expression_status_id"/>
 			<createIndex tableName="rule_expression" indexName="i_rule_expression_status_id">
 				<column name="status_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-145">
+	<changeSet author="pgawade" id="2011-04-08-8840-145-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="rule_set" indexName="i_rule_set_rule_expression_id"/>
 			<createIndex tableName="rule_set" indexName="i_rule_set_rule_expression_id">
 				<column name="rule_expression_id"/>
 			</createIndex>
 	</changeSet>		
-	<changeSet author="pgawade" id="2011-04-08-8840-146">
+	<changeSet author="pgawade" id="2011-04-08-8840-146-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="rule_set" indexName="i_rule_set_se_definition_id"/>
 			<createIndex tableName="rule_set" indexName="i_rule_set_se_definition_id">
 				<column name="study_event_definition_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-147">
+	<changeSet author="pgawade" id="2011-04-08-8840-147-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="rule_set" indexName="i_rule_set_crf_id"/>
-			<createIndex tableName="rule_set" indexName="">
+			<createIndex tableName="rule_set" indexName="i_rule_set_crf_id">
 				<column name="crf_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-148">
+	<changeSet author="pgawade" id="2011-04-08-8840-148-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="rule_set" indexName="i_rule_set_crf_version_id"/>
 			<createIndex tableName="rule_set" indexName="i_rule_set_crf_version_id">
 				<column name="crf_version_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-149">
+	<changeSet author="pgawade" id="2011-04-08-8840-149-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="rule_set" indexName="i_rule_set_study_id"/>
 			<createIndex tableName="rule_set" indexName="i_rule_set_study_id">
 				<column name="study_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-150">
+	<changeSet author="pgawade" id="2011-04-08-8840-150-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="rule_set" indexName="i_rule_set_status_id"/>
 			<createIndex tableName="rule_set" indexName="i_rule_set_status_id">
 				<column name="status_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-151">
+	<changeSet author="pgawade" id="2011-04-08-8840-151-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="rule_set_audit" indexName="i_rule_set_audit_rule_set_id"/>
 			<createIndex tableName="rule_set_audit" indexName="">
 				<column name="rule_set_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-152">
+	<changeSet author="pgawade" id="2011-04-08-8840-152-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="rule_set_audit" indexName="i_rule_set_audit_status_id"/>
 			<createIndex tableName="rule_set_audit" indexName="i_rule_set_audit_status_id">
 				<column name="status_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-153">
+	<changeSet author="pgawade" id="2011-04-08-8840-153-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="rule_set_rule" indexName="i_rule_set_rule_rule_set_id"/>
 			<createIndex tableName="rule_set_rule" indexName="i_rule_set_rule_rule_set_id">
 				<column name="rule_set_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-154">
+	<changeSet author="pgawade" id="2011-04-08-8840-154-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="rule_set_rule" indexName="i_rule_set_rule_rule_id"/>
 			<createIndex tableName="rule_set_rule" indexName="i_rule_set_rule_rule_id">
 				<column name="rule_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-155">
+	<changeSet author="pgawade" id="2011-04-08-8840-155-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="rule_set_rule" indexName="i_rule_set_rule_status_id"/>
 			<createIndex tableName="rule_set_rule" indexName="i_rule_set_rule_status_id">
 				<column name="status_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-156">
+	<changeSet author="pgawade" id="2011-04-08-8840-156-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="rule_set_rule_audit" indexName="i_rule_set_rule_ars_rule_id"/>
 			<createIndex tableName="rule_set_rule_audit" indexName="i_rule_set_rule_ars_rule_id">
 				<column name="rule_set_rule_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-157">
+	<changeSet author="pgawade" id="2011-04-08-8840-157-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="rule_set_rule_audit" indexName="i_rule_set_rule_audit_st_id"/>
 			<createIndex tableName="rule_set_rule_audit" indexName="i_rule_set_rule_audit_st_id">
 				<column name="status_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-158">
+	<changeSet author="pgawade" id="2011-04-08-8840-158-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="dn_event_crf_map" indexName="i_dn_event_crf_map_ecrf_id"/>
 			<createIndex tableName="dn_event_crf_map" indexName="i_dn_event_crf_map_ecrf_id">
 				<column name="event_crf_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-159">
+	<changeSet author="pgawade" id="2011-04-08-8840-159-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="dn_event_crf_map" indexName="i_dn_event_crf_map_d_note_id"/>
 			<createIndex tableName="dn_event_crf_map" indexName="i_dn_event_crf_map_d_note_id">
 				<column name="discrepancy_note_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-160">
+	<changeSet author="pgawade" id="2011-04-08-8840-160-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="dn_item_data_map" indexName="i_dn_item_data_map_item_d_id"/>
 			<createIndex tableName="dn_item_data_map" indexName="i_dn_item_data_map_item_d_id">
 				<column name="item_data_id"/>
 			</createIndex>
 	</changeSet>		
-	<changeSet author="pgawade" id="2011-04-08-8840-161">
+	<changeSet author="pgawade" id="2011-04-08-8840-161-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="dn_item_data_map" indexName="i_dn_item_data_map_d_note_id"/>
 			<createIndex tableName="dn_item_data_map" indexName="i_dn_item_data_map_d_note_id">
 				<column name="discrepancy_note_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-162">
+	<changeSet author="pgawade" id="2011-04-08-8840-162-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="dn_study_event_map" indexName="i_dn_study_e_map_s_event_id"/>
 			<createIndex tableName="dn_study_event_map" indexName="i_dn_study_e_map_s_event_id">
 				<column name="study_event_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-163">
+	<changeSet author="pgawade" id="2011-04-08-8840-163-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="dn_study_event_map" indexName="i_dn_study_e_map_dis_note_id"/>
 			<createIndex tableName="dn_study_event_map" indexName="i_dn_study_e_map_dis_note_id">
 				<column name="discrepancy_note_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-164">
+	<changeSet author="pgawade" id="2011-04-08-8840-164-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="dn_study_subject_map" indexName="i_dn_study_subject_map_ss_id"/>
 			<createIndex tableName="dn_study_subject_map" indexName="i_dn_study_subject_map_ss_id">
 				<column name="study_subject_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-165">
+	<changeSet author="pgawade" id="2011-04-08-8840-165-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="dn_study_subject_map" indexName="i_dn_study_subject_map_dn_id"/>
 			<createIndex tableName="dn_study_subject_map" indexName="i_dn_study_subject_map_dn_id">
 				<column name="discrepancy_note_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-166">
+	<changeSet author="pgawade" id="2011-04-08-8840-166-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="discrepancy_note" indexName="i_disc_note_dn_type_id"/>
 			<createIndex tableName="discrepancy_note" indexName="i_disc_note_dn_type_id">
 				<column name="discrepancy_note_type_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-167">
+	<changeSet author="pgawade" id="2011-04-08-8840-167-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="discrepancy_note" indexName="i_disc_note_res_status_id"/>
 			<createIndex tableName="discrepancy_note" indexName="i_disc_note_res_status_id">
 				<column name="resolution_status_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-168">
+	<changeSet author="pgawade" id="2011-04-08-8840-168-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="discrepancy_note" indexName="i_disc_note_owner_id"/>
 			<createIndex tableName="discrepancy_note" indexName="i_disc_note_owner_id">
 				<column name="owner_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-169">
+	<changeSet author="pgawade" id="2011-04-08-8840-169-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="discrepancy_note" indexName="i_disc_note_parent_dn_id"/>
 			<createIndex tableName="discrepancy_note" indexName="i_disc_note_parent_dn_id">
 				<column name="parent_dn_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-170">
+	<changeSet author="pgawade" id="2011-04-08-8840-170-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="discrepancy_note" indexName="i_disc_note_entity_type"/>
 			<createIndex tableName="discrepancy_note" indexName="i_disc_note_entity_type">
 				<column name="entity_type"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-171">
+	<changeSet author="pgawade" id="2011-04-08-8840-171-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="discrepancy_note" indexName="i_disc_note_study_id"/>
 			<createIndex tableName="discrepancy_note" indexName="i_disc_note_study_id">
 				<column name="study_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-172">
+	<changeSet author="pgawade" id="2011-04-08-8840-172-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="dn_subject_map" indexName="i_dn_subject_map_subject_id"/>
 			<createIndex tableName="dn_subject_map" indexName="i_dn_subject_map_subject_id">
 				<column name="subject_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-173">
+	<changeSet author="pgawade" id="2011-04-08-8840-173-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="dn_subject_map" indexName="i_dn_subject_map_dn_id"/>
 			<createIndex tableName="dn_subject_map" indexName="i_dn_subject_map_dn_id">
 				<column name="discrepancy_note_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-174">
+	<changeSet author="pgawade" id="2011-04-08-8840-174-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="dataset_crf_version_map" indexName="i_dset_crf_v_map_dataset_id"/>
 			<createIndex tableName="dataset_crf_version_map" indexName="i_dset_crf_v_map_dataset_id">
 				<column name="dataset_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-175">
+	<changeSet author="pgawade" id="2011-04-08-8840-175-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="dataset_crf_version_map" indexName="i_dset_crf_version_map_edc_id"/>
 			<createIndex tableName="dataset_crf_version_map" indexName="i_dset_crf_version_map_edc_id">
 				<column name="event_definition_crf_id"/>
 			</createIndex>
 	</changeSet>		
-	<changeSet author="pgawade" id="2011-04-08-8840-176">
+	<changeSet author="pgawade" id="2011-04-08-8840-176-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="dataset_study_group_class_map" indexName="i_dset_sgc_map_dataset_id"/>
 			<createIndex tableName="dataset_study_group_class_map" indexName="i_dset_sgc_map_dataset_id">
 				<column name="dataset_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-177">
+	<changeSet author="pgawade" id="2011-04-08-8840-177-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="dataset_study_group_class_map" indexName="i_dset_sgc_map_st_gr_cl_id"/>
 			<createIndex tableName="dataset_study_group_class_map" indexName="i_dset_sgc_map_st_gr_cl_id">
 				<column name="study_group_class_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-178">
+	<changeSet author="pgawade" id="2011-04-08-8840-178-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="dataset" indexName="i_dset_status_id"/>
 			<createIndex tableName="dataset" indexName="i_dset_status_id">
 				<column name="status_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-179">
+	<changeSet author="pgawade" id="2011-04-08-8840-179-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="dataset_filter_map" indexName="i_dset_filter_map_dataset_id"/>
 			<createIndex tableName="dataset_filter_map" indexName="i_dset_filter_map_dataset_id">
 				<column name="dataset_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-180">
+	<changeSet author="pgawade" id="2011-04-08-8840-180-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="dataset_filter_map" indexName="i_dset_filter_map_filter_id"/>
 			<createIndex tableName="dataset_filter_map" indexName="i_dset_filter_map_filter_id">
 				<column name="filter_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-181">
+	<changeSet author="pgawade" id="2011-04-08-8840-181-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="dataset_filter_map" indexName="i_dataset_filter_map_ordinal"/>
 			<createIndex tableName="dataset_filter_map" indexName="i_dataset_filter_map_ordinal">
 				<column name="ordinal"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-182">
+	<changeSet author="pgawade" id="2011-04-08-8840-182-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="dc_primitive" indexName="i_dc_prim_decision_con_id"/>
 			<createIndex tableName="dc_primitive" indexName="i_dc_prim_decision_con_id">
 				<column name="decision_condition_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-183">
+	<changeSet author="pgawade" id="2011-04-08-8840-183-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="dc_primitive" indexName="i_dc_prim_item_id"/>
 			<createIndex tableName="dc_primitive" indexName="i_dc_prim_item_id">
 				<column name="item_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-184">
+	<changeSet author="pgawade" id="2011-04-08-8840-184-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="dc_primitive" indexName="i_dc_prim_dyn_value_item_id"/>
 			<createIndex tableName="dc_primitive" indexName="i_dc_prim_dyn_value_item_id">
 				<column name="dynamic_value_item_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-185">
+	<changeSet author="pgawade" id="2011-04-08-8840-185-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="dc_section_event" indexName="i_dc_sec_event_section_id"/>
 			<createIndex tableName="dc_section_event" indexName="i_dc_sec_event_section_id">
 				<column name="section_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-186">
+	<changeSet author="pgawade" id="2011-04-08-8840-186-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="dc_substitution_event" indexName="i_dc_subs_event_item_id"/>
 			<createIndex tableName="dc_substitution_event" indexName="i_dc_subs_event_item_id">
 				<column name="item_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-187">
+	<changeSet author="pgawade" id="2011-04-08-8840-187-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="dc_computed_event" indexName="i_dc_computed_e_dc_event_id"/>
 			<createIndex tableName="dc_computed_event" indexName="i_dc_computed_e_dc_event_id">
 				<column name="dc_event_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-188">
+	<changeSet author="pgawade" id="2011-04-08-8840-188-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="dc_computed_event" indexName="i_dc_comp_e_item_target_id"/>
 			<createIndex tableName="dc_computed_event" indexName="i_dc_comp_e_item_target_id">
 				<column name="item_target_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-189">
+	<changeSet author="pgawade" id="2011-04-08-8840-189-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="dc_summary_item_map" indexName="i_dc_summary_item_map_item_id"/>
 			<createIndex tableName="dc_summary_item_map" indexName="i_dc_summary_item_map_item_id">
 				<column name="item_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-190">
+	<changeSet author="pgawade" id="2011-04-08-8840-190-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="decision_condition" indexName="i_decision_con_crfversion_id"/>
 			<createIndex tableName="decision_condition" indexName="i_decision_con_crfversion_id">
 				<column name="crf_version_id"/>
 			</createIndex>
 	</changeSet>		
-	<changeSet author="pgawade" id="2011-04-08-8840-191">
+	<changeSet author="pgawade" id="2011-04-08-8840-191-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="decision_condition" indexName="i_decision_con_status_id"/>
 			<createIndex tableName="decision_condition" indexName="i_decision_con_status_id">
 				<column name="status_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-192">
+	<changeSet author="pgawade" id="2011-04-08-8840-192-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="completion_status" indexName="i_completion_status_status_id"/>
 			<createIndex tableName="completion_status" indexName="i_completion_status_status_id">
 				<column name="status_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-193">
+	<changeSet author="pgawade" id="2011-04-08-8840-193-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="filter_crf_version_map" indexName="i_filter_crfv_map_filter_id"/>
 			<createIndex tableName="filter_crf_version_map" indexName="i_filter_crfv_map_filter_id">
 				<column name="filter_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-194">
+	<changeSet author="pgawade" id="2011-04-08-8840-194-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="filter_crf_version_map" indexName="i_filter_crfv_map_crfv_id"/>
 			<createIndex tableName="filter_crf_version_map" indexName="i_filter_crfv_map_crfv_id">
 				<column name="crf_version_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-195">
+	<changeSet author="pgawade" id="2011-04-08-8840-195-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="item_group_metadata" indexName="i_item_group_met_item_gr_id"/>
 			<createIndex tableName="item_group_metadata" indexName="i_item_group_met_item_gr_id">
 				<column name="item_group_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-196">
+	<changeSet author="pgawade" id="2011-04-08-8840-196-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="item_group" indexName="i_item_group_crf_id"/>
 			<createIndex tableName="item_group" indexName="i_item_group_crf_id">
 				<column name="crf_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-197">
+	<changeSet author="pgawade" id="2011-04-08-8840-197-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="item_group" indexName="i_item_group_status_id"/>
 			<createIndex tableName="item_group" indexName="i_item_group_status_id">
 				<column name="status_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-198">
+	<changeSet author="pgawade" id="2011-04-08-8840-198-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="item_data" indexName="i_item_data_ordinal"/>
 			<createIndex tableName="item_data" indexName="i_item_data_ordinal">
 				<column name="ordinal"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-199">
+	<changeSet author="pgawade" id="2011-04-08-8840-199-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="response_set" indexName="i_response_set_version_id"/>
 			<createIndex tableName="response_set" indexName="i_response_set_version_id">
 				<column name="version_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-200">
+	<changeSet author="pgawade" id="2011-04-08-8840-200-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="item_form_metadata" indexName="i_item_form_metadata_par_id"/>
 			<createIndex tableName="item_form_metadata" indexName="i_item_form_metadata_par_id">
 				<column name="parent_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-201">
+	<changeSet author="pgawade" id="2011-04-08-8840-201-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="item_form_metadata" indexName="i_item_form_meta_dec_con_id"/>
 			<createIndex tableName="item_form_metadata" indexName="i_item_form_meta_dec_con_id">
 				<column name="decision_condition_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-202">
+	<changeSet author="pgawade" id="2011-04-08-8840-202-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="item_form_metadata" indexName="i_item_form_metadata_ordinal"/>
 			<createIndex tableName="item_form_metadata" indexName="i_item_form_metadata_ordinal">
 				<column name="ordinal"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-203">
+	<changeSet author="pgawade" id="2011-04-08-8840-203-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="section" indexName="i_section_status_id"/>
 			<createIndex tableName="section" indexName="i_section_status_id">
 				<column name="status_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-204">
+	<changeSet author="pgawade" id="2011-04-08-8840-204-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="study_event_definition" indexName="i_study_event_def_status_id"/>
 			<createIndex tableName="study_event_definition" indexName="i_study_event_def_status_id">
 				<column name="status_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-205">
+	<changeSet author="pgawade" id="2011-04-08-8840-205-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="study_event_definition" indexName="i_study_event_def_update_id"/>
 			<createIndex tableName="study_event_definition" indexName="i_study_event_def_update_id">
 				<column name="update_id"/>
 			</createIndex>
 	</changeSet>		
-	<changeSet author="pgawade" id="2011-04-08-8840-206">
+	<changeSet author="pgawade" id="2011-04-08-8840-206-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="study_event" indexName="i_study_event_sample_ordinal"/>
 			<createIndex tableName="study_event" indexName="i_study_event_sample_ordinal">
 				<column name="sample_ordinal"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-207">
+	<changeSet author="pgawade" id="2011-04-08-8840-207-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="study_event" indexName="i_study_event_date_start"/>
 			<createIndex tableName="study_event" indexName="i_study_event_date_start">
 				<column name="date_start"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-208">
+	<changeSet author="pgawade" id="2011-04-08-8840-208-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="study_event" indexName="i_study_event_date_end"/>
 			<createIndex tableName="study_event" indexName="i_study_event_date_end">
 				<column name="date_end"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-209">
+	<changeSet author="pgawade" id="2011-04-08-8840-209-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="study_event" indexName="i_study_event_status_id"/>
 			<createIndex tableName="study_event" indexName="i_study_event_status_id">
 				<column name="status_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-210">
+	<changeSet author="pgawade" id="2011-04-08-8840-210-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="study_event" indexName="i_study_event_sub_event_st_id"/>
 			<createIndex tableName="study_event" indexName="i_study_event_sub_event_st_id">
 				<column name="subject_event_status_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-211">
+	<changeSet author="pgawade" id="2011-04-08-8840-211-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="study_group_class" indexName="i_study_gr_class_study_id"/>
 			<createIndex tableName="study_group_class" indexName="i_study_gr_class_study_id">
 				<column name="study_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-212">
+	<changeSet author="pgawade" id="2011-04-08-8840-212-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="study_group_class" indexName="i_study_gr_class_status_id"/>
 			<createIndex tableName="study_group_class" indexName="i_study_gr_class_status_id">
 				<column name="status_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-213">
+	<changeSet author="pgawade" id="2011-04-08-8840-213-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="subject_group_map" indexName="i_sub_gr_map_study_gr_cl_id"/>
 			<createIndex tableName="subject_group_map" indexName="i_sub_gr_map_study_gr_cl_id">
 				<column name="study_group_class_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-214">
+	<changeSet author="pgawade" id="2011-04-08-8840-214-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="subject_group_map" indexName="i_subject_group_map_status_id"/>
 			<createIndex tableName="subject_group_map" indexName="i_subject_group_map_status_id">
 				<column name="status_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-215">
+	<changeSet author="pgawade" id="2011-04-08-8840-215-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="study_subject" indexName="i_study_subject_label"/>
 			<createIndex tableName="study_subject" indexName="i_study_subject_label">
 				<column name="label"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-216">
+	<changeSet author="pgawade" id="2011-04-08-8840-216-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="study_subject" indexName="i_study_subject_status_id"/>
 			<createIndex tableName="study_subject" indexName="i_study_subject_status_id">
 				<column name="status_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-217">
+	<changeSet author="pgawade" id="2011-04-08-8840-217-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="subject" indexName="i_subject_date_of_birth"/>
 			<createIndex tableName="subject" indexName="i_subject_date_of_birth">
 				<column name="date_of_birth"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-218">
+	<changeSet author="pgawade" id="2011-04-08-8840-218-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="subject" indexName="i_subject_gender"/>
 			<createIndex tableName="subject" indexName="i_subject_gender">
 				<column name="gender"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-219">
+	<changeSet author="pgawade" id="2011-04-08-8840-219-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="subject" indexName="i_subject_unique_identifier"/>
 			<createIndex tableName="subject" indexName="i_subject_unique_identifier">
 				<column name="unique_identifier"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-220">
+	<changeSet author="pgawade" id="2011-04-08-8840-220-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="subject" indexName="i_subject_date_created"/>
 			<createIndex tableName="subject " indexName="i_subject_date_created">
 				<column name="date_created"/>
 			</createIndex>
 	</changeSet>		
-	<changeSet author="pgawade" id="2011-04-08-8840-221">
+	<changeSet author="pgawade" id="2011-04-08-8840-221-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="event_crf" indexName="i_event_crf_date_interviewed"/>
 			<createIndex tableName="event_crf" indexName="i_event_crf_date_interviewed">
 				<column name="date_interviewed"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-222">
+	<changeSet author="pgawade" id="2011-04-08-8840-222-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="event_crf" indexName="i_event_crf_interviewer_name"/>
 			<createIndex tableName="event_crf" indexName="i_event_crf_interviewer_name">
 				<column name="interviewer_name"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-223">
+	<changeSet author="pgawade" id="2011-04-08-8840-223-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="event_crf" indexName="i_event_crf_comp_status_id"/>
 			<createIndex tableName="event_crf" indexName="i_event_crf_comp_status_id">
 				<column name="completion_status_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-224">
+	<changeSet author="pgawade" id="2011-04-08-8840-224-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="event_crf" indexName="i_event_crf_validator_id"/>
 			<createIndex tableName="event_crf" indexName="i_event_crf_validator_id">
 				<column name="validator_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-225">
+	<changeSet author="pgawade" id="2011-04-08-8840-225-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="event_crf" indexName="i_event_crf_owner_id"/>
 			<createIndex tableName="event_crf" indexName="i_event_crf_owner_id">
 				<column name="owner_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-226">
+	<changeSet author="pgawade" id="2011-04-08-8840-226-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="event_crf" indexName="i_event_crf_study_subject_id"/>
 			<createIndex tableName="event_crf" indexName="i_event_crf_study_subject_id">
 				<column name="study_subject_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-227">
+	<changeSet author="pgawade" id="2011-04-08-8840-227-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="item" indexName="i_item_units "/>
 			<createIndex tableName="item" indexName="i_item_units ">
 				<column name="units"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-228">
+	<changeSet author="pgawade" id="2011-04-08-8840-228-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="item" indexName="i_item_item_data_type_id"/>
 			<createIndex tableName="item" indexName="i_item_item_data_type_id">
 				<column name="item_data_type_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-229">
+	<changeSet author="pgawade" id="2011-04-08-8840-229-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="item" indexName="i_item_item_reference_type_id"/>
 			<createIndex tableName="item" indexName="i_item_item_reference_type_id">
 				<column name="item_reference_type_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-230">
+	<changeSet author="pgawade" id="2011-04-08-8840-230-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="crf" indexName="i_crf_status_id"/>
 			<createIndex tableName="crf" indexName="i_crf_status_id">
 				<column name="status_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-231">
+	<changeSet author="pgawade" id="2011-04-08-8840-231-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="crf" indexName="i_crf_name "/>
 			<createIndex tableName="crf" indexName="i_crf_name ">
 				<column name="name"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-232">
+	<changeSet author="pgawade" id="2011-04-08-8840-232-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="crf" indexName="i_crf_owner_id"/>
 			<createIndex tableName="crf" indexName="i_crf_owner_id">
 				<column name="owner_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-233">
+	<changeSet author="pgawade" id="2011-04-08-8840-233-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="event_definition_crf" indexName="i_event_def_crf_study_id"/>
 			<createIndex tableName="event_definition_crf" indexName="i_event_def_crf_study_id">
 				<column name="study_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-234">
+	<changeSet author="pgawade" id="2011-04-08-8840-234-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="event_definition_crf" indexName="i_edc_default_version_id"/>
 			<createIndex tableName="event_definition_crf" indexName="i_edc_default_version_id">
 				<column name="default_version_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-235">
+	<changeSet author="pgawade" id="2011-04-08-8840-235-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="event_definition_crf" indexName="i_event_def_crf_status_id"/>
 			<createIndex tableName="event_definition_crf" indexName="i_event_def_crf_status_id">
 				<column name="status_id"/>
 			</createIndex>
 	</changeSet>		
-	<changeSet author="pgawade" id="2011-04-08-8840-236">
+	<changeSet author="pgawade" id="2011-04-08-8840-236-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="event_definition_crf" indexName="i_event_def_crf_ordinal"/>
 			<createIndex tableName="event_definition_crf" indexName="i_event_def_crf_ordinal">
 				<column name="ordinal"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-237">
+	<changeSet author="pgawade" id="2011-04-08-8840-237-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="event_definition_crf" indexName="i_event_def_crf_el_signature"/>
 			<createIndex tableName="event_definition_crf" indexName="i_event_def_crf_el_signature">
 				<column name="electronic_signature"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-238">
+	<changeSet author="pgawade" id="2011-04-08-8840-238-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="crf_version" indexName="i_crf_version_name"/>
 			<createIndex tableName="crf_version" indexName="i_crf_version_name">
 				<column name="name"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-239">
+	<changeSet author="pgawade" id="2011-04-08-8840-239-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="crf_version" indexName="i_crf_version_status_id"/>
 			<createIndex tableName="crf_version" indexName="i_crf_version_status_id">
 				<column name="status_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-240">
+	<changeSet author="pgawade" id="2011-04-08-8840-240-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="study_parameter_value" indexName="i_study_param_value_study_id"/>
 			<createIndex tableName="study_parameter_value" indexName="i_study_param_value_study_id">
 				<column name="study_parameter_value"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-241">
+	<changeSet author="pgawade" id="2011-04-08-8840-241-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="study" indexName="i_study_parent_study_id"/>
 			<createIndex tableName="study" indexName="i_study_parent_study_id">
 				<column name="parent_study_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-242">
+	<changeSet author="pgawade" id="2011-04-08-8840-242-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="study" indexName="i_study_unique_identifier"/>
 			<createIndex tableName="study" indexName="i_study_unique_identifier">
 				<column name="unique_identifier"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-243">
+	<changeSet author="pgawade" id="2011-04-08-8840-243-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="study" indexName="i_study_name"/>
 			<createIndex tableName="study" indexName="i_study_name">
 				<column name="name"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-244">
+	<changeSet author="pgawade" id="2011-04-08-8840-244-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="study" indexName="i_study_owner_id"/>
 			<createIndex tableName="study" indexName="i_study_owner_id">
 				<column name="owner_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-245">
+	<changeSet author="pgawade" id="2011-04-08-8840-245-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="study" indexName="i_study_type_id"/>
 			<createIndex tableName="study" indexName="i_study_type_id">
 				<column name="type_id"/>
 			</createIndex>
 	</changeSet>
-	<changeSet author="pgawade" id="2011-04-08-8840-246">
+	<changeSet author="pgawade" id="2011-04-08-8840-246-2">
 			<preConditions onFail="MARK_RAN">
 				<dbms type="oracle" />
 			</preConditions>
-			<dropIndex tableName="study" indexName="i_study_status_id"/>
 			<createIndex tableName="study" indexName="i_study_status_id">
 				<column name="status_id"/>
 			</createIndex>
