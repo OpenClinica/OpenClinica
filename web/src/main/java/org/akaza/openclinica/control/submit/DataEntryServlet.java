@@ -546,9 +546,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
         // if the validation was successful
         logMe("Entering  displayItemWithGroups sdao.findPrevious  "+System.currentTimeMillis());
         int sIndex = TableOfContentsServlet.sectionIndexInToc(section.getSection(), toc, sectionIdsInToc);
-        SectionBean previousSec = this.prevSection(section.getSection(), ecb, toc, sectionIdsInToc, sIndex);
+        SectionBean previousSec = this.prevSection(section.getSection(), ecb, toc, sIndex);
         logMe("Entering  displayItemWithGroups sdao.findPrevious  end "+System.currentTimeMillis());
-        SectionBean nextSec = this.nextSection(section.getSection(), ecb, toc, sectionIdsInToc, sIndex);
+        SectionBean nextSec = this.nextSection(section.getSection(), ecb, toc, sIndex);
         section.setFirstSection(!previousSec.isActive());
         section.setLastSection(!nextSec.isActive());
 
@@ -1765,8 +1765,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     request.setAttribute(TOC_DISPLAY, toc);
                     sectionIdsInToc = TableOfContentsServlet.sectionIdsInToc(toc);
                     sIndex = TableOfContentsServlet.sectionIndexInToc(section.getSection(), toc, sectionIdsInToc);
-                    previousSec = this.prevSection(section.getSection(), ecb, toc, sectionIdsInToc, sIndex);
-                    nextSec = this.nextSection(section.getSection(), ecb, toc, sectionIdsInToc, sIndex);
+                    previousSec = this.prevSection(section.getSection(), ecb, toc, sIndex);
+                    nextSec = this.nextSection(section.getSection(), ecb, toc, sIndex);
                     section.setFirstSection(!previousSec.isActive());
                     section.setLastSection(!nextSec.isActive());
                     //
@@ -1808,8 +1808,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     request.setAttribute(TOC_DISPLAY, toc);
                     sectionIdsInToc = TableOfContentsServlet.sectionIdsInToc(toc);
                     sIndex = TableOfContentsServlet.sectionIndexInToc(section.getSection(), toc, sectionIdsInToc);
-                    previousSec = this.prevSection(section.getSection(), ecb, toc, sectionIdsInToc, sIndex);
-                    nextSec = this.nextSection(section.getSection(), ecb, toc, sectionIdsInToc, sIndex);
+                    previousSec = this.prevSection(section.getSection(), ecb, toc, sIndex);
+                    nextSec = this.nextSection(section.getSection(), ecb, toc, sIndex);
                     section.setFirstSection(!previousSec.isActive());
                     section.setLastSection(!nextSec.isActive());
                     */
@@ -5369,47 +5369,26 @@ public abstract class DataEntryServlet extends CoreSecureController {
         }
     }
     
-    protected void updateDisplaySection(DisplaySectionBean section, SectionBean previousSec, SectionBean nextSec,
-            DisplayTableOfContentsBean toc, LinkedList<Integer> sectionIdsInToc, HttpServletRequest request) {
-        SectionBean sb = section.getSection();
-        EventCRFBean ecb = section.getEventCRF();
-        int sIndex = TableOfContentsServlet.sectionIndexInToc(sb, toc, sectionIdsInToc);
-        previousSec = prevSection(sb, ecb, toc, sectionIdsInToc, sIndex);
-        nextSec = nextSection(sb, ecb, toc, sectionIdsInToc, sIndex);
-        section.setFirstSection(!previousSec.isActive());
-        section.setLastSection(!nextSec.isActive());
-    }
-
-    protected SectionBean prevSection(SectionBean sb, EventCRFBean ecb, DisplayTableOfContentsBean toc, LinkedList<Integer> sectionIdsInToc, int sbPos) {
+    protected SectionBean prevSection(SectionBean sb, EventCRFBean ecb, DisplayTableOfContentsBean toc, int sbPos) {
         SectionBean p = new SectionBean();
-        SectionBean c = sb;
         ArrayList<SectionBean> sectionBeans = new ArrayList<SectionBean>();
         if (toc != null) {
             sectionBeans = toc.getSections();
             if (sbPos > 0) {
-                while (!sectionIdsInToc.contains(p.getId()) && sbPos > 1) {
-                    p = sectionBeans.get(sbPos - 1);
-                    c = p;
-                    sbPos -= 1;
-                }
+                p = sectionBeans.get(sbPos - 1);
             }
         } 
         return p != null && p.getId() > 0 ? p : new SectionBean();
     }
 
-    protected SectionBean nextSection(SectionBean sb, EventCRFBean ecb, DisplayTableOfContentsBean toc, LinkedList<Integer> sectionIdsInToc, int sbPos) {
+    protected SectionBean nextSection(SectionBean sb, EventCRFBean ecb, DisplayTableOfContentsBean toc, int sbPos) {
         SectionBean n = new SectionBean();
-        SectionBean c = sb;
         ArrayList<SectionBean> sectionBeans = new ArrayList<SectionBean>();
         if (toc != null) {
             sectionBeans = toc.getSections();
-            int size = sectionIdsInToc.size();
+            int size = sectionBeans.size();
             if (sbPos >= 0 && size > 1 && sbPos < size-1) {
-                while (!sectionIdsInToc.contains(n.getId()) && sbPos < size - 1) {
-                    n = sectionBeans.get(sbPos + 1);
-                    c = n;
-                    sbPos += 1;
-                }
+                n = sectionBeans.get(sbPos + 1);
             } 
         }
         return n != null && n.getId() > 0 ? n : new SectionBean();
