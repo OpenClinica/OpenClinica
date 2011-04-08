@@ -62,7 +62,7 @@
         </div>
         <div id="UserInfo">
             <a href="${urlPrefix}UpdateProfile"><b><c:out value="${userBean.name}" /></b> (<c:out value="${userRole.role.description}" />)</a>&nbsp;|&nbsp;
-            <c:out value="${pageContext.request.locale.displayName}"/>&nbsp;|&nbsp;
+            <c:out value="${pageContext.request.locale.language}"/>&nbsp;|&nbsp;
             <a href="${urlPrefix}j_spring_security_logout"><fmt:message key="log_out" bundle="${resword}"/></a>
         </div>
         <br/><br style="line-height: 4px;"/>
