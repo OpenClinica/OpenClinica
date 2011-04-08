@@ -131,7 +131,7 @@
 	<sql>select ifm.item_id from item_form_metadata ifm where ifm.section_id = ? and ifm.crf_version_id = ?
     and ifm.show_item = 't'
     and ifm.item_id not in  (select distinct igm.item_id from item_group_metadata igm where igm.crf_version_id = ? 
-		and igm.show_group = 'f' and igm.name != 'Ungrouped'
+		and igm.show_group = 'f' 
 		and igm.item_id in (select im.item_id from item_form_metadata im where im.section_id = ? and im.crf_version_id = ?)) 
     limit 1
 	</sql>

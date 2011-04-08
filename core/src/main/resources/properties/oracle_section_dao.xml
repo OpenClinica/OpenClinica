@@ -126,12 +126,14 @@
 			from item_form_metadata ifm where ifm.section_id = ?)
 		</sql>
 	</query>
+	<query>
 	<name>containNormalItem</name>
 	<sql>select ifm.item_id from item_form_metadata ifm where ifm.section_id = ? and ifm.crf_version_id = ?
     and ifm.show_item = 1
     and ifm.item_id not in  (select distinct igm.item_id from item_group_metadata igm where igm.crf_version_id = ? 
-		and igm.show_group = 0 and igm.name != 'Ungrouped'
+		and igm.show_group = 0 
 		and igm.item_id in (select im.item_id from item_form_metadata im where im.section_id = ? and im.crf_version_id = ?)) 
     rownum = 1
 	</sql>
+	</query>
 </queries>
