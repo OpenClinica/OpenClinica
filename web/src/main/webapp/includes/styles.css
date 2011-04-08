@@ -1586,10 +1586,6 @@ div#sumBox { -moz-border-radius: 3px 3px 3px 3px;
 	-moz-box-shadow: 4px 4px 4px #CACACA;
 	-webkit-box-shadow: 4px 4px 4px #CACACA;
 	box-shadow: 4px 4px 4px #CACACA;
-	/* For IE 8 */
-	-ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#CACACA')";
-	/* For IE 5.5 - 7 */
-	filter: progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#CACACA');
 	}
 	}
 
