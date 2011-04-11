@@ -227,23 +227,6 @@
     </tr>
     
     <tr valign="top">
-        <td class="table_header_column"><fmt:message key="institutional_affiliation" bundle="${resword}"/>:</td>
-        <td valign="top">
-            <table border="0" cellpadding="0" cellspacing="0">
-                <tr>
-                    <td valign="top"><div class="formfieldM_BG">
-                        <input type="text" name="institutionalAffiliation" value="<c:out value="${institutionalAffiliation}"/>" size="20" class="formfieldM" />
-                    </div></td>
-                    <td>*</td>
-                </tr>
-                <tr>
-                    <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="institutionalAffiliation" /></jsp:include></td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-    
-    <tr valign="top">
         <td class="table_header_column"><fmt:message key="can_run_web_services" bundle="${resword}"/>:</td>
         <td valign="top">
             <table border="0" cellpadding="0" cellspacing="0">
