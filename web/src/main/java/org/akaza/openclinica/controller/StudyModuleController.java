@@ -15,6 +15,7 @@ import org.akaza.openclinica.dao.rule.RuleDAO;
 import org.akaza.openclinica.domain.managestudy.StudyModuleStatus;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.view.StudyInfoPanel;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -78,6 +79,11 @@ public class StudyModuleController {
     @RequestMapping(method = RequestMethod.GET)
     public ModelMap handleMainPage(HttpServletRequest request) {
         ModelMap map = new ModelMap();
+        // Todo need something to reset panel from all the Spring Controllers
+        StudyInfoPanel panel = new StudyInfoPanel();
+        panel.reset();
+        request.getSession().setAttribute("panel", panel);
+
         //setUpSidebar(request);
         ResourceBundleProvider.updateLocale(request.getLocale());
 
