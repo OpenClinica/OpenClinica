@@ -120,6 +120,7 @@
       and s.section_id = ifm.section_id
       and ifm.item_id = igm.item_id
       and ig.name != 'Ungrouped'
+      and igm.repeating_group = 1   
   	  and rownum = 1
   </sql>
   </query>
