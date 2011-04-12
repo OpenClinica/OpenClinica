@@ -133,7 +133,7 @@
     and ifm.item_id not in  (select distinct igm.item_id from item_group_metadata igm where igm.crf_version_id = ? 
 		and igm.show_group = 0 
 		and igm.item_id in (select im.item_id from item_form_metadata im where im.section_id = ? and im.crf_version_id = ?)) 
-    rownum = 1
+    	and rownum = 1
 	</sql>
 	</query>
 </queries>
