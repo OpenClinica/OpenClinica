@@ -5,12 +5,14 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.domain.crfdata.DynamicsItemFormMetadataBean;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class DynamicsItemFormMetadataDao extends AbstractDomainDao<DynamicsItemFormMetadataBean> {
 
+public class DynamicsItemFormMetadataDao extends AbstractDomainDao<DynamicsItemFormMetadataBean> {
+    protected final org.slf4j.Logger logger = LoggerFactory.getLogger(org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao.class);
     @Override
     public Class<DynamicsItemFormMetadataBean> domainClass() {
         return DynamicsItemFormMetadataBean.class;
@@ -45,10 +47,28 @@ public class DynamicsItemFormMetadataDao extends AbstractDomainDao<DynamicsItemF
      */
     @Override
     public DynamicsItemFormMetadataBean saveOrUpdate(DynamicsItemFormMetadataBean domainObject) {
+      
+     try{   
+        logMe("******>>>>>>>Current thread Running>>>>>>>>>>>>"+Thread.currentThread()+"DomainObj="+domainObject);
+        getCurrentSession().beginTransaction();
         getCurrentSession().saveOrUpdate(domainObject);
+        
+        logMe("******>>>>>>>Current thread Running>>>>>>>>>>>>flushing >>>>>>>>>"+Thread.currentThread()+"/n crfVersionId="+domainObject.getCrfVersionId()+
+                "eventCrfId:"+domainObject.getEventCrfId()+"itemFormMetadataId:"+domainObject.getItemFormMetadataId()
+                +"Id:"+domainObject.getId()+"Item Data Id:"+domainObject.getItemDataId()+"ItemFormMetaDataId:"+domainObject.getItemFormMetadataId());
+        logMe("******>>>>>>>Current thread Running>>>>>>>>>>>>flushing >>>>>>>>>"+Thread.currentThread()+"DomainObj="+getCurrentSession().getEntityName(domainObject));
+        getCurrentSession().getTransaction().commit();
+        
         getCurrentSession().flush();
+        getCurrentSession().evict(domainObject);
+     }catch(Exception e){
+         logMe("******>>>>>>>Current thread Running>>>> "+Thread.currentThread());
+         e.printStackTrace();
+     }
+      
         return domainObject;
     }
+    
     
     @SuppressWarnings("unchecked")
     public List<Integer> findItemIdsForAGroupInSection(int groupId, int sectionId, int crfVersionId, int eventCrfId) {
@@ -241,5 +261,13 @@ public class DynamicsItemFormMetadataDao extends AbstractDomainDao<DynamicsItemF
         q.setInteger("crfVersionId", crfVersionId);
         return q.list() != null && q.list().size() > 0;
     }
-
+    /**
+     * utility method to print out logs
+     * @param message
+     */
+    private void logMe(String message)
+    {
+      // System.out.println(message);
+        logger.info(message);
+    }
 }
