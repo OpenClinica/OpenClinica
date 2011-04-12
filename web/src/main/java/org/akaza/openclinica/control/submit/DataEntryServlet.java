@@ -1824,7 +1824,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     boolean markSuccessfully = false; // if the CRF was marked
                     // complete
                     // successfully
-                    if (markComplete) {
+                    if (markComplete && section.isLastSection()) {
                         logger.debug("need to mark CRF as complete");
                         markSuccessfully = markCRFComplete(request);
                         logger.debug("...marked CRF as complete: " + markSuccessfully);
