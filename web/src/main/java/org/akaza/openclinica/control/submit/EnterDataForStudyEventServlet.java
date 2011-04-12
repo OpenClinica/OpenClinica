@@ -114,7 +114,7 @@ public class EnterDataForStudyEventServlet extends SecureController {
      */
     @Override
     protected void processRequest() throws Exception {
-        removeLockedCRF(ub.getId());
+       // removeLockedCRF(ub.getId());
         CoreSecureController.removeLockedCRF(ub.getId());
         FormProcessor fp = new FormProcessor(request);
 
