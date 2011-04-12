@@ -703,9 +703,7 @@ public class TableOfContentsServlet extends SecureController {
                     }
                 }
             }
-            if(showSections != null && showSections.size() != sectionBeans.size()) {
-                displayTableOfContentsBean.setSections(showSections);
-            }
+            displayTableOfContentsBean.setSections(showSections);
         }
         return displayTableOfContentsBean;
     }
