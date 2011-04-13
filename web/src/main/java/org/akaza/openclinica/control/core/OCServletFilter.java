@@ -57,7 +57,7 @@ public class OCServletFilter implements javax.servlet.Filter {
     }
 
     /**
-     * Register the user in the MDC under USER_KEY.
+     * Register the user in the MDC under USERNAME.
      * 
      * @param username
      * @return true id the user can be successfully registered
