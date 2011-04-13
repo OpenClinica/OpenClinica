@@ -57,7 +57,9 @@ public class ImportRuleServlet extends SecureController {
         String action = request.getParameter("action");
         request.setAttribute("contextPath", getContextPath());
         request.setAttribute("hostPath", getHostPath());
-        request.setAttribute("designerURL", getCoreResources().getField("designer.url"));
+        //@pgawade 13-April-2011 -  #8877 
+		// request.setAttribute("designerURL",
+        // getCoreResources().getField("designer.url"));
 
         if (StringUtil.isBlank(action)) {
             forwardPage(Page.IMPORT_RULES);
