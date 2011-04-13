@@ -480,9 +480,9 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         variables.put(new Integer(10), currentStudy.getId());
 
         String sql = "";
-        if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
-            sql = sql + "SELECT * FROM ( SELECT x.*, ROWNUM as rnum FROM (";
-        }
+//        if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
+//            sql = sql + "SELECT * FROM ( SELECT x.*, ROWNUM as rnum FROM (";
+//        }
         sql = sql + digester.getQuery("findAllSubjectDNByStudy");
         sql = sql + filter.execute("");
         sql += " UNION ";
@@ -503,6 +503,9 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
             sql += " and ec.event_crf_id not in ( " + this.findSiteHiddenEventCrfIdsString(currentStudy) + " ) ";
         }
         sql += filter.execute("");
+//        if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
+//            sql += " )x)where r between " + (rowStart + 1) + " and " + rowEnd;
+//        }
 
         //System.out.println(sql);
         ArrayList rows = select(sql, variables);
