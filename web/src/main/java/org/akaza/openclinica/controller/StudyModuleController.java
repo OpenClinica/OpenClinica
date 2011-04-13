@@ -5,6 +5,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyModuleStatusDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -71,6 +72,9 @@ public class StudyModuleController {
     private StudyDAO studyDao;
     private UserAccountDAO userDao;
     private org.akaza.openclinica.dao.rule.RuleDAO ruleDao;
+
+    @Autowired
+    CoreResources coreResources;
 
     public StudyModuleController() {
 
@@ -177,7 +181,11 @@ public class StudyModuleController {
         map.addAttribute("childStudyUserCount", childStudyUserCount);
         map.addAttribute("studyId", currentStudy.getId());
         map.addAttribute("currentStudy", currentStudy);
-
+        
+        // @pgawade 13-April-2011 Added the rule designer URL        
+        if (null != coreResources) {            
+            map.addAttribute("ruleDesignerURL", coreResources.getField("designer.url"));
+        }
         UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
         request.setAttribute("userBean", userBean);
         ArrayList statusMap = Status.toStudyUpdateMembersList();
@@ -269,4 +277,6 @@ public class StudyModuleController {
     public BasicDataSource getDataSource() {
         return dataSource;
     }
+
+
 }
