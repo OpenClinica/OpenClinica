@@ -99,8 +99,11 @@ public class EventCRFDAO extends AuditableEntityDAO {
         this.setTypeExpected(19, TypeNames.INT);// updater
         this.setTypeExpected(20, TypeNames.BOOL);// electronic_signature_status
         this.setTypeExpected(21, TypeNames.BOOL);// sdv_status
-        this.setTypeExpected(22, TypeNames.INT);// sdv_status
-        this.setTypeExpected(23, TypeNames.STRING); // R for oracle
+        this.setTypeExpected(22, TypeNames.INT);// old_status
+        this.setTypeExpected(23, TypeNames.INT); // sdv_update_id
+        if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
+            this.setTypeExpected(24, TypeNames.INT); // r
+        }
 
     }
 
