@@ -115,10 +115,12 @@
 <div class="homebox_bullets"><a href="ImportRule?action=downloadtemplateWithNotes"><fmt:message key="rule_import_all_actions_with_notes" bundle="${resterm}"/></a></div><br/>
 <div class="homebox_bullets"><a href="ImportRule?action=downloadtemplate"><fmt:message key="rule_import_all_actions_without_notes" bundle="${resterm}"/></a></div><br/>
 
+<!-- @pgawade 13-April-2011 - Fix for issue #8877: Removed the Rule Designer link from import Rule Data page
+as the link is provided on Build Study page tasks -> Create Rules -> Actions  
 <span class="table_title_Admin">Build Rules</span>
 <div>&nbsp;</div>
 <div class="homebox_bullets"><a href="${designerURL}access?host=${hostPath}&app=${contextPath}&study_oid=${study.oid}&provider_user=${userBean.name}">Designer</a></div><br/>
-
+-->
 <c:choose>
     <c:when test="${userBean.sysAdmin && module=='admin'}">
         <c:import url="../include/workflow.jsp">
