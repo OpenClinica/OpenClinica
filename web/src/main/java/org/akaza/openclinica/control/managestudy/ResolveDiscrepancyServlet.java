@@ -204,10 +204,11 @@ public class ResolveDiscrepancyServlet extends SecureController {
         // check that the note has not already been closed
         ArrayList children = dndao.findAllByParent(discrepancyNoteBean);
         discrepancyNoteBean.setChildren(children);
-        if (parentNoteIsClosed(discrepancyNoteBean)) {
-            throw new InconsistentStateException(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_SERVLET, respage
-                    .getString("the_discrepancy_choose_has_been_closed_resolved_create_new"));
-        }
+        //This logic has been reverted, issue-7459
+//        if (parentNoteIsClosed(discrepancyNoteBean)) {
+//            throw new InconsistentStateException(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_SERVLET, respage
+//                    .getString("the_discrepancy_choose_has_been_closed_resolved_create_new"));
+//        }
 
         // all clear, send the user to the resolved screen
         String entityType = discrepancyNoteBean.getEntityType().toLowerCase();
