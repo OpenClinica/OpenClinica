@@ -66,7 +66,14 @@
         <filter-name>hibernateFilter</filter-name>
         <url-pattern>/*</url-pattern>
    </filter-mapping>
-
+	<filter>
+        <filter-name>logFilter</filter-name>
+        <filter-class>org.akaza.openclinica.control.core.OCServletFilter</filter-class>
+    </filter>
+     <filter-mapping>
+        <filter-name>logFilter</filter-name>
+        <url-pattern>/*</url-pattern>       
+   </filter-mapping>
 
    <!-- 
    <filter>
