@@ -774,25 +774,62 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                         UserAccountDAO userAccountDAO = new UserAccountDAO(sm.getDataSource());
                         ItemDAO itemDAO = new ItemDAO(sm.getDataSource());
                         ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
-                        ItemDataBean itemData = (ItemDataBean) iddao.findByPK(note.getEntityId());
+                        ItemBean item = new ItemBean();
+                        ItemDataBean itemData = new ItemDataBean();
+                        SectionBean section = new SectionBean();
+
                         StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
                         UserAccountBean assignedUser = (UserAccountBean) userAccountDAO.findByPK(note.getAssignedUserId());
                         String alertEmail = assignedUser.getEmail();
-                        message.append(MessageFormat.format(respage.getString("mailDNHeader"), assignedUser.getFirstName(),assignedUser.getLastName(),note.getDescription()));
+                        message.append(MessageFormat.format(respage.getString("mailDNHeader"), assignedUser.getFirstName(),assignedUser.getLastName()));
+                        message.append("<A HREF='" + SQLInitServlet.getField("sysURL.base")
+                                + "ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=" + assignedUser.getName()
+                                + "&listNotes_f_entityName=" + note.getEntityName()
+                                + "'>" + SQLInitServlet.getField("sysURL.base") + "</A><BR/>");
+                        message.append(respage.getString("you_received_this_from"));
                         StudyBean study = (StudyBean) studyDAO.findByPK(note.getStudyId());
-                        message.append(MessageFormat.format(respage.getString("mailDNParameters1"),study.getName(),note.getSubjectName(),note.getCrfName(),note.getEventName()));
-                        // plus
-                        // repeating
-                        // number
-                        // ?
                         SectionDAO sectionDAO = new SectionDAO(sm.getDataSource());
-                        SectionBean section = (SectionBean) sectionDAO.findByPK(sectionId);
-                        message.append(MessageFormat.format(respage.getString("mailDNParameters2"),section.getName(),groupLabel));
-                        // plus
-                        // repeating
-                        // number?
-                        ItemBean item = (ItemBean) itemDAO.findByPK(itemData.getItemId());
-                        message.append(MessageFormat.format(respage.getString("mailDNParameters3"),item.getName(),note.getDescription(),note.getDetailedNotes()));
+
+                        if ("itemData".equalsIgnoreCase(entityType)) {
+                            itemData = (ItemDataBean) iddao.findByPK(note.getEntityId());
+                            item = (ItemBean) itemDAO.findByPK(itemData.getItemId());
+                            if (sectionId > 0) {
+                                section = (SectionBean) sectionDAO.findByPK(sectionId);
+                            } else {
+                                //Todo section should be initialized when sectionId = 0
+                            }
+                        }
+
+                        message.append(respage.getString("email_body_separator"));
+                        message.append(respage.getString("disc_note_info"));
+                        message.append(respage.getString("email_body_separator"));
+                        message.append(MessageFormat.format(respage.getString("mailDNParameters1"), note.getDescription(), note.getDetailedNotes(), ub.getName()));
+                        message.append(respage.getString("email_body_separator"));
+                        message.append(respage.getString("entity_information"));
+                        message.append(respage.getString("email_body_separator"));
+                        message.append(MessageFormat.format(respage.getString("mailDNParameters2"), study.getName(), note.getSubjectName()));
+
+                        if (!("studySub".equalsIgnoreCase(entityType)
+                                || "subject".equalsIgnoreCase(entityType))) {
+                            message.append(MessageFormat.format(respage.getString("mailDNParameters3"), note.getEventName()));
+                            if (!"studyEvent".equalsIgnoreCase(note.getEntityType())) {
+                                message.append(MessageFormat.format(respage.getString("mailDNParameters4"), note.getCrfName()));
+                                if (!"eventCrf".equalsIgnoreCase(note.getEntityType())) {
+                                    if (sectionId > 0) {
+                                        message.append(MessageFormat.format(respage.getString("mailDNParameters5"), section.getName()));
+                                    }
+                                    message.append(MessageFormat.format(respage.getString("mailDNParameters6"), item.getName()));
+                                }
+                            }
+                        }
+
+                        message.append(respage.getString("email_body_separator"));
+                        message.append(MessageFormat.format(respage.getString("mailDNThanks"), study.getName()));
+                        message.append(respage.getString("email_body_separator"));
+                        message.append(respage.getString("disclaimer"));
+                        message.append(respage.getString("email_body_separator"));
+                        message.append(respage.getString("email_footer"));
+
 
                         /*
                          *
@@ -810,12 +847,12 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                          * https://openclinica.s-3.com/OpenClinica_testbed/
                          * ViewSectionDataEntry ?ecId=117&sectionId=142&tabId=2
                          */
-                        message.append("<P>" + respage.getString("please_select_the_link_below_dn") + "</P>");
-                        message.append("<A HREF='" + SQLInitServlet.getField("sysURL.base") + "'>" + SQLInitServlet.getField("sysURL.base") + "</A><BR/>");
-                        message.append("<P>"+respage.getString("mailDNThanks")+"</P>");
-                        message.append("<P><P>" + respage.getString("email_footer"));
+//                        message.append("<P>" + respage.getString("please_select_the_link_below_dn") + "</P>");
+
+
+
                         String emailBodyString = message.toString();
-                        sendEmail(alertEmail.trim(), EmailEngine.getAdminEmail(), MessageFormat.format(respage.getString("mailDNSubject"),note.getDescription()), emailBodyString, true, null,
+                        sendEmail(alertEmail.trim(), EmailEngine.getAdminEmail(), MessageFormat.format(respage.getString("mailDNSubject"),study.getName(), note.getEntityName()), emailBodyString, true, null,
                                 null, true);
 
                     } else {
