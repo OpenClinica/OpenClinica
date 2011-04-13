@@ -4,7 +4,6 @@ import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.service.PdfProcessingFunction;
 import org.akaza.openclinica.bean.service.SasProcessingFunction;
 import org.akaza.openclinica.bean.service.SqlProcessingFunction;
-
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -261,6 +260,7 @@ public class CoreResources implements ResourceLoaderAware {
 
         }
         setMailProps();
+        setRuleDesignerProps();
         if (DATAINFO.getProperty("crfFileExtensions") != null)
             DATAINFO.setProperty("crf_file_extensions", DATAINFO.getProperty("crfFileExtensions"));
         if (DATAINFO.getProperty("crfFileExtensionSettings") != null)
@@ -307,7 +307,12 @@ public class CoreResources implements ResourceLoaderAware {
         logger.debug("DataInfo..." + DATAINFO);
         String designerURL = DATAINFO.getProperty("designerURL");
         if (designerURL == null || designerURL.isEmpty())
-            designerURL = "http://svn.akazaresearch.com:8081/Designer-0.1.0.BUILD-SNAPSHOT/";
+            // @pgawade 13-April-2011 - Fix for issue #8877: Commented out the
+            // hardcoded rule designer
+            // URL as it is added as a property
+            // in datainfo.properties file
+            // designerURL =
+            // "http://svn.akazaresearch.com:8081/Designer-0.1.0.BUILD-SNAPSHOT/";
         DATAINFO.setProperty("designer.url", designerURL);
         return DATAINFO;
     }
@@ -328,6 +333,10 @@ public class CoreResources implements ResourceLoaderAware {
 
     }
 
+    private void setRuleDesignerProps() {
+
+        DATAINFO.setProperty("designer.url", DATAINFO.getProperty("designerURL"));
+    }
     private void setDatabaseProperties(String database) {
 
         DATAINFO.setProperty("username", DATAINFO.getProperty("dbUser"));
