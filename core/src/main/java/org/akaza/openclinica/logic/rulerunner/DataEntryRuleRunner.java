@@ -10,6 +10,7 @@ import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.action.ActionProcessor;
 import org.akaza.openclinica.domain.rule.action.ActionProcessorFacade;
+import org.akaza.openclinica.domain.rule.action.ActionType;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunLogBean;
 import org.akaza.openclinica.domain.rule.action.ShowActionBean;
@@ -52,7 +53,11 @@ public class DataEntryRuleRunner extends RuleRunner {
         switch (executionMode) {
         case SAVE:        {
             toBeExecuted = (HashMap<String, ArrayList<RuleActionContainer>>)request.getAttribute("toBeExecuted");
-            break;
+            
+            if(request.getAttribute("insertAction")==null) //Break only if the action is insertAction;
+             break;
+            
+           
         }
         case DRY_RUN:
         {
@@ -86,6 +91,9 @@ public class DataEntryRuleRunner extends RuleRunner {
                             Iterator<RuleActionBean> itr = actionListBasedOnRuleExecutionResult.iterator();
                             while (itr.hasNext()) {
                                 RuleActionBean ruleActionBean = itr.next();
+                                if(ruleActionBean.getActionType()==ActionType.INSERT) {
+                                    request.setAttribute("insertAction", true);
+                                }
                                 RuleActionRunLogBean ruleActionRunLog =
                                     new RuleActionRunLogBean(ruleActionBean.getActionType(), itemData, itemData.getValue(), ruleSetRule.getRuleBean().getOid());
                                 if (getRuleActionRunLogDao().findCountByRuleActionRunLogBean(ruleActionRunLog) > 0) {
@@ -126,7 +134,6 @@ public class DataEntryRuleRunner extends RuleRunner {
                 ActionProcessor ap =
                     ActionProcessorFacade.getActionProcessor(ruleActionContainer.getRuleAction().getActionType(), ds, getMailSender(), dynamicsMetadataService,
                             ruleActionContainer.getRuleSetBean(), getRuleActionRunLogDao(), ruleActionContainer.getRuleAction().getRuleSetRule());
-                
                
                 ItemDataBean  itemData =            
                     getExpressionService().getItemDataBeanFromDb(ruleActionContainer.getRuleSetBean().getTarget().getValue());
