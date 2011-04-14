@@ -182,9 +182,11 @@ public class StudyModuleController {
         map.addAttribute("studyId", currentStudy.getId());
         map.addAttribute("currentStudy", currentStudy);
         
-        // @pgawade 13-April-2011 Added the rule designer URL        
+        // @pgawade 13-April-2011- #8877:  Added the rule designer URL        
         if (null != coreResources) {            
             map.addAttribute("ruleDesignerURL", coreResources.getField("designer.url"));
+            map.addAttribute("contextPath", getContextPath(request));
+            map.addAttribute("hostPath", getHostPath(request));
         }
         UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
         request.setAttribute("userBean", userBean);
@@ -278,5 +280,33 @@ public class StudyModuleController {
         return dataSource;
     }
 
+    public String getContextPath(HttpServletRequest request) {
+        String contextPath = request.getContextPath().replaceAll("/", "");
+        return contextPath;
+    }
+
+    public String getRequestURLMinusServletPath(HttpServletRequest request) {
+        String requestURLMinusServletPath = request.getRequestURL().toString().replaceAll(request.getServletPath(), "");
+        return requestURLMinusServletPath;
+    }
+
+    public String getHostPath(HttpServletRequest request) {
+        String requestURLMinusServletPath = getRequestURLMinusServletPath(request);
+        String hostPath = "";
+        if (null != requestURLMinusServletPath) {
+            String tmpPath = requestURLMinusServletPath.substring(0, requestURLMinusServletPath.lastIndexOf("/"));
+            hostPath = tmpPath.substring(0, tmpPath.lastIndexOf("/"));
+        }
+        return hostPath;
+    }
+
+    public String getWebAppName(String servletCtxRealPath) {
+        String webAppName = null;
+        if (null != servletCtxRealPath) {
+            String[] tokens = servletCtxRealPath.split("\\\\");
+            webAppName = tokens[(tokens.length - 1)].trim();
+        }
+        return webAppName;
+    }
 
 }
