@@ -219,7 +219,7 @@
                         AND (s.study_id=? OR s.study_id=?
                             OR s.study_id in (select ss.study_id from study_subject ss WHERE ss.study_subject_id=?)
                         )
-                        ORDER BY ua.date_created ASC
+                        ORDER BY ua.last_name ASC
                 </sql>
         </query>
         <query>
