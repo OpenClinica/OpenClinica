@@ -17,6 +17,7 @@ import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.akaza.openclinica.web.SQLInitServlet;
 
 import java.util.Locale;
 
@@ -82,6 +83,7 @@ public class UnLockUserServlet extends SecureController {
                 try {
                     sendRestoreEmail(u, password);
                 } catch (Exception e) {
+                    e.printStackTrace();
                     message += respage.getString("however_was_error_sending_user_email_regarding");
                 }
             } else {
@@ -96,11 +98,13 @@ public class UnLockUserServlet extends SecureController {
     private void sendRestoreEmail(UserAccountBean u, String password) throws Exception {
         logger.info("Sending restore and password reset notification to " + u.getName());
 
-        String body = resword.getString("Dear ") + u.getFirstName() + " " + u.getLastName() + ",\n";
-        body += restext.getString("your_account_has_been_unlocked_and_password_reset") + ":\n\n";
-        body += resword.getString("user_name") + u.getName() + "\n";
-        body += resword.getString("password") + password + "\n\n";
-        body += restext.getString("please_test_your_login_information_and_let") + "\n";
+        String body = resword.getString("dear") + u.getFirstName() + " " + u.getLastName() + ",<br>";
+        body += restext.getString("your_account_has_been_unlocked_and_password_reset") + ":<br><br>";
+        body += resword.getString("user_name") + u.getName() + "<br>";
+        body += resword.getString("password") + password + "<br><br>";
+        body += restext.getString("please_test_your_login_information_and_let") + "<br>";
+        body += "<A HREF='" + SQLInitServlet.getField("sysURL.base") + "'>";
+        body += SQLInitServlet.getField("sysURL.base") + "</A> <br><br>";
         body += restext.getString("openclinica_system_administrator");
 
         logger.info("Sending email...begin");
