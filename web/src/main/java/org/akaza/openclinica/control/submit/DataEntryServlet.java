@@ -510,7 +510,14 @@ public abstract class DataEntryServlet extends CoreSecureController {
         CRFVersionDAO cvdao = new CRFVersionDAO(getDataSource());
         CRFVersionBean crfVersionBean = (CRFVersionBean) cvdao.findByPK(ecb.getCRFVersionId());
 
-        List<RuleSetBean> ruleSets = createAndInitializeRuleSet(currentStudy, studyEventDefinition, crfVersionBean, studyEventBean, ecb, shouldRunRules(), request, response);
+        Phase phase2 = Phase.INITIAL_DATA_ENTRY;
+        if (getServletPage(request).equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
+            phase2 = Phase.DOUBLE_DATA_ENTRY;
+        } else if (getServletPage(request).equals(Page.ADMIN_EDIT_SERVLET)) {
+            phase2 = Phase.ADMIN_EDITING;
+        }
+        List<RuleSetBean> ruleSets = createAndInitializeRuleSet(currentStudy, studyEventDefinition, crfVersionBean, studyEventBean, ecb, true, request, response);
+        boolean shouldRunRules = getRuleSetService(request).shouldRunRulesForRuleSets(ruleSets, phase2);
         DisplaySectionBean section = getDisplayBean(hasGroup, false, request, isSubmitted);
         //hasSCDItem has been initiallized in getDisplayBean() which is online above
         if(section.getSection().hasSCDItem()) {
@@ -829,15 +836,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
             }
             logMe(" Validate and Loop end  "+System.currentTimeMillis());
            
-            Phase phase2 = Phase.INITIAL_DATA_ENTRY;
-            if (getServletPage(request).equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
-                phase2 = Phase.DOUBLE_DATA_ENTRY;
-            } else if (getServletPage(request).equals(Page.ADMIN_EDIT_SERVLET)) {
-                phase2 = Phase.ADMIN_EDITING;
-            }
             // this.getItemMetadataService().resetItemCounter();
             HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid  = null;
-            groupOrdinalPLusItemOid = runRules(allItems, ruleSets, true, shouldRunRules(), MessageType.ERROR, phase2,ecb, request);
+            groupOrdinalPLusItemOid = runRules(allItems, ruleSets, true, shouldRunRules, MessageType.ERROR, phase2,ecb, request);
           /*  if(( List<DisplayItemWithGroupBean>)session.getAttribute(ALL_ITEMS_LIST)==null)
             {
                  groupOrdinalPLusItemOid = runRules(allItems, ruleSets, true, shouldRunRules(), MessageType.ERROR, phase2,ecb, request);
@@ -1313,7 +1314,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
             logger.debug("errors here: " + errors.toString());
             // <<
             logMe("error check  Loop begin  "+System.currentTimeMillis());
-            if (errors.isEmpty() && shouldRunRules()) {
+            if (errors.isEmpty() && shouldRunRules) {
                 logger.debug("Errors was empty");
                 if (session.getAttribute("rulesErrors") != null) {
                     // rules have already generated errors, Let's compare old
@@ -1627,7 +1628,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 //System.out.println("running rules: " + phase2.name());
                 ArrayList<Integer> prevShownDynItemDataIds = (ArrayList<Integer>)this.getItemMetadataService().getDynamicsItemFormMetadataDao().findShowItemDataIdsInSection(section.getSection().getId(), ecb.getCRFVersionId(), ecb.getId());
                 logMe("DisplayItemWithGroupBean dryrun  start"+System.currentTimeMillis());
-                HashMap<String, ArrayList<String>> rulesPostDryRun = runRules(allItems, ruleSets, false, shouldRunRules(), MessageType.WARNING, phase2,ecb, request);
+                HashMap<String, ArrayList<String>> rulesPostDryRun = runRules(allItems, ruleSets, false, shouldRunRules, MessageType.WARNING, phase2,ecb, request);
                 
                 //JN: After Running rules second time, release the lock
              //   getUnavailableCRFList().remove(ecb.getId());
