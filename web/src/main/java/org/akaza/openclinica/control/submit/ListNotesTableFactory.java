@@ -560,7 +560,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             ResolutionStatus status = (ResolutionStatus) ((HashMap<Object, Object>) item).get("discrepancyNoteBean.resolutionStatus");
 
             if (status != null) {
-                value = status.getName();
+                value = "<img src=\""+status.getIconFilePath() +"\" border=\"0\" align=\"left\"> &nbsp;&nbsp;" + status.getName() ;
             }
             return value;
         }

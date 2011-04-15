@@ -220,7 +220,7 @@ public class ViewNotesServlet extends SecureController {
         }
 
         request.setAttribute("summaryMap", stats);
-        request.setAttribute("mapKeys", discNoteUtil.getStatusNames());
+        request.setAttribute("mapKeys", ResolutionStatus.getMembers());
         request.setAttribute("typeNames", discNoteUtil.getTypeNames());
         request.setAttribute("typeKeys", totalMap);
         request.setAttribute("grandTotal", grandTotal);

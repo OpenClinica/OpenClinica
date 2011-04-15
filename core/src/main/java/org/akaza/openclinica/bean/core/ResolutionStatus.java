@@ -70,6 +70,10 @@ public class ResolutionStatus extends Term {
 
     private static final ResolutionStatus[] members = { OPEN, UPDATED, RESOLVED, CLOSED, NOT_APPLICABLE };
 
+    public static ResolutionStatus[] getMembers() {
+        return members;
+    }
+    
     public static final List list = Arrays.asList(members);
 
     private List privileges;

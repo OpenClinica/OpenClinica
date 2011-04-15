@@ -147,13 +147,13 @@
             </c:forEach>
             <td align="center"><strong>Total</strong></td>
         </tr>
-            <c:forEach var="statusName" items="${mapKeys}">
+            <c:forEach var="status" items="${mapKeys}">
                 <tr>
-                    <td><strong>${statusName}</strong></td>
+                    <td><strong>${status.name}</strong><img src="${status.iconFilePath}" border="0" align="right"></td>
                     <c:forEach var="typeName" items="${typeNames}">
-                        <td align="center">${summaryMap[statusName][typeName]}</td>
+                        <td align="center">${summaryMap[status.name][typeName]}</td>
                     </c:forEach>
-                    <td align="center"> ${summaryMap[statusName]['Total']}</td>
+                    <td align="center"> ${summaryMap[status.name]['Total']}</td>
                 </tr>
             </c:forEach>
         <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>

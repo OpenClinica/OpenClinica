@@ -50,10 +50,7 @@ public class DiscrepancyNoteUtil {
     // These two variables are to arrange the Summary Statistics accordingly
     // Mantis Issue: 7771
     public static final String[] TYPE_NAMES = {"Query", "Failed Validation Check", "Reason for Change", "Annotation"};
-    public static final String[] STATUS_NAMES = {"New", "Updated", "Resolution Proposed", "Closed", "Not Applicable"};
-    public static String[] getStatusNames() {
-        return STATUS_NAMES;
-    }
+
     public static String[] getTypeNames() {
         return TYPE_NAMES;
     }
@@ -1034,14 +1031,14 @@ public class DiscrepancyNoteUtil {
         Map<String, String> tempMap = null;
         int tempType = 0;
         String tempTotal = "--";
-        for (String statusName: STATUS_NAMES) {
+        for (ResolutionStatus status: ResolutionStatus.getMembers()) {
             tempMap = new HashMap<String, String>();
-            summaryMap.put(statusName, tempMap);
-            tempTotal = countNotes(discList, RESOLUTION_STATUS.get(statusName), 0);
+            summaryMap.put(status.getName(), tempMap);
+            tempTotal = countNotes(discList, RESOLUTION_STATUS.get(status.getName()), 0);
             tempMap.put("Total", tempTotal.equals("0")?"--":tempTotal);
             for (String typeName: TYPE_NAMES) {
                 tempType = TYPES.get(typeName);
-                String number = countNotes(discList, RESOLUTION_STATUS.get(statusName), tempType);
+                String number = countNotes(discList, RESOLUTION_STATUS.get(status.getName()), tempType);
                 tempMap.put(typeName, number.equals("0")?"--":number);
             }
         }
