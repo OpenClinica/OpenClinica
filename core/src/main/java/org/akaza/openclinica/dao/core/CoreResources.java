@@ -364,7 +364,7 @@ public class CoreResources implements ResourceLoaderAware {
         ByteArrayInputStream listSrcFiles[] = new ByteArrayInputStream[10];
         String[] fileNames =
             { "odm_spss_dat.xsl", "ODMToTAB.xsl", "odm_to_html.xsl", "odm_to_xslfo.xsl", "ODM-XSLFO-Stylesheet.xsl", "odm_spss_sps.xsl", "copyXML.xsl",
-                "odm1.3_to_1.2.xsl", "odm1.3_to_1.2_extensions.xsl" };
+                "odm1.3_to_1.2.xsl", "odm1.3_to_1.2_extensions.xsl", "odm1.3_to_1.3_no_extensions.xsl" };
         try {
             listSrcFiles[0] =
                 (ByteArrayInputStream) resourceLoader.getResource("classpath:properties" + File.separator + "xslt" + File.separator + fileNames[0])
@@ -392,6 +392,9 @@ public class CoreResources implements ResourceLoaderAware {
                         .getInputStream();
             listSrcFiles[8] =
                 (ByteArrayInputStream) resourceLoader.getResource("classpath:properties" + File.separator + "xslt" + File.separator + fileNames[8])
+                        .getInputStream();
+            listSrcFiles[9] =
+                (ByteArrayInputStream) resourceLoader.getResource("classpath:properties" + File.separator + "xslt" + File.separator + fileNames[9])
                         .getInputStream();
 
         } catch (IOException ioe) {
