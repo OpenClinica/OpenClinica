@@ -10,23 +10,29 @@ package org.akaza.openclinica.control.core;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
+import org.akaza.openclinica.bean.managestudy.*;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.SessionManager;
+import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
+import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.dao.submit.ItemDAO;
+import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.BreadcrumbTrail;
@@ -997,6 +1003,94 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         }
         return url;
     }
+
+
+    public DiscrepancyNoteBean getNoteInfo(DiscrepancyNoteBean note) {
+        StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
+        if ("itemData".equalsIgnoreCase(note.getEntityType())) {
+            int itemDataId = note.getEntityId();
+            ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
+            ItemDataBean itemData = (ItemDataBean) iddao.findByPK(itemDataId);
+            ItemDAO idao = new ItemDAO(sm.getDataSource());
+            if (StringUtil.isBlank(note.getEntityName())) {
+                ItemBean item = (ItemBean) idao.findByPK(itemData.getItemId());
+                note.setEntityName(item.getName());
+                request.setAttribute("item", item);
+            }
+            EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+            StudyEventDAO svdao = new StudyEventDAO(sm.getDataSource());
+
+            EventCRFBean ec = (EventCRFBean) ecdao.findByPK(itemData.getEventCRFId());
+            StudyEventBean event = (StudyEventBean) svdao.findByPK(ec.getStudyEventId());
+
+            StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+            StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(event.getStudyEventDefinitionId());
+            note.setEventName(sed.getName());
+            note.setEventStart(event.getDateStarted());
+
+            CRFDAO cdao = new CRFDAO(sm.getDataSource());
+            CRFBean crf = cdao.findByVersionId(ec.getCRFVersionId());
+            note.setCrfName(crf.getName());
+            note.setEventCRFId(ec.getId());
+
+            if (StringUtil.isBlank(note.getSubjectName())) {
+                StudySubjectBean ss = (StudySubjectBean) ssdao.findByPK(ec.getStudySubjectId());
+                note.setSubjectName(ss.getName());
+            }
+
+            if (note.getDiscrepancyNoteTypeId() == 0) {
+                note.setDiscrepancyNoteTypeId(DiscrepancyNoteType.FAILEDVAL.getId());// default
+                // value
+            }
+
+        } else if ("eventCrf".equalsIgnoreCase(note.getEntityType())) {
+            int eventCRFId = note.getEntityId();
+            EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+            StudyEventDAO svdao = new StudyEventDAO(sm.getDataSource());
+
+            EventCRFBean ec = (EventCRFBean) ecdao.findByPK(eventCRFId);
+            StudyEventBean event = (StudyEventBean) svdao.findByPK(ec.getStudyEventId());
+
+            StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+            StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(event.getStudyEventDefinitionId());
+            note.setEventName(sed.getName());
+            note.setEventStart(event.getDateStarted());
+
+            CRFDAO cdao = new CRFDAO(sm.getDataSource());
+            CRFBean crf = cdao.findByVersionId(ec.getCRFVersionId());
+            note.setCrfName(crf.getName());
+            StudySubjectBean ss = (StudySubjectBean) ssdao.findByPK(ec.getStudySubjectId());
+            note.setSubjectName(ss.getName());
+            note.setEventCRFId(ec.getId());
+
+        } else if ("studyEvent".equalsIgnoreCase(note.getEntityType())) {
+            int eventId = note.getEntityId();
+            StudyEventDAO svdao = new StudyEventDAO(sm.getDataSource());
+            StudyEventBean event = (StudyEventBean) svdao.findByPK(eventId);
+
+            StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+            StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(event.getStudyEventDefinitionId());
+            note.setEventName(sed.getName());
+            note.setEventStart(event.getDateStarted());
+
+            StudySubjectBean ss = (StudySubjectBean) ssdao.findByPK(event.getStudySubjectId());
+            note.setSubjectName(ss.getName());
+
+        } else if ("studySub".equalsIgnoreCase(note.getEntityType())) {
+            int studySubjectId = note.getEntityId();
+            StudySubjectBean ss = (StudySubjectBean) ssdao.findByPK(studySubjectId);
+            note.setSubjectName(ss.getName());
+
+        } else if ("Subject".equalsIgnoreCase(note.getEntityType())) {
+            int subjectId = note.getEntityId();
+            StudySubjectBean ss = ssdao.findBySubjectIdAndStudy(subjectId, currentStudy);
+            note.setSubjectName(ss.getName());
+        }
+
+        return note;
+    }
+
+
 
     /**
      * A inner class designed to allow the implementation of a JUnit test case for abstract SecureController. The inner class
