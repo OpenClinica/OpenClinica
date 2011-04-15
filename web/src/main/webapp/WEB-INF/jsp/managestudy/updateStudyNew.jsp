@@ -164,7 +164,7 @@
               <td><div class="formfieldXL_BG">
            <c:set var="dis" value="${parentStudy.name!='' && !parentStudy.status.available}"/>
            <c:set var="status1" value="${studyToView.status.id}"/>
-           <select name="statusId" class="formfieldXL" <c:if test="${dis}">disabled="true" </c:if>>
+           <select name="statusId" class="formfieldXL" disabled="true">
               <c:forEach var="status" items="${statuses}">
                <c:choose>
                 <c:when test="${status1 == status.id}">
