@@ -1,7 +1,5 @@
 package org.akaza.openclinica.service.rule;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -32,6 +30,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
 
 public interface RuleSetServiceInterface {
 
@@ -203,4 +203,13 @@ public interface RuleSetServiceInterface {
 
     public void setMailSender(JavaMailSenderImpl mailSender);
 
+    /**
+     * Return true if there is at least one rule should be run for a phase.
+     * 
+     * @param ruleSets
+     * @param phase
+     * @return
+     */
+    public boolean shouldRunRulesForRuleSets(List<RuleSetBean> ruleSets, Phase phase);
+    
 }

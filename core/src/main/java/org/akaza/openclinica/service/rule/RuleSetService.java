@@ -44,8 +44,9 @@ import org.akaza.openclinica.domain.rule.RuleSetAuditBean;
 import org.akaza.openclinica.domain.rule.RuleSetBasedViewContainer;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
-import org.akaza.openclinica.domain.rule.RuleSetRuleBean.RuleSetRuleBeanImportStatus;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
+import org.akaza.openclinica.domain.rule.RuleSetRuleBean.RuleSetRuleBeanImportStatus;
+import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.logic.rulerunner.CrfBulkRuleRunner;
@@ -765,6 +766,21 @@ public class RuleSetService implements RuleSetServiceInterface {
         String expression = getExpressionService().replaceCRFOidInExpression(ruleSetBean.getTarget().getValue(), replacementCrfOid);
         ruleSetBean.getTarget().setValue(expression);
         return ruleSetBean;
+    }
+    
+    public boolean shouldRunRulesForRuleSets(List<RuleSetBean> ruleSets, Phase phase) {
+        for(RuleSetBean ruleSetBean: ruleSets) {
+            List<RuleSetRuleBean> ruleSetRuleBeans = ruleSetBean.getRuleSetRules();
+            for(RuleSetRuleBean ruleSetRuleBean : ruleSetRuleBeans) {
+                List<RuleActionBean> ruleActionBeans = ruleSetRuleBean.getActions();
+                for(RuleActionBean ruleActionBean : ruleActionBeans) {
+                    if(ruleActionBean.getRuleActionRun().canRun(phase)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /**
