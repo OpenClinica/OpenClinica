@@ -12,28 +12,24 @@ import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.managestudy.*;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
+import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.EmailEngine;
+import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
-import org.akaza.openclinica.dao.submit.SectionDAO;
+import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
@@ -251,54 +247,81 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
                     logger.info("++++++ found our way here");
                     // generate email for user here
                     StringBuffer message = new StringBuffer();
-                    int sectionId = fp.getInt("sectionId");
-                    String groupLabel = fp.getString("groupLabel");
+
+                    dn = getNoteInfo(dn);
+
                     // generate message here
                     EmailEngine em = new EmailEngine(EmailEngine.getSMTPHost());
                     UserAccountDAO userAccountDAO = new UserAccountDAO(sm.getDataSource());
                     ItemDAO itemDAO = new ItemDAO(sm.getDataSource());
                     ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
-                    ItemDataBean itemData = (ItemDataBean) iddao.findByPK(dn.getEntityId());
+                    ItemBean item = new ItemBean();
+                    ItemDataBean itemData = new ItemDataBean();
+
                     StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
                     UserAccountBean assignedUser = (UserAccountBean) userAccountDAO.findByPK(dn.getAssignedUserId());
                     String alertEmail = assignedUser.getEmail();
-                    message.append(MessageFormat.format(respage.getString("mailDNHeader"), assignedUser.getFirstName(), assignedUser.getLastName(), dn
-                            .getDescription()));
+                    message.append(MessageFormat.format(respage.getString("mailDNHeader"), assignedUser.getFirstName(),assignedUser.getLastName()));
+                    message.append("<A HREF='" + SQLInitServlet.getField("sysURL.base")
+                            + "ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=" + assignedUser.getName()
+                            + "&listNotes_f_entityName=" + dn.getEntityName()
+                            + "'>" + SQLInitServlet.getField("sysURL.base") + "</A><BR/>");
+                    message.append(respage.getString("you_received_this_from"));
                     StudyBean study = (StudyBean) studyDAO.findByPK(dn.getStudyId());
-                    message.append(MessageFormat.format(respage.getString("mailDNParameters1"), study.getName(), dn.getSubjectName(), dn.getCrfName(), dn
-                            .getEventName()));
-                    // plus
-                    // repeating
-                    // number
-                    // ?
-                    SectionDAO sectionDAO = new SectionDAO(sm.getDataSource());
-                    SectionBean section = (SectionBean) sectionDAO.findByPK(sectionId);
-                    message.append(MessageFormat.format(respage.getString("mailDNParameters2"), section.getName(), groupLabel));
-                    // plus
-                    // repeating
-                    // number?
-                    ItemBean item = (ItemBean) itemDAO.findByPK(itemData.getItemId());
-                    message.append(MessageFormat.format(respage.getString("mailDNParameters3"), item.getName(), dn.getDescription(), dn.getDetailedNotes()));
-    
+
+                    if ("itemData".equalsIgnoreCase(entityType)) {
+                        itemData = (ItemDataBean) iddao.findByPK(dn.getEntityId());
+                        item = (ItemBean) itemDAO.findByPK(itemData.getItemId());
+                    }
+
+                    message.append(respage.getString("email_body_separator"));
+                    message.append(respage.getString("disc_note_info"));
+                    message.append(respage.getString("email_body_separator"));
+                    message.append(MessageFormat.format(respage.getString("mailDNParameters1"), dn.getDescription(), dn.getDetailedNotes(), ub.getName()));
+                    message.append(respage.getString("email_body_separator"));
+                    message.append(respage.getString("entity_information"));
+                    message.append(respage.getString("email_body_separator"));
+                    message.append(MessageFormat.format(respage.getString("mailDNParameters2"), study.getName(), dn.getSubjectName()));
+
+                    if (!("studySub".equalsIgnoreCase(entityType)
+                            || "subject".equalsIgnoreCase(entityType))) {
+                        message.append(MessageFormat.format(respage.getString("mailDNParameters3"), dn.getEventName()));
+                        if (!"studyEvent".equalsIgnoreCase(dn.getEntityType())) {
+                            message.append(MessageFormat.format(respage.getString("mailDNParameters4"), dn.getCrfName()));
+                            if (!"eventCrf".equalsIgnoreCase(dn.getEntityType())) {
+                                message.append(MessageFormat.format(respage.getString("mailDNParameters6"), item.getName()));
+                            }
+                        }
+                    }
+
+                    message.append(respage.getString("email_body_separator"));
+                    message.append(MessageFormat.format(respage.getString("mailDNThanks"), study.getName()));
+                    message.append(respage.getString("email_body_separator"));
+                    message.append(respage.getString("disclaimer"));
+                    message.append(respage.getString("email_body_separator"));
+                    message.append(respage.getString("email_footer"));
+
+
                     /*
+                     *
+                     *
+                     *
                      * Please select the link below to view the information
-                     * provided. You may need to login to OpenClinica_testbed with
-                     * your user name and password after selecting the link. If you
-                     * receive a page cannot be displayed message, please make sure
-                     * to select the Change Study/Site link in the upper right table
-                     * of the page, select the study referenced above, and select
-                     * the link again.
-                     * 
+                     * provided. You may need to login to
+                     * OpenClinica_testbed with your user name and password
+                     * after selecting the link. If you receive a page
+                     * cannot be displayed message, please make sure to
+                     * select the Change Study/Site link in the upper right
+                     * table of the page, select the study referenced above,
+                     * and select the link again.
+                     *
                      * https://openclinica.s-3.com/OpenClinica_testbed/
                      * ViewSectionDataEntry ?ecId=117&sectionId=142&tabId=2
                      */
-                    message.append("<P>" + respage.getString("please_select_the_link_below_dn") + "</P>");
-                    message.append("<A HREF='" + SQLInitServlet.getField("sysURL.base") + "'>" + SQLInitServlet.getField("sysURL.base") + "</A><BR/>");
-                    message.append("<P>" + respage.getString("mailDNThanks") + "</P>");
-                    message.append("<P><P>" + respage.getString("email_footer"));
+
                     String emailBodyString = message.toString();
-                    sendEmail(alertEmail.trim(), EmailEngine.getAdminEmail(), MessageFormat.format(respage.getString("mailDNSubject"), dn.getDescription()),
-                            emailBodyString, true, null, null, true);
+                    sendEmail(alertEmail.trim(), EmailEngine.getAdminEmail(), MessageFormat.format(respage.getString("mailDNSubject"),study.getName(), dn.getEntityName()), emailBodyString, true, null,
+                            null, true);
                 }
                 
                 String close = fp.getString("close"+parentId);
@@ -435,6 +458,91 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
         }
         logger.info("Original pageFileName: "+origin);
         return origin;
+    }
+
+    private DiscrepancyNoteBean getNoteInfo(DiscrepancyNoteBean note) {
+        StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
+        if ("itemData".equalsIgnoreCase(note.getEntityType())) {
+            int itemDataId = note.getEntityId();
+            ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
+            ItemDataBean itemData = (ItemDataBean) iddao.findByPK(itemDataId);
+            ItemDAO idao = new ItemDAO(sm.getDataSource());
+            if (StringUtil.isBlank(note.getEntityName())) {
+                ItemBean item = (ItemBean) idao.findByPK(itemData.getItemId());
+                note.setEntityName(item.getName());
+                request.setAttribute("item", item);
+            }
+            EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+            StudyEventDAO svdao = new StudyEventDAO(sm.getDataSource());
+
+            EventCRFBean ec = (EventCRFBean) ecdao.findByPK(itemData.getEventCRFId());
+            StudyEventBean event = (StudyEventBean) svdao.findByPK(ec.getStudyEventId());
+
+            StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+            StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(event.getStudyEventDefinitionId());
+            note.setEventName(sed.getName());
+            note.setEventStart(event.getDateStarted());
+
+            CRFDAO cdao = new CRFDAO(sm.getDataSource());
+            CRFBean crf = cdao.findByVersionId(ec.getCRFVersionId());
+            note.setCrfName(crf.getName());
+            note.setEventCRFId(ec.getId());
+
+            if (StringUtil.isBlank(note.getSubjectName())) {
+                StudySubjectBean ss = (StudySubjectBean) ssdao.findByPK(ec.getStudySubjectId());
+                note.setSubjectName(ss.getName());
+            }
+
+            if (note.getDiscrepancyNoteTypeId() == 0) {
+                note.setDiscrepancyNoteTypeId(DiscrepancyNoteType.FAILEDVAL.getId());// default
+                // value
+            }
+
+        } else if ("eventCrf".equalsIgnoreCase(note.getEntityType())) {
+            int eventCRFId = note.getEntityId();
+            EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+            StudyEventDAO svdao = new StudyEventDAO(sm.getDataSource());
+
+            EventCRFBean ec = (EventCRFBean) ecdao.findByPK(eventCRFId);
+            StudyEventBean event = (StudyEventBean) svdao.findByPK(ec.getStudyEventId());
+
+            StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+            StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(event.getStudyEventDefinitionId());
+            note.setEventName(sed.getName());
+            note.setEventStart(event.getDateStarted());
+
+            CRFDAO cdao = new CRFDAO(sm.getDataSource());
+            CRFBean crf = cdao.findByVersionId(ec.getCRFVersionId());
+            note.setCrfName(crf.getName());
+            StudySubjectBean ss = (StudySubjectBean) ssdao.findByPK(ec.getStudySubjectId());
+            note.setSubjectName(ss.getName());
+            note.setEventCRFId(ec.getId());
+
+        } else if ("studyEvent".equalsIgnoreCase(note.getEntityType())) {
+            int eventId = note.getEntityId();
+            StudyEventDAO svdao = new StudyEventDAO(sm.getDataSource());
+            StudyEventBean event = (StudyEventBean) svdao.findByPK(eventId);
+
+            StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+            StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(event.getStudyEventDefinitionId());
+            note.setEventName(sed.getName());
+            note.setEventStart(event.getDateStarted());
+
+            StudySubjectBean ss = (StudySubjectBean) ssdao.findByPK(event.getStudySubjectId());
+            note.setSubjectName(ss.getName());
+
+        } else if ("studySub".equalsIgnoreCase(note.getEntityType())) {
+            int studySubjectId = note.getEntityId();
+            StudySubjectBean ss = (StudySubjectBean) ssdao.findByPK(studySubjectId);
+            note.setSubjectName(ss.getName());
+
+        } else if ("Subject".equalsIgnoreCase(note.getEntityType())) {
+            int subjectId = note.getEntityId();
+            StudySubjectBean ss = ssdao.findBySubjectIdAndStudy(subjectId, currentStudy);
+            note.setSubjectName(ss.getName());
+        }
+
+        return note;
     }
 
 }
