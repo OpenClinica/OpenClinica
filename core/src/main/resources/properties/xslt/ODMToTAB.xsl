@@ -346,6 +346,7 @@
 
 		<xsl:if test="$oid=@FormOID">
 			<xsl:text>CRF</xsl:text>
+			<xsl:value-of select="count(preceding-sibling::*) + 1" />
 			<xsl:value-of select="$delimiter" />
 
 			<xsl:value-of select="$formName" />
