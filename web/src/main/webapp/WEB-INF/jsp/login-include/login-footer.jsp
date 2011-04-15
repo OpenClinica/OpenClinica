@@ -26,17 +26,21 @@
                 </td>
                 <td class="footer"><fmt:message key="footer.license.1" bundle="${resword}"/> </td>
                 <td class="footer" align="right"><fmt:message key="Version_release" bundle="${resword}"/> &nbsp;&nbsp;</td>
-                <td width="80" align="right" valign="bottom"><a href="http://www.akazaresearch.com"><img src="${pageContext.request.contextPath}/images/Akazalogo.gif" border="0" alt="<fmt:message key="developed_by_akaza" bundle="${resword}"/>" title="<fmt:message key="developed_by_akaza" bundle="${resword}"/>"></a></td>
+                <td width="80" align="right" valign="bottom"></td>
             </tr>
             <tr>
                 <td class="footer"/>
                 <td class="footer"> <fmt:message key="footer.license.2" bundle="${resword}"/></td>
-                <td align="right" class="footer"><a href="javascript:void(0)" onmouseover="Tip('<fmt:message key="footer.tooltip" bundle="${resword}"/>')" onmouseout="UnTip()"><center><fmt:message key="footer.edition.1" bundle="${resword}"/></center></a></td>
+                <td align="right" class="footer">
+                    <a href="javascript:void(0)" onmouseover="Tip('<fmt:message key="footer.tooltip" bundle="${resword}"/>')" onmouseout="UnTip()">
+                    <center><fmt:message key="footer.edition.2" bundle="${resword}"/></center></a>
+                </td>
             </tr>
             <tr>
                 <td class="footer"/>
                 <td class="footer"><fmt:message key="footer.license.3" bundle="${resword}"/></td>
-                <td align="right" class="footer"><a href="javascript:void(0)" onmouseover="Tip('<fmt:message key="footer.tooltip" bundle="${resword}"/>')" onmouseout="UnTip()"><center><fmt:message key="footer.edition.2" bundle="${resword}"/></center></a></td>
+                <td align="right" class="footer">
+                </td>
             </tr>
 		</table>
 
