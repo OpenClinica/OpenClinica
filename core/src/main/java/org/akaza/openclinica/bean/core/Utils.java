@@ -195,10 +195,15 @@ public class Utils {
 
     public static String getAttachedFilePath(StudyBean study) {
         String attachedFilePath = CoreResources.getField("attached_file_location");
+        // @pgawade 15-April-2011: issue #8682
         if (attachedFilePath == null || attachedFilePath.length() <= 0) {
-            attachedFilePath = CoreResources.getField("filePath") + "attached_files" + File.separator + study.getIdentifier() + File.separator;
+            // attachedFilePath = CoreResources.getField("filePath") +
+            // "attached_files" + File.separator + study.getIdentifier() +
+            // File.separator;
+            attachedFilePath = CoreResources.getField("filePath") + "attached_files" + File.separator + study.getOid() + File.separator;
         } else {
-            attachedFilePath += study.getIdentifier() + File.separator;
+            // attachedFilePath += study.getIdentifier() + File.separator;
+            attachedFilePath += study.getOid() + File.separator;
         }
         return attachedFilePath;
     }
