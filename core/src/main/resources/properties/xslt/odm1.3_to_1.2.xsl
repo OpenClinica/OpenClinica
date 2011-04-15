@@ -10,7 +10,7 @@
 	<!-- File: odm1.3_to_1.2.xsl -->
 	<!-- Date: 2010-01-25 -->
 	<!-- Version: 1.0.0 -->
-	<!-- Author: Jamuna Nyayapathi(Akaza) -->
+	<!-- Author: Jamuna Nyayapathi(Akaza), Pradnya Gawade(Akaza) -->
 	<!-- Organization: Akaza Research -->
 	<!-- Description: XSL sheet to convert ODM 1.3 to ODM 1.2 without extensions. -->
 	<!-- Notes: none yet -->
@@ -38,13 +38,11 @@
 
 
 
-	<xsl:template priority="4"
+	<xsl:template priority="5"
 		match="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:ItemDef">
 
 
-		<!--<xsl:call-template name="toText"> -->
-		<!--<xsl:with-param name="toDataType" select="'text'"></xsl:with-param> -->
-		<!--</xsl:call-template> -->
+		
 		<xsl:variable name="datatype" select="@DataType" />
 		<xsl:if test="$datatype='partialDate'">
 			<xsl:element name="{local-name()}">
@@ -60,14 +58,18 @@
 
 	<!-- Namespace uri needs to be changed to cdisc 1.2 -->
 	<!-- Namespace uri needs to be changed to cdisc 1.2 -->
-	<xsl:template name="namespaceTo1.2" priority="3"
-		match="//*[namespace-uri()='http://www.cdisc.org/ns/odm/v1.3' or namespace-uri()='http://www.openclinica.org/ns/odm_ext_v130/v3.1' or namespace-uri()='http://www.openclinica.org/ns/rules/v3.1'] ">
+	
+	<xsl:template name="namespaceTo1.2" priority="1"
+		match="//*[namespace-uri()='http://www.cdisc.org/ns/odm/v1.3'] ">
 		<xsl:element name="{local-name()}" namespace="http://www.cdisc.org/ns/odm/v1.2">
 			<xsl:apply-templates select="@*|*|text()" />
 		</xsl:element>
 	</xsl:template>
 
+<xsl:template name="removeOCExtnElmnt" priority="3" match="//*[ namespace-uri()='http://www.openclinica.org/ns/odm_ext_v130/v3.1' or namespace-uri()='http://www.openclinica.org/ns/rules/v3.1']" ></xsl:template>
 
+<xsl:template name="removeOCExtnAttrib" priority="2" match="//@*[ namespace-uri()='http://www.openclinica.org/ns/odm_ext_v130/v3.1' or namespace-uri()='http://www.openclinica.org/ns/rules/v3.1']" ></xsl:template>
+<!--
 	<xsl:template name="namespaceTo1.2_no" priority="1"
 		match="//@*[namespace-uri()='http://www.openclinica.org/ns/odm_ext_v130/v3.1' ] ">
 		<xsl:element name="{local-name()}" namespace="''">
@@ -82,12 +84,12 @@
 		</xsl:element>
 	</xsl:template>
 
-
+-->
 
 	<xsl:template priority="4" match="@ODMVersion">
 		<xsl:attribute name="ODMVersion">1.2</xsl:attribute>
 	</xsl:template>
-<xsl:template match="//odm:ODM/odm:Study/odm:MetaDataVersion/odm:RuleImport" priority="5"></xsl:template>
+<xsl:template match="//odm:ODM/odm:Study/odm:MetaDataVersion/odm:RuleImport" priority="6"></xsl:template>
 
 
 
