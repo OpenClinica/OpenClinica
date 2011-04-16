@@ -228,7 +228,11 @@ public class ScheduledJobController {
         SimpleTrigger oldTrigger = (SimpleTrigger) scheduler.getTrigger(triggerName, triggerGroupName);
      
         Date startTime = new Date(oldTrigger.getStartTime().getTime()+oldTrigger.getRepeatInterval()); 
-        
+        if(triggerGroupName.equals(ExtractController.TRIGGER_GROUP_NAME))
+        {
+            scheduler.interrupt(theJobName, theJobGroupName);
+        }
+
         scheduler.pauseJob(theJobName, theJobGroupName);
         
         SimpleTrigger newTrigger = new SimpleTrigger(triggerName,triggerGroupName);
