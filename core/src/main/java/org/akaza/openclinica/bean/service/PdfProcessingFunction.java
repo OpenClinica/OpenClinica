@@ -31,9 +31,9 @@ import javax.xml.transform.sax.SAXResult;
  * @author thickerson
  *
  */
-public class PdfProcessingFunction extends ProcessingFunction implements Serializable {
+public class PdfProcessingFunction extends ProcessingFunction  {
 
-    private FopFactory fopFactory = FopFactory.newInstance();
+  
     
     public PdfProcessingFunction() {
         fileType = "pdf";
@@ -50,7 +50,7 @@ public class PdfProcessingFunction extends ProcessingFunction implements Seriali
      * @see org.akaza.openclinica.bean.service.ProcessingInterface#run()
      */
     public ProcessingResultType run() {
-        
+         FopFactory fopFactory = FopFactory.newInstance(); 
         OutputStream out = null;   
         File outputFile =null;
         String zipName = "_";
