@@ -28,31 +28,12 @@
 	<xsl:template name="copyTemplate" match="node()|@*">
 
 		<xsl:copy>
-			<xsl:apply-templates select="@*|*|text()" />
+			<xsl:apply-templates select="@*|node()" />
 		</xsl:copy>
 	</xsl:template>
 
 
-	<!-- template for changing any datatype to 'text',datatype needs to be sent 
-		as a parameter. -->
 
-
-
-	<xsl:template priority="5"
-		match="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:ItemDef">
-
-
-		
-		<xsl:variable name="datatype" select="@DataType" />
-		<xsl:if test="$datatype='partialDate'">
-			<xsl:element name="{local-name()}">
-				<xsl:attribute name="DataType">
-                        
-<xsl:value-of select="'text'"></xsl:value-of>
-</xsl:attribute>
-			</xsl:element>
-		</xsl:if>
-	</xsl:template>
 
 
 
