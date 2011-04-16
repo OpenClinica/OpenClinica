@@ -823,33 +823,38 @@ public class ExpressionService {
         if (length > 0) {
             item = getItemFromExpression(expression);
             if (item == null)
-                throw new OpenClinicaSystemException("item is Invalid");
+                throw new OpenClinicaSystemException("OCRERR_0023");
+                //throw new OpenClinicaSystemException("item is Invalid");
         }
 
         if (length > 1) {
             List<ItemGroupBean> persistentItemGroups = (List<ItemGroupBean>) getItemGroupDao().findGroupsByItemID(item.getId());
             itemGroup = persistentItemGroups.size() > 0 ? persistentItemGroups.get(0) : null;
             if (itemGroup == null || !itemGroup.getOid().equals(getItemGroupOidFromExpression(expression)))
-                throw new OpenClinicaSystemException("itemGroup is Invalid");
+                throw new OpenClinicaSystemException("OCRERR_0022");
+                //throw new OpenClinicaSystemException("itemGroup is Invalid");
         }
 
         if (length > 2) {
             crf = getCRFFromExpression(expression);
             if (crf == null || crf.getId() != itemGroup.getCrfId())
-                throw new OpenClinicaSystemException("CRF is Invalid");
+                throw new OpenClinicaSystemException("OCRERR_0033");
+                //throw new OpenClinicaSystemException("CRF is Invalid");
         }
 
         if (length > 3) {
             StudyEventDefinitionBean studyEventDefinition = getStudyEventDefinitionFromExpression(expression);
             crf = getCRFFromExpression(expression);
             if (studyEventDefinition == null || crf == null)
-                throw new OpenClinicaSystemException("StudyEventDefinition is Invalid");
+                throw new OpenClinicaSystemException("OCRERR_0034");
+                //throw new OpenClinicaSystemException("StudyEventDefinition is Invalid");
 
             EventDefinitionCRFBean eventDefinitionCrf =
                 getEventDefinitionCRFDao().findByStudyEventDefinitionIdAndCRFId(this.expressionWrapper.getStudyBean(), studyEventDefinition.getId(),
                         crf.getId());
             if (eventDefinitionCrf == null || eventDefinitionCrf.getId() == 0)
-                throw new OpenClinicaSystemException("StudyEventDefinition is Invalid");
+                throw new OpenClinicaSystemException("OCRERR_0034");
+                //throw new OpenClinicaSystemException("StudyEventDefinition is Invalid");
         }
     }
 
