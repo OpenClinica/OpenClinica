@@ -494,7 +494,7 @@ public class CoreResources implements ResourceLoaderAware {
             // file name of the xslt stylesheet
             epbean.setFiledescription(getExtractField("extract." + i + ".fileDescription"));
             // description of the choice of format
-            epbean.setHelpText(getExtractField("extract." + i + ".helptext"));
+            epbean.setHelpText(getExtractField("extract." + i + ".helpText"));
             // help text, currently in the alt-text of the link
             epbean.setLinkText(getExtractField("extract." + i + ".linkText"));
             // link text of the choice of format
