@@ -10,9 +10,9 @@
 # Change the variables below if they do not mee your environment.
 
 RETVAL=$?
-CATALINA_HOME="/usr/local/tomcat"
-JAVA_HOME="/usr/local/java"
-JAVA_OPTS="$JAVA_OPTS -Xmx1280m -XX:MaxPermSize=180m"
+export CATALINA_HOME="/usr/local/tomcat"
+export JAVA_HOME="/usr/local/java"
+export JAVA_OPTS="$JAVA_OPTS -Xmx1280m -XX:MaxPermSize=180m"
 
 case "$1" in
  start)
@@ -38,7 +38,7 @@ case "$1" in
                     echo $"Stopping Tomcat"
                     /bin/su tomcat $CATALINA_HOME/bin/shutdown.sh
                 fi
-                sleep 3
+                sleep 10
                 /etc/init.d/tomcat status
         else
                 echo
