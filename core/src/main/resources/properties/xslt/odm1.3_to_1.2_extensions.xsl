@@ -24,29 +24,12 @@
 	<xsl:template name="copyTemplate" match="node()|@*">
 
 		<xsl:copy>
-			<xsl:apply-templates select="@*|*|text()" />
+			<xsl:apply-templates select="@*|node()" />
 		</xsl:copy>
 	</xsl:template>
 
-	<!-- template for changing any datatype to 'text',datatype needs to be sent 
-		as a parameter. -->
-	<xsl:template priority="5"
-		match="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:ItemDef">
-		<!--<xsl:call-template name="toText"> -->
-		<!--<xsl:with-param name="toDataType" select="'text'"></xsl:with-param> -->
-		<!--</xsl:call-template> -->
-		<xsl:variable name="datatype" select="@DataType" />
-		<xsl:if test="$datatype='partialDate'">
-			<xsl:element name="{local-name()}">
-				<xsl:attribute name="DataType">
-                        
-<xsl:value-of select="'text'"></xsl:value-of>
-</xsl:attribute>
-			</xsl:element>
-		</xsl:if>
-	</xsl:template>
 
-
+<!--JN:  Perhaps the down should be applied to node? Check later? -->
 
 	<!-- Namespace uri needs to be changed to cdisc 1.2 -->
 	<xsl:template name="namespaceTo1.2" priority="1"
