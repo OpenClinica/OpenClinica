@@ -115,7 +115,7 @@
 								<xsl:text>Location_</xsl:text>
 								<xsl:value-of select="$E" />
 								<xsl:value-of select="$eventPosition" />
-								<xsl:text>_repeat</xsl:text>
+								<xsl:text>_</xsl:text>
 								<xsl:value-of select="@StudyEventRepeatKey" />
 								<xsl:text> A</xsl:text>
 								<xsl:choose>
@@ -133,7 +133,7 @@
 								<xsl:text>StartDate_</xsl:text>
 								<xsl:value-of select="$E" />
 								<xsl:value-of select="$eventPosition" />
-								<xsl:text>_repeat</xsl:text>
+								<xsl:text>_</xsl:text>
 								<xsl:value-of select="@StudyEventRepeatKey" />
 								<xsl:text> ADATE10</xsl:text>
 								<xsl:text>&#xa;</xsl:text>
@@ -143,7 +143,7 @@
 								<xsl:text>EndDate_</xsl:text>
 								<xsl:value-of select="$E" />
 								<xsl:value-of select="$eventPosition" />
-								<xsl:text>_repeat</xsl:text>
+								<xsl:text>_</xsl:text>
 								<xsl:value-of select="@StudyEventRepeatKey" />
 								<xsl:text> ADATE10</xsl:text>
 								<xsl:text>&#xa;</xsl:text>
@@ -153,7 +153,7 @@
 								<xsl:text>Event Status_</xsl:text>
 								<xsl:value-of select="$E" />
 								<xsl:value-of select="$eventPosition" />
-								<xsl:text>_repeat</xsl:text>
+								<xsl:text>_</xsl:text>
 								<xsl:value-of select="@StudyEventRepeatKey" />
 								<xsl:text> A</xsl:text>
 								<xsl:choose>
@@ -171,7 +171,7 @@
 								<xsl:text>Age_</xsl:text>
 								<xsl:value-of select="$E" />
 								<xsl:value-of select="$eventPosition" />
-								<xsl:text>_repeat</xsl:text>
+								<xsl:text>_</xsl:text>
 								<xsl:value-of select="@StudyEventRepeatKey" />
 								<xsl:text> A</xsl:text>
 								<xsl:choose>
@@ -193,7 +193,7 @@
 									<xsl:text>Location_</xsl:text>
 									<xsl:value-of select="$E" />
 									<xsl:value-of select="$eventPosition" />
-									<xsl:text>_repeat</xsl:text>
+									<xsl:text>_</xsl:text>
 									<xsl:value-of select="@StudyEventRepeatKey" />
 									<xsl:text> A</xsl:text>
 									<xsl:choose>
@@ -211,7 +211,7 @@
 									<xsl:text>StartDate_</xsl:text>
 									<xsl:value-of select="$E" />
 									<xsl:value-of select="$eventPosition" />
-									<xsl:text>_repeat</xsl:text>
+									<xsl:text>_</xsl:text>
 									<xsl:value-of select="@StudyEventRepeatKey" />
 									<xsl:text> ADATE10</xsl:text>
 									<xsl:text>&#xa;</xsl:text>
@@ -221,7 +221,7 @@
 									<xsl:text>EndDate_</xsl:text>
 									<xsl:value-of select="$E" />
 									<xsl:value-of select="$eventPosition" />
-									<xsl:text>_repeat</xsl:text>
+									<xsl:text>_</xsl:text>
 									<xsl:value-of select="@StudyEventRepeatKey" />
 									<xsl:text> ADATE10</xsl:text>
 									<xsl:text>&#xa;</xsl:text>
@@ -231,7 +231,7 @@
 									<xsl:text>Event Status_</xsl:text>
 									<xsl:value-of select="$E" />
 									<xsl:value-of select="$eventPosition" />
-									<xsl:text>_repeat</xsl:text>
+									<xsl:text>_</xsl:text>
 									<xsl:value-of select="@StudyEventRepeatKey" />
 									<xsl:text> A</xsl:text>
 									<xsl:choose>
@@ -249,7 +249,7 @@
 									<xsl:text>Age_</xsl:text>
 									<xsl:value-of select="$E" />
 									<xsl:value-of select="$eventPosition" />
-									<xsl:text>_repeat</xsl:text>
+									<xsl:text>_</xsl:text>
 									<xsl:value-of select="@StudyEventRepeatKey" />
 									<xsl:text> A</xsl:text>
 									<xsl:choose>
@@ -418,15 +418,15 @@
 			
 			<xsl:value-of select="$C" />
 			<xsl:value-of select="$crfPosition" />
-			<xsl:text>_</xsl:text>
+<!--			<xsl:text>_</xsl:text>-->
 			<xsl:variable name="group" select="$itemData/parent::node()" />
 			<xsl:variable name="groupOID" select="$group/@ItemGroupOID" />
-			<xsl:apply-templates
+			<!--<xsl:apply-templates
 				select="//odm:ODM/odm:Study/odm:MetaDataVersion/odm:ItemGroupDef[@OID=$groupOID]"
 				mode="itemGroupDefSPSS">
 			</xsl:apply-templates>
 
-			<xsl:if test="$group/@ItemGroupRepeatKey">
+			--><xsl:if test="$group/@ItemGroupRepeatKey">
 				<xsl:text>_</xsl:text>
 				<xsl:value-of select="$group/@ItemGroupRepeatKey" />
 			</xsl:if>
@@ -499,7 +499,7 @@
 									<xsl:value-of select="$E" />
 									<xsl:value-of select="$eventPosition" />
 									<xsl:if test="@StudyEventRepeatKey">
-										<xsl:text>_repeat</xsl:text>
+										<xsl:text>_</xsl:text>
 										<xsl:value-of select="@StudyEventRepeatKey" />
 									</xsl:if>
 									<xsl:text>_</xsl:text>
@@ -522,7 +522,7 @@
 									<xsl:value-of select="$E" />
 									<xsl:value-of select="$eventPosition" />
 									<xsl:if test="@StudyEventRepeatKey">
-										<xsl:text>_repeat</xsl:text>
+										<xsl:text>_</xsl:text>
 										<xsl:value-of select="@StudyEventRepeatKey" />
 									</xsl:if>
 									<xsl:text>_</xsl:text>
@@ -537,7 +537,7 @@
 									<xsl:value-of select="$E" />
 									<xsl:value-of select="$eventPosition" />
 									<xsl:if test="@StudyEventRepeatKey">
-										<xsl:text>_repeat</xsl:text>
+										<xsl:text>_</xsl:text>
 										<xsl:value-of select="@StudyEventRepeatKey" />
 									</xsl:if>
 									<xsl:text>_</xsl:text>
@@ -560,7 +560,7 @@
 									<xsl:value-of select="$E" />
 									<xsl:value-of select="$eventPosition" />
 									<xsl:if test="@StudyEventRepeatKey">
-										<xsl:text>_repeat</xsl:text>
+										<xsl:text>_</xsl:text>
 										<xsl:value-of select="@StudyEventRepeatKey" />
 									</xsl:if>
 									<xsl:text>_</xsl:text>
@@ -587,7 +587,7 @@
 										<xsl:value-of select="$E" />
 										<xsl:value-of select="$eventPosition" />
 										<xsl:if test="@StudyEventRepeatKey">
-											<xsl:text>_repeat</xsl:text>
+											<xsl:text>_</xsl:text>
 											<xsl:value-of select="@StudyEventRepeatKey" />
 										</xsl:if>
 										<xsl:text>_</xsl:text>
@@ -610,7 +610,7 @@
 										<xsl:value-of select="$E" />
 										<xsl:value-of select="$eventPosition" />
 										<xsl:if test="@StudyEventRepeatKey">
-											<xsl:text>_repeat</xsl:text>
+											<xsl:text>_</xsl:text>
 											<xsl:value-of select="@StudyEventRepeatKey" />
 										</xsl:if>
 										<xsl:text>_</xsl:text>
@@ -625,7 +625,7 @@
 										<xsl:value-of select="$E" />
 										<xsl:value-of select="$eventPosition" />
 										<xsl:if test="@StudyEventRepeatKey">
-											<xsl:text>_repeat</xsl:text>
+											<xsl:text>_</xsl:text>
 											<xsl:value-of select="@StudyEventRepeatKey" />
 										</xsl:if>
 										<xsl:text>_</xsl:text>
@@ -648,7 +648,7 @@
 										<xsl:value-of select="$E" />
 										<xsl:value-of select="$eventPosition" />
 										<xsl:if test="@StudyEventRepeatKey">
-											<xsl:text>_repeat</xsl:text>
+											<xsl:text>_</xsl:text>
 											<xsl:value-of select="@StudyEventRepeatKey" />
 										</xsl:if>
 										<xsl:text>_</xsl:text>
@@ -824,14 +824,14 @@
 								<xsl:text>Location_</xsl:text>
 								<xsl:value-of select="$E" />
 								<xsl:value-of select="$eventPosition" />
-								<xsl:text>_repeat</xsl:text>
+								<xsl:text>_</xsl:text>
 								<xsl:value-of select="@StudyEventRepeatKey" />
 								<xsl:text> "Location For </xsl:text>
 								<xsl:value-of select="$eventName" />
 								<xsl:text>(</xsl:text>
 								<xsl:value-of select="$E" />
 								<xsl:value-of select="$eventPosition" />
-								<xsl:text>_repeat</xsl:text>
+								<xsl:text>_</xsl:text>
 								<xsl:value-of select="@StudyEventRepeatKey" />
 								<xsl:text>)"</xsl:text>
 								<xsl:text>&#xa;</xsl:text>
@@ -841,14 +841,14 @@
 								<xsl:text>StartDate_</xsl:text>
 								<xsl:value-of select="$E" />
 								<xsl:value-of select="$eventPosition" />
-								<xsl:text>_repeat</xsl:text>
+								<xsl:text>_</xsl:text>
 								<xsl:value-of select="@StudyEventRepeatKey" />
 								<xsl:text> "Start Date For </xsl:text>
 								<xsl:value-of select="$eventName" />
 								<xsl:text>(</xsl:text>
 								<xsl:value-of select="$E" />
 								<xsl:value-of select="$eventPosition" />
-								<xsl:text>_repeat</xsl:text>
+								<xsl:text>_</xsl:text>
 								<xsl:value-of select="@StudyEventRepeatKey" />
 								<xsl:text>)"</xsl:text>
 								<xsl:text>&#xa;</xsl:text>
@@ -858,14 +858,14 @@
 								<xsl:text>EndDate_</xsl:text>
 								<xsl:value-of select="$E" />
 								<xsl:value-of select="$eventPosition" />
-								<xsl:text>_repeat</xsl:text>
+								<xsl:text>_</xsl:text>
 								<xsl:value-of select="@StudyEventRepeatKey" />
 								<xsl:text> "End Date For </xsl:text>
 								<xsl:value-of select="$eventName" />
 								<xsl:text>(</xsl:text>
 								<xsl:value-of select="$E" />
 								<xsl:value-of select="$eventPosition" />
-								<xsl:text>_repeat</xsl:text>
+								<xsl:text>_</xsl:text>
 								<xsl:value-of select="@StudyEventRepeatKey" />
 								<xsl:text>)"</xsl:text>
 								<xsl:text>&#xa;</xsl:text>
@@ -875,14 +875,14 @@
 								<xsl:text>Event Status_</xsl:text>
 								<xsl:value-of select="$E" />
 								<xsl:value-of select="$eventPosition" />
-								<xsl:text>_repeat</xsl:text>
+								<xsl:text>_</xsl:text>
 								<xsl:value-of select="@StudyEventRepeatKey" />
 								<xsl:text> "Event Status For </xsl:text>
 								<xsl:value-of select="$eventName" />
 								<xsl:text>(</xsl:text>
 								<xsl:value-of select="$E" />
 								<xsl:value-of select="$eventPosition" />
-								<xsl:text>_repeat</xsl:text>
+								<xsl:text>_</xsl:text>
 								<xsl:value-of select="@StudyEventRepeatKey" />
 								<xsl:text>)"</xsl:text>
 								<xsl:text>&#xa;</xsl:text>
@@ -892,14 +892,14 @@
 								<xsl:text>Age_</xsl:text>
 								<xsl:value-of select="$E" />
 								<xsl:value-of select="$eventPosition" />
-								<xsl:text>_repeat</xsl:text>
+								<xsl:text>_</xsl:text>
 								<xsl:value-of select="@StudyEventRepeatKey" />
 								<xsl:text> "Age For </xsl:text>
 								<xsl:value-of select="$eventName" />
 								<xsl:text>(</xsl:text>
 								<xsl:value-of select="$E" />
 								<xsl:value-of select="$eventPosition" />
-								<xsl:text>_repeat</xsl:text>
+								<xsl:text>_</xsl:text>
 								<xsl:value-of select="@StudyEventRepeatKey" />
 								<xsl:text>)"</xsl:text>
 								<xsl:text>&#xa;</xsl:text>
@@ -913,14 +913,14 @@
 									<xsl:text>Location_</xsl:text>
 									<xsl:value-of select="$E" />
 									<xsl:value-of select="$eventPosition" />
-									<xsl:text>_repeat</xsl:text>
+									<xsl:text>_</xsl:text>
 									<xsl:value-of select="@StudyEventRepeatKey" />
 									<xsl:text> "Location For </xsl:text>
 									<xsl:value-of select="$eventName" />
 									<xsl:text>(</xsl:text>
 									<xsl:value-of select="$E" />
 									<xsl:value-of select="$eventPosition" />
-									<xsl:text>_repeat</xsl:text>
+									<xsl:text>_</xsl:text>
 									<xsl:value-of select="@StudyEventRepeatKey" />
 									<xsl:text>)"</xsl:text>
 									<xsl:text>&#xa;</xsl:text>
@@ -930,14 +930,14 @@
 									<xsl:text>StartDate_</xsl:text>
 									<xsl:value-of select="$E" />
 									<xsl:value-of select="$eventPosition" />
-									<xsl:text>_repeat</xsl:text>
+									<xsl:text>_</xsl:text>
 									<xsl:value-of select="@StudyEventRepeatKey" />
 									<xsl:text> "Start Date For </xsl:text>
 									<xsl:value-of select="$eventName" />
 									<xsl:text>(</xsl:text>
 									<xsl:value-of select="$E" />
 									<xsl:value-of select="$eventPosition" />
-									<xsl:text>_repeat</xsl:text>
+									<xsl:text>_</xsl:text>
 									<xsl:value-of select="@StudyEventRepeatKey" />
 									<xsl:text>)"</xsl:text>
 									<xsl:text>&#xa;</xsl:text>
@@ -947,14 +947,14 @@
 									<xsl:text>EndDate_</xsl:text>
 									<xsl:value-of select="$E" />
 									<xsl:value-of select="$eventPosition" />
-									<xsl:text>_repeat</xsl:text>
+									<xsl:text>_</xsl:text>
 									<xsl:value-of select="@StudyEventRepeatKey" />
 									<xsl:text> "End Date For </xsl:text>
 									<xsl:value-of select="$eventName" />
 									<xsl:text>(</xsl:text>
 									<xsl:value-of select="$E" />
 									<xsl:value-of select="$eventPosition" />
-									<xsl:text>_repeat</xsl:text>
+									<xsl:text>_</xsl:text>
 									<xsl:value-of select="@StudyEventRepeatKey" />
 									<xsl:text>)"</xsl:text>
 									<xsl:text>&#xa;</xsl:text>
@@ -964,14 +964,14 @@
 									<xsl:text>Event Status_</xsl:text>
 									<xsl:value-of select="$E" />
 									<xsl:value-of select="$eventPosition" />
-									<xsl:text>_repeat</xsl:text>
+									<xsl:text>_</xsl:text>
 									<xsl:value-of select="@StudyEventRepeatKey" />
 									<xsl:text> "Event Status For </xsl:text>
 									<xsl:value-of select="$eventName" />
 									<xsl:text>(</xsl:text>
 									<xsl:value-of select="$E" />
 									<xsl:value-of select="$eventPosition" />
-									<xsl:text>_repeat</xsl:text>
+									<xsl:text>_</xsl:text>
 									<xsl:value-of select="@StudyEventRepeatKey" />
 									<xsl:text>)"</xsl:text>
 									<xsl:text>&#xa;</xsl:text>
@@ -981,14 +981,14 @@
 									<xsl:text>Age_</xsl:text>
 									<xsl:value-of select="$E" />
 									<xsl:value-of select="$eventPosition" />
-									<xsl:text>_repeat</xsl:text>
+									<xsl:text>_</xsl:text>
 									<xsl:value-of select="@StudyEventRepeatKey" />
 									<xsl:text> "Age For </xsl:text>
 									<xsl:value-of select="$eventName" />
 									<xsl:text>(</xsl:text>
 									<xsl:value-of select="$E" />
 									<xsl:value-of select="$eventPosition" />
-									<xsl:text>_repeat</xsl:text>
+									<xsl:text>_</xsl:text>
 									<xsl:value-of select="@StudyEventRepeatKey" />
 									<xsl:text>)"</xsl:text>
 									<xsl:text>&#xa;</xsl:text>
@@ -1129,7 +1129,7 @@
 									<xsl:value-of select="$E" />
 									<xsl:value-of select="$eventPosition" />
 									<xsl:if test="@StudyEventRepeatKey">
-										<xsl:text>_repeat</xsl:text>
+										<xsl:text>_</xsl:text>
 										<xsl:value-of select="@StudyEventRepeatKey" />
 									</xsl:if>
 									<xsl:text>_</xsl:text>
@@ -1140,7 +1140,7 @@
 									<xsl:text>(</xsl:text>
 									<xsl:value-of select="$E" />
 									<xsl:value-of select="$eventPosition" />
-									<xsl:text>_repeat</xsl:text>
+									<xsl:text>_</xsl:text>
 									<xsl:value-of select="@StudyEventRepeatKey" />
 									<xsl:text>)"</xsl:text>
 									<xsl:text>&#xa;</xsl:text>
@@ -1151,7 +1151,7 @@
 									<xsl:value-of select="$E" />
 									<xsl:value-of select="$eventPosition" />
 									<xsl:if test="@StudyEventRepeatKey">
-										<xsl:text>_repeat</xsl:text>
+										<xsl:text>_</xsl:text>
 										<xsl:value-of select="@StudyEventRepeatKey" />
 									</xsl:if>
 									<xsl:text>_</xsl:text>
@@ -1162,7 +1162,7 @@
 									<xsl:text>(</xsl:text>
 									<xsl:value-of select="$E" />
 									<xsl:value-of select="$eventPosition" />
-									<xsl:text>_repeat</xsl:text>
+									<xsl:text>_</xsl:text>
 									<xsl:value-of select="@StudyEventRepeatKey" />
 									<xsl:text>)"</xsl:text>
 									<xsl:text>&#xa;</xsl:text>
@@ -1173,7 +1173,7 @@
 									<xsl:value-of select="$E" />
 									<xsl:value-of select="$eventPosition" />
 									<xsl:if test="@StudyEventRepeatKey">
-										<xsl:text>_repeat</xsl:text>
+										<xsl:text>_</xsl:text>
 										<xsl:value-of select="@StudyEventRepeatKey" />
 									</xsl:if>
 									<xsl:text>_</xsl:text>
@@ -1184,7 +1184,7 @@
 									<xsl:text>(</xsl:text>
 									<xsl:value-of select="$E" />
 									<xsl:value-of select="$eventPosition" />
-									<xsl:text>_repeat</xsl:text>
+									<xsl:text>_</xsl:text>
 									<xsl:value-of select="@StudyEventRepeatKey" />
 									<xsl:text>)"</xsl:text>
 									<xsl:text>&#xa;</xsl:text>
@@ -1195,7 +1195,7 @@
 									<xsl:value-of select="$E" />
 									<xsl:value-of select="$eventPosition" />
 									<xsl:if test="@StudyEventRepeatKey">
-										<xsl:text>_repeat</xsl:text>
+										<xsl:text>_</xsl:text>
 										<xsl:value-of select="@StudyEventRepeatKey" />
 									</xsl:if>
 									<xsl:text>_</xsl:text>
@@ -1206,7 +1206,7 @@
 									<xsl:text>(</xsl:text>
 									<xsl:value-of select="$E" />
 									<xsl:value-of select="$eventPosition" />
-									<xsl:text>_repeat</xsl:text>
+									<xsl:text>_</xsl:text>
 									<xsl:value-of select="@StudyEventRepeatKey" />
 									<xsl:text>)"</xsl:text>
 									<xsl:text>&#xa;</xsl:text>
@@ -1221,7 +1221,7 @@
 										<xsl:value-of select="$E" />
 										<xsl:value-of select="$eventPosition" />
 										<xsl:if test="@StudyEventRepeatKey">
-											<xsl:text>_repeat</xsl:text>
+											<xsl:text>_</xsl:text>
 											<xsl:value-of select="@StudyEventRepeatKey" />
 										</xsl:if>
 										<xsl:text>_</xsl:text>
@@ -1232,7 +1232,7 @@
 										<xsl:text>(</xsl:text>
 										<xsl:value-of select="$E" />
 										<xsl:value-of select="$eventPosition" />
-										<xsl:text>_repeat</xsl:text>
+										<xsl:text>_</xsl:text>
 										<xsl:value-of select="@StudyEventRepeatKey" />
 										<xsl:text>)"</xsl:text>
 										<xsl:text>&#xa;</xsl:text>
@@ -1243,7 +1243,7 @@
 										<xsl:value-of select="$E" />
 										<xsl:value-of select="$eventPosition" />
 										<xsl:if test="@StudyEventRepeatKey">
-											<xsl:text>_repeat</xsl:text>
+											<xsl:text>_</xsl:text>
 											<xsl:value-of select="@StudyEventRepeatKey" />
 										</xsl:if>
 										<xsl:text>_</xsl:text>
@@ -1254,7 +1254,7 @@
 										<xsl:text>(</xsl:text>
 										<xsl:value-of select="$E" />
 										<xsl:value-of select="$eventPosition" />
-										<xsl:text>_repeat</xsl:text>
+										<xsl:text>_</xsl:text>
 										<xsl:value-of select="@StudyEventRepeatKey" />
 										<xsl:text>)"</xsl:text>
 										<xsl:text>&#xa;</xsl:text>
@@ -1265,7 +1265,7 @@
 										<xsl:value-of select="$E" />
 										<xsl:value-of select="$eventPosition" />
 										<xsl:if test="@StudyEventRepeatKey">
-											<xsl:text>_repeat</xsl:text>
+											<xsl:text>_</xsl:text>
 											<xsl:value-of select="@StudyEventRepeatKey" />
 										</xsl:if>
 										<xsl:text>_</xsl:text>
@@ -1276,7 +1276,7 @@
 										<xsl:text>(</xsl:text>
 										<xsl:value-of select="$E" />
 										<xsl:value-of select="$eventPosition" />
-										<xsl:text>_repeat</xsl:text>
+										<xsl:text>_</xsl:text>
 										<xsl:value-of select="@StudyEventRepeatKey" />
 										<xsl:text>)"</xsl:text>
 										<xsl:text>&#xa;</xsl:text>
@@ -1287,7 +1287,7 @@
 										<xsl:value-of select="$E" />
 										<xsl:value-of select="$eventPosition" />
 										<xsl:if test="@StudyEventRepeatKey">
-											<xsl:text>_repeat</xsl:text>
+											<xsl:text>_</xsl:text>
 											<xsl:value-of select="@StudyEventRepeatKey" />
 										</xsl:if>
 										<xsl:text>_</xsl:text>
@@ -1298,7 +1298,7 @@
 										<xsl:text>(</xsl:text>
 										<xsl:value-of select="$E" />
 										<xsl:value-of select="$eventPosition" />
-										<xsl:text>_repeat</xsl:text>
+										<xsl:text>_</xsl:text>
 										<xsl:value-of select="@StudyEventRepeatKey" />
 										<xsl:text>)"</xsl:text>
 										<xsl:text>&#xa;</xsl:text>
