@@ -106,9 +106,16 @@ public class ExtractPropertyBean implements Serializable{
         id = 0;
         zipFormat = true;
         deleteOld = true;
+        postProcessing = null;
         successMessage=null;
         failureMessage=null;
         datasetId = null;
+        postProcLocation = null;
+        postProcExportName = null;
+         postProcDeleteOld = true;
+         postProcZip = true;
+        doNotDelFiles=null;
+        
     }
     
     
