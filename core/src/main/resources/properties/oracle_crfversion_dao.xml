@@ -105,6 +105,13 @@
 		<sql>delete from section where crf_version_id=</sql>
 	</query>
 	<query>
+		<name>deleteScdItemMetadataByVersion</name>
+		<sql>delete from scd_item_metadata scd where scd.scd_item_form_metadata_id in (
+				select ifm.item_form_metadata_id from item_form_metadata ifm 
+				where ifm.show_item=0 and ifm.crf_version_id=
+		</sql>
+	</query>
+	<query>
 		<name>deleteItemMetaDataByVersion</name>
 		<sql>delete from item_form_metadata where crf_version_id=</sql>
 	</query>
