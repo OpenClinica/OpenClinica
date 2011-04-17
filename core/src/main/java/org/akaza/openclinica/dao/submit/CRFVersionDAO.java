@@ -323,7 +323,9 @@ public class CRFVersionDAO extends AuditableEntityDAO {
      */
     public ArrayList generateDeleteQueries(int versionId, ArrayList items) {
         ArrayList sqls = new ArrayList();
-        String sql = digester.getQuery("deleteItemMetaDataByVersion") + versionId;
+        String sql = digester.getQuery("deleteScdItemMetadataByVersion") + versionId + ")";
+        sqls.add(sql);
+        sql = digester.getQuery("deleteItemMetaDataByVersion") + versionId;
         sqls.add(sql);
         sql = digester.getQuery("deleteSectionsByVersion") + versionId;
         sqls.add(sql);
