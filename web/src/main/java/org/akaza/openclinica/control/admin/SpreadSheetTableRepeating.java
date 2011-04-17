@@ -1457,10 +1457,12 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         String sql2_1 = "";
                         if(display.length() > 0) {
                             if(controlItemName.length()>0 && optionValue.length()>0 && message.length()>0) {
+                                //At this point, all errors for scd should be caught; and insert into item_form_metadata should be done 
                                 if (dbName.equals("oracle")) {
                                     sql2_1 = "insert into scd_item_metadata (scd_item_form_metadata_id,control_item_form_metadata_id,control_item_name," 
                                         + "option_value,message) values(" 
-                                        + "(select ifm.item_form_metadata_id from item_form_metadata ifm where ifm.item_id=" + selectCorrectItemQueryOracle + "),"
+                                        + "(select max(ifm.item_form_metadata_id) from item_form_metadata ifm where ifm.item_id=" + selectCorrectItemQueryOracle 
+                                        + "and ifm.show_item=0 ),"
                                         + "(select cifm.item_form_metadata_id from item, item_form_metadata cifm"
                                         + " where item.item_id = (select max(item_id) from item where name = '" + controlItemName +"')" 
                                         + " and item.owner_id = " + ownerId + " and cifm.item_id = item.item_id and cifm.item_form_metadata_id > " + maxItemFormMetadataId
@@ -1469,7 +1471,8 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                 } else {
                                     sql2_1 = "insert into scd_item_metadata (scd_item_form_metadata_id,control_item_form_metadata_id,control_item_name," 
                                     	+ "option_value,message) values(" 
-                                    	+ "(select ifm.item_form_metadata_id from item_form_metadata ifm where ifm.item_id=" + selectCorrectItemQueryPostgres + "),"
+                                    	+ "(select max(ifm.item_form_metadata_id) from item_form_metadata ifm where ifm.item_id=" + selectCorrectItemQueryPostgres 
+                                    	+ "and ifm.show_item=false ),"
                                     	+ "(select cifm.item_form_metadata_id from item, item_form_metadata cifm"
                                     	+ " where item.item_id = (select max(item_id) from item where name = '" + controlItemName +"')" 
                                     	+ " and item.owner_id = " + ownerId + " and cifm.item_id = item.item_id and cifm.item_form_metadata_id > " + maxItemFormMetadataId
