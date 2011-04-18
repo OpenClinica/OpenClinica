@@ -48,6 +48,8 @@ public class CoreResources implements ResourceLoaderAware {
     // private MessageSource messageSource;
     private static ArrayList<ExtractPropertyBean> extractProperties;
 
+    public static String ODM_MAPPING_DIR;
+
     // TODO:Clean up all system outs
     // default no arg constructor
     public CoreResources() {
@@ -86,7 +88,9 @@ public class CoreResources implements ResourceLoaderAware {
     public void setResourceLoader(ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
         try {
-            // setPROPERTIES_DIR();
+            // setPROPERTIES_DIR(resourceLoader);
+            // @pgawade 18-April-2011 Fix for issue 8394
+            setODM_MAPPING_DIR();
             webapp = getWebAppName(resourceLoader.getResource("/").getURI().getPath());
             logMe("is web app name null?" + webapp);
 
@@ -101,6 +105,9 @@ public class CoreResources implements ResourceLoaderAware {
             SQLFactory factory = SQLFactory.getInstance();
             factory.run(dbName, resourceLoader);
             copyBaseToDest(resourceLoader);
+            // @pgawade 18-April-2011 Fix for issue 8394
+            copyODMMappingXMLtoResources(resourceLoader);
+
             extractProperties = findExtractProperties();
             // tbh, following line to be removed
             // reportUrl();
@@ -466,6 +473,63 @@ public class CoreResources implements ResourceLoaderAware {
         }
     }
 
+    /**
+     * @pgawade 18-April-2011 - Fix for issue 8394 Copy
+     *          core\resources\properties\cd_odm_mapping.xml to web application
+     *          resources outside the core jar file Reason - During CRF data
+     *          import, Castor API is not able to load this mapping xml file
+     *          from core jar file
+     */
+    private void copyODMMappingXMLtoResources(ResourceLoader resourceLoader) {
+        // System.out.println("Properties directory?"+resourceLoader.getResource("properties/xslt"));
+
+        ByteArrayInputStream listSrcFiles[] = new ByteArrayInputStream[10];
+        String[] fileNames = { "cd_odm_mapping.xml" };
+        try {
+            listSrcFiles[0] =
+                (ByteArrayInputStream) resourceLoader.getResource("classpath:properties" + File.separator + "cd_odm_mapping.xml").getInputStream();
+
+        } catch (IOException ioe) {
+            OpenClinicaSystemException oe = new OpenClinicaSystemException("Unable to read source files");
+            oe.initCause(ioe);
+            oe.setStackTrace(ioe.getStackTrace());
+            logger.debug(ioe.getMessage());
+            throw oe;
+        }
+
+        File dest = null;
+        try {
+            File placeholder_file = new File(resourceLoader.getResource("classpath:properties" + File.separator + "placeholder.properties").getURL().getFile());
+            String placeholder_file_path = placeholder_file.getPath();
+            String tmp1 = placeholder_file_path.substring(6);
+            String tmp2 = tmp1.substring(0, tmp1.indexOf("WEB-INF") - 1);
+            String tmp3 = tmp2 + File.separator + "WEB-INF" + File.separator + "classes";
+            dest = new File(tmp3 + File.separator + "odm_mapping");
+
+        } catch (IOException ioe) {
+            OpenClinicaSystemException oe = new OpenClinicaSystemException("Unable to get web app base path");
+            oe.initCause(ioe);
+            oe.setStackTrace(ioe.getStackTrace());
+            throw oe;
+        }
+
+        if (!dest.exists()) {
+            if (!dest.mkdirs()) {
+                throw new OpenClinicaSystemException("Copying files, Could not create direcotry: " + dest.getAbsolutePath() + ".");
+            }
+        }
+
+        for (int i = 0; i < fileNames.length; i++) {
+            File dest1 = new File(dest, fileNames[i]);
+            // File src1 = listSrcFiles[i];
+            if (listSrcFiles[i] != null)
+                copyFiles(listSrcFiles[i], dest1);
+        }
+
+    }
+
+
+
     public ResourceLoader getResourceLoader() {
         return resourceLoader;
     }
@@ -662,6 +726,29 @@ public class CoreResources implements ResourceLoaderAware {
         }
 
     }
+
+    /**
+     * @pgawade 18-April-2011 - Fix for issue 8394 Method to set the absolute
+     *          file path value to point to "odm_mapping" in resources.
+     *          cd_odm_mapping.xml file used by Castor API during CRF data
+     *          import will be copied to this location during application
+     *          initialization
+     */
+    public void setODM_MAPPING_DIR() {
+        String resource = "classpath:datainfo.properties";
+
+        Resource scr = resourceLoader.getResource(resource);
+        String absolutePath = null;
+        try {
+
+            absolutePath = scr.getFile().getAbsolutePath();
+            ODM_MAPPING_DIR = absolutePath.replaceAll("datainfo.properties", "") + "odm_mapping";
+            System.out.println("ODM_MAPPING_DIR: " + ODM_MAPPING_DIR);
+        } catch (IOException e) {
+            throw new OpenClinicaSystemException(e.getMessage(), e.fillInStackTrace());
+        }
+    }
+
 
     public static String getDBName() {
         return DB_NAME;
