@@ -278,7 +278,10 @@ public class ImportSpringJob extends QuartzJobBean {
         File xsdFile = new File(propertiesPath + File.separator + "ODM1-3-0.xsd");
         File xsdFile2 = new File(propertiesPath + File.separator + "ODM1-2-1.xsd");
         boolean fail = false;
-        myMap.loadMapping(propertiesPath + File.separator + "cd_odm_mapping.xml");
+        // @pgawade 18-April-2011 Fix for issue 8394
+        String ODM_MAPPING_DIR_path = CoreResources.ODM_MAPPING_DIR;
+        myMap.loadMapping(ODM_MAPPING_DIR_path + File.separator + "cd_odm_mapping.xml");
+
         Unmarshaller um1 = new Unmarshaller(myMap);
         ODMContainer odmContainer = new ODMContainer();
         // BufferedWriter out = new BufferedWriter(new FileWriter(new File("log.txt")));
