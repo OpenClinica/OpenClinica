@@ -1,4 +1,4 @@
-<%@ page contentType="text/html; charset=UTF-8" %>
+e<%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
@@ -96,7 +96,7 @@
 
 <br clear="all">
 <input type="submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_long">
-<p><a href="pages/studymodule"/><fmt:message key="import_rules_back_to_study_build" bundle="${resword}"/></a></p>
+<p><a href="pages/studymodule"><fmt:message key="import_rules_back_to_study_build" bundle="${resword}"/></a></p>
 </form>
 
 
@@ -105,10 +105,6 @@
 <div>&nbsp;</div>
 <div class="homebox_bullets"><a href="javascript:openDocWindow('help/5_5_rules_Help.html')"><fmt:message key="rule_import_rules_documentation" bundle="${resterm}"/></a></div><br/>
  
-<span class="table_title_Admin"><fmt:message key="rule_import_example_rules" bundle="${resterm}"/></span>
-<div>&nbsp;</div>
-<div class="homebox_bullets"><a href="ImportRule?action=downloadrulesxsd"><fmt:message key="rule_import_cross_field_email" bundle="${resterm}"/></a></div><br/>
-<div class="homebox_bullets"><a href="ImportRule?action=downloadrulesxsd"><fmt:message key="rule_import_generic" bundle="${resterm}"/></a></div><br/>
 
 <span class="table_title_Admin"><fmt:message key="rule_import_templates" bundle="${resterm}"/></span>
 <div>&nbsp;</div>
