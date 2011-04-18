@@ -120,6 +120,7 @@ public class XsltTransformJob extends QuartzJobBean {
         Boolean exceptions = false;
         JobDataMap dataMap = context.getMergedJobDataMap();
         String localeStr = dataMap.getString(LOCALE);
+        String[] doNotDeleteUntilExtract = new String[4];
         int cnt = dataMap.getInt("count");
         DatasetBean datasetBean = null;
         if (localeStr != null) {
@@ -148,6 +149,8 @@ public class XsltTransformJob extends QuartzJobBean {
             // logger.info("found output path: " + outputPath);
             logger.debug("found output path: " + outputPath);
             String generalFileDir = dataMap.getString(XML_FILE_PATH);
+            
+            
             int epBeanId = dataMap.getInt(EXTRACT_PROPERTY);
             int dsId = dataMap.getInt(DATASET_ID);
             // JN: Change from earlier versions, cannot get static reference as
@@ -155,7 +158,17 @@ public class XsltTransformJob extends QuartzJobBean {
             // datasetId as a variable which is different for each dataset and
             // that needs to be loaded dynamically
             ExtractPropertyBean epBean = (ExtractPropertyBean) dataMap.get(EP_BEAN);
+           
+            File doNotDelDir = new File(generalFileDir);
+            if(doNotDelDir.isDirectory())
+            {
+                doNotDeleteUntilExtract = doNotDelDir.list();
+            }
+            
+           // doNotDeleteUntilExtract = outputPath + File.separator + epBean.getExportFileName()[0];
+            
             zipped = epBean.getZipFormat();
+           
             deleteOld = epBean.getDeleteOld();
             long sysTimeBegin = System.currentTimeMillis();
             userAccountDao = new UserAccountDAO(dataSource);
@@ -536,8 +549,11 @@ public class XsltTransformJob extends QuartzJobBean {
                 logger.debug("EXCEPTIONS... EVEN TEHN DELETING OFF OLD FILES");
                 String generalFileDir = dataMap.getString(XML_FILE_PATH);
                 File oldFilesPath = new File(generalFileDir);
-
-                String endFile = dataMap.getString(POST_FILE_PATH) + File.separator + dataMap.getString(POST_FILE_NAME);
+                String endFile = "";
+                ExtractPropertyBean epBean = (ExtractPropertyBean) dataMap.get(EP_BEAN);
+                
+                //if()
+                endFile = dataMap.getString(POST_FILE_PATH) + File.separator + dataMap.getString(POST_FILE_NAME);
                 if (oldFilesPath.isDirectory()) {
 
                     markForDelete = Arrays.asList(oldFilesPath.listFiles());
@@ -546,7 +562,7 @@ public class XsltTransformJob extends QuartzJobBean {
                 logger.debug("deleting the old files reference from archive dataset");
 
                 if (deleteOld) {
-                    deleteIntermFiles(markForDelete, endFile, new String[1]);
+                    deleteIntermFiles(markForDelete, endFile, doNotDeleteUntilExtract);
                 }
 
             }
