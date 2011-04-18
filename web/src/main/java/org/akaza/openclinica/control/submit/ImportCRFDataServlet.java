@@ -7,6 +7,15 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -30,15 +39,6 @@ import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.crfdata.ImportCRFDataService;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Unmarshaller;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * Create a new CRF verison by uploading excel file. Makes use of several other
@@ -148,8 +148,8 @@ public class ImportCRFDataServlet extends SecureController {
             // // above sets to validate against namespace
 
             Mapping myMap = new Mapping();
-            String propertiesPath = CoreResources.PROPERTIES_DIR;
-            myMap.loadMapping(propertiesPath + File.separator + "cd_odm_mapping.xml");
+            String ODM_MAPPING_DIRPath = CoreResources.ODM_MAPPING_DIR;
+            myMap.loadMapping(ODM_MAPPING_DIRPath + File.separator + "cd_odm_mapping.xml");
 
             Unmarshaller um1 = new Unmarshaller(myMap);
             //um1.addNamespaceToPackageMapping("http://www.cdisc.org/ns/odm/v1.3"
