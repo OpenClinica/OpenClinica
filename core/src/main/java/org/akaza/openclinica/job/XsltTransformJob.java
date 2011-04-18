@@ -202,9 +202,9 @@ public class XsltTransformJob extends QuartzJobBean {
             // transformation
             // this will have to be toggled by the export data format? no, the
             // export file will have to be zipped/not zipped
-            String ODMXMLFileName = "";
+            String ODMXMLFileName = "Jamuna_TestD20110418154620-0400.xml";
             int fId = 0;
-            for (Iterator it = answerMap.entrySet().iterator(); it.hasNext();) {
+           /* for (Iterator it = answerMap.entrySet().iterator(); it.hasNext();) {
                 java.util.Map.Entry entry = (java.util.Map.Entry) it.next();
                 Object key = entry.getKey();
                 Object value = entry.getValue();
@@ -215,7 +215,7 @@ public class XsltTransformJob extends QuartzJobBean {
                 Integer fileID = (Integer) value;
                 fId = fileID.intValue();
                 logger.debug("found " + fId + " and " + ODMXMLFileName);
-            }
+            }*/
 
             // create dirs
 
@@ -496,7 +496,10 @@ public class XsltTransformJob extends QuartzJobBean {
             }
 
             logger.info("just sent email to " + alertEmail + ", from " + EmailEngine.getAdminEmail());
-            dataMap.put("successMsg", successMsg);
+            if(successMsg==null) successMsg =" "; 
+                
+                
+           postSuccessMessage(successMsg, context);
             logMe(emailBuffer.toString());
         } catch (TransformerConfigurationException e) {
             sendErrorEmail(e.getMessage(), context, alertEmail);
@@ -774,6 +777,22 @@ public class XsltTransformJob extends QuartzJobBean {
         return exisitingFiles;
     }
 
+    private void postSuccessMessage(String message,JobExecutionContext context){
+        String SCHEDULER = "schedulerFactoryBean";
+        try {
+            ApplicationContext appContext = (ApplicationContext) context.getScheduler().getContext().get("applicationContext");
+            StdScheduler scheduler = (StdScheduler) appContext.getBean(SCHEDULER);
+            JobDetail jobDetail = context.getJobDetail();
+            JobDataMap dataMap = jobDetail.getJobDataMap();
+            dataMap.put("successMsg", message);
+            jobDetail.setJobDataMap(dataMap);
+            // replace the job with the extra data
+            scheduler.addJob(jobDetail, true);
+
+        } catch (Exception e) {
+
+        }
+    }
     private void postErrorMessage(String message, JobExecutionContext context) {
         String SCHEDULER = "schedulerFactoryBean";
         try {

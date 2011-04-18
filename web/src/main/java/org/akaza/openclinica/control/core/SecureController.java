@@ -278,7 +278,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 // ProcessingResultType message = (ProcessingResultType) details.getResult();
                 org.quartz.JobDataMap dataMap = details.getJobDataMap();
                 String failMessage = dataMap.getString("failMessage");
-                if (state == Trigger.STATE_NONE) {
+                if (state == Trigger.STATE_NONE || state== Trigger.STATE_COMPLETE) {
                     // add the message here that your export is done
                     System.out.println("adding a message!");
                     // TODO make absolute paths in the message, for example a link from /pages/* would break
@@ -293,18 +293,20 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                         request.getSession().removeAttribute("groupName");
                         request.getSession().removeAttribute("datasetId");
                     } else {
-                        String successMsg = dataMap.getString("successMessage");
-                        if (successMsg != null ) {
+                        String successMsg = dataMap.getString("SUCCESS_MESSAGE");
+                        String success = dataMap.getString("successMsg");
+                        if (success != null ) {
+                            
                             if (successMsg.contains("$linkURL")) {
                                 successMsg = decodeLINKURL(successMsg, datasetId);
                             }
-
+                       
                             addPageMessage("Your Extract is now completed. Please go to review them at <a href='ViewDatasets'>View Datasets</a> or <a href='ExportDataset?datasetId="
                                 + datasetId + "'>View Specific Dataset</a>." + successMsg);
                             request.getSession().removeAttribute("jobName");
                             request.getSession().removeAttribute("groupName");
                             request.getSession().removeAttribute("datasetId");
-                        } 
+                        }
                     }
                    
                 } else {
