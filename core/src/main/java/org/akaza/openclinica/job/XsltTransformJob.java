@@ -202,9 +202,9 @@ public class XsltTransformJob extends QuartzJobBean {
             // transformation
             // this will have to be toggled by the export data format? no, the
             // export file will have to be zipped/not zipped
-            String ODMXMLFileName = "";
+            String ODMXMLFileName = "Jamuna_TestD20110418154620-0400.xml";
             int fId = 0;
-            for (Iterator it = answerMap.entrySet().iterator(); it.hasNext();) {
+           /* for (Iterator it = answerMap.entrySet().iterator(); it.hasNext();) {
                 java.util.Map.Entry entry = (java.util.Map.Entry) it.next();
                 Object key = entry.getKey();
                 Object value = entry.getValue();
@@ -215,7 +215,7 @@ public class XsltTransformJob extends QuartzJobBean {
                 Integer fileID = (Integer) value;
                 fId = fileID.intValue();
                 logger.debug("found " + fId + " and " + ODMXMLFileName);
-            }
+            }*/
 
             // create dirs
 
@@ -445,9 +445,12 @@ public class XsltTransformJob extends QuartzJobBean {
                     deleteOldFiles(tempFile.listFiles(xmlFilter));
                 }
 
+               final double sysTimeEnd = setFormat((System.currentTimeMillis() - start)/60000);
                 ArchivedDatasetFileBean fbFinal =
                     generateFileRecord(archivedFilename, outputPath, datasetBean, done, new File(outputPath + File.separator + archivedFilename).length(),
                             ExportFormatBean.TXTFILE, userAccountId);
+               
+                
                 if (jobName != null) {
                     subject = "Job Ran: " + jobName;
                 } else {
@@ -872,7 +875,8 @@ public class XsltTransformJob extends QuartzJobBean {
 
     // Utility method to format upto 3 decimals.
     private double setFormat(double number) {
-        DecimalFormat df = new DecimalFormat("#.###");
+        if(number <1) number=1.0;
+        DecimalFormat df = new DecimalFormat("#.#");
         logger.info("Number is" + Double.parseDouble(df.format(number)));
         logger.info("Number is" + (float) Double.parseDouble(df.format(number)));
         return  Double.valueOf(df.format(number));
