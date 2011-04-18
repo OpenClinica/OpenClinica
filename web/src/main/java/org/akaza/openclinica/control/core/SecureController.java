@@ -289,23 +289,24 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                         // More information may be available in the log files.
                         addPageMessage("The extract data job failed with the message: <br/><br/>" + failMessage
                             + "<br/><br/>More information may be available in the log files.");
+                        request.getSession().removeAttribute("jobName");
+                        request.getSession().removeAttribute("groupName");
+                        request.getSession().removeAttribute("datasetId");
                     } else {
-                        String successMsg = dataMap.getString("SUCCESS_MESSAGE");
-                        if (successMsg != null) {
+                        String successMsg = dataMap.getString("successMessage");
+                        if (successMsg != null ) {
                             if (successMsg.contains("$linkURL")) {
                                 successMsg = decodeLINKURL(successMsg, datasetId);
                             }
 
                             addPageMessage("Your Extract is now completed. Please go to review them at <a href='ViewDatasets'>View Datasets</a> or <a href='ExportDataset?datasetId="
                                 + datasetId + "'>View Specific Dataset</a>." + successMsg);
-                        } else {
-                            addPageMessage("Your Extract is now completed. Please go to review them at <a href='ViewDatasets'>View Datasets</a> or <a href='ExportDataset?datasetId="
-                                + datasetId + "'>View Specific Dataset</a>.");
-                        }
+                            request.getSession().removeAttribute("jobName");
+                            request.getSession().removeAttribute("groupName");
+                            request.getSession().removeAttribute("datasetId");
+                        } 
                     }
-                    request.getSession().removeAttribute("jobName");
-                    request.getSession().removeAttribute("groupName");
-                    request.getSession().removeAttribute("datasetId");
+                   
                 } else {
 
                 }

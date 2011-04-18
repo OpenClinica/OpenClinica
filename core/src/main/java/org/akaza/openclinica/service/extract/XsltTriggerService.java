@@ -1,14 +1,11 @@
 package org.akaza.openclinica.service.extract;
 
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
-import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.quartz.JobDataMap;
 import org.quartz.SimpleTrigger;
 
 import java.util.Date;
-import java.text.SimpleDateFormat;
-import java.io.File;
 import java.math.BigInteger;
 
 public class XsltTriggerService {
@@ -92,139 +89,6 @@ public class XsltTriggerService {
         
         return trigger;
     }
-
-    /**
-     * Returns the datetime based on pattern :"yyyy-MM-dd-HHmmssSSS", typically for resolving file name
-     * @param endFilePath
-     * @param dsBean
-     * @param sdfDir
-     * @return
-     */
-    public static String resolveVars(String endFilePath, DatasetBean dsBean, SimpleDateFormat sdfDir, String filePath){
-
-        if(endFilePath.contains("$exportFilePath")) {
-            endFilePath = 	endFilePath.replace("$exportFilePath", filePath);// was + File.separator, tbh
-        }
-
-         if(endFilePath.contains("${exportFilePath}")) {
-            endFilePath = 	endFilePath.replace("${exportFilePath}", filePath);// was + File.separator, tbh
-        }
-        if(endFilePath.contains("$datasetId")) {
-        	endFilePath = endFilePath.replace("$datasetId", dsBean.getId()+"");
-        }
-        if(endFilePath.contains("${datasetId}")) {
-         	endFilePath = endFilePath.replace("${datasetId}", dsBean.getId()+"");
-         }
-        if(endFilePath.contains("$datasetName")) {
-        	endFilePath = endFilePath.replace("$datasetName", dsBean.getName());
-        }
-        if(endFilePath.contains("${datasetName}"))
-       		 {
-       	 endFilePath = endFilePath.replace("${datasetName}", dsBean.getName());
-       		 }
-        if(endFilePath.contains("$datetime")) {
-       	 String simpleDatePattern = "yyyy-MM-dd-HHmmssSSS";
-             sdfDir = new SimpleDateFormat(simpleDatePattern);
-       	endFilePath = endFilePath.replace("$datetime",  sdfDir.format(new java.util.Date()));
-       }
-       if(endFilePath.contains("${datetime}")){
-       	 String simpleDatePattern = "yyyy-MM-dd-HHmmssSSS";
-            sdfDir = new SimpleDateFormat(simpleDatePattern);
-      		endFilePath = endFilePath.replace("${datetime}",  sdfDir.format(new java.util.Date()));
-       }
-       if(endFilePath.contains("$dateTime")) {
-      	 String simpleDatePattern = "yyyy-MM-dd-HHmmssSSS";
-        sdfDir = new SimpleDateFormat(simpleDatePattern);
-        	endFilePath = endFilePath.replace("$dateTime",  sdfDir.format(new java.util.Date()));
-        }
-        if(endFilePath.contains("${dateTime}")){
-       	 String simpleDatePattern = "yyyy-MM-dd-HHmmssSSS";
-            sdfDir = new SimpleDateFormat(simpleDatePattern);
-       		endFilePath = endFilePath.replace("${dateTime}",  sdfDir.format(new java.util.Date()));
-        }
-        if(endFilePath.contains("$date")) {
-        	 String dateFilePattern = "yyyy-MM-dd";
-        	  sdfDir = new SimpleDateFormat(dateFilePattern);
-        	endFilePath = endFilePath.replace("$date",sdfDir.format(new java.util.Date()) );
-        }
-        if(endFilePath.contains("${date}"))
-        {
-        	 String dateFilePattern = "yyyy-MM-dd";
-        	  sdfDir = new SimpleDateFormat(dateFilePattern);
-       	 endFilePath = endFilePath.replace("${date}",sdfDir.format(new java.util.Date()) );
-        }
-        //TODO change to dateTime
-
-   	return endFilePath;
-   }
-
-    //TODO: ${linkURL} needs to be added
-    /**
-     *
-     * for dateTimePattern, the directory structure is created. "yyyy" + File.separator + "MM" + File.separator + "dd" + File.separator,
-     * to resolve location
-     */
-    public static String getEndFilePath(String endFilePath, DatasetBean dsBean, SimpleDateFormat sdfDir, String filePath){
-    	 String simpleDatePattern =  "yyyy" + File.separator + "MM" + File.separator + "dd" + File.separator ;
-         SimpleDateFormat sdpDir = new SimpleDateFormat(simpleDatePattern);
-
-
-         if(endFilePath.contains("$exportFilePath")) {
-             endFilePath = 	endFilePath.replace("$exportFilePath", filePath);// was + File.separator, tbh
-         }
-
-          if(endFilePath.contains("${exportFilePath}")) {
-             endFilePath = 	endFilePath.replace("${exportFilePath}", filePath);// was + File.separator, tbh
-         }
-         if(endFilePath.contains("$datasetId")) {
-         	endFilePath = endFilePath.replace("$datasetId", dsBean.getId()+"");
-         }
-         if(endFilePath.contains("${datasetId}")) {
-          	endFilePath = endFilePath.replace("${datasetId}", dsBean.getId()+"");
-          }
-         if(endFilePath.contains("$datasetName")) {
-         	endFilePath = endFilePath.replace("$datasetName", dsBean.getName());
-         }
-         if(endFilePath.contains("${datasetName}"))
-        		 {
-        	 endFilePath = endFilePath.replace("${datasetName}", dsBean.getName());
-        		 }
-         //TODO change to dateTime
-         if(endFilePath.contains("$datetime")) {
-         	endFilePath = endFilePath.replace("$datetime",  sdfDir.format(new java.util.Date()));
-         }
-         if(endFilePath.contains("${datetime}")){
-        		endFilePath = endFilePath.replace("${datetime}",  sdfDir.format(new java.util.Date()));
-         }
-         if(endFilePath.contains("$dateTime")) {
-          	endFilePath = endFilePath.replace("$dateTime",  sdfDir.format(new java.util.Date()));
-          }
-          if(endFilePath.contains("${dateTime}")){
-         		endFilePath = endFilePath.replace("${dateTime}",  sdfDir.format(new java.util.Date()));
-          }
-         if(endFilePath.contains("$date")) {
-
-         	endFilePath = endFilePath.replace("$date",sdpDir.format(new java.util.Date()) );
-         }
-         if(endFilePath.contains("${date}"))
-         {
-        	 endFilePath = endFilePath.replace("${date}",sdpDir.format(new java.util.Date()) );
-         }
-
-    	return endFilePath;
-    }
-
-    public static ExtractPropertyBean setAllProps(ExtractPropertyBean epBean,DatasetBean dsBean,SimpleDateFormat sdfDir, String filePath) {
-    	epBean.setFiledescription(XsltTriggerService.resolveVars(epBean.getFiledescription(), dsBean, sdfDir, filePath));
-    	epBean.setLinkText(XsltTriggerService.resolveVars(epBean.getLinkText(), dsBean, sdfDir, filePath));
-    	epBean.setHelpText(XsltTriggerService.resolveVars(epBean.getHelpText(), dsBean, sdfDir, filePath));
-    	epBean.setFileLocation(XsltTriggerService.resolveVars(epBean.getFileLocation(), dsBean, sdfDir, filePath));
-    	epBean.setFailureMessage(XsltTriggerService.resolveVars(epBean.getFailureMessage(), dsBean, sdfDir, filePath));
-    	epBean.setSuccessMessage(XsltTriggerService.resolveVars(epBean.getSuccessMessage(), dsBean, sdfDir, filePath));
-    	epBean.setZipName(XsltTriggerService.resolveVars(epBean.getZipName(), dsBean, sdfDir, filePath));
-    	epBean.setDatasetName(dsBean.getName());//JN:Adding this line to reflect the dataset name in the scheduled jobs list.
-    	return epBean;
-	}
 
     public static long getIntervalTime(String period) {
         BigInteger interval = new BigInteger("0");

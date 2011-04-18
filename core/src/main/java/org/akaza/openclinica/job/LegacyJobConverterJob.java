@@ -6,6 +6,7 @@ import org.springframework.context.ApplicationContext;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.akaza.openclinica.service.extract.ExtractUtils;
 import org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.extract.DatasetBean;
@@ -46,7 +47,7 @@ public class LegacyJobConverterJob extends QuartzJobBean {
             Scheduler scheduler = context.getScheduler();
             String triggerGroup = "DEFAULT";
             String[] legacyTriggers = scheduler.getTriggerNames(triggerGroup);
-
+ExtractUtils extractUtils = new ExtractUtils();
             if (legacyTriggers == null && legacyTriggers.length == 0) {
                 logger.info("No legacy jobs to convert");
                 return;
@@ -93,7 +94,7 @@ public class LegacyJobConverterJob extends QuartzJobBean {
                     String datasetFilePath = getFilePath(context) + "datasets";
 
                     while(i<exportFiles.length) {
-                        temp[i] = XsltTriggerService.resolveVars(exportFiles[i],dsBean,sdfDir, datasetFilePath);
+                        temp[i] = extractUtils.resolveVars(exportFiles[i],dsBean,sdfDir, datasetFilePath);
                         i++;
                     }
                     epBean.setDoNotDelFiles(temp);
@@ -105,18 +106,18 @@ public class LegacyJobConverterJob extends QuartzJobBean {
 
                     String xsltPath = getFilePath(context) + "xslt" + File.separator + files[0];
                     String endFilePath = epBean.getFileLocation();
-                    endFilePath  =  XsltTriggerService.getEndFilePath(endFilePath, dsBean, sdfDir, datasetFilePath);
+                    endFilePath  =  extractUtils.getEndFilePath(endFilePath, dsBean, sdfDir, datasetFilePath);
 
                     if(epBean.getPostProcExportName() !=null ) {
-                        String preProcExportPathName = XsltTriggerService.resolveVars(epBean.getPostProcExportName(),dsBean,sdfDir, datasetFilePath);
+                        String preProcExportPathName = extractUtils.resolveVars(epBean.getPostProcExportName(),dsBean,sdfDir, datasetFilePath);
                         epBean.setPostProcExportName(preProcExportPathName);
                     }
                     if (epBean.getPostProcLocation()!=null) {
-                        String prePocLoc = XsltTriggerService.getEndFilePath(epBean.getPostProcLocation(), dsBean, sdfDir, datasetFilePath);
+                        String prePocLoc = extractUtils.getEndFilePath(epBean.getPostProcLocation(), dsBean, sdfDir, datasetFilePath);
                         epBean.setPostProcLocation(prePocLoc);
                     }
 
-                    XsltTriggerService.setAllProps(epBean, dsBean, sdfDir, datasetFilePath);
+                    extractUtils.setAllProps(epBean, dsBean, sdfDir, datasetFilePath);
                     XsltTriggerService xsltService = new XsltTriggerService();
                     SimpleTrigger newTrigger = null;
                     newTrigger = xsltService.generateXsltTrigger(xsltPath,

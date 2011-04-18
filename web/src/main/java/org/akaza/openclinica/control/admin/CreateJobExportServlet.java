@@ -13,6 +13,7 @@ import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.service.extract.ExtractUtils;
 import org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -125,6 +126,7 @@ public class CreateJobExportServlet extends SecureController {
         TriggerService triggerService = new TriggerService();
         scheduler = getScheduler();
         String action = fp.getString("action");
+        ExtractUtils extractUtils = new ExtractUtils();
         if (StringUtil.isBlank(action)) {
             // set up list of data sets
             // select by ... active study
@@ -179,7 +181,7 @@ public class CreateJobExportServlet extends SecureController {
 
                 while(i<exportFiles.length)
                 {
-                    temp[i] = XsltTriggerService.resolveVars(exportFiles[i],dsBean,sdfDir, datasetFilePath);
+                    temp[i] = extractUtils.resolveVars(exportFiles[i],dsBean,sdfDir, datasetFilePath);
                     i++;
                 }
                 epBean.setDoNotDelFiles(temp);
@@ -198,20 +200,20 @@ public class CreateJobExportServlet extends SecureController {
                 //JN all the properties need to have the variables...
                 String xsltPath = SQLInitServlet.getField("filePath") + "xslt" + File.separator +files[cnt];
                 String endFilePath = epBean.getFileLocation();
-                endFilePath  =  XsltTriggerService.getEndFilePath(endFilePath, dsBean, sdfDir, datasetFilePath);
+                endFilePath  =  extractUtils.getEndFilePath(endFilePath, dsBean, sdfDir, datasetFilePath);
               //  exportFileName = resolveVars(exportFileName,dsBean,sdfDir);
                 if(epBean.getPostProcExportName()!=null)
                 {
                     //String preProcExportPathName = getEndFilePath(epBean.getPostProcExportName(),dsBean,sdfDir);
-                    String preProcExportPathName = XsltTriggerService.resolveVars(epBean.getPostProcExportName(),dsBean,sdfDir, datasetFilePath);
+                    String preProcExportPathName =  extractUtils.resolveVars(epBean.getPostProcExportName(),dsBean,sdfDir, datasetFilePath);
                     epBean.setPostProcExportName(preProcExportPathName);
                 }
                 if(epBean.getPostProcLocation()!=null)
                 {
-                    String prePocLoc = XsltTriggerService.getEndFilePath(epBean.getPostProcLocation(), dsBean, sdfDir, datasetFilePath);
+                    String prePocLoc = extractUtils.getEndFilePath(epBean.getPostProcLocation(), dsBean, sdfDir, datasetFilePath);
                     epBean.setPostProcLocation(prePocLoc);
                 }
-                XsltTriggerService.setAllProps(epBean, dsBean, sdfDir, datasetFilePath);
+                extractUtils.setAllProps(epBean, dsBean, sdfDir, datasetFilePath);
                 SimpleTrigger trigger = null;
 
                 trigger = xsltService.generateXsltTrigger(xsltPath,
