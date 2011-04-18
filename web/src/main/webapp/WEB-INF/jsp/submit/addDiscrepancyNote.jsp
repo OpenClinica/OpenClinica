@@ -167,13 +167,22 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
 	        <td class="table_cell_noborder"><fmt:message key="subject" bundle="${resword}"/>:&nbsp;&nbsp;</td>
 	        <td class="table_cell_noborder"><b><c:out value="${discrepancyNote.subjectName}"/></b></td>
 	        <td class="table_cell_noborder" style="padding-left: 40px;"><fmt:message key="event" bundle="${resword}"/>:&nbsp;&nbsp;</td>
-	        <td class="table_cell_noborder"><b><c:out value="${discrepancyNote.eventName}"/></b></td>
+	        <td class="table_cell_noborder"><b><c:out value="${discrepancyNote.eventName =='' ? 'N/A' : discrepancyNote.eventName}"/></b></td>
     	</tr>
         <tr>
             <td class="table_cell_noborder"><fmt:message key="event_date" bundle="${resword}"/>:&nbsp;&nbsp;</td>
-            <td class="table_cell_noborder"><b><fmt:formatDate value="${discrepancyNote.eventStart}" pattern="${dteFormat}"/></b></td>
+            <td class="table_cell_noborder">
+                <c:choose>
+                    <c:when test="${discrepancyNote.eventStart == null}">
+                        <b><fmt:message key="N/A" bundle="${resword}"/></b>
+                    </c:when>
+                    <c:otherwise>
+                        <b><fmt:formatDate value="${discrepancyNote.eventStart}" pattern="${dteFormat}"/></b>
+                    </c:otherwise>
+                </c:choose>
+            </td>
             <td class="table_cell_noborder" style="padding-left: 40px;"><fmt:message key="CRF" bundle="${resword}"/>:&nbsp;&nbsp;</td>
-            <td class="table_cell_noborder"><b><c:out value="${discrepancyNote.crfName}"/></b></td>
+            <td class="table_cell_noborder"><b><c:out value="${discrepancyNote.crfName == '' ? 'N/A' : discrepancyNote.crfName}"/></b></td>
         </tr>
         <tr>
         	<td class="table_cell_noborder"><fmt:message key="Current_Value" bundle="${resword}"/>:&nbsp;&nbsp;</td>
@@ -186,6 +195,7 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
                 <fmt:message key="Data_Dictionary" bundle="${resword}"/></a>
             </c:when>
             <c:otherwise>
+                <b><fmt:message key="N/A" bundle="${resword}"/></b>
             </c:otherwise>
             </c:choose>
             </td>

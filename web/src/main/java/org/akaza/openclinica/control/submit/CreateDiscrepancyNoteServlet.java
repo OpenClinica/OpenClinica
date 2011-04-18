@@ -245,6 +245,8 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                     if ("enrollment_date".equalsIgnoreCase(column)) {
                         if (ssub.getEnrollmentDate() != null) {
                             request.setAttribute("entityValue", dateFormatter.format(ssub.getEnrollmentDate()));
+                        } else {
+                            request.setAttribute("entityValue", resword.getString("N/A"));
                         }
                         request.setAttribute("entityName", resword.getString("enrollment_date"));
                     } else if ("gender".equalsIgnoreCase(column)) {
@@ -253,6 +255,8 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                     } else if ("date_of_birth".equalsIgnoreCase(column)) {
                         if (sub.getDateOfBirth() != null) {
                             request.setAttribute("entityValue", dateFormatter.format(sub.getDateOfBirth()));
+                        } else {
+                            request.setAttribute("entityValue", resword.getString("N/A"));
                         }
                         request.setAttribute("entityName", resword.getString("date_of_birth"));
                     } else if ("unique_identifier".equalsIgnoreCase(column)) {
@@ -284,16 +288,20 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                 preUserId = se.getOwnerId();
                 if (!StringUtil.isBlank(column)) {
                     if ("location".equalsIgnoreCase(column)) {
-                        request.setAttribute("entityValue", se.getLocation());
+                        request.setAttribute("entityValue", (se.getLocation().equals("") || se.getLocation() == null) ? resword.getString("N/A") : se.getLocation());
                         request.setAttribute("entityName", resword.getString("location"));
-                    } else if ("date_start".equalsIgnoreCase(column)) {
+                    } else if ("start_date".equalsIgnoreCase(column)) {
                         if (se.getDateStarted() != null) {
                             request.setAttribute("entityValue", dateFormatter.format(se.getDateStarted()));
+                        } else {
+                            request.setAttribute("entityValue", resword.getString("N/A"));
                         }
                         request.setAttribute("entityName", resword.getString("start_date"));
-                    } else if ("date_end".equalsIgnoreCase(column)) {
+                    } else if ("end_date".equalsIgnoreCase(column)) {
                         if (se.getDateEnded() != null) {
                             request.setAttribute("entityValue", dateFormatter.format(se.getDateEnded()));
+                        } else {
+                            request.setAttribute("entityValue", resword.getString("N/A"));
                         }
                         request.setAttribute("entityName", resword.getString("end_date"));
                     }
@@ -305,6 +313,8 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                     if ("date_interviewed".equals(column)) {
                         if (ec.getDateInterviewed() != null) {
                             request.setAttribute("entityValue", dateFormatter.format(ec.getDateInterviewed()));
+                        } else {
+                            request.setAttribute("entityValue", resword.getString("N/A"));
                         }
                         request.setAttribute("entityName", resword.getString("date_interviewed"));
                     } else if ("interviewer_name".equals(column)) {
