@@ -62,6 +62,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -89,6 +90,8 @@ public class RuleController {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     @Autowired
     CoreResources coreResources;
+
+    private final static String DUPLICATE_MESSAGE = "DUPLICATE";
 
     private RulesPostImportContainer mapRulesToRulesPostImportContainer(org.openclinica.ns.rules.v31.Rules rules) {
         RulesPostImportContainer rpic = new RulesPostImportContainer();
@@ -340,8 +343,8 @@ public class RuleController {
 
     @RequestMapping(value = "/studies/{study}/validateAndSaveRule", method = RequestMethod.POST)
     public @ResponseBody
-    Response validateAndSave(@RequestBody org.openclinica.ns.rules.v31.Rules rules, Model model, HttpSession session, @PathVariable("study") String studyOid)
-            throws Exception {
+    Response validateAndSave(@RequestBody org.openclinica.ns.rules.v31.Rules rules, Model model, HttpSession session, @PathVariable("study") String studyOid,
+            @RequestParam("ignoreDuplicates") Boolean ignoreDuplicates) throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         RulesPostImportContainer rpic = mapRulesToRulesPostImportContainer(rules);
         StudyDAO studyDao = new StudyDAO(dataSource);
@@ -370,6 +373,13 @@ public class RuleController {
                     messageType.setMessage(error);
                     response.getMessages().add(messageType);
                 }
+            }
+        } else if ((rpic.getDuplicateRuleDefs().size() > 0 || rpic.getDuplicateRuleSetDefs().size() > 0) && !ignoreDuplicates) {
+            response.setValid(Boolean.FALSE);
+            for (AuditableBeanWrapper<RuleBean> beanWrapper : rpic.getDuplicateRuleDefs()) {
+                org.openclinica.ns.response.v31.MessagesType messageType = new MessagesType();
+                messageType.setMessage(DUPLICATE_MESSAGE);
+                response.getMessages().add(messageType);
             }
         } else {
             getRuleSetService().saveImport(rpic);
