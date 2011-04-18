@@ -148,6 +148,7 @@ public class ImportCRFDataServlet extends SecureController {
             // // above sets to validate against namespace
 
             Mapping myMap = new Mapping();
+            // @pgawade 18-April-2011 Fix for issue 8394
             String ODM_MAPPING_DIRPath = CoreResources.ODM_MAPPING_DIR;
             myMap.loadMapping(ODM_MAPPING_DIRPath + File.separator + "cd_odm_mapping.xml");
 
