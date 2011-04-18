@@ -54,11 +54,11 @@ public class StudyParameterConfig {
         discrepancyManagement = "true";
         genderRequired = "true";
         subjectPersonIdRequired = "required";
-        interviewerNameRequired = "yes";
+        interviewerNameRequired = "not_used";
 
         interviewerNameDefault = "blank";
         interviewerNameEditable = "true";
-        interviewDateRequired = "yes";
+        interviewDateRequired = "not_used";
         interviewDateDefault = "blank"; // blank, pre-populated
         interviewDateEditable = "true";// editable or not
         subjectIdGeneration = "manual";// manual, auto non-editable, auto
