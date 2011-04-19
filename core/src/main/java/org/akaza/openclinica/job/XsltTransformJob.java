@@ -202,9 +202,9 @@ public class XsltTransformJob extends QuartzJobBean {
             // transformation
             // this will have to be toggled by the export data format? no, the
             // export file will have to be zipped/not zipped
-            String ODMXMLFileName = "Jamuna_TestD20110418154620-0400.xml";
+            String ODMXMLFileName = "";
             int fId = 0;
-         /*   for (Iterator it = answerMap.entrySet().iterator(); it.hasNext();) {
+            for (Iterator it = answerMap.entrySet().iterator(); it.hasNext();) {
                 java.util.Map.Entry entry = (java.util.Map.Entry) it.next();
                 Object key = entry.getKey();
                 Object value = entry.getValue();
@@ -216,7 +216,7 @@ public class XsltTransformJob extends QuartzJobBean {
                 fId = fileID.intValue();
                 logger.debug("found " + fId + " and " + ODMXMLFileName);
             }
-*/
+
             // create dirs
 
             File output = new File(outputPath);
