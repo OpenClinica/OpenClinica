@@ -202,9 +202,9 @@ public class XsltTransformJob extends QuartzJobBean {
             // transformation
             // this will have to be toggled by the export data format? no, the
             // export file will have to be zipped/not zipped
-            String ODMXMLFileName = "";
+            String ODMXMLFileName = "Jamuna_TestD20110418154620-0400.xml";
             int fId = 0;
-            for (Iterator it = answerMap.entrySet().iterator(); it.hasNext();) {
+         /*   for (Iterator it = answerMap.entrySet().iterator(); it.hasNext();) {
                 java.util.Map.Entry entry = (java.util.Map.Entry) it.next();
                 Object key = entry.getKey();
                 Object value = entry.getValue();
@@ -216,7 +216,7 @@ public class XsltTransformJob extends QuartzJobBean {
                 fId = fileID.intValue();
                 logger.debug("found " + fId + " and " + ODMXMLFileName);
             }
-
+*/
             // create dirs
 
             File output = new File(outputPath);
@@ -340,16 +340,17 @@ public class XsltTransformJob extends QuartzJobBean {
                                 ExportFormatBean.PDFFILE, userAccountId);
 
                     if (successMsg == null || successMsg.isEmpty()) {
-                        emailBuffer.append("<p>" + pageMessages.getString("html_email_body_4") + " " + fbFinal.getName()
+                   /*     emailBuffer.append("<p>" + pageMessages.getString("html_email_body_4") + " " + fbFinal.getName()
                             + pageMessages.getString("html_email_body_4_5") + CoreResources.getField("sysURL.base") + "AccessFile?fileId=" + fbFinal.getId()
                             + pageMessages.getString("html_email_body_3") + "</p>");
-
+*/
                     }
 
                     if (successMsg.contains("$linkURL")) {
                         successMsg =
                             successMsg.replace("$linkURL", "<a href=\"" + CoreResources.getField("sysURL.base") + "AccessFile?fileId=" + fbFinal.getId()
-                                + "\">here </a>");
+                                + "\">" + CoreResources.getField("sysURL.base") + "AccessFile?fileId=" + fbFinal.getId()
+                                + " </a>");
                     }
                     emailBuffer.append("<p>" + successMsg + "</p>");
                     logMe("System time begining.."+sysTimeBegin);
@@ -464,16 +465,17 @@ public class XsltTransformJob extends QuartzJobBean {
                 // fbFinal.getId() + "'>here</a>.";
 
                 if (successMsg == null || successMsg.isEmpty()) {
-                    emailBuffer.append("<p>" + pageMessages.getString("html_email_body_4") + " " + fbFinal.getName()
+                /*    emailBuffer.append("<p>" + pageMessages.getString("html_email_body_4") + " " + fbFinal.getName()
                         + pageMessages.getString("html_email_body_4_5") + CoreResources.getField("sysURL.base") + "AccessFile?fileId=" + fbFinal.getId()
                         + pageMessages.getString("html_email_body_3") + "</p>");
-                    logger.info("email buffer??" + emailBuffer);
+                */    logger.info("email buffer??" + emailBuffer);
 
                 } else {
                     if (successMsg.contains("$linkURL")) {
                         successMsg =
                             successMsg.replace("$linkURL", "<a href=\"" + CoreResources.getField("sysURL.base") + "AccessFile?fileId=" + fbFinal.getId()
-                                + "\">here </a>");
+                                + "\">" + CoreResources.getField("sysURL.base") + "AccessFile?fileId=" + fbFinal.getId()
+                                + " </a>");
                     }
                     emailBuffer.append("<p>" + successMsg + "</p>");
                 }
