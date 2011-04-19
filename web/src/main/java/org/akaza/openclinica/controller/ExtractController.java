@@ -10,6 +10,7 @@ import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
 import org.akaza.openclinica.service.extract.ExtractUtils;
 import org.akaza.openclinica.service.extract.XsltTriggerService;
@@ -68,6 +69,7 @@ public class ExtractController {
     @RequestMapping(method = RequestMethod.GET)
     public ModelMap processSubmit(@RequestParam("id") String id, @RequestParam("datasetId") String datasetId, HttpServletRequest request)  {
         ModelMap map = new ModelMap();
+        ResourceBundleProvider.updateLocale(request.getLocale());
         // String datasetId = (String)request.getAttribute("datasetId");
         // String id = (String)request.getAttribute("id");
         System.out.println("found both id " + id + " and dataset " + datasetId);
