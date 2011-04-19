@@ -99,7 +99,7 @@ function genToolTips(itemId){
     var auditLog = '';
 	<c:set var="discrepancyNotes" value="1"/>
 		<c:forEach var="itemsSection" items="${section.items}">
-	   			
+
 	   			if("${itemsSection.item.id}"== itemId)
 	   			{
 				<c:set var="notesSize" value="${itemsSection.totNew}"/>
@@ -124,7 +124,36 @@ function genToolTips(itemId){
                        }
 	   			}
 	    </c:forEach>
-	 	
+    //including tool tips for grouped items
+        <c:forEach var="group" items="${section.displayFormGroups}">
+            <c:forEach var="itemsSection" items="${group.items}">
+
+                   if("${itemsSection.item.id}"== itemId)
+                   {
+
+                <c:set var="notesSize" value="${itemsSection.totNew}"/>
+                   title = "<c:out value="${itemsSection.item.name}"/>";
+                       <c:set  var="discrepancyNotes" value="${itemsSection.discrepancyNotes}"/>
+                    <c:forEach var="discrepancyNotes" items="${discrepancyNotes}">
+                     resStatus[i] =<c:out value="${discrepancyNotes.resolutionStatusId}"/>;
+                          detailedNotes[i] ="<c:out value="${discrepancyNotes.description}"/>";
+                          discrepancyType[i] = "<c:out value="${discrepancyNotes.disType.name}"/>";
+                          updatedDates[i] = "<c:out value="${discrepancyNotes.createdDate}"/>";
+                        parentDnIds[i] = "<c:out value="${discrepancyNotes.parentDnId}"/>";
+                       i++;
+
+                        </c:forEach>
+                    totNotes = 	 ${notesSize};
+                          if(totNotes >0) footNote = totNotes + " " + '<fmt:message key="foot_threads" bundle="${resword}"/>' + " " + '<fmt:message key="footNote_threads" bundle="${resword}"/>';
+                       if("${itemsSection.data.auditLog}" == "true"){
+                           auditLog = '<fmt:message key="audit_exist" bundle="${resword}" />';
+                       }
+                   }
+
+            </c:forEach>
+        </c:forEach>
+
+
 		  var htmlgen = 
 	          '<div class=\"tooltip\">'+
 	          '<table  width="95%">'+
