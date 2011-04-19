@@ -657,16 +657,13 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
             if (isDesignerRequest) {
                 value += testEditByDesignerBuilder(target, ruleOid);
             } else if (ruleSetRule.getStatus() != Status.DELETED) {
-                // Fix for issue #8877
                 value +=
                     viewLinkBuilder(ruleSetId) + executeLinkBuilder(ruleSetId, ruleId) + removeLinkBuilder(ruleSetRuleId, ruleSetId)
-                        + extractXmlLinkBuilder(ruleSetRuleId) + testLinkBuilder(ruleSetRuleId) + testEditByDesignerBuilder(target, ruleOid);
-                ;
+                        + extractXmlLinkBuilder(ruleSetRuleId) + testLinkBuilder(ruleSetRuleId);
             } else {
-                // Fix for issue #8877
                 value +=
                     viewLinkBuilder(ruleSetId) + restoreLinkBuilder(ruleSetRuleId, ruleSetId) + extractXmlLinkBuilder(ruleSetRuleId)
-                        + testLinkBuilder(ruleSetRuleId) + testEditByDesignerBuilder(target, ruleOid);
+                        + testLinkBuilder(ruleSetRuleId);
             }
             return value;
         }
@@ -773,12 +770,10 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         HtmlBuilder actionLink = new HtmlBuilder();
         // String designerURL = "http://localhost:8080/Designer-0.1.0.BUILD-SNAPSHOT/";
         actionLink.a().href(designerURL + "ruleBuilder?" + "target=" + target + "&ruleOid=" + ruleOid);
-
         actionLink.append("target=\"_parent\"");
         actionLink.append("onMouseDown=\"javascript:setImage('bt_test','images/bt_EnterData_d.gif');\"");
         actionLink.append("onMouseUp=\"javascript:setImage('bt_test','images/bt_EnterData.gif');\"").close();
-        // Fix for issue #8877
-        actionLink.img().name("bt_test").src("images/bt_Reassign_d.gif").border("0").alt("Test").title("Test").append("hspace=\"2\"").end().aEnd();
+        actionLink.img().name("bt_test").src("images/bt_EnterData.gif").border("0").alt("Test").title("Test").append("hspace=\"2\"").end().aEnd();
         actionLink.append("&nbsp;&nbsp;&nbsp;");
         return actionLink.toString();
 
