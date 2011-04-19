@@ -371,9 +371,7 @@ function detectIEWindows(userAgentString) {
 }
 /* Return true, if the browser used is Firefox on Windows. */
 function detectFirefoxWindows(userAgentString) {
-    return ((userAgentString.indexOf("Mozilla") != -1) &&
-            (userAgentString.indexOf("Windows") != -1) &&
-            (userAgentString.indexOf("Firefox") != -1));
+    return /Firefox[\/\s](\d+\.\d+)/.test(userAgentString);
 }
 /*change a button to a new CSS class if the button is in a disabled state.
  THIS METHOD IS USED BY LINES 306 AND 1221 in the file repetition-model.js*/

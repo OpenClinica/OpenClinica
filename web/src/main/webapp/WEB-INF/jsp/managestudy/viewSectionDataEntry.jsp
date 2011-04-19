@@ -55,7 +55,7 @@
 
 </head>
 <body class="aka_bodywidth" onload=
-  "if(! detectFirefoxWindows(navigator.userAgent)){$document.getElementById('centralContainer').style.display='none';new Effect.Appear('centralContainer', {duration:1});};
+  "if(detectFirefoxWindows(navigator.userAgent)){$document.getElementById('centralContainer').style.display='none';new Effect.Appear('centralContainer', {duration:1});};
         document.getElementById('CRF_infobox_closed').style.display='block';document.getElementById('CRF_infobox_open').style.display='none'
         <c:if test='${popUpURL != ""}'>openDNoteWindow('<c:out value="${popUpURL}" />');</c:if>"
 
