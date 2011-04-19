@@ -98,6 +98,7 @@ public class PrintAllSiteEventCRFServlet extends DataEntryServlet {
         }
 
         Map eventDefinitionDefaultVersions = new LinkedHashMap();
+        Map eventDefinitionEventDefCrf = new LinkedHashMap<StudyEventDefinitionBean, EventDefinitionCRFBean>();
         for (int i = 0; i < edcs.size(); i++) {
             EventDefinitionCRFBean edc = edcs.get(i);
             if (!edc.getStatus().equals(Status.AVAILABLE)) {
@@ -122,6 +123,7 @@ public class PrintAllSiteEventCRFServlet extends DataEntryServlet {
                     list = new ArrayList();
                 list.add(defaultVersion);
                 eventDefinitionDefaultVersions.put(studyEventDefinitionBean, list);
+                eventDefinitionEventDefCrf.put(studyEventDefinitionBean, edc);
             }
         }
 
@@ -198,6 +200,8 @@ public class PrintAllSiteEventCRFServlet extends DataEntryServlet {
                         allSectionBeans.add((SectionBean) sdao.findByPK(sectId));
                     }
                 }
+                EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) eventDefinitionEventDefCrf.get(sedBean);
+                request.setAttribute(EVENT_DEF_CRF_BEAN, edcBean);
                 request.setAttribute(INPUT_EVENT_CRF,ecb);
                 request.setAttribute(SECTION_BEAN,sb);
                 request.setAttribute(ALL_SECTION_BEANS, allSectionBeans);
