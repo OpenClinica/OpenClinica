@@ -269,7 +269,7 @@ public class XsltTransformJob extends QuartzJobBean {
                 // logic to prevent deleting the file being created.
 
             }
-            final double done = setFormat((new Double(System.currentTimeMillis() - start))/60000);
+            final double done = setFormat((new Double(System.currentTimeMillis() - start))/1000);
             logger.info("--> job completed in " + done + " ms");
             // run post processing
 
@@ -354,7 +354,7 @@ public class XsltTransformJob extends QuartzJobBean {
                     emailBuffer.append("<p>" + successMsg + "</p>");
                     logMe("System time begining.."+sysTimeBegin);
                     logMe("System time end.."+System.currentTimeMillis());
-                    double sysTimeEnd = setFormat((System.currentTimeMillis() - sysTimeBegin)/60000);
+                    double sysTimeEnd = setFormat((System.currentTimeMillis() - sysTimeBegin)/1000);
                     logMe("difference"+sysTimeEnd);
                     
                     if (fbFinal != null) {
