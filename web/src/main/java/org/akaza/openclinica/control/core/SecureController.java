@@ -301,8 +301,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                                 successMsg = decodeLINKURL(successMsg, datasetId);
                             }
                        
-                            addPageMessage("Your Extract is now completed. Please go to review them at <a href='ViewDatasets'>View Datasets</a> or <a href='ExportDataset?datasetId="
-                                + datasetId + "'>View Specific Dataset</a>." + successMsg);
+                            addPageMessage("Your Extract is now completed. Please go to review them at <a href='ExportDataset?datasetId="
+                                + datasetId + "'> Here </a>." + successMsg);
                             request.getSession().removeAttribute("jobName");
                             request.getSession().removeAttribute("groupName");
                             request.getSession().removeAttribute("datasetId");
