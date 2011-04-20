@@ -156,6 +156,8 @@ public class PrintCRFServlet extends DataEntryServlet {
                 }
             }
             request.setAttribute(ALL_SECTION_BEANS, allSectionBeans);
+            request.setAttribute(INPUT_EVENT_CRF,ecb);
+            
             sectionBeans = super.getAllDisplayBeans(request);
         }
         request.setAttribute(INPUT_EVENT_CRF,ecb);

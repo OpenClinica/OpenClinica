@@ -170,14 +170,16 @@ public class DisplayItemBean implements Comparable {
         if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.RADIO) 
             || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECT) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)) {
 
-            ArrayList nullValues = eventDefinitionCRF.getNullValuesList();
-            for (int i = 0; i < nullValues.size(); i++) {
-                NullValue nv = (NullValue) nullValues.get(i);
-                ResponseOptionBean ro = new ResponseOptionBean();
+            if (eventDefinitionCRF != null) {
+                ArrayList nullValues = eventDefinitionCRF.getNullValuesList();
+                for (int i = 0; i < nullValues.size(); i++) {
+                    NullValue nv = (NullValue) nullValues.get(i);
+                    ResponseOptionBean ro = new ResponseOptionBean();
 
-                ro.setValue(nv.getName());
-                ro.setText(nv.getDescription());
-                rsb.addOption(ro);
+                    ro.setValue(nv.getName());
+                    ro.setText(nv.getDescription());
+                    rsb.addOption(ro);
+                }
             }
         }
         metadata.setResponseSet(rsb);
