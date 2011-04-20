@@ -714,6 +714,7 @@ public class Validator {
                 float upperBound = v.getFloat(1);
                 errorMessage =
                     resexception.getString("input_should_be_between") + new Float(lowerBound).intValue() + " " + resword.getString("and")
+ + " "
                         + new Float(upperBound).intValue() + ".";
                 break;
             case IS_A_DATE:
