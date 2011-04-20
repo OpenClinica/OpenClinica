@@ -56,7 +56,10 @@ public class InsertActionProcessor implements ActionProcessor {
         getItemMetadataService().insert(itemDataBean.getId(), ((InsertActionBean) ruleAction).getProperties(), ub, ruleSet);
         RuleActionRunLogBean ruleActionRunLog =
             new RuleActionRunLogBean(ruleAction.getActionType(), itemDataBean, itemDataBean.getValue(), ruleSetRule.getRuleBean().getOid());
-        ruleActionRunLogDao.saveOrUpdate(ruleActionRunLog);
+        if (ruleActionRunLogDao.findCountByRuleActionRunLogBean(ruleActionRunLog) > 0) {
+        } else {
+            ruleActionRunLogDao.saveOrUpdate(ruleActionRunLog);
+        }
         return null;
     }
 

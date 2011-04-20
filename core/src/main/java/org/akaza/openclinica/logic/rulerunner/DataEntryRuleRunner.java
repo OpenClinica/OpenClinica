@@ -55,8 +55,10 @@ public class DataEntryRuleRunner extends RuleRunner {
             toBeExecuted = (HashMap<String, ArrayList<RuleActionContainer>>)request.getAttribute("toBeExecuted");
             
             if(request.getAttribute("insertAction")==null) //Break only if the action is insertAction;
-             break;
-            
+            { break;
+            }else {
+                toBeExecuted = new HashMap<String, ArrayList<RuleActionContainer>>();
+            }
            
         }
         case DRY_RUN:
@@ -83,21 +85,29 @@ public class DataEntryRuleRunner extends RuleRunner {
                         OpenClinicaExpressionParser oep = new OpenClinicaExpressionParser(eow);
                         result = oep.parseAndEvaluateExpression(rule.getExpression().getValue());
                         itemData = getExpressionService().getItemDataBeanFromDb(ruleSet.getTarget().getValue());
-
+                        
                         // Actions
                         List<RuleActionBean> actionListBasedOnRuleExecutionResult = ruleSetRule.getActions(result, phase);
 
                         if (itemData != null) {
                             Iterator<RuleActionBean> itr = actionListBasedOnRuleExecutionResult.iterator();
+                            String firstDDE = "firstDDEInsert_"+ruleSetRule.getOid()+"_"+itemData.getId();
                             while (itr.hasNext()) {
                                 RuleActionBean ruleActionBean = itr.next();
                                 if(ruleActionBean.getActionType()==ActionType.INSERT) {
                                     request.setAttribute("insertAction", true);
+                                    if(phase==Phase.DOUBLE_DATA_ENTRY && itemData.getStatus().getId()==4 
+                                            && request.getAttribute(firstDDE)==null) {
+                                        request.setAttribute(firstDDE, true);
+                                    }
                                 }
-                                RuleActionRunLogBean ruleActionRunLog =
-                                    new RuleActionRunLogBean(ruleActionBean.getActionType(), itemData, itemData.getValue(), ruleSetRule.getRuleBean().getOid());
-                                if (getRuleActionRunLogDao().findCountByRuleActionRunLogBean(ruleActionRunLog) > 0) {
-                                    itr.remove();
+                                if(request.getAttribute(firstDDE)==Boolean.TRUE) {
+                                } else {
+                                    RuleActionRunLogBean ruleActionRunLog =
+                                        new RuleActionRunLogBean(ruleActionBean.getActionType(), itemData, itemData.getValue(), ruleSetRule.getRuleBean().getOid());
+                                    if (getRuleActionRunLogDao().findCountByRuleActionRunLogBean(ruleActionRunLog) > 0) {
+                                        itr.remove();
+                                    }
                                 }
                             }
                         }
