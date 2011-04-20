@@ -76,17 +76,16 @@ public class PrintAllEventCRFServlet extends DataEntryServlet {
         SectionBean sb = (SectionBean)request.getAttribute(SECTION_BEAN);
         ArrayList<SectionBean> allSectionBeans;
         // The PrintDataEntry servlet handles this parameter
-        int siteId = fp.getInt("siteId");
         boolean isSubmitted = false;
         StudyEventDefinitionDAO sedao = new StudyEventDefinitionDAO(sm.getDataSource());
         EventDefinitionCRFDAO edao = new EventDefinitionCRFDAO(sm.getDataSource());
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
 
         StudyDAO studyDao = new StudyDAO(sm.getDataSource());
-        StudyBean site = (StudyBean) studyDao.findByPK(siteId);
+        StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 
         ArrayList<StudyEventDefinitionBean> seds = new ArrayList<StudyEventDefinitionBean>();
-        seds = sedao.findAllByStudy(site);
+        seds = sedao.findAllByStudy(currentStudy);
 
         //        ArrayList eventDefinitionCRFs = (ArrayList) edao.findAllByStudy(site);
 
@@ -96,7 +95,7 @@ public class PrintAllEventCRFServlet extends DataEntryServlet {
         ArrayList<EventDefinitionCRFBean> edcs = new ArrayList();
         for (StudyEventDefinitionBean sed : seds) {
             int defId = sed.getId();
-            edcs.addAll(edcdao.findAllByDefinitionAndSiteIdAndParentStudyId(defId, siteId, site.getParentStudyId()));
+            edcs.addAll(edcdao.findAllByDefinition(currentStudy, defId));
         }
 
         Map eventDefinitionDefaultVersions = new LinkedHashMap();
@@ -218,12 +217,8 @@ public class PrintAllEventCRFServlet extends DataEntryServlet {
                 sedCrfBeans.put(sedBean, list);
             }
         }
-        StudyBean parentStudy = (StudyBean) studyDao.findByPK(site.getParentStudyId());
-        String studyName = parentStudy.getName();
-        String siteName = site.getName();
         request.setAttribute("sedCrfBeans", sedCrfBeans);
-        request.setAttribute("studyName", studyName);
-        request.setAttribute("site", siteName);
+        request.setAttribute("studyName", currentStudy.getName());
         forwardPage(Page.VIEW_ALL_DEFAULT_CRF_VERSIONS_PRINT, request, response);
     }
 

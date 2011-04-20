@@ -1133,7 +1133,11 @@ function openNewWindow(inURL, name, features, windowSize) {
 
     if(inURL && inURL.indexOf("Print") != -1) {
         if(detectIEWindows(navigator.userAgent)) {
-            inURL = inURL+"&ie=y";
+            if (inURL.indexOf("?") == -1) {
+                inURL = inURL+"?ie=y";
+            } else {
+                inURL = inURL+"&ie=y";
+            }
         }
     }
 
