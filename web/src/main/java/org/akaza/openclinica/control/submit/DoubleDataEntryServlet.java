@@ -351,17 +351,15 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
                 validateDisplayItemBean(v, displayItem, inputName, request);
             }
 
-            // if (validationCount == null || validationCount.intValue() == 0) {
-            if (i == 0 && formGroups.size() != digbs.size()) {
-                v.addValidation(inputName + "group", Validator.DIFFERENT_NUMBER_OF_GROUPS_IN_DDE);
-                // TODO internationalize this string, tbh
-                v
-                        .setErrorMessage("There are additional values here that were not present in the initial data entry. You have entered a different number of groups"
-                            + " for the item groups containing " + inputName);
+            if (validationCount == null || validationCount.intValue() == 0) {
+                if (i == 0 && formGroups.size() != digbs.size()) {
+                    v.addValidation(inputName + "group", Validator.DIFFERENT_NUMBER_OF_GROUPS_IN_DDE);
+                    // TODO internationalize this string, tbh
+                    v.setErrorMessage("There are additional values here that were not present in the initial data entry. You have entered a different number of groups"
+                                + " for the item groups containing " + inputName);
 
+                }
             }
-            // }
-
         }
 
         return formGroups;
