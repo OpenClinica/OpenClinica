@@ -48,7 +48,7 @@
     <fmt:message key="change_user_profile" bundle="${resword}"/>
     <a href="javascript:openDocWindow('help/1_1_updateProfile_Help.html')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
 
-<strong><fmt:message key="browser_locale" bundle="${resword}"/><c:out value="${pageContext.request.locale.displayName}"/></strong>
+<strong><fmt:message key="browser_locale" bundle="${resword}"/><c:out value="${displayLocale.displayLanguage}"/></strong>
 <br><br>
 <form action="UpdateProfile" method="post">
 <fmt:message key="field_required" bundle="${resword}"/><br>
