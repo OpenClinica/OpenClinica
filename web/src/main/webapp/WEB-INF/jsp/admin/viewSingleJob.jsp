@@ -81,7 +81,7 @@
 		<td class="table_header_column"><fmt:message key="description" bundle="${resword}"/>:</td>
 		<td class="table_cell"><c:out value="${triggerBean.description}" />&nbsp;</td>
 	</tr>
-	<c:if test="${groupName=='DEFAULT'}">
+	<c:if test="${groupName=='XsltTriggersExportJobs'}">
 	<tr>
 		<td class="table_header_column"><fmt:message key="dataset" bundle="${resword}"/>:</td>
 		<td class="table_cell"><c:out value="${triggerBean.dataset.name}" />&nbsp;</td>
@@ -95,7 +95,7 @@
 		<td class="table_header_column"><fmt:message key="contact_email" bundle="${resword}"/>:</td>
 		<td class="table_cell"><c:out value="${triggerBean.contactEmail}" />&nbsp;</td>
 	</tr>
-	<c:if test="${groupName=='XsltTriggers'}">
+	<c:if test="${groupName=='XsltTriggersExportJobs'}">
 	<tr>
 		<td class="table_header_column"><fmt:message key="file_formats" bundle="${resword}"/>:</td>
 		<td class="table_cell">
@@ -116,7 +116,7 @@
 <table border="0" cellpadding="0" cellspacing="0">
   <tr>
 <c:choose>
-<c:when test="${groupName=='XsltTriggers'}">
+<c:when test="${groupName=='XsltTriggersExportJobs'}">
    <td>
    <form action='UpdateJobExport?tname=<c:out value="${triggerBean.fullName}" />' method="POST">
     <input type="submit" name="submit" value="<fmt:message key="edit_this_job" bundle="${resword}"/>" class="button_long">
