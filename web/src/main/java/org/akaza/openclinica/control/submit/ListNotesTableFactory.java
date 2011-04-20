@@ -104,7 +104,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     protected void configureColumns(TableFacade tableFacade, Locale locale) {
 
         tableFacade.setColumnProperties("studySubject.label", "discrepancyNoteBean.disType",
-                "discrepancyNoteBean.resolutionStatus", "siteId", "discrepancyNoteBean.createdDate",
+ "discrepancyNoteBean.resolutionStatus", "siteId",
+                "discrepancyNoteBean.createdDate",
                 "discrepancyNoteBean.updatedDate", "age", "days", "eventName",
                 "eventStartDate", "crfName", "entityName", "entityValue", "discrepancyNoteBean.entityType",
                 "discrepancyNoteBean.description", "discrepancyNoteBean.detailedNotes",
@@ -112,6 +113,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                  "discrepancyNoteBean.owner", "actions");
         Row row = tableFacade.getTable().getRow();
         configureColumn(row.getColumn("studySubject.label"), resword.getString("study_subject_ID"), null, null, true, true);
+        configureColumn(row.getColumn("siteId"), resword.getString("site_id"), null, null, true, true);
         configureColumn(row.getColumn("discrepancyNoteBean.createdDate"), resword.getString("date_created"), new DateCellEditor(getDateFormat()), null, true,
                 true);
         configureColumn(row.getColumn("discrepancyNoteBean.updatedDate"), resword.getString("date_updated"), new DateCellEditor(getDateFormat()), null, true,
