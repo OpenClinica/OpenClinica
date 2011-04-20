@@ -62,17 +62,20 @@
 <c:set var="dtetmeFormat"><fmt:message key="date_time_format_string" bundle="${resformat}"/></c:set>
 <jsp:useBean id="now" class="java.util.Date" />
 <P><I><fmt:message key="note_that_job_is_set" bundle="${resword}"/> <fmt:formatDate value="${now}" pattern="${dtetmeFormat}"/>.</I></P>
+
+<p class="text"><br/><fmt:message key="field_required" bundle="${resword}"/></p>
+
 <table>
 	<tr>
 		<td class="text"><b><fmt:message key="job_name" bundle="${resword}"/>:</b><br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="jobName"/></jsp:include></td>
 		<td class="text">
-			<input type="text" name="jobName" size="30" value="<c:out value="${jobName}"/>"/>
-		</td>
+			<input type="text" name="jobName" size="30" value="<c:out value="${jobName}"/>"/> *
+		</td> 	
 	</tr>
 	<tr>
 		<td class="text"><b><fmt:message key="description" bundle="${resword}"/>:</b><br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="jobDesc"/></jsp:include></td>
-		<td class="text"><input type="text" name="jobDesc" size="60" value="<c:out value="${jobDesc}"/>"/>
-		</td>
+		<td class="text"><input type="text" name="jobDesc" size="60" value="<c:out value="${jobDesc}"/>"/> *
+		</td> 	
 	</tr>
 	<tr>
 		<td class="text"><b><fmt:message key="please_pick_a_dataset_to_export" bundle="${resword}"/>:</b></td>
@@ -97,7 +100,7 @@
 			<c:if test="${periodToRun == 'daily'}">
 				checked
 			</c:if>
-			/></td>
+			/></td>			
 		</tr>
 		<tr>
 			<td class="text"><fmt:message key="weekly" bundle="${resword}"/></td>
@@ -144,7 +147,7 @@
 		</td>
 		<td class="text">
 			<table border="0" cellpadding="0" cellspacing="0">
-            <c:forEach var="extract" items="${extractProperties}">
+            <c:forEach var="extract" items="${extractProperties}" varStatus="loopCounter">
 			<tr>
 				<td class="text">
                     <c:choose>
@@ -161,18 +164,22 @@
 						checked
 					</c:if>
 				/></td>
+				<c:if test="${loopCounter.count == 1}">
+					<td>*</td>
+				</c:if>
 			</tr>
             </c:forEach>
 			</table>
 		</td>
+		
 	</tr>
 
 
 
 	<tr>
 		<td class="text"><b><fmt:message key="contact_email" bundle="${resword}"/>:</b><br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="contactEmail"/></jsp:include></td>
-		<td class="text"><input type="text" name="contactEmail" size="60" value="<c:out value="${contactEmail}"/>"/>
-		</td>
+		<td class="text"><input type="text" name="contactEmail" size="60" value="<c:out value="${contactEmail}"/>"/> *
+		</td>		
 	</tr>
 	<tr>
 

@@ -53,6 +53,8 @@
 <jsp:useBean id="now" class="java.util.Date" />
 <P><I><fmt:message key="note_that_job_is_set" bundle="${resword}"/> <fmt:formatDate value="${now}" pattern="${dtetmeFormat}"/>.</I></P>
 
+<p class="text"><br/><fmt:message key="field_required" bundle="${resword}"/></p>
+
 <form action="CreateJobImport" method="post">
 
 <input type="hidden" name="action" value="confirmall" />
@@ -61,13 +63,13 @@
 	<tr>
 		<td class="text"><b><fmt:message key="import_job_name" bundle="${resword}"/>:</b><br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="jobName"/></jsp:include></td>
 		<td class="text">
-			<input type="text" name="jobName" size="30" value="<c:out value="${jobName}"/>"/>
-		</td>
+			<input type="text" name="jobName" size="30" value="<c:out value="${jobName}"/>"/> *
+		</td>		
 	</tr>
 	<tr>
 		<td class="text"><b><fmt:message key="import_job_desc" bundle="${resword}"/>:</b><br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="jobDesc"/></jsp:include></td>
-		<td class="text"><input type="text" name="jobDesc" size="60" value="<c:out value="${jobDesc}"/>"/>
-		</td>
+		<td class="text"><input type="text" name="jobDesc" size="60" value="<c:out value="${jobDesc}"/>"/> *
+		</td> 
 	</tr>
 	<tr>
 		<td class="text">
@@ -107,10 +109,11 @@
 									</c:otherwise>
 								</c:choose>
 							</c:forEach>
-						</select>
+						</select> *
 
 						<%-- have to put a default picker here next, tbh--%>
 		</td>
+		
 	</tr>
 	<tr>
 		<td class="text"><b><fmt:message key="the_default_filepath" bundle="${resword}"/>:</b></td>
@@ -207,8 +210,8 @@
 			selected
 			</c:if>
 			>50</option>
-		</select> <fmt:message key="minutes" bundle="${resword}"/>.
-		</td>
+		</select> <fmt:message key="minutes" bundle="${resword}"/>. *
+		</td>		
 	</tr>
 
 	<tr>
