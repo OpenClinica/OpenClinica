@@ -3,6 +3,7 @@
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<jsp:useBean id="displayLocale" scope="session" type="java.util.Locale"/>
 
 <script language="JavaScript">
         function reportBug() {
