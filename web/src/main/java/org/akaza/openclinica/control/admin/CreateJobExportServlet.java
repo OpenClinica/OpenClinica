@@ -295,6 +295,13 @@ public class CreateJobExportServlet extends SecureController {
         if (jobDate.before(new Date())) {
             v.addError(errors, DATE_START_JOB + "Date", "This date needs to be later than the present time.");
         }
+        // @pgawade 20-April-2011 Limit the job description to 250 characters
+        String jobDesc = fp.getString(JOB_DESC);
+        if ((null != jobDesc) && (!jobDesc.equals(""))) {
+            if (jobDesc.length() > 250) {
+                v.addError(errors, JOB_DESC, "A job description cannot be more than 250 characters.");
+            }
+        }
         return errors;
     }
 }
