@@ -63,7 +63,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-
+import org.akaza.openclinica.bean.admin.TriggerBean;
 /**
  * Xalan Transform Job, an XSLT transform job using the Xalan classes
  * 
