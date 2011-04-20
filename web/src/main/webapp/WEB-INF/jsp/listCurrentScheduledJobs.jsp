@@ -22,7 +22,7 @@
 
         <div class="sidebar_tab_content">
 
-            <fmt:message key="design_implement_sdv_study_subject" bundle="${restext}"/>
+            <fmt:message key="cancel_data_export_info" bundle="${restext}"/>
 
         </div>
 
@@ -55,7 +55,7 @@
 </script>
 
 <h1><span class="title_manage">
-Scheduled Jobs For the Extract Process
+<fmt:message key="currently_executing_data_export_jobs" bundle="${resword}"/>
 </span></h1>
 
 
