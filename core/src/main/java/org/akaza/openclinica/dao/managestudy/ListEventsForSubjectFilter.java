@@ -85,10 +85,19 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
                     }
                     criteria += " order by event_crf_id asc" + ")";
                 } else {// DataEntryStage.UNCOMPLETED
-                    criteria += " AND (se.study_subject_id is null or (se.study_event_definition_id != " + studyEventDefinitionId;
+                    criteria +=" AND ( ( SELECT count(*) FROM event_crf event_crf, crf_version crf_version WHERE study_event_id in  " +
+                    		" (SELECT se.study_event_id FROM study_event study_event, study_event_definition sed " +
+                    		"WHERE se.study_subject_id=SS.SUBJECT_ID and se.study_event_definition_id = "+studyEventDefinitionId +
+                    "and se.study_event_definition_id= sed.study_event_definition_id  ) and crf_version.crf_id =" +crfId +" and  " +
+                    		"        event_crf.crf_version_id = crf_version.crf_version_id ) =0 " +
+                    		"and  se.study_EVENT_ID not in (select study_event_id from  event_crf ec,crf_version cv where " +
+                    		"ec.crf_version_id = cv.crf_version_id and crf_id= " + crfId +
+                    		" ) and se.study_event_definition_id = " +studyEventDefinitionId +
+                    		")";
+                   /* criteria += " AND (se.study_subject_id is null or (se.study_event_definition_id != " + studyEventDefinitionId;
                     criteria += " AND (select count(*) from  study_subject ss1 LEFT JOIN study_event ON ss1.study_subject_id = study_event.study_subject_id";
                     criteria +=
-                        " where  study_event.study_event_definition_id =" + studyEventDefinitionId + " and ss.study_subject_id = ss1.study_subject_id) =0))";
+                        " where  study_event.study_event_definition_id =" + studyEventDefinitionId + " and ss.study_subject_id = ss1.study_subject_id) =0))";*/
                 }
 
             } else {
