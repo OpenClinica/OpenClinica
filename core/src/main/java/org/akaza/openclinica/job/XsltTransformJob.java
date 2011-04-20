@@ -12,6 +12,7 @@ import org.akaza.openclinica.bean.service.ProcessingResultType;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.OpenClinicaMailSender;
 import org.akaza.openclinica.core.util.XMLFileFilter;
+import org.akaza.openclinica.dao.admin.AuditEventDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
@@ -22,7 +23,6 @@ import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.extract.GenerateExtractFileService;
 import org.akaza.openclinica.service.extract.XsltTriggerService;
-
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -94,6 +94,7 @@ public class XsltTransformJob extends QuartzJobBean {
     private UserAccountDAO userAccountDao;
     private CoreResources coreResources;
     private RuleSetRuleDao ruleSetRuleDao;
+    AuditEventDAO auditEventDAO;
     public static final String EP_BEAN = "epBean";
 
     // POST PROCESSING VARIABLES
@@ -132,13 +133,15 @@ public class XsltTransformJob extends QuartzJobBean {
         String alertEmail = dataMap.getString(EMAIL);
         java.io.InputStream in = null;
         FileOutputStream endFileStream = null;
+        UserAccountBean userBean = null;
         try {
             ApplicationContext appContext = (ApplicationContext) context.getScheduler().getContext().get("applicationContext");
             mailSender = (OpenClinicaMailSender) appContext.getBean("openClinicaMailSender");
             dataSource = (DataSource) appContext.getBean("dataSource");
             coreResources = (CoreResources) appContext.getBean("coreResources");
             ruleSetRuleDao = (RuleSetRuleDao) appContext.getBean("ruleSetRuleDao");
-
+            auditEventDAO = new AuditEventDAO(dataSource);
+            StringBuffer auditMessage = new StringBuffer();
             DatasetDAO dsdao = new DatasetDAO(dataSource);
             
             // init all fields from the data map
@@ -153,6 +156,7 @@ public class XsltTransformJob extends QuartzJobBean {
             
             int epBeanId = dataMap.getInt(EXTRACT_PROPERTY);
             int dsId = dataMap.getInt(DATASET_ID);
+
             // JN: Change from earlier versions, cannot get static reference as
             // static references don't work. Reason being for example there could be
             // datasetId as a variable which is different for each dataset and
@@ -172,7 +176,9 @@ public class XsltTransformJob extends QuartzJobBean {
             deleteOld = epBean.getDeleteOld();
             long sysTimeBegin = System.currentTimeMillis();
             userAccountDao = new UserAccountDAO(dataSource);
-            UserAccountBean userBean = (UserAccountBean) userAccountDao.findByPK(userAccountId);
+            // UserAccountBean userBean = (UserAccountBean)
+            // userAccountDao.findByPK(userAccountId);
+            userBean = (UserAccountBean) userAccountDao.findByPK(userAccountId);
             generateFileService = new GenerateExtractFileService(dataSource, userBean, coreResources, ruleSetRuleDao);
             studyDao = new StudyDAO(dataSource);
             StudyBean currentStudy = (StudyBean) studyDao.findByPK(studyId);
@@ -493,6 +499,18 @@ public class XsltTransformJob extends QuartzJobBean {
             emailBuffer.append("<p>" + pageMessages.getString("html_email_body_5") + "</p>");
             try {
                 mailSender.sendEmail(alertEmail, EmailEngine.getAdminEmail(), subject, emailBuffer.toString(), true);
+                
+                // @pgawade 19-April-2011 Log the event into audit_event table
+                String extractName = (String) dataMap.get(XsltTriggerService.JOB_NAME);
+                TriggerBean triggerBean = new TriggerBean();
+                triggerBean.setDataset(datasetBean);
+                triggerBean.setUserAccount(userBean);
+                triggerBean.setFullName(extractName);
+                String actionMsg = "You may access the " + (String) dataMap.get(XsltTriggerService.EXPORT_FORMAT) +
+ " file by changing your study/site to "
+                        + currentStudy.getName() + " and selecting the Export Data icon for " + datasetBean.getName() + " dataset on the View Datasets page.";
+                auditEventDAO.createRowForExtractDataJobSuccess(triggerBean, actionMsg);
+                
             } catch (OpenClinicaSystemException ose) {
                 // Do Nothing, In the future we might want to have an email
                 // status added to system.
@@ -536,6 +554,13 @@ public class XsltTransformJob extends QuartzJobBean {
             ee.printStackTrace();
             logger.error(ee.getStackTrace().toString());
             exceptions = true;
+
+            TriggerBean triggerBean = new TriggerBean();
+            // triggerBean.setDataset(datasetBean);
+            triggerBean.setUserAccount(userBean);
+            triggerBean.setFullName((String) dataMap.get(XsltTriggerService.JOB_NAME));
+            auditEventDAO.createRowForExtractDataJobFailure(triggerBean);
+
         } finally {
 
             if (in != null)
