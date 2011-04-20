@@ -29,9 +29,23 @@ public class EqualityOpNode extends ExpressionNode {
 
     @Override
     String testCalculate() throws OpenClinicaSystemException {
-        String l = String.valueOf(left.testValue());
-        String r = String.valueOf(right.testValue());
-        return calc(l, r);
+        String x = null;
+        String y = null;
+        String l = left.testValue();
+        String r = right.testValue();
+        try {
+            Float fx = Float.valueOf(l);
+            Float fy = Float.valueOf(r);
+            x = fx.toString();
+            y = fy.toString();
+        } catch (NumberFormatException nfe) {
+            // Don't do anything cause we were just testing above.
+        }
+        if (x == null && y == null) {
+            x = String.valueOf(l);
+            y = String.valueOf(r);
+        }
+        return calc(x, y);
     }
 
     @Override
