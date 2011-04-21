@@ -1392,6 +1392,11 @@ public class Validator {
         if (fieldValue == null) {
             return false;
         }
+        // Excepts the blank Mantis Issue: 7703.
+        if (fieldValue.equals("")) {
+            return true;
+        }
+        
         try {
             int i = Integer.parseInt(fieldValue);
         } catch (Exception e) {
