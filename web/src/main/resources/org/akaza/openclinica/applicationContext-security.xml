@@ -86,7 +86,7 @@
         <property name="defaultFailureUrl" value="/pages/login/login?action=errorLogin" />
         <property name="exceptionMappings">
             <props>
-                <prop key="org.springframework.security.LockedException">/pages/login/login?action=errorLocked</prop>
+                <prop key="org.springframework.security.authentication.LockedException">/pages/login/login?action=errorLocked</prop>
             </props>
         </property>
     </bean>
