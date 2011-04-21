@@ -194,8 +194,8 @@ public class PrintEventCRFServlet extends DataEntryServlet {
                 }
 
                 request.setAttribute(ALL_SECTION_BEANS, allSectionBeans);
-                sectionBeans = super.getAllDisplayBeans(request);
                 request.setAttribute(INPUT_EVENT_CRF,ecb);
+                sectionBeans = super.getAllDisplayBeans(request);
                 request.setAttribute(SECTION_BEAN,sb);
                 DisplaySectionBean dsb = super.getDisplayBean(false, false, request, isSubmitted);
                 //            request.setAttribute("allSections", sectionBeans);
