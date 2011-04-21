@@ -4,7 +4,6 @@
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 
-<%--<jsp:include page="../include/home-header.jsp"/>--%>
 <c:import url="../include/home-header.jsp">
     <c:param name="profilePage" value="yes"/>
 </c:import>
@@ -48,7 +47,7 @@
     <fmt:message key="change_user_profile" bundle="${resword}"/>
     <a href="javascript:openDocWindow('help/1_1_updateProfile_Help.html')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
 
-<strong><fmt:message key="browser_locale" bundle="${resword}"/><c:out value="${displayLocale.displayLanguage}"/> <fmt:message key="language" bundle="${resword}"/></strong>
+<strong><fmt:message key="browser_locale" bundle="${resword}"/><c:out value="${resword.locale.displayLanguage}"/> <fmt:message key="language" bundle="${resword}"/></strong>
 <br><br>
 <form action="UpdateProfile" method="post">
 <fmt:message key="field_required" bundle="${resword}"/><br>

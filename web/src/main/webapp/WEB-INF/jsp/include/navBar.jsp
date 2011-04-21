@@ -3,7 +3,6 @@
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
-<jsp:useBean id="displayLocale" scope="session" type="java.util.Locale"/>
 
 <script language="JavaScript">
         function reportBug() {
@@ -62,7 +61,7 @@
             <a href="${urlPrefix}ChangeStudy"><fmt:message key="change_study_site" bundle="${resworkflow}"/></a>
         </div>
         <div id="UserInfo">
-            <a href="${urlPrefix}UpdateProfile"><b><c:out value="${userBean.name}" /></b> (<c:out value="${userRole.role.description}" />) <c:out value="${displayLocale.language}"/></a>&nbsp;|&nbsp;
+            <a href="${urlPrefix}UpdateProfile"><b><c:out value="${userBean.name}" /></b> (<c:out value="${userRole.role.description}" />) <c:out value="${resword.locale.language}"/></a>&nbsp;|&nbsp;
             <a href="${urlPrefix}j_spring_security_logout"><fmt:message key="log_out" bundle="${resword}"/></a>
         </div>
         <br/><br style="line-height: 4px;"/>
