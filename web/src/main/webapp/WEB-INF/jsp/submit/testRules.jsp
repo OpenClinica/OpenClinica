@@ -411,7 +411,7 @@
             var="testRuleAction" varStatus="status">
             <c:if
                 test="${testRuleAction.expressionEvaluatesTo == ruleEvaluatesTo && ruleEvaluatesTo !='' && action != 'validate' }">
-                <c:forEach items="${testRuleAction.properties}" var="mapEntry">
+                <c:forEach items="${testRuleAction.propertiesForDisplay}" var="mapEntry">
                     <tr valign="top">
                         <td class="formlabel">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
                         <td style="color: #789EC5;"></td>
