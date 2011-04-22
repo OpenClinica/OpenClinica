@@ -378,11 +378,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
         local_df = new SimpleDateFormat(resformat.getString("date_format_string"));
 
-        // Mantis Issue: 9097
-        Locale testLocale = resadmin.getLocale();
-        session.setAttribute("displayLocale", testLocale);
-
-
         try {
             String userName = request.getRemoteUser();
             // BWP 1/8/08<< the sm variable may already be set with a mock
