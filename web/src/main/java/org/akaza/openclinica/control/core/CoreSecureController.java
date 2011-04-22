@@ -971,7 +971,7 @@ public abstract class CoreSecureController extends HttpServlet {
             if (id == userId)
             {
               getUnavailableCRFList().remove(entry.getKey());
-//                entry.setValue(id+(int)Math.random());
+//                entry.setValue(id+(int)Math.random()); //TODO; revisit to make it work this way and avoid swallowing. 
            }
               
                 //getUnavailableCRFList().
