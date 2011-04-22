@@ -5063,10 +5063,12 @@ public abstract class DataEntryServlet extends CoreSecureController {
             Boolean shouldRunRules, HttpServletRequest request, HttpServletResponse response) {
         if (shouldRunRules) {
             List<RuleSetBean> ruleSets = getRuleSetService(request).getRuleSetsByCrfStudyAndStudyEventDefinition(currentStudy, studyEventDefinition, crfVersionBean);
-            ruleSets = getRuleSetService(request).filterByStatusEqualsAvailable(ruleSets);
-            ruleSets = getRuleSetService(request).filterRuleSetsByStudyEventOrdinal(ruleSets, studyEventBean, crfVersionBean, studyEventDefinition);
-            // place next line here, tbh
-            ruleSets = getRuleSetService(request).filterRuleSetsByHiddenItems(ruleSets, eventCrfBean, crfVersionBean);
+            if(ruleSets!=null&&ruleSets.size()>0) {
+                ruleSets = getRuleSetService(request).filterByStatusEqualsAvailable(ruleSets);
+                ruleSets = getRuleSetService(request).filterRuleSetsByStudyEventOrdinal(ruleSets, studyEventBean, crfVersionBean, studyEventDefinition);
+                // place next line here, tbh
+                ruleSets = getRuleSetService(request).filterRuleSetsByHiddenItems(ruleSets, eventCrfBean, crfVersionBean);
+            }
             return ruleSets!=null&&ruleSets.size()>0?ruleSets:new ArrayList<RuleSetBean>();
         } else
             return new ArrayList<RuleSetBean>();
