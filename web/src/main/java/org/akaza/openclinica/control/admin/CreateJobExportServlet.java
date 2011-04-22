@@ -236,6 +236,7 @@ public class CreateJobExportServlet extends SecureController {
                 trigger.getJobDataMap().put(XsltTriggerService.EXPORT_FORMAT, epBean.getFiledescription());
                 trigger.getJobDataMap().put(XsltTriggerService.EXPORT_FORMAT_ID, exportFormatId);
                 trigger.getJobDataMap().put(XsltTriggerService.JOB_NAME, jobName);
+				trigger.getJobDataMap().put("job_type", "exportJob");
 
                 JobDetailBean jobDetailBean = new JobDetailBean();
                 jobDetailBean.setGroup(xsltService.TRIGGER_GROUP_NAME);
