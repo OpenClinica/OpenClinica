@@ -225,7 +225,6 @@ public class ResolveDiscrepancyServlet extends SecureController {
         // If Study is Frozen or Locked
         if (currentStudy.getStatus().isFrozen()) {
             redirectMonitor(module, discrepancyNoteBean);
-            return;
         }
 
         boolean toView = false;
@@ -415,7 +414,6 @@ public class ResolveDiscrepancyServlet extends SecureController {
                     e.printStackTrace();
                 }
             }
-
         }
 
     }
