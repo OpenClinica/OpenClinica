@@ -145,6 +145,7 @@
 			</table>
 		</td>
 	</tr>
+    <c:if test="${study.studyParameterConfig.eventLocationRequired != 'not_used'}">
     <tr valign="top"><td class="formlabel"><fmt:message key="location" bundle="${resword}"/>:</td>
     <td>
         <table border="0" cellpadding="0" cellspacing="0">
@@ -156,8 +157,9 @@
       <td><c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${ss_id}&id=<c:out value="${event.id}"/>&name=studyEvent&field=location&column=location','spanAlert-location'); return false;"><img name="flag_location" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if>
       </td></tr>
      </table>
-    </td></tr>
-
+    </td>
+    </tr>
+    </c:if>
   <tr valign="top">
     <td class="formlabel"><fmt:message key="status" bundle="${resword}"/>:</td>
     <td>
