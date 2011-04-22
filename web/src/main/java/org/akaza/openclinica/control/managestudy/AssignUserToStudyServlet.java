@@ -308,7 +308,7 @@ public class AssignUserToStudyServlet extends SecureController {
                         + " under the Study " + currentStudy.getParentStudyName() +" "
                         + resword.getString("as") + " \"" + sub.getRole().getDescription() + "\". ";
         }
-        boolean emailSent = sendEmail(u.getEmail().trim(), respage.getString("new_user_added_to_study"), body, false);
+//        boolean emailSent = sendEmail(u.getEmail().trim(), respage.getString("new_user_added_to_study"), body, false);
 //        if (emailSent) {
 //            sendEmail(ub.getEmail().trim(), EmailEngine.getAdminEmail(), respage.getString("new_user_added_to_study"), body, false,"","", false);
 //            sendEmail(EmailEngine.getAdminEmail(), EmailEngine.getAdminEmail(), respage.getString("new_user_added_to_study"), body, false,"","", false);
