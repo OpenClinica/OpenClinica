@@ -402,7 +402,7 @@ public abstract class CoreSecureController extends HttpServlet {
                 } else {
                     currentStudy = new StudyBean();
                 }
-               
+                session.setAttribute("study", currentStudy);// The above line is moved here since currentstudy's value is set in else block and could change
             } else if (currentStudy.getId() > 0) {
                 // YW 06-20-2007<< set site's parentstudy name when site is
                 // restored
@@ -411,7 +411,7 @@ public abstract class CoreSecureController extends HttpServlet {
                 }
                 // YW >>
             }
-            session.setAttribute("study", currentStudy);// The above line is moved here since currentstudy's value is set in else block and could change
+          
 
             if (currentStudy.getParentStudyId() > 0) {
                 /*
