@@ -306,8 +306,12 @@ public class RuleSetService implements RuleSetServiceInterface {
         logger.debug("crfVersionID : " + crfVersion.getId() + " studyId : " + study.getId() + " studyEventDefinition : " + sed.getId());
         List<RuleSetBean> ruleSets = getRuleSetDao().findByCrfVersionOrCrfAndStudyAndStudyEventDefinition(crfVersion, crf, study, sed);
         logger.info("getRuleSetsByCrfStudyAndStudyEventDefinition() : ruleSets Size {} : ", ruleSets.size());
-        for (RuleSetBean ruleSetBean : ruleSets) {
-            getObjects(ruleSetBean);
+        if(ruleSets!=null&&ruleSets.size()>0) {
+            for (RuleSetBean ruleSetBean : ruleSets) {
+                getObjects(ruleSetBean);
+            }
+        } else {
+            ruleSets = new ArrayList<RuleSetBean>();
         }
         return ruleSets;
         // return eagerFetchRuleSet(ruleSets);
