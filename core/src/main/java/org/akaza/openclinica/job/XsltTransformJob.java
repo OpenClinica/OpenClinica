@@ -498,19 +498,22 @@ public class XsltTransformJob extends QuartzJobBean {
             // String email = dataMap.getString(EMAIL);
             emailBuffer.append("<p>" + pageMessages.getString("html_email_body_5") + "</p>");
             try {
-                mailSender.sendEmail(alertEmail, EmailEngine.getAdminEmail(), subject, emailBuffer.toString(), true);
-                
+
                 // @pgawade 19-April-2011 Log the event into audit_event table
-                String extractName = (String) dataMap.get(XsltTriggerService.JOB_NAME);
-                TriggerBean triggerBean = new TriggerBean();
-                triggerBean.setDataset(datasetBean);
-                triggerBean.setUserAccount(userBean);
-                triggerBean.setFullName(extractName);
-                String actionMsg = "You may access the " + (String) dataMap.get(XsltTriggerService.EXPORT_FORMAT) +
- " file by changing your study/site to "
-                        + currentStudy.getName() + " and selecting the Export Data icon for " + datasetBean.getName() + " dataset on the View Datasets page.";
-                auditEventDAO.createRowForExtractDataJobSuccess(triggerBean, actionMsg);
-                
+                if ((null != dataMap.get("job_type")) && (((String) dataMap.get("job_type")).equalsIgnoreCase("exportJob"))) {
+                    String extractName = (String) dataMap.get(XsltTriggerService.JOB_NAME);
+                    TriggerBean triggerBean = new TriggerBean();
+                    triggerBean.setDataset(datasetBean);
+                    triggerBean.setUserAccount(userBean);
+                    triggerBean.setFullName(extractName);
+                    String actionMsg =
+                        "You may access the " + (String) dataMap.get(XsltTriggerService.EXPORT_FORMAT) + " file by changing your study/site to "
+                            + currentStudy.getName() + " and selecting the Export Data icon for " + datasetBean.getName()
+                            + " dataset on the View Datasets page.";
+                    auditEventDAO.createRowForExtractDataJobSuccess(triggerBean, actionMsg);
+                }
+                mailSender.sendEmail(alertEmail, EmailEngine.getAdminEmail(), subject, emailBuffer.toString(), true);
+
             } catch (OpenClinicaSystemException ose) {
                 // Do Nothing, In the future we might want to have an email
                 // status added to system.
@@ -555,11 +558,13 @@ public class XsltTransformJob extends QuartzJobBean {
             logger.error(ee.getStackTrace().toString());
             exceptions = true;
 
-            TriggerBean triggerBean = new TriggerBean();
-            // triggerBean.setDataset(datasetBean);
-            triggerBean.setUserAccount(userBean);
-            triggerBean.setFullName((String) dataMap.get(XsltTriggerService.JOB_NAME));
-            auditEventDAO.createRowForExtractDataJobFailure(triggerBean);
+            if ((null != dataMap.get("job_type")) && (((String) dataMap.get("job_type")).equalsIgnoreCase("exportJob"))) {
+                TriggerBean triggerBean = new TriggerBean();
+                // triggerBean.setDataset(datasetBean);
+                triggerBean.setUserAccount(userBean);
+                triggerBean.setFullName((String) dataMap.get(XsltTriggerService.JOB_NAME));
+                auditEventDAO.createRowForExtractDataJobFailure(triggerBean);
+            }
 
         } finally {
 
