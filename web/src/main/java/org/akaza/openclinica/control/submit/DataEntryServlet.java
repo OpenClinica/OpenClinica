@@ -1626,7 +1626,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 }
                 logMe("DisplayItemWithGroupBean allitems4 end "+System.currentTimeMillis());
                 //System.out.println("running rules: " + phase2.name());
-                ArrayList<Integer> prevShownDynItemDataIds = (ArrayList<Integer>)this.getItemMetadataService().getDynamicsItemFormMetadataDao().findShowItemDataIdsInSection(section.getSection().getId(), ecb.getCRFVersionId(), ecb.getId());
+                ArrayList<Integer> prevShownDynItemDataIds = shouldRunRules?
+                    (ArrayList<Integer>)this.getItemMetadataService().getDynamicsItemFormMetadataDao().findShowItemDataIdsInSection(section.getSection().getId(), ecb.getCRFVersionId(), ecb.getId())
+                    :new ArrayList<Integer>();
                 logMe("DisplayItemWithGroupBean dryrun  start"+System.currentTimeMillis());
                 HashMap<String, ArrayList<String>> rulesPostDryRun = runRules(allItems, ruleSets, false, shouldRunRules, MessageType.WARNING, phase2,ecb, request);
                 
@@ -5065,7 +5067,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
             ruleSets = getRuleSetService(request).filterRuleSetsByStudyEventOrdinal(ruleSets, studyEventBean, crfVersionBean, studyEventDefinition);
             // place next line here, tbh
             ruleSets = getRuleSetService(request).filterRuleSetsByHiddenItems(ruleSets, eventCrfBean, crfVersionBean);
-            return ruleSets;
+            return ruleSets!=null&&ruleSets.size()>0?ruleSets:new ArrayList<RuleSetBean>();
         } else
             return new ArrayList<RuleSetBean>();
     }
