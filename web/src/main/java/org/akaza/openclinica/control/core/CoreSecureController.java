@@ -22,6 +22,7 @@ import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.ConcurrentModificationException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -401,7 +402,7 @@ public abstract class CoreSecureController extends HttpServlet {
                 } else {
                     currentStudy = new StudyBean();
                 }
-                session.setAttribute("study", currentStudy);
+               
             } else if (currentStudy.getId() > 0) {
                 // YW 06-20-2007<< set site's parentstudy name when site is
                 // restored
@@ -410,6 +411,7 @@ public abstract class CoreSecureController extends HttpServlet {
                 }
                 // YW >>
             }
+            session.setAttribute("study", currentStudy);// The above line is moved here since currentstudy's value is set in else block and could change
 
             if (currentStudy.getParentStudyId() > 0) {
                 /*
@@ -957,14 +959,26 @@ public abstract class CoreSecureController extends HttpServlet {
 
     }
 
-    // JN:Not sure why these methods are synchronized?
+   //JN:Synchornized in the securecontroller to avoid concurrent modification exception
+    //JN: this could still throw concurrentModification, coz of remove TODO: try to do better. 
     public static synchronized void  removeLockedCRF(int userId) {
+     try{
         for (Iterator iter = getUnavailableCRFList().entrySet().iterator(); iter.hasNext();) {
             java.util.Map.Entry entry = (java.util.Map.Entry) iter.next();
+            
+            
             int id = (Integer) entry.getValue();
             if (id == userId)
-                getUnavailableCRFList().remove(entry.getKey());
+            {
+              getUnavailableCRFList().remove(entry.getKey());
+//                entry.setValue(id+(int)Math.random());
+           }
+              
+                //getUnavailableCRFList().
         }
+     }catch(ConcurrentModificationException cme){
+         cme.printStackTrace();//swallowing the exception, not the ideal thing to do but safer as of now.
+     }
     }
 
     public synchronized void  lockThisEventCRF(int ecb, int ub) {
