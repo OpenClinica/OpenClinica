@@ -3156,7 +3156,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 logger.debug("REMOVE an item data" + idb.getItemId() + idb.getValue());
                 idb.setUpdater(ub);
                 idb.setStatus(Status.DELETED);
-                idb = (ItemDataBean) iddao.updateValue(idb);
+                idb = (ItemDataBean) iddao.updateValueForRemoved(idb);
 
                 DiscrepancyNoteDAO dnDao = new DiscrepancyNoteDAO(getDataSource());
                 List dnNotesOfRemovedItem = dnDao.findExistingNotesForItemData(idb.getId());

@@ -35,6 +35,13 @@
 		VALUE=?,DATE_UPDATED=NOW(),UPDATE_ID=? WHERE
 		ITEM_DATA_ID=?</sql>
 	</query>
+	
+		<query>
+		<name>updateValueForRemoved</name>
+		<sql>UPDATE ITEM_DATA SET STATUS_ID=?,
+		VALUE=?,UPDATE_ID=? WHERE
+		ITEM_DATA_ID=?</sql>
+	</query>
 	<query>
         <name>updateUser</name>
         <sql>UPDATE ITEM_DATA SET

@@ -181,6 +181,35 @@ public class ItemDataDAO extends AuditableEntityDAO {
         return idb;
     }
     
+    
+    public EntityBean updateValueForRemoved(EntityBean eb) {
+        ItemDataBean idb = (ItemDataBean) eb;
+
+        // YW 12-06-2007 << convert to oc_date_format_string pattern before
+        // inserting into database
+        ItemDataType dataType = getDataType(idb.getItemId());
+        if (dataType.equals(ItemDataType.DATE)) {
+            idb.setValue(Utils.convertedItemDateValue(idb.getValue(), local_df_string, oc_df_string));
+        } else if (dataType.equals(ItemDataType.PDATE)) {
+            idb.setValue(formatPDate(idb.getValue()));
+        }
+        // YW >>
+
+        idb.setActive(false);
+
+        HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
+        variables.put(new Integer(1), new Integer(idb.getStatus().getId()));
+        variables.put(new Integer(2), idb.getValue());
+        variables.put(new Integer(3), new Integer(idb.getUpdaterId()));
+        variables.put(new Integer(4), new Integer(idb.getId()));
+        this.execute(digester.getQuery("updateValueForRemoved"), variables);
+
+        if (isQuerySuccessful()) {
+            idb.setActive(true);
+        }
+
+        return idb;
+    }
     /**
      * this will update item data status
      */

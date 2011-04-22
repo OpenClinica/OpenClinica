@@ -190,6 +190,9 @@
 		    LANGUAGE plpgsql;
     	 </sql>
     </changeSet>
+    
+    
+    
     <changeSet author="pgawade (generated)" id="1235684743487-361">
     	<preConditions onFail="MARK_RAN">
 	 	<dbms type="postgresql" />
@@ -424,6 +427,9 @@
 		END; ' LANGUAGE plpgsql VOLATILE;
     	 </sql>
     </changeSet>
+    
+    
+    
     <changeSet author="pgawade (generated)" id="1235684743487-365">
     	<preConditions onFail="MARK_RAN">
 	 	<dbms type="postgresql" />
