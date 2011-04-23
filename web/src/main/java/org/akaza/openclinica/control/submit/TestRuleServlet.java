@@ -249,8 +249,10 @@ public class TestRuleServlet extends SecureController {
                     try {
                         SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_format_string"));
                         SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
-                        java.util.Date date = sdf2.parse(entry.getValue());
-                        entry.setValue(sdf.format(date));
+                        if(!entry.getValue().isEmpty()) {
+                            java.util.Date date = sdf2.parse(entry.getValue());
+                            entry.setValue(sdf.format(date));
+                        }
                     } catch (Exception e) {
                         System.out.println(e);
                         // TODO: handle exception
@@ -298,8 +300,10 @@ public class TestRuleServlet extends SecureController {
                     try {
                         SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_format_string"));
                         SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
-                        java.util.Date date = sdf.parse(entry.getValue());
-                        entry.setValue(sdf2.format(date));
+                        if(!entry.getValue().isEmpty()) {
+                            java.util.Date date = sdf.parse(entry.getValue());
+                            entry.setValue(sdf2.format(date));
+                        }
                     } catch (Exception e) {
                         // TODO: handle exception
                     }
