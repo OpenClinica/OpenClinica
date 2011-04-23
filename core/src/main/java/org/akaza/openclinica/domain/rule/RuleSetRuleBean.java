@@ -13,8 +13,8 @@ import org.akaza.openclinica.domain.rule.action.EmailActionBean;
 import org.akaza.openclinica.domain.rule.action.HideActionBean;
 import org.akaza.openclinica.domain.rule.action.InsertActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
-import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
 import org.akaza.openclinica.domain.rule.action.ShowActionBean;
+import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
 import org.apache.commons.collections.FactoryUtils;
 import org.apache.commons.collections.list.LazyList;
 import org.hibernate.annotations.GenericGenerator;
@@ -147,8 +147,13 @@ public class RuleSetRuleBean extends AbstractAuditableMutableDomainObject {
         List<RuleActionBean> ruleActions = new ArrayList<RuleActionBean>();
         for (RuleActionBean action : actions) {
             String key = action.getExpressionEvaluatesTo().toString();
-            if (ruleEvaluatedTo.equals(key) && action.getRuleActionRun().canRun(phase)) {
-                ruleActions.add(action);
+            //if (ruleEvaluatedTo.equals(key) && action.getRuleActionRun().canRun(phase)) {
+            //    ruleActions.add(action);
+            //}
+            if (ruleEvaluatedTo.equals(key)) {
+                if(action.getRuleActionRun().canRun(phase)) ruleActions.add(action);
+            } else if("blankAgainstDateyyyyMMdd".equals(ruleEvaluatedTo)) {
+                if(action.getRuleActionRun().canRun(phase)) ruleActions.add(action);
             }
         }
         return ruleActions;
@@ -266,8 +271,8 @@ public class RuleSetRuleBean extends AbstractAuditableMutableDomainObject {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((actions == null) ? 0 : actions.hashCode());
-        result = prime * result + ((ruleBean == null) ? 0 : ruleBean.hashCode());
+        result = prime * result + (actions == null ? 0 : actions.hashCode());
+        result = prime * result + (ruleBean == null ? 0 : ruleBean.hashCode());
         return result;
     }
 
