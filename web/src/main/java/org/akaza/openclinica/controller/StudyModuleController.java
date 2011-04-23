@@ -4,7 +4,6 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyModuleStatusDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -14,8 +13,8 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.rule.RuleDAO;
 import org.akaza.openclinica.domain.managestudy.StudyModuleStatus;
-import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.HttpSessionRequiredException;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 
 import java.util.ArrayList;
@@ -36,10 +39,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * @author: sshamim
- * Date: Jan 22, 2009
- * Time: 6:52:16 PM
- * Manages the Study creation process
+ * @author: sshamim Date: Jan 22, 2009 Time: 6:52:16 PM Manages the Study creation process
  */
 @Controller("studyModuleController")
 @RequestMapping("/studymodule")
@@ -57,9 +57,9 @@ public class StudyModuleController {
     @Qualifier("ruleSetService")
     private RuleSetServiceInterface ruleSetService;
 
-//    @Autowired
-//    @Qualifier("ruleSetDao")
-//    private RuleSetDao ruleSetDao;
+    // @Autowired
+    // @Qualifier("ruleSetDao")
+    // private RuleSetDao ruleSetDao;
 
     @Autowired
     @Qualifier("dataSource")
@@ -88,7 +88,7 @@ public class StudyModuleController {
         panel.reset();
         request.getSession().setAttribute("panel", panel);
 
-        //setUpSidebar(request);
+        // setUpSidebar(request);
         ResourceBundleProvider.updateLocale(request.getLocale());
 
         StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
@@ -110,13 +110,13 @@ public class StudyModuleController {
         int crfCount = crfDao.findAllByStudy(currentStudy.getId()).size();
         int crfWithEventDefinition = crfDao.findAllActiveByDefinitions(currentStudy.getId()).size();
         int totalCrf = crfCount + crfWithEventDefinition;
-        //int eventDefinitionCount = eventDefinitionCRFDao.findAllActiveByStudy(currentStudy).size();
+        // int eventDefinitionCount = eventDefinitionCRFDao.findAllActiveByStudy(currentStudy).size();
         int eventDefinitionCount = studyEventDefinitionDao.findAllActiveByStudy(currentStudy).size();
 
         int subjectGroupCount = studyGroupClassDao.findAllActiveByStudy(currentStudy).size();
 
-        //List<RuleSetBean> ruleSets = ruleSetService.getRuleSetsByStudy(currentStudy);
-        //ruleSets = ruleSetService.filterByStatusEqualsAvailableOnlyRuleSetRules(ruleSets);
+        // List<RuleSetBean> ruleSets = ruleSetService.getRuleSetsByStudy(currentStudy);
+        // ruleSets = ruleSetService.filterByStatusEqualsAvailableOnlyRuleSetRules(ruleSets);
 
         int ruleCount = ruleSetService.getCountByStudy(currentStudy);
 
@@ -181,24 +181,24 @@ public class StudyModuleController {
         map.addAttribute("childStudyUserCount", childStudyUserCount);
         map.addAttribute("studyId", currentStudy.getId());
         map.addAttribute("currentStudy", currentStudy);
-        
-        // @pgawade 13-April-2011- #8877:  Added the rule designer URL        
-        if (null != coreResources) {            
+
+        // @pgawade 13-April-2011- #8877: Added the rule designer URL
+        if (null != coreResources) {
             map.addAttribute("ruleDesignerURL", coreResources.getField("designer.url"));
             map.addAttribute("contextPath", getContextPath(request));
             map.addAttribute("hostPath", getHostPath(request));
+            map.addAttribute("path", "pages/studymodule");
         }
         UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
         request.setAttribute("userBean", userBean);
         ArrayList statusMap = Status.toStudyUpdateMembersList();
-//        statusMap.add(Status.PENDING);
+        // statusMap.add(Status.PENDING);
         request.setAttribute("statusMap", statusMap);
 
-        if(currentStudy.getParentStudyId() > 0){
-            StudyBean parentStudy = (StudyBean)studyDao.findByPK(currentStudy.getParentStudyId());
+        if (currentStudy.getParentStudyId() > 0) {
+            StudyBean parentStudy = (StudyBean) studyDao.findByPK(currentStudy.getParentStudyId());
             request.setAttribute("parentStudy", parentStudy);
         }
-
 
         ArrayList pageMessages = new ArrayList();
         if (request.getSession().getAttribute("pageMessages") != null) {
@@ -213,7 +213,7 @@ public class StudyModuleController {
     public String processSubmit(@ModelAttribute("studyModuleStatus") StudyModuleStatus studyModuleStatus, BindingResult result, SessionStatus status,
             HttpServletRequest request) {
         StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
-        if (request.getParameter("saveStudyStatus") == null){
+        if (request.getParameter("saveStudyStatus") == null) {
             studyModuleStatusDao.saveOrUpdate(studyModuleStatus);
             status.setComplete();
         } else {
