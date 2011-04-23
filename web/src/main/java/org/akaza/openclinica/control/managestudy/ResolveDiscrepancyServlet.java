@@ -217,14 +217,17 @@ public class ResolveDiscrepancyServlet extends SecureController {
         // BWP 03/17/2009 3166: if it's not an ItemData type note, redirect
         // Monitors to View Subject or
         // View Study Events <<
-        if (currentRole.getRole().equals(Role.MONITOR) && !"itemdata".equalsIgnoreCase(entityType) && !"eventcrf".equalsIgnoreCase(entityType)) {
+        if (currentRole.getRole().equals(Role.MONITOR) && !"itemdata".equalsIgnoreCase(entityType)
+                && !"eventcrf".equalsIgnoreCase(entityType)) {
             redirectMonitor(module, discrepancyNoteBean);
             return;
         }
         // >>
         // If Study is Frozen or Locked
-        if (currentStudy.getStatus().isFrozen()) {
+        if (currentStudy.getStatus().isFrozen() && !"itemdata".equalsIgnoreCase(entityType) 
+                && !"eventcrf".equalsIgnoreCase(entityType)) {
             redirectMonitor(module, discrepancyNoteBean);
+            return;
         }
 
         boolean toView = false;
