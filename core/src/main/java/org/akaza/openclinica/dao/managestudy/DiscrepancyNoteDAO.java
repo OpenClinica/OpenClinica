@@ -503,11 +503,8 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
             sql += " and ec.event_crf_id not in ( " + this.findSiteHiddenEventCrfIdsString(currentStudy) + " ) ";
         }
         sql += filter.execute("");
-//        if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
-//            sql += " )x)where r between " + (rowStart + 1) + " and " + rowEnd;
-//        }
+        sql += sort.execute("");
 
-        //System.out.println(sql);
         ArrayList rows = select(sql, variables);
 
         Iterator it = rows.iterator();
