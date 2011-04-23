@@ -48,6 +48,9 @@ public class RelationalOpNode extends ExpressionNode {
         double x, y;
         String l = String.valueOf(left.value());
         String r = String.valueOf(right.value());
+        //allowed date node against blank node
+        if(l.isEmpty() && ExpressionTreeHelper.isDateyyyyMMdd(r)) return "true";
+        if(r.isEmpty() && ExpressionTreeHelper.isDateyyyyMMdd(l)) return "true";
         validate(l, r);
         if (ExpressionTreeHelper.isDateyyyyMMdd(l) && ExpressionTreeHelper.isDateyyyyMMdd(r)) {
             x = ExpressionTreeHelper.getDate(l).getTime();
