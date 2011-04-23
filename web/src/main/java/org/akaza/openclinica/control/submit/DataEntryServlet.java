@@ -2366,7 +2366,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
         FormProcessor fp = new FormProcessor(request);
         org.akaza.openclinica.bean.core.ResponseType rt = dib.getMetadata().getResponseSet().getResponseType();
         
-        if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)) {
+        if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)
+                || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECT)) {
             dib.loadFormValue(fp.getStringArray(inputName));
             // YW, 2-4-2008 << calculation result has been written in dib-data
         } else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CALCULATION)
