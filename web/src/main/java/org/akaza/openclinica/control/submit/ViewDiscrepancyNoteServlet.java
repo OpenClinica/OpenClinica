@@ -44,14 +44,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author jxu
@@ -193,6 +186,10 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
         Boolean refresh = fp.getBoolean("refresh");
         request.setAttribute("refresh", refresh+"");
         String ypos = fp.getString("y");
+        if (ypos == null || ypos.length() == 0) {
+            ypos = "0";
+        }
+        
         request.setAttribute("y", ypos);
         
         DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(sm.getDataSource());
@@ -422,7 +419,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 
         FormDiscrepancyNotes newNotes = (FormDiscrepancyNotes) session.getAttribute(FORM_DISCREPANCY_NOTES_NAME);
 
-        HashMap<Integer, DiscrepancyNoteBean> noteTree = new HashMap<Integer, DiscrepancyNoteBean>();
+        Map<Integer, DiscrepancyNoteBean> noteTree = new LinkedHashMap<Integer, DiscrepancyNoteBean>();
         
         if (newNotes != null && !newNotes.getNotes(field).isEmpty()) {
             ArrayList newFieldNotes = newNotes.getNotes(field);
@@ -701,6 +698,23 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
                     //parent.setResStatus(ResolutionStatus.get(lastChild.getResolutionStatusId()));
                 }
             }
+        }
+
+        //Sorting parent notes according to the last child being updated. The parent who has the most recently updated child gets into the top.
+        List<DiscrepancyNoteBean> parentNotes = new ArrayList<DiscrepancyNoteBean>(noteTree.values());
+        Collections.sort(parentNotes, new Comparator<DiscrepancyNoteBean>(){
+            public int compare(DiscrepancyNoteBean dn1, DiscrepancyNoteBean dn2) {
+                ArrayList<DiscrepancyNoteBean> cn1 = dn1.getChildren();
+                DiscrepancyNoteBean child1 = cn1.size() > 0 ? cn1.get(cn1.size() - 1) : dn1;
+                ArrayList<DiscrepancyNoteBean> cn2 = dn2.getChildren();
+                DiscrepancyNoteBean child2 = cn2.size() > 0 ? cn2.get(cn2.size() - 1) : dn2;
+                return child1.getId() > child2.getId() ? -1 : 1; 
+                //return ((DiscrepancyNoteBean)o1).getLastDateUpdated().after(((DiscrepancyNoteBean)o2).getLastDateUpdated()) ? -1 : 1;
+            }
+        });
+        noteTree.clear();
+        for (DiscrepancyNoteBean dn : parentNotes) {
+            noteTree.put(dn.getId(), dn);
         }
     }
 

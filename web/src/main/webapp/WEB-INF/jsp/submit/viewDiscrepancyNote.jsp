@@ -26,8 +26,28 @@
     <title><fmt:message key="openclinica" bundle="${resword}"/>- <fmt:message key="view_discrepancy_note" bundle="${resword}"/></title>
     <link rel="stylesheet" href="includes/styles.css" type="text/css">
     <script language="JavaScript" src="includes/global_functions_javascript.js"></script>
-    
-    
+    <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
+    <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js"></script>
+    <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js"></script>
+    <script type="text/javascript" language="javascript">jQuery.noConflict();</script>
+    <script language="JavaScript">
+        function scrollToElement(id) {
+            alert(id);
+            alert(document.getElementById(id).offsetTop);
+            window.scrollTo(0,(document.getElementById(id)).offsetTop);
+        }
+
+        function findPosition(obj) {
+            var curtop = 0;
+            if (obj.offsetParent) {
+                do {
+                    curtop += obj.offsetTop;
+                } while (obj = obj.offsetParent);
+            return [curtop];
+            }
+        }
+    </script>
+
     <style type="text/css">
 
         .popup_BG { background-image: url(images/main_BG.gif);
@@ -53,7 +73,7 @@
 <!-- End Alert Box -->
 
 <div style="float: left;"><h1 class="title_manage"><c:out value="${entityName}"/>: <fmt:message key="view_discrepancy_notes" bundle="${resword}"/></h1></div>
-<div style="float: right;"><p><a href="#" onclick="javascript:window.close();"><fmt:message key="close_window" bundle="${resword}"/></a></p></div>
+<div style="float: right;"><p><a href="#" onclick="javascript:window.close();"><fmt:message key="exit_window" bundle="${resword}"/></a></p></div>
 <br clear="all">
 
 
@@ -252,13 +272,13 @@
                             			<c:forEach var="status" items="${resolutionStatuses}">
                         					<c:choose>
                         					<c:when test="${status.id == 2}">
-                        						<input class="button_medium" type="button" id="resStatus${status.id}${note.value.id}" value="<fmt:message key="Update" bundle="${resterm}"/>" onclick="javascript:boxShowWithDefault('<c:out value="${note.value.id}"/>','<c:out value="${sindex}"/>','<c:out value="${status.id}"/>','<c:out value="${status.name}"/>');"/>
+                        						<input class="button_medium" type="button" id="resStatus${status.id}${note.value.id}" value="<fmt:message key="updaate_note" bundle="${resterm}"/>" onclick="javascript:boxShowWithDefault('<c:out value="${note.value.id}"/>','<c:out value="${sindex}"/>','<c:out value="${status.id}"/>','<c:out value="${status.name}"/>');/*scrollToElement('<c:out value="submitBtn${note.value.id}"/>');*/"/>
             								</c:when>
             								<c:when test="${status.id == 3}">
                         						<input class="button_medium" type="button" id="resStatus${status.id}${note.value.id}" value="<fmt:message key="Propose_Resolution" bundle="${resterm}"/>" onclick="javascript:boxShowWithDefault('<c:out value="${note.value.id}"/>','<c:out value="${sindex}"/>','<c:out value="${status.id}"/>','<c:out value="${status.name}"/>');"/>
             								</c:when>
             								<c:when test="${status.id == 4}">
-                        						<input class="button_medium" type="button" id="resStatus${status.id}${note.value.id}" value="<fmt:message key="Close" bundle="${resterm}"/>" onclick="javascript:boxShowWithDefault('<c:out value="${note.value.id}"/>','<c:out value="${sindex}"/>','<c:out value="${status.id}"/>','<c:out value="${status.name}"/>');"/>
+                        						<input class="button_medium" type="button" id="resStatus${status.id}${note.value.id}" value="<fmt:message key="close_note" bundle="${resterm}"/>" onclick="javascript:boxShowWithDefault('<c:out value="${note.value.id}"/>','<c:out value="${sindex}"/>','<c:out value="${status.id}"/>','<c:out value="${status.name}"/>');"/>
             								</c:when>
                         					</c:choose>
                         					<c:set var="sindex" value="${sindex+1}"/>

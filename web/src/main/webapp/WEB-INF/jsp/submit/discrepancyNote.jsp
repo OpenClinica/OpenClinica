@@ -31,8 +31,8 @@ function boxShowWithDefault(id, index, defaultId, defaultValue){
 	var objSelect = MM_findObj("resStatusId"+id);
 	if(objSelect != null) {
 		objSelect.selectedIndex = index;
-		objSelect.options[selectedIndex].value = defaultId;
-		objSelect.options[selectedIndex].text = defaultValue;	
+		objSelect.options[index].value = defaultId;
+		objSelect.options[index].text = defaultValue;
 	}
 }
 
@@ -205,7 +205,7 @@ function setYPos(id) {
 		<div class="dnBoxCol1-1"><fmt:message key="description" bundle="${resword}"/>:<span class="alert">*</span></div>
 		<div class="dnBoxCol2-1">
 			<span id="description${parentId}">
-				<div class="formfieldXL_BG"><input type="text" name="description${parentId}" value="<c:out value="${discrepancyNote.description}"/>" class="formfieldXL"></div>
+				<div class="formfieldXL_BG"><input type="text" id="description${parentId}id" name="description${parentId}" value="<c:out value="${discrepancyNote.description}"/>" class="formfieldXL"></div>
 				<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="description${parentId}"/></jsp:include>
 			</span>
 		</div>
@@ -370,7 +370,7 @@ function setYPos(id) {
 		<c:set var= "noteEntityType" value="${discrepancyNote.entityType}"/>
 		<c:if test="${enterData == '1' || canMonitor == '1' || noteEntityType != 'itemData' }">
 			<div class="dnBoxCol3">
-				<input type="submit" name="Submit${parentId}" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onclick="javascript:setYPos('<c:out value="${parentId}"/>');">
+				<input type="submit" id="submitBtn${parentId}" name="Submit${parentId}" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onclick="javascript:setYPos('<c:out value="${parentId}"/>');">
 				<input type="submit" name="SubmitExit${parentId}" value="<fmt:message key="submit_exit" bundle="${resword}"/>" class="button_medium" onclick="javascript:setValue('close<c:out value="${parentId}"/>','true');javascript:setYPos('<c:out value="${parentId}"/>');">
 			</div>
 		</c:if>
