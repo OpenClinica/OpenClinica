@@ -30,6 +30,7 @@ public class ExpressionTreeHelper {
     final static String MMddyyyyFORMATSlashes = "MM/dd/yyyy";
     final static String yyyyMMddFORMATDashes = "yyyy-MM-dd";
     final static String MMddyyyyFORMATDashes = "MM-dd-yyyy";
+    final static String ddMMMyyyyFORMATDashes = "dd-MMM-yyyy";
 
     static Date getDate(String dateString) {
         logger.info("DateString : " + dateString);
@@ -44,6 +45,17 @@ public class ExpressionTreeHelper {
                 throw new OpenClinicaSystemException("OCRERR_0004", new Object[] { dateString });
             }
         } else {
+            throw new OpenClinicaSystemException("OCRERR_0004", new Object[] { dateString });
+        }
+    }
+    
+    static Date getDateFromddMMMyyyyDashes(String dateString) {
+        logger.info("DateString : " + dateString);
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy");
+            Date d = sdf.parse(dateString);
+            return d;
+        } catch (ParseException e) {
             throw new OpenClinicaSystemException("OCRERR_0004", new Object[] { dateString });
         }
     }
@@ -80,6 +92,23 @@ public class ExpressionTreeHelper {
             return true;
         else
             return false;
+    }
+    
+    static public boolean isDateddMMMyyyyDashes(String dateString) {
+        String dateFormat = ddMMMyyyyFORMATDashes;
+        SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
+        Date theDate = null;
+        try {
+            theDate = sdf.parse(dateString);
+        } catch (ParseException e) {
+            logger.info("dateString="+dateString+" failed parse format: "+dateFormat);
+            return false;
+        }
+        if (!sdf.format(theDate).equals(dateString)) {
+            logger.info("dateSring="+dateString+" has been parsed to "+theDate+" which cannot be formatted back to "+dateString);
+            return false;
+        }
+        return true;
     }
 
     static public String isValidDateMMddyyyy(String theString) {

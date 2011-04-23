@@ -48,13 +48,19 @@ public class RelationalOpNode extends ExpressionNode {
         double x, y;
         String l = String.valueOf(left.value());
         String r = String.valueOf(right.value());
-        //allowed date node against blank node
-        if(l.isEmpty() && ExpressionTreeHelper.isDateyyyyMMdd(r)) return "true";
-        if(r.isEmpty() && ExpressionTreeHelper.isDateyyyyMMdd(l)) return "true";
+        if(blankAgainstDateyyyyMMdd(l,r)) {
+            return "blankAgainstDateyyyyMMdd";
+        }
         validate(l, r);
         if (ExpressionTreeHelper.isDateyyyyMMdd(l) && ExpressionTreeHelper.isDateyyyyMMdd(r)) {
             x = ExpressionTreeHelper.getDate(l).getTime();
             y = ExpressionTreeHelper.getDate(r).getTime();
+        } else if(ExpressionTreeHelper.isDateddMMMyyyyDashes(l) && ExpressionTreeHelper.isDateyyyyMMdd(r)) {
+            x = ExpressionTreeHelper.getDateFromddMMMyyyyDashes(l).getTime();
+            y = ExpressionTreeHelper.getDate(r).getTime();
+        } else if(ExpressionTreeHelper.isDateddMMMyyyyDashes(r) && ExpressionTreeHelper.isDateyyyyMMdd(l)) {
+            x = ExpressionTreeHelper.getDate(l).getTime();
+            y = ExpressionTreeHelper.getDateFromddMMMyyyyDashes(r).getTime();
         } else {
             x = Double.valueOf(l);
             y = Double.valueOf(r);
@@ -88,9 +94,11 @@ public class RelationalOpNode extends ExpressionNode {
     }
 
     void validate(String l, String r) throws OpenClinicaSystemException {
-        if (!(ExpressionTreeHelper.isDateyyyyMMdd(l) && ExpressionTreeHelper.isDateyyyyMMdd(r)) && !isDouble(l, r)) {
-            //throw new OpenClinicaSystemException(l + " and " + r + " cannot be used with the " + op.toString() + " operator");
-            throw new OpenClinicaSystemException("OCRERR_0001", new Object[] { l, r, op.toString() });
+        if(!preValidateOnddMMMyyyyDashes(l, r)) {
+            if (!(ExpressionTreeHelper.isDateyyyyMMdd(l) && ExpressionTreeHelper.isDateyyyyMMdd(r)) && !isDouble(l, r)) {
+                //throw new OpenClinicaSystemException(l + " and " + r + " cannot be used with the " + op.toString() + " operator");
+                throw new OpenClinicaSystemException("OCRERR_0001", new Object[] { l, r, op.toString() });
+            }
         }
     }
 
@@ -99,6 +107,23 @@ public class RelationalOpNode extends ExpressionNode {
             //throw new OpenClinicaSystemException(l + " and " + r + " cannot be used with the " + op.toString() + " operator");
             throw new OpenClinicaSystemException("OCRERR_0001", new Object[] { ltext, rtext, op.toString() });
         }
+    }
+    
+    /*
+     * Precondition: both l and r are not empty.
+     * Return true only if one is dd-MMM-yyyy format, another is ExpressionTreeHelper.isDateyyyyMMdd
+     */
+    private boolean preValidateOnddMMMyyyyDashes(String l, String r) {
+        if(ExpressionTreeHelper.isDateddMMMyyyyDashes(l)&&ExpressionTreeHelper.isDateyyyyMMdd(r)
+            ||ExpressionTreeHelper.isDateddMMMyyyyDashes(r)&&ExpressionTreeHelper.isDateyyyyMMdd(l)) {
+            return true;
+        }
+        return false;
+    }
+    
+    private boolean blankAgainstDateyyyyMMdd(String l, String r) {
+        return l.isEmpty() && ExpressionTreeHelper.isDateyyyyMMdd(r) 
+                || r.isEmpty() && ExpressionTreeHelper.isDateyyyyMMdd(l);
     }
 
     @Override
