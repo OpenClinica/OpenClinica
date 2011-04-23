@@ -737,14 +737,6 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                         }
 
                     }
-                    if (note.getEntityId() == 0) {
-                        // addPageMessage(
-                        // "Your discrepancy note for the item cannot be saved because there is no item data for this CRF in the database yet."
-                        // );
-                        addPageMessage(respage.getString("note_cannot_be_saved"));
-                        forwardPage(Page.ADD_DISCREPANCY_NOTE_SAVE_DONE);
-                        return;
-                    }
                     note = (DiscrepancyNoteBean) dndao.create(note);
 
                     dndao.createMapping(note);
