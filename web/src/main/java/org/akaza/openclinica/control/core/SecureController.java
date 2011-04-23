@@ -724,6 +724,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     protected void setPopUpURL(String url) {
         if (url != null && request != null) {
             request.setAttribute(POP_UP_URL, url);
+            request.setAttribute("hasPopUp", 1);
             logger.info("just set pop up url: " + url);
             System.out.println("just set pop up url: " + url);
         }

@@ -118,6 +118,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 <input type="hidden" name="fromViewNotes" value="<c:out value="${fromViewNotes}"/>" />
 <%-- We have to feed this value to the method giveFirstElementFocus()--%>
 <input id="formFirstField" type="hidden" name="formFirstField" value="${requestScope['formFirstField']}" />
+<input id="hasPopUp" type="hidden" name="hasPopUp" value="${requestScope['hasPopUp']}" />
 <input type="hidden" name="exitTo" value="${exitTo}" />
 <script type="text/javascript" language="JavaScript">
     // <![CDATA[

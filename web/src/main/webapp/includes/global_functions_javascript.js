@@ -141,6 +141,13 @@ function myCancel(objButtonText) {
  */
 function giveFirstElementFocus(){
 
+    var element = document.getElementById("hasPopUp");
+    if (element != null) {
+        var hasPopUp = element.value;
+        if (hasPopUp == 1) {
+            return;
+        }
+    }
     var frm = document.getElementById("mainForm");
     if(frm == null){
         return;
