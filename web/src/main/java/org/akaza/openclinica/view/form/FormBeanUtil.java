@@ -308,6 +308,12 @@ public class FormBeanUtil {
 
         // divide up items into columns
         int numberOfColumns = getNumberOfColumnsFromItems(items);
+        // Fixing table width for orphan table Mantis issue: 9087.
+        // ToDo recheck why the main table getting fixed 
+        int tableWidth = numberOfColumns*300;
+        table.setAttribute("style", "width:" + tableWidth + "px;");
+
+
         // A Map designed to hold DisplayItemBeans according to their column
         // number
         // The Map index is the column number; it is sorted so it begins with
