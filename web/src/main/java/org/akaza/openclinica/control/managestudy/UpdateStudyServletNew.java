@@ -16,6 +16,7 @@ import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
+import org.akaza.openclinica.control.form.Validation;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyConfigService;
@@ -250,8 +251,12 @@ public class UpdateStudyServletNew extends SecureController {
         study.setKeywords(fp.getString("keywords"));
         study.setEligibility(fp.getString("eligibility"));
         study.setGender(fp.getString("gender"));
-
+        if (fp.getString("ageMax").length() > 3) {
+            Validator.addError(errors, "ageMax", respage.getString("condition_eligibility_3"));
+        }
         study.setAgeMax(fp.getString("ageMax"));
+
+
         study.setAgeMin(fp.getString("ageMin"));
         study.setHealthyVolunteerAccepted(fp.getBoolean("healthyVolunteerAccepted"));
         study.setExpectedTotalEnrollment(fp.getInt("expectedTotalEnrollment"));
