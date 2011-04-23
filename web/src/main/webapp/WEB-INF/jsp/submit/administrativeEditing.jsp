@@ -748,21 +748,22 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
     	</c:choose>
     </c:forEach>
     <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">
-        <c:choose>
-            <c:when test="${sectionBorders == 1}">
-                <td class="aka_padding_norm aka_cellBorders_dark">
-                    <input type="hidden" name="<c:out value="${repeatParentId}"/>_[<c:out value="${repeatParentId}"/>].newRow" value="yes" />
-                    <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove"></button>
-                </td>
-            </c:when>
-
-            <c:otherwise>
-                <td class="aka_padding_norm aka_cellBorders">
-                    <input type="hidden" name="<c:out value="${repeatParentId}"/>_[<c:out value="${repeatParentId}"/>].newRow" value="yes" />
-                    <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove"></button>
-                </td>
-            </c:otherwise>
-        </c:choose>
+    <!-- 0009164: Disable the X for a repeating group-->
+<!--        <c:choose>-->
+<!--            <c:when test="${sectionBorders == 1}">-->
+<!--                <td class="aka_padding_norm aka_cellBorders_dark">-->
+<!--                    <input type="hidden" name="<c:out value="${repeatParentId}"/>_[<c:out value="${repeatParentId}"/>].newRow" value="yes" />-->
+<!--                    <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove"></button>-->
+<!--                </td>-->
+<!--            </c:when>-->
+<!---->
+<!--            <c:otherwise>-->
+<!--                <td class="aka_padding_norm aka_cellBorders">-->
+<!--                    <input type="hidden" name="<c:out value="${repeatParentId}"/>_[<c:out value="${repeatParentId}"/>].newRow" value="yes" />-->
+<!--                    <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove"></button>-->
+<!--                </td>-->
+<!--            </c:otherwise>-->
+<!--        </c:choose>-->
     </c:if>
 </tr>
 
