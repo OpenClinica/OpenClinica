@@ -32,10 +32,19 @@ public class RelationalOpNode extends ExpressionNode {
         double x, y;
         String l = String.valueOf(left.testValue());
         String r = String.valueOf(right.testValue());
+        if(blankAgainstDateyyyyMMdd(l,r)) {
+            return "blankAgainstDateyyyyMMdd";
+        }
         validate(l, r, left.getNumber(), right.getNumber());
         if (ExpressionTreeHelper.isDateyyyyMMdd(l) && ExpressionTreeHelper.isDateyyyyMMdd(r)) {
             x = ExpressionTreeHelper.getDate(l).getTime();
             y = ExpressionTreeHelper.getDate(r).getTime();
+        } else if(ExpressionTreeHelper.isDateddMMMyyyyDashes(l) && ExpressionTreeHelper.isDateyyyyMMdd(r)) {
+            x = ExpressionTreeHelper.getDateFromddMMMyyyyDashes(l).getTime();
+            y = ExpressionTreeHelper.getDate(r).getTime();
+        } else if(ExpressionTreeHelper.isDateddMMMyyyyDashes(r) && ExpressionTreeHelper.isDateyyyyMMdd(l)) {
+            x = ExpressionTreeHelper.getDate(l).getTime();
+            y = ExpressionTreeHelper.getDateFromddMMMyyyyDashes(r).getTime();
         } else {
             x = Double.valueOf(l);
             y = Double.valueOf(r);

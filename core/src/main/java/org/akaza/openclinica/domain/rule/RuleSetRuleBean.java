@@ -147,13 +147,8 @@ public class RuleSetRuleBean extends AbstractAuditableMutableDomainObject {
         List<RuleActionBean> ruleActions = new ArrayList<RuleActionBean>();
         for (RuleActionBean action : actions) {
             String key = action.getExpressionEvaluatesTo().toString();
-            //if (ruleEvaluatedTo.equals(key) && action.getRuleActionRun().canRun(phase)) {
-            //    ruleActions.add(action);
-            //}
-            if (ruleEvaluatedTo.equals(key)) {
-                if(action.getRuleActionRun().canRun(phase)) ruleActions.add(action);
-            } else if("blankAgainstDateyyyyMMdd".equals(ruleEvaluatedTo)) {
-                if(action.getRuleActionRun().canRun(phase)) ruleActions.add(action);
+            if (ruleEvaluatedTo.equals(key) && action.getRuleActionRun().canRun(phase)) {
+                ruleActions.add(action);
             }
         }
         return ruleActions;
