@@ -164,30 +164,46 @@
               <td><div class="formfieldXL_BG">
            <c:set var="dis" value="${parentStudy.name!='' && !parentStudy.status.available}"/>
            <c:set var="status1" value="${studyToView.status.id}"/>
-           <select name="statusId" class="formfieldXL" disabled="true">
-              <c:forEach var="status" items="${statuses}">
-               <c:choose>
-                <c:when test="${status1 == status.id}">
-                 <option value="<c:out value="${status.id}"/>" selected>
-                     <c:if test="${status.id == 4}">
-                         <fmt:message key="design" bundle="${resword}"/>
-                     </c:if>
-                     <c:if test="${status.id != 4}">
-                         <c:out value="${status.name}"/>
-                     </c:if>
-                </c:when>
-                <c:otherwise>
-                 <option value="<c:out value="${status.id}"/>">
-                      <c:if test="${status.id == 4}">
-                          <fmt:message key="design" bundle="${resword}"/>
-                      </c:if>
-                      <c:if test="${status.id != 4}">
-                          <c:out value="${status.name}"/>
-                      </c:if>
-                </c:otherwise>
-               </c:choose>
-            </c:forEach>
-           </select></div>
+          <select class="formfieldXL" name="statusId" disabled="true">
+            <c:forEach var="status" items="${statuses}">
+             <c:choose>
+              <c:when test="${status1 == status.id}">
+               <option value="<c:out value="${status.id}"/>" selected><c:out value="${status.name}"/>
+              </c:when>
+              <c:otherwise>
+               <option value="<c:out value="${status.id}"/>"><c:out value="${status.name}"/>
+              </c:otherwise>
+             </c:choose>
+           </c:forEach>
+           </select>
+           <input type=hidden name="status" value="${status1}">
+
+                  <%--<select name="statusId" class="formfieldXL" disabled="true">--%>
+              <%--<c:forEach var="status" items="${statuses}">--%>
+               <%--<c:choose>--%>
+                <%--<c:when test="${status1 == status.id}">--%>
+                 <%--<option value="<c:out value="${status.id}"/>" selected>--%>
+                     <%--<c:if test="${status.id == 4}">--%>
+                         <%--<fmt:message key="design" bundle="${resword}"/>--%>
+                     <%--</c:if>--%>
+                     <%--<c:if test="${status.id != 4}">--%>
+                         <%--<c:out value="${status.name}"/>--%>
+                     <%--</c:if>--%>
+                <%--</c:when>--%>
+                <%--<c:otherwise>--%>
+                 <%--<option value="<c:out value="${status.id}"/>">--%>
+                      <%--<c:if test="${status.id == 4}">--%>
+                          <%--<fmt:message key="design" bundle="${resword}"/>--%>
+                      <%--</c:if>--%>
+                      <%--<c:if test="${status.id != 4}">--%>
+                          <%--<c:out value="${status.name}"/>--%>
+                      <%--</c:if>--%>
+                <%--</c:otherwise>--%>
+               <%--</c:choose>--%>
+            <%--</c:forEach>--%>
+           <%--</select>--%>
+
+              </div>
           </td><td>*</td></tr>
           <tr valign="top"><td class="formlabel"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#SecondaryIds" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#SecondaryIds'); return false;"><b><fmt:message key="secondary_IDs" bundle="${resword}"/></b>:</a><br>(<fmt:message key="separate_by_commas" bundle="${resword}"/>)</td>
           <td> <div class="formtextareaXL4_BG">

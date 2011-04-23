@@ -364,7 +364,7 @@ public class UpdateStudyServletNew extends SecureController {
     private boolean updateStudy2(FormProcessor fp) {
 
         study.setOldStatus(study.getStatus());
-        study.setStatus(Status.get(fp.getInt("statusId")));
+        study.setStatus(Status.get(fp.getInt("status")));
 
         if (StringUtil.isBlank(fp.getString(INPUT_VER_DATE))) {
             study.setProtocolDateVerification(null);
