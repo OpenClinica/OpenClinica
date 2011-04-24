@@ -76,10 +76,10 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
             StudyEventDefinitionBean sed) {
         // Using a sql query because we are referencing objects not managed by hibernate
         String query =
-            " select rs.* from rule_set rs where rs.study_id = :studyId " + " AND ( rs.study_event_definition_id = :studyEventDefinitionId "
+            " select rs.* from rule_set rs where rs.study_id = :studyId " + " AND (( rs.study_event_definition_id = :studyEventDefinitionId "
                 + " AND (( rs.crf_version_id = :crfVersionId AND rs.crf_id = :crfId ) "
                 + " OR (rs.crf_version_id is null AND rs.crf_id = :crfId ))) OR ( rs.study_event_definition_id is null "
-                + " and rs.item_id in (select item_id from item_form_metadata where crf_version_id = :crfVersionId)  )";
+                + " and rs.item_id in (select item_id from item_form_metadata where crf_version_id = :crfVersionId)  ))";
         org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(domainClass());
         q.setInteger("crfVersionId", crfVersion.getId());
         q.setInteger("crfId", crfBean.getId());
