@@ -31,6 +31,9 @@ public class ListNotesSort implements CriteriaCommand {
     public String execute(String criteria) {
         String theCriteria = "";
         for (Sort sort : sorts) {
+            if (columnMapping.get(sort.getProperty()) == null || columnMapping.get(sort.getProperty()).length() == 0) {
+                continue;
+            }
             if (theCriteria.length() == 0) {
                 theCriteria += buildCriteriaInitial(criteria, sort.getProperty(), sort.getOrder());
             } else {
