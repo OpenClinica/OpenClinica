@@ -56,7 +56,16 @@
     <td class="table_cell"><fmt:formatDate value="${note.createdDate}" pattern="${dteFormat}"/></td>
     <td class="table_cell"><fmt:formatDate value="${note.updatedDate}" pattern="${dteFormat}"/></td>
     <td class="table_cell"><c:out value="${note.age}" /></td>
-    <td class="table_cell"><c:out value="${note.days}" /></td>
+    <td class="table_cell">
+        <c:choose>
+            <c:when test="${note.days > 0}">
+                <c:out value="${note.days}" />
+            </c:when>
+            <c:otherwise>
+                &nbsp;
+            </c:otherwise>
+        </c:choose>
+    </td>
     <td class="table_cell"><c:out value="${note.eventName}" />&nbsp;</td>
     <td class="table_cell"><c:out value="${note.crfName}" />&nbsp;</td>
     <td class="table_cell">	 
