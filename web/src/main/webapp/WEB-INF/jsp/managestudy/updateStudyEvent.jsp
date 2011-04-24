@@ -121,7 +121,7 @@
 			<tr>
 				<c:import url="../include/showDateTimeInput.jsp"><c:param name="prefix" value="start"/><c:param name="count" value="1"/></c:import>
 				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>) *<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
-                    <a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${ss_id}&id=<c:out value="${event.id}"/>&name=studyEvent&field=start&column=date_start','spanAlert-start'); return false;"><img id="flag_start" name="flag_start" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
+                    <a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${ss_id}&id=<c:out value="${event.id}"/>&name=studyEvent&field=start&column=start_date','spanAlert-start'); return false;"><img id="flag_start" name="flag_start" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
 			</tr>
 			<tr>
 				<td colspan="7"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="start"/></jsp:include></td>
@@ -137,7 +137,7 @@
 			<tr>
 				<c:import url="../include/showDateTimeInput.jsp"><c:param name="prefix" value="end"/><c:param name="count" value="2"/></c:import>
 				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>) <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
-                    <a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${ss_id}&id=<c:out value="${event.id}"/>&name=studyEvent&field=end&column=date_end','spanAlert-end'); return false;"><img id="flag_end" name="flag_end" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
+                    <a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${ss_id}&id=<c:out value="${event.id}"/>&name=studyEvent&field=end&column=end_date','spanAlert-end'); return false;"><img id="flag_end" name="flag_end" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
 			</tr>
 			<tr>
 				<td colspan="7"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="end"/></jsp:include></td>
