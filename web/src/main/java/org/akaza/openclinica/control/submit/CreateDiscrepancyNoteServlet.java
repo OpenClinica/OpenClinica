@@ -546,7 +546,17 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             }
             // #4346 TBH 10/2009 
 
+            //If the data entry form has not been saved yet, collecting info from parent page.
             dnb = getNoteInfo(dnb);// populate note infos
+            if (dnb.getEventName() == null || dnb.getEventName().equals("")) {
+                dnb.setEventName(fp.getString("eventName"));
+            }
+            if (dnb.getEventStart() == null) {
+                dnb.setEventStart(fp.getDate("eventDate"));
+            }
+            if (dnb.getCrfName() == null || dnb.getCrfName().equals("")) {
+                dnb.setCrfName(fp.getString("crfName"));
+            }
             //            String detailedDes = fp.getString("strErrMsg");
             //            if (detailedDes != null) {
             //            	dnb.setDetailedNotes(detailedDes);

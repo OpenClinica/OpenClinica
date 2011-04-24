@@ -963,9 +963,13 @@ include the default value first in the select list --%>
 	    ></a></td>
     </c:when>
     <c:otherwise>
+        <c:set var="eventName" value="${toc.studyEventDefinition.name}"/>
+        <c:set var="eventDate" value="${toc.studyEvent.dateStarted}"/>
+        <c:set var="crfName" value="${toc.crf.name} ${toc.crfVersion.name}"/>
+
 	    <td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"   onmouseover="callTip(genToolTips(${itemId}));"
 	           onmouseout="UnTip()" onClick=
-	    "openDNWindow('CreateDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&groupLabel=<c:out value="${displayItem.metadata.groupLabel}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=input<c:out value="${itemId}" />&column=value&enterData=1&errorFlag=<c:out value="${errorFlag}"/>','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
+	    "openDNWindow('CreateDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&groupLabel=<c:out value="${displayItem.metadata.groupLabel}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=input<c:out value="${itemId}" />&column=value&enterData=1&errorFlag=<c:out value="${errorFlag}"/>&eventName=${eventName}&eventDate=${eventDate}&crfName=${crfName}','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
 	    ><img id="flag_input<c:out value="${itemId}" />" name="flag_input<c:out value="${itemId}" />" src=
 	    "images/<c:out value="${imageFileName}"/>.gif" border="0" alt=
 	    "<fmt:message key="discrepancy_note" bundle="${resword}"/>"
