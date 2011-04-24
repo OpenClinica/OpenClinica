@@ -539,6 +539,14 @@ public class ItemDataDAO extends AuditableEntityDAO {
         return this.executeFindAllQuery("findAllByEventCRFIdAndItemId", variables);
     }
 
+    public ArrayList<ItemDataBean> findAllByEventCRFIdAndItemIdNoStatus(int eventCRFId, int itemId) {
+        setTypesExpected();
+        HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
+        variables.put(new Integer(1), new Integer(eventCRFId));
+        variables.put(new Integer(2), new Integer(itemId));
+
+        return this.executeFindAllQuery("findAllByEventCRFIdAndItemIdNoStatus", variables);
+    }
     public ArrayList<ItemDataBean> findAllBlankRequiredByEventCRFId(int eventCRFId, int crfVersionId) {
         setTypesExpected();
         HashMap<Integer, Object> variables = new HashMap<Integer, Object>();

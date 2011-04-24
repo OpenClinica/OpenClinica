@@ -4201,7 +4201,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         ItemDAO idao = new ItemDAO(getDataSource());
         for (int i = 0; i < sections.size(); i++) {
             SectionBean sb = (SectionBean) sections.get(i);
-            if (!isSectionReviewedOnce(sb, request)) {
+            if (!isCreateItemReqd(sb, request)) {
                 // ArrayList requiredItems =
                 // idao.findAllRequiredBySectionId(sb.getId());
                 // if (!requiredItems.isEmpty()) {
@@ -4210,6 +4210,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 ArrayList items = idao.findAllBySectionId(sb.getId());
                 for (int j = 0; j < items.size(); j++) {
                     ItemBean item = (ItemBean) items.get(j);
+                    ArrayList<ItemDataBean> itemBean =  iddao.findAllByEventCRFIdAndItemIdNoStatus(ecb.getId(),item.getId());
                     ItemDataBean idb = new ItemDataBean();
                     idb.setItemId(item.getId());
                     idb.setEventCRFId(ecb.getId());
@@ -4222,7 +4223,28 @@ public abstract class DataEntryServlet extends CoreSecureController {
                         idb.setStatus(Status.UNAVAILABLE);
                     }
                     idb.setValue("");
-                    iddao.create(idb);
+                    boolean save = true;
+                    if(itemBean.size()>0) save = false;
+                   /* while(itemBean.iterator().hasNext())
+                    {
+                       
+                        ItemDataBean temp = itemBean.iterator().next();
+                       if(idb.getEventCRFId()==(temp.getEventCRFId()))
+                       {
+                           if(idb.getItemId()==(temp.getItemId())){
+                              save = false; 
+                           }
+                       }
+                     
+                           
+                    }*/
+                    if(save)
+                    {
+                        iddao.create(idb);
+                    
+                    }
+                   
+                    
                 }
             }
         }
@@ -4257,22 +4279,65 @@ public abstract class DataEntryServlet extends CoreSecureController {
         System.out.println(" for " + key + " num items " + numItems + " num items blank " + numItemsBlank + 
                 " num items pending " + numItemsPending + " completed " + numItemsCompleted);
 
-        if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY) && edcb.isDoubleEntry()) {
-            if (numItemsPending == 0 && numItemsBlank == 0 && numItems > 0) {
+        if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY) && edcb.isDoubleEntry()) 
+        {
+            if (numItemsPending == 0 && numItems > 0) {
                 System.out.println("returns false on ide loop " + key);
                 return false;
             }
-        } else {
-            if (numItemsCompleted == 0 && numItemsBlank == 0 && numItems > 0) {
+        } else 
+        {
+            
+            if (numItemsCompleted == 0  && numItems > 0) {
                 System.out.println("returns false on other loop " + key);
                 return false;
             }
+            
         }
 
         return true;
 
     }
 
+    protected boolean isCreateItemReqd(SectionBean sb, HttpServletRequest request) {
+        SectionDAO sdao = new SectionDAO(getDataSource());
+        EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
+        EventDefinitionCRFBean edcb = (EventDefinitionCRFBean)request.getAttribute(EVENT_DEF_CRF_BEAN);
+        DataEntryStage stage = ecb.getStage();
+
+        HashMap numItemsHM = sdao.getNumItemsBySectionId();
+        HashMap numItemsPendingHM = sdao.getNumItemsPendingBySectionId(ecb);
+        HashMap numItemsCompletedHM = sdao.getNumItemsCompletedBySection(ecb);
+        HashMap numItemsBlankHM = sdao.getNumItemsBlankBySectionId(ecb);
+
+        Integer key = new Integer(sb.getId());
+
+        int numItems = TableOfContentsServlet.getIntById(numItemsHM, key);
+        int numItemsPending = TableOfContentsServlet.getIntById(numItemsPendingHM, key);
+        int numItemsCompleted = TableOfContentsServlet.getIntById(numItemsCompletedHM, key);
+        int numItemsBlank = TableOfContentsServlet.getIntById(numItemsBlankHM, key);
+        System.out.println(" for " + key + " num items " + numItems + " num items blank " + numItemsBlank + 
+                " num items pending " + numItemsPending + " completed " + numItemsCompleted);
+
+        if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY) && edcb.isDoubleEntry()) 
+        {
+            if (numItemsPending == 0 && numItems > 0) {
+                System.out.println("returns false on ide loop " + key);
+                return false;
+            }
+        } else 
+        {
+            
+           if(numItemsCompleted < numItems){
+               return false;
+           }
+            
+        }
+
+        return true;
+
+    }    
+    
     /**
      * Checks if all the sections in an event crf are reviewed once
      * tbh updated to prevent duplicates, 03/2011
