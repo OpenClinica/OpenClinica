@@ -110,6 +110,7 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
                 edc.setVersions(versions);
                 CRFBean crf = (CRFBean) cdao.findByPK(edc.getCrfId());
                 edc.setCrfName(crf.getName());
+                edc.setCrf(crf);
                 // TO DO: use a better way on JSP page,eg.function tag
                 edc.setNullFlags(processNullValues(edc));
 

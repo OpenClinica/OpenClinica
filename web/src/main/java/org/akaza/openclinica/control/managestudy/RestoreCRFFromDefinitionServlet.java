@@ -59,6 +59,7 @@ public class RestoreCRFFromDefinitionServlet extends SecureController {
                 EventDefinitionCRFBean edc = (EventDefinitionCRFBean) edcs.get(i);
                 if (edc.getCrfId() == id) {
                     edc.setStatus(Status.AVAILABLE);
+                    edc.setOldStatus(Status.DELETED);
                     crfName = edc.getCrfName();
                 }
 

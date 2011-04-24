@@ -7,26 +7,32 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import org.akaza.openclinica.bean.core.NullValue;
-import org.akaza.openclinica.bean.core.NumericComparisonOperator;
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.*;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author jxu
@@ -194,6 +200,7 @@ public class UpdateEventDefinitionServlet extends SecureController {
         edao.update(sed);
 
         EventDefinitionCRFDAO cdao = new EventDefinitionCRFDAO(sm.getDataSource());
+
         for (int i = 0; i < edcs.size(); i++) {
             EventDefinitionCRFBean edc = (EventDefinitionCRFBean) edcs.get(i);
             if (edc.getId() > 0) {// need to do update
@@ -203,6 +210,12 @@ public class UpdateEventDefinitionServlet extends SecureController {
                 logger.info("version:" + edc.getDefaultVersionId());
                 logger.info("Electronic Signature [" + edc.isElectronicSignature() + "]");
                 cdao.update(edc);
+
+                if (edc.getStatus().equals(Status.DELETED)
+                        || edc.getStatus().equals(Status.AUTO_DELETED)) {
+                    removeAllEventsItems(edc, sed);
+                }
+
             } else { // to insert
                 edc.setOwner(ub);
                 edc.setCreatedDate(new Date());
@@ -220,6 +233,131 @@ public class UpdateEventDefinitionServlet extends SecureController {
         
         addPageMessage(respage.getString("the_ED_has_been_updated_succesfully"));
         forwardPage(Page.LIST_DEFINITION_SERVLET);
+    }
+
+    public void removeAllEventsItems(EventDefinitionCRFBean edc, StudyEventDefinitionBean sed){
+        StudyEventDAO seDao = new StudyEventDAO(sm.getDataSource());
+        EventCRFDAO ecrfDao = new EventCRFDAO(sm.getDataSource());
+        ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
+        
+        // Getting Study Events
+        ArrayList seList = seDao.findAllByStudyEventDefinitionAndCrfOids(sed.getOid(), edc.getCrf().getOid());
+        for (int j = 0; j < seList.size(); j++) {
+            StudyEventBean seBean = (StudyEventBean) seList.get(j);
+            // Getting Event CRFs
+            ArrayList ecrfList = ecrfDao.findAllByStudyEventAndCrfOrCrfVersionOid(seBean, edc.getCrf().getOid());
+            for (int k = 0; k < ecrfList.size(); k++) {
+                EventCRFBean ecrfBean = (EventCRFBean) ecrfList.get(k);
+                ecrfBean.setStatus(Status.AUTO_DELETED);
+                ecrfBean.setUpdater(ub);
+                ecrfBean.setUpdatedDate(new Date());
+                ecrfDao.update(ecrfBean);
+                // Getting Item Data
+                ArrayList itemData = iddao.findAllByEventCRFId(ecrfBean.getId());
+                // remove all the item data
+                for (int a = 0; a < itemData.size(); a++) {
+                    ItemDataBean item = (ItemDataBean) itemData.get(a);
+                    if (!item.getStatus().equals(Status.DELETED)) {
+                        item.setOldStatus(item.getStatus());
+                        item.setStatus(Status.AUTO_DELETED);
+                        item.setUpdater(ub);
+                        item.setUpdatedDate(new Date());
+                        iddao.update(item);
+                        DiscrepancyNoteDAO dnDao = new DiscrepancyNoteDAO(sm.getDataSource());
+                        List dnNotesOfRemovedItem = dnDao.findExistingNotesForItemData(item.getId());
+                        if (!dnNotesOfRemovedItem.isEmpty()) {
+                            DiscrepancyNoteBean itemParentNote = null;
+                            for (Object obj : dnNotesOfRemovedItem) {
+                                if (((DiscrepancyNoteBean)obj).getParentDnId() == 0) {
+                                    itemParentNote = (DiscrepancyNoteBean)obj;
+                                }
+                            }
+                            DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
+                            if (itemParentNote != null) {
+                                dnb.setParentDnId(itemParentNote.getId());
+                                dnb.setDiscrepancyNoteTypeId(itemParentNote.getDiscrepancyNoteTypeId());
+                            }
+                            dnb.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
+                            dnb.setStudyId(currentStudy.getId());
+                            dnb.setAssignedUserId(ub.getId());
+                            dnb.setOwner(ub);
+                            dnb.setEntityType(DiscrepancyNoteBean.ITEM_DATA);
+                            dnb.setEntityId(item.getId());
+                            dnb.setColumn("value");
+                            dnb.setCreatedDate(new Date());
+                            dnb.setDescription("The item has been removed, this Discrepancy Note has been Closed.");
+                            dnDao.create(dnb);
+                            dnDao.createMapping(dnb);
+                            itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
+                            dnDao.update(itemParentNote);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void restoreAllEventsItems(EventDefinitionCRFBean edc, StudyEventDefinitionBean sed){
+        StudyEventDAO seDao = new StudyEventDAO(sm.getDataSource());
+        EventCRFDAO ecrfDao = new EventCRFDAO(sm.getDataSource());
+        ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
+
+        // All Study Events
+        ArrayList seList = seDao.findAllByStudyEventDefinitionAndCrfOids(sed.getOid(), edc.getCrf().getOid());
+        for (int j = 0; j < seList.size(); j++) {
+            StudyEventBean seBean = (StudyEventBean) seList.get(j);
+            // All Event CRFs
+            ArrayList ecrfList = ecrfDao.findAllByStudyEventAndCrfOrCrfVersionOid(seBean, edc.getCrf().getOid());
+            for (int k = 0; k < ecrfList.size(); k++) {
+                EventCRFBean ecrfBean = (EventCRFBean) ecrfList.get(k);
+                ecrfBean.setStatus(Status.AVAILABLE);
+                ecrfBean.setUpdater(ub);
+                ecrfBean.setUpdatedDate(new Date());
+                ecrfDao.update(ecrfBean);
+                // All Item Data
+                ArrayList itemData = iddao.findAllByEventCRFId(ecrfBean.getId());
+                // remove all the item data
+                for (int a = 0; a < itemData.size(); a++) {
+                    ItemDataBean item = (ItemDataBean) itemData.get(a);
+                    if (item.getStatus().equals(Status.DELETED) || item.getStatus().equals(Status.AUTO_DELETED)) {
+                        item.setOldStatus(item.getStatus());
+                        item.setStatus(Status.AVAILABLE);
+                        item.setUpdater(ub);
+                        item.setUpdatedDate(new Date());
+                        iddao.update(item);
+//                        DiscrepancyNoteDAO dnDao = new DiscrepancyNoteDAO(sm.getDataSource());
+//                        List dnNotesOfRemovedItem = dnDao.findExistingNotesForItemData(item.getId());
+//                        if (!dnNotesOfRemovedItem.isEmpty()) {
+//                            DiscrepancyNoteBean itemParentNote = null;
+//                            for (Object obj : dnNotesOfRemovedItem) {
+//                                if (((DiscrepancyNoteBean)obj).getParentDnId() == 0) {
+//                                    itemParentNote = (DiscrepancyNoteBean)obj;
+//                                }
+//                            }
+//                            DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
+//                            if (itemParentNote != null) {
+//                                dnb.setParentDnId(itemParentNote.getId());
+//                                dnb.setDiscrepancyNoteTypeId(itemParentNote.getDiscrepancyNoteTypeId());
+//                            }
+//                            dnb.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
+//                            dnb.setStudyId(currentStudy.getId());
+//                            dnb.setAssignedUserId(ub.getId());
+//                            dnb.setOwner(ub);
+//                            dnb.setEntityType(DiscrepancyNoteBean.ITEM_DATA);
+//                            dnb.setEntityId(item.getId());
+//                            dnb.setColumn("value");
+//                            dnb.setCreatedDate(new Date());
+//                            dnb.setDescription("The item has been removed, this Discrepancy Note has been Closed.");
+//                            dnDao.create(dnb);
+//                            dnDao.createMapping(dnb);
+//                            itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
+//                            dnDao.update(itemParentNote);
+//                        }
+                    }
+                }
+            }
+        }
+
     }
 
 }
