@@ -449,7 +449,8 @@ public class TextIO {
         skipWhitespace();
         StringBuffer str = new StringBuffer(50);
         char ch = lookChar();
-        while (ch == EOF || !Character.isWhitespace(ch)) {
+        //while (ch == EOF || !Character.isWhitespace(ch)) {
+        while (ch == EOF || !Character.isWhitespace(ch) && ch != ')') {
             str.append(readChar());
             ch = lookChar();
         }
