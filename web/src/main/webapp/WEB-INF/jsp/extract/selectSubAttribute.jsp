@@ -42,7 +42,7 @@
        <input type="checkbox" checked name="dob" value="yes">
      </c:when>
      <c:otherwise>
-       <input type="checkbox" name="dob" value="yes">
+       <%--<input type="checkbox" name="dob" value="yes">--%>
      </c:otherwise>
    </c:choose>
    
