@@ -15,19 +15,19 @@
  <td class="table_header_column_top"><fmt:message key="subject_status" bundle="${resword}"/></td>
  <td class="table_header_column_top"><fmt:message key="subject_unique_ID" bundle="${resword}"/></td>    
  <td class="table_header_column_top"><fmt:message key="secondary_ID" bundle="${resword}"/></td>
- <td class="table_header_column_top"> 
+
    <c:choose>
     <c:when test="${study.studyParameterConfig.collectDob == '1'}">
-     <fmt:message key="date_of_birth" bundle="${resword}"/>
+        <td class="table_header_column_top">
+            <fmt:message key="date_of_birth" bundle="${resword}"/>
+        </td>    
     </c:when>
-    <c:when test="${study.studyParameterConfig.collectDob == '3'}">
-     <fmt:message key="date_of_birth" bundle="${resword}"/>
+    <c:when test="${study.studyParameterConfig.collectDob == '2'}">
+        <td class="table_header_column_top">
+            <fmt:message key="year_of_birth" bundle="${resword}"/>
+        </td>
     </c:when>
-    <c:otherwise>
-     <fmt:message key="year_of_birth" bundle="${resword}"/>
-    </c:otherwise> 
    </c:choose>
- </td>
  <td class="table_header_column_top"><fmt:message key="gender" bundle="${resword}"/></td>
  </tr>
  <tr>
@@ -62,19 +62,23 @@
        </c:otherwise>
       </c:choose>
      </td>
-
-     <td class="table_cell">
+     
     <c:choose>
-     <c:when test="${newDataset.showSubjectDob}">
-       <input type="checkbox" checked name="dob" value="yes" disabled="disabled">
-     </c:when>
-     <c:otherwise>
-       <input type="checkbox" name="dob" value="yes" disabled="disabled">
-     </c:otherwise>
-   </c:choose>  
-    </td>
+        <c:when test="${study.studyParameterConfig.collectDob != '3'}">
+            <td class="table_cell">
+                <c:choose>
+                <c:when test="${newDataset.showSubjectDob}">
+                  <input type="checkbox" checked name="dob" value="yes" disabled="disabled">
+                </c:when>
+                <c:otherwise>
+                  <input type="checkbox" name="dob" value="yes" disabled="disabled">
+                </c:otherwise>
+               </c:choose>
+            </td>
+        </c:when>
+    </c:choose>
 
-     <td class="table_cell">
+ <td class="table_cell">
   <c:choose>
      <c:when test="${newDataset.showSubjectGender}">
        <input type="checkbox" checked name="gender" value="yes" disabled="disabled">
