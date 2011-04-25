@@ -51,11 +51,14 @@
 <jsp:useBean scope='request' id='table' class='org.akaza.openclinica.web.bean.EntityBeanTable'/>
 <c:choose>
 <c:when test="${userBean.sysAdmin && module=='admin'}">
-	<h1><span class="title_manage"><fmt:message key="administer_CRFs2" bundle="${resworkflow}"/> <a href="javascript:openDocWindow('help/3_5_viewCRF_Help.html')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
+	<h1><span class="title_manage"><fmt:message key="administer_CRFs2" bundle="${resworkflow}"/>
+        <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/administer-crfs-crf-template')">
+            <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
 </span></h1>
 </c:when>
 <c:otherwise>
-	<h1><span class="title_manage"><fmt:message key="manage_CRFs2" bundle="${resworkflow}"/> <a href="javascript:openDocWindow('help/3_5_viewCRF_Help.html')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
+	<h1><span class="title_manage"><fmt:message key="manage_CRFs2" bundle="${resworkflow}"/>
+        <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/study-setup')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
 </span></h1>
 </c:otherwise>
 </c:choose>

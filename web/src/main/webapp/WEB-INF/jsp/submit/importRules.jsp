@@ -67,7 +67,7 @@
 </c:choose>
 
 <fmt:message key="import_rule_data" bundle="${resworkflow}"/> ${study.name}
-<a href="javascript:openDocWindow('help/5_5_rules_Help.html')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${restext}"/>" title="<fmt:message key="help" bundle="${restext}"/>"></a>
+<a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/study-setup')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${restext}"/>" title="<fmt:message key="help" bundle="${restext}"/>"></a>
 </h1>
 
 

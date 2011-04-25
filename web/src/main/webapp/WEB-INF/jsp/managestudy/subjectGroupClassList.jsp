@@ -45,7 +45,10 @@
 <jsp:useBean scope='request' id='table' class='org.akaza.openclinica.web.bean.EntityBeanTable'/>
 
 <h1><span class="title_manage">
-<fmt:message key="manage_all_groups_in_study" bundle="${restext}"/> <c:out value="${study.name}"/> <a href="javascript:openDocWindow('help/3_4_subjectGroups_Help.html')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${restext}"/>" title="<fmt:message key="help" bundle="${restext}"/>"></a>
+<fmt:message key="manage_all_groups_in_study" bundle="${restext}"/>
+    <c:out value="${study.name}"/>
+    <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/monitor-and-manage-data/manage-all-groups')">
+        <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${restext}"/>" title="<fmt:message key="help" bundle="${restext}"/>"></a>
 </span></h1>
 
 <%-- 

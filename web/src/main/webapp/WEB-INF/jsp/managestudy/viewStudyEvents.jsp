@@ -79,7 +79,7 @@
  <fmt:message key="view_all_events_in" bundle="${resword}"/> <c:out value="${study.name}"/>
  <c:choose>
    <c:when test="${userRole.manageStudy}">
-      <a href="javascript:openDocWindow('help/4_5_viewEvents_Help.html')">
+      <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/view-events')">
       <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>">
       </a>
    </c:when>

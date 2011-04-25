@@ -14,7 +14,7 @@
 
 <!-- Footer -->
 
-		<table border="0" cellpadding=0" cellspacing="0" width="100%">
+		<table border="0" cellpadding="0" cellspacing="0" width="100%">
 			 <tr>
                 <td class="footer">
                 <a href="http://www.openclinica.org" target="new"><fmt:message key="openclinica_portal" bundle="${resword}"/></a>
