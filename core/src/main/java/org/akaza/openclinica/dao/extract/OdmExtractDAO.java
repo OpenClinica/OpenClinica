@@ -2346,7 +2346,7 @@ public class OdmExtractDAO extends DatasetDAO {
                     try {
                         form.setInterviewDate(new SimpleDateFormat("yyyy-MM-dd").format((Date) row.get("date_interviewed")));
                     } catch (NullPointerException npe) {
-                        logger.info("caught NPE");
+                        logger.debug("caught NPE");
                         form.setInterviewDate(new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
                     }
                 }
@@ -2442,7 +2442,8 @@ public class OdmExtractDAO extends DatasetDAO {
         } catch (NullPointerException e) {
             // TODO Auto-generated catch block
             // e.printStackTrace();
-            System.out.println("caught NPE here");
+            //System.out.println("caught NPE here");
+			logger.debug("caught NPE here");
         }
 
         logger.debug("returning " + stage.getName());
