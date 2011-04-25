@@ -6,6 +6,9 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 
+<jsp:useBean scope="request" id="studyEvent" class="org.akaza.openclinica.bean.managestudy.StudyEventBean" />
+<jsp:useBean scope="request" id="studySubject" class="org.akaza.openclinica.bean.managestudy.StudySubjectBean" />
+
 <c:choose>
  <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin && module=='admin'}">
    <c:import url="../include/admin-header.jsp"/>
@@ -120,8 +123,20 @@
 		  	<table border="0" cellpadding="0" cellspacing="0">
 			<tr>
 				<c:import url="../include/showDateTimeInput.jsp"><c:param name="prefix" value="start"/><c:param name="count" value="1"/></c:import>
-				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>) *<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
-                    <a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${ss_id}&id=<c:out value="${event.id}"/>&name=studyEvent&field=start&column=start_date','spanAlert-start'); return false;"><img id="flag_start" name="flag_start" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
+				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>) *
+                <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
+                    <c:choose>
+                        <c:when test="${hasStartDateNote eq 'yes'}">
+                            <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=start_date&column=start_date&strErrMsg','spanAlert-start_date'); return false;"
+                                    ><img id="flag_start_date" name="flag_start_date" src="images/icon_Note.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
+                        </c:when>
+                        <c:otherwise>
+                            <c:if test="${!study.status.locked}">
+                                <a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=start_date&column=start_date&strErrMsg=','spanAlert-start'); return false;"><img id="flag_start_date" name="flag_start_date" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
+                            </c:if>
+                        </c:otherwise>
+                    </c:choose>
+                </c:if></td>
 			</tr>
 			<tr>
 				<td colspan="7"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="start"/></jsp:include></td>
@@ -136,8 +151,20 @@
 		  	<table border="0" cellpadding="0" cellspacing="0">
 			<tr>
 				<c:import url="../include/showDateTimeInput.jsp"><c:param name="prefix" value="end"/><c:param name="count" value="2"/></c:import>
-				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>) <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
-                    <a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${ss_id}&id=<c:out value="${event.id}"/>&name=studyEvent&field=end&column=end_date','spanAlert-end'); return false;"><img id="flag_end" name="flag_end" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
+				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>)
+                    <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
+                    <c:choose>
+                        <c:when test="${hasEndDateNote eq 'yes'}">
+                            <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=end_date&column=end_date&strErrMsg','spanAlert-start_date'); return false;"
+                                    ><img id="flag_end_date" name="flag_end_date" src="images/icon_Note.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
+                        </c:when>
+                        <c:otherwise>
+                            <c:if test="${!study.status.locked}">
+                                <a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=end_date&column=end_date&strErrMsg=','spanAlert-start'); return false;"><img id="flag_end_date" name="flag_end_date" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
+                            </c:if>
+                        </c:otherwise>
+                    </c:choose>
+                    </c:if></td>
 			</tr>
 			<tr>
 				<td colspan="7"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="end"/></jsp:include></td>
@@ -154,7 +181,19 @@
       <input type="text" name="location" value="<c:out value="${event.location}"/>" class="formfieldXL"></div>
        <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="location"/></jsp:include>
       </td>
-      <td><c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${ss_id}&id=<c:out value="${event.id}"/>&name=studyEvent&field=location&column=location','spanAlert-location'); return false;"><img name="flag_location" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if>
+      <td><c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
+          <c:choose>
+              <c:when test="${hasLocationNote eq 'yes'}">
+                  <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=location&column=location&strErrMsg','spanAlert-start_date'); return false;"
+                          ><img id="flag_location" name="flag_location" src="images/icon_Note.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
+              </c:when>
+              <c:otherwise>
+                  <c:if test="${!study.status.locked}">
+                      <a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=location&column=location&strErrMsg=','spanAlert-start'); return false;"><img id="flag_location" name="flag_start" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
+                  </c:if>
+              </c:otherwise>
+          </c:choose>
+      </c:if>
       </td></tr>
      </table>
     </td>

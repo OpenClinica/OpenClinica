@@ -8,18 +8,9 @@
 package org.akaza.openclinica.control.managestudy;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.core.DataEntryStage;
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
+import org.akaza.openclinica.bean.core.*;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
-import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.managestudy.*;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.control.SpringServletAccess;
@@ -80,6 +71,11 @@ public class UpdateStudyEventServlet extends SecureController {
     // YW >>
 
     public static final String INPUT_LOCATION = "location";
+
+    public final static String HAS_LOCATION_NOTE = "hasLocationNote";
+    public final static String HAS_START_DATE_NOTE = "hasStartDateNote";
+    public final static String HAS_END_DATE_NOTE = "hasEndDateNote";
+
 
     @Override
     public void mayProceed() throws InsufficientPermissionException {
@@ -553,6 +549,32 @@ public class UpdateStudyEventServlet extends SecureController {
         } else {
             logger.info("no action, go to update page");
 
+            DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(sm.getDataSource());
+            StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByPK(studyEvent.getStudySubjectId());
+            int studyId = studySubjectBean.getStudyId();
+            boolean subjectStudyIsCurrentStudy = studyId == currentStudy.getId();
+            boolean isParentStudy = studyBean.getParentStudyId() < 1;
+
+            ArrayList<DiscrepancyNoteBean> allNotesforSubjectAndEvent = new ArrayList<DiscrepancyNoteBean>();
+
+            if (subjectStudyIsCurrentStudy && isParentStudy) {
+                allNotesforSubjectAndEvent = discrepancyNoteDAO.findAllStudyEventByStudyAndId(currentStudy, studySubjectBean.getId());
+            } else { // findAllStudyEventByStudiesAndSubjectId
+                if (!isParentStudy) {
+                    StudyBean stParent = (StudyBean) sdao.findByPK(studyBean.getParentStudyId());
+                    allNotesforSubjectAndEvent = discrepancyNoteDAO.findAllStudyEventByStudiesAndSubjectId(stParent, studyBean, studySubjectBean.getId());
+                } else {
+
+                    allNotesforSubjectAndEvent = discrepancyNoteDAO.findAllStudyEventByStudiesAndSubjectId(currentStudy, studyBean, studySubjectBean.getId());
+
+                }
+
+            }
+
+            if (!allNotesforSubjectAndEvent.isEmpty()) {
+                setRequestAttributesForNotes(allNotesforSubjectAndEvent);
+            }
+
             HashMap presetValues = new HashMap();
             // YW 08-17-2007 <<
             if (studyEvent.getStartTimeFlag() == true) {
@@ -613,7 +635,9 @@ public class UpdateStudyEventServlet extends SecureController {
 
             setPresetValues(presetValues);
 
-            request.setAttribute(EVENT_BEAN, studyEvent);
+            request.setAttribute("studyEvent", studyEvent);
+            request.setAttribute("studySubject", studySubjectBean);
+
             discNotes = new FormDiscrepancyNotes();
             session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
 
@@ -735,6 +759,20 @@ public class UpdateStudyEventServlet extends SecureController {
         } else {
             return "";
         }
+    }
+    private void setRequestAttributesForNotes(List<DiscrepancyNoteBean> discBeans) {
+        for (DiscrepancyNoteBean discrepancyNoteBean : discBeans) {
+            if ("location".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
+                request.setAttribute(HAS_LOCATION_NOTE, "yes");
+            } else if ("start_date".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
+                request.setAttribute(HAS_START_DATE_NOTE, "yes");
+
+            } else if ("end_date".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
+                request.setAttribute(HAS_END_DATE_NOTE, "yes");
+            }
+
+        }
+
     }
 
 }
