@@ -384,6 +384,16 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
         if (eventCRFId == 0) {
             ecb = new EventCRFBean();
            ecb.setCRFVersionId(sb.getCRFVersionId());
+            if (currentStudy.getParentStudyId() > 0) {
+                // this is a site,find parent
+                StudyDAO studydao = new StudyDAO(getDataSource());
+                StudyBean parentStudy = (StudyBean) studydao.findByPK(currentStudy.getParentStudyId());
+                request.setAttribute("studyTitle", parentStudy.getName());
+                request.setAttribute("siteTitle", currentStudy.getName());
+            } else {
+                request.setAttribute("studyTitle", currentStudy.getName());
+            }
+
         } else {
             ecb = (EventCRFBean) ecdao.findByPK(eventCRFId);
 
@@ -418,7 +428,8 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
             if (study.getParentStudyId() > 0) {
                 // this is a site,find parent
                 StudyBean parentStudy = (StudyBean) studydao.findByPK(study.getParentStudyId());
-                request.setAttribute("studyTitle", parentStudy.getName() + " - " + study.getName());
+                request.setAttribute("studyTitle", parentStudy.getName());
+                request.setAttribute("siteTitle", study.getName());
             } else {
                 request.setAttribute("studyTitle", study.getName());
             }

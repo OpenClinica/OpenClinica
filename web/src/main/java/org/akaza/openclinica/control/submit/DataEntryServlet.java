@@ -570,8 +570,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
         if (study.getParentStudyId() > 0) {
             // this is a site,find parent
             StudyBean parentStudy = (StudyBean) studydao.findByPK(study.getParentStudyId());
-            request.setAttribute("studyTitle", study.getName());
-            request.setAttribute("siteTitle",parentStudy.getName() );
+            request.setAttribute("studyTitle", parentStudy.getName());
+            request.setAttribute("siteTitle",study.getName());
         } else {
             request.setAttribute("studyTitle", study.getName());
         }
