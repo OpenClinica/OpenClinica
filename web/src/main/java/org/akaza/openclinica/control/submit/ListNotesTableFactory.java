@@ -1,16 +1,5 @@
 package org.akaza.openclinica.control.submit;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
@@ -62,6 +51,17 @@ import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.editor.DateCellEditor;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpServletResponse;
 
 public class ListNotesTableFactory extends AbstractTableFactory {
 
@@ -207,7 +207,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             h.put("discrepancyNoteBean.disType", discrepancyNoteBean.getDisType());
             h.put("discrepancyNoteBean.resolutionStatus", discrepancyNoteBean.getResStatus());
             h.put("age", discrepancyNoteBean.getResolutionStatusId()==5?null:discrepancyNoteBean.getAge());
-            h.put("days", (discrepancyNoteBean.getResolutionStatusId()==4 || discrepancyNoteBean.getResolutionStatusId()==5)?null:discrepancyNoteBean.getDays());
+            h.put("days", discrepancyNoteBean.getResolutionStatusId()==4 || discrepancyNoteBean.getResolutionStatusId()==5?null:discrepancyNoteBean.getDays());
             h.put("siteId", ((StudyBean) getStudyDao().findByPK(discrepancyNoteBean.getStudySub().getStudyId())).getIdentifier());
             h.put("discrepancyNoteBean", discrepancyNoteBean);
             h.put("discrepancyNoteBean.createdDate", discrepancyNoteBean.getCreatedDate());
@@ -368,12 +368,12 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                     // dnb.setCrfName(cb.getName());
                     String column = dnb.getColumn().trim();
                     if (!StringUtil.isBlank(column)) {
-                        if ("date_start".equals(column)) {
+                        if ("start_date".equals(column)) {
                             if (se.getDateStarted() != null) {
                                 dnb.setEntityValue(se.getDateStarted().toString());
                             }
                             dnb.setEntityName(resword.getString("start_date"));
-                        } else if ("date_end".equals(column)) {
+                        } else if ("end_date".equals(column)) {
                             if (se.getDateEnded() != null) {
                                 dnb.setEntityValue(se.getDateEnded().toString());
                             }
