@@ -21,7 +21,6 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Map;
 import java.util.Properties;
 
 public class CoreResources implements ResourceLoaderAware {
@@ -137,7 +136,9 @@ public class CoreResources implements ResourceLoaderAware {
             vals = replaceWebapp(vals);
             vals = replaceCatHome(vals);
             logMe("key: " + key + " vals:" + vals);
+            System.out.println("setDataInfoVals.key="+key+" vals="+vals);
             DATAINFO.setProperty(key, vals);
+            System.out.println("datainfo.getProperty --setDataInfoVals.key="+key+" vals="+vals);
         }
 
     }
@@ -194,12 +195,12 @@ public class CoreResources implements ResourceLoaderAware {
         //        }
 
         
-        if (value.contains("${catalina.home}") &&  (catalina != null)) {
+        if (value.contains("${catalina.home}") &&  catalina != null) {
             value = value.replace("${catalina.home}", catalina);
             logMe("replaced ${catalina.home} with " + catalina);
         }
 
-        if (value.contains("$catalina.home") &&  (catalina != null)) {
+        if (value.contains("$catalina.home") &&  catalina != null) {
             value = value.replace("$catalina.home", catalina);
             logMe("replaced $catalina.home with " + catalina);
         }
@@ -222,7 +223,7 @@ public class CoreResources implements ResourceLoaderAware {
 
     private Properties setDataInfoProperties() {
         String filePath = DATAINFO.getProperty("filePath");
-        if (filePath == null || filePath.isEmpty())
+        if (filePath == null || filePath.isEmpty()) 
             filePath = "$catalina.home/$WEBAPP.lower.data";
         String database = DATAINFO.getProperty("dbType");
 
@@ -231,6 +232,8 @@ public class CoreResources implements ResourceLoaderAware {
         logMe("DataInfo..." + DATAINFO);
         logMe("filePath = " + filePath);
         setDataInfoVals();
+        if(DATAINFO.getProperty("filePath")==null || DATAINFO.getProperty("filePath").length()<=0) 
+            DATAINFO.setProperty("filePath", filePath);
 
         DATAINFO.setProperty("changeLogFile", "src/main/resources/migration/master.xml");
         // sysURL.base
@@ -256,7 +259,7 @@ public class CoreResources implements ResourceLoaderAware {
 
         String attached_file_location = DATAINFO.getProperty("attached_file_location");
         if (attached_file_location == null || attached_file_location.isEmpty()) {
-            attached_file_location = DATAINFO.getProperty(filePath) + File.separator + "attached_files";
+            attached_file_location = DATAINFO.getProperty("filePath") + "attached_files" + File.separator;
             DATAINFO.setProperty("attached_file_location", attached_file_location);
         }
 
@@ -760,7 +763,6 @@ public class CoreResources implements ResourceLoaderAware {
             value = value.trim();
         }
         return value == null ? "" : value;
-
     }
 
     // TODO internationalize
