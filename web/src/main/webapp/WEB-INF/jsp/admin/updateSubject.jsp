@@ -120,7 +120,7 @@
 		<td class="formlabel"><fmt:message key="date_of_birth" bundle="${resword}"/>:</td>
 	  	<td>
 		  <div class="formfieldXL_BG"><input type="text" name="dateOfBirth" size="15" value="<c:out value="${dateOfBirth}"/>" class="formfieldXL"></div>
-		  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dateOfBirth"/></jsp:include>
+		  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="yearOfBirth"/></jsp:include>
 	  	</td><td class="formlabel">(<fmt:message key="date_format" bundle="${resformat}"/>) *
 	  	<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
 		 <a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${studySubId}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&field=dateOfBirth&column=date_of_birth','spanAlert-dateOfBirth'); return false;">

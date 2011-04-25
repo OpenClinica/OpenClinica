@@ -116,9 +116,9 @@ public class UpdateSubjectServlet extends SecureController {
                 if (dob != null) {
                     cal.setTime(dob);
                     year = cal.get(Calendar.YEAR);
-                    request.setAttribute(YEAR_DOB, new Integer(year));
+                   // request.setAttribute(YEAR_DOB, new Integer(year));
                 } else {
-                    request.setAttribute(DATE_DOB, "");
+                    //request.setAttribute(DATE_DOB, "");
                 }
             }
             if ("show".equalsIgnoreCase(action)) {
