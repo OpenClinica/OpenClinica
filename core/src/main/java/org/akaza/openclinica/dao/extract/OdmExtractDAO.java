@@ -948,9 +948,16 @@ public class OdmExtractDAO extends DatasetDAO {
                 }
                 if (rsTypeId == 3 || rsTypeId == 7) {// 3:checkbox;
                     // //7:multi-select
-                    len = maxLengths.containsKey(itId) ? maxLengths.get(itId) : 0;
-                    len = Math.max(len, Math.max(rsText.length(), rsValue.length()));
-                    idef.setLength(len);
+                   // len = maxLengths.containsKey(itId) ? maxLengths.get(itId) : 0;
+                    //len = Math.max(len, Math.max(rsText.length(), rsValue.length()));
+                    Iterator<String> iter = multi.keySet().iterator();
+                    String temp = "";
+                    while (iter.hasNext()) {
+                    temp += iter.next();
+                    temp += ",";
+                    
+                    }
+                    idef.setLength(temp.length());
                 } else if ("text".equalsIgnoreCase(datatype)) {
                     if (len > 0) {
                         idef.setLength(len);
