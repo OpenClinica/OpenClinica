@@ -141,7 +141,7 @@ public class ScriptRunner {
 				}
 				String trimmedLine = line.trim();
 				if (trimmedLine.startsWith("--")) {
-					println(trimmedLine);
+                    // println(trimmedLine);
 				} else if (trimmedLine.length() < 1
 						|| trimmedLine.startsWith("//")) {
 					// Do nothing
@@ -157,7 +157,7 @@ public class ScriptRunner {
 					command.append(" ");
 					Statement statement = conn.createStatement();
 
-					println(command);
+                    // println(command);
 
 					boolean hasResults = false;
 					if (stopOnError) {
