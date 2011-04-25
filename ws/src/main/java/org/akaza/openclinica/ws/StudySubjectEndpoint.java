@@ -339,6 +339,14 @@ public class StudySubjectEndpoint {
         subject.setUniqueIdentifier(subjectTransfer.getPersonId());
         subject.setLabel(subjectTransfer.getStudySubjectId());
         subject.setDateOfBirth(subjectTransfer.getDateOfBirth());
+        // below added tbh 04/2011
+        if (subject.getDateOfBirth() != null) {
+        	subject.setDobCollected(true);
+        } else {
+        	subject.setDobCollected(false);
+        }
+        // >> above added tbh 04/2011, mantis issue having to 
+        // deal with not being able to change DOB after a submit
         subject.setGender(subjectTransfer.getGender());
         if (subjectTransfer.getOwner() != null) {
             subject.setOwner(subjectTransfer.getOwner());
