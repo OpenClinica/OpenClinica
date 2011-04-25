@@ -83,6 +83,7 @@ public class OpenClinicaVariableNode extends ExpressionNode {
         String testInt = "1";
         String testBoolean = "true";
         String testDate = "2008-01-01";
+        String testPDate = "";
         if (item != null) {
             ItemDataType itemDataType = ItemDataType.get(item.getItemDataTypeId());
             switch (itemDataType.getId()) {
@@ -112,6 +113,9 @@ public class OpenClinicaVariableNode extends ExpressionNode {
             }
             case 9: {
                 return theTest(testDate);
+            }
+            case 10: {
+                return theTest(testPDate);
             }
             case 11: {
                 return theTest(testString + ".txt");
