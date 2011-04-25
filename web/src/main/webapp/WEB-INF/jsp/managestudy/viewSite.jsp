@@ -469,7 +469,7 @@
 <div class="table_title_manage">
   <fmt:message key="CRFs" bundle="${resword}"/>
 </div>
-<p><fmt:message key="click_the_up_down_arrow_icons" bundle="${restext}"/></p>
+<%--<p><fmt:message key="click_the_up_down_arrow_icons" bundle="${restext}"/></p>--%>
 <!-- <div style="width: 700px"> -->
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
@@ -477,7 +477,6 @@
 <div class="tablebox_center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
  <tr valign="top">
-    <td class="table_header_row_left"><fmt:message key="order" bundle="${resword}"/></td>
     <td width="90px" class="table_header_row"><fmt:message key="name" bundle="${resword}"/></td>
     <td valign="top" class="table_header_row"><fmt:message key="required" bundle="${resword}"/></td>
     <td valign="top" class="table_header_row"><fmt:message key="double_data_entry" bundle="${resword}"/></td>
@@ -506,35 +505,6 @@
     </c:otherwise>
   </c:choose>
    <tr valign="top">
-    <td class="table_cell_left">
-      <c:choose>
-        <c:when test="${status.first}">
-          <c:choose>
-           <c:when test="${defSize>1}">
-            <a  href="ChangeDefinitionCRFOrdinal?current=<c:out value="${nextCrf.id}"/>&previous=<c:out value="${crf.id}"/>&id=<c:out value="${definition.id}"/>&siteId=<c:out value="${siteToView.id}"/>"
-                    <c:if test="${siteToView.parentStudyId > 0}">onClick="return false;" </c:if>>
-                <img src="images/bt_sort_descending.gif" border="0" alt="move down" title="move down"/></a>
-           </c:when>
-           <c:otherwise>
-             &nbsp;
-           </c:otherwise>
-          </c:choose>
-        </c:when>
-        <c:when test="${status.last}">
-           <a href="ChangeDefinitionCRFOrdinal?current=<c:out value="${crf.id}"/>&previous=<c:out value="${prevCrf.id}"/>&id=<c:out value="${definition.id}"/>&siteId=<c:out value="${siteToView.id}"/>"
-              <c:if test="${siteToView.parentStudyId > 0}">onClick="return false;" </c:if>>
-               <img src="images/bt_sort_ascending.gif" alt="move up" title="move up" border="0"/></a>
-        </c:when>
-        <c:otherwise>
-          <a href="ChangeDefinitionCRFOrdinal?current=<c:out value="${crf.id}"/>&previous=<c:out value="${prevCrf.id}"/>&id=<c:out value="${definition.id}"/>&siteId=<c:out value="${siteToView.id}"/>"
-             <c:if test="${siteToView.parentStudyId > 0}">onClick="return false;" </c:if>>
-              <img src="images/bt_sort_ascending.gif" alt="move up" title="move up" border="0" /></a>
-          <a href="ChangeDefinitionCRFOrdinal?previous=<c:out value="${crf.id}"/>&current=<c:out value="${nextCrf.id}"/>&id=<c:out value="${definition.id}"/>&siteId=<c:out value="${siteToView.id}"/>"
-             <c:if test="${siteToView.parentStudyId > 0}">onClick="return false;" </c:if>>
-              <img src="images/bt_sort_descending.gif" alt="move down" title="move up" border="0" /></a>
-        </c:otherwise>
-      </c:choose>
-    </td>
     <td class="table_cell" width="90px"><c:out value="${crf.crfName}"/></td>
 
     <c:choose>

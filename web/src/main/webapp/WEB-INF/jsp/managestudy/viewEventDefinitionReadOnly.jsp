@@ -82,7 +82,7 @@
 <div class="table_title_manage">
   <fmt:message key="CRFs" bundle="${resword}"/>
 </div>
-<p><fmt:message key="click_the_up_down_arrow_icons" bundle="${restext}"/></p>
+<%--<p><fmt:message key="click_the_up_down_arrow_icons" bundle="${restext}"/></p>--%>
 <div style="width: 700px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
