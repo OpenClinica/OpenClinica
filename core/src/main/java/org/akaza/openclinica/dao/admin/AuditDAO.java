@@ -404,11 +404,12 @@ public class AuditDAO extends EntityDAO {
 
     }
 
-    public ArrayList checkItemAuditEventsExist(int itemId, String auditTable) {
+    public ArrayList checkItemAuditEventsExist(int itemId, String auditTable,int ecbId) {
         this.setTypesExpected();
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(itemId));
         variables.put(new Integer(2), auditTable);
+        variables.put(new Integer(3), ecbId);
 
         String sql = digester.getQuery("checkItemAuditEventsExist");
         ArrayList alist = this.select(sql, variables);

@@ -3754,7 +3754,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                         dib.setNumDiscrepancyNotes(numNotes + notes.size());// + notes2.size());
                         dib.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(itemDataId, notes));
                         
-                        dib =  setTotals(dib,itemDataId,notes);
+                        dib =  setTotals(dib,itemDataId,notes, ecb.getId());
                         logger.debug("dib note size:" + dib.getNumDiscrepancyNotes() + " " + dib.getData().getId() + " " + inputName);
                         items.set(j, dib);
                     }
@@ -3781,7 +3781,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 discNotes.setNumExistingFieldNotes(inputFieldName, numNotes);
                 dib.setNumDiscrepancyNotes(numNotes + discNotes.getNotes(inputFieldName).size());
                 dib.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(itemDataId, discNotes.getNotes(inputFieldName)));
-               dib =  setTotals(dib,itemDataId,discNotes.getNotes(inputFieldName));
+               dib =  setTotals(dib,itemDataId,discNotes.getNotes(inputFieldName), ecb.getId());
 
                 ArrayList childItems = dib.getChildren();
                 for (int j = 0; j < childItems.size(); j++) {
@@ -3795,7 +3795,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     discNotes.setNumExistingFieldNotes(childInputFieldName, childNumNotes);
                     child.setNumDiscrepancyNotes(childNumNotes + discNotes.getNotes(childInputFieldName).size());
                     child.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(childItemDataId, discNotes.getNotes(childInputFieldName)));
-                    child = setTotals(child,childItemDataId,discNotes.getNotes(childInputFieldName));
+                    child = setTotals(child,childItemDataId,discNotes.getNotes(childInputFieldName), ecb.getId());
                     childItems.set(j, child);
                 }
                 dib.setChildren(childItems);
@@ -3843,12 +3843,15 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
 
 
+
+
         /**
      * To set the totals of each resolution status on the DisplayItemBean for each item.
      * @param dib
-     * @param notes
+         * @param notes
+         * @param ecbId TODO
      */
-    private DisplayItemBean setTotals(DisplayItemBean dib,int itemDataId,ArrayList<DiscrepancyNoteBean> notes)
+    private DisplayItemBean setTotals(DisplayItemBean dib,int itemDataId,ArrayList<DiscrepancyNoteBean> notes, int ecbId)
     {
         long t = System.currentTimeMillis();
         logMe("Method::::::setTotals"+t);
@@ -3893,7 +3896,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         logMe("time taken thus far, before audit log check"+(System.currentTimeMillis()-t));
         long t1 = System.currentTimeMillis();
         AuditDAO adao = new AuditDAO(getDataSource());
-        ArrayList itemAuditEvents = adao.checkItemAuditEventsExist(dib.getItem().getId(), "item_data");
+        ArrayList itemAuditEvents = adao.checkItemAuditEventsExist(dib.getItem().getId(), "item_data", ecbId);
         if (itemAuditEvents.size() > 0) {
             dib.getData().setAuditLog(true);    
         }
