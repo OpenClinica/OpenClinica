@@ -19,7 +19,7 @@
                 <td class="footer">
                 <a href="http://www.openclinica.org" target="new"><fmt:message key="openclinica_portal" bundle="${resword}"/></a>
                 &nbsp;&nbsp;&nbsp;
-                <a href="javascript:openDocWindow('${pageContext.request.contextPath}/help/index.html')"><fmt:message key="help" bundle="${resword}"/></a>
+                <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1')"><fmt:message key="help" bundle="${resword}"/></a>
                 &nbsp;&nbsp;&nbsp;
                 <a href="${pageContext.request.contextPath}/Contact"><fmt:message key="contact" bundle="${resword}"/></a>
                 &nbsp;&nbsp;&nbsp;
