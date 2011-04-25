@@ -215,6 +215,9 @@ public class UpdateEventDefinitionServlet extends SecureController {
                         || edc.getStatus().equals(Status.AUTO_DELETED)) {
                     removeAllEventsItems(edc, sed);
                 }
+                if (edc.getOldStatus()!=null && edc.getOldStatus().equals(Status.DELETED)) {
+                    restoreAllEventsItems(edc, sed);
+                }
 
             } else { // to insert
                 edc.setOwner(ub);
@@ -248,6 +251,7 @@ public class UpdateEventDefinitionServlet extends SecureController {
             ArrayList ecrfList = ecrfDao.findAllByStudyEventAndCrfOrCrfVersionOid(seBean, edc.getCrf().getOid());
             for (int k = 0; k < ecrfList.size(); k++) {
                 EventCRFBean ecrfBean = (EventCRFBean) ecrfList.get(k);
+                ecrfBean.setOldStatus(ecrfBean.getStatus());
                 ecrfBean.setStatus(Status.AUTO_DELETED);
                 ecrfBean.setUpdater(ub);
                 ecrfBean.setUpdatedDate(new Date());
@@ -310,7 +314,7 @@ public class UpdateEventDefinitionServlet extends SecureController {
             ArrayList ecrfList = ecrfDao.findAllByStudyEventAndCrfOrCrfVersionOid(seBean, edc.getCrf().getOid());
             for (int k = 0; k < ecrfList.size(); k++) {
                 EventCRFBean ecrfBean = (EventCRFBean) ecrfList.get(k);
-                ecrfBean.setStatus(Status.AVAILABLE);
+                ecrfBean.setStatus(ecrfBean.getOldStatus());
                 ecrfBean.setUpdater(ub);
                 ecrfBean.setUpdatedDate(new Date());
                 ecrfDao.update(ecrfBean);
@@ -320,39 +324,10 @@ public class UpdateEventDefinitionServlet extends SecureController {
                 for (int a = 0; a < itemData.size(); a++) {
                     ItemDataBean item = (ItemDataBean) itemData.get(a);
                     if (item.getStatus().equals(Status.DELETED) || item.getStatus().equals(Status.AUTO_DELETED)) {
-                        item.setOldStatus(item.getStatus());
-                        item.setStatus(Status.AVAILABLE);
+                        item.setStatus(item.getOldStatus());
                         item.setUpdater(ub);
                         item.setUpdatedDate(new Date());
                         iddao.update(item);
-//                        DiscrepancyNoteDAO dnDao = new DiscrepancyNoteDAO(sm.getDataSource());
-//                        List dnNotesOfRemovedItem = dnDao.findExistingNotesForItemData(item.getId());
-//                        if (!dnNotesOfRemovedItem.isEmpty()) {
-//                            DiscrepancyNoteBean itemParentNote = null;
-//                            for (Object obj : dnNotesOfRemovedItem) {
-//                                if (((DiscrepancyNoteBean)obj).getParentDnId() == 0) {
-//                                    itemParentNote = (DiscrepancyNoteBean)obj;
-//                                }
-//                            }
-//                            DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
-//                            if (itemParentNote != null) {
-//                                dnb.setParentDnId(itemParentNote.getId());
-//                                dnb.setDiscrepancyNoteTypeId(itemParentNote.getDiscrepancyNoteTypeId());
-//                            }
-//                            dnb.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
-//                            dnb.setStudyId(currentStudy.getId());
-//                            dnb.setAssignedUserId(ub.getId());
-//                            dnb.setOwner(ub);
-//                            dnb.setEntityType(DiscrepancyNoteBean.ITEM_DATA);
-//                            dnb.setEntityId(item.getId());
-//                            dnb.setColumn("value");
-//                            dnb.setCreatedDate(new Date());
-//                            dnb.setDescription("The item has been removed, this Discrepancy Note has been Closed.");
-//                            dnDao.create(dnb);
-//                            dnDao.createMapping(dnb);
-//                            itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
-//                            dnDao.update(itemParentNote);
-//                        }
                     }
                 }
             }
