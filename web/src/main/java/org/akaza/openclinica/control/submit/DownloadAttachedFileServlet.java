@@ -7,12 +7,6 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.DataInputStream;
-import java.util.ArrayList;
-import java.util.Locale;
-
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.SecureController;
@@ -21,6 +15,12 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.Locale;
 
 import javax.servlet.ServletOutputStream;
 
@@ -67,21 +67,20 @@ public class DownloadAttachedFileServlet extends SecureController {
     public void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
         String filePathName = "";
-        String attachedFilePath = "";
         String fileName = fp.getString("fileName");
         File f = new File(fileName);
         if (fileName != null && fileName.length() > 0) {
             int parentStudyId = currentStudy.getParentStudyId();
             String testPath = Utils.getAttachedFileRootPath();
             String tail = File.separator + f.getName();
-            String testName = testPath + currentStudy.getIdentifier() + tail;
+            String testName = testPath + currentStudy.getOid() + tail;
             File temp = new File(testName);
             if (temp.exists()) {
                 filePathName = testName;
                 logger.info(currentStudy.getName() + " existing filePathName=" + filePathName);
             } else {
                 if (currentStudy.isSite(parentStudyId)) {
-                    testName = testPath + ((StudyBean) new StudyDAO(sm.getDataSource()).findByPK(parentStudyId)).getIdentifier() + tail;
+                    testName = testPath + ((StudyBean) new StudyDAO(sm.getDataSource()).findByPK(parentStudyId)).getOid() + tail;
                     temp = new File(testName);
                     if (temp.exists()) {
                         filePathName = testName;
@@ -121,7 +120,7 @@ public class DownloadAttachedFileServlet extends SecureController {
                 byte[] bbuf = new byte[(int) file.length()];
                 inStream = new DataInputStream(new FileInputStream(file));
                 int length;
-                while ((inStream != null) && ((length = inStream.read(bbuf)) != -1)) {
+                while (inStream != null && (length = inStream.read(bbuf)) != -1) {
                     outStream.write(bbuf, 0, length);
                 }
 
