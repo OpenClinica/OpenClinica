@@ -184,4 +184,7 @@ public class SubjectEventStatus extends Term implements Comparable {
         System.out.println("myList = " + myList);
     }
 
+    public String getName(boolean rawString) {
+        return super.name;
+    }
 }

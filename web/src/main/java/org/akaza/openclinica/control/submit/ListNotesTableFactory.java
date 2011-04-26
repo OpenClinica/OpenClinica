@@ -335,7 +335,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                         dnb.setEventName(se.getName());
                     }
                     dnb.setCrfName(cb.getName());
-                    dnb.setCrfStatus(ecb.getStatus().getName());
+                    dnb.setCrfStatus(resword.getString(se.getSubjectEventStatus().getName(true)));
 
                     String column = dnb.getColumn().trim();
                     if (!StringUtil.isBlank(column)) {
@@ -425,7 +425,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                     dnb.setEventStart(se.getDateStarted());
                     dnb.setEventName(se.getName());
                     dnb.setCrfName(cb.getName());
-                    dnb.setCrfStatus(ec.getStatus().getName());
+                    dnb.setCrfStatus(resword.getString(se.getSubjectEventStatus().getName(true)));
                     // }
                 }
                 //Because all places set DiscrepancyNoteBean subjectId  as its studySub's Id.
