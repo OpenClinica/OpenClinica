@@ -30,7 +30,15 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
-<fmt:setLocale value="${resword.locale}" scope="session"/>
+
+<c:choose>
+    <c:when test="${resword.locale == null}"><fmt:setLocale value="en" scope="session"/></c:when>
+    <c:otherwise><fmt:setLocale value="${resword.locale}" scope="session"/></c:otherwise>
+</c:choose>
+
+<%--<c:set var="formatLocale"><fmt:message key="locale_string" bundle="${resformat}"/></c:set>--%>
+<%--<fmt:setLocale value="${formatLocale}" scope="session"/>--%>
+
 
 
 <body class="login_BG" onLoad="document.getElementById('username').focus();">
