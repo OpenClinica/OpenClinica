@@ -43,10 +43,7 @@
 <jsp:useBean scope="session" id="subjectToUpdate" class="org.akaza.openclinica.bean.submit.SubjectBean" />
 <jsp:useBean scope="session" id="localBirthDate" class="java.lang.String" />
 
-<body class="aka_bodywidth" onload=
-  "if(! detectFirefoxWindows(navigator.userAgent)){document.getElementById('centralContainer').style.display='none';new Effect.Appear('centralContainer', {duration:1});};
-        <c:if test='${popUpURL != ""}'>
-		openDNoteWindow('<c:out value="${popUpURL}" />');</c:if>">
+<body class="aka_bodywidth" onload="<c:if test='${popUpURL != ""}'>openDNoteWindow('<c:out value="${popUpURL}" />');</c:if>">
 
 <h1><span class="title_manage"><fmt:message key="update_subject_details" bundle="${resword}"/></span></h1>
 <P><fmt:message key="field_required" bundle="${resword}"/></P>

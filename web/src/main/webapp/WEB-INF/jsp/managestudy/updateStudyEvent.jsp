@@ -54,10 +54,7 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<body class="aka_bodywidth" onload=
-  "if(! detectFirefoxWindows(navigator.userAgent)){document.getElementById('centralContainer').style.display='none';new Effect.Appear('centralContainer', {duration:1});};
-        <c:if test='${popUpURL != ""}'>
-		openDNoteWindow('<c:out value="${popUpURL}" />');</c:if>">
+<body class="aka_bodywidth" onload="<c:if test='${popUpURL != ""}'>openDNoteWindow('<c:out value="${popUpURL}" />');</c:if> ">
 
 <script type="text/JavaScript" language="JavaScript">
   <!--
