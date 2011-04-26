@@ -38,24 +38,21 @@
 
    <p>
     <c:choose>
-        <c:when test="${study.studyParameterConfig.collectDob != '3'}">
-            <c:choose>
-              <c:when test="${newDataset.showSubjectDob}">
-                <input type="checkbox" checked name="dob" value="yes">
-              </c:when>
-              <c:otherwise>
-                <input type="checkbox" name="dob" value="yes">
-              </c:otherwise>
-            </c:choose>
-        </c:when>
-    </c:choose>    
+      <c:when test="${newDataset.showSubjectDob}">
+        <input type="checkbox" checked name="dob" value="yes">
+      </c:when>
+      <c:otherwise>
+        <input type="checkbox" name="dob" value="yes">
+      </c:otherwise>
+    </c:choose>
+
    <c:choose>
-    <c:when test="${study.studyParameterConfig.collectDob == '1'}">
+    <c:when test="${study.studyParameterConfig.collectDob != '2'}">
      <fmt:message key="date_of_birth" bundle="${resword}"/>
     </c:when>
-    <c:when test="${study.studyParameterConfig.collectDob == '2'}">
+    <c:otherwise>
      <fmt:message key="year_of_birth" bundle="${resword}"/>
-    </c:when>
+    </c:otherwise>
    </c:choose>
    </p>
 	<%--</c:if>--%>

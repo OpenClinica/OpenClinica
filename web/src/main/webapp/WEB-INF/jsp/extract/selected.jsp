@@ -14,19 +14,16 @@
  <td class="table_header_column_top"><fmt:message key="subject_status" bundle="${resword}"/></td>
  <td class="table_header_column_top"><fmt:message key="subject_unique_ID" bundle="${resword}"/></td>
  <td class="table_header_column_top"><fmt:message key="secondary_ID" bundle="${resword}"/></td>
-
+ <td class="table_header_column_top">
    <c:choose>
-    <c:when test="${study.studyParameterConfig.collectDob == '1'}">
-        <td class="table_header_column_top">
-            <fmt:message key="date_of_birth" bundle="${resword}"/>
-        </td>    
+    <c:when test="${study.studyParameterConfig.collectDob != '2'}">
+        <fmt:message key="date_of_birth" bundle="${resword}"/>
     </c:when>
-    <c:when test="${study.studyParameterConfig.collectDob == '2'}">
-        <td class="table_header_column_top">
-            <fmt:message key="year_of_birth" bundle="${resword}"/>
-        </td>   
-    </c:when>
+    <c:otherwise>
+        <fmt:message key="year_of_birth" bundle="${resword}"/>
+    </c:otherwise>
    </c:choose>
+ </td>   
  <td class="table_header_column_top"><fmt:message key="gender" bundle="${resword}"/></td>
  </tr>
  <tr>
@@ -60,21 +57,17 @@
     </c:choose>
    </td>
 
-    <c:choose>
-    <c:when test="${study.studyParameterConfig.collectDob != '3'}">
-        <td class="table_cell">
- 			<c:choose>
-		     <c:when test="${newDataset.showSubjectDob}">
-		       <input type="checkbox" checked name="dob" value="yes">
-		     </c:when>
-		     <c:otherwise>
-		       <input type="checkbox" name="dob" value="yes">
-		     </c:otherwise>
-		   </c:choose>
-        </td>    
-    </c:when>
-   </c:choose>
- 
+    <td class="table_cell">
+        <c:choose>
+         <c:when test="${newDataset.showSubjectDob}">
+           <input type="checkbox" checked name="dob" value="yes">
+         </c:when>
+         <c:otherwise>
+           <input type="checkbox" name="dob" value="yes">
+         </c:otherwise>
+       </c:choose>
+    </td>
+
  </td>
  <td class="table_cell">
   <c:choose>
@@ -102,11 +95,7 @@
  <td class="table_header_column_top"><fmt:message key="start_date" bundle="${resword}"/></td>
  <td class="table_header_column_top"><fmt:message key="end_date" bundle="${resword}"/></td>
  <td class="table_header_column_top"><fmt:message key="status" bundle="${resword}"/></td>
- <td class="table_header_column_top">
-	<c:if test="${study.studyParameterConfig.collectDob == '1' || study.studyParameterConfig.collectDob == '2'}">
- 		<fmt:message key="subject_age_at_event" bundle="${resword}"/>
-	</c:if>
-</td>
+ <td class="table_header_column_top"><fmt:message key="subject_age_at_event" bundle="${resword}"/></td>
  </tr>
  <tr>
  <td class="table_cell"><c:choose>
@@ -149,21 +138,14 @@
    </c:choose>
  </td>
    <td class="table_cell">
-	<c:choose>
-			<c:when
-				test="${study.studyParameterConfig.collectDob == '1' || study.studyParameterConfig.collectDob == '2'}">
-				<c:choose>
-					<c:when test="${newDataset.showSubjectAgeAtEvent}">
-						<input type="checkbox" checked name="age_at_event" value="yes">
-					</c:when>
-					<c:otherwise>
-						<input type="checkbox" name="age_at_event" value="yes">
-					</c:otherwise>
-				</c:choose>
-			</c:when>
-			<c:otherwise>
-			</c:otherwise>
-		</c:choose>
+        <c:choose>
+            <c:when test="${newDataset.showSubjectAgeAtEvent}">
+                <input type="checkbox" checked name="age_at_event" value="yes">
+            </c:when>
+            <c:otherwise>
+                <input type="checkbox" name="age_at_event" value="yes">
+            </c:otherwise>
+        </c:choose>
    </td>
 </tr>
 </table>
