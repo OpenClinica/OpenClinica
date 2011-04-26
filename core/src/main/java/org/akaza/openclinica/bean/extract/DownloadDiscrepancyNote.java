@@ -230,6 +230,8 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
             writer.append(",");
             writer.append("CRF Name");
             writer.append(",");
+            writer.append("CRF Status");
+            writer.append(",");
             writer.append("Entity name");
             writer.append(",");
             writer.append("Entity value");
@@ -295,6 +297,9 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
         writer.append(",");
 
         writer.append(escapeQuotesInCSV(discNoteBean.getCrfName()));
+        writer.append(",");
+
+        writer.append(escapeQuotesInCSV(discNoteBean.getCrfStatus()));
         writer.append(",");
 
         writer.append(escapeQuotesInCSV(discNoteBean.getEntityName()));
@@ -623,8 +628,14 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
             cell = createCell("Study Event Date",dnBean.getEventStart()+"");
             table.addCell(cell);
 
+            StringBuilder tmpStrBuilder = new StringBuilder("CRF: ");
+            tmpStrBuilder.append(dnBean.getCrfName());
+            tmpStrBuilder.append("\n");
+            tmpStrBuilder.append("Status: ");
+            tmpStrBuilder.append(dnBean.getCrfStatus());
             content.append(dnBean.getCrfName());
-            cell = createCell("CRF",dnBean.getCrfName());
+
+            cell = new Cell(new Paragraph(tmpStrBuilder.toString(), new Font(Font.HELVETICA, 14, Font.BOLD, new Color(0, 0, 0))));
 
             table.addCell(cell);
 

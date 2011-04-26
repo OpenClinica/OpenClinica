@@ -51,6 +51,7 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
     private String eventName = "";
     private Date eventStart;
     private String crfName = "";
+    private String crfStatus = "";
     private int numChildren = 0;
     private String entityName = "";
     private String entityValue = "";
@@ -425,6 +426,14 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
      */
     public void setCrfName(String crfName) {
         this.crfName = crfName;
+    }
+
+    public String getCrfStatus() {
+        return crfStatus;
+    }
+
+    public void setCrfStatus(String crfStatus) {
+        this.crfStatus = crfStatus;
     }
 
     /**

@@ -107,7 +107,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
  "discrepancyNoteBean.resolutionStatus", "siteId",
                 "discrepancyNoteBean.createdDate",
                 "discrepancyNoteBean.updatedDate", "age", "days", "eventName",
-                "eventStartDate", "crfName", "entityName", "entityValue", "discrepancyNoteBean.entityType",
+                "eventStartDate", "crfName","crfStatus", "entityName", "entityValue", "discrepancyNoteBean.entityType",
                 "discrepancyNoteBean.description", "discrepancyNoteBean.detailedNotes",
                 "numberOfNotes", "discrepancyNoteBean.user",
                  "discrepancyNoteBean.owner", "actions");
@@ -121,6 +121,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         configureColumn(row.getColumn("eventStartDate"), resword.getString("event_date"), new DateCellEditor(getDateFormat()), null, false, false);
         configureColumn(row.getColumn("eventName"), resword.getString("event_name"), null, null, true, true);
         configureColumn(row.getColumn("crfName"), resword.getString("CRF"), null, null, true, true);
+        configureColumn(row.getColumn("crfStatus"), resword.getString("CRF_status"), null, null, true, true);
         configureColumn(row.getColumn("entityName"), resword.getString("entity_name"), null, null, true, true);
         configureColumn(row.getColumn("entityValue"), resword.getString("entity_value"), null, null, true, true);
         configureColumn(row.getColumn("discrepancyNoteBean.description"), resword.getString("description"), null, null, true, false);
@@ -148,6 +149,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         tableFacade.addFilterMatcher(new MatcherKey(UserAccountBean.class, "studySubject.label"), new GenericFilterMatecher());
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "eventName"), new StringFilterMatcher());
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "crfName"), new StringFilterMatcher());
+        tableFacade.addFilterMatcher(new MatcherKey(String.class, "crfStatus"), new StringFilterMatcher());
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "entityName"), new StringFilterMatcher());
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "entityValue"), new StringFilterMatcher());
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "age"), new AgeDaysFilterMatcher());
@@ -215,6 +217,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             h.put("eventName", discrepancyNoteBean.getEventName());
             h.put("eventStartDate", discrepancyNoteBean.getEventStart());
             h.put("crfName", discrepancyNoteBean.getCrfName());
+            h.put("crfStatus", discrepancyNoteBean.getCrfStatus());
             h.put("entityName", discrepancyNoteBean.getEntityName());
             h.put("entityValue", discrepancyNoteBean.getEntityValue());
             h.put("discrepancyNoteBean", discrepancyNoteBean);
@@ -332,6 +335,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                         dnb.setEventName(se.getName());
                     }
                     dnb.setCrfName(cb.getName());
+                    dnb.setCrfStatus(ecb.getStatus().getName());
 
                     String column = dnb.getColumn().trim();
                     if (!StringUtil.isBlank(column)) {
@@ -421,6 +425,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                     dnb.setEventStart(se.getDateStarted());
                     dnb.setEventName(se.getName());
                     dnb.setCrfName(cb.getName());
+                    dnb.setCrfStatus(ec.getStatus().getName());
                     // }
                 }
                 //Because all places set DiscrepancyNoteBean subjectId  as its studySub's Id.

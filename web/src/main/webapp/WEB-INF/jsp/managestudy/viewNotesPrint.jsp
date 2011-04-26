@@ -40,6 +40,7 @@
 	<td class="table_header_row"><fmt:message key="days_since_updated" bundle="${resword}"/></td>
 	<td class="table_header_row"><fmt:message key="event" bundle="${resword}"/></td>
 	<td class="table_header_row"><fmt:message key="CRF" bundle="${resword}"/></td>
+	<td class="table_header_row"><fmt:message key="CRF_status" bundle="${resword}"/></td>
 	<td class="table_header_row"><fmt:message key="entity_name" bundle="${resword}"/></td>
 	<td class="table_header_row"><fmt:message key="entity_value" bundle="${resword}"/></td>		
 	<td class="table_header_row"><fmt:message key="description" bundle="${resword}"/></td>	
@@ -68,7 +69,8 @@
     </td>
     <td class="table_cell"><c:out value="${note.eventName}" />&nbsp;</td>
     <td class="table_cell"><c:out value="${note.crfName}" />&nbsp;</td>
-    <td class="table_cell">	 
+    <td class="table_cell"><c:out value="${note.crfStatus}" />&nbsp;</td>
+    <td class="table_cell">
 	    <c:out value="${note.entityName}"/>&nbsp;	 
 	</td>
 	<td class="table_cell"><c:out value="${note.entityValue}" />&nbsp;</td>
