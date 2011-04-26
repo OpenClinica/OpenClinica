@@ -181,6 +181,7 @@ public class RuleController {
                 property.setValue(propertyType.getValue());
                 ExpressionBean expressionBean = new ExpressionBean(Context.OC_RULES_V1, propertyType.getValueExpression().getValue());
                 property.setValueExpression(expressionBean);
+                action.addProperty(property);
             }
             ruleSetRuleBean.addAction(action);
         }
@@ -374,7 +375,7 @@ public class RuleController {
                     response.getMessages().add(messageType);
                 }
             }
-        } else if ((rpic.getDuplicateRuleDefs().size() > 0 || rpic.getDuplicateRuleSetDefs().size() > 0) && !ignoreDuplicates) {
+        } else if ((rpic.getDuplicateRuleDefs().size() > 0) && !ignoreDuplicates) {
             response.setValid(Boolean.FALSE);
             for (AuditableBeanWrapper<RuleBean> beanWrapper : rpic.getDuplicateRuleDefs()) {
                 org.openclinica.ns.response.v31.MessagesType messageType = new MessagesType();
