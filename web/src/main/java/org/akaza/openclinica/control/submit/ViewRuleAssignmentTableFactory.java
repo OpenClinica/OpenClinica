@@ -15,7 +15,11 @@ import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.action.ActionType;
+import org.akaza.openclinica.domain.rule.action.HideActionBean;
+import org.akaza.openclinica.domain.rule.action.InsertActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
+import org.akaza.openclinica.domain.rule.action.RuleActionRunBean;
+import org.akaza.openclinica.domain.rule.action.ShowActionBean;
 import org.akaza.openclinica.domain.technicaladmin.LoginStatus;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
@@ -510,7 +514,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
                 // builder.tr(1).close().td(1).close().append(ruleAction.getExpressionEvaluatesTo()).tdEnd().trEnd(1);
             }
             // builder.tableEnd(1);
-
+            
             return builder.toString();
         }
 
@@ -603,7 +607,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
                     builder.tr(1).close().td(1).close().append("<i>" + resword.getString(entry.getKey()) + "</i>").tdEnd().td(1).close()
                             .append(entry.getValue()).tdEnd().trEnd(1);
                 }
-
+                appendRunOn(builder,ruleAction);
+                appendDest(builder,ruleAction);
             }
             builder.tableEnd(1);
 
@@ -619,7 +624,49 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
             }
             return expressionEvaluatesTo;
         }
+        
+        public void appendRunOn(HtmlBuilder builder, RuleActionBean ruleAction) {
+            String s = "";
+            RuleActionRunBean ruleActionRun = ruleAction.getRuleActionRun();
+            if(ruleActionRun.getInitialDataEntry()) s+=resword.getString("IDE_comma")+" ";
+            if(ruleActionRun.getDoubleDataEntry()) s+=resword.getString("DDE_comma")+" ";
+            if(ruleActionRun.getAdministrativeDataEntry()) s+=resword.getString("ADE_comma")+" ";
+            if(ruleActionRun.getBatch()) s+=resword.getString("batch_comma")+" ";
+            s = s.trim(); s = s.substring(0,s.length()-1);
+            if(s.length()>0) 
+                builder.tr(1).close().td(1).close().append("<i>" + resword.getString("run_on_colon") + "</i>").tdEnd().td(1).close().append(s).tdEnd().trEnd(1);
+        }
 
+        public void appendDest(HtmlBuilder builder, RuleActionBean ruleAction) {
+            ActionType actionType = ruleAction.getActionType();
+            if(actionType==ActionType.INSERT) {
+                InsertActionBean a = (InsertActionBean)ruleAction;
+                appendDestProps(builder,a.getProperties());
+            }
+            if(actionType==ActionType.SHOW) {
+                ShowActionBean a = (ShowActionBean)ruleAction;
+                appendDestProps(builder,a.getProperties());
+            }
+            if(actionType==ActionType.HIDE) {
+                HideActionBean a = (HideActionBean)ruleAction;
+                appendDestProps(builder,a.getProperties());
+            }
+        }
+        private void appendDestProps(HtmlBuilder builder, 
+                List<org.akaza.openclinica.domain.rule.action.PropertyBean> propertyBeans) {
+            if(propertyBeans!=null && propertyBeans.size()>0) {
+                String s = "";
+                for(org.akaza.openclinica.domain.rule.action.PropertyBean p : propertyBeans) {
+                    s += p.getOid().trim() + ", ";
+                }
+                s = s.trim(); s = s.substring(0,s.length()-1);
+                builder.tr(1).close().td(1).close().append("<i>" + resword.getString("dest_prop_colon") + "</i>").tdEnd()
+                .td(1).close().append(s).tdEnd().td(1).close().tdEnd();
+                builder.trEnd(1);
+                builder.tr(1).close().td(1).close().tdEnd().trEnd(1);
+                builder.tr(1).close().td(1).close().tdEnd().trEnd(1);
+            }
+        }
     }
 
     private class ActionTypeDroplistFilterEditor extends DroplistFilterEditor {
