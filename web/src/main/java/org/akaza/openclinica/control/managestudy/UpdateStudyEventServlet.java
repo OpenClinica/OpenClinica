@@ -58,7 +58,7 @@ public class UpdateStudyEventServlet extends SecureController {
 
     public static final String STUDY_SUBJECT_ID = "ss_id";
 
-    public static final String EVENT_BEAN = "event";
+    public static final String EVENT_BEAN = "studyEvent";
 
     public static final String EVENT_DEFINITION_BEAN = "eventDefinition";
 
@@ -408,7 +408,7 @@ public class UpdateStudyEventServlet extends SecureController {
                 request.setAttribute("uncompletedEventDefinitionCRFs", uncompletedEventDefinitionCRFs);
                 request.setAttribute("displayEventCRFs", displayEventCRFs);
 
-                request.setAttribute("studyEvent", studyEvent);
+                request.setAttribute(EVENT_BEAN, studyEvent);
                 session.setAttribute("eventSigned", studyEvent);
 
                 DiscrepancyNoteUtil discNoteUtil = new DiscrepancyNoteUtil();

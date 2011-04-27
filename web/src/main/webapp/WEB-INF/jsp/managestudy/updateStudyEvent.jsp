@@ -97,7 +97,7 @@
 
 <form action="UpdateStudyEvent" method="post">
 <input type="hidden" name="action" value="submit">
-<input type="hidden" name="event_id" value="<c:out value="${event.id}"/>">
+<input type="hidden" name="event_id" value="<c:out value="${studyEvent.id}"/>">
 <input type="hidden" name="ss_id" value="<c:out value="${ss_id}"/>">
  <div style="width: 550px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -113,7 +113,6 @@
   <td><div class="formfieldXL_BG">
   &nbsp;&nbsp;<c:out value="${eventDefinition.name}"/></div>
   </td></tr>
-
   <tr valign="top">
   	<td class="formlabel"><fmt:message key="start_date_time" bundle="${resword}"/>:</td>
 	  	<td valign="top">
@@ -175,7 +174,7 @@
         <table border="0" cellpadding="0" cellspacing="0">
         <tr><td>
         <div class="formfieldXL_BG">
-      <input type="text" name="location" value="<c:out value="${event.location}"/>" class="formfieldXL"></div>
+      <input type="text" name="location" value="<c:out value="${studyEvent.location}"/>" class="formfieldXL"></div>
        <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="location"/></jsp:include>
       </td>
       <td><c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
@@ -201,14 +200,14 @@
     <td>
      <div class="formfieldM_BG">
          <c:choose>
-         <c:when test="${event.subjectEventStatus.locked && userRole.researchAssistant}">
-           <c:set var="status1" value="${event.subjectEventStatus.id}"/>
+         <c:when test="${studyEvent.subjectEventStatus.locked && userRole.researchAssistant}">
+           <c:set var="status1" value="${studyEvent.subjectEventStatus.id}"/>
            <select class="formfieldM" name="statusId" disabled="true">
-                 <option value="<c:out value="${event.subjectEventStatus.id}"/>" selected><c:out value="${event.subjectEventStatus.name}"/>
+                 <option value="<c:out value="${studyEvent.subjectEventStatus.id}"/>" selected><c:out value="${event.subjectEventStatus.name}"/>
            </select>
         </c:when>
         <c:otherwise>
-            <c:set var="status1" value="${event.subjectEventStatus.id}"/>
+            <c:set var="status1" value="${studyEvent.subjectEventStatus.id}"/>
             <select class="formfieldM" name="statusId">
                <c:forEach var="status" items="${statuses}">
                 <c:choose>
