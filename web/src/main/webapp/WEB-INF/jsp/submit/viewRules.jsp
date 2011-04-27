@@ -199,6 +199,31 @@
                     <td ><c:out value="${mapEntry.value}"/></td>
                 </tr>
                 </c:forEach>
+                
+                <c:set var="runon" value=""/>
+		        <c:if test="${val.ruleActionRun.initialDataEntry eq 'true'}"><c:set var="runon"><fmt:message key="IDE_comma" bundle="${resword}" /></c:set></c:if>
+		        <c:if test="${val.ruleActionRun.doubleDataEntry eq 'true'}"><c:set var="runon"><c:out value="${runon}"/> <fmt:message key="DDE_comma" bundle="${resword}" /></c:set></c:if>
+		        <c:if test="${val.ruleActionRun.administrativeDataEntry eq 'true'}"><c:set var="runon"><c:out value="${runon}"/> <fmt:message key="ADE_comma" bundle="${resword}" /></c:set></c:if>
+		        <c:if test="${val.ruleActionRun.batch eq 'true'}"><c:set var="runon"><c:out value="${runon}"/> <fmt:message key="batch_comma" bundle="${resword}"/></c:set></c:if>
+		        <c:if test="${fn:length(runon)>0}">
+			        <tr valign="top">
+		        		<td><i><fmt:message key="run_on_colon" bundle="${resword}" /></i></td>
+	        			<td><c:out value="${fn:substring(runon,0,fn:length(runon)-1)}"/></td>
+		        	</tr>
+		        </c:if>
+		        
+		        <c:if test="${val.actionType.code!=1 && val.actionType.code !=2 && fn:length(val.properties)>0}">
+		        	<c:set var="props" value=""/>
+		    		<c:forEach items="${val.properties}" var="prop" varStatus="status">
+		    			<c:set var="props"><c:out value="${props}"/> <c:out value="${prop.oid}"/>,</c:set>
+		    		</c:forEach>
+		        	<c:if test="${fn:length(props)>0}">
+		    			<tr valign="top">
+	                		<td ><i><fmt:message key="dest_prop_colon" bundle="${resword}" /></i></td>
+                			<td ><c:out value="${fn:substring(props,0,fn:length(props)-1)}"/></td>
+                		</tr>
+                	</c:if>
+                </c:if>
             </table>
             </td>
             <td class="table_cell">&nbsp;</td>

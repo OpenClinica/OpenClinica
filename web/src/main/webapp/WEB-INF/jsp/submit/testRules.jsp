@@ -200,31 +200,31 @@
                         <c:if test='${testRuleAction.expressionEvaluatesTo == "false"}'>SELECTED</c:if>>false</option>
                 </select></td>
             </tr>
-            <c:forEach items="${testRuleAction.propertiesForDisplay}" var="mapEntry"
-                varStatus="status">
-                <c:choose>
-                    <c:when test="${status.count == 1}">
-                        <tr valign="top">
-                            <td></td>
-                            <td class="formlabel"><fmt:message
-                                key="test_rules_execute_action" bundle="${resword}" /></td>
-                            <td class="formlabel"><i><fmt:message
-                                key="${mapEntry.key}" bundle="${resword}" /></i></td>
-                            <td class="formValue">${mapEntry.value}</td>
-                        </tr>
-                    </c:when>
-                    <c:otherwise>
-                        <tr valign="top">
-                            <td></td>
-                            <td></td>
-                            <td class="formlabel"><i><fmt:message
-                                key="${mapEntry.key}" bundle="${resword}" /></i></td>
-                            <td class="formValue">${mapEntry.value}</td>
-                        </tr>
-                    </c:otherwise>
-                </c:choose>
-
+            <c:forEach items="${testRuleAction.propertiesForDisplay}" var="mapEntry" varStatus="status">
+                <tr valign="top"><td></td>
+	                <c:choose>
+	                <c:when test="${status.count == 1}">
+                		<td class="formlabel"><fmt:message key="test_rules_execute_action" bundle="${resword}"/></td>
+	                </c:when>
+	                <c:otherwise><td></td></c:otherwise>
+                	</c:choose>     
+	                <td><i><fmt:message key="${mapEntry.key}" bundle="${resword}"/></i></td>
+	                <td>${mapEntry.value}</td>
+                </tr>
             </c:forEach>
+            
+	        <c:if test="${testRuleAction.actionType.code!=1 && testRuleAction.actionType.code !=2 && fn:length(testRuleAction.properties)>0}">
+	        	<c:set var="props" value=""/>
+	    		<c:forEach items="${testRuleAction.properties}" var="prop" varStatus="status">
+	    			<c:set var="props"><c:out value="${props}"/> <c:out value="${prop.oid}"/>,</c:set>
+	    		</c:forEach>
+	        	<c:if test="${fn:length(props)>0}">
+	    			<tr valign="top"><td></td><td></td>
+                		<td><i><fmt:message key="dest_prop_colon" bundle="${resword}" /></i>&nbsp;</td>
+                		<td><c:out value="${fn:substring(props,0,fn:length(props)-1)}"/></td>
+               		</tr>
+               	</c:if>
+               </c:if>
 
             <tr valign="top">
                 <td>&nbsp;</td>
@@ -416,11 +416,28 @@
                         <td class="formlabel">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
                         <td style="color: #789EC5;"></td>
                         <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-                        <td class="formlabel"><i><fmt:message
+                        <td><i><fmt:message
                             key="${mapEntry.key}" bundle="${resword}" /></i></td>
-                        <td class="formValue">${mapEntry.value}</td>
+                        <td>${mapEntry.value}</td>
                     </tr>
                 </c:forEach>
+		        
+	        	<c:if test="${testRuleAction.actionType.code!=1 && testRuleAction.actionType.code !=2 && fn:length(testRuleAction.properties)>0}">
+	        	<c:set var="props" value=""/>
+	    		<c:forEach items="${testRuleAction.properties}" var="prop" varStatus="status">
+	    			<c:set var="props"><c:out value="${props}"/> <c:out value="${prop.oid}"/>,</c:set>
+	    		</c:forEach>
+	        	<c:if test="${fn:length(props)>0}">
+	    			<tr valign="top">
+	    				<td class="formlabel">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                        <td style="color: #789EC5;"></td>
+                        <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                		<td><i><fmt:message key="dest_prop_colon" bundle="${resword}" /></i>&nbsp;</td>
+                		<td><c:out value="${fn:substring(props,0,fn:length(props)-1)}"/></td>
+               		</tr>
+               	</c:if>
+               </c:if>
+                
                 <tr valign="top">
                     <td>&nbsp;</td>
                 </tr>
