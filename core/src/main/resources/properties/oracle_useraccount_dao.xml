@@ -219,7 +219,7 @@
                         AND (s.study_id=? OR s.study_id=?
                             OR s.study_id in (select ss.study_id from study_subject ss WHERE ss.study_subject_id=?)
                         )
-                        ORDER BY ua.last_name ASC
+                       ORDER BY ua.date_created ASC
                 </sql>
         </query>
         <query>
@@ -228,4 +228,18 @@
                 WHERE sur.user_name=uc.user_name and (sur.role_name=? OR sur.role_name=?)
             </sql>
         </query>
+
+        <query>
+            <name>findRoleByUserNameAndStudyIdOrSiteId</name>
+            <sql>SELECT * from study_user_role where
+                user_name = ? and (study_id = ? or study_id = ?)
+            </sql>
+        </query>
+        <query>
+            <name>findRoleCountByUserNameAndStudyId</name>
+            <sql>SELECT * from study_user_role where
+                user_name = ? and study_id = ?
+            </sql>
+        </query>
+
 </queries>

@@ -972,6 +972,24 @@ public class UserAccountDAO extends AuditableEntityDAO {
         return doesntExist;
     }
 
+    public int findRoleCountByUserNameAndStudyId(String userName, int studyId, int childStudyId) {
+
+        this.setRoleTypesExpected();
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), userName);
+        variables.put(new Integer(2), studyId);
+
+        ArrayList alist = new ArrayList();
+        if(childStudyId == 0){
+            alist = this.select(digester.getQuery("findRoleCountByUserNameAndStudyId"), variables);
+        } else {
+            variables.put(new Integer(3), childStudyId);
+            alist = this.select(digester.getQuery("findRoleByUserNameAndStudyIdOrSiteId"), variables);
+        }
+        return alist.size();
+    }
+
+
     public void setSysAdminRole(UserAccountBean uab, boolean creating) {
         HashMap variables = new HashMap();
         variables.put(new Integer(1), uab.getName());
