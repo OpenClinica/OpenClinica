@@ -190,7 +190,7 @@
             <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a></div>
         </div>
         <div class="taskRightColumn">
-            <c:if test="${!study.status.frozen}">
+            <c:if test="${!study.status.frozen && !study.status.locked}">
                 <div class="taskLink"><a href="${urlPrefix}CreateNewStudyEvent"><fmt:message key="nav_schedule_event" bundle="${resword}"/></a></div>
             </c:if>
             <div class="taskLink"><a href="${urlPrefix}ViewStudyEvents"><fmt:message key="nav_view_events" bundle="${resword}"/></a></div>
@@ -208,7 +208,7 @@
             <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a></div>
         </div>
         <div class="taskRightColumn">
-            <c:if test="${!study.status.frozen}">
+            <c:if test="${!study.status.frozen && !study.status.locked}">
                 <div class="taskLink"><a href="${urlPrefix}CreateNewStudyEvent"><fmt:message key="nav_schedule_event" bundle="${resword}"/></a></div>
             </c:if>    
             <div class="taskLink"><a href="${urlPrefix}ViewStudyEvents"><fmt:message key="nav_view_events" bundle="${resword}"/></a></div>
@@ -234,7 +234,7 @@
             <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a></div>
         </div>
         <div class="taskRightColumn">
-            <c:if test="${!study.status.frozen}">
+            <c:if test="${!study.status.frozen && !study.status.locked}">
                 <div class="taskLink"><a href="${urlPrefix}CreateNewStudyEvent"><fmt:message key="nav_schedule_event" bundle="${resword}"/></a></div>
             </c:if>
             <div class="taskLink"><a href="${urlPrefix}ViewStudyEvents"><fmt:message key="nav_view_events" bundle="${resword}"/></a></div>
