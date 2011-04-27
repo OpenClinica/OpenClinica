@@ -482,7 +482,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 <c:set var="repeatParentId" value="${displayItem.itemGroup.itemGroupBean.name}"/>
 <c:set var="sectionBorders" value="${section.section.borders}" />
 
-<c:set var="repeatNumber" value="1"/>
+<c:set var="repeatNumber" value="0"/>
 <c:set var="repeatMax" value="${displayItem.itemGroup.groupMetaBean.repeatMax}"/>
 <c:set var="totalColsPlusSubcols" value="0" />
 <c:set var="questionNumber" value=""/>
@@ -611,147 +611,6 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 
 <c:forEach var="bodyItemGroup" items="${displayItem.itemGroups}"  varStatus="status">
 <c:set var="columnNum"  value="1"/>
-<c:choose>
-<c:when test="${status.last}">
-<!-- for the last but not the only first row, we need to use [] so the repetition javascript can copy it to create new row-->
-<tr id="<c:out value="${repeatParentId}"/>" repeat="template" repeat-start="<c:out value="${repeatNumber}"/>" repeat-max="<c:out value="${repeatMax}"/>">
-    <input type="hidden" name="<c:out value="${repeatParentId}"/>_[<c:out value="${repeatParentId}"/>].existing" value="<c:out value="${uniqueId+1}"/>">
-
-    <c:forEach var="bodyItem" items="${bodyItemGroup.items}">
-    <c:choose>
-    <c:when test="${bodyItem.metadata.showItem}">
-        <c:set var="itemNum" value="${itemNum + 1}" />
-        <c:set var="isHorizontalCellLevel" scope="request" value="${false}"/>
-        <c:if test="${bodyItem.metadata.responseLayout eq 'horizontal' ||
-      bodyItem.metadata.responseLayout eq 'Horizontal'}">
-            <c:set var="isHorizontalCellLevel" scope="request" value="${true}"/>
-        </c:if>
-        <c:choose>
-            <c:when test="${isHorizontalCellLevel && sectionBorders == 1 && (bodyItem.metadata.responseSet.responseType.name eq 'radio' ||
-           bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
-                <%-- For horizontal checkboxes, radio buttons--%>
-                <c:forEach var="respOption" items="${bodyItem.metadata.responseSet.options}">
-                    <td class="aka_padding_norm aka_cellBorders_dark">
-                        <c:set var="displayItem" scope="request" value="${bodyItem}" />
-                        <c:set var="responseOptionBean" scope="request" value="${respOption}" />
-                        <c:import url="../submit/showGroupItemInput.jsp">
-                            <c:param name="repeatParentId" value="${repeatParentId}"/>
-                            <c:param name="rowCount" value="${uniqueId}"/>
-                            <c:param name="key" value="${numOfDate}" />
-                            <c:param name="isLast" value="${true}"/>
-                            <c:param name="tabNum" value="${itemNum}"/>
-                            <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
-                            <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
-                            <c:param name="originJSP" value="administrativeEditing"/>
-                            <c:param name="isForcedRFC" value="${study.studyParameterConfig.adminForcedReasonForChange}"/>
-                        </c:import>
-                    </td>
-                </c:forEach>
-            </c:when>
-            <c:when test="${isHorizontalCellLevel &&
-                (bodyItem.metadata.responseSet.responseType.name eq 'radio' ||
-           bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
-                <%-- For horizontal checkboxes, radio buttons--%>
-                <c:forEach var="respOption" items="${bodyItem.metadata.responseSet.options}">
-                    <td class="aka_padding_norm aka_cellBorders">
-                        <c:set var="displayItem" scope="request" value="${bodyItem}" />
-                        <c:set var="responseOptionBean" scope="request" value="${respOption}" />
-                        <c:import url="../submit/showGroupItemInput.jsp">
-                            <c:param name="repeatParentId" value="${repeatParentId}"/>
-                            <c:param name="rowCount" value="${uniqueId}"/>
-                            <c:param name="key" value="${numOfDate}" />
-                            <c:param name="isLast" value="${true}"/>
-                            <c:param name="tabNum" value="${itemNum}"/>
-                            <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
-                            <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
-                            <c:param name="originJSP" value="administrativeEditing"/>
-                            <c:param name="isForcedRFC" value="${study.studyParameterConfig.adminForcedReasonForChange}"/>
-                        </c:import>
-                    </td>
-                </c:forEach>
-            </c:when>
-            <c:when test="${sectionBorders == 1}">
-                <td class="aka_padding_norm aka_cellBorders_dark">
-                    <c:set var="displayItem" scope="request" value="${bodyItem}" />
-					<c:import url="../submit/generateGroupItemTxt.jsp">
-						<c:param name="itemId" value="${bodyItem.item.id}"/>
-						<c:param name="inputType" value="${bodyItem.metadata.responseSet.responseType.name}"/>
-						<c:param name="function" value="${bodyItem.metadata.responseSet.options[0].value}"/>
-						<c:param name="linkText" value="${bodyItem.metadata.leftItemText}"/>
-						<c:param name="repeatParentId" value="${repeatParentId}"/>
-                        <c:param name="rowCount" value="${uniqueId}"/>
-						<c:param name="isLast" value="${true}"/>
-						<c:param name="side" value="left"/>
-					</c:import>
-                    <c:import url="../submit/showGroupItemInput.jsp">
-                        <c:param name="repeatParentId" value="${repeatParentId}"/>
-                        <c:param name="rowCount" value="${uniqueId}"/>
-                        <c:param name="key" value="${numOfDate}" />
-                        <c:param name="isLast" value="${true}"/>
-                        <c:param name="tabNum" value="${itemNum}"/>
-                        <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
-                        <c:param name="originJSP" value="administrativeEditing"/>
-                        <c:param name="isForcedRFC" value="${study.studyParameterConfig.adminForcedReasonForChange}"/>
-                    </c:import>
-					<c:import url="../submit/generateGroupItemTxt.jsp">
-						<c:param name="itemId" value="${bodyItem.item.id}"/>
-						<c:param name="inputType" value="${bodyItem.metadata.responseSet.responseType.name}"/>
-						<c:param name="function" value="${bodyItem.metadata.responseSet.options[0].value}"/>
-						<c:param name="linkText" value="${bodyItem.metadata.leftItemText}"/>
-						<c:param name="repeatParentId" value="${repeatParentId}"/>
-                        <c:param name="rowCount" value="${uniqueId}"/>
-						<c:param name="isLast" value="${true}"/>
-						<c:param name="side" value="right"/>
-					</c:import>
-                </td>
-            </c:when>
-            <%-- could be a radio or checkbox that is not horizontal --%>
-            <c:otherwise>
-                <td class="aka_padding_norm aka_cellBorders">
-                    <c:set var="displayItem" scope="request" value="${bodyItem}" />
-					<c:import url="../submit/generateGroupItemTxt.jsp">
-						<c:param name="itemId" value="${bodyItem.item.id}"/>
-						<c:param name="inputType" value="${bodyItem.metadata.responseSet.responseType.name}"/>
-						<c:param name="function" value="${bodyItem.metadata.responseSet.options[0].value}"/>
-						<c:param name="linkText" value="${bodyItem.metadata.leftItemText}"/>
-						<c:param name="repeatParentId" value="${repeatParentId}"/>
-                        <c:param name="rowCount" value="${uniqueId}"/>
-						<c:param name="isLast" value="${true}"/>
-						<c:param name="side" value="left"/>
-					</c:import>
-                    <c:import url="../submit/showGroupItemInput.jsp">
-                        <c:param name="repeatParentId" value="${repeatParentId}"/>
-                        <c:param name="rowCount" value="${uniqueId}"/>
-                        <c:param name="key" value="${numOfDate}" />
-                        <c:param name="isLast" value="${true}"/>
-                        <c:param name="tabNum" value="${itemNum}"/>
-                        <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
-                        <c:param name="originJSP" value="administrativeEditing"/>
-                        <c:param name="isForcedRFC" value="${study.studyParameterConfig.adminForcedReasonForChange}"/>
-                    </c:import>
-					<c:import url="../submit/generateGroupItemTxt.jsp">
-						<c:param name="itemId" value="${bodyItem.item.id}"/>
-						<c:param name="inputType" value="${bodyItem.metadata.responseSet.responseType.name}"/>
-						<c:param name="function" value="${bodyItem.metadata.responseSet.options[0].value}"/>
-						<c:param name="linkText" value="${bodyItem.metadata.leftItemText}"/>
-						<c:param name="repeatParentId" value="${repeatParentId}"/>
-                        <c:param name="rowCount" value="${uniqueId}"/>
-						<c:param name="isLast" value="${true}"/>
-						<c:param name="side" value="right"/>
-					</c:import>
-                </td>
-            </c:otherwise>
-        </c:choose>
-        <c:set var="columnNum" value="${columnNum+1}"/>
-        </c:when>
-        <c:when test="${bodyItem.blankDwelt}"><td class="aka_padding_norm aka_cellBorders"></c:when>
-    	</c:choose>
-    </c:forEach>
-   
-</tr>
-
-</c:when>
-<c:otherwise>
 
 <tr repeat="0">
 <c:set var="columnNum"  value="1"/>
@@ -900,7 +759,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                         <input type="hidden" name="<c:out value="${repeatParentId}"/>_manual<c:out value="${uniqueId}"/>.newRow" value="yes">
                     </c:otherwise>
                 </c:choose>
-                <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove"></button>
+                <!-- <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove"></button> -->
             </td>
         </c:when>
         <c:otherwise>
@@ -915,15 +774,168 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                         <input type="hidden" name="<c:out value="${repeatParentId}"/>_manual<c:out value="${uniqueId}"/>.newRow" value="yes">
                     </c:otherwise>
                 </c:choose>
-                <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove"></button>
+              <!--   <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove"></button> -->
             </td>
 
         </c:otherwise>
     </c:choose>
 </c:if>    
 </tr>
-</c:otherwise>
-</c:choose>
+
+<c:if test="${status.last}">
+<!-- for the last but not the only first row, we need to use [] so the repetition javascript can copy it to create new row-->
+<tr id="<c:out value="${repeatParentId}"/>" repeat="template" repeat-start="<c:out value="${repeatNumber}"/>" repeat-max="<c:out value="${repeatMax}"/>">
+    <input type="hidden" name="<c:out value="${repeatParentId}"/>_[<c:out value="${repeatParentId}"/>].existing" value="<c:out value="${uniqueId+1}"/>">
+
+    <c:forEach var="bodyItem" items="${bodyItemGroup.items}">
+    <c:choose>
+    <c:when test="${bodyItem.metadata.showItem}">
+        <c:set var="itemNum" value="${itemNum + 1}" />
+        <c:set var="isHorizontalCellLevel" scope="request" value="${false}"/>
+        <c:if test="${bodyItem.metadata.responseLayout eq 'horizontal' ||
+      bodyItem.metadata.responseLayout eq 'Horizontal'}">
+            <c:set var="isHorizontalCellLevel" scope="request" value="${true}"/>
+        </c:if>
+        <c:choose>
+            <c:when test="${isHorizontalCellLevel && sectionBorders == 1 && (bodyItem.metadata.responseSet.responseType.name eq 'radio' ||
+           bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
+                <%-- For horizontal checkboxes, radio buttons--%>
+                <c:forEach var="respOption" items="${bodyItem.metadata.responseSet.options}">
+                    <td class="aka_padding_norm aka_cellBorders_dark">
+                        <c:set var="displayItem" scope="request" value="${bodyItem}" />
+                        <c:set var="responseOptionBean" scope="request" value="${respOption}" />
+                        <c:import url="../submit/showGroupItemInput.jsp">
+                            <c:param name="repeatParentId" value="${repeatParentId}"/>
+                            <c:param name="rowCount" value="${uniqueId}"/>
+                            <c:param name="key" value="${numOfDate}" />
+                            <c:param name="isLast" value="${true}"/>
+                            <c:param name="tabNum" value="${itemNum}"/>
+                            <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
+                            <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
+                            <c:param name="originJSP" value="administrativeEditing"/>
+                            <c:param name="isForcedRFC" value="${study.studyParameterConfig.adminForcedReasonForChange}"/>
+                        </c:import>
+                    </td>
+                </c:forEach>
+            </c:when>
+            <c:when test="${isHorizontalCellLevel &&
+                (bodyItem.metadata.responseSet.responseType.name eq 'radio' ||
+           bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
+                <%-- For horizontal checkboxes, radio buttons--%>
+                <c:forEach var="respOption" items="${bodyItem.metadata.responseSet.options}">
+                    <td class="aka_padding_norm aka_cellBorders">
+                        <c:set var="displayItem" scope="request" value="${bodyItem}" />
+                        <c:set var="responseOptionBean" scope="request" value="${respOption}" />
+                        <c:import url="../submit/showGroupItemInput.jsp">
+                            <c:param name="repeatParentId" value="${repeatParentId}"/>
+                            <c:param name="rowCount" value="${uniqueId}"/>
+                            <c:param name="key" value="${numOfDate}" />
+                            <c:param name="isLast" value="${true}"/>
+                            <c:param name="tabNum" value="${itemNum}"/>
+                            <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
+                            <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
+                            <c:param name="originJSP" value="administrativeEditing"/>
+                            <c:param name="isForcedRFC" value="${study.studyParameterConfig.adminForcedReasonForChange}"/>
+                        </c:import>
+                    </td>
+                </c:forEach>
+            </c:when>
+            <c:when test="${sectionBorders == 1}">
+                <td class="aka_padding_norm aka_cellBorders_dark">
+                    <c:set var="displayItem" scope="request" value="${bodyItem}" />
+					<c:import url="../submit/generateGroupItemTxt.jsp">
+						<c:param name="itemId" value="${bodyItem.item.id}"/>
+						<c:param name="inputType" value="${bodyItem.metadata.responseSet.responseType.name}"/>
+						<c:param name="function" value="${bodyItem.metadata.responseSet.options[0].value}"/>
+						<c:param name="linkText" value="${bodyItem.metadata.leftItemText}"/>
+						<c:param name="repeatParentId" value="${repeatParentId}"/>
+                        <c:param name="rowCount" value="${uniqueId}"/>
+						<c:param name="isLast" value="${true}"/>
+						<c:param name="side" value="left"/>
+					</c:import>
+                    <c:import url="../submit/showGroupItemInput.jsp">
+                        <c:param name="repeatParentId" value="${repeatParentId}"/>
+                        <c:param name="rowCount" value="${uniqueId}"/>
+                        <c:param name="key" value="${numOfDate}" />
+                        <c:param name="isLast" value="${true}"/>
+                        <c:param name="tabNum" value="${itemNum}"/>
+                        <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
+                        <c:param name="originJSP" value="administrativeEditing"/>
+                        <c:param name="isForcedRFC" value="${study.studyParameterConfig.adminForcedReasonForChange}"/>
+                    </c:import>
+					<c:import url="../submit/generateGroupItemTxt.jsp">
+						<c:param name="itemId" value="${bodyItem.item.id}"/>
+						<c:param name="inputType" value="${bodyItem.metadata.responseSet.responseType.name}"/>
+						<c:param name="function" value="${bodyItem.metadata.responseSet.options[0].value}"/>
+						<c:param name="linkText" value="${bodyItem.metadata.leftItemText}"/>
+						<c:param name="repeatParentId" value="${repeatParentId}"/>
+                        <c:param name="rowCount" value="${uniqueId}"/>
+						<c:param name="isLast" value="${true}"/>
+						<c:param name="side" value="right"/>
+					</c:import>
+                </td>
+            </c:when>
+            <%-- could be a radio or checkbox that is not horizontal --%>
+            <c:otherwise>
+                <td class="aka_padding_norm aka_cellBorders">
+                    <c:set var="displayItem" scope="request" value="${bodyItem}" />
+					<c:import url="../submit/generateGroupItemTxt.jsp">
+						<c:param name="itemId" value="${bodyItem.item.id}"/>
+						<c:param name="inputType" value="${bodyItem.metadata.responseSet.responseType.name}"/>
+						<c:param name="function" value="${bodyItem.metadata.responseSet.options[0].value}"/>
+						<c:param name="linkText" value="${bodyItem.metadata.leftItemText}"/>
+						<c:param name="repeatParentId" value="${repeatParentId}"/>
+                        <c:param name="rowCount" value="${uniqueId}"/>
+						<c:param name="isLast" value="${true}"/>
+						<c:param name="side" value="left"/>
+					</c:import>
+                    <c:import url="../submit/showGroupItemInput.jsp">
+                        <c:param name="repeatParentId" value="${repeatParentId}"/>
+                        <c:param name="rowCount" value="${uniqueId}"/>
+                        <c:param name="key" value="${numOfDate}" />
+                        <c:param name="isLast" value="${true}"/>
+                        <c:param name="tabNum" value="${itemNum}"/>
+                        <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
+                        <c:param name="originJSP" value="administrativeEditing"/>
+                        <c:param name="isForcedRFC" value="${study.studyParameterConfig.adminForcedReasonForChange}"/>
+                    </c:import>
+					<c:import url="../submit/generateGroupItemTxt.jsp">
+						<c:param name="itemId" value="${bodyItem.item.id}"/>
+						<c:param name="inputType" value="${bodyItem.metadata.responseSet.responseType.name}"/>
+						<c:param name="function" value="${bodyItem.metadata.responseSet.options[0].value}"/>
+						<c:param name="linkText" value="${bodyItem.metadata.leftItemText}"/>
+						<c:param name="repeatParentId" value="${repeatParentId}"/>
+                        <c:param name="rowCount" value="${uniqueId}"/>
+						<c:param name="isLast" value="${true}"/>
+						<c:param name="side" value="right"/>
+					</c:import>
+                </td>
+            </c:otherwise>
+        </c:choose>
+        <c:set var="columnNum" value="${columnNum+1}"/>
+        </c:when>
+        <c:when test="${bodyItem.blankDwelt}"><td class="aka_padding_norm aka_cellBorders"></c:when>
+    	</c:choose>
+    </c:forEach>
+    <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">
+        <c:choose>
+            <c:when test="${sectionBorders == 1}">
+                <td class="aka_padding_norm aka_cellBorders_dark">
+                    <input type="hidden" name="<c:out value="${repeatParentId}"/>_[<c:out value="${repeatParentId}"/>].newRow" value="yes" />
+                    <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove"></button>
+                </td>
+            </c:when>
+
+            <c:otherwise>
+                <td class="aka_padding_norm aka_cellBorders">
+                    <input type="hidden" name="<c:out value="${repeatParentId}"/>_[<c:out value="${repeatParentId}"/>].newRow" value="yes" />
+                    <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove"></button>
+                </td>
+            </c:otherwise>
+        </c:choose>
+    </c:if>
+</tr>
+</c:if>
 <c:set var="uniqueId" value="${uniqueId +1}"/>
 </c:forEach>
 <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">
