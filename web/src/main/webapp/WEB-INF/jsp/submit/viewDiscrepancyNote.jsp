@@ -264,7 +264,7 @@
 
                             </c:forEach>
                             <c:set var="showDNBox" value="n"/>
-                            <c:if test="${isLocked eq 'no'}">
+                            <c:if test="${!study.status.locked}">
                             	<tr>
                             	<td class="table_cell_left" colspan="4" align="right">
                             		<c:if test="${(note.value.id>0 && note.value.resStatus.id != 5) && !(note.value.resStatus.id == 4 && whichResStatus == '22')}">
@@ -319,7 +319,7 @@
 <c:set var="count" value="${count+1}"/>
 </c:forEach>
 
-<c:if test="${isLocked eq 'no'}">
+<c:if test="${!study.status.locked}">
 	<div style="clear:both;"></div>
 	<c:choose>
     <c:when test="${boxToShow==0}">
