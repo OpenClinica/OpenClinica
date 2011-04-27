@@ -136,9 +136,7 @@ public class CoreResources implements ResourceLoaderAware {
             vals = replaceWebapp(vals);
             vals = replaceCatHome(vals);
             logMe("key: " + key + " vals:" + vals);
-            System.out.println("setDataInfoVals.key="+key+" vals="+vals);
             DATAINFO.setProperty(key, vals);
-            System.out.println("datainfo.getProperty --setDataInfoVals.key="+key+" vals="+vals);
         }
 
     }
@@ -746,7 +744,7 @@ public class CoreResources implements ResourceLoaderAware {
 
             absolutePath = scr.getFile().getAbsolutePath();
             ODM_MAPPING_DIR = absolutePath.replaceAll("datainfo.properties", "") + "odm_mapping";
-            System.out.println("ODM_MAPPING_DIR: " + ODM_MAPPING_DIR);
+            //System.out.println("ODM_MAPPING_DIR: " + ODM_MAPPING_DIR);
         } catch (IOException e) {
             throw new OpenClinicaSystemException(e.getMessage(), e.fillInStackTrace());
         }
