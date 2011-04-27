@@ -119,12 +119,12 @@
 
 
           </td>
-          <c:if test="${version.status.available}">
-          <td><a href="LockCRFVersion?module=<c:out value="${module}"/>&id=<c:out value="${version.id}"/>"
-			onMouseDown="javascript:setImage('bt_Lock1','images/bt_Lock_d.gif');"
-			onMouseUp="javascript:setImage('bt_Lock1','images/bt_Lock.gif');"><img 
-			name="bt_Lock1" src="images/bt_Lock.gif" border="0" alt="<fmt:message key="archive" bundle="${resword}"/>" title="<fmt:message key="archive" bundle="${resword}"/>" align="left" hspace="6"></a>
-		  </td>
+          <c:if test="${version.status.available && userBean.sysAdmin && module=='admin'}">
+              <td><a href="LockCRFVersion?module=<c:out value="${module}"/>&id=<c:out value="${version.id}"/>"
+                onMouseDown="javascript:setImage('bt_Lock1','images/bt_Lock_d.gif');"
+                onMouseUp="javascript:setImage('bt_Lock1','images/bt_Lock.gif');"><img
+                name="bt_Lock1" src="images/bt_Lock.gif" border="0" alt="<fmt:message key="archive" bundle="${resword}"/>" title="<fmt:message key="archive" bundle="${resword}"/>" align="left" hspace="6"></a>
+              </td>
 		  </c:if>
 		  <c:if test="${version.status.name=='locked'}">             
              <td><a href="UnlockCRFVersion?module=<c:out value="${module}"/>&id=<c:out value="${version.id}"/>"
