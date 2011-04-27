@@ -150,7 +150,18 @@ public class ViewDatasetsServlet extends SecureController {
             } else if ("details".equalsIgnoreCase(action)) {
                 FormProcessor fp = new FormProcessor(request);
                 int datasetId = fp.getInt("datasetId");
+                
                 DatasetBean db = initializeAttributes(datasetId);
+                StudyDAO sdao = new StudyDAO(sm.getDataSource());
+                StudyBean study = (StudyBean)sdao.findByPK(db.getStudyId());
+
+                if (study.getId() != currentStudy.getId() && study.getParentStudyId() != currentStudy.getId()) {
+                    addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+                            + " " + respage.getString("change_active_study_or_contact"));
+                    forwardPage(Page.MENU_SERVLET);
+                    return;
+                }
+
                 /*
                  * EntityBeanTable table = fp.getEntityBeanTable(); ArrayList
                  * datasetRows = DatasetRow.generateRowFromBean(db); String[]
@@ -173,20 +184,12 @@ public class ViewDatasetsServlet extends SecureController {
     public void mayProceed() throws InsufficientPermissionException {
 
         locale = request.getLocale();
-        // < resword =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.words",locale);
-        // < restext =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.notes",locale);
-        // < respage =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",locale);
-        // <
-        // resexception=ResourceBundle.getBundle("org.akaza.openclinica.i18n.exceptions",locale);
 
         if (ub.isSysAdmin()) {
             return;
         }
-        if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)
-            || currentRole.getRole().equals(Role.INVESTIGATOR) || currentRole.getRole().equals(Role.MONITOR)) {
+
+        if (!currentRole.getRole().equals(Role.RESEARCHASSISTANT)) {
             return;
         }
 

@@ -44,18 +44,35 @@ public class EditDatasetServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
-        String action = request.getParameter("action");
-        DatasetDAO dsDAO = new DatasetDAO(sm.getDataSource());
 
         int dsId = fp.getInt("dsId");
         DatasetBean dataset = initializeAttributes(dsId);
 
+        StudyDAO sdao = new StudyDAO(sm.getDataSource());
+        StudyBean study = (StudyBean)sdao.findByPK(dataset.getStudyId());
+        // Checking if user has permission to access the current study/site
+        checkRoleByUserAndStudy(ub, study.getParentStudyId(), study.getId());
+
+        // Checking the dataset belongs to current study or a site of current study
+        if (study.getId() != currentStudy.getId() && study.getParentStudyId() != currentStudy.getId()) {
+            addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+                    + " " + respage.getString("change_active_study_or_contact"));
+            forwardPage(Page.MENU_SERVLET);
+            return;
+        }
+
+        if((currentRole.isMonitor() || currentRole.isInvestigator()) && (dataset.getOwnerId() != ub.getId())){
+            addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+                    + " " + respage.getString("change_active_study_or_contact"));
+            forwardPage(Page.MENU_SERVLET);
+            return;
+        }
+
+        
         HashMap events = (LinkedHashMap) session.getAttribute("eventsForCreateDataset");
         // << tbh
         CRFDAO crfdao = new CRFDAO(sm.getDataSource());
-        ItemDAO idao = new ItemDAO(sm.getDataSource());
-        ArrayList<String> ids = CreateDatasetServlet.allSedItemIdsInStudy(events, crfdao, idao);
-        session.setAttribute("numberOfStudyItems", new Integer(ids.size()).toString());
+
         // >> tbh 11/2009
         if (events == null || events.isEmpty()) {
             events = new LinkedHashMap();

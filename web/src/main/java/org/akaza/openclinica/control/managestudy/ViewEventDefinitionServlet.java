@@ -20,7 +20,9 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -52,6 +54,7 @@ public class ViewEventDefinitionServlet extends SecureController {
     public void processRequest() throws Exception {
 
         StudyEventDefinitionDAO sdao = new StudyEventDefinitionDAO(sm.getDataSource());
+        StudyDAO studyDao = new StudyDAO(sm.getDataSource());
         FormProcessor fp = new FormProcessor(request);
         int defId = fp.getInt("id", true);
 
@@ -61,6 +64,15 @@ public class ViewEventDefinitionServlet extends SecureController {
         } else {
             // definition id
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) sdao.findByPK(defId);
+
+            if (currentStudy.getId() != sed.getStudyId()) {
+                addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+                        + " " + respage.getString("change_active_study_or_contact"));
+                forwardPage(Page.MENU_SERVLET);
+                return;
+            }
+            
+            checkRoleByUserAndStudy(ub, sed.getStudyId(), 0);
 
             EventDefinitionCRFDAO edao = new EventDefinitionCRFDAO(sm.getDataSource());
             ArrayList eventDefinitionCRFs = (ArrayList) edao.findAllByDefinition(this.currentStudy, defId);

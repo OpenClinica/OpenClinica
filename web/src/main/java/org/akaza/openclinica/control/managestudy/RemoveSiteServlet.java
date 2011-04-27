@@ -71,6 +71,12 @@ public class RemoveSiteServlet extends SecureController {
 
         int siteId = Integer.valueOf(idString.trim()).intValue();
         StudyBean study = (StudyBean) sdao.findByPK(siteId);
+        if (currentStudy.getId() != study.getParentStudyId()) {
+            addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+                    + " " + respage.getString("change_active_study_or_contact"));
+            forwardPage(Page.MENU_SERVLET);
+            return;
+        }
 
         // find all user and roles
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());

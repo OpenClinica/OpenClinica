@@ -15,6 +15,7 @@ import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.ResponseOptionBean;
 import org.akaza.openclinica.bean.submit.ResponseSetBean;
+import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -66,16 +67,15 @@ public class CreateCRFVersionServlet extends SecureController {
     public void mayProceed() throws InsufficientPermissionException {
 
         locale = request.getLocale();
-        // < resword =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.words",locale);
-        // <
-        // resexception=ResourceBundle.getBundle("org.akaza.openclinica.i18n.exceptions",locale);
-        // < respage =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",locale);
-
         if (ub.isSysAdmin()) {
             return;
         }
+        Role r = currentRole.getRole();
+        if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR)) {
+            return;
+        }
+        addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
+        throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
     }
 
     @Override

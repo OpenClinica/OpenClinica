@@ -1093,7 +1093,19 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
         return note;
     }
-
+    public void checkRoleByUserAndStudy(UserAccountBean ub, int studyId, int siteId){
+        StudyUserRoleBean studyUserRole = ub.getRoleByStudy(studyId);
+        StudyUserRoleBean siteUserRole = new StudyUserRoleBean();
+        if (siteId != 0) {
+            siteUserRole = ub.getRoleByStudy(siteId);    
+        }
+        if(studyUserRole.getRole().equals(Role.INVALID) && siteUserRole.getRole().equals(Role.INVALID)){
+            addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+                    + " " + respage.getString("change_active_study_or_contact"));
+            forwardPage(Page.MENU_SERVLET);
+            return;
+        }
+    }
 
 
     /**

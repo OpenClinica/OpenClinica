@@ -18,7 +18,7 @@
  <c:if test="${userBean != null && userBean.id>0}">	 
   <c:choose>
   
-    <c:when test="${!empty pageMessages}">
+    <c:when test="${!empty pageMessages || param.message == 'authentication_failed'}">
 
 	<tr id="sidebar_Alerts_open" style="display: all">
 		<td class="sidebar_tab">

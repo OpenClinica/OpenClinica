@@ -11,14 +11,13 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Collection;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.managestudy.*;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
@@ -30,10 +29,7 @@ import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
@@ -85,7 +81,6 @@ public class ViewNoteServlet extends SecureController {
         int noteId = fp.getInt(NOTE_ID, true);
 
         DiscrepancyNoteBean note = (DiscrepancyNoteBean) dndao.findByPK(noteId);
-
         String entityType = note.getEntityType();
 
         if (note.getEntityId() > 0 && !entityType.equals("")) {
@@ -237,6 +232,34 @@ public class ViewNoteServlet extends SecureController {
             }
 
         }
+
+        //Check if this Note would be accessed from the Current Study
+        // Mantis Issue 8495.
+        if(note.getStudyId() != currentStudy.getId()){
+            if(currentStudy.getParentStudyId() > 0){
+                if (currentStudy.getId() != note.getStudySub().getStudyId()) {
+                    addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+                            + " " + respage.getString("change_active_study_or_contact"));
+                    forwardPage(Page.MENU_SERVLET);
+                    return;
+                }
+            } else {
+                // The SubjectStudy is not belong to currentstudy and current study is not a site.
+                StudyDAO studydao = new StudyDAO(sm.getDataSource());
+                Collection sites;
+                sites = studydao.findOlnySiteIdsByStudy(currentStudy);
+                if (!sites.contains(note.getStudySub().getStudyId())) {
+                    addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " " + respage.getString("change_active_study_or_contact"));
+                    forwardPage(Page.MENU_SERVLET);
+                    return;
+                }
+            }
+        }
+        // Check end
+
+
+
+
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
 
         ArrayList<DiscrepancyNoteBean> notes = dndao.findAllEntityByPK(note.getEntityType(), noteId);

@@ -87,8 +87,15 @@ public class InitUpdateCRFServlet extends SecureController {
         } else {
             CRFDAO cdao = new CRFDAO(sm.getDataSource());
             CRFBean crf = (CRFBean) cdao.findByPK(crfId);
-            session.setAttribute(CRF, crf);
-            forwardPage(Page.UPDATE_CRF);
+            if(!ub.isSysAdmin() && (crf.getOwnerId() != ub.getId())){
+                addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+                        + " " + respage.getString("change_active_study_or_contact"));
+                forwardPage(Page.MENU_SERVLET);
+                return;
+            } else {
+                session.setAttribute(CRF, crf);
+                forwardPage(Page.UPDATE_CRF);
+            }
 
         }
     }

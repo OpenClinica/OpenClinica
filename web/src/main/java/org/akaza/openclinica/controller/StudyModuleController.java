@@ -34,6 +34,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -81,10 +83,19 @@ public class StudyModuleController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public ModelMap handleMainPage(HttpServletRequest request) {
+    public ModelMap handleMainPage(HttpServletRequest request, HttpServletResponse response) {
         ModelMap map = new ModelMap();
         // Todo need something to reset panel from all the Spring Controllers
         StudyInfoPanel panel = new StudyInfoPanel();
+		 UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
+        if(!mayProceed(request)){
+            try{
+                response.sendRedirect(request.getContextPath() + "/MainMenu?message=authentication_failed");
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            return null;
+        }
         panel.reset();
         request.getSession().setAttribute("panel", panel);
 
@@ -189,7 +200,7 @@ public class StudyModuleController {
             map.addAttribute("hostPath", getHostPath(request));
             map.addAttribute("path", "pages/studymodule");
         }
-        UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
+       // UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
         request.setAttribute("userBean", userBean);
         ArrayList statusMap = Status.toStudyUpdateMembersList();
         // statusMap.add(Status.PENDING);
@@ -307,6 +318,17 @@ public class StudyModuleController {
             webAppName = tokens[(tokens.length - 1)].trim();
         }
         return webAppName;
+    }
+	
+	    private boolean mayProceed(HttpServletRequest request) {
+        StudyUserRoleBean currentRole = (StudyUserRoleBean)request.getSession().getAttribute("userRole");
+        Role r = currentRole.getRole();
+
+        if (r.equals(Role.ADMIN) || r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR)) {
+            return true;
+        }
+
+        return false;
     }
 
 }

@@ -9,6 +9,7 @@ package org.akaza.openclinica.control.managestudy;
 
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.InterventionBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -42,16 +43,16 @@ public class UpdateStudyServletNew extends SecureController {
      */
     @Override
     public void mayProceed() throws InsufficientPermissionException {
+
         if (ub.isSysAdmin()) {
             return;
         }
-
-        // addPageMessage(respage.getString(
-        // "no_have_correct_privilege_current_study") +
-        // respage.getString("change_study_contact_sysadmin"));
-        // throw new InsufficientPermissionException(Page.STUDY_LIST_SERVLET,
-        // resexception.getString("not_admin"), "1");
-
+        Role r = currentRole.getRole();
+        if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR)) {
+            return;
+        }
+        addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
+        throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
     }
 
     @Override
@@ -66,6 +67,12 @@ public class UpdateStudyServletNew extends SecureController {
         boolean isInterventional = false;
 
         study = (StudyBean) sdao.findByPK(studyId);
+        if(study.getId() != currentStudy.getId()){
+            addPageMessage(respage.getString("not_current_study") + respage.getString("change_study_contact_sysadmin"));
+            forwardPage(Page.MENU_SERVLET);
+            return;
+        }
+
         study.setId(studyId);
         StudyConfigService scs = new StudyConfigService(sm.getDataSource());
         study = scs.setParametersForStudy(study);

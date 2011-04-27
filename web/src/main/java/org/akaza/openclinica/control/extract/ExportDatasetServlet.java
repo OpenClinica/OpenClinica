@@ -109,7 +109,17 @@ public class ExportDatasetServlet extends SecureController {
             }
         }
         DatasetBean db = (DatasetBean) dsdao.findByPK(datasetId);
+       StudyDAO sdao = new StudyDAO(sm.getDataSource());
+        StudyBean study = (StudyBean)sdao.findByPK(db.getStudyId());
+        checkRoleByUserAndStudy(ub, study.getParentStudyId(), study.getId());
 
+        //Checks if the study is current study or child of current study
+        if (study.getId() != currentStudy.getId() && study.getParentStudyId() != currentStudy.getId()) {
+            addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+                    + " " + respage.getString("change_active_study_or_contact"));
+            forwardPage(Page.MENU_SERVLET);
+            return;
+        }
         /**
          * @vbc 08/06/2008 NEW EXTRACT DATA IMPLEMENTATION get study_id and
          *      parentstudy_id int currentstudyid = currentStudy.getId(); int
@@ -123,7 +133,7 @@ public class ExportDatasetServlet extends SecureController {
 
         StudyBean parentStudy = new StudyBean();
         if (currentStudy.getParentStudyId() > 0) {
-            StudyDAO sdao = new StudyDAO(sm.getDataSource());
+            //StudyDAO sdao = new StudyDAO(sm.getDataSource());
             parentStudy = (StudyBean) sdao.findByPK(currentStudy.getParentStudyId());
         }
 

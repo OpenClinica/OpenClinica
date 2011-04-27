@@ -55,12 +55,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.DisplayStudyEventRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import javax.sql.DataSource;
 
@@ -102,7 +97,7 @@ public class ViewStudySubjectServlet extends SecureController {
     public void mayProceed() throws InsufficientPermissionException {
         // YW 10-18-2007, if a study subject with passing parameter does not
         // belong to user's studies, it can not be viewed
-        mayAccess();
+//        mayAccess();
         removeLockedCRF(ub.getId());
         CoreSecureController.removeLockedCRF(ub.getId());  
         if (ub.isSysAdmin()) {
@@ -190,6 +185,25 @@ public class ViewStudySubjectServlet extends SecureController {
 
             StudyDAO studydao = new StudyDAO(sm.getDataSource());
             StudyBean study = (StudyBean) studydao.findByPK(studyId);
+            //Check if this StudySubject would be accessed from the Current Study
+            if(studySub.getStudyId() != currentStudy.getId()){
+                if(currentStudy.getParentStudyId() > 0){
+                    addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " " + respage.getString("change_active_study_or_contact"));
+                    forwardPage(Page.MENU_SERVLET);
+                    return;
+                } else {
+                    // The SubjectStudy is not belong to currentstudy and current study is not a site.
+                    Collection sites = studydao.findOlnySiteIdsByStudy(currentStudy);
+                    if (!sites.contains(study.getId())) {
+                        addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " " + respage.getString("change_active_study_or_contact"));
+                        forwardPage(Page.MENU_SERVLET);
+                        return;
+                    }
+                }
+            }
+            
+
+
             // If the study subject derives from a site, and is being viewed
             // from a parent study,
             // then the study IDs will be different. However, since each note is

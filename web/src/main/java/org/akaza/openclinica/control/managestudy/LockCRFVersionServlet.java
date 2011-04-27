@@ -68,6 +68,13 @@ public class LockCRFVersionServlet extends SecureController {
        CRFVersionBean version = (CRFVersionBean)cvdao.findByPK(crfVersionId);
        //System.out.println("crf version found:" + version.getName());
        CRFBean crf = (CRFBean)cdao.findByPK(version.getCrfId());
+
+       if (!ub.isSysAdmin() && (version.getOwnerId() != ub.getId())) {
+           addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+                   + " " + respage.getString("change_active_study_or_contact"));
+           forwardPage(Page.MENU_SERVLET);
+           return;
+       }
       
        EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
        ArrayList eventCRFs = ecdao.findAllStudySubjectByCRFVersion(crfVersionId);

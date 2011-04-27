@@ -25,6 +25,7 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -70,6 +71,9 @@ public class InitUpdateSubStudyServlet extends SecureController {
         } else {
             int studyId = Integer.valueOf(idString.trim()).intValue();
             StudyBean study = (StudyBean) sdao.findByPK(studyId);
+
+            checkRoleByUserAndStudy(ub, study.getParentStudyId(), study.getId());
+            
             String parentStudyName = "";
             StudyBean parent = new StudyBean();
             if (study.getParentStudyId() > 0) {

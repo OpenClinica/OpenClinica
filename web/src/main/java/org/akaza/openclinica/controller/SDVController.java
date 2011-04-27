@@ -42,6 +42,15 @@ import java.util.ResourceBundle;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
+import javax.servlet.http.HttpSession;
+import javax.servlet.ServletContext;
+import javax.servlet.RequestDispatcher;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
+import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.akaza.openclinica.view.Page;
+import org.akaza.openclinica.control.SpringServletAccess;
+import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 
 
 /**
@@ -74,7 +83,14 @@ public class SDVController {
 
     @RequestMapping("/viewSubjectAggregate")
     public ModelMap viewSubjectAggregateHandler(HttpServletRequest request, HttpServletResponse response, @RequestParam("studyId") int studyId) {
-
+		if(!mayProceed(request)){
+            try{
+                response.sendRedirect(request.getContextPath() + "/MainMenu?message=authentication_failed");
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            return null;
+        }
         ModelMap gridMap = new ModelMap();
         boolean showMoreLink = false;
         if(request.getParameter("showMoreLink")!=null){
@@ -128,8 +144,17 @@ public class SDVController {
     }
 
     @RequestMapping("/viewAllSubjectSDVtmp")
-    public ModelMap viewAllSubjectHandler(HttpServletRequest request, @RequestParam("studyId") int studyId) {
-        ResourceBundleProvider.updateLocale(request.getLocale());
+    public ModelMap viewAllSubjectHandler(HttpServletRequest request, @RequestParam("studyId") int studyId, HttpServletResponse response) {
+    
+        if(!mayProceed(request)){
+            try{
+                response.sendRedirect(request.getContextPath() + "/MainMenu?message=authentication_failed");
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            return null;
+        }
+    ResourceBundleProvider.updateLocale(request.getLocale());
         // Reseting the side info panel set by SecureControler Mantis Issue: 8680.
         // Todo need something to reset panel from all the Spring Controllers 
         StudyInfoPanel panel = new StudyInfoPanel();
@@ -289,6 +314,15 @@ public class SDVController {
     public String sdvOneCRFFormHandler(HttpServletRequest request, HttpServletResponse response, @RequestParam("crfId") int crfId,
             @RequestParam("redirection") String redirection, ModelMap model) {
 
+			
+			 if(!mayProceed(request)){
+            try{
+                response.sendRedirect(request.getContextPath() + "/MainMenu?message=authentication_failed");
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            return null;
+        }
         //For the messages that appear in the left column of the results page
         ArrayList<String> pageMessages = new ArrayList<String>();
 
@@ -528,6 +562,17 @@ public class SDVController {
         Date date = sdf.parse("01/01/2007");
         System.out.println("date = " + date);
 
+    }
+	
+	 private boolean mayProceed(HttpServletRequest request) {
+        StudyUserRoleBean currentRole = (StudyUserRoleBean)request.getSession().getAttribute("userRole"); 
+        Role r = currentRole.getRole();
+
+        if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR) || r.equals(Role.MONITOR)) {
+            return true;
+        }
+
+        return false;
     }
 
 }

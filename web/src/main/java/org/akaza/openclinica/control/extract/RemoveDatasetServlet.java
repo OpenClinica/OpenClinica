@@ -10,9 +10,11 @@ package org.akaza.openclinica.control.extract;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.extract.DatasetBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.DatasetRow;
@@ -45,6 +47,24 @@ public class RemoveDatasetServlet extends SecureController {
         DatasetDAO dsDAO = new DatasetDAO(sm.getDataSource());
         DatasetBean dataset = (DatasetBean) dsDAO.findByPK(dsId);
 
+        StudyDAO sdao = new StudyDAO(sm.getDataSource());
+        StudyBean study = (StudyBean)sdao.findByPK(dataset.getStudyId());
+        checkRoleByUserAndStudy(ub, study.getParentStudyId(), study.getId());
+        if (study.getId() != currentStudy.getId() && study.getParentStudyId() != currentStudy.getId()) {
+            addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+                    + " " + respage.getString("change_active_study_or_contact"));
+            forwardPage(Page.MENU_SERVLET);
+            return;
+        }
+
+        if(!ub.isSysAdmin() && (dataset.getOwnerId() != ub.getId())){
+            addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+                    + " " + respage.getString("change_active_study_or_contact"));
+            forwardPage(Page.MENU_SERVLET);
+            return;
+        }
+
+
         String action = request.getParameter("action");
         if (resword.getString("remove_this_dataset").equalsIgnoreCase(action)) {
             dataset.setStatus(Status.DELETED);
@@ -68,22 +88,12 @@ public class RemoveDatasetServlet extends SecureController {
     public void mayProceed() throws InsufficientPermissionException {
 
         locale = request.getLocale();
-        // < resmessage =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",locale);
-        // < restext =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.notes",locale);
-        // < resword =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.words",locale);
-        // < respage =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",locale);
-        // <
-        // resexception=ResourceBundle.getBundle("org.akaza.openclinica.i18n.exceptions",locale);
 
         if (ub.isSysAdmin()) {
             return;// TODO limit to owner only?
         }
         if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)
-            || currentRole.getRole().equals(Role.INVESTIGATOR)) {
+            ) {
             return;
         }
 

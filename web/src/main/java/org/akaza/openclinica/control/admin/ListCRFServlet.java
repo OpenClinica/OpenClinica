@@ -53,7 +53,7 @@ public class ListCRFServlet extends SecureController {
         // < respage =
         // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",locale);
 
-        if (ub.isSysAdmin()) {
+        if (ub.isSysAdmin() || ub.isTechAdmin()) {
             return;
         }
 
@@ -82,6 +82,13 @@ public class ListCRFServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         // checks which module the requests are from
         String module = fp.getString(MODULE);
+
+        if(module.equalsIgnoreCase("admin") && !(ub.isSysAdmin()||ub.isTechAdmin())){
+            addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+                    + " " + respage.getString("change_active_study_or_contact"));
+            forwardPage(Page.MENU_SERVLET);
+            return;
+        }
         request.setAttribute(MODULE, module);
 
         String dir = SQLInitServlet.getField("filePath") + "crf" + File.separator + "new" + File.separator;// for

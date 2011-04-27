@@ -26,6 +26,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -65,6 +66,16 @@ public class RemoveEventDefinitionServlet extends SecureController {
         int defId = Integer.valueOf(idString.trim()).intValue();
         StudyEventDefinitionDAO sdao = new StudyEventDefinitionDAO(sm.getDataSource());
         StudyEventDefinitionBean sed = (StudyEventDefinitionBean) sdao.findByPK(defId);
+
+//        checkRoleByUserAndStudy(ub.getName(), sed.getStudyId(), 0);
+        if (currentStudy.getId() != sed.getStudyId()) {
+            addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+                    + " " + respage.getString("change_active_study_or_contact"));
+            forwardPage(Page.MENU_SERVLET);
+            return;
+        }
+        
+        
         // find all CRFs
         EventDefinitionCRFDAO edao = new EventDefinitionCRFDAO(sm.getDataSource());
         ArrayList eventDefinitionCRFs = (ArrayList) edao.findAllByDefinition(defId);

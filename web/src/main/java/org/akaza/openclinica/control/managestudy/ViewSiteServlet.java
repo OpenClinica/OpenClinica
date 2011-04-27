@@ -21,6 +21,7 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -42,11 +43,13 @@ public class ViewSiteServlet extends SecureController {
         if (ub.isSysAdmin()) {
             return;
         }
-        if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)
-            || currentRole.getRole().equals(Role.INVESTIGATOR) || currentRole.getRole().equals(Role.RESEARCHASSISTANT)) {
+        if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)) {
             return;
         }
-
+        int siteId = request.getParameter("id") == null ? 0 : Integer.valueOf(request.getParameter("id"));
+        if (currentStudy.getId() == siteId) {
+            return;
+        }
         addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " " + respage.getString("change_study_contact_sysadmin"));
         throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_director"), "1");
 
@@ -70,6 +73,7 @@ public class ViewSiteServlet extends SecureController {
             int siteId = Integer.valueOf(idString.trim()).intValue();
             StudyBean study = (StudyBean) sdao.findByPK(siteId);
 
+            checkRoleByUserAndStudy(ub, study.getParentStudyId(), study.getId());
             // if (currentStudy.getId() != study.getId()) {
 
             ArrayList configs = new ArrayList();

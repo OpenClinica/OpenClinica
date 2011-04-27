@@ -74,6 +74,12 @@ public class RemoveCRFVersionServlet extends SecureController {
                 return;
             }
             CRFVersionBean version = (CRFVersionBean) cvdao.findByPK(versionId);
+            if (!ub.isSysAdmin() && (version.getOwnerId() != ub.getId())) {
+                addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+                        + " " + respage.getString("change_active_study_or_contact"));
+                forwardPage(Page.MENU_SERVLET);
+                return;
+            }
 
             SectionDAO secdao = new SectionDAO(sm.getDataSource());
 

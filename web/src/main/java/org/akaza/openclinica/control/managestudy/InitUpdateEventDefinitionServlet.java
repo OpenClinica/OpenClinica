@@ -49,6 +49,7 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
         if (ub.isSysAdmin()) {
             return;
         }
+
         StudyEventDAO sdao = new StudyEventDAO(sm.getDataSource());
         // get current studyid
         int studyId = currentStudy.getId();
@@ -97,6 +98,13 @@ public class InitUpdateEventDefinitionServlet extends SecureController {
             // definition id
             int defId = Integer.valueOf(idString.trim()).intValue();
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) sdao.findByPK(defId);
+
+            if (currentStudy.getId() != sed.getStudyId()) {
+                addPageMessage(respage.getString("no_have_correct_privilege_current_study")
+                        + " " + respage.getString("change_active_study_or_contact"));
+                forwardPage(Page.MENU_SERVLET);
+                return;
+            }
 
             EventDefinitionCRFDAO edao = new EventDefinitionCRFDAO(sm.getDataSource());
             ArrayList eventDefinitionCRFs = (ArrayList) edao.findAllParentsByDefinition(defId);

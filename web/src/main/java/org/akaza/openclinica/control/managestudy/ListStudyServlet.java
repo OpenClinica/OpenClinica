@@ -9,6 +9,7 @@ package org.akaza.openclinica.control.managestudy;
 
 import org.akaza.openclinica.bean.admin.DisplayStudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -40,22 +41,16 @@ public class ListStudyServlet extends SecureController {
     public void mayProceed() throws InsufficientPermissionException {
 
         locale = request.getLocale();
-        // < resword =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.words",locale);
-        // < restext =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.notes",locale);
-        // < respage =
-        // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",locale);
-        // <
-        // resexception=ResourceBundle.getBundle("org.akaza.openclinica.i18n.exceptions",locale);
 
-        if (ub.isSysAdmin()) {
+        if (ub.isSysAdmin() || ub.isTechAdmin()) {
             return;
         }
-
-//        addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
-//        throw new InsufficientPermissionException(Page.ADMIN_SYSTEM_SERVLET, resexception.getString("not_admin"), "1");
-
+//        Role r = currentRole.getRole();
+//        if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR)) {
+//            return;
+//        }
+        addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
+        throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
     }
 
     /**

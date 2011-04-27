@@ -144,7 +144,7 @@ public class ViewRuleAssignmentNewServlet extends SecureController {
             return;
         }
         Role r = currentRole.getRole();
-        if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR) || r.equals(Role.INVESTIGATOR) || r.equals(Role.RESEARCHASSISTANT)) {
+       if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR)) {
             return;
         }
         addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));

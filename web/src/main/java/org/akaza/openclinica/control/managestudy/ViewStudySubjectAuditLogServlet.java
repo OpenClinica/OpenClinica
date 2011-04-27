@@ -11,6 +11,7 @@ package org.akaza.openclinica.control.managestudy;
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.Utils;
+import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
@@ -53,6 +54,19 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
      */
     @Override
     public void mayProceed() throws InsufficientPermissionException {
+
+//        if (SubmitDataServlet.mayViewData(ub, currentRole)) {
+//            return;
+//        }
+//        if (ub.isSysAdmin()) {
+//            return;
+//        }
+//        Role r = currentRole.getRole();
+//        if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR)) {
+//            return;
+//        }
+//        addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
+//        throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
         if (ub.isSysAdmin()) {
             return;
         }
@@ -61,9 +75,9 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
             return;
         }
 
-        addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " " + respage.getString("change_active_study_or_contact"));
+        addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " " + respage.getString("change_study_contact_sysadmin"));
         throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS, resexception.getString("not_study_director"), "1");
-
+        
     }
 
     @Override
@@ -95,10 +109,29 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
             forwardPage(Page.LIST_STUDY_SUBJECTS);
         } else {
             StudySubjectBean studySubject = (StudySubjectBean) subdao.findByPK(studySubId);
+            StudyBean study = (StudyBean) studydao.findByPK(studySubject.getStudyId());
+            //Check if this StudySubject would be accessed from the Current Study
+            if(studySubject.getStudyId() != currentStudy.getId()){
+                if(currentStudy.getParentStudyId() > 0){
+                    addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " " + respage.getString("change_active_study_or_contact"));
+                    forwardPage(Page.MENU_SERVLET);
+                    return;
+                } else {
+                    // The SubjectStudy is not belong to currentstudy and current study is not a site.
+                    Collection sites = studydao.findOlnySiteIdsByStudy(currentStudy);
+                    if (!sites.contains(study.getId())) {
+                        addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " " + respage.getString("change_active_study_or_contact"));
+                        forwardPage(Page.MENU_SERVLET);
+                        return;
+                    }
+                }
+            }
+
+
             request.setAttribute("studySub", studySubject);
             SubjectBean subject = (SubjectBean) sdao.findByPK(studySubject.getSubjectId());
             request.setAttribute("subject", subject);
-            StudyBean study = (StudyBean) studydao.findByPK(studySubject.getStudyId());
+
             request.setAttribute("study", study);
 
             /* Show both study subject and subject audit events together */
