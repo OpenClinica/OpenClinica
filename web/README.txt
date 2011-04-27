@@ -1,11 +1,11 @@
 ﻿--------------------------------------------------------------
 OPENCLINICA RELEASE NOTES
-OpenClinica Version 3.1-beta3
+OpenClinica Version 3.1
 Document Version 1.0
 --------------------------------------------------------------
 
 --------------------------------------------------------------
-Updated: March 28, 2011 Paul Galvin pgalvin@akazaresearch.com
+Updated: April 25, 2011 Paul Galvin pgalvin@akazaresearch.com
 
 --------------------------------------------------------------
 
@@ -13,7 +13,11 @@ Updated: March 28, 2011 Paul Galvin pgalvin@akazaresearch.com
 OVERVIEW
 --------------------------------------------------------------
 
-This is a beta3 release of OpenClinica 3.1.  It should not be used in a production setting.  For more information on the features, please see https://www.openclinica.org/dokuwiki/doku.php?id=developerwiki:oc31beta.  
+This release of OpenClinica addresses issues in OpenClinica 3.0.x and includes many new features and functionality. Please see http://clinicalresearch.wordpress.com/2010/06/09/openclinica-3-1-project-%E2%80%9Camethyst%E2%80%9D-preview/ and http://clinicalresearch.wordpress.com/2010/10/26/new-capabilities-added-to-openclinica-version-3-1/ for some information on the new features. 
+
+A list of all the issues addressed in the 3.1 release can be found at https://issuetracker.openclinica.com/roadmap_page.php?project_id=84
+
+For more detailed information on the features, please see https://wiki.openclinica.com/doku.php?id=ocfeatures:openclinica3.1.  
 
 The web application and the web services piece of OpenClinica are in separate war files. 
 
@@ -55,7 +59,9 @@ Some key features of OpenClinica include:
 --------------------------------------------------------------
 II. ISSUES ADDRESSED AND KNOWN ISSUES
 --------------------------------------------------------------
-This is a beta release.  To view the features and bugs being worked on for 3.1, please go to https://www.openclinica.org/bugtracker/roadmap_page.php?project_id=84 
+All issues addressed can be found at https://issuetracker.openclinica.com/roadmap_page.php?project_id=84
+
+Known issues can be found at https://wiki.openclinica.com/doku.php?id=ocknownissues:start
 
 --------------------------------------------------------------
 III. SOFTWARE DEPENDENCIES AND SYSTEM REQUIREMENTS
@@ -64,14 +70,12 @@ III. SOFTWARE DEPENDENCIES AND SYSTEM REQUIREMENTS
 Pre-requisites (versions):
     Operating system(s): Windows XP, Windows Server 2003, Redhat Enterprise Linux 4.0+
     Browsers: Internet Explorer  7.0, or 8.0 Mozilla Firefox 3.x
-    JDK : 1.6.0_16
-    Application server : Tomcat 6.0.20
+    JDK : 1.6.0
+    Application server : Tomcat 6.0
     Database server : PostgreSQL 8.4 or Oracle 10g
     OpenClinica version for Upgrades only: OpenClinica 3.0.x
 
-The source code has been removed from the distribution package to make it easier to navigate the file structure.  To access the source code, please visit https://svn.akazaresearch.com
-
-NOTE: You must configure the smtp host correctly, or the web page may time out when trying to send emails. 
+The source code has been removed from the distribution package to make it easier to navigate the file structure.  To access the source code, please visit https://svn.akazaresearch.com.
 
 --------------------------------------------------------------
 IV. ABOUT OPENCLINICA
