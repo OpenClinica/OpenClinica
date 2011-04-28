@@ -109,19 +109,29 @@ public class StudySubjectEndpoint {
      */
     @PayloadRoot(localPart = "createRequest", namespace = NAMESPACE_URI_V1)
     public Source createStudySubject(@XPathParam("//studySubject:studySubject") NodeList subject) throws Exception {
-        ResourceBundleProvider.updateLocale(locale);
-        Element subjectElement = (Element) subject.item(0);
-        SubjectTransferBean subjectTransferBean = unMarshallToSubjectTransfer(subjectElement);
+        try {
+            ResourceBundleProvider.updateLocale(locale);
+            Element subjectElement = (Element) subject.item(0);
+            SubjectTransferBean subjectTransferBean = unMarshallToSubjectTransfer(subjectElement);
 
-        DataBinder dataBinder = new DataBinder((subjectTransferBean));
-        Errors errors = dataBinder.getBindingResult();
-        SubjectTransferValidator subjectTransferValidator = new SubjectTransferValidator(dataSource);
-        subjectTransferValidator.validate((subjectTransferBean), errors);
-        if (!errors.hasErrors()) {
-            String label = create(subjectTransferBean);
-            return new DOMSource(mapConfirmation(messages.getMessage("studySubjectEndpoint.success", null, "Success", locale), label, errors));
-        } else {
-            return new DOMSource(mapConfirmation(messages.getMessage("studySubjectEndpoint.fail", null, "Fail", locale), null, errors));
+            DataBinder dataBinder = new DataBinder((subjectTransferBean));
+            Errors errors = dataBinder.getBindingResult();
+            System.out.println("got here before validation");
+            subjectTransferBean.setOwner(getUserAccount());
+            SubjectTransferValidator subjectTransferValidator = new SubjectTransferValidator(dataSource);
+            subjectTransferValidator.validate((subjectTransferBean), errors);
+            if (!errors.hasErrors()) {
+                String label = create(subjectTransferBean);
+                System.out.println("got here after creation");
+                return new DOMSource(mapConfirmation(messages.getMessage("studySubjectEndpoint.success", null, "Success", locale), label, errors));
+            } else {
+                System.out.println("got here by throwing an error");
+                return new DOMSource(mapConfirmation(messages.getMessage("studySubjectEndpoint.fail", null, "Fail", locale), null, errors));
+            }
+        } catch (NullPointerException npe) {
+            npe.printStackTrace();
+            Errors errors = null;
+            return new DOMSource(mapConfirmation(messages.getMessage("studySubjectEndpoint.fail", null, "Null Pointer Exception", locale), null, errors));
         }
     }
 
@@ -339,6 +349,7 @@ public class StudySubjectEndpoint {
         subject.setUniqueIdentifier(subjectTransfer.getPersonId());
         subject.setLabel(subjectTransfer.getStudySubjectId());
         subject.setDateOfBirth(subjectTransfer.getDateOfBirth());
+        System.out.println("testing new code here...");
         // below added tbh 04/2011
         if (subject.getDateOfBirth() != null) {
         	subject.setDobCollected(true);
