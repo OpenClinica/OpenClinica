@@ -205,15 +205,15 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
     TabLabel[<c:out value="${count}"/>]="<c:out value="${section.label}"/>";
     if (TabLabel[<c:out value="${count}"/>].length>8) {
         var shortName = TabLabel[<c:out value="${count}"/>].substring(0,7);
-        TabLabel[<c:out value="${count}"/>]= shortName + '...' + "<span id='secNumItemsCom<c:out value="${count}"/>' style='font-weight: normal;'>(<c:out value="${section.numItemsCompleted}"/>/<c:out value="${section.numItems}" />)</span>";
-    } else {
-        TabLabel[<c:out value="${count}"/>]="<c:out value="${section.label}"/> " + "<span id='secNumItemsCom<c:out value="${count}"/>' style='font-weight: normal;'>(<c:out value="${section.numItemsCompleted}"/>/<c:out value="${section.numItems}" />)</span>";
-    }
+        TabLabel[<c:out value="${count}"/>]= shortName + '...' + "<span style='font-weight: normal;'>(<c:out value="${section.numItemsCompleted}"/>/<c:out value="${section.numItems}" />)</span>";
+     } else {
+       TabLabel[<c:out value="${count}"/>]="<c:out value="${section.label}"/> " + "<span style='font-weight: normal;'>(<c:out value="${section.numItemsCompleted}"/>/<c:out value="${section.numItems}" />)</span>";
+     }
 
     <c:set var="count" value="${count+1}"/>
     </c:forEach>
 
-    DisplaySectionTabs();
+    DisplaySectionTabs()
     selectTabs(${tabId},${sectionNum},'crfHeaderTabs');
 
     function DisplaySectionTabs()
@@ -227,13 +227,13 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
             url = "AdministrativeEditing?eventCRFId=" + <c:out value="${section.eventCRF.id}"/> + "&sectionId=" + sectionId + "&tab=" + TabID + "&exitTo=${exitTo}";
             currTabID = <c:out value="${tabId}"/>;
             if (TabID<=TabsShown)
-            {
-                document.write('<td class="crfHeaderTabs" valign="bottom" id="Tab' + TabID + '">');
-            }
+                {
+                document.write('<td valign="bottom" id="Tab' + TabID + '" style="display: all" >');
+                }
             else
-            {
-                document.write('<td class="crfHeaderTabs" valign="bottom" id="Tab' + TabID + '">');
-            }
+                {
+                document.write('<td valign="bottom" id="Tab' + TabID + '" style="display: none" >');
+                }
             if (TabID != currTabID) {
                 document.write('<div id="Tab' + TabID + 'NotSelected" style="display:all"><div class="tab_BG"><div class="tab_L"><div class="tab_R">');
                 document.write('<a class="tabtext" title="' + TabFullName[(TabID-1)] + '" href=' + url + ' onclick="return checkSectionStatus();">' + TabLabel[(TabID-1)] + '</a></div></div></div></div>');
