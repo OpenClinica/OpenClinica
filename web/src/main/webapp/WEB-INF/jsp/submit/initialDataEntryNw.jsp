@@ -572,12 +572,12 @@ window.onload = initmb;
 <%-- end place where we highlight sections --%>
 <c:set var="uniqueId" value="0"/>
 <c:set var="repeatParentId" value="${displayItem.itemGroup.itemGroupBean.oid}"/>
-
-<c:set var="repeatNumber" value="${displayItem.itemGroup.groupMetaBean.repeatNum}"/>
-<c:if test="${groupHasData}">
+<c:set var="repeatNumber" value="0"/>
+<!-- <c:set var="repeatNumber" value="${displayItem.itemGroup.groupMetaBean.repeatNum}"/>-->
+<!-- <c:if test="${groupHasData}"> -->
     <!-- there are already item data for an item group, repeat number just be 1-->
-    <c:set var="repeatNumber" value="0"/>
-</c:if>
+    <!-- <c:set var="repeatNumber" value="0"/> -->
+<!--</c:if> -->
 <c:set var="repeatMax" value="${displayItem.itemGroup.groupMetaBean.repeatMax}"/>
 <c:set var="totalColsPlusSubcols" value="0" />
 <c:set var="questionNumber" value=""/>
