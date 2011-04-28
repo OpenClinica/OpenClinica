@@ -1710,16 +1710,17 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                 if (newFieldName.equals(itemBean.getOid())) {
                                     //System.out.println("is show item for " + displayItemBean.getItem().getId() + ": " + displayItemBean.getMetadata().isShowItem());
                                     //System.out.println("check run dynamics item check " + runDynamicsItemCheck(displayItemBean).getMetadata().isShowItem());
-                                    if (!displayItemBean.getMetadata().isShowItem() && !runDynamicsItemCheck(displayItemBean, null, request).getMetadata().isShowItem()) {
+                                    if (!displayItemBean.getMetadata().isShowItem()) {
                                         // double check there?
-                                        inSameSection = true;
                                         logger.debug("found item " + this.getInputName(displayItemBean) + " vs. " + fieldName + " and is show item: "
                                             + displayItemBean.getMetadata().isShowItem());
                                         // if is repeating, use the other input name? no
 
-                                        errorsPostDryRun.put(this.getInputName(displayItemBean), rulesPostDryRun.get(fieldName));
-
                                         displayItemBean.getMetadata().setShowItem(true);
+                                        if(prevShownDynItemDataIds==null || !prevShownDynItemDataIds.contains(displayItemBean.getData().getId())) {
+                                            inSameSection = true;
+                                            errorsPostDryRun.put(this.getInputName(displayItemBean), rulesPostDryRun.get(fieldName));
+                                        }
                                     }
                                 }
                                 itemWithGroup.setSingleItem(displayItemBean);
