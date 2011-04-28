@@ -25,6 +25,10 @@
         <param-name>SQLInitServlet</param-name>
         <param-value>org/</param-value>
     </context-param>
+    
+     
+    
+    
     <listener>
         <!--@pgawade 01-DEC-2010 Replaced the listener with the extended class
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>-->
@@ -41,6 +45,17 @@
       <listener>
         <listener-class>org.akaza.openclinica.control.OCServletContextListener</listener-class>
     </listener>
+<listener>
+
+    <listener-class>
+
+        org.springframework.web.context.request.RequestContextListener
+
+    </listener-class>
+
+  </listener>
+
+ 
 
     <filter>
         <filter-name>encodingFilter</filter-name>

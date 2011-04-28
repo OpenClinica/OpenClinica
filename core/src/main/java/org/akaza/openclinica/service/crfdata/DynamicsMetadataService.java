@@ -951,44 +951,50 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         this.dynamicsItemFormMetadataDao = dynamicsItemFormMetadataDao;
     }
 
+    //JN: The following methods were all returning global variables causing an issue in the case of concurrent users. Modified to return new DAO Object. The thread pooling will take care of any heap issues and I do not expect any.
+    
+    
     private EventCRFDAO getEventCRFDAO() {
-        eventCRFDAO = this.eventCRFDAO != null ? eventCRFDAO : new EventCRFDAO(ds);
-        return eventCRFDAO;
+    /*    eventCRFDAO = this.eventCRFDAO != null ? eventCRFDAO : new EventCRFDAO(ds);
+        return eventCRFDAO;*/
+        return  new EventCRFDAO(ds);
     }
 
     private ItemDataDAO getItemDataDAO() {
-        itemDataDAO = this.itemDataDAO != null ? itemDataDAO : new ItemDataDAO(ds);
-        return itemDataDAO;
+    /*    itemDataDAO = this.itemDataDAO != null ? itemDataDAO : new ItemDataDAO(ds);
+        return itemDataDAO;*/
+        return new ItemDataDAO(ds);
     }
 
     private ItemDAO getItemDAO() {
-        itemDAO = this.itemDAO != null ? itemDAO : new ItemDAO(ds);
-        return itemDAO;
+        /*itemDAO = this.itemDAO != null ? itemDAO : new ItemDAO(ds);
+        return itemDAO;*/
+        return new ItemDAO(ds);
     }
 
     private ItemGroupDAO getItemGroupDAO() {
-        itemGroupDAO = this.itemGroupDAO != null ? itemGroupDAO : new ItemGroupDAO(ds);
-        return itemGroupDAO;
+        //itemGroupDAO = this.itemGroupDAO != null ? itemGroupDAO : new ItemGroupDAO(ds);
+        return new ItemGroupDAO(ds);
     }
 
     private SectionDAO getSectionDAO() {
-        sectionDAO = this.sectionDAO != null ? sectionDAO : new SectionDAO(ds);
-        return sectionDAO;
+     //   sectionDAO = this.sectionDAO != null ? sectionDAO : new SectionDAO(ds);
+        return new SectionDAO(ds);
     }
 
     private ItemFormMetadataDAO getItemFormMetadataDAO() {
-        itemFormMetadataDAO = this.itemFormMetadataDAO != null ? itemFormMetadataDAO : new ItemFormMetadataDAO(ds);
-        return itemFormMetadataDAO;
+     //   itemFormMetadataDAO = this.itemFormMetadataDAO != null ? itemFormMetadataDAO : new ItemFormMetadataDAO(ds);
+        return new ItemFormMetadataDAO(ds);
     }
 
     private ItemGroupMetadataDAO getItemGroupMetadataDAO() {
-        itemGroupMetadataDAO = this.itemGroupMetadataDAO != null ? itemGroupMetadataDAO : new ItemGroupMetadataDAO(ds);
-        return itemGroupMetadataDAO;
+        //itemGroupMetadataDAO = this.itemGroupMetadataDAO != null ? itemGroupMetadataDAO : new ItemGroupMetadataDAO(ds);
+        return new ItemGroupMetadataDAO(ds);
     }
 
     public StudyEventDAO getStudyEventDAO() {
-        studyEventDAO = this.studyEventDAO != null ? studyEventDAO : new StudyEventDAO(ds);
-        return studyEventDAO;
+        //studyEventDAO = this.studyEventDAO != null ? studyEventDAO : new StudyEventDAO(ds);
+        return new StudyEventDAO(ds);
     }
 
     public EventDefinitionCRFDAO getEventDefinitionCRfDAO() {

@@ -530,6 +530,11 @@ public abstract class EntityDAO implements DAOInterface {
         return latestPK;
     }
 
+    
+    private void logMe(String message){
+      //  System.out.println(message);
+        logger.debug(message);
+    }
     public ArrayList processResultRows(ResultSet rs) {// throws SQLException
         ArrayList al = new ArrayList();
         HashMap hm;
@@ -543,7 +548,7 @@ public abstract class EntityDAO implements DAOInterface {
                 for (int i = 1; i <= rsmd.getColumnCount(); i++) {
                     String column = rsmd.getColumnName(i).toLowerCase();
                     Integer type = (Integer) setTypes.get(new Integer(i));
-                    // logger.warn("column name: "+column+" type # "+type.intValue()+" row # "+i);
+                     logMe("column name: "+column+" type # "+type.intValue()+" row # "+i);
                     switch (type.intValue()) {
                     // just putting the top five in here for now, tbh
                     // put in statements to catch nulls in the db, tbh

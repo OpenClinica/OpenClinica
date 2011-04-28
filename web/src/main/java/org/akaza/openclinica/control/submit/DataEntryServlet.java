@@ -270,7 +270,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
     private void logMe(String message)
     {
-       //System.out.println(message);
+      // System.out.println(message);
         logger.trace(message);
     }
     
@@ -516,8 +516,11 @@ public abstract class DataEntryServlet extends CoreSecureController {
         } else if (getServletPage(request).equals(Page.ADMIN_EDIT_SERVLET)) {
             phase2 = Phase.ADMIN_EDITING;
         }
+        logMe("Entering ruleSets::: CreateAndInitializeRuleSet:::"+Thread.currentThread());
+        logMe("Entering ruleSets::: CreateAndInitializeRuleSet:::"+Thread.currentThread()+"currentStudy?"+currentStudy+"studyEventDefinition"+studyEventDefinition+"crfVersionBean"+crfVersionBean+"studyEventBean"+studyEventBean+"ecb"+ecb);
         List<RuleSetBean> ruleSets = createAndInitializeRuleSet(currentStudy, studyEventDefinition, crfVersionBean, studyEventBean, ecb, true, request, response);
         boolean shouldRunRules = getRuleSetService(request).shouldRunRulesForRuleSets(ruleSets, phase2);
+        logMe("Entering getDisplayBean:::::Thread::::"+Thread.currentThread());
         DisplaySectionBean section = getDisplayBean(hasGroup, false, request, isSubmitted);
         //hasSCDItem has been initiallized in getDisplayBean() which is online above
         if(section.getSection().hasSCDItem()) {
@@ -3341,7 +3344,10 @@ public abstract class DataEntryServlet extends CoreSecureController {
         // Use itemGroups to determine if there are any ungrouped items
 
         // get all the parent display item beans not in group
+       logMe("Entering getParentDisplayItems::: Thread is? "+Thread.currentThread());
         ArrayList displayItems = getParentDisplayItems(hasGroup, sb, edcb, idao, ifmdao, iddao, hasUngroupedItems, request);
+        logMe("Entering getParentDisplayItems::: Done and Thread is? "+Thread.currentThread());
+        
         logger.debug("just ran get parent display, has group " + hasGroup + " has ungrouped " + hasUngroupedItems);
         // now sort them by ordinal
         Collections.sort(displayItems);
@@ -3520,12 +3526,13 @@ public abstract class DataEntryServlet extends CoreSecureController {
             if (dib != null) {
                 // boolean showItem = false;
                 boolean needsHighlighting = !ifmb.isShowItem();
-                boolean showItem = getItemMetadataService().isShown(ifmb.getItemId(), ecb, dib.getData());
+                logMe("Entering thread before getting ItemMetadataService:::"+Thread.currentThread());
+                boolean showItem = getItemMetadataServicePerRequest().isShown(ifmb.getItemId(), ecb, dib.getData());
                 if (getServletPage(request).equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
-                    showItem = getItemMetadataService().hasPassedDDE(ifmb, ecb, dib.getData());
+                    showItem = getItemMetadataServicePerRequest().hasPassedDDE(ifmb, ecb, dib.getData());
                 }
                 // is the above needed for children items too?
-                boolean passedDDE = getItemMetadataService().hasPassedDDE(ifmb, ecb, dib.getData());
+                boolean passedDDE = getItemMetadataServicePerRequest().hasPassedDDE(ifmb, ecb, dib.getData());
                 if (showItem) { // we are only showing, not hiding
                     logger.debug("set show item " + ifmb.getItemId() + " idb " + dib.getData().getId() + " show item " + showItem + " passed dde " + passedDDE);
                     // ifmb.setShowItem(showItem);
@@ -3638,6 +3645,16 @@ public abstract class DataEntryServlet extends CoreSecureController {
         return itemMetadataService;
     }
 
+    //usign the scope per request just to make sure the multi threaded requests are not getting messed up, since this error is thrown consistently.
+    public DynamicsMetadataService getItemMetadataServicePerRequest() {
+        DynamicsMetadataService itemMetadataService =null;
+        logMe("Inside the getItemMetadataServicePerRequest::::"+Thread.currentThread());
+        itemMetadataService =
+            itemMetadataService != null ? itemMetadataService : (DynamicsMetadataService) SpringServletAccess.getApplicationContext(getServletContext()).getBean(
+                    "dynamicsMetadataServicePerRequest");
+        logMe("Obtained the getItemMetadataServicePerRequest object::::"+Thread.currentThread()+"ItemMetadataService is???"+itemMetadataService);
+        return itemMetadataService;
+    }
     /**
      * @return The Page object which represents this servlet's JSP.
      */
@@ -5141,8 +5158,11 @@ public abstract class DataEntryServlet extends CoreSecureController {
             EventCRFBean eventCrfBean,
             Boolean shouldRunRules, HttpServletRequest request, HttpServletResponse response) {
         if (shouldRunRules) {
+            logMe("Current Thread:::"+Thread.currentThread());
             List<RuleSetBean> ruleSets = getRuleSetService(request).getRuleSetsByCrfStudyAndStudyEventDefinition(currentStudy, studyEventDefinition, crfVersionBean);
+            logMe("Current Thread:::"+Thread.currentThread()+"RuleSet Now?"+ruleSets);
             if(ruleSets!=null&&ruleSets.size()>0) {
+                
                 ruleSets = getRuleSetService(request).filterByStatusEqualsAvailable(ruleSets);
                 ruleSets = getRuleSetService(request).filterRuleSetsByStudyEventOrdinal(ruleSets, studyEventBean, crfVersionBean, studyEventDefinition);
                 // place next line here, tbh
@@ -5186,12 +5206,26 @@ public abstract class DataEntryServlet extends CoreSecureController {
     protected abstract boolean isAdminForcedReasonForChange(HttpServletRequest request);
 
     private RuleSetServiceInterface getRuleSetService(HttpServletRequest request) {
-        //TODO:where is the ruleservice initialized? does not have any references. Check it 
+       
         RuleSetServiceInterface ruleSetService = null;
         
         ruleSetService =
             ruleSetService != null ? ruleSetService : (RuleSetServiceInterface) SpringServletAccess.getApplicationContext(getServletContext()).getBean(
                     "ruleSetService");
+        ruleSetService.setContextPath(getContextPath(request));
+        ruleSetService.setMailSender((JavaMailSenderImpl) SpringServletAccess.getApplicationContext(getServletContext()).getBean("mailSender"));
+        ruleSetService.setRequestURLMinusServletPath(getRequestURLMinusServletPath(request));
+        return ruleSetService;
+    }
+
+    
+    private RuleSetServiceInterface getRuleSetServicePerRequest(HttpServletRequest request) {
+        //TODO:where is the ruleservice initialized? does not have any references. Check it 
+        RuleSetServiceInterface ruleSetService = null;
+        
+        ruleSetService =
+            ruleSetService != null ? ruleSetService : (RuleSetServiceInterface) SpringServletAccess.getApplicationContext(getServletContext()).getBean(
+                    "ruleSetServicePerRequest");
         ruleSetService.setContextPath(getContextPath(request));
         ruleSetService.setMailSender((JavaMailSenderImpl) SpringServletAccess.getApplicationContext(getServletContext()).getBean("mailSender"));
         ruleSetService.setRequestURLMinusServletPath(getRequestURLMinusServletPath(request));

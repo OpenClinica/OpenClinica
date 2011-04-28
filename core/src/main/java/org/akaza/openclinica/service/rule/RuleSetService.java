@@ -529,6 +529,7 @@ public class RuleSetService implements RuleSetServiceInterface {
     public List<RuleSetBean> filterRuleSetsByHiddenItems(List<RuleSetBean> ruleSets, EventCRFBean eventCrf, CRFVersionBean crfVersion) {
         ArrayList<RuleSetBean> shownRuleSets = new ArrayList<RuleSetBean>();
         for (RuleSetBean ruleSetBean : ruleSets) {
+            logMe("Entering the filterRuleSetsBy HiddenItems? Thread::"+Thread.currentThread()+"eventCrf?"+eventCrf+"crfVersion??"+crfVersion+"ruleSets?"+ruleSets);
             ItemBean target = ruleSetBean.getItem();
             ItemFormMetadataBean metadataBean = this.getItemFormMetadataDao().findByItemIdAndCRFVersionId(target.getId(), crfVersion.getId());
             ItemDataBean itemData = this.getItemDataDao().findByItemIdAndEventCRFId(target.getId(), eventCrf.getId());
@@ -548,6 +549,11 @@ public class RuleSetService implements RuleSetServiceInterface {
         return shownRuleSets;
     }
 
+    private void logMe(String message){
+    //    System.out.println(message);
+        logger.debug(message);
+        
+    }
     /*
      * (non-Javadoc)
      * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#filterRuleSetsByStudyEventOrdinal(java.util.List)
@@ -843,48 +849,52 @@ public class RuleSetService implements RuleSetServiceInterface {
     }
 
     private CRFDAO getCrfDao() {
-        crfDao = this.crfDao != null ? crfDao : new CRFDAO(dataSource);
-        return crfDao;
+        //crfDao = this.crfDao != null ? crfDao : new CRFDAO(dataSource);
+        return new CRFDAO(dataSource);
     }
 
     private StudyEventDAO getStudyEventDao() {
-        studyEventDao = this.studyEventDao != null ? studyEventDao : new StudyEventDAO(dataSource);
-        return studyEventDao;
+      //  studyEventDao = this.studyEventDao != null ? studyEventDao : new StudyEventDAO(dataSource);
+        return new StudyEventDAO(dataSource);
     }
 
     private ItemDAO getItemDao() {
-        itemDao = this.itemDao != null ? itemDao : new ItemDAO(dataSource);
-        return itemDao;
+       // itemDao = this.itemDao != null ? itemDao : new ItemDAO(dataSource);
+        return new ItemDAO(dataSource);
     }
 
     private ItemFormMetadataDAO getItemFormMetadataDao() {
-        itemFormMetadataDao = this.itemFormMetadataDao != null ? itemFormMetadataDao : new ItemFormMetadataDAO(dataSource);
-        return itemFormMetadataDao;
+        
+       // itemFormMetadataDao = this.itemFormMetadataDao != null ? itemFormMetadataDao : new ItemFormMetadataDAO(dataSource);
+      //  return itemFormMetadataDao;
+        return new ItemFormMetadataDAO(dataSource);
     }
 
     private ExpressionService getExpressionService() {
         expressionService = this.expressionService != null ? expressionService : new ExpressionService(dataSource);
         return expressionService;
     }
+    //JN:No reason to use global variables, they could cause potential concurrency issues.  
 
     public StudyEventDefinitionDAO getStudyEventDefinitionDao() {
-        studyEventDefinitionDao = this.studyEventDefinitionDao != null ? studyEventDefinitionDao : new StudyEventDefinitionDAO(dataSource);
-        return studyEventDefinitionDao;
+    //    studyEventDefinitionDao = this.studyEventDefinitionDao != null ? studyEventDefinitionDao : new StudyEventDefinitionDAO(dataSource);
+        return  new StudyEventDefinitionDAO(dataSource);
     }
+   
 
     public StudyDAO getStudyDao() {
-        studyDao = this.studyDao != null ? studyDao : new StudyDAO(dataSource);
-        return studyDao;
+       // studyDao = this.studyDao != null ? studyDao : new StudyDAO(dataSource);
+        return new StudyDAO(dataSource);
     }
 
     private ItemDataDAO getItemDataDao() {
-        itemDataDao = this.itemDataDao != null ? itemDataDao : new ItemDataDAO(dataSource);
-        return itemDataDao;
+      //  itemDataDao = this.itemDataDao != null ? itemDataDao : new ItemDataDAO(dataSource);
+        return  new ItemDataDAO(dataSource);
     }
 
     private CRFVersionDAO getCrfVersionDao() {
-        crfVersionDao = this.crfVersionDao != null ? crfVersionDao : new CRFVersionDAO(dataSource);
-        return crfVersionDao;
+       // crfVersionDao = this.crfVersionDao != null ? crfVersionDao : new CRFVersionDAO(dataSource);
+        return new CRFVersionDAO(dataSource);
     }
 
     public DynamicsItemFormMetadataDao getDynamicsItemFormMetadataDao() {

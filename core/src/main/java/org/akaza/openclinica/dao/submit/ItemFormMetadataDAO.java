@@ -16,6 +16,7 @@ import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.exception.OpenClinicaException;
 
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -704,6 +705,10 @@ public class ItemFormMetadataDAO extends EntityDAO {
         // Auto-generated method stub
         return null;
     }
+    private void logMe(String message){
+        logger.debug(message);
+      //  System.out.println(message);
+    }
 
     public ItemFormMetadataBean findByItemIdAndCRFVersionId(int itemId, int crfVersionId) {
         this.setTypesExpected();
@@ -714,13 +719,19 @@ public class ItemFormMetadataDAO extends EntityDAO {
         this.setTypeExpected(30, TypeNames.INT);// repeat_max
         this.setTypeExpected(31, TypeNames.STRING);// section_name
 
+        logMe("Current Thread:::"+Thread.currentThread()+"types Expected?");
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(itemId));
         variables.put(new Integer(2), new Integer(crfVersionId));
 
         String sql = digester.getQuery("findByItemIdAndCRFVersionId");
+        
+        logMe("Thread?"+Thread.currentThread()+"SQL?"+sql+"variables?"+variables);
+        
         ArrayList alist = this.select(sql, variables);
 
+        
+        
         Iterator it = alist.iterator();
 
         ItemFormMetadataBean ifmb = new ItemFormMetadataBean();

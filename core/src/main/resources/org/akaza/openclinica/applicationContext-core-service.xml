@@ -31,7 +31,16 @@
     <bean id="eventService" class="org.akaza.openclinica.service.EventService">
         <constructor-arg ref="dataSource"/>
     </bean>
+    <bean id="dynamicsMetadataServicePerRequest" class="org.akaza.openclinica.service.crfdata.DynamicsMetadataService" autowire="byName" scope="request" lazy-init="true">
+
+        <constructor-arg ref="dataSource"/>
+
+    </bean>  
     
+    
+    <bean id="ruleSetServicePerRequest" class="org.akaza.openclinica.service.rule.RuleSetService" autowire="byName" scope="request" lazy-init="true">
+        <constructor-arg ref="dataSource"/>
+    </bean>
     <bean id="insertActionValidator" class="org.akaza.openclinica.validator.rule.action.InsertActionValidator">
         <constructor-arg ref="dataSource"/>
     </bean>
