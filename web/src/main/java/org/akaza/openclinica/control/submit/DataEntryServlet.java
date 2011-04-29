@@ -4050,7 +4050,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         seb.setUpdater(ub);
 
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(getDataSource());
-        ArrayList allCRFs = ecdao.findAllByStudyEvent(seb);
+        ArrayList allCRFs = ecdao.findAllByStudyEventAndStatus(seb,Status.UNAVAILABLE);
         StudyBean study = (StudyBean) session.getAttribute("study");
         ArrayList allEDCs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study, seb.getStudyEventDefinitionId());
         CRFVersionDAO crfversionDao=  new CRFVersionDAO(getDataSource());
@@ -4063,7 +4063,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         ArrayList requiredCrfIds = new ArrayList();
         
         // go through the list and find out if all are required, tbh
-        for (int ii = 0; ii < allEDCs.size(); ii++) {
+/*        for (int ii = 0; ii < allEDCs.size(); ii++) {
             EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) allEDCs.get(ii);
             if (!edcBean.isRequiredCRF()) {
                 logger.trace("found one non required CRF: " + edcBean.getCrfName() + " " + edcBean.getCrfId() + " " + edcBean.getDefaultVersionName());
@@ -4078,14 +4078,14 @@ public abstract class DataEntryServlet extends CoreSecureController {
             }
             
         }
-        
+     */   
         //JN: Add another loop to get list of all required crfs
         
         
-        logger.trace("non required crf ids: " + nonRequiredCrfIds.toString());
+       // logger.trace("non required crf ids: " + nonRequiredCrfIds.toString());
         // go through all the crfs and check their status
         // add an additional check to see if it is required or not, tbh
-        for (int i = 0; i < allCRFs.size(); i++) {
+    /*    for (int i = 0; i < allCRFs.size(); i++) {
             EventCRFBean ec = (EventCRFBean) allCRFs.get(i);
             logger.trace("-- looking at a CRF: " + ec.getName() + " " + ec.getCrf().getName() + " " + ec.getCrf().getId());
             // if clause kind of not right since none of the above fields are
@@ -4111,7 +4111,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
            int crfId = crfVersionBean.getCrfId();
            
             
-            if (ec.getStatus().equals(Status.UNAVAILABLE)&& requiredCrfIds.contains(new Integer(crfId)) ) { // &&
+            if (ec.getStatus().equals(Status.UNAVAILABLE) // && requiredCrfIds.contains(new Integer(crfId))
+                    ) { // &&
                 allCrfsCompleted = true;
                 logger.trace("just rejected eventCompleted looking at a CRF: " + ec.getName());
                 reqCRFCNTR++;
@@ -4119,29 +4120,30 @@ public abstract class DataEntryServlet extends CoreSecureController {
             }
             
         }
-        if (requiredCrfIds.size()==0) allCrfsCompleted = true;// Incase none of the crfs are required.
-        else if(reqCRFCNTR!=requiredCrfIds.size()) allCrfsCompleted = false;
+      //  if (requiredCrfIds.size()==0) allCrfsCompleted = true;// Incase none of the crfs are required.
+       // else if(reqCRFCNTR!=requiredCrfIds.size()) allCrfsCompleted = false;
         
         if (!allRequired) {
             logger.trace("SEB contains some nonrequired CRFs: " + allEDCsize + " vs " + allEDCs.size());
-        }
+        }*/
 
-        if (eventCompleted && allCRFs.size() >= allEDCsize) {// was
+        if ( allCRFs.size() == allEDCs.size()) {// was
             // allEDCs.size(),
             // tbh
-            //JN: all crfs are completed and not all are required then set the subject event status as complete
-            if (allCrfsCompleted && !allRequired && allEDCsize != 0)
-            {
+            //JN: all crfs are completed and then set the subject event status as complete
+           
+          
                 seb.setSubjectEventStatus(SubjectEventStatus.COMPLETED);
-            }
-            else if (!allRequired && allEDCsize != 0) {// what if there are no// TODO:
+          
+            /*else if (!allRequired && allEDCsize != 0) {// what if there are no// TODO:
                 // required CRFs, and all
                 // CRFs have been finished?
                 addPageMessage(respage.getString("CRF_completed"), request);
-            } else if (!edcb.isDoubleEntry()){ //TODO: perhaps this logic can go... JN check later
+            }*/ 
+             /*if (!edcb.isDoubleEntry()){ //TODO: perhaps this logic can go... JN check later
                 logger.trace("just set subj event status to -- COMPLETED --");
                 seb.setSubjectEventStatus(SubjectEventStatus.COMPLETED);
-            }
+            }*/
         }
 
         seb = (StudyEventBean) sedao.update(seb);
