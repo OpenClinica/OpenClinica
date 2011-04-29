@@ -267,7 +267,15 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
                         dnb.setEventName(se.getName());
                     }
                     dnb.setCrfName(cb.getName());
-                    dnb.setCrfStatus(resword.getString(ecb.getStage().getNameRaw()));
+
+                    String crfStatus = resword.getString(ecb.getStage().getNameRaw());
+                    if (crfStatus.equals("Invalid")) {
+                        crfStatus = "";
+                    } else if (crfStatus.equals("Data Entry Complete")) {
+                        crfStatus = "Complete";
+                    }
+                    dnb.setCrfStatus(crfStatus);
+
 
                     String column = dnb.getColumn().trim();
                     if (!StringUtil.isBlank(column)) {
@@ -337,7 +345,14 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
                     dnb.setEventStart(se.getDateStarted());
                     dnb.setEventName(se.getName());
                     dnb.setCrfName(cb.getName());
-                    dnb.setCrfStatus(resword.getString(ec.getStage().getNameRaw()));
+                    String crfStatus = resword.getString(ec.getStage().getNameRaw());
+                    if (crfStatus.equals("Invalid")) {
+                        crfStatus = "";
+                    } else if (crfStatus.equals("Data Entry Complete")) {
+                        crfStatus = "Complete";
+                    }
+                    dnb.setCrfStatus(crfStatus);
+
                 }
             }
 
