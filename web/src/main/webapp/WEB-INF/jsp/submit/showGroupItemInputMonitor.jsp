@@ -10,6 +10,93 @@
 <jsp:useBean scope="request" id="responseOptionBean" class="org.akaza.openclinica.bean.submit.ResponseOptionBean" />
 <jsp:useBean scope='request' id='formMessages' class='java.util.HashMap'/>
 
+<script language="javascript">
+    function genToolTips(itemId){
+        var resStatus = new Array();
+        var detailedNotes= new Array();
+        var discrepancyType = new Array();
+        var updatedDates = new Array();
+        var i=0;
+        var discNotes = new Array();
+        var title = '<fmt:message key="tooltip_title1" bundle="${resword}"/>';
+        var parentDnIds = new Array();
+        var totNotes = 0;
+        var footNote = '<fmt:message key="footNote" bundle="${resword}"/>';
+        var auditLog = '';
+        <c:set var="discrepancyNotes" value="1"/>
+            <c:forEach var="itemsSection" items="${section.items}">
+
+                       if("${itemsSection.item.id}"== itemId)
+                       {
+                    <c:set var="notesSize" value="${itemsSection.totNew}"/>
+                       title = "<c:out value="${itemsSection.item.name}"/>";
+                           <c:set  var="discrepancyNotes" value="${itemsSection.discrepancyNotes}"/>
+                        <c:forEach var="discrepancyNotes" items="${discrepancyNotes}">
+                         resStatus[i] =<c:out value="${discrepancyNotes.resolutionStatusId}"/>;
+                              detailedNotes[i] ="<c:out value="${discrepancyNotes.description}"/>";
+                              discrepancyType[i] = "<c:out value="${discrepancyNotes.disType.name}"/>";
+                              updatedDates[i] = "<c:out value="${discrepancyNotes.createdDate}"/>";
+                            parentDnIds[i] = "<c:out value="${discrepancyNotes.parentDnId}"/>";
+                           i++;
+
+                            </c:forEach>
+                        totNotes = 	 ${notesSize};
+
+
+                           if(totNotes >0) footNote = totNotes + " " + '<fmt:message key="foot_threads" bundle="${resword}"/>' + " " + '<fmt:message key="footNote_threads" bundle="${resword}"/>';
+                           <%--if(totNotes >0) footNote = '<fmt:message key="footNote_threads" bundle="${resword}"/>'+ totNotes+ '<fmt:message key="foot_threads" bundle="${resword}"/>' ;--%>
+                           if("${itemsSection.data.auditLog}" == "true"){
+                               auditLog = '<fmt:message key="audit_exist" bundle="${resword}" />';
+                           }
+                       }
+            </c:forEach>
+        //including tool tips for grouped items
+            <c:forEach var="group" items="${section.displayFormGroups}">
+                <c:forEach var="itemsSection" items="${group.items}">
+
+                       if("${itemsSection.item.id}"== itemId)
+                       {
+
+                    <c:set var="notesSize" value="${itemsSection.totNew}"/>
+                       title = "<c:out value="${itemsSection.item.name}"/>";
+                           <c:set  var="discrepancyNotes" value="${itemsSection.discrepancyNotes}"/>
+                        <c:forEach var="discrepancyNotes" items="${discrepancyNotes}">
+                         resStatus[i] =<c:out value="${discrepancyNotes.resolutionStatusId}"/>;
+                              detailedNotes[i] ="<c:out value="${discrepancyNotes.description}"/>";
+                              discrepancyType[i] = "<c:out value="${discrepancyNotes.disType.name}"/>";
+                              updatedDates[i] = "<c:out value="${discrepancyNotes.createdDate}"/>";
+                            parentDnIds[i] = "<c:out value="${discrepancyNotes.parentDnId}"/>";
+                           i++;
+
+                            </c:forEach>
+                        totNotes = 	 ${notesSize};
+                              if(totNotes >0) footNote = totNotes + " " + '<fmt:message key="foot_threads" bundle="${resword}"/>' + " " + '<fmt:message key="footNote_threads" bundle="${resword}"/>';
+                           if("${itemsSection.data.auditLog}" == "true"){
+                               auditLog = '<fmt:message key="audit_exist" bundle="${resword}" />';
+                           }
+                       }
+
+                </c:forEach>
+            </c:forEach>
+
+
+              var htmlgen =
+                  '<div class=\"tooltip\">'+
+                  '<table  width="95%">'+
+                  ' <tr><td  align=\"center\" class=\"header1\">' +title+
+                  ' </td></tr><tr></tr></table><table  style="border-collapse:collapse" cellspacing="0" cellpadding="0" width="95%" >'+
+                  drawRows(i,resStatus,detailedNotes,discrepancyType,updatedDates,parentDnIds)+
+                  '</table><table width="95%"  class="tableborder" align="left">'+
+                  '</table><table><tr></tr></table>'+
+                  '<table width="95%"><tbody><td height="30" colspan="3"><span class=\"note\">'+footNote +'</span>'+
+                  '</td></tr>' +
+                  '<tr><td align=\"center\">'+ auditLog +'</td></tr>' +
+                  '</tbody></table></table></div>';
+              return htmlgen;
+        }
+
+</script>
+
 <c:set var="inputType" value="${displayItem.metadata.responseSet.responseType.name}" />
 <c:set var="itemId" value="${displayItem.item.id}" />
 <c:set var="numOfDate" value="${param.key}" />
@@ -379,7 +466,7 @@
   <c:choose>
     <c:when test="${displayItem.numDiscrepancyNotes > 0}">
 
-    <a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"   onmouseover="callTip(genToolTip(${totNew},${totUpdated},${totRes},${totClosed},${totNA}) );"
+    <a tabindex="<c:out value="${tabNum + 1000}"/>" href="#" onmouseover="callTip(genToolTips(${itemId}));"
            onmouseout="UnTip()" onClick=
     "openDNoteWindow('ViewDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=<c:out value="${parsedInputName}"/>&column=value&monitor=1&writeToDB=1&errorFlag=<c:out value="${errorFlag}"/>&isLocked=<c:out value="${isLocked}"/>','spanAlert-<c:out value="${parsedInputName}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
     ><img id="flag_<c:out value="${inputName}"/>" name="flag_input<c:out value="${inputName}" />" src=
@@ -394,7 +481,7 @@
      <c:if test="${isLocked eq notLocked}">
       <c:set var="imageFileName" value="icon_noNote" />
 
-       <a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"  onmouseover="callTip(genToolTip(${totNew},${totUpdated},${totRes},${totClosed},${totNA}) );"
+       <a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"  onmouseover="callTip(genToolTips(${itemId}));"
            onmouseout="UnTip()" onClick=
     "openDNWindow('CreateDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&groupLabel=<c:out value="${displayItem.metadata.groupLabel}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=<c:out value="${parsedInputName}"/>&column=value&monitor=1&writeToDB=1&errorFlag=<c:out value="${errorFlag}"/>&isLocked=<c:out value="${isLocked}"/>','spanAlert-<c:out value="${parsedInputName}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
     ><img id="flag_<c:out value="${inputName}"/>" name="flag_<c:out value="${inputName}"/>" src=
