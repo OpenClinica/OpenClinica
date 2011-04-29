@@ -298,6 +298,14 @@ public class EventCRFDAO extends AuditableEntityDAO {
         return executeFindAllQuery("findAllByStudyEvent", variables);
     }
 
+    
+    public ArrayList findAllByStudyEventAndStatus(StudyEventBean studyEvent,Status status) {
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(studyEvent.getId()));
+        variables.put(new Integer(2),new Integer(status.getId()));
+        return executeFindAllQuery("findAllByStudyEventAndStatus", variables);
+    }
+    
     public ArrayList<EventCRFBean> findAllByStudySubject(int studySubjectId) {
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(studySubjectId));
