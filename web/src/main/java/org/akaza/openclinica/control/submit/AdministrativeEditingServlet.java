@@ -7,15 +7,6 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -34,6 +25,15 @@ import org.akaza.openclinica.control.managestudy.ViewNotesServlet;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  * @author jxu
@@ -321,6 +321,10 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
             // need to get data from form again
             dib = loadFormValue(dib, request);
         }
+        if (groupOrdinalPLusItemOid.containsKey(dib.getItem().getOid()) || fireRuleValidation) {
+            messages = messages == null ? groupOrdinalPLusItemOid.get(dib.getItem().getOid()) : messages;
+            dib = validateDisplayItemBeanSingleCV(rv, dib, inputName, messages);
+        }
         return dib;
     }
 
@@ -329,6 +333,37 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
             List<DisplayItemGroupBean> formGroups, RuleValidator rv, HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid, HttpServletRequest request, HttpServletResponse response) {
         EventDefinitionCRFBean edcb = (EventDefinitionCRFBean)request.getAttribute(EVENT_DEF_CRF_BEAN);
         formGroups = loadFormValueForItemGroup(digb, digbs, formGroups, edcb.getId(), request);
+        String inputName = "";
+        for (int i = 0; i < formGroups.size(); i++) {
+            DisplayItemGroupBean displayGroup = formGroups.get(i);
+
+            List<DisplayItemBean> items = displayGroup.getItems();
+            int order = displayGroup.getOrdinal();
+            if (displayGroup.isAuto() && displayGroup.getFormInputOrdinal() > 0) {
+                order = displayGroup.getFormInputOrdinal();
+            }
+            for (DisplayItemBean displayItem : items) {
+                // int manualcount = 0;
+                // tbh trying to set this correctly 01/2010
+                if (displayGroup.isAuto()) {
+                    inputName = getGroupItemInputName(displayGroup, order, displayItem);
+                } else {
+                    inputName = getGroupItemManualInputName(displayGroup, order, displayItem);
+                    // manualcount++;
+                }
+                logger.debug("THe oid is " + displayItem.getItem().getOid() + " order : " + order + " inputName : " + inputName);
+
+                if (groupOrdinalPLusItemOid.containsKey(displayItem.getItem().getOid())
+                    || groupOrdinalPLusItemOid.containsKey(String.valueOf(displayGroup.getIndex() + 1) + displayItem.getItem().getOid())) {
+                    logger.debug("IN : " + String.valueOf(displayGroup.getIndex() + 1) + displayItem.getItem().getOid());
+                    validateDisplayItemBean(v, displayItem, inputName, rv, groupOrdinalPLusItemOid, true, groupOrdinalPLusItemOid.get(String
+                            .valueOf(displayGroup.getIndex() + 1)
+                        + displayItem.getItem().getOid()), request);
+                } else {
+                    validateDisplayItemBean(v, displayItem, inputName, rv, groupOrdinalPLusItemOid, false, null, request);
+                }
+            }
+        }
         return formGroups;
     }
 
