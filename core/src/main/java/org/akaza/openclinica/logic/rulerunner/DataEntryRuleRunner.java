@@ -103,8 +103,16 @@ public class DataEntryRuleRunner extends RuleRunner {
                                 }
                                 if(request.getAttribute(firstDDE)==Boolean.TRUE) {
                                 } else {
+                                    String itemDataValueFromForm = "";
+                                    if(variableAndValue.containsKey(key)) {
+                                        itemDataValueFromForm = variableAndValue.get(key);
+                                    } else {
+                                        logger.info("Cannot find value from variableAndValue for item="+key+". " +
+                                        		"Used itemData.getValue()");
+                                        itemDataValueFromForm = itemData.getValue();
+                                    }
                                     RuleActionRunLogBean ruleActionRunLog =
-                                        new RuleActionRunLogBean(ruleActionBean.getActionType(), itemData, itemData.getValue(), ruleSetRule.getRuleBean().getOid());
+                                        new RuleActionRunLogBean(ruleActionBean.getActionType(), itemData, itemDataValueFromForm, ruleSetRule.getRuleBean().getOid());
                                     if (getRuleActionRunLogDao().findCountByRuleActionRunLogBean(ruleActionRunLog) > 0) {
                                         itr.remove();
                                     }
