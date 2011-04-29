@@ -594,7 +594,7 @@ public class ImportCRFDataService {
                     try {
                         Date originalDate = sdf_sqldate.parse(dateValue);
                         String replacementValue = new SimpleDateFormat("MM/dd/yyyy").format(originalDate);
-                        displayItemBean.getData().setValue(replacementValue);
+                        displayItemBean.getData().setValue(dateValue);
                     } catch (ParseException pe1) {
 
                         // next version; fail if it does not pass iso 8601
