@@ -183,8 +183,4 @@ public class SubjectEventStatus extends Term implements Comparable {
         ArrayList<String> myList = (ArrayList) getSubjectEventStatusValues();
         System.out.println("myList = " + myList);
     }
-
-    public String getName(boolean rawString) {
-        return super.name;
-    }
 }

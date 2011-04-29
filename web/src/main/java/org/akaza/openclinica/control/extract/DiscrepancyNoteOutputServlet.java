@@ -267,7 +267,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
                         dnb.setEventName(se.getName());
                     }
                     dnb.setCrfName(cb.getName());
-                    dnb.setCrfStatus(resword.getString(se.getSubjectEventStatus().getName(true)));
+                    dnb.setCrfStatus(resword.getString(ecb.getStage().getNameRaw()));
 
                     String column = dnb.getColumn().trim();
                     if (!StringUtil.isBlank(column)) {
@@ -337,7 +337,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
                     dnb.setEventStart(se.getDateStarted());
                     dnb.setEventName(se.getName());
                     dnb.setCrfName(cb.getName());
-                    dnb.setCrfStatus(resword.getString(se.getSubjectEventStatus().getName(true)));
+                    dnb.setCrfStatus(resword.getString(ec.getStage().getNameRaw()));
                 }
             }
 

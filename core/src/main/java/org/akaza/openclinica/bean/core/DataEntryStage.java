@@ -87,4 +87,8 @@ public class DataEntryStage extends Term {
     public static ArrayList toArrayList() {
         return new ArrayList(list);
     }
+
+    public String getNameRaw() {
+        return super.name;
+    }
 }
