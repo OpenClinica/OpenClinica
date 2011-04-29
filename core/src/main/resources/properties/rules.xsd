@@ -113,6 +113,12 @@
         <xs:attribute name="AdministrativeDataEntry" type="xs:boolean" use="required"/>
         <xs:attribute name="InitialDataEntry" type="xs:boolean" use="required"/>
         <xs:attribute name="DoubleDataEntry" type="xs:boolean" use="required"/>
+         <!--
+          The attribute for ImportDataDataEntry is not supported in 3.1. 
+          You may still provide TRUE or FALSE as values, but imported data will never be subjected to Rules 
+          at the time of Import. 
+          Please execute the rules in Batch after the data has been imported to verify the data is accurate.
+         -->
         <xs:attribute name="ImportDataEntry" type="xs:boolean" use="required"/>
         <xs:attribute name="Batch" type="xs:boolean" use="required"/>
     </xs:attributeGroup>
