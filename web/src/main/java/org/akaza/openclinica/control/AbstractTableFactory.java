@@ -212,4 +212,19 @@ public abstract class AbstractTableFactory {
         
         return name;
     }
+    public ArrayList paginateData(ArrayList list, int rowStart, int rowEnd) {
+        ArrayList mainList = new ArrayList();
+        if (rowStart > 0) {
+            rowStart = rowStart+1;
+        }
+        for (int i = rowStart; i <= rowEnd; i++) {
+            if(i < list.size() ) {
+                mainList.add(list.get(i));
+            } else {
+                break;
+            }
+
+        }
+        return mainList;
+    }
 }

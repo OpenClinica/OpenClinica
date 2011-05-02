@@ -185,19 +185,17 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         int rowStart = limit.getRowSelect().getRowStart();
         int rowEnd = limit.getRowSelect().getRowEnd();
 
-        ArrayList<DiscrepancyNoteBean> items =
-            getDiscrepancyNoteDao().getViewNotesWithFilterAndSort(getCurrentStudy(), listNotesFilter, listNotesSort, rowStart, rowEnd);
+        ArrayList<DiscrepancyNoteBean> items = getDiscrepancyNoteDao().getViewNotesWithFilterAndSort(getCurrentStudy(), listNotesFilter, listNotesSort);
+        //Keeping all notes without pagination to be shown in print popup.
+        notesForPrintPop = items;
+        items = paginateData(items, rowStart, rowEnd);
         Collection<HashMap<Object, Object>> theItems = new ArrayList<HashMap<Object, Object>>();
         this.setAllNotes(populateRowsWithAttachedData(items));
 
-        //Keeping all notes without pagination to be shown in print popup.
-        notesForPrintPop = getDiscrepancyNoteDao().getViewNotesWithFilterAndSort(getCurrentStudy(), listNotesFilter, listNotesSort);
 
         // for (DiscrepancyNoteBean discrepancyNoteBean : items) {
         for (DiscrepancyNoteBean discrepancyNoteBean : allNotes) {
             UserAccountBean owner = (UserAccountBean) getUserAccountDao().findByPK(discrepancyNoteBean.getOwnerId());
-//            UserAccountBean assignedUser =
-//                discrepancyNoteBean.getUpdaterId() == 0 ? null : (UserAccountBean) getUserAccountDao().findByPK(discrepancyNoteBean.getAssignedUserId());
 
             HashMap<Object, Object> h = new HashMap<Object, Object>();
 
@@ -207,7 +205,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             h.put("discrepancyNoteBean.resolutionStatus", discrepancyNoteBean.getResStatus());
             h.put("age", discrepancyNoteBean.getResolutionStatusId()==5?null:discrepancyNoteBean.getAge());
             h.put("days", discrepancyNoteBean.getResolutionStatusId()==4 || discrepancyNoteBean.getResolutionStatusId()==5?null:discrepancyNoteBean.getDays());
-            h.put("siteId", ((StudyBean) getStudyDao().findByPK(discrepancyNoteBean.getStudySub().getStudyId())).getIdentifier());
+            h.put("siteId", discrepancyNoteBean.getStudySub().getStudyName());
             h.put("discrepancyNoteBean", discrepancyNoteBean);
             h.put("discrepancyNoteBean.createdDate", discrepancyNoteBean.getCreatedDate());
             h.put("discrepancyNoteBean.updatedDate", discrepancyNoteBean.getUpdatedDate());

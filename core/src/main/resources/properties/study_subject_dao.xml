@@ -2,8 +2,8 @@
 <queries>
 	<query>
 		<name>findByPK</name>
-		<sql>SELECT * FROM study_subject WHERE
-		study_subject_id = ?</sql>
+		<sql>SELECT ss.*,st.unique_identifier FROM study_subject ss, study st WHERE
+		ss.study_subject_id = ? and ss.study_id = st.study_id</sql>
 	</query>
 	<query>
 		<name>findByPKAndStudy</name>
@@ -287,7 +287,7 @@
 	<query>
 		<name>findBySubjectIdAndStudy</name>
 		<sql>
-			SELECT ss.*
+			SELECT ss.*, st.unique_identifier
 			FROM study_subject ss, study st
 			WHERE ss.subject_id=?
 				AND ss.study_id=st.study_id
