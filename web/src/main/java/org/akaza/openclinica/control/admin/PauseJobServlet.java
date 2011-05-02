@@ -55,7 +55,8 @@ public class PauseJobServlet extends SecureController {
     protected void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
         String triggerName = fp.getString("tname");
-        String gName = fp.getString("gname");
+       // String gName = fp.getString("gname");
+        String gName= request.getParameter("gname");
         String finalGroupName = "";
         if ("".equals(gName) || "0".equals(gName)) {
             finalGroupName = XsltTriggerService.TRIGGER_GROUP_NAME;
