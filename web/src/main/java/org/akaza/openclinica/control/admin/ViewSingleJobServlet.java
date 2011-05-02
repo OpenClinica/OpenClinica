@@ -74,7 +74,7 @@ public class ViewSingleJobServlet extends SecureController {
         }
         // << tbh 09/03/2009 #4143
         scheduler = getScheduler();
-        Trigger trigger = scheduler.getTrigger(triggerName.trim(), groupName);
+        Trigger trigger = scheduler.getTrigger(triggerName, groupName);
 
         // trigger bean is a wrapper for the trigger, to serve as a link btw
         // quartz classes and oc classes

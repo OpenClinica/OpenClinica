@@ -120,8 +120,8 @@ public class UpdateJobImportServlet extends SecureController {
         String triggerName = fp.getString("tname");
         scheduler = getScheduler();
         System.out.println("found trigger name " + triggerName);
-        Trigger trigger = scheduler.getTrigger(triggerName.trim(), TRIGGER_IMPORT_GROUP);
-        System.out.println("found trigger from the other side " + trigger.getFullName());
+        Trigger trigger = scheduler.getTrigger(triggerName, TRIGGER_IMPORT_GROUP);
+        //System.out.println("found trigger from the other side " + trigger.getFullName());
         if (StringUtil.isBlank(action)) {
             setUpServlet(trigger);
             forwardPage(Page.UPDATE_JOB_IMPORT);

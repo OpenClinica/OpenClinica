@@ -228,6 +228,7 @@ public class CreateJobExportServlet extends SecureController {
                 trigger.setRepeatInterval(XsltTriggerService.getIntervalTime(period));
                 trigger.setDescription(jobDesc);
                 // set just the start date
+                
                 trigger.setStartTime(startDateTime);
                 trigger.setName(jobName);// + datasetId);
                 trigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT);
