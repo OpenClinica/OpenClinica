@@ -30,7 +30,7 @@ import java.util.HashMap;
  */
 public class ViewJobServlet extends SecureController {
 
-    private static String TRIGGER_GROUP = "DEFAULT";
+    private static String TRIGGER_GROUP = XsltTriggerService.TRIGGER_GROUP_NAME;
     private static String SCHEDULER = "schedulerFactoryBean";
     private static String EXPORT_TRIGGER = "exportTrigger";
 
@@ -71,8 +71,8 @@ public class ViewJobServlet extends SecureController {
         scheduler = getScheduler();
         // Scheduler sched = sfb.getScheduler();
 
-        String[] triggerNames = scheduler.getTriggerNames(XsltTriggerService.TRIGGER_GROUP_NAME);
-
+     String[] triggerNames = scheduler.getTriggerNames(XsltTriggerService.TRIGGER_GROUP_NAME);
+  //      String[]    triggerNames          =           scheduler.getJobNames(XsltTriggerService.TRIGGER_GROUP_NAME);
         // logger.info("trigger list: "+triggerNames.length);
         // logger.info("trigger names: "+triggerNames.toString());
 
