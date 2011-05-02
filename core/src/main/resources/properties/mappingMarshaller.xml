@@ -22,7 +22,7 @@
     
     <class name="org.akaza.openclinica.domain.rule.RuleSetBean" >
        
-       <field name="OriginalTarget"
+       <field name="Target"
             type="org.akaza.openclinica.domain.rule.expression.ExpressionBean">
             <bind-xml name="Target"/>
         </field>
