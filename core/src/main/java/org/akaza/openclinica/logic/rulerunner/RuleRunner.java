@@ -158,7 +158,8 @@ public class RuleRunner {
         sb.append(respage.getString("email_footer"));
 
         String subject = contextPath + " - [" + currentStudy.getName() + "] ";
-        String message = ruleAction.getSummary().length() < 20 ? ruleAction.getSummary() : ruleAction.getSummary().substring(0, 20) + " ... ";
+        String ruleSummary = ruleAction.getSummary() != null ? ruleAction.getSummary() : "";
+        String message = ruleSummary.length() < 20 ? ruleSummary : ruleSummary.substring(0, 20) + " ... ";
         subject += message;
 
         HashMap<String, String> emailContents = new HashMap<String, String>();
