@@ -214,11 +214,11 @@
 					<table border="1" cellpadding="0" cellspacing="0">
 						<tr valign="top">
 							<td class="table_header_row">
-								<xsl:text>Person ID</xsl:text>
+								<xsl:text>Study Subject ID</xsl:text>
 							</td>
 							<xsl:if test="$uniqueIdExist">
 								<td class="table_header_row">
-									<xsl:text>Unique ID</xsl:text>
+									<xsl:text>Person ID</xsl:text>
 								</td>
 							</xsl:if>
 							<xsl:if test="$subjectStatusExist">

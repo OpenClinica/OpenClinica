@@ -188,7 +188,7 @@
 						<xsl:otherwise>
 							<xsl:if
 								test="preceding-sibling::odm:StudyEventData[1]/@StudyEventRepeatKey != @StudyEventRepeatKey">
-								<xsl:text>Location_</xsl:text>
+								<!--<xsl:text>Location_</xsl:text>-->
 								<xsl:if test="$eventLocationExist">
 									<xsl:text>Location_</xsl:text>
 									<xsl:value-of select="$E" />
@@ -908,7 +908,7 @@
 						<xsl:otherwise>
 							<xsl:if
 								test="preceding-sibling::odm:StudyEventData[1]/@StudyEventRepeatKey != @StudyEventRepeatKey">
-								<xsl:text>Location_</xsl:text>
+								<!--<xsl:text>Location_</xsl:text>-->
 								<xsl:if test="$eventLocationExist">
 									<xsl:text>Location_</xsl:text>
 									<xsl:value-of select="$E" />

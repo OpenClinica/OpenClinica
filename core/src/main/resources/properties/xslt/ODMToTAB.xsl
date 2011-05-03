@@ -154,10 +154,10 @@
 		<!--<xsl:value-of select="$eol"/>--><!-- Subject Data, item 
 			data etc -->
 		<!--<xsl:text>SubjectId</xsl:text>-->
-		<xsl:text>Person ID</xsl:text>
+		<xsl:text>Study Subject ID</xsl:text>
 		<xsl:value-of select="$sep"/>
 		<xsl:if test="$uniqueIdExist">
-			<xsl:text>Unique ID</xsl:text>
+			<xsl:text>Person ID</xsl:text>
 			<xsl:value-of select="$delimiter" />
 		</xsl:if>
 		<xsl:if test="$subjectStatusExist">
