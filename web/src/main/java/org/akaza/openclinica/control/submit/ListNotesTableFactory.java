@@ -1,7 +1,10 @@
 package org.akaza.openclinica.control.submit;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.core.*;
+import org.akaza.openclinica.bean.core.AuditableEntityBean;
+import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
+import org.akaza.openclinica.bean.core.ResolutionStatus;
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -119,7 +122,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         configureColumn(row.getColumn("eventStartDate"), resword.getString("event_date"), new DateCellEditor(getDateFormat()), null, false, false);
         configureColumn(row.getColumn("eventName"), resword.getString("event_name"), null, null, true, false);
         configureColumn(row.getColumn("crfName"), resword.getString("CRF"), null, null, true, false);
-        configureColumn(row.getColumn("crfStatus"), resword.getString("CRF_status"), null, null, true, false);
+        configureColumn(row.getColumn("crfStatus"), resword.getString("CRF_status"), null, null, false, false);
         configureColumn(row.getColumn("entityName"), resword.getString("entity_name"), null, null, true, false);
         configureColumn(row.getColumn("entityValue"), resword.getString("entity_value"), null, null, true, false);
         configureColumn(row.getColumn("discrepancyNoteBean.description"), resword.getString("description"), null, null, true, false);
@@ -147,7 +150,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         tableFacade.addFilterMatcher(new MatcherKey(UserAccountBean.class, "studySubject.label"), new GenericFilterMatecher());
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "eventName"), new StringFilterMatcher());
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "crfName"), new StringFilterMatcher());
-        tableFacade.addFilterMatcher(new MatcherKey(String.class, "crfStatus"), new StringFilterMatcher());
+        //tableFacade.addFilterMatcher(new MatcherKey(String.class, "crfStatus"), new StringFilterMatcher());
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "entityName"), new StringFilterMatcher());
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "entityValue"), new StringFilterMatcher());
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "age"), new AgeDaysFilterMatcher());
@@ -570,7 +573,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             if (itemValue == null || filterValue == null) {
                 return false;
             }
-            if (((String)itemValue).trim().startsWith((filterValue).trim())) {
+            if (((String)itemValue).trim().startsWith(filterValue.trim())) {
                 return true;
             }
 
