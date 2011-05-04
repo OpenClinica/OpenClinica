@@ -1085,20 +1085,26 @@ public class DiscrepancyNoteUtil {
         String crfName = "";
         String entityName = "";
         String entityValue = "";
+        String crfStatus = "";
         for(int i=0; i < discFilter.getFilters().size(); i++) {
             ListNotesFilter.Filter filter = discFilter.getFilters().get(i);
             eventName = filter.getProperty().equals("eventName") ? filter.getValue().toString() : eventName;
             crfName = filter.getProperty().equals("crfName") ? filter.getValue().toString() : crfName;
             entityName = filter.getProperty().equals("entityName") ? filter.getValue().toString() : entityName;
             entityValue = filter.getProperty().equals("entityValue") ? filter.getValue().toString() : entityValue;
+            crfStatus = filter.getProperty().equals("crfStatus") ? filter.getValue().toString() : entityValue;
         }
 
         ArrayList newList = new ArrayList<DiscrepancyNoteBean>();
+        if(eventName.equals("") && crfName.equals("") && entityName.equals("") && entityValue.equals("") && crfStatus.equals("")) {
+            return mainList;
+        }
         for(DiscrepancyNoteBean dnBean: mainList){
             if(dnBean.getEventName().toLowerCase().indexOf(eventName.toLowerCase())>=0
                     && dnBean.getCrfName().toLowerCase().indexOf(crfName.toLowerCase())>=0
                     && dnBean.getEntityName().toLowerCase().indexOf(entityName.toLowerCase())>=0
-                    && dnBean.getEntityValue().toLowerCase().indexOf(entityValue.toLowerCase())>=0){
+                    && dnBean.getEntityValue().toLowerCase().indexOf(entityValue.toLowerCase())>=0
+                    && dnBean.getCrfStatus().toLowerCase().indexOf(crfStatus.toLowerCase())>=0){
                 newList.add(dnBean);
             }
         }

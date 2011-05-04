@@ -33,6 +33,7 @@ import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.jmesa.core.filter.DateFilterMatcher;
 import org.jmesa.core.filter.FilterMatcher;
 import org.jmesa.core.filter.MatcherKey;
@@ -146,7 +147,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         tableFacade.addFilterMatcher(new MatcherKey(UserAccountBean.class, "studySubject.label"), new GenericFilterMatecher());
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "eventName"), new StringFilterMatcher());
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "crfName"), new StringFilterMatcher());
-        tableFacade.addFilterMatcher(new MatcherKey(String.class, "crfStatus"), new EventCRFStatusFilterMatcher());
+        tableFacade.addFilterMatcher(new MatcherKey(String.class, "crfStatus"), new StringFilterMatcher());
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "entityName"), new StringFilterMatcher());
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "entityValue"), new StringFilterMatcher());
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "age"), new AgeDaysFilterMatcher());
@@ -176,24 +177,24 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
         Limit limit = tableFacade.getLimit();
         ListNotesFilter listNotesFilter = getListNoteFilter(limit);
-        if (!limit.isComplete()) {
-            int totalRows = getDiscrepancyNoteDao().getViewNotesCountWithFilter(listNotesFilter, getCurrentStudy());
-            tableFacade.setTotalRows(totalRows);
-        }
-
         ListNotesSort listNotesSort = getListSubjectSort(limit);
+
+        ArrayList<DiscrepancyNoteBean> items = getDiscrepancyNoteDao().getViewNotesWithFilterAndSort(getCurrentStudy(), listNotesFilter, listNotesSort);
+        this.setAllNotes(populateRowsWithAttachedData(items));
+        this.setAllNotes(DiscrepancyNoteUtil.customFilter(allNotes, listNotesFilter));
+        
+        //Keeping all notes without pagination to be shown in print popup.
+        notesForPrintPop = allNotes;
+        if (!limit.isComplete()) {
+            tableFacade.setTotalRows(allNotes.size());
+        }
         int rowStart = limit.getRowSelect().getRowStart();
         int rowEnd = limit.getRowSelect().getRowEnd();
 
-        ArrayList<DiscrepancyNoteBean> items = getDiscrepancyNoteDao().getViewNotesWithFilterAndSort(getCurrentStudy(), listNotesFilter, listNotesSort);
-        //Keeping all notes without pagination to be shown in print popup.
-        notesForPrintPop = items;
-        items = paginateData(items, rowStart, rowEnd);
+        allNotes = paginateData(allNotes, rowStart, rowEnd);
+
         Collection<HashMap<Object, Object>> theItems = new ArrayList<HashMap<Object, Object>>();
-        this.setAllNotes(populateRowsWithAttachedData(items));
 
-
-        // for (DiscrepancyNoteBean discrepancyNoteBean : items) {
         for (DiscrepancyNoteBean discrepancyNoteBean : allNotes) {
             UserAccountBean owner = (UserAccountBean) getUserAccountDao().findByPK(discrepancyNoteBean.getOwnerId());
 
@@ -233,11 +234,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     private ArrayList<DiscrepancyNoteBean> populateRowsWithAttachedData(ArrayList noteRows) {
         DiscrepancyNoteDAO dndao = getDiscrepancyNoteDao();
         ArrayList<DiscrepancyNoteBean> allNotes = new ArrayList<DiscrepancyNoteBean>();
-        // Set<String> hiddenCrfIds = new TreeSet<String>();
-        // if (currentStudy.isSite(currentStudy.getParentStudyId())) {
-        // hiddenCrfIds =
-        // this.getEventDefinitionCRFDao().findHiddenCrfIdsBySite(currentStudy);
-        // }
 
         for (int i = 0; i < noteRows.size(); i++) {
             // DiscrepancyNoteRow dnr = (DiscrepancyNoteRow) noteRows.get(i);
@@ -272,7 +268,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                 AuditableEntityBean aeb = dndao.findEntity(dnb);
                 dnb.setEntityName(aeb.getName());
                 if (entityType.equalsIgnoreCase("subject")) {
-                    allNotes.add(dnb);
+//                    allNotes.add(dnb);
                     SubjectBean sb = (SubjectBean) aeb;
                     StudySubjectBean ssb = studySubjectDao.findBySubjectIdAndStudy(sb.getId(), currentStudy);
                     dnb.setStudySub(ssb);
@@ -293,7 +289,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                         }
                     }
                 } else if (entityType.equalsIgnoreCase("studySub")) {
-                    allNotes.add(dnb);
+//                    allNotes.add(dnb);
                     StudySubjectBean ssb = (StudySubjectBean) aeb;
                     dnb.setStudySub(ssb);
                     String column = dnb.getColumn().trim();
@@ -353,7 +349,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                     }
                     // }
                 } else if (entityType.equalsIgnoreCase("studyEvent")) {
-                    allNotes.add(dnb);
+//                    allNotes.add(dnb);
                     StudyEventDAO sed = getStudyEventDao();
                     StudyEventBean se = (StudyEventBean) sed.findByPK(dnb.getEntityId());
                     // EventCRFBean ecb = eventCRFDao.findBy;
@@ -406,7 +402,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                     // if (currentStudy.getParentStudyId() > 0 &&
                     // hiddenCrfIds.contains(cb.getId())) {
                     // } else {
-                    allNotes.add(dnb);
+//                    allNotes.add(dnb);
                     dnb.setStageId(ec.getStage().getId());
                     dnb.setEntityName(ib.getName());
                     dnb.setEntityValue(idb.getValue());
@@ -439,6 +435,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                 dnb.setSubjectId(dnb.getStudySub().getId());
             }
             dnb.setSiteId(((StudyBean) getStudyDao().findByPK(dnb.getStudySub().getStudyId())).getIdentifier());
+            allNotes.add(dnb);
         }
         return allNotes;
     }
