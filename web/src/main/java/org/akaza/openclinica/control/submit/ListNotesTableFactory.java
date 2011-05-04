@@ -110,17 +110,17 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                  "discrepancyNoteBean.owner", "actions");
         Row row = tableFacade.getTable().getRow();
         configureColumn(row.getColumn("studySubject.label"), resword.getString("study_subject_ID"), null, null, true, true);
-        configureColumn(row.getColumn("siteId"), resword.getString("site_id"), null, null, true, true);
+        configureColumn(row.getColumn("siteId"), resword.getString("site_id"), null, null, true, false);
         configureColumn(row.getColumn("discrepancyNoteBean.createdDate"), resword.getString("date_created"), new DateCellEditor(getDateFormat()), null, true,
                 true);
         configureColumn(row.getColumn("discrepancyNoteBean.updatedDate"), resword.getString("date_updated"), new DateCellEditor(getDateFormat()), null, true,
-                true);
+                false);
         configureColumn(row.getColumn("eventStartDate"), resword.getString("event_date"), new DateCellEditor(getDateFormat()), null, false, false);
-        configureColumn(row.getColumn("eventName"), resword.getString("event_name"), null, null, true, true);
-        configureColumn(row.getColumn("crfName"), resword.getString("CRF"), null, null, true, true);
-        configureColumn(row.getColumn("crfStatus"), resword.getString("CRF_status"), null, null, true, true);
-        configureColumn(row.getColumn("entityName"), resword.getString("entity_name"), null, null, true, true);
-        configureColumn(row.getColumn("entityValue"), resword.getString("entity_value"), null, null, true, true);
+        configureColumn(row.getColumn("eventName"), resword.getString("event_name"), null, null, true, false);
+        configureColumn(row.getColumn("crfName"), resword.getString("CRF"), null, null, true, false);
+        configureColumn(row.getColumn("crfStatus"), resword.getString("CRF_status"), null, null, true, false);
+        configureColumn(row.getColumn("entityName"), resword.getString("entity_name"), null, null, true, false);
+        configureColumn(row.getColumn("entityValue"), resword.getString("entity_value"), null, null, true, false);
         configureColumn(row.getColumn("discrepancyNoteBean.description"), resword.getString("description"), null, null, true, false);
         configureColumn(row.getColumn("discrepancyNoteBean.detailedNotes"), resword.getString("detailed_notes"), null, null, false, false);
         configureColumn(row.getColumn("numberOfNotes"), resword.getString("of_notes"), null, null, false, false);

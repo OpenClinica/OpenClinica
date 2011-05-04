@@ -1,6 +1,7 @@
 package org.akaza.openclinica.control.submit;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
@@ -62,7 +63,15 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
     private List<Integer> ruleSetRuleIds;
     private final String designerURL;
     private String[] columnNames = new String[] {};
+    private UserAccountBean currentUser;
+    
+    public UserAccountBean getCurrentUser() {
+        return currentUser;
+    }
 
+    public void setCurrentUser(UserAccountBean currentUser) {
+        this.currentUser = currentUser;
+    }
     public ViewRuleAssignmentTableFactory(boolean showMoreLink, String designerURL, boolean isDesignerRequest) {
         this.showMoreLink = showMoreLink;
         this.designerURL = designerURL;
@@ -701,9 +710,11 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
             String target = (String) ((HashMap<Object, Object>) item).get("targetValue");
             String ruleOid = (String) ((HashMap<Object, Object>) item).get("ruleOid");
 
-            if (isDesignerRequest) {
+        //    if (isDesignerRequest)
+          //  {
                 value += testEditByDesignerBuilder(target, ruleOid);
-            } else if (ruleSetRule.getStatus() != Status.DELETED) {
+            //} else
+                if (ruleSetRule.getStatus() != Status.DELETED) {
                 value +=
                     viewLinkBuilder(ruleSetId) + executeLinkBuilder(ruleSetId, ruleId) + removeLinkBuilder(ruleSetRuleId, ruleSetId)
                         + extractXmlLinkBuilder(ruleSetRuleId) + testLinkBuilder(ruleSetRuleId);
@@ -806,8 +817,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         HtmlBuilder actionLink = new HtmlBuilder();
         actionLink.a().href("TestRule?ruleSetRuleId=" + ruleSetRuleId);
         actionLink.append("onMouseDown=\"javascript:setImage('bt_test','images/bt_EnterData_d.gif');\"");
-        actionLink.append("onMouseUp=\"javascript:setImage('bt_test','images/bt_EnterData.gif');\"").close();
-        actionLink.img().name("bt_test").src("images/bt_EnterData.gif").border("0").alt("Test").title("Test").append("hspace=\"2\"").end().aEnd();
+        actionLink.append("onMouseUp=\"javascript:setImage('bt_test','images/bt_Reassign_d.gif');\"").close();
+        actionLink.img().name("bt_test").src("images/bt_Reassign_d.gif").border("0").alt("Test").title("Test").append("hspace=\"2\"").end().aEnd();
         actionLink.append("&nbsp;&nbsp;&nbsp;");
         return actionLink.toString();
 
@@ -816,11 +827,11 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
     private String testEditByDesignerBuilder(String target, String ruleOid) {
         HtmlBuilder actionLink = new HtmlBuilder();
         // String designerURL = "http://localhost:8080/Designer-0.1.0.BUILD-SNAPSHOT/";
-        actionLink.a().href(designerURL + "ruleBuilder?" + "target=" + target + "&ruleOid=" + ruleOid);
+        actionLink.a().href(designerURL  + "&target=" + target + "&ruleOid=" + ruleOid +"&study_oid=" +currentStudy.getOid()+"&provider_user="+getCurrentUser().getName()+"&path=ViewRuleAssignment");
         actionLink.append("target=\"_parent\"");
         actionLink.append("onMouseDown=\"javascript:setImage('bt_test','images/bt_EnterData_d.gif');\"");
         actionLink.append("onMouseUp=\"javascript:setImage('bt_test','images/bt_EnterData.gif');\"").close();
-        actionLink.img().name("bt_test").src("images/bt_EnterData.gif").border("0").alt("Test").title("Test").append("hspace=\"2\"").end().aEnd();
+        actionLink.img().name("bt_test").src("images/bt_EnterData.gif").border("0").alt("Rule Designer").title("Rule Designer").append("hspace=\"2\"").end().aEnd();
         actionLink.append("&nbsp;&nbsp;&nbsp;");
         return actionLink.toString();
 
