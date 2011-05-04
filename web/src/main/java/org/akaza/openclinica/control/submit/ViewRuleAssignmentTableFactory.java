@@ -65,6 +65,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
     private String[] columnNames = new String[] {};
     private UserAccountBean currentUser;
     
+    private String designerLink;
     public UserAccountBean getCurrentUser() {
         return currentUser;
     }
@@ -828,6 +829,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
     private String testEditByDesignerBuilder(String target, String ruleOid) {
         HtmlBuilder actionLink = new HtmlBuilder();
         // String designerURL = "http://localhost:8080/Designer-0.1.0.BUILD-SNAPSHOT/";
+        setDesignerLink(designerURL  + "&target=" + target + "&ruleOid=" + ruleOid +"&study_oid=" +currentStudy.getOid()+"&provider_user="+getCurrentUser().getName());
         actionLink.a().href(designerURL  + "&target=" + target + "&ruleOid=" + ruleOid +"&study_oid=" +currentStudy.getOid()+"&provider_user="+getCurrentUser().getName()+"&path=ViewRuleAssignment");
         actionLink.append("target=\"_parent\"");
         actionLink.append("onMouseDown=\"javascript:setImage('bt_test','images/bt_EnterData_d.gif');\"");
@@ -836,6 +838,14 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         actionLink.append("&nbsp;&nbsp;&nbsp;");
         return actionLink.toString();
 
+    }
+    
+    public String getDesingerLink(){
+        return designerLink;
+    }
+    public void setDesignerLink(String designerLink)
+    {
+        this.designerLink = designerLink;
     }
 
 }

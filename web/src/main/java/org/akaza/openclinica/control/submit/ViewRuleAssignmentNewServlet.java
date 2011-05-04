@@ -120,6 +120,7 @@ public class ViewRuleAssignmentNewServlet extends SecureController {
         factory.setCurrentStudy(currentStudy);
         factory.setCurrentUser(((UserAccountBean)request.getSession().getAttribute(USER_BEAN_NAME)));
         String ruleAssignmentsHtml = factory.createTable(request, response).render();
+        request.getSession().setAttribute("ruleDesignerUrl",factory.getDesingerLink());
         request.setAttribute("ruleAssignmentsHtml", ruleAssignmentsHtml);
         createStudyEventForInfoPanel();
         if (ruleAssignmentsHtml != null) {
