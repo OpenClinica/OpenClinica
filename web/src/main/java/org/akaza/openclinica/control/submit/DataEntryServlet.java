@@ -3527,12 +3527,12 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 // boolean showItem = false;
                 boolean needsHighlighting = !ifmb.isShowItem();
                 logMe("Entering thread before getting ItemMetadataService:::"+Thread.currentThread());
-                boolean showItem = getItemMetadataServicePerRequest().isShown(ifmb.getItemId(), ecb, dib.getData());
+                boolean showItem = getItemMetadataService().isShown(ifmb.getItemId(), ecb, dib.getData());
                 if (getServletPage(request).equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
-                    showItem = getItemMetadataServicePerRequest().hasPassedDDE(ifmb, ecb, dib.getData());
+                    showItem = getItemMetadataService().hasPassedDDE(ifmb, ecb, dib.getData());
                 }
                 // is the above needed for children items too?
-                boolean passedDDE = getItemMetadataServicePerRequest().hasPassedDDE(ifmb, ecb, dib.getData());
+                boolean passedDDE = getItemMetadataService().hasPassedDDE(ifmb, ecb, dib.getData());
                 if (showItem) { // we are only showing, not hiding
                     logger.debug("set show item " + ifmb.getItemId() + " idb " + dib.getData().getId() + " show item " + showItem + " passed dde " + passedDDE);
                     // ifmb.setShowItem(showItem);
@@ -3646,7 +3646,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
     }
 
     //usign the scope per request just to make sure the multi threaded requests are not getting messed up, since this error is thrown consistently.
-    public DynamicsMetadataService getItemMetadataServicePerRequest() {
+   /* public DynamicsMetadataService getItemMetadataServicePerRequest() {
         DynamicsMetadataService itemMetadataService =null;
         logMe("Inside the getItemMetadataServicePerRequest::::"+Thread.currentThread());
         itemMetadataService =
@@ -3654,7 +3654,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     "dynamicsMetadataServicePerRequest");
         logMe("Obtained the getItemMetadataServicePerRequest object::::"+Thread.currentThread()+"ItemMetadataService is???"+itemMetadataService);
         return itemMetadataService;
-    }
+    }*/
     /**
      * @return The Page object which represents this servlet's JSP.
      */
@@ -3773,7 +3773,19 @@ public abstract class DataEntryServlet extends CoreSecureController {
                         dib.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(itemDataId, notes));
                         
                         dib =  setTotals(dib,itemDataId,notes, ecb.getId());
+                        AuditDAO adao = new AuditDAO(getDataSource());
+                        ArrayList itemAuditEvents = adao.checkItemAuditEventsExist(itemDataId, "item_data", ecb.getId());
+                        if (itemAuditEvents.size() > 0) {
+                            dib.setHasAudit(true);    
+                            dib.getData().setAuditLog(true);    
+                        }
+                        else
+                        {
+                            dib.setHasAudit(false);
+                            dib.getData().setAuditLog(false);    
+                        }
                         logger.debug("dib note size:" + dib.getNumDiscrepancyNotes() + " " + dib.getData().getId() + " " + inputName);
+                        
                         items.set(j, dib);
                     }
                     displayGroup.setItems(items);
@@ -3914,10 +3926,22 @@ public abstract class DataEntryServlet extends CoreSecureController {
         logMe("time taken thus far, before audit log check"+(System.currentTimeMillis()-t));
         long t1 = System.currentTimeMillis();
         AuditDAO adao = new AuditDAO(getDataSource());
-        ArrayList itemAuditEvents = adao.checkItemAuditEventsExist(dib.getItem().getId(), "item_data", ecbId);
+        ArrayList itemAuditEvents = adao.checkItemAuditEventsExist(itemDataId, "item_data", ecbId);
         if (itemAuditEvents.size() > 0) {
+            dib.setHasAudit(true);    
             dib.getData().setAuditLog(true);    
         }
+        else
+        {
+            dib.setHasAudit(false);
+            dib.getData().setAuditLog(false);    
+        }
+        
+        
+        
+        
+        
+        
         logMe("time taken thus far, after audit log check"+(System.currentTimeMillis()-t));
         logMe("Only for audit check::"+(System.currentTimeMillis()-t1));
         dib.setTotNew(totNew);//totNew is used for parent thread count
