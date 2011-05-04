@@ -1,14 +1,5 @@
 package org.akaza.openclinica.control;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.jmesa.facade.TableFacade;
 import org.jmesa.facade.TableFacadeImpl;
 import org.jmesa.limit.ExportType;
@@ -21,6 +12,15 @@ import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.editor.FilterEditor;
 import org.jmesa.view.html.component.HtmlColumn;
 import org.jmesa.view.html.component.HtmlTable;
+
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public abstract class AbstractTableFactory {
 
@@ -214,6 +214,9 @@ public abstract class AbstractTableFactory {
     }
     public ArrayList paginateData(ArrayList list, int rowStart, int rowEnd) {
         ArrayList mainList = new ArrayList();
+        if (rowStart > 0) {
+            rowStart = rowStart+1;
+        }
         for (int i = rowStart; i <= rowEnd; i++) {
             if(i < list.size() ) {
                 mainList.add(list.get(i));
