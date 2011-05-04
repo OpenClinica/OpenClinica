@@ -539,18 +539,23 @@ public class ExpressionService {
     }
 
     public String constructFullExpressionIfPartialProvided(String expression, String ruleSetTargetExpression) {
-        String[] splitExpression = expression.split(ESCAPED_SEPERATOR);
-        switch (splitExpression.length) {
-        case 1:
-            return deContextualizeExpression(3, expression, ruleSetTargetExpression);
-        case 2:
-            return deContextualizeExpression(2, expression, ruleSetTargetExpression);
-        case 3:
-            return deContextualizeExpression(1, expression, ruleSetTargetExpression);
-        case 4:
+        if(expression == null) {
+            logger.info("expression is null.");
             return expression;
-        default:
-            throw new OpenClinicaSystemException("Full Expression cannot be constructed from provided expression : " + expression);
+        } else {
+            String[] splitExpression = expression.split(ESCAPED_SEPERATOR);
+            switch (splitExpression.length) {
+            case 1:
+                return deContextualizeExpression(3, expression, ruleSetTargetExpression);
+            case 2:
+                return deContextualizeExpression(2, expression, ruleSetTargetExpression);
+            case 3:
+                return deContextualizeExpression(1, expression, ruleSetTargetExpression);
+            case 4:
+                return expression;
+            default:
+                throw new OpenClinicaSystemException("Full Expression cannot be constructed from provided expression : " + expression);
+            }
         }
     }
 

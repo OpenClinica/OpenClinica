@@ -28,4 +28,6 @@
     <include file="migration/amethyst/2011-04-04-6336.xml"/>    
 	<include file="migration/amethyst/2011-03-22-8248.xml"/>
 	<include file="migration/amethyst/2011-04-05-7475.xml"/>
+	<include file="migration/amethyst/2011-05-03-9423.xml"/>
+	<include file="migration/amethyst/2011-05-03-9430.xml"/>
 </databaseChangeLog>

@@ -475,18 +475,24 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
             logger.info("Value from property value is : {}", value);
             value = property.getValue();
         }
-        String expression =
-            getExpressionService().constructFullExpressionIfPartialProvided(property.getValueExpression().getValue(), ruleSet.getTarget().getValue());
-        ItemBean itemBean = getExpressionService().getItemBeanFromExpression(expression);
-        String itemGroupBOrdinal = getExpressionService().getGroupOrdninalCurated(expression);
-        ItemDataBean itemData =
-            getItemDataDAO().findByItemIdAndEventCRFIdAndOrdinal(itemBean.getId(), eventCrfBean.getId(),
-                    itemGroupBOrdinal == "" ? 1 : Integer.valueOf(itemGroupBOrdinal));
-        if (itemData.getId() == 0) {
-            logger.info("Cannot get Value for ExpressionValue {}", expression);
+        if(property.getValueExpression() == null) {
+            logger.info("There is no ValueExpression for property ="+property.getOid());
         } else {
-            value = itemData.getValue();
-            logger.info("Value from ExpressionValue '{}'  is : {}", expression, value);
+            String expression =
+                getExpressionService().constructFullExpressionIfPartialProvided(property.getValueExpression().getValue(), ruleSet.getTarget().getValue());
+            if(expression != null) {
+                ItemBean itemBean = getExpressionService().getItemBeanFromExpression(expression);
+                String itemGroupBOrdinal = getExpressionService().getGroupOrdninalCurated(expression);
+                ItemDataBean itemData =
+                    getItemDataDAO().findByItemIdAndEventCRFIdAndOrdinal(itemBean.getId(), eventCrfBean.getId(),
+                            itemGroupBOrdinal == "" ? 1 : Integer.valueOf(itemGroupBOrdinal));
+                if (itemData.getId() == 0) {
+                    logger.info("Cannot get Value for ExpressionValue {}", expression);
+                } else {
+                    value = itemData.getValue();
+                    logger.info("Value from ExpressionValue '{}'  is : {}", expression, value);
+                }
+            }
         }
         return value;
 
