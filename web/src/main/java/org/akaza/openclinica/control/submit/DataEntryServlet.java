@@ -3527,7 +3527,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 // boolean showItem = false;
                 boolean needsHighlighting = !ifmb.isShowItem();
                 logMe("Entering thread before getting ItemMetadataService:::"+Thread.currentThread());
-                boolean showItem = getItemMetadataService().isShown(ifmb.getItemId(), ecb, dib.getData());
+               boolean showItem = getItemMetadataService().isShown(ifmb.getItemId(), ecb, dib.getData());
                 if (getServletPage(request).equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
                     showItem = getItemMetadataService().hasPassedDDE(ifmb, ecb, dib.getData());
                 }
@@ -3773,19 +3773,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                         dib.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(itemDataId, notes));
                         
                         dib =  setTotals(dib,itemDataId,notes, ecb.getId());
-                        AuditDAO adao = new AuditDAO(getDataSource());
-                        ArrayList itemAuditEvents = adao.checkItemAuditEventsExist(itemDataId, "item_data", ecb.getId());
-                        if (itemAuditEvents.size() > 0) {
-                            dib.setHasAudit(true);    
-                            dib.getData().setAuditLog(true);    
-                        }
-                        else
-                        {
-                            dib.setHasAudit(false);
-                            dib.getData().setAuditLog(false);    
-                        }
                         logger.debug("dib note size:" + dib.getNumDiscrepancyNotes() + " " + dib.getData().getId() + " " + inputName);
-                        
                         items.set(j, dib);
                     }
                     displayGroup.setItems(items);
@@ -3926,22 +3914,10 @@ public abstract class DataEntryServlet extends CoreSecureController {
         logMe("time taken thus far, before audit log check"+(System.currentTimeMillis()-t));
         long t1 = System.currentTimeMillis();
         AuditDAO adao = new AuditDAO(getDataSource());
-        ArrayList itemAuditEvents = adao.checkItemAuditEventsExist(itemDataId, "item_data", ecbId);
+        ArrayList itemAuditEvents = adao.checkItemAuditEventsExist(dib.getItem().getId(), "item_data", ecbId);
         if (itemAuditEvents.size() > 0) {
-            dib.setHasAudit(true);    
             dib.getData().setAuditLog(true);    
         }
-        else
-        {
-            dib.setHasAudit(false);
-            dib.getData().setAuditLog(false);    
-        }
-        
-        
-        
-        
-        
-        
         logMe("time taken thus far, after audit log check"+(System.currentTimeMillis()-t));
         logMe("Only for audit check::"+(System.currentTimeMillis()-t1));
         dib.setTotNew(totNew);//totNew is used for parent thread count
