@@ -126,14 +126,14 @@
 		<!-- mode="itemGroupDataHeaderTempl"></xsl:apply-templates> -->
 		<xsl:value-of select="$eol"></xsl:value-of><!-- Subject Data, item 
 			data etc -->
-		<xsl:text>Study Subject ID</xsl:text>
+		<xsl:text>StudySubjectID</xsl:text>
 		<xsl:value-of select="$sep"></xsl:value-of>
 		<xsl:if test="$uniqueIdExist">
-			<xsl:text>Person ID</xsl:text>
+			<xsl:text>PersonID</xsl:text>
 			<xsl:value-of select="$delimiter" />
 		</xsl:if>
 		<xsl:if test="$subjectStatusExist">
-			<xsl:text>Subject Status</xsl:text>
+			<xsl:text>SubjectStatus</xsl:text>
 			<xsl:value-of select="$delimiter" />
 		</xsl:if>
 		<xsl:if test="$sexExist">
@@ -141,7 +141,7 @@
 			<xsl:value-of select="$delimiter" />
 		</xsl:if>
 		<xsl:if test="$dobExist">
-			<xsl:text>Date of Birth</xsl:text>
+			<xsl:text>DateofBirth</xsl:text>
 			<xsl:value-of select="$delimiter" />
 		</xsl:if>
 		<!--
@@ -1283,7 +1283,7 @@
 				<xsl:value-of select="$delimiter" />	
 			</xsl:if>
 			<xsl:if test="$eventStatusExist">					
-				<xsl:text>Event Status_</xsl:text>
+				<xsl:text>EventStatus_</xsl:text>
 				<xsl:value-of select="$E" />
 				<xsl:value-of select="$eventPosition" />							
 				<xsl:text>_</xsl:text>
@@ -1338,7 +1338,7 @@
 			<xsl:value-of select="$delimiter" />
 		</xsl:if>
 		<xsl:if test="$eventStatusExist">			
-			<xsl:text>Event Status_</xsl:text>
+			<xsl:text>EventStatus_</xsl:text>
 			<xsl:value-of select="$E" />
 			<xsl:value-of select="$eventPosition" />
 			<xsl:value-of select="$delimiter" />
@@ -1462,7 +1462,7 @@
 						<xsl:if test="$interviewDateExist">
 							
 								<xsl:value-of select="' '"	/>
-								<xsl:text>Interview Date_</xsl:text>
+								<xsl:text>InterviewDate_</xsl:text>
 								<xsl:value-of select="$E" />
 								<xsl:value-of select="$eventPosition" />
 								<xsl:text>_</xsl:text>
@@ -1474,7 +1474,7 @@
 						<xsl:if test="$crfStatusExist">
 							
 							<xsl:value-of select="' '"	/>
-							<xsl:text>CRF Version Status_</xsl:text>
+							<xsl:text>CRFVersionStatus_</xsl:text>
 							<xsl:value-of select="$E" />
 							<xsl:value-of select="$eventPosition" />
 							<xsl:text>_</xsl:text>
@@ -1486,7 +1486,7 @@
 						<xsl:if test="$crfVersionExist">
 							
 								<xsl:value-of select="' '"	/>	
-								<xsl:text>Version Name_</xsl:text>
+								<xsl:text>VersionName_</xsl:text>
 								<xsl:value-of select="$E" />
 								<xsl:value-of select="$eventPosition" />
 								<xsl:text>_</xsl:text>
@@ -1560,7 +1560,7 @@
 					<xsl:if test="$interviewDateExist">
 						
 							<xsl:value-of select="' '"	/>	
-							<xsl:text>Interview Date_</xsl:text>
+							<xsl:text>InterviewDate_</xsl:text>
 							<xsl:value-of select="$E" />
 							<xsl:value-of select="$eventPosition" />										
 							<xsl:text>_</xsl:text>
@@ -1574,7 +1574,7 @@
 					<xsl:if test="$crfStatusExist">
 						
 							<xsl:value-of select="' '"	/>
-							<xsl:text>CRF Version Status_</xsl:text>
+							<xsl:text>CRFVersionStatus_</xsl:text>
 							<xsl:value-of select="$E" />
 							<xsl:value-of select="$eventPosition" />
 							<xsl:text>_</xsl:text>
@@ -1588,7 +1588,7 @@
 					<xsl:if test="$crfVersionExist">
 						
 							<xsl:value-of select="' '"	/>
-							<xsl:text>Version Name_</xsl:text>
+							<xsl:text>VersionName_</xsl:text>
 							<xsl:value-of select="$E" />
 							<xsl:value-of select="$eventPosition" />
 							<xsl:text>_</xsl:text>
@@ -1945,7 +1945,9 @@
 				
 				
 		 
-			<xsl:value-of select="' '"/><xsl:value-of select="@Name" />
+			<xsl:value-of select="' '"/>
+			<!--<xsl:value-of select="@Name" />-->
+			<xsl:value-of select='replace(normalize-space(@Name), "\s", "_")'/>
 			<xsl:text>_</xsl:text>
 			<!--<xsl:value-of select="$C" /><xsl:value-of select="$crfPosition" />-->
 			<xsl:value-of select="$E"/>	<xsl:value-of select="$eventPosition"/>
