@@ -214,9 +214,6 @@ public abstract class AbstractTableFactory {
     }
     public ArrayList paginateData(ArrayList list, int rowStart, int rowEnd) {
         ArrayList mainList = new ArrayList();
-        if (rowStart > 0) {
-            rowStart = rowStart+1;
-        }
         for (int i = rowStart; i <= rowEnd; i++) {
             if(i < list.size() ) {
                 mainList.add(list.get(i));
