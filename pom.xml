@@ -5,9 +5,9 @@
     <groupId>org.akaza.openclinica</groupId>
     <artifactId>OpenClinica</artifactId>
     <packaging>pom</packaging>
-    <version>3.1-SNAPSHOT</version>
+    <version>3.1</version>
     <name>OpenClinica</name>
-    <description>3.1-SNAPSHOT</description>
+    <description>3.1</description>
     <repositories>
 		<repository>
 			<id>Rufus Repository</id>
@@ -62,7 +62,7 @@
 		<test.dbPassword>clinica</test.dbPassword>
 		<test.hibernateDialect>org.hibernate.dialect.PostgreSQLDialect</test.hibernateDialect>
 		<test.locale>en_US</test.locale>
-		<scm.path>scm:svn:http://svn.akazaresearch.com/openclinica/OpenClinica/branches/OpenClinica-3.1-SNAPSHOT/projects</scm.path>
+		<scm.path>scm:svn:http://svn.akazaresearch.com/openclinica/OpenClinica/branches/OpenClinica-3.1/projects</scm.path>
 		<!--  Library Versions -->
 		<spring.version>3.0.5.RELEASE</spring.version>
 	</properties>
