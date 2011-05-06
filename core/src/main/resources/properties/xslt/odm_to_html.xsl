@@ -1595,7 +1595,7 @@
 					<xsl:value-of select="substring-after($currentToken, ' ')"/>
 				</xsl:if>
 			</xsl:variable>
-			<!--colItemName: *<xsl:value-of select="$colItemName"/>*-->
+			<!--colItemName: **<xsl:value-of select="$colItemName"/>**-->
 			<xsl:variable name="isColForRepeatingGrp" select="contains($numericAfter_C, '_')"/><!--isColForRepeatingGrp<xsl:value-of select="$isColForRepeatingGrp"/>-->
 			<xsl:variable name="colRepeatGrpKey">
 				<xsl:if test="contains($numericAfter_C, '_')">
@@ -1946,7 +1946,7 @@
 									 and ../@ItemGroupOID=$grpOID  and ../@ItemGroupRepeatKey = $grpRepeatKey
 									 and ../../@FormOID = $formOID 
 									 and ../../../@StudyEventOID = $eventOID]"/>
-									<!-- itemData oid:<xsl:value-of select="$itemData/@ItemOID"/>-->
+									<!--itemData oid:<xsl:value-of select="$itemData/@ItemOID"/>-->
 									<xsl:choose>
 										<xsl:when test="$itemData/@Value">
 											<td class="table_cell">
@@ -2629,7 +2629,7 @@
 		<xsl:param name="eventStatusExist"/>
 		<xsl:param name="eventEndDateExist"/>
 		<xsl:param name="ageExist"/>	
-	  
+	  <!--createColForNonRepeatingEvent-->
 	   <xsl:if test="$eventLocationExist">								
 			<td class="table_header_row">
 				<xsl:text>Location_</xsl:text>
@@ -3882,7 +3882,7 @@
   <xsl:template  mode="studyItemDataColumnHeaders" match="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:StudyEventDef[@OID]">
 		<xsl:param name="eventOID"/> 
 		<xsl:param name="isEventRepeating"/>
-		
+		<!--studyItemDataColumnHeaders-->
 
 	  <!-- <xsl:variable name="formRefOID" select="@FormOID"/>	  formRefOID - <xsl:value-of select="$formRefOID" />
 	   <xsl:variable name="formRefNodeId" select="generate-id()"/>
@@ -3935,7 +3935,7 @@
 		<xsl:otherwise>
 			<xsl:for-each select="odm:FormRef">
 			<xsl:variable name="formRefOID" select="@FormOID"/>
-			
+			<!--formRefOID:<xsl:value-of select="$formRefOID"/>-->
 			<xsl:variable name="formRefNodeId" select="generate-id()"/>
 			
 			<xsl:variable name="crfPosition">
@@ -4013,7 +4013,7 @@
 		<xsl:param name="isEventRepeating"/>
 		<xsl:param name="eventOID"/>	
 		<xsl:param name="StudyEventRepeatKey"/>
-		
+		<!--formRefToDefTemplateForHeaders-->
 		<xsl:variable name="formOID" select="@OID"/>
 		<xsl:apply-templates select="odm:ItemGroupRef" mode="ItemGrpRefs">
 			<xsl:with-param name="crfPosition" select="$crfPosition"/>
@@ -4032,9 +4032,9 @@
 		<xsl:param name="formOID"/>
 		<xsl:param name="eventOID"/>	
 		<xsl:param name="StudyEventRepeatKey"/>
-			
+			<!--ItemGrpRefs:formOID:<xsl:value-of select="$formOID"/>-->
 		<xsl:variable name="grpOID" select="@ItemGroupOID"/>
-		<xsl:apply-templates select="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:ItemGroupDef[@OID = $grpOID]" mode="ItemGrpRefToDefTemplateForHeaders">
+		<xsl:apply-templates  mode="ItemGrpRefToDefTemplateForHeaders" select="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:ItemGroupDef[@OID = $grpOID]">
 			<xsl:with-param name="crfPosition" select="$crfPosition"/>
 			<xsl:with-param name="eventPosition" select="$eventPosition"/>
 			<xsl:with-param name="isEventRepeating" select="$isEventRepeating"/>
@@ -4053,7 +4053,7 @@
 		<xsl:param name="grpOID"/>		
 		<xsl:param name="eventOID"/>
 		<xsl:param name="StudyEventRepeatKey"/>	
-			
+			<!--ItemGrpRefToDefTemplateForHeaders:formOID:<xsl:value-of select="$formOID"/>-->
 		<xsl:variable name="isGrpRepeating" select="@Repeating"/>
 		<!--<xsl:variable name="itemGrpRepeatKey" select="1"/>-->
 		
@@ -4110,35 +4110,75 @@
 		<xsl:param name="itemGrpRepeatKey"/> 
 		<xsl:param name="isGrpRepeating"/>
 		
-		
-		<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @StudyEventRepeatKey = $StudyEventRepeatKey 
+		<!--createItemDataColForRepeatingGrps:formOID:<xsl:value-of select="$formOID"/>-->
+		<!--cnt: <xsl:value-of select="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @StudyEventRepeatKey = $StudyEventRepeatKey 
 			and odm:FormData/@FormOID = $formOID and odm:FormData/odm:ItemGroupData/@ItemGroupOID = $grpOID 
-			and odm:FormData/odm:ItemGroupData/@ItemGroupRepeatKey = $itemGrpRepeatKey]) &gt; 0">
-			<xsl:apply-templates select="odm:ItemRef" mode="GrpItemRefs">
-				<xsl:with-param name="crfPosition" select="$crfPosition"/>
-				<xsl:with-param name="eventPosition" select="$eventPosition"/>
-				<xsl:with-param name="isEventRepeating" select="$isEventRepeating"/>
-				<xsl:with-param name="formOID" select="$formOID"/>
-				<xsl:with-param name="grpOID" select="$grpOID"/>
-				<xsl:with-param name="isGrpRepeating" select="$isGrpRepeating"/>
-				<xsl:with-param name="eventOID" select="$eventOID"/>	
-				<xsl:with-param name="StudyEventRepeatKey" select="$StudyEventRepeatKey"/>
-				<xsl:with-param name="itemGrpRepeatKey" select="$itemGrpRepeatKey"/>
-				<xsl:with-param name="isLastItem" select="position()=last()" />
-			</xsl:apply-templates> 
-			
-			<xsl:apply-templates mode="createItemDataColForRepeatingGrps" select=".">
-				<xsl:with-param name="crfPosition" select="$crfPosition"/>
-				<xsl:with-param name="eventPosition" select="$eventPosition"/>
-				<xsl:with-param name="isEventRepeating" select="$isEventRepeating"/>
-				<xsl:with-param name="formOID" select="$formOID"/>
-				<xsl:with-param name="grpOID" select="$grpOID"/>		
-				<xsl:with-param name="eventOID" select="$eventOID"/>
-				<xsl:with-param name="StudyEventRepeatKey" select="$StudyEventRepeatKey"/>	
-				<xsl:with-param name="itemGrpRepeatKey" select="$itemGrpRepeatKey+1"/> 
-				<xsl:with-param name="isGrpRepeating" select="$isGrpRepeating"/>
-			</xsl:apply-templates>
-		</xsl:if>
+			and odm:FormData/odm:ItemGroupData/@ItemGroupRepeatKey = $itemGrpRepeatKey])"/>
+		cntModified : <xsl:value-of select="count($allStudyEventDataElements[@StudyEventOID = $eventOID 
+			and odm:FormData/@FormOID = $formOID and odm:FormData/odm:ItemGroupData/@ItemGroupOID = $grpOID 
+			and odm:FormData/odm:ItemGroupData/@ItemGroupRepeatKey = $itemGrpRepeatKey])"/>	-->
+			<xsl:choose>
+				<xsl:when test="$isEventRepeating = 'Yes'">
+					<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @StudyEventRepeatKey = $StudyEventRepeatKey 
+						and odm:FormData/@FormOID = $formOID and odm:FormData/odm:ItemGroupData/@ItemGroupOID = $grpOID 
+						and odm:FormData/odm:ItemGroupData/@ItemGroupRepeatKey = $itemGrpRepeatKey]) &gt; 0">
+							<xsl:apply-templates select="odm:ItemRef" mode="GrpItemRefs">
+								<xsl:with-param name="crfPosition" select="$crfPosition"/>
+								<xsl:with-param name="eventPosition" select="$eventPosition"/>
+								<xsl:with-param name="isEventRepeating" select="$isEventRepeating"/>
+								<xsl:with-param name="formOID" select="$formOID"/>
+								<xsl:with-param name="grpOID" select="$grpOID"/>
+								<xsl:with-param name="isGrpRepeating" select="$isGrpRepeating"/>
+								<xsl:with-param name="eventOID" select="$eventOID"/>	
+								<xsl:with-param name="StudyEventRepeatKey" select="$StudyEventRepeatKey"/>
+								<xsl:with-param name="itemGrpRepeatKey" select="$itemGrpRepeatKey"/>
+								<xsl:with-param name="isLastItem" select="position()=last()" />
+							</xsl:apply-templates> 
+							
+							<xsl:apply-templates mode="createItemDataColForRepeatingGrps" select=".">
+								<xsl:with-param name="crfPosition" select="$crfPosition"/>
+								<xsl:with-param name="eventPosition" select="$eventPosition"/>
+								<xsl:with-param name="isEventRepeating" select="$isEventRepeating"/>
+								<xsl:with-param name="formOID" select="$formOID"/>
+								<xsl:with-param name="grpOID" select="$grpOID"/>		
+								<xsl:with-param name="eventOID" select="$eventOID"/>
+								<xsl:with-param name="StudyEventRepeatKey" select="$StudyEventRepeatKey"/>	
+								<xsl:with-param name="itemGrpRepeatKey" select="$itemGrpRepeatKey+1"/> 
+								<xsl:with-param name="isGrpRepeating" select="$isGrpRepeating"/>
+							</xsl:apply-templates>
+					</xsl:if>		
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID 
+						and odm:FormData/@FormOID = $formOID and odm:FormData/odm:ItemGroupData/@ItemGroupOID = $grpOID 
+						and odm:FormData/odm:ItemGroupData/@ItemGroupRepeatKey = $itemGrpRepeatKey]) &gt; 0">
+							<xsl:apply-templates select="odm:ItemRef" mode="GrpItemRefs">
+								<xsl:with-param name="crfPosition" select="$crfPosition"/>
+								<xsl:with-param name="eventPosition" select="$eventPosition"/>
+								<xsl:with-param name="isEventRepeating" select="$isEventRepeating"/>
+								<xsl:with-param name="formOID" select="$formOID"/>
+								<xsl:with-param name="grpOID" select="$grpOID"/>
+								<xsl:with-param name="isGrpRepeating" select="$isGrpRepeating"/>
+								<xsl:with-param name="eventOID" select="$eventOID"/>	
+								<xsl:with-param name="StudyEventRepeatKey" select="$StudyEventRepeatKey"/>
+								<xsl:with-param name="itemGrpRepeatKey" select="$itemGrpRepeatKey"/>
+								<xsl:with-param name="isLastItem" select="position()=last()" />
+							</xsl:apply-templates> 
+							
+							<xsl:apply-templates mode="createItemDataColForRepeatingGrps" select=".">
+								<xsl:with-param name="crfPosition" select="$crfPosition"/>
+								<xsl:with-param name="eventPosition" select="$eventPosition"/>
+								<xsl:with-param name="isEventRepeating" select="$isEventRepeating"/>
+								<xsl:with-param name="formOID" select="$formOID"/>
+								<xsl:with-param name="grpOID" select="$grpOID"/>		
+								<xsl:with-param name="eventOID" select="$eventOID"/>
+								<xsl:with-param name="StudyEventRepeatKey" select="$StudyEventRepeatKey"/>	
+								<xsl:with-param name="itemGrpRepeatKey" select="$itemGrpRepeatKey+1"/> 
+								<xsl:with-param name="isGrpRepeating" select="$isGrpRepeating"/>
+							</xsl:apply-templates>
+					</xsl:if>
+				</xsl:otherwise>
+			</xsl:choose>
   </xsl:template>
   
   
@@ -4153,7 +4193,7 @@
 		<xsl:param name="eventOID"/>	
 		<xsl:param name="itemGrpRepeatKey"/>	
 		<xsl:param name="isLastItem"/>
-		
+		<!--GrpItemRefs-->
 		<xsl:variable name="itemOID" select="@ItemOID"/>
 		<xsl:choose>
 			<xsl:when test="$isEventRepeating = 'Yes'">
@@ -4176,9 +4216,16 @@
 			</xsl:apply-templates>
 		</xsl:if>	
 			</xsl:when>
-			<xsl:otherwise>
+			<xsl:otherwise><!--non-repeating grp
+			eventOID: <xsl:value-of select="$eventOID"/>
+			formOID: <xsl:value-of select="$formOID"/>
+			grpOID: <xsl:value-of select="$grpOID"/>
+			itemOID: <xsl:value-of select="$itemOID"/>
+			cnt: <xsl:value-of select="count($allStudyEventDataElements[@StudyEventOID = $eventOID and odm:FormData/@FormOID = 
+						$formOID and odm:FormData/odm:ItemGroupData/@ItemGroupOID = $grpOID and odm:FormData/odm:ItemGroupData/odm:ItemData/@ItemOID = $itemOID])"/>-->
 				<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and odm:FormData/@FormOID = 
 						$formOID and odm:FormData/odm:ItemGroupData/@ItemGroupOID = $grpOID and odm:FormData/odm:ItemGroupData/odm:ItemData/@ItemOID = $itemOID]) &gt; 0">
+						
 				<xsl:apply-templates
 					select="//odm:ODM/odm:Study/odm:MetaDataVersion/odm:ItemDef[@OID=$itemOID]"
 					mode="ItemDefColHeaders2">
