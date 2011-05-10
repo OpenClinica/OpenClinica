@@ -101,9 +101,9 @@ public class EventCRFDAO extends AuditableEntityDAO {
         this.setTypeExpected(21, TypeNames.BOOL);// sdv_status
         this.setTypeExpected(22, TypeNames.INT);// old_status
         this.setTypeExpected(23, TypeNames.INT); // sdv_update_id
-        if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
-            this.setTypeExpected(24, TypeNames.INT); // r
-        }
+//        if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
+//            this.setTypeExpected(24, TypeNames.INT); // r
+//        }
 
     }
 
@@ -369,10 +369,11 @@ public class EventCRFDAO extends AuditableEntityDAO {
     public ArrayList findUndeletedWithStudySubjectsByCRFVersion(int versionId) {
         this.setTypesExpected();
         // ss.label, sed.name as sed_name, s.name as study_name, ss.sample_ordinal as repeat_number
-        this.setTypeExpected(23, TypeNames.STRING);
+//        this.setTypeExpected(23, TypeNames.STRING);
         this.setTypeExpected(24, TypeNames.STRING);
         this.setTypeExpected(25, TypeNames.STRING);
-        this.setTypeExpected(26, TypeNames.INT);
+        this.setTypeExpected(26, TypeNames.STRING);
+        this.setTypeExpected(27, TypeNames.INT);
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(versionId));
 
