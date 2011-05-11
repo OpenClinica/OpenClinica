@@ -84,6 +84,8 @@ Rem
 Rem
 grant connect, resource to &user_name;
 grant create materialized view to &user_name;
+grant create view to &user_name;
+
 Rem
 Rem
 

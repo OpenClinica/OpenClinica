@@ -1,10 +1,10 @@
 {\rtf1\ansi\ansicpg1252\cocoartf1038\cocoasubrtf350
 {\fonttbl\f0\fswiss\fcharset0 Helvetica;}
 {\colortbl;\red255\green255\blue255;}
-\margl1440\margr1440\vieww9000\viewh8400\viewkind0
+\margl1440\margr1440\vieww17940\viewh14600\viewkind0
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
 
-\f0\b\fs24 \cf0 OPENCLINICA INSTALLATION GUIDE for LINUX\
+\f0\b\fs24 \cf0 OPENCLINICA INSTALLATION GUIDE for LINUX - ENTERPRISE\
 OpenClinica Version 3.1\
 Document Version 1.0 \
 --------------------------------------------------------------\
@@ -12,9 +12,8 @@ Updated: April 14th, 2011 smartin@akazaresearch.com, pgalvin@akazaresearch.com\
 \
 About OpenClinica\
 ------------------------------------------------------\
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
 
-\b0 \cf0 \
+\b0 \
 OpenClinica: Open Source Software Platform for Managing Clinical Research Studies Professional Open Source Solutions for the Clinical Research Enterprise\
 \
 OpenClinica is a free, open source clinical trial software platform for Electronic Data Capture (EDC) clinical data management in clinical research. The software is web-based and designed to support all types of clinical studies in diverse research settings. From the ground up, OpenClinica is built on leading independent standards to achieve high levels of interoperability. Its modular architecture and transparent, collaborative development model offer outstanding flexibility while supporting a robust, enterprise-quality solution.\
@@ -40,21 +39,17 @@ OS Requirements\
 ------------------------------------------------------\
 
 \b0 The following packages should be installed on your OS: vim, unzip, tar\
-"root" user access, all command in this install guide should be ran with root level privileges.\
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+"root" user access is required, all command in this install guide should be ran with root level privileges.\
 
-\b \cf0 \
+\b \
 Download Installation Files\
 ------------------------------------------------------\
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
 
-\b0 \cf0 OpenClinica runs and depends on several external applications: Sun's Java Development Kit, Apache Jakarta's Tomcat Servlet Container, and the Postgres Relational Database.\
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+\b0 OpenClinica runs and depends on several external applications: Sun's Java Development Kit, Apache Jakarta's Tomcat Servlet Container, and the Postgres Relational Database.\
 
-\b \cf0 \
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+\b \
 
-\b0 \cf0 At Akaza Research we keep a copy of the setup files for tomcat, postgres and java located at the link below. Note there are 32bit and 64bit editions when applicable, also these are the exact versions we test with. Our software may work with other versions of the applications but have not been tested.\
+\b0 At Akaza Research we keep a copy of the setup files for tomcat, postgres and java located at the link below. Note there are 32bit and 64bit editions when applicable, also these are the exact versions we test with. Our software may work with other versions of the applications but have not been tested.\
 \
 http://svn.akazaresearch.com/oc/software/OpenClinica-3.1/\
 \
@@ -67,9 +62,11 @@ Run the following command for your architecture to download the files on your se
 	mkdir -p /usr/local/oc/install \
 	cd /usr/local/oc/install\
 \
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+This will download OpenClinica Enterprise edition.\
+	wget --no-check-certificate --http-user=installer --http-password=dhy29sdh1 https://svn.akazaresearch.com/oc/software/OpenClinica-3.1/enterprise/OpenClinica-3.1.zip\
+\
 
-\b \cf0 Now run the 32bit or 64bit commands below depending on your architecture. 
+\b Now run the 32bit or 64bit commands below depending on your architecture. 
 \b0 \
 \
 
@@ -99,66 +96,52 @@ Postgres - http://www.postgresql.org/\
 Java - http://www.oracle.com/technetwork/java/index.html\
 Tomcat - http://tomcat.apache.org/\
 \
-To obtain the OpenClinica 3.1 software itself you can download that on our openclinica.com website from the following URL.\
-\
-https://community.openclinica.com/project/openclinica\
-\
-Note: A free community account is needed and you will be prompted to login to access the download.\
-\
-Once downloaded please move it into the "/usr/local/oc/install" directory we created and downloaded the other software into.\
 \
 
 \b FOR THE REMAINDER OF THE DOCUMENT I WILL NOT BE USING EXACT FILENAMES AS THESE NEXT STEPS CAN BE USED FOR EITHER 32BIT OR 64BIT. PLEASE FILL IN THE FILENAME AS NEEDED FOR YOUR ARCHITECTURE.\
 \
 Install Java\
 ------------------------------------------------------\
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
 
-\b0 \cf0 You should already be in "/ust/local/oc/install" if not cd into it now via the command below.\
+\b0 You should already be in "/ust/local/oc/install" if not cd into it now via the command below.\
 	cd /usr/local/oc/install\
 Now run the following to install java.\
 	chmod a+x jdk-6*\
 	./jdk-6*\
-Once done extracting and you see "Press Enter to continue\'85..", press enter. A web browser will open up to register the JDK feel free to register or close the browser.\
+Once done extracting and you see "Press Enter to continue\'85..", press enter. AIf a web browser opens up to register the JDK feel, free to register or close the browser.\
 \
 Now java is done extracting we are going to set it up in the OS with the following commands.\
 	mv jdk1*/ /usr/local/\
 	ln -s /usr/local/jdk1* /usr/local/java\
 Java is now installed and is in a location we expect it to be in.\
 \
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
 
-\b \cf0 Tomcat Install\
+\b Tomcat Install\
 ------------------------------------------------------\
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
 
-\b0 \cf0 You should already be in "/ust/local/oc/install" if not cd into it now via the command below.\
+\b0 You should already be in "/ust/local/oc/install" if not cd into it now via the command below.\
 	cd /usr/local/oc/install\
 Now run the following commands to install tomcat.\
 	tar -zxvf apache-tomcat-*\
 	mv apache-tomcat-6.0.32 /usr/local/\
-	ln -s /usr/local/apache-tomcat-6.0.32 /usr/local/tomcat\
+	ln -s /usr/local/apache-tomcat-6.0.32/ /usr/local/tomcat\
 	/usr/sbin/adduser tomcat\
 Now we are going to move all the webapps that come with tomcat to an oldwebapps directory as we do not need them\
 	mkdir /usr/local/tomcat/oldwebapps \
 	mv /usr/local/tomcat/webapps/* /usr/local/tomcat/oldwebapps\
 Tomcat is now installed, we will setup the init script we when run through the OpenClinica application setup.\
 \
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
 
-\b \cf0 Postgres install\
+\b Postgres install\
 ------------------------------------------------------\
 NOTE: If you are using oracle as your database please skip this section and install oracle now, we do not provide instructions on how to install oracle, we do provide instructions later in this document that shows you how to setup the OpenClinica user and db within oracle so OpenClinica can use oracle.\
 \
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
 
-\b0 \cf0 You should already be in "/ust/local/oc/install" if not cd into it now via the command below.\
+\b0 You should already be in "/ust/local/oc/install" if not cd into it now via the command below.\
 	cd /usr/local/oc/install\
 	chmod a+x postgresql-8.4.*\
 	./postgresql-8.4.* --mode text\
-\
 Now you will see the PostgresSQL Setup Wizard start, for the most part we want the defaults, I have displayed them below, confirm they match and hit enter for each section is they do. If they do not match type in what I have in my examples below.\
-\
 	Installation Directory [/opt/PostgreSQL/8.4]:  
 \b (press enter to accept this)\
 	
@@ -179,8 +162,8 @@ Now you will see the PostgresSQL Setup Wizard start, for the most part we want t
 	
 \b0 Install pl/pgsql in template1 database? [Y/n]:  
 \b (type "n" and press enter)\
-	
-\b0 Do you want to continue? [Y/n]:
+
+\b0 	Do you want to continue? [Y/n]:
 \b  (press enter to accept this)\
 
 \b0 Setup will install postgres and you should see a "Setup has finished installing PostgreSQL on your computer." message. You will then have the following prompt.\
@@ -188,7 +171,18 @@ Now you will see the PostgresSQL Setup Wizard start, for the most part we want t
 \b (type "n" and press enter)\
 	\
 
-\b0 Postgres is now installed and will start on boot.
+\b0 Replacing default config file with enterprise edited version.
+\b \
+	
+\b0 cp /opt/PostgreSQL/8.4/data/postgresql.conf /opt/PostgreSQL/8.4/data/postgresql.conf-orig\
+	wget --no-check-certificate --http-user=installer --http-password=dhy29sdh1  https://svn.akazaresearch.com/oc/software/OpenClinica-3.1/enterprise/linux/postgresql.conf\
+
+\b 	
+\b0 cp postgresql.conf /opt/PostgreSQL/8.4/data/postgresql.conf 
+\b (when prompted to overwrite file type "y", and hit "enter")\
+	
+\b0 \
+Postgres is now installed and will start on boot.
 \b \
 \
 Setup OpenClinica application and db.\
@@ -199,24 +193,22 @@ Setup OpenClinica application and db.\
 	unzip OpenClinica-3.1*\
 	cd OpenClinica-3.1*/distribution\
 	unzip OpenClinica.war -d OpenClinica\
+	cp -rf OpenClinica OpenClinica_test\
 	cp -rf OpenClinica* /usr/local/tomcat/webapps\
 	rm -f /usr/local/tomcat/webapps/OpenClinica.war\
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
 
-\b \cf0 \
-	\
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+\b \
 
-\b0 \cf0 OpenClinica is now deployed we will configure it after we setup the databases. \
+\b0 OpenClinica is now deployed we will configure it after we setup the databases. \
 \
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
 
-\b \cf0 Postgres DB Setup\
+\b Postgres DB Setup\
 ------------------------------------------------------
 \b0 \
-When prompted for passwords on the below commands please enter the postgres superuser password you set during postgres install.\
+When prompted for passwords on the below commands please enter the postgres superuser password you set during the postgres install.\
 	/opt/PostgreSQL/8.4/bin/psql -U postgres -c "CREATE ROLE clinica LOGIN ENCRYPTED PASSWORD 'clinica' SUPERUSER NOINHERIT NOCREATEDB NOCREATEROLE" \
 	/opt/PostgreSQL/8.4/bin/psql -U postgres -c "CREATE DATABASE  openclinica WITH ENCODING='UTF8' OWNER=clinica" \
+	/opt/PostgreSQL/8.4/bin/psql -U postgres -c "CREATE DATABASE  openclinica_test WITH ENCODING='UTF8' OWNER=clinica" \
 \
 These scripts created the db and the "clinic" db user OpenClinica uses to connect to the database. Note that the "clinic" db users password is set to "clinica" by default, since this is very insecure run the following commands to change the password.\
 \
@@ -228,24 +220,21 @@ These scripts created the db and the "clinic" db user OpenClinica uses to connec
 	
 \b0 \\q 
 \b (this will exit the psql prompt)\
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
 
-\b0 \cf0 	\
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+\b0 	\
 
-\b \cf0 Oracle DB Setup\
+\b Oracle DB Setup\
 ------------------------------------------------------\
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
 
-\b0 \cf0 Please see the following page for Oracle DB setup\
+\b0 Please see the following page for Oracle DB setup\
 \
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+{\field{\*\fldinst{HYPERLINK "https://docs.openclinica.com/3.1/installation/oracle-database-setup"}}{\fldrslt https://docs.openclinica.com/3.1/installation/oracle-database-setup}}\
+\
 
-\b \cf0 Setting tomcat to start on boot\
+\b Setting tomcat to start on boot\
 ------------------------------------------------------\
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
 
-\b0 \cf0 	cp /usr/local/oc/install/OpenClinica-3.1/install-docs/linux/tomcat /etc/init.d/	\
+\b0 	cp /usr/local/oc/install/OpenClinica-3.1/install-docs/linux/tomcat /etc/init.d/	\
 	cd /etc/init.d\
 	chmod a+x /etc/init.d/tomcat\
 	/sbin/chkconfig --add tomcat 
@@ -255,18 +244,17 @@ You can manually stop and start tomcat with these scripts instead of using the i
 \b0 \
 /usr/local/tomcat/bin/shutdown.sh\
 /usr/local/tomcat/bin/startup.sh\
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
 
-\b \cf0 \
+\b \
 \
 Configuring the OpenClinica application\
 ------------------------------------------------------
 \b0 \
 The configuration of OpenClinica in 3.1 has gotten much easier if you followed these installation instruction you should only need to edit one parameter in the configuration file (dbPass) for OpenClinica to work. You may want to add email support and other custom settings.\
 \
-The configuration file is located at "/usr/local/tomcat/webapps/OpenClinica/WEB-INF/classes/datainfo.properties ".\
+The configuration files are located at "/usr/local/tomcat/webapps/OpenClinica/WEB-INF/classes/datainfo.properties " for the production instance and "/usr/local/tomcat/webapps/OpenClinica_test/WEB-INF/classes/datainfo.properties " for the test instance.\
 \
-Edit /usr/local/tomcat/webapps/OpenClinica/WEB-INF/classes/datainfo.properties and change the properties to suit your server environment as needed.  The initial datainfo.properties file looks something like this:\
+Edit /usr/local/tomcat/webapps/OpenClinica/WEB-INF/classes/datainfo.properties and "/usr/local/tomcat/webapps/OpenClinica_test/WEB-INF/classes/datainfo.properties" and change the properties to suit your server environment as needed.  The initial datainfo.properties file looks something like this:\
 \
 #############################################################################\
 # 1 - Database Configuration\
@@ -541,36 +529,136 @@ OpenClinica_version=SNAPSHOT\
 At this point you have installed and setup tomcat, java, postgres and OpenClinica. Restart your computer and verify OpenClinica starts on boot with the following command.\
 	reboot\
 \
-Once the computer has been restarted you should be able to access OpenClinica from the following URL's on the server itself.\
-	http://localhost:8080/OpenClinica 
+
+\b Configure HTTPS\
+--------------------------------------------------------------\
+
+\b0 Akaza Research strongly recommends securing the Tomcat application server using SSL. SSL is the technology used to make secured 'https://' connections. SSL requires a third-party security certificate to be effective. Information regarding configuring ssl certificates for tomcat can be found here. http://tomcat.apache.org/tomcat-6.0-doc/ssl-howto.html\
+\
+Get your tomcat compatible ssl certificate from your IT department and place it on the server into the "/usr/local/oc/install" directory and rename the file to be "tomcat.keystore" or follow the self signed SSL certificate instructions in the next section and then return here once done.\
+\
+Run the following command to implement your SSL certificate.\
+	cd /usr/local/oc/install\
+	cp /usr/local/oc/install/tomcat.keystore /usr/local/tomcat/openclinica.data/\
+	cp /usr/local/tomcat/conf/server.xml /usr/local/tomcat/conf/server.xml-orig\
+	wget --no-check-certificate --http-user=installer --http-password=dhy29sdh1  https://svn.akazaresearch.com/oc/software/OpenClinica-3.1/enterprise/linux/ssl-server.xml\
+	cp /usr/local/oc/install/ssl-server.xml /usr/local/tomcat/conf/server.xml
+\b  (When prompted to overwrite type "y" and press "enter")
+\b0 \
+\
+Edit "usr/local/tomcat/conf/server.xml" and replace "SSLPASSWORD" with your keystore password in the port 8443 connector section.\
+If your certificate is in "java keystore" format this is the only thing you need to edit, if your certificate is in "pkcs12" format you have to add the following to the connector "<keystoreType="pkcs12>", example is below.\
+\
+    <Connector port="8443" protocol="HTTP/1.1" SSLEnabled="true"\
+               maxThreads="150" scheme="https" secure="true"\
+               clientAuth="false" sslProtocol="TLS" \
+               ciphers="SSL_RSA_WITH_RC4_128_MD5, SSL_RSA_WITH_RC4_128_SHA, TLS_RSA_WITH_AES_128_CBC_SHA, TLS_DHE_RSA_WITH_AES_128_CBC_SHA, TLS_DHE_DSS_WITH_AES_128_CBC_SHA, SSL_RSA_WITH_3DES_EDE_CBC_SHA, SSL_DHE_RSA_WITH_3DES_EDE_CBC_SHA, SSL_DHE_DSS_WITH_3DES_EDE_CBC_SHA"\
+               keystoreFile="/usr/local/tomcat/openclinica.data/tomcat.keystore"\
+               keystorePass="SSLPASSWORD" <keystoreType="pkcs12>  />\
+\
+Once done with your edits save the file. We will know want to restart tomcat to apply the changes. Due this by issuing the following command.\
+	/etc/init.d/tomcat restart\
+\
+Since we do not have our customers access OpenClinca on port 8443 we have to do an iptables-redirect that redirects traffic from 443 to 8443. This is accomplished by running the following commands.\
+	/sbin/iptables -t nat -I PREROUTING --src 0/0 -p tcp --dport 443 -j REDIRECT --to-ports 8443\
+	/sbin/iptables-save > /etc/sysconfig/iptables 
+\b (redhat only, see how to have your iptables persist through a reboot for your linux distro)\
+\
+
+\b0 After the above commands have been run you should be able to access OpenClinica from the following URL's. 
+\b (Note: For local firewalls you will need to have both "443" and "8443" open, for external firewall's you just need port "443" open)
+\b0 \
+\
+	https://localhost/OpenClinica 
+\b (from another machine replace "localhost" with the servers IP or hostname)\
+
+\b0 	https://localhost/OpenClinica_test 
 \b (from another machine replace "localhost" with the servers IP or hostname)\
 \
-Configure HTTPS\
---------------------------------------------------------------\
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
 
-\b0 \cf0 Akaza Research strongly recommends securing the Tomcat application server using SSL. SSL is the technology used to make secured 'https://' connections. SSL requires a third-party security certificate to be effective. Information regarding configuring ssl certificates for tomcat can be found here. http://tomcat.apache.org/tomcat-6.0-doc/ssl-howto.html
+\b0 To make sure the iptables redirect persists after a reboot issue the following command to restart the server.\
+	reboot
 \b \
 \
 
+\b0 After the server has restarted you should be able to access OpenClinica from the following URL's. 
+\b (Note: For local firewalls you will need to have both "443" and "8443" open, for external firewall's you just need port "443" open)
 \b0 \
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+\
+	https://localhost/OpenClinica 
+\b (from another machine replace "localhost" with the servers IP or hostname)\
 
-\b \cf0 Verify environment by logging in
+\b0 	https://localhost/OpenClinica_test 
+\b (from another machine replace "localhost" with the servers IP or hostname)\
+\
+
+\b0 If you cannot access the URL's please ask the administrator to confirm ports 443 and 8443 are open in the firewall.
+\b \
+\
+\
+Self Signed SSL certificate instructions\
+--------------------------------------------------------------\
+
+\b0 Skip this section if you are not using a self signed SSL certificate.\
+\
+To create a self signed ssl certificate run the following commands.\
+\
+You should already be in "/ust/local/oc/install" if not cd into it now via the command below.\
+	mkdir -p /usr/local/oc/install/ssl\
+	cd /usr/local/oc/install/ssl\
+	/usr/local/jdk1.6.0_24/bin/keytool -genkey -alias tomcat_key -keyalg RSA -keysize 2048 -keystore tomcat.keystore -validity 365\
+	When prompted with "Enter keystore password:" please enter a password for you ssl certificate and remember this password as your keystore password as you will need it in future steps, once password is entered press "enter" and retype the password when you are prompted with "Re-enter new password: ".\
+The next set of questions are related to your certificate and should be filled out accordingly for this server. Below is some examples and explanations when needed.\
+	What is your first and last name? [Unknown]:  
+\b (This is your server name or IP so you wool enter "openclinica.example.com" or an IP like 192.168.1.15)\
+	
+\b0 What is the name of your organizational unit?  [Unknown]:  
+\b (Usually people put the name of the company or department ex. "Akaza Research LLC")\
+
+\b0 	What is the name of your organization?  [Unknown]:  
+\b (This is almost always the company name and most people have this and the above option be the same but it is not required)\
+	
+\b0 What is the name of your City or Locality?  [Unknown]: 
+\b (Enter your city, ex. "Waltham")\
+
+\b0 	What is the name of your State or Province?  [Unknown]:
+\b  (Enter your state, ex "Massachusetts")\
+
+\b0 	What is the two-letter country code for this unit?  [Unknown]:  
+\b (Enter your countries two letter abbreviation, ex "US")
+\b0 \
+	Is CN=192.168.15.156, OU=Akaza Research LLC, O=Akaza Research LLC, L=Waltham, ST=Massachusetts, C=US correct?  [no]:  
+\b (This is just making sure you entered the correct data, if it looks good type "yes" and press "enter" otherwise type "no" and press "enter" and you will start the questions over)\
+
+\b0 	Enter key password for <tomcat_key>        (RETURN if same as keystore password):  
+\b (For this prompt do NOT enter your password and just hit "enter")\
+
+\b0 \
+We have finished creating the self signed certificate.\
+\
+Now we will move tomcat.keystore to "/usr/local/oc/install" with the following command.\
+	 mv tomcat.keystore /usr/local/oc/install/\
+\
+Now go back to the "CONFIGURE HTTPS" section above.	\
+
+\b 	\
+
+\b0 \
+
+\b Verify environment by logging in
 \b0 \
 
 \b --------------------------------------------------------------
 \b0 \
-Login with the username "root" and the password "12345678". Please change this password as soon as you log in. The root user will be assigned a default project called "default". Create a technical admininstrator login for youself and secure the password for the default root user. Create user accounts, you will want to create at least one Study Coordinator.\
+Login with the username "root" and the password "12345678". Please change this password as soon as you log in. The root user will be assigned a default project called "default". Create a technical administrator login for yourself and secure the password for the default root user. Create user accounts, you will want to create at least one Study Coordinator.\
 \
 Refer users to the OpenClinica Quick Start for instructions on using the application.\
 
 \b \
 Validation and Testing\
 --------------------------------------------------------------\
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
 
-\b0 \cf0 Please contact contact@akazaresearch.com for services to assist with on-site or remote installation, validation and quality assurance services for OpenClinica.
+\b0 Please contact contact@akazaresearch.com for services to assist with on-site or remote installation, validation and quality assurance services for OpenClinica.
 \b \
 \
 Developer and Contact Information\
