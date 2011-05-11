@@ -124,7 +124,7 @@ public class CoreResources implements ResourceLoaderAware {
     /**
      * For changing values which are applicable to all properties, for ex webapp name can be used in any properties
      */
-    private void setDataInfoVals() {
+    private void setDataInfoVals(String filePath) {
 
         Enumeration<String> properties = (Enumeration<String>) DATAINFO.propertyNames();
         String vals, key;
@@ -135,12 +135,22 @@ public class CoreResources implements ResourceLoaderAware {
             logMe(" key: " + key + " vals:" + vals);
             vals = replaceWebapp(vals);
             vals = replaceCatHome(vals);
+            vals = replaceFilePath(vals,filePath);
             logMe("key: " + key + " vals:" + vals);
             DATAINFO.setProperty(key, vals);
         }
 
     }
 
+    
+    private static String replaceFilePath(String value,String filePath){
+        if (value.contains("${filePath}")) {
+            logMe("value?"+value);
+            value = value.replace("${WEBAPP}", filePath);
+            logMe("value after replaced?"+value);
+        }
+        return value;
+    }
     private static String replaceWebapp(String value) {
         logMe(value);
 
@@ -181,18 +191,6 @@ public class CoreResources implements ResourceLoaderAware {
             catalina = System.getenv("catalina.home");
             logMe("----set catalina " + catalina);
         }
-        //        logMe("catalina home - " + value);
-        //        logMe("CATALINA_HOME system variable is " + System.getProperty("CATALINA_HOME"));
-        //        logMe("CATALINA_HOME system env variable is " + System.getenv("CATALINA_HOME"));
-        //        logMe(" -Dcatalina.home system property variable is"+System.getProperty(" -Dcatalina.home"));
-        //        logMe("CATALINA.HOME system env variable is"+System.getenv("catalina.home"));
-        //        logMe("CATALINA_BASE system env variable is"+System.getenv("CATALINA_BASE"));
-        //        Map<String, String> env = System.getenv();
-        //        for (String envName : env.keySet()) {
-        //            logMe("%s=%s%n"+ envName+ env.get(envName));
-        //        }
-
-        
         if (value.contains("${catalina.home}") &&  catalina != null) {
             value = value.replace("${catalina.home}", catalina);
             logMe("replaced ${catalina.home} with " + catalina);
@@ -229,7 +227,7 @@ public class CoreResources implements ResourceLoaderAware {
 
         logMe("DataInfo..." + DATAINFO);
         logMe("filePath = " + filePath);
-        setDataInfoVals();
+        setDataInfoVals( filePath);
         if(DATAINFO.getProperty("filePath")==null || DATAINFO.getProperty("filePath").length()<=0) 
             DATAINFO.setProperty("filePath", filePath);
 
@@ -369,10 +367,10 @@ public class CoreResources implements ResourceLoaderAware {
     private void copyBaseToDest(ResourceLoader resourceLoader) {
         // System.out.println("Properties directory?"+resourceLoader.getResource("properties/xslt"));
 
-        ByteArrayInputStream listSrcFiles[] = new ByteArrayInputStream[10];
+        ByteArrayInputStream listSrcFiles[] = new ByteArrayInputStream[11];
         String[] fileNames =
             { "odm_spss_dat.xsl", "ODMToTAB.xsl", "odm_to_html.xsl", "odm_to_xslfo.xsl", "ODM-XSLFO-Stylesheet.xsl", "odm_spss_sps.xsl", "copyXML.xsl",
-                "odm1.3_to_1.2.xsl", "odm1.3_to_1.2_extensions.xsl", "odm1.3_to_1.3_no_extensions.xsl" };
+                "odm1.3_to_1.2.xsl", "odm1.3_to_1.2_extensions.xsl", "odm1.3_to_1.3_no_extensions.xsl","ODMReportStylesheet.xsl" };
         try {
             listSrcFiles[0] =
                 (ByteArrayInputStream) resourceLoader.getResource("classpath:properties" + File.separator + "xslt" + File.separator + fileNames[0])
@@ -403,6 +401,9 @@ public class CoreResources implements ResourceLoaderAware {
                         .getInputStream();
             listSrcFiles[9] =
                 (ByteArrayInputStream) resourceLoader.getResource("classpath:properties" + File.separator + "xslt" + File.separator + fileNames[9])
+                        .getInputStream();
+            listSrcFiles[10] =
+                (ByteArrayInputStream) resourceLoader.getResource("classpath:properties" + File.separator + "xslt" + File.separator + fileNames[10])
                         .getInputStream();
 
         } catch (IOException ioe) {
@@ -500,14 +501,10 @@ public class CoreResources implements ResourceLoaderAware {
 
         File dest = null;
         try {
-            // File placeholder_file = new
-            // File(resourceLoader.getResource("classpath:properties" +
-            // File.separator + "placeholder.properties").getURL().getFile());
-            File placeholder_file = new File(resourceLoader.getResource("classpath:org/akaza/openclinica/applicationContext-web-beans.xml").getURL().getFile());
+            File placeholder_file = new File(resourceLoader.getResource("classpath:properties" + File.separator + "placeholder.properties").getURL().getFile());
             String placeholder_file_path = placeholder_file.getPath();
-            // String tmp1 = placeholder_file_path.substring(6);
-            // String tmp2 = tmp1.substring(0, tmp1.indexOf("WEB-INF") - 1);
-            String tmp2 = placeholder_file_path.substring(0, placeholder_file_path.indexOf("WEB-INF") - 1);
+            String tmp1 = placeholder_file_path.substring(6);
+            String tmp2 = tmp1.substring(0, tmp1.indexOf("WEB-INF") - 1);
             String tmp3 = tmp2 + File.separator + "WEB-INF" + File.separator + "classes";
             dest = new File(tmp3 + File.separator + "odm_mapping");
 
