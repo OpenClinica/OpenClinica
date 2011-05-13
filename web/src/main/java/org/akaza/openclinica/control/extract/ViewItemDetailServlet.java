@@ -48,7 +48,8 @@ public class ViewItemDetailServlet extends SecureController {
         locale = request.getLocale();
         // < respage =
         // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",locale);
-        if (SubmitDataServlet.mayViewData(ub, currentRole)) {
+
+        if (currentStudy.getParentStudyId() == 0 && SubmitDataServlet.mayViewData(ub, currentRole)) {
             return;
         }
         addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));

@@ -5513,5 +5513,24 @@ public abstract class DataEntryServlet extends CoreSecureController {
         }
         return n != null && n.getId() > 0 ? n : new SectionBean();
     }
+
+    public void mayAccess(HttpServletRequest request) throws InsufficientPermissionException {
+        FormProcessor fp = new FormProcessor(request);
+        EventCRFDAO edao = new EventCRFDAO(getDataSource());
+        UserAccountBean ub =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
+        int eventCRFId = fp.getInt("ecId", true);
+        if (eventCRFId == 0) {
+            eventCRFId = fp.getInt("eventCRFId", true);
+        }
+
+        if (eventCRFId > 0) {
+            if (!entityIncluded(eventCRFId, ub.getName(), edao, getDataSource())) {
+                addPageMessage(respage.getString("required_event_CRF_belong"), request);
+                throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("entity_not_belong_studies"), "1");
+            }
+        }
+
+
+    }
 }
   
