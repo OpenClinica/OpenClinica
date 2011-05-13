@@ -216,6 +216,9 @@
 							<td class="table_header_row">
 								<xsl:text>Study Subject ID</xsl:text>
 							</td>
+							<td class="table_header_row">
+								<xsl:text>Protocol ID</xsl:text>
+							</td>
 							<xsl:if test="$uniqueIdExist">
 								<td class="table_header_row">
 									<xsl:text>Person ID</xsl:text>
@@ -407,9 +410,17 @@
 		mode="allSubjectData">
 		<xsl:param name="tokenizedEventHeaders"/>
 		<xsl:param name="tokenizedcrfAndDataItemsHeaders"/>
+		
+		<xsl:variable name="studyOID" select="../@StudyOID"/>
+		<xsl:variable name="studyElement" select="//odm:Study[@OID = $studyOID]"/>
+		<xsl:variable name="protocolName" select="$studyElement/odm:GlobalVariables/odm:ProtocolName"/>
+		
 		<tr valign="top">
 			<td class="table_cell_left">
 				<xsl:value-of select="@OpenClinica:StudySubjectID"></xsl:value-of>
+			</td>
+			<td class="table_cell_left">
+				<xsl:value-of select="$protocolName"></xsl:value-of>
 			</td>
 			<xsl:if test="$uniqueIdExist">
 				<td class="table_cell">

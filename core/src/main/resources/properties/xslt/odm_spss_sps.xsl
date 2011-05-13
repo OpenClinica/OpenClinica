@@ -2388,6 +2388,10 @@
 
 <xsl:template name="subjectDataColumnHeaders" mode="subjectDataColumnHeaders" match="/odm:ODM/odm:ClinicalData/odm:SubjectData" >
 		
+		<xsl:variable name="studyOID" select="../@StudyOID"/>
+		<xsl:variable name="studyElement" select="//odm:Study[@OID = $studyOID]"/>
+		<xsl:variable name="protocolName" select="$studyElement/odm:GlobalVariables/odm:ProtocolName"/>
+		
 		<xsl:text>StudySubjectID</xsl:text>
 		<xsl:variable name="valueLength">
 			<xsl:for-each select="//odm:ODM/odm:ClinicalData/odm:SubjectData/string-length(@OpenClinica:StudySubjectID)">
@@ -2400,6 +2404,20 @@
 		<xsl:text> A</xsl:text><xsl:value-of select="$valueLength" />
 		<!--<xsl:text> "Study Subject ID"</xsl:text>-->
 		<xsl:text>&#xa;</xsl:text>
+		
+		<xsl:text>ProtocolID</xsl:text>
+		<xsl:variable name="valueLengthProtocolID">
+			<xsl:for-each select="//odm:ODM/odm:Study/odm:GlobalVariables/odm:ProtocolName/string-length(.)">
+				<xsl:sort data-type="number"/>
+				<xsl:if test="position() = last()">
+					<xsl:value-of select="."/>
+				</xsl:if>
+			</xsl:for-each>
+		</xsl:variable>
+		<xsl:text> A</xsl:text><xsl:value-of select="$valueLengthProtocolID" />
+		<!--<xsl:text> "Study Subject ID"</xsl:text>-->
+		<xsl:text>&#xa;</xsl:text>
+		
 		<!--<xsl:text>ProtocolID</xsl:text>
 		<xsl:text> "Protocol ID_Site ID"</xsl:text>
 		<xsl:text>&#xa;</xsl:text>-->
@@ -2471,6 +2489,11 @@
 		<xsl:text>StudySubjectID</xsl:text>
 		<xsl:text> "Study Subject ID"</xsl:text><xsl:text> /</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
+		
+		<xsl:text>ProtocolID</xsl:text>
+		<xsl:text> "Protocol ID"</xsl:text><xsl:text> /</xsl:text>
+		<xsl:text>&#xa;</xsl:text>
+		
 		<!--<xsl:text>ProtocolID</xsl:text>
 		<xsl:text> "Protocol ID_Site ID"</xsl:text>
 		<xsl:text>&#xa;</xsl:text>-->
