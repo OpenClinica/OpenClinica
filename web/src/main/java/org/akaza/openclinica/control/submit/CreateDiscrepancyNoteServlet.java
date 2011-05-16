@@ -128,6 +128,9 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
     
     public static final String WHICH_RES_STATUSES = "whichResStatus";
 
+    public String exceptionName = resexception.getString("no_permission_to_create_discrepancy_note");
+    public String noAccessMessage = respage.getString("you_may_not_create_discrepancy_note") + respage.getString("change_study_contact_sysadmin");
+
     /*
      * (non-Javadoc)
      *
@@ -143,9 +146,6 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
         // < respage =
         // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",
         // locale);
-
-        String exceptionName = resexception.getString("no_permission_to_create_discrepancy_note");
-        String noAccessMessage = respage.getString("you_may_not_create_discrepancy_note") + respage.getString("change_study_contact_sysadmin");
 
         if (SubmitDataServlet.mayViewData(ub, currentRole)) {
             return;
@@ -430,6 +430,11 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                 dnb.setSubjectName(ssub.getName());
                 dnb.setSubjectId(ssub.getId());
                 dnb.setStudySub(ssub);
+                if (ssub.getStudyId() != currentStudy.getId() && ssub.getStudyId() != currentStudy.getParentStudyId()) {
+                    addPageMessage(noAccessMessage);
+                    throw new InsufficientPermissionException(Page.MENU_SERVLET, exceptionName, "1");
+                }
+                
             }
             if (itemId > 0) {
                 ItemBean item = (ItemBean) new ItemDAO(sm.getDataSource()).findByPK(itemId);
