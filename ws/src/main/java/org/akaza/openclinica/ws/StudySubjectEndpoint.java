@@ -144,19 +144,25 @@ public class StudySubjectEndpoint {
      */
     @PayloadRoot(localPart = "listAllByStudyRequest", namespace = NAMESPACE_URI_V1)
     public ListAllByStudyResponse listStudySubjectsInStudy(JAXBElement<ListStudySubjectsInStudyType> requestElement) throws Exception {
-        ResourceBundleProvider.updateLocale(new Locale("en_US"));
-        ListStudySubjectsInStudyType listStudySubjectsInStudyType = requestElement.getValue();
-        StudyBean study = null;
         try {
-            study = validateRequestAndReturnStudy(listStudySubjectsInStudyType.getStudyRef());
-        } catch (OpenClinicaSystemException e) {
-            ListAllByStudyResponse response = new ListAllByStudyResponse();
-            response.setResult(messages.getMessage("studySubjectEndpoint.fail", null, "Fail", locale));
-            response.getError().add(messages.getMessage(e.getErrorCode(), null, e.getErrorCode(), locale));
-            return response;
+            ResourceBundleProvider.updateLocale(new Locale("en_US"));
+            ListStudySubjectsInStudyType listStudySubjectsInStudyType = requestElement.getValue();
+            StudyBean study = null;
+            try {
+                study = validateRequestAndReturnStudy(listStudySubjectsInStudyType.getStudyRef());
+            } catch (OpenClinicaSystemException e) {
+                e.printStackTrace();
+                ListAllByStudyResponse response = new ListAllByStudyResponse();
+                response.setResult(messages.getMessage("studySubjectEndpoint.fail", null, "Fail", locale));
+                response.getError().add(messages.getMessage(e.getErrorCode(), null, e.getErrorCode(), locale));
+                return response;
+            }
+            return mapListStudySubjectsInStudyResponse(study, messages.getMessage("studySubjectEndpoint.success", null, "Success", locale),
+                    listStudySubjectsInStudyType.getStudyRef());
+        } catch (Exception eee) {
+            eee.printStackTrace();
+            throw eee;
         }
-        return mapListStudySubjectsInStudyResponse(study, messages.getMessage("studySubjectEndpoint.success", null, "Success", locale),
-                listStudySubjectsInStudyType.getStudyRef());
     }
 
     /**
