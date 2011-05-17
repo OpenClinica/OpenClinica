@@ -52,13 +52,16 @@ public class ImportRuleServlet extends SecureController {
     XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
     RulesPostImportContainerService rulesPostImportContainerService;
 
+    private static final String RULES_XSD_FILENAME = "rules.xsd";
+    private static final String MAPPING_XSD_FILENAME = "mapping.xml";
+
     @Override
     public void processRequest() throws Exception {
         String action = request.getParameter("action");
         request.setAttribute("contextPath", getContextPath());
         request.setAttribute("hostPath", getHostPath());
-        //@pgawade 13-April-2011 -  #8877 
-		// request.setAttribute("designerURL",
+        // @pgawade 13-April-2011 - #8877
+        // request.setAttribute("designerURL",
         // getCoreResources().getField("designer.url"));
 
         if (StringUtil.isBlank(action)) {
@@ -84,12 +87,7 @@ public class ImportRuleServlet extends SecureController {
 
             try {
                 File f = uploadHelper.returnFiles(request, context, getDirToSaveUploadedFileIn()).get(0);
-                // File xsdFile = new File(getServletContext().getInitParameter("propertiesDir") + "rules.xsd");
-                // File xsdFile = new File(SpringServletAccess.getPropertiesDir(context) + "rules.xsd");
-                InputStream xsdFile = getCoreResources().getInputStream("rules.xsd");
-
-                schemaValidator.validateAgainstSchema(f, xsdFile);
-                RulesPostImportContainer importedRules = handleLoadCastor(f);
+                RulesPostImportContainer importedRules = loadXML(f);
                 logger.info(ub.getFirstName());
                 importedRules = getRulesPostImportContainerService().validateRuleDefs(importedRules);
                 importedRules = getRulesPostImportContainerService().validateRuleSetDefs(importedRules);
@@ -108,6 +106,18 @@ public class ImportRuleServlet extends SecureController {
                 forwardPage(Page.IMPORT_RULES);
             }
         }
+    }
+
+    private RulesPostImportContainer loadXML(File xmlFile) {
+        RulesPostImportContainer importedRules = null;
+        try {
+            importedRules = handleLoadCastor(xmlFile, RULES_XSD_FILENAME, MAPPING_XSD_FILENAME);
+            return importedRules;
+        } catch (OpenClinicaSystemException ose) {
+            importedRules = handleLoadCastor(xmlFile, "rules-ODM.xsd", "mappingDesigner.xml");
+            return importedRules;
+        }
+
     }
 
     private void provideMessage(RulesPostImportContainer rulesContainer) {
@@ -139,16 +149,19 @@ public class ImportRuleServlet extends SecureController {
         return theDir;
     }
 
-    private RulesPostImportContainer handleLoadCastor(File xmlFile) {
+    private RulesPostImportContainer handleLoadCastor(File xmlFile, String xsdFileName, String mappingFileName) {
 
         RulesPostImportContainer ruleImport = null;
         try {
+            // Validate xml using xsd
+            InputStream xsdFile = getCoreResources().getInputStream(xsdFileName);
+            schemaValidator.validateAgainstSchema(xmlFile, xsdFile);
             // create an XMLContext instance
             XMLContext xmlContext = new XMLContext();
             // create and set a Mapping instance
             Mapping mapping = xmlContext.createMapping();
             // mapping.loadMapping(SpringServletAccess.getPropertiesDir(context) + "mapping.xml");
-            mapping.loadMapping(getCoreResources().getURL("mapping.xml"));
+            mapping.loadMapping(getCoreResources().getURL(mappingFileName));
 
             xmlContext.addMapping(mapping);
             // create a new Unmarshaller
