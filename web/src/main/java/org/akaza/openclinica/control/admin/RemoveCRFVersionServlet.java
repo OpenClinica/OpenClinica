@@ -197,13 +197,16 @@ public class RemoveCRFVersionServlet extends SecureController {
     // when existing default version is locked
     public static void updateEventDef(EventDefinitionCRFBean edcBean, EventDefinitionCRFDAO edcDao, ArrayList versionList, int crfVIdToLock) {
         ArrayList<Integer> idList = new ArrayList<Integer>();
-        CRFVersionBean temp = (CRFVersionBean) versionList.get(0);
+        CRFVersionBean temp = null;
+        if ((null != versionList) && (versionList.size() > 0)) {
+            temp = (CRFVersionBean) versionList.get(0);
+        }
         // Check the first version in list if it is getting locked
         // here. If not, make that as default version. Otherwise get the next
         // element in list and make that as the default version.
 
         if (StringUtil.isBlank(edcBean.getSelectedVersionIds())){
-            if ((null != temp) && (temp.getId() == crfVIdToLock)) {
+            if ((null != temp) && (temp.getId() == crfVIdToLock) && (null != versionList) && (versionList.size() > 1)) {
                 CRFVersionBean temp2 = (CRFVersionBean) versionList.get(1);
                 edcBean.setDefaultVersionId(temp2.getId());
             } else {
