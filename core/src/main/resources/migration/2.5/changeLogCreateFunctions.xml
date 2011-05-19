@@ -2419,6 +2419,35 @@
 			      );
 			END IF;
 		    END IF;
+		    IF(OLDREC.sdv_status <![CDATA[<>]]> NEWREC.sdv_status) THEN
+			  entity_name_value := 'EventCRF SDV Status';
+			  event_type_id := '32';
+			  /* -- */
+			    INSERT INTO audit_log_event(
+				audit_id,
+				audit_log_event_type_id,
+				audit_date,
+				user_id,
+				audit_table,
+				entity_id,
+				entity_name,
+				old_value,
+				new_value,
+				event_crf_id
+			      ) VALUES (
+				audit_log_event_audit_id_seq.nextval,
+				event_type_id,
+				sysdate,
+				NEWREC.update_id,
+				'event_crf',
+				NEWREC.event_crf_id,
+				entity_name_value,
+				OLDREC.sdv_status,
+				NEWREC.sdv_status,
+				NEWREC.event_crf_id
+			      );
+			END IF;
+		    END IF;
 		END;
 		 /* -------------------------------------------------------------------------------- */
 
