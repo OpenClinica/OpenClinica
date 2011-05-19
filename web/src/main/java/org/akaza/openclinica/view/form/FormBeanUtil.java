@@ -96,9 +96,9 @@ public class FormBeanUtil {
      * @return A List of DisplayItemBeans.
      */
     public static List<DisplayItemBean> getDisplayBeansFromItems(List<ItemBean> itemBeans, 
-    		DataSource dataSource, 
-    		EventCRFBean eventCrfBean, 
-    		int sectionId,
+            DataSource dataSource, 
+            EventCRFBean eventCrfBean, 
+            int sectionId,
             List<String> nullValuesList, 
             ServletContext context) {
         // logger = LoggerFactory.getLogger(getClass().getName());
@@ -120,7 +120,86 @@ public class FormBeanUtil {
         // findByItemIdAndCRFVersionId
         for (ItemBean iBean : itemBeans) {
             displayBean = new DisplayItemBean();
-            meta = metaDao.findByItemIdAndCRFVersionId(iBean.getId(), eventCrfBean.getCRFVersionId());
+            meta = metaDao.findByItemIdAndCRFVersionId(iBean.getId(), eventCrfBean.getCRFVersionId());//TODO: eventcrfBean is not valid??
+
+            // Only include Items that belong to the associated section
+            if (meta.getSectionId() == sectionId) {
+                displayBean.setItem(iBean);
+                ItemDataBean itemDataBean = itemDataDAO.findByItemIdAndEventCRFId(iBean.getId(), eventCrfBean.getId());//findByItemIdAndEventCRFIdAndOrdinal(iBean.getId(), eventCrfBean.getId(), ordinal)
+                // null values is set by adding the event def. crf bean, but
+                // here we have taken a different approach, tbh
+                // displayBean.setEventDefinitionCRF();
+                displayBean.setMetadata(runDynamicsCheck(meta, eventCrfBean, itemDataBean, context));
+                displayBean.setData(itemDataBean);
+                displayBean.setDbData(itemDataBean);
+                // System.out.println("just set: " + itemDataBean.getValue() + " from " + itemDataBean.getItemId());
+
+                responseName = displayBean.getMetadata().getResponseSet().getResponseType().getName();
+                respOptions = displayBean.getMetadata().getResponseSet().getOptions();
+                if (hasNullValues
+                    && respOptions != null
+                    && ("checkbox".equalsIgnoreCase(responseName) || "radio".equalsIgnoreCase(responseName) || "single-select".equalsIgnoreCase(responseName) || "multi-select"
+                            .equalsIgnoreCase(responseName))) {
+
+                    for (String val : nullValuesList) {
+                        respBean = new ResponseOptionBean();
+                        // BWP>> set text to the extended version, "not
+                        // applicable"?
+                        tmpVal = DataEntryInputGenerator.NULL_VALUES_LONGVERSION.get(val);
+                        if (tmpVal != null && tmpVal.length() > 0) {
+                            respBean.setText(tmpVal);
+                        } else {
+                            respBean.setText(val);
+                        }
+
+                        respBean.setValue(val);
+                        respOptions.add(respBean);
+                    }
+                }
+                disBeans.add(displayBean);
+                // logger.info("### respOptions size
+                // "+respOptions.size()+" of item name "+iBean.getName());
+            }
+            // logger.info("### found name "+iBean.getName()+" and found
+            // response size: "+
+            // displayBean.getMetadata().getResponseSet().getOptions().size());
+
+        }
+
+        // sort the List of DisplayItemBeans on their ordinal
+        Collections.sort(disBeans);
+        return disBeans;
+    }
+
+    
+    
+    public static List<DisplayItemBean> getDisplayBeansFromItemsForPrint(List<ItemBean> itemBeans, 
+            DataSource dataSource, 
+            EventCRFBean eventCrfBean, 
+            int sectionId,
+            List<String> nullValuesList, 
+            ServletContext context,
+            int crfVersionId) {
+        // logger = LoggerFactory.getLogger(getClass().getName());
+        List<DisplayItemBean> disBeans = new ArrayList<DisplayItemBean>();
+        if (itemBeans == null || itemBeans.isEmpty())
+            return disBeans;
+        ItemFormMetadataDAO metaDao = new ItemFormMetadataDAO(dataSource);
+        ItemDataDAO itemDataDAO = new ItemDataDAO(dataSource);
+        DisplayItemBean displayBean;
+        ItemFormMetadataBean meta;
+
+        // Add any null values to checks or radios
+        String responseName;
+        List<ResponseOptionBean> respOptions;
+        ResponseOptionBean respBean;
+
+        boolean hasNullValues = nullValuesList != null && !nullValuesList.isEmpty();
+        String tmpVal = "";
+        // findByItemIdAndCRFVersionId
+        for (ItemBean iBean : itemBeans) {
+            displayBean = new DisplayItemBean();
+            meta = metaDao.findByItemIdAndCRFVersionId(iBean.getId(), crfVersionId);//TODO: eventcrfBean is not valid??
 
             // Only include Items that belong to the associated section
             if (meta.getSectionId() == sectionId) {
@@ -308,10 +387,11 @@ public class FormBeanUtil {
 
         // divide up items into columns
         int numberOfColumns = getNumberOfColumnsFromItems(items);
+        numberOfColumns = 5;
         // Fixing table width for orphan table Mantis issue: 9087.
         // ToDo recheck why the main table getting fixed 
-        int tableWidth = numberOfColumns*300;
-        table.setAttribute("style", "width:" + tableWidth + "px;");
+       // int tableWidth = numberOfColumns*300;
+     //   table.setAttribute("style", "width:" + tableWidth + "px;");
 
 
         // A Map designed to hold DisplayItemBeans according to their column
@@ -323,7 +403,7 @@ public class FormBeanUtil {
         // with the first row of DisplayItemBeans
         SortedMap<Integer, List<DisplayItemBean>> multiRowMap = new TreeMap<Integer, List<DisplayItemBean>>();
         // This isn't necessary unless there is more than one column
-        if (numberOfColumns > 1) {
+       if (numberOfColumns > 1) {
             int column;
             for (DisplayItemBean displayItem : items) {
                 column = displayItem.getMetadata().getColumnNumber();
@@ -333,6 +413,7 @@ public class FormBeanUtil {
                 colMap.get(column).add(displayItem);
             }
             int numberOfRows = getNumberOfTableRows(colMap);
+           // numberOfRows = 2;
             List<DisplayItemBean> itemsList;
             // the list inside multiRowMap
             List<DisplayItemBean> rowsList;
@@ -382,7 +463,7 @@ public class FormBeanUtil {
             temp = beanList.size();
             highestRowNumber = temp > highestRowNumber ? temp : highestRowNumber;
         }
-        return highestRowNumber;
+        return 1;
     }
 
     /**
@@ -572,7 +653,7 @@ public class FormBeanUtil {
         List<DisplayItemBean> itemsList;
         int numberOfBeansInRow;
 
-        Element formFieldRow;
+        Element  formFieldRow = new Element("tr");;
         Element headerRow;
         Element subHeaderRow;
 
@@ -583,7 +664,7 @@ public class FormBeanUtil {
             // Each Entry points to a List of DisplayItemBeans that are in the
             // rows
             // Create the row containing the item + form field
-            formFieldRow = new Element("tr");
+            
             headerRow = new Element("tr");
             subHeaderRow = new Element("tr");
             String leftSideTxt = "";
@@ -660,8 +741,9 @@ public class FormBeanUtil {
             if (cellCountDif > 0) {
                 formFieldRow = addEmptyTDcells(formFieldRow, cellCountDif);
             }
-            tbody.addContent(formFieldRow);
+           
         }
+        tbody.addContent(formFieldRow);
     }
 
     private Element addEmptyTDcells(Element row, int numberOfCellsToAdd) {
@@ -726,7 +808,7 @@ public class FormBeanUtil {
         SectionBean secBean = (SectionBean) sectionDao.findByPK(sectionId);
         displaySectionBean.setSection(secBean);
         // changed from: findGroupBySectionId
-        List<ItemGroupBean> itemGroupBeans = formGroupDAO.findLegitGroupBySectionId(sectionId);
+        List<ItemGroupBean> itemGroupBeans = formGroupDAO.findLegitGroupAllBySectionId(sectionId);
         // all items associated with the section, including those not in a group
         List<ItemFormMetadataBean> allMetas = new ArrayList<ItemFormMetadataBean>();
         try {
@@ -770,6 +852,113 @@ public class FormBeanUtil {
                 itemGroup.setMeta(meta);
             }
             displayItems = getDisplayBeansFromItems(itBeans, dataSource, eventCrfBean, sectionId, nullValuesList, context);
+            displayItemGBean = this.createDisplayFormGroup(displayItems, itemGroup);
+            displayFormBeans.add(displayItemGBean);
+        }
+        // We still have to sort these display item group beans on their
+        // ItemGroupMetadataBean?
+        // then number their ordinals accordingly
+        Collections.sort(displayFormBeans, new Comparator<DisplayItemGroupBean>() {
+
+            public int compare(DisplayItemGroupBean displayItemGroupBean, DisplayItemGroupBean displayItemGroupBean1) {
+                return displayItemGroupBean.getGroupMetaBean().compareTo(displayItemGroupBean1.getGroupMetaBean());
+            }
+        });
+        // Now provide the display item group beans with an ordinal
+        int digOrdinal = 0;
+        for (DisplayItemGroupBean digBean : displayFormBeans) {
+            digBean.setOrdinal(++digOrdinal);
+        }
+
+        // find out whether there are any ungrouped items by comparing the
+        // number of
+        // grouped items to allMetas.size()
+        // List<DisplayItemGroupBean> nonGroupBeans=null;
+        int tempCount = 0;
+        for (DisplayItemGroupBean groupBean : displayFormBeans) {
+            tempCount += groupBean.getItems().size();
+        }
+        if (tempCount < allMetas.size()) {
+            nonGroupBeans = createGroupBeansForNongroupedItems(allMetas, displayFormBeans, sectionId, dataSource, nullValuesList, eventCrfBean, context);
+        }
+        if (nonGroupBeans != null) {
+            displayFormBeans.addAll(nonGroupBeans);
+        }
+        // sort the list according to the ordinal of the contained
+        // DisplayItemGroupBeans
+        Collections.sort(displayFormBeans, new Comparator<DisplayItemGroupBean>() {
+
+            public int compare(DisplayItemGroupBean disFormGroupBean, DisplayItemGroupBean disFormGroupBean1) {
+                Integer compInt = disFormGroupBean1.getOrdinal();
+                Integer compInt2 = disFormGroupBean.getOrdinal();
+                return compInt2.compareTo(compInt);
+            }
+        });
+        displaySectionBean.setDisplayFormGroups(displayFormBeans);
+
+        return displaySectionBean;
+    }
+    
+    
+    public DisplaySectionBean createDisplaySectionBWithFormGroupsForPrint(int sectionId, int crfVersionId, DataSource dataSource, int eventCRFDefId,
+            EventCRFBean eventCrfBean, ServletContext context) {
+
+        DisplaySectionBean displaySectionBean = new DisplaySectionBean();
+
+        ItemGroupDAO formGroupDAO = new ItemGroupDAO(dataSource);
+        ItemGroupMetadataDAO igMetaDAO = new ItemGroupMetadataDAO(dataSource);
+        ItemDAO itemDao = new ItemDAO(dataSource);
+        ItemFormMetadataDAO metaDao = new ItemFormMetadataDAO(dataSource);
+        SectionDAO sectionDao = new SectionDAO(dataSource);
+
+        // Give the DisplaySectionBean a legitimate SectionBean
+        SectionBean secBean = (SectionBean) sectionDao.findByPK(sectionId);
+        displaySectionBean.setSection(secBean);
+        // changed from: findGroupBySectionId
+        List<ItemGroupBean> itemGroupBeans = formGroupDAO.findLegitGroupAllBySectionId(sectionId);
+        // all items associated with the section, including those not in a group
+        List<ItemFormMetadataBean> allMetas = new ArrayList<ItemFormMetadataBean>();
+        try {
+            allMetas = metaDao.findAllBySectionId(sectionId);
+        } catch (OpenClinicaException oce) {
+            logger.info("oce.getOpenClinicaMessage() = " + oce.getOpenClinicaMessage());
+        }
+        // Sort these items according to their position on the CRF; their
+        // ordinal
+        Collections.sort(allMetas);
+        // The DisplayItemGroupBean(s) for "nongrouped" items
+        List<DisplayItemGroupBean> nonGroupBeans = null;
+
+        // if(itemGroupBeans.isEmpty()) return displaySectionBean;
+        // Find out whether there are any checkboxes/radios/select elements
+        // and if so, get any null values
+        // associated with them
+        List<String> nullValuesList = new ArrayList<String>();
+        boolean itemsHaveChecksRadios = itemsIncludeChecksRadiosSelects(allMetas);
+        if (itemsHaveChecksRadios && eventCRFDefId > 0) {
+            // method returns null values as a List<String>
+            nullValuesList = this.getNullValuesByEventCRFDefId(eventCRFDefId, dataSource);
+        }
+
+        // Get the items associated with each group
+        List<ItemBean> itBeans;
+        List<DisplayItemBean> displayItems;
+        List<DisplayItemGroupBean> displayFormBeans = new ArrayList<DisplayItemGroupBean>();
+        DisplayItemGroupBean displayItemGBean;
+
+        for (ItemGroupBean itemGroup : itemGroupBeans) {
+            itBeans = itemDao.findAllItemsByGroupIdForPrint(itemGroup.getId(), crfVersionId,sectionId);//TODO:fix me!
+            System.out.println("just ran find all by group id " + itemGroup.getId() + " found " + itBeans.size() + " item beans");
+            List<ItemGroupMetadataBean> metadata = igMetaDAO.findMetaByGroupAndSectionForPrint(itemGroup.getId(), crfVersionId, sectionId);//TODO:fix me add item_form_metadata.section_id to the query
+            if (!metadata.isEmpty()) {
+                // for a given crf version, all the items in the same group
+                // have the same group metadata info
+                // so we can get one of the metadata and set the metadata for
+                // the group
+                ItemGroupMetadataBean meta = metadata.get(0);
+                itemGroup.setMeta(meta);
+            }
+            displayItems = getDisplayBeansFromItemsForPrint(itBeans, dataSource, eventCrfBean, sectionId, nullValuesList, context,crfVersionId);
             displayItemGBean = this.createDisplayFormGroup(displayItems, itemGroup);
             displayFormBeans.add(displayItemGBean);
         }

@@ -62,12 +62,8 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
         this.displaySectionBeans = displaySectionBeans;
     }
 
-    /**
-     * Sequentially create a String of XML representing all of the sections on a
-     * Case Report Form, for the purpose of web-page display.
-     *
-     * @return A string representing the XML or XHTML.
-     */
+  
+    
     @Override
     public String createMarkup() {
         // If the CRF has
@@ -435,6 +431,406 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
         }
         return webPageBuilder.toString();
     }
+    
+    
+    
+    
+    
+    
+    
+    /**
+     * Sequentially create a String of XML representing all of the sections on a
+     * Case Report Form, for the purpose of web-page display.
+     *
+     * @return A string representing the XML or XHTML.
+     */
+
+    public String createMarkupNoDE() {
+        // data associated with it, pass on the responsibility to another object
+        ViewPersistanceHandler persistanceHandler = new ViewPersistanceHandler();
+
+        ViewBuilderPrintDecorator builderUtil = new ViewBuilderPrintDecorator();
+        // This object holds the printed output of the JDom Document object,
+        // which represents
+        // the XML for each section's HTML tables. The object is re-written
+        // each time a new section is generated
+        Writer writer = new StringWriter();
+        // This object contains all of the markup for all of the sections.
+        StringBuilder webPageBuilder = new StringBuilder();
+
+        // Keep track of the section number so we can create page numbers
+        int pageNumber = 0;
+
+        if (isInternetExplorer) {
+            for (DisplaySectionBean displaySecBean : this.displaySectionBeans) {
+
+                this.reconfigureView = builderUtil.hasThreePlusColumns(displaySecBean);
+                // Now the application knows that the view for at least one
+                // section has to be
+                // reformulated for IE
+                if (reconfigureView)
+                    break;
+            }
+        }
+        int uniqueId = 0;
+        // Print all the sections of a group-type table
+        for (DisplaySectionBean displaySecBean : this.displaySectionBeans) {
+
+            // The CellFactoryPrintDecorator object that generates the content
+            // for HTML table TD cells.
+            CellFactoryPrintDecorator cellFactory = new CellFactoryPrintDecorator();
+
+            // The object that handles the repetition model attributes for the
+            // HTML table elements
+            RepeatManager repeatManager = new RepeatManager();
+
+            // These classes "decorate" the FormBeanUtil and ViewBuilderUtil
+            // classes to
+            // provide special services required in printing
+            FormBeanUtilDecorator formUtilDecorator = new FormBeanUtilDecorator();
+
+            // Does this particular section have to be reconfigured for printing
+            // in IE browsers?
+            boolean changeHTMLForIE = false;
+            if (reconfigureView) {
+//                changeHTMLForIE = builderUtil.hasThreePlusColumns(displaySecBean);
+            }
+
+            // We have to change the Section's ItemGroupBeans if the Section has
+            // group tables exceeding three columns, in terms of printing for IE
+            // browsers.
+            // Any ItemGroupBean specifically has to be reduced to one column,
+            // if it exceeds
+            // three columns; changeHTMLForIE is 'true' if this section has any
+            // group tables
+            // that are 3+ columns
+//            if (changeHTMLForIE) {
+//                List<DisplayItemGroupBean> newGroupBeans = builderUtil.reduceColumnsGroupTables(displaySecBean.getDisplayFormGroups());
+//
+//                // Now set the display section beans groups to the reshuffled
+//                // list
+//                displaySecBean.setDisplayFormGroups(newGroupBeans);
+//            }
+
+            // increment the page number
+            ++pageNumber;
+            // The SectionBean associated with this section
+            sectionBean = displaySecBean.getSection();
+
+            if (involvesDataEntry) {
+                List<ItemDataBean> itemDataBeans;
+                persistanceHandler = new ViewPersistanceHandler();
+                itemDataBeans = persistanceHandler.fetchPersistedData(sectionBean.getId(), eventCRFbean.getId());
+
+                if (!itemDataBeans.isEmpty()) {
+                    hasDbFormValues = true;
+                }
+                persistanceHandler.setItemDataBeans(itemDataBeans);
+            }
+            // Keep track of whether a group has any repeat behavior; true or
+            // false
+            boolean repeatFlag;
+
+            // The number of repeating table rows that the group will start
+            // with.
+            int repeatNumber;
+
+            // the div tag that will be the root node for each printable section
+            Element divRoot = new Element("div");
+            divRoot.setAttribute("id", ("toplevel" + pageNumber));
+            divRoot.setAttribute("class", "toplevel");
+
+            // remove float properties for IE browsers
+            if (isInternetExplorer) {
+                divRoot.setAttribute("style", "float:none");
+            }
+            Document doc = new Document(divRoot);
+            // Show the section's title, subtitle, or instructions
+            builderUtil.showTitles(divRoot, sectionBean, pageNumber, isInternetExplorer);
+            // One way to generate an id for the repeating tbody or tr element
+
+            // The tabindex attribute for select and input tags
+            int tabindex = 1;
+
+            // Should discrepancy note icons be displayed
+            boolean hasDiscrepancyMgt = false;
+            StudyBean studBean = this.getStudyBean();
+            if (studBean != null && studBean.getStudyParameterConfig().getDiscrepancyManagement().equalsIgnoreCase("true")) {
+
+                hasDiscrepancyMgt = true;
+            }
+            // Create a table for every DisplayItemGroupBean
+            // A DisplayItemGroupBean contains an ItemGroupBean and
+            // its list of DisplayItemBeans
+            for (DisplayItemGroupBean displayItemGroup : displaySecBean.getDisplayFormGroups()) {
+                ArrayList headerlist = new ArrayList();
+                ArrayList bodylist = new ArrayList();
+                ArrayList subHeadList = new ArrayList();
+
+                List<DisplayItemBean> currentDisplayItems = displayItemGroup.getItems();
+                // A Map that contains persistent (stored in a database),
+                // repeated rows
+                // in a matrix type table
+                // The Map index is the Item id of the first member of the row;
+                // the value is a List
+                // of item beans that make up the row
+                SortedMap<Integer, List<ItemDataBean>> ordinalItemDataMap = new TreeMap<Integer, List<ItemDataBean>>();
+                // Is this a persistent matrix table and does it already have
+                // repeated rows
+                // in the database?
+                boolean hasStoredRepeatedRows = false;
+
+                // Is this a non-group type table that shares the same section
+                // as a group table?
+                boolean unGroupedTable = displayItemGroup.getItemGroupBean().getName().equalsIgnoreCase(BeanFactory.UNGROUPED);
+
+                // Load any database values into the DisplayItemBeans
+                if (hasDbFormValues) {
+                    currentDisplayItems = persistanceHandler.loadDataIntoDisplayBeans(currentDisplayItems, (!unGroupedTable));
+                    /*
+                     * The highest number ordinal represents how many repeated
+                     * rows there are. If the ordinal in ItemDataBeans > 1, then
+                     * we know that the group has persistent repeated rows. Get
+                     * a structure that maps each ordinal (i.e., >= 2) to its
+                     * corresponding List of ItemDataBeans. Then iterate the
+                     * existing DisplayBeans, with the number of new rows
+                     * equaling the highest ordinal number minus 1 (meaning, the
+                     * first row represents the row of the group table that
+                     * would exist if the user displayed the table, but didn't
+                     * generate any new rows). For example, in a List of
+                     * ItemDataBeans, if the highest ordinal property among
+                     * these beans is 5, then the matrix table has 4 repeated
+                     * rows from the database. Provide each new row with its
+                     * values by using the ItemDataBeans.
+                     */
+                    if (involvesDataEntry && !unGroupedTable && persistanceHandler.hasPersistentRepeatedRows(currentDisplayItems)) {
+                        hasStoredRepeatedRows = true;
+                        // if the displayitems contain duplicate item ids, then
+                        // these duplicates
+                        // represent repeated rows. Separate them into a Map of
+                        // new rows that
+                        // will be appended to the HTML table.
+                        ordinalItemDataMap = persistanceHandler.handleExtraGroupRows();
+                    }
+                }// end if hasDbFormValues
+
+                // Does the table have a group header?
+                String groupHeader = displayItemGroup.getGroupMetaBean().getHeader();
+                boolean hasGroupHeader = groupHeader != null && groupHeader.length() > 0;
+
+                // Add group header, if there is one
+                if (hasGroupHeader) {
+                    Element divGroupHeader = new Element("div");
+                    // necessary?
+                    divGroupHeader.setAttribute("class", "aka_group_header");
+                    Element strong = new Element("strong");
+                    strong.setAttribute("style", "float:none");
+                    strong.addContent(groupHeader);
+                    divGroupHeader.addContent(strong);
+                    divRoot.addContent(divGroupHeader);
+                }
+                Element tableDiv = new Element("div");
+                tableDiv.setAttribute("class", "tableDiv");
+                if (isInternetExplorer) {
+                    tableDiv.setAttribute("style", "float:none");
+                }
+                divRoot.addContent(tableDiv);
+
+                // This group represents "orphaned" items (those without a
+                // group) if
+                // the FormGroupBean has a group label of UNGROUPED
+                Element orphanTable = null;
+               /* if (unGroupedTable) {
+                    orphanTable = formUtilDecorator.createXHTMLTableFromNonGroup(currentDisplayItems, tabindex, hasDiscrepancyMgt, hasDbFormValues, true);
+                    // We have to track the point the tabindex has reached here
+                    // The tabindex will increment by the size of the
+                    // displayItemGroup List
+                    tabindex += currentDisplayItems.size();
+
+                    tableDiv.addContent(orphanTable);
+
+                    continue;
+                }// end if unGroupedTable
+*/
+                uniqueId++;
+                String repeatParentId = "repeatParent" + uniqueId;
+                repeatNumber = displayItemGroup.getGroupMetaBean().getRepeatNum();
+                // If the form has repeat behavior, this number is > 0
+                // Do not allow repeat numbers < 1
+                repeatNumber = repeatNumber < 1 ? 1 : repeatNumber;
+                // And a limit of 12
+                repeatNumber = repeatNumber > 12 ? 12 : repeatNumber;
+                // This is always true during this iteration
+                repeatFlag = true;
+                Element table = createTable();
+
+                // add the thead element
+                Element thead = new Element("tr");
+                tableDiv.addContent(table);
+//                table.addContent(thead);
+                // Does this group involve a Horizontal checkbox or radio
+                // button?
+                boolean hasResponseLayout = builderUtil.hasResponseLayout(currentDisplayItems);
+                // add th elements to the thead element
+                // We have to create an extra thead column for the Remove Row
+                // button, if
+                // the table involves repeating rows; thus the final boolean
+                // parameter
+                List<Element> thTags =
+                    repeatFlag ? createTheadContentsFromDisplayItems(currentDisplayItems, true) : createTheadContentsFromDisplayItems(currentDisplayItems,
+                            false);
+                int i = 0;
+                for (Element el : thTags) {
+                    i++;
+                    thead.addContent(el);
+                    if(i%maxColRow == 0) {
+                        headerlist.add(thead);
+                        thead = new Element("tr");
+                    } 
+                }
+
+                if(i%maxColRow!=0)headerlist.add(thead);
+                
+                // Make sure the layout for "horizontal" checkboxes or radios is
+                // displayed
+                // in this manner.
+                if (hasResponseLayout) {
+                    addResponseLayoutRow(subHeadList, currentDisplayItems);
+                }
+
+
+                Element row;
+                Element td;
+                // For each row in the table
+                row = new Element("tr");
+                // If the group has repeat behavior and repeats row by row,
+                // then the
+                // repetition model type attributes have to be added to the tr
+                // tag
+                if (repeatFlag && !(involvesDataEntry && hasStoredRepeatedRows)) {
+                    table = repeatManager.addParentRepeatAttributes(table, repeatParentId, repeatNumber, displayItemGroup.getGroupMetaBean().getRepeatMax());
+                }
+                // The content for the table cells. For each item...
+                int j = 0;
+                for (DisplayItemBean displayBean : currentDisplayItems) {
+                    j++;
+                    // What type of input: text, radio, checkbox, etc.?
+                    String responseName = displayBean.getMetadata().getResponseSet().getResponseType().getName();
+                    // We have to create cells in a different way if the input
+                    // is radio or checkbox, and the response_layout is
+                    // horizontal
+                    if (displayBean.getMetadata().getResponseLayout().equalsIgnoreCase("horizontal")
+                        && (responseName.equalsIgnoreCase("checkbox") || responseName.equalsIgnoreCase("radio"))) {
+                        // The final true parameter is for disabling D Notes
+                        Element[] elements =
+                            cellFactory.createCellContentsForChecks(responseName, displayBean, displayBean.getMetadata().getResponseSet().getOptions().size(),
+                                    ++tabindex, false, true);
+                        for (Element el : elements) {
+                            el = builderUtil.setClassNames(el);
+                            if (repeatFlag) {
+//                                el = repeatManager.addChildRepeatAttributes(el, repeatParentId, displayBean.getItem().getId(), null);
+                            }
+                            row.addContent(el);
+                        }
+                        // move to the next item
+                        continue;
+                    }
+                    td = new Element("td");
+                    td = builderUtil.setClassNames(td);
+                    // Create cells within each row
+                    td = cellFactory.createCellContents(td, responseName, displayBean, ++tabindex, hasDiscrepancyMgt, hasDbFormValues, true);
+                    if (repeatFlag) {
+                    }
+                    row.addContent(td);
+                    if(j%maxColRow==0){
+                        bodylist.add(row);
+                        row = new Element("tr");
+                        if (repeatFlag) {
+                            repeatParentId = repeatParentId+uniqueId++;
+                        }
+                    } 
+                }// end for displayBean
+                if(j%maxColRow!=0)bodylist.add(row);
+                //Creating the first/main table
+                if(hasStoredRepeatedRows){
+                    Element newRow = new Element("tr");
+                    Element div = new Element("div");
+                    div.setAttribute("id", "repeatCaption");
+                    Element newCol = new Element("td");
+                    Element strong = new Element("strong");
+                    strong.addContent("Repeat: 1");
+                    div.addContent(strong);
+                    newCol.addContent(div);
+                    newRow.addContent(newCol);
+                    table.addContent(newRow);
+                }
+               /* for(int k=0; k<headerlist.size();k++){
+                    Element head = (Element)headerlist.get(k);
+                    Element body = (Element)bodylist.get(k);
+                    table.addContent(head);
+                    if(subHeadList.size()>0){
+                        try{
+                            Element subHead = (Element)subHeadList.get(k);
+                            table.addContent(subHead);
+                        }catch (IndexOutOfBoundsException IOB){
+                        }
+                    }
+                    table.addContent(body);
+                }*/
+               if(!hasStoredRepeatedRows)
+                for(int ii=0;ii<repeatNumber;ii++){
+                    divRoot.addContent( createTableWithoutData(bodylist,headerlist,subHeadList,ii));
+                    }
+                // The final true parameter is for disabling D Note icons from
+                // being clicked
+                if (hasStoredRepeatedRows) {
+                    List storedRepeatedRows =
+                        builderUtil.generatePersistentMatrixRows(ordinalItemDataMap, currentDisplayItems, tabindex, repeatParentId, hasDiscrepancyMgt, true, maxColRow);
+                    // add these new rows to the table
+                    int count = 1;
+                    for(int l = 0; l<storedRepeatedRows.size();l++){
+                        ++count;
+                        List<Element> rowsList = (ArrayList)storedRepeatedRows.get(l);
+                        divRoot.addContent(createTableWithData(rowsList, headerlist, subHeadList, count));
+                    }
+                }
+            }// end for displayFormGroup
+            XMLOutputter outp = new XMLOutputter();
+            Format format = Format.getPrettyFormat();
+            format.setOmitDeclaration(true);
+            outp.setFormat(format);
+            // The writer object contains the markup for one printable section
+            writer = new StringWriter();
+            try {
+                outp.output(doc, writer);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            // The webPageBuilder object contains the markup for all of the
+            // sections
+            // in the print view
+            webPageBuilder.append(writer.toString());
+        }
+        return webPageBuilder.toString();
+    }
+    
+    
+    
+    
+
+    
+    // JN: So this displayFormGroups is being sent in a weird format, the list with values in currentDisplayItems
+    // does not have the repeatnumber since metadata info is wrong, hence this weird way of going through the list.
+    //Perhaps the better way is to fix the list itself, however the method is DisplaySectionBeanHandler.getDisplaySectionBeans is being used at several places and seems to be right,
+    //there could be a issue with eventcrf which was never handled correctly hence this shortcut
+    private int getRepeatFromPrevMeta(List<DisplayItemGroupBean> displayFormGroups) {
+
+        if(displayFormGroups.size()>0)
+        return displayFormGroups.get(0).getGroupMetaBean().getRepeatNum();
+        else
+            return 0;
+
+    }
 
     private Element createTableWithData(List<Element> rows, ArrayList headerList, ArrayList subHeaderList, int rep) {
         Element table = createTable();
@@ -462,6 +858,52 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
     }
 
 
+    private Element createTableWithoutData(List<Element> rows, ArrayList headerList, ArrayList subHeaderList, int rep) {
+       
+//      {
+         Element table = createTable();
+      //  if(headerList.size()>0){
+              table = createTable();
+         table.setAttribute("id","repeat"+rep);
+          Element newCol = new Element("td");
+          Element strong = new Element("strong");
+          strong.setAttribute("style","aka_font_general");
+          strong.addContent("Repeat: "+(rep+1));//to avoid showing repeat 0;
+          newCol.addContent(strong);
+         
+          Element newRow = new Element("tr");
+          newRow.addContent(newCol.cloneContent());
+          
+              
+          table.addContent(newRow.cloneContent());
+          strong.removeContent();
+        //}
+          if(headerList.size()==0){
+              newRow.setAttribute("style","display:none;");
+              newCol.setAttribute("style","display:none;");
+              strong.setAttribute("style","display:none;");
+              table.setAttribute("style","display:none;");
+              
+          }
+              
+          for(int i=0; i<headerList.size();i++){
+              
+             
+            Element head = (Element)headerList.get(i);
+            Element body = rows.get(i);
+            table.addContent((Element)head.clone());
+            if(subHeaderList.size()>0){
+                try{
+                    Element subHead = (Element)subHeaderList.get(i);
+                    table.addContent((Element)subHead.clone());
+                }catch (IndexOutOfBoundsException IOB){
+                }
+            }
+            table.addContent(body.cloneContent());
+      //  }
+      }
+        return table;
+    }
     private void addResponseLayoutRow(ArrayList subHeadList, List<DisplayItemBean> displayBeans) {
         Element thRow = new Element("tr");
         String responseName;
@@ -573,7 +1015,18 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
         return thTag;
 
     }
+    public void createDarkBorders(Element element){
+        if(element == null)  return;
 
+        //remove the existing class attribute and replace it with one that specifies
+        //darker cell borders
+        element.removeAttribute("class");
+        //Is it a th or td tag?
+        String cssRuleIdentifier = element.getName();
+        String cssClasses = CssRules.getClassNamesForTag(cssRuleIdentifier+" borders_on");
+        element.setAttribute("class",cssClasses);
+
+    }
     public List<Element> createTheadContentsFromDisplayItems(List<DisplayItemBean> displayBeans, boolean generateExtraColumn) {
         List<Element> elements = new ArrayList<Element>();
         ItemFormMetadataBean itemFormBean;

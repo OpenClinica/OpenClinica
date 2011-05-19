@@ -335,7 +335,20 @@ public class ItemGroupDAO extends AuditableEntityDAO {
         }
         return beanList;
     }
+    public List<ItemGroupBean> findLegitGroupAllBySectionId(int sectionId) {
+        this.setTypesExpected();
+        HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
+        variables.put(1, sectionId);
+        List listofMaps = this.select(digester.getQuery("findLegitGroupAllBySectionId"), variables);
 
+        List<ItemGroupBean> beanList = new ArrayList<ItemGroupBean>();
+        ItemGroupBean bean;
+        for (Object map : listofMaps) {
+            bean = (ItemGroupBean) this.getEntityFromHashMap((HashMap) map);
+            beanList.add(bean);
+        }
+        return beanList;
+    }
     public Object getEntityFromHashMap(HashMap hm) {
         ItemGroupBean formGroupBean = new ItemGroupBean();
         super.setEntityAuditInformation(formGroupBean, hm);

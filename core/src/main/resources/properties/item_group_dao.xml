@@ -78,6 +78,19 @@
       and igm.repeating_group = true
     </sql>
   </query>
+  
+
+    <query>
+    <name>findLegitGroupAllBySectionId</name>
+    <sql>
+      select distinct ig.* from item_group ig, item_group_metadata igm,
+      section s, item_form_metadata ifm
+      where ifm.section_id=? and igm.crf_version_id=s.crf_version_id
+      and ig.item_group_id = igm.item_group_id
+      and s.section_id = ifm.section_id
+      and ifm.item_id = igm.item_id
+    </sql>
+  </query>
   <!--Do not include any groups that have the 'Ungrouped' name in the database-->
   <query>
     <name>findOnlyGroupsByCRFVersionID</name>

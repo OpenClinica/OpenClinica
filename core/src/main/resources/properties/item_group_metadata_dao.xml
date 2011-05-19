@@ -31,6 +31,21 @@
      </sql>
   </query>
   
+  
+  <query>
+    <name>findMetaByGroupAndSectionForPrint</name>
+    <sql>select distinct igm.* from item_group_metadata igm,
+  item_form_metadata if
+    where igm.item_group_id =?
+    and igm.crf_version_id=?
+    and igm.crf_version_id=if.crf_version_id
+    and if.section_id=?
+    and if.item_id = igm.item_id
+    order by igm.ordinal asc
+     </sql>
+  </query>
+  
+  
   <query>
     <name>findByPK</name>
     <sql>select igm.* from item_group_metadata igm
