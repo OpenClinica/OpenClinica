@@ -548,87 +548,96 @@ public abstract class EntityDAO implements DAOInterface {
                 for (int i = 1; i <= rsmd.getColumnCount(); i++) {
                     String column = rsmd.getColumnName(i).toLowerCase();
                     Integer type = (Integer) setTypes.get(new Integer(i));
-                     logMe("column name: "+column+" type # "+type.intValue()+" row # "+i);
-                    switch (type.intValue()) {
-                    // just putting the top five in here for now, tbh
-                    // put in statements to catch nulls in the db, tbh
-                    // 10-15-2004
-                    case TypeNames.DATE:
-                        // logger.warn("date: "+column);
-                        hm.put(column, rs.getDate(i));
-                        // do we want to put in a fake date if it's null?
-                        /*
-                         * if (rs.wasNull()) { hm.put(column,new Date(System.currentTimeMillis())); }
-                         */
-                        break;
-                    case TypeNames.TIMESTAMP:
-                        // logger.warn("timestamp: "+column);
-                        hm.put(column, rs.getTimestamp(i));
-                        break;
-                    case TypeNames.DOUBLE:
-                        // logger.warn("double: "+column);
-                        hm.put(column, new Double(rs.getDouble(i)));
-                        if (rs.wasNull()) {
-                            hm.put(column, new Double(0));
-                        }
-                        break;
-                    case TypeNames.BOOL:
-                        // BADS FLAG
-                        if (CoreResources.getDBName().equals("oracle")) {
-                            hm.put(column, new Boolean(rs.getString(i).equals("1") ? true : false));
+                    // @pgawade 18-May-2011 Fix for issue #9703 - temporarily
+                    // commented out the following log statement
+                    // as in case of viewing SDV page, type value for one of
+                    // columns was null causing NullPointerException
+                    // logMe("column name: "+column+" type # "+type.intValue()+" row # "+i);
+                    if (null != type) {
+                        switch (type.intValue()) {
+                        // just putting the top five in here for now, tbh
+                        // put in statements to catch nulls in the db, tbh
+                        // 10-15-2004
+                        case TypeNames.DATE:
+                            // logger.warn("date: "+column);
+                            hm.put(column, rs.getDate(i));
+                            // do we want to put in a fake date if it's null?
+                            /*
+                             * if (rs.wasNull()) { hm.put(column,new
+                             * Date(System.currentTimeMillis())); }
+                             */
+                            break;
+                        case TypeNames.TIMESTAMP:
+                            // logger.warn("timestamp: "+column);
+                            hm.put(column, rs.getTimestamp(i));
+                            break;
+                        case TypeNames.DOUBLE:
+                            // logger.warn("double: "+column);
+                            hm.put(column, new Double(rs.getDouble(i)));
                             if (rs.wasNull()) {
-                                if (column.equalsIgnoreCase("start_time_flag") || column.equalsIgnoreCase("end_time_flag")) {
-                                    hm.put(column, new Boolean(false));
-                                } else {
-                                    hm.put(column, new Boolean(true));
+                                hm.put(column, new Double(0));
+                            }
+                            break;
+                        case TypeNames.BOOL:
+                            // BADS FLAG
+                            if (CoreResources.getDBName().equals("oracle")) {
+                                hm.put(column, new Boolean(rs.getString(i).equals("1") ? true : false));
+                                if (rs.wasNull()) {
+                                    if (column.equalsIgnoreCase("start_time_flag") || column.equalsIgnoreCase("end_time_flag")) {
+                                        hm.put(column, new Boolean(false));
+                                    } else {
+                                        hm.put(column, new Boolean(true));
+                                    }
+                                }
+                            } else {
+                                hm.put(column, new Boolean(rs.getBoolean(i)));
+                                if (rs.wasNull()) {
+                                    // YW 08-17-2007 << Since I didn't
+                                    // investigate
+                                    // what's the impact if changing true to
+                                    // false,
+                                    // I only do change for the columns of
+                                    // "start_time_flag" and "end_time_flag" in
+                                    // the
+                                    // table study_event
+                                    if (column.equalsIgnoreCase("start_time_flag") || column.equalsIgnoreCase("end_time_flag")) {
+                                        hm.put(column, new Boolean(false));
+                                    } else {
+                                        hm.put(column, new Boolean(true));
+                                    }
+                                    // bad idea? what to put, then?
                                 }
                             }
-                        } else {
-                            hm.put(column, new Boolean(rs.getBoolean(i)));
+                            break;
+                        case TypeNames.FLOAT:
+                            hm.put(column, new Float(rs.getFloat(i)));
                             if (rs.wasNull()) {
-                                // YW 08-17-2007 << Since I didn't investigate
-                                // what's the impact if changing true to false,
-                                // I only do change for the columns of
-                                // "start_time_flag" and "end_time_flag" in the
-                                // table study_event
-                                if (column.equalsIgnoreCase("start_time_flag") || column.equalsIgnoreCase("end_time_flag")) {
-                                    hm.put(column, new Boolean(false));
-                                } else {
-                                    hm.put(column, new Boolean(true));
-                                }
-                                // bad idea? what to put, then?
+                                hm.put(column, new Float(0.0));
                             }
-                        }
-                        break;
-                    case TypeNames.FLOAT:
-                        hm.put(column, new Float(rs.getFloat(i)));
-                        if (rs.wasNull()) {
-                            hm.put(column, new Float(0.0));
-                        }
-                        break;
-                    case TypeNames.INT:
-                        hm.put(column, new Integer(rs.getInt(i)));
-                        if (rs.wasNull()) {
-                            hm.put(column, new Integer(0));
-                        }
-                        break;
-                    case TypeNames.STRING:
-                        hm.put(column, rs.getString(i));
-                        if (rs.wasNull()) {
-                            hm.put(column, "");
-                        }
-                        break;
-                    case TypeNames.CHAR:
-                        hm.put(column, rs.getString(i));
-                        if (rs.wasNull()) {
-                            char x = 'x';
-                            hm.put(column, new Character(x));
-                        }
-                        break;
-                    default:
-                        // do nothing?
-                    }// end switch
-
+                            break;
+                        case TypeNames.INT:
+                            hm.put(column, new Integer(rs.getInt(i)));
+                            if (rs.wasNull()) {
+                                hm.put(column, new Integer(0));
+                            }
+                            break;
+                        case TypeNames.STRING:
+                            hm.put(column, rs.getString(i));
+                            if (rs.wasNull()) {
+                                hm.put(column, "");
+                            }
+                            break;
+                        case TypeNames.CHAR:
+                            hm.put(column, rs.getString(i));
+                            if (rs.wasNull()) {
+                                char x = 'x';
+                                hm.put(column, new Character(x));
+                            }
+                            break;
+                        default:
+                            // do nothing?
+                        }// end switch
+                    }
                 }// end for loop
                 al.add(hm);
                 // adding a row gotten from the database
