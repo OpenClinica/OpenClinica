@@ -496,25 +496,9 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
 //                changeHTMLForIE = builderUtil.hasThreePlusColumns(displaySecBean);
             }
 
-            // We have to change the Section's ItemGroupBeans if the Section has
-            // group tables exceeding three columns, in terms of printing for IE
-            // browsers.
-            // Any ItemGroupBean specifically has to be reduced to one column,
-            // if it exceeds
-            // three columns; changeHTMLForIE is 'true' if this section has any
-            // group tables
-            // that are 3+ columns
-//            if (changeHTMLForIE) {
-//                List<DisplayItemGroupBean> newGroupBeans = builderUtil.reduceColumnsGroupTables(displaySecBean.getDisplayFormGroups());
-//
-//                // Now set the display section beans groups to the reshuffled
-//                // list
-//                displaySecBean.setDisplayFormGroups(newGroupBeans);
-//            }
-
-            // increment the page number
+  
             ++pageNumber;
-            // The SectionBean associated with this section
+        
             sectionBean = displaySecBean.getSection();
 
             if (involvesDataEntry) {
@@ -559,6 +543,8 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
 
                 hasDiscrepancyMgt = true;
             }
+            //Not to show discrepancy flags in the print crfs when there is no data
+            hasDiscrepancyMgt=false;
             // Create a table for every DisplayItemGroupBean
             // A DisplayItemGroupBean contains an ItemGroupBean and
             // its list of DisplayItemBeans
@@ -764,22 +750,10 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
                     newRow.addContent(newCol);
                     table.addContent(newRow);
                 }
-               /* for(int k=0; k<headerlist.size();k++){
-                    Element head = (Element)headerlist.get(k);
-                    Element body = (Element)bodylist.get(k);
-                    table.addContent(head);
-                    if(subHeadList.size()>0){
-                        try{
-                            Element subHead = (Element)subHeadList.get(k);
-                            table.addContent(subHead);
-                        }catch (IndexOutOfBoundsException IOB){
-                        }
-                    }
-                    table.addContent(body);
-                }*/
+            
                if(!hasStoredRepeatedRows)
                 for(int ii=0;ii<repeatNumber;ii++){
-                    divRoot.addContent( createTableWithoutData(bodylist,headerlist,subHeadList,ii));
+                    divRoot.addContent( createTableWithoutData(bodylist,headerlist,subHeadList,ii,unGroupedTable));
                     }
                 // The final true parameter is for disabling D Note icons from
                 // being clicked
@@ -858,13 +832,15 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
     }
 
 
-    private Element createTableWithoutData(List<Element> rows, ArrayList headerList, ArrayList subHeaderList, int rep) {
+    private Element createTableWithoutData(List<Element> rows, ArrayList headerList, ArrayList subHeaderList, int rep,boolean ungrouped) {
        
 //      {
          Element table = createTable();
       //  if(headerList.size()>0){
               table = createTable();
-         table.setAttribute("id","repeat"+rep);
+          if(!ungrouped)
+          { 
+          table.setAttribute("id","repeat"+rep);
           Element newCol = new Element("td");
           Element strong = new Element("strong");
           strong.setAttribute("style","aka_font_general");
@@ -877,6 +853,7 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
               
           table.addContent(newRow.cloneContent());
           strong.removeContent();
+          
         //}
           if(headerList.size()==0){
               newRow.setAttribute("style","display:none;");
@@ -885,7 +862,7 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
               table.setAttribute("style","display:none;");
               
           }
-              
+          }    
           for(int i=0; i<headerList.size();i++){
               
              
