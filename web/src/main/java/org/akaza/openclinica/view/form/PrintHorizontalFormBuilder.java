@@ -568,8 +568,8 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
 
                 // Is this a non-group type table that shares the same section
                 // as a group table?
-                boolean unGroupedTable = displayItemGroup.getItemGroupBean().getName().equalsIgnoreCase(BeanFactory.UNGROUPED);
-
+               // boolean unGroupedTable = displayItemGroup.getItemGroupBean().getName().equalsIgnoreCase(BeanFactory.UNGROUPED);
+                boolean unGroupedTable = displayItemGroup.getGroupMetaBean().isRepeatingGroup()?false:true;
                 // Load any database values into the DisplayItemBeans
                 if (hasDbFormValues) {
                     currentDisplayItems = persistanceHandler.loadDataIntoDisplayBeans(currentDisplayItems, (!unGroupedTable));
@@ -626,7 +626,7 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
                 // group) if
                 // the FormGroupBean has a group label of UNGROUPED
                 Element orphanTable = null;
-               /* if (unGroupedTable) {
+                if (unGroupedTable) {
                     orphanTable = formUtilDecorator.createXHTMLTableFromNonGroup(currentDisplayItems, tabindex, hasDiscrepancyMgt, hasDbFormValues, true);
                     // We have to track the point the tabindex has reached here
                     // The tabindex will increment by the size of the
@@ -637,7 +637,7 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
 
                     continue;
                 }// end if unGroupedTable
-*/
+
                 uniqueId++;
                 String repeatParentId = "repeatParent" + uniqueId;
                 repeatNumber = displayItemGroup.getGroupMetaBean().getRepeatNum();
@@ -714,7 +714,7 @@ public class PrintHorizontalFormBuilder extends DefaultFormBuilder {
                         for (Element el : elements) {
                             el = builderUtil.setClassNames(el);
                             if (repeatFlag) {
-//                                el = repeatManager.addChildRepeatAttributes(el, repeatParentId, displayBean.getItem().getId(), null);
+                                el = repeatManager.addChildRepeatAttributes(el, repeatParentId, displayBean.getItem().getId(), null);
                             }
                             row.addContent(el);
                         }

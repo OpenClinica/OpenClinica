@@ -387,7 +387,7 @@ public class FormBeanUtil {
 
         // divide up items into columns
         int numberOfColumns = getNumberOfColumnsFromItems(items);
-        numberOfColumns = 5;
+       // numberOfColumns = 5;
         // Fixing table width for orphan table Mantis issue: 9087.
         // ToDo recheck why the main table getting fixed 
        // int tableWidth = numberOfColumns*300;
