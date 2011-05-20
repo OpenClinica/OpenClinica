@@ -1493,6 +1493,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     ssb.setUpdatedDate(new Date());
                     studySubjectDao.update(ssb);
                     ecb.setSdvStatus(false);
+                    ecb.setSdvUpdateId(ub.getId());
                 }
 
                 ecb = (EventCRFBean) ecdao.update(ecb);

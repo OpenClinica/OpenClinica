@@ -430,7 +430,17 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                 dnb.setSubjectName(ssub.getName());
                 dnb.setSubjectId(ssub.getId());
                 dnb.setStudySub(ssub);
-                if (ssub.getStudyId() != currentStudy.getId() && ssub.getStudyId() != currentStudy.getParentStudyId()) {
+                StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
+                int parentStudyForSubject = 0;
+                StudyBean studyBeanSub = (StudyBean) studyDAO.findByPK(ssub.getStudyId());
+                if (null != studyBeanSub) {
+                    parentStudyForSubject = studyBeanSub.getParentStudyId();
+                }
+                // if (ssub.getStudyId() != currentStudy.getId() &&
+                // ssub.getStudyId() != currentStudy.getParentStudyId()) {
+                // if (ssub.getStudyId() != currentStudy.getId() &&
+                // ssub.getStudyId() != parentStudyForSubject) {
+                if (ssub.getStudyId() != currentStudy.getId() && currentStudy.getId() != parentStudyForSubject) {
                     addPageMessage(noAccessMessage);
                     throw new InsufficientPermissionException(Page.MENU_SERVLET, exceptionName, "1");
                 }
@@ -968,6 +978,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                 studySubject.setUpdatedDate(new Date());
                 studySubjectDAO.update(studySubject);
                 ec.setSdvStatus(false);
+                ec.setSdvUpdateId(ub.getId());
                 ecdao.update(ec);
             }
 
