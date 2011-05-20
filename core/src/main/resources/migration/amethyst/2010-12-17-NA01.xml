@@ -225,7 +225,7 @@
 				audit_log_event_audit_id_seq.nextval,
 				event_type_id,
 				sysdate,
-				NEWREC.update_id,
+				NEWREC.sdv_update_id,
 				'event_crf',
 				NEWREC.event_crf_id,
 				entity_name_value,
