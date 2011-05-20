@@ -1,8 +1,86 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+<changeSet author="pgawade (generated)" id="2011-05-20-9703-1">
+		<preConditions onFail="MARK_RAN">
+			<dbms type="oracle" />			
+	 	</preConditions>
+		<sql splitStatements="false">
+			/* --
+		prompt Create trigger EVENT_CRF_UPDATE on table EVENT_CRF
+		-- */
 
+		CREATE OR REPLACE TRIGGER event_crf_update
+		    AFTER UPDATE ON event_crf
+		    FOR EACH ROW
+		declare
+		trg_operation varchar2(10);
+		newrec  event_crf%rowtype;
+		oldrec  event_crf%rowtype;
+		begin
+		/* -- */
+		newrec.EVENT_CRF_ID                := :new.EVENT_CRF_ID;
+		newrec.STUDY_EVENT_ID              := :new.STUDY_EVENT_ID;
+		newrec.CRF_VERSION_ID              := :new.CRF_VERSION_ID;
+		newrec.DATE_INTERVIEWED            := :new.DATE_INTERVIEWED;
+		newrec.INTERVIEWER_NAME            := :new.INTERVIEWER_NAME;
+		newrec.COMPLETION_STATUS_ID        := :new.COMPLETION_STATUS_ID;
+		newrec.STATUS_ID                   := :new.STATUS_ID;
+		newrec.ANNOTATIONS                 := :new.ANNOTATIONS;
+		newrec.DATE_COMPLETED              := :new.DATE_COMPLETED;
+		newrec.VALIDATOR_ID                := :new.VALIDATOR_ID;
+		newrec.DATE_VALIDATE               := :new.DATE_VALIDATE;
+		newrec.DATE_VALIDATE_COMPLETED     := :new.DATE_VALIDATE_COMPLETED;
+		newrec.VALIDATOR_ANNOTATIONS       := :new.VALIDATOR_ANNOTATIONS;
+		newrec.VALIDATE_STRING             := :new.VALIDATE_STRING;
+		newrec.OWNER_ID                    := :new.OWNER_ID;
+		newrec.DATE_CREATED                := :new.DATE_CREATED;
+		newrec.STUDY_SUBJECT_ID            := :new.STUDY_SUBJECT_ID;
+		newrec.DATE_UPDATED                := :new.DATE_UPDATED;
+		newrec.UPDATE_ID                   := :new.UPDATE_ID;
+		newrec.ELECTRONIC_SIGNATURE_STATUS := :new.ELECTRONIC_SIGNATURE_STATUS;
+		newrec.SDV_UPDATE_ID := :new.SDV_UPDATE_ID;
+		newrec.SDV_STATUS := :new.SDV_STATUS;
+		
+		/* -- */
+		oldrec.EVENT_CRF_ID                := :old.EVENT_CRF_ID;
+		oldrec.STUDY_EVENT_ID              := :old.STUDY_EVENT_ID;
+		oldrec.CRF_VERSION_ID              := :old.CRF_VERSION_ID;
+		oldrec.DATE_INTERVIEWED            := :old.DATE_INTERVIEWED;
+		oldrec.INTERVIEWER_NAME            := :old.INTERVIEWER_NAME;
+		oldrec.COMPLETION_STATUS_ID        := :old.COMPLETION_STATUS_ID;
+		oldrec.STATUS_ID                   := :old.STATUS_ID;
+		oldrec.ANNOTATIONS                 := :old.ANNOTATIONS;
+		oldrec.DATE_COMPLETED              := :old.DATE_COMPLETED;
+		oldrec.VALIDATOR_ID                := :old.VALIDATOR_ID;
+		oldrec.DATE_VALIDATE               := :old.DATE_VALIDATE;
+		oldrec.DATE_VALIDATE_COMPLETED     := :old.DATE_VALIDATE_COMPLETED;
+		oldrec.VALIDATOR_ANNOTATIONS       := :old.VALIDATOR_ANNOTATIONS;
+		oldrec.VALIDATE_STRING             := :old.VALIDATE_STRING;
+		oldrec.OWNER_ID                    := :old.OWNER_ID;
+		oldrec.DATE_CREATED                := :old.DATE_CREATED;
+		oldrec.STUDY_SUBJECT_ID            := :old.STUDY_SUBJECT_ID;
+		oldrec.DATE_UPDATED                := :old.DATE_UPDATED;
+		oldrec.UPDATE_ID                   := :old.UPDATE_ID;
+		oldrec.ELECTRONIC_SIGNATURE_STATUS := :old.ELECTRONIC_SIGNATURE_STATUS;
+		oldrec.SDV_UPDATE_ID := :old.SDV_UPDATE_ID;
+		oldrec.sdv_status :=:old.sdv_status;
+		/* -- 
+		   -- */
+		  if inserting then
+		    trg_operation := 'INSERT';
+		  elsif updating then
+		    trg_operation := 'UPDATE';
+		  elsif deleting then
+		    trg_operation := 'DELETE';
+		  end if;
+		  /* -- */
+		   clinica_table_api.event_crf_trigger(trg_operation, newrec, oldrec);
+		end;
+		/* / */
+		</sql>
+	</changeSet>
   
-    <changeSet author="jnyayapathi" id="2011-05-20-9703-1">
+    <changeSet author="jnyayapathi" id="2011-05-20-9703-2">
         <preConditions onFail="MARK_RAN">
             <dbms type="oracle" />          
         </preConditions>    
@@ -105,7 +183,34 @@
                 NEWREC.event_crf_id
                   );
             END IF;
-
+			IF(OLDREC.sdv_status <![CDATA[<>]]> NEWREC.sdv_status) THEN
+			  entity_name_value := 'EventCRF SDV Status';
+			  event_type_id := '32';
+			  /* -- */
+			    INSERT INTO audit_log_event(
+				audit_id,
+				audit_log_event_type_id,
+				audit_date,
+				user_id,
+				audit_table,
+				entity_id,
+				entity_name,
+				old_value,
+				new_value,
+				event_crf_id
+			      ) VALUES (
+				audit_log_event_audit_id_seq.nextval,
+				event_type_id,
+				sysdate,
+				NEWREC.sdv_update_id,
+				'event_crf',
+				NEWREC.event_crf_id,
+				entity_name_value,
+				OLDREC.sdv_status,
+				NEWREC.sdv_status,
+				NEWREC.event_crf_id
+			      );
+			END IF;
             IF((nvl(OLDREC.interviewer_name, ' ') <![CDATA[<>]]> nvl(NEWREC.interviewer_name, ' ')) AND (OLDREC.interviewer_name is not null)) THEN
               /* -- Event CRF interviewer name */
               entity_name_value := 'Interviewer Name';
@@ -135,34 +240,7 @@
                 NEWREC.event_crf_id
                   );
             END IF;
-    		IF(nvl(OLDREC.sdv_status,' ') <![CDATA[<>]]> nvl( NEWREC.sdv_status,' ')) THEN
-			  entity_name_value := 'EventCRF SDV Status';
-			  event_type_id := '32';
-			  /* -- */
-			    INSERT INTO audit_log_event(
-				audit_id,
-				audit_log_event_type_id,
-				audit_date,
-				user_id,
-				audit_table,
-				entity_id,
-				entity_name,
-				old_value,
-				new_value,
-				event_crf_id
-			      ) VALUES (
-				audit_log_event_audit_id_seq.nextval,
-				event_type_id,
-				sysdate,
-				NEWREC.sdv_update_id,
-				'event_crf',
-				NEWREC.event_crf_id,
-				entity_name_value,
-				OLDREC.sdv_status,
-				NEWREC.sdv_status,
-				NEWREC.event_crf_id
-			      );
-			END IF;
+    		
 		    END IF;
           
         END;
@@ -298,8 +376,6 @@
                 entity_name_value := null;
             end;
             /* -- */
-            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id)
-                VALUES (audit_log_event_audit_id_seq.nextval , '12', sysdate, NEWREC.update_id, 'item_data', NEWREC.item_data_id, entity_name_value, OLDREC.status_id, NEWREC.status_id, NEWREC.event_crf_id);
             /* --------------- */
             END IF;
 
