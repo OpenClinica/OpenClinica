@@ -121,6 +121,29 @@ public class RuleSetService implements RuleSetServiceInterface {
         RuleSetBean persistentRuleSetBean = getRuleSetDao().saveOrUpdate(ruleSetBean);
         return persistentRuleSetBean;
     }
+    
+    @Transactional
+    public void saveImportFromDesigner(RulesPostImportContainer rulesContainer) {
+    	HashMap<String,RuleBean> ruleBeans = new HashMap<String, RuleBean>();
+        for (AuditableBeanWrapper<RuleBean> ruleBeanWrapper : rulesContainer.getValidRuleDefs()) {
+            RuleBean r = getRuleDao().saveOrUpdate(ruleBeanWrapper.getAuditableBean());
+            ruleBeans.put(r.getOid(), r);
+        }
+        for (AuditableBeanWrapper<RuleBean> ruleBeanWrapper : rulesContainer.getDuplicateRuleDefs()) {
+        	RuleBean r = getRuleDao().saveOrUpdate(ruleBeanWrapper.getAuditableBean());
+            ruleBeans.put(r.getOid(), r);
+        }
+
+        for (AuditableBeanWrapper<RuleSetBean> ruleBeanWrapper : rulesContainer.getValidRuleSetDefs()) {
+            loadRuleSetRuleWithPersistentRules(ruleBeanWrapper.getAuditableBean());
+            saveRuleSet(ruleBeanWrapper.getAuditableBean());
+        }
+
+        for (AuditableBeanWrapper<RuleSetBean> ruleBeanWrapper : rulesContainer.getDuplicateRuleSetDefs()) {
+            loadRuleSetRuleWithPersistentRulesWithHashMap(ruleBeanWrapper.getAuditableBean(),ruleBeans);
+            replaceRuleSet(ruleBeanWrapper.getAuditableBean());
+        }
+    }
 
     /*
      * (non-Javadoc)
@@ -176,6 +199,15 @@ public class RuleSetService implements RuleSetServiceInterface {
         ruleSetAuditBean.setStatus(status);
         ruleSetAuditBean.setUpdater(user);
         return ruleSetAuditBean;
+    }
+    
+    public void loadRuleSetRuleWithPersistentRulesWithHashMap(RuleSetBean ruleSetBean,HashMap<String,RuleBean> persistentRules) {
+        for (RuleSetRuleBean ruleSetRule : ruleSetBean.getRuleSetRules()) {
+            if (ruleSetRule.getId() == null) {
+                String ruleOid = ruleSetRule.getOid();
+                ruleSetRule.setRuleBean(persistentRules.get(ruleOid));
+            }
+        }
     }
 
     /*

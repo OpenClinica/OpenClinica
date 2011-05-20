@@ -383,7 +383,7 @@ public class RuleController {
                 response.getMessages().add(messageType);
             }
         } else {
-            getRuleSetService().saveImport(rpic);
+        	getRuleSetService().saveImportFromDesigner(rpic);
         }
         logger.debug("RPIC READY");
         return response;
