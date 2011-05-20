@@ -282,7 +282,7 @@
 				audit_log_event_audit_id_seq.nextval,
 				event_type_id,
 				sysdate,
-				NEWREC.sdv_update_id,
+				NEWREC.update_id,
 				'event_crf',
 				NEWREC.event_crf_id,
 				entity_name_value,
@@ -450,6 +450,8 @@
 			    entity_name_value := null;
 			end;
 			/* -- */
+			INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id)
+			    VALUES (audit_log_event_audit_id_seq.nextval , '12', sysdate, NEWREC.update_id, 'item_data', NEWREC.item_data_id, entity_name_value, OLDREC.status_id, NEWREC.status_id, NEWREC.event_crf_id);
 			/* --------------- */
 			END IF;
 
