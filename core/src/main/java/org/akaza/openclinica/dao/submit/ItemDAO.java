@@ -275,6 +275,24 @@ public class ItemDAO extends AuditableEntityDAO {
         return beanList;
     }
 
+    
+    
+    public List<ItemBean> findAllItemsByGroupIdForPrint(int id, int crfVersionId,int sectionId) {
+        this.setTypesExpected();
+        HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
+        variables.put(1, id);
+        variables.put(2, crfVersionId);
+        variables.put(3,sectionId);
+        String sql = digester.getQuery("findAllItemsByGroupIdForPrint");
+        List listofMaps = this.select(sql, variables);
+        List<ItemBean> beanList = new ArrayList<ItemBean>();
+        ItemBean bean;
+        for (Object map : listofMaps) {
+            bean = (ItemBean) this.getEntityFromHashMap((HashMap) map);
+            beanList.add(bean);
+        }
+        return beanList;
+    }
     public ItemBean findItemByGroupIdandItemOid(int id, String itemOid) {
         ItemBean bean;
         this.setTypesExpected();

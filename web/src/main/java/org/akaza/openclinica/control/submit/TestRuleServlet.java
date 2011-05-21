@@ -349,7 +349,7 @@ public class TestRuleServlet extends SecureController {
         target.setValue(targetString);
         ruleSet.setTarget(target);
 
-        RuleSetBean persistentRuleSet = getRuleSetDao().findByExpression(ruleSet);
+        RuleSetBean persistentRuleSet = getRuleSetDao().findByExpressionAndStudy(ruleSet,currentStudy.getId());
 
         if (persistentRuleSet != null) {
             request.setAttribute("ruleSetId", item.getId());

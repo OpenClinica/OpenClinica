@@ -9,9 +9,11 @@ package org.akaza.openclinica.control.extract;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
+import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
+import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -39,7 +41,14 @@ public class AccessFileServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         int fileId = fp.getInt("fileId");
         ArchivedDatasetFileDAO asdfdao = new ArchivedDatasetFileDAO(sm.getDataSource());
+        DatasetDAO dsDao = new DatasetDAO(sm.getDataSource());
         ArchivedDatasetFileBean asdfBean = (ArchivedDatasetFileBean) asdfdao.findByPK(fileId);
+        DatasetBean dsBean = (DatasetBean) dsDao.findByPK(asdfBean.getDatasetId());
+        if (dsBean.getStudyId() != currentStudy.getParentStudyId() && dsBean.getStudyId() != currentStudy.getId()) {
+            addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
+            throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
+        }
+
         // asdfBean.setWebPath(WEB_DIR+
         // asdfBean.getDatasetId()+
         // "/"+

@@ -81,6 +81,10 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
     public static final String CAN_MONITOR = "canMonitor";
     public static final String ERROR_FLAG = "errorFlag";
     public static final String FROM_BOX = "fromBox";
+
+
+    public String exceptionName = resexception.getString("no_permission_to_create_discrepancy_note");
+    public String noAccessMessage = respage.getString("you_may_not_create_discrepancy_note") + respage.getString("change_study_contact_sysadmin");
     
     
     // locked, so don't
@@ -100,15 +104,13 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
         // < respage =
         // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",locale);
 
-        String exceptionName = resexception.getString("no_permission_to_create_discrepancy_note");
-        String noAccessMessage = respage.getString("you_may_not_create_discrepancy_note") + respage.getString("change_study_contact_sysadmin");
 
         if (SubmitDataServlet.mayViewData(ub, currentRole)) {
             return;
         }
 
         addPageMessage(noAccessMessage);
-        throw new InsufficientPermissionException(Page.MENU, exceptionName, "1");
+        throw new InsufficientPermissionException(Page.MENU_SERVLET, exceptionName, "1");
     }
  
     @Override
@@ -412,6 +414,14 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
         request.setAttribute(CreateDiscrepancyNoteServlet.WRITE_TO_DB, writeToDB ? "1" : "0");
 
         ArrayList notes = (ArrayList) dndao.findAllByEntityAndColumn(name, entityId, column);
+
+        if (notes.size() > 0) {
+            DiscrepancyNoteBean note = (DiscrepancyNoteBean) notes.get(0);
+            if (note.getStudyId() != currentStudy.getId() && note.getStudyId() != currentStudy.getParentStudyId()) {
+                addPageMessage(noAccessMessage);
+                throw new InsufficientPermissionException(Page.MENU_SERVLET, exceptionName, "1");
+            }
+        }
         // BWP 5/13/2009 3468 WHO; update the resolution status of parent disc
         // notes based
         // on the status of child notes

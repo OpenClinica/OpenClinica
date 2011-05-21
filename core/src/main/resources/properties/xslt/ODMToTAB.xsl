@@ -156,6 +156,8 @@
 		<!--<xsl:text>SubjectId</xsl:text>-->
 		<xsl:text>Study Subject ID</xsl:text>
 		<xsl:value-of select="$sep"/>
+		<xsl:text>Protocol ID</xsl:text>
+		<xsl:value-of select="$sep"/>
 		<xsl:if test="$uniqueIdExist">
 			<xsl:text>Person ID</xsl:text>
 			<xsl:value-of select="$delimiter" />
@@ -456,7 +458,13 @@
 		<xsl:param name="tokenizedEventHeaders"/>
 		<xsl:param name="tokenizedcrfAndDataItemsHeaders"/>
 		
+		<xsl:variable name="studyOID" select="../@StudyOID"/>
+		<xsl:variable name="studyElement" select="//odm:Study[@OID = $studyOID]"/>
+		<xsl:variable name="protocolName" select="$studyElement/odm:GlobalVariables/odm:ProtocolName"/>
+		
 		<xsl:apply-templates select="@OpenClinica:StudySubjectID" />
+		<xsl:value-of select="$sep"/>
+		<xsl:apply-templates select="$protocolName" />
 		<xsl:value-of select="$sep"/>
 		<xsl:if test="$uniqueIdExist">
 			<xsl:value-of select="@OpenClinica:UniqueIdentifier"/>

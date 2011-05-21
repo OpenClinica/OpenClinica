@@ -19,8 +19,8 @@ import org.akaza.openclinica.domain.rule.AuditableBeanWrapper;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
-import org.akaza.openclinica.domain.rule.RuleSetRuleBean.RuleSetRuleBeanImportStatus;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
+import org.akaza.openclinica.domain.rule.RuleSetRuleBean.RuleSetRuleBeanImportStatus;
 import org.akaza.openclinica.domain.rule.action.EmailActionBean;
 import org.akaza.openclinica.domain.rule.action.HideActionBean;
 import org.akaza.openclinica.domain.rule.action.InsertActionBean;
@@ -81,7 +81,7 @@ public class RulesPostImportContainerService {
         AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper = new AuditableBeanWrapper<RuleSetBean>(ruleSetBean);
         ruleSetBeanWrapper.getAuditableBean().setStudy(currentStudy);
         if (isRuleSetExpressionValid(ruleSetBeanWrapper)) {
-            RuleSetBean persistentRuleSetBean = getRuleSetDao().findByExpression(ruleSetBean);
+            RuleSetBean persistentRuleSetBean = getRuleSetDao().findByExpressionAndStudy(ruleSetBean,currentStudy.getId());
 
             if (persistentRuleSetBean != null) {
                 List<RuleSetRuleBean> importedRuleSetRules = ruleSetBeanWrapper.getAuditableBean().getRuleSetRules();
@@ -127,7 +127,7 @@ public class RulesPostImportContainerService {
             AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper = new AuditableBeanWrapper<RuleSetBean>(ruleSetBean);
             ruleSetBeanWrapper.getAuditableBean().setStudy(currentStudy);
             if (isRuleSetExpressionValid(ruleSetBeanWrapper)) {
-                RuleSetBean persistentRuleSetBean = getRuleSetDao().findByExpression(ruleSetBean);
+                RuleSetBean persistentRuleSetBean = getRuleSetDao().findByExpressionAndStudy(ruleSetBean,currentStudy.getId());
 
                 if (persistentRuleSetBean != null) {
                     List<RuleSetRuleBean> importedRuleSetRules = ruleSetBeanWrapper.getAuditableBean().getRuleSetRules();
@@ -287,7 +287,7 @@ public class RulesPostImportContainerService {
     private void isRuleActionValid(RuleActionBean ruleActionBean, AuditableBeanWrapper<RuleSetBean> ruleSetBeanWrapper,
             EventDefinitionCRFBean eventDefinitionCRFBean) {
         if (ruleActionBean instanceof ShowActionBean) {
-            List<PropertyBean> properties = (((ShowActionBean) ruleActionBean).getProperties());
+            List<PropertyBean> properties = ((ShowActionBean) ruleActionBean).getProperties();
             if (ruleActionBean.getRuleActionRun().getBatch() == true || ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
                 ruleSetBeanWrapper.error("ShowAction " + ((ShowActionBean) ruleActionBean).toString()
                     + " is not Valid. You cannot have ImportDataEntry=\"true\" Batch=\"true\". ");
@@ -301,7 +301,7 @@ public class RulesPostImportContainerService {
             }
         }
         if (ruleActionBean instanceof HideActionBean) {
-            List<PropertyBean> properties = (((HideActionBean) ruleActionBean).getProperties());
+            List<PropertyBean> properties = ((HideActionBean) ruleActionBean).getProperties();
             if (ruleActionBean.getRuleActionRun().getBatch() == true || ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
                 ruleSetBeanWrapper.error("HideAction " + ((HideActionBean) ruleActionBean).toString()
                     + " is not Valid. You cannot have ImportDataEntry=\"true\" Batch=\"true\". ");
@@ -318,13 +318,13 @@ public class RulesPostImportContainerService {
             if (ruleActionBean.getRuleActionRun().getBatch() == true || ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
                 ruleSetBeanWrapper.error("InsertAction " + ((InsertActionBean) ruleActionBean).toString() + " is not Valid. ");
             }
-            DataBinder dataBinder = new DataBinder((ruleActionBean));
+            DataBinder dataBinder = new DataBinder(ruleActionBean);
             Errors errors = dataBinder.getBindingResult();
             InsertActionValidator insertActionValidator = getInsertActionValidator();
             insertActionValidator.setEventDefinitionCRFBean(eventDefinitionCRFBean);
             insertActionValidator.setRuleSetBean(ruleSetBeanWrapper.getAuditableBean());
             insertActionValidator.setExpressionService(expressionService);
-            insertActionValidator.validate((ruleActionBean), errors);
+            insertActionValidator.validate(ruleActionBean, errors);
             if (errors.hasErrors()) {
                 ruleSetBeanWrapper.error("InsertAction is not valid: " + errors.getAllErrors().get(0).getDefaultMessage());
             }

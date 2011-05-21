@@ -264,13 +264,28 @@ public class ImportCRFDataServlet extends SecureController {
             // events)
 
             List<EventCRFBean> eventCRFBeans = getImportCRFDataService().fetchEventCRFBeans(odmContainer, ub);
-
-            ArrayList<Integer> permittedEventCRFIds = new ArrayList<Integer>();
-            logger.info("found a list of eventCRFBeans: " + eventCRFBeans.toString());
-
             List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
             HashMap<String, String> totalValidationErrors = new HashMap<String, String>();
             HashMap<String, String> hardValidationErrors = new HashMap<String, String>();
+            // @pgawade 17-May-2011 Fix for issue#9590 - collection of
+            // eventCRFBeans is returned as null
+            // when status of one the events in xml file is either stopped,
+            // signed or locked.
+            // Instead of repeating the code to fetch the events in xml file,
+            // method in the ImportCRFDataService is modified for this fix.
+            if (eventCRFBeans == null) {
+                fail = true;
+                addPageMessage(respage.getString("no_event_status_matching"));
+            }
+ else {
+            ArrayList<Integer> permittedEventCRFIds = new ArrayList<Integer>();
+            logger.info("found a list of eventCRFBeans: " + eventCRFBeans.toString());
+
+//            List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
+                // HashMap<String, String> totalValidationErrors = new
+                // HashMap<String, String>();
+                // HashMap<String, String> hardValidationErrors = new
+                // HashMap<String, String>();
             System.out.println("found event crfs " + eventCRFBeans.size());
             // -- does the event already exist? if not, fail
             if (!eventCRFBeans.isEmpty()) {
@@ -365,6 +380,7 @@ public class ImportCRFDataServlet extends SecureController {
             // errors = displayItemBeanWrapper.getValidationErrors();
             //
             // }
+ }
             if (fail) {
                 System.out.println("failed here - forwarding...");
                 forwardPage(Page.IMPORT_CRF_DATA);
@@ -386,6 +402,7 @@ public class ImportCRFDataServlet extends SecureController {
                 System.out.println("did not fail - forwarding...");
                 forwardPage(Page.VERIFY_IMPORT_SERVLET);
             }
+//            }
         }
     }
 

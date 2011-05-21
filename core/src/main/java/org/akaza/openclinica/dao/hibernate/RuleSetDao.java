@@ -116,6 +116,17 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
         q.setParameter("context", ruleSet.getTarget().getContext());
         return (RuleSetBean) q.uniqueResult();
     }
+    
+    public RuleSetBean findByExpressionAndStudy(RuleSetBean ruleSet, Integer studyId) {
+        String query = "from " + getDomainClassName() + " ruleSet  where ruleSet.originalTarget.value = :value " +
+        		"AND ruleSet.originalTarget.context = :context " +
+        		"AND ruleSet.studyId = :studyId ";
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setString("value", ruleSet.getTarget().getValue());
+        q.setParameter("context", ruleSet.getTarget().getContext());
+        q.setInteger("studyId", studyId);
+        return (RuleSetBean) q.uniqueResult();
+    }
 
     public Long getCountByStudy(StudyBean currentStudy) {
         String query = "select count(*) from " + getDomainClassName() + " ruleSet  where ruleSet.studyId = :studyId and ruleSet.status = :status ";

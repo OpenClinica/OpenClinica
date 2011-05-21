@@ -48,6 +48,9 @@ public interface RuleSetServiceInterface {
      */
 
     public abstract RuleSetBean saveRuleSet(RuleSetBean ruleSetBean);
+    
+    @Transactional
+    public abstract void saveImportFromDesigner(RulesPostImportContainer rulesContainer);
 
     @Transactional
     public abstract void saveImport(RulesPostImportContainer rulesContainer);

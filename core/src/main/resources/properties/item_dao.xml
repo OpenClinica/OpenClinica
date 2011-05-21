@@ -120,6 +120,19 @@
             and fgim.item_id=i.item_id
 		</sql>
 	</query>
+	
+	
+	<query>
+		<name>findAllItemsByGroupIdForPrint</name>
+		<sql>select distinct i.* from item i, item_group fg, item_group_metadata fgim,item_form_metadata ifm
+		where fg.item_group_id=?
+            and fg.item_group_id=fgim.item_group_id
+            and fgim.crf_version_id=?
+            and fgim.item_id=i.item_id
+            and ifm.item_id = i.item_id
+            and ifm.section_id=?
+		</sql>
+	</query>
 	<query>
         <name>findItemByGroupIdandItemOid</name>
         <sql>select distinct i.* from item i, item_group fg, item_group_metadata fgim

@@ -174,6 +174,24 @@ public class ItemGroupMetadataDAO extends EntityDAO {
         return beanList;
     }
 
+    
+    
+    public List<ItemGroupMetadataBean> findMetaByGroupAndSectionForPrint(int itemGroupId, int crfVersionId, int sectionId) {
+        this.setTypesExpected();
+        HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
+        variables.put(1, itemGroupId);
+        variables.put(2, crfVersionId);
+        variables.put(3, sectionId);
+        List listofMaps = this.select(digester.getQuery("findMetaByGroupAndSectionForPrint"), variables);
+
+        List<ItemGroupMetadataBean> beanList = new ArrayList<ItemGroupMetadataBean>();
+        ItemGroupMetadataBean bean;
+        for (Object map : listofMaps) {
+            bean = (ItemGroupMetadataBean) this.getEntityFromHashMap((HashMap) map);
+            beanList.add(bean);
+        }
+        return beanList;
+    }
     public EntityBean update(EntityBean eb) throws OpenClinicaException {
         return new ItemGroupMetadataBean(); // To change body of implemented
         // methods use File | Settings |

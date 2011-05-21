@@ -226,7 +226,7 @@ public class MetadataUnit extends OdmUnit {
             // SET
         case 8:
         case 10: // partial-date
-            return "text";
+            return "partialDate";
             // INT
         case 6:
             return "integer";

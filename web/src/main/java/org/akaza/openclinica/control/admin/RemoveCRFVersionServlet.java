@@ -180,6 +180,45 @@ public class RemoveCRFVersionServlet extends SecureController {
             for (String id : ids) {
                 idList.add(Integer.valueOf(id));
             }
+            for (int i = 0; i < versionList.size(); i++) {
+                CRFVersionBean versionBean = (CRFVersionBean) versionList.get(i);
+                if (idList.contains(versionBean.getId())) {
+                    edcBean.setDefaultVersionId(versionBean.getId());
+                    edcDao.update(edcBean);
+                    break;
+                }
+            }
+        }
+    }
+
+    // @pgawade 18-May-2011 #5414 - Ovrloaded the method updateEventDef for an
+    // additional parameter of crf version being locked.
+    // These are changes for setting the correct default crf version Id to event
+    // when existing default version is locked
+    public static void updateEventDef(EventDefinitionCRFBean edcBean, EventDefinitionCRFDAO edcDao, ArrayList versionList, int crfVIdToLock) {
+        ArrayList<Integer> idList = new ArrayList<Integer>();
+        CRFVersionBean temp = null;
+        if ((null != versionList) && (versionList.size() > 0)) {
+            temp = (CRFVersionBean) versionList.get(0);
+        }
+        // Check the first version in list if it is getting locked
+        // here. If not, make that as default version. Otherwise get the next
+        // element in list and make that as the default version.
+
+        if (StringUtil.isBlank(edcBean.getSelectedVersionIds())){
+            if ((null != temp) && (temp.getId() == crfVIdToLock) && (null != versionList) && (versionList.size() > 1)) {
+                CRFVersionBean temp2 = (CRFVersionBean) versionList.get(1);
+                edcBean.setDefaultVersionId(temp2.getId());
+            } else {
+                edcBean.setDefaultVersionId(temp.getId());
+            }
+            edcDao.update(edcBean);
+        } else {
+            String sversionIds = edcBean.getSelectedVersionIds();
+            String[] ids = sversionIds.split("\\,");
+            for (String id : ids) {
+                idList.add(Integer.valueOf(id));
+            }
             for(int i = 0; i < versionList.size(); i++){
                 CRFVersionBean versionBean = (CRFVersionBean)versionList.get(i);
                 if (idList.contains(versionBean.getId())){
