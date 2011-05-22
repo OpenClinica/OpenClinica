@@ -417,7 +417,18 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 
         if (notes.size() > 0) {
             DiscrepancyNoteBean note = (DiscrepancyNoteBean) notes.get(0);
-            if (note.getStudyId() != currentStudy.getId() && note.getStudyId() != currentStudy.getParentStudyId()) {
+            // @pgawade 21-May-2011 Corrected the condition to throw no access
+            // error
+            StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
+            int parentStudyForNote = 0;
+            StudyBean studyBeanSub = (StudyBean) studyDAO.findByPK(note.getStudyId());
+            if (null != studyBeanSub) {
+                parentStudyForNote = studyBeanSub.getParentStudyId();
+            }
+            // if (note.getStudyId() != currentStudy.getId() &&
+            // note.getStudyId() != currentStudy.getParentStudyId()) {
+
+            if (note.getStudyId() != currentStudy.getId() && currentStudy.getId() != parentStudyForNote) {
                 addPageMessage(noAccessMessage);
                 throw new InsufficientPermissionException(Page.MENU_SERVLET, exceptionName, "1");
             }
