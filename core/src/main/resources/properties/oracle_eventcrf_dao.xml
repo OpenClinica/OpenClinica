@@ -324,7 +324,7 @@
             , ELECTRONIC_SIGNATURE_STATUS=?
             , SDV_STATUS=?
             , OLD_STATUS_ID=?
-            , SDV_UPDADE_ID = ?
+            , SDV_UPDATE_ID = ?
             WHERE EVENT_CRF_ID=?
         </sql>
     </query>
