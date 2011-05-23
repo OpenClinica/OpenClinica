@@ -163,7 +163,11 @@ public class EventCRFDAO extends AuditableEntityDAO {
         } else {
             variables.put(new Integer(18), new Integer(0));
         }
-        variables.put(new Integer(19), new Integer(ecb.getId()));
+        // @pgawade 22-May-2011 added the sdv updater id variable
+        variables.put(new Integer(19), ecb.getSdvUpdateId());
+        // variables.put(new Integer(19), new Integer(ecb.getId()));
+        variables.put(new Integer(20), new Integer(ecb.getId()));
+
         this.execute(digester.getQuery("update"), variables, nullVars);
 
         if (isQuerySuccessful()) {
