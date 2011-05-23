@@ -14,18 +14,44 @@ Translated variables: [[Key to variables and/or reference document]] -->
 	<Target Context="OC_RULES_V1"></Target>
 		<!-- RuleRef is where you reference an existing RuleDef. This is how you define what expression to apply to your target and what actions should take place. -->
 		<RuleRef OID="">
-		<!-- Discrepancy note action means that a discrepancy note can be logged automatically when the referenced expression evaluates to a result. You can define if you want the action to occur if it evaluates to "true" or "false" -->
+			<!-- Run defines when the rule Action is going to be executed. Indicate whether you want the rule to execute for with a "true" or "false" -->
+			<Run AdministrativeDataEntry="" InitialDataEntry="" DoubleDataEntry=""  Batch="" />
+			<!-- Discrepancy note action means that a discrepancy note can be logged automatically when the referenced expression evaluates to a result. You can define if you want the action to occur if it evaluates to "true" or "false" -->
 			<DiscrepancyNoteAction IfExpressionEvaluates="">
-			<!-- Message is the error message that the data entry person would see. This is also the message that gets pre-populated in the detailed notes in the discrepancy note that gets logged -->
+				<!-- Message is the error message that the data entry person would see. This is also the message that gets pre-populated in the detailed notes in the discrepancy note that gets logged -->
 				<Message></Message>
 			</DiscrepancyNoteAction>
-<!-- Email action means that an email can be sent automatically when the referenced expression evaluates to a result. You can define if you want the action to occur if it evaluates to "true" or "false" -->			
-			<EmailAction IfExpressionEvaluates="">
-			<!-- Message is the error message that the data entry person would see. This is also the message that gets pre-populated in the email that gets sent -->
+			<!-- Email action means that an email can be sent automatically when the referenced expression evaluates to a result. You can define if you want the action to occur if it evaluates to "true" or "false" -->			
+                <Run AdministrativeDataEntry="" InitialDataEntry="" DoubleDataEntry=""  Batch="" />
+				<EmailAction IfExpressionEvaluates="">
+				<!-- Message is the error message that the data entry person would see. This is also the message that gets pre-populated in the email that gets sent -->
 				<Message></Message>
 				<!-- To allows you to specify an email account that the email will be sent to. You can specify more than one email by using comma separated values: e.g. usera@example.com,userb@example.com -->
 				<To></To>
 			</EmailAction>
+			<!-- Show action means that an item or group of items will be displayed automatically when the referenced expression evaluates to a result. The items or group of items to be shown must be part of the same CRF as the Target.  You can define if you want the action to occur if it evaluates to "true" or "false" -->
+			<ShowAction IfExpressionEvaluates="">
+                <Run AdministrativeDataEntry="" InitialDataEntry="" DoubleDataEntry=""  Batch="" />
+ 				<!-- Message is the information that the data entry person would see if the shown items or group of items is in the same section as the target. The message will not be displayed if the items or group of items to be shown are in a different section of the CRF -->
+				<Message></Message>
+ 				<!-- DestinationProperty is the OID of the item or group of items that will be shown when the action executes -->
+				<DestinationProperty OID =""/>
+            </ShowAction>			
+			<!-- Hide action means that an item or group of items will be displayed automatically when the referenced expression evaluates to a result. The items or group of items to be hidden must be part of the same CRF as the Target and not contain any data.  You can define if you want the action to occur if it evaluates to "true" or "false" -->
+			<HideAction IfExpressionEvaluates="">
+                <Run AdministrativeDataEntry="" InitialDataEntry="" DoubleDataEntry=""  Batch="" />
+                <Message></Message>
+ 				<!-- DestinationProperty is the OID of the item or group of items that will be hidden when the action executes -->
+				<DestinationProperty OID =""/>
+            </HideAction>
+ 			<!-- InsertAction is used to insert a value into another item in the same CRF or another CRF in the same event definition.  It can be a calculated value, a single default value, or can be a value of another field.  You can define if you want the action to occur if it evaluates to "true" or "false" -->
+			<InsertAction IfExpressionEvaluates="">
+                <Run AdministrativeDataEntry="" InitialDataEntry="" DoubleDataEntry="" Batch=""/>
+			<!-- DestinationProperty is the item that will get the value inserted based on the rule expression.  If it is part of the same group as the target, you only need to provide the ITEM OID.  If it is in a different group, but the same CRF, you must provide the GROUP OID with the ITEM OID.   If the item is in a different CRF, you must provide the CRF OID, GROUP OID, and ITEM OID.  Value="" is the value you want to insert into the destination property -->
+			<DestinationProperty OID="" Value=""></DestinationProperty>
+					<!-- ValueExpression is used to copy a value from one item to another.  If it is part of the same group as the target, you only need to provide the ITEM OID.  If it is in a different group, but the same CRF, you must provide the GROUP OID with the ITEM OID.   If the item is in a different CRF, you must provide the CRF OID, GROUP OID, and ITEM OID.-->
+					<ValueExpression Context="OC_RULES_V1"></ValueExpression>
+            </InsertAction>
 		</RuleRef>
 	</RuleAssignment>
 	<!-- RuleDef is where you define your expression and description. In the RuleDef tag, there are two attributes that must be defined: OID and Name. OID must be uniqe, all UPPERCASE and can not contain whitespace. Name should be a descriptive name for anyone that might be managing the rules through the rules interface. -->
