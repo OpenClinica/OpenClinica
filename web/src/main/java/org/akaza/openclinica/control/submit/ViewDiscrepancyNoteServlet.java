@@ -420,15 +420,29 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
             // @pgawade 21-May-2011 Corrected the condition to throw no access
             // error
             StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
-            int parentStudyForNote = 0;
-            StudyBean studyBeanSub = (StudyBean) studyDAO.findByPK(note.getStudyId());
+            int parentStudyForNoteSub = 0;
+            int noteSubId = note.getOwnerId();
+            StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
+            StudySubjectBean notessub = (StudySubjectBean) ssdao.findByPK(noteSubId);
+            StudyBean studyBeanSub = (StudyBean) studyDAO.findByPK(notessub.getStudyId());
             if (null != studyBeanSub) {
-                parentStudyForNote = studyBeanSub.getParentStudyId();
+                parentStudyForNoteSub = studyBeanSub.getParentStudyId();
             }
+            // int parentStudyForNote = 0;
+
+            // StudyBean studyBeanSub = (StudyBean)
+            // studyDAO.findByPK(note.getStudyId());
+
+            // if (null != studyBeanSub) {
+            // parentStudyForNote = studyBeanSub.getParentStudyId();
+            // }
+
             // if (note.getStudyId() != currentStudy.getId() &&
             // note.getStudyId() != currentStudy.getParentStudyId()) {
 
-            if (note.getStudyId() != currentStudy.getId() && currentStudy.getId() != parentStudyForNote) {
+            // if (note.getStudyId() != currentStudy.getId() &&
+            // currentStudy.getId() != parentStudyForNote) {
+            if (notessub.getStudyId() != currentStudy.getId() && currentStudy.getId() != parentStudyForNoteSub) {
                 addPageMessage(noAccessMessage);
                 throw new InsufficientPermissionException(Page.MENU_SERVLET, exceptionName, "1");
             }
