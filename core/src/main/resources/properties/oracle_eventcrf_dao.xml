@@ -467,5 +467,10 @@
             and se.study_event_definition_id= sed.study_event_definition_id) order by event_crf_id asc
         </sql>
     </query>
+     
+     <query>
+        <name>findAllByStudyEventAndStatus</name>
+        <sql>SELECT * FROM event_crf WHERE study_event_id=? and status_id = ? order by event_crf_id asc</sql>
+    </query>
 
 </queries>
