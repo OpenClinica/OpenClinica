@@ -69,6 +69,17 @@
 		</sql>
 	</query>
 	<query>
+		<name>getNumItemsCompletedBySection</name>
+		<sql>
+			SELECT M.section_id as section_id, count(*) AS num_items
+			FROM ITEM_DATA D, ITEM_FORM_METADATA M
+			WHERE D.item_id = M.item_id
+				--AND D.status_id = 2
+				AND D.event_crf_id = ?
+			GROUP BY M.section_id
+		</sql>
+	</query>
+	<query>
 		<name>getNumItemsPendingBySectionId</name>
 		<sql>
 			SELECT M.section_id as section_id, count(*) AS num_items
