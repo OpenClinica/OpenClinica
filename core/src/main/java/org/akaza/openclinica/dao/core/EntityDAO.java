@@ -1855,7 +1855,7 @@ public abstract class EntityDAO implements DAOInterface {
                 + sedin
                 + " 				   AND  "
                 + " 					(	study_event.sample_ordinal IS NOT NULL AND "
-                + " 						study_event.location IS NOT NULL AND "
+               // + " 						study_event.location IS NOT NULL AND " //JN:Starting 3.1 study event location is no longer null
                 + " 						study_event.date_start IS NOT NULL  "
                 + " 					) "
                 + " 				   AND "
@@ -1989,7 +1989,7 @@ public abstract class EntityDAO implements DAOInterface {
                 + sedin
                 + "                  AND  "
                 + "                   (   study_event.sample_ordinal IS NOT NULL AND "
-                + "                       study_event.location IS NOT NULL AND "
+              //  + "                       study_event.location IS NOT NULL AND " JN: starting 3.1 study_event.location can be null
                 + "                       study_event.date_start IS NOT NULL  "
                 + "                   ) "
                 + "                  AND "
