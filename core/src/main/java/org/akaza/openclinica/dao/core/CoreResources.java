@@ -481,7 +481,7 @@ public class CoreResources implements ResourceLoaderAware {
      *          import, Castor API is not able to load this mapping xml file
      *          from core jar file
      */
-    private void copyODMMappingXMLtoResources(ResourceLoader resourceLoader) {
+     private void copyODMMappingXMLtoResources(ResourceLoader resourceLoader) {
         // System.out.println("Properties directory?"+resourceLoader.getResource("properties/xslt"));
 
         ByteArrayInputStream listSrcFiles[] = new ByteArrayInputStream[10];
@@ -500,14 +500,10 @@ public class CoreResources implements ResourceLoaderAware {
 
         File dest = null;
         try {
-            // File placeholder_file = new
-            // File(resourceLoader.getResource("classpath:properties" +
-            // File.separator + "placeholder.properties").getURL().getFile());
-            File placeholder_file = new File(resourceLoader.getResource("classpath:org/akaza/openclinica/applicationContext-web-beans.xml").getURL().getFile());
+            File placeholder_file = new File(resourceLoader.getResource("classpath:properties" + File.separator + "placeholder.properties").getURL().getFile());
             String placeholder_file_path = placeholder_file.getPath();
-            // String tmp1 = placeholder_file_path.substring(6);
-            // String tmp2 = tmp1.substring(0, tmp1.indexOf("WEB-INF") - 1);
-            String tmp2 = placeholder_file_path.substring(0, placeholder_file_path.indexOf("WEB-INF") - 1);
+            String tmp1 = placeholder_file_path.substring(6);
+            String tmp2 = tmp1.substring(0, tmp1.indexOf("WEB-INF") - 1);
             String tmp3 = tmp2 + File.separator + "WEB-INF" + File.separator + "classes";
             dest = new File(tmp3 + File.separator + "odm_mapping");
 
