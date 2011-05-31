@@ -686,14 +686,25 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         String[] resValArray = value1.split(",");
                         if (labelWithValues.containsKey(responseLabel)) {
                             if (!StringUtil.isBlank(resValues)) {
-                                for (int i = 0; i < resValArray.length; i++) {
-                                    if (!resValArray[i].equals(mapValArray[i])) {
-                                        errors.add(resPageMsg.getString("resp_label_with_different_resp_values") + " " + k + ", "
-                                            + resPageMsg.getString("items_worksheet") + ".");
-                                        htmlErrors.put(j + "," + k + ",16", resPageMsg.getString("resp_label_with_different_resp_values_html_error"));
-                                        break;
-                                    }
-                                }
+								// @pgawade 31-May-2011 Added the check to
+								// compare the size of resValArray and
+								// mapValArray before comparing the individual
+								// elements in them
+								if ((null != resValArray) && (null != mapValArray) && (resValArray.length != mapValArray.length)) {
+									errors.add(resPageMsg.getString("resp_label_with_different_resp_values") + " " + k + ", "
+										+ resPageMsg.getString("items_worksheet") + ".");
+									htmlErrors.put(j + "," + k + ",16", resPageMsg.getString("resp_label_with_different_resp_values_html_error"));
+								} 
+								else {
+									for (int i = 0; i < resValArray.length; i++) {
+										if (!resValArray[i].equals(mapValArray[i])) {
+											errors.add(resPageMsg.getString("resp_label_with_different_resp_values") + " " + k + ", "
+												+ resPageMsg.getString("items_worksheet") + ".");
+											htmlErrors.put(j + "," + k + ",16", resPageMsg.getString("resp_label_with_different_resp_values_html_error"));
+											break;
+										}
+									}
+								}
                             }
                             controlValues.put(secName+"---"+itemName, mapValArray);
                         } else {
