@@ -7,7 +7,9 @@ CREATE OR REPLACE
       promote IN INTEGER)
     RETURN INTEGER
   IS
+  
   BEGIN
+    
     UPDATE dn_item_data_map
     SET item_data_id   = promote
     WHERE item_data_id = remove;
@@ -15,8 +17,9 @@ CREATE OR REPLACE
     SET entity_id   = promote
     WHERE entity_id = remove
     AND audit_table = 'item_data';
-    DELETE FROM item_data WHERE item_data_id = remove AND ordinal = 1;
-    --raise notice 'deleted %', remove;
+    --DELETE FROM item_data WHERE item_data_id = remove AND ordinal = 1 returning rowid into rr;
+    --commit;
+    --dbms_output.put_line('deleted '|| remove || ' rowid ' || rr);
     --update item_data set status_id = 7, date_updated = now(), update_id = 1
     -- where item_data_id = item_data_record.min_item_data_id;
     RETURN 1;
@@ -67,6 +70,9 @@ IS
   sed_name            VARCHAR2(4000);
   max_item_data_id    INTEGER;
   min_item_data_id    INTEGER;
+  vbuffer varchar2(4000);
+  status integer;
+  rr urowid;
 BEGIN
   ret_count := 0;
   SELECT MAX(cnt)
@@ -78,6 +84,7 @@ BEGIN
     HAVING COUNT(item_id)   > 1
     AND COUNT(event_crf_id) > 1
     );
+    DBMS_OUTPUT.ENABLE(1000000);
   -- usually, the above will be 2.  however, it may be higher
   FOR i IN 2..max_overall
   LOOP
@@ -137,11 +144,13 @@ BEGIN
         (SELECT event_crf_id FROM item_data WHERE item_data_id = max_item_data_id
         );
       dbms_output.put_line('looking at records for SSID '|| event_ssid || ' CRF '|| crf_name ||' Version '|| crf_version_name ||' Study Event ' || sed_name);
-      dbms_output.put_line('comparing item_data_id '|| min_item_data_id ||' with a value of '|| min_item_value ||' and item_data_id '|| max_item_data_id ||' with a value of ' || max_item_value);
+      --dbms_output.put_line('comparing item_data_id '|| min_item_data_id ||' with a value of '|| min_item_value ||' and item_data_id '|| max_item_data_id ||' with a value of ' || max_item_value);
       -- end of extra here, continue with logic of removals
       -- if our values are identical, we can remove the initial row created and move DNs over to the most recent row.
-      IF min_item_value     = max_item_value THEN
+      IF (min_item_value     = max_item_value) or (min_item_value is null and max_item_value is null) THEN
         ret_count          := ret_count + DELTE(min_item_data_id, max_item_data_id);
+        DELETE FROM item_data WHERE item_data_id = min_item_data_id AND ordinal = 1 returning rowid into rr;
+        dbms_output.put_line('deleted '|| min_item_data_id || ' rowid ' || rr);
       elsif min_item_value <> max_item_value THEN
         SELECT id.date_updated
         INTO min_item_date_updated
@@ -190,32 +199,62 @@ BEGIN
         IF min_last_touched > max_last_touched THEN
           --raise notice 'reviewed TIMESTAMPS: min % VS max %', min_item_timestamp, max_item_timestamp;
           ret_count           := ret_count + DELTE(min_item_data_id, max_item_data_id);
+          DELETE FROM item_data WHERE item_data_id = min_item_data_id AND ordinal = 1 returning rowid into rr;
+          dbms_output.put_line('deleted '|| min_item_data_id || ' rowid ' || rr);
         elsif max_last_touched > min_last_touched THEN
           --raise notice 'reviewed TIMESTAMPS: max % VS  min %', max_item_timestamp, min_item_timestamp;
           ret_count := ret_count + DELTE(max_item_data_id, min_item_data_id);
+          DELETE FROM item_data WHERE item_data_id = max_item_data_id AND ordinal = 1 returning rowid into rr;
+          dbms_output.put_line('deleted '|| max_item_data_id || ' rowid ' || rr);
           -- final rows that dont make the cut - compare on PK
         ELSE
           -- here we look at blanks vs nonblanks, and then finally, make a decision based on PK
           IF min_item_value = '' AND max_item_value <> '' THEN
             ret_count      := ret_count + DELTE(min_item_data_id, max_item_data_id);
+            DELETE FROM item_data WHERE item_data_id = min_item_data_id AND ordinal = 1 returning rowid into rr;
+            dbms_output.put_line('deleted '|| min_item_data_id || ' rowid ' || rr);
             --raise notice 'removed on Blank Value %', item_data_record.min_item_data_id;
           elsif max_item_value = '' AND min_item_value <> '' THEN
             ret_count         := ret_count + DELTE(max_item_data_id, min_item_data_id);
+            DELETE FROM item_data WHERE item_data_id = max_item_data_id AND ordinal = 1 returning rowid into rr;
+            dbms_output.put_line('deleted '|| max_item_data_id || ' rowid ' || rr);
+            
             --raise notice 'removed on Blank Value %', item_data_record.max_item_data_id;
           ELSE
             -- both items are nonblank
             ret_count := ret_count + DELTE(max_item_data_id, min_item_data_id);
+            DELETE FROM item_data WHERE item_data_id = max_item_data_id AND ordinal = 1 returning rowid into rr;
+            dbms_output.put_line('deleted '|| max_item_data_id || ' rowid ' || rr);
             --raise notice 'removed on PK %', item_data_record.max_item_data_id;
           END IF;
         END IF;
+        
       END IF;
     END LOOP;
     CLOSE item_data_record_max;
     CLOSE item_data_record_min;
     --'i is %', i;
     --raise notice 'max_overall is %', max_overall;
+    --dbms_output.get_lines;
+    --commit;
+    DBMS_OUTPUT.GET_LINE(vbuffer, status); 
   END LOOP;
   RETURN ret_count;
 END repair_item_data_1;
 /
-SELECT repair_item_data_1() FROM dual;
+set serveroutput on;
+
+declare
+  nnn number;
+begin
+  nnn := repair_item_data_1();
+  dbms_output.put_line (nnn);
+end;
+/
+
+--grant all on item_data to thickerson; 
+--DBMS_OUTPUT.ENABLE (buffer_size => 100000000);
+
+--SELECT repair_item_data_1() FROM dual;
+
+commit;
