@@ -22,7 +22,8 @@
       <includes>
         <include>database/PostgreSQL/${pom.version}/*/*</include>
         <include>database/Oracle/${pom.version}/*/*</include>
-        <include>languages/*/*</include>
+		<include>languages/*</include>       
+	   <include>languages/*/*</include>
       </includes>
     </fileSet>
   </fileSets>
