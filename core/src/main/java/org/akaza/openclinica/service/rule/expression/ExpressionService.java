@@ -929,9 +929,9 @@ public class ExpressionService {
         }
 
         if (length > 1) {
-            List<ItemGroupBean> persistentItemGroups = (List<ItemGroupBean>) getItemGroupDao().findGroupsByItemID(item.getId());
-            itemGroup = persistentItemGroups.size() > 0 ? persistentItemGroups.get(0) : null;
-            if (itemGroup == null || !itemGroup.getOid().equals(getItemGroupOidFromExpression(expression)))
+            String itemGroupOid = getItemGroupOidFromExpression(expression);
+            itemGroup = getItemGroupDao().findByOid(itemGroupOid);
+            if(itemGroup == null)
                 throw new OpenClinicaSystemException("OCRERR_0022");
             // throw new OpenClinicaSystemException("itemGroup is Invalid");
         }

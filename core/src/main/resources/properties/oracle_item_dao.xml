@@ -171,4 +171,8 @@
            select count(item.item_id) from item where item.status_id != 5
         </sql>
     </query>
+        <query>
+        <name>findAllByEventCRFIdAndItemIdNoStatus</name>
+        <sql>select * from item_data where event_crf_id=? and item_id = ? Order by item_data.ordinal asc </sql>
+    </query>
 </queries>

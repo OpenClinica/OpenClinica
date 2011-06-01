@@ -369,7 +369,7 @@ public class CoreResources implements ResourceLoaderAware {
 
         ByteArrayInputStream listSrcFiles[] = new ByteArrayInputStream[11];
         String[] fileNames =
-            { "odm_spss_dat.xsl", "ODMToTAB.xsl", "odm_to_html.xsl", "odm_to_xslfo.xsl", "ODM-XSLFO-Stylesheet.xsl", "odm_spss_sps.xsl", "copyXML.xsl",
+            { "odm_spss_dat.xsl", "ODMToTAB.xsl", "odm_to_html.xsl", "odm_to_xslfo.xsl",  "odm_spss_sps.xsl", "copyXML.xsl",
                 "odm1.3_to_1.2.xsl", "odm1.3_to_1.2_extensions.xsl", "odm1.3_to_1.3_no_extensions.xsl","ODMReportStylesheet.xsl" };
         try {
             listSrcFiles[0] =
@@ -400,9 +400,6 @@ public class CoreResources implements ResourceLoaderAware {
                 (ByteArrayInputStream) resourceLoader.getResource("classpath:properties" + File.separator + "xslt" + File.separator + fileNames[8])
                         .getInputStream();
             listSrcFiles[9] =
-                (ByteArrayInputStream) resourceLoader.getResource("classpath:properties" + File.separator + "xslt" + File.separator + fileNames[9])
-                        .getInputStream();
-            listSrcFiles[10] =
                 (ByteArrayInputStream) resourceLoader.getResource("classpath:properties" + File.separator + "xslt" + File.separator + fileNames[10])
                         .getInputStream();
 
@@ -482,7 +479,7 @@ public class CoreResources implements ResourceLoaderAware {
      *          import, Castor API is not able to load this mapping xml file
      *          from core jar file
      */
-    private void copyODMMappingXMLtoResources(ResourceLoader resourceLoader) {
+     private void copyODMMappingXMLtoResources(ResourceLoader resourceLoader) {
         // System.out.println("Properties directory?"+resourceLoader.getResource("properties/xslt"));
 
         ByteArrayInputStream listSrcFiles[] = new ByteArrayInputStream[10];

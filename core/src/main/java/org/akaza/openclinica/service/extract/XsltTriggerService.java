@@ -109,5 +109,10 @@ public class XsltTriggerService {
         }
         return interval.longValue();
     }
+    
+    public String getTriggerGroupNameForExportJobs()
+    {
+        return "XsltTriggersExportJobs";
+    }
 
 }

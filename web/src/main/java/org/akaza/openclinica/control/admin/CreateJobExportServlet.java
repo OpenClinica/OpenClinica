@@ -221,7 +221,7 @@ public class CreateJobExportServlet extends SecureController {
                         endFilePath + File.separator,
                         exportFileName,
                         dsBean.getId(),
-                        epBean, userBean, request.getLocale().getLanguage(),cnt,  SQLInitServlet.getField("filePath") + "xslt", XsltTriggerService.TRIGGER_GROUP_NAME);
+                        epBean, userBean, request.getLocale().getLanguage(),cnt,  SQLInitServlet.getField("filePath") + "xslt", xsltService.getTriggerGroupNameForExportJobs());
 
                 //Updating the original trigger with user given inputs
                 trigger.setRepeatCount(64000);
@@ -240,7 +240,7 @@ public class CreateJobExportServlet extends SecureController {
 				trigger.getJobDataMap().put("job_type", "exportJob");
 
                 JobDetailBean jobDetailBean = new JobDetailBean();
-                jobDetailBean.setGroup(xsltService.TRIGGER_GROUP_NAME);
+                jobDetailBean.setGroup(xsltService.getTriggerGroupNameForExportJobs());
                 jobDetailBean.setName(trigger.getName());
                 jobDetailBean.setJobClass(org.akaza.openclinica.job.XsltStatefulJob.class);
                 jobDetailBean.setJobDataMap(trigger.getJobDataMap());
