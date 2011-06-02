@@ -502,13 +502,17 @@ public class CoreResources implements ResourceLoaderAware {
             // File(resourceLoader.getResource("classpath:properties" +
             // File.separator + "placeholder.properties").getURL().getFile());
             File placeholder_file = new File(resourceLoader.getResource("classpath:org/akaza/openclinica/applicationContext-web-beans.xml").getURL().getFile());
+            logMe("placeholder_file:"+placeholder_file);
             String placeholder_file_path = placeholder_file.getPath();
+            logMe("placeholder_file_path:"+placeholder_file_path);
             // String tmp1 = placeholder_file_path.substring(6);
             // String tmp2 = tmp1.substring(0, tmp1.indexOf("WEB-INF") - 1);
             String tmp2 = placeholder_file_path.substring(0, placeholder_file_path.indexOf("WEB-INF") - 1);
+            logMe("tmp2:"+tmp2);
             String tmp3 = tmp2 + File.separator + "WEB-INF" + File.separator + "classes";
+            logMe("tmp3:"+tmp3);
             dest = new File(tmp3 + File.separator + "odm_mapping");
-
+            logMe("dest:"+dest);
         } catch (IOException ioe) {
             OpenClinicaSystemException oe = new OpenClinicaSystemException("Unable to get web app base path");
             oe.initCause(ioe);
@@ -852,7 +856,7 @@ public class CoreResources implements ResourceLoaderAware {
 
     // TODO comment out system out after dev
     private static void logMe(String message) {
-        // System.out.println(message);
+         System.out.println(message);
         logger.info(message);
     }
 
