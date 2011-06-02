@@ -367,7 +367,7 @@ public class CoreResources implements ResourceLoaderAware {
     private void copyBaseToDest(ResourceLoader resourceLoader) {
         // System.out.println("Properties directory?"+resourceLoader.getResource("properties/xslt"));
 
-        ByteArrayInputStream listSrcFiles[] = new ByteArrayInputStream[11];
+        ByteArrayInputStream listSrcFiles[] = new ByteArrayInputStream[10];
         String[] fileNames =
             { "odm_spss_dat.xsl", "ODMToTAB.xsl", "odm_to_html.xsl", "odm_to_xslfo.xsl",  "odm_spss_sps.xsl", "copyXML.xsl",
                 "odm1.3_to_1.2.xsl", "odm1.3_to_1.2_extensions.xsl", "odm1.3_to_1.3_no_extensions.xsl","ODMReportStylesheet.xsl" };
