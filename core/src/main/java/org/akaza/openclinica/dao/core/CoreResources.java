@@ -856,7 +856,7 @@ public class CoreResources implements ResourceLoaderAware {
 
     // TODO comment out system out after dev
     private static void logMe(String message) {
-         System.out.println(message);
+      //   System.out.println(message);
         logger.info(message);
     }
 
