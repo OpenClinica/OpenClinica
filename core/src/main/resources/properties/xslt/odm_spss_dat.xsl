@@ -2605,7 +2605,7 @@
 																</xsl:otherwise>
 															</xsl:choose>													
 															</xsl:when>
-															<xsl:otherwise> {only event repeating }
+															<xsl:otherwise>
 																<!-- check item name -->
 																<xsl:for-each select="./odm:ItemData">
 																	<xsl:variable name="itemOID" select="@ItemOID"/>
