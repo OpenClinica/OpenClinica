@@ -25,6 +25,7 @@ CREATE OR REPLACE
     RETURN 1;
   END DELTE;
   /
+  
 CREATE OR REPLACE
 FUNCTION repair_item_data_1
   RETURN INTEGER
@@ -239,22 +240,33 @@ BEGIN
     --commit;
     DBMS_OUTPUT.GET_LINE(vbuffer, status); 
   END LOOP;
+  
   RETURN ret_count;
 END repair_item_data_1;
 /
 set serveroutput on;
 
+ALTER TABLE item_data
+DISABLE ALL TRIGGERS;
+ALTER TABLE dn_item_data_map
+DISABLE ALL TRIGGERS;
+ALTER TABLE audit_log_event
+DISABLE ALL TRIGGERS;
+    
 declare
   nnn number;
 begin
+  
   nnn := repair_item_data_1();
   dbms_output.put_line (nnn);
+  
 end;
 /
-
---grant all on item_data to thickerson; 
---DBMS_OUTPUT.ENABLE (buffer_size => 100000000);
-
---SELECT repair_item_data_1() FROM dual;
+ALTER TABLE item_data
+ENABLE ALL TRIGGERS;
+ALTER TABLE dn_item_data_map
+ENABLE ALL TRIGGERS;
+ALTER TABLE audit_log_event
+ENABLE ALL TRIGGERS;
 
 commit;
