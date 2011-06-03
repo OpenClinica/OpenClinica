@@ -2589,7 +2589,7 @@
 			<!-- get event posiotn and event repeat key (if repeating event) from next token.-->		
 			<xsl:variable name="nextToken" select="$tokenizedcrfAndDataItemsHeaders[$currentPos+1]"/>
 			<!--currentToken:*<xsl:value-of select="$currentToken"/>*-->
-			<!--next token:<xsl:value-of select="$nextToken"/>-->
+			<!--next token:*<xsl:value-of select="$nextToken"/>*-->
 			<xsl:variable name="numericStart">
 				<xsl:choose>
 					<xsl:when test="ends-with($nextToken,'Interviewer')">
@@ -2605,12 +2605,12 @@
 						<xsl:value-of select="substring-before($nextToken,concat($delimiter, 'Version Name'))"/>
 					</xsl:when>
 					<xsl:otherwise>
-						<xsl:value-of select="substring-before($nextToken,concat($delimiter, ' '))"/>
+						<xsl:value-of select="substring-before($nextToken,concat(' ', $delimiter))"/>
 					</xsl:otherwise>
 				</xsl:choose>
 				
 			</xsl:variable>
-			<!--{numeric start: <xsl:value-of select="$numericStart"/>}-->
+	<!--{numeric start: <xsl:value-of select="$numericStart"/>}-->
 			<xsl:variable name="numericB4_C" select="substring-before($numericStart, '_C')"/>
 			<!--numericB4_C: <xsl:value-of select="$numericB4_C"/>-->
 			<xsl:variable name="colEventPosition" >
@@ -2623,7 +2623,7 @@
 				</xsl:otherwise>
 				</xsl:choose>
 			</xsl:variable>
-			<!--colEventPosition: <xsl:value-of select="$colEventPosition"/>-->
+			<!--olEventPosition: <xsl:value-of select="$colEventPosition"/>-->
 			
 			<xsl:variable name="isColForRepeatingEvent" select="contains($numericB4_C, '_')"/><!--isColForRepeatingEvent<xsl:value-of select="$isColForRepeatingEvent"/>-->
 			<xsl:variable name="colRepeatEventKey">

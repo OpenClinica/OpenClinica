@@ -2463,7 +2463,7 @@
 						<xsl:value-of select="substring-before($nextToken,concat($delimiter, 'Version Name'))"/>
 					</xsl:when>
 					<xsl:otherwise>
-						<xsl:value-of select="substring-before($nextToken,concat($delimiter, ' '))"/>
+						<xsl:value-of select="substring-before($nextToken,concat(' ', $delimiter))"/>
 					</xsl:otherwise>
 				</xsl:choose>
 				
@@ -2605,7 +2605,7 @@
 																</xsl:otherwise>
 															</xsl:choose>													
 															</xsl:when>
-															<xsl:otherwise>
+															<xsl:otherwise> 
 																<!-- check item name -->
 																<xsl:for-each select="./odm:ItemData">
 																	<xsl:variable name="itemOID" select="@ItemOID"/>
