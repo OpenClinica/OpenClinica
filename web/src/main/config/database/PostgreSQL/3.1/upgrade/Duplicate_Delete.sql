@@ -3,11 +3,15 @@
 -- also pass in event_crf_id?
 CREATE OR REPLACE FUNCTION delete(remove integer, promote integer) returns integer AS $$
         BEGIN
+		
+		
         	update dn_item_data_map set item_data_id = promote 
 				where item_data_id = remove;
 		update audit_log_event set entity_id = promote 
 				where entity_id = remove and audit_table = 'item_data';
 		delete from item_data where item_data_id = remove and ordinal = 1;
+
+		
 		--raise notice 'deleted %', remove;
 		--update item_data set status_id = 7, date_updated = now(), update_id = 1 
 		--	where item_data_id = item_data_record.min_item_data_id;
@@ -39,6 +43,10 @@ declare
 	crf_version_name text;
 	sed_name text;
 begin
+
+	ALTER TABLE dn_item_data_map DISABLE TRIGGER ALL;
+		ALTER TABLE audit_log_event DISABLE TRIGGER ALL;
+		ALTER TABLE item_data DISABLE TRIGGER ALL;
 	select into ret_count 0;
 	select into max_overall max(overall.cnt) from (select count(item_id) as cnt from item_data 
 		where ordinal = 1 --and status_id != 5 and status_id != 7
@@ -113,8 +121,18 @@ begin
 					ret_count = ret_count + delete(item_data_record.max_item_data_id, item_data_record.min_item_data_id);
 				-- final rows that dont make the cut - compare on PK
 				else 
-					ret_count = ret_count + delete(item_data_record.max_item_data_id, item_data_record.min_item_data_id);
-					raise notice 'removed on PK %', item_data_record.max_item_data_id;
+				-- here we look at blanks vs nonblanks, and then finally, make a decision based on PK
+					if min_item_value = '' and max_item_value <> '' then
+						ret_count = ret_count + delete(item_data_record.min_item_data_id, item_data_record.max_item_data_id);
+						raise notice 'removed on Blank Value %', item_data_record.min_item_data_id;
+					elsif max_item_value = '' and min_item_value <> '' then
+						ret_count = ret_count + delete(item_data_record.max_item_data_id, item_data_record.min_item_data_id);
+						raise notice 'removed on Blank Value %', item_data_record.max_item_data_id;
+					else
+					-- both items are nonblank
+						ret_count = ret_count + delete(item_data_record.max_item_data_id, item_data_record.min_item_data_id);
+						raise notice 'removed on PK %', item_data_record.max_item_data_id;
+					end if;
 				end if;
 				
 			end if;
@@ -123,7 +141,9 @@ begin
 	raise notice 'i is %', i;
 	raise notice 'max_overall is %', max_overall;
 	end loop;
-
+	ALTER TABLE dn_item_data_map ENABLE TRIGGER ALL;
+		ALTER TABLE audit_log_event ENABLE TRIGGER ALL;
+		ALTER TABLE item_data ENABLE TRIGGER ALL;
 	return ret_count;
 end;
 $$
