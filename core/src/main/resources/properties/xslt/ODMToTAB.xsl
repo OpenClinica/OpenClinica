@@ -61,6 +61,7 @@
 		select="//odm:ODM/odm:Study/odm:MetaDataVersion/odm:StudyEventDef" />
     <xsl:variable name="allStudyEventDataElements"
 		select="//odm:StudyEventData" />	
+	<xsl:variable name="allItemGrpDataDataElements" select="//odm:ItemGroupData"/>	
 	<xsl:variable name="allFormRefElements"
 		select="//odm:ODM/odm:Study/odm:MetaDataVersion/odm:StudyEventDef/odm:FormRef" />	
 	<!-- Tokenization of column headers-->
@@ -1965,9 +1966,9 @@
 			and odm:FormData/odm:ItemGroupData/@ItemGroupRepeatKey = $itemGrpRepeatKey])"/>	-->
 			<xsl:choose>
 				<xsl:when test="$isEventRepeating = 'Yes'">
-					<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @StudyEventRepeatKey = $StudyEventRepeatKey 
-						and odm:FormData/@FormOID = $formOID and odm:FormData/odm:ItemGroupData/@ItemGroupOID = $grpOID 
-						and odm:FormData/odm:ItemGroupData/@ItemGroupRepeatKey = $itemGrpRepeatKey]) &gt; 0">
+					<xsl:if test="count($allItemGrpDataDataElements[../../@StudyEventOID = $eventOID and ../../@StudyEventRepeatKey = $StudyEventRepeatKey 
+						and ../@FormOID = $formOID and @ItemGroupOID = $grpOID 
+						and @ItemGroupRepeatKey = $itemGrpRepeatKey]) &gt; 0">
 							<xsl:apply-templates select="odm:ItemRef" mode="GrpItemRefs">
 								<xsl:with-param name="crfPosition" select="$crfPosition"/>
 								<xsl:with-param name="eventPosition" select="$eventPosition"/>
@@ -1995,9 +1996,9 @@
 					</xsl:if>		
 				</xsl:when>
 				<xsl:otherwise>
-					<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID 
-						and odm:FormData/@FormOID = $formOID and odm:FormData/odm:ItemGroupData/@ItemGroupOID = $grpOID 
-						and odm:FormData/odm:ItemGroupData/@ItemGroupRepeatKey = $itemGrpRepeatKey]) &gt; 0">
+					<xsl:if test="count($allItemGrpDataDataElements[../../@StudyEventOID = $eventOID 
+						and ../@FormOID = $formOID and @ItemGroupOID = $grpOID 
+						and @ItemGroupRepeatKey = $itemGrpRepeatKey]) &gt; 0">
 							<xsl:apply-templates select="odm:ItemRef" mode="GrpItemRefs">
 								<xsl:with-param name="crfPosition" select="$crfPosition"/>
 								<xsl:with-param name="eventPosition" select="$eventPosition"/>
