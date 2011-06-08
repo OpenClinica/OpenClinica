@@ -421,9 +421,12 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
             // error
             StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
             int parentStudyForNoteSub = 0;
-            int noteSubId = note.getOwnerId();
+          //@pgawade #9801: 07-June-2011 corrected the way to get study subject id associated with discrepancy note
+            //int noteSubId = note.getOwnerId();            
             StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
-            StudySubjectBean notessub = (StudySubjectBean) ssdao.findByPK(noteSubId);
+//            StudySubjectBean notessub = (StudySubjectBean) ssdao.findByPK(noteSubId);
+            
+            StudySubjectBean notessub = (StudySubjectBean) ssdao.findByPK(subjectId);
             StudyBean studyBeanSub = (StudyBean) studyDAO.findByPK(notessub.getStudyId());
             if (null != studyBeanSub) {
                 parentStudyForNoteSub = studyBeanSub.getParentStudyId();
