@@ -37,7 +37,7 @@
 <%--</c:choose>--%>
 
 <c:set var="formatLocale"><fmt:message key="locale_string" bundle="${resformat}"/></c:set>
-<fmt:setLocale value="${formatLocale}" scope="session"/>
+
 
 
 

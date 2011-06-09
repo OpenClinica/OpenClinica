@@ -3,6 +3,7 @@
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
 <script language="JavaScript">
         function reportBug() {
@@ -62,12 +63,14 @@
         </div>
         <div id="UserInfo">
             <a href="${urlPrefix}UpdateProfile"><b><c:out value="${userBean.name}" /></b> (<c:out value="${userRole.role.description}" />)&nbsp;
-                <c:choose>
-                    <c:when test="${resword.locale == null}">
+				<c:set var="formatLocale"><fmt:message key="locale_string" bundle="${resformat}"/></c:set>
+				
+			   <c:choose>
+                    <c:when test="${formatLocale == null}">
                         en
                     </c:when>
                     <c:otherwise>
-                        <c:out value="${resword.locale.language}"/>
+                        <c:out value="${formatLocale}"/>
                     </c:otherwise>
                 </c:choose>
             </a>&nbsp;|&nbsp;
