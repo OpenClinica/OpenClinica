@@ -1,5 +1,8 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <dataset>
+<!-- JN: Commenting out for Now TODO: fix me -->
+
+<!--
 
   <crf crf_id="1" status_id="1" name="Agent Administration" description="Cal&apos;s Test v1; new template" owner_id="1" date_created="2008-07-02" oc_oid="F_AGEN"/>
   <crf crf_id="2" status_id="1" name="Concomitant Medications AG" description="Test" owner_id="1" date_created="2008-07-02" oc_oid="F_CONC"/>
@@ -226,13 +229,13 @@
   <rule_expression id="-2" value="SE_ED2REPEA.F_CONC_V20.IG_CONC_CONCOMITANTMEDICATIONS.I_CONC_CON_MED_NAME" context="1" owner_id="0" date_created="2008-07-02" status_id="1" version="0"/>
   <rule_expression id="-3" value="SE_ED2REPEA.F_CONC.IG_CONC_CONCOMITANTMEDICATIONS.I_CONC_CON_MED_NAME" context="1" owner_id="0" date_created="2008-07-02" status_id="1" version="0"/>
   
-  <!--  InValid RuleSets 
+    InValid RuleSets 
   <rule_set id="3" rule_expression_id="2" study_event_definition_id="2" crf_id="2" crf_version_id="2" study_id="1" owner_id="0" date_created="2008-07-02" status_id="1" version="1"/>
   <rule_set id="4" rule_expression_id="3" study_event_definition_id="2" crf_id="2"                    study_id="1" owner_id="0" date_created="2008-07-02" status_id="5" version="1"/>
   
   <rule_set_rule id="5" rule_set_id="3" rule_id="1" owner_id="0" date_created="2008-07-02" status_id="5"/>
   <rule_set_rule id="6" rule_set_id="4" rule_id="1" owner_id="0" date_created="2008-07-02" status_id="1"/>
-  -->
+  
 
   <versioning_map crf_version_id="1" item_id="1"/>
   <versioning_map crf_version_id="1" item_id="2"/>
@@ -268,4 +271,4 @@
   <versioning_map crf_version_id="2" item_id="32"/>
   <versioning_map crf_version_id="2" item_id="33"/>
   <versioning_map crf_version_id="2" item_id="34"/>
-</dataset>
+--></dataset>
