@@ -17,7 +17,9 @@ import org.akaza.openclinica.templates.HibernateOcDbTestCase;
 
 import java.util.List;
 
-public class RuleSetDaoTest extends HibernateOcDbTestCase {
+import junit.framework.TestCase;
+
+public class RuleSetDaoTest extends TestCase {
 
     public RuleSetDaoTest() {
        // super();
