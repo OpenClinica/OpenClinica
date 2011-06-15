@@ -21,9 +21,9 @@ import junit.framework.TestCase;
 
 public class RuleSetDaoTest extends TestCase {
 
-    public RuleSetDaoTest() {
+   /* public RuleSetDaoTest() {
        // super();
-    }
+    }*/
 /**
  * JN:Commenting out or returning asserts true for now.. TODO: FIX ALL !!!!!
  */
