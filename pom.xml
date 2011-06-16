@@ -60,6 +60,7 @@
 		<test.dbUrl>jdbc:postgresql://localhost:5432/</test.dbUrl>
 		<test.dbUsername>clinica</test.dbUsername>
 		<test.dbPassword>clinica</test.dbPassword>
+		<test.db>OpenClinica-core-3.1-SNAPSHOT-TEST</test.db>
 		<test.hibernateDialect>org.hibernate.dialect.PostgreSQLDialect</test.hibernateDialect>
 		<test.locale>en_US</test.locale>
 		<scm.path>scm:svn:http://svn.akazaresearch.com/openclinica/OpenClinica/branches/OpenClinica-3.1-SNAPSHOT/projects</scm.path>
