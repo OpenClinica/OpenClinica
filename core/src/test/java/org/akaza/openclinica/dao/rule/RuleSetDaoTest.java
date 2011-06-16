@@ -17,29 +17,24 @@ import org.akaza.openclinica.templates.HibernateOcDbTestCase;
 
 import java.util.List;
 
-import junit.framework.TestCase;
+public class RuleSetDaoTest extends HibernateOcDbTestCase {
 
-public class RuleSetDaoTest extends TestCase {
+    public RuleSetDaoTest() {
+        super();
+    }
 
-   /* public RuleSetDaoTest() {
-       // super();
-    }*/
-/**
- * JN:Commenting out or returning asserts true for now.. TODO: FIX ALL !!!!!
- */
     public void testSaveOrUpdate() {
-/*        RuleSetDao ruleSetDao = (RuleSetDao) getContext().getBean("ruleSetDao");
+        RuleSetDao ruleSetDao = (RuleSetDao) getContext().getBean("ruleSetDao");
         RuleDao ruleDao = (RuleDao) getContext().getBean("ruleDao");
         RuleBean persistantRuleBean = ruleDao.findById(1);
         RuleSetBean ruleSetBean = createStubRuleSetBean(persistantRuleBean);
         ruleSetBean = ruleSetDao.saveOrUpdate(ruleSetBean);
 
-        assertNotNull("Persistant id is null", ruleSetBean.getId());*/
-        assertTrue(true);
+        assertNotNull("Persistant id is null", ruleSetBean.getId());
     }
 
     public void testFindById() {
-      /*  RuleSetDao ruleSetDao = (RuleSetDao) getContext().getBean("ruleSetDao");
+        RuleSetDao ruleSetDao = (RuleSetDao) getContext().getBean("ruleSetDao");
         RuleSetBean ruleSet = null;
         ruleSet = ruleSetDao.findById(-1);
 
@@ -58,23 +53,21 @@ public class RuleSetDaoTest extends TestCase {
                 .getActionType());
         assertEquals("The type of the Action should be DiscrepancyNoteAction", "org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean", ruleSet
                 .getRuleSetRules().get(0).getActions().get(0).getClass().getName());
-        assertEquals("The size of the RuleSetRules is not 2", new Integer(2), Integer.valueOf(ruleSet.getRuleSetRules().get(0).getActions().size()));*/
-        assertTrue(true);
+        assertEquals("The size of the RuleSetRules is not 2", new Integer(2), Integer.valueOf(ruleSet.getRuleSetRules().get(0).getActions().size()));
     }
 
     public void testFindAllByStudy() {
 
-       /* RuleSetDao ruleSetDao = (RuleSetDao) getContext().getBean("ruleSetDao");
+        RuleSetDao ruleSetDao = (RuleSetDao) getContext().getBean("ruleSetDao");
         List<RuleSetBean> ruleSets = null;
         StudyBean study = new StudyBean();
         study.setId(1);
         ruleSets = ruleSetDao.findAllByStudy(study);
-        assertEquals("The RuleSets List size should be 2", 2, ruleSets.size());*/
-        assertTrue(true);
+        assertEquals("The RuleSets List size should be 2", 2, ruleSets.size());
     }
 
     public void testFindByCrfVersionOrCrfAndStudyAndStudyEventDefinition() {
-     /*   CRFBean crfBean = new CRFBean();
+        CRFBean crfBean = new CRFBean();
         crfBean.setId(2);
         CRFVersionBean crfVersionBean = new CRFVersionBean();
         crfVersionBean.setId(2);
@@ -86,8 +79,7 @@ public class RuleSetDaoTest extends TestCase {
         RuleSetDao ruleSetDao = (RuleSetDao) getContext().getBean("ruleSetDao");
         List<RuleSetBean> persistentRuleSets = ruleSetDao.findByCrfVersionOrCrfAndStudyAndStudyEventDefinition(crfVersionBean, crfBean, studyBean, sed);
         assertNotNull("The returned ruleSet was null", persistentRuleSets);
-        assertEquals("The List size of ruleset objects should be 2 ", persistentRuleSets.size(), 2);*/
-        assertTrue(true);
+        assertEquals("The List size of ruleset objects should be 2 ", persistentRuleSets.size(), 2);
 
     }
 
@@ -106,7 +98,7 @@ public class RuleSetDaoTest extends TestCase {
     // }
 
     public void testFindByCrfEmptyResultSet() {
-   /*     CRFBean crfBean = new CRFBean();
+        CRFBean crfBean = new CRFBean();
         crfBean.setId(4);
         StudyBean studyBean = new StudyBean();
         studyBean.setId(1);
@@ -116,39 +108,35 @@ public class RuleSetDaoTest extends TestCase {
         List<RuleSetBean> persistentRuleSets = ruleSetDao.findByCrf(crfBean, studyBean);
         assertNotNull("The returned ruleSet was null", persistentRuleSets);
         assertEquals("The List size of ruleset objects should be 0 ", persistentRuleSets.size(), 0);
-*/
-        assertTrue(true);
+
     }
 
     public void testFindByExpression() {
-      /*  RuleSetBean ruleSet = createStubRuleSetBean();
+        RuleSetBean ruleSet = createStubRuleSetBean();
         RuleSetDao ruleSetDao = (RuleSetDao) getContext().getBean("ruleSetDao");
         RuleSetBean persistentRuleSet = ruleSetDao.findByExpression(ruleSet);
         assertNotNull("The returned ruleSet was null", persistentRuleSet);
         assertEquals("The id of returned object should be -1 ", persistentRuleSet.getId(), new Integer(-1));
-*/
-        assertTrue(true);
+
     }
 
-  /*  private RuleSetBean createStubRuleSetBean(RuleBean ruleBean) {
+    private RuleSetBean createStubRuleSetBean(RuleBean ruleBean) {
         RuleSetBean ruleSet = new RuleSetBean();
         ruleSet.setTarget(createExpression(Context.OC_RULES_V1, "SE_ED2REPEA.F_CONC_V20.IG_CONC_CONCOMITANTMEDICATIONS.I_CONC_CON_MED_N"));
         RuleSetRuleBean ruleSetRule = createRuleSetRule(ruleSet, ruleBean);
         ruleSet.addRuleSetRule(ruleSetRule);
         return ruleSet;
-       
-    }*/
+    }
 
- /*   private RuleSetBean createStubRuleSetBean() {
+    private RuleSetBean createStubRuleSetBean() {
         RuleSetBean ruleSet = new RuleSetBean();
         ruleSet.setTarget(createExpression(Context.OC_RULES_V1, "SE_ED2REPEA.F_CONC_V20.IG_CONC_CONCOMITANTMEDICATIONS.I_CONC_CON_MED_NAME"));
         RuleSetRuleBean ruleSetRule = createRuleSetRule(ruleSet, null);
         ruleSet.addRuleSetRule(ruleSetRule);
         return ruleSet;
-       
-    }*/
+    }
 
-  /*  private RuleSetRuleBean createRuleSetRule(RuleSetBean ruleSet, RuleBean ruleBean) {
+    private RuleSetRuleBean createRuleSetRule(RuleSetBean ruleSet, RuleBean ruleBean) {
         RuleSetRuleBean ruleSetRule = new RuleSetRuleBean();
         DiscrepancyNoteActionBean ruleAction = new DiscrepancyNoteActionBean();
         ruleAction.setMessage("HELLO WORLD");
@@ -158,7 +146,7 @@ public class RuleSetDaoTest extends TestCase {
         ruleSetRule.setRuleBean(ruleBean);
 
         return ruleSetRule;
-    }*/
+    }
 
     /*
      * private RuleBean createRuleBean() { RuleBean ruleBean = new RuleBean();

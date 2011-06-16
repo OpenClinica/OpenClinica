@@ -22,19 +22,27 @@ import javax.sql.DataSource;
 public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-    private PlatformTransactionManager transactionManager;
-    private ApplicationContext context;
+    public static PlatformTransactionManager transactionManager;
+    private static ApplicationContext context;
 
     Properties properties = new Properties();
-    private final String dbName;
-    private final String dbUrl;
-    private final String dbUserName;
-    private final String dbPassword;
-    private final String dbDriverClassName;
-    private final String locale;
+    private static String dbName;
+    private static String dbUrl;
+    private static String dbUserName;
+    private static String dbPassword;
+    private static String dbDriverClassName;
+    private static String locale;
 
     public HibernateOcDbTestCase() {
-        super();
+   
+      
+       
+
+    }
+
+    @Override
+    protected void setUp() throws Exception {
+     
         loadProperties();
         dbName = properties.getProperty("dbName");
         dbUrl = properties.getProperty("url");
@@ -45,11 +53,6 @@ public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
         initializeLocale();
         initializeQueriesInXml();
         setUpContext();
-
-    }
-
-    @Override
-    protected void setUp() throws Exception {
         // TODO Auto-generated method stub
         super.setUp();
     }
@@ -60,9 +63,16 @@ public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
         // use different settings.
         context =
             new ClassPathXmlApplicationContext(
-                    new String[] { "classpath*:applicationContext*.xml", "classpath*:org/akaza/openclinica/applicationContext*.xml", });
+                    new String[] { "classpath*:applicationContext-core-s*.xml", "classpath*:org/akaza/openclinica/applicationContext-core-db.xml",
+                        "classpath*:org/akaza/openclinica/applicationContext-core-email.xml",
+                        "classpath*:org/akaza/openclinica/applicationContext-core-hibernate.xml",
+                        "classpath*:org/akaza/openclinica/applicationContext-core-scheduler.xml",
+                        "classpath*:org/akaza/openclinica/applicationContext-core-service.xml",
+                       " classpath*:org/akaza/openclinica/applicationContext-core-timer.xml",
+                        "classpath*:org/akaza/openclinica/applicationContext-security.xml" });
         transactionManager = (PlatformTransactionManager) context.getBean("transactionManager");
         transactionManager.getTransaction(new DefaultTransactionDefinition());
+        
     }
 
     @Override
@@ -122,6 +132,7 @@ public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
         SQLFactory.getInstance().run(dbName, context);
     }
 
+    
     private String getPropertiesFilePath() {
         return "/test.properties";
     }
@@ -147,4 +158,17 @@ public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
     public String getDbName() {
         return dbName;
     }
+  @Override
+  public void tearDown(){
+    
+      try {
+        super.tearDown();
+        transactionManager = null;
+       // getDataSource().getConnection().close();
+    } catch (Exception e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+    }
+
+  }
 }

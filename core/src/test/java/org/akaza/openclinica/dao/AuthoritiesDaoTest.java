@@ -15,8 +15,9 @@ public class AuthoritiesDaoTest extends HibernateOcDbTestCase {
     public void testSaveOrUpdate() {
     	AuthoritiesDao authoritiesDao = (AuthoritiesDao) getContext().getBean("authoritiesDao");
         AuthoritiesBean authorities = new AuthoritiesBean();
-        authorities.setUsername("krikor");
+        authorities.setUsername("root");
         authorities.setAuthority("ROLE_USER");
+        authorities.setId(-1);
         authorities = authoritiesDao.saveOrUpdate(authorities);
 
         assertNotNull("Persistant id is null", authorities.getId());
