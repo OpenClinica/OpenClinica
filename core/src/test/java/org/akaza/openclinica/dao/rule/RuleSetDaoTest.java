@@ -89,7 +89,7 @@ public class RuleSetDaoTest extends HibernateOcDbTestCase {
         assertEquals("The size of the RuleSetRules is not 2", new Integer(2), Integer.valueOf(ruleSet.getRuleSetRules().get(0).getActions().size()));
     }
 
-    //JN:The following commented out tests are not working, suspicion is and arnd studyid and the way it is set, TODO:revisit
+    //JN:The following commented out tests are failing, suspicion is and arnd studyid and the way it is set, TODO:revisit
 /*    public void testFindAllByStudy() {
 
    //     RuleSetDao ruleSetDao = (RuleSetDao) getContext().getBean("ruleSetDao");
