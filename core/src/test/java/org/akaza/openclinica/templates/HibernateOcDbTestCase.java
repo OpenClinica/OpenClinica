@@ -10,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
@@ -22,28 +24,58 @@ import javax.sql.DataSource;
 public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-    public static PlatformTransactionManager transactionManager;
-    private static ApplicationContext context;
+   // public static PlatformTransactionManager transactionManager;
+    protected static ApplicationContext context;
 
-    Properties properties = new Properties();
-    private static String dbName;
-    private static String dbUrl;
-    private static String dbUserName;
-    private static String dbPassword;
-    private static String dbDriverClassName;
-    private static String locale;
+    protected static Properties properties = new Properties();
+    public static String dbName;
+    public static String dbUrl;
+    public static String dbUserName;
+    public static String dbPassword;
+    public static String dbDriverClassName;
+    public static String locale;
+    public  BasicDataSource ds ;
+    
+   protected static  PlatformTransactionManager transactionManager;
+   static
+   {
+       
+       loadProperties();
+       dbName = properties.getProperty("dbName");
+       dbUrl = properties.getProperty("url");
+       dbUserName = properties.getProperty("username");
+       dbPassword = properties.getProperty("password");
+       dbDriverClassName = properties.getProperty("driver");
+       locale = properties.getProperty("locale");
+       initializeLocale();
+       initializeQueriesInXml();
+      
+    
+       
+       context =
+           new ClassPathXmlApplicationContext(
+                   new String[] { "classpath*:applicationContext-core-s*.xml", "classpath*:org/akaza/openclinica/applicationContext-core-db.xml",
+                       "classpath*:org/akaza/openclinica/applicationContext-core-email.xml",
+                       "classpath*:org/akaza/openclinica/applicationContext-core-hibernate.xml",
+                       "classpath*:org/akaza/openclinica/applicationContext-core-service.xml",
+                      " classpath*:org/akaza/openclinica/applicationContext-core-timer.xml",
+                       "classpath*:org/akaza/openclinica/applicationContext-security.xml" });
+     transactionManager = (PlatformTransactionManager) context.getBean("transactionManager");
+     transactionManager.getTransaction(new DefaultTransactionDefinition());
+       
+
+   }
+  
 
     public HibernateOcDbTestCase() {
    
       
-       
-
     }
 
     @Override
     protected void setUp() throws Exception {
      
-        loadProperties();
+    /*    loadProperties();
         dbName = properties.getProperty("dbName");
         dbUrl = properties.getProperty("url");
         dbUserName = properties.getProperty("username");
@@ -51,17 +83,18 @@ public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
         dbDriverClassName = properties.getProperty("driver");
         locale = properties.getProperty("locale");
         initializeLocale();
-        initializeQueriesInXml();
-        setUpContext();
+        initializeQueriesInXml();*/
+       // setUpContext();
         // TODO Auto-generated method stub
         super.setUp();
+        
     }
 
     private void setUpContext() {
         // Loading the applicationContext under test/resources first allows
         // test.properties to be loaded first.Hence we can
         // use different settings.
-        context =
+       /* context =
             new ClassPathXmlApplicationContext(
                     new String[] { "classpath*:applicationContext-core-s*.xml", "classpath*:org/akaza/openclinica/applicationContext-core-db.xml",
                         "classpath*:org/akaza/openclinica/applicationContext-core-email.xml",
@@ -71,7 +104,7 @@ public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
                        " classpath*:org/akaza/openclinica/applicationContext-core-timer.xml",
                         "classpath*:org/akaza/openclinica/applicationContext-security.xml" });
         transactionManager = (PlatformTransactionManager) context.getBean("transactionManager");
-        transactionManager.getTransaction(new DefaultTransactionDefinition());
+        transactionManager.getTransaction(new DefaultTransactionDefinition());*/
         
     }
 
@@ -81,8 +114,8 @@ public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
     }
 
     @Override
-    public DataSource getDataSource() {
-        BasicDataSource ds = new BasicDataSource();
+    public  DataSource getDataSource() {
+       ds = new BasicDataSource();
         ds.setAccessToUnderlyingConnectionAllowed(true);
         ds.setDriverClassName(dbDriverClassName);
         ds.setUsername(dbUserName);
@@ -95,7 +128,7 @@ public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
         return context;
     }
 
-    private void loadProperties() {
+    public static void loadProperties() {
         try {
             properties.load(HibernateOcDbTestCase.class.getResourceAsStream(getPropertiesFilePath()));
         } catch (Exception ioExc) {
@@ -103,7 +136,7 @@ public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
         }
     }
 
-    private void initializeLocale() {
+    protected static void initializeLocale() {
         ResourceBundleProvider.updateLocale(new Locale(locale));
     }
 
@@ -111,7 +144,7 @@ public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
      * Instantiates SQLFactory and all the xml files that contain the queries
      * that are used in our dao class
      */
-    private void initializeQueriesInXml() {
+    protected static void initializeQueriesInXml() {
         String baseDir = System.getProperty("basedir");
         if (baseDir == null || "".equalsIgnoreCase(baseDir)) {
             throw new IllegalStateException(
@@ -133,7 +166,7 @@ public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
     }
 
     
-    private String getPropertiesFilePath() {
+    private static String getPropertiesFilePath() {
         return "/test.properties";
     }
 
@@ -162,8 +195,12 @@ public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
   public void tearDown(){
     
       try {
+      
+        transactionManager.commit( transactionManager.getTransaction(new DefaultTransactionDefinition()));
         super.tearDown();
-        transactionManager = null;
+      //  transactionManager = null;
+       if(ds!=null)
+        ds.getConnection().close();
        // getDataSource().getConnection().close();
     } catch (Exception e) {
         // TODO Auto-generated catch block
