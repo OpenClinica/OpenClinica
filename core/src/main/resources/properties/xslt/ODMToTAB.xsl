@@ -19,6 +19,10 @@
 	<!--E to represent Events -->
 	<xsl:variable name="E" select="'E'" />
 	<xsl:variable name="C" select="'C'" />
+	
+	<xsl:variable name="matchSep" select="'M_'"/>
+	<xsl:variable name="nonMatchSep" select="'*N'"/>
+	
 	<xsl:variable name="delimiter" select="$sep" />
 	<xsl:variable name="studyEventDefOID" select="//odm:StudyEventDef[@OID]" />
 
@@ -2233,18 +2237,18 @@
 									<xsl:when test="$isColForRepeatingEvent"> 
 										<xsl:choose>
 											<xsl:when test="@StudyEventRepeatKey = $colRepeatEventKey">
-												<xsl:text>M</xsl:text><xsl:value-of select="position()"/><!--_<xsl:value-of select="@StudyEventRepeatKey"/>-->
+												<!--<xsl:text>M</xsl:text>--><xsl:value-of select="$matchSep"/><xsl:value-of select="position()"/><!--_<xsl:value-of select="@StudyEventRepeatKey"/>-->
 											</xsl:when>
-											<xsl:otherwise><xsl:text>N</xsl:text>
+											<xsl:otherwise><!--<xsl:text>N</xsl:text>--><xsl:value-of select="$nonMatchSep"/>
 											</xsl:otherwise>
 										</xsl:choose>										
 									</xsl:when>									
-									<xsl:otherwise><xsl:text>M</xsl:text><xsl:value-of select="position()"/>
+									<xsl:otherwise><!--<xsl:text>M</xsl:text>--><xsl:value-of select="$matchSep"/><xsl:value-of select="position()"/>
 									</xsl:otherwise>
 								</xsl:choose>
 							</xsl:when>
 							<xsl:otherwise>
-								<xsl:text>N</xsl:text>
+								<!--<xsl:text>N</xsl:text>--><xsl:value-of select="$nonMatchSep"/>
 							</xsl:otherwise>			
 						</xsl:choose>
 					</xsl:for-each>	
@@ -2252,9 +2256,9 @@
 									
 					<!--ifMatch: *<xsl:value-of select="$ifMatch"/>*-->
 				<xsl:choose>
-					<xsl:when test="contains($ifMatch, 'M')">
+					<xsl:when test="contains($ifMatch, $matchSep)">
 					 
-							<xsl:variable name="StrAfterM" select="substring-after($ifMatch,'M')"/>
+							<xsl:variable name="StrAfterM" select="substring-after($ifMatch,$matchSep)"/>
 							<!--<xsl:variable name="StrB4N" select="substring-before($StrAfterM,'N')"/>
 							<xsl:variable name="evenPos" select="substring-before($StrB4N, '_')"/>
 							<xsl:variable name="evenRepeatKey" select="substring-aftere($StrB4N, '_')"/>-->
@@ -2264,8 +2268,8 @@
 							<!--<xsl:variable name="StrB4N" select="substring-before($StrAfterM,'N')"/>-->
 							<xsl:variable name="evenPos">
 								<xsl:choose>
-									<xsl:when test="contains($StrAfterM,'N')">
-										<xsl:value-of select="substring-before($StrAfterM,'N')"/>
+									<xsl:when test="contains($StrAfterM,$nonMatchSep)">
+										<xsl:value-of select="substring-before($StrAfterM,$nonMatchSep)"/>
 									</xsl:when>
 									<xsl:otherwise>
 										<xsl:value-of select="$StrAfterM"/>
@@ -2748,7 +2752,7 @@
 																			
 																			<xsl:choose>
 																				<xsl:when test="normalize-space($colItemName) = $itemName"><!--{item name matched}-->
-																					<xsl:text>M_</xsl:text><xsl:value-of select="$eventOID"/><xsl:value-of select="$mValSeparator1"/>
+																					<!--<xsl:text>M_</xsl:text>--><xsl:value-of select="$matchSep"/><xsl:value-of select="$eventOID"/><xsl:value-of select="$mValSeparator1"/>
 																					<xsl:text>_</xsl:text><xsl:value-of select="$formOID"/><xsl:value-of select="$mValSeparator2"/>
 																					<xsl:text>_</xsl:text><xsl:value-of select="$grpOID"/><xsl:value-of select="$mValSeparator3"/>
 																					<xsl:text>_</xsl:text><xsl:value-of select="$itemOID"/><xsl:value-of select="$mValSeparator4"/>	
@@ -2756,13 +2760,13 @@
 																					<xsl:text>_</xsl:text><xsl:value-of select="$grpRepeatKey"/>																					
 																				</xsl:when>
 																				<xsl:otherwise>
-																					<xsl:text>N</xsl:text>
+																					<!--<xsl:text>N</xsl:text>--><xsl:value-of select="$nonMatchSep"/>
 																				</xsl:otherwise>
 																			</xsl:choose>
 																		</xsl:for-each>
 																</xsl:when>
 																<xsl:otherwise>
-																	<xsl:text>N</xsl:text>
+																	<!--<xsl:text>N</xsl:text>--><xsl:value-of select="$nonMatchSep"/>
 																</xsl:otherwise>
 															</xsl:choose>													
 															</xsl:when>
@@ -2773,14 +2777,14 @@
 																	<xsl:variable name="itemName" select="//odm:ItemDef[@OID = $itemOID]/@Name"/>
 																	<xsl:choose>
 																		<xsl:when test="normalize-space($colItemName) = $itemName">
-																			<xsl:text>M_</xsl:text><xsl:value-of select="$eventOID"/><xsl:value-of select="$mValSeparator1"/>
+																			<!--<xsl:text>M_</xsl:text>--><xsl:value-of select="$matchSep"/><xsl:value-of select="$eventOID"/><xsl:value-of select="$mValSeparator1"/>
 																					<xsl:text>_</xsl:text><xsl:value-of select="$formOID"/><xsl:value-of select="$mValSeparator2"/>																																										
 																					<xsl:text>_</xsl:text><xsl:value-of select="$grpOID"/><xsl:value-of select="$mValSeparator3"/>
 																					<xsl:text>_</xsl:text><xsl:value-of select="$itemOID"/>	<xsl:value-of select="$mValSeparator4"/>
 																					<xsl:text>_</xsl:text><xsl:value-of select="$colRepeatEventKey"/>
 																		</xsl:when>
 																		<xsl:otherwise>
-																			<xsl:text>N</xsl:text>
+																			<!--<xsl:text>N</xsl:text>--><xsl:value-of select="$nonMatchSep"/>
 																		</xsl:otherwise>
 																	</xsl:choose>
 																</xsl:for-each>
@@ -2789,14 +2793,14 @@
 												</xsl:for-each>
 													</xsl:when>
 													<xsl:otherwise>
-														<xsl:text>N</xsl:text>
+														<!--<xsl:text>N</xsl:text>--><xsl:value-of select="$nonMatchSep"/>
 													</xsl:otherwise>
 										</xsl:choose>
 									
 							</xsl:for-each>
 											</xsl:when>
 											<xsl:otherwise>
-												<xsl:text>N</xsl:text>
+												<!--<xsl:text>N</xsl:text>--><xsl:value-of select="$nonMatchSep"/>
 											</xsl:otherwise>
 										</xsl:choose>
 									</xsl:when>
@@ -2836,20 +2840,20 @@
 																			
 																			<xsl:choose>
 																				<xsl:when test="normalize-space($colItemName) = $itemName"><!-- only grp repeating --> 
-																					<xsl:text>M_</xsl:text><xsl:value-of select="$eventOID"/><xsl:value-of select="$mValSeparator1"/>
+																					<!--<xsl:text>M_</xsl:text>--><xsl:value-of select="$matchSep"/><xsl:value-of select="$eventOID"/><xsl:value-of select="$mValSeparator1"/>
 																					<xsl:text>_</xsl:text><xsl:value-of select="$formOID"/><xsl:value-of select="$mValSeparator2"/>
 																					<xsl:text>_</xsl:text><xsl:value-of select="$grpOID"/><xsl:value-of select="$mValSeparator3"/>
 																					<xsl:text>_</xsl:text><xsl:value-of select="$itemOID"/><xsl:value-of select="$mValSeparator5"/>	
 																					<xsl:text>_</xsl:text><xsl:value-of select="$grpRepeatKey"/>
 																				</xsl:when>
 																				<xsl:otherwise>
-																					<xsl:text>N</xsl:text>
+																					<!--<xsl:text>N</xsl:text>--><xsl:value-of select="$nonMatchSep"/>
 																				</xsl:otherwise>
 																			</xsl:choose>
 																		</xsl:for-each>
 																</xsl:when>
 																<xsl:otherwise>
-																	<xsl:text>N</xsl:text>
+																	<!--<xsl:text>N</xsl:text>--><xsl:value-of select="$nonMatchSep"/>
 																</xsl:otherwise>
 															</xsl:choose>													
 														</xsl:when>
@@ -2860,13 +2864,13 @@
 																	<xsl:variable name="itemName" select="//odm:ItemDef[@OID = $itemOID]/@Name"/><!--itemName:<xsl:value-of select="$itemName"/>-->
 																	<xsl:choose>
 																		<xsl:when test="normalize-space($colItemName) = $itemName"><!-- nothing repeating -->
-																			<xsl:text>M_</xsl:text><xsl:value-of select="$eventOID"/><xsl:value-of select="$mValSeparator1"/>
+																			<!--<xsl:text>M_</xsl:text>--><xsl:value-of select="$matchSep"/><xsl:value-of select="$eventOID"/><xsl:value-of select="$mValSeparator1"/>
 																			<xsl:text>_</xsl:text><xsl:value-of select="$formOID"/><xsl:value-of select="$mValSeparator2"/>
 																			<xsl:text>_</xsl:text><xsl:value-of select="$grpOID"/><xsl:value-of select="$mValSeparator3"/>
 																			<xsl:text>_</xsl:text><xsl:value-of select="$itemOID"/>																					
 																		</xsl:when>
 																		<xsl:otherwise>
-																			<xsl:text>N</xsl:text>
+																			<!--<xsl:text>N</xsl:text>--><xsl:value-of select="$nonMatchSep"/>
 																		</xsl:otherwise>
 																	</xsl:choose>
 																</xsl:for-each>
@@ -2875,7 +2879,7 @@
 												</xsl:for-each>
 											</xsl:when>
 											<xsl:otherwise>
-												<xsl:text>N</xsl:text>
+												<!--<xsl:text>N</xsl:text>--><xsl:value-of select="$nonMatchSep"/>
 											</xsl:otherwise>
 										</xsl:choose>
 									
@@ -2884,7 +2888,7 @@
 								</xsl:choose>									
 								</xsl:when>
 								<xsl:otherwise>
-									<xsl:text>N</xsl:text>
+									<!--<xsl:text>N</xsl:text>--><xsl:value-of select="$nonMatchSep"/>
 								</xsl:otherwise>
 							</xsl:choose>
 							
@@ -2893,9 +2897,9 @@
 						
 					<!--ifMatch:<xsl:value-of select="$ifMatch"/>-->
 					<xsl:choose>
-					<xsl:when test="contains($ifMatch, 'M')">
+					<xsl:when test="contains($ifMatch, $matchSep)">
 							
-							<xsl:variable name="eventOID" select="substring-before(substring-after($ifMatch, 'M_'), $mValSeparator1)"/>
+							<xsl:variable name="eventOID" select="substring-before(substring-after($ifMatch, $matchSep), $mValSeparator1)"/>
 							<!--eventOID:*<xsl:value-of select="$eventOID"/>*-->
 							<!--<xsl:variable name="formOID" select="$ifMatchTokenized[3]"/>-->
 							
@@ -2916,8 +2920,8 @@
 									<xsl:otherwise><!-- nothing repeating -->
 										<xsl:variable name="afterSep3" select="substring-after($ifMatch, concat($mValSeparator3,'_'))"/>
 										<xsl:choose>
-											<xsl:when test="contains($afterSep3,'N')">
-												<xsl:value-of select="substring-before($afterSep3,'N')"/>
+											<xsl:when test="contains($afterSep3,$nonMatchSep)">
+												<xsl:value-of select="substring-before($afterSep3,$nonMatchSep)"/>
 											</xsl:when>
 											<xsl:otherwise>
 												<xsl:value-of select="$afterSep3"/>
@@ -2931,8 +2935,8 @@
 								<xsl:if test="contains($ifMatch, $mValSeparator4)">
 									<xsl:variable name="afterSep4" select="substring-after($ifMatch, concat($mValSeparator4,'_'))"/>
 									<xsl:choose>
-										<xsl:when test="contains($afterSep4, 'N')">
-											<xsl:variable name="beforeN" select="substring-before($afterSep4, 'N')"/>
+										<xsl:when test="contains($afterSep4, $nonMatchSep)">
+											<xsl:variable name="beforeN" select="substring-before($afterSep4, $nonMatchSep)"/>
 											<xsl:choose>
 												<xsl:when test="contains($beforeN, $mValSeparator5)">
 													<xsl:value-of select="substring-before($beforeN, $mValSeparator5)"/>
@@ -2960,8 +2964,8 @@
 								<xsl:if test="contains($ifMatch, $mValSeparator5)">
 									<xsl:variable name="afterSep5" select="substring-after($ifMatch, concat($mValSeparator5,'_'))"/>
 									<xsl:choose>
-										<xsl:when test="contains($afterSep5, 'N')">
-											<xsl:value-of select="substring-before($afterSep5, 'N')"/>											
+										<xsl:when test="contains($afterSep5, $nonMatchSep)">
+											<xsl:value-of select="substring-before($afterSep5, $nonMatchSep)"/>											
 										</xsl:when>
 										<xsl:otherwise>
 											<xsl:value-of select="$afterSep5"/>
@@ -3083,25 +3087,25 @@
 													<xsl:when test="$isColForRepeatingEvent"><!--col for repeating event -->
 														<xsl:choose>
 															<xsl:when test="../@StudyEventRepeatKey = normalize-space($colRepeatEventKey)"><!--event repeat key matched-->
-																<xsl:text>M_</xsl:text><xsl:value-of select="$eventOID"/><xsl:value-of select="$mValSeparator1"/><xsl:value-of select="$formOID"/><xsl:value-of select="$mValSeparator2"/><xsl:value-of select="../@StudyEventRepeatKey"/>
+																<!--<xsl:text>M_</xsl:text>--><xsl:value-of select="$matchSep"/><xsl:value-of select="$eventOID"/><xsl:value-of select="$mValSeparator1"/><xsl:value-of select="$formOID"/><xsl:value-of select="$mValSeparator2"/><xsl:value-of select="../@StudyEventRepeatKey"/>
 															</xsl:when>
-															<xsl:otherwise><xsl:text>N</xsl:text><!--event repeat key mismatch-->
+															<xsl:otherwise><!--<xsl:text>N</xsl:text>--><xsl:value-of select="$nonMatchSep"/><!--event repeat key mismatch-->
 															</xsl:otherwise>
 														</xsl:choose>										
 													</xsl:when>									
-													<xsl:otherwise><xsl:text>M_</xsl:text><xsl:value-of select="$eventOID"/><xsl:value-of select="$mValSeparator1"/><xsl:value-of select="$formOID"/>
+													<xsl:otherwise><!--<xsl:text>M_</xsl:text>--><xsl:value-of select="$matchSep"/><xsl:value-of select="$eventOID"/><xsl:value-of select="$mValSeparator1"/><xsl:value-of select="$formOID"/>
 														<!--match for non-repeating event-->
 													</xsl:otherwise>
 												</xsl:choose>
 											</xsl:when>
 											<xsl:otherwise><!--crf mismatch-->
-												<xsl:text>N</xsl:text>
+												<!--<xsl:text>N</xsl:text>--><xsl:value-of select="$nonMatchSep"/>
 											</xsl:otherwise>			
 										</xsl:choose>
 									</xsl:for-each>
 								</xsl:when>
 								<xsl:otherwise>
-									<xsl:text>N</xsl:text><!--event mismatch-->
+									<!--<xsl:text>N</xsl:text>--><xsl:value-of select="$nonMatchSep"/><!--event mismatch-->
 								</xsl:otherwise>
 							</xsl:choose>
 							
@@ -3110,10 +3114,10 @@
 					<!--<xsl:variable name="ifMatch" select="'NN'"/>-->
 				<!--atch: <xsl:value-of select="$ifMatch"/>}-->
 					<xsl:choose>
-						<xsl:when test="contains($ifMatch, 'M')">					 
+						<xsl:when test="contains($ifMatch, $matchSep)">					 
 							<!--<xsl:variable name="ifMatchTokenized" select="tokenize($ifMatch,'_')"/>-->
 							<!--<xsl:variable name="eventOID" select="$ifMatchTokenized[2]"/>-->
-							<xsl:variable name="eventOID" select="substring-before(substring-after($ifMatch, 'M_'), $mValSeparator1)"/>
+							<xsl:variable name="eventOID" select="substring-before(substring-after($ifMatch, $matchSep), $mValSeparator1)"/>
 							<!--eventOID:*<xsl:value-of select="$eventOID"/>*-->
 							<!--<xsl:variable name="formOID" select="$ifMatchTokenized[3]"/>-->
 							<xsl:variable name="formOID">
@@ -3124,8 +3128,8 @@
 									<xsl:otherwise>
 										<xsl:variable name="afterSep1" select="substring-after($ifMatch, $mValSeparator1)"/>
 										<xsl:choose>
-											<xsl:when test="contains($afterSep1, 'N')">
-												<xsl:value-of select="substring-before($afterSep1, 'N')"/>
+											<xsl:when test="contains($afterSep1, $nonMatchSep)">
+												<xsl:value-of select="substring-before($afterSep1, $nonMatchSep)"/>
 											</xsl:when>
 											<xsl:otherwise>
 												<xsl:value-of select="$afterSep1"/>
@@ -3140,8 +3144,8 @@
 								<xsl:if test="$isColForRepeatingEvent">
 									<xsl:variable name="afterSep1" select="substring-after($ifMatch,$mValSeparator2 )"/>
 									<xsl:choose>
-										<xsl:when test="contains($afterSep1, 'N')">
-											<xsl:value-of select="substring-before($afterSep1, 'N')"/>
+										<xsl:when test="contains($afterSep1, $nonMatchSep)">
+											<xsl:value-of select="substring-before($afterSep1, $nonMatchSep)"/>
 										</xsl:when>
 										<xsl:otherwise>
 											<xsl:value-of select="$afterSep1"/>
