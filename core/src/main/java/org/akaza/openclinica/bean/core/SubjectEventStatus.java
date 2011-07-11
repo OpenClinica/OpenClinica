@@ -178,9 +178,21 @@ public class SubjectEventStatus extends Term implements Comparable {
         }
         return 0;
     }
+    
+    public static SubjectEventStatus getByName(String name) {
+        for (int i = 0; i < list.size(); i++) {
+            SubjectEventStatus temp = (SubjectEventStatus) list.get(i);
+            if (temp.getName().equals(name)) {
+                return temp;
+            }
+        }
+        return INVALID;
+    }
 
+    /*
     public static void main(String[] args) {
         ArrayList<String> myList = (ArrayList) getSubjectEventStatusValues();
         System.out.println("myList = " + myList);
     }
+    */
 }
