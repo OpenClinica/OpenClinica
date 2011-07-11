@@ -84,4 +84,11 @@
 				AND (st.study_id=? or st.parent_study_id=?)
 		</sql>
 	</query>
+	<query>
+		<name>findByNameAndGroupClassId</name>
+		<sql>
+			select sg.* from study_group sg
+			where sg.name = ? and sg.study_group_class_id = ?
+		</sql>
+	</query>
 </queries>
