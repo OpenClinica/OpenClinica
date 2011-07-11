@@ -466,6 +466,20 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                    }catch(Exception ex){
                      value = "01-Jan-1700";
                    }
+            }else if("discrepancyNoteBean.disType".equalsIgnoreCase(property)) {
+                ResourceBundle reterm = ResourceBundleProvider.getTermsBundle();
+                if(reterm.getString("Query_and_Failed_Validation_Check").equals(value)) {
+                    value = 31 + "";
+                } else {
+                    value = DiscrepancyNoteType.getByName(value).getId()+""; 
+                }
+            }else if("discrepancyNoteBean.resolutionStatus".equalsIgnoreCase(property)) {
+                ResourceBundle reterm = ResourceBundleProvider.getTermsBundle();
+                if(reterm.getString("New_and_Updated").equalsIgnoreCase(value)){
+                    value = 21 + "";
+                } else {
+                    value = ResolutionStatus.getByName(value).getId()+"";
+                }
             }
             //
             listNotesFilter.addFilter(property, value);
@@ -501,15 +515,16 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     public void setAuditUserLoginDao(AuditUserLoginDao auditUserLoginDao) {
         this.auditUserLoginDao = auditUserLoginDao;
     }
-
+    
     private class ResolutionStatusDroplistFilterEditor extends DroplistFilterEditor {
         @Override
         protected List<Option> getOptions() {
             List<Option> options = new ArrayList<Option>();
+            ResourceBundle reterm = ResourceBundleProvider.getTermsBundle();
             for (Object status : ResolutionStatus.toArrayList()) {
-                options.add(new Option(String.valueOf(((ResolutionStatus) status).getId()), ((ResolutionStatus) status).getName()));
+                options.add(new Option(((ResolutionStatus) status).getName(), ((ResolutionStatus) status).getName()));
             }
-            options.add(new Option("21", "New and Updated"));
+            options.add(new Option(reterm.getString("New_and_Updated"), reterm.getString("New_and_Updated")));
             return options;
         }
     }
@@ -518,10 +533,11 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         @Override
         protected List<Option> getOptions() {
             List<Option> options = new ArrayList<Option>();
+            ResourceBundle reterm = ResourceBundleProvider.getTermsBundle();
             for (Object type : DiscrepancyNoteType.toArrayList()) {
-                options.add(new Option(String.valueOf(((DiscrepancyNoteType) type).getId()), ((DiscrepancyNoteType) type).getName()));
+                options.add(new Option(((DiscrepancyNoteType) type).getName(), ((DiscrepancyNoteType) type).getName()));
             }
-            options.add(new Option("31", "Query and Failed Validation Check"));
+            options.add(new Option(reterm.getString("Query_and_Failed_Validation_Check"), reterm.getString("Query_and_Failed_Validation_Check")));
             return options;
         }
     }
@@ -543,15 +559,21 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             return true;
         }
     }
-    
+   
     private class DNTypeFilterMatcher implements FilterMatcher {
         public boolean evaluate(Object itemValue, String filterValue) {
             int itemDNTypeId = ((DiscrepancyNoteType)itemValue).getId();
-            int filterDNTypeId = Integer.valueOf(filterValue).intValue();
+            /* int filterDNTypeId = Integer.valueOf(DiscrepancyNoteType.getByName(filterValue)).intValue();
             if(filterDNTypeId==31) {
                 return itemDNTypeId==1 || itemDNTypeId==3;
             } else {
                 return itemDNTypeId == filterDNTypeId;
+            } */
+            ResourceBundle reterm = ResourceBundleProvider.getTermsBundle();
+            if(reterm.getString("Query_and_Failed_Validation_Check").equals(filterValue)) {
+                return itemDNTypeId==1 || itemDNTypeId==3; 
+            } else {
+                return itemDNTypeId == DiscrepancyNoteType.getByName(filterValue).getId();
             }
         }
     }
@@ -559,11 +581,11 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     private class DNResolutionStatusFilterMatcher implements FilterMatcher {
         public boolean evaluate(Object itemValue, String filterValue) {
             int itemDNTypeId = ((ResolutionStatus)itemValue).getId();
-            int filterDNTypeId = Integer.valueOf(filterValue).intValue();
-            if(filterDNTypeId==21) {
-                return itemDNTypeId==1 || itemDNTypeId==2;
+            ResourceBundle reterm = ResourceBundleProvider.getTermsBundle();
+            if(reterm.getString("New_and_Updated").equals(filterValue)) {
+                return itemDNTypeId==1 || itemDNTypeId==2; 
             } else {
-                return itemDNTypeId==filterDNTypeId;
+                return itemDNTypeId == ResolutionStatus.getByName(filterValue).getId();
             }
         }
     }
