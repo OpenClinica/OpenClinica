@@ -305,6 +305,14 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         for (Filter filter : filters) {
             String property = filter.getProperty();
             String value = filter.getValue();
+            if("ruleSetRuleStatus".equals(property)) {
+                Status s = Status.getByDescription(value);
+                int code = s!=null ? s.getCode() : -1;
+                value = code>0 ? Status.getByCode(code).getCode()+"" : "0";
+            } else if("actionType".equals(property)) {
+                ActionType a = ActionType.getByDescription(value);
+                value = a != null? a.getCode()+"":value;
+            }
             viewRuleAssignmentFilter.addFilter(property, value);
         }
 
@@ -685,7 +693,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         protected List<Option> getOptions() {
             List<Option> options = new ArrayList<Option>();
             for (ActionType actionTypes : ActionType.values()) {
-                options.add(new Option(String.valueOf(actionTypes.getCode()), actionTypes.getDescription()));
+                options.add(new Option(actionTypes.getDescription(), actionTypes.getDescription()));
             }
             return options;
         }
@@ -740,8 +748,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         @Override
         protected List<Option> getOptions() {
             List<Option> options = new ArrayList<Option>();
-            options.add(new Option(String.valueOf(Status.AVAILABLE.getCode()), Status.AVAILABLE.toString()));
-            options.add(new Option(String.valueOf(Status.DELETED.getCode()), Status.DELETED.toString()));
+            options.add(new Option(Status.AVAILABLE.toString(), Status.AVAILABLE.toString()));
+            options.add(new Option(Status.DELETED.toString(), Status.DELETED.toString()));
             return options;
         }
     }
