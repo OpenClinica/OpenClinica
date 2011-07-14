@@ -46,6 +46,15 @@ public enum Status implements CodedEnum {
         }
         return enumObjects.get(Integer.valueOf(code));
     }
+    
+    public static Status getByDescription(String description) {
+        for (Status theEnum : Status.values()) {
+            if(description.equals(theEnum.getDescription())) {
+                return theEnum;
+            }
+        }
+        return null;
+    }
 
     /**
      * A wrapper for name() method to be used in JSPs
