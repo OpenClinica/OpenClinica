@@ -319,7 +319,8 @@ public class ExtractController {
        StudyUserRoleBean currentRole = (StudyUserRoleBean)request.getSession().getAttribute("userRole");
        Role r = currentRole.getRole();
 
-       if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR) || r.equals(Role.MONITOR) || r.equals(Role.COORDINATOR)) {
+       if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR) || r.equals(Role.MONITOR)
+               || currentRole.getRole().equals(Role.INVESTIGATOR) ) {
            return true;
        }
        return false;
