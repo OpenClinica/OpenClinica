@@ -44,7 +44,7 @@ public class AccessFileServlet extends SecureController {
         DatasetDAO dsDao = new DatasetDAO(sm.getDataSource());
         ArchivedDatasetFileBean asdfBean = (ArchivedDatasetFileBean) asdfdao.findByPK(fileId);
         DatasetBean dsBean = (DatasetBean) dsDao.findByPK(asdfBean.getDatasetId());
-        if (!(dsBean.getStudyId() == currentStudy.getParentStudyId() || dsBean.getStudyId() == currentStudy.getId()) ) {
+        if ((dsBean.getStudyId() != currentStudy.getParentStudyId() || dsBean.getStudyId() != currentStudy.getId()) ) {
             addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
             throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
         }
