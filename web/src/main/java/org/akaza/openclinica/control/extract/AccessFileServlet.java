@@ -10,10 +10,12 @@ package org.akaza.openclinica.control.extract;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.extract.DatasetBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -43,8 +45,17 @@ public class AccessFileServlet extends SecureController {
         ArchivedDatasetFileDAO asdfdao = new ArchivedDatasetFileDAO(sm.getDataSource());
         DatasetDAO dsDao = new DatasetDAO(sm.getDataSource());
         ArchivedDatasetFileBean asdfBean = (ArchivedDatasetFileBean) asdfdao.findByPK(fileId);
+        StudyDAO studyDao = new StudyDAO(sm.getDataSource());
         DatasetBean dsBean = (DatasetBean) dsDao.findByPK(asdfBean.getDatasetId());
-        if ((dsBean.getStudyId() != currentStudy.getParentStudyId() ) )
+        int parentId = currentStudy.getParentStudyId();
+        if(parentId==0)//Logged in at study level
+        {
+            StudyBean studyBean = (StudyBean )studyDao.findByPK(dsBean.getStudyId());
+            parentId =  studyBean.getParentStudyId();//parent id of dataset created
+            
+        }
+        //logic: is parentId of the dataset created not equal to currentstudy? or is current study
+        if ((parentId)!=currentStudy.getId() )
 if( dsBean.getStudyId() != currentStudy.getId())		{
             addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
             throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
