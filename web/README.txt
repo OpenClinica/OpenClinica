@@ -1,11 +1,11 @@
 ﻿--------------------------------------------------------------
 OPENCLINICA RELEASE NOTES
-OpenClinica Version 3.1
+OpenClinica Version 3.1.1
 Document Version 1.0
 --------------------------------------------------------------
 
 --------------------------------------------------------------
-Updated: April 25, 2011 Paul Galvin pgalvin@akazaresearch.com
+Updated: July 15th, 2011 Paul Galvin pgalvin@openclinica.com
 
 --------------------------------------------------------------
 
@@ -13,9 +13,11 @@ Updated: April 25, 2011 Paul Galvin pgalvin@akazaresearch.com
 OVERVIEW
 --------------------------------------------------------------
 
-This release of OpenClinica addresses issues in OpenClinica 3.0.x and includes many new features and functionality. Please see http://clinicalresearch.wordpress.com/2010/06/09/openclinica-3-1-project-%E2%80%9Camethyst%E2%80%9D-preview/ and http://clinicalresearch.wordpress.com/2010/10/26/new-capabilities-added-to-openclinica-version-3-1/ for some information on the new features. 
+This release of OpenClinica addresses an issue with an Investigator user role not being allowed to export datasets, as well as study level users not being able to download export files created at a site. 
 
-A list of all the issues addressed in the 3.1 release can be found at https://issuetracker.openclinica.com/roadmap_page.php?project_id=84
+A list of all the issues addressed in the 3.1.1 release can be found at https://issuetracker.openclinica.com/roadmap_page.php?project_id=84.
+
+To see a list of all the issues resolved for 3.1, please go to https://issuetracker.openclinica.com/changelog_page.php?project_id=84
 
 For more detailed information on the features, please see https://wiki.openclinica.com/doku.php?id=ocfeatures:openclinica3.1.  
 
