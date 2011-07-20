@@ -740,7 +740,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
     private class StatusCellEditor implements CellEditor {
         public Object getValue(Object item, String property, int rowcount) {
             RuleSetRuleBean ruleSetRule = (RuleSetRuleBean) new BasicCellEditor().getValue(item, "ruleSetRule", rowcount);
-            return ruleSetRule.getStatus().getName();
+            return ruleSetRule.getStatus().getDescription();
         }
     }
 
