@@ -48,7 +48,7 @@
             /*First remove the sort if it is set on the limit,
                and then set the page back to the first one.*/
             this.removeSortFromLimit(id, property);
-            this.setPageToLimit(id, '1');
+            //this.setPageToLimit(id, '1');
 
             var limit = this.getTableFacade(id).limit;
             var sort = new classes.Sort(position, property, order);
@@ -82,7 +82,7 @@
             /*First remove the filter if it is set on the limit,
               and then set the page back to the first one.*/
             this.removeFilterFromLimit(id, property);
-            this.setPageToLimit(id, '1');
+            //this.setPageToLimit(id, '1');
 
             var limit = this.getTableFacade(id).limit;
             var filter = new classes.Filter(property, value);
