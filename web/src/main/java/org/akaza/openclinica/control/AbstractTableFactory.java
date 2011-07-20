@@ -12,6 +12,8 @@ import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.editor.FilterEditor;
 import org.jmesa.view.html.component.HtmlColumn;
 import org.jmesa.view.html.component.HtmlTable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -26,6 +28,8 @@ public abstract class AbstractTableFactory {
 
     protected Locale locale;
 
+    protected Logger logger = LoggerFactory.getLogger(getClass().getName());
+    
     protected abstract String getTableName();
 
     protected String getCaptionName() {
@@ -47,7 +51,7 @@ public abstract class AbstractTableFactory {
     public TableFacade createTable(HttpServletRequest request, HttpServletResponse response) {
         locale = request.getLocale();
         TableFacade tableFacade = getTableFacadeImpl(request, response);
-        tableFacade.setStateAttr("restore");
+        setStateAttr(tableFacade);
         setDataAndLimitVariables(tableFacade);
         configureTableFacade(response, tableFacade);
         if (!tableFacade.getLimit().isExported()) {
@@ -226,5 +230,14 @@ public abstract class AbstractTableFactory {
 
         }
         return mainList;
+    }
+    
+    public void setStateAttr(TableFacade tableFacade) {
+        if(getTableName() != null) {
+            tableFacade.setStateAttr(getTableName()+"_restore");
+        } else {
+            tableFacade.setStateAttr("restore");
+            logger.debug("getTableName() returned null, so tableFacade.setStateAttr = restore");
+        }
     }
 }
