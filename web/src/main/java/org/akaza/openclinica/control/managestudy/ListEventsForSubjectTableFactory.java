@@ -88,7 +88,6 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
     final HashMap<Integer, String> imageIconPaths = new HashMap<Integer, String>(8);
     final HashMap<Integer, String> crfColumnImageIconPaths = new HashMap<Integer, String>(8);
-    private HashMap<String,Integer> studyGroupNameAndIDs = new HashMap<String,Integer>();
 
     public ListEventsForSubjectTableFactory(boolean showMoreLink) {
         imageIconPaths.put(1, "images/icon_Scheduled.gif");
@@ -335,12 +334,6 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
             } else if("event.status".equalsIgnoreCase(property)) {
                 value = SubjectEventStatus.getByName(value).getId()+"";
             } else if(property.startsWith("sgc_")){
-                /*
-                initialStudyGroupNameAndIDs();
-                int studyGroupClassId = property.endsWith("_")? 0 : Integer.valueOf(property.split("_")[1]);
-                String key = studyGroupClassId+"---"+value;
-                value = studyGroupNameAndIDs.containsKey(key)?studyGroupNameAndIDs.get(key)+"":value;
-                */
                 int studyGroupClassId = property.endsWith("_")? 0 : Integer.valueOf(property.split("_")[1]);
                 value = studyGroupDAO.findByNameAndGroupClassID(value, studyGroupClassId).getId()+"";
             } else if(property.startsWith("crf_")) {
@@ -1088,15 +1081,4 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         SimpleDateFormat sdf = new SimpleDateFormat(format);
         return sdf.format(date);
     }
-    
-    private void initialStudyGroupNameAndIDs() {
-        if(studyGroupNameAndIDs.size()==0 && this.getStudyGroupClasses().size()>0) {
-            for (StudyGroupClassBean groupClass : this.getStudyGroupClasses()) {
-                for(StudyGroupBean group: (ArrayList<StudyGroupBean>)this.getStudyGroupDAO().findAllByGroupClass(groupClass)) {
-                    studyGroupNameAndIDs.put(groupClass.getId()+"---"+group.getName(), group.getId());
-                }
-            }
-        }
-    }
-
 }

@@ -139,7 +139,12 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
         if (!limit.isComplete()) {
             int totalRows = getTotalRowCount(studySubjectSDVFilter);
             tableFacade.setTotalRows(totalRows);
-        }
+        } /*else {
+            int totalRows = getTotalRowCount(studySubjectSDVFilter);
+            int pageNum = limit.getRowSelect().getPage();
+            tableFacade.setTotalRows(totalRows);
+            limit.getRowSelect().setPage(pageNum);
+        }*/
 
         StudySubjectSDVSort studySubjectSDVSort = getStudySubjectSDVSort(limit);
 
@@ -184,6 +189,10 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
         }
 
         return studySubjectSDVFilter;
+    }
+    
+    public StudySubjectSDVFilter createStudySubjectSDVFilter(Limit limit) {
+        return getStudySubjectSDVFilter(limit);
     }
 
     protected StudySubjectSDVSort getStudySubjectSDVSort(Limit limit) {
@@ -284,7 +293,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
         List<StudyGroupBean> studyGroupBeans =
             studyGroupDAO.getGroupByStudySubject(studySubjectBean.getId(), studySubjectBean.getStudyId(), studySubjectBean.getStudyId());
 
-        if (studyGroupBeans != null && (!studyGroupBeans.isEmpty())) {
+        if (studyGroupBeans != null && !studyGroupBeans.isEmpty()) {
             row.setGroup(studyGroupBeans.get(0).getName());
         }
         StringBuilder actions = new StringBuilder("<table><tr><td>");
