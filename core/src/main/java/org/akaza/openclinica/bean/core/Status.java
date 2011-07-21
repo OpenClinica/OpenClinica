@@ -32,10 +32,10 @@ public class Status extends Term implements Comparable {
 
     private static final Status[] members =
         { INVALID, AVAILABLE, PENDING, PRIVATE, UNAVAILABLE, LOCKED, DELETED, AUTO_DELETED, SIGNED, FROZEN, SOURCE_DATA_VERIFICATION };
-    private static List list = Arrays.asList(members);
+    private static List list = Arrays.asList(members);  
 
-    private static final Status[] activeMembers = { AVAILABLE, PENDING, PRIVATE, UNAVAILABLE, LOCKED, SIGNED };
-    private static List activeList = Arrays.asList(activeMembers);
+    private static final Status[] activeMembers = { AVAILABLE, SIGNED, DELETED, AUTO_DELETED };
+    private static List activeList = Arrays.asList(activeMembers);  
 
     private static final Status[] studySubjectDropDownMembers = { AVAILABLE, SIGNED, DELETED, AUTO_DELETED };
     private static List studySubjectDropDownList = Arrays.asList(studySubjectDropDownMembers);
