@@ -19,6 +19,7 @@
 	<!--E to represent Events -->
 	<xsl:variable name="E" select="'E'" />
 	<xsl:variable name="C" select="'C'" />
+	<xsl:variable name="itemNameAndEventSep" select="'x@x'"/>
 	
 	<xsl:variable name="matchSep" select="'M_'"/>
 	<xsl:variable name="nonMatchSep" select="'*N'"/>
@@ -65,6 +66,7 @@
 		select="//odm:ODM/odm:Study/odm:MetaDataVersion/odm:StudyEventDef" />
     <xsl:variable name="allStudyEventDataElements"
 		select="//odm:StudyEventData" />	
+	<xsl:variable name="allItemDataElements" select="//odm:ItemData"/>	
 	<xsl:variable name="allItemGrpDataDataElements" select="//odm:ItemGroupData"/>	
 	<xsl:variable name="allFormRefElements"
 		select="//odm:ODM/odm:Study/odm:MetaDataVersion/odm:StudyEventDef/odm:FormRef" />	
@@ -79,9 +81,11 @@
 	<xsl:variable name="crfAndDataItemsHeaders">
 		<xsl:apply-templates
 			select="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:StudyEventDef"
-			mode="studyFormAndDataItemsHeaders" />
+			mode="studyFormAndDataItemsHeaders">
+				<xsl:with-param name="generateIntHeadersList" select="'Yes'"/>
+		</xsl:apply-templates>
 	</xsl:variable>
-	<xsl:variable name="tokenizedcrfAndDataItemsHeaders" select="tokenize($crfAndDataItemsHeaders,'_E')"/>
+	<xsl:variable name="tokenizedcrfAndDataItemsHeaders" select="tokenize($crfAndDataItemsHeaders,$itemNameAndEventSep)"/>
 	<xsl:variable name="mValSeparator1" select="'_][_1'"/>	
 	<xsl:variable name="mValSeparator2" select="'_][_2'"/>
 	<xsl:variable name="mValSeparator3" select="'_][_3'"/>
@@ -149,6 +153,9 @@
 		<xsl:apply-templates
 			select="//odm:ODM/odm:Study/odm:MetaDataVersion"
 			 mode="metadataDisplay"/>
+			 <!--tokenizedcrfAndDataItemsHeaders:<xsl:for-each select="$tokenizedcrfAndDataItemsHeaders">
+					token<xsl:value-of select="position()"/>:<xsl:value-of select="."/>
+				</xsl:for-each>-->
 <!--		<xsl:apply-templates-->
 <!--			select="//odm:ODM/odm:Study/odm:MetaDataVersion/odm:FormDef[@OID]"-->
 <!--			mode="formDataTemplate"></xsl:apply-templates>-->
@@ -1474,6 +1481,7 @@
 <xsl:template
 		match="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:StudyEventDef[@OID]"
 		mode="studyFormAndDataItemsHeaders">
+		<xsl:param name="generateIntHeadersList"/>
 		<!--<xsl:variable name="formRefOID" select="@FormOID"/>-->
 		<xsl:variable name="eventOID" select="@OID" />
 		<xsl:variable name="isEventRepeating" select="@Repeating" />
@@ -1503,7 +1511,8 @@
 			mode="studyFormColumnHeaders">
 			<xsl:with-param name="eventPosition" select="$eventPosition" />
 			<xsl:with-param name="isRepeatingEvent" select="$isRepeatingEvent"/>
-			<xsl:with-param name="eventOID" select="$eventOID"/>			
+			<xsl:with-param name="eventOID" select="$eventOID"/>
+			<xsl:with-param name="generateIntHeadersList" select="$generateIntHeadersList"/>			
 		</xsl:apply-templates>
 		<!-- apply template for item data columns -->
 		<xsl:apply-templates
@@ -1511,6 +1520,7 @@
 			mode="studyItemDataColumnHeaders">			
 			<xsl:with-param name="eventOID" select="$eventOID"/>	
 			<xsl:with-param name="isEventRepeating" select="$isEventRepeating"/>		
+			<xsl:with-param name="generateIntHeadersList" select="$generateIntHeadersList"/>
 		</xsl:apply-templates>		
 	</xsl:template>
 	
@@ -1521,6 +1531,7 @@
 		<xsl:param name="eventOID"/>		
 		<xsl:param name="eventPosition"/>
 		<xsl:param name="isRepeatingEvent"/>	
+		<xsl:param name="generateIntHeadersList"/>
 		
 		<!--<xsl:variable name="formRefOID" select="@FormOID"/>-->
 		<!--
@@ -1536,7 +1547,8 @@
 				<xsl:apply-templates select="." mode="createCRFColForRepeatingEvent">
 					<xsl:with-param name="eventOID" select="$eventOID"/>   
 				   <xsl:with-param name="eventPosition" select="$eventPosition"/>
-				   <xsl:with-param name="eventRepeatCnt" select="1"/>				   						
+				   <xsl:with-param name="eventRepeatCnt" select="1"/>	
+				   <xsl:with-param name="generateIntHeadersList" select="$generateIntHeadersList"/>			   						
 				</xsl:apply-templates>			
 			</xsl:when>
 			<xsl:otherwise>
@@ -1570,8 +1582,16 @@
 						<xsl:if test="$interviewerNameExist">
 							
 								<xsl:value-of select="' '"	/>
-								<xsl:text>Interviewer_</xsl:text>
-								<xsl:value-of select="$E" />
+								<xsl:text>Interviewer</xsl:text>
+								<xsl:choose>
+									<xsl:when test="$generateIntHeadersList = 'Yes'"><!-- Use special constants here than '_E' for internal processing -->
+										<xsl:value-of select="$itemNameAndEventSep"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:text>_</xsl:text>				
+										<xsl:value-of select="$E"/>
+									</xsl:otherwise>
+								</xsl:choose>								
 								<xsl:value-of select="$eventPosition" />
 								<xsl:text>_</xsl:text>
 								<xsl:value-of select="$C" />
@@ -1582,8 +1602,16 @@
 						<xsl:if test="$interviewDateExist">
 							
 								<xsl:value-of select="' '"	/>
-								<xsl:text>Interview Date_</xsl:text>
-								<xsl:value-of select="$E" />
+								<xsl:text>Interview Date</xsl:text>
+								<xsl:choose>
+									<xsl:when test="$generateIntHeadersList = 'Yes'"><!-- Use special constants here than '_E' for internal processing -->
+										<xsl:value-of select="$itemNameAndEventSep"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:text>_</xsl:text>				
+										<xsl:value-of select="$E"/>
+									</xsl:otherwise>
+								</xsl:choose>
 								<xsl:value-of select="$eventPosition" />
 								<xsl:text>_</xsl:text>
 								<xsl:value-of select="$C" />
@@ -1594,8 +1622,16 @@
 						<xsl:if test="$crfStatusExist">
 							
 							<xsl:value-of select="' '"	/>
-							<xsl:text>CRF Version Status_</xsl:text>
-							<xsl:value-of select="$E" />
+							<xsl:text>CRF Version Status</xsl:text>
+								<xsl:choose>
+									<xsl:when test="$generateIntHeadersList = 'Yes'"><!-- Use special constants here than '_E' for internal processing -->
+										<xsl:value-of select="$itemNameAndEventSep"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:text>_</xsl:text>				
+										<xsl:value-of select="$E"/>
+									</xsl:otherwise>
+								</xsl:choose>
 							<xsl:value-of select="$eventPosition" />
 							<xsl:text>_</xsl:text>
 							<xsl:value-of select="$C" />
@@ -1606,8 +1642,16 @@
 						<xsl:if test="$crfVersionExist">
 							
 								<xsl:value-of select="' '"	/>	
-								<xsl:text>Version Name_</xsl:text>
-								<xsl:value-of select="$E" />
+								<xsl:text>Version Name</xsl:text>
+								<xsl:choose>
+									<xsl:when test="$generateIntHeadersList = 'Yes'"><!-- Use special constants here than '_E' for internal processing -->
+										<xsl:value-of select="$itemNameAndEventSep"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:text>_</xsl:text>				
+										<xsl:value-of select="$E"/>
+									</xsl:otherwise>
+								</xsl:choose>
 								<xsl:value-of select="$eventPosition" />
 								<xsl:text>_</xsl:text>
 								<xsl:value-of select="$C" />
@@ -1633,6 +1677,7 @@
 		<xsl:param name="eventOID" />   
 	   <xsl:param name="eventPosition"/>
 	   <xsl:param name="eventRepeatCnt" />
+	   <xsl:param name="generateIntHeadersList"/>
 	   <!--<xsl:param name="crfPosition" />	   
 	   <xsl:param name="crfVersionExist"/>
 		<xsl:param name="interviewerNameExist"/>
@@ -1666,8 +1711,16 @@
 					<xsl:if test="$interviewerNameExist">
 						
 							<xsl:value-of select="' '"	/><!-- added for tokenization when displaying crf data -->
-							<xsl:text>Interviewer_</xsl:text>
-							<xsl:value-of select="$E" />
+							<xsl:text>Interviewer</xsl:text>
+								<xsl:choose>
+									<xsl:when test="$generateIntHeadersList = 'Yes'"><!-- Use special constants here than '_E' for internal processing -->
+										<xsl:value-of select="$itemNameAndEventSep"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:text>_</xsl:text>				
+										<xsl:value-of select="$E"/>
+									</xsl:otherwise>
+								</xsl:choose>
 							<xsl:value-of select="$eventPosition" />										
 							<xsl:text>_</xsl:text>
 							<xsl:value-of select="$eventRepeatCnt" />										
@@ -1680,8 +1733,16 @@
 					<xsl:if test="$interviewDateExist">
 						
 							<xsl:value-of select="' '"	/>	
-							<xsl:text>Interview Date_</xsl:text>
-							<xsl:value-of select="$E" />
+							<xsl:text>Interview Date</xsl:text>
+								<xsl:choose>
+									<xsl:when test="$generateIntHeadersList = 'Yes'"><!-- Use special constants here than '_E' for internal processing -->
+										<xsl:value-of select="$itemNameAndEventSep"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:text>_</xsl:text>				
+										<xsl:value-of select="$E"/>
+									</xsl:otherwise>
+								</xsl:choose>
 							<xsl:value-of select="$eventPosition" />										
 							<xsl:text>_</xsl:text>
 							<xsl:value-of select="$eventRepeatCnt" />										
@@ -1694,8 +1755,16 @@
 					<xsl:if test="$crfStatusExist">
 						
 							<xsl:value-of select="' '"	/>
-							<xsl:text>CRF Version Status_</xsl:text>
-							<xsl:value-of select="$E" />
+							<xsl:text>CRF Version Status</xsl:text>
+								<xsl:choose>
+									<xsl:when test="$generateIntHeadersList = 'Yes'"><!-- Use special constants here than '_E' for internal processing -->
+										<xsl:value-of select="$itemNameAndEventSep"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:text>_</xsl:text>				
+										<xsl:value-of select="$E"/>
+									</xsl:otherwise>
+								</xsl:choose>
 							<xsl:value-of select="$eventPosition" />
 							<xsl:text>_</xsl:text>
 							<xsl:value-of select="$eventRepeatCnt" />
@@ -1708,8 +1777,16 @@
 					<xsl:if test="$crfVersionExist">
 						
 							<xsl:value-of select="' '"	/>
-							<xsl:text>Version Name_</xsl:text>
-							<xsl:value-of select="$E" />
+							<xsl:text>Version Name</xsl:text>
+								<xsl:choose>
+									<xsl:when test="$generateIntHeadersList = 'Yes'"><!-- Use special constants here than '_E' for internal processing -->
+										<xsl:value-of select="$itemNameAndEventSep"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:text>_</xsl:text>				
+										<xsl:value-of select="$E"/>
+									</xsl:otherwise>
+								</xsl:choose>
 							<xsl:value-of select="$eventPosition" />
 							<xsl:text>_</xsl:text>
 							<xsl:value-of select="$eventRepeatCnt" />
@@ -1726,6 +1803,7 @@
 			<xsl:with-param name="eventOID" select="$eventOID"/>   
 			<xsl:with-param name="eventPosition" select="$eventPosition"/>
 			<xsl:with-param name="eventRepeatCnt" select="$eventRepeatCnt+1"/>
+			<xsl:with-param name="generateIntHeadersList" select="$generateIntHeadersList"/>
 		</xsl:call-template>
 		</xsl:if>
    </xsl:template>
@@ -1733,7 +1811,7 @@
    <xsl:template  mode="studyItemDataColumnHeaders" match="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:StudyEventDef[@OID]">
 		<xsl:param name="eventOID"/> 
 		<xsl:param name="isEventRepeating"/>
-		
+		<xsl:param name="generateIntHeadersList"/>
 
 	  <!-- <xsl:variable name="formRefOID" select="@FormOID"/>	  formRefOID - <xsl:value-of select="$formRefOID" />
 	   <xsl:variable name="formRefNodeId" select="generate-id()"/>
@@ -1781,6 +1859,7 @@
 			   <xsl:with-param name="eventRepeatCnt" select="1"/>				   						
 				<xsl:with-param name="MaxEventRepeatKey" select="$MaxEventRepeatKey"/>
 				<xsl:with-param name="isEventRepeating" select="$isEventRepeating"/><!-- this is just need to pass on to further template which is common to repeating and non-repeating events -->
+				<xsl:with-param name="generateIntHeadersList" select="$generateIntHeadersList"/>
 			</xsl:apply-templates>			
 		</xsl:when>
 		<xsl:otherwise>
@@ -1804,6 +1883,7 @@
 				<xsl:with-param name="isEventRepeating" select="$isEventRepeating"/>
 				<xsl:with-param name="eventOID" select="$eventOID"/>
 				<xsl:with-param name="StudyEventRepeatKey" select="$MaxEventRepeatKey"/><!-- this param is of no use for non-repeating column further when creating the columns -->
+				<xsl:with-param name="generateIntHeadersList" select="$generateIntHeadersList"/>
 			</xsl:apply-templates>
 								
 		</xsl:for-each>	
@@ -1817,6 +1897,7 @@
 	   <xsl:param name="eventRepeatCnt" />
 	   <xsl:param name="MaxEventRepeatKey"/>
 	   <xsl:param name="isEventRepeating"/>
+	   <xsl:param name="generateIntHeadersList"/>
 	   
 		<xsl:for-each select="odm:FormRef">
 			<xsl:variable name="formRefOID" select="@FormOID"/>
@@ -1839,6 +1920,7 @@
 				<xsl:with-param name="isEventRepeating" select="$isEventRepeating"/>
 				<xsl:with-param name="eventOID" select="$eventOID"/>
 				<xsl:with-param name="StudyEventRepeatKey" select="$eventRepeatCnt"/>
+				<xsl:with-param name="generateIntHeadersList" select="$generateIntHeadersList"/>
 			</xsl:apply-templates>						
 				
 		</xsl:for-each>	
@@ -1853,7 +1935,7 @@
 		   <xsl:with-param name="eventPosition" select="$eventPosition"/>
 		   <xsl:with-param name="eventRepeatCnt" select="$eventRepeatCnt+1"/>	
 		    <xsl:with-param name="isEventRepeating" select="$isEventRepeating"/>	
-		    	   						
+		    <xsl:with-param name="generateIntHeadersList" select="$generateIntHeadersList"/>	   						
 		</xsl:apply-templates>
 		</xsl:if>
    </xsl:template>
@@ -1864,6 +1946,7 @@
 		<xsl:param name="isEventRepeating"/>
 		<xsl:param name="eventOID"/>	
 		<xsl:param name="StudyEventRepeatKey"/>
+		<xsl:param name="generateIntHeadersList"/>
 		
 		<xsl:variable name="formOID" select="@OID"/>
 		<xsl:apply-templates select="odm:ItemGroupRef" mode="ItemGrpRefs">
@@ -1873,6 +1956,7 @@
 			<xsl:with-param name="formOID" select="$formOID"/>
 			<xsl:with-param name="eventOID" select="$eventOID"/>	
 			<xsl:with-param name="StudyEventRepeatKey" select="$StudyEventRepeatKey"/>
+			<xsl:with-param name="generateIntHeadersList" select="$generateIntHeadersList"/>
 		</xsl:apply-templates>
   </xsl:template>
   
@@ -1883,6 +1967,7 @@
 		<xsl:param name="formOID"/>
 		<xsl:param name="eventOID"/>	
 		<xsl:param name="StudyEventRepeatKey"/>
+		<xsl:param name="generateIntHeadersList"/>
 			
 		<xsl:variable name="grpOID" select="@ItemGroupOID"/>
 		<xsl:apply-templates select="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:ItemGroupDef[@OID = $grpOID]" mode="ItemGrpRefToDefTemplateForHeaders">
@@ -1893,6 +1978,7 @@
 			<xsl:with-param name="grpOID" select="$grpOID"/>
 			<xsl:with-param name="eventOID" select="$eventOID"/>	
 			<xsl:with-param name="StudyEventRepeatKey" select="$StudyEventRepeatKey"/>
+			<xsl:with-param name="generateIntHeadersList" select="$generateIntHeadersList"/>
 		</xsl:apply-templates>
   </xsl:template>
   
@@ -1904,6 +1990,7 @@
 		<xsl:param name="grpOID"/>		
 		<xsl:param name="eventOID"/>
 		<xsl:param name="StudyEventRepeatKey"/>	
+		<xsl:param name="generateIntHeadersList"/>
 			
 		<xsl:variable name="isGrpRepeating" select="@Repeating"/>
 		<!--<xsl:variable name="itemGrpRepeatKey" select="1"/>-->
@@ -1920,6 +2007,7 @@
 					<xsl:with-param name="StudyEventRepeatKey" select="$StudyEventRepeatKey"/>	
 					<xsl:with-param name="isGrpRepeating" select="$isGrpRepeating"/> 
 					<xsl:with-param name="itemGrpRepeatKey" select="1"/> 
+					<xsl:with-param name="generateIntHeadersList" select="$generateIntHeadersList"/>
 				</xsl:apply-templates>
 			</xsl:when>
 			<xsl:otherwise>
@@ -1934,6 +2022,7 @@
 					<xsl:with-param name="StudyEventRepeatKey" select="$StudyEventRepeatKey"/>
 					<xsl:with-param name="isLastItem" select="position()=last()" />
 					<!--<xsl:with-param name="itemGrpRepeatKey" select="$itemGrpRepeatKey"/>-->
+					<xsl:with-param name="generateIntHeadersList" select="$generateIntHeadersList"/>
 			</xsl:apply-templates>
 			</xsl:otherwise>
 		</xsl:choose>
@@ -1960,6 +2049,7 @@
 		<xsl:param name="StudyEventRepeatKey"/>	
 		<xsl:param name="itemGrpRepeatKey"/> 
 		<xsl:param name="isGrpRepeating"/>
+		<xsl:param name="generateIntHeadersList"/>
 		
 		<!--createItemDataColForRepeatingGrps:formOID:<xsl:value-of select="$formOID"/>-->
 		<!--cnt: <xsl:value-of select="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @StudyEventRepeatKey = $StudyEventRepeatKey 
@@ -2001,6 +2091,7 @@
 								<xsl:with-param name="StudyEventRepeatKey" select="$StudyEventRepeatKey"/>
 								<xsl:with-param name="itemGrpRepeatKey" select="$itemGrpRepeatKey"/>
 								<xsl:with-param name="isLastItem" select="position()=last()" />
+								<xsl:with-param name="generateIntHeadersList" select="$generateIntHeadersList"/>
 							</xsl:apply-templates> 
 					</xsl:if>
 					<xsl:if test="($itemGrpRepeatKey+1) &lt;= number($maxGrpRepeatKey)">		
@@ -2014,6 +2105,7 @@
 							<xsl:with-param name="StudyEventRepeatKey" select="$StudyEventRepeatKey"/>	
 							<xsl:with-param name="itemGrpRepeatKey" select="$itemGrpRepeatKey+1"/> 
 							<xsl:with-param name="isGrpRepeating" select="$isGrpRepeating"/>
+							<xsl:with-param name="generateIntHeadersList" select="$generateIntHeadersList"/>
 						</xsl:apply-templates>
 					</xsl:if>		
 				</xsl:when>
@@ -2032,6 +2124,7 @@
 								<xsl:with-param name="StudyEventRepeatKey" select="$StudyEventRepeatKey"/>
 								<xsl:with-param name="itemGrpRepeatKey" select="$itemGrpRepeatKey"/>
 								<xsl:with-param name="isLastItem" select="position()=last()" />
+								<xsl:with-param name="generateIntHeadersList" select="$generateIntHeadersList"/>
 							</xsl:apply-templates> 
 							
 							<xsl:apply-templates mode="createItemDataColForRepeatingGrps" select=".">
@@ -2044,6 +2137,7 @@
 								<xsl:with-param name="StudyEventRepeatKey" select="$StudyEventRepeatKey"/>	
 								<xsl:with-param name="itemGrpRepeatKey" select="$itemGrpRepeatKey+1"/> 
 								<xsl:with-param name="isGrpRepeating" select="$isGrpRepeating"/>
+								<xsl:with-param name="generateIntHeadersList" select="$generateIntHeadersList"/>
 							</xsl:apply-templates>
 					</xsl:if>
 				</xsl:otherwise>
@@ -2062,6 +2156,7 @@
 		<xsl:param name="eventOID"/>	
 		<xsl:param name="itemGrpRepeatKey"/>	
 		<xsl:param name="isLastItem"/>
+		<xsl:param name="generateIntHeadersList"/>
 		
 		<xsl:variable name="itemOID" select="@ItemOID"/>
 		<xsl:choose>
@@ -2082,13 +2177,16 @@
 				<xsl:with-param name="StudyEventRepeatKey" select="$StudyEventRepeatKey"/>
 				<xsl:with-param name="itemGrpRepeatKey" select="$itemGrpRepeatKey"/>
 				<xsl:with-param name="isLastItem" select="$isLastItem" />
+				<xsl:with-param name="generateIntHeadersList" select="$generateIntHeadersList"/>
 			</xsl:apply-templates>
 		</xsl:if>	
 			</xsl:when>
 			<xsl:otherwise>
-				<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and odm:FormData/@FormOID = 
-						$formOID and odm:FormData/odm:ItemGroupData/@ItemGroupOID = $grpOID and odm:FormData/odm:ItemGroupData/odm:ItemData/@ItemOID = $itemOID]) &gt; 0">
-				<xsl:apply-templates
+				<xsl:choose>
+				<xsl:when test="$isGrpRepeating = 'Yes'"><!--repeating grp-->
+					<xsl:if test="count($allItemDataElements[@ItemOID = $itemOID and ../@ItemGroupOID = $grpOID and ../@ItemGroupRepeatKey =$itemGrpRepeatKey and ../../@FormOID = 
+						$formOID and ../../../@StudyEventOID = $eventOID]) &gt; 0"><!--create col-->
+					<xsl:apply-templates
 					select="//odm:ODM/odm:Study/odm:MetaDataVersion/odm:ItemDef[@OID=$itemOID]"
 					mode="ItemDefColHeaders2">
 					<xsl:with-param name="crfPosition" select="$crfPosition" />
@@ -2102,9 +2200,33 @@
 					<xsl:with-param name="StudyEventRepeatKey" select="$StudyEventRepeatKey"/>	
 					<xsl:with-param name="itemGrpRepeatKey" select="$itemGrpRepeatKey"/>
 					<xsl:with-param name="isLastItem" select="$isLastItem" />
+					<xsl:with-param name="generateIntHeadersList" select="$generateIntHeadersList"/>
 				</xsl:apply-templates>
-		</xsl:if>	
+					</xsl:if>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:if test="count($allItemDataElements[@ItemOID = $itemOID and ../@ItemGroupOID = $grpOID and ../../@FormOID = 
+						$formOID and ../../../@StudyEventOID = $eventOID]) &gt; 0">
+					<xsl:apply-templates select="//odm:ODM/odm:Study/odm:MetaDataVersion/odm:ItemDef[@OID=$itemOID]" mode="ItemDefColHeaders2">
+						<xsl:with-param name="crfPosition" select="$crfPosition"/>
+						<xsl:with-param name="eventPosition" select="$eventPosition"/>
+						<xsl:with-param name="isEventRepeating" select="$isEventRepeating"/>
+						<xsl:with-param name="isGrpRepeating" select="$isGrpRepeating"/>
+						<!--<xsl:with-param name="currentFormOID" select="$currentFormOID" />-->
+						<!--<xsl:with-param name="itemData" select="$itemData" />-->
+						<xsl:with-param name="itemOID" select="$itemOID"/>
+						<xsl:with-param name="eventOID" select="$eventOID"/>
+						<xsl:with-param name="StudyEventRepeatKey" select="$StudyEventRepeatKey"/>
+						<xsl:with-param name="itemGrpRepeatKey" select="$itemGrpRepeatKey"/>
+						<xsl:with-param name="isLastItem" select="$isLastItem"/>
+						<xsl:with-param name="generateIntHeadersList" select="$generateIntHeadersList"/>
+					</xsl:apply-templates>
+				</xsl:if>
+				</xsl:otherwise>		
+			</xsl:choose>	
 			</xsl:otherwise>
+		
+			
 		</xsl:choose>		
   </xsl:template>
   
@@ -2120,13 +2242,22 @@
 		<xsl:param name="grpRepeatKey"/>	
 		<xsl:param name="itemGrpRepeatKey"/>
 		<xsl:param name="isLastItem"/>
-				
+		<xsl:param name="generateIntHeadersList"/>		
 				
 		 
 			<xsl:value-of select="' '"/><xsl:value-of select="@Name" />
-			<xsl:text>_</xsl:text>
-			<!--<xsl:value-of select="$C" /><xsl:value-of select="$crfPosition" />-->
-			<xsl:value-of select="$E"/>	<xsl:value-of select="$eventPosition"/>
+			<!--<xsl:text>_</xsl:text>			
+			<xsl:value-of select="$E"/>	<xsl:value-of select="$eventPosition"/>-->
+			<xsl:choose>
+				<xsl:when test="$generateIntHeadersList = 'Yes'"><!-- Use special constants here than '_E' for internal processing -->
+					<xsl:value-of select="$itemNameAndEventSep"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:text>_</xsl:text>				
+					<xsl:value-of select="$E"/>
+				</xsl:otherwise>
+			</xsl:choose>
+			<xsl:value-of select="$eventPosition"/>	
 			<xsl:if test="$isEventRepeating = 'Yes'">
 				<xsl:text>_</xsl:text><xsl:value-of select="$StudyEventRepeatKey"/>
 			</xsl:if>
@@ -2611,8 +2742,8 @@
 			<!-- ***************************************-->																			
 			<!-- get event posiotn and event repeat key (if repeating event) from next token.-->		
 			<xsl:variable name="nextToken" select="$tokenizedcrfAndDataItemsHeaders[$currentPos+1]"/>
-			<!--currentToken:*<xsl:value-of select="$currentToken"/>*-->
-			<!--next token:*<xsl:value-of select="$nextToken"/>*-->
+			<!--currentToken:*<xsl:value-of select="$currentToken"/>*
+			next token:*<xsl:value-of select="$nextToken"/>*-->
 			<xsl:variable name="numericStart">
 				<xsl:choose>
 					<xsl:when test="ends-with($nextToken,'Interviewer')">
@@ -2633,7 +2764,7 @@
 				</xsl:choose>
 				
 			</xsl:variable>
-	<!--{numeric start: <xsl:value-of select="$numericStart"/>}-->
+			<!--{numeric start: <xsl:value-of select="$numericStart"/>}-->
 			<xsl:variable name="numericB4_C" select="substring-before($numericStart, '_C')"/>
 			<!--numericB4_C: <xsl:value-of select="$numericB4_C"/>-->
 			<xsl:variable name="colEventPosition" >
@@ -2646,7 +2777,7 @@
 				</xsl:otherwise>
 				</xsl:choose>
 			</xsl:variable>
-			<!--olEventPosition: <xsl:value-of select="$colEventPosition"/>-->
+			<!--colEventPosition: <xsl:value-of select="$colEventPosition"/>-->
 			
 			<xsl:variable name="isColForRepeatingEvent" select="contains($numericB4_C, '_')"/><!--isColForRepeatingEvent<xsl:value-of select="$isColForRepeatingEvent"/>-->
 			<xsl:variable name="colRepeatEventKey">
@@ -2895,7 +3026,7 @@
 						</xsl:for-each>	<!-- subjectEvents-->
 						</xsl:variable>
 						
-					<!--ifMatch:<xsl:value-of select="$ifMatch"/>-->
+					<!--ifMatch:-<xsl:value-of select="$ifMatch"/>*-->
 					<xsl:choose>
 					<xsl:when test="contains($ifMatch, $matchSep)">
 							
