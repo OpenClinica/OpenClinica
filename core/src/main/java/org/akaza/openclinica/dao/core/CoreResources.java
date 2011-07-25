@@ -711,6 +711,7 @@ public class CoreResources implements ResourceLoaderAware {
                 outputStream.close();
                 inputStream.close();
             }
+            logMe("path of file:"+f.getAbsolutePath());
             return f;
 
         } catch (IOException e) {
@@ -858,7 +859,7 @@ public class CoreResources implements ResourceLoaderAware {
 
     // TODO comment out system out after dev
     private static void logMe(String message) {
-      //   System.out.println(message);
+         System.out.println(message);
         logger.info(message);
     }
 
