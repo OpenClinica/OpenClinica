@@ -30,6 +30,7 @@ import org.exolab.castor.xml.XMLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -57,6 +58,7 @@ public class ImportRuleServlet extends SecureController {
         String action = request.getParameter("action");
         request.setAttribute("contextPath", getContextPath());
         request.setAttribute("hostPath", getHostPath());
+        copyFiles();
         //@pgawade 13-April-2011 -  #8877 
         // request.setAttribute("designerURL",
         // getCoreResources().getField("designer.url"));
@@ -67,17 +69,17 @@ public class ImportRuleServlet extends SecureController {
         }
         if ("downloadrulesxsd".equalsIgnoreCase(action)) {
             // File xsdFile = new File(SpringServletAccess.getPropertiesDir(context) + "rules.xsd");
-            File xsdFile = getCoreResources().getFile("rules.xsd");
+            File xsdFile = getCoreResources().getFile("rules.xsd", "rules"+File.separator);
             dowloadFile(xsdFile, "text/xml");
         }
         if ("downloadtemplate".equalsIgnoreCase(action)) {
             // File file = new File(SpringServletAccess.getPropertiesDir(context) + "rules_template.xml");
-            File file = getCoreResources().getFile("rules_template.xml");
+            File file = getCoreResources().getFile("rules_template.xml",  "rules"+File.separator);
             dowloadFile(file, "text/xml");
         }
         if ("downloadtemplateWithNotes".equalsIgnoreCase(action)) {
             // File file = new File(SpringServletAccess.getPropertiesDir(context) + "rules_template_with_notes.xml");
-            File file = getCoreResources().getFile("rules_template_with_notes.xml");
+            File file = getCoreResources().getFile("rules_template_with_notes.xml",  "rules"+File.separator);
             dowloadFile(file, "text/xml");
         }
         if ("confirm".equalsIgnoreCase(action)) {
@@ -108,6 +110,11 @@ public class ImportRuleServlet extends SecureController {
                 forwardPage(Page.IMPORT_RULES);
             }
         }
+    }
+
+    private void copyFiles() {
+        
+        
     }
 
     private void provideMessage(RulesPostImportContainer rulesContainer) {

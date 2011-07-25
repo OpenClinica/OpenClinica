@@ -110,6 +110,7 @@ public class CoreResources implements ResourceLoaderAware {
             extractProperties = findExtractProperties();
             }
           
+            copyImportRulesFiles();
             // tbh, following line to be removed
             // reportUrl();
 
@@ -427,6 +428,24 @@ public class CoreResources implements ResourceLoaderAware {
         }
 
     }
+    
+    private void copyImportRulesFiles() throws IOException
+    {
+        ByteArrayInputStream listSrcFiles[] = new ByteArrayInputStream[3];
+        String[] fileNames =       { "rules.xsd", "rules_template.xml", "rules_template_with_notes.xml" };
+        listSrcFiles[0] =   (ByteArrayInputStream) resourceLoader.getResource("classpath:properties" + File.separator + fileNames[0]).getInputStream();
+        listSrcFiles[1] =   (ByteArrayInputStream) resourceLoader.getResource("classpath:properties" + File.separator + fileNames[1]).getInputStream();
+        listSrcFiles[2] =   (ByteArrayInputStream) resourceLoader.getResource("classpath:properties" + File.separator + fileNames[2]).getInputStream();
+        File dest = new File(getField("filePath") + "rules");
+        for (int i = 0; i < listSrcFiles.length; i++) {
+            File dest1 = new File(dest, fileNames[i]);
+            // File src1 = listSrcFiles[i];
+            if (listSrcFiles[i] != null)
+                copyFiles(listSrcFiles[i], dest1);
+        }
+        
+        
+    }
 
     private void copyFiles(ByteArrayInputStream fis, File dest) {
         FileOutputStream fos = null;
@@ -697,11 +716,21 @@ public class CoreResources implements ResourceLoaderAware {
         return resourceLoader.getResource("classpath:properties/" + fileName).getURL();
     }
 
+    /**
+     * @deprecated Use {@link #getFile(String,String)} instead
+     */
     public File getFile(String fileName) {
+        return getFile(fileName, "filePath");
+    }
+
+    public File getFile(String fileName, String relDirectory) {
         try {
+           
             InputStream inputStream = getInputStream(fileName);
-            File f = new File(fileName);
-            OutputStream outputStream = new FileOutputStream(f);
+            
+            File f = new File(getField("filePath")+relDirectory+fileName);
+            
+     /*       OutputStream outputStream = new FileOutputStream(f);
             byte buf[] = new byte[1024];
             int len;
             try {
@@ -710,7 +739,7 @@ public class CoreResources implements ResourceLoaderAware {
             } finally {
                 outputStream.close();
                 inputStream.close();
-            }
+            }*/
             logMe("path of file:"+f.getAbsolutePath());
             return f;
 
