@@ -380,6 +380,7 @@ public class SDVController {
 
         }
         request.setAttribute("pageMessages", pageMessages);
+        request.setAttribute("sdv_restore", "true");
 
         //model.addAttribute("allParams",parameterMap);
         //model.addAttribute("verified",updateCRFs);
@@ -432,6 +433,7 @@ public class SDVController {
                     .add("There was a problem with submitting the Event CRF verification to the database. Is it possible that the database system is down temporarily?");
         }
         request.setAttribute("pageMessages", pageMessages);
+        request.setAttribute("s_sdv_restore", "true");
         sdvUtil.forwardRequestFromController(request, response, "/pages/" + redirection);
         return null;
 
