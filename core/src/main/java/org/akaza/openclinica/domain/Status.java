@@ -4,6 +4,7 @@ import org.akaza.openclinica.domain.enumsupport.CodedEnum;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 /*
@@ -47,13 +48,27 @@ public enum Status implements CodedEnum {
         return enumObjects.get(Integer.valueOf(code));
     }
     
-    public static Status getByDescription(String description) {
+    public static Status getByI18nDescription(String i18nDescription, Locale locale) {
         for (Status theEnum : Status.values()) {
-            if(description.equals(theEnum.getDescription())) {
+            if(i18nDescription.equals(theEnum.getI18nDescription(locale))) {
                 return theEnum;
             }
         }
         return null;
+    }
+    
+    public String getI18nDescription(Locale locale) {
+        if (!"".equals(this.description)) {
+            ResourceBundle resterm = ResourceBundleProvider.getTermsBundle(locale);
+            String des = resterm.getString(this.description);
+            if(des != null) {
+                return des.trim();
+            }  else {
+                return "";
+            }
+        } else {
+            return this.description;
+        }
     }
 
     /**
