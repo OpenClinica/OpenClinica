@@ -17,7 +17,6 @@ import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
 import org.akaza.openclinica.web.table.sdv.SubjectIdSDVFactory;
 import org.jmesa.facade.TableFacade;
-import org.jmesa.limit.Limit;
 import org.jmesa.view.html.component.HtmlColumn;
 import org.jmesa.view.html.component.HtmlRow;
 import org.jmesa.view.html.component.HtmlTable;
@@ -116,7 +115,6 @@ public class SDVController {
         request.setAttribute("pageMessages", pageMessages);
         sdvFactory.showMoreLink = showMoreLink;
         TableFacade facade = sdvFactory.createTable(request, response);
-        restorePage(request, facade);
         String sdvMatrix = facade.render();
         gridMap.addAttribute(SUBJECT_SDV_TABLE_ATTRIBUTE, sdvMatrix);
         return gridMap;
@@ -287,6 +285,7 @@ public class SDVController {
                 parameterMap.put(tmpName, request.getParameter(tmpName));
             }
         }
+        request.setAttribute("sdv_restore", "true");
 
         //For the messages that appear in the left column of the results page
         ArrayList<String> pageMessages = new ArrayList<String>();
@@ -454,6 +453,7 @@ public class SDVController {
                 parameterMap.put(tmpName, request.getParameter(tmpName));
             }
         }
+        request.setAttribute("s_sdv_restore", "true");
 
         //For the messages that appear in the left column of the results page
         ArrayList<String> pageMessages = new ArrayList<String>();
@@ -586,16 +586,5 @@ public class SDVController {
         }
 
         return false;
-    }
-
-    public void restorePage(HttpServletRequest request, TableFacade tableFacade) {
-        Limit limit = tableFacade.getLimit();
-        String restore = request.getAttribute(limit.getId()+"_restore") + "";
-        if (restore != null && "true".equalsIgnoreCase(restore)) {
-            int totalRows = sdvFactory.getTotalRowCount(sdvFactory.createStudySubjectSDVFilter(limit));
-            int pageNum = limit.getRowSelect().getPage();
-            tableFacade.setTotalRows(totalRows);
-            limit.getRowSelect().setPage(pageNum);
-        }
     }
 }

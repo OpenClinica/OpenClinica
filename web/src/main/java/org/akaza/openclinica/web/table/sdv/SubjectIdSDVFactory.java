@@ -136,15 +136,18 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
             contextPath = context.getContextPath();
         }
 
+        String restore = context.getRequestAttribute(limit.getId()+"_restore") + "";
         if (!limit.isComplete()) {
             int totalRows = getTotalRowCount(studySubjectSDVFilter);
             tableFacade.setTotalRows(totalRows);
-        } /*else {
+        } else if (restore != null && "true".equalsIgnoreCase(restore)) {
             int totalRows = getTotalRowCount(studySubjectSDVFilter);
             int pageNum = limit.getRowSelect().getPage();
+            int maxRows = limit.getRowSelect().getMaxRows();
+            tableFacade.setMaxRows(maxRows);
             tableFacade.setTotalRows(totalRows);
             limit.getRowSelect().setPage(pageNum);
-        }*/
+        }
 
         StudySubjectSDVSort studySubjectSDVSort = getStudySubjectSDVSort(limit);
 
