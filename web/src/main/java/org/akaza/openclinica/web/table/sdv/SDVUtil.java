@@ -225,9 +225,17 @@ public class SDVUtil {
         EventCRFSDVFilter eventCRFSDVFilter = getEventCRFSDVFilter(limit, studyId);
         WebContext context = tableFacade.getWebContext();
 
+        String restore = request.getAttribute(limit.getId()+"_restore") + "";
         if (!limit.isComplete()) {
             int totalRows = getTotalRowCount(eventCRFSDVFilter, studyId);
             tableFacade.setTotalRows(totalRows);
+        } else if (restore != null && "true".equalsIgnoreCase(restore)) {
+            int totalRows = getTotalRowCount(eventCRFSDVFilter, studyId);
+            int pageNum = limit.getRowSelect().getPage();
+            int maxRows = limit.getRowSelect().getMaxRows();
+            tableFacade.setMaxRows(maxRows);
+            tableFacade.setTotalRows(totalRows);
+            limit.getRowSelect().setPage(pageNum);
         }
 
         EventCRFSDVSort eventCRFSDVSort = getEventCRFSDVSort(limit);
