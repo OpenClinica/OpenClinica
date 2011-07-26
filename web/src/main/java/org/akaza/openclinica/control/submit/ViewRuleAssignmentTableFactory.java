@@ -306,7 +306,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
             String property = filter.getProperty();
             String value = filter.getValue();
             if("ruleSetRuleStatus".equals(property)) {
-                Status s = Status.getByDescription(value);
+                Status s = Status.getByI18nDescription(value, locale);
                 int code = s!=null ? s.getCode() : -1;
                 value = code>0 ? Status.getByCode(code).getCode()+"" : "0";
             } else if("actionType".equals(property)) {
@@ -740,7 +740,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
     private class StatusCellEditor implements CellEditor {
         public Object getValue(Object item, String property, int rowcount) {
             RuleSetRuleBean ruleSetRule = (RuleSetRuleBean) new BasicCellEditor().getValue(item, "ruleSetRule", rowcount);
-            return ruleSetRule.getStatus().getDescription();
+            //return ruleSetRule.getStatus().getDescription();
+            return ruleSetRule.getStatus().getI18nDescription(locale);
         }
     }
 
@@ -748,8 +749,10 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         @Override
         protected List<Option> getOptions() {
             List<Option> options = new ArrayList<Option>();
-            options.add(new Option(Status.AVAILABLE.toString(), Status.AVAILABLE.toString()));
-            options.add(new Option(Status.DELETED.toString(), Status.DELETED.toString()));
+            //options.add(new Option(Status.AVAILABLE.toString(), Status.AVAILABLE.toString()));
+            //options.add(new Option(Status.DELETED.toString(), Status.DELETED.toString()));
+            options.add(new Option(Status.AVAILABLE.getI18nDescription(locale), Status.AVAILABLE.getI18nDescription(locale)));
+            options.add(new Option(Status.DELETED.getI18nDescription(locale), Status.DELETED.getI18nDescription(locale)));
             return options;
         }
     }
