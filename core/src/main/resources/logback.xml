@@ -279,7 +279,7 @@
 		<SyslogHost>${usage.stats.host}</SyslogHost>
 		<port>${usage.stats.port}</port>
 		<Facility>LOCAL7</Facility>
-		<SuffixPattern>[%mdc{WEBAPP}] %mdc{HOSTNAME} %mdc{USERNAME} %logger %msg</SuffixPattern>
+		<SuffixPattern>[%mdc{WEBAPP}] %mdc{USERNAME} %logger %msg</SuffixPattern>
 	</appender>
 	
 	<!-- LOGGERS -->
