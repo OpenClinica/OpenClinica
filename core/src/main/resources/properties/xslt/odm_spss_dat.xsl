@@ -2942,7 +2942,7 @@
 													<xsl:choose>
 														<xsl:when test="$isColForRepeatingGrp">
 															<xsl:choose>
-																<xsl:when test="$grpRepeatKey = normalize-space($colRepeatGrpKey)">grp matched
+																<xsl:when test="$grpRepeatKey = normalize-space($colRepeatGrpKey)">
 																		<!-- check item name -->
 																		<xsl:for-each select="./odm:ItemData">
 																			<xsl:variable name="itemOID" select="@ItemOID"/>

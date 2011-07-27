@@ -935,8 +935,8 @@
 				<!--not last	-->
 				<!-- get which event this is -->
 				<xsl:variable name="nextToken" select="$tokenizedEventHeaders[$currentPos+1]"/>
-				currentToken:*<xsl:value-of select="$currentToken"/>*
-					next token:<xsl:value-of select="$nextToken"/>
+				<!--currentToken:*<xsl:value-of select="$currentToken"/>*
+					next token:<xsl:value-of select="$nextToken"/>-->
 				<xsl:variable name="numericStart">
 					<xsl:if test="ends-with($nextToken,'Location')">
 						<xsl:value-of select="substring-before($nextToken,'Location')"/>
@@ -957,7 +957,7 @@
 						<xsl:value-of select="$nextToken"/>
 					</xsl:if>
 				</xsl:variable>
-				<!---numeric start: <xsl:value-of select="$numericStart"/>-->
+				<!--numeric start: <xsl:value-of select="$numericStart"/>-->
 				<xsl:variable name="colEventPosition">
 					<xsl:choose>
 						<xsl:when test="contains($numericStart, '_')">
@@ -1003,7 +1003,7 @@
 						<xsl:text>Age</xsl:text>
 					</xsl:if>
 				</xsl:variable>
-				colType:<xsl:value-of select="$colType"/>
+				<!--colType:<xsl:value-of select="$colType"/>-->
 				<xsl:variable name="ifMatch">
 					<xsl:for-each select="$subjectEvents">
 						<xsl:variable name="eventOID" select="@StudyEventOID"/>
@@ -1045,7 +1045,7 @@
 						</xsl:choose>
 					</xsl:for-each>
 				</xsl:variable>
-				ifMatch: *<xsl:value-of select="$ifMatch"/>*
+				<!--ifMatch: *<xsl:value-of select="$ifMatch"/>*-->
 				<xsl:choose>
 					<xsl:when test="contains($ifMatch, $matchSep)">
 						<xsl:variable name="StrAfterM" select="substring-after($ifMatch,$matchSep)"/>
@@ -1439,7 +1439,7 @@
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:variable>
-				<!--numeric start: <xsl:value-of select="$numericStart"/>-->
+				<!--numeric start: *<xsl:value-of select="$numericStart"/>*-->
 				<xsl:variable name="numericB4_C" select="substring-before($numericStart, '_C')"/>
 				<!--numericB4_C: <xsl:value-of select="$numericB4_C"/>-->
 				<xsl:variable name="colEventPosition">
@@ -1481,7 +1481,7 @@
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:variable>
-				<!--colType: <xsl:value-of select="$colType"/>	-->
+				<!--colType: *<xsl:value-of select="$colType"/>*	-->
 				<xsl:variable name="numericAfter_C" select="substring-after($numericStart, '_C')"/>
 				<!--numericAfter_C:<xsl:value-of select="$numericAfter_C"/>	-->
 				<xsl:variable name="colCrfPosition">
@@ -1515,7 +1515,7 @@
 						<xsl:variable name="ifMatch">
 							<xsl:for-each select="$subjectEvents">
 								<xsl:variable name="eventOID" select="@StudyEventOID"/>
-								<!--	eventOID:<xsl:value-of select="$eventOID"/>	-->
+									<!--eventOID:<xsl:value-of select="$eventOID"/>	-->
 								<xsl:variable name="eventRepeatKey" select="@StudyEventRepeatKey"/>
 								<!--eventRepeatKey:<xsl:value-of select="$eventRepeatKey"/>-->
 								<xsl:variable name="eventPosition">
@@ -1531,10 +1531,10 @@
 										<!--event matched-->
 										<xsl:choose>
 											<xsl:when test="$isColForRepeatingEvent">
-												<!--repeating event -->
+												
 												<xsl:choose>
 													<xsl:when test="$colRepeatEventKey = $eventRepeatKey">
-														<!--event repeat match-->
+														
 														<xsl:for-each select="./odm:FormData">
 															<xsl:variable name="formOID" select="@FormOID"/>
 															<!--formOID:<xsl:value-of select="$formOID"/>-->
@@ -1553,7 +1553,7 @@
 															<!--crfPosition:<xsl:value-of select="$crfPosition"/>-->
 															<xsl:choose>
 																<xsl:when test="$crfPosition = normalize-space($colCrfPosition)">
-																	<!--crf matched-->
+																	
 																	<xsl:for-each select="./odm:ItemGroupData">
 																		<xsl:variable name="grpOID" select="@ItemGroupOID"/>
 																		<!--grp OID<xsl:value-of select="$grpOID"/>-->
@@ -1675,11 +1675,12 @@
 																<xsl:variable name="grpOID" select="@ItemGroupOID"/>
 																<!--grpOID:<xsl:value-of select="$grpOID"/>-->
 																<xsl:variable name="grpRepeatKey" select="@ItemGroupRepeatKey"/>
-																<!--grpRepeatKey:<xsl:value-of select="$grpRepeatKey"/>-->
+																<!--grpRepeatKey:*<xsl:value-of select="$grpRepeatKey"/>*
+																colRepeatGrpKey:*<xsl:value-of select="$colRepeatGrpKey"/>*-->
 																<xsl:choose>
 																	<xsl:when test="$isColForRepeatingGrp">
 																		<xsl:choose>
-																			<xsl:when test="$grpRepeatKey = $colRepeatGrpKey">
+																			<xsl:when test="$grpRepeatKey = normalize-space($colRepeatGrpKey)">
 																				<!--grp matched-->
 																				<!-- check item name -->
 																				<xsl:for-each select="./odm:ItemData">
