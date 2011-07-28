@@ -7,6 +7,16 @@
  */
 package org.akaza.openclinica.dao.core;
 
+import org.akaza.openclinica.bean.core.ApplicationConstants;
+import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.Utils;
+import org.akaza.openclinica.bean.extract.ExtractBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -21,16 +31,6 @@ import java.util.Iterator;
 import java.util.Locale;
 
 import javax.sql.DataSource;
-
-import org.akaza.openclinica.bean.core.ApplicationConstants;
-import org.akaza.openclinica.bean.core.EntityBean;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.Utils;
-import org.akaza.openclinica.bean.extract.ExtractBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * <p/>
@@ -420,10 +420,10 @@ public abstract class EntityDAO implements DAOInterface {
             }
         } catch (SQLException sqle) {
             signalFailure(sqle);
-            if (logger.isWarnEnabled()) {
-                logger.warn("Exeception while executing dynamic statement, EntityDAO.execute: " + query + ": " + sqle.getMessage());
+            //if (logger.isWarnEnabled()) {
+                logger.info("Exeception while executing dynamic statement, EntityDAO.execute: " + query + ": " + sqle.getMessage());
                 sqle.printStackTrace();
-            }
+            //}
         } finally {
             this.closeIfNecessary(con, ps);
         }
