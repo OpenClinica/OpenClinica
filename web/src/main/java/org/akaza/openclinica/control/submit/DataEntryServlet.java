@@ -7,6 +7,7 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
@@ -3917,7 +3918,15 @@ public abstract class DataEntryServlet extends CoreSecureController {
         AuditDAO adao = new AuditDAO(getDataSource());
         ArrayList itemAuditEvents = adao.checkItemAuditEventsExist(dib.getItem().getId(), "item_data", ecbId);
         if (itemAuditEvents.size() > 0) {
-            dib.getData().setAuditLog(true);    
+            AuditBean itemFirstAudit = (AuditBean)itemAuditEvents.get(0);
+            if(itemFirstAudit.getOldValue().length()>0) {
+                dib.getData().setAuditLog(true);    
+            }else {
+                AuditBean a = adao.findItemInitialValueAuditByAuditID(itemFirstAudit.getId());
+                if(a.getId()==0) {
+                    dib.getData().setAuditLog(true);    
+                }
+            }
         }
         logMe("time taken thus far, after audit log check"+(System.currentTimeMillis()-t));
         logMe("Only for audit check::"+(System.currentTimeMillis()-t1));
@@ -4387,7 +4396,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         HashMap numItemsCompletedHM = sdao.getNumItemsCompletedBySectionId(ecb);
 
         for (int i = 0; i < sections.size(); i++) {
-            SectionBean sb = (SectionBean) sections.get(i);
+            SectionBean sb = sections.get(i);
             Integer key = new Integer(sb.getId());
 
             int numItems = TableOfContentsServlet.getIntById(numItemsHM, key);
