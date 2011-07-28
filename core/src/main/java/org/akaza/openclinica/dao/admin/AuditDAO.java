@@ -10,8 +10,8 @@ package org.akaza.openclinica.dao.admin;
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.DeletedEventCRFBean;
 import org.akaza.openclinica.bean.core.EntityBean;
-import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.EntityDAO;
 import org.akaza.openclinica.dao.core.SQLFactory;
@@ -424,5 +424,22 @@ public class AuditDAO extends EntityDAO {
             al.add(eb);
         }
         return al;
+    }
+    
+    public AuditBean findItemInitialValueAuditByAuditID(int auditId) {
+        AuditBean eb = new AuditBean();
+        this.setTypesExpected();
+
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(auditId));
+
+        String sql = digester.getQuery("findItemInitialValueAuditByAuditID");
+        ArrayList alist = this.select(sql, variables);
+        Iterator it = alist.iterator();
+
+        if (it.hasNext()) {
+            eb = (AuditBean) this.getEntityFromHashMap((HashMap) it.next());
+        }
+        return eb;
     }
 }
