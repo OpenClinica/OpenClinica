@@ -114,14 +114,8 @@
             and itd.item_data_id = ae.entity_id
             and ae.audit_table = ?
             and itd.event_crf_id = ?
+            and ROWNUM &lt;= 2
             order by ae.audit_date desc
-            and ROWNUM =1
         </sql>
-    </query>
-    <query>
-    	<name>findItemInitialValueAuditByAuditID</name>
-    	<sql>
-    	select ae.* from audit_log_event ae where ae.audit_id = ? and ae.old_value is null
-    	</sql>
     </query>
 </queries>

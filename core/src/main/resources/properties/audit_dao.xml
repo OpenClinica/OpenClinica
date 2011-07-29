@@ -114,14 +114,7 @@
              and ae.audit_table = ?
              and itd.event_crf_id = ? 
              order by ae.audit_date desc
-            limit 1
-            
+            limit 2
         </sql>
-    </query>
-    <query>
-    	<name>findItemInitialValueAuditByAuditID</name>
-    	<sql>
-    	select ae.* from audit_log_event ae where ae.audit_id = ? and ae.old_value isNull
-    	</sql>
     </query>
 </queries>
