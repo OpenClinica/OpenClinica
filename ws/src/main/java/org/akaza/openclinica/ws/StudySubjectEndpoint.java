@@ -24,7 +24,7 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.subject.SubjectServiceInterface;
-import org.akaza.openclinica.validator.SubjectTransferValidator;
+import org.akaza.openclinica.ws.validator.SubjectTransferValidator;
 import org.openclinica.ws.beans.EventType;
 import org.openclinica.ws.beans.EventsType;
 import org.openclinica.ws.beans.GenderType;
@@ -116,16 +116,17 @@ public class StudySubjectEndpoint {
 
             DataBinder dataBinder = new DataBinder((subjectTransferBean));
             Errors errors = dataBinder.getBindingResult();
-            System.out.println("got here before validation");
+         //   System.out.println("got here before validation");
             subjectTransferBean.setOwner(getUserAccount());
             SubjectTransferValidator subjectTransferValidator = new SubjectTransferValidator(dataSource);
             subjectTransferValidator.validate((subjectTransferBean), errors);
             if (!errors.hasErrors()) {
+            //	System.out.println("got here before creation");
                 String label = create(subjectTransferBean);
-                System.out.println("got here after creation");
+            //    System.out.println("got here after creation" + label);
                 return new DOMSource(mapConfirmation(messages.getMessage("studySubjectEndpoint.success", null, "Success", locale), label, errors));
             } else {
-                System.out.println("got here by throwing an error");
+             //   System.out.println("got here by throwing an error");
                 return new DOMSource(mapConfirmation(messages.getMessage("studySubjectEndpoint.fail", null, "Fail", locale), null, errors));
             }
         } catch (NullPointerException npe) {
@@ -287,15 +288,15 @@ public class StudySubjectEndpoint {
         Element site = DomUtils.getChildElementByTagName(study, "siteRef");
         Element siteIdentifierElement = site == null ? null : DomUtils.getChildElementByTagName(site, "identifier");
 
-        String personIdValue = personIdElement == null ? null : DomUtils.getTextValue(personIdElement);
-        String studySubjectIdValue = DomUtils.getTextValue(studySubjectIdElement);
-        String genderValue = genderElement == null ? null : DomUtils.getTextValue(genderElement);
-        String secondaryIdValue = secondaryIdElement == null ? null : DomUtils.getTextValue(secondaryIdElement);
-        String enrollmentDateValue = DomUtils.getTextValue(enrollmentDateElement);
-        String dateOfBirthValue = dateOfBirthElement == null ? null : DomUtils.getTextValue(dateOfBirthElement);
-        String yearOfBirthValue = yearOfBirthElement == null ? null : DomUtils.getTextValue(yearOfBirthElement);
-        String studyIdentifier = studyIdentifierElement == null ? null : DomUtils.getTextValue(studyIdentifierElement);
-        String siteIdentifier = siteIdentifierElement == null ? null : DomUtils.getTextValue(siteIdentifierElement);
+        String personIdValue = personIdElement == null ? null : DomUtils.getTextValue(personIdElement).trim();
+        String studySubjectIdValue = DomUtils.getTextValue(studySubjectIdElement).trim();
+        String genderValue = genderElement == null ? null : DomUtils.getTextValue(genderElement).trim();
+        String secondaryIdValue = secondaryIdElement == null ? null : DomUtils.getTextValue(secondaryIdElement).trim();
+        String enrollmentDateValue = DomUtils.getTextValue(enrollmentDateElement).trim();
+        String dateOfBirthValue = dateOfBirthElement == null ? null : DomUtils.getTextValue(dateOfBirthElement).trim();
+        String yearOfBirthValue = yearOfBirthElement == null ? null : DomUtils.getTextValue(yearOfBirthElement).trim();
+        String studyIdentifier = studyIdentifierElement == null ? null : DomUtils.getTextValue(studyIdentifierElement).trim();
+        String siteIdentifier = siteIdentifierElement == null ? null : DomUtils.getTextValue(siteIdentifierElement).trim();
 
         SubjectTransferBean subjectTransferBean = new SubjectTransferBean();
 
@@ -355,7 +356,7 @@ public class StudySubjectEndpoint {
         subject.setUniqueIdentifier(subjectTransfer.getPersonId());
         subject.setLabel(subjectTransfer.getStudySubjectId());
         subject.setDateOfBirth(subjectTransfer.getDateOfBirth());
-        System.out.println("testing new code here...");
+      //  System.out.println("testing new code here...");
         // below added tbh 04/2011
         if (subject.getDateOfBirth() != null) {
         	subject.setDobCollected(true);

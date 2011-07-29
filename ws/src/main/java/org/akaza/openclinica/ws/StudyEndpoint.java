@@ -91,7 +91,12 @@ public class StudyEndpoint {
         resultElement.setTextContent(confirmation);
         responseElement.appendChild(resultElement);
         MetadataUnit mdc = new MetadataUnit(dataSource, study, 0);
+        //htaycher : catch null pointer exception and proceed
+        try{
         mdc.collectOdmStudy();
+        }catch(Exception e){
+        	System.out.print("Exception calling mdc.collectOdmStudy()"+ e.getMessage());
+        }
         MetaDataReportBean meta = new MetaDataReportBean(mdc.getOdmStudy());
         meta.addNodeStudy(Boolean.FALSE);
         Element odmElement = document.createElementNS(NAMESPACE_URI_V1, "odm");
@@ -126,13 +131,16 @@ public class StudyEndpoint {
 
         Element studyRefElement = DomUtils.getChildElementByTagName(studyEventDefinitionListAll, "studyRef");
         Element studyIdentifierElement = DomUtils.getChildElementByTagName(studyRefElement, "identifier");
-        Element siteRef = DomUtils.getChildElementByTagName(studyRefElement, "siteRef");
-        Element siteIdentifierElement = siteRef == null ? null : DomUtils.getChildElementByTagName(siteRef, "identifier");
+        //htaycher metaData coming on study level only
+       // Element siteRef = DomUtils.getChildElementByTagName(studyRefElement, "siteRef");
+       // Element siteIdentifierElement = siteRef == null ? null : DomUtils.getChildElementByTagName(siteRef, "identifier");
 
         String studyIdentifier = studyIdentifierElement == null ? null : DomUtils.getTextValue(studyIdentifierElement);
-        String siteIdentifier = siteIdentifierElement == null ? null : DomUtils.getTextValue(siteIdentifierElement);
+      //  String siteIdentifier = siteIdentifierElement == null ? null : DomUtils.getTextValue(siteIdentifierElement);
 
-        StudyMetadataRequestBean studyMetadataRequest = new StudyMetadataRequestBean(studyIdentifier, siteIdentifier, getUserAccount());
+       // StudyMetadataRequestBean studyMetadataRequest = new StudyMetadataRequestBean(studyIdentifier, siteIdentifier, getUserAccount());
+        StudyMetadataRequestBean studyMetadataRequest = new StudyMetadataRequestBean(studyIdentifier,  getUserAccount());
+        
         return studyMetadataRequest;
 
     }

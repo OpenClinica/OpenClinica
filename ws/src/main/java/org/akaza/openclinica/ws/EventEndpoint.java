@@ -82,35 +82,7 @@ public class EventEndpoint {
             @XPathParam("//e:endTime") String endTime) throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         Element eventElement = (Element) event.item(0);
-
-        Element eventDefinitionOidElement = DomUtils.getChildElementByTagName(eventElement, "eventDefinitionOID");
-        Element locationElement = DomUtils.getChildElementByTagName(eventElement, "location");
-        Element startDateElement = DomUtils.getChildElementByTagName(eventElement, "startDate");
-        Element endDateElement = DomUtils.getChildElementByTagName(eventElement, "endDate");
-        Element startTimeElement = DomUtils.getChildElementByTagName(eventElement, "startTime");
-        Element endTimeElement = DomUtils.getChildElementByTagName(eventElement, "endTime");
-
-        Element subjectRefElement = DomUtils.getChildElementByTagName(eventElement, "studySubjectRef");
-        Element labelElement = DomUtils.getChildElementByTagName(subjectRefElement, "label");
-
-        Element studyRefElement = DomUtils.getChildElementByTagName(eventElement, "studyRef");
-        Element studyIdentifierElement = DomUtils.getChildElementByTagName(studyRefElement, "identifier");
-        Element siteRef = DomUtils.getChildElementByTagName(studyRefElement, "siteRef");
-        Element siteIdentifierElement = siteRef == null ? null : DomUtils.getChildElementByTagName(siteRef, "identifier");
-
-        String studySubjectId = DomUtils.getTextValue(labelElement);
-        eventDefinitionOID = DomUtils.getTextValue(eventDefinitionOidElement);
-        String studyIdentifier = DomUtils.getTextValue(studyIdentifierElement);
-        String siteIdentifier = siteIdentifierElement == null ? null : DomUtils.getTextValue(siteIdentifierElement);
-        location = DomUtils.getTextValue(locationElement);
-        startDate = DomUtils.getTextValue(startDateElement);
-        startTime = startTimeElement == null ? null : DomUtils.getTextValue(startTimeElement);
-        endDate = endDateElement == null ? null : DomUtils.getTextValue(endDateElement);
-        endTime = endTimeElement == null ? null : DomUtils.getTextValue(endTimeElement);
-
-        StudyEventTransferBean studyEventTransferBean =
-            new StudyEventTransferBean(studySubjectId, studyIdentifier, siteIdentifier, eventDefinitionOID, location, getDate(startDate, startTime), getDate(
-                    endDate, endTime), getUserAccount());
+        StudyEventTransferBean studyEventTransferBean = unMarshallToEventTransfer(eventElement);
 
         DataBinder dataBinder = new DataBinder((studyEventTransferBean));
         Errors errors = dataBinder.getBindingResult();
@@ -122,8 +94,8 @@ public class EventEndpoint {
             try {
                 HashMap<String, String> h =
                     getEventService().scheduleEvent(studyEventTransferBean.getUser(), studyEventTransferBean.getStartDateTime(),
-                            studyEventTransferBean.getEndDateTime(), location, studyEventTransferBean.getStudyUniqueId(),
-                            studyEventTransferBean.getSiteUniqueId(), eventDefinitionOID, studyEventTransferBean.getStudySubjectId());
+                            studyEventTransferBean.getEndDateTime(), studyEventTransferBean.getLocation(), studyEventTransferBean.getStudyUniqueId(),
+                            studyEventTransferBean.getSiteUniqueId(), studyEventTransferBean.getEventDefinitionOID(), studyEventTransferBean.getStudySubjectId());
                 return new DOMSource(mapSuccessConfirmation(h));
             } catch (OpenClinicaSystemException ose) {
                 errors.reject("eventEndpoint.cannot_schedule", "Cannot schedule an event for this Subject.");
@@ -163,6 +135,49 @@ public class EventEndpoint {
 
     }
 
+    /**
+     * Process createEvent request by creating StudyEventTransferBean from received payload.
+     * 
+     * @param subjectElement
+     * @return SubjectTransferBean
+     * @throws ParseException
+     */
+    private StudyEventTransferBean unMarshallToEventTransfer(Element eventElement)
+    	throws ParseException {
+
+   
+
+    Element eventDefinitionOidElement = DomUtils.getChildElementByTagName(eventElement, "eventDefinitionOID");
+    Element locationElement = DomUtils.getChildElementByTagName(eventElement, "location");
+    Element startDateElement = DomUtils.getChildElementByTagName(eventElement, "startDate");
+    Element endDateElement = DomUtils.getChildElementByTagName(eventElement, "endDate");
+    Element startTimeElement = DomUtils.getChildElementByTagName(eventElement, "startTime");
+    Element endTimeElement = DomUtils.getChildElementByTagName(eventElement, "endTime");
+
+    Element subjectRefElement = DomUtils.getChildElementByTagName(eventElement, "studySubjectRef");
+    Element labelElement = DomUtils.getChildElementByTagName(subjectRefElement, "label");
+
+    Element studyRefElement = DomUtils.getChildElementByTagName(eventElement, "studyRef");
+    Element studyIdentifierElement = DomUtils.getChildElementByTagName(studyRefElement, "identifier");
+    Element siteRef = DomUtils.getChildElementByTagName(studyRefElement, "siteRef");
+    Element siteIdentifierElement = siteRef == null ? null : DomUtils.getChildElementByTagName(siteRef, "identifier");
+
+    String studySubjectId = DomUtils.getTextValue(labelElement).trim();
+    String eventDefinitionOID = DomUtils.getTextValue(eventDefinitionOidElement).trim();
+    String studyIdentifier = DomUtils.getTextValue(studyIdentifierElement).trim();
+    String siteIdentifier = siteIdentifierElement == null ? null : DomUtils.getTextValue(siteIdentifierElement).trim();
+    String location = DomUtils.getTextValue(locationElement).trim();
+    String startDate = DomUtils.getTextValue(startDateElement).trim();
+    String startTime = startTimeElement == null ? null : DomUtils.getTextValue(startTimeElement).trim();
+    String endDate = endDateElement == null ? null : DomUtils.getTextValue(endDateElement).trim();
+    String endTime = endTimeElement == null ? null : DomUtils.getTextValue(endTimeElement).trim();
+
+    StudyEventTransferBean studyEventTransferBean =
+        new StudyEventTransferBean(studySubjectId, studyIdentifier, siteIdentifier, eventDefinitionOID, location, getDate(startDate, startTime), getDate(
+                endDate, endTime), getUserAccount());
+    return studyEventTransferBean;
+}
+    
     /**
      * Create Error Response
      * 

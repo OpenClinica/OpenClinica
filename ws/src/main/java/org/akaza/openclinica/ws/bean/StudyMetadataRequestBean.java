@@ -8,10 +8,18 @@ public class StudyMetadataRequestBean {
     private String siteUniqueId;
     private UserAccountBean user;
 
+    //htaycher : metadata on study level only
     public StudyMetadataRequestBean(String studyUniqueId, String siteUniqueId, UserAccountBean user) {
         super();
         this.studyUniqueId = studyUniqueId;
         this.siteUniqueId = siteUniqueId;
+        this.user = user;
+    }
+    
+    public StudyMetadataRequestBean(String studyUniqueId, UserAccountBean user) {
+        super();
+        this.studyUniqueId = studyUniqueId;
+       
         this.user = user;
     }
 

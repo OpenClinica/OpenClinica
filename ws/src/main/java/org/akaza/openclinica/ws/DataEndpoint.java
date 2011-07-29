@@ -2,14 +2,24 @@ package org.akaza.openclinica.ws;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.submit.DisplayItemBeanWrapper;
+import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.web.crfdata.DataImportService;
+import org.akaza.openclinica.web.job.TriggerService;
+import org.akaza.openclinica.ws.bean.CRFDataImportBean;
+import org.akaza.openclinica.ws.validator.CRFDataImportValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
+import org.springframework.validation.DataBinder;
+import org.springframework.validation.Errors;
+import org.springframework.validation.ObjectError;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.XPathParam;
@@ -19,10 +29,16 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.io.InputStream;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.ResourceBundle;
+
+import javax.sql.DataSource;
+import org.xml.sax.InputSource;
 
 import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilder;
@@ -33,6 +49,11 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
+import org.akaza.openclinica.web.job.CrfBusinessLogicHelper;
+import org.akaza.openclinica.web.job.TriggerService;
+import org.exolab.castor.mapping.Mapping;
+import org.exolab.castor.xml.Unmarshaller;
 
 @Endpoint
 public class DataEndpoint {
@@ -69,33 +90,104 @@ public class DataEndpoint {
         logger.debug("rootElement=" + odmElement);
 
         String xml = null;
-        StudyBean studyBean = null;
         UserAccountBean userBean = null;
+        
+        
         try {
-            if (odmElement != null) {
-                xml = node2String(odmElement);
-                xml = xml.replaceAll("<ODM>", this.ODM_HEADER_NAMESPACE);
-                Element clinicalDataNode = (Element) odmElement.getElementsByTagName("ClinicalData").item(0);
-                studyBean = new StudyDAO(dataSource).findByOid(clinicalDataNode.getAttribute("StudyOID"));
-                logger.debug("found study " + clinicalDataNode.getAttribute("StudyOID"));
-                // userBean = (UserAccountBean) new UserAccountDAO(dataSource).findByPK(Integer.parseInt(clinicalDataNode.getAttribute("UserID")));
-                userBean = getUserAccount();
-            }
+            if (odmElement == null) {return new DOMSource(mapFailConfirmation(null,"Your XML is not well-formed."));}
+          //  xml = node2String(odmElement);
+          //  xml = xml.replaceAll("<ODM>", this.ODM_HEADER_NAMESPACE);
+            ODMContainer odmContainer = unmarshallToODMContainer( odmElement);
+           // Element clinicalDataNode = (Element) odmElement.getElementsByTagName("ClinicalData").item(0);
+           // String studyUniqueID = clinicalDataNode.getAttribute("StudyOID");
+            String studyUniqueID =  odmContainer.getCrfDataPostImportContainer().getStudyOID();
+            userBean = getUserAccount();
+            CRFDataImportBean crfDataImportBean = new CRFDataImportBean(studyUniqueID, userBean);
 
-            // return fail messages iff we get proper error messages from the import, tbh
-            if (odmElement != null) {
-                // return new DOMSource(mapConfirmation(xml, studyBean, userBean, messages.getMessage("dataEndpoint.success", null, "Success", locale)));
-                return new DOMSource(mapConfirmation(xml, studyBean, userBean));
-            } else {
-                // return new DOMSource(mapConfirmation(xml, studyBean, userBean, messages.getMessage("dataEndpoint.fail", null, "Success", locale)));
-                return new DOMSource(mapFailMessage("Your XML is not well-formed."));
-                // TODO something else?
+            DataBinder dataBinder = new DataBinder(crfDataImportBean);
+            Errors errors = dataBinder.getBindingResult();
+            CRFDataImportValidator crfDataImportValidator = new CRFDataImportValidator(dataSource);
+            crfDataImportValidator.validate(crfDataImportBean, errors);
+
+            if (!errors.hasErrors() ) {
+            	List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
+            	     
+            	List<String> errorMessagesFromValidation = new DataImportService().validateData(odmContainer,dataSource, coreResources, 
+            			crfDataImportBean.getStudy(), userBean,displayItemBeanWrappers);
+            	if (  errorMessagesFromValidation.size()>0)
+            	{
+            		String err_msg = convertToErrorString(errorMessagesFromValidation);
+            		return new DOMSource(mapFailConfirmation(null, err_msg));
+            	}
+            	
+            	List<String > auditMsgs = new DataImportService().submitData(odmContainer,dataSource,  
+            			crfDataImportBean.getStudy(), userBean,displayItemBeanWrappers);
+            	return new DOMSource(mapConfirmation(auditMsgs));
             }
-        } catch (NullPointerException npe) {
-            return new DOMSource(mapFailMessage("Your XML is not well-formed."));
+            else
+            {
+            	return new DOMSource(mapFailConfirmation(errors,null));
+            }
+               
+                ////
+         } catch (Exception npe) {
+            return new DOMSource(mapFailConfirmation(null,"Your XML is not well-formed. "+ npe.getMessage()));
         }
         // return new DOMSource(mapConfirmation(xml, studyBean, userBean));
     }
+    
+    
+   private ODMContainer unmarshallToODMContainer(Element odmElement) throws Exception
+   {
+	   ResourceBundle  respage = ResourceBundleProvider.getPageMessagesBundle();
+	      
+	   String xml = node2String(odmElement);
+       xml = xml.replaceAll("<ODM>", this.ODM_HEADER_NAMESPACE);
+       
+       if ( xml == null )throw new Exception( respage.getString("unreadable_file") );
+       
+        Mapping myMap = new Mapping();
+
+       // InputStream xsdFile = coreResources.getInputStream("ODM1-3-0.xsd");//new File(propertiesPath + File.separator + "ODM1-3-0.xsd");
+       // InputStream xsdFile2 = coreResources.getInputStream("ODM1-2-1.xsd");//new File(propertiesPath + File.separator + "ODM1-2-1.xsd");
+        InputStream mapInputStream = coreResources.getInputStream("cd_odm_mapping.xml");
+        
+        myMap.loadMapping(new InputSource(mapInputStream));
+        Unmarshaller um1 = new Unmarshaller(myMap);
+        ODMContainer odmContainer = new ODMContainer();
+      
+        try {
+            logger.debug(xml);
+             // File xsdFileFinal = new File(xsdFile);
+            // schemaValidator.validateAgainstSchema(xml, xsdFile);
+            // removing schema validation since we are presented with the chicken v egg error problem
+            odmContainer = (ODMContainer) um1.unmarshal(new StringReader(xml));
+            logger.debug("Found crf data container for study oid: " + odmContainer.getCrfDataPostImportContainer().getStudyOID());
+            logger.debug("found length of subject list: " + odmContainer.getCrfDataPostImportContainer().getSubjectData().size());
+            return odmContainer;
+            
+        } catch (Exception me1) {
+            // fail against one, try another
+            me1.printStackTrace();
+            logger.debug("failed in unmarshaling, trying another version = "+me1.getMessage());
+//           htaycher: use only one schema according to Tom
+            //try {
+//                // schemaValidator.validateAgainstSchema(xml, xsdFile2);
+//                // for backwards compatibility, we also try to validate vs
+//                // 1.2.1 ODM 06/2008
+//                odmContainer = (ODMContainer) um1.unmarshal(new StringReader(xml));
+//            } catch (Exception me2) {
+//                // not sure if we want to report me2
+//                me2.printStackTrace();
+//                   // break here with an exception
+//                logger.debug("found an error with XML: " + me2.getMessage());
+//                throw new Exception();
+//               
+//            }
+            throw new Exception();
+        }
+        
+   }
     
     /**
      * Helper Method to get the user account
@@ -114,27 +206,45 @@ public class DataEndpoint {
         return (UserAccountBean) userAccountDao.findByUserName(username);
     }
     
+   
     /**
-     * Create a default 'fail' response
+     * Create Error Response
+     * 
+     * @param confirmation
+     * @return
+     * @throws Exception
      */
-    private Element mapFailMessage(String message) throws Exception {
-        DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
-        Document document = docBuilder.newDocument();
+    private Element mapFailConfirmation(Errors errors, String message) throws Exception {
+    	  DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
+          DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
+          Document document = docBuilder.newDocument();
 
-        Element responseElement = document.createElementNS(NAMESPACE_URI_V1, "importDataResponse");
-        Element resultElement = document.createElementNS(NAMESPACE_URI_V1, "result");
+          Element responseElement = document.createElementNS(NAMESPACE_URI_V1, "importDataResponse");
+          Element resultElement = document.createElementNS(NAMESPACE_URI_V1, "result");
+          
+          String confirmation = messages.getMessage("dataEndpoint.fail", null, "Success", locale);
+          resultElement.setTextContent(confirmation);
+          responseElement.appendChild(resultElement);
+         
+          if ( errors != null){
+		        for (ObjectError error : errors.getAllErrors()) {
+		            Element errorElement = document.createElementNS(NAMESPACE_URI_V1, "error");
+		            String theMessage = messages.getMessage(error.getCode(), error.getArguments(), locale);
+		            errorElement.setTextContent(theMessage);
+		            responseElement.appendChild(errorElement);
+		        }
+          }
+          if (message != null)
+          {
         
-        String confirmation = messages.getMessage("dataEndpoint.fail", null, "Success", locale);
-        resultElement.setTextContent(confirmation);
-        responseElement.appendChild(resultElement);
-        Element msgElement = document.createElementNS(NAMESPACE_URI_V1, "error");
-        msgElement.setTextContent(message);
-        responseElement.appendChild(msgElement);
-        logger.debug("sending fail message " + message);
-        return responseElement;
-    }
+	        Element msgElement = document.createElementNS(NAMESPACE_URI_V1, "error");
+	        msgElement.setTextContent(message);
+	        responseElement.appendChild(msgElement);
+	        logger.debug("sending fail message " + message);
+	      }
+         return responseElement;
 
+    }
     /**
      * Create Response
      * 
@@ -142,30 +252,27 @@ public class DataEndpoint {
      * @return
      * @throws Exception
      */
-    private Element mapConfirmation(String xml, StudyBean studyBean, UserAccountBean userBean) throws Exception {
-
-        DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
+    private Element mapConfirmation(List<String> auditMsgs ) throws Exception {
+    	DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
         Document document = docBuilder.newDocument();
 
         Element responseElement = document.createElementNS(NAMESPACE_URI_V1, "importDataResponse");
         Element resultElement = document.createElementNS(NAMESPACE_URI_V1, "result");
         
-        List<String> auditMsgs = new ArrayList<String>();
-        if (xml != null) {
-            auditMsgs = new DataImportService().importData(dataSource, coreResources, studyBean, userBean, xml);
-        } else {
-            logger.debug("found null in xml");
-        }
-
         if (auditMsgs != null) {
             String status = auditMsgs.get(0);
             if ("fail".equals(status)) {
-                String confirmation = messages.getMessage("dataEndpoint.fail", null, "Success", locale);
+                String confirmation = messages.getMessage("dataEndpoint.fail", null, "Fail", locale);
                 resultElement.setTextContent(confirmation);
                 responseElement.appendChild(resultElement);
                 Element msgElement = document.createElementNS(NAMESPACE_URI_V1, "error");
-                msgElement.setTextContent(auditMsgs.get(1));
+                auditMsgs.remove(0);
+                StringBuffer output_msg = new StringBuffer("");
+                for (String mes : auditMsgs){
+                	output_msg.append(mes);
+                }
+                msgElement.setTextContent(output_msg.toString());
                 responseElement.appendChild(msgElement);
             } else if ("warn".equals(status)){
                 // set a summary here, and set individual warnings for each DN
@@ -188,21 +295,12 @@ public class DataEndpoint {
                 resultElement.setTextContent(confirmation);
                 responseElement.appendChild(resultElement);
             }
-            // TODO set up a success + warnings status above? tbh 08/2010
-            //            Element auditMsgsElement = document.createElementNS(NAMESPACE_URI_V1, "auditMessages");
-            //            responseElement.appendChild(auditMsgsElement);
-            //
-            //            for (String msg : auditMsgs) {
-            //                Element msgElement = document.createElementNS(NAMESPACE_URI_V1, "auditMessage");
-            //                msgElement.setTextContent(msg);
-            //                auditMsgsElement.appendChild(msgElement);
-            //            }
-        }
+         }
 
         return responseElement;
     }
 
-    public static String node2String(Node node) {
+    private static String node2String(Node node) {
         try {
             TransformerFactory tFactory = TransformerFactory.newInstance();
             
@@ -219,6 +317,17 @@ public class DataEndpoint {
         }
 
         return null;
+    }
+    
+    private String convertToErrorString(List<String> errorMessages)
+    {
+    	StringBuilder result = new StringBuilder();
+    	for (String str: errorMessages)
+    	{
+    		result.append(str + " \n");
+    	}
+    	
+    	return result.toString();
     }
 
 }

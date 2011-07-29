@@ -34,22 +34,17 @@ public class StudyMetadataRequestValidator implements Validator {
         StudyMetadataRequestBean studyMetadataRequest = (StudyMetadataRequestBean) obj;
 
         if (studyMetadataRequest.getStudyUniqueId() == null && studyMetadataRequest.getSiteUniqueId() == null) {
-            e.reject("studyEventDefinitionRequestValidator.invalid_study_identifier");
-            return;
+        	 e.reject("studyEventDefinitionRequestValidator.study_does_not_exist");
+             return;
         }
         if (studyMetadataRequest.getStudyUniqueId() != null && studyMetadataRequest.getSiteUniqueId() == null) {
             StudyBean study = getStudyDAO().findByUniqueIdentifier(studyMetadataRequest.getStudyUniqueId());
             if (study == null) {
-                e.reject("studyEventDefinitionRequestValidator.invalid_study_identifier");
-                return;
+            	  e.reject("subjectTransferValidator.study_does_not_exist", new Object[] { studyMetadataRequest.getStudyUniqueId() }, "Study identifier you specified "
+                          + studyMetadataRequest.getStudyUniqueId() + " does not correspond to a valid study.");
+                  return;  
             }
-        }
-        if (studyMetadataRequest.getStudyUniqueId() != null && studyMetadataRequest.getSiteUniqueId() == null) {
-            StudyBean study = getStudyDAO().findByUniqueIdentifier(studyMetadataRequest.getStudyUniqueId());
-            if (study == null) {
-                e.reject("studyEventDefinitionRequestValidator.invalid_study_identifier");
-                return;
-            }
+       
             StudyUserRoleBean studySur = getUserAccountDAO().findRoleByUserNameAndStudyId(studyMetadataRequest.getUser().getName(), study.getId());
             if (studySur.getStatus() != Status.AVAILABLE) {
                 e.reject("studyEventDefinitionRequestValidator.insufficient_permissions",
@@ -57,20 +52,20 @@ public class StudyMetadataRequestValidator implements Validator {
                 return;
             }
         }
-        if (studyMetadataRequest.getStudyUniqueId() != null && studyMetadataRequest.getSiteUniqueId() != null) {
-            StudyBean study = getStudyDAO().findByUniqueIdentifier(studyMetadataRequest.getStudyUniqueId());
-            StudyBean site = getStudyDAO().findByUniqueIdentifier(studyMetadataRequest.getSiteUniqueId());
-            if (study == null || site == null || site.getParentStudyId() != study.getId()) {
-                e.reject("studyEventDefinitionRequestValidator.invalid_study_identifier_site_identifier");
-                return;
-            }
-            StudyUserRoleBean siteSur = getUserAccountDAO().findRoleByUserNameAndStudyId(studyMetadataRequest.getUser().getName(), site.getId());
-            if (siteSur.getStatus() != Status.AVAILABLE) {
-                e.reject("studyEventDefinitionRequestValidator.insufficient_permissions",
-                        "You do not have sufficient privileges to proceed with this operation.");
-                return;
-            }
-        }
+//        if (studyMetadataRequest.getStudyUniqueId() != null && studyMetadataRequest.getSiteUniqueId() != null) {
+//            StudyBean study = getStudyDAO().findByUniqueIdentifier(studyMetadataRequest.getStudyUniqueId());
+//            StudyBean site = getStudyDAO().findByUniqueIdentifier(studyMetadataRequest.getSiteUniqueId());
+//            if (study == null || site == null || site.getParentStudyId() != study.getId()) {
+//                e.reject("studyEventDefinitionRequestValidator.invalid_study_identifier_site_identifier");
+//                return;
+//            }
+//            StudyUserRoleBean siteSur = getUserAccountDAO().findRoleByUserNameAndStudyId(studyMetadataRequest.getUser().getName(), site.getId());
+//            if (siteSur.getStatus() != Status.AVAILABLE) {
+//                e.reject("studyEventDefinitionRequestValidator.insufficient_permissions",
+//                        "You do not have sufficient privileges to proceed with this operation.");
+//                return;
+//            }
+//        }
     }
 
     public StudyDAO getStudyDAO() {

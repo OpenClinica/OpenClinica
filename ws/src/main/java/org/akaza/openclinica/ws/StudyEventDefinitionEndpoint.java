@@ -121,8 +121,8 @@ public class StudyEventDefinitionEndpoint {
         Element siteRef = DomUtils.getChildElementByTagName(studyRefElement, "siteRef");
         Element siteIdentifierElement = siteRef == null ? null : DomUtils.getChildElementByTagName(siteRef, "identifier");
 
-        String studyIdentifier = studyIdentifierElement == null ? null : DomUtils.getTextValue(studyIdentifierElement);
-        String siteIdentifier = siteIdentifierElement == null ? null : DomUtils.getTextValue(siteIdentifierElement);
+        String studyIdentifier = studyIdentifierElement == null ? null : DomUtils.getTextValue(studyIdentifierElement).trim();
+        String siteIdentifier = siteIdentifierElement == null ? null : DomUtils.getTextValue(siteIdentifierElement).trim();
 
         StudyEventDefinitionRequestBean studyEventDefinitionRequestBean =
             new StudyEventDefinitionRequestBean(studyIdentifier, siteIdentifier, getUserAccount());
