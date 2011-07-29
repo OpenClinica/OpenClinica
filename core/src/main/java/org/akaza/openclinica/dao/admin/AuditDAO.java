@@ -425,21 +425,4 @@ public class AuditDAO extends EntityDAO {
         }
         return al;
     }
-    
-    public AuditBean findItemInitialValueAuditByAuditID(int auditId) {
-        AuditBean eb = new AuditBean();
-        this.setTypesExpected();
-
-        HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(auditId));
-
-        String sql = digester.getQuery("findItemInitialValueAuditByAuditID");
-        ArrayList alist = this.select(sql, variables);
-        Iterator it = alist.iterator();
-
-        if (it.hasNext()) {
-            eb = (AuditBean) this.getEntityFromHashMap((HashMap) it.next());
-        }
-        return eb;
-    }
 }
