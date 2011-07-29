@@ -437,6 +437,11 @@ public class CoreResources implements ResourceLoaderAware {
         listSrcFiles[1] =   (ByteArrayInputStream) resourceLoader.getResource("classpath:properties" + File.separator + fileNames[1]).getInputStream();
         listSrcFiles[2] =   (ByteArrayInputStream) resourceLoader.getResource("classpath:properties" + File.separator + fileNames[2]).getInputStream();
         File dest = new File(getField("filePath") + "rules");
+        if (!dest.exists()) {
+            if (!dest.mkdirs()) {
+                throw new OpenClinicaSystemException("Copying files, Could not create direcotry: " + dest.getAbsolutePath() + ".");
+            }
+        }
         for (int i = 0; i < listSrcFiles.length; i++) {
             File dest1 = new File(dest, fileNames[i]);
             // File src1 = listSrcFiles[i];
