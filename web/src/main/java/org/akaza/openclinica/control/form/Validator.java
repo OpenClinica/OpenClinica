@@ -836,7 +836,7 @@ public class Validator {
               
                 
             case NO_SEMI_COLONS_OR_COLONS:
-                errorMessage = resexception.getString("field_not_blank");
+                errorMessage = resexception.getString("field_not_have_colons_or_semi");
                 break;
             }
         }
@@ -1162,7 +1162,7 @@ public class Validator {
     protected boolean isColonSemiColon(String fieldName)
     {
         String fieldValue = getFieldValue(fieldName);
-        if(fieldValue.indexOf(";")!=-1 && fieldValue.indexOf(":")!=-1)
+        if(fieldValue.indexOf(";")!=-1 || fieldValue.indexOf(":")!=-1)
             return true;
         else
             return false;
