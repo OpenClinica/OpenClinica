@@ -7,7 +7,7 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.ws.bean.StudyEventDefinitionRequestBean;
+import org.akaza.openclinica.ws.bean.BaseStudyDefinitionBean;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
@@ -27,50 +27,41 @@ public class StudyEventDefinitionRequestValidator implements Validator {
 
     @SuppressWarnings("rawtypes")
     public boolean supports(Class clazz) {
-        return StudyEventDefinitionRequestBean.class.equals(clazz);
+        return BaseStudyDefinitionBean.class.equals(clazz);
     }
 
     public void validate(Object obj, Errors e) {
-        StudyEventDefinitionRequestBean studyEventDefinitionRequestBean = (StudyEventDefinitionRequestBean) obj;
+    	BaseStudyDefinitionBean studyEventDefinitionRequestBean = (BaseStudyDefinitionBean) obj;
 
         if (studyEventDefinitionRequestBean.getStudyUniqueId() == null && studyEventDefinitionRequestBean.getSiteUniqueId() == null) {
             e.reject("studyEventDefinitionRequestValidator.invalid_study_identifier");
             return;
         }
-        if (studyEventDefinitionRequestBean.getStudyUniqueId() != null && studyEventDefinitionRequestBean.getSiteUniqueId() == null) {
+        //verify study ID
+        if (studyEventDefinitionRequestBean.getStudyUniqueId() != null ) {
             StudyBean study = getStudyDAO().findByUniqueIdentifier(studyEventDefinitionRequestBean.getStudyUniqueId());
             if (study == null) {
                 e.reject("studyEventDefinitionRequestValidator.invalid_study_identifier");
                 return;
             }
+            studyEventDefinitionRequestBean.setStudy(study);
         }
-        if (studyEventDefinitionRequestBean.getStudyUniqueId() != null && studyEventDefinitionRequestBean.getSiteUniqueId() == null) {
-            StudyBean study = getStudyDAO().findByUniqueIdentifier(studyEventDefinitionRequestBean.getStudyUniqueId());
-            if (study == null) {
-                e.reject("studyEventDefinitionRequestValidator.invalid_study_identifier");
-                return;
-            }
-            StudyUserRoleBean studySur = getUserAccountDAO().findRoleByUserNameAndStudyId(studyEventDefinitionRequestBean.getUser().getName(), study.getId());
-            if (studySur.getStatus() != Status.AVAILABLE) {
-                e.reject("studyEventDefinitionRequestValidator.insufficient_permissions",
-                        "You do not have sufficient privileges to proceed with this operation.");
-                return;
-            }
-        }
-        if (studyEventDefinitionRequestBean.getStudyUniqueId() != null && studyEventDefinitionRequestBean.getSiteUniqueId() != null) {
-            StudyBean study = getStudyDAO().findByUniqueIdentifier(studyEventDefinitionRequestBean.getStudyUniqueId());
-            StudyBean site = getStudyDAO().findByUniqueIdentifier(studyEventDefinitionRequestBean.getSiteUniqueId());
-            if (study == null || site == null || site.getParentStudyId() != study.getId()) {
+        if ( studyEventDefinitionRequestBean.getSiteUniqueId() != null) {
+        	StudyBean site = getStudyDAO().findSiteByUniqueIdentifier(studyEventDefinitionRequestBean.getStudyUniqueId(), studyEventDefinitionRequestBean.getSiteUniqueId());
+ 	        
+		    if ( site == null ) {
                 e.reject("studyEventDefinitionRequestValidator.invalid_study_identifier_site_identifier");
                 return;
             }
-            StudyUserRoleBean siteSur = getUserAccountDAO().findRoleByUserNameAndStudyId(studyEventDefinitionRequestBean.getUser().getName(), site.getId());
-            if (siteSur.getStatus() != Status.AVAILABLE) {
-                e.reject("studyEventDefinitionRequestValidator.insufficient_permissions",
-                        "You do not have sufficient privileges to proceed with this operation.");
-                return;
-            }
+		    studyEventDefinitionRequestBean.setStudy(site);
         }
+        StudyUserRoleBean siteSur = getUserAccountDAO().findRoleByUserNameAndStudyId(studyEventDefinitionRequestBean.getUser().getName(), studyEventDefinitionRequestBean.getStudy().getId());
+        if (siteSur.getStatus() != Status.AVAILABLE) {
+            e.reject("studyEventDefinitionRequestValidator.insufficient_permissions",
+                    "You do not have sufficient privileges to proceed with this operation.");
+            return;
+        }
+    
     }
 
     public StudyDAO getStudyDAO() {

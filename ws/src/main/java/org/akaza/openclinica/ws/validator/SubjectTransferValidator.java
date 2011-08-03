@@ -10,6 +10,7 @@ import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import org.akaza.openclinica.ws.bean.SubjectStudyDefinitionBean;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
@@ -34,6 +35,69 @@ public class SubjectTransferValidator implements Validator {
         return SubjectTransferBean.class.equals(clazz);
     }
 
+    public void validateIsSubjectExists(Object obj, Errors e) {
+    	SubjectStudyDefinitionBean subjectStudyBean = (SubjectStudyDefinitionBean) obj;
+
+        if (subjectStudyBean.getStudyUniqueId() == null && subjectStudyBean.getSiteUniqueId() == null) {
+            e.reject("studyEventDefinitionRequestValidator.study_does_not_exist");
+            return;
+        }
+        String studySubjectId = subjectStudyBean.getSubjectLabel();
+        if (studySubjectId == null || studySubjectId.length() < 1) {
+            e.reject("subjectTransferValidator.studySubjectId_required");
+            return;
+        } else if (studySubjectId.length() > 30) {
+            e.reject("subjectTransferValidator.studySubjectId_invalid_length", new Object[] { studySubjectId }, "studySubjectId: " + studySubjectId
+                + " cannot be longer than 30 characters.");
+            return;
+        } 
+        
+        
+        
+        StudyBean study = getStudyDAO().findByUniqueIdentifier(subjectStudyBean.getStudyUniqueId());
+        if (study == null) {
+            e.reject("subjectTransferValidator.study_does_not_exist", new Object[] { subjectStudyBean.getStudyUniqueId() }, "Study identifier you specified "
+                + subjectStudyBean.getStudyUniqueId() + " does not correspond to a valid study.");
+            return;
+        }
+        else{        subjectStudyBean.setStudy(study);}
+   
+        
+        
+        
+        StudyBean site = null;
+        if (subjectStudyBean.getSiteUniqueId() != null) {
+            site = getStudyDAO().findSiteByUniqueIdentifier(subjectStudyBean.getStudyUniqueId(), subjectStudyBean.getSiteUniqueId());
+ 	        if (site == null) {
+	            e.reject("subjectTransferValidator.site_does_not_exist", new Object[] { subjectStudyBean.getSiteUniqueId() },
+	                    "Site identifier you specified does not correspond to a valid site.");
+	            return;
+	        }
+ 	       subjectStudyBean.setStudy(site);
+       }
+        
+        UserAccountBean ua = subjectStudyBean.getUser();
+        StudyUserRoleBean role = ua.getRoleByStudy(study);
+        if (role.getId() == 0 ) {
+            e.reject("subjectTransferValidator.insufficient_permissions", "You do not have sufficient privileges to proceed with this operation.");
+            return;
+        }
+        
+        StudySubjectBean studySubject = getStudySubjectDAO().findByLabelAndStudy(subjectStudyBean.getSubjectLabel(), subjectStudyBean.getStudy());
+      
+        //it is not null but label null
+        if (studySubject == null || studySubject.getOid()== null) {
+            e.reject("studyEventTransferValidator.study_subject_does_not_exist", new Object[] { subjectStudyBean.getSubjectLabel() },
+                    "StudySubject label you specified " + subjectStudyBean.getSubjectLabel() + " does not correspond to a valid StudySubject.");
+            return;
+        }
+        else
+        {
+        	subjectStudyBean.setSubjectOIDId(studySubject.getOid());
+        }
+        	
+    	
+    }
     public void validate(Object obj, Errors e) {
         SubjectTransferBean subjectTransferBean = (SubjectTransferBean) obj;
 
@@ -41,49 +105,56 @@ public class SubjectTransferValidator implements Validator {
             e.reject("studyEventDefinitionRequestValidator.study_does_not_exist");
             return;
         }
-        
-        StudyBean study = getStudyDAO().findByUniqueIdentifier(subjectTransferBean.getStudyOid());
-        if (study == null) {
-            e.reject("subjectTransferValidator.study_does_not_exist", new Object[] { subjectTransferBean.getStudyOid() }, "Study identifier you specified "
-                + subjectTransferBean.getStudyOid() + " does not correspond to a valid study.");
-            return;
+  
+        StudyBean study = null;
+        if ( subjectTransferBean.getStudyOid() != null)
+        {
+	        study = getStudyDAO().findByUniqueIdentifier(subjectTransferBean.getStudyOid());
+	        if (study == null) {
+	            e.reject("subjectTransferValidator.study_does_not_exist", new Object[] { subjectTransferBean.getStudyOid() }, "Study identifier you specified "
+	                + subjectTransferBean.getStudyOid() + " does not correspond to a valid study.");
+	            return;
+	        }
+	        //validate study status
+	        if (study != null && !study.getStatus().isAvailable()) {
+	            e.reject("subjectTransferValidator.study_status_wrong", new Object[] { subjectTransferBean.getStudyOid() }, "Study "
+	            		+ subjectTransferBean.getStudyOid() +" has wrong status. Subject can be added to an 'AVAILABLE' study only.");
+	            return;
+	        }
+	        subjectTransferBean.setStudy(study);
         }
-        //validate study status
-        if (study != null && !study.getStatus().isAvailable()) {
-            e.reject("subjectTransferValidator.study_status_wrong", new Object[] { subjectTransferBean.getStudyOid() }, "Study "
-            		+ subjectTransferBean.getStudyOid() +" has wrong status. Subject can be added to an 'AVAILABLE' study only.");
-            return;
-        }
-   
         UserAccountBean ua = subjectTransferBean.getOwner();
-        StudyUserRoleBean role = ua.getRoleByStudy(study);
+        StudyUserRoleBean role = ua.getRoleByStudy(subjectTransferBean.getStudy());
         if (role.getId() == 0 || role.getRole().equals(Role.MONITOR)) {
             e.reject("subjectTransferValidator.insufficient_permissions", "You do not have sufficient privileges to proceed with this operation.");
             return;
         }
-        subjectTransferBean.setStudy(study);
+       
+        
         
         StudyBean site = null;
         if (subjectTransferBean.getSiteIdentifier() != null) {
             site = getStudyDAO().findSiteByUniqueIdentifier(subjectTransferBean.getStudyOid(), subjectTransferBean.getSiteIdentifier());
-        
-            
-	        if (site == null) {
+ 	        if (site == null) {
 	            e.reject("subjectTransferValidator.site_does_not_exist", new Object[] { subjectTransferBean.getSiteIdentifier() },
 	                    "Site identifier you specified does not correspond to a valid site.");
 	            return;
 	        }
 	        //validate site status
-	        if (site != null && !site.getStatus().isAvailable()) {
+	        if ( ! site.getStatus().isAvailable()) {
 	        
 	            e.reject("subjectTransferValidator.site_status_wrong", new Object[] { subjectTransferBean.getSiteIdentifier() }, "Site "
 	            		+ site.getName() +" has wrong status. Subject can be added to an 'AVAILABLE' site only.");
 	            return;
 	        }
 	        subjectTransferBean.setStudy(site);//???????????
-	        
         }
-        
+        role = ua.getRoleByStudy(site);
+        if (role.getId() == 0 || role.getRole().equals(Role.MONITOR)) {
+            e.reject("subjectTransferValidator.insufficient_permissions", "You do not have sufficient privileges to proceed with this operation.");
+            return;
+        }
+      
         int handleStudyId = study.getParentStudyId() > 0 ? study.getParentStudyId() : study.getId();
         StudyParameterValueBean studyParameter = getStudyParameterValueDAO().findByHandleAndStudy(handleStudyId, "subjectPersonIdRequired");
         String personId = subjectTransferBean.getPersonId();

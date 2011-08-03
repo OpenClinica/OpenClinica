@@ -7,10 +7,7 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.ws.bean.CRFDataImportBean;
-import org.akaza.openclinica.ws.bean.StudyMetadataRequestBean;
+import org.akaza.openclinica.ws.bean.BaseStudyDefinitionBean;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
@@ -28,12 +25,15 @@ public class CRFDataImportValidator implements Validator {
 
     @SuppressWarnings("rawtypes")
     public boolean supports(Class clazz) {
-        return CRFDataImportBean.class.equals(clazz);
+       // return CRFDataImportBean.class.equals(clazz);
+    	return BaseStudyDefinitionBean.class.equals(clazz);
+    	
     }
 
     public void validate(Object obj, Errors e) {
-    	CRFDataImportBean crfDataImportBean = (CRFDataImportBean) obj;
-
+    	//CRFDataImportBean crfDataImportBean = (CRFDataImportBean) obj;
+    	BaseStudyDefinitionBean crfDataImportBean = (BaseStudyDefinitionBean) obj;
+    	
         if (crfDataImportBean.getStudyUniqueId() == null ) {
         	 e.reject("studyEventDefinitionRequestValidator.study_does_not_exist");
              return;

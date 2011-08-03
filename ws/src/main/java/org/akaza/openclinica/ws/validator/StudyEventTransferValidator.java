@@ -53,13 +53,12 @@ public class StudyEventTransferValidator implements Validator {
             		+ studyEventTransferBean.getStudyUniqueId() +" has wrong status.");
             return;
         }
+        else
+        {
+        	studyEventTransferBean.setStudy(study);
+        }
         
 
-        StudyUserRoleBean role = studyEventTransferBean.getUser().getRoleByStudy(study);
-        if (role.getId() == 0 || role.getRole().equals(Role.MONITOR)) {
-        	  e.reject("studyEventTransferValidator.insufficient_permissions", "You do not have sufficient privileges to proceed with this operation.");
-              return;
-        }
 
         if (studyEventTransferBean.getSiteUniqueId() != null) {
             study = getStudyDAO().findSiteByUniqueIdentifier(studyEventTransferBean.getStudyUniqueId(), studyEventTransferBean.getSiteUniqueId());
@@ -77,20 +76,26 @@ public class StudyEventTransferValidator implements Validator {
 	            		+ study.getName() +" has wrong status. Subject can be added to an 'AVAILABLE' site only.");
 	            return;
 	        }
+	        studyEventTransferBean.setStudy(study);
         }
        
-        
+      //by study or site
+        StudyUserRoleBean role = studyEventTransferBean.getUser().getRoleByStudy(studyEventTransferBean.getStudy().getId());
+        if (role.getId() == 0 || role.getRole().equals(Role.MONITOR)) {
+        	  e.reject("studyEventTransferValidator.insufficient_permissions", "You do not have sufficient privileges to proceed with this operation.");
+              return;
+        }
 
         // Non Business Validation
-        if (studyEventTransferBean.getStudySubjectId() == null || studyEventTransferBean.getStudySubjectId().length() < 1) {
+        if (studyEventTransferBean.getSubjectLabel() == null ) {
             e.reject("studyEventTransferValidator.studySubjectId_required");
             return;
         }
-        StudySubjectBean studySubject = getStudySubjectDAO().findByLabelAndStudy(studyEventTransferBean.getStudySubjectId(), study);
+        StudySubjectBean studySubject = getStudySubjectDAO().findByLabelAndStudy(studyEventTransferBean.getSubjectLabel(), studyEventTransferBean.getStudy());
         //it is not null but label null
         if (studySubject == null || studySubject.getOid()== null) {
-            e.reject("studyEventTransferValidator.study_subject_does_not_exist", new Object[] { studyEventTransferBean.getStudySubjectId() },
-                    "StudySubject label you specified " + studyEventTransferBean.getStudySubjectId() + " does not correspond to a valid StudySubject.");
+            e.reject("studyEventTransferValidator.study_subject_does_not_exist", new Object[] { studyEventTransferBean.getSubjectLabel() },
+                    "StudySubject label you specified " + studyEventTransferBean.getSubjectLabel() + " does not correspond to a valid StudySubject.");
             return;
         }
 
@@ -117,7 +122,7 @@ public class StudyEventTransferValidator implements Validator {
             return;
         }
         
-        int parentStudyId = study.getId();
+        int parentStudyId = study.getParentStudyId();
         StudyEventDefinitionBean studyEventDefinition =
             getStudyEventDefinitionDAO().findByOidAndStudy(studyEventTransferBean.getEventDefinitionOID(), study.getId(), parentStudyId);
         if (studyEventDefinition == null) {

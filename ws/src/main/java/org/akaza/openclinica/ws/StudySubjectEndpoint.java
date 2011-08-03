@@ -24,6 +24,7 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.subject.SubjectServiceInterface;
+import org.akaza.openclinica.ws.bean.SubjectStudyDefinitionBean;
 import org.akaza.openclinica.ws.validator.SubjectTransferValidator;
 import org.openclinica.ws.beans.EventType;
 import org.openclinica.ws.beans.EventsType;
@@ -166,6 +167,39 @@ public class StudySubjectEndpoint {
         }
     }
 
+    
+    /**
+       * Use this method to find if studysubject exists by study/site/subject lable.
+     * 
+     * @param requestElement
+     * @return studySubjectOID
+     * @throws Exception
+  */
+    @PayloadRoot(localPart = "isStudySubjectRequest", namespace = NAMESPACE_URI_V1)
+    public Source isStudySubject( @XPathParam("//studySubject:studySubject") NodeList subject
+    		) throws Exception {
+    	ResourceBundleProvider.updateLocale(locale);
+        Element subjectElement = (Element) subject.item(0);
+       // Element studyElement = (Element) study.item(0);
+        SubjectStudyDefinitionBean subjectStudyBean = unMarshallToSubjectStudy(subjectElement);//,studyElement);
+
+        DataBinder dataBinder = new DataBinder((subjectStudyBean));
+        Errors errors = dataBinder.getBindingResult();
+     //   System.out.println("got here before validation");
+        SubjectTransferValidator subjectTransferValidator = new SubjectTransferValidator(dataSource);
+        subjectTransferValidator.validateIsSubjectExists((subjectStudyBean), errors);
+     
+        if (!errors.hasErrors()) {
+           
+            return new DOMSource(mapConfirmation(messages.getMessage("studySubjectEndpoint.success", null, 
+            		"Success", locale), subjectStudyBean.getSubjectOIDId(), errors,"subjectOID"));
+
+        } else {
+            return new DOMSource(mapConfirmation(messages.getMessage("studySubjectEndpoint.fail", null, "Fail", locale), null, errors));
+            
+        }
+    }
+    
     /**
      * Build the response for listStudySubjectsInStudy method
      * 
@@ -231,8 +265,8 @@ public class StudySubjectEndpoint {
      */
     private StudyBean validateRequestAndReturnStudy(StudyRefType studyRef) {
 
-        String studyIdentifier = studyRef == null ? null : studyRef.getIdentifier();
-        String siteIdentifier = studyRef.getSiteRef() == null ? null : studyRef.getSiteRef().getIdentifier();
+        String studyIdentifier = studyRef == null ? null : studyRef.getIdentifier().trim();
+        String siteIdentifier = studyRef.getSiteRef() == null ? null : studyRef.getSiteRef().getIdentifier().trim();
 
         if (studyIdentifier == null && siteIdentifier == null) {
             throw new OpenClinicaSystemException("studySubjectEndpoint.provide_valid_study_site", "Provide a valid study/site.");
@@ -304,7 +338,7 @@ public class StudySubjectEndpoint {
         subjectTransferBean.setSiteIdentifier(siteIdentifier);
         subjectTransferBean.setPersonId(personIdValue);
         subjectTransferBean.setStudySubjectId(studySubjectIdValue);
-        if (genderValue == null) {
+        if (genderValue == null || genderValue.length()<1) {
             // Do nothing
         } else {
             subjectTransferBean.setGender(genderValue.toCharArray()[0]);
@@ -320,22 +354,48 @@ public class StudySubjectEndpoint {
     }
 
     /**
+     * Process createStudySubject request by creating SubjectStudyDefinitionBean from received payload.
+     * 
+     * @param subjectElement
+     * @return SubjectTransferBean
+     * @throws ParseException
+     */
+    private SubjectStudyDefinitionBean unMarshallToSubjectStudy(Element subjectStudyElement) throws ParseException {
+
+        Element studySubjectIdElement = DomUtils.getChildElementByTagName(subjectStudyElement, "label");
+        Element study = DomUtils.getChildElementByTagName(subjectStudyElement, "studyRef");
+        Element studyIdentifierElement = DomUtils.getChildElementByTagName(study, "identifier");
+        Element site = DomUtils.getChildElementByTagName(study, "siteRef");
+        Element siteIdentifierElement = site == null ? null : DomUtils.getChildElementByTagName(site, "identifier");
+
+        String studySubjectIdValue = DomUtils.getTextValue(studySubjectIdElement).trim();
+        String studyIdentifier = studyIdentifierElement == null ? null : DomUtils.getTextValue(studyIdentifierElement).trim();
+        String siteIdentifier = siteIdentifierElement == null ? null : DomUtils.getTextValue(siteIdentifierElement).trim();
+
+        SubjectStudyDefinitionBean subjectTransferBean = new SubjectStudyDefinitionBean(
+        		studyIdentifier,  siteIdentifier, 
+        		getUserAccount(),  studySubjectIdValue);
+
+  
+        return subjectTransferBean;
+    }
+    /**
      * Create the Subject object if it is not already in the system.
      * 
      * @param subjectTransferBean
      * @return String
      */
     private String create(SubjectTransferBean subjectTransferBean) {
-        boolean isSubjectInMain = doesSubjectExist(subjectTransferBean);
+        //boolean isSubjectInMain = doesSubjectExist(subjectTransferBean);
 
-        if (isSubjectInMain) {
-            // TODO : either return something or throw exception or don't do anything
-            logger.debug("SubjectInMain");
-            throw new OpenClinicaSystemException("Duplicate label");
-        } else {
+//        if (isSubjectInMain) {
+//            // TODO : either return something or throw exception or don't do anything
+//            logger.debug("SubjectInMain");
+//            throw new OpenClinicaSystemException("Duplicate label");
+//        } else {
             logger.debug("creating subject transfer");
             return createSubject(subjectTransferBean);
-        }
+        //}
     }
 
     /**
@@ -384,7 +444,11 @@ public class StudySubjectEndpoint {
      * @throws Exception
      * @see #createStudySubject
      */
-    private Element mapConfirmation(String confirmation, String studySubjectLabel, Errors errors) throws Exception {
+    
+    private Element mapConfirmation(String confirmation, String studySubjectLabel, Errors errors) throws Exception  	{
+    	return  mapConfirmation( confirmation,  studySubjectLabel,  errors, "label") ;    	}
+    
+    private Element mapConfirmation(String confirmation, String studySubjectLabel, Errors errors, String label) throws Exception {
         DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
         Document document = docBuilder.newDocument();
@@ -392,7 +456,7 @@ public class StudySubjectEndpoint {
         Element responseElement = document.createElementNS(NAMESPACE_URI_V1, "createResponse");
         Element resultElement = document.createElementNS(NAMESPACE_URI_V1, "result");
         resultElement.setTextContent(confirmation);
-        Element labelElement = document.createElementNS(NAMESPACE_URI_V1, "label");
+        Element labelElement = document.createElementNS(NAMESPACE_URI_V1, label);
         labelElement.setTextContent(studySubjectLabel);
         responseElement.appendChild(resultElement);
         responseElement.appendChild(labelElement);

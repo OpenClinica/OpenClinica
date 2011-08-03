@@ -1,18 +1,13 @@
 package org.akaza.openclinica.ws;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBeanWrapper;
 import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.web.crfdata.DataImportService;
-import org.akaza.openclinica.web.job.TriggerService;
-import org.akaza.openclinica.ws.bean.CRFDataImportBean;
+import org.akaza.openclinica.ws.bean.BaseStudyDefinitionBean;
 import org.akaza.openclinica.ws.validator.CRFDataImportValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +35,6 @@ import java.util.ResourceBundle;
 import javax.sql.DataSource;
 import org.xml.sax.InputSource;
 
-import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
@@ -50,8 +44,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.akaza.openclinica.web.job.CrfBusinessLogicHelper;
-import org.akaza.openclinica.web.job.TriggerService;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Unmarshaller;
 
@@ -102,8 +94,9 @@ public class DataEndpoint {
            // String studyUniqueID = clinicalDataNode.getAttribute("StudyOID");
             String studyUniqueID =  odmContainer.getCrfDataPostImportContainer().getStudyOID();
             userBean = getUserAccount();
-            CRFDataImportBean crfDataImportBean = new CRFDataImportBean(studyUniqueID, userBean);
-
+           // CRFDataImportBean crfDataImportBean = new CRFDataImportBean(studyUniqueID, userBean);
+            BaseStudyDefinitionBean crfDataImportBean = new BaseStudyDefinitionBean(studyUniqueID, userBean);
+            
             DataBinder dataBinder = new DataBinder(crfDataImportBean);
             Errors errors = dataBinder.getBindingResult();
             CRFDataImportValidator crfDataImportValidator = new CRFDataImportValidator(dataSource);

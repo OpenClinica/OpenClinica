@@ -12,6 +12,7 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.EventServiceInterface;
+
 import org.akaza.openclinica.ws.bean.StudyEventTransferBean;
 import org.akaza.openclinica.ws.validator.StudyEventTransferValidator;
 import org.slf4j.Logger;
@@ -95,7 +96,8 @@ public class EventEndpoint {
                 HashMap<String, String> h =
                     getEventService().scheduleEvent(studyEventTransferBean.getUser(), studyEventTransferBean.getStartDateTime(),
                             studyEventTransferBean.getEndDateTime(), studyEventTransferBean.getLocation(), studyEventTransferBean.getStudyUniqueId(),
-                            studyEventTransferBean.getSiteUniqueId(), studyEventTransferBean.getEventDefinitionOID(), studyEventTransferBean.getStudySubjectId());
+                            studyEventTransferBean.getSiteUniqueId(), studyEventTransferBean.getEventDefinitionOID(), 
+                            studyEventTransferBean.getSubjectLabel());
                 return new DOMSource(mapSuccessConfirmation(h));
             } catch (OpenClinicaSystemException ose) {
                 errors.reject("eventEndpoint.cannot_schedule", "Cannot schedule an event for this Subject.");

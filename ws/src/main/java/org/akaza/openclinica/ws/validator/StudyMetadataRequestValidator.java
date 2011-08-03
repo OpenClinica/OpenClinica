@@ -7,7 +7,7 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.ws.bean.StudyMetadataRequestBean;
+import org.akaza.openclinica.ws.bean.BaseStudyDefinitionBean;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
@@ -27,11 +27,11 @@ public class StudyMetadataRequestValidator implements Validator {
 
     @SuppressWarnings("rawtypes")
     public boolean supports(Class clazz) {
-        return StudyMetadataRequestBean.class.equals(clazz);
+        return BaseStudyDefinitionBean.class.equals(clazz);
     }
 
     public void validate(Object obj, Errors e) {
-        StudyMetadataRequestBean studyMetadataRequest = (StudyMetadataRequestBean) obj;
+    	BaseStudyDefinitionBean studyMetadataRequest = (BaseStudyDefinitionBean) obj;
 
         if (studyMetadataRequest.getStudyUniqueId() == null && studyMetadataRequest.getSiteUniqueId() == null) {
         	 e.reject("studyEventDefinitionRequestValidator.study_does_not_exist");
