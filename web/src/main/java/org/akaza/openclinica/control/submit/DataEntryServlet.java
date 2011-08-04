@@ -4407,8 +4407,12 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 if (numItemsPending == 0 && numItems > 0) {
                     return false;
                 }
+                
             } else {
                 if (numItemsCompleted == 0 && numItems > 0) {
+                    return false;
+                }
+                else if(numItemsCompleted < numItems){
                     return false;
                 }
             }
