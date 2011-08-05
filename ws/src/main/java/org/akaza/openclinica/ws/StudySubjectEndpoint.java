@@ -322,7 +322,7 @@ public class StudySubjectEndpoint {
         Element site = DomUtils.getChildElementByTagName(study, "siteRef");
         Element siteIdentifierElement = site == null ? null : DomUtils.getChildElementByTagName(site, "identifier");
 
-        String personIdValue = personIdElement == null ? null : DomUtils.getTextValue(personIdElement).trim();
+        String personIdValue = personIdElement == null ? "" : DomUtils.getTextValue(personIdElement).trim();
         String studySubjectIdValue = DomUtils.getTextValue(studySubjectIdElement).trim();
         String genderValue = genderElement == null ? null : DomUtils.getTextValue(genderElement).trim();
         String secondaryIdValue = secondaryIdElement == null ? null : DomUtils.getTextValue(secondaryIdElement).trim();
