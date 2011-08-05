@@ -139,6 +139,7 @@ public class SubjectTransferValidator implements Validator {
         			subjectTransferBean.getSiteIdentifier(), null, e);
             if (site == null) { return;	        }
             site_id = site.getId();
+            subjectTransferBean.setStudy(site);
         }
         boolean isRoleVerified = helper.verifyRole(subjectTransferBean.getOwner(), study.getId(), site_id, Role.MONITOR, e);
         if ( !isRoleVerified){ return;}
@@ -254,7 +255,7 @@ public class SubjectTransferValidator implements Validator {
             } 
 	    }
         else{
-        	if (gender.length() > 0 && !("m".equals(gender) || !"f".equals(gender))) {
+        	if (gender.length() > 0 && !("m".equals(gender) || "f".equals(gender))) {
                 e.reject("subjectTransferValidator.gender_is_m_or_f");
                 return;
             } 
