@@ -109,8 +109,9 @@ public class SubjectTransferValidator implements Validator {
       
         //it is not null but label null
         if (studySubject == null || studySubject.getOid()== null) {
-            e.reject("studyEventTransferValidator.study_subject_does_not_exist", new Object[] { subjectStudyBean.getSubjectLabel() },
-                    "StudySubject label you specified " + subjectStudyBean.getSubjectLabel() + " does not correspond to a valid StudySubject.");
+            e.reject("studyEventTransferValidator.study_subject_does_not_exist", new Object[] { subjectStudyBean.getSubjectLabel(), subjectStudyBean.getStudy().getName() },
+                    "StudySubject label you specified " + subjectStudyBean.getSubjectLabel() + " does not correspond to a study "+subjectStudyBean.getStudy().getName());
+         
             return;
         }
         else

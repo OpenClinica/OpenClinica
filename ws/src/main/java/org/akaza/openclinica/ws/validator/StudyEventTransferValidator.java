@@ -112,11 +112,12 @@ public class StudyEventTransferValidator implements Validator {
             e.reject("studyEventTransferValidator.studySubjectId_required");
             return;
         }
+        
         StudySubjectBean studySubject = getStudySubjectDAO().findByLabelAndStudy(studyEventTransferBean.getSubjectLabel(), studyEventTransferBean.getStudy());
         //it is not null but label null
         if (studySubject == null || studySubject.getOid()== null) {
-            e.reject("studyEventTransferValidator.study_subject_does_not_exist", new Object[] { studyEventTransferBean.getSubjectLabel() },
-                    "StudySubject label you specified " + studyEventTransferBean.getSubjectLabel() + " does not correspond to a valid StudySubject.");
+            e.reject("studyEventTransferValidator.study_subject_does_not_exist", new Object[] { studyEventTransferBean.getSubjectLabel(), studyEventTransferBean.getStudy().getName() },
+                    "StudySubject label you specified " + studyEventTransferBean.getSubjectLabel() + " does not correspond to a study "+studyEventTransferBean.getStudy().getName());
             return;
         }
 
@@ -136,13 +137,14 @@ public class StudyEventTransferValidator implements Validator {
             return;
         }
         
-        if (studyEventTransferBean.getEndDateTime().compareTo(studyEventTransferBean.getStartDateTime())!= -1) {
-            e.reject("studyEventTransferValidator.start_date_after_end_date", new Object[] { studyEventTransferBean.getEndDateTime(),studyEventTransferBean.getStartDateTime() },
-                    "Start date "+studyEventTransferBean.getEndDateTime()+"  after end date ("+studyEventTransferBean.getStartDateTime()+").");
-           
-            return;
+        if ( studyEventTransferBean.getEndDateTime() != null && studyEventTransferBean.getStartDateTime() != null){
+	        if (studyEventTransferBean.getEndDateTime().compareTo(studyEventTransferBean.getStartDateTime())== -1) {
+	            e.reject("studyEventTransferValidator.start_date_after_end_date", new Object[] { studyEventTransferBean.getStartDateTime(),studyEventTransferBean.getEndDateTime() },
+	                    "Start date "+studyEventTransferBean.getStartDateTime()+"  after end date ("+studyEventTransferBean.getEndDateTime()+").");
+	           
+	            return;
+	        }
         }
-        
         int parentStudyId = study.getParentStudyId();
         StudyEventDefinitionBean studyEventDefinition =
             getStudyEventDefinitionDAO().findByOidAndStudy(studyEventTransferBean.getEventDefinitionOID(), study.getId(), parentStudyId);
