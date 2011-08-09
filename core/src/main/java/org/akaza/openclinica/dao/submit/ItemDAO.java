@@ -222,6 +222,13 @@ public class ItemDAO extends AuditableEntityDAO {
         return this.executeFindAllQuery("findAllParentsBySectionId", variables);
     }
 
+    public ArrayList findAllNonRepeatingParentsBySectionId(int sectionId) {
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(sectionId));
+
+        return this.executeFindAllQuery("findAllNonRepeatingParentsBySectionId", variables);
+    }
+
     public ArrayList findAllBySectionId(int sectionId) {
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(sectionId));
