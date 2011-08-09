@@ -43,6 +43,22 @@
             and ifm.crf_version_id=c.crf_version_id 
             and c.crf_id=?
 		</sql>
+	</query>	
+	<query>
+		<name>findAllNonRepeatingParentsBySectionId</name>
+		<sql>
+			  SELECT i.*, m.crf_version_id FROM item i, item_form_metadata m
+  			, item_group ig, item_group_metadata igm
+    		,section s
+			WHERE i.item_id = m.item_id
+				AND (m.parent_id = 0 or m.parent_id is null)
+				AND m.section_id = ?				
+				and igm.crf_version_id=s.crf_version_id
+				and ig.item_group_id = igm.item_group_id
+				and s.section_id = m.section_id
+				and m.item_id = igm.item_id 
+				and igm.repeating_group != true	
+		</sql>
 	</query>
 	
 	<query>
