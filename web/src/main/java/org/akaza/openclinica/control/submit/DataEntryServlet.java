@@ -3469,9 +3469,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
      */
     private ArrayList getParentDisplayItems(boolean hasGroup, SectionBean sb, EventDefinitionCRFBean edcb, ItemDAO idao, ItemFormMetadataDAO ifmdao,
             ItemDataDAO iddao, boolean hasUngroupedItems, HttpServletRequest request) throws Exception {
-
         ArrayList answer = new ArrayList();
-        EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
+        EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 
         // DisplayItemBean objects are composed of an ItemBean, ItemDataBean and
         // ItemFormDataBean.
@@ -3486,22 +3485,34 @@ public abstract class DataEntryServlet extends CoreSecureController {
         // ArrayList items = idao.findAllParentsBySectionId(sb.getId());
 
         ArrayList items = new ArrayList();
+        ArrayList itemsUngrped = new ArrayList();
         if (hasGroup) {
             // issue 1689: this method causes problems with items that have
             // been defined as grouped, then redefined as ungrouped; thus it
             // is "checked twice" with hasUngroupedItems.
             // See: FormBeanUtil.sectionHasUngroupedItems.
             if (hasUngroupedItems) {
-                items = idao.findAllUngroupedParentsBySectionId(sb.getId(), sb.getCRFVersionId());
+                // @pgawade 05-Aug-2011 fix for issue 10628 - commented out the
+                // if-else logic based on 'hasGroup' flag.
+                // 'if' part is unchanged but else part is changed to be
+                // executed always because that is to get the non-repeating and
+                // ungrouped item details and was getting skipped in case the
+                // section has repeating group items plus non-repeating group
+                // items
+                itemsUngrped = idao.findAllUngroupedParentsBySectionId(sb.getId(), sb.getCRFVersionId());
             }
             // however, if we have true:true, we exclude all grouped items
-            //            items.addAll(
-            //                          idao.findAllGroupedParentsBySectionId(
-            //                                          sb.getId(), sb.getCRFVersionId()));
-        } else {
-            logger.trace("no item groups");
-            items = idao.findAllParentsBySectionId(sb.getId());
+            // items.addAll(
+            // idao.findAllGroupedParentsBySectionId(
+            // sb.getId(), sb.getCRFVersionId()));
         }
+        
+        // else {
+        logger.trace("no item groups");
+        // items = idao.findAllParentsBySectionId(sb.getId());
+        items = idao.findAllNonRepeatingParentsBySectionId(sb.getId());
+        items.addAll(itemsUngrped);
+        // }
         logger.debug("items size" + items.size());
         for (int i = 0; i < items.size(); i++) {
             DisplayItemBean dib = new DisplayItemBean();
@@ -3544,13 +3555,13 @@ public abstract class DataEntryServlet extends CoreSecureController {
                         + passedDDE + " value " + dib.getData().getValue());
                 }
                 // now set highlighting for admin entry only
-                //                if (getServletPage().equals(Page.ADMIN_EDIT_SERVLET)) {
-                //                    if (needsHighlighting && ifmb.isShowItem()) {
-                //                        // that is, if it was not shown but now is shown ...
-                //                        ifmb.setHighlighted(true);
-                //                        logger.debug("set highlighted to true");
-                //                    }
-                //                }
+                // if (getServletPage().equals(Page.ADMIN_EDIT_SERVLET)) {
+                // if (needsHighlighting && ifmb.isShowItem()) {
+                // // that is, if it was not shown but now is shown ...
+                // ifmb.setHighlighted(true);
+                // logger.debug("set highlighted to true");
+                // }
+                // }
                 // << tbh 06/2010
                 // TODO child items
                 // logger.debug("did not catch NPE 1");
