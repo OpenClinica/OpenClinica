@@ -215,7 +215,7 @@ public class DataEndpoint {
           Element responseElement = document.createElementNS(NAMESPACE_URI_V1, "importDataResponse");
           Element resultElement = document.createElementNS(NAMESPACE_URI_V1, "result");
           
-          String confirmation = messages.getMessage("dataEndpoint.fail", null, "Success", locale);
+          String confirmation = messages.getMessage("dataEndpoint.fail", null, "Fail", locale);
           resultElement.setTextContent(confirmation);
           responseElement.appendChild(resultElement);
          

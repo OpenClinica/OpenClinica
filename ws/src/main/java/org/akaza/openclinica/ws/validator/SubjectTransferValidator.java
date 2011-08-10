@@ -47,13 +47,13 @@ public class SubjectTransferValidator implements Validator {
             e.reject("studyEventDefinitionRequestValidator.study_does_not_exist");
             return;
         }
-        
-        StudyBean study = helper.verifyStudy(getStudyDAO(), subjectStudyBean.getStudyUniqueId(), null, e);
+        Status[] included_status= new Status[]{Status.AVAILABLE };
+        StudyBean study = helper.verifyStudy(getStudyDAO(), subjectStudyBean.getStudyUniqueId(), included_status, e);
         if (study == null) return;
         subjectStudyBean.setStudy(study);
         StudyBean site = null;int site_id = -1;
         if (subjectStudyBean.getSiteUniqueId() != null) {
-        	site = helper.verifySite(getStudyDAO(), subjectStudyBean.getStudyUniqueId(), subjectStudyBean.getSiteUniqueId(), null, e);
+        	site = helper.verifySite(getStudyDAO(), subjectStudyBean.getStudyUniqueId(), subjectStudyBean.getSiteUniqueId(), included_status, e);
             if (site == null) { return;	        }
             site_id = site.getId();
             subjectStudyBean.setStudy(site);
@@ -130,7 +130,6 @@ public class SubjectTransferValidator implements Validator {
         }
         
         Status[] included_status= new Status[]{Status.AVAILABLE };
-        
         StudyBean study = helper.verifyStudy(getStudyDAO(), subjectTransferBean.getStudyOid(), included_status, e);
         if (study == null) return;
         StudyBean site = null;int site_id = -1;

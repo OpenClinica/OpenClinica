@@ -53,6 +53,7 @@ import org.w3c.dom.NodeList;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -110,13 +111,15 @@ public class StudySubjectEndpoint {
      */
     @PayloadRoot(localPart = "createRequest", namespace = NAMESPACE_URI_V1)
     public Source createStudySubject(@XPathParam("//studySubject:studySubject") NodeList subject) throws Exception {
-        try {
+    	Errors errors = null;
+    	try {
+        	
             ResourceBundleProvider.updateLocale(locale);
             Element subjectElement = (Element) subject.item(0);
             SubjectTransferBean subjectTransferBean = unMarshallToSubjectTransfer(subjectElement);
 
             DataBinder dataBinder = new DataBinder((subjectTransferBean));
-            Errors errors = dataBinder.getBindingResult();
+            errors = dataBinder.getBindingResult();
          //   System.out.println("got here before validation");
             subjectTransferBean.setOwner(getUserAccount());
             SubjectTransferValidator subjectTransferValidator = new SubjectTransferValidator(dataSource);
@@ -132,9 +135,12 @@ public class StudySubjectEndpoint {
             }
         } catch (NullPointerException npe) {
             npe.printStackTrace();
-            Errors errors = null;
             return new DOMSource(mapConfirmation(messages.getMessage("studySubjectEndpoint.fail", null, "Null Pointer Exception", locale), null, errors));
-        }
+        } catch(Exception e){
+        	  List<String> error_messages = new ArrayList<String>();
+        	  error_messages.add(e.getMessage());
+        	  return new DOMSource(mapConfirmation(messages.getMessage("studySubjectEndpoint.fail", null, "Fail", locale), null,  errors, "label", error_messages) );
+         }
     }
 
     /**
@@ -307,7 +313,7 @@ public class StudySubjectEndpoint {
      * @return SubjectTransferBean
      * @throws ParseException
      */
-    private SubjectTransferBean unMarshallToSubjectTransfer(Element subjectElement) throws ParseException {
+    private SubjectTransferBean unMarshallToSubjectTransfer(Element subjectElement) throws ParseException, Exception {
 
         Element studySubjectIdElement = DomUtils.getChildElementByTagName(subjectElement, "label");
         Element secondaryIdElement = DomUtils.getChildElementByTagName(subjectElement, "secondaryLabel");
@@ -446,9 +452,13 @@ public class StudySubjectEndpoint {
      */
     
     private Element mapConfirmation(String confirmation, String studySubjectLabel, Errors errors) throws Exception  	{
-    	return  mapConfirmation( confirmation,  studySubjectLabel,  errors, "label") ;    	}
+    	return  mapConfirmation( confirmation,  studySubjectLabel,  errors, "label", null) ;    	}
     
-    private Element mapConfirmation(String confirmation, String studySubjectLabel, Errors errors, String label) throws Exception {
+    private Element mapConfirmation(String confirmation, String studySubjectLabel, Errors errors, String label) throws Exception  	{
+    	return  mapConfirmation( confirmation,  studySubjectLabel,  errors, label, null) ;    
+    }
+
+    private Element mapConfirmation(String confirmation, String studySubjectLabel, Errors errors, String label,  List<String> error_messages) throws Exception {
         DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
         Document document = docBuilder.newDocument();
@@ -456,20 +466,35 @@ public class StudySubjectEndpoint {
         Element responseElement = document.createElementNS(NAMESPACE_URI_V1, "createResponse");
         Element resultElement = document.createElementNS(NAMESPACE_URI_V1, "result");
         resultElement.setTextContent(confirmation);
-        Element labelElement = document.createElementNS(NAMESPACE_URI_V1, label);
-        labelElement.setTextContent(studySubjectLabel);
         responseElement.appendChild(resultElement);
-        responseElement.appendChild(labelElement);
-
-        for (ObjectError error : errors.getAllErrors()) {
-            Element errorElement = document.createElementNS(NAMESPACE_URI_V1, "error");
-            String theMessage = messages.getMessage(error.getCode(), error.getArguments(), locale);
-            errorElement.setTextContent(theMessage);
-            responseElement.appendChild(errorElement);
+        
+        if ( studySubjectLabel != null){
+	        Element labelElement = document.createElementNS(NAMESPACE_URI_V1, label);
+	        labelElement.setTextContent(studySubjectLabel);
+	        responseElement.appendChild(labelElement);
         }
+        if ( errors != null){
+	        for (ObjectError error : errors.getAllErrors()) {
+	            Element errorElement = document.createElementNS(NAMESPACE_URI_V1, "error");
+	            String theMessage = messages.getMessage(error.getCode(), error.getArguments(), locale);
+	            errorElement.setTextContent(theMessage);
+	            responseElement.appendChild(errorElement);
+	        }
+        }
+        if ( error_messages != null && error_messages.size()>0){
+	    	StringBuilder output_msg = new StringBuilder();
+	        for (String mes : error_messages){
+	        	output_msg.append(mes);
+	        }
+	    	Element msgElement = document.createElementNS(NAMESPACE_URI_V1, "error");
+	        msgElement.setTextContent(output_msg.toString());
+	        responseElement.appendChild(msgElement);
+    	}
         return responseElement;
 
     }
+    
+    
 
     /**
      * Helper method that translates a date object to an XMLGregorianCalendar which is the data type used in jaxb generated classes.
@@ -511,9 +536,16 @@ public class StudySubjectEndpoint {
      * @return Date
      * @throws ParseException
      */
-    private Date getDate(String dateAsString) throws ParseException {
+    private Date getDate(String dateAsString) throws ParseException, Exception {
         SimpleDateFormat sdf = new SimpleDateFormat(getDateFormat());
-        return sdf.parse(dateAsString);
+        sdf.setLenient(false);
+        Date dd = sdf.parse(dateAsString);
+        Calendar c = Calendar.getInstance();
+        c.setTime(dd);
+        if (c.get(Calendar.YEAR) < 1900 || c.get(Calendar.YEAR) > 9999) {
+        	throw new Exception("Unparsable date: "+dateAsString);
+        }
+        return dd;
     }
 
     /**
