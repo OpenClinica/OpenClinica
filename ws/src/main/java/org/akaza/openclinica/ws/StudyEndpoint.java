@@ -9,7 +9,7 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.logic.odmExport.MetadataUnit;
-import org.akaza.openclinica.ws.bean.StudyMetadataRequestBean;
+import org.akaza.openclinica.ws.bean.BaseStudyDefinitionBean;
 import org.akaza.openclinica.ws.validator.StudyMetadataRequestValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +67,8 @@ public class StudyEndpoint {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         Element studyRefElement = (Element) studyNodeList.item(0);
 
-        StudyMetadataRequestBean studyMetadataRequestBean = unMarshallRequest(studyRefElement);
+        //StudyMetadataRequestBean studyMetadataRequestBean = unMarshallRequest(studyRefElement);
+        BaseStudyDefinitionBean studyMetadataRequestBean = unMarshallRequest(studyRefElement);
         DataBinder dataBinder = new DataBinder((studyMetadataRequestBean));
         Errors errors = dataBinder.getBindingResult();
         StudyMetadataRequestValidator studyMetadataRequestValidator = new StudyMetadataRequestValidator(dataSource);
@@ -91,7 +92,12 @@ public class StudyEndpoint {
         resultElement.setTextContent(confirmation);
         responseElement.appendChild(resultElement);
         MetadataUnit mdc = new MetadataUnit(dataSource, study, 0);
+        //htaycher : catch null pointer exception and proceed
+        try{
         mdc.collectOdmStudy();
+        }catch(Exception e){
+        	System.out.print("Exception calling mdc.collectOdmStudy()"+ e.getMessage());
+        }
         MetaDataReportBean meta = new MetaDataReportBean(mdc.getOdmStudy());
         meta.addNodeStudy(Boolean.FALSE);
         Element odmElement = document.createElementNS(NAMESPACE_URI_V1, "odm");
@@ -122,22 +128,28 @@ public class StudyEndpoint {
 
     }
 
-    private StudyMetadataRequestBean unMarshallRequest(Element studyEventDefinitionListAll) {
+    //private StudyMetadataRequestBean unMarshallRequest(Element studyEventDefinitionListAll) {
+    	private BaseStudyDefinitionBean unMarshallRequest(Element studyEventDefinitionListAll) {
 
         Element studyRefElement = DomUtils.getChildElementByTagName(studyEventDefinitionListAll, "studyRef");
         Element studyIdentifierElement = DomUtils.getChildElementByTagName(studyRefElement, "identifier");
-        Element siteRef = DomUtils.getChildElementByTagName(studyRefElement, "siteRef");
-        Element siteIdentifierElement = siteRef == null ? null : DomUtils.getChildElementByTagName(siteRef, "identifier");
+        //htaycher metaData coming on study level only
+       // Element siteRef = DomUtils.getChildElementByTagName(studyRefElement, "siteRef");
+       // Element siteIdentifierElement = siteRef == null ? null : DomUtils.getChildElementByTagName(siteRef, "identifier");
 
-        String studyIdentifier = studyIdentifierElement == null ? null : DomUtils.getTextValue(studyIdentifierElement);
-        String siteIdentifier = siteIdentifierElement == null ? null : DomUtils.getTextValue(siteIdentifierElement);
+        String studyIdentifier = studyIdentifierElement == null ? null : DomUtils.getTextValue(studyIdentifierElement).trim();   
+      //  String siteIdentifier = siteIdentifierElement == null ? null : DomUtils.getTextValue(siteIdentifierElement);
 
-        StudyMetadataRequestBean studyMetadataRequest = new StudyMetadataRequestBean(studyIdentifier, siteIdentifier, getUserAccount());
+       // StudyMetadataRequestBean studyMetadataRequest = new StudyMetadataRequestBean(studyIdentifier, siteIdentifier, getUserAccount());
+       //htaycher: depricated StudyMetadataRequestBean studyMetadataRequest = new StudyMetadataRequestBean(studyIdentifier,  getUserAccount());
+        
+        BaseStudyDefinitionBean studyMetadataRequest = new BaseStudyDefinitionBean(studyIdentifier,  getUserAccount());
+        
         return studyMetadataRequest;
 
     }
 
-    StudyBean getStudy(StudyMetadataRequestBean studyMetadataRequest) {
+    StudyBean getStudy(BaseStudyDefinitionBean studyMetadataRequest) {
         StudyBean study = null;
         if (studyMetadataRequest.getStudyUniqueId() != null && studyMetadataRequest.getSiteUniqueId() == null) {
             study = getStudyDao().findByUniqueIdentifier(studyMetadataRequest.getStudyUniqueId());

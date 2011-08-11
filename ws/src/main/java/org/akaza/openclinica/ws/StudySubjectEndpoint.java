@@ -24,7 +24,8 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.subject.SubjectServiceInterface;
-import org.akaza.openclinica.validator.SubjectTransferValidator;
+import org.akaza.openclinica.ws.bean.SubjectStudyDefinitionBean;
+import org.akaza.openclinica.ws.validator.SubjectTransferValidator;
 import org.openclinica.ws.beans.EventType;
 import org.openclinica.ws.beans.EventsType;
 import org.openclinica.ws.beans.GenderType;
@@ -52,6 +53,7 @@ import org.w3c.dom.NodeList;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -109,30 +111,36 @@ public class StudySubjectEndpoint {
      */
     @PayloadRoot(localPart = "createRequest", namespace = NAMESPACE_URI_V1)
     public Source createStudySubject(@XPathParam("//studySubject:studySubject") NodeList subject) throws Exception {
-        try {
+    	Errors errors = null;
+    	try {
+        	
             ResourceBundleProvider.updateLocale(locale);
             Element subjectElement = (Element) subject.item(0);
             SubjectTransferBean subjectTransferBean = unMarshallToSubjectTransfer(subjectElement);
 
             DataBinder dataBinder = new DataBinder((subjectTransferBean));
-            Errors errors = dataBinder.getBindingResult();
-            System.out.println("got here before validation");
+            errors = dataBinder.getBindingResult();
+         //   System.out.println("got here before validation");
             subjectTransferBean.setOwner(getUserAccount());
             SubjectTransferValidator subjectTransferValidator = new SubjectTransferValidator(dataSource);
             subjectTransferValidator.validate((subjectTransferBean), errors);
             if (!errors.hasErrors()) {
+            //	System.out.println("got here before creation");
                 String label = create(subjectTransferBean);
-                System.out.println("got here after creation");
+            //    System.out.println("got here after creation" + label);
                 return new DOMSource(mapConfirmation(messages.getMessage("studySubjectEndpoint.success", null, "Success", locale), label, errors));
             } else {
-                System.out.println("got here by throwing an error");
+             //   System.out.println("got here by throwing an error");
                 return new DOMSource(mapConfirmation(messages.getMessage("studySubjectEndpoint.fail", null, "Fail", locale), null, errors));
             }
         } catch (NullPointerException npe) {
             npe.printStackTrace();
-            Errors errors = null;
             return new DOMSource(mapConfirmation(messages.getMessage("studySubjectEndpoint.fail", null, "Null Pointer Exception", locale), null, errors));
-        }
+        } catch(Exception e){
+        	  List<String> error_messages = new ArrayList<String>();
+        	  error_messages.add(e.getMessage());
+        	  return new DOMSource(mapConfirmation(messages.getMessage("studySubjectEndpoint.fail", null, "Fail", locale), null,  errors, "label", error_messages) );
+         }
     }
 
     /**
@@ -165,6 +173,39 @@ public class StudySubjectEndpoint {
         }
     }
 
+    
+    /**
+       * Use this method to find if studysubject exists by study/site/subject lable.
+     * 
+     * @param requestElement
+     * @return studySubjectOID
+     * @throws Exception
+  */
+    @PayloadRoot(localPart = "isStudySubjectRequest", namespace = NAMESPACE_URI_V1)
+    public Source isStudySubject( @XPathParam("//studySubject:studySubject") NodeList subject
+    		) throws Exception {
+    	ResourceBundleProvider.updateLocale(locale);
+        Element subjectElement = (Element) subject.item(0);
+       // Element studyElement = (Element) study.item(0);
+        SubjectStudyDefinitionBean subjectStudyBean = unMarshallToSubjectStudy(subjectElement);//,studyElement);
+
+        DataBinder dataBinder = new DataBinder((subjectStudyBean));
+        Errors errors = dataBinder.getBindingResult();
+     //   System.out.println("got here before validation");
+        SubjectTransferValidator subjectTransferValidator = new SubjectTransferValidator(dataSource);
+        subjectTransferValidator.validateIsSubjectExists((subjectStudyBean), errors);
+     
+        if (!errors.hasErrors()) {
+           
+            return new DOMSource(mapConfirmation(messages.getMessage("studySubjectEndpoint.success", null, 
+            		"Success", locale), subjectStudyBean.getSubjectOIDId(), errors,"subjectOID"));
+
+        } else {
+            return new DOMSource(mapConfirmation(messages.getMessage("studySubjectEndpoint.fail", null, "Fail", locale), null, errors));
+            
+        }
+    }
+    
     /**
      * Build the response for listStudySubjectsInStudy method
      * 
@@ -230,8 +271,8 @@ public class StudySubjectEndpoint {
      */
     private StudyBean validateRequestAndReturnStudy(StudyRefType studyRef) {
 
-        String studyIdentifier = studyRef == null ? null : studyRef.getIdentifier();
-        String siteIdentifier = studyRef.getSiteRef() == null ? null : studyRef.getSiteRef().getIdentifier();
+        String studyIdentifier = studyRef == null ? null : studyRef.getIdentifier().trim();
+        String siteIdentifier = studyRef.getSiteRef() == null ? null : studyRef.getSiteRef().getIdentifier().trim();
 
         if (studyIdentifier == null && siteIdentifier == null) {
             throw new OpenClinicaSystemException("studySubjectEndpoint.provide_valid_study_site", "Provide a valid study/site.");
@@ -272,7 +313,7 @@ public class StudySubjectEndpoint {
      * @return SubjectTransferBean
      * @throws ParseException
      */
-    private SubjectTransferBean unMarshallToSubjectTransfer(Element subjectElement) throws ParseException {
+    private SubjectTransferBean unMarshallToSubjectTransfer(Element subjectElement) throws ParseException, Exception {
 
         Element studySubjectIdElement = DomUtils.getChildElementByTagName(subjectElement, "label");
         Element secondaryIdElement = DomUtils.getChildElementByTagName(subjectElement, "secondaryLabel");
@@ -287,15 +328,15 @@ public class StudySubjectEndpoint {
         Element site = DomUtils.getChildElementByTagName(study, "siteRef");
         Element siteIdentifierElement = site == null ? null : DomUtils.getChildElementByTagName(site, "identifier");
 
-        String personIdValue = personIdElement == null ? null : DomUtils.getTextValue(personIdElement);
-        String studySubjectIdValue = DomUtils.getTextValue(studySubjectIdElement);
-        String genderValue = genderElement == null ? null : DomUtils.getTextValue(genderElement);
-        String secondaryIdValue = secondaryIdElement == null ? null : DomUtils.getTextValue(secondaryIdElement);
-        String enrollmentDateValue = DomUtils.getTextValue(enrollmentDateElement);
-        String dateOfBirthValue = dateOfBirthElement == null ? null : DomUtils.getTextValue(dateOfBirthElement);
-        String yearOfBirthValue = yearOfBirthElement == null ? null : DomUtils.getTextValue(yearOfBirthElement);
-        String studyIdentifier = studyIdentifierElement == null ? null : DomUtils.getTextValue(studyIdentifierElement);
-        String siteIdentifier = siteIdentifierElement == null ? null : DomUtils.getTextValue(siteIdentifierElement);
+        String personIdValue = personIdElement == null ? "" : DomUtils.getTextValue(personIdElement).trim();
+        String studySubjectIdValue = DomUtils.getTextValue(studySubjectIdElement).trim();
+        String genderValue = genderElement == null ? null : DomUtils.getTextValue(genderElement).trim();
+        String secondaryIdValue = secondaryIdElement == null ? null : DomUtils.getTextValue(secondaryIdElement).trim();
+        String enrollmentDateValue = DomUtils.getTextValue(enrollmentDateElement).trim();
+        String dateOfBirthValue = dateOfBirthElement == null ? null : DomUtils.getTextValue(dateOfBirthElement).trim();
+        String yearOfBirthValue = yearOfBirthElement == null ? null : DomUtils.getTextValue(yearOfBirthElement).trim();
+        String studyIdentifier = studyIdentifierElement == null ? null : DomUtils.getTextValue(studyIdentifierElement).trim();
+        String siteIdentifier = siteIdentifierElement == null ? null : DomUtils.getTextValue(siteIdentifierElement).trim();
 
         SubjectTransferBean subjectTransferBean = new SubjectTransferBean();
 
@@ -303,7 +344,7 @@ public class StudySubjectEndpoint {
         subjectTransferBean.setSiteIdentifier(siteIdentifier);
         subjectTransferBean.setPersonId(personIdValue);
         subjectTransferBean.setStudySubjectId(studySubjectIdValue);
-        if (genderValue == null) {
+        if (genderValue == null || genderValue.length()<1) {
             // Do nothing
         } else {
             subjectTransferBean.setGender(genderValue.toCharArray()[0]);
@@ -319,22 +360,48 @@ public class StudySubjectEndpoint {
     }
 
     /**
+     * Process createStudySubject request by creating SubjectStudyDefinitionBean from received payload.
+     * 
+     * @param subjectElement
+     * @return SubjectTransferBean
+     * @throws ParseException
+     */
+    private SubjectStudyDefinitionBean unMarshallToSubjectStudy(Element subjectStudyElement) throws ParseException {
+
+        Element studySubjectIdElement = DomUtils.getChildElementByTagName(subjectStudyElement, "label");
+        Element study = DomUtils.getChildElementByTagName(subjectStudyElement, "studyRef");
+        Element studyIdentifierElement = DomUtils.getChildElementByTagName(study, "identifier");
+        Element site = DomUtils.getChildElementByTagName(study, "siteRef");
+        Element siteIdentifierElement = site == null ? null : DomUtils.getChildElementByTagName(site, "identifier");
+
+        String studySubjectIdValue = DomUtils.getTextValue(studySubjectIdElement).trim();
+        String studyIdentifier = studyIdentifierElement == null ? null : DomUtils.getTextValue(studyIdentifierElement).trim();
+        String siteIdentifier = siteIdentifierElement == null ? null : DomUtils.getTextValue(siteIdentifierElement).trim();
+
+        SubjectStudyDefinitionBean subjectTransferBean = new SubjectStudyDefinitionBean(
+        		studyIdentifier,  siteIdentifier, 
+        		getUserAccount(),  studySubjectIdValue);
+
+  
+        return subjectTransferBean;
+    }
+    /**
      * Create the Subject object if it is not already in the system.
      * 
      * @param subjectTransferBean
      * @return String
      */
     private String create(SubjectTransferBean subjectTransferBean) {
-        boolean isSubjectInMain = doesSubjectExist(subjectTransferBean);
+        //boolean isSubjectInMain = doesSubjectExist(subjectTransferBean);
 
-        if (isSubjectInMain) {
-            // TODO : either return something or throw exception or don't do anything
-            logger.debug("SubjectInMain");
-            throw new OpenClinicaSystemException("Duplicate label");
-        } else {
+//        if (isSubjectInMain) {
+//            // TODO : either return something or throw exception or don't do anything
+//            logger.debug("SubjectInMain");
+//            throw new OpenClinicaSystemException("Duplicate label");
+//        } else {
             logger.debug("creating subject transfer");
             return createSubject(subjectTransferBean);
-        }
+        //}
     }
 
     /**
@@ -355,7 +422,7 @@ public class StudySubjectEndpoint {
         subject.setUniqueIdentifier(subjectTransfer.getPersonId());
         subject.setLabel(subjectTransfer.getStudySubjectId());
         subject.setDateOfBirth(subjectTransfer.getDateOfBirth());
-        System.out.println("testing new code here...");
+      //  System.out.println("testing new code here...");
         // below added tbh 04/2011
         if (subject.getDateOfBirth() != null) {
         	subject.setDobCollected(true);
@@ -383,7 +450,15 @@ public class StudySubjectEndpoint {
      * @throws Exception
      * @see #createStudySubject
      */
-    private Element mapConfirmation(String confirmation, String studySubjectLabel, Errors errors) throws Exception {
+    
+    private Element mapConfirmation(String confirmation, String studySubjectLabel, Errors errors) throws Exception  	{
+    	return  mapConfirmation( confirmation,  studySubjectLabel,  errors, "label", null) ;    	}
+    
+    private Element mapConfirmation(String confirmation, String studySubjectLabel, Errors errors, String label) throws Exception  	{
+    	return  mapConfirmation( confirmation,  studySubjectLabel,  errors, label, null) ;    
+    }
+
+    private Element mapConfirmation(String confirmation, String studySubjectLabel, Errors errors, String label,  List<String> error_messages) throws Exception {
         DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
         Document document = docBuilder.newDocument();
@@ -391,20 +466,35 @@ public class StudySubjectEndpoint {
         Element responseElement = document.createElementNS(NAMESPACE_URI_V1, "createResponse");
         Element resultElement = document.createElementNS(NAMESPACE_URI_V1, "result");
         resultElement.setTextContent(confirmation);
-        Element labelElement = document.createElementNS(NAMESPACE_URI_V1, "label");
-        labelElement.setTextContent(studySubjectLabel);
         responseElement.appendChild(resultElement);
-        responseElement.appendChild(labelElement);
-
-        for (ObjectError error : errors.getAllErrors()) {
-            Element errorElement = document.createElementNS(NAMESPACE_URI_V1, "error");
-            String theMessage = messages.getMessage(error.getCode(), error.getArguments(), locale);
-            errorElement.setTextContent(theMessage);
-            responseElement.appendChild(errorElement);
+        
+        if ( studySubjectLabel != null){
+	        Element labelElement = document.createElementNS(NAMESPACE_URI_V1, label);
+	        labelElement.setTextContent(studySubjectLabel);
+	        responseElement.appendChild(labelElement);
         }
+        if ( errors != null){
+	        for (ObjectError error : errors.getAllErrors()) {
+	            Element errorElement = document.createElementNS(NAMESPACE_URI_V1, "error");
+	            String theMessage = messages.getMessage(error.getCode(), error.getArguments(), locale);
+	            errorElement.setTextContent(theMessage);
+	            responseElement.appendChild(errorElement);
+	        }
+        }
+        if ( error_messages != null && error_messages.size()>0){
+	    	StringBuilder output_msg = new StringBuilder();
+	        for (String mes : error_messages){
+	        	output_msg.append(mes);
+	        }
+	    	Element msgElement = document.createElementNS(NAMESPACE_URI_V1, "error");
+	        msgElement.setTextContent(output_msg.toString());
+	        responseElement.appendChild(msgElement);
+    	}
         return responseElement;
 
     }
+    
+    
 
     /**
      * Helper method that translates a date object to an XMLGregorianCalendar which is the data type used in jaxb generated classes.
@@ -446,9 +536,16 @@ public class StudySubjectEndpoint {
      * @return Date
      * @throws ParseException
      */
-    private Date getDate(String dateAsString) throws ParseException {
+    private Date getDate(String dateAsString) throws ParseException, Exception {
         SimpleDateFormat sdf = new SimpleDateFormat(getDateFormat());
-        return sdf.parse(dateAsString);
+        sdf.setLenient(false);
+        Date dd = sdf.parse(dateAsString);
+        Calendar c = Calendar.getInstance();
+        c.setTime(dd);
+        if (c.get(Calendar.YEAR) < 1900 || c.get(Calendar.YEAR) > 9999) {
+        	throw new Exception("Unparsable date: "+dateAsString);
+        }
+        return dd;
     }
 
     /**
