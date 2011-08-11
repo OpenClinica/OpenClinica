@@ -136,7 +136,7 @@ public class SubjectTransferValidator implements Validator {
         subjectTransferBean.setStudy(study);
         if (subjectTransferBean.getSiteIdentifier() != null) {
         	site = helper.verifySite(getStudyDAO(), subjectTransferBean.getStudyOid(), 
-        			subjectTransferBean.getSiteIdentifier(), null, e);
+        			subjectTransferBean.getSiteIdentifier(), included_status, e);
             if (site == null) { return;	        }
             site_id = site.getId();
             subjectTransferBean.setStudy(site);
