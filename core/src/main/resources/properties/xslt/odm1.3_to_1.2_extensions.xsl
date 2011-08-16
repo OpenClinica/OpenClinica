@@ -63,4 +63,13 @@
 	 </xsl:element>
 </xsl:template>
 
+<!-- template for changing the datatype to 'partialDate' to 'text' as ODM 1.2 did not support data type 'partialDate' -->
+<xsl:template match="@DataType[parent::*:ItemDef and .='partialDate']" priority="13">
+	<xsl:attribute name="DataType">
+		<xsl:value-of select="'text'"></xsl:value-of>
+	</xsl:attribute>
+</xsl:template>
+	
+<!-- template to remove Description element from StudyEventDef, FormDef, ItemGroupDef and ItemDef as it was not supported by ODM 1.2-->
+<xsl:template match="//olddef:Description[parent::olddef:StudyEventDef or parent::olddef:FormDef or parent::olddef:ItemGroupDef or parent::olddef:ItemDef]" priority="14"/>	
 </xsl:stylesheet>
