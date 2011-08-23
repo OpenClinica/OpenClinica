@@ -76,16 +76,10 @@ IS
   rr urowid;
 BEGIN
   ret_count := 0;
-  SELECT MAX(cnt)
-  INTO max_overall
-  FROM
-    (SELECT COUNT(item_id) AS cnt
-    FROM item_data
-    WHERE ordinal           = 1
-    HAVING COUNT(item_id)   > 1
-    AND COUNT(event_crf_id) > 1
-    );
-    DBMS_OUTPUT.ENABLE(1000000);
+  select max(cnt) into max_overall from (select count(*) as cnt from item_data where ordinal = 1 group by item_id, event_crf_id, ordinal); 
+  
+  DBMS_OUTPUT.ENABLE(1000000);
+  dbms_output.put_line('found max overall: ' || max_overall);
   -- usually, the above will be 2.  however, it may be higher
   FOR i IN 2..max_overall
   LOOP
@@ -95,7 +89,7 @@ BEGIN
       FETCH item_data_record_max INTO max_item_data_id;
       FETCH item_data_record_min INTO min_item_data_id;
       EXIT
-    WHEN item_data_record_max%notfound OR item_data_record_max%notfound IS NULL;
+      WHEN item_data_record_max%notfound OR item_data_record_max%notfound IS NULL;
       SELECT id.value
       INTO min_item_value
       FROM item_data id
@@ -145,10 +139,24 @@ BEGIN
         (SELECT event_crf_id FROM item_data WHERE item_data_id = max_item_data_id
         );
       dbms_output.put_line('looking at records for SSID '|| event_ssid || ' CRF '|| crf_name ||' Version '|| crf_version_name ||' Study Event ' || sed_name);
-      --dbms_output.put_line('comparing item_data_id '|| min_item_data_id ||' with a value of '|| min_item_value ||' and item_data_id '|| max_item_data_id ||' with a value of ' || max_item_value);
+      dbms_output.put_line('comparing item_data_id '|| min_item_data_id ||' with a value of '|| min_item_value ||' and item_data_id '|| max_item_data_id ||' with a value of ' || max_item_value);
       -- end of extra here, continue with logic of removals
       -- if our values are identical, we can remove the initial row created and move DNs over to the most recent row.
-      IF (min_item_value     = max_item_value) or (min_item_value is null and max_item_value is null) THEN
+      -- but first, we need to check the null values here, becuase the following = and <> statements don't apply to nulls
+      if min_item_value is null then
+        ret_count          := ret_count + DELTE(min_item_data_id, max_item_data_id);
+        dbms_output.put_line('removing null value created: ' || min_item_data_id);
+        DELETE FROM item_data WHERE item_data_id = min_item_data_id AND ordinal = 1 returning rowid into rr;
+        dbms_output.put_line('deleted '|| min_item_data_id || ' rowid ' || rr);
+      end if;
+      if max_item_value is null then
+        ret_count          := ret_count + DELTE(max_item_data_id, min_item_data_id);
+        dbms_output.put_line('removing null value created: ' || max_item_data_id);
+        DELETE FROM item_data WHERE item_data_id = max_item_data_id AND ordinal = 1 returning rowid into rr;
+        dbms_output.put_line('deleted '|| max_item_data_id || ' rowid ' || rr);
+      end if;
+      IF (min_item_value     = max_item_value) 
+      THEN
         ret_count          := ret_count + DELTE(min_item_data_id, max_item_data_id);
         DELETE FROM item_data WHERE item_data_id = min_item_data_id AND ordinal = 1 returning rowid into rr;
         dbms_output.put_line('deleted '|| min_item_data_id || ' rowid ' || rr);
@@ -198,29 +206,34 @@ BEGIN
         END IF;
         -- the main logic; determine which one wins it
         IF min_last_touched > max_last_touched THEN
+          
           --raise notice 'reviewed TIMESTAMPS: min % VS max %', min_item_timestamp, max_item_timestamp;
           ret_count           := ret_count + DELTE(min_item_data_id, max_item_data_id);
           DELETE FROM item_data WHERE item_data_id = min_item_data_id AND ordinal = 1 returning rowid into rr;
           dbms_output.put_line('deleted '|| min_item_data_id || ' rowid ' || rr);
         elsif max_last_touched > min_last_touched THEN
+          
           --raise notice 'reviewed TIMESTAMPS: max % VS  min %', max_item_timestamp, min_item_timestamp;
           ret_count := ret_count + DELTE(max_item_data_id, min_item_data_id);
           DELETE FROM item_data WHERE item_data_id = max_item_data_id AND ordinal = 1 returning rowid into rr;
           dbms_output.put_line('deleted '|| max_item_data_id || ' rowid ' || rr);
           -- final rows that dont make the cut - compare on PK
         ELSE
+          -- line put in to see if we get this far
+          -- ret_count := ret_count + 10;
           -- here we look at blanks vs nonblanks, and then finally, make a decision based on PK
-          IF min_item_value = '' AND max_item_value <> '' THEN
+          IF min_item_value = '' AND max_item_value <> '' --OR (min_item_value is null AND max_item_value is not null) 
+          THEN
             ret_count      := ret_count + DELTE(min_item_data_id, max_item_data_id);
             DELETE FROM item_data WHERE item_data_id = min_item_data_id AND ordinal = 1 returning rowid into rr;
             dbms_output.put_line('deleted '|| min_item_data_id || ' rowid ' || rr);
-            --raise notice 'removed on Blank Value %', item_data_record.min_item_data_id;
-          elsif max_item_value = '' AND min_item_value <> '' THEN
+          
+          elsif max_item_value = '' AND min_item_value <> '' -- OR (max_item_value is null AND min_item_value is not null) 
+          THEN
             ret_count         := ret_count + DELTE(max_item_data_id, min_item_data_id);
             DELETE FROM item_data WHERE item_data_id = max_item_data_id AND ordinal = 1 returning rowid into rr;
             dbms_output.put_line('deleted '|| max_item_data_id || ' rowid ' || rr);
-            
-            --raise notice 'removed on Blank Value %', item_data_record.max_item_data_id;
+          
           ELSE
             -- both items are nonblank
             ret_count := ret_count + DELTE(max_item_data_id, min_item_data_id);
@@ -228,9 +241,10 @@ BEGIN
             dbms_output.put_line('deleted '|| max_item_data_id || ' rowid ' || rr);
             --raise notice 'removed on PK %', item_data_record.max_item_data_id;
           END IF;
-        END IF;
-        
+        END IF;    
       END IF;
+	  --ret_count := ret_count + 1;
+    
     END LOOP;
     CLOSE item_data_record_max;
     CLOSE item_data_record_min;

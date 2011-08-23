@@ -46,16 +46,10 @@ IS
   min_item_data_id    INTEGER;
 BEGIN
   ret_count := 0;
-  SELECT MAX(cnt)
-  INTO max_overall
-  FROM
-    (SELECT COUNT(item_id) AS cnt
-    FROM item_data
-    WHERE ordinal           = 1
-    HAVING COUNT(item_id)   > 1
-    AND COUNT(event_crf_id) > 1
-    );
+  select max(cnt) into max_overall from (select count(*) as cnt from item_data where ordinal = 1 group by item_id, event_crf_id, ordinal); 
   -- usually, the above will be 2.  however, it may be higher
+  dbms_output.put_line('found max overall: ' || max_overall);
+  DBMS_OUTPUT.ENABLE(1000000);
   FOR i IN 2..max_overall
   LOOP
     OPEN item_data_record_max;
@@ -65,7 +59,7 @@ BEGIN
       FETCH item_data_record_min INTO min_item_data_id;
       EXIT
     WHEN item_data_record_max%notfound OR item_data_record_max%notfound IS NULL;
-      SELECT id.value
+    SELECT id.value
       INTO min_item_value
       FROM item_data id
       WHERE id.item_data_id = min_item_data_id;
@@ -117,9 +111,15 @@ BEGIN
       dbms_output.put_line('comparing item_data_id '|| min_item_data_id ||' with a value of '|| min_item_value ||' and item_data_id '|| max_item_data_id ||' with a value of ' || max_item_value);
       -- end of extra here, continue with logic of removals
       -- if our values are identical, we can remove the initial row created and move DNs over to the most recent row.
+      if min_item_value is null then
+        dbms_output.put_line('removing null value created: ' || min_item_data_id);
+      end if;
+      if max_item_value is null then
+        dbms_output.put_line('removing null value created: ' || max_item_data_id);
+      end if;
       IF min_item_value     = max_item_value THEN
         --ret_count          := ret_count + DELTE(min_item_data_id, max_item_data_id);
-		dbms_output.put_line('removing initial row created: ' || min_item_data_id);
+        dbms_output.put_line('removing initial row created: ' || min_item_data_id);
       elsif min_item_value <> max_item_value THEN
         SELECT id.date_updated
         INTO min_item_date_updated
@@ -177,16 +177,21 @@ BEGIN
           IF min_item_value = '' AND max_item_value <> '' THEN
             --ret_count      := ret_count + DELTE(min_item_data_id, max_item_data_id);
             dbms_output.put_line('removed on Blank Value ' || min_item_data_id);
+          
           elsif max_item_value = '' AND min_item_value <> '' THEN
             --ret_count         := ret_count + DELTE(max_item_data_id, min_item_data_id);
             dbms_output.put_line('removed on Blank Value ' || max_item_data_id);
-          ELSE
+          
+          elsif min_item_value <> '' and max_item_value <> '' then
             -- both items are nonblank
             --ret_count := ret_count + DELTE(max_item_data_id, min_item_data_id);
             dbms_output.put_line('removed on PK ' || max_item_data_id);
           END IF;
         END IF;
       END IF;
+      -- end of extra here, continue with logic of removals
+      -- if our values are identical, we can remove the initial row created and move DNs over to the most recent row.
+      ret_count := ret_count + 1;
     END LOOP;
     CLOSE item_data_record_max;
     CLOSE item_data_record_min;
@@ -196,4 +201,6 @@ BEGIN
   RETURN ret_count;
 END test_item_data;
 /
+set serveroutput on;
 SELECT test_item_data() FROM dual;
+commit;
