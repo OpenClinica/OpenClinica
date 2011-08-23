@@ -24,7 +24,8 @@
     <element name="getMetadataRequest">
         <complexType>
             <sequence>
-                <element name="studyMetadata" type="beans:studyMetadataType"/>
+               <!--   <element name="studyMetadata" type="beans:studyMetadataType"/> -->
+                <element name="studyMetadata" type="beans:siteRefType"/>
             </sequence>
         </complexType>
     </element>

@@ -5,9 +5,11 @@ import org.akaza.openclinica.bean.extract.odm.MetaDataReportBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.odmbeans.ODMBean;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
 import org.akaza.openclinica.logic.odmExport.MetadataUnit;
 import org.akaza.openclinica.ws.bean.BaseStudyDefinitionBean;
 import org.akaza.openclinica.ws.validator.StudyMetadataRequestValidator;
@@ -92,6 +94,18 @@ public class StudyEndpoint {
         resultElement.setTextContent(confirmation);
         responseElement.appendChild(resultElement);
         MetadataUnit mdc = new MetadataUnit(dataSource, study, 0);
+        MetaDataCollector.setTextLength(200);//transfer from web , should be stored in db somewhere
+        
+        ODMBean odmb = mdc.getOdmBean();
+        odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC2-0.xsd");
+        ArrayList<String> xmlnsList = new ArrayList<String>();
+        xmlnsList.add("xmlns=\"http://www.cdisc.org/ns/odm/v1.3\"");
+        xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/odm_ext_v130/v3.1\"");
+        xmlnsList.add("xmlns:OpenClinicaRules=\"http://www.openclinica.org/ns/rules/v3.1\"");
+        odmb.setXmlnsList(xmlnsList);
+        odmb.setODMVersion("oc1.3");
+        mdc.setOdmBean(odmb);
+    
         //htaycher : catch null pointer exception and proceed
         try{
         mdc.collectOdmStudy();
@@ -99,7 +113,10 @@ public class StudyEndpoint {
         	System.out.print("Exception calling mdc.collectOdmStudy()"+ e.getMessage());
         }
         MetaDataReportBean meta = new MetaDataReportBean(mdc.getOdmStudy());
+        meta.setODMVersion("oc1.3");
         meta.addNodeStudy(Boolean.FALSE);
+        
+        
         Element odmElement = document.createElementNS(NAMESPACE_URI_V1, "odm");
         odmElement.setTextContent(meta.getXmlOutput().toString());
         responseElement.appendChild(odmElement);
@@ -131,20 +148,9 @@ public class StudyEndpoint {
     //private StudyMetadataRequestBean unMarshallRequest(Element studyEventDefinitionListAll) {
     	private BaseStudyDefinitionBean unMarshallRequest(Element studyEventDefinitionListAll) {
 
-        Element studyRefElement = DomUtils.getChildElementByTagName(studyEventDefinitionListAll, "studyRef");
-        Element studyIdentifierElement = DomUtils.getChildElementByTagName(studyRefElement, "identifier");
-        //htaycher metaData coming on study level only
-       // Element siteRef = DomUtils.getChildElementByTagName(studyRefElement, "siteRef");
-       // Element siteIdentifierElement = siteRef == null ? null : DomUtils.getChildElementByTagName(siteRef, "identifier");
-
+        Element studyIdentifierElement = DomUtils.getChildElementByTagName(studyEventDefinitionListAll, "identifier");
         String studyIdentifier = studyIdentifierElement == null ? null : DomUtils.getTextValue(studyIdentifierElement).trim();   
-      //  String siteIdentifier = siteIdentifierElement == null ? null : DomUtils.getTextValue(siteIdentifierElement);
-
-       // StudyMetadataRequestBean studyMetadataRequest = new StudyMetadataRequestBean(studyIdentifier, siteIdentifier, getUserAccount());
-       //htaycher: depricated StudyMetadataRequestBean studyMetadataRequest = new StudyMetadataRequestBean(studyIdentifier,  getUserAccount());
-        
         BaseStudyDefinitionBean studyMetadataRequest = new BaseStudyDefinitionBean(studyIdentifier,  getUserAccount());
-        
         return studyMetadataRequest;
 
     }
