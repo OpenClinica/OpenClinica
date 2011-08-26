@@ -12,6 +12,7 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
@@ -233,6 +234,7 @@ public class StudySubjectEndpoint {
             subjectType.setDateOfBirth(getXMLGregorianCalendarDate(subjectBean.getDateOfBirth()));
             studySubjectType.setSubject(subjectType);
             // studySubjectType.setStudyRef(studyRef);
+            logger.debug(studySubjectBean.getLabel());
             studySubjectType.setEvents(getEvents(studySubjectBean));
             studySubjectsType.getStudySubject().add(studySubjectType);
 
@@ -252,13 +254,25 @@ public class StudySubjectEndpoint {
         StudyEventDefinitionDAO studyEventDefinitionDao = new StudyEventDefinitionDAO(dataSource);
         EventsType eventsType = new EventsType();
         List<StudyEventBean> events = eventDao.findAllByStudySubject(studySubject);
+        StudyEventDefinitionBean eb=null;
         for (StudyEventBean studyEventBean : events) {
-            EventType eventType = new EventType();
-            eventType.setEventDefinitionOID(studyEventDefinitionDao.findByEventDefinitionCRFId(studyEventBean.getStudyEventDefinitionId()).getOid());
+        	 StudyEventDefinitionBean sed = (StudyEventDefinitionBean) studyEventDefinitionDao.findByPK(studyEventBean.getStudyEventDefinitionId());
+        	 studyEventBean.setStudyEventDefinition(sed);
+            
+             EventType eventType = new EventType();
+            eventType.setEventDefinitionOID(studyEventBean.getStudyEventDefinition().getOid());
             eventType.setLocation(studyEventBean.getLocation());
             eventType.setStartDate(getXMLGregorianCalendarDate(studyEventBean.getDateStarted()));
             eventType.setStartTime(getXMLGregorianCalendarTime(studyEventBean.getDateStarted()));
+            if ( studyEventBean.getDateEnded() != null){
+	            eventType.setEndDate(getXMLGregorianCalendarDate(studyEventBean.getDateEnded()));
+	            eventType.setEndTime(getXMLGregorianCalendarTime(studyEventBean.getDateEnded()));
+            }
+            
+            
             eventsType.getEvent().add(eventType);
+            logger.debug(eventType.getEventDefinitionOID()+" "+eventType.getStartDate());
+            
         }
         return eventsType;
     }
@@ -520,7 +534,7 @@ public class StudySubjectEndpoint {
      * @throws Exception
      */
     private XMLGregorianCalendar getXMLGregorianCalendarTime(Date date) throws Exception {
-        GregorianCalendar gc = new GregorianCalendar();
+        GregorianCalendar gc = new GregorianCalendar(locale);
         gc.setTime(date);
         DatatypeFactory df = DatatypeFactory.newInstance();
         XMLGregorianCalendar gcTime =
