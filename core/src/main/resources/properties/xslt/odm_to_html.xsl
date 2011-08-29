@@ -1886,6 +1886,11 @@
 													<xsl:value-of select="$itemData/@Value"/>
 												</td>
 											</xsl:when>
+											<xsl:when test="$itemData/@OpenClinica:ReasonForNull">
+												<td class="table_cell">
+													<xsl:value-of select="$itemData/@OpenClinica:ReasonForNull"/>
+												</td>
+											</xsl:when>
 											<xsl:otherwise>
 												<td class="table_cell">
 													<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
@@ -1903,6 +1908,11 @@
 											<xsl:when test="$itemData/@Value">
 												<td class="table_cell">
 													<xsl:value-of select="$itemData/@Value"/>
+												</td>
+											</xsl:when>
+											<xsl:when test="$itemData/@OpenClinica:ReasonForNull">
+												<td class="table_cell">
+													<xsl:value-of select="$itemData/@OpenClinica:ReasonForNull"/>
 												</td>
 											</xsl:when>
 											<xsl:otherwise>
@@ -1926,6 +1936,11 @@
 													<xsl:value-of select="$itemData/@Value"/>
 												</td>
 											</xsl:when>
+											<xsl:when test="$itemData/@OpenClinica:ReasonForNull">
+												<td class="table_cell">
+													<xsl:value-of select="$itemData/@OpenClinica:ReasonForNull"/>
+												</td>
+											</xsl:when>
 											<xsl:otherwise>
 												<td class="table_cell">
 													<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
@@ -1943,6 +1958,11 @@
 											<xsl:when test="$itemData/@Value">
 												<td class="table_cell">
 													<xsl:value-of select="$itemData/@Value"/>
+												</td>
+											</xsl:when>
+											<xsl:when test="$itemData/@OpenClinica:ReasonForNull">
+												<td class="table_cell">
+													<xsl:value-of select="$itemData/@OpenClinica:ReasonForNull"/>
 												</td>
 											</xsl:when>
 											<xsl:otherwise>
@@ -2488,7 +2508,6 @@
 		<xsl:variable name="ageExist" select="count($allStudyEventDataElements[@OpenClinica:SubjectAgeAtEvent]) &gt; 0"/>-->
 		
 		
-		
 		<xsl:variable name="eventPosition">
 			<xsl:copy-of select="position()"/>
 		</xsl:variable>
@@ -2523,13 +2542,13 @@
 	</xsl:template>
 	<xsl:template name="createColForRepeatingEvent" match="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:StudyEventDef" mode="createColForRepeatingEvent">
 		<xsl:param name="eventOID"/>
-		<xsl:param name="eventPosition"/>
+		<xsl:param name="eventPosition"/> 
 		<!--<xsl:param name="eventLocationExist"/>
 		<xsl:param name="eventStartDateExist"/>
 		<xsl:param name="eventStatusExist"/>
 		<xsl:param name="eventEndDateExist"/>
 		<xsl:param name="ageExist"/>-->		
-		<xsl:param name="eventRepeatCnt"/>
+		<xsl:param name="eventRepeatCnt"/><!--createColForRepeatingEvent, eventOID<xsl:value-of select="$eventOID"/>-->
 			<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @StudyEventRepeatKey = $eventRepeatCnt and @OpenClinica:StudyEventLocation]) &gt; 0">
 				<!--<xsl:if test="$eventLocationExist">-->
 					<td class="table_header_row">
@@ -2541,7 +2560,7 @@
 					</td>
 				<!--</xsl:if>-->
 			</xsl:if>
-			<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @StudyEventRepeatKey = $eventRepeatCnt and @OpenClinica:StartDate]) &gt; 0">
+			<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @StudyEventRepeatKey = $eventRepeatCnt and @OpenClinica:StartDate]) &gt; 0"><!--col for event startdate-->
 			<!--<xsl:if test="$eventStartDateExist">-->
 				<td class="table_header_row">
 					<xsl:text>StartDate_</xsl:text>
@@ -2601,6 +2620,7 @@
 	<xsl:template mode="createColForNonRepeatingEvent" match="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:StudyEventDef">
 		<xsl:param name="eventPosition"/>
 		<xsl:param name="eventOID"/>
+		
 		<!--<xsl:param name="eventLocationExist"/>
 		<xsl:param name="eventStartDateExist"/>
 		<xsl:param name="eventStatusExist"/>
