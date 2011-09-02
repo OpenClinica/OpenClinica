@@ -13,6 +13,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.DisplayItemWithGroupBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
@@ -558,7 +559,7 @@ public class RuleSetService implements RuleSetServiceInterface {
         return validRuleSets;
     }
 
-    public List<RuleSetBean> filterRuleSetsByHiddenItems(List<RuleSetBean> ruleSets, EventCRFBean eventCrf, CRFVersionBean crfVersion) {
+    public List<RuleSetBean> filterRuleSetsByHiddenItems(List<RuleSetBean> ruleSets, EventCRFBean eventCrf, CRFVersionBean crfVersion,List<ItemBean> itemBeansWithSCDShown) {
         ArrayList<RuleSetBean> shownRuleSets = new ArrayList<RuleSetBean>();
         for (RuleSetBean ruleSetBean : ruleSets) {
             logMe("Entering the filterRuleSetsBy HiddenItems? Thread::"+Thread.currentThread()+"eventCrf?"+eventCrf+"crfVersion??"+crfVersion+"ruleSets?"+ruleSets);
@@ -566,8 +567,9 @@ public class RuleSetService implements RuleSetServiceInterface {
             ItemFormMetadataBean metadataBean = this.getItemFormMetadataDao().findByItemIdAndCRFVersionId(target.getId(), crfVersion.getId());
             ItemDataBean itemData = this.getItemDataDao().findByItemIdAndEventCRFId(target.getId(), eventCrf.getId());
             DynamicsItemFormMetadataBean dynamicsBean = this.getDynamicsItemFormMetadataDao().findByMetadataBean(metadataBean, eventCrf, itemData);
+            if(itemBeansWithSCDShown==null)itemBeansWithSCDShown= new ArrayList<ItemBean>();
             if (dynamicsBean == null) {
-                if (metadataBean.isShowItem()) {
+                if (metadataBean.isShowItem()|| itemBeansWithSCDShown.contains(target)) {
                     logger.debug("just added rule set bean");
                     shownRuleSets.add(ruleSetBean);
                 }

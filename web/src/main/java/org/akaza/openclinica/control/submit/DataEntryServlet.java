@@ -519,8 +519,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
         }
         logMe("Entering ruleSets::: CreateAndInitializeRuleSet:::"+Thread.currentThread());
         logMe("Entering ruleSets::: CreateAndInitializeRuleSet:::"+Thread.currentThread()+"currentStudy?"+currentStudy+"studyEventDefinition"+studyEventDefinition+"crfVersionBean"+crfVersionBean+"studyEventBean"+studyEventBean+"ecb"+ecb);
-        List<RuleSetBean> ruleSets = createAndInitializeRuleSet(currentStudy, studyEventDefinition, crfVersionBean, studyEventBean, ecb, true, request, response);
-        boolean shouldRunRules = getRuleSetService(request).shouldRunRulesForRuleSets(ruleSets, phase2);
+      //  List<RuleSetBean> ruleSets = createAndInitializeRuleSet(currentStudy, studyEventDefinition, crfVersionBean, studyEventBean, ecb, true, request, response);
+       // boolean shouldRunRules = getRuleSetService(request).shouldRunRulesForRuleSets(ruleSets, phase2);
         logMe("Entering getDisplayBean:::::Thread::::"+Thread.currentThread());
         DisplaySectionBean section = getDisplayBean(hasGroup, false, request, isSubmitted);
         //hasSCDItem has been initiallized in getDisplayBean() which is online above
@@ -803,9 +803,11 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 }
             }
             logMe("Loop ended  "+System.currentTimeMillis());
-          
+          //JN: This is the list that contains all the scd-shown items.
+            List<ItemBean> itemBeansWithSCDShown = new ArrayList<ItemBean>();
             if(validate && section.getSection().hasSCDItem()) {
                 logMe(" Validate and Loop  "+System.currentTimeMillis());
+                
                 for (int i = 0; i < allItems.size(); ++i) {
                     DisplayItemBean dib = allItems.get(i).getSingleItem();
                     ItemFormMetadataBean ifmb = dib.getMetadata();
@@ -818,6 +820,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
                             //for scd item
                             //a control item is always before its scd item
                             dib.setIsSCDtoBeShown(section.getShowSCDItemIds().contains(dib.getMetadata().getItemId()));
+                            if(dib.getIsSCDtoBeShown())
+                                itemBeansWithSCDShown.add(dib.getItem());
+
                             validateSCDItemBean(v, dib);
                         }  
                         ArrayList<DisplayItemBean> children = dib.getChildren();
@@ -831,6 +836,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                 //for scd item
                                 //a control item is always before its scd item
                                 child.setIsSCDtoBeShown(section.getShowSCDItemIds().contains(child.getMetadata().getItemId()));
+                                if(child.getIsSCDtoBeShown())
+                                    itemBeansWithSCDShown.add(dib.getItem());
                                 validateSCDItemBean(v, child);
                             }
                         }
@@ -839,7 +846,10 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 logMe(" Validate and Loop end  "+System.currentTimeMillis());
             }
             logMe(" Validate and Loop end  "+System.currentTimeMillis());
-           
+            //JN:calling again here, for the items with simple conditional display and rules.
+            List<RuleSetBean>  ruleSets = createAndInitializeRuleSet(currentStudy, studyEventDefinition, crfVersionBean, studyEventBean, ecb, true, request, response,  itemBeansWithSCDShown);
+            boolean shouldRunRules = getRuleSetService(request).shouldRunRulesForRuleSets(ruleSets, phase2);
+          
             // this.getItemMetadataService().resetItemCounter();
             HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid  = null;
             groupOrdinalPLusItemOid = runRules(allItems, ruleSets, true, shouldRunRules, MessageType.ERROR, phase2,ecb, request);
@@ -1637,11 +1647,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 logMe("DisplayItemWithGroupBean dryrun  start"+System.currentTimeMillis());
                 HashMap<String, ArrayList<String>> rulesPostDryRun = runRules(allItems, ruleSets, false, shouldRunRules, MessageType.WARNING, phase2,ecb, request);
                 
-                //JN: After Running rules second time, release the lock
-             //   getUnavailableCRFList().remove(ecb.getId());
-                
-                
-                //System.out.println("found rules post dry run: " + rulesPostDryRun.toString());
+               
                 HashMap<String, ArrayList<String>> errorsPostDryRun = new HashMap<String, ArrayList<String>>();
                 // additional step needed, run rules and see if any items are 'shown' AFTER saving data
                 logMe("DisplayItemWithGroupBean dryrun  end"+System.currentTimeMillis());
@@ -5178,12 +5184,25 @@ public abstract class DataEntryServlet extends CoreSecureController {
         return c;
     }
 
+    /**
+     * @deprecated Use {@link #createAndInitializeRuleSet(StudyBean,StudyEventDefinitionBean,CRFVersionBean,StudyEventBean,EventCRFBean,Boolean,HttpServletRequest,HttpServletResponse,List)} instead
+     */
     private List<RuleSetBean> createAndInitializeRuleSet(StudyBean currentStudy,
             StudyEventDefinitionBean studyEventDefinition,
             CRFVersionBean crfVersionBean,
             StudyEventBean studyEventBean,
             EventCRFBean eventCrfBean,
             Boolean shouldRunRules, HttpServletRequest request, HttpServletResponse response) {
+                return createAndInitializeRuleSet(currentStudy, studyEventDefinition, crfVersionBean, studyEventBean, eventCrfBean, shouldRunRules, request,
+                        response, null);
+            }
+
+    private List<RuleSetBean> createAndInitializeRuleSet(StudyBean currentStudy,
+            StudyEventDefinitionBean studyEventDefinition,
+            CRFVersionBean crfVersionBean,
+            StudyEventBean studyEventBean,
+            EventCRFBean eventCrfBean,
+            Boolean shouldRunRules, HttpServletRequest request, HttpServletResponse response, List<ItemBean> itemBeansWithSCDShown) {
         if (shouldRunRules) {
             logMe("Current Thread:::"+Thread.currentThread());
             List<RuleSetBean> ruleSets = getRuleSetService(request).getRuleSetsByCrfStudyAndStudyEventDefinition(currentStudy, studyEventDefinition, crfVersionBean);
@@ -5193,13 +5212,12 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 ruleSets = getRuleSetService(request).filterByStatusEqualsAvailable(ruleSets);
                 ruleSets = getRuleSetService(request).filterRuleSetsByStudyEventOrdinal(ruleSets, studyEventBean, crfVersionBean, studyEventDefinition);
                 // place next line here, tbh
-                ruleSets = getRuleSetService(request).filterRuleSetsByHiddenItems(ruleSets, eventCrfBean, crfVersionBean);
+                ruleSets = getRuleSetService(request).filterRuleSetsByHiddenItems(ruleSets, eventCrfBean, crfVersionBean,itemBeansWithSCDShown);
             }
             return ruleSets!=null&&ruleSets.size()>0?ruleSets:new ArrayList<RuleSetBean>();
         } else
             return new ArrayList<RuleSetBean>();
     }
-
     private HashMap<String, ArrayList<String>> runRules(List<DisplayItemWithGroupBean> allItems, List<RuleSetBean> ruleSets, Boolean dryRun,
             Boolean shouldRunRules, MessageType mt, Phase phase,EventCRFBean ecb, HttpServletRequest request) {
         UserAccountBean ub =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);      
