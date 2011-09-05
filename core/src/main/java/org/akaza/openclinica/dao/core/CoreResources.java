@@ -108,9 +108,11 @@ public class CoreResources implements ResourceLoaderAware {
             // @pgawade 18-April-2011 Fix for issue 8394
             copyODMMappingXMLtoResources(resourceLoader);
             extractProperties = findExtractProperties();
+            //JN: this is in for junits to run without extract props
+            copyImportRulesFiles();
             }
           
-            copyImportRulesFiles();
+           
             // tbh, following line to be removed
             // reportUrl();
 
