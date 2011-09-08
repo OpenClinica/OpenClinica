@@ -84,7 +84,7 @@
       </a>
    </c:when>
    <c:otherwise>
-    <a href="javascript:openDocWindow('help/2_5_viewEvents_Help.html')">
+    <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/view-events')">
     <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>">
     </a>
    </c:otherwise>
