@@ -5,9 +5,9 @@
     <groupId>org.akaza.openclinica</groupId>
     <artifactId>OpenClinica-Parent</artifactId>
     <packaging>pom</packaging>
-    <version>3.1.1</version>
+    <version>3.1.1-CCHMC</version>
     <name>OpenClinica</name>
-    <description>3.1.1</description>
+    <description>3.1.1-CCHMC</description>
     <repositories>
 		<repository>
 			<id>Rufus Repository</id>
