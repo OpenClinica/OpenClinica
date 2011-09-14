@@ -8,6 +8,7 @@
 package org.akaza.openclinica.dao.submit;
 
 import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.ResponseSetBean;
 import org.akaza.openclinica.dao.core.DAODigester;
@@ -29,6 +30,9 @@ import javax.sql.DataSource;
  * @author ssachs
  */
 public class ItemFormMetadataDAO extends EntityDAO {
+    
+    private static HashMap<Integer, ItemFormMetadataBean> formMetadataCache = 
+        new HashMap<Integer, ItemFormMetadataBean>();
 
     @Override
     protected void setDigesterName() {
@@ -39,14 +43,35 @@ public class ItemFormMetadataDAO extends EntityDAO {
         getCurrentPKName = "getCurrentPK";
         getNextPKName = "getNextPK";
     }
+    
+    private void resetCache() {
+        synchronized(formMetadataCache) {
+            // if (formMetadataCache == null) {
+                if (formMetadataCache.size() <= 0) {
+                    formMetadataCache = new HashMap<Integer, ItemFormMetadataBean>();
+                    try {
+                        Collection<ItemFormMetadataBean> mets = this.findAll();
+                        for (ItemFormMetadataBean metadata : mets) {
+                            Integer primaryKey = new Integer(metadata.getId());
+                            formMetadataCache.put(primaryKey, metadata);
+                        }
+                    } catch (OpenClinicaException oce) {
+                        oce.printStackTrace();
+                    }
+                }
+            // }
+        }
+    }
 
     public ItemFormMetadataDAO(DataSource ds) {
         super(ds);
+        resetCache();
     }
 
     public ItemFormMetadataDAO(DataSource ds, DAODigester digester) {
         super(ds);
         this.digester = digester;
+        resetCache();
     }
 
     // This constructor sets up the Locale for JUnit tests; see the locale
@@ -530,22 +555,33 @@ public class ItemFormMetadataDAO extends EntityDAO {
      * @see org.akaza.openclinica.dao.core.DAOInterface#findByPK(int)
      */
     public EntityBean findByPK(int id) throws OpenClinicaException {
-        ItemFormMetadataBean ifmb = new ItemFormMetadataBean();
-        this.setTypesExpected();
+        synchronized(formMetadataCache) {
+            ItemFormMetadataBean ifmb = new ItemFormMetadataBean();
+            HashMap<Integer, ItemFormMetadataBean> hm = formMetadataCache;
+            if (hm.size() <= 0) {
 
-        // TODO place holder to return here, tbh
-        HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(id));
+                this.setTypesExpected();
 
-        String sql = digester.getQuery("findByPK");
-        ArrayList alist = this.select(sql, variables);
-        Iterator it = alist.iterator();
+                // TODO place holder to return here, tbh
+                HashMap variables = new HashMap();
+                variables.put(new Integer(1), new Integer(id));
 
-        if (it.hasNext()) {
-            ifmb = (ItemFormMetadataBean) this.getEntityFromHashMap((HashMap) it.next());
+                String sql = digester.getQuery("findByPK");
+                ArrayList alist = this.select(sql, variables);
+                Iterator it = alist.iterator();
+
+                if (it.hasNext()) {
+                    ifmb = (ItemFormMetadataBean) this.getEntityFromHashMap((HashMap) it.next());
+                }
+            } else {
+                ifmb = formMetadataCache.get(new Integer(id));
+                if (ifmb != null) {
+                    return ifmb;
+                }
+            }
+            // again should never get here but you never know...
+            return ifmb;
         }
-
-        return ifmb;
     }
 
     /*
@@ -610,7 +646,7 @@ public class ItemFormMetadataDAO extends EntityDAO {
         if (isQuerySuccessful()) {
             ifmb.setId(id);
         }
-
+        resetCache();
         return ifmb;
     }
 
@@ -679,7 +715,7 @@ public class ItemFormMetadataDAO extends EntityDAO {
             ifmb.setId(0);
             ifmb.setActive(false);
         }
-
+        resetCache();
         return ifmb;
     }
 

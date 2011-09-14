@@ -29,22 +29,50 @@ import javax.sql.DataSource;
  * @author jsampson
  */
 public class StudyEventDefinitionDAO extends AuditableEntityDAO {
+    
+    private static HashMap<Integer, StudyEventDefinitionBean> definitionCache = 
+        new HashMap<Integer, StudyEventDefinitionBean>();
 
     private void setQueryNames() {
         findAllByStudyName = "findAllByStudy";
         findAllActiveByStudyName = "findAllActiveByStudy";
         findByPKAndStudyName = "findByPKAndStudy";
     }
+    
+    private void setCache() {
+        synchronized(definitionCache) {
+            if (definitionCache == null) {
+                definitionCache = new HashMap<Integer, StudyEventDefinitionBean>();
+            }
+        }
+    }
+    
+    private void resetCache() {
+        synchronized(definitionCache) {
+            // if (definitionCache == null) {
+                if (definitionCache.size() <= 0) {
+                    definitionCache = new HashMap<Integer, StudyEventDefinitionBean>();
+                    Collection<StudyEventDefinitionBean> defs = this.findAll();
+                    for (StudyEventDefinitionBean definition : defs) {
+                        Integer primaryKey = new Integer(definition.getId());
+                        definitionCache.put(primaryKey, definition);
+                    }
+                }
+            // }
+        }
+    }
 
     public StudyEventDefinitionDAO(DataSource ds) {
         super(ds);
         setQueryNames();
+        resetCache();
     }
 
     public StudyEventDefinitionDAO(DataSource ds, DAODigester digester) {
         super(ds);
         this.digester = digester;
         setQueryNames();
+        resetCache();
     }
 
     // This constructor sets up the Locale for JUnit tests; see the locale
@@ -53,6 +81,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 
         this(ds, digester);
         this.locale = locale;
+        resetCache();
     }
 
     @Override
@@ -143,7 +172,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
         variables.put(new Integer(10), new Integer(sedb.getOrdinal()));
         variables.put(new Integer(11), getValidOid(sedb));
         this.execute(digester.getQuery("create"), variables);
-
+        resetCache();
         return sedb;
     }
 
@@ -161,6 +190,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
         variables.put(new Integer(9), new Integer(sedb.getOrdinal()));
         variables.put(new Integer(10), new Integer(sedb.getId()));
         this.execute(digester.getQuery("update"), variables);
+        resetCache();
         return eb;
     }
 
@@ -320,6 +350,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
             StudyEventDefinitionBean eb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) it.next());
             al.add(eb);
         }
+        // resetCache();
         return al;
     }
 
@@ -330,22 +361,34 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
     }
 
     public EntityBean findByPK(int ID) {
+        synchronized(definitionCache) {
+            HashMap<Integer, StudyEventDefinitionBean> hm = definitionCache;
+            if (hm.size() <= 0) {
+                StudyEventDefinitionBean eb = new StudyEventDefinitionBean();
+                this.setTypesExpected();
 
-        StudyEventDefinitionBean eb = new StudyEventDefinitionBean();
-        this.setTypesExpected();
+                HashMap variables = new HashMap();
+                variables.put(new Integer(1), new Integer(ID));
 
-        HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(ID));
+                String sql = digester.getQuery("findByPK");
 
-        String sql = digester.getQuery("findByPK");
+                ArrayList alist = this.select(sql, variables);
+                Iterator it = alist.iterator();
 
-        ArrayList alist = this.select(sql, variables);
-        Iterator it = alist.iterator();
-
-        if (it.hasNext()) {
-            eb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) it.next());
+                if (it.hasNext()) {
+                    eb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) it.next());
+                }
+                resetCache();
+                return eb;
+            } else {
+                StudyEventDefinitionBean definitionBean = definitionCache.get(new Integer(ID)); 
+                if (definitionBean != null) {
+                    return definitionBean; 
+                } 
+            }
+            // should never get here, but if we do, we should return something
+            return new StudyEventDefinitionBean();
         }
-        return eb;
     }
 
     /*

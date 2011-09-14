@@ -1,6 +1,7 @@
 package org.akaza.openclinica.dao.submit;
 
 import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.dao.core.EntityDAO;
 import org.akaza.openclinica.dao.core.SQLFactory;
@@ -19,10 +20,34 @@ import javax.sql.DataSource;
  * Created by IntelliJ IDEA. User: bruceperry Date: May 10, 2007
  */
 public class ItemGroupMetadataDAO extends EntityDAO {
+    
+    private static HashMap<Integer, ItemGroupMetadataBean> groupMetadataCache =
+        new HashMap<Integer, ItemGroupMetadataBean>();
+    
+    private void resetCache() {
+        synchronized(groupMetadataCache) {
+            // if (groupMetadataCache == null) {
+                if (groupMetadataCache.size() <= 0) {
+                    groupMetadataCache = new HashMap<Integer, ItemGroupMetadataBean>();
+                    try {
+                        Collection<ItemGroupMetadataBean> mets = this.findAll();
+                        for (ItemGroupMetadataBean metadata : mets) {
+                            Integer primaryKey = new Integer(metadata.getId());
+                            groupMetadataCache.put(primaryKey, metadata);
+                        }
+                    } catch (OpenClinicaException oce) {
+                        oce.printStackTrace();
+                    }
+                }
+            // }
+        }
+    }
+    
     public ItemGroupMetadataDAO(DataSource ds) {
         super(ds);
         // this.getCurrentPKName="findCurrentPKValue";
         this.getNextPKName = "getNextPK";
+        resetCache();
     }
 
     @Override
@@ -92,6 +117,9 @@ public class ItemGroupMetadataDAO extends EntityDAO {
     }
 
     public EntityBean findByPK(int id) throws OpenClinicaException {
+        synchronized(groupMetadataCache) {
+            HashMap<Integer, ItemGroupMetadataBean> hm = groupMetadataCache;
+            if (hm.size() <= 0) {
         ItemGroupMetadataBean eb = new ItemGroupMetadataBean();
         this.setTypesExpected();
         HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
@@ -104,7 +132,14 @@ public class ItemGroupMetadataDAO extends EntityDAO {
             eb = (ItemGroupMetadataBean) this.getEntityFromHashMap((HashMap) it.next());
         }
         return eb;
-        //return new ItemGroupMetadataBean(); // To change body of implemented
+            } else {
+                ItemGroupMetadataBean metadata = hm.get(new Integer(id));
+                if (metadata != null) {
+                    return metadata;
+                }
+            }
+        }
+        return new ItemGroupMetadataBean(); // To change body of implemented
         // methods use File | Settings |
         // File Templates.;
     }
@@ -153,6 +188,7 @@ public class ItemGroupMetadataDAO extends EntityDAO {
         if (isQuerySuccessful()) {
             eb.setId(id);
         }
+        resetCache();
         return eb;
 
     }

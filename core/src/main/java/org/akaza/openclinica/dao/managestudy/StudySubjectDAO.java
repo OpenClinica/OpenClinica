@@ -20,6 +20,7 @@ import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
 import org.akaza.openclinica.dao.StudySubjectSDVFilter;
 import org.akaza.openclinica.dao.StudySubjectSDVSort;
@@ -29,6 +30,7 @@ import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
+import org.akaza.openclinica.exception.OpenClinicaException;
 
 /**
  * @author jxu
@@ -37,6 +39,9 @@ import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 public class StudySubjectDAO extends AuditableEntityDAO {
 
     // private DAODigester digester;
+    
+    private HashMap<Integer, StudySubjectBean> studySubjectCache =
+        new HashMap<Integer, StudySubjectBean>();
 
     public void setQueryNames() {
         findAllByStudyName = "findAllByStudy";
@@ -44,17 +49,35 @@ public class StudySubjectDAO extends AuditableEntityDAO {
         getCurrentPKName = "getCurrentPK";
 
     }
+    
+    private void resetCache() {
+        synchronized(studySubjectCache) {
+            // if (studySubjectCache == null) {
+                if (studySubjectCache.size() <= 0) {
+                    studySubjectCache = new HashMap<Integer, StudySubjectBean>();
+
+                    Collection<StudySubjectBean> subjects = this.findAll();
+                    for (StudySubjectBean subject : subjects) {
+                        Integer primaryKey = new Integer(subject.getId());
+                        studySubjectCache.put(primaryKey, subject);
+                    }
+                }
+            // }
+        }
+    }
 
     public StudySubjectDAO(DataSource ds) {
         super(ds);
         // digester = SQLFactory.getInstance().getDigester(digesterName);
         setQueryNames();
+        resetCache();
     }
 
     public StudySubjectDAO(DataSource ds, DAODigester digester) {
         super(ds);
         this.digester = digester;
         setQueryNames();
+        resetCache();
     }
 
     @Override
@@ -418,21 +441,32 @@ public class StudySubjectDAO extends AuditableEntityDAO {
     }
 
     public EntityBean findByPK(int ID) {
-        StudySubjectBean eb = new StudySubjectBean();
-        this.setTypesExpected();
+        synchronized(studySubjectCache) {
+            HashMap<Integer, StudySubjectBean> hm = studySubjectCache;
+            if (hm.size() <= 0) {
+                StudySubjectBean eb = new StudySubjectBean();
+                this.setTypesExpected();
 
-        HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(ID));
+                HashMap variables = new HashMap();
+                variables.put(new Integer(1), new Integer(ID));
 
-        String sql = digester.getQuery("findByPK");
-        ArrayList alist = this.select(sql, variables);
-        Iterator it = alist.iterator();
+                String sql = digester.getQuery("findByPK");
+                ArrayList alist = this.select(sql, variables);
+                Iterator it = alist.iterator();
 
-        if (it.hasNext()) {
-            eb = (StudySubjectBean) this.getEntityFromHashMap((HashMap) it.next());
+                if (it.hasNext()) {
+                    eb = (StudySubjectBean) this.getEntityFromHashMap((HashMap) it.next());
+                }
+
+                return eb;
+            } else {
+                StudySubjectBean studySubject = hm.get(new Integer(ID));
+                if (studySubject != null) {
+                    return studySubject;
+                }
+            }
         }
-
-        return eb;
+        return new StudySubjectBean();
     }
 
     public StudySubjectBean findByLabelAndStudy(String label, StudyBean study) {
@@ -601,7 +635,7 @@ public class StudySubjectDAO extends AuditableEntityDAO {
                 sgmb.setId(sgmdao.getCurrentPK());
             }
         }
-
+        resetCache();
         return sb;
     }
 
@@ -1060,7 +1094,7 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 
         String sql = digester.getQuery("update");
         this.execute(sql, variables, nullVars);
-
+        resetCache();
         return sb;
     }
 

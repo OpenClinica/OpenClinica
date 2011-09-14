@@ -43,20 +43,40 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 public class StudyEventDAO extends AuditableEntityDAO {
     // private DAODigester digester;
 
+    private static HashMap<Integer, StudyEventBean> studyEventCache = 
+        new HashMap<Integer, StudyEventBean>();
+    
     private void setQueryNames() {
         findByPKAndStudyName = "findByPKAndStudy";
         getCurrentPKName = "getCurrentPrimaryKey";
+    }
+    
+    private void resetCache() {
+        synchronized(studyEventCache) {
+            // if (studyEventCache == null) {
+                if (studyEventCache.size() <= 0) {
+                    studyEventCache = new HashMap<Integer, StudyEventBean>();
+                    Collection<StudyEventBean> evs = this.findAll();
+                    for (StudyEventBean event : evs) {
+                        Integer primaryKey = new Integer(event.getId());
+                        studyEventCache.put(primaryKey, event);
+                    }
+                }
+            // }
+        }
     }
 
     public StudyEventDAO(DataSource ds) {
         super(ds);
         setQueryNames();
+        resetCache();
     }
 
     public StudyEventDAO(DataSource ds, DAODigester digester) {
         super(ds);
         this.digester = digester;
         setQueryNames();
+        resetCache();
     }
 
     // This constructor sets up the Locale for JUnit tests; see the locale
@@ -433,21 +453,32 @@ public class StudyEventDAO extends AuditableEntityDAO {
     }
 
     public EntityBean findByPK(int ID) {
-        StudyEventBean eb = new StudyEventBean();
-        this.setTypesExpected();
+        synchronized(studyEventCache) {
+            HashMap<Integer, StudyEventBean> hm = studyEventCache;
+            if (hm.size() <= 0) {
+                StudyEventBean eb = new StudyEventBean();
+                this.setTypesExpected();
 
-        HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(ID));
+                HashMap variables = new HashMap();
+                variables.put(new Integer(1), new Integer(ID));
 
-        String sql = digester.getQuery("findByPK");
-        ArrayList alist = this.select(sql, variables);
-        Iterator it = alist.iterator();
+                String sql = digester.getQuery("findByPK");
+                ArrayList alist = this.select(sql, variables);
+                Iterator it = alist.iterator();
 
-        if (it.hasNext()) {
-            eb = (StudyEventBean) this.getEntityFromHashMap((HashMap) it.next());
+                if (it.hasNext()) {
+                    eb = (StudyEventBean) this.getEntityFromHashMap((HashMap) it.next());
+                }
+
+                return eb;
+            } else {
+                StudyEventBean eventBean = hm.get(new Integer(ID));
+                if (eventBean != null) {
+                    return eventBean;
+                }
+            }
         }
-
-        return eb;
+        return new StudyEventBean();
     }
 
     /**
@@ -492,7 +523,7 @@ public class StudyEventDAO extends AuditableEntityDAO {
         if (isQuerySuccessful()) {
             sb.setId(getLatestPK());
         }
-
+        resetCache();
         return sb;
     }
 
@@ -541,7 +572,8 @@ public class StudyEventDAO extends AuditableEntityDAO {
         if (isQuerySuccessful()) {
             sb.setActive(true);
         }
-
+        resetCache();
+        // possible change with update
         return sb;
     }
 

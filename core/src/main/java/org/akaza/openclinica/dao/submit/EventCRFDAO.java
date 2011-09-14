@@ -11,6 +11,7 @@ package org.akaza.openclinica.dao.submit;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
@@ -46,20 +47,40 @@ import javax.sql.DataSource;
 public class EventCRFDAO extends AuditableEntityDAO {
     // private DAODigester digester;
 
+    private static HashMap<Integer, EventCRFBean> eventCrfCache =
+        new HashMap<Integer, EventCRFBean>();
+    
     private void setQueryNames() {
         this.findByPKAndStudyName = "findByPKAndStudy";
         this.getCurrentPKName = "getCurrentPK";
+    }
+    
+    private void resetCache() {
+        synchronized(eventCrfCache) {
+            // if (eventCrfCache == null) {
+                if (eventCrfCache.size() <= 0) {
+                    eventCrfCache = new HashMap<Integer, EventCRFBean>();
+                    Collection<EventCRFBean> defs = this.findAll();
+                    for (EventCRFBean eventCrf : defs) {
+                        Integer primaryKey = new Integer(eventCrf.getId());
+                        eventCrfCache.put(primaryKey, eventCrf);
+                    }
+                }
+            // }
+        }
     }
 
     public EventCRFDAO(DataSource ds) {
         super(ds);
         setQueryNames();
+        resetCache();
     }
 
     public EventCRFDAO(DataSource ds, DAODigester digester) {
         super(ds);
         this.digester = digester;
         setQueryNames();
+        resetCache();
     }
 
     // This constructor sets up the Locale for JUnit tests; see the locale
@@ -173,6 +194,7 @@ public class EventCRFDAO extends AuditableEntityDAO {
         if (isQuerySuccessful()) {
             ecb.setActive(true);
         }
+        resetCache();
 
         return ecb;
     }
@@ -186,6 +208,7 @@ public class EventCRFDAO extends AuditableEntityDAO {
         } else {
             execute(digester.getQuery("markCompleteDDE"), variables);
         }
+        resetCache();
     }
 
     public EntityBean create(EntityBean eb) {
@@ -217,7 +240,7 @@ public class EventCRFDAO extends AuditableEntityDAO {
         if (isQuerySuccessful()) {
             ecb.setId(getLatestPK());
         }
-
+        resetCache();
         return ecb;
     }
 
@@ -266,21 +289,32 @@ public class EventCRFDAO extends AuditableEntityDAO {
     }
 
     public EntityBean findByPK(int ID) {
-        EventCRFBean eb = new EventCRFBean();
-        this.setTypesExpected();
+        synchronized(eventCrfCache) {
+            HashMap<Integer, EventCRFBean> hm = eventCrfCache;
+            if (hm.size() <= 0) {
+                EventCRFBean eb = new EventCRFBean();
+                this.setTypesExpected();
 
-        HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(ID));
+                HashMap variables = new HashMap();
+                variables.put(new Integer(1), new Integer(ID));
 
-        String sql = digester.getQuery("findByPK");
-        ArrayList alist = this.select(sql, variables);
-        Iterator it = alist.iterator();
+                String sql = digester.getQuery("findByPK");
+                ArrayList alist = this.select(sql, variables);
+                Iterator it = alist.iterator();
 
-        if (it.hasNext()) {
-            eb = (EventCRFBean) this.getEntityFromHashMap((HashMap) it.next());
+                if (it.hasNext()) {
+                    eb = (EventCRFBean) this.getEntityFromHashMap((HashMap) it.next());
+                }
+
+                return eb;
+            } else {
+                EventCRFBean eventCrf = hm.get(new Integer(ID));
+                if (eventCrf != null) {
+                    return eventCrf;
+                }
+            }
         }
-
-        return eb;
+        return new EventCRFBean();
     }
 
     public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
@@ -426,6 +460,7 @@ public class EventCRFDAO extends AuditableEntityDAO {
         variables.put(new Integer(1), new Integer(eventCRFId));
 
         this.execute(digester.getQuery("delete"), variables);
+        resetCache();
         return;
 
     }
