@@ -18,7 +18,7 @@
  <meta http-equiv="X-UA-Compatible" content="IE=8" />
 
 <link rel="stylesheet" href="<c:url value='/includes/styles.css'/>" type="text/css"/>
-<link rel="stylesheet" href="<c:url value='/includes/styles2.css'/>" type="text/css" />
+<%-- <link rel="stylesheet" href="includes/styles2.css" type="text/css">--%>
 <link rel="stylesheet" href="<c:url value='/includes/NewLoginStyles.css'/>" type="text/css"/>
 <script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/jmesa/jquery-1.3.2.min.js'/>"></script>
 <script type="text/javascript" language="JavaScript" src="<c:url value='/includes/jmesa/jquery.blockUI.js'/>"></script>

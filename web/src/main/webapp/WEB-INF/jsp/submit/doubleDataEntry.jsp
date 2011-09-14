@@ -27,7 +27,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=8" />
     
     <link rel="stylesheet" href="includes/styles.css" type="text/css" media="screen">
-    <link rel="stylesheet" href="includes/styles2.css" type="text/css" media="screen">
+<%-- <link rel="stylesheet" href="includes/styles2.css" type="text/css">--%>
     <link rel="stylesheet" href="includes/print.css" type="text/css" media="print">
 
     <script type="text/javascript" language="JavaScript">

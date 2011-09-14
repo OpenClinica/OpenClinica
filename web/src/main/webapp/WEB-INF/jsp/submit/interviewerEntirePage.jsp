@@ -9,7 +9,7 @@
 <head><title>OpenClinica interview</title>
    <%-- <fmt:message key="view_data_entry" bundle="${resword}"/>--%>
     <link rel="stylesheet" href="includes/styles.css" type="text/css" media="screen">
-    <link rel="stylesheet" href="includes/styles2.css" type="text/css" media="screen">
+<%-- <link rel="stylesheet" href="includes/styles2.css" type="text/css">--%>
     <link rel="stylesheet" href="includes/print.css" type="text/css" media="print">
     <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/Tabs.js"></script>
