@@ -39,7 +39,7 @@
 <!-- End -->
 
   <script type="text/JavaScript" language="JavaScript" src="includes/prototype.js"></script>
-  <script type="text/JavaScript" language="JavaScript" src="includes/scriptaculous.js"></script>
+  <script type="text/JavaScript" language="JavaScript" src="includes/scriptaculous.js?load=effects"></script>
   <script type="text/JavaScript" language="JavaScript" src="includes/effects.js"></script>
 </head>
  <%-- I removed this include because you cannot have both
