@@ -25,7 +25,7 @@
 
 <%-- <link rel="stylesheet" href="includes/NewNavStyles.css" type="text/css" />--%>
 <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript2.js"></script>
+<%-- <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript2.js"></script> --%>
 <script type="text/JavaScript" language="JavaScript" src="includes/Tabs.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/CalendarPopup.js"></script>
 <script type="text/JavaScript" language="JavaScript" src=
