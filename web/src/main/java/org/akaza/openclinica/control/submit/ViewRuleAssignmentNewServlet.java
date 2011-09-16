@@ -114,7 +114,7 @@ public class ViewRuleAssignmentNewServlet extends SecureController {
 
     private void createTable() {
 
-        ViewRuleAssignmentTableFactory factory = new ViewRuleAssignmentTableFactory(showMoreLink, getCoreResources().getField("designer.url")+"access?host="+getHostPath(request)+"&app="+getContextPath(request), isDesigner);
+        ViewRuleAssignmentTableFactory factory = new ViewRuleAssignmentTableFactory(showMoreLink, getCoreResources().getField("designer.url")+"access?host="+getHostPathFromSysUrl(getCoreResources().getField("sysURL.base"),request.getContextPath())+"&app="+getContextPath(request), isDesigner);
         factory.setRuleSetService(getRuleSetService());
         factory.setItemFormMetadataDAO(getItemFormMetadataDAO());
         factory.setCurrentStudy(currentStudy);
@@ -133,6 +133,9 @@ public class ViewRuleAssignmentNewServlet extends SecureController {
         }
 
     }
+    private String getHostPathFromSysUrl(String sysURL,String contextPath) {
+        return sysURL.replaceAll(contextPath+"/", "");
+       }
     public String getContextPath(HttpServletRequest request) {
         String contextPath = request.getContextPath().replaceAll("/", "");
         return contextPath;
