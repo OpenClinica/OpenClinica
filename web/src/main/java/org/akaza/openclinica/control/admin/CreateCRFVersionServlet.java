@@ -104,7 +104,6 @@ public class CreateCRFVersionServlet extends SecureController {
         CRFVersionBean version = (CRFVersionBean) session.getAttribute("version");
 
         if (StringUtil.isBlank(action)) {
-            System.out.println(action);
             logger.info("action is blank");
             request.setAttribute("version", version);
             forwardPage(Page.CREATE_CRF_VERSION);
@@ -140,9 +139,6 @@ public class CreateCRFVersionServlet extends SecureController {
                 e.printStackTrace();
             }
             session.setAttribute("tempFileName", tempFile);
-            String crfName = tempFile;
-            Integer id = (Integer)request.getAttribute("CrfId");
-            CRFBean crfBean = (CRFBean) cdao.findByPK(version.getCrfId());
             // YW, at this point, if there are errors, they point to no file
             // provided and/or not xls format
             if (errors.isEmpty()) {
@@ -151,10 +147,7 @@ public class CreateCRFVersionServlet extends SecureController {
                     Validator.addError(errors, "excel_file", resword.getString("the_version_CRF_version_more_than_255"));
                 } else if (s.length() <= 0) {
                     Validator.addError(errors, "excel_file", resword.getString("the_VERSION_column_was_blank"));
-                }else if(!crfBean.getName().equals(crfName)){
-                    Validator.addError(errors, "excel_file", resword.getString("crf_name_different"));
                 }
-                
                 version.setName(s);
                 if (version.getCrfId() == 0) {
                     version.setCrfId(fp.getInt("crfId"));
