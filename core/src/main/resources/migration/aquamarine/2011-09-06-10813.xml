@@ -26,7 +26,7 @@
            create or replace 
 			Procedure updt_metadata_repeating_group
 			  IS      
-			  cursor c1 is select igm.ITEM_GROUP_METADATA_ID from item_group_metadata igm, ITEM_GROUP ig where igm.item_group_id = ig.item_group_id and ig.name = 'Ungrouped';
+			  cursor c1 is select igm.ITEM_GROUP_METADATA_ID from item_group_metadata igm, ITEM_GROUP ig where igm.item_group_id = ig.item_group_id and ig.name = 'Ungrouped' and igm.REPEATING_GROUP = 1;
 			  
 			  BEGIN
 			      FOR cc in c1
