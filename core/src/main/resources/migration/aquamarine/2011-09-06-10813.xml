@@ -2,24 +2,24 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
-	<!--  <changeSet author="pgawade" id="2011-09-06-10813-1" dbms="postgresql">
-        <comment>update repeating_group column of item_group_metadata for 3.0 to 3.1 migrations </comment>
+	 <changeSet author="pgawade" id="2011-09-06-10813-1" dbms="postgresql">
+        <comment>update repeating_group column of item_group_metadata for 3.0 to 3.1 migrations on postgres database</comment>
         <sql splitStatements="false">
             CREATE OR REPLACE FUNCTION updt_metadata_repeating_group() RETURNS void AS
             'DECLARE
             mviews2 RECORD;
             BEGIN
-            FOR mviews2 in select igm.ITEM_GROUP_METADATA_ID from item_group_metadata igm, ITEM_GROUP ig where igm.item_group_id = ig.item_group_id and ig.name = "Ungrouped"
+            FOR mviews2 in select igm.ITEM_GROUP_METADATA_ID from item_group_metadata igm, ITEM_GROUP ig where igm.item_group_id = ig.item_group_id and ig.name = ''Ungrouped'' and igm.REPEATING_GROUP = true
                 LOOP    
-                    UPDATE item_group_metadata set REPEATING_GROUP = 0  where ITEM_GROUP_METADATA_ID = cc.ITEM_GROUP_METADATA_ID;
+                    UPDATE item_group_metadata set REPEATING_GROUP = false  where ITEM_GROUP_METADATA_ID = mviews2.ITEM_GROUP_METADATA_ID;
                 END LOOP;
             END;
             ' LANGUAGE plpgsql VOLATILE;
             COMMIT;
             Select updt_metadata_repeating_group();
-            DROP FUNCTION updt_metadata_repeating_group();
+            DROP FUNCTION updt_metadata_repeating_group(); 
         </sql>
-    </changeSet>-->
+    </changeSet>
     <changeSet author="pgawade" id="2011-09-06-10813-1" dbms="oracle">
         <comment>Update repeating_group column of item_group_metadata for 3.0 to 3.1 migrations on oracle database</comment>
         <sql splitStatements="false">
