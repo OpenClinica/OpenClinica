@@ -1159,10 +1159,10 @@ but the custom tag uses that, not this jstl code--%>
 		<c:set var="scdShowStatus" value="${displayItem.singleItem.scdData.scdDisplayInfo.scdShowStatus}"/>
 		<c:set var="cdId" value="${displayItem.singleItem.item.id}"/>
 		<c:choose>
-		<c:when test="${scdShowStatus == 1}">
+		<c:when test="${scdShowStatus == 1}">	<%-- 'SHOW_CHANGABLE' --%>
     		<tr class="aka_stripes" id="<c:out value="hd${cdId}"/>">
 		</c:when>
-		<c:when test="${scdShowStatus == 2}">
+		<c:when test="${scdShowStatus == 2}">	<%-- 'HIDE_CHANGABLE' --%>
 			<tr class="aka_stripes" id="<c:out value="hd${cdId}"/>" style="display:none">
 		</c:when>
 		<c:otherwise>
@@ -1185,10 +1185,10 @@ but the custom tag uses that, not this jstl code--%>
 		<c:set var="scdShowStatus" value="${displayItem.singleItem.scdData.scdDisplayInfo.scdShowStatus}"/>
 		<c:set var="cdId" value="${displayItem.singleItem.item.id}"/>
 		<c:choose>
-		<c:when test="${scdShowStatus == 1}">
+		<c:when test="${scdShowStatus == 1}">	<%-- 'SHOW_CHANGABLE' --%>
     		<tr class="aka_stripes" id="<c:out value="sub${cdId}"/>">
 		</c:when>
-		<c:when test="${scdShowStatus == 2}">
+		<c:when test="${scdShowStatus == 2}">	<%-- 'HIDE_CHANGABLE' --%>
 			<tr class="aka_stripes" id="<c:out value="sub${cdId}"/>" style="display:none">
 		</c:when>
 		<c:otherwise>
@@ -1209,10 +1209,10 @@ but the custom tag uses that, not this jstl code--%>
 <c:set var="rowSCDShowIDStr" value="${displayItem.singleItem.scdData.scdDisplayInfo.rowSCDShowIDStr}"/>
 <input type="hidden" id="rowSCDShowIDs${numOfTr}" value="${rowSCDShowIDStr}" />
 <c:choose>
-<c:when test="${rowDisplay == 0}">
+<c:when test="${rowDisplay == 0}">	<%-- 'SHOW_UNCHANGABLE' --%>
 	<tr>
 </c:when>
-<c:when test="${rowDisplay == 1}">
+<c:when test="${rowDisplay == 1}">	<%-- 'SHOW_CHANGABLE' --%>
 	<tr id="tr${numOfTr}">
 </c:when>
 <c:otherwise>
@@ -1231,10 +1231,10 @@ but the custom tag uses that, not this jstl code--%>
 							<c:set var="cdId" value="${displayItem.singleItem.item.id}"/>
 							<input type="hidden" id="col${cdId}" value="${numOfTr}"/>
 							<c:choose>
-							<c:when test="${scdShowStatus == 1}"> 
+							<c:when test="${scdShowStatus == 1}">	<%-- 'SHOW_CHANGABLE' --%> 
 		                		<td valign="top" id="t${cdId}">
 					    	</c:when>
-					    	<c:when test="${scdShowStatus == 2}">
+					    	<c:when test="${scdShowStatus == 2}">	<%-- 'HIDE_CHANGABLE' --%>
 		                		<td valign="top" id="t${cdId}" style="display:none">
 		                	</c:when>
 		                	<c:otherwise>
@@ -1354,10 +1354,10 @@ but the custom tag uses that, not this jstl code--%>
 					<c:set var="scdShowStatus" value="${childItem.scdData.scdDisplayInfo.scdShowStatus}"/>
 					<c:set var="cdId" value="${childItem.item.id}"/>
 					<c:choose>
-					<c:when test="${scdShowStatus == 1}"> 
+					<c:when test="${scdShowStatus == 1}"> <%-- 'SHOW_CHANGABLE' --%>
                 		<tr id="t${cdId}">
 			    	</c:when>
-			    	<c:when test="${scdShowStatus == 2}">
+			    	<c:when test="${scdShowStatus == 2}">	<%-- 'HIDE_CHANGABLE' --%>
                 		<tr id="t${cdId}" style="display:none">
                 	</c:when>
                 	<c:otherwise>
