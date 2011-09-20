@@ -2125,11 +2125,13 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         throw new CRFReadingException("The CRF_NAME column was blank in the CRF worksheet.");
                     }
                     
-                    CRFBean checkName = (CRFBean) cdao.findByPK(crfId);
-                    if (!checkName.getName().equals(crfName)) {
-                        throw new CRFReadingException(resPageMsg.getString("the") + " " +
-                                resPageMsg.getString("CRF_NAME_column") + " '" + crfName + "' " +
-                                resPageMsg.getString("did_not_match_crf_name") + " '" + checkName.getName() + "'.");
+                    if(crfId > 0) {
+                        CRFBean checkName = (CRFBean) cdao.findByPK(crfId);
+                        if (!checkName.getName().equals(crfName)) {
+                            throw new CRFReadingException(resPageMsg.getString("the") + " " +
+                                    resPageMsg.getString("CRF_NAME_column") + " '" + crfName + "' " +
+                                    resPageMsg.getString("did_not_match_crf_name") + " '" + checkName.getName() + "'.");
+                        }
                     }
 
                     if (crfName.length() > 255) {
