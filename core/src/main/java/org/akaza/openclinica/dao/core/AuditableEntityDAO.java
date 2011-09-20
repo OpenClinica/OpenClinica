@@ -189,7 +189,7 @@ public abstract class AuditableEntityDAO<K extends String,V extends ArrayList> e
 
         String sql = digester.getQuery(findByPKAndStudyName);
 
-        ArrayList rows = this.selectByCache(sql, variables);
+        ArrayList rows = this.select(sql, variables);
         Iterator it = rows.iterator();
 
         if (it.hasNext()) {

@@ -440,6 +440,23 @@ public class StudyEventDAO extends AuditableEntityDAO {
         variables.put(new Integer(1), new Integer(ID));
 
         String sql = digester.getQuery("findByPK");
+        ArrayList alist = this.select(sql, variables);
+        Iterator it = alist.iterator();
+
+        if (it.hasNext()) {
+            eb = (StudyEventBean) this.getEntityFromHashMap((HashMap) it.next());
+        }
+
+        return eb;
+    }
+    public EntityBean findByPKCached(int ID) {
+        StudyEventBean eb = new StudyEventBean();
+        this.setTypesExpected();
+
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(ID));
+
+        String sql = digester.getQuery("findByPK");
         ArrayList alist = this.selectByCache(sql, variables);
         Iterator it = alist.iterator();
 
