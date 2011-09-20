@@ -2124,6 +2124,13 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         // htmlErrors.put(j + ",1,0", "REQUIRED FIELD");
                         throw new CRFReadingException("The CRF_NAME column was blank in the CRF worksheet.");
                     }
+                    
+                    CRFBean checkName = (CRFBean) cdao.findByPK(crfId);
+                    if (!checkName.getName().equals(crfName)) {
+                        throw new CRFReadingException(resPageMsg.getString("the") + " " +
+                                resPageMsg.getString("CRF_NAME_column") + " '" + crfName + "' " +
+                                resPageMsg.getString("did_not_match_crf_name") + " '" + checkName.getName() + "'.");
+                    }
 
                     if (crfName.length() > 255) {
                         errors.add(resPageMsg.getString("crf_name_length_error"));
