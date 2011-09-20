@@ -69,92 +69,9 @@
             <param-value>true</param-value>
         </init-param>
 		
-		<init-param>
-  <param-name>varyHeader</param-name>
-  <param-value>true</param-value>
-</init-param>
-
 
     </filter>
-	
-	<!--ehCache gzip stuff -->
-	<filter>
-<filter-name>CachePage1CachingFilter</filter-name>
-<filter-class>net.sf.ehcache.constructs.web.filter.SimplePageCachingFilter
-</filter-class>
-<init-param>
- <param-name>suppressStackTrace</param-name>
- <param-value>false</param-value>
-</init-param>
-<init-param>
- <param-name>cacheName</param-name>
- <param-value>CachePage1CachingFilter</param-value>
-</init-param>
- </filter>
 
- <filter>
-<filter-name>SimplePageFragmentCachingFilter</filter-name>    <filter-class>net.sf.ehcache.constructs.web.filter.SimplePageFragmentCachingFilter
-</filter-class>
-<init-param>
- <param-name>suppressStackTrace</param-name>
- <param-value>false</param-value>
-</init-param>
-<init-param>
- <param-name>cacheName</param-name>
- <param-value>SimplePageFragmentCachingFilter</param-value>
-</init-param>
- </filter>
-
- <filter>
-<filter-name>SimpleCachingHeadersPageCachingFilter</filter-name>    <filter-class>net.sf.ehcache.constructs.web.filter.SimpleCachingHeadersPageCachingFilter
-</filter-class>
-<init-param>
- <param-name>suppressStackTrace</param-name>
- <param-value>false</param-value>
-</init-param>
-<init-param>
- <param-name>cacheName</param-name>
- <param-value>CachedPage2Cache</param-value>
-</init-param>
- </filter>
-
- <!-- This is a filter chain. They are executed in the order below.
-      Do not change the order. -->
-
- <filter-mapping>
-<filter-name>CachePage1CachingFilter</filter-name>
-<url-pattern>/WEB-INF/jsp/submit/initialDataEntryNW.jsp</url-pattern>
-<dispatcher>REQUEST</dispatcher>
-<dispatcher>INCLUDE</dispatcher>
-<dispatcher>FORWARD</dispatcher>
- </filter-mapping>
-
- <filter-mapping>
-<filter-name>SimplePageFragmentCachingFilter</filter-name>
-<url-pattern>/WEB-INF/jsp/include/Footer.jsp</url-pattern>
- </filter-mapping>
-
- <filter-mapping>
-<filter-name>SimplePageFragmentCachingFilter</filter-name>
-<url-pattern>/WEB-INF/jsp/submit/interviewer.jsp</url-pattern>
- </filter-mapping>
-	
-	 <filter-mapping>
-<filter-name>SimplePageFragmentCachingFilter</filter-name>
-<url-pattern>/WEB-INF/jsp/submit/showGroupItemInput.jsp</url-pattern>
- </filter-mapping>
-		 <filter-mapping>
-<filter-name>SimplePageFragmentCachingFilter</filter-name>
-<url-pattern>/WEB-INF/jsp/submit/generateGroupItemTxt.jsp</url-pattern>
- </filter-mapping>
- <filter-mapping>
-<filter-name>SimplePageFragmentCachingFilter</filter-name>
-<url-pattern>/WEB-INF/jsp/submit/showItemInput.jsp</url-pattern>
- </filter-mapping>
-  <filter-mapping>
-<filter-name>SimplePageFragmentCachingFilter</filter-name>
-<url-pattern>/WEB-INF/jsp/submit/ generateLeftItemTxt.jsp</url-pattern>
- </filter-mapping>
 	
     <filter-mapping>
         <filter-name>encodingFilter</filter-name>
@@ -168,8 +85,24 @@
      <filter-mapping>
         <filter-name>compressFilter</filter-name>
         <url-pattern>/InitialDataEntry</url-pattern>
-       
-   </filter-mapping>
+     </filter-mapping>
+	    <filter-mapping>
+        <filter-name>compressFilter</filter-name>
+        <url-pattern>/ViewSectionDataEntry</url-pattern>
+     </filter-mapping>
+	  <filter-mapping>
+        <filter-name>compressFilter</filter-name>
+        <url-pattern>/AdministrativeEditing</url-pattern>
+     </filter-mapping>
+	<filter-mapping>
+        <filter-name>compressFilter</filter-name>
+  	  <url-pattern>/DoubleDataEntry</url-pattern>
+    </filter-mapping>
+	<filter-mapping>
+        <filter-name>compressFilter</filter-name>
+  	<url-pattern>/ListStudySubjects</url-pattern>
+    </filter-mapping>
+  
    <filter>
         <filter-name>springSecurityFilterChain</filter-name>
         <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
