@@ -13,9 +13,14 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.DAODigester;
+import org.akaza.openclinica.dao.core.PreparedStatementFactory;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -28,51 +33,23 @@ import javax.sql.DataSource;
  * @author thickerson
  * @author jsampson
  */
-public class StudyEventDefinitionDAO extends AuditableEntityDAO {
-    
-    private static HashMap<Integer, StudyEventDefinitionBean> definitionCache = 
-        new HashMap<Integer, StudyEventDefinitionBean>();
+public class StudyEventDefinitionDAO<K extends String,V extends ArrayList> extends AuditableEntityDAO {
 
     private void setQueryNames() {
         findAllByStudyName = "findAllByStudy";
         findAllActiveByStudyName = "findAllActiveByStudy";
         findByPKAndStudyName = "findByPKAndStudy";
     }
-    
-    private void setCache() {
-        synchronized(definitionCache) {
-            if (definitionCache == null) {
-                definitionCache = new HashMap<Integer, StudyEventDefinitionBean>();
-            }
-        }
-    }
-    
-    private void resetCache() {
-        synchronized(definitionCache) {
-            // if (definitionCache == null) {
-                if (definitionCache.size() <= 0) {
-                    definitionCache = new HashMap<Integer, StudyEventDefinitionBean>();
-                    Collection<StudyEventDefinitionBean> defs = this.findAll();
-                    for (StudyEventDefinitionBean definition : defs) {
-                        Integer primaryKey = new Integer(definition.getId());
-                        definitionCache.put(primaryKey, definition);
-                    }
-                }
-            // }
-        }
-    }
 
     public StudyEventDefinitionDAO(DataSource ds) {
         super(ds);
         setQueryNames();
-        resetCache();
     }
 
     public StudyEventDefinitionDAO(DataSource ds, DAODigester digester) {
         super(ds);
         this.digester = digester;
         setQueryNames();
-        resetCache();
     }
 
     // This constructor sets up the Locale for JUnit tests; see the locale
@@ -81,7 +58,6 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
 
         this(ds, digester);
         this.locale = locale;
-        resetCache();
     }
 
     @Override
@@ -172,7 +148,7 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
         variables.put(new Integer(10), new Integer(sedb.getOrdinal()));
         variables.put(new Integer(11), getValidOid(sedb));
         this.execute(digester.getQuery("create"), variables);
-        resetCache();
+
         return sedb;
     }
 
@@ -190,7 +166,6 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
         variables.put(new Integer(9), new Integer(sedb.getOrdinal()));
         variables.put(new Integer(10), new Integer(sedb.getId()));
         this.execute(digester.getQuery("update"), variables);
-        resetCache();
         return eb;
     }
 
@@ -350,7 +325,6 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
             StudyEventDefinitionBean eb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) it.next());
             al.add(eb);
         }
-        // resetCache();
         return al;
     }
 
@@ -361,34 +335,22 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
     }
 
     public EntityBean findByPK(int ID) {
-        synchronized(definitionCache) {
-            HashMap<Integer, StudyEventDefinitionBean> hm = definitionCache;
-            if (hm.size() <= 0) {
-                StudyEventDefinitionBean eb = new StudyEventDefinitionBean();
-                this.setTypesExpected();
 
-                HashMap variables = new HashMap();
-                variables.put(new Integer(1), new Integer(ID));
+        StudyEventDefinitionBean eb = new StudyEventDefinitionBean();
+        this.setTypesExpected();
 
-                String sql = digester.getQuery("findByPK");
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(ID));
 
-                ArrayList alist = this.select(sql, variables);
-                Iterator it = alist.iterator();
+        String sql = digester.getQuery("findByPK");
 
-                if (it.hasNext()) {
-                    eb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) it.next());
-                }
-                resetCache();
-                return eb;
-            } else {
-                StudyEventDefinitionBean definitionBean = definitionCache.get(new Integer(ID)); 
-                if (definitionBean != null) {
-                    return definitionBean; 
-                } 
-            }
-            // should never get here, but if we do, we should return something
-            return new StudyEventDefinitionBean();
+        ArrayList alist = this.select(sql, variables);
+        Iterator it = alist.iterator();
+
+        if (it.hasNext()) {
+            eb = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) it.next());
         }
+        return eb;
     }
 
     /*
@@ -480,5 +442,56 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
         }
         return al;
     }
+    @Override
+    public ArrayList<V> select(String query, HashMap variables) {
+        clearSignals();
 
+        ArrayList results = new ArrayList();
+        V  value;
+        K key;
+        ResultSet rs = null;
+        Connection con = null;
+        PreparedStatementFactory psf = new PreparedStatementFactory(variables);
+        PreparedStatement ps = null;
+        
+        try {
+            con = ds.getConnection();
+            if (con.isClosed()) {
+                if (logger.isWarnEnabled())
+                    logger.warn("Connection is closed: GenericDAO.select!");
+                throw new SQLException();
+            }
+
+           ps = con.prepareStatement(query);
+           
+       
+            ps = psf.generate(ps);// enter variables here!
+            key = (K) ps.toString();
+            if((results=(V) cache.get(key))==null)
+            {
+            rs = ps.executeQuery();
+            results = this.processResultRows(rs);
+            if(results!=null){
+                cache.put(key,results);
+            }
+            }
+            
+            if (logger.isInfoEnabled()) {
+                logger.info("Executing dynamic query, EntityDAO.select:query " + query);
+            }
+            signalSuccess();
+              
+
+        } catch (SQLException sqle) {
+            signalFailure(sqle);
+            if (logger.isWarnEnabled()) {
+                logger.warn("Exception while executing dynamic query, GenericDAO.select: " + query + ":message: " + sqle.getMessage());
+                sqle.printStackTrace();
+            }
+        } finally {
+            this.closeIfNecessary(con, rs, ps);
+        }
+        return results;
+
+    }
 }

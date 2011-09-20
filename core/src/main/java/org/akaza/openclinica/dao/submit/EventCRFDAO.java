@@ -11,7 +11,6 @@ package org.akaza.openclinica.dao.submit;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
@@ -20,9 +19,14 @@ import org.akaza.openclinica.dao.EventCRFSDVSort;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.core.DAODigester;
+import org.akaza.openclinica.dao.core.PreparedStatementFactory;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -44,43 +48,23 @@ import javax.sql.DataSource;
  *
  *         TODO test create and update first thing
  */
-public class EventCRFDAO extends AuditableEntityDAO {
+public class EventCRFDAO  <K extends String,V extends ArrayList> extends AuditableEntityDAO {
     // private DAODigester digester;
 
-    private static HashMap<Integer, EventCRFBean> eventCrfCache =
-        new HashMap<Integer, EventCRFBean>();
-    
     private void setQueryNames() {
         this.findByPKAndStudyName = "findByPKAndStudy";
         this.getCurrentPKName = "getCurrentPK";
-    }
-    
-    private void resetCache() {
-        synchronized(eventCrfCache) {
-            // if (eventCrfCache == null) {
-                if (eventCrfCache.size() <= 0) {
-                    eventCrfCache = new HashMap<Integer, EventCRFBean>();
-                    Collection<EventCRFBean> defs = this.findAll();
-                    for (EventCRFBean eventCrf : defs) {
-                        Integer primaryKey = new Integer(eventCrf.getId());
-                        eventCrfCache.put(primaryKey, eventCrf);
-                    }
-                }
-            // }
-        }
     }
 
     public EventCRFDAO(DataSource ds) {
         super(ds);
         setQueryNames();
-        resetCache();
     }
 
     public EventCRFDAO(DataSource ds, DAODigester digester) {
         super(ds);
         this.digester = digester;
         setQueryNames();
-        resetCache();
     }
 
     // This constructor sets up the Locale for JUnit tests; see the locale
@@ -194,7 +178,6 @@ public class EventCRFDAO extends AuditableEntityDAO {
         if (isQuerySuccessful()) {
             ecb.setActive(true);
         }
-        resetCache();
 
         return ecb;
     }
@@ -208,7 +191,6 @@ public class EventCRFDAO extends AuditableEntityDAO {
         } else {
             execute(digester.getQuery("markCompleteDDE"), variables);
         }
-        resetCache();
     }
 
     public EntityBean create(EntityBean eb) {
@@ -240,7 +222,7 @@ public class EventCRFDAO extends AuditableEntityDAO {
         if (isQuerySuccessful()) {
             ecb.setId(getLatestPK());
         }
-        resetCache();
+
         return ecb;
     }
 
@@ -289,32 +271,21 @@ public class EventCRFDAO extends AuditableEntityDAO {
     }
 
     public EntityBean findByPK(int ID) {
-        synchronized(eventCrfCache) {
-            HashMap<Integer, EventCRFBean> hm = eventCrfCache;
-            if (hm.size() <= 0) {
-                EventCRFBean eb = new EventCRFBean();
-                this.setTypesExpected();
+        EventCRFBean eb = new EventCRFBean();
+        this.setTypesExpected();
 
-                HashMap variables = new HashMap();
-                variables.put(new Integer(1), new Integer(ID));
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(ID));
 
-                String sql = digester.getQuery("findByPK");
-                ArrayList alist = this.select(sql, variables);
-                Iterator it = alist.iterator();
+        String sql = digester.getQuery("findByPK");
+        ArrayList alist = this.select(sql, variables);
+        Iterator it = alist.iterator();
 
-                if (it.hasNext()) {
-                    eb = (EventCRFBean) this.getEntityFromHashMap((HashMap) it.next());
-                }
-
-                return eb;
-            } else {
-                EventCRFBean eventCrf = hm.get(new Integer(ID));
-                if (eventCrf != null) {
-                    return eventCrf;
-                }
-            }
+        if (it.hasNext()) {
+            eb = (EventCRFBean) this.getEntityFromHashMap((HashMap) it.next());
         }
-        return new EventCRFBean();
+
+        return eb;
     }
 
     public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
@@ -460,7 +431,6 @@ public class EventCRFDAO extends AuditableEntityDAO {
         variables.put(new Integer(1), new Integer(eventCRFId));
 
         this.execute(digester.getQuery("delete"), variables);
-        resetCache();
         return;
 
     }
@@ -915,4 +885,56 @@ public class EventCRFDAO extends AuditableEntityDAO {
         }
     }
 
+    @Override
+    public ArrayList<V> select(String query, HashMap variables) {
+        clearSignals();
+
+        ArrayList results = new ArrayList();
+        V  value;
+        K key;
+        ResultSet rs = null;
+        Connection con = null;
+        PreparedStatementFactory psf = new PreparedStatementFactory(variables);
+        PreparedStatement ps = null;
+        
+        try {
+            con = ds.getConnection();
+            if (con.isClosed()) {
+                if (logger.isWarnEnabled())
+                    logger.warn("Connection is closed: GenericDAO.select!");
+                throw new SQLException();
+            }
+
+           ps = con.prepareStatement(query);
+           
+       
+            ps = psf.generate(ps);// enter variables here!
+            key = (K) ps.toString();
+            if((results=(V) cache.get(key))==null)
+            {
+            rs = ps.executeQuery();
+            results = this.processResultRows(rs);
+            if(results!=null){
+                cache.put(key,results);
+            }
+            }
+            
+            if (logger.isInfoEnabled()) {
+                logger.info("Executing dynamic query, EntityDAO.select:query " + query);
+            }
+            signalSuccess();
+              
+
+        } catch (SQLException sqle) {
+            signalFailure(sqle);
+            if (logger.isWarnEnabled()) {
+                logger.warn("Exception while executing dynamic query, GenericDAO.select: " + query + ":message: " + sqle.getMessage());
+                sqle.printStackTrace();
+            }
+        } finally {
+            this.closeIfNecessary(con, rs, ps);
+        }
+        return results;
+
+    }
 }

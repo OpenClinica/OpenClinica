@@ -28,9 +28,15 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.extract.ExtractBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.dao.cache.CacheWrapper;
+import org.akaza.openclinica.dao.cache.EhCacheWrapper;
+
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
 
 /**
  * <p/>
@@ -49,8 +55,10 @@ import org.slf4j.LoggerFactory;
  * At the time of writing, the only methods which execute queries are select and execute.
  * 
  * @author thickerson
+ * @param <V>
+ * @param <K>
  */
-public abstract class EntityDAO implements DAOInterface {
+public abstract class EntityDAO<K extends String,V extends ArrayList> implements DAOInterface {
     protected DataSource ds;
 
     protected String digesterName;
@@ -59,6 +67,11 @@ public abstract class EntityDAO implements DAOInterface {
 
     private HashMap setTypes = new HashMap();
 
+    /* Here is the cache reference */
+    protected EhCacheWrapper cache;
+  //  protected EhCacheWrapper cache = new EhCacheWrapper();
+    protected EhCacheManagerFactoryBean cacheManager;
+    
     // set the types we expect from the database
 
     // private ArrayList results = new ArrayList();
@@ -92,11 +105,26 @@ public abstract class EntityDAO implements DAOInterface {
     protected String oc_df_string = "";
     protected String local_df_string = "";
 
+    protected EhCacheWrapper ehCacheWrapper;
+    
     public EntityDAO(DataSource ds) {
         this.ds = ds;
         setDigesterName();
         digester = SQLFactory.getInstance().getDigester(digesterName);
         initializeI18nStrings();
+     setCache( SQLFactory.getInstance().getEhCacheWrapper());
+    }
+    
+    /**
+     * This is the method added to cache the queries
+     * @param cache
+     */
+    public void setCache(final EhCacheWrapper cache) {
+        this.cache = cache;
+    }
+
+    public EhCacheWrapper getCache(){
+        return cache;
     }
 
     /**
@@ -164,14 +192,16 @@ public abstract class EntityDAO implements DAOInterface {
 
     }
 
-    public ArrayList select(String query, HashMap variables) {
+    public ArrayList<V> select(String query, HashMap variables) {
         clearSignals();
 
         ArrayList results = new ArrayList();
+       
         ResultSet rs = null;
         Connection con = null;
         PreparedStatementFactory psf = new PreparedStatementFactory(variables);
         PreparedStatement ps = null;
+        
         try {
             con = ds.getConnection();
             if (con.isClosed()) {
@@ -180,14 +210,23 @@ public abstract class EntityDAO implements DAOInterface {
                 throw new SQLException();
             }
 
-            ps = con.prepareStatement(query);
+           ps = con.prepareStatement(query);
+           
+       
             ps = psf.generate(ps);// enter variables here!
+       
+            {
             rs = ps.executeQuery();
+            results = this.processResultRows(rs);
+        
+            }
+            
             if (logger.isInfoEnabled()) {
                 logger.info("Executing dynamic query, EntityDAO.select:query " + query);
             }
             signalSuccess();
-            results = this.processResultRows(rs);
+         
+              
 
         } catch (SQLException sqle) {
             signalFailure(sqle);
@@ -232,6 +271,60 @@ public abstract class EntityDAO implements DAOInterface {
             }
         } finally {
             this.closeIfNecessary(rs, ps);
+        }
+        return results;
+
+    }
+    
+    //JN: The following method is added for when certain queries needed caching...
+    
+    public ArrayList<V> selectByCache(String query, HashMap variables) {
+        clearSignals();
+
+        ArrayList results = new ArrayList();
+        V  value;
+        K key;
+        ResultSet rs = null;
+        Connection con = null;
+        PreparedStatementFactory psf = new PreparedStatementFactory(variables);
+        PreparedStatement ps = null;
+        
+        try {
+            con = ds.getConnection();
+            if (con.isClosed()) {
+                if (logger.isWarnEnabled())
+                    logger.warn("Connection is closed: GenericDAO.select!");
+                throw new SQLException();
+            }
+
+           ps = con.prepareStatement(query);
+           
+       
+            ps = psf.generate(ps);// enter variables here!
+            key = (K) ps.toString();
+            if((results=(V) cache.get(key))==null)
+            {
+            rs = ps.executeQuery();
+            results = this.processResultRows(rs);
+            if(results!=null){
+                cache.put(key,results);
+            }
+            }
+            
+            if (logger.isInfoEnabled()) {
+                logger.info("Executing dynamic query, EntityDAO.select:query " + query);
+            }
+            signalSuccess();
+              
+
+        } catch (SQLException sqle) {
+            signalFailure(sqle);
+            if (logger.isWarnEnabled()) {
+                logger.warn("Exception while executing dynamic query, GenericDAO.select: " + query + ":message: " + sqle.getMessage());
+                sqle.printStackTrace();
+            }
+        } finally {
+            this.closeIfNecessary(con, rs, ps);
         }
         return results;
 
@@ -3019,4 +3112,7 @@ public abstract class EntityDAO implements DAOInterface {
         }
         return statusConstraint;
     }
+    
+    
+    
 }

@@ -36,7 +36,7 @@ import java.util.Locale;
 
 import javax.sql.DataSource;
 
-public class StudyDAO extends AuditableEntityDAO {
+public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEntityDAO {
     // private DataSource ds;
     // private DAODigester digester;
 
@@ -404,7 +404,7 @@ public class StudyDAO extends AuditableEntityDAO {
         this.setTypesExpected();
         HashMap variables = new HashMap();
         variables.put(new Integer(1), oid);
-        ArrayList alist = this.select(digester.getQuery("findByOid"), variables);
+        ArrayList alist = this.selectByCache(digester.getQuery("findByOid"), variables);
         Iterator it = alist.iterator();
 
         if (it.hasNext()) {
@@ -801,7 +801,7 @@ public class StudyDAO extends AuditableEntityDAO {
         variables.put(new Integer(1), new Integer(ID));
 
         String sql = digester.getQuery("findByPK");
-        ArrayList alist = this.select(sql, variables);
+        ArrayList alist = this.selectByCache(sql, variables);
         Iterator it = alist.iterator();
 
         if (it.hasNext()) {
@@ -822,7 +822,7 @@ public class StudyDAO extends AuditableEntityDAO {
         variables.put(new Integer(1), name);
 
         String sql = digester.getQuery("findByName");
-        ArrayList alist = this.select(sql, variables);
+        ArrayList alist = this.selectByCache(sql, variables);
         Iterator it = alist.iterator();
 
         if (it.hasNext()) {

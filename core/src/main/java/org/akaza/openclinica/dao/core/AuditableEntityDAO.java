@@ -30,7 +30,7 @@ import javax.sql.DataSource;
  *
  *
  */
-public abstract class AuditableEntityDAO extends EntityDAO {
+public abstract class AuditableEntityDAO<K extends String,V extends ArrayList> extends EntityDAO {
     /**
      * Should the name of a query which refers to a SQL command of the following
      * form:
@@ -189,7 +189,7 @@ public abstract class AuditableEntityDAO extends EntityDAO {
 
         String sql = digester.getQuery(findByPKAndStudyName);
 
-        ArrayList rows = this.select(sql, variables);
+        ArrayList rows = this.selectByCache(sql, variables);
         Iterator it = rows.iterator();
 
         if (it.hasNext()) {

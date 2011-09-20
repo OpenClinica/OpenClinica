@@ -13,9 +13,14 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.DAODigester;
+import org.akaza.openclinica.dao.core.PreparedStatementFactory;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -34,7 +39,7 @@ import javax.sql.DataSource;
  * 
  * 
  */
-public class CRFVersionDAO extends AuditableEntityDAO {
+public class CRFVersionDAO<K extends String,V extends ArrayList> extends AuditableEntityDAO {
 
     @Override
     protected void setDigesterName() {
@@ -452,5 +457,57 @@ public class CRFVersionDAO extends AuditableEntityDAO {
         } else {
             return null;
         }
+    }
+    @Override
+    public ArrayList<V> select(String query, HashMap variables) {
+        clearSignals();
+
+        ArrayList results = new ArrayList();
+        V  value;
+        K key;
+        ResultSet rs = null;
+        Connection con = null;
+        PreparedStatementFactory psf = new PreparedStatementFactory(variables);
+        PreparedStatement ps = null;
+        
+        try {
+            con = ds.getConnection();
+            if (con.isClosed()) {
+                if (logger.isWarnEnabled())
+                    logger.warn("Connection is closed: GenericDAO.select!");
+                throw new SQLException();
+            }
+
+           ps = con.prepareStatement(query);
+           
+       
+            ps = psf.generate(ps);// enter variables here!
+            key = (K) ps.toString();
+            if((results=(V) cache.get(key))==null)
+            {
+            rs = ps.executeQuery();
+            results = this.processResultRows(rs);
+            if(results!=null){
+                cache.put(key,results);
+            }
+            }
+            
+            if (logger.isInfoEnabled()) {
+                logger.info("Executing dynamic query, EntityDAO.select:query " + query);
+            }
+            signalSuccess();
+              
+
+        } catch (SQLException sqle) {
+            signalFailure(sqle);
+            if (logger.isWarnEnabled()) {
+                logger.warn("Exception while executing dynamic query, GenericDAO.select: " + query + ":message: " + sqle.getMessage());
+                sqle.printStackTrace();
+            }
+        } finally {
+            this.closeIfNecessary(con, rs, ps);
+        }
+        return results;
+
     }
 }

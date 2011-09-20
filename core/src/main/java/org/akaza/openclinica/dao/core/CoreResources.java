@@ -103,11 +103,13 @@ public class CoreResources implements ResourceLoaderAware {
             DB_NAME = dbName;
             SQLFactory factory = SQLFactory.getInstance();
             factory.run(dbName, resourceLoader);
+            factory.getEhCacheWrapper();
             copyBaseToDest(resourceLoader);
             // @pgawade 18-April-2011 Fix for issue 8394
             copyODMMappingXMLtoResources(resourceLoader);
 
             extractProperties = findExtractProperties();
+            
             // tbh, following line to be removed
             // reportUrl();
 

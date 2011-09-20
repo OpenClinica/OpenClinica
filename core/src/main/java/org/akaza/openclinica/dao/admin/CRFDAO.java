@@ -29,7 +29,7 @@ import javax.sql.DataSource;
  * @author thickerson
  * 
  */
-public class CRFDAO extends AuditableEntityDAO {
+public class CRFDAO<K extends String,V extends ArrayList> extends AuditableEntityDAO {
     // private DataSource ds;
     // private DAODigester digester;
 
@@ -351,7 +351,7 @@ public class CRFDAO extends AuditableEntityDAO {
         variables.put(new Integer(1), oid);
         String sql = digester.getQuery("findByOID");
 
-        ArrayList rows = this.select(sql, variables);
+        ArrayList rows = this.selectByCache(sql, variables);
         Iterator it = rows.iterator();
 
         if (it.hasNext()) {

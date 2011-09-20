@@ -1,13 +1,17 @@
 package org.akaza.openclinica.dao.submit;
 
 import org.akaza.openclinica.bean.core.EntityBean;
-import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.dao.core.EntityDAO;
+import org.akaza.openclinica.dao.core.PreparedStatementFactory;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.exception.OpenClinicaException;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -19,35 +23,11 @@ import javax.sql.DataSource;
 /**
  * Created by IntelliJ IDEA. User: bruceperry Date: May 10, 2007
  */
-public class ItemGroupMetadataDAO extends EntityDAO {
-    
-    private static HashMap<Integer, ItemGroupMetadataBean> groupMetadataCache =
-        new HashMap<Integer, ItemGroupMetadataBean>();
-    
-    private void resetCache() {
-        synchronized(groupMetadataCache) {
-            // if (groupMetadataCache == null) {
-                if (groupMetadataCache.size() <= 0) {
-                    groupMetadataCache = new HashMap<Integer, ItemGroupMetadataBean>();
-                    try {
-                        Collection<ItemGroupMetadataBean> mets = this.findAll();
-                        for (ItemGroupMetadataBean metadata : mets) {
-                            Integer primaryKey = new Integer(metadata.getId());
-                            groupMetadataCache.put(primaryKey, metadata);
-                        }
-                    } catch (OpenClinicaException oce) {
-                        oce.printStackTrace();
-                    }
-                }
-            // }
-        }
-    }
-    
+public class ItemGroupMetadataDAO<K extends String,V extends ArrayList> extends EntityDAO {
     public ItemGroupMetadataDAO(DataSource ds) {
         super(ds);
         // this.getCurrentPKName="findCurrentPKValue";
         this.getNextPKName = "getNextPK";
-        resetCache();
     }
 
     @Override
@@ -117,9 +97,6 @@ public class ItemGroupMetadataDAO extends EntityDAO {
     }
 
     public EntityBean findByPK(int id) throws OpenClinicaException {
-        synchronized(groupMetadataCache) {
-            HashMap<Integer, ItemGroupMetadataBean> hm = groupMetadataCache;
-            if (hm.size() <= 0) {
         ItemGroupMetadataBean eb = new ItemGroupMetadataBean();
         this.setTypesExpected();
         HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
@@ -132,14 +109,7 @@ public class ItemGroupMetadataDAO extends EntityDAO {
             eb = (ItemGroupMetadataBean) this.getEntityFromHashMap((HashMap) it.next());
         }
         return eb;
-            } else {
-                ItemGroupMetadataBean metadata = hm.get(new Integer(id));
-                if (metadata != null) {
-                    return metadata;
-                }
-            }
-        }
-        return new ItemGroupMetadataBean(); // To change body of implemented
+        //return new ItemGroupMetadataBean(); // To change body of implemented
         // methods use File | Settings |
         // File Templates.;
     }
@@ -188,7 +158,6 @@ public class ItemGroupMetadataDAO extends EntityDAO {
         if (isQuerySuccessful()) {
             eb.setId(id);
         }
-        resetCache();
         return eb;
 
     }
@@ -268,6 +237,58 @@ public class ItemGroupMetadataDAO extends EntityDAO {
         }
 
         return false;
+    }
+    @Override
+    public ArrayList<V> select(String query, HashMap variables) {
+        clearSignals();
+
+        ArrayList results = new ArrayList();
+        V  value;
+        K key;
+        ResultSet rs = null;
+        Connection con = null;
+        PreparedStatementFactory psf = new PreparedStatementFactory(variables);
+        PreparedStatement ps = null;
+        
+        try {
+            con = ds.getConnection();
+            if (con.isClosed()) {
+                if (logger.isWarnEnabled())
+                    logger.warn("Connection is closed: GenericDAO.select!");
+                throw new SQLException();
+            }
+
+           ps = con.prepareStatement(query);
+           
+       
+            ps = psf.generate(ps);// enter variables here!
+            key = (K) ps.toString();
+            if((results=(V) cache.get(key))==null)
+            {
+            rs = ps.executeQuery();
+            results = this.processResultRows(rs);
+            if(results!=null){
+                cache.put(key,results);
+            }
+            }
+            
+            if (logger.isInfoEnabled()) {
+                logger.info("Executing dynamic query, EntityDAO.select:query " + query);
+            }
+            signalSuccess();
+              
+
+        } catch (SQLException sqle) {
+            signalFailure(sqle);
+            if (logger.isWarnEnabled()) {
+                logger.warn("Exception while executing dynamic query, GenericDAO.select: " + query + ":message: " + sqle.getMessage());
+                sqle.printStackTrace();
+            }
+        } finally {
+            this.closeIfNecessary(con, rs, ps);
+        }
+        return results;
+
     }
 
 }

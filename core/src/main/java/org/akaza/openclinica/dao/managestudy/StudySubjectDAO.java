@@ -7,6 +7,10 @@
  */
 package org.akaza.openclinica.dao.managestudy;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,28 +24,24 @@ import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
 import org.akaza.openclinica.dao.StudySubjectSDVFilter;
 import org.akaza.openclinica.dao.StudySubjectSDVSort;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.core.DAODigester;
+import org.akaza.openclinica.dao.core.PreparedStatementFactory;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
-import org.akaza.openclinica.exception.OpenClinicaException;
 
 /**
  * @author jxu
  * 
  */
-public class StudySubjectDAO extends AuditableEntityDAO {
+public class StudySubjectDAO<K extends String,V extends ArrayList> extends AuditableEntityDAO {
 
     // private DAODigester digester;
-    
-    private HashMap<Integer, StudySubjectBean> studySubjectCache =
-        new HashMap<Integer, StudySubjectBean>();
 
     public void setQueryNames() {
         findAllByStudyName = "findAllByStudy";
@@ -49,35 +49,17 @@ public class StudySubjectDAO extends AuditableEntityDAO {
         getCurrentPKName = "getCurrentPK";
 
     }
-    
-    private void resetCache() {
-        synchronized(studySubjectCache) {
-            // if (studySubjectCache == null) {
-                if (studySubjectCache.size() <= 0) {
-                    studySubjectCache = new HashMap<Integer, StudySubjectBean>();
-
-                    Collection<StudySubjectBean> subjects = this.findAll();
-                    for (StudySubjectBean subject : subjects) {
-                        Integer primaryKey = new Integer(subject.getId());
-                        studySubjectCache.put(primaryKey, subject);
-                    }
-                }
-            // }
-        }
-    }
 
     public StudySubjectDAO(DataSource ds) {
         super(ds);
         // digester = SQLFactory.getInstance().getDigester(digesterName);
         setQueryNames();
-        resetCache();
     }
 
     public StudySubjectDAO(DataSource ds, DAODigester digester) {
         super(ds);
         this.digester = digester;
         setQueryNames();
-        resetCache();
     }
 
     @Override
@@ -441,32 +423,21 @@ public class StudySubjectDAO extends AuditableEntityDAO {
     }
 
     public EntityBean findByPK(int ID) {
-        synchronized(studySubjectCache) {
-            HashMap<Integer, StudySubjectBean> hm = studySubjectCache;
-            if (hm.size() <= 0) {
-                StudySubjectBean eb = new StudySubjectBean();
-                this.setTypesExpected();
+        StudySubjectBean eb = new StudySubjectBean();
+        this.setTypesExpected();
 
-                HashMap variables = new HashMap();
-                variables.put(new Integer(1), new Integer(ID));
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(ID));
 
-                String sql = digester.getQuery("findByPK");
-                ArrayList alist = this.select(sql, variables);
-                Iterator it = alist.iterator();
+        String sql = digester.getQuery("findByPK");
+        ArrayList alist = this.select(sql, variables);
+        Iterator it = alist.iterator();
 
-                if (it.hasNext()) {
-                    eb = (StudySubjectBean) this.getEntityFromHashMap((HashMap) it.next());
-                }
-
-                return eb;
-            } else {
-                StudySubjectBean studySubject = hm.get(new Integer(ID));
-                if (studySubject != null) {
-                    return studySubject;
-                }
-            }
+        if (it.hasNext()) {
+            eb = (StudySubjectBean) this.getEntityFromHashMap((HashMap) it.next());
         }
-        return new StudySubjectBean();
+
+        return eb;
     }
 
     public StudySubjectBean findByLabelAndStudy(String label, StudyBean study) {
@@ -635,7 +606,7 @@ public class StudySubjectDAO extends AuditableEntityDAO {
                 sgmb.setId(sgmdao.getCurrentPK());
             }
         }
-        resetCache();
+
         return sb;
     }
 
@@ -1094,7 +1065,7 @@ public class StudySubjectDAO extends AuditableEntityDAO {
 
         String sql = digester.getQuery("update");
         this.execute(sql, variables, nullVars);
-        resetCache();
+
         return sb;
     }
 
@@ -1226,5 +1197,57 @@ public class StudySubjectDAO extends AuditableEntityDAO {
         }
         studySubjectIds = studySubjectIds.endsWith(",")?studySubjectIds.substring(0, studySubjectIds.length()-1):studySubjectIds;
         return studySubjectIds;
+    }
+    @Override
+    public ArrayList<V> select(String query, HashMap variables) {
+        clearSignals();
+
+        ArrayList results = new ArrayList();
+        V  value;
+        K key;
+        ResultSet rs = null;
+        Connection con = null;
+        PreparedStatementFactory psf = new PreparedStatementFactory(variables);
+        PreparedStatement ps = null;
+        
+        try {
+            con = ds.getConnection();
+            if (con.isClosed()) {
+                if (logger.isWarnEnabled())
+                    logger.warn("Connection is closed: GenericDAO.select!");
+                throw new SQLException();
+            }
+
+           ps = con.prepareStatement(query);
+           
+       
+            ps = psf.generate(ps);// enter variables here!
+            key = (K) ps.toString();
+            if((results=(V) cache.get(key))==null)
+            {
+            rs = ps.executeQuery();
+            results = this.processResultRows(rs);
+            if(results!=null){
+                cache.put(key,results);
+            }
+            }
+            
+            if (logger.isInfoEnabled()) {
+                logger.info("Executing dynamic query, EntityDAO.select:query " + query);
+            }
+            signalSuccess();
+              
+
+        } catch (SQLException sqle) {
+            signalFailure(sqle);
+            if (logger.isWarnEnabled()) {
+                logger.warn("Exception while executing dynamic query, GenericDAO.select: " + query + ":message: " + sqle.getMessage());
+                sqle.printStackTrace();
+            }
+        } finally {
+            this.closeIfNecessary(con, rs, ps);
+        }
+        return results;
+
     }
 }
