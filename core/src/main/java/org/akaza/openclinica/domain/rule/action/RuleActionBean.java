@@ -7,15 +7,6 @@
  */
 package org.akaza.openclinica.domain.rule.action;
 
-import org.akaza.openclinica.domain.AbstractAuditableMutableDomainObject;
-import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Parameter;
-import org.hibernate.annotations.Type;
-
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -29,6 +20,17 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+
+import org.akaza.openclinica.domain.AbstractAuditableMutableDomainObject;
+import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
+import org.hibernate.annotations.Type;
+
 /**
  * @author Krikor Krumlian
  */
@@ -37,6 +39,8 @@ import javax.persistence.Transient;
 @DiscriminatorColumn(name = "action_type", discriminatorType = DiscriminatorType.INTEGER)
 @Table(name = "rule_action")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "rule_action_id_seq") })
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+
 public class RuleActionBean extends AbstractAuditableMutableDomainObject implements Comparable<ActionType> {
 
     private RuleSetRuleBean ruleSetRule;

@@ -200,7 +200,9 @@ public class StudyModuleController {
             map.addAttribute("ruleDesignerURL", coreResources.getField("designer.url"));
             map.addAttribute("contextPath", getContextPath(request));
             logMe("before checking getHostPath url = "+request.getRequestURL());
-            map.addAttribute("hostPath", getHostPath(request));
+            //JN: for the eclinicalhosting the https is not showing up in the request path, going for a fix of taking the hostpath from sysurl
+            //map.addAttribute("hostPath", getHostPath(request));
+            map.addAttribute("hostPath", getHostPathFromSysUrl(coreResources.getField("sysURL.base"),request.getContextPath()));
             map.addAttribute("path", "pages/studymodule");
         }
        // UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
@@ -217,10 +219,14 @@ public class StudyModuleController {
         ArrayList pageMessages = new ArrayList();
         if (request.getSession().getAttribute("pageMessages") != null) {
             pageMessages.addAll((ArrayList) request.getSession().getAttribute("pageMessages"));
-            request.setAttribute("pageMessages", pageMessages);
+            request.setAttribute("pageMessages", pageMessages); 
             request.getSession().removeAttribute("pageMessages");
         }
         return map;
+    }
+
+    private String getHostPathFromSysUrl(String sysURL,String contextPath) {
+     return sysURL.replaceAll(contextPath+"/", "");
     }
 
     @RequestMapping(method = RequestMethod.POST)

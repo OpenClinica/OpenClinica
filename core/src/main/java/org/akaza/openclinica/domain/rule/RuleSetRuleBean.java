@@ -17,6 +17,8 @@ import org.akaza.openclinica.domain.rule.action.ShowActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
 import org.apache.commons.collections.FactoryUtils;
 import org.apache.commons.collections.list.LazyList;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
@@ -35,6 +37,7 @@ import javax.persistence.Transient;
 @Entity
 @Table(name = "rule_set_rule")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "rule_set_rule_id_seq") })
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class RuleSetRuleBean extends AbstractAuditableMutableDomainObject {
 
     RuleSetBean ruleSetBean;

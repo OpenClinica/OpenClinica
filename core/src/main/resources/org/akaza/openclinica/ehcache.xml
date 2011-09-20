@@ -1,0 +1,43 @@
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd" maxBytesLocalHeap="1M" maxBytesLocalOffHeap="16M">
+<defaultCache maxElementsInMemory="10000" eternal="false" overflowToDisk="true" timeToIdleSeconds="10" timeToLiveSeconds="20" diskPersistent="true" />
+<cache name="com.akaza.openclinica.dao.core.DAOCache" eternal="false"
+    maxElementsInMemory="10000" overflowToDisk="true" diskPersistent="false"
+    timeToIdleSeconds="0" timeToLiveSeconds="300"
+    memoryStoreEvictionPolicy="LRU" />
+<cache
+name="org.hibernate.cache.StandardQueryCache"
+maxElementsInMemory="5"
+eternal="false"
+timeToLiveSeconds="120"
+overflowToDisk="true"/>
+ <!-- Page and Page Fragment Caches -->
+<cache name="CachePage1CachingFilter"
+  maxElementsInMemory="10"
+  eternal="false"
+  timeToIdleSeconds="10000"
+  timeToLiveSeconds="10000"
+  overflowToDisk="true">
+</cache>
+<cache name="CachedPage2Cache"
+  maxElementsInMemory="10"
+  eternal="false"
+  timeToLiveSeconds="3600"
+  overflowToDisk="true">
+</cache>
+<cache name="SimplePageFragmentCachingFilter"
+  maxElementsInMemory="10"
+  eternal="false"
+  timeToIdleSeconds="10000"
+  timeToLiveSeconds="10000"
+  overflowToDisk="true">
+</cache>
+<cache name="SimpleCachingHeadersTimeoutPageCachingFilter"
+  maxElementsInMemory="10"
+  eternal="false"
+  timeToIdleSeconds="10000"
+  timeToLiveSeconds="10000"
+  overflowToDisk="true">
+</cache>
+
+</ehcache>
+
