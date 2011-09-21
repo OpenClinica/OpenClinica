@@ -128,7 +128,7 @@ public class RuleExecutionBusinessObject {
     }
 
     private RuleSetBean getRuleSetBean(EventCRFBean eventCrfBean) {
-        RuleSetDAO ruleSetDao = new RuleSetDAO(sm.getDataSource());
+        // RuleSetDAO ruleSetDao = new RuleSetDAO(sm.getDataSource());
         return null;
     }
 

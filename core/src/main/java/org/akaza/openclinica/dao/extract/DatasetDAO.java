@@ -225,27 +225,27 @@ public class DatasetDAO extends AuditableEntityDAO {
         DatasetBean db = (DatasetBean) eb;
         HashMap variables = new HashMap();
         HashMap nullVars = new HashMap();
-        variables.put(new Integer(1), new Integer(db.getStudyId()));
-        variables.put(new Integer(2), new Integer(db.getStatus().getId()));
-        variables.put(new Integer(3), db.getName());
-        variables.put(new Integer(4), db.getDescription());
-        variables.put(new Integer(5), db.getSQLStatement());
-        variables.put(new Integer(6), db.getDateLastRun());
-        variables.put(new Integer(7), new Integer(db.getNumRuns()));
+        variables.put(Integer.valueOf(1), Integer.valueOf(db.getStudyId()));
+        variables.put(Integer.valueOf(2), Integer.valueOf(db.getStatus().getId()));
+        variables.put(Integer.valueOf(3), db.getName());
+        variables.put(Integer.valueOf(4), db.getDescription());
+        variables.put(Integer.valueOf(5), db.getSQLStatement());
+        variables.put(Integer.valueOf(6), db.getDateLastRun());
+        variables.put(Integer.valueOf(7), Integer.valueOf(db.getNumRuns()));
 
-        variables.put(new Integer(8), new Integer(db.getUpdaterId()));
+        variables.put(Integer.valueOf(8), Integer.valueOf(db.getUpdaterId()));
         if (db.getApproverId() <= 0) {
-            // nullVars.put(new Integer(9), null);
+            // nullVars.put(Integer.valueOf(9), null);
             // ABOVE IS WRONG; follow the example below:
-            nullVars.put(new Integer(9), new Integer(Types.NUMERIC));
-            variables.put(new Integer(9), null);
+            nullVars.put(Integer.valueOf(9), Integer.valueOf(Types.NUMERIC));
+            variables.put(Integer.valueOf(9), null);
         } else {
-            variables.put(new Integer(9), new Integer(db.getApproverId()));
+            variables.put(Integer.valueOf(9), Integer.valueOf(db.getApproverId()));
         }
 
-        variables.put(new Integer(10), db.getDateStart());
-        variables.put(new Integer(11), db.getDateEnd());
-        variables.put(new Integer(12), new Integer(db.getId()));
+        variables.put(Integer.valueOf(10), db.getDateStart());
+        variables.put(Integer.valueOf(11), db.getDateEnd());
+        variables.put(Integer.valueOf(12), Integer.valueOf(db.getId()));
         this.execute(digester.getQuery("update"), variables, nullVars);
         return eb;
     }
@@ -275,38 +275,38 @@ public class DatasetDAO extends AuditableEntityDAO {
         DatasetBean db = (DatasetBean) eb;
         HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
         HashMap nullVars = new HashMap();
-        variables.put(new Integer(1), new Integer(db.getStudyId()));
-        variables.put(new Integer(2), new Integer(db.getStatus().getId()));
-        variables.put(new Integer(3), db.getName());
-        variables.put(new Integer(4), db.getDescription());
-        variables.put(new Integer(5), db.getSQLStatement());
-        variables.put(new Integer(6), new Integer(db.getOwnerId()));
-        variables.put(new Integer(7), new Integer(db.getNumRuns()));
-        variables.put(new Integer(8), new Boolean(db.isShowEventLocation()));
-        variables.put(new Integer(9), new Boolean(db.isShowEventStart()));
-        variables.put(new Integer(10), new Boolean(db.isShowEventEnd()));
-        variables.put(new Integer(11), new Boolean(db.isShowSubjectDob()));
-        variables.put(new Integer(12), new Boolean(db.isShowSubjectGender()));
-        variables.put(new Integer(13), new Boolean(db.isShowEventStatus()));
-        variables.put(new Integer(14), new Boolean(db.isShowSubjectStatus()));
-        variables.put(new Integer(15), new Boolean(db.isShowSubjectUniqueIdentifier()));
-        variables.put(new Integer(16), new Boolean(db.isShowSubjectAgeAtEvent()));
-        variables.put(new Integer(17), new Boolean(db.isShowCRFstatus()));
-        variables.put(new Integer(18), new Boolean(db.isShowCRFversion()));
-        variables.put(new Integer(19), new Boolean(db.isShowCRFinterviewerName()));
-        variables.put(new Integer(20), new Boolean(db.isShowCRFinterviewerDate()));
-        variables.put(new Integer(21), new Boolean(db.isShowSubjectGroupInformation()));
-        // variables.put(new Integer(22), new
+        variables.put(Integer.valueOf(1), Integer.valueOf(db.getStudyId()));
+        variables.put(Integer.valueOf(2), Integer.valueOf(db.getStatus().getId()));
+        variables.put(Integer.valueOf(3), db.getName());
+        variables.put(Integer.valueOf(4), db.getDescription());
+        variables.put(Integer.valueOf(5), db.getSQLStatement());
+        variables.put(Integer.valueOf(6), Integer.valueOf(db.getOwnerId()));
+        variables.put(Integer.valueOf(7), Integer.valueOf(db.getNumRuns()));
+        variables.put(Integer.valueOf(8), new Boolean(db.isShowEventLocation()));
+        variables.put(Integer.valueOf(9), new Boolean(db.isShowEventStart()));
+        variables.put(Integer.valueOf(10), new Boolean(db.isShowEventEnd()));
+        variables.put(Integer.valueOf(11), new Boolean(db.isShowSubjectDob()));
+        variables.put(Integer.valueOf(12), new Boolean(db.isShowSubjectGender()));
+        variables.put(Integer.valueOf(13), new Boolean(db.isShowEventStatus()));
+        variables.put(Integer.valueOf(14), new Boolean(db.isShowSubjectStatus()));
+        variables.put(Integer.valueOf(15), new Boolean(db.isShowSubjectUniqueIdentifier()));
+        variables.put(Integer.valueOf(16), new Boolean(db.isShowSubjectAgeAtEvent()));
+        variables.put(Integer.valueOf(17), new Boolean(db.isShowCRFstatus()));
+        variables.put(Integer.valueOf(18), new Boolean(db.isShowCRFversion()));
+        variables.put(Integer.valueOf(19), new Boolean(db.isShowCRFinterviewerName()));
+        variables.put(Integer.valueOf(20), new Boolean(db.isShowCRFinterviewerDate()));
+        variables.put(Integer.valueOf(21), new Boolean(db.isShowSubjectGroupInformation()));
+        // variables.put(Integer.valueOf(22), new
         // Boolean(db.isShowDiscrepancyInformation()));
-        variables.put(new Integer(22), new Boolean(false));
+        variables.put(Integer.valueOf(22), new Boolean(false));
         // currently not changing structure to allow for disc notes to be added
         // in the future
-        variables.put(new Integer(23), db.getODMMetaDataVersionName());
-        variables.put(new Integer(24), db.getODMMetaDataVersionOid());
-        variables.put(new Integer(25), db.getODMPriorStudyOid());
-        variables.put(new Integer(26), db.getODMPriorMetaDataVersionOid());
-        variables.put(new Integer(27), db.isShowSubjectSecondaryId());
-        variables.put(new Integer(28), db.getDatasetItemStatus().getId());
+        variables.put(Integer.valueOf(23), db.getODMMetaDataVersionName());
+        variables.put(Integer.valueOf(24), db.getODMMetaDataVersionOid());
+        variables.put(Integer.valueOf(25), db.getODMPriorStudyOid());
+        variables.put(Integer.valueOf(26), db.getODMPriorMetaDataVersionOid());
+        variables.put(Integer.valueOf(27), db.isShowSubjectSecondaryId());
+        variables.put(Integer.valueOf(28), db.getDatasetItemStatus().getId());
 
         this.executeWithPK(digester.getQuery("create"), variables, nullVars);
 
@@ -382,7 +382,7 @@ public class DatasetDAO extends AuditableEntityDAO {
         this.setTypeExpected(1, TypeNames.INT);// dataset id
         this.setTypeExpected(2, TypeNames.INT);// subject group id
         HashMap<Integer, Integer> variablesNew = new HashMap<Integer, Integer>();
-        variablesNew.put(new Integer(1), new Integer(datasetId));
+        variablesNew.put(Integer.valueOf(1), Integer.valueOf(datasetId));
         ArrayList alist = this.select(digester.getQuery("findAllGroups"), variablesNew);
         // convert them to ids for the array list, tbh
         // the above is an array list of hashmaps, each hash map being a row in
@@ -423,8 +423,8 @@ public class DatasetDAO extends AuditableEntityDAO {
         int studyId = currentStudy.getId();
         this.setTypesExpected();
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(studyId));
-        variables.put(new Integer(2), new Integer(studyId));
+        variables.put(Integer.valueOf(1), Integer.valueOf(studyId));
+        variables.put(Integer.valueOf(2), Integer.valueOf(studyId));
         ArrayList alist = this.select(digester.getQuery("findTopFive"), variables);
         ArrayList al = new ArrayList();
         Iterator it = alist.iterator();
@@ -447,9 +447,9 @@ public class DatasetDAO extends AuditableEntityDAO {
         this.setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(studyId));
-        variables.put(new Integer(2), new Integer(studyId));
-        variables.put(new Integer(3), new Integer(ownerId));
+        variables.put(Integer.valueOf(1), Integer.valueOf(studyId));
+        variables.put(Integer.valueOf(2), Integer.valueOf(studyId));
+        variables.put(Integer.valueOf(3), Integer.valueOf(ownerId));
 
         ArrayList alist = this.select(digester.getQuery("findByOwnerId"), variables);
         ArrayList al = new ArrayList();
@@ -472,7 +472,7 @@ public class DatasetDAO extends AuditableEntityDAO {
         this.setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(ID));
+        variables.put(Integer.valueOf(1), Integer.valueOf(ID));
 
         String sql = digester.getQuery("findByPK");
         ArrayList alist = this.select(sql, variables);
@@ -496,8 +496,8 @@ public class DatasetDAO extends AuditableEntityDAO {
         this.setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), name);
-        variables.put(new Integer(2), new Integer(study.getId()));
+        variables.put(Integer.valueOf(1), name);
+        variables.put(Integer.valueOf(2), Integer.valueOf(study.getId()));
         String sql = digester.getQuery("findByNameAndStudy");
         ArrayList alist = this.select(sql, variables);
         Iterator it = alist.iterator();
@@ -641,16 +641,16 @@ public class DatasetDAO extends AuditableEntityDAO {
 
     public ArrayList findAllByStudyId(int studyId) {
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(studyId));
-        variables.put(new Integer(2), new Integer(studyId));
+        variables.put(Integer.valueOf(1), Integer.valueOf(studyId));
+        variables.put(Integer.valueOf(2), Integer.valueOf(studyId));
 
         return executeFindAllQuery("findAllByStudyId", variables);
     }
 
     public ArrayList findAllByStudyIdAdmin(int studyId) {
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(studyId));
-        variables.put(new Integer(2), new Integer(studyId));
+        variables.put(Integer.valueOf(1), Integer.valueOf(studyId));
+        variables.put(Integer.valueOf(2), Integer.valueOf(studyId));
 
         return executeFindAllQuery("findAllByStudyIdAdmin", variables);
     }
@@ -724,48 +724,48 @@ public class DatasetDAO extends AuditableEntityDAO {
         DatasetBean db = (DatasetBean) eb;
         HashMap variables = new HashMap();
         HashMap nullVars = new HashMap();
-        variables.put(new Integer(1), new Integer(db.getStudyId()));
-        variables.put(new Integer(2), new Integer(db.getStatus().getId()));
-        variables.put(new Integer(3), db.getName());
-        variables.put(new Integer(4), db.getDescription());
-        variables.put(new Integer(5), db.getSQLStatement());
-        variables.put(new Integer(6), db.getDateLastRun());
-        variables.put(new Integer(7), new Integer(db.getNumRuns()));
+        variables.put(Integer.valueOf(1), Integer.valueOf(db.getStudyId()));
+        variables.put(Integer.valueOf(2), Integer.valueOf(db.getStatus().getId()));
+        variables.put(Integer.valueOf(3), db.getName());
+        variables.put(Integer.valueOf(4), db.getDescription());
+        variables.put(Integer.valueOf(5), db.getSQLStatement());
+        variables.put(Integer.valueOf(6), db.getDateLastRun());
+        variables.put(Integer.valueOf(7), Integer.valueOf(db.getNumRuns()));
 
-        variables.put(new Integer(8), new Integer(db.getUpdaterId()));
+        variables.put(Integer.valueOf(8), Integer.valueOf(db.getUpdaterId()));
         if (db.getApproverId() <= 0) {
-            // nullVars.put(new Integer(9), null);
+            // nullVars.put(Integer.valueOf(9), null);
             // ABOVE IS WRONG; follow the example below:
-            nullVars.put(new Integer(9), new Integer(Types.NUMERIC));
-            variables.put(new Integer(9), null);
+            nullVars.put(Integer.valueOf(9), Integer.valueOf(Types.NUMERIC));
+            variables.put(Integer.valueOf(9), null);
         } else {
-            variables.put(new Integer(9), new Integer(db.getApproverId()));
+            variables.put(Integer.valueOf(9), Integer.valueOf(db.getApproverId()));
         }
 
-        variables.put(new Integer(10), db.getDateStart());
-        variables.put(new Integer(11), db.getDateEnd());
-        variables.put(new Integer(12), new Boolean(db.isShowEventLocation()));
-        variables.put(new Integer(13), new Boolean(db.isShowEventStart()));
-        variables.put(new Integer(14), new Boolean(db.isShowEventEnd()));
-        variables.put(new Integer(15), new Boolean(db.isShowSubjectDob()));
-        variables.put(new Integer(16), new Boolean(db.isShowSubjectGender()));
-        variables.put(new Integer(17), new Boolean(db.isShowEventStatus()));
-        variables.put(new Integer(18), new Boolean(db.isShowSubjectStatus()));
-        variables.put(new Integer(19), new Boolean(db.isShowSubjectUniqueIdentifier()));
-        variables.put(new Integer(20), new Boolean(db.isShowSubjectAgeAtEvent()));
-        variables.put(new Integer(21), new Boolean(db.isShowCRFstatus()));
-        variables.put(new Integer(22), new Boolean(db.isShowCRFversion()));
-        variables.put(new Integer(23), new Boolean(db.isShowCRFinterviewerName()));
-        variables.put(new Integer(24), new Boolean(db.isShowCRFinterviewerDate()));
-        variables.put(new Integer(25), new Boolean(db.isShowSubjectGroupInformation()));
-        variables.put(new Integer(26), new Boolean(false));
-        variables.put(new Integer(27), db.getODMMetaDataVersionName());
-        variables.put(new Integer(28), db.getODMMetaDataVersionOid());
-        variables.put(new Integer(29), db.getODMPriorStudyOid());
-        variables.put(new Integer(30), db.getODMPriorMetaDataVersionOid());
-        variables.put(new Integer(31), new Boolean(db.isShowSubjectSecondaryId()));
-        variables.put(new Integer(32), new Integer(db.getDatasetItemStatus().getId()));
-        variables.put(new Integer(33), new Integer(db.getId()));
+        variables.put(Integer.valueOf(10), db.getDateStart());
+        variables.put(Integer.valueOf(11), db.getDateEnd());
+        variables.put(Integer.valueOf(12), new Boolean(db.isShowEventLocation()));
+        variables.put(Integer.valueOf(13), new Boolean(db.isShowEventStart()));
+        variables.put(Integer.valueOf(14), new Boolean(db.isShowEventEnd()));
+        variables.put(Integer.valueOf(15), new Boolean(db.isShowSubjectDob()));
+        variables.put(Integer.valueOf(16), new Boolean(db.isShowSubjectGender()));
+        variables.put(Integer.valueOf(17), new Boolean(db.isShowEventStatus()));
+        variables.put(Integer.valueOf(18), new Boolean(db.isShowSubjectStatus()));
+        variables.put(Integer.valueOf(19), new Boolean(db.isShowSubjectUniqueIdentifier()));
+        variables.put(Integer.valueOf(20), new Boolean(db.isShowSubjectAgeAtEvent()));
+        variables.put(Integer.valueOf(21), new Boolean(db.isShowCRFstatus()));
+        variables.put(Integer.valueOf(22), new Boolean(db.isShowCRFversion()));
+        variables.put(Integer.valueOf(23), new Boolean(db.isShowCRFinterviewerName()));
+        variables.put(Integer.valueOf(24), new Boolean(db.isShowCRFinterviewerDate()));
+        variables.put(Integer.valueOf(25), new Boolean(db.isShowSubjectGroupInformation()));
+        variables.put(Integer.valueOf(26), new Boolean(false));
+        variables.put(Integer.valueOf(27), db.getODMMetaDataVersionName());
+        variables.put(Integer.valueOf(28), db.getODMMetaDataVersionOid());
+        variables.put(Integer.valueOf(29), db.getODMPriorStudyOid());
+        variables.put(Integer.valueOf(30), db.getODMPriorMetaDataVersionOid());
+        variables.put(Integer.valueOf(31), new Boolean(db.isShowSubjectSecondaryId()));
+        variables.put(Integer.valueOf(32), Integer.valueOf(db.getDatasetItemStatus().getId()));
+        variables.put(Integer.valueOf(33), Integer.valueOf(db.getId()));
 
         this.execute(digester.getQuery("updateAll"), variables, nullVars);
         if (isQuerySuccessful()) {
@@ -813,17 +813,17 @@ public class DatasetDAO extends AuditableEntityDAO {
 
     protected void createGroupMap(int datasetId, int studyGroupClassId, HashMap nullVars) {
         HashMap<Integer, Integer> variablesNew = new HashMap<Integer, Integer>();
-        variablesNew.put(new Integer(1), new Integer(datasetId));
+        variablesNew.put(Integer.valueOf(1), Integer.valueOf(datasetId));
         Integer groupId = Integer.valueOf(studyGroupClassId);
-        variablesNew.put(new Integer(2), groupId);
+        variablesNew.put(Integer.valueOf(2), groupId);
         this.execute(digester.getQuery("createGroupMap"), variablesNew, nullVars);
     }
 
     protected void removeGroupMap(int datasetId, int studyGroupClassId, HashMap nullVars) {
         HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
-        variables.put(new Integer(1), new Integer(datasetId));
+        variables.put(Integer.valueOf(1), Integer.valueOf(datasetId));
         Integer groupId = Integer.valueOf(studyGroupClassId);
-        variables.put(new Integer(2), groupId);
+        variables.put(Integer.valueOf(2), groupId);
         this.execute(digester.getQuery("removeGroupMap"), variables, nullVars);
     }
 
@@ -876,7 +876,7 @@ public class DatasetDAO extends AuditableEntityDAO {
                     // get into int
                     try {
                         no = Integer.parseInt(sed_stno.trim());
-                        sedvec_tmp.add(new Integer(no));
+                        sedvec_tmp.add(Integer.valueOf(no));
 
                         // set the new string
                         sed_st = sed_st.substring(ic + 1, sed_st.length());
@@ -892,7 +892,7 @@ public class DatasetDAO extends AuditableEntityDAO {
                     try {
                         no = Integer.parseInt(sed_st.trim());
 
-                        sedvec_tmp.add(new Integer(no));
+                        sedvec_tmp.add(Integer.valueOf(no));
                     } catch (NumberFormatException nfe) {
                         // info("Exception when converted to Integer
                         // for:"+number);
@@ -927,7 +927,7 @@ public class DatasetDAO extends AuditableEntityDAO {
                     // get into int
                     try {
                         no = Integer.parseInt(it_stno.trim());
-                        itvec.add(new Integer(no));
+                        itvec.add(Integer.valueOf(no));
 
                         // set the new string
                         it_st = it_st.substring(ic + 1, it_st.length());
@@ -943,7 +943,7 @@ public class DatasetDAO extends AuditableEntityDAO {
                     try {
                         no = Integer.parseInt(it_st.trim());
 
-                        itvec.add(new Integer(no));
+                        itvec.add(Integer.valueOf(no));
                     } catch (NumberFormatException nfe) {
                         // info("Exception when converted to Integer
                         // for:"+number);

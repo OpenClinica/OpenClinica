@@ -46,7 +46,7 @@ public class PreparedStatementFactory {
     }
 
     public void addVariable(int order, Object param) {
-        variables.put(new Integer(order), param);
+        variables.put(Integer.valueOf(order), param);
     }
 
     public PreparedStatement generate(PreparedStatement ps) throws SQLException, NullPointerException {

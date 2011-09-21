@@ -174,8 +174,9 @@ public class DisplayEventCRFBean implements Comparable {
             if (isEditor) {
                 performAdministrativeEditingPermitted = true;
             }
-        } else if (stage.equals(DataEntryStage.INVALID)) {
-        }
+        } // else if (stage.equals(DataEntryStage.INVALID)) {
+        // }
+        //
     }
 
 

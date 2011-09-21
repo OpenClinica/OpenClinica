@@ -109,10 +109,10 @@ public abstract class AuditableEntityDAO<K extends String,V extends ArrayList> e
         HashMap variables = new HashMap();
 
         // study.study_id=?
-        variables.put(new Integer(1), new Integer(study.getId()));
+        variables.put(Integer.valueOf(1), Integer.valueOf(study.getId()));
 
         // or study.parent_study_id=?
-        variables.put(new Integer(2), new Integer(study.getId()));
+        variables.put(Integer.valueOf(2), Integer.valueOf(study.getId()));
 
         String sql = digester.getQuery(findAllByStudyName);
 
@@ -139,10 +139,10 @@ public abstract class AuditableEntityDAO<K extends String,V extends ArrayList> e
         HashMap variables = new HashMap();
 
         // study.study_id=?
-        variables.put(new Integer(1), new Integer(study.getId()));
+        variables.put(Integer.valueOf(1), Integer.valueOf(study.getId()));
 
         // or study.parent_study_id=?
-        variables.put(new Integer(2), new Integer(study.getId()));
+        variables.put(Integer.valueOf(2), Integer.valueOf(study.getId()));
 
         String sql = digester.getQuery(findAllActiveByStudyName);
 
@@ -179,13 +179,13 @@ public abstract class AuditableEntityDAO<K extends String,V extends ArrayList> e
 
         HashMap variables = new HashMap();
         // id=?
-        variables.put(new Integer(1), new Integer(id));
+        variables.put(Integer.valueOf(1), Integer.valueOf(id));
 
         // study.study_id = ?
-        variables.put(new Integer(2), new Integer(study.getId()));
+        variables.put(Integer.valueOf(2), Integer.valueOf(study.getId()));
 
         // study.parent_study_id = ?
-        variables.put(new Integer(3), new Integer(study.getId()));
+        variables.put(Integer.valueOf(3), Integer.valueOf(study.getId()));
 
         String sql = digester.getQuery(findByPKAndStudyName);
 

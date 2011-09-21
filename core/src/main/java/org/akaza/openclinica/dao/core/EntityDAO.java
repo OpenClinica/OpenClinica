@@ -136,7 +136,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
      *            the number that is equal to TypeNames
      */
     public void setTypeExpected(int num, int type) {
-        setTypes.put(new Integer(num), new Integer(type));
+        setTypes.put(Integer.valueOf(num), Integer.valueOf(type));
     }
 
     public void unsetTypeExpected() {
@@ -288,7 +288,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
         Connection con = null;
         PreparedStatementFactory psf = new PreparedStatementFactory(variables);
         PreparedStatement ps = null;
-        
+
         try {
             con = ds.getConnection();
             if (con.isClosed()) {
@@ -297,25 +297,25 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
                 throw new SQLException();
             }
 
-           ps = con.prepareStatement(query);
-           
-       
+            ps = con.prepareStatement(query);
+
+
             ps = psf.generate(ps);// enter variables here!
             key = (K) ps.toString();
             if((results=(V) cache.get(key))==null)
             {
-            rs = ps.executeQuery();
-            results = this.processResultRows(rs);
-            if(results!=null){
-                cache.put(key,results);
+                rs = ps.executeQuery();
+                results = this.processResultRows(rs);
+                if(results!=null){
+                    cache.put(key,results);
+                }
             }
-            }
-            
+
             if (logger.isInfoEnabled()) {
                 logger.info("Executing dynamic query, EntityDAO.select:query " + query);
             }
             signalSuccess();
-              
+
 
         } catch (SQLException sqle) {
             signalFailure(sqle);
@@ -373,7 +373,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
     // ArrayList keys = new ArrayList();
     // while (rs.next()) {
     // int key = rs.getInt(1);
-    // keys.add(new Integer(key));
+    // keys.add(Integer.valueOf(key));
     // }
     //
     // insertKeys = new int[keys.size()];
@@ -640,7 +640,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
 
                 for (int i = 1; i <= rsmd.getColumnCount(); i++) {
                     String column = rsmd.getColumnName(i).toLowerCase();
-                    Integer type = (Integer) setTypes.get(new Integer(i));
+                    Integer type = (Integer) setTypes.get(Integer.valueOf(i));
                     // @pgawade 18-May-2011 Fix for issue #9703 - temporarily
                     // commented out the following log statement
                     // as in case of viewing SDV page, type value for one of
@@ -709,9 +709,9 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
                             }
                             break;
                         case TypeNames.INT:
-                            hm.put(column, new Integer(rs.getInt(i)));
+                            hm.put(column, Integer.valueOf(rs.getInt(i)));
                             if (rs.wasNull()) {
-                                hm.put(column, new Integer(0));
+                                hm.put(column, Integer.valueOf(0));
                             }
                             break;
                         case TypeNames.STRING:
@@ -1125,9 +1125,9 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
                 }
 
                 // second column
-                obj.setSubjectId(new Integer(rs.getInt("subject_id")));
+                obj.setSubjectId(Integer.valueOf(rs.getInt("subject_id")));
                 if (rs.wasNull()) {
-                    obj.setSubjectId(new Integer(0));
+                    obj.setSubjectId(Integer.valueOf(0));
                 }
 
                 // old subject_identifier
@@ -1163,9 +1163,9 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
                     obj.setDobCollected(false);
                 }
 
-                Integer subjectStatusId = new Integer(rs.getInt("status_id"));
+                Integer subjectStatusId = Integer.valueOf(rs.getInt("status_id"));
                 if (rs.wasNull()) {
-                    subjectStatusId = new Integer(0);
+                    subjectStatusId = Integer.valueOf(0);
                 }
                 obj.setStatus(Status.get(subjectStatusId.intValue()));
 
@@ -1450,19 +1450,19 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
             while (rs.next()) {
 
                 // itemdataid
-                Integer vitemdataid = new Integer(rs.getInt("itemdataid"));
+                Integer vitemdataid = Integer.valueOf(rs.getInt("itemdataid"));
                 if (rs.wasNull()) {
                     // ERROR - should always be different than NULL
                 }
 
                 // itemdataordinal
-                Integer vitemdataordinal = new Integer(rs.getInt("itemdataordinal"));
+                Integer vitemdataordinal = Integer.valueOf(rs.getInt("itemdataordinal"));
                 if (rs.wasNull()) {
                     // ERROR - should always be different than NULL
                 }
 
                 // item_group_id
-                Integer vitem_group_id = new Integer(rs.getInt("item_group_id"));
+                Integer vitem_group_id = Integer.valueOf(rs.getInt("item_group_id"));
                 if (rs.wasNull()) {
                     // ERROR - should always be different than NULL
                 }
@@ -1510,10 +1510,10 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
                 }
 
                 // crfversionstatusid
-                Integer vcrfversionstatusid = new Integer(rs.getInt("crfversionstatusid"));
+                Integer vcrfversionstatusid = Integer.valueOf(rs.getInt("crfversionstatusid"));
                 if (rs.wasNull()) {
                     // TODO - what value default
-                    // vcrfversionstatusid = new Integer(?);
+                    // vcrfversionstatusid = Integer.valueOf(?);
                 }
 
                 // dateinterviewed
@@ -1541,49 +1541,49 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
                 }
 
                 // eventcrfcompletionstatusid
-                Integer veventcrfcompletionstatusid = new Integer(rs.getInt("eventcrfcompletionstatusid"));
+                Integer veventcrfcompletionstatusid = Integer.valueOf(rs.getInt("eventcrfcompletionstatusid"));
                 if (rs.wasNull()) {
                     // TODO - what value default
                 }
 
                 // repeat_number
-                Integer vrepeat_number = new Integer(rs.getInt("repeat_number"));
+                Integer vrepeat_number = Integer.valueOf(rs.getInt("repeat_number"));
                 if (rs.wasNull()) {
                     // TODO - what value default
                 }
 
                 // crfid
-                Integer vcrfid = new Integer(rs.getInt("crfid"));
+                Integer vcrfid = Integer.valueOf(rs.getInt("crfid"));
                 if (rs.wasNull()) {
                     // TODO - what value default
                 }
 
                 // studysubjectid
-                Integer vstudysubjectid = new Integer(rs.getInt("studysubjectid"));
+                Integer vstudysubjectid = Integer.valueOf(rs.getInt("studysubjectid"));
                 if (rs.wasNull()) {
                     // TODO - what value default
                 }
 
                 // eventcrfid
-                Integer veventcrfid = new Integer(rs.getInt("eventcrfid"));
+                Integer veventcrfid = Integer.valueOf(rs.getInt("eventcrfid"));
                 if (rs.wasNull()) {
                     // TODO - what value default
                 }
 
                 // itemid
-                Integer vitemid = new Integer(rs.getInt("itemid"));
+                Integer vitemid = Integer.valueOf(rs.getInt("itemid"));
                 if (rs.wasNull()) {
                     // TODO - what value default
                 }
 
                 // crfversionid
-                Integer vcrfversionid = new Integer(rs.getInt("crfversionid"));
+                Integer vcrfversionid = Integer.valueOf(rs.getInt("crfversionid"));
                 if (rs.wasNull()) {
                     // TODO - what value default
                 }
 
-                Integer eventcrfstatusid = new Integer(rs.getInt("eventcrfstatusid"));
-                Integer itemdatatypeid = new Integer(rs.getInt("itemDataTypeId"));
+                Integer eventcrfstatusid = Integer.valueOf(rs.getInt("eventcrfstatusid"));
+                Integer itemdatatypeid = Integer.valueOf(rs.getInt("itemDataTypeId"));
 
                 // add it to the HashMap
                 eb.addEntryBASE_ITEMGROUPSIDE(
@@ -1657,13 +1657,13 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
             while (rs.next()) {
 
                 // itemdataid
-                Integer vitemdataid = new Integer(rs.getInt("itemdataid"));
+                Integer vitemdataid = Integer.valueOf(rs.getInt("itemdataid"));
                 if (rs.wasNull()) {
                     // ERROR - should always be different than NULL
                 }
 
                 // studysubjectid
-                Integer vstudysubjectid = new Integer(rs.getInt("studysubjectid"));
+                Integer vstudysubjectid = Integer.valueOf(rs.getInt("studysubjectid"));
                 if (rs.wasNull()) {
                     // ERROR - should always be different than NULL
                 }
@@ -1675,7 +1675,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
                 }
 
                 // study_event_definition_id
-                Integer vstudy_event_definition_id = new Integer(rs.getInt("study_event_definition_id"));
+                Integer vstudy_event_definition_id = Integer.valueOf(rs.getInt("study_event_definition_id"));
                 if (rs.wasNull()) {
                     //
                 }
@@ -1767,37 +1767,37 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
                 }// if
 
                 // status_id
-                Integer vstatus_id = new Integer(rs.getInt("status_id"));
+                Integer vstatus_id = Integer.valueOf(rs.getInt("status_id"));
                 if (rs.wasNull()) {
                     // TODO - what value default
                 }
 
                 // subject_event_status_id
-                Integer vsubject_event_status_id = new Integer(rs.getInt("subject_event_status_id"));
+                Integer vsubject_event_status_id = Integer.valueOf(rs.getInt("subject_event_status_id"));
                 if (rs.wasNull()) {
                     // TODO - what value default
                 }
 
                 // studyeventid
-                Integer vstudyeventid = new Integer(rs.getInt("studyeventid"));
+                Integer vstudyeventid = Integer.valueOf(rs.getInt("studyeventid"));
                 if (rs.wasNull()) {
                     // TODO - what value default
                 }
 
                 // eventcrfid
-                Integer veventcrfid = new Integer(rs.getInt("eventcrfid"));
+                Integer veventcrfid = Integer.valueOf(rs.getInt("eventcrfid"));
                 if (rs.wasNull()) {
                     // TODO - what value default
                 }
 
                 // itemid
-                Integer vitemid = new Integer(rs.getInt("itemid"));
+                Integer vitemid = Integer.valueOf(rs.getInt("itemid"));
                 if (rs.wasNull()) {
                     // TODO - what value default
                 }
 
                 // crfversionid
-                Integer vcrfversionid = new Integer(rs.getInt("crfversionid"));
+                Integer vcrfversionid = Integer.valueOf(rs.getInt("crfversionid"));
                 if (rs.wasNull()) {
                     // TODO - what value default
                 }
