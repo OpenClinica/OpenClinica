@@ -501,7 +501,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) edcdao.findByPK(eventDefinitionCRFId);
         request.setAttribute(EVENT_DEF_CRF_BEAN, edcb);//JN:Putting the event_def_crf_bean in the request attribute.
         
-        StudyEventBean studyEventBean = (StudyEventBean) seDao.findByPK(ecb.getStudyEventId());
+        StudyEventBean studyEventBean = (StudyEventBean) seDao.findByPKCached(ecb.getStudyEventId());
         edcBean.setId(eventDefinitionCRFId);
 
         StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(getDataSource());
@@ -1853,7 +1853,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     success = success && ecb.isActive();
 
                     StudyEventDAO sedao = new StudyEventDAO(getDataSource());
-                    StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
+                    StudyEventBean seb = (StudyEventBean) sedao.findByPKCached(ecb.getStudyEventId());
                     seb.setUpdatedDate(now);
                     seb.setUpdater(ub);
                     seb = (StudyEventBean) sedao.update(seb);
@@ -2093,7 +2093,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 request.setAttribute(INPUT_EVENT_CRF, ecb);
                 if (studyEventId > 0) {
                     StudyEventDAO sedao = new StudyEventDAO(getDataSource());
-                    StudyEventBean sEvent = (StudyEventBean) sedao.findByPK(studyEventId);
+                    StudyEventBean sEvent = (StudyEventBean) sedao.findByPKCached(studyEventId);
                     ecb = updateECB(sEvent, request);
                 }
                 request.setAttribute(INPUT_EVENT_CRF, ecb);
@@ -2265,7 +2265,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         }
 
         StudyEventDAO sedao = new StudyEventDAO(getDataSource());
-        StudyEventBean sEvent = (StudyEventBean) sedao.findByPK(studyEventId);
+        StudyEventBean sEvent = (StudyEventBean) sedao.findByPKCached(studyEventId);
         StudyBean studyWithSED = currentStudy;
         if (currentStudy.getParentStudyId() > 0) {
             studyWithSED = new StudyBean();
@@ -4044,7 +4044,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
         // change status for study event
         StudyEventDAO sedao = new StudyEventDAO(getDataSource());
-        StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
+        StudyEventBean seb = (StudyEventBean) sedao.findByPKCached(ecb.getStudyEventId());
         seb.setUpdatedDate(new Date());
         seb.setUpdater(ub);
 
