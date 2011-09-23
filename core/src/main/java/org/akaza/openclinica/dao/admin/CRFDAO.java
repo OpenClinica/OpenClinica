@@ -351,7 +351,7 @@ public class CRFDAO<K extends String,V extends ArrayList> extends AuditableEntit
         variables.put(Integer.valueOf(1), oid);
         String sql = digester.getQuery("findByOID");
 
-        ArrayList rows = this.selectByCache(sql, variables);
+        ArrayList rows = this.select(sql, variables);
         Iterator it = rows.iterator();
 
         if (it.hasNext()) {
