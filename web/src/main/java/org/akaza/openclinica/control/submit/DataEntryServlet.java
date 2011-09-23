@@ -516,9 +516,11 @@ public abstract class DataEntryServlet extends CoreSecureController {
         } else if (getServletPage(request).equals(Page.ADMIN_EDIT_SERVLET)) {
             phase2 = Phase.ADMIN_EDITING;
         }
-         List<RuleSetBean> ruleSets = createAndInitializeRuleSet(currentStudy, studyEventDefinition, crfVersionBean, studyEventBean, ecb, true, request, response);
+        logMe("Entering ruleSets::: CreateAndInitializeRuleSet:::"+Thread.currentThread());
+        logMe("Entering ruleSets::: CreateAndInitializeRuleSet:::"+Thread.currentThread()+"currentStudy?"+currentStudy+"studyEventDefinition"+studyEventDefinition+"crfVersionBean"+crfVersionBean+"studyEventBean"+studyEventBean+"ecb"+ecb);
+        List<RuleSetBean> ruleSets = createAndInitializeRuleSet(currentStudy, studyEventDefinition, crfVersionBean, studyEventBean, ecb, true, request, response);
         boolean shouldRunRules = getRuleSetService(request).shouldRunRulesForRuleSets(ruleSets, phase2);
-     
+        logMe("Entering getDisplayBean:::::Thread::::"+Thread.currentThread());
         DisplaySectionBean section = getDisplayBean(hasGroup, false, request, isSubmitted);
         //hasSCDItem has been initiallized in getDisplayBean() which is online above
         if(section.getSection().hasSCDItem()) {
