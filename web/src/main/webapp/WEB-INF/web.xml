@@ -102,7 +102,18 @@
         <filter-name>compressFilter</filter-name>
   	<url-pattern>/ListStudySubjects</url-pattern>
     </filter-mapping>
-  
+		<filter-mapping>
+        <filter-name>compressFilter</filter-name>
+   <url-pattern>/SectionPreview</url-pattern>
+    </filter-mapping>
+		<filter-mapping>
+        <filter-name>compressFilter</filter-name>
+   <url-pattern>/CreateCRFVersion</url-pattern>
+    </filter-mapping>
+	<filter-mapping>
+    <filter-name>compressFilter</filter-name>
+   <url-pattern>/*</url-pattern>
+    </filter-mapping>
    <filter>
         <filter-name>springSecurityFilterChain</filter-name>
         <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
