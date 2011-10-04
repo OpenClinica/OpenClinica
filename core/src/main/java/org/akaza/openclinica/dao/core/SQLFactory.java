@@ -7,9 +7,6 @@
  */
 package org.akaza.openclinica.dao.core;
 
-import org.springframework.core.io.ResourceLoader;
-import org.xml.sax.SAXException;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -17,6 +14,14 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Set;
+
+import net.sf.ehcache.CacheException;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.hibernate.EhCacheProvider;
+
+import org.akaza.openclinica.dao.cache.EhCacheWrapper;
+import org.springframework.core.io.ResourceLoader;
+import org.xml.sax.SAXException;
 
 /**
  * Provides a singleton SQLFactory instance
@@ -68,6 +73,23 @@ public class SQLFactory {
     // YW, 05-2008, for odm extract
     public final String DAO_ODM_EXTRACT = "odm_extract";
 
+    
+    // EhCacheManagerFactoryBean cacheManagerBean = new EhCacheManagerFactoryBean();
+    //  cacheManagerBean.setConfigLocation= (new org.springframework.core.io.FileSystemResource("classpath:org/akaza/openclinica/ehcache.xml") );
+    // cacheManagerBean.setConfigLocation(new FileSystemReour(""));
+     
+
+    public EhCacheWrapper ehCacheWrapper;
+    
+
+    public EhCacheWrapper getEhCacheWrapper() {
+        return ehCacheWrapper;
+    }
+
+    public void setEhCacheWrapper(EhCacheWrapper ehCacheWrapper) {
+        this.ehCacheWrapper = ehCacheWrapper;
+    }
+
     public static String JUNIT_XML_DIR =
         "C:\\work\\eclipse\\workspace\\OpenClinica" + File.separator + "webapp" + File.separator + "properties" + File.separator;
 
@@ -107,6 +129,10 @@ public class SQLFactory {
         return (DAODigester) digesters.get(name);
     }
 
+    
+    
+    
+    
     public void run(String dbName, ResourceLoader resourceLoader) {
         // we get the type of the database and run the factory, picking
         // up all the queries. NOTE that this should only be run
@@ -121,7 +147,24 @@ public class SQLFactory {
         // key is the public static final sting used above; value is the actual
         // filename
         HashMap fileList = new HashMap();
-
+        CacheManager cacheManager = new CacheManager();
+        
+        
+       
+      
+        try {
+            cacheManager = cacheManager.create(resourceLoader.getResource("classpath:org/akaza/openclinica/ehcache.xml").getInputStream());
+        } catch (CacheException e) {
+          
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        EhCacheWrapper ehCache = new EhCacheWrapper("com.akaza.openclinica.dao.core.DAOCache",cacheManager);
+        
+        
+        setEhCacheWrapper(ehCache);
+        
         if ("oracle".equals(dbName)) {
             // logger.warn("Oracle Test");
             fileList.put(this.DAO_USERACCOUNT, "oracle_useraccount_dao.xml");

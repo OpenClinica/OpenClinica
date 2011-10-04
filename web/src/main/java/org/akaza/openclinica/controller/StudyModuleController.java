@@ -219,7 +219,7 @@ public class StudyModuleController {
         ArrayList pageMessages = new ArrayList();
         if (request.getSession().getAttribute("pageMessages") != null) {
             pageMessages.addAll((ArrayList) request.getSession().getAttribute("pageMessages"));
-            request.setAttribute("pageMessages", pageMessages);
+            request.setAttribute("pageMessages", pageMessages); 
             request.getSession().removeAttribute("pageMessages");
         }
         return map;
@@ -228,6 +228,10 @@ public class StudyModuleController {
         return sysURL.replaceAll(contextPath+"/", "");
        }
     
+    private String getHostPathFromSysUrl(String sysURL,String contextPath) {
+     return sysURL.replaceAll(contextPath+"/", "");
+    }
+
     @RequestMapping(method = RequestMethod.POST)
     public String processSubmit(@ModelAttribute("studyModuleStatus") StudyModuleStatus studyModuleStatus, BindingResult result, SessionStatus status,
             HttpServletRequest request) {
@@ -306,6 +310,7 @@ public class StudyModuleController {
 
     public String getRequestURLMinusServletPath(HttpServletRequest request) {
         String requestURLMinusServletPath = request.getRequestURL().toString().replaceAll(request.getServletPath(), "");
+        logMe("processing.."+requestURLMinusServletPath);
         return requestURLMinusServletPath;
     }
 
@@ -347,4 +352,8 @@ public class StudyModuleController {
             System.out.println(msg);
             logger.info(msg);
         }
+	    private void logMe(String msg){
+	        System.out.println(msg);
+	        logger.info(msg);
+	    }
 }

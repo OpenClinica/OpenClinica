@@ -6,10 +6,12 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
 
     @Override
@@ -85,6 +87,8 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
         q.setInteger("crfId", crfBean.getId());
         q.setInteger("studyId", currentStudy.getParentStudyId() != 0 ? currentStudy.getParentStudyId() : currentStudy.getId());
         q.setInteger("studyEventDefinitionId", sed.getId());
+        q.setCacheable(true);
+      
         return (ArrayList<RuleSetBean>) q.list();
     }
 

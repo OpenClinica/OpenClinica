@@ -19,9 +19,14 @@ import org.akaza.openclinica.dao.EventCRFSDVSort;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.core.DAODigester;
+import org.akaza.openclinica.dao.core.PreparedStatementFactory;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -43,7 +48,7 @@ import javax.sql.DataSource;
  *
  *         TODO test create and update first thing
  */
-public class EventCRFDAO extends AuditableEntityDAO {
+public class EventCRFDAO  <K extends String,V extends ArrayList> extends AuditableEntityDAO {
     // private DAODigester digester;
 
     private void setQueryNames() {
@@ -879,5 +884,6 @@ public class EventCRFDAO extends AuditableEntityDAO {
             return 0;
         }
     }
+
 
 }

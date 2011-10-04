@@ -13,9 +13,14 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.DAODigester;
+import org.akaza.openclinica.dao.core.PreparedStatementFactory;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -28,7 +33,7 @@ import javax.sql.DataSource;
  * @author thickerson
  * @author jsampson
  */
-public class StudyEventDefinitionDAO extends AuditableEntityDAO {
+public class StudyEventDefinitionDAO<K extends String,V extends ArrayList> extends AuditableEntityDAO {
 
     private void setQueryNames() {
         findAllByStudyName = "findAllByStudy";
@@ -437,5 +442,5 @@ public class StudyEventDefinitionDAO extends AuditableEntityDAO {
         }
         return al;
     }
-
+ 
 }

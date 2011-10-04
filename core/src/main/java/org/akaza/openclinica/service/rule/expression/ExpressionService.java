@@ -8,6 +8,7 @@
 package org.akaza.openclinica.service.rule.expression;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.Utils;
@@ -402,7 +403,7 @@ public class ExpressionService {
                 return returnedRuleExpression;
             }
 
-            Integer itemId = itemData.isEmpty() ? getItemDao().findByOid(getItemOid(ruleExpression)).get(0).getId() : itemData.get(0).getItemId();
+            Integer itemId = itemData.isEmpty() ? ((EntityBean) getItemDao().findByOid(getItemOid(ruleExpression)).get(0)).getId() : itemData.get(0).getItemId();
 
             ItemGroupMetadataBean itemGroupMetadataBean =
                 (ItemGroupMetadataBean) getItemGroupMetadataDao().findByItemAndCrfVersion(itemId, theEventCrfBean.getCRFVersionId());
@@ -1011,7 +1012,7 @@ public class ExpressionService {
             // ItemBean item =
             // getItemDao().findItemByGroupIdandItemOid(getItemGroupExpression(ruleSet.getTarget().getValue()).getId(),
             // oid);
-            ItemBean item = getItemDao().findByOid(oid).get(0);
+            ItemBean item = (ItemBean) getItemDao().findByOid(oid).get(0);
             if (item != null) {
                 return "OK";
             }
