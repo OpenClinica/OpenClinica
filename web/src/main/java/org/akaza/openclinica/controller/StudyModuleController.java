@@ -228,9 +228,7 @@ public class StudyModuleController {
         return sysURL.replaceAll(contextPath+"/", "");
        }
     
-    private String getHostPathFromSysUrl(String sysURL,String contextPath) {
-     return sysURL.replaceAll(contextPath+"/", "");
-    }
+ 
 
     @RequestMapping(method = RequestMethod.POST)
     public String processSubmit(@ModelAttribute("studyModuleStatus") StudyModuleStatus studyModuleStatus, BindingResult result, SessionStatus status,
@@ -352,8 +350,5 @@ public class StudyModuleController {
             System.out.println(msg);
             logger.info(msg);
         }
-	    private void logMe(String msg){
-	        System.out.println(msg);
-	        logger.info(msg);
-	    }
+
 }
