@@ -44,7 +44,16 @@
 		    <url>http://maven.springframework.org/milestone</url>
 		    <snapshots><enabled>false</enabled></snapshots>		
 		</repository>
+		
+		
+			<repository>
+   <id>terracotta-releases</id>
+   <url>http://www.terracotta.org/download/reflector/releases</url>
+   <releases><enabled>true</enabled></releases>
+   <snapshots><enabled>false</enabled></snapshots>
+</repository>
 	</repositories>
+	
 	<pluginRepositories>
 		<pluginRepository>
 			<id>java.net</id>
@@ -286,6 +295,29 @@
 			<artifactId>hibernate-core</artifactId>
 			<version>3.5.1-Final</version>
 		</dependency>
+	<dependency>
+			<groupId>net.sf.ehcache</groupId>
+			<artifactId>ehcache-core</artifactId>
+			<version>2.4.5</version>
+	</dependency>
+
+
+	<dependency>
+        <groupId>net.sf.ehcache</groupId>
+        <artifactId>ehcache-web</artifactId>
+        <version>2.0.3</version>
+    </dependency>
+	  
+	<dependency>
+		<groupId>net.sf.ehcache</groupId>
+		<artifactId>ehcache-terracotta</artifactId>
+		<version>2.4.5</version>
+	</dependency>
+<dependency>
+  <groupId>com.googlecode.ehcache-spring-annotations</groupId>
+  <artifactId>ehcache-spring-annotations</artifactId>
+  <version>1.1.3</version>
+</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-annotations</artifactId>
