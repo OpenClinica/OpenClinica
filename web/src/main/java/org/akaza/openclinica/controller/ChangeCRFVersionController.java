@@ -126,8 +126,8 @@ public class ChangeCRFVersionController {
         CRFDAO cdao = new CRFDAO(dataSource);
         CRFBean crfBean = (CRFBean)cdao.findByPK(crfId);
         CRFVersionDAO crfVersionDao = new CRFVersionDAO(dataSource);
-        ArrayList<CRFVersionBean> versions = (ArrayList<CRFVersionBean>) crfVersionDao.findAllByCRF(crfId);
-        String dir = SQLInitServlet.getField("filePath") + "crf" + File.separator + "new" + File.separator;// for
+        ArrayList<CRFVersionBean> versions = (ArrayList<CRFVersionBean>) crfVersionDao.findAllActiveByCRF(crfId);
+       // String dir = SQLInitServlet.getField("filePath") + "crf" + File.separator + "new" + File.separator;// for
         
         /*
         // check whether the speadsheet is available on the server
