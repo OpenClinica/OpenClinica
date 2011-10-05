@@ -18,10 +18,28 @@
                 window.location = pageName;
             }
         }
+        function confirmCancelAction( pageName, contextPath){
+            var confirm1 = confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>');
+            if(confirm1){
+            	 var tform = document.forms["fr_cancel_button"];
+            	tform.action=contextPath+"/"+pageName;
+            	tform.submit();
+
+            }
+        }
         function confirmExit(pageName){
             var confirm1 = confirm('<fmt:message key="sure_to_exit" bundle="${resword}"/>');
             if(confirm1){
                 window.location = pageName;
+            }
+        }
+        function confirmExitAction( pageName, contextPath){
+            var confirm1 = confirm('<fmt:message key="sure_to_exit" bundle="${resword}"/>');
+            if(confirm1){
+            	 var tform = document.forms["fr_cancel_button"];
+            	tform.action=contextPath+"/"+pageName;
+            	tform.submit();
+
             }
         }
         function goBack(){
@@ -42,8 +60,11 @@
 <!--  If Controller Spring based append ../ to urls -->
 <c:set var="urlPrefix" value=""/>
 <c:set var="requestFromSpringController" value="${param.isSpringController}" />
-<c:if test="${requestFromSpringController == 'true' }">
+<c:if test="${requestFromSpringController == '1' }">
     <c:set var="urlPrefix" value="../"/>
+</c:if>
+<c:if test="${requestFromSpringController == '2' }">
+    <c:set var="urlPrefix" value="../../"/>
 </c:if>
 
 <!-- Main Navigation -->

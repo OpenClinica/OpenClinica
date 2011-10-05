@@ -1,4 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
  
@@ -14,7 +16,14 @@
         <td valign="bottom">
 
 <!-- Footer -->
-
+<c:set var="urlPrefix" value=""/>
+<c:set var="requestFromSpringController" value="${param.isSpringControllerFooter}" />
+<c:if test="${requestFromSpringController == '1' }">
+    <c:set var="urlPrefix" value="../"/>
+</c:if>
+<c:if test="${requestFromSpringController == '2' }">
+    <c:set var="urlPrefix" value="../../"/>
+</c:if>
 <script type="text/javascript" src="includes/wz_tooltip/wz_tooltip.js"></script>
 <SCRIPT LANGUAGE="JavaScript">
 
@@ -27,7 +36,7 @@ document.write('<table border="0" cellpadding=0" cellspacing="0" width="' + docu
                 &nbsp;&nbsp;&nbsp;
                 <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1')"><fmt:message key="help" bundle="${resword}"/></a>
                 &nbsp;&nbsp;&nbsp;
-                <a href="Contact"><fmt:message key="contact" bundle="${resword}"/></a>
+                <a href="${urlPrefix}Contact"><fmt:message key="contact" bundle="${resword}"/></a>
                 &nbsp;&nbsp;&nbsp;
                 </td>
                 <td class="footer"><fmt:message key="footer.license.1" bundle="${resword}"/> </td>
