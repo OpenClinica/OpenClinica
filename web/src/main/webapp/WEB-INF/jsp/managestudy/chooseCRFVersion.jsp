@@ -100,9 +100,7 @@ jQuery(document).ready( function () {
 </select>
 <input type='hidden' id='selectedVersionName' name='selectedVersionName' value='zzz'>
 
-<c:if test="${! empty errorMessage }">
-<div style="alert"><% request.getAttribute("errorMessage ");%></div>
-</c:if>
+
 
 
 </td></tr>
