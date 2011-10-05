@@ -42,6 +42,7 @@ public class ItemBean extends AuditableEntityBean implements Comparable {
         result = prime * result + itemDataTypeId;
         result = prime * result + ((itemMeta == null) ? 0 : itemMeta.hashCode());
         result = prime * result + ((itemMetas == null) ? 0 : itemMetas.hashCode());
+        result = prime * result + ((itemDataElements == null) ? 0 : itemDataElements.hashCode());
         result = prime * result + itemReferenceTypeId;
         result = prime * result + ((oid == null) ? 0 : oid.hashCode());
         result = prime * result + ((oidGenerator == null) ? 0 : oidGenerator.hashCode());
@@ -100,6 +101,8 @@ public class ItemBean extends AuditableEntityBean implements Comparable {
                 return false;
         } else if (!itemMetas.equals(other.itemMetas))
             return false;
+        
+        
         if (itemReferenceTypeId != other.itemReferenceTypeId)
             return false;
         if (oid == null) {
@@ -135,6 +138,7 @@ public class ItemBean extends AuditableEntityBean implements Comparable {
     private ItemFormMetadataBean itemMeta;// not in DB, for display
 
     private ArrayList itemMetas;// not in DB, one item can have multiple meta
+    private ArrayList<ItemDataBean>  itemDataElements;
 
     private boolean selected = false; // not in DB, used for creating dataset
 
@@ -153,6 +157,7 @@ public class ItemBean extends AuditableEntityBean implements Comparable {
     public ItemBean() {
         dataType = ItemDataType.ST;
         itemMetas = new ArrayList();
+        
         this.oidGenerator = new ItemOidGenerator();
     }
 
@@ -291,7 +296,28 @@ public class ItemBean extends AuditableEntityBean implements Comparable {
     public void setItemMetas(ArrayList itemMetas) {
         this.itemMetas = itemMetas;
     }
+    /**
+     * @return Returns the itemMetas.
+     */
+    public ArrayList<ItemDataBean> getItemDataElements() {
+        return itemDataElements;
+    }
+    public void addItemDataElement(ItemDataBean el) {
+        if ( itemDataElements == null){
+        	itemDataElements = new ArrayList<ItemDataBean>();
+        }
+        itemDataElements.add(el);
+    }
 
+    /**
+     * @param itemMetas
+     *            The itemMetas to set.
+     */
+    public void setItemDataElements(ArrayList<ItemDataBean> itemDataElements) {
+        this.itemDataElements = itemDataElements;
+    }
+
+    
     /**
      * @return Returns the selected.
      */
@@ -317,7 +343,15 @@ public class ItemBean extends AuditableEntityBean implements Comparable {
             ItemFormMetadataBean m1 = (ItemFormMetadataBean) getItemMetas().get(0);
             ItemFormMetadataBean m2 = (ItemFormMetadataBean) arg.getItemMetas().get(0);
             return m1.getOrdinal() - m2.getOrdinal();
-        } else {
+        }
+        //fix here 
+        else if (!itemDataElements.isEmpty() && !arg.getItemDataElements().isEmpty()) {
+            ItemDataBean m1 = (ItemDataBean) getItemDataElements().get(0);
+            ItemDataBean m2 = (ItemDataBean) arg.getItemDataElements().get(0);
+            return m1.getOrdinal() - m2.getOrdinal();
+        }
+        
+        else {
             return getName().compareTo(arg.getName());
         }
     }
