@@ -1198,7 +1198,8 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
         studySubjectIds = studySubjectIds.endsWith(",")?studySubjectIds.substring(0, studySubjectIds.length()-1):studySubjectIds;
         return studySubjectIds;
     }
-    @Override
+    //Jn: Commenting out the studySubjectDao's caching since its used only in one place in dataentry and is causing issues when trying to add new subject to a study event via createNewStudyEvent
+   /* @Override
     public ArrayList<V> select(String query, HashMap variables) {
         clearSignals();
 
@@ -1249,5 +1250,5 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
         }
         return results;
 
-    }
+    }*/
 }
