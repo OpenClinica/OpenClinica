@@ -147,7 +147,7 @@ jQuery(document).ready( function () {
 
 <c:forEach var="version" items="${crfBean.versions}">
 <tr>
-<c:if test="${version.statusId == 1}" >
+<c:if test="${version.status.id == 1}" >
 <td  class="table_cell"  > <c:out value="${version.name}" />&nbsp;</td>
 <td  class="table_cell"  > <c:out value="${version.oid}" />&nbsp;</td>
 <td  class="table_cell"  > <fmt:formatDate value="${version.createdDate}" pattern="${dteFormat}"/>&nbsp;</td>
