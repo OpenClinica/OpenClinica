@@ -1,6 +1,5 @@
 package org.akaza.openclinica.dao.managestudy;
 
-import org.akaza.openclinica.domain.Status;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import java.util.ArrayList;
@@ -81,8 +80,10 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
                 }
                 else if (value.equals("2")){ //DAtaEntryStage.Initial_data_entry
                     criteria += " and  se.study_EVENT_ID  in(select study_event_id from  event_crf ec,crf_version cv where " +
-                    		"ec.crf_version_id = cv.crf_version_id and crf_id= "+crfId+ " and ec.status_id = "+Status.AVAILABLE.getCode()+ ")" +
-                    		 "and se.study_event_definition_id =" +studyEventDefinitionId;
+                    		"ec.crf_version_id = cv.crf_version_id and crf_id= "+crfId+"  and ( date_validate_completed is  null  or DATE_COMPLETED is NULL ) )"+
+                    		 "and se.study_event_definition_id =" +studyEventDefinitionId +" and se.subject_event_status_id = 3";
+ 
+        
                 }
                 else if (value.equals("4")){
                    //DAtaEntryStage.double data entry
