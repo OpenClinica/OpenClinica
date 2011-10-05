@@ -16,6 +16,8 @@
     	 	CREATE OR REPLACE FUNCTION event_crf_version_change_trigger() RETURNS "trigger"
 		    AS 'DECLARE
 			pk INTEGER;
+			crf_old_name TEXT;
+			crf_new_name TEXT;
 			
 		BEGIN
 			IF (TG_OP = ''UPDATE'') THEN
@@ -23,7 +25,12 @@
 				 /*---------------*/
 
 				    SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
-				
+				   SELECT INTO crf_old_name cf.name FROM crf_version cf WHERE cf.crf_version_id = OLD.crf_version_id;
+				    SELECT INTO crf_new_name cf.name FROM crf_version cf WHERE cf.crf_version_id = NEW.crf_version_id;
+				    
+				    
+				    
+				    
 					INSERT INTO audit_log_event(  
 					audit_id, 
 					audit_date,  
@@ -46,8 +53,8 @@
 					OLD.event_crf_id, 
 					''CRF version'',
 					''33'',
-					OLD.crf_version_id, 
-					NEW.crf_version_id,
+					crf_old_name, 
+					crf_new_name,
 					OLD.event_crf_id,
 					OLD.study_event_id
 					);
