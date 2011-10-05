@@ -7,12 +7,15 @@
  */
 package org.akaza.openclinica.bean.core;
 
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 /**
  * @author Jun Xu
@@ -153,6 +156,7 @@ public class SubjectEventStatus extends Term implements Comparable {
      * @return An int id, like 1 for "scheduled"
      */
     public static int getSubjectEventStatusIdByName(String name) {
+        ResourceBundle resterm = ResourceBundleProvider.getTermsBundle();
 
         if (name == null || "".equalsIgnoreCase(name)) {
             return 0;
@@ -160,10 +164,13 @@ public class SubjectEventStatus extends Term implements Comparable {
         boolean validArg = false;
 
         String status_name = name.trim().replace(" ", "_").toLowerCase();
+        
         for (String statusName : getSubjectEventStatusValues()) {
-            if (status_name.equalsIgnoreCase(statusName)) {
-                validArg = true;
-                break;
+            if(resterm.getString(statusName) != null) {
+                if (status_name.equalsIgnoreCase(resterm.getString(statusName).trim())) {
+                    validArg = true;
+                    break;
+                }
             }
         }
 
@@ -172,7 +179,7 @@ public class SubjectEventStatus extends Term implements Comparable {
         }
 
         for (int key : membersMap.keySet()) {
-            if (status_name.equalsIgnoreCase(getSubjectEventStatusName(key))) {
+            if (status_name.equalsIgnoreCase(resterm.getString(getSubjectEventStatusName(key)))) {
                 return key;
             }
         }
