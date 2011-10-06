@@ -1,11 +1,13 @@
 package org.akaza.openclinica.controller;
 
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
@@ -123,10 +125,32 @@ public class ChangeCRFVersionController {
         
          
         //from event_crf get 
+        StudyBean study = (StudyBean) request.getSession().getAttribute("study");
+        
         CRFDAO cdao = new CRFDAO(dataSource);
         CRFBean crfBean = (CRFBean)cdao.findByPK(crfId);
         CRFVersionDAO crfVersionDao = new CRFVersionDAO(dataSource);
         ArrayList<CRFVersionBean> versions = (ArrayList<CRFVersionBean>) crfVersionDao.findAllActiveByCRF(crfId);
+        if (study.getParentStudyId()>0 ){
+         	EventDefinitionCRFDAO edfdao = new EventDefinitionCRFDAO(dataSource);
+        	EventDefinitionCRFBean edf = (EventDefinitionCRFBean) edfdao.findByPK(eventDefinitionCRFId);
+        	if (!edf.getSelectedVersionIds().equals("")){
+	        	String[] version_ids = edf.getSelectedVersionIds().split(",");
+	        	HashMap<String,String> tmp = new HashMap<String,String>(version_ids.length);
+	        	for ( String vs : version_ids){
+	        		tmp.put(vs, vs);
+	        	}
+	        	ArrayList<CRFVersionBean> site_versions = new ArrayList<CRFVersionBean>(versions.size());
+	        	
+	        	for (CRFVersionBean vs : versions) {
+	                if (tmp.get( String.valueOf(vs.getId())) != null) {
+	                	site_versions.add(vs);
+	                }
+	            }
+        	    versions = site_versions;
+        	}
+        
+        }
        // String dir = SQLInitServlet.getField("filePath") + "crf" + File.separator + "new" + File.separator;// for
         
         /*
