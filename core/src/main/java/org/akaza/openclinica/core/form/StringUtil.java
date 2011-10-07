@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 /**
@@ -38,9 +39,11 @@ public class StringUtil {
 
     }
 
+    /*
     public static void main(String[] args) {
         System.out.println(StringUtil.escapeSingleQuote("my ' header'"));
     }
+    */
 
     /**
      * Checks whether a string is blank
@@ -93,26 +96,46 @@ public class StringUtil {
     }
 
     /**
+     * Invoked method that uses the default locale.
      * @param s
      * @param dateFormat
      * @return
-     * 
-     * @author ywang (Nov., 2008)
      */
-    public static boolean isFormatDate(String s, String dateFormat) {
+    // ywang (Nov., 2008)
+    public static boolean isFormatDate(String s, String dateFormat) { 
         String dateformat = parseDateFormat(dateFormat);
         return isSameDate(dateformat, dateformat, s);
     }
+    
+    /**
+     * Return true if a string can be parsed by the dateFormat with locale.
+     *  
+     * @param s
+     * @param dateFormat
+     * @param locale
+     * @return
+     */
+    //ywang (Oct., 2011)
+    public static boolean isDateFormatString(String s, String dateFormat, Locale locale) {
+        String dateformat = parseDateFormat(dateFormat);
+        SimpleDateFormat f = new SimpleDateFormat(dateformat, locale);
+        f.setLenient(false);
+        try {
+            f.parse(s);
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
+    }
 
     /**
-     * Allow only 4 digits, no more, no less
+     * Allow only 4 digits, no more, no less. SimpleDateFormat uses the default locale.
      * 
      * @param s
      * @param yearFormat
      * @return
-     * 
-     * @author ywang (Nov., 2008)
      */
+    //ywang (Nov., 2008)
     public static boolean isPartialYear(String s, String yearFormat) {
         int dn = 0;
         char[] cyear = s.toCharArray();
@@ -143,9 +166,8 @@ public class StringUtil {
      * @param s
      * @param yearMonthFormat
      * @return
-     * 
-     * @author ywang (Nov., 2008)
      */
+    //ywang (Nov., 2008)
     public static boolean isPartialYearMonth(String s, String yearMonthFormat) {
         String yearmonthformat = parseDateFormat(yearMonthFormat) + "-dd";
         String sym = s + "-18";
@@ -172,6 +194,7 @@ public class StringUtil {
     /**
      * Return true if a date String is the same day when it is parsed by two
      * different dateFormats. The year can only between 1000 and 9999.
+     * SimpleDataFormat uses the default locale.
      * 
      * @param dateFormat1
      * @param dateFormat2
