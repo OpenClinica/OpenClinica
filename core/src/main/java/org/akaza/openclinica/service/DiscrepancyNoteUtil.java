@@ -1038,11 +1038,13 @@ public class DiscrepancyNoteUtil {
         for (ResolutionStatus status: ResolutionStatus.getMembers()) {
             tempMap = new HashMap<String, String>();
             summaryMap.put(status.getName(), tempMap);
-            tempTotal = countNotes(discList, RESOLUTION_STATUS.get(status.getName()), 0);
+            //tempTotal = countNotes(discList, RESOLUTION_STATUS.get(status.getName()), 0);
+            tempTotal = countNotes(discList, status.getId(), 0);
             tempMap.put("Total", tempTotal.equals("0")?"--":tempTotal);
             for (String typeName: TYPE_NAMES) {
                 tempType = TYPES.get(typeName);
-                String number = countNotes(discList, RESOLUTION_STATUS.get(status.getName()), tempType);
+                //String number = countNotes(discList, RESOLUTION_STATUS.get(status.getName()), tempType);
+                String number = countNotes(discList, status.getId(), tempType);
                 tempMap.put(typeName, number.equals("0")?"--":number);
             }
         }
