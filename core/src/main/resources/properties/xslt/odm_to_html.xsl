@@ -17,8 +17,8 @@
 	<xsl:variable name="groupDetails" select="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:ItemGroupDef"/>
 	<xsl:variable name="itemDef" select="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:ItemDef"/>
 	<xsl:variable name="codeList" select="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:CodeList"/>
-	<xsl:variable name="allEventDefs" select="//odm:ODM/odm:Study/odm:MetaDataVersion/odm:StudyEventDef"/>
-	<xsl:variable name="eventDefCount" select="count(/odm:ODM/odm:Study/odm:MetaDataVersion/odm:StudyEventDef)"/>
+	<xsl:variable name="allEventDefs" select="//odm:ODM/odm:Study[1]/odm:MetaDataVersion/odm:StudyEventDef"/>
+	<xsl:variable name="eventDefCount" select="count(/odm:ODM/odm:Study[1]/odm:MetaDataVersion/odm:StudyEventDef)"/>
 	<xsl:variable name="allStudyEventDataElements" select="//odm:StudyEventData"/>
 	<xsl:variable name="allItemGrpDataDataElements" select="//odm:ItemGroupData"/>
 	<xsl:variable name="allFormRefElements" select="//odm:ODM/odm:Study/odm:MetaDataVersion/odm:StudyEventDef/odm:FormRef"/>
@@ -48,12 +48,12 @@
 	<xsl:variable name="crfStatusExist" select="//odm:FormData/@OpenClinica:Status"/>
 	<!-- Tokenization of column headers-->
 	<xsl:variable name="eventColHeaders">
-		<xsl:apply-templates select="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:StudyEventDef" mode="studyEventInfoHeaders">		
+		<xsl:apply-templates select="/odm:ODM/odm:Study[1]/odm:MetaDataVersion/odm:StudyEventDef" mode="studyEventInfoHeaders">		
 		</xsl:apply-templates>
 	</xsl:variable>
 	<xsl:variable name="tokenizedEventHeaders" select="tokenize($eventColHeaders,'_E')"/>
 	<xsl:variable name="crfAndDataItemsHeaders">
-		<xsl:apply-templates select="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:StudyEventDef" mode="studyFormAndDataItemsHeaders">
+		<xsl:apply-templates select="/odm:ODM/odm:Study[1]/odm:MetaDataVersion/odm:StudyEventDef" mode="studyFormAndDataItemsHeaders">
 			<xsl:with-param name="generateIntHeadersList" select="'Yes'"/>
 		</xsl:apply-templates>
 	</xsl:variable>
@@ -167,7 +167,7 @@
 								<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
 							</td>
 						</tr>
-						<xsl:apply-templates select="//odm:ODM/odm:Study/odm:MetaDataVersion" mode="metadataDisplay"/>
+						<xsl:apply-templates select="//odm:ODM/odm:Study[1]/odm:MetaDataVersion" mode="metadataDisplay"/>
 						<!-- placeholder 1 studyeventdata -->
 						<!--<xsl:apply-templates
 							select="/odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData[generate-id() = generate-id(key('studyEvents',@StudyEventOID)[1])]"
@@ -226,11 +226,11 @@
 							<!--			<xsl:apply-templates
 			select="/odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData"
 			mode="studyEventInfo" />-->
-							<xsl:apply-templates select="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:StudyEventDef" mode="studyEventInfoHeaders"/>
+							<xsl:apply-templates select="/odm:ODM/odm:Study[1]/odm:MetaDataVersion/odm:StudyEventDef" mode="studyEventInfoHeaders"/>
 							<!--	<xsl:apply-templates
 			select="/odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData"
 			mode="studyEventHeader" />-->
-							<xsl:apply-templates select="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:StudyEventDef" mode="studyFormAndDataItemsHeaders">
+							<xsl:apply-templates select="/odm:ODM/odm:Study[1]/odm:MetaDataVersion/odm:StudyEventDef" mode="studyFormAndDataItemsHeaders">
 								<xsl:with-param name="generateIntHeadersList" select="'No'"/>
 							</xsl:apply-templates>
 							<!-- place holder 3 -->
@@ -1008,7 +1008,7 @@
 					<xsl:for-each select="$subjectEvents">
 						<xsl:variable name="eventOID" select="@StudyEventOID"/>
 						<xsl:variable name="eventPosition">
-							<xsl:for-each select="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:StudyEventDef">
+							<xsl:for-each select="/odm:ODM/odm:Study[1]/odm:MetaDataVersion/odm:StudyEventDef">
 								<xsl:if test="@OID = $eventOID">
 									<xsl:copy-of select="position()"/>
 								</xsl:if>
@@ -1519,7 +1519,7 @@
 								<xsl:variable name="eventRepeatKey" select="@StudyEventRepeatKey"/>
 								<!--eventRepeatKey:<xsl:value-of select="$eventRepeatKey"/>-->
 								<xsl:variable name="eventPosition">
-									<xsl:for-each select="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:StudyEventDef">
+									<xsl:for-each select="/odm:ODM/odm:Study[1]/odm:MetaDataVersion/odm:StudyEventDef">
 										<xsl:if test="@OID = $eventOID">
 											<xsl:copy-of select="position()"/>
 										</xsl:if>
@@ -2010,7 +2010,7 @@
 								<xsl:variable name="eventOID" select="@StudyEventOID"/>
 								<!--eventOID:<xsl:value-of select="$eventOID"/>-->
 								<xsl:variable name="eventPosition">
-									<xsl:for-each select="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:StudyEventDef">
+									<xsl:for-each select="/odm:ODM/odm:Study[1]/odm:MetaDataVersion/odm:StudyEventDef">
 										<xsl:if test="@OID = $eventOID">
 											<xsl:copy-of select="position()"/>
 										</xsl:if>
@@ -2289,7 +2289,7 @@
 		</xsl:for-each>
 		</xsl:variable>-->
 		<xsl:variable name="eventPosition">
-			<xsl:for-each select="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:StudyEventDef">
+			<xsl:for-each select="/odm:ODM/odm:Study[1]/odm:MetaDataVersion/odm:StudyEventDef">
 				<xsl:if test="@OID = $StudyEventDataOID">
 					<xsl:copy-of select="position()"/>
 				</xsl:if>
@@ -3189,7 +3189,7 @@
 			</xsl:for-each>
 		</xsl:variable>
 		<xsl:variable name="eventPosition2">
-			<xsl:for-each select="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:StudyEventDef">
+			<xsl:for-each select="/odm:ODM/odm:Study[1]/odm:MetaDataVersion/odm:StudyEventDef">
 				<xsl:if test="@OID = $eventOID">
 					<xsl:copy-of select="position()"/>
 				</xsl:if>
@@ -3222,7 +3222,7 @@
 		<xsl:variable name="isRepeatingEvent" select="@Repeating"/>
 		<!-- calculate event position -->
 		<xsl:variable name="eventPosition">
-			<xsl:for-each select="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:StudyEventDef">
+			<xsl:for-each select="/odm:ODM/odm:Study[1]/odm:MetaDataVersion/odm:StudyEventDef">
 				<xsl:if test="@OID = $eventOID">
 					<xsl:copy-of select="position()"/>
 				</xsl:if>
@@ -3869,7 +3869,7 @@
 			</xsl:for-each>
 		</xsl:variable>-->
 		<xsl:variable name="eventPosition">
-			<xsl:for-each select="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:StudyEventDef">
+			<xsl:for-each select="/odm:ODM/odm:Study[1]/odm:MetaDataVersion/odm:StudyEventDef">
 				<xsl:if test="@OID = $eventOID">
 					<xsl:copy-of select="position()"/>
 				</xsl:if>
