@@ -21,6 +21,7 @@
 		</rollback>
 	</changeSet>
 	<changeSet author="jamuna" id="2010-05-27-5724-1" dbms="postgresql">
+	         <validCheckSum>67f21277561d5b27a6fdcb7cf9e172d</validCheckSum>
 		<comment>recreating the view back</comment>
 		<createView viewName="dn_age_days">		
    		SELECT dn.discrepancy_note_id, 'now'::text::date - (( SELECT discrepancy_note.date_created
@@ -28,7 +29,7 @@
           WHERE discrepancy_note.parent_dn_id = dn.discrepancy_note_id AND discrepancy_note.discrepancy_note_id = (( SELECT max(discrepancy_note.discrepancy_note_id) AS max
                    FROM discrepancy_note
                   WHERE discrepancy_note.parent_dn_id = dn.discrepancy_note_id AND dn.resolution_status_id &lt;&gt; 4 AND dn.resolution_status_id &lt;&gt; 5)))) AS days, (( SELECT discrepancy_note.date_created        FROM discrepancy_note          WHERE discrepancy_note.parent_dn_id = dn.discrepancy_note_id AND discrepancy_note.discrepancy_note_id = (( SELECT max(discrepancy_note.discrepancy_note_id) AS max                   FROM discrepancy_note                  WHERE discrepancy_note.parent_dn_id = dn.discrepancy_note_id)))) - dn.date_created AS age   FROM discrepancy_note dn  WHERE dn.parent_dn_id IS NULL;
-	ALTER TABLE dn_age_days OWNER TO clinica;
+
 </createView>
 	<rollback>
 		 		<createView viewName="dn_age_days">		
