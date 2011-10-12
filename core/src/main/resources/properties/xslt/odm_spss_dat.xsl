@@ -111,24 +111,7 @@
 		<xsl:variable name="eventDefCount"
 			select="count(/odm:ODM/odm:Study[1]/odm:MetaDataVersion/odm:StudyEventDef)" />
 
-		<!-- <xsl:text>Dataset Name:</xsl:text> <xsl:text>&#x9;</xsl:text> <xsl:value-of 
-			select="$delimiter" /> <xsl:value-of select="$datasetName" /> <xsl:text>&#xa;</xsl:text> 
-			<xsl:text>Dataset Description: </xsl:text> <xsl:value-of select="$desc" /> 
-			<xsl:value-of select="$delimiter" /> <xsl:text>&#xa;</xsl:text> <xsl:text>Item 
-			Status: </xsl:text> <xsl:value-of select="$delimiter" /> <xsl:text>&#xa;</xsl:text> 
-			<xsl:text>Study Name: </xsl:text> <xsl:value-of select="$delimiter" /> <xsl:value-of 
-			select="$study/odm:GlobalVariables/odm:StudyName" /> <xsl:text>&#xa;</xsl:text> 
-			<xsl:text>Protocol ID: </xsl:text> <xsl:value-of select="$delimiter" /> <xsl:value-of 
-			select="$protocolNameStudy" /> <xsl:text>&#xa;</xsl:text> <xsl:text>Date: 
-			</xsl:text> <xsl:value-of select="$delimiter" /> <xsl:call-template name="FormatDate"> 
-			<xsl:with-param name="DateTime" select="/odm:ODM/@CreationDateTime" /> </xsl:call-template> 
-			<xsl:text>&#xa;</xsl:text> <xsl:text>Subjects: </xsl:text> <xsl:value-of 
-			select="$delimiter" /> <xsl:value-of select="$subject_count" /> <xsl:text>&#xa;</xsl:text> 
-			<xsl:text>Study Events Definitions</xsl:text> <xsl:value-of select="$delimiter" 
-			/> <xsl:value-of select="$eventDefCount" /> <xsl:text>&#xa;</xsl:text> <xsl:apply-templates 
-			select="//odm:ODM/odm:Study/odm:MetaDataVersion/odm:StudyEventDef[@OID]" 
-			mode="studyEventDefinition"></xsl:apply-templates> <xsl:apply-templates select="//odm:ODM/odm:Study/odm:MetaDataVersion/odm:FormDef[@OID]" 
-			mode="formDataTemplate"></xsl:apply-templates> -->
+		
 
 		<!-- <xsl:apply-templates -->
 		<!-- select="//odm:ODM/odm:Study/odm:MetaDataVersion/odm:FormDef[@OID]" -->
@@ -334,14 +317,15 @@
 
 	<xsl:template priority="1" mode="formDataTemplate"
 		match="//odm:ODM/odm:Study/odm:MetaDataVersion/odm:FormDef">
-
+		<xsl:param name="eventOID"/>
+		
 		<xsl:variable name="OID" select="@OID" />
 		<xsl:variable name="formName" select="@Name" />
 		<xsl:variable name="oid" select="$OID" />
 		<xsl:value-of select="position()" />
 
 		<xsl:apply-templates
-			select="//odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData/odm:FormData[generate-id() = generate-id(key('eventCRFs',$oid)[1])]"
+			select="//odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData/odm:FormData[generate-id() = generate-id(key('eventCRFs',$oid)[1])  and ../@StudyEventOID = $eventOID]"
 			mode="CrfInfo">
 			<xsl:with-param name="oid" select="$oid" />
 			<xsl:with-param name="formName" select="$formName" />
@@ -1475,16 +1459,17 @@
 							</xsl:if>
 						</xsl:for-each>
 					</xsl:variable>
-					<xsl:variable name="crfVersionExist" select="count(//odm:FormData[@FormOID = $formRefOID and 
-					@OpenClinica:Version]) 	
-						&gt; 0"/>
-					<xsl:variable name="interviewerNameExist" select="count(//odm:FormData[@FormOID = $formRefOID and 
+					<xsl:variable name="crfVersionExist" select="count(//odm:FormData[../@StudyEventOID = $eventOID and @FormOID = $formRefOID and 
+					@OpenClinica:Version])&gt; 0"/>
+					
+					<xsl:variable name="interviewerNameExist" select="count(//odm:FormData[../@StudyEventOID = $eventOID and @FormOID = $formRefOID and 
 						@OpenClinica:InterviewerName]) &gt; 0"/>
-					<xsl:variable name="interviewDateExist" select="count(//odm:FormData[@FormOID = $formRefOID and 
+						
+					<xsl:variable name="interviewDateExist" select="count(//odm:FormData[../@StudyEventOID = $eventOID and @FormOID = $formRefOID and 
 						@OpenClinica:InterviewDate]) &gt; 0"/>
-					<xsl:variable name="crfStatusExist" select="count(//odm:FormData[@FormOID = $formRefOID and 
-					@OpenClinica:Status]) &gt; 
-						0"/>
+						
+					<xsl:variable name="crfStatusExist" select="count(//odm:FormData[../@StudyEventOID = $eventOID and @FormOID = $formRefOID and 
+					@OpenClinica:Status]) &gt; 0"/>
 						
 					<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and odm:FormData/@FormOID = 
 						$formRefOID]) &gt; 0">
@@ -1608,13 +1593,16 @@
 					</xsl:if>
 				</xsl:for-each>
 			</xsl:variable>
-			<xsl:variable name="crfVersionExist" select="count(//odm:FormData[@FormOID = $formRefOID and @OpenClinica:Version 
+			<xsl:variable name="crfVersionExist" select="count(//odm:FormData[../@StudyEventOID = $eventOID and @FormOID = $formRefOID and @OpenClinica:Version 
 			and ../@StudyEventRepeatKey = $eventRepeatCnt]) &gt; 0"/>
-			<xsl:variable name="interviewerNameExist" select="count(//odm:FormData[@FormOID = $formRefOID and 
+			
+			<xsl:variable name="interviewerNameExist" select="count(//odm:FormData[../@StudyEventOID = $eventOID and @FormOID = $formRefOID and 
 				@OpenClinica:InterviewerName  and ../@StudyEventRepeatKey = $eventRepeatCnt]) &gt; 0"/>
-			<xsl:variable name="interviewDateExist" select="count(//odm:FormData[@FormOID = $formRefOID and 
+				
+			<xsl:variable name="interviewDateExist" select="count(//odm:FormData[../@StudyEventOID = $eventOID and @FormOID = $formRefOID and 
 				@OpenClinica:InterviewDate  and ../@StudyEventRepeatKey = $eventRepeatCnt]) &gt; 0"/>
-			<xsl:variable name="crfStatusExist" select="count(//odm:FormData[@FormOID = $formRefOID and @OpenClinica:Status  and 
+				
+			<xsl:variable name="crfStatusExist" select="count(//odm:FormData[../@StudyEventOID = $eventOID and @FormOID = $formRefOID and @OpenClinica:Status  and 
 			../@StudyEventRepeatKey = $eventRepeatCnt]) &gt; 0"/>
 					
 					<xsl:if test="$interviewerNameExist">
