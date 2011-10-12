@@ -726,14 +726,14 @@
 						</xsl:for-each>
 					</xsl:variable>
 					
-					<xsl:variable name="crfVersionExist" select="count(//odm:FormData[@FormOID = $formRefOID and 
+					<xsl:variable name="crfVersionExist" select="count(//odm:FormData[../@StudyEventOID = $eventOID and @FormOID = $formRefOID and 
 					@OpenClinica:Version]) 	
 						&gt; 0"/>
-					<xsl:variable name="interviewerNameExist" select="count(//odm:FormData[@FormOID = $formRefOID and 
+					<xsl:variable name="interviewerNameExist" select="count(//odm:FormData[../@StudyEventOID = $eventOID and @FormOID = $formRefOID and 
 						@OpenClinica:InterviewerName]) &gt; 0"/>
-					<xsl:variable name="interviewDateExist" select="count(//odm:FormData[@FormOID = $formRefOID and 
+					<xsl:variable name="interviewDateExist" select="count(//odm:FormData[../@StudyEventOID = $eventOID and @FormOID = $formRefOID and 
 						@OpenClinica:InterviewDate]) &gt; 0"/>
-					<xsl:variable name="crfStatusExist" select="count(//odm:FormData[@FormOID = $formRefOID and 
+					<xsl:variable name="crfStatusExist" select="count(//odm:FormData[../@StudyEventOID = $eventOID and @FormOID = $formRefOID and 
 					@OpenClinica:Status]) &gt; 
 						0"/>
 					<!--	
@@ -835,14 +835,14 @@
 							</xsl:if>
 						</xsl:for-each>
 					</xsl:variable>
-					<xsl:variable name="crfVersionExist" select="count(//odm:FormData[@FormOID = $formRefOID and 
+					<xsl:variable name="crfVersionExist" select="count(//odm:FormData[../@StudyEventOID = $eventOID and @FormOID = $formRefOID and 
 					@OpenClinica:Version]) 	
 						&gt; 0"/>
-					<xsl:variable name="interviewerNameExist" select="count(//odm:FormData[@FormOID = $formRefOID and 
+					<xsl:variable name="interviewerNameExist" select="count(//odm:FormData[../@StudyEventOID = $eventOID and @FormOID = $formRefOID and 
 						@OpenClinica:InterviewerName]) &gt; 0"/>
-					<xsl:variable name="interviewDateExist" select="count(//odm:FormData[@FormOID = $formRefOID and 
+					<xsl:variable name="interviewDateExist" select="count(//odm:FormData[../@StudyEventOID = $eventOID and @FormOID = $formRefOID and 
 						@OpenClinica:InterviewDate]) &gt; 0"/>
-					<xsl:variable name="crfStatusExist" select="count(//odm:FormData[@FormOID = $formRefOID and 
+					<xsl:variable name="crfStatusExist" select="count(//odm:FormData[../@StudyEventOID = $eventOID and @FormOID = $formRefOID and 
 					@OpenClinica:Status]) &gt; 
 						0"/>
 					<!-- maximum length of InterviewerName for CRF -->					
@@ -979,13 +979,16 @@
 						<xsl:text>VALUE LABELS</xsl:text>
 						<xsl:text>&#xa;</xsl:text>
 					</xsl:if>	
-					<xsl:variable name="crfVersionExist" select="count(//odm:FormData[@FormOID = $formRefOID and @OpenClinica:Version 
+					<xsl:variable name="crfVersionExist" select="count(//odm:FormData[../@StudyEventOID = $eventOID and @FormOID = $formRefOID and @OpenClinica:Version 
 					and ../@StudyEventRepeatKey = $eventRepeatCnt]) &gt; 0"/>
-					<xsl:variable name="interviewerNameExist" select="count(//odm:FormData[@FormOID = $formRefOID and 
+					
+					<xsl:variable name="interviewerNameExist" select="count(//odm:FormData[../@StudyEventOID = $eventOID and @FormOID = $formRefOID and 
 						@OpenClinica:InterviewerName  and ../@StudyEventRepeatKey = $eventRepeatCnt]) &gt; 0"/>
-					<xsl:variable name="interviewDateExist" select="count(//odm:FormData[@FormOID = $formRefOID and 
+						
+					<xsl:variable name="interviewDateExist" select="count(//odm:FormData[../@StudyEventOID = $eventOID and @FormOID = $formRefOID and 
 						@OpenClinica:InterviewDate  and ../@StudyEventRepeatKey = $eventRepeatCnt]) &gt; 0"/>
-					<xsl:variable name="crfStatusExist" select="count(//odm:FormData[@FormOID = $formRefOID and @OpenClinica:Status  and 
+						
+					<xsl:variable name="crfStatusExist" select="count(//odm:FormData[../@StudyEventOID = $eventOID and @FormOID = $formRefOID and @OpenClinica:Status  and 
 					../@StudyEventRepeatKey = $eventRepeatCnt]) &gt; 0"/>
 					<!--				
 					<xsl:variable name="interLen">
@@ -1129,14 +1132,18 @@
 							</xsl:if>
 						</xsl:for-each>
 					</xsl:variable>
-					<xsl:variable name="crfVersionExist" select="count(//odm:FormData[@FormOID = $formRefOID and @OpenClinica:Version 
+					<xsl:variable name="crfVersionExist" select="count(//odm:FormData[../@StudyEventOID = $eventOID and @FormOID = $formRefOID and @OpenClinica:Version 
 					and ../@StudyEventRepeatKey = $eventRepeatCnt]) &gt; 0"/>
-					<xsl:variable name="interviewerNameExist" select="count(//odm:FormData[@FormOID = $formRefOID and 
+					
+					<xsl:variable name="interviewerNameExist" select="count(//odm:FormData[../@StudyEventOID = $eventOID and @FormOID = $formRefOID and 
 						@OpenClinica:InterviewerName  and ../@StudyEventRepeatKey = $eventRepeatCnt]) &gt; 0"/>
-					<xsl:variable name="interviewDateExist" select="count(//odm:FormData[@FormOID = $formRefOID and 
+						
+					<xsl:variable name="interviewDateExist" select="count(//odm:FormData[../@StudyEventOID = $eventOID and @FormOID = $formRefOID and 
 						@OpenClinica:InterviewDate  and ../@StudyEventRepeatKey = $eventRepeatCnt]) &gt; 0"/>
-					<xsl:variable name="crfStatusExist" select="count(//odm:FormData[@FormOID = $formRefOID and @OpenClinica:Status  and 
+						
+					<xsl:variable name="crfStatusExist" select="count(//odm:FormData[../@StudyEventOID = $eventOID and @FormOID = $formRefOID and @OpenClinica:Status  and 
 					../@StudyEventRepeatKey = $eventRepeatCnt]) &gt; 0"/>
+					
 					<!-- maximum length of InterviewerName for CRF -->					
 					<xsl:variable name="interLen">
 						<xsl:for-each select="//odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData/odm:FormData/string-length(@OpenClinica:InterviewerName)">
@@ -1480,7 +1487,8 @@
 		<xsl:param name="StudyEventRepeatKey"/>	
 		<xsl:param name="itemGrpRepeatKey"/> 
 		<xsl:param name="isGrpRepeating"/>
-		<xsl:param name="calledFor"/><!--{createItemDataColForRepeatingGrps}
+		<xsl:param name="calledFor"/>
+		<!--{createItemDataColForRepeatingGrps}
 		eventOID:*<xsl:value-of select="$eventOID"/>*
 		formOID:*<xsl:value-of select="$formOID"/>*
 		grpOID:*<xsl:value-of select="$grpOID"/>*
@@ -1489,7 +1497,7 @@
 		cnt21:<xsl:value-of select="count($allItemGrpDataDataElements[../../@StudyEventOID = $eventOID 
 						and ../@FormOID = $formOID and @ItemGroupOID = $grpOID 
 						and @ItemGroupRepeatKey = $itemGrpRepeatKey])"/>-->
-		<xsl:variable name="maxGrpRepeatKey">
+		<!--<xsl:variable name="maxGrpRepeatKey">
 				<xsl:for-each select="$allItemGrpDataDataElements[../../@StudyEventOID = $eventOID and ../../@StudyEventRepeatKey = $StudyEventRepeatKey 
 						and ../@FormOID = $formOID and @ItemGroupOID = $grpOID ]/@ItemGroupRepeatKey">
 						
@@ -1498,7 +1506,7 @@
 					 <xsl:value-of select="."/>
 				   </xsl:if>
 				  </xsl:for-each>
-			</xsl:variable>			
+			</xsl:variable>	-->		
 			<!--grpOID: <xsl:value-of select="$grpOID"/>	
 			maxGrpRepeatKey:<xsl:value-of select="$maxGrpRepeatKey"/>
 			StudyEventRepeatKey:<xsl:value-of select="$StudyEventRepeatKey"/>
@@ -1508,6 +1516,15 @@
 						and @ItemGroupRepeatKey = $itemGrpRepeatKey])"/>-->
 	    <xsl:choose>
 				<xsl:when test="$isEventRepeating = 'Yes'">
+					<xsl:variable name="maxGrpRepeatKey">
+						<xsl:for-each select="$allItemGrpDataDataElements[../../@StudyEventOID = $eventOID and ../../@StudyEventRepeatKey = $StudyEventRepeatKey 
+							and ../@FormOID = $formOID and @ItemGroupOID = $grpOID ]/@ItemGroupRepeatKey">
+							<xsl:sort data-type="number"/>
+							<xsl:if test="position() = last()">
+								<xsl:value-of select="."/>
+							</xsl:if>
+						</xsl:for-each>
+					</xsl:variable>
 					<xsl:if test="count($allItemGrpDataDataElements[../../@StudyEventOID = $eventOID and ../../@StudyEventRepeatKey = $StudyEventRepeatKey 
 						and ../@FormOID = $formOID and @ItemGroupOID = $grpOID 
 						and @ItemGroupRepeatKey = $itemGrpRepeatKey]) &gt; 0">
@@ -1540,37 +1557,48 @@
 							</xsl:apply-templates>
 					</xsl:if>		
 				</xsl:when>
+				
 				<xsl:otherwise>	
+					<xsl:variable name="maxGrpRepeatKey">
+						<xsl:for-each select="$allItemGrpDataDataElements[../../@StudyEventOID = $eventOID  
+							and ../@FormOID = $formOID and @ItemGroupOID = $grpOID ]/@ItemGroupRepeatKey">
+							<xsl:sort data-type="number"/>
+							<xsl:if test="position() = last()">
+							<xsl:value-of select="."/>
+							</xsl:if>
+						</xsl:for-each>
+					</xsl:variable>
 					<xsl:if test="count($allItemGrpDataDataElements[../../@StudyEventOID = $eventOID 
 						and ../@FormOID = $formOID and @ItemGroupOID = $grpOID 
 						and @ItemGroupRepeatKey = $itemGrpRepeatKey]) &gt; 0"><!--go ahead-->
-			<xsl:apply-templates select="odm:ItemRef" mode="GrpItemRefs">
-				<xsl:with-param name="crfPosition" select="$crfPosition"/>
-				<xsl:with-param name="eventPosition" select="$eventPosition"/>
-				<xsl:with-param name="isEventRepeating" select="$isEventRepeating"/>
-				<xsl:with-param name="formOID" select="$formOID"/>
-				<xsl:with-param name="grpOID" select="$grpOID"/>
-				<xsl:with-param name="isGrpRepeating" select="$isGrpRepeating"/>
-				<xsl:with-param name="eventOID" select="$eventOID"/>	
-				<xsl:with-param name="StudyEventRepeatKey" select="$StudyEventRepeatKey"/>
-				<xsl:with-param name="itemGrpRepeatKey" select="$itemGrpRepeatKey"/>
-				<xsl:with-param name="isLastItem" select="position()=last()" />
-				<xsl:with-param name="calledFor" select="$calledFor"/>
-			</xsl:apply-templates> 
-			
-			<xsl:apply-templates mode="createItemDataColForRepeatingGrps" select=".">
-				<xsl:with-param name="crfPosition" select="$crfPosition"/>
-				<xsl:with-param name="eventPosition" select="$eventPosition"/>
-				<xsl:with-param name="isEventRepeating" select="$isEventRepeating"/>
-				<xsl:with-param name="formOID" select="$formOID"/>
-				<xsl:with-param name="grpOID" select="$grpOID"/>		
-				<xsl:with-param name="eventOID" select="$eventOID"/>
-				<xsl:with-param name="StudyEventRepeatKey" select="$StudyEventRepeatKey"/>	
-				<xsl:with-param name="itemGrpRepeatKey" select="$itemGrpRepeatKey+1"/> 
-				<xsl:with-param name="isGrpRepeating" select="$isGrpRepeating"/>
-				<xsl:with-param name="calledFor" select="$calledFor"/>
-			</xsl:apply-templates>
-		</xsl:if>
+						<xsl:apply-templates select="odm:ItemRef" mode="GrpItemRefs">
+							<xsl:with-param name="crfPosition" select="$crfPosition"/>
+							<xsl:with-param name="eventPosition" select="$eventPosition"/>
+							<xsl:with-param name="isEventRepeating" select="$isEventRepeating"/>
+							<xsl:with-param name="formOID" select="$formOID"/>
+							<xsl:with-param name="grpOID" select="$grpOID"/>
+							<xsl:with-param name="isGrpRepeating" select="$isGrpRepeating"/>
+							<xsl:with-param name="eventOID" select="$eventOID"/>	
+							<xsl:with-param name="StudyEventRepeatKey" select="$StudyEventRepeatKey"/>
+							<xsl:with-param name="itemGrpRepeatKey" select="$itemGrpRepeatKey"/>
+							<xsl:with-param name="isLastItem" select="position()=last()" />
+							<xsl:with-param name="calledFor" select="$calledFor"/>
+						</xsl:apply-templates> 
+					</xsl:if>
+					<xsl:if test="($itemGrpRepeatKey+1) &lt;= number($maxGrpRepeatKey)">	
+						<xsl:apply-templates mode="createItemDataColForRepeatingGrps" select=".">
+							<xsl:with-param name="crfPosition" select="$crfPosition"/>
+							<xsl:with-param name="eventPosition" select="$eventPosition"/>
+							<xsl:with-param name="isEventRepeating" select="$isEventRepeating"/>
+							<xsl:with-param name="formOID" select="$formOID"/>
+							<xsl:with-param name="grpOID" select="$grpOID"/>		
+							<xsl:with-param name="eventOID" select="$eventOID"/>
+							<xsl:with-param name="StudyEventRepeatKey" select="$StudyEventRepeatKey"/>	
+							<xsl:with-param name="itemGrpRepeatKey" select="$itemGrpRepeatKey+1"/> 
+							<xsl:with-param name="isGrpRepeating" select="$isGrpRepeating"/>
+							<xsl:with-param name="calledFor" select="$calledFor"/>
+						</xsl:apply-templates>
+					</xsl:if>
 				  </xsl:otherwise>
 		</xsl:choose>		  
   </xsl:template>
