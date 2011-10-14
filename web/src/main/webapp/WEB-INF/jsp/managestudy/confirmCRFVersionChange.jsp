@@ -14,7 +14,7 @@
 <!-- move the alert message to the sidebar-->
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->
-<tr id="sidebar_Instructions_open" style="display: none">
+<tr id="sidebar_Instructions_open" style="display: all">
 		<td class="sidebar_tab">
 
 		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="../../images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
@@ -22,13 +22,13 @@
 		<b><fmt:message key="instructions" bundle="${resword}"/></b>
 
 		<div class="sidebar_tab_content">
-
+			<fmt:message key="confirm_crf_instruction_key"  bundle="${resword}"/>
 		</div>
 
 		</td>
 
 	</tr>
-	<tr id="sidebar_Instructions_closed" style="display: all">
+	<tr id="sidebar_Instructions_closed" style="display: none">
 		<td class="sidebar_tab">
 
 		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="../../images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
@@ -51,20 +51,52 @@
 
 <table cellpadding="2" cellspacing="2" border="0" >
 
+
+
+
+<!-- header table -->
 <!-- subject lable here -->
 <tr><td>
 <fmt:message key="study_subject_ID" bundle="${resword}"/>: &nbsp;</td>
 <td><c:out value="${studySubjectLabel}"/></td></tr>
 
+
+
+<tr><td>
+<fmt:message key="event" bundle="${resword}"/>:</td>
+<td> <c:out value="${eventName}" />&nbsp;(<c:out value="${eventCreateDate}" />)</td></tr>
+
+<c:if test="${! empty eventOrdinal}">
+<tr><td><fmt:message key="occurrence_number" bundle="${resword}"/>:</td>
+<td><c:out value="${eventOrdinal}" /></td></tr>
+</c:if>     
+
+<!--  <tr><td>
+<fmt:message key="study" bundle="${resword}"/>:</td>
+<td><c:out value="${studySubjectLabel}"/></td></tr>-->
+
 <!-- CRF name  here -->
 <tr><td>
-<fmt:message key="choose_CRF_version_crf_name" bundle="${resword}"/></td>
-<td><c:out value="${crfName}"/></td></tr>
+<fmt:message key="choose_CRF_version_crf_name" bundle="${resword}"/>:</td>
+<td><a href="#" onclick="window.openNewWindow('../../ViewCRF?module=admin&crfId=<c:out value="${crfBean.id}"/>' ,'','no','dn')">
+<c:out value="${crfName}"/></a></td></tr>
 <tr><td>
 
 
-</td></tr>
+<!-- default version label here -->
+<tr><td>
+<fmt:message key="choose_CRF_version_current_crf_version_title" bundle="${resword}"/>:</td>
+<td><c:out value="${crfVersionName}"/></td></tr>
+
+<tr><td>
+<fmt:message key="confirm_CRF_version_new_version" bundle="${resword}"/>: </td>
+<td><c:out value="${selectedVersionName}"/></td></tr>
 </table>
+<!-- header ends -->
+
+<br><br>
+<fmt:message key="confirm_crf_version_table_comment" bundle="${resword}"/>
+
 <br><br>
 <!-- crf table here -->
 
@@ -83,8 +115,20 @@
 
 <tr>
 <td  class="table_cell_right" > ${row[0]}&nbsp;</td>
-<td  class="table_cell"  > ${row[1]}&nbsp;</td>
-<td  class="table_cell"  > ${row[2]}&nbsp;</td>
+<td  class="table_cell"  > 
+<c:choose>
+<c:when test="${empty row[1]}" >
+&nbsp;
+</c:when>
+<c:otherwise>
+<a href="javascript: openDocWindow('../../ViewItemDetail?itemId=${row[2]}')"> ${row[1]} </a>
+</c:otherwise>
+</c:choose>
+</td>
+
+
+
+<td  class="table_cell"  > ${row[3]}&nbsp;</td>
 </tr>
 </c:forEach>
 </table></td>
@@ -103,9 +147,18 @@
 <c:forEach items="${rows}" var="row" varStatus="rowLoop" begin="0" step="1">
 
 <tr>
-<td  class="table_cell"  > ${row[3]}&nbsp;</td>
 <td  class="table_cell"  > ${row[4]}&nbsp;</td>
-<td  class="table_cell"  > ${row[5]}&nbsp;</td>
+<td  class="table_cell"  > 
+<c:choose>
+<c:when test="${empty row[5]}" >
+&nbsp;
+</c:when>
+<c:otherwise>
+<a href="javascript: openDocWindow('../../ViewItemDetail?itemId=${row[6]}')"> ${row[1]} </a>
+</c:otherwise>
+</c:choose>
+</td>
+<td  class="table_cell"  > ${row[7]}&nbsp;</td>
 </tr>
 </c:forEach>
 </table>
@@ -123,7 +176,9 @@
 <input type="hidden" name="crfName" value="${crfName}">
 <input type="hidden" name="crfVersionName" value="${crfVersionName}">
 <input type="hidden" name="eventCRFId" value="${eventCRFId}">
-
+<input type="hidden" name="eventName" value="${eventName}">
+<input type="hidden" name="eventCreateDate" value="${eventCreateDate}">
+<input type="hidden" name="eventOrdinal" value="${eventOrdinal}">
 
 <input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_long">
 </form></td><td>

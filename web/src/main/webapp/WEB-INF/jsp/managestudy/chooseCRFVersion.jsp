@@ -30,7 +30,7 @@ jQuery(document).ready( function () {
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->
 <!-- then instructions-->
-<tr id="sidebar_Instructions_open" style="display: none">
+<tr id="sidebar_Instructions_open" style="display: all">
 		<td class="sidebar_tab">
 
 		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="../../images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
@@ -38,13 +38,13 @@ jQuery(document).ready( function () {
 		<b><fmt:message key="instructions" bundle="${resword}"/></b>
 
 		<div class="sidebar_tab_content">
-
+			<fmt:message key="choose_crf_instruction_key"  bundle="${resword}"/>
 		</div>
 
 		</td>
 
 	</tr>
-	<tr id="sidebar_Instructions_closed" style="display: all">
+	<tr id="sidebar_Instructions_closed" style="display: none">
 		<td class="sidebar_tab">
 
 		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="../../images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
@@ -68,18 +68,40 @@ jQuery(document).ready( function () {
 <input type="hidden" name="crfName" value="${crfName}">
 <input type="hidden" name="crfVersionName" value="${crfVersionName}">
 <input type="hidden" name="eventCRFId" value="${eventCRFId}">
+<input type="hidden" name="eventName" value="${eventName}">
+<input type="hidden" name="eventCreateDate" value="${eventCreateDate}">
+<input type="hidden" name="eventOrdinal" value="${eventOrdinal}">
+        	
 
 
 <table cellpadding="2" cellspacing="2" border="0" class="dataTable" >
 
-<!-- subject lable here -->
+<!-- header table -->
 <tr><td>
 <fmt:message key="study_subject_ID" bundle="${resword}"/>:</td>
 <td><c:out value="${studySubjectLabel}"/></td></tr>
 
+
+<tr><td>
+<fmt:message key="event" bundle="${resword}"/>:</td>
+<td> <c:out value="${eventName}" />&nbsp;(<c:out value="${eventCreateDate}" />)</td></tr>
+
+<c:if test="${! empty eventOrdinal}">
+<tr><td><fmt:message key="occurrence_number" bundle="${resword}"/>:</td>
+<td><c:out value="${eventOrdinal}" /></td></tr>
+</c:if>     
+	
+
+<!-- <tr><td>
+<fmt:message key="study" bundle="${resword}"/>:</td>
+<td><c:out value="${studySubjectLabel}"/></td></tr>
+ -->
+ 
 <tr><td>
 <fmt:message key="choose_CRF_version_crf_name" bundle="${resword}"/></td>
-<td><c:out value="${crfName}"/></td></tr>
+<td>
+<a href="#" onclick="window.openNewWindow('../../ViewCRF?module=admin&crfId=<c:out value="${crfBean.id}"/>' ,'','no','dn')">
+<c:out value="${crfName}"/></a></td></tr>
 
 <!-- default version label here -->
 <tr><td>
@@ -100,21 +122,22 @@ jQuery(document).ready( function () {
 </select>
 <input type='hidden' id='selectedVersionName' name='selectedVersionName' value='zzz'>
 
-
-
-
 </td></tr>
 </table>
+<!-- header ends -->
+
+
 <!-- crf table here -->
 <br><br>
 
 <table cellpadding="0" cellspacing="0" border="1" class="dataTable" >
 <tr>
+<!-- 
 <td class="table_header_row" style="color: #789EC5;"><fmt:message key="CRF_name" bundle="${resword}"/></td>
 <td class="table_header_row" style="color: #789EC5;"><fmt:message key="date_updated" bundle="${resword}"/></td>
 <td class="table_header_row" style="color: #789EC5;"><fmt:message key="last_updated_by" bundle="${resword}"/></td>
-<td class="table_header_row" style="color: #789EC5;"><fmt:message key="crf_oid" bundle="${resword}"/></td>
-<td class="table_header_row" style="color: #789EC5;"><fmt:message key="versions" bundle="${resword}"/></td>
+<td class="table_header_row" style="color: #789EC5;"><fmt:message key="crf_oid" bundle="${resword}"/></td> -->
+<td class="table_header_row" style="color: #789EC5;"><fmt:message key="version_name" bundle="${resword}"/></td>
 <td class="table_header_row" style="color: #789EC5;"><fmt:message key="version_oid" bundle="${resword}"/></td>
 <td class="table_header_row" style="color: #789EC5;"><fmt:message key="date_created" bundle="${resword}"/></td>
 <td class="table_header_row" style="color: #789EC5;"><fmt:message key="owner" bundle="${resword}"/></td>
@@ -124,7 +147,7 @@ jQuery(document).ready( function () {
 <td class="table_header_row" style="color: #789EC5;"><fmt:message key="action" bundle="${resword}"/></td>
 </tr>
 <tr valign="top">
-<td  class="table_cell_left" rowspan="<c:out value="${numberOfVersions}" />"><c:out value="${crfBean.name}" /> &nbsp;</td>
+<!--  <td  class="table_cell_left" rowspan="<c:out value="${numberOfVersions}" />"><c:out value="${crfBean.name}" /> &nbsp;</td>
 <td  class="table_cell"  rowspan="<c:out value="${numberOfVersions}" />"> <fmt:formatDate value="${crfBean.updatedDate}" pattern="${dteFormat}"/>&nbsp;</td>
 <td  class="table_cell"  rowspan="<c:out value="${numberOfVersions}" />"> <c:out value="${crfBean.updater.name}" />&nbsp;</td>
 <td  class="table_cell"  rowspan="<c:out value="${numberOfVersions}" />"> <c:out value="${crfBean.oid}" />&nbsp;</td>
@@ -132,17 +155,17 @@ jQuery(document).ready( function () {
 <td  class="table_cell"  > &nbsp;</td>
 <td  class="table_cell"  ><fmt:formatDate value="${crfBean.createdDate}" pattern="${dteFormat}"/>&nbsp;</td>
 <td  class="table_cell"  > &nbsp;</td>
-<!--<td  class="table_cell"  > &nbsp;</td>-->
 <td  class="table_cell"  > &nbsp;</td>
 <td  class="table_cell"  > &nbsp;
-<a href="../../ViewCRF?module=admin&crfId=<c:out value="${crfBean.id}"/> "
+      
+<a href="#" onclick="window.openNewWindow('../../ViewCRF?module=admin&crfId=<c:out value="${crfBean.id}"/>' ,'','no','dn')" 
                onMouseDown="javascript:setImage('bt_View1','../../images/bt_View_d.gif');"
                onMouseUp="javascript:setImage('bt_View1','../../images/bt_View.gif');"><img
           name="bt_View1" src="../../images/bt_View.gif" border="0" alt="View" title="View" align="left" hspace="6"></a>
 
 
 </td></tr>
-
+-->
 <!-- versions data -->
 
 <c:forEach var="version" items="${crfBean.versions}">
@@ -156,7 +179,7 @@ jQuery(document).ready( function () {
 <td  class="table_cell"  style="text-align:center;" ><c:if test="${version.id == crfversionId}">X</c:if>&nbsp;</td>
 <td  class="table_cell"  > &nbsp;
 <a onmouseup="javascript:setImage('bt_View1','../../images/bt_View.gif');" onmousedown="javascript:setImage('bt_View1','../../images/bt_View_d.gif');" 
-href="../../ViewSectionDataEntry?module=admin&crfId=<c:out value="${crfBean.id}"/>&crfVersionId=<c:out value="${version.id}"/>&tabId=1&crfListPage=yes">
+href="#" onclick="window.openNewWindow('../../ViewSectionDataEntry?module=admin&crfId=<c:out value="${crfBean.id}"/>&crfVersionId=<c:out value="${version.id}"/>&tabId=1&crfListPage=yes','','no','')">
 <img hspace="6" border="0" align="left" title="View" alt="View" src="../../images/bt_View.gif" name="bt_View1">
 </a>
 </td>

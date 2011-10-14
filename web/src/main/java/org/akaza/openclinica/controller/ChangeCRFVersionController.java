@@ -2,12 +2,17 @@ package org.akaza.openclinica.controller;
 
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
@@ -29,9 +34,12 @@ import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -62,7 +70,8 @@ public class ChangeCRFVersionController {
     @Qualifier("sidebarInit")
     private SidebarInit sidebarInit;
     
-   
+    ResourceBundle  resword,resformat;
+
 
     public ChangeCRFVersionController() {
     }
@@ -122,7 +131,7 @@ public class ChangeCRFVersionController {
         //get CRF by ID with all versions
         //create List of all versions (label + value)
         //set default CRF version label
-        
+        setupResource(request);
          
         //from event_crf get 
         StudyBean study = (StudyBean) request.getSession().getAttribute("study");
@@ -131,9 +140,23 @@ public class ChangeCRFVersionController {
         CRFBean crfBean = (CRFBean)cdao.findByPK(crfId);
         CRFVersionDAO crfVersionDao = new CRFVersionDAO(dataSource);
         ArrayList<CRFVersionBean> versions = (ArrayList<CRFVersionBean>) crfVersionDao.findAllActiveByCRF(crfId);
+        StudyEventDefinitionDAO sfed = new StudyEventDefinitionDAO(dataSource);
+    	StudyEventDefinitionBean sedb =   sfed.findByEventDefinitionCRFId(eventDefinitionCRFId);
+    	request.setAttribute("eventName", sedb.getName());
+    		
+    	 EventCRFDAO ecdao = new EventCRFDAO(dataSource);
+    	 EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(eventCRFId);
+
+         StudyEventDAO sedao = new StudyEventDAO(dataSource);
+         StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
+         request.setAttribute("eventCreateDate", formatDate(seb.getCreatedDate()));
+       	if ( sedb.isRepeating()){
+    		request.setAttribute("eventOrdinal", seb.getSampleOrdinal());
+    	}
         if (study.getParentStudyId()>0 ){
-         	EventDefinitionCRFDAO edfdao = new EventDefinitionCRFDAO(dataSource);
+        	EventDefinitionCRFDAO edfdao = new EventDefinitionCRFDAO(dataSource);
         	EventDefinitionCRFBean edf = (EventDefinitionCRFBean) edfdao.findByPK(eventDefinitionCRFId);
+        	
         	if (!edf.getSelectedVersionIds().equals("")){
 	        	String[] version_ids = edf.getSelectedVersionIds().split(",");
 	        	HashMap<String,String> tmp = new HashMap<String,String>(version_ids.length);
@@ -198,6 +221,10 @@ public class ChangeCRFVersionController {
     		@RequestParam(value="eventDefinitionCRFId", required = false) int eventDefinitionCRFId,
     		@RequestParam(value="selectedVersionId" , required = false) int selectedVersionId,
     		@RequestParam(value="selectedVersionName", required=false) String selectedVersionName,
+    		@RequestParam(value="eventName",  required=false) String eventName,
+		    @RequestParam(value="eventCreateDate",  required=false) String eventCreateDate,        	
+		    @RequestParam(value="eventOrdinal", required=false) String eventOrdinal,
+		        
     		@RequestParam("confirmCRFVersionSubmit") String as
     ) 
     
@@ -220,15 +247,23 @@ public class ChangeCRFVersionController {
       	request.setAttribute("crfversionId", crfVersionId);
       	request.setAttribute("crfVersionName",crfVersionName.trim());
       	request.setAttribute("selectedVersionId",selectedVersionId);
-      	request.setAttribute("selectedVersionName",selectedVersionName.trim());
+      	if (selectedVersionName != null){
+      		selectedVersionName = selectedVersionName.trim();
+      	}
+      	request.setAttribute("selectedVersionName",selectedVersionName);
+      	request.setAttribute("eventName", eventName);
+    	request.setAttribute("eventCreateDate", eventCreateDate);
+    	request.setAttribute("eventOrdinal", eventOrdinal);
       	
         ModelMap gridMap = new ModelMap();
         ArrayList<String> pageMessages = (ArrayList<String>) request.getAttribute("pageMessages");
         if (pageMessages == null) {
             pageMessages = new ArrayList<String>();
         }
+        setupResource(request);
         if ( selectedVersionId == -1){
-        	String errorMessage = "Please select CRF version number";
+        	
+        	String errorMessage = resword.getString("confirm_crf_version_em_select_version");//"Please select CRF version";
 //        	pageMessages.add(errorMessage);
 //        	request.setAttribute("pageMessages",pageMessages);
 //        	request.setAttribute("errorMessage",errorMessage);
@@ -274,7 +309,7 @@ public class ChangeCRFVersionController {
 	        	}
 	        	if ( cur_counter >= (cur_items.size()-1) && new_counter < (new_items.size()-1 )){
 	        		 new_counter++;
-	        		String[]row = {"","","",new_element.getName(),	new_element.getOid(),""};
+	        		String[]row = {"","","","",new_element.getName(),	new_element.getOid(),String.valueOf(new_element.getId()),""};
         			rows.add(row);
 	        	}
 	        	if ( cur_counter < (cur_items.size()-1) && new_counter >= (new_items.size()-1 )){
@@ -282,8 +317,9 @@ public class ChangeCRFVersionController {
 	        		for (ItemDataBean data_item : cur_element.getItemDataElements()){
 	        			String[]row = {cur_element.getName()+" ("+data_item.getOrdinal()+")",
 	        					cur_element.getOid(),
+	        					String.valueOf(cur_element.getId()),
 	        					data_item.getValue(),
-        						"","",""};
+        						"","","",""};
 	        			rows.add(row);
 	        		}
 	        	}
@@ -292,17 +328,21 @@ public class ChangeCRFVersionController {
 	        		for (ItemDataBean data_item : cur_element.getItemDataElements()){
 	        			String[]row = {cur_element.getName()+" ("+data_item.getOrdinal()+")",
 	        					cur_element.getOid(),
+	        					String.valueOf(cur_element.getId()),
 	        					data_item.getValue(),
         						cur_element.getName()+" ("+data_item.getOrdinal()+")",
         						new_element.getOid(),
-        						data_item.getValue()};
+        						String.valueOf(new_element.getId()),
+        						data_item.getValue()
+        						
+	        			};
 	        			rows.add(row);
 	        		}
 	        		
 	        	}
 	        	else if ( new_element != null && cur_element != null && new_element.getId() < cur_element.getId()){
 	        		 new_counter++;
-	        		String[]row = {"","","",new_element.getName(),	new_element.getOid(),""};
+	        		String[]row = {"","","","",new_element.getName(),	new_element.getOid(),String.valueOf(new_element.getId()),""};
         			rows.add(row);
 	        	}
 	        	else if ( new_element != null && cur_element != null && new_element.getId() > cur_element.getId()){
@@ -310,8 +350,9 @@ public class ChangeCRFVersionController {
 	        		for (ItemDataBean data_item : cur_element.getItemDataElements()){
 	        			String[]row = {cur_element.getName()+" ("+data_item.getOrdinal()+")",
 	        					cur_element.getOid(),
+	        					String.valueOf(cur_element.getId()),
 	        					data_item.getValue(),
-        						"","",""};
+        						"","","",""};
 	        			rows.add(row);
 	        		}
 	        	}
@@ -360,9 +401,9 @@ public class ChangeCRFVersionController {
 //	        		
 //	        	}
 //	        }		
-	        
+	       
         }catch(Exception e){
-        	 pageMessages.add("Can not extract data for the 'Change CRF version' action.");
+        	 pageMessages.add(resword.getString("confirm_crf_version_em_dataextraction"));
             
         }
         request.setAttribute("pageMessages", pageMessages);
@@ -401,20 +442,19 @@ public class ChangeCRFVersionController {
             pageMessages = new ArrayList<String>();
         }
         request.setAttribute("pageMessages", pageMessages);
+        setupResource(request);
 //update event_crf_id table
         try{
 	        EventCRFDAO event_crf_dao = new EventCRFDAO(dataSource);
 	        event_crf_dao.updateCRFVersionID(eventCRFId, newCRFVersionId);
 	        //create AuditEvent
 	        
-	        
+	        pageMessages.add(resword.getString("confirm_crf_version_ms"));
 	        redirect( request, response, "/ViewStudySubject?id="+studySubjectId);
         }
         catch (Exception e){
-        	ResourceBundleProvider.updateLocale(new Locale("en_US"));
-             
-        	String erm = ResourceBundleProvider.getPageMessagesBundle().getString("error_message_cannot_update_crf_version");
-        	pageMessages.add("error_message_cannot_update_crf_version");
+          
+        	pageMessages.add(resword.getString("error_message_cannot_update_crf_version"));
         	
         }
         
@@ -481,6 +521,19 @@ public class ChangeCRFVersionController {
          panel.setIconInfoShown(false);
          request.getSession().setAttribute("panel", panel);
     
+    }
+    
+    private void setupResource(HttpServletRequest request){
+    	 Locale locale = request.getLocale();
+         ResourceBundleProvider.updateLocale(locale);
+         resword = ResourceBundleProvider.getWordsBundle(locale);
+         resformat = ResourceBundleProvider.getFormatBundle(locale);
+    }
+    private String formatDate(Date date){
+    	String dateFormat = resformat.getString("date_format_string") ;
+    	SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
+    	String s = formatter.format(date);
+    	return s;
     }
    
 }
