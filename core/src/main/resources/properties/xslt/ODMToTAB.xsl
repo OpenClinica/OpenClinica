@@ -62,6 +62,8 @@
 	<xsl:variable name="dobExist"
 		select="//odm:SubjectData/@OpenClinica:DateOfBirth" />
 	<xsl:variable name="subjectStatusExist" select="//odm:SubjectData/@OpenClinica:Status" />
+	<xsl:variable name="subjectSecondaryIdExist" select="//odm:SubjectData/@OpenClinica:SecondaryID"/>
+	
 	<xsl:variable name="allEventDefs"
 		select="//odm:ODM/odm:Study[1]/odm:MetaDataVersion/odm:StudyEventDef" />
     <xsl:variable name="allStudyEventDataElements"
@@ -174,6 +176,10 @@
 			<xsl:text>Person ID</xsl:text>
 			<xsl:value-of select="$delimiter" />
 		</xsl:if>
+		<xsl:if test="$subjectSecondaryIdExist">
+			<xsl:text>Secondary ID</xsl:text>
+			<xsl:value-of select="$delimiter" />
+		</xsl:if>		
 		<xsl:if test="$subjectStatusExist">
 			<xsl:text>Subject Status</xsl:text>
 			<xsl:value-of select="$delimiter" />
@@ -482,6 +488,10 @@
 		<xsl:value-of select="$sep"/>
 		<xsl:if test="$uniqueIdExist">
 			<xsl:value-of select="@OpenClinica:UniqueIdentifier"/>
+			<xsl:value-of select="$delimiter" />
+		</xsl:if>
+		<xsl:if test="$subjectSecondaryIdExist">
+			<xsl:value-of select="@OpenClinica:SecondaryID"/>
 			<xsl:value-of select="$delimiter" />
 		</xsl:if>
 		<!--<xsl:apply-templates select="@OpenClinica:UniqueIdentifier"/> <xsl:value-of 
