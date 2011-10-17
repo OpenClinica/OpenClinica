@@ -33,6 +33,7 @@
 	<xsl:variable name="dobExist"
 		select="//odm:SubjectData/@OpenClinica:DateOfBirth" />
 	<xsl:variable name="subjectStatusExist" select="//odm:SubjectData/@OpenClinica:Status" />
+	<xsl:variable name="subjectSecondaryIdExist" select="//odm:SubjectData/@OpenClinica:SecondaryID"/>
 	
 	<xsl:variable name="allStudyEventDataElements"
 		select="//odm:StudyEventData" />
@@ -1958,6 +1959,21 @@
 			<!--<xsl:text> "Unique ID"</xsl:text>-->
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
+		
+		<xsl:if test="$subjectSecondaryIdExist">
+			<xsl:variable name="valueLength">
+				<xsl:for-each select="//odm:ODM/odm:ClinicalData/odm:SubjectData/string-length(@OpenClinica:SecondaryID)">
+					<xsl:sort data-type="number"/>
+					<xsl:if test="position() = last()">
+						<xsl:value-of select="."/>
+					</xsl:if>
+				</xsl:for-each>
+			</xsl:variable>
+			<xsl:text>SecondaryID</xsl:text>
+			<xsl:text> A</xsl:text><xsl:value-of select="$valueLength" />
+			<!--<xsl:text> "Unique ID"</xsl:text>-->
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
 
 		<xsl:if test="$subjectStatusExist">
 			<xsl:text>SubjectStatus</xsl:text>
@@ -2023,6 +2039,12 @@
 		<xsl:if test="$uniqueIdExist">
 			<xsl:text>PersonID</xsl:text>
 			<xsl:text> "Person ID"</xsl:text><xsl:text> /</xsl:text>
+			<xsl:text>&#xa;</xsl:text>
+		</xsl:if>
+		
+		<xsl:if test="$subjectSecondaryIdExist">
+			<xsl:text>SecondaryID</xsl:text>
+			<xsl:text> "Secondary ID"</xsl:text><xsl:text> /</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
 

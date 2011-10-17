@@ -33,10 +33,13 @@
 	<xsl:key name="studyEvents" match="odm:StudyEventData" use="@StudyEventOID"/>
 	<xsl:key name="eventCRFs" match="odm:FormData" use="@FormOID"/>
 	<xsl:key name="itemDataKey" match="odm:ItemData" use="@ItemOID"/>
+	
 	<xsl:variable name="sexExist" select="//odm:SubjectData/@OpenClinica:Sex"/>
 	<xsl:variable name="uniqueIdExist" select="//odm:SubjectData/@OpenClinica:UniqueIdentifier"/>
 	<xsl:variable name="dobExist" select="//odm:SubjectData/@OpenClinica:DateOfBirth"/>
 	<xsl:variable name="subjectStatusExist" select="//odm:SubjectData/@OpenClinica:Status"/>
+	<xsl:variable name="subjectSecondaryIdExist" select="//odm:SubjectData/@OpenClinica:SecondaryID"/>
+	
 	<xsl:variable name="eventLocationExist" select="//odm:StudyEventData/@OpenClinica:StudyEventLocation"/>
 	<xsl:variable name="eventStartDateExist" select="//odm:StudyEventData/@OpenClinica:StartDate"/>
 	<xsl:variable name="eventEndDateExist" select="//odm:StudyEventData/@OpenClinica:EndDate"/>
@@ -190,13 +193,18 @@
 						<tr valign="top">
 							<td class="table_header_row">
 								<xsl:text>Study Subject ID</xsl:text>
-							</td>
+							</td>							
 							<td class="table_header_row">
 								<xsl:text>Protocol ID</xsl:text>
 							</td>
 							<xsl:if test="$uniqueIdExist">
 								<td class="table_header_row">
 									<xsl:text>Person ID</xsl:text>
+								</td>
+							</xsl:if>
+							<xsl:if test="$subjectSecondaryIdExist">
+								<td class="table_header_row">
+									<xsl:text>Secondary ID</xsl:text>
 								</td>
 							</xsl:if>
 							<xsl:if test="$subjectStatusExist">
@@ -382,6 +390,18 @@
 					<xsl:choose>
 						<xsl:when test="@OpenClinica:UniqueIdentifier">
 							<xsl:value-of select="@OpenClinica:UniqueIdentifier"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+						</xsl:otherwise>
+					</xsl:choose>
+				</td>
+			</xsl:if>
+			<xsl:if test="$subjectSecondaryIdExist">
+				<td class="table_cell">
+					<xsl:choose>
+						<xsl:when test="@OpenClinica:SecondaryID">
+							<xsl:value-of select="@OpenClinica:SecondaryID"/>
 						</xsl:when>
 						<xsl:otherwise>
 							<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
