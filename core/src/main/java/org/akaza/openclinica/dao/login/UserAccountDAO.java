@@ -941,6 +941,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
     }
 
     public StudyUserRoleBean updateStudyUserRole(StudyUserRoleBean s, String userName) {
+        Locale currentLocale = ResourceBundleProvider.getLocale();
+        ResourceBundleProvider.updateLocale(Locale.US);
         HashMap variables = new HashMap();
 
         variables.put(new Integer(1), s.getRoleName());
@@ -952,6 +954,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         String sql = digester.getQuery("updateStudyUserRole");
         this.execute(sql, variables);
 
+        ResourceBundleProvider.updateLocale(currentLocale);
         return s;
     }
 
