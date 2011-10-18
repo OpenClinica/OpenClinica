@@ -457,7 +457,7 @@ window.onload = initmb;
                                             </c:when>
                                             <c:otherwise>
                                                 <td valign="bottom">  <input type="checkbox" id="markCompleteId" name="markComplete" value="Yes"
-                                                                            <c:if test="${markComplete=='Yes'}"> checked </c:if> onclick="displayMessageFromCheckbox(this)">
+                                                                            <c:if test="${markComplete=='Yes'}"> checked </c:if> onclick="displayMessageFromCheckbox(this, '<fmt:message key="marking_CRF_complete_finalize_DE" bundle="${restext}"/>')">
                                                 </td>
                                                 <td valign="bottom" nowrap="nowrap">&nbsp; <fmt:message key="mark_CRF_complete" bundle="${resword}"/>&nbsp;&nbsp;&nbsp;</td>
                                             </c:otherwise>
@@ -515,7 +515,7 @@ window.onload = initmb;
                                             </c:when>
                                             <c:otherwise>
                                                 <td valign="bottom">  <input type="checkbox" id="markCompleteId" name="markComplete" value="Yes"
-                                                                            <c:if test="${markComplete=='Yes'}"> checked </c:if> onclick="displayMessageFromCheckbox(this)">
+                                                                            <c:if test="${markComplete=='Yes'}"> checked </c:if> onclick="displayMessageFromCheckbox(this,'<fmt:message key="marking_CRF_complete_finalize_DE" bundle="${restext}"/>')">
                                                 </td>
                                                 <td valign="bottom" nowrap="nowrap">&nbsp; <fmt:message key="mark_CRF_complete" bundle="${resword}"/>&nbsp;&nbsp;&nbsp;</td>
                                             </c:otherwise>
@@ -1488,7 +1488,7 @@ table-->
                                 </c:when>
                                 <c:otherwise>
                                     <td valign="bottom">  <input type="checkbox" id="markCompleteId" name="markComplete" value="Yes"
-                                                                <c:if test="${markComplete=='Yes'}"> checked </c:if> onclick="displayMessageFromCheckbox(this)">
+                                                                <c:if test="${markComplete=='Yes'}"> checked </c:if> onclick="displayMessageFromCheckbox(this, '<fmt:message key="marking_CRF_complete_finalize_DE" bundle="${restext}"/>')">
                                     </td>
                                     <td valign="bottom" nowrap="nowrap">&nbsp; <fmt:message key="mark_CRF_complete" bundle="${resword}"/>&nbsp;&nbsp;&nbsp;</td>
                                 </c:otherwise>

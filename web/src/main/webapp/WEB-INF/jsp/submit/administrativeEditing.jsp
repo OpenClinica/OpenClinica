@@ -391,7 +391,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                                     <%--<c:choose>
                                       <c:when test="${stage !='adminEdit' && section.lastSection}">
                                         <td valign="bottom">  <input type="checkbox" name="markComplete" value="Yes"
-                                                                     onclick="displayMessageFromCheckbox(this)">
+                                                                     onclick="displayMessageFromCheckbox(this, '<fmt:message key="marking_CRF_complete_finalize_DE" bundle="${restext}"/>')">
                                         </td>
                                         <td valign="bottom" nowrap="nowrap">&nbsp; <fmt:message key="mark_CRF_complete" bundle="${resword}"/> &nbsp;&nbsp;&nbsp;</td>
                                       </c:when>
@@ -440,7 +440,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                                     <%--<c:choose>
                                       <c:when test="${stage !='adminEdit' && section.lastSection}">
                                         <td valign="bottom"><input type="checkbox" name="markComplete" value="Yes"
-                                                                   onclick="displayMessageFromCheckbox(this)">
+                                                                   onclick="displayMessageFromCheckbox(this, '<fmt:message key="marking_CRF_complete_finalize_DE" bundle="${restext}"/>')">
                                         </td>
                                         <td valign="bottom" nowrap>&nbsp; <fmt:message key="mark_CRF_complete" bundle="${resword}"/> &nbsp;&nbsp;&nbsp;</td>
                                       </c:when>
@@ -1288,7 +1288,7 @@ table-->
                       <c:when test="${stage !='adminEdit' && section.lastSection}">
                         <td valign="bottom">
                           <input type="checkbox" name="markComplete" value="Yes"
-                                 onClick="displayMessageFromCheckbox(this)">
+                                 onClick="displayMessageFromCheckbox(this, '<fmt:message key="marking_CRF_complete_finalize_DE" bundle="${restext}"/>')">
                         </td>
                         <td valign="bottom" nowrap>&nbsp; <fmt:message key="mark_CRF_complete" bundle="${resword}"/> &nbsp;&nbsp;&nbsp;</td>
                       </c:when>
