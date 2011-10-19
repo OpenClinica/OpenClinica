@@ -2623,7 +2623,7 @@
 				</td>
 			<!--</xsl:if>-->
 			</xsl:if>
-			<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @StudyEventRepeatKey = $eventRepeatCnt ]) &gt; 0">	
+			<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @StudyEventRepeatKey = ($eventRepeatCnt+1) ]) &gt; 0">	
 				<xsl:call-template name="createColForRepeatingEvent">
 					<xsl:with-param name="eventRepeatCnt" select="$eventRepeatCnt+1"/>
 					<xsl:with-param name="eventOID" select="$eventOID"/>
@@ -3145,6 +3145,12 @@
 			<xsl:with-param name="crfRefPosition" select="position()"/>
 		</xsl:apply-templates>-->
 		</xsl:if>
+		<!-- moved the template call to generate list of CRFs within an event here to cover the scenarion correctly where same CRF is included in more than one events -->
+		<!--<xsl:variable name="studyEventDef" select="//odm:ODM/odm:Study[1]/odm:MetaDataVersion/odm:StudyEventDef[@OID = $oid]"/>
+		<xsl:apply-templates select="$studyEventDef/odm:FormRef" mode="formRefToDefMapTemplate">
+			<xsl:with-param name="eventOID" select="$oid"/>
+			<xsl:with-param name="eventDefPosition" select="$studyEventDefPosition"/>
+		</xsl:apply-templates>-->
 	</xsl:template>
 	<xsl:template priority="1" mode="formRefToDefMapTemplate" match="//odm:ODM/odm:Study/odm:MetaDataVersion/odm:StudyEventDef/odm:FormRef">
 		<xsl:param name="eventOID"/>
@@ -3438,126 +3444,7 @@
 							<xsl:copy-of select="."/>
 						</xsl:for-each>
 					</xsl:variable>
-					<!--<xsl:for-each select="exsl:node-set($allStudyEvents)/odm:StudyEventData">
-						<xsl:choose>
-							<xsl:when test="position()=1">
-					<xsl:if test="$interviewerNameExist">
-								<td class="table_header_row">
-									<xsl:text>Interviewer_</xsl:text>
-									<xsl:value-of select="$E" />
-									<xsl:value-of select="$eventPosition" />
-									<xsl:if test="@StudyEventRepeatKey">
-										<xsl:text>_</xsl:text>
-										<xsl:value-of select="@StudyEventRepeatKey" />
-									</xsl:if>
-									<xsl:text>_</xsl:text>
-									<xsl:value-of select="$C" />
-									<xsl:value-of select="$crfPosition" />
-						</td>
-								</xsl:if>
-
-								<xsl:if test="$interviewDateExist">
-									<td class="table_header_row">
-									<xsl:text>Interviewer date</xsl:text>
-									<xsl:value-of select="$E" />
-									<xsl:value-of select="$eventPosition" />
-									<xsl:if test="@StudyEventRepeatKey">
-										<xsl:text>_</xsl:text>
-										<xsl:value-of select="@StudyEventRepeatKey" />
-									</xsl:if>
-									<xsl:text>_</xsl:text>
-									<xsl:value-of select="$C" />
-									<xsl:value-of select="$crfPosition" />
-									</td>
-								</xsl:if>
-
-								<xsl:if test="$crfStatusExist">
-									<td class="table_header_row">
-									<xsl:text>CRF Version Status_</xsl:text>
-									<xsl:value-of select="$E" />
-									<xsl:value-of select="$eventPosition" />
-									<xsl:text>_</xsl:text>
-									<xsl:value-of select="@StudyEventRepeatKey" />
-									<xsl:text>_</xsl:text>
-									<xsl:value-of select="$C" />
-									<xsl:value-of select="$crfPosition" />
-									</td>
-								</xsl:if>
-
-								<xsl:if test="$crfVersionExist">
-									<td class="table_header_row">
-									<xsl:text>Version Name_</xsl:text>
-									<xsl:value-of select="$E" />
-									<xsl:value-of select="$eventPosition" />
-									<xsl:text>_</xsl:text>
-									<xsl:value-of select="@StudyEventRepeatKey" />
-									<xsl:text>_</xsl:text>
-									<xsl:value-of select="$C" />
-									<xsl:value-of select="$crfPosition" />
-									</td>
-								</xsl:if>
-							</xsl:when>
-							<xsl:otherwise>
-								<xsl:if
-									test="preceding-sibling::odm:StudyEventData[1]/@StudyEventRepeatKey != @StudyEventRepeatKey"><xsl:if test="$interviewerNameExist">
-										<td class="table_header_row">
-										<xsl:text>Interviewer_</xsl:text>
-										<xsl:value-of select="$E" />
-										<xsl:value-of select="$eventPosition" />
-										<xsl:if test="@StudyEventRepeatKey">
-											<xsl:text>_</xsl:text>
-											<xsl:value-of select="@StudyEventRepeatKey" />
-										</xsl:if>
-										<xsl:text>_</xsl:text>
-										<xsl:value-of select="$C" />
-										<xsl:value-of select="$crfPosition" />
-										</td>
-									</xsl:if>
-
-									<xsl:if test="$interviewDateExist">
-										<td class="table_header_row">
-										<xsl:text>Interviewer date</xsl:text>
-										<xsl:value-of select="$E" />
-										<xsl:value-of select="$eventPosition" />
-										<xsl:if test="@StudyEventRepeatKey">
-											<xsl:text>_</xsl:text>
-											<xsl:value-of select="@StudyEventRepeatKey" />
-										</xsl:if>
-										<xsl:text>_</xsl:text>
-										<xsl:value-of select="$C" />
-										<xsl:value-of select="$crfPosition" />
-										</td>
-									</xsl:if>
-
-									<xsl:if test="$crfStatusExist">
-										<td class="table_header_row">
-										<xsl:text>CRF Version Status_</xsl:text>
-										<xsl:value-of select="$E" />
-										<xsl:value-of select="$eventPosition" />
-										<xsl:text>_</xsl:text>
-										<xsl:value-of select="@StudyEventRepeatKey" />
-										<xsl:text>_</xsl:text>
-										<xsl:value-of select="$C" />
-										<xsl:value-of select="$crfPosition" />
-</td>										
-									</xsl:if>
-
-									<xsl:if test="$crfVersionExist">
-										<td class="table_header_row">
-										<xsl:text>Version Name_</xsl:text>
-										<xsl:value-of select="$E" />
-										<xsl:value-of select="$eventPosition" />
-										<xsl:text>_</xsl:text>
-										<xsl:value-of select="@StudyEventRepeatKey" />
-										<xsl:text>_</xsl:text>
-										<xsl:value-of select="$C" />
-										<xsl:value-of select="$crfPosition" />
-										</td>
-									</xsl:if>
-								</xsl:if>
-							</xsl:otherwise>
-						</xsl:choose>
-					</xsl:for-each>-->
+					
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:if test="$interviewerNameExist">
@@ -3875,7 +3762,7 @@
 			</xsl:if>
 		</xsl:for-each>
 		<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @StudyEventRepeatKey = 
-					$eventRepeatCnt]) &gt; 0">
+					($eventRepeatCnt+1)]) &gt; 0">
 			<xsl:call-template name="createCRFColForRepeatingEvent">
 				<xsl:with-param name="eventOID" select="$eventOID"/>
 				<xsl:with-param name="eventPosition" select="$eventPosition"/>
@@ -3997,7 +3884,7 @@
 			</xsl:apply-templates>
 		</xsl:for-each>
 		<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @StudyEventRepeatKey = 
-					$eventRepeatCnt]) &gt; 0">
+					($eventRepeatCnt+1)]) &gt; 0">
 			<xsl:apply-templates select="." mode="createItemDataColForRepeatingEvent">
 				<xsl:with-param name="eventOID" select="$eventOID"/>
 				<xsl:with-param name="eventPosition" select="$eventPosition"/>

@@ -1443,7 +1443,7 @@
 				<xsl:value-of select="$eventRepeatCnt" />	
 				<xsl:value-of select="$delimiter" />							
 			</xsl:if>
-			<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @StudyEventRepeatKey = $eventRepeatCnt ]) &gt; 0">		
+			<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @StudyEventRepeatKey = ($eventRepeatCnt+1) ]) &gt; 0">		
 				<xsl:call-template name="createColForRepeatingEvent">
 					<xsl:with-param name="eventRepeatCnt" select="$eventRepeatCnt+1"/>
 					<xsl:with-param name="eventOID"  select="$eventOID"/>
@@ -1827,7 +1827,7 @@
 				
 		</xsl:for-each>	
 		<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @StudyEventRepeatKey = 
-					$eventRepeatCnt]) &gt; 0">	
+					($eventRepeatCnt+1)]) &gt; 0">	
 		<xsl:call-template name="createCRFColForRepeatingEvent">
 			<xsl:with-param name="eventOID" select="$eventOID"/>   
 			<xsl:with-param name="eventPosition" select="$eventPosition"/>
@@ -1955,7 +1955,7 @@
 		</xsl:for-each>	
 		
 		<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @StudyEventRepeatKey = 
-					$eventRepeatCnt]) &gt; 0">	
+					($eventRepeatCnt+1)]) &gt; 0">	
 					
 		
 		
