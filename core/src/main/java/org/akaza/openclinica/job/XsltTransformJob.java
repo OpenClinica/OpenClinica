@@ -1,5 +1,6 @@
 package org.akaza.openclinica.job;
 
+import org.akaza.openclinica.bean.admin.TriggerBean;
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.ExportFormatBean;
@@ -52,7 +53,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.zip.ZipEntry;
-
 import java.util.zip.ZipOutputStream;
 
 import javax.sql.DataSource;
@@ -63,7 +63,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import org.akaza.openclinica.bean.admin.TriggerBean;
 /**
  * Xalan Transform Job, an XSLT transform job using the Xalan classes
  * 
@@ -242,9 +241,9 @@ public class XsltTransformJob extends QuartzJobBean {
             int numXLS = epBean.getFileName().length;
             int fileCntr = 0;
            
-            String xmlFilePath = generalFileDir + ODMXMLFileName;
+            String xmlFilePath = new File(generalFileDir + ODMXMLFileName).toURI().toURL().toExternalForm();
             String endFile =null;
-           File oldFilesPath = new File(generalFileDir);
+            File oldFilesPath = new File(generalFileDir);
             while(fileCntr<numXLS)
             {
                 String xsltPath = dataMap.getString(XSLT_PATH)+ File.separator +epBean.getFileName()[fileCntr];
@@ -275,7 +274,7 @@ public class XsltTransformJob extends QuartzJobBean {
                 // logic to prevent deleting the file being created.
 
             }
-            final double done = setFormat((new Double(System.currentTimeMillis() - start))/1000);
+            final double done = setFormat(new Double(System.currentTimeMillis() - start)/1000);
             logger.info("--> job completed in " + done + " ms");
             // run post processing
 
@@ -424,7 +423,7 @@ public class XsltTransformJob extends QuartzJobBean {
                         logMe("zipName?? = " + epBean.getZipName());
 
                         String zipName =
-                            (epBean.getZipName() == null || epBean.getZipName().isEmpty()) ? endFile + ".zip" : path + epBean.getZipName() + ".zip";
+                            epBean.getZipName() == null || epBean.getZipName().isEmpty() ? endFile + ".zip" : path + epBean.getZipName() + ".zip";
 
                         archivedFilename = new File(zipName).getName();
                         zipAll(path, epBean.getDoNotDelFiles(), zipName);
@@ -500,7 +499,7 @@ public class XsltTransformJob extends QuartzJobBean {
             try {
 
                 // @pgawade 19-April-2011 Log the event into audit_event table
-                if ((null != dataMap.get("job_type")) && (((String) dataMap.get("job_type")).equalsIgnoreCase("exportJob"))) {
+                if (null != dataMap.get("job_type") && ((String) dataMap.get("job_type")).equalsIgnoreCase("exportJob")) {
                     String extractName = (String) dataMap.get(XsltTriggerService.JOB_NAME);
                     TriggerBean triggerBean = new TriggerBean();
                     triggerBean.setDataset(datasetBean);
@@ -558,7 +557,7 @@ public class XsltTransformJob extends QuartzJobBean {
             logger.error(ee.getStackTrace().toString());
             exceptions = true;
 
-            if ((null != dataMap.get("job_type")) && (((String) dataMap.get("job_type")).equalsIgnoreCase("exportJob"))) {
+            if (null != dataMap.get("job_type") && ((String) dataMap.get("job_type")).equalsIgnoreCase("exportJob")) {
                 TriggerBean triggerBean = new TriggerBean();
                 // triggerBean.setDataset(datasetBean);
                 triggerBean.setUserAccount(userBean);
@@ -629,12 +628,12 @@ public class XsltTransformJob extends QuartzJobBean {
             zos = new ZipOutputStream(fos);
             byte data[] = new byte[BUFFER];
 
-            for (int i = 0; i < files.length; i++) {
+            for (String file : files) {
                 logMe("Path = " + path + "zipName = " + zipname);
-                fis = new FileInputStream(path + files[i]);
+                fis = new FileInputStream(path + file);
 
                 orgin = new BufferedInputStream(fis, BUFFER);
-                ZipEntry entry = new ZipEntry(files[i]);
+                ZipEntry entry = new ZipEntry(file);
                 zos.putNextEntry(entry);
                 int cnt = 0;
                 while ((cnt = orgin.read(data, 0, BUFFER)) != -1) {
@@ -770,9 +769,9 @@ public class XsltTransformJob extends QuartzJobBean {
     // A stub to delete old files.
     private void deleteOldFiles(File[] oldFiles) {
         // File[] files = complete.listFiles();
-        for (int i = 0; i < oldFiles.length; i++) {
-            if (oldFiles[i].exists())
-                oldFiles[i].delete();
+        for (File oldFile : oldFiles) {
+            if (oldFile.exists())
+                oldFile.delete();
         }
 
     }
@@ -860,7 +859,7 @@ public class XsltTransformJob extends QuartzJobBean {
         // database schema
         // fbInitial.setFileSize( setFormat(bytesToKilo(fileLength)));
 
-        fbInitial.setFileSize((int) (fileLength));
+        fbInitial.setFileSize((int) fileLength);
 
         // logger.info("ODM setFileSize: " + (int)newFile.length() );
         // set the above to compressed size?
