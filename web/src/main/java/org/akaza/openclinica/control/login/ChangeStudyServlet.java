@@ -7,11 +7,6 @@
  */
 package org.akaza.openclinica.control.login;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -44,6 +39,11 @@ import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * @author jxu
@@ -271,6 +271,7 @@ public class ChangeStudyServlet extends SecureController {
         // YW 2-18-2008, if study has been really changed <<
         if (prevStudyId != studyId) {
             session.removeAttribute("eventsForCreateDataset");
+            session.setAttribute("tableFacadeRestore", "false");
         }
         request.setAttribute("studyJustChanged", "yes");
         // YW >>
