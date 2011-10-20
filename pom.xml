@@ -72,7 +72,7 @@
 		<test.db>OpenClinica-core-3.1-SNAPSHOT-TEST</test.db>
 		<test.hibernateDialect>org.hibernate.dialect.PostgreSQLDialect</test.hibernateDialect>
 		<test.locale>en_US</test.locale>
-		<scm.path>scm:svn:http://svn.akazaresearch.com/openclinica-enterprise/OpenClinica/branches/OpenClinica-3.1-Utah</scm.path>
+		<scm.path>scm:svn:http://svn.akazaresearch.com/openclinica-enterprise/OpenClinica/branches/OpenClinica-3.1-Utah/projects</scm.path>
 		<!--  Library Versions -->
 		<spring.version>3.0.5.RELEASE</spring.version>
 	</properties>
