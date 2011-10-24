@@ -133,10 +133,68 @@ int selectedValue;
 		<div class="tablebox_center">
 
 
+<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
+<script type="text/javascript">
+jQuery.noConflict();
+
+function handleUserSource() {
+    var userTypeVal = jQuery("input[name='userSource']:checked").val();
+    if (userTypeVal == "ldap") {
+        jQuery(".passwordRow").hide();
+        jQuery(".webservicesRow").hide();
+        jQuery(".ldapSelect").show();
+        jQuery("#userName").attr('readonly', 'true');
+    } else {
+        jQuery(".passwordRow").show();
+        jQuery(".webservicesRow").show();
+        jQuery(".ldapSelect").hide();
+        jQuery("#userName").removeAttr('readonly');
+    }
+}
+</script>
+<c:if test="${ldapEnabled}">
+<script type="text/javascript">
+
+jQuery(document).ready(function() {
+    jQuery("input[name='userSource']").change(function() {
+    	handleUserSource();
+    	jQuery("#userName").val('');
+    });
+    
+    jQuery(".ldapSelect").click(function() {
+        jQuery.blockUI({
+            message: jQuery("#listLdapUsersForm"), css:{
+                left: "300px",
+                top: "10px"
+            }
+        });
+    });
+    
+    jQuery("#closeLdapSelect").click(function() {
+        jQuery.unblockUI();
+    });
+    
+    handleUserSource();
+});
+
+</script>
+</c:if>
 		<!-- Table Contents -->
 <input type="hidden" id="changeRoles" name="changeRoles">
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
 	<tr>
+	<c:if test="${ldapEnabled}">
+    <tr valign="top">
+        <td class="formlabel">User source:</td>
+        <td valign="top">
+            <input type="radio" name="userSource" value="ldap" checked="checked"> LDAP - <input type="radio" name="userSource" value="local"> Local 
+        </td>
+    </tr>
+    </c:if>
+    <c:if test="${not ldapEnabled}">
+        <input type="hidden" name="userSource" value="local"/>
+    </c:if>
 	<tr valign="top">
 		<td class="formlabel"><fmt:message key="username2" bundle="${resword}"/>:</td>
 		<td valign="top">
@@ -145,7 +203,7 @@ int selectedValue;
 					<td valign="top"><div class="formfieldM_BG">
 						<input type="text" id="userName" name="userName" value="<c:out value="${userName}"/>" size="20" class="formfieldM" />
 					</div></td>
-					<td>*</td>
+					<td><a class="ldapSelect" href="#"><img alt="Lookup LDAP user" src="images/create_new.gif" border="0"></a>*</td>
 				</tr>
 				<tr>
 					<td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="userName" /></jsp:include></td>
@@ -323,7 +381,7 @@ int selectedValue;
 			</table>
 		</td>
 	</tr>
-	<tr valign="top">
+	<tr valign="top" class="webservicesRow">
         <td class="formlabel"><fmt:message key="can_run_web_services" bundle="${resword}"/>:</td>
         <td valign="top">
             <table border="0" cellpadding="0" cellspacing="0">
@@ -341,7 +399,7 @@ int selectedValue;
             </table>
         </td>
     </tr>
-    <tr valign="top">
+    <tr valign="top" class="passwordRow">
 	  <td class="formlabel"><fmt:message key="user_password_generated" bundle="${resword}"/>:</td>
 	  	<td>
 	  	<c:choose>
@@ -372,4 +430,11 @@ int selectedValue;
 </tr>
 </table>
 </form>
+
+<div id="listLdapUsersForm" style="display:none;">
+<div style="background:#FFFFFF;">
+<iframe src="pages/listLdapUsers" width="500" height="350" frameborder="0">
+</iframe>
+</div>
+</div>
 <jsp:include page="../include/footer.jsp"/>

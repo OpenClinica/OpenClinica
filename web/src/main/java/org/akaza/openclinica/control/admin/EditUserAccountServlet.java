@@ -7,6 +7,9 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -22,12 +25,9 @@ import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 /**
  * @author ssachs
- * 
+ *
  *         Servlet for creating a user account.
  */
 public class EditUserAccountServlet extends SecureController {
@@ -54,6 +54,8 @@ public class EditUserAccountServlet extends SecureController {
     public static final String ARG_STEPNUM = "stepNum";
 
     public static final String INPUT_RUN_WEBSERVICES = "runWebServices";
+
+    public static final String FLAG_LDAP_USER = "ldapUser";
 
     // possible values of ARG_STEPNUM
     public static final int EDIT_STEP = 1;
@@ -261,6 +263,8 @@ public class EditUserAccountServlet extends SecureController {
 
         String sendPwd = SQLInitServlet.getField("user_account_notification");
         fp.addPresetValue(USER_ACCOUNT_NOTIFICATION, sendPwd);
+
+        fp.addPresetValue(FLAG_LDAP_USER, user.isLdapUser());
     }
 
     private void loadPresetValuesFromForm(FormProcessor fp) {
