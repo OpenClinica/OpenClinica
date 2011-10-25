@@ -41,6 +41,24 @@ public class LdapUserService {
     @Value("s[ldap.userSearch.baseDn]")
     private String userSearchBase;
 
+    @Value("s[ldap.userData.distinguishedName]")
+    private String keyDistinguishedName;
+
+    @Value("s[ldap.userData.username]")
+    private String keyUsername;
+
+    @Value("s[ldap.userData.firstName]")
+    private String keyFirstName;
+
+    @Value("s[ldap.userData.lastName]")
+    private String keyLastname;
+
+    @Value("s[ldap.userData.email]")
+    private String keyEmail;
+
+    @Value("s[ldap.userData.organization]")
+    private String keyOrganization;
+
     private LdapTemplate ldapTemplate;
 
     @PostConstruct // Eclipse warning here is an Eclipse bug, not an issue with the code
@@ -53,19 +71,21 @@ public class LdapUserService {
 
         public Object mapFromAttributes(Attributes attributes) throws NamingException {
             LdapUser u = new LdapUser();
-            u.setDistinguishedName(attToString(attributes, "distinguishedName"));
-            u.setUsername(attToString(attributes, "sAMAccountName"));
-            u.setFirstName(attToString(attributes, "givenName"));
-            u.setLastName(attToString(attributes, "sn"));
-            u.setEmail(attToString(attributes, "mail"));
-            u.setOrganization(attToString(attributes, "company"));
+            u.setDistinguishedName(attToString(attributes, keyDistinguishedName));
+            u.setUsername(attToString(attributes, keyUsername));
+            u.setFirstName(attToString(attributes, keyFirstName));
+            u.setLastName(attToString(attributes, keyLastname));
+            u.setEmail(attToString(attributes, keyEmail));
+            u.setOrganization(attToString(attributes, keyOrganization));
             return u;
         }
 
         private String attToString(Attributes a, String key) throws NamingException {
-            Attribute att = a.get(key);
-            if (att != null) {
-                return a.get(key).get().toString();
+            if (!StringUtils.isEmpty(key)) { // Check if the key for this attribute was defined in the properties file
+                Attribute att = a.get(key);
+                if (att != null) {
+                    return a.get(key).get().toString();
+                }
             }
             return null;
         }

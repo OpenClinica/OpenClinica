@@ -107,6 +107,12 @@ public class MainMenuServlet extends SecureController {
         // Event Definition list and Group Class list for add suybject window.
         request.setAttribute("allDefsArray", super.getEventDefinitionsByCurrentStudy());
         request.setAttribute("studyGroupClasses", super.getStudyGroupClassesByCurrentStudy());
+
+        if (ub.isLdapUser()) {
+            // "Forge" a password change date for LDAP user
+            lastPwdChangeDate = new Date();
+        }
+
         if (lastPwdChangeDate != null) {// not a new user
             Calendar cal = Calendar.getInstance();
             // compute difference between current date and lastPwdChangeDate
@@ -114,7 +120,7 @@ public class MainMenuServlet extends SecureController {
             long days = difference / (1000 * 60 * 60 * 24);
             session.setAttribute("passwordExpired", "no");
 
-            if (days >= pwdExpireDay) {// password expired, need to be changed
+            if (!ub.isLdapUser() && days >= pwdExpireDay) {// password expired, need to be changed
                 studies = (ArrayList) sdao.findAllByUser(ub.getName());
                 request.setAttribute("studies", studies);
                 session.setAttribute("userBean1", ub);
@@ -165,7 +171,7 @@ public class MainMenuServlet extends SecureController {
                     //request.setAttribute("label", new Integer(nextLabel).toString());
                     request.setAttribute("label", resword.getString("id_generated_Save_Add"));
                 }
-                
+
                 if (currentRole.isInvestigator() || currentRole.isResearchAssistant()) {
                     setupListStudySubjectTable();
                 }

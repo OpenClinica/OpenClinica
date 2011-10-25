@@ -43,15 +43,19 @@ Filter: <input type="text" name="filter" value="<c:out value="${param.filter}"/>
     <thead>
         <tr>
             <th class="table_header_row_left">Username&nbsp;</th>
-            <th class="table_header_row">Full name&nbsp;</th>
+            <th class="table_header_row">First name&nbsp;</th>
+            <th class="table_header_row">Last name&nbsp;</th>
+            <th class="table_header_row">Email&nbsp;</th>
             <th class="table_header_row">Actions&nbsp;</th>
         </tr>
     </thead>
     <tbody>
     <c:forEach items="${memberList}" var="m">
         <tr>
-            <td class="table_cell_left"><c:out value="${m.username}"/></td>
-            <td class="table_cell"><c:out value="${m.firstName} ${m.lastName}"/></td>
+            <td class="table_cell_left"><c:out value="${m.username}"/>&nbsp;</td>
+            <td class="table_cell"><c:out value="${m.firstName}"/>&nbsp;</td>
+            <td class="table_cell"><c:out value="${m.lastName}"/>&nbsp;</td>
+            <td class="table_cell"><c:out value="${m.email}"/>&nbsp;</td>
             <td class="table_cell">
             <a href="<c:url value="/pages/selectLdapUser"><c:param name="dn" value="${m.distinguishedName}"/></c:url>" target="_parent"><img src="../images/create_new.gif" border="0"/></a></td>
         </tr>
