@@ -186,9 +186,12 @@ jQuery(document).ready(function() {
 	<tr>
 	<c:if test="${ldapEnabled}">
     <tr valign="top">
-        <td class="formlabel">User source:</td>
+        <td class="formlabel"><fmt:message key="createUserAccount.userSource.label" bundle="${resword}"/></td>
         <td valign="top">
-            <input type="radio" name="userSource" value="ldap" checked="checked"> LDAP - <input type="radio" name="userSource" value="local"> Local 
+            <input type="radio" name="userSource" value="ldap" checked="checked"> 
+            <fmt:message key="createUserAccount.userSource.ldap.label" bundle="${resword}"/> - 
+            <input type="radio" name="userSource" value="local"> 
+            <fmt:message key="createUserAccount.userSource.local.label" bundle="${resword}"/> 
         </td>
     </tr>
     </c:if>
@@ -203,7 +206,8 @@ jQuery(document).ready(function() {
 					<td valign="top"><div class="formfieldM_BG">
 						<input type="text" id="userName" name="userName" value="<c:out value="${userName}"/>" size="20" class="formfieldM" />
 					</div></td>
-					<td><a class="ldapSelect" href="#"><img alt="Lookup LDAP user" src="images/create_new.gif" border="0"></a>*</td>
+					<td><a class="ldapSelect" href="#"><img alt="<fmt:message key="createUserAccount.user.lookupLdap.tooltip" bundle="${resword}"/>" 
+					   title="<fmt:message key="createUserAccount.user.lookupLdap.tooltip" bundle="${resword}"/>" src="images/create_new.gif" border="0"></a>*</td>
 				</tr>
 				<tr>
 					<td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="userName" /></jsp:include></td>

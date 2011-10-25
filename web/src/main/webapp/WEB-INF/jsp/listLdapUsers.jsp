@@ -22,14 +22,20 @@ body {
 <head>
 </head>
 <body>
+<link rel="stylesheet" href="../includes/jmesa/jmesa.css" type="text/css">
 <script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery-1.3.2.min.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery.jmesa.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jmesa.js"></script>
+
 <h1><span class="title_manage">
-LDAP Users
+<fmt:message key="listLdapUsers.header.title" bundle="${resword}"/>
 </span></h1>
 
 <span>
 <form action="" method="get">
-Filter: <input type="text" name="filter" value="<c:out value="${param.filter}"/>"/> <input type="submit"/>
+<span class="aka_font_general"><fmt:message key="listLdapUsers.filter.label" bundle="${resword}"/></span>
+<input type="text" name="filter" value="<c:out value="${param.filter}"/>"/> 
+<input type="submit" class="button_search" value="<fmt:message key="listLdapUsers.filter.submit" bundle="${resword}"/>"/>
 </form>
 </span>
 
@@ -42,11 +48,16 @@ Filter: <input type="text" name="filter" value="<c:out value="${param.filter}"/>
 <table cellspacing="0" cellpadding="0" border="0">
     <thead>
         <tr>
-            <th class="table_header_row_left">Username&nbsp;</th>
-            <th class="table_header_row">First name&nbsp;</th>
-            <th class="table_header_row">Last name&nbsp;</th>
-            <th class="table_header_row">Email&nbsp;</th>
-            <th class="table_header_row">Actions&nbsp;</th>
+            <td class="table_header_row_left">
+            <fmt:message key="listLdapUsers.list.table.header.username.label" bundle="${resword}"/>&nbsp;</td>
+            <td class="table_header_row">
+            <fmt:message key="listLdapUsers.list.table.header.firstName.label" bundle="${resword}"/>&nbsp;</td>
+            <td class="table_header_row">
+            <fmt:message key="listLdapUsers.list.table.header.lastName.label" bundle="${resword}"/>&nbsp;</td>
+            <td class="table_header_row">
+            <fmt:message key="listLdapUsers.list.table.header.email.label" bundle="${resword}"/>&nbsp;</td>
+            <td class="table_header_row">
+            <fmt:message key="listLdapUsers.list.table.header.actions.label" bundle="${resword}"/>&nbsp;</td>
         </tr>
     </thead>
     <tbody>
@@ -57,12 +68,15 @@ Filter: <input type="text" name="filter" value="<c:out value="${param.filter}"/>
             <td class="table_cell"><c:out value="${m.lastName}"/>&nbsp;</td>
             <td class="table_cell"><c:out value="${m.email}"/>&nbsp;</td>
             <td class="table_cell">
-            <a href="<c:url value="/pages/selectLdapUser"><c:param name="dn" value="${m.distinguishedName}"/></c:url>" target="_parent"><img src="../images/create_new.gif" border="0"/></a></td>
+            <a href="<c:url value="/pages/selectLdapUser"><c:param name="dn" value="${m.distinguishedName}"/></c:url>" target="_parent">
+            <img src="../images/create_new.gif" 
+            alt="<fmt:message key="listLdapUsers.list.table.selectUser.tooltip" bundle="${resword}"/>" 
+            title="<fmt:message key="listLdapUsers.list.table.selectUser.tooltip" bundle="${resword}"/>" border="0"/></a></td>
         </tr>
     </c:forEach>
     <c:if test="${empty memberList}">
         <tr>
-            <td colspan="3">No results found</td>
+            <td colspan="3"><fmt:message key="listLdapUsers.list.table.emptyResults.label" bundle="${resword}"/></td>
         </tr>
     </c:if>
     </tbody>
@@ -74,7 +88,9 @@ Filter: <input type="text" name="filter" value="<c:out value="${param.filter}"/>
 </table>
 </c:if>
 
+<form action="<c:url value="/pages/selectLdapUser"/>" method="get" target="_parent">
+<input type="submit" class="button_medium" value="<fmt:message key="listLdapUsers.close.label" bundle="${resword}"/>">
+</form>
 
-<a href="<c:url value="/pages/selectLdapUser"/>" target="_parent">CLOSE</a>
 </body>
 </html>
