@@ -52,6 +52,9 @@
 <c:set var="displayPwd" value="no" />
 
 <c:forEach var="presetValue" items="${presetValues}">
+    <c:if test='${presetValue.key == "userSource"}'>
+        <c:set var="userSource" value="${presetValue.value}" />
+    </c:if>
 	<c:if test='${presetValue.key == "userName"}'>
 		<c:set var="userName" value="${presetValue.value}" />
 	</c:if>
@@ -188,9 +191,9 @@ jQuery(document).ready(function() {
     <tr valign="top">
         <td class="formlabel"><fmt:message key="createUserAccount.userSource.label" bundle="${resword}"/></td>
         <td valign="top">
-            <input type="radio" name="userSource" value="ldap" checked="checked"> 
+            <input type="radio" name="userSource" value="ldap"<c:if test="${empty userSource or userSource eq 'ldap' }"> checked="checked"</c:if>> 
             <fmt:message key="createUserAccount.userSource.ldap.label" bundle="${resword}"/> - 
-            <input type="radio" name="userSource" value="local"> 
+            <input type="radio" name="userSource" value="local"<c:if test="${userSource eq 'local' }"> checked="checked"</c:if>> 
             <fmt:message key="createUserAccount.userSource.local.label" bundle="${resword}"/> 
         </td>
     </tr>

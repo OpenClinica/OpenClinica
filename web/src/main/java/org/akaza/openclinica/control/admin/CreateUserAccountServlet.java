@@ -168,7 +168,8 @@ public class CreateUserAccountServlet extends SecureController {
         request.setAttribute("ldapEnabled", isLdapEnabled());
         request.setAttribute("activeStudy", activeStudy);
         if (!fp.isSubmitted() || changeRoles) {
-            String textFields[] = { INPUT_USERNAME, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_EMAIL, INPUT_INSTITUTION, INPUT_DISPLAY_PWD };
+            String textFields[] = { INPUT_USER_SOURCE, INPUT_USERNAME, INPUT_FIRST_NAME, INPUT_LAST_NAME, INPUT_EMAIL,
+                    INPUT_INSTITUTION, INPUT_DISPLAY_PWD };
             fp.setCurrentStringValuesAsPreset(textFields);
 
             String ddlbFields[] = { INPUT_STUDY, INPUT_ROLE, INPUT_TYPE, INPUT_RUN_WEBSERVICES };
