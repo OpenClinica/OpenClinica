@@ -1,8 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<script type="text/JavaScript" language="JavaScript" src="../../includes/jmesa/jquery-1.3.2.min.js"></script>
-
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions"     prefix="fn" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
@@ -10,26 +9,15 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="resmessages"/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
-<script type="text/javascript" charset="utf-8">
-jQuery(document).ready( function () {
-    jQuery('#selectedVersion').change(function() {
-        var x = jQuery(this).val();
-        // and update the hidden input's value
-        var ind = jQuery(this).attr("selectedIndex") ;
-		var selectedText = jQuery(this.options[ind]).text();
-		jQuery('#selectedVersionName').val(selectedText);
-    });
-});
+<link rel="stylesheet" href="../../includes/style_shaded_table.css" type="text/css">
 
-</script>
 
 <jsp:include page="../include/managestudy_top_pages_new.jsp"/>
+	
 	
 
 <!-- move the alert message to the sidebar-->
 <jsp:include page="../include/sideAlert.jsp"/>
-<!-- then instructions-->
-<!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: all">
 		<td class="sidebar_tab">
 
@@ -58,7 +46,20 @@ jQuery(document).ready( function () {
 <fmt:message key="choose_CRF_version" bundle="${resword}"/>
 
 </span></h1>
+<script type="text/JavaScript" language="JavaScript" src="../../includes/jmesa/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" language="javascript">
+$.noConflict();
+ jQuery(document).ready(function(){
+       jQuery('#selectedVersion').change(function() {
+        var x = jQuery(this).val();
+        // and update the hidden input's value
+        var ind = jQuery(this).attr("selectedIndex") ;
+		var selectedText = jQuery(this.options[ind]).text();
+		jQuery('#selectedVersionName').val(selectedText);
+    });
+});
 
+</script>
 <form action="${pageContext.request.contextPath}/pages/managestudy/confirmCRFVersionChange" method="POST">
 <input type="hidden" name="studySubjectId" value="${studySubjectId}">
 <input type="hidden" name="eventDefinitionCRFId" value="${eventDefinitionCRFId}">
@@ -100,7 +101,7 @@ jQuery(document).ready( function () {
 <tr><td>
 <fmt:message key="choose_CRF_version_crf_name" bundle="${resword}"/></td>
 <td>
-<a href="#" onclick="window.openNewWindow('../../ViewCRF?module=admin&crfId=<c:out value="${crfBean.id}"/>' ,'','no','dn')">
+<a href="#" onclick="window.openNewWindow('../../ViewCRF?module=admin&crfId=<c:out value="${crfBean.id}"/>' ,'','','dn')">
 <c:out value="${crfName}"/></a></td></tr>
 
 <!-- default version label here -->
@@ -130,7 +131,7 @@ jQuery(document).ready( function () {
 <!-- crf table here -->
 <br><br>
 
-<table cellpadding="0" cellspacing="0" border="1" class="dataTable" >
+<table cellpadding="0" cellspacing="0" border="1" class="shaded_table" >
 <tr>
 <!-- 
 <td class="table_header_row" style="color: #789EC5;"><fmt:message key="CRF_name" bundle="${resword}"/></td>
@@ -146,26 +147,7 @@ jQuery(document).ready( function () {
 <td class="table_header_row" style="color: #789EC5;"><fmt:message key="default_version" bundle="${resword}"/></td>
 <td class="table_header_row" style="color: #789EC5;"><fmt:message key="action" bundle="${resword}"/></td>
 </tr>
-<tr valign="top">
-<!--  <td  class="table_cell_left" rowspan="<c:out value="${numberOfVersions}" />"><c:out value="${crfBean.name}" /> &nbsp;</td>
-<td  class="table_cell"  rowspan="<c:out value="${numberOfVersions}" />"> <fmt:formatDate value="${crfBean.updatedDate}" pattern="${dteFormat}"/>&nbsp;</td>
-<td  class="table_cell"  rowspan="<c:out value="${numberOfVersions}" />"> <c:out value="${crfBean.updater.name}" />&nbsp;</td>
-<td  class="table_cell"  rowspan="<c:out value="${numberOfVersions}" />"> <c:out value="${crfBean.oid}" />&nbsp;</td>
-<td  class="table_cell"  > &nbsp;</td>
-<td  class="table_cell"  > &nbsp;</td>
-<td  class="table_cell"  ><fmt:formatDate value="${crfBean.createdDate}" pattern="${dteFormat}"/>&nbsp;</td>
-<td  class="table_cell"  > &nbsp;</td>
-<td  class="table_cell"  > &nbsp;</td>
-<td  class="table_cell"  > &nbsp;
-      
-<a href="#" onclick="window.openNewWindow('../../ViewCRF?module=admin&crfId=<c:out value="${crfBean.id}"/>' ,'','no','dn')" 
-               onMouseDown="javascript:setImage('bt_View1','../../images/bt_View_d.gif');"
-               onMouseUp="javascript:setImage('bt_View1','../../images/bt_View.gif');"><img
-          name="bt_View1" src="../../images/bt_View.gif" border="0" alt="View" title="View" align="left" hspace="6"></a>
 
-
-</td></tr>
--->
 <!-- versions data -->
 
 <c:forEach var="version" items="${crfBean.versions}">
@@ -179,9 +161,16 @@ jQuery(document).ready( function () {
 <td  class="table_cell"  style="text-align:center;" ><c:if test="${version.id == crfversionId}">X</c:if>&nbsp;</td>
 <td  class="table_cell"  > &nbsp;
 <a onmouseup="javascript:setImage('bt_View1','../../images/bt_View.gif');" onmousedown="javascript:setImage('bt_View1','../../images/bt_View_d.gif');" 
-href="#" onclick="window.openNewWindow('../../ViewSectionDataEntry?module=admin&crfId=<c:out value="${crfBean.id}"/>&crfVersionId=<c:out value="${version.id}"/>&tabId=1&crfListPage=yes','','no','')">
+href="#" onclick="window.openNewWindow('../../ViewSectionDataEntry?module=admin&crfId=<c:out value="${crfBean.id}"/>&crfVersionId=<c:out value="${version.id}"/>&tabId=1&crfListPage=yes','','','')">
 <img hspace="6" border="0" align="left" title="View" alt="View" src="../../images/bt_View.gif" name="bt_View1">
 </a>
+&nbsp;
+<a onmouseup="javascript:setImage('bt_Metadata','../../images/bt_Metadata.gif');" onmousedown="javascript:setImage('bt_Metadata','../../images/bt_Metadata.gif');" 
+href="#" onclick="window.openNewWindow('../../ViewCRFVersion?id=<c:out value="${version.id}"/>','','','')">
+<img hspace="6" border="0" align="left" title="Metadata" alt="Metadata" src="../../images/bt_Metadata.gif" name="bt_Metadata">
+</a>
+
+
 </td>
 </c:if>
 
@@ -210,8 +199,7 @@ class="button_long" onClick="confirmCancelAction('ViewStudySubject', '${pageCont
 </form>
 </td>
 </tr></table>
-
 <jsp:include page="../include/footer.jsp">
- <jsp:param name="isSpringControllerFooter" value="1" />
+ <jsp:param name="isSpringControllerFooter" value="2" />
     </jsp:include>
 

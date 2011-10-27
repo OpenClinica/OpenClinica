@@ -9,7 +9,9 @@
 
 <jsp:include page="../include/managestudy_top_pages_new.jsp"/>
 	
-	
+	<link rel="stylesheet" href="../../includes/style_shaded_table.css" type="text/css">
+
+
 
 <!-- move the alert message to the sidebar-->
 <jsp:include page="../include/sideAlert.jsp"/>
@@ -78,7 +80,7 @@
 <!-- CRF name  here -->
 <tr><td>
 <fmt:message key="choose_CRF_version_crf_name" bundle="${resword}"/>:</td>
-<td><a href="#" onclick="window.openNewWindow('../../ViewCRF?module=admin&crfId=<c:out value="${crfBean.id}"/>' ,'','no','dn')">
+<td><a href="#" onclick="window.openNewWindow('../../ViewCRF?module=admin&crfId=<c:out value="${crfId}"/>' ,'','','dn')">
 <c:out value="${crfName}"/></a></td></tr>
 <tr><td>
 
@@ -86,11 +88,19 @@
 <!-- default version label here -->
 <tr><td>
 <fmt:message key="choose_CRF_version_current_crf_version_title" bundle="${resword}"/>:</td>
-<td><c:out value="${crfVersionName}"/></td></tr>
+<td>
+<a href="#" onclick="window.openNewWindow('../../ViewSectionDataEntry?module=admin&crfId=<c:out value="${crfId}"/>&crfVersionId=<c:out value="${crfversionId}"/>&tabId=1&crfListPage=yes','','','')">
+<c:out value="${crfVersionName}"/>
+</a>
+</td></tr>
 
 <tr><td>
 <fmt:message key="confirm_CRF_version_new_version" bundle="${resword}"/>: </td>
-<td><c:out value="${selectedVersionName}"/></td></tr>
+<td>
+<a href="#" onclick="window.openNewWindow('../../ViewSectionDataEntry?module=admin&crfId=<c:out value="${crfId}"/>&crfVersionId=<c:out value="${selectedVersionId}"/>&tabId=1&crfListPage=yes','','','')">
+<c:out value="${selectedVersionName}"/>
+</a>
+</td></tr>
 </table>
 <!-- header ends -->
 
@@ -100,9 +110,9 @@
 <br><br>
 <!-- crf table here -->
 
-<table cellpadding="2" cellspacing="2" border="1"  >
+<table cellpadding="2" cellspacing="2" border="1"   class="shaded_table" >
 <tr><td>
-<table cellpadding="2" cellspacing="2" border="0"  >
+<table cellpadding="2" cellspacing="2" border="0" >
 <tr>
 <td class="table_header_row" style="color: #789EC5;" colspan="3"><fmt:message key="confirm_CRF_version_current_version" bundle="${resword}"/>: '
 <c:out value="${crfVersionName}"/>'</td></tr>
@@ -154,7 +164,7 @@
 &nbsp;
 </c:when>
 <c:otherwise>
-<a href="javascript: openDocWindow('../../ViewItemDetail?itemId=${row[6]}')"> ${row[1]} </a>
+<a href="javascript: openDocWindow('../../ViewItemDetail?itemId=${row[6]}')"> ${row[5]} </a>
 </c:otherwise>
 </c:choose>
 </td>
@@ -193,5 +203,5 @@
 
 
 <jsp:include page="../include/footer.jsp">
- <jsp:param name="isSpringControllerFooter" value="1" />
+ <jsp:param name="isSpringControllerFooter" value="2" />
     </jsp:include>
