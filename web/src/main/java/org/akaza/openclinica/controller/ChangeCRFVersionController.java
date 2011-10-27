@@ -8,6 +8,7 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -17,6 +18,7 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
+import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +40,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -289,120 +292,87 @@ public class ChangeCRFVersionController {
         //select   name, ordinal, oc_oid,   item_data_id, i.item_id, value        from item_data id, item i 
        // where id.item_id=i.item_id and event_crf_id = 171 order  by i.item_id,ordinal;
         ArrayList<String[]> rows = new ArrayList<String[]>();
+        int cur_counter = 0; int new_counter = 0;
+	       
         try{
         	ItemDAO item_dao = new ItemDAO(dataSource);
         	ItemDataBean d_bean = null;
-	        ItemFormMetadataDAO item_form_mdata = new ItemFormMetadataDAO(dataSource);
-	        ArrayList<ItemBean> cur_items = item_dao.findAllWithItemDataByCRFVersionId(eventCRFId);
+        	//get metadata to find repeat group or not
+	        ItemGroupMetadataDAO dao_item_form_mdata = new ItemGroupMetadataDAO(dataSource);
+	        List<ItemGroupMetadataBean> beans_item_form_mdata = dao_item_form_mdata.findByCrfVersion( crfVersionId);
+	        HashMap<Integer, ItemGroupMetadataBean> hash_item_form_mdata = new HashMap<Integer, ItemGroupMetadataBean>(beans_item_form_mdata.size());
+	        //put in hash 
+	        
+	        for (ItemGroupMetadataBean bn : beans_item_form_mdata){
+	        	hash_item_form_mdata.put(new Integer(bn.getItemId()), bn);
+	        }
+	        List<ItemGroupMetadataBean> bn_new_item_form_mdata = dao_item_form_mdata.findByCrfVersion( selectedVersionId);
+	        HashMap<Integer, ItemGroupMetadataBean> hash_new_item_form_mdata = new HashMap<Integer, ItemGroupMetadataBean>(bn_new_item_form_mdata.size());
+	        //put in hash 
+	        
+	        for (ItemGroupMetadataBean bn : bn_new_item_form_mdata){
+	        	hash_new_item_form_mdata.put(new Integer(bn.getItemId()), bn);
+	        }
+	        //get items description
+	        ArrayList<ItemBean> cur_items = item_dao.findAllWithItemDataByCRFVersionId(crfVersionId,eventCRFId);
 	        ArrayList<ItemBean> new_items = item_dao.findAllItemsByVersionId(selectedVersionId);
 	       
-	        int cur_counter = 0; int new_counter = 0;
-	        ItemBean cur_element=null; ItemBean new_element=null;
+	         ItemBean cur_element=null; ItemBean new_element=null;
+	        ItemGroupMetadataBean bn_mdata= null;ItemGroupMetadataBean bn_new_mdata=null;
 	        while ( true){
 	        	if (cur_counter >= (cur_items.size()-1) && new_counter >= (new_items.size()-1 )){break;}
+	        	cur_element = cur_items.get(cur_counter);
+        		bn_mdata = hash_item_form_mdata.get( new Integer(cur_element.getId()));
+        		new_element = new_items.get(new_counter);
+        		bn_new_mdata = hash_new_item_form_mdata.get( new Integer(new_element.getId()));
+        		
+	        	if (  new_element.getId() == cur_element.getId()){
+	        		buildRecord( cur_element,  new_element,  bn_mdata, bn_new_mdata, rows);
+	        	}
+	        	else if (  new_element.getId() < cur_element.getId()){
+	        		buildRecord( null,  new_element,  null, bn_new_mdata, rows);  		
+	        	}
+	        	else if (  new_element.getId() > cur_element.getId()){
+	        		buildRecord( cur_element,  null,  bn_mdata, null, rows);
+	        	}
 	        	
-	        	if ( cur_counter< cur_items.size()){
-	        		cur_element = cur_items.get(cur_counter);
-	        	}
-	        	if (new_counter < new_items.size()){
-	        		new_element = new_items.get(new_counter);
-	        	}
+	        	
 	        	if ( cur_counter >= (cur_items.size()-1) && new_counter < (new_items.size()-1 )){
-	        		 new_counter++;
-	        		String[]row = {"","","","",new_element.getName(),	new_element.getOid(),String.valueOf(new_element.getId()),""};
-        			rows.add(row);
-	        	}
+	        		while(new_counter< new_items.size()-1){
+	        			new_counter ++; 
+	        			new_element = new_items.get(new_counter);
+	            		bn_new_mdata = hash_new_item_form_mdata.get( new Integer(new_element.getId()));
+	            		
+	            		buildRecord( null,  new_element,  null, bn_new_mdata, rows);  		
+	        		}
+	        		break;
+             	}
 	        	if ( cur_counter < (cur_items.size()-1) && new_counter >= (new_items.size()-1 )){
-	        		cur_counter ++; 
-	        		for (ItemDataBean data_item : cur_element.getItemDataElements()){
-	        			String[]row = {cur_element.getName()+" ("+data_item.getOrdinal()+")",
-	        					cur_element.getOid(),
-	        					String.valueOf(cur_element.getId()),
-	        					data_item.getValue(),
-        						"","","",""};
-	        			rows.add(row);
+	        		while(cur_counter< cur_items.size()-1){
+	        			cur_counter ++; 
+		        		cur_element = cur_items.get(cur_counter);
+		        		bn_mdata = hash_item_form_mdata.get( new Integer(cur_element.getId()));
+		        		buildRecord( cur_element,  null,  bn_mdata, null, rows);
 	        		}
+	        		break;
 	        	}
-	        	if ( new_element != null && cur_element != null &&  new_element.getId() == cur_element.getId()){
-	        		cur_counter ++;  new_counter++;
-	        		for (ItemDataBean data_item : cur_element.getItemDataElements()){
-	        			String[]row = {cur_element.getName()+" ("+data_item.getOrdinal()+")",
-	        					cur_element.getOid(),
-	        					String.valueOf(cur_element.getId()),
-	        					data_item.getValue(),
-        						cur_element.getName()+" ("+data_item.getOrdinal()+")",
-        						new_element.getOid(),
-        						String.valueOf(new_element.getId()),
-        						data_item.getValue()
-        						
-	        			};
-	        			rows.add(row);
-	        		}
-	        		
+	        	if ( new_element.getId() == cur_element.getId()){
+	        		cur_counter ++;  new_counter++;continue;
 	        	}
-	        	else if ( new_element != null && cur_element != null && new_element.getId() < cur_element.getId()){
-	        		 new_counter++;
-	        		String[]row = {"","","","",new_element.getName(),	new_element.getOid(),String.valueOf(new_element.getId()),""};
-        			rows.add(row);
+	        	else if (new_element.getId() < cur_element.getId()){
+	        		 new_counter++;continue;
 	        	}
-	        	else if ( new_element != null && cur_element != null && new_element.getId() > cur_element.getId()){
-	        		cur_counter ++; 
-	        		for (ItemDataBean data_item : cur_element.getItemDataElements()){
-	        			String[]row = {cur_element.getName()+" ("+data_item.getOrdinal()+")",
-	        					cur_element.getOid(),
-	        					String.valueOf(cur_element.getId()),
-	        					data_item.getValue(),
-        						"","","",""};
-	        			rows.add(row);
-	        		}
+	        	else if ( new_element.getId() > cur_element.getId()){
+	        		cur_counter ++; continue;
 	        	}
+	        	
 	        	
 	        }
 	        
 
-//	        for ( ItemBean item: cur_items){
-//	        	field_id = new Integer(item.getId());
-//	        	for ( int count = 0; count < item.getItemDataElements().size(); count++){
-//	        		d_bean = item.getItemDataElements().get(count);
-//	        		String[]row = {"","","","","",""};
-//	        		rows.add(row);
-//	        		row[0]= item.getName()+" ("+d_bean.getOrdinal()+")";//item name + ordinal
-//	        		row[1]= item.getOid();//item oid
-//	        		row[2]= d_bean.getValue(); //value
-//	        		
-//	        		if ( new_items_hash.get( field_id) != null){
-//	        			row[5]=row[2];
-//	        			row[3]=new_items_hash.get( field_id).getName();
-//	        			row[4]=new_items_hash.get( field_id).getOid();
-//	        		}
-//	        		else{
-//	        			row[3]=row[4]=row[5]="";
-//	        		}
-//	        	}
-//	        }
-//	       
-//	        for ( ItemBean item: cur_items){
-//	        	field_id = new Integer(item.getId());
-//	        	if ( new_items_hash.get( field_id) != null){
-//		        	for ( String[] cur_row : rows){
-//		        		if ( cur_row[1].equals(item.getOid())){
-//		        			cur_row[5]=cur_row[2];
-//		        			cur_row[3]=new_items_hash.get( field_id).getName();
-//		        			cur_row[4]=new_items_hash.get( field_id).getOid();
-//		        		}
-//		        	}
-//	        	}
-//	        	else{//new items
-//	        		row = new String[6];
-//	        		rows.add(row);
-//	        		row[0]=row[1]=row[2]=row[5]="";
-//	        		row[3]=item.getName();
-//	        		row[4] = item.getOid();
-//	        		
-//	        	}
-//	        }		
 	       
         }catch(Exception e){
+        	 System.out.println(cur_counter+" "+new_counter);
         	 pageMessages.add(resword.getString("confirm_crf_version_em_dataextraction"));
             
         }
@@ -411,7 +381,89 @@ public class ChangeCRFVersionController {
         return gridMap;
     }
 
-    
+    private void buildRecord(ItemBean cur_element, ItemBean new_element, ItemGroupMetadataBean cur_bean_mdata, 
+    		ItemGroupMetadataBean new_bean_mdata,ArrayList<String[]> rows){
+    	
+    	
+    	String[] row = new String[8];
+    	int cycle_count=0;
+    	if (cur_element == null && new_element != null){
+    		row[0]=row[1]=row[2]=row[3]=row[7]="";
+    		row[4]=(new_bean_mdata.isRepeatingGroup())? new_element.getName()+"(1)":new_element.getName();
+    		row[5]=new_element.getOid();
+    		row[6]=String.valueOf(new_element.getId());
+    		rows.add(row);
+    		return;
+    	}
+    	else if (cur_element != null && new_element == null) {
+    		
+    		for (ItemDataBean data_item : cur_element.getItemDataElements()){
+    			row = new String[8];
+    			row[0] = (cur_bean_mdata.isRepeatingGroup())? cur_element.getName()+" ("+data_item.getOrdinal()+")": cur_element.getName();
+    			row[1]=		cur_element.getOid();
+    			row[2]=		String.valueOf(cur_element.getId());
+    			row[3]=		data_item.getValue()	;
+    			row[4]=row[6]=row[7]=row[5]="";
+    			rows.add(row);
+    			cycle_count++;
+    			if ( cycle_count >0 && !cur_bean_mdata.isRepeatingGroup()){
+    				break;
+    			}
+    		}
+    		return;
+    	}
+    	else if (cur_element != null && new_element != null){
+    		//for repeating groups: 3 cases
+    		//one cycle: repeating group item -> none-repeating group item
+    		//second cycle -> back none-repeating to prev repeating
+    		for (ItemDataBean data_item : cur_element.getItemDataElements()){
+    			row = new String[8];
+    			if (!cur_bean_mdata.isRepeatingGroup() && cycle_count>0 ){
+    				row[0]=row[1]=row[2]=row[3]="";
+    			}else{
+    				row[0] = (cur_bean_mdata.isRepeatingGroup())? cur_element.getName()+" ("+data_item.getOrdinal()+")": cur_element.getName();
+        			row[1]=		cur_element.getOid();
+	    			row[2]=		String.valueOf(cur_element.getId());
+	    			row[3]=	data_item.getValue()	;
+    			}
+    			if (new_bean_mdata.isRepeatingGroup()){
+    				//case when new one is a repeating group and has data from some previous entry while current does not have a repeating group
+    				if (!cur_bean_mdata.isRepeatingGroup()){
+		    			row[4] =  cur_element.getName()+" ("+data_item.getOrdinal()+")";
+	 				}
+    				
+    				//new one is repeating & cur is repeating
+    				if (cur_bean_mdata.isRepeatingGroup()){
+		    			row[4]=row[0];
+    				}
+    				row[5]=new_element.getOid();
+	    			row[6]=String.valueOf(new_element.getId());
+	    			row[7]=	data_item.getValue()	;
+    			}
+    			else{
+    				if ( cycle_count == 0){
+    					
+    					row[4]=row[0];
+    	    			row[5]=new_element.getOid();
+    	    			row[6]=String.valueOf(new_element.getId());
+    	    			row[7]=	data_item.getValue()	;
+    				}
+    				else{
+    					row[4]=row[5]=row[6]=row[7]="";
+    				}
+    			}
+    			cycle_count++;
+    			//do not add row if all items empty -> from data of repeat group to none-rep
+    			if ( !(row[0].equals("") && row[4].equals(""))){
+    				rows.add(row);
+    			}
+    		}
+    		return;
+    	}
+    	
+    	
+    	
+    }
     
     @RequestMapping("/managestudy/changeCRFVersion")
     // @RequestMapping("/managestudy/changeCRFVersionAction")
@@ -450,7 +502,8 @@ public class ChangeCRFVersionController {
 	        //create AuditEvent
 	        
 	        pageMessages.add(resword.getString("confirm_crf_version_ms"));
-	        redirect( request, response, "/ViewStudySubject?id="+studySubjectId);
+	        String msg=resword.getString("confirm_crf_version_ms");
+	        redirect( request, response, "/ViewStudySubject?isFromCRFVersionChange="+msg+"&id="+studySubjectId);
         }
         catch (Exception e){
           
