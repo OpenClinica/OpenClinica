@@ -556,7 +556,7 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
 //    from item_data id, item i 
 //    where id.item_id=i.item_id and event_crf_id = ? order  by i.item_id,ordinal;
     
-    public ArrayList<ItemBean> findAllWithItemDataByCRFVersionId(int crfVersionId) {
+    public ArrayList<ItemBean> findAllWithItemDataByCRFVersionId(int crfVersionId,int eventCRFId) {
         this.unsetTypeExpected();
         
         this.setTypeExpected(1, TypeNames.STRING);//(item)name
@@ -571,6 +571,8 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
 
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(crfVersionId));
+        variables.put(new Integer(2), new Integer(eventCRFId));
+        
         String sql = digester.getQuery("findAllWithItemDataByCRFVersionId");
 
         ArrayList rows = super.select(sql, variables);
