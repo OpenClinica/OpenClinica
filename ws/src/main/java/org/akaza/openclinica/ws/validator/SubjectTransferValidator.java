@@ -8,10 +8,12 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
+import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.ws.bean.SubjectStudyDefinitionBean;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -26,6 +28,7 @@ public class SubjectTransferValidator implements Validator {
 
     DataSource dataSource;
     StudyDAO studyDAO;
+    SubjectDAO subjectDao;
     StudySubjectDAO studySubjectDAO;
     StudyParameterValueDAO studyParameterValueDAO;
     UserAccountDAO userAccountDAO;
@@ -197,8 +200,17 @@ public class SubjectTransferValidator implements Validator {
         int handleStudyId = study.getParentStudyId() > 0 ? study.getParentStudyId() : study.getId();
         StudyParameterValueBean studyParameter = getStudyParameterValueDAO().findByHandleAndStudy(handleStudyId, "subjectPersonIdRequired");
         String personId = subjectTransferBean.getPersonId();
+        //personId 3 cases: 
+//        	a. requiered: personId != null && personId.length() > 255
+//        	b. optional: can be provided but can be missed
+//        	c. not-used: personId==null
+        
         if ("required".equals(studyParameter.getValue()) && (personId == null || personId.length() < 1)) {
             e.reject("subjectTransferValidator.personId_required", new Object[] { study.getName() }, "personId is required for the study: " + study.getName());
+            return;
+        }
+        if ("not used".equals(studyParameter.getValue()) && !(personId == null ||  personId.length() <1 )) {
+            e.reject("subjectTransferValidator.personId_not_used", new Object[] { study.getName() }, "personId is not used for the study: " + study.getName());
             return;
         }
 
@@ -207,7 +219,18 @@ public class SubjectTransferValidator implements Validator {
                 + " cannot be longer than 255 characters.");
             return;
         }
-
+// verify that personId is unique 
+         if (subjectTransferBean.getPersonId() != null && subjectTransferBean.getPersonId().length()>0){
+	         SubjectBean subjectWithSamePersonId = getSubjectDao().findByUniqueIdentifier( subjectTransferBean.getPersonId());
+	   	 
+		   	 if ( subjectWithSamePersonId.getId() !=0 )
+		   	 {
+		   		 e.reject("subjectTransferValidator.personId_duplicated", new Object[] { personId }, 
+		   				 "A subject with the Person ID: "+personId+" is already enrolled in this study. ");
+		   	     return;
+		   	 }
+         }
+        
         String idSetting = "";
         StudyParameterValueBean subjectIdGenerationParameter = getStudyParameterValueDAO().findByHandleAndStudy(handleStudyId, "subjectIdGeneration");
         idSetting = subjectIdGenerationParameter.getValue();
@@ -281,7 +304,13 @@ public class SubjectTransferValidator implements Validator {
                 e.reject("subjectTransferValidator.yearOfBirth_invalid", new Object[] { yearOfBirth }, "Year of birth: " + yearOfBirth + " is not valid");
                 return;
             }
-        }
+            //not used
+        }else if ("3".equals(studyParameter.getValue())) {
+        	if( dateOfBirth != null  ||  !(yearOfBirth == null || yearOfBirth.length()<1)) {
+	            e.reject("subjectTransferValidator.date_of_birth_notused", new Object[] { study.getName() },
+	                    "Date of Birth is not used for the study " + study.getName());
+	            return;
+        } }
 
         Date enrollmentDate = subjectTransferBean.getEnrollmentDate();
         if (enrollmentDate == null) {
@@ -308,5 +337,9 @@ public class SubjectTransferValidator implements Validator {
     }
     public UserAccountDAO getUserAccountDAO() {
         return this.userAccountDAO != null ? userAccountDAO : new UserAccountDAO(dataSource);
+    }
+    public SubjectDAO getSubjectDao() {
+       return this.subjectDao != null ? subjectDao : new SubjectDAO(dataSource);
+        
     }
 }
