@@ -1903,7 +1903,7 @@ div#sumBox table tr:first-child td { border-top-width: 0px;
 
 #bt_Home td, #bt_Home li { color: #FFFFFF; background-color: #789EC5; }
 
-#bt_Home ul, #bt_Home li { display: inline; margin: 0px; padding: 0px; list-style-item: none; }
+#bt_Home ul, #bt_Home li { display: inline; float: left; margin: 0px; padding: 0px; list-style-item: none; }
 
 #bt_Home form { margin: 0px; }
 
