@@ -124,7 +124,7 @@
 <c:forEach items="${rows}" var="row" varStatus="rowLoop" begin="0" step="1">
 
 <tr>
-<td  class="table_cell_right" > ${row[0]}&nbsp;</td>
+<td  class="table_cell" > ${row[0]}&nbsp;</td>
 <td  class="table_cell"  > 
 <c:choose>
 <c:when test="${empty row[1]}" >
