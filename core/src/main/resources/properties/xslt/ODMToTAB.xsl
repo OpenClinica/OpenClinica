@@ -1355,6 +1355,16 @@
 		<xsl:copy-of select="position()" />
 	</xsl:variable>
 	
+	<!-- maximum value of StudyEventRepeatKey for an event -->
+		<xsl:variable name="MaxEventRepeatKey">
+			<xsl:for-each select="//odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData/@StudyEventRepeatKey">
+				<xsl:sort data-type="number"/>
+				<xsl:if test="position() = last()">
+					<xsl:value-of select="."/>
+				</xsl:if>
+			</xsl:for-each>
+		</xsl:variable>
+		
 	<xsl:choose>
 		<xsl:when test="$isRepeating = 'Yes'">
 			<!-- write event data header columns for repeating event -->
@@ -1364,6 +1374,7 @@
 				<xsl:with-param name="eventRepeatCnt" select="1"/>
 				<xsl:with-param name="eventOID"  select="$eventDefOID"/>
 				<xsl:with-param name="eventPosition" select="$eventPosition" />
+				<xsl:with-param name="MaxEventRepeatKey" select="$MaxEventRepeatKey"/>
 				<!-- <xsl:with-param name="eventLocationExist" select="$eventLocationExist"/>
 				<xsl:with-param name="eventStartDateExist"  select="$eventStartDateExist"/>
 				<xsl:with-param name="eventStatusExist" select="$eventStatusExist"/>
@@ -1395,6 +1406,7 @@
 		<xsl:param name="eventEndDateExist"/>
 		<xsl:param name="ageExist"/>		-->
 		<xsl:param name="eventRepeatCnt" />
+		<xsl:param name="MaxEventRepeatKey"/>
 		
 		<!--<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @StudyEventRepeatKey = $eventRepeatCnt]) &gt; 0">		-->
 			
@@ -1443,11 +1455,15 @@
 				<xsl:value-of select="$eventRepeatCnt" />	
 				<xsl:value-of select="$delimiter" />							
 			</xsl:if>
-			<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @StudyEventRepeatKey = ($eventRepeatCnt+1) ]) &gt; 0">		
+			<!--<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @StudyEventRepeatKey = 
+					($eventRepeatCnt+1)]) &gt; 0">-->
+			<!-- fix for issue 11832: corrected to repeat the process for next incremental event repeat key until it reaches the value of "MaxEventRepeatKey" -->
+			<xsl:if test="($eventRepeatCnt+1) &lt;= number($MaxEventRepeatKey)">		
 				<xsl:call-template name="createColForRepeatingEvent">
 					<xsl:with-param name="eventRepeatCnt" select="$eventRepeatCnt+1"/>
 					<xsl:with-param name="eventOID"  select="$eventOID"/>
 					<xsl:with-param name="eventPosition" select="$eventPosition" />	
+					<xsl:with-param name="MaxEventRepeatKey" select="$MaxEventRepeatKey"/>
 					<!--<xsl:with-param name="eventLocationExist" select="$eventLocationExist"/>
 					<xsl:with-param name="eventStartDateExist" select="$eventStartDateExist"/>
 					<xsl:with-param name="eventStatusExist" select="$eventStatusExist"/>
@@ -1530,6 +1546,15 @@
 				</xsl:if>
 			</xsl:for-each>
 		</xsl:variable>-->
+		<!-- maximum value of StudyEventRepeatKey for an event -->
+		<xsl:variable name="MaxEventRepeatKey">
+			<xsl:for-each select="//odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData/@StudyEventRepeatKey">
+				<xsl:sort data-type="number"/>
+				<xsl:if test="position() = last()">
+					<xsl:value-of select="."/>
+				</xsl:if>
+			</xsl:for-each>
+		</xsl:variable>
 		
 		<xsl:apply-templates
 			select="."
@@ -1537,7 +1562,8 @@
 			<xsl:with-param name="eventPosition" select="$eventPosition" />
 			<xsl:with-param name="isRepeatingEvent" select="$isRepeatingEvent"/>
 			<xsl:with-param name="eventOID" select="$eventOID"/>
-			<xsl:with-param name="generateIntHeadersList" select="$generateIntHeadersList"/>			
+			<xsl:with-param name="generateIntHeadersList" select="$generateIntHeadersList"/>	
+			<xsl:with-param name="MaxEventRepeatKey" select="$MaxEventRepeatKey"/>		
 		</xsl:apply-templates>
 		<!-- apply template for item data columns -->
 		<xsl:apply-templates
@@ -1546,6 +1572,7 @@
 			<xsl:with-param name="eventOID" select="$eventOID"/>	
 			<xsl:with-param name="isEventRepeating" select="$isEventRepeating"/>		
 			<xsl:with-param name="generateIntHeadersList" select="$generateIntHeadersList"/>
+			<xsl:with-param name="MaxEventRepeatKey" select="$MaxEventRepeatKey"/>
 		</xsl:apply-templates>		
 	</xsl:template>
 	
@@ -1557,7 +1584,7 @@
 		<xsl:param name="eventPosition"/>
 		<xsl:param name="isRepeatingEvent"/>	
 		<xsl:param name="generateIntHeadersList"/>
-		
+		<xsl:param name="MaxEventRepeatKey"/>
 		<!--<xsl:variable name="formRefOID" select="@FormOID"/>-->
 		<!--
 		<xsl:variable name="crfVersionExist" select="count(//odm:FormData[@FormOID = $formRefOID and @OpenClinica:Version]) &gt; 0"/>
@@ -1573,7 +1600,8 @@
 					<xsl:with-param name="eventOID" select="$eventOID"/>   
 				   <xsl:with-param name="eventPosition" select="$eventPosition"/>
 				   <xsl:with-param name="eventRepeatCnt" select="1"/>	
-				   <xsl:with-param name="generateIntHeadersList" select="$generateIntHeadersList"/>			   						
+				   <xsl:with-param name="generateIntHeadersList" select="$generateIntHeadersList"/>		
+				   <xsl:with-param name="MaxEventRepeatKey" select="$MaxEventRepeatKey"/>	   						
 				</xsl:apply-templates>			
 			</xsl:when>
 			<xsl:otherwise>
@@ -1704,6 +1732,7 @@
 	   <xsl:param name="eventPosition"/>
 	   <xsl:param name="eventRepeatCnt" />
 	   <xsl:param name="generateIntHeadersList"/>
+	   <xsl:param name="MaxEventRepeatKey"/>
 	   <!--<xsl:param name="crfPosition" />	   
 	   <xsl:param name="crfVersionExist"/>
 		<xsl:param name="interviewerNameExist"/>
@@ -1826,14 +1855,17 @@
 					</xsl:if>				
 				
 		</xsl:for-each>	
-		<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @StudyEventRepeatKey = 
-					($eventRepeatCnt+1)]) &gt; 0">	
-		<xsl:call-template name="createCRFColForRepeatingEvent">
-			<xsl:with-param name="eventOID" select="$eventOID"/>   
-			<xsl:with-param name="eventPosition" select="$eventPosition"/>
-			<xsl:with-param name="eventRepeatCnt" select="$eventRepeatCnt+1"/>
-			<xsl:with-param name="generateIntHeadersList" select="$generateIntHeadersList"/>
-		</xsl:call-template>
+		<!--<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @StudyEventRepeatKey = 
+					($eventRepeatCnt+1)]) &gt; 0">	-->
+		<!-- fix for issue 11832: corrected to repeat the process for next incremental event repeat key until it reaches the value of "MaxEventRepeatKey" -->
+		<xsl:if test="($eventRepeatCnt+1) &lt;= number($MaxEventRepeatKey)">					
+			<xsl:call-template name="createCRFColForRepeatingEvent">
+				<xsl:with-param name="eventOID" select="$eventOID"/>   
+				<xsl:with-param name="eventPosition" select="$eventPosition"/>
+				<xsl:with-param name="eventRepeatCnt" select="$eventRepeatCnt+1"/>
+				<xsl:with-param name="generateIntHeadersList" select="$generateIntHeadersList"/>
+				<xsl:with-param name="MaxEventRepeatKey" select="$MaxEventRepeatKey"/>
+			</xsl:call-template>
 		</xsl:if>
    </xsl:template>
    
@@ -1841,7 +1873,8 @@
 		<xsl:param name="eventOID"/> 
 		<xsl:param name="isEventRepeating"/>
 		<xsl:param name="generateIntHeadersList"/>
-
+		<xsl:param name="MaxEventRepeatKey"/>
+		
 	  <!-- <xsl:variable name="formRefOID" select="@FormOID"/>	  formRefOID - <xsl:value-of select="$formRefOID" />
 	   <xsl:variable name="formRefNodeId" select="generate-id()"/>
 		<xsl:variable name="crfPosition">
@@ -1861,15 +1894,7 @@
 			</xsl:for-each>
 		</xsl:variable>  
 	
-	<!-- maximum value of StudyEventRepeatKey for an event -->
-	<xsl:variable name="MaxEventRepeatKey">
-		<xsl:for-each select="//odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData/@StudyEventRepeatKey">
-		<xsl:sort data-type="number"/>
-		   <xsl:if test="position() = last()">
-			 <xsl:value-of select="."/>
-		   </xsl:if>
-		  </xsl:for-each>
-    </xsl:variable>
+	
     <!--<xsl:variable name="StudyEventRepeatKey" select="1"/>--><!--temp hardcoded-->
     <!--
 	<xsl:apply-templates select="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:FormDef[@OID = $formRefOID]" mode="formRefToDefTemplateForHeaders">
@@ -1928,36 +1953,40 @@
 	   <xsl:param name="isEventRepeating"/>
 	   <xsl:param name="generateIntHeadersList"/>
 	   
-		<xsl:for-each select="odm:FormRef">
-			<xsl:variable name="formRefOID" select="@FormOID"/>
-			
-			
-			<xsl:variable name="formRefNodeId" select="generate-id()"/>
-			<xsl:variable name="crfPosition">
-				<xsl:for-each select="$allFormRefElements">
-					<xsl:if test="@FormOID = $formRefOID">
-						<xsl:if test="$formRefNodeId = generate-id()">
-							<xsl:copy-of select="position()" />
-						</xsl:if>
-					</xsl:if>
-				</xsl:for-each>
-			</xsl:variable>
-					
-			<xsl:apply-templates select="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:FormDef[@OID = $formRefOID]" mode="formRefToDefTemplateForHeaders">
-				<xsl:with-param name="crfPosition" select="$crfPosition"/>
-				<xsl:with-param name="eventPosition" select="$eventPosition"/>
-				<xsl:with-param name="isEventRepeating" select="$isEventRepeating"/>
-				<xsl:with-param name="eventOID" select="$eventOID"/>
-				<xsl:with-param name="StudyEventRepeatKey" select="$eventRepeatCnt"/>
-				<xsl:with-param name="generateIntHeadersList" select="$generateIntHeadersList"/>
-			</xsl:apply-templates>						
+	   <xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @StudyEventRepeatKey = 
+					$eventRepeatCnt]) &gt; 0">
+			<xsl:for-each select="odm:FormRef">
+				<xsl:variable name="formRefOID" select="@FormOID"/>
 				
-		</xsl:for-each>	
-		
-		<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @StudyEventRepeatKey = 
-					($eventRepeatCnt+1)]) &gt; 0">	
+				
+				<xsl:variable name="formRefNodeId" select="generate-id()"/>
+				<xsl:variable name="crfPosition">
+					<xsl:for-each select="$allFormRefElements">
+						<xsl:if test="@FormOID = $formRefOID">
+							<xsl:if test="$formRefNodeId = generate-id()">
+								<xsl:copy-of select="position()" />
+							</xsl:if>
+						</xsl:if>
+					</xsl:for-each>
+				</xsl:variable>
+						
+				<xsl:apply-templates select="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:FormDef[@OID = $formRefOID]" mode="formRefToDefTemplateForHeaders">
+					<xsl:with-param name="crfPosition" select="$crfPosition"/>
+					<xsl:with-param name="eventPosition" select="$eventPosition"/>
+					<xsl:with-param name="isEventRepeating" select="$isEventRepeating"/>
+					<xsl:with-param name="eventOID" select="$eventOID"/>
+					<xsl:with-param name="StudyEventRepeatKey" select="$eventRepeatCnt"/>
+					<xsl:with-param name="generateIntHeadersList" select="$generateIntHeadersList"/>
+				</xsl:apply-templates>						
 					
-		
+			</xsl:for-each>	
+		</xsl:if>	
+					
+		<!-- fix for issue 11832: corrected to repeat the process for next incremental event repeat key until it reaches the value of "MaxEventRepeatKey" -->
+		<!--<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @StudyEventRepeatKey = 
+					($eventRepeatCnt+1)]) &gt; 0">-->
+					
+		<xsl:if test="($eventRepeatCnt+1) &lt;= number($MaxEventRepeatKey)">
 		
 		<xsl:apply-templates select="." mode="createItemDataColForRepeatingEvent">
 			<xsl:with-param name="eventOID" select="$eventOID"/>   
@@ -1965,6 +1994,7 @@
 		   <xsl:with-param name="eventRepeatCnt" select="$eventRepeatCnt+1"/>	
 		    <xsl:with-param name="isEventRepeating" select="$isEventRepeating"/>	
 		    <xsl:with-param name="generateIntHeadersList" select="$generateIntHeadersList"/>	   						
+		    <xsl:with-param name="MaxEventRepeatKey" select="$MaxEventRepeatKey"/>	
 		</xsl:apply-templates>
 		</xsl:if>
    </xsl:template>
