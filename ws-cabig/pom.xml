@@ -7,7 +7,7 @@
     <name>OpenClinica Web Services - caBIG</name>
     <parent>
         <groupId>org.akaza.openclinica</groupId>
-        <artifactId>OpenClinica</artifactId>
+        <artifactId>OpenClinica-Parent</artifactId>
         <version>3.1.2</version>
     </parent>
     <dependencies>

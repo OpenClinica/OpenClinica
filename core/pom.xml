@@ -7,7 +7,7 @@
     <name>OpenClinica Core</name>
     <parent>
         <groupId>org.akaza.openclinica</groupId>
-        <artifactId>OpenClinica</artifactId>
+        <artifactId>OpenClinica-Parent</artifactId>
         <version>3.1.2</version>
     </parent>    
     <dependencies> 
@@ -256,22 +256,25 @@
 		</plugins>
 	</reporting>
 
- <!-- JN:Adding these back here, since not sure if whats in parent would reflect here when running tests from core package, perhaps it can be removed from parent?-->
+<!-- 
 	<properties>
 		<catalina.home>C:\\Java\\tomcat</catalina.home>
 		<test.dbName>postgres</test.dbName>
 		<test.dbDriverClassName>org.postgresql.Driver</test.dbDriverClassName>
-		<test.dbUrl>jdbc:postgresql://svn.akazaresearch.com:5432/</test.dbUrl>
+		<test.dbUrl>jdbc:postgresql://localhost:5432/</test.dbUrl>
 		<test.dbUsername>clinica</test.dbUsername>
 		<test.dbPassword>clinica</test.dbPassword>
-		<test.db>OpenClinica-core-3.1-SNAPSHOT-TEST</test.db>
 		<test.hibernateDialect>org.hibernate.dialect.PostgreSQLDialect</test.hibernateDialect>
 		<test.locale>en_US</test.locale>
+<<<<<<< .working
+		<scm.path>scm:svn:http://svn.akazaresearch.com/openclinica/OpenClinica/branches/OpenClinica-3.0-SNAPSHOT</scm.path> -->
+=======
 	
+>>>>>>> .merge-right.r16256
 		<!--  Library Versions -->
 		<!--<spring.version>2.5.6.SEC01</spring.version>-->
 		
- 	</properties> 
+<!-- 	</properties> -->
     <build>
  <!--        <resources>
             <resource>
