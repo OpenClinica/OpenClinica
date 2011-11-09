@@ -163,11 +163,11 @@ public class SubjectEventStatus extends Term implements Comparable {
         }
         boolean validArg = false;
 
-        String status_name = name.trim().replace(" ", "_").toLowerCase();
+        //String status_name = name.trim().replace(" ", "_").toLowerCase();
         
         for (String statusName : getSubjectEventStatusValues()) {
             if(resterm.getString(statusName) != null) {
-                if (status_name.equalsIgnoreCase(resterm.getString(statusName).trim())) {
+                if (name.equalsIgnoreCase(resterm.getString(statusName).trim())) {
                     validArg = true;
                     break;
                 }
@@ -179,7 +179,7 @@ public class SubjectEventStatus extends Term implements Comparable {
         }
 
         for (int key : membersMap.keySet()) {
-            if (status_name.equalsIgnoreCase(resterm.getString(getSubjectEventStatusName(key)))) {
+            if (name.equalsIgnoreCase(resterm.getString(getSubjectEventStatusName(key)))) {
                 return key;
             }
         }

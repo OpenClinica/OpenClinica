@@ -6,7 +6,7 @@
 	where dn.assigned_user_id = ?
 	AND dn.study_id in (SELECT study_id FROM study WHERE study_id = ? or parent_study_id=?)
 	AND ((dn.parent_dn_id IS NULL) or (dn.parent_dn_id = 0))
-	AND (dn.resolution_status_id=1 OR dn.resolution_status_id=2 OR dn.resolution_status_id=3);
+	AND (dn.resolution_status_id=1 OR dn.resolution_status_id=2 OR dn.resolution_status_id=3)
     	</sql>
     </query>
     <query>

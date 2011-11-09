@@ -3,11 +3,11 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.akaza.openclinica</groupId>
-    <artifactId>OpenClinica</artifactId>
+    <artifactId>OpenClinica-Parent</artifactId>
     <packaging>pom</packaging>
-    <version>3.1-SNAPSHOT</version>
+    <version>3.1.2</version>
     <name>OpenClinica</name>
-    <description>3.1-SNAPSHOT</description>
+    <description>3.1.2</description>
     <repositories>
 		<repository>
 			<id>Rufus Repository</id>
@@ -63,16 +63,15 @@
 		</pluginRepository>
 	</pluginRepositories>   
 	<properties>
-		<catalina.home>/usr/local/tomcat</catalina.home>
+		<!-- <catalina.home>/usr/local/tomcat</catalina.home> -->
 		<test.dbName>postgres</test.dbName>
 		<test.dbDriverClassName>org.postgresql.Driver</test.dbDriverClassName>
 		<test.dbUrl>jdbc:postgresql://localhost:5432/</test.dbUrl>
 		<test.dbUsername>clinica</test.dbUsername>
 		<test.dbPassword>clinica</test.dbPassword>
-		<test.db>OpenClinica-core-3.1-SNAPSHOT-TEST</test.db>
 		<test.hibernateDialect>org.hibernate.dialect.PostgreSQLDialect</test.hibernateDialect>
 		<test.locale>en_US</test.locale>
-		<scm.path>scm:svn:http://svn.akazaresearch.com/openclinica/OpenClinica/branches/OpenClinica-3.1-SNAPSHOT/projects</scm.path>
+		<scm.path>scm:svn:http://svn.akazaresearch.com/openclinica-enterprise/OpenClinica/tags/OpenClinica-3.1.2/projects</scm.path>
 		<!--  Library Versions -->
 		<spring.version>3.0.5.RELEASE</spring.version>
 	</properties>
@@ -385,7 +384,7 @@
 					here's the bug info http://jira.codehaus.org/browse/MASSEMBLY-104 -->
 				<version>2.2-beta-1</version>
 				<configuration>
-					<outputDirectory>/var/www/html/OpenClinica-3.1-distros</outputDirectory>
+					<outputDirectory>/var/www/html/OpenClinica-3.1-distros/enterprise</outputDirectory>
 					<descriptors>
 						<descriptor>src/assemble/openclinica-assemble.xml</descriptor>
 					</descriptors>
@@ -406,10 +405,10 @@
 					<!-- Container configuration -->
 					<container>
 						<containerId>tomcat5x</containerId>
-						<home>${catalina.home}</home>
+						<home>/usr/local/tomcat</home>
 					</container>
 					<configuration>
-						<home>${catalina.home}</home>
+						<home>/usr/local/tomcat</home>
 						<type>existing</type>
 					</configuration>
 				</configuration>

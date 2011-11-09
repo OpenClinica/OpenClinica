@@ -88,11 +88,14 @@ public class SDVController {
         ModelMap gridMap = new ModelMap();
         HttpSession session = request.getSession();
         boolean showMoreLink = false;
-        if(request.getParameter("showMoreLink")!=null){
+        if(session.getAttribute("sSdvRestore") != null && session.getAttribute("sSdvRestore") == "false") {
+            session.setAttribute("sSdvRestore", "true");
+            showMoreLink = true;
+        }else if(request.getParameter("showMoreLink")!=null){
             showMoreLink = Boolean.parseBoolean(request.getParameter("showMoreLink").toString());
         }else if(session.getAttribute("s_sdv_showMoreLink")!=null) {
             showMoreLink = Boolean.parseBoolean(session.getAttribute("s_sdv_showMoreLink")+"");
-        } else {
+        }else {
             showMoreLink = true;
         }
         request.setAttribute("showMoreLink", showMoreLink+"");
@@ -168,7 +171,11 @@ public class SDVController {
         //Not necessary when using old page design...
         // setUpSidebar(request);
         boolean showMoreLink = false;
-        if(request.getParameter("showMoreLink")!=null){
+        if(session.getAttribute("tableFacadeRestore") != null && session.getAttribute("tableFacadeRestore") == "false") {
+            session.setAttribute("tableFacadeRestore","true");
+            session.setAttribute("sSdvRestore", "false");
+            showMoreLink = true;
+        }else if(request.getParameter("showMoreLink")!=null){
             showMoreLink = Boolean.parseBoolean(request.getParameter("showMoreLink").toString());
         }else if(session.getAttribute("sdv_showMoreLink")!=null) {
             showMoreLink = Boolean.parseBoolean(session.getAttribute("sdv_showMoreLink")+"");
