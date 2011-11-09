@@ -48,6 +48,11 @@ document.write('<table border="0" cellpadding=0" cellspacing="0" width="' + docu
                 <td class="footer"><fmt:message key="footer.license.3" bundle="${resword}"/></td>
                 <td align="right" class="footer"></td>
             </tr>
+             <tr>
+                <td class="footer"/>
+                <td class="footer"><fmt:message key="footer.license.4" bundle="${resword}"/></td>
+                <td align="right" class="footer"></td>
+            </tr>
         </table>
 
 <!-- End Footer -->
