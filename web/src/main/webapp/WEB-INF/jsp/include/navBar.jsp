@@ -13,14 +13,12 @@
             openDocWindow(bugtrack);
         }
         function confirmCancel(pageName){
-            alert("pageName exit");
             var confirm1 = confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>');
             if(confirm1){
                 window.location = pageName;
             }
         }
         function confirmExit(pageName){
-            alert("pageName exit");
             var confirm1 = confirm('<fmt:message key="sure_to_exit" bundle="${resword}"/>');
             if(confirm1){
                 window.location = pageName;
