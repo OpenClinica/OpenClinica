@@ -267,7 +267,6 @@ xmlns:xs="http://www.w3.org/2001/XMLSchema">
 									<!-- Table for non-grouped items was not created before; create it -->
 									<!-- *********** CREATE TABLE for non-repeating items start ***************  -->
 									<xsl:call-template name="create-table-non-repeating-grp-items">
-										<xsl:with-param name="studySchemaName" select="$studySchemaName"/>
 										<xsl:with-param name="tableName" select="$tableName"/>
 										<xsl:with-param name="itemGroupDef" select="$itemGroupDef"/>
 										<xsl:with-param name="grpItemsCnt" select="$grpItemsCnt"/>
@@ -494,7 +493,6 @@ xmlns:xs="http://www.w3.org/2001/XMLSchema">
 								<xsl:if test="$precedingSameFormsRepeatingGroupCnt = 0">
 									<!-- *********** CREATE TABLE for repeating group items TABLE start ***************  -->
 									<xsl:call-template name="create-table-repeating-grp-items">
-										<xsl:with-param name="studySchemaName" select="$studySchemaName"/>
 										<xsl:with-param name="tableName" select="$tableName"/>
 										<xsl:with-param name="itemGroupDef" select="$itemGroupDef"/>
 									</xsl:call-template>
@@ -695,7 +693,6 @@ xmlns:xs="http://www.w3.org/2001/XMLSchema">
 									</xsl:call-template>
 								</xsl:variable>
 								<xsl:call-template name="create-table-non-repeating-grp-items">
-									<xsl:with-param name="studySchemaName" select="$studySchemaName"/>
 									<xsl:with-param name="tableName" select="$tableName"/>
 									<xsl:with-param name="itemGroupDef" select="$itemGroupDef"/>
 									<xsl:with-param name="grpItemsCnt" select="$grpItemsCnt"/>
@@ -753,7 +750,6 @@ xmlns:xs="http://www.w3.org/2001/XMLSchema">
 									</xsl:call-template>
 								</xsl:variable>
 								<xsl:call-template name="create-table-repeating-grp-items">
-									<xsl:with-param name="studySchemaName" select="$studySchemaName"/>
 									<xsl:with-param name="tableName" select="$tableName"/>
 									<xsl:with-param name="itemGroupDef" select="$itemGroupDef"/>
 								</xsl:call-template>
@@ -960,7 +956,6 @@ xmlns:xs="http://www.w3.org/2001/XMLSchema">
 	</xsl:template>
 	<!-- template to create the table for non-repeating group items -->
 	<xsl:template name="create-table-non-repeating-grp-items">
-		<xsl:param name="studySchemaName"/>	
 		<xsl:param name="tableName"/>
 		<xsl:param name="itemGroupDef"/>
 		<!-- @pgawade 07/28/2010 Added the parameter for number of items in a CRF items group to divide the form data into two in case this number exceeds the defined maximum limit.-->
@@ -991,8 +986,7 @@ xmlns:xs="http://www.w3.org/2001/XMLSchema">
 				crf_status character varying(255), 
 				interviewerName character varying(255),
 				interviewDate date,
-				warehouse_insert_created_timestamp timestamp with time zone<!--,	@pgawade 02-Nov-2011 Fix for issue 11799-->);
-				<!-- @pgawade 02-Nov-2011 fix for issue 11799 -->	          	 
+				warehouse_insert_created_timestamp timestamp with time zone,		          	 
 				<xsl:for-each select="$itemGroupDef/odm:ItemRef">
 					<xsl:variable name="ItemOIDval" select="@ItemOID"/>
 					<xsl:variable name="itemDef" select="../../odm:ItemDef[@OID=$ItemOIDval]"/>				
@@ -1005,85 +999,34 @@ xmlns:xs="http://www.w3.org/2001/XMLSchema">
 						<xsl:call-template name="is-item-multi-select">
 							<xsl:with-param name="itemDef" select="$itemDef"/>
 						</xsl:call-template>
-					</xsl:variable>					
-					<!-- old code start -->
-					<!--<xsl:choose>
+					</xsl:variable>
+					<xsl:choose>
 						<xsl:when test="$itemDef/@DataType = 'partialDate'">
-							<xsl:if test="position() !=1">, </xsl:if>-->
 							<!-- For item with DataType="partialDate", create 2 columns of type date to store minimun and maximum date range values -->
-							<!--<xsl:call-template name="partial-date-min-val-col-name">-->
+							<xsl:call-template name="partial-date-min-val-col-name">
 								<!-- @pgawade 05/06/2010 Changed the item column name to be item name instead of item OID temporarily -->
 								<!--<xsl:with-param name="itemOID" select="@ItemOID"/>-->
-								<!--<xsl:with-param name="itemName" select="$itemName"/>
+								<xsl:with-param name="itemName" select="$itemName"/>
 							</xsl:call-template>
 							<xsl:text> </xsl:text> date,
-								<xsl:call-template name="partial-date-max-val-col-name">-->
+								<xsl:call-template name="partial-date-max-val-col-name">
 								<!-- @pgawade 05/06/2010 Changed the item column name to be item name instead of item OID temporarily -->
-								<!--<xsl:with-param name="itemOID" select="@ItemOID"/>
+								<!--<xsl:with-param name="itemOID" select="@ItemOID"/>-->
 								<xsl:with-param name="itemName" select="$itemName"/>
-							</xsl:call-template>-->
-							<!--<xsl:text> </xsl:text> date	
-							</xsl:when>-->
-						<!--<xsl:when test="$isItemMultiSelect='true'">--><!-- Skip multi-select items -->							
-						<!--</xsl:when>	-->
-						<!--<xsl:otherwise>
-						<xsl:if test="position() !=1">, </xsl:if>
+							</xsl:call-template>
+							<xsl:text> </xsl:text> date	
+							</xsl:when>
+						<xsl:when test="$isItemMultiSelect='true'"><!-- Skip multi-select items -->							
+						</xsl:when>	
+						<xsl:otherwise>
 							<xsl:value-of select="$itemName"/>
 							<xsl:text> </xsl:text>
 							<xsl:value-of select="$itemDef/@DataType"/>
 						</xsl:otherwise>
-					</xsl:choose>-->
-					<!--<xsl:if test="not(position()=last()) and $isItemMultiSelect='false'">, </xsl:if>-->
-					<!-- old code end -->
-					<!-- new code start -->
-				<xsl:choose>
-					<xsl:when test="$itemDef/@DataType = 'partialDate'">
-						<!-- For item with DataType="partialDate", create 2 columns of type date to store minimun and maximum date range values -->
-						<xsl:variable name="partialDateMinValColName">
-							<xsl:call-template name="partial-date-min-val-col-name">
-								<!--<xsl:with-param name="itemOID" select="@ItemOID"/>-->
-								<xsl:with-param name="itemName" select="$itemName"/>
-							</xsl:call-template>
-						</xsl:variable>
-						<xsl:call-template name="add-col-to-table">
-							<!-- @ccollins 5/12/10 added schema name to params -->
-							<xsl:with-param name="schemaName" select="$studySchemaName"/>
-							<xsl:with-param name="tableName" select="$tableName"/>
-							<xsl:with-param name="colName" select="$partialDateMinValColName"/>
-							<xsl:with-param name="colDataType" select="'date'"/>
-						</xsl:call-template>
-						<xsl:variable name="partialDateMaxValColName">
-							<xsl:call-template name="partial-date-max-val-col-name">
-								<!--<xsl:with-param name="itemOID" select="@ItemOID"/>-->
-								<xsl:with-param name="itemName" select="$itemName"/>
-							</xsl:call-template>
-						</xsl:variable>
-						<xsl:call-template name="add-col-to-table">
-							<!-- @ccollins 5/12/10 added schema name to params -->
-							<xsl:with-param name="schemaName" select="$studySchemaName"/>
-							<xsl:with-param name="tableName" select="$tableName"/>
-							<xsl:with-param name="colName" select="$partialDateMaxValColName"/>
-							<xsl:with-param name="colDataType" select="'date'"/>
-						</xsl:call-template>
-					</xsl:when>
-					<xsl:when test="$isItemMultiSelect='true'">
-						<!-- Skip multi-select items -->
-					</xsl:when>
-					<xsl:otherwise>
-						<!-- column name as item OID and column data type as value of attribute DataType in the item definition -->
-						<xsl:call-template name="add-col-to-table">
-							<!-- @ccollins 5/12/10 added schema name to params -->
-							<xsl:with-param name="schemaName" select="$studySchemaName"/>
-							<xsl:with-param name="tableName" select="$tableName"/>
-							<!--<xsl:with-param name="colName" select="@ItemOID"/>-->
-							<xsl:with-param name="colName" select="$itemName"/>
-							<xsl:with-param name="colDataType" select="$itemDef/@DataType"/>
-						</xsl:call-template>
-					</xsl:otherwise>
-				</xsl:choose>
-				<!-- new code end -->
+					</xsl:choose>
+					<xsl:if test="not(position()=last()) and $isItemMultiSelect='false'">, </xsl:if>
 				</xsl:for-each>
-				<!--);	-->
+				);	
 				<!-- Create table to store response option text -->
 				create table <xsl:value-of select="normalize-space($RespOptionsTxtTbl)"/> (				
 				item_data_id serial NOT NULL,
@@ -1100,7 +1043,7 @@ xmlns:xs="http://www.w3.org/2001/XMLSchema">
 				crf_status character varying(255), 
 				interviewerName character varying(255),
 				interviewDate date,
-				warehouse_insert_created_timestamp timestamp with time zone	<!--	@pgawade 02-Nov-2011 Fix for issue 11799-->	);
+				warehouse_insert_created_timestamp timestamp with time zone		          	 
 				<xsl:for-each select="$itemGroupDef/odm:ItemRef">
 					<xsl:variable name="ItemOIDval" select="@ItemOID"/>
 					<xsl:variable name="itemDef" select="../../odm:ItemDef[@OID=$ItemOIDval]"/>				
@@ -1122,16 +1065,10 @@ xmlns:xs="http://www.w3.org/2001/XMLSchema">
 									<xsl:with-param name="itemDef" select="$itemDef"/>
 								</xsl:call-template>
 							</xsl:variable>
-							<!--,<xsl:call-template name="get-multi-select-column-names-with-data-type">							
+							,<xsl:call-template name="get-multi-select-column-names-with-data-type">							
 								<xsl:with-param name="itemName" select="$itemName"/>
 								<xsl:with-param name="multiSelectListId" select="$multiSelectListId"/>
-							</xsl:call-template>-->
-							<xsl:call-template name="get-multi-select-columns-alter-table-statements">								
-								<xsl:with-param name="schemaName" select="$studySchemaName"/>
-								<xsl:with-param name="tableName" select="$RespOptionsTxtTbl"/>								
-								<xsl:with-param name="itemName" select="$itemName"/>								
-								<xsl:with-param name="multiSelectListId" select="$multiSelectListId"/>
-						</xsl:call-template>
+							</xsl:call-template>
 						</xsl:when>
 						<xsl:otherwise>						
 							<xsl:variable name="isItemSingleSelect">
@@ -1141,30 +1078,16 @@ xmlns:xs="http://www.w3.org/2001/XMLSchema">
 							</xsl:variable>
 							<!-- Create additional column of type text to store the label for selected value from the corresponding code list -->
 							<xsl:if test="$isItemSingleSelect='true'">
-								<!--,<xsl:call-template name="get-col-name-single-select-label">							
+								,<xsl:call-template name="get-col-name-single-select-label">							
 									<xsl:with-param name="itemName" select="$itemName"/>
 								</xsl:call-template>
 								<xsl:text> </xsl:text>
-								<xsl:call-template name="get-col-data-type-single-select-label"/>-->
-								<xsl:variable name="col-name-single-select-label">
-									<xsl:call-template name="get-col-name-single-select-label">									
-										<xsl:with-param name="itemName" select="$itemName"/>
-									</xsl:call-template>
-								</xsl:variable>									
-								<xsl:variable name="col-data-type-single-select-label">
-									<xsl:call-template name="get-col-data-type-single-select-label"/>
-								</xsl:variable>
-								<xsl:call-template name="add-col-to-table">								
-									<xsl:with-param name="schemaName" select="$studySchemaName"/>
-									<xsl:with-param name="tableName" select="$RespOptionsTxtTbl"/>
-									<xsl:with-param name="colName" select="$col-name-single-select-label"/>
-									<xsl:with-param name="colDataType" select="$col-data-type-single-select-label"/>
-								</xsl:call-template>
+								<xsl:call-template name="get-col-data-type-single-select-label"/>
 							</xsl:if>
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:for-each>
-				<!--);	-->
+				);	
 			</xsl:when>
 			<xsl:otherwise><!-- Create only one table to store all item values for the ungrouped items -->
 				create table <xsl:value-of select="normalize-space($tableName)"/> (
@@ -1184,7 +1107,7 @@ xmlns:xs="http://www.w3.org/2001/XMLSchema">
 				crf_status character varying(255), 
 				interviewerName character varying(255),
 				interviewDate date,
-				warehouse_insert_created_timestamp timestamp with time zone<!--, @pgawade 02-Nov-2011 fix for issue 11799 -->); 			          	 
+				warehouse_insert_created_timestamp timestamp with time zone, 			          	 
 				<xsl:for-each select="$itemGroupDef/odm:ItemRef">
 				<xsl:variable name="ItemOIDval" select="@ItemOID"/>
 				<xsl:variable name="itemDef" select="../../odm:ItemDef[@OID=$ItemOIDval]"/>
@@ -1216,119 +1139,46 @@ xmlns:xs="http://www.w3.org/2001/XMLSchema">
 					</xsl:call-template>
 				</xsl:variable>
 				
-				<!-- @pgawade 31-Oct-2011 Changed to put comma separating every item column to start of for-loop than end to get it correct -->	
-				<!--<xsl:if test="position() !=1">, </xsl:if>-->
-				<!-- old code start-->
-				<!--<xsl:choose>
-					<xsl:when test="$itemDef/@DataType = 'partialDate'">-->
-						
+				<xsl:choose>
+					<xsl:when test="$itemDef/@DataType = 'partialDate'">
 						<!-- For item with DataType="partialDate", create 2 columns of type date to store minimun and maximum date range values -->
-						<!--<xsl:call-template name="partial-date-min-val-col-name">-->
+						<xsl:call-template name="partial-date-min-val-col-name">
 							<!-- @pgawade 05/06/2010 Changed the item column name to be item name instead of item OID temporarily -->
 							<!--<xsl:with-param name="itemOID" select="@ItemOID"/>-->
-							<!--<xsl:with-param name="itemName" select="$itemName"/>
+							<xsl:with-param name="itemName" select="$itemName"/>
 						</xsl:call-template>
 						<xsl:text> </xsl:text> date,
-							<xsl:call-template name="partial-date-max-val-col-name">-->
+							<xsl:call-template name="partial-date-max-val-col-name">
 							<!-- @pgawade 05/06/2010 Changed the item column name to be item name instead of item OID temporarily -->
-							<!--<xsl:with-param name="itemOID" select="@ItemOID"/>
+							<!--<xsl:with-param name="itemOID" select="@ItemOID"/>-->
 							<xsl:with-param name="itemName" select="$itemName"/>
 						</xsl:call-template>
 						<xsl:text> </xsl:text> date	
 						</xsl:when>
-					<xsl:when test="$isItemMultiSelect='true'"> -->
+					<xsl:when test="$isItemMultiSelect='true'"> 
 						<!-- For multi-select items create number of columns equal to number of items in the associated codelist -->
 						<!-- 04/12/2010: Changes for "OpenClinica:MultiSelectListRef " child element in the definition of multi-select items -->
-						<!--<xsl:variable name="multiSelectListId">
-							<xsl:call-template name="get-multi-select-list-id">
-								<xsl:with-param name="itemDef" select="$itemDef"/>
-							</xsl:call-template>
-						</xsl:variable>
-						<xsl:call-template name="get-multi-select-column-names-with-data-type">-->
-							<!-- @pgawade 05/06/2010 Changed the item column name to be item name instead of item OID temporarily -->
-							<!--<xsl:with-param name="itemOID" select="$ItemOIDval"/>-->
-							<!--<xsl:with-param name="itemName" select="$itemName"/>
-							<xsl:with-param name="multiSelectListId" select="$multiSelectListId"/>
-						</xsl:call-template>
-					</xsl:when>
-					<xsl:otherwise>-->
-						
-						<!-- column name as item OID and column data type as value of attribute DataType in the item definition -->
-						<!-- @pgawade 05/06/2010 Changed the item column name to be item name instead of item OID temporarily -->
-						<!-- <xsl:value-of select="@ItemOID"/><xsl:text> </xsl:text> <xsl:value-of select="$itemDef/@DataType"/>	-->
-						<!--<xsl:value-of select="$itemName"/>
-						<xsl:text> </xsl:text>
-						<xsl:value-of select="$itemDef/@DataType"/>
-					</xsl:otherwise>
-				</xsl:choose>-->
-				<!-- old code end -->
-				<!-- new code start -->
-				<xsl:choose>
-					<xsl:when test="$itemDef/@DataType = 'partialDate'">
-						<!-- For item with DataType="partialDate", create 2 columns of type date to store minimun and maximum date range values -->
-						<xsl:variable name="partialDateMinValColName">
-							<xsl:call-template name="partial-date-min-val-col-name">
-								<!--<xsl:with-param name="itemOID" select="@ItemOID"/>-->
-								<xsl:with-param name="itemName" select="$itemName"/>
-							</xsl:call-template>
-						</xsl:variable>
-						<xsl:call-template name="add-col-to-table">
-							<!-- @ccollins 5/12/10 added schema name to params -->
-							<xsl:with-param name="schemaName" select="$studySchemaName"/>
-							<xsl:with-param name="tableName" select="$tableName"/>
-							<xsl:with-param name="colName" select="$partialDateMinValColName"/>
-							<xsl:with-param name="colDataType" select="'date'"/>
-						</xsl:call-template>
-						<xsl:variable name="partialDateMaxValColName">
-							<xsl:call-template name="partial-date-max-val-col-name">
-								<!--<xsl:with-param name="itemOID" select="@ItemOID"/>-->
-								<xsl:with-param name="itemName" select="$itemName"/>
-							</xsl:call-template>
-						</xsl:variable>
-						<xsl:call-template name="add-col-to-table">
-							<!-- @ccollins 5/12/10 added schema name to params -->
-							<xsl:with-param name="schemaName" select="$studySchemaName"/>
-							<xsl:with-param name="tableName" select="$tableName"/>
-							<xsl:with-param name="colName" select="$partialDateMaxValColName"/>
-							<xsl:with-param name="colDataType" select="'date'"/>
-						</xsl:call-template>
-					</xsl:when>
-					<xsl:when test="$isItemMultiSelect='true'">
-						<!-- For multi-select items create number of columns equal to number of items in the associated codelist -->
-						<!-- 04/12/2010: Changes for "OpenClinica:MultiSelectListRef " child element in the definition of multi-select items -->
-						<!--<xsl:variable name="codelistOID">
-									<xsl:call-template name="get-codelist-OID">
-										<xsl:with-param name="itemDef" select="$itemDef"/>	
-									</xsl:call-template>
-								</xsl:variable>-->
-						
 						<xsl:variable name="multiSelectListId">
 							<xsl:call-template name="get-multi-select-list-id">
 								<xsl:with-param name="itemDef" select="$itemDef"/>
 							</xsl:call-template>
-						</xsl:variable><!--multiSelectListId:<xsl:value-of select="$multiSelectListId"/>-->
-						<!-- @pgawade 07/28/2010 If the number of items exceed 'max-crf-item-cnt-for-single-tbl' value; single select item labels and multi-select booleans will be part of another table -->																		
-						<xsl:call-template name="get-multi-select-columns-alter-table-statements">								
-							<xsl:with-param name="schemaName" select="$studySchemaName"/>
-							<xsl:with-param name="tableName" select="$tableName"/>								
-							<xsl:with-param name="itemName" select="$itemName"/>								
+						</xsl:variable>
+						<xsl:call-template name="get-multi-select-column-names-with-data-type">
+							<!-- @pgawade 05/06/2010 Changed the item column name to be item name instead of item OID temporarily -->
+							<!--<xsl:with-param name="itemOID" select="$ItemOIDval"/>-->
+							<xsl:with-param name="itemName" select="$itemName"/>
 							<xsl:with-param name="multiSelectListId" select="$multiSelectListId"/>
 						</xsl:call-template>
-						<!--after call template-->
 					</xsl:when>
 					<xsl:otherwise>
 						<!-- column name as item OID and column data type as value of attribute DataType in the item definition -->
-						<xsl:call-template name="add-col-to-table">
-							<!-- @ccollins 5/12/10 added schema name to params -->
-							<xsl:with-param name="schemaName" select="$studySchemaName"/>
-							<xsl:with-param name="tableName" select="$tableName"/>
-							<!--<xsl:with-param name="colName" select="@ItemOID"/>-->
-							<xsl:with-param name="colName" select="$itemName"/>
-							<xsl:with-param name="colDataType" select="$itemDef/@DataType"/>
-						</xsl:call-template>
+						<!-- @pgawade 05/06/2010 Changed the item column name to be item name instead of item OID temporarily -->
+						<!-- <xsl:value-of select="@ItemOID"/><xsl:text> </xsl:text> <xsl:value-of select="$itemDef/@DataType"/>	-->
+						<xsl:value-of select="$itemName"/>
+						<xsl:text> </xsl:text>
+						<xsl:value-of select="$itemDef/@DataType"/>
 					</xsl:otherwise>
 				</xsl:choose>
-				<!-- new code end -->
 				<!-- Check if the item is single select only if item is not multi-select-->
 				<xsl:if test="$isItemMultiSelect='false'">
 					<xsl:variable name="isItemSingleSelect">
@@ -1338,29 +1188,18 @@ xmlns:xs="http://www.w3.org/2001/XMLSchema">
 					</xsl:variable>
 					<!-- Create additional column of type text to store the label for selected value from the corresponding code list -->
 					<xsl:if test="$isItemSingleSelect='true'">
-					<xsl:variable name="col-name-single-select-label">
-							<xsl:call-template name="get-col-name-single-select-label">
+							,<xsl:call-template name="get-col-name-single-select-label">
 							<!-- @pgawade 05/06/2010 Changed the item column name to be item name instead of item OID temporarily -->
 							<!--<xsl:with-param name="itemOID" select="@ItemOID"/>-->
 							<xsl:with-param name="itemName" select="$itemName"/>
 						</xsl:call-template>
-					</xsl:variable>	
-					<!--	<xsl:text> </xsl:text>-->
-					<xsl:variable name="col-data-type-single-select-label">
+						<xsl:text> </xsl:text>
 						<xsl:call-template name="get-col-data-type-single-select-label"/>
-					</xsl:variable>
-					<xsl:call-template name="add-col-to-table">
-						<!-- @ccollins 5/12/10 added schema name to params -->
-						<xsl:with-param name="schemaName" select="$studySchemaName"/>
-						<xsl:with-param name="tableName" select="$tableName"/>
-						<xsl:with-param name="colName" select="$col-name-single-select-label"/>
-						<xsl:with-param name="colDataType" select="$col-data-type-single-select-label"/>
-					</xsl:call-template>	
 					</xsl:if>
 				</xsl:if>
-				<!--<xsl:if test="not(position()=last())">, </xsl:if>-->
+				<xsl:if test="not(position()=last())">, </xsl:if>
 			</xsl:for-each>
-			<!--	);	-->
+				);	
 			</xsl:otherwise>
 		</xsl:choose>	
 	</xsl:template>
@@ -2152,7 +1991,6 @@ xmlns:xs="http://www.w3.org/2001/XMLSchema">
 															</xsl:when>
 															<!-- @ccollins 6/03/10 added test for int, real, date datatypes to handle null (temporary fix) -->
 															<xsl:when test="$itemDef/@DataType = ('integer') or $itemDef/@DataType = ('real') or $itemDef/@DataType = ('date')">
-															
 																<xsl:choose>
 																	<xsl:when test="string(number($itemValue)) = 'NaN' and $itemDef/@DataType != ('date')">
 																			NULL
@@ -2235,7 +2073,6 @@ xmlns:xs="http://www.w3.org/2001/XMLSchema">
 	</xsl:template>
 	<!-- template to create the table for repeating group items -->
 	<xsl:template name="create-table-repeating-grp-items">
-		<xsl:param name="studySchemaName"/>
 		<xsl:param name="tableName"/>
 		<xsl:param name="itemGroupDef"/>
 			create table <xsl:value-of select="normalize-space($tableName)"/> (		
@@ -2254,7 +2091,7 @@ xmlns:xs="http://www.w3.org/2001/XMLSchema">
 			interviewerName character varying(255),
 			interviewDate date, 
 			item_group_repeat_key integer,
-			warehouse_insert_created_timestamp timestamp with time zone<!--, @pgawade 02-Nov-2011 fix for issue 11799 -->);						             	 
+			warehouse_insert_created_timestamp timestamp with time zone,						             	 
 			<xsl:for-each select="$itemGroupDef/odm:ItemRef">
 			<xsl:variable name="ItemOIDval" select="@ItemOID"/>
 			<xsl:variable name="itemDef" select="../../odm:ItemDef[@OID=$ItemOIDval]"/>
@@ -2285,122 +2122,50 @@ xmlns:xs="http://www.w3.org/2001/XMLSchema">
 					<xsl:with-param name="itemDef" select="$itemDef"/>
 				</xsl:call-template>
 			</xsl:variable>
-			<!-- old code for issue #11799 start	-->
-			<!--<xsl:if test="position() !=1">, </xsl:if>			
 			<xsl:choose>
-				<xsl:when test="$itemDef/@DataType = 'partialDate'">-->
-				
+				<xsl:when test="$itemDef/@DataType = 'partialDate'">
 					<!-- For item with DataType="partialDate", create 2 columns of type date to store minimun and maximum date range values -->
-					<!--<xsl:call-template name="partial-date-min-val-col-name">-->
+					<xsl:call-template name="partial-date-min-val-col-name">
 						<!-- @pgawade 05/06/2010 Changed the item column name to be item name instead of item OID temporarily -->
 						<!--<xsl:with-param name="itemOID" select="@ItemOID"/>-->
-						<!--<xsl:with-param name="itemName" select="$itemName"/>
+						<xsl:with-param name="itemName" select="$itemName"/>
 					</xsl:call-template>
 					<xsl:text> </xsl:text> date,						
-						<xsl:call-template name="partial-date-max-val-col-name">-->
+						<xsl:call-template name="partial-date-max-val-col-name">
 						<!-- @pgawade 05/06/2010 Changed the item column name to be item name instead of item OID temporarily -->
 						<!--<xsl:with-param name="itemOID" select="@ItemOID"/>-->
-						<!--<xsl:with-param name="itemName" select="$itemName"/>
+						<xsl:with-param name="itemName" select="$itemName"/>
 					</xsl:call-template>
 					<xsl:text> </xsl:text> date					
 					</xsl:when>
-				<xsl:when test="$isItemMultiSelect='true'">-->
+				<xsl:when test="$isItemMultiSelect='true'">
 					<!-- For multi-select items create number of columns equal to number of items in the associated codelist -->
 					<!--<xsl:variable name="codelistOID">
 							<xsl:call-template name="get-codelist-OID">
 								<xsl:with-param name="itemDef" select="$itemDef"/>	
 							</xsl:call-template>
 						</xsl:variable>-->
-					<!--<xsl:variable name="multiSelectListId">
+					<xsl:variable name="multiSelectListId">
 						<xsl:call-template name="get-multi-select-list-id">
 							<xsl:with-param name="itemDef" select="$itemDef"/>
 						</xsl:call-template>
 					</xsl:variable>
-					<xsl:call-template name="get-multi-select-column-names-with-data-type">-->
+					<xsl:call-template name="get-multi-select-column-names-with-data-type">
 						<!-- @pgawade 05/06/2010 Changed the item column name to be item name instead of item OID temporarily -->
 						<!--<xsl:with-param name="itemOID" select="$ItemOIDval"/>-->
-						<!--<xsl:with-param name="itemName" select="$itemName"/>
+						<xsl:with-param name="itemName" select="$itemName"/>
 						<xsl:with-param name="multiSelectListId" select="$multiSelectListId"/>
 					</xsl:call-template>
-				</xsl:when>-->
-				<!--<xsl:otherwise>-->
-				
+				</xsl:when>
+				<xsl:otherwise>
 					<!-- column name as item OID and column data type as value of attribute DataType in the item definition -->
 					<!-- @pgawade 05/06/2010 Changed the item column name to be item name instead of item OID temporarily -->
 					<!--<xsl:value-of select="@ItemOID"/>-->
-					<!--<xsl:value-of select="$itemName"/>
+					<xsl:value-of select="$itemName"/>
 					<xsl:text> </xsl:text>
 					<xsl:value-of select="$itemDef/@DataType"/>
 				</xsl:otherwise>
-			</xsl:choose>-->
-			<!-- old code for issue #11799 end -->	
-			<!-- new code for issue #11799 start -->
-				<xsl:choose>
-					<xsl:when test="$itemDef/@DataType = 'partialDate'">
-						<!-- For item with DataType="partialDate", create 2 columns of type date to store minimun and maximum date range values -->
-						<xsl:variable name="partialDateMinValColName">
-							<xsl:call-template name="partial-date-min-val-col-name">
-								<!--<xsl:with-param name="itemOID" select="@ItemOID"/>-->
-								<xsl:with-param name="itemName" select="$itemName"/>
-							</xsl:call-template>
-						</xsl:variable>
-						<xsl:call-template name="add-col-to-table">
-							<!-- @ccollins 5/12/10 added schema name to params -->
-							<xsl:with-param name="schemaName" select="$studySchemaName"/>
-							<xsl:with-param name="tableName" select="$tableName"/>
-							<xsl:with-param name="colName" select="$partialDateMinValColName"/>
-							<xsl:with-param name="colDataType" select="'date'"/>
-						</xsl:call-template>
-						<xsl:variable name="partialDateMaxValColName">
-							<xsl:call-template name="partial-date-max-val-col-name">
-								<!--<xsl:with-param name="itemOID" select="@ItemOID"/>-->
-								<xsl:with-param name="itemName" select="$itemName"/>
-							</xsl:call-template>
-						</xsl:variable>
-						<xsl:call-template name="add-col-to-table">
-							<!-- @ccollins 5/12/10 added schema name to params -->
-							<xsl:with-param name="schemaName" select="$studySchemaName"/>
-							<xsl:with-param name="tableName" select="$tableName"/>
-							<xsl:with-param name="colName" select="$partialDateMaxValColName"/>
-							<xsl:with-param name="colDataType" select="'date'"/>
-						</xsl:call-template>
-					</xsl:when>
-					<xsl:when test="$isItemMultiSelect='true'">
-						<!-- For multi-select items create number of columns equal to number of items in the associated codelist -->
-						<!-- 04/12/2010: Changes for "OpenClinica:MultiSelectListRef " child element in the definition of multi-select items -->
-						<!--<xsl:variable name="codelistOID">
-									<xsl:call-template name="get-codelist-OID">
-										<xsl:with-param name="itemDef" select="$itemDef"/>	
-									</xsl:call-template>
-								</xsl:variable>-->
-						
-						<xsl:variable name="multiSelectListId">
-							<xsl:call-template name="get-multi-select-list-id">
-								<xsl:with-param name="itemDef" select="$itemDef"/>
-							</xsl:call-template>
-						</xsl:variable>
-						<!-- @pgawade 07/28/2010 If the number of items exceed 'max-crf-item-cnt-for-single-tbl' value; single select item labels and multi-select booleans will be part of another table -->																		
-						<xsl:call-template name="get-multi-select-columns-alter-table-statements">								
-							<xsl:with-param name="schemaName" select="$studySchemaName"/>
-							<xsl:with-param name="tableName" select="$tableName"/>								
-							<xsl:with-param name="itemName" select="$itemName"/>								
-							<xsl:with-param name="multiSelectListId" select="$multiSelectListId"/>
-						</xsl:call-template>
-						
-					</xsl:when>
-					<xsl:otherwise>
-						<!-- column name as item OID and column data type as value of attribute DataType in the item definition -->
-						<xsl:call-template name="add-col-to-table">
-							<!-- @ccollins 5/12/10 added schema name to params -->
-							<xsl:with-param name="schemaName" select="$studySchemaName"/>
-							<xsl:with-param name="tableName" select="$tableName"/>
-							<!--<xsl:with-param name="colName" select="@ItemOID"/>-->
-							<xsl:with-param name="colName" select="$itemName"/>
-							<xsl:with-param name="colDataType" select="$itemDef/@DataType"/>
-						</xsl:call-template>
-					</xsl:otherwise>
-				</xsl:choose>
-				<!-- new code for issue #11799 end -->
+			</xsl:choose>
 			<xsl:if test="$isItemMultiSelect='false'">
 				<!-- Check if the item is single select only if item is not multi-select-->
 				<xsl:variable name="isItemSingleSelect">
@@ -2410,40 +2175,18 @@ xmlns:xs="http://www.w3.org/2001/XMLSchema">
 				</xsl:variable>
 				<!-- Create additional column of type text to store the label for selected value from the corresponding code list -->
 				<xsl:if test="$isItemSingleSelect='true'">
-						<!-- old code for issue #11799 start -->	
-						<!--,<xsl:call-template name="get-col-name-single-select-label">-->
+						,<xsl:call-template name="get-col-name-single-select-label">
 						<!-- @pgawade 05/06/2010 Changed the item column name to be item name instead of item OID temporarily -->
 						<!--<xsl:with-param name="itemOID" select="@ItemOID"/>-->
-						<!--<xsl:with-param name="itemName" select="$itemName"/>
+						<xsl:with-param name="itemName" select="$itemName"/>
 					</xsl:call-template>
 					<xsl:text> </xsl:text>
-					<xsl:call-template name="get-col-data-type-single-select-label"/>-->
-					<!-- old code for issue #11799 end -->	
-					<!-- new code for issue #11799 start -->		
-					<xsl:variable name="col-name-single-select-label">
-							<xsl:call-template name="get-col-name-single-select-label">
-							<!-- @pgawade 05/06/2010 Changed the item column name to be item name instead of item OID temporarily -->
-							<!--<xsl:with-param name="itemOID" select="@ItemOID"/>-->
-							<xsl:with-param name="itemName" select="$itemName"/>
-						</xsl:call-template>
-					</xsl:variable>	
-					<!--	<xsl:text> </xsl:text>-->
-					<xsl:variable name="col-data-type-single-select-label">
-						<xsl:call-template name="get-col-data-type-single-select-label"/>
-					</xsl:variable>
-					<xsl:call-template name="add-col-to-table">
-						<!-- @ccollins 5/12/10 added schema name to params -->
-						<xsl:with-param name="schemaName" select="$studySchemaName"/>
-						<xsl:with-param name="tableName" select="$tableName"/>
-						<xsl:with-param name="colName" select="$col-name-single-select-label"/>
-						<xsl:with-param name="colDataType" select="$col-data-type-single-select-label"/>
-					</xsl:call-template>
-					<!-- new code for issue #11799 end -->	
+					<xsl:call-template name="get-col-data-type-single-select-label"/>
 				</xsl:if>
 			</xsl:if>
-			<!--<xsl:if test="not(position()=last())">, </xsl:if>-->
+			<xsl:if test="not(position()=last())">, </xsl:if>
 		</xsl:for-each>
-			<!--);-->
+			);
 		</xsl:template>
 	<!-- template to add column to a table -->
 	<xsl:template name="add-col-to-table">
@@ -3102,9 +2845,7 @@ xmlns:xs="http://www.w3.org/2001/XMLSchema">
 		<xsl:param name="itemDef"/>
 		<!--<xsl:variable name="isCodeListRefElement" select="$itemDef/odm:CodeListRef"/>		-->
 		<!-- Multi-select items will have "OpenClinica:MultiSelectListRef" child element in its definition -->
-		
 		<xsl:variable name="isMultiSelectRefElement" select="$itemDef/OpenClinica:MultiSelectListRef"/>
-		 
 		<!--<xsl:variable name="isMultiSelect" select="$isCodeListRefElement/@OpenClinica:IsMultiSelect"/>-->
 		<!--<xsl:if test="$isCodeListRefElement">
 				<xsl:choose>
