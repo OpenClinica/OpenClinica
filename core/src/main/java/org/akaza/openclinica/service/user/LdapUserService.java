@@ -12,9 +12,11 @@ import org.akaza.openclinica.domain.user.LdapUser;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.ldap.core.AttributesMapper;
 import org.springframework.ldap.core.ContextSource;
-import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.core.DirContextOperations;
+import org.springframework.security.ldap.SpringSecurityLdapTemplate;
 import org.springframework.stereotype.Service;
 
 /**
@@ -31,6 +33,9 @@ public class LdapUserService {
 
     @Value("s[ldap.enabled]")
     private String ldapEnabledProperty;
+
+    @Value("s[ldap.loginQuery]")
+    private String loginQuery;
 
     @Value("s[ldap.passwordRecoveryURL]")
     private String passwordRecoveryURL;
@@ -59,11 +64,11 @@ public class LdapUserService {
     @Value("s[ldap.userData.organization]")
     private String keyOrganization;
 
-    private LdapTemplate ldapTemplate;
+    private SpringSecurityLdapTemplate ldapTemplate;
 
     @PostConstruct // Eclipse warning here is an Eclipse bug, not an issue with the code
     public void init() {
-        ldapTemplate = new LdapTemplate(contextSource);
+        ldapTemplate = new SpringSecurityLdapTemplate(contextSource);
         ldapTemplate.setIgnorePartialResultException(true);
     }
 
@@ -113,6 +118,14 @@ public class LdapUserService {
      */
     public LdapUser loadUser(String dn) {
         return (LdapUser) ldapTemplate.lookup(dn, ldapUserAttributesMapper);
+    }
+
+    public DirContextOperations searchForUser(String username) {
+        try {
+            return ldapTemplate.searchForSingleEntry(userSearchBase, loginQuery, new String[] { username });
+        } catch (IncorrectResultSizeDataAccessException e) {
+            return null;
+        }
     }
 
     public boolean isLdapServerConfigured() {

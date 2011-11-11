@@ -75,9 +75,7 @@
         <constructor-arg>
             <bean class="org.springframework.security.ldap.authentication.BindAuthenticator">
                 <constructor-arg ref="contextSource"/>
-                <property name="userDnPatterns">
-                    <list><value>s[ldap.userDnPattern]</value></list>
-                </property>
+                <property name="userSearch" ref="openClinicaLdapUserSearch"/>
             </bean>
         </constructor-arg>
         <constructor-arg>
