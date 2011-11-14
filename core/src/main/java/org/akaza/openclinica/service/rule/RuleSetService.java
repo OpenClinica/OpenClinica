@@ -543,7 +543,7 @@ public class RuleSetService implements RuleSetServiceInterface {
                     ruleSetBean.addExpression(replaceSEDOrdinal(ruleSetBean.getTarget(), studyEvent));
                     validRuleSets.add(ruleSetBean);
                 }
-                if (studyEventDefinitionOrdinal.equals(studyEvent.getSampleOrdinal())) {
+                if (studyEventDefinitionOrdinal.equals(String.valueOf(studyEvent.getSampleOrdinal()))) {
                     ruleSetBean.addExpression(replaceSEDOrdinal(ruleSetBean.getTarget(), studyEvent));
                     validRuleSets.add(ruleSetBean);
                 }

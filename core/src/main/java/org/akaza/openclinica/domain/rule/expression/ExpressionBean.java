@@ -27,7 +27,7 @@ import javax.persistence.Transient;
 @Entity
 @Table(name = "rule_expression")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "rule_expression_id_seq") })
-@Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ExpressionBean extends AbstractAuditableMutableDomainObject {
 
     private Context context;

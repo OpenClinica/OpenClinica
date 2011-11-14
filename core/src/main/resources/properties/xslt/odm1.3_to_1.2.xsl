@@ -72,7 +72,12 @@
 	</xsl:template>
 <xsl:template match="//odm:ODM/odm:Study/odm:MetaDataVersion/odm:RuleImport" priority="6"></xsl:template>
 
-
+<!-- template for changing the datatype to 'partialDate' to 'text' as ODM 1.2 did not support data type 'partialDate' -->
+<xsl:template match="@DataType[parent::*:ItemDef and .='partialDate']" priority="13">
+	<xsl:attribute name="DataType">
+		<xsl:value-of select="'text'"></xsl:value-of>
+	</xsl:attribute>
+</xsl:template>
 
 
 </xsl:stylesheet>
