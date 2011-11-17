@@ -23,20 +23,8 @@
 			
 	
 	
-	<changeSet author="htaycher " id="2011-11-16-11950-4">
-    	<preConditions onFail="MARK_RAN">
-	 	<dbms type="postgresql" />
-		<!--fixing restore study event trigger-->
-	</preConditions>     	 
-    	 <sql splitStatements="false">
-    	 	CREATE  TRIGGER study_event_insert_update
-		    AFTER UPDATE ON study_event
-		    FOR EACH ROW
-		    EXECUTE PROCEDURE study_event_trigger_new();
-    	 </sql>
-    </changeSet>
-    
-<changeSet author="htaycher " id="2011-11-16-11950-5" runOnChange="true">
+	
+<changeSet author="htaycher " id="2011-11-16-11950-4" runOnChange="true">
     	<preConditions onFail="MARK_RAN">
 	 	<dbms type="postgresql" />
 		<!--fixing restore study event trigger -->
@@ -116,6 +104,18 @@
     </changeSet>
     
    
+    <changeSet author="htaycher " id="2011-11-16-11950-5">
+    	<preConditions onFail="MARK_RAN">
+	 	<dbms type="postgresql" />
+		<!--fixing restore study event trigger-->
+	</preConditions>     	 
+    	 <sql splitStatements="false">
+    	 	CREATE  TRIGGER study_event_insert_update
+		    AFTER UPDATE ON study_event
+		    FOR EACH ROW
+		    EXECUTE PROCEDURE study_event_trigger_new();
+    	 </sql>
+    </changeSet>
     
  <changeSet author="htaycher" id="2011-11-16-11950-12">
 	<preConditions onFail="MARK_RAN">
