@@ -358,6 +358,7 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
         variables.put(new Integer(1), new Integer(ID));
 
         String sql = digester.getQuery("findByPK");
+        
         ArrayList alist = this.select(sql, variables);
         Iterator it = alist.iterator();
 
@@ -528,6 +529,7 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
            
        
             ps = psf.generate(ps);// enter variables here!
+            logger.info("query is..."+ps.toString());
             key = (K) ps.toString();
             if((results=(V) cache.get(key))==null)
             {
