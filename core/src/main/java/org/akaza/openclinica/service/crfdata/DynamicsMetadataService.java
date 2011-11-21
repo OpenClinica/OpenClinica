@@ -871,7 +871,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
     public void updateGroupDynItemsInSection(DisplayItemWithGroupBean itemWithGroup, int sectionId, int crfVersionId, int eventCrfId) {
         DisplayItemGroupBean digb = itemWithGroup.getItemGroup();
         int groupId = digb.getItemGroupBean().getId();
-        ArrayList<Integer> itemIds = (ArrayList<Integer>)this.dynamicsItemFormMetadataDao.findItemIdsForAGroupInSection(groupId, sectionId, crfVersionId, eventCrfId);
+        List<Integer> itemIds = this.dynamicsItemFormMetadataDao.findItemIdsForAGroupInSection(groupId, sectionId, crfVersionId, eventCrfId);
         if(itemIds!=null && itemIds.size()>0) {
             List<Integer> showItemIds = this.dynamicsItemFormMetadataDao.findShowItemIdsForAGroupInSection(groupId, sectionId, crfVersionId, eventCrfId);
             this.updateItemGroupInASection(digb, itemIds, showItemIds);
@@ -885,7 +885,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                 DisplayItemGroupBean digb = itemWithGroup.getItemGroup();
                 if(isGroupRepeating(digb.getItemGroupBean().getMeta())) {
                     int groupId = digb.getItemGroupBean().getId();
-                    ArrayList<Integer> itemIds = (ArrayList<Integer>)this.dynamicsItemFormMetadataDao.findItemIdsForAGroupInSection(groupId, sectionId, crfVersionId, eventCrfId);
+                    List<Integer> itemIds = this.dynamicsItemFormMetadataDao.findItemIdsForAGroupInSection(groupId, sectionId, crfVersionId, eventCrfId);
                     if(itemIds!=null && itemIds.size()>0) {
                         List<Integer> showItemIds = this.dynamicsItemFormMetadataDao.findShowItemIdsForAGroupInSection(groupId, sectionId, crfVersionId, eventCrfId);
                         this.updateItemGroupInASection(digb, itemIds, showItemIds);
@@ -911,8 +911,8 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
     private void updateGroupDynItemsInASection(DisplayItemWithGroupBean itemWithGroup, List<Integer> showItemIds,
             int groupId, int sectionId, int crfVersionId, int eventCrfId) {
         List<DisplayItemGroupBean> digbs = itemWithGroup.getItemGroups();
-        ArrayList<Integer> showDataIds = (ArrayList<Integer>)this.dynamicsItemFormMetadataDao.findShowItemDataIdsForAGroupInSection(groupId, sectionId, crfVersionId, eventCrfId);
-        ArrayList<Integer> hideDataIds = (ArrayList<Integer>)this.dynamicsItemFormMetadataDao.findHideItemDataIdsForAGroupInSection(groupId, sectionId, crfVersionId, eventCrfId);
+        List<Integer> showDataIds = this.dynamicsItemFormMetadataDao.findShowItemDataIdsForAGroupInSection(groupId, sectionId, crfVersionId, eventCrfId);
+        List<Integer> hideDataIds = this.dynamicsItemFormMetadataDao.findHideItemDataIdsForAGroupInSection(groupId, sectionId, crfVersionId, eventCrfId);
         for(int n=0; n<digbs.size(); ++n) {
             DisplayItemGroupBean dg = digbs.get(n);
             ArrayList<DisplayItemBean> items = (ArrayList<DisplayItemBean>)dg.getItems();
