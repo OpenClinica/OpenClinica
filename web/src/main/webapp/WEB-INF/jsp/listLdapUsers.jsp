@@ -27,6 +27,10 @@ body {
 <script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery.jmesa.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jmesa.js"></script>
 
+<table cellpadding="10">
+<tr>
+<td>
+
 <h1><span class="title_manage">
 <fmt:message key="listLdapUsers.header.title" bundle="${resword}"/>
 </span></h1>
@@ -91,6 +95,10 @@ body {
 <form action="<c:url value="/pages/selectLdapUser"/>" method="get" target="_parent">
 <input type="submit" class="button_medium" value="<fmt:message key="listLdapUsers.close.label" bundle="${resword}"/>">
 </form>
+
+</td>
+</tr>
+</table>
 
 </body>
 </html>
