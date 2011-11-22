@@ -1,7 +1,9 @@
 package org.akaza.openclinica.service.user;
 
 import java.text.MessageFormat;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.naming.NamingException;
@@ -97,7 +99,7 @@ public class LdapUserService {
     };
 
     /**
-     * Retrieves a list of users within a <code>baseDn</code> matching a <code>filter</code>. The filter must be a
+     * Retrieves a list of users matching a <code>filter</code>. The filter must be a
      * non-empty string.
      *
      * @param filter
@@ -108,6 +110,29 @@ public class LdapUserService {
         assert(!StringUtils.isEmpty(filter));
         String query = MessageFormat.format(userSearchQuery, filter);
         return ldapTemplate.search(userSearchBase, query, ldapUserAttributesMapper);
+    }
+
+    /**
+     * Retrieves a list of users matching a <code>filter</code> which usernames are not present in
+     * <code>existingUsers</code>.
+     *
+     * @param filter
+     * @param existingUsers
+     * @return
+     */
+    public List<LdapUser> listNewUsers(String filter, Set<String> existingUsers) {
+        List<LdapUser> result = listUsers(filter);
+        if (existingUsers != null) {
+            Iterator<LdapUser> it = result.iterator();
+
+            while (it.hasNext()) {
+                LdapUser user = it.next();
+                if (existingUsers.contains(user.getUsername())) {
+                    it.remove();
+                }
+            }
+        }
+        return result;
     }
 
     /**

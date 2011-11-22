@@ -77,7 +77,10 @@
         </property>
     </bean>
     -->
-
-        
+    
+    <!-- Exposing old-fashioned DAOs as Spring beans -->
+    <bean class="org.akaza.openclinica.dao.login.UserAccountDAO">
+        <constructor-arg ref="dataSource"/>
+    </bean>
 
 </beans>
