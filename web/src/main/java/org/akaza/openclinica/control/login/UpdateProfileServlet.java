@@ -7,7 +7,7 @@
  */
 package org.akaza.openclinica.control.login;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -32,6 +32,8 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
  */
 public class UpdateProfileServlet extends SecureController {
 
+    private static final long serialVersionUID = -2519124535258437372L;
+
     @Override
     public void mayProceed() throws InsufficientPermissionException {
 
@@ -45,7 +47,7 @@ public class UpdateProfileServlet extends SecureController {
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
         UserAccountBean userBean1 = (UserAccountBean) udao.findByUserName(ub.getName());
 
-        ArrayList studies = (ArrayList) sdao.findAllByUser(ub.getName());
+        Collection studies = sdao.findAllByUser(ub.getName());
 
         if (StringUtil.isBlank(action)) {
             request.setAttribute("studies", studies);
@@ -115,8 +117,7 @@ public class UpdateProfileServlet extends SecureController {
 
             String oldPass = fp.getString("oldPasswd").trim();
             SecurityManager sm = (SecurityManager) SpringServletAccess.getApplicationContext(context).getBean("securityManager");
-            String oldDigestPass = sm.encrytPassword(oldPass, getUserDetails());
-            if (!userBean1.isLdapUser() && !sm.isPasswordValid(ub.getPasswd(), oldPass, getUserDetails())) {
+            if (!userBean1.isLdapUser() && !sm.verifyPassword(oldPass, getUserDetails())) {
                 Validator.addError(errors, "oldPasswd", resexception.getString("wrong_old_password"));
                 request.setAttribute("formMessages", errors);
                 // addPageMessage("Wrong old password. Please try again.");

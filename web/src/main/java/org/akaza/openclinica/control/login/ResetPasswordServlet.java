@@ -7,6 +7,9 @@
  */
 package org.akaza.openclinica.control.login;
 
+import java.util.ArrayList;
+import java.util.Date;
+
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -17,15 +20,14 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
-import java.util.ArrayList;
-import java.util.Date;
-
 /**
  * Reset expired password
- * 
+ *
  * @author ywang
  */
 public class ResetPasswordServlet extends SecureController {
+
+    private static final long serialVersionUID = -5259201015824317949L;
 
     @Override
     public void mayProceed() throws InsufficientPermissionException {
@@ -68,8 +70,7 @@ public class ResetPasswordServlet extends SecureController {
 
         String oldPwd = fp.getString("oldPasswd").trim();
         SecurityManager sm = ((SecurityManager) SpringServletAccess.getApplicationContext(context).getBean("securityManager"));
-        String oldDigestPass = sm.encrytPassword(oldPwd, getUserDetails());
-        if (!sm.isPasswordValid(ub.getPasswd(), oldPwd, getUserDetails())) {
+        if (!sm.verifyPassword(oldPwd, getUserDetails())) {
             Validator.addError(errors, "oldPasswd", resexception.getString("wrong_old_password"));
             request.setAttribute("formMessages", errors);
             forwardPage(Page.RESET_PASSWORD);
