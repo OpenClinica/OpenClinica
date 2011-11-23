@@ -203,9 +203,6 @@ public abstract class CoreSecureController extends HttpServlet {
     public void passwdTimeOut(HttpServletRequest request, HttpServletResponse response, UserAccountBean ub) {
         Date lastChangeDate = ub.getPasswdTimestamp();
         if (!ub.isLdapUser() && lastChangeDate == null) {
-            addPageMessage(respage.getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName() + ". " + respage.getString("password_set"), request);
-            // + "<a href=\"UpdateProfile\">" +
-            // respage.getString("user_profile") + " </a>");
             int pwdChangeRequired = new Integer(SQLInitServlet.getField("change_passwd_required")).intValue();
             if (pwdChangeRequired == 1) {
                 request.setAttribute("mustChangePass", "yes");

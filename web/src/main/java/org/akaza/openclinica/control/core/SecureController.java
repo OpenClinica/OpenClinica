@@ -254,8 +254,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     public void passwdTimeOut() {
         Date lastChangeDate = ub.getPasswdTimestamp();
         if (!ub.isLdapUser() && lastChangeDate == null) {
-            addPageMessage(respage.getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName() + ". " + respage.getString("password_set"));
-            // + "<a href=\"UpdateProfile\">" + respage.getString("user_profile") + " </a>");
             int pwdChangeRequired = new Integer(SQLInitServlet.getField("change_passwd_required")).intValue();
             if (pwdChangeRequired == 1) {
                 request.setAttribute("mustChangePass", "yes");
