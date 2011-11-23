@@ -2894,7 +2894,10 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     // a string's size could be more than 255, which is more
                     // than
                     // the db field length
-                    v.addValidation(inputName, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+                    v.addValidation(inputName, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 3999);
+					// Changed to 3999 as part of the agreement with U of Utah.  Only for their customized code
+					// For support in the main branch or trunk, this should become a parameter in datainfo.properties
+					// Paul Galvin - Nov 22, 2011
 
                 } else if (idt.equals(ItemDataType.INTEGER)) {
                     v.addValidation(inputName, Validator.IS_AN_INTEGER);
