@@ -309,6 +309,11 @@ public abstract class DataEntryServlet extends CoreSecureController {
         String age = "";
         UserAccountBean ub =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
 
+        //for 11958: repeating groups rows appear if validation returns to the same section
+        int isFirstTimeOnSection =fp.getInt("isFirstTimeOnSection");
+        request.setAttribute( "isFirstTimeOnSection",isFirstTimeOnSection+"");
+        
+        
         if (fp.getString(GO_EXIT).equals("") && !isSubmitted && fp.getString("tabId").equals("") && fp.getString("sectionId").equals("")) {
             //HashMap unavailableCRF = getUnavailableCRFList();
             if (getUnavailableCRFList().containsKey(ecb.getId())) {
