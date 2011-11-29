@@ -159,6 +159,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
         ResultSet rs = null;
         Connection con = null;
         Statement ps = null;
+        logger.info("query???"+query);
         try {
             con = ds.getConnection();
             if (con.isClosed()) {
@@ -625,8 +626,8 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
 
     
     private void logMe(String message){
-      //  System.out.println(message);
-        logger.debug(message);
+        System.out.println(message);
+        logger.info(message);
     }
     public ArrayList processResultRows(ResultSet rs) {// throws SQLException
         ArrayList al = new ArrayList();
@@ -816,7 +817,8 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
         EntityBean answer = new EntityBean();
 
         String sql = digester.getQuery(queryName);
-
+        logMe("query:"+queryName+"variables:"+variables);
+        
         ArrayList rows;
         if (variables == null || variables.isEmpty()) {
             rows = this.select(sql);
