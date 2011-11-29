@@ -15,7 +15,7 @@ LdapUserService ldapUserService = (LdapUserService) ctx.getBean(LdapUserService.
 <div align="justify" style="width: 630px; height: 330px;; background:#FFFFFF; padding:5px 8px 0px 8px">
 <h1><fmt:message key="request_password_form" bundle="${resword}"/></h1>
 <p><fmt:message key="you_must_be_an_openClinica_member_to_receive_a_password" bundle="${resword}"/></p>
-<p><a href="<%= ldapUserService.getPasswordRecoveryURL() %>"><fmt:message key="login.requestPassword.retrieveLdapPassword" bundle="${resword}"/></a></p>
+<p><a href="<%= ldapUserService.getPasswordRecoveryURL() %>" target="_blank"><fmt:message key="login.requestPassword.retrieveLdapPassword" bundle="${resword}"/></a></p>
 <p><fmt:message key="all_fields_are_required" bundle="${resword}"/></p>
 
 <form action="${pageContext.request.contextPath}/RequestPassword" method="post">
