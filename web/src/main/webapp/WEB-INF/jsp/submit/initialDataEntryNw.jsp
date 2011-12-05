@@ -118,6 +118,9 @@ giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%>
 <%-- We have to feed this value to the method giveFirstElementFocus()--%>
 <input id="formFirstField" type="hidden" name="formFirstField" value="${requestScope['formFirstField']}" />
 <input type="hidden" name="exitTo" value="${exitTo}" />
+<input type="hidden" name="sectionId" value="<c:out value="${section.section.id}"/>" />
+<input type="hidden" name="isFirstTimeOnSection" value="<c:out value="${section.section.id}"/>" />
+
 <%--FF: ${requestScope['formFirstField']}<br />--%>
 
 
@@ -579,10 +582,14 @@ window.onload = initmb;
     <!-- there are already item data for an item group, repeat number just be 1-->
     <c:set var="repeatNumber" value="0"/>
 </c:when>
+<c:when test="${isFirstTimeOnSection == section.section.id}">
+	<c:set var="repeatNumber" value="0"/>
+</c:when>
 <c:otherwise>
  <c:set var="repeatNumber" value="${repeatNumber-1}"/>
 </c:otherwise>
 </c:choose>
+
 <c:set var="repeatMax" value="${displayItem.itemGroup.groupMetaBean.repeatMax}"/>
 <c:set var="totalColsPlusSubcols" value="0" />
 <c:set var="questionNumber" value=""/>
@@ -990,6 +997,7 @@ but the custom tag uses that, not this jstl code--%>
                             <c:param name="rowCount" value="${uniqueId}"/>
                             <c:param name="key" value="${numOfDate}" />
                             <c:param name="isLast" value="${true}"/>
+							<c:param name="isTemplateRow" value="${true}"/>
                             <c:param name="tabNum" value="${itemNum}"/>
                             <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
                             <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
@@ -1011,6 +1019,7 @@ but the custom tag uses that, not this jstl code--%>
                             <c:param name="rowCount" value="${uniqueId}"/>
                             <c:param name="key" value="${numOfDate}" />
                             <c:param name="isLast" value="${true}"/>
+							<c:param name="isTemplateRow" value="${true}"/>
                             <c:param name="tabNum" value="${itemNum}"/>
                             <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
                             <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
@@ -1027,6 +1036,7 @@ but the custom tag uses that, not this jstl code--%>
                         <c:param name="rowCount" value="${uniqueId}"/>
                         <c:param name="key" value="${numOfDate}" />
                         <c:param name="isLast" value="${true}"/>
+						<c:param name="isTemplateRow" value="${true}"/>
                         <c:param name="tabNum" value="${itemNum}"/>
                         <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                         <c:param name="originJSP" value="initialDataEntry"/>
@@ -1052,6 +1062,7 @@ but the custom tag uses that, not this jstl code--%>
                         <c:param name="rowCount" value="${uniqueId}"/>
                         <c:param name="key" value="${numOfDate}" />
                         <c:param name="isLast" value="${true}"/>
+						<c:param name="isTemplateRow" value="${true}"/>
                         <c:param name="tabNum" value="${itemNum}"/>
                         <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                         <c:param name="originJSP" value="initialDataEntry"/>
