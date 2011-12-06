@@ -33,6 +33,3 @@ prompt
 prompt Please check spool_oracle_setup_db.txt for errors
 prompt
 Rem
-spool off
-END;
-/

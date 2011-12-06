@@ -17,7 +17,7 @@ Rem
 
 Rem
 Rem
-create tablespace someother
+create tablespace openclinica
 datafile '&ts_file' size 512M;
 Rem
 Rem
