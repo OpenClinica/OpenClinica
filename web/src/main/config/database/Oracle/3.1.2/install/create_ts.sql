@@ -4,7 +4,7 @@ set verify off
 set serveroutput on size 20000
 Rem
 Rem
-accept ts_name prompt "Specify Tablespace name for Clinica Data: "
+Rem accept ts_name prompt "Specify Tablespace name for Clinica Data: "
 Rem
 prompt If the tablespace is new, please specify the following
 prompt Tablespace Size ( (S)mall - 32MB, (M)edium - 256MB, (L)arge -512MB
@@ -30,7 +30,7 @@ set heading on
 set termout on
 Rem
 Rem
-create tablespace &ts_name
+create tablespace openclinica
 datafile '&ts_file' size &&ts_size;
 Rem
 Rem
