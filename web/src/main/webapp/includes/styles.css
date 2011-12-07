@@ -956,7 +956,7 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
 
 .loginbutton { background-color:transparent;
     border-width: 0px;
-    background-image: url(../images/loginbutton_BG.gif);
+    background-image: url(../images/button_BG.gif);
     background-repeat: no-repeat;
     background-position: bottom;
     font-family: Tahoma, Arial, Helvetica, Sans-Serif;
@@ -964,7 +964,7 @@ a.breadcrumb_completed:hover, a.breadcrumb_completed:active { font-family: Tahom
     line-height: 11px;
     color: #FFFFFF;
     font-weight: bold;
-    width: 60px;
+    width: 80px;
     height: 17px;
     margin-right: 10px;
 }
@@ -1903,7 +1903,7 @@ div#sumBox table tr:first-child td { border-top-width: 0px;
 
 #bt_Home td, #bt_Home li { color: #FFFFFF; background-color: #789EC5; }
 
-#bt_Home ul, #bt_Home li { display: inline; margin: 0px; padding: 0px; list-style-item: none; }
+#bt_Home ul, #bt_Home li { display: inline; float: left; margin: 0px; padding: 0px; list-style-item: none; }
 
 #bt_Home form { margin: 0px; }
 

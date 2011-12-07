@@ -455,7 +455,7 @@ function checkDataStatus() {
                                             </c:when>
                                             <c:otherwise>
                                                 <td valign="bottom">  <input type="checkbox" id="markCompleteId" name="markComplete" value="Yes"
-                                                                             onclick="displayMessageFromCheckbox(this)">
+                                                                             onclick="displayMessageFromCheckbox(this, '<fmt:message key="marking_CRF_complete_finalize_DE" bundle="${restext}"/>')">
                                                 </td>
                                                 <td valign="bottom" nowrap="nowrap">&nbsp; <fmt:message key="mark_CRF_complete" bundle="${resword}"/>&nbsp;&nbsp;&nbsp;</td>
                                             </c:otherwise>

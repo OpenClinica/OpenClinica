@@ -363,7 +363,7 @@ public class StudySubjectEndpoint {
         } else {
             subjectTransferBean.setGender(genderValue.toCharArray()[0]);
         }
-        subjectTransferBean.setDateOfBirth(dateOfBirthValue == null ? null : getDate(dateOfBirthValue));
+        subjectTransferBean.setDateOfBirth((dateOfBirthValue == null || dateOfBirthValue.length()==0)? null : getDate(dateOfBirthValue));
         subjectTransferBean.setSecondaryId(secondaryIdValue == null ? "" : secondaryIdValue);
         subjectTransferBean.setYearOfBirth(yearOfBirthValue);
         subjectTransferBean.setEnrollmentDate(getDate(enrollmentDateValue));

@@ -450,7 +450,7 @@ window.onload = initmb;
                                             </c:when>
                                             <c:otherwise>
                                                 <td valign="bottom">  <input type="checkbox" id="markCompleteId" name="markComplete" value="Yes"
-                                                                            <c:if test="${markComplete=='Yes'}"> checked </c:if> onclick="displayMessageFromCheckbox(this)">
+                                                                            <c:if test="${markComplete=='Yes'}"> checked </c:if> onclick="displayMessageFromCheckbox(this, '<fmt:message key="marking_CRF_complete_finalize_DE" bundle="${restext}"/>')">
                                                 </td>
                                                 <td valign="bottom" nowrap="nowrap">&nbsp; <fmt:message key="mark_CRF_complete" bundle="${resword}"/>&nbsp;&nbsp;&nbsp;</td>
                                             </c:otherwise>
@@ -509,7 +509,7 @@ window.onload = initmb;
                                             </c:when>
                                             <c:otherwise>
                                                 <td valign="bottom">  <input type="checkbox" id="markCompleteId" name="markComplete" value="Yes"
-                                                                            <c:if test="${markComplete=='Yes'}"> checked </c:if> onclick="displayMessageFromCheckbox(this)">
+                                                                            <c:if test="${markComplete=='Yes'}"> checked </c:if> onclick="displayMessageFromCheckbox(this,'<fmt:message key="marking_CRF_complete_finalize_DE" bundle="${restext}"/>')">
                                                 </td>
                                                 <td valign="bottom" nowrap="nowrap">&nbsp; <fmt:message key="mark_CRF_complete" bundle="${resword}"/>&nbsp;&nbsp;&nbsp;</td>
                                             </c:otherwise>
@@ -932,6 +932,7 @@ window.onload = initmb;
                             <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
                             <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                             <c:param name="originJSP" value="doubleDataEntry"/>
+                            <c:param name="isTemplateRow" value="${true}"/>
                         </c:import>
                     </td>
                 </c:forEach>
@@ -953,6 +954,7 @@ window.onload = initmb;
                             <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
                             <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                             <c:param name="originJSP" value="doubleDataEntry"/>
+                            <c:param name="isTemplateRow" value="${true}"/>
                         </c:import>
                     </td>
                 </c:forEach>
@@ -975,6 +977,7 @@ window.onload = initmb;
                         <c:param name="rowCount" value="${uniqueId}"/>
                         <c:param name="key" value="${numOfDate}" />
                         <c:param name="isLast" value="${true}"/>
+                        <c:param name="isTemplateRow" value="${true}"/>
                         <c:param name="tabNum" value="${itemNum}"/>
                         <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                         <c:param name="originJSP" value="doubleDataEntry"/>
@@ -1011,6 +1014,7 @@ window.onload = initmb;
                         <c:param name="rowCount" value="${uniqueId}"/>
                         <c:param name="key" value="${numOfDate}" />
                         <c:param name="isLast" value="${true}"/>
+                        <c:param name="isTemplateRow" value="${true}"/>
                         <c:param name="tabNum" value="${itemNum}"/>
                         <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                         <c:param name="originJSP" value="doubleDataEntry"/>
@@ -1424,7 +1428,7 @@ table-->
                                 </c:when>
                                 <c:otherwise>
                                     <td valign="bottom">  <input type="checkbox" id="markCompleteId" name="markComplete" value="Yes"
-                                                                <c:if test="${markComplete=='Yes'}"> checked </c:if> onclick="displayMessageFromCheckbox(this)">
+                                                                <c:if test="${markComplete=='Yes'}"> checked </c:if> onclick="displayMessageFromCheckbox(this, '<fmt:message key="marking_CRF_complete_finalize_DE" bundle="${restext}"/>')">
                                     </td>
                                     <td valign="bottom" nowrap="nowrap">&nbsp; <fmt:message key="mark_CRF_complete" bundle="${resword}"/>&nbsp;&nbsp;&nbsp;</td>
                                 </c:otherwise>

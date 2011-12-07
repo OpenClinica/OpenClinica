@@ -723,10 +723,9 @@ function isCheckedRadioOrCheckbox(inputObject){
 /* Only display the confirm dialogue box if the checkbox was checked
  when the user clicked it; then uncheck the checkbox if the user chooses "cancel"
  in the confirm dialogue. */
-function displayMessageFromCheckbox(checkboxObject){
+function displayMessageFromCheckbox(checkboxObject, message){
     if(checkboxObject != null && checkboxObject.checked){
-        var bool =  confirm(
-                "Marking this CRF complete will finalize data entry. You will be allowed to edit the data later but this data entry stage is completed. If Double Data Entry is required, you or another user may need to complete this CRF again before it is verified as complete. Are you sure you want to mark this CRF complete?");
+        var bool =  confirm(message);
         if(! bool) {
         	var checkboxObjects = document.getElementsByName(checkboxObject.name);
         	if(checkboxObjects[0]){
@@ -1738,20 +1737,3 @@ if(BrowserDetect.browser=='Explorer' && BrowserDetect.version<7)
 	document.write('.dropdown { background-image: url(images/dropdown_BG.gif); }');
 	document.write('</style>');
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

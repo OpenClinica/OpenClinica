@@ -69,7 +69,7 @@ public class FormBeanUtil {
             // if the base case is not already shown, let's check it
             boolean showItem = getItemMetadataService(context).isShown(new Integer(metadataBean.getItemId()), eventCrfBean, itemDataBean);
             metadataBean.setShowItem(showItem);
-            System.out.println("running is shown to the db..." + showItem + " for " + metadataBean.getItemId());
+           // System.out.println("running is shown to the db..." + showItem + " for " + metadataBean.getItemId());
             // setting true or false here, tbh
         }
         // however, we run into a puzzle here at the last section, apparently we might take a deep-copy again, resetting this to false

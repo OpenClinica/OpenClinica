@@ -7,6 +7,27 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
@@ -92,27 +113,6 @@ import org.akaza.openclinica.view.form.FormBeanUtil;
 import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
 
 /**
  * @author ssachs
@@ -209,26 +209,26 @@ public abstract class DataEntryServlet extends CoreSecureController {
     public static final String DATE_INTERVIEWED = "date_interviewed";
 
     public static final String NOTE_SUBMITTED = "note_submitted";
-    
-    
+
+
     public static final String SECTION_BEAN = "section_bean";
     public static final String ALL_SECTION_BEANS = "all_section_bean";
 
-    public static final String EVENT_DEF_CRF_BEAN = "event_def_crf_bean"; 
-    
+    public static final String EVENT_DEF_CRF_BEAN = "event_def_crf_bean";
+
     public static final String ALL_ITEMS_LIST = "all_items_list";
-    
+
     private DataSource dataSource;
 
- 
-   
-    
-    
+
+
+
+
 
     @Override
     public void init(ServletConfig config) throws ServletException
     {
-        super.init(config); 
+        super.init(config);
         try{
       ServletContext  context = getServletContext();
     SessionManager     sm = new SessionManager(SpringServletAccess.getApplicationContext(context));
@@ -237,7 +237,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
             ne.printStackTrace();
         }
     }
-    
+
     public DataSource getDataSource(){
         return dataSource;
     }
@@ -274,10 +274,10 @@ public abstract class DataEntryServlet extends CoreSecureController {
       // System.out.println(message);
         logger.trace(message);
     }
-    
+
     @Override
     protected  void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-       
+
         //JN:The following were the the global variables, moved as local.
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
         SectionBean sb = (SectionBean)request.getAttribute(SECTION_BEAN);
@@ -296,7 +296,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
          boolean isSubmitted = false;
 
         boolean hasGroup = false;
-        
+
         EventCRFDAO ecdao = null;
         FormProcessor fp = new FormProcessor(request);
         logMe("Enterting DataEntry Servlet"+System.currentTimeMillis());
@@ -308,6 +308,11 @@ public abstract class DataEntryServlet extends CoreSecureController {
         panel.setStudyInfoShown(false);
         String age = "";
         UserAccountBean ub =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
+
+        //for 11958: repeating groups rows appear if validation returns to the same section
+        int isFirstTimeOnSection =fp.getInt("isFirstTimeOnSection");
+        request.setAttribute( "isFirstTimeOnSection",isFirstTimeOnSection+"");
+        
         
         if (fp.getString(GO_EXIT).equals("") && !isSubmitted && fp.getString("tabId").equals("") && fp.getString("sectionId").equals("")) {
             //HashMap unavailableCRF = getUnavailableCRFList();
@@ -323,11 +328,11 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 lockThisEventCRF(ecb.getId(), ub.getId());
             }
         }
-       
+
         if (!ecb.isActive()) {
             throw new InconsistentStateException(Page.LIST_STUDY_SUBJECTS_SERVLET, resexception.getString("event_not_exists"));
         }
- 
+
         logMe("Enterting DataEntry Get the status/number of item discrepancy notes"+System.currentTimeMillis());
         // Get the status/number of item discrepancy notes
         DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
@@ -353,7 +358,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         int resolvedNum = 0;
         int notAppNum = 0;
         DiscrepancyNoteBean tempBean;
-        
+
         for (DiscrepancyNoteThread dnThread : noteThreads) {
             /*
              * 3014: do not count parent beans, only the last child disc note of the thread.
@@ -487,21 +492,21 @@ public abstract class DataEntryServlet extends CoreSecureController {
         // tbh>>
         // logger.trace("trying event def crf id: "+eventDefinitionCRFId);
         logMe("Entering some EVENT DEF CRF CHECK "+System.currentTimeMillis());
-   
-       
+
+
         if (eventDefinitionCRFId <= 0) {
             // TODO we have to get that id before we can continue
             EventDefinitionCRFBean edcBean = edcdao.findByStudyEventIdAndCRFVersionId(study, ecb.getStudyEventId(), ecb.getCRFVersionId());
             eventDefinitionCRFId = edcBean.getId();
         }
-   
+
         logMe("Entering some EVENT DEF CRF CHECK DONE "+System.currentTimeMillis());
         logMe("Entering some Study EVENT DEF CRF CHECK  "+System.currentTimeMillis());
         StudyEventDAO seDao = new StudyEventDAO(getDataSource());
         EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) edcdao.findByPK(eventDefinitionCRFId);
         EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) edcdao.findByPK(eventDefinitionCRFId);
         request.setAttribute(EVENT_DEF_CRF_BEAN, edcb);//JN:Putting the event_def_crf_bean in the request attribute.
-        
+
         StudyEventBean studyEventBean = (StudyEventBean) seDao.findByPK(ecb.getStudyEventId());
         edcBean.setId(eventDefinitionCRFId);
 
@@ -579,7 +584,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         } else {
             request.setAttribute("studyTitle", study.getName());
         }
-        
+
         logMe("Entering  Get the study then the parent study end  "+System.currentTimeMillis());
         // Let us process the age
         if (currentStudy.getStudyParameterConfig().getCollectDob().equals("1")) {
@@ -622,18 +627,18 @@ public abstract class DataEntryServlet extends CoreSecureController {
             session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, null);
 
             discNotes = new FormDiscrepancyNotes();
-            
+
             //            discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
             //            if (discNotes == null) {
             //                discNotes = new FormDiscrepancyNotes();
             //            }
             // << tbh 01/2010
-            
+
             section = populateNotesWithDBNoteCounts(discNotes, section, request);
             logger.debug("+++ just ran populateNotes, printing field notes: " + discNotes.getFieldNotes().toString());
             logger.debug("found disc notes: " + discNotes.getNumExistingFieldNotes().toString());
             session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
-           
+
             if(section.getSection().hasSCDItem()) {
                 section = SCDItemDisplayInfo.generateSCDDisplayInfo(section,this.getServletPage(request).equals(Page.INITIAL_DATA_ENTRY)
                         || this.getServletPage(request).equals(Page.ADMIN_EDIT_SERVLET) && !this.isAdminForcedReasonForChange(request));
@@ -643,7 +648,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
             session.removeAttribute(DoubleDataEntryServlet.COUNT_VALIDATE + keyId);
 
             setUpPanel(section);
-            if (newUploadedFiles.size() > 0) { 
+            if (newUploadedFiles.size() > 0) {
                 if (this.unloadFiles(newUploadedFiles)) {
 
                 } else {
@@ -807,7 +812,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
             List<ItemBean> itemBeansWithSCDShown = new ArrayList<ItemBean>();
             if(validate && section.getSection().hasSCDItem()) {
                 logMe(" Validate and Loop  "+System.currentTimeMillis());
-                
+
                 for (int i = 0; i < allItems.size(); ++i) {
                     DisplayItemBean dib = allItems.get(i).getSingleItem();
                     ItemFormMetadataBean ifmb = dib.getMetadata();
@@ -824,7 +829,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                 itemBeansWithSCDShown.add(dib.getItem());
 
                             validateSCDItemBean(v, dib);
-                        }  
+                        }
                         ArrayList<DisplayItemBean> children = dib.getChildren();
                         for (int j = 0; j < children.size(); j++) {
                             DisplayItemBean child = children.get(j);
@@ -849,7 +854,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
             //JN:calling again here, for the items with simple conditional display and rules.
             List<RuleSetBean>  ruleSets = createAndInitializeRuleSet(currentStudy, studyEventDefinition, crfVersionBean, studyEventBean, ecb, true, request, response,  itemBeansWithSCDShown);
             boolean shouldRunRules = getRuleSetService(request).shouldRunRulesForRuleSets(ruleSets, phase2);
-          
+
             // this.getItemMetadataService().resetItemCounter();
             HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid  = null;
             groupOrdinalPLusItemOid = runRules(allItems, ruleSets, true, shouldRunRules, MessageType.ERROR, phase2,ecb, request);
@@ -868,7 +873,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     session.setAttribute(ALL_ITEMS_LIST, allItems);
                     session.setAttribute("groupOrdinalPLusItemOid", groupOrdinalPLusItemOid);
                 }
-                
+
             }*/
             ////System.out.println("first run of rules : " + groupOrdinalPLusItemOid.toString());
             logMe("allItems  Loop begin  "+System.currentTimeMillis());
@@ -1222,7 +1227,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     }
                 }
             }
-            
+
             logMe("allItems 3 Loop end  "+System.currentTimeMillis());
             // YW >>
 
@@ -1250,7 +1255,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 v.addValidation(INPUT_INTERVIEW_DATE, Validator.IS_A_DATE);
                 v.alwaysExecuteLastValidation(INPUT_INTERVIEW_DATE);
             }
-           
+
             if(section.getSection().hasSCDItem()) {
                 section = SCDItemDisplayInfo.generateSCDDisplayInfo(section,this.getServletPage(request).equals(Page.INITIAL_DATA_ENTRY)
                         || this.getServletPage(request).equals(Page.ADMIN_EDIT_SERVLET) && !this.isAdminForcedReasonForChange(request) );
@@ -1379,7 +1384,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 // YW, 2-4-2008 <<
                 logMe("!errors if  Loop begin  "+System.currentTimeMillis());
                 HashMap<String, ArrayList<String>> siErrors = sv.validate();
-                
+
                 if (siErrors != null && !siErrors.isEmpty()) {
                     Iterator iter = siErrors.keySet().iterator();
                     while (iter.hasNext()) {
@@ -1425,7 +1430,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     String fieldName = iter3.next().toString();
                     logger.debug("found error after shuffle " + fieldName);
                 }
-                //Mantis Issue: 8116. Parsist the markComplete chebox on error 
+                //Mantis Issue: 8116. Parsist the markComplete chebox on error
                 request.setAttribute("markComplete", fp.getString(INPUT_MARK_COMPLETE));
                 // << tbh, 02/2010
                 // YW >>
@@ -1451,7 +1456,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
             } else {
                 logger.debug("Do we hit this in save ?????");
                 logMe("Do we hit this in save ????  "+System.currentTimeMillis());
-               
+
                 boolean success = true;
                 boolean temp = true;
 
@@ -1525,7 +1530,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 logMe("DisplayItemWithGroupBean allitems4 "+System.currentTimeMillis());
                 for (int i = 0; i < allItems.size(); i++) {
                     DisplayItemWithGroupBean diwb = allItems.get(i);
-                  
+
                     // we don't write success = success && writeToDB here
                     // since the short-circuit mechanism may prevent Java
                     // from executing writeToDB.
@@ -1641,13 +1646,14 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 }
                 logMe("DisplayItemWithGroupBean allitems4 end "+System.currentTimeMillis());
                 //System.out.println("running rules: " + phase2.name());
-                ArrayList<Integer> prevShownDynItemDataIds = shouldRunRules?
-                    (ArrayList<Integer>)this.getItemMetadataService().getDynamicsItemFormMetadataDao().findShowItemDataIdsInSection(section.getSection().getId(), ecb.getCRFVersionId(), ecb.getId())
+                List<Integer> prevShownDynItemDataIds = shouldRunRules?
+                    this.getItemMetadataService().getDynamicsItemFormMetadataDao().findShowItemDataIdsInSection(
+                            section.getSection().getId(), ecb.getCRFVersionId(), ecb.getId())
                     :new ArrayList<Integer>();
                 logMe("DisplayItemWithGroupBean dryrun  start"+System.currentTimeMillis());
                 HashMap<String, ArrayList<String>> rulesPostDryRun = runRules(allItems, ruleSets, false, shouldRunRules, MessageType.WARNING, phase2,ecb, request);
-                
-               
+
+
                 HashMap<String, ArrayList<String>> errorsPostDryRun = new HashMap<String, ArrayList<String>>();
                 // additional step needed, run rules and see if any items are 'shown' AFTER saving data
                 logMe("DisplayItemWithGroupBean dryrun  end"+System.currentTimeMillis());
@@ -1986,8 +1992,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                     return;
 
                                 }
-                       
-                             
+
+
                                 int tabNum = 0;
                                 if (fp.getString("tab") == null) {
                                     tabNum = 1;
@@ -1999,7 +2005,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                 }
 
                                 forwardPage(getServletPage(request), request, response);
-                              
+
                             }
                             // session.removeAttribute(AddNewSubjectServlet.
                             // FORM_DISCREPANCY_NOTES_NAME);
@@ -2070,14 +2076,14 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
        HttpSession session = request.getSession();
        StudyBean currentStudy =    (StudyBean)  session.getAttribute("study");
-       
+
         // BWP >>we should have the correct crfVersionId, in order to acquire
         // the correct
         // section IDs
-       
+
             FormProcessor fp = new FormProcessor(request);
             EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
-            
+
             SectionDAO sdao = new SectionDAO(getDataSource());
             EventCRFBean   ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
        //JN:Happening when drilling down?
@@ -2377,7 +2383,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         String inputName = getInputName(dib);
         FormProcessor fp = new FormProcessor(request);
         org.akaza.openclinica.bean.core.ResponseType rt = dib.getMetadata().getResponseSet().getResponseType();
-        
+
         if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)
                 || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECT)) {
             dib.loadFormValue(fp.getStringArray(inputName));
@@ -2416,7 +2422,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         ItemDAO idao = new ItemDAO(getDataSource());
         List<ItemBean> itBeans = idao.findAllItemsByGroupId(digb.getItemGroupBean().getId(), sb.getCRFVersionId());
         logger.debug("+++ starting to review groups: " + repeatMax);
-        
+
         long timeCheck = System.currentTimeMillis();
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
 
@@ -3082,8 +3088,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
     protected boolean writeToDB(DisplayItemBean dib, ItemDataDAO iddao, int ordinal, HttpServletRequest request) {
         ItemDataBean idb = dib.getData();
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
-        if (dib.getEditFlag()!=null && "remove".equalsIgnoreCase(dib.getEditFlag()) 
-                && getItemMetadataService().isShown(idb.getItemId(), ecb, idb)) { 
+        if (dib.getEditFlag()!=null && "remove".equalsIgnoreCase(dib.getEditFlag())
+                && getItemMetadataService().isShown(idb.getItemId(), ecb, idb)) {
             getItemMetadataService().hideItem(dib.getMetadata(), ecb, idb);
         }else {
             if (getServletPage(request).equals(Page.DOUBLE_DATA_ENTRY_SERVLET)) {
@@ -3113,7 +3119,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
         idb.setItemId(dib.getItem().getId());
         idb.setEventCRFId(ecb.getId());
-       
+
         if (idb.getValue().equals("")) {
             idb.setStatus(getBlankItemStatus());
         } else {
@@ -3151,7 +3157,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 // <<tbh
             } else if ("edit".equalsIgnoreCase(dib.getEditFlag())) {
                                 idb.setUpdater(ub);
-               
+
                 // //System.out.println("update an item data - running update value " + idb.getId() + " :" + idb.getValue());
                 logger.info("update item update_id " + idb.getUpdater().getId());
                 // update tbh #5999, #5998; if an item_data was not included in
@@ -3319,7 +3325,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
         // Find out whether any display items are *not* grouped; see issue 1689
         hasUngroupedItems = formBeanUtil.sectionHasUngroupedItems(getDataSource(), sb.getId(), itemGroups);
-         
+
         sdao = new SectionDAO(getDataSource());
      //
         sb.setHasSCDItem(hasUngroupedItems?sdao.hasSCDItem(sb.getId()):false);
@@ -3358,7 +3364,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
        logMe("Entering getParentDisplayItems::: Thread is? "+Thread.currentThread());
         ArrayList displayItems = getParentDisplayItems(hasGroup, sb, edcb, idao, ifmdao, iddao, hasUngroupedItems, request);
         logMe("Entering getParentDisplayItems::: Done and Thread is? "+Thread.currentThread());
-        
+
         logger.debug("just ran get parent display, has group " + hasGroup + " has ungrouped " + hasUngroupedItems);
         // now sort them by ordinal
         Collections.sort(displayItems);
@@ -3404,7 +3410,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
       ItemDataDAO iddao = new ItemDataDAO(getDataSource());
        // ALL_SECTION_BEANS
         ArrayList<SectionBean> allSectionBeans = (ArrayList<SectionBean>)request.getAttribute(ALL_SECTION_BEANS);
-        
+
         for (int j = 0; j < allSectionBeans.size(); j++) {
 
             SectionBean sb = allSectionBeans.get(j);
@@ -3427,10 +3433,10 @@ public abstract class DataEntryServlet extends CoreSecureController {
             CRFBean cb = (CRFBean) cdao.findByPK(cvb.getCrfId());
             section.setCrf(cb);
 
-            
+
             EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(getDataSource());
            EventDefinitionCRFBean edcb = edcdao.findByStudyEventIdAndCRFVersionId(study, ecb.getStudyEventId(), cvb.getId());
-            
+
             section.setEventDefinitionCRF(edcb);
 
             // setup DAO's here to avoid creating too many objects
@@ -3515,7 +3521,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
             // idao.findAllGroupedParentsBySectionId(
             // sb.getId(), sb.getCRFVersionId()));
         }
-        
+
         // else {
         logger.trace("no item groups");
         // items = idao.findAllParentsBySectionId(sb.getId());
@@ -3734,7 +3740,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         }
         logMe("Method:populateNotesWithDBNoteCounts before calling setToolTipEventNotes"+System.currentTimeMillis()+"time took:"+(System.currentTimeMillis()-t));
         setToolTipEventNotes(request);
-        
+
         request.setAttribute("nameNoteResStatus", getDiscrepancyNoteResolutionStatus(existingNameNotes));
         request.setAttribute("IntrvDateNoteResStatus", getDiscrepancyNoteResolutionStatus(existingIntrvDateNotes));
 
@@ -3793,7 +3799,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                         //                        }
                         dib.setNumDiscrepancyNotes(numNotes + notes.size());// + notes2.size());
                         dib.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(itemDataId, notes));
-                        
+
                         dib =  setTotals(dib,itemDataId,notes, ecb.getId());
                         logger.debug("dib note size:" + dib.getNumDiscrepancyNotes() + " " + dib.getData().getId() + " " + inputName);
                         items.set(j, dib);
@@ -3851,14 +3857,14 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
     private void setToolTipEventNotes(HttpServletRequest request) {
    long t = System.currentTimeMillis();
-        
+
         logMe("Method:setToolTipEventNotes"+t);
         DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
         ArrayList<DiscrepancyNoteBean> ecNotes = dndao.findEventCRFDNotesToolTips(ecb);
         ArrayList<DiscrepancyNoteBean> nameNotes = new ArrayList();
         ArrayList<DiscrepancyNoteBean> dateNotes = new ArrayList();
-     
+
         for (int i = 0; i < ecNotes.size(); i++) {
             DiscrepancyNoteBean dn = ecNotes.get(i);
             if (INTERVIEWER_NAME.equalsIgnoreCase(dn.getColumn())) {
@@ -3879,7 +3885,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         logMe("existing Method:setToolTipEventNotes, time took"+(System.currentTimeMillis()-t));
         }
 
-   
+
 
 
 
@@ -3901,7 +3907,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
          ArrayList<DiscrepancyNoteBean> existingNotes = dndao.findExistingNotesForToolTip(itemDataId);
          dib.setDiscrepancyNotes(existingNotes);
-         
+
          for (DiscrepancyNoteBean obj : dib.getDiscrepancyNotes()) {
              DiscrepancyNoteBean note =  obj;
 
@@ -3955,7 +3961,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         dib.setTotUpdated(totUpdated);
         dib.setTotClosed(totClosed);
         dib.setTotNA(totNA);
-      
+
         logMe("returning back..time taken"+(System.currentTimeMillis()-t));
         return dib;
     }
@@ -4091,7 +4097,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         int allEDCsize = allEDCs.size();
         ArrayList nonRequiredCrfIds = new ArrayList();
         ArrayList requiredCrfIds = new ArrayList();
-        
+
         // go through the list and find out if all are required, tbh
 /*        for (int ii = 0; ii < allEDCs.size(); ii++) {
             EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) allEDCs.get(ii);
@@ -4104,14 +4110,14 @@ public abstract class DataEntryServlet extends CoreSecureController {
             if (edcBean.isRequiredCRF()) {
                 logger.trace("found one non required CRF: " + edcBean.getCrfName() + " " + edcBean.getCrfId() + " " + edcBean.getDefaultVersionName());
                             requiredCrfIds.add(new Integer(edcBean.getCrfId()));
-              
+
             }
-            
+
         }
-     */   
+     */
         //JN: Add another loop to get list of all required crfs
-        
-        
+
+
        // logger.trace("non required crf ids: " + nonRequiredCrfIds.toString());
         // go through all the crfs and check their status
         // add an additional check to see if it is required or not, tbh
@@ -4127,7 +4133,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 logger.trace("just rejected eventCompleted looking at a CRF: " + ec.getName());
                 break;
             }
-            
+
         }
         int reqCRFCNTR = 0;
         //JN: The following logic is to iterate through all crfs to see if all are marked as done, if not allcrfsflag will be set to false.
@@ -4139,8 +4145,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
             // set in the dao, tbh
            CRFVersionBean crfVersionBean = (CRFVersionBean) crfversionDao.findByPK(ec.getCRFVersionId());
            int crfId = crfVersionBean.getCrfId();
-           
-            
+
+
             if (ec.getStatus().equals(Status.UNAVAILABLE) // && requiredCrfIds.contains(new Integer(crfId))
                     ) { // &&
                 allCrfsCompleted = true;
@@ -4148,11 +4154,11 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 reqCRFCNTR++;
            //     break;
             }
-            
+
         }
       //  if (requiredCrfIds.size()==0) allCrfsCompleted = true;// Incase none of the crfs are required.
        // else if(reqCRFCNTR!=requiredCrfIds.size()) allCrfsCompleted = false;
-        
+
         if (!allRequired) {
             logger.trace("SEB contains some nonrequired CRFs: " + allEDCsize + " vs " + allEDCs.size());
         }*/
@@ -4161,15 +4167,15 @@ public abstract class DataEntryServlet extends CoreSecureController {
             // allEDCs.size(),
             // tbh
             //JN: all crfs are completed and then set the subject event status as complete
-           
-          
+
+
                 seb.setSubjectEventStatus(SubjectEventStatus.COMPLETED);
-          
+
             /*else if (!allRequired && allEDCsize != 0) {// what if there are no// TODO:
                 // required CRFs, and all
                 // CRFs have been finished?
                 addPageMessage(respage.getString("CRF_completed"), request);
-            }*/ 
+            }*/
              /*if (!edcb.isDoubleEntry()){ //TODO: perhaps this logic can go... JN check later
                 logger.trace("just set subj event status to -- COMPLETED --");
                 seb.setSubjectEventStatus(SubjectEventStatus.COMPLETED);
@@ -4280,24 +4286,24 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     if(itemBean.size()>0) save = false;
                    /* while(itemBean.iterator().hasNext())
                     {
-                       
+
                         ItemDataBean temp = itemBean.iterator().next();
                        if(idb.getEventCRFId()==(temp.getEventCRFId()))
                        {
                            if(idb.getItemId()==(temp.getItemId())){
-                              save = false; 
+                              save = false;
                            }
                        }
-                     
-                           
+
+
                     }*/
                     if(save)
                     {
                         iddao.create(idb);
-                    
+
                     }
-                   
-                    
+
+
                 }
             }
         }
@@ -4329,23 +4335,23 @@ public abstract class DataEntryServlet extends CoreSecureController {
         int numItemsPending = TableOfContentsServlet.getIntById(numItemsPendingHM, key);
         int numItemsCompleted = TableOfContentsServlet.getIntById(numItemsCompletedHM, key);
         int numItemsBlank = TableOfContentsServlet.getIntById(numItemsBlankHM, key);
-        System.out.println(" for " + key + " num items " + numItems + " num items blank " + numItemsBlank + 
+        System.out.println(" for " + key + " num items " + numItems + " num items blank " + numItemsBlank +
                 " num items pending " + numItemsPending + " completed " + numItemsCompleted);
 
-        if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY) && edcb.isDoubleEntry()) 
+        if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY) && edcb.isDoubleEntry())
         {
             if (numItemsPending == 0 && numItems > 0) {
                 System.out.println("returns false on ide loop " + key);
                 return false;
             }
-        } else 
+        } else
         {
-            
+
             if (numItemsCompleted == 0  && numItems > 0) {
                 System.out.println("returns false on other loop " + key);
                 return false;
             }
-            
+
         }
 
         return true;
@@ -4369,28 +4375,28 @@ public abstract class DataEntryServlet extends CoreSecureController {
         int numItemsPending = TableOfContentsServlet.getIntById(numItemsPendingHM, key);
         int numItemsCompleted = TableOfContentsServlet.getIntById(numItemsCompletedHM, key);
         int numItemsBlank = TableOfContentsServlet.getIntById(numItemsBlankHM, key);
-        System.out.println(" for " + key + " num items " + numItems + " num items blank " + numItemsBlank + 
+        System.out.println(" for " + key + " num items " + numItems + " num items blank " + numItemsBlank +
                 " num items pending " + numItemsPending + " completed " + numItemsCompleted);
 
-        if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY) && edcb.isDoubleEntry()) 
+        if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY) && edcb.isDoubleEntry())
         {
             if (numItemsPending == 0 && numItems > 0) {
                 System.out.println("returns false on ide loop " + key);
                 return false;
             }
-        } else 
+        } else
         {
-            
+
            if(numItemsCompleted < numItems){
                return false;
            }
-            
+
         }
 
         return true;
 
-    }    
-    
+    }
+
     /**
      * Checks if all the sections in an event crf are reviewed once
      * tbh updated to prevent duplicates, 03/2011
@@ -4427,7 +4433,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 if (numItemsPending == 0 && numItems > 0) {
                     return false;
                 }
-                
+
             } else {
                 if (numItemsCompleted == 0 && numItems > 0) {
                     return false;
@@ -4442,7 +4448,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         // if we get this far, all sections are checked and we return a true
        // return true;
     }
-    
+
     protected void getEventDefinitionCRFBean(HttpServletRequest request) {
         HttpSession session = request.getSession();
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
@@ -4624,12 +4630,12 @@ public abstract class DataEntryServlet extends CoreSecureController {
          */
         return displayItemWithGroups;
     }
-    
+
     protected void loadItemsWithGroupRows(DisplayItemWithGroupBean itemWithGroup, SectionBean sb, EventDefinitionCRFBean edcb, EventCRFBean ecb, HttpServletRequest request) {
-        //this method is a copy of the method: createItemWithGroups , 
+        //this method is a copy of the method: createItemWithGroups ,
         //only modified for load one DisplayItemWithGroupBean.
         //
-        
+
         ItemDAO idao = new ItemDAO(getDataSource());
         // For adding null values to display items
         FormBeanUtil formBeanUtil = new FormBeanUtil();
@@ -4944,7 +4950,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         }
         return false;
     }
-   
+
     protected boolean isChanged(DisplayItemBean dib, HashMap<Integer, String> oldItemdata, String attachedFilePath) {
         ItemDataBean idb = dib.getData();
         String value = idb.getValue();
@@ -4972,7 +4978,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
     protected boolean isChanged(ItemDataBean idb, HashMap<Integer, String> oldItemdata, DisplayItemBean dib,String attachedFilePath) {
         //if(dib.getMetadata().isConditionalDisplayItem() && !dib.getIsSCDtoBeShown()) {
             //return false;
-           
+
         //} else {
             return isChanged(dib, oldItemdata, attachedFilePath);
         //}
@@ -5190,6 +5196,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
     /**
      * @deprecated Use {@link #createAndInitializeRuleSet(StudyBean,StudyEventDefinitionBean,CRFVersionBean,StudyEventBean,EventCRFBean,Boolean,HttpServletRequest,HttpServletResponse,List)} instead
      */
+    @Deprecated
     private List<RuleSetBean> createAndInitializeRuleSet(StudyBean currentStudy,
             StudyEventDefinitionBean studyEventDefinition,
             CRFVersionBean crfVersionBean,
@@ -5211,7 +5218,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
             List<RuleSetBean> ruleSets = getRuleSetService(request).getRuleSetsByCrfStudyAndStudyEventDefinition(currentStudy, studyEventDefinition, crfVersionBean);
             logMe("Current Thread:::"+Thread.currentThread()+"RuleSet Now?"+ruleSets);
             if(ruleSets!=null&&ruleSets.size()>0) {
-                
+
                 ruleSets = getRuleSetService(request).filterByStatusEqualsAvailable(ruleSets);
                 ruleSets = getRuleSetService(request).filterRuleSetsByStudyEventOrdinal(ruleSets, studyEventBean, crfVersionBean, studyEventDefinition);
                 // place next line here, tbh
@@ -5223,7 +5230,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
     }
     private HashMap<String, ArrayList<String>> runRules(List<DisplayItemWithGroupBean> allItems, List<RuleSetBean> ruleSets, Boolean dryRun,
             Boolean shouldRunRules, MessageType mt, Phase phase,EventCRFBean ecb, HttpServletRequest request) {
-        UserAccountBean ub =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);      
+        UserAccountBean ub =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
         StudyBean currentStudy =    (StudyBean)  request.getSession().getAttribute("study");
  if (shouldRunRules) {
             Container c = new Container();
@@ -5254,9 +5261,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
     protected abstract boolean isAdminForcedReasonForChange(HttpServletRequest request);
 
     private RuleSetServiceInterface getRuleSetService(HttpServletRequest request) {
-       
+
         RuleSetServiceInterface ruleSetService = null;
-        
+
         ruleSetService =
             ruleSetService != null ? ruleSetService : (RuleSetServiceInterface) SpringServletAccess.getApplicationContext(getServletContext()).getBean(
                     "ruleSetService");
@@ -5266,11 +5273,11 @@ public abstract class DataEntryServlet extends CoreSecureController {
         return ruleSetService;
     }
 
-    
+
     private RuleSetServiceInterface getRuleSetServicePerRequest(HttpServletRequest request) {
-        //TODO:where is the ruleservice initialized? does not have any references. Check it 
+        //TODO:where is the ruleservice initialized? does not have any references. Check it
         RuleSetServiceInterface ruleSetService = null;
-        
+
         ruleSetService =
             ruleSetService != null ? ruleSetService : (RuleSetServiceInterface) SpringServletAccess.getApplicationContext(getServletContext()).getBean(
                     "ruleSetServicePerRequest");
@@ -5520,9 +5527,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
         }
         return resolutionStatus;
     }
-    
+
     /*
-     * Update DisplaySectionBean's firstSection & lastSection; 
+     * Update DisplaySectionBean's firstSection & lastSection;
      */
     protected void updateDisplaySectionPlace(DisplaySectionBean displaySectionBean, DisplayTableOfContentsBean toc, HttpServletRequest request) {
         if (toc != null) {
@@ -5534,7 +5541,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
             }
         }
     }
-    
+
     protected SectionBean prevSection(SectionBean sb, EventCRFBean ecb, DisplayTableOfContentsBean toc, int sbPos) {
         SectionBean p = new SectionBean();
         ArrayList<SectionBean> sectionBeans = new ArrayList<SectionBean>();
@@ -5543,7 +5550,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
             if (sbPos > 0) {
                 p = sectionBeans.get(sbPos - 1);
             }
-        } 
+        }
         return p != null && p.getId() > 0 ? p : new SectionBean();
     }
 
@@ -5555,7 +5562,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
             int size = sectionBeans.size();
             if (sbPos >= 0 && size > 1 && sbPos < size-1) {
                 n = sectionBeans.get(sbPos + 1);
-            } 
+            }
         }
         return n != null && n.getId() > 0 ? n : new SectionBean();
     }
@@ -5579,4 +5586,3 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
     }
 }
-  

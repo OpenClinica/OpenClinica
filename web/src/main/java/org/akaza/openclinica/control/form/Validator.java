@@ -1172,7 +1172,7 @@ public class Validator {
     protected boolean isColonSemiColon(String fieldName)
     {
         String fieldValue = getFieldValue(fieldName);
-        if(fieldValue.indexOf(";")!=-1 || fieldValue.indexOf(":")!=-1)
+        if(fieldValue.indexOf(";")!=-1 || fieldValue.indexOf(":")!=-1 || fieldValue.indexOf("*")!=-1)
             return true;
         else
             return false;

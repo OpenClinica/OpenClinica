@@ -1,5 +1,10 @@
 package org.akaza.openclinica.service.crfdata;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
@@ -37,11 +42,6 @@ import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.sql.DataSource;
-
 public class DynamicsMetadataService implements MetadataServiceInterface {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     private final String ESCAPED_SEPERATOR = "\\.";
@@ -64,7 +64,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
     	// itemsAlreadyShown = new ArrayList<Integer>();
         this.ds = ds;
     }
-    
+
     public boolean hide(Object metadataBean, EventCRFBean eventCrfBean) {
         // TODO -- interesting problem, where is the SpringServletAccess object going to live now? tbh 03/2010
         ItemFormMetadataBean itemFormMetadataBean = (ItemFormMetadataBean) metadataBean;
@@ -175,9 +175,9 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
     }
 
     /**
-     * 
+     *
      * TODO: remove the @deprecated call. The reason it is there now is to accommodate the call being made from the DataEntryServlet
-     * 
+     *
      * @param metadataBean
      * @param eventCrfBean
      * @param itemDataBean
@@ -230,7 +230,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         getDynamicsItemFormMetadataDao().saveOrUpdate(dynamicsMetadataBean);
         return true;
     }
-    
+
     public boolean hideItem(ItemFormMetadataBean metadataBean, EventCRFBean eventCrfBean, ItemDataBean itemDataBean) {
         ItemFormMetadataBean itemFormMetadataBean = metadataBean;
         DynamicsItemFormMetadataBean dynamicsMetadataBean = this.getDynamicsItemFormMetadataDao().findByItemDataBean(itemDataBean);
@@ -249,7 +249,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
         getDynamicsItemGroupMetadataDao().saveOrUpdate(dynamicsMetadataBean);
         return true;
     }
-    
+
     public boolean hideGroup(ItemGroupMetadataBean metadataBean, EventCRFBean eventCrfBean) {
 
         ItemGroupMetadataBean itemGroupMetadataBean = metadataBean;
@@ -851,7 +851,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 
         return new ItemOrItemGroupHolder(null, null);
     }
-    
+
     public void updateGroupDynamicsInSection(List<DisplayItemWithGroupBean> displayItemWithGroups, int sectionId, EventCRFBean eventCrfBean) {
         for (DisplayItemWithGroupBean itemWithGroup : displayItemWithGroups) {
             if (itemWithGroup.isInGroup()) {
@@ -860,34 +860,34 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
             }
         }
     }
-    
+
     public void updateDynShowGroupInSection(DisplayItemGroupBean itemGroup, EventCRFBean eventCrfBean) {
         DynamicsItemGroupMetadataBean dgm = dynamicsItemGroupMetadataDao.findByMetadataBean(itemGroup.getGroupMetaBean(), eventCrfBean);
         if(dgm!=null && dgm.getId()>0) {
             itemGroup.getGroupMetaBean().setShowGroup(dgm.isShowGroup());
         }
     }
-    
+
     public void updateGroupDynItemsInSection(DisplayItemWithGroupBean itemWithGroup, int sectionId, int crfVersionId, int eventCrfId) {
         DisplayItemGroupBean digb = itemWithGroup.getItemGroup();
         int groupId = digb.getItemGroupBean().getId();
-        ArrayList<Integer> itemIds = (ArrayList<Integer>)this.dynamicsItemFormMetadataDao.findItemIdsForAGroupInSection(groupId, sectionId, crfVersionId, eventCrfId);
+        List<Integer> itemIds = this.dynamicsItemFormMetadataDao.findItemIdsForAGroupInSection(groupId, sectionId, crfVersionId, eventCrfId);
         if(itemIds!=null && itemIds.size()>0) {
-            ArrayList<Integer> showItemIds = (ArrayList<Integer>)this.dynamicsItemFormMetadataDao.findShowItemIdsForAGroupInSection(groupId, sectionId, crfVersionId, eventCrfId);
+            List<Integer> showItemIds = this.dynamicsItemFormMetadataDao.findShowItemIdsForAGroupInSection(groupId, sectionId, crfVersionId, eventCrfId);
             this.updateItemGroupInASection(digb, itemIds, showItemIds);
             this.updateGroupDynItemsInASection(itemWithGroup, showItemIds, groupId, sectionId, crfVersionId, eventCrfId);
         }
     }
-    
+
     public void updateRepeatingGroupDynItemsInASection(List<DisplayItemWithGroupBean> displayItemWithGroups, int sectionId, int crfVersionId, int eventCrfId) {
         for (DisplayItemWithGroupBean itemWithGroup : displayItemWithGroups) {
             if (itemWithGroup.isInGroup()) {
                 DisplayItemGroupBean digb = itemWithGroup.getItemGroup();
                 if(isGroupRepeating(digb.getItemGroupBean().getMeta())) {
                     int groupId = digb.getItemGroupBean().getId();
-                    ArrayList<Integer> itemIds = (ArrayList<Integer>)this.dynamicsItemFormMetadataDao.findItemIdsForAGroupInSection(groupId, sectionId, crfVersionId, eventCrfId);
+                    List<Integer> itemIds = this.dynamicsItemFormMetadataDao.findItemIdsForAGroupInSection(groupId, sectionId, crfVersionId, eventCrfId);
                     if(itemIds!=null && itemIds.size()>0) {
-                        ArrayList<Integer> showItemIds = (ArrayList<Integer>)this.dynamicsItemFormMetadataDao.findShowItemIdsForAGroupInSection(groupId, sectionId, crfVersionId, eventCrfId);
+                        List<Integer> showItemIds = this.dynamicsItemFormMetadataDao.findShowItemIdsForAGroupInSection(groupId, sectionId, crfVersionId, eventCrfId);
                         this.updateItemGroupInASection(digb, itemIds, showItemIds);
                         this.updateGroupDynItemsInASection(itemWithGroup, showItemIds, groupId, sectionId, crfVersionId, eventCrfId);
                     }
@@ -895,7 +895,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
             }
         }
     }
-    
+
     private void updateItemGroupInASection(DisplayItemGroupBean itemGroup, List<Integer> itemIds, List<Integer> showItemIds) {
         ArrayList<DisplayItemBean> dibs = (ArrayList<DisplayItemBean>) itemGroup.getItems();
         for(DisplayItemBean dib : dibs) {
@@ -904,15 +904,15 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                 meta.setShowItem(true);
             } else if (itemIds.contains(dib.getItem().getId())){
                 dib.getMetadata().setShowItem(false);
-            } 
+            }
         }
     }
 
-    private void updateGroupDynItemsInASection(DisplayItemWithGroupBean itemWithGroup, List<Integer> showItemIds, 
+    private void updateGroupDynItemsInASection(DisplayItemWithGroupBean itemWithGroup, List<Integer> showItemIds,
             int groupId, int sectionId, int crfVersionId, int eventCrfId) {
         List<DisplayItemGroupBean> digbs = itemWithGroup.getItemGroups();
-        ArrayList<Integer> showDataIds = (ArrayList<Integer>)this.dynamicsItemFormMetadataDao.findShowItemDataIdsForAGroupInSection(groupId, sectionId, crfVersionId, eventCrfId);
-        ArrayList<Integer> hideDataIds = (ArrayList<Integer>)this.dynamicsItemFormMetadataDao.findHideItemDataIdsForAGroupInSection(groupId, sectionId, crfVersionId, eventCrfId);
+        List<Integer> showDataIds = this.dynamicsItemFormMetadataDao.findShowItemDataIdsForAGroupInSection(groupId, sectionId, crfVersionId, eventCrfId);
+        List<Integer> hideDataIds = this.dynamicsItemFormMetadataDao.findHideItemDataIdsForAGroupInSection(groupId, sectionId, crfVersionId, eventCrfId);
         for(int n=0; n<digbs.size(); ++n) {
             DisplayItemGroupBean dg = digbs.get(n);
             ArrayList<DisplayItemBean> items = (ArrayList<DisplayItemBean>)dg.getItems();
@@ -932,11 +932,11 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
             }
         }
     }
-    
+
     public Boolean hasShowingDynGroupInSection(int sectionId, int crfVersionId, int eventCrfId) {
         return dynamicsItemGroupMetadataDao.hasShowingInSection(sectionId, crfVersionId, eventCrfId);
     }
-    
+
     public Boolean hasShowingDynItemInSection(int sectionId, int crfVersionId, int eventCrfId) {
         return dynamicsItemFormMetadataDao.hasShowingInSection(sectionId, crfVersionId, eventCrfId);
     }
@@ -958,8 +958,8 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
     }
 
     //JN: The following methods were all returning global variables causing an issue in the case of concurrent users. Modified to return new DAO Object. The thread pooling will take care of any heap issues and I do not expect any.
-    
-    
+
+
     private EventCRFDAO getEventCRFDAO() {
     /*    eventCRFDAO = this.eventCRFDAO != null ? eventCRFDAO : new EventCRFDAO(ds);
         return eventCRFDAO;*/
