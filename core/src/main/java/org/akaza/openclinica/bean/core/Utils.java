@@ -116,13 +116,14 @@ public class Utils {
     }
 
     /**
-     * Convert string with from_pattern to string with to_pattern
+     * Convert string with from_pattern to string with to_pattern.
+     * SimpleDateFormat uses the default locale.
      * 
      * @param value
      * @return
      * 
-     * @author ywang 12-06-2007
      */
+    //ywang 12-06-2007
     public static String convertedItemDateValue(String itemValue, String from_pattern, String to_pattern) {
         String temp = itemValue == null ? null : itemValue.trim();
         if (itemValue != null && temp.length() > 4 && temp.length() == from_pattern.length()) {
@@ -146,8 +147,8 @@ public class Utils {
      * @param filePath
      * @param content
      * 
-     * @author ywang (07-2008)
      */
+    //ywang (07-2008)
     public static boolean createZipFile(String fileName, String filePath, StringBuffer content) {
         try {
             File dir = new File(filePath);
