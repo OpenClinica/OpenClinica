@@ -1,43 +1,36 @@
 package org.akaza.openclinica.controller;
 
-import org.akaza.openclinica.bean.extract.DatasetBean;
-import org.akaza.openclinica.bean.extract.ExtractBean;
-import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.core.Role;
-// import org.akaza.openclinica.control.extract.StdScheduler;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.extract.DatasetDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-
-import org.akaza.openclinica.service.extract.ExtractUtils;
-import org.akaza.openclinica.service.extract.XsltTriggerService;
-import org.apache.commons.dbcp.BasicDataSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.akaza.openclinica.web.SQLInitServlet;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import org.quartz.SchedulerException;
-import org.quartz.SimpleTrigger;
-import org.quartz.impl.StdScheduler;
-import org.springframework.scheduling.quartz.JobDetailBean;
-
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.extract.DatasetBean;
+import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.control.SpringServletAccess;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.extract.DatasetDAO;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.extract.ExtractUtils;
+import org.akaza.openclinica.service.extract.XsltTriggerService;
+import org.akaza.openclinica.web.SQLInitServlet;
+import org.apache.commons.dbcp.BasicDataSource;
+import org.quartz.SchedulerException;
+import org.quartz.SimpleTrigger;
+import org.quartz.impl.StdScheduler;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.quartz.JobDetailBean;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller("extractController")
 @RequestMapping("/extract")
@@ -49,19 +42,23 @@ public class ExtractController {
     @Autowired
     @Qualifier("dataSource")
     private BasicDataSource dataSource;
-    
+
     private DatasetDAO datasetDao;
 
     private StdScheduler scheduler;
 
-    private  String SCHEDULER = "schedulerFactoryBean";
-    
-    public static String TRIGGER_GROUP_NAME = "XsltTriggers";
-    
+    private final  String SCHEDULER = "schedulerFactoryBean";
+
+    //public static String TRIGGER_GROUP_NAME = "XsltTriggers";
+    @Autowired
+    @Qualifier("openClinicaInstanceId")
+    private String openClinicaInstanceId;
+
+
     public ExtractController() {
-        
+
     }
-    
+
     /**
      * process the page from whence you came, i.e. extract a dataset
      * @param id, the id of the extract properties bean, gained from Core Resources
@@ -80,7 +77,7 @@ public class ExtractController {
             }
             return null;
         }
-        
+
         ModelMap map = new ModelMap();
         ResourceBundleProvider.updateLocale(request.getLocale());
         // String datasetId = (String)request.getAttribute("datasetId");
@@ -93,9 +90,9 @@ public class ExtractController {
         datasetDao = new DatasetDAO(dataSource);
         UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
         CoreResources cr =  new CoreResources();
-        
+
         ExtractPropertyBean epBean = cr.findExtractPropertyBeanById(new Integer(id).intValue(),datasetId);
-        
+
         DatasetBean dsBean = (DatasetBean)datasetDao.findByPK(new Integer(datasetId).intValue());
         // set the job in motion
         String[] files = epBean.getFileName();
@@ -119,20 +116,20 @@ public class ExtractController {
     	}
     	epBean.setDoNotDelFiles(temp);
     	epBean.setExportFileName(temp);
-    	   scheduler = getScheduler(request);
+           scheduler = getScheduler(request);
       // while(cnt < fileSize)
        {
-    	 
+
         XsltTriggerService xsltService = new XsltTriggerService();
-        
+
         // TODO get a user bean somehow?
         String generalFileDir = SQLInitServlet.getField("filePath");
-       
+
         generalFileDir = generalFileDir + "datasets" + File.separator + dsBean.getId() + File.separator + sdfDir.format(new java.util.Date());
-    
+
         exportFileName = epBean.getExportFileName()[cnt];
-        
-       
+
+
         // need to set the dataset path here, tbh
         System.out.println("found odm xml file path " + generalFileDir);
         // next, can already run jobs, translations, and then add a message to be notified later
@@ -157,66 +154,69 @@ public class ExtractController {
         // result code, user message, optional URL, archive message, log file message
         // asdf table: sort most recent at top
         System.out.println("found xslt file name " + xsltPath);
-        
+
+
         // String xmlFilePath = generalFileDir + ODMXMLFileName;
-         simpleTrigger = xsltService.generateXsltTrigger(xsltPath, 
+         simpleTrigger = xsltService.generateXsltTrigger(xsltPath,
         		 generalFileDir, // xml_file_path
-                endFilePath + File.separator, 
-                exportFileName, 
-                dsBean.getId(), 
-                epBean, userBean, request.getLocale().getLanguage(),cnt,  SQLInitServlet.getField("filePath") + "xslt",this.TRIGGER_GROUP_NAME);
+                endFilePath + File.separator,
+                exportFileName,
+                dsBean.getId(),
+                epBean, userBean, request.getLocale().getLanguage(),cnt,  SQLInitServlet.getField("filePath") + "xslt",
+                openClinicaInstanceId);
         // System.out.println("just set locale: " + request.getLocale().getLanguage());
-     
+
         cnt++;
         jobDetailBean = new JobDetailBean();
-        jobDetailBean.setGroup(this.TRIGGER_GROUP_NAME);
+        jobDetailBean.setGroup(openClinicaInstanceId);
         jobDetailBean.setName(simpleTrigger.getName()+System.currentTimeMillis());
         jobDetailBean.setJobClass(org.akaza.openclinica.job.XsltStatefulJob.class);
         jobDetailBean.setJobDataMap(simpleTrigger.getJobDataMap());
         jobDetailBean.setDurability(true); // need durability? YES - we will want to see if it's finished
         jobDetailBean.setVolatility(false);
-        
+
         try {
             Date dateStart = scheduler.scheduleJob(jobDetailBean, simpleTrigger);
             System.out.println("== found job date: " + dateStart.toString());
-            
+
         } catch (SchedulerException se) {
             se.printStackTrace();
         }
-    
+
        }
         request.setAttribute("datasetId", datasetId);
         // set the job name here in the user's session, so that we can ping the scheduler to pull it out later
         if(jobDetailBean!=null)
         request.getSession().setAttribute("jobName", jobDetailBean.getName());
         if(simpleTrigger!= null)
-        request.getSession().setAttribute("groupName", this.TRIGGER_GROUP_NAME);
-       
+        request.getSession().setAttribute("groupName", openClinicaInstanceId);
+
         request.getSession().setAttribute("datasetId", new Integer(dsBean.getId()));
         return map;
     }
-    
+
     /**
      * @deprecated Use {@link #setAllProps(ExtractPropertyBean,DatasetBean,SimpleDateFormat,ExtractUtils)} instead
      */
+    @Deprecated
     private ExtractPropertyBean setAllProps(ExtractPropertyBean epBean,DatasetBean dsBean,SimpleDateFormat sdfDir) {
         return setAllProps(epBean, dsBean, sdfDir,new ExtractUtils());
     }
 
     private ExtractPropertyBean setAllProps(ExtractPropertyBean epBean,DatasetBean dsBean,SimpleDateFormat sdfDir, ExtractUtils extractUtils) {
-    	
-    	
-    	
+
+
+
     	return extractUtils.setAllProps(epBean, dsBean, sdfDir,  SQLInitServlet.getField("filePath"));
-    	
-		
+
+
 	}
 
 
     //TODO: ${linkURL} needs to be added
     /**
-     * 
-     * for dateTimePattern, the directory structure is created. "yyyy" + File.separator + "MM" + File.separator + "dd" + File.separator, 
+     *
+     * for dateTimePattern, the directory structure is created. "yyyy" + File.separator + "MM" + File.separator + "dd" + File.separator,
      * to resolve location
      * @param filePath TODO
      * @param extractUtils TODO
@@ -224,7 +224,7 @@ public class ExtractController {
     private String getEndFilePath(String endFilePath,DatasetBean dsBean,SimpleDateFormat sdfDir, String filePath, ExtractUtils extractUtils){
     	return extractUtils.getEndFilePath(endFilePath, dsBean, sdfDir, filePath);
     }
-    
+
     /**
      * Returns the datetime based on pattern :"yyyy-MM-dd-HHmmssSSS", typically for resolving file name
      * @param endFilePath
@@ -233,6 +233,7 @@ public class ExtractController {
      * @return
      * @deprecated Use {@link #resolveVars(String,DatasetBean,SimpleDateFormat,String, ExtractUtils)} instead
      */
+    @Deprecated
     private String resolveVars(String endFilePath,DatasetBean dsBean,SimpleDateFormat sdfDir){
         return resolveVars(endFilePath, dsBean, sdfDir, SQLInitServlet.getField("filePath"),new ExtractUtils());
     }
@@ -246,6 +247,7 @@ public class ExtractController {
      * @return
      * @deprecated Use {@link #resolveVars(String,DatasetBean,SimpleDateFormat,String,ExtractUtils)} instead
      */
+    @Deprecated
     private String resolveVars(String endFilePath,DatasetBean dsBean,SimpleDateFormat sdfDir, String filePath){
         return resolveVars(endFilePath, dsBean, sdfDir, filePath, new ExtractUtils());
     }
@@ -261,7 +263,7 @@ public class ExtractController {
      */
     private String resolveVars(String endFilePath,DatasetBean dsBean,SimpleDateFormat sdfDir, String filePath, ExtractUtils extractUtils){
         return extractUtils.resolveVars(endFilePath, dsBean, sdfDir, filePath);
-     
+
    }
     private void setUpSidebar(HttpServletRequest request) {
         if (sidebarInit.getAlertsBoxSetup() == SidebarEnumConstants.OPENALERTS) {
@@ -287,12 +289,13 @@ public class ExtractController {
     public void setSidebarInit(SidebarInit sidebarInit) {
         this.sidebarInit = sidebarInit;
     }
-    
+
     private StdScheduler getScheduler(HttpServletRequest request) {
         scheduler = this.scheduler != null ? scheduler : (StdScheduler) SpringServletAccess.getApplicationContext(request.getSession().getServletContext()).getBean(SCHEDULER);
         return scheduler;
     }
-    
+
+
     private String resolveExportFilePath(String  epBeanFileName) {
         // String retMe = "";
         //String epBeanFileName = epBean.getExportFileName();
