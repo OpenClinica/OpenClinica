@@ -1,7 +1,10 @@
 package org.akaza.openclinica.control.admin;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+
 import org.akaza.openclinica.bean.admin.TriggerBean;
-import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.SpringServletAccess;
@@ -9,33 +12,30 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.bean.TriggerRow;
 import org.akaza.openclinica.web.job.ExampleSpringJob;
-import org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.quartz.JobDataMap;
 import org.quartz.Trigger;
 import org.quartz.impl.StdScheduler;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-
 /**
- * 
+ *
  * @author thickerson purpose: to generate the list of jobs and allow us to view them
  */
 public class ViewJobServlet extends SecureController {
 
-   
+
     private static String SCHEDULER = "schedulerFactoryBean";
     private static String EXPORT_TRIGGER = "exportTrigger";
 
     private SchedulerFactoryBean schedulerFactoryBean;
     private StdScheduler scheduler;
+    private String instanceName;
 
     @Override
     protected void mayProceed() throws InsufficientPermissionException {
@@ -60,6 +60,13 @@ public class ViewJobServlet extends SecureController {
         return scheduler;
     }
 
+    protected String getInstanceName() {
+        if (instanceName == null) {
+            instanceName = (String) SpringServletAccess.getApplicationContext(context).getBean("openClinicaInstanceId");
+        }
+        return instanceName;
+    }
+
     @Override
     protected void processRequest() throws Exception {
         // TODO single stage servlet where we get the list of jobs
@@ -72,7 +79,7 @@ public class ViewJobServlet extends SecureController {
         XsltTriggerService xsltTriggerSrvc = new XsltTriggerService();
         // Scheduler sched = sfb.getScheduler();
 
-     String[] triggerNames = scheduler.getTriggerNames(xsltTriggerSrvc.getTriggerGroupNameForExportJobs());
+     String[] triggerNames = scheduler.getTriggerNames(getInstanceName());
   //      String[]    triggerNames          =           scheduler.getJobNames(XsltTriggerService.TRIGGER_GROUP_NAME);
         // logger.info("trigger list: "+triggerNames.length);
         // logger.info("trigger names: "+triggerNames.toString());
@@ -80,7 +87,7 @@ public class ViewJobServlet extends SecureController {
 
         ArrayList triggerBeans = new ArrayList();
         for (String triggerName : triggerNames) {
-            Trigger trigger = scheduler.getTrigger(triggerName, xsltTriggerSrvc.getTriggerGroupNameForExportJobs());
+            Trigger trigger = scheduler.getTrigger(triggerName, getInstanceName());
             try {
                 logger.debug("prev fire time " + trigger.getPreviousFireTime().toString());
                 logger.debug("next fire time " + trigger.getNextFireTime().toString());

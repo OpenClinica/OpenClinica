@@ -1,25 +1,36 @@
 package org.akaza.openclinica.job;
 
-import org.springframework.scheduling.quartz.QuartzJobBean;
-import org.springframework.scheduling.quartz.JobDetailBean;
-import org.springframework.context.ApplicationContext;
-import org.quartz.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.akaza.openclinica.service.extract.ExtractUtils;
-import org.akaza.openclinica.service.extract.XsltTriggerService;
-import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
-import org.akaza.openclinica.bean.extract.DatasetBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.dao.extract.DatasetDAO;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.core.OpenClinicaMailSender;
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
 
 import javax.sql.DataSource;
-import java.io.File;
-import java.util.*;
-import java.text.SimpleDateFormat;
+
+import org.akaza.openclinica.bean.extract.DatasetBean;
+import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.core.OpenClinicaMailSender;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.extract.DatasetDAO;
+import org.akaza.openclinica.service.extract.ExtractUtils;
+import org.akaza.openclinica.service.extract.XsltTriggerService;
+import org.quartz.JobDataMap;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.SimpleTrigger;
+import org.quartz.Trigger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.scheduling.quartz.JobDetailBean;
+import org.springframework.scheduling.quartz.QuartzJobBean;
 
 /**
  * Converts all old jobs created under DEFAULT group, to make it use new XSLT transformation code
@@ -33,6 +44,7 @@ public class LegacyJobConverterJob extends QuartzJobBean {
     private DataSource dataSource = null;
     private OpenClinicaMailSender mailSender = null;
     private CoreResources coreResources = null;
+    private String instanceId;
 
     public static final String USER_ID = "user_id";
     public static final String DATASET_ID = "dsId";
@@ -41,6 +53,7 @@ public class LegacyJobConverterJob extends QuartzJobBean {
     public static final String JOB_DESC = "jobDesc";
     public static final String PERIOD = "periodToRun";
 
+    @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
         try {
             //Pulling all the trigger under the DEFAULT group
@@ -56,6 +69,7 @@ ExtractUtils extractUtils = new ExtractUtils();
             mailSender = (OpenClinicaMailSender) getApplicationContext(context).getBean("openClinicaMailSender");
             dataSource = (DataSource) getApplicationContext(context).getBean("dataSource");
             coreResources = (CoreResources) getApplicationContext(context).getBean("coreResources");
+            instanceId = (String) getApplicationContext(context).getBean("openClinicaInstanceId");
 
             for (String triggerName : legacyTriggers) {
                 Trigger trigger = scheduler.getTrigger(triggerName, triggerGroup);
@@ -125,7 +139,7 @@ ExtractUtils extractUtils = new ExtractUtils();
                             endFilePath + File.separator,
                             exportFileName,
                             dsBean.getId(),
-                            epBean, userBean, Locale.US.getLanguage() , cnt,  getFilePath(context) + "xslt", xsltService.getTriggerGroupNameForExportJobs());
+                            epBean, userBean, Locale.US.getLanguage() , cnt,  getFilePath(context) + "xslt", instanceId);
                     //Updating the original trigger with user given inputs
                     newTrigger.setRepeatCount(64000);
                     newTrigger.setRepeatInterval(XsltTriggerService.getIntervalTime(period));
