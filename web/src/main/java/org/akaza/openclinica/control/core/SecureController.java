@@ -8,31 +8,41 @@
 
 package org.akaza.openclinica.control.core;
 
+import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.*;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
-import org.akaza.openclinica.dao.managestudy.*;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
+import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
-import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.submit.ItemDAO;
+import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.BreadcrumbTrail;
@@ -148,7 +158,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
      */
     protected SimpleDateFormat local_df = new SimpleDateFormat("MM/dd/yyyy");
     public static ResourceBundle resadmin, resaudit, resexception, resformat, respage, resterm, restext, resword, resworkflow;
-
+    protected static Locale format_locale;
+    
     protected StudyInfoPanel panel = new StudyInfoPanel();
 
     public static final String PAGE_MESSAGE = "pageMessages";// for showing
@@ -381,6 +392,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         resword = ResourceBundleProvider.getWordsBundle(locale);
         respage = ResourceBundleProvider.getPageMessagesBundle(locale);
         resworkflow = ResourceBundleProvider.getWorkflowBundle(locale);
+        format_locale = new Locale(resformat.getString("locale_string"));
 
         local_df = new SimpleDateFormat(resformat.getString("date_format_string"));
 

@@ -450,6 +450,9 @@ public class Validator {
     public static final int IS_VALID_WIDTH_DECIMAL = 35;
     public static final int BARCODE_EAN_13 = 36;
     public static final int TO_HIDE_CONDITIONAL_DISPLAY = 37;
+    /**
+     * Validate date format according to locale_string in format.properties
+     */
     public static final int IS_A_LOCALE_DATE = 39;
     
     public static final int NO_SEMI_COLONS_OR_COLONS = 43;
@@ -1132,7 +1135,7 @@ public class Validator {
             break;
         case IS_A_LOCALE_DATE:
             String fieldvalue = getFieldValue(fieldName);
-            if (StringUtil.isBlank(fieldvalue) || !StringUtil.isDateFormatString(fieldvalue, resformat.getString("date_format_string"), locale)) {
+            if (StringUtil.isBlank(fieldvalue) || !StringUtil.isDateFormatString(fieldvalue, resformat.getString("date_format_string"), new Locale(resformat.getString("locale_string")))) {
                 addError(fieldName, v);
             }
             break;

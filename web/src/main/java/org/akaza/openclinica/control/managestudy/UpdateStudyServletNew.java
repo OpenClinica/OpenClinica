@@ -8,8 +8,8 @@
 package org.akaza.openclinica.control.managestudy;
 
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
-import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.InterventionBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -17,7 +17,6 @@ import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
-import org.akaza.openclinica.control.form.Validation;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyConfigService;
@@ -25,7 +24,7 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
-import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -98,7 +97,7 @@ public class UpdateStudyServletNew extends SecureController {
 
         ArrayList interventionArray = new ArrayList();
         if (isInterventional) {
-            interventionArray = parseInterventions((study));
+            interventionArray = parseInterventions(study);
             setMaps(isInterventional, interventionArray);
         } else {
             setMaps(isInterventional, interventionArray);
@@ -108,13 +107,16 @@ public class UpdateStudyServletNew extends SecureController {
 
             // First Load First Form
             if (study.getDatePlannedStart() != null) {
-                fp.addPresetValue(INPUT_START_DATE, local_df.format(study.getDatePlannedStart()));
+                fp.addPresetValue(INPUT_START_DATE, 
+                        new SimpleDateFormat(resformat.getString("date_format_string"),format_locale).format(study.getDatePlannedStart()));
             }
             if (study.getDatePlannedEnd() != null) {
-                fp.addPresetValue(INPUT_END_DATE, local_df.format(study.getDatePlannedEnd()));
+                fp.addPresetValue(INPUT_END_DATE, 
+                        new SimpleDateFormat(resformat.getString("date_format_string"),format_locale).format(study.getDatePlannedEnd()));
             }
             if (study.getProtocolDateVerification() != null) {
-                fp.addPresetValue(INPUT_VER_DATE, local_df.format(study.getProtocolDateVerification()));
+                fp.addPresetValue(INPUT_VER_DATE, 
+                        new SimpleDateFormat(resformat.getString("date_format_string"),format_locale).format(study.getProtocolDateVerification()));
             }
             setPresetValues(fp.getPresetValues());
             // first load 2nd form
@@ -190,16 +192,17 @@ public class UpdateStudyServletNew extends SecureController {
 
     private void validateStudy2(FormProcessor fp, Validator v) {
 
-        v.addValidation(INPUT_START_DATE, Validator.IS_A_DATE);
+        v.addValidation(INPUT_START_DATE, Validator.IS_A_LOCALE_DATE);
         if (!StringUtil.isBlank(fp.getString(INPUT_END_DATE))) {
-            v.addValidation(INPUT_END_DATE, Validator.IS_A_DATE);
+            v.addValidation(INPUT_END_DATE, Validator.IS_A_LOCALE_DATE);
         }
         if (!StringUtil.isBlank(fp.getString(INPUT_VER_DATE))) {
-            v.addValidation(INPUT_VER_DATE, Validator.IS_A_DATE);
+            v.addValidation(INPUT_VER_DATE, Validator.IS_A_LOCALE_DATE);
         }
 
         errors = v.validate();
         logger.info("has validation errors");
+        /*
         try {
             local_df.parse(fp.getString(INPUT_START_DATE));
             fp.addPresetValue(INPUT_START_DATE, local_df.format(fp.getDate(INPUT_START_DATE)));
@@ -216,6 +219,16 @@ public class UpdateStudyServletNew extends SecureController {
             local_df.parse(fp.getString(INPUT_END_DATE));
             fp.addPresetValue(INPUT_END_DATE, local_df.format(fp.getDate(INPUT_END_DATE)));
         } catch (ParseException pe) {
+            fp.addPresetValue(INPUT_END_DATE, fp.getString(INPUT_END_DATE));
+        }
+        */
+        if (!StringUtil.isBlank(fp.getString(INPUT_START_DATE))) {
+            fp.addPresetValue(INPUT_START_DATE, fp.getString(INPUT_START_DATE));
+        }
+        if (!StringUtil.isBlank(fp.getString(INPUT_VER_DATE))) {
+            fp.addPresetValue(INPUT_VER_DATE, fp.getString(INPUT_VER_DATE));
+        }
+        if (!StringUtil.isBlank(fp.getString(INPUT_END_DATE))) {
             fp.addPresetValue(INPUT_END_DATE, fp.getString(INPUT_END_DATE));
         }
         updateStudy2(fp);
@@ -376,15 +389,15 @@ public class UpdateStudyServletNew extends SecureController {
         if (StringUtil.isBlank(fp.getString(INPUT_VER_DATE))) {
             study.setProtocolDateVerification(null);
         } else {
-            study.setProtocolDateVerification(fp.getDate(INPUT_VER_DATE));
+            study.setProtocolDateVerification(fp.getDate(INPUT_VER_DATE,format_locale));
         }
 
-        study.setDatePlannedStart(fp.getDate(INPUT_START_DATE));
+        study.setDatePlannedStart(fp.getDate(INPUT_START_DATE,format_locale));
 
         if (StringUtil.isBlank(fp.getString(INPUT_END_DATE))) {
             study.setDatePlannedEnd(null);
         } else {
-            study.setDatePlannedEnd(fp.getDate(INPUT_END_DATE));
+            study.setDatePlannedEnd(fp.getDate(INPUT_END_DATE,format_locale));
         }
 
         study.setPhase(fp.getString("phase"));
@@ -522,7 +535,7 @@ public class UpdateStudyServletNew extends SecureController {
         // interviewDateEditable parameters for all sites>>
         List<StudyBean> sites = new ArrayList<StudyBean>();
         sites = (ArrayList) sdao.findAllByParent(newStudy.getId());
-        if (sites != null && (!sites.isEmpty())) {
+        if (sites != null && !sites.isEmpty()) {
             updateInterviewerForSites(newStudy, sites, spvdao, "interviewerNameEditable");
         }
         // >>
@@ -539,7 +552,7 @@ public class UpdateStudyServletNew extends SecureController {
         spv.setValue(study1.getStudyParameterConfig().getInterviewDateEditable());
         updateParameter(spvdao, spv);
         // BWP 1/12/2009 3169>>
-        if (sites != null && (!sites.isEmpty())) {
+        if (sites != null && !sites.isEmpty()) {
             updateInterviewerForSites(newStudy, sites, spvdao, "interviewDateEditable");
         }
         // >>

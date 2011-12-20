@@ -128,7 +128,8 @@ public class UpdateSubjectServlet extends SecureController {
                 Date birthDate = sub.getDateOfBirth();
                 try {
                     //String localBirthDate = local_df.format(birthDate);
-                    String localBirthDate = new SimpleDateFormat(resformat.getString("date_format_string"),request.getLocale()).format(birthDate);
+                    //String localBirthDate = new SimpleDateFormat(resformat.getString("date_format_string"),request.getLocale()).format(birthDate);
+                    String localBirthDate = new SimpleDateFormat(resformat.getString("date_format_string"),format_locale).format(birthDate);
                     session.setAttribute("localBirthDate", localBirthDate);
                 } catch (NullPointerException e) {
                     // TODO Auto-generated catch block
@@ -332,18 +333,19 @@ public class UpdateSubjectServlet extends SecureController {
                 request.setAttribute(YEAR_DOB, fp.getString(YEAR_DOB));
             } else if (!StringUtil.isBlank(fp.getString(DATE_DOB))) {
                 // DOB is null orginally, and user entered a new DOB
-                v.addValidation(DATE_DOB, Validator.IS_A_DATE);
+                //v.addValidation(DATE_DOB, Validator.IS_A_DATE);
+                v.addValidation(DATE_DOB, Validator.IS_A_LOCALE_DATE);
                 v.alwaysExecuteLastValidation(DATE_DOB);
                 request.setAttribute(DATE_DOB, fp.getString(DATE_DOB));
                 newDobInput = true;
-                sub.setDateOfBirth(fp.getDate(DATE_DOB));
+                sub.setDateOfBirth(fp.getDate(DATE_DOB, format_locale));
 
             } else {
                 sub.setDateOfBirth(null);
 
             }
         } else {
-            sub.setDateOfBirth(fp.getDate(DATE_DOB));
+            sub.setDateOfBirth(fp.getDate(DATE_DOB, format_locale));
         }
 
         if (!StringUtil.isBlank(fp.getString("gender"))) {
