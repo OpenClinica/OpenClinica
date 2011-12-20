@@ -4,6 +4,8 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+<c:set var="localeStr"><fmt:message key="locale_string" bundle="${resformat}"/></c:set>
+<fmt:setLocale value="${localeStr}"/>
 
 <html>
 <head>
