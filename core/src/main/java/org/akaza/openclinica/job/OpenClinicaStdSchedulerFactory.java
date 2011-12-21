@@ -20,7 +20,7 @@ public class OpenClinicaStdSchedulerFactory extends StdSchedulerFactory {
         String threadCount = props.getProperty("org.quartz.threadPool.threadCount");
         if (threadCount.trim().equals("0")) {
             // Replaces the thread pool class used
-            props.put("org.quartz.threadPool.class", "org.quartz.simpl.ZeroSizeThreadPool");
+            props.put("org.quartz.threadPool.class", "org.akaza.openclinica.job.EmptyThreadPool");
             // Removes "org.quartz.threadPool.*" properties not applicable for this class
             props.remove("org.quartz.threadPool.threadCount");
             props.remove("org.quartz.threadPool.threadPriority");
