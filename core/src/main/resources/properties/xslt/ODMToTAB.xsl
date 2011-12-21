@@ -145,7 +145,7 @@
 		<xsl:value-of select="$delimiter" />
 		<xsl:value-of select="$subject_count" />
 		<xsl:text>&#xa;</xsl:text>
-		<xsl:text>Study Events Definitions</xsl:text>
+		<xsl:text>Study Event Definitions</xsl:text>
 		<xsl:value-of select="$delimiter" />
 		<xsl:value-of select="$eventDefCount" />
 		<xsl:text>&#xa;</xsl:text>
