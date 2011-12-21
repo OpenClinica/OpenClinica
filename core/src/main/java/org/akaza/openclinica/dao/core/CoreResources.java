@@ -1,15 +1,5 @@
 package org.akaza.openclinica.dao.core;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Properties;
-
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.service.PdfProcessingFunction;
 import org.akaza.openclinica.bean.service.SasProcessingFunction;
@@ -21,6 +11,17 @@ import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Properties;
 
 public class CoreResources implements ResourceLoaderAware {
 
@@ -66,7 +67,7 @@ public class CoreResources implements ResourceLoaderAware {
         webapp = getWebAppName(resourceLoader.getResource("/").getURI().getPath());
 
     }
-
+    
     public void reportUrl() {
         String contHome = System.getProperty("catalina.home");
         logMe("--> System getProperty catalina.home: " + contHome);
@@ -110,8 +111,8 @@ public class CoreResources implements ResourceLoaderAware {
             //JN: this is in for junits to run without extract props
             copyImportRulesFiles();
             }
-
-
+          
+           
             // tbh, following line to be removed
             // reportUrl();
 
@@ -170,17 +171,17 @@ public class CoreResources implements ResourceLoaderAware {
             catalina = System.getProperty("CATALINA_HOME");
             logMe("-set catalina " + catalina);
         }
-
+        
         if (catalina == null) {
             catalina = System.getProperty("catalina.home");
             logMe("---set catalina " + catalina);
         }
-
+        
         if (catalina == null) {
             catalina = System.getenv("CATALINA_HOME");
             logMe("--set catalina " + catalina);
         }
-
+        
         if (catalina == null) {
             catalina = System.getenv("catalina.home");
             logMe("----set catalina " + catalina);
@@ -196,7 +197,7 @@ public class CoreResources implements ResourceLoaderAware {
         //            logMe("%s=%s%n"+ envName+ env.get(envName));
         //        }
 
-
+        
         if (value.contains("${catalina.home}") &&  catalina != null) {
             value = value.replace("${catalina.home}", catalina);
             logMe("replaced ${catalina.home} with " + catalina);
@@ -225,7 +226,7 @@ public class CoreResources implements ResourceLoaderAware {
 
     private Properties setDataInfoProperties() {
         String filePath = DATAINFO.getProperty("filePath");
-        if (filePath == null || filePath.isEmpty())
+        if (filePath == null || filePath.isEmpty()) 
             filePath = "$catalina.home/$WEBAPP.lower.data";
         String database = DATAINFO.getProperty("dbType");
 
@@ -234,7 +235,7 @@ public class CoreResources implements ResourceLoaderAware {
         logMe("DataInfo..." + DATAINFO);
         logMe("filePath = " + filePath);
         setDataInfoVals();
-        if(DATAINFO.getProperty("filePath")==null || DATAINFO.getProperty("filePath").length()<=0)
+        if(DATAINFO.getProperty("filePath")==null || DATAINFO.getProperty("filePath").length()<=0) 
             DATAINFO.setProperty("filePath", filePath);
 
         DATAINFO.setProperty("changeLogFile", "src/main/resources/migration/master.xml");
@@ -449,8 +450,8 @@ public class CoreResources implements ResourceLoaderAware {
             if (listSrcFiles[i] != null)
                 copyFiles(listSrcFiles[i], dest1);
         }
-
-
+        
+        
     }
 
     private void copyFiles(ByteArrayInputStream fis, File dest) {
@@ -680,8 +681,8 @@ public class CoreResources implements ResourceLoaderAware {
             ret.add(epbean);
             i++;
         }
-
-        // tbh change to print out properties
+        
+        // tbh change to print out properties 
 
         // System.out.println("found " + ret.size() + " records in extract.properties");
         return ret;
@@ -725,18 +726,17 @@ public class CoreResources implements ResourceLoaderAware {
     /**
      * @deprecated Use {@link #getFile(String,String)} instead
      */
-    @Deprecated
     public File getFile(String fileName) {
         return getFile(fileName, "filePath");
     }
 
     public File getFile(String fileName, String relDirectory) {
         try {
-
+           
             InputStream inputStream = getInputStream(fileName);
-
+            
             File f = new File(getField("filePath")+relDirectory+fileName);
-
+            
      /*       OutputStream outputStream = new FileOutputStream(f);
             byte buf[] = new byte[1024];
             int len;
@@ -848,7 +848,7 @@ public class CoreResources implements ResourceLoaderAware {
     // there.
 
     /**
-     *
+     * 
      */
     public ExtractPropertyBean findExtractPropertyBeanById(int id, String datasetId) {
         boolean notDone = true;
@@ -891,10 +891,6 @@ public class CoreResources implements ResourceLoaderAware {
             webAppName = tokens[(tokens.length - 1)].trim();
         }
         return webAppName;
-    }
-
-    public static String getWebapp() {
-        return webapp;
     }
 
     // TODO comment out system out after dev

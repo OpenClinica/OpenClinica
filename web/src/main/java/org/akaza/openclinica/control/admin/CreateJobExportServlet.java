@@ -1,18 +1,10 @@
 package org.akaza.openclinica.control.admin;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-
-import javax.servlet.http.HttpServletRequest;
-
+import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -26,16 +18,23 @@ import org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
+import org.akaza.openclinica.web.job.ExampleSpringJob;
 import org.akaza.openclinica.web.job.TriggerService;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
 import org.quartz.impl.StdScheduler;
 import org.springframework.scheduling.quartz.JobDetailBean;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.math.BigInteger;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
 /**
- *
+ * 
  * @author thickerson
- *
+ * 
  */
 public class CreateJobExportServlet extends SecureController {
     public static final String PERIOD = "periodToRun";
@@ -52,8 +51,6 @@ public class CreateJobExportServlet extends SecureController {
     // faking out DRY - should we create a super class, Job Servlet, which
     // captures the scheduler?
     private StdScheduler scheduler;
-
-    private String instanceName;
 
     // private SimpleTrigger trigger;
     // private JobDataMap jobDataMap;
@@ -81,14 +78,6 @@ public class CreateJobExportServlet extends SecureController {
         scheduler = this.scheduler != null ? scheduler : (StdScheduler) SpringServletAccess.getApplicationContext(context).getBean(SCHEDULER);
         return scheduler;
     }
-
-    protected String getInstanceName() {
-        if (instanceName == null) {
-            instanceName = (String) SpringServletAccess.getApplicationContext(context).getBean("openClinicaInstanceId");
-        }
-        return instanceName;
-    }
-
 
     private void setUpServlet() {
 
@@ -232,14 +221,14 @@ public class CreateJobExportServlet extends SecureController {
                         endFilePath + File.separator,
                         exportFileName,
                         dsBean.getId(),
-                        epBean, userBean, request.getLocale().getLanguage(),cnt,  SQLInitServlet.getField("filePath") + "xslt", getInstanceName());
+                        epBean, userBean, request.getLocale().getLanguage(),cnt,  SQLInitServlet.getField("filePath") + "xslt", xsltService.getTriggerGroupNameForExportJobs());
 
                 //Updating the original trigger with user given inputs
                 trigger.setRepeatCount(64000);
                 trigger.setRepeatInterval(XsltTriggerService.getIntervalTime(period));
                 trigger.setDescription(jobDesc);
                 // set just the start date
-
+                
                 trigger.setStartTime(startDateTime);
                 trigger.setName(jobName);// + datasetId);
                 trigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT);
@@ -251,7 +240,7 @@ public class CreateJobExportServlet extends SecureController {
 				trigger.getJobDataMap().put("job_type", "exportJob");
 
                 JobDetailBean jobDetailBean = new JobDetailBean();
-                jobDetailBean.setGroup(getInstanceName());
+                jobDetailBean.setGroup(xsltService.getTriggerGroupNameForExportJobs());
                 jobDetailBean.setName(trigger.getName());
                 jobDetailBean.setJobClass(org.akaza.openclinica.job.XsltStatefulJob.class);
                 jobDetailBean.setJobDataMap(trigger.getJobDataMap());
