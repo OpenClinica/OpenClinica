@@ -32,8 +32,11 @@ import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
-import java.text.ParseException;
-import java.util.*;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * @author jxu Processes request to update a study subject
@@ -130,7 +133,9 @@ public class UpdateStudySubjectServlet extends SecureController {
 
                 session.setAttribute("studySub", sub);
                 // below added tbh 092007
-                String enrollDateStr = local_df.format(sub.getEnrollmentDate());
+                //String enrollDateStr = local_df.format(sub.getEnrollmentDate());
+                String enrollDateStr = 
+                    new SimpleDateFormat(resformat.getString("date_format_string"),SecureController.getFormat_locale()).format(sub.getEnrollmentDate());
                 session.setAttribute("enrollDateStr", enrollDateStr);
                 // above added tbh 092007
                 discNotes = new FormDiscrepancyNotes();
@@ -213,14 +218,14 @@ public class UpdateStudySubjectServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         java.util.Date enrollDate = sub.getEnrollmentDate();
 
-        if (ub.isSysAdmin() || currentRole.isManageStudy() || currentRole.isInvestigator() || (currentStudy.getParentStudyId() > 0 && currentRole.isResearchAssistant())){
+        if (ub.isSysAdmin() || currentRole.isManageStudy() || currentRole.isInvestigator() || currentStudy.getParentStudyId() > 0 && currentRole.isResearchAssistant()){
             //currentRole.getRoleName().equals(Role.STUDYDIRECTOR) || currentRole.getRoleName().equals(Role.COORDINATOR)) {
 
             v.addValidation("label", Validator.NO_BLANKS);
 
             String eDateString = fp.getString("enrollmentDate");
             if (!StringUtil.isBlank(eDateString)) {
-                v.addValidation("enrollmentDate", Validator.IS_A_DATE);
+                v.addValidation("enrollmentDate", Validator.IS_A_LOCALE_DATE);
                 v.alwaysExecuteLastValidation("enrollmentDate");
             }
 
@@ -244,6 +249,7 @@ public class UpdateStudySubjectServlet extends SecureController {
             sub.setLabel(fp.getString("label"));
             sub.setSecondaryLabel(fp.getString("secondaryLabel"));
 
+            /*
             try {
                 local_df.setLenient(false);
                 if (!StringUtil.isBlank(eDateString)) {
@@ -252,6 +258,8 @@ public class UpdateStudySubjectServlet extends SecureController {
             } catch (ParseException fe) {
 
             }
+            */
+            enrollDate = new SimpleDateFormat(resformat.getString("date_format_string"),SecureController.getFormat_locale()).parse(eDateString);
             sub.setEnrollmentDate(enrollDate);
 
         }
