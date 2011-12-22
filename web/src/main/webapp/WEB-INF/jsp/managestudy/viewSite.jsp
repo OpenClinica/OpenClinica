@@ -10,8 +10,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
-<c:set var="localeStr"><fmt:message key="locale_string" bundle="${resformat}"/></c:set>
-<fmt:setLocale value="${localeStr}"/>
+<fmt:setLocale value="${localeString}"/>
 
 
 <jsp:useBean scope='request' id='siteToView' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>

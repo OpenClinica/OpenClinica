@@ -5,6 +5,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
+<fmt:setLocale value="${localeString}"/>
 
 <jsp:include page="../include/admin-header.jsp"/>
 

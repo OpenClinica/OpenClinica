@@ -7,8 +7,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
-<c:set var="localeStr"><fmt:message key="locale_string" bundle="${resformat}"/></c:set>
-<fmt:setLocale value="${localeStr}"/>
+<fmt:setLocale value="${localeString}"/>
 
 <c:choose>
 	<c:when test="${userRole.role.id > 3}">
