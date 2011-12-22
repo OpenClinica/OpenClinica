@@ -29,7 +29,7 @@ import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
-import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -80,13 +80,16 @@ public class UpdateSubStudyServlet extends SecureController {
             FormProcessor fp = new FormProcessor(request);
             logger.info("start date:" + study.getDatePlannedEnd());
             if (study.getDatePlannedEnd() != null) {
-                fp.addPresetValue(INPUT_END_DATE, local_df.format(study.getDatePlannedEnd()));
+                fp.addPresetValue(INPUT_END_DATE, 
+                        new SimpleDateFormat(resformat.getString("date_format_string"),SecureController.getFormat_locale()).format(study.getDatePlannedEnd()));
             }
             if (study.getDatePlannedStart() != null) {
-                fp.addPresetValue(INPUT_START_DATE, local_df.format(study.getDatePlannedStart()));
+                fp.addPresetValue(INPUT_START_DATE, 
+                        new SimpleDateFormat(resformat.getString("date_format_string"),SecureController.getFormat_locale()).format(study.getDatePlannedStart()));
             }
             if (study.getProtocolDateVerification() != null) {
-                fp.addPresetValue(INPUT_VER_DATE, local_df.format(study.getProtocolDateVerification()));
+                fp.addPresetValue(INPUT_VER_DATE, 
+                        new SimpleDateFormat(resformat.getString("date_format_string"),SecureController.getFormat_locale()).format(study.getProtocolDateVerification()));
             }
 
             setPresetValues(fp.getPresetValues());
@@ -119,13 +122,13 @@ public class UpdateSubStudyServlet extends SecureController {
         // << tbh, #3943, 07/2009
         v.addValidation("prinInvestigator", Validator.NO_BLANKS);
         if (!StringUtil.isBlank(fp.getString(INPUT_START_DATE))) {
-            v.addValidation(INPUT_START_DATE, Validator.IS_A_DATE);
+            v.addValidation(INPUT_START_DATE, Validator.IS_A_LOCALE_DATE);
         }
         if (!StringUtil.isBlank(fp.getString(INPUT_END_DATE))) {
-            v.addValidation(INPUT_END_DATE, Validator.IS_A_DATE);
+            v.addValidation(INPUT_END_DATE, Validator.IS_A_LOCALE_DATE);
         }
         if (!StringUtil.isBlank(fp.getString(INPUT_VER_DATE))) {
-            v.addValidation(INPUT_VER_DATE, Validator.IS_A_DATE);
+            v.addValidation(INPUT_VER_DATE, Validator.IS_A_LOCALE_DATE);
         }
         if (!StringUtil.isBlank(fp.getString("facConEmail"))) {
             v.addValidation("facConEmail", Validator.IS_A_EMAIL);
@@ -191,6 +194,10 @@ public class UpdateSubStudyServlet extends SecureController {
             submitStudy();
         } else {
             logger.info("has validation errors");
+            fp.addPresetValue(INPUT_START_DATE, fp.getString(INPUT_START_DATE));
+            fp.addPresetValue(INPUT_VER_DATE, fp.getString(INPUT_VER_DATE));
+            fp.addPresetValue(INPUT_END_DATE, fp.getString(INPUT_END_DATE));
+            /*
             try {
                 local_df.parse(fp.getString(INPUT_START_DATE));
                 fp.addPresetValue(INPUT_START_DATE, local_df.format(fp.getDate(INPUT_START_DATE)));
@@ -211,6 +218,7 @@ public class UpdateSubStudyServlet extends SecureController {
             } catch (ParseException pe) {
                 fp.addPresetValue(INPUT_END_DATE, fp.getString(INPUT_END_DATE));
             }
+            */
             setPresetValues(fp.getPresetValues());
             request.setAttribute("formMessages", errors);
             request.setAttribute("facRecruitStatusMap", CreateStudyServlet.facRecruitStatusMap);
@@ -239,32 +247,11 @@ public class UpdateSubStudyServlet extends SecureController {
         java.util.Date startDate = null;
         java.util.Date endDate = null;
         java.util.Date protocolDate = null;
-        try {
-            local_df.setLenient(false);
-            startDate = local_df.parse(fp.getString("startDate"));
-
-        } catch (ParseException fe) {
-            startDate = study.getDatePlannedStart();
-            logger.info(fe.getMessage());
-        }
+        startDate = fp.getDate("startDate", SecureController.getFormat_locale());
         study.setDatePlannedStart(startDate);
-
-        try {
-            local_df.setLenient(false);
-            endDate = local_df.parse(fp.getString("endDate"));
-
-        } catch (ParseException fe) {
-            endDate = study.getDatePlannedEnd();
-        }
+        endDate = fp.getDate("endDate", SecureController.getFormat_locale());
         study.setDatePlannedEnd(endDate);
-
-        try {
-            local_df.setLenient(false);
-            protocolDate = local_df.parse(fp.getString(INPUT_VER_DATE));
-
-        } catch (ParseException fe) {
-            protocolDate = study.getProtocolDateVerification();
-        }
+        protocolDate = fp.getDate(INPUT_VER_DATE, SecureController.getFormat_locale());
         study.setProtocolDateVerification(protocolDate);
         study.setFacilityCity(fp.getString("facCity"));
         study.setFacilityContactDegree(fp.getString("facConDrgree"));

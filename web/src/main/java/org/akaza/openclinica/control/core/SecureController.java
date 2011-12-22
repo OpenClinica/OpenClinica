@@ -158,10 +158,11 @@ public abstract class SecureController extends HttpServlet implements SingleThre
      */
     protected SimpleDateFormat local_df = new SimpleDateFormat("MM/dd/yyyy");
     public static ResourceBundle resadmin, resaudit, resexception, resformat, respage, resterm, restext, resword, resworkflow;
-    protected static Locale format_locale;
+    private static Locale format_locale;
     
     protected StudyInfoPanel panel = new StudyInfoPanel();
 
+    public static final String FORMAT_LOCALE_STRING = "localeString";
     public static final String PAGE_MESSAGE = "pageMessages";// for showing
     // page
     // wide message
@@ -392,7 +393,9 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         resword = ResourceBundleProvider.getWordsBundle(locale);
         respage = ResourceBundleProvider.getPageMessagesBundle(locale);
         resworkflow = ResourceBundleProvider.getWorkflowBundle(locale);
-        format_locale = new Locale(resformat.getString("locale_string"));
+        String locStr = resformat.getString("locale_string");
+        format_locale = new Locale(locStr);
+        session.setAttribute(FORMAT_LOCALE_STRING, locStr);
 
         local_df = new SimpleDateFormat(resformat.getString("date_format_string"));
 
@@ -1145,4 +1148,11 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         }
     }
 
+
+    public static Locale getFormat_locale() {
+        return format_locale;
+    }
+    public static void setFormat_locale(Locale formatLocale) {
+        format_locale = formatLocale;
+    }
 }

@@ -108,15 +108,15 @@ public class UpdateStudyServletNew extends SecureController {
             // First Load First Form
             if (study.getDatePlannedStart() != null) {
                 fp.addPresetValue(INPUT_START_DATE, 
-                        new SimpleDateFormat(resformat.getString("date_format_string"),format_locale).format(study.getDatePlannedStart()));
+                        new SimpleDateFormat(resformat.getString("date_format_string"),SecureController.getFormat_locale()).format(study.getDatePlannedStart()));
             }
             if (study.getDatePlannedEnd() != null) {
                 fp.addPresetValue(INPUT_END_DATE, 
-                        new SimpleDateFormat(resformat.getString("date_format_string"),format_locale).format(study.getDatePlannedEnd()));
+                        new SimpleDateFormat(resformat.getString("date_format_string"),SecureController.getFormat_locale()).format(study.getDatePlannedEnd()));
             }
             if (study.getProtocolDateVerification() != null) {
                 fp.addPresetValue(INPUT_VER_DATE, 
-                        new SimpleDateFormat(resformat.getString("date_format_string"),format_locale).format(study.getProtocolDateVerification()));
+                        new SimpleDateFormat(resformat.getString("date_format_string"),SecureController.getFormat_locale()).format(study.getProtocolDateVerification()));
             }
             setPresetValues(fp.getPresetValues());
             // first load 2nd form
@@ -389,15 +389,15 @@ public class UpdateStudyServletNew extends SecureController {
         if (StringUtil.isBlank(fp.getString(INPUT_VER_DATE))) {
             study.setProtocolDateVerification(null);
         } else {
-            study.setProtocolDateVerification(fp.getDate(INPUT_VER_DATE,format_locale));
+            study.setProtocolDateVerification(fp.getDate(INPUT_VER_DATE,SecureController.getFormat_locale()));
         }
 
-        study.setDatePlannedStart(fp.getDate(INPUT_START_DATE,format_locale));
+        study.setDatePlannedStart(fp.getDate(INPUT_START_DATE,SecureController.getFormat_locale()));
 
         if (StringUtil.isBlank(fp.getString(INPUT_END_DATE))) {
             study.setDatePlannedEnd(null);
         } else {
-            study.setDatePlannedEnd(fp.getDate(INPUT_END_DATE,format_locale));
+            study.setDatePlannedEnd(fp.getDate(INPUT_END_DATE,SecureController.getFormat_locale()));
         }
 
         study.setPhase(fp.getString("phase"));

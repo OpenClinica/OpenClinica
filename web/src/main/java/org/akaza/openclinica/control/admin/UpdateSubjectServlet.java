@@ -129,7 +129,7 @@ public class UpdateSubjectServlet extends SecureController {
                 try {
                     //String localBirthDate = local_df.format(birthDate);
                     //String localBirthDate = new SimpleDateFormat(resformat.getString("date_format_string"),request.getLocale()).format(birthDate);
-                    String localBirthDate = new SimpleDateFormat(resformat.getString("date_format_string"),format_locale).format(birthDate);
+                    String localBirthDate = new SimpleDateFormat(resformat.getString("date_format_string"),SecureController.getFormat_locale()).format(birthDate);
                     session.setAttribute("localBirthDate", localBirthDate);
                 } catch (NullPointerException e) {
                     // TODO Auto-generated catch block
@@ -338,14 +338,14 @@ public class UpdateSubjectServlet extends SecureController {
                 v.alwaysExecuteLastValidation(DATE_DOB);
                 request.setAttribute(DATE_DOB, fp.getString(DATE_DOB));
                 newDobInput = true;
-                sub.setDateOfBirth(fp.getDate(DATE_DOB, format_locale));
+                sub.setDateOfBirth(fp.getDate(DATE_DOB, SecureController.getFormat_locale()));
 
             } else {
                 sub.setDateOfBirth(null);
 
             }
         } else {
-            sub.setDateOfBirth(fp.getDate(DATE_DOB, format_locale));
+            sub.setDateOfBirth(fp.getDate(DATE_DOB, SecureController.getFormat_locale()));
         }
 
         if (!StringUtil.isBlank(fp.getString("gender"))) {
