@@ -244,15 +244,10 @@ public class UpdateSubStudyServlet extends SecureController {
         study.setPrincipalInvestigator(fp.getString("prinInvestigator"));
         study.setExpectedTotalEnrollment(fp.getInt("expectedTotalEnrollment"));
 
-        java.util.Date startDate = null;
-        java.util.Date endDate = null;
-        java.util.Date protocolDate = null;
-        startDate = fp.getDate("startDate", SecureController.getFormat_locale());
-        study.setDatePlannedStart(startDate);
-        endDate = fp.getDate("endDate", SecureController.getFormat_locale());
-        study.setDatePlannedEnd(endDate);
-        protocolDate = fp.getDate(INPUT_VER_DATE, SecureController.getFormat_locale());
-        study.setProtocolDateVerification(protocolDate);
+        study.setDatePlannedStart(fp.getDate("startDate", SecureController.getFormat_locale()));
+        study.setDatePlannedEnd(fp.getDate("endDate", SecureController.getFormat_locale()));
+        study.setProtocolDateVerification(fp.getDate(INPUT_VER_DATE, SecureController.getFormat_locale()));
+
         study.setFacilityCity(fp.getString("facCity"));
         study.setFacilityContactDegree(fp.getString("facConDrgree"));
         study.setFacilityName(fp.getString("facName"));

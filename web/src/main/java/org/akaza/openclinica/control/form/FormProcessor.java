@@ -291,17 +291,23 @@ public class FormProcessor {
         return answer;
     }
     
-    public static Date getDateFromString(String date, Locale locale) {
-        Date answer;
+    /**
+     * Null will return if date string cannot be parsed.
+     * @param date
+     * @param locale
+     * @return
+     */
+    public Date getDateFromString(String date, Locale locale) {
+        Date answer = null;
         ResourceBundle resformat = ResourceBundleProvider.getFormatBundle();
         try {
             SimpleDateFormat f = new SimpleDateFormat(resformat.getString("date_format_string"), locale);
             f.setLenient(false);
             answer = f.parse(date);
         } catch (Exception e) {
-            answer = DEFAULT_DATE;
+            logger.info("date=\""+date+"\" cannot be parsed. "+answer+" has been returned.");
+            System.out.println("date=\""+date+"\" cannot be parsed. "+answer+" has been returned.");
         }
-
         return answer;
     }
 
@@ -316,13 +322,24 @@ public class FormProcessor {
         return getDate(fieldName, false);
     }
     
+    /**
+     * Null will be returned if String cannot be parsed to Date.
+     * @param fieldName
+     * @param searchAttributes
+     * @param locale
+     * @return
+     */
     public Date getDate(String fieldName, boolean searchAttributes, Locale locale) {
-        Date answer;
         String fieldValue = getString(fieldName, searchAttributes);
-
-        return FormProcessor.getDateFromString(fieldValue,locale);
+        return getDateFromString(fieldValue,locale);
     }
 
+    /**
+     * Null will be returned if String cannot be parsed to Date
+     * @param fieldName
+     * @param locale
+     * @return
+     */
     public Date getDate(String fieldName, Locale locale) {
         return getDate(fieldName, false, locale);
     }
