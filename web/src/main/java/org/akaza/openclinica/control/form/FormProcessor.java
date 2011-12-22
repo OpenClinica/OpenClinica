@@ -306,7 +306,6 @@ public class FormProcessor {
             answer = f.parse(date);
         } catch (Exception e) {
             logger.info("date=\""+date+"\" cannot be parsed. "+answer+" has been returned.");
-            System.out.println("date=\""+date+"\" cannot be parsed. "+answer+" has been returned.");
         }
         return answer;
     }
