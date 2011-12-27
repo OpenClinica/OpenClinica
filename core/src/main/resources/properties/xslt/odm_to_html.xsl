@@ -18,7 +18,11 @@
 	<xsl:variable name="itemDef" select="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:ItemDef"/>
 	<xsl:variable name="codeList" select="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:CodeList"/>
 	<xsl:variable name="allEventDefs" select="//odm:ODM/odm:Study[1]/odm:MetaDataVersion/odm:StudyEventDef"/>
-	<xsl:variable name="eventDefCount" select="count(/odm:ODM/odm:Study[1]/odm:MetaDataVersion/odm:StudyEventDef)"/>
+	<!-- fix for issue #12238 -->
+	<!--<xsl:variable name="eventDefCount" select="count(/odm:ODM/odm:Study[1]/odm:MetaDataVersion/odm:StudyEventDef)"/>-->
+	<xsl:variable name="eventDefCount"
+			select="count(//odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData[generate-id() = generate-id(key('studyEvents',@StudyEventOID)[1])])" />
+			
 	<xsl:variable name="allStudyEventDataElements" select="//odm:StudyEventData"/>
 	<xsl:variable name="allItemGrpDataDataElements" select="//odm:ItemGroupData"/>
 	<xsl:variable name="allFormRefElements" select="//odm:ODM/odm:Study/odm:MetaDataVersion/odm:StudyEventDef/odm:FormRef"/>
