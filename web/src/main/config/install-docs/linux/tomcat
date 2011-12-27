@@ -10,14 +10,15 @@
 # Change the variables below if they do not mee your environment.
 
 RETVAL=$?
-export CATALINA_HOME="/usr/local/tomcat"
+export INIT_NAME="tomcat"
+export CATALINA_HOME="/usr/local/apache-tomcat-6.0.35"
 export JAVA_HOME="/usr/local/java"
 export JAVA_OPTS="$JAVA_OPTS -Xmx1280m -XX:MaxPermSize=180m"
 
 case "$1" in
  start)
-        ps ax | grep "$CATALINA_HOME" | grep "$JAVA_HOME" |grep -v grep |  awk '{printf $1 " "}' | wc | awk '{print $2}' > /tmp/tomcat_process_count.txt
-        read line < /tmp/tomcat_process_count.txt
+        ps ax | grep "$CATALINA_HOME" | grep "$JAVA_HOME" |grep -v grep |  awk '{printf $1 " "}' | wc | awk '{print $2}' > /tmp/$INIT_NAME_process_count.txt
+        read line < /tmp/$INIT_NAME_process_count.txt
         if [ $line -gt 0 ]; then
                 echo "Tomcat is already running with a PID of `ps ax | grep "$CATALINA_HOME" | grep "$JAVA_HOME" |  awk '{printf $1 " "}'`"
         else
@@ -26,12 +27,12 @@ case "$1" in
                     echo $"Starting Tomcat"
                     /bin/su tomcat $CATALINA_HOME/bin/startup.sh
                 fi
-                /etc/init.d/tomcat status
+                /etc/init.d/$INIT_NAME status
         fi
         ;;
  stop)
-         ps ax | grep "$CATALINA_HOME" | grep "$JAVA_HOME" |grep -v grep |  awk '{printf $1 " "}' | wc | awk '{print $2}' > /tmp/tomcat_process_count.txt
-        read line < /tmp/tomcat_process_count.txt
+         ps ax | grep "$CATALINA_HOME" | grep "$JAVA_HOME" |grep -v grep |  awk '{printf $1 " "}' | wc | awk '{print $2}' > /tmp/$INIT_NAME_process_count.txt
+        read line < /tmp/$INIT_NAME_process_count.txt
         if [ $line -gt 0 ]; then
                 if [ -f $CATALINA_HOME/bin/shutdown.sh ];
                   then
@@ -39,7 +40,7 @@ case "$1" in
                     /bin/su tomcat $CATALINA_HOME/bin/shutdown.sh
                 fi
                 sleep 10
-                /etc/init.d/tomcat status
+                /etc/init.d/$INIT_NAME status
         else
                 echo
                 echo "Tomcat was not running"
@@ -48,13 +49,13 @@ case "$1" in
         ;;
 
  restart)
-        /etc/init.d/tomcat stop
-        /etc/init.d/tomcat start
+        /etc/init.d/$INIT_NAME stop
+        /etc/init.d/$INIT_NAME start
         ;;
 
  status) 
-         ps ax | grep "$CATALINA_HOME" | grep "$JAVA_HOME" |grep -v grep |  awk '{printf $1 " "}' | wc | awk '{print $2}' > /tmp/tomcat_process_count.txt
-        read line < /tmp/tomcat_process_count.txt
+         ps ax | grep "$CATALINA_HOME" | grep "$JAVA_HOME" |grep -v grep |  awk '{printf $1 " "}' | wc | awk '{print $2}' > /tmp/$INIT_NAME_process_count.txt
+        read line < /tmp/$INIT_NAME_process_count.txt
         if [ $line -gt 0 ]; then
             echo
             echo -n "Tomcat is running with a PID of "` 
@@ -69,23 +70,23 @@ case "$1" in
         ;;
  kill)
         PID=`ps aux | grep "$CATALINA_HOME" | grep "$JAVA_HOME" | awk '{printf $2 " "}'`
- 	echo
+        echo
         echo "Killing Tomcat process running on PID $PID"
-	echo
+        echo
         kill $PID
         sleep 10
         echo "Confirming tomcat is killed"
-        /etc/init.d/tomcat status
+        /etc/init.d/$INIT_NAME status
         ;;
  forcekill)
         PID=`ps ax | grep "$CATALINA_HOME" | grep "$JAVA_HOME" |awk '{printf $1 " "}'`
         echo
-	echo "Killing Tomcat process running on PID $PID"
-	echo
+        echo "Killing Tomcat process running on PID $PID"
+        echo
         kill -9 $PID
         sleep 10
         echo "Confirming tomcat is killed"
-        /etc/init.d/tomcat status
+        /etc/init.d/$INIT_NAME status
         ;;
  *)
         echo $"Usage: $0 {start|stop|restart|status|kill|forcekill}"
