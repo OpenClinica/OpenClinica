@@ -1,3 +1,5 @@
+﻿-- Tom Hickerson -- OpenClinica, LLC - 2011
+
 -- meant to remove duplicates, possibly triplcates or quadruplicates, and reassign their discrepancy notes.
 -- however, need to reconcile different values in database.
 -- also pass in event_crf_id?
@@ -19,8 +21,9 @@ CREATE OR REPLACE FUNCTION delete(remove integer, promote integer) returns integ
         END;
 $$ LANGUAGE plpgsql;
 
-create or replace function repair_item_data_1() returns integer as $$
-declare
+
+CREATE OR REPLACE FUNCTION repair_item_data_1() returns integer as $$
+DECLARE
 	item_data_record record;
 	min_dn_count integer;
 	max_dn_count integer;
@@ -42,7 +45,7 @@ declare
 	ret_count integer;
 	crf_version_name text;
 	sed_name text;
-begin
+BEGIN
 
 	ALTER TABLE dn_item_data_map DISABLE TRIGGER ALL;
 		ALTER TABLE audit_log_event DISABLE TRIGGER ALL;
@@ -53,6 +56,7 @@ begin
 		group by item_id, event_crf_id 
 		having count(item_id) > 1 and count(event_crf_id) > 1) AS overall;
 	-- usually, the above will be 2.  however, it may be higher
+	if max_overall is not null then
 	for i in 2..max_overall loop
 		for item_data_record in
 			(select max(item_data_id) as max_item_data_id,
@@ -141,12 +145,103 @@ begin
 	raise notice 'i is %', i;
 	raise notice 'max_overall is %', max_overall;
 	end loop;
+	-- if..then..else added for a cleaner response to when there are no duplicate rows found in the first place -- Tope Oluwole - 22-Dec-2011
+	else 
+		max_overall = 0;
+		raise notice 'Initial delete script claims no duplicate records are in the item_data table.';
+	end if;
 	ALTER TABLE dn_item_data_map ENABLE TRIGGER ALL;
 		ALTER TABLE audit_log_event ENABLE TRIGGER ALL;
 		ALTER TABLE item_data ENABLE TRIGGER ALL;
 	return ret_count;
-end;
+END;
 $$
 LANGUAGE plpgsql;
 
+
+-- Adds contraint to item_data table
+CREATE OR REPLACE FUNCTION apply_item_data_contraint() returns integer as $$
+BEGIN
+	ALTER TABLE item_data ADD CONSTRAINT duplicate_item_uniqueness_key UNIQUE (item_id, event_crf_id, ordinal);
+	return 1;
+END;
+$$
+LANGUAGE plpgsql;
+
+
+-- Tope Oluwole -- OpenClinica, LLC -- 23dec2011
+CREATE TYPE dup_data_record_type as (item_id integer, event_crf_id integer, ordinal integer, min_value varchar(4000), max_value varchar(4000), name varchar(255), item_data_id integer);
+
+-- Tope Oluwole -- OpenClinica, LLC -- 23dec2011
+-- Finds rogue item_data_id to be promoted and removed
+CREATE OR REPLACE FUNCTION check_4_dups_that_may_fail_contraint() returns setof dup_data_record_type AS $$
+DECLARE
+	dup_data_record dup_data_record_type;
+	dup_data_record_count integer;
+	contraint_ran_flag integer;
+BEGIN
+	raise notice 'Double checking there are no more duplicate rows in the item_data table.';
+	
+	contraint_ran_flag = 0;
+	dup_data_record_count = 0;
+
+	-- Double checks for duplicate rows
+	-- This initial duplicate row is only disregarded as part of the pre-check
+	select into dup_data_record itemsWithDups_PreCheck.*, item.name from item,
+		(
+		select item_id, event_crf_id, ordinal, min(value) as min_value, max(value) as max_value
+			from item_data
+			group by item_id, event_crf_id, ordinal
+			having count(item_id) > 1 or count(event_crf_id) > 1 or count(ordinal) > 1
+		) as itemsWithDups_PreCheck limit 1;
+		
+	-- If no duplicate rows are found after the double check, apply unique contraint
+	
+	if dup_data_record.item_id is null then 
+		BEGIN
+			contraint_ran_flag = apply_item_data_contraint();
+			if contraint_ran_flag = 1 then
+				raise notice 'There are no duplicate rows in the item_data table after the double check. The contraint has been applied.';
+			end if;
+			return;
+		EXCEPTION 
+			-- In the event a unique contraint on item_data data has already been applied. 
+			-- duplicate_table condition name is based on PostgreSQL Error Code 42P07 at http://www.postgresql.org/docs/8.0/static/errcodes-appendix.html
+			when duplicate_table then 
+			raise notice 'There are no duplicate rows in the item_data table. The constraint has already been applied.';
+		END;
+	else
+	-- If duplicate rows are found after the double check, produce a report of duplicates.
+		raise notice 'Duplicate records have been found after the double check. View data output for a report.';
+		raise notice '\t Item ID \t Event CRF ID \t Ordinal \t Min Value \t Max Value \t Item Name \t Item Data ID';
+		for dup_data_record in (select itemDataIds2Rpt.*, item_data_id from item_data,
+		(
+			-- Checks for Items with at least one duplicate row (that caused the unique contraint to fail).
+			select itemsWithDups.*, item.name from item,
+			(
+			select item_id, event_crf_id, ordinal, min(value) as min_value, max(value) as max_value
+				from item_data
+				group by item_id, event_crf_id, ordinal
+				having count(item_id) > 1 or count(event_crf_id) > 1 or count(ordinal) > 1
+			) as itemsWithDups
+			where itemsWithDups.item_id = item.item_id 
+			order by event_crf_id, item_id, ordinal
+	
+		) as itemDataIds2Rpt
+		where itemDataIds2Rpt.item_id = item_data.item_id and
+		itemDataIds2Rpt.event_crf_id = item_data.event_crf_id and
+		itemDataIds2Rpt.ordinal = item_data.ordinal
+		order by item_data_id) loop
+			raise notice '\t%\t%\t%\t%\t%\t%\t%', dup_data_record.item_id, dup_data_record.event_crf_id, dup_data_record.ordinal, dup_data_record.min_value, dup_data_record.max_value, dup_data_record.name, dup_data_record.item_data_id;
+			dup_data_record_count = dup_data_record_count + 1;
+			return next dup_data_record;
+		end loop;
+		raise notice 'Duplicate rows found: %', dup_data_record_count;
+	end if;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Initial delete script
 select repair_item_data_1();
+-- Checks if any duplicate records are remaining, and if so, provides report
+select * from check_4_dups_that_may_fail_contraint();
