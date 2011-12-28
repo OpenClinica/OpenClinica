@@ -19,9 +19,10 @@
       <directory>src/main/config</directory>
       <outputDirectory>config</outputDirectory>
       <includes>
-        <include>database/PostgreSQL/${pom.version}/*/*</include>
-        <include>database/Oracle/${pom.version}/*/*</include>
+        <include>database/PostgreSQL/3.1.2/*/*</include>
+        <include>database/Oracle/3.1.2/*/*</include>
         <include>languages/*</include>
+		<include>languages/*/*</include>
       </includes>
     </fileSet>
   </fileSets>
