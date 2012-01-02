@@ -29,7 +29,7 @@
   	<file>
   		<source>target/${pom.artifactId}-${pom.version}.war</source>
   		<outputDirectory>distribution</outputDirectory>
-  		<destName>${pom.artifactId}.war</destName>
+  		<destName>OpenClinica-ws.war</destName>
   	</file>
   </files>
 </assembly>
