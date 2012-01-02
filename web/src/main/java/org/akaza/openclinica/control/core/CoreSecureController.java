@@ -1,21 +1,5 @@
 package org.akaza.openclinica.control.core;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
-
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -30,6 +14,18 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.StringTokenizer;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -139,6 +135,7 @@ public abstract class CoreSecureController extends HttpServlet {
         request.setAttribute(PAGE_MESSAGE, pageMessages);
     }
 
+    @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
         try {
@@ -150,7 +147,9 @@ public abstract class CoreSecureController extends HttpServlet {
         }
     }
 
-    private DataSource getDataSource() {
+    // @pgawade: 02Jan2012: Changed the scope for getter to protected so it will
+    // be available in child classes
+    protected DataSource getDataSource() {
         return dataSource;
     }
 
