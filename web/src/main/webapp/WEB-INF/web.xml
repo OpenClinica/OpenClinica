@@ -2131,7 +2131,16 @@
         <servlet-name>ViewItemAuditLogServlet</servlet-name>
         <url-pattern>/ViewItemAuditLog</url-pattern>
     </servlet-mapping>
-
+    <servlet>
+	<servlet-name>urlRewriterServlet</servlet-name>
+        <servlet-class>org.akaza.openclinica.control.urlRewrite.UrlRewriteServlet		 
+		</servlet-class>        
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>urlRewriterServlet</servlet-name>
+        <url-pattern>/ClinicalData/*</url-pattern>
+    </servlet-mapping>
 
     <!-- 
     <security-constraint>
