@@ -31,7 +31,10 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head><title>OpenClinica <fmt:message key="view_data_entry" bundle="${resword}"/></title>
+<head>
+<base href="<%=
+org.akaza.openclinica.web.util.WebUtil.basePath(pageContext) %>" />
+<title>OpenClinica <fmt:message key="view_data_entry" bundle="${resword}"/></title>
     <meta http-equiv="X-UA-Compatible" content="IE=8" />
     
     <link rel="stylesheet" href="includes/styles.css" type="text/css" media="screen">
@@ -163,7 +166,10 @@ http://svn.akazaresearch.com:8080/OpenClinica-2.2/EnterDataForStudyEvent?eventId
         <input type="button" onclick="window.location = '<c:out value="${window_location}"/>'" value="<fmt:message key="exit" bundle="${resword}"/>" class="button"/>
     </c:when>
     <c:when test="${!empty exitTo}">
-        <input type="button" onclick="window.location = '<c:out value="${exitTo}"/>'" value="<fmt:message key="exit" bundle="${resword}"/>" class="button"/>
+    	<!--  do not display the exit button when exitTo request parameter is 'none' -->
+    	<c:if test="${exitTo != 'none'}">
+        	<input type="button" onclick="window.location = '<c:out value="${exitTo}"/>'" value="<fmt:message key="exit" bundle="${resword}"/>" class="button"/>
+        </c:if>	
     </c:when>
     <c:otherwise>
         <c:choose>
