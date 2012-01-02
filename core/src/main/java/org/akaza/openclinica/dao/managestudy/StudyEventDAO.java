@@ -1107,5 +1107,40 @@ public class StudyEventDAO extends AuditableEntityDAO {
             return 0;
         }
     }
+    
+    public HashMap getStudySubjectCRFData(StudyBean sb, int studySubjectId, int eventDefId, String crfVersionOID, int eventOrdinal) {
+        HashMap studySubjectCRFDataDetails = new HashMap();
+        this.setNewCRFTypesExpected();
+        HashMap variables = new HashMap();
+        variables.put(Integer.valueOf(1), Integer.valueOf(sb.getId()));
+        variables.put(Integer.valueOf(2), Integer.valueOf(eventOrdinal));
+        variables.put(Integer.valueOf(3), crfVersionOID);
+        variables.put(Integer.valueOf(4), Integer.valueOf(studySubjectId));
+        variables.put(Integer.valueOf(5), Integer.valueOf(eventDefId));
+        
+        ArrayList alist = this.select(digester.getQuery("getStudySubjectCRFDataDetails"), variables);
+        // TODO make sure this other statement for eliciting crfs works, tbh
+        // switched from getEventAndCRFVersionInformation
+        // to getEventsAndMultipleCRFVersionInformation
+        // crfs = this.getEventAndCRFVersionInformation(alist);
+        studySubjectCRFDataDetails = this.getStudySubjectCRFDataDetails(alist);
+        return studySubjectCRFDataDetails;
+    }
+
+    private HashMap getStudySubjectCRFDataDetails(ArrayList rows) {
+        HashMap returnMe = new HashMap();
+        Iterator it = rows.iterator();
+
+        while (it.hasNext()) {
+            HashMap answers = (HashMap) it.next();
+
+            returnMe.put("event_crf_id", answers.get("event_crf_id"));
+            returnMe.put("event_definition_crf_id", answers.get("event_definition_crf_id"));
+            returnMe.put("study_event_id", answers.get("study_event_id"));
+
+        }// end of cycling through answers
+
+        return returnMe;
+    }
 
 }
