@@ -264,4 +264,24 @@
             and (status_id != 5 and status_id != 7)
         </sql>
     </query>
+      <query>
+    	<name>getStudySubjectCRFDataDetails</name>
+    	<sql>
+    		select ecrf.event_crf_id, edcrf.event_definition_crf_id, se.study_event_id 
+			from study_event_definition sed, 
+			event_definition_crf edcrf, 
+			study_event se, event_crf ecrf, crf c, crf_version cv
+			where sed.study_id = ?
+			and c.crf_id = cv.crf_id
+			and edcrf.crf_id = c.crf_id
+			and ecrf.study_event_id = se.study_event_id
+			and ecrf.crf_version_id = cv.crf_version_id
+			and se.study_event_definition_id = sed.study_event_definition_id
+			and se.sample_ordinal = ?
+			and edcrf.study_event_definition_id = sed.study_event_definition_id
+			and cv.oc_oid = ?
+			and se.study_subject_id = ?
+			and sed.study_event_definition_id = ?
+    	</sql>
+    </query>
 </queries>
