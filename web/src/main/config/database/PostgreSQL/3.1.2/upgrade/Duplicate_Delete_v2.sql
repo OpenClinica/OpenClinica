@@ -225,13 +225,13 @@ BEGIN
 				having count(item_id) > 1 or count(event_crf_id) > 1 or count(ordinal) > 1
 			) as itemsWithDups
 			where itemsWithDups.item_id = item.item_id 
-			order by event_crf_id, item_id, ordinal
+			order by item_id, ordinal, event_crf_id
 	
 		) as itemDataIds2Rpt
 		where itemDataIds2Rpt.item_id = item_data.item_id and
 		itemDataIds2Rpt.event_crf_id = item_data.event_crf_id and
 		itemDataIds2Rpt.ordinal = item_data.ordinal
-		order by item_data_id) loop
+		) loop
 			raise notice '\t%\t%\t%\t%\t%\t%\t%', dup_data_record.item_id, dup_data_record.event_crf_id, dup_data_record.ordinal, dup_data_record.min_value, dup_data_record.max_value, dup_data_record.name, dup_data_record.item_data_id;
 			dup_data_record_count = dup_data_record_count + 1;
 			return next dup_data_record;
