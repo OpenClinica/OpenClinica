@@ -30,10 +30,11 @@
   <td><div class="formfieldXL_BG"><input type="text" name="email" value="<c:out value="${userBean1.email}"/>" class="formfieldXL"></div>
   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="email"/></jsp:include></td></tr>
   <tr valign="top"><td class="formlabel"><fmt:message key="password_challenge_question" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG">
-  <select name="passwdChallengeQuestion" class="formfieldXL">  
-   <c:forEach var="question" items="${challengeQuestions}"> 
-     <option value="<c:out value="${question.name}"/>"><c:out value="${question.name}"/></option>    
-   </c:forEach> 
+  <select name="passwdChallengeQuestion" class="formfieldXL">
+            <option><fmt:message key="favourite_pet" bundle="${resword}"/></option>
+            <option><fmt:message key="city_of_birth" bundle="${resword}"/></option>
+            <option><fmt:message key="mother_maiden_name" bundle="${resword}"/></option>
+            <option><fmt:message key="favorite_color" bundle="${resword}"/></option>
    </select></div></td></tr>
   <tr valign="top"><td class="formlabel"><fmt:message key="password_challenge_answer" bundle="${resword}"/>:</td>
   <td><div class="formfieldXL_BG"><input type="text" name="passwdChallengeAnswer" value="<c:out value="${userBean1.passwdChallengeAnswer}"/>" class="formfieldXL"></div>

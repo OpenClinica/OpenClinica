@@ -723,10 +723,9 @@ function isCheckedRadioOrCheckbox(inputObject){
 /* Only display the confirm dialogue box if the checkbox was checked
  when the user clicked it; then uncheck the checkbox if the user chooses "cancel"
  in the confirm dialogue. */
-function displayMessageFromCheckbox(checkboxObject){
+function displayMessageFromCheckbox(checkboxObject, message){
     if(checkboxObject != null && checkboxObject.checked){
-        var bool =  confirm(
-                "Marking this CRF complete will finalize data entry. You will be allowed to edit the data later but this data entry stage is completed. If Double Data Entry is required, you or another user may need to complete this CRF again before it is verified as complete. Are you sure you want to mark this CRF complete?");
+        var bool =  confirm(message);
         if(! bool) {
         	var checkboxObjects = document.getElementsByName(checkboxObject.name);
         	if(checkboxObjects[0]){
@@ -1523,43 +1522,43 @@ function handleResponse(){
 //}
 
 function requestSignatureFromCheckbox(password, checkbox){
-    checkboxObject = checkbox;
-    if (password==null || password==''){
-        alert('Your password did not match. Please try again.');
-        checkbox.checked=false;
-        return;
-    }
-    if(checkbox != null && checkbox.checked){
-        sendRequest("GET", "MatchPassword?password=" + password);
-    }
+	checkboxObject = checkbox;
+	if (password==null || password==''){
+		alert('Your password did not match. Please try again.');
+		checkbox.checked=false;
+		return;
+	}
+	if(checkbox != null && checkbox.checked){
+		sendRequest("GET", "MatchPassword?password=" + password);
+	}
 }
 
 function numberGroupRows(){
-    alert("test");
-    var allGroupDivs = $$("div.tableDiv");
-    var allTrTags;
-    var rowCounter;
+	alert("test");
+	var allGroupDivs = $$("div.tableDiv");
+	var allTrTags;
+	var rowCounter;
 
-    for(var i = 0; i < allGroupDivs.length; i++){
+	for(var i = 0; i < allGroupDivs.length; i++){
 
-        allTrTags =  allGroupDivs[i].getElementsByTagName("tr");
+		allTrTags =  allGroupDivs[i].getElementsByTagName("tr");
 
-        for(var j=0; j < allTrTags.length;j++) {
+		for(var j=0; j < allTrTags.length;j++) {
 
-            if(allTrTags[j]) {
-                rowCounter=allTrTags[j].getAttribute("repeat");
+			if(allTrTags[j]) {
+				rowCounter=allTrTags[j].getAttribute("repeat");
 
-                if(rowCounter && rowCounter.indexOf("template") == -1)  {
-                    rowCounter++;
-                    allTrTags[j].innerHTML=rowCounter+
-                                           allTrTags[j].innerHTML;
-                    rowCounter=0;//reset
-                }
-            }
-        }
+				if(rowCounter && rowCounter.indexOf("template") == -1)  {
+					rowCounter++;
+					allTrTags[j].innerHTML=rowCounter+
+					allTrTags[j].innerHTML;
+					rowCounter=0;//reset
+				}
+			}
+		}
 
 
-    }
+	}
 }
 
 /**
@@ -1583,5 +1582,158 @@ function refreshSource(isRefresh, pattern) {
 
 
 
+function findPos(navElement)
+{
+	var subnavElement='sub'+navElement;
+	var parentobj = document.getElementById(navElement);
+	var obj = document.getElementById(subnavElement);
+	var posX = parentobj.offsetLeft;var posY = parentobj.offsetTop;
+	var offsetx = -14;
+	var offsety = (parentobj.offsetHeight);
+	while(parentobj.offsetParent)
+	{
+		posX=posX+parentobj.offsetParent.offsetLeft;
+		posY=posY+parentobj.offsetParent.offsetTop;
+		if(parentobj==document.getElementsByTagName('body')[0]){break}
+		else
+		{
+			parentobj=parentobj.offsetParent;
+		}
+	}
+	obj.style.top  = (posY + offsety) + 'px';
+	obj.style.left = (posX + offsetx) + 'px';
+	displayObject( subnavElement, true );
+}
 
+function setNav(thisNavItem)
+{
+	hideSubnavs();
+	layersShowOrHide('visible', 'sub' + thisNavItem);
+	layersShowOrHide('visible', 'nav_hide');
+	findPos(thisNavItem);
+}
 
+function hideSubnavs()
+{
+	var navItem = new Array('nav_Tasks');
+	for(i=0;i<navItem.length;i++) 
+	{
+		layersShowOrHide('hidden', 'sub' + navItem[i]);
+	}
+	layersShowOrHide('hidden', 'nav_hide');
+}
+
+var BrowserDetect = {
+		init: function () {
+			this.browser = this.searchString(this.dataBrowser) || "An unknown browser";
+			this.version = this.searchVersion(navigator.userAgent)
+			|| this.searchVersion(navigator.appVersion)
+			|| "an unknown version";
+			this.OS = this.searchString(this.dataOS) || "an unknown OS";
+		},
+		searchString: function (data) {
+			for (var i=0;i<data.length;i++)	{
+				var dataString = data[i].string;
+				var dataProp = data[i].prop;
+				this.versionSearchString = data[i].versionSearch || data[i].identity;
+				if (dataString) {
+					if (dataString.indexOf(data[i].subString) != -1)
+						return data[i].identity;
+				}
+				else if (dataProp)
+					return data[i].identity;
+			}
+		},
+		searchVersion: function (dataString) {
+			var index = dataString.indexOf(this.versionSearchString);
+			if (index == -1) return;
+			return parseFloat(dataString.substring(index+this.versionSearchString.length+1));
+		},
+		dataBrowser: [
+		              { 	string: navigator.userAgent,
+		            	  subString: "OmniWeb",
+		            	  versionSearch: "OmniWeb/",
+		            	  identity: "OmniWeb"
+		              },
+		              {
+		            	  string: navigator.vendor,
+		            	  subString: "Apple",
+		            	  identity: "Safari"
+		              },
+		              {
+		            	  prop: window.opera,
+		            	  identity: "Opera"
+		              },
+		              {
+		            	  string: navigator.vendor,
+		            	  subString: "iCab",
+		            	  identity: "iCab"
+		              },
+		              {
+		            	  string: navigator.vendor,
+		            	  subString: "KDE",
+		            	  identity: "Konqueror"
+		              },
+		              {
+		            	  string: navigator.userAgent,
+		            	  subString: "Firefox",
+		            	  identity: "Firefox"
+		              },
+		              {
+		            	  string: navigator.vendor,
+		            	  subString: "Camino",
+		            	  identity: "Camino"
+		              },
+		              {		// for newer Netscapes (6+)
+		            	  string: navigator.userAgent,
+		            	  subString: "Netscape",
+		            	  identity: "Netscape"
+		              },
+		              {
+		            	  string: navigator.userAgent,
+		            	  subString: "MSIE",
+		            	  identity: "Explorer",
+		            	  versionSearch: "MSIE"
+		              },
+		              {
+		            	  string: navigator.userAgent,
+		            	  subString: "Gecko",
+		            	  identity: "Mozilla",
+		            	  versionSearch: "rv"
+		              },
+		              { 		// for older Netscapes (4-)
+		            	  string: navigator.userAgent,
+		            	  subString: "Mozilla",
+		            	  identity: "Netscape",
+		            	  versionSearch: "Mozilla"
+		              }
+		              ],
+		              dataOS : [
+		                        {
+		                        	string: navigator.platform,
+		                        	subString: "Win",
+		                        	identity: "Windows"
+		                        },
+		                        {
+		                        	string: navigator.platform,
+		                        	subString: "Mac",
+		                        	identity: "Mac"
+		                        },
+		                        {
+		                        	string: navigator.platform,
+		                        	subString: "Linux",
+		                        	identity: "Linux"
+		                        }
+		                        ]
+
+};
+BrowserDetect.init();
+if(BrowserDetect.browser=='Explorer' && BrowserDetect.version<7)
+{
+	document.write('<style type="text/CSS">');
+	document.write('#OClogo { background-image: url(images/OC_login_logo.gif); }');
+	document.write('.loginBox_T { background-image: url(images/login_box_T.gif); }');
+	document.write('.loginBox { background-image: url(images/login_box_BG.gif); }');
+	document.write('.dropdown { background-image: url(images/dropdown_BG.gif); }');
+	document.write('</style>');
+}

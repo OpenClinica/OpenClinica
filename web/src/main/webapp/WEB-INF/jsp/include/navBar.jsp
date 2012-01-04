@@ -3,6 +3,7 @@
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
 <script language="JavaScript">
         function reportBug() {
@@ -37,6 +38,10 @@
         }
 </script>
 
+
+<jsp:useBean scope='session' id='tableFacadeRestore' class='java.lang.String' />
+<c:set var="restore" value="true"/>
+<c:if test="${tableFacadeRestore=='false'}"><c:set var="restore" value="false"/></c:if>
 <c:set var="profilePage" value="${param.profilePage}"/>
 <!--  If Controller Spring based append ../ to urls -->
 <c:set var="urlPrefix" value=""/>
@@ -62,12 +67,14 @@
         </div>
         <div id="UserInfo">
             <a href="${urlPrefix}UpdateProfile"><b><c:out value="${userBean.name}" /></b> (<c:out value="${userRole.role.description}" />)&nbsp;
-                <c:choose>
-                    <c:when test="${resword.locale == null}">
+				<c:set var="formatLocale"><fmt:message key="locale_string" bundle="${resformat}"/></c:set>
+				
+			   <c:choose>
+                    <c:when test="${formatLocale == null}">
                         en
                     </c:when>
                     <c:otherwise>
-                        <c:out value="${resword.locale.language}"/>
+                        <c:out value="${formatLocale}"/>
                     </c:otherwise>
                 </c:choose>
             </a>&nbsp;|&nbsp;
@@ -111,7 +118,7 @@
                                         <c:if test="${userRole.monitor }">
                                             <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                             <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                            <li><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?studyId=${study.id}"><fmt:message key="nav_sdv" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                            <li><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message key="nav_sdv" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                             <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                         </c:if>
                                         <li id="nav_Tasks" style="position: relative; z-index: 3;">
@@ -164,7 +171,7 @@
         <div class="taskLeftColumn">
             <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
             <div class="taskLink"><a href="${urlPrefix}ViewStudyEvents"><fmt:message key="nav_view_events" bundle="${resword}"/></a></div>
-            <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?studyId=${study.id}"><fmt:message key="nav_source_data_verification" bundle="${resword}"/></a></div>
+            <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message key="nav_source_data_verification" bundle="${resword}"/></a></div>
         </div>
         <div class="taskRightColumn">
             <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a></div>
@@ -243,7 +250,7 @@
         <br clear="all"> 
         <div class="taskGroup"><fmt:message key="nav_monitor_and_manage_data" bundle="${resword}"/></div>
         <div class="taskLeftColumn">
-            <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?studyId=${study.id}"><fmt:message key="nav_source_data_verification" bundle="${resword}"/></a></div>
+            <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message key="nav_source_data_verification" bundle="${resword}"/></a></div>
             <div class="taskLink"><a href="${urlPrefix}StudyAuditLog"><fmt:message key="nav_study_audit_log" bundle="${resword}"/></a></div>
             <c:choose>
                 <c:when test="${study.parentStudyId > 0 && (userRole.coordinator || userRole.director) }">

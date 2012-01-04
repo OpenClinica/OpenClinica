@@ -13,6 +13,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.DisplayItemWithGroupBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
@@ -121,6 +122,29 @@ public class RuleSetService implements RuleSetServiceInterface {
         RuleSetBean persistentRuleSetBean = getRuleSetDao().saveOrUpdate(ruleSetBean);
         return persistentRuleSetBean;
     }
+    
+    @Transactional
+    public void saveImportFromDesigner(RulesPostImportContainer rulesContainer) {
+    	HashMap<String,RuleBean> ruleBeans = new HashMap<String, RuleBean>();
+        for (AuditableBeanWrapper<RuleBean> ruleBeanWrapper : rulesContainer.getValidRuleDefs()) {
+            RuleBean r = getRuleDao().saveOrUpdate(ruleBeanWrapper.getAuditableBean());
+            ruleBeans.put(r.getOid(), r);
+        }
+        for (AuditableBeanWrapper<RuleBean> ruleBeanWrapper : rulesContainer.getDuplicateRuleDefs()) {
+        	RuleBean r = getRuleDao().saveOrUpdate(ruleBeanWrapper.getAuditableBean());
+            ruleBeans.put(r.getOid(), r);
+        }
+
+        for (AuditableBeanWrapper<RuleSetBean> ruleBeanWrapper : rulesContainer.getValidRuleSetDefs()) {
+            loadRuleSetRuleWithPersistentRules(ruleBeanWrapper.getAuditableBean());
+            saveRuleSet(ruleBeanWrapper.getAuditableBean());
+        }
+
+        for (AuditableBeanWrapper<RuleSetBean> ruleBeanWrapper : rulesContainer.getDuplicateRuleSetDefs()) {
+            loadRuleSetRuleWithPersistentRulesWithHashMap(ruleBeanWrapper.getAuditableBean(),ruleBeans);
+            replaceRuleSet(ruleBeanWrapper.getAuditableBean());
+        }
+    }
 
     /*
      * (non-Javadoc)
@@ -176,6 +200,15 @@ public class RuleSetService implements RuleSetServiceInterface {
         ruleSetAuditBean.setStatus(status);
         ruleSetAuditBean.setUpdater(user);
         return ruleSetAuditBean;
+    }
+    
+    public void loadRuleSetRuleWithPersistentRulesWithHashMap(RuleSetBean ruleSetBean,HashMap<String,RuleBean> persistentRules) {
+        for (RuleSetRuleBean ruleSetRule : ruleSetBean.getRuleSetRules()) {
+            if (ruleSetRule.getId() == null) {
+                String ruleOid = ruleSetRule.getOid();
+                ruleSetRule.setRuleBean(persistentRules.get(ruleOid));
+            }
+        }
     }
 
     /*
@@ -510,7 +543,7 @@ public class RuleSetService implements RuleSetServiceInterface {
                     ruleSetBean.addExpression(replaceSEDOrdinal(ruleSetBean.getTarget(), studyEvent));
                     validRuleSets.add(ruleSetBean);
                 }
-                if (studyEventDefinitionOrdinal.equals(studyEvent.getSampleOrdinal())) {
+                if (studyEventDefinitionOrdinal.equals(String.valueOf(studyEvent.getSampleOrdinal()))) {
                     ruleSetBean.addExpression(replaceSEDOrdinal(ruleSetBean.getTarget(), studyEvent));
                     validRuleSets.add(ruleSetBean);
                 }
@@ -526,7 +559,7 @@ public class RuleSetService implements RuleSetServiceInterface {
         return validRuleSets;
     }
 
-    public List<RuleSetBean> filterRuleSetsByHiddenItems(List<RuleSetBean> ruleSets, EventCRFBean eventCrf, CRFVersionBean crfVersion) {
+    public List<RuleSetBean> filterRuleSetsByHiddenItems(List<RuleSetBean> ruleSets, EventCRFBean eventCrf, CRFVersionBean crfVersion,List<ItemBean> itemBeansWithSCDShown) {
         ArrayList<RuleSetBean> shownRuleSets = new ArrayList<RuleSetBean>();
         for (RuleSetBean ruleSetBean : ruleSets) {
             logMe("Entering the filterRuleSetsBy HiddenItems? Thread::"+Thread.currentThread()+"eventCrf?"+eventCrf+"crfVersion??"+crfVersion+"ruleSets?"+ruleSets);
@@ -534,8 +567,9 @@ public class RuleSetService implements RuleSetServiceInterface {
             ItemFormMetadataBean metadataBean = this.getItemFormMetadataDao().findByItemIdAndCRFVersionId(target.getId(), crfVersion.getId());
             ItemDataBean itemData = this.getItemDataDao().findByItemIdAndEventCRFId(target.getId(), eventCrf.getId());
             DynamicsItemFormMetadataBean dynamicsBean = this.getDynamicsItemFormMetadataDao().findByMetadataBean(metadataBean, eventCrf, itemData);
+            if(itemBeansWithSCDShown==null)itemBeansWithSCDShown= new ArrayList<ItemBean>();
             if (dynamicsBean == null) {
-                if (metadataBean.isShowItem()) {
+                if (metadataBean.isShowItem()|| itemBeansWithSCDShown.contains(target)) {
                     logger.debug("just added rule set bean");
                     shownRuleSets.add(ruleSetBean);
                 }

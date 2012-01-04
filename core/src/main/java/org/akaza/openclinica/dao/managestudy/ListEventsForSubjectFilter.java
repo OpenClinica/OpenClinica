@@ -1,5 +1,6 @@
 package org.akaza.openclinica.dao.managestudy;
 
+import org.akaza.openclinica.domain.Status;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import java.util.ArrayList;
@@ -59,7 +60,7 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
 
                 int group_id = Integer.parseInt(value.toString());
                 criteria +=
-                    "AND " + group_id + " = (" + " select sgm.study_group_id" + " FROM SUBJECT_GROUP_MAP sgm, STUDY_GROUP sg, STUDY_GROUP_CLASS sgc, STUDY s"
+                    "AND " + group_id + " = (" + " select distinct sgm.study_group_id" + " FROM SUBJECT_GROUP_MAP sgm, STUDY_GROUP sg, STUDY_GROUP_CLASS sgc, STUDY s"
                         + " WHERE " + " sgm.study_group_class_id = " + study_group_class_id + " AND sgm.study_subject_id = SS.study_subject_id"
                         + " AND sgm.study_group_id = sg.study_group_id" + " AND (s.parent_study_id = sgc.study_id OR SS.study_id = sgc.study_id)"
                         + " AND sgm.study_group_class_id = sgc.study_group_class_id" + " ) ";
@@ -80,10 +81,8 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
                 }
                 else if (value.equals("2")){ //DAtaEntryStage.Initial_data_entry
                     criteria += " and  se.study_EVENT_ID  in(select study_event_id from  event_crf ec,crf_version cv where " +
-                    		"ec.crf_version_id = cv.crf_version_id and crf_id= "+crfId+"  and ( date_validate_completed is  null  or DATE_COMPLETED is NULL ) )"+
-                    		 "and se.study_event_definition_id =" +studyEventDefinitionId +" and se.subject_event_status_id = 3";
- 
-        
+                    		"ec.crf_version_id = cv.crf_version_id and crf_id= "+crfId+ " and ec.status_id = "+Status.AVAILABLE.getCode()+ ")" +
+                    		 "and se.study_event_definition_id =" +studyEventDefinitionId;
                 }
                 else if (value.equals("4")){
                    //DAtaEntryStage.double data entry

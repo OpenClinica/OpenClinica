@@ -7,34 +7,44 @@
  */
 package org.akaza.openclinica.dao.submit;
 
-import org.akaza.openclinica.bean.core.EntityBean;
-import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
-import org.akaza.openclinica.bean.submit.ResponseSetBean;
-import org.akaza.openclinica.dao.core.DAODigester;
-import org.akaza.openclinica.dao.core.EntityDAO;
-import org.akaza.openclinica.dao.core.SQLFactory;
-import org.akaza.openclinica.dao.core.TypeNames;
-import org.akaza.openclinica.exception.OpenClinicaException;
+import javax.sql.DataSource;
 
-
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 
-import javax.sql.DataSource;
+
+
+
+import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import org.akaza.openclinica.bean.submit.ResponseSetBean;
+
+import org.akaza.openclinica.dao.core.DAODigester;
+import org.akaza.openclinica.dao.core.EntityDAO;
+import org.akaza.openclinica.dao.core.PreparedStatementFactory;
+import org.akaza.openclinica.dao.core.SQLFactory;
+import org.akaza.openclinica.dao.core.TypeNames;
+import org.akaza.openclinica.exception.OpenClinicaException;
 
 /**
  * @author ssachs
  */
-public class ItemFormMetadataDAO extends EntityDAO {
+public class ItemFormMetadataDAO<K extends String,V extends ArrayList> extends EntityDAO {
 
     @Override
     protected void setDigesterName() {
         digesterName = SQLFactory.getInstance().DAO_ITEMFORMMETADATA;
     }
 
+    
+    
     private void setQueryNames() {
         getCurrentPKName = "getCurrentPK";
         getNextPKName = "getNextPK";
@@ -42,6 +52,7 @@ public class ItemFormMetadataDAO extends EntityDAO {
 
     public ItemFormMetadataDAO(DataSource ds) {
         super(ds);
+      //  setCache(new EhCacheWrapper("ItemFormMetadataDAO",R);
     }
 
     public ItemFormMetadataDAO(DataSource ds, DAODigester digester) {
@@ -66,8 +77,8 @@ public class ItemFormMetadataDAO extends EntityDAO {
      *         the primary key in <code>ints</code>.
      * @throws OpenClinicaException
      */
-    public ArrayList findByMultiplePKs(ArrayList ints) throws OpenClinicaException {
-        ArrayList answer = new ArrayList();
+    public ArrayList<ItemFormMetadataBean> findByMultiplePKs(ArrayList ints) throws OpenClinicaException {
+        ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
 
         this.setTypesExpected();
 
@@ -243,8 +254,8 @@ public class ItemFormMetadataDAO extends EntityDAO {
      * 
      * @see org.akaza.openclinica.dao.core.DAOInterface#findAll()
      */
-    public Collection findAll() throws OpenClinicaException {
-        ArrayList answer = new ArrayList();
+    public Collection<ItemFormMetadataBean> findAll() throws OpenClinicaException {
+        ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
 
         this.setTypesExpected();
 
@@ -277,7 +288,7 @@ public class ItemFormMetadataDAO extends EntityDAO {
         this.unsetTypeExpected();
         this.setTypeExpected(1, TypeNames.INT);
 
-        HashMap variables = new HashMap();
+        HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
         variables.put(new Integer(1), new Integer(crfVersionId));
         String sql = digester.getQuery("findAllCountHiddenByCRFVersionId");
 
@@ -326,7 +337,7 @@ public class ItemFormMetadataDAO extends EntityDAO {
         this.unsetTypeExpected();
         this.setTypeExpected(1, TypeNames.INT);
 
-        HashMap variables = new HashMap();
+        HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
         variables.put(new Integer(1), new Integer(eventCrfId));
         String sql = digester.getQuery("findAllCountHiddenButShownByEventCrfId");
 
@@ -340,12 +351,12 @@ public class ItemFormMetadataDAO extends EntityDAO {
         return answer;
     }
 
-    public ArrayList findAllByCRFVersionId(int crfVersionId) throws OpenClinicaException {
-        ArrayList answer = new ArrayList();
+    public ArrayList<ItemFormMetadataBean> findAllByCRFVersionId(int crfVersionId) throws OpenClinicaException {
+        ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
 
         this.setTypesExpected();
 
-        HashMap variables = new HashMap();
+        HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
         variables.put(new Integer(1), new Integer(crfVersionId));
 
         String sql = digester.getQuery("findAllByCRFVersionId");
@@ -360,12 +371,12 @@ public class ItemFormMetadataDAO extends EntityDAO {
         return answer;
     }
 
-    public ArrayList findAllByCRFIdItemIdAndHasValidations(int crfId, int itemId) {
-        ArrayList answer = new ArrayList();
+    public ArrayList<ItemFormMetadataBean> findAllByCRFIdItemIdAndHasValidations(int crfId, int itemId) {
+        ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
 
         this.setTypesExpected();
 
-        HashMap variables = new HashMap();
+        HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
         variables.put(new Integer(1), new Integer(crfId));
         variables.put(new Integer(2), new Integer(itemId));
 
@@ -381,17 +392,33 @@ public class ItemFormMetadataDAO extends EntityDAO {
         return answer;
     }
 
-    public ArrayList findAllByCRFVersionIdAndResponseTypeId(int crfVersionId, int responseTypeId) throws OpenClinicaException {
-        ArrayList answer = new ArrayList<ItemFormMetadataBean>();
+    public ArrayList<ItemFormMetadataBean> findAllByCRFVersionIdAndResponseTypeId(int crfVersionId, int responseTypeId) throws OpenClinicaException {
+     //Caching purpose
+        V  value;
+        K key;
+    
+        
+        ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
 
         this.setTypesExpected();
-
-        HashMap variables = new HashMap<Integer, Object>();
+        
+        HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
         variables.put(new Integer(1), new Integer(crfVersionId));
         variables.put(new Integer(2), new Integer(responseTypeId));
-
+        ArrayList alist;
+        PreparedStatementFactory psf = new PreparedStatementFactory(variables);
+        
         String sql = digester.getQuery("findAllByCRFVersionIdAndResponseTypeId");
-        ArrayList alist = this.select(sql, variables);
+       
+        key = (K) (sql+","+crfVersionId+","+responseTypeId);
+        
+        if((alist=(V) cache.get(key))==null)
+        {
+         alist = this.select(sql, variables);
+         if(alist!=null)
+             cache.put(key, alist);
+        }
+       
         Iterator it = alist.iterator();
 
         while (it.hasNext()) {
@@ -402,10 +429,12 @@ public class ItemFormMetadataDAO extends EntityDAO {
         return answer;
     }
 
-    public ArrayList findAllByItemId(int itemId) {
+ 
+    
+    public ArrayList<ItemFormMetadataBean> findAllByItemId(int itemId) {
 
         // TODO place holder for returning here, tbh
-        ArrayList answer = new ArrayList();
+        ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
 
         this.setTypesExpected();
         // BWP: changed from 25 to 26 when added response_layout?
@@ -415,7 +444,7 @@ public class ItemFormMetadataDAO extends EntityDAO {
         this.setTypeExpected(29, TypeNames.STRING);// group_label
         this.setTypeExpected(30, TypeNames.INT);// repeat_max
         this.setTypeExpected(31, TypeNames.STRING);// section_name
-        HashMap variables = new HashMap();
+        HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
         variables.put(new Integer(1), new Integer(itemId));
 
         String sql = digester.getQuery("findAllByItemId");
@@ -442,10 +471,10 @@ public class ItemFormMetadataDAO extends EntityDAO {
         return answer;
     }
 
-    public ArrayList findAllByItemIdAndHasValidations(int itemId) {
+    public ArrayList<ItemFormMetadataBean> findAllByItemIdAndHasValidations(int itemId) {
 
         // TODO place holder for returning here, tbh
-        ArrayList answer = new ArrayList();
+        ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
 
         this.setTypesExpected();
         // BWP: changed from 25 to 26 when added response_layout?
@@ -455,7 +484,7 @@ public class ItemFormMetadataDAO extends EntityDAO {
         this.setTypeExpected(29, TypeNames.STRING);// group_label
         this.setTypeExpected(30, TypeNames.INT);// repeat_max
         this.setTypeExpected(31, TypeNames.STRING);// section_name
-        HashMap variables = new HashMap();
+        HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
         variables.put(new Integer(1), new Integer(itemId));
 
         String sql = digester.getQuery("findAllByItemIdAndHasValidations");
@@ -482,12 +511,12 @@ public class ItemFormMetadataDAO extends EntityDAO {
         return answer;
     }
 
-    public ArrayList findAllBySectionId(int sectionId) throws OpenClinicaException {
-        ArrayList answer = new ArrayList();
+    public ArrayList<ItemFormMetadataBean> findAllBySectionId(int sectionId) throws OpenClinicaException {
+        ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
 
         this.setTypesExpected();
 
-        HashMap variables = new HashMap();
+        HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
         variables.put(new Integer(1), new Integer(sectionId));
 
         String sql = digester.getQuery("findAllBySectionId");
@@ -503,12 +532,12 @@ public class ItemFormMetadataDAO extends EntityDAO {
         return answer;
     }
 
-    public ArrayList findAllByCRFVersionIdAndSectionId(int crfVersionId, int sectionId) throws OpenClinicaException {
-        ArrayList answer = new ArrayList();
+    public ArrayList<ItemFormMetadataBean> findAllByCRFVersionIdAndSectionId(int crfVersionId, int sectionId) throws OpenClinicaException {
+        ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
 
         this.setTypesExpected();
 
-        HashMap variables = new HashMap();
+        HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
         variables.put(new Integer(1), new Integer(crfVersionId));
         variables.put(new Integer(2), new Integer(sectionId));
 
@@ -534,7 +563,7 @@ public class ItemFormMetadataDAO extends EntityDAO {
         this.setTypesExpected();
 
         // TODO place holder to return here, tbh
-        HashMap variables = new HashMap();
+        HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
         variables.put(new Integer(1), new Integer(id));
 
         String sql = digester.getQuery("findByPK");
@@ -555,7 +584,7 @@ public class ItemFormMetadataDAO extends EntityDAO {
      */
     public EntityBean create(EntityBean eb) throws OpenClinicaException {
         ItemFormMetadataBean ifmb = (ItemFormMetadataBean) eb;
-        HashMap variables = new HashMap();
+        HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
 
         int ind = 0;
         int id = getNextPK();
@@ -621,7 +650,7 @@ public class ItemFormMetadataDAO extends EntityDAO {
      */
     public EntityBean update(EntityBean eb) throws OpenClinicaException {
         ItemFormMetadataBean ifmb = (ItemFormMetadataBean) eb;
-        HashMap variables = new HashMap();
+        HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
 
         int ind = 0;
 
@@ -720,10 +749,11 @@ public class ItemFormMetadataDAO extends EntityDAO {
         this.setTypeExpected(31, TypeNames.STRING);// section_name
 
         logMe("Current Thread:::"+Thread.currentThread()+"types Expected?");
-        HashMap variables = new HashMap();
+        HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
         variables.put(new Integer(1), new Integer(itemId));
         variables.put(new Integer(2), new Integer(crfVersionId));
-
+       
+        
         String sql = digester.getQuery("findByItemIdAndCRFVersionId");
         
         logMe("Thread?"+Thread.currentThread()+"SQL?"+sql+"variables?"+variables);
@@ -769,7 +799,7 @@ public class ItemFormMetadataDAO extends EntityDAO {
     public ItemFormMetadataBean findByItemIdAndCRFVersionIdNotInIGM(int itemId, int crfVersionId) {
         this.setTypesExpected();
 
-        HashMap variables = new HashMap();
+        HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
         variables.put(new Integer(1), new Integer(itemId));
         variables.put(new Integer(2), new Integer(crfVersionId));
 
@@ -802,7 +832,7 @@ public class ItemFormMetadataDAO extends EntityDAO {
         this.setTypeExpected(ind, TypeNames.STRING);// description
         ind++;
 
-        HashMap variables = new HashMap();
+        HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
         variables.put(new Integer(1), new Integer(id));
 
         return (ResponseSetBean) this.executeFindByPKQuery("findResponseSetByPK", variables);
@@ -817,7 +847,7 @@ public class ItemFormMetadataDAO extends EntityDAO {
         ArrayList<ItemFormMetadataBean> answer = new ArrayList<ItemFormMetadataBean>();
         this.unsetTypeExpected();
         this.setTypesExpected();
-        HashMap variables = new HashMap();
+        HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
         variables.put(new Integer(1), sectionId);
 
         String sql = digester.getQuery("findSCDItemsBySectionId");
@@ -842,5 +872,62 @@ public class ItemFormMetadataDAO extends EntityDAO {
         }
 
         return answer;
+    }
+    
+    
+/**
+ * need to use this method when you want the results to be cached. i.e they do not get updated.
+ */
+    @Override
+    public ArrayList<V> select(String query, HashMap variables) {
+        clearSignals();
+
+        ArrayList results = new ArrayList();
+        V  value;
+        K key;
+        ResultSet rs = null;
+        Connection con = null;
+        PreparedStatementFactory psf = new PreparedStatementFactory(variables);
+        PreparedStatement ps = null;
+        
+        try {
+            con = ds.getConnection();
+            if (con.isClosed()) {
+                if (logger.isWarnEnabled())
+                    logger.warn("Connection is closed: GenericDAO.select!");
+                throw new SQLException();
+            }
+
+           ps = con.prepareStatement(query);
+           
+       
+            ps = psf.generate(ps);// enter variables here!
+            key = (K) ps.toString();
+            if((results=(V) cache.get(key))==null)
+            {
+            rs = ps.executeQuery();
+            results = this.processResultRows(rs);
+            if(results!=null){
+                cache.put(key,results);
+            }
+            }
+            
+            if (logger.isInfoEnabled()) {
+                logger.info("Executing dynamic query, EntityDAO.select:query " + query);
+            }
+            signalSuccess();
+              
+
+        } catch (SQLException sqle) {
+            signalFailure(sqle);
+            if (logger.isWarnEnabled()) {
+                logger.warn("Exception while executing dynamic query, GenericDAO.select: " + query + ":message: " + sqle.getMessage());
+                sqle.printStackTrace();
+            }
+        } finally {
+            this.closeIfNecessary(con, rs, ps);
+        }
+        return results;
+
     }
 }

@@ -98,7 +98,7 @@
 			<xs:element name="Sex" type="odm:text" minOccurs="0" maxOccurs="1"/>
 			<xs:element ref="Age" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="HealthyVolunteersAccepted" type="odm:text" minOccurs="0" maxOccurs="1"/>
-			<xs:element name="ExpectedTotalEnrollment" type="odm:integer" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="ExpectedTotalEnrollment" type="odm:integer" minOccurs="0" maxOccurs="1"/>
 			<xs:group ref="ConditionsAndEligibilityElementExtension" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 		<xs:attributeGroup ref="ConditionsAndEligibilityAttributeDefinition"/>
@@ -464,7 +464,7 @@
 		<xs:attribute name="OfficialTitle" type="odm:text"/>
 		<xs:attribute name="SecondaryIDs" type="odm:text"/>
 		<xs:attribute name="DateCreated" type="odm:date"/>
-		<xs:attribute name="StartDate" type="odm:date" use="required"/>
+		<xs:attribute name="StartDate" type="odm:date"/>
 		<xs:attribute name="StudyCompletionDate" type="odm:date"/>
 	</xs:attributeGroup>
 	

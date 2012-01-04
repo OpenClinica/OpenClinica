@@ -25,11 +25,11 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 /**
@@ -119,15 +119,18 @@ public class InitUpdateSubStudyServlet extends SecureController {
             FormProcessor fp = new FormProcessor(request);
             logger.info("start date:" + study.getDatePlannedEnd());
             if (study.getDatePlannedEnd() != null) {
-                fp.addPresetValue(UpdateSubStudyServlet.INPUT_END_DATE, local_df.format(study.getDatePlannedEnd()));
+                fp.addPresetValue(UpdateSubStudyServlet.INPUT_END_DATE, 
+                        new SimpleDateFormat(resformat.getString("date_format_string"),SecureController.getFormat_locale()).format(study.getDatePlannedEnd()));
             }
             if (study.getDatePlannedStart() != null) {
-                fp.addPresetValue(UpdateSubStudyServlet.INPUT_START_DATE, local_df.format(study.getDatePlannedStart()));
+                fp.addPresetValue(UpdateSubStudyServlet.INPUT_START_DATE, 
+                        new SimpleDateFormat(resformat.getString("date_format_string"),SecureController.getFormat_locale()).format(study.getDatePlannedStart()));
+            }
+            if (study.getProtocolDateVerification() != null) {
+                fp.addPresetValue(UpdateSubStudyServlet.INPUT_VER_DATE, 
+                        new SimpleDateFormat(resformat.getString("date_format_string"),SecureController.getFormat_locale()).format(study.getProtocolDateVerification()));
             }
             setPresetValues(fp.getPresetValues());
-            if (study.getProtocolDateVerification() != null) {
-                fp.addPresetValue(UpdateSubStudyServlet.INPUT_VER_DATE, local_df.format(study.getProtocolDateVerification()));
-            }
 
             forwardPage(Page.UPDATE_SUB_STUDY);
         }

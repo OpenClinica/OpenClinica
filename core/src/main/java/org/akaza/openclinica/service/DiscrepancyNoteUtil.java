@@ -1,5 +1,20 @@
 package org.akaza.openclinica.service;
 
+import org.akaza.openclinica.bean.core.ResolutionStatus;
+import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.ListNotesFilter;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.submit.EventCRFDAO;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,17 +27,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.sql.DataSource;
-
-import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.core.ResolutionStatus;
-import org.akaza.openclinica.dao.managestudy.*;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
 
 /**
  * DiscrepancyNoteUtil is a convenience class for managing discrepancy notes,
@@ -1034,11 +1038,13 @@ public class DiscrepancyNoteUtil {
         for (ResolutionStatus status: ResolutionStatus.getMembers()) {
             tempMap = new HashMap<String, String>();
             summaryMap.put(status.getName(), tempMap);
-            tempTotal = countNotes(discList, RESOLUTION_STATUS.get(status.getName()), 0);
+            //tempTotal = countNotes(discList, RESOLUTION_STATUS.get(status.getName()), 0);
+            tempTotal = countNotes(discList, status.getId(), 0);
             tempMap.put("Total", tempTotal.equals("0")?"--":tempTotal);
             for (String typeName: TYPE_NAMES) {
                 tempType = TYPES.get(typeName);
-                String number = countNotes(discList, RESOLUTION_STATUS.get(status.getName()), tempType);
+                //String number = countNotes(discList, RESOLUTION_STATUS.get(status.getName()), tempType);
+                String number = countNotes(discList, status.getId(), tempType);
                 tempMap.put(typeName, number.equals("0")?"--":number);
             }
         }
@@ -1085,20 +1091,26 @@ public class DiscrepancyNoteUtil {
         String crfName = "";
         String entityName = "";
         String entityValue = "";
+        //String crfStatus = "";
         for(int i=0; i < discFilter.getFilters().size(); i++) {
             ListNotesFilter.Filter filter = discFilter.getFilters().get(i);
             eventName = filter.getProperty().equals("eventName") ? filter.getValue().toString() : eventName;
             crfName = filter.getProperty().equals("crfName") ? filter.getValue().toString() : crfName;
             entityName = filter.getProperty().equals("entityName") ? filter.getValue().toString() : entityName;
             entityValue = filter.getProperty().equals("entityValue") ? filter.getValue().toString() : entityValue;
+            //crfStatus = filter.getProperty().equals("crfStatus") ? filter.getValue().toString() : crfStatus;
         }
 
         ArrayList newList = new ArrayList<DiscrepancyNoteBean>();
+        if(eventName.equals("") && crfName.equals("") && entityName.equals("") && entityValue.equals("")) {// && crfStatus.equals("")) {
+            return mainList;
+        }
         for(DiscrepancyNoteBean dnBean: mainList){
             if(dnBean.getEventName().toLowerCase().indexOf(eventName.toLowerCase())>=0
                     && dnBean.getCrfName().toLowerCase().indexOf(crfName.toLowerCase())>=0
                     && dnBean.getEntityName().toLowerCase().indexOf(entityName.toLowerCase())>=0
-                    && dnBean.getEntityValue().toLowerCase().indexOf(entityValue.toLowerCase())>=0){
+                    && dnBean.getEntityValue().toLowerCase().indexOf(entityValue.toLowerCase())>=0) {
+                    //&& dnBean.getCrfStatus().toLowerCase().indexOf(crfStatus.toLowerCase())>=0){
                 newList.add(dnBean);
             }
         }

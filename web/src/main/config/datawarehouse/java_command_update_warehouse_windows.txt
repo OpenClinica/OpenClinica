@@ -1,1 +1,0 @@
-java -cp C:\OpenClinica\OpenClinica-2.0.1\conf;C:\OpenClinica\OpenClinica-2.0.1\conf\postgresql-8.1-405.jdbc3.jar UpdateWarehouseJDBC C:\OpenClinica\OpenClinica-2.0.1\conf\update_warehouse_jdbc.properties

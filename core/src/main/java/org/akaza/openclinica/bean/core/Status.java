@@ -32,12 +32,12 @@ public class Status extends Term implements Comparable {
 
     private static final Status[] members =
         { INVALID, AVAILABLE, PENDING, PRIVATE, UNAVAILABLE, LOCKED, DELETED, AUTO_DELETED, SIGNED, FROZEN, SOURCE_DATA_VERIFICATION };
-    private static List list = Arrays.asList(members);
+    private static List list = Arrays.asList(members);  
 
-    private static final Status[] activeMembers = { AVAILABLE, PENDING, PRIVATE, UNAVAILABLE, LOCKED, SIGNED };
-    private static List activeList = Arrays.asList(activeMembers);
+    private static final Status[] activeMembers = { AVAILABLE, SIGNED, DELETED, AUTO_DELETED };
+    private static List activeList = Arrays.asList(activeMembers);  
 
-    private static final Status[] studySubjectDropDownMembers = { AVAILABLE, SIGNED, DELETED };
+    private static final Status[] studySubjectDropDownMembers = { AVAILABLE, SIGNED, DELETED, AUTO_DELETED };
     private static List studySubjectDropDownList = Arrays.asList(studySubjectDropDownMembers);
 
     private static final Status[] subjectDropDownMembers = { AVAILABLE, DELETED };
@@ -78,10 +78,20 @@ public class Status extends Term implements Comparable {
     }
 
     public static Status getFromMap(int id) {
-        if (id < 0 || id > (membersMap.size() - 1)) {
+        if (id < 0 || id > membersMap.size() - 1) {
             return Status.INVALID;
         }
         return (Status) get(id, list);
+    }
+    
+    public static Status getByName(String name) {
+        for (int i = 0; i < list.size(); i++) {
+            Status temp = (Status) list.get(i);
+            if (temp.getName().equals(name)) {
+                return temp;
+            }
+        }
+        return INVALID;
     }
 
     public static ArrayList toArrayList() {

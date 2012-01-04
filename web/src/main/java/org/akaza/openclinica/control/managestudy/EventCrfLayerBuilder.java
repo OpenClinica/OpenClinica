@@ -187,7 +187,8 @@ public class EventCrfLayerBuilder {
             html.nbsp().nbsp();
             printDataEntry(html, eventCrfBean, reswords.getString("print"));
             html.tdEnd().trEnd(0);
-            if (currentStudy.getStatus() == Status.AVAILABLE && (currentRole.isDirector() || currentUser.isSysAdmin())) {
+            //if (currentStudy.getStatus() == Status.AVAILABLE && (currentRole.isDirector() || currentUser.isSysAdmin())) {
+            if (!currentRole.isMonitor() && currentStudy.getStatus() == Status.AVAILABLE) {
                 if (! hiddenCrf()) {
                     html.tr(0).valign("top").close();
                     html.td(0).styleClass(table_cell_left).close();
@@ -196,12 +197,14 @@ public class EventCrfLayerBuilder {
                     administrativeEditing(html, eventCrfBean, reswords.getString("edit"));
                     html.tdEnd().trEnd(0);
                 }
-                html.tr(0).valign("top").close();
-                html.td(0).styleClass(table_cell_left).close();
-                removeEventCrf(html, eventCrfBean, studySubject);
-                html.nbsp().nbsp();
-                removeEventCrf(html, eventCrfBean, studySubject, reswords.getString("remove"));
-                html.tdEnd().trEnd(0);
+                if(currentRole.isDirector() || currentUser.isSysAdmin()) {
+                    html.tr(0).valign("top").close();
+                    html.td(0).styleClass(table_cell_left).close();
+                    removeEventCrf(html, eventCrfBean, studySubject);
+                    html.nbsp().nbsp();
+                    removeEventCrf(html, eventCrfBean, studySubject, reswords.getString("remove"));
+                    html.tdEnd().trEnd(0);
+                }
             }
             if (currentStudy.getStatus() == Status.AVAILABLE && currentUser.isSysAdmin()) {
                 html.tr(0).valign("top").close();

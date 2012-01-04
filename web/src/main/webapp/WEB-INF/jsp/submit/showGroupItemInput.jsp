@@ -238,9 +238,12 @@ function switchStr(itemId, id,attribute,str1,str2) {
 </script>
 
 <c:set var="inputType" value="${displayItem.metadata.responseSet.responseType.name}" />
+<c:set var="functionType" value="${displayItem.metadata.responseSet.options[0].value}"/>
 <c:set var="itemId" value="${displayItem.item.id}" />
 <c:set var="numOfDate" value="${param.key}" />
 <c:set var="isLast" value="${param.isLast}" />
+<c:set var="isTemplateRow" value="${param.isTemplateRow}" />
+
 <c:set var="isFirst" value="${param.isFirst}" />
 <c:set var="repeatParentId" value="${param.repeatParentId}" />
 <c:set var="rowCount" value="${param.rowCount}" />
@@ -296,6 +299,10 @@ function switchStr(itemId, id,attribute,str1,str2) {
   </c:if>
 </c:forEach>
 
+<c:if test="${isTemplateRow == true}">
+ <c:set var="isInError" value="${false}" />
+ </c:if>
+ 
  <c:if test="${isInError}">
       <c:set var="errorFlag" value="1"/><!--  use in discrepancy note-->
  </c:if>
@@ -588,17 +595,85 @@ function switchStr(itemId, id,attribute,str1,str2) {
   </select>
 </c:if>
 <c:if test='${inputType == "calculation" || inputType == "group-calculation"}'>
-	<input type="hidden" name="input<c:out value="${itemId}"/>" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
- <label for="<c:out value="${inputName}"/>"></label>
-  <c:choose>
-    <c:when test="${isInError}">
-      <span class="aka_exclaim_error">! </span><input class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" class="disabled" disabled="disabled" name="<c:out value="${inputName}"/>" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
-    </c:when>
-    <c:otherwise>
-      <input id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
-        "this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" class="disabled" disabled="disabled" name="<c:out value="${inputName}"/>" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
-    </c:otherwise>
-  </c:choose>
+	<%-- need to test for coding function here, tbh  --%>
+	<c:set var="isAnExternalValue" value="0"/>
+	<c:forTokens items="${functionType}" delims="\"" begin="0" end="0" var="functionName">
+		<c:if test="${functionName eq 'func: getExternalValue(' || functionName eq 'func: getexternalvalue('}">
+			<c:set var="isAnExternalValue" value="1"/>
+		</c:if>
+	</c:forTokens>
+	<c:choose>
+		<c:when test="${isAnExternalValue == '1'}">
+			<c:set var="rowCountPlusOne" value="${rowCount + 10}"/>
+			<label for="<c:out value="${inputName}"/>"></label>
+			
+			<%-- above for test, adding javascript below to support FF3 tbh 03/2007 --%>
+			<script>
+				if (window.attachEvent)
+				{
+					window.attachEvent("onmessage", receiver<c:out value="${parsedInputName}"/>); // for IE
+				}
+				else 
+				{
+					window.addEventListener("message", receiver<c:out value="${parsedInputName}"/>, false); // for FF
+				}
+				function receiver<c:out value="${parsedInputName}"/>(e) {
+					// alert(e.origin + ": " + e.source + " said " + e.data);
+					if (e.data.substring(0,e.data.indexOf(":")) != 'mainForm.<c:out value="${inputName}"/>')
+					{
+						// alert(e.origin + ": said " + e.data);
+						for (i = 0; i <= <c:out value="${rowCountPlusOne}"/> ; i++ )
+						{
+							// alert('trying: ' + 'mainForm.<c:out value="${repeatParentId}"/>_' + i + 'input<c:out value="${itemId}"/>');
+							if (e.data.substring(0,e.data.indexOf(":")) == 'mainForm.<c:out value="${repeatParentId}"/>_' + i + 'input<c:out value="${itemId}"/>') 
+							{
+								// alert(e.origin + ": but we found " + e.data);
+								var inputName2 = '<c:out value="${repeatParentId}"/>_' + i + 'input<c:out value="${itemId}"/>';
+								eval('document.crfForm.' + inputName2 + '.value = e.data.substring(e.data.indexOf(":") + 1);');
+							}
+							// added per bug #3861
+							if (e.data.substring(0,e.data.indexOf(":")) == 'mainForm.<c:out value="${repeatParentId}"/>_manual' + i + 'input<c:out value="${itemId}"/>')
+							{
+								// alert(e.origin + ": but we found " + e.data);
+								var inputName3 = '<c:out value="${repeatParentId}"/>_manual' + i + 'input<c:out value="${itemId}"/>';
+								eval('document.crfForm.' + inputName3 + '.value = e.data.substring(e.data.indexOf(":") + 1);');
+							}
+							
+						}
+						
+						return;
+					}
+					
+					// document.crfForm.<c:out value="${inputName}"/>.value = e.data.substring(e.data.indexOf(":") + 1);
+					// document.crfForm.<c:out value="${parsedInputName}"/>.value = e.data.substring(e.data.indexOf(":") + 1);
+				}
+			</script> 
+			
+		    <c:choose>
+		        <c:when test="${isInError}">
+      				<span class="aka_exclaim_error">! </span><input class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" readonly="readonly" onChange=
+		          		"this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" name="<c:out value="${inputName}" />" value="<c:out value="${inputTxtValue}"/>" />
+		        </c:when>
+		        <c:otherwise>
+		            <input class="aka_input_readonly" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" readonly="readonly" onChange=
+		              "this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" name="<c:out value="${inputName}" />" value="<c:out value="${inputTxtValue}"/>" />
+		        </c:otherwise>
+		    </c:choose>
+		</c:when>
+		<c:otherwise>
+			<input type="hidden" name="input<c:out value="${itemId}"/>" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
+			<label for="<c:out value="${inputName}"/>"></label>
+			<c:choose>
+				<c:when test="${isInError}">
+      				<span class="aka_exclaim_error">! </span><input class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" class="disabled" disabled="disabled" name="<c:out value="${inputName}"/>" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
+				</c:when>
+				<c:otherwise>
+					<input id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
+							"this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" class="disabled" disabled="disabled" name="<c:out value="${inputName}"/>" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
+    			</c:otherwise>
+			</c:choose>
+		</c:otherwise>
+	</c:choose>
 </c:if>
 <c:if test="${displayItem.metadata.required}">
   <span class="alert">*</span>

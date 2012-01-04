@@ -15,6 +15,8 @@ import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.domain.AbstractAuditableMutableDomainObject;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
@@ -36,6 +38,7 @@ import javax.persistence.Transient;
 @Entity
 @Table(name = "rule_set")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "rule_set_id_seq") })
+@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class RuleSetBean extends AbstractAuditableMutableDomainObject {
 
     private StudyEventDefinitionBean studyEventDefinition;

@@ -10,6 +10,9 @@ package org.akaza.openclinica.bean.login;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+
+import java.util.ResourceBundle;
 
 /**
  * @author thickerson
@@ -113,6 +116,14 @@ public class StudyUserRoleBean extends AuditableEntityBean {
      */
     public void setRoleName(String roleName) {
         Role role = Role.getByName(roleName);
+        if(role == null || role.getId()==0) {
+            ResourceBundle resterm = ResourceBundleProvider.getTermsBundle();
+            if(resterm.getString("site_investigator").equals(roleName)) {
+                role = Role.INVESTIGATOR;
+            } else if("Data Specialist".equals(roleName)) {
+                role = Role.INVESTIGATOR;
+            }
+        }
         setRole(role);
     }
 

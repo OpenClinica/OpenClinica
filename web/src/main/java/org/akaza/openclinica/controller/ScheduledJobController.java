@@ -226,7 +226,8 @@ public class ScheduledJobController {
         logMe("About to pause the job-->"+theJobName+"Job Group Name -->"+theJobGroupName);
           
         SimpleTrigger oldTrigger = (SimpleTrigger) scheduler.getTrigger(triggerName, triggerGroupName);
-     
+        if(oldTrigger!=null)
+        {
         Date startTime = new Date(oldTrigger.getStartTime().getTime()+oldTrigger.getRepeatInterval()); 
         if(triggerGroupName.equals(ExtractController.TRIGGER_GROUP_NAME))
         {
@@ -278,6 +279,7 @@ public class ScheduledJobController {
         request.setAttribute("pageMessages", pageMessages);
         
         logMe("jobDetails>"+ scheduler.getJobDetail(theJobName, theJobGroupName));
+        }
         sdvUtil.forwardRequestFromController(request, response, "/pages/" + redirection);
         return null;
         }

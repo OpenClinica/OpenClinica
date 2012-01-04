@@ -109,6 +109,17 @@ public class ImportCRFDataService {
                 logger.info("find all by def and subject " + studyEventDefinitionBean.getName() + " study subject " + studySubjectBean.getName());
                 // ArrayList<StudyEventBean> studyEventBeans = studyEventDAO.findAllByDefinitionAndSubject(studyEventDefinitionBean, studySubjectBean);
 
+                StudyEventBean studyEventBean =
+                    (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(), studyEventDefinitionBean.getId(),
+                            Integer.parseInt(sampleOrdinal));
+                // @pgawade 16-March-2011 Do not allow the data import
+                // if event status is one of the - stopped, signed,
+                // locked
+                if (studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.LOCKED)
+                    || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SIGNED)
+                    || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.STOPPED)) {
+                    return null;
+                }
                 for (FormDataBean formDataBean : formDataBeans) {
 
                     CRFVersionDAO crfVersionDAO = new CRFVersionDAO(ds);
@@ -122,9 +133,11 @@ public class ImportCRFDataService {
                         // iterate the studyeventbeans here
                         // for (StudyEventBean studyEventBean : studyEventBeans) {
 
-                        StudyEventBean studyEventBean =
-                            (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(),
-                                    studyEventDefinitionBean.getId(), Integer.parseInt(sampleOrdinal));
+                        // StudyEventBean studyEventBean =
+                        // (StudyEventBean)
+                        // studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(),
+                        // studyEventDefinitionBean.getId(),
+                        // Integer.parseInt(sampleOrdinal));
 
                         ArrayList<EventCRFBean> eventCrfBeans = eventCrfDAO.findByEventSubjectVersion(studyEventBean, studySubjectBean, crfVersionBean);
                         // what if we have begun with creating a study
