@@ -1,0 +1,5 @@
+syntax: glob
+core/target/*
+web/target/*
+ws-cabig/target/*
+ws/target/*
