@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>org.akaza.openclinica</groupId>
 		<artifactId>OpenClinica</artifactId>
-		<version>SNAPSHOT</version>
+		<version>3.1.2-Community</version>
 	</parent>
 	<dependencies>
 		<dependency>
@@ -309,6 +309,7 @@
 	</dependencies>
 
 	<build>
+        <finalName>OpenClinica-web-3.1.2</finalName>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>

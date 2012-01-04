@@ -7,10 +7,14 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.odmbeans.UserBean;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
@@ -110,11 +114,13 @@ public class ViewRuleAssignmentNewServlet extends SecureController {
 
     private void createTable() {
 
-        ViewRuleAssignmentTableFactory factory = new ViewRuleAssignmentTableFactory(showMoreLink, getCoreResources().getField("designer.url"), isDesigner);
+        ViewRuleAssignmentTableFactory factory = new ViewRuleAssignmentTableFactory(showMoreLink, getCoreResources().getField("designer.url")+"access?host="+getHostPathFromSysUrl(getCoreResources().getField("sysURL.base"),request.getContextPath())+"&app="+getContextPath(request), isDesigner);
         factory.setRuleSetService(getRuleSetService());
         factory.setItemFormMetadataDAO(getItemFormMetadataDAO());
         factory.setCurrentStudy(currentStudy);
+        factory.setCurrentUser(((UserAccountBean)request.getSession().getAttribute(USER_BEAN_NAME)));
         String ruleAssignmentsHtml = factory.createTable(request, response).render();
+        request.getSession().setAttribute("ruleDesignerUrl",factory.getDesingerLink());
         request.setAttribute("ruleAssignmentsHtml", ruleAssignmentsHtml);
         createStudyEventForInfoPanel();
         if (ruleAssignmentsHtml != null) {
@@ -126,6 +132,26 @@ public class ViewRuleAssignmentNewServlet extends SecureController {
 
         }
 
+    }
+    private String getHostPathFromSysUrl(String sysURL,String contextPath) {
+        return sysURL.replaceAll(contextPath+"/", "");
+       }
+    public String getContextPath(HttpServletRequest request) {
+        String contextPath = request.getContextPath().replaceAll("/", "");
+        return contextPath;
+    }
+    public String getHostPath(HttpServletRequest request) {
+        String requestURLMinusServletPath = getRequestURLMinusServletPath(request);
+        String hostPath = "";
+        if (null != requestURLMinusServletPath) {
+             hostPath = requestURLMinusServletPath.substring(0, requestURLMinusServletPath.lastIndexOf("/"));
+           // hostPath = tmpPath.substring(0, tmpPath.lastIndexOf("/"));
+        }
+        return hostPath;
+    }
+    public String getRequestURLMinusServletPath(HttpServletRequest request) {
+        String requestURLMinusServletPath = request.getRequestURL().toString().replaceAll(request.getServletPath(), "");
+        return requestURLMinusServletPath;
     }
 
     @Override

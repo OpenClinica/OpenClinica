@@ -30,7 +30,7 @@ import java.util.HashMap;
  */
 public class ViewJobServlet extends SecureController {
 
-    private static String TRIGGER_GROUP = XsltTriggerService.TRIGGER_GROUP_NAME;
+   
     private static String SCHEDULER = "schedulerFactoryBean";
     private static String EXPORT_TRIGGER = "exportTrigger";
 
@@ -69,9 +69,10 @@ public class ViewJobServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         // First we must get a reference to a scheduler
         scheduler = getScheduler();
+        XsltTriggerService xsltTriggerSrvc = new XsltTriggerService();
         // Scheduler sched = sfb.getScheduler();
 
-     String[] triggerNames = scheduler.getTriggerNames(XsltTriggerService.TRIGGER_GROUP_NAME);
+     String[] triggerNames = scheduler.getTriggerNames(xsltTriggerSrvc.getTriggerGroupNameForExportJobs());
   //      String[]    triggerNames          =           scheduler.getJobNames(XsltTriggerService.TRIGGER_GROUP_NAME);
         // logger.info("trigger list: "+triggerNames.length);
         // logger.info("trigger names: "+triggerNames.toString());
@@ -79,7 +80,7 @@ public class ViewJobServlet extends SecureController {
 
         ArrayList triggerBeans = new ArrayList();
         for (String triggerName : triggerNames) {
-            Trigger trigger = scheduler.getTrigger(triggerName, XsltTriggerService.TRIGGER_GROUP_NAME);
+            Trigger trigger = scheduler.getTrigger(triggerName, xsltTriggerSrvc.getTriggerGroupNameForExportJobs());
             try {
                 logger.debug("prev fire time " + trigger.getPreviousFireTime().toString());
                 logger.debug("next fire time " + trigger.getNextFireTime().toString());

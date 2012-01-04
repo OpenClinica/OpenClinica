@@ -86,7 +86,8 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
         super.configureTableFacade(response, tableFacade);
         tableFacade.addFilterMatcher(new MatcherKey(Date.class, "subject.createdDate"), new DateFilterMatcher(getDateFormat()));
         tableFacade.addFilterMatcher(new MatcherKey(Date.class, "subject.updatedDate"), new DateFilterMatcher(getDateFormat()));
-        tableFacade.addFilterMatcher(new MatcherKey(Status.class, "subject.status"), new GenericFilterMatecher());
+        //tableFacade.addFilterMatcher(new MatcherKey(Status.class, "subject.status"), new GenericFilterMatecher());
+        tableFacade.addFilterMatcher(new MatcherKey(Status.class, "subject.status"), new StatusFilterMatecher());
         tableFacade.addFilterMatcher(new MatcherKey(UserAccountBean.class, "subject.owner"), new GenericFilterMatecher());
         tableFacade.addFilterMatcher(new MatcherKey(UserAccountBean.class, "subject.updater"), new GenericFilterMatecher());
     }
@@ -156,7 +157,7 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
         Collection<Filter> filters = filterSet.getFilters();
         for (Filter filter : filters) {
             String property = filter.getProperty();
-            String value = filter.getValue();
+            String value = Status.getByName(filter.getValue()).getId()+"";
             listSubjectFilter.addFilter(property, value);
         }
 
@@ -197,7 +198,8 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
         protected List<Option> getOptions() {
             List<Option> options = new ArrayList<Option>();
             for (Object status : Status.toSubjectDropDownArrayList()) {
-                options.add(new Option(String.valueOf(((Status) status).getId()), ((Status) status).getName()));
+                //options.add(new Option(String.valueOf(((Status) status).getId()), ((Status) status).getName()));
+                options.add(new Option(((Status) status).getName(), ((Status) status).getName()));
             }
             return options;
         }
@@ -206,6 +208,13 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
     private class GenericFilterMatecher implements FilterMatcher {
         public boolean evaluate(Object itemValue, String filterValue) {
             return true;
+        }
+    }
+    
+    private class StatusFilterMatecher implements FilterMatcher {
+        public boolean evaluate(Object itemValue, String filterValue) {
+            int itemStatusId = ((Status)itemValue).getId();
+            return itemStatusId == Status.getByName(filterValue).getId();
         }
     }
 

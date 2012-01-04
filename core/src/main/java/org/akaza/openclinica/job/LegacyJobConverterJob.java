@@ -125,7 +125,7 @@ ExtractUtils extractUtils = new ExtractUtils();
                             endFilePath + File.separator,
                             exportFileName,
                             dsBean.getId(),
-                            epBean, userBean, Locale.US.getLanguage() , cnt,  getFilePath(context) + "xslt", XsltTriggerService.TRIGGER_GROUP_NAME);
+                            epBean, userBean, Locale.US.getLanguage() , cnt,  getFilePath(context) + "xslt", xsltService.getTriggerGroupNameForExportJobs());
                     //Updating the original trigger with user given inputs
                     newTrigger.setRepeatCount(64000);
                     newTrigger.setRepeatInterval(XsltTriggerService.getIntervalTime(period));

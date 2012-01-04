@@ -1,18 +1,23 @@
 package org.akaza.openclinica.ws;
 
 import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.extract.odm.MetaDataReportBean;
+import org.akaza.openclinica.bean.extract.odm.FullReportBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.odmbeans.ODMBean;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.logic.odmExport.MetadataUnit;
-import org.akaza.openclinica.ws.bean.StudyMetadataRequestBean;
+import org.akaza.openclinica.logic.odmExport.AdminDataCollector;
+import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
+import org.akaza.openclinica.ws.bean.BaseStudyDefinitionBean;
 import org.akaza.openclinica.ws.validator.StudyMetadataRequestValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.context.MessageSource;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -48,12 +53,19 @@ public class StudyEndpoint {
     StudyDAO studyDao;
     UserAccountDAO userAccountDao;
     private final MessageSource messages;
+    private final CoreResources coreResources;
+    private final RuleSetRuleDao ruleSetRuleDao;
+  
     private final Locale locale;
 
-    public StudyEndpoint(DataSource dataSource, MessageSource messages) {
+    public StudyEndpoint(DataSource dataSource, MessageSource messages, 
+    		CoreResources coreResources, RuleSetRuleDao ruleSetRuleDao) {
         this.dataSource = dataSource;
         this.messages = messages;
         this.locale = new Locale("en_US");
+        this.coreResources = coreResources;
+        this.ruleSetRuleDao = ruleSetRuleDao;
+        
     }
 
     /**
@@ -67,7 +79,8 @@ public class StudyEndpoint {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         Element studyRefElement = (Element) studyNodeList.item(0);
 
-        StudyMetadataRequestBean studyMetadataRequestBean = unMarshallRequest(studyRefElement);
+        //StudyMetadataRequestBean studyMetadataRequestBean = unMarshallRequest(studyRefElement);
+        BaseStudyDefinitionBean studyMetadataRequestBean = unMarshallRequest(studyRefElement);
         DataBinder dataBinder = new DataBinder((studyMetadataRequestBean));
         Errors errors = dataBinder.getBindingResult();
         StudyMetadataRequestValidator studyMetadataRequestValidator = new StudyMetadataRequestValidator(dataSource);
@@ -90,18 +103,48 @@ public class StudyEndpoint {
         Element resultElement = document.createElementNS(NAMESPACE_URI_V1, "result");
         resultElement.setTextContent(confirmation);
         responseElement.appendChild(resultElement);
-        MetadataUnit mdc = new MetadataUnit(dataSource, study, 0);
-        mdc.collectOdmStudy();
-        MetaDataReportBean meta = new MetaDataReportBean(mdc.getOdmStudy());
-        meta.addNodeStudy(Boolean.FALSE);
+        
         Element odmElement = document.createElementNS(NAMESPACE_URI_V1, "odm");
-        odmElement.setTextContent(meta.getXmlOutput().toString());
+        String reportText = getReport(study);
+        odmElement.setTextContent(reportText);//meta.getXmlOutput().toString());
         responseElement.appendChild(odmElement);
 
         return responseElement;
 
     }
 
+    
+    private String getReport(StudyBean currentStudy){
+//    	ServletContext servletContext =
+//    	    (ServletContext) context.getMessageContext().get(MessageContext.SERVLET_CONTEXT);
+        MetaDataCollector mdc = new MetaDataCollector(dataSource, currentStudy,ruleSetRuleDao);
+        AdminDataCollector adc = new AdminDataCollector(dataSource, currentStudy);
+        MetaDataCollector.setTextLength(200);
+
+        ODMBean odmb = mdc.getODMBean();
+        odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC2-0.xsd");
+        ArrayList<String> xmlnsList = new ArrayList<String>();
+        xmlnsList.add("xmlns=\"http://www.cdisc.org/ns/odm/v1.3\"");
+        //xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/openclinica_odm/v1.3\"");
+        xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/odm_ext_v130/v3.1\"");
+        xmlnsList.add("xmlns:OpenClinicaRules=\"http://www.openclinica.org/ns/rules/v3.1\"");
+        odmb.setXmlnsList(xmlnsList);
+        odmb.setODMVersion("oc1.3");
+        mdc.setODMBean(odmb);
+        adc.setOdmbean(odmb);
+        mdc.collectFileData();
+        adc.collectFileData();
+        
+        FullReportBean report = new FullReportBean();
+        report.setAdminDataMap(adc.getOdmAdminDataMap());
+        report.setOdmStudyMap(mdc.getOdmStudyMap());
+        report.setCoreResources(coreResources);
+        report.setOdmBean(mdc.getODMBean());
+        report.setODMVersion("oc1.3");
+        report.createStudyMetaOdmXml(Boolean.FALSE);
+       
+        return  report.getXmlOutput().toString().trim();
+    }
     private Element mapConfirmation(String confirmation, Errors errors) throws Exception {
         DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
@@ -122,22 +165,17 @@ public class StudyEndpoint {
 
     }
 
-    private StudyMetadataRequestBean unMarshallRequest(Element studyEventDefinitionListAll) {
+    //private StudyMetadataRequestBean unMarshallRequest(Element studyEventDefinitionListAll) {
+    	private BaseStudyDefinitionBean unMarshallRequest(Element studyEventDefinitionListAll) {
 
-        Element studyRefElement = DomUtils.getChildElementByTagName(studyEventDefinitionListAll, "studyRef");
-        Element studyIdentifierElement = DomUtils.getChildElementByTagName(studyRefElement, "identifier");
-        Element siteRef = DomUtils.getChildElementByTagName(studyRefElement, "siteRef");
-        Element siteIdentifierElement = siteRef == null ? null : DomUtils.getChildElementByTagName(siteRef, "identifier");
-
-        String studyIdentifier = studyIdentifierElement == null ? null : DomUtils.getTextValue(studyIdentifierElement);
-        String siteIdentifier = siteIdentifierElement == null ? null : DomUtils.getTextValue(siteIdentifierElement);
-
-        StudyMetadataRequestBean studyMetadataRequest = new StudyMetadataRequestBean(studyIdentifier, siteIdentifier, getUserAccount());
+        Element studyIdentifierElement = DomUtils.getChildElementByTagName(studyEventDefinitionListAll, "identifier");
+        String studyIdentifier = studyIdentifierElement == null ? null : DomUtils.getTextValue(studyIdentifierElement).trim();   
+        BaseStudyDefinitionBean studyMetadataRequest = new BaseStudyDefinitionBean(studyIdentifier,  getUserAccount());
         return studyMetadataRequest;
 
     }
 
-    StudyBean getStudy(StudyMetadataRequestBean studyMetadataRequest) {
+    StudyBean getStudy(BaseStudyDefinitionBean studyMetadataRequest) {
         StudyBean study = null;
         if (studyMetadataRequest.getStudyUniqueId() != null && studyMetadataRequest.getSiteUniqueId() == null) {
             study = getStudyDao().findByUniqueIdentifier(studyMetadataRequest.getStudyUniqueId());
@@ -277,5 +315,7 @@ public class StudyEndpoint {
         userAccountDao = userAccountDao != null ? userAccountDao : new UserAccountDAO(dataSource);
         return userAccountDao;
     }
+    
+   
 
 }

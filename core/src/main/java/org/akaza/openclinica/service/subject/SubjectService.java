@@ -48,7 +48,9 @@ public class SubjectService implements SubjectServiceInterface {
      */
     public String createSubject(SubjectBean subjectBean, StudyBean studyBean, Date enrollmentDate, String secondaryId) {
         // studyBean = getStudyDao().findByUniqueIdentifier(studyBean.getIdentifier()); // Need to
-        if (subjectBean.getUniqueIdentifier() != null && getSubjectDao().findByUniqueIdentifier(subjectBean.getUniqueIdentifier()).getId() != 0) {
+        if (subjectBean.getUniqueIdentifier() != null && subjectBean.getUniqueIdentifier().trim().length()> 0 && 
+        		getSubjectDao().findByUniqueIdentifier(subjectBean.getUniqueIdentifier()).getId() != 0) {
+        	//this condition should always be false - subject should have unique person id or none
             subjectBean = getSubjectDao().findByUniqueIdentifier(subjectBean.getUniqueIdentifier());
         } else {
             subjectBean.setStatus(Status.AVAILABLE);

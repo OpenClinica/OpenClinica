@@ -1,7 +1,6 @@
 <assembly>
   <id></id>
   <formats>
-    <format>tar.gz</format>
     <format>zip</format>
   </formats>
   <fileSets>
@@ -20,17 +19,18 @@
       <directory>src/main/config</directory>
       <outputDirectory>config</outputDirectory>
       <includes>
-        <include>database/PostgreSQL/${pom.version}/*/*</include>
-        <include>database/Oracle/${pom.version}/*/*</include>
+        <include>database/PostgreSQL/3.1.2/*/*</include>
+        <include>database/Oracle/3.1.2/*/*</include>
         <include>languages/*</include>
+		<include>languages/*/*</include>
       </includes>
     </fileSet>
   </fileSets>
   <files>
   	<file>
-  		<source>target/${pom.artifactId}-${pom.version}.war</source>
+  		<source>target/OpenClinica-web-3.1.2.war</source>
   		<outputDirectory>distribution</outputDirectory>
-  		<destName>${pom.artifactId}.war</destName>
+  		<destName>OpenClinica.war</destName>
   	</file>
   </files>
 </assembly>

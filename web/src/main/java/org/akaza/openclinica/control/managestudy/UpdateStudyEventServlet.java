@@ -124,7 +124,6 @@ public class UpdateStudyEventServlet extends SecureController {
             // link back to view
             // study subject
         }
-
         // YW 11-07-2007, a study event could not be updated if its study
         // subject has been removed
         // Status s = ((StudySubjectBean)new
@@ -181,6 +180,7 @@ public class UpdateStudyEventServlet extends SecureController {
 
         StudyDAO sdao = new StudyDAO(this.sm.getDataSource());
         StudyBean studyBean = (StudyBean) sdao.findByPK(ssub.getStudyId());
+        checkRoleByUserAndStudy(ub, studyBean.getParentStudyId(), studyBean.getId());
         // To remove signed status from the list
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
         boolean removeSign = false;

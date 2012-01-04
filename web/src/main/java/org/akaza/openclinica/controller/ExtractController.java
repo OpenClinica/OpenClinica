@@ -4,7 +4,9 @@ import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.ExtractBean;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.core.Role;
 // import org.akaza.openclinica.control.extract.StdScheduler;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.dao.core.CoreResources;
@@ -35,6 +37,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @Controller("extractController")
 @RequestMapping("/extract")
@@ -67,7 +70,17 @@ public class ExtractController {
      * @return model map, but more importantly, creates a quartz job which runs right away and generates all output there
      */
     @RequestMapping(method = RequestMethod.GET)
-    public ModelMap processSubmit(@RequestParam("id") String id, @RequestParam("datasetId") String datasetId, HttpServletRequest request)  {
+    public ModelMap processSubmit(@RequestParam("id") String id,
+                                  @RequestParam("datasetId") String datasetId, HttpServletRequest request, HttpServletResponse response)  {
+        if(!mayProceed(request)){
+            try{
+                response.sendRedirect(request.getContextPath() + "/MainMenu?message=authentication_failed");
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            return null;
+        }
+        
         ModelMap map = new ModelMap();
         ResourceBundleProvider.updateLocale(request.getLocale());
         // String datasetId = (String)request.getAttribute("datasetId");
@@ -300,4 +313,17 @@ public class ExtractController {
         return epBeanFileName;// + "." + epBean.getPostProcessing().getFileType();// not really the case - might be text to pdf
         // return retMe;
     }
+
+    private boolean mayProceed(HttpServletRequest request) {
+
+       StudyUserRoleBean currentRole = (StudyUserRoleBean)request.getSession().getAttribute("userRole");
+       Role r = currentRole.getRole();
+
+       if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR) || r.equals(Role.MONITOR)
+               || currentRole.getRole().equals(Role.INVESTIGATOR) ) {
+           return true;
+       }
+       return false;
+   }
+
 }

@@ -75,6 +75,7 @@ public class InitCreateCRFVersionServlet extends SecureController {
             version.setCrfId(crfId);
             session.setAttribute("version", version);
             request.setAttribute("crfName", name);
+            request.setAttribute("CrfId", new Integer(crfId));
             forwardPage(Page.CREATE_CRF_VERSION);
         }
     }

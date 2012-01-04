@@ -79,7 +79,6 @@
     </query>
     <query>
     	<name>findEventCRFAuditEventsWithItemDataType</name>
-    	<!--find additional item_data_type_id, YW (Dec. 2008) -->
     	<sql>
     	SELECT ale.audit_id, ale.audit_date, ale.audit_table, ale.user_id, ale.entity_id,
         	ale.entity_name, ale.reason_for_change, ale.audit_log_event_type_id, ale.old_value,
@@ -114,8 +113,8 @@
             and itd.item_data_id = ae.entity_id
              and ae.audit_table = ?
              and itd.event_crf_id = ? 
-            limit 1
-            
+             order by ae.audit_date desc
+            limit 2
         </sql>
     </query>
 </queries>

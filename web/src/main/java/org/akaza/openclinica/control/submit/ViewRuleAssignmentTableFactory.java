@@ -1,6 +1,7 @@
 package org.akaza.openclinica.control.submit;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
@@ -62,7 +63,16 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
     private List<Integer> ruleSetRuleIds;
     private final String designerURL;
     private String[] columnNames = new String[] {};
+    private UserAccountBean currentUser;
+    
+    private String designerLink;
+    public UserAccountBean getCurrentUser() {
+        return currentUser;
+    }
 
+    public void setCurrentUser(UserAccountBean currentUser) {
+        this.currentUser = currentUser;
+    }
     public ViewRuleAssignmentTableFactory(boolean showMoreLink, String designerURL, boolean isDesignerRequest) {
         this.showMoreLink = showMoreLink;
         this.designerURL = designerURL;
@@ -107,7 +117,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         String actionsHeader =
             resword.getString("actions") + "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;"
                 + "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;"
-                + "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;";
+                + "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;"
+                + "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;";
         configureColumn(row.getColumn("actions"), actionsHeader, new ActionsCellEditor(), new DefaultActionsEditor(locale), true, false);
 
     }
@@ -294,6 +305,14 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         for (Filter filter : filters) {
             String property = filter.getProperty();
             String value = filter.getValue();
+            if("ruleSetRuleStatus".equals(property)) {
+                Status s = Status.getByI18nDescription(value, locale);
+                int code = s!=null ? s.getCode() : -1;
+                value = code>0 ? Status.getByCode(code).getCode()+"" : "0";
+            } else if("actionType".equals(property)) {
+                ActionType a = ActionType.getByDescription(value);
+                value = a != null? a.getCode()+"":value;
+            }
             viewRuleAssignmentFilter.addFilter(property, value);
         }
 
@@ -674,7 +693,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         protected List<Option> getOptions() {
             List<Option> options = new ArrayList<Option>();
             for (ActionType actionTypes : ActionType.values()) {
-                options.add(new Option(String.valueOf(actionTypes.getCode()), actionTypes.getDescription()));
+                options.add(new Option(actionTypes.getDescription(), actionTypes.getDescription()));
             }
             return options;
         }
@@ -701,9 +720,11 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
             String target = (String) ((HashMap<Object, Object>) item).get("targetValue");
             String ruleOid = (String) ((HashMap<Object, Object>) item).get("ruleOid");
 
-            if (isDesignerRequest) {
+        //    if (isDesignerRequest)
+          //  {
                 value += testEditByDesignerBuilder(target, ruleOid);
-            } else if (ruleSetRule.getStatus() != Status.DELETED) {
+            //} else
+                if (ruleSetRule.getStatus() != Status.DELETED) {
                 value +=
                     viewLinkBuilder(ruleSetId) + executeLinkBuilder(ruleSetId, ruleId) + removeLinkBuilder(ruleSetRuleId, ruleSetId)
                         + extractXmlLinkBuilder(ruleSetRuleId) + testLinkBuilder(ruleSetRuleId);
@@ -719,7 +740,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
     private class StatusCellEditor implements CellEditor {
         public Object getValue(Object item, String property, int rowcount) {
             RuleSetRuleBean ruleSetRule = (RuleSetRuleBean) new BasicCellEditor().getValue(item, "ruleSetRule", rowcount);
-            return ruleSetRule.getStatus().getName();
+            //return ruleSetRule.getStatus().getDescription();
+            return ruleSetRule.getStatus().getI18nDescription(locale);
         }
     }
 
@@ -727,8 +749,10 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         @Override
         protected List<Option> getOptions() {
             List<Option> options = new ArrayList<Option>();
-            options.add(new Option(String.valueOf(Status.AVAILABLE.getCode()), Status.AVAILABLE.toString()));
-            options.add(new Option(String.valueOf(Status.DELETED.getCode()), Status.DELETED.toString()));
+            //options.add(new Option(Status.AVAILABLE.toString(), Status.AVAILABLE.toString()));
+            //options.add(new Option(Status.DELETED.toString(), Status.DELETED.toString()));
+            options.add(new Option(Status.AVAILABLE.getI18nDescription(locale), Status.AVAILABLE.getI18nDescription(locale)));
+            options.add(new Option(Status.DELETED.getI18nDescription(locale), Status.DELETED.getI18nDescription(locale)));
             return options;
         }
     }
@@ -806,8 +830,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         HtmlBuilder actionLink = new HtmlBuilder();
         actionLink.a().href("TestRule?ruleSetRuleId=" + ruleSetRuleId);
         actionLink.append("onMouseDown=\"javascript:setImage('bt_test','images/bt_EnterData_d.gif');\"");
-        actionLink.append("onMouseUp=\"javascript:setImage('bt_test','images/bt_EnterData.gif');\"").close();
-        actionLink.img().name("bt_test").src("images/bt_EnterData.gif").border("0").alt("Test").title("Test").append("hspace=\"2\"").end().aEnd();
+        actionLink.append("onMouseUp=\"javascript:setImage('bt_test','images/bt_Reassign_d.gif');\"").close();
+        actionLink.img().name("bt_test").src("images/bt_Reassign_d.gif").border("0").alt("Test").title("Test").append("hspace=\"2\"").end().aEnd();
         actionLink.append("&nbsp;&nbsp;&nbsp;");
         return actionLink.toString();
 
@@ -816,14 +840,23 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
     private String testEditByDesignerBuilder(String target, String ruleOid) {
         HtmlBuilder actionLink = new HtmlBuilder();
         // String designerURL = "http://localhost:8080/Designer-0.1.0.BUILD-SNAPSHOT/";
-        actionLink.a().href(designerURL + "ruleBuilder?" + "target=" + target + "&ruleOid=" + ruleOid);
+        setDesignerLink(designerURL  + "&target=" + target + "&ruleOid=" + ruleOid +"&study_oid=" +currentStudy.getOid()+"&provider_user="+getCurrentUser().getName());
+        actionLink.a().href(designerURL  + "&target=" + target + "&ruleOid=" + ruleOid +"&study_oid=" +currentStudy.getOid()+"&provider_user="+getCurrentUser().getName()+"&path=ViewRuleAssignment");
         actionLink.append("target=\"_parent\"");
         actionLink.append("onMouseDown=\"javascript:setImage('bt_test','images/bt_EnterData_d.gif');\"");
         actionLink.append("onMouseUp=\"javascript:setImage('bt_test','images/bt_EnterData.gif');\"").close();
-        actionLink.img().name("bt_test").src("images/bt_EnterData.gif").border("0").alt("Test").title("Test").append("hspace=\"2\"").end().aEnd();
+        actionLink.img().name("bt_test").src("images/bt_EnterData.gif").border("0").alt("Rule Designer").title("Rule Designer").append("hspace=\"2\"").end().aEnd();
         actionLink.append("&nbsp;&nbsp;&nbsp;");
         return actionLink.toString();
 
+    }
+    
+    public String getDesingerLink(){
+        return designerLink;
+    }
+    public void setDesignerLink(String designerLink)
+    {
+        this.designerLink = designerLink;
     }
 
 }

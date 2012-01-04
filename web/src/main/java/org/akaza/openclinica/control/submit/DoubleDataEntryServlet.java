@@ -216,16 +216,42 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
             inputName = getInputName(dib);
             isSingleItem = true;
         }
+
+
         // we only give warning to user if data entered in DDE is different from
         // IDE when the first
         // time user hits 'save'
         int keyId = ecb.getId();
         Integer validationCount = (Integer) session.getAttribute(COUNT_VALIDATE + keyId);
 
-        ItemDataBean valueToCompare = dib.getData();
+        // @pgawade 12-Aug-2011 issue 10601:
+        // 1. Moved the call to loadFormValue method setting values
+        // from form here. It was at the end
+        // of this method before that is after validations and so an extra
+        // validation for checking value entered
+        // against the data type was getting implemented for non-repeating group
+        // items.
+        // 2. Copying the form data into new object for non repeating items to
+        // pass to validation
+        // for matching IDE and DDE values. Id same reference is used, the way
+        // code here was written, it affetcs
+        // the value used in validation of data entered in DDE against the
+        // related data type
+        ItemDataBean valueToCompareTmp = dib.getData();
+        ItemDataBean valueToCompare = copyItemDataBean(valueToCompareTmp);
+
         if (!isSingleItem) {
             valueToCompare = dib.getDbData();
         }
+
+
+        // only load form value when an item is not in a group,
+        // if in group, the value is already loaded
+        // see formGroups = loadFormValueForItemGroup(digb,digbs,formGroups);
+        if (isSingleItem) {
+            dib = loadFormValue(dib, request);
+        }
+
         boolean showOriginalItem = getItemMetadataService().isShown(dib.getItem().getId(), ecb, valueToCompare);// was dib.getData()
         boolean showItem = dib.getMetadata().isShowItem();
         if(!showItem && dib.getScdData().getScdItemMetadataBean().getScdItemFormMetadataId()>0) {
@@ -294,12 +320,12 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
             }
 
         }
-        // only load form value when an item is not in a group,
-        // if in group, the value is already loaded
-        // see formGroups = loadFormValueForItemGroup(digb,digbs,formGroups);
-        if (isSingleItem) {
-            dib = loadFormValue(dib, request);
-        }
+        // // only load form value when an item is not in a group,
+        // // if in group, the value is already loaded
+        // // see formGroups = loadFormValueForItemGroup(digb,digbs,formGroups);
+        // if (isSingleItem) {
+        // dib = loadFormValue(dib, request);
+        // }
 
         return dib;
 
@@ -629,5 +655,25 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
     @Override
     protected boolean isAdminForcedReasonForChange(HttpServletRequest request) {
         return false;
+    }
+
+    private ItemDataBean copyItemDataBean(ItemDataBean src) {
+        ItemDataBean result = new ItemDataBean();
+        result.setEventCRFId(src.getEventCRFId());
+        result.setItemId(src.getItemId());
+        result.setValue(src.getValue());
+        result.setOrdinal(src.getOrdinal());
+        result.setSelected(src.isSelected());
+        result.setAuditLog(src.isAuditLog());
+        result.setCreatedDate(src.getCreatedDate());
+        result.setUpdatedDate(src.getUpdatedDate());
+        result.setOwner(src.getOwner());
+        result.setOwnerId(src.getOwnerId());
+        result.setUpdater(src.getUpdater());
+        result.setUpdaterId(src.getUpdaterId());
+        result.setStatus(src.getStatus());
+
+        return result;
+
     }
 }

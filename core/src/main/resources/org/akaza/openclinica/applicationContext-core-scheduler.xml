@@ -7,7 +7,8 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
     >
     
-    <bean id="schedulerFactoryBean" class="org.springframework.scheduling.quartz.SchedulerFactoryBean" depends-on="liquibase">
+    <bean id="schedulerFactoryBean" class="org.akaza.openclinica.job.OpenClinicaSchedulerFactoryBean" 
+            depends-on="liquibase" destroy-method="destroy">
         <property name="dataSource" ref="dataSource"/>
         <property name="transactionManager" ref="transactionManager"/>
         <property name="quartzProperties">

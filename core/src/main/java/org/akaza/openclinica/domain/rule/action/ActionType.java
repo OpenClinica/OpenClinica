@@ -48,4 +48,12 @@ public enum ActionType implements CodedEnum {
         return description;
     }
 
+    public static ActionType getByDescription(String description) {
+        for (ActionType theEnum : ActionType.values()) {
+            if(theEnum.getDescription().equals(description)) {
+                return theEnum;
+            }
+        }
+        return null;
+    }
 }

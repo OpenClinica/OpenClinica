@@ -2,18 +2,20 @@ package org.akaza.openclinica.controller;
 
 import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
 
+import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.controller.helper.SdvFilterDataBean;
 import org.akaza.openclinica.controller.helper.table.SubjectSDVContainer;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.web.table.sdv.SDVUtil;
-import org.akaza.openclinica.web.table.sdv.SubjectIdSDVFactory;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.StudyInfoPanel;
+import org.akaza.openclinica.web.table.sdv.SDVUtil;
+import org.akaza.openclinica.web.table.sdv.SubjectIdSDVFactory;
 import org.jmesa.facade.TableFacade;
 import org.jmesa.view.html.component.HtmlColumn;
 import org.jmesa.view.html.component.HtmlRow;
@@ -41,16 +43,8 @@ import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
 import javax.servlet.http.HttpSession;
-import javax.servlet.ServletContext;
-import javax.servlet.RequestDispatcher;
-import org.springframework.web.servlet.view.InternalResourceViewResolver;
-import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import javax.sql.DataSource;
 
 
 /**
@@ -92,15 +86,25 @@ public class SDVController {
             return null;
         }
         ModelMap gridMap = new ModelMap();
+        HttpSession session = request.getSession();
         boolean showMoreLink = false;
-        if(request.getParameter("showMoreLink")!=null){
+        if(session.getAttribute("sSdvRestore") != null && session.getAttribute("sSdvRestore") == "false") {
+            session.setAttribute("sSdvRestore", "true");
+            showMoreLink = true;
+        }else if(request.getParameter("showMoreLink")!=null){
             showMoreLink = Boolean.parseBoolean(request.getParameter("showMoreLink").toString());
-        }else{
+        }else if(session.getAttribute("s_sdv_showMoreLink")!=null) {
+            showMoreLink = Boolean.parseBoolean(session.getAttribute("s_sdv_showMoreLink")+"");
+        }else {
             showMoreLink = true;
         }
         request.setAttribute("showMoreLink", showMoreLink+"");
+        session.setAttribute("s_sdv_showMoreLink", showMoreLink+"");
         
         request.setAttribute("studyId", studyId);
+        String restore = (String)request.getAttribute("s_sdv_restore");
+        restore = restore != null && restore.length()>0 ? restore : "false";
+        request.setAttribute("s_sdv_restore", restore);
         // request.setAttribute("studySubjectId",studySubjectId);
         /*SubjectIdSDVFactory tableFactory = new SubjectIdSDVFactory();
         * @RequestParam("studySubjectId") int studySubjectId,*/
@@ -159,6 +163,7 @@ public class SDVController {
         // Todo need something to reset panel from all the Spring Controllers 
         StudyInfoPanel panel = new StudyInfoPanel();
         panel.reset();
+        HttpSession session = request.getSession();
         request.getSession().setAttribute("panel", panel);
 
         ModelMap gridMap = new ModelMap();
@@ -166,17 +171,27 @@ public class SDVController {
         //Not necessary when using old page design...
         // setUpSidebar(request);
         boolean showMoreLink = false;
-        if(request.getParameter("showMoreLink")!=null){
+        if(session.getAttribute("tableFacadeRestore") != null && session.getAttribute("tableFacadeRestore") == "false") {
+            session.setAttribute("tableFacadeRestore","true");
+            session.setAttribute("sSdvRestore", "false");
+            showMoreLink = true;
+        }else if(request.getParameter("showMoreLink")!=null){
             showMoreLink = Boolean.parseBoolean(request.getParameter("showMoreLink").toString());
-        }else{
+        }else if(session.getAttribute("sdv_showMoreLink")!=null) {
+            showMoreLink = Boolean.parseBoolean(session.getAttribute("sdv_showMoreLink")+"");
+        } else {
             showMoreLink = true;
         }
         request.setAttribute("showMoreLink", showMoreLink+"");
+        session.setAttribute("sdv_showMoreLink", showMoreLink+"");
         request.setAttribute("studyId", studyId);
+        String restore = (String)request.getAttribute("sdv_restore");
+        restore = restore != null && restore.length()>0 ? restore : "false";
+        request.setAttribute("sdv_restore", restore);
         //request.setAttribute("imagePathPrefix","../");
         //We need a study subject id for the first tab;
         Integer studySubjectId = (Integer) request.getAttribute("studySubjectId");
-        studySubjectId = (studySubjectId == null || studySubjectId == 0 ? 0 : studySubjectId);
+        studySubjectId = studySubjectId == null || studySubjectId == 0 ? 0 : studySubjectId;
         request.setAttribute("studySubjectId", studySubjectId);
 
         //set up the elements for the view's filter box
@@ -277,6 +292,7 @@ public class SDVController {
                 parameterMap.put(tmpName, request.getParameter(tmpName));
             }
         }
+        request.setAttribute("sdv_restore", "true");
 
         //For the messages that appear in the left column of the results page
         ArrayList<String> pageMessages = new ArrayList<String>();
@@ -339,6 +355,8 @@ public class SDVController {
 
         }
         request.setAttribute("pageMessages", pageMessages);
+        
+        request.setAttribute("sdv_restore", "true");
 
         //model.addAttribute("allParams",parameterMap);
         //model.addAttribute("verified",updateCRFs);
@@ -369,6 +387,7 @@ public class SDVController {
 
         }
         request.setAttribute("pageMessages", pageMessages);
+        request.setAttribute("sdv_restore", "true");
 
         //model.addAttribute("allParams",parameterMap);
         //model.addAttribute("verified",updateCRFs);
@@ -399,6 +418,7 @@ public class SDVController {
 
         }
         request.setAttribute("pageMessages", pageMessages);
+        request.setAttribute("s_sdv_restore", "true");
         sdvUtil.forwardRequestFromController(request, response, "/pages/" + redirection);
         return null;
     }
@@ -420,6 +440,7 @@ public class SDVController {
                     .add("There was a problem with submitting the Event CRF verification to the database. Is it possible that the database system is down temporarily?");
         }
         request.setAttribute("pageMessages", pageMessages);
+        request.setAttribute("s_sdv_restore", "true");
         sdvUtil.forwardRequestFromController(request, response, "/pages/" + redirection);
         return null;
 
@@ -441,6 +462,7 @@ public class SDVController {
                 parameterMap.put(tmpName, request.getParameter(tmpName));
             }
         }
+        request.setAttribute("s_sdv_restore", "true");
 
         //For the messages that appear in the left column of the results page
         ArrayList<String> pageMessages = new ArrayList<String>();
@@ -574,5 +596,4 @@ public class SDVController {
 
         return false;
     }
-
 }

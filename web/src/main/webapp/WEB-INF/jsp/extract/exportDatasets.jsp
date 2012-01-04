@@ -49,7 +49,7 @@
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope="request" id="dataset" class="org.akaza.openclinica.bean.extract.DatasetBean"/>
 <jsp:useBean scope="request" id="filelist" class="java.util.ArrayList"/>
-<h1><span class="title_manage"><fmt:message key="download_data" bundle="${resword}"/>: <c:out value="${dataset.name}"/> <a href="javascript:openDocWindow('help/4_3_exportDatasets_Help.html')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
+<h1><span class="title_manage"><fmt:message key="download_data" bundle="${resword}"/>: <c:out value="${dataset.name}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/export-datasets')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
 
 <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -115,7 +115,7 @@
 		--%>
 		<%--<li><a href="javascript:openDocWindow('ExportDataset?action=csv&datasetId=<c:out value="${dataset.id}"/>')"><fmt:message key="comma_delimited_text" bundle="${resword}"/></a></li>--%>
 		<%-- 
-		<li><a href="javascript:openDoc('ExportDataset?action=spss&datasetId=<c:out value="${dataset.id}"/>')"><fmt:message key="SPSS_syntax_and_data" bundle="${resword}"/></a>&nbsp;<a href="javascript:openDocWindow('help/4_4_spssSpec_Help.html')"><img src="images/bt_Help_Extract.gif" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>" border="0"></a></li>
+		<li><a href="javascript:openDoc('ExportDataset?action=spss&datasetId=<c:out value="${dataset.id}"/>')"><fmt:message key="SPSS_syntax_and_data" bundle="${resword}"/></a>&nbsp;<a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/spss-file-specifications')"><img src="images/bt_Help_Extract.gif" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>" border="0"></a></li>
 		<li><a href="javascript:openDoc('ExportDataset?action=odm&datasetId=<c:out value="${dataset.id}"/>&odmVersion=1.3')"><fmt:message key="CDISC_ODM_XML_format" bundle="${resword}"/>&nbsp;1.3</a></li>
 		<li><a href="javascript:openDoc('ExportDataset?action=odm&datasetId=<c:out value="${dataset.id}"/>&odmVersion=1.3&xalan=1')">Generate the 1.3 XML and SQL Dataset with XSLT</a></li>
 		<li><a href="javascript:openDoc('ExportDataset?action=odm&datasetId=<c:out value="${dataset.id}"/>&odmVersion=1.2')"><fmt:message key="CDISC_ODM_XML_format" bundle="${resword}"/>&nbsp;1.2</a></li>
@@ -169,11 +169,11 @@
 
 <P><b><fmt:message key="note" bundle="${resword}"/>: </b><fmt:message key="export_dataset_download2" bundle="${restext}"/>
 
-<p><fmt:message key="export_dataset_download3" bundle="${restext}"/><a href="javascript:openDocWindow('help/4_3_exportDatasets_Help.html#downloadsettings')"><img src="images/bt_Help_Extract.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a> <fmt:message key="export_dataset_download6" bundle="${restext}"/>
+<p><fmt:message key="export_dataset_download3" bundle="${restext}"/><a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/export-datasets')"><img src="images/bt_Help_Extract.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a> <fmt:message key="export_dataset_download6" bundle="${restext}"/>
 <%--<P>You may select all, copy and paste the text generated into a text editor or excel spreadsheet.
 --%>
 
-<p><e><fmt:message key="internet_explorer_users" bundle="${resword}"/></i>: <fmt:message key="export_dataset_download4" bundle="${restext}"/><a href="javascript:openDocWindow('help/4_3_exportDatasets_Help.html#downloadsettings')"><img src="images/bt_Help_Extract.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a> <fmt:message key="export_dataset_download5" bundle="${restext}"/>
+<p><e><fmt:message key="internet_explorer_users" bundle="${resword}"/></i>: <fmt:message key="export_dataset_download4" bundle="${restext}"/><a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/export-datasets')"><img src="images/bt_Help_Extract.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a> <fmt:message key="export_dataset_download5" bundle="${restext}"/>
 
 <P><fmt:message key="archive_of_exported_dataset_files" bundle="${resword}"/>:</P>
 

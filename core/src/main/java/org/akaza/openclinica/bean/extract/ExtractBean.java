@@ -619,7 +619,7 @@ public class ExtractBean {
                     if (!iter.hasNext()) {
                         answer.nextCell("");
 
-                        didb.setGroupName(new Integer(sgcBean.getId()), "");
+                        didb.setGroupName(Integer.valueOf(sgcBean.getId()), "");
                     }
                     /*
                      * case 1 - one or more groups assigned - runs through the
@@ -631,14 +631,14 @@ public class ExtractBean {
                         // logger.info("+++ picture of study group map:
                         // "+studyGroupMap.toString());
 
-                        if (studyGroupMap.containsKey(new Integer(sgcBean.getId()))) {
-                            StudyGroupBean groupBean = (StudyGroupBean) studyGroupMap.get(new Integer(sgcBean.getId()));
+                        if (studyGroupMap.containsKey(Integer.valueOf(sgcBean.getId()))) {
+                            StudyGroupBean groupBean = (StudyGroupBean) studyGroupMap.get(Integer.valueOf(sgcBean.getId()));
                             // logger.info("found a group name in a group
                             // class: "+groupBean.getName());
 
                             answer.nextCell(groupBean.getName());
 
-                            didb.setGroupName(new Integer(sgcBean.getId()), groupBean.getName());
+                            didb.setGroupName(Integer.valueOf(sgcBean.getId()), groupBean.getName());
 
                             break;
                             // didb.setGroupName(groupBean.getName());
@@ -646,7 +646,7 @@ public class ExtractBean {
                         } else {
                             answer.nextCell("");
 
-                            didb.setGroupName(new Integer(sgcBean.getId()), "");
+                            didb.setGroupName(Integer.valueOf(sgcBean.getId()), "");
                         }// end if
                     }// end while
                 }// end for
@@ -889,7 +889,7 @@ public class ExtractBean {
     }
 
     protected boolean selected(ItemBean ib) {
-        return selectedItems.containsKey(new Integer(ib.getId()));
+        return selectedItems.containsKey(Integer.valueOf(ib.getId()));
     }
 
     protected boolean selectedSEDCRF(StudyEventDefinitionBean sed, CRFBean cb) {
@@ -897,7 +897,7 @@ public class ExtractBean {
     }
 
     protected boolean selectedSED(StudyEventDefinitionBean sed) {
-        return selectedSEDs.containsKey(new Integer(sed.getId()));
+        return selectedSEDs.containsKey(Integer.valueOf(sed.getId()));
     }
 
     private void markDisplayed(StudyEventDefinitionBean sed, CRFBean cb, ItemBean ib) {
@@ -1488,7 +1488,7 @@ public class ExtractBean {
     // //////////////////////////
 
     private Integer getMaxOrdinalsKey(int studySubjectId) {
-        return new Integer(studySubjectId);
+        return Integer.valueOf(studySubjectId);
     }
 
     private int getMaxOrdinal(int studyEventDefinitionId) {
@@ -1512,7 +1512,7 @@ public class ExtractBean {
         // disable logg - slow performance
         // logger.info("*** set max ordinal: " + sampleOrdinal + " for key " +
         // key.toString());
-        maxOrdinals.put(key, new Integer(sampleOrdinal));
+        maxOrdinals.put(key, Integer.valueOf(sampleOrdinal));
     }
 
     // /////////////////////////////////////////////
@@ -1614,7 +1614,7 @@ public class ExtractBean {
 
     private ArrayList getStudyGroupMap(int h) {
         syncSubjectIndex(h);
-        Integer key = new Integer(currentSubject.getId());
+        Integer key = Integer.valueOf(currentSubject.getId());
         ArrayList value = (ArrayList) studyGroupMaps.get(key);
         return value != null ? value : new ArrayList();
     }

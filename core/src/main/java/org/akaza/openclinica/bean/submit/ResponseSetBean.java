@@ -134,7 +134,7 @@ public class ResponseSetBean extends EntityBean {
             }
 
             options.add(ro);
-            optionIndexesByValue.put(value, new Integer(options.size() - 1));
+            optionIndexesByValue.put(value, Integer.valueOf(options.size() - 1));
         }
 
         return;
@@ -148,7 +148,7 @@ public class ResponseSetBean extends EntityBean {
      */
     public void addOption(ResponseOptionBean ro) {
         options.add(ro);
-        optionIndexesByValue.put(ro.getValue(), new Integer(options.size() - 1));
+        optionIndexesByValue.put(ro.getValue(), Integer.valueOf(options.size() - 1));
     }
 
     /**

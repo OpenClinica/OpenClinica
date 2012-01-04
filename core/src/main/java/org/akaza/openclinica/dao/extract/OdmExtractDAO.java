@@ -1938,7 +1938,7 @@ public class OdmExtractDAO extends DatasetDAO {
     protected void setOCSubjectDataDNs(OdmClinicalDataBean data, String studySubjectOids, HashMap<String, String> subOidPoses) {
         this.setOCSubjectDataDNsTypesExpected();
         HashMap<String, ArrayList<ChildNoteBean>> pDNs = new HashMap<String, ArrayList<ChildNoteBean>>();
-        HashMap<String, ArrayList<DiscrepancyNoteBean>> sDNs = new HashMap<String, ArrayList<DiscrepancyNoteBean>>();
+        // HashMap<String, ArrayList<DiscrepancyNoteBean>> sDNs = new HashMap<String, ArrayList<DiscrepancyNoteBean>>();
         logger.debug("Begin to execute GetOCSubjectDataDNsSql");
         logger.debug("getOCSubjectDataDNsSql= " + this.getOCSubjectDataDNsSql(studySubjectOids));
         ArrayList rows = select(this.getOCSubjectDataDNsSql(studySubjectOids));
@@ -1995,7 +1995,7 @@ public class OdmExtractDAO extends DatasetDAO {
     protected void setOCEventDataDNs(OdmClinicalDataBean data, String definitionOids, String studySubjectOids, HashMap<String, String> evnOidPoses) {
         this.setOCEventDataDNsTypesExpected();
         HashMap<String, ArrayList<ChildNoteBean>> pDNs = new HashMap<String, ArrayList<ChildNoteBean>>();
-        HashMap<String, ArrayList<DiscrepancyNoteBean>> sDNs = new HashMap<String, ArrayList<DiscrepancyNoteBean>>();
+        // HashMap<String, ArrayList<DiscrepancyNoteBean>> sDNs = new HashMap<String, ArrayList<DiscrepancyNoteBean>>();
         logger.debug("Begin to execute GetOCEventDataDNsSql");
         logger.debug("getOCEventDataDNsSql= " + this.getOCEventDataDNsSql(definitionOids, studySubjectOids));
         ArrayList rows = select(this.getOCEventDataDNsSql(definitionOids, studySubjectOids));
@@ -2056,7 +2056,7 @@ public class OdmExtractDAO extends DatasetDAO {
     protected void setOCFormDataDNs(OdmClinicalDataBean data, String ecIds, HashMap<Integer, String> formOidPoses) {
         this.setOCFormDataDNsTypesExpected();
         HashMap<String, ArrayList<ChildNoteBean>> pDNs = new HashMap<String, ArrayList<ChildNoteBean>>();
-        HashMap<String, ArrayList<DiscrepancyNoteBean>> sDNs = new HashMap<String, ArrayList<DiscrepancyNoteBean>>();
+        // HashMap<String, ArrayList<DiscrepancyNoteBean>> sDNs = new HashMap<String, ArrayList<DiscrepancyNoteBean>>();
         logger.debug("Begin to execute GetOCEventDataDNsSql");
         logger.debug("getOCFormDataDNsSql= " + this.getOCFormDataDNsSql(ecIds));
         ArrayList rows = select(this.getOCFormDataDNsSql(ecIds));
@@ -2118,7 +2118,7 @@ public class OdmExtractDAO extends DatasetDAO {
     protected void setOCItemDataDNs(OdmClinicalDataBean data, String idataIds, HashMap<Integer, String> idataOidPoses) {
         this.setOCItemDataDNsTypesExpected();
         HashMap<String, ArrayList<ChildNoteBean>> pDNs = new HashMap<String, ArrayList<ChildNoteBean>>();
-        HashMap<String, ArrayList<DiscrepancyNoteBean>> sDNs = new HashMap<String, ArrayList<DiscrepancyNoteBean>>();
+        // HashMap<String, ArrayList<DiscrepancyNoteBean>> sDNs = new HashMap<String, ArrayList<DiscrepancyNoteBean>>();
         logger.debug("Begin to execute GetOCItemDataDNsSql");
         logger.debug("getOCItemDataDNsSql= " + this.getOCItemDataDNsSql(idataIds));
         ArrayList rows = select(this.getOCItemDataDNsSql(idataIds));
@@ -2353,8 +2353,9 @@ public class OdmExtractDAO extends DatasetDAO {
                     try {
                         form.setInterviewDate(new SimpleDateFormat("yyyy-MM-dd").format((Date) row.get("date_interviewed")));
                     } catch (NullPointerException npe) {
-                        logger.debug("caught NPE");
-                        form.setInterviewDate(new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+                        logger.debug("caught NPE for interviewDate");
+                        //Comment it out for: 11592. For this exaction function, interviewDate should be kept as the same as in database.
+                        //form.setInterviewDate(new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
                     }
                 }
                 // ----- finish adding crf attributes

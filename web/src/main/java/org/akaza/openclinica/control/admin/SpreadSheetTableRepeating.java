@@ -57,7 +57,7 @@ import java.util.TreeSet;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-/**
+/** 
  * <P>
  * Returns multiple types of things based on the parsing; returns html table
  * returns data objects as SQL strings.
@@ -686,14 +686,25 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         String[] resValArray = value1.split(",");
                         if (labelWithValues.containsKey(responseLabel)) {
                             if (!StringUtil.isBlank(resValues)) {
-                                for (int i = 0; i < resValArray.length; i++) {
-                                    if (!resValArray[i].equals(mapValArray[i])) {
-                                        errors.add(resPageMsg.getString("resp_label_with_different_resp_values") + " " + k + ", "
-                                            + resPageMsg.getString("items_worksheet") + ".");
-                                        htmlErrors.put(j + "," + k + ",16", resPageMsg.getString("resp_label_with_different_resp_values_html_error"));
-                                        break;
-                                    }
-                                }
+								// @pgawade 31-May-2011 Added the check to
+								// compare the size of resValArray and
+								// mapValArray before comparing the individual
+								// elements in them
+								if (null != resValArray && null != mapValArray && resValArray.length != mapValArray.length) {
+									errors.add(resPageMsg.getString("resp_label_with_different_resp_values") + " " + k + ", "
+										+ resPageMsg.getString("items_worksheet") + ".");
+									htmlErrors.put(j + "," + k + ",16", resPageMsg.getString("resp_label_with_different_resp_values_html_error"));
+								} 
+								else {
+									for (int i = 0; i < resValArray.length; i++) {
+										if (!resValArray[i].equals(mapValArray[i])) {
+											errors.add(resPageMsg.getString("resp_label_with_different_resp_values") + " " + k + ", "
+												+ resPageMsg.getString("items_worksheet") + ".");
+											htmlErrors.put(j + "," + k + ",16", resPageMsg.getString("resp_label_with_different_resp_values_html_error"));
+											break;
+										}
+									}
+								}
                             }
                             controlValues.put(secName+"---"+itemName, mapValArray);
                         } else {
@@ -1453,38 +1464,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 
                         }
                         queries.add(sql2);
-                        
-                        String sql2_1 = "";
-                        if(display.length() > 0) {
-                            if(controlItemName.length()>0 && optionValue.length()>0 && message.length()>0) {
-                                //At this point, all errors for scd should be caught; and insert into item_form_metadata should be done 
-                                if (dbName.equals("oracle")) {
-                                    sql2_1 = "insert into scd_item_metadata (scd_item_form_metadata_id,control_item_form_metadata_id,control_item_name," 
-                                        + "option_value,message) values(" 
-                                        + "(select max(ifm.item_form_metadata_id) from item_form_metadata ifm where ifm.item_id=" + selectCorrectItemQueryOracle 
-                                        + "and ifm.show_item=0 ),"
-                                        + "(select cifm.item_form_metadata_id from item, item_form_metadata cifm"
-                                        + " where item.item_id = (select max(item_id) from item where name = '" + controlItemName +"')" 
-                                        + " and item.owner_id = " + ownerId + " and cifm.item_id = item.item_id and cifm.item_form_metadata_id > " + maxItemFormMetadataId
-                                        + "), '" + controlItemName + "', '" + stripQuotes(optionValue) + "', '" + stripQuotes(message) + "'"
-                                        + ")";
-                                } else {
-                                    sql2_1 = "insert into scd_item_metadata (scd_item_form_metadata_id,control_item_form_metadata_id,control_item_name," 
-                                    	+ "option_value,message) values(" 
-                                    	+ "(select max(ifm.item_form_metadata_id) from item_form_metadata ifm where ifm.item_id=" + selectCorrectItemQueryPostgres 
-                                    	+ "and ifm.show_item=false ),"
-                                    	+ "(select cifm.item_form_metadata_id from item, item_form_metadata cifm"
-                                    	+ " where item.item_id = (select max(item_id) from item where name = '" + controlItemName +"')" 
-                                    	+ " and item.owner_id = " + ownerId + " and cifm.item_id = item.item_id and cifm.item_form_metadata_id > " + maxItemFormMetadataId
-                                    	+ "), '" + controlItemName + "', '" + stripQuotes(optionValue) + "', '" + stripQuotes(message) + "'"
-                                    	+ ")";
-                                }
-                                queries.add(sql2_1);
-                            } else {
-                                logger.info("No insert into scd_item_metadata for item name = " + itemName + 
-                                        "with Simple_Conditional_Display = \"" + display + "\".");
-                            }
-                        }
+                            
                         
                         // link version with items now
                         String sql3 = "";
@@ -1496,6 +1476,42 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                 "INSERT INTO VERSIONING_MAP (CRF_VERSION_ID, ITEM_ID) VALUES ( " + versionIdString + "," + selectCorrectItemQueryPostgres + ")";
                         }
                         queries.add(sql3);
+                        
+                        String sql2_1 = "";
+                        if(display.length() > 0) {
+                            if(controlItemName.length()>0 && optionValue.length()>0 && message.length()>0) {
+                                //At this point, all errors for scd should be caught; and insert into item_form_metadata should be done 
+                                if (dbName.equals("oracle")) {
+                                    sql2_1 = "insert into scd_item_metadata (scd_item_form_metadata_id,control_item_form_metadata_id,control_item_name," 
+                                        + "option_value,message) values(" 
+                                        + "(select max(ifm.item_form_metadata_id) from item_form_metadata ifm where ifm.item_id=" + selectCorrectItemQueryOracle 
+                                        + "and ifm.show_item=0 ),"
+                                        + "(select cifm.item_form_metadata_id from item, item_form_metadata cifm"
+                                        + " where cifm.crf_version_id = " + versionIdString 
+                                        + " and item.item_id = (select it.item_id from item it, versioning_map vm where it.name = '" + controlItemName +"'"
+                                        + " and vm.crf_version_id = " + versionIdString + " and vm.item_id = it.item_id)" 
+                                        + " and cifm.item_id = item.item_id), "
+                                        + "'" + controlItemName + "', '" + stripQuotes(optionValue) + "', '" + stripQuotes(message) + "'"
+                                        + ")";
+                                } else {
+                                    sql2_1 = "insert into scd_item_metadata (scd_item_form_metadata_id,control_item_form_metadata_id,control_item_name," 
+                                        + "option_value,message) values(" 
+                                        + "(select max(ifm.item_form_metadata_id) from item_form_metadata ifm where ifm.item_id=" + selectCorrectItemQueryPostgres 
+                                        + "and ifm.show_item=false ),"
+                                        + "(select cifm.item_form_metadata_id from item, item_form_metadata cifm"
+                                        + " where cifm.crf_version_id = " + versionIdString 
+                                        + " and item.item_id = (select it.item_id from item it, versioning_map vm where it.name = '" + controlItemName +"'"
+                                        + " and vm.crf_version_id = " + versionIdString + " and vm.item_id = it.item_id)" 
+                                        + " and cifm.item_id = item.item_id), "
+                                        + "'" + controlItemName + "', '" + stripQuotes(optionValue) + "', '" + stripQuotes(message) + "'"
+                                        + ")";
+                                }
+                                queries.add(sql2_1);
+                            } else {
+                                logger.info("No insert into scd_item_metadata for item name = " + itemName + 
+                                        "with Simple_Conditional_Display = \"" + display + "\".");
+                            }
+                        }
 
                         // if (!StringUtil.isBlank(groupLabel)) {
                         // //add the item and the group label together
@@ -2107,6 +2123,15 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         // worksheet.");
                         // htmlErrors.put(j + ",1,0", "REQUIRED FIELD");
                         throw new CRFReadingException("The CRF_NAME column was blank in the CRF worksheet.");
+                    }
+                    
+                    if(crfId > 0) {
+                        CRFBean checkName = (CRFBean) cdao.findByPK(crfId);
+                        if (!checkName.getName().equals(crfName)) {
+                            throw new CRFReadingException(resPageMsg.getString("the") + " " +
+                                    resPageMsg.getString("CRF_NAME_column") + " '" + crfName + "' " +
+                                    resPageMsg.getString("did_not_match_crf_name") + " '" + checkName.getName() + "'.");
+                        }
                     }
 
                     if (crfName.length() > 255) {

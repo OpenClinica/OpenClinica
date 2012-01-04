@@ -150,7 +150,7 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
      */
     @Override
     protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-
+        mayAccess(request);
         locale = request.getLocale();
         HttpSession session = request.getSession();
         FormProcessor fp = new FormProcessor(request);

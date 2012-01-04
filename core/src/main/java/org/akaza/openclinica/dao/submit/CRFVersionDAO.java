@@ -13,9 +13,14 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.DAODigester;
+import org.akaza.openclinica.dao.core.PreparedStatementFactory;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -34,7 +39,7 @@ import javax.sql.DataSource;
  * 
  * 
  */
-public class CRFVersionDAO extends AuditableEntityDAO {
+public class CRFVersionDAO<K extends String,V extends ArrayList> extends AuditableEntityDAO {
 
     @Override
     protected void setDigesterName() {
@@ -453,4 +458,5 @@ public class CRFVersionDAO extends AuditableEntityDAO {
             return null;
         }
     }
+
 }

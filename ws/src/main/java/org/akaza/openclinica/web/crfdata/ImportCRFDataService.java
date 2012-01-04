@@ -2,6 +2,7 @@ package org.akaza.openclinica.web.crfdata;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
+
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.core.ResponseType;
@@ -107,8 +108,7 @@ public class ImportCRFDataService {
                 StudyEventDefinitionBean studyEventDefinitionBean =
                     studyEventDefinitionDAO.findByOidAndStudy(studyEventDataBean.getStudyEventOID(), studyBean.getId(), studyBean.getParentStudyId());
                 logger.info("find all by def and subject " + studyEventDefinitionBean.getName() + " study subject " + studySubjectBean.getName());
-                // ArrayList<StudyEventBean> studyEventBeans = studyEventDAO.findAllByDefinitionAndSubject(studyEventDefinitionBean, studySubjectBean);
-
+                
                 for (FormDataBean formDataBean : formDataBeans) {
 
                     CRFVersionDAO crfVersionDAO = new CRFVersionDAO(ds);
@@ -125,7 +125,15 @@ public class ImportCRFDataService {
                         StudyEventBean studyEventBean =
                             (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(),
                                     studyEventDefinitionBean.getId(), Integer.parseInt(sampleOrdinal));
-
+                        // ArrayList<StudyEventBean> studyEventBeans = studyEventDAO.findAllByDefinitionAndSubject(studyEventDefinitionBean, studySubjectBean);
+                        // htaycher: transfer from web  @pgawade 16-March-2011 Do not allow the data import
+                        // if event status is one of the - stopped, signed,
+                        // locked
+                        if (studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.LOCKED)
+                            || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SIGNED)
+                            || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.STOPPED)) {
+                            return null;
+                        }
                         ArrayList<EventCRFBean> eventCrfBeans = eventCrfDAO.findByEventSubjectVersion(studyEventBean, studySubjectBean, crfVersionBean);
                         // what if we have begun with creating a study
                         // event, but haven't entered data yet? this would
@@ -389,8 +397,7 @@ public class ImportCRFDataService {
                                         // also
                                         // possible
                                         // nullpointer
-
-                                        displayItemBean.setData(itemDataBean);
+                                         displayItemBean.setData(itemDataBean);
                                         displayItemBean.setMetadata(metadataBean);
                                         // set event def crf?
                                         displayItemBean.setEventDefinitionCRF(eventDefinitionCRF);
@@ -572,7 +579,7 @@ public class ImportCRFDataService {
         return itemDataBean;
     }
 
-    private void attachValidator(DisplayItemBean displayItemBean, ImportHelper importHelper, DiscrepancyValidator v, HashMap<String, String> hardv,
+    private void attachValidator(DisplayItemBean displayItemBean, ImportHelper importHelper, DiscrepancyValidator discValidator, HashMap<String, String> hardv,
             javax.servlet.http.HttpServletRequest request, String eventCRFRepeatKey, String studySubjectOID) throws OpenClinicaException {
         org.akaza.openclinica.bean.core.ResponseType rt = displayItemBean.getMetadata().getResponseSet().getResponseType();
         String itemOid = displayItemBean.getItem().getOid() + "_" + eventCRFRepeatKey + "_" + displayItemBean.getData().getOrdinal() + "_" + studySubjectOID;
@@ -591,10 +598,16 @@ public class ImportCRFDataService {
                 if (!"".equals(displayItemBean.getData().getValue())) {
                     String dateValue = displayItemBean.getData().getValue();
                     SimpleDateFormat sdf_sqldate = new SimpleDateFormat("yyyy-MM-dd");
+                    sdf_sqldate.setLenient(false);
                     try {
+                    	//htaycher: database exspects format YYYY-MM-DD
                         Date originalDate = sdf_sqldate.parse(dateValue);
-                        String replacementValue = new SimpleDateFormat("MM/dd/yyyy").format(originalDate);
+                       // String replacementValue = new SimpleDateFormat("MM/dd/yyyy").format(originalDate);
+                        
+                        String replacementValue = new SimpleDateFormat("yyyy-MM-dd").format(originalDate);
                         displayItemBean.getData().setValue(replacementValue);
+                    
+                    
                     } catch (ParseException pe1) {
 
                         // next version; fail if it does not pass iso 8601
@@ -651,7 +664,7 @@ public class ImportCRFDataService {
             // what if it's a phone number? how often does that happen?
 
             request.setAttribute(itemOid, displayItemBean.getData().getValue());
-            displayItemBean = importHelper.validateDisplayItemBeanText(v, displayItemBean, itemOid);
+            displayItemBean = importHelper.validateDisplayItemBeanText(discValidator, displayItemBean, itemOid);
             // errors = v.validate();
 
         } else if (rt.equals(ResponseType.CALCULATION) || rt.equals(ResponseType.GROUP_CALCULATION)) {
@@ -692,7 +705,7 @@ public class ImportCRFDataService {
                 // + displayItemBean.getItem().getOid() + " repeat key " +
                 // displayItemBean.getData().getOrdinal(), "");
             }
-            displayItemBean = importHelper.validateDisplayItemBeanSingleCV(v, displayItemBean, itemOid);
+            displayItemBean = importHelper.validateDisplayItemBeanSingleCV(discValidator, displayItemBean, itemOid);
             // errors = v.validate();
         } else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)) {
             // logger.info(itemOid + "is a CHECKBOX
@@ -706,7 +719,7 @@ public class ImportCRFDataService {
                 // logger.debug("--  theValue was NULL, the real value was " + displayItemBean.getData().getValue());
                 hardv.put(itemOid, "This is not in the correct response set.");
             }
-            displayItemBean = importHelper.validateDisplayItemBeanMultipleCV(v, displayItemBean, itemOid);
+            displayItemBean = importHelper.validateDisplayItemBeanMultipleCV(discValidator, displayItemBean, itemOid);
             // errors = v.validate();
         }
     }

@@ -107,12 +107,16 @@
 <h1><span class="title_manage">
 <c:choose>
 	<c:when test="${requestStudySubject == requestStudySubjectFalse}">
+	
 <fmt:message key="schedule_study_event_for" bundle="${resword}"/><b> <c:out value="${chosenSubject.name}" /></b>
-        <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/add-subject')">
+        <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/schedule-event')">
             <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
 	</c:when>
 	<c:otherwise>
-<fmt:message key="schedule_study_event_for" bundle="${resword}"/><a href="javascript:openDocWindow('help/2_3_newStudyEvent_Help.html')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
+	
+<fmt:message key="schedule_study_event_for" bundle="${resword}"/>
+<a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/schedule-event#enterData')">
+<img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
 	</c:otherwise>
 </c:choose>
 </span></h1>

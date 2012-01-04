@@ -36,7 +36,7 @@ import java.util.Locale;
 
 import javax.sql.DataSource;
 
-public class StudyDAO extends AuditableEntityDAO {
+public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEntityDAO {
     // private DataSource ds;
     // private DAODigester digester;
 

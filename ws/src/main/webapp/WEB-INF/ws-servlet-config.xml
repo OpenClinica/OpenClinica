@@ -136,6 +136,8 @@
     <bean id="studyEndpoint" class="org.akaza.openclinica.ws.StudyEndpoint">
         <constructor-arg ref="dataSource"/>
         <constructor-arg ref="messageSource"/>
+        <constructor-arg ref="coreResources"/>
+        <constructor-arg ref="ruleSetRuleDao"/>
     </bean>
     
     <bean id="studySubjectEndpoint" class="org.akaza.openclinica.ws.StudySubjectEndpoint">

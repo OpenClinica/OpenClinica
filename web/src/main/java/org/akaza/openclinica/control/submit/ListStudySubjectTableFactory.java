@@ -1,6 +1,5 @@
 package org.akaza.openclinica.control.submit;
 
-import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -17,7 +16,6 @@ import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
-import org.akaza.openclinica.control.DefaultView;
 import org.akaza.openclinica.control.ListStudyView;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.FindSubjectsFilter;
@@ -46,7 +44,6 @@ import org.jmesa.view.editor.BasicCellEditor;
 import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
-import org.omg.CORBA.Request;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -366,6 +363,12 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         for (Filter filter : filters) {
             String property = filter.getProperty();
             String value = filter.getValue();
+            if("studySubject.status".equalsIgnoreCase(property)) {
+                value = Status.getByName(value).getId()+"";
+            } else if (property.startsWith("sgc_")) {
+                int studyGroupClassId = property.endsWith("_")? 0 : Integer.valueOf(property.split("_")[1]);
+                value = studyGroupDAO.findByNameAndGroupClassID(value, studyGroupClassId).getId()+"";
+            }
             auditUserLoginFilter.addFilter(property, value);
         }
 
@@ -538,7 +541,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     public class StatusFilterMatcher implements FilterMatcher {
         public boolean evaluate(Object itemValue, String filterValue) {
 
-            String item = StringUtils.lowerCase(String.valueOf(((Status) itemValue).getId()));
+            String item = StringUtils.lowerCase(String.valueOf(((Status) itemValue).getName()));
             String filter = StringUtils.lowerCase(String.valueOf(filterValue));
 
             if (filter.equals(item)) {
@@ -563,7 +566,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
         public boolean evaluate(Object itemValue, String filterValue) {
 
-            String item = StringUtils.lowerCase(String.valueOf(itemValue).trim());
+            String item = StringUtils.lowerCase(studyGroupDAO.findByPK(Integer.valueOf(itemValue.toString())).getName());
             String filter = StringUtils.lowerCase(String.valueOf(filterValue.trim()));
             if (filter.equals(item)) {
                 return true;
@@ -585,7 +588,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             List<Option> options = new ArrayList<Option>();
             for (Object status : Status.toDropDownArrayList()) {
                 ((Status) status).getName();
-                options.add(new Option(String.valueOf(((Status) status).getId()), ((Status) status).getName()));
+                options.add(new Option(((Status) status).getName(), ((Status) status).getName()));
             }
             return options;
         }
@@ -616,7 +619,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             List<Option> options = new ArrayList<Option>();
             StudyGroupDAO studyGroupDAO = getStudyGroupDAO();
             for (Object subjectStudyGroup : studyGroupDAO.findAllByGroupClass(this.studyGroupClass)) {
-                options.add(new Option(String.valueOf(((StudyGroupBean) subjectStudyGroup).getId()), ((StudyGroupBean) subjectStudyGroup).getName()));
+                options.add(new Option(((StudyGroupBean) subjectStudyGroup).getName(), ((StudyGroupBean) subjectStudyGroup).getName()));
             }
             return options;
         }
@@ -739,7 +742,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                         url.append(reAssignStudySubjectLinkBuilder(studySubjectBean));
                     }
 
-                    if ((getCurrentRole().getRole() == Role.INVESTIGATOR)
+                    if (getCurrentRole().getRole() == Role.INVESTIGATOR
                         && getStudyBean().getStatus() == Status.AVAILABLE && studySubjectBean.getStatus() != Status.DELETED && isSignable) {
                         url.append(signStudySubjectLinkBuilder(studySubjectBean));
                     }
