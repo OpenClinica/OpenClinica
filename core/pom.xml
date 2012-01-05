@@ -268,9 +268,6 @@
 		<test.locale>en_US</test.locale>
 <<<<<<< .working
 		<scm.path>scm:svn:http://svn.akazaresearch.com/openclinica/OpenClinica/branches/OpenClinica-3.0-SNAPSHOT</scm.path> -->
-=======
-	
->>>>>>> .merge-right.r16256
 		<!--  Library Versions -->
 		<!--<spring.version>2.5.6.SEC01</spring.version>-->
 		
