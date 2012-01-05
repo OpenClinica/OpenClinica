@@ -7,12 +7,14 @@ Rem
 prompt We will now setup the oracle user account that OpenClinica will use.
 Rem
 prompt
+accept ts_name prompt "Specify the Tablespace name you provided when you executed the create_ts.sql script: "
+prompt
 accept user_name prompt "Specify the wanted username for the OpenClinica oracle account: "
 prompt
-prompt The user &user_name will be created with a default tablespace of openclinica.
+prompt The user &user_name will be created with a default tablespace of &ts_name.
 Rem
 create user &user_name identified by clinica
-default tablespace openclinica
+default tablespace &ts_name
 quota 0 on system;
 Rem
 Rem
@@ -33,6 +35,3 @@ prompt
 prompt Please check spool_oracle_setup_db.txt for errors
 prompt
 Rem
-spool off
-END;
-/
