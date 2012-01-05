@@ -138,6 +138,8 @@ public class CreateDatasetServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         String action = fp.getString("action");
         if (StringUtil.isBlank(action)) {
+            
+            
             // step 1 -- instructions, and continue button
             session.setAttribute("newDataset", new DatasetBean());
             session.setAttribute("allItems", new ArrayList());
@@ -344,6 +346,7 @@ public class CreateDatasetServlet extends SecureController {
                 Validator v = new Validator(request);
 
                 v.addValidation("dsName", Validator.NO_BLANKS);
+                v.addValidation("dsName", Validator.NO_SEMI_COLONS_OR_COLONS);
                 v.addValidation("dsDesc", Validator.NO_BLANKS);
                 v.addValidation("dsStatus", Validator.IS_VALID_TERM, TermType.STATUS);
 

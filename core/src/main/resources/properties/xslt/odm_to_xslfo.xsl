@@ -21,65 +21,7 @@
           <fo:block font-size="12pt" space-after="5mm"><xsl:value-of select="$protocolNameStudy"/>
           </fo:block>
           <fo:block font-size="10pt">
-            <fo:table table-layout="fixed" width="100%" border-collapse="separate">
-     <!--<html>
-      <body>
-        <h1>View Dataset</h1>
-        <table border="1" >
-            <tr>-->
-            <fo:table-column column-width="2cm"><xsl:text>Subject Unique ID</xsl:text></fo:table-column>
-            <fo:table-column column-width="2cm"><xsl:text>Protocol ID_Site ID</xsl:text></fo:table-column>
-            <fo:table-column column-width="2cm"><xsl:text>Date of Birth</xsl:text></fo:table-column>
-            <fo:table-column column-width="2cm"><xsl:text>Sex</xsl:text></fo:table-column>
-            <fo:table-column column-width="2cm"><xsl:text>Subject Status</xsl:text></fo:table-column>
-            <fo:table-column column-width="2cm">Unique ID</fo:table-column>
-            <fo:table-column column-width="2cm">Secondary ID</fo:table-column>
-            <fo:table-column column-width="2cm">Location</fo:table-column>
-            <fo:table-column column-width="2cm">Start Date</fo:table-column>
-            <fo:table-column column-width="2cm">End Date</fo:table-column>
-            <fo:table-column column-width="2cm">Subject Event Status</fo:table-column>
-            <fo:table-column column-width="2cm">Age at Event</fo:table-column>
-            <fo:table-column column-width="2cm">Interview Date</fo:table-column>
-            <fo:table-column column-width="2cm">Interviewer Name</fo:table-column>
-            <fo:table-column column-width="2cm">Crf Version Status</fo:table-column>
-            <fo:table-column column-width="2cm">Crf Name</fo:table-column>
-            <!--</tr>
-        <tr>-->
-		<fo:table-body>
-			<fo:table-row>
-            <xsl:for-each select="/odm:ODM/odm:ClinicalData">
-                <xsl:for-each select="./odm:SubjectData">
-				
-                    <fo:table-cell><fo:block><xsl:value-of select="@OpenClinica:UniqueIdentifier"/></fo:block></fo:table-cell>
-                    <fo:table-cell><fo:block><xsl:value-of select="$protocolNameStudy"/></fo:block></fo:table-cell>
-                    <fo:table-cell><fo:block><xsl:value-of select="@OpenClinica:DateOfBirth"/></fo:block></fo:table-cell>
-                    <fo:table-cell><fo:block><xsl:value-of select="@OpenClinica:Sex"/></fo:block></fo:table-cell>
-                    <fo:table-cell><fo:block><xsl:value-of select="@OpenClinica:Status"/></fo:block></fo:table-cell>
-                    <fo:table-cell><fo:block><xsl:value-of select="@OpenClinica:UniqueIdentifier"/></fo:block></fo:table-cell>
-                    <fo:table-cell><fo:block><xsl:value-of select="@OpenClinica:SecondaryId"/></fo:block></fo:table-cell>
-                    <fo:table-cell><fo:block><xsl:value-of select="@OpenClinica:StudyEventLocation"/></fo:block></fo:table-cell>
-                    <xsl:for-each select="./odm:StudyEventData">
-                        <fo:table-cell><fo:block><xsl:value-of select="@OpenClinica:StartDate"/></fo:block></fo:table-cell>
-                        <fo:table-cell><fo:block><xsl:value-of select="@OpenClinica:EndDate"/></fo:block></fo:table-cell>
-                        <fo:table-cell><fo:block><xsl:value-of select="@OpenClinica:Status"/></fo:block></fo:table-cell>
-                        <fo:table-cell><fo:block><xsl:value-of select="@OpenClinica:SubjectAgeAtEvent"/></fo:block></fo:table-cell>
-                        <xsl:for-each select="./odm:FormData">
-                            <fo:table-cell><fo:block><xsl:value-of select="@OpenClinica:InterviewDate"/></fo:block></fo:table-cell>
-                            <fo:table-cell><fo:block><xsl:value-of select="@OpenClinica:InterviewerName"/></fo:block></fo:table-cell>
-                            <fo:table-cell><fo:block><xsl:value-of select="@OpenClinica:Status"/></fo:block></fo:table-cell>
-                            <fo:table-cell><fo:block><xsl:value-of select="@OpenClinica:Version"/></fo:block></fo:table-cell>
-                        </xsl:for-each>
-                    </xsl:for-each>
-                    
-                 </xsl:for-each>
-            </xsl:for-each>
-        <!--</tr>
-        </table>
-      </body>
-     </html>-->
-		</fo:table-row>
-	  </fo:table-body>
-            </fo:table>
+           
           </fo:block>
         </fo:flow>
       </fo:page-sequence>

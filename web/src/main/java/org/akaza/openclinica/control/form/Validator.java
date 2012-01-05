@@ -451,6 +451,8 @@ public class Validator {
     public static final int IS_VALID_WIDTH_DECIMAL = 35;
 
     public static final int TO_HIDE_CONDITIONAL_DISPLAY = 37;
+    
+    public static final int NO_SEMI_COLONS_OR_COLONS = 43;
 
     /**
      * The last field for which an addValidation method was invoked. This is
@@ -831,6 +833,11 @@ public class Validator {
                 break;
             case TO_HIDE_CONDITIONAL_DISPLAY:
                 errorMessage = v.getErrorMessage();
+              
+                
+            case NO_SEMI_COLONS_OR_COLONS:
+                errorMessage = resexception.getString("field_not_have_colons_or_semi");
+                break;
             }
         }
         // logger.info("<<<error added: "+errorMessage+" to "+fieldName);
@@ -1119,8 +1126,12 @@ public class Validator {
         case TO_HIDE_CONDITIONAL_DISPLAY:
             addError(fieldName, v);
             break;
+        
+        case NO_SEMI_COLONS_OR_COLONS:
+            if(isColonSemiColon(fieldName))
+            addError(fieldName, v);
+            break;
         }
-
         return errors;
     }
 
@@ -1147,6 +1158,15 @@ public class Validator {
         return false;
     }
 
+    
+    protected boolean isColonSemiColon(String fieldName)
+    {
+        String fieldValue = getFieldValue(fieldName);
+        if(fieldValue.indexOf(";")!=-1 || fieldValue.indexOf(":")!=-1)
+            return true;
+        else
+            return false;
+    }
     protected boolean isNumber(String fieldName) {
         String fieldValue = getFieldValue(fieldName);
 

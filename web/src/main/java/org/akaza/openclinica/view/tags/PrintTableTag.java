@@ -72,7 +72,11 @@ public class PrintTableTag extends SimpleTagSupport {
             if (studyBean != null) {
                 printFormBuilder.setStudyBean(studyBean);
             }
+            if ("true".equalsIgnoreCase(stringWriter.toString())) {
             tagWriter.println(printFormBuilder.createMarkup());
+            }
+            else
+                tagWriter.println(printFormBuilder.createMarkupNoDE());
         } else {
             tagWriter.println("The application could not generate the markup for the printable form.<br />"
                 + "This error may have been caused by the altering of the web page's URL; the URL needs "

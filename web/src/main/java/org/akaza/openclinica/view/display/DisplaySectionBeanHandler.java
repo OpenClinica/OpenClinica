@@ -117,7 +117,7 @@ public class DisplaySectionBeanHandler {
             // for printing
             DisplaySectionBean displaySectionBean;
             for (SectionBean sectionBean : allCrfSections) {
-                displaySectionBean = formBeanUtil.createDisplaySectionBWithFormGroups(sectionBean.getId(), 
+                displaySectionBean = formBeanUtil.createDisplaySectionBWithFormGroupsForPrint(sectionBean.getId(), 
                         this.crfVersionId, dataSource, eventDefBean.getId(), eventCRFBean, context);
                 displaySectionBeans.add(displaySectionBean);
             }

@@ -140,6 +140,9 @@ public class StudyAuditLogTableFactory extends AbstractTableFactory {
         for (Filter filter : filters) {
             String property = filter.getProperty();
             String value = filter.getValue();
+            if("studySubject.status".equalsIgnoreCase(property)) {
+                value = Status.getByName(value).getId()+"";
+            }
             auditLogStudyFilter.addFilter(property, value);
         }
 
@@ -180,7 +183,7 @@ public class StudyAuditLogTableFactory extends AbstractTableFactory {
         protected List<Option> getOptions() {
             List<Option> options = new ArrayList<Option>();
             for (Object status : Status.toActiveArrayList()) {
-                options.add(new Option(String.valueOf(((Status) status).getId()), ((Status) status).getName()));
+                options.add(new Option(((Status) status).getName(), ((Status) status).getName()));
             }
             return options;
         }

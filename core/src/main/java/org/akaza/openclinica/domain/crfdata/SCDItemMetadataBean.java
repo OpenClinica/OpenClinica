@@ -30,9 +30,9 @@ public class SCDItemMetadataBean extends AbstractMutableDomainObject {
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + controlItemFormMetadataId;
-        result = prime * result + ((controlItemName == null) ? 0 : controlItemName.hashCode());
-        result = prime * result + ((message == null) ? 0 : message.hashCode());
-        result = prime * result + ((optionValue == null) ? 0 : optionValue.hashCode());
+        result = prime * result + (controlItemName == null ? 0 : controlItemName.hashCode());
+        result = prime * result + (message == null ? 0 : message.hashCode());
+        result = prime * result + (optionValue == null ? 0 : optionValue.hashCode());
         result = prime * result + scdItemFormMetadataId;
         result = prime * result + scdItemId;
         return result;
@@ -69,21 +69,30 @@ public class SCDItemMetadataBean extends AbstractMutableDomainObject {
             return false;
         return true;
     }
-    private int scdItemFormMetadataId = 0;
-    private int controlItemFormMetadataId = 0;
-    private String controlItemName = "";
-    private String optionValue = "";
-    private String message="";
+    private Integer scdItemFormMetadataId;
+    private Integer controlItemFormMetadataId;
+    private String controlItemName;
+    private String optionValue;
+    private String message;
     
     private int scdItemId = 0; 
     
-    public int getScdItemFormMetadataId() {
+    public SCDItemMetadataBean() {
+        scdItemFormMetadataId = 0;
+        controlItemFormMetadataId = 0;
+        controlItemName = "";
+        optionValue = "";
+        message="";
+
+    }
+    
+    public Integer getScdItemFormMetadataId() {
         return scdItemFormMetadataId;
     }
     public void setScdItemFormMetadataId(int scdItemFormMetadataId) {
         this.scdItemFormMetadataId = scdItemFormMetadataId;
     }
-    public int getControlItemFormMetadataId() {
+    public Integer getControlItemFormMetadataId() {
         return controlItemFormMetadataId;
     }
     public void setControlItemFormMetadataId(int controlItemFormMetadataId) {

@@ -137,7 +137,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                         if (interviewerName != null && interviewerName.length() > 0) {
                             xml.append("\" OpenClinica:InterviewerName=\"" + StringEscapeUtils.escapeXml(interviewerName));
                         }
-                        if (form.getInterviewDate() != null) {
+                        if (form.getInterviewDate() != null && form.getInterviewDate().length() > 0) {
                             xml.append("\" OpenClinica:InterviewDate=\"" + form.getInterviewDate());
                         }
                         String status = form.getStatus();

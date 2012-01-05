@@ -58,7 +58,7 @@
                 <sql>
                         SELECT d.* FROM item_data d, item_form_metadata m
                         WHERE d.item_id = m.item_id AND m.section_id = ? AND d.event_crf_id=?
-                        order by d.item_data_id, d.ordinal
+                        order by d.ordinal
                 </sql>
         </query>
         <query>
@@ -67,7 +67,7 @@
                         SELECT d.* FROM item_data d, item_form_metadata m
                         WHERE d.item_id = m.item_id AND m.section_id = ? AND d.event_crf_id=?
                         and d.status_id != 5
-                        order by d.item_data_id, d.ordinal
+                        order by d.ordinal
                 </sql>
         </query>
         <query>
@@ -132,14 +132,14 @@
                         And id.item_id = igm.item_id
             And id.item_id = ifm.item_id
                 </sql>
+        </query>
         <query>
                 <name>getMaxOrdinalForGroupByItemAndEventCrf</name>
                 <sql>
                     select max(ordinal) AS max_ord from item_data where item_id = ? and event_crf_id = ?
                 </sql>
         </query>        
-        </query>
-        	<query>
+        <query>
 		<name>findByItemIdAndEventCRFIdAndOrdinal</name>
 		<sql>SELECT * FROM item_data WHERE item_id=? AND event_crf_id = ? And item_data.ordinal=?
 		Order by item_data.ordinal asc

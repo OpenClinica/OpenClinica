@@ -1,14 +1,16 @@
 package org.akaza.openclinica.control.submit;
 
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.control.DefaultToolbar;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.jmesa.view.html.toolbar.*;
-import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.core.CoreContext;
+import org.jmesa.view.html.HtmlBuilder;
+import org.jmesa.view.html.toolbar.AbstractItem;
+import org.jmesa.view.html.toolbar.AbstractItemRenderer;
+import org.jmesa.view.html.toolbar.ClearItemRenderer;
+import org.jmesa.view.html.toolbar.ToolbarItem;
+import org.jmesa.view.html.toolbar.ToolbarItemRenderer;
+import org.jmesa.view.html.toolbar.ToolbarItemType;
 
-import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 public class ListNotesTableToolbar extends DefaultToolbar {
@@ -115,7 +117,7 @@ public class ListNotesTableToolbar extends DefaultToolbar {
          *      java.util.Locale)
          */
         String getIndexes() {
-            String result = "4, 5, 9, 14, 16, 17, 19";
+            String result = "4, 5, 9, 11, 14, 16, 17, 19";
             return result;
         }
 

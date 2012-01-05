@@ -1,0 +1,225 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Mapping DTD Version 1.0//EN" "http://castor.org/mapping.dtd">
+<mapping>
+
+    <field-handler name="emailHandler" class="org.akaza.openclinica.bean.rule.EmailHandler"/>
+
+    <class name="org.akaza.openclinica.domain.rule.RulesPostImportContainer">
+        <map-to xml="Rules" ns-prefix="ns3" ns-uri="http://www.openclinica.org/ns/rules/v3.1"/>
+        
+        <field name="RuleSets"
+            type="org.akaza.openclinica.domain.rule.RuleSetBean"
+            collection="arraylist">
+            <bind-xml name="RuleAssignment"/>
+        </field>
+        
+        <field name="RuleDefs"
+            type="org.akaza.openclinica.domain.rule.RuleBean"
+            collection="arraylist">
+            <bind-xml name="RuleDef"/>
+        </field>
+    </class>
+    
+    <class name="org.akaza.openclinica.domain.rule.RuleSetBean">
+        <map-to xml="RuleAssignment" ns-prefix="ns3"/>
+       
+       <field name="OriginalTarget"
+            type="org.akaza.openclinica.domain.rule.expression.ExpressionBean">
+            <bind-xml name="Target"
+
+                <class name="org.akaza.openclinica.domain.rule.expression.ExpressionBean"  auto-complete="true">
+			        <map-to ns-prefix="ns3" xml="Target" />
+			        <field name="ContextName" type="string" handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler">
+			            <bind-xml name="Context" node="attribute"/>
+			       </field>
+			       <field name="Value" type="string" handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler">
+			            <bind-xml node="text"/>         
+			       </field>
+			    </class>            
+			    </bind-xml>
+        </field>
+       
+       <field name="RuleSetRules"
+            type="org.akaza.openclinica.domain.rule.RuleSetRuleBean"
+            collection="arraylist">
+            <bind-xml name="RuleRef"/>
+       </field>
+        
+    </class>
+    
+    <class name="org.akaza.openclinica.domain.rule.RuleSetRuleBean" auto-complete="true">
+       <map-to xml="RuleRef" ns-prefix="ns3"/> 
+       <field name="Oid"
+               type="java.lang.String">
+            <bind-xml name="OID" node="attribute"/>
+       </field>
+       
+        <field name="Actions"
+            type="org.akaza.openclinica.domain.rule.action.RuleActionBean"
+            collection="arraylist">
+            <bind-xml auto-naming="deriveByClass" node="element"/>
+       </field>
+        
+    </class>
+    
+    <class name="org.akaza.openclinica.domain.rule.RuleBean" >
+       <map-to xml="RuleDef" ns-prefix="ns3"/>
+       <field name="Type"
+               type="java.lang.String">
+            <bind-xml name="Type" node="attribute"/>
+       </field>
+       <field name="Oid"
+               type="java.lang.String">
+            <bind-xml name="OID" node="attribute"/>
+       </field>
+       <field name="Name"
+               type="java.lang.String">
+            <bind-xml name="Name" node="attribute"/>
+       </field>
+       <field name="Description"
+               type="java.lang.String">
+            <bind-xml name="Description" node="element"/>
+       </field>
+       <field name="Expression"
+            type="org.akaza.openclinica.domain.rule.expression.ExpressionBean">
+            <bind-xml name="Expression">
+                <class name="org.akaza.openclinica.domain.rule.expression.ExpressionBean"  auto-complete="true">
+                    <map-to ns-prefix="ns3" xml="Expression" />
+                    <field name="ContextName" type="string" handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler">
+                        <bind-xml name="Context" node="attribute"/>
+                   </field>
+                   <field name="Value" type="string" handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler">
+                        <bind-xml node="text"/>         
+                   </field>
+                </class>
+            </bind-xml>
+        </field> 
+    </class>
+    
+    <class name="org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean">
+        <map-to xml="DiscrepancyNoteAction" ns-prefix="ns3" />
+        <field name="ExpressionEvaluatesTo"
+               type="java.lang.Boolean">
+            <bind-xml name="IfExpressionEvaluates" node="attribute"/>
+       </field>
+       <field name="RuleActionRun"
+               type="org.akaza.openclinica.domain.rule.action.RuleActionRunBean">
+               <bind-xml name="Run"/>
+       </field>
+       <field name="Message"
+               type="java.lang.String">
+            <bind-xml name="Message" node="element">
+                <class name="java.lang.String">
+                    <map-to xml="Message" ns-prefix="ns3" />
+                </class>
+            </bind-xml>
+       </field>
+     </class>
+     <class name="org.akaza.openclinica.domain.rule.action.EmailActionBean">
+        <map-to xml="EmailAction" />
+        <field name="ExpressionEvaluatesTo"
+               type="java.lang.Boolean">
+            <bind-xml name="IfExpressionEvaluates" node="attribute"/>
+       </field>
+       <field name="RuleActionRun"
+               type="org.akaza.openclinica.domain.rule.action.RuleActionRunBean">
+               <bind-xml name="Run"/>
+       </field>
+        <field name="Message"
+               type="java.lang.String">
+            <bind-xml name="Message" node="element"/>
+        </field>
+        <field name="To"
+               type="java.lang.String" handler="emailHandler">
+            <bind-xml name="To" node="element"/>
+        </field>
+     </class>
+     <class name="org.akaza.openclinica.domain.rule.action.ShowActionBean">
+        <map-to xml="ShowAction" />
+        <field name="ExpressionEvaluatesTo"
+               type="java.lang.Boolean">
+            <bind-xml name="IfExpressionEvaluates" node="attribute"/>
+       </field>
+       <field name="RuleActionRun"
+               type="org.akaza.openclinica.domain.rule.action.RuleActionRunBean">
+               <bind-xml name="Run"/>
+       </field>
+        <field name="Message"
+               type="java.lang.String">
+            <bind-xml name="Message" node="element"/>
+        </field>
+        <field name="Properties"
+            type="org.akaza.openclinica.domain.rule.action.PropertyBean"
+            collection="arraylist">
+            <bind-xml name="DestinationProperty"/>
+        </field>
+     </class> 
+     <class name="org.akaza.openclinica.domain.rule.action.HideActionBean">
+        <map-to xml="HideAction" />
+        <field name="ExpressionEvaluatesTo"
+               type="java.lang.Boolean">
+            <bind-xml name="IfExpressionEvaluates" node="attribute"/>
+       </field>
+       <field name="RuleActionRun"
+               type="org.akaza.openclinica.domain.rule.action.RuleActionRunBean">
+               <bind-xml name="Run"/>
+       </field>
+        <field name="Message"
+               type="java.lang.String">
+            <bind-xml name="Message" node="element"/>
+        </field>
+        <field name="Properties"
+            type="org.akaza.openclinica.domain.rule.action.PropertyBean"
+            collection="arraylist">
+            <bind-xml name="DestinationProperty"/>
+        </field>
+     </class>
+     <class name="org.akaza.openclinica.domain.rule.action.InsertActionBean">
+        <map-to xml="InsertAction" />
+        <field name="Properties"
+            type="org.akaza.openclinica.domain.rule.action.PropertyBean"
+            collection="arraylist">
+            <bind-xml name="DestinationProperty"/>
+        </field>
+        <field name="ExpressionEvaluatesTo"
+               type="java.lang.Boolean">
+            <bind-xml name="IfExpressionEvaluates" node="attribute"/>
+       </field>
+       <field name="RuleActionRun"
+               type="org.akaza.openclinica.domain.rule.action.RuleActionRunBean">
+               <bind-xml name="Run"/>
+       </field>
+     </class>
+     
+     <class name="org.akaza.openclinica.domain.rule.action.PropertyBean" auto-complete="true">
+        <map-to ns-prefix="ns3"/>
+        <field name="oid" type="string"  handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler" required="true">
+            <bind-xml name="OID" node="attribute"/>
+       </field>
+       <field name="value" type="string" handler="org.akaza.openclinica.bean.rule.EmptySpaceHandler" required="false">
+            <bind-xml name="Value" node="attribute"/>
+       </field>
+       <field name="valueExpression"
+               type="org.akaza.openclinica.domain.rule.expression.ExpressionBean">
+               <bind-xml name="ValueExpression"/>
+       </field>
+     </class>
+     <class name="org.akaza.openclinica.domain.rule.action.RuleActionRunBean" auto-complete="true">
+        <map-to ns-prefix="ns3" xml="Run"/>
+        <field name="administrativeDataEntry" type="boolean">
+            <bind-xml name="AdministrativeDataEntry" node="attribute"/>
+       </field>
+       <field name="initialDataEntry" type="boolean">
+            <bind-xml name="InitialDataEntry" node="attribute"/>
+       </field>
+       <field name="doubleDataEntry" type="boolean">
+            <bind-xml name="DoubleDataEntry" node="attribute"/>
+       </field>
+       <field name="importDataEntry" type="boolean">
+            <bind-xml name="ImportDataEntry" node="attribute"/>
+       </field>
+       <field name="batch" type="boolean">
+            <bind-xml name="Batch" node="attribute"/>
+       </field>
+     </class>
+</mapping>

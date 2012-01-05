@@ -7,8 +7,8 @@
     <name>OpenClinica Core</name>
     <parent>
         <groupId>org.akaza.openclinica</groupId>
-        <artifactId>OpenClinica</artifactId>
-        <version>SNAPSHOT</version>
+        <artifactId>OpenClinica-Parent</artifactId>
+        <version>3.1.2</version>
     </parent>    
     <dependencies> 
 		<dependency>
@@ -266,7 +266,11 @@
 		<test.dbPassword>clinica</test.dbPassword>
 		<test.hibernateDialect>org.hibernate.dialect.PostgreSQLDialect</test.hibernateDialect>
 		<test.locale>en_US</test.locale>
+<<<<<<< .working
 		<scm.path>scm:svn:http://svn.akazaresearch.com/openclinica/OpenClinica/branches/OpenClinica-3.0-SNAPSHOT</scm.path> -->
+=======
+	
+>>>>>>> .merge-right.r16256
 		<!--  Library Versions -->
 		<!--<spring.version>2.5.6.SEC01</spring.version>-->
 		

@@ -13,7 +13,7 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.ws.bean.StudyEventDefinitionRequestBean;
+import org.akaza.openclinica.ws.bean.BaseStudyDefinitionBean;
 import org.akaza.openclinica.ws.validator.StudyEventDefinitionRequestValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +72,9 @@ public class StudyEventDefinitionEndpoint {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         Element studyRefElement = (Element) studyNodeList.item(0);
 
-        StudyEventDefinitionRequestBean studyEventDefinitionRequestBean = unMarshallRequest(studyRefElement);
+       // StudyEventDefinitionRequestBean studyEventDefinitionRequestBean = unMarshallRequest(studyRefElement);
+        BaseStudyDefinitionBean studyEventDefinitionRequestBean = unMarshallRequest(studyRefElement);
+        
         DataBinder dataBinder = new DataBinder((studyEventDefinitionRequestBean));
         Errors errors = dataBinder.getBindingResult();
         StudyEventDefinitionRequestValidator studyEventDefinitionRequestValidator = new StudyEventDefinitionRequestValidator(dataSource);
@@ -86,8 +88,9 @@ public class StudyEventDefinitionEndpoint {
         }
     }
 
-    StudyBean getStudy(StudyEventDefinitionRequestBean studyEventDefinitionRequestBean) {
-        StudyBean study = null;
+   // StudyBean getStudy(StudyEventDefinitionRequestBean studyEventDefinitionRequestBean) {
+    	 StudyBean getStudy(BaseStudyDefinitionBean studyEventDefinitionRequestBean) {
+    		         StudyBean study = null;
         if (studyEventDefinitionRequestBean.getStudyUniqueId() != null && studyEventDefinitionRequestBean.getSiteUniqueId() == null) {
             study = getStudyDao().findByUniqueIdentifier(studyEventDefinitionRequestBean.getStudyUniqueId());
         }
@@ -114,18 +117,22 @@ public class StudyEventDefinitionEndpoint {
         return (UserAccountBean) getUserAccountDao().findByUserName(username);
     }
 
-    private StudyEventDefinitionRequestBean unMarshallRequest(Element studyEventDefinitionListAll) {
-
+  // private StudyEventDefinitionRequestBean unMarshallRequest(Element studyEventDefinitionListAll) {
+    private BaseStudyDefinitionBean  unMarshallRequest(Element studyEventDefinitionListAll) {
         Element studyRefElement = DomUtils.getChildElementByTagName(studyEventDefinitionListAll, "studyRef");
         Element studyIdentifierElement = DomUtils.getChildElementByTagName(studyRefElement, "identifier");
         Element siteRef = DomUtils.getChildElementByTagName(studyRefElement, "siteRef");
         Element siteIdentifierElement = siteRef == null ? null : DomUtils.getChildElementByTagName(siteRef, "identifier");
 
-        String studyIdentifier = studyIdentifierElement == null ? null : DomUtils.getTextValue(studyIdentifierElement);
-        String siteIdentifier = siteIdentifierElement == null ? null : DomUtils.getTextValue(siteIdentifierElement);
+        String studyIdentifier = studyIdentifierElement == null ? null : DomUtils.getTextValue(studyIdentifierElement).trim();
+        String siteIdentifier = siteIdentifierElement == null ? null : DomUtils.getTextValue(siteIdentifierElement).trim();
 
-        StudyEventDefinitionRequestBean studyEventDefinitionRequestBean =
-            new StudyEventDefinitionRequestBean(studyIdentifier, siteIdentifier, getUserAccount());
+//        StudyEventDefinitionRequestBean studyEventDefinitionRequestBean =
+//            new StudyEventDefinitionRequestBean(studyIdentifier, siteIdentifier, getUserAccount());
+       
+        BaseStudyDefinitionBean studyEventDefinitionRequestBean =
+        				new BaseStudyDefinitionBean(studyIdentifier, siteIdentifier, getUserAccount());
+  
         return studyEventDefinitionRequestBean;
 
     }

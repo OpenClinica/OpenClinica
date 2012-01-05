@@ -26,7 +26,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=8" />
     
     <link rel="stylesheet" href="includes/styles.css" type="text/css" media="screen">
-    <link rel="stylesheet" href="includes/styles2.css" type="text/css" media="screen">
+<%-- <link rel="stylesheet" href="includes/styles2.css" type="text/css">--%>
     <link rel="stylesheet" href="includes/print.css" type="text/css" media="print">
     <script type="text/javascript" language="JavaScript">
         //this has been declared here so that it is accessible from other functions in the global_functions_javascript.js
@@ -38,7 +38,7 @@
     <script type="text/javascript"  language="JavaScript" src=
       "includes/repetition-model/repetition-model.js"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/prototype.js"></script>
-    <script type="text/JavaScript" language="JavaScript" src="includes/scriptaculous.js"></script>
+    <script type="text/JavaScript" language="JavaScript" src="includes/scriptaculous.js?load=effects"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/effects.js"></script>
 
     <!-- Added for the new Calender -->
@@ -118,6 +118,9 @@ giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%>
 <%-- We have to feed this value to the method giveFirstElementFocus()--%>
 <input id="formFirstField" type="hidden" name="formFirstField" value="${requestScope['formFirstField']}" />
 <input type="hidden" name="exitTo" value="${exitTo}" />
+<input type="hidden" name="sectionId" value="<c:out value="${section.section.id}"/>" />
+<input type="hidden" name="isFirstTimeOnSection" value="<c:out value="${section.section.id}"/>" />
+
 <%--FF: ${requestScope['formFirstField']}<br />--%>
 
 
@@ -574,10 +577,19 @@ window.onload = initmb;
 <c:set var="repeatParentId" value="${displayItem.itemGroup.itemGroupBean.oid}"/>
 
 <c:set var="repeatNumber" value="${displayItem.itemGroup.groupMetaBean.repeatNum}"/>
-<c:if test="${groupHasData}">
+<c:choose>
+<c:when test="${groupHasData}">
     <!-- there are already item data for an item group, repeat number just be 1-->
     <c:set var="repeatNumber" value="0"/>
-</c:if>
+</c:when>
+<c:when test="${isFirstTimeOnSection == section.section.id}">
+	<c:set var="repeatNumber" value="0"/>
+</c:when>
+<c:otherwise>
+ <c:set var="repeatNumber" value="${repeatNumber-1}"/>
+</c:otherwise>
+</c:choose>
+
 <c:set var="repeatMax" value="${displayItem.itemGroup.groupMetaBean.repeatMax}"/>
 <c:set var="totalColsPlusSubcols" value="0" />
 <c:set var="questionNumber" value=""/>
@@ -714,9 +726,7 @@ but the custom tag uses that, not this jstl code--%>
     <c:set var="repeatRowCount" value="${repeatRowCount+1}"/>
 </c:forEach>
 <!-- there are data posted already -->
-<c:if test="${repeatRowCount>1}">
-    <c:set var="repeatNumber" value="1"/>
-</c:if>
+
 <c:forEach var="bodyItemGroup" items="${displayItem.itemGroups}"  varStatus="status">
 <c:set var="columnNum"  value="1"/>
 <!-- hasError is set to true when validation error happens-->
@@ -928,7 +938,7 @@ but the custom tag uses that, not this jstl code--%>
 
 
 <!-- for the last but not the first row and only row, we need to use [] so the repetition javascript can copy it to create new row-->
-<tr id="<c:out value="${repeatParentId}"/>" repeat="template" repeat-start="0" repeat-max="<c:out value="${repeatMax}"/>" >
+<tr id="<c:out value="${repeatParentId}"/>" repeat="template" repeat-start="${repeatNumber}" repeat-max="<c:out value="${repeatMax}"/>" >
 	<c:set var="isButtonRemShow" value="true"/>
     <c:forEach var="bodyItem" items="${bodyItemGroup.items}">
 	<!-- found show item: <c:out value="${bodyItem.metadata.showItem}"/> -->
@@ -987,6 +997,7 @@ but the custom tag uses that, not this jstl code--%>
                             <c:param name="rowCount" value="${uniqueId}"/>
                             <c:param name="key" value="${numOfDate}" />
                             <c:param name="isLast" value="${true}"/>
+							<c:param name="isTemplateRow" value="${true}"/>
                             <c:param name="tabNum" value="${itemNum}"/>
                             <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
                             <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
@@ -1008,6 +1019,7 @@ but the custom tag uses that, not this jstl code--%>
                             <c:param name="rowCount" value="${uniqueId}"/>
                             <c:param name="key" value="${numOfDate}" />
                             <c:param name="isLast" value="${true}"/>
+							<c:param name="isTemplateRow" value="${true}"/>
                             <c:param name="tabNum" value="${itemNum}"/>
                             <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
                             <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
@@ -1024,6 +1036,7 @@ but the custom tag uses that, not this jstl code--%>
                         <c:param name="rowCount" value="${uniqueId}"/>
                         <c:param name="key" value="${numOfDate}" />
                         <c:param name="isLast" value="${true}"/>
+						<c:param name="isTemplateRow" value="${true}"/>
                         <c:param name="tabNum" value="${itemNum}"/>
                         <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                         <c:param name="originJSP" value="initialDataEntry"/>
@@ -1049,6 +1062,7 @@ but the custom tag uses that, not this jstl code--%>
                         <c:param name="rowCount" value="${uniqueId}"/>
                         <c:param name="key" value="${numOfDate}" />
                         <c:param name="isLast" value="${true}"/>
+						<c:param name="isTemplateRow" value="${true}"/>
                         <c:param name="tabNum" value="${itemNum}"/>
                         <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                         <c:param name="originJSP" value="initialDataEntry"/>
@@ -1156,10 +1170,10 @@ but the custom tag uses that, not this jstl code--%>
 		<c:set var="scdShowStatus" value="${displayItem.singleItem.scdData.scdDisplayInfo.scdShowStatus}"/>
 		<c:set var="cdId" value="${displayItem.singleItem.item.id}"/>
 		<c:choose>
-		<c:when test="${scdShowStatus == 1}">
+		<c:when test="${scdShowStatus == 1}">	<%-- 'SHOW_CHANGABLE' --%>
     		<tr class="aka_stripes" id="<c:out value="hd${cdId}"/>">
 		</c:when>
-		<c:when test="${scdShowStatus == 2}">
+		<c:when test="${scdShowStatus == 2}">	<%-- 'HIDE_CHANGABLE' --%>
 			<tr class="aka_stripes" id="<c:out value="hd${cdId}"/>" style="display:none">
 		</c:when>
 		<c:otherwise>
@@ -1182,10 +1196,10 @@ but the custom tag uses that, not this jstl code--%>
 		<c:set var="scdShowStatus" value="${displayItem.singleItem.scdData.scdDisplayInfo.scdShowStatus}"/>
 		<c:set var="cdId" value="${displayItem.singleItem.item.id}"/>
 		<c:choose>
-		<c:when test="${scdShowStatus == 1}">
+		<c:when test="${scdShowStatus == 1}">	<%-- 'SHOW_CHANGABLE' --%>
     		<tr class="aka_stripes" id="<c:out value="sub${cdId}"/>">
 		</c:when>
-		<c:when test="${scdShowStatus == 2}">
+		<c:when test="${scdShowStatus == 2}">	<%-- 'HIDE_CHANGABLE' --%>
 			<tr class="aka_stripes" id="<c:out value="sub${cdId}"/>" style="display:none">
 		</c:when>
 		<c:otherwise>
@@ -1206,10 +1220,10 @@ but the custom tag uses that, not this jstl code--%>
 <c:set var="rowSCDShowIDStr" value="${displayItem.singleItem.scdData.scdDisplayInfo.rowSCDShowIDStr}"/>
 <input type="hidden" id="rowSCDShowIDs${numOfTr}" value="${rowSCDShowIDStr}" />
 <c:choose>
-<c:when test="${rowDisplay == 0}">
+<c:when test="${rowDisplay == 0}">	<%-- 'SHOW_UNCHANGABLE' --%>
 	<tr>
 </c:when>
-<c:when test="${rowDisplay == 1}">
+<c:when test="${rowDisplay == 1}">	<%-- 'SHOW_CHANGABLE' --%>
 	<tr id="tr${numOfTr}">
 </c:when>
 <c:otherwise>
@@ -1228,10 +1242,10 @@ but the custom tag uses that, not this jstl code--%>
 							<c:set var="cdId" value="${displayItem.singleItem.item.id}"/>
 							<input type="hidden" id="col${cdId}" value="${numOfTr}"/>
 							<c:choose>
-							<c:when test="${scdShowStatus == 1}"> 
+							<c:when test="${scdShowStatus == 1}">	<%-- 'SHOW_CHANGABLE' --%> 
 		                		<td valign="top" id="t${cdId}">
 					    	</c:when>
-					    	<c:when test="${scdShowStatus == 2}">
+					    	<c:when test="${scdShowStatus == 2}">	<%-- 'HIDE_CHANGABLE' --%>
 		                		<td valign="top" id="t${cdId}" style="display:none">
 		                	</c:when>
 		                	<c:otherwise>
@@ -1351,10 +1365,10 @@ but the custom tag uses that, not this jstl code--%>
 					<c:set var="scdShowStatus" value="${childItem.scdData.scdDisplayInfo.scdShowStatus}"/>
 					<c:set var="cdId" value="${childItem.item.id}"/>
 					<c:choose>
-					<c:when test="${scdShowStatus == 1}"> 
+					<c:when test="${scdShowStatus == 1}"> <%-- 'SHOW_CHANGABLE' --%>
                 		<tr id="t${cdId}">
 			    	</c:when>
-			    	<c:when test="${scdShowStatus == 2}">
+			    	<c:when test="${scdShowStatus == 2}">	<%-- 'HIDE_CHANGABLE' --%>
                 		<tr id="t${cdId}" style="display:none">
                 	</c:when>
                 	<c:otherwise>

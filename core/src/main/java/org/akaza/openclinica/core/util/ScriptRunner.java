@@ -29,7 +29,7 @@ import java.sql.*;
 
 /**
  * Tool to run database scripts
- * 
+ *  jnyayapathi
  */
 /** Rules to Follow to add classes/methods to Util package:
  * No repeating the code. 

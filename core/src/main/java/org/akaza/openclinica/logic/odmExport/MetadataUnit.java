@@ -219,14 +219,19 @@ public class MetadataUnit extends OdmUnit {
         switch (OCDataTypeId) {
         // BL //BN //ED //TEL //ST
         case 1:
-        case 2:
-        case 3:
-        case 4:
-        case 5:
-            // SET
-        case 8:
-        case 10: // partial-date
             return "text";
+        case 2:
+            return "text";
+        case 3:
+            return "text";
+        case 4:
+            return "text";
+        case 5:
+            return "text";
+        case 8:
+            return "text";
+        case 10: // partial-date
+            return "partialDate";
             // INT
         case 6:
             return "integer";

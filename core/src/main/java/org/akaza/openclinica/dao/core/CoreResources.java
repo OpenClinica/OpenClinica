@@ -103,11 +103,16 @@ public class CoreResources implements ResourceLoaderAware {
             DB_NAME = dbName;
             SQLFactory factory = SQLFactory.getInstance();
             factory.run(dbName, resourceLoader);
-            copyBaseToDest(resourceLoader);
+            if(extractInfo!=null)
+            {copyBaseToDest(resourceLoader);
             // @pgawade 18-April-2011 Fix for issue 8394
             copyODMMappingXMLtoResources(resourceLoader);
-
             extractProperties = findExtractProperties();
+            //JN: this is in for junits to run without extract props
+            copyImportRulesFiles();
+            }
+          
+           
             // tbh, following line to be removed
             // reportUrl();
 
@@ -366,13 +371,13 @@ public class CoreResources implements ResourceLoaderAware {
 
     }
 
-    private void copyBaseToDest(ResourceLoader resourceLoader) {
+   private void copyBaseToDest(ResourceLoader resourceLoader) {
         // System.out.println("Properties directory?"+resourceLoader.getResource("properties/xslt"));
 
-        ByteArrayInputStream listSrcFiles[] = new ByteArrayInputStream[10];
+        ByteArrayInputStream listSrcFiles[] = new ByteArrayInputStream[11];
         String[] fileNames =
-            { "odm_spss_dat.xsl", "ODMToTAB.xsl", "odm_to_html.xsl", "odm_to_xslfo.xsl", "ODM-XSLFO-Stylesheet.xsl", "odm_spss_sps.xsl", "copyXML.xsl",
-                "odm1.3_to_1.2.xsl", "odm1.3_to_1.2_extensions.xsl", "odm1.3_to_1.3_no_extensions.xsl" };
+            { "odm_spss_dat.xsl", "ODMToTAB.xsl", "odm_to_html.xsl", "odm_to_xslfo.xsl",  "odm_spss_sps.xsl", "copyXML.xsl",
+                "odm1.3_to_1.2.xsl", "odm1.3_to_1.2_extensions.xsl", "odm1.3_to_1.3_no_extensions.xsl","ODMReportStylesheet.xsl" };
         try {
             listSrcFiles[0] =
                 (ByteArrayInputStream) resourceLoader.getResource("classpath:properties" + File.separator + "xslt" + File.separator + fileNames[0])
@@ -426,6 +431,30 @@ public class CoreResources implements ResourceLoaderAware {
                 copyFiles(listSrcFiles[i], dest1);
         }
 
+    }
+
+ 
+    private void copyImportRulesFiles() throws IOException
+    {
+        ByteArrayInputStream listSrcFiles[] = new ByteArrayInputStream[3];
+        String[] fileNames =       { "rules.xsd", "rules_template.xml", "rules_template_with_notes.xml" };
+        listSrcFiles[0] =   (ByteArrayInputStream) resourceLoader.getResource("classpath:properties" + File.separator + fileNames[0]).getInputStream();
+        listSrcFiles[1] =   (ByteArrayInputStream) resourceLoader.getResource("classpath:properties" + File.separator + fileNames[1]).getInputStream();
+        listSrcFiles[2] =   (ByteArrayInputStream) resourceLoader.getResource("classpath:properties" + File.separator + fileNames[2]).getInputStream();
+        File dest = new File(getField("filePath") + "rules");
+        if (!dest.exists()) {
+            if (!dest.mkdirs()) {
+                throw new OpenClinicaSystemException("Copying files, Could not create direcotry: " + dest.getAbsolutePath() + ".");
+            }
+        }
+        for (int i = 0; i < listSrcFiles.length; i++) {
+            File dest1 = new File(dest, fileNames[i]);
+            // File src1 = listSrcFiles[i];
+            if (listSrcFiles[i] != null)
+                copyFiles(listSrcFiles[i], dest1);
+        }
+        
+        
     }
 
     private void copyFiles(ByteArrayInputStream fis, File dest) {
@@ -500,13 +529,21 @@ public class CoreResources implements ResourceLoaderAware {
 
         File dest = null;
         try {
-            File placeholder_file = new File(resourceLoader.getResource("classpath:properties" + File.separator + "placeholder.properties").getURL().getFile());
+            // File placeholder_file = new
+            // File(resourceLoader.getResource("classpath:properties" +
+            // File.separator + "placeholder.properties").getURL().getFile());
+            File placeholder_file = new File(resourceLoader.getResource("classpath:org/akaza/openclinica/applicationContext-web-beans.xml").getURL().getFile());
+            logMe("placeholder_file:"+placeholder_file);
             String placeholder_file_path = placeholder_file.getPath();
-            String tmp1 = placeholder_file_path.substring(6);
-            String tmp2 = tmp1.substring(0, tmp1.indexOf("WEB-INF") - 1);
+            logMe("placeholder_file_path:"+placeholder_file_path);
+            // String tmp1 = placeholder_file_path.substring(6);
+            // String tmp2 = tmp1.substring(0, tmp1.indexOf("WEB-INF") - 1);
+            String tmp2 = placeholder_file_path.substring(0, placeholder_file_path.indexOf("WEB-INF") - 1);
+            logMe("tmp2:"+tmp2);
             String tmp3 = tmp2 + File.separator + "WEB-INF" + File.separator + "classes";
+            logMe("tmp3:"+tmp3);
             dest = new File(tmp3 + File.separator + "odm_mapping");
-
+            logMe("dest:"+dest);
         } catch (IOException ioe) {
             OpenClinicaSystemException oe = new OpenClinicaSystemException("Unable to get web app base path");
             oe.initCause(ioe);
@@ -689,11 +726,21 @@ public class CoreResources implements ResourceLoaderAware {
         return resourceLoader.getResource("classpath:properties/" + fileName).getURL();
     }
 
+    /**
+     * @deprecated Use {@link #getFile(String,String)} instead
+     */
     public File getFile(String fileName) {
+        return getFile(fileName, "filePath");
+    }
+
+    public File getFile(String fileName, String relDirectory) {
         try {
+           
             InputStream inputStream = getInputStream(fileName);
-            File f = new File(fileName);
-            OutputStream outputStream = new FileOutputStream(f);
+            
+            File f = new File(getField("filePath")+relDirectory+fileName);
+            
+     /*       OutputStream outputStream = new FileOutputStream(f);
             byte buf[] = new byte[1024];
             int len;
             try {
@@ -702,7 +749,8 @@ public class CoreResources implements ResourceLoaderAware {
             } finally {
                 outputStream.close();
                 inputStream.close();
-            }
+            }*/
+            logMe("path of file:"+f.getAbsolutePath());
             return f;
 
         } catch (IOException e) {
@@ -851,7 +899,7 @@ public class CoreResources implements ResourceLoaderAware {
     // TODO comment out system out after dev
     private static void logMe(String message) {
         // System.out.println(message);
-        logger.info(message);
+        //logger.info(message);
     }
 
 }

@@ -19,9 +19,14 @@ import org.akaza.openclinica.dao.EventCRFSDVSort;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.core.DAODigester;
+import org.akaza.openclinica.dao.core.PreparedStatementFactory;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -43,7 +48,7 @@ import javax.sql.DataSource;
  *
  *         TODO test create and update first thing
  */
-public class EventCRFDAO extends AuditableEntityDAO {
+public class EventCRFDAO  <K extends String,V extends ArrayList> extends AuditableEntityDAO {
     // private DAODigester digester;
 
     private void setQueryNames() {
@@ -101,9 +106,9 @@ public class EventCRFDAO extends AuditableEntityDAO {
         this.setTypeExpected(21, TypeNames.BOOL);// sdv_status
         this.setTypeExpected(22, TypeNames.INT);// old_status
         this.setTypeExpected(23, TypeNames.INT); // sdv_update_id
-        if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
-            this.setTypeExpected(24, TypeNames.INT); // r
-        }
+//        if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
+//            this.setTypeExpected(24, TypeNames.INT); // r
+//        }
 
     }
 
@@ -163,7 +168,11 @@ public class EventCRFDAO extends AuditableEntityDAO {
         } else {
             variables.put(new Integer(18), new Integer(0));
         }
-        variables.put(new Integer(19), new Integer(ecb.getId()));
+        // @pgawade 22-May-2011 added the sdv updater id variable
+        variables.put(new Integer(19), ecb.getSdvUpdateId());
+        // variables.put(new Integer(19), new Integer(ecb.getId()));
+        variables.put(new Integer(20), new Integer(ecb.getId()));
+
         this.execute(digester.getQuery("update"), variables, nullVars);
 
         if (isQuerySuccessful()) {
@@ -369,10 +378,11 @@ public class EventCRFDAO extends AuditableEntityDAO {
     public ArrayList findUndeletedWithStudySubjectsByCRFVersion(int versionId) {
         this.setTypesExpected();
         // ss.label, sed.name as sed_name, s.name as study_name, ss.sample_ordinal as repeat_number
-        this.setTypeExpected(23, TypeNames.STRING);
+//        this.setTypeExpected(23, TypeNames.STRING);
         this.setTypeExpected(24, TypeNames.STRING);
         this.setTypeExpected(25, TypeNames.STRING);
-        this.setTypeExpected(26, TypeNames.INT);
+        this.setTypeExpected(26, TypeNames.STRING);
+        this.setTypeExpected(27, TypeNames.INT);
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(versionId));
 
@@ -874,5 +884,6 @@ public class EventCRFDAO extends AuditableEntityDAO {
             return 0;
         }
     }
+
 
 }

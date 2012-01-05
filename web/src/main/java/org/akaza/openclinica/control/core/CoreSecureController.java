@@ -308,6 +308,8 @@ public abstract class CoreSecureController extends HttpServlet {
     private void process(HttpServletRequest request, HttpServletResponse response) throws OpenClinicaException, UnsupportedEncodingException {
 
         request.setCharacterEncoding("UTF-8");
+        response.setHeader("Content-Encoding", "gzip");
+
         HttpSession session = request.getSession();
         // BWP >> 1/8/2008
         try {

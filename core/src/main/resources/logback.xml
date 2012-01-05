@@ -279,7 +279,7 @@
 		<SyslogHost>${usage.stats.host}</SyslogHost>
 		<port>${usage.stats.port}</port>
 		<Facility>LOCAL7</Facility>
-		<SuffixPattern>[%mdc{WEBAPP}] %mdc{USERNAME} %logger %msg</SuffixPattern>
+		<SuffixPattern>[%mdc{WEBAPP}] %mdc{HOSTNAME} %mdc{USERNAME} %logger %msg</SuffixPattern>
 	</appender>
 	
 	<!-- LOGGERS -->
@@ -317,6 +317,19 @@
 	<if condition='property("logLocation").equalsIgnoreCase("local") || property("logLocation").equalsIgnoreCase("both")'>
 		<then>
 			<appender-ref ref="DB_LOGFILE"/>
+		</then>
+	</if>
+	<if condition='property("logLocation").equalsIgnoreCase("syslog") || property("logLocation").equalsIgnoreCase("both")'>
+		<then>
+			<appender-ref ref="SYSLOG-NEWS"/>
+		</then>
+	</if>	
+  </logger>
+    <logger additivity="false" name="org.hibernate.stat">
+    <level value="INFO" />
+	<if condition='property("logLocation").equalsIgnoreCase("local") || property("logLocation").equalsIgnoreCase("both")'>
+		<then>
+			<appender-ref ref="LOGFILE-OTHER"/>
 		</then>
 	</if>
 	<if condition='property("logLocation").equalsIgnoreCase("syslog") || property("logLocation").equalsIgnoreCase("both")'>
@@ -493,9 +506,7 @@
 			</then>	
 		</if>	
 	</logger>	
-	<logger additivity="false" name="org.akaza.openclinica.dao">
-		<level value="${logLevel}" />
-	</logger>
+
   <root>
     <!-- <level value="INFO" />
     <appender-ref ref="CONSOLE"/> -->

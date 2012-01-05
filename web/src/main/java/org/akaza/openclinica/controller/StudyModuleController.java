@@ -17,6 +17,8 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.apache.commons.dbcp.BasicDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -74,7 +76,7 @@ public class StudyModuleController {
     private StudyDAO studyDao;
     private UserAccountDAO userDao;
     private org.akaza.openclinica.dao.rule.RuleDAO ruleDao;
-
+    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     @Autowired
     CoreResources coreResources;
 
@@ -197,7 +199,10 @@ public class StudyModuleController {
         if (null != coreResources) {
             map.addAttribute("ruleDesignerURL", coreResources.getField("designer.url"));
             map.addAttribute("contextPath", getContextPath(request));
-            map.addAttribute("hostPath", getHostPath(request));
+            logMe("before checking getHostPath url = "+request.getRequestURL());
+            //JN: for the eclinicalhosting the https is not showing up in the request path, going for a fix of taking the hostpath from sysurl
+            //map.addAttribute("hostPath", getHostPath(request));
+            map.addAttribute("hostPath", getHostPathFromSysUrl(coreResources.getField("sysURL.base"),request.getContextPath()));
             map.addAttribute("path", "pages/studymodule");
         }
        // UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
@@ -214,11 +219,16 @@ public class StudyModuleController {
         ArrayList pageMessages = new ArrayList();
         if (request.getSession().getAttribute("pageMessages") != null) {
             pageMessages.addAll((ArrayList) request.getSession().getAttribute("pageMessages"));
-            request.setAttribute("pageMessages", pageMessages);
+            request.setAttribute("pageMessages", pageMessages); 
             request.getSession().removeAttribute("pageMessages");
         }
         return map;
     }
+    private String getHostPathFromSysUrl(String sysURL,String contextPath) {
+        return sysURL.replaceAll(contextPath+"/", "");
+       }
+    
+ 
 
     @RequestMapping(method = RequestMethod.POST)
     public String processSubmit(@ModelAttribute("studyModuleStatus") StudyModuleStatus studyModuleStatus, BindingResult result, SessionStatus status,
@@ -298,16 +308,22 @@ public class StudyModuleController {
 
     public String getRequestURLMinusServletPath(HttpServletRequest request) {
         String requestURLMinusServletPath = request.getRequestURL().toString().replaceAll(request.getServletPath(), "");
+        logMe("processing.."+requestURLMinusServletPath);
         return requestURLMinusServletPath;
     }
 
     public String getHostPath(HttpServletRequest request) {
+        logMe("into the getHostPath/....URL = "+request.getRequestURL()+"URI="+request.getRequestURI()+"PROTOCOL=");
         String requestURLMinusServletPath = getRequestURLMinusServletPath(request);
         String hostPath = "";
+        
         if (null != requestURLMinusServletPath) {
             String tmpPath = requestURLMinusServletPath.substring(0, requestURLMinusServletPath.lastIndexOf("/"));
+            logMe("processing2..."+tmpPath);
             hostPath = tmpPath.substring(0, tmpPath.lastIndexOf("/"));
+            logMe("processing2..."+hostPath);
         }
+        logMe("after all the stripping returning"+hostPath);
         return hostPath;
     }
 
@@ -330,5 +346,9 @@ public class StudyModuleController {
 
         return false;
     }
+	    private void logMe(String msg){
+            System.out.println(msg);
+            logger.info(msg);
+        }
 
 }

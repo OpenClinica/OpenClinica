@@ -26,8 +26,8 @@ public class ItemGroupMetadataBean extends EntityBean implements Comparable {
 
     public ItemGroupMetadataBean() {
         super();
-        this.itemId = new Integer(0);
-        this.itemGroupId = new Integer(0);
+        this.itemId = Integer.valueOf(0);
+        this.itemGroupId = Integer.valueOf(0);
         header = "";
         subheader = "";
         layout = "";

@@ -96,7 +96,12 @@ public class LockCRFVersionServlet extends SecureController {
                ArrayList edcList = (ArrayList)edCRFDao.findAllByCRF(version.getCrfId());
                for(int i = 0; i < edcList.size(); i++){
                    EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean)edcList.get(i);
-                   RemoveCRFVersionServlet.updateEventDef(edcBean, edCRFDao, versionList);
+                    // @pgawade 18-May-2011 #5414 - Changes for setting the correct
+                    // default crf version Id to event
+                    // when existing default version is locked
+                    // RemoveCRFVersionServlet.updateEventDef(edcBean, edCRFDao,
+                    // versionList);
+                    RemoveCRFVersionServlet.updateEventDef(edcBean, edCRFDao, versionList, crfVersionId);
                }
            }
 

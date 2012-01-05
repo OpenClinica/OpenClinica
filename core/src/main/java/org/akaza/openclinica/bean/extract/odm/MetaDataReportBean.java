@@ -687,7 +687,9 @@ public class MetaDataReportBean extends OdmXmlReportBean {
                 xml.append(" SecondaryIDs=\"" + StringEscapeUtils.escapeXml(temp) + "\"");
             }
             xml.append(" DateCreated=\"" + new SimpleDateFormat("yyyy-MM-dd").format(study.getCreatedDate()) + "\"");
-            xml.append(" StartDate=\"" + new SimpleDateFormat("yyyy-MM-dd").format(study.getDatePlannedStart()) + "\"");
+            if(study.getDatePlannedStart() instanceof java.util.Date) {
+                xml.append(" StartDate=\"" + new SimpleDateFormat("yyyy-MM-dd").format(study.getDatePlannedStart()) + "\"");
+            }
             if (study.getDatePlannedEnd() != null) {
                 xml.append(" StudyCompletionDate=\"" + new SimpleDateFormat("yyyy-MM-dd").format(study.getDatePlannedEnd()) + "\"");
             }
@@ -816,9 +818,11 @@ public class MetaDataReportBean extends OdmXmlReportBean {
             xml.append(study.getHealthyVolunteerAccepted() ? "Yes" : "No");
             xml.append("</OpenClinica:HealthyVolunteersAccepted>");
             xml.append(nls);
-            xml.append(currentIndent + indent + indent + "<OpenClinica:ExpectedTotalEnrollment>" + study.getExpectedTotalEnrollment()
-                + "</OpenClinica:ExpectedTotalEnrollment>");
-            xml.append(nls);
+            if(study.getExpectedTotalEnrollment()>0) {
+                xml.append(currentIndent + indent + indent + "<OpenClinica:ExpectedTotalEnrollment>" + study.getExpectedTotalEnrollment()
+                    + "</OpenClinica:ExpectedTotalEnrollment>");
+                xml.append(nls);
+            }
             xml.append(currentIndent + indent + "</OpenClinica:ConditionsAndEligibility>");
             xml.append(nls);
 

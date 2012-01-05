@@ -324,6 +324,7 @@
             , ELECTRONIC_SIGNATURE_STATUS=?
             , SDV_STATUS=?
             , OLD_STATUS_ID=?
+            , SDV_UPDATE_ID = ?
             WHERE EVENT_CRF_ID=?
         </sql>
     </query>
@@ -453,8 +454,8 @@
 
     <query>
         <name>setSDVStatus</name>
-        <sql>
-            update event_crf set sdv_status=? where event_crf_id=?
+        <sql>            
+            update event_crf set sdv_status=?, sdv_update_id=? where event_crf_id=?
         </sql>
     </query>
 
@@ -465,6 +466,11 @@
             WHERE se.study_subject_id=?
             and se.study_event_definition_id= sed.study_event_definition_id) order by event_crf_id asc
         </sql>
+    </query>
+     
+     <query>
+        <name>findAllByStudyEventAndStatus</name>
+        <sql>SELECT * FROM event_crf WHERE study_event_id=? and status_id = ? order by event_crf_id asc</sql>
     </query>
 
 </queries>

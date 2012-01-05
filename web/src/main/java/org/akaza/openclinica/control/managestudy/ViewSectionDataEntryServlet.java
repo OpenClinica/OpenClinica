@@ -86,6 +86,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
         UserAccountBean ub =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
         StudyUserRoleBean  currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
         locale = request.getLocale();
+
         // <
         // resexception=ResourceBundle.getBundle(
         // "org.akaza.openclinica.i18n.exceptions",locale);
@@ -206,6 +207,11 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
         int eventDefinitionCRFId = fp.getInt("eventDefinitionCRFId");
         EventDefinitionCRFDAO eventCrfDao = new EventDefinitionCRFDAO(getDataSource());
         edcb = (EventDefinitionCRFBean) eventCrfDao.findByPK(eventDefinitionCRFId);
+        if (eventCRFId == 0 && (edcb.getStudyId() != currentStudy.getParentStudyId() && edcb.getStudyId() != currentStudy.getId() )) {
+            addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " " + respage.getString("change_study_contact_sysadmin"), request);
+            throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_director"), "1");
+        }
+
         if (crfId == 0 && eventDefinitionCRFId > 0) {
             // try to get crfId from eventDefinitionCRFId
             // edcb = (EventDefinitionCRFBean)
@@ -712,19 +718,6 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
      * @author ywang 10-18-2007
      * @param request TODO
      */
-    public void mayAccess(HttpServletRequest request) throws InsufficientPermissionException {
-        FormProcessor fp = new FormProcessor(request);
-        EventCRFDAO edao = new EventCRFDAO(getDataSource());
-        UserAccountBean ub =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
-        int eventCRFId = fp.getInt("ecId", true);
-
-        if (eventCRFId > 0) {
-            if (!entityIncluded(eventCRFId, ub.getName(), edao, getDataSource())) {
-                addPageMessage(respage.getString("required_event_CRF_belong"), request);
-                throw new InsufficientPermissionException(Page.MENU, resexception.getString("entity_not_belong_studies"), "1");
-            }
-        }
-    }
 
     private void setAttributeForInterviewerDNotes(List<DiscrepancyNoteBean> eventCrfNotes, HttpServletRequest request) {
         for (DiscrepancyNoteBean dnBean : eventCrfNotes) {

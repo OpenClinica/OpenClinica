@@ -82,6 +82,8 @@ public class RemoveStudySubjectServlet extends SecureController {
             StudyDAO studydao = new StudyDAO(sm.getDataSource());
             StudyBean study = (StudyBean) studydao.findByPK(studyId);
 
+            checkRoleByUserAndStudy(ub, study.getParentStudyId(), study.getId());
+
             // find study events
             StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
 //            ArrayList events = sedao.findAllByStudyAndStudySubjectId(study, studySubId);

@@ -8,6 +8,7 @@
 package org.akaza.openclinica.service.rule.expression;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.Utils;
@@ -402,7 +403,7 @@ public class ExpressionService {
                 return returnedRuleExpression;
             }
 
-            Integer itemId = itemData.isEmpty() ? getItemDao().findByOid(getItemOid(ruleExpression)).get(0).getId() : itemData.get(0).getItemId();
+            Integer itemId = itemData.isEmpty() ? ((EntityBean) getItemDao().findByOid(getItemOid(ruleExpression)).get(0)).getId() : itemData.get(0).getItemId();
 
             ItemGroupMetadataBean itemGroupMetadataBean =
                 (ItemGroupMetadataBean) getItemGroupMetadataDao().findByItemAndCrfVersion(itemId, theEventCrfBean.getCRFVersionId());
@@ -539,18 +540,23 @@ public class ExpressionService {
     }
 
     public String constructFullExpressionIfPartialProvided(String expression, String ruleSetTargetExpression) {
-        String[] splitExpression = expression.split(ESCAPED_SEPERATOR);
-        switch (splitExpression.length) {
-        case 1:
-            return deContextualizeExpression(3, expression, ruleSetTargetExpression);
-        case 2:
-            return deContextualizeExpression(2, expression, ruleSetTargetExpression);
-        case 3:
-            return deContextualizeExpression(1, expression, ruleSetTargetExpression);
-        case 4:
+        if(expression == null) {
+            logger.info("expression is null.");
             return expression;
-        default:
-            throw new OpenClinicaSystemException("Full Expression cannot be constructed from provided expression : " + expression);
+        } else {
+            String[] splitExpression = expression.split(ESCAPED_SEPERATOR);
+            switch (splitExpression.length) {
+            case 1:
+                return deContextualizeExpression(3, expression, ruleSetTargetExpression);
+            case 2:
+                return deContextualizeExpression(2, expression, ruleSetTargetExpression);
+            case 3:
+                return deContextualizeExpression(1, expression, ruleSetTargetExpression);
+            case 4:
+                return expression;
+            default:
+                throw new OpenClinicaSystemException("Full Expression cannot be constructed from provided expression : " + expression);
+            }
         }
     }
 
@@ -924,9 +930,9 @@ public class ExpressionService {
         }
 
         if (length > 1) {
-            List<ItemGroupBean> persistentItemGroups = (List<ItemGroupBean>) getItemGroupDao().findGroupsByItemID(item.getId());
-            itemGroup = persistentItemGroups.size() > 0 ? persistentItemGroups.get(0) : null;
-            if (itemGroup == null || !itemGroup.getOid().equals(getItemGroupOidFromExpression(expression)))
+            String itemGroupOid = getItemGroupOidFromExpression(expression);
+            itemGroup = getItemGroupDao().findByOid(itemGroupOid);
+            if(itemGroup == null)
                 throw new OpenClinicaSystemException("OCRERR_0022");
             // throw new OpenClinicaSystemException("itemGroup is Invalid");
         }
@@ -1006,7 +1012,7 @@ public class ExpressionService {
             // ItemBean item =
             // getItemDao().findItemByGroupIdandItemOid(getItemGroupExpression(ruleSet.getTarget().getValue()).getId(),
             // oid);
-            ItemBean item = getItemDao().findByOid(oid).get(0);
+            ItemBean item = (ItemBean) getItemDao().findByOid(oid).get(0);
             if (item != null) {
                 return "OK";
             }

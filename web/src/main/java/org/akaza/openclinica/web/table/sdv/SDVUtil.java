@@ -52,7 +52,17 @@ import org.springframework.validation.BindingResult;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -211,12 +221,21 @@ public class SDVUtil {
     public void setDataAndLimitVariables(TableFacade tableFacade, int studyId, HttpServletRequest request) {
 
         Limit limit = tableFacade.getLimit();
+
         EventCRFSDVFilter eventCRFSDVFilter = getEventCRFSDVFilter(limit, studyId);
         WebContext context = tableFacade.getWebContext();
 
+        String restore = request.getAttribute(limit.getId()+"_restore") + "";
         if (!limit.isComplete()) {
             int totalRows = getTotalRowCount(eventCRFSDVFilter, studyId);
             tableFacade.setTotalRows(totalRows);
+        } else if (restore != null && "true".equalsIgnoreCase(restore)) {
+            int totalRows = getTotalRowCount(eventCRFSDVFilter, studyId);
+            int pageNum = limit.getRowSelect().getPage();
+            int maxRows = limit.getRowSelect().getMaxRows();
+            tableFacade.setMaxRows(maxRows);
+            tableFacade.setTotalRows(totalRows);
+            limit.getRowSelect().setPage(pageNum);
         }
 
         EventCRFSDVSort eventCRFSDVSort = getEventCRFSDVSort(limit);
@@ -239,6 +258,12 @@ public class SDVUtil {
 
         tableFacade.setItems(items);
          */
+    }
+    
+    private void updateLimitRowSelect(TableFacade tableFacade, HttpServletRequest request) {
+        Limit limit = tableFacade.getLimit();
+        String p = request.getParameter(limit.getId()+"_p_");
+        int pn = p != null && p.length()>0 ? Integer.parseInt(p) : 1;
     }
 
     public int getTotalRowCount(EventCRFSDVFilter eventCRFSDVFilter, Integer studyId) {
@@ -584,7 +609,7 @@ public class SDVUtil {
         //boolean showMoreLink = Boolean.parseBoolean(request.getAttribute("showMoreLink").toString());//commented by Jamuna, throwing null pointer exception
         boolean showMoreLink = Boolean.parseBoolean(request.getAttribute("showMoreLink")==null?"false":request.getAttribute("showMoreLink").toString());
         TableFacade tableFacade = createTableFacade("sdv", request);
-        tableFacade.setStateAttr("restore");
+        tableFacade.setStateAttr("sdv_restore");
         resformat = ResourceBundleProvider.getFormatBundle(request.getLocale());
         this.pathPrefix = pathPrefix;
 
@@ -1333,7 +1358,7 @@ public class SDVUtil {
             if (filterBean.getStudy_subject_id().length() > 0) {
                 studySubjectBean = (StudySubjectBean) studySubjectDAO.findByPK(eventCBean.getStudySubjectId());
 
-                studySub = (filterBean.getStudy_subject_id().equalsIgnoreCase(studySubjectBean.getLabel()));
+                studySub = filterBean.getStudy_subject_id().equalsIgnoreCase(studySubjectBean.getLabel());
 
             }
 
@@ -1342,33 +1367,33 @@ public class SDVUtil {
             if (filterBean.getStudyEventDefinition() > 0) {
                 studyEventBean = (StudyEventBean) studyEventDAO.findByPK(eventCBean.getStudyEventId());
 
-                studyEventDef = (filterBean.getStudyEventDefinition() == studyEventBean.getStudyEventDefinitionId());
+                studyEventDef = filterBean.getStudyEventDefinition() == studyEventBean.getStudyEventDefinitionId();
 
             }
 
             //Event CRF status
             if (filterBean.getStudyEventStatus() > 0) {
 
-                studyEventStatus = (filterBean.getStudyEventStatus() == eventCBean.getStatus().getId());
+                studyEventStatus = filterBean.getStudyEventStatus() == eventCBean.getStatus().getId();
             }
 
             //Event CRF subject event status
             if (filterBean.getEventCRFStatus() > 0) {
                 studyEventBean = (StudyEventBean) studyEventDAO.findByPK(eventCBean.getStudyEventId());
 
-                eventCRFStatusBool = (filterBean.getEventCRFStatus() == studyEventBean.getSubjectEventStatus().getId());
+                eventCRFStatusBool = filterBean.getEventCRFStatus() == studyEventBean.getSubjectEventStatus().getId();
             }
 
             //Event CRF SDV status; true or false
             if (!filterBean.getEventcrfSDVStatus().equalsIgnoreCase("N/A")) {
                 boolean sdvBool = filterBean.getEventcrfSDVStatus().equalsIgnoreCase("complete");
-                eventcrfSDVStatus = (eventCBean.isSdvStatus() == sdvBool);
+                eventcrfSDVStatus = eventCBean.isSdvStatus() == sdvBool;
             }
 
             //Event CRF name match
             if (filterBean.getEventCRFName().length() > 0) {
                 String tmpName = getCRFName(eventCBean.getCRFVersionId());
-                eventCRFNameBool = (tmpName.equalsIgnoreCase(filterBean.getEventCRFName()));
+                eventCRFNameBool = tmpName.equalsIgnoreCase(filterBean.getEventCRFName());
             }
 
             //TODO: Event CRF SDV requirement, when the application provides a way
@@ -1387,7 +1412,7 @@ public class SDVUtil {
                 calendarNow.setTime(eventCBean.getUpdatedDate());
 
                 upDatedDateBool =
-                    ((calendarNow.after(calStart) && calendarNow.before(calendarEnd)) || (calendarNow.equals(calStart) || calendarNow.equals(calendarEnd)));
+                    calendarNow.after(calStart) && calendarNow.before(calendarEnd) || calendarNow.equals(calStart) || calendarNow.equals(calendarEnd);
 
             }
 
