@@ -70,8 +70,6 @@ public class CoreResources implements ResourceLoaderAware {
     
     public void reportUrl() {
         String contHome = System.getProperty("catalina.home");
-        logMe("--> System getProperty catalina.home: " + contHome);
-        logMe("--> results of System.getenv(): " + System.getenv().toString());
         Properties pros = System.getProperties();
         Enumeration proEnum = pros.propertyNames();
         for (; proEnum.hasMoreElements(); ) {
@@ -79,8 +77,7 @@ public class CoreResources implements ResourceLoaderAware {
             String propName = (String)proEnum.nextElement();
 
             // Get property value
-            String propValue = (String)pros.get(propName);
-            logMe("--> property: " + propName + " and value: " + propValue);
+            String propValue = (String) pros.get(propName);
         }
     }
 
@@ -91,7 +88,6 @@ public class CoreResources implements ResourceLoaderAware {
             // @pgawade 18-April-2011 Fix for issue 8394
             setODM_MAPPING_DIR();
             webapp = getWebAppName(resourceLoader.getResource("/").getURI().getPath());
-            logMe("is web app name null?" + webapp);
 
             String dbName = dataInfo.getProperty("dbType");
 
@@ -137,17 +133,14 @@ public class CoreResources implements ResourceLoaderAware {
             key = properties.nextElement();
             vals = DATAINFO.getProperty(key);
             // replacePaths(vals);
-            logMe(" key: " + key + " vals:" + vals);
             vals = replaceWebapp(vals);
             vals = replaceCatHome(vals);
-            logMe("key: " + key + " vals:" + vals);
             DATAINFO.setProperty(key, vals);
         }
 
     }
 
     private static String replaceWebapp(String value) {
-        logMe(value);
 
         if (value.contains("${WEBAPP}")) {
             value = value.replace("${WEBAPP}", webapp);
@@ -169,22 +162,18 @@ public class CoreResources implements ResourceLoaderAware {
         String catalina = null;
         if (catalina == null) {
             catalina = System.getProperty("CATALINA_HOME");
-            logMe("-set catalina " + catalina);
         }
         
         if (catalina == null) {
             catalina = System.getProperty("catalina.home");
-            logMe("---set catalina " + catalina);
         }
         
         if (catalina == null) {
             catalina = System.getenv("CATALINA_HOME");
-            logMe("--set catalina " + catalina);
         }
         
         if (catalina == null) {
             catalina = System.getenv("catalina.home");
-            logMe("----set catalina " + catalina);
         }
         //        logMe("catalina home - " + value);
         //        logMe("CATALINA_HOME system variable is " + System.getProperty("CATALINA_HOME"));
@@ -200,14 +189,12 @@ public class CoreResources implements ResourceLoaderAware {
         
         if (value.contains("${catalina.home}") &&  catalina != null) {
             value = value.replace("${catalina.home}", catalina);
-            logMe("replaced ${catalina.home} with " + catalina);
         }
 
         if (value.contains("$catalina.home") &&  catalina != null) {
             value = value.replace("$catalina.home", catalina);
-            logMe("replaced $catalina.home with " + catalina);
         }
-        logMe("--> catalina home set in new property is: " + value);
+
         return value;
     }
 
@@ -232,8 +219,6 @@ public class CoreResources implements ResourceLoaderAware {
 
         setDatabaseProperties(database);
 
-        logMe("DataInfo..." + DATAINFO);
-        logMe("filePath = " + filePath);
         setDataInfoVals();
         if(DATAINFO.getProperty("filePath")==null || DATAINFO.getProperty("filePath").length()<=0) 
             DATAINFO.setProperty("filePath", filePath);
@@ -533,17 +518,15 @@ public class CoreResources implements ResourceLoaderAware {
             // File(resourceLoader.getResource("classpath:properties" +
             // File.separator + "placeholder.properties").getURL().getFile());
             File placeholder_file = new File(resourceLoader.getResource("classpath:org/akaza/openclinica/applicationContext-web-beans.xml").getURL().getFile());
-            logMe("placeholder_file:"+placeholder_file);
+
             String placeholder_file_path = placeholder_file.getPath();
-            logMe("placeholder_file_path:"+placeholder_file_path);
+
             // String tmp1 = placeholder_file_path.substring(6);
             // String tmp2 = tmp1.substring(0, tmp1.indexOf("WEB-INF") - 1);
             String tmp2 = placeholder_file_path.substring(0, placeholder_file_path.indexOf("WEB-INF") - 1);
-            logMe("tmp2:"+tmp2);
             String tmp3 = tmp2 + File.separator + "WEB-INF" + File.separator + "classes";
-            logMe("tmp3:"+tmp3);
             dest = new File(tmp3 + File.separator + "odm_mapping");
-            logMe("dest:"+dest);
+
         } catch (IOException ioe) {
             OpenClinicaSystemException oe = new OpenClinicaSystemException("Unable to get web app base path");
             oe.initCause(ioe);
@@ -740,17 +723,12 @@ public class CoreResources implements ResourceLoaderAware {
             
             File f = new File(getField("filePath")+relDirectory+fileName);
             
-     /*       OutputStream outputStream = new FileOutputStream(f);
-            byte buf[] = new byte[1024];
-            int len;
-            try {
-                while ((len = inputStream.read(buf)) > 0)
-                    outputStream.write(buf, 0, len);
-            } finally {
-                outputStream.close();
-                inputStream.close();
-            }*/
-            logMe("path of file:"+f.getAbsolutePath());
+            /*
+             * OutputStream outputStream = new FileOutputStream(f); byte buf[] =
+             * new byte[1024]; int len; try { while ((len =
+             * inputStream.read(buf)) > 0) outputStream.write(buf, 0, len); }
+             * finally { outputStream.close(); inputStream.close(); }
+             */
             return f;
 
         } catch (IOException e) {
@@ -896,10 +874,11 @@ public class CoreResources implements ResourceLoaderAware {
         return webAppName;
     }
 
+/*
     // TODO comment out system out after dev
     private static void logMe(String message) {
         // System.out.println(message);
         //logger.info(message);
     }
-
+*/
 }
