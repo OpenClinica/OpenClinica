@@ -8,60 +8,6 @@
     <version>3.1-SNAPSHOT</version>
     <name>OpenClinica</name>
     <description>3.1-SNAPSHOT</description>
-    <repositories>
-		<repository>
-			<id>Rufus Repository</id>
-			<url>http://svn.akazaresearch.com/ocrepository/repository</url>
-		</repository>
-		<repository>
-			<id>Jboss Repository</id>
-			<url>http://repository.jboss.org/nexus/content/groups/public-jboss</url>
-		</repository>
-		<repository>
-			<id>codehaus-snapshots</id>
-			<name>Maven Codehaus Snapshots</name>
-			<url>http://snapshots.maven.codehaus.org/maven2/</url>
-		</repository>
-		<repository>
-			<id>java.net</id>
-			<url>http://download.java.net/maven/1</url>
-			<layout>legacy</layout>
-		</repository>
-		<repository>
-            <id>maven2-repository.dev.java.net</id>
-            <name>Java.net Repository for Maven</name>
-            <url>http://download.java.net/maven/2/</url>
-        </repository>
-		<repository>
-			<id>spring-ext</id>
-			<name>Spring repo-ext</name>
-			<url>https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext/</url>
-		</repository>
-		<!-- Spring's milestone repository -->
-		<repository>
-		    <id>org.springframework.maven.milestone</id>
-		    <name>Spring Maven Milestone Repository</name>
-		    <url>http://maven.springframework.org/milestone</url>
-		    <snapshots><enabled>false</enabled></snapshots>		
-		</repository>
-		
-		
-			<repository>
-   <id>terracotta-releases</id>
-   <url>http://www.terracotta.org/download/reflector/releases</url>
-   <releases><enabled>true</enabled></releases>
-   <snapshots><enabled>false</enabled></snapshots>
-</repository>
-	</repositories>
-	
-	<pluginRepositories>
-		<pluginRepository>
-			<id>java.net</id>
-			<name>Java.net Repository for Maven2</name>
-			<url>http://download.java.net/maven/1/</url>
-			<layout>legacy</layout>
-		</pluginRepository>
-	</pluginRepositories>   
 	<properties>
 		<catalina.home>/usr/local/tomcat</catalina.home>
 		<test.dbName>postgres</test.dbName>
@@ -75,6 +21,7 @@
 		<scm.path>scm:svn:http://svn.akazaresearch.com/openclinica/OpenClinica/branches/OpenClinica-3.1-SNAPSHOT/projects</scm.path>
 		<!--  Library Versions -->
 		<spring.version>3.0.5.RELEASE</spring.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<profiles>
 		<profile>
@@ -98,6 +45,48 @@
 				<config.file>src/main/resources/oracle-local.properties</config.file>
 			</properties>
 		</profile>
+		<profile>
+		  <!-- 
+		   This profile is not compatible with Maven v2. Use it with Maven v3 only.
+		   -->
+		  <id>m2eclipse-config</id>
+		  <activation>
+		      <property>
+		          <name>useJRebel</name>
+		          <value>true</value>
+		      </property>
+		  </activation>
+		  <build>
+	        <pluginManagement>
+	            <plugins>
+	                <plugin>
+	                <groupId>org.eclipse.m2e</groupId>
+	                  <artifactId>lifecycle-mapping</artifactId>
+	                  <version>1.0.0</version>
+	                  <configuration>
+	                    <lifecycleMappingMetadata>
+	                      <pluginExecutions>
+	                        <pluginExecution>
+	                          <pluginExecutionFilter>
+	                            <groupId>org.zeroturnaround</groupId>
+	                            <artifactId>jrebel-maven-plugin</artifactId>
+	                            <versionRange>[1.0.0,)</versionRange>
+	                            <goals>
+	                              <goal>generate</goal>
+	                            </goals>
+	                          </pluginExecutionFilter>
+	                          <action>
+	                            <ignore />
+	                          </action>
+	                        </pluginExecution>
+	                      </pluginExecutions>
+	                    </lifecycleMappingMetadata>
+	                  </configuration>
+	                </plugin>
+	            </plugins>
+	        </pluginManagement>
+		  </build>
+		</profile>
 	</profiles>
 	
     <modules>
@@ -106,29 +95,6 @@
         <module>ws</module>
         <module>ws-cabig</module>
     </modules>
-
-    <!-- Specify versions once for commonly-used deps -->
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-mock</artifactId>
-                <version>2.0.8</version>
-            </dependency>
-            <!-- submodules -->
-            <dependency>
-                <groupId>${groupId}</groupId>
-                <artifactId>core</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${groupId}</groupId>
-                <artifactId>core</artifactId>
-                <version>${project.version}</version>
-                <type>test-jar</type>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <!-- These dependencies are used by _all_ child projects -->
     <dependencies>
@@ -366,6 +332,17 @@
 			<artifactId>liquibase-core</artifactId>
 			<version>1.9.5</version>
 		</dependency>
+        <!-- Explicitly defining dependencies versions for Maven 3 -->
+        <dependency>
+            <groupId>antlr</groupId>
+            <artifactId>antlr</artifactId>
+            <version>2.7.6</version>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.14</version>
+        </dependency>
 
     </dependencies>
     <build>
@@ -373,6 +350,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
                 <configuration>
                     <source>1.5</source>
                     <target>1.5</target>
@@ -394,6 +372,7 @@
             <plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-eclipse-plugin</artifactId>
+                <version>2.8</version>
 				<configuration>
 					<addVersionToProjectName>true</addVersionToProjectName>
 				</configuration>
@@ -414,41 +393,82 @@
 					</configuration>
 				</configuration>
 			</plugin>
+			<plugin>
+		  <groupId>org.zeroturnaround</groupId>
+		  <artifactId>jrebel-maven-plugin</artifactId>
+		  <executions>
+			<execution>
+			  <id>generate-rebel-xml</id>
+			  <phase>process-resources</phase>
+			  <goals>
+				<goal>generate</goal>
+			  </goals>
+			</execution>
+		  </executions>
+		</plugin>
         </plugins>
+
     </build>
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.0.1</version>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <report>index</report>
-                            <report>summary</report>
-                            <report>dependencies</report>
-                            <!--<report>project-team</report>-->
-                            <report>mailing-list</report>
-                            <report>issue-tracking</report>
-                            <report>javadocs</report>
-                            <report>scm</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-        </plugins>
-    </reporting>
     <scm>
 		<connection>${scm.path}</connection>
 		<developerConnection>${scm.path}</developerConnection>
 	</scm>
 
-    <distributionManagement>
-        <repository>
-            <id>download.company</id>
-            <name>Company</name>
-            <url>scp://download.company.com/maven2</url>
-        </repository>
-    </distributionManagement>
+<repositories>
+    <repository>
+        <id>Rufus Repository</id>
+        <url>http://svn.akazaresearch.com/ocrepository/repository</url>
+    </repository>
+    <repository>
+      <id>jboss-public-repository-group</id>
+      <name>JBoss Public Repository Group</name>
+      <url>http://repository.jboss.org/nexus/content/groups/public/</url>
+      <layout>default</layout>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
+      </snapshots>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>jboss-public-repository-group</id>
+      <name>JBoss Public Repository Group</name>
+      <url>http://repository.jboss.org/nexus/content/groups/public/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </pluginRepository>
+  </pluginRepositories>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.3.1</version>
+        <reportSets>
+          <reportSet>
+            <reports>
+                <report>index</report>
+                <report>summary</report>
+                <report>dependencies</report>
+                <report>mailing-list</report>
+                <report>issue-tracking</report>
+                <report>javadocs</report>
+                <report>scm</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+    </plugins>
+  </reporting>
+
 </project>

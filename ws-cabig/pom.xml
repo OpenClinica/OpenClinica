@@ -12,7 +12,7 @@
     </parent>
     <dependencies>
     	<dependency>
-            <groupId>${groupId}</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>OpenClinica-core</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -103,11 +103,6 @@
             <version>${spring.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-web</artifactId>
             <version>${spring.version}</version>
@@ -152,21 +147,6 @@
 			<artifactId>sitemesh</artifactId>
 			<version>2.3</version>
 		</dependency>
-		<dependency>
-			<groupId>org.dbunit</groupId>
-			<artifactId>dbunit</artifactId>
-			<version>2.3.0</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>org.slf4j</artifactId>
-					<groupId>slf4j-nop</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>org.slf4j</artifactId>
-					<groupId>slf4j-api</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
 		<!-- for servlet tests  -->
 		<dependency>
 			<groupId>javax.j2ee</groupId>
@@ -191,14 +171,8 @@
 		<dependency>
 			<groupId>org.jmesa</groupId>
 			<artifactId>jmesa</artifactId>
-			<version>2.4.2</version>
+			<version>2.5.2</version>
 			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>oro</groupId>
-			<artifactId>oro</artifactId>
-			<version>2.0.8</version>
-			<scope>test</scope>
 		</dependency>
 		<!-- end servlet tests -->
 		<dependency>
@@ -345,13 +319,6 @@
 				</exclusion>				
 			</exclusions>
 		</dependency>
-		<!-- @pgawade 16-NOV-2010 jmesa library for unit tests -->
-		<dependency>
-			<groupId>org.jmesa</groupId>
-			<artifactId>jmesa</artifactId>
-			<version>2.4.2</version>
-			<scope>test</scope>
-		</dependency>
 		<!-- Postgres JDBC driver -->
 		<dependency>
 			<groupId>postgresql</groupId>
@@ -360,12 +327,6 @@
 			<scope>runtime</scope>
 		</dependency>
 		<!-- Oracle JDBC driver -->
-		<dependency>
-			<groupId>oracle</groupId>
-			<artifactId>ojdbc14</artifactId>
-			<version>9i</version>
-			<scope>compile</scope>
-		</dependency>
 		<dependency>
 			<groupId>org.codehaus.castor</groupId>
 			<artifactId>castor</artifactId>
@@ -378,10 +339,12 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.7</version>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>
+                <version>2.8</version>
 			</plugin>
 		</plugins>
 	</reporting>
@@ -412,6 +375,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.1</version>
                 <executions>
                     <execution>
                         <goals>
@@ -421,8 +385,9 @@
                 </executions>
             </plugin>
 			<plugin>
-				<groupId>com.sun.tools.xjc.maven2</groupId>
-				<artifactId>maven-jaxb-plugin</artifactId>
+				<groupId>org.jvnet.jaxb2.maven2</groupId>
+				<artifactId>maven-jaxb2-plugin</artifactId>
+                <version>0.7.5</version>
 				<executions>
 					<execution>
 						<phase>generate-sources</phase>
@@ -439,6 +404,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
+                <version>2.6</version>
 				<configuration>					
 				</configuration>
 			</plugin>

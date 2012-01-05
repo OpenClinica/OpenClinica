@@ -11,7 +11,7 @@
 	</parent>
 	<dependencies>
 		<dependency>
-			<groupId>${groupId}</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>OpenClinica-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -73,11 +73,6 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-webmvc</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-web</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
 		<dependency>
@@ -143,18 +138,6 @@
 		</dependency>
 		<!-- <dependency> <groupId>org.mockejb</groupId> <artifactId>mockejb</artifactId> 
 			<version>0.6-beta2</version> <scope>test</scope> </dependency> -->
-		<dependency>
-			<groupId>org.jmesa</groupId>
-			<artifactId>jmesa</artifactId>
-			<version>2.4.2</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>oro</groupId>
-			<artifactId>oro</artifactId>
-			<version>2.0.8</version>
-			<scope>test</scope>
-		</dependency>
 		<!-- end servlet tests -->
 		<dependency>
 			<groupId>commons-beanutils</groupId>
@@ -328,6 +311,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.1</version>
 				<executions>
 					<execution>
 						<goals>
