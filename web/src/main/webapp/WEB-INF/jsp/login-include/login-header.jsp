@@ -21,6 +21,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
+  <base href="<%=
+org.akaza.openclinica.web.util.WebUtil.basePath(pageContext) %>" />
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=8" />
 
