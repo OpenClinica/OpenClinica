@@ -9,7 +9,6 @@
     <name>OpenClinica</name>
     <description>3.1-SNAPSHOT</description>
 	<properties>
-		<catalina.home>/usr/local/tomcat</catalina.home>
 		<test.dbName>postgres</test.dbName>
 		<test.dbDriverClassName>org.postgresql.Driver</test.dbDriverClassName>
 		<test.dbUrl>jdbc:postgresql://localhost:5432/</test.dbUrl>
