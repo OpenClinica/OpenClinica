@@ -1,11 +1,11 @@
 ﻿--------------------------------------------------------------
 OPENCLINICA RELEASE NOTES
-OpenClinica Version 3.1
+OpenClinica Version 3.1.2
 Document Version 1.0
 --------------------------------------------------------------
 
 --------------------------------------------------------------
-Updated: May 3, 2011 Paul Galvin pgalvin@akazaresearch.com
+Updated: November 7, 2011 Paul Galvin pgalvin@akazaresearch.com
 
 --------------------------------------------------------------
 
@@ -13,7 +13,7 @@ Updated: May 3, 2011 Paul Galvin pgalvin@akazaresearch.com
 OVERVIEW
 --------------------------------------------------------------
 
-This is the production release of OpenClinica 3.1 ws-cabig.   
+This is the production release of OpenClinica 3.1.2 ws-cabig.   
 
 The web application and the web services piece of OpenClinica are in separate war files. 
 

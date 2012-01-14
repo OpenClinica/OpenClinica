@@ -292,6 +292,7 @@
 	</dependencies>
 
 	<build>
+        <finalName>OpenClinica-web-3.1.2</finalName>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>

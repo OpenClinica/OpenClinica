@@ -1,0 +1,96 @@
+#!/bin/bash
+#
+# tomcat        
+#
+# chkconfig: 2345 90 15 
+# description:  Tomcat start script for OpenClinica.
+#
+#
+#
+# Change the variables below if they do not mee your environment.
+
+RETVAL=$?
+export CATALINA_HOME="/usr/local/tomcat"
+export JAVA_HOME="/usr/local/java"
+export JAVA_OPTS="$JAVA_OPTS -Xmx1280m -XX:MaxPermSize=180m"
+
+case "$1" in
+ start)
+        ps ax | grep "$CATALINA_HOME" | grep "$JAVA_HOME" |grep -v grep |  awk '{printf $1 " "}' | wc | awk '{print $2}' > /tmp/tomcat_process_count.txt
+        read line < /tmp/tomcat_process_count.txt
+        if [ $line -gt 0 ]; then
+                echo "Tomcat is already running with a PID of `ps ax | grep "$CATALINA_HOME" | grep "$JAVA_HOME" |  awk '{printf $1 " "}'`"
+        else
+                if [ -f $CATALINA_HOME/bin/startup.sh ];
+                  then
+                    echo $"Starting Tomcat"
+                    /bin/su tomcat $CATALINA_HOME/bin/startup.sh
+                fi
+                /etc/init.d/tomcat status
+        fi
+        ;;
+ stop)
+         ps ax | grep "$CATALINA_HOME" | grep "$JAVA_HOME" |grep -v grep |  awk '{printf $1 " "}' | wc | awk '{print $2}' > /tmp/tomcat_process_count.txt
+        read line < /tmp/tomcat_process_count.txt
+        if [ $line -gt 0 ]; then
+                if [ -f $CATALINA_HOME/bin/shutdown.sh ];
+                  then
+                    echo $"Stopping Tomcat"
+                    /bin/su tomcat $CATALINA_HOME/bin/shutdown.sh
+                fi
+                sleep 10
+                /etc/init.d/tomcat status
+        else
+                echo
+                echo "Tomcat was not running"
+                echo
+        fi
+        ;;
+
+ restart)
+        /etc/init.d/tomcat stop
+        /etc/init.d/tomcat start
+        ;;
+
+ status) 
+         ps ax | grep "$CATALINA_HOME" | grep "$JAVA_HOME" |grep -v grep |  awk '{printf $1 " "}' | wc | awk '{print $2}' > /tmp/tomcat_process_count.txt
+        read line < /tmp/tomcat_process_count.txt
+        if [ $line -gt 0 ]; then
+            echo
+            echo -n "Tomcat is running with a PID of "` 
+        ps ax | grep "$CATALINA_HOME" | grep "$JAVA_HOME" |  awk '{printf $1 " "}'`
+            echo -n ""
+            echo
+        else
+            echo
+            echo "Tomcat is not running"
+            echo
+        fi
+        ;;
+ kill)
+        PID=`ps aux | grep "$CATALINA_HOME" | grep "$JAVA_HOME" | awk '{printf $2 " "}'`
+ 	echo
+        echo "Killing Tomcat process running on PID $PID"
+	echo
+        kill $PID
+        sleep 10
+        echo "Confirming tomcat is killed"
+        /etc/init.d/tomcat status
+        ;;
+ forcekill)
+        PID=`ps ax | grep "$CATALINA_HOME" | grep "$JAVA_HOME" |awk '{printf $1 " "}'`
+        echo
+	echo "Killing Tomcat process running on PID $PID"
+	echo
+        kill -9 $PID
+        sleep 10
+        echo "Confirming tomcat is killed"
+        /etc/init.d/tomcat status
+        ;;
+ *)
+        echo $"Usage: $0 {start|stop|restart|status|kill|forcekill}"
+        exit 1
+        ;;
+esac
+
+exit $RETVAL
