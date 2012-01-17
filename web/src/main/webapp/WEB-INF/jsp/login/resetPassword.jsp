@@ -45,7 +45,7 @@
     <c:if test="${mustChangePass=='yes'}">
         <tr><td class="formlabel"><fmt:message key="password_challenge_question" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG">
             <select name="passwdChallengeQ" class="formfieldXL">
-                <option value="" >Please Select One</option>
+                <option value="" ><fmt:message key="Please_Select_One" bundle="${resword}"/></option>
                 <option><fmt:message key="favourite_pet" bundle="${resword}"/></option>
                 <option><fmt:message key="city_of_birth" bundle="${resword}"/></option>
                 <option><fmt:message key="mother_maiden_name" bundle="${resword}"/></option>

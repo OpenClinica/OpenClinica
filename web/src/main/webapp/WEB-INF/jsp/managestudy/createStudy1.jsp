@@ -170,7 +170,7 @@
         <tr><fmt:message key="select_user_for_edit_update" bundle="${restext}"/> </tr>
         <br>
         <br>
-        <tr valign="top"><td class="formlabel">Select User :</td><td>
+        <tr valign="top"><td class="formlabel"><fmt:message key="Select_User" bundle="${restext}"/> :</td><td>
          <div class="formfieldL_BG">
           <select name="selectedUser" class="formfieldL">1
           <option value="">-<fmt:message key="select" bundle="${resword}"/>-</option>

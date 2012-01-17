@@ -102,6 +102,7 @@
      </c:forEach>
     </select></div>
   </td></tr>
+  <c:if test="${not userBean1.ldapUser}">
   <tr valign="bottom"><td class="formlabel"><fmt:message key="password_challenge_question" bundle="${resword}"/>:</td><td>
   <div class="formfieldXL_BG">
   <select name="passwdChallengeQuestion" class="formfieldXL">
@@ -145,6 +146,7 @@
   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="passwd"/></jsp:include></td></tr>
   <tr><td class="formlabel"><fmt:message key="confirm_new_password" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG"><input type="password" name="passwd1" value="" class="formfieldXL"></div>
   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="passwd1"/></jsp:include></td></tr>
+  </c:if>
   <tr><td class="formlabel"><fmt:message key="phone" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG"><input type="text" name="phone" value="<c:out value="${userBean1.phone}"/>" class="formfieldXL"></div>
   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="phone"/></jsp:include></td><td class="formlabel">*</td></tr>
 

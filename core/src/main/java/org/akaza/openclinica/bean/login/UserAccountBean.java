@@ -7,16 +7,16 @@
  */
 package org.akaza.openclinica.bean.login;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
 
 /**
  * @author thickerson
@@ -26,6 +26,11 @@ public class UserAccountBean extends AuditableEntityBean {
     /*
      * since we extend entity bean, we already have the following: user_id, user_name, owner_id, date_created, date_updated, update_id
      */
+
+    /**
+     * LDAP/Active Directory users are identified by having this password stored in the database
+     */
+    public static final String LDAP_PASSWORD = "*";
 
     private String passwd;
     private String firstName;
@@ -515,6 +520,10 @@ public class UserAccountBean extends AuditableEntityBean {
 
     public void setRunWebservices(Boolean runWebservices) {
         this.runWebservices = runWebservices;
+    }
+
+    public boolean isLdapUser() {
+        return this.passwd.equals("*");
     }
 
 }

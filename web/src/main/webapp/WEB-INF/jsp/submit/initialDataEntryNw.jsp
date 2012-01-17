@@ -6,6 +6,7 @@
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='session' id='study' class='org.akaza.openclinica.bean.managestudy.StudyBean' />
@@ -45,8 +46,8 @@
 
         <link rel="stylesheet" type="text/css" media="all" href="includes/new_cal/skins/aqua/theme.css" title="Aqua" />
         <script type="text/javascript" src="includes/new_cal/calendar.js"></script>
-        <script type="text/javascript" src="includes/new_cal/lang/calendar-en.js"></script>
-        <script type="text/javascript" src="includes/new_cal/calendar-setup.js"></script>
+	    <script type="text/javascript" src="includes/new_cal/lang/<fmt:message key="jscalendar_language_file" bundle="${resformat}"/>"></script>
+	    <script type="text/javascript" src="includes/new_cal/calendar-setup.js"></script>
     <!-- End -->
 
 </head>
@@ -115,6 +116,9 @@ giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%>
 <input type="hidden" name="sectionId" value="<c:out value="${section.section.id}"/>" />
 <input type="hidden" name="checkInputs" value="<c:out value="${checkInputsValue}"/>" />
 <input type="hidden" name="tab" value="<c:out value="${tabId}"/>" />
+<input type="hidden" name="sectionId" value="<c:out value="${section.section.id}"/>" />
+<input type="hidden" name="isFirstTimeOnSection" value="<c:out value="${section.section.id}"/>" />
+
 <%-- We have to feed this value to the method giveFirstElementFocus()--%>
 <input id="formFirstField" type="hidden" name="formFirstField" value="${requestScope['formFirstField']}" />
 <input type="hidden" name="exitTo" value="${exitTo}" />
@@ -460,7 +464,7 @@ window.onload = initmb;
                                             </c:when>
                                             <c:otherwise>
                                                 <td valign="bottom">  <input type="checkbox" id="markCompleteId" name="markComplete" value="Yes"
-                                                                            <c:if test="${markComplete=='Yes'}"> checked </c:if> onclick="displayMessageFromCheckbox(this)">
+                                                                            <c:if test="${markComplete=='Yes'}"> checked </c:if> onclick="displayMessageFromCheckbox(this, '<fmt:message key="marking_CRF_complete_finalize_DE" bundle="${restext}"/>')">
                                                 </td>
                                                 <td valign="bottom" nowrap="nowrap">&nbsp; <fmt:message key="mark_CRF_complete" bundle="${resword}"/>&nbsp;&nbsp;&nbsp;</td>
                                             </c:otherwise>
@@ -518,7 +522,7 @@ window.onload = initmb;
                                             </c:when>
                                             <c:otherwise>
                                                 <td valign="bottom">  <input type="checkbox" id="markCompleteId" name="markComplete" value="Yes"
-                                                                            <c:if test="${markComplete=='Yes'}"> checked </c:if> onclick="displayMessageFromCheckbox(this)">
+                                                                            <c:if test="${markComplete=='Yes'}"> checked </c:if> onclick="displayMessageFromCheckbox(this,'<fmt:message key="marking_CRF_complete_finalize_DE" bundle="${restext}"/>')">
                                                 </td>
                                                 <td valign="bottom" nowrap="nowrap">&nbsp; <fmt:message key="mark_CRF_complete" bundle="${resword}"/>&nbsp;&nbsp;&nbsp;</td>
                                             </c:otherwise>
@@ -588,6 +592,7 @@ window.onload = initmb;
 <c:otherwise>
  <c:set var="repeatNumber" value="${repeatNumber-1}"/>
 </c:otherwise>
+
 </c:choose>
 
 <c:set var="repeatMax" value="${displayItem.itemGroup.groupMetaBean.repeatMax}"/>
@@ -999,6 +1004,7 @@ but the custom tag uses that, not this jstl code--%>
                             <c:param name="isLast" value="${true}"/>
 							<c:param name="isTemplateRow" value="${true}"/>
                             <c:param name="tabNum" value="${itemNum}"/>
+                            <c:param name="isTemplateRow" value="${true}"/>
                             <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
                             <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                             <c:param name="originJSP" value="initialDataEntry"/>
@@ -1024,6 +1030,8 @@ but the custom tag uses that, not this jstl code--%>
                             <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
                             <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                             <c:param name="originJSP" value="initialDataEntry"/>
+                            <c:param name="isTemplateRow" value="${true}"/>
+                          
                         </c:import>
                     </td>
                 </c:forEach>
@@ -1040,6 +1048,8 @@ but the custom tag uses that, not this jstl code--%>
                         <c:param name="tabNum" value="${itemNum}"/>
                         <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                         <c:param name="originJSP" value="initialDataEntry"/>
+                        <c:param name="isTemplateRow" value="${true}"/>
+                          
                     </c:import>
                 </td>
             </c:when>
@@ -1066,6 +1076,7 @@ but the custom tag uses that, not this jstl code--%>
                         <c:param name="tabNum" value="${itemNum}"/>
                         <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                         <c:param name="originJSP" value="initialDataEntry"/>
+                        <c:param name="isTemplateRow" value="${true}"/>
                     </c:import>
                     <c:import url="../submit/generateGroupItemTxt.jsp">
                         <c:param name="itemId" value="${bodyItem.item.id}"/>
@@ -1499,7 +1510,7 @@ table-->
                                 </c:when>
                                 <c:otherwise>
                                     <td valign="bottom">  <input type="checkbox" id="markCompleteId" name="markComplete" value="Yes"
-                                                                <c:if test="${markComplete=='Yes'}"> checked </c:if> onclick="displayMessageFromCheckbox(this)">
+                                                                <c:if test="${markComplete=='Yes'}"> checked </c:if> onclick="displayMessageFromCheckbox(this, '<fmt:message key="marking_CRF_complete_finalize_DE" bundle="${restext}"/>')">
                                     </td>
                                     <td valign="bottom" nowrap="nowrap">&nbsp; <fmt:message key="mark_CRF_complete" bundle="${resword}"/>&nbsp;&nbsp;&nbsp;</td>
                                 </c:otherwise>

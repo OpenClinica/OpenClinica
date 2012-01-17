@@ -242,6 +242,8 @@ function switchStr(itemId, id,attribute,str1,str2) {
 <c:set var="itemId" value="${displayItem.item.id}" />
 <c:set var="numOfDate" value="${param.key}" />
 <c:set var="isLast" value="${param.isLast}" />
+<c:set var="isTemplateRow" value="${param.isTemplateRow}" />
+
 <c:set var="isFirst" value="${param.isFirst}" />
 <c:set var="repeatParentId" value="${param.repeatParentId}" />
 <c:set var="rowCount" value="${param.rowCount}" />

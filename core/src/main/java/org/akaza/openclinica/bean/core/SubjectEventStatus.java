@@ -9,13 +9,7 @@ package org.akaza.openclinica.bean.core;
 
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 
 /**
  * @author Jun Xu
@@ -167,7 +161,7 @@ public class SubjectEventStatus extends Term implements Comparable {
         
         for (String statusName : getSubjectEventStatusValues()) {
             if(resterm.getString(statusName) != null) {
-                if (name.equalsIgnoreCase(resterm.getString(statusName).trim())) {
+                if (status_name.equalsIgnoreCase(resterm.getString(statusName).trim())) {
                     validArg = true;
                     break;
                 }

@@ -4,14 +4,17 @@
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
 <jsp:useBean scope="request" id="currRow" class="org.akaza.openclinica.web.bean.DisplayStudyRow" />
+<c:set var="available"><fmt:message key="available" bundle="${resterm}"/></c:set>
+<c:set var="removed"><fmt:message key="removed" bundle="${resterm}"/></c:set>
 <c:choose>
-  <c:when test="${currRow.bean.parent.status.name eq 'available'}">
+  <c:when test="${currRow.bean.parent.status.name eq available}">
     <c:set var="className" value="aka_green_highlight"/>
   </c:when>
-  <c:when test="${currRow.bean.parent.status.name eq 'removed'}">
+  <c:when test="${currRow.bean.parent.status.name eq removed}">
     <c:set var="className" value="aka_red_highlight"/>
   </c:when>
 </c:choose>
