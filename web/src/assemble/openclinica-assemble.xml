@@ -28,7 +28,7 @@
   </fileSets>
   <files>
   	<file>
-  		<source>target/OpenClinica-web-3.1.2.war</source>
+  		<source>target/OpenClinica-web-3.1-SNAPSHOT.war</source>
   		<outputDirectory>distribution</outputDirectory>
   		<destName>OpenClinica.war</destName>
   	</file>
