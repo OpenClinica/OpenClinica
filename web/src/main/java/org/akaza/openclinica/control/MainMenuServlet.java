@@ -7,11 +7,6 @@
  */
 package org.akaza.openclinica.control;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.control.admin.EventStatusStatisticsTableFactory;
@@ -37,6 +32,11 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  *
@@ -107,6 +107,12 @@ public class MainMenuServlet extends SecureController {
         // Event Definition list and Group Class list for add suybject window.
         request.setAttribute("allDefsArray", super.getEventDefinitionsByCurrentStudy());
         request.setAttribute("studyGroupClasses", super.getStudyGroupClassesByCurrentStudy());
+
+        if (ub.isLdapUser()) {
+            // "Forge" a password change date for LDAP user
+            lastPwdChangeDate = new Date();
+        }
+
         if (lastPwdChangeDate != null) {// not a new user
             Calendar cal = Calendar.getInstance();
             // compute difference between current date and lastPwdChangeDate
@@ -114,7 +120,7 @@ public class MainMenuServlet extends SecureController {
             long days = difference / (1000 * 60 * 60 * 24);
             session.setAttribute("passwordExpired", "no");
 
-            if (days >= pwdExpireDay) {// password expired, need to be changed
+            if (!ub.isLdapUser() && days >= pwdExpireDay) {// password expired, need to be changed
                 studies = (ArrayList) sdao.findAllByUser(ub.getName());
                 request.setAttribute("studies", studies);
                 session.setAttribute("userBean1", ub);
@@ -148,9 +154,11 @@ public class MainMenuServlet extends SecureController {
                     }
                 }
 
-                //Integer assignedDiscrepancies = getDiscrepancyNoteDAO().countAllItemDataByStudyAndUser(currentStudy, ub);
-                Integer assignedDiscrepancies = getDiscrepancyNoteDAO().getViewNotesCountWithFilter(" AND dn.assigned_user_id ="
-                        + ub.getId() + " AND (dn.resolution_status_id=1 OR dn.resolution_status_id=2 OR dn.resolution_status_id=3)", currentStudy);
+                ////Integer assignedDiscrepancies = getDiscrepancyNoteDAO().countAllItemDataByStudyAndUser(currentStudy, ub);
+                //Integer assignedDiscrepancies = getDiscrepancyNoteDAO().getViewNotesCountWithFilter(" AND dn.assigned_user_id ="
+                //  + ub.getId() + " AND (dn.resolution_status_id=1 OR dn.resolution_status_id=2 OR dn.resolution_status_id=3)", currentStudy);
+                //Yufang code added by Jamuna, to optimize the query on MainMenu
+                Integer assignedDiscrepancies = getDiscrepancyNoteDAO().getViewNotesCountWithFilter(ub.getId(), currentStudy.getId());
                 request.setAttribute("assignedDiscrepancies", assignedDiscrepancies == null ? 0 : assignedDiscrepancies);
 
                 int parentStudyId = currentStudy.getParentStudyId()>0?currentStudy.getParentStudyId():currentStudy.getId();
@@ -164,7 +172,7 @@ public class MainMenuServlet extends SecureController {
                     //request.setAttribute("label", new Integer(nextLabel).toString());
                     request.setAttribute("label", resword.getString("id_generated_Save_Add"));
                 }
-                
+
                 if (currentRole.isInvestigator() || currentRole.isResearchAssistant()) {
                     setupListStudySubjectTable();
                 }

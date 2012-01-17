@@ -3,7 +3,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
-
+<fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+<%@ page import="org.akaza.openclinica.i18n.util.ResourceBundleProvider" %>
 <c:import url="../include/home-header.jsp">
     <c:param name="profilePage" value="yes"/>
 </c:import>
@@ -46,15 +47,26 @@
 <h1><span class="title_manage">
     <fmt:message key="change_user_profile" bundle="${resword}"/>
     <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/working-openclinica')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
-<strong><fmt:message key="browser_locale" bundle="${resword}"/>
-    <c:choose>
-        <c:when test="${resword.locale == null}">
-            English
-        </c:when>
-        <c:otherwise>
-            <c:out value="${resword.locale.displayLanguage}"/>
-        </c:otherwise>
-    </c:choose>
+<strong>
+<fmt:message key="browser_locale" bundle="${resword}"/>
+   <c:set var="formatLocale"><fmt:message key="locale_string" bundle="${resformat}"/></c:set>
+ <c:set var="language"  value="<%=ResourceBundleProvider.getLocale().getDisplayLanguage()%>"></c:set>
+<c:set var="country"  value="<%=ResourceBundleProvider.getLocale().getDisplayCountry()%>"></c:set> 
+ 		
+	
+			   <c:choose>
+                    <c:when test="${formatLocale == null}">
+                        English
+                    </c:when>
+                    <c:otherwise>
+                        <c:out value="${language}"/>
+						<c:if test="${country!=''}">
+						/
+						<c:out value="${country}"/>
+						</c:if>
+						
+                    </c:otherwise>
+                </c:choose>
     &nbsp;<fmt:message key="language" bundle="${resword}"/></strong>
 <br><br>
 <form action="UpdateProfile" method="post">
@@ -90,6 +102,7 @@
      </c:forEach>
     </select></div>
   </td></tr>
+  <c:if test="${not userBean1.ldapUser}">
   <tr valign="bottom"><td class="formlabel"><fmt:message key="password_challenge_question" bundle="${resword}"/>:</td><td>
   <div class="formfieldXL_BG">
   <select name="passwdChallengeQuestion" class="formfieldXL">
@@ -133,6 +146,7 @@
   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="passwd"/></jsp:include></td></tr>
   <tr><td class="formlabel"><fmt:message key="confirm_new_password" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG"><input type="password" name="passwd1" value="" class="formfieldXL"></div>
   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="passwd1"/></jsp:include></td></tr>
+  </c:if>
   <tr><td class="formlabel"><fmt:message key="phone" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG"><input type="text" name="phone" value="<c:out value="${userBean1.phone}"/>" class="formfieldXL"></div>
   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="phone"/></jsp:include></td><td class="formlabel">*</td></tr>
 

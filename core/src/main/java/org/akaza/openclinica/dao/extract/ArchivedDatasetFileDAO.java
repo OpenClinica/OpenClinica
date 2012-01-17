@@ -71,13 +71,13 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
         ArchivedDatasetFileBean fb = (ArchivedDatasetFileBean) eb;
         HashMap variables = new HashMap();
         HashMap nullVars = new HashMap();
-        variables.put(new Integer(1), fb.getName());
-        variables.put(new Integer(2), new Integer(fb.getDatasetId()));
-        variables.put(new Integer(3), new Integer(fb.getExportFormatId()));
-        variables.put(new Integer(4), fb.getFileReference());
-        variables.put(new Integer(5), new Integer(fb.getFileSize()));
-        variables.put(new Integer(6), new Double(fb.getRunTime()));
-        variables.put(new Integer(7), new Integer(fb.getOwnerId()));
+        variables.put(Integer.valueOf(1), fb.getName());
+        variables.put(Integer.valueOf(2), Integer.valueOf(fb.getDatasetId()));
+        variables.put(Integer.valueOf(3), Integer.valueOf(fb.getExportFormatId()));
+        variables.put(Integer.valueOf(4), fb.getFileReference());
+        variables.put(Integer.valueOf(5), Integer.valueOf(fb.getFileSize()));
+        variables.put(Integer.valueOf(6), new Double(fb.getRunTime()));
+        variables.put(Integer.valueOf(7), Integer.valueOf(fb.getOwnerId()));
         this.executeWithPK(digester.getQuery("create"), variables, nullVars);
         if (isQuerySuccessful()) {
             fb.setId(getLatestPK());
@@ -89,14 +89,14 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
         ArchivedDatasetFileBean fb = (ArchivedDatasetFileBean) eb;
         HashMap variables = new HashMap();
         HashMap nullVars = new HashMap();
-        variables.put(new Integer(1), fb.getName());
-        variables.put(new Integer(2), new Integer(fb.getDatasetId()));
-        variables.put(new Integer(3), new Integer(fb.getExportFormatId()));
-        variables.put(new Integer(4), fb.getFileReference());
-        variables.put(new Integer(5), new Integer(fb.getFileSize()));
-        variables.put(new Integer(6), new Double(fb.getRunTime()));
-        variables.put(new Integer(7), new Integer(fb.getOwnerId()));
-        variables.put(new Integer(8), new Integer(fb.getId()));
+        variables.put(Integer.valueOf(1), fb.getName());
+        variables.put(Integer.valueOf(2), Integer.valueOf(fb.getDatasetId()));
+        variables.put(Integer.valueOf(3), Integer.valueOf(fb.getExportFormatId()));
+        variables.put(Integer.valueOf(4), fb.getFileReference());
+        variables.put(Integer.valueOf(5), Integer.valueOf(fb.getFileSize()));
+        variables.put(Integer.valueOf(6), new Double(fb.getRunTime()));
+        variables.put(Integer.valueOf(7), Integer.valueOf(fb.getOwnerId()));
+        variables.put(Integer.valueOf(8), Integer.valueOf(fb.getId()));
         this.execute(digester.getQuery("update"), variables, nullVars);
         return fb;
     }
@@ -122,7 +122,7 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
 
     public void deleteArchiveDataset(ArchivedDatasetFileBean adfBean){
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), adfBean.getId());
+        variables.put(Integer.valueOf(1), adfBean.getId());
         this.execute(digester.getQuery("deleteArchiveDataset"), variables);
     }
 
@@ -151,7 +151,7 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
         this.setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(ID));
+        variables.put(Integer.valueOf(1), Integer.valueOf(ID));
 
         String sql = digester.getQuery("findByPK");
         ArrayList alist = this.select(sql, variables);
@@ -169,7 +169,7 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
         this.setTypesExpected();
         ArrayList al = new ArrayList();
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(did));
+        variables.put(Integer.valueOf(1), Integer.valueOf(did));
 
         String sql = digester.getQuery("findByDatasetId");
         ArrayList alist = this.select(sql, variables);
@@ -188,7 +188,7 @@ public class ArchivedDatasetFileDAO extends AuditableEntityDAO {
         this.setTypesExpected();
         ArrayList al = new ArrayList();
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), new Integer(did));
+        variables.put(Integer.valueOf(1), Integer.valueOf(did));
 
         String sql = digester.getQuery("findByDatasetIdByDate");
         ArrayList alist = this.select(sql, variables);

@@ -7,11 +7,6 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
@@ -32,6 +27,12 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * @author jxu
@@ -126,7 +127,8 @@ public class UpdateSubjectServlet extends SecureController {
                 // tbh
                 Date birthDate = sub.getDateOfBirth();
                 try {
-                    String localBirthDate = local_df.format(birthDate);
+                    //String localBirthDate = local_df.format(birthDate);
+                    String localBirthDate = new SimpleDateFormat(resformat.getString("date_format_string"),request.getLocale()).format(birthDate);
                     session.setAttribute("localBirthDate", localBirthDate);
                 } catch (NullPointerException e) {
                     // TODO Auto-generated catch block
@@ -220,12 +222,12 @@ public class UpdateSubjectServlet extends SecureController {
             }
             // if the original DOB is null, but user entered a new DOB
             if (!StringUtil.isBlank(fp.getString(DATE_DOB))) {
-                v.addValidation(DATE_DOB, Validator.IS_A_DATE);
+                v.addValidation(DATE_DOB, Validator.IS_A_LOCALE_DATE);
                 v.alwaysExecuteLastValidation(DATE_DOB);
             }
         } else {
             if (!StringUtil.isBlank(fp.getString(DATE_DOB))) {
-                v.addValidation(DATE_DOB, Validator.IS_A_DATE);
+                v.addValidation(DATE_DOB, Validator.IS_A_LOCALE_DATE);
                 v.alwaysExecuteLastValidation(DATE_DOB);
             }
 

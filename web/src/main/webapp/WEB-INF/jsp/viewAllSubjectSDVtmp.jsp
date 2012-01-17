@@ -63,6 +63,9 @@
         <img src="../images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${restext}"/>" title="<fmt:message key="help" bundle="${restext}"/>"></a>
 </span></h1>
 
+<jsp:useBean scope='session' id='sSdvRestore' class='java.lang.String' />
+<c:set var="restore" value="true"/>
+<c:if test="${sSdvRestore=='false'}"><c:set var="restore" value="false"/></c:if>
 
 <div id="searchFilterSDV">
     <table border="0" cellpadding="0" cellspacing="0">
@@ -74,7 +77,7 @@
               
             <td valign="bottom" id="Tab2'">
 				<div id="Tab2Selected"><div class="tab_BG"><div class="tab_L"><div class="tab_R">
-                    <a class="tabtext" title="<fmt:message key="view_by_studysubjectID" bundle="${resword}"/>" href='viewSubjectAggregate?studyId=${studyId}' onclick="javascript:HighlightTab(2);"><fmt:message key="view_by_studysubjectID" bundle="${resword}"/></a></div></div></div></div>
+                    <a class="tabtext" title="<fmt:message key="view_by_studysubjectID" bundle="${resword}"/>" href='viewSubjectAggregate?s_sdv_restore=${restore}&studyId=${studyId}' onclick="javascript:HighlightTab(2);"><fmt:message key="view_by_studysubjectID" bundle="${resword}"/></a></div></div></div></div>
                 <div id="Tab2NotSelected" style="display:none"><div class="tab_BG_h"><div class="tab_L_h"><div class="tab_R_h"><span class="tabtext"><fmt:message key="view_by_studysubjectID" bundle="${resword}"/></span></div></div></div></div></td>
 
         </tr>

@@ -7,6 +7,8 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import java.util.Locale;
+
 import org.akaza.openclinica.bean.core.EntityAction;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.SpringServletAccess;
@@ -18,11 +20,11 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 
-import java.util.Locale;
-
 // allows both deletion and restoration of a study user role
 
 public class DeleteUserServlet extends SecureController {
+
+    private static final long serialVersionUID = 298106781476442393L;
 
     // < ResourceBundle restext;
     Locale locale;
@@ -94,8 +96,10 @@ public class DeleteUserServlet extends SecureController {
                 String password = sm.genPassword();
                 String passwordHash = sm.encrytPassword(password, getUserDetails());
 
-                u.setPasswd(passwordHash);
-                u.setPasswdTimestamp(null);
+                if (!u.isLdapUser()) {
+                    u.setPasswd(passwordHash);
+                    u.setPasswdTimestamp(null);
+                }
 
                 udao.restore(u);
 
@@ -103,7 +107,9 @@ public class DeleteUserServlet extends SecureController {
                     message = respage.getString("the_user_has_been_restored");
 
                     try {
-                        sendRestoreEmail(u, password);
+                        if (!u.isLdapUser()) {
+                            sendRestoreEmail(u, password);
+                        }
                     } catch (Exception e) {
                         message += respage.getString("however_was_error_sending_user_email_regarding");
                     }
@@ -115,18 +121,6 @@ public class DeleteUserServlet extends SecureController {
 
         addPageMessage(message);
         forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET);
-    }
-
-    private void sendDeleteEmail(UserAccountBean u) throws Exception {
-        logger.info("Sending delete notification to " + u.getName());
-
-        String body = "Dear " + u.getFirstName() + " " + u.getLastName() + ",\n";
-        body += "Your account has been deleted from the OpenClinica system.  Please contact the system administrator if this was a mistake.\n\n";
-        body += "OpenClinica System Administrator";
-
-        logger.info("Sending email...begin");
-        sendEmail(u.getEmail().trim(), "Your OpenClinica account has been deleted", body, false);
-        logger.info("Sending email...done");
     }
 
     private void sendRestoreEmail(UserAccountBean u, String password) throws Exception {

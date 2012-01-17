@@ -4,12 +4,29 @@
 	<Target Context="OC_RULES_V1"></Target>
 		<RuleRef OID="">
 			<DiscrepancyNoteAction IfExpressionEvaluates="">
+                <Run AdministrativeDataEntry="" InitialDataEntry="" DoubleDataEntry="" ImportDataEntry="false" Batch="" />
 				<Message></Message>
 			</DiscrepancyNoteAction>
 			<EmailAction IfExpressionEvaluates="">
+                <Run AdministrativeDataEntry="" InitialDataEntry="" DoubleDataEntry="" ImportDataEntry="false" Batch="" />
 				<Message></Message>
 				<To></To>
 			</EmailAction>
+            <ShowAction IfExpressionEvaluates="">
+                <Run AdministrativeDataEntry="" InitialDataEntry="" DoubleDataEntry="" ImportDataEntry="false" Batch="" />
+                <Message></Message>
+				<DestinationProperty OID =""/>
+            </ShowAction>			
+			<HideAction IfExpressionEvaluates="">
+                <Run AdministrativeDataEntry="" InitialDataEntry="" DoubleDataEntry="" ImportDataEntry="false" Batch="" />
+                <Message></Message>
+				<DestinationProperty OID =""/>
+            </HideAction>
+            <InsertAction IfExpressionEvaluates="">
+                <Run AdministrativeDataEntry="" InitialDataEntry="" DoubleDataEntry="" ImportDataEntry="false" Batch=""/>
+				<DestinationProperty OID="" Value=""></DestinationProperty>
+					<ValueExpression Context="OC_RULES_V1"></ValueExpression>
+            </InsertAction>
 		</RuleRef>
 	</RuleAssignment>
 	<RuleDef OID="" Name="">

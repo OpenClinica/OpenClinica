@@ -447,10 +447,12 @@ public class Validator {
     public static final int IS_PARTIAL_DATE = 34;
     // YW >>
     public static final int IS_AN_RULE = 33;
-    public static final int BARCODE_EAN_13 = 36;
     public static final int IS_VALID_WIDTH_DECIMAL = 35;
-
+    public static final int BARCODE_EAN_13 = 36;
     public static final int TO_HIDE_CONDITIONAL_DISPLAY = 37;
+    public static final int IS_A_LOCALE_DATE = 39;
+    
+    public static final int NO_SEMI_COLONS_OR_COLONS = 43;
 
     /**
      * The last field for which an addValidation method was invoked. This is
@@ -831,6 +833,15 @@ public class Validator {
                 break;
             case TO_HIDE_CONDITIONAL_DISPLAY:
                 errorMessage = v.getErrorMessage();
+                break;
+            case IS_A_LOCALE_DATE:
+                errorMessage = resexception.getString("input_not_valid_date") + resformat.getString("date_format_string") 
+                    + " " + resexception.getString("format1") + ", " + resexception.getString("or_language_mismatched") + ".";
+                break;
+              
+            case NO_SEMI_COLONS_OR_COLONS:
+                errorMessage = resexception.getString("field_not_have_colons_or_semi");
+                break;
             }
         }
         // logger.info("<<<error added: "+errorMessage+" to "+fieldName);
@@ -1119,8 +1130,18 @@ public class Validator {
         case TO_HIDE_CONDITIONAL_DISPLAY:
             addError(fieldName, v);
             break;
+        case IS_A_LOCALE_DATE:
+            String fieldvalue = getFieldValue(fieldName);
+            if (StringUtil.isBlank(fieldvalue) || !StringUtil.isDateFormatString(fieldvalue, resformat.getString("date_format_string"), locale)) {
+                addError(fieldName, v);
+            }
+            break;
+        
+        case NO_SEMI_COLONS_OR_COLONS:
+            if(isColonSemiColon(fieldName))
+            addError(fieldName, v);
+            break;
         }
-
         return errors;
     }
 
@@ -1147,6 +1168,15 @@ public class Validator {
         return false;
     }
 
+    
+    protected boolean isColonSemiColon(String fieldName)
+    {
+        String fieldValue = getFieldValue(fieldName);
+        if(fieldValue.indexOf(";")!=-1 || fieldValue.indexOf(":")!=-1 || fieldValue.indexOf("*")!=-1)
+            return true;
+        else
+            return false;
+    }
     protected boolean isNumber(String fieldName) {
         String fieldValue = getFieldValue(fieldName);
 
@@ -1949,8 +1979,8 @@ public class Validator {
      * @param dataType
      * @return
      * 
-     * @author ywang (02-2009)
      */
+    // ywang (02-2009)
     public static StringBuffer validateWidthDecimalSetting(String widthDecimal, String dataType, boolean isCalculationItem, Locale locale) {
         StringBuffer message = new StringBuffer();
         ResourceBundle resException = ResourceBundleProvider.getExceptionsBundle(locale);

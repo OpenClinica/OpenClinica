@@ -8,52 +8,6 @@
 
 package org.akaza.openclinica.control.core;
 
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
-import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.*;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.core.EmailEngine;
-import org.akaza.openclinica.core.SessionManager;
-import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.core.AuditableEntityDAO;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
-import org.akaza.openclinica.dao.managestudy.*;
-import org.akaza.openclinica.dao.service.StudyConfigService;
-import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
-import org.akaza.openclinica.dao.submit.ItemDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.exception.OpenClinicaException;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.view.BreadcrumbTrail;
-import org.akaza.openclinica.view.Page;
-import org.akaza.openclinica.view.StudyInfoPanel;
-import org.akaza.openclinica.view.StudyInfoPanelLine;
-import org.akaza.openclinica.web.InconsistentStateException;
-import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.akaza.openclinica.web.SQLInitServlet;
-import org.akaza.openclinica.web.bean.EntityBeanTable;
-import org.quartz.SchedulerException;
-import org.quartz.Trigger;
-import org.quartz.impl.StdScheduler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.mail.MailException;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -84,9 +38,65 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
+import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
+import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.control.SpringServletAccess;
+import org.akaza.openclinica.core.EmailEngine;
+import org.akaza.openclinica.core.SessionManager;
+import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.core.AuditableEntityDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
+import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.service.StudyConfigService;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.ItemDAO;
+import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.exception.OpenClinicaException;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.view.BreadcrumbTrail;
+import org.akaza.openclinica.view.Page;
+import org.akaza.openclinica.view.StudyInfoPanel;
+import org.akaza.openclinica.view.StudyInfoPanelLine;
+import org.akaza.openclinica.web.InconsistentStateException;
+import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.akaza.openclinica.web.SQLInitServlet;
+import org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.quartz.SchedulerException;
+import org.quartz.Trigger;
+import org.quartz.impl.StdScheduler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.mail.MailException;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+
 /**
  * This class enhances the Controller in several ways.
- * 
+ *
  * <ol>
  * <li>The method mayProceed, for which the class is named, is declared abstract and is called before processRequest. This
  * method indicates whether the user may proceed with the action he wishes to perform (as indicated by various attributes or
@@ -95,33 +105,33 @@ import javax.sql.DataSource;
  * should throw an exception. InsufficientPermissionException will accept a Page object which indicates where the user should
  * be redirected in order to be informed that he has insufficient permission, and the process method enforces this redirection
  * by catching an InsufficientPermissionException object.
- * 
+ *
  * <li>Four new members, session, request, response, and the UserAccountBean object ub have been declared protected, and are
  * set in the process method. This allows developers to avoid passing these objects between methods, and moreover it
  * accurately encodes the fact that these objects represent the state of the servlet.
- * 
+ *
  * <br/>
  * In particular, please note that it is no longer necessary to generate a bean for the session manager, the current user or
  * the current study.
- * 
+ *
  * <li>The method processRequest has been declared abstract. This change is unlikely to affect most code, since by custom
  * processRequest is declared in each subclass anyway.
- * 
+ *
  * <li>The standard try-catch block within most processRequest methods has been included in the process method, which calls
  * the processRequest method. Therefore, subclasses may throw an Exception in the processRequest method without having to
  * handle it.
- * 
+ *
  * <li>The addPageMessage method has been declared to streamline the process of setting page-level messages. The accompanying
  * showPageMessages.jsp file in jsp/include/ automatically displays all of the page messages; the developer need only include
  * this file in the jsp.
- * 
+ *
  * <li>The addEntityList method makes it easy to add a Collection of EntityBeans to the request. Note that this method should
  * only be used for Collections from which one EntityBean must be selected by the user. If the Collection is empty, this
  * method will throw an InconsistentStateException, taking the user to an error page and settting a page message indicating
  * that the user may not proceed because no entities are present. Note that the error page and the error message must be
  * specified.
  * </ol>
- * 
+ *
  * @author ssachs, modified by ywang
  */
 public abstract class SecureController extends HttpServlet implements SingleThreadModel {
@@ -232,7 +242,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     /**
      * Process request
-     * 
+     *
      * @throws Exception
      */
     protected abstract void processRequest() throws Exception;
@@ -243,9 +253,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     public void passwdTimeOut() {
         Date lastChangeDate = ub.getPasswdTimestamp();
-        if (lastChangeDate == null) {
-            addPageMessage(respage.getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName() + ". " + respage.getString("password_set"));
-            // + "<a href=\"UpdateProfile\">" + respage.getString("user_profile") + " </a>");
+        if (!ub.isLdapUser() && lastChangeDate == null) {
             int pwdChangeRequired = new Integer(SQLInitServlet.getField("change_passwd_required")).intValue();
             if (pwdChangeRequired == 1) {
                 request.setAttribute("mustChangePass", "yes");
@@ -296,11 +304,11 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                         String successMsg = dataMap.getString("SUCCESS_MESSAGE");
                         String success = dataMap.getString("successMsg");
                         if (success != null ) {
-                            
+
                             if (successMsg.contains("$linkURL")) {
                                 successMsg = decodeLINKURL(successMsg, datasetId);
                             }
-                       
+
                             if(successMsg!=null && !successMsg.isEmpty())
                             {
                                 addPageMessage(successMsg);
@@ -314,7 +322,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                             request.getSession().removeAttribute("datasetId");
                         }
                     }
-                   
+
                 } else {
 
                 }
@@ -592,7 +600,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     /**
      * Handles the HTTP <code>GET</code> method.
-     * 
+     *
      * @param request
      * @param response
      * @throws ServletException
@@ -610,7 +618,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     /**
      * Handles the HTTP <code>POST</code> method.
-     * 
+     *
      * @param request servlet request
      * @param response servlet response
      */
@@ -629,7 +637,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
      * Forwards to a jsp page. Additions to the forwardPage() method involve checking the session for the bread crumb trail
      * and setting it, if necessary. Setting it here allows the developer to only have to update the
      * <code>BreadcrumbTrail</code> class.
-     * 
+     *
      * @param jspPage The page to go to.
      * @param checkTrail The command to check for, and set a trail in the session.
      */
@@ -704,7 +712,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
      * e.g.:
      * <code>addEntityList("groups", allGroups, "There are no groups to display, so you cannot add a subject to this Study.",
      * Page.SUBMIT_DATA)</code>
-     * 
+     *
      * @param beanName The name of the entity list as it should be stored in the request object.
      * @param list The Collection of entities.
      * @param messageIfEmpty The message to display if the collection is empty.
@@ -738,8 +746,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     /**
      * <p>Check if an entity with passed entity id is included in studies of current user.</p>
-     * 
-     * <p>Note: This method called AuditableEntityDAO.findByPKAndStudy which required 
+     *
+     * <p>Note: This method called AuditableEntityDAO.findByPKAndStudy which required
      * "The subclass must define findByPKAndStudyName before calling this
      * method. Otherwise an inactive AuditableEntityBean will be returned."</p>
      * @author ywang 10-18-2007
@@ -1103,7 +1111,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         StudyUserRoleBean studyUserRole = ub.getRoleByStudy(studyId);
         StudyUserRoleBean siteUserRole = new StudyUserRoleBean();
         if (siteId != 0) {
-            siteUserRole = ub.getRoleByStudy(siteId);    
+            siteUserRole = ub.getRoleByStudy(siteId);
         }
         if(studyUserRole.getRole().equals(Role.INVALID) && siteUserRole.getRole().equals(Role.INVALID)){
             addPageMessage(respage.getString("no_have_correct_privilege_current_study")
@@ -1117,7 +1125,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     /**
      * A inner class designed to allow the implementation of a JUnit test case for abstract SecureController. The inner class
      * allows the test case to call the outer class' private process() method.
-     * 
+     *
      * @author Bruce W. Perry 01/2008
      * @see org.akaza.openclinica.servlettests.SecureControllerServletTest
      * @see org.akaza.openclinica.servlettests.SecureControllerWrapper

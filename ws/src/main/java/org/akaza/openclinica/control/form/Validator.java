@@ -470,14 +470,14 @@ public class Validator {
         validations = new HashMap();
         errors = new HashMap();
         this.request = request;
-        locale = request.getLocale();
+        if ( request != null){locale = request.getLocale();}
         resformat = ResourceBundleProvider.getFormatBundle(locale);
         restext = ResourceBundleProvider.getTextsBundle(locale);
         resexception = ResourceBundleProvider.getExceptionsBundle(locale);
         resword = ResourceBundleProvider.getWordsBundle(locale);
         lastField = "";
     }
-
+   
     protected ArrayList getFieldValidations(String fieldName) {
         ArrayList fieldValidations;
 
@@ -693,7 +693,7 @@ public class Validator {
 
     protected void addError(String fieldName, Validation v) {
 
-        locale = request.getLocale();
+       // locale = request.getLocale(); htaycher : set in constructor
         resexception = ResourceBundleProvider.getExceptionsBundle(locale);
         resword = ResourceBundleProvider.getWordsBundle(locale);
 
@@ -1747,7 +1747,7 @@ public class Validator {
             }
             return false;
         }
-        System.out.println("value matches initial: found " + oldValue + " versus " + fieldValue);
+        logger.debug("value matches initial: found " + oldValue + " versus " + fieldValue);
         return fieldValue.equals(oldValue);
     }
 

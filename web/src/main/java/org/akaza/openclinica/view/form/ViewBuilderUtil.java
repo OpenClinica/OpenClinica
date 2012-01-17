@@ -83,9 +83,11 @@ public class ViewBuilderUtil {
         if(hasDarkBorders){
             String cssClasses = CssRules.getClassNamesForTag("td borders_on");
             addButtonCell.setAttribute("class",cssClasses);
+           
         }  else {
             addButtonCell = this.setClassNames(addButtonCell);
         }
+        addButtonCell.setAttribute("style","display:block;");
         addButtonCell.setAttribute("colspan", columnNumber + "");
         addButtonCell.addContent(RepeatManager.createrepeatButtonControl(ResourceBundleProvider.getResWord("add"), repeatParentId));
         addButtonRow.addContent(addButtonCell);

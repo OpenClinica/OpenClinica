@@ -7,26 +7,32 @@
  */
 package org.akaza.openclinica.core;
 
-import org.springframework.security.authentication.dao.SaltSource;
-import org.springframework.security.authentication.encoding.PasswordEncoder;
-import org.springframework.security.core.userdetails.UserDetails;
-
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.dao.SaltSource;
+import org.springframework.security.authentication.encoding.PasswordEncoder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
+
 /**
- * 
+ *
  * @author Krikor Krumlian
- * 
+ *
  */
 public class SecurityManager {
 
     private PasswordEncoder encoder;
     private SaltSource saltSource;
 
+    private AuthenticationProvider providers[];
+
     /**
      * Generates a random password with default length
-     * 
+     *
      */
     public String genPassword() {
         return genPassword(8);
@@ -34,7 +40,7 @@ public class SecurityManager {
 
     /**
      * Generates a random password by length
-     * 
+     *
      * @param howmany
      */
     public String genPassword(int howmany) {
@@ -61,6 +67,14 @@ public class SecurityManager {
         return encoder.encodePassword(password, salt);
     }
 
+    /**
+     * @deprecated Use {@link #verifyPassword(String, UserDetails)} instead.
+     * @param encPass
+     * @param rawPass
+     * @param userDetails
+     * @return
+     */
+    @Deprecated
     public boolean isPasswordValid(String encPass, String rawPass, UserDetails userDetails) {
         Object salt = null;
 
@@ -69,6 +83,24 @@ public class SecurityManager {
         }
 
         return encoder.isPasswordValid(encPass, rawPass, salt);
+    }
+
+    public boolean verifyPassword(String clearTextPassword, UserDetails userDetails) {
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails.getUsername(),
+                clearTextPassword);
+
+        for (AuthenticationProvider p : providers) {
+            try {
+                p.authenticate(authentication);
+                return true;
+            } catch (AuthenticationException e) {
+                // Nothing to do
+            }
+
+        }
+
+        return false;
     }
 
     public PasswordEncoder getEncoder() {
@@ -85,6 +117,14 @@ public class SecurityManager {
 
     public void setSaltSource(SaltSource saltSource) {
         this.saltSource = saltSource;
+    }
+
+    public AuthenticationProvider[] getProviders() {
+        return providers;
+    }
+
+    public void setProviders(AuthenticationProvider[] providers) {
+        this.providers = providers;
     }
 
 }

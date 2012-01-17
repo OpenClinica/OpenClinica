@@ -7,10 +7,30 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.core.*;
+import org.akaza.openclinica.bean.core.DataEntryStage;
+import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.*;
+import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.control.SpringServletAccess;
@@ -38,19 +58,9 @@ import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 /**
  * @author jxu
- * 
+ *
  *         Performs updating study event action
  */
 public class UpdateStudyEventServlet extends SecureController {
@@ -124,7 +134,6 @@ public class UpdateStudyEventServlet extends SecureController {
             // link back to view
             // study subject
         }
-
         // YW 11-07-2007, a study event could not be updated if its study
         // subject has been removed
         // Status s = ((StudySubjectBean)new
@@ -181,6 +190,7 @@ public class UpdateStudyEventServlet extends SecureController {
 
         StudyDAO sdao = new StudyDAO(this.sm.getDataSource());
         StudyBean studyBean = (StudyBean) sdao.findByPK(ssub.getStudyId());
+        checkRoleByUserAndStudy(ub, studyBean.getParentStudyId(), studyBean.getId());
         // To remove signed status from the list
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
         boolean removeSign = false;
@@ -303,7 +313,7 @@ public class UpdateStudyEventServlet extends SecureController {
             if (ses.equals(SubjectEventStatus.SKIPPED) || ses.equals(SubjectEventStatus.STOPPED)) {
                 studyEvent.setStatus(Status.UNAVAILABLE);
                 for (int i = 0; i < eventCRFs.size(); i++) {
-                    EventCRFBean ecb = (EventCRFBean) eventCRFs.get(i);
+                    EventCRFBean ecb = eventCRFs.get(i);
                     ecb.setOldStatus(ecb.getStatus());
                     ecb.setStatus(Status.UNAVAILABLE);
                     ecb.setUpdater(ub);
@@ -312,7 +322,7 @@ public class UpdateStudyEventServlet extends SecureController {
                 }
             } else {
                 for (int i = 0; i < eventCRFs.size(); i++) {
-                    EventCRFBean ecb = (EventCRFBean) eventCRFs.get(i);
+                    EventCRFBean ecb = eventCRFs.get(i);
                     ecb.setUpdater(ub);
                     ecb.setUpdatedDate(new Date());
                     ecdao.update(ecb);
@@ -479,7 +489,7 @@ public class UpdateStudyEventServlet extends SecureController {
             SecurityManager securityManager = ((SecurityManager) SpringServletAccess.getApplicationContext(context).getBean("securityManager"));
             UserAccountBean ub = (UserAccountBean) session.getAttribute("userBean");
             StudyEventBean seb = (StudyEventBean) session.getAttribute("eventSigned");
-            if (securityManager.isPasswordValid(ub.getPasswd(), password, getUserDetails()) && ub.getName().equals(username)) {
+            if (securityManager.verifyPassword(password, getUserDetails()) && ub.getName().equals(username)) {
                 seb.setUpdater(ub);
                 seb.setUpdatedDate(new Date());
                 sedao.update(seb);
@@ -659,10 +669,10 @@ public class UpdateStudyEventServlet extends SecureController {
          * event definition ED, if (!isCompleted(ED)) { answer += ED; } return
          * answer; This algorithm is guaranteed to find all the event
          * definitions for which no event CRF exists.
-         * 
+         *
          * The motivation for using this algorithm is reducing the number of
          * database hits.
-         * 
+         *
          * -jun-we have to add more CRFs here: the event CRF which dones't have
          * item data yet
          */

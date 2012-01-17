@@ -14,13 +14,15 @@
                            http://www.springframework.org/schema/security/oauth2 
                            http://www.springframework.org/schema/security/spring-security-oauth2.xsd">
     
+  
   <security:authentication-manager alias="authenticationManager">
     <security:authentication-provider user-service-ref="ocUserDetailsService">
         <security:password-encoder ref="openClinicaPasswordEncoder" />
         <!-- <security:password-encoder hash="md5" /> -->
         <!-- <security:user-service properties="/WEB-INF/users.properties" /> -->
     </security:authentication-provider>
-  </security:authentication-manager>    
+    <security:authentication-provider ref="ldapAuthenticationProvider"/>
+  </security:authentication-manager>       
 
     <bean id="shaPasswordEncoder" class="org.springframework.security.authentication.encoding.ShaPasswordEncoder" />
     <bean id="md5PasswordEncoder" class="org.springframework.security.authentication.encoding.Md5PasswordEncoder" />
@@ -32,6 +34,15 @@
 
     <bean id="securityManager" class="org.akaza.openclinica.core.SecurityManager">
         <property name="encoder" ref="openClinicaPasswordEncoder" />
+        <property name="providers">
+            <list>
+                <ref bean="ldapAuthenticationProvider"/>
+                <bean class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
+                    <property name="userDetailsService" ref="ocUserDetailsService"/>
+                    <property name="passwordEncoder" ref="openClinicaPasswordEncoder"/>
+                </bean>
+            </list>
+        </property>
     </bean>
 
     <!-- 
@@ -61,5 +72,24 @@
             access="ROLE_USER" />
     </security:global-method-security>
     -->
+    
+    <!-- ActiveDirectory -->
+    <bean id="contextSource" class="org.springframework.security.ldap.DefaultSpringSecurityContextSource">
+        <constructor-arg><value>s[ldap.host]</value></constructor-arg>
+        <property name="userDn"><value>s[ldap.userDn]</value></property>
+        <property name="password"><value>s[ldap.password]</value></property>
+    </bean>
+    
+    <bean id="ldapAuthenticationProvider" class="org.springframework.security.ldap.authentication.LdapAuthenticationProvider">
+        <constructor-arg>
+            <bean class="org.springframework.security.ldap.authentication.BindAuthenticator">
+                <constructor-arg ref="contextSource"/>
+                <property name="userSearch" ref="openClinicaLdapUserSearch"/>
+            </bean>
+        </constructor-arg>
+        <constructor-arg>
+            <bean class="org.akaza.openclinica.web.filter.OpenClinicaLdapAuthoritiesPopulator"/>
+        </constructor-arg>
+     </bean>
     
 </beans>

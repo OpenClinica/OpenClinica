@@ -2,19 +2,60 @@ package org.akaza.openclinica.dao.rule;
 
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.hibernate.RuleDao;
+import org.akaza.openclinica.dao.hibernate.RuleSetAuditDao;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.expression.Context;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.templates.HibernateOcDbTestCase;
+import org.hibernate.HibernateException;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 public class RuleDaoTest extends HibernateOcDbTestCase {
+    private static RuleDao ruleDao;
+  /*  static
+    {
+        
+        loadProperties();
+        dbName = properties.getProperty("dbName");
+        dbUrl = properties.getProperty("url");
+        dbUserName = properties.getProperty("username");
+        dbPassword = properties.getProperty("password");
+        dbDriverClassName = properties.getProperty("driver");
+        locale = properties.getProperty("locale");
+        initializeLocale();
+        initializeQueriesInXml();
+       
+     
+        
+        context =
+            new ClassPathXmlApplicationContext(
+                    new String[] { "classpath*:applicationContext-core-s*.xml", "classpath*:org/akaza/openclinica/applicationContext-core-db.xml",
+                        "classpath*:org/akaza/openclinica/applicationContext-core-email.xml",
+                        "classpath*:org/akaza/openclinica/applicationContext-core-hibernate.xml",
+                        "classpath*:org/akaza/openclinica/applicationContext-core-scheduler.xml",
+                        "classpath*:org/akaza/openclinica/applicationContext-core-service.xml",
+                       " classpath*:org/akaza/openclinica/applicationContext-core-timer.xml",
+                        "classpath*:org/akaza/openclinica/applicationContext-security.xml" });
+      transactionManager = (PlatformTransactionManager) context.getBean("transactionManager");
+      transactionManager.getTransaction(new DefaultTransactionDefinition());
+        
 
+    }*/
     public RuleDaoTest() {
         super();
+       
     }
 
+    @Override
+    public void setUp() throws Exception{
+        super.setUp();
+        ruleDao = (RuleDao) getContext().getBean("ruleDao");
+        
+    }
     public void testFindByOidString() {
-        RuleDao ruleDao = (RuleDao) getContext().getBean("ruleDao");
+      //  RuleDao ruleDao = (RuleDao) getContext().getBean("ruleDao");
         String oid = "RULE_1";
         RuleBean persistentRuleBean = ruleDao.findByOid(oid, 1);
 
@@ -23,7 +64,7 @@ public class RuleDaoTest extends HibernateOcDbTestCase {
     }
 
     public void testFindById() {
-        RuleDao ruleDao = (RuleDao) getContext().getBean("ruleDao");
+      //  RuleDao ruleDao = (RuleDao) getContext().getBean("ruleDao");
         RuleBean ruleBean = null;
         ruleBean = ruleDao.findById(-1);
 
@@ -34,7 +75,7 @@ public class RuleDaoTest extends HibernateOcDbTestCase {
     }
 
     public void testFindByIdEmptyResultSet() {
-        RuleDao ruleDao = (RuleDao) getContext().getBean("ruleDao");
+      //  RuleDao ruleDao = (RuleDao) getContext().getBean("ruleDao");
         RuleBean ruleBean2 = null;
         ruleBean2 = ruleDao.findById(-3);
 
@@ -43,7 +84,7 @@ public class RuleDaoTest extends HibernateOcDbTestCase {
     }
 
     public void testFindByOid() {
-        RuleDao ruleDao = (RuleDao) getContext().getBean("ruleDao");
+       // RuleDao ruleDao = (RuleDao) getContext().getBean("ruleDao");
         RuleBean ruleBean = new RuleBean();
         ruleBean.setOid("RULE_1");
         StudyBean studyBean = new StudyBean();
@@ -56,7 +97,7 @@ public class RuleDaoTest extends HibernateOcDbTestCase {
     }
 
     public void testSaveOrUpdate() {
-        RuleDao ruleDao = (RuleDao) getContext().getBean("ruleDao");
+     //   RuleDao ruleDao = (RuleDao) getContext().getBean("ruleDao");
         RuleBean ruleBean = createRuleBeanStub();
         RuleBean persistentRuleBean = ruleDao.saveOrUpdate(ruleBean);
 
@@ -83,5 +124,14 @@ public class RuleDaoTest extends HibernateOcDbTestCase {
         expression.setValue(value);
         return expression;
     }
-
+    public void tearDown(){
+        try {
+            ruleDao.getSessionFactory().getCurrentSession().close();
+          
+        } catch (HibernateException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        super.tearDown();
+    }
 }

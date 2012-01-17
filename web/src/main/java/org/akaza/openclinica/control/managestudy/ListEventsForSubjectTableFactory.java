@@ -166,12 +166,12 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "event.status"), new SubjectEventStatusFilterMatcher());
 
         // subject group class filter matcher
-        for (int i = 3; i < 3 + studyGroupClasses.size(); i++) {
-            tableFacade.addFilterMatcher(new MatcherKey(Integer.class, columnNames[i]), new SubjectGroupFilterMatcher());
+        for (int i = 4; i < 4 + studyGroupClasses.size(); i++) {
+            tableFacade.addFilterMatcher(new MatcherKey(String.class, columnNames[i]), new SubjectGroupFilterMatcher());
         }
 
         // crf columns filtering
-        for (int i = 5 + studyGroupClasses.size(); i < columnNames.length - 1; i++) {
+        for (int i = 6 + studyGroupClasses.size(); i < columnNames.length - 1; i++) {
             tableFacade.addFilterMatcher(new MatcherKey(String.class, columnNames[i]), new SubjectEventCRFStatusFilterMatcher());
         }
     }
@@ -188,7 +188,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
     @Override
     public void setDataAndLimitVariables(TableFacade tableFacade) {
         Limit limit = tableFacade.getLimit();
-
+        
         ListEventsForSubjectFilter eventsForSubjectFilter = getListEventsForSubjectFilter(limit);
 
         if (!limit.isComplete()) {
@@ -329,6 +329,16 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         for (Filter filter : filters) {
             String property = filter.getProperty();
             String value = filter.getValue();
+            if("studySubject.status".equalsIgnoreCase(property)) {
+                value = Status.getByName(value).getId()+"";
+            } else if("event.status".equalsIgnoreCase(property)) {
+                value = SubjectEventStatus.getByName(value).getId()+"";
+            } else if(property.startsWith("sgc_")){
+                int studyGroupClassId = property.endsWith("_")? 0 : Integer.valueOf(property.split("_")[1]);
+                value = studyGroupDAO.findByNameAndGroupClassID(value, studyGroupClassId).getId()+"";
+            } else if(property.startsWith("crf_")) {
+                value = DataEntryStage.getByName(value).getId()+"";
+            }
             listEventsForSubjectFilter.addFilter(property, value);
         }
 
@@ -528,8 +538,8 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
     public class StatusFilterMatcher implements FilterMatcher {
         public boolean evaluate(Object itemValue, String filterValue) {
 
-            String item = StringUtils.lowerCase(String.valueOf(((Status) itemValue).getId()));
-            String filter = StringUtils.lowerCase(String.valueOf(filterValue));
+            String item = StringUtils.lowerCase(((Status) itemValue).getName());
+            String filter = StringUtils.lowerCase(filterValue);
 
             if (filter.equals(item)) {
                 return true;
@@ -548,13 +558,8 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
     public class SubjectGroupFilterMatcher implements FilterMatcher {
 
         public boolean evaluate(Object itemValue, String filterValue) {
-
-            String item = StringUtils.lowerCase(String.valueOf(itemValue).trim());
-            String filter = StringUtils.lowerCase(String.valueOf(filterValue.trim()));
-            if (filter.equals(item)) {
-                return true;
-            }
-            return false;
+            String itemSGName = studyGroupDAO.findByPK(Integer.valueOf(itemValue.toString())).getName();
+            return filterValue.equalsIgnoreCase(itemSGName);
         }
     }
 
@@ -578,8 +583,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         protected List<Option> getOptions() {
             List<Option> options = new ArrayList<Option>();
             for (Object status : Status.toDropDownArrayList()) {
-                ((Status) status).getName();
-                options.add(new Option(String.valueOf(((Status) status).getId()), ((Status) status).getName()));
+                options.add(new Option(((Status) status).getName(), ((Status) status).getName()));
             }
             return options;
         }
@@ -590,8 +594,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         protected List<Option> getOptions() {
             List<Option> options = new ArrayList<Option>();
             for (Object subjectEventStatus : SubjectEventStatus.toArrayList()) {
-                ((SubjectEventStatus) subjectEventStatus).getName();
-                options.add(new Option(String.valueOf(((SubjectEventStatus) subjectEventStatus).getId()), ((SubjectEventStatus) subjectEventStatus).getName()));
+                options.add(new Option(((SubjectEventStatus) subjectEventStatus).getName(), ((SubjectEventStatus) subjectEventStatus).getName()));
             }
             return options;
         }
@@ -603,7 +606,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
             List<Option> options = new ArrayList<Option>();
             for (Object eventCRFStatus : DataEntryStage.toArrayList()) {
                 if (((DataEntryStage) eventCRFStatus).getId() != 0) {
-                    options.add(new Option(String.valueOf(((DataEntryStage) eventCRFStatus).getId()), ((DataEntryStage) eventCRFStatus).getName()));
+                    options.add(new Option(((DataEntryStage) eventCRFStatus).getName(), ((DataEntryStage) eventCRFStatus).getName()));
                 }
             }
             return options;
@@ -622,8 +625,9 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         protected List<Option> getOptions() {
             List<Option> options = new ArrayList<Option>();
             StudyGroupDAO studyGroupDAO = getStudyGroupDAO();
-            for (Object subjectStudyGroup : studyGroupDAO.findAllByGroupClass(this.studyGroupClass)) {
-                options.add(new Option(String.valueOf(((StudyGroupBean) subjectStudyGroup).getId()), ((StudyGroupBean) subjectStudyGroup).getName()));
+            ArrayList<StudyGroupBean> groups = studyGroupDAO.findAllByGroupClass(this.studyGroupClass);
+            for (Object subjectStudyGroup : groups) {
+                options.add(new Option(((StudyGroupBean) subjectStudyGroup).getName(), ((StudyGroupBean) subjectStudyGroup).getName()));
             }
             return options;
         }
@@ -705,7 +709,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
     private class EventCrfCellEditor implements CellEditor {
 
-        SubjectEventStatus subjectEventStatus;
+        SubjectEventStatus subjectEventStatus;  
         DataEntryStage dataEntryStage;
         StudyEventBean studyEvent;
         StudySubjectBean studySubjectBean;
@@ -1077,5 +1081,4 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         SimpleDateFormat sdf = new SimpleDateFormat(format);
         return sdf.format(date);
     }
-
 }

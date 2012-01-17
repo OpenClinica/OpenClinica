@@ -7,6 +7,9 @@
  */
 package org.akaza.openclinica.control.login;
 
+import java.util.Collection;
+import java.util.Date;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.SpringServletAccess;
@@ -20,17 +23,16 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
-import java.util.ArrayList;
-import java.util.Date;
-
 /**
  * @author jxu
  * @version CVS: $Id: UpdateProfileServlet.java,v 1.9 2005/02/23 18:58:11 jxu
  *          Exp $
- * 
+ *
  * Servlet for processing 'update profile' request from user
  */
 public class UpdateProfileServlet extends SecureController {
+
+    private static final long serialVersionUID = -2519124535258437372L;
 
     @Override
     public void mayProceed() throws InsufficientPermissionException {
@@ -45,7 +47,7 @@ public class UpdateProfileServlet extends SecureController {
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
         UserAccountBean userBean1 = (UserAccountBean) udao.findByUserName(ub.getName());
 
-        ArrayList studies = (ArrayList) sdao.findAllByUser(ub.getName());
+        Collection studies = sdao.findAllByUser(ub.getName());
 
         if (StringUtil.isBlank(action)) {
             request.setAttribute("studies", studies);
@@ -76,10 +78,12 @@ public class UpdateProfileServlet extends SecureController {
         v.addValidation("firstName", Validator.NO_BLANKS);
         v.addValidation("lastName", Validator.NO_BLANKS);
         v.addValidation("email", Validator.IS_A_EMAIL);
-        v.addValidation("passwdChallengeQuestion", Validator.NO_BLANKS);
-        v.addValidation("passwdChallengeAnswer", Validator.NO_BLANKS);
+        if (!userBean1.isLdapUser()) {
+            v.addValidation("passwdChallengeQuestion", Validator.NO_BLANKS);
+            v.addValidation("passwdChallengeAnswer", Validator.NO_BLANKS);
+            v.addValidation("oldPasswd", Validator.NO_BLANKS);// old password
+        }
         // v.addValidation("activeStudyId", Validator.IS_AN_INTEGER);
-        v.addValidation("oldPasswd", Validator.NO_BLANKS);// old password
         if (!StringUtil.isBlank(fp.getString("passwd"))) {
             v.addValidation("passwd", Validator.IS_A_PASSWORD);// new password
             v.addValidation("passwd1", Validator.CHECK_SAME, "passwd");// confirm
@@ -113,8 +117,7 @@ public class UpdateProfileServlet extends SecureController {
 
             String oldPass = fp.getString("oldPasswd").trim();
             SecurityManager sm = (SecurityManager) SpringServletAccess.getApplicationContext(context).getBean("securityManager");
-            String oldDigestPass = sm.encrytPassword(oldPass, getUserDetails());
-            if (!sm.isPasswordValid(ub.getPasswd(), oldPass, getUserDetails())) {
+            if (!userBean1.isLdapUser() && !sm.verifyPassword(oldPass, getUserDetails())) {
                 Validator.addError(errors, "oldPasswd", resexception.getString("wrong_old_password"));
                 request.setAttribute("formMessages", errors);
                 // addPageMessage("Wrong old password. Please try again.");
@@ -140,7 +143,7 @@ public class UpdateProfileServlet extends SecureController {
 
     /**
      * Updates user new profile
-     * 
+     *
      */
     private void submitProfile(UserAccountDAO udao) {
 

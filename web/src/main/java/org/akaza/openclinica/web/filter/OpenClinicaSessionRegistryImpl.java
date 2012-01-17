@@ -1,5 +1,10 @@
 package org.akaza.openclinica.web.filter;
 
+import java.util.Date;
+import java.util.Locale;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -9,11 +14,7 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.User;
-
-import java.util.Date;
-import java.util.Locale;
-
-import javax.sql.DataSource;
+import org.springframework.security.ldap.userdetails.LdapUserDetails;
 
 public class OpenClinicaSessionRegistryImpl extends SessionRegistryImpl {
 
@@ -26,8 +27,15 @@ public class OpenClinicaSessionRegistryImpl extends SessionRegistryImpl {
         SessionInformation info = getSessionInformation(sessionId);
 
         if (info != null) {
-            User u = (User) info.getPrincipal();
-            auditLogout(u.getUsername());
+            String username = null;
+            Object p = info.getPrincipal();
+            if (p instanceof User) {
+                username = ((User) p).getUsername();
+            } else if (p instanceof LdapUserDetails) {
+                username = ((LdapUserDetails) p).getUsername();
+            }
+
+            auditLogout(username);
         }
         super.removeSessionInformation(sessionId);
     }

@@ -158,7 +158,7 @@ public class SectionDAO extends AuditableEntityDAO {
         variables.put(new Integer(1), new Integer(ID));
 
         String sql = digester.getQuery("findByVersionId");
-        ArrayList alist = this.select(sql, variables);
+        ArrayList alist = this.selectByCache(sql, variables);
 
         ArrayList al = new ArrayList();
         Iterator it = alist.iterator();
@@ -177,7 +177,7 @@ public class SectionDAO extends AuditableEntityDAO {
         variables.put(new Integer(1), new Integer(ID));
 
         String sql = digester.getQuery("findByPK");
-        ArrayList alist = this.select(sql, variables);
+        ArrayList alist = this.selectByCache(sql, variables);
         Iterator it = alist.iterator();
 
         if (it.hasNext()) {

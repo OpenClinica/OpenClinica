@@ -87,6 +87,10 @@ public class ViewNotesServlet extends SecureController {
         }
 
         FormProcessor fp = new FormProcessor(request);
+        if ("yes".equalsIgnoreCase(fp.getString(PRINT))) {
+            forwardPage(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_PRINT);
+            return;
+        }
         if(fp.getString("showMoreLink").equals("")){
             showMoreLink = true;
         }else {
@@ -203,11 +207,6 @@ public class ViewNotesServlet extends SecureController {
 
         ArrayList allNotes = ListNotesTableFactory.getNotesForPrintPop();
 
-        Limit limit = tf.getLimit();
-        ListNotesFilter listNotesFilter = factory.getListNoteFilter(limit);
-
-//        factory.populateDataInNote(allNotes);
-        allNotes = DiscrepancyNoteUtil.customFilter(allNotes, listNotesFilter);
         session.setAttribute("allNotes", allNotes);
 
         DiscrepancyNoteUtil discNoteUtil = new DiscrepancyNoteUtil();

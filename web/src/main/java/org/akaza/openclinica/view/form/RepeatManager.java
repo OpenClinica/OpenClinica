@@ -21,9 +21,10 @@ public class RepeatManager {
      */
     public Element addParentRepeatAttributes(Element repeater, String parentRepeaterId, Integer repeatStart, Integer repeatMax) {
         repeater.setAttribute("id", parentRepeaterId);
-        repeater.setAttribute("repeat", "template");
-        repeater.setAttribute("repeat-start", repeatStart.toString());
+    //    repeater.setAttribute("repeat", "template");
+      repeater.setAttribute("repeat-start", repeatStart.toString());
         repeater.setAttribute("repeat-max", repeatMax.toString());
+        repeater.setAttribute("style","");
         return repeater;
     }
 

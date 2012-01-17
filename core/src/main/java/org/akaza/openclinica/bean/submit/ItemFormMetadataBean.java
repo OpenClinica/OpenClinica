@@ -662,7 +662,7 @@ public class ItemFormMetadataBean extends EntityBean implements Comparable {
             return 1;
         }
         int ordinal = ((ItemFormMetadataBean) o).getOrdinal();
-        return new Integer(this.getOrdinal()).compareTo(ordinal);
+        return Integer.valueOf(this.getOrdinal()).compareTo(ordinal);
     }
 
     public String getWidthDecimal() {

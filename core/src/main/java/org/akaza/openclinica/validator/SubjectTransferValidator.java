@@ -102,6 +102,15 @@ public class SubjectTransferValidator implements Validator {
             e.reject("subjectTransferValidator.gender_required", new Object[] { study.getName() }, "Gender is required for the study: " + study.getName());
             return;
         }
+        
+        if (!"m".equals(gender) && !"f".equals(gender)) {
+            System.out.println("did not pass gender: " + gender);
+            e.reject("subjectTransferValidator.gender_is_m_or_f");
+            //e.reject("subjectTransferValidator.gender_required", new Object[] { study.getName() }, "Gender is required to be 'm' or 'f'");
+            return;
+        } else {
+            System.out.println("passed gender: " + gender);
+        }
 
         Date dateOfBirth = subjectTransferBean.getDateOfBirth();
         String yearOfBirth = subjectTransferBean.getYearOfBirth();

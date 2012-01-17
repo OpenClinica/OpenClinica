@@ -91,4 +91,14 @@ public class DataEntryStage extends Term {
     public String getNameRaw() {
         return super.name;
     }
+    
+    public static DataEntryStage getByName(String name) {
+        for (int i = 0; i < list.size(); i++) {
+            DataEntryStage temp = (DataEntryStage) list.get(i);
+            if (temp.getName().equals(name)) {
+                return temp;
+            }
+        }
+        return INVALID;
+    }
 }

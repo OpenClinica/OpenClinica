@@ -18,11 +18,11 @@
  <meta http-equiv="X-UA-Compatible" content="IE=8" />
 
 <link rel="stylesheet" href="<c:url value='/includes/styles.css'/>" type="text/css"/>
-<link rel="stylesheet" href="<c:url value='/includes/styles2.css'/>" type="text/css" />
+<%-- <link rel="stylesheet" href="includes/styles2.css" type="text/css">--%>
 <link rel="stylesheet" href="<c:url value='/includes/NewLoginStyles.css'/>" type="text/css"/>
 <script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/jmesa/jquery-1.3.2.min.js'/>"></script>
 <script type="text/javascript" language="JavaScript" src="<c:url value='/includes/jmesa/jquery.blockUI.js'/>"></script>
-<script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/global_functions_javascript2.js'/>"></script>
+<%-- <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript2.js"></script> --%>
 <script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/global_functions_javascript.js'/>"></script>
 </head>
 
@@ -37,7 +37,7 @@
 <%--</c:choose>--%>
 
 <c:set var="formatLocale"><fmt:message key="locale_string" bundle="${resformat}"/></c:set>
-<fmt:setLocale value="${formatLocale}" scope="session"/>
+
 
 
 

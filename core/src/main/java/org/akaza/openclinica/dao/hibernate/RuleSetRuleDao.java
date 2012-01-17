@@ -9,6 +9,9 @@ import org.akaza.openclinica.domain.rule.action.InsertActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.rule.action.ShowActionBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.hibernate.stat.Statistics;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -16,7 +19,9 @@ import java.util.ArrayList;
 public class RuleSetRuleDao extends AbstractDomainDao<RuleSetRuleBean> {
 
     private CoreResources coreResources;
-
+    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    
+    
     @Override
     public Class<RuleSetRuleBean> domainClass() {
         return RuleSetRuleBean.class;
@@ -42,8 +47,24 @@ public class RuleSetRuleDao extends AbstractDomainDao<RuleSetRuleBean> {
     public ArrayList<RuleSetRuleBean> findByRuleSetStudyIdAndStatusAvail(Integer studyId) {
         String query = "from " + getDomainClassName() + " ruleSetRule  where ruleSetRule.ruleSetBean.studyId = :studyId and status = :status ";
         org.hibernate.Query q = getCurrentSession().createQuery(query);
+        
+        
+        
         q.setInteger("studyId", studyId);
         q.setParameter("status", org.akaza.openclinica.domain.Status.AVAILABLE);
+        
+        q.setCacheable(true);
+        q.setCacheRegion(getDomainClassName());
+        //JN: enabling statistics for hibernate queries etc... to monitor the performance
+        
+        Statistics stats = getSessionFactory().getStatistics();
+        logger.info("EntityRuleSet"+ stats.getEntityInsertCount());
+        logger.info(stats.getQueryExecutionMaxTimeQueryString());
+        logger.info("hit count"+stats.getSecondLevelCacheHitCount());
+        stats.logSummary();
+        
+ 
+        
         ArrayList<RuleSetRuleBean> ruleSetRules = (ArrayList<RuleSetRuleBean>) q.list();
         // Forcing eager fetch of actions & their properties
         for (RuleSetRuleBean ruleSetRuleBean : ruleSetRules) {

@@ -101,7 +101,7 @@ public class ImportHelper {
      *            The DisplayItemBean to validate.
      * @return The DisplayItemBean which is validated.
      */
-    public DisplayItemBean validateDisplayItemBeanText(DiscrepancyValidator v, DisplayItemBean dib, String inputName) {
+    public DisplayItemBean validateDisplayItemBeanText(DiscrepancyValidator discValidator, DisplayItemBean dib, String inputName) {
 
         if (StringUtil.isBlank(inputName)) {// for single items
             inputName = getInputName(dib);
@@ -123,7 +123,7 @@ public class ImportHelper {
             if (StringUtil.isBlank(idb.getValue())) {
                 // check required first
                 if (ibMeta.isRequired()) {
-                    v.addValidation(inputName, Validator.IS_REQUIRED);
+                	discValidator.addValidation(inputName, Validator.IS_REQUIRED);
                 }
             } else {
 
@@ -131,11 +131,11 @@ public class ImportHelper {
                     // a string's size could be more than 255, which is more
                     // than
                     // the db field length
-                    v.addValidation(inputName, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+                	discValidator.addValidation(inputName, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
 
                 } else if (idt.equals(ItemDataType.INTEGER)) {
                     // hard edit check, will comment out for now, tbh 05/2008
-                    // v.addValidation(inputName, Validator.IS_AN_INTEGER);
+                   // v.addValidation(inputName, Validator.IS_AN_INTEGER);
                     // v.alwaysExecuteLastValidation(inputName);
 
                 } else if (idt.equals(ItemDataType.REAL)) {
@@ -153,12 +153,12 @@ public class ImportHelper {
 
                 } else if (idt.equals(ItemDataType.SET)) {
                     // v.addValidation(inputName, Validator.NO_BLANKS_SET);
-                    v.addValidation(inputName, Validator.IN_RESPONSE_SET_SINGLE_VALUE, dib.getMetadata().getResponseSet());
+                	discValidator.addValidation(inputName, Validator.IN_RESPONSE_SET_SINGLE_VALUE, dib.getMetadata().getResponseSet());
                 }
 
                 else if (idt.equals(ItemDataType.DATE)) {
                     // hard edit check, will comment out for now, tbh 05/08
-                    // v.addValidation(inputName, Validator.IS_A_DATE);
+                     //v.addValidation(inputName, Validator.IS_A_DATE);
                     // v.alwaysExecuteLastValidation(inputName);
                 }
 
@@ -181,7 +181,7 @@ public class ImportHelper {
 
                     if (customValidation != null) {
                         customValidation.setErrorMessage(dib.getMetadata().getRegexpErrorMsg());
-                        v.addValidation(inputName, customValidation);
+                        discValidator.addValidation(inputName, customValidation);
                     }
                 }
             }

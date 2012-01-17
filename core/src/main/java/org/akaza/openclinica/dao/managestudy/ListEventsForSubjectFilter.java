@@ -59,7 +59,7 @@ public class ListEventsForSubjectFilter implements CriteriaCommand {
 
                 int group_id = Integer.parseInt(value.toString());
                 criteria +=
-                    "AND " + group_id + " = (" + " select sgm.study_group_id" + " FROM SUBJECT_GROUP_MAP sgm, STUDY_GROUP sg, STUDY_GROUP_CLASS sgc, STUDY s"
+                    "AND " + group_id + " = (" + " select distinct sgm.study_group_id" + " FROM SUBJECT_GROUP_MAP sgm, STUDY_GROUP sg, STUDY_GROUP_CLASS sgc, STUDY s"
                         + " WHERE " + " sgm.study_group_class_id = " + study_group_class_id + " AND sgm.study_subject_id = SS.study_subject_id"
                         + " AND sgm.study_group_id = sg.study_group_id" + " AND (s.parent_study_id = sgc.study_id OR SS.study_id = sgc.study_id)"
                         + " AND sgm.study_group_class_id = sgc.study_group_class_id" + " ) ";

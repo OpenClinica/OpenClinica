@@ -1,21 +1,5 @@
 package org.akaza.openclinica.control.core;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
-
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -30,6 +14,18 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.StringTokenizer;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -72,7 +68,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 /**
- * Abstract class for creating a controller servlet and extending capabilities of SecureController. However, not using the SingleThreadModel. 
+ * Abstract class for creating a controller servlet and extending capabilities of SecureController. However, not using the SingleThreadModel.
  * @author jnyayapathi
  *
  */
@@ -139,6 +135,7 @@ public abstract class CoreSecureController extends HttpServlet {
         request.setAttribute(PAGE_MESSAGE, pageMessages);
     }
 
+    @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
         try {
@@ -189,12 +186,12 @@ public abstract class CoreSecureController extends HttpServlet {
 
     /**
      * Process request
-     * 
+     *
      * @param request
      *            TODO
      * @param response
      *            TODO
-     * 
+     *
      * @throws Exception
      */
     protected abstract void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception;
@@ -205,10 +202,7 @@ public abstract class CoreSecureController extends HttpServlet {
 
     public void passwdTimeOut(HttpServletRequest request, HttpServletResponse response, UserAccountBean ub) {
         Date lastChangeDate = ub.getPasswdTimestamp();
-        if (lastChangeDate == null) {
-            addPageMessage(respage.getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName() + ". " + respage.getString("password_set"), request);
-            // + "<a href=\"UpdateProfile\">" +
-            // respage.getString("user_profile") + " </a>");
+        if (!ub.isLdapUser() && lastChangeDate == null) {
             int pwdChangeRequired = new Integer(SQLInitServlet.getField("change_passwd_required")).intValue();
             if (pwdChangeRequired == 1) {
                 request.setAttribute("mustChangePass", "yes");
@@ -308,6 +302,8 @@ public abstract class CoreSecureController extends HttpServlet {
     private void process(HttpServletRequest request, HttpServletResponse response) throws OpenClinicaException, UnsupportedEncodingException {
 
         request.setCharacterEncoding("UTF-8");
+        response.setHeader("Content-Encoding", "gzip");
+
         HttpSession session = request.getSession();
         // BWP >> 1/8/2008
         try {
@@ -411,7 +407,7 @@ public abstract class CoreSecureController extends HttpServlet {
                 }
                 // YW >>
             }
-          
+
 
             if (currentStudy.getParentStudyId() > 0) {
                 /*
@@ -549,7 +545,7 @@ public abstract class CoreSecureController extends HttpServlet {
                 getUnavailableCRFList().remove(((EventCRFBean)request.getAttribute( "event")).getId());
             forwardPage(Page.ERROR, request, response);
         }
-       
+
     }
 
     public static String getStackTrace(Throwable t) {
@@ -563,7 +559,7 @@ public abstract class CoreSecureController extends HttpServlet {
 
     /**
      * Handles the HTTP <code>GET</code> method.
-     * 
+     *
      * @param request
      * @param response
      * @throws ServletException
@@ -572,9 +568,9 @@ public abstract class CoreSecureController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, java.io.IOException {
         try {
-        
-            
-            
+
+
+
             logger.debug("Request");
             process(request, response);
         } catch (Exception e) {
@@ -587,7 +583,7 @@ public abstract class CoreSecureController extends HttpServlet {
 
     /**
      * Handles the HTTP <code>POST</code> method.
-     * 
+     *
      * @param request
      *            servlet request
      * @param response
@@ -612,7 +608,7 @@ public abstract class CoreSecureController extends HttpServlet {
      * checking the session for the bread crumb trail and setting it, if
      * necessary. Setting it here allows the developer to only have to update
      * the <code>BreadcrumbTrail</code> class.
-     * 
+     *
      * @param jspPage
      *            The page to go to.
      * @param checkTrail
@@ -698,7 +694,7 @@ public abstract class CoreSecureController extends HttpServlet {
      * Use, e.g.:
      * <code>addEntityList("groups", allGroups, "There are no groups to display, so you cannot add a subject to this Study.",
      * Page.SUBMIT_DATA)</code>
-     * 
+     *
      * @param beanName
      *            The name of the entity list as it should be stored in the
      *            request object.
@@ -744,13 +740,13 @@ public abstract class CoreSecureController extends HttpServlet {
      * Check if an entity with passed entity id is included in studies of
      * current user.
      * </p>
-     * 
+     *
      * <p>
      * Note: This method called AuditableEntityDAO.findByPKAndStudy which
      * required "The subclass must define findByPKAndStudyName before calling
      * this method. Otherwise an inactive AuditableEntityBean will be returned."
      * </p>
-     * 
+     *
      * @author ywang 10-18-2007
      * @param entityId
      *            int
@@ -960,20 +956,20 @@ public abstract class CoreSecureController extends HttpServlet {
     }
 
    //JN:Synchornized in the securecontroller to avoid concurrent modification exception
-    //JN: this could still throw concurrentModification, coz of remove TODO: try to do better. 
+    //JN: this could still throw concurrentModification, coz of remove TODO: try to do better.
     public static synchronized void  removeLockedCRF(int userId) {
      try{
         for (Iterator iter = getUnavailableCRFList().entrySet().iterator(); iter.hasNext();) {
             java.util.Map.Entry entry = (java.util.Map.Entry) iter.next();
-            
-            
+
+
             int id = (Integer) entry.getValue();
             if (id == userId)
             {
               getUnavailableCRFList().remove(entry.getKey());
-//                entry.setValue(id+(int)Math.random()); //TODO; revisit to make it work this way and avoid swallowing. 
+//                entry.setValue(id+(int)Math.random()); //TODO; revisit to make it work this way and avoid swallowing.
            }
-              
+
                 //getUnavailableCRFList().
         }
      }catch(ConcurrentModificationException cme){
@@ -982,9 +978,9 @@ public abstract class CoreSecureController extends HttpServlet {
     }
 
     public synchronized void  lockThisEventCRF(int ecb, int ub) {
-        
+
         getUnavailableCRFList().put(ecb, ub);
-        
+
     }
 
     public  synchronized static HashMap getUnavailableCRFList() {
@@ -994,21 +990,21 @@ public abstract class CoreSecureController extends HttpServlet {
     // JN:Doesnt look like the following method is used anywhere, commenting out
     /*
      * public void dowloadFile(File f, String contentType) throws Exception {
-     * 
+     *
      * response.setHeader("Content-disposition", "attachment; filename=\"" +
      * f.getName() + "\";"); response.setContentType("text/xml");
      * response.setHeader("Pragma", "public");
-     * 
+     *
      * ServletOutputStream op = response.getOutputStream();
-     * 
+     *
      * DataInputStream in = null; try { response.setContentType("text/xml");
      * response.setHeader("Pragma", "public"); response.setContentLength((int)
      * f.length());
-     * 
+     *
      * byte[] bbuf = new byte[(int) f.length()]; in = new DataInputStream(new
      * FileInputStream(f)); int length; while (in != null && (length =
      * in.read(bbuf)) != -1) { op.write(bbuf, 0, length); }
-     * 
+     *
      * in.close(); op.flush(); op.close(); } catch (Exception ee) {
      * ee.printStackTrace(); } finally { if (in != null) { in.close(); } if (op
      * != null) { op.close(); } } }
@@ -1020,7 +1016,7 @@ public abstract class CoreSecureController extends HttpServlet {
      * != null) { fileName += temp; } temp = request.getQueryString(); if (temp
      * != null && temp.length() > 0) { fileName += "?" + temp; } return
      * fileName; }
-     * 
+     *
      * public String getPageURL() { String url =
      * request.getRequestURL().toString(); String query =
      * request.getQueryString(); if (url != null && url.length() > 0 && query !=
@@ -1031,7 +1027,7 @@ public abstract class CoreSecureController extends HttpServlet {
      * A inner class designed to allow the implementation of a JUnit test case
      * for abstract CoreSecureController. The inner class allows the test case
      * to call the outer class' private process() method.
-     * 
+     *
      * @author Bruce W. Perry 01/2008
      * @see org.akaza.openclinica.servlettests.SecureControllerServletTest
      * @see org.akaza.openclinica.servlettests.SecureControllerWrapper

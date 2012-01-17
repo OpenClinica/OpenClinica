@@ -6,7 +6,9 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.DisplayItemWithGroupBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.dao.hibernate.RuleDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetAuditDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
@@ -48,6 +50,9 @@ public interface RuleSetServiceInterface {
      */
 
     public abstract RuleSetBean saveRuleSet(RuleSetBean ruleSetBean);
+    
+    @Transactional
+    public abstract void saveImportFromDesigner(RulesPostImportContainer rulesContainer);
 
     @Transactional
     public abstract void saveImport(RulesPostImportContainer rulesContainer);
@@ -137,8 +142,9 @@ public interface RuleSetServiceInterface {
 
     /**
      * Iterate over rulesets and remove those which are currently hidden.
+     * @param allItems 
      */
-    public abstract List<RuleSetBean> filterRuleSetsByHiddenItems(List<RuleSetBean> ruleSets, EventCRFBean eventCrf, CRFVersionBean crfVersion);
+    public abstract List<RuleSetBean> filterRuleSetsByHiddenItems(List<RuleSetBean> ruleSets, EventCRFBean eventCrf, CRFVersionBean crfVersion, List<ItemBean> itemBeansWithSCDShown);
 
     /**
      * Iterate over ruleSet.getExpressions(). Given the following expression SE_TESTINGF[studyEventId].F_AGEN_8_V204.IG_AGEN_DOSETABLE6[X].I_AGEN_DOSEDATE64 X

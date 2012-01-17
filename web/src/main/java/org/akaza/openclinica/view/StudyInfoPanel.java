@@ -642,6 +642,7 @@ public class StudyInfoPanel {
                 if (count == displayCRFs.size() - 1 && dseBean.getUncompletedCRFs().size() == 0) {
                     // last event CRF for this event
                     // it's the current crf
+                    //JN:Removing the linkx, since the links are being shown in the tree without access, Mantis:9964
                     if (ecb != null && ecb.getId() == dec.getEventCRF().getId()) {// was
                         // getName(),
                         // tbh
@@ -649,7 +650,7 @@ public class StudyInfoPanel {
                         displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage()), "<span class='alert'>"
                             + dec.getEventCRF().getCrf().getName() + " " + dec.getEventCRF().getCrfVersion().getName() + "</span>", false, true, true));
                     } else {
-                        displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage()), "<a href='" + getTOCLink(dec) + "'>"
+                        displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage()), " "
                             + dec.getEventCRF().getCrf().getName() + " " + dec.getEventCRF().getCrfVersion().getName() + "</a>", false, true, false));
                     }
 
@@ -658,7 +659,7 @@ public class StudyInfoPanel {
                         displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage()), "<span class='alert'>"
                             + dec.getEventCRF().getCrf().getName() + " " + dec.getEventCRF().getCrfVersion().getName() + "</span>", false, false, true));
                     } else {
-                        displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage()), "<a href='" + getTOCLink(dec) + "'>"
+                        displayData.add(new StudyInfoPanelLine("" + getStageImageText(dec.getStage()), " "
                             + dec.getEventCRF().getCrf().getName() + " " + dec.getEventCRF().getCrfVersion().getName() + "</a>", false, false, false));
                     }
                 }
@@ -677,9 +678,7 @@ public class StudyInfoPanel {
                             + dedc.getEdc().getCrf().getName() + "</span>", false, true, true));
                     } else {
                         displayData.add(new StudyInfoPanelLine("<img src='images/icon_NotStarted.gif' alt='Not Started'/>",
-                                "<a href='InitialDataEntry?eventDefinitionCRFId=" + dedc.getEdc().getId() + "&studyEventId=" + seBean.getId() + "&subjectId="
-                                    + studySubject.getSubjectId() + "&eventCRFId=" + dedc.getEventCRF().getId() + "&crfVersionId="
-                                    + dedc.getEdc().getDefaultVersionId() + "'>" + dedc.getEdc().getCrf().getName() + "</a>", false, true, false));
+                                "<span class='alert'>" + dedc.getEdc().getCrf().getName() + "</a>", false, true, false));
 
                     }
                 } else {
@@ -690,9 +689,7 @@ public class StudyInfoPanel {
                             + dedc.getEdc().getCrf().getName() + "</span>", false, false, true));
                     } else {
                         displayData.add(new StudyInfoPanelLine("<img src='images/icon_NotStarted.gif' alt='Not Started'/>",
-                                "<a href='InitialDataEntry?eventDefinitionCRFId=" + dedc.getEdc().getId() + "&studyEventId=" + seBean.getId() + "&subjectId="
-                                    + studySubject.getSubjectId() + "&eventCRFId=" + dedc.getEventCRF().getId() + "&crfVersionId="
-                                    + dedc.getEdc().getDefaultVersionId() + "'>" + dedc.getEdc().getCrf().getName() + "</a>", false, false, false));
+                                "<span class='alert'>" + dedc.getEdc().getCrf().getName() + "</a>", false, false, false));
 
                     }
                 }

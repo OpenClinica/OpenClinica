@@ -7,6 +7,10 @@
  */
 package org.akaza.openclinica.dao.submit;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -26,6 +30,7 @@ import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.DAODigester;
+import org.akaza.openclinica.dao.core.PreparedStatementFactory;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 
@@ -34,7 +39,7 @@ import org.akaza.openclinica.dao.core.TypeNames;
  * 
  * 
  */
-public class ItemDAO extends AuditableEntityDAO {
+public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEntityDAO {
     // private DAODigester digester;
 
     public ItemDAO(DataSource ds) {
@@ -222,6 +227,13 @@ public class ItemDAO extends AuditableEntityDAO {
         return this.executeFindAllQuery("findAllParentsBySectionId", variables);
     }
 
+    public ArrayList findAllNonRepeatingParentsBySectionId(int sectionId) {
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(sectionId));
+
+        return this.executeFindAllQuery("findAllNonRepeatingParentsBySectionId", variables);
+    }
+
     public ArrayList findAllBySectionId(int sectionId) {
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(sectionId));
@@ -275,6 +287,24 @@ public class ItemDAO extends AuditableEntityDAO {
         return beanList;
     }
 
+    
+    
+    public List<ItemBean> findAllItemsByGroupIdForPrint(int id, int crfVersionId,int sectionId) {
+        this.setTypesExpected();
+        HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
+        variables.put(1, id);
+        variables.put(2, crfVersionId);
+        variables.put(3,sectionId);
+        String sql = digester.getQuery("findAllItemsByGroupIdForPrint");
+        List listofMaps = this.select(sql, variables);
+        List<ItemBean> beanList = new ArrayList<ItemBean>();
+        ItemBean bean;
+        for (Object map : listofMaps) {
+            bean = (ItemBean) this.getEntityFromHashMap((HashMap) map);
+            beanList.add(bean);
+        }
+        return beanList;
+    }
     public ItemBean findItemByGroupIdandItemOid(int id, String itemOid) {
         ItemBean bean;
         this.setTypesExpected();
@@ -328,6 +358,7 @@ public class ItemDAO extends AuditableEntityDAO {
         variables.put(new Integer(1), new Integer(ID));
 
         String sql = digester.getQuery("findByPK");
+        
         ArrayList alist = this.select(sql, variables);
         Iterator it = alist.iterator();
 
@@ -472,5 +503,59 @@ public class ItemDAO extends AuditableEntityDAO {
             nameMap.put(cn, pn);
         }
         return nameMap;
+    }
+    
+    @Override
+    public ArrayList<V> select(String query, HashMap variables) {
+        clearSignals();
+
+        ArrayList results = new ArrayList();
+        V  value;
+        K key;
+        ResultSet rs = null;
+        Connection con = null;
+        PreparedStatementFactory psf = new PreparedStatementFactory(variables);
+        PreparedStatement ps = null;
+        
+        try {
+            con = ds.getConnection();
+            if (con.isClosed()) {
+                if (logger.isWarnEnabled())
+                    logger.warn("Connection is closed: GenericDAO.select!");
+                throw new SQLException();
+            }
+
+           ps = con.prepareStatement(query);
+           
+       
+            ps = psf.generate(ps);// enter variables here!
+            logger.info("query is..."+ps.toString());
+            key = (K) ps.toString();
+            if((results=(V) cache.get(key))==null)
+            {
+            rs = ps.executeQuery();
+            results = this.processResultRows(rs);
+            if(results!=null){
+                cache.put(key,results);
+            }
+            }
+            
+            if (logger.isInfoEnabled()) {
+                logger.info("Executing dynamic query, EntityDAO.select:query " + query);
+            }
+            signalSuccess();
+              
+
+        } catch (SQLException sqle) {
+            signalFailure(sqle);
+            if (logger.isWarnEnabled()) {
+                logger.warn("Exception while executing dynamic query, GenericDAO.select: " + query + ":message: " + sqle.getMessage());
+                sqle.printStackTrace();
+            }
+        } finally {
+            this.closeIfNecessary(con, rs, ps);
+        }
+        return results;
+
     }
 }

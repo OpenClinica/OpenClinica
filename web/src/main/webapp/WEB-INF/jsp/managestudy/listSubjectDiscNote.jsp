@@ -93,12 +93,12 @@ applied on resolution status or type--%>
 <fmt:message key="manage_all_discrepancy_notes_in" bundle="${restext}"/> <c:out value="${study.name}"/>
     <c:choose>
         <c:when test="${module eq 'manage'}">
-            <a href="javascript:openDocWindow('help/2_3_discrepancyNotes_Help.html')">
+            <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/monitor-and-manage-data/notes-and-discrepancies')">
             <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${restext}"/>" title="<fmt:message key="help" bundle="${restext}"/>">
             </a>
         </c:when>
         <c:otherwise>
-            <a href="javascript:openDocWindow('help/2_3_discrepancyNotes_Help.html')">
+            <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/monitor-and-manage-data/notes-and-discrepancies')">
             <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${restext}"/>" title="<fmt:message key="help" bundle="${restext}"/>">
             </a>
         </c:otherwise>
