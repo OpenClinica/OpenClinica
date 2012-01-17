@@ -27,7 +27,7 @@
   </fileSets>
   <files>
   	<file>
-  		<source>target/OpenClinica-3.1.2.war</source>
+  		<source>target/${pom.artifactId}-${pom.version}.war</source>
   		<outputDirectory>distribution</outputDirectory>
   		<destName>OpenClinica.war</destName>
   	</file>

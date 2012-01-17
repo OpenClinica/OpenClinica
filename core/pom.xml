@@ -8,7 +8,7 @@
     <parent>
         <groupId>org.akaza.openclinica</groupId>
         <artifactId>OpenClinica-Parent</artifactId>
-        <version>3.1.2</version>
+        <version>3.1.2-Utah</version>
     </parent>    
     <dependencies> 
 		<dependency>
@@ -256,29 +256,7 @@
 		</plugins>
 	</reporting>
 
-<!-- 
-	<properties>
-		<catalina.home>C:\\Java\\tomcat</catalina.home>
-		<test.dbName>postgres</test.dbName>
-		<test.dbDriverClassName>org.postgresql.Driver</test.dbDriverClassName>
-		<test.dbUrl>jdbc:postgresql://localhost:5432/</test.dbUrl>
-		<test.dbUsername>clinica</test.dbUsername>
-		<test.dbPassword>clinica</test.dbPassword>
-		<test.hibernateDialect>org.hibernate.dialect.PostgreSQLDialect</test.hibernateDialect>
-		<test.locale>en_US</test.locale>
-<<<<<<< .working
-		<scm.path>scm:svn:http://svn.akazaresearch.com/openclinica/OpenClinica/branches/OpenClinica-3.0-SNAPSHOT</scm.path> -->
-		<!--  Library Versions -->
-		<!--<spring.version>2.5.6.SEC01</spring.version>-->
-		
-<!-- 	</properties> -->
     <build>
- <!--        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources> -->
 		<!-- @pgawade 16-NOV-2010 filter test resources -->
         <testResources>
 			<testResource>
