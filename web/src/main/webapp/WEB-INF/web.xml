@@ -12,7 +12,7 @@
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>
-            classpath*:org/akaza/openclinica/applicationContext*.xml
+            classpath*:org/akaza/openclinica/applicationContext*.xml,classpath*:org/akaza/openclinica/ehcache.xml
         </param-value>
   </context-param>
     

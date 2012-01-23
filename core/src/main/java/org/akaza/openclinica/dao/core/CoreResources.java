@@ -99,6 +99,7 @@ public class CoreResources implements ResourceLoaderAware {
             DB_NAME = dbName;
             SQLFactory factory = SQLFactory.getInstance();
             factory.run(dbName, resourceLoader);
+            factory.getEhCacheWrapper();
             if(extractInfo!=null)
             {copyBaseToDest(resourceLoader);
             // @pgawade 18-April-2011 Fix for issue 8394
@@ -125,7 +126,7 @@ public class CoreResources implements ResourceLoaderAware {
     /**
      * For changing values which are applicable to all properties, for ex webapp name can be used in any properties
      */
-    private void setDataInfoVals() {
+    private void setDataInfoVals(String filePath) {
 
         Enumeration<String> properties = (Enumeration<String>) DATAINFO.propertyNames();
         String vals, key;
@@ -135,11 +136,21 @@ public class CoreResources implements ResourceLoaderAware {
             // replacePaths(vals);
             vals = replaceWebapp(vals);
             vals = replaceCatHome(vals);
+            vals = replaceFilePath(vals,filePath);
             DATAINFO.setProperty(key, vals);
         }
 
     }
 
+    
+    private static String replaceFilePath(String value,String filePath){
+        if (value.contains("${filePath}")) {
+            logMe("value?"+value);
+            value = value.replace("${WEBAPP}", filePath);
+            logMe("value after replaced?"+value);
+        }
+        return value;
+    }
     private static String replaceWebapp(String value) {
 
         if (value.contains("${WEBAPP}")) {
@@ -175,18 +186,6 @@ public class CoreResources implements ResourceLoaderAware {
         if (catalina == null) {
             catalina = System.getenv("catalina.home");
         }
-        //        logMe("catalina home - " + value);
-        //        logMe("CATALINA_HOME system variable is " + System.getProperty("CATALINA_HOME"));
-        //        logMe("CATALINA_HOME system env variable is " + System.getenv("CATALINA_HOME"));
-        //        logMe(" -Dcatalina.home system property variable is"+System.getProperty(" -Dcatalina.home"));
-        //        logMe("CATALINA.HOME system env variable is"+System.getenv("catalina.home"));
-        //        logMe("CATALINA_BASE system env variable is"+System.getenv("CATALINA_BASE"));
-        //        Map<String, String> env = System.getenv();
-        //        for (String envName : env.keySet()) {
-        //            logMe("%s=%s%n"+ envName+ env.get(envName));
-        //        }
-
-        
         if (value.contains("${catalina.home}") &&  catalina != null) {
             value = value.replace("${catalina.home}", catalina);
         }
@@ -219,7 +218,7 @@ public class CoreResources implements ResourceLoaderAware {
 
         setDatabaseProperties(database);
 
-        setDataInfoVals();
+        setDataInfoVals( filePath);
         if(DATAINFO.getProperty("filePath")==null || DATAINFO.getProperty("filePath").length()<=0) 
             DATAINFO.setProperty("filePath", filePath);
 
@@ -359,10 +358,10 @@ public class CoreResources implements ResourceLoaderAware {
     private void copyBaseToDest(ResourceLoader resourceLoader) {
         // System.out.println("Properties directory?"+resourceLoader.getResource("properties/xslt"));
 
-        ByteArrayInputStream listSrcFiles[] = new ByteArrayInputStream[10];
+        ByteArrayInputStream listSrcFiles[] = new ByteArrayInputStream[11];
         String[] fileNames =
             { "odm_spss_dat.xsl", "ODMToTAB.xsl", "odm_to_html.xsl", "odm_to_xslfo.xsl",  "odm_spss_sps.xsl", "copyXML.xsl",
-                "odm1.3_to_1.2.xsl", "odm1.3_to_1.2_extensions.xsl", "odm1.3_to_1.3_no_extensions.xsl" };
+                "odm1.3_to_1.2.xsl", "odm1.3_to_1.2_extensions.xsl", "odm1.3_to_1.3_no_extensions.xsl","ODMReportStylesheet.xsl" };
         try {
             listSrcFiles[0] =
                 (ByteArrayInputStream) resourceLoader.getResource("classpath:properties" + File.separator + "xslt" + File.separator + fileNames[0])
@@ -521,9 +520,11 @@ public class CoreResources implements ResourceLoaderAware {
             // String tmp1 = placeholder_file_path.substring(6);
             // String tmp2 = tmp1.substring(0, tmp1.indexOf("WEB-INF") - 1);
             String tmp2 = placeholder_file_path.substring(0, placeholder_file_path.indexOf("WEB-INF") - 1);
+            logMe("tmp2:"+tmp2);
             String tmp3 = tmp2 + File.separator + "WEB-INF" + File.separator + "classes";
+            logMe("tmp3:"+tmp3);
             dest = new File(tmp3 + File.separator + "odm_mapping");
-
+            logMe("dest:"+dest);
         } catch (IOException ioe) {
             OpenClinicaSystemException oe = new OpenClinicaSystemException("Unable to get web app base path");
             oe.initCause(ioe);
@@ -873,7 +874,7 @@ public class CoreResources implements ResourceLoaderAware {
 
     // // TODO comment out system out after dev
     // private static void logMe(String message) {
-//         System.out.println(message);
+      //   System.out.println(message);
     // logger.info(message);
     // }
 

@@ -1,0 +1,16 @@
+table.shaded_table{
+border-style: solid;
+border-width: 1px;
+border-color: #b2b2b2;
+border-radius: 3px;
+-moz-border-radius: 3px;
+-webkit-border-radius: 3px;
+box-shadow: 2px 2px 4px #CCCCCC;
+-moz-box-shadow: 2px 2px 4px #CCCCCC;
+-webkit-box-shadow: 2px 2px 4px #CCCCCC;
+box-shadow: 2px 2px 4px #CCCCCC;
+/* For IE 8 */
+-ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=3, Direction=135, Color='#CCCCCC')";
+/* For IE 5.5 - 7 */
+filter: progid:DXImageTransform.Microsoft.Shadow(Strength=3, Direction=135, Color='#CCCCCC');
+}

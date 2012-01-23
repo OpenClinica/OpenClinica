@@ -27,6 +27,7 @@ import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.DAODigester;
@@ -558,4 +559,111 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
         return results;
 
     }
+    
+    @Override
+    public ArrayList<V> select(String query, HashMap variables) {
+        clearSignals();
+
+        ArrayList results = new ArrayList();
+        V  value;
+        K key;
+        ResultSet rs = null;
+        Connection con = null;
+        PreparedStatementFactory psf = new PreparedStatementFactory(variables);
+        PreparedStatement ps = null;
+        
+        try {
+            con = ds.getConnection();
+            if (con.isClosed()) {
+                if (logger.isWarnEnabled())
+                    logger.warn("Connection is closed: GenericDAO.select!");
+                throw new SQLException();
+            }
+
+           ps = con.prepareStatement(query);
+           
+       
+            ps = psf.generate(ps);// enter variables here!
+            key = (K) ps.toString();
+            if((results=(V) cache.get(key))==null)
+            {
+	            rs = ps.executeQuery();
+	            results = this.processResultRows(rs);
+	            if(results!=null){
+	                cache.put(key,results);
+	            }
+            }
+            
+            if (logger.isInfoEnabled()) {
+                logger.info("Executing dynamic query, EntityDAO.select:query " + query);
+            }
+            signalSuccess();
+              
+
+        } catch (SQLException sqle) {
+            signalFailure(sqle);
+            if (logger.isWarnEnabled()) {
+                logger.warn("Exception while executing dynamic query, GenericDAO.select: " + query + ":message: " + sqle.getMessage());
+                sqle.printStackTrace();
+            }
+        } finally {
+            this.closeIfNecessary(con, rs, ps);
+        }
+        return results;
+
+    }
+    
+//    select   name, ordinal, oc_oid, item_data_id, i.item_id as item_id, value
+//
+//    from item_data id, item i 
+//    where id.item_id=i.item_id and event_crf_id = ? order  by i.item_id,ordinal;
+    
+    public ArrayList<ItemBean> findAllWithItemDataByCRFVersionId(int crfVersionId,int eventCRFId) {
+        this.unsetTypeExpected();
+        
+        this.setTypeExpected(1, TypeNames.STRING);//(item)name
+        this.setTypeExpected(2, TypeNames.INT);//ordinal
+        this.setTypeExpected(3, TypeNames.STRING);//oc_oid
+        this.setTypeExpected(4, TypeNames.INT);//item_data_id
+        this.setTypeExpected(5, TypeNames.INT);//item_id
+        this.setTypeExpected(6, TypeNames.STRING);//(item)value
+        
+        
+        ArrayList<ItemBean> answer = new ArrayList<ItemBean>();
+
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(crfVersionId));
+        variables.put(new Integer(2), new Integer(eventCRFId));
+        
+        String sql = digester.getQuery("findAllWithItemDataByCRFVersionId");
+
+        ArrayList rows = super.select(sql, variables);
+        Iterator it = rows.iterator();
+        int cur_item_id=0;
+        ItemBean item_bean = null;
+        ItemDataBean item_data_bean = null;
+        while (it.hasNext()) {
+            HashMap row = (HashMap) it.next();
+            Integer id = (Integer) row.get("item_id");
+            if (cur_item_id!= id.intValue() ){
+            	item_bean = new ItemBean();
+            	answer.add(item_bean);
+            	cur_item_id = id.intValue();
+            	item_bean.setId(cur_item_id);
+            	item_bean.setName((String) row.get("name"));
+            	item_bean.setOid((String) row.get("oc_oid"));
+            	
+            }
+            item_data_bean = new ItemDataBean();
+            item_data_bean.setValue((String) row.get("value"));
+            item_data_bean.setOrdinal(((Integer) row.get("ordinal")).intValue());
+            item_data_bean.setId(((Integer) row.get("item_data_id")).intValue());
+            item_data_bean.setItemId(cur_item_id);
+            item_bean.addItemDataElement(item_data_bean);
+           
+        }
+
+        return answer;
+    }
+
 }

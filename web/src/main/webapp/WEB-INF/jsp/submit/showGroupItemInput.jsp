@@ -1,6 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>  
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
@@ -363,6 +363,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
   <%-- <c:out value="txt item"/> --%>
   <%-- add for error messages --%>
   <label for="<c:out value="${inputName}"/>"></label>
+  <input type="hidden" id="defValue<c:out value="${inputName}"/>" name="defValue<c:out value="${inputName}"/>" value="<c:out value="${defValue}"/>"/>
   <c:choose>
     <c:when test="${isInError}">
       <span class="aka_exclaim_error">! </span><input class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" name="<c:out value="${inputName}"/>" value="<c:out value="${inputTxtValue}"/>" />
@@ -386,12 +387,13 @@ function switchStr(itemId, id,attribute,str1,str2) {
 </c:if>
 <c:if test='${inputType == "textarea"}'>
   <label for="<c:out value="${inputName}"/>"></label>
+  <input type="hidden" id="defValue<c:out value="${inputName}"/>" name="defValue<c:out value="${inputName}"/>" value="<c:out value="${defValue}"/>"/>
   <c:choose>
     <c:when test="${isInError}">
       <span class="aka_exclaim_error">! </span><textarea class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" name="<c:out value="${inputName}"/>" rows="5" cols="40"><c:out value="${inputTxtValue}"/></textarea>
     </c:when>
     <c:otherwise>
-      <textarea id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" name="<c:out value="${inputName}"/>" rows="5" cols="40"><c:out value="${inputTxtValue}"/></textarea>
+      <textarea id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" title="<c:out value="${defValue}"/>" onChange="this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" name="<c:out value="${inputName}"/>" rows="5" cols="40"><c:out value="${inputTxtValue}"/></textarea>
     </c:otherwise>
   </c:choose>
 </c:if>
@@ -492,41 +494,55 @@ function switchStr(itemId, id,attribute,str1,str2) {
 
   <label for="<c:out value="${inputName}"/>"></label>
   <c:choose>
-
+  	<c:when test="${displayItem.metadata.defaultValue != '' &&
+                displayItem.metadata.defaultValue != null}">
+    	<c:set var="printDefault" value="true"/>
+    </c:when>
+    <c:otherwise><c:set var="printDefault" value="false"/></c:otherwise>
+  </c:choose>
+  <c:choose>
     <c:when test="${isInError}">
       <span class="aka_exclaim_error">! </span>
       <select class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" name="<c:out value="${inputName}"/>" class="formfield">
-          <%-- taken from showItemInput.jsp, somebody kind of forgot to put the options in there but added the </select>--%>
-        <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
           <c:choose>
-            <c:when test="${count==selectedOption}">
-              <c:set var="checked" value="selected" />
-            </c:when>
-            <c:otherwise>
-              <c:set var="checked" value="" />
-            </c:otherwise>
-          </c:choose>
-          <option value="<c:out value="${option.value}" />" <c:out value="${checked}"/>
-                    <c:if test="${option.selected}">
-      	                selected="selected"
-                    </c:if>
-                  >
-            <c:out value="${option.text}" />
-          </option>
-
-          <c:set var="count" value="${count+1}"/>
-        </c:forEach>
+          <c:when test="${printDefault == 'true'}">
+            <c:set var="count" value="0"/>
+            <option value="<c:out value="" />" <c:out value=""/> ><c:out value="${displayItem.metadata.defaultValue}" /></option>
+            <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
+              <c:choose>
+                <c:when test="${count==selectedOption}"><c:set var="checked" value="selected" /></c:when>
+                <c:otherwise><c:set var="checked" value="" /></c:otherwise>
+              </c:choose>
+              <option value="<c:out value="${option.value}" />" <c:out value="${checked}"/> ><c:out value="${option.text}" /></option>
+              <c:set var="count" value="${count+1}"/>
+            </c:forEach>
+          </c:when>
+          <c:otherwise>
+           <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
+	          <c:choose>
+	            <c:when test="${count==selectedOption}">
+	              <c:set var="checked" value="selected" />
+	            </c:when>
+	            <c:otherwise>
+	              <c:set var="checked" value="" />
+	            </c:otherwise>
+	          </c:choose>
+	          <option value="<c:out value="${option.value}" />" <c:out value="${checked}"/>
+	                    <c:if test="${option.selected}">
+	      	                selected="selected"
+	                    </c:if>
+	                  >
+	            <c:out value="${option.text}" />
+	          </option>
+          	<c:set var="count" value="${count+1}"/>
+        	</c:forEach>
+          </c:otherwise>
+        </c:choose>
       </select>
     </c:when>
 
     <c:otherwise>
-      <c:choose>
-        <c:when test="${displayItem.metadata.defaultValue != '' &&
-                displayItem.metadata.defaultValue != null}">
-          <c:set var="printDefault" value="true"/>
-        </c:when>
-        <c:otherwise><c:set var="printDefault" value="false"/></c:otherwise>
-      </c:choose>
+
       <c:set var="selectedOption" value="-1"/>
       <c:set var="count" value="0"/>
       <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">

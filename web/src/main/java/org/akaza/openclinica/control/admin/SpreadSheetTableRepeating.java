@@ -705,6 +705,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 										}
 									}
 								}
+								}
                             }
                             controlValues.put(secName+"---"+itemName, mapValArray);
                         } else {

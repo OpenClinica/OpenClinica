@@ -129,6 +129,21 @@ public class ItemGroupMetadataDAO<K extends String,V extends ArrayList> extends 
         }
         return eb;
     }
+    public List<ItemGroupMetadataBean> findByCrfVersion(Integer crfVersionId) {
+        ItemGroupMetadataBean eb = new ItemGroupMetadataBean();
+        this.setTypesExpected();
+        HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
+        variables.put(1, crfVersionId);
+        String sql = digester.getQuery("findByCrfVersionId");
+        ArrayList alist = this.select(sql, variables);
+        List<ItemGroupMetadataBean> beanList = new ArrayList<ItemGroupMetadataBean>();
+        ItemGroupMetadataBean bean;
+        for (Object map : alist) {
+            bean = (ItemGroupMetadataBean) this.getEntityFromHashMap((HashMap) map);
+            beanList.add(bean);
+        }
+        return beanList;
+    }
 
     public EntityBean create(EntityBean eb) throws OpenClinicaException {
         // INSERT INTO item_group_metadata (item_group_id,
