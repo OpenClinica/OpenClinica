@@ -1,6 +1,16 @@
 package org.akaza.openclinica.controller;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -31,16 +41,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author: sshamim Date: Jan 22, 2009 Time: 6:52:16 PM Manages the Study creation process
@@ -219,16 +219,11 @@ public class StudyModuleController {
         ArrayList pageMessages = new ArrayList();
         if (request.getSession().getAttribute("pageMessages") != null) {
             pageMessages.addAll((ArrayList) request.getSession().getAttribute("pageMessages"));
-            request.setAttribute("pageMessages", pageMessages); 
+            request.setAttribute("pageMessages", pageMessages);
             request.getSession().removeAttribute("pageMessages");
         }
         return map;
     }
-    private String getHostPathFromSysUrl(String sysURL,String contextPath) {
-        return sysURL.replaceAll(contextPath+"/", "");
-       }
-    
- 
 
     private String getHostPathFromSysUrl(String sysURL,String contextPath) {
      return sysURL.replaceAll(contextPath+"/", "");
@@ -320,7 +315,7 @@ public class StudyModuleController {
         logMe("into the getHostPath/....URL = "+request.getRequestURL()+"URI="+request.getRequestURI()+"PROTOCOL=");
         String requestURLMinusServletPath = getRequestURLMinusServletPath(request);
         String hostPath = "";
-        
+
         if (null != requestURLMinusServletPath) {
             String tmpPath = requestURLMinusServletPath.substring(0, requestURLMinusServletPath.lastIndexOf("/"));
             logMe("processing2..."+tmpPath);
@@ -339,7 +334,7 @@ public class StudyModuleController {
         }
         return webAppName;
     }
-	
+
 	    private boolean mayProceed(HttpServletRequest request) {
         StudyUserRoleBean currentRole = (StudyUserRoleBean)request.getSession().getAttribute("userRole");
         Role r = currentRole.getRole();
@@ -350,10 +345,6 @@ public class StudyModuleController {
 
         return false;
     }
-	    private void logMe(String msg){
-            System.out.println(msg);
-            logger.info(msg);
-        }
 
 	    private void logMe(String msg){
 	        System.out.println(msg);

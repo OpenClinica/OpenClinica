@@ -7,6 +7,23 @@
  */
 package org.akaza.openclinica.control.admin;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.admin.NewCRFBean;
 import org.akaza.openclinica.bean.core.ApplicationConstants;
@@ -40,24 +57,7 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-
-/** 
+/**
  * <P>
  * Returns multiple types of things based on the parsing; returns html table
  * returns data objects as SQL strings.
@@ -176,7 +176,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
         HashMap<String, String> allItems = new HashMap<String, String>();
         Map<String, String[]> controlValues = new HashMap<String, String[]>();
         int maxItemFormMetadataId = new ItemFormMetadataDAO(ds).findMaxId();
-        
+
 
         int validSheetNum = 0;
         for (int j = 0; j < numSheets; j++) {
@@ -263,7 +263,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         HSSFCell cell = sheet.getRow(k).getCell((short) 0);
                         String itemName = getValue(cell);
                         itemName = itemName.replaceAll("<[^>]*>", "");
-                        
+
                      // regexp to make sure it is all word characters, '\w+' in regexp terms
                         if (!Utils.isMatchingRegexp(itemName, "\\w+")) {
                             // different item error to go here
@@ -427,7 +427,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         // Checking for a valid paren item name
                         if(!StringUtil.isBlank(parentItem)){
                             if(!itemNames.containsValue(parentItem)){
-                                errors.add("the Parent item specified on row "+k+" does not exist in the CRF template. Please update the value. ");    
+                                errors.add("the Parent item specified on row "+k+" does not exist in the CRF template. Please update the value. ");
                             }
                         }
                         // BWP>>Prevent parent names that equal the Item names
@@ -694,7 +694,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 									errors.add(resPageMsg.getString("resp_label_with_different_resp_values") + " " + k + ", "
 										+ resPageMsg.getString("items_worksheet") + ".");
 									htmlErrors.put(j + "," + k + ",16", resPageMsg.getString("resp_label_with_different_resp_values_html_error"));
-								} 
+								}
 								else {
 									for (int i = 0; i < resValArray.length; i++) {
 										if (!resValArray[i].equals(mapValArray[i])) {
@@ -704,7 +704,6 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 											break;
 										}
 									}
-								}
 								}
                             }
                             controlValues.put(secName+"---"+itemName, mapValArray);
@@ -1066,19 +1065,19 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         } else {
                             isRequired = "1".equals(required) ? true : false;
                         }
-                        // >> tbh 02/04/2010 adding this column for Dynamics 
+                        // >> tbh 02/04/2010 adding this column for Dynamics
                         ++cellIndex;
                         boolean isShowItem = true;
                         // default is true
                         cell = sheet.getRow(k).getCell((short) cellIndex);
                         String showItem = getValue(cell);
-                        
+
                         if (!StringUtil.isBlank(showItem)) {
                             isShowItem = "0".equals(showItem) ? false : true;
                             isShowItem = "Hide".equalsIgnoreCase(showItem) ? false : true;
                             // supporting both, tbh 03/2010
                         }
-                      
+
                         ++cellIndex;
                         cell = sheet.getRow(k).getCell((short) cellIndex);
                         String display = getValue(cell);
@@ -1090,7 +1089,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                         + resPageMsg.getString("should_be_hide_for_scd"));
                                     htmlErrors.put(j + "," + k + "," + (cellIndex-1), resPageMsg.getString("INVALID_VALUE"));
                             }
-                            
+
                             String pvKey = secName+"---";
                             String d = display.replaceAll("\\\\,", "##");
                             String[] par = d.split(",");
@@ -1139,7 +1138,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                     htmlErrors.put(j + "," + k + "," + cellIndex, resPageMsg.getString("INVALID_VALUE"));
                             }
                         }
-                      
+
                         // Create oid for Item Bean
                         String itemOid = idao.getValidOid(new ItemBean(), crfName, itemName, itemOids);
                         itemOids.add(itemOid);
@@ -1229,10 +1228,10 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                	 String upSql = "";
                              	if(oldItem.getDataType() == oldItem.getDataType().DATE && ib.getDataType() == ib.getDataType().PDATE)//New Feature allow date to pdate even if the data is entered
                              	{
-                             		  
+
                                         if (dbName.equals("oracle")) {
                                             upSql =
-                                                "UPDATE ITEM SET DESCRIPTION='" + stripQuotes(descLabel) 
+                                                "UPDATE ITEM SET DESCRIPTION='" + stripQuotes(descLabel)
                                                     + "',PHI_STATUS=" + (phiBoolean ? 1 : 0) + "," + "ITEM_DATA_TYPE_ID=" + dataTypeIdString
                                                     + " WHERE exists (SELECT versioning_map.item_id from versioning_map, crf_version where"
                                                     + " versioning_map.crf_version_id = crf_version.crf_version_id" + " AND crf_version.crf_id= " + crfId
@@ -1249,11 +1248,11 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                                     + ownerId + " AND item.item_id = versioning_map.item_id AND"
                                                     + " versioning_map.crf_version_id = crf_version.crf_version_id" + " AND crf_version.crf_id = " + crfId;
                                         }// end of if dbName
-                             		
+
                              	}
                              	else{
                              		if (dbName.equals("oracle")) {
-                             	
+
                                         upSql =
                                             "UPDATE ITEM SET DESCRIPTION='" + stripQuotes(descLabel) + "'," + "PHI_STATUS=" + (phiBoolean ? 1 : 0)
                                                 + " WHERE exists (SELECT versioning_map.item_id from versioning_map, crf_version where"
@@ -1409,7 +1408,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                     + "','"
                                     + widthDecimal
                                     + "', "
-                                    + (isShowItem ? 1 : 0) 
+                                    + (isShowItem ? 1 : 0)
                                     + ")";
                             logger.warn(sql2);
 
@@ -1460,13 +1459,13 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                     + ", '"
                                     + stripQuotes(default_value)
                                     + "','"
-                                    + stripQuotes(responseLayout) + "','" + widthDecimal + "'," + isShowItem 
+                                    + stripQuotes(responseLayout) + "','" + widthDecimal + "'," + isShowItem
                                     + ")";
 
                         }
                         queries.add(sql2);
-                            
-                        
+
+
                         // link version with items now
                         String sql3 = "";
                         if (dbName.equals("oracle")) {
@@ -1477,39 +1476,39 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                 "INSERT INTO VERSIONING_MAP (CRF_VERSION_ID, ITEM_ID) VALUES ( " + versionIdString + "," + selectCorrectItemQueryPostgres + ")";
                         }
                         queries.add(sql3);
-                        
+
                         String sql2_1 = "";
                         if(display.length() > 0) {
                             if(controlItemName.length()>0 && optionValue.length()>0 && message.length()>0) {
-                                //At this point, all errors for scd should be caught; and insert into item_form_metadata should be done 
+                                //At this point, all errors for scd should be caught; and insert into item_form_metadata should be done
                                 if (dbName.equals("oracle")) {
-                                    sql2_1 = "insert into scd_item_metadata (scd_item_form_metadata_id,control_item_form_metadata_id,control_item_name," 
-                                        + "option_value,message) values(" 
-                                        + "(select max(ifm.item_form_metadata_id) from item_form_metadata ifm where ifm.item_id=" + selectCorrectItemQueryOracle 
+                                    sql2_1 = "insert into scd_item_metadata (scd_item_form_metadata_id,control_item_form_metadata_id,control_item_name,"
+                                        + "option_value,message) values("
+                                        + "(select max(ifm.item_form_metadata_id) from item_form_metadata ifm where ifm.item_id=" + selectCorrectItemQueryOracle
                                         + "and ifm.show_item=0 ),"
                                         + "(select cifm.item_form_metadata_id from item, item_form_metadata cifm"
-                                        + " where cifm.crf_version_id = " + versionIdString 
+                                        + " where cifm.crf_version_id = " + versionIdString
                                         + " and item.item_id = (select it.item_id from item it, versioning_map vm where it.name = '" + controlItemName +"'"
-                                        + " and vm.crf_version_id = " + versionIdString + " and vm.item_id = it.item_id)" 
+                                        + " and vm.crf_version_id = " + versionIdString + " and vm.item_id = it.item_id)"
                                         + " and cifm.item_id = item.item_id), "
                                         + "'" + controlItemName + "', '" + stripQuotes(optionValue) + "', '" + stripQuotes(message) + "'"
                                         + ")";
                                 } else {
-                                    sql2_1 = "insert into scd_item_metadata (scd_item_form_metadata_id,control_item_form_metadata_id,control_item_name," 
-                                        + "option_value,message) values(" 
-                                        + "(select max(ifm.item_form_metadata_id) from item_form_metadata ifm where ifm.item_id=" + selectCorrectItemQueryPostgres 
+                                    sql2_1 = "insert into scd_item_metadata (scd_item_form_metadata_id,control_item_form_metadata_id,control_item_name,"
+                                        + "option_value,message) values("
+                                        + "(select max(ifm.item_form_metadata_id) from item_form_metadata ifm where ifm.item_id=" + selectCorrectItemQueryPostgres
                                         + "and ifm.show_item=false ),"
                                         + "(select cifm.item_form_metadata_id from item, item_form_metadata cifm"
-                                        + " where cifm.crf_version_id = " + versionIdString 
+                                        + " where cifm.crf_version_id = " + versionIdString
                                         + " and item.item_id = (select it.item_id from item it, versioning_map vm where it.name = '" + controlItemName +"'"
-                                        + " and vm.crf_version_id = " + versionIdString + " and vm.item_id = it.item_id)" 
+                                        + " and vm.crf_version_id = " + versionIdString + " and vm.item_id = it.item_id)"
                                         + " and cifm.item_id = item.item_id), "
                                         + "'" + controlItemName + "', '" + stripQuotes(optionValue) + "', '" + stripQuotes(message) + "'"
                                         + ")";
                                 }
                                 queries.add(sql2_1);
                             } else {
-                                logger.info("No insert into scd_item_metadata for item name = " + itemName + 
+                                logger.info("No insert into scd_item_metadata for item name = " + itemName +
                                         "with Simple_Conditional_Display = \"" + display + "\".");
                             }
                         }
@@ -1626,7 +1625,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                             + itemName
                                             + "' "
                                             + "AND ITEM.ITEM_ID = ITEM_FORM_METADATA.ITEM_ID and ITEM_FORM_METADATA.CRF_VERSION_ID=CRF_VERSION.CRF_VERSION_ID "
-                                            + "AND CRF_VERSION.CRF_ID= " + crfId + " ORDER BY ITEM.OID DESC LIMIT 1)," + k + ", " 
+                                            + "AND CRF_VERSION.CRF_ID= " + crfId + " ORDER BY ITEM.OID DESC LIMIT 1)," + k + ", "
                                             + igMeta.isShowGroup() + ", " + igMeta.isRepeatingGroup() + ")";
 
                                 }
@@ -1664,8 +1663,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             queries.add(sqlGroupLabel);
 
                         }
-
-                    }// end of very long for loop, tbh
+                    }
 
                     // **************************************
                     // above this is where we will add the first sql query for
@@ -1785,7 +1783,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         // to be switched to int, tbh
                         // adding clause to convert to int, tbh, 06/07
                         if (newVersionCrf && !isRepeatingGroup && !StringUtil.isBlank(groupRepeatNumber)){
-                            errors.add(resPageMsg.getString("repeat_number_none_repeating"));    
+                            errors.add(resPageMsg.getString("repeat_number_none_repeating"));
                         } else if (!isRepeatingGroup && StringUtil.isBlank(groupRepeatNumber)) {
                                 groupRepeatNumber = "1";
                         } else {
@@ -1806,7 +1804,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         // to be switched to int, tbh
                         // adding clause to convert to int, tbh 06/07
                         if (newVersionCrf && !isRepeatingGroup && !StringUtil.isBlank(groupRepeatMax)){
-                            errors.add(resPageMsg.getString("repeat_max_none_repeating"));    
+                            errors.add(resPageMsg.getString("repeat_max_none_repeating"));
                         } else if (!isRepeatingGroup && StringUtil.isBlank(groupRepeatMax)) {
                             groupRepeatMax = "1";
                         } else {
@@ -1835,7 +1833,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         String showGroup = getValue(cell);
                         boolean isShowGroup = true;
                         if (!StringUtil.isBlank(showGroup)) {
-                         
+
                             try {
                                 isShowGroup = "0".equals(showGroup) ? false : true;
                                 isShowGroup = "Hide".equalsIgnoreCase(showGroup) ? false : true;
@@ -1850,7 +1848,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         //                                    + resPageMsg.getString("SHOW_GROUP_column") + resPageMsg.getString("can_only_be_either_0_or_1"));
                         //                            htmlErrors.put(j + "," + gk + "," + 4, resPageMsg.getString("INVALID_VALUE"));
                         //                        }
-                        
+
                         // cell = sheet.getRow(gk).getCell((short) 6);
                         // String groupRepeatArray = getValue(cell);
                         // below added 06/14/2007, tbh
@@ -2125,7 +2123,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         // htmlErrors.put(j + ",1,0", "REQUIRED FIELD");
                         throw new CRFReadingException("The CRF_NAME column was blank in the CRF worksheet.");
                     }
-                    
+
                     if(crfId > 0) {
                         CRFBean checkName = (CRFBean) cdao.findByPK(crfId);
                         if (!checkName.getName().equals(crfName)) {
@@ -2482,7 +2480,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
             break;
         case HSSFCell.CELL_TYPE_BOOLEAN:
             boolean val2 = cell.getBooleanCellValue();
-            if (val2) { 
+            if (val2) {
                 val = "true";
             } else {
                 val = "false";
@@ -2567,7 +2565,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
      * Checks whether the parent_item is valid a name
      *
      */
-    
+
     public boolean isRepeating() {
         return isRepeating;
     }

@@ -9,12 +9,14 @@
     <name>OpenClinica</name>
     <description>3.1.1-CCHMC</description>
 		
+<!--
 		<repository>
    <id>terracotta-releases</id>
    <url>http://www.terracotta.org/download/reflector/releases</url>
    <releases><enabled>true</enabled></releases>
    <snapshots><enabled>false</enabled></snapshots>
 </repository>
+-->
 
 
 	<properties>
