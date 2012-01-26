@@ -247,4 +247,6 @@
 
 
 
-<jsp:include page="include/footer.jsp"/>
+<jsp:include page="include/footer.jsp">
+ <jsp:param name="isSpringControllerFooter" value="1" />
+    </jsp:include>

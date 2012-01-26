@@ -2148,6 +2148,28 @@
 					<xsl:if test="count($allItemGrpDataDataElements[../../@StudyEventOID = $eventOID and ../../@StudyEventRepeatKey = $StudyEventRepeatKey 
 						and ../@FormOID = $formOID and @ItemGroupOID = $grpOID 
 						and @ItemGroupRepeatKey = $itemGrpRepeatKey]) &gt; 0">
+								<xsl:with-param name="itemGrpRepeatKey" select="$itemGrpRepeatKey"/>
+								<xsl:with-param name="isLastItem" select="position()=last()" />
+							</xsl:apply-templates> 
+					</xsl:if>
+					<xsl:if test="($itemGrpRepeatKey+1) &lt;= number($maxGrpRepeatKey)">		
+						<xsl:apply-templates mode="createItemDataColForRepeatingGrps" select=".">
+							<xsl:with-param name="crfPosition" select="$crfPosition"/>
+							<xsl:with-param name="eventPosition" select="$eventPosition"/>
+							<xsl:with-param name="isEventRepeating" select="$isEventRepeating"/>
+							<xsl:with-param name="formOID" select="$formOID"/>
+							<xsl:with-param name="grpOID" select="$grpOID"/>		
+							<xsl:with-param name="eventOID" select="$eventOID"/>
+							<xsl:with-param name="StudyEventRepeatKey" select="$StudyEventRepeatKey"/>	
+							<xsl:with-param name="itemGrpRepeatKey" select="$itemGrpRepeatKey+1"/> 
+							<xsl:with-param name="isGrpRepeating" select="$isGrpRepeating"/>
+						</xsl:apply-templates>
+					</xsl:if>		
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:if test="count($allItemGrpDataDataElements[../../@StudyEventOID = $eventOID 
+						and ../@FormOID = $formOID and @ItemGroupOID = $grpOID 
+						and @ItemGroupRepeatKey = $itemGrpRepeatKey]) &gt; 0">
 							<xsl:apply-templates select="odm:ItemRef" mode="GrpItemRefs">
 								<xsl:with-param name="crfPosition" select="$crfPosition"/>
 								<xsl:with-param name="eventPosition" select="$eventPosition"/>
@@ -3400,7 +3422,7 @@
 						</xsl:for-each>	
 					</xsl:variable>
 					<!--<xsl:variable name="ifMatch" select="'NN'"/>-->
-				<!--{ifMatch: <xsl:value-of select="$ifMatch"/>}-->
+				<!--atch: <xsl:value-of select="$ifMatch"/>}-->
 					<xsl:choose>
 						<xsl:when test="contains($ifMatch, $matchSep)">					 
 							<!--<xsl:variable name="ifMatchTokenized" select="tokenize($ifMatch,'_')"/>-->

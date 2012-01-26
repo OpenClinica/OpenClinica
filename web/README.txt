@@ -1,6 +1,6 @@
 --------------------------------------------------------------
 OPENCLINICA RELEASE NOTES
-OpenClinica Version 3.1.2
+OpenClinica Version 3.1
 Document Version 1.0
 --------------------------------------------------------------
 

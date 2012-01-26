@@ -1,5 +1,13 @@
 package org.akaza.openclinica.controller;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -34,14 +42,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author: sshamim Date: Jan 22, 2009 Time: 6:52:16 PM Manages the Study creation process
@@ -225,10 +225,10 @@ public class StudyModuleController {
         }
         return map;
     }
-    private String getHostPathFromSysUrl(String sysURL,String contextPath) {
-        return sysURL.replaceAll(contextPath+"/", "");
-       }
 
+    private String getHostPathFromSysUrl(String sysURL,String contextPath) {
+     return sysURL.replaceAll(contextPath+"/", "");
+    }
 
 
     @RequestMapping(method = RequestMethod.POST)
@@ -347,9 +347,9 @@ public class StudyModuleController {
 
         return false;
     }
-	    private void logMe(String msg){
-            System.out.println(msg);
-            logger.info(msg);
-        }
 
+	    private void logMe(String msg){
+	        System.out.println(msg);
+	        logger.info(msg);
+	    }
 }

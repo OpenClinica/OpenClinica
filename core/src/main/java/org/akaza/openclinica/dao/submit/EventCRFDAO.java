@@ -884,6 +884,19 @@ public class EventCRFDAO  <K extends String,V extends ArrayList> extends Auditab
             return 0;
         }
     }
+    
+    public void updateCRFVersionID(int event_crf_id, int crf_version_id){
+    	 this.unsetTypeExpected();
+         this.setTypeExpected(1, TypeNames.INT);
+         this.setTypeExpected(2, TypeNames.INT);
+
+         HashMap variables = new HashMap();
+         variables.put(1, crf_version_id);
+         variables.put(2, event_crf_id);
+         String sql = digester.getQuery("updateCRFVersionID");
+         this.execute(sql, variables);
+    }
+
 
 
 }
