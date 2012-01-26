@@ -1,25 +1,25 @@
 package org.akaza.openclinica.control.admin;
 
-import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.service.extract.ExtractUtils;
+import org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.job.ExampleSpringJob;
 import org.akaza.openclinica.web.job.TriggerService;
-import org.akaza.openclinica.service.extract.ExtractUtils;
-import org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.quartz.JobDataMap;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
@@ -27,14 +27,15 @@ import org.quartz.Trigger;
 import org.quartz.impl.StdScheduler;
 import org.springframework.scheduling.quartz.JobDetailBean;
 
-import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.io.File;
-import java.text.SimpleDateFormat;
+
+import javax.servlet.http.HttpServletRequest;
 
 public class UpdateJobExportServlet extends SecureController {
 
@@ -208,7 +209,7 @@ public class UpdateJobExportServlet extends SecureController {
                         endFilePath + File.separator,
                         exportFileName,
                         dsBean.getId(),
-                        epBean, userBean, request.getLocale().getLanguage(),cnt,  SQLInitServlet.getField("filePath") + "xslt", TRIGGER_GROUP_JOB);
+                        epBean, userBean, LocaleResolver.getLocale(request).getLanguage(),cnt,  SQLInitServlet.getField("filePath") + "xslt", TRIGGER_GROUP_JOB);
 
                 //Updating the original trigger with user given inputs
                 trigger.setRepeatCount(64000);
@@ -272,7 +273,7 @@ public class UpdateJobExportServlet extends SecureController {
             v.addError(errors, FORMAT_ID, "Please pick at least one.");
         }
         for (String triggerName : triggerNames) {
-            if (triggerName.equals(fp.getString(JOB_NAME)) && (!triggerName.equals(properName))) {
+            if (triggerName.equals(fp.getString(JOB_NAME)) && !triggerName.equals(properName)) {
                 v.addError(errors, JOB_NAME, "A job with that name already exists.  Please pick another name.");
             }
         }

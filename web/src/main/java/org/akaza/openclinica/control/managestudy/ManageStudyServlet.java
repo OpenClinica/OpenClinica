@@ -13,6 +13,7 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -22,7 +23,7 @@ import java.util.Locale;
 
 /**
  * Generates the index page of manage study module
- * 
+ *
  * @author ssachs
  */
 public class ManageStudyServlet extends SecureController {
@@ -32,7 +33,7 @@ public class ManageStudyServlet extends SecureController {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.akaza.openclinica.control.core.SecureController#processRequest()
      */
     @Override
@@ -129,7 +130,7 @@ public class ManageStudyServlet extends SecureController {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.akaza.openclinica.control.core.SecureController#mayProceed()
      */
     /**
@@ -137,7 +138,7 @@ public class ManageStudyServlet extends SecureController {
      */
     @Override
     public void mayProceed() throws InsufficientPermissionException {
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         // < restext =
         // ResourceBundle.getBundle("org.akaza.openclinica.i18n.notes",locale);
         // < respage =

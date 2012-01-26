@@ -7,9 +7,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -31,6 +28,7 @@ import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.display.DisplaySectionBeanHandler;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -39,10 +37,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * @author Krikor Krumlian 10/26/2006
- * 
- * 
+ *
+ *
  *         View a CRF version section data entry
  */
 public class PrintCRFServlet extends DataEntryServlet {
@@ -57,7 +58,7 @@ public class PrintCRFServlet extends DataEntryServlet {
     @Override
     public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
 
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         // <
         // resexception=ResourceBundle.getBundle("org.akaza.openclinica.i18n.exceptions",locale);
         // < respage =
@@ -157,12 +158,12 @@ public class PrintCRFServlet extends DataEntryServlet {
             }
             request.setAttribute(ALL_SECTION_BEANS, allSectionBeans);
             request.setAttribute(INPUT_EVENT_CRF,ecb);
-            
+
             sectionBeans = super.getAllDisplayBeans(request);
         }
         request.setAttribute(INPUT_EVENT_CRF,ecb);
         request.setAttribute(SECTION_BEAN,sb);
-      
+
         DisplaySectionBean dsb = super.getDisplayBean(false, false, request, isSubmitted);
         request.setAttribute("allSections", sectionBeans);
         request.setAttribute("displayAllCRF", "1");
@@ -294,10 +295,12 @@ public class PrintCRFServlet extends DataEntryServlet {
     protected boolean shouldRunRules() {
         return false;
     }
+    @Override
     protected boolean isAdministrativeEditing() {
     	return false;
     }
-    
+
+    @Override
     protected boolean isAdminForcedReasonForChange(HttpServletRequest request) {
     	return false;
     }

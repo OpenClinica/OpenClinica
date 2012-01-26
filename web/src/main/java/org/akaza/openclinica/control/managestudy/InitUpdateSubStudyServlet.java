@@ -29,19 +29,18 @@ import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 /**
  * @author jxu
- * 
+ *
  * @version CVS: $Id: InitUpdateSubStudyServlet.java 9834 2007-09-05 22:28:31Z
  *          jxu $
  */
 public class InitUpdateSubStudyServlet extends SecureController {
 
     /**
-     * 
+     *
      */
     @Override
     public void mayProceed() throws InsufficientPermissionException {
@@ -73,7 +72,7 @@ public class InitUpdateSubStudyServlet extends SecureController {
             StudyBean study = (StudyBean) sdao.findByPK(studyId);
 
             checkRoleByUserAndStudy(ub, study.getParentStudyId(), study.getId());
-            
+
             String parentStudyName = "";
             StudyBean parent = new StudyBean();
             if (study.getParentStudyId() > 0) {
@@ -119,16 +118,16 @@ public class InitUpdateSubStudyServlet extends SecureController {
             FormProcessor fp = new FormProcessor(request);
             logger.info("start date:" + study.getDatePlannedEnd());
             if (study.getDatePlannedEnd() != null) {
-                fp.addPresetValue(UpdateSubStudyServlet.INPUT_END_DATE, 
-                        new SimpleDateFormat(resformat.getString("date_format_string"),SecureController.getFormat_locale()).format(study.getDatePlannedEnd()));
+                fp.addPresetValue(UpdateSubStudyServlet.INPUT_END_DATE,
+                        local_df.format(study.getDatePlannedEnd()));
             }
             if (study.getDatePlannedStart() != null) {
-                fp.addPresetValue(UpdateSubStudyServlet.INPUT_START_DATE, 
-                        new SimpleDateFormat(resformat.getString("date_format_string"),SecureController.getFormat_locale()).format(study.getDatePlannedStart()));
+                fp.addPresetValue(UpdateSubStudyServlet.INPUT_START_DATE,
+                        local_df.format(study.getDatePlannedStart()));
             }
             if (study.getProtocolDateVerification() != null) {
-                fp.addPresetValue(UpdateSubStudyServlet.INPUT_VER_DATE, 
-                        new SimpleDateFormat(resformat.getString("date_format_string"),SecureController.getFormat_locale()).format(study.getProtocolDateVerification()));
+                fp.addPresetValue(UpdateSubStudyServlet.INPUT_VER_DATE,
+                        local_df.format(study.getProtocolDateVerification()));
             }
             setPresetValues(fp.getPresetValues());
 

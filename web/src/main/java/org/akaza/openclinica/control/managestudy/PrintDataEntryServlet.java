@@ -7,9 +7,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.Utils;
@@ -43,6 +40,7 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.display.DisplaySectionBeanHandler;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -50,6 +48,9 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Krikor Krumlian 10/26/2006
@@ -69,7 +70,7 @@ public class PrintDataEntryServlet extends DataEntryServlet {
     @Override
     public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
         StudyUserRoleBean  currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         UserAccountBean ub =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
         // <
         // resexception=ResourceBundle.getBundle("org.akaza.openclinica.i18n.exceptions",locale);
@@ -350,11 +351,13 @@ public class PrintDataEntryServlet extends DataEntryServlet {
     protected boolean shouldRunRules() {
         return false;
     }
-    
+
+    @Override
     protected boolean isAdministrativeEditing() {
     	return false;
     }
-    
+
+    @Override
     protected boolean isAdminForcedReasonForChange(HttpServletRequest request) {
     	return false;
     }

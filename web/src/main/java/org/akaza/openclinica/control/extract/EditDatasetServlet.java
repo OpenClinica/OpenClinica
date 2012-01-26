@@ -20,7 +20,6 @@ import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
-import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -32,8 +31,8 @@ import java.util.List;
 
 /**
  * @author thickerson
- * 
- * 
+ *
+ *
  */
 public class EditDatasetServlet extends SecureController {
 
@@ -61,14 +60,14 @@ public class EditDatasetServlet extends SecureController {
             return;
         }
 
-        if((currentRole.isMonitor() || currentRole.isInvestigator()) && (dataset.getOwnerId() != ub.getId())){
+        if((currentRole.isMonitor() || currentRole.isInvestigator()) && dataset.getOwnerId() != ub.getId()){
             addPageMessage(respage.getString("no_have_correct_privilege_current_study")
                     + " " + respage.getString("change_active_study_or_contact"));
             forwardPage(Page.MENU_SERVLET);
             return;
         }
 
-        
+
         HashMap events = (LinkedHashMap) session.getAttribute("eventsForCreateDataset");
         // << tbh
         CRFDAO crfdao = new CRFDAO(sm.getDataSource());
@@ -154,12 +153,12 @@ public class EditDatasetServlet extends SecureController {
 
     /**
      * Initialize data of a DatasetBean and set session attributes for displaying selected data of this DatasetBean
-     * 
+     *
      * @param db
      * @return
-     * 
-     * @author ywang (Feb, 2008)
+     *
      */
+    // @author ywang (Feb, 2008)
     public DatasetBean initializeAttributes(int datasetId) {
         DatasetDAO dsdao = new DatasetDAO(sm.getDataSource());
         DatasetBean db = dsdao.initialDatasetData(datasetId);

@@ -1,10 +1,8 @@
 package org.akaza.openclinica.control.admin;
 
-import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -13,28 +11,32 @@ import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.service.extract.ExtractUtils;
 import org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
-import org.akaza.openclinica.web.job.ExampleSpringJob;
 import org.akaza.openclinica.web.job.TriggerService;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
 import org.quartz.impl.StdScheduler;
 import org.springframework.scheduling.quartz.JobDetailBean;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.File;
-import java.math.BigInteger;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
- * 
+ *
  * @author thickerson
- * 
+ *
  */
 public class CreateJobExportServlet extends SecureController {
     public static final String PERIOD = "periodToRun";
@@ -102,7 +104,7 @@ public class CreateJobExportServlet extends SecureController {
         request.setAttribute(FORMAT_ID, fp2.getInt(FORMAT_ID));
         request.setAttribute(PERIOD, fp2.getString(PERIOD));
         request.setAttribute(DATASET_ID, fp2.getInt(DATASET_ID));
-        Date jobDate = (fp2.getDateTime(DATE_START_JOB));
+        Date jobDate = fp2.getDateTime(DATE_START_JOB);
         HashMap presetValues = new HashMap();
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(jobDate);
@@ -221,14 +223,14 @@ public class CreateJobExportServlet extends SecureController {
                         endFilePath + File.separator,
                         exportFileName,
                         dsBean.getId(),
-                        epBean, userBean, request.getLocale().getLanguage(),cnt,  SQLInitServlet.getField("filePath") + "xslt", xsltService.getTriggerGroupNameForExportJobs());
+                        epBean, userBean, LocaleResolver.getLocale(request).getLanguage(),cnt,  SQLInitServlet.getField("filePath") + "xslt", xsltService.getTriggerGroupNameForExportJobs());
 
                 //Updating the original trigger with user given inputs
                 trigger.setRepeatCount(64000);
                 trigger.setRepeatInterval(XsltTriggerService.getIntervalTime(period));
                 trigger.setDescription(jobDesc);
                 // set just the start date
-                
+
                 trigger.setStartTime(startDateTime);
                 trigger.setName(jobName);// + datasetId);
                 trigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT);
@@ -290,7 +292,7 @@ public class CreateJobExportServlet extends SecureController {
             v.addError(errors, FORMAT_ID, "Please pick at least one.");
         }
         for (String triggerName : triggerNames) {
-            if (triggerName.equals(fp.getString(JOB_NAME)) && (!triggerName.equals(properName))) {
+            if (triggerName.equals(fp.getString(JOB_NAME)) && !triggerName.equals(properName)) {
                 v.addError(errors, JOB_NAME, "A job with that name already exists.  Please pick another name.");
             }
         }
@@ -299,7 +301,7 @@ public class CreateJobExportServlet extends SecureController {
         }
         // @pgawade 20-April-2011 Limit the job description to 250 characters
         String jobDesc = fp.getString(JOB_DESC);
-        if ((null != jobDesc) && (!jobDesc.equals(""))) {
+        if (null != jobDesc && !jobDesc.equals("")) {
             if (jobDesc.length() > 250) {
                 v.addError(errors, JOB_DESC, "A job description cannot be more than 250 characters.");
             }

@@ -1,8 +1,5 @@
 package org.akaza.openclinica.control.managestudy;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -30,6 +27,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.display.DisplaySectionBeanHandler;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -40,6 +38,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Shamim
@@ -53,7 +54,7 @@ public class PrintAllSiteEventCRFServlet extends DataEntryServlet {
      */
     @Override
     public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         UserAccountBean ub =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
         StudyUserRoleBean  currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
         if (ub.isSysAdmin()) {
@@ -75,7 +76,7 @@ public class PrintAllSiteEventCRFServlet extends DataEntryServlet {
         //JN:The following were the the global variables, moved as local.
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
         SectionBean sb = (SectionBean)request.getAttribute(SECTION_BEAN);
-        
+
         StudyEventDefinitionDAO sedao = new StudyEventDefinitionDAO(getDataSource());
         EventDefinitionCRFDAO edao = new EventDefinitionCRFDAO(getDataSource());
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(getDataSource());
@@ -194,7 +195,7 @@ public class PrintAllSiteEventCRFServlet extends DataEntryServlet {
                 ArrayList sects = (ArrayList) sdao.findByVersionId(version.getId());
                 for (int i = 0; i < sects.size(); i++) {
                      sb = (SectionBean) sects.get(i);
-                  
+
                     int sectId = sb.getId();
                     if (sectId > 0) {
                         allSectionBeans.add((SectionBean) sdao.findByPK(sectId));
@@ -206,7 +207,7 @@ public class PrintAllSiteEventCRFServlet extends DataEntryServlet {
                 request.setAttribute(SECTION_BEAN,sb);
                 request.setAttribute(ALL_SECTION_BEANS, allSectionBeans);
                 sectionBeans = super.getAllDisplayBeans(request);
-             
+
                 DisplaySectionBean dsb = super.getDisplayBean(false, false, request, isSubmitted);
                 PrintCRFBean printCrfBean = new PrintCRFBean();
                 printCrfBean.setAllSections(sectionBeans);

@@ -24,6 +24,8 @@ import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.EntityDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.i18n.util.I18nFormatUtil;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,12 +49,12 @@ import java.util.regex.PatternSyntaxException;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * 
+ *
  * A class to validate form input.
- * 
+ *
  * <p>
  * The general usage of the Validator is as follows:
- * 
+ *
  * <code>
  * Validator v = new Validator(request); // request is an HttpServletRequest object
  *
@@ -81,11 +83,11 @@ import javax.servlet.http.HttpServletRequest;
  *      // this means at least one of your fields did not validate properly.
  * }
  * </code>
- * 
+ *
  * <p>
  * To determine whether there were any errors on the form, you use code like
  * this:
- * 
+ *
  * <code>
  * ArrayList fieldMessages = errors.get(fieldname);
  *
@@ -96,11 +98,11 @@ import javax.servlet.http.HttpServletRequest;
  *      // there were errors on the form
  * }
  * </code>
- * 
+ *
  * <p>
  * There are 15 types of validations possible; below there are details on the
  * semantics as well as the syntax of the addValidation call:
- * 
+ *
  * <ul>
  * <li> NO_BLANKS   test that a given input is not blank
  * <ul>
@@ -254,18 +256,18 @@ import javax.servlet.http.HttpServletRequest;
  * <li> e.g. addValidation("input123", Validator.NO_BLANKS_SET);
  * </ul>
  * </ul>
- * 
+ *
  * <p>
  * How to add a validation type
  * </p>
- * 
+ *
  * <p>
  * We will take, as an example, a new type of validation which checks that the
  * input field contains a multiple of some integer (specified by the control.)
  * For example, if you are asking the user to input time in 15-minute
  * increments, you can use this validation to ensure that the user enters a
  * multiple of 15.
- * 
+ *
  * <ul>
  * <li> assign the type a public static int, e.g. IS_MULTIPLE
  * <li> if necessary, write an addValidation method to store that type of
@@ -283,15 +285,15 @@ import javax.servlet.http.HttpServletRequest;
  *      addValidation(fieldName, v);
  * }
  * </code>
- * 
+ *
  * <br/><br/> Note that in the code above, we added a comment to indicate which
  * validation type the addValidation method is used for. This is a courtesy to
  * other developers who are using the class.
- * 
+ *
  * <li> if it's not necessary to write an addValidation method, determine which
  * addValidation will be used to store the type of validation you are writing,
  * and note this fact in the comments for the appropriate addValidation method.
- * 
+ *
  * <li> if necessary, write a method to execute the validation, similar to
  * isBlank, isNumber, etc. note that the utility functions
  * intComparesToStaticValue and matchesRegex can handle a wide variety of
@@ -315,12 +317,12 @@ import javax.servlet.http.HttpServletRequest;
  *      return true;
  * }
  * </code>
- * 
+ *
  * <li> in validate(String fieldName, Validation v, HashMap errors), add a case
  * to respond to the new validation type be sure to get all necessary arguments,
  * determine if the input field passes validation, and call addError(fieldName,
  * v) if the field does not pass validation <br/>For example: <br/><br/>
- * 
+ *
  * <code>
  *  // ... (top of switch statement)
  *  case IS_MULTIPLE:
@@ -331,11 +333,11 @@ import javax.servlet.http.HttpServletRequest;
  *      break;
  *  // ... (bottom of switch statement)
  * </code>
- * 
+ *
  * <li> in addError(String fieldName, Validation v), add a case to set a default
  * error message which will be displayed to the user if an input violates the
  * validation rule. <br/>For example: <br/><br/>
- * 
+ *
  * <code>
  *  // ... (top of switch statement)
  *  case IS_MULTIPLE:
@@ -344,9 +346,9 @@ import javax.servlet.http.HttpServletRequest;
  *      break;
  *  // ... (bottom of switch statement)
  * </code>
- * 
+ *
  * @author ssachs
- * 
+ *
  */
 
 // TODO: add ability to halt at a given validation
@@ -450,11 +452,7 @@ public class Validator {
     public static final int IS_VALID_WIDTH_DECIMAL = 35;
     public static final int BARCODE_EAN_13 = 36;
     public static final int TO_HIDE_CONDITIONAL_DISPLAY = 37;
-    /**
-     * Validate date format according to locale_string in format.properties
-     */
-    public static final int IS_A_LOCALE_DATE = 39;
-    
+
     public static final int NO_SEMI_COLONS_OR_COLONS = 43;
 
     /**
@@ -471,11 +469,13 @@ public class Validator {
 
     protected ResourceBundle resformat;
 
+    //protected Locale format_locale;
+
     public Validator(HttpServletRequest request) {
         validations = new HashMap();
         errors = new HashMap();
         this.request = request;
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         resformat = ResourceBundleProvider.getFormatBundle(locale);
         restext = ResourceBundleProvider.getTextsBundle(locale);
         resexception = ResourceBundleProvider.getExceptionsBundle(locale);
@@ -612,7 +612,7 @@ public class Validator {
     /**
      * Add a validation to check that every response provided is an element of
      * the specified set.
-     * 
+     *
      * @param fieldName
      *            The name of the input on the form.
      * @param type
@@ -630,7 +630,7 @@ public class Validator {
     /**
      * Add a validation to check that the specified input matches the value from
      * initial data entry.
-     * 
+     *
      * @param fieldName
      *            The name of the input.
      * @param type
@@ -698,7 +698,7 @@ public class Validator {
 
     protected void addError(String fieldName, Validation v) {
 
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         resexception = ResourceBundleProvider.getExceptionsBundle(locale);
         resword = ResourceBundleProvider.getWordsBundle(locale);
 
@@ -837,11 +837,6 @@ public class Validator {
             case TO_HIDE_CONDITIONAL_DISPLAY:
                 errorMessage = v.getErrorMessage();
                 break;
-            case IS_A_LOCALE_DATE:
-                errorMessage = resexception.getString("input_not_valid_date") + resformat.getString("date_format_string") 
-                    + " " + resexception.getString("format1") + ", " + resexception.getString("or_language_mismatched") + ".";
-                break;
-              
             case NO_SEMI_COLONS_OR_COLONS:
                 errorMessage = resexception.getString("field_not_have_colons_or_semi");
                 break;
@@ -858,7 +853,7 @@ public class Validator {
     /**
      * Adds an error to a <code>HashMap</code> of errors generated by
      * validate. This can be used for "one-off" validations, e.g.:
-     * 
+     *
      * <code>
      * errors = v.validate();
      *
@@ -866,7 +861,7 @@ public class Validator {
      *     Validator.addError(errors, fieldName, "The special condition was not met.");
      * }
      * </code>
-     * 
+     *
      * @param existingErrors
      *            The <code>HashMap</code> of errors generated by a call to
      *            <code>validate()</code>.
@@ -1060,7 +1055,7 @@ public class Validator {
             }
             break;
         case DATE_IN_PAST:
-            if (!isDateInPast(fieldName)) {
+            if (!isDateInPast(fieldName, locale)) {
                 addError(fieldName, v);
             }
             break;
@@ -1105,8 +1100,8 @@ public class Validator {
                 // StringUtil.isFormatYear(fieldValue)
                 // || StringUtil.isFormatDate(fieldValue,
                 // resformat.getString("date_format_string"))) {
-                if (StringUtil.isFormatDate(fieldValue, resformat.getString("date_format_string")) || StringUtil.isPartialYear(fieldValue, "yyyy")
-                    || StringUtil.isPartialYearMonth(fieldValue, resformat.getString("date_format_year_month"))) {
+                if (StringUtil.isFormatDate(fieldValue, resformat.getString("date_format_string"), locale) || StringUtil.isPartialYear(fieldValue, "yyyy", locale)
+                    || StringUtil.isPartialYearMonth(fieldValue, resformat.getString("date_format_year_month"),locale)) {
 
                     isPDate = true;
                 }
@@ -1133,13 +1128,7 @@ public class Validator {
         case TO_HIDE_CONDITIONAL_DISPLAY:
             addError(fieldName, v);
             break;
-        case IS_A_LOCALE_DATE:
-            String fieldvalue = getFieldValue(fieldName);
-            if (StringUtil.isBlank(fieldvalue) || !StringUtil.isDateFormatString(fieldvalue, resformat.getString("date_format_string"), new Locale(resformat.getString("locale_string")))) {
-                addError(fieldName, v);
-            }
-            break;
-        
+
         case NO_SEMI_COLONS_OR_COLONS:
             if(isColonSemiColon(fieldName))
             addError(fieldName, v);
@@ -1171,7 +1160,7 @@ public class Validator {
         return false;
     }
 
-    
+
     protected boolean isColonSemiColon(String fieldName)
     {
         String fieldValue = getFieldValue(fieldName);
@@ -1223,17 +1212,17 @@ public class Validator {
      * @param fieldName
      *            The name of a field containing some text string.
      * @return <code>true</code> if the field contains a valid date in
-     *         "MM/dd/yyyy" format; <code>false</code> otherwise.
+     *         correct format; <code>false</code> otherwise.
      */
     protected boolean isDate(String fieldName) {
         String fieldValue = getFieldValue(fieldName);
         if (StringUtil.isBlank(fieldValue)) {
             return false;
         }
-        if (!StringUtil.isFormatDate(fieldValue, resformat.getString("date_format_string"))) {
+        if (!StringUtil.isDateFormatString(fieldValue, resformat.getString("date_format_string"), locale)) {
             return false;
         }
-        SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_format_string"));
+        SimpleDateFormat sdf = I18nFormatUtil.getDateFormat(locale);
         sdf.setLenient(false);
         try {
             java.util.Date date = sdf.parse(fieldValue);
@@ -1256,7 +1245,7 @@ public class Validator {
         if (StringUtil.isBlank(fieldValue)) {
             return true;
         }
-        SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_format_string"), ResourceBundleProvider.getLocale());
+        SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_format_string"), locale);
         sdf.setLenient(false);
         try {
             java.util.Date date = sdf.parse(fieldValue);
@@ -1291,10 +1280,28 @@ public class Validator {
         return false;
     }
 
+    protected boolean isDateInPast(String fieldName, Locale locale) {
+        Date d = null;
+        if (fieldName != null) {
+            d = FormProcessor.getDateFromString(getFieldValue(fieldName));
+        }
+        if (d != null) {
+            Date today = new Date();
+            Calendar cal = Calendar.getInstance();
+            /*Adding one day with the current server date to allow validation for date entered form a client in forward timezone*/
+            cal.add(Calendar.HOUR, 24);
+            today = cal.getTime();
+            if (today.compareTo(d) >= 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Assumes the date was entered in "MM/dd/yyyy" or "MM/dd/yyyy hh:mm a"
      * format.
-     * 
+     *
      * @param d
      *            The date whose year we want to query for having four or less
      *            digits.
@@ -1361,7 +1368,7 @@ public class Validator {
         }
         // YW >>
         String fieldValue = date + " " + hour + ":" + minute + ":00 " + half;
-        SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_time_format_string"));
+        SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_time_format_string"),locale);
         sdf.setLenient(false);
         try {
             java.util.Date result = sdf.parse(fieldValue);
@@ -1429,7 +1436,7 @@ public class Validator {
         if (fieldValue.equals("")) {
             return true;
         }
-        
+
         try {
             int i = Integer.parseInt(fieldValue);
         } catch (Exception e) {
@@ -1746,7 +1753,7 @@ public class Validator {
     /**
      * Determine if the value for the specified field matches the value in the
      * bean.
-     * 
+     *
      * @param fieldName
      *            The name of the input.
      * @param oldValue
@@ -1799,7 +1806,7 @@ public class Validator {
     /**
      * Set the error message that is generated if the last field added to the
      * Validator does not properly validate.
-     * 
+     *
      * @param message
      *            The error message to display.
      */
@@ -1977,11 +1984,11 @@ public class Validator {
     /**
      * Return error message of widthDecimal validation. If valid, no message
      * returns.
-     * 
+     *
      * @param widthDecimal
      * @param dataType
      * @return
-     * 
+     *
      */
     // ywang (02-2009)
     public static StringBuffer validateWidthDecimalSetting(String widthDecimal, String dataType, boolean isCalculationItem, Locale locale) {

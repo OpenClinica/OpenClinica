@@ -80,7 +80,7 @@
 			<artifactId>spring-security-web</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>net.sourceforge.pjl-comp-filter</groupId>
 			<artifactId>pjl-comp-filter</artifactId>
@@ -136,8 +136,14 @@
 			<version>1.0</version>
 			<scope>compile</scope>
 		</dependency>
-		<!-- <dependency> <groupId>org.mockejb</groupId> <artifactId>mockejb</artifactId> 
+		<!-- <dependency> <groupId>org.mockejb</groupId> <artifactId>mockejb</artifactId>
 			<version>0.6-beta2</version> <scope>test</scope> </dependency> -->
+		<dependency>
+			<groupId>org.jmesa</groupId>
+			<artifactId>jmesa</artifactId>
+			<version>2.4.2</version>
+			<scope>compile</scope>
+		</dependency>
 		<!-- end servlet tests -->
 		<dependency>
 			<groupId>commons-beanutils</groupId>
@@ -225,7 +231,6 @@
 			<groupId>javax.servlet</groupId>
 			<artifactId>jstl</artifactId>
 			<version>1.1.2</version>
-			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
@@ -311,7 +316,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-                <version>2.3.1</version>
+				<version>2.3.1</version>
 				<executions>
 					<execution>
 						<goals>

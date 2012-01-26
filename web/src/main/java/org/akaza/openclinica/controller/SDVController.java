@@ -12,6 +12,7 @@ import org.akaza.openclinica.controller.helper.SdvFilterDataBean;
 import org.akaza.openclinica.controller.helper.table.SubjectSDVContainer;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
@@ -100,7 +101,7 @@ public class SDVController {
         }
         request.setAttribute("showMoreLink", showMoreLink+"");
         session.setAttribute("s_sdv_showMoreLink", showMoreLink+"");
-        
+
         request.setAttribute("studyId", studyId);
         String restore = (String)request.getAttribute("s_sdv_restore");
         restore = restore != null && restore.length()>0 ? restore : "false";
@@ -149,7 +150,7 @@ public class SDVController {
 
     @RequestMapping("/viewAllSubjectSDVtmp")
     public ModelMap viewAllSubjectHandler(HttpServletRequest request, @RequestParam("studyId") int studyId, HttpServletResponse response) {
-    
+
         if(!mayProceed(request)){
             try{
                 response.sendRedirect(request.getContextPath() + "/MainMenu?message=authentication_failed");
@@ -158,9 +159,9 @@ public class SDVController {
             }
             return null;
         }
-    ResourceBundleProvider.updateLocale(request.getLocale());
+    ResourceBundleProvider.updateLocale(LocaleResolver.getLocale(request));
         // Reseting the side info panel set by SecureControler Mantis Issue: 8680.
-        // Todo need something to reset panel from all the Spring Controllers 
+        // Todo need something to reset panel from all the Spring Controllers
         StudyInfoPanel panel = new StudyInfoPanel();
         panel.reset();
         HttpSession session = request.getSession();
@@ -330,7 +331,7 @@ public class SDVController {
     public String sdvOneCRFFormHandler(HttpServletRequest request, HttpServletResponse response, @RequestParam("crfId") int crfId,
             @RequestParam("redirection") String redirection, ModelMap model) {
 
-			
+
 			 if(!mayProceed(request)){
             try{
                 response.sendRedirect(request.getContextPath() + "/MainMenu?message=authentication_failed");
@@ -355,7 +356,7 @@ public class SDVController {
 
         }
         request.setAttribute("pageMessages", pageMessages);
-        
+
         request.setAttribute("sdv_restore", "true");
 
         //model.addAttribute("allParams",parameterMap);
@@ -526,13 +527,13 @@ public class SDVController {
         //Fix column titles
         HtmlTable table = (HtmlTable) tableFacade.getTable();
         //i18n caption; TODO: convert to Spring messages
-        ResourceBundle resourceBundle = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words", request.getLocale());
+        ResourceBundle resourceBundle = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words", LocaleResolver.getLocale(request));
 
         String[] allTitles =
-            { resourceBundle.getString("study_subject_ID"), resourceBundle.getString("person_ID"), resourceBundle.getString("secondary_ID"), 
-              resourceBundle.getString("event_name"), resourceBundle.getString("event_date"), resourceBundle.getString("enrollment_date"), 
+            { resourceBundle.getString("study_subject_ID"), resourceBundle.getString("person_ID"), resourceBundle.getString("secondary_ID"),
+              resourceBundle.getString("event_name"), resourceBundle.getString("event_date"), resourceBundle.getString("enrollment_date"),
               resourceBundle.getString("subject_status"),resourceBundle.getString("CRF_name")+" / "+resourceBundle.getString("version"),
-              resourceBundle.getString("CRF_status"),resourceBundle.getString("last_updated_date"), resourceBundle.getString("last_updated_by"), 
+              resourceBundle.getString("CRF_status"),resourceBundle.getString("last_updated_date"), resourceBundle.getString("last_updated_by"),
               resourceBundle.getString("SDV_status")+" / "+resourceBundle.getString("actions") };
 
         setTitles(allTitles, table);
@@ -585,9 +586,9 @@ public class SDVController {
         System.out.println("date = " + date);
 
     }
-	
+
 	 private boolean mayProceed(HttpServletRequest request) {
-        StudyUserRoleBean currentRole = (StudyUserRoleBean)request.getSession().getAttribute("userRole"); 
+        StudyUserRoleBean currentRole = (StudyUserRoleBean)request.getSession().getAttribute("userRole");
         Role r = currentRole.getRole();
 
         if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR) || r.equals(Role.MONITOR)) {

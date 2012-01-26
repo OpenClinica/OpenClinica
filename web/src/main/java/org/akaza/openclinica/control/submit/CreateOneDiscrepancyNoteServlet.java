@@ -12,24 +12,27 @@ import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.*;
+import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
-import org.akaza.openclinica.bean.submit.SectionBean;
-import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.EmailEngine;
-import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.*;
+import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
-import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
@@ -44,7 +47,7 @@ import javax.servlet.http.HttpSession;
 
 /**
  * Create a discrepancy note
- * 
+ *
  */
 public class CreateOneDiscrepancyNoteServlet extends SecureController {
 
@@ -71,13 +74,13 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.akaza.openclinica.control.core.SecureController#mayProceed()
      */
     @Override
     protected void mayProceed() throws InsufficientPermissionException {
         checkStudyLocked(Page.MENU_SERVLET, respage.getString("current_study_locked"));
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
 
         String exceptionName = resexception.getString("no_permission_to_create_discrepancy_note");
         String noAccessMessage = respage.getString("you_may_not_create_discrepancy_note") + respage.getString("change_study_contact_sysadmin");
@@ -108,7 +111,7 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
             logger.info("entityId is 0. Note saving can not be started.");
         }
         String entityType = fp.getString(ENTITY_TYPE, true);
-        
+
         FormDiscrepancyNotes noteTree = (FormDiscrepancyNotes) session.getAttribute(FORM_DISCREPANCY_NOTES_NAME);
         if (noteTree == null) {
             noteTree = new FormDiscrepancyNotes();
@@ -155,7 +158,7 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
             }
         }
         //
-        
+
 
         if (errors.isEmpty()) {
             HashMap<String, ArrayList<String>> results = new HashMap<String, ArrayList<String>>();
@@ -193,7 +196,7 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
             } else {
                 ypos = "0";
             }
-            
+
             dn = (DiscrepancyNoteBean)dndao.create(dn);
             boolean success = dn.getId()>0 ? true : false;
             if(success) {
@@ -202,7 +205,7 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
                 success = dndao.isQuerySuccessful();
                 if(success == false) {
                     mess.add(restext.getString("failed_create_dn_mapping_for_dnId") + dn.getId()+". ");
-                } 
+                }
                 noteTree.addNote(field, dn);
                 noteTree.addIdNote(dn.getEntityId(), field);
                 session.setAttribute(FORM_DISCREPANCY_NOTES_NAME, noteTree);
@@ -323,7 +326,7 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
                     sendEmail(alertEmail.trim(), EmailEngine.getAdminEmail(), MessageFormat.format(respage.getString("mailDNSubject"),study.getName(), dn.getEntityName()), emailBodyString, true, null,
                             null, true);
                 }
-                
+
                 String close = fp.getString("close"+parentId);
                 //session.setAttribute(CLOSE_WINDOW, "true".equals(close)?"true":"");
                 if("true".equals(close)) {
@@ -340,7 +343,7 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
                         addPageMessage(restext.getString("a_new_dn_thread_added"));
                     }
                 }
-                
+
             } else {
                 session.setAttribute(BOX_TO_SHOW, parentId+"");
             }
@@ -424,16 +427,16 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
         noteSubmitted.put(itemDataBeanId, Boolean.TRUE);
         session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, noteSubmitted);
     }
-    
+
     private String appendPageFileName(String origin, String parameterName, String parameterValue) {
         String parameter = parameterName + "=" + parameterValue;
         String[] a = origin.split("\\?");
-        if (a.length == 2) { 
+        if (a.length == 2) {
             if(("&"+a[1]).contains("&"+parameterName+"=")) {
                 String result = a[0]+"?";
                 String[] b = ("&"+a[1]).split("&"+parameterName+"=");
                 if(b.length==2) {
-                    result += b[0].substring(1) + "&" + parameter 
+                    result += b[0].substring(1) + "&" + parameter
                            + (b[1].contains("&") ? b[1].substring(b[1].indexOf("&")) : "");
                     return result;
                 } else if(b.length>2) {
@@ -445,7 +448,7 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
                     result += b[j].contains("&")?b[j].substring(b[j].indexOf("&")) : "";
                     return result;
                 }
-                
+
             } else {
                 return origin + "&" + parameter;
             }

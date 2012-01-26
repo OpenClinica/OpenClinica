@@ -4,7 +4,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/> 
+<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
@@ -35,14 +35,14 @@
 <script language="JavaScript">
 <!--
 function sendToPage() {
-	
+
 	var theUrl = "ExportDataset?datasetId=" + <c:out value="${dataset.id}"/>;
-	
+
 	var current = window.location+"";
-	
-	if (current.indexOf("CreateDataset") != -1) {	
-	   window.location=theUrl;	   
-	   
+
+	if (current.indexOf("CreateDataset") != -1) {
+	   window.location=theUrl;
+
 	}
 }
 
@@ -52,10 +52,11 @@ function sendToPage() {
 
     <link rel="stylesheet" type="text/css" media="all" href="includes/new_cal/skins/aqua/theme.css" title="Aqua" />
     <script type="text/javascript" src="includes/new_cal/calendar.js"></script>
+    <script type="text/javascript" src="includes/new_cal/lang/calendar-en.js"></script>
     <script type="text/javascript" src="includes/new_cal/lang/<fmt:message key="jscalendar_language_file" bundle="${resformat}"/>"></script>
     <script type="text/javascript" src="includes/new_cal/calendar-setup.js"></script>
 <!-- End -->
-    
+
 </head>
 
 <body onload="javascript:sendToPage()" class="background" topmargin="0" leftmargin="0" marginwidth="0" marginheight="0">

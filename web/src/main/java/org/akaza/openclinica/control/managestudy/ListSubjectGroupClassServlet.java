@@ -15,6 +15,7 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
@@ -27,9 +28,9 @@ import java.util.Locale;
 
 /**
  * Lists all the subject group classes in a study
- * 
+ *
  * @author jxu
- * 
+ *
  */
 public class ListSubjectGroupClassServlet extends SecureController {
 
@@ -43,7 +44,7 @@ public class ListSubjectGroupClassServlet extends SecureController {
     @Override
     public void mayProceed() throws InsufficientPermissionException {
 
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         // <
         // resexception=ResourceBundle.getBundle(
         // "org.akaza.openclinica.i18n.exceptions",locale);

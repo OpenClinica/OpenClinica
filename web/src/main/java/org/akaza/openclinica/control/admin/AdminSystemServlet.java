@@ -12,6 +12,7 @@ import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -90,7 +91,7 @@ public class AdminSystemServlet extends SecureController {
     @Override
     protected void mayProceed() throws InsufficientPermissionException {
 
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         // < resword =
         // ResourceBundle.getBundle("org.akaza.openclinica.i18n.words",locale);
         // <

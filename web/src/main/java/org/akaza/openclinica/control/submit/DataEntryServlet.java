@@ -7,27 +7,6 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
@@ -99,6 +78,7 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
 import org.akaza.openclinica.exception.OpenClinicaException;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.logic.expressionTree.ExpressionTreeHelper;
 import org.akaza.openclinica.logic.rulerunner.MessageContainer.MessageType;
@@ -113,6 +93,27 @@ import org.akaza.openclinica.view.form.FormBeanUtil;
 import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
 
 /**
  * @author ssachs
@@ -238,6 +239,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         }
     }
 
+    @Override
     public DataSource getDataSource(){
         return dataSource;
     }
@@ -249,7 +251,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
     protected abstract void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException;
 
     /*
-     * locale = request.getLocale(); //< resmessage = ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages" ,locale); //< restext =
+     * locale = LocaleResolver.getLocale(request); //< resmessage = ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages" ,locale); //< restext =
      * ResourceBundle.getBundle("org.akaza.openclinica.i18n.notes",locale); //< resexception =ResourceBundle.getBundle("org.akaza.openclinica.i18n.exceptions"
      * ,locale);
      */
@@ -279,9 +281,10 @@ public abstract class DataEntryServlet extends CoreSecureController {
     protected  void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         //JN:The following were the the global variables, moved as local.
+        locale = LocaleResolver.getLocale(request);
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
         SectionBean sb = (SectionBean)request.getAttribute(SECTION_BEAN);
-        ItemDataDAO iddao = new ItemDataDAO(getDataSource());
+        ItemDataDAO iddao = new ItemDataDAO(getDataSource(),locale);
         HttpSession session = request.getSession();
         StudyBean currentStudy =    (StudyBean) session.getAttribute("study");
         StudyUserRoleBean  currentRole = (StudyUserRoleBean) session.getAttribute("userRole");
@@ -301,7 +304,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
         FormProcessor fp = new FormProcessor(request);
         logMe("Enterting DataEntry Servlet"+System.currentTimeMillis());
         EventDefinitionCRFDAO  edcdao = new EventDefinitionCRFDAO(getDataSource());
-        locale = request.getLocale();
 
         FormDiscrepancyNotes discNotes;
 
@@ -312,8 +314,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
         //for 11958: repeating groups rows appear if validation returns to the same section
         int isFirstTimeOnSection =fp.getInt("isFirstTimeOnSection");
         request.setAttribute( "isFirstTimeOnSection",isFirstTimeOnSection+"");
-        
-        
+
+
         if (fp.getString(GO_EXIT).equals("") && !isSubmitted && fp.getString("tabId").equals("") && fp.getString("sectionId").equals("")) {
             //HashMap unavailableCRF = getUnavailableCRFList();
             if (getUnavailableCRFList().containsKey(ecb.getId())) {
@@ -2226,7 +2228,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
      * @throws Exception
      */
     private EventCRFBean createEventCRF(HttpServletRequest request, FormProcessor fp) throws InconsistentStateException {
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         // < resmessage =
         // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",
         // locale);
@@ -3278,6 +3280,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         DisplaySectionBean section = new DisplaySectionBean();
         FormProcessor fp = new FormProcessor(request);
         HttpSession session = request.getSession();
+        Locale loc = this.locale == null ? LocaleResolver.getLocale(request) : this.locale;
         StudyBean study = (StudyBean) session.getAttribute("study");
        SessionManager sm = (SessionManager)request.getSession().getAttribute("sm");
        EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
@@ -3353,7 +3356,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         // setup DAO's here to avoid creating too many objects
        ItemDAO idao = new ItemDAO(getDataSource());
        ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(getDataSource());
-       ItemDataDAO iddao = new ItemDataDAO(getDataSource());
+       ItemDataDAO iddao = new ItemDataDAO(getDataSource(), loc);
 
         // Use itemGroups to determine if there are any ungrouped items
 
@@ -3404,7 +3407,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         HttpSession session = request.getSession();
         StudyBean study = (StudyBean) session.getAttribute("study");
       SectionDAO  sdao = new SectionDAO(getDataSource());
-      ItemDataDAO iddao = new ItemDataDAO(getDataSource());
+      ItemDataDAO iddao = new ItemDataDAO(getDataSource(), locale);
        // ALL_SECTION_BEANS
         ArrayList<SectionBean> allSectionBeans = (ArrayList<SectionBean>)request.getAttribute(ALL_SECTION_BEANS);
 
@@ -3439,7 +3442,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
             // setup DAO's here to avoid creating too many objects
            ItemDAO idao = new ItemDAO(getDataSource());
            ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(getDataSource());
-            iddao = new ItemDataDAO(getDataSource());
+            iddao = new ItemDataDAO(getDataSource(),locale);
 
             // get all the display item beans
             ArrayList displayItems = getParentDisplayItems(false, sb, edcb, idao, ifmdao, iddao, false, request);
@@ -3609,7 +3612,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         int parentId = parent.getItem().getId();
         ItemDAO idao = new ItemDAO(getDataSource());
         ArrayList childItemBeans = idao.findAllByParentIdAndCRFVersionId(parentId, ecb.getCRFVersionId());
-        ItemDataDAO iddao = new ItemDataDAO(getDataSource());
+        ItemDataDAO iddao = new ItemDataDAO(getDataSource(),locale);
         ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(getDataSource());
         for (int i = 0; i < childItemBeans.size(); i++) {
             ItemBean child = (ItemBean) childItemBeans.get(i);
@@ -3971,13 +3974,13 @@ public abstract class DataEntryServlet extends CoreSecureController {
      */
 
    protected boolean markCRFComplete(HttpServletRequest request) throws Exception {
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         HttpSession session = request.getSession();
         UserAccountBean ub =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
         EventDefinitionCRFBean edcb = (EventDefinitionCRFBean)request.getAttribute(EVENT_DEF_CRF_BEAN);
         EventCRFDAO ecdao = new EventCRFDAO(getDataSource());
-        ItemDataDAO iddao = new ItemDataDAO(getDataSource());
+        ItemDataDAO iddao = new ItemDataDAO(getDataSource(),locale);
         // < respage =
         // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",
         // locale);
@@ -4198,7 +4201,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
         DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
         // need to update this method to accomodate dynamics, tbh
-        ItemDataDAO iddao = new ItemDataDAO(getDataSource());
+        ItemDataDAO iddao = new ItemDataDAO(getDataSource(),locale);
         ItemDAO idao = new ItemDAO(getDataSource());
         ItemFormMetadataDAO itemFormMetadataDao = new ItemFormMetadataDAO(getDataSource());
         int allRequiredNum = idao.findAllRequiredByCRFVersionId(ecb.getCRFVersionId());
@@ -4253,7 +4256,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
        SectionDAO sdao = new SectionDAO(getDataSource());
         ArrayList sections = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
         UserAccountBean ub =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
-        ItemDataDAO iddao = new ItemDataDAO(getDataSource());
+        ItemDataDAO iddao = new ItemDataDAO(getDataSource(),locale);
         ItemDAO idao = new ItemDAO(getDataSource());
         for (int i = 0; i < sections.size(); i++) {
             SectionBean sb = (SectionBean) sections.get(i);
@@ -4494,7 +4497,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         }
 
         if (hasItemGroup) {
-            ItemDataDAO iddao = new ItemDataDAO(getDataSource());
+            ItemDataDAO iddao = new ItemDataDAO(getDataSource(),locale);
             ArrayList data = iddao.findAllActiveBySectionIdAndEventCRFId(sb.getId(), ecb.getId());
             // BWP 12/2/07>> set a flag signaling to data entry JSPs that data
             // is involved
@@ -4641,7 +4644,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         // method returns null values as a List<String>
         nullValuesList = formBeanUtil.getNullValuesByEventCRFDefId(edcb.getId(), getDataSource());
         // >>BWP
-        ItemDataDAO iddao = new ItemDataDAO(getDataSource());
+        ItemDataDAO iddao = new ItemDataDAO(getDataSource(),locale);
         ArrayList data = iddao.findAllActiveBySectionIdAndEventCRFId(sb.getId(), ecb.getId());
         DisplayItemGroupBean itemGroup = itemWithGroup.getItemGroup();
         // to arrange item groups and other single items, the ordinal of
@@ -4853,7 +4856,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
     protected HashMap<String, String> prepareSectionItemDataBeans(int sectionId, HttpServletRequest request) {
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
         HashMap<String, String> scoreItemdata = new HashMap<String, String>();
-        ItemDataDAO iddao = new ItemDataDAO(getDataSource());
+        ItemDataDAO iddao = new ItemDataDAO(getDataSource(),locale);
         ArrayList<ItemDataBean> idbs = iddao.findAllActiveBySectionIdAndEventCRFId(sectionId, ecb.getId());
         for (ItemDataBean idb : idbs) {
             if (idb.getId() > 0) {
@@ -4870,7 +4873,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         HashMap<Integer, TreeSet<Integer>> ordinals = new HashMap<Integer, TreeSet<Integer>>();
         SectionDAO sdao = new SectionDAO(getDataSource());
         ArrayList<SectionBean> sbs = sdao.findAllByCRFVersionId(ecb.getCRFVersionId());
-        ItemDataDAO iddao = new ItemDataDAO(getDataSource());
+        ItemDataDAO iddao = new ItemDataDAO(getDataSource(),locale);
         for (SectionBean section : sbs) {
             ArrayList<ItemDataBean> idbs = iddao.findAllActiveBySectionIdAndEventCRFId(section.getId(), ecb.getId());
             if (idbs != null && idbs.size() > 0) {
@@ -4897,7 +4900,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
     protected HashMap<Integer, Integer> prepareGroupSizes(HashMap<String, ItemBean> scoreItems, HttpServletRequest request) {
         HashMap<Integer, Integer> groupSizes = new HashMap<Integer, Integer>();
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
-        ItemDataDAO iddao = new ItemDataDAO(getDataSource());
+        ItemDataDAO iddao = new ItemDataDAO(getDataSource(),locale);
         SectionDAO sdao = new SectionDAO(getDataSource());
         Iterator iter = scoreItems.keySet().iterator();
         while (iter.hasNext()) {
@@ -4922,7 +4925,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
     protected HashMap<Integer, String> prepareSectionItemdata(int sectionId, HttpServletRequest request) {
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
-        ItemDataDAO iddao = new ItemDataDAO(getDataSource());
+        ItemDataDAO iddao = new ItemDataDAO(getDataSource(),locale);
         HashMap<Integer, String> itemdata = new HashMap<Integer, String>();
         ArrayList<ItemDataBean> idbs = iddao.findAllActiveBySectionIdAndEventCRFId(sectionId, ecb.getId());
         for (ItemDataBean idb : idbs) {

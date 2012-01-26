@@ -30,6 +30,8 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.i18n.util.I18nFormatUtil;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.jmesa.core.filter.MatcherKey;
 import org.jmesa.facade.TableFacade;
@@ -259,7 +261,7 @@ public class SDVUtil {
         tableFacade.setItems(items);
          */
     }
-    
+
     private void updateLimitRowSelect(TableFacade tableFacade, HttpServletRequest request) {
         Limit limit = tableFacade.getLimit();
         String p = request.getParameter(limit.getId()+"_p_");
@@ -307,7 +309,7 @@ public class SDVUtil {
         List<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();
         /*
         StudyEventDAO studyEventDAO = new StudyEventDAO(dataSource);
-        
+
         StudyDAO studyDAO = new StudyDAO(dataSource);
         StudyBean studyBean = (StudyBean) studyDAO.findByPK(studyId);
 
@@ -434,7 +436,7 @@ public class SDVUtil {
     /*
     private int getTotalRowCount(FilterSet filterSet, int studyId) {
 
-       
+
         EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
 
         if (filterSet.getFilters().size() == 0) {
@@ -587,7 +589,7 @@ public class SDVUtil {
         HtmlTable table = (HtmlTable) tableFacade.getTable();
         //i18n caption; TODO: convert to Spring messages
         ResourceBundle resourceBundle = ResourceBundle.getBundle(
-          "org.akaza.openclinica.i18n.words",request.getLocale());
+          "org.akaza.openclinica.i18n.words",LocaleResolver.getLocale(request));
 
         String[] allTitles = {"Study Subject Id","Person Id","Secondary Id" ,"Event Name",
           "Event Date","Enrollment Date","Subject Status","CRF Name / Version","CRF Status",
@@ -610,7 +612,7 @@ public class SDVUtil {
         boolean showMoreLink = Boolean.parseBoolean(request.getAttribute("showMoreLink")==null?"false":request.getAttribute("showMoreLink").toString());
         TableFacade tableFacade = createTableFacade("sdv", request);
         tableFacade.setStateAttr("sdv_restore");
-        resformat = ResourceBundleProvider.getFormatBundle(request.getLocale());
+        resformat = ResourceBundleProvider.getFormatBundle(LocaleResolver.getLocale(request));
         this.pathPrefix = pathPrefix;
 
         String[] allColumns =
@@ -642,7 +644,7 @@ public class SDVUtil {
         crfStatus.getFilterRenderer().setFilterEditor(new CrfStatusFilter());
 
         HtmlColumn actions = row.getColumn("sdvStatusActions");
-        actions.getFilterRenderer().setFilterEditor(new DefaultActionsEditor(request.getLocale()));
+        actions.getFilterRenderer().setFilterEditor(new DefaultActionsEditor(LocaleResolver.getLocale(request)));
 
         HtmlColumn sdvStatus = row.getColumn("sdvStatus");
         sdvStatus.getFilterRenderer().setFilterEditor(new SdvStatusFilter());
@@ -667,12 +669,12 @@ public class SDVUtil {
         // if(totalRowCount > 0){
         sDVToolbar.setMaxRowsIncrements(new int[] { 15, 25, 50 });
         tableFacade.setToolbar(sDVToolbar);
-        tableFacade.setView(new SDVView(request.getLocale(), request));
+        tableFacade.setView(new SDVView(LocaleResolver.getLocale(request), request));
 
         //Fix column titles
         HtmlTable table = (HtmlTable) tableFacade.getTable();
         //i18n caption; TODO: convert to Spring messages
-        ResourceBundle resword = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words",request.getLocale());
+        ResourceBundle resword = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words",LocaleResolver.getLocale(request));
 
         String[] allTitles =
         { resword.getString("SDV_status"), resword.getString("study_subject_ID"), resword.getString("site_id"), resword.getString("person_ID"), resword.getString("secondary_ID"), resword.getString("event_name"), resword.getString("event_date"), resword.getString("enrollment_date"), resword.getString("subject_status"),
@@ -746,7 +748,7 @@ public class SDVUtil {
         //Fix column titles
         HtmlTable table = (HtmlTable) tableFacade.getTable();
         //i18n caption; TODO: convert to Spring messages
-        ResourceBundle resword = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words",request.getLocale());
+        ResourceBundle resword = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words",LocaleResolver.getLocale(request));
 
         String[] allTitles =
         {  resword.getString("study_subject_ID"), resword.getString("site_id"), resword.getString("person_ID"), resword.getString("secondary_ID"), resword.getString("event_name"), resword.getString("event_date"), resword.getString("enrollment_date"), resword.getString("subject_status"),
@@ -757,7 +759,7 @@ public class SDVUtil {
         //format column dates
         formatColumns(table, new String[] { "eventDate", "enrollmentDate", "lastUpdatedDate" }, request);
 
-        
+
         table.getTableRenderer().setWidth("800");
         return tableFacade.render();
     }
@@ -804,7 +806,7 @@ public class SDVUtil {
 
         Locale locale = ResourceBundleProvider.localeMap.get(Thread.currentThread());
         if (locale == null) {
-            ResourceBundleProvider.updateLocale(request.getLocale());
+            ResourceBundleProvider.updateLocale(LocaleResolver.getLocale(request));
         }
         ResourceBundle bundle = ResourceBundleProvider.getFormatBundle();
         String format = bundle.getString("date_time_format_string");
@@ -892,8 +894,8 @@ public class SDVUtil {
             tempSDVBean.setStudyEventStatus(studyEventBean.getStatus().getName());
 
             //TODO: I18N Date must be formatted properly
-            String pattern = getDateFormat();
-            SimpleDateFormat sdformat = new SimpleDateFormat(pattern);
+            Locale locale = LocaleResolver.getLocale(request);
+            SimpleDateFormat sdformat = I18nFormatUtil.getDateFormat(locale);
 
             if (studySubjectBean.getEnrollmentDate() != null) {
                 tempSDVBean.setEnrollmentDate(sdformat.format(studySubjectBean.getEnrollmentDate()));
@@ -1206,7 +1208,7 @@ public class SDVUtil {
         //Fix column titles
         HtmlTable table = (HtmlTable) tableFacade.getTable();
         //i18n caption; TODO: convert to Spring messages
-        ResourceBundle resword = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words", request.getLocale());
+        ResourceBundle resword = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words", LocaleResolver.getLocale(request));
 
         String[] allTitles = { resword.getString("study_subject_ID"), resword.getString("study_subject_status"), resword.getString("num_CRFs_SDV"), resword.getString("porc_CRFs_SDV"), resword.getString("group") };
 
@@ -1446,23 +1448,23 @@ public class SDVUtil {
             HtmlSnippets snippets = getHtmlSnippets();
             HtmlBuilder html = new HtmlBuilder();
             html.append(snippets.themeStart());
-            
+
             html.append(snippets.tableStart());
-          
+
             html.append(snippets.theadStart());
            // html.append(snippets.tableStart());
             html.append(customHeader());
             html.append(snippets.toolbar());
             html.append(selectAll());
-          
+
             html.append(snippets.header());
             html.append(snippets.filter());
-          
-            
+
+
             html.append(snippets.tbodyStart());
-          
+
             html.append(snippets.body());
-            
+
             html.append(snippets.theadEnd());
             html.append(snippets.footer());
             html.append(snippets.statusBar());
@@ -1489,10 +1491,10 @@ public class SDVUtil {
         	if(showTitle)
         	{
         	HtmlBuilder html = new HtmlBuilder();
-	        
+
         	 html.tr(0).styleClass("header").width("100%").close();
 	        html.td(0).colspan("100%").style("border-bottom: 1px solid white;background-color:white;color:black;font-size:12px;").align("left").close().append(resword.getString("source_data_verification")).tdEnd().trEnd(0);
-	        
+
 
 	        return html.toString();
         	}
@@ -1507,8 +1509,8 @@ public class SDVUtil {
             return ItemUtils.getItemValue(item, property);
         }
     }
-    
-    
-    
+
+
+
 
 }

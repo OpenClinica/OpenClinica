@@ -4,7 +4,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 
-<fmt:setLocale value="${localeString}"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
@@ -153,7 +152,7 @@
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="protocol_verification" bundle="${resword}"/>:</td><td class="table_cell">
   <fmt:formatDate value="${siteToView.protocolDateVerification}" pattern="${dteFormat}"/>
-  </td></tr> 
+  </td></tr>
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="start_date" bundle="${resword}"/>:</td><td class="table_cell">
   <fmt:formatDate value="${siteToView.datePlannedStart}" pattern="${dteFormat}"/>&nbsp;
@@ -612,7 +611,7 @@
 <br><br>
     <c:choose>
         <c:when test="${userBean.sysAdmin}">
-            <input type="button" onclick="confirmExit('ListSite');"  name="cancel" value="<fmt:message key="exit" bundle="${resword}"/>   " class="button_medium"/>    
+            <input type="button" onclick="confirmExit('ListSite');"  name="cancel" value="<fmt:message key="exit" bundle="${resword}"/>   " class="button_medium"/>
         </c:when>
         <c:otherwise>
             <input type="button" onclick="goBack();" name="cancel" value="<fmt:message key="exit" bundle="${resword}"/>   " class="button_medium"/>
@@ -624,7 +623,7 @@
 <br>
  <c:choose>
   <c:when test="${fromListSite=='yes'}">
-   <p><a href="#" onClick="history.go(-1)"><fmt:message key="go_back_to_site_list" bundle="${resword}"/></a></p>   
+   <p><a href="#" onClick="history.go(-1)"><fmt:message key="go_back_to_site_list" bundle="${resword}"/></a></p>
   </c:when>
   <c:otherwise>
     <c:choose>

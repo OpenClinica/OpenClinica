@@ -18,6 +18,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -45,7 +46,7 @@ public class Utils {
 
     /**
      * This Method will compare the two Dates and return a String with number of years , weeks and days.
-     * 
+     *
      * @author Krikor Krumlian 10/20/2006
      * @param eventStartDate
      *            The event start date
@@ -117,21 +118,39 @@ public class Utils {
 
     /**
      * Convert string with from_pattern to string with to_pattern.
-     * SimpleDateFormat uses the default locale.
-     * 
-     * @param value
+     * Use SimpleDateFormat with no Locale parameter.
+     *
+     * @param itemValue
+     * @param from_pattern
+     * @param to_pattern
      * @return
-     * 
      */
-    //ywang 12-06-2007
     public static String convertedItemDateValue(String itemValue, String from_pattern, String to_pattern) {
+        return resolveItemDateValue(itemValue, from_pattern, to_pattern, null);
+    }
+
+    public static String convertedItemDateValue(String itemValue, String from_pattern, String to_pattern,
+            Locale locale) {
+        return resolveItemDateValue(itemValue, from_pattern, to_pattern, locale);
+    }
+
+    private static String resolveItemDateValue(String itemValue,
+            String from_pattern, String to_pattern, Locale locale) {
+        SimpleDateFormat sdf_from;
+        SimpleDateFormat sdf_to;
+        if(locale == null) {
+            sdf_from = new SimpleDateFormat(from_pattern);
+            sdf_to = new SimpleDateFormat(to_pattern);
+        } else {
+            sdf_from = new SimpleDateFormat(from_pattern, locale);
+            sdf_to = new SimpleDateFormat(to_pattern, locale);
+        }
         String temp = itemValue == null ? null : itemValue.trim();
-        if (itemValue != null && temp.length() > 4 && temp.length() == from_pattern.length()) {
-            SimpleDateFormat sdf = new SimpleDateFormat(from_pattern);
-            sdf.setLenient(false);
+        if (itemValue != null && temp.length() > 4) {
+            sdf_from.setLenient(false);
             try {
-                java.util.Date date = sdf.parse(itemValue);
-                return new SimpleDateFormat(to_pattern).format(date);
+                java.util.Date date = sdf_from.parse(itemValue);
+                return sdf_to.format(date);
             } catch (ParseException fe) {
                 return itemValue;
             }
@@ -142,13 +161,12 @@ public class Utils {
 
     /**
      * Zip StringBuffer to a file
-     * 
+     *
      * @param fileName
      * @param filePath
      * @param content
-     * 
+     *
      */
-    //ywang (07-2008)
     public static boolean createZipFile(String fileName, String filePath, StringBuffer content) {
         try {
             File dir = new File(filePath);
@@ -170,7 +188,7 @@ public class Utils {
 
     /**
      * age = the_year_of_controlDate - the_year_of_birthDate
-     * 
+     *
      * @param birthDate
      * @param controlDate
      * @return

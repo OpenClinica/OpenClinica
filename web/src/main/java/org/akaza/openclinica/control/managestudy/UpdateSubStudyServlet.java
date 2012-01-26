@@ -29,13 +29,12 @@ import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
 /**
  * @author jxu
- * 
+ *
  * @version CVS: $Id: UpdateSubStudyServlet.java,v 1.7 2005/07/05 21:55:58 jxu
  *          Exp $
  */
@@ -80,16 +79,13 @@ public class UpdateSubStudyServlet extends SecureController {
             FormProcessor fp = new FormProcessor(request);
             logger.info("start date:" + study.getDatePlannedEnd());
             if (study.getDatePlannedEnd() != null) {
-                fp.addPresetValue(INPUT_END_DATE, 
-                        new SimpleDateFormat(resformat.getString("date_format_string"),SecureController.getFormat_locale()).format(study.getDatePlannedEnd()));
+                fp.addPresetValue(INPUT_END_DATE, local_df.format(study.getDatePlannedEnd()));
             }
             if (study.getDatePlannedStart() != null) {
-                fp.addPresetValue(INPUT_START_DATE, 
-                        new SimpleDateFormat(resformat.getString("date_format_string"),SecureController.getFormat_locale()).format(study.getDatePlannedStart()));
+                fp.addPresetValue(INPUT_START_DATE, local_df.format(study.getDatePlannedStart()));
             }
             if (study.getProtocolDateVerification() != null) {
-                fp.addPresetValue(INPUT_VER_DATE, 
-                        new SimpleDateFormat(resformat.getString("date_format_string"),SecureController.getFormat_locale()).format(study.getProtocolDateVerification()));
+                fp.addPresetValue(INPUT_VER_DATE, local_df.format(study.getProtocolDateVerification()));
             }
 
             setPresetValues(fp.getPresetValues());
@@ -107,7 +103,7 @@ public class UpdateSubStudyServlet extends SecureController {
 
     /**
      * Validates the first section of study and save it into study bean * *
-     * 
+     *
      * @param request
      * @param response
      * @throws Exception
@@ -122,13 +118,13 @@ public class UpdateSubStudyServlet extends SecureController {
         // << tbh, #3943, 07/2009
         v.addValidation("prinInvestigator", Validator.NO_BLANKS);
         if (!StringUtil.isBlank(fp.getString(INPUT_START_DATE))) {
-            v.addValidation(INPUT_START_DATE, Validator.IS_A_LOCALE_DATE);
+            v.addValidation(INPUT_START_DATE, Validator.IS_A_DATE);
         }
         if (!StringUtil.isBlank(fp.getString(INPUT_END_DATE))) {
-            v.addValidation(INPUT_END_DATE, Validator.IS_A_LOCALE_DATE);
+            v.addValidation(INPUT_END_DATE, Validator.IS_A_DATE);
         }
         if (!StringUtil.isBlank(fp.getString(INPUT_VER_DATE))) {
-            v.addValidation(INPUT_VER_DATE, Validator.IS_A_LOCALE_DATE);
+            v.addValidation(INPUT_VER_DATE, Validator.IS_A_DATE);
         }
         if (!StringUtil.isBlank(fp.getString("facConEmail"))) {
             v.addValidation("facConEmail", Validator.IS_A_EMAIL);
@@ -230,7 +226,7 @@ public class UpdateSubStudyServlet extends SecureController {
 
     /**
      * Constructs study bean from reques * *
-     * 
+     *
      * @param request
      * @return
      */
@@ -244,9 +240,18 @@ public class UpdateSubStudyServlet extends SecureController {
         study.setPrincipalInvestigator(fp.getString("prinInvestigator"));
         study.setExpectedTotalEnrollment(fp.getInt("expectedTotalEnrollment"));
 
-        study.setDatePlannedStart(fp.getDate("startDate", SecureController.getFormat_locale()));
-        study.setDatePlannedEnd(fp.getDate("endDate", SecureController.getFormat_locale()));
-        study.setProtocolDateVerification(fp.getDate(INPUT_VER_DATE, SecureController.getFormat_locale()));
+        if(!StringUtil.isBlank(fp.getString("startDate")))
+            study.setDatePlannedStart(fp.getDate("startDate"));
+        else
+            study.setDatePlannedStart(null);
+        if(!StringUtil.isBlank(fp.getString("endDate")))
+            study.setDatePlannedEnd(fp.getDate("endDate"));
+        else
+            study.setDatePlannedEnd(null);
+        if(!StringUtil.isBlank(fp.getString(INPUT_VER_DATE)))
+            study.setProtocolDateVerification(fp.getDate(INPUT_VER_DATE));
+        else
+            study.setProtocolDateVerification(null);
 
         study.setFacilityCity(fp.getString("facCity"));
         study.setFacilityContactDegree(fp.getString("facConDrgree"));

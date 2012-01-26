@@ -161,7 +161,7 @@ public class ViewCRFServlet extends SecureController {
         HtmlTable table = (HtmlTable) tableFacade.getTable();
         //i18n caption; TODO: convert to Spring messages
         /*
-        ResourceBundle resourceBundle = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words", request.getLocale());
+        ResourceBundle resourceBundle = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words", LocaleResolver.getLocale(request));
         String captionText = resourceBundle.getString("studies_using_crf");
         if (captionText == null || "".equalsIgnoreCase(captionText)) {
             captionText = "Studies Using this CRF for Data Entry";

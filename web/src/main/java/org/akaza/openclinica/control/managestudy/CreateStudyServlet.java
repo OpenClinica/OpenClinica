@@ -37,11 +37,11 @@ import java.util.Locale;
 
 /**
  * Processes request to create a new study
- * 
+ *
  * @author jxu
  * @version CVS: $Id: CreateStudyServlet.java 10644 2008-01-27 17:23:31Z
  *          thickerson $
- * 
+ *
  */
 public class CreateStudyServlet extends SecureController {
     public static final String INPUT_START_DATE = "startDate";
@@ -184,37 +184,37 @@ public class CreateStudyServlet extends SecureController {
      * facRecruitStatusMap.put("Completed", "Completed");
      * facRecruitStatusMap.put("Suspended", "Suspended");
      * facRecruitStatusMap.put("Terminated", "Terminated");
-     * 
+     *
      * studyPhaseMap.put("N/A", "N/A"); studyPhaseMap.put("Phase I", "Phase I");
      * studyPhaseMap.put("Phase I/Phase II", "Phase I/Phase II");
      * studyPhaseMap.put("Phase II", "Phase II"); studyPhaseMap.put("Phase
      * II/Phase III", "Phase II/Phase III"); studyPhaseMap.put("Phase III",
      * "Phase III"); studyPhaseMap.put("Phase III/Phase IV", "Phase III/Phase
      * IV"); studyPhaseMap.put("Phase IV", "Phase IV");
-     * 
+     *
      * interPurposeMap.put("Treatment", "Treatment");
      * interPurposeMap.put("Prevention", "Prevention");
      * interPurposeMap.put("Diagnosis", "Diagnosis");
      * interPurposeMap.put("Educational/Counseling/Training",
      * "Educational/Counseling/Training");
-     * 
+     *
      * allocationMap.put("Randomized Clinical Trial", "Randomized Clinical
      * Trial"); allocationMap.put("Nonrandomized Trial", "Nonrandomized Trial");
-     * 
+     *
      * maskingMap.put("Open", "Open"); maskingMap.put("Single Blind", "Single
      * Blind"); maskingMap.put("Double Blind", "Double Blind");
-     * 
+     *
      * controlMap.put("Placebo", "Placebo"); controlMap.put("Active", "Active");
      * controlMap.put("Uncontrolled", "Uncontrolled");
      * controlMap.put("Historical", "Historical"); controlMap.put("Dose
      * Comparison", "Dose Comparison");
-     * 
+     *
      * assignmentMap.put("Single Group", "Single Group");
      * assignmentMap.put("Parallel", "Parallel");
      * assignmentMap.put("Cross-over", "Cross-over");
      * assignmentMap.put("Factorial", "Factorial"); assignmentMap.put("Expanded
      * Access", "Expanded Access");
-     * 
+     *
      * endpointMap.put("Safety", "Safety"); endpointMap.put("Efficacy",
      * "Efficacy"); endpointMap.put("Safety/Efficacy", "Safety/Efficacy");
      * endpointMap.put("Bio-equivalence", "Bio-equivalence");
@@ -223,22 +223,22 @@ public class CreateStudyServlet extends SecureController {
      * endpointMap.put("Pharmacodynamics", "Pharmacodynamics");
      * endpointMap.put("Pharmacokinetics/Pharmacodynamics",
      * "Pharmacokinetics/Pharmacodynamics");
-     * 
+     *
      * interTypeMap.put("Drug", "Drug"); interTypeMap.put("Gene Transfer", "Gene
      * Transfer"); interTypeMap.put("Vaccine", "Vaccine");
      * interTypeMap.put("Behavior", "Behavior"); interTypeMap.put("Device",
      * "Device"); interTypeMap.put("Procedure", "Procedure");
      * interTypeMap.put("Other", "Other");
-     * 
+     *
      * obserPurposeMap.put("Natural History", "Natural History");
      * obserPurposeMap.put("Screening", "Screening");
      * obserPurposeMap.put("Psychosocial", "Psychosocial");
-     * 
+     *
      * selectionMap.put("Convenience Sample", "Convenience Sample");
      * selectionMap.put("Defined Population", "Defined Population");
      * selectionMap.put("Random Sample", "Random Sample");
      * selectionMap.put("Case Control", "Case Control");
-     * 
+     *
      * timingMap.put("Retrospective", "Retrospective");
      * timingMap.put("Prospective", "Prospective"); }
      */
@@ -358,7 +358,7 @@ public class CreateStudyServlet extends SecureController {
 
     /**
      * Validates the first section of study and save it into study bean
-     * 
+     *
      * @param request
      * @param response
      * @throws Exception
@@ -482,7 +482,7 @@ public class CreateStudyServlet extends SecureController {
 
     /**
      * Validates the second section of study info inputs
-     * 
+     *
      * @throws Exception
      */
     private void confirmStudy2() throws Exception {
@@ -544,7 +544,7 @@ public class CreateStudyServlet extends SecureController {
 
     /**
      * Confirms the third section of study info inputs
-     * 
+     *
      * @throws Exception
      */
     private void confirmStudy3() throws Exception {
@@ -600,7 +600,7 @@ public class CreateStudyServlet extends SecureController {
 
     /**
      * Validates the forth section of study and save it into study bean
-     * 
+     *
      * @param request
      * @param response
      * @throws Exception
@@ -655,7 +655,7 @@ public class CreateStudyServlet extends SecureController {
 
     /**
      * Validates the forth section of study and save it into study bean
-     * 
+     *
      * @param request
      * @param response
      * @throws Exception
@@ -704,7 +704,7 @@ public class CreateStudyServlet extends SecureController {
 
     /**
      * Lets user confirm all the study info entries input
-     * 
+     *
      * @throws Exception
      */
     private void confirmStudy6() throws Exception {
@@ -742,7 +742,7 @@ public class CreateStudyServlet extends SecureController {
 
     /**
      * Lets user confirm all the study info entries input
-     * 
+     *
      * @throws Exception
      */
     private void confirmWholeStudy() throws Exception {
@@ -790,7 +790,7 @@ public class CreateStudyServlet extends SecureController {
 
     /**
      * Inserts the new study into database
-     * 
+     *
      */
     private void submitStudy() {
         StudyDAO sdao = new StudyDAO(sm.getDataSource());
@@ -873,7 +873,7 @@ public class CreateStudyServlet extends SecureController {
 
     /**
      * Constructs study bean from the first section
-     * 
+     *
      * @param request
      * @return
      */
@@ -899,7 +899,7 @@ public class CreateStudyServlet extends SecureController {
 
     /**
      * Updates the study bean with inputs from the second section
-     * 
+     *
      * @param request
      * @return true if study type is Interventional, otherwise false
      */
@@ -943,7 +943,7 @@ public class CreateStudyServlet extends SecureController {
 
     /**
      * Updates the study bean with inputs from the third section
-     * 
+     *
      * @param isInterventional
      *            if the study type is internventional
      */
@@ -987,7 +987,7 @@ public class CreateStudyServlet extends SecureController {
 
     /**
      * Sets map in request for different JSP pages
-     * 
+     *
      * @param request
      * @param isInterventional
      */
@@ -1013,10 +1013,8 @@ public class CreateStudyServlet extends SecureController {
 
     }
 
-    // it´s not necessary its use.
+    // itï¿½s not necessary its use.
     private void updateMaps() {
-        // < ResourceBundleresadmin =
-        // ResourceBundleProvider.getAdminBundle(request.getLocale());
         if (current_maps_locale != resadmin.getLocale()) {
             current_maps_locale = resadmin.getLocale();
             facRecruitStatusMap.put("not_yet_recruiting", resadmin.getString("not_yet_recruiting"));

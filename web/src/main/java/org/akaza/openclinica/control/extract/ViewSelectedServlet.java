@@ -20,6 +20,7 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -29,7 +30,7 @@ import java.util.Locale;
 
 /**
  * @author jxu
- * 
+ *
  * Views selected items for creating dataset, aslo allow user to de-select or
  * select all items in a study
  */
@@ -42,7 +43,7 @@ public class ViewSelectedServlet extends SecureController {
     @Override
     public void mayProceed() throws InsufficientPermissionException {
 
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         // < restext =
         // ResourceBundle.getBundle("org.akaza.openclinica.i18n.notes",locale);
         // < respage =

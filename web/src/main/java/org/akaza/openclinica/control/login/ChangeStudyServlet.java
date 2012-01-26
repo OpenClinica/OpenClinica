@@ -36,6 +36,7 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
@@ -73,7 +74,7 @@ public class ChangeStudyServlet extends SecureController {
     @Override
     public void mayProceed() throws InsufficientPermissionException {
 
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         // < restext =
         // ResourceBundle.getBundle("org.akaza.openclinica.i18n.notes",locale);
 
@@ -106,7 +107,7 @@ public class ChangeStudyServlet extends SecureController {
             validStudies.add(sr);
         }
 
-        
+
         if (StringUtil.isBlank(action)) {
             request.setAttribute("studies", validStudies);
 
@@ -145,11 +146,11 @@ public class ChangeStudyServlet extends SecureController {
                     request.setAttribute("currentStudy", currentStudy);
                     forwardPage(Page.CHANGE_STUDY_CONFIRM);
                     return;
-                    
+
                 }
             }
             addPageMessage(restext.getString("no_study_selected"));
-            
+
             forwardPage(Page.CHANGE_STUDY);
         }
     }

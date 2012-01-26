@@ -32,7 +32,7 @@ import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
-import java.text.SimpleDateFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -67,7 +67,7 @@ public class UpdateStudySubjectServlet extends SecureController {
         SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
         FormProcessor fp = new FormProcessor(request);
-        
+
         String fromResolvingNotes = fp.getString("fromResolvingNotes",true);
         if (StringUtil.isBlank(fromResolvingNotes)) {
             session.removeAttribute(ViewNotesServlet.WIN_LOCATION);
@@ -75,7 +75,7 @@ public class UpdateStudySubjectServlet extends SecureController {
             checkStudyLocked(Page.LIST_STUDY_SUBJECTS_SERVLET, respage.getString("current_study_locked"));
             checkStudyFrozen(Page.LIST_STUDY_SUBJECTS_SERVLET, respage.getString("current_study_frozen"));
         }
-        
+
         int studySubId = fp.getInt("id", true);// studySubjectId
 
         if (studySubId == 0) {
@@ -133,9 +133,8 @@ public class UpdateStudySubjectServlet extends SecureController {
 
                 session.setAttribute("studySub", sub);
                 // below added tbh 092007
-                //String enrollDateStr = local_df.format(sub.getEnrollmentDate());
-                String enrollDateStr = 
-                    new SimpleDateFormat(resformat.getString("date_format_string"),SecureController.getFormat_locale()).format(sub.getEnrollmentDate());
+                String enrollDateStr = sub.getEnrollmentDate()!=null ?
+                    local_df.format(sub.getEnrollmentDate()) : "";
                 session.setAttribute("enrollDateStr", enrollDateStr);
                 // above added tbh 092007
                 discNotes = new FormDiscrepancyNotes();
@@ -225,7 +224,7 @@ public class UpdateStudySubjectServlet extends SecureController {
 
             String eDateString = fp.getString("enrollmentDate");
             if (!StringUtil.isBlank(eDateString)) {
-                v.addValidation("enrollmentDate", Validator.IS_A_LOCALE_DATE);
+                v.addValidation("enrollmentDate", Validator.IS_A_DATE);
                 v.alwaysExecuteLastValidation("enrollmentDate");
             }
 
@@ -249,23 +248,22 @@ public class UpdateStudySubjectServlet extends SecureController {
             sub.setLabel(fp.getString("label"));
             sub.setSecondaryLabel(fp.getString("secondaryLabel"));
 
-            /*
             try {
                 local_df.setLenient(false);
                 if (!StringUtil.isBlank(eDateString)) {
                     enrollDate = local_df.parse(eDateString);
+                } else {
+                    enrollDate = null;
                 }
             } catch (ParseException fe) {
-
+                logger.info("Enrollment Date cannot be parsed.");
             }
-            */
-            enrollDate = new SimpleDateFormat(resformat.getString("date_format_string"),SecureController.getFormat_locale()).parse(eDateString);
             sub.setEnrollmentDate(enrollDate);
 
         }
 
         // below added tbh 092007, fix for YY vs YYYY formatting
-        String enrollDateStr = local_df.format(enrollDate);
+        String enrollDateStr = enrollDate != null ? local_df.format(enrollDate) : "";
 
         session.setAttribute("enrollDateStr", enrollDateStr);
         // above added tbh 092007

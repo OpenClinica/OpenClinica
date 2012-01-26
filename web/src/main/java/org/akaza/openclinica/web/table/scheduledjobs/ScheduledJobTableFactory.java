@@ -1,20 +1,11 @@
 package org.akaza.openclinica.web.table.scheduledjobs;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
-import org.akaza.openclinica.controller.helper.table.SubjectAggregateContainer;
 import org.akaza.openclinica.dao.ScheduledJobSort;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
-import org.akaza.openclinica.web.table.sdv.SdvStatusFilter;
 import org.jmesa.facade.TableFacade;
 import org.jmesa.limit.Limit;
 import org.jmesa.limit.Sort;
@@ -23,13 +14,16 @@ import org.jmesa.view.component.Row;
 import org.jmesa.view.html.AbstractHtmlView;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.HtmlSnippets;
-import org.jmesa.view.html.component.HtmlColumnImpl;
-import org.jmesa.view.html.component.HtmlRow;
 import org.jmesa.view.html.component.HtmlTable;
-import org.quartz.JobExecutionContext;
-import org.quartz.impl.StdScheduler;
-import org.jmesa.view.html.component.HtmlColumn;
 import org.jmesa.web.WebContext;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 /**
  * View builder for the list of scheduled jobs with an ability to cancel the job
  * @author jnyayapathi
@@ -62,7 +56,7 @@ public class ScheduledJobTableFactory extends AbstractTableFactory {
 //       HtmlColumn sdvStatus = ((HtmlRow) row).getColumn("checkbox");
 //       sdvStatus.getFilterRenderer().setFilterEditor(new SdvStatusFilter());
         sdvUtil.setHtmlCellEditors(tableFacade, new String[] { "action" }, false);
-        
+
         configureColumn(row.getColumn("action"), "Actions", sdvUtil.getCellEditorNoEscapes(), new DefaultActionsEditor(locale), true, false);
 
     }
@@ -71,7 +65,7 @@ public class ScheduledJobTableFactory extends AbstractTableFactory {
  */
     @Override
     public TableFacade createTable(HttpServletRequest request, HttpServletResponse response) {
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         TableFacade tableFacade = getTableFacadeImpl(request, response);
         tableFacade.setStateAttr("restore");
         int maxJobs = (Integer) request.getAttribute("totalJobs");

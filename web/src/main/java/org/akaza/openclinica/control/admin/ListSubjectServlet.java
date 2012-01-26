@@ -12,6 +12,7 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -19,7 +20,7 @@ import java.util.Locale;
 
 /**
  * Processes user request and generate subject list
- * 
+ *
  * @author jxu
  */
 public class ListSubjectServlet extends SecureController {
@@ -31,7 +32,7 @@ public class ListSubjectServlet extends SecureController {
     @Override
     public void mayProceed() throws InsufficientPermissionException {
 
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
 
         if (ub.isSysAdmin()) {
             return;
@@ -56,7 +57,7 @@ public class ListSubjectServlet extends SecureController {
         factory.setUserAccountDao(uadao);
         factory.setStudyDao(studyDao);
         factory.setCurrentStudy(currentStudy);
-        
+
 
         String auditLogsHtml = factory.createTable(request, response).render();
         request.setAttribute("listSubjectsHtml", auditLogsHtml);

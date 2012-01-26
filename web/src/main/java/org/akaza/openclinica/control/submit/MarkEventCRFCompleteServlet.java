@@ -24,6 +24,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InconsistentStateException;
@@ -120,7 +121,7 @@ public class MarkEventCRFCompleteServlet extends SecureController {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.akaza.openclinica.control.core.SecureController#processRequest()
      */
     @Override
@@ -143,7 +144,7 @@ public class MarkEventCRFCompleteServlet extends SecureController {
          * isEmpty()){ throw new InconsistentStateException(errorPage, "You may
          * not mark this Event CRF complete, because interviewer name is
          * blank."); } }
-         * 
+         *
          * if (ecb.getDateInterviewed() == null) { if ((discNotes == null) ||
          * (discNotes
          * .getNotes(TableOfContentsServlet.INPUT_INTERVIEW_DATE).isEmpty()) ) {
@@ -179,8 +180,8 @@ public class MarkEventCRFCompleteServlet extends SecureController {
 
         if (!fp.isSubmitted()) {
             DisplayTableOfContentsBean toc = TableOfContentsServlet.getDisplayBean(ecb, sm.getDataSource(), currentStudy);
-            toc = TableOfContentsServlet.getDisplayBeanWithShownSections(sm.getDataSource(), toc, 
-                    (DynamicsMetadataService)SpringServletAccess.getApplicationContext(getServletContext()).getBean("dynamicsMetadataService")); 
+            toc = TableOfContentsServlet.getDisplayBeanWithShownSections(sm.getDataSource(), toc,
+                    (DynamicsMetadataService)SpringServletAccess.getApplicationContext(getServletContext()).getBean("dynamicsMetadataService"));
             request.setAttribute(BEAN_DISPLAY, toc);
 
             resetPanel();
@@ -262,13 +263,13 @@ public class MarkEventCRFCompleteServlet extends SecureController {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.akaza.openclinica.control.core.SecureController#mayProceed()
      */
     @Override
     protected void mayProceed() throws InsufficientPermissionException {
 
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         // <
         // resexception=ResourceBundle.getBundle(
         // "org.akaza.openclinica.i18n.exceptions",locale);

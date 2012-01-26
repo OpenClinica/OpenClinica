@@ -27,7 +27,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head><title>OpenClinica <fmt:message key="administrative_editing" bundle="${resword}"/></title>
     <meta http-equiv="X-UA-Compatible" content="IE=8" />
-    
+
     <link rel="stylesheet" href="includes/styles.css" type="text/css">
 <%-- <link rel="stylesheet" href="includes/styles2.css" type="text/css">--%>
     <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
@@ -42,6 +42,7 @@
 
     <link rel="stylesheet" type="text/css" media="all" href="includes/new_cal/skins/aqua/theme.css" title="Aqua" />
     <script type="text/javascript" src="includes/new_cal/calendar.js"></script>
+    <script type="text/javascript" src="includes/new_cal/lang/calendar-en.js"></script>
     <script type="text/javascript" src="includes/new_cal/lang/<fmt:message key="jscalendar_language_file" bundle="${resformat}"/>"></script>
     <script type="text/javascript" src="includes/new_cal/calendar-setup.js"></script>
     <!-- End -->
@@ -103,13 +104,13 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                 <img src="images/icon_Invalid.gif" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>">
             </c:when>
             <c:otherwise>
-              
+
             </c:otherwise>
         </c:choose></b>  &nbsp;&nbsp;</span> </h1> </td><td>
 		<h1><span class="title_manage"> <c:out value="${studySubject.label}" />&nbsp;&nbsp; </span></h1></td></tr></table>
 <%--</div>--%>
 
-<form id="mainForm" name="crfForm" method="POST" action="AdministrativeEditing" onLoad="javascript:leftnavExpand('CRF_infobox_open');"> 
+<form id="mainForm" name="crfForm" method="POST" action="AdministrativeEditing" onLoad="javascript:leftnavExpand('CRF_infobox_open');">
 <input type="hidden" name="eventCRFId" value="<c:out value="${section.eventCRF.id}"/>" />
 <input type="hidden" name="sectionId" value="<c:out value="${section.section.id}"/>" />
 <input type="hidden" name="checkInputs" value="<c:out value="${checkInputsValue}"/>" />
@@ -552,7 +553,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
         </th>
         </c:if>
     </c:forEach>
-    <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">            
+    <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">
         <c:choose>
             <c:when test="${sectionBorders == 1}">
                 <th class="aka_headerBackground aka_padding_large aka_cellBorders_dark" />
@@ -778,7 +779,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 
         </c:otherwise>
     </c:choose>
-</c:if>    
+</c:if>
 </tr>
 
 <c:if test="${status.last}">
@@ -1063,7 +1064,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
             <tr>
                 	</c:if>
 
-    
+
             			<c:choose>
 						<c:when test="${cdisplay > 0}">
 							<c:set var="scdShowStatus" value="${displayItem.singleItem.scdData.scdDisplayInfo.scdShowStatus}"/>
@@ -1085,7 +1086,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 		                	<td valign="top">
 		                </c:otherwise>
 		                </c:choose>
-                    
+
 						<%-- put in highlighting here, tbh --%>
                         <c:choose>
                     		<c:when test="${displayItem.singleItem.metadata.highlighted}">

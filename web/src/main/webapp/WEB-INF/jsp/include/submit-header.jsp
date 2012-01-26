@@ -3,9 +3,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/> 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/> 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/> 
+<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
 
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
@@ -34,6 +34,7 @@
 
     <link rel="stylesheet" type="text/css" media="all" href="includes/new_cal/skins/aqua/theme.css" title="Aqua" />
     <script type="text/javascript" src="includes/new_cal/calendar.js"></script>
+    <script type="text/javascript" src="includes/new_cal/lang/calendar-en.js"></script>
     <script type="text/javascript" src="includes/new_cal/lang/<fmt:message key="jscalendar_language_file" bundle="${resformat}"/>"></script>
     <script type="text/javascript" src="includes/new_cal/calendar-setup.js"></script>
 <!-- End -->
@@ -45,7 +46,7 @@
  <%-- I removed this include because you cannot have both
  	"onLoad" tests: <jsp:include page="../include/showPopUp.jsp"/> --%>
  	<%-- --%>
-<body style="width:1024px;" class="main_BG" 
+<body style="width:1024px;" class="main_BG"
 <c:choose>
 <c:when test="${tabId != null && tabId>0}">
 onload="TabsForwardByNum(<c:out value="${tabId}"/>);<jsp:include page="../include/showPopUp2.jsp"/>"

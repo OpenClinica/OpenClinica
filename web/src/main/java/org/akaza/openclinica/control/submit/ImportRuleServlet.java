@@ -17,6 +17,7 @@ import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -30,7 +31,6 @@ import org.exolab.castor.xml.XMLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -41,7 +41,7 @@ import java.util.Locale;
 
 /**
  * Verify the Rule import , show records that have Errors as well as records that will be saved.
- * 
+ *
  * @author Krikor krumlian
  */
 public class ImportRuleServlet extends SecureController {
@@ -59,7 +59,7 @@ public class ImportRuleServlet extends SecureController {
         request.setAttribute("contextPath", getContextPath());
         request.setAttribute("hostPath", getHostPath());
         copyFiles();
-        //@pgawade 13-April-2011 -  #8877 
+        //@pgawade 13-April-2011 -  #8877
         // request.setAttribute("designerURL",
         // getCoreResources().getField("designer.url"));
 
@@ -113,8 +113,8 @@ public class ImportRuleServlet extends SecureController {
     }
 
     private void copyFiles() {
-        
-        
+
+
     }
 
     private void provideMessage(RulesPostImportContainer rulesContainer) {
@@ -211,7 +211,7 @@ public class ImportRuleServlet extends SecureController {
 
     @Override
     public void mayProceed() throws InsufficientPermissionException {
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         if (ub.isSysAdmin()) {
             return;
         }

@@ -22,16 +22,17 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
-import java.util.Locale;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 
 /**
  * Servlet for creating a table.
- * 
+ *
  * @author Krikor Krumlian
  */
 public class ListStudySubjectsServlet extends SecureController {
@@ -48,18 +49,18 @@ public class ListStudySubjectsServlet extends SecureController {
     private EventCRFDAO eventCRFDAO;
     private EventDefinitionCRFDAO eventDefintionCRFDAO;
     private StudyGroupDAO studyGroupDAO;
-    private boolean showMoreLink; 
+    private boolean showMoreLink;
     Locale locale;
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.akaza.openclinica.control.core.SecureController#mayProceed()
      */
     @Override
     protected void mayProceed() throws InsufficientPermissionException {
 
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
 
         if (ub.isSysAdmin()) {
             return;

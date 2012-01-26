@@ -1,5 +1,6 @@
 package org.akaza.openclinica.control;
 
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.jmesa.facade.TableFacade;
 import org.jmesa.facade.TableFacadeImpl;
 import org.jmesa.limit.ExportType;
@@ -29,7 +30,7 @@ public abstract class AbstractTableFactory {
     protected Locale locale;
 
     protected Logger logger = LoggerFactory.getLogger(getClass().getName());
-    
+
     protected abstract String getTableName();
 
     protected String getCaptionName() {
@@ -49,7 +50,7 @@ public abstract class AbstractTableFactory {
     public abstract void setDataAndLimitVariables(TableFacade tableFacade);
 
     public TableFacade createTable(HttpServletRequest request, HttpServletResponse response) {
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         TableFacade tableFacade = getTableFacadeImpl(request, response);
         setStateAttr(tableFacade);
         setDataAndLimitVariables(tableFacade);
@@ -67,18 +68,18 @@ public abstract class AbstractTableFactory {
     }
 
     /**
-     * Use this method to export all data from table. 
+     * Use this method to export all data from table.
      * 1. filters/sorts will be ignored
      * 2. Whole table will be exported page by page
      * 3. Configure getSize(Limit limit)
-     * 
+     *
      * @param request
      * @param response
      * @see getSize(Limit limit), createLimits()
      * @see filter & sort methods in implementations
      */
     public void exportCSVTable(HttpServletRequest request, HttpServletResponse response, String path) {
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         String DATE_FORMAT = "yyyyMMddHHmmss";
         SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
         String fileName = getTableName() + "_" + sdf.format(new Date());
@@ -137,7 +138,7 @@ public abstract class AbstractTableFactory {
     /**
      * By Default we configure a default toolbar. Overwrite this method if you
      * need to provide a custom toolbar and configure other options.
-     * 
+     *
      * @param tableFacade
      */
     public void configureTableFacadePostColumnConfiguration(TableFacade tableFacade) {
@@ -147,7 +148,7 @@ public abstract class AbstractTableFactory {
     /**
      * By Default we configure a default view. Overwrite this method if you need
      * to provide a custom view.
-     * 
+     *
      * @param tableFacade
      * @see http://code.google.com/p/jmesa/wiki/CustomViewTotalsTutorial
      */
@@ -187,7 +188,7 @@ public abstract class AbstractTableFactory {
             }
         }
     }
-    
+
     public static String getDNFlagIconName(int dnResolutionStatusId) {
         String name = "";
         switch (dnResolutionStatusId) {
@@ -213,7 +214,7 @@ public abstract class AbstractTableFactory {
             name = "icon_noNote";
             break;
         }
-        
+
         return name;
     }
     public ArrayList paginateData(ArrayList list, int rowStart, int rowEnd) {
@@ -231,7 +232,7 @@ public abstract class AbstractTableFactory {
         }
         return mainList;
     }
-    
+
     public void setStateAttr(TableFacade tableFacade) {
         if(getTableName() != null) {
             tableFacade.setStateAttr(getTableName()+"_restore");

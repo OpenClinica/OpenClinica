@@ -14,6 +14,7 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -32,7 +33,7 @@ public class UploadFileServlet extends SecureController {
 
     @Override
     protected void mayProceed() throws InsufficientPermissionException {
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         if ("false".equals(session.getAttribute("mayProcessUploading"))) {
             addPageMessage(respage.getString("you_not_have_permission_upload_file"));
             request.setAttribute("uploadFileStauts", "noPermission");
@@ -142,15 +143,15 @@ public class UploadFileServlet extends SecureController {
                 logger.debug("found non word characters");
                 fileName = fileName.replaceAll("\\W+", "_");
             }
-            String newName = pathAndName.substring(0, n) + 
-            	File.separator + 
+            String newName = pathAndName.substring(0, n) +
+            	File.separator +
             	fileName + new SimpleDateFormat("yyyyMMddHHmmssZ").format(new Date()) + pathAndName.substring(p);
             // >> tbh 5545 remove all html-symbol characters here
             //            if (!Utils.isMatchingRegexp(newName, "[a-zA-Z_0-9/\\\\:.+-\\s]")) {
             //                logger.debug("found non word characters");
             //                newName = newName.replaceAll("[^a-zA-Z_0-9/\\\\:.+-\\s]", "_");
             //            }
-            
+
             // << tbh 5545 replace all non-words with the underscore
             logger.debug("-- > returning: " + newName);
             return new File(newName);

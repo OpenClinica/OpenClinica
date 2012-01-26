@@ -21,6 +21,7 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -33,7 +34,7 @@ import java.util.Locale;
 
 /**
  * @author jxu
- * 
+ *
  *         TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style - Code Templates
  */
 public class EditSelectedServlet extends SecureController {
@@ -45,7 +46,7 @@ public class EditSelectedServlet extends SecureController {
     @Override
     public void mayProceed() throws InsufficientPermissionException {
 
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         // < respage =
         // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",locale);
         // <
@@ -213,7 +214,7 @@ public class EditSelectedServlet extends SecureController {
 
     /**
      * Finds all the items in a study giving all events in the study
-     * 
+     *
      * @param events
      * @return
      */

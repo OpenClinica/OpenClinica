@@ -3,7 +3,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 
-<fmt:setLocale value="${localeString}"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
@@ -38,7 +37,7 @@
         });
     }
     function checkCRFLockedInitial(ecId, formName){
-        if(ecId==0) {formName.submit(); return;} 
+        if(ecId==0) {formName.submit(); return;}
         jQuery.post("CheckCRFLocked?ecId="+ ecId + "&ran="+Math.random(), function(data){
             if(data == 'true'){
                 formName.submit();
@@ -109,7 +108,7 @@
     <tr><td>
         <h1>
             <div class="title_manage">
-                <fmt:message key="view_subject2" bundle="${resword}"/><c:out value="${studySub.label}"/> 
+                <fmt:message key="view_subject2" bundle="${resword}"/><c:out value="${studySub.label}"/>
                 <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/view-subject')">
                     <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
 
@@ -200,20 +199,20 @@
 							<td class="table_header_column_top"><fmt:message key="study_subject_ID" bundle="${resword}"/></td>
 							<td class="table_cell_top"><c:out value="${studySub.label}"/></td>
 							<td class="table_header_row"><fmt:message key="person_ID" bundle="${resword}"/>
-							
+
 							<%-- DN for person ID goes here --%>
 							<c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
 					            <c:set var="isNew" value="${hasUniqueIDNote eq 'yes' ? 0 : 1}"/>
-					             
+
 					            <c:choose>
 					                <c:when test="${hasUniqueIDNote eq 'yes'}">
 					                    <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
 					                        <img id="flag_uniqueIdentifier" name="flag_uniqueIdentifier" src="images/icon_Note.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
 					                    </a>
-					                    
+
 					                </c:when>
 					                <c:otherwise>
-					                    
+
 					                            <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
 					                                <img id="flag_uniqueIdentifier" name="flag_uniqueIdentifier" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
 					                            </a>
@@ -232,26 +231,26 @@
 							    <c:when test="${subjectStudy.studyParameterConfig.collectDob == '1'}">
 
 							            <td class="table_header_row"><fmt:message key="date_of_birth" bundle="${resword}"/>
-							            
+
 							            <%-- DN for DOB goes here --%>
 							            <c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
 						                    <c:set var="isNew" value="${hasDOBNote eq 'yes' ? 0 : 1}"/>
-						
+
 						                    <c:choose>
 						                        <c:when test="${hasDOBNote eq 'yes'}">
 						                            <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
 						                                <img id="flag_dob" name="flag_dob" src="images/icon_Note.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
 						                            </a>
-						                            
+
 						                        </c:when>
 						                        <c:otherwise>
-						                            
+
 						                                <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob'); return false;">
 						                                    <img id="flag_dob" name="flag_dob" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
 						                                </a>
 						                        </c:otherwise>
 						                    </c:choose>
-						
+
 						                </c:if>
 							            </td>
 							            <td class="table_cell"><fmt:formatDate value="${subject.dateOfBirth}" pattern="${dteFormat}"/></td>
@@ -260,26 +259,26 @@
 							    <c:when test="${subjectStudy.studyParameterConfig.collectDob == '3'}">
 
 							            <td class="table_header_row"><fmt:message key="date_of_birth" bundle="${resword}"/>
-							            
+
 							            <%-- DN for DOB goes here --%>
 							            <c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
 						                    <c:set var="isNew" value="${hasDOBNote eq 'yes' ? 0 : 1}"/>
-						
+
 						                    <c:choose>
 						                        <c:when test="${hasDOBNote eq 'yes'}">
 						                            <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
 						                                <img id="flag_dob" name="flag_dob" src="images/icon_Note.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
 						                            </a>
-						                            
+
 						                        </c:when>
 						                        <c:otherwise>
-						                            
+
 						                                <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob'); return false;">
 						                                    <img id="flag_dob" name="flag_dob" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
 						                                </a>
 						                        </c:otherwise>
 						                    </c:choose>
-						
+
 						                </c:if>
 							            </td>
 							            <td class="table_cell"><fmt:message key="not_used" bundle="${resword}"/></td>
@@ -288,26 +287,26 @@
 							    <c:otherwise>
 
 							            <td class="table_header_row"><fmt:message key="year_of_birth" bundle="${resword}"/>
-							            
+
 							            <%-- DN for DOB goes here --%>
 							            <c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
 						                    <c:set var="isNew" value="${hasDOBNote eq 'yes' ? 0 : 1}"/>
-						
+
 						                    <c:choose>
 						                        <c:when test="${hasDOBNote eq 'yes'}">
 						                            <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
 						                                <img id="flag_dob" name="flag_dob" src="images/icon_Note.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
 						                            </a>
-						                            
+
 						                        </c:when>
 						                        <c:otherwise>
-						                            
+
 						                                <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob'); return false;">
 						                                    <img id="flag_dob" name="flag_dob" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
 						                                </a>
 						                        </c:otherwise>
 						                    </c:choose>
-						
+
 						                </c:if>
 							            </td>
 							            <td class="table_cell"><c:out value="${yearOfBirth}"/>
@@ -322,7 +321,7 @@
 							<td class="table_header_column"><fmt:message key="OID" bundle="${resword}"/></td>
     						<td class="table_cell"><c:out value="${studySub.oid}"/></td>
 							<td class="table_header_row"><fmt:message key="gender" bundle="${resword}"/>
-							
+
 							<%-- DN for Gender goes here --%>
 							<c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
 					            <c:set var="isNew" value="${hasGenderNote eq 'yes' ? 0 : 1}"/>
@@ -376,7 +375,7 @@
 							                </a>
 							            </c:otherwise>
 							        </c:choose>
-					            </c:if> 
+					            </c:if>
 							</td>
     						<td class="table_cell"><fmt:formatDate value="${studySub.enrollmentDate}" pattern="${dteFormat}"/>&nbsp;
 					     	</td>

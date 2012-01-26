@@ -7,7 +7,6 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
@@ -18,7 +17,6 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
@@ -31,18 +29,17 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
@@ -125,7 +122,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
     public static final String PRESET_USER_ACCOUNT_ID = "preUserAccountId";
 
     public static final String EMAIL_USER_ACCOUNT = "sendEmail";
-    
+
     public static final String WHICH_RES_STATUSES = "whichResStatus";
 
     public String exceptionName = resexception.getString("no_permission_to_create_discrepancy_note");
@@ -139,7 +136,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
     @Override
     protected void mayProceed() throws InsufficientPermissionException {
         checkStudyLocked(Page.MENU_SERVLET, respage.getString("current_study_locked"));
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         // <
         // resexception=ResourceBundle.getBundle(
         // "org.akaza.openclinica.i18n.exceptions",locale);
@@ -225,7 +222,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
         if ("itemData".equalsIgnoreCase(entityType) && enteringData) {
             request.setAttribute("enterItemData", "yes");
         }
-        
+
         DateFormat dateFormatter = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
         int preUserId = 0;
         if (!StringUtil.isBlank(entityType)) {
@@ -288,7 +285,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                 preUserId = se.getOwnerId();
                 if (!StringUtil.isBlank(column)) {
                     if ("location".equalsIgnoreCase(column)) {
-                        request.setAttribute("entityValue", (se.getLocation().equals("") || se.getLocation() == null) ? resword.getString("N/A") : se.getLocation());
+                        request.setAttribute("entityValue", se.getLocation().equals("") || se.getLocation() == null ? resword.getString("N/A") : se.getLocation());
                         request.setAttribute("entityName", resword.getString("location"));
                     } else if ("start_date".equalsIgnoreCase(column)) {
                         if (se.getDateStarted() != null) {
@@ -337,7 +334,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                 request.setAttribute("parent", parent);
             }
             dndao.setFetchMapping(false);
-        } /* 
+        } /*
         else {
             if (!isNew) {// not a new note, so try to find the parent note
                 for (int i = 0; i < notes.size(); i++) {
@@ -387,11 +384,11 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 
         }*/
         //only for adding a new thread
-        if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.INVESTIGATOR)) { 
-            ArrayList<ResolutionStatus> resStatuses = new ArrayList<ResolutionStatus>(); 
+        if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.INVESTIGATOR)) {
+            ArrayList<ResolutionStatus> resStatuses = new ArrayList<ResolutionStatus>();
             resStatuses.add(ResolutionStatus.OPEN);
             resStatuses.add(ResolutionStatus.RESOLVED);
-            request.setAttribute(RES_STATUSES, resStatuses); 
+            request.setAttribute(RES_STATUSES, resStatuses);
             ArrayList types2 = DiscrepancyNoteType.toArrayList();
             types2.remove(DiscrepancyNoteType.QUERY);
             request.setAttribute(DIS_TYPES, types2);
@@ -401,18 +398,18 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             resStatuses.add(ResolutionStatus.OPEN);
             resStatuses.add(ResolutionStatus.UPDATED);
             resStatuses.add(ResolutionStatus.CLOSED);
-            request.setAttribute(RES_STATUSES, resStatuses);  
-            request.setAttribute(WHICH_RES_STATUSES, "1"); 
+            request.setAttribute(RES_STATUSES, resStatuses);
+            request.setAttribute(WHICH_RES_STATUSES, "1");
             ArrayList<DiscrepancyNoteType> types2 = new ArrayList<DiscrepancyNoteType>();
             types2.add(DiscrepancyNoteType.QUERY);
             request.setAttribute(DIS_TYPES, types2);
-        } else {//Role.STUDYDIRECTOR Role.COORDINATOR  
+        } else {//Role.STUDYDIRECTOR Role.COORDINATOR
             ArrayList<ResolutionStatus> resStatuses = ResolutionStatus.toArrayList();
             resStatuses.remove(ResolutionStatus.NOT_APPLICABLE);
-            request.setAttribute(RES_STATUSES, resStatuses); ;   
+            request.setAttribute(RES_STATUSES, resStatuses); ;
             request.setAttribute(WHICH_RES_STATUSES, "2");
-            //it's for parentDNId is null or 0 and FVC  
-            //ArrayList<ResolutionStatus> resStatuses = new ArrayList<ResolutionStatus>(); 
+            //it's for parentDNId is null or 0 and FVC
+            //ArrayList<ResolutionStatus> resStatuses = new ArrayList<ResolutionStatus>();
             //resStatuses.add(ResolutionStatus.OPEN);
             //resStatuses.add(ResolutionStatus.RESOLVED);
             //request.setAttribute(RES_STATUSES, resStatuses);
@@ -444,7 +441,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                     addPageMessage(noAccessMessage);
                     throw new InsufficientPermissionException(Page.MENU_SERVLET, exceptionName, "1");
                 }
-                
+
             }
             if (itemId > 0) {
                 ItemBean item = (ItemBean) new ItemDAO(sm.getDataSource()).findByPK(itemId);
@@ -506,7 +503,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                         // request.setAttribute(PRESET_RES_STATUS, new Integer(ResolutionStatus.NOT_APPLICABLE.getId()).toString());
                     }
                     // << tbh 02/2010, trumps failed evaluation error checks
-                    // can we put this in admin editing 
+                    // can we put this in admin editing
                     request.setAttribute("autoView", "0");
                     // above set to automatically open up the user panel
                 } else {
@@ -523,7 +520,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                     dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.QUERY.getId());
                     // remove this option for CRCs and Investigators
                     //if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) && currentStudy.getId() != currentStudy.getParentStudyId()
-                    if (currentRole.getRole().equals(Role.RESEARCHASSISTANT)    
+                    if (currentRole.getRole().equals(Role.RESEARCHASSISTANT)
                         || currentRole.getRole().equals(Role.INVESTIGATOR)) {
                         request.setAttribute("autoView", "0");
                     } else {
@@ -559,7 +556,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                 dnb.setDetailedNotes(detailedDes);
                 System.out.println("found strErrMsg: " + fp.getString("strErrMsg"));
             }
-            // #4346 TBH 10/2009 
+            // #4346 TBH 10/2009
 
             //If the data entry form has not been saved yet, collecting info from parent page.
             dnb = getNoteInfo(dnb);// populate note infos
@@ -577,7 +574,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             //            	dnb.setDetailedNotes(detailedDes);
             //            	// System.out.println("found strErrMsg: " +fp.getString("strErrMsg"));
             //            }
-            //            // #4346 TBH 10/2009 
+            //            // #4346 TBH 10/2009
             request.setAttribute(DIS_NOTE, dnb);
             request.setAttribute("unlock", "0");
             request.setAttribute(WRITE_TO_DB, writeToDB ? "1" : "0");

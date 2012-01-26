@@ -2,6 +2,7 @@ package org.akaza.openclinica.controller.helper;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -31,7 +32,7 @@ public class SetUpUserInterceptor extends HandlerInterceptorAdapter {
 
         Locale locale = ResourceBundleProvider.localeMap.get(Thread.currentThread());
         if (locale == null) {
-            ResourceBundleProvider.updateLocale(httpServletRequest.getLocale());
+            ResourceBundleProvider.updateLocale(LocaleResolver.getLocale(httpServletRequest));
         }
 
         //Set up the user account bean: check the Session first
@@ -47,7 +48,7 @@ public class SetUpUserInterceptor extends HandlerInterceptorAdapter {
             userBeanIsInvalid = "".equalsIgnoreCase(userName);
             if (!userBeanIsInvalid) {
                 userBean = (UserAccountBean) userAccountDAO.findByUserName(userName);
-                userBeanIsInvalid = (userBean == null);
+                userBeanIsInvalid = userBean == null;
                 if (!userBeanIsInvalid) {
                     currentSession.setAttribute(USER_BEAN_NAME, userBean);
                 }

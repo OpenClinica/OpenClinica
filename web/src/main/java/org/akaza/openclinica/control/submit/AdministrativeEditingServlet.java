@@ -23,6 +23,7 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.RuleValidator;
 import org.akaza.openclinica.control.managestudy.ViewNotesServlet;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -37,7 +38,7 @@ import javax.servlet.http.HttpSession;
 
 /**
  * @author jxu
- * 
+ *
  *         Performs 'administrative editing' action for study director/study
  *         coordinator
  */
@@ -49,7 +50,7 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.akaza.openclinica.control.submit.DataEntryServlet#getServletPage()
      */
@@ -100,12 +101,12 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
                     if(x.length()<3) {
                         if(!x.contains("e")) {
                             y += "eventCRFId=" + eventCRFId + "&";
-                        } 
+                        }
                         if(!x.contains("s")) {
                             y += "sectionId=" + sectionId + "&";
-                        } 
+                        }
                         if(!x.contains("t")) {
-                            y += "tab=" + tabId + "&"; 
+                            y += "tab=" + tabId + "&";
                         }
                     }
                     y = y.substring(0,y.length()-1);
@@ -124,7 +125,7 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.akaza.openclinica.control.submit.DataEntryServlet#getJSPPage()
      */
     @Override
@@ -134,7 +135,7 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @seeorg.akaza.openclinica.control.submit.DataEntryServlet#
      * validateInputOnFirstRound()
      */
@@ -145,19 +146,19 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.akaza.openclinica.control.core.SecureController#mayProceed()
      */
     @Override
     protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
         mayAccess(request);
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         HttpSession session = request.getSession();
         FormProcessor fp = new FormProcessor(request);
         UserAccountBean ub =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
         StudyUserRoleBean  currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
-      
-        
+
+
         // <
         // resexception=ResourceBundle.getBundle(
         // "org.akaza.openclinica.i18n.exceptions",locale);
@@ -220,7 +221,7 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.akaza.openclinica.control.submit.DataEntryServlet#setEventCRFAnnotations
      * (java.lang.String)
@@ -228,13 +229,13 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
     @Override
     protected void setEventCRFAnnotations(String annotations, HttpServletRequest request) {
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
-        
+
         ecb.setAnnotations(annotations);
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.akaza.openclinica.control.submit.DataEntryServlet#loadDBValues()
      */
     @Override
@@ -252,7 +253,7 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.akaza.openclinica.control.submit.DataEntryServlet#validateDisplayItemBean
      * (org.akaza.openclinica.core.form.Validator,
@@ -369,7 +370,7 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.akaza.openclinica.control.submit.DataEntryServlet#getBlankItemStatus
      * ()
@@ -381,7 +382,7 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.akaza.openclinica.control.submit.DataEntryServlet#getNonBlankItemStatus
      * ()
@@ -393,7 +394,7 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.akaza.openclinica.control.submit.DataEntryServlet#getEventCRFAnnotations
      * ()
@@ -401,7 +402,7 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
     @Override
     protected String getEventCRFAnnotations(HttpServletRequest request) {
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
-        
+
         return ecb.getAnnotations();
     }
 

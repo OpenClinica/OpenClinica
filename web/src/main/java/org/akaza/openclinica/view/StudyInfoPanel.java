@@ -23,6 +23,7 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -184,7 +185,7 @@ public class StudyInfoPanel {
      */
     public void setData(Page page, HttpSession session, HttpServletRequest request) {
 
-        Locale locale = request.getLocale();
+        Locale locale = LocaleResolver.getLocale(request);
         resword = ResourceBundleProvider.getWordsBundle();
         local_sdf = new SimpleDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString("date_format_string"));
         // logger.info("found date format string: " +

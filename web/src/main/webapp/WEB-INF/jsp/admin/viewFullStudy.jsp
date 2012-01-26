@@ -2,7 +2,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<fmt:setLocale value="${localeString}"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
@@ -66,7 +65,7 @@
 	           objLeftNavRowElement.display = (objLeftNavRowElement.display == "none" ) ? "" : "none";
                objExCl = MM_findObj("excl_"+strLeftNavRowElementName);
                if(objLeftNavRowElement.display == "none"){
-                   objExCl.src = "images/bt_Expand.gif"; 
+                   objExCl.src = "images/bt_Expand.gif";
                }else{
                    objExCl.src = "images/bt_Collapse.gif";
                }
@@ -79,8 +78,8 @@
 
 
 <strong><fmt:message key="download_study_meta" bundle="${restext}"/>
-<a href="javascript:openDocWindow('DownloadStudyMetadata?studyId=<c:out value="${studyToView.id}"/>');"> 
-<fmt:message key="here" bundle="${restext}"/></a>.  
+<a href="javascript:openDocWindow('DownloadStudyMetadata?studyId=<c:out value="${studyToView.id}"/>');">
+<fmt:message key="here" bundle="${restext}"/></a>.
 <fmt:message key="opening_finished_may_save" bundle="${restext}"/>
  </strong>
 <fmt:message key="get_subject_oid_from_matrix_show_more" bundle="${restext}"/>
@@ -649,7 +648,7 @@
             <fmt:message key="${studyToView.studyParameterConfig.eventLocationRequired}" bundle="${resword}"/>
        </td>
     </tr>
-    
+
 </table>
 
 </div>

@@ -10,6 +10,7 @@ package org.akaza.openclinica.control.rule;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.rule.RuleExecutionBusinessObject;
 import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -17,9 +18,9 @@ import java.util.Locale;
 
 /**
  * Execute a Cross Edit Check
- * 
+ *
  * @author Krikor Krumlian
- * 
+ *
  */
 public class ExecuteCrossEditCheckServlet extends SecureController {
 
@@ -39,13 +40,13 @@ public class ExecuteCrossEditCheckServlet extends SecureController {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.akaza.openclinica.control.core.SecureController#mayProceed()
      */
     @Override
     public void mayProceed() throws InsufficientPermissionException {
 
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         if (ub.isSysAdmin()) {
             return;
         }

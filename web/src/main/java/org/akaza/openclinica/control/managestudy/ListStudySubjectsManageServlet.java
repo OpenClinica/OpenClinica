@@ -8,6 +8,7 @@
 package org.akaza.openclinica.control.managestudy;
 
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -28,7 +29,7 @@ public class ListStudySubjectsManageServlet extends ListStudySubjectServlet {
     @Override
     public void mayProceed() throws InsufficientPermissionException {
 
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         // <
         // resexception=ResourceBundle.getBundle("org.akaza.openclinica.i18n.exceptions",locale);
         // < respage =
@@ -38,7 +39,7 @@ public class ListStudySubjectsManageServlet extends ListStudySubjectServlet {
             return;
         }
 
-        if (currentRole.getRole().equals(Role.MONITOR) || 
+        if (currentRole.getRole().equals(Role.MONITOR) ||
           currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)) {
             return;
         }

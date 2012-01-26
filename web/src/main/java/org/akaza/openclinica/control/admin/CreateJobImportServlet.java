@@ -1,6 +1,5 @@
 package org.akaza.openclinica.control.admin;
 
-import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
@@ -8,6 +7,7 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
@@ -25,7 +25,7 @@ import java.util.HashMap;
 
 /**
  * Create Job Import Servlet, by Tom Hickerson, 2009
- * 
+ *
  * @author thickerson Purpose: to create jobs in the 'importTrigger' group,
  *         which will be meant to run the ImportStatefulJob.
  */
@@ -101,10 +101,10 @@ public class CreateJobImportServlet extends SecureController {
         addEntityList("studies", finalList, respage.getString("a_user_cannot_be_created_no_study_as_active"), Page.ADMIN_SYSTEM);
         // YW >>
         // << tbh
-        
+
         request.setAttribute("filePath", directory);
         // request.setAttribute("activeStudy", activeStudy);
-        
+
         request.setAttribute(JOB_NAME, fp2.getString(JOB_NAME));
         request.setAttribute(JOB_DESC, fp2.getString(JOB_DESC));
         request.setAttribute(EMAIL, fp2.getString(EMAIL));
@@ -144,7 +144,7 @@ public class CreateJobImportServlet extends SecureController {
                 int studyId = fp.getInt(STUDY_ID);
                 StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
                 StudyBean studyBean = (StudyBean) studyDAO.findByPK(studyId);
-                SimpleTrigger trigger = triggerService.generateImportTrigger(fp, sm.getUserBean(), studyBean, request.getLocale().getLanguage());
+                SimpleTrigger trigger = triggerService.generateImportTrigger(fp, sm.getUserBean(), studyBean, LocaleResolver.getLocale(request).getLanguage());
 
                 // SimpleTrigger trigger = new SimpleTrigger();
                 JobDetailBean jobDetailBean = new JobDetailBean();

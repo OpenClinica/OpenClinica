@@ -15,7 +15,7 @@
             classpath*:org/akaza/openclinica/applicationContext*.xml
         </param-value>
   </context-param>
-    
+
     <context-param>
         <param-name>jmesaMessagesLocation</param-name>
         <param-value>org/akaza/openclinica/jmesaResourceBundle</param-value>
@@ -25,10 +25,10 @@
         <param-name>SQLInitServlet</param-name>
         <param-value>org/</param-value>
     </context-param>
-    
-     
-    
-    
+
+
+
+
     <listener>
         <!--@pgawade 01-DEC-2010 Replaced the listener with the extended class
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>-->
@@ -55,7 +55,6 @@
 
   </listener>
 
- 
 
     <filter>
         <filter-name>encodingFilter</filter-name>
@@ -68,16 +67,24 @@
             <param-name>forceEncoding</param-name>
             <param-value>true</param-value>
         </init-param>
-		
+
 
     </filter>
 
-	
+
     <filter-mapping>
         <filter-name>encodingFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
+	<filter>
+   		<filter-name>localeFilter</filter-name>
+   		<filter-class>org.akaza.openclinica.web.filter.LocaleFilter</filter-class>
+   </filter>
+   <filter-mapping>
+   		<filter-name>localeFilter</filter-name>
+   		<url-pattern>/*</url-pattern>
+   </filter-mapping>
      <filter>
         <filter-name>compressFilter</filter-name>
         <filter-class>com.planetj.servlet.filter.compression.CompressingFilter </filter-class>
@@ -117,7 +124,7 @@
    <filter>
         <filter-name>springSecurityFilterChain</filter-name>
         <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
-    </filter>      
+    </filter>
     <filter-mapping>
         <filter-name>springSecurityFilterChain</filter-name>
             <url-pattern>/*</url-pattern>
@@ -136,11 +143,11 @@
     </filter>
      <filter-mapping>
         <filter-name>logFilter</filter-name>
-        <url-pattern>/*</url-pattern>       
+        <url-pattern>/*</url-pattern>
    </filter-mapping>
 
 
-   <!-- 
+   <!--
    <filter>
         <filter-name>sitemesh</filter-name>
         <filter-class>com.opensymphony.module.sitemesh.filter.PageFilter</filter-class>
@@ -162,11 +169,11 @@
         <!--<url-pattern>/*</url-pattern>-->
     <!--</filter-mapping>-->
 
-<!-- 
+<!--
 <filter>
 <filter-name>HistoryLog</filter-name>
 	<filter-class>org.akaza.openclinica.history.HistoryLog</filter-class>
-	
+
 </filter>
 <filter-mapping>
 <filter-name>HistoryLog</filter-name>
@@ -174,24 +181,24 @@
 
 <dispatcher>FORWARD</dispatcher>
    <url-pattern>/ViewStudySubject1</url-pattern>
-   
+
 </filter-mapping>-->
    <servlet>
         <servlet-name>pages</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
         <load-on-startup>2</load-on-startup>
     </servlet>
-    
+
     <servlet-mapping>
         <servlet-name>pages</servlet-name>
         <url-pattern>/pages/*</url-pattern>
     </servlet-mapping>
-    
+
     <servlet-mapping>
     <servlet-name>pages</servlet-name>
     <url-pattern>/oauth/*</url-pattern>
   </servlet-mapping>
-   
+
     <servlet>
         <servlet-name>ws</servlet-name>
         <servlet-class>org.springframework.ws.transport.http.MessageDispatcherServlet</servlet-class>
@@ -215,7 +222,7 @@
         <extension>xsd</extension>
         <mime-type>text/xml</mime-type>
     </mime-mapping>
-    
+
     <servlet>
         <servlet-name>SQLInitServlet</servlet-name>
         <display-name>SQLInitServlet</display-name>
@@ -238,19 +245,19 @@
         <description>RssReaderServlet</description>
         <servlet-class>org.akaza.openclinica.control.RssReaderServlet</servlet-class>
     </servlet>
-    
+
     <servlet>
         <servlet-name>AuditUserActivityServlet</servlet-name>
         <description>AuditUserActivityServlet</description>
         <servlet-class>org.akaza.openclinica.control.admin.AuditUserActivityServlet</servlet-class>
     </servlet>
-    
+
     <servlet>
         <servlet-name>SystemStatusServlet</servlet-name>
         <description>SystemStatusServlet</description>
         <servlet-class>org.akaza.openclinica.control.admin.SystemStatusServlet</servlet-class>
     </servlet>
-    
+
     <servlet>
         <servlet-name>AuditDatabaseServlet</servlet-name>
         <description>AuditDatabaseServlet</description>
@@ -343,7 +350,7 @@
         <description>UpdateJobExportServlet</description>
         <servlet-class>org.akaza.openclinica.control.admin.UpdateJobExportServlet</servlet-class>
     </servlet>
-    
+
     <servlet>
         <servlet-name>UpdateJobImportServlet</servlet-name>
         <display-name>UpdateJobImportServlet</display-name>
@@ -674,7 +681,7 @@
         <display-name>DataEntry</display-name>
         <servlet-class>org.akaza.openclinica.control.submit.DataEntryServlet</servlet-class>
     </servlet>
-    
+
     <servlet>
         <servlet-name>DoubleDataEntryServlet</servlet-name>
         <display-name>DoubleDataEntry</display-name>
@@ -1105,7 +1112,7 @@
         <display-name>ListEventsForSubject</display-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ListEventsForSubjectServlet</servlet-class>
     </servlet>
-    
+
     <servlet>
         <servlet-name>ListEventsForSubjectsServlet</servlet-name>
         <display-name>ListEventsForSubjects</display-name>
@@ -1147,13 +1154,13 @@
         <display-name>ViewRuleSet</display-name>
         <servlet-class>org.akaza.openclinica.control.submit.ViewRuleSetServlet</servlet-class>
     </servlet>
-    
+
     <servlet>
         <servlet-name>ViewRuleAssignmentNewServlet</servlet-name>
         <display-name>ViewRuleAssignmentNew</display-name>
         <servlet-class>org.akaza.openclinica.control.submit.ViewRuleAssignmentNewServlet</servlet-class>
     </servlet>
-    
+
     <servlet>
         <servlet-name>DownloadRuleSetXmlServlet</servlet-name>
         <display-name>DownloadRuleSetXml</display-name>
@@ -1315,42 +1322,42 @@
         <servlet-name>ListDiscNotesSubjectServlet</servlet-name>
         <url-pattern>/ListDiscNotesSubjectServlet</url-pattern>
     </servlet-mapping>
--->    
+-->
     <servlet-mapping>
         <servlet-name>ViewJobServlet</servlet-name>
         <url-pattern>/ViewJob</url-pattern>
     </servlet-mapping>
-    
+
     <servlet-mapping>
         <servlet-name>ViewAllJobsServlet</servlet-name>
         <url-pattern>/ViewAllJobs</url-pattern>
     </servlet-mapping>
-    
+
     <servlet-mapping>
         <servlet-name>ViewImportJobServlet</servlet-name>
         <url-pattern>/ViewImportJob</url-pattern>
     </servlet-mapping>
-    
+
     <servlet-mapping>
         <servlet-name>ViewSingleJobServlet</servlet-name>
         <url-pattern>/ViewSingleJob</url-pattern>
     </servlet-mapping>
-    
+
     <servlet-mapping>
         <servlet-name>PauseJobServlet</servlet-name>
         <url-pattern>/PauseJob</url-pattern>
     </servlet-mapping>
-    
+
     <servlet-mapping>
         <servlet-name>CreateJobExportServlet</servlet-name>
         <url-pattern>/CreateJobExport</url-pattern>
     </servlet-mapping>
-    
+
     <servlet-mapping>
         <servlet-name>CreateJobImportServlet</servlet-name>
         <url-pattern>/CreateJobImport</url-pattern>
     </servlet-mapping>
-    
+
     <servlet-mapping>
         <servlet-name>UpdateJobExportServlet</servlet-name>
         <url-pattern>/UpdateJobExport</url-pattern>
@@ -1360,7 +1367,7 @@
         <servlet-name>UpdateJobImportServlet</servlet-name>
         <url-pattern>/UpdateJobImport</url-pattern>
     </servlet-mapping>
-    
+
     <servlet-mapping>
         <servlet-name>ExecuteCrossEditCheckServlet</servlet-name>
         <url-pattern>/ExecuteCrossEditCheck</url-pattern>
@@ -1396,12 +1403,12 @@
         <servlet-name>ViewRuleAssignmentServlet</servlet-name>
         <url-pattern>/ViewRuleAssignmentNew</url-pattern>
     </servlet-mapping>
-    
+
     <servlet-mapping>
         <servlet-name>DownloadRuleSetXmlServlet</servlet-name>
         <url-pattern>/DownloadRuleSetXml</url-pattern>
     </servlet-mapping>
-    
+
     <servlet-mapping>
         <servlet-name>ViewRuleAssignmentNewServlet</servlet-name>
         <url-pattern>/ViewRuleAssignment</url-pattern>
@@ -1677,7 +1684,7 @@
         <servlet-name>DataEntryServlet</servlet-name>
         <url-pattern>/DataEntry</url-pattern>
     </servlet-mapping>
-    
+
     <servlet-mapping>
         <servlet-name>DoubleDataEntryServlet</servlet-name>
         <url-pattern>/DoubleDataEntry</url-pattern>
@@ -2133,16 +2140,16 @@
     </servlet-mapping>
     <servlet>
 	<servlet-name>urlRewriterServlet</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.urlRewrite.UrlRewriteServlet		 
-		</servlet-class>        
+        <servlet-class>org.akaza.openclinica.control.urlRewrite.UrlRewriteServlet
+		</servlet-class>
     </servlet>
-    
+
     <servlet-mapping>
         <servlet-name>urlRewriterServlet</servlet-name>
         <url-pattern>/ClinicalData/*</url-pattern>
     </servlet-mapping>
 
-    <!-- 
+    <!--
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>Choose download format</web-resource-name>
@@ -2771,7 +2778,7 @@
         </form-login-config>
     </login-config>
      -->
-    <!-- SECURITY ROLES 
+    <!-- SECURITY ROLES
     <security-role>
         <description>The most secure role</description>
         <role-name>admin</role-name>

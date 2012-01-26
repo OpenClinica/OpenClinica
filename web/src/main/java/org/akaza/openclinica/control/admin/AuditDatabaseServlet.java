@@ -14,6 +14,7 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.hibernate.DatabaseChangeLogDao;
 import org.akaza.openclinica.domain.technicaladmin.DatabaseChangeLogBean;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.jmesa.facade.TableFacade;
@@ -27,7 +28,7 @@ import java.util.Locale;
 
 /**
  * Servlet for creating a user account.
- * 
+ *
  * @author Krikor Krumlian
  */
 public class AuditDatabaseServlet extends SecureController {
@@ -45,7 +46,7 @@ public class AuditDatabaseServlet extends SecureController {
     @Override
     protected void mayProceed() throws InsufficientPermissionException {
 
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         // < restext =
         // ResourceBundle.getBundle("org.akaza.openclinica.i18n.notes",locale);
 

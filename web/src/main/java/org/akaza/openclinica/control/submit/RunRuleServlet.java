@@ -14,6 +14,7 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.domain.rule.RuleBulkExecuteContainer;
 import org.akaza.openclinica.domain.rule.RuleBulkExecuteContainerTwo;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
@@ -29,7 +30,7 @@ import java.util.Set;
 
 /**
  * Run Rules Using this Servlet
- * 
+ *
  * @author Krikor krumlian
  */
 public class RunRuleServlet extends SecureController {
@@ -96,7 +97,7 @@ public class RunRuleServlet extends SecureController {
 
     @Override
     public void mayProceed() throws InsufficientPermissionException {
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         if (ub.isSysAdmin()) {
             return;
         }

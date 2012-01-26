@@ -24,6 +24,7 @@ import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.domain.user.AuthoritiesBean;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
@@ -38,7 +39,7 @@ import java.util.ResourceBundle;
 
 /**
  * Servlet for creating a user account.
- * 
+ *
  * @author ssachs
  */
 public class CreateUserAccountServlet extends SecureController {
@@ -65,7 +66,7 @@ public class CreateUserAccountServlet extends SecureController {
     @Override
     protected void mayProceed() throws InsufficientPermissionException {
 
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         // < restext =
         // ResourceBundle.getBundle("org.akaza.openclinica.i18n.notes",locale);
 
@@ -174,7 +175,7 @@ public class CreateUserAccountServlet extends SecureController {
             // Mantis Issue 6058.
             String sendPwd = SQLInitServlet.getField("user_account_notification");
             fp.addPresetValue(USER_ACCOUNT_NOTIFICATION, sendPwd);
-            // 
+            //
             setPresetValues(presetValues);
             forwardPage(Page.CREATE_ACCOUNT);
         } else {
@@ -215,7 +216,7 @@ public class CreateUserAccountServlet extends SecureController {
                 createdUserAccountBean.setEmail(fp.getString(INPUT_EMAIL));
                 createdUserAccountBean.setInstitutionalAffiliation(fp.getString(INPUT_INSTITUTION));
 
-                SecurityManager secm = ((SecurityManager) SpringServletAccess.getApplicationContext(context).getBean("securityManager"));
+                SecurityManager secm = (SecurityManager) SpringServletAccess.getApplicationContext(context).getBean("securityManager");
                 String password = secm.genPassword();
                 String passwordHash = secm.encrytPassword(password, getUserDetails());
 

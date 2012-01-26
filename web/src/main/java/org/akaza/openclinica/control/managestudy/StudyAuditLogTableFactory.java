@@ -13,6 +13,7 @@ import org.akaza.openclinica.dao.managestudy.StudyAuditLogFilter;
 import org.akaza.openclinica.dao.managestudy.StudyAuditLogSort;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
+import org.akaza.openclinica.i18n.util.I18nFormatUtil;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.jmesa.core.filter.DateFilterMatcher;
 import org.jmesa.core.filter.FilterMatcher;
@@ -30,6 +31,7 @@ import org.jmesa.view.html.editor.DroplistFilterEditor;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -81,7 +83,7 @@ public class StudyAuditLogTableFactory extends AbstractTableFactory {
 
     @Override
     public void setDataAndLimitVariables(TableFacade tableFacade) {
-        // initialize i18n 
+        // initialize i18n
         resword = ResourceBundleProvider.getWordsBundle(getLocale());
         resformat = ResourceBundleProvider.getFormatBundle(getLocale());
 
@@ -116,7 +118,7 @@ public class StudyAuditLogTableFactory extends AbstractTableFactory {
             h.put("studySubject.owner", owner);
             h.put("studySubject.status", studySubjectBean.getStatus());
             h.put("subject", subject);
-            h.put("subject.dateOfBirth", subject.getDateOfBirth());
+            h.put("subject.dateOfBirth", resolveBirthDay(subject.getDateOfBirth(),subject.isDobCollected(),getLocale()));
             h.put("subject.uniqueIdentifier", subject.getUniqueIdentifier());
 
             theItems.add(h);
@@ -129,7 +131,7 @@ public class StudyAuditLogTableFactory extends AbstractTableFactory {
      * A very custom way to filter the items. The AuditUserLoginFilter acts as a
      * command for the Hibernate criteria object. Take the Limit information and
      * filter the rows.
-     * 
+     *
      * @param limit
      *            The Limit to use.
      */
@@ -153,7 +155,7 @@ public class StudyAuditLogTableFactory extends AbstractTableFactory {
      * A very custom way to sort the items. The AuditUserLoginSort acts as a
      * command for the Hibernate criteria object. Take the Limit information and
      * sort the rows.
-     * 
+     *
      * @param limit
      *            The Limit to use.
      */
@@ -279,5 +281,19 @@ public class StudyAuditLogTableFactory extends AbstractTableFactory {
 
     public void setUserAccountDao(UserAccountDAO userAccountDao) {
         this.userAccountDao = userAccountDao;
+    }
+
+    private String resolveBirthDay(Date birthDate, boolean isDobCollected, Locale locale) {
+        if(birthDate == null) {
+            return "";
+        }else {
+            if(isDobCollected) {
+                return I18nFormatUtil.getDateFormat(locale).format(birthDate);
+            } else {
+                Calendar c = Calendar.getInstance(locale);
+                c.setTime(birthDate);
+                return c.get(Calendar.YEAR)+"";
+            }
+        }
     }
 }

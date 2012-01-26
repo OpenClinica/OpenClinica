@@ -36,11 +36,6 @@
     <%--<c:otherwise><fmt:setLocale value="${resword.locale}" scope="session"/></c:otherwise>--%>
 <%--</c:choose>--%>
 
-<c:set var="formatLocale"><fmt:message key="locale_string" bundle="${resformat}"/></c:set>
-
-
-
-
 <body class="login_BG" onLoad="document.getElementById('username').focus();">
     <div class="login_BG">
     <center>

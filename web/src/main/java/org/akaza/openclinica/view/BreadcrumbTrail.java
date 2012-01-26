@@ -9,6 +9,7 @@ package org.akaza.openclinica.view;
 
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
 import java.util.ArrayList;
@@ -70,7 +71,7 @@ public class BreadcrumbTrail {
      */
     public ArrayList generateTrail(Page jspPage, HttpServletRequest request) {
 
-        Locale locale = request.getLocale();
+        Locale locale = LocaleResolver.getLocale(request);
         ResourceBundle resworkflow = ResourceBundleProvider.getWorkflowBundle(locale);
 
         try {

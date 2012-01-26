@@ -6,6 +6,10 @@ public class ApplicationConstants {
         return "yyyy-MM-dd";
     }
 
+    public static String getPDateFormatInSavedData() {
+        return "yyyy-MM";
+    }
+
     public static String getDateFormatInExtract() {
         return "yyyy-MM-dd";
     }

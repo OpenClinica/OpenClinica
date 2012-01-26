@@ -25,7 +25,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head><title>OpenClinica <fmt:message key="double_data_entry" bundle="${resword}"/></title>
     <meta http-equiv="X-UA-Compatible" content="IE=8" />
-    
+
     <link rel="stylesheet" href="includes/styles.css" type="text/css" media="screen">
 <%-- <link rel="stylesheet" href="includes/styles2.css" type="text/css">--%>
     <link rel="stylesheet" href="includes/print.css" type="text/css" media="print">
@@ -41,6 +41,7 @@
 
     <link rel="stylesheet" type="text/css" media="all" href="includes/new_cal/skins/aqua/theme.css" title="Aqua" />
     <script type="text/javascript" src="includes/new_cal/calendar.js"></script>
+    <script type="text/javascript" src="includes/new_cal/lang/calendar-en.js"></script>
     <script type="text/javascript" src="includes/new_cal/lang/<fmt:message key="jscalendar_language_file" bundle="${resformat}"/>"></script>
     <script type="text/javascript" src="includes/new_cal/calendar-setup.js"></script>
     <!-- End -->
@@ -104,7 +105,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                 <img src="images/icon_Invalid.gif" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>">
             </c:when>
             <c:otherwise>
-              
+
             </c:otherwise>
         </c:choose></b>  &nbsp;&nbsp;</span> </h1> </td><td>
 		<h1><span class="title_manage"> <c:out value="${studySubject.label}" />&nbsp;&nbsp; </span></h1></td></tr></table>
@@ -371,7 +372,7 @@ window.onload = initmb;
         return true;
     }
     //-->
-    
+
     function disableSubmit() {
 		var srh = document.getElementById('srh');
 		var srl = document.getElementById('srl');
@@ -380,7 +381,7 @@ window.onload = initmb;
 		srh.disabled = true;
 		srl.disabled = true;
 		seh.disabled = true;
-		sel.disabled = true; 
+		sel.disabled = true;
 	}
 </script>
 
@@ -548,7 +549,7 @@ window.onload = initmb;
 <c:set var="sectionBorders" value="${section.section.borders}" />
 <!--<c:set var="repeatNumber" value="${displayItem.itemGroup.groupMetaBean.repeatNum}"/>-->
 <!--  was just <td>, tbh 05/03/2010 -->
-<%-- place where we need to highlight sections, 
+<%-- place where we need to highlight sections,
 	one of the error keys should equal the item group's OID --%>
 <c:set var="isSectionShown" value="false"/>
 <c:forEach var="formMsg" items="${formMessages}">
@@ -636,7 +637,7 @@ window.onload = initmb;
         </c:choose>
         </th>
     </c:forEach>
-    <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">            
+    <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">
         <c:choose>
             <c:when test="${sectionBorders == 1}">
                 <th class="aka_headerBackground aka_padding_large aka_cellBorders_dark" />
@@ -681,7 +682,7 @@ window.onload = initmb;
                     <th class="aka_headerBackground aka_padding_large aka_cellBorders"/>
                 </c:otherwise>
             </c:choose>
-        </c:if>    
+        </c:if>
         </c:forEach>
         <th />
     </tr>
@@ -703,7 +704,7 @@ window.onload = initmb;
 	<%-- adding more highlighting here, tbh 05/2010 --%>
 	<c:set var="isItemShown" value="false"/>
 		<c:forEach var="formMsg" items="${formMessages}">
-			
+
 			<c:set var="inputValue"><c:out value="${repeatParentId}"/>_<c:out value="${uniqueId}"/>input<c:out value="${bodyItem.item.id}"/></c:set>
 			<c:if test="${formMsg.key eq inputValue}">
 				<c:set var="isItemShown" value="true"/>
@@ -878,7 +879,7 @@ window.onload = initmb;
 
         </c:otherwise>
     </c:choose>
-</c:if>    
+</c:if>
 </tr>
 <c:if test="${status.last}">
 <!-- for the last but not the only first row, we need to use [] so the repetition javascript can copy it to create new row-->
@@ -889,17 +890,17 @@ window.onload = initmb;
     <c:when test="${bodyItem.metadata.showItem}">
 	<%-- set up highlighting here, tbh 05/2010 --%>
 		<c:set var="isItemShown" value="false"/>
-		
+
 		<c:forEach var="formMsg" items="${formMessages}">
-			
+
 			<c:set var="inputValue"><c:out value="${repeatParentId}"/>_<c:out value="${uniqueId}"/>input<c:out value="${bodyItem.item.id}"/></c:set>
 			<c:if test="${formMsg.key eq inputValue}">
 				<c:set var="isItemShown" value="true"/>
 				<%-- PASS! <c:out value="${inputValue}"/> --%>
 			</c:if>
-			
+
 		</c:forEach>
-		
+
         <c:choose>
 			<c:when test="${isItemShown && hasShown}">
                  <c:set var="extraClass" value="aka_group_show"/>
@@ -1186,7 +1187,7 @@ window.onload = initmb;
 							<c:set var="cdId" value="${displayItem.singleItem.item.id}"/>
 							<input type="hidden" id="col${cdId}" value="${numOfTr}"/>
 							<c:choose>
-							<c:when test="${scdShowStatus == 1}">	<%-- 'SHOW_CHANGABLE' --%> 
+							<c:when test="${scdShowStatus == 1}">	<%-- 'SHOW_CHANGABLE' --%>
 		                		<td valign="top" id="t${cdId}">
 					    	</c:when>
 					    	<c:when test="${scdShowStatus == 2}">	<%-- 'HIDE_CHANGABLE' --%>
@@ -1201,8 +1202,8 @@ window.onload = initmb;
 		                	<td valign="top">
 		                </c:otherwise>
 		                </c:choose>
-                
-                    
+
+
 						<c:set var="isItemShown" value="false"/>
 						<c:forEach var="formMsg" items="${formMessages}">
 							<c:set var="inputValue">input<c:out value="${displayItem.singleItem.item.id}"/></c:set>

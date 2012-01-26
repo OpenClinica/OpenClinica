@@ -163,11 +163,11 @@ public class CrfBusinessLogicHelper {
      * The following methods are for 'mark CRF complete' Note that we will also
      * wrap Study Event status changes in this code, possibly split out in a
      * later release, tbh 06/2008
-     * 
+     *
      * @return
      */
     public boolean markCRFComplete(EventCRFBean ecb, UserAccountBean ub) throws Exception {
-        // locale = request.getLocale();
+        // locale = LocaleResolver.getLocale(request);
         // < respage =
         // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",
         // locale);
@@ -340,11 +340,11 @@ public class CrfBusinessLogicHelper {
          * (!nonRequiredCrfIds.contains(new // Integer(ec.getCrf().getId())))) {
          * eventCompleted = false; logger.info("just rejected eventCompleted
          * looking at a CRF: " + ec.getName()); break; } }
-         * 
+         *
          * if (!allRequired) {
          * logger.info("SEB contains some nonrequired CRFs: " + allEDCsize +
          * " vs " + allEDCs.size()); }
-         * 
+         *
          * if (eventCompleted && allCRFs.size() >= allEDCsize) {// was //
          * allEDCs.size(), // tbh if (!allRequired) { addPageMessage("All
          * Required CRFs have been completed. "+ "You can update the Study

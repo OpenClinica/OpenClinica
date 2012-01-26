@@ -1,5 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ page import="org.akaza.openclinica.i18n.util.ResourceBundleProvider" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
@@ -67,16 +68,7 @@
         </div>
         <div id="UserInfo">
             <a href="${urlPrefix}UpdateProfile"><b><c:out value="${userBean.name}" /></b> (<c:out value="${userRole.role.description}" />)&nbsp;
-				<c:set var="formatLocale"><fmt:message key="locale_string" bundle="${resformat}"/></c:set>
-				
-			   <c:choose>
-                    <c:when test="${formatLocale == null}">
-                        en
-                    </c:when>
-                    <c:otherwise>
-                        <c:out value="${formatLocale}"/>
-                    </c:otherwise>
-                </c:choose>
+				<c:out value="<%=ResourceBundleProvider.getLocale().toString()%>"/>
             </a>&nbsp;|&nbsp;
             <a href="${urlPrefix}j_spring_security_logout"><fmt:message key="log_out" bundle="${resword}"/></a>
         </div>
@@ -112,7 +104,7 @@
                                             <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                             <c:if test="${study.status.available}">
                                                 <li><a href="${urlPrefix}AddNewSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                            </c:if>    
+                                            </c:if>
                                             <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                         </c:if>
                                         <c:if test="${userRole.monitor }">
@@ -122,21 +114,21 @@
                                             <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
                                         </c:if>
                                         <li id="nav_Tasks" style="position: relative; z-index: 3;">
-                                            <a href="#" onmouseover="setNav('nav_Tasks');" id="nav_Tasks_link"><fmt:message key="nav_tasks" bundle="${resword}"/> 
+                                            <a href="#" onmouseover="setNav('nav_Tasks');" id="nav_Tasks_link"><fmt:message key="nav_tasks" bundle="${resword}"/>
                                                 <img src="${urlPrefix}images/bt_Tasks_pulldown.gif" alt="Tasks" border="0"/></a>
                                         </li>
                                         </ul>
                                     </td>
                                     <td align="right" style="font-weight: normal;">
-                                        
+
                                         <form METHOD="GET" action="${urlPrefix}ListStudySubjects" onSubmit=" if (document.forms[0]['findSubjects_f_studySubject.label'].value == '<fmt:message key="study_subject_ID" bundle="${resword}"/>') { document.forms[0]['findSubjects_f_studySubject.label'].value=''}">
-                                            <a href="javascript:reportBug()"><fmt:message key="openclinica_report_issue" bundle="${resword}"/></a>&nbsp;|&nbsp; 
+                                            <a href="javascript:reportBug()"><fmt:message key="openclinica_report_issue" bundle="${resword}"/></a>&nbsp;|&nbsp;
                                             <a href="javascript:openDocWindow('<c:out value="${sessionScope.supportURL}" />')"><fmt:message key="openclinica_feedback" bundle="${resword}"/></a>&nbsp;&nbsp;
                                             <input type="text" name="findSubjects_f_studySubject.label" onblur="if (this.value == '') this.value = '<fmt:message key="study_subject_ID" bundle="${resword}"/>'" onfocus="if (this.value == '<fmt:message key="study_subject_ID" bundle="${resword}"/>') this.value = ''" value="<fmt:message key="study_subject_ID" bundle="${resword}"/>" class="navSearch"/>
                                             <input type="hidden" name="navBar" value="yes"/>
                                             <input type="submit" value="<fmt:message key="go" bundle="${resword}"/>"  class="navSearchButton"/>
                                         </form>
-                                        
+
                                     </td>
                                 </tr>
                             </table>
@@ -156,11 +148,11 @@
 
 
 <div id="nav_hide" style="position: absolute; left: 0px; top: 0px; visibility: hidden; z-index: 2; width: 100%; height: 400px;">
-    
-<a href="#" onmouseover="hideSubnavs();"><img src="${urlPrefix}images/spacer.gif" alt="" width="1000" height="400" border="0"/></a>
-</div>      
 
-    
+<a href="#" onmouseover="hideSubnavs();"><img src="${urlPrefix}images/spacer.gif" alt="" width="1000" height="400" border="0"/></a>
+</div>
+
+
     </div>
     <img src="${urlPrefix}images/spacer.gif" width="596" height="1"><br>
 <!-- End Main Navigation -->
@@ -185,7 +177,7 @@
         <div class="taskRightColumn">
             <div class="taskLink"><a href="${urlPrefix}CreateDataset"><fmt:message key="nav_create_dataset" bundle="${resword}"/></a></div>
         </div>
-        <br clear="all">    
+        <br clear="all">
         </c:if>
         <c:if test="${userRole.researchAssistant }">
         <div class="taskGroup"><fmt:message key="nav_submit_data" bundle="${resword}"/></div>
@@ -217,11 +209,11 @@
         <div class="taskRightColumn">
             <c:if test="${!study.status.frozen && !study.status.locked}">
                 <div class="taskLink"><a href="${urlPrefix}CreateNewStudyEvent"><fmt:message key="nav_schedule_event" bundle="${resword}"/></a></div>
-            </c:if>    
+            </c:if>
             <div class="taskLink"><a href="${urlPrefix}ViewStudyEvents"><fmt:message key="nav_view_events" bundle="${resword}"/></a></div>
             <div class="taskLink"><a href="${urlPrefix}ImportCRFData"><fmt:message key="nav_import_data" bundle="${resword}"/></a></div>
         </div>
-        <br clear="all">    
+        <br clear="all">
         <div class="taskGroup"><fmt:message key="nav_extract_data" bundle="${resword}"/></div>
         <div class="taskLeftColumn">
             <div class="taskLink"><a href="${urlPrefix}ViewDatasets"><fmt:message key="nav_view_datasets" bundle="${resword}"/></a></div>
@@ -229,7 +221,7 @@
         <div class="taskRightColumn">
             <div class="taskLink"><a href="${urlPrefix}CreateDataset"><fmt:message key="nav_create_dataset" bundle="${resword}"/></a></div>
         </div>
-        <br clear="all">            
+        <br clear="all">
         </c:if>
         <c:if test="${userRole.coordinator || userRole.director}">
         <div class="taskGroup"><fmt:message key="nav_submit_data" bundle="${resword}"/></div>
@@ -247,7 +239,7 @@
             <div class="taskLink"><a href="${urlPrefix}ViewStudyEvents"><fmt:message key="nav_view_events" bundle="${resword}"/></a></div>
             <div class="taskLink"><a href="${urlPrefix}ImportCRFData"><fmt:message key="nav_import_data" bundle="${resword}"/></a></div>
         </div>
-        <br clear="all"> 
+        <br clear="all">
         <div class="taskGroup"><fmt:message key="nav_monitor_and_manage_data" bundle="${resword}"/></div>
         <div class="taskLeftColumn">
             <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message key="nav_source_data_verification" bundle="${resword}"/></a></div>
@@ -270,7 +262,7 @@
             </c:otherwise>
         </c:choose>
         </div>
-        <br clear="all"> 
+        <br clear="all">
         <div class="taskGroup"><fmt:message key="nav_extract_data" bundle="${resword}"/></div>
         <div class="taskLeftColumn">
             <div class="taskLink"><a href="${urlPrefix}ViewDatasets"><fmt:message key="nav_view_datasets" bundle="${resword}"/></a></div>
@@ -278,7 +270,7 @@
         <div class="taskRightColumn">
             <div class="taskLink"><a href="${urlPrefix}CreateDataset"><fmt:message key="nav_create_dataset" bundle="${resword}"/></a></div>
         </div>
-        <br clear="all">    
+        <br clear="all">
         <div class="taskGroup"><fmt:message key="nav_study_setup" bundle="${resword}"/></div>
         <div class="taskLeftColumn">
             <div class="taskLink"><a href="${urlPrefix}ViewStudy?id=${study.id}&viewFull=yes"><fmt:message key="nav_view_study" bundle="${resword}"/></a></div>

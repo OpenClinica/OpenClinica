@@ -16,9 +16,9 @@ import java.util.Locale;
 import java.util.regex.Pattern;
 
 /**
- * 
+ *
  * Help class for string usage
- * 
+ *
  * @author jxu
  */
 public class StringUtil {
@@ -47,7 +47,7 @@ public class StringUtil {
 
     /**
      * Checks whether a string is blank
-     * 
+     *
      * @param s
      * @return true if blank, false otherwise
      */
@@ -101,15 +101,19 @@ public class StringUtil {
      * @param dateFormat
      * @return
      */
-    // ywang (Nov., 2008)
-    public static boolean isFormatDate(String s, String dateFormat) { 
+    public static boolean isFormatDate(String s, String dateFormat) {
         String dateformat = parseDateFormat(dateFormat);
         return isSameDate(dateformat, dateformat, s);
     }
-    
+
+    public static boolean isFormatDate(String s, String dateFormat, Locale locale) {
+        String dateformat = parseDateFormat(dateFormat);
+        return isSameDate(dateformat, dateformat, s, locale);
+    }
+
     /**
      * Return true if a string can be parsed by the dateFormat with locale.
-     *  
+     *
      * @param s
      * @param dateFormat
      * @param locale
@@ -130,13 +134,20 @@ public class StringUtil {
 
     /**
      * Allow only 4 digits, no more, no less. SimpleDateFormat uses the default locale.
-     * 
+     *
      * @param s
      * @param yearFormat
      * @return
      */
-    //ywang (Nov., 2008)
     public static boolean isPartialYear(String s, String yearFormat) {
+        return partialYear(s, yearFormat, null);
+    }
+
+    public static boolean isPartialYear(String s, String yearFormat, Locale locale) {
+        return partialYear(s, yearFormat, locale);
+    }
+
+    private static boolean partialYear(String s, String yearFormat, Locale locale) {
         int dn = 0;
         char[] cyear = s.toCharArray();
         for (char c : cyear) {
@@ -149,7 +160,12 @@ public class StringUtil {
             return false;
         }
         String yearformat = parseDateFormat(yearFormat) + "-MM-dd";
-        SimpleDateFormat sdf_y = new SimpleDateFormat(yearformat);
+        SimpleDateFormat sdf_y;
+        if(locale == null) {
+            sdf_y = new SimpleDateFormat(yearformat);
+        }else {
+            sdf_y = new SimpleDateFormat(yearformat, locale);
+        }
         sdf_y.setLenient(false);
         String sy = s + "-01-18";
         try {
@@ -162,21 +178,26 @@ public class StringUtil {
 
     /**
      * The year can only between 1000 and 9999.
-     * 
+     *
      * @param s
      * @param yearMonthFormat
      * @return
      */
-    //ywang (Nov., 2008)
     public static boolean isPartialYearMonth(String s, String yearMonthFormat) {
         String yearmonthformat = parseDateFormat(yearMonthFormat) + "-dd";
         String sym = s + "-18";
         return isSameDate(yearmonthformat, yearmonthformat, sym);
     }
 
+    public static boolean isPartialYearMonth(String s, String yearMonthFormat, Locale locale) {
+        String yearmonthformat = parseDateFormat(yearMonthFormat) + "-dd";
+        String sym = s + "-18";
+        return isSameDate(yearmonthformat, yearmonthformat, sym, locale);
+    }
+
     /**
      * return dateFormat with lowercase "y" and "d"
-     * 
+     *
      * @param dateFormat
      * @return
      */
@@ -195,7 +216,7 @@ public class StringUtil {
      * Return true if a date String is the same day when it is parsed by two
      * different dateFormats. The year can only between 1000 and 9999.
      * SimpleDataFormat uses the default locale.
-     * 
+     *
      * @param dateFormat1
      * @param dateFormat2
      * @param dateStr
@@ -206,6 +227,18 @@ public class StringUtil {
         sdf1.setLenient(false);
         SimpleDateFormat sdf2 = new SimpleDateFormat(dateFormat2);
         sdf2.setLenient(false);
+        return sameDate(sdf1,sdf2,dateStr);
+    }
+
+    public static boolean isSameDate(String dateFormat1, String dateFormat2, String dateStr, Locale locale) {
+        SimpleDateFormat sdf1 = new SimpleDateFormat(dateFormat1, locale);
+        sdf1.setLenient(false);
+        SimpleDateFormat sdf2 = new SimpleDateFormat(dateFormat2, locale);
+        sdf2.setLenient(false);
+        return sameDate(sdf1,sdf2,dateStr);
+    }
+
+    private static boolean sameDate(SimpleDateFormat sdf1, SimpleDateFormat sdf2, String dateStr) {
         try {
             Date d1 = sdf1.parse(dateStr);
             try {

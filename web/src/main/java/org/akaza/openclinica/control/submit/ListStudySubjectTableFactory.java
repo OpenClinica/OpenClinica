@@ -29,6 +29,7 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.apache.commons.lang.StringUtils;
 import org.jmesa.core.filter.FilterMatcher;
@@ -75,10 +76,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     private ArrayList<StudyGroupClassBean> studyGroupClasses;
     private StudyUserRoleBean currentRole;
     private UserAccountBean currentUser;
-    private boolean showMoreLink;
+    private final boolean showMoreLink;
     private ResourceBundle resword;
     private ResourceBundle resformat;
-    private ResourceBundle resterms = ResourceBundleProvider.getTermsBundle();
+    private final ResourceBundle resterms = ResourceBundleProvider.getTermsBundle();
 
 
     final HashMap<Integer, String> imageIconPaths = new HashMap<Integer, String>(8);
@@ -86,7 +87,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     @Override
 //To avoid showing title in other pages, the request element is used to determine where the request came from.
     public TableFacade createTable(HttpServletRequest request, HttpServletResponse response) {
-         locale = request.getLocale();
+         locale = LocaleResolver.getLocale(request);
         TableFacade tableFacade = getTableFacadeImpl(request, response);
         tableFacade.setStateAttr("restore");
         setDataAndLimitVariables(tableFacade);
@@ -525,7 +526,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         this.currentUser = currentUser;
     }
 
-    
+
     private class CharFilterMatcher implements FilterMatcher {
         public boolean evaluate(Object itemValue, String filterValue) {
             String item = StringUtils.lowerCase(String.valueOf(itemValue));

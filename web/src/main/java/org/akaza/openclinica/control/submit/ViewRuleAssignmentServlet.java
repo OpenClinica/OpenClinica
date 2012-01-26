@@ -13,6 +13,7 @@ import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
 import org.akaza.openclinica.view.Page;
@@ -30,7 +31,7 @@ import java.util.Locale;
 /**
  * Verify the Rule import , show records that have Errors as well as records
  * that will be saved.
- * 
+ *
  * @author Krikor krumlian
  */
 public class ViewRuleAssignmentServlet extends SecureController {
@@ -87,7 +88,7 @@ public class ViewRuleAssignmentServlet extends SecureController {
 
     @Override
     public void mayProceed() throws InsufficientPermissionException {
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         if (ub.isSysAdmin()) {
             return;
         }

@@ -1,9 +1,9 @@
-/* 
+/*
  * OpenClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
  * For details see: http://www.openclinica.org/license
  *
- * Copyright 2003-2008 Akaza Research 
+ * Copyright 2003-2008 Akaza Research
  */
 package org.akaza.openclinica.control.submit;
 
@@ -12,6 +12,7 @@ import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -23,7 +24,7 @@ import java.util.Locale;
 /**
  * View the uploaded data and verify what is going to be saved into the system
  * and what is not.
- * 
+ *
  * @author Krikor Krumlian
  */
 @SuppressWarnings("serial")
@@ -89,7 +90,7 @@ public class VerifyImportedRuleServlet extends SecureController {
     @Override
     public void mayProceed() throws InsufficientPermissionException {
 
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         if (ub.isSysAdmin()) {
             return;
         }

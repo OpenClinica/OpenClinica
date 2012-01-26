@@ -15,6 +15,7 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.DatasetRow;
@@ -57,7 +58,7 @@ public class RemoveDatasetServlet extends SecureController {
             return;
         }
 
-        if(!ub.isSysAdmin() && (dataset.getOwnerId() != ub.getId())){
+        if(!ub.isSysAdmin() && dataset.getOwnerId() != ub.getId()){
             addPageMessage(respage.getString("no_have_correct_privilege_current_study")
                     + " " + respage.getString("change_active_study_or_contact"));
             forwardPage(Page.MENU_SERVLET);
@@ -87,7 +88,7 @@ public class RemoveDatasetServlet extends SecureController {
     @Override
     public void mayProceed() throws InsufficientPermissionException {
 
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
 
         if (ub.isSysAdmin()) {
             return;// TODO limit to owner only?

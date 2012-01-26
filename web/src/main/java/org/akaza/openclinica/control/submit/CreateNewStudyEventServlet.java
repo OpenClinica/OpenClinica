@@ -25,6 +25,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -48,10 +49,10 @@ public class CreateNewStudyEventServlet extends SecureController {
     public static final String INPUT_STUDY_EVENT_DEFINITION = "studyEventDefinition";
 
     // public static final String INPUT_STUDY_EVENT_DEFINITION_SCHEDULED =
-    // "studyEventDefinitionScheduled"; 
+    // "studyEventDefinitionScheduled";
 
     public static final String INPUT_STUDY_SUBJECT = "studySubject";
-    
+
     public static final String INPUT_STUDY_SUBJECT_LABEL = "studySubjectLabel";
 
     public static final String INPUT_STUDY_SUBJECT_ID_FROM_VIEWSUBJECT = "studySubjectId";
@@ -318,7 +319,7 @@ public class CreateNewStudyEventServlet extends SecureController {
 
             // StudySubjectBean studySubject = (StudySubjectBean) sdao.findByPK(fp.getInt(INPUT_STUDY_SUBJECT));
             // sdao.findByLabelAndStudy(label, study)
-            StudySubjectBean studySubject = (StudySubjectBean) sdao.findByLabelAndStudy(fp.getString(INPUT_STUDY_SUBJECT_LABEL), currentStudy);
+            StudySubjectBean studySubject = sdao.findByLabelAndStudy(fp.getString(INPUT_STUDY_SUBJECT_LABEL), currentStudy);
             // >> 4358 tbh, 11/2009
             // what if we are sent here from AddNewSubjectServlet.java??? we need to get that study subject bean
             if (request.getAttribute(INPUT_STUDY_SUBJECT) != null) {
@@ -614,7 +615,7 @@ public class CreateNewStudyEventServlet extends SecureController {
     @Override
     protected void mayProceed() throws InsufficientPermissionException {
 
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         // < restext =
         // ResourceBundle.getBundle("org.akaza.openclinica.i18n.notes",locale);
         // < respage =
@@ -643,7 +644,7 @@ public class CreateNewStudyEventServlet extends SecureController {
      * <li>The subject does not yet have a study event for the given study event
      * definition
      * </ul>
-     * 
+     *
      * @param studyEventDefinition
      *            The definition of the study event which is to be added for the
      *            subject.

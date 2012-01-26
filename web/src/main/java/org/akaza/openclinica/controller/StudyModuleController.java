@@ -1,6 +1,8 @@
 package org.akaza.openclinica.controller;
 
+import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -13,6 +15,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.rule.RuleDAO;
 import org.akaza.openclinica.domain.managestudy.StudyModuleStatus;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.StudyInfoPanel;
@@ -36,8 +39,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -102,7 +103,7 @@ public class StudyModuleController {
         request.getSession().setAttribute("panel", panel);
 
         // setUpSidebar(request);
-        ResourceBundleProvider.updateLocale(request.getLocale());
+        ResourceBundleProvider.updateLocale(LocaleResolver.getLocale(request));
 
         StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
 
@@ -219,7 +220,7 @@ public class StudyModuleController {
         ArrayList pageMessages = new ArrayList();
         if (request.getSession().getAttribute("pageMessages") != null) {
             pageMessages.addAll((ArrayList) request.getSession().getAttribute("pageMessages"));
-            request.setAttribute("pageMessages", pageMessages); 
+            request.setAttribute("pageMessages", pageMessages);
             request.getSession().removeAttribute("pageMessages");
         }
         return map;
@@ -227,8 +228,8 @@ public class StudyModuleController {
     private String getHostPathFromSysUrl(String sysURL,String contextPath) {
         return sysURL.replaceAll(contextPath+"/", "");
        }
-    
- 
+
+
 
     @RequestMapping(method = RequestMethod.POST)
     public String processSubmit(@ModelAttribute("studyModuleStatus") StudyModuleStatus studyModuleStatus, BindingResult result, SessionStatus status,
@@ -316,7 +317,7 @@ public class StudyModuleController {
         logMe("into the getHostPath/....URL = "+request.getRequestURL()+"URI="+request.getRequestURI()+"PROTOCOL=");
         String requestURLMinusServletPath = getRequestURLMinusServletPath(request);
         String hostPath = "";
-        
+
         if (null != requestURLMinusServletPath) {
             String tmpPath = requestURLMinusServletPath.substring(0, requestURLMinusServletPath.lastIndexOf("/"));
             logMe("processing2..."+tmpPath);
@@ -331,11 +332,11 @@ public class StudyModuleController {
         String webAppName = null;
         if (null != servletCtxRealPath) {
             String[] tokens = servletCtxRealPath.split("\\\\");
-            webAppName = tokens[(tokens.length - 1)].trim();
+            webAppName = tokens[tokens.length - 1].trim();
         }
         return webAppName;
     }
-	
+
 	    private boolean mayProceed(HttpServletRequest request) {
         StudyUserRoleBean currentRole = (StudyUserRoleBean)request.getSession().getAttribute("userRole");
         Role r = currentRole.getRole();

@@ -40,6 +40,7 @@ import org.akaza.openclinica.dao.rule.RuleSetDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.service.crfdata.HideCRFManager;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -109,7 +110,7 @@ public class EnterDataForStudyEventServlet extends SecureController {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.akaza.openclinica.control.core.SecureController#processRequest()
      */
     @Override
@@ -244,13 +245,13 @@ public class EnterDataForStudyEventServlet extends SecureController {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.akaza.openclinica.control.core.SecureController#mayProceed()
      */
     @Override
     protected void mayProceed() throws InsufficientPermissionException {
 
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         // <
         // resexception=ResourceBundle.getBundle(
         // "org.akaza.openclinica.i18n.exceptions",locale);
@@ -272,7 +273,7 @@ public class EnterDataForStudyEventServlet extends SecureController {
     /**
      * Finds all the event definitions for which no event CRF exists - which is
      * the list of event definitions with uncompleted event CRFs.
-     * 
+     *
      * @param eventDefinitionCRFs
      *            All of the event definition CRFs for this study event.
      * @param eventCRFs
@@ -292,10 +293,10 @@ public class EnterDataForStudyEventServlet extends SecureController {
          * event definition ED, if (!isCompleted(ED)) { answer += ED; } return
          * answer; This algorithm is guaranteed to find all the event
          * definitions for which no event CRF exists.
-         * 
+         *
          * The motivation for using this algorithm is reducing the number of
          * database hits.
-         * 
+         *
          * -jun-we have to add more CRFs here: the event CRF which dones't have
          * item data yet
          */
@@ -440,7 +441,7 @@ public class EnterDataForStudyEventServlet extends SecureController {
     /**
      * Each of the event CRFs with its corresponding CRFBean. Then generates a
      * list of DisplayEventCRFBeans, one for each event CRF.
-     * 
+     *
      * @param eventCRFs
      *            The list of event CRFs for this study event.
      * @param eventDefinitionCRFs
@@ -532,12 +533,12 @@ public class EnterDataForStudyEventServlet extends SecureController {
      * will represent Event CRFs which are in initial data entry, have completed
      * initial data entry, are in double data entry, or have completed double
      * data entry.
-     * 
+     *
      * The list is sorted using the DisplayEventCRFBean's compareTo method (that
      * is, using the event definition crf bean's ordinal value.) Also, the
      * setFlags method of each DisplayEventCRFBean object will have been called
      * once.
-     * 
+     *
      * @param studyEvent
      *            The study event for which we want the Event CRFs.
      * @param ecdao
@@ -614,7 +615,7 @@ public class EnterDataForStudyEventServlet extends SecureController {
      * If DiscrepancyNoteBeans have a certain column value, then set flags that
      * a JSP will check in the request attribute. This is a convenience method
      * called by the processRequest() method.
-     * 
+     *
      * @param discBeans
      *            A List of DiscrepancyNoteBeans.
      */

@@ -22,6 +22,7 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.view.Page;
@@ -112,7 +113,7 @@ public class ListDiscNotesSubjectServlet extends SecureController {
         if (!filterSummary.isEmpty()) {
             request.setAttribute(FILTER_SUMMARY, filterSummary);
         }
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
 
         StudyBean sbean = (StudyBean) session.getAttribute("study");
         //List<DiscrepancyNoteBean> allDiscNotes = discNoteUtil.getThreadedDNotesForStudy(sbean, resolutionStatusIds, sm.getDataSource(), discNoteType, true);
@@ -154,7 +155,7 @@ public class ListDiscNotesSubjectServlet extends SecureController {
         factory.setEventDefintionCRFDAO(eddao);
         factory.setStudyGroupDAO(sgdao);
         factory.setDiscrepancyNoteDAO(dnDAO);
-        
+
         factory.setModule(moduleStr);
         factory.setDiscNoteType(discNoteType);
         // factory.setStudyHasDiscNotes(allDiscNotes != null &&
@@ -174,7 +175,7 @@ public class ListDiscNotesSubjectServlet extends SecureController {
     @Override
     public void mayProceed() throws InsufficientPermissionException {
 
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         // <
         // resexception=ResourceBundle.getBundle("org.akaza.openclinica.i18n.exceptions",locale);
         // < respage =

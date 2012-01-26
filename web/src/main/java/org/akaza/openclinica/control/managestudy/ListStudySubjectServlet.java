@@ -34,6 +34,7 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.bean.DisplayStudySubjectRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
@@ -67,7 +68,7 @@ public abstract class ListStudySubjectServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         // < resword =
         // ResourceBundle.getBundle("org.akaza.openclinica.i18n.words",locale);
 

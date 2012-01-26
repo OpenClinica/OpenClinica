@@ -35,6 +35,7 @@ import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
 import org.akaza.openclinica.domain.rule.expression.ExpressionProcessor;
 import org.akaza.openclinica.domain.rule.expression.ExpressionProcessorFactory;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.akaza.openclinica.view.Page;
@@ -56,7 +57,7 @@ import java.util.Map;
 
 /**
  * Verify the Rule import , show records that have Errors as well as records that will be saved.
- * 
+ *
  * @author Krikor krumlian
  */
 public class TestRuleServlet extends SecureController {
@@ -400,7 +401,7 @@ public class TestRuleServlet extends SecureController {
 
     @Override
     public void mayProceed() throws InsufficientPermissionException {
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         if (ub.isSysAdmin()) {
             return;
         }

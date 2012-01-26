@@ -21,6 +21,7 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -50,13 +51,13 @@ public class ListDiscNotesForCRFServlet extends SecureController {
     // < ResourceBundleresword;
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.akaza.openclinica.control.core.SecureController#mayProceed()
      */
     @Override
     protected void mayProceed() throws InsufficientPermissionException {
 
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         // < resword =
         // ResourceBundle.getBundle("org.akaza.openclinica.i18n.words",locale);
 
@@ -121,7 +122,7 @@ public class ListDiscNotesForCRFServlet extends SecureController {
          * Generate a summary of how we are filtering; Map<String, List<String>>
          * filterSummary = discNoteUtil.generateFilterSummary(discNoteType,
          * resolutionStatusIds);
-         * 
+         *
          * if (!filterSummary.isEmpty()) { request.setAttribute(FILTER_SUMMARY,
          * filterSummary); }
          */

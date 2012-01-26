@@ -7,7 +7,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
-<link type="text/css" href="includes/jmesa/jmesa.css"  rel="stylesheet"> 
+<link type="text/css" href="includes/jmesa/jmesa.css"  rel="stylesheet">
 <link rel="stylesheet" href="includes/styles.css" type="text/css">
 <%-- <link rel="stylesheet" href="includes/styles2.css" type="text/css">--%>
 <%-- <link rel="stylesheet" href="includes/NewNavStyles.css" type="text/css" />--%>
@@ -20,8 +20,9 @@
 
 <link rel="stylesheet" type="text/css" media="all" href="includes/new_cal/skins/aqua/theme.css" title="Aqua" />
 <script type="text/javascript" src="includes/new_cal/calendar.js"></script>
+<script type="text/javascript" src="includes/new_cal/lang/calendar-en.js"></script>
 <script type="text/javascript" src="includes/new_cal/lang/<fmt:message key="jscalendar_language_file" bundle="${resformat}"/>"></script>
-<script type="text/javascript" src="includes/new_cal/calendar-setup.js"></script>   
+<script type="text/javascript" src="includes/new_cal/calendar-setup.js"></script>
 
 <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-1.3.2.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js"></script>

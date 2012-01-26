@@ -1,15 +1,5 @@
 package org.akaza.openclinica.control.managestudy;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -38,9 +28,20 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.display.DisplaySectionBeanHandler;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Shamim
@@ -54,7 +55,7 @@ public class PrintAllEventCRFServlet extends DataEntryServlet {
      */
     @Override
     public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         UserAccountBean ub =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
         StudyUserRoleBean  currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
         if (ub.isSysAdmin()) {
@@ -157,7 +158,7 @@ public class PrintAllEventCRFServlet extends DataEntryServlet {
                     // a boolean value depending on whether data is involved or not
                     // ('false' in terms of this
                     // servlet; see PrintDataEntryServlet).
-                   
+
                     DisplaySectionBeanHandler handler = new DisplaySectionBeanHandler(false, getDataSource(), getServletContext());
                     handler.setCrfVersionId(crfVersionBean.getId());
                     //handler.setEventCRFId(eventCRFId);
@@ -201,7 +202,7 @@ public class PrintAllEventCRFServlet extends DataEntryServlet {
                 request.setAttribute(SECTION_BEAN,sb);
                 request.setAttribute(ALL_SECTION_BEANS, allSectionBeans);
                 sectionBeans = super.getAllDisplayBeans(request);
-           
+
                 DisplaySectionBean dsb = super.getDisplayBean(false, false, request, isSubmitted);
                 PrintCRFBean printCrfBean = new PrintCRFBean();
                 printCrfBean.setAllSections(sectionBeans);
@@ -251,7 +252,7 @@ public class PrintAllEventCRFServlet extends DataEntryServlet {
     @Override
     protected String getEventCRFAnnotations(HttpServletRequest request) {
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
-        
+
         return ecb.getAnnotations();
     }
 
@@ -263,7 +264,7 @@ public class PrintAllEventCRFServlet extends DataEntryServlet {
     @Override
     protected void setEventCRFAnnotations(String annotations, HttpServletRequest request) {
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
-        
+
         ecb.setAnnotations(annotations);
     }
 

@@ -22,6 +22,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.DatasetRow;
@@ -36,11 +37,11 @@ import java.util.Locale;
 /**
  * ViewDatasetsServlet.java, the view datasets function accessed from the
  * extract datasets main page.
- * 
+ *
  * @author thickerson
- * 
- * 
- * 
+ *
+ *
+ *
  */
 public class ViewDatasetsServlet extends SecureController {
 
@@ -150,7 +151,7 @@ public class ViewDatasetsServlet extends SecureController {
             } else if ("details".equalsIgnoreCase(action)) {
                 FormProcessor fp = new FormProcessor(request);
                 int datasetId = fp.getInt("datasetId");
-                
+
                 DatasetBean db = initializeAttributes(datasetId);
                 StudyDAO sdao = new StudyDAO(sm.getDataSource());
                 StudyBean study = (StudyBean)sdao.findByPK(db.getStudyId());
@@ -183,7 +184,7 @@ public class ViewDatasetsServlet extends SecureController {
     @Override
     public void mayProceed() throws InsufficientPermissionException {
 
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
 
         if (ub.isSysAdmin()) {
             return;
@@ -201,12 +202,12 @@ public class ViewDatasetsServlet extends SecureController {
     /**
      * Initialize data of a DatasetBean and set session attributes for
      * displaying selected data of this DatasetBean
-     * 
+     *
      * @param db
      * @return
-     * 
-     * @author ywang (Feb, 2008)
+     *
      */
+    // @author ywang (Feb, 2008)
     public DatasetBean initializeAttributes(int datasetId) {
         DatasetDAO dsdao = new DatasetDAO(sm.getDataSource());
         DatasetBean db = dsdao.initialDatasetData(datasetId);

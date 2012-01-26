@@ -16,6 +16,7 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -52,10 +53,10 @@ public class AccessFileServlet extends SecureController {
         {
             StudyBean studyBean = (StudyBean )studyDao.findByPK(dsBean.getStudyId());
             parentId =  studyBean.getParentStudyId();//parent id of dataset created
-            
+
         }
         //logic: is parentId of the dataset created not equal to currentstudy? or is current study
-        if ((parentId)!=currentStudy.getId() )
+        if (parentId!=currentStudy.getId() )
 if( dsBean.getStudyId() != currentStudy.getId())		{
             addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
             throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
@@ -97,12 +98,12 @@ if( dsBean.getStudyId() != currentStudy.getId())		{
             response.setHeader("Content-disposition", "filename=\"" + asdfBean.getName() + "\";");
             response.setContentType("text/html; charset=utf-8");
         } else {
-            
+
             // response.setContentType("text/plain");
             // to ensure backwards compatability to text files shown on server
             // not needed anymore? tbh 10/2010
         }
-        
+
         System.out.println("just set content type: " + response.getContentType());
         finalTarget.setFileName("/WEB-INF/jsp/extract/generatedFileDataset.jsp");
         // }
@@ -115,7 +116,7 @@ if( dsBean.getStudyId() != currentStudy.getId())		{
     @Override
     public void mayProceed() throws InsufficientPermissionException {
 
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         // < restext =
         // ResourceBundle.getBundle("org.akaza.openclinica.i18n.notes",locale);
         // < respage =

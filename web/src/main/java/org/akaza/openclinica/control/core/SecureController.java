@@ -44,6 +44,8 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.i18n.util.I18nFormatUtil;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.BreadcrumbTrail;
 import org.akaza.openclinica.view.Page;
@@ -96,7 +98,7 @@ import javax.sql.DataSource;
 
 /**
  * This class enhances the Controller in several ways.
- * 
+ *
  * <ol>
  * <li>The method mayProceed, for which the class is named, is declared abstract and is called before processRequest. This
  * method indicates whether the user may proceed with the action he wishes to perform (as indicated by various attributes or
@@ -105,34 +107,34 @@ import javax.sql.DataSource;
  * should throw an exception. InsufficientPermissionException will accept a Page object which indicates where the user should
  * be redirected in order to be informed that he has insufficient permission, and the process method enforces this redirection
  * by catching an InsufficientPermissionException object.
- * 
+ *
  * <li>Four new members, session, request, response, and the UserAccountBean object ub have been declared protected, and are
  * set in the process method. This allows developers to avoid passing these objects between methods, and moreover it
  * accurately encodes the fact that these objects represent the state of the servlet.
- * 
+ *
  * <br/>
  * In particular, please note that it is no longer necessary to generate a bean for the session manager, the current user or
  * the current study.
- * 
+ *
  * <li>The method processRequest has been declared abstract. This change is unlikely to affect most code, since by custom
  * processRequest is declared in each subclass anyway.
- * 
+ *
  * <li>The standard try-catch block within most processRequest methods has been included in the process method, which calls
  * the processRequest method. Therefore, subclasses may throw an Exception in the processRequest method without having to
  * handle it.
- * 
+ *
  * <li>The addPageMessage method has been declared to streamline the process of setting page-level messages. The accompanying
  * showPageMessages.jsp file in jsp/include/ automatically displays all of the page messages; the developer need only include
  * this file in the jsp.
- * 
+ *
  * <li>The addEntityList method makes it easy to add a Collection of EntityBeans to the request. Note that this method should
  * only be used for Collections from which one EntityBean must be selected by the user. If the Collection is empty, this
  * method will throw an InconsistentStateException, taking the user to an error page and settting a page message indicating
  * that the user may not proceed because no entities are present. Note that the error page and the error message must be
  * specified.
  * </ol>
- * 
- * @author ssachs, modified by ywang
+ *
+ * @author ssachs
  */
 public abstract class SecureController extends HttpServlet implements SingleThreadModel {
     protected ServletContext context;
@@ -158,11 +160,9 @@ public abstract class SecureController extends HttpServlet implements SingleThre
      */
     protected SimpleDateFormat local_df = new SimpleDateFormat("MM/dd/yyyy");
     public static ResourceBundle resadmin, resaudit, resexception, resformat, respage, resterm, restext, resword, resworkflow;
-    private static Locale format_locale;
-    
+
     protected StudyInfoPanel panel = new StudyInfoPanel();
 
-    public static final String FORMAT_LOCALE_STRING = "localeString";
     public static final String PAGE_MESSAGE = "pageMessages";// for showing
     // page
     // wide message
@@ -244,7 +244,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     /**
      * Process request
-     * 
+     *
      * @throws Exception
      */
     protected abstract void processRequest() throws Exception;
@@ -308,11 +308,11 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                         String successMsg = dataMap.getString("SUCCESS_MESSAGE");
                         String success = dataMap.getString("successMsg");
                         if (success != null ) {
-                            
+
                             if (successMsg.contains("$linkURL")) {
                                 successMsg = decodeLINKURL(successMsg, datasetId);
                             }
-                       
+
                             if(successMsg!=null && !successMsg.isEmpty())
                             {
                                 addPageMessage(successMsg);
@@ -326,7 +326,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                             request.getSession().removeAttribute("datasetId");
                         }
                     }
-                   
+
                 } else {
 
                 }
@@ -382,7 +382,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         currentRole = (StudyUserRoleBean) session.getAttribute("userRole");
 
         // Set current language preferences
-        Locale locale = request.getLocale();
+        Locale locale = LocaleResolver.getLocale(request);
         ResourceBundleProvider.updateLocale(locale);
         resadmin = ResourceBundleProvider.getAdminBundle(locale);
         resaudit = ResourceBundleProvider.getAuditEventsBundle(locale);
@@ -393,11 +393,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         resword = ResourceBundleProvider.getWordsBundle(locale);
         respage = ResourceBundleProvider.getPageMessagesBundle(locale);
         resworkflow = ResourceBundleProvider.getWorkflowBundle(locale);
-        String locStr = resformat.getString("locale_string");
-        format_locale = new Locale(locStr);
-        session.setAttribute(FORMAT_LOCALE_STRING, locStr);
 
-        local_df = new SimpleDateFormat(resformat.getString("date_format_string"));
+        local_df = I18nFormatUtil.getDateFormat(locale);
 
         try {
             String userName = request.getRemoteUser();
@@ -607,7 +604,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     /**
      * Handles the HTTP <code>GET</code> method.
-     * 
+     *
      * @param request
      * @param response
      * @throws ServletException
@@ -625,7 +622,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     /**
      * Handles the HTTP <code>POST</code> method.
-     * 
+     *
      * @param request servlet request
      * @param response servlet response
      */
@@ -644,7 +641,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
      * Forwards to a jsp page. Additions to the forwardPage() method involve checking the session for the bread crumb trail
      * and setting it, if necessary. Setting it here allows the developer to only have to update the
      * <code>BreadcrumbTrail</code> class.
-     * 
+     *
      * @param jspPage The page to go to.
      * @param checkTrail The command to check for, and set a trail in the session.
      */
@@ -719,7 +716,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
      * e.g.:
      * <code>addEntityList("groups", allGroups, "There are no groups to display, so you cannot add a subject to this Study.",
      * Page.SUBMIT_DATA)</code>
-     * 
+     *
      * @param beanName The name of the entity list as it should be stored in the request object.
      * @param list The Collection of entities.
      * @param messageIfEmpty The message to display if the collection is empty.
@@ -753,8 +750,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     /**
      * <p>Check if an entity with passed entity id is included in studies of current user.</p>
-     * 
-     * <p>Note: This method called AuditableEntityDAO.findByPKAndStudy which required 
+     *
+     * <p>Note: This method called AuditableEntityDAO.findByPKAndStudy which required
      * "The subclass must define findByPKAndStudyName before calling this
      * method. Otherwise an inactive AuditableEntityBean will be returned."</p>
      * @author ywang 10-18-2007
@@ -1118,7 +1115,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         StudyUserRoleBean studyUserRole = ub.getRoleByStudy(studyId);
         StudyUserRoleBean siteUserRole = new StudyUserRoleBean();
         if (siteId != 0) {
-            siteUserRole = ub.getRoleByStudy(siteId);    
+            siteUserRole = ub.getRoleByStudy(siteId);
         }
         if(studyUserRole.getRole().equals(Role.INVALID) && siteUserRole.getRole().equals(Role.INVALID)){
             addPageMessage(respage.getString("no_have_correct_privilege_current_study")
@@ -1132,7 +1129,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     /**
      * A inner class designed to allow the implementation of a JUnit test case for abstract SecureController. The inner class
      * allows the test case to call the outer class' private process() method.
-     * 
+     *
      * @author Bruce W. Perry 01/2008
      * @see org.akaza.openclinica.servlettests.SecureControllerServletTest
      * @see org.akaza.openclinica.servlettests.SecureControllerWrapper
@@ -1146,13 +1143,5 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         public void process(HttpServletRequest request, HttpServletResponse response) throws OpenClinicaException, UnsupportedEncodingException {
             SecureController.this.process(request, response);
         }
-    }
-
-
-    public static Locale getFormat_locale() {
-        return format_locale;
-    }
-    public static void setFormat_locale(Locale formatLocale) {
-        format_locale = formatLocale;
     }
 }

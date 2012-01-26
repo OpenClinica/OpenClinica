@@ -26,6 +26,7 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.job.CrfBusinessLogicHelper;
@@ -41,7 +42,7 @@ import javax.sql.DataSource;
 /**
  * View the uploaded data and verify what is going to be saved into the system
  * and what is not.
- * 
+ *
  * @author Krikor Krumlian
  */
 public class VerifyImportedCRFDataServlet extends SecureController {
@@ -49,12 +50,12 @@ public class VerifyImportedCRFDataServlet extends SecureController {
     Locale locale;
 
     /**
-     * 
+     *
      */
     @Override
     public void mayProceed() throws InsufficientPermissionException {
 
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         if (ub.isSysAdmin()) {
             return;
         }
@@ -207,8 +208,8 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                         } else {
                             itemDataDao.create(displayItemBean.getData());
                             logger.info("created: " + displayItemBean.getData().getItemId()+"event CRF ID = "+eventCrfBean.getId()+"CRF VERSION ID ="+eventCrfBean.getCRFVersionId());
-                            
-                            
+
+
                             // does this dao function work for repeating
                             // events/groups?
                             // ItemDataBean itemDataBean =

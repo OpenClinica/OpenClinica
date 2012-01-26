@@ -13,6 +13,7 @@ import org.akaza.openclinica.bean.extract.FilterBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.extract.FilterDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
@@ -77,7 +78,7 @@ public class RemoveFilterServlet extends SecureController {
     @Override
     public void mayProceed() throws InsufficientPermissionException {
 
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         // < resmessage =
         // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",locale);
         // < restext =

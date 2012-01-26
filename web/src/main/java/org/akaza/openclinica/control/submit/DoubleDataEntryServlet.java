@@ -28,6 +28,7 @@ import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -56,7 +57,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
         UserAccountBean ub =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
         StudyUserRoleBean  currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
-        
+
         boolean userIsOwner = ub.getId() == ecb.getOwnerId();
         boolean lessThanTwelveHoursHavePassed = !DisplayEventCRFBean.initialDataEntryCompletedMoreThanTwelveHoursAgo(ecb);
 
@@ -65,7 +66,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.akaza.openclinica.control.core.SecureController#mayProceed()
      */
     @Override
@@ -75,9 +76,9 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
         UserAccountBean ub =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
         StudyUserRoleBean  currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
         HttpSession session = request.getSession();
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
 
-        
+
         // < respage =
         // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",
         // locale);
@@ -195,7 +196,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @seeorg.akaza.openclinica.control.submit.DataEntryServlet#
      * validateInputOnFirstRound()
      */
@@ -210,7 +211,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
         org.akaza.openclinica.bean.core.ResponseType rt = dib.getMetadata().getResponseSet().getResponseType();
         HttpSession session = request.getSession();
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
-        
+
         boolean isSingleItem = false;
         if (StringUtil.isBlank(inputName)) {// for single items
             inputName = getInputName(dib);
@@ -257,7 +258,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
         if(!showItem && dib.getScdData().getScdItemMetadataBean().getScdItemFormMetadataId()>0) {
             showItem = true;
         }
-        boolean showDuplicateItem = getItemMetadataService().hasPassedDDE(dib.getMetadata(), ecb, valueToCompare);//.isShown(dib.getItem().getId(), ecb, dib.getDbData());// where is the set db data? 
+        boolean showDuplicateItem = getItemMetadataService().hasPassedDDE(dib.getMetadata(), ecb, valueToCompare);//.isShown(dib.getItem().getId(), ecb, dib.getDbData());// where is the set db data?
         logger.debug("*** show original item has value " + dib.getData().getValue() + " and show item has value " + valueToCompare.getValue());
         logger.debug("--- show original: " + showOriginalItem + " show duplicate: " + showDuplicateItem + " and just show item: " + showItem);
         logger.debug("VALIDATION COUNT " + validationCount);
@@ -350,7 +351,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
         HttpSession session = request.getSession();
         logger.info("===got this far");
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
-        
+
         int keyId = ecb.getId();
         Integer validationCount = (Integer) session.getAttribute(COUNT_VALIDATE + keyId);
 
@@ -404,7 +405,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
             isSingleItem = true;
         }
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
-        
+
         // we only give warning to user if data entered in DDE is different from
         // IDE when the first
         // time user hits 'save'
@@ -439,7 +440,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.akaza.openclinica.control.submit.DataEntryServlet#getBlankItemStatus
      * ()
@@ -451,7 +452,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.akaza.openclinica.control.submit.DataEntryServlet#getNonBlankItemStatus
      * ()
@@ -463,7 +464,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.akaza.openclinica.control.submit.DataEntryServlet#getEventCRFAnnotations
      * ()
@@ -471,13 +472,13 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
     @Override
     protected String getEventCRFAnnotations(HttpServletRequest request) {
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
-        
+
         return ecb.getValidatorAnnotations();
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.akaza.openclinica.control.submit.DataEntryServlet#setEventCRFAnnotations
      * (java.lang.String)
@@ -485,13 +486,13 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
     @Override
     protected void setEventCRFAnnotations(String annotations, HttpServletRequest request) {
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
-        
+
         ecb.setValidatorAnnotations(annotations);
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.akaza.openclinica.control.submit.DataEntryServlet#getJSPPage()
      */
     @Override
@@ -501,7 +502,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.akaza.openclinica.control.submit.DataEntryServlet#getServletPage()
      */
@@ -523,7 +524,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.akaza.openclinica.control.submit.DataEntryServlet#loadDBValues()
      */
     @Override
@@ -563,7 +564,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
 
         org.akaza.openclinica.bean.core.ResponseType rt = dib.getMetadata().getResponseSet().getResponseType();
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
-        
+
         boolean isSingleItem = false;
         if (StringUtil.isBlank(inputName)) {// for single items
             inputName = getInputName(dib);

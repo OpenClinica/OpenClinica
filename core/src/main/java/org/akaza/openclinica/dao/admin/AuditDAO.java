@@ -9,27 +9,32 @@ package org.akaza.openclinica.dao.admin;
 
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.DeletedEventCRFBean;
+import org.akaza.openclinica.bean.core.ApplicationConstants;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.Utils;
+import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.EntityDAO;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
+import org.akaza.openclinica.i18n.util.I18nFormatUtil;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 import javax.sql.DataSource;
 
 /**
  * @author Krikor Krumlian 2/10/2007
  * @author jsampson
- * 
+ *
  */
 public class AuditDAO extends EntityDAO {
     // private DAODigester digester;
@@ -100,15 +105,13 @@ public class AuditDAO extends EntityDAO {
         eb.setEntityId(((Integer) hm.get("entity_id")).intValue());
         eb.setEntityName((String) hm.get("entity_name"));
         eb.setReasonForChange((String) hm.get("reason_for_change"));
-        // YW 12-07-2007 <<
         if (eb.getAuditTable().equalsIgnoreCase("item_data")) {
-            eb.setOldValue(Utils.convertedItemDateValue((String) hm.get("old_value"), oc_df_string, local_df_string));
-            eb.setNewValue(Utils.convertedItemDateValue((String) hm.get("new_value"), oc_df_string, local_df_string));
+            eb.setOldValue(convertedItemDataValue((String) hm.get("old_value"), this.locale));
+            eb.setNewValue(convertedItemDataValue((String) hm.get("new_value"), this.locale));
         } else {
             eb.setOldValue((String) hm.get("old_value"));
             eb.setNewValue((String) hm.get("new_value"));
         }
-        // YW >>
         eb.setEventCRFId(((Integer) hm.get("event_crf_id")).intValue());
         eb.setAuditEventTypeId(((Integer) hm.get("audit_log_event_type_id")).intValue());
         eb.setUserName((String) hm.get("user_name"));
@@ -125,7 +128,7 @@ public class AuditDAO extends EntityDAO {
 
     /*
      * Find By Primary Key
-     * 
+     *
      * @see org.akaza.openclinica.dao.core.DAOInterface#findByPK(int)
      */
     public EntityBean findByPK(int id) {
@@ -147,7 +150,7 @@ public class AuditDAO extends EntityDAO {
 
     /*
      * Find All Audit Beans
-     * 
+     *
      * @see org.akaza.openclinica.dao.core.DAOInterface#findAll()
      */
     public Collection findAll() {
@@ -164,7 +167,7 @@ public class AuditDAO extends EntityDAO {
 
     /*
      * Find audit log events for a study subject
-     * 
+     *
      */
     public Collection findStudySubjectAuditEvents(int studySubjectId) {
         this.setTypesExpected();
@@ -186,7 +189,7 @@ public class AuditDAO extends EntityDAO {
 
     /*
      * Find audit log events type for a subject
-     * 
+     *
      */
     public Collection findSubjectAuditEvents(int subjectId) {
         this.setTypesExpected();
@@ -208,7 +211,7 @@ public class AuditDAO extends EntityDAO {
 
     /*
      * Find audit log events type for an event CRF
-     * 
+     *
      */
     public Collection findEventCRFAuditEvents(int eventCRFId) {
         this.setTypesExpected();
@@ -248,7 +251,7 @@ public class AuditDAO extends EntityDAO {
 
     /*
      * Find audit log events type for an Study Event
-     * 
+     *
      */
     public Collection findStudyEventAuditEvents(int studyEventId) {
         this.setTypesExpected();
@@ -270,7 +273,7 @@ public class AuditDAO extends EntityDAO {
 
     /*
      * Find deleted Event CRFs from audit log
-     * 
+     *
      */
     public List findDeletedEventCRFsFromAuditEvent(int studyEventId) {
         this.unsetTypeExpected();
@@ -355,7 +358,7 @@ public class AuditDAO extends EntityDAO {
 
     /*
      * Find audit group assignment log events for a study subject
-     * 
+     *
      */
     public Collection findStudySubjectGroupAssignmentAuditEvents(int studySubjectId) {
         this.setTypesExpected();
@@ -376,7 +379,7 @@ public class AuditDAO extends EntityDAO {
     }
 
     /*
-        Find audit events for a single Item 
+        Find audit events for a single Item
      */
 
     public ArrayList findItemAuditEvents(int entityId, String auditTable) {
@@ -424,5 +427,25 @@ public class AuditDAO extends EntityDAO {
             al.add(eb);
         }
         return al;
+    }
+
+    private String convertedItemDataValue(String itemValue, Locale locale) {
+        String temp = itemValue;
+        String yearMonthFormat = I18nFormatUtil.yearMonthFormatString(locale);
+        String yearFormat = I18nFormatUtil.yearFormatString();
+        String dateFormat = I18nFormatUtil.dateFormatString(locale);
+        try{
+            if (StringUtil.isFormatDate(itemValue, oc_df_string, locale)) {
+                temp = Utils.convertedItemDateValue(itemValue, oc_df_string, local_df_string, locale);
+            } else if (StringUtil.isPartialYear(itemValue, yearFormat, locale)) {
+                temp = itemValue;
+            } else if (StringUtil.isPartialYearMonth(itemValue, ApplicationConstants.getPDateFormatInSavedData(), locale)) {
+                temp = new SimpleDateFormat(yearMonthFormat, locale).format(
+                        new SimpleDateFormat(ApplicationConstants.getPDateFormatInSavedData(), locale).parse(itemValue));
+            }
+        } catch (Exception ex) {
+            logger.warn("Parsial Date Parsing Exception........");
+        }
+        return temp;
     }
 }

@@ -24,7 +24,6 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -107,16 +106,13 @@ public class UpdateStudyServletNew extends SecureController {
 
             // First Load First Form
             if (study.getDatePlannedStart() != null) {
-                fp.addPresetValue(INPUT_START_DATE, 
-                        new SimpleDateFormat(resformat.getString("date_format_string"),SecureController.getFormat_locale()).format(study.getDatePlannedStart()));
+                fp.addPresetValue(INPUT_START_DATE, local_df.format(study.getDatePlannedStart()));
             }
             if (study.getDatePlannedEnd() != null) {
-                fp.addPresetValue(INPUT_END_DATE, 
-                        new SimpleDateFormat(resformat.getString("date_format_string"),SecureController.getFormat_locale()).format(study.getDatePlannedEnd()));
+                fp.addPresetValue(INPUT_END_DATE, local_df.format(study.getDatePlannedEnd()));
             }
             if (study.getProtocolDateVerification() != null) {
-                fp.addPresetValue(INPUT_VER_DATE, 
-                        new SimpleDateFormat(resformat.getString("date_format_string"),SecureController.getFormat_locale()).format(study.getProtocolDateVerification()));
+                fp.addPresetValue(INPUT_VER_DATE, local_df.format(study.getProtocolDateVerification()));
             }
             setPresetValues(fp.getPresetValues());
             // first load 2nd form
@@ -192,12 +188,12 @@ public class UpdateStudyServletNew extends SecureController {
 
     private void validateStudy2(FormProcessor fp, Validator v) {
 
-        v.addValidation(INPUT_START_DATE, Validator.IS_A_LOCALE_DATE);
+        v.addValidation(INPUT_START_DATE, Validator.IS_A_DATE);
         if (!StringUtil.isBlank(fp.getString(INPUT_END_DATE))) {
-            v.addValidation(INPUT_END_DATE, Validator.IS_A_LOCALE_DATE);
+            v.addValidation(INPUT_END_DATE, Validator.IS_A_DATE);
         }
         if (!StringUtil.isBlank(fp.getString(INPUT_VER_DATE))) {
-            v.addValidation(INPUT_VER_DATE, Validator.IS_A_LOCALE_DATE);
+            v.addValidation(INPUT_VER_DATE, Validator.IS_A_DATE);
         }
 
         errors = v.validate();
@@ -389,15 +385,15 @@ public class UpdateStudyServletNew extends SecureController {
         if (StringUtil.isBlank(fp.getString(INPUT_VER_DATE))) {
             study.setProtocolDateVerification(null);
         } else {
-            study.setProtocolDateVerification(fp.getDate(INPUT_VER_DATE,SecureController.getFormat_locale()));
+            study.setProtocolDateVerification(fp.getDate(INPUT_VER_DATE));
         }
 
-        study.setDatePlannedStart(fp.getDate(INPUT_START_DATE,SecureController.getFormat_locale()));
+        study.setDatePlannedStart(fp.getDate(INPUT_START_DATE));
 
         if (StringUtil.isBlank(fp.getString(INPUT_END_DATE))) {
             study.setDatePlannedEnd(null);
         } else {
-            study.setDatePlannedEnd(fp.getDate(INPUT_END_DATE,SecureController.getFormat_locale()));
+            study.setDatePlannedEnd(fp.getDate(INPUT_END_DATE));
         }
 
         study.setPhase(fp.getString("phase"));

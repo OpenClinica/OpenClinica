@@ -36,7 +36,7 @@
 org.akaza.openclinica.web.util.WebUtil.basePath(pageContext) %>" />
 <title>OpenClinica <fmt:message key="view_data_entry" bundle="${resword}"/></title>
     <meta http-equiv="X-UA-Compatible" content="IE=8" />
-    
+
     <link rel="stylesheet" href="includes/styles.css" type="text/css" media="screen">
 <%-- <link rel="stylesheet" href="includes/styles2.css" type="text/css">--%>
     <link rel="stylesheet" href="includes/print.css" type="text/css" media="print">
@@ -52,6 +52,7 @@ org.akaza.openclinica.web.util.WebUtil.basePath(pageContext) %>" />
 
     <link rel="stylesheet" type="text/css" media="all" href="includes/new_cal/skins/aqua/theme.css" title="Aqua" />
     <script type="text/javascript" src="includes/new_cal/calendar.js"></script>
+    <script type="text/javascript" src="includes/new_cal/lang/calendar-en.js"></script>
     <script type="text/javascript" src="includes/new_cal/lang/<fmt:message key="jscalendar_language_file" bundle="${resformat}"/>"></script>
     <script type="text/javascript" src="includes/new_cal/calendar-setup.js"></script>
     <!-- End -->
@@ -101,7 +102,7 @@ margin-top:20px;margin-top:10px;document.getElementById('centralContainer').styl
                 <img src="images/icon_Invalid.gif" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>">
             </c:when>
             <c:otherwise>
-              
+
             </c:otherwise>
         </c:choose></b>  &nbsp;&nbsp;</span> </h1> </td><td>
 		<h1><span class="title_manage"> <c:out value="${studySubject.label}" />&nbsp;&nbsp; </span></h1></td></tr></table>
@@ -169,7 +170,7 @@ http://svn.akazaresearch.com:8080/OpenClinica-2.2/EnterDataForStudyEvent?eventId
     	<!--  do not display the exit button when exitTo request parameter is 'none' -->
     	<c:if test="${exitTo != 'none'}">
         	<input type="button" onclick="window.location = '<c:out value="${exitTo}"/>'" value="<fmt:message key="exit" bundle="${resword}"/>" class="button"/>
-        </c:if>	
+        </c:if>
     </c:when>
     <c:otherwise>
         <c:choose>
@@ -433,7 +434,7 @@ function checkDataStatus() {
             </table>
         </td>
     </tr>
-    </c:if>    
+    </c:if>
 </c:if>
 
 <c:if test="${currPage != displayItem.pageNumberLabel && displayItemNum >0}">
@@ -576,7 +577,7 @@ but the custom tag uses that, not this jstl code--%>
         </c:choose>
         </th>
     </c:forEach>
-    <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">            
+    <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">
         <c:choose>
             <c:when test="${sectionBorders == 1}">
                 <th class="aka_headerBackground aka_padding_large aka_cellBorders_dark" />

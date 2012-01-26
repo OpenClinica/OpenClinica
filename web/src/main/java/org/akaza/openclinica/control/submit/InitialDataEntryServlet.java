@@ -7,15 +7,6 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
@@ -26,12 +17,22 @@ import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.RuleValidator;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  * @author ssachs
@@ -46,7 +47,7 @@ public class InitialDataEntryServlet extends DataEntryServlet {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.akaza.openclinica.control.core.SecureController#mayProceed()
      */
 
@@ -56,8 +57,8 @@ public class InitialDataEntryServlet extends DataEntryServlet {
         checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"), request, response);
         checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"), request, response);
         HttpSession session = request.getSession();
-        locale = request.getLocale();
-        
+        locale = LocaleResolver.getLocale(request);
+
         session.setAttribute("mayProcessUploading", "true");
         // <
         // resexception=ResourceBundle.getBundle(
@@ -104,7 +105,7 @@ public class InitialDataEntryServlet extends DataEntryServlet {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @seeorg.akaza.openclinica.control.submit.DataEntryServlet#
      * validateInputOnFirstRound()
      */
@@ -147,7 +148,7 @@ public class InitialDataEntryServlet extends DataEntryServlet {
             List<DisplayItemGroupBean> formGroups, RuleValidator rv, HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid, HttpServletRequest request, HttpServletResponse response) {
 
         EventDefinitionCRFBean edcb = (EventDefinitionCRFBean)request.getAttribute(EVENT_DEF_CRF_BEAN);
-                
+
         formGroups = loadFormValueForItemGroup(digb, digbs, formGroups, edcb.getId(), request);
         String inputName = "";
         for (int i = 0; i < formGroups.size(); i++) {
@@ -186,7 +187,7 @@ public class InitialDataEntryServlet extends DataEntryServlet {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.akaza.openclinica.control.submit.DataEntryServlet#validateDisplayItemBean
      * (org.akaza.openclinica.core.form.Validator,
@@ -207,7 +208,7 @@ public class InitialDataEntryServlet extends DataEntryServlet {
         }
 
         // types TEL and ED are not supported yet
-        if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXT) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXTAREA) || 
+        if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXT) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXTAREA) ||
                 rt.equals(org.akaza.openclinica.bean.core.ResponseType.FILE)) {
             dib = validateDisplayItemBeanText(v, dib, inputName, request);
         } else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.RADIO) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECT)) {
@@ -249,7 +250,7 @@ public class InitialDataEntryServlet extends DataEntryServlet {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.akaza.openclinica.control.submit.DataEntryServlet#getBlankItemStatus
      * ()
@@ -261,7 +262,7 @@ public class InitialDataEntryServlet extends DataEntryServlet {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.akaza.openclinica.control.submit.DataEntryServlet#getNonBlankItemStatus
      * ()
@@ -274,7 +275,7 @@ public class InitialDataEntryServlet extends DataEntryServlet {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.akaza.openclinica.control.submit.DataEntryServlet#getEventCRFAnnotations
      * ()
@@ -287,7 +288,7 @@ public class InitialDataEntryServlet extends DataEntryServlet {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.akaza.openclinica.control.submit.DataEntryServlet#setEventCRFAnnotations
      * (java.lang.String)
@@ -300,7 +301,7 @@ public class InitialDataEntryServlet extends DataEntryServlet {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.akaza.openclinica.control.submit.DataEntryServlet#getJSPPage()
      */
     @Override
@@ -312,7 +313,7 @@ public class InitialDataEntryServlet extends DataEntryServlet {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.akaza.openclinica.control.submit.DataEntryServlet#getServletPage()
      */
@@ -333,7 +334,7 @@ public class InitialDataEntryServlet extends DataEntryServlet {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.akaza.openclinica.control.submit.DataEntryServlet#loadDBValues()
      */
     @Override

@@ -7,15 +7,6 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -33,6 +24,7 @@ import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.exception.OpenClinicaException;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
@@ -40,12 +32,21 @@ import org.akaza.openclinica.web.crfdata.ImportCRFDataService;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Unmarshaller;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+
 /**
  * Create a new CRF verison by uploading excel file. Makes use of several other
  * classes to validate and provide accurate validation. More specifically, uses
  * XmlSchemaValidationHelper, ImportCRFDataService, ODMContainer, and others to
  * import all the XML in the ODM 1.3 standard.
- * 
+ *
  * @author Krikor Krumlian, Tom Hickerson updated Apr-May 2008
  */
 public class ImportCRFDataServlet extends SecureController {
@@ -60,14 +61,14 @@ public class ImportCRFDataServlet extends SecureController {
     // < ResourceBundleresword,resexception,respage;
 
     /**
-     * 
+     *
      */
     @Override
     public void mayProceed() throws InsufficientPermissionException {
         checkStudyLocked(Page.MENU_SERVLET, respage.getString("current_study_locked"));
         checkStudyFrozen(Page.MENU_SERVLET, respage.getString("current_study_frozen"));
 
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         if (ub.isSysAdmin()) {
             return;
         }
@@ -106,15 +107,15 @@ public class ImportCRFDataServlet extends SecureController {
         }
         if ("confirm".equalsIgnoreCase(action)) {
             String dir = SQLInitServlet.getField("filePath");
-            if (!(new File(dir)).exists()) {
+            if (!new File(dir).exists()) {
                 logger.info("The filePath in datainfo.properties is invalid " + dir);
                 addPageMessage(respage.getString("filepath_you_defined_not_seem_valid"));
                 forwardPage(Page.IMPORT_CRF_DATA);
             }
             // All the uploaded files will be saved in filePath/crf/original/
             String theDir = dir + "crf" + File.separator + "original" + File.separator;
-            if (!(new File(theDir)).isDirectory()) {
-                (new File(theDir)).mkdirs();
+            if (!new File(theDir).isDirectory()) {
+                new File(theDir).mkdirs();
                 logger.info("Made the directory " + theDir);
             }
             //MultipartRequest multi = new MultipartRequest(request, theDir, 50 * 1024 * 1024);
@@ -434,7 +435,7 @@ public class ImportCRFDataServlet extends SecureController {
 
     /**
      * Uploads the xml file
-     * 
+     *
      * @param version
      * @throws Exception
      */

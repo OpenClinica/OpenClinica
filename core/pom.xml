@@ -9,14 +9,14 @@
         <groupId>org.akaza.openclinica</groupId>
         <artifactId>OpenClinica</artifactId>
         <version>3.1-SNAPSHOT</version>
-    </parent>    
-    <dependencies> 
+    </parent>
+    <dependencies>
 		<dependency>
 			<groupId>javax.transaction</groupId>
 			<artifactId>transaction-api</artifactId>
 			<version>1.1</version>
-		</dependency>		
-		<!--@pgawade 16-NOV-2010 spring security dependency for unit tests -->   	 	
+		</dependency>
+		<!--@pgawade 16-NOV-2010 spring security dependency for unit tests -->
 		<dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-web</artifactId>
@@ -26,8 +26,7 @@
 		<dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
-            <version>${spring.version}</version>			
-			<scope>test</scope>
+            <version>${spring.version}</version>
         </dependency>
 		<dependency>
 			<groupId>org.apache.xmlgraphics</groupId>
@@ -205,7 +204,7 @@
 				<exclusion>
 					<artifactId>antlr</artifactId>
 					<groupId>antlr</groupId>
-				</exclusion>				
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<!-- Postgres JDBC driver -->
@@ -245,7 +244,7 @@
 			<version>0.1.0.BUILD-SNAPSHOT</version>
 			<type>jar</type>
 			<scope>compile</scope>
-		</dependency>		
+		</dependency>
 	</dependencies>
 	<!-- @pgawade 16-NOV-2010 unit tests through maven -->
 	<reporting>
@@ -274,11 +273,11 @@
 		<test.db>OpenClinica-core-3.1-SNAPSHOT-TEST</test.db>
 		<test.hibernateDialect>org.hibernate.dialect.PostgreSQLDialect</test.hibernateDialect>
 		<test.locale>en_US</test.locale>
-	
+
 		<!--  Library Versions -->
 		<!--<spring.version>2.5.6.SEC01</spring.version>-->
-		
- 	</properties> 
+
+ 	</properties>
     <build>
  <!--        <resources>
             <resource>
@@ -301,7 +300,7 @@
                 <configuration>
                     <source>1.5</source>
                     <target>1.5</target>
-                      <!-- 
+                      <!--
                        <nonFilteredFileExtensions> -->
             <!-- default value contains jpg,jpeg,gif,bmp,png -->
          <!--    <nonFilteredFileExtension>xls</nonFilteredFileExtension>

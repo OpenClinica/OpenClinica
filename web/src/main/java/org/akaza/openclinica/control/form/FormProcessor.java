@@ -10,6 +10,8 @@ package org.akaza.openclinica.control.form;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.dao.core.EntityDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.i18n.util.I18nFormatUtil;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.slf4j.Logger;
@@ -32,17 +34,17 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author ssachs
- * 
+ *
  * This class does two things: retrieve input from a form, and prepare to set
  * default values
- * 
+ *
  * three dimensions:
  * <ul>
  * <li> do we throw an exception when the key isn't present?</li>
  * <li> do we look in the attributes and parameters, or just the parameters?</li>
  * <li> do we look in an HttpServletRequest, or a MultipartRequest?</li>
  * </ul>
- * 
+ *
  * TODO handle MultiPartRequests - is this a priority, since we don't have many
  * file uploads?
  */
@@ -52,6 +54,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class FormProcessor {
     private HttpServletRequest request;
+    private static Locale locale;
     private HashMap presetValues;
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -73,6 +76,7 @@ public class FormProcessor {
     public FormProcessor(HttpServletRequest request) {
         this.request = request;
         this.presetValues = new HashMap();
+        this.locale = LocaleResolver.getLocale(request);
     }
 
     /**
@@ -139,10 +143,10 @@ public class FormProcessor {
      * For an input which is supposed to return an array of strings, such as a
      * checkbox or multiple-select input, retrieve all of those strings in an
      * ArrayList.
-     * 
+     *
      * Note that the values must be contained in the request parameters, not in
      * the attributes.
-     * 
+     *
      * @param fieldName
      *            The name of the input
      * @return An array of all the Strings corresponding to that input.
@@ -276,37 +280,24 @@ public class FormProcessor {
         return result;
     }
 
+    /**
+     * Precondition: ResourceBundleProvider's locale has been updated.
+     * @param date
+     * @return
+     */
     // GET DATE
     public static Date getDateFromString(String date) {
         Date answer;
-        ResourceBundle resformat = ResourceBundleProvider.getFormatBundle();
+        //Locale locale = ResourceBundleProvider.getLocale();
         try {
-            SimpleDateFormat f = new SimpleDateFormat(resformat.getString("date_format_string"), ResourceBundleProvider.getLocale());
+            SimpleDateFormat f = I18nFormatUtil.getDateFormat(locale);
             f.setLenient(false);
             answer = f.parse(date);
         } catch (Exception e) {
-            answer = DEFAULT_DATE;
+            //answer = DEFAULT_DATE;
+            answer = null;
         }
 
-        return answer;
-    }
-    
-    /**
-     * Null will return if date string cannot be parsed.
-     * @param date
-     * @param locale
-     * @return
-     */
-    public Date getDateFromString(String date, Locale locale) {
-        Date answer = null;
-        ResourceBundle resformat = ResourceBundleProvider.getFormatBundle();
-        try {
-            SimpleDateFormat f = new SimpleDateFormat(resformat.getString("date_format_string"), locale);
-            f.setLenient(false);
-            answer = f.parse(date);
-        } catch (Exception e) {
-            logger.info("date=\""+date+"\" cannot be parsed. "+answer+" has been returned.");
-        }
         return answer;
     }
 
@@ -320,28 +311,6 @@ public class FormProcessor {
     public Date getDate(String fieldName) {
         return getDate(fieldName, false);
     }
-    
-    /**
-     * Null will be returned if String cannot be parsed to Date.
-     * @param fieldName
-     * @param searchAttributes
-     * @param locale
-     * @return
-     */
-    public Date getDate(String fieldName, boolean searchAttributes, Locale locale) {
-        String fieldValue = getString(fieldName, searchAttributes);
-        return getDateFromString(fieldValue,locale);
-    }
-
-    /**
-     * Null will be returned if String cannot be parsed to Date
-     * @param fieldName
-     * @param locale
-     * @return
-     */
-    public Date getDate(String fieldName, Locale locale) {
-        return getDate(fieldName, false, locale);
-    }
 
     /**
      * @param dateTime
@@ -351,9 +320,9 @@ public class FormProcessor {
      */
     public static Date getDateTimeFromString(String dateTime) {
         Date answer;
-        ResourceBundle resformat = ResourceBundleProvider.getFormatBundle();
+        //Locale locale = ResourceBundleProvider.getLocale();
         try {
-            SimpleDateFormat f = new SimpleDateFormat(resformat.getString("date_time_format_string"));
+            SimpleDateFormat f = I18nFormatUtil.getDateFormat(locale);
             f.setLenient(false);
             answer = f.parse(dateTime);
         } catch (Exception e) {
@@ -369,7 +338,7 @@ public class FormProcessor {
      * <p>
      * Precondition:Before calling this method, it should make sure that field
      * has been entered valid datetime data.
-     * 
+     *
      * @param prefix
      * @return
      */
@@ -377,13 +346,14 @@ public class FormProcessor {
         /*
          * problem with this - if the field values aren't filled in, we grab the
          * default date instead
-         * 
+         *
          * below additions stick defaults into hour, minute and half to make
          * sure we adhere to the simpledateformat, tbh
-         * 
+         *
          * changes have been made to satisfy both data_time_format_string, YW (06-2008)
          */
-        ResourceBundle resformat = ResourceBundleProvider.getFormatBundle();
+        //Locale locale = ResourceBundleProvider.getLocale();
+        ResourceBundle resformat = ResourceBundleProvider.getFormatBundle(locale);
         String date = getString(prefix + "Date");
         String hour = getString(prefix + "Hour");
         String minute = getString(prefix + "Minute");
@@ -403,7 +373,7 @@ public class FormProcessor {
         }
 
         String fieldValue = date + " " + hour + ":" + minute + ":00 " + half;
-        SimpleDateFormat sdf = new SimpleDateFormat(resformat.getString("date_time_format_string"));
+        SimpleDateFormat sdf = I18nFormatUtil.getDateTimeFormat(locale);
 
         sdf.setLenient(false);
 
@@ -486,11 +456,11 @@ public class FormProcessor {
     /**
      * Propogates values in date/time fields to the preset values, so that they
      * can be used to populate a form.
-     * 
+     *
      * In particular, for each prefix in prefixes, the following strings are
      * loaded in from the form, and propagated to the preset values: prefix +
      * "Date" prefix + "Hour" prefix + "Minute" prefix + "Half"
-     * 
+     *
      * @param prefixes
      *            An array of Strings. Each String is a prefix for a set of
      *            date/time fields.
@@ -590,7 +560,7 @@ public class FormProcessor {
      * Return a String which cancatenates inputed "Date", "Hour", "Minute" and
      * "am/pm" if applicable. Empty string will be returned if none of them has
      * been entered.
-     * 
+     *
      * @param prefix
      * @return
      */
@@ -609,7 +579,7 @@ public class FormProcessor {
 
     /**
      * Precondition: is a valid datetime.
-     * 
+     *
      * @param prefix
      * @return
      */

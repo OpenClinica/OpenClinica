@@ -28,6 +28,7 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
@@ -66,7 +67,7 @@ public class MainMenuServlet extends SecureController {
 
     @Override
     public void mayProceed() throws InsufficientPermissionException {
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         // < respage =
         // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",locale);
     }
@@ -166,7 +167,7 @@ public class MainMenuServlet extends SecureController {
                     //request.setAttribute("label", new Integer(nextLabel).toString());
                     request.setAttribute("label", resword.getString("id_generated_Save_Add"));
                 }
-                
+
                 if (currentRole.isInvestigator() || currentRole.isResearchAssistant()) {
                     setupListStudySubjectTable();
                 }

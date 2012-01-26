@@ -1,8 +1,5 @@
 package org.akaza.openclinica.control.managestudy;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -29,6 +26,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.display.DisplaySectionBeanHandler;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -37,6 +35,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Shamim
@@ -51,7 +52,7 @@ public class PrintEventCRFServlet extends DataEntryServlet {
      */
     @Override
     public void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         StudyUserRoleBean  currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
         UserAccountBean ub =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
         if (ub.isSysAdmin()) {
@@ -129,7 +130,7 @@ public class PrintEventCRFServlet extends DataEntryServlet {
             CRFVersionDAO crfVersionDAO = new CRFVersionDAO(getDataSource());
             CRFDAO crfDao = new CRFDAO(getDataSource());
             ArrayList printCrfBeans = new ArrayList();
-    
+
             for (Iterator it = defaultVersions.iterator(); it.hasNext();) {
                 allSectionBeans = new ArrayList<SectionBean>();
                 ArrayList sectionBeans = new ArrayList();
@@ -257,7 +258,7 @@ public class PrintEventCRFServlet extends DataEntryServlet {
      */
     @Override
     protected String getEventCRFAnnotations(HttpServletRequest request) {
-      
+
         //JN:The following were the the global variables, moved as local.
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
         return ecb.getAnnotations();

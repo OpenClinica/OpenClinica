@@ -9,13 +9,13 @@ package org.akaza.openclinica.control.admin;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.admin.NewCRFBean;
+import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.rule.FileUploadHelper;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.bean.submit.ResponseOptionBean;
 import org.akaza.openclinica.bean.submit.ResponseSetBean;
-import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -30,6 +30,7 @@ import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.exception.CRFReadingException;
 import org.akaza.openclinica.exception.OpenClinicaException;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
@@ -50,8 +51,8 @@ import java.util.Set;
 
 /**
  * Create a new CRF verison by uploading excel file
- * 
- * @author jxu, ywang
+ *
+ * @author jxu
  */
 public class CreateCRFVersionServlet extends SecureController {
 
@@ -61,12 +62,12 @@ public class CreateCRFVersionServlet extends SecureController {
     // < ResourceBundleresword,resexception,respage;
 
     /**
-     * 
+     *
      */
     @Override
     public void mayProceed() throws InsufficientPermissionException {
 
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         if (ub.isSysAdmin()) {
             return;
         }
@@ -109,7 +110,7 @@ public class CreateCRFVersionServlet extends SecureController {
             forwardPage(Page.CREATE_CRF_VERSION);
         } else if ("confirm".equalsIgnoreCase(action)) {
             String dir = SQLInitServlet.getField("filePath");
-            if (!(new File(dir)).exists()) {
+            if (!new File(dir).exists()) {
                 logger.info("The filePath in datainfo.properties is invalid " + dir);
                 addPageMessage(resword.getString("the_filepath_you_defined"));
                 forwardPage(Page.CREATE_CRF_VERSION);
@@ -119,8 +120,8 @@ public class CreateCRFVersionServlet extends SecureController {
             }
             // All the uploaded files will be saved in filePath/crf/original/
             String theDir = dir + "crf" + File.separator + "original" + File.separator;
-            if (!(new File(theDir)).isDirectory()) {
-                (new File(theDir)).mkdirs();
+            if (!new File(theDir).isDirectory()) {
+                new File(theDir).mkdirs();
                 logger.info("Made the directory " + theDir);
             }
             //MultipartRequest multi = new MultipartRequest(request, theDir, 50 * 1024 * 1024);
@@ -394,7 +395,7 @@ public class CreateCRFVersionServlet extends SecureController {
 
     /**
      * Uploads the excel version file
-     * 
+     *
      * @param version
      * @throws Exception
      */
@@ -437,13 +438,13 @@ public class CreateCRFVersionServlet extends SecureController {
                     htab = new SpreadSheetTableRepeating(inStream, ub,
                     // SpreadSheetTable htab = new SpreadSheetTable(new
                             // FileInputStream(theDir + tempFile), ub,
-                            version.getName(), request.getLocale(), currentStudy.getId());
+                            version.getName(), locale, currentStudy.getId());
 
                     htab.setMeasurementUnitDao((MeasurementUnitDao) SpringServletAccess.getApplicationContext(context).getBean("measurementUnitDao"));
 
                     if (!htab.isRepeating()) {
                         inStreamClassic = new FileInputStream(theDir + tempFile);
-                        sstc = new SpreadSheetTableClassic(inStreamClassic, ub, version.getName(), request.getLocale(), currentStudy.getId());
+                        sstc = new SpreadSheetTableClassic(inStreamClassic, ub, version.getName(), locale, currentStudy.getId());
                         sstc.setMeasurementUnitDao((MeasurementUnitDao) SpringServletAccess.getApplicationContext(context).getBean("measurementUnitDao"));
                     }
                     // logger.info("finishing with feedin file-input-stream, did
@@ -565,7 +566,7 @@ public class CreateCRFVersionServlet extends SecureController {
 
     /**
      * Checks whether the version can be deleted
-     * 
+     *
      * @param previousVersionId
      * @return
      */
@@ -613,7 +614,7 @@ public class CreateCRFVersionServlet extends SecureController {
     /**
      * Checks whether the item with same name has the same other fields: units,
      * phi_status if no, they are two different items, cannot have the same same
-     * 
+     *
      * @param items
      *            items from excel
      * @return the items found
@@ -689,13 +690,13 @@ public class CreateCRFVersionServlet extends SecureController {
      * When the version is added, for each non-new item OpenClinica should check
      * the RESPONSE_OPTIONS_TEXT, and RESPONSE_VALUES used for the item in other
      * versions of the CRF.
-     * 
+     *
      * For a given RESPONSE_VALUES code, the associated RESPONSE_OPTIONS_TEXT
      * string is different than in a previous version
-     * 
+     *
      * For a given RESPONSE_OPTIONS_TEXT string, the associated RESPONSE_VALUES
      * code is different than in a previous version
-     * 
+     *
      * @param oldRes
      * @param newRes
      * @return The original option
@@ -745,7 +746,7 @@ public class CreateCRFVersionServlet extends SecureController {
 
     /**
      * Copy one file to another
-     * 
+     *
      * @param src
      * @param dst
      * @throws IOException
@@ -769,7 +770,7 @@ public class CreateCRFVersionServlet extends SecureController {
      * with single quote. Don''t -> Don't, for example. If the option text has
      * single quote, it is changed to double quotes for SQL compatability, so we
      * will change it back before the comparison
-     * 
+     *
      * @param subj
      *            the subject line
      * @return A string with all the quotes escaped.

@@ -7,14 +7,11 @@
  */
 package org.akaza.openclinica.control.submit;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.odmbeans.UserBean;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
@@ -26,6 +23,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.service.crfdata.HideCRFManager;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.service.rule.RulesPostImportContainerService;
@@ -39,9 +37,11 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * Verify the Rule import , show records that have Errors as well as records that will be saved.
- * 
+ *
  * @author Krikor krumlian
  */
 public class ViewRuleAssignmentNewServlet extends SecureController {
@@ -118,7 +118,7 @@ public class ViewRuleAssignmentNewServlet extends SecureController {
         factory.setRuleSetService(getRuleSetService());
         factory.setItemFormMetadataDAO(getItemFormMetadataDAO());
         factory.setCurrentStudy(currentStudy);
-        factory.setCurrentUser(((UserAccountBean)request.getSession().getAttribute(USER_BEAN_NAME)));
+        factory.setCurrentUser((UserAccountBean)request.getSession().getAttribute(USER_BEAN_NAME));
         String ruleAssignmentsHtml = factory.createTable(request, response).render();
         request.getSession().setAttribute("ruleDesignerUrl",factory.getDesingerLink());
         request.setAttribute("ruleAssignmentsHtml", ruleAssignmentsHtml);
@@ -165,7 +165,7 @@ public class ViewRuleAssignmentNewServlet extends SecureController {
 
     @Override
     public void mayProceed() throws InsufficientPermissionException {
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         if (ub.isSysAdmin()) {
             return;
         }

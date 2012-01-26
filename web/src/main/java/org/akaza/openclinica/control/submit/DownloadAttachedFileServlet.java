@@ -13,6 +13,7 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -34,7 +35,7 @@ public class DownloadAttachedFileServlet extends SecureController {
      */
     @Override
     public void mayProceed() throws InsufficientPermissionException {
-        Locale locale = request.getLocale();
+        Locale locale = LocaleResolver.getLocale(request);
         FormProcessor fp = new FormProcessor(request);
         int eventCRFId = fp.getInt("eventCRFId");
         EventCRFDAO edao = new EventCRFDAO(sm.getDataSource());

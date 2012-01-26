@@ -14,6 +14,7 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.ListSubjectFilter;
 import org.akaza.openclinica.dao.submit.ListSubjectSort;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
+import org.akaza.openclinica.i18n.util.I18nFormatUtil;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.jmesa.core.filter.DateFilterMatcher;
 import org.jmesa.core.filter.FilterMatcher;
@@ -131,9 +132,13 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
             h.put("subject", subject);
             h.put("subject.uniqueIdentifier", subject.getUniqueIdentifier());
             h.put("subject.gender", subject.getGender());
-            h.put("subject.createdDate", subject.getCreatedDate());
+            Date tempDate = subject.getCreatedDate();
+            String tempDateStr = tempDate == null ? "" : I18nFormatUtil.getDateFormat(getLocale()).format(tempDate);
+            h.put("subject.createdDate", tempDateStr);
             h.put("subject.owner", owner);
-            h.put("subject.updatedDate", subject.getUpdatedDate());
+            tempDate = subject.getUpdatedDate();
+            tempDateStr = tempDate == null ? "" : I18nFormatUtil.getDateFormat(getLocale()).format(tempDate);
+            h.put("subject.updatedDate", tempDateStr);
             h.put("subject.updater", updater);
             h.put("subject.status", subject.getStatus());
 
@@ -147,7 +152,7 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
      * A very custom way to filter the items. The AuditUserLoginFilter acts as a
      * command for the Hibernate criteria object. Take the Limit information and
      * filter the rows.
-     * 
+     *
      * @param limit
      *            The Limit to use.
      */
@@ -168,7 +173,7 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
      * A very custom way to sort the items. The AuditUserLoginSort acts as a
      * command for the Hibernate criteria object. Take the Limit information and
      * sort the rows.
-     * 
+     *
      * @param limit
      *            The Limit to use.
      */
@@ -210,7 +215,7 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
             return true;
         }
     }
-    
+
     private class StatusFilterMatecher implements FilterMatcher {
         public boolean evaluate(Object itemValue, String filterValue) {
             int itemStatusId = ((Status)itemValue).getId();

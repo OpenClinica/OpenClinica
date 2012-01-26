@@ -49,24 +49,13 @@
     <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/working-openclinica')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
 <strong>
 <fmt:message key="browser_locale" bundle="${resword}"/>
-   <c:set var="formatLocale"><fmt:message key="locale_string" bundle="${resformat}"/></c:set>
  <c:set var="language"  value="<%=ResourceBundleProvider.getLocale().getDisplayLanguage()%>"></c:set>
-<c:set var="country"  value="<%=ResourceBundleProvider.getLocale().getDisplayCountry()%>"></c:set> 
- 		
-	
-			   <c:choose>
-                    <c:when test="${formatLocale == null}">
-                        English
-                    </c:when>
-                    <c:otherwise>
+<c:set var="country"  value="<%=ResourceBundleProvider.getLocale().getDisplayCountry()%>"></c:set>
                         <c:out value="${language}"/>
 						<c:if test="${country!=''}">
 						/
 						<c:out value="${country}"/>
 						</c:if>
-						
-                    </c:otherwise>
-                </c:choose>
     &nbsp;<fmt:message key="language" bundle="${resword}"/></strong>
 <br><br>
 <form action="UpdateProfile" method="post">

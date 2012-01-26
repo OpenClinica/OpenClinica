@@ -29,7 +29,6 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -71,7 +70,7 @@ public class UpdateSubjectServlet extends SecureController {
         DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(sm.getDataSource());
         FormProcessor fp = new FormProcessor(request);
         FormDiscrepancyNotes discNotes = null;
-        
+
         String fromResolvingNotes = fp.getString("fromResolvingNotes",true);
         if (StringUtil.isBlank(fromResolvingNotes)) {
             session.removeAttribute(ViewNotesServlet.WIN_LOCATION);
@@ -127,9 +126,7 @@ public class UpdateSubjectServlet extends SecureController {
                 // tbh
                 Date birthDate = sub.getDateOfBirth();
                 try {
-                    //String localBirthDate = local_df.format(birthDate);
-                    //String localBirthDate = new SimpleDateFormat(resformat.getString("date_format_string"),request.getLocale()).format(birthDate);
-                    String localBirthDate = new SimpleDateFormat(resformat.getString("date_format_string"),SecureController.getFormat_locale()).format(birthDate);
+                    String localBirthDate = local_df.format(birthDate);
                     session.setAttribute("localBirthDate", localBirthDate);
                 } catch (NullPointerException e) {
                     // TODO Auto-generated catch block
@@ -142,7 +139,7 @@ public class UpdateSubjectServlet extends SecureController {
 
                 discNotes = new FormDiscrepancyNotes();
                 session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
-                
+
                 /*
                 ArrayList<DiscrepancyNoteBean> dns = dndao.findAllSubjectByStudyAndId(currentStudy, subjectId);
                 if(dns.size()>0) {
@@ -166,7 +163,7 @@ public class UpdateSubjectServlet extends SecureController {
                 }else {
                     session.setAttribute("birthDNFlag","icon_noNote");
                 }
-                
+
                 forwardPage(Page.UPDATE_SUBJECT);
             } else if ("confirm".equalsIgnoreCase(action)) {
                 request.setAttribute(BEAN_FATHERS, dsFathers);
@@ -223,12 +220,12 @@ public class UpdateSubjectServlet extends SecureController {
             }
             // if the original DOB is null, but user entered a new DOB
             if (!StringUtil.isBlank(fp.getString(DATE_DOB))) {
-                v.addValidation(DATE_DOB, Validator.IS_A_LOCALE_DATE);
+                v.addValidation(DATE_DOB, Validator.IS_A_DATE);
                 v.alwaysExecuteLastValidation(DATE_DOB);
             }
         } else {
             if (!StringUtil.isBlank(fp.getString(DATE_DOB))) {
-                v.addValidation(DATE_DOB, Validator.IS_A_LOCALE_DATE);
+                v.addValidation(DATE_DOB, Validator.IS_A_DATE);
                 v.alwaysExecuteLastValidation(DATE_DOB);
             }
 
@@ -333,19 +330,22 @@ public class UpdateSubjectServlet extends SecureController {
                 request.setAttribute(YEAR_DOB, fp.getString(YEAR_DOB));
             } else if (!StringUtil.isBlank(fp.getString(DATE_DOB))) {
                 // DOB is null orginally, and user entered a new DOB
-                //v.addValidation(DATE_DOB, Validator.IS_A_DATE);
-                v.addValidation(DATE_DOB, Validator.IS_A_LOCALE_DATE);
+                v.addValidation(DATE_DOB, Validator.IS_A_DATE);
                 v.alwaysExecuteLastValidation(DATE_DOB);
                 request.setAttribute(DATE_DOB, fp.getString(DATE_DOB));
                 newDobInput = true;
-                sub.setDateOfBirth(fp.getDate(DATE_DOB, SecureController.getFormat_locale()));
+                sub.setDateOfBirth(fp.getDate(DATE_DOB));
 
             } else {
                 sub.setDateOfBirth(null);
 
             }
         } else {
-            sub.setDateOfBirth(fp.getDate(DATE_DOB, SecureController.getFormat_locale()));
+            if(StringUtil.isBlank(fp.getString(DATE_DOB))) {
+                sub.setDateOfBirth(null);
+            } else {
+                sub.setDateOfBirth(fp.getDate(DATE_DOB));
+            }
         }
 
         if (!StringUtil.isBlank(fp.getString("gender"))) {

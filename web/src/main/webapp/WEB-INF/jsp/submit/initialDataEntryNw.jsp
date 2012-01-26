@@ -25,7 +25,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head><title>OpenClinica <fmt:message key="initial_data_entry" bundle="${resword}"/></title>
     <meta http-equiv="X-UA-Compatible" content="IE=8" />
-    
+
     <link rel="stylesheet" href="includes/styles.css" type="text/css" media="screen">
 <%-- <link rel="stylesheet" href="includes/styles2.css" type="text/css">--%>
     <link rel="stylesheet" href="includes/print.css" type="text/css" media="print">
@@ -46,6 +46,7 @@
 
         <link rel="stylesheet" type="text/css" media="all" href="includes/new_cal/skins/aqua/theme.css" title="Aqua" />
         <script type="text/javascript" src="includes/new_cal/calendar.js"></script>
+        <script type="text/javascript" src="includes/new_cal/lang/calendar-en.js"></script>
 	    <script type="text/javascript" src="includes/new_cal/lang/<fmt:message key="jscalendar_language_file" bundle="${resformat}"/>"></script>
 	    <script type="text/javascript" src="includes/new_cal/calendar-setup.js"></script>
     <!-- End -->
@@ -102,7 +103,7 @@ giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%>
                 <img src="images/icon_Invalid.gif" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>">
             </c:when>
             <c:otherwise>
-              
+
             </c:otherwise>
         </c:choose></b>  &nbsp;&nbsp;</span> </h1> </td><td>
 		<h1><span class="title_manage"> <c:out value="${studySubject.label}" />&nbsp;&nbsp; </span></h1></td></tr></table>
@@ -383,7 +384,7 @@ window.onload = initmb;
 
 
     function checkEntryStatus(strImageName) {
-        closing = false;        
+        closing = false;
         objImage = MM_findObj(strImageName);
     //alert(objImage.src);
         if (objImage != null && objImage.src.indexOf('images/icon_UnsavedData.gif')>0) {
@@ -557,7 +558,7 @@ window.onload = initmb;
 <%-- the section borders property value --%>
 <c:set var="sectionBorders" value="${section.section.borders}" />
 <tr>
-<%-- place where we need to highlight sections, 
+<%-- place where we need to highlight sections,
 	one of the error keys should equal the item group's OID --%>
 <c:set var="isSectionShown" value="false"/>
 <c:forEach var="formMsg" items="${formMessages}">
@@ -650,7 +651,7 @@ but the custom tag uses that, not this jstl code--%>
                 <c:set var="totalColsPlusSubcols" value="${totalColsPlusSubcols + 1}" />
             </c:otherwise>
         </c:choose>
- 
+
         <c:choose>
             <c:when test="${thItem.metadata.header == ''}">
                 <c:if test="${! (empty questionNumber)}">
@@ -738,12 +739,12 @@ but the custom tag uses that, not this jstl code--%>
 <c:set var="columnNum"  value="1"/>
 	<c:set var="isButtonRemShow" value="true"/>
 <c:forEach var="bodyItem" items="${bodyItemGroup.items}">
-	
-	
+
+
 <c:if test="${groupHasData}">
 	<c:set var="isButtonRemShow" value="false"/>
 	</c:if>
-	
+
 <!-- found show item: <c:out value="${bodyItem.metadata.showItem}"/> -->
 <c:choose>
 <c:when test="${bodyItem.metadata.showItem}">
@@ -751,7 +752,7 @@ but the custom tag uses that, not this jstl code--%>
 		<%-- update td class with aka_group_show if they meet the criteria --%>
 		<c:set var="isItemShown" value="false"/>
 		<c:forEach var="formMsg" items="${formMessages}">
-			
+
 			<c:set var="inputValue"><c:out value="${repeatParentId}"/>_<c:out value="${uniqueId}"/>input<c:out value="${bodyItem.item.id}"/></c:set>
 			<c:if test="${formMsg.key eq inputValue}">
 				<c:set var="isItemShown" value="true"/>
@@ -889,7 +890,7 @@ but the custom tag uses that, not this jstl code--%>
     </c:when>
     <c:when test="${bodyItem.blankDwelt}"><td class="aka_padding_norm aka_cellBorders"></c:when>
     </c:choose>
-	
+
 </c:forEach>
     <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">
     <c:choose>
@@ -905,7 +906,7 @@ but the custom tag uses that, not this jstl code--%>
                         <input type="hidden" name="<c:out value="${repeatParentId}"/>_manual<c:out value="${uniqueId}"/>.newRow" value="yes">
                     </c:otherwise>
                 </c:choose>
-			
+
     <c:if test="${isButtonRemShow == true }">
                 <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove"></button>
                 </c:if>
@@ -923,7 +924,7 @@ but the custom tag uses that, not this jstl code--%>
                         <input type="hidden" name="<c:out value="${repeatParentId}"/>_manual<c:out value="${uniqueId}"/>.newRow" value="yes">
                     </c:otherwise>
                 </c:choose>
-			
+
               <c:if test="${isButtonRemShow == true }">
                          <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove" ></button>
                     </c:if>
@@ -943,31 +944,31 @@ but the custom tag uses that, not this jstl code--%>
 	<c:set var="isButtonRemShow" value="true"/>
     <c:forEach var="bodyItem" items="${bodyItemGroup.items}">
 	<!-- found show item: <c:out value="${bodyItem.metadata.showItem}"/> -->
-		
+
 	<c:if test = "${!empty bodyItem.data}">
-	
+
 	<c:set var="isButtonRemShow" value="false"/>
 	</c:if>
-	
+
 	<c:choose>
     <c:when test="${bodyItem.metadata.showItem}">
 		<%-- highlighting for items within item groups, tbh --%>
 		<%-- update td class with aka_group_show if they meet the criteria --%>
 		<c:set var="isItemShown" value="false"/>
-		
-		
-		
-		
+
+
+
+
 		<c:forEach var="formMsg" items="${formMessages}">
-			
+
 			<c:set var="inputValue"><c:out value="${repeatParentId}"/>_<c:out value="${uniqueId}"/>input<c:out value="${bodyItem.item.id}"/></c:set>
 			<c:if test="${formMsg.key eq inputValue}">
 				<c:set var="isItemShown" value="true"/>
 <!--				PASS! <c:out value="${inputValue}"/> -->
 			</c:if>
-			
+
 		</c:forEach>
-		
+
         <c:choose>
 			<c:when test="${isItemShown && hasShown}">
                  <c:set var="extraClass" value="aka_group_show"/>
@@ -1025,7 +1026,7 @@ but the custom tag uses that, not this jstl code--%>
                             <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                             <c:param name="originJSP" value="initialDataEntry"/>
                             <c:param name="isTemplateRow" value="${true}"/>
-                          
+
                         </c:import>
                     </td>
                 </c:forEach>
@@ -1042,7 +1043,7 @@ but the custom tag uses that, not this jstl code--%>
                         <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                         <c:param name="originJSP" value="initialDataEntry"/>
                         <c:param name="isTemplateRow" value="${true}"/>
-                          
+
                     </c:import>
                 </td>
             </c:when>
@@ -1087,14 +1088,14 @@ but the custom tag uses that, not this jstl code--%>
         </c:when>
         <c:when test="${bodyItem.blankDwelt}"><td class="aka_padding_norm aka_cellBorders"></c:when>
     	</c:choose>
-	
+
     </c:forEach>
     <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">
         <c:choose>
             <c:when test="${sectionBorders == 1}">
                 <td class="aka_padding_norm aka_cellBorders_dark">
                     <input type="hidden" name="<c:out value="${repeatParentId}"/>_[<c:out value="${repeatParentId}"/>].newRow" value="yes" />
-				
+
 				 <c:if test="${isButtonRemShow == true }">
                     <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove"></button>
                     </c:if>
@@ -1104,10 +1105,10 @@ but the custom tag uses that, not this jstl code--%>
             <c:otherwise>
                 <td class="aka_padding_norm aka_cellBorders">
                     <input type="hidden" name="<c:out value="${repeatParentId}"/>_[<c:out value="${repeatParentId}"/>].newRow" value="yes" />
-	          
-                <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove" style="display:block;"></button> 
-           
-              
+
+                <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove" style="display:block;"></button>
+
+
                 </td>
             </c:otherwise>
         </c:choose>
@@ -1129,7 +1130,7 @@ but the custom tag uses that, not this jstl code--%>
                 <c:otherwise>
                     <td class="aka_padding_norm aka_cellBorders" colspan="<c:out value="${totalColsPlusSubcols + 1}"/>">
                         <button stype="add" type="button" template="<c:out value="${repeatParentId}"/>" class="button_search"><fmt:message key="add" bundle="${resword}"/></button></td>
-						
+
                 </c:otherwise>
             </c:choose>
         </tr>
@@ -1238,14 +1239,14 @@ but the custom tag uses that, not this jstl code--%>
             <tr>
                     </c:if>
 
-                    
+
                 		<c:choose>
 						<c:when test="${cdisplay > 0}">
 							<c:set var="scdShowStatus" value="${displayItem.singleItem.scdData.scdDisplayInfo.scdShowStatus}"/>
 							<c:set var="cdId" value="${displayItem.singleItem.item.id}"/>
 							<input type="hidden" id="col${cdId}" value="${numOfTr}"/>
 							<c:choose>
-							<c:when test="${scdShowStatus == 1}">	<%-- 'SHOW_CHANGABLE' --%> 
+							<c:when test="${scdShowStatus == 1}">	<%-- 'SHOW_CHANGABLE' --%>
 		                		<td valign="top" id="t${cdId}">
 					    	</c:when>
 					    	<c:when test="${scdShowStatus == 2}">	<%-- 'HIDE_CHANGABLE' --%>
@@ -1261,7 +1262,7 @@ but the custom tag uses that, not this jstl code--%>
 		                </c:otherwise>
 		                </c:choose>
 
-                    
+
                     <%-- this is where we need to set the block for shown items, tbh --%>
                     	<c:set var="isItemShown" value="false"/>
 						<c:forEach var="formMsg" items="${formMessages}">
@@ -1280,7 +1281,7 @@ but the custom tag uses that, not this jstl code--%>
                     			<tr>
                     		</c:otherwise>
                     	</c:choose>
-                        
+
                             <td valign="top" class="aka_ques_block"><c:out value="${displayItem.singleItem.metadata.questionNumberLabel}" escapeXml="false"/></td>
                             <!--
                             <td valign="top" class="aka_text_block"><c:out value="${displayItem.singleItem.metadata.leftItemText}" escapeXml="false"/></td>
@@ -1447,7 +1448,7 @@ but the custom tag uses that, not this jstl code--%>
                                 </td>
                             </tr>
                             <%--BWP: try this--%>
-                            <!-- blocking for Mantis Issue: 7704.        
+                            <!-- blocking for Mantis Issue: 7704.
                             <tr>
                                 <td valign="top" colspan="4" style="text-align:right">
                                 <c:import url="../showMessage.jsp"><c:param name="key" value=

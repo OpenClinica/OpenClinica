@@ -15,6 +15,7 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
@@ -39,7 +40,7 @@ public class UnLockUserServlet extends SecureController {
     @Override
     protected void mayProceed() throws InsufficientPermissionException {
 
-        locale = request.getLocale();
+        locale = LocaleResolver.getLocale(request);
         // < restext =
         // ResourceBundle.getBundle("org.akaza.openclinica.i18n.notes",locale);
 
@@ -65,7 +66,7 @@ public class UnLockUserServlet extends SecureController {
         } else {
             u.setUpdater(ub);
 
-            SecurityManager sm = ((SecurityManager) SpringServletAccess.getApplicationContext(context).getBean("securityManager"));
+            SecurityManager sm = (SecurityManager) SpringServletAccess.getApplicationContext(context).getBean("securityManager");
             String password = sm.genPassword();
             String passwordHash = sm.encrytPassword(password, getUserDetails());
 
