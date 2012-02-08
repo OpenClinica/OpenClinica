@@ -6,7 +6,6 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.DisplayItemWithGroupBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.dao.hibernate.RuleDao;
@@ -25,6 +24,7 @@ import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
+import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer;
 import org.akaza.openclinica.logic.rulerunner.MessageContainer;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,10 +39,10 @@ public interface RuleSetServiceInterface {
 
     /**
      * Now I know why ORM are pretty cool. Takes care of saving the whole object graph.
-     * 
+     *
      * @param ruleSetBean
      * @return
-     * 
+     *
      *         public RuleSetBean saveRuleSet(RuleSetBean ruleSetBean) { RuleSetBean persistentRuleSetBean = (RuleSetBean)
      *         getRuleSetDao().saveOrUpdate(ruleSetBean); // Save RuleSetRules for (RuleSetRuleBean ruleSetRule : persistentRuleSetBean.getRuleSetRules()) {
      *         ruleSetRule.setRuleSetBean(persistentRuleSetBean); getRuleSetRuleDao().saveOrUpdate(ruleSetRule); // Save Actions for (RuleActionBean action :
@@ -50,7 +50,7 @@ public interface RuleSetServiceInterface {
      */
 
     public abstract RuleSetBean saveRuleSet(RuleSetBean ruleSetBean);
-    
+
     @Transactional
     public abstract void saveImportFromDesigner(RulesPostImportContainer rulesContainer);
 
@@ -76,6 +76,9 @@ public interface RuleSetServiceInterface {
 
     public abstract MessageContainer runRulesInDataEntry(List<RuleSetBean> ruleSets, Boolean dryRun, StudyBean currentStudy, UserAccountBean ub,
             HashMap<String, String> variableAndValue, Phase phase,EventCRFBean ecb, HttpServletRequest request);
+
+    //public abstract MessageContainer runRulesInImportData(List<RuleSetBean> ruleSets, ExecutionMode executionMode, StudyBean currentStudy, UserAccountBean ub, ODMContainer odmContainer);
+    public abstract void runRulesInImportData(List<ImportDataRuleRunnerContainer> containers, StudyBean study, UserAccountBean ub, ExecutionMode executionMode);
 
     public abstract List<RuleSetBean> getRuleSetsByCrfStudyAndStudyEventDefinition(StudyBean study, StudyEventDefinitionBean sed, CRFVersionBean crfVersion);
 
@@ -108,12 +111,12 @@ public interface RuleSetServiceInterface {
 
     /**
      * Use in DataEntry Rule Execution Scenarios
-     * 
+     *
      * A RuleSet has a Target with Value which is provided by rule Creator. value might be :
      * SE_TESTINGF[ALL].F_AGEN_8_V204.IG_AGEN_DOSETABLE6[ALL].I_AGEN_DOSEDATE64 OR SE_TESTINGF[1].F_AGEN_8_V204.IG_AGEN_DOSETABLE6[ALL].I_AGEN_DOSEDATE64 OR
      * SE_TESTINGF.F_AGEN_8_V204.IG_AGEN_DOSETABLE6[ALL].I_AGEN_DOSEDATE64 in which case it would need to be transformed to
      * SE_TESTINGF[x].F_AGEN_8_V204.IG_AGEN_DOSETABLE6[ALL].I_AGEN_DOSEDATE64 where x is the studyEventId.
-     * 
+     *
      * @param ruleSets
      * @param studyEvent
      * @param crfVersion
@@ -131,7 +134,7 @@ public interface RuleSetServiceInterface {
     /**
      * Iterate over ruleSet.getExpressions(). Given the following expression SE_TESTINGF[studyEventId].F_AGEN_8_V204.IG_AGEN_DOSETABLE6[X].I_AGEN_DOSEDATE64 X
      * could be : ALL , "" , Number if ALL or "" then iterate over all group ordinals if they exist and add. if Number just add the number
-     * 
+     *
      * @param ruleSets
      * @param grouped
      * @return
@@ -142,14 +145,14 @@ public interface RuleSetServiceInterface {
 
     /**
      * Iterate over rulesets and remove those which are currently hidden.
-     * @param allItems 
+     * @param allItems
      */
     public abstract List<RuleSetBean> filterRuleSetsByHiddenItems(List<RuleSetBean> ruleSets, EventCRFBean eventCrf, CRFVersionBean crfVersion, List<ItemBean> itemBeansWithSCDShown);
 
     /**
      * Iterate over ruleSet.getExpressions(). Given the following expression SE_TESTINGF[studyEventId].F_AGEN_8_V204.IG_AGEN_DOSETABLE6[X].I_AGEN_DOSEDATE64 X
      * could be : ALL , "" , Number case 1 : if "" then iterate over itemDatas if they exist add. case 2 : if Number just add the number
-     * 
+     *
      * @param ruleSets
      * @param grouped
      * @return
@@ -211,11 +214,11 @@ public interface RuleSetServiceInterface {
 
     /**
      * Return true if there is at least one rule should be run for a phase.
-     * 
+     *
      * @param ruleSets
      * @param phase
      * @return
      */
     public boolean shouldRunRulesForRuleSets(List<RuleSetBean> ruleSets, Phase phase);
-    
+
 }

@@ -1,9 +1,9 @@
-/* 
+/*
  * GNU Lesser General Public License (GNU LGPL).
  * For details see: http://www.openclinica.org/license
  *
  * OpenClinica is distributed under the
- * Copyright 2003-2008 Akaza Research 
+ * Copyright 2003-2008 Akaza Research
  */
 package org.akaza.openclinica.service.rule;
 
@@ -13,7 +13,6 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.DisplayItemWithGroupBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
@@ -45,14 +44,16 @@ import org.akaza.openclinica.domain.rule.RuleSetAuditBean;
 import org.akaza.openclinica.domain.rule.RuleSetBasedViewContainer;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
-import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean.RuleSetRuleBeanImportStatus;
+import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.logic.rulerunner.CrfBulkRuleRunner;
 import org.akaza.openclinica.logic.rulerunner.DataEntryRuleRunner;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
+import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunner;
+import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer;
 import org.akaza.openclinica.logic.rulerunner.MessageContainer;
 import org.akaza.openclinica.logic.rulerunner.RuleSetBulkRuleRunner;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
@@ -73,7 +74,7 @@ import javax.sql.DataSource;
 
 /**
  * @author krikor
- * 
+ *
  */
 public class RuleSetService implements RuleSetServiceInterface {
 
@@ -122,7 +123,7 @@ public class RuleSetService implements RuleSetServiceInterface {
         RuleSetBean persistentRuleSetBean = getRuleSetDao().saveOrUpdate(ruleSetBean);
         return persistentRuleSetBean;
     }
-    
+
     @Transactional
     public void saveImportFromDesigner(RulesPostImportContainer rulesContainer) {
     	HashMap<String,RuleBean> ruleBeans = new HashMap<String, RuleBean>();
@@ -201,7 +202,7 @@ public class RuleSetService implements RuleSetServiceInterface {
         ruleSetAuditBean.setUpdater(user);
         return ruleSetAuditBean;
     }
-    
+
     public void loadRuleSetRuleWithPersistentRulesWithHashMap(RuleSetBean ruleSetBean,HashMap<String,RuleBean> persistentRules) {
         for (RuleSetRuleBean ruleSetRule : ruleSetBean.getRuleSetRules()) {
             if (ruleSetRule.getId() == null) {
@@ -326,6 +327,19 @@ public class RuleSetService implements RuleSetServiceInterface {
         return ruleRunner.runRules(ruleSets, executionMode, currentStudy, variableAndValue, ub, phase, request);
         // return new HashMap<String, ArrayList<String>>();
         // return runRules(ruleSets, dryRun, currentStudy, c.variableAndValue, ub);
+    }
+
+    public void runRulesInImportData(List<ImportDataRuleRunnerContainer> containers,
+            StudyBean study, UserAccountBean ub, ExecutionMode executionMode) {
+        ImportDataRuleRunner ruleRunner = new ImportDataRuleRunner(dataSource, requestURLMinusServletPath, contextPath, mailSender);
+        if(dynamicsMetadataService == null) {
+            dynamicsMetadataService = new DynamicsMetadataService(dataSource);
+        }
+        dynamicsMetadataService.setExpressionService(getExpressionService());
+        ruleRunner.setDynamicsMetadataService(dynamicsMetadataService);
+        ruleRunner.setRuleActionRunLogDao(ruleActionRunLogDao);
+
+        ruleRunner.runRules(containers, study, ub, executionMode);
     }
 
     /*
@@ -586,7 +600,7 @@ public class RuleSetService implements RuleSetServiceInterface {
     private void logMe(String message){
     //    System.out.println(message);
         logger.debug(message);
-        
+
     }
     /*
      * (non-Javadoc)
@@ -696,7 +710,7 @@ public class RuleSetService implements RuleSetServiceInterface {
                 if (grouped.containsKey(groupOIDConcatItemOID) && groupOrdinal.equals("")) {
                     for (int i = 0; i < grouped.get(groupOIDConcatItemOID); i++) {
                         ExpressionBean expBean = new ExpressionBean();
-                        expBean.setValue(getExpressionService().replaceGroupOidOrdinalInExpression(expression.getValue(), (i + 1)));
+                        expBean.setValue(getExpressionService().replaceGroupOidOrdinalInExpression(expression.getValue(), i + 1));
                         expBean.setContext(expression.getContext());
                         expressionsWithCorrectGroupOrdinal.add(expBean);
                     }
@@ -768,7 +782,7 @@ public class RuleSetService implements RuleSetServiceInterface {
                 if (groupOrdinal.equals("") && itemDatas.size() > 0) {
                     for (int k = 0; k < itemDatas.size(); k++) {
                         ExpressionBean expBean = new ExpressionBean();
-                        expBean.setValue(getExpressionService().replaceGroupOidOrdinalInExpression(expression.getValue(), (k + 1)));
+                        expBean.setValue(getExpressionService().replaceGroupOidOrdinalInExpression(expression.getValue(), k + 1));
                         expBean.setContext(expression.getContext());
                         expressionsWithCorrectGroupOrdinal.add(expBean);
                     }
@@ -811,7 +825,7 @@ public class RuleSetService implements RuleSetServiceInterface {
         ruleSetBean.getTarget().setValue(expression);
         return ruleSetBean;
     }
-    
+
     public boolean shouldRunRulesForRuleSets(List<RuleSetBean> ruleSets, Phase phase) {
         for(RuleSetBean ruleSetBean: ruleSets) {
             List<RuleSetRuleBean> ruleSetRuleBeans = ruleSetBean.getRuleSetRules();
@@ -898,7 +912,7 @@ public class RuleSetService implements RuleSetServiceInterface {
     }
 
     private ItemFormMetadataDAO getItemFormMetadataDao() {
-        
+
        // itemFormMetadataDao = this.itemFormMetadataDao != null ? itemFormMetadataDao : new ItemFormMetadataDAO(dataSource);
       //  return itemFormMetadataDao;
         return new ItemFormMetadataDAO(dataSource);
@@ -908,13 +922,13 @@ public class RuleSetService implements RuleSetServiceInterface {
         expressionService = this.expressionService != null ? expressionService : new ExpressionService(dataSource);
         return expressionService;
     }
-    //JN:No reason to use global variables, they could cause potential concurrency issues.  
+    //JN:No reason to use global variables, they could cause potential concurrency issues.
 
     public StudyEventDefinitionDAO getStudyEventDefinitionDao() {
     //    studyEventDefinitionDao = this.studyEventDefinitionDao != null ? studyEventDefinitionDao : new StudyEventDefinitionDAO(dataSource);
         return  new StudyEventDefinitionDAO(dataSource);
     }
-   
+
 
     public StudyDAO getStudyDao() {
        // studyDao = this.studyDao != null ? studyDao : new StudyDAO(dataSource);

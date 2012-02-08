@@ -1,9 +1,9 @@
-/* 
+/*
  * OpenClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
  * For details see: http://www.openclinica.org/license
  *
- * Copyright 2003-2008 Akaza Research 
+ * Copyright 2003-2008 Akaza Research
  */
 package org.akaza.openclinica.service.rule;
 
@@ -19,9 +19,8 @@ import org.akaza.openclinica.domain.rule.AuditableBeanWrapper;
 import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
-import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean.RuleSetRuleBeanImportStatus;
-import org.akaza.openclinica.domain.rule.action.EmailActionBean;
+import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import org.akaza.openclinica.domain.rule.action.HideActionBean;
 import org.akaza.openclinica.domain.rule.action.InsertActionBean;
 import org.akaza.openclinica.domain.rule.action.PropertyBean;
@@ -48,7 +47,7 @@ import javax.sql.DataSource;
 
 /**
  * @author Krikor Krumlian
- * 
+ *
  */
 public class RulesPostImportContainerService {
 
@@ -243,7 +242,7 @@ public class RulesPostImportContainerService {
     /**
      * If the RuleSet contains any RuleSetRule object with an invalid RuleRef OID (OID that is not in DB or in the Valid Rule Lists) , Then add an error to the
      * ruleSetBeanWrapper, which in terms will make the RuleSet inValid.
-     * 
+     *
      * @param importContainer
      * @param ruleSetBeanWrapper
      */
@@ -288,9 +287,11 @@ public class RulesPostImportContainerService {
             EventDefinitionCRFBean eventDefinitionCRFBean) {
         if (ruleActionBean instanceof ShowActionBean) {
             List<PropertyBean> properties = ((ShowActionBean) ruleActionBean).getProperties();
-            if (ruleActionBean.getRuleActionRun().getBatch() == true || ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
+            //if (ruleActionBean.getRuleActionRun().getBatch() == true || ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
+            if (ruleActionBean.getRuleActionRun().getBatch() == true ) {
                 ruleSetBeanWrapper.error("ShowAction " + ((ShowActionBean) ruleActionBean).toString()
-                    + " is not Valid. You cannot have ImportDataEntry=\"true\" Batch=\"true\". ");
+                    + " is not Valid. You cannot have Batch=\"true\". ");
+                    //+ " is not Valid. You cannot have ImportDataEntry=\"true\" Batch=\"true\". ");
             }
             for (PropertyBean propertyBean : properties) {
                 String result = getExpressionService().checkValidityOfItemOrItemGroupOidInCrf(propertyBean.getOid(), ruleSetBeanWrapper.getAuditableBean());
@@ -302,9 +303,11 @@ public class RulesPostImportContainerService {
         }
         if (ruleActionBean instanceof HideActionBean) {
             List<PropertyBean> properties = ((HideActionBean) ruleActionBean).getProperties();
-            if (ruleActionBean.getRuleActionRun().getBatch() == true || ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
+            //if (ruleActionBean.getRuleActionRun().getBatch() == true || ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
+            if (ruleActionBean.getRuleActionRun().getBatch() == true ) {
                 ruleSetBeanWrapper.error("HideAction " + ((HideActionBean) ruleActionBean).toString()
-                    + " is not Valid. You cannot have ImportDataEntry=\"true\" Batch=\"true\". ");
+                        + " is not Valid. You cannot have Batch=\"true\". ");
+                    //+ " is not Valid. You cannot have ImportDataEntry=\"true\" Batch=\"true\". ");
             }
             for (PropertyBean propertyBean : properties) {
                 String result = getExpressionService().checkValidityOfItemOrItemGroupOidInCrf(propertyBean.getOid(), ruleSetBeanWrapper.getAuditableBean());
@@ -315,7 +318,8 @@ public class RulesPostImportContainerService {
             }
         }
         if (ruleActionBean instanceof InsertActionBean) {
-            if (ruleActionBean.getRuleActionRun().getBatch() == true || ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
+            //if (ruleActionBean.getRuleActionRun().getBatch() == true || ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
+            if (ruleActionBean.getRuleActionRun().getBatch() == true) {
                 ruleSetBeanWrapper.error("InsertAction " + ((InsertActionBean) ruleActionBean).toString() + " is not Valid. ");
             }
             DataBinder dataBinder = new DataBinder(ruleActionBean);
@@ -329,12 +333,12 @@ public class RulesPostImportContainerService {
                 ruleSetBeanWrapper.error("InsertAction is not valid: " + errors.getAllErrors().get(0).getDefaultMessage());
             }
         }
-        if (ruleActionBean instanceof EmailActionBean) {
-            if (ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
-                ruleSetBeanWrapper.error("EmailAction " + ((EmailActionBean) ruleActionBean).toString()
-                    + " is not Valid.You cannot have ImportDataEntry=\"true\". ");
-            }
-        }
+        //if (ruleActionBean instanceof EmailActionBean) {
+            //if (ruleActionBean.getRuleActionRun().getImportDataEntry() == true) {
+            //    ruleSetBeanWrapper.error("EmailAction " + ((EmailActionBean) ruleActionBean).toString()
+            //        + " is not Valid.You cannot have ImportDataEntry=\"true\". ");
+            //}
+        //}
     }
 
     private String createError(String key) {

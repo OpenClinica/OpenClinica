@@ -66,7 +66,7 @@ public class RuleRunner {
     String contextPath;
 
     public enum RuleRunnerMode {
-        DATA_ENTRY, CRF_BULK, RULSET_BULK
+        DATA_ENTRY, CRF_BULK, RULSET_BULK, IMPORT_DATA
     };
 
     public RuleRunner(DataSource ds, String requestURLMinusServletPath, String contextPath, JavaMailSenderImpl mailSender) {
