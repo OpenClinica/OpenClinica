@@ -134,9 +134,9 @@ public class DataEndpoint {
             			studyBean, userBean,displayItemBeanWrappers);
 
             	//run rules if applicable
-            	new DataImportService().runRules(studyBean, userBean, containers, ruleSetService, ExecutionMode.SAVE);
+            	List<String> ruleActionMsgs = new DataImportService().runRules(studyBean, userBean, containers, ruleSetService, ExecutionMode.SAVE);
 
-            	return new DOMSource(mapConfirmation(auditMsgs));
+            	return new DOMSource(mapConfirmation(auditMsgs, ruleActionMsgs));
             }
             else
             {
@@ -266,7 +266,7 @@ public class DataEndpoint {
      * @return
      * @throws Exception
      */
-    private Element mapConfirmation(List<String> auditMsgs ) throws Exception {
+    private Element mapConfirmation(List<String> auditMsgs, List<String> ruleActionMsgs ) throws Exception {
     	DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
         Document document = docBuilder.newDocument();
@@ -304,10 +304,22 @@ public class DataEndpoint {
                     responseElement.appendChild(warning);
                 }
             } else {
-                // plain success no warnings
-                String confirmation = messages.getMessage("dataEndpoint.success", null, "Success", locale);
-                resultElement.setTextContent(confirmation);
-                responseElement.appendChild(resultElement);
+                if (ruleActionMsgs != null && !ruleActionMsgs.isEmpty()) {
+                    //if there is message from rule. Import data success with rule message
+                    String confirmation = messages.getMessage("dataEndpoint.success", null, "Success", locale);
+                    resultElement.setTextContent(confirmation);
+                    responseElement.appendChild(resultElement);
+                    for(String s : ruleActionMsgs) {
+                        Element ruleMsg = document.createElementNS(NAMESPACE_URI_V1, "rule_action_warning");
+                        ruleMsg.setTextContent(s);
+                        responseElement.appendChild(ruleMsg);
+                    }
+                } else {
+                    // plain success no warnings
+                    String confirmation = messages.getMessage("dataEndpoint.success", null, "Success", locale);
+                    resultElement.setTextContent(confirmation);
+                    responseElement.appendChild(resultElement);
+                }
             }
          }
 
@@ -351,25 +363,5 @@ public class DataEndpoint {
     public void setRuleSetService(RuleSetServiceInterface ruleSetService) {
         this.ruleSetService = ruleSetService;
     }
-
-    /*
-    public RuleSetDao getRuleSetDao() {
-        return ruleSetDao;
-    }
-
-    public JavaMailSenderImpl getMailSender() {
-        return mailSender;
-    }
-
-    public void setRuleSetDao(RuleSetDao ruleSetDao) {
-        this.ruleSetDao = ruleSetDao;
-    }
-
-    public void setMailSender(JavaMailSenderImpl mailSender) {
-        this.mailSender = mailSender;
-    }
-
-*/
-
 
 }

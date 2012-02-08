@@ -646,24 +646,43 @@ public class DataImportService {
     public List<ImportDataRuleRunnerContainer> runRulesSetup(DataSource dataSource, StudyBean studyBean,
             UserAccountBean userBean, List<SubjectDataBean> subjectDataBeans, RuleSetServiceInterface ruleSetService) {
         List<ImportDataRuleRunnerContainer> containers = new ArrayList<ImportDataRuleRunnerContainer>();
-        ImportDataRuleRunnerContainer container;
-        for (SubjectDataBean subjectDataBean : subjectDataBeans) {
-            container = new ImportDataRuleRunnerContainer();
-            container.init(dataSource, studyBean, subjectDataBean, ruleSetService);
-            if(container.getShouldRunRules())   containers.add(container);
-
+        if(ruleSetService.getCountByStudy(studyBean)>0) {
+            ImportDataRuleRunnerContainer container;
+            for (SubjectDataBean subjectDataBean : subjectDataBeans) {
+                container = new ImportDataRuleRunnerContainer();
+                container.init(dataSource, studyBean, subjectDataBean, ruleSetService);
+                if(container.getShouldRunRules())   containers.add(container);
+            }
+            if(containers != null && ! containers.isEmpty())
+                ruleSetService.runRulesInImportData(containers, studyBean, userBean, ExecutionMode.DRY_RUN);
         }
-        if(containers != null && ! containers.isEmpty())
-            ruleSetService.runRulesInImportData(containers, studyBean, userBean, ExecutionMode.DRY_RUN);
         return containers;
     }
 
 
-    public void runRules(StudyBean studyBean, UserAccountBean userBean,
+    public List<String> runRules(StudyBean studyBean, UserAccountBean userBean,
             List<ImportDataRuleRunnerContainer> containers, RuleSetServiceInterface ruleSetService,
             ExecutionMode executionMode) {
-        if(containers != null && ! containers.isEmpty())
-            ruleSetService.runRulesInImportData(containers, studyBean, userBean, executionMode);
+        List<String> messages = new ArrayList<String>();
+        if(containers != null && ! containers.isEmpty()) {
+            HashMap<String, ArrayList<String>> summary = ruleSetService.runRulesInImportData(containers, studyBean, userBean, executionMode);
+            messages = extractRuleActionWarnings(summary);
+        }
+        return messages;
+    }
+
+    private List<String> extractRuleActionWarnings(HashMap<String, ArrayList<String>> summaryMap) {
+        List<String> messages = new ArrayList<String>();
+        if(summaryMap != null && !summaryMap.isEmpty()) {
+            for (String key : summaryMap.keySet()) {
+                StringBuilder mesg = new StringBuilder(key+" : ");
+                for(String s : summaryMap.get(key)) {
+                    mesg.append(s+", ");
+                }
+                messages.add(mesg.toString());
+            }
+        }
+        return messages;
     }
 
     private ImportCRFDataService getImportCRFDataService(DataSource dataSource) {
