@@ -329,7 +329,7 @@ public class RuleSetService implements RuleSetServiceInterface {
         // return runRules(ruleSets, dryRun, currentStudy, c.variableAndValue, ub);
     }
 
-    public void runRulesInImportData(List<ImportDataRuleRunnerContainer> containers,
+    public HashMap<String, ArrayList<String>> runRulesInImportData(List<ImportDataRuleRunnerContainer> containers,
             StudyBean study, UserAccountBean ub, ExecutionMode executionMode) {
         ImportDataRuleRunner ruleRunner = new ImportDataRuleRunner(dataSource, requestURLMinusServletPath, contextPath, mailSender);
         if(dynamicsMetadataService == null) {
@@ -339,7 +339,7 @@ public class RuleSetService implements RuleSetServiceInterface {
         ruleRunner.setDynamicsMetadataService(dynamicsMetadataService);
         ruleRunner.setRuleActionRunLogDao(ruleActionRunLogDao);
 
-        ruleRunner.runRules(containers, study, ub, executionMode);
+        return ruleRunner.runRules(containers, study, ub, executionMode);
     }
 
     /*

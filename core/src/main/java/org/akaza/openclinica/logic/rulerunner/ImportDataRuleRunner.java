@@ -17,6 +17,7 @@ import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionObjectWrapper;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.logic.expressionTree.OpenClinicaExpressionParser;
+import org.akaza.openclinica.logic.rulerunner.MessageContainer.MessageType;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import java.util.ArrayList;
@@ -34,8 +35,16 @@ public class ImportDataRuleRunner extends RuleRunner {
         super(ds, requestURLMinusServletPath, contextPath, mailSender);
     }
 
-    public void runRules(List<ImportDataRuleRunnerContainer> containers,
+    /**
+     * @param containers
+     * @param study
+     * @param ub
+     * @param executionMode
+     * @return Returned RuleActionBean summary with key as groupOrdinalPLusItemOid.
+     */
+    public HashMap<String, ArrayList<String>> runRules(List<ImportDataRuleRunnerContainer> containers,
             StudyBean study, UserAccountBean ub, ExecutionMode executionMode) {
+        HashMap<String, ArrayList<String>> messageMap = new HashMap<String, ArrayList<String>>();
 
         if(executionMode == ExecutionMode.DRY_RUN) {
             for(ImportDataRuleRunnerContainer container : containers) {
@@ -44,9 +53,15 @@ public class ImportDataRuleRunner extends RuleRunner {
             }
         } else if(executionMode == ExecutionMode.SAVE){
             for(ImportDataRuleRunnerContainer container : containers) {
-                this.runRules(study, ub, (HashMap<String, String>)container.getVariableAndValue(), container.getRuleActionContainerMap());
+                MessageContainer messageContainer =
+                        this.runRules(study, ub, (HashMap<String, String>)container.getVariableAndValue(), container.getRuleActionContainerMap());
+                if(messageContainer != null) {
+                    messageMap.putAll(messageContainer.getByMessageType(MessageType.ERROR));
+                    messageMap.putAll(messageContainer.getByMessageType(MessageType.WARNING));
+                }
             }
         }
+        return messageMap;
     }
 
     private HashMap<String, ArrayList<RuleActionContainer>> populateToBeExpected(ImportDataRuleRunnerContainer container,

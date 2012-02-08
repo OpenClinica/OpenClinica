@@ -29,6 +29,7 @@ import org.akaza.openclinica.logic.rulerunner.MessageContainer;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -77,8 +78,14 @@ public interface RuleSetServiceInterface {
     public abstract MessageContainer runRulesInDataEntry(List<RuleSetBean> ruleSets, Boolean dryRun, StudyBean currentStudy, UserAccountBean ub,
             HashMap<String, String> variableAndValue, Phase phase,EventCRFBean ecb, HttpServletRequest request);
 
-    //public abstract MessageContainer runRulesInImportData(List<RuleSetBean> ruleSets, ExecutionMode executionMode, StudyBean currentStudy, UserAccountBean ub, ODMContainer odmContainer);
-    public abstract void runRulesInImportData(List<ImportDataRuleRunnerContainer> containers, StudyBean study, UserAccountBean ub, ExecutionMode executionMode);
+    /**
+     * @param containers
+     * @param study
+     * @param ub
+     * @param executionMode
+     * @return RuleActionBean summary with key as groupOrdinalPLusItemOid.
+     */
+    public abstract HashMap<String, ArrayList<String>> runRulesInImportData(List<ImportDataRuleRunnerContainer> containers, StudyBean study, UserAccountBean ub, ExecutionMode executionMode);
 
     public abstract List<RuleSetBean> getRuleSetsByCrfStudyAndStudyEventDefinition(StudyBean study, StudyEventDefinitionBean sed, CRFVersionBean crfVersion);
 
