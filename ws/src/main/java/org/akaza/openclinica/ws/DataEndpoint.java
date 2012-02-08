@@ -1,28 +1,38 @@
 package org.akaza.openclinica.ws;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBeanWrapper;
 import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
+import org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
+import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer;
+import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.web.crfdata.DataImportService;
 import org.akaza.openclinica.ws.bean.BaseStudyDefinitionBean;
 import org.akaza.openclinica.ws.validator.CRFDataImportValidator;
+import org.exolab.castor.mapping.Mapping;
+import org.exolab.castor.xml.Unmarshaller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.XPathParam;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
 
 import java.io.InputStream;
 import java.io.StringReader;
@@ -33,8 +43,6 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 import javax.sql.DataSource;
-import org.xml.sax.InputSource;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
@@ -43,9 +51,6 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-
-import org.exolab.castor.mapping.Mapping;
-import org.exolab.castor.xml.Unmarshaller;
 
 @Endpoint
 public class DataEndpoint {
@@ -59,32 +64,38 @@ public class DataEndpoint {
     private final CoreResources coreResources;
     private final Locale locale;
 
+    @Autowired
+    @Qualifier("ruleSetService")
+    private RuleSetServiceInterface ruleSetService;
+
     public DataEndpoint(DataSource dataSource, MessageSource messages, CoreResources coreResources) {
         this.dataSource = dataSource;
         this.messages = messages;
         this.coreResources = coreResources;
-        
+        this.ruleSetService = getRuleSetService();
+
         this.locale = new Locale("en_US");
     }
 
     /**
      * if NAMESPACE_URI_V1:importDataRequest execute this method
-     * 
+     *
      * @return
      * @throws Exception
      */
     @PayloadRoot(localPart = "importRequest", namespace = NAMESPACE_URI_V1)
     public Source importData(@XPathParam("//ODM") Element odmElement) throws Exception {
 
+
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
 
         // logger.debug("rootElement=" + odmElement);
         logger.debug("rootElement=" + odmElement);
 
-        String xml = null;
+        //String xml = null;
         UserAccountBean userBean = null;
-        
-        
+
+
         try {
             if (odmElement == null) {return new DOMSource(mapFailConfirmation(null,"Your XML is not well-formed."));}
           //  xml = node2String(odmElement);
@@ -96,7 +107,7 @@ public class DataEndpoint {
             userBean = getUserAccount();
            // CRFDataImportBean crfDataImportBean = new CRFDataImportBean(studyUniqueID, userBean);
             BaseStudyDefinitionBean crfDataImportBean = new BaseStudyDefinitionBean(studyUniqueID, userBean);
-            
+
             DataBinder dataBinder = new DataBinder(crfDataImportBean);
             Errors errors = dataBinder.getBindingResult();
             CRFDataImportValidator crfDataImportValidator = new CRFDataImportValidator(dataSource);
@@ -104,51 +115,61 @@ public class DataEndpoint {
 
             if (!errors.hasErrors() ) {
             	List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
-            	     
-            	List<String> errorMessagesFromValidation = new DataImportService().validateData(odmContainer,dataSource, coreResources, 
-            			crfDataImportBean.getStudy(), userBean,displayItemBeanWrappers);
+            	StudyBean studyBean = crfDataImportBean.getStudy();
+
+            	List<String> errorMessagesFromValidation = new DataImportService().validateData(odmContainer,dataSource, coreResources,
+            			studyBean, userBean,displayItemBeanWrappers);
             	if (  errorMessagesFromValidation.size()>0)
             	{
             		String err_msg = convertToErrorString(errorMessagesFromValidation);
             		return new DOMSource(mapFailConfirmation(null, err_msg));
             	}
-            	
-            	List<String > auditMsgs = new DataImportService().submitData(odmContainer,dataSource,  
-            			crfDataImportBean.getStudy(), userBean,displayItemBeanWrappers);
+
+            	//setup ruleSets to run if applicable
+            	ArrayList<SubjectDataBean> subjectDataBeans = odmContainer.getCrfDataPostImportContainer().getSubjectData();
+            	List<ImportDataRuleRunnerContainer> containers = new DataImportService().runRulesSetup(dataSource, studyBean,
+            	        userBean, subjectDataBeans, ruleSetService);
+
+            	List<String > auditMsgs = new DataImportService().submitData(odmContainer,dataSource,
+            			studyBean, userBean,displayItemBeanWrappers);
+
+            	//run rules if applicable
+            	new DataImportService().runRules(studyBean, userBean, containers, ruleSetService, ExecutionMode.SAVE);
+
             	return new DOMSource(mapConfirmation(auditMsgs));
             }
             else
             {
             	return new DOMSource(mapFailConfirmation(errors,null));
             }
-               
+
                 ////
          } catch (Exception npe) {
             return new DOMSource(mapFailConfirmation(null,"Your XML is not well-formed. "+ npe.getMessage()));
         }
         // return new DOMSource(mapConfirmation(xml, studyBean, userBean));
     }
-    
-    
+
+
    private ODMContainer unmarshallToODMContainer(Element odmElement) throws Exception
    {
 	   ResourceBundle  respage = ResourceBundleProvider.getPageMessagesBundle();
-	      
+
 	   String xml = node2String(odmElement);
        xml = xml.replaceAll("<ODM>", this.ODM_HEADER_NAMESPACE);
-       
+
        if ( xml == null )throw new Exception( respage.getString("unreadable_file") );
-       
+
         Mapping myMap = new Mapping();
 
        // InputStream xsdFile = coreResources.getInputStream("ODM1-3-0.xsd");//new File(propertiesPath + File.separator + "ODM1-3-0.xsd");
        // InputStream xsdFile2 = coreResources.getInputStream("ODM1-2-1.xsd");//new File(propertiesPath + File.separator + "ODM1-2-1.xsd");
         InputStream mapInputStream = coreResources.getInputStream("cd_odm_mapping.xml");
-        
+
         myMap.loadMapping(new InputSource(mapInputStream));
         Unmarshaller um1 = new Unmarshaller(myMap);
         ODMContainer odmContainer = new ODMContainer();
-      
+
         try {
             logger.debug(xml);
              // File xsdFileFinal = new File(xsdFile);
@@ -158,7 +179,7 @@ public class DataEndpoint {
             logger.debug("Found crf data container for study oid: " + odmContainer.getCrfDataPostImportContainer().getStudyOID());
             logger.debug("found length of subject list: " + odmContainer.getCrfDataPostImportContainer().getSubjectData().size());
             return odmContainer;
-            
+
         } catch (Exception me1) {
             // fail against one, try another
             me1.printStackTrace();
@@ -175,16 +196,16 @@ public class DataEndpoint {
 //                   // break here with an exception
 //                logger.debug("found an error with XML: " + me2.getMessage());
 //                throw new Exception();
-//               
+//
 //            }
             throw new Exception();
         }
-        
+
    }
-    
+
     /**
      * Helper Method to get the user account
-     * 
+     *
      * @return UserAccountBean
      */
     private UserAccountBean getUserAccount() {
@@ -198,11 +219,11 @@ public class DataEndpoint {
         UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
         return (UserAccountBean) userAccountDao.findByUserName(username);
     }
-    
-   
+
+
     /**
      * Create Error Response
-     * 
+     *
      * @param confirmation
      * @return
      * @throws Exception
@@ -214,11 +235,11 @@ public class DataEndpoint {
 
           Element responseElement = document.createElementNS(NAMESPACE_URI_V1, "importDataResponse");
           Element resultElement = document.createElementNS(NAMESPACE_URI_V1, "result");
-          
+
           String confirmation = messages.getMessage("dataEndpoint.fail", null, "Fail", locale);
           resultElement.setTextContent(confirmation);
           responseElement.appendChild(resultElement);
-         
+
           if ( errors != null){
 		        for (ObjectError error : errors.getAllErrors()) {
 		            Element errorElement = document.createElementNS(NAMESPACE_URI_V1, "error");
@@ -229,7 +250,7 @@ public class DataEndpoint {
           }
           if (message != null)
           {
-        
+
 	        Element msgElement = document.createElementNS(NAMESPACE_URI_V1, "error");
 	        msgElement.setTextContent(message);
 	        responseElement.appendChild(msgElement);
@@ -240,7 +261,7 @@ public class DataEndpoint {
     }
     /**
      * Create Response
-     * 
+     *
      * @param confirmation
      * @return
      * @throws Exception
@@ -252,7 +273,7 @@ public class DataEndpoint {
 
         Element responseElement = document.createElementNS(NAMESPACE_URI_V1, "importDataResponse");
         Element resultElement = document.createElementNS(NAMESPACE_URI_V1, "result");
-        
+
         if (auditMsgs != null) {
             String status = auditMsgs.get(0);
             if ("fail".equals(status)) {
@@ -296,7 +317,7 @@ public class DataEndpoint {
     private static String node2String(Node node) {
         try {
             TransformerFactory tFactory = TransformerFactory.newInstance();
-            
+
             Transformer transformer = tFactory.newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 
@@ -311,7 +332,7 @@ public class DataEndpoint {
 
         return null;
     }
-    
+
     private String convertToErrorString(List<String> errorMessages)
     {
     	StringBuilder result = new StringBuilder();
@@ -319,8 +340,36 @@ public class DataEndpoint {
     	{
     		result.append(str + " \n");
     	}
-    	
+
     	return result.toString();
     }
+
+    public RuleSetServiceInterface getRuleSetService() {
+        return ruleSetService;
+    }
+
+    public void setRuleSetService(RuleSetServiceInterface ruleSetService) {
+        this.ruleSetService = ruleSetService;
+    }
+
+    /*
+    public RuleSetDao getRuleSetDao() {
+        return ruleSetDao;
+    }
+
+    public JavaMailSenderImpl getMailSender() {
+        return mailSender;
+    }
+
+    public void setRuleSetDao(RuleSetDao ruleSetDao) {
+        this.ruleSetDao = ruleSetDao;
+    }
+
+    public void setMailSender(JavaMailSenderImpl mailSender) {
+        this.mailSender = mailSender;
+    }
+
+*/
+
 
 }
