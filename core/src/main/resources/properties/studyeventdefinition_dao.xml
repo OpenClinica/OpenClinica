@@ -131,4 +131,18 @@
 				order by sed.ordinal asc
 		</sql>
 	</query>
+    <query>
+        <name>findByStudySubject</name>
+        <sql>
+            select * from study_event_definition where study_event_definition_id in (
+            select distinct study_event_definition_id from study_event where study_subject_id = ?)
+        </sql>
+    </query>
+    <query>
+        <name>buildMaxOrdinalByStudyEvent</name>
+        <sql>
+            select max(sample_ordinal) as max_ord, study_event_definition_id from 
+            study_event group by study_event_definition_id, study_subject_id having study_subject_id = ?
+        </sql>
+    </query>
 </queries>

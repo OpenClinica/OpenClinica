@@ -4,4 +4,4 @@ syntax: glob
 *.classpath
 *.settings/*
 *.externalToolBuilders/*
-
+*.springBeans

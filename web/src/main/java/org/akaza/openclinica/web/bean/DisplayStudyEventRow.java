@@ -7,9 +7,10 @@
  */
 package org.akaza.openclinica.web.bean;
 
-import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
-
 import java.util.ArrayList;
+import java.util.List;
+
+import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
 
 /**
  * @author jxu
@@ -92,7 +93,7 @@ public class DisplayStudyEventRow extends EntityBeanRow {
         return DisplayStudyEventRow.generateRowsFromBeans(beans);
     }
 
-    public static ArrayList generateRowsFromBeans(ArrayList beans) {
+    public static ArrayList generateRowsFromBeans(List beans) {
         ArrayList answer = new ArrayList();
 
         Class[] parameters = null;

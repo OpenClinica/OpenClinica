@@ -475,4 +475,18 @@
             WHERE EVENT_CRF_ID=?
         </sql>
     </query>
+    <query>
+        <name>buildEventCrfListByStudyEvent</name>
+        <sql>
+            select * from event_crf where study_subject_id = ?
+        </sql>
+    </query>
+    <query>
+        <name>buildNonEmptyEventCrfIds</name>
+        <sql>
+            select distinct event_crf_id from item_data where 
+            event_crf_id in (select event_crf_id from event_crf where study_subject_id = ?)
+        </sql>
+    </query>
+    
 </queries>

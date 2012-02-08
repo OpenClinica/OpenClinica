@@ -7,6 +7,16 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.AuditEventBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.admin.StudyEventAuditBean;
@@ -49,15 +59,14 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
+import org.akaza.openclinica.log.Stopwatch;
 import org.akaza.openclinica.service.crfdata.HideCRFManager;
+import org.akaza.openclinica.service.managestudy.StudySubjectService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.DisplayStudyEventRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
-
-import java.util.*;
-
-import javax.sql.DataSource;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author jxu
@@ -99,7 +108,7 @@ public class ViewStudySubjectServlet extends SecureController {
         // belong to user's studies, it can not be viewed
 //        mayAccess();
         removeLockedCRF(ub.getId());
-        CoreSecureController.removeLockedCRF(ub.getId());  
+        CoreSecureController.removeLockedCRF(ub.getId());
         if (ub.isSysAdmin()) {
             return;
         }
@@ -114,6 +123,8 @@ public class ViewStudySubjectServlet extends SecureController {
 
     public static ArrayList<DisplayStudyEventBean> getDisplayStudyEventsForStudySubject(StudySubjectBean studySub, DataSource ds, UserAccountBean ub,
             StudyUserRoleBean currentRole) {
+        Stopwatch stopwatch = Stopwatch.createAndStart("getDisplayStudyEventsForStudySubject (study: "
+            + studySub.getId() + "; user: " + ub.getId() + "; role: " + currentRole.getId() + ")");
         StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(ds);
         StudyEventDAO sedao = new StudyEventDAO(ds);
         EventCRFDAO ecdao = new EventCRFDAO(ds);
@@ -125,6 +136,7 @@ public class ViewStudySubjectServlet extends SecureController {
 
         ArrayList displayEvents = new ArrayList();
         for (int i = 0; i < events.size(); i++) {
+            Stopwatch s1 = Stopwatch.createAndStart("displayEvents " + i);
             StudyEventBean event = (StudyEventBean) events.get(i);
             StudySubjectBean studySubject = (StudySubjectBean) ssdao.findByPK(event.getStudySubjectId());
 
@@ -149,9 +161,11 @@ public class ViewStudySubjectServlet extends SecureController {
             displayEvents.add(de);
             // event.setEventCRFs(createAllEventCRFs(eventCRFs,
             // eventDefinitionCRFs));
+            s1.stop();
 
         }
 
+        stopwatch.stop();
         return displayEvents;
     }
 
@@ -208,7 +222,7 @@ public class ViewStudySubjectServlet extends SecureController {
                     }
                 }
             }
-            
+
 
 
             // If the study subject derives from a site, and is being viewed
@@ -301,7 +315,11 @@ public class ViewStudySubjectServlet extends SecureController {
             StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
             StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
 
-            ArrayList<DisplayStudyEventBean> displayEvents = getDisplayStudyEventsForStudySubject(studySub, sm.getDataSource(), ub, currentRole);
+            StudySubjectService studySubjectService = (StudySubjectService)
+                    WebApplicationContextUtils.getWebApplicationContext(getServletContext()).getBean("studySubjectService");
+            List<DisplayStudyEventBean> displayEvents =
+                    studySubjectService.getDisplayStudyEventsForStudySubject(studySub, ub, currentRole);
+            //ArrayList<DisplayStudyEventBean> displayEvents = getDisplayStudyEventsForStudySubject(studySub, sm.getDataSource(), ub, currentRole);
             //A. Hamid.
             // Mantis Issue 5048: Preventing Investigators from Unlocking Events
             for(int i = 0; i < displayEvents.size(); i++){
@@ -413,6 +431,7 @@ public class ViewStudySubjectServlet extends SecureController {
      */
     public static ArrayList getDisplayEventCRFs(DataSource ds, ArrayList eventCRFs, ArrayList eventDefinitionCRFs, UserAccountBean ub,
             StudyUserRoleBean currentRole, SubjectEventStatus status, StudyBean study) {
+        Stopwatch stopwatch = Stopwatch.createAndStart("getDisplayEventCRFs");
         ArrayList answer = new ArrayList();
 
         // HashMap definitionsById = new HashMap();
@@ -476,7 +495,7 @@ public class ViewStudySubjectServlet extends SecureController {
                 // System.out.println("edc.isDoubleEntry()" +
                 // edc.isDoubleEntry() + ecb.getId());
                 dec.setFlags(ecb, ub, currentRole, edc.isDoubleEntry());
-                                
+
                 if (dec.isLocked()) {
                     // System.out.println("*** found a locked DEC:
                     // "+edc.getCrfName());
@@ -490,6 +509,7 @@ public class ViewStudySubjectServlet extends SecureController {
             }
         }
 
+        stopwatch.stop();
         return answer;
     }
 
@@ -504,6 +524,7 @@ public class ViewStudySubjectServlet extends SecureController {
      * @return The list of event definitions for which no event CRF exists.
      */
     public static ArrayList getUncompletedCRFs(DataSource ds, ArrayList eventDefinitionCRFs, ArrayList eventCRFs, SubjectEventStatus status) {
+        Stopwatch stopwatch = Stopwatch.createAndStart("getUncompletedCRFs");
         int i;
         HashMap completed = new HashMap();
         HashMap startedButIncompleted = new HashMap();
@@ -584,6 +605,7 @@ public class ViewStudySubjectServlet extends SecureController {
             }
         }
         // System.out.println("size of answer" + answer.size());
+        stopwatch.stop();
         return answer;
     }
 
