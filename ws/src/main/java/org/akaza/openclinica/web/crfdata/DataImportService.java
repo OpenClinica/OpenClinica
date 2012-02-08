@@ -646,19 +646,18 @@ public class DataImportService {
     public List<ImportDataRuleRunnerContainer> runRulesSetup(DataSource dataSource, StudyBean studyBean,
             UserAccountBean userBean, List<SubjectDataBean> subjectDataBeans, RuleSetServiceInterface ruleSetService) {
         List<ImportDataRuleRunnerContainer> containers = new ArrayList<ImportDataRuleRunnerContainer>();
-        if(ruleSetService.getCountByStudy(studyBean) > 0 ) {
-            ImportDataRuleRunnerContainer container;
-            for (SubjectDataBean subjectDataBean : subjectDataBeans) {
-                container = new ImportDataRuleRunnerContainer();
-                container.init(dataSource, studyBean, subjectDataBean, ruleSetService);
-                if(container.getShouldRunRules())   containers.add(container);
+        ImportDataRuleRunnerContainer container;
+        for (SubjectDataBean subjectDataBean : subjectDataBeans) {
+            container = new ImportDataRuleRunnerContainer();
+            container.init(dataSource, studyBean, subjectDataBean, ruleSetService);
+            if(container.getShouldRunRules())   containers.add(container);
 
-                if(containers != null && ! containers.isEmpty())
-                    ruleSetService.runRulesInImportData(containers, studyBean, userBean, ExecutionMode.DRY_RUN);
-            }
         }
+        if(containers != null && ! containers.isEmpty())
+            ruleSetService.runRulesInImportData(containers, studyBean, userBean, ExecutionMode.DRY_RUN);
         return containers;
     }
+
 
     public void runRules(StudyBean studyBean, UserAccountBean userBean,
             List<ImportDataRuleRunnerContainer> containers, RuleSetServiceInterface ruleSetService,
