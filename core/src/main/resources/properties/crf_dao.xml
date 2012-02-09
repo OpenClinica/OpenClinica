@@ -143,8 +143,10 @@
     </query>
     <query>
       <name>buildCrfById</name>
-      <sql>select * from crf where crf_id in (
-      select distinct crf_id from crf_version where crf_version_id in (
-      select distinct crf_version_id from event_crf where study_subject_id = ?))</sql>
+      <sql>
+      select * from crf where crf_id in (select crf_id from event_definition_crf where study_event_definition_id in (
+      select study_event_definition_id from study_event_definition where study_event_definition_id in (
+      select distinct study_event_definition_id from study_event where study_subject_id = ?)))
+      </sql>
     </query>
 </queries>
