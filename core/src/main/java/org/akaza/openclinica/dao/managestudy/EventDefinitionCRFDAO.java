@@ -848,4 +848,39 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
         return result;
     }
 
+    public Map<Integer, SortedSet<EventDefinitionCRFBean>> buildEventDefinitionCRFListByStudyEventDefinitionForStudy(
+            Integer studySubjectId) {
+        this.setTypesExpected(); // <== Must be called first
+
+        HashMap<Integer, Object> param = new HashMap<Integer, Object>();
+        int i = 1;
+        param.put(i++, studySubjectId);
+
+        List selectResult = select(digester.getQuery("buildEventDefinitionCRFListByStudyEventDefinitionForStudy"),
+                param);
+
+        Map<Integer, SortedSet<EventDefinitionCRFBean>> result =
+                new HashMap<Integer, SortedSet<EventDefinitionCRFBean>>();
+        Iterator it = selectResult.iterator();
+        while (it.hasNext()) {
+            EventDefinitionCRFBean bean = (EventDefinitionCRFBean) this.getEntityFromHashMap((HashMap) it.next());
+            Integer studyEventDefinitionId = bean.getStudyEventDefinitionId();
+
+            if (!result.containsKey(studyEventDefinitionId)) {
+                result.put(studyEventDefinitionId, new TreeSet<EventDefinitionCRFBean>(
+                        new Comparator<EventDefinitionCRFBean>() {
+                            public int compare(EventDefinitionCRFBean o1, EventDefinitionCRFBean o2) {
+                                Integer ord1 = o1.getOrdinal();
+                                Integer ord2 = o2.getOrdinal();
+                                return ord1.compareTo(ord2);
+                            }
+                        }));
+            }
+            result.get(studyEventDefinitionId).add(bean);
+
+        }
+
+        return result;
+    }
+
 }

@@ -79,10 +79,17 @@ public class StudySubjectServiceImpl implements StudySubjectService {
 
         StudyBean study = (StudyBean) studyDao.findByPK(studySubject.getStudyId());
 
-        //FIXME Check when parentStudyId is null
-        Map<Integer, SortedSet<EventDefinitionCRFBean>> eventDefinitionCrfByStudyEventDefinition =
-                eventDefinitionCrfDao.buildEventDefinitionCRFListByStudyEventDefinition(studySubject.getId(),
-                        study.getId(), study.getParentStudyId());
+        Map<Integer, SortedSet<EventDefinitionCRFBean>> eventDefinitionCrfByStudyEventDefinition;
+        if (study.getParentStudyId() < 1) { // Is a study
+            eventDefinitionCrfByStudyEventDefinition =
+                    eventDefinitionCrfDao.buildEventDefinitionCRFListByStudyEventDefinitionForStudy(
+                            studySubject.getId());
+        } else { // Is a site
+            eventDefinitionCrfByStudyEventDefinition =
+                    eventDefinitionCrfDao.buildEventDefinitionCRFListByStudyEventDefinition(studySubject.getId(),
+                    study.getId(), study.getParentStudyId());
+        }
+
 
         Map<Integer, SortedSet<EventCRFBean>> eventCrfListByStudyEvent = eventCrfDao.buildEventCrfListByStudyEvent(
                 studySubject.getId());
