@@ -19,6 +19,9 @@ import org.akaza.openclinica.bean.submit.DisplayItemBeanWrapper;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
+import org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
@@ -27,6 +30,9 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
+import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer;
+import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.job.CrfBusinessLogicHelper;
@@ -34,6 +40,7 @@ import org.akaza.openclinica.web.job.ImportSpringJob;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -141,6 +148,14 @@ public class VerifyImportedCRFDataServlet extends SecureController {
         }
 
         if ("save".equalsIgnoreCase(action)) {
+
+            //setup ruleSets to run if applicable
+            RuleSetServiceInterface ruleSetService =
+                    (RuleSetServiceInterface)SpringServletAccess.getApplicationContext(context).getBean("ruleSetService");
+            List<ImportDataRuleRunnerContainer> containers =
+                    this.ruleRunSetup(sm.getDataSource(), currentStudy, ub, ruleSetService);
+
+
             List<DisplayItemBeanWrapper> displayItemBeanWrappers = (List<DisplayItemBeanWrapper>) session.getAttribute("importedData");
             // System.out.println("Size of displayItemBeanWrappers : " + displayItemBeanWrappers.size());
 
@@ -278,9 +293,68 @@ public class VerifyImportedCRFDataServlet extends SecureController {
             }
 
             addPageMessage(respage.getString("data_has_been_successfully_import"));
+
+            addPageMessage(this.ruleActionWarnings(this.runRules(currentStudy, ub, containers, ruleSetService, ExecutionMode.SAVE)));
+
             // forwardPage(Page.SUBMIT_DATA_SERVLET);
             forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
             // replaced tbh, 06/2009
+        }
+    }
+
+    private List<ImportDataRuleRunnerContainer> ruleRunSetup(DataSource dataSource, StudyBean studyBean,
+            UserAccountBean userBean, RuleSetServiceInterface ruleSetService) {
+        List<ImportDataRuleRunnerContainer> containers = new ArrayList<ImportDataRuleRunnerContainer>();
+        ODMContainer odmContainer = (ODMContainer)session.getAttribute("odmContainer");
+        if(odmContainer != null) {
+            ArrayList<SubjectDataBean> subjectDataBeans = odmContainer.getCrfDataPostImportContainer().getSubjectData();
+            if(ruleSetService.getCountByStudy(studyBean)>0) {
+                ImportDataRuleRunnerContainer container;
+                for (SubjectDataBean subjectDataBean : subjectDataBeans) {
+                    container = new ImportDataRuleRunnerContainer();
+                    container.init(dataSource, studyBean, subjectDataBean, ruleSetService);
+                    if(container.getShouldRunRules())   containers.add(container);
+                }
+                if(containers != null && ! containers.isEmpty())
+                    ruleSetService.runRulesInImportData(containers, studyBean, userBean, ExecutionMode.DRY_RUN);
+            }
+        }
+        return containers;
+    }
+
+    private List<String> runRules(StudyBean studyBean, UserAccountBean userBean,
+            List<ImportDataRuleRunnerContainer> containers, RuleSetServiceInterface ruleSetService,
+            ExecutionMode executionMode) {
+        List<String> messages = new ArrayList<String>();
+        if(containers != null && ! containers.isEmpty()) {
+            HashMap<String, ArrayList<String>> summary = ruleSetService.runRulesInImportData(containers, studyBean, userBean, executionMode);
+            messages = extractRuleActionWarnings(summary);
+        }
+        return messages;
+    }
+
+    private List<String> extractRuleActionWarnings(HashMap<String, ArrayList<String>> summaryMap) {
+        List<String> messages = new ArrayList<String>();
+        if(summaryMap != null && !summaryMap.isEmpty()) {
+            for (String key : summaryMap.keySet()) {
+                StringBuilder mesg = new StringBuilder(key+" : ");
+                for(String s : summaryMap.get(key)) {
+                    mesg.append(s+", ");
+                }
+                messages.add(mesg.toString());
+            }
+        }
+        return messages;
+    }
+
+    private String ruleActionWarnings(List<String> warnings) {
+        if(warnings.isEmpty()) return "";
+        else {
+            StringBuilder mesg = new StringBuilder("Rule Action Warnings: ");
+            for(String s : warnings) {
+                mesg.append(s+"; ");
+            }
+            return mesg.toString();
         }
     }
 }

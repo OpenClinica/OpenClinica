@@ -159,6 +159,7 @@ public class ImportCRFDataServlet extends SecureController {
             // "ODMContainer");
             boolean fail = false;
             ODMContainer odmContainer = new ODMContainer();
+            session.removeAttribute("odmContainer");
             try {
 
                 // schemaValidator.validateAgainstSchema(f, xsdFile);
@@ -387,6 +388,7 @@ public class ImportCRFDataServlet extends SecureController {
                 forwardPage(Page.IMPORT_CRF_DATA);
             } else {
                 addPageMessage(respage.getString("passing_crf_edit_checks"));
+                session.setAttribute("odmContainer", odmContainer);
                 session.setAttribute("importedData", displayItemBeanWrappers);
                 session.setAttribute("validationErrors", totalValidationErrors);
                 session.setAttribute("hardValidationErrors", hardValidationErrors);
