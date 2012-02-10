@@ -4,19 +4,23 @@
 package org.akaza.openclinica.control.urlRewrite;
 
 import java.util.HashMap;
+import java.util.ResourceBundle;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.control.core.CoreSecureController;
+import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -31,12 +35,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author pgawade Servlet to call appropriate application pages correspond to
+ * @author pgawade Servlet to call appropriate application pages corresponding to
  *         supported RESTful URLs
  * 
  */
 public class UrlRewriteServlet extends CoreSecureController {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    
+    
+    
+//    StudyBean study = null;
+//    StudySubjectBean subject = null;
+//    StudyEventDefinitionBean sed = null;
+//    CRFBean c = null;
+//    CRFVersionBean cv = null;
+//    ItemBean item = null;
+//    ItemGroupBean ig = null;
 
     @Override
     protected void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException {
@@ -71,46 +85,60 @@ public class UrlRewriteServlet extends CoreSecureController {
             }
 
             ocResource = getOpenClinicaResourceFromURL(requestOIDStr);
-
-            // If the form OID in the request uri is not null, it will be
-            // interpretted as a request to
-            // view form data and hence will be forwarded to servlet path
-            // "/ViewSectionDataEntry"
-            if ((null != ocResource) && (ocResource.getFormVersionOID() != null)) {
-                HashMap<String, String> mapQueryParams = getQueryStringParameters(requestQueryStr);
-
-            // set the required parameters into request
-                if (null != ocResource.getEventDefinitionCrfId()) {
-                    request.setAttribute("eventDefinitionCRFId", ocResource.getEventDefinitionCrfId().toString());
-                }
-                if (null != ocResource.getEventCrfId()) {
-                    request.setAttribute("ecId", ocResource.getEventCrfId().toString());
-                }
-                if (null != ocResource.getStudyEventId()) {
-                    request.setAttribute("eventId", ocResource.getStudyEventId().toString());
-                }
-                if (null != ocResource.getStudySubjectID()) {
-                    request.setAttribute("studySubjectId", ocResource.getStudySubjectID().toString());
-                    // request.setAttribute("exitTo", "ViewStudySubject?id=" +
-                    // ocResource.getStudySubjectID());
-                }
-                // request.setAttribute("crfVersionId","");
-                if ((null != mapQueryParams) && (mapQueryParams.size() != 0)) {
-                    if (mapQueryParams.containsKey("tabId")) {
-                        request.setAttribute("tabId", mapQueryParams.get("tabId"));
-                    }
-                    if ((null != ocResource.getStudySubjectID()) && (mapQueryParams.containsKey("exitTo"))) {
-                        request.setAttribute("exitTo", "ViewStudySubject?id=" + ocResource.getStudySubjectID());
-                    }
-                }
-
-                forwardPage(Page.VIEW_SECTION_DATA_ENTRY_SERVLET, request, response);
-                // response.sendRedirect(Page.VIEW_SECTION_DATA_ENTRY_SERVLET.getFileName());
+            if(null != ocResource){            	
+            	if(ocResource.isInValid()){
+            		response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            		//request.setAttribute("errorMsg", ocResource.getMessages().get(0));
+            		errors = new HashMap();
+            		Validator.addError(errors, "error:", ocResource.getMessages().get(0));
+            		request.setAttribute("formMessages", errors);
+            	}
+	            
+		            // If the form OID in the request uri is not null, it will be
+		            // interpretted as a request to
+		            // view form data and hence will be forwarded to servlet path
+		            // "/ViewSectionDataEntry"
+		            if ((null != ocResource) && (ocResource.getFormVersionOID() != null)) {
+		                HashMap<String, String> mapQueryParams = getQueryStringParameters(requestQueryStr);
+		
+		            // set the required parameters into request
+		                if (null != ocResource.getEventDefinitionCrfId()) {
+		                    request.setAttribute("eventDefinitionCRFId", ocResource.getEventDefinitionCrfId().toString());
+		                }
+		                if (null != ocResource.getEventCrfId()) {
+		                    request.setAttribute("ecId", ocResource.getEventCrfId().toString());
+		                }
+		                if (null != ocResource.getStudyEventId()) {
+		                    request.setAttribute("eventId", ocResource.getStudyEventId().toString());
+		                }
+		                if (null != ocResource.getStudySubjectID()) {
+		                    request.setAttribute("studySubjectId", ocResource.getStudySubjectID().toString());
+		                    // request.setAttribute("exitTo", "ViewStudySubject?id=" +
+		                    // ocResource.getStudySubjectID());
+		                }
+		                // request.setAttribute("crfVersionId","");
+		                if ((null != mapQueryParams) && (mapQueryParams.size() != 0)) {
+		                    if (mapQueryParams.containsKey("tabId")) {
+		                        request.setAttribute("tabId", mapQueryParams.get("tabId"));
+		                    }
+		                    if ((null != ocResource.getStudySubjectID()) && (mapQueryParams.containsKey("exitTo"))) {
+		                        request.setAttribute("exitTo", "ViewStudySubject?id=" + ocResource.getStudySubjectID());
+		                    }
+		                }
+		                //ToDo: Changes to work on to fix #0012507	
+//		                else{
+//		                	request.setAttribute("crfId", ocResource.getFormID());
+//		                	request.setAttribute("crfVersionId", ocResource.getFormVersionID());
+//		                	request.setAttribute("module", "?");
+//		                }
+		
+		                forwardPage(Page.VIEW_SECTION_DATA_ENTRY_SERVLET, request, response);
+		                // response.sendRedirect(Page.VIEW_SECTION_DATA_ENTRY_SERVLET.getFileName());
+		            }
             }
-
-            // implement other RESTful URLs here forwarding to corresponding
-            // pages of application
-            // (and associated combinations of mode and format)
+	            // implement other RESTful URLs here forwarding to corresponding
+	            // pages of application
+	            // (and associated combinations of mode and format)
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -173,7 +201,7 @@ public class UrlRewriteServlet extends CoreSecureController {
                     ItemDAO idao = new ItemDAO(getDataSource());
                     ItemGroupDAO igdao = new ItemGroupDAO(getDataSource());
                     StudyEventDAO sedao = new StudyEventDAO(getDataSource());
-
+                     
                     StudyBean study = null;
                     StudySubjectBean subject = null;
                     StudyEventDefinitionBean sed = null;
@@ -181,7 +209,8 @@ public class UrlRewriteServlet extends CoreSecureController {
                     CRFVersionBean cv = null;
                     ItemBean item = null;
                     ItemGroupBean ig = null;
-
+                    StudyEventBean studyEvent = null;
+                    
                     Integer studySubjectId = 0;
                     Integer eventDefId = 0;
                     Integer eventRepeatKey = 0;
@@ -207,19 +236,35 @@ public class UrlRewriteServlet extends CoreSecureController {
                             switch (i) {
                             case 0: {// study OID
                                 study = stdao.findByOid(URLParamValue);
-                                openClinicaResource.setStudyOID(URLParamValue);
-                                if (null != study) {
-                                    openClinicaResource.setStudyID(study.getId());
+                                //validate study OID
+                                if(study == null){
+                                	openClinicaResource.setInValid(true);
+                                	openClinicaResource.getMessages().add(resexception.getString("invalid_study_oid"));
+                                	return openClinicaResource;
+                                }
+                                else{
+	                                openClinicaResource.setStudyOID(URLParamValue);
+	                                if (null != study) {
+	                                    openClinicaResource.setStudyID(study.getId());
+	                                }	                                
                                 }
                                 break;
                             }
 
                             case 1: {// StudySubjectKey
                                 subject = ssubdao.findByOidAndStudy(URLParamValue, study.getId());
-                                openClinicaResource.setStudySubjectOID(URLParamValue);
-                                if (null != subject) {
-                                    studySubjectId = subject.getId();
-                                    openClinicaResource.setStudySubjectID(studySubjectId);
+                              //validate subject OID
+                                if(subject == null){
+                                	openClinicaResource.setInValid(true);
+                                	openClinicaResource.getMessages().add(resexception.getString("invalid_subject_oid"));
+                                	return openClinicaResource;
+                                }
+                                else{
+	                                openClinicaResource.setStudySubjectOID(URLParamValue);
+	                                if (null != subject) {
+	                                    studySubjectId = subject.getId();
+	                                    openClinicaResource.setStudySubjectID(studySubjectId);
+	                                }
                                 }
                                 break;
                             }
@@ -229,52 +274,88 @@ public class UrlRewriteServlet extends CoreSecureController {
                                 // repeat key
                                 String seoid = "";
                                 String eventOrdinal = "";
-                                if (URLParamValue.contains("%5B")) {
+                                if (URLParamValue.contains("%5B") && URLParamValue.contains("%5D")) {
                                     seoid = URLParamValue.substring(0, URLParamValue.indexOf("%5B"));
                                     openClinicaResource.setStudyEventDefOID(seoid);
                                     eventOrdinal = URLParamValue.substring(URLParamValue.indexOf("%5B") + 3, URLParamValue.indexOf("%5D"));
                                 }
+                                else{//event ordinal not specified
+                                	openClinicaResource.setInValid(true);
+                                	openClinicaResource.getMessages().add(resexception.getString("event_ordinal_not_specified"));
+                                	return openClinicaResource;
+                                }
                                 if ((null != seoid) && (null != study)) {
                                     sed = sedefdao.findByOidAndStudy(seoid, study.getId(), study.getParentStudyId());
-
-                                    if (null != sed) {
+                                    //validate study event oid
+                                    if(null == sed){
+                                    	openClinicaResource.setInValid(true);
+                                    	openClinicaResource.getMessages().add(resexception.getString("invalid_event_oid"));
+                                    	return openClinicaResource;
+                                    }
+                                    else{
                                         eventDefId = sed.getId();
                                         openClinicaResource.setStudyEventDefID(eventDefId);
                                     }
                                 }
                                 if (null != eventRepeatKey) {
                                     eventRepeatKey = Integer.parseInt(eventOrdinal.trim());
-                                    openClinicaResource.setStudyEventRepeatKey(eventRepeatKey);
+                                    //validate the event ordinal specified exists in database
+                                    studyEvent = (StudyEventBean)sedao.findByStudySubjectIdAndDefinitionIdAndOrdinal(subject.getId(), sed.getId(), eventRepeatKey);
+                                    if(null == studyEvent){
+                                    	openClinicaResource.setInValid(true);
+                                    	openClinicaResource.getMessages().add(resexception.getString("invalid_event_ordinal"));
+                                    	return openClinicaResource;
+                                    }
+                                    else{
+                                    	openClinicaResource.setStudyEventRepeatKey(eventRepeatKey);
+                                    }
                                 }
                                 break;
                             }
 
                             case 3: {// form OID
                                 openClinicaResource.setFormVersionOID(URLParamValue);
-                                if (null != study) {
-                                    // cv =
-                                    // crfvdao.findByCrfVersionOidAndStudy(URLParamValue,
-                                    // study.getId());
-                                    // if (null != cv) {
-                                    // openClinicaResource.setFormVersionID(cv.getId());
-                                    // openClinicaResource.setFormID(cv.getCrfId());
-                                    // }
-
-                                    HashMap studySubjectCRFDataDetails =
-                                        sedao.getStudySubjectCRFData(study, studySubjectId, eventDefId, URLParamValue, eventRepeatKey);
-                                    if ((null != studySubjectCRFDataDetails) && (studySubjectCRFDataDetails.size() != 0)) {
-                                        if (studySubjectCRFDataDetails.containsKey("event_crf_id")) {
-                                            openClinicaResource.setEventCrfId((Integer) studySubjectCRFDataDetails.get("event_crf_id"));
-                                        }
-
-                                        if (studySubjectCRFDataDetails.containsKey("event_definition_crf_id")) {
-                                            openClinicaResource.setEventDefinitionCrfId((Integer) studySubjectCRFDataDetails.get("event_crf_id"));
-                                        }
-
-                                        if (studySubjectCRFDataDetails.containsKey("study_event_id")) {
-                                            openClinicaResource.setStudyEventId((Integer) studySubjectCRFDataDetails.get("event_crf_id"));
-                                        }
-                                    }
+                                //validate the crf version oid
+                                cv = crfvdao.findByOid(URLParamValue);
+                                if(cv == null){
+                                	openClinicaResource.setInValid(true);
+                                	openClinicaResource.getMessages().add(resexception.getString("invalid_crf_oid"));
+                                	return openClinicaResource;
+                                }
+                                else{
+                                	//validate if crf is removed
+                                	if(cv.getStatus().equals(Status.DELETED)){
+                                		openClinicaResource.setInValid(true);
+                                    	openClinicaResource.getMessages().add(resexception.getString("removed_crf"));
+                                    	return openClinicaResource;
+                                	}
+                                	else{
+		                                if (null != study) {
+		                                    // cv =
+		                                    // crfvdao.findByCrfVersionOidAndStudy(URLParamValue,
+		                                    // study.getId());
+		                                    // if (null != cv) {
+		                                    // openClinicaResource.setFormVersionID(cv.getId());
+		                                    // openClinicaResource.setFormID(cv.getCrfId());
+		                                    // }
+		
+		                                    HashMap studySubjectCRFDataDetails =
+		                                        sedao.getStudySubjectCRFData(study, studySubjectId, eventDefId, URLParamValue, eventRepeatKey);
+		                                    if ((null != studySubjectCRFDataDetails) && (studySubjectCRFDataDetails.size() != 0)) {
+		                                        if (studySubjectCRFDataDetails.containsKey("event_crf_id")) {
+		                                            openClinicaResource.setEventCrfId((Integer) studySubjectCRFDataDetails.get("event_crf_id"));
+		                                        }
+		
+		                                        if (studySubjectCRFDataDetails.containsKey("event_definition_crf_id")) {
+		                                            openClinicaResource.setEventDefinitionCrfId((Integer) studySubjectCRFDataDetails.get("event_crf_id"));
+		                                        }
+		
+		                                        if (studySubjectCRFDataDetails.containsKey("study_event_id")) {
+		                                            openClinicaResource.setStudyEventId((Integer) studySubjectCRFDataDetails.get("event_crf_id"));
+		                                        }
+		                                    }
+		                                }
+                                	}
                                 }
                                 break;
                             }
@@ -318,4 +399,18 @@ public class UrlRewriteServlet extends CoreSecureController {
         return openClinicaResource;
     }
 
+//    /**
+//     * Method to validate the details specified on RESTful URL
+//     * @param res
+//     * @return boolean
+//     */
+//    public boolean validateOpenClinicaResource (OpenClinicaResource res){
+//    	boolean isValid = false;
+//    	
+//    	if(null != res){
+//    		
+//    	}
+//    	
+//    	return isValid;
+//    }
 }

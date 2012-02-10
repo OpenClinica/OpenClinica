@@ -9,6 +9,8 @@
 <jsp:useBean scope='session' id='userRole' class='org.akaza.openclinica.bean.login.StudyUserRoleBean' />
 <jsp:useBean scope="session" id="passwordExpired" class="java.lang.String"/>
 
+<jsp:useBean scope='request' id='formMessages' class='java.util.HashMap'/>
+
     <!-- 
     
     userRole: <c:out value="${userRole.role.name}"/>
@@ -35,7 +37,24 @@
 	</c:otherwise>
 </c:choose>
 
-<h1><span class="title_manage"><fmt:message key="404_error_msg_header" bundle="${resword}"/></span></h1>
+<h1><span class="title_manage"><fmt:message key="404_error_msg_header" bundle="${resword}"/></span></h1> 
+<c:if test="${! empty formMessages}">
+    <!-- initial position for data entry error messages; we'll
+    improve the style as well -->
+    <div id="errorMessagesContainer" class="aka_err_message">
+        <ul>
+            <c:forEach var="formMsg" items="${formMessages}">
+                <li style="color:  #ff0000"><span style="text-decoration: underline"><strong><label for="<c:out value="${formMsg.key}" />"><c:out value="${formMsg.value}" /></label></strong></span></li>
+            </c:forEach>
+        </ul>
+        <!--  Use the formMessages request attribute to grab each validation
+      error message?
+      error messages look like:
+
+       Woops, you forgot to provide a value for
+       <strong><label for="formElementName">formElementName</label></strong>.<br/>-->
+    </div>
+</c:if>
 
 <font class="bodytext">
 
