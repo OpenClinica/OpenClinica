@@ -270,7 +270,7 @@
             select * from event_definition_crf where study_event_definition_id in (
             select study_event_definition_id from study_event_definition where study_event_definition_id in (
             select distinct study_event_definition_id from study_event where study_subject_id = ?)) 
-            and parent_id is null and status_id=1
+            and parent_id is null
         </sql>
     </query>
 </queries>
