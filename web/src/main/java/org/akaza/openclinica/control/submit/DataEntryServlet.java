@@ -54,7 +54,6 @@ import org.akaza.openclinica.control.form.ScoreItemValidator;
 import org.akaza.openclinica.control.form.Validation;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.managestudy.ViewNotesServlet;
-import org.akaza.openclinica.control.managestudy.ViewStudySubjectServlet;
 import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -80,6 +79,7 @@ import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.log.Stopwatch;
 import org.akaza.openclinica.logic.expressionTree.ExpressionTreeHelper;
 import org.akaza.openclinica.logic.rulerunner.MessageContainer.MessageType;
 import org.akaza.openclinica.logic.score.ScoreCalculator;
@@ -279,6 +279,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
     @Override
     protected  void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        Stopwatch sw = Stopwatch.createAndStart("DataEntryServlet#processRequest");
+        try {
 
         //JN:The following were the the global variables, moved as local.
         locale = LocaleResolver.getLocale(request);
@@ -594,10 +596,10 @@ public abstract class DataEntryServlet extends CoreSecureController {
             Date enrollmentDate = ssb.getEnrollmentDate();
             age = Utils.getInstacne().processAge(enrollmentDate, subject.getDateOfBirth());
         }
-        ArrayList beans = ViewStudySubjectServlet.getDisplayStudyEventsForStudySubject(ssb, getDataSource(), ub, currentRole);
+        //ArrayList beans = ViewStudySubjectServlet.getDisplayStudyEventsForStudySubject(ssb, getDataSource(), ub, currentRole);
         request.setAttribute("studySubject", ssb);
         request.setAttribute("subject", subject);
-        request.setAttribute("beans", beans);
+        //request.setAttribute("beans", beans);
         request.setAttribute("eventCRF", ecb);
         request.setAttribute("age", age);
         request.setAttribute("decryptedPassword", ((SecurityManager) SpringServletAccess.getApplicationContext(getServletContext()).getBean("securityManager"))
@@ -2017,6 +2019,10 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 }// end of if-block for dynamic rules not in same section, tbh 05/2010
             }// end of save
         }
+        } finally {
+            sw.stop();
+        }
+
     }
 
     /**
@@ -3708,6 +3714,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
      */
 
     protected DisplaySectionBean populateNotesWithDBNoteCounts(FormDiscrepancyNotes discNotes, DisplaySectionBean section, HttpServletRequest request) {
+        Stopwatch sw = Stopwatch.createAndStart("populateNotesWithDBNoteCounts");
         DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
        // ArrayList items = section.getItems();
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
@@ -3852,6 +3859,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         }
 
         section.setDisplayItemGroups(allItems);
+        sw.stop();
         return section;
     }
 

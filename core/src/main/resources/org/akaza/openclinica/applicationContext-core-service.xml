@@ -38,6 +38,44 @@
     
     <bean id="simpleConditionalDisplayService" class="org.akaza.openclinica.service.crfdata.SimpleConditionalDisplayService" autowire="byName">
         <constructor-arg ref="dataSource"/>
+    </bean>
+    
+    <bean id="studyEventDao" class="org.akaza.openclinica.dao.managestudy.StudyEventDAO">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+    
+    <bean id="studyDao" class="org.akaza.openclinica.dao.managestudy.StudyDAO">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+    
+    <bean id="studyEventDefinitionDao" class="org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+    
+    <bean id="eventDefinitionCrfDao" class="org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+    
+    <bean id="eventCrfDao" class="org.akaza.openclinica.dao.submit.EventCRFDAO">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+    
+    <bean id="crfDao" class="org.akaza.openclinica.dao.admin.CRFDAO">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+    
+    <bean id="crfVersionDao" class="org.akaza.openclinica.dao.submit.CRFVersionDAO">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+
+    <bean id="studySubjectService" class="org.akaza.openclinica.service.managestudy.StudySubjectServiceImpl">
+        <property name="studyDao" ref="studyDao"/>
+        <property name="studyEventDao" ref="studyEventDao"/>
+        <property name="studyEventDefinitionDao" ref="studyEventDefinitionDao"/>
+        <property name="eventDefinitionCrfDao" ref="eventDefinitionCrfDao"/>
+        <property name="eventCrfDao" ref="eventCrfDao"/>
+        <property name="crfDao" ref="crfDao"/>
+        <property name="crfVersionDao" ref="crfVersionDao"/>
     </bean> 
    <!-- 
     <bean id="sdvUtil" class="org.akaza.openclinica.web.table.sdv.SDVUtil"  name="sdvUtil">

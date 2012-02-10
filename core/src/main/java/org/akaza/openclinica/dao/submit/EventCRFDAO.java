@@ -8,6 +8,24 @@
 
 package org.akaza.openclinica.dao.submit;
 
+import java.sql.Timestamp;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -19,24 +37,8 @@ import org.akaza.openclinica.dao.EventCRFSDVSort;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.core.DAODigester;
-import org.akaza.openclinica.dao.core.PreparedStatementFactory;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-
-import javax.sql.DataSource;
 
 /**
  * <P>
@@ -307,14 +309,14 @@ public class EventCRFDAO  <K extends String,V extends ArrayList> extends Auditab
         return executeFindAllQuery("findAllByStudyEvent", variables);
     }
 
-    
+
     public ArrayList findAllByStudyEventAndStatus(StudyEventBean studyEvent,Status status) {
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(studyEvent.getId()));
         variables.put(new Integer(2),new Integer(status.getId()));
         return executeFindAllQuery("findAllByStudyEventAndStatus", variables);
     }
-    
+
     public ArrayList<EventCRFBean> findAllByStudySubject(int studySubjectId) {
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(studySubjectId));
@@ -884,7 +886,7 @@ public class EventCRFDAO  <K extends String,V extends ArrayList> extends Auditab
             return 0;
         }
     }
-    
+
     public void updateCRFVersionID(int event_crf_id, int crf_version_id){
     	 this.unsetTypeExpected();
          this.setTypeExpected(1, TypeNames.INT);
@@ -897,6 +899,57 @@ public class EventCRFDAO  <K extends String,V extends ArrayList> extends Auditab
          this.execute(sql, variables);
     }
 
+    public Map<Integer, SortedSet<EventCRFBean>> buildEventCrfListByStudyEvent(Integer studySubjectId) {
+        this.setTypesExpected(); // <== Must be called first
+
+        Map<Integer, SortedSet<EventCRFBean>> result = new HashMap<Integer, SortedSet<EventCRFBean>>();
+
+        HashMap<Integer, Object> param = new HashMap<Integer, Object>();
+        int i = 1;
+        param.put(i++, studySubjectId);
+
+        List selectResult = select(digester.getQuery("buildEventCrfListByStudyEvent"), param);
+
+        Iterator it = selectResult.iterator();
+
+        while (it.hasNext()) {
+            EventCRFBean bean = (EventCRFBean) this.getEntityFromHashMap((HashMap) it.next());
+
+            Integer studyEventId = bean.getStudyEventId();
+            if (!result.containsKey(studyEventId)) {
+                result.put(studyEventId, new TreeSet<EventCRFBean>(new Comparator<EventCRFBean>(
+                        ) {
+                            public int compare(EventCRFBean o1, EventCRFBean o2) {
+                                Integer id1 = o1.getId();
+                                Integer id2 = o2.getId();
+                                return id1.compareTo(id2);
+                            }
+                        }));
+            }
+            result.get(studyEventId).add(bean);
+        }
+
+        return result;
+    }
+
+    public Set<Integer> buildNonEmptyEventCrfIds(Integer studySubjectId) {
+        Set<Integer> result = new HashSet<Integer>();
+
+        HashMap<Integer, Object> param = new HashMap<Integer, Object>();
+        int i = 1;
+        param.put(i++, studySubjectId);
+
+        List selectResult = select(digester.getQuery("buildNonEmptyEventCrfIds"), param);
+
+        Iterator it = selectResult.iterator();
+
+        while (it.hasNext()) {
+            HashMap hm = (HashMap) it.next();
+            result.add((Integer) hm.get("event_crf_id"));
+        }
+
+        return result;
+    }
 
 
 }

@@ -239,4 +239,27 @@
          order by ordinal asc
         </sql>
     </query>
+    <query>
+        <name>buildEventDefinitionCRFListByStudyEventDefinition</name>
+        <sql>
+            select * from event_definition_crf where status_id = 1 and study_event_definition_id in (
+                select study_event_definition_id from study_event_definition where study_event_definition_id in (
+                    select distinct study_event_definition_id from study_event where study_subject_id = ?)) 
+            and (study_id=? or study_id=?) 
+            and event_definition_crf_id not in (
+                select parent_id from event_definition_crf where study_event_definition_id in (
+                    select study_event_definition_id from study_event_definition where study_event_definition_id in (
+                    select distinct study_event_definition_id from study_event where study_subject_id = ?))
+            and study_id=?)
+        </sql>
+    </query>
+    <query>
+        <name>buildEventDefinitionCRFListByStudyEventDefinitionForStudy</name>
+        <sql>
+	        select * from event_definition_crf where study_event_definition_id in (
+	        select study_event_definition_id from study_event_definition where study_event_definition_id in (
+	        select distinct study_event_definition_id from study_event where study_subject_id = ?)) 
+	        and parent_id is null and status_id=1
+        </sql>
+    </query>
 </queries>

@@ -7,29 +7,34 @@
  */
 package org.akaza.openclinica.dao.managestudy;
 
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.domain.SourceDataVerification;
 
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.sql.DataSource;
-
 /**
  * @author jxu
- * 
+ *
  */
 public class EventDefinitionCRFDAO extends AuditableEntityDAO {
     // private DAODigester digester;
@@ -150,7 +155,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 
     /**
      * Find all EventDefinitionCRFBean for the StudyBean.
-     * 
+     *
      * @param study
      * @param definitionId
      * @return
@@ -163,7 +168,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
     /**
      * Find all EventDefinitionCRFBean which have no parent
      * EventDefinitionCRFBean.
-     * 
+     *
      * @param definitionId
      * @return
      */
@@ -185,7 +190,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 
     /**
      * Find all EventDefinitionCRFBean for the site
-     * 
+     *
      * @param definitionId
      * @param siteId
      * @param parentStudyId
@@ -389,7 +394,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 
     /**
      * Find all EventDefinitionCRFBean for the StudyBean.
-     * 
+     *
      * @param study
      * @param eventDefinitionId
      * @return
@@ -445,7 +450,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
     /**
      * Find all active EventDefinitionCRFBean for the StudyBean and the
      * study_event_definition_id
-     * 
+     *
      * @param study
      * @param eventDefinitionId
      * @return
@@ -517,7 +522,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
     /**
      * isRequiredInDefinition, looks at a specific EventCRF and determines if
      * it's required or not
-     * 
+     *
      * @return boolean to tell us if it's required or not.
      */
     public boolean isRequiredInDefinition(int crfVersionId, StudyEventBean studyEvent) {
@@ -597,7 +602,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
     /**
      * Find the EventDefinitionCRFBean of a study. So this
      * EventDefinitionCRFBean has no parent.
-     * 
+     *
      * @param studyEventId
      *            The requested study event id.
      * @param crfVersionId
@@ -700,7 +705,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 
     /**
      * Find EventDefinitionCRFBean for the StudyBean.
-     * 
+     *
      * @param study
      * @param studyEventDefinitionId
      * @param crfId
@@ -714,7 +719,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
     /**
      * Find EventDefinitionCRFBean for a study. So this EventDefinitionCRFBean
      * has no parent.
-     * 
+     *
      * @param studyEventDefinitionId
      * @param crfId
      * @return
@@ -799,4 +804,83 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 
         return names;
     }
+
+    /**
+     * Loads all {@link EventDefinitionCRFBean} associated to the list of {@link StudyEventDefinitionBean}
+     *
+     * @return
+     */
+    public Map<Integer, SortedSet<EventDefinitionCRFBean>> buildEventDefinitionCRFListByStudyEventDefinition(
+            Integer studySubjectId, Integer siteId, Integer parentStudyId) {
+        this.setTypesExpected(); // <== Must be called first
+
+        HashMap<Integer, Object> param = new HashMap<Integer, Object>();
+        int i = 1;
+        param.put(i++, studySubjectId);
+        param.put(i++, siteId);
+        param.put(i++, parentStudyId);
+        param.put(i++, studySubjectId);
+        param.put(i++, siteId);
+
+        List selectResult = select(digester.getQuery("buildEventDefinitionCRFListByStudyEventDefinition"), param);
+
+        Map<Integer, SortedSet<EventDefinitionCRFBean>> result =
+                new HashMap<Integer, SortedSet<EventDefinitionCRFBean>>();
+        Iterator it = selectResult.iterator();
+        while (it.hasNext()) {
+            EventDefinitionCRFBean bean = (EventDefinitionCRFBean) this.getEntityFromHashMap((HashMap) it.next());
+            Integer studyEventDefinitionId = bean.getStudyEventDefinitionId();
+
+            if (!result.containsKey(studyEventDefinitionId)) {
+                result.put(studyEventDefinitionId, new TreeSet<EventDefinitionCRFBean>(
+                        new Comparator<EventDefinitionCRFBean>() {
+                            public int compare(EventDefinitionCRFBean o1, EventDefinitionCRFBean o2) {
+                                Integer ord1 = o1.getOrdinal();
+                                Integer ord2 = o2.getOrdinal();
+                                return ord1.compareTo(ord2);
+                            }
+                        }));
+            }
+            result.get(studyEventDefinitionId).add(bean);
+
+        }
+
+        return result;
+    }
+
+    public Map<Integer, SortedSet<EventDefinitionCRFBean>> buildEventDefinitionCRFListByStudyEventDefinitionForStudy(
+            Integer studySubjectId) {
+        this.setTypesExpected(); // <== Must be called first
+
+        HashMap<Integer, Object> param = new HashMap<Integer, Object>();
+        int i = 1;
+        param.put(i++, studySubjectId);
+
+        List selectResult = select(digester.getQuery("buildEventDefinitionCRFListByStudyEventDefinitionForStudy"),
+                param);
+
+        Map<Integer, SortedSet<EventDefinitionCRFBean>> result =
+                new HashMap<Integer, SortedSet<EventDefinitionCRFBean>>();
+        Iterator it = selectResult.iterator();
+        while (it.hasNext()) {
+            EventDefinitionCRFBean bean = (EventDefinitionCRFBean) this.getEntityFromHashMap((HashMap) it.next());
+            Integer studyEventDefinitionId = bean.getStudyEventDefinitionId();
+
+            if (!result.containsKey(studyEventDefinitionId)) {
+                result.put(studyEventDefinitionId, new TreeSet<EventDefinitionCRFBean>(
+                        new Comparator<EventDefinitionCRFBean>() {
+                            public int compare(EventDefinitionCRFBean o1, EventDefinitionCRFBean o2) {
+                                Integer ord1 = o1.getOrdinal();
+                                Integer ord2 = o2.getOrdinal();
+                                return ord1.compareTo(ord2);
+                            }
+                        }));
+            }
+            result.get(studyEventDefinitionId).add(bean);
+
+        }
+
+        return result;
+    }
+
 }
