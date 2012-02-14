@@ -3,6 +3,9 @@
  */
 package org.akaza.openclinica.control.urlRewrite;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author pgawade This represents a resource which could be any OpenClinica
  *         object say study or study subject, study event definition etc. The
@@ -56,8 +59,14 @@ public class OpenClinicaResource {
                                 * CRF with data for a given subject for a given
                                 * event
                                 */
-
-
+    private boolean isInValid; /* this is to validate the OID parameters specified to identify the resource are correct */
+    
+    private List<String> messages; /* this is to store the validation error messages */ 
+    
+    public OpenClinicaResource() {
+    	messages = new ArrayList<String>();
+    }
+    
     /**
      * @return the studyOID
      */
@@ -371,5 +380,21 @@ public class OpenClinicaResource {
 
         return sb.toString();
     }
+
+	public boolean isInValid() {
+		return isInValid;
+	}
+
+	public void setInValid(boolean isInValid) {
+		this.isInValid = isInValid;
+	}
+
+	public List<String> getMessages() {
+		return messages;
+	}
+
+	public void setMessages(List<String> messages) {
+		this.messages = messages;
+	}	
 
 }

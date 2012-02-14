@@ -7,27 +7,24 @@
  */
 package org.akaza.openclinica.dao.managestudy;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.DAODigester;
-import org.akaza.openclinica.dao.core.PreparedStatementFactory;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-
-import javax.sql.DataSource;
 
 /**
  * @author thickerson
@@ -88,7 +85,7 @@ public class StudyEventDefinitionDAO<K extends String,V extends ArrayList> exten
     /**
      * <P>
      * findNextKey, a method to return a simple int from the database.
-     * 
+     *
      * @return int, which is the next primary key for creating a study event
      *         definition.
      */
@@ -193,7 +190,7 @@ public class StudyEventDefinitionDAO<K extends String,V extends ArrayList> exten
          * (Integer)hm.get("update_id"); eb.setUpdaterId(updaterId.intValue());
          * Integer statusId = (Integer)hm.get("status_id");
          * eb.setStatus(Status.get(statusId.intValue()));
-         * 
+         *
          * Date dateCreated = (Date)hm.get("date_created"); Date dateUpdated =
          * (Date)hm.get("date_updated"); eb.setCreatedDate(dateCreated);
          * eb.setUpdatedDate(dateUpdated);
@@ -355,7 +352,7 @@ public class StudyEventDefinitionDAO<K extends String,V extends ArrayList> exten
 
     /*
      * added tbh, 02/2008 (non-Javadoc)
-     * 
+     *
      * @see org.akaza.openclinica.dao.core.DAOInterface#findByPK(int)
      */
     public EntityBean findByName(String name) {
@@ -442,5 +439,48 @@ public class StudyEventDefinitionDAO<K extends String,V extends ArrayList> exten
         }
         return al;
     }
- 
+
+    /**
+     *
+     * @param studySubjectId
+     * @return
+     */
+    public Map<Integer, StudyEventDefinitionBean> findByStudySubject(int studySubjectId) {
+        this.setTypesExpected(); // <== Must be called first
+        HashMap<Integer, Object> param = new HashMap<Integer, Object>();
+        param.put(1, studySubjectId);
+
+        List selectResult = select(digester.getQuery("findByStudySubject"), param);
+
+        Map<Integer,StudyEventDefinitionBean> result = new HashMap<Integer, StudyEventDefinitionBean>();
+
+        Iterator it = selectResult.iterator();
+        while (it.hasNext()) {
+            StudyEventDefinitionBean bean = (StudyEventDefinitionBean) this.getEntityFromHashMap((HashMap) it.next());
+            result.put(bean.getId(), bean);
+        }
+        return result;
+    }
+
+    /**
+     *
+     * @param studySubjectId
+     * @return
+     */
+    public Map<Integer, Integer> buildMaxOrdinalByStudyEvent(int studySubjectId) {
+        HashMap<Integer, Object> param = new HashMap<Integer, Object>();
+        param.put(1, studySubjectId);
+
+        List selectResult = select(digester.getQuery("buildMaxOrdinalByStudyEvent"), param);
+
+        Map<Integer,Integer> result = new HashMap<Integer, Integer>();
+
+        Iterator it = selectResult.iterator();
+        while (it.hasNext()) {
+            HashMap hm = (HashMap) it.next();
+            result.put((Integer) hm.get("study_event_definition_id"), (Integer) hm.get("max_ord"));
+        }
+        return result;
+    }
+
 }

@@ -142,4 +142,9 @@
         <name>findCRFVersionId</name>
         <sql>SELECT CRF_VERSION_ID FROM CRF_VERSION WHERE CRF_ID=? AND NAME =? </sql>
     </query>
+    <query>
+        <name>buildCrfVersionById</name>
+        <sql>select * from crf_version where crf_version_id in (
+        select distinct crf_version_id from event_crf where study_subject_id = ?)</sql>
+    </query>
 </queries>

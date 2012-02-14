@@ -8,36 +8,33 @@
  */
 package org.akaza.openclinica.dao.submit;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.DAODigester;
-import org.akaza.openclinica.dao.core.PreparedStatementFactory;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-
-import javax.sql.DataSource;
 
 /**
  * <p>
  * CRFVersionDAO.java, the data access object for versions of instruments in the
  * database. Each of these are related to Sections, a versioning map that links
  * them with Items, and an Event, which then links to a Study.
- * 
+ *
  * @author thickerson
- * 
- * 
+ *
+ *
  */
 public class CRFVersionDAO<K extends String,V extends ArrayList> extends AuditableEntityDAO {
 
@@ -322,7 +319,7 @@ public class CRFVersionDAO<K extends String,V extends ArrayList> extends Auditab
 
     /**
      * Generates all the delete queries for deleting a version
-     * 
+     *
      * @param versionId
      * @param items
      */
@@ -457,6 +454,31 @@ public class CRFVersionDAO<K extends String,V extends ArrayList> extends Auditab
         } else {
             return null;
         }
+    }
+
+    /**
+     *
+     * @param studySubjectId
+     * @return
+     */
+    public Map<Integer, CRFVersionBean> buildCrfVersionById(Integer studySubjectId) {
+        this.setTypesExpected(); // <== Must be called first
+        Map<Integer, CRFVersionBean> result = new HashMap<Integer, CRFVersionBean>();
+
+        HashMap<Integer, Object> param = new HashMap<Integer, Object>();
+        int i = 1;
+        param.put(i++, studySubjectId);
+
+        List selectResult = select(digester.getQuery("buildCrfVersionById"), param);
+
+        Iterator it = selectResult.iterator();
+
+        while (it.hasNext()) {
+            CRFVersionBean bean = (CRFVersionBean) this.getEntityFromHashMap((HashMap) it.next());
+            result.put(bean.getId(), bean);
+        }
+
+        return result;
     }
 
 }

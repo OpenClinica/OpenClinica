@@ -7,6 +7,11 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
@@ -44,11 +49,6 @@ import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.service.crfdata.HideCRFManager;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * @author ssachs
@@ -232,8 +232,8 @@ public class EnterDataForStudyEventServlet extends SecureController {
         request.setAttribute(BEAN_DISPLAY_EVENT_CRFS, displayEventCRFs);
 
         // this is for generating side info panel
-        ArrayList beans = ViewStudySubjectServlet.getDisplayStudyEventsForStudySubject(studySubjectBean, sm.getDataSource(), ub, currentRole);
-        request.setAttribute("beans", beans);
+        //ArrayList beans = ViewStudySubjectServlet.getDisplayStudyEventsForStudySubject(studySubjectBean, sm.getDataSource(), ub, currentRole);
+        //request.setAttribute("beans", beans);
         EventCRFBean ecb = new EventCRFBean();
         ecb.setStudyEventId(eventId);
         request.setAttribute("eventCRF", ecb);
