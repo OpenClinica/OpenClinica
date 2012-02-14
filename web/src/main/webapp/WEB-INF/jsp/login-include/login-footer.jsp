@@ -2,7 +2,7 @@
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 
-<script type="text/javascript" src="<c:url value='/includes/wz_tooltip/wz_tooltip.js'/>"></script>
+<script type="text/javascript" src="<c:url value='${pageContext.request.contextPath}/includes/wz_tooltip/wz_tooltip.js'/>"></script>
 </td>
 			</tr>
 		</table>
