@@ -1,5 +1,8 @@
 package org.akaza.openclinica.domain.rule.action;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -8,6 +11,7 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
@@ -47,7 +51,8 @@ public class HideActionBean extends RuleActionBean {
         return p;
     }
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @Fetch(value = FetchMode.SUBSELECT)
     @JoinColumn(name = "rule_action_id", nullable = true)
     public List<PropertyBean> getProperties() {
         return properties;
@@ -74,8 +79,8 @@ public class HideActionBean extends RuleActionBean {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((message == null) ? 0 : message.hashCode());
-        result = prime * result + ((properties == null) ? 0 : properties.hashCode());
+        result = prime * result + (message == null ? 0 : message.hashCode());
+        result = prime * result + (properties == null ? 0 : properties.hashCode());
         return result;
     }
 

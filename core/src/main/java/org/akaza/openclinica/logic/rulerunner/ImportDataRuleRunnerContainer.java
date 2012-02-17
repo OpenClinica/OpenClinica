@@ -25,6 +25,7 @@ import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,7 +52,15 @@ public class ImportDataRuleRunnerContainer {
     private String studySubjectOid;
     private Boolean shouldRunRules;
 
-    public void init(DataSource ds, StudyBean studyBean, SubjectDataBean subjectDataBean, RuleSetServiceInterface ruleSetService) {
+    /**
+     * Populate importDataTrueRuleSets and variableAndValue
+     * @param ds
+     * @param studyBean
+     * @param subjectDataBean
+     * @param ruleSetService
+     */
+    @Transactional
+    public void initRuleSetsAndTargets(DataSource ds, StudyBean studyBean, SubjectDataBean subjectDataBean, RuleSetServiceInterface ruleSetService) {
         this.shouldRunRules = this.shouldRunRules == null ? Boolean.FALSE : this.shouldRunRules;
         this.importDataTrueRuleSets = this.importDataTrueRuleSets == null ? new ArrayList<RuleSetBean>() : this.importDataTrueRuleSets;
         this.variableAndValue = this.variableAndValue == null ? new HashMap<String, String>() : this.variableAndValue;
@@ -134,6 +143,7 @@ public class ImportDataRuleRunnerContainer {
         }
     }
 
+    @Transactional
     private List<RuleSetBean> filterByImportDataEntryTrue(List<RuleSetBean> ruleSetBeans) {
         List<RuleSetBean> ruleSets = ruleSetBeans;
         if(ruleSets != null) {

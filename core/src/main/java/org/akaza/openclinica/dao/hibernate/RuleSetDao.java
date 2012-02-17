@@ -8,6 +8,7 @@ import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -74,6 +75,7 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
     }
 
     @SuppressWarnings("unchecked")
+    @Transactional
     public ArrayList<RuleSetBean> findByCrfVersionOrCrfAndStudyAndStudyEventDefinition(CRFVersionBean crfVersion, CRFBean crfBean, StudyBean currentStudy,
             StudyEventDefinitionBean sed) {
         // Using a sql query because we are referencing objects not managed by hibernate
@@ -88,7 +90,7 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
         q.setInteger("studyId", currentStudy.getParentStudyId() != 0 ? currentStudy.getParentStudyId() : currentStudy.getId());
         q.setInteger("studyEventDefinitionId", sed.getId());
         q.setCacheable(true);
-      
+
         return (ArrayList<RuleSetBean>) q.list();
     }
 
@@ -120,7 +122,7 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
         q.setParameter("context", ruleSet.getTarget().getContext());
         return (RuleSetBean) q.uniqueResult();
     }
-    
+
     public RuleSetBean findByExpressionAndStudy(RuleSetBean ruleSet, Integer studyId) {
         String query = "from " + getDomainClassName() + " ruleSet  where ruleSet.originalTarget.value = :value " +
         		"AND ruleSet.originalTarget.context = :context " +

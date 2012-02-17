@@ -1,9 +1,9 @@
-/* 
+/*
  * OpenClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
  * For details see: http://www.openclinica.org/license
  *
- * Copyright 2003-2008 Akaza Research 
+ * Copyright 2003-2008 Akaza Research
  */
 package org.akaza.openclinica.domain.rule;
 
@@ -13,12 +13,14 @@ import org.akaza.openclinica.domain.rule.action.EmailActionBean;
 import org.akaza.openclinica.domain.rule.action.HideActionBean;
 import org.akaza.openclinica.domain.rule.action.InsertActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
-import org.akaza.openclinica.domain.rule.action.ShowActionBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
+import org.akaza.openclinica.domain.rule.action.ShowActionBean;
 import org.apache.commons.collections.FactoryUtils;
 import org.apache.commons.collections.list.LazyList;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
@@ -28,6 +30,7 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -123,7 +126,7 @@ public class RuleSetRuleBean extends AbstractAuditableMutableDomainObject {
 
     /**
      * Run the rule and pass in the result. Will return all actions that match the result.
-     * 
+     *
      * @param actionEvaluatesTo
      * @return
      */
@@ -141,7 +144,7 @@ public class RuleSetRuleBean extends AbstractAuditableMutableDomainObject {
 
     /**
      * Run the rule and pass in the result. Will return all actions that match the result.
-     * 
+     *
      * @param actionEvaluatesTo
      * @return
      */
@@ -187,7 +190,8 @@ public class RuleSetRuleBean extends AbstractAuditableMutableDomainObject {
         this.ruleBean = ruleBean;
     }
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @Fetch(value = FetchMode.SUBSELECT)
     @JoinColumn(name = "rule_set_rule_id", nullable = false)
     public List<RuleActionBean> getActions() {
         return actions;

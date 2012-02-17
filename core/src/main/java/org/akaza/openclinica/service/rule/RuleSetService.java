@@ -329,6 +329,7 @@ public class RuleSetService implements RuleSetServiceInterface {
         // return runRules(ruleSets, dryRun, currentStudy, c.variableAndValue, ub);
     }
 
+    @Transactional
     public HashMap<String, ArrayList<String>> runRulesInImportData(List<ImportDataRuleRunnerContainer> containers,
             StudyBean study, UserAccountBean ub, ExecutionMode executionMode) {
         ImportDataRuleRunner ruleRunner = new ImportDataRuleRunner(dataSource, requestURLMinusServletPath, contextPath, mailSender);
@@ -348,6 +349,7 @@ public class RuleSetService implements RuleSetServiceInterface {
      * org.akaza.openclinica.service.rule.RuleSetServiceInterface#getRuleSetsByCrfStudyAndStudyEventDefinition(org.akaza.openclinica.bean.managestudy.StudyBean,
      * org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean, org.akaza.openclinica.bean.submit.CRFVersionBean)
      */
+    @Transactional
     public List<RuleSetBean> getRuleSetsByCrfStudyAndStudyEventDefinition(StudyBean study, StudyEventDefinitionBean sed, CRFVersionBean crfVersion) {
         CRFBean crf = getCrfDao().findByVersionId(crfVersion.getId());
         logger.debug("crfVersionID : " + crfVersion.getId() + " studyId : " + study.getId() + " studyEventDefinition : " + sed.getId());
@@ -370,6 +372,7 @@ public class RuleSetService implements RuleSetServiceInterface {
 
     }
 
+    @Transactional
     public int getCountByStudy(StudyBean study) {
         int count = getRuleSetRuleDao().getCountByStudy(study);
         return count;
@@ -513,6 +516,7 @@ public class RuleSetService implements RuleSetServiceInterface {
      * (non-Javadoc)
      * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#filterByStatusEqualsAvailable(java.util.List)
      */
+    @Transactional
     public List<RuleSetBean> filterByStatusEqualsAvailable(List<RuleSetBean> ruleSets) {
         for (Iterator<RuleSetBean> j = ruleSets.iterator(); j.hasNext();) {
             RuleSetBean ruleSet = j.next();
@@ -547,6 +551,7 @@ public class RuleSetService implements RuleSetServiceInterface {
      * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#filterRuleSetsByStudyEventOrdinal(java.util.List,
      * org.akaza.openclinica.bean.managestudy.StudyEventBean)
      */
+    @Transactional
     public List<RuleSetBean> filterRuleSetsByStudyEventOrdinal(List<RuleSetBean> ruleSets, StudyEventBean studyEvent, CRFVersionBean crfVersion,
             StudyEventDefinitionBean studyEventDefinition) {
         ArrayList<RuleSetBean> validRuleSets = new ArrayList<RuleSetBean>();
@@ -826,6 +831,7 @@ public class RuleSetService implements RuleSetServiceInterface {
         return ruleSetBean;
     }
 
+    @Transactional
     public boolean shouldRunRulesForRuleSets(List<RuleSetBean> ruleSets, Phase phase) {
         for(RuleSetBean ruleSetBean: ruleSets) {
             List<RuleSetRuleBean> ruleSetRuleBeans = ruleSetBean.getRuleSetRules();

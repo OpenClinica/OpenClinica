@@ -19,6 +19,7 @@ import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.logic.expressionTree.OpenClinicaExpressionParser;
 import org.akaza.openclinica.logic.rulerunner.MessageContainer.MessageType;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,6 +43,7 @@ public class ImportDataRuleRunner extends RuleRunner {
      * @param executionMode
      * @return Returned RuleActionBean summary with key as groupOrdinalPLusItemOid.
      */
+    @Transactional
     public HashMap<String, ArrayList<String>> runRules(List<ImportDataRuleRunnerContainer> containers,
             StudyBean study, UserAccountBean ub, ExecutionMode executionMode) {
         HashMap<String, ArrayList<String>> messageMap = new HashMap<String, ArrayList<String>>();
@@ -64,6 +66,7 @@ public class ImportDataRuleRunner extends RuleRunner {
         return messageMap;
     }
 
+    @Transactional
     private HashMap<String, ArrayList<RuleActionContainer>> populateToBeExpected(ImportDataRuleRunnerContainer container,
             StudyBean study, UserAccountBean ub) {
         //copied code for toBeExpected from DataEntryServlet runRules
@@ -151,7 +154,7 @@ public class ImportDataRuleRunner extends RuleRunner {
         return toBeExecuted;
     }
 
-
+    @Transactional
     private MessageContainer runRules(StudyBean currentStudy, UserAccountBean ub, HashMap<String, String> variableAndValue,
             HashMap<String, ArrayList<RuleActionContainer>> toBeExecuted) {
         //Copied from DataEntryRuleRunner runRules

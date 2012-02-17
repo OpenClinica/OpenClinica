@@ -1,9 +1,9 @@
-/* 
+/*
  * OpenClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
  * For details see: http://www.openclinica.org/license
  *
- * Copyright 2003-2008 Akaza Research 
+ * Copyright 2003-2008 Akaza Research
  */
 package org.akaza.openclinica.domain.rule;
 
@@ -17,6 +17,8 @@ import org.akaza.openclinica.domain.AbstractAuditableMutableDomainObject;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
@@ -25,6 +27,7 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -72,7 +75,7 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
         ruleSetRuleBean.setRuleSetBean(this);
         ruleSetRules.add(ruleSetRuleBean);
     }
-    
+
     @Transient
     public void addRuleSetRuleForDisplay(RuleSetRuleBean ruleSetRuleBean) {
         if (this.ruleSetRules == null)
@@ -180,7 +183,8 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
     }
 
     // @OneToMany(mappedBy = "ruleSetBean")
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @Fetch(value = FetchMode.SUBSELECT)
     @JoinColumn(name = "rule_set_id", nullable = false)
     public List<RuleSetRuleBean> getRuleSetRules() {
         return ruleSetRules;
@@ -375,7 +379,7 @@ public class RuleSetBean extends AbstractAuditableMutableDomainObject {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((target == null) ? 0 : target.hashCode());
+        result = prime * result + (target == null ? 0 : target.hashCode());
         return result;
     }
 
