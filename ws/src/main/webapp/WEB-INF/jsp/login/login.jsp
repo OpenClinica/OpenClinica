@@ -56,20 +56,8 @@
             <div ID="loginBox">
             <!-- Login box contents -->
                 <div ID="login">
-                    <form action="<c:url value='/j_spring_security_check'/>" method="post">
-                    <h1><fmt:message key="login" bundle="${resword}"/></h1>
-                    <b><fmt:message key="user_name" bundle="${resword}"/></b>
-                        <div class="formfieldM_BG">
-                            <input type="text" id="username" name="j_username" class="formfieldM">
-                        </div>
-
-                    <b><fmt:message key="password" bundle="${resword}"/></b>
-                        <div class="formfieldM_BG">
-                            <input type="password" id="j_password" name="j_password"  class="formfieldM">
-                        </div>
-                    <input type="submit" name="submit" value="<fmt:message key='login' bundle='${resword}'/>" class="loginbutton" />
-                    <a href="#" id="requestPassword"> <fmt:message key="forgot_password" bundle="${resword}"/></a>
-                   </form>
+                     <h1><fmt:message key="login_ws" bundle="${resword}"/></h1>
+                    
                    <br/><jsp:include page="../login-include/login-alertbox.jsp"/>
                    <%-- <a href="<c:url value="/RequestPassword"/>"> <fmt:message key="forgot_password" bundle="${resword}"/></a> --%>
                </div>
@@ -121,9 +109,7 @@
             });
 
 
-            jQuery('#requestPassword').click(function() {
-                jQuery.blockUI({ message: jQuery('#requestPasswordForm'), css:{left: "200px", top:"180px" } });
-            });
+           
 
             jQuery('#cancel').click(function() {
                 jQuery.unblockUI();
@@ -133,10 +119,7 @@
 
     </script>
 
-        <div id="requestPasswordForm" style="display:none;">
-              <c:import url="requestPasswordPop.jsp">
-              </c:import>
-        </div>
+    
 
 <!-- Footer -->
 <!-- End Main Content Area -->

@@ -1528,3 +1528,40 @@ akaza_logo{
     height:81px;
     float: left;
 }
+.footer_bottom { /*background-image: url(../images/footer_BG.gif);
+    background-repeat: repeat-x;
+    background-position: bottom;*/
+    vertical-align: top;
+    padding-right: 10px;
+	padding-top: 10px;
+	padding-left: 10px;
+    line-height: 15px;
+	text-align:left;
+}
+.footer_table{
+
+min-width: 700px;
+    overflow: hidden;
+   
+}
+.footer_table  {
+table-layout: fixed;
+width:100%;
+min-width: 700px;
+    overflow: hidden;
+background-color: transparent;
+}
+
+#ft_tooltip {
+	   position:absolute;
+    	display:none;
+		width:40%;
+		background-color:#E2E7FF;
+		color:#000044;
+		border:2px solid #003099;
+		font-family:Verdana,Geneva,sans-serif;
+		padding:3px;
+		font-size:11px;
+		-moz-box-shadow: 2px 2px 11px #C0C0C0;
+		-webkit-box-shadow: 2px 2px 11px #C0C0C0;
+	}
