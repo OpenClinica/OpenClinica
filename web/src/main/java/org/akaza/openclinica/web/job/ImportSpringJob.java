@@ -31,6 +31,9 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
+import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer;
+import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.crfdata.ImportCRFDataService;
 import org.exolab.castor.mapping.Mapping;
@@ -45,6 +48,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.scheduling.quartz.JobDetailBean;
 import org.springframework.scheduling.quartz.QuartzJobBean;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -66,9 +70,9 @@ import javax.sql.DataSource;
 
 /**
  * Import Spring Job, a job running asynchronously on the Tomcat server using Spring and Quartz.
- * 
+ *
  * @author thickerson, 04/2009
- * 
+ *
  */
 public class ImportSpringJob extends QuartzJobBean {
 
@@ -145,7 +149,7 @@ public class ImportSpringJob extends QuartzJobBean {
             StudyDAO studyDAO = new StudyDAO(dataSource);
             StudyBean studyBean;
             if (studyOid != null) {
-            	studyBean = (StudyBean) studyDAO.findByOid(studyOid);
+            	studyBean = studyDAO.findByOid(studyOid);
             } else {
             	studyBean = (StudyBean) studyDAO.findByName(studyName);
             }
@@ -175,9 +179,9 @@ public class ImportSpringJob extends QuartzJobBean {
             int placeHolder = 0;
             for (int i = 0; i < files.length; i++) {
                 // hmm
-                if (!(new File(fileDirectory + File.separator + files[i])).isDirectory()) {
+                if (!new File(fileDirectory + File.separator + files[i]).isDirectory()) {
                     File f = new File(fileDirectory + File.separator + files[i]);
-                    if ((f == null) || (f.getName() == null)) {
+                    if (f == null || f.getName() == null) {
                         System.out.println("found a null file");
                     } else if (f.getName().indexOf(".xml") < 0 && f.getName().indexOf(".XML") < 0) {
                         System.out.println("does not seem to be an xml file");
@@ -196,17 +200,17 @@ public class ImportSpringJob extends QuartzJobBean {
                     // destination[i] = new File(IMPORT_DIR_2 + files[i]);
                 }
             }
-            if ((target.length > 0) && (destination.length > 0)) {
+            if (target.length > 0 && destination.length > 0) {
                 cutAndPaste(target, destination);
                 // do everything else here with 'destination'
                 System.out.println("=== about to start processData... ===");
-                ArrayList<String> auditMessages = processData(destination, dataSource, respage, ub, studyBean, destDirectory, triggerBean);
+                ArrayList<String> auditMessages = processData(destination, dataSource, respage, ub, studyBean, destDirectory, triggerBean, appContext);
                 System.out.println("=== finished process data, audit message returned ===");
                 // String[] messages = auditMessage.split("===+");
 
                 auditEventDAO.createRowForExtractDataJobSuccess(triggerBean, auditMessages.get(1));
                 try {
-                    if ((contactEmail != null) && (!"".equals(contactEmail))) {
+                    if (contactEmail != null && !"".equals(contactEmail)) {
                         mailSender.sendEmail(contactEmail, respage.getString("job_ran_for") + " " + triggerBean.getFullName(), generateMsg(
                                 auditMessages.get(0), contactEmail), true);
                         System.out.println("=== sent email ===");
@@ -268,7 +272,7 @@ public class ImportSpringJob extends QuartzJobBean {
      * return a message which will go to audit and to the end user.
      */
     private ArrayList<String> processData(File[] dest, DataSource dataSource, ResourceBundle respage, UserAccountBean ub, StudyBean studyBean,
-            File destDirectory, TriggerBean triggerBean) throws Exception {
+            File destDirectory, TriggerBean triggerBean, ApplicationContext appContext) throws Exception {
         StringBuffer msg = new StringBuffer();
         StringBuffer auditMsg = new StringBuffer();
         Mapping myMap = new Mapping();
@@ -358,7 +362,7 @@ public class ImportSpringJob extends QuartzJobBean {
                 // add to session
                 // forward to another page
                 System.out.println(errors.toString());
-                
+
                 if (errors.size() > 0) {
                 	out.write("<P>Errors:<br/>");
                     for (String error : errors) {
@@ -508,7 +512,7 @@ public class ImportSpringJob extends QuartzJobBean {
             // << tbh 05/2010, bug #5110, leave off the detailed reports
             out.close();
 
-            
+
             if (fail) {
                 // forwardPage(Page.IMPORT_CRF_DATA);
                 // break here with an exception
@@ -553,6 +557,12 @@ public class ImportSpringJob extends QuartzJobBean {
                 // forwardPage(Page.VERIFY_IMPORT_SERVLET);
                 // instead of forwarding, go ahead and save it all, sending a
                 // message at the end
+
+              //setup ruleSets to run if applicable
+                RuleSetServiceInterface ruleSetService =
+                        (RuleSetServiceInterface)appContext.getBean("ruleSetService");
+                List<ImportDataRuleRunnerContainer> containers =
+                        this.ruleRunSetup(dataSource, studyBean, ub, ruleSetService, odmContainer);
 
                 CrfBusinessLogicHelper crfBusinessLogicHelper = new CrfBusinessLogicHelper(dataSource);
                 for (DisplayItemBeanWrapper wrapper : displayItemBeanWrappers) {
@@ -625,7 +635,7 @@ public class ImportSpringJob extends QuartzJobBean {
                 // MessageFormat mf = new MessageFormat("");
                 String linkMessage =
                     respage.getString("you_can_review_the_data") + SQLInitServlet.getField("sysURL.base") + respage.getString("you_can_review_the_data_2")
-                        + SQLInitServlet.getField("sysURL.base") + respage.getString("you_can_review_the_data_3") + generalFileDir + f.getName() 
+                        + SQLInitServlet.getField("sysURL.base") + respage.getString("you_can_review_the_data_3") + generalFileDir + f.getName()
                         + "&tn=" + triggerBean.getFullName() + "&gn=1"
                         + respage.getString("you_can_review_the_data_4") + "<br/>";
                 // mf.applyPattern(respage.getString("you_can_review_the_data"));
@@ -644,11 +654,12 @@ public class ImportSpringJob extends QuartzJobBean {
                 // << tbh 06/2010
                 // msg.append(finalLine);
                 // auditMsg.append(finalLine);
+                auditMsg.append(this.runRules(studyBean, ub, containers, ruleSetService, ExecutionMode.SAVE));
             }
         }// end for loop
         // is the writer still not closed? try to close it
-        
-        
+
+
         ArrayList<String> retList = new ArrayList<String>();
         retList.add(msg.toString());
         retList.add(auditMsg.toString());
@@ -720,4 +731,49 @@ public class ImportSpringJob extends QuartzJobBean {
         }
     }
 
+    @Transactional
+    private List<ImportDataRuleRunnerContainer> ruleRunSetup(DataSource dataSource, StudyBean studyBean,
+            UserAccountBean userBean, RuleSetServiceInterface ruleSetService, ODMContainer odmContainer) {
+        List<ImportDataRuleRunnerContainer> containers = new ArrayList<ImportDataRuleRunnerContainer>();
+        if(odmContainer != null) {
+            ArrayList<SubjectDataBean> subjectDataBeans = odmContainer.getCrfDataPostImportContainer().getSubjectData();
+            if(ruleSetService.getCountByStudy(studyBean)>0) {
+                ImportDataRuleRunnerContainer container;
+                for (SubjectDataBean subjectDataBean : subjectDataBeans) {
+                    container = new ImportDataRuleRunnerContainer();
+                    container.initRuleSetsAndTargets(dataSource, studyBean, subjectDataBean, ruleSetService);
+                    if(container.getShouldRunRules())   containers.add(container);
+                }
+                if(containers != null && ! containers.isEmpty())
+                    ruleSetService.runRulesInImportData(containers, studyBean, userBean, ExecutionMode.DRY_RUN);
+            }
+        }
+        return containers;
+    }
+
+    @Transactional
+    private StringBuffer runRules(StudyBean studyBean, UserAccountBean userBean,
+            List<ImportDataRuleRunnerContainer> containers, RuleSetServiceInterface ruleSetService,
+            ExecutionMode executionMode) {
+        StringBuffer messages = new StringBuffer();
+        if(containers != null && ! containers.isEmpty()) {
+            HashMap<String, ArrayList<String>> summary = ruleSetService.runRulesInImportData(containers, studyBean, userBean, executionMode);
+            messages = extractRuleActionWarnings(summary);
+        }
+        return messages;
+    }
+
+    private StringBuffer extractRuleActionWarnings(HashMap<String, ArrayList<String>> summaryMap) {
+        //List<String> messages = new ArrayList<String>();
+        StringBuffer mesg = new StringBuffer();
+        if(summaryMap != null && !summaryMap.isEmpty()) {
+            for (String key : summaryMap.keySet()) {
+                mesg.append(key+" : ");
+                for(String s : summaryMap.get(key)) {
+                    mesg.append(s+", ");
+                }
+            }
+        }
+        return new StringBuffer();
+    }
 }

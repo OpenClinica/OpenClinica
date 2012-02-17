@@ -312,7 +312,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                 ImportDataRuleRunnerContainer container;
                 for (SubjectDataBean subjectDataBean : subjectDataBeans) {
                     container = new ImportDataRuleRunnerContainer();
-                    container.init(dataSource, studyBean, subjectDataBean, ruleSetService);
+                    container.initRuleSetsAndTargets(dataSource, studyBean, subjectDataBean, ruleSetService);
                     if(container.getShouldRunRules())   containers.add(container);
                 }
                 if(containers != null && ! containers.isEmpty())
