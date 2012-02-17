@@ -562,10 +562,16 @@ public class RuleSetService implements RuleSetServiceInterface {
                     ruleSetBean.addExpression(replaceSEDOrdinal(ruleSetBean.getTarget(), studyEvent));
                     validRuleSets.add(ruleSetBean);
                 }
-                if (studyEventDefinitionOrdinal.equals(String.valueOf(studyEvent.getSampleOrdinal()))) {
+                String compareOrdinal = Integer.toString(studyEvent.getSampleOrdinal());
+                if (studyEventDefinitionOrdinal.equals(compareOrdinal)) {
                     ruleSetBean.addExpression(replaceSEDOrdinal(ruleSetBean.getTarget(), studyEvent));
                     validRuleSets.add(ruleSetBean);
                 }
+              /* if (studyEventDefinitionOrdinal.equals(String.valueOf(studyEvent.getSampleOrdinal()))) {
+                    ruleSetBean.addExpression(replaceSEDOrdinal(ruleSetBean.getTarget(), studyEvent));
+                    validRuleSets.add(ruleSetBean);
+                }
+                */
             } else {
                 String expression =
                     getExpressionService().constructFullExpressionIfPartialProvided(ruleSetBean.getTarget().getValue(), crfVersion, studyEventDefinition);

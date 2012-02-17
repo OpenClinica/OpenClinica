@@ -597,6 +597,14 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                 oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA));
                 getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd");
             }
+            // If A is repeating group with index & B is none-repeating group 
+            if (isGroupARepeating && !isGroupBRepeating ) {
+                ItemDataBean oidBasedItemData =
+                        oneToOne(itemDataBeanA, eventCrfBeanA, itemGroupMetadataBeanA, itemBeanB, itemGroupMetadataBeanB, eventCrfBeanB, ub, 1);
+                 
+                oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA));
+                getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd");
+            }
 
         }
     }
