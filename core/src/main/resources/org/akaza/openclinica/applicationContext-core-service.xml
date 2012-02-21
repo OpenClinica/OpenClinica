@@ -20,7 +20,7 @@
         <constructor-arg ref="dataSource"/>
     </bean>      
     <bean id="ruleSetService" class="org.akaza.openclinica.service.rule.RuleSetService" autowire="byName">
-        <constructor-arg ref="dataSource"/>
+        <property name="dataSource" ref="dataSource"/>
     </bean>
     <bean id="rulesPostImportContainerService" class="org.akaza.openclinica.service.rule.RulesPostImportContainerService" autowire="byName">
         <constructor-arg ref="dataSource"/>

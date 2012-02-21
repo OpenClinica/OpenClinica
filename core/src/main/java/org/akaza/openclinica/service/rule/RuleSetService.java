@@ -7,6 +7,15 @@
  */
 package org.akaza.openclinica.service.rule;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -61,16 +70,6 @@ import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
 
 /**
  * @author krikor
@@ -79,7 +78,7 @@ import javax.sql.DataSource;
 public class RuleSetService implements RuleSetServiceInterface {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-    DataSource dataSource;
+    private DataSource dataSource;
     private RuleSetDao ruleSetDao;
     private RuleSetAuditDao ruleSetAuditDao;
     private RuleDao ruleDao;
@@ -106,15 +105,6 @@ public class RuleSetService implements RuleSetServiceInterface {
     private RuleActionRunLogDao ruleActionRunLogDao;
 
     /*
-     * public RuleSetService(DataSource ds, String requestURLMinusServletPath, String contextPath) { this.dataSource = ds; this.requestURLMinusServletPath =
-     * requestURLMinusServletPath; this.contextPath = contextPath; }
-     */
-
-    public RuleSetService(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
-
-    /*
      * (non-Javadoc)
      * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#saveRuleSet(org.akaza.openclinica.domain.rule.RuleSetBean)
      */
@@ -124,7 +114,7 @@ public class RuleSetService implements RuleSetServiceInterface {
         return persistentRuleSetBean;
     }
 
-    @Transactional
+
     public void saveImportFromDesigner(RulesPostImportContainer rulesContainer) {
     	HashMap<String,RuleBean> ruleBeans = new HashMap<String, RuleBean>();
         for (AuditableBeanWrapper<RuleBean> ruleBeanWrapper : rulesContainer.getValidRuleDefs()) {
@@ -151,7 +141,7 @@ public class RuleSetService implements RuleSetServiceInterface {
      * (non-Javadoc)
      * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#saveImport(org.akaza.openclinica.domain.rule.RulesPostImportContainer)
      */
-    @Transactional
+
     public void saveImport(RulesPostImportContainer rulesContainer) {
         for (AuditableBeanWrapper<RuleBean> ruleBeanWrapper : rulesContainer.getValidRuleDefs()) {
             getRuleDao().saveOrUpdate(ruleBeanWrapper.getAuditableBean());
@@ -171,7 +161,7 @@ public class RuleSetService implements RuleSetServiceInterface {
         }
     }
 
-    @Transactional
+
     public void saveImport(RuleSetRuleBean ruleSetRule) {
         getRuleDao().saveOrUpdate(ruleSetRule.getRuleBean());
         getRuleSetDao().saveOrUpdate(ruleSetRule.getRuleSetBean());
@@ -329,7 +319,7 @@ public class RuleSetService implements RuleSetServiceInterface {
         // return runRules(ruleSets, dryRun, currentStudy, c.variableAndValue, ub);
     }
 
-    @Transactional
+
     public HashMap<String, ArrayList<String>> runRulesInImportData(List<ImportDataRuleRunnerContainer> containers,
             StudyBean study, UserAccountBean ub, ExecutionMode executionMode) {
         ImportDataRuleRunner ruleRunner = new ImportDataRuleRunner(dataSource, requestURLMinusServletPath, contextPath, mailSender);
@@ -349,7 +339,7 @@ public class RuleSetService implements RuleSetServiceInterface {
      * org.akaza.openclinica.service.rule.RuleSetServiceInterface#getRuleSetsByCrfStudyAndStudyEventDefinition(org.akaza.openclinica.bean.managestudy.StudyBean,
      * org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean, org.akaza.openclinica.bean.submit.CRFVersionBean)
      */
-    @Transactional
+
     public List<RuleSetBean> getRuleSetsByCrfStudyAndStudyEventDefinition(StudyBean study, StudyEventDefinitionBean sed, CRFVersionBean crfVersion) {
         CRFBean crf = getCrfDao().findByVersionId(crfVersion.getId());
         logger.debug("crfVersionID : " + crfVersion.getId() + " studyId : " + study.getId() + " studyEventDefinition : " + sed.getId());
@@ -372,7 +362,7 @@ public class RuleSetService implements RuleSetServiceInterface {
 
     }
 
-    @Transactional
+
     public int getCountByStudy(StudyBean study) {
         int count = getRuleSetRuleDao().getCountByStudy(study);
         return count;
@@ -516,7 +506,7 @@ public class RuleSetService implements RuleSetServiceInterface {
      * (non-Javadoc)
      * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#filterByStatusEqualsAvailable(java.util.List)
      */
-    @Transactional
+
     public List<RuleSetBean> filterByStatusEqualsAvailable(List<RuleSetBean> ruleSets) {
         for (Iterator<RuleSetBean> j = ruleSets.iterator(); j.hasNext();) {
             RuleSetBean ruleSet = j.next();
@@ -551,7 +541,7 @@ public class RuleSetService implements RuleSetServiceInterface {
      * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#filterRuleSetsByStudyEventOrdinal(java.util.List,
      * org.akaza.openclinica.bean.managestudy.StudyEventBean)
      */
-    @Transactional
+
     public List<RuleSetBean> filterRuleSetsByStudyEventOrdinal(List<RuleSetBean> ruleSets, StudyEventBean studyEvent, CRFVersionBean crfVersion,
             StudyEventDefinitionBean studyEventDefinition) {
         ArrayList<RuleSetBean> validRuleSets = new ArrayList<RuleSetBean>();
@@ -837,7 +827,7 @@ public class RuleSetService implements RuleSetServiceInterface {
         return ruleSetBean;
     }
 
-    @Transactional
+
     public boolean shouldRunRulesForRuleSets(List<RuleSetBean> ruleSets, Phase phase) {
         for(RuleSetBean ruleSetBean: ruleSets) {
             List<RuleSetRuleBean> ruleSetRuleBeans = ruleSetBean.getRuleSetRules();
@@ -996,5 +986,21 @@ public class RuleSetService implements RuleSetServiceInterface {
     public void setRuleActionRunLogDao(RuleActionRunLogDao ruleActionRunLogDao) {
         this.ruleActionRunLogDao = ruleActionRunLogDao;
     }
+
+    /**
+     * @return the dataSource
+     */
+    public DataSource getDataSource() {
+        return dataSource;
+    }
+
+    /**
+     * @param dataSource the dataSource to set
+     */
+    public void setDataSource(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
+
 
 }

@@ -9,6 +9,10 @@
 							http://www.springframework.org/schema/util/spring-util-2.5.xsd">
 
 
+     <bean id="sharedTransactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
+        <property name="transactionManager" ref="transactionManager"/>
+     </bean>
+     
      <!-- WSDL Definitions -->
 
      <bean id="dataWsdl" class="org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition">
@@ -126,7 +130,8 @@
         <constructor-arg ref="dataSource"/>
         <constructor-arg ref="messageSource"/>
         <constructor-arg ref="coreResources"/>
-        <property name="ruleSetService"><ref bean="ruleSetService" /></property>
+        <property name="ruleSetService" ref="ruleSetService"/>
+        <property name="transactionTemplate" ref="sharedTransactionTemplate"/>
     </bean>
 
      <bean id="studyEventDefinitionEndpoint" class="org.akaza.openclinica.ws.StudyEventDefinitionEndpoint">

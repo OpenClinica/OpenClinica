@@ -48,35 +48,6 @@ public class DynamicsItemFormMetadataDao extends AbstractDomainDao<DynamicsItemF
         return (DynamicsItemFormMetadataBean) q.uniqueResult();
     }
 
-    /**
-     * The reason we overwrite this method is to make it non transactional. and mainly to make saves faster.
-     */
-    @Override
-    public DynamicsItemFormMetadataBean saveOrUpdate(DynamicsItemFormMetadataBean domainObject) {
-
-     try{
-        LOG.trace("******>>>>>>>Current thread Running>>>>>>>>>>>>"+Thread.currentThread()+"DomainObj="+domainObject);
-        getCurrentSession().beginTransaction();
-        getCurrentSession().saveOrUpdate(domainObject);
-
-        LOG.trace("******>>>>>>>Current thread Running>>>>>>>>>>>>flushing >>>>>>>>>"+Thread.currentThread()+"/n crfVersionId="+domainObject.getCrfVersionId()+
-                "eventCrfId:"+domainObject.getEventCrfId()+"itemFormMetadataId:"+domainObject.getItemFormMetadataId()
-                +"Id:"+domainObject.getId()+"Item Data Id:"+domainObject.getItemDataId()+"ItemFormMetaDataId:"+domainObject.getItemFormMetadataId());
-        LOG.trace("******>>>>>>>Current thread Running>>>>>>>>>>>>flushing >>>>>>>>>"+Thread.currentThread()+"DomainObj="+getCurrentSession().getEntityName(domainObject));
-        getCurrentSession().getTransaction().commit();
-
-        getCurrentSession().flush();
-        getCurrentSession().evict(domainObject);
-     }catch(Exception e){
-         LOG.trace("******>>>>>>>Current thread Running>>>> "+Thread.currentThread());
-         e.printStackTrace();
-         throw new RuntimeException("Error saving DynamicsItemFormMetadataBean", e);
-     }
-
-        return domainObject;
-    }
-
-
     public List<Integer> findItemIdsForAGroupInSection(int groupId, int sectionId, int crfVersionId, int eventCrfId) {
         String oracle = "select distinct ditem.item_id from dyn_item_form_metadata ditem"
             + " where ditem.item_data_id in (select idata.item_data_id from item_data idata"

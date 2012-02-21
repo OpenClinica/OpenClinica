@@ -1,5 +1,12 @@
 package org.akaza.openclinica.service.rule;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -27,14 +34,6 @@ import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer;
 import org.akaza.openclinica.logic.rulerunner.MessageContainer;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
 
 public interface RuleSetServiceInterface {
 
@@ -52,13 +51,10 @@ public interface RuleSetServiceInterface {
 
     public abstract RuleSetBean saveRuleSet(RuleSetBean ruleSetBean);
 
-    @Transactional
     public abstract void saveImportFromDesigner(RulesPostImportContainer rulesContainer);
 
-    @Transactional
     public abstract void saveImport(RulesPostImportContainer rulesContainer);
 
-    @Transactional
     public void saveImport(RuleSetRuleBean ruleSetRule);
 
     public abstract RuleSetBean updateRuleSet(RuleSetBean ruleSetBean, UserAccountBean user, Status status);

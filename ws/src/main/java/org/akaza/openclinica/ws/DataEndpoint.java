@@ -1,39 +1,5 @@
 package org.akaza.openclinica.ws;
 
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.submit.DisplayItemBeanWrapper;
-import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
-import org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
-import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer;
-import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
-import org.akaza.openclinica.web.crfdata.DataImportService;
-import org.akaza.openclinica.ws.bean.BaseStudyDefinitionBean;
-import org.akaza.openclinica.ws.validator.CRFDataImportValidator;
-import org.exolab.castor.mapping.Mapping;
-import org.exolab.castor.xml.Unmarshaller;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.MessageSource;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.validation.DataBinder;
-import org.springframework.validation.Errors;
-import org.springframework.validation.ObjectError;
-import org.springframework.ws.server.endpoint.annotation.Endpoint;
-import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
-import org.springframework.ws.server.endpoint.annotation.XPathParam;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
-
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -52,10 +18,45 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.submit.DisplayItemBeanWrapper;
+import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
+import org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
+import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer;
+import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
+import org.akaza.openclinica.web.crfdata.DataImportService;
+import org.akaza.openclinica.ws.bean.BaseStudyDefinitionBean;
+import org.akaza.openclinica.ws.validator.CRFDataImportValidator;
+import org.exolab.castor.mapping.Mapping;
+import org.exolab.castor.xml.Unmarshaller;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.validation.DataBinder;
+import org.springframework.validation.Errors;
+import org.springframework.validation.ObjectError;
+import org.springframework.ws.server.endpoint.annotation.Endpoint;
+import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
+import org.springframework.ws.server.endpoint.annotation.XPathParam;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
+
 @Endpoint
 public class DataEndpoint {
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    protected static final Logger LOG = LoggerFactory.getLogger(DataEndpoint.class);
     private final String NAMESPACE_URI_V1 = "http://openclinica.org/ws/data/v1";
 
     private final String ODM_HEADER_NAMESPACE = "<ODM xmlns=\"http://www.cdisc.org/ns/odm/v1.3\" targetNamespace=\"http://openclinica.org/ws/data/v1\" xmlns:OpenClinica=\"http://www.openclinica.org/ns/openclinica_odm/v1.3\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.cdisc.org/ns/odm/v1.3\">";
@@ -63,10 +64,11 @@ public class DataEndpoint {
     private final MessageSource messages;
     private final CoreResources coreResources;
     private final Locale locale;
+    private final DataImportService dataImportService = new DataImportService();
 
-    @Autowired
-    @Qualifier("ruleSetService")
     private RuleSetServiceInterface ruleSetService;
+
+    private TransactionTemplate transactionTemplate;
 
     public DataEndpoint(DataSource dataSource, MessageSource messages, CoreResources coreResources) {
         this.dataSource = dataSource;
@@ -84,13 +86,23 @@ public class DataEndpoint {
      * @throws Exception
      */
     @PayloadRoot(localPart = "importRequest", namespace = NAMESPACE_URI_V1)
-    public Source importData(@XPathParam("//ODM") Element odmElement) throws Exception {
+    public Source importData(@XPathParam("//ODM") final Element odmElement) throws Exception {
+        return getTransactionTemplate().execute(new TransactionCallback<Source>() {
+            public Source doInTransaction(TransactionStatus status) {
+                try {
+                    return importDataInTransaction(odmElement);
+                } catch (Exception e) {
+                    throw new RuntimeException("Error processing data import request",e);
+                }
+            }
+        });
+    }
 
-
+    protected Source importDataInTransaction(Element odmElement) throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
 
         // logger.debug("rootElement=" + odmElement);
-        logger.debug("rootElement=" + odmElement);
+        LOG.debug("rootElement=" + odmElement);
 
         //String xml = null;
         UserAccountBean userBean = null;
@@ -117,7 +129,7 @@ public class DataEndpoint {
             	List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
             	StudyBean studyBean = crfDataImportBean.getStudy();
 
-            	List<String> errorMessagesFromValidation = new DataImportService().validateData(odmContainer,dataSource, coreResources,
+            	List<String> errorMessagesFromValidation = dataImportService.validateData(odmContainer,dataSource, coreResources,
             			studyBean, userBean,displayItemBeanWrappers);
             	if (  errorMessagesFromValidation.size()>0)
             	{
@@ -127,14 +139,14 @@ public class DataEndpoint {
 
             	//setup ruleSets to run if applicable
             	ArrayList<SubjectDataBean> subjectDataBeans = odmContainer.getCrfDataPostImportContainer().getSubjectData();
-            	List<ImportDataRuleRunnerContainer> containers = new DataImportService().runRulesSetup(dataSource, studyBean,
+            	List<ImportDataRuleRunnerContainer> containers = dataImportService.runRulesSetup(dataSource, studyBean,
             	        userBean, subjectDataBeans, ruleSetService);
 
             	List<String > auditMsgs = new DataImportService().submitData(odmContainer,dataSource,
             			studyBean, userBean,displayItemBeanWrappers);
 
             	//run rules if applicable
-            	List<String> ruleActionMsgs = new DataImportService().runRules(studyBean, userBean, containers, ruleSetService, ExecutionMode.SAVE);
+            	List<String> ruleActionMsgs = dataImportService.runRules(studyBean, userBean, containers, ruleSetService, ExecutionMode.SAVE);
 
             	return new DOMSource(mapConfirmation(auditMsgs, ruleActionMsgs));
             }
@@ -144,8 +156,10 @@ public class DataEndpoint {
             }
 
                 ////
-         } catch (Exception npe) {
-            return new DOMSource(mapFailConfirmation(null,"Your XML is not well-formed. "+ npe.getMessage()));
+         } catch (Exception e) {
+            //return new DOMSource(mapFailConfirmation(null,"Your XML is not well-formed. "+ npe.getMessage()));
+             LOG.error("Error processing data import request", e);
+             throw new Exception(e);
         }
         // return new DOMSource(mapConfirmation(xml, studyBean, userBean));
     }
@@ -171,19 +185,19 @@ public class DataEndpoint {
         ODMContainer odmContainer = new ODMContainer();
 
         try {
-            logger.debug(xml);
+            LOG.debug(xml);
              // File xsdFileFinal = new File(xsdFile);
             // schemaValidator.validateAgainstSchema(xml, xsdFile);
             // removing schema validation since we are presented with the chicken v egg error problem
             odmContainer = (ODMContainer) um1.unmarshal(new StringReader(xml));
-            logger.debug("Found crf data container for study oid: " + odmContainer.getCrfDataPostImportContainer().getStudyOID());
-            logger.debug("found length of subject list: " + odmContainer.getCrfDataPostImportContainer().getSubjectData().size());
+            LOG.debug("Found crf data container for study oid: " + odmContainer.getCrfDataPostImportContainer().getStudyOID());
+            LOG.debug("found length of subject list: " + odmContainer.getCrfDataPostImportContainer().getSubjectData().size());
             return odmContainer;
 
         } catch (Exception me1) {
             // fail against one, try another
             me1.printStackTrace();
-            logger.debug("failed in unmarshaling, trying another version = "+me1.getMessage());
+            LOG.debug("failed in unmarshaling, trying another version = "+me1.getMessage());
 //           htaycher: use only one schema according to Tom
             //try {
 //                // schemaValidator.validateAgainstSchema(xml, xsdFile2);
@@ -254,7 +268,7 @@ public class DataEndpoint {
 	        Element msgElement = document.createElementNS(NAMESPACE_URI_V1, "error");
 	        msgElement.setTextContent(message);
 	        responseElement.appendChild(msgElement);
-	        logger.debug("sending fail message " + message);
+	        LOG.debug("sending fail message " + message);
 	      }
          return responseElement;
 
@@ -363,5 +377,15 @@ public class DataEndpoint {
     public void setRuleSetService(RuleSetServiceInterface ruleSetService) {
         this.ruleSetService = ruleSetService;
     }
+
+    public TransactionTemplate getTransactionTemplate() {
+        return transactionTemplate;
+    }
+
+    public void setTransactionTemplate(TransactionTemplate transactionTemplate) {
+        this.transactionTemplate = transactionTemplate;
+    }
+
+
 
 }

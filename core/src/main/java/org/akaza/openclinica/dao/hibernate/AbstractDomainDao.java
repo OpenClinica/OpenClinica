@@ -3,12 +3,12 @@ package org.akaza.openclinica.dao.hibernate;
 import org.akaza.openclinica.domain.DomainObject;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.stat.Statistics;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 public abstract class AbstractDomainDao<T extends DomainObject> {
 
-    private SessionFactory sessionFactory;
+    private HibernateTemplate hibernateTemplate;
 
     abstract Class<T> domainClass();
 
@@ -36,28 +36,25 @@ public abstract class AbstractDomainDao<T extends DomainObject> {
         return (Long) getCurrentSession().createQuery("select count(*) from " + domainClass().getName()).uniqueResult();
     }
 
-    /**
-     * @return the sessionFactory
-     */
     public SessionFactory getSessionFactory() {
-        return sessionFactory;
-    }
-
-    /**
-     * @param sessionFactory the sessionFactory to set
-     */
-    public void setSessionFactory(SessionFactory sessionFactory) {
-      
-        
-        
-        this.sessionFactory = sessionFactory;
+        return hibernateTemplate.getSessionFactory();
     }
 
     /**
      * @return Session Object
      */
     protected Session getCurrentSession() {
-        return sessionFactory.getCurrentSession();
+        return getSessionFactory().getCurrentSession();
     }
+
+    public HibernateTemplate getHibernateTemplate() {
+        return hibernateTemplate;
+    }
+
+    public void setHibernateTemplate(HibernateTemplate hibernateTemplate) {
+        this.hibernateTemplate = hibernateTemplate;
+    }
+
+
 
 }

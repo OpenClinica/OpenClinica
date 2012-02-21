@@ -78,21 +78,13 @@
   <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
     <property name="sessionFactory" ref="sessionFactory"/>
   </bean>
- 
-    
-  <bean id="transactionInterceptor" class="org.springframework.transaction.interceptor.TransactionInterceptor">
-		<property name="transactionManager">
-    		<ref bean="transactionManager"/>
-    	</property>
-    	<property name="transactionAttributes">
-    			<props>
-    			<prop key="*">PROPAGATION_REQUIRED, ISOLATION_READ_COMMITTED</prop>
-    		</props>
-    	</property>
-    </bean>
+
+  <bean id="hibernateTemplate" class="org.springframework.orm.hibernate3.HibernateTemplate">
+    <property name="sessionFactory" ref="sessionFactory"/>
+  </bean>
 
   <!-- Instructs the container to look for beans with @Transactional and decorate them -->
-  <tx:annotation-driven transaction-manager="transactionManager"/>
+  <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
 
   <bean id="abstractDomainDao" class="org.akaza.openclinica.dao.hibernate.AbstractDomainDao" abstract="true"/>
 
