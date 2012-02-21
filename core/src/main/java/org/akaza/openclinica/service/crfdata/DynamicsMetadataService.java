@@ -1,10 +1,5 @@
 package org.akaza.openclinica.service.crfdata;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
@@ -41,6 +36,11 @@ import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
 
 public class DynamicsMetadataService implements MetadataServiceInterface {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -498,7 +498,15 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
 
     }
 
+    public void insert(ItemDataBean itemDataBean, List<PropertyBean> properties, UserAccountBean ub, RuleSetBean ruleSet) {
+        insert(itemDataBean.getId(), properties, ub, ruleSet, itemDataBean.getStatus());
+    }
+
     public void insert(Integer itemDataId, List<PropertyBean> properties, UserAccountBean ub, RuleSetBean ruleSet) {
+        insert(itemDataId, properties, ub, ruleSet, null);
+    }
+
+    private void insert(Integer itemDataId, List<PropertyBean> properties, UserAccountBean ub, RuleSetBean ruleSet, Status itemDataStatus) {
         ItemDataBean itemDataBeanA = (ItemDataBean) getItemDataDAO().findByPK(itemDataId);
         EventCRFBean eventCrfBeanA = (EventCRFBean) getEventCRFDAO().findByPK(itemDataBeanA.getEventCRFId());
         StudyEventBean studyEventBeanA = (StudyEventBean) getStudyEventDAO().findByPK(eventCrfBeanA.getStudyEventId());
@@ -555,6 +563,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                 ItemDataBean oidBasedItemData =
                     oneToOne(itemDataBeanA, eventCrfBeanA, itemGroupMetadataBeanA, itemBeanB, itemGroupMetadataBeanB, eventCrfBeanB, ub, 1);
                 oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA));
+                if(itemDataStatus != null) oidBasedItemData.setStatus(itemDataStatus);
                 getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd");
             }
             // If A is not repeating group & B is a repeating group with no index selected
@@ -563,6 +572,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                     oneToMany(itemDataBeanA, eventCrfBeanA, itemGroupMetadataBeanA, itemBeanB, itemGroupBeanB, itemGroupMetadataBeanB, eventCrfBeanB, ub);
                 for (ItemDataBean oidBasedItemData : oidBasedItemDatas) {
                     oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA));
+                    if(itemDataStatus != null) oidBasedItemData.setStatus(itemDataStatus);
                     getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd");
                 }
             }
@@ -572,6 +582,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                     oneToIndexedMany(itemDataBeanA, eventCrfBeanA, itemGroupMetadataBeanA, itemBeanB, itemGroupBeanB, itemGroupMetadataBeanB, eventCrfBeanB,
                             ub, Integer.valueOf(itemGroupBOrdinal));
                 oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA));
+                if(itemDataStatus != null) oidBasedItemData.setStatus(itemDataStatus);
                 getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd");
             }
             // If A is repeating/ non repeating group & B is a repeating group with index selected as END
@@ -579,6 +590,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                 ItemDataBean oidBasedItemData =
                     oneToEndMany(itemDataBeanA, eventCrfBeanA, itemGroupMetadataBeanA, itemBeanB, itemGroupBeanB, itemGroupMetadataBeanB, eventCrfBeanB, ub);
                 oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA));
+                if(itemDataStatus != null) oidBasedItemData.setStatus(itemDataStatus);
                 getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd");
             }
             // If A is repeating group with index & B is a repeating group with index selected
@@ -587,6 +599,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                     oneToIndexedMany(itemDataBeanA, eventCrfBeanA, itemGroupMetadataBeanA, itemBeanB, itemGroupBeanB, itemGroupMetadataBeanB, eventCrfBeanB,
                             ub, Integer.valueOf(itemGroupBOrdinal));
                 oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA));
+                if(itemDataStatus != null) oidBasedItemData.setStatus(itemDataStatus);
                 getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd");
             }
             // If A is repeating group with index & B is a repeating group with no index selected
@@ -595,6 +608,7 @@ public class DynamicsMetadataService implements MetadataServiceInterface {
                     oneToIndexedMany(itemDataBeanA, eventCrfBeanA, itemGroupMetadataBeanA, itemBeanB, itemGroupBeanB, itemGroupMetadataBeanB, eventCrfBeanB,
                             ub, Integer.valueOf(itemGroupAOrdinal));
                 oidBasedItemData.setValue(getValue(propertyBean, ruleSet, eventCrfBeanA));
+                if(itemDataStatus != null) oidBasedItemData.setStatus(itemDataStatus);
                 getItemDataDAO().updateValue(oidBasedItemData, "yyyy-MM-dd");
             }
             // If A is repeating group with index & B is none-repeating group 
