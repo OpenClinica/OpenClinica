@@ -59,7 +59,6 @@ public class ImportDataRuleRunner extends RuleRunner {
                         this.runRules(study, ub, (HashMap<String, String>)container.getVariableAndValue(), container.getRuleActionContainerMap());
                 if(messageContainer != null) {
                     messageMap.putAll(messageContainer.getByMessageType(MessageType.ERROR));
-                    messageMap.putAll(messageContainer.getByMessageType(MessageType.WARNING));
                 }
             }
         }
@@ -176,7 +175,6 @@ public class ImportDataRuleRunner extends RuleRunner {
 
                 ItemDataBean  itemData =
                     getExpressionService().getItemDataBeanFromDb(ruleActionContainer.getRuleSetBean().getTarget().getValue());
-
 
                 RuleActionBean rab =
                     ap.execute(RuleRunnerMode.IMPORT_DATA, ExecutionMode.SAVE, ruleActionContainer.getRuleAction(), itemData,

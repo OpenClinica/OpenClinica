@@ -94,30 +94,29 @@ public class ImportDataRuleRunnerContainer {
                 StudyEventBean studyEvent = (StudyEventBean)new StudyEventDAO(ds).findByStudySubjectIdAndDefinitionIdAndOrdinal(
                         studySubject.getId(), sed.getId(), Integer.valueOf(studyEventDataBean.getStudyEventRepeatKey()));
                 List<RuleSetBean> ruleSets = ruleSetService.getRuleSetsByCrfStudyAndStudyEventDefinition(studyBean, sed, crfVersion);
-                Set<String> targetItemOids = new HashSet<String>();
+                //Set<String> targetItemOids = new HashSet<String>();
                 if(ruleSets != null && !ruleSets.isEmpty()) {
                     ruleSets = filterByImportDataEntryTrue(ruleSets);
                     if(ruleSets != null && !ruleSets.isEmpty()) {
                         ruleSets = ruleSetService.filterByStatusEqualsAvailable(ruleSets);
                         ruleSets = ruleSetService.filterRuleSetsByStudyEventOrdinal(ruleSets, studyEvent, crfVersion, sed);
+                        //ruleSets = ruleSetService.filterRuleSetsByHiddenItems(ruleSets, eventCrfBean, crfVersion, new ArrayList<ItemBean>());
                         shouldRunRules = ruleSetService.shouldRunRulesForRuleSets(ruleSets, Phase.IMPORT);
                         if(shouldRunRules != null && shouldRunRules == Boolean.TRUE) {
-                            targetItemOids = collectTargetItemOids(ruleSets);
+                            //targetItemOids = collectTargetItemOids(ruleSets);
 
                             HashMap<String, Integer> grouped = new HashMap<String, Integer>();
                             ArrayList<ImportItemGroupDataBean> itemGroupDataBeans = formDataBean.getItemGroupData();
                             for (ImportItemGroupDataBean itemGroupDataBean : itemGroupDataBeans) {
                                 ArrayList<ImportItemDataBean> itemDataBeans = itemGroupDataBean.getItemData();
                                 for (ImportItemDataBean importItemDataBean : itemDataBeans) {
-                                    if(targetItemOids.contains(importItemDataBean.getItemOID())) {
+                                    //if(targetItemOids.contains(importItemDataBean.getItemOID())) {
                                         ItemBean item = new ItemDAO<String, ArrayList>(ds).findByOid(importItemDataBean.getItemOID()).get(0);
                                         String igOid = itemGroupDataBean.getItemGroupOID();
-                                        ItemGroupMetadataBean itemGroupMetadataBean =
-                                                (ItemGroupMetadataBean)new ItemGroupMetadataDAO<String, ArrayList>(ds).findByItemAndCrfVersion(item.getId(), crfVersion.getId());
+                                        Integer igOrdinal = Integer.valueOf(itemGroupDataBean.getItemGroupRepeatKey());
                                         //
                                         //logic from DataEntryServlet method: populateRuleSpecificHashMaps()
-                                        if(itemGroupMetadataBean.isRepeatingGroup()) {
-                                            Integer igOrdinal = Integer.valueOf(itemGroupDataBean.getItemGroupRepeatKey());
+                                        if(isRepeatIGForSure(ds, crfVersion.getId(), igOid, igOrdinal, item.getId())) {
                                             String key1 = igOid + "[" + igOrdinal + "]." + importItemDataBean.getItemOID();
                                             String key = igOid + "." + importItemDataBean.getItemOID();
                                             variableAndValue.put(key1, importItemDataBean.getValue());
@@ -131,7 +130,7 @@ public class ImportDataRuleRunnerContainer {
                                             grouped.put(importItemDataBean.getItemOID(), 1);
                                         }
                                         //
-                                    }
+                                    //}
                                 }
                             }
                             ruleSets = ruleSetService.solidifyGroupOrdinalsUsingFormProperties(ruleSets, grouped);
@@ -175,6 +174,19 @@ public class ImportDataRuleRunnerContainer {
             }
         }
         return itemOids;
+    }
+
+    private boolean isRepeatIGForSure(DataSource ds, Integer crfVersionId,  String itemGroupOid, Integer igOrdinal, Integer itemId) {
+        boolean isRepeatForSure = igOrdinal != null && igOrdinal > 1 ? true : false;
+        if(!isRepeatForSure) {
+            if(itemGroupOid.endsWith("_UNGROUPED") || itemGroupOid.contains("_UNGROUPED_")) isRepeatForSure = false;
+            else {
+                ItemGroupMetadataBean itemGroupMetadataBean =
+                    (ItemGroupMetadataBean)new ItemGroupMetadataDAO<String, ArrayList>(ds).findByItemAndCrfVersion(itemId, crfVersionId);
+                isRepeatForSure = itemGroupMetadataBean.isRepeatingGroup();
+            }
+        }
+        return isRepeatForSure;
     }
 
 

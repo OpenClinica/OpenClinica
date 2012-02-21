@@ -1,5 +1,6 @@
 package org.akaza.openclinica.domain.rule.action;
 
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
@@ -43,6 +44,8 @@ public class InsertActionProcessor implements ActionProcessor {
         case SAVE: {
             if (ruleRunnerMode == RuleRunnerMode.DATA_ENTRY) {
                 save(ruleAction, itemDataBean, itemData, currentStudy, ub);
+            } else if(ruleRunnerMode == RuleRunnerMode.IMPORT_DATA) {
+                saveWithStatusUpdated(ruleAction, itemDataBean, itemData, currentStudy, ub);
             } else {
                 save(ruleAction, itemDataBean, itemData, currentStudy, ub);
             }
@@ -52,15 +55,26 @@ public class InsertActionProcessor implements ActionProcessor {
         }
     }
 
+    private RuleActionBean saveWithStatusUpdated(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, StudyBean currentStudy, UserAccountBean ub) {
+        itemDataBean.setStatus(Status.UNAVAILABLE);
+        getItemMetadataService().insert(itemDataBean, ((InsertActionBean) ruleAction).getProperties(), ub, ruleSet);
+        ruleActionRunLogSaveOrUpdate(ruleAction, itemDataBean, itemData, currentStudy, ub);
+        return null;
+    }
+
     private RuleActionBean save(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, StudyBean currentStudy, UserAccountBean ub) {
         getItemMetadataService().insert(itemDataBean.getId(), ((InsertActionBean) ruleAction).getProperties(), ub, ruleSet);
+        ruleActionRunLogSaveOrUpdate(ruleAction, itemDataBean, itemData, currentStudy, ub);
+        return null;
+    }
+
+    private void ruleActionRunLogSaveOrUpdate(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, StudyBean currentStudy, UserAccountBean ub) {
         RuleActionRunLogBean ruleActionRunLog =
-            new RuleActionRunLogBean(ruleAction.getActionType(), itemDataBean, itemDataBean.getValue(), ruleSetRule.getRuleBean().getOid());
+                new RuleActionRunLogBean(ruleAction.getActionType(), itemDataBean, itemDataBean.getValue(), ruleSetRule.getRuleBean().getOid());
         if (ruleActionRunLogDao.findCountByRuleActionRunLogBean(ruleActionRunLog) > 0) {
         } else {
             ruleActionRunLogDao.saveOrUpdate(ruleActionRunLog);
         }
-        return null;
     }
 
     private RuleActionBean saveAndReturnMessage(RuleActionBean ruleAction, ItemDataBean itemDataBean, String itemData, StudyBean currentStudy,
