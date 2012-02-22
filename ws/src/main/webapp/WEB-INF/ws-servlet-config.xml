@@ -9,9 +9,6 @@
 							http://www.springframework.org/schema/util/spring-util-2.5.xsd">
 
 
-     <bean id="sharedTransactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
-        <property name="transactionManager" ref="transactionManager"/>
-     </bean>
      
      <!-- WSDL Definitions -->
 
