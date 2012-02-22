@@ -89,6 +89,19 @@
 	                            <ignore />
 	                          </action>
 	                        </pluginExecution>
+	                        <pluginExecution>
+	                          <pluginExecutionFilter>
+	                          	<groupId>org.codehaus.mojo</groupId>
+	                          	<artifactId>buildnumber-maven-plugin</artifactId>
+	                            <versionRange>[1.0.0,)</versionRange>
+	                            <goals>
+	                              <goal>hgchangeset</goal>
+	                            </goals>
+	                          </pluginExecutionFilter>
+	                          <action>
+	                            <ignore />
+	                          </action>
+	                        </pluginExecution>
 	                      </pluginExecutions>
 	                    </lifecycleMappingMetadata>
 	                  </configuration>
@@ -445,6 +458,23 @@
 			</execution>
 		  </executions>
 		</plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <version>1.0</version>
+                <executions>
+                	<execution>
+                		<phase>validate</phase>
+                		<goals>
+                			<goal>hgchangeset</goal>
+                		</goals>
+                	</execution>
+                </executions>
+                <configuration>
+                    <doCheck>true</doCheck>
+                    <doUpdate>true</doUpdate>
+                </configuration>
+            </plugin>		
         </plugins>
 
     </build>
