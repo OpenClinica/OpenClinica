@@ -246,20 +246,39 @@ public class ExpressionService {
             logger.debug("studyEvent : {} , itemOid {} , itemGroupOid {}", new Object[] { studyEventofThisExpression.getId(),
                 getItemOidFromExpression(expression), getItemGroupOidFromExpression(expression) });
 
+            //looking in db while it can be not saved yet-> first entry -> need to get from forms as well
             List<ItemDataBean> itemData =
                 getItemDataDao().findByStudyEventAndOids(Integer.valueOf(studyEventofThisExpression.getId()), getItemOidFromExpression(expression),
                         getItemGroupOidFromExpression(expression));
 
             expression = fixGroupOrdinal(expression, ruleSetExpression, itemData, expressionWrapper.getEventCrf());
-
+//htaycher: not sure what should be here -> doubt index can be != 0
             Integer index =
                 getItemGroupOidOrdinalFromExpression(expression).equals("") ? 0 : Integer.valueOf(getItemGroupOidOrdinalFromExpression(expression)) - 1;
 
-            ItemDataBean itemDataBean = itemData.get(index);
-            ItemBean itemBean = (ItemBean) getItemDao().findByPK(itemDataBean.getItemId());
-            String value = itemData.get(index).getValue();
-            value = ifValueIsDate(itemBean, value);
-
+            String valueFromDb =null;ItemBean itemBean =null;
+            if (itemData != null && itemData.size()> 0 && index <= itemData.size() ){
+	            ItemDataBean itemDataBean = itemData.get(index);
+	            itemBean = (ItemBean) getItemDao().findByPK(itemDataBean.getItemId());
+	            valueFromDb = itemData.get(index).getValue();
+	            valueFromDb=ifValueIsDate(itemBean, valueFromDb);
+            }
+            
+            String valueFromForm = null;
+            if (items == null) {
+                valueFromForm = getValueFromForm(expression);
+            } else {
+                valueFromForm = getValueFromForm(expression, items);
+            }
+          
+            logger.debug("valueFromForm : {} , valueFromDb : {}", valueFromForm, valueFromDb);
+            if (valueFromForm == null && valueFromDb == null) {
+                throw new OpenClinicaSystemException("OCRERR_0017", new Object[] { expression,
+                    expressionWrapper.getRuleSet().getTarget().getValue() });
+            }
+         
+            String value = valueFromForm == null ? valueFromDb : valueFromForm;
+            
             return value;
         } catch (Exception e) {
             return null;
@@ -316,18 +335,20 @@ public class ExpressionService {
 
     public String evaluateExpression(String expression) throws OpenClinicaSystemException {
         String value = null;
+        Map<Integer, ItemBean> itemBeansI = new HashMap<Integer, ItemBean>();
+        
+        if(items != null) {
+            Iterator<ItemBean> iter = items.values().iterator();
+            while(iter.hasNext()) {
+                ItemBean item = iter.next();
+                itemBeansI.put(item.getId(), item);
+            }
+        }
         if (expressionWrapper.getRuleSet() != null) {
             if (isExpressionPartial(expression)) {
                 String fullExpression = constructFullExpressionIfPartialProvided(expression, expressionWrapper.getRuleSet().getTarget().getValue());
                 List<ItemDataBean> itemDatas = getItemDatas(fullExpression);
-                Map<Integer, ItemBean> itemBeansI = new HashMap<Integer, ItemBean>();
-                if(items != null) {
-                    Iterator<ItemBean> iter = items.values().iterator();
-                    while(iter.hasNext()) {
-                        ItemBean item = iter.next();
-                        itemBeansI.put(item.getId(), item);
-                    }
-                }
+               
                 fullExpression =
                     fixGroupOrdinal(fullExpression, expressionWrapper.getRuleSet().getTarget().getValue(), itemDatas, expressionWrapper.getEventCrf());
                 if (checkSyntax(fullExpression)) {
