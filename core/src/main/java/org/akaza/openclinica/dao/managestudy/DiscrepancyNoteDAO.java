@@ -7,6 +7,16 @@
  */
 package org.akaza.openclinica.dao.managestudy;
 
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.EntityBean;
@@ -25,20 +35,11 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
-
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
-
-import javax.sql.DataSource;
+import org.akaza.openclinica.log.Stopwatch;
 
 /**
  * @author jxu
- * 
+ *
  *         TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style - Code Templates
  */
 public class DiscrepancyNoteDAO extends AuditableEntityDAO {
@@ -394,6 +395,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         }
     }
 
+    /*
     public ArrayList<DiscrepancyNoteBean> getViewNotesWithFilterAndSort(StudyBean currentStudy, ListNotesFilter filter, ListNotesSort sort, int rowStart,
             int rowEnd) {
         ArrayList<DiscrepancyNoteBean> discNotes = new ArrayList<DiscrepancyNoteBean>();
@@ -458,8 +460,10 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         }
         return discNotes;
     }
+    */
 
     public ArrayList<DiscrepancyNoteBean> getViewNotesWithFilterAndSort(StudyBean currentStudy, ListNotesFilter filter, ListNotesSort sort) {
+        Stopwatch sw = Stopwatch.createAndStart("getViewNotesWithFilterAndSort");
         ArrayList<DiscrepancyNoteBean> discNotes = new ArrayList<DiscrepancyNoteBean>();
         setTypesExpected();
         this.setTypeExpected(12, TypeNames.STRING);
@@ -513,6 +517,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
             discBean = findSingleMapping(discBean);
             discNotes.add(discBean);
         }
+        sw.stop();
         return discNotes;
     }
 
@@ -942,7 +947,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
     /**
      * Find all DiscrepancyNoteBeans associated with a certain Study Subject and Study.
-     * 
+     *
      * @param study
      *            A StudyBean, whose id property is checked.
      * @param studySubjectId
@@ -1157,7 +1162,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         variables.put(Integer.valueOf(8), Integer.valueOf(eventCRFBean.getId()));
         variables.put(Integer.valueOf(9), Integer.valueOf(eventCRFBean.getId()));
         variables.put(Integer.valueOf(10), Integer.valueOf(eventCRFBean.getId()));
-        
+
         dNotelist = this.select(digester.getQuery("findEventCRFDNotesForToolTips"), variables);
 
         ArrayList<DiscrepancyNoteBean> returnedNotelist = new ArrayList<DiscrepancyNoteBean>();
@@ -1470,7 +1475,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
         if (isQuerySuccessful()) {
             dnb.setActive(true);
-        } 
+        }
 
         return dnb;
     }
@@ -1494,7 +1499,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
         return dnb;
     }
-    
+
     public EntityBean updateAssignedUserToNull(EntityBean eb) {
         // update discrepancy_note set
         // assigned_user_id = null
@@ -1841,7 +1846,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
             DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
             al.add(eb);
         }
-        
+
 //        alist = this.select(digester.getQuery("findParentNotesForToolTip"), variables);
 //         it = alist.iterator();
 //        while (it.hasNext()) {
@@ -1858,7 +1863,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         HashMap variables = new HashMap();
         variables.put(Integer.valueOf(1), Integer.valueOf(itemDataId));
         variables.put(Integer.valueOf(2), Integer.valueOf(itemDataId));
-       
+
         alist = this.select(digester.getQuery("findParentNotesForToolTip"), variables);
         ArrayList<DiscrepancyNoteBean> al = new ArrayList<DiscrepancyNoteBean>();
         Iterator it = alist.iterator();
@@ -1959,7 +1964,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         HashMap variables = new HashMap();
         variables.put(Integer.valueOf(1), Integer.valueOf(subjectId));
         variables.put(Integer.valueOf(2), new String(column));
-        
+
         String sql = digester.getQuery("getResolutionStatusIdForSubjectDNFlag");
         ArrayList alist = this.select(sql, variables);
         Iterator it = alist.iterator();
@@ -1972,7 +1977,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         }
         return id;
     }
-    
+
     //Yufang code, addded by Jamuna
     public Integer getViewNotesCountWithFilter(Integer assignedUserId, Integer studyId) {
         this.unsetTypeExpected();
