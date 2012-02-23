@@ -45,7 +45,7 @@ public class ImportDataRuleRunnerContainer {
     private HashMap<String, ArrayList<RuleActionContainer>> RuleActionContainerMap;
     private List<RuleSetBean> importDataTrueRuleSets;
     /**
-     * Key is target full expression; Value is item data value to be imported.
+     * Key is full expression; Value is item data value to be imported.
      */
     private Map<String, String> variableAndValue;
     private String studyOid;
@@ -53,7 +53,8 @@ public class ImportDataRuleRunnerContainer {
     private Boolean shouldRunRules;
 
     /**
-     * Populate importDataTrueRuleSets and variableAndValue
+     * Populate importDataTrueRuleSets and variableAndValue.
+     * Precondition: import data file passed validation which means all OIDs are not empty.
      * @param ds
      * @param studyBean
      * @param subjectDataBean
@@ -91,8 +92,10 @@ public class ImportDataRuleRunnerContainer {
                     crfVersion = new CRFVersionDAO<String, ArrayList>(ds).findByOid(cvOid);
                     cvs.put(cvOid, crfVersion);
                 }
+                String sedOrd = studyEventDataBean.getStudyEventRepeatKey();
+                Integer sedOrdinal = sedOrd != null && !sedOrd.isEmpty() ? Integer.valueOf(sedOrd) : 1;
                 StudyEventBean studyEvent = (StudyEventBean)new StudyEventDAO(ds).findByStudySubjectIdAndDefinitionIdAndOrdinal(
-                        studySubject.getId(), sed.getId(), Integer.valueOf(studyEventDataBean.getStudyEventRepeatKey()));
+                        studySubject.getId(), sed.getId(), sedOrdinal);
                 List<RuleSetBean> ruleSets = ruleSetService.getRuleSetsByCrfStudyAndStudyEventDefinition(studyBean, sed, crfVersion);
                 //Set<String> targetItemOids = new HashSet<String>();
                 if(ruleSets != null && !ruleSets.isEmpty()) {
@@ -113,7 +116,8 @@ public class ImportDataRuleRunnerContainer {
                                     //if(targetItemOids.contains(importItemDataBean.getItemOID())) {
                                         ItemBean item = new ItemDAO<String, ArrayList>(ds).findByOid(importItemDataBean.getItemOID()).get(0);
                                         String igOid = itemGroupDataBean.getItemGroupOID();
-                                        Integer igOrdinal = Integer.valueOf(itemGroupDataBean.getItemGroupRepeatKey());
+                                        String igOrd = itemGroupDataBean.getItemGroupRepeatKey();
+                                        Integer igOrdinal = igOrd != null && !igOrd.isEmpty() ? Integer.valueOf(igOrd) : 1;
                                         //
                                         //logic from DataEntryServlet method: populateRuleSpecificHashMaps()
                                         if(isRepeatIGForSure(ds, crfVersion.getId(), igOid, igOrdinal, item.getId())) {
