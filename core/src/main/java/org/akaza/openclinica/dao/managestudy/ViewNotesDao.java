@@ -20,7 +20,7 @@ import org.akaza.openclinica.service.managestudy.ViewNotesSortCriteria;
  */
 public interface ViewNotesDao {
 
-    List<DiscrepancyNoteBean> listNotes(StudyBean currentStudy, ViewNotesFilterCriteria filter,
+    List<DiscrepancyNoteBean> findAllDiscrepancyNotes(StudyBean currentStudy, ViewNotesFilterCriteria filter,
             ViewNotesSortCriteria sort);
 
 

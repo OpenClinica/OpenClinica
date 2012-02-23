@@ -16,6 +16,7 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.Resource;
@@ -44,7 +45,7 @@ public class QueryStore implements Serializable, ResourceLoaderAware {
             for (Resource r : resources) {
                 Properties p = new Properties();
                 p.load(r.getInputStream());
-                fileByName.put(r.getFilename(), p);
+                fileByName.put(StringUtils.substringBeforeLast(r.getFilename(), "."), p);
             }
         } catch (IOException e) {
             throw new BeanInitializationException("Unable to read files from directory 'classpath:queries/" + dbFolder

@@ -117,6 +117,7 @@
   
   <bean id="viewNotesDao" class="org.akaza.openclinica.dao.managestudy.ViewNotesDaoImpl">
     <property name="dataSource" ref="dataSource"/>
+    <property name="queryStore" ref="queryStore"/>
   </bean>
   
 </beans>

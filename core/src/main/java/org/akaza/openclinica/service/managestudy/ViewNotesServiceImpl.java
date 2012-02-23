@@ -30,7 +30,7 @@ public class ViewNotesServiceImpl implements ViewNotesService {
     public List<DiscrepancyNoteBean> listNotes(StudyBean currentStudy,
             ViewNotesFilterCriteria filter, ViewNotesSortCriteria sort) {
         Stopwatch sw = Stopwatch.createAndStart("listNotes");
-        List<DiscrepancyNoteBean> result = viewNotesDao.listNotes(currentStudy, filter, sort);
+        List<DiscrepancyNoteBean> result = viewNotesDao.findAllDiscrepancyNotes(currentStudy, filter, sort);
         sw.stop();
         return result;
     }
