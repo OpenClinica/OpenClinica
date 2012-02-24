@@ -1,23 +1,5 @@
 package org.akaza.openclinica.web.job;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.admin.TriggerBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
@@ -71,6 +53,24 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+import javax.sql.DataSource;
 
 /**
  * Import Spring Job, a job running asynchronously on the Tomcat server using Spring and Quartz.
@@ -177,18 +177,22 @@ public class ImportSpringJob extends QuartzJobBean {
             	studyBean = (StudyBean) studyDAO.findByName(studyName);
             }
             // might also need study id here for the data service?
-            File fileDirectory = new File(IMPORT_DIR);
+            File fileDirectory = new File(SQLInitServlet.getField("filePath") + DIR_PATH + File.separator);
+            //File fileDirectory = new File(IMPORT_DIR);
             if ("".equals(directory)) { // avoid NPEs
                 // do nothing here?
             } else {
                 // there is a separator at the end of IMPORT_DIR already...
-                fileDirectory = new File(IMPORT_DIR + directory + File.separator);
+                //fileDirectory = new File(IMPORT_DIR + directory + File.separator);
+                fileDirectory = new File(SQLInitServlet.getField("filePath") + DIR_PATH + File.separator
+                        + directory + File.separator);
             }
             if (!fileDirectory.isDirectory()) {
                 fileDirectory.mkdirs();
             }
             // this is necessary the first time this is run, tbh
-            File destDirectory = new File(IMPORT_DIR_2);
+            //File destDirectory = new File(IMPORT_DIR_2);
+            File destDirectory = new File(SQLInitServlet.getField("filePath") + DEST_DIR + File.separator);
             if (!destDirectory.isDirectory()) {
                 destDirectory.mkdirs();
             }
@@ -196,7 +200,8 @@ public class ImportSpringJob extends QuartzJobBean {
             // read them
             // File fileDirectory = new File(directory);
             String[] files = fileDirectory.list();
-            System.out.println("found " + files.length + " files under directory " + IMPORT_DIR + directory);
+            System.out.println("found " + files.length + " files under directory "
+                    + SQLInitServlet.getField("filePath") + DIR_PATH + File.separator + directory);
             File[] target = new File[files.length];
             File[] destination = new File[files.length];
             int placeHolder = 0;
@@ -216,7 +221,8 @@ public class ImportSpringJob extends QuartzJobBean {
                         target[i] = f;// new File(IMPORT_DIR +
                         // directory +
                         // File.separator + files[i]);
-                        destination[i] = new File(IMPORT_DIR_2 + files[i]);
+                        //destination[i] = new File(IMPORT_DIR_2 + files[i]);
+                        destination[i] = new File(SQLInitServlet.getField("filePath") + DEST_DIR + File.separator + files[i]);
                     }
                     // target[i] = new File(IMPORT_DIR + directory +
                     // File.separator + files[i]);
