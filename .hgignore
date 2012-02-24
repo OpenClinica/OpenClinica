@@ -5,5 +5,4 @@ syntax: glob
 *.settings/*
 *.externalToolBuilders/*
 *.springBeans
-ws/src/main/resources/datainfo.properties
-web/src/main/resources/datainfo.properties
+*.pmd

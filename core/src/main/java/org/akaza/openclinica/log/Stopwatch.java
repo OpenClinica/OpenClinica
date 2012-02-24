@@ -21,7 +21,7 @@ public class Stopwatch {
     private static final Logger LOG = LoggerFactory.getLogger(Stopwatch.class.getName());
 
     private static final String START_LABEL = "START: %s";
-    private static final String STOP_LABEL  = "STOP:  %s - %.2fs";
+    private static final String STOP_LABEL  = "STOP:  %s - %dm %.2fs";
 
     private final String name;
 
@@ -47,7 +47,7 @@ public class Stopwatch {
     public void stop() {
         if (LOG.isDebugEnabled()) {
             long totalTime = System.currentTimeMillis() - startTime;
-            LOG.debug(String.format(STOP_LABEL, name, (float) totalTime / 1000));
+            LOG.debug(String.format(STOP_LABEL, name, totalTime / 60000,  (float) (totalTime % 60000) / 1000));
         }
     }
 

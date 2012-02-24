@@ -1856,7 +1856,8 @@ public class OdmExtractDAO extends DatasetDAO {
                     } else {
                         auditLog.setOldValue(Status.getFromMap(Integer.parseInt(oldValue)).getName());
                     }
-                } else if (typeId == 32) {
+                } //Fix for 0011675: SDV'ed subject is dipslayed as not SDV'ed in the 1.3 Full ODM Extract commenting out the following lines as these are treated like booleans while they are strings
+                /* else if (typeId == 32) {
                     if ("1".equals(newValue)) {
                         auditLog.setNewValue("TRUE");
                     } else {
@@ -1867,7 +1868,7 @@ public class OdmExtractDAO extends DatasetDAO {
                     } else {
                         auditLog.setOldValue("FALSE");
                     }
-                } else {
+                }*/ else {
                     auditLog.setNewValue(newValue);
                     auditLog.setOldValue(oldValue);
                 }
