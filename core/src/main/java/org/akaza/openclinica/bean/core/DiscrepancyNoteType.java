@@ -7,7 +7,6 @@
  */
 package org.akaza.openclinica.bean.core;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -24,7 +23,7 @@ public class DiscrepancyNoteType extends Term {
 
     public static final DiscrepancyNoteType FAILEDVAL = new DiscrepancyNoteType(1, "Failed_Validation_Check", null);
 
-    //public static final DiscrepancyNoteType INCOMPLETE = new DiscrepancyNoteType(2, "Incomplete", null);   
+    //public static final DiscrepancyNoteType INCOMPLETE = new DiscrepancyNoteType(2, "Incomplete", null);
 
     //public static final DiscrepancyNoteType UNCLEAR = new DiscrepancyNoteType(3, "Unclear/Unreadable", null);
 
@@ -37,10 +36,10 @@ public class DiscrepancyNoteType extends Term {
     //public static final DiscrepancyNoteType OTHER = new DiscrepancyNoteType(5, "Other", null);
 
     //private static final DiscrepancyNoteType[] members = { FAILEDVAL, INCOMPLETE, UNCLEAR, ANNOTATION, QUERY, REASON_FOR_CHANGE, OTHER };
-    
+
     private static final DiscrepancyNoteType[] members = { FAILEDVAL, ANNOTATION, QUERY, REASON_FOR_CHANGE };
 
-    public static final List list = Arrays.asList(members);
+    public static final List<DiscrepancyNoteType> list = Arrays.asList(members);
 
     private List privileges;
 
@@ -62,16 +61,12 @@ public class DiscrepancyNoteType extends Term {
 
     public static DiscrepancyNoteType getByName(String name) {
         for (int i = 0; i < list.size(); i++) {
-            DiscrepancyNoteType temp = (DiscrepancyNoteType) list.get(i);
+            DiscrepancyNoteType temp = list.get(i);
             if (temp.getName().equals(name)) {
                 return temp;
             }
         }
         return INVALID;
-    }
-
-    public static ArrayList toArrayList() {
-        return new ArrayList(list);
     }
 
     public boolean hasPrivilege(Privilege p) {

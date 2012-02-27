@@ -9,13 +9,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
-import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -49,11 +46,9 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.log.Stopwatch;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
+import org.akaza.openclinica.service.managestudy.ViewNotesFilterCriteria;
 import org.akaza.openclinica.service.managestudy.ViewNotesService;
-import org.jmesa.core.filter.DateFilterMatcher;
 import org.jmesa.core.filter.FilterMatcher;
-import org.jmesa.core.filter.MatcherKey;
-import org.jmesa.core.filter.StringFilterMatcher;
 import org.jmesa.facade.TableFacade;
 import org.jmesa.limit.Filter;
 import org.jmesa.limit.FilterSet;
@@ -65,8 +60,12 @@ import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.editor.DateCellEditor;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ListNotesTableFactory extends AbstractTableFactory {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ListNotesTableFactory.class.getName());
 
     private AuditUserLoginDao auditUserLoginDao;
     private StudySubjectDAO studySubjectDao;
@@ -145,24 +144,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     }
 
     @Override
-    public void configureTableFacade(HttpServletResponse response, TableFacade tableFacade) {
-        super.configureTableFacade(response, tableFacade);
-        tableFacade.addFilterMatcher(new MatcherKey(Date.class, "discrepancyNoteBean.createdDate"), new DateFilterMatcher(getDateFormat()));
-        tableFacade.addFilterMatcher(new MatcherKey(Date.class, "discrepancyNoteBean.updatedDate"), new DateFilterMatcher(getDateFormat()));
-        tableFacade.addFilterMatcher(new MatcherKey(UserAccountBean.class, "discrepancyNoteBean.user"), new GenericFilterMatecher());
-        tableFacade.addFilterMatcher(new MatcherKey(UserAccountBean.class, "studySubject.label"), new GenericFilterMatecher());
-        tableFacade.addFilterMatcher(new MatcherKey(String.class, "eventName"), new StringFilterMatcher());
-        tableFacade.addFilterMatcher(new MatcherKey(String.class, "crfName"), new StringFilterMatcher());
-        //tableFacade.addFilterMatcher(new MatcherKey(String.class, "crfStatus"), new StringFilterMatcher());
-        tableFacade.addFilterMatcher(new MatcherKey(String.class, "entityName"), new StringFilterMatcher());
-        tableFacade.addFilterMatcher(new MatcherKey(String.class, "entityValue"), new StringFilterMatcher());
-        tableFacade.addFilterMatcher(new MatcherKey(String.class, "age"), new AgeDaysFilterMatcher());
-        tableFacade.addFilterMatcher(new MatcherKey(String.class, "days"), new AgeDaysFilterMatcher());
-        tableFacade.addFilterMatcher(new MatcherKey(String.class, "discrepancyNoteBean.disType"), new DNTypeFilterMatcher());
-        tableFacade.addFilterMatcher(new MatcherKey(String.class, "discrepancyNoteBean.resolutionStatus"), new DNResolutionStatusFilterMatcher());
-    }
-
-    @Override
     public void configureTableFacadePostColumnConfiguration(TableFacade tableFacade) {
         ListNotesTableToolbar toolbar = new ListNotesTableToolbar(showMoreLink);
         tableFacade.setToolbar(toolbar);
@@ -183,11 +164,13 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         resformat = ResourceBundleProvider.getFormatBundle(getLocale());
 
         Limit limit = tableFacade.getLimit();
+
         ListNotesFilter listNotesFilter = getListNoteFilter(limit);
         ListNotesSort listNotesSort = getListSubjectSort(limit);
 
         //ArrayList<DiscrepancyNoteBean> items = getDiscrepancyNoteDao().getViewNotesWithFilterAndSort(getCurrentStudy(), listNotesFilter, listNotesSort);
-        List<DiscrepancyNoteBean> items = getViewNotesService().listNotes(getCurrentStudy(), null, null);
+        List<DiscrepancyNoteBean> items = getViewNotesService().listNotes(getCurrentStudy(),
+                ViewNotesFilterCriteria.buildFilterCriteria(limit.getFilterSet(), getDateFormat()), null);
         //this.setAllNotes(populateRowsWithAttachedData(items));
         this.setAllNotes(items);
         this.setAllNotes(DiscrepancyNoteUtil.customFilter(allNotes, listNotesFilter));
@@ -205,8 +188,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         Collection<HashMap<Object, Object>> theItems = new ArrayList<HashMap<Object, Object>>();
 
         for (DiscrepancyNoteBean discrepancyNoteBean : allNotes) {
-            Stopwatch sw1 = Stopwatch.createAndStart("discrepancyNoteBean = " + discrepancyNoteBean.getId() );
-            UserAccountBean owner = (UserAccountBean) getUserAccountDao().findByPK(discrepancyNoteBean.getOwnerId());
 
             HashMap<Object, Object> h = new HashMap<Object, Object>();
 
@@ -216,7 +197,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             h.put("discrepancyNoteBean.resolutionStatus", discrepancyNoteBean.getResStatus());
             h.put("age", discrepancyNoteBean.getResolutionStatusId()==5?null:discrepancyNoteBean.getAge());
             h.put("days", discrepancyNoteBean.getResolutionStatusId()==4 || discrepancyNoteBean.getResolutionStatusId()==5?null:discrepancyNoteBean.getDays());
-            h.put("siteId", discrepancyNoteBean.getStudySub().getStudyName());
+            h.put("siteId", discrepancyNoteBean.getSiteId());
             h.put("discrepancyNoteBean", discrepancyNoteBean);
             h.put("discrepancyNoteBean.createdDate", discrepancyNoteBean.getCreatedDate());
             h.put("discrepancyNoteBean.updatedDate", discrepancyNoteBean.getUpdatedDate());
@@ -232,11 +213,10 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             h.put("numberOfNotes", discrepancyNoteBean.getNumChildren());
             h.put("discrepancyNoteBean.user", discrepancyNoteBean.getAssignedUser());
             h.put("discrepancyNoteBean.entityType", discrepancyNoteBean.getEntityType());
-            h.put("discrepancyNoteBean.owner", owner);
+            h.put("discrepancyNoteBean.owner", discrepancyNoteBean.getOwner());
 
             theItems.add(h);
             setStudyHasDiscNotes(true);
-            sw1.stop();
         }
         tableFacade.setItems(theItems);
         sw.stop();
@@ -535,8 +515,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         protected List<Option> getOptions() {
             List<Option> options = new ArrayList<Option>();
             ResourceBundle reterm = ResourceBundleProvider.getTermsBundle();
-            for (Object status : ResolutionStatus.toArrayList()) {
-                options.add(new Option(((ResolutionStatus) status).getName(), ((ResolutionStatus) status).getName()));
+            for (ResolutionStatus status : ResolutionStatus.list) {
+                options.add(new Option(Integer.toString(status.getId()), status.getName()));
             }
             options.add(new Option(reterm.getString("New_and_Updated"), reterm.getString("New_and_Updated")));
             return options;
@@ -548,72 +528,11 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         protected List<Option> getOptions() {
             List<Option> options = new ArrayList<Option>();
             ResourceBundle reterm = ResourceBundleProvider.getTermsBundle();
-            for (Object type : DiscrepancyNoteType.toArrayList()) {
-                options.add(new Option(((DiscrepancyNoteType) type).getName(), ((DiscrepancyNoteType) type).getName()));
+            for (DiscrepancyNoteType type : DiscrepancyNoteType.list) {
+                options.add(new Option(Integer.toString(type.getId()), type.getName()));
             }
             options.add(new Option(reterm.getString("Query_and_Failed_Validation_Check"), reterm.getString("Query_and_Failed_Validation_Check")));
             return options;
-        }
-    }
-
-    private class AssignedUserDroplistFilterEditor extends DroplistFilterEditor {
-        @Override
-        protected List<Option> getOptions() {
-            List<Option> options = new ArrayList<Option>();
-            Collection currentStudyUsers = userAccountDao.findAll();
-            for (Object type : currentStudyUsers) {
-                options.add(new Option(String.valueOf(((UserAccountBean) type).getId()), ((UserAccountBean) type).getName()));
-            }
-            return options;
-        }
-    }
-
-    private class GenericFilterMatecher implements FilterMatcher {
-        public boolean evaluate(Object itemValue, String filterValue) {
-            return true;
-        }
-    }
-
-    private class DNTypeFilterMatcher implements FilterMatcher {
-        public boolean evaluate(Object itemValue, String filterValue) {
-            int itemDNTypeId = ((DiscrepancyNoteType)itemValue).getId();
-            /* int filterDNTypeId = Integer.valueOf(DiscrepancyNoteType.getByName(filterValue)).intValue();
-            if(filterDNTypeId==31) {
-                return itemDNTypeId==1 || itemDNTypeId==3;
-            } else {
-                return itemDNTypeId == filterDNTypeId;
-            } */
-            ResourceBundle reterm = ResourceBundleProvider.getTermsBundle();
-            if(reterm.getString("Query_and_Failed_Validation_Check").equals(filterValue)) {
-                return itemDNTypeId==1 || itemDNTypeId==3;
-            } else {
-                return itemDNTypeId == DiscrepancyNoteType.getByName(filterValue).getId();
-            }
-        }
-    }
-
-    private class DNResolutionStatusFilterMatcher implements FilterMatcher {
-        public boolean evaluate(Object itemValue, String filterValue) {
-            int itemDNTypeId = ((ResolutionStatus)itemValue).getId();
-            ResourceBundle reterm = ResourceBundleProvider.getTermsBundle();
-            if(reterm.getString("New_and_Updated").equals(filterValue)) {
-                return itemDNTypeId==1 || itemDNTypeId==2;
-            } else {
-                return itemDNTypeId == ResolutionStatus.getByName(filterValue).getId();
-            }
-        }
-    }
-
-    private class EventCRFStatusFilterMatcher implements FilterMatcher {
-        public boolean evaluate(Object itemValue, String filterValue) {
-            if (itemValue == null || filterValue == null) {
-                return false;
-            }
-            if (((String)itemValue).trim().startsWith(filterValue.trim())) {
-                return true;
-            }
-
-            return false;
         }
     }
 
@@ -643,19 +562,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         }
     }
 
-    private class StatusCellEditor implements CellEditor {
-        @SuppressWarnings("unchecked")
-        public Object getValue(Object item, String property, int rowcount) {
-            String value = "";
-            Status status = (Status) ((HashMap<Object, Object>) item).get("subject.status");
-
-            if (status != null) {
-                value = status.getName();
-            }
-            return value;
-        }
-    }
-
     private class OwnerCellEditor implements CellEditor {
         @SuppressWarnings("unchecked")
         public Object getValue(Object item, String property, int rowcount) {
@@ -669,33 +575,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         }
     }
 
-//    private class AgeCellEditor implements CellEditor {
-//        @SuppressWarnings("unchecked")
-//        public Object getValue(Object item, String property, int rowcount) {
-//            String value = "";
-//            int age = (Integer) ((HashMap<Object, Object>) item).get("age");
-//
-//            if (age != 0) {
-//                value = age + "";
-//            }
-//            return value;
-//        }
-//    }
-//    private class DaysCellEditor implements CellEditor {
-//        @SuppressWarnings("unchecked")
-//        public Object getValue(Object item, String property, int rowcount) {
-//            String value = "";
-//            int days = (Integer) ((HashMap<Object, Object>) item).get("days");
-//
-//            if (days != 0) {
-//                value = days + "";
-//            }
-//            return value;
-//        }
-//    }
-
-
-
     private class AssignedUserCellEditor implements CellEditor {
         @SuppressWarnings("unchecked")
         public Object getValue(Object item, String property, int rowcount) {
@@ -704,19 +583,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
             if (user != null) {
                 value = user.getFirstName() + " " + user.getLastName() + " (" + user.getName() + ")";
-            }
-            return value;
-        }
-    }
-
-    private class UpdaterCellEditor implements CellEditor {
-        @SuppressWarnings("unchecked")
-        public Object getValue(Object item, String property, int rowcount) {
-            String value = "";
-            UserAccountBean user = (UserAccountBean) ((HashMap<Object, Object>) item).get("subject.updater");
-
-            if (user != null) {
-                value = user.getName();
             }
             return value;
         }
@@ -789,59 +655,12 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         return actionLink.toString();
     }
 
-    private String updateSubjectLink(Integer subjectId) {
-        HtmlBuilder builder = new HtmlBuilder();
-        builder.a().href("UpdateSubject?action=show&id=" + subjectId);
-        builder.onmouseout("javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');");
-        builder.onmouseover("javascript:setImage('bt_Edit1','images/bt_Edit.gif');");
-        builder.close();
-        builder.img().name("bt_Edit1").src("images/bt_Edit.gif").border("0").alt(resword.getString("edit")).title(resword.getString("edit")).align("left")
-                .append("hspace=\"6\"").close();
-        builder.aEnd();
-        return builder.toString();
-    }
-
-    private String removeSubjectLink(Integer subjectId) {
-        HtmlBuilder builder = new HtmlBuilder();
-        builder.a().href("RemoveSubject?action=confirm&id=" + subjectId);
-        builder.onmouseout("javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');");
-        builder.onmouseover("javascript:setImage('bt_Remove1','images/bt_Remove.gif');");
-        builder.close();
-        builder.img().name("bt_Remove1").src("images/bt_Remove.gif").border("0").alt(resword.getString("remove")).title(resword.getString("remove"))
-                .align("left").append("hspace=\"6\"").close();
-        builder.aEnd();
-        return builder.toString();
-    }
-
-    private String viewSubjectLink(Integer subjectId) {
-        HtmlBuilder builder = new HtmlBuilder();
-        builder.a().href("UpdateSubject?action=show&id=" + subjectId);
-        builder.onmouseout("javascript:setImage('bt_View1','images/bt_View_d.gif');");
-        builder.onmouseover("javascript:setImage('bt_View1','images/bt_View.gif');");
-        builder.close();
-        builder.img().name("bt_View1").src("images/bt_View.gif").border("0").alt(resword.getString("view")).title(resword.getString("view")).align("left")
-                .append("hspace=\"6\"").close();
-        builder.aEnd();
-        return builder.toString();
-    }
-
-    private String restoreSubjectLink(Integer subjectId) {
-        HtmlBuilder builder = new HtmlBuilder();
-        builder.a().href("RestoreSubject?action=confirm&id=" + subjectId);
-        builder.onmouseout("javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');");
-        builder.onmouseover("javascript:setImage('bt_Restore3','images/bt_Restore.gif');");
-        builder.close();
-        builder.img().name("bt_Restore3").src("images/bt_Restore.gif").border("0").alt(resword.getString("restore")).title(resword.getString("restore"))
-                .align("left").append("hspace=\"6\"").close();
-        builder.aEnd();
-        return builder.toString();
-    }
     // Ignore the mathing values with filter
     public class AgeDaysFilterMatcher implements FilterMatcher {
-    public boolean evaluate(Object itemValue, String filterValue) {
-        return true;
+        public boolean evaluate(Object itemValue, String filterValue) {
+            return true;
+        }
     }
-}
 
     private String formatDate(Date date) {
         String format = resformat.getString("date_format_string");
@@ -1024,6 +843,5 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     public void setViewNotesService(ViewNotesService viewNotesService) {
         this.viewNotesService = viewNotesService;
     }
-
 
 }
