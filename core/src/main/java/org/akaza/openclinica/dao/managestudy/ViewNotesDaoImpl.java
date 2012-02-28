@@ -99,21 +99,36 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
     public List<DiscrepancyNoteBean> findAllDiscrepancyNotes(StudyBean currentStudy, ViewNotesFilterCriteria filter,
             ViewNotesSortCriteria sort) {
         Map<String, Object> arguments = listNotesArguments(currentStudy);
-        List<DiscrepancyNoteBean> result = getNamedParameterJdbcTemplate().query(listNotesSql(filter, arguments),
+        List<DiscrepancyNoteBean> result = getNamedParameterJdbcTemplate().query(listNotesSql(filter, sort, arguments),
                 arguments,
                 DISCREPANCY_NOTE_ROW_MAPPER);
         return result;
     }
 
-    protected String listNotesSql(ViewNotesFilterCriteria filter, Map<String, Object> arguments) {
+    protected String listNotesSql(ViewNotesFilterCriteria filter, ViewNotesSortCriteria sort,
+            Map<String, Object> arguments) {
         List<String> terms = new ArrayList<String>();
         terms.add(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.main"));
 
         // Append query filters
-        for (String filterKey : filter.getFilters().keySet()) {
-            String filterQuery = queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.filter." + filterKey);
-            terms.add(filterQuery);
-            arguments.put(filterKey, filter.getFilters().get(filterKey));
+        if (filter != null) {
+            for (String filterKey : filter.getFilters().keySet()) {
+                String filterQuery = queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.filter." + filterKey);
+                terms.add(filterQuery);
+                arguments.put(filterKey, filter.getFilters().get(filterKey));
+            }
+        }
+
+        // Append sort criteria
+        if (sort != null) {
+            if (!sort.getSorters().isEmpty()) {
+                terms.add(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.orderby"));
+            }
+            for (String sortKey : sort.getSorters().keySet()) {
+                String sortQuery = queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.sort." + sortKey);
+                terms.add(sortQuery);
+                terms.add(sort.getSorters().get(sortKey));
+            }
         }
 
         // Limit number of results (pagination)

@@ -9,24 +9,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
-import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
-import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -48,6 +39,7 @@ import org.akaza.openclinica.log.Stopwatch;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.service.managestudy.ViewNotesFilterCriteria;
 import org.akaza.openclinica.service.managestudy.ViewNotesService;
+import org.akaza.openclinica.service.managestudy.ViewNotesSortCriteria;
 import org.jmesa.core.filter.FilterMatcher;
 import org.jmesa.facade.TableFacade;
 import org.jmesa.limit.Filter;
@@ -168,10 +160,10 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         ListNotesFilter listNotesFilter = getListNoteFilter(limit);
         ListNotesSort listNotesSort = getListSubjectSort(limit);
 
-        //ArrayList<DiscrepancyNoteBean> items = getDiscrepancyNoteDao().getViewNotesWithFilterAndSort(getCurrentStudy(), listNotesFilter, listNotesSort);
         List<DiscrepancyNoteBean> items = getViewNotesService().listNotes(getCurrentStudy(),
-                ViewNotesFilterCriteria.buildFilterCriteria(limit.getFilterSet(), getDateFormat()), null);
-        //this.setAllNotes(populateRowsWithAttachedData(items));
+                ViewNotesFilterCriteria.buildFilterCriteria(limit.getFilterSet(), getDateFormat()),
+                ViewNotesSortCriteria.buildFilterCriteria(limit.getSortSet()));
+
         this.setAllNotes(items);
         this.setAllNotes(DiscrepancyNoteUtil.customFilter(allNotes, listNotesFilter));
 
@@ -221,220 +213,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         tableFacade.setItems(theItems);
         sw.stop();
 
-    }
-
-    private ArrayList<DiscrepancyNoteBean> populateRowsWithAttachedData(ArrayList noteRows) {
-        Stopwatch sw = Stopwatch.createAndStart("populateRowsWithAttachedData");
-        DiscrepancyNoteDAO dndao = getDiscrepancyNoteDao();
-        ArrayList<DiscrepancyNoteBean> allNotes = new ArrayList<DiscrepancyNoteBean>();
-
-        for (int i = 0; i < noteRows.size(); i++) {
-            Stopwatch sw1 = Stopwatch.createAndStart("DiscrepancyNoteBean #" + i);
-            // DiscrepancyNoteRow dnr = (DiscrepancyNoteRow) noteRows.get(i);
-            DiscrepancyNoteBean dnb = (DiscrepancyNoteBean) noteRows.get(i);
-            dnb.setAssignedUser((UserAccountBean) getUserAccountDao().findByPK(dnb.getAssignedUserId()));
-            if (dnb.getParentDnId() == 0) {
-                // System.out.println("running query on study id " + currentStudy.getId() + " and dnb " + dnb.getId());
-                ArrayList children = dndao.findAllByStudyAndParent(currentStudy, dnb.getId());
-                // dnr.setNumChildren(children.size());
-                dnb.setNumChildren(children.size());
-
-                for (int j = 0; j < children.size(); j++) {
-                    DiscrepancyNoteBean child = (DiscrepancyNoteBean) children.get(j);
-
-                    /*
-                     * if (child.getResolutionStatusId() > dnb.getResolutionStatusId()) { // dnr.setStatus(ResolutionStatus.get(child. //
-                     * getResolutionStatusId())); dnb.setResStatus(ResolutionStatus.get(child.getResolutionStatusId())); }
-                     */
-                    /*
-                     * The update date is the date created of the latest child note
-                     */
-                    // dnb.setUpdatedDate(((DiscrepancyNoteBean) children.get(0)).getCreatedDate());
-                    dnb.setUpdatedDate(child.getCreatedDate());
-                    // << one line change tbh, 02/2010
-                    // the previous line didnt work since we always create two notes on creation.
-                }
-            }
-
-            String entityType = dnb.getEntityType();
-            Stopwatch sw2 = Stopwatch.createAndStart("EntityType: " + entityType);
-            if (dnb.getEntityId() > 0 && !entityType.equals("")) {
-                AuditableEntityBean aeb = dndao.findEntity(dnb);
-                dnb.setEntityName(aeb.getName());
-                if (entityType.equalsIgnoreCase("subject")) {
-//                    allNotes.add(dnb);
-                    SubjectBean sb = (SubjectBean) aeb;
-                    StudySubjectBean ssb = studySubjectDao.findBySubjectIdAndStudy(sb.getId(), currentStudy);
-                    dnb.setStudySub(ssb);
-                    String column = dnb.getColumn().trim();
-                    if (!StringUtil.isBlank(column)) {
-                        if ("gender".equalsIgnoreCase(column)) {
-                            dnb.setEntityValue(sb.getGender() + "");
-                            dnb.setEntityName(resword.getString("gender"));
-                        } else if ("date_of_birth".equals(column)) {
-                            if (sb.getDateOfBirth() != null) {
-                                dnb.setEntityValue(sb.getDateOfBirth().toString());
-
-                            }
-                            dnb.setEntityName(resword.getString("date_of_birth"));
-                        } else if ("unique_identifier".equalsIgnoreCase(column)) {
-                            dnb.setEntityName(resword.getString("unique_identifier"));
-                            dnb.setEntityValue(sb.getUniqueIdentifier());
-                        }
-                    }
-                } else if (entityType.equalsIgnoreCase("studySub")) {
-//                    allNotes.add(dnb);
-                    StudySubjectBean ssb = (StudySubjectBean) aeb;
-                    dnb.setStudySub(ssb);
-                    String column = dnb.getColumn().trim();
-                    if (!StringUtil.isBlank(column)) {
-                        if ("enrollment_date".equals(column)) {
-                            if (ssb.getEnrollmentDate() != null) {
-                                dnb.setEntityValue(ssb.getEnrollmentDate().toString());
-
-                            }
-                            dnb.setEntityName(resword.getString("enrollment_date"));
-
-                        }
-                    }
-                } else if (entityType.equalsIgnoreCase("eventCRF")) {
-                    StudyEventDAO sed = getStudyEventDao();
-                    StudyEventBean se = (StudyEventBean) sed.findByPK(dnb.getEntityId());
-
-                    EventCRFBean ecb = (EventCRFBean) aeb;
-                    CRFVersionDAO cvdao = getCrfVersionDao();
-                    CRFDAO cdao = getCrfDao();
-                    CRFVersionBean cvb = (CRFVersionBean) cvdao.findByPK(ecb.getCRFVersionId());
-                    CRFBean cb = (CRFBean) cdao.findByPK(cvb.getCrfId());
-
-                    // if (currentStudy.getParentStudyId() > 0 &&
-                    // hiddenCrfIds.contains(cb.getId())) {
-                    // } else {
-                    dnb.setStageId(ecb.getStage().getId());
-                    dnb.setEntityName(cb.getName() + " (" + cvb.getName() + ")");
-
-                    StudySubjectBean ssub = (StudySubjectBean) getStudySubjectDao().findByPK(ecb.getStudySubjectId());
-                    dnb.setStudySub(ssub);
-                    if (se != null) {
-                        dnb.setEventStart(se.getDateStarted());
-                        dnb.setEventName(se.getName());
-                    }
-                    dnb.setCrfName(cb.getName());
-                    String crfStatus = resword.getString(ecb.getStage().getNameRaw());
-                    if (crfStatus.equals("Invalid")) {
-                        crfStatus = "";
-                    } else if (crfStatus.equals("Data Entry Complete")) {
-                        crfStatus = "Complete";
-                    }
-                    dnb.setCrfStatus(crfStatus);
-
-                    String column = dnb.getColumn().trim();
-                    if (!StringUtil.isBlank(column)) {
-                        if ("date_interviewed".equals(column)) {
-                            if (ecb.getDateInterviewed() != null) {
-                                dnb.setEntityValue(ecb.getDateInterviewed().toString());
-
-                            }
-                            dnb.setEntityName(resword.getString("date_interviewed"));
-                        } else if ("interviewer_name".equals(column)) {
-                            dnb.setEntityValue(ecb.getInterviewerName());
-                            dnb.setEntityName(resword.getString("interviewer_name"));
-                        }
-                    }
-                    // }
-                } else if (entityType.equalsIgnoreCase("studyEvent")) {
-//                    allNotes.add(dnb);
-                    StudyEventDAO sed = getStudyEventDao();
-                    StudyEventBean se = (StudyEventBean) sed.findByPK(dnb.getEntityId());
-                    // EventCRFBean ecb = eventCRFDao.findBy;
-                    // CRFVersionDAO cvdao = getCrfVersionDao();
-                    // CRFDAO cdao = getCrfDao();
-                    // CRFVersionBean cvb = (CRFVersionBean)
-                    // cvdao.findByPK(ecb.getCRFVersionId());
-                    // CRFBean cb = (CRFBean) cdao.findByPK(cvb.getCrfId());
-                    StudyEventDefinitionDAO seddao = getStudyEventDefinitionDao();
-                    StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(se.getStudyEventDefinitionId());
-                    se.setName(sedb.getName());
-                    dnb.setEntityName(sedb.getName());
-                    StudySubjectBean ssub = (StudySubjectBean) getStudySubjectDao().findByPK(se.getStudySubjectId());
-                    dnb.setStudySub(ssub);
-                    dnb.setEventStart(se.getDateStarted());
-                    dnb.setEventName(se.getName());
-                    // dnb.setCrfName(cb.getName());
-                    String column = dnb.getColumn().trim();
-                    if (!StringUtil.isBlank(column)) {
-                        if ("start_date".equals(column)) {
-                            if (se.getDateStarted() != null) {
-                                dnb.setEntityValue(se.getDateStarted().toString());
-                            }
-                            dnb.setEntityName(resword.getString("start_date"));
-                        } else if ("end_date".equals(column)) {
-                            if (se.getDateEnded() != null) {
-                                dnb.setEntityValue(se.getDateEnded().toString());
-                            }
-                            dnb.setEntityName(resword.getString("end_date"));
-                        } else if ("location".equals(column)) {
-                            dnb.setEntityValue(se.getLocation());
-                            dnb.setEntityName(resword.getString("location"));
-                        }
-                    }
-                } else if (entityType.equalsIgnoreCase("itemData")) {
-                    ItemDataDAO iddao = getItemDataDao();
-                    ItemDAO idao = getItemDao();
-
-                    ItemDataBean idb = (ItemDataBean) iddao.findByPK(dnb.getEntityId());
-                    ItemBean ib = (ItemBean) idao.findByPK(idb.getItemId());
-
-                    EventCRFDAO ecdao = getEventCRFDao();
-                    EventCRFBean ec = (EventCRFBean) ecdao.findByPK(idb.getEventCRFId());
-
-                    CRFVersionDAO cvdao = getCrfVersionDao();
-                    CRFDAO cdao = getCrfDao();
-                    CRFVersionBean cvb = (CRFVersionBean) cvdao.findByPK(ec.getCRFVersionId());
-                    CRFBean cb = (CRFBean) cdao.findByPK(cvb.getCrfId());
-
-                    // if (currentStudy.getParentStudyId() > 0 &&
-                    // hiddenCrfIds.contains(cb.getId())) {
-                    // } else {
-//                    allNotes.add(dnb);
-                    dnb.setStageId(ec.getStage().getId());
-                    dnb.setEntityName(ib.getName());
-                    dnb.setEntityValue(idb.getValue());
-                    dnb.setItemId(ib.getId());
-
-                    StudyEventDAO sed = getStudyEventDao();
-                    StudyEventBean se = (StudyEventBean) sed.findByPK(ec.getStudyEventId());
-
-                    StudyEventDefinitionDAO seddao = getStudyEventDefinitionDao();
-                    StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(se.getStudyEventDefinitionId());
-
-                    se.setName(sedb.getName());
-
-                    StudySubjectDAO ssdao = getStudySubjectDao();
-                    StudySubjectBean ssub = (StudySubjectBean) ssdao.findByPK(ec.getStudySubjectId());
-                    dnb.setStudySub(ssub);
-                    dnb.setEventStart(se.getDateStarted());
-                    dnb.setEventName(se.getName());
-                    dnb.setCrfName(cb.getName());
-                    String crfStatus = resword.getString(ec.getStage().getNameRaw());
-                    if (crfStatus.equals("Invalid")) {
-                        crfStatus = "";
-                    } else if (crfStatus.equals("Data Entry Complete")) {
-                        crfStatus = "Complete";
-                    }
-                    dnb.setCrfStatus(crfStatus);
-                    // }
-                }
-                sw2.stop();
-                //Because all places set DiscrepancyNoteBean subjectId  as its studySub's Id.
-                dnb.setSubjectId(dnb.getStudySub().getId());
-            }
-            dnb.setSiteId(((StudyBean) getStudyDao().findByPK(dnb.getStudySub().getStudyId())).getIdentifier());
-            allNotes.add(dnb);
-            sw1.stop();
-        }
-        sw.stop();
-        return allNotes;
     }
 
     /**
@@ -822,10 +600,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
     public void setResolutionStatus(Integer resolutionStatus) {
         this.resolutionStatus = resolutionStatus;
-    }
-
-    public ArrayList<DiscrepancyNoteBean> populateDataInNote(List notes) {
-        return populateRowsWithAttachedData((ArrayList) notes);
     }
 
     public static List<DiscrepancyNoteBean> getNotesForPrintPop() {
