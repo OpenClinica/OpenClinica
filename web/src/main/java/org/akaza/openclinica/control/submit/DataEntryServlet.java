@@ -825,7 +825,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                             //for control item
                             //dib has to loadFormValue first. Here loadFormValue has been done in validateDisplayItemBean(v, dib, "")
                             section.setShowSCDItemIds(SimpleConditionalDisplayService.conditionalDisplayToBeShown(dib, section.getShowSCDItemIds()));
-                        } else if(dib.getScdData().getScdItemMetadataBean().getScdItemFormMetadataId()>0) {
+                        }  if(dib.getScdData().getScdItemMetadataBean().getScdItemFormMetadataId()>0) {
                             //for scd item
                             //a control item is always before its scd item
                             dib.setIsSCDtoBeShown(section.getShowSCDItemIds().contains(dib.getMetadata().getItemId()));
@@ -841,7 +841,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                 //for control item
                                 //dib has to loadFormValue first. Here loadFormValue has been done in validateDisplayItemBean(v, dib, "")
                                 section.setShowSCDItemIds(SimpleConditionalDisplayService.conditionalDisplayToBeShown(child, section.getShowSCDItemIds()));
-                            } else if(child.getScdData().getScdItemMetadataBean().getScdItemFormMetadataId()>0) {
+                            } if(child.getScdData().getScdItemMetadataBean().getScdItemFormMetadataId()>0) {
                                 //for scd item
                                 //a control item is always before its scd item
                                 child.setIsSCDtoBeShown(section.getShowSCDItemIds().contains(child.getMetadata().getItemId()));
