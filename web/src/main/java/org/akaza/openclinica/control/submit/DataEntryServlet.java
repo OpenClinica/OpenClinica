@@ -1343,6 +1343,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     // rules have already generated errors, Let's compare old
                     // error list with new
                     // error list, if lists not same show errors.
+                	
                     HashMap h = ruleValidator.validate();
                     Set<String> a = (Set<String>) session.getAttribute("rulesErrors");
                     Set<String> ba = h.keySet();
@@ -5393,18 +5394,26 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                 logger.debug("removing: " + intendedKey + " and replacing it with " + replacementKey);
                             }
                         }
-                    } else if (j == dgbs.size() - 1) { // last repeat
-                        for (DisplayItemBean dib : dibs) {
-                            String intendedKey = digb.getInputId() + getInputName(dib);
-                            String replacementKey = digb.getItemGroupBean().getOid() + "_1" + getInputName(dib);
-                            if (!replacementKey.equals(intendedKey) && errors.containsKey(intendedKey)) {
-                                // String errorMessage = (String)errors.get(intendedKey);
-                                errors.put(replacementKey, errors.get(intendedKey));
-                                errors.remove(intendedKey);
-                                logger.debug("removing: " + intendedKey + " and replacing it with " + replacementKey);
-                            }
-                        }
-                    } else { // everything in between
+                    } 
+    /*
+     * #12190,12191 -> if rule is trigered from last row of RG page never saved,
+     * the commented block has been introduced for 5044, I cannot reproduced wrong behaviour mentioned in this item,
+     * however, OC marked several OK fields as one in error in UI, messages are OK
+     *                 
+     */
+//                    else if (j == dgbs.size() - 1) { // last repeat
+//                        for (DisplayItemBean dib : dibs) {
+//                            String intendedKey = digb.getInputId() + getInputName(dib);
+//                            String replacementKey = digb.getItemGroupBean().getOid() + "_1" + getInputName(dib);
+//                            if (!replacementKey.equals(intendedKey) && errors.containsKey(intendedKey)) {
+//                                // String errorMessage = (String)errors.get(intendedKey);
+//                                errors.put(replacementKey, errors.get(intendedKey));
+//                                errors.remove(intendedKey);
+//                                logger.debug("removing: " + intendedKey + " and replacing it with " + replacementKey);
+//                            }
+//                        }
+                   // }
+                else { // everything in between
                         manualRows++;
                         for (DisplayItemBean dib : dibs) {
                             String intendedKey = digb.getInputId() + getInputName(dib);
