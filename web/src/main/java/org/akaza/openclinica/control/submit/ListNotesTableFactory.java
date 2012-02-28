@@ -84,7 +84,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     private Boolean studyHasDiscNotes = new Boolean(false);
     private ViewNotesService viewNotesService;
     private final boolean showMoreLink;
-    public static List<DiscrepancyNoteBean> notesForPrintPop;
 
     public ListNotesTableFactory(boolean showMoreLink){
         this.showMoreLink = showMoreLink;
@@ -164,11 +163,10 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                 ViewNotesFilterCriteria.buildFilterCriteria(limit.getFilterSet(), getDateFormat()),
                 ViewNotesSortCriteria.buildFilterCriteria(limit.getSortSet()));
 
-        this.setAllNotes(items);
-        this.setAllNotes(DiscrepancyNoteUtil.customFilter(allNotes, listNotesFilter));
+        //this.setAllNotes(items);
+        this.setAllNotes(DiscrepancyNoteUtil.customFilter(items, listNotesFilter));
 
         //Keeping all notes without pagination to be shown in print popup.
-        notesForPrintPop = allNotes;
         if (!limit.isComplete()) {
             tableFacade.setTotalRows(allNotes.size());
         }
@@ -600,14 +598,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
     public void setResolutionStatus(Integer resolutionStatus) {
         this.resolutionStatus = resolutionStatus;
-    }
-
-    public static List<DiscrepancyNoteBean> getNotesForPrintPop() {
-        return notesForPrintPop;
-    }
-
-    public static void setNotesForPrintPop(List<DiscrepancyNoteBean> notesForPrintPop) {
-        ListNotesTableFactory.notesForPrintPop = notesForPrintPop;
     }
 
     public ViewNotesService getViewNotesService() {

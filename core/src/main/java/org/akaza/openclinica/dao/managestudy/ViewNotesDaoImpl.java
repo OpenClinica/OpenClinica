@@ -105,6 +105,52 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
         return result;
     }
 
+    public Map<Integer, Map<Integer, Integer>> calculateNotesSummary(StudyBean currentStudy,
+            ViewNotesFilterCriteria filter) {
+        final Map<Integer, Map<Integer, Integer>> result = new HashMap<Integer, Map<Integer,Integer>>();
+
+        //Initializing the table with zeroes
+        for (DiscrepancyNoteType dnType : DiscrepancyNoteType.list) {
+            Map<Integer, Integer> dnTypeMap = new HashMap<Integer, Integer>();
+            for (ResolutionStatus resStatus : ResolutionStatus.list) {
+                dnTypeMap.put(resStatus.getId(), 0);
+            }
+            result.put(dnType.getId(), dnTypeMap);
+        }
+
+        Map<String,Object> arguments = new HashMap<String, Object>(2);
+        arguments.put("studyId", currentStudy.getId());
+
+        List<String> terms = new ArrayList<String>();
+        terms.add(queryStore.query(QUERYSTORE_FILE, "countDiscrepancyNotes.main"));
+
+        // Reuse the filter criteria from #findAllDiscrepancyNotes, as both queries load data from the same view
+        if (filter != null) {
+            for (String filterKey : filter.getFilters().keySet()) {
+                String filterQuery = queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.filter." + filterKey);
+                terms.add(filterQuery);
+                arguments.put(filterKey, filter.getFilters().get(filterKey));
+            }
+        }
+
+        terms.add(queryStore.query(QUERYSTORE_FILE, "countDiscrepancyNotes.group"));
+        String query = StringUtils.join(terms, ' ');
+
+
+        LOG.debug("SQL: " + query);
+        getNamedParameterJdbcTemplate().query(query, arguments, new RowMapper<Void>() {
+            // Using 'void' as return type as the extractor uses the pre-populated 'result' object
+            public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
+                result.get(rs.getInt("discrepancy_note_type_id")).put(
+                        rs.getInt("resolution_status_id"), rs.getInt("total"));
+                return null;
+            }
+
+        });
+
+        return result;
+    }
+
     protected String listNotesSql(ViewNotesFilterCriteria filter, ViewNotesSortCriteria sort,
             Map<String, Object> arguments) {
         List<String> terms = new ArrayList<String>();
@@ -142,7 +188,6 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
     protected Map<String, Object> listNotesArguments(StudyBean currentStudy) {
         Map<String,Object> arguments = new HashMap<String, Object>();
         arguments.put("studyId", currentStudy.getId());
-        arguments.put("parentStudyId", currentStudy.getParentStudyId());
         arguments.put("limit", 50);
         return arguments;
     }

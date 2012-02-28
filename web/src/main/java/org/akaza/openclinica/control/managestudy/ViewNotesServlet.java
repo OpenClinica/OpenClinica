@@ -11,6 +11,7 @@ package org.akaza.openclinica.control.managestudy;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ import java.util.Set;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
+import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -47,6 +49,7 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.log.Stopwatch;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
+import org.akaza.openclinica.service.managestudy.ViewNotesFilterCriteria;
 import org.akaza.openclinica.service.managestudy.ViewNotesService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -222,13 +225,16 @@ public class ViewNotesServlet extends SecureController {
         String viewNotesPageFileName = this.getPageServletFileName();
         session.setAttribute("viewNotesPageFileName", viewNotesPageFileName);
 
-        List<DiscrepancyNoteBean> allNotes = ListNotesTableFactory.getNotesForPrintPop();
+        List<DiscrepancyNoteBean> allNotes = factory.getAllNotes();
 
         session.setAttribute("allNotes", allNotes);
 
         DiscrepancyNoteUtil discNoteUtil = new DiscrepancyNoteUtil();
-        Map stats = discNoteUtil.generateDiscNoteSummary(allNotes);
-        Map<String, String> totalMap = discNoteUtil.generateDiscNoteTotal(allNotes);
+
+        Map<String, Map<String, String>> stats = generateDiscrepancyNotesSummary(resolveViewNotesService(),
+                ViewNotesFilterCriteria.buildFilterCriteria(tf.getLimit().getFilterSet(),
+                        resformat.getString("date_format_string")));
+        Map<String,String> totalMap = generateDiscrepancyNotesTotal(stats);
 
         int grandTotal = 0;
         for (String typeName: totalMap.keySet()) {
@@ -256,6 +262,55 @@ public class ViewNotesServlet extends SecureController {
         } finally {
             sw.stop();
         }
+    }
+
+    /**
+     * @param stats
+     * @return
+     */
+    private Map<String, String> generateDiscrepancyNotesTotal(Map<String, Map<String, String>> stats) {
+        Map<String, String> result = new HashMap<String, String>(stats.size());
+
+        int totals[] = new int[DiscrepancyNoteType.list.size() + 1]; // The "invalid" type is not part of this list
+
+        for (String resStatus : stats.keySet()) {
+            Map<String, String> dnTypeMap = stats.get(resStatus);
+            for (String dnType: dnTypeMap.keySet()) {
+                String stringVal = dnTypeMap.get(dnType);
+                int val = (stringVal.equals("--") ? 0 : Integer.parseInt(stringVal));
+                totals[DiscrepancyNoteType.getByName(dnType).getId()] += val;
+            }
+        }
+
+        for (int i = 1; i < totals.length; i++) { // Discarding i = 0 ("Invalid" DiscrepancyNoteType)
+            String dnType = DiscrepancyNoteType.get(i).getName();
+            result.put(dnType, (totals[i] == 0 ? "--" : Integer.toString(totals[i])));
+        }
+
+        return result;
+    }
+
+    /**
+     * @param resolveViewNotesService
+     * @return
+     */
+    private Map<String, Map<String, String>> generateDiscrepancyNotesSummary(ViewNotesService viewNotesService,
+            ViewNotesFilterCriteria filter) {
+        Map<Integer, Map<Integer, Integer>> summary = viewNotesService.calculateNotesSummary(currentStudy, filter);
+
+        Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>(summary.size());
+        for (ResolutionStatus resStatus : ResolutionStatus.list) {
+            Map<String, String> resStatusMap = new HashMap<String, String>(DiscrepancyNoteType.list.size());
+            int acc = 0;
+            for (DiscrepancyNoteType dnType : DiscrepancyNoteType.list) {
+                int val = summary.get(dnType.getId()).get(resStatus.getId());
+                resStatusMap.put(dnType.getName(), (val == 0 ? "--" : Integer.toString(val)));
+                acc += val;
+            }
+            resStatusMap.put("Total", (acc == 0 ? "--" : Integer.toString(acc)));
+            result.put(resStatus.getName(), resStatusMap);
+        }
+        return result;
     }
 
     public ArrayList<DiscrepancyNoteBean> filterForOneSubject(ArrayList<DiscrepancyNoteBean> allNotes, int subjectId, int resolutionStatus) {

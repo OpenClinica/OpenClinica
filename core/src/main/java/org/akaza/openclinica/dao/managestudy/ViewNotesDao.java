@@ -8,6 +8,7 @@
 package org.akaza.openclinica.dao.managestudy;
 
 import java.util.List;
+import java.util.Map;
 
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -22,6 +23,8 @@ public interface ViewNotesDao {
 
     List<DiscrepancyNoteBean> findAllDiscrepancyNotes(StudyBean currentStudy, ViewNotesFilterCriteria filter,
             ViewNotesSortCriteria sort);
+
+    Map<Integer, Map<Integer, Integer>> calculateNotesSummary(StudyBean currentStudy, ViewNotesFilterCriteria filter);
 
 
 }

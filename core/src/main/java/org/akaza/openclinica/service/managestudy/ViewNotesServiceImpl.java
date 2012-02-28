@@ -8,6 +8,7 @@
 package org.akaza.openclinica.service.managestudy;
 
 import java.util.List;
+import java.util.Map;
 
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -31,6 +32,15 @@ public class ViewNotesServiceImpl implements ViewNotesService {
             ViewNotesFilterCriteria filter, ViewNotesSortCriteria sort) {
         Stopwatch sw = Stopwatch.createAndStart("listNotes");
         List<DiscrepancyNoteBean> result = viewNotesDao.findAllDiscrepancyNotes(currentStudy, filter, sort);
+        LOG.debug("Found " + result.size() + " discrepancy notes");
+        sw.stop();
+        return result;
+    }
+
+    public Map<Integer, Map<Integer, Integer>> calculateNotesSummary(StudyBean currentStudy,
+            ViewNotesFilterCriteria filter) {
+        Stopwatch sw = Stopwatch.createAndStart("calculateNotesSummary");
+        Map<Integer, Map<Integer, Integer>> result = viewNotesDao.calculateNotesSummary(currentStudy, filter);
         sw.stop();
         return result;
     }
