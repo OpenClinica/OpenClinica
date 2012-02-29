@@ -344,18 +344,7 @@ public class GenerateExtractFileService {
         } */
     	HashMap answerMap = new HashMap<String, Integer>();
 		//JN: Zipped in the next stage as thats where the ODM file is named and copied over in default categories.
-//        if(zipped)
-//        {	try {
-//				zipFile(ODMXMLFileName,generalFileDir);
-//				
-//			} catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				logger.error(e.getMessage());
-//				e.printStackTrace();
-//			}
-//		
-//        }   // return ODMXMLFileName;
-        
+
         answerMap.put(ODMXMLFileName, new Integer(fId));
     //    if(deleteOld && files!=null &&oldFiles!=null) setOldFiles(oldFiles);
         return answerMap;
@@ -368,104 +357,8 @@ public class GenerateExtractFileService {
     	return oldFiles;
     }
 
-	/**
-     * createSPSSFile, added by tbh, 01/2009
-     * 
-     * @param db
-     * @param eb
-     * @param currentstudyid
-     * @param parentstudy
-     * @return
-     */
-    public HashMap<String, Integer> createSPSSFile(DatasetBean db, ExtractBean eb2, StudyBean currentStudy, StudyBean parentStudy, long sysTimeBegin,
-            String generalFileDir, SPSSReportBean answer, String generalFileDirCopy) {
-        setUpResourceBundles();
 
-        String SPSSFileName = db.getName() + "_data_spss.dat";
-        String DDLFileName = db.getName() + "_ddl_spss.sps";
-        String ZIPFileName = db.getName() + "_spss";
-
-        SPSSVariableNameValidator svnv = new SPSSVariableNameValidator();
-        answer.setDatFileName(SPSSFileName);
-        // DatasetDAO dsdao = new DatasetDAO(ds);
-
-        // create the extract bean here, tbh
-        // ExtractBean eb = this.generateExtractBean(db, currentStudy,
-        // parentStudy);
-
-        // eb = dsdao.getDatasetData(eb, currentStudy.getId(),
-        // parentStudy.getId());
-
-        // eb.getMetadata();
-
-        // eb.computeReport(answer);
-
-        answer.setItems(eb2.getItemNames());// set up items here to get
-        // itemMetadata
-
-        // set up response sets for each item here
-        ItemDAO itemdao = new ItemDAO(ds);
-        ItemFormMetadataDAO imfdao = new ItemFormMetadataDAO(ds);
-        ArrayList items = answer.getItems();
-        for (int i = 0; i < items.size(); i++) {
-            DisplayItemHeaderBean dih = (DisplayItemHeaderBean) items.get(i);
-            ItemBean item = dih.getItem();
-            ArrayList metas = imfdao.findAllByItemId(item.getId());
-            // for (int h = 0; h < metas.size(); h++) {
-            // ItemFormMetadataBean ifmb = (ItemFormMetadataBean)
-            // metas.get(h);
-            // logger.info("group name found:
-            // "+ifmb.getGroupLabel());
-            // }
-            // logger.info("crf versionname" +
-            // meta.getCrfVersionName());
-            item.setItemMetas(metas);
-
-        }
-
-        HashMap eventDescs = new HashMap<String, String>();
-
-        eventDescs = eb2.getEventDescriptions();
-
-        eventDescs.put("SubjID", resword.getString("study_subject_ID"));
-        eventDescs.put("ProtocolID", resword.getString("protocol_ID_site_ID"));
-        eventDescs.put("DOB", resword.getString("date_of_birth"));
-        eventDescs.put("YOB", resword.getString("year_of_birth"));
-        eventDescs.put("Gender", resword.getString("gender"));
-        answer.setDescriptions(eventDescs);
-
-        ArrayList generatedReports = new ArrayList<String>();
-        try {
-        	// YW <<
-        	generatedReports.add(answer.getMetadataFile(svnv, eb2).toString());
-        	generatedReports.add(answer.getDataFile().toString());
-        	// YW >>
-        } catch (IndexOutOfBoundsException i) {
-        	generatedReports.add(answer.getMetadataFile(svnv, eb2).toString());
-        	logger.debug("throw the error here");
-        }
-
-        long sysTimeEnd = System.currentTimeMillis() - sysTimeBegin;
-
-        ArrayList titles = new ArrayList();
-        // YW <<
-        titles.add(DDLFileName);
-        titles.add(SPSSFileName);
-        // YW >>
-
-        // create new createFile method that accepts array lists to
-        // put into zip files
-        int fId = this.createFile(ZIPFileName, titles, generalFileDir, generatedReports, db, sysTimeEnd, ExportFormatBean.TXTFILE, true);
-        if (!"".equals(generalFileDirCopy)) {
-        	int fId2 = this.createFile(ZIPFileName, titles, generalFileDirCopy, generatedReports, db, sysTimeEnd, ExportFormatBean.TXTFILE, false);
-        }
-        // return DDLFileName;
-        HashMap answerMap = new HashMap<String, Integer>();
-        answerMap.put(DDLFileName, new Integer(fId));
-        return answerMap;
-    }
-
-    public int createFile(String zipName, ArrayList names, String dir, ArrayList contents, DatasetBean datasetBean, long time, 
+      public int createFile(String zipName, ArrayList names, String dir, ArrayList contents, DatasetBean datasetBean, long time, 
     		ExportFormatBean efb, boolean saveToDB) {
         ArchivedDatasetFileBean fbFinal = new ArchivedDatasetFileBean();
         // >> tbh #4915
@@ -622,51 +515,6 @@ public class GenerateExtractFileService {
             w.write(content);
             w.close();
             logger.info("finished writing the text file...");
-/*            if (zipped) {
-                // now, we write the file to the zip file
-                FileInputStream is = new FileInputStream(newFile);
-                ZipOutputStream z = new ZipOutputStream(new FileOutputStream(new File(complete, name + ".zip")));
-                if(oldFiles!=null || !oldFiles.isEmpty())
-                {
-                	
-                	if(oldFiles.contains(new File(complete, name + ".zip")))
-                	{
-                		oldFiles.remove(new File(complete, name + ".zip"));//Dont delete the files which u r just creating
-                	}
-                }
-                logger.info("created zip output stream...");
-                // we write over the content no matter what
-                // we then check to make sure there are no duplicates
-                // TODO need to change the above -- save all content!
-                // z.write(content);
-                z.putNextEntry(new java.util.zip.ZipEntry(name));
-                // int length = (int) newFile.length();
-                int bytesRead;
-                byte[] buff = new byte[512];
-                // read from buffered input stream and put into zip file
-                // while (-1 != (bytesRead = bis.read(buff, 0, buff.length))) {
-                while ((bytesRead = is.read(buff)) != -1) {
-                    z.write(buff, 0, bytesRead);
-                }
-                logger.info("writing buffer...");
-                // }
-                z.closeEntry();
-                z.finish();
-                // newFile = new File(complete, name+".zip");
-                // newFile.setLastModified(System.currentTimeMillis());
-                //
-                // BufferedWriter w2 = new BufferedWriter(new FileWriter(newFile));
-                // w2.write(newOut.toString());
-                // w2.close();
-                if (is != null) {
-                    try {
-                        is.close();
-                    } catch (java.io.IOException ie) {
-                        ie.printStackTrace();
-                    }
-                }
-                logger.info("finished zipping up file...");
-            }*/
             // set up the zip to go into the database
             if (saveToDB) {
                 ArchivedDatasetFileBean fb = new ArchivedDatasetFileBean();
