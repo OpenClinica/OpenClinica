@@ -29,10 +29,10 @@
            where i.item_id = ifm.item_id
            and ifm.crf_version_id=?
            and ifm.required=1
-           and ifm.show_item=0  
+           and ifm.show_item=0
         </sql>
     </query>
-    
+
     <query>
     	<name>findAllCountHiddenUnderGroupsByCRFVersionId</name>
     	<sql>
@@ -52,18 +52,18 @@
             FROM item_form_metadata m, response_set rs
             WHERE m.crf_version_id in ( select crf_version_id from crf_version where crf_id= ? )
                 AND m.response_set_id = rs.response_set_id
-                AND m.item_id = ? 
+                AND m.item_id = ?
                 AND m.regexp != ''
             </sql>
         </query>
    <query>
         <name>findAllCountHiddenButShownByEventCrfId</name>
         <sql>
-           select count(*) as "number" from dyn_item_form_metadata dyn, item_form_metadata ifm 
+           select count(*) as "number" from dyn_item_form_metadata dyn, item_form_metadata ifm
            where dyn.item_form_metadata_id = ifm.item_form_metadata_id
            and dyn.event_crf_id = ?
            and ifm.required=1
-           and dyn.show_item=1 
+           and dyn.show_item=1
         </sql>
     </query>
    <query>
@@ -241,4 +241,37 @@
 		where s.scd_item_form_metadata_id = ifm.item_form_metadata_id);
 		</sql>
 	</query>
+		<query>
+		<name>findInstantItemsByCrfVersionId</name>
+		<sql>
+		select oifm.section_id as o_sec_id, oit.item_id as o_item_id, oig.oc_oid as o_ig_oid,
+			oig.name as o_ig_name, oigm.repeating_group as o_repeating,
+			difm.section_id as d_sec_id, difm.item_id as d_item_id, dig.oc_oid as d_ig_oid,
+			dig.name as d_ig_name, digm.repeating_group as d_repeating,
+			difm.item_form_metadata_id as d_ifm_id,
+			trim((substr(rs.options_values, instr(rs.options_values, ',', 1, 1)+1,
+				(instr(rs.options_values,')',1,1)-instr(rs.options_values,',',1,1)-1)
+					))) as option_name
+		from response_set rs join item oit on oit.name = trim((substr(rs.options_values, instr(rs.options_values,'(',1,1)+1,
+		        (instr(rs.options_values,',',1,1) - instr(rs.options_values,'(',1,1)-1)))),
+			item_form_metadata difm,  item_group_metadata digm, item_group dig,
+			item_form_metadata oifm, item_group_metadata oigm, item_group oig
+		where difm.crf_version_id = ? and rs.version_id = ? and rs.response_type_id = 10
+			and difm.response_set_id = rs.response_set_id
+			and oifm.crf_version_id = ?
+			and oifm.item_id = oit.item_id
+			and digm.crf_version_id = ? and digm.item_id = difm.item_id
+			and dig.item_group_id = digm.item_group_id
+			and oigm.crf_version_id = ? and oigm.item_id = oit.item_id
+			and oig.item_group_id = oigm.item_group_id
+		order by oifm.section_id, oifm.item_id
+		</sql>
+  </query>
+  <query>
+  	<name>instantTypeExistsInSection</name>
+  	<sql>select ifm.item_form_metadata_id from item_form_metadata ifm, response_set rs
+         where rs.response_type_id = 10 and ifm.section_id = ?
+         and ifm.response_set_id = rs.response_set_id and rownum = 1
+  	</sql>
+  </query>
 </queries>

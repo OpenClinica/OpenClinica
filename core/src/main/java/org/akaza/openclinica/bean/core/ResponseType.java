@@ -32,12 +32,14 @@ public class ResponseType extends Term {
     public static final ResponseType CALCULATION = new ResponseType(8, "calculation");
 
     public static final ResponseType GROUP_CALCULATION = new ResponseType(9, "group-calculation");
-    
+
+    public static final ResponseType INSTANT_CALCULATION = new ResponseType(10, "instant-calculation");
+
     // public static final ResponseType CODING = new ResponseType(10, "text(non-editable)");// added 03/2009, tbh
     // changed 03/09, from 'coding' to 'text(non-editable)' to accept spreadsheet changes
 
 
-    private static final ResponseType[] members = { TEXT, TEXTAREA, CHECKBOX, FILE, RADIO, SELECT, SELECTMULTI, CALCULATION, GROUP_CALCULATION};// , CODING };
+    private static final ResponseType[] members = { TEXT, TEXTAREA, CHECKBOX, FILE, RADIO, SELECT, SELECTMULTI, CALCULATION, GROUP_CALCULATION, INSTANT_CALCULATION};// , CODING };
 
     public static final List list = Arrays.asList(members);
 
