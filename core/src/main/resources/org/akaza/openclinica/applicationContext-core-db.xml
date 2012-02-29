@@ -78,6 +78,8 @@
     </bean>
     -->
 
-        
+    <bean id="queryStore" class="org.akaza.openclinica.dao.QueryStore" init-method="init">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
 
 </beans>

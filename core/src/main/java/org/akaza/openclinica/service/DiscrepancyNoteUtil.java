@@ -1,5 +1,18 @@
 package org.akaza.openclinica.service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
@@ -14,19 +27,6 @@ import org.akaza.openclinica.dao.managestudy.ListNotesFilter;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import javax.sql.DataSource;
 
 /**
  * DiscrepancyNoteUtil is a convenience class for managing discrepancy notes,
@@ -1052,7 +1052,7 @@ public class DiscrepancyNoteUtil {
         return summaryMap;
     }
 
-    public Map generateDiscNoteTotal(ArrayList<DiscrepancyNoteBean> discList) {
+    public Map generateDiscNoteTotal(List<DiscrepancyNoteBean> discList) {
 
         Map<String, String> summaryMap = new HashMap<String, String>();
         int tempType = 0;
@@ -1064,7 +1064,7 @@ public class DiscrepancyNoteUtil {
         return summaryMap;
     }
 
-    public String countNotes(ArrayList<DiscrepancyNoteBean> discList, int statusId, int typeId){
+    public String countNotes(List<DiscrepancyNoteBean> discList, int statusId, int typeId){
         Integer count = 0;
         for(int i = 0; i < discList.size(); i++){
             DiscrepancyNoteBean discBean = discList.get(i);
@@ -1086,7 +1086,7 @@ public class DiscrepancyNoteUtil {
         return count.toString();
     }
 
-    public static ArrayList<DiscrepancyNoteBean> customFilter(ArrayList<DiscrepancyNoteBean> mainList, ListNotesFilter discFilter) {
+    public static List<DiscrepancyNoteBean> customFilter(List<DiscrepancyNoteBean> mainList, ListNotesFilter discFilter) {
         String eventName = "";
         String crfName = "";
         String entityName = "";

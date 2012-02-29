@@ -61,7 +61,7 @@ public class DataEntryStage extends Term {
         return this == DataEntryStage.LOCKED;
     }
 
-    public static final List list = Arrays.asList(members);
+    public static final List<DataEntryStage> list = Arrays.asList(members);
 
     private List privileges;
 
@@ -91,10 +91,10 @@ public class DataEntryStage extends Term {
     public String getNameRaw() {
         return super.name;
     }
-    
+
     public static DataEntryStage getByName(String name) {
         for (int i = 0; i < list.size(); i++) {
-            DataEntryStage temp = (DataEntryStage) list.get(i);
+            DataEntryStage temp = list.get(i);
             if (temp.getName().equals(name)) {
                 return temp;
             }
