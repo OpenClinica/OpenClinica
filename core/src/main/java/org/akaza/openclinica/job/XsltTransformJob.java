@@ -430,6 +430,7 @@ public class XsltTransformJob extends QuartzJobBean {
                         String[] tempArray = { archivedFilename };
                         dontDelFiles = tempArray;
                          endFile = archivedFilename;
+                         
                    // }
 
                 } else if (zipped) {
@@ -639,7 +640,10 @@ public class XsltTransformJob extends QuartzJobBean {
                 while ((cnt = orgin.read(data, 0, BUFFER)) != -1) {
                     zos.write(data, 0, cnt);
                 }
+               fis.close();
             }
+            
+           
 
         } catch (IOException ioe) {
             ioe.printStackTrace();
@@ -653,6 +657,10 @@ public class XsltTransformJob extends QuartzJobBean {
             if (fos != null)
                 fos.close();
 
+        }
+        for(String file:files){
+            File f  = new File(path+file);
+            f.delete();
         }
     }
 

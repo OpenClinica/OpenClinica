@@ -52,10 +52,11 @@
 		<xsl:value-of select="$seperator"/>
 		<xsl:text>GET DATA  /TYPE = TXT/FILE = 'SPSS_DAT</xsl:text>
 		<!--<xsl:text>GET DATA  /TYPE = TXT/FILE = '</xsl:text>-->
-		<!--'All_Items_SPSS_data_spss.dat'-->		
-		<xsl:variable name="currentDate" select="current-date()"/>
+		<!--'All_Items_SPSS_data_spss.dat'-->
+		<!-- @pgawade 29-Feb-2012 fix for issue #11796 Do not include data timestamp in the name of .dat file name -->		
+		<!-- <xsl:variable name="currentDate" select="current-date()"/>
 		<xsl:variable name="currentDateTime" select="current-dateTime()"/>		
-		<xsl:value-of select="format-dateTime($currentDateTime, '[Y0001]-[M01]-[D01]-[H01][m01][s00001]')"/>
+		<xsl:value-of select="format-dateTime($currentDateTime, '[Y0001]-[M01]-[D01]-[H01][m01][s00001]')"/> -->
 
 <!--<xsl:text>C:\tmp\oc_extract_issues\temp</xsl:text>-->
 		<xsl:text>.dat' /DELCASE = LINE /DELIMITERS = "\t" /ARRANGEMENT = DELIMITED /FIRSTCASE = 2 /IMPORTCASE = ALL /VARIABLES =</xsl:text>
