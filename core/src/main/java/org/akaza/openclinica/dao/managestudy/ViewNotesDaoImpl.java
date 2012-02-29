@@ -17,6 +17,7 @@ import java.util.Map;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -52,6 +53,7 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
             StudySubjectBean studySubjectBean = new StudySubjectBean();
             studySubjectBean.setId(b.getStudyId());
             studySubjectBean.setLabel(rs.getString("label"));
+            studySubjectBean.setStatus(Status.get(rs.getInt("ss_status_id")));
             b.setStudySub(studySubjectBean);
             b.setDiscrepancyNoteTypeId(rs.getInt("discrepancy_note_type_id"));
             b.setDisType(DiscrepancyNoteType.get(b.getDiscrepancyNoteTypeId()));
