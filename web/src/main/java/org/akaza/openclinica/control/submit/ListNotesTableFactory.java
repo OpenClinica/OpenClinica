@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -211,6 +214,13 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         tableFacade.setItems(theItems);
         sw.stop();
 
+    }
+
+    @Override
+    public TableFacade getTableFacadeImpl(HttpServletRequest request, HttpServletResponse response) {
+        TableFacade facade = super.getTableFacadeImpl(request, response);
+        facade.autoFilterAndSort(false); // Filtering and sorting performed on the DB layer
+        return facade;
     }
 
     /**

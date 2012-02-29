@@ -215,7 +215,6 @@ public class ViewNotesServlet extends SecureController {
         factory.setResolutionStatus(resolutionStatus);
         factory.setViewNotesService(resolveViewNotesService());
         //factory.setResolutionStatusIds(resolutionStatusIds);
-        long startTime = System.currentTimeMillis();
         TableFacade tf = factory.createTable(request, response);
         String viewNotesHtml = tf.render();
 
@@ -247,11 +246,6 @@ public class ViewNotesServlet extends SecureController {
         request.setAttribute("typeNames", discNoteUtil.getTypeNames());
         request.setAttribute("typeKeys", totalMap);
         request.setAttribute("grandTotal", grandTotal);
-        long endTime = System.currentTimeMillis();
-
-        System.out.println("Time taken[" + (startTime)/1000 + "]");
-        System.out.println("Time taken[" + (endTime)/1000 + "]");
-        System.out.println("Time taken[" + (endTime - startTime)/1000 + "]");
 
         if ("yes".equalsIgnoreCase(fp.getString(PRINT))) {
             request.setAttribute("allNotes", allNotes);
