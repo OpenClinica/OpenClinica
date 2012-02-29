@@ -118,7 +118,8 @@
 		<!-- <xsl:apply-templates -->
 		<!-- select="//odm:ODM/odm:Study/odm:MetaDataVersion/odm:FormDef[@OID]" -->
 		<!-- mode="itemGroupDataHeaderTempl"></xsl:apply-templates> -->
-		<xsl:value-of select="$eol"></xsl:value-of><!-- Subject Data, item 
+		<!-- JN: Commenting out fix for 0012071: SPSS *.dat file has blank row at the beginning-->
+		<!-- xsl:value-of select="$eol"></xsl:value-of--><!-- Subject Data, item 
 			data etc -->
 		<xsl:text>StudySubjectID</xsl:text>
 		<xsl:value-of select="$sep"/>
