@@ -15,9 +15,9 @@
 <style type="text/css">
 
 .tooltip {
-		
+
 	width:100%;
-	
+
 }
 
 </style>
@@ -82,6 +82,7 @@ form element in red --%>
   </c:if>
 
 <script language="JavaScript" src="includes/global_functions_javascript.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="includes/instant_onchange.js"></script>
 
 <script lang="Javascript">
 <!--
@@ -105,14 +106,14 @@ function genToolTips(itemId){
 				<c:set var="notesSize" value="${itemsSection.totNew}"/>
 	   			title = "<c:out value="${itemsSection.item.name}"/>";
 	   				<c:set  var="discrepancyNotes" value="${itemsSection.discrepancyNotes}"/>
-	        		<c:forEach var="discrepancyNotes" items="${discrepancyNotes}">  	
+	        		<c:forEach var="discrepancyNotes" items="${discrepancyNotes}">
 		             resStatus[i] =<c:out value="${discrepancyNotes.resolutionStatusId}"/>;
 			      	    detailedNotes[i] ="<c:out value="${discrepancyNotes.description}"/>";
 			      	    discrepancyType[i] = "<c:out value="${discrepancyNotes.disType.name}"/>";
 			      	    updatedDates[i] = "<c:out value="${discrepancyNotes.createdDate}"/>";
 						parentDnIds[i] = "<c:out value="${discrepancyNotes.parentDnId}"/>";
 			   	    i++;
-					
+
 			   	 	</c:forEach>
 					totNotes = 	 ${notesSize};
 
@@ -154,13 +155,13 @@ function genToolTips(itemId){
         </c:forEach>
 
 
-		  var htmlgen = 
+		  var htmlgen =
 	          '<div class=\"tooltip\">'+
 	          '<table  width="95%">'+
 	          ' <tr><td  align=\"center\" class=\"header1\">' +title+
 	          ' </td></tr><tr></tr></table><table  style="border-collapse:collapse" cellspacing="0" cellpadding="0" width="95%" >'+
 	          drawRows(i,resStatus,detailedNotes,discrepancyType,updatedDates,parentDnIds)+
-	          '</table><table width="95%"  class="tableborder" align="left">'+  	
+	          '</table><table width="95%"  class="tableborder" align="left">'+
 	          '</table><table><tr></tr></table>'+
 	          '<table width="95%"><tbody><td height="30" colspan="3"><span class=\"note\">'+footNote +'</span>'+
 	          '</td></tr>' +
@@ -168,7 +169,7 @@ function genToolTips(itemId){
               '</tbody></table></table></div>';
 		  return htmlgen;
 	}
-  
+
 function replaceSwitch(eventCRFId,itemId,id,attribute,str1,str2,filename,pathAndName,status) {
 	var rp = document.getElementById(id+itemId);
 	var div = document.getElementById('div'+itemId);
@@ -311,9 +312,9 @@ function conditionalShow(strLeftNavRowElementName){
     objLeftNavRowElement = MM_findObj("t"+strLeftNavRowElementName);
     if (objLeftNavRowElement != null) {
         if (objLeftNavRowElement.style) { objLeftNavRowElement = objLeftNavRowElement.style; }
-		if (objLeftNavRowElement.display == "none") { 
+		if (objLeftNavRowElement.display == "none") {
 			objLeftNavRowElement.display = "";	toShow = "true";
-			showRow(strLeftNavRowElementName); 
+			showRow(strLeftNavRowElementName);
 		}
     }
     if(toShow == "true") {
@@ -338,19 +339,19 @@ function conditionalHide(strLeftNavRowElementName){
     if (objLeftNavRowElement != null) {
 	    var obj = MM_findObj("ft"+strLeftNavRowElementName);
 	    if(obj != null) { if(obj.value != "") { toHide = "false";  }
-	    } else { 
+	    } else {
 		    obj = MM_findObj("a"+strLeftNavRowElementName);
 		    if(obj != null) { if(obj.value != "") { toHide = "false";  }
 	    	} else {
 			    obj = MM_findObj("input"+strLeftNavRowElementName);
 				var type = obj.type;
-				if(obj.value != "" && (type=="textarea" || type=="text" || type=="select-one" || type=="select-multiple")) { toHide = "false"; 
-				}else if(obj.length > 0) { for(var i=0; i<obj.length; ++i) { if(obj[i].checked && obj[i].value != "") { toHide = "false"; break;}}} 
+				if(obj.value != "" && (type=="textarea" || type=="text" || type=="select-one" || type=="select-multiple")) { toHide = "false";
+				}else if(obj.length > 0) { for(var i=0; i<obj.length; ++i) { if(obj[i].checked && obj[i].value != "") { toHide = "false"; break;}}}
 	    	}
     	}
 		if(toHide == "true") {
 	        if (objLeftNavRowElement.style) { objLeftNavRowElement = objLeftNavRowElement.style; }
-	        if (objLeftNavRowElement.display == "none") { toHide = "false"; 
+	        if (objLeftNavRowElement.display == "none") { toHide = "false";
         	} else { objLeftNavRowElement.display = "none";		hideRow(strLeftNavRowElementName); }
     	}
     }
@@ -379,7 +380,7 @@ function selectControlShow(element,scdPairStr) {
 	    for(var i = 0; i < element.options.length; i++){
 			if(element.options[i].selected) {
 		        if(element.options[i].value==arr[j+1]){
-			        showIds[n] = arr[j]; 
+			        showIds[n] = arr[j];
 			        hideIds[m] = -1;
 			        ++n;
 	        	}
@@ -438,10 +439,10 @@ function showRow(itemId) {
 		var objIDs = MM_findObj("rowSCDShowIDs" + numOfTr); 	var ids = objIDs.value;
 		if(ids.length > 1) {
 			if(ids.indexOf("-"+itemId+"-") == -1) { ids = ids + itemId + "-"; objIDs.value = ids;}
-		} else { ids = "-" + itemId + "-";	objIDs.value = ids;		} 
-		var objTr = MM_findObj("tr"+numOfTr); 
+		} else { ids = "-" + itemId + "-";	objIDs.value = ids;		}
+		var objTr = MM_findObj("tr"+numOfTr);
 		if(objTr != null && objTr.style.display == "none") { objTr.style.display = "";	}
-	}		
+	}
 }
 
 function hideRow(itemId) {
@@ -449,12 +450,12 @@ function hideRow(itemId) {
 	if(objCol != null) {
 		var numOfTr = objCol.value;
 		var objIDs = MM_findObj("rowSCDShowIDs" + numOfTr); 	var ids = objIDs.value;
-		if(ids.length > 1) { 
+		if(ids.length > 1) {
 			if(ids.indexOf("-"+itemId+"-") != -1) { ids = ids.replace(itemId + "-", ""); objIDs.value = ids;	}
-		} 
-		if(ids.length <= 1) { 
-			var objTr = MM_findObj("tr"+numOfTr); 
-			if(objTr != null) { objTr.style.display = "none";	} 
+		}
+		if(ids.length <= 1) {
+			var objTr = MM_findObj("tr"+numOfTr);
+			if(objTr != null) { objTr.style.display = "none";	}
 		}
 	}
 }
@@ -521,17 +522,32 @@ function hideRow(itemId) {
 	</c:otherwise>
 	</c:choose>
 </c:if>
-
+<c:if test='${inputType == "instant-calculation"}'>
+  <label for="input<c:out value="${itemId}"/>"></label>
+  <input type="hidden" id="input<c:out value="${itemId}"/>" name="input<c:out value="${itemId}"/>" value="<c:out value="${inputTxtValue}"/>" >
+  <c:choose>
+    <c:when test="${isInError && !hasShown}">
+      <span class="<c:out value="${exclaim}"/>">! </span><input class="<c:out value="${input}"/>" id="showinput<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
+      "this.className='changedField'; manualChange('input<c:out value="${itemId}"/>'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');"
+      type="text" name="showinput<c:out value="${itemId}" />" value="<c:out value="${inputTxtValue}"/>" />
+    </c:when>
+    <c:otherwise>
+      <input id="showinput<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
+        "this.className='changedField'; manualChange('input<c:out value="${itemId}"/>'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif','<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');"
+        type="text" name="showinput<c:out value="${itemId}" />" value="<c:out value="${inputTxtValue}"/>" />
+    </c:otherwise>
+  </c:choose>
+</c:if>
 <c:if test='${inputType == "text"}'>
   <label for="input<c:out value="${itemId}"/>"></label>
   <c:choose>
     <c:when test="${isInError && !hasShown}">
       <span class="<c:out value="${exclaim}"/>">! </span><input class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
-      "this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" name="input<c:out value="${itemId}" />" value="<c:out value="${inputTxtValue}"/>" />
+      "this.className='changedField'; destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" name="input<c:out value="${itemId}" />" value="<c:out value="${inputTxtValue}"/>" />
     </c:when>
     <c:otherwise>
       <input id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
-        "this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif','<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" name="input<c:out value="${itemId}" />" value="<c:out value="${inputTxtValue}"/>" />
+        "this.className='changedField'; destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif','<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" name="input<c:out value="${itemId}" />" value="<c:out value="${inputTxtValue}"/>" />
     </c:otherwise>
   </c:choose>
   <c:if test="${displayItem.item.itemDataTypeId==9 || displayItem.item.itemDataTypeId==10}"><!-- date type-->
@@ -546,10 +562,12 @@ function hideRow(itemId) {
   <label for="input<c:out value="${itemId}"/>"></label>
   <c:choose>
     <c:when test="${isInError && !hasShown}">
-      <span class="<c:out value="${exclaim}"/>">! </span><textarea class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" name="input<c:out value="${itemId}" />" rows="5" cols="40"><c:out value="${inputTxtValue}"/></textarea>
+      <span class="<c:out value="${exclaim}"/>">! </span><textarea class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>"
+      onChange="this.className='changedField'; destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" name="input<c:out value="${itemId}" />" rows="5" cols="40"><c:out value="${inputTxtValue}"/></textarea>
     </c:when>
     <c:otherwise>
-      <textarea id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" name="input<c:out value="${itemId}" />" rows="5" cols="40"><c:out value="${inputTxtValue}"/></textarea>
+      <textarea id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
+      "this.className='changedField';destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" name="input<c:out value="${itemId}" />" rows="5" cols="40"><c:out value="${inputTxtValue}"/></textarea>
     </c:otherwise>
   </c:choose>
 </c:if>
@@ -578,10 +596,12 @@ function hideRow(itemId) {
 			<c:forEach var="aPair" items="${displayItem.scdData.scdSetsForControl}">
 				<c:set var="scdPairStr" value="${scdPairStr}-----${aPair.scdItemId}-----${aPair.optionValue}"/>
 	    	</c:forEach>
-	    	<input class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onClick="javascript:checkControlShow(this, '<c:out value="${scdPairStr}"/>');" onChange="this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="checkbox" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
+       		<input class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onClick="javascript:checkControlShow(this, '<c:out value="${scdPairStr}"/>');"
+	    	onChange="this.className='changedField'; destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="checkbox" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
        	</c:when>
 		<c:otherwise>
-			<input class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="checkbox" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
+			<input class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>"
+			onChange="this.className='changedField'; destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="checkbox" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
       	</c:otherwise>
 		</c:choose>
       </c:when>
@@ -592,10 +612,12 @@ function hideRow(itemId) {
 			<c:forEach var="aPair" items="${displayItem.scdData.scdSetsForControl}">
 				<c:set var="scdPairStr" value="${scdPairStr}-----${aPair.scdItemId}-----${aPair.optionValue}"/>
 	    	</c:forEach>
-    		<input id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onClick="javascript:checkControlShow(this, '<c:out value="${scdPairStr}"/>');" onChange="this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="checkbox" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:out value="${isChecked}"/> <c:if test="${! isHorizontal}"><br/></c:if>
+      		<input id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onClick="javascript:checkControlShow(this, '<c:out value="${scdPairStr}"/>');"
+    		onChange="this.className='changedField';destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="checkbox" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:out value="${isChecked}"/> <c:if test="${! isHorizontal}"><br/></c:if>
       	</c:when>
 		<c:otherwise>
-			<input id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="checkbox" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
+      		<input id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>"
+			onChange="this.className='changedField';destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="checkbox" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
       	</c:otherwise>
 		</c:choose>
       	</c:otherwise>
@@ -620,10 +642,12 @@ function hideRow(itemId) {
 					<c:forEach var="aPair" items="${displayItem.scdData.scdSetsForControl}">
 						<c:set var="scdPairStr" value="${scdPairStr}-----${aPair.scdItemId}-----${aPair.optionValue}"/>
 	    			</c:forEach>
-	    			<input class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onClick="javascript:radioControlShow(this, '<c:out value="${scdPairStr}"/>');"  onChange="this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="radio" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
+		        	<input class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onClick="javascript:radioControlShow(this, '<c:out value="${scdPairStr}"/>');"
+	    			onChange="this.className='changedField';destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="radio" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
 		        </c:when>
 		        <c:otherwise>
-		        	<input class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="radio" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
+		        	<input class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>"
+		        	onChange="this.className='changedField'; destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="radio" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
 		        </c:otherwise>
 	        	</c:choose>
             </c:when>
@@ -634,10 +658,12 @@ function hideRow(itemId) {
 					<c:forEach var="aPair" items="${displayItem.scdData.scdSetsForControl}">
 						<c:set var="scdPairStr" value="${scdPairStr}-----${aPair.scdItemId}-----${aPair.optionValue}"/>
 	    			</c:forEach>
-		            <input id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>"  onClick="javascript:radioControlShow(this, '<c:out value="${scdPairStr}"/>');" onChange="this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="radio" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
+		        	<input id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>"  onClick="javascript:radioControlShow(this, '<c:out value="${scdPairStr}"/>');"
+		            onChange="this.className='changedField'; destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="radio" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
 		        </c:when>
 		        <c:otherwise>
-		        	<input id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>"  onChange="this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="radio" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
+		        	<input id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>"
+		        	onChange="this.className='changedField';destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="radio" name="input<c:out value="${itemId}"/>" value="<c:out value="${option.value}" />" <c:out value="${checked}"/> /> <c:out value="${option.text}" /> <c:if test="${! isHorizontal}"><br/></c:if>
 		        </c:otherwise>
 	        	</c:choose>
         	</c:otherwise>
@@ -678,10 +704,12 @@ include the default value first in the select list --%>
 			<c:forEach var="aPair" items="${displayItem.scdData.scdSetsForControl}">
 				<c:set var="scdPairStr" value="${scdPairStr}-----${aPair.scdItemId}-----${aPair.optionValue}"/>
 			</c:forEach>
-			<select class="<c:out value="${input}"/> formfield" id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="javascript:selectControlShow(this, '<c:out value="${scdPairStr}"/>'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" name="input<c:out value="${itemId}"/>">
+			<select class="<c:out value="${input}"/> formfield" id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>"
+			onChange="destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); javascript:selectControlShow(this, '<c:out value="${scdPairStr}"/>'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" name="input<c:out value="${itemId}"/>">
 		</c:when>
 		<c:otherwise>
-			<select class="<c:out value="${input}"/> formfield" id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" name="input<c:out value="${itemId}"/>">
+			<select class="<c:out value="${input}"/> formfield" id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>"
+			onChange="this.className='changedField'; destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" name="input<c:out value="${itemId}"/>">
 		</c:otherwise>
 		</c:choose>
 		<c:if test="${printDefaultFirst}">
@@ -733,10 +761,12 @@ include the default value first in the select list --%>
 		<c:forEach var="aPair" items="${displayItem.scdData.scdSetsForControl}">
 			<c:set var="scdPairStr" value="${scdPairStr}-----${aPair.scdItemId}-----${aPair.optionValue}"/>
     	</c:forEach>
-    	<select id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="javascript:selectControlShow(this, '<c:out value="${scdPairStr}"/>'); this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" name="input<c:out value="${itemId}"/>" class="formfield">
+    	<select id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>"
+    	onChange="destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); javascript:selectControlShow(this, '<c:out value="${scdPairStr}"/>'); this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" name="input<c:out value="${itemId}"/>" class="formfield">
     </c:when>
 	<c:otherwise>
-		<select id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" name="input<c:out value="${itemId}"/>" class="formfield">
+		<select id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>"
+		onChange="this.className='changedField'; destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" name="input<c:out value="${itemId}"/>" class="formfield">
 	</c:otherwise>
 	</c:choose>
       <c:choose>
@@ -784,10 +814,12 @@ include the default value first in the select list --%>
 			<c:forEach var="aPair" items="${displayItem.scdData.scdSetsForControl}">
 				<c:set var="scdPairStr" value="${scdPairStr}-----${aPair.scdItemId}-----${aPair.optionValue}"/>
 			</c:forEach>
-      		<select class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" multiple  tabindex="<c:out value="${tabNum}"/>" name="input<c:out value="${itemId}"/>" onChange="javascript:selectControlShow(this, '<c:out value="${scdPairStr}"/>'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');">
+			<select class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" multiple  tabindex="<c:out value="${tabNum}"/>" name="input<c:out value="${itemId}"/>"
+      		onChange="destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); javascript:selectControlShow(this, '<c:out value="${scdPairStr}"/>'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');">
 		</c:when>
 		<c:otherwise>
-      		<select class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" multiple  tabindex="<c:out value="${tabNum}"/>" name="input<c:out value="${itemId}"/>" onChange="this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');">
+  			<select class="<c:out value="${input}"/>" id="input<c:out value="${itemId}"/>" multiple  tabindex="<c:out value="${tabNum}"/>" name="input<c:out value="${itemId}"/>"
+      		onChange="this.className='changedField'; destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');">
   		</c:otherwise>
 		</c:choose>
     </c:when>
@@ -798,10 +830,12 @@ include the default value first in the select list --%>
 			<c:forEach var="aPair" items="${displayItem.scdData.scdSetsForControl}">
 				<c:set var="scdPairStr" value="${scdPairStr}-----${aPair.scdItemId}-----${aPair.optionValue}"/>
 	    	</c:forEach>
-    		<select id="input<c:out value="${itemId}"/>" multiple  tabindex="<c:out value="${tabNum}"/>" name="input<c:out value="${itemId}"/>" onChange="javascript:selectControlShow(this, '<c:out value="${scdPairStr}"/>'); this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');">
+  			<select id="input<c:out value="${itemId}"/>" multiple  tabindex="<c:out value="${tabNum}"/>" name="input<c:out value="${itemId}"/>"
+    		onChange="destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />'); javascript:selectControlShow(this, '<c:out value="${scdPairStr}"/>'); this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');">
   		</c:when>
   		<c:otherwise>
-  			<select id="input<c:out value="${itemId}"/>" multiple  tabindex="<c:out value="${tabNum}"/>" name="input<c:out value="${itemId}"/>" onChange="this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');">
+  			<select id="input<c:out value="${itemId}"/>" multiple  tabindex="<c:out value="${tabNum}"/>" name="input<c:out value="${itemId}"/>"
+  			onChange="this.className='changedField';destNonRepInstant('<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.nonRepFrontStr.frontStrDelimiter.code}" />');  javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');">
   		</c:otherwise>
   		</c:choose>
    </c:otherwise>
@@ -922,18 +956,18 @@ include the default value first in the select list --%>
     "openDNoteWindow('ViewDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&isRfc=0&itemId=<c:out value="${itemId}" />&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=input<c:out value="${itemId}"/>&column=value&monitor=1&writeToDB=1','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
     ><img id="flag_input<c:out value="${itemId}" />" name="flag_input<c:out value="${itemId}" />" src=
     "images/<c:out value="${imageFileName}"/>.gif" border="0" alt=
-    "<fmt:message key="discrepancy_note" bundle="${resword}"/>" 
+    "<fmt:message key="discrepancy_note" bundle="${resword}"/>"
      ></a></td>
 
     </c:when>
     <c:when test="${(displayItem.numDiscrepancyNotes > 0) && (isForcedRFC eq 'true')}">
-	
+
 		<td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"    onmouseover="callTip(genToolTips(${itemId}));"
            onmouseout="UnTip()" onClick=
     "openDNWindow('ViewDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&isRfc=1&itemId=<c:out value="${itemId}" />&groupLabel=<c:out value="${displayItem.metadata.groupLabel}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=input<c:out value="${itemId}" />&column=value&enterData=1&writeToDB=0&errorFlag=<c:out value="${errorFlag}"/>','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
     ><img id="flag_input<c:out value="${itemId}" />" name="flag_input<c:out value="${itemId}" />" src=
     "images/<c:out value="${imageFileName}"/>.gif" border="0" alt=
-    "<fmt:message key="discrepancy_note" bundle="${resword}"/>" 
+    "<fmt:message key="discrepancy_note" bundle="${resword}"/>"
       ></a></td>
 
 	</c:when>
@@ -944,7 +978,7 @@ include the default value first in the select list --%>
     "openDNWindow('CreateDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&isRfc=1&itemId=<c:out value="${itemId}" />&groupLabel=<c:out value="${displayItem.metadata.groupLabel}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=input<c:out value="${itemId}" />&column=value&enterData=1&writeToDB=1&errorFlag=<c:out value="${errorFlag}"/>','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
     ><img id="flag_input<c:out value="${itemId}" />" name="flag_input<c:out value="${itemId}" />" src=
     "images/<c:out value="${imageFileName}"/>.gif" border="0" alt=
-    "<fmt:message key="discrepancy_note" bundle="${resword}"/>" 
+    "<fmt:message key="discrepancy_note" bundle="${resword}"/>"
       ></a></td>
 
     </c:otherwise>

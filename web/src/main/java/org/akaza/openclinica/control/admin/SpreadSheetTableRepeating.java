@@ -7,23 +7,6 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.admin.NewCRFBean;
 import org.akaza.openclinica.bean.core.ApplicationConstants;
@@ -40,6 +23,12 @@ import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.bean.submit.ResponseSetBean;
 import org.akaza.openclinica.control.form.Validator;
+import org.akaza.openclinica.control.form.spreadsheet.OnChangeSheetValidationCell;
+import org.akaza.openclinica.control.form.spreadsheet.OnChangeSheetValidationType;
+import org.akaza.openclinica.control.form.spreadsheet.OnChangeSheetValidator;
+import org.akaza.openclinica.control.form.spreadsheet.SheetCell;
+import org.akaza.openclinica.control.form.spreadsheet.SheetValidationContainer;
+import org.akaza.openclinica.control.form.spreadsheet.SheetValidationType;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.MeasurementUnitDao;
@@ -56,6 +45,23 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * <P>
@@ -173,9 +179,12 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
         ItemDAO idao = new ItemDAO(ds);
         CRFVersionDAO cvdao = new CRFVersionDAO(ds);
         ItemGroupDAO itemGroupDao = new ItemGroupDAO(ds);
-        HashMap<String, String> allItems = new HashMap<String, String>();
+        SheetValidationContainer sheetContainer = new SheetValidationContainer();
+        HashMap<String, String> allItems = (HashMap<String, String>)sheetContainer.getAllItems();
+        //HashMap<String, String> allItems = new HashMap<String, String>();
         Map<String, String[]> controlValues = new HashMap<String, String[]>();
         int maxItemFormMetadataId = new ItemFormMetadataDAO(ds).findMaxId();
+        OnChangeSheetValidator instantValidator = new OnChangeSheetValidator(sheetContainer, resPageMsg);
 
 
         int validSheetNum = 0;
@@ -409,6 +418,9 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             }
                         }
 
+                        sheetContainer.getItemSectionNameMap().put(itemName, secName);
+                        sheetContainer.collectRepGrpItemNameMap(itemName, groupLabel);
+
                         cell = sheet.getRow(k).getCell((short) 7);
                         String header = getValue(cell);
                         if (header != null && header.length() > 2000) {
@@ -484,7 +496,9 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                 if(!StringUtil.isBlank(def)){
                                     errors.add(resPageMsg.getString("radio_with_default")+ itemNames.get(k) +resPageMsg.getString("change_radio"));
                                 }
-                            }
+                            }else if(responseTypeId == ResponseType.INSTANT_CALCULATION.getId()) {
+                                unit = "";
+                             }
                         }
 
                         cell = sheet.getRow(k).getCell((short) 14);
@@ -521,8 +535,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         // << tbh
                         if (responseLabel.equalsIgnoreCase("text") || responseLabel.equalsIgnoreCase("textarea")) {
                             resOptions = "text";
-                        }
-                        if ("file".equalsIgnoreCase(responseType)) {
+                        } else if ("file".equalsIgnoreCase(responseType)) {
                             resOptions = "file";
                         }
                         int numberOfOptions = 0;
@@ -582,12 +595,11 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         String resValues = getValue(cell);
                         if (responseLabel.equalsIgnoreCase("text") || responseLabel.equalsIgnoreCase("textarea")) {
                             resValues = "text";
-                        }
-                        if ("file".equalsIgnoreCase(responseType)) {
+                        } else if ("file".equalsIgnoreCase(responseType)) {
                             resValues = "file";
                         }
                         if (!resNames.contains(responseLabel) && StringUtil.isBlank(resValues) && responseTypeId != ResponseType.TEXT.getId()
-                            && responseTypeId != ResponseType.TEXTAREA.getId()) {
+                            && responseTypeId != ResponseType.TEXTAREA.getId() && responseTypeId != ResponseType.INSTANT_CALCULATION.getId()) {
                             // << tbh #4180
 
                             // errors.add("The RESPONSE_VALUES column was blank
@@ -599,7 +611,8 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             htmlErrors.put(j + "," + k + ",16", resPageMsg.getString("required_field"));
                         }
                         // YW 1-25-2008 << validate scoring expression
-                        if (responseTypeId == 8 || responseTypeId == 9) {
+                        if (responseTypeId == ResponseType.CALCULATION.getId()
+                                    || responseTypeId == ResponseType.GROUP_CALCULATION.getId()) {
                             // right now, func is not required; but if there is
                             // func, it must be correctly spelled
                             if (resValues.contains(":")) {
@@ -652,6 +665,12 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                     }
                                 }
                             }
+                        } else if("instant-calculation".equalsIgnoreCase(responseType)) {
+                            OnChangeSheetValidationCell onchangecell =
+                                    new OnChangeSheetValidationCell(OnChangeSheetValidationType.ALL, new SheetCell.Builder().
+                                            rowName(itemName).colTitle("RESPONSE_VALUES_column").colValue(resValues).
+                                            forWhich("instant_calculation").sheetNum(j).rowNum(k).colNum(16).build());
+                            instantValidator.addValidationCells(onchangecell);
                         } else if (numberOfOptions > 0) {
                             // YW >>
                             String value1 = resValues.replaceAll("\\\\,", "##");
@@ -756,6 +775,12 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                         + resPageMsg.getString("should_be_file") + resPageMsg.getString("at_row") + " " + k + ", "
                                         + resPageMsg.getString("items_worksheet") + ".");
                                     htmlErrors.put(j + "," + k + ",19", resPageMsg.getString("should_be_file"));
+                                } else if("instant-calculation".equalsIgnoreCase(responseType)) {
+                                    OnChangeSheetValidationCell onchangecell =
+                                            new OnChangeSheetValidationCell(OnChangeSheetValidationType.NONE, SheetValidationType.SHOULD_BE_ST,
+                                                    new SheetCell.Builder().rowName(itemName).colTitle("DATA_TYPE_column").colValue(dataType).
+                                                    forWhich("instant_calculation").sheetNum(j).rowNum(k).colNum(19).build());
+                                        instantValidator.addValidationCells(onchangecell);
                                 }
                                 // dataTypeId =
                                 // (ItemDataType.getByName(dataType)).getId();
@@ -847,13 +872,16 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                 default_value = getValue(cell);
                             }
                         }
-                        // YW 1-30-2008
-                        if (default_value.length() > 0 && (responseTypeId == 8 || responseTypeId == 9)) {
-                            errors.add(resPageMsg.getString("default_value_not_allowed_for_calculation") + k + ", " + resPageMsg.getString("items_worksheet")
-                                + ".");
-                            htmlErrors.put(j + "," + k + ",18", resPageMsg.getString("INVALID_FIELD"));
+                        if (default_value.length() > 0) {
+                            if(responseTypeId == ResponseType.CALCULATION.getId()
+                                || responseTypeId == ResponseType.GROUP_CALCULATION.getId()) {
+                                errors.add(resPageMsg.getString("default_value_not_allowed_for_calculation") + k + ", " + resPageMsg.getString("items_worksheet")
+                                    + ".");
+                                htmlErrors.put(j + "," + k + ",18", resPageMsg.getString("INVALID_FIELD"));
+                            } else if(responseTypeId == ResponseType.INSTANT_CALCULATION.getId()) {
+                                default_value = "";
+                            }
                         }
-                        // YW >>
 
                         cellIndex = 19;
                         String widthDecimal = "";
@@ -1685,6 +1713,9 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                     // we need to make sure groups sql are executed first,
                     // because item_group_id is
                     // used when we insert item group meta data with item
+                    instantValidator.validate();
+                    errors = (ArrayList<String>)instantValidator.getSheetErrors().addErrorsToSheet(errors);
+                    htmlErrors = (HashMap<String,String>)instantValidator.getSheetErrors().putHtmlErrorsToSheet(htmlErrors);
                 } else if (sheetName.equalsIgnoreCase("Groups")) {
                     logger.info("read groups, ***comment added 5.14.07");
                     ArrayList groupNames = new ArrayList();
@@ -1776,6 +1807,9 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         groupHeader = org.akaza.openclinica.core.form.StringUtil.escapeSingleQuote(groupHeader);
                         if (groupHeader != null && groupHeader.length() > 255) {
                             errors.add(resPageMsg.getString("group_header_length_error"));
+                        }
+                        if(isRepeatingGroup) {
+                            sheetContainer.getRepeatingGroupLabels().add(groupLabel);
                         }
 
                         cell = sheet.getRow(gk).getCell((short) ++cellNo);

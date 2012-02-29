@@ -42,6 +42,9 @@
 	</c:otherwise>
 	</c:choose>
 </c:if>
+<c:if test='${inputType == "instant-calculation"}'>
+	<input type="text" name="input<c:out value="${itemId}" />" value="<c:out value="${inputTxtValue}"/>" style="background:white;color:#4D4D4D;"/>
+</c:if>
 <c:if test='${inputType == "text"}'>
 	<input type="text" name="input<c:out value="${itemId}" />" value="<c:out value="${inputTxtValue}"/>" style="background:white;color:#4D4D4D;"/>
 </c:if>

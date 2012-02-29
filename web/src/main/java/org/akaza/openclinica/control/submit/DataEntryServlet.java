@@ -86,7 +86,10 @@ import org.akaza.openclinica.logic.score.ScoreCalculator;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
+import org.akaza.openclinica.service.crfdata.InstantOnChangeService;
 import org.akaza.openclinica.service.crfdata.SimpleConditionalDisplayService;
+import org.akaza.openclinica.service.crfdata.front.InstantOnChangeFrontStrGroup;
+import org.akaza.openclinica.service.crfdata.front.InstantOnChangeFrontStrParcel;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.form.FormBeanUtil;
@@ -219,6 +222,11 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
     public static final String ALL_ITEMS_LIST = "all_items_list";
 
+    /**
+     * Session attribute, and will be followed by crf_version_id
+     */
+    public static final String CV_INSTANT_META = "cvInstantMeta";
+
     private DataSource dataSource;
 
 
@@ -312,6 +320,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         panel.setStudyInfoShown(false);
         String age = "";
         UserAccountBean ub =(UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
+        String instantAtt = CV_INSTANT_META + ecb.getCRFVersionId();
 
         //for 11958: repeating groups rows appear if validation returns to the same section
         int isFirstTimeOnSection =fp.getInt("isFirstTimeOnSection");
@@ -420,6 +429,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         if ("removed".equalsIgnoreCase(s.getName()) || "auto-removed".equalsIgnoreCase(s.getName())) {
             addPageMessage(respage.getString("you_may_not_perform_data_entry_on_a_CRF") + respage.getString("study_subject_has_been_deleted"), request);
             request.setAttribute("id", new Integer(ecb.getStudySubjectId()).toString());
+            session.removeAttribute(instantAtt);
             forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET, request, response);
         }
         // YW >>
@@ -466,6 +476,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
             }
             String fromResolvingNotes = fp.getString("fromResolvingNotes", true);
             String winLocation = (String) session.getAttribute(ViewNotesServlet.WIN_LOCATION);
+            session.removeAttribute(instantAtt);
             if (!StringUtil.isBlank(fromResolvingNotes) && !StringUtil.isBlank(winLocation)) {
                 response.sendRedirect(response.encodeRedirectURL(winLocation));
             } else {
@@ -639,6 +650,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
             // << tbh 01/2010
 
             section = populateNotesWithDBNoteCounts(discNotes, section, request);
+            populateInstantOnChange(request.getSession(), ecb, section);
             logger.debug("+++ just ran populateNotes, printing field notes: " + discNotes.getFieldNotes().toString());
             logger.debug("found disc notes: " + discNotes.getNumExistingFieldNotes().toString());
             session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
@@ -1245,6 +1257,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
             // logger.debug("+++ try to populate notes");
 
             section = populateNotesWithDBNoteCounts(discNotes, section, request);
+            populateInstantOnChange(request.getSession(), ecb, section);
             // logger.debug("+++ try to populate notes, got count of field notes: " + discNotes.getFieldNotes().toString());
 
             if (currentStudy.getStudyParameterConfig().getInterviewerNameRequired().equals("yes")) {
@@ -1778,6 +1791,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
                         // section.setItems(displayItems);
                         section.setDisplayItemGroups(displayGroupsWithItems);
+                        populateInstantOnChange(request.getSession(), ecb, section);
 
                         // section.setDisplayFormGroups(newDisplayBean.getDisplayFormGroups());
 
@@ -1912,6 +1926,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                         session.removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
                         logger.debug("try to remove to_create_crf");
                         session.removeAttribute("to_create_crf");
+                        session.removeAttribute(instantAtt);
 
                         // forwardPage(Page.SUBMIT_DATA_SERVLET);
                         forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
@@ -1992,6 +2007,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                             forwardPage(Page.setNewPage(viewNotesPageFileName, "View Notes"), request, response);
                                         }
                                     }
+                                    session.removeAttribute(instantAtt);
                                     forwardPage(Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET, request, response);
                                     return;
 
@@ -5590,7 +5606,42 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("entity_not_belong_studies"), "1");
             }
         }
+    }
 
-
+    protected void populateInstantOnChange(HttpSession session, EventCRFBean ecb, DisplaySectionBean section)  {
+        int cvId = ecb.getCRFVersionId();
+        int sectionId = section.getSection().getId();
+        InstantOnChangeService ins = (InstantOnChangeService) SpringServletAccess.getApplicationContext(
+                getServletContext()).getBean("instantOnChangeService");
+        InstantOnChangeFrontStrParcel strsInSec = new InstantOnChangeFrontStrParcel();
+        HashMap<Integer,InstantOnChangeFrontStrGroup> nonRepOri = null;
+        HashMap<String,Map<Integer,InstantOnChangeFrontStrGroup>> grpOri = null;
+        HashMap<Integer, InstantOnChangeFrontStrParcel> instantOnChangeFrontStrParcels = (HashMap<Integer, InstantOnChangeFrontStrParcel>)session.getAttribute(CV_INSTANT_META+cvId);
+        if(instantOnChangeFrontStrParcels != null && instantOnChangeFrontStrParcels.containsKey(sectionId)) {
+            strsInSec = instantOnChangeFrontStrParcels.get(sectionId);
+            nonRepOri = (HashMap<Integer,InstantOnChangeFrontStrGroup>)strsInSec.getNonRepOrigins();
+            grpOri = (HashMap<String,Map<Integer,InstantOnChangeFrontStrGroup>>)strsInSec.getRepOrigins();
+        } else if(instantOnChangeFrontStrParcels == null || instantOnChangeFrontStrParcels.size() == 0) {
+            //if(ins.needRunInstantInSection(sectionId)) {
+                boolean shouldSetAtt = false;
+                instantOnChangeFrontStrParcels = (HashMap<Integer, InstantOnChangeFrontStrParcel>)ins.instantOnChangeFrontStrParcelInCrfVersion(cvId);
+                if(instantOnChangeFrontStrParcels.size()>0) {
+                    session.setAttribute(CV_INSTANT_META+cvId, instantOnChangeFrontStrParcels);
+                    if(instantOnChangeFrontStrParcels.containsKey(sectionId)) {
+                        strsInSec = instantOnChangeFrontStrParcels.get(sectionId);
+                        if(strsInSec != null) {
+                            grpOri = (HashMap<String,Map<Integer,InstantOnChangeFrontStrGroup>>)strsInSec.getRepOrigins();
+                            nonRepOri = (HashMap<Integer,InstantOnChangeFrontStrGroup>)strsInSec.getNonRepOrigins();
+                        }
+                    }
+                }
+            //}
+        }
+        if(grpOri != null && grpOri.size()>0) {
+            ins.itemGroupsInstantUpdate(section.getDisplayItemGroups(), grpOri);
+        }
+        if(nonRepOri != null && nonRepOri.size()>0) {
+            ins.itemsInstantUpdate(section.getDisplayItemGroups(), nonRepOri);
+        }
     }
 }

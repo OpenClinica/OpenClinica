@@ -187,7 +187,19 @@
 	</c:otherwise>
 	</c:choose>
 </c:if>
-
+<c:if test='${inputType == "instant-calculation"}'>
+  <%-- add for error messages --%>
+  <label for="<c:out value="${inputName}"/>"></label>
+  <c:choose>
+    <c:when test="${isInError}">
+      <span class="aka_exclaim_error">! </span><input class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="text" name="<c:out value="${inputName}"/>" value="<c:out value="${inputTxtValue}"/>" />
+    </c:when>
+    <c:otherwise>
+      <input id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
+        "this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="text" name="<c:out value="${inputName}"/>" value="<c:out value="${inputTxtValue}"/>" />
+    </c:otherwise>
+  </c:choose>
+</c:if>
 <c:if test='${inputType == "text"}'>
   <%-- <c:out value="txt item"/> --%>
   <%-- add for error messages --%>

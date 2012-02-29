@@ -1,5 +1,13 @@
 package org.akaza.openclinica.view.form;
 
+import org.akaza.openclinica.bean.submit.ResponseOptionBean;
+import org.akaza.openclinica.bean.submit.ResponseSetBean;
+import org.akaza.openclinica.i18n.util.HtmlUtils;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.jdom.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,14 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
-import org.akaza.openclinica.bean.submit.ResponseOptionBean;
-import org.akaza.openclinica.bean.submit.ResponseSetBean;
-import org.akaza.openclinica.i18n.util.HtmlUtils;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.jdom.Element;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class creates various types of input fields such as text inputs and
@@ -543,6 +543,23 @@ public class DataEntryInputGenerator implements InputGenerator {
         }
         tdCell.addContent(element2);
 
+        return tdCell;
+    }
+
+    public Element createInstantTag(Element tdCell, Integer itemId, Integer tabNumber, String dbValue,
+            boolean hasSavedData) {
+        Element element = new Element("input");
+        element.setAttribute("type", "text");
+        element.setAttribute("tabindex", tabNumber.toString());
+        element.setAttribute("name", "input" + itemId.toString());
+        element.setAttribute("onChange", ONCHANGE_TEXT_INPUT);
+        element.setAttribute("value", "");
+        if (dbValue != null && dbValue.length() > 0) {
+            element.setAttribute("value", dbValue);
+        } else {
+            element.setAttribute("value", "");
+        }
+        tdCell.addContent(element);
         return tdCell;
     }
 

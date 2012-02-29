@@ -13,6 +13,9 @@
 <c:if test='${inputType=="file"}'>
 	<c:out value="${displayItem.data.value}"/>
 </c:if>
+<c:if test='${inputType == "instant-calculation"}'>
+	<c:out value="${displayItem.data.value}"/>
+</c:if>
 <c:if test='${inputType == "text"}'>
   <c:out value="${displayItem.metadata.responseSet.value}"/>
 </c:if>
