@@ -358,14 +358,10 @@ public class CoreResources implements ResourceLoaderAware {
 
         String[] fileNames =
             { "odm_spss_dat.xsl", "ODMToTAB.xsl", "odm_to_html.xsl", "odm_to_xslfo.xsl",  "odm_spss_sps.xsl", "copyXML.xsl",
-                "odm1.3_to_1.2.xsl", "odm1.3_to_1.2_extensions.xsl", "odm1.3_to_1.3_no_extensions.xsl","ODMReportStylesheet.xsl" };
+                "odm1.3_to_1.2.xsl", "odm1.3_to_1.2_extensions.xsl", "odm1.3_to_1.3_no_extensions.xsl"};
         ByteArrayInputStream listSrcFiles[] = new ByteArrayInputStream[fileNames.length];
 
         try {
-            listSrcFiles[0] =
-                (ByteArrayInputStream) resourceLoader.getResource("classpath:properties" + File.separator + "xslt" + File.separator + fileNames[0])
-                        .getInputStream();
-
             for (int i = 0; i < listSrcFiles.length; i++) {
                 listSrcFiles[i] = (ByteArrayInputStream) resourceLoader.getResource(
                         "classpath:properties" + File.separator + "xslt" + File.separator + fileNames[i]).
