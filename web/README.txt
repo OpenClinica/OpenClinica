@@ -1,27 +1,24 @@
 --------------------------------------------------------------
 OPENCLINICA RELEASE NOTES
-OpenClinica Version 3.1
+OpenClinica Version 3.1.3-alpha
 Document Version 1.0
 --------------------------------------------------------------
 
 --------------------------------------------------------------
-Updated: 24-Dec-2011 by Richard Jap rjap@openclinica.com
+Updated: Mar 5, 2012
+
 --------------------------------------------------------------
 
+--------------------------------------------------------------
+OVERVIEW
+--------------------------------------------------------------
 
-OpenClinica 3.1.2 is the maintenance release of OpenClinica 3.1. It addresses a large number of issues discovered with 3.1 and 3.1.1. The most notable improvements include:
+This is the latest development release of OpenClinica 3.1.3-alpha code branch. 
 
-- Fixes to Extract Data issues tied to extract job completion, data format/accuracy 
-- Increased data capture performance (especially for very large CRFs with lots of rules)
-- Show/Hide improvements allowing use of simple conditionals with rule-based show/hide on CRF items, and numerous other fixes
-- Addition of filter/sort persistence on SDV, so when you leave the page and return your filter sort settings will persist.
-- Addition of audit entry upon entry of initial value to an item 
+A list of changes in each development release can be found at 
+https://issuetracker.openclinica.com/roadmap_page.php?project_id=160
 
-The web application and the web services modules of OpenClinica are in separate war files. 
-
-Please refer to the following URL for more information on OpenClinica 3.1.2:
-
-https://wiki.openclinica.com/doku.php?id=developerwiki:oc312 
+The web application and the web services piece of OpenClinica are in separate war files. 
 
 --------------------------------------------------------------
 CONTENTS OF THIS DOCUMENT
@@ -61,9 +58,8 @@ Some key features of OpenClinica include:
 --------------------------------------------------------------
 II. ISSUES ADDRESSED AND KNOWN ISSUES
 --------------------------------------------------------------
-All issues addressed can be found at https://issuetracker.openclinica.com/changelog_page.php?version_id=54
 
-Known issues can be found at https://wiki.openclinica.com/doku.php?id=ocknownissues:start
+This is a development release. There will be bugs and it is not recommended for use in production. 
 
 --------------------------------------------------------------
 III. SOFTWARE DEPENDENCIES AND SYSTEM REQUIREMENTS
@@ -71,13 +67,13 @@ III. SOFTWARE DEPENDENCIES AND SYSTEM REQUIREMENTS
 
 Pre-requisites (versions):
     Operating system(s): Windows XP, Windows Server 2003, Redhat Enterprise Linux 4.0+
-    Browsers: Internet Explorer 7.0, or 8.0 Mozilla Firefox 3.x or above
+    Browsers: Internet Explorer  7.0, or 8.0 Mozilla Firefox 3.x
     JDK : 1.6.0
     Application server : Tomcat 6.0
     Database server : PostgreSQL 8.4 or Oracle 10g
     OpenClinica version for Upgrades only: OpenClinica 3.0.x
 
-The source code has been removed from the distribution package to make it easier to navigate the file structure.  To access the source code, please visit https://svn.akazaresearch.com.
+The source code has been removed from the distribution package to make it easier to navigate the file structure.  To access the source code, please visit https://dev.openclinica.com/hg/.
 
 --------------------------------------------------------------
 IV. ABOUT OPENCLINICA
@@ -86,7 +82,7 @@ IV. ABOUT OPENCLINICA
 OpenClinica: Open Source Software Platform for Clinical Trials Electronic Data Capture
 Professional Open Source Solutions for the Clinical Research Enterprise
 
-OpenClinica is a free, open source clinical trial software platform for Electronic Data Capture (EDC) and clinical data management in clinical research. The software is web-based and designed to support all types of clinical studies in diverse research settings. From the ground up, OpenClinica is built on leading independent standards to achieve high levels of interoperability. Its modular architecture and transparent, collaborative development model offer outstanding flexibility while supporting a robust, enterprise-quality solution.
+OpenClinica is a free, open source clinical trial software platform for Electronic Data Capture (EDC) clinical data management in clinical research. The software is web-based and designed to support all types of clinical studies in diverse research settings. From the ground up, OpenClinica is built on leading independent standards to achieve high levels of interoperability. Its modular architecture and transparent, collaborative development model offer outstanding flexibility while supporting a robust, enterprise-quality solution.
 
 More about OpenClinica: https://www.OpenClinica.com
 
@@ -96,17 +92,17 @@ OpenClinica is distributed under the GNU Lesser General Public License (GNU LGPL
 
 Developer and Contact Information
 --------------------------------------------------------------
-OpenClinica LLC, based in Waltham, MA, provides clinical trials informatics solutions based on OpenClinica, the world's most widely used open source clinical trials software.
+OpenClinica, LLC, based in Waltham, MA, provides clinical trials informatics solutions based on OpenClinica, the world's most widely used open source clinical trials software.
 
-OpenClinica LLC
+OpenClinica, LLC
 460 Totten Pond Rd, Suite 200
 Waltham, MA 02451
 phone: 617.621.8585
 fax: 617.621.0065
 email: contact@openclinica.com
 
-For more about our products and services see:
-http://www.OpenClinica.com/
+For more about OpenClinica’s products and services see:
+http://www.OpenClinica.com/ [^] [^]
 
 
 --------------------------------------------------------------
