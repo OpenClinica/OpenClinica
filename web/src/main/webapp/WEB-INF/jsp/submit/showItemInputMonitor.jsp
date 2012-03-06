@@ -46,14 +46,14 @@ function genToolTips(itemId){
             }
 	   	}
     </c:forEach>
-	 	
-		  var htmlgen = 
+
+		  var htmlgen =
 	          '<div class=\"tooltip\">'+
 	          '<table  width="95%">'+
 	          ' <tr><td  align=\"center\" class=\"header1\">' +title+
 	          ' </td></tr><tr></tr></table><table  style="border-collapse:collapse" cellspacing="0" cellpadding="0" width="95%" >'+
 	          drawRows(i,resStatus,detailedNotes,discrepancyType,updatedDates,parentDnIds)+
-	          '</table><table width="95%"  class="tableborder" align="left">'+  	
+	          '</table><table width="95%"  class="tableborder" align="left">'+
 	          '</table><table><tr></tr></table>'+
 	          '<table width="95%"><tbody><td height="30" colspan="3"><span class=\"note\">'+footNote +'</span>'+
 	          '</td></tr>'+
@@ -61,7 +61,7 @@ function genToolTips(itemId){
               '</tbody></table></table></div>';
 		  return htmlgen;
 	}
-  
+
   </script>
 <c:set var="inputType" value="${displayItem.metadata.responseSet.responseType.name}" />
 <c:set var="itemId" value="${displayItem.item.id}" />
@@ -145,6 +145,20 @@ form element in red --%>
 		</c:choose>
 	</c:otherwise>
 	</c:choose>
+</c:if>
+
+<c:if test='${inputType == "instant-calculation"}'>
+  <label for="input<c:out value="${itemId}"/>"></label>
+  <c:choose>
+    <c:when test="${isInError}">
+      <span class="aka_exclaim_error">! </span><input class="aka_input_error" id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
+      "this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="text" name="input<c:out value="${itemId}" />" value="<c:out value="${inputTxtValue}"/>" />
+    </c:when>
+    <c:otherwise>
+      <input id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
+        "this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="text" name="input<c:out value="${itemId}" />" value="<c:out value="${inputTxtValue}"/>" />
+    </c:otherwise>
+  </c:choose>
 </c:if>
 
 <c:if test='${inputType == "text"}'>
@@ -269,10 +283,10 @@ form element in red --%>
   			displayItem.metadata.defaultValue != '' && displayItem.metadata.defaultValue != null}">
   	 --%>
   	 <c:when test="${
-                      (originJSP eq 'doubleDataEntry' || (! (originJSP eq 'administrativeEditing'))) 
-                       && (ddeEntered != false || ( hasDataFlag != true)) 
-                       && (ddeEntered != false || ( sessionScope['groupHasData'] != true)) 
-                       && displayItem.metadata.defaultValue != '' && displayItem.metadata.defaultValue != null}">		
+                      (originJSP eq 'doubleDataEntry' || (! (originJSP eq 'administrativeEditing')))
+                       && (ddeEntered != false || ( hasDataFlag != true))
+                       && (ddeEntered != false || ( sessionScope['groupHasData'] != true))
+                       && displayItem.metadata.defaultValue != '' && displayItem.metadata.defaultValue != null}">
         <c:set var="printDefault" value="true"/>
       </c:when>
       <c:otherwise>

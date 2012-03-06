@@ -7,6 +7,20 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
@@ -42,20 +56,6 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author jxu
@@ -129,7 +129,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
     protected void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
 
-        request.setAttribute(DIS_TYPES, DiscrepancyNoteType.toArrayList());
+        request.setAttribute(DIS_TYPES, DiscrepancyNoteType.list);
         if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.INVESTIGATOR)) {
             ArrayList<ResolutionStatus> resStatuses = new ArrayList();
             resStatuses.add(ResolutionStatus.UPDATED);
@@ -141,7 +141,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
             resStatuses2.add(ResolutionStatus.OPEN);
             resStatuses2.add(ResolutionStatus.RESOLVED);
             request.setAttribute(RES_STATUSES2, resStatuses2);
-            ArrayList types2 = DiscrepancyNoteType.toArrayList();
+            List<DiscrepancyNoteType> types2 = new ArrayList<DiscrepancyNoteType>(DiscrepancyNoteType.list);
             types2.remove(DiscrepancyNoteType.QUERY);
             request.setAttribute(DIS_TYPES2, types2);
         } else if(currentRole.getRole().equals(Role.MONITOR)){
@@ -155,7 +155,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
             types2.add(DiscrepancyNoteType.QUERY);
             request.setAttribute(DIS_TYPES2, types2);
         } else {//Role.STUDYDIRECTOR Role.COORDINATOR
-            ArrayList<ResolutionStatus> resStatuses = ResolutionStatus.toArrayList();
+            List<ResolutionStatus> resStatuses = new ArrayList<ResolutionStatus>(ResolutionStatus.list);
             resStatuses.remove(ResolutionStatus.NOT_APPLICABLE);
             request.setAttribute(RES_STATUSES, resStatuses); ;
             //it's for parentDNId is null or 0 and FVC

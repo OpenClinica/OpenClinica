@@ -28,4 +28,6 @@ public interface InputGenerator {
     // YW, 1-10-2007 << response type = calculation
     Element createCaculationTag(Element tdCell, Integer itemId, ResponseSetBean responseSet, boolean isDateType, String dbValue, boolean hasSavedData);
     // YW >>
+
+    Element createInstantTag(Element tdCell, Integer itemId, Integer tabNumber, String dbValue, boolean hasSavedData);
 }

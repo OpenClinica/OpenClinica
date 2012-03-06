@@ -1,11 +1,11 @@
 ﻿--------------------------------------------------------------
 OPENCLINICA RELEASE NOTES
-OpenClinica Version 3.1
+OpenClinica Version 3.1.3-alpha
 Document Version 1.0
 --------------------------------------------------------------
 
 --------------------------------------------------------------
-Updated: November 7, 2011 Paul Galvin pgalvin@akazaresearch.com
+Updated: Mar 5, 2012
 
 --------------------------------------------------------------
 
@@ -13,9 +13,12 @@ Updated: November 7, 2011 Paul Galvin pgalvin@akazaresearch.com
 OVERVIEW
 --------------------------------------------------------------
 
-This is the release of OpenClinica 3.1-ws.  
+This is the latest development release of OpenClinica 3.1.3-alpha code branch. 
 
-The web application and the web services piece of OpenClinica are in separate war files. For more information on the supported web services, and instructions on how to use them, please visit https://docs.openclinica.com/3.1/technical-documents/openclinica-web-services-guide
+A list of changes in each development release can be found at 
+https://issuetracker.openclinica.com/roadmap_page.php?project_id=160
+
+The web application and the web services piece of OpenClinica are in separate war files. 
 
 --------------------------------------------------------------
 CONTENTS OF THIS DOCUMENT
@@ -55,7 +58,8 @@ Some key features of OpenClinica include:
 --------------------------------------------------------------
 II. ISSUES ADDRESSED AND KNOWN ISSUES
 --------------------------------------------------------------
-This is a beta release.  To view the features and bugs being worked on for 3.1.1, please go to https://www.openclinica.org/bugtracker/roadmap_page.php?project_id=84 
+
+This is a development release. There will be bugs and it is not recommended for use in production. 
 
 --------------------------------------------------------------
 III. SOFTWARE DEPENDENCIES AND SYSTEM REQUIREMENTS
@@ -64,14 +68,12 @@ III. SOFTWARE DEPENDENCIES AND SYSTEM REQUIREMENTS
 Pre-requisites (versions):
     Operating system(s): Windows XP, Windows Server 2003, Redhat Enterprise Linux 4.0+
     Browsers: Internet Explorer  7.0, or 8.0 Mozilla Firefox 3.x
-    JDK : 1.6.0_16
-    Application server : Tomcat 6.0.20
+    JDK : 1.6.0
+    Application server : Tomcat 6.0
     Database server : PostgreSQL 8.4 or Oracle 10g
     OpenClinica version for Upgrades only: OpenClinica 3.0.x
 
-The source code has been removed from the distribution package to make it easier to navigate the file structure.  To access the source code, please visit https://svn.akazaresearch.com
-
-NOTE: You must configure the smtp host correctly, or the web page may time out when trying to send emails. 
+The source code has been removed from the distribution package to make it easier to navigate the file structure.  To access the source code, please visit https://dev.openclinica.com/hg/.
 
 --------------------------------------------------------------
 IV. ABOUT OPENCLINICA
@@ -90,16 +92,16 @@ OpenClinica is distributed under the GNU Lesser General Public License (GNU LGPL
 
 Developer and Contact Information
 --------------------------------------------------------------
-Akaza Research, based in Waltham, MA, provides clinical trials informatics solutions based on OpenClinica, the world's most widely used open source clinical trials software.
+OpenClinica, LLC, based in Waltham, MA, provides clinical trials informatics solutions based on OpenClinica, the world's most widely used open source clinical trials software.
 
-Akaza Research
+OpenClinica, LLC
 460 Totten Pond Rd, Suite 200
 Waltham, MA 02451
 phone: 617.621.8585
 fax: 617.621.0065
-email: contact@akazaresearch.com
+email: contact@openclinica.com
 
-For more about Akaza’s products and services see:
+For more about OpenClinica’s products and services see:
 http://www.OpenClinica.com/ [^] [^]
 
 

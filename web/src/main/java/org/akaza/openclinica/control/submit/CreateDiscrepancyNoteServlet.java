@@ -7,6 +7,16 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import java.text.DateFormat;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+
+import javax.servlet.http.HttpSession;
+
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
@@ -43,15 +53,6 @@ import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
-
-import java.text.DateFormat;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-
-import javax.servlet.http.HttpSession;
 
 /**
  * Create a discrepancy note for a data entity
@@ -156,10 +157,10 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
     protected void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
         DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(sm.getDataSource());
-        ArrayList types = DiscrepancyNoteType.toArrayList();
+        List<DiscrepancyNoteType> types = DiscrepancyNoteType.list;
 
         request.setAttribute(DIS_TYPES, types);
-        request.setAttribute(RES_STATUSES, ResolutionStatus.toArrayList());
+        request.setAttribute(RES_STATUSES, ResolutionStatus.list);
         // types.remove(DiscrepancyNoteType.ANNOTATION);//this for legancy data
         // only, not for new notes
 
@@ -389,7 +390,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             resStatuses.add(ResolutionStatus.OPEN);
             resStatuses.add(ResolutionStatus.RESOLVED);
             request.setAttribute(RES_STATUSES, resStatuses);
-            ArrayList types2 = DiscrepancyNoteType.toArrayList();
+            List<DiscrepancyNoteType> types2 = new ArrayList<DiscrepancyNoteType>(DiscrepancyNoteType.list);
             types2.remove(DiscrepancyNoteType.QUERY);
             request.setAttribute(DIS_TYPES, types2);
             request.setAttribute(WHICH_RES_STATUSES, "22");
@@ -404,7 +405,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             types2.add(DiscrepancyNoteType.QUERY);
             request.setAttribute(DIS_TYPES, types2);
         } else {//Role.STUDYDIRECTOR Role.COORDINATOR
-            ArrayList<ResolutionStatus> resStatuses = ResolutionStatus.toArrayList();
+            List<ResolutionStatus> resStatuses = new ArrayList<ResolutionStatus>(ResolutionStatus.list);
             resStatuses.remove(ResolutionStatus.NOT_APPLICABLE);
             request.setAttribute(RES_STATUSES, resStatuses); ;
             request.setAttribute(WHICH_RES_STATUSES, "2");

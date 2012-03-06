@@ -34,6 +34,21 @@
 	<input type="button" value="<fmt:message key="click_to_upload" bundle="${resword}"/>">
 </c:if>
 
+<c:if test='${inputType == "instant-calculation"}'>
+  <label for="input<c:out value="${itemId}"/>"></label>
+  <c:choose>
+    <c:when test="${isInError}">
+      <span class="aka_exclaim_error">! </span><input class="aka_input_error" id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
+      "this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="text" name="input<c:out value="${itemId}" />" value="<c:out value="${inputTxtValue}"/>" />
+    </c:when>
+    <c:otherwise>
+      <input id="input<c:out value="${itemId}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
+        "this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="text" name="input<c:out value="${itemId}" />" value="<c:out value="${inputTxtValue}"/>" />
+    </c:otherwise>
+  </c:choose>
+</c:if>
+
+
 <c:if test='${inputType == "text"}'>
 	<input tabindex="<c:out value="${tabNum}"/>" style="background:white;color:#4D4D4D;" onChange=
     "this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="text" name="input<c:out value="${itemId}" />" value="<c:out value="${inputTxtValue}"/>" />

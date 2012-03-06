@@ -19,7 +19,7 @@ import java.util.List;
 public class CellFactory {
     // The object to which this class delegates the creation of
     // input elements or tags.
-    private DataEntryInputGenerator inputGenerator = new DataEntryInputGenerator();
+    private final DataEntryInputGenerator inputGenerator = new DataEntryInputGenerator();
     // Two static fields used by addTextToCell() to position text inside the
     // table cell
     public final static String RIGHT = "right";
@@ -59,8 +59,8 @@ public class CellFactory {
          */
         if (responseName.equalsIgnoreCase("text")) {
             td =
-              inputGenerator.createTextInputTag(td, displayBean.getItem().getId(), tabIndex, displayBean.getMetadata().getDefaultValue(), (displayBean
-                .getItem().getItemDataTypeId() == 9), displayBean.getData().getValue(), hasSavedData);
+              inputGenerator.createTextInputTag(td, displayBean.getItem().getId(), tabIndex, displayBean.getMetadata().getDefaultValue(), displayBean
+                .getItem().getItemDataTypeId() == 9, displayBean.getData().getValue(), hasSavedData);
         } else if (responseName.equalsIgnoreCase("textarea")) {
             td =
               inputGenerator.createTextareaTag(td, displayBean.getItem().getId(), tabIndex, displayBean.getData().getValue(), displayBean.getMetadata()
@@ -89,10 +89,12 @@ public class CellFactory {
                 displayBean.getData().getValue(), displayBean.getMetadata().getDefaultValue(), hasSavedData);
         } else if (responseName.equalsIgnoreCase("calculation") || responseName.equalsIgnoreCase("group-calculation")) {
             td =
-              inputGenerator.createCaculationTag(td, displayBean.getItem().getId(), displayBean.getMetadata().getResponseSet(), (displayBean.getItem()
-                .getItemDataTypeId() == 9), displayBean.getData().getValue(), hasSavedData);
+              inputGenerator.createCaculationTag(td, displayBean.getItem().getId(), displayBean.getMetadata().getResponseSet(), displayBean.getItem()
+                .getItemDataTypeId() == 9, displayBean.getData().getValue(), hasSavedData);
         } else if (responseName.equalsIgnoreCase("file")) {
             td = inputGenerator.createFileTag(td, displayBean.getData().getValue(), forPrinting);
+        } else if (responseName.equalsIgnoreCase("instant-calculation")) {
+            td = inputGenerator.createInstantTag(td, displayBean.getItem().getId(), tabIndex, displayBean.getData().getValue(), hasSavedData);
         }
 
         String rightSideTxt = displayBean.getMetadata().getRightItemText();

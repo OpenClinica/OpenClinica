@@ -9,10 +9,17 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
+import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -29,23 +36,31 @@ import org.akaza.openclinica.control.submit.ListNotesTableFactory;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.*;
+import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
+import org.akaza.openclinica.log.Stopwatch;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
+import org.akaza.openclinica.service.managestudy.ViewNotesFilterCriteria;
+import org.akaza.openclinica.service.managestudy.ViewNotesService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.DiscrepancyNoteRow;
 import org.jmesa.facade.TableFacade;
-import org.jmesa.limit.Limit;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * 
+ *
  * View a list of all discrepancy notes in current study
- * 
+ *
  * @author ssachs
  * @author jxu
  */
@@ -57,6 +72,7 @@ public class ViewNotesServlet extends SecureController {
     public static final String NOTES_TABLE = "notesTable";
     public static final String DISCREPANCY_NOTE_TYPE = "discrepancyNoteType";
     private boolean showMoreLink;
+    private ViewNotesService viewNotesService;
 
     /*
      * public static final Map<Integer,String> TYPES = new HashMap<Integer,String>();
@@ -67,11 +83,14 @@ public class ViewNotesServlet extends SecureController {
      */
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.akaza.openclinica.control.core.SecureController#processRequest()
      */
     @Override
     protected void processRequest() throws Exception {
+        Stopwatch sw = Stopwatch.createAndStart("ViewNotesServlet#processRequest");
+        try {
+
         String module = request.getParameter("module");
         String moduleStr = "manage";
         if (module != null && module.trim().length() > 0) {
@@ -96,7 +115,7 @@ public class ViewNotesServlet extends SecureController {
         }else {
             showMoreLink = Boolean.parseBoolean(fp.getString("showMoreLink"));
         }
-        
+
         int oneSubjectId = fp.getInt("id");
         // BWP 11/03/2008 3029: This session attribute in removed in
         // ResolveDiscrepancyServlet.mayProceed() >>
@@ -140,7 +159,7 @@ public class ViewNotesServlet extends SecureController {
             session.removeAttribute(WIN_LOCATION);
             session.removeAttribute(NOTES_TABLE);
         }
-        
+
         // after resolving a note, user wants to go back to view notes page, we
         // save the current URL
         // so we can go back later
@@ -194,8 +213,8 @@ public class ViewNotesServlet extends SecureController {
         factory.setModule(moduleStr);
         factory.setDiscNoteType(discNoteType);
         factory.setResolutionStatus(resolutionStatus);
+        factory.setViewNotesService(resolveViewNotesService());
         //factory.setResolutionStatusIds(resolutionStatusIds);
-        long startTime = System.currentTimeMillis();
         TableFacade tf = factory.createTable(request, response);
         String viewNotesHtml = tf.render();
 
@@ -205,17 +224,20 @@ public class ViewNotesServlet extends SecureController {
         String viewNotesPageFileName = this.getPageServletFileName();
         session.setAttribute("viewNotesPageFileName", viewNotesPageFileName);
 
-        ArrayList allNotes = ListNotesTableFactory.getNotesForPrintPop();
+        List<DiscrepancyNoteBean> allNotes = factory.getAllNotes();
 
         session.setAttribute("allNotes", allNotes);
 
         DiscrepancyNoteUtil discNoteUtil = new DiscrepancyNoteUtil();
-        Map stats = discNoteUtil.generateDiscNoteSummary(allNotes);
-        Map<String, String> totalMap = discNoteUtil.generateDiscNoteTotal(allNotes);
+
+        Map<String, Map<String, String>> stats = generateDiscrepancyNotesSummary(resolveViewNotesService(),
+                ViewNotesFilterCriteria.buildFilterCriteria(tf.getLimit().getFilterSet(),
+                        resformat.getString("date_format_string")));
+        Map<String,String> totalMap = generateDiscrepancyNotesTotal(stats);
 
         int grandTotal = 0;
         for (String typeName: totalMap.keySet()) {
-            String total = totalMap.get(typeName); 
+            String total = totalMap.get(typeName);
             grandTotal = total.equals("--") ? grandTotal + 0 : grandTotal + Integer.parseInt(total);
         }
 
@@ -224,11 +246,6 @@ public class ViewNotesServlet extends SecureController {
         request.setAttribute("typeNames", discNoteUtil.getTypeNames());
         request.setAttribute("typeKeys", totalMap);
         request.setAttribute("grandTotal", grandTotal);
-        long endTime = System.currentTimeMillis();
-
-        System.out.println("Time taken[" + (startTime)/1000 + "]");
-        System.out.println("Time taken[" + (endTime)/1000 + "]");
-        System.out.println("Time taken[" + (endTime - startTime)/1000 + "]");
 
         if ("yes".equalsIgnoreCase(fp.getString(PRINT))) {
             request.setAttribute("allNotes", allNotes);
@@ -236,6 +253,58 @@ public class ViewNotesServlet extends SecureController {
         } else {
             forwardPage(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY);
         }
+        } finally {
+            sw.stop();
+        }
+    }
+
+    /**
+     * @param stats
+     * @return
+     */
+    private Map<String, String> generateDiscrepancyNotesTotal(Map<String, Map<String, String>> stats) {
+        Map<String, String> result = new HashMap<String, String>(stats.size());
+
+        int totals[] = new int[DiscrepancyNoteType.list.size() + 1]; // The "invalid" type is not part of this list
+
+        for (String resStatus : stats.keySet()) {
+            Map<String, String> dnTypeMap = stats.get(resStatus);
+            for (String dnType: dnTypeMap.keySet()) {
+                String stringVal = dnTypeMap.get(dnType);
+                int val = (stringVal.equals("--") ? 0 : Integer.parseInt(stringVal));
+                totals[DiscrepancyNoteType.getByName(dnType).getId()] += val;
+            }
+        }
+
+        for (int i = 1; i < totals.length; i++) { // Discarding i = 0 ("Invalid" DiscrepancyNoteType)
+            String dnType = DiscrepancyNoteType.get(i).getName();
+            result.put(dnType, (totals[i] == 0 ? "--" : Integer.toString(totals[i])));
+        }
+
+        return result;
+    }
+
+    /**
+     * @param resolveViewNotesService
+     * @return
+     */
+    private Map<String, Map<String, String>> generateDiscrepancyNotesSummary(ViewNotesService viewNotesService,
+            ViewNotesFilterCriteria filter) {
+        Map<Integer, Map<Integer, Integer>> summary = viewNotesService.calculateNotesSummary(currentStudy, filter);
+
+        Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>(summary.size());
+        for (ResolutionStatus resStatus : ResolutionStatus.list) {
+            Map<String, String> resStatusMap = new HashMap<String, String>(DiscrepancyNoteType.list.size());
+            int acc = 0;
+            for (DiscrepancyNoteType dnType : DiscrepancyNoteType.list) {
+                int val = summary.get(dnType.getId()).get(resStatus.getId());
+                resStatusMap.put(dnType.getName(), (val == 0 ? "--" : Integer.toString(val)));
+                acc += val;
+            }
+            resStatusMap.put("Total", (acc == 0 ? "--" : Integer.toString(acc)));
+            result.put(resStatus.getName(), resStatusMap);
+        }
+        return result;
     }
 
     public ArrayList<DiscrepancyNoteBean> filterForOneSubject(ArrayList<DiscrepancyNoteBean> allNotes, int subjectId, int resolutionStatus) {
@@ -313,12 +382,12 @@ public class ViewNotesServlet extends SecureController {
                  * StudyEventDAO sed = new StudyEventDAO(sm.getDataSource());
                  * StudyEventBean se = (StudyEventBean)
                  * sed.findByPK(dnb.getEntityId());
-                 * 
+                 *
                  * StudyEventDefinitionDAO seddao = new
                  * StudyEventDefinitionDAO(sm.getDataSource());
                  * StudyEventDefinitionBean sedb = (StudyEventDefinitionBean)
                  * seddao.findByPK(se.getStudyEventDefinitionId());
-                 * 
+                 *
                  * //dnr.setEntityName(sedb.getName()); }
                  */
                 else if (entityType.equalsIgnoreCase("itemData")) {
@@ -353,7 +422,7 @@ public class ViewNotesServlet extends SecureController {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.akaza.openclinica.control.core.SecureController#mayProceed()
      */
     @Override
@@ -444,4 +513,14 @@ public class ViewNotesServlet extends SecureController {
 
         return false;
     }
+
+    protected ViewNotesService resolveViewNotesService() {
+        if (viewNotesService == null) {
+            viewNotesService = (ViewNotesService) WebApplicationContextUtils.getWebApplicationContext(
+                    getServletContext()).getBean("viewNotesService");
+        }
+        return viewNotesService;
+
+    }
+
 }

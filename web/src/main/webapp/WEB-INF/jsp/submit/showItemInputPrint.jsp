@@ -12,7 +12,9 @@
 <c:if test='${inputType=="file"}'>
 	<input type="text" id="ft<c:out value="${itemId}"/>" name="fileText<c:out value="${itemId}"/>" value="<c:out value="${displayItem.data.value}"/>">
 </c:if>
-
+<c:if test='${inputType == "instant-calculation"}'>
+	<input type="text" name="input<c:out value="${itemId}" />" value="<c:out value="${displayItem.data.value}"/>" />
+</c:if>
 <c:if test='${inputType == "text"}'>
 	<input type="text" name="input<c:out value="${itemId}" />" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
 </c:if>

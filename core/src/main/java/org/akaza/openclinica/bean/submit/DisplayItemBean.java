@@ -10,6 +10,7 @@ import org.akaza.openclinica.bean.core.NullValue;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.service.crfdata.SCDData;
+import org.akaza.openclinica.service.crfdata.front.InstantOnChangeFrontStrGroup;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -23,10 +24,10 @@ public class DisplayItemBean implements Comparable {
     private ItemFormMetadataBean metadata;
     private String editFlag = "";// used for items in a group
     private ItemDataBean dbData; // used for DDE, items in a group
-    
-    
+
+
     //adding totals here for display purposes
-    
+
     private int totNew;
 	private int totUpdated;
     private int totRes;
@@ -34,7 +35,7 @@ public class DisplayItemBean implements Comparable {
 
 
 	private int totNA;
-    
+
 
 	private ArrayList<DiscrepancyNoteBean> discrepancyNotes;
 
@@ -79,9 +80,9 @@ public class DisplayItemBean implements Comparable {
      * Will hold the discrepancy note status for the item.
      */
     private int discrepancyNoteStatus;
-    
+
     /**
-     * It is true if a scd item will display because of chosen options. 
+     * It is true if a scd item will display because of chosen options.
      */
     private boolean isSCDtoBeShown = false;
     private SCDData scdData;
@@ -91,7 +92,9 @@ public class DisplayItemBean implements Comparable {
      * By default, it is false.
      */
     private boolean blankDwelt;
-    
+
+    private InstantOnChangeFrontStrGroup instantFrontStrGroup;
+
     private void setProperties() {
         data = new ItemDataBean();
         item = new ItemBean();
@@ -103,6 +106,7 @@ public class DisplayItemBean implements Comparable {
         isSCDtoBeShown = false;
         scdData = new SCDData();
         blankDwelt = false;
+        instantFrontStrGroup = new InstantOnChangeFrontStrGroup();
     }
 
     public DisplayItemBean() {
@@ -167,7 +171,7 @@ public class DisplayItemBean implements Comparable {
 
         org.akaza.openclinica.bean.core.ResponseType rt = rsb.getResponseType();
 
-        if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.RADIO) 
+        if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.RADIO)
             || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECT) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)) {
 
             if (eventDefinitionCRF != null) {
@@ -195,7 +199,7 @@ public class DisplayItemBean implements Comparable {
     /**
      * Assumes the children are ordered by getMetadata().getColumnNumber() in
      * ascending order.
-     * 
+     *
      * @param children
      *            The children to set.
      */
@@ -228,7 +232,7 @@ public class DisplayItemBean implements Comparable {
     /**
      * Allows DisplayItemBean objects to be sorted by their metadata's ordinal
      * value.
-     * 
+     *
      * @param o
      *            The object this bean is being compared to.
      * @return A negative number if o is a DisplayItemBean with a greater
@@ -250,7 +254,7 @@ public class DisplayItemBean implements Comparable {
      * Loads a set of values from the form into the bean. This means that the
      * selected property of the ResponseOptionBean objects
      * metadata.responseSet.opresponseOption value is set properly, and
-     * 
+     *
      * @param values
      */
     public void loadFormValue(ArrayList values) {
@@ -282,7 +286,7 @@ public class DisplayItemBean implements Comparable {
 
         if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXT) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXTAREA) //|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.CODING)
             || rt.equals(org.akaza.openclinica.bean.core.ResponseType.CALCULATION) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.GROUP_CALCULATION)
-            || rt.equals(org.akaza.openclinica.bean.core.ResponseType.FILE)) {
+            || rt.equals(org.akaza.openclinica.bean.core.ResponseType.FILE) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.INSTANT_CALCULATION)) {
             rsb.setValue(value);
         } else {
             if (value != null) {
@@ -312,7 +316,8 @@ public class DisplayItemBean implements Comparable {
                 }
             }
         } else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXT) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXTAREA) //|| rt.equals(org.akaza.openclinica.bean.core.ResponseType.CODING)
-            || rt.equals(org.akaza.openclinica.bean.core.ResponseType.CALCULATION) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.GROUP_CALCULATION)) {
+            || rt.equals(org.akaza.openclinica.bean.core.ResponseType.CALCULATION) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.GROUP_CALCULATION)
+            || rt.equals(org.akaza.openclinica.bean.core.ResponseType.INSTANT_CALCULATION)) {
             rsb.setValue(dbValue);
         } else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.FILE)) {
             // Here assume dbValue from database should be a valid file pathname
@@ -351,6 +356,7 @@ public class DisplayItemBean implements Comparable {
         result = prime * result + (discrepancyNotes == null ? 0 : discrepancyNotes.hashCode());
         result = prime * result + (editFlag == null ? 0 : editFlag.hashCode());
         result = prime * result + (eventDefinitionCRF == null ? 0 : eventDefinitionCRF.hashCode());
+        result = prime * result + (instantFrontStrGroup == null ? 0 : instantFrontStrGroup.hashCode());
         result = prime * result + (isSCDtoBeShown ? 1231 : 1237);
         result = prime * result + (item == null ? 0 : item.hashCode());
         result = prime * result + (metadata == null ? 0 : metadata.hashCode());
@@ -409,6 +415,11 @@ public class DisplayItemBean implements Comparable {
                 return false;
         } else if (!eventDefinitionCRF.equals(other.eventDefinitionCRF))
             return false;
+        if (instantFrontStrGroup == null) {
+            if (other.instantFrontStrGroup != null)
+                return false;
+        } else if (!instantFrontStrGroup.equals(other.instantFrontStrGroup))
+            return false;
         if (isSCDtoBeShown != other.isSCDtoBeShown)
             return false;
         if (item == null) {
@@ -451,7 +462,7 @@ public class DisplayItemBean implements Comparable {
     public EventDefinitionCRFBean getEventDefinitionCRF() {
         return eventDefinitionCRF;
     }
-    
+
     /**
      * @param eventDefinitionCRF
      *            The eventDefinitionCRF to set.
@@ -582,5 +593,13 @@ public class DisplayItemBean implements Comparable {
 
     public void setScdData(SCDData scdData) {
         this.scdData = scdData;
+    }
+
+    public InstantOnChangeFrontStrGroup getInstantFrontStrGroup() {
+        return instantFrontStrGroup;
+    }
+
+    public void setInstantFrontStrGroup(InstantOnChangeFrontStrGroup instantFrontStrGroup) {
+        this.instantFrontStrGroup = instantFrontStrGroup;
     }
 }

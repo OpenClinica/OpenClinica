@@ -76,7 +76,7 @@
 			SELECT d.* FROM item_data d, item_form_metadata m
 			WHERE d.item_id = m.item_id AND m.section_id = ? AND d.event_crf_id=?
 			and d.status_id != 5 and d.status_id != 7
-			order by d.oid, d.ordinal
+			order by d.ordinal
 		</sql>
 	</query>
 	<query>
