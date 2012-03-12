@@ -344,4 +344,14 @@ public class StudyModuleController {
         return false;
     }
 
+    private String getHostPathFromSysUrl(String sysURL,String contextPath) {
+        return sysURL.replaceAll(contextPath+"/", "");
+       }
+
+
+       private void logMe(String msg){
+            logger.info(msg);
+        }
+
+
 }
