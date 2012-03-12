@@ -87,6 +87,6 @@ onload="TabsForwardByNum(<c:out value="${tabId}"/>);<jsp:include page="../includ
 <!-- Main Navigation -->
 
 	<jsp:include page="../include/navBar.jsp">
-        <jsp:param name="isSpringController" value="1" />
+        <jsp:param name="isSpringController" value="true" />
     </jsp:include>
 <!-- End Main Navigation -->

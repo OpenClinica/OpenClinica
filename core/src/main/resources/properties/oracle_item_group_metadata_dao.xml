@@ -42,12 +42,6 @@
         where igm.item_id =? and igm.crf_version_id =?
     </sql>
   </query>
-   <query>
-    <name>findByCrfVersionId</name>
-    <sql>select igm.* from item_group_metadata igm
-        where  igm.crf_version_id =?
-    </sql>
-  </query>
   <query>
     <name>findByPK</name>
     <sql>select igm.* from item_group_metadata igm

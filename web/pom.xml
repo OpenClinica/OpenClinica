@@ -6,7 +6,7 @@
 	<name>OpenClinica Web Application</name>
 	<parent>
 		<groupId>org.akaza.openclinica</groupId>
-		<artifactId>OpenClinica-Parent</artifactId>
+		<artifactId>OpenClinica</artifactId>
 		<version>3.1-SNAPSHOT</version>
 	</parent>
 	<dependencies>

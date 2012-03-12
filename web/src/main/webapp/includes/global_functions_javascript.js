@@ -422,8 +422,6 @@ function clearInputElementValues(trElement) {
 			    var rp=-1;
 			    var rm=-1;
 			    var myDivEls="";
-			    var defVal = "";
-			    var defValDelimiter = "-----";
                 inputs = tdElements[i].getElementsByTagName('input');
                 selects= tdElements[i].getElementsByTagName('select');
 
@@ -451,23 +449,22 @@ function clearInputElementValues(trElement) {
                             }
                             if(inputs[j].getAttribute("type") &&
                                inputs[j].getAttribute("type").indexOf("text") != -1) {
-	                           if(defVal && defVal.length > 0)	{ var lookedId = defVal.split(defValDelimiter)[0];
-	                        		if(inputs[j].getAttribute("id")==lookedId) {
-	                        			inputs[j].setAttribute("value",defVal.split(defValDelimiter)[1]); defVal="";}
-                            	} else	inputs[j].setAttribute("value","");
+                                inputs[j].setAttribute("value","");
                             }
                             //remove two buttons, Replace, Remove, for File datatype.if(inputs[j].getAttribute("type") &&
                            if(inputs[j].getAttribute("type") &&
-                               inputs[j].getAttribute("type").indexOf("button") != -1) {
-                        	   if(inputs[j].getAttribute("id") == "rp"+myId) {
+                               inputs[j].getAttribute("type").indexOf("button") != -1 &&
+                               inputs[j].getAttribute("id") == "rp"+myId) {
 	                               rp = j;
-                        	   }else if(inputs[j].getAttribute("id") == "rm"+myId) {
-	                               rm = j;
-                        	   }
                            }
-                       	   else if(inputs[j].getAttribute("type") &&
-                               inputs[j].getAttribute("type").indexOf("hidden") != -1) {
-								if(inputs[j].getAttribute("id") == "hidft"+myId) {
+                           if(inputs[j].getAttribute("type") &&
+                               inputs[j].getAttribute("type").indexOf("button") != -1 &&
+                               inputs[j].getAttribute("id") == "rm"+myId) {
+	                               rm = j;
+                           }
+                           if(inputs[j].getAttribute("type") &&
+                               inputs[j].getAttribute("type").indexOf("hidden") != -1 &&
+                               inputs[j].getAttribute("id") == "hidft"+myId) {
 		                           inputs[j].setAttribute("id", "ft"+myId);
 		                           try {
 			                           inputs[j].setAttribute("type", "text");
@@ -480,7 +477,10 @@ function clearInputElementValues(trElement) {
 		                               }catch(e){}
 		                               inputs[j].parentNode.replaceChild(newElement,inputs[j]);
 	                           	   }
-								}else if(inputs[j].getAttribute("id") == "hidup"+myId) {
+                           }
+                           if(inputs[j].getAttribute("type") &&
+                               inputs[j].getAttribute("type").indexOf("hidden") != -1 &&
+                               inputs[j].getAttribute("id") == "hidup"+myId) {
 	                               inputs[j].setAttribute("id", "up"+myId);
 	                               try {
 	                               		inputs[j].setAttribute("type", "button");
@@ -495,13 +495,9 @@ function clearInputElementValues(trElement) {
 		                               }catch(e){}
 		                               inputs[j].parentNode.replaceChild(newElement,inputs[j]);
                                	   }
-								}else if(inputs[j].getAttribute("id").startsWith("defValue")) {
-									var dv = inputs[j].getAttribute("value");
-									if(dv && dv.length>0) defVal=inputs[j].getAttribute("id").substring(8)+defValDelimiter+dv;	
-								}
-                        	}
-                    	}
-                	}
+                           }
+                        }
+                    }
                 }//end if inputs
                 
                 if(rp>=0) {
@@ -550,10 +546,7 @@ function clearInputElementValues(trElement) {
                 if(textareas) {
                     for(var m = 0; m < textareas.length; m++){
                         if(textareas[m]) {
-	                        if(defVal && defVal.length > 0)	{ var lookedId = defVal.split(defValDelimiter)[0];
-	                        	if(textareas[m].getAttribute("id")==lookedId) {
-	                        		textareas[m].innerHTML=defVal.split(defValDelimiter)[1]; defVal="";}
-                            	} else	textareas[m].innerHTML="";
+                            textareas[m].innerHTML="";
                         }
                     }
                 }

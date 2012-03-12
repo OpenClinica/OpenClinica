@@ -165,6 +165,4 @@
     <c:param name="module" value="manage"/>
 </c:import>
 
-<jsp:include page="include/footer.jsp">
- <jsp:param name="isSpringControllerFooter" value="1" />
-    </jsp:include>
+<jsp:include page="include/footer.jsp"/>
