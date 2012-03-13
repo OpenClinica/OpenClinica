@@ -261,7 +261,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
 <c:set var="ddeEntered" value="${requestScope['ddeEntered']}" />
 <!-- for the rows in model, input name processed by back-end servlet, needs to change them back to the name got from form, so we can show error frame around the input -->
 <c:set var="autoParsedInputName" value="${repeatParentId}_${rowCount - manualRows}input${itemId}" />
-<c:set var="isTemplateRow" value="${param.isTemplateRow}" />
+
 
 <c:if test="${isLast == false && rowCount==0}">
   <c:set var="inputName" value="${repeatParentId}_${rowCount}input${itemId}" />
@@ -381,7 +381,6 @@ function switchStr(itemId, id,attribute,str1,str2) {
   <%-- <c:out value="txt item"/> --%>
   <%-- add for error messages --%>
   <label for="<c:out value="${inputName}"/>"></label>
-  <input type="hidden" id="defValue<c:out value="${inputName}"/>" name="defValue<c:out value="${inputName}"/>" value="<c:out value="${defValue}"/>"/>
   <c:choose>
     <c:when test="${isInError}">
       <span class="aka_exclaim_error">! </span><input class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
@@ -406,7 +405,6 @@ function switchStr(itemId, id,attribute,str1,str2) {
 </c:if>
 <c:if test='${inputType == "textarea"}'>
   <label for="<c:out value="${inputName}"/>"></label>
-  <input type="hidden" id="defValue<c:out value="${inputName}"/>" name="defValue<c:out value="${inputName}"/>" value="<c:out value="${defValue}"/>"/>
   <c:choose>
     <c:when test="${isInError}">
       <span class="aka_exclaim_error">! </span><textarea class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
@@ -522,56 +520,41 @@ function switchStr(itemId, id,attribute,str1,str2) {
 
   <label for="<c:out value="${inputName}"/>"></label>
   <c:choose>
-  	<c:when test="${displayItem.metadata.defaultValue != '' &&
-                displayItem.metadata.defaultValue != null}">
-    	<c:set var="printDefault" value="true"/>
-    </c:when>
-    <c:otherwise><c:set var="printDefault" value="false"/></c:otherwise>
-  </c:choose>
-  <c:choose>
+
     <c:when test="${isInError}">
       <span class="aka_exclaim_error">! </span>
       <select class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
       onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" name="<c:out value="${inputName}"/>" class="formfield">
+        <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
           <c:choose>
-          <c:when test="${printDefault == 'true'}">
-            <c:set var="count" value="0"/>
-            <option value="<c:out value="" />" <c:out value=""/> ><c:out value="${displayItem.metadata.defaultValue}" /></option>
-            <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
-              <c:choose>
-                <c:when test="${count==selectedOption}"><c:set var="checked" value="selected" /></c:when>
-                <c:otherwise><c:set var="checked" value="" /></c:otherwise>
-              </c:choose>
-              <option value="<c:out value="${option.value}" />" <c:out value="${checked}"/> ><c:out value="${option.text}" /></option>
-              <c:set var="count" value="${count+1}"/>
-            </c:forEach>
-          </c:when>
-          <c:otherwise>
-           <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
-	          <c:choose>
-	            <c:when test="${count==selectedOption}">
-	              <c:set var="checked" value="selected" />
-	            </c:when>
-	            <c:otherwise>
-	              <c:set var="checked" value="" />
-	            </c:otherwise>
-	          </c:choose>
-	          <option value="<c:out value="${option.value}" />" <c:out value="${checked}"/>
-	                    <c:if test="${option.selected}">
-	      	                selected="selected"
-	                    </c:if>
-	                  >
-	            <c:out value="${option.text}" />
-	          </option>
-          	<c:set var="count" value="${count+1}"/>
-        	</c:forEach>
-          </c:otherwise>
-        </c:choose>
+            <c:when test="${count==selectedOption}">
+              <c:set var="checked" value="selected" />
+            </c:when>
+            <c:otherwise>
+              <c:set var="checked" value="" />
+            </c:otherwise>
+          </c:choose>
+          <option value="<c:out value="${option.value}" />" <c:out value="${checked}"/>
+                    <c:if test="${option.selected}">
+      	                selected="selected"
+                    </c:if>
+                  >
+            <c:out value="${option.text}" />
+          </option>
+
+          <c:set var="count" value="${count+1}"/>
+        </c:forEach>
       </select>
     </c:when>
 
     <c:otherwise>
-
+      <c:choose>
+        <c:when test="${displayItem.metadata.defaultValue != '' &&
+                displayItem.metadata.defaultValue != null}">
+          <c:set var="printDefault" value="true"/>
+        </c:when>
+        <c:otherwise><c:set var="printDefault" value="false"/></c:otherwise>
+      </c:choose>
       <c:set var="selectedOption" value="-1"/>
       <c:set var="count" value="0"/>
       <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">

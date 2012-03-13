@@ -148,7 +148,7 @@ public class MainMenuServlet extends SecureController {
                         addPageMessage(respage.getString("current_study_frozen"));
                     }
                 }
-//Yufang code added by Jamuna, to optimize the query on MainMenu
+
                 ////Integer assignedDiscrepancies = getDiscrepancyNoteDAO().countAllItemDataByStudyAndUser(currentStudy, ub);
                 //Integer assignedDiscrepancies = getDiscrepancyNoteDAO().getViewNotesCountWithFilter(" AND dn.assigned_user_id ="
                 //  + ub.getId() + " AND (dn.resolution_status_id=1 OR dn.resolution_status_id=2 OR dn.resolution_status_id=3)", currentStudy);

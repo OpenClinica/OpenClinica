@@ -934,7 +934,6 @@ window.onload = initmb;
                             <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
                             <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                             <c:param name="originJSP" value="doubleDataEntry"/>
-                            <c:param name="isTemplateRow" value="${true}"/>
                         </c:import>
                     </td>
                 </c:forEach>
@@ -957,7 +956,6 @@ window.onload = initmb;
                             <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
                             <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                             <c:param name="originJSP" value="doubleDataEntry"/>
-                            <c:param name="isTemplateRow" value="${true}"/>
                         </c:import>
                     </td>
                 </c:forEach>

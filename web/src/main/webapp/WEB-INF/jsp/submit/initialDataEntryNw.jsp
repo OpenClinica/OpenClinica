@@ -117,9 +117,6 @@ giveFirstElementFocus(); BWP: TabsForwardByNum(<c:out value="${tabId}"/>);--%>
 <input type="hidden" name="sectionId" value="<c:out value="${section.section.id}"/>" />
 <input type="hidden" name="checkInputs" value="<c:out value="${checkInputsValue}"/>" />
 <input type="hidden" name="tab" value="<c:out value="${tabId}"/>" />
-<input type="hidden" name="sectionId" value="<c:out value="${section.section.id}"/>" />
-<input type="hidden" name="isFirstTimeOnSection" value="<c:out value="${section.section.id}"/>" />
-
 <%-- We have to feed this value to the method giveFirstElementFocus()--%>
 <input id="formFirstField" type="hidden" name="formFirstField" value="${requestScope['formFirstField']}" />
 <input type="hidden" name="exitTo" value="${exitTo}" />
@@ -1005,7 +1002,6 @@ but the custom tag uses that, not this jstl code--%>
                             <c:param name="isLast" value="${true}"/>
 							<c:param name="isTemplateRow" value="${true}"/>
                             <c:param name="tabNum" value="${itemNum}"/>
-                            <c:param name="isTemplateRow" value="${true}"/>
                             <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
                             <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                             <c:param name="originJSP" value="initialDataEntry"/>
@@ -1031,7 +1027,6 @@ but the custom tag uses that, not this jstl code--%>
                             <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
                             <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                             <c:param name="originJSP" value="initialDataEntry"/>
-                            <c:param name="isTemplateRow" value="${true}"/>
 
                         </c:import>
                     </td>
@@ -1049,8 +1044,7 @@ but the custom tag uses that, not this jstl code--%>
                         <c:param name="tabNum" value="${itemNum}"/>
                         <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                         <c:param name="originJSP" value="initialDataEntry"/>
-                        <c:param name="isTemplateRow" value="${true}"/>
-
+                     
                     </c:import>
                 </td>
             </c:when>
@@ -1077,7 +1071,6 @@ but the custom tag uses that, not this jstl code--%>
                         <c:param name="tabNum" value="${itemNum}"/>
                         <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                         <c:param name="originJSP" value="initialDataEntry"/>
-                        <c:param name="isTemplateRow" value="${true}"/>
                     </c:import>
                     <c:import url="../submit/generateGroupItemTxt.jsp">
                         <c:param name="itemId" value="${bodyItem.item.id}"/>

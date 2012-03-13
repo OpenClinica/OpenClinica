@@ -92,8 +92,5 @@
     <script type="text/javascript">hideCols('s_sdv',[2,3,4])</script>
 
 </div>
-<jsp:include page="include/footer.jsp">
- <jsp:param name="isSpringControllerFooter" value="1" />
-    </jsp:include>
 </body>
 </html>
