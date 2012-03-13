@@ -73,4 +73,13 @@
   	<name>findThisCrfVersionId</name>
   	<sql>select distinct crf_version_id from item_group_metadata igm where igm.crf_version_id=?</sql>
   </query>
+  
+  
+    <query>
+    <name>findByCrfVersionId</name>
+    <sql>select igm.* from item_group_metadata igm
+        where  igm.crf_version_id =?
+    </sql>
+  </query>
+   
 </queries>

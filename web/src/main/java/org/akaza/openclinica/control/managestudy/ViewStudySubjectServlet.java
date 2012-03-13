@@ -180,6 +180,12 @@ public class ViewStudySubjectServlet extends SecureController {
         String module = fp.getString(MODULE);
         request.setAttribute(MODULE, module);
 
+		       // if coming from change crf version -> display message
+        String crfVersionChangeMsg = fp.getString("isFromCRFVersionChange");
+        if ( crfVersionChangeMsg!= null && !crfVersionChangeMsg.equals("")){
+        	addPageMessage(crfVersionChangeMsg);
+            
+       }
         if (studySubId == 0) {
             addPageMessage(respage.getString("please_choose_a_subject_to_view"));
             forwardPage(Page.LIST_STUDY_SUBJECTS);

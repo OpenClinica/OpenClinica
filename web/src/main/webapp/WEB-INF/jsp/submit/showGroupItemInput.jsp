@@ -261,7 +261,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
 <c:set var="ddeEntered" value="${requestScope['ddeEntered']}" />
 <!-- for the rows in model, input name processed by back-end servlet, needs to change them back to the name got from form, so we can show error frame around the input -->
 <c:set var="autoParsedInputName" value="${repeatParentId}_${rowCount - manualRows}input${itemId}" />
-<c:set var="isTemplateRow" value="${param.isTemplateRow}" />
+
 
 <c:if test="${isLast == false && rowCount==0}">
   <c:set var="inputName" value="${repeatParentId}_${rowCount}input${itemId}" />

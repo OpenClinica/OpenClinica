@@ -105,7 +105,7 @@
 	<query>
 		<name>findAllItemsByVersionId</name>
 		<sql>select i.* from versioning_map v, item i 
-		where v.item_id =i.item_id and v.crf_version_id=?
+		where v.item_id =i.item_id and v.crf_version_id=? order by i.item_id
 		</sql>
 	</query>
     <query>
@@ -197,4 +197,16 @@
            select count(item.item_id) from item where item.status_id != 5
         </sql>
     </query>
+	    <query>
+        <name>findAllWithItemDataByCRFVersionId</name>
+        <sql>
+             select   name, ordinal, oc_oid, item_data_id, i.item_id as item_id, 
+           value from item_data id, item i,versioning_map v
+            where 
+            v.item_id =i.item_id and v.crf_version_id=? and
+            id.item_id=i.item_id and event_crf_id = ? order  by i.item_id,ordinal;
+
+
+    	</sql>
+   </query>
 </queries>

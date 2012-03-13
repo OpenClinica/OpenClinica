@@ -478,5 +478,12 @@
             event_crf_id in (select event_crf_id from event_crf where study_subject_id = ?)
         </sql>
     </query>
-    
+     <query>
+        <name>updateCRFVersionID</name>
+        <sql>
+            UPDATE EVENT_CRF
+            SET CRF_VERSION_ID=?
+            WHERE EVENT_CRF_ID=?
+        </sql>
+   </query>
 </queries>

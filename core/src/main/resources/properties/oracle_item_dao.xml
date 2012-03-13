@@ -190,4 +190,12 @@
         <name>findAllByEventCRFIdAndItemIdNoStatus</name>
         <sql>select * from item_data where event_crf_id=? and item_id = ? Order by item_data.ordinal asc </sql>
     </query>
+	 
+    
+     <query>
+        <name>findAllWithItemDataByCRFVersionId</name>
+        <sql>
+             select   name, ordinal, oc_oid, item_data_id, i.item_id as item_id,    value from item_data id, item i,versioning_map v            where    v.item_id =i.item_id and v.crf_version_id=? and            id.item_id=i.item_id and event_crf_id = ? order  by i.item_id,ordinal
+    	</sql>
+    </query>
 </queries>
