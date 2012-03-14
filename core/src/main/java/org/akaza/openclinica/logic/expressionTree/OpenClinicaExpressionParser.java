@@ -125,7 +125,7 @@ public class OpenClinicaExpressionParser {
                 // previous terms into a bigger expression tree.
                 // char op = textIO.getAnyChar();
                 String op = textIO.peek() == 'o' ? textIO.getAnyString(3) : textIO.getAnyString(4);
-                logger.info("Operator" + op);
+                logger.debug("Operator" + op);
                 ExpressionNode nextTerm = termTree3();
                 exp = ExpressionNodeFactory.getExpNode(Operator.getByDescription(op), exp, nextTerm);
                 textIO.skipBlanks();
@@ -218,14 +218,14 @@ public class OpenClinicaExpressionParser {
     private ExpressionNode factorTree() throws OpenClinicaSystemException {
         textIO.skipBlanks();
         char ch = textIO.peek();
-        logger.info("TheChar is : " + ch);
+        logger.debug("TheChar is : " + ch);
         if (Character.isDigit(ch)) {
             String dateOrNum = textIO.getDate();
             if (dateOrNum == null) {
                 dateOrNum = String.valueOf(textIO.getDouble());
 
             }
-            logger.info("TheNum is : " + dateOrNum);
+            logger.debug("TheNum is : " + dateOrNum);
             return new ConstantNode(dateOrNum);
         } else if (ch == '(') {
             // The factor is an expression in parentheses.
@@ -239,11 +239,11 @@ public class OpenClinicaExpressionParser {
             return exp;
         } else if (String.valueOf(ch).matches("\\w+")) {
             String k = textIO.getWord();
-            logger.info("TheWord 1 is : " + k);
+            logger.debug("TheWord 1 is : " + k);
             return new OpenClinicaVariableNode(k, expressionWrapper, this);
         } else if (String.valueOf(ch).matches("\"")) {
             String k = textIO.getDoubleQuoteWord();
-            logger.info("TheWord 2 is : " + k);
+            logger.debug("TheWord 2 is : " + k);
             return new ConstantNode(k);
         } else if (ch == '\n')
             throw new OpenClinicaSystemException("OCRERR_0007");

@@ -100,7 +100,7 @@ public class SessionManager {
                 userName = "";
             }
             ub = (UserAccountBean) uDAO.findByUserName(userName);
-            logger.info("User  : {} , email address : {} Logged In ", ub.getName(), ub.getEmail());
+            logger.debug("User  : {} , email address : {} Logged In ", ub.getName(), ub.getEmail());
 
         } else {
             ub = userFromSession;

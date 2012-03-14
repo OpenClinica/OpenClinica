@@ -740,11 +740,11 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     List<DisplayItemGroupBean> formGroups = new ArrayList<DisplayItemGroupBean>();
                     // List<DisplayItemGroupBean> dbGroups2 = loadFormValueForItemGroup(dgb, dbGroups, formGroups, eventDefinitionCRFId);
                     // tbh 01/2010 change here to collect manual row counts
-                    logger.info("got db item group size " + dbGroups.size());
+                    logger.debug("got db item group size " + dbGroups.size());
 
                     if (validate) {
                         // int manualGroups = getManualRows(dbGroups2);
-                        // logger.info("+++ found manual rows from db group 2: " + manualGroups);
+                        // logger.debug("+++ found manual rows from db group 2: " + manualGroups);
                         logger.debug("===IF VALIDATE NOT A SINGLE ITEM: got to this part in the validation loop: " + dgb.getGroupMetaBean().getName());
                         // TODO next marker tbh 112007
                         // formGroups = validateDisplayItemGroupBean(v,
@@ -907,7 +907,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     // items again?
                     if (validate) {
                         // int manualGroups = getManualRows(dbGroups2);
-                        // logger.info("+++ found manual rows for db group2: " + manualGroups);
+                        // logger.debug("+++ found manual rows for db group2: " + manualGroups);
                         formGroups = validateDisplayItemGroupBean(v, dgb, dbGroups, formGroups, ruleValidator, groupOrdinalPLusItemOid, request, response);
                         // formGroups = validateDisplayItemGroupBean(v, dgb,
                         // dbGroups, formGroups);
@@ -1593,7 +1593,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                     // LAST ONE
                                     logger.trace("last one");
                                     int ordinal = j - this.getManualRows(dgbs);
-                                    logger.info("+++ found manual rows from line 1326: " + ordinal);
+                                    logger.debug("+++ found manual rows from line 1326: " + ordinal);
                                     inputName = getGroupItemInputName(displayGroup, ordinal, displayItem);
                                 }
                                 // logger.trace("&&& we get previous looking at input name: " + inputName + " " + inputName2);
@@ -3159,7 +3159,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 idb.setUpdater(ub);
                 // tbh 5990: should we update the logic here for nonrepeats?
                 // //System.out.println("string util is blank: update an item data " + idb.getId() + " :" + idb.getValue());
-                logger.info("update item update_id " + idb.getUpdater().getId());
+                logger.debug("update item update_id " + idb.getUpdater().getId());
                 idb = (ItemDataBean) iddao.updateValue(idb);
             }
         } else {
@@ -3181,7 +3181,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                 idb.setUpdater(ub);
 
                 // //System.out.println("update an item data - running update value " + idb.getId() + " :" + idb.getValue());
-                logger.info("update item update_id " + idb.getUpdater().getId());
+                logger.debug("update item update_id " + idb.getUpdater().getId());
                 // update tbh #5999, #5998; if an item_data was not included in
                 // an import data, it won't exist; we need to check on item_data_id
                 // to make sure we are running the correct command on the db
@@ -4824,7 +4824,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
      */
     public final String getGroupItemManualInputName(DisplayItemGroupBean digb, int ordinal, DisplayItemBean dib) {
         String inputName = digb.getItemGroupBean().getOid() + "_manual" + ordinal + getInputName(dib);
-        logger.info("+++ returning manual: " + inputName);
+        logger.debug("+++ returning manual: " + inputName);
         return inputName;
     }
 

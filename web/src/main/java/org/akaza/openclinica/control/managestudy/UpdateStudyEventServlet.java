@@ -236,13 +236,13 @@ public class UpdateStudyEventServlet extends SecureController {
         EventDefinitionCRFDAO edefcrfdao = new EventDefinitionCRFDAO(sm.getDataSource());
         ArrayList getAllECRFs = (ArrayList) edefcrfdao.findAllByDefinition(studyBean, studyEvent.getStudyEventDefinitionId());
         // does the study event have all complete CRFs which are required?
-        logger.info("found number of ecrfs: " + getAllECRFs.size());
+        logger.debug("found number of ecrfs: " + getAllECRFs.size());
         // may not be populated, only entered crfs seem to ping the list
         for (int u = 0; u < getAllECRFs.size(); u++) {
             EventDefinitionCRFBean ecrfBean = (EventDefinitionCRFBean) getAllECRFs.get(u);
 
             //
-            logger.info("found number of existing ecrfs: " + getECRFs.size());
+            logger.debug("found number of existing ecrfs: " + getECRFs.size());
             if (getECRFs.size() == 0) {
                 statuses.remove(SubjectEventStatus.COMPLETED);
                 statuses.remove(SubjectEventStatus.LOCKED);
@@ -250,10 +250,10 @@ public class UpdateStudyEventServlet extends SecureController {
             }// otherwise...
             for (int uv = 0; uv < getECRFs.size(); uv++) {
                 EventCRFBean existingBean = (EventCRFBean) getECRFs.get(uv);
-                logger.info("***** found: " + existingBean.getCRFVersionId() + " " + existingBean.getCrf().getId() + " "
+                logger.debug("***** found: " + existingBean.getCRFVersionId() + " " + existingBean.getCrf().getId() + " "
                     + existingBean.getCrfVersion().getName() + " " + existingBean.getStatus().getName() + " " + existingBean.getStage().getName());
 
-                logger.info("***** comparing above to ecrfBean.DefaultVersionID: " + ecrfBean.getDefaultVersionId());
+                logger.debug("***** comparing above to ecrfBean.DefaultVersionID: " + ecrfBean.getDefaultVersionId());
 
                 // if (existingBean.getCRFVersionId() ==
                 // ecrfBean.getDefaultVersionId()) {
@@ -265,7 +265,7 @@ public class UpdateStudyEventServlet extends SecureController {
                 // this is addressed in the if-clause above
                 if (!existingBean.getStatus().equals(Status.UNAVAILABLE) && edefcrfdao.isRequiredInDefinition(existingBean.getCRFVersionId(), studyEvent)) {
 
-                    logger.info("found that " + existingBean.getCrfVersion().getName() + " is required...");
+                    logger.debug("found that " + existingBean.getCrfVersion().getName() + " is required...");
                     // that is, it's not completed but required to complete
                     statuses.remove(SubjectEventStatus.COMPLETED);
                     statuses.remove(SubjectEventStatus.LOCKED);
@@ -429,7 +429,7 @@ public class UpdateStudyEventServlet extends SecureController {
 
                 forwardPage(Page.UPDATE_STUDY_EVENT_SIGNED);
             } else {
-                logger.info("no validation error");
+                logger.debug("no validation error");
                 // YW 08-17-2007 << update start_time_flag column
                 if (fp.getString(INPUT_STARTDATE_PREFIX + "Hour").equals("-1") && fp.getString(INPUT_STARTDATE_PREFIX + "Minute").equals("-1")
                     && fp.getString(INPUT_STARTDATE_PREFIX + "Half").equals("")) {
@@ -452,7 +452,7 @@ public class UpdateStudyEventServlet extends SecureController {
                 // YW >>
                 studyEvent.setLocation(fp.getString(INPUT_LOCATION));
 
-                logger.info("update study event...");
+                logger.debug("update study event...");
                 studyEvent.setUpdater(ub);
                 studyEvent.setUpdatedDate(new Date());
                 sedao.update(studyEvent);
@@ -496,7 +496,7 @@ public class UpdateStudyEventServlet extends SecureController {
                     }
                 }
                 if (allSigned) {
-                    logger.info("Signing StudySubject [" + ssub.getSubjectId() + "]");
+                    logger.debug("Signing StudySubject [" + ssub.getSubjectId() + "]");
                     ssub.setStatus(Status.SIGNED);
                     ssub.setUpdater(ub);
                     ssdao.update(ssub);
@@ -547,7 +547,7 @@ public class UpdateStudyEventServlet extends SecureController {
                 forwardPage(Page.UPDATE_STUDY_EVENT_SIGNED);
             }
         } else {
-            logger.info("no action, go to update page");
+            logger.debug("no action, go to update page");
 
             DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(sm.getDataSource());
             StudySubjectBean studySubjectBean = (StudySubjectBean) ssdao.findByPK(studyEvent.getStudySubjectId());
@@ -724,13 +724,13 @@ public class UpdateStudyEventServlet extends SecureController {
                     boolean isLocked = false;
                     for (int ii = 0; ii < versions.size(); ii++) {
                         CRFVersionBean crfvb = (CRFVersionBean) versions.get(ii);
-                        logger.info("...checking versions..." + crfvb.getName());
+                        logger.debug("...checking versions..." + crfvb.getName());
                         if (!crfvb.getStatus().equals(Status.AVAILABLE)) {
-                            logger.info("found a non active crf version");
+                            logger.debug("found a non active crf version");
                             isLocked = true;
                         }
                     }
-                    logger.info("re-set event def, line 240: " + isLocked);
+                    logger.debug("re-set event def, line 240: " + isLocked);
                     if (isLocked) {
                         dedcrf.setStatus(Status.LOCKED);
                         dedcrf.getEventCRF().setStage(DataEntryStage.LOCKED);
@@ -743,7 +743,7 @@ public class UpdateStudyEventServlet extends SecureController {
                 }// added 102007, tbh
             } else {
                 dedcrf.getEdc().setCrf(cb);
-                logger.info("_found a non active crf _");
+                logger.debug("_found a non active crf _");
                 dedcrf.setStatus(Status.LOCKED);
                 dedcrf.getEventCRF().setStage(DataEntryStage.LOCKED);
                 dedcrf.getEdc().getCrf().setStatus(Status.LOCKED);

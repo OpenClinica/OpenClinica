@@ -410,13 +410,13 @@ public class EnterDataForStudyEventServlet extends SecureController {
                     boolean isLocked = false;
                     for (int ii = 0; ii < versions.size(); ii++) {
                         CRFVersionBean crfvb = (CRFVersionBean) versions.get(ii);
-                        logger.info("...checking versions..." + crfvb.getName());
+                        logger.debug("...checking versions..." + crfvb.getName());
                         if (!crfvb.getStatus().equals(Status.AVAILABLE)) {
-                            logger.info("found a non active crf version");
+                            logger.debug("found a non active crf version");
                             isLocked = true;
                         }
                     }
-                    logger.info("re-set event def, line 240: " + isLocked);
+                    logger.debug("re-set event def, line 240: " + isLocked);
                     if (isLocked) {
                         dedcrf.setStatus(Status.LOCKED);
                         dedcrf.getEventCRF().setStage(DataEntryStage.LOCKED);
@@ -429,7 +429,7 @@ public class EnterDataForStudyEventServlet extends SecureController {
                 }// added 102007, tbh
             } else {
                 dedcrf.getEdc().setCrf(cb);
-                logger.info("_found a non active crf _");
+                logger.debug("_found a non active crf _");
                 dedcrf.setStatus(Status.LOCKED);
                 dedcrf.getEventCRF().setStage(DataEntryStage.LOCKED);
                 dedcrf.getEdc().getCrf().setStatus(Status.LOCKED);
@@ -467,21 +467,21 @@ public class EnterDataForStudyEventServlet extends SecureController {
         for (i = 0; i < eventCRFs.size(); i++) {
             EventCRFBean ecb = (EventCRFBean) eventCRFs.get(i);
 
-            logger.info("0. found event crf bean: " + ecb.getName());
+            logger.debug("0. found event crf bean: " + ecb.getName());
 
             // populate the event CRF with its crf bean
             int crfVersionId = ecb.getCRFVersionId();
             CRFBean cb = cdao.findByVersionId(crfVersionId);
-            logger.info("1. found crf bean: " + cb.getName());
+            logger.debug("1. found crf bean: " + cb.getName());
 
             ecb.setCrf(cb);
 
             CRFVersionBean cvb = (CRFVersionBean) cvdao.findByPK(crfVersionId);
-            logger.info("2. found crf version bean: " + cvb.getName());
+            logger.debug("2. found crf version bean: " + cvb.getName());
 
             ecb.setCrfVersion(cvb);
 
-            logger.info("found subj event status: " + status.getName() + " cb status: " + cb.getStatus().getName() + " cvb status: "
+            logger.debug("found subj event status: " + status.getName() + " cb status: " + cb.getStatus().getName() + " cvb status: "
                 + cvb.getStatus().getName());
             // below added tbh 092007
             boolean invalidate = false;
@@ -491,15 +491,15 @@ public class EnterDataForStudyEventServlet extends SecureController {
                 ecb.setStage(DataEntryStage.LOCKED);
                 // invalidate = true;
             } else if (!cb.getStatus().equals(Status.AVAILABLE)) {
-                logger.info("got to the CB version of the logic");
+                logger.debug("got to the CB version of the logic");
                 ecb.setStage(DataEntryStage.LOCKED);
                 // invalidate= true;
             } else if (!cvb.getStatus().equals(Status.AVAILABLE)) {
-                logger.info("got to the CVB version of the logic");
+                logger.debug("got to the CVB version of the logic");
                 ecb.setStage(DataEntryStage.LOCKED);
                 // invalidate = true;
             }
-            logger.info("found ecb stage of " + ecb.getStage().getName());
+            logger.debug("found ecb stage of " + ecb.getStage().getName());
 
             // above added tbh, 092007-102007
             try {
@@ -508,7 +508,7 @@ public class EnterDataForStudyEventServlet extends SecureController {
                 // this creates problems if we remove CRFs from
                 // event definitions
                 EventDefinitionCRFBean edcb = (EventDefinitionCRFBean) definitionsByCRFId.get(new Integer(cb.getId()));
-                logger.info("3. found event def crf bean: " + edcb.getName());
+                logger.debug("3. found event def crf bean: " + edcb.getName());
 
                 DisplayEventCRFBean dec = new DisplayEventCRFBean();
 
@@ -520,7 +520,7 @@ public class EnterDataForStudyEventServlet extends SecureController {
                     answer.add(dec);
                 }
             } catch (NullPointerException npe) {
-                logger.info("5. got to NPE on this time around!");
+                logger.debug("5. got to NPE on this time around!");
             }
         }
 

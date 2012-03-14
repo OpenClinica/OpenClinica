@@ -314,7 +314,7 @@ public class ExpressionService {
 
     public String getValueFromForm(String expression, Map<String, ItemBean> itemBeans) {
         if (itemBeans == null)
-            logger.info("The Map that stores ItemBeans is null. Item Date value cannot be processed.");
+            logger.debug("The Map that stores ItemBeans is null. Item Date value cannot be processed.");
         String result = null;
         HashMap<String, String> formValues = expressionWrapper.getItemsAndTheirValues();
         if (formValues != null && !formValues.isEmpty()) {
@@ -561,7 +561,7 @@ public class ExpressionService {
 
     public String constructFullExpressionIfPartialProvided(String expression, String ruleSetTargetExpression) {
         if(expression == null) {
-            logger.info("expression is null.");
+            logger.debug("expression is null.");
             return expression;
         } else {
             String[] splitExpression = expression.split(ESCAPED_SEPERATOR);
@@ -875,8 +875,8 @@ public class ExpressionService {
             return null;
         }
         CRFBean crf;
-        logger.info("Expression : " + expression);
-        logger.info("Expression : " + getCrfOidFromExpression(expression));
+        logger.debug("Expression : " + expression);
+        logger.debug("Expression : " + getCrfOidFromExpression(expression));
         CRFVersionBean crfVersion = getCrfVersionDao().findByOid(getCrfOidFromExpression(expression));
         if (crfVersion != null) {
             int crfId = getCrfVersionDao().getCRFIdFromCRFVersionId(crfVersion.getId());
@@ -889,7 +889,7 @@ public class ExpressionService {
     }
 
     public CRFVersionBean getCRFVersionFromExpression(String expression) {
-        logger.info("Expression : " + expression);
+        logger.debug("Expression : " + expression);
         return expression.split(ESCAPED_SEPERATOR).length < 3 ? null : getCrfVersionDao().findByOid(getCrfOidFromExpression(expression));
     }
 
