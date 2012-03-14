@@ -179,8 +179,12 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
             }
         }
 
-        // Limit number of results (pagination)
-        terms.add(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.limit"));
+        if (filter.getPageNumber() != null && filter.getPageSize() != null) {
+            // Limit number of results (pagination)
+            terms.add(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.limit"));
+            arguments.put("limit", filter.getPageSize());
+            arguments.put("offset", (filter.getPageNumber() - 1) * filter.getPageSize());
+        }
 
         String result = StringUtils.join(terms, ' ');
         LOG.debug("SQL: " + result);

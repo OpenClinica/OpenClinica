@@ -140,7 +140,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     @Override
     public void configureTableFacadePostColumnConfiguration(TableFacade tableFacade) {
         ListNotesTableToolbar toolbar = new ListNotesTableToolbar(showMoreLink);
-        tableFacade.setToolbar(toolbar);
+        //tableFacade.setToolbar(toolbar);
         toolbar.setStudyHasDiscNotes(studyHasDiscNotes);
         toolbar.setDiscNoteType(discNoteType);
         toolbar.setResolutionStatus(resolutionStatus);
@@ -159,24 +159,21 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
         Limit limit = tableFacade.getLimit();
 
+        if (!limit.isComplete()) {
+            // Set any value greater than the maximum page size here, as it will be overriden once read from DB
+            tableFacade.setTotalRows(100);
+        }
+
         ListNotesFilter listNotesFilter = getListNoteFilter(limit);
         ListNotesSort listNotesSort = getListSubjectSort(limit);
 
         List<DiscrepancyNoteBean> items = getViewNotesService().listNotes(getCurrentStudy(),
-                ViewNotesFilterCriteria.buildFilterCriteria(limit.getFilterSet(), getDateFormat()),
+                ViewNotesFilterCriteria.buildFilterCriteria(limit, getDateFormat()),
                 ViewNotesSortCriteria.buildFilterCriteria(limit.getSortSet()));
 
         //this.setAllNotes(items);
+        //FIXME Check the purpose of this #customFilter
         this.setAllNotes(DiscrepancyNoteUtil.customFilter(items, listNotesFilter));
-
-        //Keeping all notes without pagination to be shown in print popup.
-        if (!limit.isComplete()) {
-            tableFacade.setTotalRows(allNotes.size());
-        }
-        int rowStart = limit.getRowSelect().getRowStart();
-        int rowEnd = limit.getRowSelect().getRowEnd();
-
-        allNotes = paginateData(allNotes, rowStart, rowEnd);
 
         Collection<HashMap<Object, Object>> theItems = new ArrayList<HashMap<Object, Object>>();
 

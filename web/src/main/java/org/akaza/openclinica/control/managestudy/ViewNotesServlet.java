@@ -195,6 +195,8 @@ public class ViewNotesServlet extends SecureController {
         ItemDAO itemDao = new ItemDAO(sm.getDataSource());
         EventCRFDAO eventCRFDao = new EventCRFDAO(sm.getDataSource());
 
+
+
         ListNotesTableFactory factory = new ListNotesTableFactory(showMoreLink);
         factory.setSubjectDao(sdao);
         factory.setStudySubjectDao(subdao);
@@ -216,6 +218,20 @@ public class ViewNotesServlet extends SecureController {
         factory.setViewNotesService(resolveViewNotesService());
         //factory.setResolutionStatusIds(resolutionStatusIds);
         TableFacade tf = factory.createTable(request, response);
+
+        Map<String, Map<String, String>> stats = generateDiscrepancyNotesSummary(resolveViewNotesService(),
+                ViewNotesFilterCriteria.buildFilterCriteria(tf.getLimit(),
+                        resformat.getString("date_format_string")));
+        Map<String,String> totalMap = generateDiscrepancyNotesTotal(stats);
+
+        int grandTotal = 0;
+        for (String typeName: totalMap.keySet()) {
+            String total = totalMap.get(typeName);
+            grandTotal = total.equals("--") ? grandTotal + 0 : grandTotal + Integer.parseInt(total);
+        }
+        request.setAttribute("summaryMap", stats);
+
+        tf.setTotalRows(grandTotal);
         String viewNotesHtml = tf.render();
 
         request.setAttribute("viewNotesHtml", viewNotesHtml);
@@ -230,18 +246,6 @@ public class ViewNotesServlet extends SecureController {
 
         DiscrepancyNoteUtil discNoteUtil = new DiscrepancyNoteUtil();
 
-        Map<String, Map<String, String>> stats = generateDiscrepancyNotesSummary(resolveViewNotesService(),
-                ViewNotesFilterCriteria.buildFilterCriteria(tf.getLimit().getFilterSet(),
-                        resformat.getString("date_format_string")));
-        Map<String,String> totalMap = generateDiscrepancyNotesTotal(stats);
-
-        int grandTotal = 0;
-        for (String typeName: totalMap.keySet()) {
-            String total = totalMap.get(typeName);
-            grandTotal = total.equals("--") ? grandTotal + 0 : grandTotal + Integer.parseInt(total);
-        }
-
-        request.setAttribute("summaryMap", stats);
         request.setAttribute("mapKeys", ResolutionStatus.getMembers());
         request.setAttribute("typeNames", discNoteUtil.getTypeNames());
         request.setAttribute("typeKeys", totalMap);
