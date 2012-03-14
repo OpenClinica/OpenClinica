@@ -472,19 +472,7 @@
         <name>findAllByStudyEventAndStatus</name>
         <sql>SELECT * FROM event_crf WHERE study_event_id=? and status_id = ? order by event_crf_id asc</sql>
     </query>
-     
-     <query>
-        <name>findAllByStudyEventAndStatus</name>
-        <sql>SELECT * FROM event_crf WHERE study_event_id=? and status_id = ? order by event_crf_id asc</sql>
-    </query>
- <query>
-        <name>updateCRFVersionID</name>
-        <sql>
-            UPDATE EVENT_CRF
-            SET CRF_VERSION_ID=?
-            WHERE EVENT_CRF_ID=?
-        </sql>
-    </query>
+
     <query>
         <name>buildEventCrfListByStudyEvent</name>
         <sql>
@@ -498,4 +486,14 @@
             event_crf_id in (select event_crf_id from event_crf where study_subject_id = ?)
         </sql>
     </query>
+	
+ <query>
+        <name>updateCRFVersionID</name>
+        <sql>
+            UPDATE EVENT_CRF
+            SET CRF_VERSION_ID=?
+            WHERE EVENT_CRF_ID=?
+        </sql>
+    </query>
+
 </queries>

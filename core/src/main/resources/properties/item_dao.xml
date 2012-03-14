@@ -197,9 +197,7 @@
            select count(item.item_id) from item where item.status_id != 5
         </sql>
     </query>
-    
-    
-    <query>
+	    <query>
         <name>findAllWithItemDataByCRFVersionId</name>
         <sql>
              select   name, ordinal, oc_oid, item_data_id, i.item_id as item_id, 
@@ -210,9 +208,5 @@
 
 
     	</sql>
-    </query>
-    
-    
-    
-    
+   </query>
 </queries>

@@ -259,7 +259,8 @@
 				<xsl:value-of select="$E" />
 				<xsl:value-of select="$eventPosition" />
 				<xsl:text>_</xsl:text>
-				<xsl:value-of select="@StudyEventRepeatKey" />
+				<!-- @pgawade 14-Mar-2012 Corrected the variable used for event repeat -->
+				<xsl:value-of select="$eventRepeatCnt" />
 				<xsl:text> ADATE10</xsl:text>
 				<xsl:text>&#xa;</xsl:text>
 			</xsl:if>
@@ -544,7 +545,8 @@
 			</xsl:if>
 
 			<xsl:if test="$eventStatusExist">
-				<xsl:text>Event Status_</xsl:text>
+			<!-- @pgawade 14-Mar-2012 #13052 Removed the unwanted space within value label for event status -->
+				<xsl:text>EventStatus_</xsl:text>
 				<xsl:value-of select="$E" />
 				<xsl:value-of select="$eventPosition" />
 				<xsl:text>_</xsl:text>
@@ -648,7 +650,8 @@
 				</xsl:if>
 
 				<xsl:if test="$eventStatusExist">
-					<xsl:text>Event Status_</xsl:text>
+					<!-- @pgawade 14-Mar-2012 #13052 Removed the unwanted space within value label for event status -->
+				<xsl:text>EventStatus_</xsl:text>
 					<xsl:value-of select="$E" />
 					<xsl:value-of select="$eventPosition" />
 					<xsl:text> "Event Status For </xsl:text>
@@ -1011,12 +1014,13 @@
 							</xsl:if>
 						</xsl:for-each>
 					</xsl:variable>
-					<xsl:if test="$crfPosition = 1 ">
+				<!-- @pgawade 14-Mar-2012 commented out display of text "VALUE LABELS" which seems unwanted here. Probably it should be "VARIABLE LABELS" -->
+				<!--	<xsl:if test="$crfPosition = 1 ">
 						<xsl:text>.</xsl:text>
 						<xsl:text>&#xa;</xsl:text>
 						<xsl:text>VALUE LABELS</xsl:text>
 						<xsl:text>&#xa;</xsl:text>
-					</xsl:if>	
+					</xsl:if>	-->
 					<xsl:variable name="crfVersionExist" select="count(//odm:FormData[../@StudyEventOID = $eventOID and @FormOID = $formRefOID and @OpenClinica:Version 
 					and ../@StudyEventRepeatKey = $eventRepeatCnt]) &gt; 0"/>
 					
@@ -1697,6 +1701,8 @@
 						<xsl:with-param name="itemGrpRepeatKey" select="$itemGrpRepeatKey"/>
 						<xsl:with-param name="isLastItem" select="$isLastItem"/>
 						<!--<xsl:with-param name="generateIntHeadersList" select="$generateIntHeadersList"/>-->
+						<!-- @pgawade 14-Mar-2012 Added the "calledFor" parameter to pass on to print the codelists in "VALUE LABELS" section correctly -->
+						<xsl:with-param name="calledFor" select="$calledFor"/>
 					</xsl:apply-templates>
 				</xsl:if>
 				</xsl:when>
@@ -1714,6 +1720,8 @@
 						<xsl:with-param name="itemGrpRepeatKey" select="$itemGrpRepeatKey"/>
 						<xsl:with-param name="isLastItem" select="$isLastItem"/>
 						<!--<xsl:with-param name="generateIntHeadersList" select="$generateIntHeadersList"/>-->
+						<!-- @pgawade 14-Mar-2012 Added the "calledFor" parameter to pass on to print the codelists in "VALUE LABELS" section correctly -->
+						<xsl:with-param name="calledFor" select="$calledFor"/>
 					</xsl:apply-templates>
 				</xsl:if>
 				</xsl:otherwise>

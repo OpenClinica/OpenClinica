@@ -27,14 +27,13 @@ import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.submit.ItemBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.PreparedStatementFactory;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
-
+import org.akaza.openclinica.bean.submit.ItemDataBean;
 /**
  * @author thickerson
  * 
@@ -559,8 +558,8 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
         return results;
 
     }
-    
-    
+	
+	    
 //    select   name, ordinal, oc_oid, item_data_id, i.item_id as item_id, value
 //
 //    from item_data id, item i 
