@@ -61,7 +61,7 @@ function hideCols(tableId,columnNumArray,showTable){
 		//alert("iterating through loop th: "+th);
 		//alert("found class: " + theadRows[th].getAttribute('class'));
 		//alert("is it the same as?: " + theadRows[th].className);
-		
+
 		if(theadRows[th].className &&
 		  (theadRows[th].className.indexOf('filter') != -1 ||
 			theadRows[th].className.indexOf('header') != -1)) {
@@ -70,7 +70,7 @@ function hideCols(tableId,columnNumArray,showTable){
 				for(var x=0; x<columnNumArray.length;x++)  {
 
 					if(columnNumArray[x] == k){
-						
+
 						headCels[k].style.display=theStyle;
 						//alert("set " + columnNumArray[x] + " with the style: " + theStyle);
 					}
@@ -261,11 +261,11 @@ function selectTabs(tabNumber,totalNumberOfTabs,tabClassName) {
       //cycle through all the tabs; the first sibling of the selected tab
         //will have number tabNumber - 1, the next sibling with have
         //tabNumber + 1; all others should be display = "none"
-        
+
     	if(tabNumber==2)
     	{
     		 for(var i = 0; i < tdCount; i++) {
-    	
+
     	   if(i == tabNumber)  continue;  //already displayed
 
                 if(i == tabNumber - 2 || i == tabNumber - 1){ //prev sibling or next sibling
@@ -422,11 +422,13 @@ function clearInputElementValues(trElement) {
 			    var rp=-1;
 			    var rm=-1;
 			    var myDivEls="";
+			    var defVal = "";
+			    var defValDelimiter = "-----";
                 inputs = tdElements[i].getElementsByTagName('input');
                 selects= tdElements[i].getElementsByTagName('select');
 
                 textareas = tdElements[i].getElementsByTagName('textarea');
-                //for file datatype, please reference to showGroupItemInput.jsp 
+                //for file datatype, please reference to showGroupItemInput.jsp
                 myDiv = tdElements[i].getElementsByTagName('div');
                 if(myDiv) {
 	                //for file datatype, which only have one <div> with id as "div+inputname"
@@ -449,22 +451,23 @@ function clearInputElementValues(trElement) {
                             }
                             if(inputs[j].getAttribute("type") &&
                                inputs[j].getAttribute("type").indexOf("text") != -1) {
-                                inputs[j].setAttribute("value","");
+	                           if(defVal && defVal.length > 0)	{ var lookedId = defVal.split(defValDelimiter)[0];
+	                        		if(inputs[j].getAttribute("id")==lookedId) {
+	                        			inputs[j].setAttribute("value",defVal.split(defValDelimiter)[1]); defVal="";}
+                            	} else	inputs[j].setAttribute("value","");
                             }
                             //remove two buttons, Replace, Remove, for File datatype.if(inputs[j].getAttribute("type") &&
                            if(inputs[j].getAttribute("type") &&
-                               inputs[j].getAttribute("type").indexOf("button") != -1 &&
-                               inputs[j].getAttribute("id") == "rp"+myId) {
+                               inputs[j].getAttribute("type").indexOf("button") != -1) {
+                        	   if(inputs[j].getAttribute("id") == "rp"+myId) {
 	                               rp = j;
-                           }
-                           if(inputs[j].getAttribute("type") &&
-                               inputs[j].getAttribute("type").indexOf("button") != -1 &&
-                               inputs[j].getAttribute("id") == "rm"+myId) {
+                        	   }else if(inputs[j].getAttribute("id") == "rm"+myId) {
 	                               rm = j;
+                        	   }
                            }
-                           if(inputs[j].getAttribute("type") &&
-                               inputs[j].getAttribute("type").indexOf("hidden") != -1 &&
-                               inputs[j].getAttribute("id") == "hidft"+myId) {
+                       	   else if(inputs[j].getAttribute("type") &&
+                               inputs[j].getAttribute("type").indexOf("hidden") != -1) {
+								if(inputs[j].getAttribute("id") == "hidft"+myId) {
 		                           inputs[j].setAttribute("id", "ft"+myId);
 		                           try {
 			                           inputs[j].setAttribute("type", "text");
@@ -472,15 +475,12 @@ function clearInputElementValues(trElement) {
 		                               var newElement = null;
 		                               var nameStr = inputs[j].getAttribute("name");
 		                               try {
-			                           		newElement = document.createElement("<input type=\"text\" id=\"ft" + myId 
+			                           		newElement = document.createElement("<input type=\"text\" id=\"ft" + myId
 			                           		+ "\" name=\"" + nameStr + "\" disabled=\"disabled\">");
 		                               }catch(e){}
 		                               inputs[j].parentNode.replaceChild(newElement,inputs[j]);
 	                           	   }
-                           }
-                           if(inputs[j].getAttribute("type") &&
-                               inputs[j].getAttribute("type").indexOf("hidden") != -1 &&
-                               inputs[j].getAttribute("id") == "hidup"+myId) {
+								}else if(inputs[j].getAttribute("id") == "hidup"+myId) {
 	                               inputs[j].setAttribute("id", "up"+myId);
 	                               try {
 	                               		inputs[j].setAttribute("type", "button");
@@ -489,17 +489,21 @@ function clearInputElementValues(trElement) {
 	                               	   var nameStr = inputs[j].getAttribute("name");
 	                               	   var valueStr = inputs[j].getAttribute("value");
 		                               try {
-			                           		newElement = document.createElement("<input type=\"button\" id=\"up\"" + myId 
+			                           		newElement = document.createElement("<input type=\"button\" id=\"up\"" + myId
 			                           		+ "\" name=\"" + nameStr + "\" value=\"" + valueStr + "\">");
 			                           		newElement.onclick = inputs[j].onclick;
 		                               }catch(e){}
 		                               inputs[j].parentNode.replaceChild(newElement,inputs[j]);
                                	   }
-                           }
-                        }
-                    }
+								}else if(inputs[j].getAttribute("id").startsWith("defValue")) {
+									var dv = inputs[j].getAttribute("value");
+									if(dv && dv.length>0) defVal=inputs[j].getAttribute("id").substring(8)+defValDelimiter+dv;
+								}
+                        	}
+                    	}
+                	}
                 }//end if inputs
-                
+
                 if(rp>=0) {
                 	tdElements[i].removeChild(inputs[rm]);
                 	tdElements[i].removeChild(inputs[rp]);
@@ -546,7 +550,10 @@ function clearInputElementValues(trElement) {
                 if(textareas) {
                     for(var m = 0; m < textareas.length; m++){
                         if(textareas[m]) {
-                            textareas[m].innerHTML="";
+	                        if(defVal && defVal.length > 0)	{ var lookedId = defVal.split(defValDelimiter)[0];
+	                        	if(textareas[m].getAttribute("id")==lookedId) {
+	                        		textareas[m].innerHTML=defVal.split(defValDelimiter)[1]; defVal="";}
+                            	} else	textareas[m].innerHTML="";
                         }
                     }
                 }
@@ -1036,7 +1043,7 @@ function openDNWindow(inURL, spanID,strErrMsg) {
 }
 
 //--------------------------------------
-//--pop up a window which is smaller 
+//--pop up a window which is smaller
 //------------------------------------------
 function openDSNoteWindow(inURL, spanID) {
 
@@ -1108,7 +1115,7 @@ function openNctEntryWindow(inURL) {
 //-------------------------------------------------------------------------
 // Function: openDocWindow
 //
-// Pops up a new browser window containing a document, such as the 
+// Pops up a new browser window containing a document, such as the
 // PRS Reference Guide.
 //-------------------------------------------------------------------------
 
@@ -1318,7 +1325,7 @@ function layersShowOrHide() {
 }
 
 
-/* 
+/*
  Functions that swaps images.  These functions were generated by Dreamweaver, but are
  not used by e-guana.
  */
@@ -1572,7 +1579,7 @@ function refreshSource(isRefresh, pattern) {
 				window.opener.location.href = v;
 			}
 		}
-	}	
+	}
 }
 
 
@@ -1616,7 +1623,7 @@ function setNav(thisNavItem)
 function hideSubnavs()
 {
 	var navItem = new Array('nav_Tasks');
-	for(i=0;i<navItem.length;i++) 
+	for(i=0;i<navItem.length;i++)
 	{
 		layersShowOrHide('hidden', 'sub' + navItem[i]);
 	}
