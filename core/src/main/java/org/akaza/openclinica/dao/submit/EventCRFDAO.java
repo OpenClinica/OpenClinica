@@ -209,7 +209,7 @@ public class EventCRFDAO  <K extends String,V extends ArrayList> extends Auditab
             variables.put(new Integer(3), null);
             nullVars.put(new Integer(3), new Integer(Types.DATE));
         }
-        logger.info("created: ecb.getInterviewerName()" + ecb.getInterviewerName());
+        logger.debug("created: ecb.getInterviewerName()" + ecb.getInterviewerName());
         variables.put(new Integer(4), ecb.getInterviewerName());
 
         variables.put(new Integer(5), new Integer(ecb.getCompletionStatusId()));

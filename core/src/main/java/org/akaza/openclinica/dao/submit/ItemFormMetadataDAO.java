@@ -87,7 +87,7 @@ public class ItemFormMetadataDAO<K extends String,V extends ArrayList> extends E
             Integer newInt = (Integer) it.next();
             ItemFormMetadataBean ifmBean = (ItemFormMetadataBean) this.findByPK(newInt.intValue());
             // check to make sure we have what we need
-            logger.info("options: " + ifmBean.getResponseSetId() + " bean options list: " + ifmBean.getResponseSet().getOptions().toString());
+            logger.debug("options: " + ifmBean.getResponseSetId() + " bean options list: " + ifmBean.getResponseSet().getOptions().toString());
             /*
              * ArrayList options = ifmBean.getResponseSet().getOptions();
              * Iterator robit = options.iterator(); while (robit.hasNext()) {
@@ -1010,9 +1010,9 @@ public class ItemFormMetadataDAO<K extends String,V extends ArrayList> extends E
             }
             }
 
-            if (logger.isInfoEnabled()) {
-                logger.info("Executing dynamic query, EntityDAO.select:query " + query);
-            }
+         //   if (logger.isInfoEnabled()) {
+                logger.debug("Executing dynamic query, EntityDAO.select:query " + query);
+         //   }
             signalSuccess();
 
 

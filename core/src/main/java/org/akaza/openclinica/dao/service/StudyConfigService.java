@@ -127,7 +127,7 @@ public class StudyConfigService {
                     spc.setInterviewDateEditable(spv.getValue());
                 } else if (handle.equalsIgnoreCase("subjectIdGeneration")) {
                     spc.setSubjectIdGeneration(spv.getValue());
-                    logger.info("subjectIdGeneration" + spc.getSubjectIdGeneration());
+                    logger.debug("subjectIdGeneration" + spc.getSubjectIdGeneration());
                 } else if (handle.equalsIgnoreCase("subjectIdPrefixSuffix")) {
                     spc.setSubjectIdPrefixSuffix(spv.getValue());
                 } else if (handle.equalsIgnoreCase("personIdShownOnCRF")) {

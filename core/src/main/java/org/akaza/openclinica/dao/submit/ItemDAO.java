@@ -146,7 +146,7 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
     public String getValidOid(ItemBean itemBean, String crfName, String itemLabel, ArrayList<String> oidList) {
 
         String oid = getOid(itemBean, crfName, itemLabel);
-        logger.info(oid);
+        logger.debug(oid);
         String oidPreRandomization = oid;
         while (findByOid(oid).size() > 0 || oidList.contains(oid)) {
             oid = itemBean.getOidGenerator().randomizeOid(oidPreRandomization);
@@ -529,7 +529,7 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
            
        
             ps = psf.generate(ps);// enter variables here!
-            logger.info("query is..."+ps.toString());
+            logger.debug("query is..."+ps.toString());
             key = (K) ps.toString();
             if((results=(V) cache.get(key))==null)
             {
@@ -540,9 +540,9 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
             }
             }
             
-            if (logger.isInfoEnabled()) {
-                logger.info("Executing dynamic query, EntityDAO.select:query " + query);
-            }
+           // if (logger.isInfoEnabled()) {
+                logger.debug("Executing dynamic query, EntityDAO.select:query " + query);
+          //  }
             signalSuccess();
               
 

@@ -1064,7 +1064,7 @@ public class StudyEventDAO extends AuditableEntityDAO {
                 Integer id = (Integer) events.get(i);
                 if (id != null) {
                     int ordinal = i + 1;
-                    logger.info("UPDATE study_event SET sample_ordinal = " + ordinal + " WHERE study_event_id = " + id);
+                    logger.debug("UPDATE study_event SET sample_ordinal = " + ordinal + " WHERE study_event_id = " + id);
                     // execute("UPDATE study_event SET sample_ordinal = " +
                     // ordinal + " WHERE study_event_id = " + id);
                 }
@@ -1086,7 +1086,7 @@ public class StudyEventDAO extends AuditableEntityDAO {
             events = new ArrayList();
         }
         events.add(studyEventId);
-        logger.info("putting in key: " + key + " seid: " + studyEventId);
+        logger.debug("putting in key: " + key + " seid: " + studyEventId);
         subjDefs.put(key, events);
     }
 
