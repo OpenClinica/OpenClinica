@@ -101,9 +101,9 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
     public List<DiscrepancyNoteBean> findAllDiscrepancyNotes(StudyBean currentStudy, ViewNotesFilterCriteria filter,
             ViewNotesSortCriteria sort) {
         Map<String, Object> arguments = listNotesArguments(currentStudy);
-        List<DiscrepancyNoteBean> result = getNamedParameterJdbcTemplate().query(listNotesSql(filter, sort, arguments),
-                arguments,
-                DISCREPANCY_NOTE_ROW_MAPPER);
+        List<DiscrepancyNoteBean> result = getNamedParameterJdbcTemplate().query(
+                listNotesSql(filter, sort, arguments, currentStudy.isSite(currentStudy.getParentStudyId())),
+                arguments, DISCREPANCY_NOTE_ROW_MAPPER);
         return result;
     }
 
@@ -125,6 +125,11 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
 
         List<String> terms = new ArrayList<String>();
         terms.add(queryStore.query(QUERYSTORE_FILE, "countDiscrepancyNotes.main"));
+
+        terms.add(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.filter.studyHideCrf"));
+        if (currentStudy.isSite(currentStudy.getParentStudyId())) {
+            terms.add(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.filter.siteHideCrf"));
+        }
 
         // Reuse the filter criteria from #findAllDiscrepancyNotes, as both queries load data from the same view
         if (filter != null) {
@@ -154,9 +159,14 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
     }
 
     protected String listNotesSql(ViewNotesFilterCriteria filter, ViewNotesSortCriteria sort,
-            Map<String, Object> arguments) {
+            Map<String, Object> arguments, boolean isSite) {
         List<String> terms = new ArrayList<String>();
         terms.add(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.main"));
+
+        terms.add(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.filter.studyHideCrf"));
+        if (isSite) {
+            terms.add(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.filter.siteHideCrf"));
+        }
 
         // Append query filters
         if (filter != null) {
