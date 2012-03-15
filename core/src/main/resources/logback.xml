@@ -325,8 +325,8 @@
 		</then>
 	</if>	
   </logger>
-    <logger additivity="false" name="org.hibernate.stat">
-    <level value="INFO" />
+   <!-- <logger additivity="false" name="org.hibernate.stat">
+    <level value="ERROR" />
 	<if condition='property("logLocation").equalsIgnoreCase("local") || property("logLocation").equalsIgnoreCase("both")'>
 		<then>
 			<appender-ref ref="LOGFILE-OTHER"/>
@@ -337,7 +337,7 @@
 			<appender-ref ref="SYSLOG-NEWS"/>
 		</then>
 	</if>	
-  </logger>
+  </logger>-->
   <!-- Show All Hibernate log messages -->
   <logger additivity="false" name="org.hibernate">
     <level value="ERROR" />

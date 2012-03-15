@@ -379,15 +379,15 @@ public class FormProcessor {
 
         java.util.Date result;
         try {
-            logger.info("trying to parse " + fieldValue + " on the pattern " + resformat.getString("date_time_format_string"));
+            logger.debug("trying to parse " + fieldValue + " on the pattern " + resformat.getString("date_time_format_string"));
             result = sdf.parse(fieldValue);
         } catch (Exception fe) {
-            logger.info("failed to parse");
+            logger.debug("failed to parse");
             fe.printStackTrace();
             result = DEFAULT_DATE;
-            logger.info("replace with default date: " + result.toString());
+            logger.debug("replace with default date: " + result.toString());
         }
-        logger.info("returning " + result.toString());
+        logger.debug("returning " + result.toString());
         return result;
     }
 

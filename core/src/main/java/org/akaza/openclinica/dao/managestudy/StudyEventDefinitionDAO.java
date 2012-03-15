@@ -116,7 +116,7 @@ public class StudyEventDefinitionDAO<K extends String,V extends ArrayList> exten
     private String getValidOid(StudyEventDefinitionBean sedb) {
 
         String oid = getOid(sedb);
-        logger.info(oid);
+        logger.debug(oid);
         String oidPreRandomization = oid;
         while (findByOid(oid) != null) {
             oid = sedb.getOidGenerator().randomizeOid(oidPreRandomization);
@@ -131,7 +131,7 @@ public class StudyEventDefinitionDAO<K extends String,V extends ArrayList> exten
         // STATUS_ID, DATE_CREATED,ordinal,oid
         StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) eb;
         sedb.setId(this.findNextKey());
-        logger.info("***id:" + sedb.getId());
+        logger.debug("***id:" + sedb.getId());
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(sedb.getId()));
         variables.put(new Integer(2), new Integer(sedb.getStudyId()));

@@ -113,7 +113,7 @@ public class ItemGroupDAO<K extends String,V extends ArrayList> extends Auditabl
     public String getValidOid(ItemGroupBean itemGroup, String crfName, String itemGroupLabel, ArrayList<String> oidList) {
 
         String oid = getOid(itemGroup, crfName, itemGroupLabel);
-        logger.info(oid);
+        logger.debug(oid);
         String oidPreRandomization = oid;
         while (findByOid(oid) != null || oidList.contains(oid)) {
             oid = itemGroup.getOidGenerator().randomizeOid(oidPreRandomization);
@@ -462,9 +462,9 @@ public class ItemGroupDAO<K extends String,V extends ArrayList> extends Auditabl
             }
             }
             
-            if (logger.isInfoEnabled()) {
-                logger.info("Executing dynamic query, EntityDAO.select:query " + query);
-            }
+           // if (logger.isInfoEnabled()) {
+                logger.debug("Executing dynamic query, EntityDAO.select:query " + query);
+          //  }
             signalSuccess();
               
 

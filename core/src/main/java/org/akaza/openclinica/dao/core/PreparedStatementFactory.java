@@ -57,7 +57,7 @@ public class PreparedStatementFactory {
             Integer order = (Integer) varMe.getKey();
             Object objParam = varMe.getValue();
             if (objParam == null) {
-                logger.warn("found null object! " + order);
+                logger.debug("found null object! " + order);
                 if (nullVars.get(order) != null) {
                     Integer nullType = (Integer) nullVars.get(order);
                     ps.setNull(order.intValue(), nullType.intValue());
@@ -67,7 +67,7 @@ public class PreparedStatementFactory {
             } else {
                 String objType = objParam.getClass().getName();
 
-                logger.info("\nfound object name:[" + objType + "] [" + order + "] value[" + objParam + "]");
+                logger.debug("\nfound object name:[" + objType + "] [" + order + "] value[" + objParam + "]");
 
                 if ("java.lang.String".equals(objType)) {
                     ps.setString(order.intValue(), objParam.toString());

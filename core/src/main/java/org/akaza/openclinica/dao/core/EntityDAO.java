@@ -159,7 +159,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
         ResultSet rs = null;
         Connection con = null;
         Statement ps = null;
-        logger.info("query???"+query);
+        logger.debug("query???"+query);
         try {
             con = ds.getConnection();
             if (con.isClosed()) {
@@ -169,11 +169,11 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
             }
             ps = con.createStatement();
             rs = ps.executeQuery(query);
-            if (logger.isInfoEnabled()) {
-                logger.info("Executing static query, GenericDAO.select: " + query);
+     //       if (logger.isInfoEnabled()) {
+                logger.debug("Executing static query, GenericDAO.select: " + query);
                 // logger.info("fond information about result set: was null: "+
                 // rs.wasNull());
-            }
+       //     }
             // ps.close();
             signalSuccess();
             results = this.processResultRows(rs);
@@ -222,9 +222,10 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
         
             }
             
-            if (logger.isInfoEnabled()) {
-                logger.info("Executing dynamic query, EntityDAO.select:query " + query);
-            }
+          //  if (logger.isInfoEnabled()) {
+            
+                logger.debug("Executing dynamic query, EntityDAO.select:query " + query);
+          //  }
             signalSuccess();
          
               
@@ -258,9 +259,9 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
 
             ps = con.prepareStatement(query);
             rs = ps.executeQuery();
-            if (logger.isInfoEnabled()) {
-                logger.info("Executing dynamic query, EntityDAO.select:query " + query);
-            }
+        //    if (logger.isInfoEnabled()) {
+                logger.debug("Executing dynamic query, EntityDAO.select:query " + query);
+         //   }
             signalSuccess();
             results = this.processResultRows(rs);
 
@@ -312,9 +313,9 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
                 }
             }
 
-            if (logger.isInfoEnabled()) {
-                logger.info("Executing dynamic query, EntityDAO.select:query " + query);
-            }
+           // if (logger.isInfoEnabled()) {
+                logger.debug("Executing dynamic query, EntityDAO.select:query " + query);
+          //  }
             signalSuccess();
 
 
@@ -475,7 +476,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
                 throw new SQLException();
             } else {
                 signalSuccess();
-                logger.info("Executing static query, EntityDAO: " + query);
+                logger.debug("Executing static query, EntityDAO: " + query);
             }
         } catch (SQLException sqle) {
             signalFailure(sqle);
@@ -510,7 +511,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
 
             } else {
                 signalSuccess();
-                logger.info("Executing dynamic query, EntityDAO: " + query);
+                logger.debug("Executing dynamic query, EntityDAO: " + query);
             }
         } catch (SQLException sqle) {
             signalFailure(sqle);
@@ -544,7 +545,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
 
             } else {
                 signalSuccess();
-                logger.info("Executing dynamic query, EntityDAO: " + query);
+                logger.debug("Executing dynamic query, EntityDAO: " + query);
             }
         } catch (SQLException sqle) {
             signalFailure(sqle);
@@ -586,7 +587,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
                 throw new SQLException();
 
             } else {
-                logger.info("Executing dynamic query, EntityDAO: " + query);
+                logger.debug("Executing dynamic query, EntityDAO: " + query);
 
                 if (getCurrentPKName == null) {
                     this.latestPK = 0;
@@ -626,8 +627,8 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
 
     
     private void logMe(String message){
-        System.out.println(message);
-        logger.info(message);
+       // System.out.println(message);
+        logger.debug(message);
     }
     public ArrayList processResultRows(ResultSet rs) {// throws SQLException
         ArrayList al = new ArrayList();
@@ -1085,7 +1086,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
             ps.setFetchSize(50);
             rs = ps.executeQuery(query);
             if (logger.isInfoEnabled()) {
-                logger.info("Executing static query, GenericDAO.select: " + query);
+                logger.debug("Executing static query, GenericDAO.select: " + query);
                 // logger.info("fond information about result set: was null: "+
                 // rs.wasNull());
             }
@@ -1342,7 +1343,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
 
             rs = ps.executeQuery(query);
             if (logger.isInfoEnabled()) {
-                logger.info("Executing static query, GenericDAO.select: " + query);
+                logger.debug("Executing static query, GenericDAO.select: " + query);
                 // logger.info("fond information about result set: was null: "+
                 // rs.wasNull());
             }
@@ -1402,11 +1403,9 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
             ps.setFetchSize(50);
 
             rs = ps.executeQuery(query);
-            if (logger.isInfoEnabled()) {
-                logger.info("Executing static query, GenericDAO.select: " + query);
+                logger.debug("Executing static query, GenericDAO.select: " + query);
                 // logger.info("fond information about result set: was null: "+
                 // rs.wasNull());
-            }
             // ps.close();
             signalSuccess();
             System.out.println("*** query that generates the event side records " + query);
@@ -1623,11 +1622,11 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
             }
         }
 
-        if (logger.isInfoEnabled()) {
-            logger.info("Loaded addHashMapEntryBASE_ITEMGROUPSIDE: " + eb.getHBASE_EVENTSIDE().size());
+    //    if (logger.isInfoEnabled()) {
+            logger.debug("Loaded addHashMapEntryBASE_ITEMGROUPSIDE: " + eb.getHBASE_EVENTSIDE().size());
             // logger.info("fond information about result set: was null: "+
             // rs.wasNull());
-        }
+    //    }
 
         return true;
     }
@@ -1837,11 +1836,11 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
             }
         }
 
-        if (logger.isInfoEnabled()) {
-            logger.info("Loaded addHashMapEntryBASE_EVENTSIDE: " + eb.getHBASE_EVENTSIDE().size());
+        //if (logger.isInfoEnabled()) {
+            logger.debug("Loaded addHashMapEntryBASE_EVENTSIDE: " + eb.getHBASE_EVENTSIDE().size());
             // logger.info("fond information about result set: was null: "+
             // rs.wasNull());
-        }
+       // }
 
         return true;
     }
@@ -2659,11 +2658,11 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
             }
             ps = con.createStatement();
             rs = ps.executeQuery(query);
-            if (logger.isInfoEnabled()) {
-                logger.info("Executing static query, setHashMapInKeysHelper.select: " + query);
+            //if (logger.isInfoEnabled()) {
+                logger.debug("Executing static query, setHashMapInKeysHelper.select: " + query);
                 // logger.info("fond information about result set: was null: "+
                 // rs.wasNull());
-            }
+          //  }
             // ps.close();
             signalSuccess();
             results = this.processInKeyDataset(rs);
@@ -2777,11 +2776,11 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
             }
             ps = con.createStatement();
             rs = ps.executeQuery(query);
-            if (logger.isInfoEnabled()) {
-                logger.info("Executing static query, selectStudySubjectIDs: " + query);
+           // if (logger.isInfoEnabled()) {
+                logger.debug("Executing static query, selectStudySubjectIDs: " + query);
                 // logger.info("fond information about result set: was null: "+
                 // rs.wasNull());
-            }
+        //    }
             // ps.close();
             signalSuccess();
             results = this.processEventCRFIDs(rs);
@@ -2939,11 +2938,11 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
             }
             ps = con.createStatement();
             rs = ps.executeQuery(query);
-            if (logger.isInfoEnabled()) {
-                logger.info("Executing static query, getStudySubjectIDs: " + query);
+           // if (logger.isInfoEnabled()) {
+                logger.debug("Executing static query, getStudySubjectIDs: " + query);
                 // logger.info("fond information about result set: was null: "+
                 // rs.wasNull());
-            }
+            //}
             // ps.close();
             signalSuccess();
             results = this.processStudySubjectIDs(rs);

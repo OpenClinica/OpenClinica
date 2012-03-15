@@ -272,9 +272,9 @@ public class ItemGroupMetadataDAO<K extends String,V extends ArrayList> extends 
             }
             }
             
-            if (logger.isInfoEnabled()) {
-                logger.info("Executing dynamic query, EntityDAO.select:query " + query);
-            }
+          //  if (logger.isInfoEnabled()) {
+                logger.debug("Executing dynamic query, EntityDAO.select:query " + query);
+          //  }
             signalSuccess();
               
 

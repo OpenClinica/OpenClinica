@@ -578,7 +578,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
             answer = studyR;
         }
 
-        logger.info("We are returning " + answer.toString() + " for crfVersionId " + crfVersionId + " and studyEventId " + studyEventId);
+        logger.debug("We are returning " + answer.toString() + " for crfVersionId " + crfVersionId + " and studyEventId " + studyEventId);
         return answer.booleanValue();
     }
 

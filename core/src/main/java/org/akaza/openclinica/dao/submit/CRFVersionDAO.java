@@ -366,7 +366,7 @@ public class CRFVersionDAO<K extends String,V extends ArrayList> extends Auditab
     public String getValidOid(CRFVersionBean crfVersion, String crfName, String crfVersionName) {
 
         String oid = getOid(crfVersion, crfName, crfVersionName);
-        logger.info(oid);
+        logger.debug(oid);
         String oidPreRandomization = oid;
         while (findAllByOid(oid).size() > 0) {
             oid = crfVersion.getOidGenerator().randomizeOid(oidPreRandomization);
