@@ -780,9 +780,9 @@ function switchStr(itemId, id,attribute,str1,str2) {
               <c:set var="writeToDb" value="0"/>
           </c:otherwise>
       </c:choose>
-        <c:when test="${isNewItem eq true}">
+        <c:if test="${isNewItem eq true}">
 			    <c:set var="writeToDb" value="0" />
-		</c:when>  
+		</c:if>  
          <c:set var="eventName" value="${toc.studyEventDefinition.name}"/>
          <c:set var="eventDate" value="${toc.studyEvent.dateStarted}"/>
          <c:set var="crfName" value="${toc.crf.name} ${toc.crfVersion.name}"/>
