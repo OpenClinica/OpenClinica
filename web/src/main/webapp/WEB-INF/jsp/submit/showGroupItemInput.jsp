@@ -245,7 +245,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
 <c:set var="itemId" value="${displayItem.item.id}" />
 <c:set var="numOfDate" value="${param.key}" />
 <c:set var="isLast" value="${param.isLast}" />
-<c:set var="isTemplateRow" value="${param.isTemplateRow}" />
+<c:set var="isNewItem" value="${param.isNewItem}" />
 
 <c:set var="isFirst" value="${param.isFirst}" />
 <c:set var="repeatParentId" value="${param.repeatParentId}" />
@@ -303,7 +303,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
   </c:if>
 </c:forEach>
 
-<c:if test="${isTemplateRow == true}">
+<c:if test="${isNewItem eq true}">
  <c:set var="isInError" value="${false}" />
  </c:if>
 
@@ -747,11 +747,15 @@ function switchStr(itemId, id,attribute,str1,str2) {
     <c:when test="${displayItem.discrepancyNoteStatus == 5}">
         <c:set var="imageFileName" value="icon_flagWhite" />
     </c:when>
+    <%-- new template row --%>
+    <c:when test="${isNewItem == true}">
+	    <c:set var="imageFileName" value="icon_noNote" />
+	</c:when>
     <c:otherwise>
     </c:otherwise>
   </c:choose>
   <c:choose>
-    <c:when test="${displayItem.numDiscrepancyNotes > 0}">
+    <c:when test="${displayItem.numDiscrepancyNotes > 0  and isNewItem != true}">
 
     <a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"   onmouseover="callTip(genToolTips(${itemId}));"
            onmouseout="UnTip();" onClick=
@@ -770,10 +774,15 @@ function switchStr(itemId, id,attribute,str1,str2) {
           <c:when test="${originJSP eq 'administrativeEditing'}">
               <c:set var="writeToDb" value="1"/>
           </c:when>
+       
+  
           <c:otherwise>
               <c:set var="writeToDb" value="0"/>
           </c:otherwise>
       </c:choose>
+        <c:when test="${isNewItem eq true}">
+			    <c:set var="writeToDb" value="0" />
+		</c:when>  
          <c:set var="eventName" value="${toc.studyEventDefinition.name}"/>
          <c:set var="eventDate" value="${toc.studyEvent.dateStarted}"/>
          <c:set var="crfName" value="${toc.crf.name} ${toc.crfVersion.name}"/>
@@ -791,35 +800,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
 
 
 </c:if>
-<%-- we won't need this if we're not embedding error messages
-<br><c:import url="../showMessage.jsp"><c:param name="key" value=
-              "${inputName}" /></c:import>    --%>
-<%--
-adding units...
- if(responseName.equalsIgnoreCase("text") ||
-      responseName.equalsIgnoreCase("textarea") ||
-      responseName.equalsIgnoreCase("single-select") ||
-      responseName.equalsIgnoreCase("multi-select")){
 
-       td = this.addUnits(td,displayBean);
-       //td = this.addRightItemText(td,displayBean);
-    }
-    if(responseName.equalsIgnoreCase("radio") ||
-      responseName.equalsIgnoreCase("checkbox") ){
-      String grLabel = displayBean.getMetadata().getGroupLabel();
-      boolean grouped = (grLabel != null && (! "".equalsIgnoreCase(grLabel)) &&
-      (! grLabel.equalsIgnoreCase("ungrouped")));
-
-      if(! grouped) {
-         td = this.addUnits(td,displayBean);
-      }  else {
-        //the radio or checkbox does appear in a group table
-        //Do not add units if the layout is horizontal
-        if(! displayBean.getMetadata().getResponseLayout().
-          equalsIgnoreCase("Horizontal")){
-           td = this.addUnits(td,displayBean);
-        }
---%>
 <c:if test='${inputType == "text"|| inputType == "textarea" ||
 inputType == "multi-select" || inputType == "single-select" ||
 inputType == "calculation" }'>
