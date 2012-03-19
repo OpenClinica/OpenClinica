@@ -1000,7 +1000,7 @@ but the custom tag uses that, not this jstl code--%>
                             <c:param name="rowCount" value="${uniqueId}"/>
                             <c:param name="key" value="${numOfDate}" />
                             <c:param name="isLast" value="${true}"/>
-							<c:param name="iisNewItemlateRow" value="${true}"/>
+							<c:param name="isNewItem" value="${true}"/>
                             <c:param name="tabNum" value="${itemNum}"/>
                             <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
                             <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
