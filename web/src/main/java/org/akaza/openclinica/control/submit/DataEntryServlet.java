@@ -4982,6 +4982,13 @@ public abstract class DataEntryServlet extends CoreSecureController {
         // if(value != null && value.length()>0 && dib.getItem().getDataType().getId()==11) {
         // value = attachedFilePath + value;
         // }
+        //isChanged should not be run for calc/group-calc type, only for fields that they depend upon
+        org.akaza.openclinica.bean.core.ResponseType rt =dib.getMetadata().getResponseSet().getResponseType();
+        if ( rt.equals(org.akaza.openclinica.bean.core.ResponseType.CALCULATION )||
+        		rt.equals(org.akaza.openclinica.bean.core.ResponseType.GROUP_CALCULATION )){
+        	return false;
+        }
+        
         if (!oldItemdata.containsKey(idb.getId()))
             return true;
         else {
