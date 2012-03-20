@@ -891,7 +891,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 }
 
             }*/
-            ////System.out.println("first run of rules : " + groupOrdinalPLusItemOid.toString());
             logMe("allItems  Loop begin  "+System.currentTimeMillis());
             for (int i = 0; i < allItems.size(); i++) {
                 DisplayItemWithGroupBean diwg = allItems.get(i);
@@ -1663,7 +1662,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     }
                 }
                 logMe("DisplayItemWithGroupBean allitems4 end "+System.currentTimeMillis());
-                //System.out.println("running rules: " + phase2.name());
+                logger.debug("running rules: " + phase2.name());
                 List<Integer> prevShownDynItemDataIds = shouldRunRules?
                     this.getItemMetadataService().getDynamicsItemFormMetadataDao().findShowItemDataIdsInSection(
                             section.getSection().getId(), ecb.getCRFVersionId(), ecb.getId())
@@ -1818,8 +1817,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
                     // if so, stay at this section
                     logger.debug(" in same section: " + inSameSection);
-                    //System.out.println(" in same section: " + inSameSection);
-                    if (inSameSection) {
+                   if (inSameSection) {
                         // copy of one line from early on around line 400, forcing a re-show of the items
                         // section = getDisplayBean(hasGroup, true);// include all items, tbh
                         // below a copy of three lines from the if errors = true line, tbh 03/2010
@@ -2856,7 +2854,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
     private DisplayItemBean runDynamicsItemCheck(DisplayItemBean dib, Object newParam, HttpServletRequest request) {
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
         try {
-            // //System.out.println("trying run dynamics item check: item id " + dib.getItem().getId() + " item data id " + dib.getData().getId());
+        	 logger.debug("trying run dynamics item check: item id " + dib.getItem().getId() + " item data id " + dib.getData().getId());
             if (!dib.getMetadata().isShowItem()) {
                 boolean showItem = getItemMetadataService().isShown(dib.getItem().getId(), ecb, dib.getData());
                 dib.getMetadata().setShowItem(showItem);
@@ -4360,20 +4358,19 @@ public abstract class DataEntryServlet extends CoreSecureController {
         int numItemsPending = TableOfContentsServlet.getIntById(numItemsPendingHM, key);
         int numItemsCompleted = TableOfContentsServlet.getIntById(numItemsCompletedHM, key);
         int numItemsBlank = TableOfContentsServlet.getIntById(numItemsBlankHM, key);
-        System.out.println(" for " + key + " num items " + numItems + " num items blank " + numItemsBlank +
-                " num items pending " + numItemsPending + " completed " + numItemsCompleted);
+        logger.debug(" for " + key + " num items " + numItems + " num items blank " + numItemsBlank +  " num items pending " + numItemsPending + " completed " + numItemsCompleted);
 
         if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY) && edcb.isDoubleEntry())
         {
             if (numItemsPending == 0 && numItems > 0) {
-                System.out.println("returns false on ide loop " + key);
+            	 logger.debug("returns false on ide loop " + key);
                 return false;
             }
         } else
         {
 
             if (numItemsCompleted == 0  && numItems > 0) {
-                System.out.println("returns false on other loop " + key);
+            	 logger.debug("returns false on other loop " + key);
                 return false;
             }
 
@@ -4400,13 +4397,12 @@ public abstract class DataEntryServlet extends CoreSecureController {
         int numItemsPending = TableOfContentsServlet.getIntById(numItemsPendingHM, key);
         int numItemsCompleted = TableOfContentsServlet.getIntById(numItemsCompletedHM, key);
         int numItemsBlank = TableOfContentsServlet.getIntById(numItemsBlankHM, key);
-        System.out.println(" for " + key + " num items " + numItems + " num items blank " + numItemsBlank +
-                " num items pending " + numItemsPending + " completed " + numItemsCompleted);
+        logger.debug(" for " + key + " num items " + numItems + " num items blank " + numItemsBlank +     " num items pending " + numItemsPending + " completed " + numItemsCompleted);
 
         if (stage.equals(DataEntryStage.INITIAL_DATA_ENTRY) && edcb.isDoubleEntry())
         {
             if (numItemsPending == 0 && numItems > 0) {
-                System.out.println("returns false on ide loop " + key);
+               // System.out.println("returns false on ide loop " + key);
                 return false;
             }
         } else
