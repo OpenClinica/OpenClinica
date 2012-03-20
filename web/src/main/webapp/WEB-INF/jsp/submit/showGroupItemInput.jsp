@@ -366,7 +366,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
   <input type="hidden" id="<c:out value="${inputName}"/>" name="<c:out value="${inputName}"/>" value="<c:out value="${inputTxtValue}"/>" >
   <c:choose>
     <c:when test="${isInError && !hasShown}">
-      <span class="<c:out value="${exclaim}"/>">! </span><input class="<c:out value="${input}"/>" id="show<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
+      <span class="aka_exclaim_error">! </span><input class="aka_input_error"  id="show<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
       "this.className='changedField'; manualChange('<c:out value="${inputName}"/>'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');"
       type="text" name="show<c:out value="${inputName}"/>" value="<c:out value="${inputTxtValue}"/>" />
     </c:when>
@@ -774,15 +774,15 @@ function switchStr(itemId, id,attribute,str1,str2) {
           <c:when test="${originJSP eq 'administrativeEditing'}">
               <c:set var="writeToDb" value="1"/>
           </c:when>
-       
-  
+
+
           <c:otherwise>
               <c:set var="writeToDb" value="0"/>
           </c:otherwise>
       </c:choose>
         <c:if test="${isNewItem eq true}">
 			    <c:set var="writeToDb" value="0" />
-		</c:if>  
+		</c:if>
          <c:set var="eventName" value="${toc.studyEventDefinition.name}"/>
          <c:set var="eventDate" value="${toc.studyEvent.dateStarted}"/>
          <c:set var="crfName" value="${toc.crf.name} ${toc.crfVersion.name}"/>
