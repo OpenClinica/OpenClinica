@@ -94,14 +94,8 @@
     </c:if>
 </c:forEach>
 
-<h1><c:choose>
-    <c:when test="${userBean.sysAdmin && module=='admin'}">
-        <span class="title_manage">
-    </c:when>
-    <c:otherwise>
-        <span class="title_Manage">
-    </c:otherwise>
-</c:choose><fmt:message key="test_rules_title" bundle="${resword}" /></span></h1>
+<h1> <span class="title_manage">
+   <fmt:message key="test_rules_title" bundle="${resword}" /></span></h1>
 
 
 <form action="TestRule?action=${action}" method="post">
