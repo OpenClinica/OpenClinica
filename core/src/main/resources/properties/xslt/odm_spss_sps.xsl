@@ -1942,7 +1942,7 @@
 					<xsl:text> F</xsl:text><xsl:value-of select="$length"/><xsl:text>.0</xsl:text>
 				</xsl:when>
 				<xsl:when test="$dataType='partialDate'">									
-					<xsl:text> A</xsl:text><xsl:text>11.0</xsl:text>
+					<xsl:text> A</xsl:text><xsl:text>10.0</xsl:text>
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:text> A</xsl:text>				
