@@ -2112,7 +2112,9 @@
 		</xsl:if>
 	</xsl:template>
 
-	<!-- template to replace all invalid SPSS characters (characters other than any letter, any digit, a period, or the symbols @, #, _, or $) with # -->
+	<!-- template to replace all invalid SPSS characters (characters other than any letter, any digit, a period, or the symbols @, #, _, or $) with # 
+		This is a template meant for future use to handle the special case of if SPSS variables generated do not start with a letter. Associated issue number is 13583
+	-->
 	<xsl:template name="replace-invalid-char">
 		<xsl:param name="text"/>		
 		<xsl:choose>
