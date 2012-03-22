@@ -7,6 +7,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
@@ -217,11 +218,14 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 <!-- section tabs here -->
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>
+<%-- if only one section show no arrows & section jump --%>
+<c:if test="${fn:length(toc.sections) gt 1}">
+
 <td align="right" valign="middle" style="padding-left: 12px; display: none" id="TabsBack">
     <a href="javascript:TabsBack()"><img src="images/arrow_back.gif" border="0" style="margin-top:10px"></a></td>
 <td align="right" style="padding-left: 12px" id="TabsBackDis">
     <img src="images/arrow_back_dis.gif" border="0"/></td>
-
+</c:if>
 
 <script type="text/JavaScript" language="JavaScript">
 <!--
@@ -328,6 +332,8 @@ window.onload = initmb;
 
 //-->
 </script>
+<%-- if only one section show no arrows & section jump --%>
+<c:if test="${fn:length(toc.sections) gt 1}">
 
 <td align="right"id="TabsNextDis" style="display: none"><img src="images/arrow_next_dis.gif" border="0"/></td>
 <td align="right" id="TabsNext"><a href="javascript:TabsForward()"><img src="images/arrow_next.gif" border="0" style=
@@ -344,6 +350,7 @@ window.onload = initmb;
     </select>
     </div>
 </td>
+</c:if>
 </tr>
 </table>
 <%-- the below line is ABSOLUTELY NECESSARY FOR VALIDATION ON ANY PAGE --%>

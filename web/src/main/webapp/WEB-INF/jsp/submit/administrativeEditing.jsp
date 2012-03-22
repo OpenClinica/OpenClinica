@@ -3,6 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib uri="com.akazaresearch.tags" prefix="aka_frm" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
@@ -177,11 +178,14 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 <!-- section tabs here -->
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>
+<%-- if only one section show no arrows & section jump --%>
+<c:if test="${fn:length(companies) gt 1}">
+
 <td align="right" valign="middle" style="padding-left: 12px; display: none" id="TabsBack">
     <a href="javascript:TabsBack()"><img src="images/arrow_back.gif" border="0" style="margin-top:10px"></a></td>
 <td align="right" style="padding-left: 12px" id="TabsBackDis">
     <img src="images/arrow_back_dis.gif" border="0"/></td>
-
+</c:if>
 
 <script type="text/JavaScript" language="JavaScript">
     <!--
@@ -273,9 +277,14 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
     //-->
 </script>
 
+<%-- if only one section show no arrows & section jump --%>
+<c:if test="${fn:length(companies) gt 1}">
+
 <td align="right"id="TabsNextDis" style="display: none"><img src="images/arrow_next_dis.gif" border="0"/></td>
 <td align="right" id="TabsNext"><a href="javascript:TabsForward()"><img src="images/arrow_next.gif" border="0" style=
   "margin-top:10px;margin-right:6px"/></a></td>
+ 
+
 <td>&nbsp;
     <div class="formfieldM_BG_noMargin"><select class="formfieldM" name="sectionName" size="1" onchange="gotoLink();">
         <c:set var="tabCount" value="1"/>
@@ -288,6 +297,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
     </select>
     </div>
 </td>
+</c:if> 
 </tr>
 </table>
 <input type="hidden" name="submitted" value="1" />
