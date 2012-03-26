@@ -241,7 +241,7 @@
 
 <p><div class="table_title_submit"><fmt:message key="CRFs_in_this_study_event" bundle="${resword}"/>:</div>
 
-<div style="width: 600px">
+<div style="width: 700px">
 <!-- These DIVs define shaded box borders -->
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 <div class="tablebox_center">
@@ -388,8 +388,8 @@
 <td class="table_cell">&nbsp;</td>
 
 <td class="table_cell">
-    <table>
-        <tr>
+    <table >
+        <tr align="left">
             <c:choose>
 
                 <c:when test="${studyEvent.subjectEventStatus.name=='locked'}">
@@ -398,7 +398,7 @@
                 </c:when>
 
                 <c:when test="${studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && study.status.available && !studyEvent.status.deleted && !userRole.monitor}">
-                    <td class="table_cell">
+                    <td >
                         <a href="#" onclick="checkCRFLockedInitial('<c:out value="${dedc.eventCRF.id}"/>',document.startForm<c:out value="${dedc.edc.crf.id}"/>);"
                            onMouseDown="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData_d.gif');"
                            onMouseUp="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData.gif');">
@@ -408,12 +408,12 @@
 
                 <c:otherwise></c:otherwise>
             </c:choose>
-            <td class="table_cell">
+            <td >
                 <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${dedc.edc.id}"/>&crfVersionId=<c:out value="${dedc.edc.defaultVersionId}"/>&studySubjectId=<c:out value="${studySubject.id}"/>&tabId=1&eventId=<c:out value="${eventId}"/>"
                    onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
                    onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
                   name="bt_View1" align="left" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_default" bundle="${resword}"/>" title="<fmt:message key="view_default" bundle="${resword}"/>" hspace="2"></a>&nbsp;
-            </td><td class="table_cell">
+            </td><td >
             <a href="javascript:openDocWindow('PrintCRF?id=<c:out value="${dedc.edc.defaultVersionId}"/>')"
                onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
                onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><img
@@ -510,114 +510,118 @@
                             </c:if>
 
         --%>
-
+<table><tr align="left">
     <c:choose>
         <c:when test='${actionQuery == "" && dec.stage.name =="invalid" }'>
-            <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${dec.eventDefinitionCRF.id}"/>&ecId=<c:out value="${dec.eventCRF.id}"/>&tabId=1&eventId=<c:out value="${eventId}"/>"
+       <td>     <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${dec.eventDefinitionCRF.id}"/>&ecId=<c:out value="${dec.eventCRF.id}"/>&tabId=1&eventId=<c:out value="${eventId}"/>"
                onMouseDown="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
                onMouseUp="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
-              ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>" align="left" hspace="2"></a>&nbsp;
-
+              ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>" align="left" hspace="2"></a>
+</td><td>
             <a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${dec.eventCRF.id}"/>')"
                onMouseDown="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
                onMouseUp="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
-              ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>"  hspace="2"></a>&nbsp;
+              ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>"  hspace="2"></a>
+</td>
 
             <c:if test="${(studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed') && (study.status.available)}">
-                <a href="RestoreEventCRF?action=confirm&id=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySubject.id}"/>"
+          <td>      <a href="RestoreEventCRF?action=confirm&id=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySubject.id}"/>"
                    onMouseDown="javascript:setImage('bt_Restore<c:out value="${rowCount}"/>','images/bt_Restore.gif');"
                    onMouseUp="javascript:setImage('bt_Restore<c:out value="${rowCount}"/>','images/bt_Restore.gif');"
-                  ><img name="bt_Restore<c:out value="${rowCount}"/>" src="images/bt_Restore.gif" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>"  hspace="2"></a>&nbsp;
-            </c:if>
+                  ><img name="bt_Restore<c:out value="${rowCount}"/>" src="images/bt_Restore.gif" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>"  hspace="2"></a>
+           </td> </c:if>
         </c:when>
 
         <c:when test='${actionQuery == ""}'>
-            <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${dedc.edc.id}"/>&ecId=<c:out value="${dec.eventCRF.id}"/>&tabId=1&eventId=<c:out value="${eventId}"/>"
+        <td>    <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${dedc.edc.id}"/>&ecId=<c:out value="${dec.eventCRF.id}"/>&tabId=1&eventId=<c:out value="${eventId}"/>"
                onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
                onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"
               ><img name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="2"></a>
-
+</td><td>
             <a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${dec.eventCRF.id}"/>')"
                onMouseDown="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
                onMouseUp="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
-              ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>"  hspace="2"></a>&nbsp;
+              ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>"  hspace="2"></a>
+  </td>            
             <%-- added above 112007, tbh --%>
         </c:when>
         <c:otherwise>
             <c:if test="${studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && !userRole.monitor}">
                 <c:if test="${dec.continueInitialDataEntryPermitted}">
-                <a href="#"
+                <td><a href="#"
                     onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
                     onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');"
                     onclick="checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
                     <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="continue_entering_data" bundle="${resword}"/>" title="<fmt:message key="continue_entering_data" bundle="${resword}"/>" align="left" hspace="6"></a>
-                </c:if>
+               </td> </c:if>
                 <c:if test="${dec.startDoubleDataEntryPermitted}">
-                 <a href="#"
+                 <td><a href="#"
                     onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
                     onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');"
                     onclick="checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
                     <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="begin_double_data_entry" bundle="${resword}"/>" title="<fmt:message key="begin_double_data_entry" bundle="${resword}"/>" align="left" hspace="6"></a>
-                </c:if>
+                </td></c:if>
                 <c:if test="${dec.continueDoubleDataEntryPermitted}">
-                  <a href="#"
+                  <td><a href="#"
                     onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
                     onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');"
                     onclick="checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
                     <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="continue_entering_data" bundle="${resword}"/>" title="<fmt:message key="continue_entering_data" bundle="${resword}"/>" align="left" hspace="6"></a>
-                </c:if>
+               </td> </c:if>
                 <c:if test="${dec.performAdministrativeEditingPermitted}">
-                 <a href="#"
+                <td> <a href="#"
                     onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
                     onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');"
                     onclick="checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
                     <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="administrative_editing" bundle="${resword}"/>" title="<fmt:message key="administrative_editing" bundle="${resword}"/>" align="left" hspace="6">
-                    </a>
-                </c:if>
-                <c:if test="${dec.locked || dec.eventCRF.status.locked || dec.stage.locked || currRow.bean.studyEvent.subjectEventStatus.locked}">
-                    &nbsp;
+                    </a></td>
                 </c:if>
             </c:if>
 
 
-            <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${dec.eventDefinitionCRF.id}"/>&ecId=<c:out value="${dec.eventCRF.id}"/>&tabId=1&eventId=<c:out value="${eventId}"/>"
+          <td>  <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${dec.eventDefinitionCRF.id}"/>&ecId=<c:out value="${dec.eventCRF.id}"/>&tabId=1&eventId=<c:out value="${eventId}"/>"
                onMouseDown="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
                onMouseUp="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
-              ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>"  hspace="2"></a>&nbsp;
+              ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>"  hspace="2"></a>
+              </td>
 
-            <a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${dec.eventCRF.id}"/>')"
+           <td> <a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${dec.eventCRF.id}"/>')"
                onMouseDown="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
                onMouseUp="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
-              ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>"  hspace="2"></a>&nbsp;
+              ><img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>"  hspace="2"></a>
+              </td>
 
             <c:if test="${(userRole.director || userBean.sysAdmin) && (study.status.available)}">
-                <a href="RemoveEventCRF?action=confirm&id=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySubject.id}"/>"
+               <td> <a href="RemoveEventCRF?action=confirm&id=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySubject.id}"/>"
                    onMouseDown="javascript:setImage('bt_Remove<c:out value="${rowCount}"/>','images/bt_Remove.gif');"
                    onMouseUp="javascript:setImage('bt_Remove<c:out value="${rowCount}"/>','images/bt_Remove.gif');"
-                  ><img name="bt_Remove<c:out value="${rowCount}"/>" src="images/bt_Remove.gif" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>"  hspace="2"></a>&nbsp;
+                  ><img name="bt_Remove<c:out value="${rowCount}"/>" src="images/bt_Remove.gif" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>"  hspace="2"></a>
+                  </td>
             </c:if>
 
             <c:if test="${userBean.sysAdmin && (study.status.available)}">
-                <a href="DeleteEventCRF?action=confirm&ssId=<c:out value="${studySubject.id}"/>&ecId=<c:out value="${dec.eventCRF.id}"/>"
+               <td> <a href="DeleteEventCRF?action=confirm&ssId=<c:out value="${studySubject.id}"/>&ecId=<c:out value="${dec.eventCRF.id}"/>"
                    onMouseDown="javascript:setImage('bt_Delete<c:out value="${rowCount}"/>','images/bt_Delete.gif');"
                    onMouseUp="javascript:setImage('bt_Delete<c:out value="${rowCount}"/>','images/bt_Delete.gif');"
-                  ><img name="bt_Remove<c:out value="${rowCount}"/>" src="images/bt_Delete.gif" border="0" alt="<fmt:message key="delete" bundle="${resword}"/>" title="<fmt:message key="delete" bundle="${resword}"/>"  hspace="2"></a>&nbsp;
+                  ><img name="bt_Remove<c:out value="${rowCount}"/>" src="images/bt_Delete.gif" border="0" alt="<fmt:message key="delete" bundle="${resword}"/>" title="<fmt:message key="delete" bundle="${resword}"/>"  hspace="2"></a>
+                  </td>
             </c:if>
 
 			   <!--  reasign crf version -->
              <c:if test="${(userBean.sysAdmin) && (study.status.available) }">
-   <td>
-    <a href="pages/managestudy/chooseCRFVersion?crfId=<c:out value="${dec.eventCRF.crf.id}" />&crfName=<c:out value="${dec.eventCRF.crf.name}" />&crfversionId=<c:out value="${dec.eventCRF.crfVersion.id}" />&crfVersionName=<c:out value="${dec.eventCRF.crfVersion.name}" />&studySubjectLabel=<c:out value="${studySubject.label}"/>&studySubjectId=<c:out value="${studySubject.id}"/>&eventCRFId=<c:out value="${dec.eventCRF.id}"/>&eventDefinitionCRFId=<c:out value="${dec.eventDefinitionCRF.id}"/>"
+   
+  <td>  <a href="pages/managestudy/chooseCRFVersion?crfId=<c:out value="${dec.eventCRF.crf.id}" />&crfName=<c:out value="${dec.eventCRF.crf.name}" />&crfversionId=<c:out value="${dec.eventCRF.crfVersion.id}" />&crfVersionName=<c:out value="${dec.eventCRF.crfVersion.name}" />&studySubjectLabel=<c:out value="${studySubject.label}"/>&studySubjectId=<c:out value="${studySubject.id}"/>&eventCRFId=<c:out value="${dec.eventCRF.id}"/>&eventDefinitionCRFId=<c:out value="${dec.eventDefinitionCRF.id}"/>"
    onMouseDown="javascript:setImage('bt_Reassign','images/bt_Reassign_d.gif');"
    onMouseUp="javascript:setImage('bt_Reassign','images/bt_Reassign.gif');"><img
       name="Reassign" src="images/bt_Reassign.gif" border="0" alt="<fmt:message key="reassign_crf_version" bundle="${resword}"/>" title="<fmt:message key="reassign_crf_version" bundle="${resword}"/>" align="left" hspace="6"></a>
-    </td>
+   </td> 
    </c:if>
             <c:if test="${doRuleSetsExist[status.index]}" >
-                <a href="ExecuteCrossEditCheck?eventCrfId=<c:out value='${dec.eventCRF.id}'/>">execute Rule</a>
+             <td>   <a href="ExecuteCrossEditCheck?eventCrfId=<c:out value='${dec.eventCRF.id}'/>">execute Rule</a></td>
             </c:if>
         </c:otherwise>
     </c:choose>
+    </tr></table>
 </td>
 </tr>
 <c:set var="rowCount" value="${rowCount + 1}" />

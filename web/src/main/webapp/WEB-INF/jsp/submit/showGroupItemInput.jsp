@@ -10,7 +10,6 @@
 <jsp:useBean scope="request" id="displayItem" class="org.akaza.openclinica.bean.submit.DisplayItemBean" />
 <jsp:useBean scope="request" id="responseOptionBean" class="org.akaza.openclinica.bean.submit.ResponseOptionBean" />
 <jsp:useBean scope='request' id='formMessages' class='java.util.HashMap'/>
-<script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/instant_onchange.js"></script>
 
 <script lang="Javascript">
@@ -291,10 +290,19 @@ function switchStr(itemId, id,attribute,str1,str2) {
   empty displayItem.metadata.responseSet.value}">
     <c:set var="inputTxtValue" value="${defValue}"/>
   </c:when>
+ <%-- <c:when test="${isNewItem eq true }">
+  <c:if test='${inputType == "text"|| inputType == "textarea" }' >
+  		<c:set var="inputTxtValue" value="${defValue}"/>
+  </c:if>
+
+  	 
+  </c:when>--%>
+  <%--htaycher: question - when this case should be ::: --%>
   <c:otherwise>
-    <c:set var="inputTxtValue" value="${displayItem.metadata.responseSet.value}"/>
+   <c:set var="inputTxtValue" value="${displayItem.metadata.responseSet.value}"/>
    </c:otherwise>
 </c:choose>
+
 
 <c:forEach var="frmMsg" items="${formMessages}">
    <c:if test="${(frmMsg.key eq parsedInputName) || (frmMsg.key eq autoParsedInputName)}">
@@ -643,6 +651,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
   </c:forEach>
   </select>
 </c:if>
+
 <c:if test='${inputType == "calculation" || inputType == "group-calculation"}'>
 	<%-- need to test for coding function here, tbh  --%>
 	<c:set var="isAnExternalValue" value="0"/>
@@ -717,9 +726,24 @@ function switchStr(itemId, id,attribute,str1,str2) {
       				<span class="aka_exclaim_error">! </span><input class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" class="disabled" disabled="disabled" name="<c:out value="${inputName}"/>" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
 				</c:when>
 				<c:otherwise>
-					<input id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
+				<%-- new row should be empty --%>
+				<c:choose>
+					<c:when test="${isNewItem eq true }">
+							<input id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
+							"this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" class="disabled" disabled="disabled" name="<c:out value="${inputName}"/>" value="" />
+    		
+					</c:when>
+				
+					<c:otherwise>
+					
+						<input id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
 							"this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" class="disabled" disabled="disabled" name="<c:out value="${inputName}"/>" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
-    			</c:otherwise>
+    		</c:otherwise>
+					</c:choose>
+				
+				
+				
+					</c:otherwise>
 			</c:choose>
 		</c:otherwise>
 	</c:choose>
