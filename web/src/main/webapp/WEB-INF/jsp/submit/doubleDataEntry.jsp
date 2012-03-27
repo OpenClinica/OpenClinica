@@ -524,7 +524,6 @@ window.onload = initmb;
 <c:set var="uniqueId" value="0"/>
 <c:set var="repeatParentId" value="${displayItem.itemGroup.itemGroupBean.name}"/>
     <%-- the section borders property value --%>
-<c:set var="sectionBorders" value="${section.section.borders}" />
 <!--<c:set var="repeatNumber" value="${displayItem.itemGroup.groupMetaBean.repeatNum}"/>-->
 <!--  was just <td>, tbh 05/03/2010 -->
 <%-- place where we need to highlight sections,
@@ -740,23 +739,7 @@ window.onload = initmb;
     </c:choose>
 </c:forEach>
 <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">
-    <c:choose>
-        <c:when test="${sectionBorders == 1}">
-            <td class="aka_padding_norm aka_cellBorders_dark">
-                    <%-- check for manual in the input name; if rowCount > 0 then manual
-               will be in the name --%>
-                <c:choose>
-                    <c:when test="${uniqueId ==0}">
-                        <input type="hidden" name="<c:out value="${repeatParentId}"/>_<c:out value="${uniqueId}"/>.newRow" value="yes">
-                    </c:when>
-                    <c:otherwise>
-                        <input type="hidden" name="<c:out value="${repeatParentId}"/>_manual<c:out value="${uniqueId}"/>.newRow" value="yes">
-                    </c:otherwise>
-                </c:choose>
-             <!--    <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove"></button> -->
-            </td>
-        </c:when>
-        <c:otherwise>
+    
             <td class="aka_padding_norm aka_cellBorders">
                     <%-- check for manual in the input name; if rowCount > 0 then manual
                will be in the name --%>
@@ -771,8 +754,7 @@ window.onload = initmb;
               <!--  <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove"></button> -->
             </td>
 
-        </c:otherwise>
-    </c:choose>
+       
 </c:if>
 </tr>
 <c:if test="${status.last}">

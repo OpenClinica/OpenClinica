@@ -452,7 +452,6 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 
 <c:set var="uniqueId" value="0"/>
 <c:set var="repeatParentId" value="${displayItem.itemGroup.itemGroupBean.name}"/>
-<c:set var="sectionBorders" value="${section.section.borders}" />
 
 <c:set var="repeatNumber" value="0"/>
 <c:set var="repeatMax" value="${displayItem.itemGroup.groupMetaBean.repeatMax}"/>
