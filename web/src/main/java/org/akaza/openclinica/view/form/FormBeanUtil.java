@@ -1333,7 +1333,7 @@ public class FormBeanUtil {
             logger.info("oce.getOpenClinicaMessage() = " + oce.getOpenClinicaMessage());
         }
         // Sort these items according to their position on the CRF
-        Collections.sort(allMetas);
+       // Collections.sort(allMetas);
         if (arrList.isEmpty())
             return dBean;
 

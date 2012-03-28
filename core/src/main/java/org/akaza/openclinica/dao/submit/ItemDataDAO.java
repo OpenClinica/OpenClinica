@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -534,6 +535,22 @@ public class ItemDataDAO extends AuditableEntityDAO {
         return this.executeFindAllQuery("findAllActiveBySectionIdAndEventCRFId", variables);
     }
 
+    public LinkedHashMap<String,ItemDataBean> findAllActiveMap(int sectionId, int eventCRFId) {
+        setTypesExpected();
+        HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
+        LinkedHashMap<String,ItemDataBean>returnMap = new LinkedHashMap<String,ItemDataBean>();
+        variables.put(new Integer(1), new Integer(sectionId));
+        variables.put(new Integer(2), new Integer(eventCRFId));
+
+        ArrayList<ItemDataBean> al = (ArrayList<ItemDataBean>) this.executeFindAllQuery("findAllActiveBySectionIdAndEventCRFId", variables);
+        for(ItemDataBean itBean:al){
+            if(itBean!=null)
+            returnMap.put(new String(itBean.getItemId()+","+itBean.getOrdinal()), itBean);
+        }
+        return returnMap;
+    }
+  
+    
     public ArrayList<ItemDataBean> findAllByEventCRFId(int eventCRFId) {
         setTypesExpected();
         HashMap<Integer, Object> variables = new HashMap<Integer, Object>();

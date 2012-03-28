@@ -301,9 +301,9 @@ public class DisplayItemBean implements Comparable {
     }
 
     public void loadDBValue() {
-        ResponseSetBean rsb = metadata.getResponseSet();
+        ResponseSetBean rsb = getMetadata().getResponseSet();
         org.akaza.openclinica.bean.core.ResponseType rt = rsb.getResponseType();
-        String dbValue = data.getValue();
+        String dbValue = getData().getValue();
         // System.out.println("setting dbValue: " + dbValue);
         if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)) {
             String dbValues[] = dbValue.split(",");
@@ -322,7 +322,7 @@ public class DisplayItemBean implements Comparable {
         } else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.FILE)) {
             // Here assume dbValue from database should be a valid file pathname
             if (dbValue.length() > 0) {
-                dbData.setValue(dbValue);
+                getDbData().setValue(dbValue);
                 File f = new File(dbValue);
                 String filename = f.getName();
                 if (f.isFile()) {
@@ -341,7 +341,7 @@ public class DisplayItemBean implements Comparable {
             rsb.setSelected(dbValue, true);
         }
 
-        metadata.setResponseSet(rsb);
+        getMetadata().setResponseSet(rsb);
     }
 
     @Override
