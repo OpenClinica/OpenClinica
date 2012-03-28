@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
+
 /**
  *
  * Help class for string usage
@@ -50,7 +51,9 @@ public class StringUtil {
      *
      * @param s
      * @return true if blank, false otherwise
+     * @deprecated Use {@link org.apache.commons.lang.StringUtils#isBlank(String)} instead.
      */
+    @Deprecated
     public static boolean isBlank(String s) {
         return s == null ? true : s.trim().equals("") ? true : false;
 
@@ -227,7 +230,7 @@ public class StringUtil {
         sdf1.setLenient(false);
         SimpleDateFormat sdf2 = new SimpleDateFormat(dateFormat2);
         sdf2.setLenient(false);
-        return sameDate(sdf1,sdf2,dateStr);
+        return sameDate(sdf1, sdf2, dateStr);
     }
 
     public static boolean isSameDate(String dateFormat1, String dateFormat2, String dateStr, Locale locale) {

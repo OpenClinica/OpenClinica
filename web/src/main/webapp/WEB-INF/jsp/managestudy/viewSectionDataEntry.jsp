@@ -497,8 +497,6 @@ function checkDataStatus() {
 
 <c:when test="${displayItem.inGroup == true}">
 <c:set var="currPage" value="${displayItem.pageNumberLabel}" />
-<%-- the section borders property value --%>
-<c:set var="sectionBorders" value="${section.section.borders}" />
 <tr><td>
 <c:set var="uniqueId" value="0"/>
 <c:set var="repeatParentId" value="${displayItem.itemGroup.itemGroupBean.name}"/>
@@ -540,13 +538,7 @@ but the custom tag uses that, not this jstl code--%>
             </c:forEach>
         </c:if>
         <c:choose>
-            <c:when test="${isHorizontalCellLevel && sectionBorders == 1 &&
-        (thItem.metadata.responseSet.responseType.name eq 'checkbox' ||
-              thItem.metadata.responseSet.responseType.name eq 'radio')}">
-                <th colspan="<c:out value='${optionsLen}'/>" class="aka_headerBackground aka_padding_large aka_cellBorders_dark">
-                <%-- compute total columns value for the add button row colspan attribute--%>
-                <c:set var="totalColsPlusSubcols" value="${totalColsPlusSubcols + optionsLen}" />
-            </c:when>
+          
             <c:when test="${isHorizontalCellLevel &&
         (thItem.metadata.responseSet.responseType.name eq 'checkbox' ||
               thItem.metadata.responseSet.responseType.name eq 'radio')}">
@@ -554,11 +546,7 @@ but the custom tag uses that, not this jstl code--%>
                 <%-- compute total columns value for the add button row colspan attribute--%>
                 <c:set var="totalColsPlusSubcols" value="${totalColsPlusSubcols + optionsLen}" />
             </c:when>
-            <c:when test="${sectionBorders == 1}">
-                <th class="aka_headerBackground aka_padding_large aka_cellBorders_dark">
-                <%-- compute total columns value for the add button row colspan attribute--%>
-                <c:set var="totalColsPlusSubcols" value="${totalColsPlusSubcols + 1}" />
-            </c:when>
+           
             <c:otherwise>
                 <th class="aka_headerBackground aka_padding_large aka_cellBorders">
                 <%-- compute total columns value for the add button row colspan attribute--%>
@@ -578,15 +566,9 @@ but the custom tag uses that, not this jstl code--%>
         </th>
     </c:forEach>
     <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">
-        <c:choose>
-            <c:when test="${sectionBorders == 1}">
-                <th class="aka_headerBackground aka_padding_large aka_cellBorders_dark" />
-
-            </c:when>
-            <c:otherwise>
+        
                 <th class="aka_headerBackground aka_padding_large aka_cellBorders" />
-            </c:otherwise>
-        </c:choose>
+           
     </c:if>
 </tr>
 <c:if test="${isHorizontal}">
@@ -599,14 +581,7 @@ but the custom tag uses that, not this jstl code--%>
                 <c:set var="isHorizontalCellLevel" scope="request" value="${true}"/>
             </c:if>
             <c:choose>
-                <c:when test="${isHorizontalCellLevel && sectionBorders == 1 &&
-                    (thItem.metadata.responseSet.responseType.name eq 'checkbox' ||
-              thItem.metadata.responseSet.responseType.name eq 'radio')}">
-                    <c:forEach var="respOpt" items="${thItem.metadata.responseSet.options}">
-                        <th class="aka_headerBackground aka_padding_large aka_cellBorders_dark">
-                            <c:out value="${respOpt.text}" /></th>
-                    </c:forEach>
-                </c:when>
+                
                 <c:when test="${isHorizontalCellLevel &&
                     (thItem.metadata.responseSet.responseType.name eq 'checkbox' ||
               thItem.metadata.responseSet.responseType.name eq 'radio')}">
@@ -615,9 +590,7 @@ but the custom tag uses that, not this jstl code--%>
                             <c:out value="${respOpt.text}" /></th>
                     </c:forEach>
                 </c:when>
-                <c:when test="${sectionBorders == 1}">
-                    <th class="aka_headerBackground aka_padding_large aka_cellBorders_dark"/>
-                </c:when>
+             
                 <c:otherwise>
                     <th class="aka_headerBackground aka_padding_large aka_cellBorders"/>
                 </c:otherwise>
@@ -656,27 +629,7 @@ but the custom tag uses that, not this jstl code--%>
         <c:set var="isHorizontalCellLevel" scope="request" value="${true}"/>
     </c:if>
     <c:choose>
-        <c:when test="${isHorizontalCellLevel && sectionBorders == 1 && (bodyItem.metadata.responseSet.responseType.name eq 'radio' ||
-           bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
-            <%-- For horizontal checkboxes, radio buttons--%>
-            <c:forEach var="respOption" items="${bodyItem.metadata.responseSet.options}">
-                <td class="aka_padding_norm aka_cellBorders_dark">
-                    <c:set var="displayItem" scope="request" value="${bodyItem}" />
-                    <c:set var="responseOptionBean" scope="request" value="${respOption}" />
-                    <c:import url="../submit/showGroupItemInputMonitor.jsp">
-                        <c:param name="repeatParentId" value="${repeatParentId}"/>
-                        <c:param name="rowCount" value="${uniqueId}"/>
-                        <c:param name="key" value="${numOfDate}" />
-                        <c:param name="isLast" value="${true}"/>
-                        <c:param name="tabNum" value="${itemNum}"/>
-                        <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
-                        <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
-                        <c:param name="originJSP" value="initialDataEntry"/>
-                        <c:param name="isLocked" value="${isLocked}"/>
-                    </c:import>
-                </td>
-            </c:forEach>
-        </c:when>
+        
         <c:when test="${isHorizontalCellLevel &&
                 (bodyItem.metadata.responseSet.responseType.name eq 'radio' ||
            bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
@@ -699,21 +652,7 @@ but the custom tag uses that, not this jstl code--%>
                 </td>
             </c:forEach>
         </c:when>
-        <c:when test="${sectionBorders == 1}">
-            <td class="aka_padding_norm aka_cellBorders_dark">
-                <c:set var="displayItem" scope="request" value="${bodyItem}" />
-                <c:import url="../submit/showGroupItemInputMonitor.jsp">
-                    <c:param name="repeatParentId" value="${repeatParentId}"/>
-                    <c:param name="rowCount" value="${uniqueId}"/>
-                    <c:param name="key" value="${numOfDate}" />
-                    <c:param name="isLast" value="${true}"/>
-                    <c:param name="tabNum" value="${itemNum}"/>
-                    <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
-                    <c:param name="originJSP" value="initialDataEntry"/>
-                    <c:param name="isLocked" value="${isLocked}"/>
-                </c:import>
-            </td>
-        </c:when>
+       
         <%-- could be a radio or checkbox that is not horizontal --%>
         <c:otherwise>
             <td class="aka_padding_norm aka_cellBorders">
@@ -734,21 +673,12 @@ but the custom tag uses that, not this jstl code--%>
     <c:set var="columnNum" value="${columnNum+1}"/>
 </c:forEach>
     <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">
-        <c:choose>
-            <c:when test="${sectionBorders == 1}">
-                <td class="aka_padding_norm aka_cellBorders_dark">
-                    <input type="hidden" name="<c:out value="${repeatParentId}"/>_[<c:out value="${repeatParentId}"/>].newRow" value="yes" />
-                    <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove"></button>
-                </td>
-            </c:when>
-
-            <c:otherwise>
+       
                 <td class="aka_padding_norm aka_cellBorders">
                     <input type="hidden" name="<c:out value="${repeatParentId}"/>_[<c:out value="${repeatParentId}"/>].newRow" value="yes" />
                     <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove"></button>
                 </td>
-            </c:otherwise>
-        </c:choose>
+         
     </c:if>
 </tr>
 
@@ -809,21 +739,7 @@ but the custom tag uses that, not this jstl code--%>
                 </td>
             </c:forEach>
         </c:when>
-        <c:when test="${sectionBorders == 1}">
-            <td class="aka_padding_norm aka_cellBorders_dark">
-                <c:set var="displayItem" scope="request" value="${bodyItem}" />
-                <c:import url="../submit/showGroupItemInputMonitor.jsp">
-                    <c:param name="repeatParentId" value="${repeatParentId}"/>
-                    <c:param name="rowCount" value="${uniqueId}"/>
-                    <c:param name="key" value="${numOfDate}" />
-                    <c:param name="isLast" value="${false}"/>
-                    <c:param name="tabNum" value="${itemNum}"/>
-                    <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
-                    <c:param name="originJSP" value="initialDataEntry"/>
-                    <c:param name="isLocked" value="${isLocked}"/>
-                </c:import>
-            </td>
-        </c:when>
+      
         <%-- could be a radio or checkbox that is not horizontal --%>
         <c:otherwise>
             <td class="aka_padding_norm aka_cellBorders">
@@ -844,23 +760,7 @@ but the custom tag uses that, not this jstl code--%>
     <c:set var="columnNum" value="${columnNum+1}"/>
 </c:forEach>
     <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">
-        <c:choose>
-            <c:when test="${sectionBorders == 1}">
-                <td class="aka_padding_norm aka_cellBorders_dark">
-                        <%-- check for manual in the input name; if rowCount > 0 then manual
-                   will be in the name --%>
-                    <c:choose>
-                        <c:when test="${uniqueId ==0}">
-                            <input type="hidden" name="<c:out value="${repeatParentId}"/>_<c:out value="${uniqueId}"/>.newRow" value="yes">
-                        </c:when>
-                        <c:otherwise>
-                            <input type="hidden" name="<c:out value="${repeatParentId}"/>_manual<c:out value="${uniqueId}"/>.newRow" value="yes">
-                        </c:otherwise>
-                    </c:choose>
-                    <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove"></button>
-                </td>
-            </c:when>
-            <c:otherwise>
+     
                 <td class="aka_padding_norm aka_cellBorders">
                         <%-- check for manual in the input name; if rowCount > 0 then manual
                    will be in the name --%>
@@ -874,8 +774,7 @@ but the custom tag uses that, not this jstl code--%>
                     </c:choose>
                     <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove"></button>
                 </td>
-            </c:otherwise>
-        </c:choose>
+           
     </c:if>
 </tr>
 </c:otherwise>
@@ -884,19 +783,9 @@ but the custom tag uses that, not this jstl code--%>
 <!-- repeating rows in an item group end -->
 </c:forEach>
     <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">
-        <tr>
-            <c:choose>
-                <c:when test="${sectionBorders == 1}">
-                    <%-- Add 1 to the totalColsPlusSubcols variable to accomodate the cell
-                    containing the remove button--%>
-                    <td class="aka_padding_norm aka_cellBorders_dark" colspan="<c:out value="${totalColsPlusSubcols + 1}"/>">
+        <tr><td class="aka_padding_norm aka_cellBorders" colspan="<c:out value="${totalColsPlusSubcols + 1}"/>">
                         <button stype="add" type="button" template="<c:out value="${repeatParentId}"/>" class="button_search"><fmt:message key="add" bundle="${resword}"/></button></td>
-                </c:when>
-                <c:otherwise>
-                    <td class="aka_padding_norm aka_cellBorders" colspan="<c:out value="${totalColsPlusSubcols + 1}"/>">
-                        <button stype="add" type="button" template="<c:out value="${repeatParentId}"/>" class="button_search"><fmt:message key="add" bundle="${resword}"/></button></td>
-                </c:otherwise>
-            </c:choose>
+               
         </tr>
     </c:if>
 </tbody>

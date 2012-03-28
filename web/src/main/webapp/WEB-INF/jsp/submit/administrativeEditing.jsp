@@ -3,6 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib uri="com.akazaresearch.tags" prefix="aka_frm" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
@@ -12,11 +13,8 @@
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='session' id='study' class='org.akaza.openclinica.bean.managestudy.StudyBean' />
 <jsp:useBean scope='session' id='userRole' class='org.akaza.openclinica.bean.login.StudyUserRoleBean' />
-<%--<jsp:useBean scope='request' id='isAdminServlet' class='java.lang.String' />--%>
-<jsp:useBean scope="request" id="section" class=
-  "org.akaza.openclinica.bean.submit.DisplaySectionBean" />
-<%--<jsp:useBean scope="request" id="annotations" class="java.lang.String" />--%>
-<jsp:useBean scope='request' id='pageMessages' class='java.util.ArrayList'/>
+<jsp:useBean scope="request" id="section" class= "org.akaza.openclinica.bean.submit.DisplaySectionBean" />
+ <jsp:useBean scope='request' id='pageMessages' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='formMessages' class='java.util.HashMap'/>
 <jsp:useBean scope='request' id='exitTo' class='java.lang.String' />
 <jsp:useBean scope="request" id="fromViewNotes" class="java.lang.String"/>
@@ -29,12 +27,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=8" />
 
     <link rel="stylesheet" href="includes/styles.css" type="text/css">
-<%-- <link rel="stylesheet" href="includes/styles2.css" type="text/css">--%>
     <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/Tabs.js"></script>
    <script type="text/JavaScript" language="JavaScript" src="includes/CalendarPopup.js"></script>
-    <script type="text/javascript"  language="JavaScript" src=
-      "includes/repetition-model/repetition-model.js"></script>
+    <script type="text/javascript"  language="JavaScript" src="includes/repetition-model/repetition-model.js"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/prototype.js"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/scriptaculous.js?load=effects"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/effects.js"></script>
@@ -177,11 +173,14 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 <!-- section tabs here -->
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>
+<%-- if only one section show no arrows & section jump --%>
+<c:if test="${fn:length(companies) gt 1}">
+
 <td align="right" valign="middle" style="padding-left: 12px; display: none" id="TabsBack">
     <a href="javascript:TabsBack()"><img src="images/arrow_back.gif" border="0" style="margin-top:10px"></a></td>
 <td align="right" style="padding-left: 12px" id="TabsBackDis">
     <img src="images/arrow_back_dis.gif" border="0"/></td>
-
+</c:if>
 
 <script type="text/JavaScript" language="JavaScript">
     <!--
@@ -273,9 +272,14 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
     //-->
 </script>
 
+<%-- if only one section show no arrows & section jump --%>
+<c:if test="${fn:length(companies) gt 1}">
+
 <td align="right"id="TabsNextDis" style="display: none"><img src="images/arrow_next_dis.gif" border="0"/></td>
 <td align="right" id="TabsNext"><a href="javascript:TabsForward()"><img src="images/arrow_next.gif" border="0" style=
   "margin-top:10px;margin-right:6px"/></a></td>
+ 
+
 <td>&nbsp;
     <div class="formfieldM_BG_noMargin"><select class="formfieldM" name="sectionName" size="1" onchange="gotoLink();">
         <c:set var="tabCount" value="1"/>
@@ -288,6 +292,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
     </select>
     </div>
 </td>
+</c:if> 
 </tr>
 </table>
 <input type="hidden" name="submitted" value="1" />
@@ -387,19 +392,6 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                     <td align="right" valign="bottom">
                         <table border="0" cellpadding="0" cellspacing="0">
                             <tr>
-                                    <%-- for administrative editing, this is no longer needed, tbh 112007 --%>
-
-                                    <%--<c:choose>
-                                      <c:when test="${stage !='adminEdit' && section.lastSection}">
-                                        <td valign="bottom">  <input type="checkbox" name="markComplete" value="Yes"
-                                                                     onclick="displayMessageFromCheckbox(this, '<fmt:message key="marking_CRF_complete_finalize_DE" bundle="${restext}"/>')">
-                                        </td>
-                                        <td valign="bottom" nowrap="nowrap">&nbsp; <fmt:message key="mark_CRF_complete" bundle="${resword}"/> &nbsp;&nbsp;&nbsp;</td>
-                                      </c:when>
-                                      <c:otherwise>
-                                        <td colspan="2">&nbsp;</td>
-                                      </c:otherwise>
-                                    </c:choose>--%>
                                 <td><input type="submit" id="srh" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class=
                                   "button_medium" onClick="disableSubmit('DataStatus_top'); this.form.submit();"/></td>
                                 <td><input type="submit" id="seh" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class=
@@ -437,22 +429,8 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                     <td align="right" valign="bottom">
                         <table border="0" cellpadding="0" cellspacing="0">
                             <tr>
-                                    <%-- also not needed here, tbh 112007 --%>
-                                    <%--<c:choose>
-                                      <c:when test="${stage !='adminEdit' && section.lastSection}">
-                                        <td valign="bottom"><input type="checkbox" name="markComplete" value="Yes"
-                                                                   onclick="displayMessageFromCheckbox(this, '<fmt:message key="marking_CRF_complete_finalize_DE" bundle="${restext}"/>')">
-                                        </td>
-                                        <td valign="bottom" nowrap>&nbsp; <fmt:message key="mark_CRF_complete" bundle="${resword}"/> &nbsp;&nbsp;&nbsp;</td>
-                                      </c:when>
-                                      <c:otherwise>
-                                        <td colspan="2">&nbsp;</td>
-                                      </c:otherwise>
-                                    </c:choose>--%>
                                 <td><input type="submit" id="srm" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class="button_medium" onClick="disableSubmit('DataStatus_top'); this.form.submit();"/></td>
                                 <td><input type="submit" id="sem" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkEntryStatus('DataStatus_top');" /></td>
-
-                                    <%--<td valign="bottom"><img name="DataStatus_top" src="images/icon_UnchangedData.gif"></td>--%>
                             </tr>
                         </table>
                     </td>
@@ -470,17 +448,10 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 
 <tr>
 <%-- next place holder for highlighting, tbh 052010 --%>
-<c:choose>
-	<c:when test="${displayItem.itemGroup.groupMetaBean.highlighted}">
-        <td class="aka_group_show">
-	</c:when>
-	<c:otherwise>
-		<td>
-	</c:otherwise>
-</c:choose>
+<td <c:if test="${displayItem.itemGroup.groupMetaBean.highlighted}"> class="aka_group_show" </c:if> > 
+
 <c:set var="uniqueId" value="0"/>
 <c:set var="repeatParentId" value="${displayItem.itemGroup.itemGroupBean.name}"/>
-<c:set var="sectionBorders" value="${section.section.borders}" />
 
 <c:set var="repeatNumber" value="0"/>
 <c:set var="repeatMax" value="${displayItem.itemGroup.groupMetaBean.repeatMax}"/>
@@ -515,25 +486,14 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
             </c:forEach>
         </c:if>
         <c:choose>
-            <c:when test="${isHorizontalCellLevel && sectionBorders == 1 &&
-        (thItem.metadata.responseSet.responseType.name eq 'checkbox' ||
-              thItem.metadata.responseSet.responseType.name eq 'radio')}">
-                <th colspan="<c:out value='${optionsLen}'/>" class="aka_headerBackground aka_padding_large aka_cellBorders_dark">
-                <%-- compute total columns value for the add button row colspan attribute--%>
-                <c:set var="totalColsPlusSubcols" value="${totalColsPlusSubcols + optionsLen}" />
-            </c:when>
-            <c:when test="${isHorizontalCellLevel &&
-        (thItem.metadata.responseSet.responseType.name eq 'checkbox' ||
+         
+            <c:when test="${isHorizontalCellLevel &&      (thItem.metadata.responseSet.responseType.name eq 'checkbox' ||
               thItem.metadata.responseSet.responseType.name eq 'radio')}">
                 <th colspan="<c:out value='${optionsLen}'/>" class="aka_headerBackground aka_padding_large aka_cellBorders">
                 <%-- compute total columns value for the add button row colspan attribute--%>
                 <c:set var="totalColsPlusSubcols" value="${totalColsPlusSubcols + optionsLen}" />
             </c:when>
-            <c:when test="${sectionBorders == 1}">
-                <th class="aka_headerBackground aka_padding_large aka_cellBorders_dark">
-                <%-- compute total columns value for the add button row colspan attribute--%>
-                <c:set var="totalColsPlusSubcols" value="${totalColsPlusSubcols + 1}" />
-            </c:when>
+       
             <c:otherwise>
                 <th class="aka_headerBackground aka_padding_large aka_cellBorders">
                 <%-- compute total columns value for the add button row colspan attribute--%>
@@ -554,14 +514,9 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
         </c:if>
     </c:forEach>
     <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">
-        <c:choose>
-            <c:when test="${sectionBorders == 1}">
-                <th class="aka_headerBackground aka_padding_large aka_cellBorders_dark" />
-            </c:when>
-            <c:otherwise>
+    
                 <th class="aka_headerBackground aka_padding_large aka_cellBorders" />
-            </c:otherwise>
-        </c:choose>
+        
     </c:if>
 </tr>
 <c:if test="${isHorizontal}">
@@ -575,14 +530,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                 <c:set var="isHorizontalCellLevel" scope="request" value="${true}"/>
             </c:if>
             <c:choose>
-                <c:when test="${isHorizontalCellLevel && sectionBorders == 1 &&
-                    (thItem.metadata.responseSet.responseType.name eq 'checkbox' ||
-              thItem.metadata.responseSet.responseType.name eq 'radio')}">
-                    <c:forEach var="respOpt" items="${thItem.metadata.responseSet.options}">
-                        <th class="aka_headerBackground aka_padding_large aka_cellBorders_dark">
-                            <c:out value="${respOpt.text}" /></th>
-                    </c:forEach>
-                </c:when>
+             
                 <c:when test="${isHorizontalCellLevel &&
                     (thItem.metadata.responseSet.responseType.name eq 'checkbox' ||
               thItem.metadata.responseSet.responseType.name eq 'radio')}">
@@ -591,9 +539,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                             <c:out value="${respOpt.text}" /></th>
                     </c:forEach>
                 </c:when>
-                <c:when test="${sectionBorders == 1}">
-                    <th class="aka_headerBackground aka_padding_large aka_cellBorders_dark"/>
-                </c:when>
+          
                 <c:otherwise>
                     <th class="aka_headerBackground aka_padding_large aka_cellBorders"/>
                 </c:otherwise>
@@ -624,28 +570,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
         <c:set var="isHorizontalCellLevel" scope="request" value="${true}"/>
     </c:if>
     <c:choose>
-        <c:when test="${isHorizontalCellLevel &&
-            sectionBorders == 1 && (bodyItem.metadata.responseSet.responseType.name eq 'radio' ||
-           bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
-            <%-- For horizontal checkboxes, radio buttons--%>
-            <c:forEach var="respOption" items="${bodyItem.metadata.responseSet.options}">
-                <td class="aka_padding_norm aka_cellBorders_dark">
-                    <c:set var="displayItem" scope="request" value="${bodyItem}" />
-                    <c:set var="responseOptionBean" scope="request" value="${respOption}" />
-                    <c:import url="../submit/showGroupItemInput.jsp">
-                        <c:param name="repeatParentId" value="${repeatParentId}"/>
-                        <c:param name="rowCount" value="${uniqueId}"/>
-                        <c:param name="key" value="${numOfDate}" />
-                        <c:param name="isLast" value="${false}"/>
-                        <c:param name="tabNum" value="${itemNum}"/>
-                        <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
-                        <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
-                        <c:param name="originJSP" value="administrativeEditing"/>
-                        <c:param name="isForcedRFC" value="${study.studyParameterConfig.adminForcedReasonForChange}"/>
-                    </c:import>
-                </td>
-            </c:forEach>
-        </c:when>
+      
         <c:when test="${isHorizontalCellLevel &&
            (bodyItem.metadata.responseSet.responseType.name eq 'radio' ||
            bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
@@ -668,42 +593,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                 </td>
             </c:forEach>
         </c:when>
-        <c:when test="${sectionBorders == 1}">
-            <td class="aka_padding_norm aka_cellBorders_dark">
-                <c:set var="displayItem" scope="request" value="${bodyItem}" />
-				<c:import url="../submit/generateGroupItemTxt.jsp">
-						<c:param name="itemId" value="${bodyItem.item.id}"/>
-						<c:param name="inputType" value="${bodyItem.metadata.responseSet.responseType.name}"/>
-						<c:param name="function" value="${bodyItem.metadata.responseSet.options[0].value}"/>
-						<c:param name="linkText" value="${bodyItem.metadata.leftItemText}"/>
-						<c:param name="repeatParentId" value="${repeatParentId}"/>
-                        <c:param name="rowCount" value="${uniqueId}"/>
-						<c:param name="isLast" value="${false}"/>
-						<c:param name="side" value="left"/>
-					</c:import>
-                <c:import url="../submit/showGroupItemInput.jsp">
-                    <c:param name="repeatParentId" value="${repeatParentId}"/>
-                    <c:param name="rowCount" value="${uniqueId}"/>
-                    <c:param name="key" value="${numOfDate}" />
-                    <c:param name="isLast" value="${false}"/>
-                    <c:param name="tabNum" value="${itemNum}"/>
-                    <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
-                    <c:param name="originJSP" value="administrativeEditing"/>
-                    <c:param name="isForcedRFC" value="${study.studyParameterConfig.adminForcedReasonForChange}"/>
-                </c:import>
-				<c:import url="../submit/generateGroupItemTxt.jsp">
-						<c:param name="itemId" value="${bodyItem.item.id}"/>
-						<c:param name="inputType" value="${bodyItem.metadata.responseSet.responseType.name}"/>
-						<c:param name="function" value="${bodyItem.metadata.responseSet.options[0].value}"/>
-						<c:param name="linkText" value="${bodyItem.metadata.leftItemText}"/>
-						<c:param name="repeatParentId" value="${repeatParentId}"/>
-                        <c:param name="rowCount" value="${uniqueId}"/>
-						<c:param name="isLast" value="${false}"/>
-						<c:param name="side" value="right"/>
-					</c:import>
-            </td>
-        </c:when>
-        <%-- could be a radio or checkbox that is not horizontal --%>
+      <%-- could be a radio or checkbox that is not horizontal --%>
         <c:otherwise>
             <td class="aka_padding_norm aka_cellBorders">
                 <c:set var="displayItem" scope="request" value="${bodyItem}" />
@@ -746,23 +636,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
     </c:choose>
 </c:forEach>
 <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">
-    <c:choose>
-        <c:when test="${sectionBorders == 1}">
-            <td class="aka_padding_norm aka_cellBorders_dark">
-                    <%-- check for manual in the input name; if rowCount > 0 then manual
-               will be in the name --%>
-                <c:choose>
-                    <c:when test="${uniqueId ==0}">
-                        <input type="hidden" name="<c:out value="${repeatParentId}"/>_<c:out value="${uniqueId}"/>.newRow" value="yes">
-                    </c:when>
-                    <c:otherwise>
-                        <input type="hidden" name="<c:out value="${repeatParentId}"/>_manual<c:out value="${uniqueId}"/>.newRow" value="yes">
-                    </c:otherwise>
-                </c:choose>
-                <!-- <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove"></button> -->
-            </td>
-        </c:when>
-        <c:otherwise>
+
             <td class="aka_padding_norm aka_cellBorders">
                     <%-- check for manual in the input name; if rowCount > 0 then manual
                will be in the name --%>
@@ -777,8 +651,6 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
               <!--   <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove"></button> -->
             </td>
 
-        </c:otherwise>
-    </c:choose>
 </c:if>
 </tr>
 
@@ -797,28 +669,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
             <c:set var="isHorizontalCellLevel" scope="request" value="${true}"/>
         </c:if>
         <c:choose>
-            <c:when test="${isHorizontalCellLevel && sectionBorders == 1 && (bodyItem.metadata.responseSet.responseType.name eq 'radio' ||
-           bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
-                <%-- For horizontal checkboxes, radio buttons--%>
-                <c:forEach var="respOption" items="${bodyItem.metadata.responseSet.options}">
-                    <td class="aka_padding_norm aka_cellBorders_dark">
-                        <c:set var="displayItem" scope="request" value="${bodyItem}" />
-                        <c:set var="responseOptionBean" scope="request" value="${respOption}" />
-                        <c:import url="../submit/showGroupItemInput.jsp">
-                            <c:param name="repeatParentId" value="${repeatParentId}"/>
-                            <c:param name="rowCount" value="${uniqueId}"/>
-                            <c:param name="key" value="${numOfDate}" />
-                            <c:param name="isLast" value="${true}"/>
-                            <c:param name="isTemplateRow" value="${true}"/>
-                            <c:param name="tabNum" value="${itemNum}"/>
-                            <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
-                            <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
-                            <c:param name="originJSP" value="administrativeEditing"/>
-                            <c:param name="isForcedRFC" value="${study.studyParameterConfig.adminForcedReasonForChange}"/>
-                        </c:import>
-                    </td>
-                </c:forEach>
-            </c:when>
+       
             <c:when test="${isHorizontalCellLevel &&
                 (bodyItem.metadata.responseSet.responseType.name eq 'radio' ||
            bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
@@ -832,7 +683,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                             <c:param name="rowCount" value="${uniqueId}"/>
                             <c:param name="key" value="${numOfDate}" />
                             <c:param name="isLast" value="${true}"/>
-                            <c:param name="isTemplateRow" value="${true}"/>
+                            <c:param name="isNewItem" value="${true}"/>
                             <c:param name="tabNum" value="${itemNum}"/>
                             <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
                             <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
@@ -841,42 +692,6 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                         </c:import>
                     </td>
                 </c:forEach>
-            </c:when>
-            <c:when test="${sectionBorders == 1}">
-                <td class="aka_padding_norm aka_cellBorders_dark">
-                    <c:set var="displayItem" scope="request" value="${bodyItem}" />
-					<c:import url="../submit/generateGroupItemTxt.jsp">
-						<c:param name="itemId" value="${bodyItem.item.id}"/>
-						<c:param name="inputType" value="${bodyItem.metadata.responseSet.responseType.name}"/>
-						<c:param name="function" value="${bodyItem.metadata.responseSet.options[0].value}"/>
-						<c:param name="linkText" value="${bodyItem.metadata.leftItemText}"/>
-						<c:param name="repeatParentId" value="${repeatParentId}"/>
-                        <c:param name="rowCount" value="${uniqueId}"/>
-						<c:param name="isLast" value="${true}"/>
-						<c:param name="side" value="left"/>
-					</c:import>
-                    <c:import url="../submit/showGroupItemInput.jsp">
-                        <c:param name="repeatParentId" value="${repeatParentId}"/>
-                        <c:param name="rowCount" value="${uniqueId}"/>
-                        <c:param name="key" value="${numOfDate}" />
-                        <c:param name="isLast" value="${true}"/>
-                        <c:param name="isTemplateRow" value="${true}"/>
-                        <c:param name="tabNum" value="${itemNum}"/>
-                        <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
-                        <c:param name="originJSP" value="administrativeEditing"/>
-                        <c:param name="isForcedRFC" value="${study.studyParameterConfig.adminForcedReasonForChange}"/>
-                    </c:import>
-					<c:import url="../submit/generateGroupItemTxt.jsp">
-						<c:param name="itemId" value="${bodyItem.item.id}"/>
-						<c:param name="inputType" value="${bodyItem.metadata.responseSet.responseType.name}"/>
-						<c:param name="function" value="${bodyItem.metadata.responseSet.options[0].value}"/>
-						<c:param name="linkText" value="${bodyItem.metadata.leftItemText}"/>
-						<c:param name="repeatParentId" value="${repeatParentId}"/>
-                        <c:param name="rowCount" value="${uniqueId}"/>
-						<c:param name="isLast" value="${true}"/>
-						<c:param name="side" value="right"/>
-					</c:import>
-                </td>
             </c:when>
             <%-- could be a radio or checkbox that is not horizontal --%>
             <c:otherwise>
@@ -897,7 +712,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
                         <c:param name="rowCount" value="${uniqueId}"/>
                         <c:param name="key" value="${numOfDate}" />
                         <c:param name="isLast" value="${true}"/>
-                        <c:param name="isTemplateRow" value="${true}"/>
+                        <c:param name="isNewItem" value="${true}"/>
                         <c:param name="tabNum" value="${itemNum}"/>
                         <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                         <c:param name="originJSP" value="administrativeEditing"/>
@@ -922,21 +737,12 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
     	</c:choose>
     </c:forEach>
     <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">
-        <c:choose>
-            <c:when test="${sectionBorders == 1}">
-                <td class="aka_padding_norm aka_cellBorders_dark">
-                    <input type="hidden" name="<c:out value="${repeatParentId}"/>_[<c:out value="${repeatParentId}"/>].newRow" value="yes" />
-                    <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove"></button>
-                </td>
-            </c:when>
-
-            <c:otherwise>
+    
                 <td class="aka_padding_norm aka_cellBorders">
                     <input type="hidden" name="<c:out value="${repeatParentId}"/>_[<c:out value="${repeatParentId}"/>].newRow" value="yes" />
                     <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove"></button>
                 </td>
-            </c:otherwise>
-        </c:choose>
+        
     </c:if>
 </tr>
 </c:if>
@@ -944,18 +750,10 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 </c:forEach>
 <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">
     <tr>
-        <c:choose>
-            <c:when test="${sectionBorders == 1}">
-                <%-- Add 1 to the totalColsPlusSubcols variable to accommodate the cell
-                containing the remove button--%>
-                <td class="aka_padding_norm aka_cellBorders_dark" colspan="<c:out value="${totalColsPlusSubcols + 1}"/>">
-                    <button stype="add" type="button" template="<c:out value="${repeatParentId}"/>" class="button_search"><fmt:message key="add" bundle="${resword}"/></button></td>
-            </c:when>
-            <c:otherwise>
+      
                 <td class="aka_padding_norm aka_cellBorders" colspan="<c:out value="${totalColsPlusSubcols + 1}"/>">
                     <button stype="add" type="button" template="<c:out value="${repeatParentId}"/>" class="button_search"><fmt:message key="add" bundle="${resword}"/></button></td>
-            </c:otherwise>
-        </c:choose>
+       
     </tr>
 </c:if>
 </tbody>

@@ -1,11 +1,11 @@
 --------------------------------------------------------------
 OPENCLINICA RELEASE NOTES
-OpenClinica Version 3.1.3-alpha
+OpenClinica Version 3.1.3-alpha-2
 Document Version 1.0
 --------------------------------------------------------------
 
 --------------------------------------------------------------
-Updated: Mar 5, 2012
+Updated: Mar 26, 2012
 
 --------------------------------------------------------------
 
@@ -13,7 +13,7 @@ Updated: Mar 5, 2012
 OVERVIEW
 --------------------------------------------------------------
 
-This is the latest development release of OpenClinica 3.1.3-alpha code branch. 
+This is the latest development release of OpenClinica 3.1.3-alpha-2 code branch. 
 
 A list of changes in each development release can be found at 
 https://issuetracker.openclinica.com/roadmap_page.php?project_id=160

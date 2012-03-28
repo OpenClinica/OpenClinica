@@ -39,7 +39,6 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.log.Stopwatch;
-import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.service.managestudy.ViewNotesFilterCriteria;
 import org.akaza.openclinica.service.managestudy.ViewNotesService;
 import org.akaza.openclinica.service.managestudy.ViewNotesSortCriteria;
@@ -140,7 +139,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     @Override
     public void configureTableFacadePostColumnConfiguration(TableFacade tableFacade) {
         ListNotesTableToolbar toolbar = new ListNotesTableToolbar(showMoreLink);
-        tableFacade.setToolbar(toolbar);
         toolbar.setStudyHasDiscNotes(studyHasDiscNotes);
         toolbar.setDiscNoteType(discNoteType);
         toolbar.setResolutionStatus(resolutionStatus);
@@ -149,7 +147,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         tableFacade.setToolbar(toolbar);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void setDataAndLimitVariables(TableFacade tableFacade) {
         Stopwatch sw = Stopwatch.createAndStart("setDataAndLimitVariables");
@@ -158,29 +155,20 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         resformat = ResourceBundleProvider.getFormatBundle(getLocale());
 
         Limit limit = tableFacade.getLimit();
-
-        ListNotesFilter listNotesFilter = getListNoteFilter(limit);
-        ListNotesSort listNotesSort = getListSubjectSort(limit);
+        if (!limit.isComplete()) {
+            // Set any value greater than the maximum page size here, as it will be overriden once read from DB
+            tableFacade.setTotalRows(100);
+        }
 
         List<DiscrepancyNoteBean> items = getViewNotesService().listNotes(getCurrentStudy(),
-                ViewNotesFilterCriteria.buildFilterCriteria(limit.getFilterSet(), getDateFormat()),
+                ViewNotesFilterCriteria.buildFilterCriteria(limit, getDateFormat()),
                 ViewNotesSortCriteria.buildFilterCriteria(limit.getSortSet()));
 
-        //this.setAllNotes(items);
-        this.setAllNotes(DiscrepancyNoteUtil.customFilter(items, listNotesFilter));
-
-        //Keeping all notes without pagination to be shown in print popup.
-        if (!limit.isComplete()) {
-            tableFacade.setTotalRows(allNotes.size());
-        }
-        int rowStart = limit.getRowSelect().getRowStart();
-        int rowEnd = limit.getRowSelect().getRowEnd();
-
-        allNotes = paginateData(allNotes, rowStart, rowEnd);
+        this.setAllNotes(items);
 
         Collection<HashMap<Object, Object>> theItems = new ArrayList<HashMap<Object, Object>>();
 
-        for (DiscrepancyNoteBean discrepancyNoteBean : allNotes) {
+        for (DiscrepancyNoteBean discrepancyNoteBean : items) {
 
             HashMap<Object, Object> h = new HashMap<Object, Object>();
 

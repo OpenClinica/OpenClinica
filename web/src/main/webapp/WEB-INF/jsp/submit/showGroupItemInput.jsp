@@ -10,7 +10,6 @@
 <jsp:useBean scope="request" id="displayItem" class="org.akaza.openclinica.bean.submit.DisplayItemBean" />
 <jsp:useBean scope="request" id="responseOptionBean" class="org.akaza.openclinica.bean.submit.ResponseOptionBean" />
 <jsp:useBean scope='request' id='formMessages' class='java.util.HashMap'/>
-<script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/instant_onchange.js"></script>
 
 <script lang="Javascript">
@@ -245,7 +244,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
 <c:set var="itemId" value="${displayItem.item.id}" />
 <c:set var="numOfDate" value="${param.key}" />
 <c:set var="isLast" value="${param.isLast}" />
-<c:set var="isTemplateRow" value="${param.isTemplateRow}" />
+<c:set var="isNewItem" value="${param.isNewItem}" />
 
 <c:set var="isFirst" value="${param.isFirst}" />
 <c:set var="repeatParentId" value="${param.repeatParentId}" />
@@ -291,10 +290,19 @@ function switchStr(itemId, id,attribute,str1,str2) {
   empty displayItem.metadata.responseSet.value}">
     <c:set var="inputTxtValue" value="${defValue}"/>
   </c:when>
+ <%-- <c:when test="${isNewItem eq true }">
+  <c:if test='${inputType == "text"|| inputType == "textarea" }' >
+  		<c:set var="inputTxtValue" value="${defValue}"/>
+  </c:if>
+
+  	 
+  </c:when>--%>
+  <%--htaycher: question - when this case should be ::: --%>
   <c:otherwise>
-    <c:set var="inputTxtValue" value="${displayItem.metadata.responseSet.value}"/>
+   <c:set var="inputTxtValue" value="${displayItem.metadata.responseSet.value}"/>
    </c:otherwise>
 </c:choose>
+
 
 <c:forEach var="frmMsg" items="${formMessages}">
    <c:if test="${(frmMsg.key eq parsedInputName) || (frmMsg.key eq autoParsedInputName)}">
@@ -303,7 +311,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
   </c:if>
 </c:forEach>
 
-<c:if test="${isTemplateRow == true}">
+<c:if test="${isNewItem eq true}">
  <c:set var="isInError" value="${false}" />
  </c:if>
 
@@ -366,7 +374,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
   <input type="hidden" id="<c:out value="${inputName}"/>" name="<c:out value="${inputName}"/>" value="<c:out value="${inputTxtValue}"/>" >
   <c:choose>
     <c:when test="${isInError && !hasShown}">
-      <span class="<c:out value="${exclaim}"/>">! </span><input class="<c:out value="${input}"/>" id="show<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
+      <span class="aka_exclaim_error">! </span><input class="aka_input_error"  id="show<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
       "this.className='changedField'; manualChange('<c:out value="${inputName}"/>'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');"
       type="text" name="show<c:out value="${inputName}"/>" value="<c:out value="${inputTxtValue}"/>" />
     </c:when>
@@ -643,6 +651,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
   </c:forEach>
   </select>
 </c:if>
+
 <c:if test='${inputType == "calculation" || inputType == "group-calculation"}'>
 	<%-- need to test for coding function here, tbh  --%>
 	<c:set var="isAnExternalValue" value="0"/>
@@ -717,9 +726,24 @@ function switchStr(itemId, id,attribute,str1,str2) {
       				<span class="aka_exclaim_error">! </span><input class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" class="disabled" disabled="disabled" name="<c:out value="${inputName}"/>" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
 				</c:when>
 				<c:otherwise>
-					<input id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
+				<%-- new row should be empty --%>
+				<c:choose>
+					<c:when test="${isNewItem eq true }">
+							<input id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
+							"this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" class="disabled" disabled="disabled" name="<c:out value="${inputName}"/>" value="" />
+    		
+					</c:when>
+				
+					<c:otherwise>
+					
+						<input id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange=
 							"this.className='changedField'; javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" type="text" class="disabled" disabled="disabled" name="<c:out value="${inputName}"/>" value="<c:out value="${displayItem.metadata.responseSet.value}"/>" />
-    			</c:otherwise>
+    		</c:otherwise>
+					</c:choose>
+				
+				
+				
+					</c:otherwise>
 			</c:choose>
 		</c:otherwise>
 	</c:choose>
@@ -747,11 +771,15 @@ function switchStr(itemId, id,attribute,str1,str2) {
     <c:when test="${displayItem.discrepancyNoteStatus == 5}">
         <c:set var="imageFileName" value="icon_flagWhite" />
     </c:when>
+    <%-- new template row --%>
+    <c:when test="${isNewItem == true}">
+	    <c:set var="imageFileName" value="icon_noNote" />
+	</c:when>
     <c:otherwise>
     </c:otherwise>
   </c:choose>
   <c:choose>
-    <c:when test="${displayItem.numDiscrepancyNotes > 0}">
+    <c:when test="${displayItem.numDiscrepancyNotes > 0  and isNewItem != true}">
 
     <a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"   onmouseover="callTip(genToolTips(${itemId}));"
            onmouseout="UnTip();" onClick=
@@ -770,10 +798,15 @@ function switchStr(itemId, id,attribute,str1,str2) {
           <c:when test="${originJSP eq 'administrativeEditing'}">
               <c:set var="writeToDb" value="1"/>
           </c:when>
+
+
           <c:otherwise>
               <c:set var="writeToDb" value="0"/>
           </c:otherwise>
       </c:choose>
+        <c:if test="${isNewItem eq true}">
+			    <c:set var="writeToDb" value="0" />
+		</c:if>
          <c:set var="eventName" value="${toc.studyEventDefinition.name}"/>
          <c:set var="eventDate" value="${toc.studyEvent.dateStarted}"/>
          <c:set var="crfName" value="${toc.crf.name} ${toc.crfVersion.name}"/>
@@ -791,35 +824,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
 
 
 </c:if>
-<%-- we won't need this if we're not embedding error messages
-<br><c:import url="../showMessage.jsp"><c:param name="key" value=
-              "${inputName}" /></c:import>    --%>
-<%--
-adding units...
- if(responseName.equalsIgnoreCase("text") ||
-      responseName.equalsIgnoreCase("textarea") ||
-      responseName.equalsIgnoreCase("single-select") ||
-      responseName.equalsIgnoreCase("multi-select")){
 
-       td = this.addUnits(td,displayBean);
-       //td = this.addRightItemText(td,displayBean);
-    }
-    if(responseName.equalsIgnoreCase("radio") ||
-      responseName.equalsIgnoreCase("checkbox") ){
-      String grLabel = displayBean.getMetadata().getGroupLabel();
-      boolean grouped = (grLabel != null && (! "".equalsIgnoreCase(grLabel)) &&
-      (! grLabel.equalsIgnoreCase("ungrouped")));
-
-      if(! grouped) {
-         td = this.addUnits(td,displayBean);
-      }  else {
-        //the radio or checkbox does appear in a group table
-        //Do not add units if the layout is horizontal
-        if(! displayBean.getMetadata().getResponseLayout().
-          equalsIgnoreCase("Horizontal")){
-           td = this.addUnits(td,displayBean);
-        }
---%>
 <c:if test='${inputType == "text"|| inputType == "textarea" ||
 inputType == "multi-select" || inputType == "single-select" ||
 inputType == "calculation" }'>
