@@ -2050,15 +2050,8 @@
 
 		<xsl:if test="$dobExist">
 			<xsl:text>DateofBirth</xsl:text>
-			<xsl:variable name="valueLength">
-				<xsl:for-each select="//odm:ODM/odm:ClinicalData/odm:SubjectData/string-length(@OpenClinica:DateOfBirth)">
-					<xsl:sort data-type="number"/>
-					<xsl:if test="position() = last()">
-						<xsl:value-of select="."/>
-					</xsl:if>
-				</xsl:for-each>
-			</xsl:variable>
-			<xsl:text> A</xsl:text><xsl:value-of select="$valueLength" />	
+			<!-- @pgawade 21-Mar-2012 #12213 - Changing data type for date of birth to ADATE10 -->			
+			<xsl:text> ADATE10</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
 	</xsl:template>
@@ -2114,7 +2107,8 @@
 
 	<!-- template to replace all invalid SPSS characters (characters other than any letter, any digit, a period, or the symbols @, #, _, or $) with # 
 		This is a template meant for future use to handle the special case of if SPSS variables generated do not start with a letter. Associated issue number is 13583
-	-->
+-->
+	
 	<xsl:template name="replace-invalid-char">
 		<xsl:param name="text"/>		
 		<xsl:choose>
