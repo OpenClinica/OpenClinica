@@ -307,7 +307,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
          * shouldLoadDBValues() is called.
          */
          boolean isSubmitted = false;
-
         boolean hasGroup = false;
 
         EventCRFDAO ecdao = null;
@@ -408,15 +407,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
             request.setAttribute("fromViewNotes", fromViewNotes);
         }
 
-        // Not necessary: } catch (NullPointerException npe) {
-        // temp fix, jun please address the above problems
-        // try to check if dn and dn. geResStatus are not null-jxu
-        // npe.printStackTrace();
-        /*
-         * request.setAttribute("updatedNum", "0"); request.setAttribute("openNum", "0"); request.setAttribute("closedNum", "0");
-         * request.setAttribute("resolvedNum", "0"); request.setAttribute("notAppNum", "0");
-         */
-        // }
+     
         logMe("Entering Create studySubjDao.. ++++stuff"+System.currentTimeMillis());
         StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
         StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(ecb.getStudySubjectId());
@@ -560,7 +551,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         // ironically, this only covers vertical null value result sets
         // horizontal ones are covered in FormBeanUtil, tbh 112007
         logMe("Entering  displayItemWithGroups "+System.currentTimeMillis());
-        List<DisplayItemWithGroupBean> displayItemWithGroups = createItemWithGroups(section, hasGroup, eventDefinitionCRFId, request);
+        List<DisplayItemWithGroupBean> displayItemWithGroups = createItemWithGroups1(section, hasGroup, eventDefinitionCRFId, request);
         logMe("Entering  displayItemWithGroups end "+System.currentTimeMillis());
         this.getItemMetadataService().updateGroupDynamicsInSection(displayItemWithGroups, section.getSection().getId(), ecb);
         section.setDisplayItemGroups(displayItemWithGroups);
@@ -738,8 +729,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     List<DisplayItemGroupBean> dbGroups = diwg.getDbItemGroups();
                     //dbGroups = diwg.getItemGroups();
                     List<DisplayItemGroupBean> formGroups = new ArrayList<DisplayItemGroupBean>();
-                    // List<DisplayItemGroupBean> dbGroups2 = loadFormValueForItemGroup(dgb, dbGroups, formGroups, eventDefinitionCRFId);
-                    // tbh 01/2010 change here to collect manual row counts
                     logger.debug("got db item group size " + dbGroups.size());
 
                     if (validate) {
@@ -874,23 +863,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
             // this.getItemMetadataService().resetItemCounter();
             HashMap<String, ArrayList<String>> groupOrdinalPLusItemOid  = null;
             groupOrdinalPLusItemOid = runRules(allItems, ruleSets, true, shouldRunRules, MessageType.ERROR, phase2,ecb, request);
-          /*  if(( List<DisplayItemWithGroupBean>)session.getAttribute(ALL_ITEMS_LIST)==null)
-            {
-                 groupOrdinalPLusItemOid = runRules(allItems, ruleSets, true, shouldRunRules(), MessageType.ERROR, phase2,ecb, request);
-                 session.setAttribute(ALL_ITEMS_LIST, allItems);
-                 session.setAttribute("groupOrdinalPLusItemOid", groupOrdinalPLusItemOid);
-            }
-            else {
-                if( ((List<DisplayItemWithGroupBean>)session.getAttribute(ALL_ITEMS_LIST)).equals( allItems)){
-                    groupOrdinalPLusItemOid = (HashMap<String, ArrayList<String>> )session.getAttribute("groupOrdinalPLusItemOid");
-                }
-                else{
-                    groupOrdinalPLusItemOid = runRules(allItems, ruleSets, true, shouldRunRules(), MessageType.ERROR, phase2,ecb, request);
-                    session.setAttribute(ALL_ITEMS_LIST, allItems);
-                    session.setAttribute("groupOrdinalPLusItemOid", groupOrdinalPLusItemOid);
-                }
-
-            }*/
+      
             logMe("allItems  Loop begin  "+System.currentTimeMillis());
             for (int i = 0; i < allItems.size(); i++) {
                 DisplayItemWithGroupBean diwg = allItems.get(i);
@@ -3387,8 +3360,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
         logMe("Entering getParentDisplayItems::: Done and Thread is? "+Thread.currentThread());
 
         logger.debug("just ran get parent display, has group " + hasGroup + " has ungrouped " + hasUngroupedItems);
-        // now sort them by ordinal
-        Collections.sort(displayItems);
+        // now sort them by ordinal,
+        //JN: Commenting out this logic, its wrong and will give erroneous results.
+        //Collections.sort(displayItems);
 
         // now get the child DisplayItemBeans
         for (int i = 0; i < displayItems.size(); i++) {
@@ -3508,15 +3482,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         ArrayList answer = new ArrayList();
         EventCRFBean ecb = (EventCRFBean) request.getAttribute(INPUT_EVENT_CRF);
 
-        // DisplayItemBean objects are composed of an ItemBean, ItemDataBean and
-        // ItemFormDataBean.
-        // However the DAOs only provide methods to retrieve one type of bean at
-        // a
-        // time (per section)
-        // the displayItems hashmap allows us to compose these beans into
-        // DisplayItemBean objects,
-        // while hitting the database only three times
-        HashMap displayItems = new HashMap();
+         HashMap displayItems = new HashMap();
 
         // ArrayList items = idao.findAllParentsBySectionId(sb.getId());
 
@@ -3562,6 +3528,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         for (int i = 0; i < data.size(); i++) {
             ItemDataBean idb = (ItemDataBean) data.get(i);
             DisplayItemBean dib = (DisplayItemBean) displayItems.get(new Integer(idb.getItemId()));
+           
             if (dib != null) {
                 dib.setData(idb);
                 displayItems.put(new Integer(idb.getItemId()), dib);
@@ -3590,17 +3557,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     logger.debug("DID NOT set show item " + ifmb.getItemId() + " idb " + dib.getData().getId() + " show item " + showItem + " passed dde "
                         + passedDDE + " value " + dib.getData().getValue());
                 }
-                // now set highlighting for admin entry only
-                // if (getServletPage().equals(Page.ADMIN_EDIT_SERVLET)) {
-                // if (needsHighlighting && ifmb.isShowItem()) {
-                // // that is, if it was not shown but now is shown ...
-                // ifmb.setHighlighted(true);
-                // logger.debug("set highlighted to true");
-                // }
-                // }
-                // << tbh 06/2010
-                // TODO child items
-                // logger.debug("did not catch NPE 1");
+
                 dib.setMetadata(ifmb);
                 displayItems.put(new Integer(ifmb.getItemId()), dib);
             }
@@ -3694,16 +3651,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         return itemMetadataService;
     }
 
-    //usign the scope per request just to make sure the multi threaded requests are not getting messed up, since this error is thrown consistently.
-   /* public DynamicsMetadataService getItemMetadataServicePerRequest() {
-        DynamicsMetadataService itemMetadataService =null;
-        logMe("Inside the getItemMetadataServicePerRequest::::"+Thread.currentThread());
-        itemMetadataService =
-            itemMetadataService != null ? itemMetadataService : (DynamicsMetadataService) SpringServletAccess.getApplicationContext(getServletContext()).getBean(
-                    "dynamicsMetadataServicePerRequest");
-        logMe("Obtained the getItemMetadataServicePerRequest object::::"+Thread.currentThread()+"ItemMetadataService is???"+itemMetadataService);
-        return itemMetadataService;
-    }*/
+  
     /**
      * @return The Page object which represents this servlet's JSP.
      */
@@ -3786,40 +3734,20 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 for (int i = 0; i < digbs.size(); i++) {
                     DisplayItemGroupBean displayGroup = digbs.get(i);
                     List<DisplayItemBean> items = displayGroup.getItems();
-                    // for (DisplayItemBean dib : items) {
                     for (int j = 0; j < items.size(); j++) {
                         DisplayItemBean dib = items.get(j);
                         int itemDataId = dib.getData().getId();
                         int numNotes = dndao.findNumExistingNotesForItem(itemDataId);
 
-                        // logger.debug("itemDataId:" + itemDataId);
-                        // logger.debug("numNotes:" + numNotes);
-
-                        // String inputName =
-                        // displayGroup.getItemGroupBean().getName() + "_" + i +
-                        // "." + getInputName(dib);
-                        int ordinal = this.getManualRows(digbs);
+                          int ordinal = this.getManualRows(digbs);
                         String inputName = getGroupItemInputName(displayGroup, displayGroup.getFormInputOrdinal(), dib);
                         if (!displayGroup.isAuto()) {
                             inputName = getGroupItemManualInputName(displayGroup, i, dib);
                         }
 
-                        // String inputName = getGroupItemInputName(displayGroup, i, getManualRows(digbs), dib);
-                        // logger.trace("inputName: " + inputName);
-                        discNotes.setNumExistingFieldNotes(inputName, numNotes);
+                         discNotes.setNumExistingFieldNotes(inputName, numNotes);
                         ArrayList notes = discNotes.getNotes(inputName);
-                        // we need to also set the notes for the manual input name, tbh 01/2010
-                        //                        String inputName2 = this.getGroupItemManualInputName(displayGroup, i, dib);
-                        //                        logger.trace("inputName 2: " + inputName2);
-                        //                        ArrayList notes2 = discNotes.getNotes(inputName2);
-                        //                        discNotes.setNumExistingFieldNotes(inputName2, numNotes);
-                        //                        if (numNotes > 0) {
-                        //                            logger.debug("itemDataId:" + itemDataId);
-                        //                            logger.debug("numNotes:" + numNotes);
-                        //                            logger.debug("inputName: " + inputName);
-                        //                            logger.debug("inputName 2: " + inputName2);
-                        //                        }
-                        dib.setNumDiscrepancyNotes(numNotes + notes.size());// + notes2.size());
+                         dib.setNumDiscrepancyNotes(numNotes + notes.size());// + notes2.size());
                         dib.setDiscrepancyNoteStatus(getDiscrepancyNoteResolutionStatus(itemDataId, notes));
 
                         dib =  setTotals(dib,itemDataId,notes, ecb.getId());
@@ -4121,88 +4049,15 @@ public abstract class DataEntryServlet extends CoreSecureController {
         ArrayList nonRequiredCrfIds = new ArrayList();
         ArrayList requiredCrfIds = new ArrayList();
 
-        // go through the list and find out if all are required, tbh
-/*        for (int ii = 0; ii < allEDCs.size(); ii++) {
-            EventDefinitionCRFBean edcBean = (EventDefinitionCRFBean) allEDCs.get(ii);
-            if (!edcBean.isRequiredCRF()) {
-                logger.trace("found one non required CRF: " + edcBean.getCrfName() + " " + edcBean.getCrfId() + " " + edcBean.getDefaultVersionName());
-                allRequired = false;
-                nonRequiredCrfIds.add(new Integer(edcBean.getCrfId()));
-                allEDCsize--;
-            }
-            if (edcBean.isRequiredCRF()) {
-                logger.trace("found one non required CRF: " + edcBean.getCrfName() + " " + edcBean.getCrfId() + " " + edcBean.getDefaultVersionName());
-                            requiredCrfIds.add(new Integer(edcBean.getCrfId()));
-
-            }
-
-        }
-     */
-        //JN: Add another loop to get list of all required crfs
-
-
-       // logger.trace("non required crf ids: " + nonRequiredCrfIds.toString());
-        // go through all the crfs and check their status
-        // add an additional check to see if it is required or not, tbh
-    /*    for (int i = 0; i < allCRFs.size(); i++) {
-            EventCRFBean ec = (EventCRFBean) allCRFs.get(i);
-            logger.trace("-- looking at a CRF: " + ec.getName() + " " + ec.getCrf().getName() + " " + ec.getCrf().getId());
-            // if clause kind of not right since none of the above fields are
-            // set in the dao, tbh
-            if (!ec.getStatus().equals(Status.UNAVAILABLE) && ec.getDateInterviewed() != null) { // &&
-                // (!nonRequiredCrfIds.contains(new
-                // Integer(ec.getCrf().getId())))) {
-                eventCompleted = false;
-                logger.trace("just rejected eventCompleted looking at a CRF: " + ec.getName());
-                break;
-            }
-
-        }
-        int reqCRFCNTR = 0;
-        //JN: The following logic is to iterate through all crfs to see if all are marked as done, if not allcrfsflag will be set to false.
-        for (int i = 0; i < allCRFs.size(); i++) {
-            EventCRFBean ec = (EventCRFBean) allCRFs.get(i);
-            logger.trace("-- looking at a CRF: " + ec.getName() + " " + ec.getCrf().getName() + " " + ec.getCrf().getId());
-            //System.out.println("-- looking at a CRF: " + ec.getName() + " " + ec.getCrf().getName() + " " + ec.getCrf().getId());
-            // if clause kind of not right since none of the above fields are
-            // set in the dao, tbh
-           CRFVersionBean crfVersionBean = (CRFVersionBean) crfversionDao.findByPK(ec.getCRFVersionId());
-           int crfId = crfVersionBean.getCrfId();
-
-
-            if (ec.getStatus().equals(Status.UNAVAILABLE) // && requiredCrfIds.contains(new Integer(crfId))
-                    ) { // &&
-                allCrfsCompleted = true;
-                logger.trace("just rejected eventCompleted looking at a CRF: " + ec.getName());
-                reqCRFCNTR++;
-           //     break;
-            }
-
-        }
-      //  if (requiredCrfIds.size()==0) allCrfsCompleted = true;// Incase none of the crfs are required.
-       // else if(reqCRFCNTR!=requiredCrfIds.size()) allCrfsCompleted = false;
-
-        if (!allRequired) {
-            logger.trace("SEB contains some nonrequired CRFs: " + allEDCsize + " vs " + allEDCs.size());
-        }*/
+   
 
         if ( allCRFs.size() == allEDCs.size()) {// was
-            // allEDCs.size(),
-            // tbh
-            //JN: all crfs are completed and then set the subject event status as complete
+                //JN: all crfs are completed and then set the subject event status as complete
 
 
                 seb.setSubjectEventStatus(SubjectEventStatus.COMPLETED);
 
-            /*else if (!allRequired && allEDCsize != 0) {// what if there are no// TODO:
-                // required CRFs, and all
-                // CRFs have been finished?
-                addPageMessage(respage.getString("CRF_completed"), request);
-            }*/
-             /*if (!edcb.isDoubleEntry()){ //TODO: perhaps this logic can go... JN check later
-                logger.trace("just set subj event status to -- COMPLETED --");
-                seb.setSubjectEventStatus(SubjectEventStatus.COMPLETED);
-            }*/
+         
         }
 
         seb = (StudyEventBean) sedao.update(seb);
@@ -4640,7 +4495,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
             }
 
         }// if hasItemGroup
-        Collections.sort(displayItemWithGroups);
+        //Collections.sort(displayItemWithGroups);
 
         // add null values to displayitems in the itemGroups of
         // DisplayItemWithGroupBeans;
@@ -4652,6 +4507,141 @@ public abstract class DataEntryServlet extends CoreSecureController {
         return displayItemWithGroups;
     }
 
+  
+    
+    protected List<DisplayItemWithGroupBean> createItemWithGroups1(DisplaySectionBean dsb, boolean hasItemGroup, int eventCRFDefId, HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        List<DisplayItemWithGroupBean> displayItemWithGroups = new ArrayList<DisplayItemWithGroupBean>();
+        EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
+        ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO<String, ArrayList>(dataSource);
+        ItemDAO idao = new ItemDAO(getDataSource());
+        // For adding null values to display items
+        FormBeanUtil formBeanUtil = new FormBeanUtil();
+        SectionBean sb = (SectionBean)request.getAttribute(SECTION_BEAN);
+        EventDefinitionCRFBean edcb = (EventDefinitionCRFBean)request.getAttribute(EVENT_DEF_CRF_BEAN);
+        // BWP>> Get a List<String> of any null values such as NA or NI
+        // method returns null values as a List<String>
+        // >>BWP
+        ArrayList items = dsb.getItems();
+        logger.trace("single items size: " + items.size());
+        for (int i = 0; i < items.size(); i++) {
+            DisplayItemBean item = (DisplayItemBean) items.get(i);
+            DisplayItemWithGroupBean newOne = new DisplayItemWithGroupBean();
+            newOne.setSingleItem(runDynamicsItemCheck(item, null, request));
+            newOne.setOrdinal(item.getMetadata().getOrdinal());
+            newOne.setInGroup(false);
+            newOne.setPageNumberLabel(item.getMetadata().getPageNumberLabel());
+            displayItemWithGroups.add(newOne);
+            // logger.trace("just added on line 1979:
+            // "+newOne.getSingleItem().getData().getValue());
+        }
+
+        if (hasItemGroup) {
+            ItemDataDAO iddao = new ItemDataDAO(getDataSource(),locale);
+            HashMap<String,ItemDataBean> dataMap = (HashMap<String, ItemDataBean>) iddao.findAllActiveMap(sb.getId(), ecb.getId());
+            ArrayList<ItemDataBean> data = iddao.findAllActiveBySectionIdAndEventCRFId(sb.getId(), ecb.getId());
+            
+            if (data != null && data.size() > 0) {
+                session.setAttribute(HAS_DATA_FLAG, true);
+            }
+            logger.trace("found data: " + data.size());
+            logger.trace("data.toString: " + data.toString());
+
+            for (DisplayItemGroupBean itemGroup : dsb.getDisplayFormGroups()) {
+                logger.debug("found one itemGroup");
+                DisplayItemWithGroupBean newOne = new DisplayItemWithGroupBean();
+                // to arrange item groups and other single items, the ordinal of
+                // a item group will be the ordinal of the first item in this
+                // group
+                DisplayItemBean firstItem = itemGroup.getItems().get(0);
+              
+                // so we are either checking the first or the last item, BUT ONLY ONCE
+                newOne.setPageNumberLabel(firstItem.getMetadata().getPageNumberLabel());
+
+                newOne.setItemGroup(itemGroup);
+                newOne.setInGroup(true);
+                newOne.setOrdinal(itemGroup.getGroupMetaBean().getOrdinal());
+
+                List<ItemBean> itBeans = idao.findAllItemsByGroupId(itemGroup.getItemGroupBean().getId(), sb.getCRFVersionId());
+               // List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb, sb.getId(), edcb, 0, getServletContext());
+                
+                List<DisplayItemBean> dibs  = new ArrayList();
+                DisplayItemGroupBean digb = new DisplayItemGroupBean();
+                boolean hasData = false;
+                int checkAllColumns = 0;
+                if(data.size()>0) hasData=true;
+                newOne =   buildMatrixForRepeatingGroups(newOne,itemGroup,ecb, sb,itBeans,dataMap);
+
+             if (hasData) {
+                    session.setAttribute(GROUP_HAS_DATA, Boolean.TRUE);
+                    // iterate through the group rows, set data for each item in
+                    // the group
+   
+                }      
+                else {
+                    session.setAttribute(GROUP_HAS_DATA, Boolean.FALSE);
+                    // no data, still add a blank row for displaying
+                    DisplayItemGroupBean digb2 = new DisplayItemGroupBean();
+                    digb2.setItems(dibs);
+                    digb2.setEditFlag("initial");
+ 
+                }
+
+                displayItemWithGroups.add(newOne);
+            }
+
+        }// if hasItemGroup
+         return displayItemWithGroups;
+    }
+
+    
+    protected DisplayItemWithGroupBean buildMatrixForRepeatingGroups(DisplayItemWithGroupBean diwgb, DisplayItemGroupBean itemGroup, EventCRFBean ecb, SectionBean sb,List<ItemBean>itBeans, HashMap<String,ItemDataBean> dataMap)
+    { 
+        int tempOrdinal = 1;
+        ItemDataDAO iddao = new ItemDataDAO(getDataSource(),locale);
+        int maxOrdinal = iddao.getMaxOrdinalForGroup(ecb, sb, itemGroup.getItemGroupBean());
+        if(maxOrdinal==0)maxOrdinal = 1;//Incase of no data
+        ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO<String, ArrayList>(getDataSource());
+        List<DisplayItemGroupBean> itemGroups = new ArrayList<DisplayItemGroupBean>();
+        for(int i=1;i<=maxOrdinal;i++){
+          
+            List<DisplayItemBean> displayItemBeans = new ArrayList<DisplayItemBean>();
+          DisplayItemGroupBean dig = new DisplayItemGroupBean();
+            for(ItemBean itBean:itBeans){
+            
+                DisplayItemBean displayItemBean = new DisplayItemBean();
+                ItemFormMetadataBean ifm = ifmdao.findByItemIdAndCRFVersionId(itBean.getId(), ecb.getCRFVersionId());
+               // itBean.setItemMeta(ifm);//TODO:remove this or the one down displayItemBean.setMetadata(ifm);
+                displayItemBean.setMetadata(ifm);
+                displayItemBean.setItem(itBean);
+                ItemDataBean itemData =  dataMap.get(itBean.getId()+","+i);
+                if(itemData!=null){
+                    logger.debug("itemData::"+itemData);
+                }
+                if(itemData==null)
+                {
+                    itemData = displayItemBean.getData();
+                    itemData.setValue("");
+                    itemData.setOrdinal(i);
+                }
+                displayItemBean.setData(itemData);
+                displayItemBean.loadDBValue();
+                
+               displayItemBeans.add(displayItemBean);
+                
+            }
+            dig.setItems(displayItemBeans);
+            itemGroups.add(dig);
+        }
+      
+      
+
+       diwgb.setItemGroups(itemGroups);
+        return diwgb;
+    }
+    
+    
+    
     protected void loadItemsWithGroupRows(DisplayItemWithGroupBean itemWithGroup, SectionBean sb, EventDefinitionCRFBean edcb, EventCRFBean ecb, HttpServletRequest request) {
         //this method is a copy of the method: createItemWithGroups ,
         //only modified for load one DisplayItemWithGroupBean.
