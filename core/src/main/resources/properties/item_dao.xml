@@ -136,7 +136,16 @@
             and fgim.item_id=i.item_id
 		</sql>
 	</query>
-	
+	<query>
+		<name>findAllItemsByGroupIdOrdered</name>
+		<sql>select distinct i.* from item i, item_group fg, item_group_metadata fgim
+		where fg.item_group_id=?
+            and fg.item_group_id=fgim.item_group_id
+            and fgim.crf_version_id=?
+            and fgim.item_id=i.item_id
+            order by i.item_id
+		</sql>
+	</query>
 	
 	<query>
 		<name>findAllItemsByGroupIdForPrint</name>
@@ -149,6 +158,7 @@
             and ifm.section_id=?
 		</sql>
 	</query>
+	
 	<query>
         <name>findItemByGroupIdandItemOid</name>
         <sql>select distinct i.* from item i, item_group fg, item_group_metadata fgim
