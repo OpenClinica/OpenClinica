@@ -551,7 +551,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         // ironically, this only covers vertical null value result sets
         // horizontal ones are covered in FormBeanUtil, tbh 112007
         logMe("Entering  displayItemWithGroups "+System.currentTimeMillis());
-        List<DisplayItemWithGroupBean> displayItemWithGroups = createItemWithGroups1(section, hasGroup, eventDefinitionCRFId, request);
+        List<DisplayItemWithGroupBean> displayItemWithGroups = createItemWithGroups(section, hasGroup, eventDefinitionCRFId, request);
         logMe("Entering  displayItemWithGroups end "+System.currentTimeMillis());
         this.getItemMetadataService().updateGroupDynamicsInSection(displayItemWithGroups, section.getSection().getId(), ecb);
         section.setDisplayItemGroups(displayItemWithGroups);
@@ -4336,184 +4336,13 @@ public abstract class DataEntryServlet extends CoreSecureController {
      }
     }
 
-    /**
-     * Constructs a list of DisplayItemWithGroupBean, which is used for display a section of items on the UI
-     *
-     * @param dsb
-     * @param hasItemGroup
-     * @param request TODO
-     * @return
-     */
+
+  
+    
     protected List<DisplayItemWithGroupBean> createItemWithGroups(DisplaySectionBean dsb, boolean hasItemGroup, int eventCRFDefId, HttpServletRequest request) {
         HttpSession session = request.getSession();
         List<DisplayItemWithGroupBean> displayItemWithGroups = new ArrayList<DisplayItemWithGroupBean>();
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
-        ItemDAO idao = new ItemDAO(getDataSource());
-        // For adding null values to display items
-        FormBeanUtil formBeanUtil = new FormBeanUtil();
-        List<String> nullValuesList = new ArrayList<String>();
-        SectionBean sb = (SectionBean)request.getAttribute(SECTION_BEAN);
-        EventDefinitionCRFBean edcb = (EventDefinitionCRFBean)request.getAttribute(EVENT_DEF_CRF_BEAN);
-        // BWP>> Get a List<String> of any null values such as NA or NI
-        // method returns null values as a List<String>
-        nullValuesList = formBeanUtil.getNullValuesByEventCRFDefId(eventCRFDefId, getDataSource());
-        // >>BWP
-        ArrayList items = dsb.getItems();
-        logger.trace("single items size: " + items.size());
-        for (int i = 0; i < items.size(); i++) {
-            DisplayItemBean item = (DisplayItemBean) items.get(i);
-            DisplayItemWithGroupBean newOne = new DisplayItemWithGroupBean();
-            newOne.setSingleItem(runDynamicsItemCheck(item, null, request));
-            newOne.setOrdinal(item.getMetadata().getOrdinal());
-            newOne.setInGroup(false);
-            newOne.setPageNumberLabel(item.getMetadata().getPageNumberLabel());
-            displayItemWithGroups.add(newOne);
-            // logger.trace("just added on line 1979:
-            // "+newOne.getSingleItem().getData().getValue());
-        }
-
-        if (hasItemGroup) {
-            ItemDataDAO iddao = new ItemDataDAO(getDataSource(),locale);
-            ArrayList data = iddao.findAllActiveBySectionIdAndEventCRFId(sb.getId(), ecb.getId());
-            // BWP 12/2/07>> set a flag signaling to data entry JSPs that data
-            // is involved
-            // for the purposes of displaying or not displaying default values
-            if (data != null && data.size() > 0) {
-                session.setAttribute(HAS_DATA_FLAG, true);
-            }
-            // logger.trace("how many groups:" +
-            // dsb.getDisplayFormGroups().size());
-            // logger.trace("just got data using section id " + sb.getId() + "
-            // and event crf id " + ecb.getId());
-            logger.trace("found data: " + data.size());
-            logger.trace("data.toString: " + data.toString());
-
-            for (DisplayItemGroupBean itemGroup : dsb.getDisplayFormGroups()) {
-                logger.debug("found one itemGroup");
-                DisplayItemWithGroupBean newOne = new DisplayItemWithGroupBean();
-                // to arrange item groups and other single items, the ordinal of
-                // a item group will be the ordinal of the first item in this
-                // group
-                DisplayItemBean firstItem = itemGroup.getItems().get(0);
-                DisplayItemBean checkItem = firstItem;
-                // does not work if there is not any data in the first item of the group
-                // i.e. imports.
-                // does it make a difference if we take a last item?
-                boolean noNeedToSwitch = false;
-                for (int i = 0; i < data.size(); i++) {
-                    ItemDataBean idb = (ItemDataBean) data.get(i);
-                    if (idb.getItemId() == firstItem.getItem().getId()) {
-                        noNeedToSwitch = true;
-                    }
-                }
-                if (!noNeedToSwitch) {
-                    checkItem = itemGroup.getItems().get(itemGroup.getItems().size() - 1);
-                }
-                // so we are either checking the first or the last item, BUT ONLY ONCE
-                newOne.setPageNumberLabel(firstItem.getMetadata().getPageNumberLabel());
-
-                newOne.setItemGroup(itemGroup);
-                newOne.setInGroup(true);
-                newOne.setOrdinal(itemGroup.getGroupMetaBean().getOrdinal());
-
-                List<ItemBean> itBeans = idao.findAllItemsByGroupId(itemGroup.getItemGroupBean().getId(), sb.getCRFVersionId());
-
-                boolean hasData = false;
-                int checkAllColumns = 0;
-                // if a group has repetitions, the number of data of
-                // first item should be same as the row number
-                for (int i = 0; i < data.size(); i++) {
-                    ItemDataBean idb = (ItemDataBean) data.get(i);
-
-                    logger.debug("check all columns: " + checkAllColumns);
-                    if (idb.getItemId() == checkItem.getItem().getId()) {
-                        hasData = true;
-                        logger.debug("set has data to --TRUE--");
-                        checkAllColumns = 0;
-                        // so that we only fire once a row
-                        logger.debug("has data set to true");
-                        DisplayItemGroupBean digb = new DisplayItemGroupBean();
-                        // always get a fresh copy for items, may use other
-                        // better way to
-                        // do deep copy, like clone
-                        List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb, sb.getId(), edcb, 0, getServletContext());
-
-                        digb.setItems(dibs);
-                        logger.trace("set with dibs list of : " + dibs.size());
-                        digb.setGroupMetaBean(runDynamicsCheck(itemGroup.getGroupMetaBean(), request));
-                        digb.setItemGroupBean(itemGroup.getItemGroupBean());
-                        newOne.getItemGroups().add(digb);
-                        newOne.getDbItemGroups().add(digb);
-                    }
-                }
-
-                List<DisplayItemGroupBean> groupRows = newOne.getItemGroups();
-                logger.trace("how many group rows:" + groupRows.size());
-                logger.trace("how big is the data:" + data.size());
-                if (hasData) {
-                    session.setAttribute(GROUP_HAS_DATA, Boolean.TRUE);
-                    // iterate through the group rows, set data for each item in
-                    // the group
-                    for (int i = 0; i < groupRows.size(); i++) {
-                        DisplayItemGroupBean displayGroup = groupRows.get(i);
-                        for (DisplayItemBean dib : displayGroup.getItems()) {
-                            for (int j = 0; j < data.size(); j++) {
-                                ItemDataBean idb = (ItemDataBean) data.get(j);
-                                if (idb.getItemId() == dib.getItem().getId() && !idb.isSelected()) {
-                                    idb.setSelected(true);
-                                    dib.setData(idb);
-                                    logger.debug("--> set data " + idb.getId() + ": " + idb.getValue());
-
-                                    if (shouldLoadDBValues(dib)) {
-                                        logger.debug("+++should load db values is true, set value");
-                                        dib.loadDBValue();
-                                        logger.debug("+++data loaded: " + idb.getName() + ": " + idb.getOrdinal() + " " + idb.getValue());
-                                        logger.debug("+++try dib OID: " + dib.getItem().getOid());
-                                    }
-                                    break;
-                                }
-                            }
-                        }
-
-                    }
-                } else {
-                    session.setAttribute(GROUP_HAS_DATA, Boolean.FALSE);
-                    // no data, still add a blank row for displaying
-                    DisplayItemGroupBean digb2 = new DisplayItemGroupBean();
-                    List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb, sb.getId(), nullValuesList, getServletContext());
-                    digb2.setItems(dibs);
-                    logger.trace("set with nullValuesList of : " + nullValuesList);
-                    digb2.setEditFlag("initial");
-                    digb2.setGroupMetaBean(itemGroup.getGroupMetaBean());
-                    digb2.setItemGroupBean(itemGroup.getItemGroupBean());
-                    newOne.getItemGroups().add(digb2);
-                    newOne.getDbItemGroups().add(digb2);
-
-                }
-
-                displayItemWithGroups.add(newOne);
-            }
-
-        }// if hasItemGroup
-        //Collections.sort(displayItemWithGroups);
-
-        // add null values to displayitems in the itemGroups of
-        // DisplayItemWithGroupBeans;
-        // These item groups are used by the data entry screens
-        /*
-         * if(nullValuesList != null && (! nullValuesList.isEmpty())) { formBeanUtil.addNullValuesToDisplayItemWithGroupBeans( displayItemWithGroups,
-         * nullValuesList); }
-         */
-        return displayItemWithGroups;
-    }
-
-  
-    
-    protected List<DisplayItemWithGroupBean> createItemWithGroups1(DisplaySectionBean dsb, boolean hasItemGroup, int eventCRFDefId, HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        List<DisplayItemWithGroupBean> displayItemWithGroups = new ArrayList<DisplayItemWithGroupBean>();
-        EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
-        ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO<String, ArrayList>(dataSource);
         ItemDAO idao = new ItemDAO(getDataSource());
         // For adding null values to display items
         FormBeanUtil formBeanUtil = new FormBeanUtil();
@@ -4563,7 +4392,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 newOne.setOrdinal(itemGroup.getGroupMetaBean().getOrdinal());
 
                 List<ItemBean> itBeans = idao.findAllItemsByGroupId(itemGroup.getItemGroupBean().getId(), sb.getCRFVersionId());
-               // List<DisplayItemBean> dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb, sb.getId(), edcb, 0, getServletContext());
                 
                 List<DisplayItemBean> dibs  = new ArrayList();
                 DisplayItemGroupBean digb = new DisplayItemGroupBean();
@@ -4573,10 +4401,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 newOne =   buildMatrixForRepeatingGroups(newOne,itemGroup,ecb, sb,itBeans,dataMap);
 
              if (hasData) {
+                 //TODO: fix the group_has_data flag on bean not on session
                     session.setAttribute(GROUP_HAS_DATA, Boolean.TRUE);
-                    // iterate through the group rows, set data for each item in
-                    // the group
-   
+                   
                 }      
                 else {
                     session.setAttribute(GROUP_HAS_DATA, Boolean.FALSE);
@@ -4637,6 +4464,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
       
 
        diwgb.setItemGroups(itemGroups);
+       diwgb.setDbItemGroups(itemGroups);
         return diwgb;
     }
     
