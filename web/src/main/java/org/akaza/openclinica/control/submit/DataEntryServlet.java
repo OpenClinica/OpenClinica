@@ -4391,7 +4391,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 newOne.setInGroup(true);
                 newOne.setOrdinal(itemGroup.getGroupMetaBean().getOrdinal());
 
-                List<ItemBean> itBeans = idao.findAllItemsByGroupId(itemGroup.getItemGroupBean().getId(), sb.getCRFVersionId());
+                List<ItemBean> itBeans = idao.findAllItemsByGroupIdOrdered(itemGroup.getItemGroupBean().getId(), sb.getCRFVersionId());
                 
                 List<DisplayItemBean> dibs  = new ArrayList();
                 DisplayItemGroupBean digb = new DisplayItemGroupBean();
