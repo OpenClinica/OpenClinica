@@ -260,7 +260,9 @@ function switchStr(itemId, id,attribute,str1,str2) {
 <c:set var="ddeEntered" value="${requestScope['ddeEntered']}" />
 <!-- for the rows in model, input name processed by back-end servlet, needs to change them back to the name got from form, so we can show error frame around the input -->
 <c:set var="autoParsedInputName" value="${repeatParentId}_${rowCount - manualRows}input${itemId}" />
-
+<c:if test="${isNewItem eq true }"> 
+	<c:set property = "isNewItem" target="${displayItem }" value="true"/>
+</c:if>
 
 <c:if test="${isLast == false && rowCount==0}">
   <c:set var="inputName" value="${repeatParentId}_${rowCount}input${itemId}" />
@@ -794,19 +796,11 @@ function switchStr(itemId, id,attribute,str1,str2) {
     <c:otherwise>
      <c:if test="${(isLocked == null) || (isLocked eq 'no')}">
       <c:set var="imageFileName" value="icon_noNote" />
-      <c:choose>
-          <c:when test="${originJSP eq 'administrativeEditing'}">
-              <c:set var="writeToDb" value="1"/>
-          </c:when>
-
-
-          <c:otherwise>
+  		 <c:set var="writeToDb" value="1" />
+         <c:if test="${displayItem.isNewItem}">
               <c:set var="writeToDb" value="0"/>
-          </c:otherwise>
-      </c:choose>
-        <c:if test="${isNewItem eq true}">
-			    <c:set var="writeToDb" value="0" />
-		</c:if>
+           </c:if>
+       
          <c:set var="eventName" value="${toc.studyEventDefinition.name}"/>
          <c:set var="eventDate" value="${toc.studyEvent.dateStarted}"/>
          <c:set var="crfName" value="${toc.crf.name} ${toc.crfVersion.name}"/>
