@@ -24,7 +24,7 @@ public class DisplayItemBean implements Comparable {
     private ItemFormMetadataBean metadata;
     private String editFlag = "";// used for items in a group
     private ItemDataBean dbData; // used for DDE, items in a group
-
+    private boolean isNewItem;
 
     //adding totals here for display purposes
 
@@ -107,6 +107,7 @@ public class DisplayItemBean implements Comparable {
         scdData = new SCDData();
         blankDwelt = false;
         instantFrontStrGroup = new InstantOnChangeFrontStrGroup();
+        isNewItem=true;
     }
 
     public DisplayItemBean() {
@@ -602,4 +603,12 @@ public class DisplayItemBean implements Comparable {
     public void setInstantFrontStrGroup(InstantOnChangeFrontStrGroup instantFrontStrGroup) {
         this.instantFrontStrGroup = instantFrontStrGroup;
     }
+
+	public boolean getIsNewItem() {
+		return isNewItem;
+	}
+
+	public void setIsNewItem(boolean isNewItem) {
+		this.isNewItem = isNewItem;
+	}
 }

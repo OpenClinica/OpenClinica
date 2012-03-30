@@ -1561,13 +1561,14 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                     inputName = this.getGroupItemManualInputName(displayGroup, j, displayItem);
 
                                 }
-                                if (j == dgbs.size() - 1) {
-                                    // LAST ONE
-                                    logger.trace("last one");
-                                    int ordinal = j - this.getManualRows(dgbs);
-                                    logger.debug("+++ found manual rows from line 1326: " + ordinal);
-                                    inputName = getGroupItemInputName(displayGroup, ordinal, displayItem);
-                                }
+                                //htaycher last DN is not stored for new rows
+//                                if (j == dgbs.size() - 1) {
+//                                    // LAST ONE
+//                                    logger.trace("last one");
+//                                    int ordinal = j - this.getManualRows(dgbs);
+//                                    logger.debug("+++ found manual rows from line 1326: " + ordinal);
+//                                    inputName = getGroupItemInputName(displayGroup, ordinal, displayItem);
+//                                }
                                 // logger.trace("&&& we get previous looking at input name: " + inputName + " " + inputName2);
                                 logger.trace("&&& we get previous looking at input name: " + inputName);
                                 // input name 2 removed from below
@@ -4433,7 +4434,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         for(int i=1;i<=maxOrdinal;i++){
           
             List<DisplayItemBean> displayItemBeans = new ArrayList<DisplayItemBean>();
-          DisplayItemGroupBean dig = new DisplayItemGroupBean();
+            DisplayItemGroupBean dig = new DisplayItemGroupBean();
             for(ItemBean itBean:itBeans){
             
                 DisplayItemBean displayItemBean = new DisplayItemBean();
@@ -4444,17 +4445,19 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 ItemDataBean itemData =  dataMap.get(itBean.getId()+","+i);
                 if(itemData!=null){
                     logger.debug("itemData::"+itemData);
+                    displayItemBean.setIsNewItem(false);
                 }
                 if(itemData==null)
                 {
                     itemData = displayItemBean.getData();
                     itemData.setValue("");
                     itemData.setOrdinal(i);
+                   
                 }
                 displayItemBean.setData(itemData);
                 displayItemBean.loadDBValue();
                 
-               displayItemBeans.add(displayItemBean);
+                displayItemBeans.add(displayItemBean);
                 
             }
             dig.setItems(displayItemBeans);
