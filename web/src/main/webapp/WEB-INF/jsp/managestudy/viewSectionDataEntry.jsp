@@ -695,28 +695,7 @@ but the custom tag uses that, not this jstl code--%>
         <c:set var="isHorizontalCellLevel" scope="request" value="${true}"/>
     </c:if>
     <c:choose>
-        <c:when test="${isHorizontalCellLevel &&
-            sectionBorders == 1 && (bodyItem.metadata.responseSet.responseType.name eq 'radio' ||
-           bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
-            <%-- For horizontal checkboxes, radio buttons--%>
-            <c:forEach var="respOption" items="${bodyItem.metadata.responseSet.options}">
-                <td class="aka_padding_norm aka_cellBorders_dark">
-                    <c:set var="displayItem" scope="request" value="${bodyItem}" />
-                    <c:set var="responseOptionBean" scope="request" value="${respOption}" />
-                    <c:import url="../submit/showGroupItemInputMonitor.jsp">
-                        <c:param name="repeatParentId" value="${repeatParentId}"/>
-                        <c:param name="rowCount" value="${uniqueId}"/>
-                        <c:param name="key" value="${numOfDate}" />
-                        <c:param name="isLast" value="${false}"/>
-                        <c:param name="tabNum" value="${itemNum}"/>
-                        <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
-                        <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
-                        <c:param name="originJSP" value="initialDataEntry"/>
-                        <c:param name="isLocked" value="${isLocked}"/>
-                    </c:import>
-                </td>
-            </c:forEach>
-        </c:when>
+        
         <c:when test="${isHorizontalCellLevel &&
            (bodyItem.metadata.responseSet.responseType.name eq 'radio' ||
            bodyItem.metadata.responseSet.responseType.name eq 'checkbox')}">
