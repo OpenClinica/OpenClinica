@@ -643,7 +643,7 @@ but the custom tag uses that, not this jstl code--%>
                         <c:param name="rowCount" value="${uniqueId}"/>
                         <c:param name="key" value="${numOfDate}" />
                         <c:param name="isLast" value="${true}"/>
-                        <c:param name="tabNum" value="${itemNum}"/>
+						 <c:param name="tabNum" value="${itemNum}"/>
                         <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
                         <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                         <c:param name="originJSP" value="initialDataEntry"/>
@@ -662,8 +662,8 @@ but the custom tag uses that, not this jstl code--%>
                     <c:param name="rowCount" value="${uniqueId}"/>
                     <c:param name="key" value="${numOfDate}" />
                     <c:param name="isLast" value="${true}"/>
-                    <c:param name="tabNum" value="${itemNum}"/>
-                    <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
+					<c:param name="tabNum" value="${itemNum}"/>
+					<c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                     <c:param name="originJSP" value="initialDataEntry"/>
                     <c:param name="isLocked" value="${isLocked}"/>
                 </c:import>
@@ -672,7 +672,7 @@ but the custom tag uses that, not this jstl code--%>
     </c:choose>
     <c:set var="columnNum" value="${columnNum+1}"/>
 </c:forEach>
-    <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">
+    <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup  && studySubjectId == 0}">
        
                 <td class="aka_padding_norm aka_cellBorders">
                     <input type="hidden" name="<c:out value="${repeatParentId}"/>_[<c:out value="${repeatParentId}"/>].newRow" value="yes" />
@@ -714,6 +714,7 @@ but the custom tag uses that, not this jstl code--%>
                         <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                         <c:param name="originJSP" value="initialDataEntry"/>
                         <c:param name="isLocked" value="${isLocked}"/>
+						
                     </c:import>
                 </td>
             </c:forEach>
@@ -732,13 +733,14 @@ but the custom tag uses that, not this jstl code--%>
                     <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                     <c:param name="originJSP" value="initialDataEntry"/>
                     <c:param name="isLocked" value="${isLocked}"/>
+					
                 </c:import>
             </td>
         </c:otherwise>
     </c:choose>
     <c:set var="columnNum" value="${columnNum+1}"/>
 </c:forEach>
-    <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">
+    <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup && studySubjectId == 0}">
      
                 <td class="aka_padding_norm aka_cellBorders">
                         <%-- check for manual in the input name; if rowCount > 0 then manual
@@ -761,7 +763,7 @@ but the custom tag uses that, not this jstl code--%>
 <c:set var="uniqueId" value="${uniqueId +1}"/>
 <!-- repeating rows in an item group end -->
 </c:forEach>
-    <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">
+    <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup && studySubjectId == 0}">
         <tr><td class="aka_padding_norm aka_cellBorders" colspan="<c:out value="${totalColsPlusSubcols + 1}"/>">
                         <button stype="add" type="button" template="<c:out value="${repeatParentId}"/>" class="button_search"><fmt:message key="add" bundle="${resword}"/></button></td>
                
@@ -913,6 +915,7 @@ but the custom tag uses that, not this jstl code--%>
                                         <c:param name="respLayout" value="${childItem.metadata.responseLayout}"/>
                                         <c:param name="originJSP" value="initialDataEntry"/>
                                         <c:param name="isLocked" value="${isLocked}"/>
+										
                                     </c:import>
                                         <%--	<br />--%><%--<c:import url="../showMessage.jsp"><c:param name="key" value="input${childItem.item.id}" /></c:import>--%>
                                 </td>
