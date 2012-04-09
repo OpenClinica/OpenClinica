@@ -4431,7 +4431,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
       }
       return returnMap;
   }
-    protected DisplayItemWithGroupBean buildMatrixForRepeatingGroups(DisplayItemWithGroupBean diwgb, DisplayItemGroupBean itemGroup, EventCRFBean ecb, SectionBean sb,List<ItemBean>itBeans, HashMap<String,ItemDataBean> dataMap)
+    protected DisplayItemWithGroupBean buildMatrixForRepeatingGroups(DisplayItemWithGroupBean diwgb, DisplayItemGroupBean itemGroup, EventCRFBean ecb, SectionBean sb,List<ItemBean>itBeans, Map<String,ItemDataBean> dataMap)
     { 
         int tempOrdinal = 1;
         ItemDataDAO iddao = new ItemDataDAO(getDataSource(),locale);
