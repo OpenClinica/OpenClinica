@@ -1562,13 +1562,14 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                     inputName = this.getGroupItemManualInputName(displayGroup, j, displayItem);
 
                                 }
-                                if (j == dgbs.size() - 1) {
-                                    // LAST ONE
-                                    logger.trace("last one");
-                                    int ordinal = j - this.getManualRows(dgbs);
-                                    logger.debug("+++ found manual rows from line 1326: " + ordinal);
-                                    inputName = getGroupItemInputName(displayGroup, ordinal, displayItem);
-                                }
+                                //htaycher last DN is not stored for new rows
+//                                if (j == dgbs.size() - 1) {
+//                                    // LAST ONE
+//                                    logger.trace("last one");
+//                                    int ordinal = j - this.getManualRows(dgbs);
+//                                    logger.debug("+++ found manual rows from line 1326: " + ordinal);
+//                                    inputName = getGroupItemInputName(displayGroup, ordinal, displayItem);
+//                                }
                                 // logger.trace("&&& we get previous looking at input name: " + inputName + " " + inputName2);
                                 logger.trace("&&& we get previous looking at input name: " + inputName);
                                 // input name 2 removed from below
@@ -4455,17 +4456,19 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 if(itemData!=null){
                     groupHasData = true;//to indicate any item in the group has data;
                     logger.debug("itemData::"+itemData);
+                    displayItemBean.setIsNewItem(false);
                 }
                 if(itemData==null)
                 {
                     itemData = displayItemBean.getData();
                     itemData.setValue("");
                     itemData.setOrdinal(i);
+                   
                 }
                 displayItemBean.setData(itemData);
                 displayItemBean.loadDBValue();
                 
-               displayItemBeans.add(displayItemBean);
+                displayItemBeans.add(displayItemBean);
                 
             }
             dig.setItems(displayItemBeans);

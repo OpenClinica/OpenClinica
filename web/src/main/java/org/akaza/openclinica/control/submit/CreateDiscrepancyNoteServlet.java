@@ -128,7 +128,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 
     public String exceptionName = resexception.getString("no_permission_to_create_discrepancy_note");
     public String noAccessMessage = respage.getString("you_may_not_create_discrepancy_note") + respage.getString("change_study_contact_sysadmin");
-
+     
     /*
      * (non-Javadoc)
      *
@@ -171,7 +171,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
          * s.getName()) ; }
          */
 
-        boolean writeToDB = fp.getBoolean(WRITE_TO_DB, true);
+        boolean writeToDB = fp.getBoolean(WRITE_TO_DB, true); //this should be set based on a new property of DisplayItemBean
         boolean isReasonForChange = fp.getBoolean(IS_REASON_FOR_CHANGE);
         int entityId = fp.getInt(ENTITY_ID);
         // subjectId has to be added to the database when disc notes area saved
@@ -551,11 +551,10 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
 
             }
             dnb.setOwnerId(parent.getOwnerId());
-            // System.out.println("just set owner id to " + parent.getOwnerId());
             String detailedDes = fp.getString("strErrMsg");
             if (detailedDes != null) {
                 dnb.setDetailedNotes(detailedDes);
-                System.out.println("found strErrMsg: " + fp.getString("strErrMsg"));
+                logger.debug("found strErrMsg: " + fp.getString("strErrMsg"));
             }
             // #4346 TBH 10/2009
 
@@ -578,22 +577,22 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             //            // #4346 TBH 10/2009
             request.setAttribute(DIS_NOTE, dnb);
             request.setAttribute("unlock", "0");
-            request.setAttribute(WRITE_TO_DB, writeToDB ? "1" : "0");
+            request.setAttribute(WRITE_TO_DB, writeToDB ? "1" : "0");//this should go from UI & here
             ArrayList userAccounts = this.generateUserAccounts(ub.getActiveStudyId(), subjectId);
             request.setAttribute(USER_ACCOUNTS, userAccounts);
 
             // ideally should be only two cases
             if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) && currentStudy.getId() != currentStudy.getParentStudyId()) {
                 // assigning back to OP, tbh
-                request.setAttribute(USER_ACCOUNT_ID, new Integer(parent.getOwnerId()).toString());
-                System.out.println("assigned owner id: " + parent.getOwnerId());
+                request.setAttribute(USER_ACCOUNT_ID,  Integer.valueOf(parent.getOwnerId()).toString());
+                logger.debug("assigned owner id: " + parent.getOwnerId());
             } else if (dnb.getEventCRFId() > 0) {
-                System.out.println("found a event crf id: " + dnb.getEventCRFId());
+            	logger.debug("found a event crf id: " + dnb.getEventCRFId());
                 EventCRFDAO eventCrfDAO = new EventCRFDAO(sm.getDataSource());
                 EventCRFBean eventCrfBean = new EventCRFBean();
                 eventCrfBean = (EventCRFBean) eventCrfDAO.findByPK(dnb.getEventCRFId());
-                request.setAttribute(USER_ACCOUNT_ID, new Integer(eventCrfBean.getOwnerId()).toString());
-                System.out.println("assigned owner id: " + eventCrfBean.getOwnerId());
+                request.setAttribute(USER_ACCOUNT_ID,   Integer.valueOf(eventCrfBean.getOwnerId()).toString());
+                logger.debug("assigned owner id: " + eventCrfBean.getOwnerId());
             } else {
                 // the end case
 
@@ -603,8 +602,6 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             forwardPage(Page.ADD_DISCREPANCY_NOTE);
 
         } else {
-            System.out.println("submitted ************");
-
             FormDiscrepancyNotes noteTree = (FormDiscrepancyNotes) session.getAttribute(FORM_DISCREPANCY_NOTES_NAME);
 
             if (noteTree == null) {
@@ -622,7 +619,6 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             // String detailedDes = fp.getString("strErrMsg");
             // System.out.println("found strErrMsg: " +fp.getString("strErrMsg") + " and detailedDes: " + fp.getString("detailedDes"));
             int sectionId = fp.getInt("sectionId");
-            String groupLabel = fp.getString("groupLabel");
             DiscrepancyNoteBean note = new DiscrepancyNoteBean();
             v.addValidation("description", Validator.NO_BLANKS);
             v.addValidation("description", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
@@ -644,13 +640,13 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                 && typeId != DiscrepancyNoteType.REASON_FOR_CHANGE.getId()) {
                 if (assignedUserAccountId > 0) {
                     note.setAssignedUserId(assignedUserAccountId);
-                    System.out.println("^^^ found assigned user id: " + assignedUserAccountId);
+                    logger.debug("^^^ found assigned user id: " + assignedUserAccountId);
 
                 } else {
                     // a little bit of a workaround, should ideally be always from
                     // the form
                     note.setAssignedUserId(parent.getOwnerId());
-                    System.out.println("found user assigned id, in the PARENT OWNER ID: " + parent.getOwnerId() + " note that user assgined id did not work: "
+                    logger.debug("found user assigned id, in the PARENT OWNER ID: " + parent.getOwnerId() + " note that user assgined id did not work: "
                         + assignedUserAccountId);
                 }
             }
@@ -673,13 +669,10 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             }
 
             if (!parent.isActive()) {
-                // System.out.println("note entity id:" + entityId);
                 note.setEntityId(entityId);
                 note.setEntityType(entityType);
                 note.setColumn(column);
             } else {
-                // System.out.println("parent entity id:" +
-                // parent.getEntityId());
                 note.setEntityId(parent.getEntityId());
                 note.setEntityType(parent.getEntityType());
                 if (!StringUtil.isBlank(parent.getColumn())) {
@@ -695,20 +688,20 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             note = getNoteInfo(note);// populate note infos
 
             request.setAttribute(DIS_NOTE, note);
-            request.setAttribute(WRITE_TO_DB, writeToDB ? "1" : "0");
+            request.setAttribute(WRITE_TO_DB, writeToDB ? "1" : "0");//this should go from UI & here
             ArrayList userAccounts = this.generateUserAccounts(ub.getActiveStudyId(), subjectId);
 
-            request.setAttribute(USER_ACCOUNT_ID, new Integer(note.getAssignedUserId()).toString());
+            request.setAttribute(USER_ACCOUNT_ID,   Integer.valueOf(note.getAssignedUserId()).toString());
             // formality more than anything else, we should go to say the note
             // is done
 
             Role r = currentRole.getRole();
             if (r.equals(Role.MONITOR) || r.equals(Role.INVESTIGATOR) || r.equals(Role.RESEARCHASSISTANT) || r.equals(Role.COORDINATOR)) { // investigator
                 request.setAttribute("unlock", "1");
-                System.out.println("set UNLOCK to ONE");
+                logger.debug("set UNLOCK to ONE");
             } else {
                 request.setAttribute("unlock", "0");
-                System.out.println("set UNLOCK to ZERO");
+                logger.debug("set UNLOCK to ZERO");
             }
 
             request.setAttribute(USER_ACCOUNTS, userAccounts);
@@ -716,12 +709,10 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             if (errors.isEmpty()) {
 
                 if (!writeToDB) {
-                    System.out.println("*** save note into session: " + field);
                     noteTree.addNote(field, note);
                     noteTree.addIdNote(note.getEntityId(), field);
                     session.setAttribute(FORM_DISCREPANCY_NOTES_NAME, noteTree);
                     //
-                    System.out.println("forwarding on line 537");
                     /*Setting a marker to check later while saving administrative edited data. This is needed to make
                     * sure the system flags error while changing data for items which already has a DiscrepanyNote*/
                     //session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, true);
@@ -733,11 +724,11 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                     //if ("itemData".equalsIgnoreCase(entityType) && !isNew) {
                     int pdnId = note!=null?note.getParentDnId():0;
                     if(pdnId > 0) {
-                        System.out.println("Create:find parent note for item data:" + note.getEntityId());
+                    	logger.debug("Create:find parent note for item data:" + note.getEntityId());
 
                         DiscrepancyNoteBean pNote = (DiscrepancyNoteBean) dndao.findByPK(pdnId);
 
-                        System.out.println("setting owner id: " + pNote.getOwnerId());
+                        logger.debug("setting DN owner id: " + pNote.getOwnerId());
 
                         note.setOwnerId(pNote.getOwnerId());
 
@@ -782,20 +773,18 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                     //session.setAttribute(DataEntryServlet.NOTE_SUBMITTED, true);
                     manageReasonForChangeState(session, entityId);
 
-                    System.out.println("found resolution status: " + note.getResolutionStatusId());
+                    logger.debug("found resolution status: " + note.getResolutionStatusId());
 
                     String email = fp.getString(EMAIL_USER_ACCOUNT);
 
-                    System.out.println("found email: " + email);
+                    logger.debug("found email: " + email);
                     if (note.getAssignedUserId() > 0 && "1".equals(email.trim()) && DiscrepancyNoteType.QUERY.getId() == note.getDiscrepancyNoteTypeId()) {
 
-                        System.out.println("++++++ found our way here: " + note.getDiscrepancyNoteTypeId() + " id number and " + note.getDisType().getName());
-                        logger.info("++++++ found our way here");
-                        // generate email for user here
+                    	logger.debug("++++++ found our way here: " + note.getDiscrepancyNoteTypeId() + " id number and " + note.getDisType().getName());
+                       // generate email for user here
                         StringBuffer message = new StringBuffer();
 
                         // generate message here
-                        EmailEngine em = new EmailEngine(EmailEngine.getSMTPHost());
                         UserAccountDAO userAccountDAO = new UserAccountDAO(sm.getDataSource());
                         ItemDAO itemDAO = new ItemDAO(sm.getDataSource());
                         ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
@@ -881,13 +870,12 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                                 null, true);
 
                     } else {
-                        System.out.println("did not send email, but did save DN");
+                    	logger.info("did not send email, but did save DN");
                     }
                     // addPageMessage(
                     // "Your discrepancy note has been saved into database.");
                     addPageMessage(respage.getString("note_saved_into_db"));
                     addPageMessage(respage.getString("page_close_automatically"));
-                    System.out.println("forwarding on line 637");
                     forwardPage(Page.ADD_DISCREPANCY_NOTE_SAVE_DONE);
                 }
 

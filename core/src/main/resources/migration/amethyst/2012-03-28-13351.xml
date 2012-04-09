@@ -392,4 +392,34 @@ select * from view_dn_subject;
         </sql>
     </changeSet>
 
+     <changeSet author="drodrigues" id="2012-03-28-13351-12" dbms="postgresql">
+        <comment>Fixed the invertion of "days" and "age" calculation in 'view_dn_stats'.</comment>
+        <sql splitStatements="false">
+<![CDATA[
+create or replace view "view_dn_stats" as select 
+dn.discrepancy_note_id, 
+case
+    when dn.resolution_status_id = 1 or dn.resolution_status_id = 2 or dn.resolution_status_id = 3 then (current_date - totals.date_updated)
+    else null
+end as "days",
+case 
+    when dn.resolution_status_id = 1 or dn.resolution_status_id = 2 or dn.resolution_status_id = 3 then (current_date - dn.date_created)
+    when dn.resolution_status_id = 4 then (totals.date_updated - dn.date_created)
+    else null
+end as "age",
+totals.total_notes,
+dn.date_created,
+totals.date_updated
+from discrepancy_note dn,
+(
+    select dn1.parent_dn_id, max(dn1.date_created) as "date_updated", count(dn1.discrepancy_note_id) as "total_notes" from discrepancy_note dn1 group by dn1.parent_dn_id
+) as "totals"
+where 
+(dn.parent_dn_id is null or dn.parent_dn_id = 0)
+and dn.discrepancy_note_id = totals.parent_dn_id;
+]]>
+        </sql>
+    </changeSet>
+    
+
 </databaseChangeLog>     

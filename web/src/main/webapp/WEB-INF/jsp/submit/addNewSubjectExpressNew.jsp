@@ -318,7 +318,7 @@
         <td valign="top">
             <table border="0" cellpadding="0" cellspacing="0">
                 <tr><td>
-                    <div class="formfieldS_BG">
+                    <div class="formfieldM_BG">
                         <select name="studyEventDefinition" class="formfieldM">
                             <option value="">-<fmt:message key="select" bundle="${resword}"/>-</option>
                             <c:forEach var="event" items="${allDefsArray}">

@@ -63,7 +63,13 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
             b.setCreatedDate(rs.getDate("date_created"));
             b.setUpdatedDate(rs.getDate("date_updated"));
             b.setDays(rs.getInt("days"));
+            if (rs.wasNull()) {
+                b.setDays(null);
+            }
             b.setAge(rs.getInt("age"));
+            if (rs.wasNull()) {
+                b.setAge(null);
+            }
             b.setEventName(rs.getString("event_name"));
             b.setEventStart(rs.getDate("date_start"));
             b.setCrfName(rs.getString("crf_name"));
