@@ -313,6 +313,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
          boolean isSubmitted = false;
         boolean hasGroup = false;
 
+        SectionBean sssbjams2 = (SectionBean)request.getAttribute("sectionJam");
         EventCRFDAO ecdao = null;
         FormProcessor fp = new FormProcessor(request);
         logMe("Enterting DataEntry Servlet"+System.currentTimeMillis());
@@ -4349,8 +4350,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
         List<DisplayItemWithGroupBean> displayItemWithGroups = new ArrayList<DisplayItemWithGroupBean>();
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
         ItemDAO idao = new ItemDAO(getDataSource());
-        // For adding null values to display items
-        FormBeanUtil formBeanUtil = new FormBeanUtil();
         SectionBean sb = (SectionBean)request.getAttribute(SECTION_BEAN);
         EventDefinitionCRFBean edcb = (EventDefinitionCRFBean)request.getAttribute(EVENT_DEF_CRF_BEAN);
         // BWP>> Get a List<String> of any null values such as NA or NI
@@ -4372,8 +4371,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
         if (hasItemGroup) {
             ItemDataDAO iddao = new ItemDataDAO(getDataSource(),locale);
-            HashMap<String,ItemDataBean> dataMap = iddao.findAllActiveMap(sb.getId(), ecb.getId());
+           
             ArrayList<ItemDataBean> data = iddao.findAllActiveBySectionIdAndEventCRFId(sb.getId(), ecb.getId());
+            HashMap<String,ItemDataBean> dataMap = (HashMap<String, ItemDataBean>) getAllActive(data);
 
             if (data != null && data.size() > 0) {
                 session.setAttribute(HAS_DATA_FLAG, true);
@@ -4426,8 +4426,16 @@ public abstract class DataEntryServlet extends CoreSecureController {
          return displayItemWithGroups;
     }
 
-
-    protected DisplayItemWithGroupBean buildMatrixForRepeatingGroups(DisplayItemWithGroupBean diwgb, DisplayItemGroupBean itemGroup, EventCRFBean ecb, SectionBean sb,List<ItemBean>itBeans, HashMap<String,ItemDataBean> dataMap)
+  private Map getAllActive(List<ItemDataBean>al){
+      Map returnMap = new HashMap<String,ItemDataBean>();
+      
+      for(ItemDataBean itBean:al){
+          if(itBean!=null)
+          returnMap.put(new String(itBean.getItemId()+","+itBean.getOrdinal()), itBean);
+      }
+      return returnMap;
+  }
+    protected DisplayItemWithGroupBean buildMatrixForRepeatingGroups(DisplayItemWithGroupBean diwgb, DisplayItemGroupBean itemGroup, EventCRFBean ecb, SectionBean sb,List<ItemBean>itBeans, Map<String,ItemDataBean> dataMap)
     {
         int tempOrdinal = 1;
         ItemDataDAO iddao = new ItemDataDAO(getDataSource(),locale);
@@ -4435,10 +4443,12 @@ public abstract class DataEntryServlet extends CoreSecureController {
         if(maxOrdinal==0)maxOrdinal = 1;//Incase of no data
         ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO<String, ArrayList>(getDataSource());
         List<DisplayItemGroupBean> itemGroups = new ArrayList<DisplayItemGroupBean>();
+        boolean groupHasData = false;
         for(int i=1;i<=maxOrdinal;i++){
 
             List<DisplayItemBean> displayItemBeans = new ArrayList<DisplayItemBean>();
             DisplayItemGroupBean dig = new DisplayItemGroupBean();
+            
             for(ItemBean itBean:itBeans){
 
                 DisplayItemBean displayItemBean = new DisplayItemBean();
@@ -4448,7 +4458,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 displayItemBean.setItem(itBean);
                 ItemDataBean itemData =  dataMap.get(itBean.getId()+","+i);
                 if(itemData!=null){
-                    LOGGER.debug("itemData::"+itemData);
+                    groupHasData = true;//to indicate any item in the group has data;
                     displayItemBean.setIsNewItem(false);
                 }
                 if(itemData==null)
@@ -4465,6 +4475,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
             }
             dig.setItems(displayItemBeans);
+            dig.setHasData(groupHasData);
             itemGroups.add(dig);
         }
 
@@ -4791,6 +4802,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     return true;
                 else if (!oldValue.equals(value))
                     return true;
+            }else if(value.isEmpty())
+            {
+                return false;
             } else if (value != null)
                 return true;
         }
@@ -4822,8 +4836,13 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     return !value.equals(theOldValue);
                 } else if (!oldValue.equals(value))
                     return true;
-            } else if (value != null)
-                return true;
+            }
+            else if (value!=null && value.isEmpty())
+                return false;
+            else if (value != null)
+            {
+                    return true;
+                }
         }
         return false;
     }
@@ -5277,51 +5296,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         return errors;
     }
 
-    private HashMap reshuffleErrorGroupNames(HashMap errors, List<DisplayItemWithGroupBean> allItems) {
-        for (int i = 0; i < allItems.size(); i++) {
-            DisplayItemWithGroupBean diwb = allItems.get(i);
-
-            if (diwb.isInGroup()) {
-                List<DisplayItemGroupBean> dgbs = diwb.getItemGroups();
-                int manualRows = getManualRows(dgbs);
-                int totalRows = dgbs.size();
-                LOGGER.debug("found manual rows " + manualRows + " and total rows " + totalRows + " from ordinal " + diwb.getOrdinal());
-                for (DisplayItemGroupBean digb : dgbs) {
-                    ItemGroupBean igb = digb.getItemGroupBean();
-                    List<DisplayItemBean> dibs = digb.getItems();
-                    int placeHolder = 1;
-                    while (totalRows - manualRows > 2) {
-
-                        for (DisplayItemBean dib : dibs) {
-                            // needs to be 2, 3, 4 ... in the place of 4, 3, 2...
-                            String intendedKey = getGroupItemInputName(digb, placeHolder, dib);
-                            String replacementKey = getGroupItemManualInputName(digb, manualRows + 1, dib);
-                            if (errors.containsKey(intendedKey)) {
-                                // String errorMessage = (String)errors.get(intendedKey);
-                                errors.put(replacementKey, errors.get(intendedKey));
-                                errors.remove(intendedKey);
-                                LOGGER.debug("removing: " + intendedKey + " and replacing it with " + replacementKey);
-                            }
-                        }
-                        placeHolder++;
-                        manualRows++;
-                    }
-                    // but what about the last row? use the placeholder
-                    for (DisplayItemBean dib : dibs) {
-                        String lastIntendedKey = getGroupItemInputName(digb, placeHolder, dib);
-                        String lastReplacementKey = getGroupItemInputName(digb, 1, dib);
-                        if (!lastIntendedKey.equals(lastReplacementKey) && errors.containsKey(lastIntendedKey)) {
-                            // String errorMessage = (String)errors.get(intendedKey);
-                            errors.put(lastReplacementKey, errors.get(lastIntendedKey));
-                            errors.remove(lastIntendedKey);
-                            LOGGER.debug("removing: " + lastIntendedKey + " and replacing it with " + lastReplacementKey);
-                        }
-                    }
-                }
-            }
-        }
-        return errors;
-    }
+  
 
     /*Determining the resolution status that will be shown in color flag for an item.*/
     private int getDiscrepancyNoteResolutionStatus(int itemDataId, ArrayList formNotes) {

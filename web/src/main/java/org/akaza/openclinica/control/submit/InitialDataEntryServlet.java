@@ -13,6 +13,7 @@ import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.DisplayItemGroupBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.RuleValidator;
@@ -66,10 +67,10 @@ public class InitialDataEntryServlet extends DataEntryServlet {
         // < respage =
         // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",
         // locale);
-
+        
+        SectionBean sssbjams = (SectionBean)request.getAttribute("sectionJamz");
         getInputBeans(request);
-
-//        DataEntryStage stage = ecb.getStage();
+       
 //        Role r = currentRole.getRole();
 //
 //        if (stage.equals(DataEntryStage.UNCOMPLETED)) {

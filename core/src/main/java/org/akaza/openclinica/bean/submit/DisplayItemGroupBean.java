@@ -78,6 +78,7 @@ public class DisplayItemGroupBean implements Comparable {
     private String inputId; // @See loadFormValueForItemGroup() 
     private int index;
 
+    private boolean hasData;
     public DisplayItemGroupBean() {
         this.itemGroupBean = new ItemGroupBean();
         this.groupMetaBean = new ItemGroupMetadataBean();
@@ -86,6 +87,14 @@ public class DisplayItemGroupBean implements Comparable {
         editFlag = "";
         formInputOrdinal = 0;
         isAuto = true;
+    }
+
+    public boolean isHasData() {
+        return hasData;
+    }
+
+    public void setHasData(boolean hasData) {
+        this.hasData = hasData;
     }
 
     public ItemGroupBean getItemGroupBean() {
