@@ -33,7 +33,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
 
 /**
  * @author Doug Rodrigues (douglas.rodrigues@openclinica.com)
- *
+ * @author Leonel Gayard  (leonel.gayard@gmail.com)
  */
 public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements ViewNotesDao {
 
@@ -196,10 +196,17 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
         }
 
         if (filter.getPageNumber() != null && filter.getPageSize() != null) {
-            // Limit number of results (pagination)
-            terms.add(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.limit"));
-            arguments.put("limit", filter.getPageSize());
-            arguments.put("offset", (filter.getPageNumber() - 1) * filter.getPageSize());
+            if (queryStore.hasQuery(QUERYSTORE_FILE, "findAllDiscrepancyNotes.paginationPrefix")) {
+                terms.add(0, queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.paginationPrefix"));
+                terms.add(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.paginationSuffix"));
+                arguments.put("first", 1 + ((filter.getPageNumber() - 1) * filter.getPageSize()));
+                arguments.put("last",  filter.getPageSize() * filter.getPageNumber());
+            } else {
+                // Limit number of results (pagination)
+                terms.add(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.limit"));
+                arguments.put("limit", filter.getPageSize());
+                arguments.put("offset", (filter.getPageNumber() - 1) * filter.getPageSize());
+        	}
         }
 
         String result = StringUtils.join(terms, ' ');
