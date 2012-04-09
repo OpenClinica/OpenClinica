@@ -7,6 +7,15 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -26,15 +35,8 @@ import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jxu
@@ -43,6 +45,8 @@ import javax.servlet.http.HttpSession;
  *         coordinator
  */
 public class AdministrativeEditingServlet extends DataEntryServlet {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AdministrativeEditingServlet.class);
 
     Locale locale;
 
@@ -112,7 +116,7 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
                     y = y.substring(0,y.length()-1);
                     target.setFileName(y);
                 } else {
-                    logger.info("It's a wrong servlet page:" + s);
+                    LOGGER.info("It's a wrong servlet page:" + s);
                 }
             }else {
                 target.setFileName(target.getFileName() + "?eventCRFId=" + eventCRFId + "&sectionId=" + sectionId + "&tab=" + tabId);
@@ -200,7 +204,7 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
             addPageMessage(noAccessMessage, request);
             throw new InsufficientPermissionException(Page.MENU, exceptionName, "1");
         }
-        logger.info("stage name:" + stage.getName());
+        LOGGER.info("stage name:" + stage.getName());
         if (stage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE)) {
             // if (!r.equals(Role.STUDYDIRECTOR) && !r.equals(Role.COORDINATOR))
             // {
@@ -352,11 +356,11 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
                     inputName = getGroupItemManualInputName(displayGroup, order, displayItem);
                     // manualcount++;
                 }
-                logger.debug("THe oid is " + displayItem.getItem().getOid() + " order : " + order + " inputName : " + inputName);
+                LOGGER.debug("THe oid is " + displayItem.getItem().getOid() + " order : " + order + " inputName : " + inputName);
 
                 if (groupOrdinalPLusItemOid.containsKey(displayItem.getItem().getOid())
                     || groupOrdinalPLusItemOid.containsKey(String.valueOf(displayGroup.getIndex() + 1) + displayItem.getItem().getOid())) {
-                    logger.debug("IN : " + String.valueOf(displayGroup.getIndex() + 1) + displayItem.getItem().getOid());
+                    LOGGER.debug("IN : " + String.valueOf(displayGroup.getIndex() + 1) + displayItem.getItem().getOid());
                     validateDisplayItemBean(v, displayItem, inputName, rv, groupOrdinalPLusItemOid, true, groupOrdinalPLusItemOid.get(String
                             .valueOf(displayGroup.getIndex() + 1)
                         + displayItem.getItem().getOid()), request);

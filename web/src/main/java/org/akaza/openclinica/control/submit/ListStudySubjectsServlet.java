@@ -7,8 +7,11 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.control.core.CoreSecureController;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -25,10 +28,6 @@ import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
 
 /**
  * Servlet for creating a table.
@@ -76,7 +75,7 @@ public class ListStudySubjectsServlet extends SecureController {
 
     @Override
     protected void processRequest() throws Exception {
-        CoreSecureController.removeLockedCRF(ub.getId());
+        getCrfLocker().unlockAllForUser(ub.getId());
         FormProcessor fp = new FormProcessor(request);
         if(fp.getString("showMoreLink").equals("")){
             showMoreLink = true;

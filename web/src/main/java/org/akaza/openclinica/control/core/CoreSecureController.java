@@ -1,5 +1,30 @@
 package org.akaza.openclinica.control.core;
 
+import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Properties;
+import java.util.ResourceBundle;
+import java.util.StringTokenizer;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
@@ -37,46 +62,22 @@ import org.quartz.Trigger;
 import org.quartz.impl.StdScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.ResourceBundle;
-import java.util.StringTokenizer;
-
-import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
 /**
  * Abstract class for creating a controller servlet and extending capabilities of SecureController. However, not using the SingleThreadModel.
  * @author jnyayapathi
  *
  */
 public abstract class CoreSecureController extends HttpServlet {
-    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CoreSecureController.class);
+
     protected HashMap errors = new HashMap();
 
     private static String SCHEDULER = "schedulerFactoryBean";
@@ -118,7 +119,9 @@ public abstract class CoreSecureController extends HttpServlet {
     public static final String SUPPORT_URL = "supportURL";
 
     public static final String MODULE = "module";// to determine which module
-    private static HashMap unavailableCRFList = new HashMap();
+
+    private CRFLocker crfLocker;
+
     private DataSource dataSource = null;
 
     // user is in
@@ -134,20 +137,19 @@ public abstract class CoreSecureController extends HttpServlet {
         }
 
         pageMessages.add(message);
-        logger.debug(message);
+        LOGGER.debug(message);
         request.setAttribute(PAGE_MESSAGE, pageMessages);
     }
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        try {
-            ServletContext context = getServletContext();
-            SessionManager sm = new SessionManager(SpringServletAccess.getApplicationContext(context));
-            dataSource = sm.getDataSource();
-        } catch (Exception ne) {
-            ne.printStackTrace();
-        }
+
+        ServletContext context = getServletContext();
+        ApplicationContext appCtx = SpringServletAccess.getApplicationContext(context);
+        SessionManager sm = new SessionManager(appCtx);
+        dataSource = sm.getDataSource();
+        this.crfLocker = appCtx.getBean(CRFLocker.class);
     }
 
     // @pgawade: 02Jan2012: Changed the scope for getter to protected so it will
@@ -305,6 +307,15 @@ public abstract class CoreSecureController extends HttpServlet {
             this.scheduler != null ? scheduler : (StdScheduler) SpringServletAccess.getApplicationContext(request.getSession().getServletContext()).getBean(
                     SCHEDULER);
         return scheduler;
+    }
+
+    private void unlockCRFOnError(HttpServletRequest req) {
+        if (req != null) {
+            EventCRFBean eventCrf = (EventCRFBean) req.getAttribute("event");
+            if (eventCrf != null) {
+                crfLocker.unlock(eventCrf.getId());
+            }
+        }
     }
 
     private void process(HttpServletRequest request, HttpServletResponse response) throws OpenClinicaException, UnsupportedEncodingException {
@@ -534,35 +545,22 @@ public abstract class CoreSecureController extends HttpServlet {
             processRequest(request, response);
         } catch (InconsistentStateException ise) {
             ise.printStackTrace();
-            logger.warn("InconsistentStateException: org.akaza.openclinica.control.CoreSecureController: " + ise.getMessage());
-            if((EventCRFBean)request.getAttribute( "event")!=null)
-                getUnavailableCRFList().remove(((EventCRFBean)request.getAttribute( "event")).getId());
+            LOGGER.warn("InconsistentStateException: org.akaza.openclinica.control.CoreSecureController: ", ise);
+            unlockCRFOnError(request);
             addPageMessage(ise.getOpenClinicaMessage(), request);
             forwardPage(ise.getGoTo(), request, response);
         } catch (InsufficientPermissionException ipe) {
             ipe.printStackTrace();
-            logger.warn("InsufficientPermissionException: org.akaza.openclinica.control.CoreSecureController: " + ipe.getMessage());
-            if((EventCRFBean)request.getAttribute( "event")!=null)
-                getUnavailableCRFList().remove(((EventCRFBean)request.getAttribute( "event")).getId());
+            LOGGER.warn("InsufficientPermissionException: org.akaza.openclinica.control.CoreSecureController: ", ipe);
+            unlockCRFOnError(request);
             // addPageMessage(ipe.getOpenClinicaMessage());
             forwardPage(ipe.getGoTo(), request, response);
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.error(CoreSecureController.getStackTrace(e));
-            if((EventCRFBean)request.getAttribute( "event")!=null)
-                getUnavailableCRFList().remove(((EventCRFBean)request.getAttribute( "event")).getId());
+            LOGGER.error("Error processing request", e);
+            unlockCRFOnError(request);
             forwardPage(Page.ERROR, request, response);
         }
 
-    }
-
-    public static String getStackTrace(Throwable t) {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw, true);
-        t.printStackTrace(pw);
-        pw.flush();
-        sw.flush();
-        return sw.toString();
     }
 
     /**
@@ -574,18 +572,14 @@ public abstract class CoreSecureController extends HttpServlet {
      * @throws java.io.IOException
      */
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, java.io.IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {
         try {
-
-
-
-            logger.debug("Request");
+            LOGGER.debug("GET Request");
             process(request, response);
         } catch (Exception e) {
-            e.printStackTrace();
-            //UNLOCK user From the request
-            if((EventCRFBean)request.getAttribute( "event")!=null)
-            getUnavailableCRFList().remove(((EventCRFBean)request.getAttribute( "event")).getId());
+            LOGGER.error("Error processing request", e);
+        } finally {
+            unlockCRFOnError(request);
         }
     }
 
@@ -598,15 +592,14 @@ public abstract class CoreSecureController extends HttpServlet {
      *            servlet response
      */
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, java.io.IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException {
         try {
-            logger.debug("Post");
+            LOGGER.debug("POST Request");
             process(request, response);
         } catch (Exception e) {
-            e.printStackTrace();
-            //UNLOCK EVENTCRF From the request.
-            if((EventCRFBean)request.getAttribute( "event")!=null)
-            getUnavailableCRFList().remove(((EventCRFBean)request.getAttribute( "event")).getId());
+            LOGGER.error("Error processing request", e);
+        } finally {
+            unlockCRFOnError(request);
         }
     }
 
@@ -738,7 +731,7 @@ public abstract class CoreSecureController extends HttpServlet {
     protected void setPopUpURL(String url, HttpServletRequest request) {
         if (url != null && request != null) {
             request.setAttribute(POP_UP_URL, url);
-            logger.info("just set pop up url: " + url);
+            LOGGER.info("just set pop up url: " + url);
             System.out.println("just set pop up url: " + url);
         }
     }
@@ -923,7 +916,7 @@ public abstract class CoreSecureController extends HttpServlet {
         Boolean messageSent = true;
         try {
             JavaMailSenderImpl mailSender = (JavaMailSenderImpl) SpringServletAccess.getApplicationContext(getServletContext()).getBean("mailSender");
-            
+
           //@pgawade 09-Feb-2012 #issue 13201 - setting the "mail.smtp.localhost" property to localhost when java API is not able to
            //retrieve the host name
             Properties javaMailProperties = mailSender.getJavaMailProperties();
@@ -932,7 +925,7 @@ public abstract class CoreSecureController extends HttpServlet {
             		javaMailProperties.put("mail.smtp.localhost", "localhost");
             	}
             }
-            
+
             MimeMessage mimeMessage = mailSender.createMimeMessage();
 
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, htmlEmail);
@@ -945,13 +938,13 @@ public abstract class CoreSecureController extends HttpServlet {
             if (successMessage != null && sendMessage) {
                 addPageMessage(successMessage, request);
             }
-            logger.debug("Email sent successfully on {}", new Date());
+            LOGGER.debug("Email sent successfully on {}", new Date());
         } catch (MailException me) {
             me.printStackTrace();
             if (failMessage != null && sendMessage) {
                 addPageMessage(failMessage, request);
             }
-            logger.debug("Email could not be sent on {} due to: {}", new Date(), me.toString());
+            LOGGER.debug("Email could not be sent on {} due to: {}", new Date(), me.toString());
             messageSent = false;
         }
         return messageSent;
@@ -973,37 +966,10 @@ public abstract class CoreSecureController extends HttpServlet {
 
     }
 
-   //JN:Synchornized in the securecontroller to avoid concurrent modification exception
-    //JN: this could still throw concurrentModification, coz of remove TODO: try to do better.
-    public static synchronized void  removeLockedCRF(int userId) {
-     try{
-        for (Iterator iter = getUnavailableCRFList().entrySet().iterator(); iter.hasNext();) {
-            java.util.Map.Entry entry = (java.util.Map.Entry) iter.next();
-
-
-            int id = (Integer) entry.getValue();
-            if (id == userId)
-            {
-              getUnavailableCRFList().remove(entry.getKey());
-//                entry.setValue(id+(int)Math.random()); //TODO; revisit to make it work this way and avoid swallowing.
-           }
-
-                //getUnavailableCRFList().
-        }
-     }catch(ConcurrentModificationException cme){
-         cme.printStackTrace();//swallowing the exception, not the ideal thing to do but safer as of now.
-     }
+    public void unlockCRFsForUser(int userId) {
+        crfLocker.unlock(userId);
     }
 
-    public synchronized void  lockThisEventCRF(int ecb, int ub) {
-
-        getUnavailableCRFList().put(ecb, ub);
-
-    }
-
-    public  synchronized static HashMap getUnavailableCRFList() {
-        return unavailableCRFList;
-    }
 
     // JN:Doesnt look like the following method is used anywhere, commenting out
     /*
@@ -1059,5 +1025,10 @@ public abstract class CoreSecureController extends HttpServlet {
         public void process(HttpServletRequest request, HttpServletResponse response) throws OpenClinicaException, UnsupportedEncodingException {
             CoreSecureController.this.process(request, response);
         }
+    }
+
+
+    public CRFLocker getCrfLocker() {
+        return crfLocker;
     }
 }

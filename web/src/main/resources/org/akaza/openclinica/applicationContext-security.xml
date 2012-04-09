@@ -76,6 +76,7 @@
         <property name="dataSource" ref="dataSource"/>
         <property name="allowSessionCreation" value="true" />
         <property name="sessionAuthenticationStrategy" ref="sas"/>
+        <property name="crfLocker" ref="crfLocker"/>
     </bean>
     
     <bean id="successHandler" class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler" >

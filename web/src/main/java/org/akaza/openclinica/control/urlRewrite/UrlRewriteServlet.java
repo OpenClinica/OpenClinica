@@ -1,10 +1,9 @@
 /**
- * 
+ *
  */
 package org.akaza.openclinica.control.urlRewrite;
 
 import java.util.HashMap;
-import java.util.ResourceBundle;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -37,13 +36,13 @@ import org.slf4j.LoggerFactory;
 /**
  * @author pgawade Servlet to call appropriate application pages corresponding to
  *         supported RESTful URLs
- * 
+ *
  */
 public class UrlRewriteServlet extends CoreSecureController {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-    
-    
-    
+
+
+
 //    StudyBean study = null;
 //    StudySubjectBean subject = null;
 //    StudyEventDefinitionBean sed = null;
@@ -64,14 +63,14 @@ public class UrlRewriteServlet extends CoreSecureController {
 
     /**
      * Handles the HTTP <code>GET</code> method.
-     * 
+     *
      * @param request
      * @param response
      * @throws ServletException
      * @throws java.io.IOException
      */
     @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, java.io.IOException {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {
         try {
 
             String requestURI = request.getRequestURI();
@@ -85,7 +84,7 @@ public class UrlRewriteServlet extends CoreSecureController {
             }
 
             ocResource = getOpenClinicaResourceFromURL(requestOIDStr);
-            if(null != ocResource){            	
+            if(null != ocResource){
             	if(ocResource.isInValid()){
             		response.sendError(HttpServletResponse.SC_NOT_FOUND);
             		//request.setAttribute("errorMsg", ocResource.getMessages().get(0));
@@ -93,14 +92,14 @@ public class UrlRewriteServlet extends CoreSecureController {
             		Validator.addError(errors, "error:", ocResource.getMessages().get(0));
             		request.setAttribute("formMessages", errors);
             	}
-	            
+
 		            // If the form OID in the request uri is not null, it will be
 		            // interpretted as a request to
 		            // view form data and hence will be forwarded to servlet path
 		            // "/ViewSectionDataEntry"
 		            if ((null != ocResource) && (ocResource.getFormVersionOID() != null)) {
 		                HashMap<String, String> mapQueryParams = getQueryStringParameters(requestQueryStr);
-		
+
 		            // set the required parameters into request
 		                if (null != ocResource.getEventDefinitionCrfId()) {
 		                    request.setAttribute("eventDefinitionCRFId", ocResource.getEventDefinitionCrfId().toString());
@@ -125,13 +124,13 @@ public class UrlRewriteServlet extends CoreSecureController {
 		                        request.setAttribute("exitTo", "ViewStudySubject?id=" + ocResource.getStudySubjectID());
 		                    }
 		                }
-		                //ToDo: Changes to work on to fix #0012507	
+		                //ToDo: Changes to work on to fix #0012507
 //		                else{
 //		                	request.setAttribute("crfId", ocResource.getFormID());
 //		                	request.setAttribute("crfVersionId", ocResource.getFormVersionID());
 //		                	request.setAttribute("module", "?");
 //		                }
-		
+
 		                forwardPage(Page.VIEW_SECTION_DATA_ENTRY_SERVLET, request, response);
 		                // response.sendRedirect(Page.VIEW_SECTION_DATA_ENTRY_SERVLET.getFileName());
 		            }
@@ -173,7 +172,7 @@ public class UrlRewriteServlet extends CoreSecureController {
     /**
      * Method to parse the request URL parameters and get the respective
      * database identifiers
-     * 
+     *
      * @param URLPath
      *            - example "S_CPCS/320999/SE_CPCS%5B1%5D/F_CPCS_1"
      * @param queryString
@@ -201,7 +200,7 @@ public class UrlRewriteServlet extends CoreSecureController {
                     ItemDAO idao = new ItemDAO(getDataSource());
                     ItemGroupDAO igdao = new ItemGroupDAO(getDataSource());
                     StudyEventDAO sedao = new StudyEventDAO(getDataSource());
-                     
+
                     StudyBean study = null;
                     StudySubjectBean subject = null;
                     StudyEventDefinitionBean sed = null;
@@ -210,7 +209,7 @@ public class UrlRewriteServlet extends CoreSecureController {
                     ItemBean item = null;
                     ItemGroupBean ig = null;
                     StudyEventBean studyEvent = null;
-                    
+
                     Integer studySubjectId = 0;
                     Integer eventDefId = 0;
                     Integer eventRepeatKey = 0;
@@ -246,7 +245,7 @@ public class UrlRewriteServlet extends CoreSecureController {
 	                                openClinicaResource.setStudyOID(URLParamValue);
 	                                if (null != study) {
 	                                    openClinicaResource.setStudyID(study.getId());
-	                                }	                                
+	                                }
                                 }
                                 break;
                             }
@@ -338,18 +337,18 @@ public class UrlRewriteServlet extends CoreSecureController {
 		                                    // openClinicaResource.setFormVersionID(cv.getId());
 		                                    // openClinicaResource.setFormID(cv.getCrfId());
 		                                    // }
-		
+
 		                                    HashMap studySubjectCRFDataDetails =
 		                                        sedao.getStudySubjectCRFData(study, studySubjectId, eventDefId, URLParamValue, eventRepeatKey);
 		                                    if ((null != studySubjectCRFDataDetails) && (studySubjectCRFDataDetails.size() != 0)) {
 		                                        if (studySubjectCRFDataDetails.containsKey("event_crf_id")) {
 		                                            openClinicaResource.setEventCrfId((Integer) studySubjectCRFDataDetails.get("event_crf_id"));
 		                                        }
-		
+
 		                                        if (studySubjectCRFDataDetails.containsKey("event_definition_crf_id")) {
 		                                            openClinicaResource.setEventDefinitionCrfId((Integer) studySubjectCRFDataDetails.get("event_crf_id"));
 		                                        }
-		
+
 		                                        if (studySubjectCRFDataDetails.containsKey("study_event_id")) {
 		                                            openClinicaResource.setStudyEventId((Integer) studySubjectCRFDataDetails.get("event_crf_id"));
 		                                        }
@@ -406,11 +405,11 @@ public class UrlRewriteServlet extends CoreSecureController {
 //     */
 //    public boolean validateOpenClinicaResource (OpenClinicaResource res){
 //    	boolean isValid = false;
-//    	
+//
 //    	if(null != res){
-//    		
+//
 //    	}
-//    	
+//
 //    	return isValid;
 //    }
 }

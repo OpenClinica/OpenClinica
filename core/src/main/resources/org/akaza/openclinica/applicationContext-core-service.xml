@@ -99,5 +99,7 @@
     <bean id="viewNotesService" class="org.akaza.openclinica.service.managestudy.ViewNotesServiceImpl">
         <property name="viewNotesDao" ref="viewNotesDao"/>
     </bean>
+    
+    <bean id="crfLocker" class="org.akaza.openclinica.control.core.CRFLocker"/>
 
 </beans>
