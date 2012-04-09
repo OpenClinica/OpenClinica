@@ -309,7 +309,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
          boolean isSubmitted = false;
         boolean hasGroup = false;
 
-        SectionBean sssbjams2 = (SectionBean)request.getAttribute("sectionJam");
         EventCRFDAO ecdao = null;
         FormProcessor fp = new FormProcessor(request);
         logMe("Enterting DataEntry Servlet"+System.currentTimeMillis());
