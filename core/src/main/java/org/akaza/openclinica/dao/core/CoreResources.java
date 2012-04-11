@@ -15,12 +15,15 @@ import org.akaza.openclinica.bean.service.PdfProcessingFunction;
 import org.akaza.openclinica.bean.service.SasProcessingFunction;
 import org.akaza.openclinica.bean.service.SqlProcessingFunction;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
 
 public class CoreResources implements ResourceLoaderAware {
 
@@ -356,41 +359,37 @@ public class CoreResources implements ResourceLoaderAware {
     }
 
     private void copyBaseToDest(ResourceLoader resourceLoader) {
-        // System.out.println("Properties directory?"+resourceLoader.getResource("properties/xslt"));
+    	ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(resourceLoader);
+    	Resource[] resources;
+    	try {
+    		resources = resolver.getResources("classpath:properties/xslt/*.xsl");
 
-        String[] fileNames =
-            { "odm_spss_dat.xsl", "ODMToTAB.xsl", "odm_to_html.xsl", "odm_to_xslfo.xsl",  "odm_spss_sps.xsl", "copyXML.xsl",
-                "odm1.3_to_1.2.xsl", "odm1.3_to_1.2_extensions.xsl", "odm1.3_to_1.3_no_extensions.xsl" };
-        ByteArrayInputStream listSrcFiles[] = new ByteArrayInputStream[fileNames.length];
+    	} catch (IOException ioe) {
+    		logger.debug(ioe.getMessage(), ioe);
+    		throw new OpenClinicaSystemException("Unable to read source files", ioe);
+    	}
 
-        try {
-            for (int i = 0; i < listSrcFiles.length; i++) {
-                listSrcFiles[i] = (ByteArrayInputStream) resourceLoader.getResource(
-                        "classpath:properties" + File.separator + "xslt" + File.separator + fileNames[i]).
-                        getInputStream();
-            }
+    	File dest = new File(getField("filePath") + "xslt");
+    	if (!dest.exists()) {
+    		if (!dest.mkdirs()) {
+    			throw new OpenClinicaSystemException("Copying files, Could not create direcotry: " + dest.getAbsolutePath() + ".");
+    		}
+    	}
 
-        } catch (IOException ioe) {
-            OpenClinicaSystemException oe = new OpenClinicaSystemException("Unable to read source files");
-            oe.initCause(ioe);
-            oe.setStackTrace(ioe.getStackTrace());
-            logger.debug(ioe.getMessage());
-            throw oe;
-        }
-        File dest = new File(getField("filePath") + "xslt");
-        if (!dest.exists()) {
-            if (!dest.mkdirs()) {
-                throw new OpenClinicaSystemException("Copying files, Could not create direcotry: " + dest.getAbsolutePath() + ".");
-            }
-        }
+    	for (Resource r: resources) {
+    		File f = new File(dest, r.getFilename());
+    		try {
+    			
+    			FileOutputStream out = new FileOutputStream(f);
+    			IOUtils.copy(r.getInputStream(), out);
+    			out.close();
 
-        for (int i = 0; i < fileNames.length; i++) {
-            File dest1 = new File(dest, fileNames[i]);
-            // File src1 = listSrcFiles[i];
-            if (listSrcFiles[i] != null)
-                copyFiles(listSrcFiles[i], dest1);
-        }
+    		} catch (IOException ioe) {
+    			logger.debug(ioe.getMessage(), ioe);
+                throw new OpenClinicaSystemException("Unable to copy file: " + r.getFilename() + " to " + f.getAbsolutePath(), ioe);
 
+    		}
+    	}
     }
 
     private void copyImportRulesFiles() throws IOException
@@ -416,6 +415,12 @@ public class CoreResources implements ResourceLoaderAware {
 
     }
 
+    
+    /**
+     * @deprecated. ByteArrayInputStream keeps the whole file in memory needlessly.
+     * Use Commons IO's {@link IOUtils#copy(java.io.InputStream, java.io.OutputStream)} instead.
+     */
+    @Deprecated
     private void copyFiles(ByteArrayInputStream fis, File dest) {
         FileOutputStream fos = null;
         byte[] buffer = new byte[512]; // Buffer 4K at a time (you can change this).
