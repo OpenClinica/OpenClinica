@@ -174,7 +174,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>
 <%-- if only one section show no arrows & section jump --%>
-<c:if test="${fn:length(companies) gt 1}">
+<c:if test="${fn:length(toc.sections) gt 1}">
 
 <td align="right" valign="middle" style="padding-left: 12px; display: none" id="TabsBack">
     <a href="javascript:TabsBack()"><img src="images/arrow_back.gif" border="0" style="margin-top:10px"></a></td>
@@ -273,7 +273,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 </script>
 
 <%-- if only one section show no arrows & section jump --%>
-<c:if test="${fn:length(companies) gt 1}">
+<c:if test="${fn:length(toc.sections) gt 1}">
 
 <td align="right"id="TabsNextDis" style="display: none"><img src="images/arrow_next_dis.gif" border="0"/></td>
 <td align="right" id="TabsNext"><a href="javascript:TabsForward()"><img src="images/arrow_next.gif" border="0" style=
