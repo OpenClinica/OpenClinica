@@ -2,7 +2,7 @@
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
  
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.licensing" var="resword"/>
  
 <!-- END MAIN CONTENT AREA -->
 </td>
