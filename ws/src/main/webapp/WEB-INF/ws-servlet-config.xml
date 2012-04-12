@@ -13,54 +13,89 @@
      <!-- WSDL Definitions -->
 
      <bean id="dataWsdl" class="org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition">
-        <property name="schema" ref="dataSchema"/>
+        <property name="schemaCollection" ref="dataSchemaCollection"/>
         <property name="portTypeName" value="ws"/>
         <property name="locationUri" value="/ws/data/v1"/>
+	<property name="targetNamespace" value="http://openclinica.org/ws/data/v1"/>  
      </bean>
 
-     <bean id="dataSchema" class="org.springframework.xml.xsd.SimpleXsdSchema">
-         <property name="xsd" value="/WEB-INF/schemas/data.xsd" />
-     </bean>
-
+	<bean id="dataSchemaCollection" class="org.springframework.xml.xsd.commons.CommonsXsdSchemaCollection">
+    	<property name="xsds">
+        	<list>
+            	<value>/WEB-INF/schemas/beans.xsd</value>
+            	<value>/WEB-INF/schemas/data.xsd</value>
+        	</list>
+    	</property>
+    	<property name="inline" value="true"/>
+	</bean>
+	
      <bean id="studyEventDefinitionWsdl" class="org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition">
-        <property name="schema" ref="studyEventDefinitionSchema"/>
+        <property name="schemaCollection" ref="studyEventDefinitionSchemaCollection"/>
         <property name="portTypeName" value="ws"/>
         <property name="locationUri" value="/ws/studyEventDefinition/v1"/>
+        <property name="targetNamespace" value="http://openclinica.org/ws/studyEventDefiniton/v1"/>
      </bean>
 
-     <bean id="studyEventDefinitionSchema" class="org.springframework.xml.xsd.SimpleXsdSchema">
-         <property name="xsd" value="/WEB-INF/schemas/studyEventDefinition.xsd" />
-     </bean>
+	<bean id="studyEventDefinitionSchemaCollection" class="org.springframework.xml.xsd.commons.CommonsXsdSchemaCollection">
+    	<property name="xsds">
+        	<list>
+            	<value>/WEB-INF/schemas/beans.xsd</value>
+            	<value>/WEB-INF/schemas/studyEventDefinition.xsd</value>
+        	</list>
+    	</property>
+    	<property name="inline" value="true"/>
+	</bean>
 
      <bean id="studyWsdl" class="org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition">
-        <property name="schema" ref="studySchema"/>
+        <property name="schemaCollection" ref="studySchemaCollection"/>
         <property name="portTypeName" value="ws"/>
         <property name="locationUri" value="/ws/study/v1"/>
+        <property name="targetNamespace" value="http://openclinica.org/ws/study/v1"/>
      </bean>
 
-     <bean id="studySchema" class="org.springframework.xml.xsd.SimpleXsdSchema">
-         <property name="xsd" value="/WEB-INF/schemas/study.xsd" />
-     </bean>
+	<bean id="studySchemaCollection" class="org.springframework.xml.xsd.commons.CommonsXsdSchemaCollection">
+    	<property name="xsds">
+        	<list>
+            	<value>/WEB-INF/schemas/beans.xsd</value>
+            	<value>/WEB-INF/schemas/study.xsd</value>
+        	</list>
+    	</property>
+    	<property name="inline" value="true"/>
+	</bean>
 
      <bean id="studySubjectWsdl" class="org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition">
-        <property name="schema" ref="studySubjectSchema"/>
+        <property name="schemaCollection" ref="studySubjectSchemaCollection"/>
         <property name="portTypeName" value="ws"/>
         <property name="locationUri" value="/ws/studySubject/v1"/>
+        <property name="targetNamespace" value="http://openclinica.org/ws/studySubject/v1"/>
      </bean>
 
-     <bean id="studySubjectSchema" class="org.springframework.xml.xsd.SimpleXsdSchema">
-         <property name="xsd" value="/WEB-INF/schemas/studySubject.xsd" />
-     </bean>
+	<bean id="studySubjectSchemaCollection" class="org.springframework.xml.xsd.commons.CommonsXsdSchemaCollection">
+    	<property name="xsds">
+        	<list>
+            	<value>/WEB-INF/schemas/beans.xsd</value>
+            	<value>/WEB-INF/schemas/studySubject.xsd</value>
+        	</list>
+    	</property>
+    	<property name="inline" value="true"/>
+	</bean>
 
      <bean id="eventWsdl" class="org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition">
-        <property name="schema" ref="eventSchema"/>
+        <property name="schemaCollection" ref="eventSchemaCollection"/>
         <property name="portTypeName" value="ws"/>
         <property name="locationUri" value="/ws/event/v1"/>
+        <property name="targetNamespace" value="http://openclinica.org/ws/event/v1"/>
      </bean>
 
-     <bean id="eventSchema" class="org.springframework.xml.xsd.SimpleXsdSchema">
-         <property name="xsd" value="/WEB-INF/schemas/event.xsd" />
-     </bean>
+	<bean id="eventSchemaCollection" class="org.springframework.xml.xsd.commons.CommonsXsdSchemaCollection">
+    	<property name="xsds">
+        	<list>
+            	<value>/WEB-INF/schemas/beans.xsd</value>
+            	<value>/WEB-INF/schemas/event.xsd</value>
+        	</list>
+    	</property>
+    	<property name="inline" value="true"/>
+	</bean>
 
      <bean id="crfWsdl" class="org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition">
         <property name="schema" ref="crfSchema"/>
