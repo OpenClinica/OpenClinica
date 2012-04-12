@@ -5,7 +5,7 @@
  * For details see: http://www.openclinica.org/license
  * copyright 2003-2005 Akaza Research
  */
-package org.akaza.openclinica.control.core;
+package org.akaza.openclinica.core;
 
 import java.io.Serializable;
 import java.util.Iterator;

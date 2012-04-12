@@ -25,7 +25,7 @@ import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.core.CRFLocker;
+import org.akaza.openclinica.core.CRFLocker;
 import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -74,7 +74,7 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
     private ConfigurationDao configurationDao;
     private UserAccountDAO userAccountDao;
     private DataSource dataSource;
-    private CRFLocker crfLocker;
+    private org.akaza.openclinica.core.CRFLocker crfLocker;
 
     //~ Constructors ===================================================================================================
 
