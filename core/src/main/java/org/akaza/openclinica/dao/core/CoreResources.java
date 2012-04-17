@@ -362,7 +362,12 @@ public class CoreResources implements ResourceLoaderAware {
     	ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(resourceLoader);
     	Resource[] resources;
     	try {
-    		resources = resolver.getResources("classpath:properties/xslt/*.xsl");
+    		/*
+    		 * Use classpath* to search for resources that match this pattern in ALL of the
+    		 * jars in the application class path.
+    		 * See: http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/resources.html#resources-classpath-wildcards 
+    		 */
+    		resources = resolver.getResources("classpath*:properties/xslt/*.xsl");
 
     	} catch (IOException ioe) {
     		logger.debug(ioe.getMessage(), ioe);
