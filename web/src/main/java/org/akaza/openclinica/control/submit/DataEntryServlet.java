@@ -4394,7 +4394,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 List<ItemBean> itBeans = idao.findAllItemsByGroupIdOrdered(itemGroup.getItemGroupBean().getId(), sb.getCRFVersionId());
                 
                 List<DisplayItemBean> dibs  = new ArrayList();
-                DisplayItemGroupBean digb = new DisplayItemGroupBean();
+           
                 boolean hasData = false;
                 int checkAllColumns = 0;
                 if(data.size()>0) hasData=true;
