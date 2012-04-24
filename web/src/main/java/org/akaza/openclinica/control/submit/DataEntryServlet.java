@@ -313,7 +313,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
          boolean isSubmitted = false;
         boolean hasGroup = false;
 
-        SectionBean sssbjams2 = (SectionBean)request.getAttribute("sectionJam");
         EventCRFDAO ecdao = null;
         FormProcessor fp = new FormProcessor(request);
         logMe("Enterting DataEntry Servlet"+System.currentTimeMillis());
@@ -4399,7 +4398,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 List<ItemBean> itBeans = idao.findAllItemsByGroupIdOrdered(itemGroup.getItemGroupBean().getId(), sb.getCRFVersionId());
 
                 List<DisplayItemBean> dibs  = new ArrayList();
-                DisplayItemGroupBean digb = new DisplayItemGroupBean();
+           
                 boolean hasData = false;
                 int checkAllColumns = 0;
                 if(data.size()>0) hasData=true;
