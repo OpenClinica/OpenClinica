@@ -7,6 +7,18 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -55,23 +67,15 @@ import org.akaza.openclinica.service.DiscrepancyNoteThread;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jxu <p/> View a CRF version section data entry
  */
 public class ViewSectionDataEntryServlet extends DataEntryServlet {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ViewSectionDataEntryServlet.class);
 
     Locale locale;
     public static String EVENT_CRF_ID = "ecId";
@@ -495,7 +499,7 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
         }
 
         if ("saveNotes".equalsIgnoreCase(action)) {
-            logger.info("33333how many group rows:" + dsb.getDisplayItemGroups().size());
+            LOGGER.info("33333how many group rows:" + dsb.getDisplayItemGroups().size());
 
             // let's save notes for the blank items
             DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
@@ -506,15 +510,15 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
                 if (diwb.isInGroup()) {
                     List<DisplayItemGroupBean> dgbs = diwb.getItemGroups();
-                    logger.info("dgbs size: " + dgbs.size());
+                    LOGGER.info("dgbs size: " + dgbs.size());
                     for (int j = 0; j < dgbs.size(); j++) {
                         DisplayItemGroupBean displayGroup = dgbs.get(j);
                         List<DisplayItemBean> items = displayGroup.getItems();
-                        logger.info("item size: " + items.size());
+                        LOGGER.info("item size: " + items.size());
                         for (DisplayItemBean displayItem : items) {
                             String inputName = getGroupItemInputName(displayGroup, j, displayItem);
-                            logger.info("inputName:" + inputName);
-                            logger.info("item data id:" + displayItem.getData().getId());
+                            LOGGER.info("inputName:" + inputName);
+                            LOGGER.info("item data id:" + displayItem.getData().getId());
                             AddNewSubjectServlet.saveFieldNotes(inputName, discNotes, dndao, displayItem.getData().getId(), "itemData", currentStudy);
 
                         }

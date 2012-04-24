@@ -7,6 +7,12 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -42,12 +48,8 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Bruce W. Perry
@@ -57,6 +59,9 @@ import java.util.Map;
  * preview of a crf before the crfversion is inserted into the database.
  */
 public class ViewSectionDataEntryPreview extends DataEntryServlet {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ViewSectionDataEntryPreview.class);
+
     public static String SECTION_TITLE = "section_title";
     public static String SECTION_LABEL = "section_label";
     public static String SECTION_SUBTITLE = "subtitle";
@@ -105,7 +110,7 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
             // addPageMessage
             String msg = respage.getString("preview_data_has_timed_out");
             this.addPageMessage(msg, request);
-            logger.info("The session attribute \"preview_crf\" has expired or gone out of scope in: " + this.getClass().getName());
+            LOGGER.info("The session attribute \"preview_crf\" has expired or gone out of scope in: " + this.getClass().getName());
             this.forwardPage(Page.CRF_LIST_SERVLET, request, response);
         }
 
@@ -292,7 +297,7 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
             request.setAttribute("tabId", new Integer("1"));
         }
         if (hasGroups) {
-            logger.info("has group, new_table is true");
+            LOGGER.info("has group, new_table is true");
             request.setAttribute("new_table", true);
         }
         // YW 07-23-2007 << for issue 0000937
@@ -381,7 +386,7 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
     private void setupStudyBean(HttpServletRequest request) {
         String age = "";
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
-        
+
         StudySubjectDAO ssdao = new StudySubjectDAO(getDataSource());
         StudySubjectBean sub = (StudySubjectBean) ssdao.findByPK(ecb.getStudySubjectId());
         // This is the SubjectBean
@@ -447,7 +452,7 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
     @Override
     protected String getEventCRFAnnotations(HttpServletRequest request) {
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
-        
+
         return ecb.getAnnotations();
     }
 
@@ -459,7 +464,7 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
     @Override
     protected void setEventCRFAnnotations(String annotations, HttpServletRequest request) {
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
-        
+
         ecb.setAnnotations(annotations);
     }
 
@@ -544,11 +549,13 @@ public class ViewSectionDataEntryPreview extends DataEntryServlet {
     protected boolean shouldRunRules() {
         return false;
     }
-    
+
+    @Override
     protected boolean isAdministrativeEditing() {
     	return false;
     }
-    
+
+    @Override
     protected boolean isAdminForcedReasonForChange(HttpServletRequest request) {
     	return false;
     }

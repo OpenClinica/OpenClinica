@@ -7,6 +7,15 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -31,20 +40,15 @@ import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author ssachs
  */
 public class DoubleDataEntryServlet extends DataEntryServlet {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DoubleDataEntryServlet.class);
 
     Locale locale;
     // < ResourceBundlerespage,restext,resexception,resword;
@@ -141,11 +145,11 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
         if (count != null) {
             count++;
             session.setAttribute(COUNT_VALIDATE + keyId, count);
-            logger.info("^^^just set count to session: " + count);
+            LOGGER.info("^^^just set count to session: " + count);
         } else {
             count = 0;
             session.setAttribute(COUNT_VALIDATE + keyId, count);
-            logger.info("***count not found, set to session: " + count);
+            LOGGER.info("***count not found, set to session: " + count);
         }
 
         DataEntryStage stage = ecb.getStage();
@@ -259,9 +263,9 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
             showItem = true;
         }
         boolean showDuplicateItem = getItemMetadataService().hasPassedDDE(dib.getMetadata(), ecb, valueToCompare);//.isShown(dib.getItem().getId(), ecb, dib.getDbData());// where is the set db data?
-        logger.debug("*** show original item has value " + dib.getData().getValue() + " and show item has value " + valueToCompare.getValue());
-        logger.debug("--- show original: " + showOriginalItem + " show duplicate: " + showDuplicateItem + " and just show item: " + showItem);
-        logger.debug("VALIDATION COUNT " + validationCount);
+        LOGGER.debug("*** show original item has value " + dib.getData().getValue() + " and show item has value " + valueToCompare.getValue());
+        LOGGER.debug("--- show original: " + showOriginalItem + " show duplicate: " + showDuplicateItem + " and just show item: " + showItem);
+        LOGGER.debug("VALIDATION COUNT " + validationCount);
         if (showOriginalItem && showDuplicateItem || showItem) {
             if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXT) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.TEXTAREA)
                     || rt.equals(org.akaza.openclinica.bean.core.ResponseType.FILE)) {
@@ -349,14 +353,14 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
             List<DisplayItemGroupBean> formGroups, HttpServletRequest request, HttpServletResponse response) {
         EventDefinitionCRFBean edcb = (EventDefinitionCRFBean)request.getAttribute(EVENT_DEF_CRF_BEAN);
         HttpSession session = request.getSession();
-        logger.info("===got this far");
+        LOGGER.info("===got this far");
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
 
         int keyId = ecb.getId();
         Integer validationCount = (Integer) session.getAttribute(COUNT_VALIDATE + keyId);
 
         formGroups = loadFormValueForItemGroup(digb, digbs, formGroups, edcb.getId(), request);
-        logger
+        LOGGER
                 .info("found formgroups size for " + digb.getGroupMetaBean().getName() + ": " + formGroups.size() + " compare to db groups size: "
                     + digbs.size());
 
@@ -603,7 +607,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
         Integer validationCount = (Integer) request.getSession().getAttribute(COUNT_VALIDATE + keyId);
 
         formGroups = loadFormValueForItemGroup(digb, digbs, formGroups, edcb.getId(), request);
-        logger
+        LOGGER
                 .info("found formgroups size for " + digb.getGroupMetaBean().getName() + ": " + formGroups.size() + " compare to db groups size: "
                     + digbs.size());
 

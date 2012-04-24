@@ -8,6 +8,37 @@
 
 package org.akaza.openclinica.control.core;
 
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Properties;
+import java.util.ResourceBundle;
+import java.util.StringTokenizer;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.SingleThreadModel;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.Role;
@@ -25,6 +56,7 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.SpringServletAccess;
+import org.akaza.openclinica.core.CRFLocker;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -65,37 +97,6 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.ResourceBundle;
-import java.util.StringTokenizer;
-
-import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.SingleThreadModel;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
 
 /**
  * This class enhances the Controller in several ways.
@@ -193,6 +194,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     public static final String MODULE = "module";// to determine which module
 
+    private CRFLocker crfLocker;
+
     // user is in
 
     // for setting the breadcrumb trail
@@ -240,7 +243,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     @Override
     public void init() throws ServletException {
         context = getServletContext();
-        // DATASET_HOME_DIR = context.getInitParameter("datasetHomeDir");
+        crfLocker = SpringServletAccess.getApplicationContext(context).getBean(CRFLocker.class);
     }
 
     /**
@@ -920,7 +923,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             		javaMailProperties.put("mail.smtp.localhost", "localhost");
             	}
             }
-            
+
             MimeMessage mimeMessage = mailSender.createMimeMessage();
 
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, htmlEmail);
@@ -959,23 +962,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         }
         return addressTo;
 
-    }
-
-    public synchronized static void removeLockedCRF(int userId) {
-        for (Iterator iter = getUnavailableCRFList().entrySet().iterator(); iter.hasNext();) {
-            java.util.Map.Entry entry = (java.util.Map.Entry) iter.next();
-            int id = (Integer) entry.getValue();
-            if (id == userId)
-                getUnavailableCRFList().remove(entry.getKey());
-        }
-    }
-
-    public synchronized void lockThisEventCRF(int ecb, int ub) {
-        getUnavailableCRFList().put(ecb, ub);
-    }
-
-    public synchronized static HashMap getUnavailableCRFList() {
-        return CoreSecureController.getUnavailableCRFList();
     }
 
     public void dowloadFile(File f, String contentType) throws Exception {
@@ -1153,5 +1139,10 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         public void process(HttpServletRequest request, HttpServletResponse response) throws OpenClinicaException, UnsupportedEncodingException {
             SecureController.this.process(request, response);
         }
+    }
+
+
+    public CRFLocker getCrfLocker() {
+        return crfLocker;
     }
 }

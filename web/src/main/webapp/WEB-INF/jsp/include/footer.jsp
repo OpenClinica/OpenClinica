@@ -3,6 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
  
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.licensing" var="licensing"/>
  
 <!-- END MAIN CONTENT AREA -->
 </td>
@@ -22,17 +23,17 @@
           
                 </td>
                 <td class="footer_bottom" >
-				<fmt:message key="footer.license.1" bundle="${resword}"/> 
-               <fmt:message key="footer.license.2" bundle="${resword}"/>
-			   <fmt:message key="footer.license.3" bundle="${resword}"/></td>
+				<fmt:message key="footer.license.1" bundle="${licensing}"/> 
+               <fmt:message key="footer.license.2" bundle="${licensing}"/>
+			   <fmt:message key="footer.license.3" bundle="${licensing}"/></td>
 				
                 <td  class="footer_bottom" style="width:200px;">
 				
-                    <!-- <a href="javascript:void(0)" onmouseover="Tip('<fmt:message key="footer.tooltip" bundle="${resword}"/>')" onmouseout="UnTip()">
+                    <!-- <a href="javascript:void(0)" onmouseover="Tip('<fmt:message key="footer.tooltip" bundle="${licensing}"/>')" onmouseout="UnTip()">
                     -->
 					<div id="footer_tooltip">
-                    <span onmouseover="Tip('<fmt:message key="footer.tooltip" bundle="${resword}"/>')" onmouseout="UnTip()" style="color: #789EC5;"  >
-                      <fmt:message key="footer.edition.2" bundle="${resword}" /></span>
+                    <span onmouseover="Tip('<fmt:message key="footer.tooltip" bundle="${licensing}"/>')" onmouseout="UnTip()" style="color: #789EC5;"  >
+                      <fmt:message key="footer.edition.2" bundle="${licensing}" /></span>
 					  </div>
 					 <div  id="version"></div><fmt:message key="Version_release" bundle="${resword}"/> </div>
                 </td>

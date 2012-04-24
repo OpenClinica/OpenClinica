@@ -47,9 +47,6 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <listener-class>org.akaza.openclinica.dao.core.OCContextLoaderListener</listener-class>
     </listener>
     <listener>
-        <listener-class>org.akaza.openclinica.control.OCSessionListener</listener-class>
-    </listener>
-    <listener>
     <listener-class>
       org.springframework.security.web.session.HttpSessionEventPublisher
     </listener-class>

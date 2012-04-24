@@ -15,14 +15,20 @@ package org.akaza.openclinica.web.filter;
  * limitations under the License.
  */
 
+import java.util.Date;
+import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.core.CoreSecureController;
-import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.core.CRFLocker;
 import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.admin.AuditEventDAO;
 import org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean;
 import org.akaza.openclinica.domain.technicaladmin.LoginStatus;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -35,14 +41,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.TextEscapeUtils;
 import org.springframework.util.Assert;
-
-import java.util.Date;
-import java.util.Locale;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
 
 /**
  * Processes an authentication form submission. Called {@code AuthenticationProcessingFilter} prior to Spring Security
@@ -76,6 +74,7 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
     private ConfigurationDao configurationDao;
     private UserAccountDAO userAccountDao;
     private DataSource dataSource;
+    private org.akaza.openclinica.core.CRFLocker crfLocker;
 
     //~ Constructors ===================================================================================================
 
@@ -123,16 +122,15 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
             EntityBean eb = getUserAccountDao().findByUserName(username);
             userAccountBean = eb.getId() != 0 ? (UserAccountBean) eb : null;
             // Manually Checking if the user is locked which should be thrown by authenticate. Mantis Issue: 9016
-            // ToDo somebody should find why getAuthenticationManager().authenticate is not working!    
+            // ToDo somebody should find why getAuthenticationManager().authenticate is not working!
             if (userAccountBean != null && userAccountBean.getStatus().isLocked()) {
                 throw new LockedException("locked");
             }
             authentication = this.getAuthenticationManager().authenticate(authRequest);
             auditUserLogin(username, LoginStatus.SUCCESSFUL_LOGIN, userAccountBean);
             resetLockCounter(username, LoginStatus.SUCCESSFUL_LOGIN, userAccountBean);
-            //To remove the locking of Event CRFs previusly locked by this user. 
-            SecureController.removeLockedCRF(userAccountBean.getId());
-            CoreSecureController.removeLockedCRF(userAccountBean.getId());
+            //To remove the locking of Event CRFs previusly locked by this user.
+            crfLocker.unlockAllForUser(userAccountBean.getId());
         } catch (LockedException le) {
             auditUserLogin(username, LoginStatus.FAILED_LOGIN_LOCKED, userAccountBean);
             throw le;
@@ -283,6 +281,14 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
 
     public UserAccountDAO getUserAccountDao() {
         return userAccountDao != null ? userAccountDao : new UserAccountDAO(dataSource);
+    }
+
+    public CRFLocker getCrfLocker() {
+        return crfLocker;
+    }
+
+    public void setCrfLocker(CRFLocker crfLocker) {
+        this.crfLocker = crfLocker;
     }
 
 }

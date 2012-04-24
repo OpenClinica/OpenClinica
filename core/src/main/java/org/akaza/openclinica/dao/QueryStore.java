@@ -66,6 +66,15 @@ public class QueryStore implements Serializable, ResourceLoaderAware {
         return q;
     }
 
+    public boolean hasQuery(String fileName, String queryId) {
+        Properties file = fileByName.get(fileName);
+        if (file == null) {
+            throw new IllegalArgumentException("The queries file '" + fileName + "' could not be found");
+        }
+        String q = file.getProperty(queryId);
+        return q != null;
+    }
+
     protected String resolveDbFolder() {
         try {
             String url = dataSource.getConnection().getMetaData().getURL();

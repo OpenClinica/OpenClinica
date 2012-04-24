@@ -1,13 +1,9 @@
 package org.akaza.openclinica.control.submit;
 
-import org.akaza.openclinica.control.core.CoreSecureController;
-import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.control.OCSessionListener;
-import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-
-import javax.servlet.http.HttpSessionListener;
+import org.akaza.openclinica.web.InsufficientPermissionException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -16,12 +12,14 @@ import javax.servlet.http.HttpSessionListener;
  * Time: 3:32:44 PM
  */
 public class CheckCRFLocked extends SecureController {
+    @Override
     protected void processRequest() throws Exception {
         int userId;
         String ecId = request.getParameter("ecId");
         if (ecId != null && !ecId.equals("")) {
-            if (getUnavailableCRFList().containsKey(Integer.parseInt(ecId))) {
-                userId = (Integer)getUnavailableCRFList().get(Integer.parseInt(ecId));
+            int crfId = Integer.parseInt(ecId);
+            if (getCrfLocker().isLocked(crfId)) {
+                userId = getCrfLocker().getLockOwner(crfId);
                 UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
                 UserAccountBean ubean = (UserAccountBean)udao.findByPK(userId);
                 response.getWriter().print(resword.getString("CRF_unavailable") +
@@ -32,8 +30,7 @@ public class CheckCRFLocked extends SecureController {
             }
             return;
         }else if(request.getParameter("userId")!=null) {
-            removeLockedCRF(Integer.parseInt(request.getParameter("userId")));
-            CoreSecureController.removeLockedCRF(Integer.parseInt(request.getParameter("userId")));  
+            getCrfLocker().unlockAllForUser(Integer.parseInt(request.getParameter("userId")));
             if(request.getParameter("exitTo")!=null){
                 response.sendRedirect(request.getParameter("exitTo"));
             }else{

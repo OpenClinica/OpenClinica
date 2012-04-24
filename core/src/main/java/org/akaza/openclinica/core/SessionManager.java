@@ -7,6 +7,15 @@
  */
 package org.akaza.openclinica.core;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.logging.Level;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
+
 import oracle.jdbc.pool.OracleDataSource;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -18,15 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.logging.Level;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
-
 ;
 
 /**
@@ -36,7 +36,7 @@ import javax.sql.DataSource;
  * change to all control servlets; new SessionManagers will have to be stored in
  * session, since we don't want to take in all this information every time a
  * user clicks on a new servlet.
- * 
+ *
  * @author Tom Hickerson
  * @author Jun Xu
  */
@@ -63,7 +63,7 @@ public class SessionManager {
 
     /**
      * Constructor of SessionManager
-     * 
+     *
      * @param userFromSession
      * @param userName
      * @throws SQLException
@@ -75,7 +75,7 @@ public class SessionManager {
 
     /**
      * Constructor of SessionManager
-     * 
+     *
      * @param userFromSession
      * @param userName
      * @throws SQLException
@@ -85,10 +85,11 @@ public class SessionManager {
         staticDataSource = ds;
         setupUser(userFromSession, userName);
     }
-    public SessionManager( ApplicationContext applicationContext) throws SQLException {
+
+    public SessionManager( ApplicationContext applicationContext) {
         this.ds = (DataSource) applicationContext.getBean("dataSource");
         staticDataSource = ds;
-       
+
     }
     public void setupUser(UserAccountBean userFromSession, String userName) {
         if (userFromSession == null || StringUtil.isBlank(userFromSession.getName())) {
@@ -107,8 +108,8 @@ public class SessionManager {
         }
     }
 
- 
-    
+
+
     public void setupDataSource() {
         // begin remove later
         // logger.info("***** BEGIN LISTING PROPERTIES *****");

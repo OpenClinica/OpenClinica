@@ -38,7 +38,6 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
-import org.akaza.openclinica.control.core.CoreSecureController;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.CreateNewStudyEventServlet;
@@ -107,8 +106,7 @@ public class ViewStudySubjectServlet extends SecureController {
         // YW 10-18-2007, if a study subject with passing parameter does not
         // belong to user's studies, it can not be viewed
 //        mayAccess();
-        removeLockedCRF(ub.getId());
-        CoreSecureController.removeLockedCRF(ub.getId());
+        getCrfLocker().unlockAllForUser(ub.getId());
         if (ub.isSysAdmin()) {
             return;
         }
@@ -184,7 +182,7 @@ public class ViewStudySubjectServlet extends SecureController {
         String crfVersionChangeMsg = fp.getString("isFromCRFVersionChange");
         if ( crfVersionChangeMsg!= null && !crfVersionChangeMsg.equals("")){
         	addPageMessage(crfVersionChangeMsg);
-            
+
        }
         if (studySubId == 0) {
             addPageMessage(respage.getString("please_choose_a_subject_to_view"));
