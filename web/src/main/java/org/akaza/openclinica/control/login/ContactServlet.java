@@ -10,6 +10,7 @@ package org.akaza.openclinica.control.login;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
+import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -82,7 +83,7 @@ public class ContactServlet extends SecureController {
         emailBody.append("<br>" + resword.getString("subject") + ":" + subject);
         emailBody.append("<br>" + resword.getString("message") + ": " + message);
 
-        sendEmail(email, subject, emailBody.toString(), true);
+        sendEmail(EmailEngine.getAdminEmail(),email, subject, emailBody.toString(),true);
 
         if (ub != null && ub.getId() > 0) {
             forwardPage(Page.MENU_SERVLET);
