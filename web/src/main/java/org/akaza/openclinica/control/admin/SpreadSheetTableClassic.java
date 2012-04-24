@@ -629,7 +629,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                                             errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("RESPONSE_VALUES_column") + " "
                                                 + resPageMsg.getString("should_be_integer") + " " + resPageMsg.getString("at_row") + " " + k + ", "
                                                 + resPageMsg.getString("items_worksheet") + ".");
-                                            htmlErrors.put(j + "," + k + ",15", resPageMsg.getString("should_be_integer"));
+                                            htmlErrors.put(j + ", " + k + ", 15", resPageMsg.getString("should_be_integer"));
                                         }
                                     } else if ("real".equalsIgnoreCase(dataType)) {
                                         for (String s : resValArray) {
@@ -646,7 +646,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                                             errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("RESPONSE_VALUES_column") + " "
                                                 + resPageMsg.getString("should_be_real") + " " + resPageMsg.getString("at_row") + " " + k + ", "
                                                 + resPageMsg.getString("items_worksheet") + ".");
-                                            htmlErrors.put(j + "," + k + ",15", resPageMsg.getString("should_be_real"));
+                                            htmlErrors.put(j + ", " + k + ", 15", resPageMsg.getString("should_be_real"));
                                         }
                                     }
                                 }
