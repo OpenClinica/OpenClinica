@@ -579,7 +579,6 @@ public abstract class CoreSecureController extends HttpServlet {
             process(request, response);
         } catch (Exception e) {
             LOGGER.error("Error processing request", e);
-        } finally {
             unlockCRFOnError(request);
         }
     }
@@ -599,7 +598,6 @@ public abstract class CoreSecureController extends HttpServlet {
             process(request, response);
         } catch (Exception e) {
             LOGGER.error("Error processing request", e);
-        } finally {
             unlockCRFOnError(request);
         }
     }

@@ -10,8 +10,10 @@ package org.akaza.openclinica.service.managestudy;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
@@ -89,9 +91,27 @@ public class ViewNotesFilterCriteria {
         return filters;
     }
 
+    /**
+     * Processes a filter value selected by the user, converting it to the appropriate type to be used in the SQL query.
+     * @param filterName
+     * @param value
+     * @param df
+     * @return
+     */
     protected static Object processValue(String filterName, String value, DateFormat df) {
         if (Arrays.asList(NUMERIC_FILTERS).contains(filterName)) {
-            return Integer.parseInt(value);
+            // Check if the numeric value is a comma-separated list of values.
+            String multipleValues[] = StringUtils.split(value, ',');
+            if (multipleValues != null && multipleValues.length > 1) {
+                // Parse value to a list of integers.
+                List<Integer> intList = new ArrayList<Integer>(multipleValues.length);
+                for (int i = 0; i < multipleValues.length; i++) {
+                    intList.add(Integer.parseInt(multipleValues[i]));
+                }
+                return intList;
+            } else {
+                return Integer.parseInt(value);
+            }
         } else if (Arrays.asList(DATE_FILTERS).contains(filterName)) {
             try {
                 return df.parse(value);
