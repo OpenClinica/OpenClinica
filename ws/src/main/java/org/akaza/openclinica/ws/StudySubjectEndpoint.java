@@ -227,11 +227,15 @@ public class StudySubjectEndpoint {
             SubjectType subjectType = new SubjectType();
             studySubjectType.setLabel(studySubjectBean.getLabel());
             studySubjectType.setSecondaryLabel(studySubjectBean.getSecondaryLabel());
-            studySubjectType.setEnrollmentDate(getXMLGregorianCalendarDate(studySubjectBean.getEnrollmentDate()));
+            if ( studySubjectBean.getEnrollmentDate() != null){
+            	studySubjectType.setEnrollmentDate(getXMLGregorianCalendarDate(studySubjectBean.getEnrollmentDate()));
+            }
             SubjectBean subjectBean = (SubjectBean) getSubjectDao().findByPK(studySubjectBean.getSubjectId());
             subjectType.setUniqueIdentifier(subjectBean.getUniqueIdentifier());
             subjectType.setGender(GenderType.fromValue(String.valueOf(subjectBean.getGender())));
-            subjectType.setDateOfBirth(getXMLGregorianCalendarDate(subjectBean.getDateOfBirth()));
+            if ( subjectBean.getDateOfBirth() != null){
+            	subjectType.setDateOfBirth(getXMLGregorianCalendarDate(subjectBean.getDateOfBirth()));
+            }
             studySubjectType.setSubject(subjectType);
             // studySubjectType.setStudyRef(studyRef);
             logger.debug(studySubjectBean.getLabel());
@@ -262,8 +266,10 @@ public class StudySubjectEndpoint {
              EventType eventType = new EventType();
             eventType.setEventDefinitionOID(studyEventBean.getStudyEventDefinition().getOid());
             eventType.setLocation(studyEventBean.getLocation());
-            eventType.setStartDate(getXMLGregorianCalendarDate(studyEventBean.getDateStarted()));
-            eventType.setStartTime(getXMLGregorianCalendarTime(studyEventBean.getDateStarted()));
+            if ( studyEventBean.getDateStarted() != null){
+            	eventType.setStartDate(getXMLGregorianCalendarDate(studyEventBean.getDateStarted()));
+            	eventType.setStartTime(getXMLGregorianCalendarTime(studyEventBean.getDateStarted()));
+            }
             if ( studyEventBean.getDateEnded() != null){
 	            eventType.setEndDate(getXMLGregorianCalendarDate(studyEventBean.getDateEnded()));
 	            eventType.setEndTime(getXMLGregorianCalendarTime(studyEventBean.getDateEnded()));
@@ -518,6 +524,7 @@ public class StudySubjectEndpoint {
      * @throws Exception
      */
     private XMLGregorianCalendar getXMLGregorianCalendarDate(Date date) throws Exception {
+    	
         GregorianCalendar gc = new GregorianCalendar();
         gc.setTime(date);
         DatatypeFactory df = DatatypeFactory.newInstance();
