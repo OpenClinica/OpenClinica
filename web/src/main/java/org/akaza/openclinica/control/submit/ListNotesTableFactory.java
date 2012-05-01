@@ -292,7 +292,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             for (ResolutionStatus status : ResolutionStatus.list) {
                 options.add(new Option(Integer.toString(status.getId()), status.getName()));
             }
-            options.add(new Option(reterm.getString("New_and_Updated"), reterm.getString("New_and_Updated")));
+            options.add(new Option("1,2", reterm.getString("New_and_Updated")));
             return options;
         }
     }
@@ -305,7 +305,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             for (DiscrepancyNoteType type : DiscrepancyNoteType.list) {
                 options.add(new Option(Integer.toString(type.getId()), type.getName()));
             }
-            options.add(new Option(reterm.getString("Query_and_Failed_Validation_Check"), reterm.getString("Query_and_Failed_Validation_Check")));
+            options.add(new Option("1,3", reterm.getString("Query_and_Failed_Validation_Check")));
             return options;
         }
     }

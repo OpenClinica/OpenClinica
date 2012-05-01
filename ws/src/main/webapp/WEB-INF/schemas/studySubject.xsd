@@ -10,7 +10,7 @@
     <element name="createRequest">
         <complexType>
             <sequence>
-                <element name="studySubject" type="beans:studySubjectType" maxOccurs="unbounded"/>
+                <element name="studySubject" type="beans:studySubjectType"   minOccurs="1" maxOccurs="1"/>
             </sequence>
         </complexType>
     </element>

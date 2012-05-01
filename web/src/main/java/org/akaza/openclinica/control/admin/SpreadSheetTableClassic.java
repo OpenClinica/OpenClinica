@@ -559,10 +559,10 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                             // YW >>
                             if (resValArray.length != numberOfOptions) {
                                 errors.add(resPageMsg.getString("incomplete_option_value_pair") + " " + resPageMsg.getString("RESPONSE_OPTIONS_column") + " "
-                                    + resPageMsg.getString("and") + " " + resPageMsg.getString("RESPONSE_VALUES_column") + resPageMsg.getString("at_row") + k
+                                    + resPageMsg.getString("and") + " " + resPageMsg.getString("RESPONSE_VALUES_column") + " " + resPageMsg.getString("at_row") + k
                                     + " " + resPageMsg.getString("items_worksheet") + "; " + resPageMsg.getString("perhaps_missing_comma"));
-                                htmlErrors.put(j + "," + k + ",14", resPageMsg.getString("number_option_not_match"));
-                                htmlErrors.put(j + "," + k + ",15", resPageMsg.getString("number_value_not_match"));
+                                htmlErrors.put(j + ", " + k + ", 14", resPageMsg.getString("number_option_not_match"));
+                                htmlErrors.put(j + ", " + k + ", 15", resPageMsg.getString("number_value_not_match"));
                             }
                         }
 
@@ -573,19 +573,19 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                         if (StringUtil.isBlank(dataType)) {
                             errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("DATA_TYPE_column") + " "
                                 + resPageMsg.getString("was_blank_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet"));
-                            htmlErrors.put(j + "," + k + ",16", resPageMsg.getString("required_field"));
+                            htmlErrors.put(j + ", " + k + ", 16", resPageMsg.getString("required_field"));
 
                         } else {
                             if (!ItemDataType.findByName(dataType.toLowerCase())) {
                                 errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("DATA_TYPE_column") + " "
                                     + resPageMsg.getString("was_invalid_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet") + ".");
-                                htmlErrors.put(j + "," + k + ",16", resPageMsg.getString("INVALID_FIELD"));
+                                htmlErrors.put(j + ", " + k + ", 16", resPageMsg.getString("INVALID_FIELD"));
                             } else {
                                 if ("file".equalsIgnoreCase(responseType) && !"FILE".equalsIgnoreCase(dataType)) {
                                     errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("DATA_TYPE_column") + " "
-                                        + resPageMsg.getString("should_be_file") + resPageMsg.getString("at_row") + " " + k + ", "
+                                        + resPageMsg.getString("should_be_file") + " "+resPageMsg.getString("at_row") + " " + k + ", "
                                         + resPageMsg.getString("items_worksheet") + ".");
-                                    htmlErrors.put(j + "," + k + ",16", resPageMsg.getString("should_be_file"));
+                                    htmlErrors.put(j + ", " + k + ", 16", resPageMsg.getString("should_be_file"));
                                 }
                                 // dataTypeId =
                                 // (ItemDataType.getByName(dataType)).getId();
@@ -629,7 +629,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                                             errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("RESPONSE_VALUES_column") + " "
                                                 + resPageMsg.getString("should_be_integer") + " " + resPageMsg.getString("at_row") + " " + k + ", "
                                                 + resPageMsg.getString("items_worksheet") + ".");
-                                            htmlErrors.put(j + "," + k + ",15", resPageMsg.getString("should_be_integer"));
+                                            htmlErrors.put(j + ", " + k + ", 15", resPageMsg.getString("should_be_integer"));
                                         }
                                     } else if ("real".equalsIgnoreCase(dataType)) {
                                         for (String s : resValArray) {
@@ -646,7 +646,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                                             errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("RESPONSE_VALUES_column") + " "
                                                 + resPageMsg.getString("should_be_real") + " " + resPageMsg.getString("at_row") + " " + k + ", "
                                                 + resPageMsg.getString("items_worksheet") + ".");
-                                            htmlErrors.put(j + "," + k + ",15", resPageMsg.getString("should_be_real"));
+                                            htmlErrors.put(j + ", " + k + ", 15", resPageMsg.getString("should_be_real"));
                                         }
                                     }
                                 }

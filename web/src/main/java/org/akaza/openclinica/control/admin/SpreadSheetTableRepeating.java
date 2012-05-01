@@ -608,7 +608,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             // FIELD");
                             errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("RESPONSE_VALUES_column") + " "
                                 + resPageMsg.getString("was_blank_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet") + ".");
-                            htmlErrors.put(j + "," + k + ",16", resPageMsg.getString("required_field"));
+                            htmlErrors.put(j + ", " + k + ", 16", resPageMsg.getString("required_field"));
                         }
                         // YW 1-25-2008 << validate scoring expression
                         if (responseTypeId == ResponseType.CALCULATION.getId()
@@ -689,10 +689,10 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                  * MATCH");
                                  */
                                 errors.add(resPageMsg.getString("incomplete_option_value_pair") + " " + resPageMsg.getString("RESPONSE_OPTIONS_column") + " "
-                                    + resPageMsg.getString("and") + " " + resPageMsg.getString("RESPONSE_VALUES_column") + resPageMsg.getString("at_row") + k
+                                    + resPageMsg.getString("and") + " " + resPageMsg.getString("RESPONSE_VALUES_column") + " "+resPageMsg.getString("at_row") + k
                                     + " " + resPageMsg.getString("items_worksheet") + "; " + resPageMsg.getString("perhaps_missing_comma"));
-                                htmlErrors.put(j + "," + k + ",15", resPageMsg.getString("number_option_not_match"));
-                                htmlErrors.put(j + "," + k + ",16", resPageMsg.getString("number_value_not_match"));
+                                htmlErrors.put(j + ", " + k + ", 15", resPageMsg.getString("number_option_not_match"));
+                                htmlErrors.put(j + ", " + k + ", 16", resPageMsg.getString("number_value_not_match"));
                             }
                         }
 
@@ -824,7 +824,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                             errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("RESPONSE_VALUES_column") + " "
                                                 + resPageMsg.getString("should_be_integer") + " " + resPageMsg.getString("at_row") + " " + k + ", "
                                                 + resPageMsg.getString("items_worksheet") + ".");
-                                            htmlErrors.put(j + "," + k + ",16", resPageMsg.getString("should_be_integer"));
+                                            htmlErrors.put(j + ", " + k + ", 16", resPageMsg.getString("should_be_integer"));
                                         }
                                     } else if ("real".equalsIgnoreCase(dataType)) {
                                         for (String s : resValArray) {
@@ -841,7 +841,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                             errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("RESPONSE_VALUES_column") + " "
                                                 + resPageMsg.getString("should_be_real") + " " + resPageMsg.getString("at_row") + " " + k + ", "
                                                 + resPageMsg.getString("items_worksheet") + ".");
-                                            htmlErrors.put(j + "," + k + ",16", resPageMsg.getString("should_be_real"));
+                                            htmlErrors.put(j + ", " + k + ", 16", resPageMsg.getString("should_be_real"));
                                         }
                                     }
                                 }
