@@ -10,6 +10,7 @@ package org.akaza.openclinica.control.submit;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -4422,6 +4423,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
             }
 
         }// if hasItemGroup
+    
+        Collections.sort(displayItemWithGroups);
+        
          return displayItemWithGroups;
     }
 
@@ -4824,7 +4828,14 @@ public abstract class DataEntryServlet extends CoreSecureController {
         }
 
         if (!oldItemdata.containsKey(idb.getId()))
-            return true;
+        {
+            if(value!=null && value.isEmpty())//This is to address the case where the record does not exist due to Import and upon saving the value could be empty string.
+                return false;
+            else
+            {
+                return true;
+            }
+        }
         else {
             String oldValue = oldItemdata.get(idb.getId());
             if (oldValue != null) {
