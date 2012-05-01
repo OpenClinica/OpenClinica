@@ -1,5 +1,14 @@
 package org.akaza.openclinica.logic.rulerunner;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -20,15 +29,6 @@ import org.akaza.openclinica.logic.expressionTree.OpenClinicaExpressionParser;
 import org.akaza.openclinica.logic.rulerunner.MessageContainer.MessageType;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.sql.DataSource;
 
 public class ImportDataRuleRunner extends RuleRunner {
 
@@ -57,9 +57,7 @@ public class ImportDataRuleRunner extends RuleRunner {
             for(ImportDataRuleRunnerContainer container : containers) {
                 MessageContainer messageContainer =
                         this.runRules(study, ub, (HashMap<String, String>)container.getVariableAndValue(), container.getRuleActionContainerMap());
-                if(messageContainer != null) {
-                    messageMap.putAll(messageContainer.getByMessageType(MessageType.ERROR));
-                }
+                messageMap.putAll(messageContainer.getByMessageType(MessageType.ERROR));
             }
         }
         return messageMap;

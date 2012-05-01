@@ -1,5 +1,23 @@
 package org.akaza.openclinica.web.job;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.TriggerBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
@@ -36,6 +54,7 @@ import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.crfdata.ImportCRFDataService;
+import org.apache.commons.lang.StringUtils;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Unmarshaller;
 import org.quartz.JobDataMap;
@@ -53,24 +72,6 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-
-import javax.sql.DataSource;
 
 /**
  * Import Spring Job, a job running asynchronously on the Tomcat server using Spring and Quartz.
@@ -139,6 +140,7 @@ public class ImportSpringJob extends QuartzJobBean {
         respage = ResourceBundleProvider.getPageMessagesBundle();
         triggerService = new TriggerService();
 
+
         JobDataMap dataMap = context.getMergedJobDataMap();
         SimpleTrigger trigger = (SimpleTrigger) context.getTrigger();
         TriggerBean triggerBean = new TriggerBean();
@@ -149,6 +151,7 @@ public class ImportSpringJob extends QuartzJobBean {
             ApplicationContext appContext = (ApplicationContext) context.getScheduler().getContext().get("applicationContext");
             dataSource = (DataSource) appContext.getBean("dataSource");
             mailSender = (OpenClinicaMailSender) appContext.getBean("openClinicaMailSender");
+            RuleSetServiceInterface ruleSetService = (RuleSetServiceInterface) appContext.getBean("ruleSetService");
 
             itemDataDao = new ItemDataDAO(dataSource);
             eventCrfDao = new EventCRFDAO(dataSource);
@@ -233,7 +236,8 @@ public class ImportSpringJob extends QuartzJobBean {
                 cutAndPaste(target, destination);
                 // do everything else here with 'destination'
                 System.out.println("=== about to start processData... ===");
-                ArrayList<String> auditMessages = processData(destination, dataSource, respage, ub, studyBean, destDirectory, triggerBean, appContext);
+                ArrayList<String> auditMessages = processData(destination, dataSource, respage, ub, studyBean,
+                        destDirectory, triggerBean, ruleSetService);
                 System.out.println("=== finished process data, audit message returned ===");
                 // String[] messages = auditMessage.split("===+");
 
@@ -301,7 +305,7 @@ public class ImportSpringJob extends QuartzJobBean {
      * return a message which will go to audit and to the end user.
      */
     private ArrayList<String> processData(File[] dest, DataSource dataSource, ResourceBundle respage, UserAccountBean ub, StudyBean studyBean,
-            File destDirectory, TriggerBean triggerBean, ApplicationContext appContext) throws Exception {
+            File destDirectory, TriggerBean triggerBean, RuleSetServiceInterface ruleSetService) throws Exception {
         StringBuffer msg = new StringBuffer();
         StringBuffer auditMsg = new StringBuffer();
         Mapping myMap = new Mapping();
@@ -588,8 +592,6 @@ public class ImportSpringJob extends QuartzJobBean {
                 // message at the end
 
               //setup ruleSets to run if applicable
-                RuleSetServiceInterface ruleSetService =
-                        (RuleSetServiceInterface)appContext.getBean("ruleSetService");
                 List<ImportDataRuleRunnerContainer> containers =
                         this.ruleRunSetup(dataSource, studyBean, ub, ruleSetService, odmContainer);
 
@@ -793,16 +795,14 @@ public class ImportSpringJob extends QuartzJobBean {
     }
 
     private StringBuffer extractRuleActionWarnings(HashMap<String, ArrayList<String>> summaryMap) {
-        //List<String> messages = new ArrayList<String>();
-        StringBuffer mesg = new StringBuffer();
+        StringBuffer messages = new StringBuffer();
         if(summaryMap != null && !summaryMap.isEmpty()) {
             for (String key : summaryMap.keySet()) {
-                mesg.append(key+" : ");
-                for(String s : summaryMap.get(key)) {
-                    mesg.append(s+", ");
-                }
+                messages.append(key);
+                messages.append(" : ");
+                messages.append(StringUtils.join(summaryMap.get(key), ", "));
             }
         }
-        return new StringBuffer();
+        return messages;
     }
 }
