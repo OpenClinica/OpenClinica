@@ -38,9 +38,6 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <param-value>org/</param-value>
     </context-param>
 
-
-
-
     <listener>
         <!--@pgawade 01-DEC-2010 Replaced the listener with the extended class
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>-->
