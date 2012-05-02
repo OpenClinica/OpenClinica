@@ -7,6 +7,7 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -153,7 +154,6 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
         respage = ResourceBundleProvider.getPageMessagesBundle(locale);
         resworkflow = ResourceBundleProvider.getWorkflowBundle(locale);
 
-        local_df = new SimpleDateFormat(resformat.getString("date_format_string"), ResourceBundleProvider.getLocale());
     }
 
     // BWP 01/08>>
@@ -338,6 +338,8 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
             Date tmpDate = displayBean.getEventCRF().getDateInterviewed();
             String formattedInterviewerDate;
             try {
+                DateFormat local_df = new SimpleDateFormat(resformat.getString("date_format_string"),
+                        ResourceBundleProvider.getLocale());
                 formattedInterviewerDate = local_df.format(tmpDate);
             } catch (Exception e) {
                 formattedInterviewerDate = "";

@@ -7,6 +7,16 @@
  */
 package org.akaza.openclinica.dao.submit;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.ApplicationConstants;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.ItemDataType;
@@ -24,17 +34,6 @@ import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.i18n.util.I18nFormatUtil;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-
-import javax.sql.DataSource;
 
 /**
  * <P>
@@ -86,14 +85,10 @@ public class ItemDataDAO extends AuditableEntityDAO {
     public ItemDataDAO(DataSource ds, Locale locale) {
         super(ds);
         setQueryNames();
-        this.locale = locale;
-        if(locale == null) {
+        if (locale != null) {
+            this.locale = locale;
+        } else {
             this.locale = ResourceBundleProvider.getLocale();
-            if(locale == null) {
-                logger.info("Locale is NULL.");
-            } else {
-                logger.info("Locale is from ResourceBundleProvider.getLocale(), and locale="+this.locale.toString());
-            }
         }
         if(this.locale != null) {
             local_df_string = ResourceBundleProvider.getFormatBundle(this.locale).getString("date_format_string");
@@ -536,8 +531,8 @@ public class ItemDataDAO extends AuditableEntityDAO {
     }
 
 
-  
-    
+
+
     public ArrayList<ItemDataBean> findAllByEventCRFId(int eventCRFId) {
         setTypesExpected();
         HashMap<Integer, Object> variables = new HashMap<Integer, Object>();
