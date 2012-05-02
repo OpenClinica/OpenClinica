@@ -1,5 +1,17 @@
 package org.akaza.openclinica.control.submit;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -40,18 +52,6 @@ import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 
     private RuleSetServiceInterface ruleSetService;
@@ -64,7 +64,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
     private final String designerURL;
     private String[] columnNames = new String[] {};
     private UserAccountBean currentUser;
-    
+
     private String designerLink;
     public UserAccountBean getCurrentUser() {
         return currentUser;
@@ -295,7 +295,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
     /**
      * A very custom way to filter the items. The AuditUserLoginFilter acts as a command for the Hibernate criteria object.
      * Take the Limit information and filter the rows.
-     * 
+     *
      * @param limit The Limit to use.
      */
     protected ViewRuleAssignmentFilter getViewRuleAssignmentFilter(Limit limit) {
@@ -322,7 +322,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
     /**
      * A very custom way to sort the items. The AuditUserLoginSort acts as a command for the Hibernate criteria object. Take
      * the Limit information and sort the rows.
-     * 
+     *
      * @param limit The Limit to use.
      */
     protected ViewRuleAssignmentSort getViewRuleAssignmentSort(Limit limit) {
@@ -533,7 +533,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
                 // builder.tr(1).close().td(1).close().append(ruleAction.getExpressionEvaluatesTo()).tdEnd().trEnd(1);
             }
             // builder.tableEnd(1);
-            
+
             return builder.toString();
         }
 
@@ -643,16 +643,17 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
             }
             return expressionEvaluatesTo;
         }
-        
+
         public void appendRunOn(HtmlBuilder builder, RuleActionBean ruleAction) {
             String s = "";
             RuleActionRunBean ruleActionRun = ruleAction.getRuleActionRun();
             if(ruleActionRun.getInitialDataEntry()) s+=resword.getString("IDE_comma")+" ";
             if(ruleActionRun.getDoubleDataEntry()) s+=resword.getString("DDE_comma")+" ";
             if(ruleActionRun.getAdministrativeDataEntry()) s+=resword.getString("ADE_comma")+" ";
+            if (ruleActionRun.getImportDataEntry()) s += resword.getString("import_comma") + " ";
             if(ruleActionRun.getBatch()) s+=resword.getString("batch_comma")+" ";
             s = s.trim(); s = s.substring(0,s.length()-1);
-            if(s.length()>0) 
+            if(s.length()>0)
                 builder.tr(1).close().td(1).close().append("<i>" + resword.getString("run_on_colon") + "</i>").tdEnd().td(1).close().append(s).tdEnd().trEnd(1);
         }
 
@@ -671,7 +672,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
                 appendDestProps(builder,a.getProperties());
             }
         }
-        private void appendDestProps(HtmlBuilder builder, 
+        private void appendDestProps(HtmlBuilder builder,
                 List<org.akaza.openclinica.domain.rule.action.PropertyBean> propertyBeans) {
             if(propertyBeans!=null && propertyBeans.size()>0) {
                 String s = "";
@@ -850,7 +851,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         return actionLink.toString();
 
     }
-    
+
     public String getDesingerLink(){
         return designerLink;
     }

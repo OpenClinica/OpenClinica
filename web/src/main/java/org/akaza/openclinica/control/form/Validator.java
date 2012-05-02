@@ -7,6 +7,24 @@
  */
 package org.akaza.openclinica.control.form;
 
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.EntityAction;
 import org.akaza.openclinica.bean.core.EntityBean;
@@ -29,24 +47,6 @@ import org.akaza.openclinica.i18n.util.I18nFormatUtil;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.math.BigDecimal;
-import java.text.NumberFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  *
@@ -1265,7 +1265,7 @@ public class Validator {
     protected boolean isDateInPast(String fieldName) {
         Date d = null;
         if (fieldName != null) {
-            d = FormProcessor.getDateFromString(getFieldValue(fieldName));
+            d = FormProcessor.parseDate(getFieldValue(fieldName), locale);
         }
         if (d != null) {
             Date today = new Date();
@@ -1283,7 +1283,7 @@ public class Validator {
     protected boolean isDateInPast(String fieldName, Locale locale) {
         Date d = null;
         if (fieldName != null) {
-            d = FormProcessor.getDateFromString(getFieldValue(fieldName));
+            d = FormProcessor.parseDate(getFieldValue(fieldName), locale);
         }
         if (d != null) {
             Date today = new Date();
@@ -1646,8 +1646,8 @@ public class Validator {
             return false;
         }
 
-        Date laterDate = FormProcessor.getDateFromString(laterDateValue);
-        Date earlierDate = FormProcessor.getDateFromString(earlierDateValue);
+        Date laterDate = FormProcessor.parseDate(laterDateValue, locale);
+        Date earlierDate = FormProcessor.parseDate(earlierDateValue, locale);
 
         if (laterDate.compareTo(earlierDate) >= 0) {
             return true;

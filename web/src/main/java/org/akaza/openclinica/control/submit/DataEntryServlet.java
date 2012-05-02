@@ -8,6 +8,8 @@
 package org.akaza.openclinica.control.submit;
 
 import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -615,7 +617,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
         fp.addPresetValue(INPUT_INTERVIEWER, ecb.getInterviewerName());
 
         if (ecb.getDateInterviewed() != null) {
-            // SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+            DateFormat local_df = new SimpleDateFormat(resformat.getString("date_format_string"),
+                    ResourceBundleProvider.getLocale());
             String idateFormatted = local_df.format(ecb.getDateInterviewed());
             fp.addPresetValue(INPUT_INTERVIEW_DATE, idateFormatted);
         } else {
@@ -4370,7 +4373,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
         if (hasItemGroup) {
             ItemDataDAO iddao = new ItemDataDAO(getDataSource(),locale);
-           
+
             ArrayList<ItemDataBean> data = iddao.findAllActiveBySectionIdAndEventCRFId(sb.getId(), ecb.getId());
             HashMap<String,ItemDataBean> dataMap = (HashMap<String, ItemDataBean>) getAllActive(data);
 
@@ -4398,7 +4401,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 List<ItemBean> itBeans = idao.findAllItemsByGroupIdOrdered(itemGroup.getItemGroupBean().getId(), sb.getCRFVersionId());
 
                 List<DisplayItemBean> dibs  = new ArrayList();
-           
+
                 boolean hasData = false;
                 int checkAllColumns = 0;
                 if(data.size()>0) hasData=true;
@@ -4422,12 +4425,15 @@ public abstract class DataEntryServlet extends CoreSecureController {
             }
 
         }// if hasItemGroup
+
+        Collections.sort(displayItemWithGroups);
+
          return displayItemWithGroups;
     }
 
   private Map getAllActive(List<ItemDataBean>al){
       Map returnMap = new HashMap<String,ItemDataBean>();
-      
+
       for(ItemDataBean itBean:al){
           if(itBean!=null)
           returnMap.put(new String(itBean.getItemId()+","+itBean.getOrdinal()), itBean);
@@ -4447,7 +4453,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
             List<DisplayItemBean> displayItemBeans = new ArrayList<DisplayItemBean>();
             DisplayItemGroupBean dig = new DisplayItemGroupBean();
-            
+
             for(ItemBean itBean:itBeans){
 
                 DisplayItemBean displayItemBean = new DisplayItemBean();
@@ -4824,7 +4830,14 @@ public abstract class DataEntryServlet extends CoreSecureController {
         }
 
         if (!oldItemdata.containsKey(idb.getId()))
-            return true;
+        {
+            if(value!=null && value.isEmpty())//This is to address the case where the record does not exist due to Import and upon saving the value could be empty string.
+                return false;
+            else
+            {
+                return true;
+            }
+        }
         else {
             String oldValue = oldItemdata.get(idb.getId());
             if (oldValue != null) {
@@ -5295,7 +5308,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         return errors;
     }
 
-  
+
 
     /*Determining the resolution status that will be shown in color flag for an item.*/
     private int getDiscrepancyNoteResolutionStatus(int itemDataId, ArrayList formNotes) {

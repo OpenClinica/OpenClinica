@@ -1,7 +1,6 @@
 package org.akaza.openclinica.control.core;
 
 import java.io.UnsupportedEncodingException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -48,7 +47,6 @@ import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
-import org.akaza.openclinica.i18n.util.I18nFormatUtil;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.BreadcrumbTrail;
 import org.akaza.openclinica.view.Page;
@@ -84,10 +82,7 @@ public abstract class CoreSecureController extends HttpServlet {
     private static String SCHEDULER = "schedulerFactoryBean";
 
     private StdScheduler scheduler;
-    /**
-     * local_df is set to the client locale in each request.
-     */
-    protected SimpleDateFormat local_df = new SimpleDateFormat("MM/dd/yyyy");
+
     public static ResourceBundle resadmin, resaudit, resexception, resformat, respage, resterm, restext, resword, resworkflow;
 
     protected StudyInfoPanel panel = new StudyInfoPanel();
@@ -357,8 +352,6 @@ public abstract class CoreSecureController extends HttpServlet {
         resword = ResourceBundleProvider.getWordsBundle(locale);
         respage = ResourceBundleProvider.getPageMessagesBundle(locale);
         resworkflow = ResourceBundleProvider.getWorkflowBundle(locale);
-
-        local_df = I18nFormatUtil.getDateFormat(locale);
 
         try {
             String userName = request.getRemoteUser();
