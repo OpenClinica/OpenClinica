@@ -49,9 +49,12 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
         public DiscrepancyNoteBean mapRow(ResultSet rs, int rowNum) throws SQLException {
             DiscrepancyNoteBean b = new DiscrepancyNoteBean();
             b.setId(rs.getInt("discrepancy_note_id"));
+            b.setEntityId(rs.getInt("entity_id"));
+            b.setColumn(rs.getString("column_name"));
             b.setStudyId(rs.getInt("study_id"));
+            b.setSubjectId(rs.getInt("study_subject_id"));
             StudySubjectBean studySubjectBean = new StudySubjectBean();
-            studySubjectBean.setId(b.getStudyId());
+            studySubjectBean.setId(b.getSubjectId());
             studySubjectBean.setLabel(rs.getString("label"));
             studySubjectBean.setStatus(Status.get(rs.getInt("ss_status_id")));
             b.setStudySub(studySubjectBean);
@@ -100,6 +103,12 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
                 userBean.setLastName(rs.getString("owner_last_name"));
                 b.setOwner(userBean);
             }
+
+            // The discrepancy note's item ID is retrieved in the entity ID column when type = 'itemData'
+            if (b.getEntityType().equals("itemData")) {
+                b.setItemId(b.getEntityId());
+            }
+
             return b;
         }
     };
