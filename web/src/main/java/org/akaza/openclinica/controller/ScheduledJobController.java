@@ -176,7 +176,7 @@ public class ScheduledJobController {
              String contextPath = request.getContextPath();
             StringBuilder jsCodeString =
                  new StringBuilder("this.form.method='GET'; this.form.action='").append(contextPath).append("/pages/cancelScheduledJob").append("';").append(
-                         "this.form.theJobName.value='").append(st.getName()).append("';").append(
+                         "this.form.theJobName.value='").append(st.getJobName()).append("';").append(
                          "this.form.theJobGroupName.value='").append(st.getJobGroup()).append("';").append(
                          "this.form.theTriggerName.value='").append(st.getName()).append("';").
                          append("this.form.theTriggerGroupName.value='").append(st.getGroup()).append("';").append("this.form.submit();");

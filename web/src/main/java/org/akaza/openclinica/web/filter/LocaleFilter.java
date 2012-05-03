@@ -1,9 +1,5 @@
 package org.akaza.openclinica.web.filter;
 
-import org.akaza.openclinica.i18n.core.LocaleResolver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.util.Locale;
 
@@ -17,6 +13,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.jsp.jstl.core.Config;
+
+import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Filter for applying the OpenClinica's Locale
@@ -54,10 +54,10 @@ public final class LocaleFilter implements Filter {
                 Config.set(session, Config.FMT_LOCALE, locale);
                 if(response != null)    response.setLocale(locale);
             } else {
-                logger.info("Locale can not be saved into session because session is null.");
+                logger.debug("Locale can not be saved into session because session is null.");
             }
         } else {
-            logger.info("No Locale updating has been done because passed Locale is null.");
+            logger.debug("No Locale updating has been done because passed Locale is null.");
         }
     }
 }

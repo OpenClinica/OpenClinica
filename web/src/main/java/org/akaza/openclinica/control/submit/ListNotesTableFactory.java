@@ -7,6 +7,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
@@ -118,7 +120,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         configureColumn(row.getColumn("eventName"), resword.getString("event_name"), null, null, true, false);
         configureColumn(row.getColumn("crfName"), resword.getString("CRF"), null, null, true, false);
         configureColumn(row.getColumn("crfStatus"), resword.getString("CRF_status"), null, null, false, false);
-        configureColumn(row.getColumn("entityName"), resword.getString("entity_name"), null, null, true, false);
+        configureColumn(row.getColumn("entityName"), resword.getString("entity_name"), new EntityNameCellEditor(), null, true, false);
         configureColumn(row.getColumn("entityValue"), resword.getString("entity_value"), null, null, true, false);
         configureColumn(row.getColumn("discrepancyNoteBean.description"), resword.getString("description"), null, null, true, false);
         configureColumn(row.getColumn("discrepancyNoteBean.detailedNotes"), resword.getString("detailed_notes"), null, null, false, false);
@@ -359,6 +361,31 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                 value = user.getFirstName() + " " + user.getLastName() + " (" + user.getName() + ")";
             }
             return value;
+        }
+    }
+
+    private class EntityNameCellEditor implements CellEditor {
+
+
+
+
+        @SuppressWarnings("rawtypes")
+        public Object getValue(Object item, String property, int rowcount) {
+            DiscrepancyNoteBean bean = (DiscrepancyNoteBean) ((Map) item).get("discrepancyNoteBean");
+            String entityName = "";
+            if (bean.getEntityType().equals("itemData")) {
+                entityName =  bean.getEntityName();
+            } else {
+                try {
+                    entityName = resword.getString(bean.getEntityName());
+                } catch (MissingResourceException e) {
+                    logger.warn("Missing translation for key '" + bean.getEntityName() + "'", e);
+                    entityName = "###" + bean.getEntityName() + "###";
+                }
+
+            }
+            return entityName;
+
         }
     }
 

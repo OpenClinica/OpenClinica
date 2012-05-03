@@ -300,7 +300,8 @@ public class UrlRewriteServlet extends CoreSecureController {
                                     eventRepeatKey = Integer.parseInt(eventOrdinal.trim());
                                     //validate the event ordinal specified exists in database
                                     studyEvent = (StudyEventBean)sedao.findByStudySubjectIdAndDefinitionIdAndOrdinal(subject.getId(), sed.getId(), eventRepeatKey);
-                                    if(null == studyEvent){
+                                    //this method return new StudyEvent (not null) even if no studyEvent can be found
+                                    if(null == studyEvent  || studyEvent.getId() == 0){
                                     	openClinicaResource.setInValid(true);
                                     	openClinicaResource.getMessages().add(resexception.getString("invalid_event_ordinal"));
                                     	return openClinicaResource;

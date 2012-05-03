@@ -7,6 +7,15 @@
  */
 package org.akaza.openclinica.control.form;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.dao.core.EntityDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
@@ -16,15 +25,6 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.ResourceBundle;
-
-import javax.servlet.http.HttpServletRequest;
 
 // import javax.servlet.*;
 // import java.io.*;
@@ -54,7 +54,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class FormProcessor {
     private HttpServletRequest request;
-    private static Locale locale;
+    private final Locale locale;
     private HashMap presetValues;
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -286,7 +286,22 @@ public class FormProcessor {
      * @return
      */
     // GET DATE
-    public static Date getDateFromString(String date) {
+    public Date getDateFromString(String date) {
+        Date answer;
+        //Locale locale = ResourceBundleProvider.getLocale();
+        try {
+            SimpleDateFormat f = I18nFormatUtil.getDateFormat(locale);
+            f.setLenient(false);
+            answer = f.parse(date);
+        } catch (Exception e) {
+            //answer = DEFAULT_DATE;
+            answer = null;
+        }
+
+        return answer;
+    }
+
+    public static Date parseDate(String date, Locale locale) {
         Date answer;
         //Locale locale = ResourceBundleProvider.getLocale();
         try {
@@ -305,7 +320,7 @@ public class FormProcessor {
         Date answer;
         String fieldValue = getString(fieldName, searchAttributes);
 
-        return FormProcessor.getDateFromString(fieldValue);
+        return getDateFromString(fieldValue);
     }
 
     public Date getDate(String fieldName) {
@@ -318,7 +333,7 @@ public class FormProcessor {
      * @return The Date object corresponding to the provided string, or
      *         DEFAULT_DATE if the string is improperly formatted.
      */
-    public static Date getDateTimeFromString(String dateTime) {
+    public Date getDateTimeFromString(String dateTime) {
         Date answer;
         //Locale locale = ResourceBundleProvider.getLocale();
         try {
