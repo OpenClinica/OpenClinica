@@ -5,7 +5,7 @@
 
      <changeSet author="drodrigues" id="2012-05-02-14122-1" dbms="postgresql">
         <comment>Dropping old view definitions.</comment>
-        <sql splitStatements="false">
+        <sql splitStatements="true">
 <![CDATA[
 drop view view_discrepancy_note;
 drop view view_dn_item_data;
@@ -18,8 +18,8 @@ drop view view_dn_subject;
     </changeSet>
 
      <changeSet author="drodrigues" id="2012-05-02-14122-2" dbms="postgresql">
-        <comment>Dropping old view definitions.</comment>
-        <sql splitStatements="false">
+        <comment>Adding new columns to 'view_dn_item_data'.</comment>
+        <sql splitStatements="true">
 <![CDATA[
 create or replace view view_dn_item_data as select 
 s.study_id, 
@@ -78,8 +78,8 @@ left join user_account ua on (dn.assigned_user_id = ua.user_id);
     </changeSet>
 
      <changeSet author="drodrigues" id="2012-05-02-14122-3" dbms="postgresql">
-        <comment>Dropping old view definitions.</comment>
-        <sql splitStatements="false">
+        <comment>Adding new columns to 'view_dn_event_crf'.</comment>
+        <sql splitStatements="true">
 <![CDATA[
 create or replace view view_dn_event_crf as 
 select 
@@ -141,8 +141,8 @@ left join user_account ua on (dn.assigned_user_id = ua.user_id);
     </changeSet>
 
      <changeSet author="drodrigues" id="2012-05-02-14122-4" dbms="postgresql">
-        <comment>Dropping old view definitions.</comment>
-        <sql splitStatements="false">
+        <comment>Adding new columns to 'view_dn_event_crf'.</comment>
+        <sql splitStatements="true">
 <![CDATA[
 create or replace view view_dn_study_event as 
 select 
@@ -201,8 +201,8 @@ left join user_account ua on (dn.assigned_user_id = ua.user_id)
     </changeSet>
 
      <changeSet author="drodrigues" id="2012-05-02-14122-5" dbms="postgresql">
-        <comment>Dropping old view definitions.</comment>
-        <sql splitStatements="false">
+        <comment>Adding new columns to 'view_dn_event_crf'.</comment>
+        <sql splitStatements="true">
 <![CDATA[
 create or replace view view_dn_study_subject as 
 select 
@@ -254,8 +254,8 @@ left join user_account ua on (dn.assigned_user_id = ua.user_id)
     </changeSet>
 
      <changeSet author="drodrigues" id="2012-05-02-14122-6" dbms="postgresql">
-        <comment>Dropping old view definitions.</comment>
-        <sql splitStatements="false">
+        <comment>Adding new columns to 'view_dn_event_crf'.</comment>
+        <sql splitStatements="true">
 <![CDATA[
 create or replace view view_dn_subject as 
 select 
@@ -313,8 +313,8 @@ left join user_account ua on (dn.assigned_user_id = ua.user_id)
     </changeSet>
 
      <changeSet author="drodrigues" id="2012-05-02-14122-7" dbms="postgresql">
-        <comment>Dropping old view definitions.</comment>
-        <sql splitStatements="false">
+        <comment>Recreating 'view_discrepancy_note'.</comment>
+        <sql splitStatements="true">
 <![CDATA[
 create or replace view view_discrepancy_note as 
 select * from view_dn_item_data
@@ -330,5 +330,13 @@ select * from view_dn_subject;
 ]]>
         </sql>
     </changeSet>
+
+     <changeSet author="drodrigues" id="2012-05-02-14122-8" dbms="postgresql">
+        <comment>Dropping legacy/unused views.</comment>
+        <dropView viewName="dn_age_days"/>
+        <dropView viewName="dn_days"/>
+        <dropView viewName="view_hidden_event_def_crf"/>
+    </changeSet>
+
 
 </databaseChangeLog>     
