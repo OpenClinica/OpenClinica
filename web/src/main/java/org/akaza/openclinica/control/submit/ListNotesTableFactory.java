@@ -168,6 +168,14 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
         notesSummary = getViewNotesService().calculateNotesSummary(getCurrentStudy(), filter);
 
+        int pageSize = limit.getRowSelect().getMaxRows();
+        int firstRecordShown = (limit.getRowSelect().getPage() - 1) * pageSize;
+        if (firstRecordShown > notesSummary.getTotal()) { // The page selected goes beyond the dataset size
+            // Move to the last page
+            limit.getRowSelect().setPage((int) Math.ceil((double) notesSummary.getTotal() / pageSize));
+            filter = ViewNotesFilterCriteria.buildFilterCriteria(limit, getDateFormat());
+        }
+
         List<DiscrepancyNoteBean> items = getViewNotesService().listNotes(getCurrentStudy(), filter,
                 ViewNotesSortCriteria.buildFilterCriteria(limit.getSortSet()));
 

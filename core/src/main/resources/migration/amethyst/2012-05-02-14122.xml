@@ -331,12 +331,4 @@ select * from view_dn_subject;
         </sql>
     </changeSet>
 
-     <changeSet author="drodrigues" id="2012-05-02-14122-8" dbms="postgresql">
-        <comment>Dropping legacy/unused views.</comment>
-        <dropView viewName="dn_age_days"/>
-        <dropView viewName="dn_days"/>
-        <dropView viewName="view_hidden_event_def_crf"/>
-    </changeSet>
-
-
 </databaseChangeLog>     
