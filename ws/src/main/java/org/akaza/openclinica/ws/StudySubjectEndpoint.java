@@ -195,7 +195,10 @@ public class StudySubjectEndpoint {
      //   System.out.println("got here before validation");
         SubjectTransferValidator subjectTransferValidator = new SubjectTransferValidator(dataSource);
         subjectTransferValidator.validateIsSubjectExists((subjectStudyBean), errors);
-     
+        if (subjectStudyBean.getSubjectOIDId() == null ){//case for core misfunction
+            errors.reject("studySubjectEndpoint.fail");
+            
+       }
         if (!errors.hasErrors()) {
            
             return new DOMSource(mapConfirmation(messages.getMessage("studySubjectEndpoint.success", null, 
@@ -493,6 +496,7 @@ public class StudySubjectEndpoint {
 	        labelElement.setTextContent(studySubjectLabel);
 	        responseElement.appendChild(labelElement);
         }
+     
         if ( errors != null){
 	        for (ObjectError error : errors.getAllErrors()) {
 	            Element errorElement = document.createElementNS(NAMESPACE_URI_V1, "error");
