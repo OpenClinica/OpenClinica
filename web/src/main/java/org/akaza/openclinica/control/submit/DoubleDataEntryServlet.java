@@ -630,7 +630,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
                     // add the validation
                     if (groupOrdinalPLusItemOid.containsKey(displayItem.getItem().getOid())
                         || groupOrdinalPLusItemOid.containsKey(String.valueOf(order + 1) + displayItem.getItem().getOid())) {
-                        System.out.println("IN : " + String.valueOf(order + 1) + displayItem.getItem().getOid());
+                    	LOGGER.debug("IN : " + String.valueOf(order + 1) + displayItem.getItem().getOid());
                         validateDisplayItemBean(v, displayItem, inputName, rv, groupOrdinalPLusItemOid, true, groupOrdinalPLusItemOid.get(String
                                 .valueOf(order + 1)
                             + displayItem.getItem().getOid()), request);
@@ -638,7 +638,7 @@ public class DoubleDataEntryServlet extends DataEntryServlet {
                         validateDisplayItemBean(v, displayItem, inputName, rv, groupOrdinalPLusItemOid, false, null, request);
                     }
                 } else {
-                    System.out.println("OUT : " + String.valueOf(order + 1) + displayItem.getItem().getOid());
+                	LOGGER.debug("OUT : " + String.valueOf(order + 1) + displayItem.getItem().getOid());
                 }
                 // validateDisplayItemBean(v, displayItem, inputName);
             }

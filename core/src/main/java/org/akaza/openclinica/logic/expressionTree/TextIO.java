@@ -65,7 +65,7 @@ public class TextIO {
      */
     public void put(Object x, int minChars) {
         if (minChars <= 0)
-            System.out.print(x);
+            logger.debug(x.toString());
         else
             System.out.printf("%" + minChars + "s", x);
     }

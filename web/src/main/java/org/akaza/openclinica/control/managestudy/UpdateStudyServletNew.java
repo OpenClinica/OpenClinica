@@ -134,7 +134,7 @@ public class UpdateStudyServletNew extends SecureController {
 
             request.setAttribute("studyToView", study);
             if (!errors.isEmpty()) {
-                System.out.println("found errors : " + errors.toString());
+                logger.error("found errors : " + errors.toString());
                 request.setAttribute("formMessages", errors);
 
                 forwardPage(Page.UPDATE_STUDY_NEW);
@@ -611,13 +611,13 @@ public class UpdateStudyServletNew extends SecureController {
 
     private void updateParameter(StudyParameterValueDAO spvdao, StudyParameterValueBean spv) {
         StudyParameterValueBean spv1 = spvdao.findByHandleAndStudy(spv.getStudyId(), spv.getParameter());
-        System.out.println("found parameter: " + spv.getParameter());
+        logger.debug("found parameter: " + spv.getParameter());
         if (spv1.getId() > 0) {
             spvdao.update(spv);
-            System.out.println("updating");
+            logger.debug("updating");
         } else {
             spvdao.create(spv);
-            System.out.println("creating");
+            logger.debug("creating");
         }
     }
 

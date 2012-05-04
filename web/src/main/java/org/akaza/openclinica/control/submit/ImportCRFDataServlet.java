@@ -167,8 +167,8 @@ public class ImportCRFDataServlet extends SecureController {
                 InputStreamReader isr = new InputStreamReader(new FileInputStream(f), "UTF-8");
                 odmContainer = (ODMContainer) um1.unmarshal(isr);
 
-                System.out.println("Found crf data container for study oid: " + odmContainer.getCrfDataPostImportContainer().getStudyOID());
-                System.out.println("found length of subject list: " + odmContainer.getCrfDataPostImportContainer().getSubjectData().size());
+                logger.debug("Found crf data container for study oid: " + odmContainer.getCrfDataPostImportContainer().getStudyOID());
+                logger.debug("found length of subject list: " + odmContainer.getCrfDataPostImportContainer().getSubjectData().size());
                 // 2. validates against ODM 1.3
                 // check it all below, throw an exception and route to a
                 // different
@@ -256,7 +256,7 @@ public class ImportCRFDataServlet extends SecureController {
                 }
 
             }
-            System.out.println("passed error check");
+            logger.debug("passed error check");
             // TODO ADD many validation steps before we get to the
             // session-setting below
             // 4. is the event in the correct status to accept data import?
@@ -288,7 +288,7 @@ public class ImportCRFDataServlet extends SecureController {
                 // HashMap<String, String>();
                 // HashMap<String, String> hardValidationErrors = new
                 // HashMap<String, String>();
-            System.out.println("found event crfs " + eventCRFBeans.size());
+            logger.debug("found event crfs " + eventCRFBeans.size());
             // -- does the event already exist? if not, fail
             if (!eventCRFBeans.isEmpty()) {
                 for (EventCRFBean eventCRFBean : eventCRFBeans) {
@@ -354,22 +354,20 @@ public class ImportCRFDataServlet extends SecureController {
                     tempDisplayItemBeanWrappers =
                         getImportCRFDataService().lookupValidationErrors(request, odmContainer, ub, totalValidationErrors, hardValidationErrors,
                                 permittedEventCRFIds);
-                    System.out.println("generated display item bean wrappers " + tempDisplayItemBeanWrappers.size());
-                    System.out.println("size of total validation errors: " + totalValidationErrors.size());
+                    logger.debug("generated display item bean wrappers " + tempDisplayItemBeanWrappers.size());
+                    logger.debug("size of total validation errors: " + totalValidationErrors.size());
                     displayItemBeanWrappers.addAll(tempDisplayItemBeanWrappers);
                 } catch (NullPointerException npe1) {
                     // what if you have 2 event crfs but the third is a fake?
                     fail = true;
                     logger.debug("threw a NPE after calling lookup validation errors");
                     addPageMessage(respage.getString("an_error_was_thrown_while_validation_errors"));
-                    System.out.println("threw the null pointer at line 323, import");
-                    // npe1.printStackTrace();
+                     // npe1.printStackTrace();
                 } catch (OpenClinicaException oce1) {
                     fail = true;
                     logger.debug("threw an OCE after calling lookup validation errors " + oce1.getOpenClinicaMessage());
                     addPageMessage(oce1.getOpenClinicaMessage());
-                    System.out.println("threw the openclinica message at line 327, import");
-                }
+                  }
             } else {
                 fail = true;
                 addPageMessage(respage.getString("no_event_crfs_matching_the_xml_metadata"));
@@ -384,7 +382,7 @@ public class ImportCRFDataServlet extends SecureController {
             // }
  }
             if (fail) {
-                System.out.println("failed here - forwarding...");
+                logger.debug("failed here - forwarding...");
                 forwardPage(Page.IMPORT_CRF_DATA);
             } else {
                 addPageMessage(respage.getString("passing_crf_edit_checks"));
@@ -396,13 +394,11 @@ public class ImportCRFDataServlet extends SecureController {
                 // generated the wrappers; soon the only thing we will use
                 // wrappers for is the 'overwrite' flag
 
-                System.out.println("found total validation errors: " + totalValidationErrors.size());
                 logger.debug("+++ content of total validation errors: " + totalValidationErrors.toString());
                 SummaryStatsBean ssBean = getImportCRFDataService().generateSummaryStatsBean(odmContainer, displayItemBeanWrappers);
                 session.setAttribute("summaryStats", ssBean);
                 // will have to set hard edit checks here as well
                 session.setAttribute("subjectData", odmContainer.getCrfDataPostImportContainer().getSubjectData());
-                System.out.println("did not fail - forwarding...");
                 forwardPage(Page.VERIFY_IMPORT_SERVLET);
             }
 //            }

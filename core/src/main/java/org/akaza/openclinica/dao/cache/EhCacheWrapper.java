@@ -47,7 +47,7 @@ public class EhCacheWrapper<K, V> implements CacheWrapper<K, V>
     private void logMe(String message){
         
         logger.debug(message);
-        //System.out.println(message);
+       
     }
 }
 

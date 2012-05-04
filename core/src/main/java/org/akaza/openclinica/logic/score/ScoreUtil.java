@@ -86,7 +86,6 @@ public class ScoreUtil {
                     tokenname = tokenname.substring(1);
                 }
                 String funcname = getFunctionName(tokenname);
-                System.out.println("found func name: " + funcname);
                 if (funcname != null && !funcname.equalsIgnoreCase("getexternalvalue") && !funcname.equalsIgnoreCase(FUNCTION_PACKAGE + "getexternalvalue")) {
                     try {
                         token.setName(sign + evalFunc(expression, info, (Function) Class.forName(funcname).newInstance()));
@@ -123,8 +122,7 @@ public class ScoreUtil {
             // So, if this happens, either the expression or unlikely code has a
             // problem.
             else if (c == ',') {
-                System.out.println("weird found , in eval");
-                token = new ScoreToken();
+                 token = new ScoreToken();
                 throw new ScoreException("Found unexpected character , when doing evaluation", "2");
             } else {
                 couldBeSign = false;
@@ -407,7 +405,6 @@ public class ScoreUtil {
         double value = Double.NaN;
         Stack<Double> st = new Stack<Double>();
         int size = exp.size();
-        System.out.println("size=" + size);
         if (size == 1) {
             try {
                 value = Double.valueOf(exp.get(0).getName());

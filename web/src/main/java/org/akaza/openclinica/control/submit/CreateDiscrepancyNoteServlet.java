@@ -365,26 +365,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             logger.info("has notes:" + "no");
         }
 
-        /*
-        if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) && currentStudy.getId() != currentStudy.getParentStudyId()
-            || currentRole.getRole().equals(Role.INVESTIGATOR)) {
-            if (parent.getId() > 0 && parent.getDisType().equals(DiscrepancyNoteType.QUERY)) {
-                ArrayList resStatuses = new ArrayList(); // ResolutionStatus.toArrayList();
-                resStatuses.add(ResolutionStatus.UPDATED);
-                resStatuses.add(ResolutionStatus.RESOLVED);//resolution proposed
-                request.setAttribute(RES_STATUSES, resStatuses);
-                System.out.println("reset resolution status");
-            } else {
-                // they cant do anything to log a new query, so we remove
-                // this type
-                ArrayList types2 = DiscrepancyNoteType.toArrayList();
-                types2.remove(DiscrepancyNoteType.QUERY);
-                request.setAttribute(DIS_TYPES, types2);
-                System.out.println("reset discrepancy types");
-            }
-
-        }*/
-        //only for adding a new thread
+              //only for adding a new thread
         if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.INVESTIGATOR)) {
             ArrayList<ResolutionStatus> resStatuses = new ArrayList<ResolutionStatus>();
             resStatuses.add(ResolutionStatus.OPEN);

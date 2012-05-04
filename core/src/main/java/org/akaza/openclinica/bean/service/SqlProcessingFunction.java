@@ -71,10 +71,7 @@ public class SqlProcessingFunction extends ProcessingFunction implements Seriali
              * // and then execute the statement here // convert the translated
              * file to a string and then tries an execute
              * 
-             * // System.out.println("-- > about to run " + statement);
-             * 
-             * System.out.println("Stament prepared"+statement);
-             * stmt.executeUpdate(statement); //stmt.close();
+               * stmt.executeUpdate(statement); //stmt.close();
              * 
              * } // stmt.executeBatch();
              */
@@ -85,7 +82,6 @@ public class SqlProcessingFunction extends ProcessingFunction implements Seriali
             }
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println(" -- > found an exception : " + e.getMessage());
             resultError = ProcessingResultType.FAIL;
             resultError.setUrl(""); // no url required
             resultError.setArchiveMessage("Failure thrown: " + e.getMessage());

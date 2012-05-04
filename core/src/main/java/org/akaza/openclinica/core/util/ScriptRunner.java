@@ -27,6 +27,9 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.sql.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Tool to run database scripts
  *  jnyayapathi
@@ -54,6 +57,8 @@ public class ScriptRunner {
 
 	private String delimiter = DEFAULT_DELIMITER;
 	private boolean fullLineDelimiter = false;
+	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	   
 
 	/**
 	 * Default constructor
@@ -231,7 +236,7 @@ public class ScriptRunner {
 
 	private void print(Object o) {
 		if (logWriter != null) {
-			System.out.print(o);
+			logger.debug(o.toString());
 		}
 	}
 

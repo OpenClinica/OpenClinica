@@ -613,7 +613,7 @@ public class XsltTransformJob extends QuartzJobBean {
 
     private void logMe(String message) {
         logger.debug(message);
-         System.out.println(message);
+        
     }
 
     private void zipAll(String path, String[] files, String zipname) throws IOException {

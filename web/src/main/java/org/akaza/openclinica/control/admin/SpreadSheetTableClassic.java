@@ -596,7 +596,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                         if (responseTypeId == 3 || responseTypeId == 5 || responseTypeId == 6 || responseTypeId == 7) {
                             // make sure same responseLabels have same datatype
                             if (labelWithType.containsKey(responseLabel)) {
-                                System.out.println("in label=" + responseLabel);
+                                logger.debug("in label=" + responseLabel);
                                 if (!dataType.equalsIgnoreCase(labelWithType.get(responseLabel).toString())) {
                                     errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("DATA_TYPE_column") + " "
                                         + resPageMsg.getString("does_not_match_the_item_data_type_with_the_same_response_label") + " " + k + ", "

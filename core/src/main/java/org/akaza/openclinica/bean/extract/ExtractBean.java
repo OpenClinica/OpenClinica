@@ -1123,14 +1123,10 @@ public class ExtractBean {
             }//
         }// for
 
-        if (isfnd) {
-            System.out.println("ERROR in sequence");
-        } else {
-            System.out.println("OK sequence");
-        }// if
+     
 
         // before return quick count
-        System.out.println("Number of entries in the eventData is:" + eventData.size());
+        logger.debug("Number of entries in the eventData is:" + eventData.size());
 
     }// addStudyEventData
 

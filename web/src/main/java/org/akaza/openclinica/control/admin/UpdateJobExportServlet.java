@@ -88,7 +88,6 @@ public class UpdateJobExportServlet extends SecureController {
 
         dataMap = trigger.getJobDataMap();
         String contactEmail = dataMap.getString(ExampleSpringJob.EMAIL);
-        System.out.println("found email: " + contactEmail);
         int dsId = dataMap.getInt(XsltTriggerService.DATASET_ID);
         int userId = dataMap.getInt(XsltTriggerService.USER_ID);
         String period = dataMap.getString(XsltTriggerService.PERIOD);
@@ -129,10 +128,8 @@ public class UpdateJobExportServlet extends SecureController {
         String action = fp.getString("action");
         String triggerName = fp.getString("tname");
         scheduler = getScheduler();
-        System.out.println("found trigger name " + triggerName);
         ExtractUtils extractUtils = new ExtractUtils();
         Trigger updatingTrigger = scheduler.getTrigger(triggerName.trim(), XsltTriggerService.TRIGGER_GROUP_NAME);
-        // System.out.println("found trigger from the other side " + trigger.getFullName());
         if (StringUtil.isBlank(action)) {
             setUpServlet(updatingTrigger);
             forwardPage(Page.UPDATE_JOB_EXPORT);
@@ -145,7 +142,7 @@ public class UpdateJobExportServlet extends SecureController {
                 // send back
                 addPageMessage("Your modifications caused an error, please see the messages for more information.");
                 setUpServlet(updatingTrigger);
-                System.out.println("errors : " + errors.toString());
+                logger.error("errors : " + errors.toString());
                 forwardPage(Page.UPDATE_JOB_EXPORT);
             } else {
                 // change trigger, update in database

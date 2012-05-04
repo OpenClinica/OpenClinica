@@ -223,31 +223,16 @@ public abstract class CoreSecureController extends HttpServlet {
         Integer datasetId = (Integer) request.getSession().getAttribute("datasetId");
         try {
             if (jobName != null && groupName != null) {
-                System.out.println("trying to retrieve status on " + jobName + " " + groupName);
+            	LOGGER.debug("trying to retrieve status on " + jobName + " " + groupName);
                 int state = getScheduler(request).getTriggerState(jobName, groupName);
-                System.out.println("found state: " + state);
+                LOGGER.debug("found state: " + state);
                 org.quartz.JobDetail details = getScheduler(request).getJobDetail(jobName, groupName);
                 List contexts = getScheduler(request).getCurrentlyExecutingJobs();
-                // will we get the above, even if its completed running?
-                // ProcessingResultType message = null;
-                // for (int i = 0; i < contexts.size(); i++) {
-                // org.quartz.JobExecutionContext context =
-                // (org.quartz.JobExecutionContext) contexts.get(i);
-                // if (context.getJobDetail().getName().equals(jobName) &&
-                // context.getJobDetail().getGroup().equals(groupName)) {
-                // message = (ProcessingResultType) context.getResult();
-                // System.out.println("found message " +
-                // message.getDescription());
-                // }
-                // }
-                // ProcessingResultType message = (ProcessingResultType)
-                // details.getResult();
                 org.quartz.JobDataMap dataMap = details.getJobDataMap();
                 String failMessage = dataMap.getString("failMessage");
                 if (state == Trigger.STATE_NONE) {
                     // add the message here that your export is done
-                    System.out.println("adding a message!");
-                    // TODO make absolute paths in the message, for example a
+                     // TODO make absolute paths in the message, for example a
                     // link from /pages/* would break
                     // TODO i18n
                     if (failMessage != null) {
@@ -724,7 +709,6 @@ public abstract class CoreSecureController extends HttpServlet {
         if (url != null && request != null) {
             request.setAttribute(POP_UP_URL, url);
             LOGGER.info("just set pop up url: " + url);
-            System.out.println("just set pop up url: " + url);
         }
     }
 

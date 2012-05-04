@@ -276,9 +276,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         Integer datasetId = (Integer) request.getSession().getAttribute("datasetId");
         try {
             if (jobName != null && groupName != null) {
-                System.out.println("trying to retrieve status on " + jobName + " " + groupName);
                 int state = getScheduler(request).getTriggerState(jobName, groupName);
-                System.out.println("found state: " + state);
                 org.quartz.JobDetail details = getScheduler(request).getJobDetail(jobName, groupName);
                 List contexts = getScheduler(request).getCurrentlyExecutingJobs();
                 // will we get the above, even if its completed running?
@@ -296,7 +294,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 String failMessage = dataMap.getString("failMessage");
                 if (state == Trigger.STATE_NONE || state== Trigger.STATE_COMPLETE) {
                     // add the message here that your export is done
-                    System.out.println("adding a message!");
                     // TODO make absolute paths in the message, for example a link from /pages/* would break
                     // TODO i18n
                     if (failMessage != null) {
@@ -748,7 +745,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             request.setAttribute(POP_UP_URL, url);
             request.setAttribute("hasPopUp", 1);
             logger.info("just set pop up url: " + url);
-            System.out.println("just set pop up url: " + url);
+           
         }
     }
 
