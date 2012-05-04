@@ -23,6 +23,7 @@ import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.dao.QueryStore;
+import org.akaza.openclinica.service.DiscrepancyNotesSummary;
 import org.akaza.openclinica.service.managestudy.ViewNotesFilterCriteria;
 import org.akaza.openclinica.service.managestudy.ViewNotesSortCriteria;
 import org.apache.commons.lang.StringUtils;
@@ -122,19 +123,8 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
         return result;
     }
 
-    public Map<Integer, Map<Integer, Integer>> calculateNotesSummary(StudyBean currentStudy,
+    public DiscrepancyNotesSummary calculateNotesSummary(StudyBean currentStudy,
             ViewNotesFilterCriteria filter) {
-        final Map<Integer, Map<Integer, Integer>> result = new HashMap<Integer, Map<Integer,Integer>>();
-
-        //Initializing the table with zeroes
-        for (DiscrepancyNoteType dnType : DiscrepancyNoteType.list) {
-            Map<Integer, Integer> dnTypeMap = new HashMap<Integer, Integer>();
-            for (ResolutionStatus resStatus : ResolutionStatus.list) {
-                dnTypeMap.put(resStatus.getId(), 0);
-            }
-            result.put(dnType.getId(), dnTypeMap);
-        }
-
         Map<String,Object> arguments = new HashMap<String, Object>(2);
         arguments.put("studyId", currentStudy.getId());
 
@@ -158,19 +148,18 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
         terms.add(queryStore.query(QUERYSTORE_FILE, "countDiscrepancyNotes.group"));
         String query = StringUtils.join(terms, ' ');
 
+        final Integer[][] result = new Integer[ResolutionStatus.list.size() + 1][DiscrepancyNoteType.list.size() + 1];
 
         LOG.debug("SQL: " + query);
         getNamedParameterJdbcTemplate().query(query, arguments, new RowMapper<Void>() {
             // Using 'void' as return type as the extractor uses the pre-populated 'result' object
             public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
-                result.get(rs.getInt("discrepancy_note_type_id")).put(
-                        rs.getInt("resolution_status_id"), rs.getInt("total"));
+                result[rs.getInt("resolution_status_id")][rs.getInt("discrepancy_note_type_id")] = rs.getInt("total");
                 return null;
             }
-
         });
 
-        return result;
+        return new DiscrepancyNotesSummary(result);
     }
 
     protected String listNotesSql(ViewNotesFilterCriteria filter, ViewNotesSortCriteria sort,

@@ -41,6 +41,7 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.log.Stopwatch;
+import org.akaza.openclinica.service.DiscrepancyNotesSummary;
 import org.akaza.openclinica.service.managestudy.ViewNotesFilterCriteria;
 import org.akaza.openclinica.service.managestudy.ViewNotesService;
 import org.akaza.openclinica.service.managestudy.ViewNotesSortCriteria;
@@ -88,6 +89,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     private Boolean studyHasDiscNotes = new Boolean(false);
     private ViewNotesService viewNotesService;
     private final boolean showMoreLink;
+    private DiscrepancyNotesSummary notesSummary;
 
     public ListNotesTableFactory(boolean showMoreLink){
         this.showMoreLink = showMoreLink;
@@ -162,8 +164,11 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             tableFacade.setTotalRows(100);
         }
 
-        List<DiscrepancyNoteBean> items = getViewNotesService().listNotes(getCurrentStudy(),
-                ViewNotesFilterCriteria.buildFilterCriteria(limit, getDateFormat()),
+        ViewNotesFilterCriteria filter = ViewNotesFilterCriteria.buildFilterCriteria(limit, getDateFormat());
+
+        notesSummary = getViewNotesService().calculateNotesSummary(getCurrentStudy(), filter);
+
+        List<DiscrepancyNoteBean> items = getViewNotesService().listNotes(getCurrentStudy(), filter,
                 ViewNotesSortCriteria.buildFilterCriteria(limit.getSortSet()));
 
         this.setAllNotes(items);
@@ -277,6 +282,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
         return listNotesSort;
     }
+
+
 
     public AuditUserLoginDao getAuditUserLoginDao() {
         return auditUserLoginDao;
@@ -631,6 +638,10 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
     public void setViewNotesService(ViewNotesService viewNotesService) {
         this.viewNotesService = viewNotesService;
+    }
+
+    public DiscrepancyNotesSummary getNotesSummary() {
+        return notesSummary;
     }
 
 }
