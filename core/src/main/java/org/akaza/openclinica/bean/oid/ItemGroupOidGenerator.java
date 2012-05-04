@@ -28,8 +28,8 @@ public class ItemGroupOidGenerator extends OidGenerator {
         String crfName = keys[0];
         String itemGroupLabel = keys[1];
 
-        logger.info(crfName);
-        logger.info(itemGroupLabel);
+        logger.debug(crfName);
+        logger.debug(itemGroupLabel);
 
         crfName = truncateToXChars(capitalize(stripNonAlphaNumeric(crfName)), 5);
         itemGroupLabel = truncateToXChars(capitalize(stripNonAlphaNumeric(itemGroupLabel)), 26);
@@ -40,7 +40,7 @@ public class ItemGroupOidGenerator extends OidGenerator {
         if (oid.equals("IG_") || oid.equals("IG__")) {
             oid = randomizeOid("IG_");
         }
-        logger.info("OID : " + oid);
+        logger.debug("OID : " + oid);
         return oid;
     }
 }
