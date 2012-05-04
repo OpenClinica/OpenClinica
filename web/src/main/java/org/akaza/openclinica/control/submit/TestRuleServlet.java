@@ -127,8 +127,7 @@ public class TestRuleServlet extends SecureController {
                 setPresetValues(presetValues);
                 session.setAttribute("testRuleActions", rsr.getActions());
                 session.setAttribute("testRulesTarget", rsr.getRuleSetBean().getTarget().getValue());
-                System.out.println("trying to set: " + rsr.getRuleSetBean().getTarget().getValue());
-                request.setAttribute("ruleSetRuleId", ruleSetRuleId);
+                 request.setAttribute("ruleSetRuleId", ruleSetRuleId);
                 request.setAttribute("ruleSetId", rsr.getRuleSetBean().getId());
                 ItemBean item = getExpressionService().getItemBeanFromExpression(rsr.getRuleSetBean().getTarget().getValue());
                 request.setAttribute("itemName", item.getName());

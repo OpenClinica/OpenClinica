@@ -1799,7 +1799,7 @@ public class Validator {
             }
             return false;
         }
-        System.out.println("value matches initial: found " + oldValue + " versus " + fieldValue);
+        logger.debug("value matches initial: found " + oldValue + " versus " + fieldValue);
         return fieldValue.equals(oldValue);
     }
 

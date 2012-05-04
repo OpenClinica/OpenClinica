@@ -3,7 +3,7 @@
  * GNU Lesser General Public License (GNU LGPL).
 
  * For details see: http://www.openclinica.org/license
- * copyright© 2003-2005 Akaza Research
+ * copyrightï¿½ 2003-2005 Akaza Research
  */
 
 package org.akaza.openclinica.bean.admin;
@@ -374,8 +374,7 @@ public class NewCRFBean extends Object implements java.io.Serializable {
             con.setAutoCommit(false);
             Set mySet = itemQueries.entrySet();
             logger.info("---start of item query generation here---");
-            System.out.println("start query generation");
-            for (Iterator itvl = mySet.iterator(); itvl.hasNext();) {
+             for (Iterator itvl = mySet.iterator(); itvl.hasNext();) {
                 Map.Entry ment = (Map.Entry) itvl.next();
                 String pQuery = (String) ment.getValue();
                 s = con.createStatement();
@@ -397,7 +396,6 @@ public class NewCRFBean extends Object implements java.io.Serializable {
                 String query = (String) queries.get(th);// it.next();
                 count = th;
                 s = con.createStatement();
-                // System.out.println(query);
                 s.executeUpdate(query);
                 s.close();
                 error.add(query);

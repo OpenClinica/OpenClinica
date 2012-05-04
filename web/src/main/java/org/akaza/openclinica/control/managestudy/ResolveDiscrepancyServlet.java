@@ -94,8 +94,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
             // UpdateStudyEvent?event_id=12&ss_id=12
         } else if ("itemdata".equalsIgnoreCase(entityType) || "eventcrf".equalsIgnoreCase(entityType)) {
             if (currentRole.getRole().equals(Role.MONITOR) || !isCompleted) {
-                System.out.println("not completed");
-                return Page.VIEW_SECTION_DATA_ENTRY_SERVLET;
+                 return Page.VIEW_SECTION_DATA_ENTRY_SERVLET;
                 // ViewSectionDataEntry?eventDefinitionCRFId=&ecId=1&tabId=1&studySubjectId=1
             } else {
                 return Page.ADMIN_EDIT_SERVLET;

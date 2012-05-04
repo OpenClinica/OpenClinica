@@ -125,8 +125,7 @@ public class XmlSchemaValidationHelper {
             throw new OpenClinicaSystemException("File was not found", ex.getCause());
         } catch (IOException ioe) {
             // ioe.printStackTrace();
-            System.out.println(": " + ioe.getMessage());
-            throw new OpenClinicaSystemException("IO Exception", ioe.getCause());
+             throw new OpenClinicaSystemException("IO Exception", ioe.getCause());
         } catch (SAXParseException spe) {
             // spe.printStackTrace();
             throw new OpenClinicaSystemException("Line : " + spe.getLineNumber() + " - " + spe.getMessage(), spe.getCause());

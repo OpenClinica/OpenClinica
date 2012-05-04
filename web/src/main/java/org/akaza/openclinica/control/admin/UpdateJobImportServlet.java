@@ -61,7 +61,7 @@ public class UpdateJobImportServlet extends SecureController {
 
         dataMap = trigger.getJobDataMap();
         String contactEmail = dataMap.getString(ImportSpringJob.EMAIL);
-        System.out.println("found email: " + contactEmail);
+        logger.debug("found email: " + contactEmail);
         int userId = dataMap.getInt(ImportSpringJob.USER_ID);
         int hours = dataMap.getInt(CreateJobImportServlet.HOURS);
         int minutes = dataMap.getInt(CreateJobImportServlet.MINUTES);
@@ -119,7 +119,7 @@ public class UpdateJobImportServlet extends SecureController {
         String action = fp.getString("action");
         String triggerName = fp.getString("tname");
         scheduler = getScheduler();
-        System.out.println("found trigger name " + triggerName);
+        logger.debug("found trigger name " + triggerName);
         Trigger trigger = scheduler.getTrigger(triggerName, TRIGGER_IMPORT_GROUP);
         //System.out.println("found trigger from the other side " + trigger.getFullName());
         if (StringUtil.isBlank(action)) {

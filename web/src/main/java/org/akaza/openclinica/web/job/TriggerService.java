@@ -340,7 +340,7 @@ public class TriggerService {
 
         HashMap errors = v.validate();
         if ((hours.equals("0")) && (minutes.equals("0"))) {
-            System.out.println("got in the ERROR LOOP");
+           // System.out.println("got in the ERROR LOOP");
             // throw an error here, at least one should be greater than zero
             // errors.put(TAB, "Error Message - Pick one of the below");
             v.addError(errors, "hours", "At least one of the following should be greater than zero.");

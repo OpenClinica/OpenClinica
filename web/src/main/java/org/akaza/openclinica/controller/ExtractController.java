@@ -17,6 +17,8 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
 import org.quartz.impl.StdScheduler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.quartz.JobDetailBean;
@@ -51,7 +53,8 @@ public class ExtractController {
     private final  String SCHEDULER = "schedulerFactoryBean";
 
     public static String TRIGGER_GROUP_NAME = "XsltTriggers";
-
+    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    
     public ExtractController() {
 
     }
@@ -79,7 +82,7 @@ public class ExtractController {
         ResourceBundleProvider.updateLocale(LocaleResolver.getLocale(request));
         // String datasetId = (String)request.getAttribute("datasetId");
         // String id = (String)request.getAttribute("id");
-        System.out.println("found both id " + id + " and dataset " + datasetId);
+        logger.debug("found both id " + id + " and dataset " + datasetId);
         ExtractUtils extractUtils = new ExtractUtils();
         // get extract id
         // get dataset id
@@ -128,7 +131,7 @@ public class ExtractController {
 
 
         // need to set the dataset path here, tbh
-        System.out.println("found odm xml file path " + generalFileDir);
+        logger.debug("found odm xml file path " + generalFileDir);
         // next, can already run jobs, translations, and then add a message to be notified later
         //JN all the properties need to have the variables...
         String xsltPath = SQLInitServlet.getField("filePath") + "xslt" + File.separator +files[cnt];
@@ -150,7 +153,7 @@ public class ExtractController {
         // also need to add the status fields discussed w/ cc:
         // result code, user message, optional URL, archive message, log file message
         // asdf table: sort most recent at top
-        System.out.println("found xslt file name " + xsltPath);
+        logger.debug("found xslt file name " + xsltPath);
 
         // String xmlFilePath = generalFileDir + ODMXMLFileName;
          simpleTrigger = xsltService.generateXsltTrigger(xsltPath,
@@ -172,7 +175,7 @@ public class ExtractController {
 
         try {
             Date dateStart = scheduler.scheduleJob(jobDetailBean, simpleTrigger);
-            System.out.println("== found job date: " + dateStart.toString());
+            logger.debug("== found job date: " + dateStart.toString());
 
         } catch (SchedulerException se) {
             se.printStackTrace();

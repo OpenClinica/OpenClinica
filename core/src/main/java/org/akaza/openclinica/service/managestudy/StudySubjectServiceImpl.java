@@ -259,7 +259,6 @@ public class StudySubjectServiceImpl implements StudySubjectService {
             if (nonEmptyEventCrf.contains(ecrf.getId())) {// this crf has data already
                 completed.put(new Integer(crfId), Boolean.TRUE);
             } else {// event crf got created, but no data entered
-                System.out.println("added one into startedButIncompleted" + ecrf.getId());
                 startedButIncompleted.put(new Integer(crfId), ecrf);
             }
         }
@@ -290,19 +289,9 @@ public class StudySubjectServiceImpl implements StudySubjectService {
                 dedc.setEventCRF(ev);
                 answer.add(dedc);
 
-                // System.out.println("just added dedc to answer");
-                // removed, tbh, since this is proving nothing, 11-2007
-
-                /*
-                 * if (dedc.getEdc().getDefaultVersionId() !=
-                 * dedc.getEventCRF().getId()) { System.out.println("ID
-                 * MISMATCH: edc name "+dedc.getEdc().getName()+ ", default
-                 * version id "+dedc.getEdc().getDefaultVersionId()+ " event crf
-                 * id "+dedc.getEventCRF().getId()); }
-                 */
+                
             }
         }
-        // System.out.println("size of answer" + answer.size());
         stopwatch.stop();
         return answer;
     }

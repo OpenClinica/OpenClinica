@@ -219,7 +219,7 @@ public class ExportDatasetServlet extends SecureController {
                 }
                 fileName = ODMXMLFileName;
                 request.setAttribute("generate", generalFileDir + ODMXMLFileName);
-                System.out.println("+++ set the following: " + generalFileDir + ODMXMLFileName);
+                logger.debug("+++ set the following: " + generalFileDir + ODMXMLFileName);
                 // >> tbh #xslt working group
                 // put an extra flag here, where we generate the XML, and then find the XSL, run a job and 
                 // send a link with the SQL file? put the generated SQL file with the dataset?
@@ -276,7 +276,7 @@ public class ExportDatasetServlet extends SecureController {
                 fileName = TXTFileName;
                 request.setAttribute("generate", generalFileDir + TXTFileName);
                 // finalTarget.setFileName(generalFileDir+TXTFileName);
-                System.out.println("+++ set the following: " + generalFileDir + TXTFileName);
+                logger.debug("+++ set the following: " + generalFileDir + TXTFileName);
             } else if ("html".equalsIgnoreCase(action)) {
                 // html based dataset browser
                 TabReportBean answer = new TabReportBean();
@@ -333,7 +333,7 @@ public class ExportDatasetServlet extends SecureController {
                     fId = fileID.intValue();
                 }
                 request.setAttribute("generate", generalFileDir + DDLFileName);
-                System.out.println("+++ set the following: " + generalFileDir + DDLFileName);
+                logger.debug("+++ set the following: " + generalFileDir + DDLFileName);
             } else if ("csv".equalsIgnoreCase(action)) {
                 CommaReportBean answer = new CommaReportBean();
                 eb = dsdao.getDatasetData(eb, currentstudyid, parentstudy);
@@ -486,14 +486,14 @@ public class ExportDatasetServlet extends SecureController {
 
               if(entry.isDirectory()) {
                 // Assume directories are stored parents first then children.
-                System.out.println("Extracting directory: " + entry.getName());
+                logger.debug("Extracting directory: " + entry.getName());
                 // This is not robust, just for demonstration purposes.
                 (new File(entry.getName())).mkdir();
                 // no dirs necessary?
                 continue;
               }
 
-              System.out.println("Extracting file: " + entry.getName());
+              logger.debug("Extracting file: " + entry.getName());
               // System.out.println("Writing to dir " + targetDir);
               copyInputStream(zipFile.getInputStream(entry),
                  new java.io.BufferedOutputStream(new java.io.FileOutputStream(entry.getName())));
@@ -580,7 +580,7 @@ public class ExportDatasetServlet extends SecureController {
             // do we not set this or is it null b/c we come to the page with no session?
             setToPanel(resword.getString("date_last_run"), local_df.format(db.getDateLastRun()));
         } catch (NullPointerException npe) {
-            System.out.println("exception: " + npe.getMessage());
+            logger.error("exception: " + npe.getMessage());
         }
 
         logger.warn("just set file list to request, sending to page");

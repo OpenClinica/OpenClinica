@@ -181,7 +181,7 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
             checkStudyFrozen(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_frozen"), request, response);
         }
         request.setAttribute("fromResolvingNotes", fromResolvingNotes);
-        System.out.println(" +++++++++++++++++++ " + ecb.getStudyEventId());
+        LOGGER.debug(" +++++++++++++++++++ " + ecb.getStudyEventId());
         // StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
         // StudyEventBean sEvent = (StudyEventBean)
         // sedao.findByPK(ecb.getStudyEventId());
@@ -431,7 +431,7 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
         // refresh study params here, tbh 06/2009
         StudyBean currentStudy =    (StudyBean) request.getSession().getAttribute("study");
         if (currentStudy.getStudyParameterConfig().getAdminForcedReasonForChange().equals("true")) {
-            System.out.println("returning true for forced reason for change");
+        	LOGGER.debug("returning true for forced reason for change");
             return true;
         } else {
             return false;

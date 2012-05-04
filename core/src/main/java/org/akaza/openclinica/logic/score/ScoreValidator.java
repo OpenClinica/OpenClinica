@@ -29,9 +29,13 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ScoreValidator {
     private Locale locale;
     private ResourceBundle resexception;
+    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     public ScoreValidator(Locale locale) {
         this.locale = locale;
@@ -213,18 +217,16 @@ public class ScoreValidator {
 	* process the HTML and whether or not all four values are valid, tbh 05/2009
 	*/
     private StringBuffer processExternalValues(String expression) {
-        System.out.println("expression: " + expression);
         expression = expression.replace(" ", "");
         StringBuffer errors = new StringBuffer();
         String[] values = expression.split("##");
         String leftright = values[1];
-        // System.out.println("found values: " + values);
         if (!leftright.equalsIgnoreCase("left") && !leftright.equalsIgnoreCase("right")) {
         	errors.append("Your expression in getExternalValues is incorrect: the second value should be 'right' or 'left', not '" + leftright + "'; ");
         }
         String height = values[2];
         
-        System.out.println("found height: " + height);
+        logger.debug("found height: " + height);
         String width = values[3];
         try {
         	Integer neightInt = new Integer(height);
@@ -232,13 +234,12 @@ public class ScoreValidator {
         	errors.append("Your expression in getExternalValues is incorrect: the third value should be a number, not '" + height + "'; ");
         }
         width = width.replace(")", "");
-        System.out.println("found width: " + width);
+        logger.debug("found width: " + width);
         try {
         	Integer widthInt = new Integer(width);
         } catch (NumberFormatException npe) {
         	errors.append("Your expression in getExternalValues is incorrect: the fourth value should be a number, not '" + width + "'; ");
         }
-        System.out.println(errors);
         // checking three values: left/right, and two ints
         return errors;
     }
@@ -489,7 +490,6 @@ public class ScoreValidator {
         // break to exclude URLs, to fix, tbh 05/2009
         if (ch == '/') {
             if ((next == '/') && (function.equalsIgnoreCase("getexternalvalue"))) {
-                System.out.println("got this far!");
                 return true;
             }
         }
@@ -522,7 +522,6 @@ public class ScoreValidator {
     public static boolean isValidOrder(char curr, char next, String func) {
         if (curr == '/' && next == '/' && func.equalsIgnoreCase("getexternalvalue")) {
             // escaping urls, tbh 05/2009
-        	System.out.println("is valid order");
             return true;
         }
         if (curr == '(') {

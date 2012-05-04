@@ -148,7 +148,7 @@ public class SPSSReportBean extends ReportBean {
 
             int startItem = columns.size() - items.size();
 
-            System.out.println("--> generated start item " + startItem + " from " + columns.size() + " minus " + items.size());
+            logger.debug("--> generated start item " + startItem + " from " + columns.size() + " minus " + items.size());
             answer.append("/VARIABLES = \n");
 
             int index;
@@ -191,8 +191,7 @@ public class SPSSReportBean extends ReportBean {
                                 ResponseOptionBean ro = (ResponseOptionBean) options.get(l);
                                 if (ro.getText().length() > len) {
                                     len = ro.getText().length();
-                                    // System.out.println("--> 2. changed len to " + len);
-                                }
+                                 }
                             }
                         }
                         // << tbh
@@ -207,7 +206,7 @@ public class SPSSReportBean extends ReportBean {
             }
 
             // items
-            System.out.println("--> looking at " + startItem + " out of " + columns.size());
+            logger.debug("--> looking at " + startItem + " out of " + columns.size());
             for (int i = startItem; i < columns.size(); i++) {
                 DisplayItemHeaderBean dih = (DisplayItemHeaderBean) items.get(i - startItem);
                 ItemBean ib = dih.getItem();
@@ -253,7 +252,6 @@ public class SPSSReportBean extends ReportBean {
                             ResponseOptionBean ro = (ResponseOptionBean) options.get(l);
                             if (ro.getText().length() > len) {
                                 len = ro.getText().length();
-                                // System.out.println("--> change len to " + ro.getText().length());
                             }
                         }
                         // << tbh
@@ -422,8 +420,7 @@ public class SPSSReportBean extends ReportBean {
                 // and wait, what about date timestamps?
                 String convertAgainAgain = Utils.convertedItemDateValue(convertAgain, local_datetime_string, "MM/dd/yyyy");
                 answer.append(convertAgainAgain + "\t");
-                // System.out.println("just converted from " + local_df_string + ": " + s + " -> " + convertAgain);
-                // << tbh
+                 // << tbh
             }
             answer.append("\n");
         }
@@ -452,19 +449,14 @@ public class SPSSReportBean extends ReportBean {
         String[] atts = new String[size + builtin.length];
         for (int i = 0; i < 7; ++i) {
             atts[i] = builtin[i];
-            // System.out.println(atts[i]);
         }
         for (int i = 7; i < 7 + size; ++i) {
             atts[i] = svnv.getValidName(studyGroupClasses.get(i - 7).getName());
-            // System.out.println(atts[i]);
         }
         for (int i = 7 + size; i < size + builtin.length; ++i) {
             atts[i] = builtin[i - size];
-            // System.out.println(atts[i]);
         }
 
-        // System.out.println("found builtin length: " + builtin.length + " ");
-        // System.out.println("found atts length: " + atts.length + " ");
         return atts;
     }
 

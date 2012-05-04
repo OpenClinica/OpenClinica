@@ -8,6 +8,8 @@ import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.FormattingResults;
 import org.apache.fop.apps.MimeConstants;
 import org.apache.fop.apps.PageSequenceResults;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
@@ -34,7 +36,8 @@ import javax.xml.transform.sax.SAXResult;
 public class PdfProcessingFunction extends ProcessingFunction  {
 
   
-    
+	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	   
     public PdfProcessingFunction() {
         fileType = "pdf";
     }
@@ -103,12 +106,12 @@ public class PdfProcessingFunction extends ProcessingFunction  {
             java.util.List pageSequences = foResults.getPageSequences();
             for (java.util.Iterator it = pageSequences.iterator(); it.hasNext();) {
                 PageSequenceResults pageSequenceResults = (PageSequenceResults)it.next();
-                System.out.println("PageSequence "
+                logger.debug("PageSequence "
                         + (String.valueOf(pageSequenceResults.getID()).length() > 0
                                 ? pageSequenceResults.getID() : "<no id>")
                                 + " generated " + pageSequenceResults.getPageCount() + " pages.");
             }
-            System.out.println("Generated " + foResults.getPageCount() + " pages in total.");
+            logger.debug("Generated " + foResults.getPageCount() + " pages in total.");
             out.close();
           
             

@@ -297,7 +297,6 @@ public class DisplayItemBean implements Comparable {
         // logger.info("loadFormValue, line 241, DisplayItemBean
         // "+rsb.getResponseType().getName());
         metadata.setResponseSet(rsb);
-        // System.out.println("data value:" + data.getId() + " " + value);
         data.setValue(value);// comment set by tbh, 112007
     }
 
@@ -305,7 +304,6 @@ public class DisplayItemBean implements Comparable {
         ResponseSetBean rsb = getMetadata().getResponseSet();
         org.akaza.openclinica.bean.core.ResponseType rt = rsb.getResponseType();
         String dbValue = getData().getValue();
-        // System.out.println("setting dbValue: " + dbValue);
         if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)) {
             String dbValues[] = dbValue.split(",");
 

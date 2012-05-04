@@ -2,7 +2,6 @@ package org.akaza.openclinica.control.admin;
 
 import org.akaza.openclinica.bean.admin.AuditEventBean;
 import org.akaza.openclinica.bean.admin.TriggerBean;
-import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.SpringServletAccess;
@@ -81,7 +80,6 @@ public class ViewSingleJobServlet extends SecureController {
         // is it really necessary? DRY
 
         if (trigger == null) {
-            System.out.println("*** reset trigger group name");
             groupName = XsltTriggerService.TRIGGER_GROUP_NAME;
             trigger = scheduler.getTrigger(triggerName.trim(), groupName);
         }
@@ -90,9 +88,7 @@ public class ViewSingleJobServlet extends SecureController {
         // to be redone
         logger.debug("found trigger name: " + triggerName);
         logger.debug("found group name: " + groupName);
-        // System.out.println("found trigger on the other side, full name: " +
-        // trigger.getFullName());
-        TriggerBean triggerBean = new TriggerBean();
+          TriggerBean triggerBean = new TriggerBean();
         JobDataMap dataMap = new JobDataMap();
         AuditEventDAO auditEventDAO = new AuditEventDAO(sm.getDataSource());
 

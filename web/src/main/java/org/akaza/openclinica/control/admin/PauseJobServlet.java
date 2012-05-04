@@ -67,26 +67,23 @@ public class PauseJobServlet extends SecureController {
         scheduler = getScheduler();
         Trigger trigger = scheduler.getTrigger(triggerName, finalGroupName);
         try {
-            // System.out.println("found delete key: "+deleteMe);
-            // System.out.println("found is sys admin: "+ub.isSysAdmin());
-            // System.out.println("found is tech admin: "+ub.isTechAdmin());
-            if (("y".equals(deleteMe)) && (ub.isSysAdmin())) {
+             if (("y".equals(deleteMe)) && (ub.isSysAdmin())) {
                 scheduler.deleteJob(triggerName, finalGroupName);
                 // set return message here
-                System.out.println("deleted job: " + triggerName);
+                logger.debug("deleted job: " + triggerName);
                 addPageMessage("The following job " + triggerName + " and its corresponding Trigger have been deleted from the system.");
             } else {
 
                 if (scheduler.getTriggerState(triggerName, finalGroupName) == Trigger.STATE_PAUSED) {
                     scheduler.resumeTrigger(triggerName, finalGroupName);
                     // trigger.setPriority(Trigger.DEFAULT_PRIORITY);
-                    System.out.println("-- resuming trigger! " + triggerName + " " + finalGroupName);
+                    logger.debug("-- resuming trigger! " + triggerName + " " + finalGroupName);
                     addPageMessage("This trigger " + triggerName + " has been resumed and will continue to run until paused or deleted.");
                     // set message here
                 } else {
                     scheduler.pauseTrigger(triggerName, finalGroupName);
                     // trigger.setPriority(Trigger.STATE_PAUSED);
-                    System.out.println("-- pausing trigger! " + triggerName + " " + finalGroupName);
+                    logger.debug("-- pausing trigger! " + triggerName + " " + finalGroupName);
                     addPageMessage("This trigger " + triggerName + " has been paused, and will not run again until it is restored.");
                     // set message here
                 }

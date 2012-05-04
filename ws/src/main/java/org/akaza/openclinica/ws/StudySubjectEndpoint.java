@@ -121,18 +121,14 @@ public class StudySubjectEndpoint {
 
             DataBinder dataBinder = new DataBinder((subjectTransferBean));
             errors = dataBinder.getBindingResult();
-         //   System.out.println("got here before validation");
             subjectTransferBean.setOwner(getUserAccount());
             SubjectTransferValidator subjectTransferValidator = new SubjectTransferValidator(dataSource);
             subjectTransferValidator.validate((subjectTransferBean), errors);
             if (!errors.hasErrors()) {
-            //	System.out.println("got here before creation");
                 String label = create(subjectTransferBean);
-            //    System.out.println("got here after creation" + label);
                 return new DOMSource(mapConfirmation(messages.getMessage("studySubjectEndpoint.success", null, "Success", locale), label, errors));
             } else {
-             //   System.out.println("got here by throwing an error");
-                return new DOMSource(mapConfirmation(messages.getMessage("studySubjectEndpoint.fail", null, "Fail", locale), null, errors));
+               return new DOMSource(mapConfirmation(messages.getMessage("studySubjectEndpoint.fail", null, "Fail", locale), null, errors));
             }
         } catch (NullPointerException npe) {
             npe.printStackTrace();
@@ -192,10 +188,12 @@ public class StudySubjectEndpoint {
 
         DataBinder dataBinder = new DataBinder((subjectStudyBean));
         Errors errors = dataBinder.getBindingResult();
-     //   System.out.println("got here before validation");
         SubjectTransferValidator subjectTransferValidator = new SubjectTransferValidator(dataSource);
         subjectTransferValidator.validateIsSubjectExists((subjectStudyBean), errors);
-     
+        if (subjectStudyBean.getSubjectOIDId() == null ){//case for core misfunction
+            errors.reject("studySubjectEndpoint.fail");
+            
+       }
         if (!errors.hasErrors()) {
            
             return new DOMSource(mapConfirmation(messages.getMessage("studySubjectEndpoint.success", null, 
@@ -442,7 +440,6 @@ public class StudySubjectEndpoint {
         subject.setUniqueIdentifier(subjectTransfer.getPersonId());
         subject.setLabel(subjectTransfer.getStudySubjectId());
         subject.setDateOfBirth(subjectTransfer.getDateOfBirth());
-      //  System.out.println("testing new code here...");
         // below added tbh 04/2011
         if (subject.getDateOfBirth() != null) {
         	subject.setDobCollected(true);
@@ -493,6 +490,7 @@ public class StudySubjectEndpoint {
 	        labelElement.setTextContent(studySubjectLabel);
 	        responseElement.appendChild(labelElement);
         }
+     
         if ( errors != null){
 	        for (ObjectError error : errors.getAllErrors()) {
 	            Element errorElement = document.createElementNS(NAMESPACE_URI_V1, "error");

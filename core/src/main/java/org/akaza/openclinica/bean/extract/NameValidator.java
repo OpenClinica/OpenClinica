@@ -46,23 +46,7 @@ public abstract class NameValidator {
     
     protected abstract String getNextSequentialString(int maxValue);
     
-    /*
-    public String getNextSequentialString(int maxValue) {
-        if(this.sequential>=maxValue) {
-            System.out.println("Cannot generate sequential string because sequential="+sequential+" >= maxValue="+maxValue+".");
-            System.exit(1);
-        }
-        String s = "" + sequential;
-        int len = s.length();
-        if(len<this.digitSize) {
-            for (int i = len; i < this.digitSize; ++i) {
-                s = "0" + s;
-            }
-        }
-        this.sequential++;
-        return s;
-    }
-    */
+  
 
     public TreeSet<String> getUniqueNameTable() {
         return uniqueNameTable;

@@ -372,7 +372,7 @@ public class ChangeCRFVersionController {
 
 	       
         }catch(Exception e){
-        	 System.out.println(cur_counter+" "+new_counter);
+        	 logger.error(cur_counter+" "+new_counter);
         	 pageMessages.add(resword.getString("confirm_crf_version_em_dataextraction"));
             
         }

@@ -40,11 +40,7 @@ public class StringUtil {
 
     }
 
-    /*
-    public static void main(String[] args) {
-        System.out.println(StringUtil.escapeSingleQuote("my ' header'"));
-    }
-    */
+   
 
     /**
      * Checks whether a string is blank

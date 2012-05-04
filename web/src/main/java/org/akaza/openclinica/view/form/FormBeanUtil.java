@@ -342,7 +342,7 @@ public class FormBeanUtil {
             disBean.setItem(itemBean);
             disBean.setMetadata(runDynamicsCheck(itemFBean, eventCrfBean, itemDataBean, context));
             disBean.setData(itemDataBean);
-            System.out.println("3. just set: " + itemDataBean.getValue());
+            logger.debug("3. just set: " + itemDataBean.getValue());
             responseName = disBean.getMetadata().getResponseSet().getResponseType().getName();
             respOptions = disBean.getMetadata().getResponseSet().getOptions();
             if (hasNullValues
@@ -841,7 +841,7 @@ public class FormBeanUtil {
 
         for (ItemGroupBean itemGroup : itemGroupBeans) {
             itBeans = itemDao.findAllItemsByGroupId(itemGroup.getId(), crfVersionId);
-            System.out.println("just ran find all by group id " + itemGroup.getId() + " found " + itBeans.size() + " item beans");
+            logger.debug("just ran find all by group id " + itemGroup.getId() + " found " + itBeans.size() + " item beans");
             List<ItemGroupMetadataBean> metadata = igMetaDAO.findMetaByGroupAndSection(itemGroup.getId(), crfVersionId, sectionId);
             if (!metadata.isEmpty()) {
                 // for a given crf version, all the items in the same group
@@ -948,7 +948,7 @@ public class FormBeanUtil {
 
         for (ItemGroupBean itemGroup : itemGroupBeans) {
             itBeans = itemDao.findAllItemsByGroupIdForPrint(itemGroup.getId(), crfVersionId,sectionId);//TODO:fix me!
-            System.out.println("just ran find all by group id " + itemGroup.getId() + " found " + itBeans.size() + " item beans");
+            logger.debug("just ran find all by group id " + itemGroup.getId() + " found " + itBeans.size() + " item beans");
             List<ItemGroupMetadataBean> metadata = igMetaDAO.findMetaByGroupAndSectionForPrint(itemGroup.getId(), crfVersionId, sectionId);//TODO:fix me add item_form_metadata.section_id to the query
             if (!metadata.isEmpty()) {
                 // for a given crf version, all the items in the same group

@@ -321,7 +321,6 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
 
 
         writer.append("\n");
-//        System.out.println(writer.toString());
         return writer.toString();
 
 
@@ -745,11 +744,5 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
 
     }
 
-//    public static void main (String arg[]){
-//        String s = "test‘ “ & $ % +";
-//        System.out.println(StringEscapeUtils.escapeJava(s));
-//        s = s.replaceAll("\u201C","\"");
-//        System.out.println(s);
-//    }
 
 }

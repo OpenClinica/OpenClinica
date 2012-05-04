@@ -1065,11 +1065,7 @@ public class SDVUtil {
         return studySubjectIds;
     }
 
-    /* public static void main(String[] args) {
-        SDVUtil util = new SDVUtil();
-        System.out.println(util.stripPrefixFromParam(CHECKBOX_NAME+533)+"");
-    }*/
-
+    
     public Collection<SubjectSDVContainer> getSubjectAggregateRows(List<StudySubjectBean> studySubjectBeans) {
 
         if (studySubjectBeans == null || studySubjectBeans.isEmpty()) {
@@ -1249,7 +1245,7 @@ public class SDVUtil {
                     try {
                         eventCRFDAO.setSDVStatus(setVerification, userId, eventCRFBean.getId());
                     } catch (Exception exc) {
-                        System.out.println(exc.getMessage());
+                     //   System.out.println(exc.getMessage());
                         return false;
                     }
                 }
@@ -1274,7 +1270,7 @@ public class SDVUtil {
             try {
                 eventCRFDAO.setSDVStatus(setVerification, userId, eventCrfId);
             } catch (Exception exc) {
-                System.out.println(exc.getMessage());
+               // System.out.println(exc.getMessage());
                 return false;
             }
         }
