@@ -558,7 +558,7 @@ public class ViewStudySubjectServlet extends SecureController {
             if (!idata.isEmpty()) {// this crf has data already
                 completed.put(new Integer(crfId), Boolean.TRUE);
             } else {// event crf got created, but no data entered
-                System.out.println("added one into startedButIncompleted" + ecrf.getId());
+               // System.out.println("added one into startedButIncompleted" + ecrf.getId());
                 startedButIncompleted.put(new Integer(crfId), ecrf);
             }
         }

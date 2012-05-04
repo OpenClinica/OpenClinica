@@ -565,7 +565,6 @@ public class GenerateExtractFileService {
 
         } catch (Exception e) {
             logger.warn(e.getMessage());
-            System.out.println("-- exception at create file: " + e.getMessage());
             e.printStackTrace();
         }
         finally{
@@ -667,8 +666,7 @@ public class GenerateExtractFileService {
 
         } catch (Exception e) {
             logger.warn(e.getMessage());
-            System.out.println("-- exception thrown at createFile: " + e.getMessage());
-            logger.info("-- exception thrown at createFile: " + e.getMessage());
+           logger.info("-- exception thrown at createFile: " + e.getMessage());
             e.printStackTrace();
         }
         finally{
@@ -787,7 +785,6 @@ public class GenerateExtractFileService {
 
         } catch (Exception e) {
             logger.warn(e.getMessage());
-            System.out.println("-- exception thrown at createFile: " + e.getMessage());
             logger.info("-- exception thrown at createFile: " + e.getMessage());
             e.printStackTrace();
         }

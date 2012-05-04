@@ -210,7 +210,6 @@ public class CreateNewStudyEventServlet extends SecureController {
 
             // tbh
             logger.info("set preset values: " + presetValues.toString());
-            System.out.println("set preset values: " + presetValues.toString());
             logger.info("found def.w.CRF list, size " + eventDefinitions.size());
             // tbh
             setPresetValues(presetValues);
@@ -328,7 +327,6 @@ public class CreateNewStudyEventServlet extends SecureController {
             // << tbh
             if (studySubject.getLabel() == "") {
             	// add an error here, tbh
-            	System.out.println("tripped the error here 20091109");
             	Validator.addError(errors, INPUT_STUDY_SUBJECT, respage.getString("must_enter_subject_ID_for_identifying"));
             }
 
@@ -343,7 +341,7 @@ public class CreateNewStudyEventServlet extends SecureController {
                     int pk = fp.getInt(INPUT_STUDY_EVENT_DEFINITION_SCHEDULED[i]);
                     if (pk > 0) {
                         StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(pk);
-                        System.out.println("scheduled def:" + pk + " " + INPUT_STUDY_EVENT_DEFINITION_SCHEDULED[i] + " " + sedb.getName());
+                        logger.debug("scheduled def:" + pk + " " + INPUT_STUDY_EVENT_DEFINITION_SCHEDULED[i] + " " + sedb.getName());
                         definitionScheduleds.add(sedb);
                         scheduledDefinitionIds[i] = pk;
                         if (!subjectMayReceiveStudyEvent(sm.getDataSource(), sedb, studySubject)) {
@@ -429,10 +427,10 @@ public class CreateNewStudyEventServlet extends SecureController {
                 }
             }
             // YW >>
-            System.out.println("we have errors; number of this; " + errors.size());
+            logger.debug("we have errors; number of this; " + errors.size());
             if (!errors.isEmpty()) {
                 logger.info("we have errors; number of this; " + errors.size());
-                System.out.println("found request study subject: " + fp.getString(INPUT_REQUEST_STUDY_SUBJECT));
+                logger.error("found request study subject: " + fp.getString(INPUT_REQUEST_STUDY_SUBJECT));
                 addPageMessage(respage.getString("errors_in_submission_see_below"));
                 setInputMessages(errors);
 
@@ -469,7 +467,7 @@ public class CreateNewStudyEventServlet extends SecureController {
                 request.setAttribute("eventDefinitionsScheduled", eventDefinitionsScheduled);
                 forwardPage(Page.CREATE_NEW_STUDY_EVENT);
             } else {
-                System.out.println("error is empty");
+            	logger.debug("error is empty");
                 StudyEventDAO sed = new StudyEventDAO(sm.getDataSource());
 
                 StudyEventBean studyEvent = new StudyEventBean();

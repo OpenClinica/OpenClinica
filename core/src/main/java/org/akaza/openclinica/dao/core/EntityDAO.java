@@ -28,15 +28,12 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.extract.ExtractBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.dao.cache.CacheWrapper;
 import org.akaza.openclinica.dao.cache.EhCacheWrapper;
 
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.FileSystemResource;
 
 /**
  * <p/>
@@ -1349,8 +1346,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
             }
             // ps.close();
             signalSuccess();
-            System.out.println("*** query that runs before we fill the ItemGroupSide: " + query);
-            processBASE_ITEMGROUPSIDERecords(rs, eb);
+             processBASE_ITEMGROUPSIDERecords(rs, eb);
             bret = true;
             // rs.close();
 
@@ -1408,7 +1404,6 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
                 // rs.wasNull());
             // ps.close();
             signalSuccess();
-            System.out.println("*** query that generates the event side records " + query);
             bret = processBASE_EVENTSIDERecords(rs, eb);
             // rs.close();
             bret = true;

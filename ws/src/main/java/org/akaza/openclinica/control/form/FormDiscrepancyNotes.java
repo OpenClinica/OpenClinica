@@ -37,7 +37,6 @@ public class FormDiscrepancyNotes {
         }
 
         notes.add(note);
-        //System.out.println("after adding note:" + notes.size());
         fieldNotes.put(field, notes);
     }
 
@@ -53,7 +52,6 @@ public class FormDiscrepancyNotes {
         } else {
             notes = new ArrayList();
         }
-        System.out.println("field:" + field);
         if (notes != null) {
             notes.add(field);
         }

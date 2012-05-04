@@ -67,7 +67,7 @@ public class ViewImportJobServlet extends SecureController {
 
         for (String triggerName : triggerNames) {
             Trigger trigger = scheduler.getTrigger(triggerName, IMPORT_TRIGGER);
-            System.out.println("found trigger, full name: " + trigger.getFullName());
+            logger.debug("found trigger, full name: " + trigger.getFullName());
             try {
                 logger.debug("prev fire time " + trigger.getPreviousFireTime().toString());
                 logger.debug("next fire time " + trigger.getNextFireTime().toString());
@@ -91,21 +91,17 @@ public class ViewImportJobServlet extends SecureController {
                 dataMap = trigger.getJobDataMap();
                 triggerBean.setStudyName(dataMap.getString(ExampleSpringJob.STUDY_NAME));
                 String oid = dataMap.getString("study_oid");
-                if (oid != null) {
-                	System.out.println("oid is not null: " + oid);
-                } else {
-                	System.out.println("oid is null");
-                }
+               
             }
 
             // this next bit of code looks to see if the trigger is paused
-            System.out.println("Trigger Priority: " + trigger.getName() + " " + trigger.getPriority());
+            logger.debug("Trigger Priority: " + trigger.getName() + " " + trigger.getPriority());
             if (scheduler.getTriggerState(triggerName, IMPORT_TRIGGER) == Trigger.STATE_PAUSED) {
                 triggerBean.setActive(false);
-                System.out.println("setting active to false for trigger: " + trigger.getName());
+                logger.debug("setting active to false for trigger: " + trigger.getName());
             } else {
                 triggerBean.setActive(true);
-                System.out.println("setting active to TRUE for trigger: " + trigger.getName());
+                logger.debug("setting active to TRUE for trigger: " + trigger.getName());
             }
             triggerBeans.add(triggerBean);
             // our wrapper to show triggers

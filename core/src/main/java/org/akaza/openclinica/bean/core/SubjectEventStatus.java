@@ -196,10 +196,5 @@ public class SubjectEventStatus extends Term implements Comparable {
         return INVALID;
     }
 
-    /*
-    public static void main(String[] args) {
-        ArrayList<String> myList = (ArrayList) getSubjectEventStatusValues();
-        System.out.println("myList = " + myList);
-    }
-    */
+   
 }

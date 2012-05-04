@@ -22,7 +22,7 @@ import java.util.Set;
  * 
  */
 public class PreparedStatementFactory {
-    private HashMap variables = new HashMap();
+    private HashMap variables = new HashMap();              
     private HashMap nullVars = new HashMap();// to handle null
     // inputs,jxu,2004-10-28
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -117,14 +117,7 @@ public class PreparedStatementFactory {
             }// end of else loop
         }// end of for loop
         // added by jxu for debugging,but not implemented by postgres,
-        // 2004-10-27
-        /*
-         * ParameterMetaData pmd = ps.getParameterMetaData(); for(int i=1;i<=pmd.getParameterCount();i++){
-         * logger.info("Meta Data for Parameter "+i);
-         * logger.info("Parameter Type Name
-         * "+pmd.getParameterTypeName(i)); logger.info("Parameter SQL
-         * TYPE "+pmd.getParameterType(i)); }
-         */
+      
         return ps;
     }
 }

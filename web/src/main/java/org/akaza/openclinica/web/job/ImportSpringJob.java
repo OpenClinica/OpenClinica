@@ -146,7 +146,7 @@ public class ImportSpringJob extends QuartzJobBean {
         TriggerBean triggerBean = new TriggerBean();
         triggerBean.setFullName(trigger.getName());
         String contactEmail = dataMap.getString(EMAIL);
-        System.out.println("=== starting to run trigger " + trigger.getName() + " ===");
+        logger.debug("=== starting to run trigger " + trigger.getName() + " ===");
         try {
             ApplicationContext appContext = (ApplicationContext) context.getScheduler().getContext().get("applicationContext");
             dataSource = (DataSource) appContext.getBean("dataSource");
@@ -203,7 +203,7 @@ public class ImportSpringJob extends QuartzJobBean {
             // read them
             // File fileDirectory = new File(directory);
             String[] files = fileDirectory.list();
-            System.out.println("found " + files.length + " files under directory "
+            logger.debug("found " + files.length + " files under directory "
                     + SQLInitServlet.getField("filePath") + DIR_PATH + File.separator + directory);
             File[] target = new File[files.length];
             File[] destination = new File[files.length];
@@ -213,50 +213,43 @@ public class ImportSpringJob extends QuartzJobBean {
                 if (!new File(fileDirectory + File.separator + files[i]).isDirectory()) {
                     File f = new File(fileDirectory + File.separator + files[i]);
                     if (f == null || f.getName() == null) {
-                        System.out.println("found a null file");
+                    	logger.debug("found a null file");
                     } else if (f.getName().indexOf(".xml") < 0 && f.getName().indexOf(".XML") < 0) {
-                        System.out.println("does not seem to be an xml file");
+                    	logger.debug("does not seem to be an xml file");
 
                         // we need a place holder to avoid 'gaps' in the file
                         // list
                     } else {
-                        System.out.println("adding: " + f.getName());
+                    	logger.debug("adding: " + f.getName());
                         target[i] = f;// new File(IMPORT_DIR +
                         // directory +
                         // File.separator + files[i]);
                         //destination[i] = new File(IMPORT_DIR_2 + files[i]);
                         destination[i] = new File(SQLInitServlet.getField("filePath") + DEST_DIR + File.separator + files[i]);
                     }
-                    // target[i] = new File(IMPORT_DIR + directory +
-                    // File.separator + files[i]);
-                    // destination[i] = new File(IMPORT_DIR_2 + files[i]);
-                }
+                 }
             }
             if (target.length > 0 && destination.length > 0) {
                 cutAndPaste(target, destination);
                 // do everything else here with 'destination'
-                System.out.println("=== about to start processData... ===");
-                ArrayList<String> auditMessages = processData(destination, dataSource, respage, ub, studyBean,
+               ArrayList<String> auditMessages = processData(destination, dataSource, respage, ub, studyBean,
                         destDirectory, triggerBean, ruleSetService);
-                System.out.println("=== finished process data, audit message returned ===");
-                // String[] messages = auditMessage.split("===+");
-
+              
                 auditEventDAO.createRowForExtractDataJobSuccess(triggerBean, auditMessages.get(1));
                 try {
                     if (contactEmail != null && !"".equals(contactEmail)) {
                         mailSender.sendEmail(contactEmail, respage.getString("job_ran_for") + " " + triggerBean.getFullName(), generateMsg(
                                 auditMessages.get(0), contactEmail), true);
-                        System.out.println("=== sent email ===");
-                        System.out.println("email body: " + auditMessages.get(1));
+                        logger.debug("email body: " + auditMessages.get(1));
                     }
                 } catch (OpenClinicaSystemException e) {
                     // Do nothing
-                    System.out.println("=== throw an ocse === " + e.getMessage());
+                	logger.debug("=== throw an ocse === " + e.getMessage());
                     e.printStackTrace();
                 }
 
             } else {
-                System.out.println("no real files found");
+            	logger.debug("no real files found");
                 auditEventDAO.createRowForExtractDataJobSuccess(triggerBean, respage.getString("job_ran_but_no_files"));
                 // no email here, tbh
             }
@@ -273,15 +266,15 @@ public class ImportSpringJob extends QuartzJobBean {
             // service.generateSummaryStatsBean(for the email we send out later)
         } catch (Exception e) {
             // more detailed reporting here
-            System.out.println("found a fail exception: " + e.getMessage());
+        	logger.debug("found a fail exception: " + e.getMessage());
             e.printStackTrace();
             auditEventDAO.createRowForExtractDataJobFailure(triggerBean, e.getMessage());
             try {
                 mailSender.sendEmail(contactEmail, respage.getString("job_failure_for") + " " + triggerBean.getFullName(), e.getMessage(), true);
             } catch (OpenClinicaSystemException ose) {
                 // Do nothing
-                System.out.println("=== throw an ocse: " + ose.getMessage());
-                ose.printStackTrace();
+            	logger.debug("=== throw an ocse: " + ose.getMessage());
+                
             }
         }
     }
@@ -332,7 +325,7 @@ public class ImportSpringJob extends QuartzJobBean {
             String generalFileDir = sdfDir.format(new java.util.Date());
             File logDestDirectory = new File(destDirectory + File.separator + generalFileDir + f.getName().replaceAll(regex, replacement) + ".log.txt");
             if (!logDestDirectory.isDirectory()) {
-                System.out.println("creating new dir: " + logDestDirectory.getAbsolutePath());
+            	logger.debug("creating new dir: " + logDestDirectory.getAbsolutePath());
                 logDestDirectory.mkdirs();
             }
             File newFile = new File(logDestDirectory, "log.txt");
@@ -361,11 +354,10 @@ public class ImportSpringJob extends QuartzJobBean {
                 // schemaValidator.validateAgainstSchema(f, xsdFile);
                 odmContainer = (ODMContainer) um1.unmarshal(new FileReader(f));
 
-                System.out.println("Found crf data container for study oid: " + odmContainer.getCrfDataPostImportContainer().getStudyOID());
-                System.out.println("found length of subject list: " + odmContainer.getCrfDataPostImportContainer().getSubjectData().size());
+                logger.debug("Found crf data container for study oid: " + odmContainer.getCrfDataPostImportContainer().getStudyOID());
+                logger.debug("found length of subject list: " + odmContainer.getCrfDataPostImportContainer().getSubjectData().size());
             } catch (Exception me1) {
                 // fail against one, try another
-                System.out.println("failed in unmarshaling, trying another version");
                 try {
                     schemaValidator.validateAgainstSchema(f, xsdFile2);
                     // for backwards compatibility, we also try to validate vs
@@ -380,7 +372,7 @@ public class ImportSpringJob extends QuartzJobBean {
                     msg.append(mf.format(arguments) + "<br/>");
                     auditMsg.append(mf.format(arguments) + "<br/>");
                     // break here with an exception
-                    System.out.println("found an error with XML: " + msg.toString());
+                    logger.info("found an error with XML: " + msg.toString());
                     // throw new Exception(msg.toString());
                     // instead of breaking the entire operation, we should
                     // continue looping
@@ -394,8 +386,7 @@ public class ImportSpringJob extends QuartzJobBean {
             if (errors != null) {
                 // add to session
                 // forward to another page
-                System.out.println(errors.toString());
-
+              
                 if (errors.size() > 0) {
                 	out.write("<P>Errors:<br/>");
                     for (String error : errors) {
@@ -437,7 +428,7 @@ public class ImportSpringJob extends QuartzJobBean {
             List<EventCRFBean> eventCRFBeans = getImportCRFDataService(dataSource).fetchEventCRFBeans(odmContainer, ub);
 
             ArrayList<Integer> permittedEventCRFIds = new ArrayList<Integer>();
-            System.out.println("found a list of eventCRFBeans: " + eventCRFBeans.toString());
+            logger.debug("found a list of eventCRFBeans: " + eventCRFBeans.toString());
 
             List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
             HashMap<String, String> totalValidationErrors = new HashMap<String, String>();
@@ -449,7 +440,7 @@ public class ImportSpringJob extends QuartzJobBean {
                     DataEntryStage dataEntryStage = eventCRFBean.getStage();
                     Status eventCRFStatus = eventCRFBean.getStatus();
 
-                    System.out.println("Event CRF Bean: id " + eventCRFBean.getId() + ", data entry stage " + dataEntryStage.getName() + ", status "
+                    logger.debug("Event CRF Bean: id " + eventCRFBean.getId() + ", data entry stage " + dataEntryStage.getName() + ", status "
                         + eventCRFStatus.getName());
                     if (eventCRFStatus.equals(Status.AVAILABLE) || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY)
                         || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)
@@ -494,24 +485,24 @@ public class ImportSpringJob extends QuartzJobBean {
                     tempDisplayItemBeanWrappers =
                         getImportCRFDataService(dataSource).lookupValidationErrors(request, odmContainer, ub, totalValidationErrors, hardValidationErrors,
                                 permittedEventCRFIds);
-                    System.out.println("size of total validation errors: " + totalValidationErrors.size());
+                    logger.debug("size of total validation errors: " + totalValidationErrors.size());
                     displayItemBeanWrappers.addAll(tempDisplayItemBeanWrappers);
                 } catch (NullPointerException npe1) {
                     // what if you have 2 event crfs but the third is a fake?
                     npe1.printStackTrace();
                     fail = true;
-                    System.out.println("threw a NPE after calling lookup validation errors");
+                    logger.debug("threw a NPE after calling lookup validation errors");
                     msg.append(respage.getString("an_error_was_thrown_while_validation_errors") + "<br/>");
                     auditMsg.append(respage.getString("an_error_was_thrown_while_validation_errors") + "<br/>");
                     out.write(respage.getString("an_error_was_thrown_while_validation_errors") + "<br/>");
-                    System.out.println("=== threw the null pointer, import ===");
+                    logger.debug("=== threw the null pointer, import ===");
                 } catch (OpenClinicaException oce1) {
                     fail = true;
-                    System.out.println("threw an OCE after calling lookup validation errors " + oce1.getOpenClinicaMessage());
+                    logger.debug("threw an OCE after calling lookup validation errors " + oce1.getOpenClinicaMessage());
                     msg.append(oce1.getOpenClinicaMessage() + "<br/>");
                     // auditMsg.append(oce1.getOpenClinicaMessage() + "<br/>");
                     out.write(oce1.getOpenClinicaMessage() + "<br/>");
-                    System.out.println("=== threw the openclinica message, import ===");
+                    logger.debug("=== threw the openclinica message, import ===");
                 }
             } else {
                 // fail = true;
@@ -575,7 +566,7 @@ public class ImportSpringJob extends QuartzJobBean {
                 // table
                 // otherwise, we generate the other two: validation errors and
                 // valid data
-                System.out.println("found total validation errors: " + totalValidationErrors.size());
+                logger.debug("found total validation errors: " + totalValidationErrors.size());
                 SummaryStatsBean ssBean = getImportCRFDataService(dataSource).generateSummaryStatsBean(odmContainer, displayItemBeanWrappers);
                 // msg.append("===+");
                 // the above is a special key that we will use to split the
@@ -601,41 +592,41 @@ public class ImportSpringJob extends QuartzJobBean {
                     int eventCrfBeanId = -1;
                     EventCRFBean eventCrfBean = new EventCRFBean();
 
-                    System.out.println("right before we check to make sure it is savable: " + wrapper.isSavable());
+                    logger.debug("right before we check to make sure it is savable: " + wrapper.isSavable());
                     if (wrapper.isSavable()) {
                         ArrayList<Integer> eventCrfInts = new ArrayList<Integer>();
-                        System.out.println("wrapper problems found : " + wrapper.getValidationErrors().toString());
+                        logger.debug("wrapper problems found : " + wrapper.getValidationErrors().toString());
                         for (DisplayItemBean displayItemBean : wrapper.getDisplayItemBeans()) {
                             eventCrfBeanId = displayItemBean.getData().getEventCRFId();
                             eventCrfBean = (EventCRFBean) eventCrfDao.findByPK(eventCrfBeanId);
-                            System.out.println("found value here: " + displayItemBean.getData().getValue());
-                            System.out.println("found status here: " + eventCrfBean.getStatus().getName());
+                            logger.debug("found value here: " + displayItemBean.getData().getValue());
+                            logger.debug("found status here: " + eventCrfBean.getStatus().getName());
                             ItemDataBean itemDataBean = new ItemDataBean();
                             itemDataBean =
                                 itemDataDao.findByItemIdAndEventCRFIdAndOrdinal(displayItemBean.getItem().getId(), eventCrfBean.getId(), displayItemBean
                                         .getData().getOrdinal());
                             if (wrapper.isOverwrite() && itemDataBean.getStatus() != null) {
-                                System.out.println("just tried to find item data bean on item name " + displayItemBean.getItem().getName());
+                                logger.debug("just tried to find item data bean on item name " + displayItemBean.getItem().getName());
                                 itemDataBean.setUpdatedDate(new Date());
                                 itemDataBean.setUpdater(ub);
                                 itemDataBean.setValue(displayItemBean.getData().getValue());
                                 // set status?
                                 itemDataDao.update(itemDataBean);
-                                System.out.println("updated: " + itemDataBean.getItemId());
+                                logger.debug("updated: " + itemDataBean.getItemId());
                                 // need to set pk here in order to create dn
                                 displayItemBean.getData().setId(itemDataBean.getId());
                             } else {
                                 itemDataDao.create(displayItemBean.getData());
-                                System.out.println("created: " + displayItemBean.getData().getItemId());
+                                logger.debug("created: " + displayItemBean.getData().getItemId());
                                 ItemDataBean itemDataBean2 =
                                     itemDataDao.findByItemIdAndEventCRFIdAndOrdinal(displayItemBean.getItem().getId(), eventCrfBean.getId(), displayItemBean
                                             .getData().getOrdinal());
-                                System.out.println("found: id " + itemDataBean2.getId() + " name " + itemDataBean2.getName());
+                                logger.debug("found: id " + itemDataBean2.getId() + " name " + itemDataBean2.getName());
                                 displayItemBean.getData().setId(itemDataBean2.getId());
                             }
                             ItemDAO idao = new ItemDAO(dataSource);
                             ItemBean ibean = (ItemBean) idao.findByPK(displayItemBean.getData().getItemId());
-                            System.out.println("*** checking for validation errors: " + ibean.getName());
+                            logger.debug("*** checking for validation errors: " + ibean.getName());
                             String itemOid =
                                 displayItemBean.getItem().getOid() + "_" + wrapper.getStudyEventRepeatKey() + "_" + displayItemBean.getData().getOrdinal()
                                     + "_" + wrapper.getStudySubjectOid();
@@ -647,13 +638,13 @@ public class ImportSpringJob extends QuartzJobBean {
                                     DiscrepancyNoteBean parentDn =
                                         createDiscrepancyNote(ibean, message, eventCrfBean, displayItemBean, null, ub, dataSource, studyBean);
                                     createDiscrepancyNote(ibean, message, eventCrfBean, displayItemBean, parentDn.getId(), ub, dataSource, studyBean);
-                                    System.out.println("*** created disc note with message: " + message);
+                                    logger.debug("*** created disc note with message: " + message);
                                     // displayItemBean);
                                 }
                             }
                             if (!eventCrfInts.contains(new Integer(eventCrfBean.getId()))) {
                                 crfBusinessLogicHelper.markCRFComplete(eventCrfBean, ub);
-                                System.out.println("*** just updated event crf bean: " + eventCrfBean.getId());
+                                logger.debug("*** just updated event crf bean: " + eventCrfBean.getId());
                                 eventCrfInts.add(new Integer(eventCrfBean.getId()));
                             }
                         }
@@ -732,16 +723,13 @@ public class ImportSpringJob extends QuartzJobBean {
         DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(ds);
         note = (DiscrepancyNoteBean) dndao.create(note);
         // so that the below method works, need to set the entity above
-        System.out.println("trying to create mapping with " + note.getId() + " " + note.getEntityId() + " " + note.getColumn() + " " + note.getEntityType());
+       // System.out.println("trying to create mapping with " + note.getId() + " " + note.getEntityId() + " " + note.getColumn() + " " + note.getEntityType());
         dndao.createMapping(note);
-        System.out.println("just created mapping");
-        return note;
+       return note;
     }
 
     private void cutAndPaste(File[] tar, File[] dest) throws IOException {
         for (int j = 0; j < tar.length; j++) {
-            // System.out.println("starting to cut and paste " +
-            // tar[j].getName());
             try {
                 java.io.InputStream in = new FileInputStream(tar[j]);
                 java.io.OutputStream out = new FileOutputStream(dest[j]);
@@ -757,7 +745,7 @@ public class ImportSpringJob extends QuartzJobBean {
                 tar[j].delete();
             } catch (NullPointerException npe) {
                 // list can be 'gappy' which is why we need to catch this
-                System.out.println("found Npe: " + npe.getMessage());
+            	logger.error("found Npe: " + npe.getMessage());
             }
         }
     }

@@ -77,7 +77,7 @@ if( dsBean.getStudyId() != currentStudy.getId())		{
          * finalTarget.setFileName(asdfBean.getWebPath()); finalTarget =
          * Page.GENERATE_EXCEL_DATASET; } else {
          */
-        System.out.println("found file reference: " + asdfBean.getFileReference() + " and file name: " + asdfBean.getName());
+        logger.debug("found file reference: " + asdfBean.getFileReference() + " and file name: " + asdfBean.getName());
         if (asdfBean.getFileReference().endsWith(".zip")) {
             response.setHeader("Content-disposition", "attachment; filename=\"" + asdfBean.getName() + "\";");
             response.setContentType("application/zip");
@@ -104,7 +104,7 @@ if( dsBean.getStudyId() != currentStudy.getId())		{
             // not needed anymore? tbh 10/2010
         }
 
-        System.out.println("just set content type: " + response.getContentType());
+        logger.debug("just set content type: " + response.getContentType());
         finalTarget.setFileName("/WEB-INF/jsp/extract/generatedFileDataset.jsp");
         // }
         // finalTarget.setFileName(asdfBean.getWebPath());

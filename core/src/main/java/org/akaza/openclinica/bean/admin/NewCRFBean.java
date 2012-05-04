@@ -3,7 +3,7 @@
  * GNU Lesser General Public License (GNU LGPL).
 
  * For details see: http://www.openclinica.org/license
- * copyright© 2003-2005 Akaza Research
+ * copyrightï¿½ 2003-2005 Akaza Research
  */
 
 package org.akaza.openclinica.bean.admin;
@@ -259,7 +259,7 @@ public class NewCRFBean extends Object implements java.io.Serializable {
         ResultSet rs = null;
         HashMap returnMe = new HashMap();
         String sql = digester.getQuery("findItemNamesByCRF");
-        logger.info("crf id: *******" + crfId);
+        logger.debug("crf id: *******" + crfId);
         try {
             con = ds.getConnection();
             if (con.isClosed()) {
@@ -374,12 +374,11 @@ public class NewCRFBean extends Object implements java.io.Serializable {
             con.setAutoCommit(false);
             Set mySet = itemQueries.entrySet();
             logger.info("---start of item query generation here---");
-            System.out.println("start query generation");
-            for (Iterator itvl = mySet.iterator(); itvl.hasNext();) {
+             for (Iterator itvl = mySet.iterator(); itvl.hasNext();) {
                 Map.Entry ment = (Map.Entry) itvl.next();
                 String pQuery = (String) ment.getValue();
                 s = con.createStatement();
-                // logger.info(pQuery);
+                 logger.debug(pQuery);
                 s.executeUpdate(pQuery);
                 s.close();
                 // this might throw off the 'error' count, who can say?
@@ -397,7 +396,6 @@ public class NewCRFBean extends Object implements java.io.Serializable {
                 String query = (String) queries.get(th);// it.next();
                 count = th;
                 s = con.createStatement();
-                // System.out.println(query);
                 s.executeUpdate(query);
                 s.close();
                 error.add(query);
@@ -414,7 +412,7 @@ public class NewCRFBean extends Object implements java.io.Serializable {
             // to be the active version, tbh, 8-29
             if (crfId != 0) {
                 String sql = digester.getQuery("findDefaultVersion");
-                logger.info("findDefaultVersion [" + sql + "]");
+                logger.debug("findDefaultVersion [" + sql + "]");
                 ps = con.prepareStatement(sql);
                 ps.setInt(1, crfId);
                 rs = ps.executeQuery();
@@ -541,9 +539,9 @@ public class NewCRFBean extends Object implements java.io.Serializable {
              */
 
             con.commit();
-            logger.info("---end of delete query generation, all queries committed---");
+            logger.debug("---end of delete query generation, all queries committed---");
             con.setAutoCommit(true);
-            logger.info("---end of delete query generation, autocommit set to true---");
+            logger.debug("---end of delete query generation, autocommit set to true---");
 
         } catch (SQLException se) {
             se.printStackTrace();

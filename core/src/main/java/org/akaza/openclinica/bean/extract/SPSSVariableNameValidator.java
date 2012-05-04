@@ -136,8 +136,7 @@ public class SPSSVariableNameValidator extends NameValidator {
     @Override
     public String getNextSequentialString(int maxValue) {
         if(this.sequential>=maxValue) {
-            System.out.println("Cannot generate sequential string because sequential="+sequential+" >= maxValue="+maxValue+".");
-            System.exit(1);
+        	 System.exit(1);
         }
         String s = "" + this.sequential;
         int len = s.length();

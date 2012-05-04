@@ -67,7 +67,7 @@ public class OpenClinicaV1ExpressionProcessor implements ExpressionProcessor {
         try {
             oep = new OpenClinicaExpressionParser(expressionWrapper);
             String result = oep.parseAndTestEvaluateExpression(e.getValue());
-            logger.info("Test Result : " + result);
+            logger.debug("Test Result : " + result);
             return null;
         } catch (OpenClinicaSystemException e) {
             MessageFormat mf = new MessageFormat("");
@@ -82,7 +82,7 @@ public class OpenClinicaV1ExpressionProcessor implements ExpressionProcessor {
         try {
             oep = new OpenClinicaExpressionParser(expressionWrapper);
             String result = oep.parseAndTestEvaluateExpression(e.getValue());
-            logger.info("Test Result : " + result);
+            logger.debug("Test Result : " + result);
             return "Pass : " + result;
         } catch (OpenClinicaSystemException e) {
             MessageFormat mf = new MessageFormat("");
@@ -97,7 +97,7 @@ public class OpenClinicaV1ExpressionProcessor implements ExpressionProcessor {
             oep = new OpenClinicaExpressionParser(expressionWrapper);
             HashMap<String, String> resultAndTestValues = oep.parseAndTestEvaluateExpression(e.getValue(), testValues);
             String returnedResult = resultAndTestValues.get("result");
-            logger.info("Test Result : " + returnedResult);
+            logger.debug("Test Result : " + returnedResult);
             resultAndTestValues.put("ruleValidation", "rule_valid");
             resultAndTestValues.put("ruleEvaluatesTo", returnedResult);
 

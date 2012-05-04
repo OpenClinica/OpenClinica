@@ -442,7 +442,7 @@ public class UpdateStudyServlet extends SecureController {
         logger.info("study bean to be updated:" + study1.getName());
         study1.setUpdatedDate(new Date());
         study1.setUpdater((UserAccountBean) session.getAttribute("userBean"));
-        System.out.println("study's parentId=" + study1.getParentStudyId());
+        logger.debug("study's parentId=" + study1.getParentStudyId());
         sdao.update(study1);
 
         StudyParameterValueBean spv = new StudyParameterValueBean();

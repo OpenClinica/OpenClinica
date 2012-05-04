@@ -77,7 +77,7 @@ public class CreateJobImportServlet extends SecureController {
      */
     private void setUpServlet() throws Exception {
         String directory = SQLInitServlet.getField("filePath") + DIR_PATH + File.separator;
-        System.out.println("found directory: " + directory);
+        logger.debug("found directory: " + directory);
         // find all the form items and re-populate them if necessary
         FormProcessor fp2 = new FormProcessor(request);
 
@@ -134,8 +134,7 @@ public class CreateJobImportServlet extends SecureController {
             if (!errors.isEmpty()) {
                 // set errors to request
                 request.setAttribute("formMessages", errors);
-                System.out.println("has validation errors in the first section");
-                System.out.println("errors found: " + errors.toString());
+                logger.error("has validation errors in the first section"  + errors.toString());
                 setUpServlet();
 
                 forwardPage(Page.CREATE_JOB_IMPORT);
@@ -158,7 +157,7 @@ public class CreateJobImportServlet extends SecureController {
                 // set to the scheduler
                 try {
                     Date dateStart = scheduler.scheduleJob(jobDetailBean, trigger);
-                    System.out.println("== found job date: " + dateStart.toString());
+                    logger.debug("== found job date: " + dateStart.toString());
                     // set a success message here
                     addPageMessage("You have successfully created a new job: " + trigger.getName() + " which is now set to run at the time you specified.");
                     forwardPage(Page.VIEW_IMPORT_JOB_SERVLET);

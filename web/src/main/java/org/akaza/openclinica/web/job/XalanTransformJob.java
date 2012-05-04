@@ -59,12 +59,12 @@ public class XalanTransformJob extends QuartzJobBean {
 
             // Use the Transformer to apply the associated Templates object to an XML document
             // (foo.xml) and write the output to a file (foo.out).
-            System.out.println("--> job starting: ");
+          //  System.out.println("--> job starting: ");
             final long start = System.currentTimeMillis();
             transformer.transform(new StreamSource(dataMap.getString(XML_FILE_PATH)), 
                     new StreamResult(new FileOutputStream(dataMap.getString(SQL_FILE_PATH))));
             final long done = System.currentTimeMillis() - start;
-            System.out.println("--> job completed in " + done + " ms");
+           // System.out.println("--> job completed in " + done + " ms");
         } catch (TransformerConfigurationException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

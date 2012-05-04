@@ -480,8 +480,7 @@ public class CoreResources implements ResourceLoaderAware {
      *          from core jar file
      */
     private void copyODMMappingXMLtoResources(ResourceLoader resourceLoader) {
-        // System.out.println("Properties directory?"+resourceLoader.getResource("properties/xslt"));
-
+      
         ByteArrayInputStream listSrcFiles[] = new ByteArrayInputStream[10];
         String[] fileNames = { "cd_odm_mapping.xml" };
         try {
@@ -588,7 +587,6 @@ public class CoreResources implements ResourceLoaderAware {
             // destination file name of the copied files
             epbean.setExportFileName(getExtractFields("extract." + i + ".exportname"));
             // post-processing event after the creation
-            // System.out.println("found post function: " + whichFunction);
             String whichFunction = getExtractField("extract." + i + ".post").toLowerCase();
             // added by JN: Zipformat comes from extract properties returns true by default
             epbean.setZipFormat(getExtractFieldBoolean("extract." + i + ".zip"));
