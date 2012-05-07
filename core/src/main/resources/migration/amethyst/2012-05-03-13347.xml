@@ -6,7 +6,7 @@
                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
 
  <changeSet author="drodrigues" id="2012-05-03-13347-1" dbms="oracle">
-  <comment>Creates view_dn_stats.</comment>
+  <comment>Dropping old view definitions.</comment>
   <sql splitStatements="true">
   <![CDATA[
 drop view view_discrepancy_note;
@@ -20,7 +20,7 @@ drop view view_dn_subject;
  </changeSet>
 
  <changeSet author="drodrigues" id="2012-05-03-13347-2" dbms="oracle">
-  <comment>Creates view_dn_stats.</comment>
+  <comment>Creates view_dn_item_data.</comment>
   <sql splitStatements="true">
   <![CDATA[
 create or replace view view_dn_item_data as 
@@ -82,7 +82,7 @@ create or replace view view_dn_item_data as
  </changeSet>
 
  <changeSet author="drodrigues" id="2012-05-03-13347-3" dbms="oracle">
-  <comment>Creates view_dn_stats.</comment>
+  <comment>Creates view_dn_event_crf.</comment>
   <sql splitStatements="true">
   <![CDATA[
 create or replace view view_dn_event_crf as 
@@ -160,7 +160,7 @@ create or replace view view_dn_event_crf as
  </changeSet>
 
  <changeSet author="drodrigues" id="2012-05-03-13347-4" dbms="oracle">
-  <comment>Creates view_dn_stats.</comment>
+  <comment>Creates view_dn_study_event.</comment>
   <sql splitStatements="true">
   <![CDATA[
 create or replace view view_dn_study_event as 
@@ -228,7 +228,7 @@ create or replace view view_dn_study_event as
  </changeSet>
 
  <changeSet author="drodrigues" id="2012-05-03-13347-5" dbms="oracle">
-  <comment>Creates view_dn_stats.</comment>
+  <comment>Creates view_dn_study_subject.</comment>
   <sql splitStatements="true">
   <![CDATA[
   create or replace view view_dn_study_subject as 
@@ -287,7 +287,7 @@ create or replace view view_dn_study_event as
  </changeSet>
 
  <changeSet author="drodrigues" id="2012-05-03-13347-6" dbms="oracle">
-  <comment>Creates view_dn_stats.</comment>
+  <comment>Creates view_dn_subject.</comment>
   <sql splitStatements="true">
   <![CDATA[
 create or replace view view_dn_subject as 
@@ -353,7 +353,7 @@ create or replace view view_dn_subject as
  </changeSet>
 
  <changeSet author="drodrigues" id="2012-05-03-13347-7" dbms="oracle">
-  <comment>Creates view_dn_stats.</comment>
+  <comment>Creates view_discrepancy_note.</comment>
   <sql splitStatements="true">
   <![CDATA[
 create or replace view view_discrepancy_note as 
