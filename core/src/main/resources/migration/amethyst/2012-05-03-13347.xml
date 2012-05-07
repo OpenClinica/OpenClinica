@@ -370,4 +370,48 @@ create or replace view view_discrepancy_note as
   </sql>
  </changeSet>
 
+ <changeSet author="drodrigues" id="2012-05-03-13347-8" dbms="oracle">
+  <comment>Replacing view_dn_stats.</comment>
+  <sql splitStatements="true">
+  <![CDATA[
+create or replace view VIEW_DN_STATS as 
+SELECT
+dn.discrepancy_note_id,
+CASE
+   WHEN (dn.resolution_status_id = 1 or dn.resolution_status_id = 2 or dn.resolution_status_id = 3) then FLOOR(CURRENT_DATE - totals.date_updated)
+   ELSE null
+END AS days,
+CASE
+   WHEN (dn.resolution_status_id = 1 or dn.resolution_status_id = 2 or dn.resolution_status_id = 3) then FLOOR(CURRENT_DATE - dn.date_created)
+   WHEN dn.resolution_status_id = 4 then FLOOR(totals.date_updated - dn.date_created)
+   ELSE null
+END AS age,
+totals.total_notes,
+dn.date_created,
+totals.date_updated
+FROM discrepancy_note dn,
+(
+   SELECT
+   dn1.parent_dn_id,
+   max(dn1.date_created) AS date_updated,
+   count(dn1.discrepancy_note_id) AS total_notes
+   FROM discrepancy_note dn1
+   GROUP BY dn1.parent_dn_id
+)
+totals
+WHERE
+(
+   ((dn.parent_dn_id IS NULL) OR (dn.parent_dn_id = 0))
+   AND (dn.discrepancy_note_id = totals.parent_dn_id)
+)
+;
+  ]]>
+  </sql>
+ </changeSet>
+
+ <changeSet author="drodrigues" id="2012-05-03-13347-9" dbms="oracle">
+  <comment>Drop unused view_dn_dates.</comment>
+  <dropView viewName="view_dn_dates"/>
+ </changeSet>
+
 </databaseChangeLog>
