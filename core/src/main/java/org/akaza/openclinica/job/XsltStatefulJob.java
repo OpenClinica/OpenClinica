@@ -22,10 +22,10 @@ public class XsltStatefulJob extends XsltTransformJob
         super.executeInternal(context);
     }
 
-    @Override
     public void interrupt() throws UnableToInterruptJobException {
         if (thread != null) {
             thread.interrupt();
         }
     }
+
 }

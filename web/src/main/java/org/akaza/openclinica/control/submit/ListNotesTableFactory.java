@@ -23,6 +23,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
+import org.akaza.openclinica.control.DropdownFilter;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -41,6 +42,7 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.log.Stopwatch;
+import org.akaza.openclinica.service.DiscrepancyNotesSummary;
 import org.akaza.openclinica.service.managestudy.ViewNotesFilterCriteria;
 import org.akaza.openclinica.service.managestudy.ViewNotesService;
 import org.akaza.openclinica.service.managestudy.ViewNotesSortCriteria;
@@ -55,7 +57,6 @@ import org.jmesa.view.component.Row;
 import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.editor.DateCellEditor;
 import org.jmesa.view.html.HtmlBuilder;
-import org.jmesa.view.html.editor.DroplistFilterEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,6 +89,9 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     private Boolean studyHasDiscNotes = new Boolean(false);
     private ViewNotesService viewNotesService;
     private final boolean showMoreLink;
+    private DiscrepancyNotesSummary notesSummary;
+    private final TypeDroplistFilterEditor discrepancyNoteTypeDropdown = new TypeDroplistFilterEditor();
+    private final ResolutionStatusDroplistFilterEditor resolutionStatusDropdown = new ResolutionStatusDroplistFilterEditor();
 
     public ListNotesTableFactory(boolean showMoreLink){
         this.showMoreLink = showMoreLink;
@@ -127,9 +131,9 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         configureColumn(row.getColumn("numberOfNotes"), resword.getString("of_notes"), null, null, false, false);
         configureColumn(row.getColumn("discrepancyNoteBean.user"), resword.getString("assigned_user"), new AssignedUserCellEditor(), null, true, false);
         configureColumn(row.getColumn("discrepancyNoteBean.resolutionStatus"), resword.getString("resolution_status"), new ResolutionStatusCellEditor(),
-                new ResolutionStatusDroplistFilterEditor(), true, false);
+                resolutionStatusDropdown, true, false);
         configureColumn(row.getColumn("discrepancyNoteBean.disType"), resword.getString("type"), new DiscrepancyNoteTypeCellEditor(),
-                new TypeDroplistFilterEditor(), true, false);
+                discrepancyNoteTypeDropdown, true, false);
         configureColumn(row.getColumn("discrepancyNoteBean.entityType"), resword.getString("entity_type"), null, null, true, false);
         configureColumn(row.getColumn("discrepancyNoteBean.owner"), resword.getString("owner"), new OwnerCellEditor(), null, false, false);
         String actionsHeader = resword.getString("actions") + "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;";
@@ -162,8 +166,21 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             tableFacade.setTotalRows(100);
         }
 
-        List<DiscrepancyNoteBean> items = getViewNotesService().listNotes(getCurrentStudy(),
-                ViewNotesFilterCriteria.buildFilterCriteria(limit, getDateFormat()),
+        ViewNotesFilterCriteria filter = ViewNotesFilterCriteria.buildFilterCriteria(limit, getDateFormat(),
+                discrepancyNoteTypeDropdown.getDecoder(), resolutionStatusDropdown.getDecoder());
+
+        notesSummary = getViewNotesService().calculateNotesSummary(getCurrentStudy(), filter);
+
+        int pageSize = limit.getRowSelect().getMaxRows();
+        int firstRecordShown = (limit.getRowSelect().getPage() - 1) * pageSize;
+        if (firstRecordShown > notesSummary.getTotal()) { // The page selected goes beyond the dataset size
+            // Move to the last page
+            limit.getRowSelect().setPage((int) Math.ceil((double) notesSummary.getTotal() / pageSize));
+            filter = ViewNotesFilterCriteria.buildFilterCriteria(limit, getDateFormat(),
+                    discrepancyNoteTypeDropdown.getDecoder(), resolutionStatusDropdown.getDecoder());
+        }
+
+        List<DiscrepancyNoteBean> items = getViewNotesService().listNotes(getCurrentStudy(), filter,
                 ViewNotesSortCriteria.buildFilterCriteria(limit.getSortSet()));
 
         this.setAllNotes(items);
@@ -278,6 +295,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         return listNotesSort;
     }
 
+
+
     public AuditUserLoginDao getAuditUserLoginDao() {
         return auditUserLoginDao;
     }
@@ -286,29 +305,25 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         this.auditUserLoginDao = auditUserLoginDao;
     }
 
-    private class ResolutionStatusDroplistFilterEditor extends DroplistFilterEditor {
-        @Override
-        protected List<Option> getOptions() {
-            List<Option> options = new ArrayList<Option>();
+    private class ResolutionStatusDroplistFilterEditor extends DropdownFilter {
+
+        public ResolutionStatusDroplistFilterEditor() {
             ResourceBundle reterm = ResourceBundleProvider.getTermsBundle();
             for (ResolutionStatus status : ResolutionStatus.list) {
-                options.add(new Option(Integer.toString(status.getId()), status.getName()));
+                this.addOption(Integer.toString(status.getId()), status.getName());
             }
-            options.add(new Option("1,2", reterm.getString("New_and_Updated")));
-            return options;
+            this.addOption("1,2", reterm.getString("New_and_Updated"));
         }
     }
 
-    private class TypeDroplistFilterEditor extends DroplistFilterEditor {
-        @Override
-        protected List<Option> getOptions() {
-            List<Option> options = new ArrayList<Option>();
+    private class TypeDroplistFilterEditor extends DropdownFilter {
+
+        public TypeDroplistFilterEditor() {
             ResourceBundle reterm = ResourceBundleProvider.getTermsBundle();
             for (DiscrepancyNoteType type : DiscrepancyNoteType.list) {
-                options.add(new Option(Integer.toString(type.getId()), type.getName()));
+                this.addOption(Integer.toString(type.getId()), type.getName());
             }
-            options.add(new Option("1,3", reterm.getString("Query_and_Failed_Validation_Check")));
-            return options;
+            this.addOption("1,3", reterm.getString("Query_and_Failed_Validation_Check"));
         }
     }
 
@@ -631,6 +646,10 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
     public void setViewNotesService(ViewNotesService viewNotesService) {
         this.viewNotesService = viewNotesService;
+    }
+
+    public DiscrepancyNotesSummary getNotesSummary() {
+        return notesSummary;
     }
 
 }

@@ -39,7 +39,7 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.log.Stopwatch;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
-import org.akaza.openclinica.service.managestudy.ViewNotesFilterCriteria;
+import org.akaza.openclinica.service.DiscrepancyNotesSummary;
 import org.akaza.openclinica.service.managestudy.ViewNotesService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -201,9 +201,7 @@ public class ViewNotesServlet extends SecureController {
         //factory.setResolutionStatusIds(resolutionStatusIds);
         TableFacade tf = factory.createTable(request, response);
 
-        Map<String, Map<String, String>> stats = generateDiscrepancyNotesSummary(resolveViewNotesService(),
-                ViewNotesFilterCriteria.buildFilterCriteria(tf.getLimit(),
-                        resformat.getString("date_format_string")));
+        Map<String, Map<String, String>> stats = generateDiscrepancyNotesSummary(factory.getNotesSummary());
         Map<String,String> totalMap = generateDiscrepancyNotesTotal(stats);
 
         int grandTotal = 0;
@@ -272,19 +270,15 @@ public class ViewNotesServlet extends SecureController {
      * @param resolveViewNotesService
      * @return
      */
-    private Map<String, Map<String, String>> generateDiscrepancyNotesSummary(ViewNotesService viewNotesService,
-            ViewNotesFilterCriteria filter) {
-        Map<Integer, Map<Integer, Integer>> summary = viewNotesService.calculateNotesSummary(currentStudy, filter);
-
-        Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>(summary.size());
+    private Map<String, Map<String, String>> generateDiscrepancyNotesSummary(DiscrepancyNotesSummary summary) {
+        Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
         for (ResolutionStatus resStatus : ResolutionStatus.list) {
             Map<String, String> resStatusMap = new HashMap<String, String>(DiscrepancyNoteType.list.size());
-            int acc = 0;
             for (DiscrepancyNoteType dnType : DiscrepancyNoteType.list) {
-                int val = summary.get(dnType.getId()).get(resStatus.getId());
+                int val = summary.getSum(resStatus, dnType);
                 resStatusMap.put(dnType.getName(), (val == 0 ? "--" : Integer.toString(val)));
-                acc += val;
             }
+            int acc = summary.getSum(resStatus);
             resStatusMap.put("Total", (acc == 0 ? "--" : Integer.toString(acc)));
             result.put(resStatus.getName(), resStatusMap);
         }

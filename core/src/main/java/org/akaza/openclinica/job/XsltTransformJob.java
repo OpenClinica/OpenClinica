@@ -210,7 +210,19 @@ public class XsltTransformJob extends QuartzJobBean {
             String ODMXMLFileName = "";
             int fId = 0;
             for (Iterator it = answerMap.entrySet().iterator(); it.hasNext();) {
-                java.util.Map.Entry entry = (java.util.Map.Entry) it.next();
+            	/*
+	        	 * Place this thread in BLOCKED state in order to give it a chance to be interrupted
+	        	 * when the user cancels the export job.
+	        	 *
+            	 * See: java.lang.Thread#interrupt()
+            	 */
+            	Object lock = new Object();
+            	synchronized (lock) {
+	            	long millis = 1L;
+	            	lock.wait(millis);
+            	}
+
+            	java.util.Map.Entry entry = (java.util.Map.Entry) it.next();
                 Object key = entry.getKey();
                 Object value = entry.getValue();
                 ODMXMLFileName = (String) key;// JN: Since there is a logic to
@@ -246,6 +258,17 @@ public class XsltTransformJob extends QuartzJobBean {
             File oldFilesPath = new File(generalFileDir);
             while(fileCntr<numXLS)
             {
+            	/*
+            	 * Place this thread in BLOCKED state in order to give it a chance to be interrupted.
+            	 * See: java.lang.Thread#interrupt()
+            	 */
+            	Object lock = new Object();
+            	synchronized (lock) {
+	            	long millis = 1L;
+	            	lock.wait(millis);
+            	}
+
+            	
                 String xsltPath = dataMap.getString(XSLT_PATH)+ File.separator +epBean.getFileName()[fileCntr];
            // in = new java.io.FileInputStream(dataMap.getString(XSL_FILE_PATH));
                 in = new java.io.FileInputStream(xsltPath);
