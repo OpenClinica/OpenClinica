@@ -501,7 +501,7 @@ public class ExportDatasetServlet extends SecureController {
 
             zipFile.close();
           } catch (java.io.IOException ioe) {
-            System.err.println("Unhandled exception:");
+        	  logger.error("Unhandled exception:");
             ioe.printStackTrace();
             return;
           }

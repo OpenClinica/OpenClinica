@@ -130,7 +130,7 @@ public class ScheduledJobController {
         List<SimpleTrigger> simpleTriggers = new ArrayList<SimpleTrigger>();
         int index1 =0;
         for (String triggerGroup : triggerGroups) {
-            System.out.println("Group: " + triggerGroup + " contains the following triggers");
+            logger.debug("Group: " + triggerGroup + " contains the following triggers");
             triggersInGroup = scheduler.getTriggerNames(triggerGroup);
 
             for (String element : triggersInGroup) {

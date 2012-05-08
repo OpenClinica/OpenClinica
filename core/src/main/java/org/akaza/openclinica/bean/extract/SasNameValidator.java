@@ -29,7 +29,7 @@ package org.akaza.openclinica.bean.extract;
  * 
  * @auther ywang
  */
-
+@Deprecated
 public class SasNameValidator extends NameValidator {
     private int nameMaxLength = 8; // 8;// 32;
 

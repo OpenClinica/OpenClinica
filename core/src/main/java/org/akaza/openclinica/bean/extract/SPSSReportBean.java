@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
  * @author jxu
  * 
  */
+@Deprecated
 public class SPSSReportBean extends ReportBean {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());

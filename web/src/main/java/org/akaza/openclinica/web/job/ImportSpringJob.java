@@ -244,7 +244,7 @@ public class ImportSpringJob extends QuartzJobBean {
                     }
                 } catch (OpenClinicaSystemException e) {
                     // Do nothing
-                	logger.debug("=== throw an ocse === " + e.getMessage());
+                	logger.error("=== throw an ocse === " + e.getMessage());
                     e.printStackTrace();
                 }
 
