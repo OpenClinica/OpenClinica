@@ -132,10 +132,11 @@ public class GenerateExtractFileService {
     /**
      * createODMFile, added by tbh, 09/2010 - note that this is created to be backwards-compatible with previous versions of OpenClinica-web.
      * i.e. we remove the boolean zipped variable.
+     * @throws InterruptedException 
      */
     public HashMap<String, Integer> createODMFile(String odmVersion, long sysTimeBegin, String generalFileDir, DatasetBean datasetBean, 
             StudyBean currentStudy, String generalFileDirCopy,ExtractBean eb, 
-            Integer currentStudyId, Integer parentStudyId, String studySubjectNumber) {
+            Integer currentStudyId, Integer parentStudyId, String studySubjectNumber) throws InterruptedException {
         // default zipped - true
         return createODMFile(odmVersion, sysTimeBegin, generalFileDir, datasetBean, 
                 currentStudy, generalFileDirCopy, eb, currentStudyId, parentStudyId, studySubjectNumber, true, true, true, null);
@@ -144,11 +145,12 @@ public class GenerateExtractFileService {
      * createODMfile, added by tbh, 01/2009
      * @param deleteOld TODO
      * @param odmType TODO
+     * @throws InterruptedException 
      */
 
     public HashMap<String, Integer> createODMFile(String odmVersion, long sysTimeBegin, String generalFileDir, DatasetBean datasetBean, 
     		StudyBean currentStudy, String generalFileDirCopy,ExtractBean eb, 
-    		Integer currentStudyId, Integer parentStudyId, String studySubjectNumber, boolean zipped, boolean saveToDB, boolean deleteOld, String odmType) {
+    		Integer currentStudyId, Integer parentStudyId, String studySubjectNumber, boolean zipped, boolean saveToDB, boolean deleteOld, String odmType) throws InterruptedException {
         
         Integer ssNumber = getStudySubjectNumber(studySubjectNumber);
         MetaDataCollector mdc = new MetaDataCollector(ds, datasetBean, currentStudy,ruleSetRuleDao);
@@ -263,6 +265,18 @@ public class GenerateExtractFileService {
 
         Iterator<OdmStudyBase> it = cdc.getStudyBaseMap().values().iterator();
         while (it.hasNext()) {
+        	/*
+        	 * Place this thread in BLOCKED state in order to give it a chance to be interrupted
+        	 * when the user cancels the export job.
+        	 * 
+        	 * See: java.lang.Thread#interrupt()
+        	 */
+        	Object lock = new Object();
+        	synchronized (lock) {
+	        	long millis = 1L;
+	        	lock.wait(millis);
+        	}
+        	
             OdmStudyBase u = it.next();
             ArrayList newRows =
                 dsdao.selectStudySubjects(u.getStudy().getId(), 0, st_sed_in, st_itemid_in, dsdao.genDatabaseDateConstraint(eb), ecStatusConstraint,
@@ -272,6 +286,15 @@ public class GenerateExtractFileService {
             int fromIndex = 0;
             boolean firstIteration = true;
             while (fromIndex < newRows.size()) {
+            	/*
+            	 * Place this thread in BLOCKED state in order to give it a chance to be interrupted
+            	 * when the user cancels the export job.
+            	 */
+            	synchronized (lock) {
+    	        	long millis = 1L;
+    	        	lock.wait(millis);
+            	}
+            	
                 int toIndex = fromIndex + ssNumber < newRows.size() ? fromIndex + ssNumber : newRows.size() - 1;
                 List x = newRows.subList(fromIndex, toIndex + 1);
                 fromIndex = toIndex + 1;
