@@ -851,7 +851,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                                 null, true);
 
                     } else {
-                    	logger.info("did not send email, but did save DN");
+                    	logger.debug("did not send email, but did save DN");
                     }
                     // addPageMessage(
                     // "Your discrepancy note has been saved into database.");

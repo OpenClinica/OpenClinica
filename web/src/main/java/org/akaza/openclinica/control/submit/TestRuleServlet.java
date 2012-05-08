@@ -254,7 +254,7 @@ public class TestRuleServlet extends SecureController {
                             entry.setValue(sdf.format(date));
                         }
                     } catch (Exception e) {
-                        System.out.println(e);
+                        logger.error(e.toString());
                         // TODO: handle exception
                     }
                 }

@@ -64,10 +64,13 @@ public class TextIO {
      *            spaces possible.
      */
     public void put(Object x, int minChars) {
-        if (minChars <= 0)
-            logger.debug(x.toString());
+        if (minChars <= 0){
+            if ( x!=null){
+            	logger.debug(x.toString()) ;
+            }
+        }
         else
-            System.out.printf("%" + minChars + "s", x);
+        	logger.debug("%" + minChars + "s", x);
     }
 
     /**
@@ -101,7 +104,7 @@ public class TextIO {
         if (format == null)
             throw new IllegalArgumentException("Null format string in TextIO.putf() method.");
         try {
-            System.out.printf(format, items);
+        	logger.debug(format, items);
         } catch (IllegalFormatException e) {
             throw new IllegalArgumentException("Illegal format string in TextIO.putf() method.");
         }

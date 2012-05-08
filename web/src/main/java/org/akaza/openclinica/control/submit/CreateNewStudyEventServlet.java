@@ -427,7 +427,7 @@ public class CreateNewStudyEventServlet extends SecureController {
                 }
             }
             // YW >>
-            logger.debug("we have errors; number of this; " + errors.size());
+            logger.error("we have errors; number of this; " + errors.size());
             if (!errors.isEmpty()) {
                 logger.info("we have errors; number of this; " + errors.size());
                 logger.error("found request study subject: " + fp.getString(INPUT_REQUEST_STUDY_SUBJECT));

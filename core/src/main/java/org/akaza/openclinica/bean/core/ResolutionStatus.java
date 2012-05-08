@@ -127,7 +127,6 @@ public class ResolutionStatus extends Term {
         ResourceBundleProvider.updateLocale(new Locale("en"));
 
         ResolutionStatus test = new ResolutionStatus(1, "New", null, null);
-        logger.info("Test id : " + test.getId());
-        logger.info(test.getName());
+        logger.debug("Test id : " + test.getId()+" "+test.getName());
     }
 }

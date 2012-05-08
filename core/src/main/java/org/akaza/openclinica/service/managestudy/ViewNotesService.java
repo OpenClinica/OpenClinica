@@ -8,10 +8,10 @@
 package org.akaza.openclinica.service.managestudy;
 
 import java.util.List;
-import java.util.Map;
 
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.service.DiscrepancyNotesSummary;
 
 /**
  * @author Doug Rodrigues (douglas.rodrigues@openclinica.com)
@@ -22,6 +22,6 @@ public interface ViewNotesService {
     List<DiscrepancyNoteBean> listNotes(StudyBean currentStudy, ViewNotesFilterCriteria filter,
             ViewNotesSortCriteria sort);
 
-    Map<Integer, Map<Integer, Integer>> calculateNotesSummary(StudyBean currentStudy, ViewNotesFilterCriteria filter);
+    DiscrepancyNotesSummary calculateNotesSummary(StudyBean currentStudy, ViewNotesFilterCriteria filter);
 
 }

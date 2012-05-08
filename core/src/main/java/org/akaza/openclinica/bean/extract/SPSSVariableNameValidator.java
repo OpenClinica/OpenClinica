@@ -41,6 +41,7 @@ import java.util.TreeSet;
  *
  * @auther ywang
  */
+@Deprecated
 public class SPSSVariableNameValidator extends NameValidator {
     private final String[] reservedKeywords = { "all", "and", "by", "eq", "ge", "gt", "le", "lt", "ne", "not", "or", "to", "with" };
     private char replacingChar = '#';

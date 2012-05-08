@@ -8,12 +8,12 @@
 package org.akaza.openclinica.service.managestudy;
 
 import java.util.List;
-import java.util.Map;
 
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.managestudy.ViewNotesDao;
 import org.akaza.openclinica.log.Stopwatch;
+import org.akaza.openclinica.service.DiscrepancyNotesSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,10 +37,10 @@ public class ViewNotesServiceImpl implements ViewNotesService {
         return result;
     }
 
-    public Map<Integer, Map<Integer, Integer>> calculateNotesSummary(StudyBean currentStudy,
+    public DiscrepancyNotesSummary calculateNotesSummary(StudyBean currentStudy,
             ViewNotesFilterCriteria filter) {
         Stopwatch sw = Stopwatch.createAndStart("calculateNotesSummary");
-        Map<Integer, Map<Integer, Integer>> result = viewNotesDao.calculateNotesSummary(currentStudy, filter);
+        DiscrepancyNotesSummary result = viewNotesDao.calculateNotesSummary(currentStudy, filter);
         sw.stop();
         return result;
     }
