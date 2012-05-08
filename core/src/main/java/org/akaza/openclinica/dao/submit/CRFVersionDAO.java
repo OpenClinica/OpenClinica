@@ -225,7 +225,7 @@ public class CRFVersionDAO<K extends String,V extends ArrayList> extends Auditab
         this.setTypeExpected(3, TypeNames.INT);
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(versionId));
-        variables.put(new Integer(2), new Integer(versionId));
+     //   variables.put(new Integer(2), new Integer(versionId));
         String sql = digester.getQuery("findNotSharedItemsByVersion");
         ArrayList alist = this.select(sql, variables);
         ArrayList al = new ArrayList();
