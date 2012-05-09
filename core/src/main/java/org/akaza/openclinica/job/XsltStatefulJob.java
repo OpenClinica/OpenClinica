@@ -18,14 +18,11 @@ public class XsltStatefulJob extends XsltTransformJob
     @Override
     protected void executeInternal(JobExecutionContext context)
             throws JobExecutionException {
-        thread = Thread.currentThread();
         super.executeInternal(context);
     }
 
+    @Override
     public void interrupt() throws UnableToInterruptJobException {
-        if (thread != null) {
-            thread.interrupt();
-        }
+    	super.interrupt();
     }
-
 }
