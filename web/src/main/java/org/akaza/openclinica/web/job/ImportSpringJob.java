@@ -266,14 +266,14 @@ public class ImportSpringJob extends QuartzJobBean {
             // service.generateSummaryStatsBean(for the email we send out later)
         } catch (Exception e) {
             // more detailed reporting here
-        	logger.debug("found a fail exception: " + e.getMessage());
+        	logger.error("found a fail exception: " + e.getMessage());
             e.printStackTrace();
             auditEventDAO.createRowForExtractDataJobFailure(triggerBean, e.getMessage());
             try {
                 mailSender.sendEmail(contactEmail, respage.getString("job_failure_for") + " " + triggerBean.getFullName(), e.getMessage(), true);
             } catch (OpenClinicaSystemException ose) {
                 // Do nothing
-            	logger.debug("=== throw an ocse: " + ose.getMessage());
+            	logger.error("=== throw an ocse: " + ose.getMessage());
                 
             }
         }
@@ -372,7 +372,7 @@ public class ImportSpringJob extends QuartzJobBean {
                     msg.append(mf.format(arguments) + "<br/>");
                     auditMsg.append(mf.format(arguments) + "<br/>");
                     // break here with an exception
-                    logger.info("found an error with XML: " + msg.toString());
+                    logger.error("found an error with XML: " + msg.toString());
                     // throw new Exception(msg.toString());
                     // instead of breaking the entire operation, we should
                     // continue looping
@@ -498,11 +498,11 @@ public class ImportSpringJob extends QuartzJobBean {
                     logger.debug("=== threw the null pointer, import ===");
                 } catch (OpenClinicaException oce1) {
                     fail = true;
-                    logger.debug("threw an OCE after calling lookup validation errors " + oce1.getOpenClinicaMessage());
+                    logger.error("threw an OCE after calling lookup validation errors " + oce1.getOpenClinicaMessage());
                     msg.append(oce1.getOpenClinicaMessage() + "<br/>");
                     // auditMsg.append(oce1.getOpenClinicaMessage() + "<br/>");
                     out.write(oce1.getOpenClinicaMessage() + "<br/>");
-                    logger.debug("=== threw the openclinica message, import ===");
+                   
                 }
             } else {
                 // fail = true;

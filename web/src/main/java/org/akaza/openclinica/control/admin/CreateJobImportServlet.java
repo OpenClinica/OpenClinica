@@ -134,7 +134,7 @@ public class CreateJobImportServlet extends SecureController {
             if (!errors.isEmpty()) {
                 // set errors to request
                 request.setAttribute("formMessages", errors);
-                logger.error("has validation errors in the first section"  + errors.toString());
+                logger.debug("has validation errors in the first section"  + errors.toString());
                 setUpServlet();
 
                 forwardPage(Page.CREATE_JOB_IMPORT);
