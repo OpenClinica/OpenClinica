@@ -29,6 +29,7 @@ import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.SchedulerException;
+import org.quartz.UnableToInterruptJobException;
 import org.quartz.impl.StdScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,6 +107,11 @@ public class XsltTransformJob extends QuartzJobBean {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
+    /**
+     * Internal operation that creates an ODM file.
+     */
+    private GenerateExtractFileService.OdmFileCreation odmFileCreation;
+    
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
         // need to generate a Locale for emailing users with i18n
@@ -196,11 +202,17 @@ public class XsltTransformJob extends QuartzJobBean {
             datasetBean.setName(datasetBean.getName().replaceAll(" ", "_"));
             logger.debug("--> job starting: ");
 
-            HashMap answerMap =
-                generateFileService.createODMFile(epBean.getFormat(), sysTimeBegin, generalFileDir, datasetBean, currentStudy, "", eb, currentStudy.getId(),
-                        currentStudy.getParentStudyId(), "99", (Boolean) dataMap.get(ZIPPED), false, (Boolean) dataMap.get(DELETE_OLD), epBean.getOdmType());
-            
-            
+            odmFileCreation = generateFileService.new OdmFileCreation();
+
+            HashMap answerMap = null;
+            try {
+	            answerMap =
+	                odmFileCreation.createODMFile(epBean.getFormat(), sysTimeBegin, generalFileDir, datasetBean, currentStudy, "", eb, currentStudy.getId(),
+	                        currentStudy.getParentStudyId(), "99", (Boolean) dataMap.get(ZIPPED), false, (Boolean) dataMap.get(DELETE_OLD), epBean.getOdmType());
+            } catch (JobInterruptedException ex) {
+            	logger.info(ex.getMessage());
+            	return;
+            }
             
             // won't save a record of the XML to db
             // won't be a zipped file, so that we can submit it for
@@ -210,16 +222,9 @@ public class XsltTransformJob extends QuartzJobBean {
             String ODMXMLFileName = "";
             int fId = 0;
             for (Iterator it = answerMap.entrySet().iterator(); it.hasNext();) {
-            	/*
-	        	 * Place this thread in BLOCKED state in order to give it a chance to be interrupted
-	        	 * when the user cancels the export job.
-	        	 *
-            	 * See: java.lang.Thread#interrupt()
-            	 */
-            	Object lock = new Object();
-            	synchronized (lock) {
-	            	long millis = 1L;
-	            	lock.wait(millis);
+            	if (interrupted) {
+            		logger.info("XsltTransformJob interrupted.");
+            		return;
             	}
 
             	java.util.Map.Entry entry = (java.util.Map.Entry) it.next();
@@ -258,14 +263,9 @@ public class XsltTransformJob extends QuartzJobBean {
             File oldFilesPath = new File(generalFileDir);
             while(fileCntr<numXLS)
             {
-            	/*
-            	 * Place this thread in BLOCKED state in order to give it a chance to be interrupted.
-            	 * See: java.lang.Thread#interrupt()
-            	 */
-            	Object lock = new Object();
-            	synchronized (lock) {
-	            	long millis = 1L;
-	            	lock.wait(millis);
+            	if (interrupted) {
+            		logger.info("XsltTransformJob interrupted.");
+            		return;
             	}
 
             	
@@ -632,6 +632,16 @@ public class XsltTransformJob extends QuartzJobBean {
 
         }
 
+    }
+
+    private boolean interrupted = false;
+    
+    protected void interrupt() throws UnableToInterruptJobException {
+    	interrupted = true;
+
+    	if (odmFileCreation != null) {
+    		odmFileCreation.interrupt();
+    	}
     }
 
     private void logMe(String message) {
