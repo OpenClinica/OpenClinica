@@ -481,15 +481,7 @@ function checkDataStatus() {
                                     </c:otherwise>
                                 </c:choose>
 
-                                    <%-- below removed tbh, 102007 --%>
-                                    <%--
-
-                                            <td><input type="submit" name="submittedResume" value="Save" class="button_medium" /></td>
-                                            <td><input type="submit" name="submittedExit" value="Exit" class="button_medium" onClick="return checkEntryStatus('DataStatus_top');" /></td>
-
-                                    --%>
-
-                                    <%--<td valign="bottom"><img name="DataStatus_top" src="images/icon_UnchangedData.gif"></td>--%>
+                                   
                             </tr>
                         </table>
                     </td>
@@ -656,6 +648,7 @@ but the custom tag uses that, not this jstl code--%>
                         <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                         <c:param name="originJSP" value="initialDataEntry"/>
                         <c:param name="isLocked" value="${isLocked}"/>
+                        
                     </c:import>
                 </td>
             </c:forEach>
@@ -674,13 +667,14 @@ but the custom tag uses that, not this jstl code--%>
 					<c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                     <c:param name="originJSP" value="initialDataEntry"/>
                     <c:param name="isLocked" value="${isLocked}"/>
+                    
                 </c:import>
             </td>
         </c:otherwise>
     </c:choose>
     <c:set var="columnNum" value="${columnNum+1}"/>
 </c:forEach>
-    <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup  && studySubjectId == 0}">
+    <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup }">
        
                 <td class="aka_padding_norm aka_cellBorders">
                     <input type="hidden" name="<c:out value="${repeatParentId}"/>_[<c:out value="${repeatParentId}"/>].newRow" value="yes" />
@@ -748,7 +742,7 @@ but the custom tag uses that, not this jstl code--%>
     </c:choose>
     <c:set var="columnNum" value="${columnNum+1}"/>
 </c:forEach>
-    <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup && studySubjectId == 0}">
+    <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup }">
      
                 <td class="aka_padding_norm aka_cellBorders">
                         <%-- check for manual in the input name; if rowCount > 0 then manual
@@ -771,7 +765,7 @@ but the custom tag uses that, not this jstl code--%>
 <c:set var="uniqueId" value="${uniqueId +1}"/>
 <!-- repeating rows in an item group end -->
 </c:forEach>
-    <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup && studySubjectId == 0}">
+    <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup }">
         <tr><td class="aka_padding_norm aka_cellBorders" colspan="<c:out value="${totalColsPlusSubcols + 1}"/>">
                         <button stype="add" type="button" template="<c:out value="${repeatParentId}"/>" class="button_search"><fmt:message key="add" bundle="${resword}"/></button></td>
                

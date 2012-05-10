@@ -698,8 +698,7 @@ public class GenerateExtractFileService {
             // created in database!
 
         } catch (Exception e) {
-            logger.warn(e.getMessage());
-           logger.debug("-- exception thrown at createFile: " + e.getMessage());
+            logger.error(e.getMessage());
             e.printStackTrace();
         }
         finally{
@@ -817,8 +816,7 @@ public class GenerateExtractFileService {
             // created in database!
 
         } catch (Exception e) {
-            logger.warn(e.getMessage());
-            logger.debug("-- exception thrown at createFile: " + e.getMessage());
+            logger.error("-- exception thrown at createFile: " + e.getMessage());
             e.printStackTrace();
         }
 
