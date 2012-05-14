@@ -8,7 +8,7 @@
     <parent>
         <groupId>org.akaza.openclinica</groupId>
         <artifactId>OpenClinica</artifactId>
-        <version>3.1-SNAPSHOT</version>
+        <version>3.1-jikan</version>
     </parent>
     <dependencies>
     	<dependency>
