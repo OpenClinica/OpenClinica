@@ -12,6 +12,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -123,8 +124,7 @@ public class ViewNotesFilterCriteria {
             try {
                 return df.parse(value);
             } catch (ParseException e) {
-                throw new IllegalArgumentException("The filter '" + filterName + "' doesn't contain a valid date: "
-                        + value, e);
+                return new Date(0); // Returns January 1, 1970 whenever the date cannot be parsed
             }
         }
         return "%" + StringUtils.trim(value) + "%";
