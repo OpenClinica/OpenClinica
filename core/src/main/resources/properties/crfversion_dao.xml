@@ -67,7 +67,10 @@
       from versioning_map v, item i 
       where v.item_id =i.item_id
       and v.crf_version_id=?
-     
+      and v.item_id not in
+         (SELECT DISTINCT v.item_id
+	  FROM versioning_map v
+	  WHERE v.crf_version_id != ? )
 	  
 	 </sql>
 	</query>
