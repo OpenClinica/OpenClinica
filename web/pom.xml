@@ -291,6 +291,10 @@
 		</dependency>
 	</dependencies>
 
+    <properties>
+        <context.name>OpenClinica</context.name>
+    </properties>
+
 	<build>
 		<resources>
 			<resource>
@@ -320,7 +324,11 @@
 					</execution>
 				</executions>
 			</plugin>
-		</plugins>
+			<plugin>
+				<groupId>org.codehaus.cargo</groupId>
+				<artifactId>cargo-maven2-plugin</artifactId>
+			</plugin>
+        </plugins>
 	</build>
 	<scm>
 		<connection>${scm.path}/web</connection>

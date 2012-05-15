@@ -97,7 +97,45 @@
 	                    </lifecycleMappingMetadata>
 	                  </configuration>
 	                </plugin>
-	            </plugins>
+
+                    <plugin>
+                        <groupId>org.codehaus.cargo</groupId>
+                        <artifactId>cargo-maven2-plugin</artifactId>
+                        <version>1.2.1</version>
+                        <configuration>
+                            <container>
+                                <containerId>tomcat6x</containerId>
+                                <type>remote</type>
+                            </container>
+                            <configuration>
+                                <type>runtime</type>
+                                <properties>
+                                    <cargo.protocol>${remote.deployment.protocol}</cargo.protocol>
+                                    <cargo.hostname>${remote.deployment.hostname}</cargo.hostname>
+                                    <cargo.servlet.port>${remote.deployment.port}</cargo.servlet.port>
+                                    <cargo.tomcat.manager.url>${remote.deployment.url}</cargo.tomcat.manager.url>
+                                    <cargo.remote.username>${remote.deployment.username}</cargo.remote.username>
+                                    <cargo.remote.password>${remote.deployment.password}</cargo.remote.password>
+                                </properties>
+                            </configuration>
+                            <deployer>
+                                <type>remote</type>
+                                <deployables>
+                                    <deployable>
+                                        <groupId>${project.groupId}</groupId>
+                                        <artifactId>${project.artifactId}</artifactId>
+                                        <type>war</type>
+                                        <properties>
+                                            <context>${context.name}</context>
+                                        </properties>
+                                    </deployable>
+                                </deployables>
+                            </deployer>
+                        </configuration>
+                    </plugin>
+
+
+                </plugins>
 	        </pluginManagement>
 		  </build>
 		</profile>
@@ -394,22 +432,6 @@
                 <version>2.8</version>
 				<configuration>
 					<addVersionToProjectName>true</addVersionToProjectName>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.cargo</groupId>
-				<artifactId>cargo-maven2-plugin</artifactId>
-				<version>0.3.1</version>
-				<configuration>
-					<!-- Container configuration -->
-					<container>
-						<containerId>tomcat5x</containerId>
-						<home>${catalina.home}</home>
-					</container>
-					<configuration>
-						<home>${catalina.home}</home>
-						<type>existing</type>
-					</configuration>
 				</configuration>
 			</plugin>
 			<plugin>
