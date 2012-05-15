@@ -1821,12 +1821,27 @@
 		<xsl:variable name="significantDigits" select="@SignificantDigits"/>
 		
 	<!--{ItemDefColHeaders2: <xsl:value-of select="$calledFor"/>}-->
+	<!-- @pgawade 11-May-2012 Fix for issue #13613 -->
+	<xsl:variable name="itemName" select="@Name"/>
+	<!-- @pgawade 14-May-2012 #13613 prepend the 'v$' before item name if it starts with some thing other then alphabet -->
+	<xsl:variable name="itemNameValidated">
+		<xsl:choose>
+			<xsl:when test='matches(substring($itemName, 1, 1), "[^A-Za-z]")'>
+				<xsl:value-of select="concat('v$', normalize-space($itemName))"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$itemName"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+	
 		<xsl:choose>
 			<xsl:when test="$calledFor = 'itemDataValuesSPSS'">
 			<xsl:variable name="comment" select="@Comment"/>
 				<xsl:value-of select="' '"/>
 				<!--<xsl:value-of select="@Name" />-->
-				<xsl:value-of select='replace(normalize-space(@Name), "\s", "_")'/>
+				<!--<xsl:value-of select='replace(normalize-space(@Name), "\s", "_")'/>-->
+				<xsl:value-of select='replace(normalize-space($itemNameValidated), "\s", "_")'/>
 				<xsl:text>_</xsl:text>
 				<xsl:value-of select="$E"/>	<xsl:value-of select="$eventPosition"/>
 				<xsl:if test="$isEventRepeating = 'Yes'">
@@ -1876,7 +1891,8 @@
 			<xsl:variable name="codeListOID" select="./odm:CodeListRef/@CodeListOID" />
 			<xsl:if test="$codeListOID">
 				<!--<xsl:value-of select="@Name" />-->
-				<xsl:value-of select='replace(normalize-space(@Name), "\s", "_")'/>
+				<!--<xsl:value-of select='replace(normalize-space(@Name), "\s", "_")'/>-->
+				<xsl:value-of select='replace(normalize-space($itemNameValidated), "\s", "_")'/>
 				<xsl:text>_</xsl:text>
 				<xsl:value-of select="$E"/>	<xsl:value-of select="$eventPosition"/>
 				<xsl:if test="$isEventRepeating = 'Yes'">
@@ -1912,7 +1928,8 @@
 			</xsl:when>	
 			<xsl:otherwise>
 			<xsl:value-of select="' '"/>
-			<xsl:value-of select='replace(normalize-space(@Name), "\s", "_")'/>
+			<!--<xsl:value-of select='replace(normalize-space(@Name), "\s", "_")'/>-->
+			<xsl:value-of select='replace(normalize-space($itemNameValidated), "\s", "_")'/>
 			<xsl:text>_</xsl:text>
 			<xsl:value-of select="$E"/>	<xsl:value-of select="$eventPosition"/>
 			<xsl:if test="$isEventRepeating = 'Yes'">
