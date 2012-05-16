@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import org.akaza.openclinica.bean.core.ApplicationConstants;
@@ -63,6 +64,7 @@ public class SpreadSheetItemUtil {
 	public SpreadSheetItemUtil(){}
 	
 	private String cleanProperty(String property){
+		if (property == null){property="";}
 		property= property.trim();
 		return property.replaceAll("<[^>]*>", "");
         
@@ -399,30 +401,49 @@ public class SpreadSheetItemUtil {
 	 * for itemName (column 0
 	 */
 	public static boolean isItemWithSameParameterExists(
-			String column_value, ArrayList< SpreadSheetItemUtil> row_items){
-		SpreadSheetItemUtil item =  isItemWithSameParameterExists(CrfTemplateColumnNameEnum.ITEM_NAME, column_value, row_items);
-		return (item==null);
+			String column_value, List< SpreadSheetItemUtil> row_items){
+		if (row_items == null || row_items.size() ==1 ){ return false;}
+		SpreadSheetItemUtil item =  isItemWithSameParameterExists(CrfTemplateColumnNameEnum.ITEM_NAME, column_value, row_items, false);
+		return (item != null);
+	}
+	public static boolean isItemWithSameParameterExistsIncludingMyself(
+		String column_value, List< SpreadSheetItemUtil> row_items){
+		if (row_items == null || row_items.size() ==1 ) { return true;}
+		SpreadSheetItemUtil item =  isItemWithSameParameterExists(CrfTemplateColumnNameEnum.ITEM_NAME, column_value, row_items, true);
+		return (item != null);
 	}
 	public static SpreadSheetItemUtil isItemWithSameParameterExists(CrfTemplateColumnNameEnum param_column_index, 
-			String column_value, ArrayList< SpreadSheetItemUtil> row_items){
+			String column_value, List< SpreadSheetItemUtil> row_items){
+		if (row_items == null || row_items.size() ==1 ){ return null;}
+		return  isItemWithSameParameterExists( param_column_index, 	 column_value,  row_items, false);
+	}
+	public static SpreadSheetItemUtil isItemWithSameParameterExists(CrfTemplateColumnNameEnum param_column_index, 
+			String column_value, List< SpreadSheetItemUtil> row_items, boolean isIncludingMyself){
+		
+		int last_item_to_check = 0;//current item should not be included in evaluation
 		for (SpreadSheetItemUtil cur_item : row_items ){
-			switch (param_column_index){
-			case ITEM_NAME:{
-				if ( cur_item.getItemName().equals(column_value)){
-					return cur_item;
-				}
-				break;
+			if ( !isIncludingMyself ){
+				if ( last_item_to_check == row_items.size()-1 ){break;}
 			}
-			
+			last_item_to_check++;
+			switch (param_column_index){
+				case ITEM_NAME:{
+					if ( cur_item.getItemName().equals(column_value)){
+						return cur_item;
+					}
+					break;
+				}
+				
 			}
 		}
 		return null;
 		
 	}
+	
 	//TODO if we ever go to normal OO parsing of spreadsheet this method should be moved to 
 	//SpredSheetGroupUtil
 	//the problem here that Group now can be ungrouped group
-	public static void versifySectionGroupPlacementForItems(ArrayList< SpreadSheetItemUtil> row_items,
+	public static void verifySectionGroupPlacementForItems(ArrayList< SpreadSheetItemUtil> row_items,
 			ArrayList<String> ver_errors, HashMap<String,String> htmlErrors,
 			int sheetNumber,
 			ResourceBundle resPageMsg,
@@ -432,7 +453,7 @@ public class SpreadSheetItemUtil {
 		int row_number=1;
 		for (SpreadSheetItemUtil cur_item : row_items){
 			row_number++;
-			if ( cur_item.getGroupLabel() == null || cur_item.getGroupLabel().length()<1 ){
+			if (  cur_item.getGroupLabel().length()<1 ){
 				continue;
 			}
 			//verify that this is repeating group
@@ -463,12 +484,12 @@ public class SpreadSheetItemUtil {
 		
 		int row_number = row_items.size();
         // BWP>>Prevent parent names that equal the Item names 
-        if (this.getItemName() != null && this.getItemName().equalsIgnoreCase(this.getParentItem())) {
+        if ( this.getItemName().equalsIgnoreCase(this.getParentItem())) {
         	this.setParentItem( "");
         	
         }
         
-        if(!StringUtil.isBlank(this.getParentItem())){
+        if(!this.getParentItem().isEmpty()){
         	SpreadSheetItemUtil cur_item = SpreadSheetItemUtil.isItemWithSameParameterExists(CrfTemplateColumnNameEnum.ITEM_NAME, 
         			this.getParentItem(),  row_items);
         	// Checking for a valid parent item name
@@ -489,7 +510,7 @@ public class SpreadSheetItemUtil {
 				if ( item_group != null ){
 					boolean isRepeatingGroup=item_group.getMeta().isRepeatingGroup();
 					if ( isRepeatingGroup){
-			            if ( this.getGroupLabel()!= null && this.getGroupLabel().length()>0){
+			            if (  this.getParentItem().length()>0){
 			            	ver_errors.add(resPageMsg.getString("parentId_group")+row_items.size()+resPageMsg.getString("nested_parent_id_1"));
 			            	 htmlErrors.put(sheetNumber + "," + row_number + ","+CrfTemplateColumnNameEnum.PARENT_ITEM.getCellNumber(), resPageMsg.getString("INVALID_FIELD"));
 			            }
@@ -505,7 +526,7 @@ public class SpreadSheetItemUtil {
 			HashMap<String,String> htmlErrors, int sheetNumber,  ResourceBundle resPageMsg){
 		int row_number=row_items.size();
 		StringBuffer str= new StringBuffer();
-		if ( this.getSectionLabel() == null || this.getSectionLabel().length()==0){
+		if (  this.getSectionLabel().length()==0){
 			str.append(resPageMsg.getString("the") + " ");
 			str.append( resPageMsg.getString("SECTION_LABEL_column") + " ");
 			str.append( resPageMsg.getString("not_valid_section_at_row") + " ");
@@ -516,7 +537,7 @@ public class SpreadSheetItemUtil {
             		resPageMsg.getString("NOT_A_VALID_LABEL"));
        }
 		
-       if (this.getSectionLabel() != null && this.getSectionLabel().length() > 2000) {
+       if ( this.getSectionLabel().length() > 2000) {
     	   ver_errors.add(resPageMsg.getString("section_label_length_error"));
     	   htmlErrors.put(sheetNumber + "," + row_number + ","+ CrfTemplateColumnNameEnum.SECTION_LABEL.getCellNumber(), 
            		resPageMsg.getString("NOT_A_VALID_LABEL"));
@@ -549,13 +570,13 @@ public class SpreadSheetItemUtil {
                     + resPageMsg.getString("items_worksheet_with_dot")  + " "+resPageMsg.getString("you_can_only_use_letters_or_numbers"));
                 htmlErrors.put(sheetNumber + "," + k + ",0", resPageMsg.getString("INVALID_FIELD"));
         }
-        if (StringUtil.isBlank(itemName)) {
+        if (itemName.isEmpty()) {
         	ver_errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("item_name_column") + " "
                 + resPageMsg.getString("was_blank_at_row") + " "+k + ", " + resPageMsg.getString("items_worksheet_with_dot") );
             htmlErrors.put(sheetNumber + "," + k + ","+ CrfTemplateColumnNameEnum.ITEM_NAME.getCellNumber()
                 , resPageMsg.getString("required_field"));
         }
-        if (itemName != null && itemName.length() > 255) {
+        if ( itemName.length() > 255) {
         	ver_errors.add(resPageMsg.getString("item_name_length_error"));
         }
 
@@ -626,7 +647,7 @@ public class SpreadSheetItemUtil {
              }
              else if(this.getResponseTypeId() == ResponseType.CHECKBOX.getId()||
             		 this.getResponseTypeId() == ResponseType.SELECTMULTI.getId()){
-            	 //TODO
+            	 //TODO : see previous comment 
              }
            
          }

@@ -1073,7 +1073,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                 String p1 = par[1].trim();
                                 String p2 = par[2].trim();
                                 if(p0.length()>0 && p1.length()>0 && p2.length()>0) {
-                                    if(SpreadSheetItemUtil.isItemWithSameParameterExists(p0,  row_items)) {
+                                    if(SpreadSheetItemUtil.isItemWithSameParameterExistsIncludingMyself(p0,  row_items)) {
                                         controlItemName = p0; optionValue = p1; message = p2;
                                         pvKey+=p0;
                                         if(controlValues.containsKey(pvKey)) {
@@ -1607,7 +1607,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                 queries.add(sqlGroupLabel);
                             } catch (NullPointerException e) {
                                 // Auto-generated catch block, added tbh 102007
-                                logger.error(e.getMessage());
+                                logger.error( "Error  message", e);
                                 errors.add(resPageMsg.getString("Error_found_at_row") + " \"" + (k + 1) + "\"" + resPageMsg.getString("items_worksheet_with_dot")
                                     + resPageMsg.getString("GROUP_LABEL") + "\"" + groupLabel + "\" "
                                     + resPageMsg.getString("does_not_exist_in_group_spreadsheet"));
@@ -1662,7 +1662,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                     
                     //validate that items of one group are not spread over several sections
                     
-                    SpreadSheetItemUtil.versifySectionGroupPlacementForItems( row_items, errors,  htmlErrors, j,resPageMsg,  itemGroups);
+                    SpreadSheetItemUtil.verifySectionGroupPlacementForItems( row_items, errors,  htmlErrors, j,resPageMsg,  itemGroups);
                     
                     instantValidator.validate();
                     errors = (ArrayList<String>)instantValidator.getSheetErrors().addErrorsToSheet(errors);
@@ -1878,7 +1878,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                      htmlErrors.put(j + "," + gk + ",3", resPageMsg.getString("INVALID_FIELD"));
                             }
                         } catch (NumberFormatException n2) {
-                            logger.error(n2.getMessage());
+                            logger.error("Error  message", n2);
                             if ("".equals(groupRepeatMax)) {
                                 igMeta.setRepeatMax(40);
                             } else {
