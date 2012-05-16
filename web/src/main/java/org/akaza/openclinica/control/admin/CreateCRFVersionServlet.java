@@ -3,7 +3,7 @@
  * GNU Lesser General Public License (GNU LGPL).
 
  * For details see: http://www.openclinica.org/license
- * copyright 2003-2005 Akaza Research
+ * copyright 2003-2011 Akaza Research
  */
 package org.akaza.openclinica.control.admin;
 
@@ -79,18 +79,12 @@ public class CreateCRFVersionServlet extends SecureController {
         throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
     }
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public void processRequest() throws Exception {
         resetPanel();
         panel.setStudyInfoShown(true);
-        //panel.setOrderedData(true);
-
-        //setToPanel(resword.getString("create_CRF"), respage.getString("br_create_new_CRF_entering"));
-        //setToPanel(resword.getString("create_CRF_version"), respage.getString("br_create_new_CRF_uploading"));
-        //setToPanel(resword.getString("revise_CRF_version"), respage.getString("br_if_you_owner_CRF_version"));
-        //setToPanel(resword.getString("CRF_spreadsheet_template"), respage.getString("br_download_blank_CRF_spreadsheet_from"));
-        //setToPanel(resword.getString("example_CRF_br_spreadsheets"), respage.getString("br_download_example_CRF_instructions_from"));
-
+       
         CRFDAO cdao = new CRFDAO(sm.getDataSource());
         CRFVersionDAO vdao = new CRFVersionDAO(sm.getDataSource());
         EventDefinitionCRFDAO edao = new EventDefinitionCRFDAO(sm.getDataSource());
@@ -215,13 +209,14 @@ public class CreateCRFVersionServlet extends SecureController {
             } else {
                 request.setAttribute("openQueries", new HashMap());
             }
+            boolean canDelete = false;
             // check whether need to delete previous version
             Boolean deletePreviousVersion = (Boolean) session.getAttribute("deletePreviousVersion");
             Integer previousVersionId = (Integer) session.getAttribute("previousVersionId");
             if (deletePreviousVersion != null && deletePreviousVersion.equals(Boolean.TRUE) && previousVersionId != null && previousVersionId.intValue() > 0) {
                 logger.info("Need to delete previous version");
                 // whether we can delete
-                boolean canDelete = canDeleteVersion(previousVersionId.intValue());
+                canDelete = canDeleteVersion(previousVersionId.intValue());
                 if (!canDelete) {
                     logger.info("but cannot delete previous version");
                     if (session.getAttribute("itemsHaveData") == null && session.getAttribute("eventsForVersion") == null) {
@@ -233,54 +228,41 @@ public class CreateCRFVersionServlet extends SecureController {
                     if (session.getAttribute("eventsForVersion") == null) {
                         session.setAttribute("eventsForVersion", new ArrayList());
                     }
-
                     forwardPage(Page.CREATE_CRF_VERSION_NODELETE);
                     return;
                 }
-                try {
-                    CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
-                    ArrayList nonSharedItems = cvdao.findNotSharedItemsByVersion(previousVersionId.intValue());
-
-                    // now delete the version and related info
-
-                    nib.deleteFromDB();
-                    // The purpose of this new instance?
-                    NewCRFBean nib1 = (NewCRFBean) session.getAttribute("nib");
-                    // not all the items already in the item table,still need to
-                    // insert new ones
-                    if (!nonSharedItems.isEmpty()) {
-                        logger.info("items are not shared, need to insert");
-                        request.setAttribute("openQueries", nib1.getBackupItemQueries());
-                        nib1.setItemQueries(nib1.getBackupItemQueries());
-                    } else {
-                        // no need to insert new items, all items are already in
-                        // the
-                        // item table(shared by other versions)
-                        nib1.setItemQueries(new HashMap());
-
+                    ArrayList<ItemBean> nonSharedItems = (ArrayList<ItemBean>)vdao.findNotSharedItemsByVersion(previousVersionId.intValue());
+                   //htaycher: here is the trick we need to put in nib1.setItemQueries()
+                    // update statements for shared items and insert for nonShared that were just deleted 5927
+                    HashMap item_table_statements = new HashMap();
+                    ArrayList<String> temp = new ArrayList<String>(nonSharedItems.size());
+                    
+                    for ( ItemBean item : nonSharedItems){
+                    	temp.add(item.getName());
+                    	item_table_statements.put(item.getName(),  nib.getBackupItemQueries().get(item.getName()));
                     }
-                    session.setAttribute("nib", nib1);
+                    for (String item_name : (Set<String>)nib.getItemQueries().keySet()){
+                    	//check if item shared 
+                    	if ( !temp.contains(item_name)){
+                        	item_table_statements.put(item_name,  nib.getItemQueries().get(item_name));
+                    	}
+                    }
+                    // statements to run
+                    if (!nonSharedItems.isEmpty()) {  request.setAttribute("openQueries", item_table_statements);}
+                
+                    //htaycher: put all statements in
+                    nib.setItemQueries(item_table_statements);
+                    session.setAttribute("nib", nib);
+           }
 
-                } catch (OpenClinicaException pe) {
-                    session.setAttribute("excelErrors", nib.getDeleteErrors());
-                    // request.setAttribute("excelErrors",
-                    // nib.getDeleteErrors());
-                    logger.info("OpenClinicaException thrown, forwarding to CREATE_CRF_VERSION_ERROR.");
-                    forwardPage(Page.CREATE_CRF_VERSION_ERROR);
-                    return;
-                }
-            }
-
-            /*
-             * } else if ("commitsql".equalsIgnoreCase(action)) {
-             */
 
             // submit
             logger.info("commit sql");
             NewCRFBean nib1 = (NewCRFBean) session.getAttribute("nib");
             if (nib1 != null) {
                 try {
-                    nib1.insertToDB();
+                	if ( canDelete){nib1.deleteInsertToDB();}
+                	else{    nib1.insertToDB();}
                     request.setAttribute("queries", nib1.getQueries());
                     // YW << for add a link to "View CRF Version Data Entry".
                     // For this purpose, CRFVersion id is needed.
