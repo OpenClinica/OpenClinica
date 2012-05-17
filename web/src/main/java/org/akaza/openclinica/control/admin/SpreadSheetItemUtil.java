@@ -458,7 +458,12 @@ public class SpreadSheetItemUtil {
 			}
 			//verify that this is repeating group
 			ItemGroupBean item_group = itemGroups.get(cur_item.getGroupLabel());
-			boolean isRepeatingGroup=item_group.getMeta().isRepeatingGroup();
+			boolean isRepeatingGroup = false;
+			if (item_group == null){
+				//case when item has a group not listed in 'Groups' spreadSheet, error was processed before
+			}else{
+				isRepeatingGroup=item_group.getMeta().isRepeatingGroup();
+			}
 			if (!isRepeatingGroup){
 				continue;
 			}
@@ -587,7 +592,7 @@ public class SpreadSheetItemUtil {
         	ver_errors.add(resPageMsg.getString("duplicate") + " " + resPageMsg.getString("item_name_column") + " " + itemName + " "
                 + resPageMsg.getString("was_detected_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet_with_dot") );
             htmlErrors.put(sheetNumber + "," + k + ","+CrfTemplateColumnNameEnum.ITEM_NAME.getCellNumber(),
-            		resPageMsg.getString("required_field"));
+            		resPageMsg.getString("INVALID_FIELD"));
         }
 		
 	}
