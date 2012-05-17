@@ -1,5 +1,12 @@
 package org.akaza.openclinica.control.extract;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.extract.DownloadDiscrepancyNote;
@@ -33,13 +40,6 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
 
 /**
  * A servlet that sends via HTTP a file containing Discrepancy-Note related data.
@@ -121,12 +121,6 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         ListNotesSort listNotesSort = new ListNotesSort();//getListSubjectSort(limit);
         listNotesSort.addSort("","");
         ArrayList<DiscrepancyNoteBean> allDiscNotes = new DiscrepancyNoteDAO(sm.getDataSource()).getNotesWithFilterAndSort(studyBean, listNotesFilter, listNotesSort);
-
-        //Downloaded notes will contain only filtered notes.
-        ArrayList sessionNotes = (ArrayList)session.getAttribute("allNotes");
-        if (sessionNotes != null) {
-            allDiscNotes = sessionNotes;
-        }
         allDiscNotes = populateRowsWithAttachedData(allDiscNotes);
 
         // Now we have to package all the discrepancy notes in DiscrepancyNoteThread objects
