@@ -425,6 +425,7 @@
 					</configuration>
 				</configuration>
 			</plugin>
+			<plugin>
 		  <groupId>org.zeroturnaround</groupId>
 		  <artifactId>jrebel-maven-plugin</artifactId>
 		  <version>1.0.7</version>
