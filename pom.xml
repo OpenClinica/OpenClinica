@@ -409,7 +409,11 @@
 					<addVersionToProjectName>true</addVersionToProjectName>
 				</configuration>
 			</plugin>
-			<plugin>
+            <plugin>
+                <groupId>org.codehaus.cargo</groupId>
+                <artifactId>cargo-maven2-plugin</artifactId>
+                <version>1.2.1</version>
+            </plugin>
 		  <groupId>org.zeroturnaround</groupId>
 		  <artifactId>jrebel-maven-plugin</artifactId>
 		  <version>1.0.7</version>
