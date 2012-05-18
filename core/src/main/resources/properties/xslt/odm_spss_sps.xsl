@@ -118,11 +118,12 @@
 	<xsl:variable name="eventDefOID" select="@OID"/>
 	<xsl:variable name="isRepeating" select="@Repeating"/>
 	<xsl:variable name="allStudyEventDataElements" select="/odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData[@StudyEventOID = $eventDefOID]"/>	
-	<xsl:variable name="eventLocationExist" select="count($allStudyEventDataElements[@OpenClinica:StudyEventLocation]) &gt; 0"/>
+	<!--<xsl:variable name="eventLocationExist" select="count($allStudyEventDataElements[@OpenClinica:StudyEventLocation]) &gt; 0"/>
 	<xsl:variable name="eventStartDateExist" select="count($allStudyEventDataElements[@OpenClinica:StartDate]) &gt; 0"/>
 	<xsl:variable name="eventStatusExist" select="count($allStudyEventDataElements[@OpenClinica:Status]) &gt; 0"/>
 	<xsl:variable name="eventEndDateExist" select="count($allStudyEventDataElements[@OpenClinica:EndDate]) &gt; 0"/>
-	<xsl:variable name="ageExist" select="count($allStudyEventDataElements[@OpenClinica:SubjectAgeAtEvent]) &gt; 0"/>	
+	<xsl:variable name="ageExist" select="count($allStudyEventDataElements[@OpenClinica:SubjectAgeAtEvent]) &gt; 0"/>-->
+		
 	<xsl:variable name="studyEventData" select="/odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData[@StudyEventOID = $eventDefOID]"/>
 	
 <!--	<xsl:variable name="locationLen" select="string-length(@OpenClinica:StudyEventLocation)" />-->
@@ -195,11 +196,12 @@
 			<!-- write event data header columns for non repeating event -->
 			<xsl:apply-templates select="." mode="studyDataSPSSForNonRepeatingEvent">
 				<xsl:with-param name="eventPosition" select="$eventPosition"/>
-			   <xsl:with-param name="eventLocationExist" select="$eventLocationExist"/>
+				<xsl:with-param name="eventOID"  select="$eventDefOID"/>
+			  <!-- <xsl:with-param name="eventLocationExist" select="$eventLocationExist"/>
 				<xsl:with-param name="eventStartDateExist"  select="$eventStartDateExist"/>
 				<xsl:with-param name="eventStatusExist" select="$eventStatusExist"/>
 				<xsl:with-param name="eventEndDateExist" select="$eventEndDateExist"/>
-				<xsl:with-param name="ageExist" select="$ageExist"/>
+				<xsl:with-param name="ageExist" select="$ageExist"/>-->
 				<xsl:with-param name="locationLen" select="$locationLen"/>
 				<xsl:with-param name="ageLen" select="ageLen"/>
 				<xsl:with-param name="eventStatusLen" select="$eventStatusLen"/>				
@@ -220,7 +222,7 @@
 		<xsl:param name="locationLen"/>
 		<xsl:param name="ageLen"/>
 		<xsl:param name="eventStatusLen"/>
-		<xsl:param name="MaxEventRepeatKey"/>
+		<xsl:param name="MaxEventRepeatKey"/><!--studyDataSPSSForRepeatingEvent, eventPosition:<xsl:value-of select="$eventPosition"/>-->
 		<!--{studyDataSPSSForRepeatingEvent}-->
 		<!--<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @StudyEventRepeatKey = $eventRepeatCnt]) &gt; 0">		-->
 		<!--{cnt greater than 0}	-->
@@ -243,7 +245,7 @@
 				<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
 
-			<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @StudyEventRepeatKey = $eventRepeatCnt and @OpenClinica:StartDate]) &gt; 0"><!--col for event startdate-->
+			<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @StudyEventRepeatKey = $eventRepeatCnt and @OpenClinica:StartDate]) &gt; 0"><!--col for event startdate--><!--start date present-->
 			<!--<xsl:if test="$eventStartDateExist">-->
 				<xsl:text>StartDate_</xsl:text>
 				<xsl:value-of select="$E" />
@@ -255,7 +257,7 @@
 			</xsl:if>
 
 			<!--<xsl:if test="$eventEndDateExist">-->
-			<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @StudyEventRepeatKey = $eventRepeatCnt and @OpenClinica:EndDate]) &gt; 0">
+			<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @StudyEventRepeatKey = $eventRepeatCnt and @OpenClinica:EndDate]) &gt; 0"><!--end date presen-->
 				<xsl:text>EndDate_</xsl:text>
 				<xsl:value-of select="$E" />
 				<xsl:value-of select="$eventPosition" />
@@ -326,32 +328,32 @@
    
    <xsl:template mode="studyDataSPSSForNonRepeatingEvent" match="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:StudyEventDef" >
 	   <xsl:param name="eventPosition"/>
-	   <xsl:param name="eventLocationExist"/>
+	   <!--<xsl:param name="eventLocationExist"/>
 		<xsl:param name="eventStartDateExist" />
 		<xsl:param name="eventStatusExist"/>
 		<xsl:param name="eventEndDateExist"/>
-		<xsl:param name="ageExist"/>	  
+		<xsl:param name="ageExist"/>	  -->
+		<xsl:param name="eventOID"/>
 		<xsl:param name="locationLen"/>
 		<xsl:param name="ageLen"/>	  
 		<xsl:param name="eventStatusLen"/>
-	   <xsl:if test="$eventLocationExist">
+		
+		<!-- @pgawade 15-May-2012 fix for issue 14279 consider the presense of event attribute specific to ordinal -->
+	   <!--<xsl:if test="$eventLocationExist">-->
+	   <xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @OpenClinica:StudyEventLocation]) &gt; 0">
 					<xsl:text>Location_</xsl:text>
 					<xsl:value-of select="$E" />
 					<xsl:value-of select="$eventPosition" />
-					<xsl:text> A</xsl:text>
-					<!--<xsl:choose>
-						<xsl:when test="number($locationLen) &gt; 8">
-							<xsl:text>8</xsl:text>
-						</xsl:when>
-						<xsl:otherwise>-->
+					<xsl:text> A</xsl:text>					
 							<xsl:value-of select="$locationLen" />
 						<!--</xsl:otherwise>
 					</xsl:choose>-->
 					<xsl:text>&#xa;</xsl:text>
 				</xsl:if>
 				
-
-				<xsl:if test="$eventStartDateExist">
+				<!-- @pgawade 15-May-2012 fix for issue 14279 consider the presense of event attribute specific to ordinal -->
+				<!--<xsl:if test="$eventStartDateExist">-->
+				<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @OpenClinica:StartDate]) &gt; 0">
 					<xsl:text>StartDate_</xsl:text>
 					<xsl:value-of select="$E" />
 					<xsl:value-of select="$eventPosition" />
@@ -363,8 +365,10 @@
 					<xsl:text> ADATE10</xsl:text>
 					<xsl:text>&#xa;</xsl:text>-->
 				</xsl:if>
-
-				<xsl:if test="$eventEndDateExist">
+				
+				<!-- @pgawade 15-May-2012 fix for issue 14279 consider the presense of event attribute specific to ordinal -->
+				<!--<xsl:if test="$eventEndDateExist">-->
+				<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @OpenClinica:EndDate]) &gt; 0">
 					<xsl:text>EndDate_</xsl:text>
 					<xsl:value-of select="$E" />
 					<xsl:value-of select="$eventPosition" />
@@ -376,8 +380,10 @@
 					<xsl:text> ADATE10</xsl:text>
 					<xsl:text>&#xa;</xsl:text>-->
 				</xsl:if>
-
-				<xsl:if test="$eventStatusExist">
+				
+				<!-- @pgawade 15-May-2012 fix for issue 14279 consider the presense of event attribute specific to ordinal -->
+				<!-- <xsl:if test="$eventStatusExist">-->
+				<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @OpenClinica:Status]) &gt; 0">
 					<xsl:text>EventStatus_</xsl:text>
 					<xsl:value-of select="$E" />
 					<xsl:value-of select="$eventPosition" />
@@ -392,8 +398,10 @@
 					</xsl:choose>-->
 					<xsl:text>&#xa;</xsl:text>
 				</xsl:if>
-
-				<xsl:if test="$ageExist">
+				
+				<!-- @pgawade 15-May-2012 fix for issue 14279 consider the presense of event attribute specific to ordinal -->
+				<!--<xsl:if test="$ageExist">-->
+				<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @OpenClinica:SubjectAgeAtEvent]) &gt; 0">
 					<xsl:text>Age_</xsl:text>
 					<xsl:value-of select="$E" />
 					<xsl:value-of select="$eventPosition" />
@@ -415,22 +423,14 @@
 	<xsl:variable name="eventDefOID" select="@OID"/>
 	<xsl:variable name="isRepeating" select="@Repeating"/>
 	<xsl:variable name="allStudyEventDataElements" select="/odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData[@StudyEventOID = $eventDefOID]"/>	
-	<xsl:variable name="eventLocationExist" select="count($allStudyEventDataElements[@OpenClinica:StudyEventLocation]) &gt; 0"/>
+	<!--<xsl:variable name="eventLocationExist" select="count($allStudyEventDataElements[@OpenClinica:StudyEventLocation]) &gt; 0"/>
 	<xsl:variable name="eventStartDateExist" select="count($allStudyEventDataElements[@OpenClinica:StartDate]) &gt; 0"/>
 	<xsl:variable name="eventStatusExist" select="count($allStudyEventDataElements[@OpenClinica:Status]) &gt; 0"/>
 	<xsl:variable name="eventEndDateExist" select="count($allStudyEventDataElements[@OpenClinica:EndDate]) &gt; 0"/>
-	<xsl:variable name="ageExist" select="count($allStudyEventDataElements[@OpenClinica:SubjectAgeAtEvent]) &gt; 0"/>	
+	<xsl:variable name="ageExist" select="count($allStudyEventDataElements[@OpenClinica:SubjectAgeAtEvent]) &gt; 0"/>	-->
 	<xsl:variable name="studyEventData" select="/odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData[@StudyEventOID = $eventDefOID]"/>
 	<xsl:variable name="eventName" select="@Name"/>
-	<!--<xsl:variable name="locationLen"
-			select="string-length(@OpenClinica:StudyEventLocation)" />
-		<xsl:variable name="eventStatusLen" select="string-length($studyEventData/@OpenClinica:Status)" />
-		<xsl:variable name="ageLen"
-			select="string-length($studyEventData/@OpenClinica:SubjectAgeAtEvent)" />
-			
-			<xsl:variable name="eventLocationExist"
-		select="@OpenClinica:StudyEventLocation" />-->
-	<!--{EventDataColumnSPSS2}-->
+	
 		
 	<xsl:variable name="eventPosition">		
 		<xsl:copy-of select="position()" />
@@ -445,11 +445,11 @@
 				<xsl:with-param name="eventRepeatCnt" select="1"/>
 				<xsl:with-param name="eventOID"  select="$eventDefOID"/>
 				<xsl:with-param name="eventPosition" select="$eventPosition" />
-				 <xsl:with-param name="eventLocationExist" select="$eventLocationExist"/>
+				<!-- <xsl:with-param name="eventLocationExist" select="$eventLocationExist"/>
 				<xsl:with-param name="eventStartDateExist"  select="$eventStartDateExist"/>
 				<xsl:with-param name="eventStatusExist" select="$eventStatusExist"/>
 				<xsl:with-param name="eventEndDateExist" select="$eventEndDateExist"/>
-				<xsl:with-param name="ageExist" select="$ageExist"/>
+				<xsl:with-param name="ageExist" select="$ageExist"/>-->
 				<!--<xsl:with-param name="locationLen" select="$locationLen"/>
 				<xsl:with-param name="ageLen" select="$ageLen"/>
 				<xsl:with-param name="eventStatusLen" select="$eventStatusLen"/>-->
@@ -460,12 +460,13 @@
 			<!-- write event data header columns for non repeating event -->
 			<xsl:apply-templates select="." mode="studyEventDataColumnSPSSForNonRepeatingEvent">
 				<xsl:with-param name="eventPosition" select="$eventPosition"/>
-			   <xsl:with-param name="eventLocationExist" select="$eventLocationExist"/>
+				<xsl:with-param name="eventOID"  select="$eventDefOID"/>
+			   <!--<xsl:with-param name="eventLocationExist" select="$eventLocationExist"/>
 				<xsl:with-param name="eventStartDateExist"  select="$eventStartDateExist"/>
 				<xsl:with-param name="eventStatusExist" select="$eventStatusExist"/>
 				<xsl:with-param name="eventEndDateExist" select="$eventEndDateExist"/>
 				<xsl:with-param name="ageExist" select="$ageExist"/>
-				<!--<xsl:with-param name="locationLen" select="$locationLen"/>
+				<xsl:with-param name="locationLen" select="$locationLen"/>
 				<xsl:with-param name="ageLen" select="$ageLen"/>
 				<xsl:with-param name="eventStatusLen" select="$eventStatusLen"/>-->
 				<xsl:with-param name="eventName" select="$eventName"/>
@@ -476,12 +477,7 @@
 	
    <xsl:template name="studyEventDataColumnSPSSForRepeatingEvent" match="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:StudyEventDef" mode="studyEventDataColumnSPSSForRepeatingEvent" >
 		<xsl:param name="eventOID" />   
-	   <xsl:param name="eventPosition"/>
-	   <xsl:param name="eventLocationExist"/>
-		<xsl:param name="eventStartDateExist" />
-		<xsl:param name="eventStatusExist"/>
-		<xsl:param name="eventEndDateExist"/>
-		<xsl:param name="ageExist"/>		
+	   <xsl:param name="eventPosition"/>	   		
 		<xsl:param name="eventRepeatCnt" />
 		<!--<xsl:param name="locationLen"/>
 		<xsl:param name="ageLen"/>
@@ -490,8 +486,9 @@
 		<xsl:param name="eventName"/>
 		
 		<!--<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @StudyEventRepeatKey = $eventRepeatCnt]) &gt; 0">		-->
-			
-			<xsl:if test="$eventLocationExist">
+			<!-- @pgawade 15-May-2012 fix for issue 14279 consider the presense of event attribute specific to ordinal -->
+			<!--<xsl:if test="$eventLocationExist">-->
+			<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @StudyEventRepeatKey = $eventRepeatCnt and @OpenClinica:StudyEventLocation]) &gt; 0">
 				<xsl:text>Location_</xsl:text>
 				<xsl:value-of select="$E" />
 				<xsl:value-of select="$eventPosition" />
@@ -508,8 +505,10 @@
 				<xsl:text> /</xsl:text>
 				<xsl:text>&#xa;</xsl:text>
 			</xsl:if>
-
-			<xsl:if test="$eventStartDateExist">
+			
+			<!-- @pgawade 15-May-2012 fix for issue 14279 consider the presense of event attribute specific to ordinal -->	
+			<!--<xsl:if test="$eventStartDateExist">-->
+			<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @StudyEventRepeatKey = $eventRepeatCnt and @OpenClinica:StartDate]) &gt; 0">
 				<xsl:text>StartDate_</xsl:text>
 				<xsl:value-of select="$E" />
 				<xsl:value-of select="$eventPosition" />
@@ -527,7 +526,9 @@
 				<xsl:text>&#xa;</xsl:text>
 			</xsl:if>
 
-			<xsl:if test="$eventEndDateExist">
+			<!-- @pgawade 15-May-2012 fix for issue 14279 consider the presense of event attribute specific to ordinal -->		
+			<!--<xsl:if test="$eventEndDateExist">eventEndDateExist-->
+			<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @StudyEventRepeatKey = $eventRepeatCnt and @OpenClinica:EndDate]) &gt; 0">
 				<xsl:text>EndDate_</xsl:text>
 				<xsl:value-of select="$E" />
 				<xsl:value-of select="$eventPosition" />
@@ -545,7 +546,9 @@
 				<xsl:text>&#xa;</xsl:text>
 			</xsl:if>
 
-			<xsl:if test="$eventStatusExist">
+			<!-- @pgawade 15-May-2012 fix for issue 14279 consider the presense of event attribute specific to ordinal -->
+			<!--<xsl:if test="$eventStatusExist">-->
+			<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @StudyEventRepeatKey = $eventRepeatCnt and @OpenClinica:Status]) &gt; 0">
 			<!-- @pgawade 14-Mar-2012 #13052 Removed the unwanted space within value label for event status -->
 				<xsl:text>EventStatus_</xsl:text>
 				<xsl:value-of select="$E" />
@@ -564,7 +567,9 @@
 				<xsl:text>&#xa;</xsl:text>
 			</xsl:if>
 
-			<xsl:if test="$ageExist">
+			<!-- @pgawade 15-May-2012 fix for issue 14279 consider the presense of event attribute specific to ordinal -->
+			<!--<xsl:if test="$ageExist">-->
+			<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @StudyEventRepeatKey = $eventRepeatCnt and @OpenClinica:SubjectAgeAtEvent]) &gt; 0">
 				<xsl:text>Age_</xsl:text>
 				<xsl:value-of select="$E" />
 				<xsl:value-of select="$eventPosition" />
@@ -586,11 +591,11 @@
 				<xsl:with-param name="eventRepeatCnt" select="$eventRepeatCnt+1"/>
 				<xsl:with-param name="eventOID"  select="$eventOID"/>
 				<xsl:with-param name="eventPosition" select="$eventPosition" />	
-				<xsl:with-param name="eventLocationExist" select="$eventLocationExist"/>
+				<!--<xsl:with-param name="eventLocationExist" select="$eventLocationExist"/>
 				<xsl:with-param name="eventStartDateExist" select="$eventStartDateExist"/>
 				<xsl:with-param name="eventStatusExist" select="$eventStatusExist"/>
 				<xsl:with-param name="eventEndDateExist" select="$eventEndDateExist"/>
-				<xsl:with-param name="ageExist" select="$ageExist"/>	
+				<xsl:with-param name="ageExist" select="$ageExist"/>	-->
 				<xsl:with-param name="eventName"  select="$eventName"/>	
 							
 			</xsl:call-template>
@@ -598,17 +603,13 @@
    </xsl:template>
    
    <xsl:template mode="studyEventDataColumnSPSSForNonRepeatingEvent" match="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:StudyEventDef" >
-	   <xsl:param name="eventPosition"/>
-	   <xsl:param name="eventLocationExist"/>
-		<xsl:param name="eventStartDateExist" />
-		<xsl:param name="eventStatusExist"/>
-		<xsl:param name="eventEndDateExist"/>
-		<xsl:param name="ageExist"/>	  
-		<!--<xsl:param name="locationLen"/>
-		<xsl:param name="ageLen"/>	  
-		<xsl:param name="eventStatusLen"/>-->
+	   <xsl:param name="eventPosition"/>	   
 		<xsl:param name="eventName"/>
-		   <xsl:if test="$eventLocationExist">
+		<xsl:param name="eventOID"/>
+		
+		<!-- @pgawade 15-May-2012 fix for issue 14279 consider the presense of event attribute specific to ordinal -->
+		<!--   <xsl:if test="$eventLocationExist">-->
+		<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @OpenClinica:StudyEventLocation]) &gt; 0">
 					<xsl:text>Location_</xsl:text>
 					<xsl:value-of select="$E" />
 					<xsl:value-of select="$eventPosition" />
@@ -622,7 +623,8 @@
 					<xsl:text>&#xa;</xsl:text>
 				</xsl:if>
 
-				<xsl:if test="$eventStartDateExist">
+			<!--	<xsl:if test="$eventStartDateExist">-->
+			<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @OpenClinica:StartDate]) &gt; 0">
 					<xsl:text>StartDate_</xsl:text>
 					<xsl:value-of select="$E" />
 					<xsl:value-of select="$eventPosition" />
@@ -636,7 +638,8 @@
 					<xsl:text>&#xa;</xsl:text>
 				</xsl:if>
 
-				<xsl:if test="$eventEndDateExist">
+			<!--	<xsl:if test="$eventEndDateExist">-->
+			<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @OpenClinica:EndDate]) &gt; 0">
 					<xsl:text>EndDate_</xsl:text>
 					<xsl:value-of select="$E" />
 					<xsl:value-of select="$eventPosition" />
@@ -650,7 +653,8 @@
 					<xsl:text>&#xa;</xsl:text>
 				</xsl:if>
 
-				<xsl:if test="$eventStatusExist">
+			<!--	<xsl:if test="$eventStatusExist">-->
+			<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @OpenClinica:Status]) &gt; 0">
 					<!-- @pgawade 14-Mar-2012 #13052 Removed the unwanted space within value label for event status -->
 				<xsl:text>EventStatus_</xsl:text>
 					<xsl:value-of select="$E" />
@@ -665,7 +669,8 @@
 					<xsl:text>&#xa;</xsl:text>
 				</xsl:if>
 
-				<xsl:if test="$ageExist">
+			<!--	<xsl:if test="$ageExist">-->
+			<xsl:if test="count($allStudyEventDataElements[@StudyEventOID = $eventOID and @OpenClinica:SubjectAgeAtEvent]) &gt; 0">
 					<xsl:text>Age_</xsl:text>
 					<xsl:value-of select="$E" />
 					<xsl:value-of select="$eventPosition" />
@@ -1821,12 +1826,27 @@
 		<xsl:variable name="significantDigits" select="@SignificantDigits"/>
 		
 	<!--{ItemDefColHeaders2: <xsl:value-of select="$calledFor"/>}-->
+	<!-- @pgawade 11-May-2012 Fix for issue #13613 -->
+	<xsl:variable name="itemName" select="@Name"/>
+	<!-- @pgawade 14-May-2012 #13613 prepend the 'v$' before item name if it starts with some thing other then alphabet -->
+	<xsl:variable name="itemNameValidated">
+		<xsl:choose>
+			<xsl:when test='matches(substring($itemName, 1, 1), "[^A-Za-z]")'>
+				<xsl:value-of select="concat('v$', normalize-space($itemName))"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$itemName"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+	
 		<xsl:choose>
 			<xsl:when test="$calledFor = 'itemDataValuesSPSS'">
 			<xsl:variable name="comment" select="@Comment"/>
 				<xsl:value-of select="' '"/>
 				<!--<xsl:value-of select="@Name" />-->
-				<xsl:value-of select='replace(normalize-space(@Name), "\s", "_")'/>
+				<!--<xsl:value-of select='replace(normalize-space(@Name), "\s", "_")'/>-->
+				<xsl:value-of select='replace(normalize-space($itemNameValidated), "\s", "_")'/>
 				<xsl:text>_</xsl:text>
 				<xsl:value-of select="$E"/>	<xsl:value-of select="$eventPosition"/>
 				<xsl:if test="$isEventRepeating = 'Yes'">
@@ -1876,7 +1896,8 @@
 			<xsl:variable name="codeListOID" select="./odm:CodeListRef/@CodeListOID" />
 			<xsl:if test="$codeListOID">
 				<!--<xsl:value-of select="@Name" />-->
-				<xsl:value-of select='replace(normalize-space(@Name), "\s", "_")'/>
+				<!--<xsl:value-of select='replace(normalize-space(@Name), "\s", "_")'/>-->
+				<xsl:value-of select='replace(normalize-space($itemNameValidated), "\s", "_")'/>
 				<xsl:text>_</xsl:text>
 				<xsl:value-of select="$E"/>	<xsl:value-of select="$eventPosition"/>
 				<xsl:if test="$isEventRepeating = 'Yes'">
@@ -1912,7 +1933,8 @@
 			</xsl:when>	
 			<xsl:otherwise>
 			<xsl:value-of select="' '"/>
-			<xsl:value-of select='replace(normalize-space(@Name), "\s", "_")'/>
+			<!--<xsl:value-of select='replace(normalize-space(@Name), "\s", "_")'/>-->
+			<xsl:value-of select='replace(normalize-space($itemNameValidated), "\s", "_")'/>
 			<xsl:text>_</xsl:text>
 			<xsl:value-of select="$E"/>	<xsl:value-of select="$eventPosition"/>
 			<xsl:if test="$isEventRepeating = 'Yes'">

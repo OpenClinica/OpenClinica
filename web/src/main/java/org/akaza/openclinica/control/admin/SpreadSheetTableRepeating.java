@@ -30,6 +30,7 @@ import org.akaza.openclinica.control.form.spreadsheet.SheetCell;
 import org.akaza.openclinica.control.form.spreadsheet.SheetValidationContainer;
 import org.akaza.openclinica.control.form.spreadsheet.SheetValidationType;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.core.util.CrfTemplateColumnNameEnum;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.MeasurementUnitDao;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
@@ -156,9 +157,10 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
         ArrayList queries = new ArrayList();
         // ArrayList groupItemMapQueries = new ArrayList();
         ArrayList errors = new ArrayList();
-        ArrayList repeats = new ArrayList();
+       // ArrayList repeats = new ArrayList();
         HashMap tableNames = new HashMap();
         HashMap items = new HashMap();
+        SpreadSheetItemUtil item_from_row = null;
         String pVersion = "";
         String pVerDesc = "";
         int parentId = 0;
@@ -241,7 +243,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                 // try to count how many blank rows, if 5 concective blank rows
                 // found, stop reading
                 int blankRowCount = 0;
-
+                String itemName=null;String default_value=null;
                 if (sheetName.equalsIgnoreCase("Items")) {
                     logger.info("read an item in sheet" + sheetName);
                     Map labelWithOptions = new HashMap();
@@ -250,64 +252,40 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                     logger.debug("row20 is: " + getValue(sheet.getRow(0).getCell((short) 20)));
                     boolean hasWDColumn = "width_decimal".equalsIgnoreCase(getValue(sheet.getRow(0).getCell((short) 20))) ? true : false;
                     //Adding itemnames for further use
-                    HashMap itemNames = new HashMap();
+                   // HashMap itemNames = new HashMap();
+                    //htaycher : code should be competly refactored to use stucture to hold all data per row
+                    
+                    ArrayList< SpreadSheetItemUtil> row_items = new ArrayList< SpreadSheetItemUtil>();
+                     
+                   
                     for (int k = 1; k < numRows; k++) {
-                        HSSFCell cell = sheet.getRow(k).getCell((short) 0);
-                        String itemName = getValue(cell);
-                        itemName = itemName.replaceAll("<[^>]*>", "");
-                        itemNames.put(k, itemName);
-                    }
-
-                    for (int k = 1; k < numRows; k++) {
-                        // logger.info("hit row "+k);
-                        if (blankRowCount == 5) {
-                            logger.info("hit end of the row ");
-                            break;
-                        }
+                        
                         if (sheet.getRow(k) == null) {
                             blankRowCount++;
+                            if (blankRowCount == 5) {  break; }
                             continue;
                         }
                         int cellIndex = 0;
+                       
                         HSSFCell cell = sheet.getRow(k).getCell((short) 0);
-                        String itemName = getValue(cell);
-                        itemName = itemName.replaceAll("<[^>]*>", "");
-
-                     // regexp to make sure it is all word characters, '\w+' in regexp terms
-                        if (!Utils.isMatchingRegexp(itemName, "\\w+")) {
-                            // different item error to go here
-                            errors.add(resPageMsg.getString("item_name_column") + " " + resPageMsg.getString("was_invalid_at_row") + " " + k + ", "
-                                    + resPageMsg.getString("items_worksheet") + ". " + resPageMsg.getString("you_can_only_use_letters_or_numbers"));
-                                htmlErrors.put(j + "," + k + ",0", resPageMsg.getString("INVALID_FIELD"));
-                        }
-                        if (StringUtil.isBlank(itemName)) {
-                            errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("item_name_column") + " "
-                                + resPageMsg.getString("was_blank_at_row") + k + ", " + resPageMsg.getString("items_worksheet") + ".");
-                            htmlErrors.put(j + "," + k + ",0", resPageMsg.getString("required_field"));
-                        }
-                        if (itemName != null && itemName.length() > 255) {
-                            errors.add(resPageMsg.getString("item_name_length_error"));
-                        }
-
-                        if (repeats.contains(itemName)) {
-                            // errors.add("A duplicate ITEM_NAME of " + itemName
-                            // + " was detected at row " + k
-                            // + ", Items worksheet.");
-                            errors.add(resPageMsg.getString("duplicate") + " " + resPageMsg.getString("item_name_column") + " " + itemName + " "
-                                + resPageMsg.getString("was_detected_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet") + ".");
-                            htmlErrors.put(j + "," + k + ",0", resPageMsg.getString("required_field"));
-                        }
-                        repeats.add(itemName);
-
+                        item_from_row =  new SpreadSheetItemUtil();
+                        row_items.add( item_from_row);
+                  	    item_from_row.setItemName(getValue(cell));
+                  	    item_from_row.verifyItemName(row_items, errors, htmlErrors,j,  resPageMsg);
+                   	 	itemName = item_from_row.getItemName();
+                        //}
+                   
+                        
                         cell = sheet.getRow(k).getCell((short) 1);
                         String descLabel = getValue(cell);
                         descLabel = descLabel.replaceAll("<[^>]*>", "");
+                        item_from_row.setDescriptionLabel(descLabel);
 
                         if (StringUtil.isBlank(descLabel)) {
                             // errors.add("The DESCRIPTION_LABEL column was
                             // blank at row " + k + ", Items worksheet.");
                             errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("DESCRIPTION_LABEL_column") + " "
-                                + resPageMsg.getString("was_blank_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet") + ".");
+                                + resPageMsg.getString("was_blank_at_row") +" " + k + ", " + resPageMsg.getString("items_worksheet") + ".");
                             htmlErrors.put(j + "," + k + ",1", resPageMsg.getString("required_field"));
                         }
                         if (descLabel != null && descLabel.length() > 4000) {
@@ -320,7 +298,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         if (leftItemText != null && leftItemText.length() > 4000) {
                             errors.add(resPageMsg.getString("left_item_length_error"));
                         }
-
+                        item_from_row.setLeft_item_text(leftItemText);
                         // Commented out to resolve issue-2413
                         // if (StringUtil.isBlank(leftItemText)) {
                         // errors.add(resPageMsg.getString("the") + " " +
@@ -335,6 +313,11 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         String unit = getValue(cell).trim();
                         if (unit != null && unit.length() > 0) {
                             String muSql = "";
+                            //htaycher max length=64
+                            if (unit.length() > 64) {
+	                            errors.add(resPageMsg.getString("units_length_error"));
+	                            htmlErrors.put(j + "," + k + ","+CrfTemplateColumnNameEnum.UNITS.getCellNumber(), resPageMsg.getString("INVALID_FIELD"));
+                            }
                             if (this.existingUnits.size() > 0) {
                             } else {
                                 this.existingUnits = this.measurementUnitDao.findAllNames();
@@ -377,76 +360,53 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             errors.add(resPageMsg.getString("right_item_length_error"));
                         }
 
-                        cell = sheet.getRow(k).getCell((short) 5);
-                        if (cell != null) {
-                            secName = getValue(cell);
-                            secName = secName.replaceAll("<[^>]*>", "");
-                        }
-                        if (secName != null && secName.length() > 2000) {
-                            errors.add(resPageMsg.getString("section_label_length_error"));
-                        }
-
-                        if (!secNames.contains(secName)) {
-                            /*
-                             * errors .add("The SECTION_LABEL column is not a
-                             * valid section at row " + k + ", Items worksheet. " +
-                             * "Please check the Sections worksheet to see that
-                             * there is a valid LABEL for this SECTION_LABEL.");
-                             * htmlErrors.put(j + "," + k + ",5", "NOT A VALID
-                             * LABEL");
-                             */
-                            errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("SECTION_LABEL_column") + " "
-                                + resPageMsg.getString("not_valid_section_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet") + ". "
-                                + resPageMsg.getString("check_to_see_that_there_is_valid_LABEL"));
-                            htmlErrors.put(j + "," + k + ",5", resPageMsg.getString("NOT_A_VALID_LABEL"));
-                        }
+                        cell = sheet.getRow(k).getCell((short) 5);//section label
+                        item_from_row.setSectionLabel(getValue(cell));
+                        item_from_row.verifySectionLabel(row_items, errors, secNames, htmlErrors, j, resPageMsg);
+                        secName=item_from_row.getSectionLabel();
                         // *******************************************
                         // group_label will go here, tbh in place 6
                         // have to advance all the rest by one at least (if
                         // there are
                         // no other columns) tbh, 5-14-2007
 
-                        cell = sheet.getRow(k).getCell((short) 6);
-                        String groupLabel = getValue(cell);
-                        groupLabel = groupLabel.replaceAll("<[^>]*>", "");
-
-                        if (itemName.length() > 0) {
-                            if (!StringUtil.isBlank(groupLabel)) {
-                                allItems.put(itemName, groupLabel);
+                        cell = sheet.getRow(k).getCell((short) 6);//group label
+                        item_from_row.setGroupLabel(getValue(cell));
+                     //htaycher: how 'NON-GROUPED' group is processed for 3.1 template?
+                        //is it a reason for 13816
+                        if (item_from_row.getItemName().length() > 0) {
+                            if (!StringUtil.isBlank(item_from_row.getGroupLabel())) {
+                                allItems.put(item_from_row.getItemName(), item_from_row.getGroupLabel());
                             } else {
-                                allItems.put(itemName, "Ungrouped");
+                                allItems.put(item_from_row.getItemName(), "Ungrouped");
                             }
                         }
+                        String groupLabel=item_from_row.getGroupLabel();
 
                         sheetContainer.getItemSectionNameMap().put(itemName, secName);
-                        sheetContainer.collectRepGrpItemNameMap(itemName, groupLabel);
+                        sheetContainer.collectRepGrpItemNameMap(itemName, item_from_row.getGroupLabel());
 
-                        cell = sheet.getRow(k).getCell((short) 7);
+                        cell = sheet.getRow(k).getCell((short) 7);//header
                         String header = getValue(cell);
                         if (header != null && header.length() > 2000) {
                             errors.add(resPageMsg.getString("item_header_length_error"));
                         }
 
-                        cell = sheet.getRow(k).getCell((short) 8);
+                        cell = sheet.getRow(k).getCell((short) 8);//subheader
                         String subHeader = getValue(cell);
                         if (subHeader != null && subHeader.length() > 240) {
                             errors.add(resPageMsg.getString("item_subheader_length_error"));
+                            htmlErrors.put(j + "," + k + ","+CrfTemplateColumnNameEnum.SUBHEADER.getCellNumber(), resPageMsg.getString("INVALID_FIELD"));
                         }
 
-                        cell = sheet.getRow(k).getCell((short) 9);
+                        cell = sheet.getRow(k).getCell((short) 9);//parentid
                         String parentItem = getValue(cell);
-                        parentItem = parentItem.replaceAll("<[^>]*>", "");
-                        // Checking for a valid paren item name
-                        if(!StringUtil.isBlank(parentItem)){
-                            if(!itemNames.containsValue(parentItem)){
-                                errors.add("the Parent item specified on row "+k+" does not exist in the CRF template. Please update the value. ");
-                            }
-                        }
-                        // BWP>>Prevent parent names that equal the Item names
-                        if (itemName != null && itemName.equalsIgnoreCase(parentItem)) {
-                            parentItem = "";
-                        }
-                        cell = sheet.getRow(k).getCell((short) 10);
+                        item_from_row.setParentItem(parentItem);
+                        item_from_row.verifyParentID( row_items, errors,htmlErrors,j,resPageMsg, itemGroups);
+                        //for now , when(if ) code refactoring will be done, item will be written by SpreadSheetItemUtil
+                        parentItem=item_from_row.getParentItem();
+                        
+                        cell = sheet.getRow(k).getCell((short) 10);//column id
                         int columnNum = 0;
                         String column = getValue(cell);
                         if (!StringUtil.isBlank(column)) {
@@ -457,16 +417,16 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             }
                         }
 
-                        cell = sheet.getRow(k).getCell((short) 11);
+                        cell = sheet.getRow(k).getCell((short) 11);//page number
                         if (cell != null) {
                             page = getValue(cell);
                         }
 
-                        cell = sheet.getRow(k).getCell((short) 12);
+                        cell = sheet.getRow(k).getCell((short) 12);//question number
                         String questionNum = getValue(cell);
 
-                        cell = sheet.getRow(k).getCell((short) 13);
-                        String responseType = getValue(cell);
+                        cell = sheet.getRow(k).getCell((short) 13);//response type
+                         String responseType = getValue(cell);
                         int responseTypeId = 1;
                         if (StringUtil.isBlank(responseType)) {
                             // errors.add("The RESPONSE_TYPE column was blank at
@@ -474,7 +434,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             // htmlErrors.put(j + "," + k + ",13", "REQUIRED
                             // FIELD");
                             errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("RESPONSE_TYPE_column") + " "
-                                + resPageMsg.getString("was_blank_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet") + ".");
+                                + resPageMsg.getString("was_blank_at_row")+" "  + k + ", " + resPageMsg.getString("items_worksheet_with_dot"));
                             htmlErrors.put(j + "," + k + ",13", resPageMsg.getString("required_field"));
 
                         } else {
@@ -485,16 +445,21 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                 // htmlErrors.put(j + "," + k + ",13", "INVALID
                                 // FIELD");
                                 errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("RESPONSE_TYPE_column") + " "
-                                    + resPageMsg.getString("was_invalid_at_row") + k + ", " + resPageMsg.getString("items_worksheet") + ".");
+                                    + resPageMsg.getString("was_invalid_at_row") + " "+k + ", " + resPageMsg.getString("items_worksheet_with_dot"));
                                 htmlErrors.put(j + "," + k + ",13", resPageMsg.getString("INVALID_FIELD"));
                             } else {
                                 responseTypeId = ResponseType.getByName(responseType.toLowerCase()).getId();
+                                item_from_row.setResponseTypeId(responseTypeId);
+                                
                             }
                             if(responseTypeId == 5){
                                 cell = sheet.getRow(k).getCell((short) 18);
                                 String def = getValue(cell);
                                 if(!StringUtil.isBlank(def)){
-                                    errors.add(resPageMsg.getString("radio_with_default")+ itemNames.get(k) +resPageMsg.getString("change_radio"));
+                                    errors.add(resPageMsg.getString("radio_with_default")+ item_from_row.getItemName() +resPageMsg.getString("change_radio"));
+                                    htmlErrors.put(j + "," + k + ","+CrfTemplateColumnNameEnum.DEFAULT_VALUE.getCellNumber()
+                                       	 , resPageMsg.getString("INVALID_FIELD"));
+                                
                                 }
                             }else if(responseTypeId == ResponseType.INSTANT_CALCULATION.getId()) {
                                 unit = "";
@@ -514,7 +479,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             // htmlErrors.put(j + "," + k + ",14", "REQUIRED
                             // FIELD");
                             errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("RESPONSE_LABEL_column") + " "
-                                + resPageMsg.getString("was_blank_at_row") + k + ", " + resPageMsg.getString("items_worksheet") + ".");
+                                + resPageMsg.getString("was_blank_at_row") +" "+ k + ", " + resPageMsg.getString("items_worksheet_with_dot") );
                             htmlErrors.put(j + "," + k + ",14", resPageMsg.getString("required_field"));
                         } else if ("file".equalsIgnoreCase(responseType) && !"file".equalsIgnoreCase(responseLabel)) {
                             errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("RESPONSE_LABEL_column") + " "
@@ -548,7 +513,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             // htmlErrors.put(j + "," + k + ",15", "REQUIRED
                             // FIELD");
                             errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("RESPONSE_OPTIONS_TEXT_column") + " "
-                                + resPageMsg.getString("was_blank_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet") + ".");
+                                + resPageMsg.getString("was_blank_at_row") +" " + k + ", " + resPageMsg.getString("items_worksheet_with_dot"));
                             htmlErrors.put(j + "," + k + ",15", resPageMsg.getString("required_field"));
                         }
                         if (!resNames.contains(responseLabel) && !StringUtil.isBlank(resOptions)) {
@@ -563,7 +528,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             } else {
                                 // String[] resArray = resOptions.split(",");
                                 String text1 = resOptions.replaceAll("\\\\,", "##");
-                                String[] resArray = text1.split(",");
+                                String[] resArray = text1.split(",");           
                                 numberOfOptions = resArray.length;
                             }
                         }
@@ -576,12 +541,13 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         String[] mapResArray = (String[]) labelWithOptions.get(responseLabel);
                         String text1 = resOptions.replaceAll("\\\\,", "##");
                         String[] resArray = text1.split(",");
+                        item_from_row.setResponseOptions(resArray);
                         if (labelWithOptions.containsKey(responseLabel)) {
                             if (!StringUtil.isBlank(resOptions)) {
                                 for (int i = 0; i < resArray.length; i++) {
                                     if (!resArray[i].equals(mapResArray[i])) {
                                         errors.add(resPageMsg.getString("resp_label_with_different_resp_options") + " " + k + ", "
-                                            + resPageMsg.getString("items_worksheet") + ".");
+                                            + resPageMsg.getString("items_worksheet_with_dot"));
                                         htmlErrors.put(j + "," + k + ",15", resPageMsg.getString("resp_label_with_different_resp_options_html_error"));
                                         break;
                                     }
@@ -607,8 +573,8 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             // htmlErrors.put(j + "," + k + ",16", "REQUIRED
                             // FIELD");
                             errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("RESPONSE_VALUES_column") + " "
-                                + resPageMsg.getString("was_blank_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet") + ".");
-                            htmlErrors.put(j + ", " + k + ", 16", resPageMsg.getString("required_field"));
+                                + resPageMsg.getString("was_blank_at_row") +" " + k + ", " + resPageMsg.getString("items_worksheet_with_dot"));
+                            htmlErrors.put(j + ", " + k + ",16", resPageMsg.getString("required_field"));
                         }
                         // YW 1-25-2008 << validate scoring expression
                         if (responseTypeId == ResponseType.CALCULATION.getId()
@@ -691,8 +657,8 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                 errors.add(resPageMsg.getString("incomplete_option_value_pair") + " " + resPageMsg.getString("RESPONSE_OPTIONS_column") + " "
                                     + resPageMsg.getString("and") + " " + resPageMsg.getString("RESPONSE_VALUES_column") + " "+resPageMsg.getString("at_row") + k
                                     + " " + resPageMsg.getString("items_worksheet") + "; " + resPageMsg.getString("perhaps_missing_comma"));
-                                htmlErrors.put(j + ", " + k + ", 15", resPageMsg.getString("number_option_not_match"));
-                                htmlErrors.put(j + ", " + k + ", 16", resPageMsg.getString("number_value_not_match"));
+                                htmlErrors.put(j + "," + k + ",15", resPageMsg.getString("number_option_not_match"));
+                                htmlErrors.put(j + "," + k + ",16", resPageMsg.getString("number_value_not_match"));
                             }
                         }
 
@@ -718,7 +684,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 									for (int i = 0; i < resValArray.length; i++) {
 										if (!resValArray[i].equals(mapValArray[i])) {
 											errors.add(resPageMsg.getString("resp_label_with_different_resp_values") + " " + k + ", "
-												+ resPageMsg.getString("items_worksheet") + ".");
+												+ resPageMsg.getString("items_worksheet_with_dot") );
 											htmlErrors.put(j + "," + k + ",16", resPageMsg.getString("resp_label_with_different_resp_values_html_error"));
 											break;
 										}
@@ -750,6 +716,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         cell = sheet.getRow(k).getCell((short) 19);
                         String dataType = getValue(cell);
                         dataType = dataType.replaceAll("<[^>]*>", "");
+                        item_from_row.setDataType(dataType);
                         String dataTypeIdString = "1";
                         if (StringUtil.isBlank(dataType)) {
                             // errors.add("The DATA_TYPE column was blank at row
@@ -757,7 +724,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             // htmlErrors.put(j + "," + k + ",19", "REQUIRED
                             // FIELD");
                             errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("DATA_TYPE_column") + " "
-                                + resPageMsg.getString("was_blank_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet"));
+                                + resPageMsg.getString("was_blank_at_row") +" " + k + ", " + resPageMsg.getString("items_worksheet_with_dot"));
                             htmlErrors.put(j + "," + k + ",19", resPageMsg.getString("required_field"));
 
                         } else {
@@ -767,13 +734,13 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                 // htmlErrors.put(j + "," + k + ",19", "INVALID
                                 // FIELD");
                                 errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("DATA_TYPE_column") + " "
-                                    + resPageMsg.getString("was_invalid_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet") + ".");
+                                    + resPageMsg.getString("was_invalid_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet_with_dot") );
                                 htmlErrors.put(j + "," + k + ",19", resPageMsg.getString("INVALID_FIELD"));
                             } else {
                                 if ("file".equalsIgnoreCase(responseType) && !"FILE".equalsIgnoreCase(dataType)) {
                                     errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("DATA_TYPE_column") + " "
                                         + resPageMsg.getString("should_be_file") + resPageMsg.getString("at_row") + " " + k + ", "
-                                        + resPageMsg.getString("items_worksheet") + ".");
+                                        + resPageMsg.getString("items_worksheet_with_dot"));
                                     htmlErrors.put(j + "," + k + ",19", resPageMsg.getString("should_be_file"));
                                 } else if("instant-calculation".equalsIgnoreCase(responseType)) {
                                     OnChangeSheetValidationCell onchangecell =
@@ -795,7 +762,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                 if (!dataType.equalsIgnoreCase(labelWithType.get(responseLabel).toString())) {
                                     errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("DATA_TYPE_column") + " "
                                         + resPageMsg.getString("does_not_match_the_item_data_type_with_the_same_response_label") + " " + k + ", "
-                                        + resPageMsg.getString("items_worksheet"));
+                                        + resPageMsg.getString("items_worksheet_with_dot"));
                                     htmlErrors.put(j + "," + k + ",19", resPageMsg.getString("INVALID_FIELD"));
                                 }
                             } else {
@@ -823,8 +790,8 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                             wrongType = false;
                                             errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("RESPONSE_VALUES_column") + " "
                                                 + resPageMsg.getString("should_be_integer") + " " + resPageMsg.getString("at_row") + " " + k + ", "
-                                                + resPageMsg.getString("items_worksheet") + ".");
-                                            htmlErrors.put(j + ", " + k + ", 16", resPageMsg.getString("should_be_integer"));
+                                                + resPageMsg.getString("items_worksheet_with_dot") );
+                                            htmlErrors.put(j + "," + k + ",16", resPageMsg.getString("should_be_integer"));
                                         }
                                     } else if ("real".equalsIgnoreCase(dataType)) {
                                         for (String s : resValArray) {
@@ -841,7 +808,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                             errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("RESPONSE_VALUES_column") + " "
                                                 + resPageMsg.getString("should_be_real") + " " + resPageMsg.getString("at_row") + " " + k + ", "
                                                 + resPageMsg.getString("items_worksheet") + ".");
-                                            htmlErrors.put(j + ", " + k + ", 16", resPageMsg.getString("should_be_real"));
+                                            htmlErrors.put(j + "," + k + ",16", resPageMsg.getString("should_be_real"));
                                         }
                                     }
                                 }
@@ -857,32 +824,11 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         // DATA_TYPE
                         // here, default_value has been handled for dataType =
                         // date
-                        cell = sheet.getRow(k).getCell((short) 18);
-                        String default_value = getValue(cell);
-                        default_value = default_value.replaceAll("<[^>]*>", "");
-                        if ("date".equalsIgnoreCase(dataType) && !"".equals(default_value)) {
-                            // BWP>> try block needs to be added, because
-                            // cell.getDateCellValue()
-                            // can throw an exception.
-                            // All database values are stored in this format? en
-                            // Locale MM/dd/yyyy
-                            try {
-                                default_value = new SimpleDateFormat(ApplicationConstants.getDateFormatInItemData()).format(cell.getDateCellValue());
-                            } catch (Exception e) {
-                                default_value = getValue(cell);
-                            }
-                        }
-                        if (default_value.length() > 0) {
-                            if(responseTypeId == ResponseType.CALCULATION.getId()
-                                || responseTypeId == ResponseType.GROUP_CALCULATION.getId()) {
-                                errors.add(resPageMsg.getString("default_value_not_allowed_for_calculation") + k + ", " + resPageMsg.getString("items_worksheet")
-                                    + ".");
-                                htmlErrors.put(j + "," + k + ",18", resPageMsg.getString("INVALID_FIELD"));
-                            } else if(responseTypeId == ResponseType.INSTANT_CALCULATION.getId()) {
-                                default_value = "";
-                            }
-                        }
-
+                        cell = sheet.getRow(k).getCell((short) 18);//default value
+                        item_from_row.setDefaultValue(getValue(cell));
+                        item_from_row.verifyDefaultValue(row_items, errors, htmlErrors, j, resPageMsg);
+                        default_value= item_from_row.getDefaultValue();
+                        
                         cellIndex = 19;
                         String widthDecimal = "";
                         logger.debug("hasWidthDecimalColumn=" + hasWDColumn);
@@ -936,7 +882,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                     // "INVALID FIELD");
                                     errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("VALIDATION_column") + " "
                                         + resPageMsg.getString("has_an_invalid_regular_expression_at_row") + " " + k + ", "
-                                        + resPageMsg.getString("items_worksheet") + ". " + resPageMsg.getString("regular_expression_contained") + " '\\\\', "
+                                        + resPageMsg.getString("items_worksheet_with_dot") + resPageMsg.getString("regular_expression_contained") + " '\\\\', "
                                         + resPageMsg.getString("it_should_only_contain_one") + "'\\'. ");
                                     htmlErrors.put(j + "," + k + "," + cellIndex, resPageMsg.getString("INVALID_FIELD"));
                                 } else {
@@ -966,7 +912,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                             // ",21", "INVALID FIELD");
                                             errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("VALIDATION_column")
                                                 + resPageMsg.getString("has_an_invalid_regular_expression_at_row") + " " + k + ", "
-                                                + resPageMsg.getString("items_worksheet") + ". " + resPageMsg.getString("Example") + " regexp: /[0-9]*/ ");
+                                                + resPageMsg.getString("items_worksheet_with_dot") + resPageMsg.getString("Example") + " regexp: /[0-9]*/ ");
                                             htmlErrors.put(j + "," + k + "," + cellIndex, resPageMsg.getString("INVALID_FIELD"));
                                         }
                                     } else {
@@ -979,7 +925,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                         // "INVALID FIELD");
                                         errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("VALIDATION_column")
                                             + resPageMsg.getString("has_an_invalid_regular_expression_at_row") + " " + k + ", "
-                                            + resPageMsg.getString("items_worksheet") + ". " + resPageMsg.getString("Example") + " regexp: /[0-9]*/ ");
+                                            + resPageMsg.getString("items_worksheet_with_dot") + " "+resPageMsg.getString("Example") + " regexp: /[0-9]*/ ");
                                         htmlErrors.put(j + "," + k + "," + cellIndex, resPageMsg.getString("INVALID_FIELD"));
                                     }
                                 }
@@ -996,7 +942,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                     // htmlErrors.put(j + "," + k + ",21",
                                     // "INVALID FIELD");
                                     errors.add(e.getMessage() + ", " + resPageMsg.getString("at_row") + " " + k + ", "
-                                        + resPageMsg.getString("items_worksheet") + ". ");
+                                        + resPageMsg.getString("items_worksheet_with_dot"));
                                     htmlErrors.put(j + "," + k + "," + cellIndex, resPageMsg.getString("INVALID_FIELD"));
                                 }
                             } else {
@@ -1006,7 +952,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                 // htmlErrors.put(j + "," + k + ",21", "INVALID
                                 // FIELD");
                                 errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("VALIDATION_column") + " "
-                                    + resPageMsg.getString("was_invalid_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet") + ". ");
+                                    + resPageMsg.getString("was_invalid_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet_with_dot"));
                                 htmlErrors.put(j + "," + k + "," + cellIndex, resPageMsg.getString("INVALID_FIELD"));
                             }
 
@@ -1024,8 +970,8 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             // htmlErrors.put(j + "," + k + ",22", "REQUIRED
                             // FIELD");
                             errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("VALIDATION_ERROR_MESSAGE_column")
-                                + resPageMsg.getString("was_blank_at_row") + k + ", " + resPageMsg.getString("items_worksheet") + ". "
-                                + resPageMsg.getString("cannot_be_blank_if_VALIDATION_not_blank"));
+                                + resPageMsg.getString("was_blank_at_row") +" "+ k + ", " + resPageMsg.getString("items_worksheet_with_dot")
+                                + " "+resPageMsg.getString("cannot_be_blank_if_VALIDATION_not_blank"));
                             htmlErrors.put(j + "," + k + "," + cellIndex, resPageMsg.getString("required_field"));
                         }
                         if (regexpError != null && regexpError.length() > 255) {
@@ -1057,7 +1003,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             // htmlErrors.put(j + "," + k + ",23", "INVALID
                             // VALUE");
                             errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("PHI_column") + resPageMsg.getString("was_invalid_at_row") + k
-                                + ", " + resPageMsg.getString("items_worksheet") + ". " + resPageMsg.getString("PHI_column") + " "
+                                + ", " + resPageMsg.getString("items_worksheet_with_dot") + resPageMsg.getString("PHI_column") + " "
                                 + resPageMsg.getString("can_only_be_either_0_or_1"));
                             htmlErrors.put(j + "," + k + "," + cellIndex, resPageMsg.getString("INVALID_VALUE"));
                         } else {
@@ -1087,7 +1033,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             // htmlErrors.put(j + "," + k + ",24", "INVALID
                             // VALUE");
                             errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("REQUIRED_column") + " "
-                                + resPageMsg.getString("was_invalid_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet") + ". "
+                                + resPageMsg.getString("was_invalid_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet_with_dot")
                                 + resPageMsg.getString("REQUIRED_column") + resPageMsg.getString("can_only_be_either_0_or_1"));
                             htmlErrors.put(j + "," + k + "," + cellIndex, resPageMsg.getString("INVALID_VALUE"));
                         } else {
@@ -1113,7 +1059,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         if (!StringUtil.isBlank(display)) {
                             if(isShowItem != false) {
                                 errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("ITEM_DISPLAY_STATUS_column") + " "
-                                        + resPageMsg.getString("was_invalid_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet") + ". "
+                                        + resPageMsg.getString("was_invalid_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet_with_dot")
                                         + resPageMsg.getString("should_be_hide_for_scd"));
                                     htmlErrors.put(j + "," + k + "," + (cellIndex-1), resPageMsg.getString("INVALID_VALUE"));
                             }
@@ -1127,7 +1073,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                 String p1 = par[1].trim();
                                 String p2 = par[2].trim();
                                 if(p0.length()>0 && p1.length()>0 && p2.length()>0) {
-                                    if(repeats.contains(p0)) {
+                                    if(SpreadSheetItemUtil.isItemWithSameParameterExistsIncludingMyself(p0,  row_items)) {
                                         controlItemName = p0; optionValue = p1; message = p2;
                                         pvKey+=p0;
                                         if(controlValues.containsKey(pvKey)) {
@@ -1142,26 +1088,26 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                             if(!existing){
                                                 optionValue = "";
                                                 errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("SIMPLE_CONDITIONAL_DISPLAY_column") + " "
-                                                        + resPageMsg.getString("was_invalid_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet") + ". "
+                                                        + resPageMsg.getString("was_invalid_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet_with_dot")
                                                         + resPageMsg.getString("control_response_value_invalid") + " " + p1.replace("##", "\\\\,"));
                                                     htmlErrors.put(j + "," + k + "," + cellIndex, resPageMsg.getString("INVALID_VALUE"));
                                             }
                                         }
                                     }else {
                                         errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("SIMPLE_CONDITIONAL_DISPLAY_column") + " "
-                                                + resPageMsg.getString("was_invalid_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet") + ". "
+                                                + resPageMsg.getString("was_invalid_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet_with_dot")
                                                 + resPageMsg.getString("control_item_name_invalid") + " " + p0);
                                             htmlErrors.put(j + "," + k + "," + cellIndex, resPageMsg.getString("INVALID_VALUE"));
                                     }
                                 } else {
                                     errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("SIMPLE_CONDITIONAL_DISPLAY_column") + " "
-                                            + resPageMsg.getString("was_invalid_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet") + ". "
+                                            + resPageMsg.getString("was_invalid_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet_with_dot")
                                             + resPageMsg.getString("correct_pattern"));
                                         htmlErrors.put(j + "," + k + "," + cellIndex, resPageMsg.getString("INVALID_VALUE"));
                                 }
                             } else {
                                 errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("SIMPLE_CONDITIONAL_DISPLAY_column") + " "
-                                        + resPageMsg.getString("was_invalid_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet") + ". "
+                                        + resPageMsg.getString("was_invalid_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet_with_dot") 
                                         + resPageMsg.getString("correct_pattern"));
                                     htmlErrors.put(j + "," + k + "," + cellIndex, resPageMsg.getString("INVALID_VALUE"));
                             }
@@ -1661,8 +1607,8 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                 queries.add(sqlGroupLabel);
                             } catch (NullPointerException e) {
                                 // Auto-generated catch block, added tbh 102007
-                                e.printStackTrace();
-                                errors.add(resPageMsg.getString("Error_found_at_row") + " \"" + (k + 1) + "\"" + resPageMsg.getString("items_worksheet") + ". "
+                                logger.error( "Error  message", e);
+                                errors.add(resPageMsg.getString("Error_found_at_row") + " \"" + (k + 1) + "\"" + resPageMsg.getString("items_worksheet_with_dot")
                                     + resPageMsg.getString("GROUP_LABEL") + "\"" + groupLabel + "\" "
                                     + resPageMsg.getString("does_not_exist_in_group_spreadsheet"));
                                 htmlErrors.put(j + "," + k + ",6", resPageMsg.getString("GROUP_DOES_NOT_EXIST"));
@@ -1672,14 +1618,14 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             String sqlGroupLabel = "";
                             if (dbName.equals("oracle")) {
                                 sqlGroupLabel =
-                                    "INSERT INTO ITEM_GROUP_METADATA (" + "item_group_id,HEADER," + "subheader, layout, repeat_number, repeat_max,"
+                                    "INSERT INTO ITEM_GROUP_METADATA (item_group_id,HEADER,subheader, layout, repeat_number, repeat_max,"
                                         + " repeat_array,row_start_number, crf_version_id," + "item_id , ordinal, repeating_group) VALUES ("
                                         + "(SELECT MAX(ITEM_GROUP_ID) FROM ITEM_GROUP WHERE NAME='Ungrouped' AND crf_id = " + crfId + " ),'" + "" + "', '" + ""
                                         + "', '" + "" + "', " + 1 + ", " + 1 + ", '', 1," + versionIdString + "," + selectCorrectItemQueryOracle + "," + k
                                         + ", 0)";
                             } else {
                                 sqlGroupLabel =
-                                    "INSERT INTO ITEM_GROUP_METADATA (" + "item_group_id,header," + "subheader, layout, repeat_number, repeat_max,"
+                                    "INSERT INTO ITEM_GROUP_METADATA (item_group_id,header,subheader, layout, repeat_number, repeat_max,"
                                         + " repeat_array,row_start_number, crf_version_id," + "item_id , ordinal, repeating_group) VALUES ("
                                         + "(SELECT ITEM_GROUP_ID FROM ITEM_GROUP WHERE NAME='Ungrouped' AND crf_id = " + crfId
                                         + " ORDER BY OID DESC LIMIT 1),'" + "" + "', '" + "" + "', '" + "" + "', " + 1 + ", " + 1 + ", '', 1,"
@@ -1713,6 +1659,11 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                     // we need to make sure groups sql are executed first,
                     // because item_group_id is
                     // used when we insert item group meta data with item
+                    
+                    //validate that items of one group are not spread over several sections
+                    
+                    SpreadSheetItemUtil.verifySectionGroupPlacementForItems( row_items, errors,  htmlErrors, j,resPageMsg,  itemGroups);
+                    
                     instantValidator.validate();
                     errors = (ArrayList<String>)instantValidator.getSheetErrors().addErrorsToSheet(errors);
                     htmlErrors = (HashMap<String,String>)instantValidator.getSheetErrors().putHtmlErrorsToSheet(htmlErrors);
@@ -1739,13 +1690,13 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                     String defaultSql = "";
                     if (dbName.equals("oracle")) {
                         defaultSql =
-                            "INSERT INTO ITEM_GROUP ( " + "name, crf_id, status_id, date_created ,owner_id,oc_oid)" + "VALUES ('" + defaultGroup.getName()
-                                + "', " + defaultGroup.getCrfId() + "," + defaultGroup.getStatus().getId() + "," + "sysdate," + ub.getId() + ",'"
+                            "INSERT INTO ITEM_GROUP ( name, crf_id, status_id, date_created ,owner_id,oc_oid) VALUES ('" + defaultGroup.getName()
+                                + "', " + defaultGroup.getCrfId() + "," + defaultGroup.getStatus().getId() + ",sysdate," + ub.getId() + ",'"
                                 + defaultGroupOid + "')";
                     } else {
                         defaultSql =
-                            "INSERT INTO ITEM_GROUP ( " + "name, crf_id, status_id, date_created ,owner_id,oc_oid)" + "VALUES ('" + defaultGroup.getName()
-                                + "', " + defaultGroup.getCrfId() + "," + defaultGroup.getStatus().getId() + "," + "now()," + ub.getId() + ",'"
+                            "INSERT INTO ITEM_GROUP (  name, crf_id, status_id, date_created ,owner_id,oc_oid) VALUES ('" + defaultGroup.getName()
+                                + "', " + defaultGroup.getCrfId() + "," + defaultGroup.getStatus().getId() + ",now()," + ub.getId() + ",'"
                                 + defaultGroupOid + "')";
                     }
 
@@ -1753,12 +1704,11 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         queries.add(defaultSql);
                     }
                     for (int gk = 1; gk < numRows; gk++) {
-                        if (blankRowCount == 5) {
-                            logger.info("hit end of the row ");
-                            break;
-                        }
+                       
                         if (sheet.getRow(gk) == null) {
                             blankRowCount++;
+                            if (blankRowCount == 5) { break;
+                            }
                             continue;
                         }
                         HSSFCell cell = sheet.getRow(gk).getCell((short) 0);
@@ -1767,7 +1717,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 
                         if (StringUtil.isBlank(groupLabel)) {
                             errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("GROUP_LABEL_column")
-                                + resPageMsg.getString("was_blank_at_row") + gk + ", " + resPageMsg.getString("Groups_worksheet") + ".");
+                                + resPageMsg.getString("was_blank_at_row") +" "+ gk + ", " + resPageMsg.getString("Groups_worksheet") + ".");
                             htmlErrors.put(j + "," + gk + ",0", resPageMsg.getString("required_field"));
                         }
 
@@ -1828,8 +1778,10 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                 if ((dr - (int) dr) * 1000 == 0) {
                                     groupRepeatNumber = (int) dr + "";
                                 }
+                              
                             } else {
                                 logger.info("found a non-numeric code in a numeric field: groupRepeatNumber");
+                              
                             }
                         }
 
@@ -1906,32 +1858,48 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         fgb.setName(groupLabel);
                         fgb.setCrfId(crfId);
                         fgb.setStatus(Status.AVAILABLE);
+                        
 
                         ItemGroupMetadataBean igMeta = new ItemGroupMetadataBean();
                         igMeta.setHeader(groupHeader);
                         igMeta.setRepeatingGroup(isRepeatingGroup);
+                        igMeta.setBorders(0);//htaycher: no borders anymnore //13817
                         // igMeta.setLayout(groupLayout);
                         // igMeta.setRepeatArray(groupRepeatArray);
                         igMeta.setShowGroup(isShowGroup);
                         try {
                             igMeta.setRepeatMax(new Integer(Integer.parseInt(groupRepeatMax)));
+                            //mantiss 13917
+                            
+                            if (igMeta.getRepeatMax() < 1){
+                            	 errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("GROUP_REPEAT_MAX_column") + " "
+                                         + resPageMsg.getString("must_be_a_positive_integer") + ". " + groupRepeatMax + " " + resPageMsg.getString("at_row") + " "+gk
+                                         + ", " + resPageMsg.getString("Groups_worksheet") + ". ");
+                                     htmlErrors.put(j + "," + gk + ",3", resPageMsg.getString("INVALID_FIELD"));
+                            }
                         } catch (NumberFormatException n2) {
-                            n2.printStackTrace();
+                            logger.error("Error  message", n2);
                             if ("".equals(groupRepeatMax)) {
                                 igMeta.setRepeatMax(40);
                             } else {
                                 errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("GROUP_REPEAT_MAX_column") + " "
-                                    + resPageMsg.getString("must_be_a_positive_integer") + ". " + groupRepeatMax + " " + resPageMsg.getString("at_row") + gk
+                                    + resPageMsg.getString("must_be_a_positive_integer") + ". " + groupRepeatMax + " " + resPageMsg.getString("at_row") + " "+gk
                                     + ", " + resPageMsg.getString("Groups_worksheet") + ". ");
                                 htmlErrors.put(j + "," + gk + ",3", resPageMsg.getString("INVALID_FIELD"));
                             }
                         }
                         try {
                             igMeta.setRepeatNum(new Integer(Integer.parseInt(groupRepeatNumber)));
+                            if(igMeta.getRepeatNum() < 1){ //mantiss 13917
+	                            errors.add(resPageMsg.getString("the") + " "+resPageMsg.getString("GROUP_REPEAT_NUM_column")+" "
+	                                    + resPageMsg.getString("must_be_a_positive_integer_or_blank") + ". " + groupRepeatNumber + " "
+	                                    + resPageMsg.getString("at_row") + " " + gk + ", " + resPageMsg.getString("Groups_worksheet") + ". ");
+	                                htmlErrors.put(j + "," + gk + ",2", resPageMsg.getString("INVALID_FIELD"));
+                            }
                         } catch (NumberFormatException n3) {
-                            n3.printStackTrace();
-                            errors.add(resPageMsg.getString("the") + resPageMsg.getString("GROUP_REPEAT_NUM_column")
-                                + resPageMsg.getString("must_be_a_positive_integer_or_ blank") + ". " + groupRepeatNumber + " "
+                        	logger.error(n3.getMessage());
+                            errors.add(resPageMsg.getString("the") + " "+resPageMsg.getString("GROUP_REPEAT_NUM_column")+" "
+                                + resPageMsg.getString("must_be_a_positive_integer_or_blank") + ". " + groupRepeatNumber + " "
                                 + resPageMsg.getString("at_row") + " " + gk + ", " + resPageMsg.getString("Groups_worksheet") + ". ");
                             htmlErrors.put(j + "," + gk + ",2", resPageMsg.getString("INVALID_FIELD"));
                         }
@@ -2044,7 +2012,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             // htmlErrors.put(j + "," + k + ",0", "REQUIRED
                             // FIELD");
                             errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("SECTION_LABEL_column") + " "
-                                + resPageMsg.getString("was_blank_at_row") + k + " " + ", " + resPageMsg.getString("sections_worksheet") + ".");
+                                + resPageMsg.getString("was_blank_at_row")+" " + k + " " + ", " + resPageMsg.getString("sections_worksheet") + ".");
                             htmlErrors.put(j + "," + k + ",0", resPageMsg.getString("required_field"));
                         }
                         if (secLabel != null && secLabel.length() > 2000) {
@@ -2074,7 +2042,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             // htmlErrors.put(j + "," + k + ",1", "REQUIRED
                             // FIELD");
                             errors.add(resPageMsg.getString("the") + " " + resPageMsg.getString("SECTION_TITLE_column") + " "
-                                + resPageMsg.getString("was_blank_at_row") + " " + k + ", " + resPageMsg.getString("sections_worksheet") + ".");
+                                + resPageMsg.getString("was_blank_at_row")  +" "+ k + ", " + resPageMsg.getString("sections_worksheet") + ".");
                             htmlErrors.put(j + "," + k + ",1", resPageMsg.getString("required_field"));
                         }
                         if (title != null && title.length() > 2000) {

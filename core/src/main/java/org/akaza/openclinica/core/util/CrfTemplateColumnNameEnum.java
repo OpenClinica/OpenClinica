@@ -1,5 +1,9 @@
-/**
- * 
+/*
+ * OpenClinica is distributed under the
+ * GNU Lesser General Public License (GNU LGPL).
+
+ * For details see: http://www.openclinica.org/license
+ * copyright 2003-2011 Akaza Research
  */
 package org.akaza.openclinica.core.util;
 
@@ -7,7 +11,7 @@ package org.akaza.openclinica.core.util;
  * @author htaycher
  *
  */
-public enum CrfTemplateColumnName {
+public enum CrfTemplateColumnNameEnum {
 
 	ITEM_NAME (0),	DESCRIPTION_LABEL(1),	LEFT_ITEM_TEXT(2),
 	UNITS (3),	RIGHT_ITEM_TEXT (4),	SECTION_LABEL(5),
@@ -30,7 +34,7 @@ public enum CrfTemplateColumnName {
 	
 	private int cell_number;
 	 
-	 private CrfTemplateColumnName(int c) {
+	 private CrfTemplateColumnNameEnum(int c) {
 		 cell_number = c;
 	 }
 	 

@@ -20,6 +20,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -374,10 +375,10 @@ public class NewCRFBean extends Object implements java.io.Serializable {
             con.setAutoCommit(false);
             Set mySet = itemQueries.entrySet();
             logger.info("---start of item query generation here---");
-             for (Iterator itvl = mySet.iterator(); itvl.hasNext();) {
+              for (Iterator itvl = mySet.iterator(); itvl.hasNext();) {
                 Map.Entry ment = (Map.Entry) itvl.next();
                 String pQuery = (String) ment.getValue();
-                s = con.createStatement();
+                 s = con.createStatement();
                  logger.debug(pQuery);
                 s.executeUpdate(pQuery);
                 s.close();
@@ -387,20 +388,18 @@ public class NewCRFBean extends Object implements java.io.Serializable {
                 // an error. Never say never though...
             }
             logger.info("---pause in query generation, items---");
-
             // Iterator it = queries.iterator();
             // using iterator gets us out of order, and throws everything off.
             // try a for loop instead
             int last = queries.size();
             for (int th = 0; th < last; th++) {
                 String query = (String) queries.get(th);// it.next();
-                count = th;
+                 count = th;
                 s = con.createStatement();
                 s.executeUpdate(query);
                 s.close();
                 error.add(query);
             }
-
             // the below lines are temporarily commented out for instrument
             // upload, tbh 8-13
             con.commit();
@@ -495,6 +494,8 @@ public class NewCRFBean extends Object implements java.io.Serializable {
             }
 
         }
+        
+        
     }
 
     public void deleteFromDB() throws OpenClinicaException {
@@ -526,7 +527,6 @@ public class NewCRFBean extends Object implements java.io.Serializable {
                 s.close();
                 error.add(query);
             }
-
             /*
              * //now need to insert all items again-no need to do this
              * 04/12/2005 any more Set mySet = backupItemQueries.entrySet();
@@ -595,6 +595,117 @@ public class NewCRFBean extends Object implements java.io.Serializable {
                     rs2.close();
             } catch (SQLException e) {
                 e.printStackTrace();
+                throw new OpenClinicaException(e.getMessage(), "1");
+            }
+
+        }
+    }
+    
+    /*
+     * this function is used for replace CRF version only
+     * it runs all delete and insert statements in one batch
+     */
+    
+    public synchronized void  deleteInsertToDB() throws OpenClinicaException {
+       
+    	Statement statement = null;
+        Connection con = null;
+        ResultSet rs = null;
+        PreparedStatement prep_statement = null;
+        try {
+            con = ds.getConnection();
+            if (con.isClosed()) {
+                 throw new OpenClinicaException("newCRFBean, deleteInsertToDB, connection not open", "1");
+            }
+            con.setAutoCommit(false);
+
+            // delete version and related info
+             for (String dQuery : (ArrayList<String>)deleteQueries) {
+            	 logger.debug(dQuery);
+            	 statement = con.createStatement();
+                 statement.executeUpdate(dQuery);
+            	 statement.close();
+                
+            }
+            logger.debug("deleteInsertToDB function ---end of delete query generation, all queries committed---");
+            logger.debug("deleteInsertToDB function ---start of item query generation here---");
+            
+            for (String  pQuery: (Collection<String>)itemQueries.values()){
+            	logger.debug(pQuery);
+            	statement = con.createStatement();
+            	statement.executeUpdate(pQuery);
+            	statement.close();
+             }
+           
+            logger.debug("deleteInsertToDB function  ---pause in query generation, items---");
+           for (String crQuery : (ArrayList<String>)queries) {
+        	   logger.debug(crQuery);
+                statement = con.createStatement();
+                statement.executeUpdate(crQuery);
+                statement.close();
+            }
+            // the below lines are temporarily commented out for instrument
+            // upload, tbh 8-13
+            con.commit();
+            logger.debug("---end of query generation, all queries committed---");
+            con.setAutoCommit(true);
+             // at this point we check to see if there is a active version, if
+            // not, set THIS
+            // to be the active version, tbh, 8-29
+            if (crfId != 0) {
+                String sql = digester.getQuery("findDefaultVersion");
+                logger.debug("findDefaultVersion [" + sql + "]");
+                prep_statement = con.prepareStatement(sql);
+                prep_statement.setInt(1, crfId);
+                rs = prep_statement.executeQuery();
+                if (rs.next()) {
+                    // do nothing on purpose? no, we check to see if it was null
+                    // first
+                    if (rs.wasNull()) {
+                       String sql2 = digester.getQuery("updateDefaultVersion");
+                        prep_statement = con.prepareStatement(sql2);
+                        prep_statement.setInt(1, crfId);
+                        prep_statement.setInt(2, crfId);
+                        if (prep_statement.executeUpdate() != 1) {
+                            throw new OpenClinicaException("error, updated more than one row, smart assigner part of insertToDB, NewCRFBean", "");
+                        }
+                     }
+                }
+                rs.close();
+                prep_statement.close();
+            }
+        } catch (SQLException se) {
+            logger.error(se.getMessage());
+            try {
+                con.rollback();
+                logger.error("Error detected, rollback " + se.getMessage());
+                throw new OpenClinicaException("", "");
+            } catch (SQLException seq) {
+            	logger.error("Error within rollback " + seq.getMessage());
+                throw new OpenClinicaException("", "");
+            }
+        } catch (OpenClinicaException pe) {
+            pe.printStackTrace();
+            try {
+                con.rollback();
+                logger.error("OpenClinica Error detected, rollback " + pe.getMessage());
+                throw new OpenClinicaException("", "");
+            } catch (SQLException seq) {
+            	logger.error("OpenClinica Error within rollback " + seq.getMessage());
+                throw new OpenClinicaException("", "");
+             }
+
+        } finally {
+        	
+        	try{ if ( con != null){con.setAutoCommit(true);}}catch(SQLException sac){;}
+            try {
+                if (con != null)                    con.close();
+                if (statement != null)              statement.close();
+                if (prep_statement != null)         prep_statement.close();
+                if (rs != null)                    rs.close();
+                
+            } catch (SQLException e) {
+                logger.error(e.getMessage());
                 throw new OpenClinicaException(e.getMessage(), "1");
             }
 

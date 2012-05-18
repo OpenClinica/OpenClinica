@@ -326,19 +326,6 @@
 
 
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
-		<!-- @pgawade 16-NOV-2010 filter test resources -->
-        <testResources>
-			<testResource>
-				<directory>src/test/resources</directory>
-				<filtering>true</filtering>
-			</testResource>
-		</testResources>
         <plugins>
             <plugin>
                 <inherited>true</inherited>

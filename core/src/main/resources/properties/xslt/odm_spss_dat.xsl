@@ -150,31 +150,15 @@
 			<xsl:text>DateofBirth</xsl:text>
 			<xsl:value-of select="$delimiter" />
 		</xsl:if>
-		<!--
-		<xsl:apply-templates
-			select="/odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData"
-			mode="studyEventInfo" />
-        -->
+		
 		<xsl:apply-templates
 			select="/odm:ODM/odm:Study[1]/odm:MetaDataVersion/odm:StudyEventDef"
 			mode="studyEventInfoHeaders" />				
-							<!--	<xsl:apply-templates
-			select="/odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData"
-			mode="studyEventHeader" />-->
+							
 			<xsl:apply-templates
 			select="/odm:ODM/odm:Study[1]/odm:MetaDataVersion/odm:StudyEventDef"
 			mode="studyFormAndDataItemsHeaders" />
-		<!-- <xsl:apply-templates -->
-		<!-- select="//odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData/odm:FormData[generate-id() 
-			= generate-id(key('eventCRFs',@FormOID)[1])]" -->
-		<!-- mode="formDataHeader"></xsl:apply-templates> -->
-
-
-		<!-- <xsl:apply-templates -->
-		<!-- select="/odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData/odm:FormData[generate-id() 
-			= generate-id(key('eventCRFs',@FormOID)[1])]" -->
-		<!-- mode="itemDataHeader"></xsl:apply-templates> -->
-		<!-- <xsl:apply-templates select="cf"/> -->
+		
 		<xsl:value-of select="$eol"></xsl:value-of>
 
 		<xsl:apply-templates select="/odm:ODM/odm:ClinicalData/odm:SubjectData"
@@ -183,19 +167,7 @@
 			<xsl:with-param name="tokenizedcrfAndDataItemsHeaders" select="$tokenizedcrfAndDataItemsHeaders"/>
 		</xsl:apply-templates>
 
-
-
-<!---->
-		<!-- <xsl:apply-templates mode="itemDataTemplate" select="/odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData/odm:FormData"> -->
-		<!--</xsl:apply-templates> -->
-
-
-
-
 	</xsl:template>
-
-
-
 
 <xsl:template match="/odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData" mode="studyEventInfo">
 		<xsl:variable name="eventPosition">
@@ -270,27 +242,6 @@
 									<xsl:value-of select="$delimiter" />
 								</xsl:if>
 	</xsl:template>
-
-
-	<xsl:template
-		match="/odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData[@StudyEventOID]"
-		mode="studyEventHeader">
-		<xsl:variable name="eventOID" select="@StudyEventOID" />
-		<xsl:variable name="eventPosition" select="position()" />
-		<xsl:variable name="eventLocationExist" select="@OpenClinica:StudyEventLocation" />
-		<xsl:variable name="eventStartDateExist" select="@OpenClinica:StartDate" />
-
-		<xsl:variable name="eventStatusExist" select="@OpenClinica:Status" />
-		<xsl:variable name="ageExist" select="@OpenClinica:SubjectAgeAtEvent" />
-		<xsl:variable name="eventEndDateExist" select="@OpenClinica:EndDate" />
-			<xsl:variable name="studyEventRepeatKey" select="@StudyEventRepeatKey"/>
-		<xsl:apply-templates select="odm:FormData" mode="formDataHeader">
-			<xsl:with-param name="eventPosition" select="$eventPosition" />
-			<xsl:with-param name="studyEventRepeatKey" select="$studyEventRepeatKey"/>
-		</xsl:apply-templates>
-	</xsl:template>
-
-
 
 
 	<xsl:template
@@ -370,11 +321,6 @@
 		</xsl:for-each>
 	</xsl:template>
 
-
-
-
-
-
 	<xsl:template match="/odm:ODM/odm:ClinicalData/odm:SubjectData"
 		mode="allSubjectData">
 		<xsl:param name="tokenizedEventHeaders"/>
@@ -425,16 +371,7 @@
 			select="$subjectEvents"></xsl:with-param> </xsl:apply-templates> -->
 		<xsl:variable name="subjectItems"
 			select="./odm:StudyEventData/odm:FormData/odm:ItemGroupData/odm:ItemData" />
-		<!--	
-		<xsl:apply-templates
-			select="odm:StudyEventData/odm:FormData"
-			mode="eventCRFData">
-			<xsl:with-param name="subjectForms"
-				select="/odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData/odm:FormData"/>
-			<xsl:with-param name="subjectEvents" select="$subjectEvents"/>
-			<xsl:with-param name="subjectItems" select="$subjectItems"/>
-		</xsl:apply-templates>
-	-->
+		
 		<xsl:variable name="subjectForms" select="./odm:StudyEventData/odm:FormData"/>
 		
 		<xsl:call-template name="studyEventInfoData2">
@@ -483,88 +420,7 @@
 											<xsl:value-of select="$delimiter" />
 										</xsl:if>
 	</xsl:template>
-
 	
-	<xsl:template mode="itemDataColumnHeaders"
-		match="/odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData/odm:FormData/odm:ItemGroupData/odm:ItemData">
-
-		<xsl:param name="studyEventRepeatKey" />
-		<xsl:param name="eventPosition" />
-		<xsl:param name="crfPosition" />
-		<xsl:param name="currentFormOID" />
-		<xsl:variable name="itemData" select="." />
-		<xsl:variable name="itemOID" select="@ItemOID" />
-
-		<xsl:apply-templates
-			select="//odm:ODM/odm:Study/odm:MetaDataVersion/odm:ItemDef[@OID=$itemOID]"
-			mode="ItemDefColHeaders">
-			<xsl:with-param name="crfPosition" select="$crfPosition" />
-			<xsl:with-param name="currentFormOID" select="$currentFormOID" />
-			<xsl:with-param name="itemData" select="$itemData" />
-			<xsl:with-param name="itemOID" select="$itemOID" />
-				<xsl:with-param name="studyEventRepeatKey" select="$studyEventRepeatKey"/>
-			<xsl:with-param name="ePosition" select="$eventPosition"/>
-		
-		</xsl:apply-templates>
-	</xsl:template>
-
-
-	<xsl:template mode="ItemDefColHeaders"
-		match="//odm:ODM/odm:Study/odm:MetaDataVersion/odm:ItemDef[@OID]">
-		<xsl:param name="crfPosition" />
-		<xsl:param name="currentFormOID" />
-		<xsl:param name="itemData" />
-		<xsl:param name="itemOID" />
-		<xsl:variable name="formOID"
-			select="OpenClinica:ItemDetails/OpenClinica:ItemPresentInForm[@FormOID = $itemData/../../@FormOID]/@FormOID" />
-
-		<xsl:if test="$currentFormOID = $formOID"> <!-- Changed from$currentFormOID = $formOID -->
-			<xsl:value-of select="@Name" />
-			<xsl:text>_</xsl:text>
-			<xsl:value-of select="$C" />
-			<xsl:value-of select="$crfPosition" />
-<!--			<xsl:text>_</xsl:text>-->
-			<xsl:variable name="group" select="$itemData/parent::node()" />
-			<xsl:variable name="groupOID" select="$group/@ItemGroupOID" />
-			<!--<xsl:for-each select="//odm:ItemGroupDef[@OID=$groupOID]">
-				<xsl:if test="@Name !='Ungrouped'">
-					<xsl:value-of select="@Name" />
-				</xsl:if>
-			</xsl:for-each>
-			--><xsl:if test="$group/@ItemGroupRepeatKey">
-				<xsl:text>_</xsl:text>
-				<xsl:value-of select="$group/@ItemGroupRepeatKey" />
-			</xsl:if>
-			<xsl:value-of select="$delimiter" />
-		</xsl:if>
-	</xsl:template>
-	<xsl:template mode="formDataHeader"
-		match="/odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData/odm:FormData[@FormOID]">
-		<!-- <xsl:for-each select="//odm:FormData[generate-id() = generate-id(key('eventCRFs',@FormOID))]"> -->
-		<xsl:param name="studyEventRepeatKey"/>
-		<xsl:param name="eventPosition"></xsl:param>
-		<xsl:variable name="crfPosition" select="position()" />
-		<xsl:variable name="parentEvent" select=".." />
-		<xsl:variable name="currentFormOID" select="@FormOID" />
-		<xsl:apply-templates mode="studyEventData"
-			select="/odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData[generate-id() 	= generate-id(key('studyEvents',@StudyEventOID)[1])]">
-			<xsl:with-param name="crfPosition" select="$crfPosition" />
-			<xsl:with-param name="parentEvent" select="$parentEvent" />
-			<xsl:with-param name="eventPosition" select="$eventPosition" />
-		</xsl:apply-templates>
-		<xsl:apply-templates select="odm:ItemGroupData/odm:ItemData"
-			mode="itemDataColumnHeaders">
-			<xsl:with-param name="crfPosition" select="$crfPosition" />
-			<xsl:with-param name="currentFormOID" select="$currentFormOID" />
-			<xsl:with-param name="studyEventRepeatKey" select="$studyEventRepeatKey"/>	
-			<xsl:with-param name="eventPosition" select="$eventPosition"/>
-		</xsl:apply-templates>
-
-		<!-- </xsl:for-each> -->
-
-	</xsl:template>
-
-
 	<xsl:template mode="itemGroupDataHeaderTempl"
 		match="/odm:ODM/odm:ClinicalData/odm:SubjectData/odm:StudyEventData/odm:FormData">
 		<!-- <xsl:for-each select="//odm:FormData[generate-id() = generate-id(key('eventCRFs',@FormOID))]"> -->
@@ -576,9 +432,6 @@
 			<xsl:with-param name="crfPosition" select="$crfPosition" />
 			<xsl:with-param name="currentFormOID" select="@FormOID" />
 		</xsl:apply-templates>
-
-
-		<!-- </xsl:for-each> -->
 
 	</xsl:template>
 
@@ -1804,9 +1657,23 @@
 		 
 			<xsl:value-of select="' '"/>
 			<!--<xsl:value-of select="@Name" />-->
-			<xsl:value-of select='replace(normalize-space(@Name), "\s", "_")'/>
-			<!--<xsl:text>_</xsl:text>			
-			<xsl:value-of select="$E"/>	-->
+			
+			<!-- @pgawade 11-May-2012 Fix for issue #13613 -->
+			<xsl:variable name="itemName" select="@Name"/>
+			<xsl:variable name="itemNameValidated">
+				<xsl:choose>
+					<xsl:when test='matches(substring($itemName, 1, 1), "[^A-Za-z]")'>
+						<xsl:value-of select="concat('v$', normalize-space($itemName))"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="$itemName"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:variable>
+			
+			<!--<xsl:value-of select='replace(normalize-space(@Name), "\s", "_")'/>-->
+			<xsl:value-of select='replace(normalize-space($itemNameValidated), "\s", "_")'/>
+			
 			<xsl:choose>
 				<xsl:when test="$generateIntHeadersList = 'Yes'"><!-- Use special constants here than '_E' for internal processing -->
 					<xsl:value-of select="$itemNameAndEventSep"/>
@@ -2219,9 +2086,19 @@
 																		<xsl:for-each select="./odm:ItemData">
 																			<xsl:variable name="itemOID" select="@ItemOID"/>
 																			<xsl:variable name="itemName" select="//odm:ItemDef[@OID = $itemOID]/@Name"/>
-																			
-																			<xsl:choose>
-																				<xsl:when test="normalize-space($colItemName) = $itemName"><!--{item name matched}-->
+																			<!-- @pgawade 14-May-2012 #13613 prepend the 'v$' before item name if it starts with some thing other then alphabet -->
+																			<xsl:variable name="itemNameValidated">
+																				<xsl:choose>
+																					<xsl:when test='matches(substring($itemName, 1, 1), "[^A-Za-z]")'>
+																						<xsl:value-of select="concat('v$', normalize-space($itemName))"/>
+																					</xsl:when>
+																					<xsl:otherwise>
+																						<xsl:value-of select="$itemName"/>
+																					</xsl:otherwise>
+																				</xsl:choose>
+																			</xsl:variable>
+																			<xsl:choose>																			
+																				<xsl:when test="normalize-space($colItemName) = $itemNameValidated"><!--{item name matched}-->
 																					<!--<xsl:text>M_</xsl:text>--><xsl:value-of select="$matchSep"/><xsl:value-of select="$eventOID"/><xsl:value-of select="$mValSeparator1"/>
 																					<xsl:text>_</xsl:text><xsl:value-of select="$formOID"/><xsl:value-of select="$mValSeparator2"/>
 																					<xsl:text>_</xsl:text><xsl:value-of select="$grpOID"/><xsl:value-of select="$mValSeparator3"/>
@@ -2245,8 +2122,19 @@
 																<xsl:for-each select="./odm:ItemData">
 																	<xsl:variable name="itemOID" select="@ItemOID"/>
 																	<xsl:variable name="itemName" select="//odm:ItemDef[@OID = $itemOID]/@Name"/>
+																	<!-- @pgawade 14-May-2012 #13613 prepend the 'v$' before item name if it starts with some thing other then alphabet -->
+																			<xsl:variable name="itemNameValidated">
+																				<xsl:choose>
+																					<xsl:when test='matches(substring($itemName, 1, 1), "[^A-Za-z]")'>
+																						<xsl:value-of select="concat('v$', normalize-space($itemName))"/>
+																					</xsl:when>
+																					<xsl:otherwise>
+																						<xsl:value-of select="$itemName"/>
+																					</xsl:otherwise>
+																				</xsl:choose>
+																			</xsl:variable>
 																	<xsl:choose>
-																		<xsl:when test="normalize-space($colItemName) = $itemName">
+																		<xsl:when test="normalize-space($colItemName) = $itemNameValidated">
 																			<!--<xsl:text>M_</xsl:text>--><xsl:value-of select="$matchSep"/><xsl:value-of select="$eventOID"/><xsl:value-of select="$mValSeparator1"/>
 																					<xsl:text>_</xsl:text><xsl:value-of select="$formOID"/><xsl:value-of select="$mValSeparator2"/>																																										
 																					<xsl:text>_</xsl:text><xsl:value-of select="$grpOID"/><xsl:value-of select="$mValSeparator3"/>
@@ -2307,9 +2195,19 @@
 																		<xsl:for-each select="./odm:ItemData">
 																			<xsl:variable name="itemOID" select="@ItemOID"/>
 																			<xsl:variable name="itemName" select="//odm:ItemDef[@OID = $itemOID]/@Name"/>
-																			
+																			<!-- @pgawade 14-May-2012 #13613 prepend the 'v$' before item name if it starts with some thing other then alphabet -->
+																			<xsl:variable name="itemNameValidated">
+																				<xsl:choose>
+																					<xsl:when test='matches(substring($itemName, 1, 1), "[^A-Za-z]")'>
+																						<xsl:value-of select="concat('v$', normalize-space($itemName))"/>
+																					</xsl:when>
+																					<xsl:otherwise>
+																						<xsl:value-of select="$itemName"/>
+																					</xsl:otherwise>
+																				</xsl:choose>
+																			</xsl:variable>
 																			<xsl:choose>
-																				<xsl:when test="normalize-space($colItemName) = $itemName"><!-- only grp repeating --> 
+																				<xsl:when test="normalize-space($colItemName) = $itemNameValidated"><!-- only grp repeating --> 
 																					<!--<xsl:text>M_</xsl:text>--><xsl:value-of select="$matchSep"/><xsl:value-of select="$eventOID"/><xsl:value-of select="$mValSeparator1"/>
 																					<xsl:text>_</xsl:text><xsl:value-of select="$formOID"/><xsl:value-of select="$mValSeparator2"/>
 																					<xsl:text>_</xsl:text><xsl:value-of select="$grpOID"/><xsl:value-of select="$mValSeparator3"/>
@@ -2332,8 +2230,19 @@
 																<xsl:for-each select="./odm:ItemData">
 																	<xsl:variable name="itemOID" select="@ItemOID"/><!--itemOID:<xsl:value-of select="$itemOID"/>-->
 																	<xsl:variable name="itemName" select="//odm:ItemDef[@OID = $itemOID]/@Name"/><!--itemName:<xsl:value-of select="$itemName"/>-->
+																	<!-- @pgawade 14-May-2012 #13613 prepend the 'v$' before item name if it starts with some thing other then alphabet -->
+																			<xsl:variable name="itemNameValidated">
+																				<xsl:choose>
+																					<xsl:when test='matches(substring($itemName, 1, 1), "[^A-Za-z]")'>
+																						<xsl:value-of select="concat('v$', normalize-space($itemName))"/>
+																					</xsl:when>
+																					<xsl:otherwise>
+																						<xsl:value-of select="$itemName"/>
+																					</xsl:otherwise>
+																				</xsl:choose>
+																			</xsl:variable>
 																	<xsl:choose>
-																		<xsl:when test="normalize-space($colItemName) = $itemName"><!-- nothing repeating -->
+																		<xsl:when test="normalize-space($colItemName) = $itemNameValidated"><!-- nothing repeating -->
 																			<!--<xsl:text>M_</xsl:text>--><xsl:value-of select="$matchSep"/><xsl:value-of select="$eventOID"/><xsl:value-of select="$mValSeparator1"/>
 																			<xsl:text>_</xsl:text><xsl:value-of select="$formOID"/><xsl:value-of select="$mValSeparator2"/>
 																			<xsl:text>_</xsl:text><xsl:value-of select="$grpOID"/><xsl:value-of select="$mValSeparator3"/>
