@@ -14,7 +14,6 @@
 
      <util:properties id="dataInfo" location="classpath:datainfo.properties"/>
      <util:properties id="extractInfo" location="classpath:extract.properties"/>
-     <util:properties id="oracle" location="classpath:oracle.properties"/>
      <util:properties id="enterpriseInfo" location="classpath:enterprise.properties"/>
   <!--
 
