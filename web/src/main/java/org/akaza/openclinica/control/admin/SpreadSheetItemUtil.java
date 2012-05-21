@@ -693,18 +693,19 @@ public class SpreadSheetItemUtil {
 			 for   ( ItemGroupCrvVersionUtil check_group : item_group_crf_records){
 				 check_group_count++;
 		    	 //we expect no more than one hit
-		    	 if (check_group.getItemName().equals(row_item.getItemName())){
-		    		 // hit different group for active crv_version
-		    		 if ( !row_item.getGroupLabel().equals(check_group.getGroupName()) && check_group.getCrfVersionStatus()==1){
-		    			 item_messages.append(resPageMsg.getString("verifyUniqueItemPlacementInGroups_4") + check_group.getGroupName() );
-		    			 item_messages.append(resPageMsg.getString("verifyUniqueItemPlacementInGroups_5"));
-		    			 item_messages.append(check_group.getCrfVersionName());
-		    			 if ( check_group_count != item_group_crf_records.size()){item_messages.append("', ");
-		    		 }
+		    	 if (check_group.getItemName().equals(row_item.getItemName()) && 
+		    	 	!(row_item.getGroupLabel().equals("") && check_group.getGroupName().equals("Ungrouped"))){
 		    		 
+			    		 if ( !row_item.getGroupLabel().equals(check_group.getGroupName()) && check_group.getCrfVersionStatus()==1){
+			    			 item_messages.append(resPageMsg.getString("verifyUniqueItemPlacementInGroups_4") + check_group.getGroupName() );
+			    			 item_messages.append(resPageMsg.getString("verifyUniqueItemPlacementInGroups_5"));
+			    			 item_messages.append(check_group.getCrfVersionName());
+			    			 if ( check_group_count != item_group_crf_records.size()){item_messages.append("', "); }
+		    		 }
 		    	 }
-		     }
-			 row_count++;
+		    }
+		     
+			
 			 if ( item_messages.length()>0){
 				 htmlErrors.put(sheetNumber + "," + row_count + ","+CrfTemplateColumnNameEnum.GROUP_LABEL.getCellNumber(),
 		            		resPageMsg.getString("INVALID_FIELD"));
@@ -713,7 +714,7 @@ public class SpreadSheetItemUtil {
     					resPageMsg.getString("verifyUniqueItemPlacementInGroups_2")+row_item.getItemName()+
     					  resPageMsg.getString("verifyUniqueItemPlacementInGroups_3")+item_messages.toString()+").");
 			 }
-	     }
+			 row_count++;
 	}
 }
 }
