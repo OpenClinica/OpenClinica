@@ -86,15 +86,7 @@
 
 </div>
 <br>
-<c:choose>
-    <c:when test="${userBean.sysAdmin && module=='admin'}">
-        <span class="table_title_Admin">
-    </c:when>
-    <c:otherwise>
-        <span class="table_title_Manage">
-    </c:otherwise>
-</c:choose>
-<fmt:message key="versions" bundle="${resword}"/></span>
+<span class="title_Manage" style="font-weight: bold;" ><fmt:message key="versions" bundle="${resword}"/></span>
 <div style="width: 600px">
     <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
@@ -119,12 +111,7 @@
                         <table border="0" cellpadding="0" cellspacing="0">
                             <tr>
                                 <td>
-                                    <!--
-                                    <a href="ViewTableOfContent?crfVersionId=<c:out value="${version.id}"/>"
-                                    onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-                                    onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
-                                    name="bt_View1" src="images/bt_View.gif" border="0" alt="View" title="View" align="left" hspace="6"></a>
-                                    -->
+                                   
                                     <a href="ViewSectionDataEntry?module=<c:out value="${module}"/>&crfId=<c:out value="${crf.id}"/>&crfVersionId=<c:out value="${version.id}"/>&tabId=1"
                                        onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
                                        onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
@@ -151,8 +138,50 @@
     </div></div></div></div></div></div></div></div>
 
 </div>
+<br>
+<span class="title_Manage" style="font-weight: bold;"><fmt:message key="Items" bundle="${resword}"/></span>
+<div style="width: 600px">
+    <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+
+        <div class="tablebox_center">
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr valign="top">
+                    <td class="table_header_row_left"><fmt:message key="name" bundle="${resword}"/></td>
+                    <td class="table_header_row"><fmt:message key="item_oid" bundle="${resword}"/></td>
+                    <td class="table_header_row"><fmt:message key="description" bundle="${resword}"/></td>
+                    <td class="table_header_row"><fmt:message key="data_type" bundle="${resword}"/></td>
+                    <td class="table_header_row"><fmt:message key="versions" bundle="${resword}"/></td>
+                    <td class="table_header_row"><fmt:message key="integrity_check" bundle="${resword}"/></td>
+                </tr>
+                 <c:forEach var ="item" items="${items}">
+                <tr valign="top">
+                    <td class="table_cell_left">
+                     <c:if test="${item.id > 0}"><a href="javascript: openDocWindow('ViewItemDetail?itemId=<c:out value="${item.id}"/>')"></c:if><c:out value="${item.itemName}"/> <c:if test="${item.id > 0}"></a></c:if></td>
+                    <td class="table_cell"><c:out value="${item.itemOID}"/></td>
+                    <td class="table_cell"><c:out value="${item.itemDescription}"/></td>
+                    <td class="table_cell"><c:out value="${item.itemDataType}"/></td>
+                    <td class="table_cell"><c:out value="${item.versions}"/></td>
+                    <td class="table_cell">
+                     <c:choose>
+    <c:when test="${empty item.errorMesages}"><%-- no errors - green image --%>
+    	 <img src="images/icon_DEcomplete.gif">
+    </c:when>
+    <c:otherwise>
+    <c:if test="${item.crfVersionStatus == 1 }">    	<img src="images/bt_Delete.gif"><c:out value="${item.errorMesages}"/></c:if>
+     <c:if test="${item.crfVersionStatus != 1 }">    	<img src="images/icon_Skipped.gif"><c:out value="${item.errorMesages}"/></c:if>
+    </c:otherwise>
+    </c:choose>
+                   
+                    
+                    </td>
+                </tr>
+                </c:forEach>
+                </table>
+                </div></div></div></div></div></div></div></div></div></div>
+
+
 <br/>
-<span class="table_title_Admin"><fmt:message key="studies_using_crf" bundle="${resword}"/></span>
+<span class="title_Manage" style="font-weight: bold;"><fmt:message key="studies_using_crf" bundle="${resword}"/></span>
 
 <div id="studiesDiv">
     <form  action="${pageContext.request.contextPath}/ViewCRF">
@@ -161,15 +190,9 @@
         ${studiesTableHTML}
     </form>
 </div>
-<!-- 
-<form  action="${pageContext.request.contextPath}/ViewCRF">
-    <input type="hidden" name="module" value="manager">
-    <input type="hidden" name="crfId" value="${crf.id}">
-    ${rules}
-</form>
- -->
+
  <br/>
-<span class="table_title_Admin"><fmt:message key="rule_rules" bundle="${resword}"/></span>
+<span class="title_Manage" style="font-weight: bold;"><fmt:message key="rule_rules" bundle="${resword}"/></span>
 <div>&nbsp;</div>
 <div class="homebox_bullets"><a href="RunRule?crfId=<c:out value="${crf.id}"/>&action=dryRun"><fmt:message key="rule_crf_run_all" bundle="${resword}"/></a></div><br/>
 <div class="homebox_bullets"><a href="ViewRuleAssignment?ruleAssignments_f_crfName=<c:out value="${crfName}"/>"><fmt:message key="rule_crf_view_rules_for_this_crf" bundle="${resword}"/></a></div><br/>

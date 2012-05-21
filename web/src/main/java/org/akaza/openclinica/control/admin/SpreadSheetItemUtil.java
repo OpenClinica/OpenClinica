@@ -10,9 +10,6 @@ package org.akaza.openclinica.control.admin;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -20,10 +17,10 @@ import java.util.ResourceBundle;
 import org.akaza.openclinica.bean.core.ApplicationConstants;
 import org.akaza.openclinica.bean.core.ResponseType;
 import org.akaza.openclinica.bean.core.Utils;
-import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
-import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.core.util.CrfTemplateColumnNameEnum;
+import org.akaza.openclinica.core.util.ItemGroupCrvVersionUtil;
+import org.akaza.openclinica.dao.submit.ItemDAO;
 
 public class SpreadSheetItemUtil {
 	
@@ -673,4 +670,50 @@ public class SpreadSheetItemUtil {
 		this.response_options = response_options;
 	}
 	
+	
+	public static void verifyUniqueItemPlacementInGroups(ArrayList< SpreadSheetItemUtil> row_items,
+			ArrayList<String> ver_errors, HashMap<String,String> htmlErrors,
+			int sheetNumber,
+			ResourceBundle resPageMsg,
+			String crfName, javax.sql.DataSource ds){
+		
+		/*ver_errors.add(resPageMsg.getString("duplicate") + " " + resPageMsg.getString("item_name_column") + " " + itemName + " "
+                + resPageMsg.getString("was_detected_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet_with_dot") );
+            htmlErrors.put(sheetNumber + "," + k + ","+CrfTemplateColumnNameEnum.ITEM_NAME.getCellNumber(),
+            		resPageMsg.getString("INVALID_FIELD"));
+            		*/
+		
+		//get all items with group / version info from db 
+		 ItemDAO idao = new ItemDAO(ds);
+		 int row_count = 1; int check_group_count = 0;
+		 StringBuffer item_messages = null;
+		 ArrayList<ItemGroupCrvVersionUtil> item_group_crf_records= idao.findAllWithItemGroupCRFVersionMetadataByCRFId(   crfName) ;
+	     for ( SpreadSheetItemUtil row_item : row_items){
+	    	 item_messages = new StringBuffer();
+			 for   ( ItemGroupCrvVersionUtil check_group : item_group_crf_records){
+				 check_group_count++;
+		    	 //we expect no more than one hit
+		    	 if (check_group.getItemName().equals(row_item.getItemName())){
+		    		 // hit different group for active crv_version
+		    		 if ( !row_item.getGroupLabel().equals(check_group.getGroupName()) && check_group.getCrfVersionStatus()==1){
+		    			 item_messages.append(resPageMsg.getString("verifyUniqueItemPlacementInGroups_4") + check_group.getGroupName() );
+		    			 item_messages.append(resPageMsg.getString("verifyUniqueItemPlacementInGroups_5"));
+		    			 item_messages.append(check_group.getCrfVersionName());
+		    			 if ( check_group_count != item_group_crf_records.size()){item_messages.append("', ");
+		    		 }
+		    		 
+		    	 }
+		     }
+			 row_count++;
+			 if ( item_messages.length()>0){
+				 htmlErrors.put(sheetNumber + "," + row_count + ","+CrfTemplateColumnNameEnum.GROUP_LABEL.getCellNumber(),
+		            		resPageMsg.getString("INVALID_FIELD"));
+				 ver_errors.add(resPageMsg.getString("verifyUniqueItemPlacementInGroups_1")+row_item.getItemName()
+    					+"' "+ resPageMsg.getString("at_row") +" '"+ row_count+
+    					resPageMsg.getString("verifyUniqueItemPlacementInGroups_2")+row_item.getItemName()+
+    					  resPageMsg.getString("verifyUniqueItemPlacementInGroups_3")+item_messages.toString()+").");
+			 }
+	     }
+	}
+}
 }

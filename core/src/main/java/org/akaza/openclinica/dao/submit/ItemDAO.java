@@ -34,6 +34,7 @@ import org.akaza.openclinica.dao.core.PreparedStatementFactory;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.core.util.ItemGroupCrvVersionUtil;
 /**
  * @author thickerson
  * 
@@ -626,5 +627,94 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
 
         return answer;
     }
-
+/*
+ * select  distinct item.name as item_name, item_group.name as group_name,  item_group.oc_oid as group_oid ,
+crf_version.name as version_name, crf_version.status_id as v_status
+ from item, item_group  , item_group_metadata, crf_version
+ where    item.item_id= item_group_metadata.item_id  and item_group_metadata.item_group_id =  item_group.item_group_id
+ and item_group_metadata.crf_version_id = crf_version.crf_version_id
+ and    item_group.crf_id =(select crf_id from CRF where name=?) order by item.name;
+ 
+ */
+    public ArrayList<ItemGroupCrvVersionUtil> findAllWithItemGroupCRFVersionMetadataByCRFId( String  crfName) {
+        this.unsetTypeExpected();
+        this.setTypeExpected(1, TypeNames.STRING);//(crf)name
+        this.setTypeExpected(2, TypeNames.STRING);//(crf)name
+        this.setTypeExpected(3, TypeNames.STRING);//(crf)name
+        this.setTypeExpected(4, TypeNames.STRING);//(crf)name
+        this.setTypeExpected(5, TypeNames.INT);//(crf)name
+        
+        HashMap variables = new HashMap();
+        variables.put(new Integer (1), crfName);
+       
+        String sql = digester.getQuery("findAllWithItemGroupCRFVersionMetadataByCRFId");
+        ArrayList rows = this.select(sql, variables);
+        ItemGroupCrvVersionUtil item = null;
+        ArrayList<ItemGroupCrvVersionUtil> item_group_crfversion_info = new ArrayList<ItemGroupCrvVersionUtil>();
+        Iterator it = rows.iterator();
+        while (it.hasNext()) {
+            HashMap row = (HashMap) it.next();
+            item = new ItemGroupCrvVersionUtil();
+            item.setItemName((String) row.get("item_name"));
+            item.setCrfVersionName((String) row.get("version_name"));
+            item.setCrfVersionStatus(((Integer) row.get("v_status")).intValue());
+            item.setGroupName((String) row.get("group_name"));
+            item.setGroupOID((String) row.get("group_oid"));
+            item_group_crfversion_info.add(item);
+           
+        }
+        return item_group_crfversion_info;
+    }
+    
+    /*
+     * select  distinct item.name as item_name, item.description as description, item.item_id as item_id, 
+item.item_data_type_id as data_type, item.oc_oid as item_oid,
+item_group.name as group_name,  item_group.oc_oid as group_oid ,
+crf_version.name as version_name, crf_version.status_id as v_status
+     */
+    public ArrayList<ItemGroupCrvVersionUtil> findAllWithItemDetailsGroupCRFVersionMetadataByCRFId( String  crfName) {
+        this.unsetTypeExpected();
+        this.setTypeExpected(1, TypeNames.STRING);//(crf)name
+        this.setTypeExpected(2, TypeNames.STRING);//(crf)description
+        this.setTypeExpected(3, TypeNames.INT);//(crf)item_id
+        this.setTypeExpected(4, TypeNames.INT);//(crf)data_type
+        this.setTypeExpected(5, TypeNames.STRING);//(crf)item_oid
+        this.setTypeExpected(6, TypeNames.STRING);//(crf)group_name
+        this.setTypeExpected(7, TypeNames.STRING);//(crf)group_oid
+        this.setTypeExpected(8, TypeNames.STRING);//(crf)version_name
+        this.setTypeExpected(9, TypeNames.INT);//(crf)v_status
+        
+        HashMap variables = new HashMap();
+        variables.put(new Integer (1), crfName);
+       
+        String sql = digester.getQuery("findAllWithItemDetailsGroupCRFVersionMetadataByCRFId");
+        ArrayList rows = this.select(sql, variables);
+        ItemGroupCrvVersionUtil item = null;
+        ItemDataType itemDT= null;
+        ArrayList<ItemGroupCrvVersionUtil> item_group_crfversion_info = new ArrayList<ItemGroupCrvVersionUtil>();
+        Iterator it = rows.iterator();
+        while (it.hasNext()) {
+            HashMap row = (HashMap) it.next();
+            item = new ItemGroupCrvVersionUtil();
+            item.setItemName((String) row.get("item_name"));
+            item.setCrfVersionName((String) row.get("version_name"));
+            item.setCrfVersionStatus(((Integer) row.get("v_status")).intValue());
+            item.setGroupName((String) row.get("group_name"));
+            item.setGroupOID((String) row.get("group_oid"));
+            this.setTypeExpected(2, TypeNames.STRING);//(crf)
+            this.setTypeExpected(3, TypeNames.INT);//(crf)item_id
+            this.setTypeExpected(4, TypeNames.INT);//(crf)data_type
+            this.setTypeExpected(5, TypeNames.STRING);//(crf)item_oid
+         
+            item.setItemDescription((String) row.get("description"));
+            item.setItemOID((String) row.get("item_oid"));
+            itemDT = ItemDataType.get((Integer) row.get("data_type"));
+            
+            item.setItemDataType(itemDT.getDescription());
+            item.setId((Integer) row.get("item_id"));
+            item_group_crfversion_info.add(item);
+           
+        }
+        return item_group_crfversion_info;
+    }
 }
