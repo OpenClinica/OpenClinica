@@ -291,10 +291,6 @@
 		</dependency>
 	</dependencies>
 
-    <properties>
-        <context.name>OpenClinica</context.name>
-    </properties>
-
 	<build>
 		<plugins>
 			<plugin>
@@ -346,7 +342,7 @@
                                         <artifactId>${project.artifactId}</artifactId>
                                         <type>war</type>
                                         <properties>
-                                            <context>${context.name}</context>
+                                            <context>${instance.name}</context>
                                         </properties>
                                     </deployable>
                                 </deployables>

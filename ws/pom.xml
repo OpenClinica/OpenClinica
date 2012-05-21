@@ -400,7 +400,7 @@
                                         <artifactId>${project.artifactId}</artifactId>
                                         <type>war</type>
                                         <properties>
-                                            <context>${context.name}</context>
+                                            <context>${instance.name}-ws</context>
                                         </properties>
                                     </deployable>
                                 </deployables>
