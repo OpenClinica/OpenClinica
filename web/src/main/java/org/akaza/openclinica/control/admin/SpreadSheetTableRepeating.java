@@ -295,7 +295,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         if (leftItemText != null && leftItemText.length() > 4000) {
                             errors.add(resPageMsg.getString("left_item_length_error"));
                         }
-                        item_from_row.setLeft_item_text(leftItemText);
+                        item_from_row.setLeftItemText(leftItemText);
                         // Commented out to resolve issue-2413
                         // if (StringUtil.isBlank(leftItemText)) {
                         // errors.add(resPageMsg.getString("the") + " " +
