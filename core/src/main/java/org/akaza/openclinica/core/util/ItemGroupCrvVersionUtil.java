@@ -12,8 +12,8 @@ public class ItemGroupCrvVersionUtil {
 	private String itemOID;
 	private String itemDescription;
 	private String itemDataType;
-	private String i_versions;
-	private String i_errorMesages;
+	private String versions;
+	private String errorMesages;
 	private int    id;
 	
 	
@@ -137,25 +137,25 @@ public class ItemGroupCrvVersionUtil {
 	 * @return the i_Versions
 	 */
 	public String getVersions() {
-		return i_versions;
+		return versions;
 	}
 	/**
 	 * @param i_Versions the i_Versions to set
 	 */
 	public void setVersions(String i_Versions) {
-		this.i_versions = i_Versions;
+		this.versions = i_Versions;
 	}
 	/**
 	 * @return the i_errorMesages
 	 */
 	public String getErrorMesages() {
-		return i_errorMesages;
+		return errorMesages;
 	}
 	/**
 	 * @param i_errorMesages the i_errorMesages to set
 	 */
 	public void setErrorMesages(String i_errorMesages) {
-		this.i_errorMesages = i_errorMesages;
+		this.errorMesages = i_errorMesages;
 	}
 	/**
 	 * @return the i_id
