@@ -131,14 +131,14 @@
 	</tr>
 <!-- TODO:
 for each study user is in, show:
-�	Role
-�	Studies created/owned
-�	CRFs created/owned (including versions)
-�	Study Events created/owned
-�	Subjects created/owned
-�	Queries created/owned
-�	Datasets downloaded
-�	Link to reload page including full audit record for User.
+	Role
+	Studies created/owned
+	CRFs created/owned (including versions)
+	Study Events created/owned
+	Subjects created/owned
+	Queries created/owned
+	Datasets downloaded
+	Link to reload page including full audit record for User.
 
 -->
 

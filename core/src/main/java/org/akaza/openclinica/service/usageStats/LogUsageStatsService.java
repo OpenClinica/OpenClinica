@@ -48,7 +48,7 @@ public class LogUsageStatsService {
                                                                  // information
 
     // constants for event messages
-    public final static String event_msg_OC_started = "US003 – OpenClinica was started";
+    public final static String event_msg_OC_started = "US003  OpenClinica was started";
     // constants for event detail parameters
     public final static String OC_start_time = "oc_start_time";
     // public final static String OC_init_complete_time = "init_complete_time";
