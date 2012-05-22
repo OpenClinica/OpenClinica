@@ -562,12 +562,12 @@
 
     <distributionManagement>
         <repository>
-            <id>dev.openclinica.com</id>
+            <id>openclinica-artifactory</id>
             <name>dev.openclinica.com-releases</name>
             <url>https://dev.openclinica.com/artifactory/libs-release-local</url>
         </repository>
         <snapshotRepository>
-            <id>dev.openclinica.com</id>
+            <id>openclinica-artifactory</id>
             <name>dev.openclinica.com-snapshots</name>
             <url>https://dev.openclinica.com/artifactory/libs-snapshot-local</url>
         </snapshotRepository>
