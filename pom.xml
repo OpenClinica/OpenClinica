@@ -7,48 +7,32 @@
     <packaging>pom</packaging>
     <version>3.1-SNAPSHOT</version>
     <name>OpenClinica</name>
-    <description>3.1-SNAPSHOT</description>
-<!--
--->
-	<properties>
-		<test.dbName>postgres</test.dbName>
-		<test.dbDriverClassName>org.postgresql.Driver</test.dbDriverClassName>
-		<test.dbUrl>jdbc:postgresql://localhost:5432/</test.dbUrl>
-		<test.dbUsername>clinica</test.dbUsername>
-		<test.dbPassword>clinica</test.dbPassword>
-		<test.db>OpenClinica-core-3.1-SNAPSHOT-TEST</test.db>
-		<test.hibernateDialect>org.hibernate.dialect.PostgreSQLDialect</test.hibernateDialect>
-		<test.locale>en_US</test.locale>
-		<scm.path>scm:svn:http://svn.akazaresearch.com/openclinica/OpenClinica/branches/OpenClinica-3.1-SNAPSHOT/projects</scm.path>
-		<!--  Library Versions -->
-		<spring.version>3.0.5.RELEASE</spring.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <description>OpenClinica 3.1-SNAPSHOT</description>
 
+    <modules>
+        <module>core</module>
+        <module>web</module>
+        <module>ws</module>
+        <module>ws-cabig</module>
+    </modules>
+
+    <properties>
         <!-- Default configuration activation -->
         <config.id>default</config.id>
+
+		<skipTests>true</skipTests>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<!-- Project's source control URL -->
+		<hg.url>https://dev.openclinica.com/hg/openclinica/community/OpenClinica-3.1-SNAPSHOT</hg.url>
+
+        <!-- Config file - required by liquibase plugin -->
+        <config.file>src/main/resources/datainfo.properties</config.file>
+
+		<!--  Library Versions -->
+		<spring.version>3.0.5.RELEASE</spring.version>
 	</properties>
 	<profiles>
-		<profile>
-			<id>postgres-dev</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<properties>
-				<config.file>src/main/resources/datainfo.properties</config.file>
-			</properties>
-		</profile>
-		<profile>
-			<id>oracle-dev</id>
-			<properties>
-				<config.file>src/main/resources/oracle.properties</config.file>
-			</properties>
-		</profile>
-		<profile>
-			<id>oracle-local</id>
-			<properties>
-				<config.file>src/main/resources/oracle-local.properties</config.file>
-			</properties>
-		</profile>
 		<profile>
 		  <!-- 
 		   This profile is not compatible with Maven v2. Use it with Maven v3 only.
@@ -100,28 +84,28 @@
 	                    </lifecycleMappingMetadata>
 	                  </configuration>
 	                </plugin>
-	                <plugin>
-	                    <groupId>org.apache.maven.plugins</groupId>
-	                    <artifactId>maven-resources-plugin</artifactId>
-	                    <version>2.5</version>
-	                    <configuration>
-	                        <delimiters>
-	                            <delimiter>${*}</delimiter>
-	                        </delimiters>
-	                    </configuration>
-	                </plugin>
 	            </plugins>
 	        </pluginManagement>
 		  </build>
 		</profile>
 	</profiles>
-	
-    <modules>
-        <module>core</module>
-        <module>web</module>
-        <module>ws</module>
-        <module>ws-cabig</module>
-    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.jmesa</groupId>
+                <artifactId>jmesa</artifactId>
+                <version>2.4.2-oc</version>
+            </dependency>
+            <dependency>
+                <groupId>org.akaza.openclinica.odm</groupId>
+                <artifactId>openclinica-odm</artifactId>
+                <version>1.0</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+
 
     <!-- These dependencies are used by _all_ child projects -->
     <dependencies>
@@ -260,13 +244,6 @@
             <artifactId>spring-oxm</artifactId>
             <version>${spring.version}</version>
         </dependency>
-        <!--
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>oauth-kk</artifactId>
-			<version>1.0</version>
-		</dependency>
-		-->
 		<dependency>
 			<groupId>org.springframework.security.oauth</groupId>
 			<artifactId>spring-security-oauth</artifactId>
@@ -288,30 +265,18 @@
 			<artifactId>hibernate-core</artifactId>
 			<version>3.5.1-Final</version>
 		</dependency>
-	<dependency>
-			<groupId>net.sf.ehcache</groupId>
-			<artifactId>ehcache-core</artifactId>
-			<version>2.4.5</version>
-	</dependency>
-
-
-	<dependency>
-        <groupId>net.sf.ehcache</groupId>
-        <artifactId>ehcache-web</artifactId>
-        <version>2.0.3</version>
-    </dependency>
-	  
-	<dependency>
-		<groupId>net.sf.ehcache</groupId>
-		<artifactId>ehcache-terracotta</artifactId>
-		<version>2.4.5</version>
-	</dependency>
-<dependency>
-  <groupId>com.googlecode.ehcache-spring-annotations</groupId>
-  <artifactId>ehcache-spring-annotations</artifactId>
-  <version>1.1.3</version>
-</dependency>
-		<dependency>
+        <dependency>
+            <groupId>net.sf.ehcache</groupId>
+            <artifactId>ehcache-core</artifactId>
+            <version>2.1.0</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode.ehcache-spring-annotations</groupId>
+            <artifactId>ehcache-spring-annotations</artifactId>
+            <version>1.1.3</version>
+        </dependency>
+        <dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-annotations</artifactId>
 			<version>3.5.1-Final</version>
@@ -370,93 +335,142 @@
             <artifactId>log4j</artifactId>
             <version>1.2.14</version>
         </dependency>
-	<!-- required for WSDL schema collection -->
-	<dependency>
-		<groupId>org.apache.ws.commons.schema</groupId>
-		<artifactId>XmlSchema</artifactId>
-		<version>1.4.7</version>
-	</dependency>
+        <!-- required for WSDL schema collection -->
+        <dependency>
+            <groupId>org.apache.ws.commons.schema</groupId>
+            <artifactId>XmlSchema</artifactId>
+            <version>1.4.7</version>
+        </dependency>
     </dependencies>
     <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
-                <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
-                </configuration>
-            </plugin>
-            <plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<!-- Using a beta version due to a bug in the previous stable version				
-					here's the bug info http://jira.codehaus.org/browse/MASSEMBLY-104 -->
-				<version>2.2-beta-1</version>
-				<configuration>
-					<outputDirectory>${openclinica.distros.dir}</outputDirectory>
-					<descriptors>
-						<descriptor>src/assemble/openclinica-assemble.xml</descriptor>
-					</descriptors>
-				</configuration>
-			</plugin>
-            <plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-eclipse-plugin</artifactId>
-                <version>2.8</version>
-				<configuration>
-					<addVersionToProjectName>true</addVersionToProjectName>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.cargo</groupId>
-				<artifactId>cargo-maven2-plugin</artifactId>
-				<version>1.2.1</version>
-				<configuration>
-					<!-- Container configuration -->
-					<container>
-						<containerId>tomcat5x</containerId>
-						<home>${catalina.home}</home>
-					</container>
-					<configuration>
-						<home>${catalina.home}</home>
-						<type>existing</type>
-					</configuration>
-				</configuration>
-			</plugin>
-			<plugin>
-		  <groupId>org.zeroturnaround</groupId>
-		  <artifactId>jrebel-maven-plugin</artifactId>
-		  <version>1.0.7</version>
-		  <executions>
-			<execution>
-			  <id>generate-rebel-xml</id>
-			  <phase>process-resources</phase>
-			  <goals>
-				<goal>generate</goal>
-			  </goals>
-			</execution>
-		  </executions>
-		</plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>buildnumber-maven-plugin</artifactId>
-                <version>1.0</version>
-                <executions>
-                	<execution>
-                		<phase>validate</phase>
-                		<goals>
-                			<goal>hgchangeset</goal>
-                		</goals>
-                	</execution>
-                </executions>
-                <configuration>
-                    <doCheck>true</doCheck>
-                    <doUpdate>true</doUpdate>
-                </configuration>
-            </plugin>		
-        </plugins>
+    	<pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>2.3.2</version>
+                    <configuration>
+                        <source>6</source>
+                        <target>6</target>
+                        <compilerArgument>-Xlint:all</compilerArgument>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>2.5</version>
+                    <configuration>
+                        <delimiters>
+                            <delimiter>${*}</delimiter>
+                        </delimiters>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.10</version>
+                    <configuration>
+                        <skipTests>${skipTests}</skipTests>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>2.3</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>2.2.2</version>
+                    <configuration>
+                        <outputDirectory>${openclinica.distros.dir}</outputDirectory>
+                        <descriptors>
+                            <descriptor>${project.basedir}/src/assemble/openclinica-assemble.xml</descriptor>
+                        </descriptors>
+                        <appendAssemblyId>false</appendAssemblyId>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-eclipse-plugin</artifactId>
+                    <version>2.8</version>
+                    <configuration>
+                        <addVersionToProjectName>true</addVersionToProjectName>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.cargo</groupId>
+                    <artifactId>cargo-maven2-plugin</artifactId>
+                    <version>1.1.4</version>
+                    <configuration>
+                        <!-- Container configuration -->
+                        <container>
+                            <containerId>tomcat6x</containerId>
+                            <home>${catalina.home}</home>
+                        </container>
+                        <configuration>
+                            <home>${catalina.home}</home>
+                            <type>existing</type>
+                        </configuration>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.liquibase</groupId>
+                    <artifactId>liquibase-plugin</artifactId>
+                    <version>1.9.1.0</version>
+                    <configuration>
+                        <propertyFile>${config.file}</propertyFile>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.zeroturnaround</groupId>
+                    <artifactId>jrebel-maven-plugin</artifactId>
+                    <version>1.0.7</version>
+                    <executions>
+                        <execution>
+                            <id>generate-rebel-xml</id>
+                            <phase>process-resources</phase>
+                            <goals>
+                                <goal>generate</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>buildnumber-maven-plugin</artifactId>
+                    <version>1.0</version>
+                    <executions>
+                        <execution>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>hgchangeset</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <doCheck>true</doCheck>
+                        <doUpdate>true</doUpdate>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.jvnet.jaxb2.maven2</groupId>
+                    <artifactId>maven-jaxb2-plugin</artifactId>
+                    <version>0.7.5</version>
+                    <executions>
+                        <execution>
+                            <phase>generate-sources</phase>
+                            <goals>
+                                <goal>generate</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <schemaDirectory>src/main/webapp/WEB-INF/schemas</schemaDirectory>
+                    </configuration>
+                </plugin>
+            </plugins>
+    	</pluginManagement>
 
         <resources>
             <resource>
@@ -484,65 +498,79 @@
 
     </build>
     <scm>
-		<connection>${scm.path}</connection>
-		<developerConnection>${scm.path}</developerConnection>
+		<connection>scm:hg:${hg.url}</connection>
+		<developerConnection>scm:hg:${hg.url}</developerConnection>
 	</scm>
 
-<repositories>
-    <repository>
-        <id>Rufus Repository</id>
-        <url>http://svn.akazaresearch.com/ocrepository/repository</url>
-    </repository>
-    <repository>
-      <id>jboss-public-repository-group</id>
-      <name>JBoss Public Repository Group</name>
-      <url>http://repository.jboss.org/nexus/content/groups/public/</url>
-      <layout>default</layout>
-      <releases>
-        <enabled>true</enabled>
-        <updatePolicy>never</updatePolicy>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-        <updatePolicy>never</updatePolicy>
-      </snapshots>
-    </repository>
-  </repositories>
-  <pluginRepositories>
-    <pluginRepository>
-      <id>jboss-public-repository-group</id>
-      <name>JBoss Public Repository Group</name>
-      <url>http://repository.jboss.org/nexus/content/groups/public/</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </pluginRepository>
-  </pluginRepositories>
+    <repositories>
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>central</id>
+            <name>libs-release</name>
+            <url>https://dev.openclinica.com/artifactory/libs-release</url>
+        </repository>
+        <repository>
+            <snapshots/>
+            <id>snapshots</id>
+            <name>libs-snapshot</name>
+            <url>https://dev.openclinica.com/artifactory/libs-snapshot</url>
+        </repository>
+        <repository>
+            <id>jboss-public-repository-group</id>
+            <name>JBoss Public Repository Group</name>
+            <url>http://repository.jboss.org/nexus/content/groups/public/</url>
+            <layout>default</layout>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>central</id>
+            <name>plugins-release</name>
+            <url>https://dev.openclinica.com/artifactory/plugins-release</url>
+        </pluginRepository>
+        <pluginRepository>
+            <snapshots/>
+            <id>snapshots</id>
+            <name>plugins-snapshot</name>
+            <url>https://dev.openclinica.com/artifactory/plugins-snapshot</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>jboss-public-repository-group</id>
+            <name>JBoss Public Repository Group</name>
+            <url>http://repository.jboss.org/nexus/content/groups/public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
 
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>2.3.1</version>
-        <reportSets>
-          <reportSet>
-            <reports>
-                <report>index</report>
-                <report>summary</report>
-                <report>dependencies</report>
-                <report>mailing-list</report>
-                <report>issue-tracking</report>
-                <report>javadocs</report>
-                <report>scm</report>
-            </reports>
-          </reportSet>
-        </reportSets>
-      </plugin>
-    </plugins>
-  </reporting>
+    <distributionManagement>
+        <repository>
+            <id>dev.openclinica.com</id>
+            <name>dev.openclinica.com-releases</name>
+            <url>https://dev.openclinica.com/artifactory/libs-release-local</url>
+        </repository>
+        <snapshotRepository>
+            <id>dev.openclinica.com</id>
+            <name>dev.openclinica.com-snapshots</name>
+            <url>https://dev.openclinica.com/artifactory/libs-snapshot-local</url>
+        </snapshotRepository>
+    </distributionManagement>
 
 </project>
