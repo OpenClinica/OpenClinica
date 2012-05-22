@@ -209,4 +209,30 @@
              select   name, ordinal, oc_oid, item_data_id, i.item_id as item_id,    value from item_data id, item i,versioning_map v            where    v.item_id =i.item_id and v.crf_version_id=? and            id.item_id=i.item_id and event_crf_id = ? order  by i.item_id,ordinal
     	</sql>
     </query>
+     <query>
+        <name>findAllWithItemGroupCRFVersionMetadataByCRFId</name>
+        <sql>
+           
+	select  distinct item.name as item_name, item_group.name as group_name,  item_group.oc_oid as group_oid ,
+	crf_version.name as version_name, crf_version.status_id as v_status
+	 from item, item_group  , item_group_metadata, crf_version
+	 where    item.item_id= item_group_metadata.item_id  and item_group_metadata.item_group_id =  item_group.item_group_id
+	 and item_group_metadata.crf_version_id = crf_version.crf_version_id
+	 and    item_group.crf_id =(select crf_id from CRF where name=?) order by item.name;
+ 	</sql>
+   </query>
+    <query>
+        <name>findAllWithItemDetailsGroupCRFVersionMetadataByCRFId</name>
+        <sql>
+           
+	select  distinct item.name as item_name, item.description as description, item.item_id as item_id, 
+	item.item_data_type_id as data_type, item.oc_oid as item_oid,
+	item_group.name as group_name,  item_group.oc_oid as group_oid ,
+	crf_version.name as version_name, crf_version.status_id as v_status
+	 from item, item_group  , item_group_metadata, crf_version
+	 where    item.item_id= item_group_metadata.item_id  and item_group_metadata.item_group_id =  item_group.item_group_id
+	 and item_group_metadata.crf_version_id = crf_version.crf_version_id
+	 and    item_group.crf_id =(select crf_id from CRF where name=?) order by item.name;
+	 	</sql>
+   </query>
 </queries>

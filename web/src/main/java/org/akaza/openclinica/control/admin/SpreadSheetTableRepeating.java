@@ -3,17 +3,15 @@
  * GNU Lesser General Public License (GNU LGPL).
 
  * For details see: http://www.openclinica.org/license
- * copyright 2003-2005 Akaza Research
+ * copyright 2003-2011 Akaza Research
  */
 package org.akaza.openclinica.control.admin;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.admin.NewCRFBean;
-import org.akaza.openclinica.bean.core.ApplicationConstants;
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.ResponseType;
 import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.oid.MeasurementUnitOidGenerator;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
@@ -52,7 +50,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -298,7 +295,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         if (leftItemText != null && leftItemText.length() > 4000) {
                             errors.add(resPageMsg.getString("left_item_length_error"));
                         }
-                        item_from_row.setLeft_item_text(leftItemText);
+                        item_from_row.setLeftItemText(leftItemText);
                         // Commented out to resolve issue-2413
                         // if (StringUtil.isBlank(leftItemText)) {
                         // errors.add(resPageMsg.getString("the") + " " +
@@ -1664,7 +1661,10 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                     
                     SpreadSheetItemUtil.verifySectionGroupPlacementForItems( row_items, errors,  htmlErrors, j,resPageMsg,  itemGroups);
                     
-                    instantValidator.validate();
+                    SpreadSheetItemUtil.verifyUniqueItemPlacementInGroups( row_items, errors,  htmlErrors, j,resPageMsg, 
+                    		crfName, ds);
+                  
+        			instantValidator.validate();
                     errors = (ArrayList<String>)instantValidator.getSheetErrors().addErrorsToSheet(errors);
                     htmlErrors = (HashMap<String,String>)instantValidator.getSheetErrors().putHtmlErrorsToSheet(htmlErrors);
                 } else if (sheetName.equalsIgnoreCase("Groups")) {

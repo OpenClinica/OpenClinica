@@ -10,9 +10,6 @@ package org.akaza.openclinica.control.admin;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -20,10 +17,10 @@ import java.util.ResourceBundle;
 import org.akaza.openclinica.bean.core.ApplicationConstants;
 import org.akaza.openclinica.bean.core.ResponseType;
 import org.akaza.openclinica.bean.core.Utils;
-import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
-import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.core.util.CrfTemplateColumnNameEnum;
+import org.akaza.openclinica.core.util.ItemGroupCrvVersionUtil;
+import org.akaza.openclinica.dao.submit.ItemDAO;
 
 public class SpreadSheetItemUtil {
 	
@@ -31,34 +28,34 @@ public class SpreadSheetItemUtil {
 	
 	
 	
-	private String item_name;//1
-	private String description_label;//2
-	private String left_item_text;//3
-	private String units;//4
-	private String right_item_text;//5
-	private String section_label;//6
-	private String group_label;//7
-	private String header;//8
-	private String subheader;//9
-	private String parent_item;//10
-	private String column_number;//11
-	private String page_number;//12
-	private String question_number;//13
-	private int response_type_id;//14
-	private String response_label;//15
-	private String response_options_text;//16
-	private String[] response_options;
-	private String response_values_or_calculations;//17
-	private String response_layout;//18
-	private String default_value;//19
-	private String data_type;//20
-	private String width_decimal;//21
-	private String validation;//22
-	private String validation_error_message;//23
-	private String phi;//24
-	private String required;//25
-	private String item_display_status;//26
-	private String simple_conditional_display;//27
+	private String itemName;//1
+	private String descriptionLabel;//2
+	private String leftItemText;//3
+//	private String units;//4
+//	private String right_item_text;//5
+	private String sectionLabel;//6
+	private String groupLabel;//7
+//	private String header;//8
+//	private String subheader;//9
+	private String parentItem;//10
+//	private String column_number;//11
+//	private String page_number;//12
+//	private String question_number;//13
+	private int responseTypeId;//14
+//	private String response_label;//15
+//	private String response_options_text;//16
+	private String[] responseOptions;
+//	private String response_values_or_calculations;//17
+//	private String response_layout;//18
+	private String defaultValue;//19
+	private String dataType;//20
+//	private String width_decimal;//21
+//	private String validation;//22
+//	private String validation_error_message;//23
+//	private String phi;//24
+//	private String required;//25
+//	private String item_display_status;//26
+//	private String simple_conditional_display;//27
 	
 	
 	public SpreadSheetItemUtil(){}
@@ -70,84 +67,84 @@ public class SpreadSheetItemUtil {
         
 	}
 	
-	public String getSimple_conditional_display() {
-		return simple_conditional_display;
-	}
-	public void setSimple_conditional_display(String simple_conditional_display) {
-		this.simple_conditional_display = simple_conditional_display;
-	}
+//	public String getSimple_conditional_display() {
+//		return simple_conditional_display;
+//	}
+//	public void setSimple_conditional_display(String simple_conditional_display) {
+//		this.simple_conditional_display = simple_conditional_display;
+//	}
 	/**
 	 * @return the item_name
 	 */
 	public String getItemName() {
-		return item_name;
+		return itemName;
 	}
 	/**
 	 * @param item_name the item_name to set
 	 */
 	public void setItemName(String item_name) {
 		item_name = cleanProperty(item_name);
-		this.item_name = item_name;
+		this.itemName = item_name;
 	}
 	/**
-	 * @return the description_label
+	 * @return the descriptionLabel
 	 */
 	public String getDescriptionLabel() {
-		return description_label;
+		return descriptionLabel;
 	}
 	/**
-	 * @param description_label the description_label to set
+	 * @param descriptionLabel the descriptionLabel to set
 	 */
-	public void setDescriptionLabel(String description_label) {
-		this.description_label = description_label;
+	public void setDescriptionLabel(String descriptionLabel) {
+		this.descriptionLabel = descriptionLabel;
 	}
 	/**
 	 * @return the left_item_text
 	 */
-	public String getLeft_item_text() {
-		return left_item_text;
+	public String getLeftItemText() {
+		return leftItemText;
 	}
 	/**
 	 * @param left_item_text the left_item_text to set
 	 */
-	public void setLeft_item_text(String left_item_text) {
-		this.left_item_text = left_item_text;
+	public void setLeftItemText(String left_item_text) {
+		this.leftItemText = left_item_text;
 	}
-	/**
-	 * @return the units
-	 */
-	public String getUnits() {
-		return units;
-	}
-	/**
-	 * @param units the units to set
-	 */
-	public void setUnits(String units) {
-		this.units = units;
-	}
-	/**
-	 * @return the right_item_text
-	 */
-	public String getRight_item_text() {
-		return right_item_text;
-	}
-	/**
-	 * @param right_item_text the right_item_text to set
-	 */
-	public void setRight_item_text(String right_item_text) {
-		this.right_item_text = right_item_text;
-	}
+//	/**
+//	 * @return the units
+//	 */
+//	public String getUnits() {
+//		return units;
+//	}
+//	/**
+//	 * @param units the units to set
+//	 */
+//	public void setUnits(String units) {
+//		this.units = units;
+//	}
+//	/**
+//	 * @return the right_item_text
+//	 */
+//	public String getRight_item_text() {
+//		return right_item_text;
+//	}
+//	/**
+//	 * @param right_item_text the right_item_text to set
+//	 */
+//	public void setRight_item_text(String right_item_text) {
+//		this.right_item_text = right_item_text;
+//	}
 	/**
 	 * @return the section_label
 	 */
 	public String getSectionLabel() {
-		return section_label;
+		return sectionLabel;
 	}
 	/**
 	 * @param section_label the section_label to set
 	 */
 	public void setSectionLabel(String section_label) {
-		this.section_label = cleanProperty(section_label);
+		this.sectionLabel = cleanProperty(section_label);
        
        
 		
@@ -156,247 +153,247 @@ public class SpreadSheetItemUtil {
 	 * @return the group_label
 	 */
 	public String getGroupLabel() {
-		return group_label;
+		return groupLabel;
 	}
 	/**
 	 * @param group_label the group_label to set
 	 */
 	public void setGroupLabel(String group_label) {
-		this.group_label =  cleanProperty(group_label);
+		this.groupLabel =  cleanProperty(group_label);
 	}
-	/**
-	 * @return the header
-	 */
-	public String getHeader() {
-		return header;
-	}
-	/**
-	 * @param header the header to set
-	 */
-	public void setHeader(String header) {
-		this.header = header;
-	}
-	/**
-	 * @return the subheader
-	 */
-	public String getSubheader() {
-		return subheader;
-	}
-	/**
-	 * @param subheader the subheader to set
-	 */
-	public void setSubheader(String subheader) {
-		this.subheader = subheader;
-	}
+//	/**
+//	 * @return the header
+//	 */
+//	public String getHeader() {
+//		return header;
+//	}
+//	/**
+//	 * @param header the header to set
+//	 */
+//	public void setHeader(String header) {
+//		this.header = header;
+//	}
+//	/**
+//	 * @return the subheader
+//	 */
+//	public String getSubheader() {
+//		return subheader;
+//	}
+//	/**
+//	 * @param subheader the subheader to set
+//	 */
+//	public void setSubheader(String subheader) {
+//		this.subheader = subheader;
+//	}
 	/**
 	 * @return the parent_item
 	 */
 	public String getParentItem() {
-		return parent_item;
+		return parentItem;
 	}
 	/**
 	 * @param parent_item the parent_item to set
 	 */
 	public void setParentItem(String parent_item) {
-		this.parent_item = cleanProperty(parent_item);
+		this.parentItem = cleanProperty(parent_item);
 	
 	}
-	/**
-	 * @return the column_number
-	 */
-	public String getColumn_number() {
-		return column_number;
-	}
-	/**
-	 * @param column_number the column_number to set
-	 */
-	public void setColumn_number(String column_number) {
-		this.column_number = column_number;
-	}
-	/**
-	 * @return the page_number
-	 */
-	public String getPage_number() {
-		return page_number;
-	}
-	/**
-	 * @param page_number the page_number to set
-	 */
-	public void setPage_number(String page_number) {
-		this.page_number = page_number;
-	}
-	/**
-	 * @return the question_number
-	 */
-	public String getQuestion_number() {
-		return question_number;
-	}
-	/**
-	 * @param question_number the question_number to set
-	 */
-	public void setQuestion_number(String question_number) {
-		this.question_number = question_number;
-	}
+//	/**
+//	 * @return the column_number
+//	 */
+//	public String getColumn_number() {
+//		return column_number;
+//	}
+//	/**
+//	 * @param column_number the column_number to set
+//	 */
+//	public void setColumn_number(String column_number) {
+//		this.column_number = column_number;
+//	}
+//	/**
+//	 * @return the page_number
+//	 */
+//	public String getPage_number() {
+//		return page_number;
+//	}
+//	/**
+//	 * @param page_number the page_number to set
+//	 */
+//	public void setPage_number(String page_number) {
+//		this.page_number = page_number;
+//	}
+//	/**
+//	 * @return the question_number
+//	 */
+//	public String getQuestion_number() {
+//		return question_number;
+//	}
+//	/**
+//	 * @param question_number the question_number to set
+//	 */
+//	public void setQuestion_number(String question_number) {
+//		this.question_number = question_number;
+//	}
 	/**
 	 * @return the responSe_type
 	 */
 	public int getResponseTypeId() {
-		return response_type_id;
+		return responseTypeId;
 	}
 	/**
 	 * @param responSe_type the responSe_type to set
 	 */
 	public void setResponseTypeId(int response_type_id) {
-		this.response_type_id = response_type_id;
+		this.responseTypeId = response_type_id;
 	}
 	
 	
-	/**
-	 * @return the response_label
-	 */
-	public String getResponse_label() {
-		return response_label;
-	}
-	/**
-	 * @param response_label the response_label to set
-	 */
-	public void setResponse_label(String response_label) {
-		this.response_label = response_label;
-	}
-	/**
-	 * @return the response_options_text
-	 */
-	public String getResponse_options_text() {
-		return response_options_text;
-	}
-	/**
-	 * @param response_options_text the response_options_text to set
-	 */
-	public void setResponse_options_text(String response_options_text) {
-		this.response_options_text = response_options_text;
-	}
-	/**
-	 * @return the response_values_or_calculations
-	 */
-	public String getResponse_values_or_calculations() {
-		return response_values_or_calculations;
-	}
-	/**
-	 * @param response_values_or_calculations the response_values_or_calculations to set
-	 */
-	public void setResponse_values_or_calculations(
-			String response_values_or_calculations) {
-		this.response_values_or_calculations = response_values_or_calculations;
-	}
-	/**
-	 * @return the response_layout
-	 */
-	public String getResponse_layout() {
-		return response_layout;
-	}
-	/**
-	 * @param response_layout the response_layout to set
-	 */
-	public void setResponse_layout(String response_layout) {
-		this.response_layout = response_layout;
-	}
+//	/**
+//	 * @return the response_label
+//	 */
+//	public String getResponse_label() {
+//		return response_label;
+//	}
+//	/**
+//	 * @param response_label the response_label to set
+//	 */
+//	public void setResponse_label(String response_label) {
+//		this.response_label = response_label;
+//	}
+//	/**
+//	 * @return the response_options_text
+//	 */
+//	public String getResponse_options_text() {
+//		return response_options_text;
+//	}
+//	/**
+//	 * @param response_options_text the response_options_text to set
+//	 */
+//	public void setResponse_options_text(String response_options_text) {
+//		this.response_options_text = response_options_text;
+//	}
+//	/**
+//	 * @return the response_values_or_calculations
+//	 */
+//	public String getResponse_values_or_calculations() {
+//		return response_values_or_calculations;
+//	}
+//	/**
+//	 * @param response_values_or_calculations the response_values_or_calculations to set
+//	 */
+//	public void setResponse_values_or_calculations(
+//			String response_values_or_calculations) {
+//		this.response_values_or_calculations = response_values_or_calculations;
+//	}
+//	/**
+//	 * @return the response_layout
+//	 */
+//	public String getResponse_layout() {
+//		return response_layout;
+//	}
+//	/**
+//	 * @param response_layout the response_layout to set
+//	 */
+//	public void setResponse_layout(String response_layout) {
+//		this.response_layout = response_layout;
+//	}
 	/**
 	 * @return the default_value
 	 */
 	public String getDefaultValue() {
-		return default_value;
+		return defaultValue;
 	}
 	/**
 	 * @param default_value the default_value to set
 	 */
 	public void setDefaultValue(String default_value) {
-		this.default_value = cleanProperty(default_value);
+		this.defaultValue = cleanProperty(default_value);
 	}
 	/**
 	 * @return the data_type
 	 */
 	public String getDataType() {
-		return data_type;
+		return dataType;
 	}
 	/**
 	 * @param data_type the data_type to set
 	 */
 	public void setDataType(String data_type) {
-		this.data_type = cleanProperty(data_type);
+		this.dataType = cleanProperty(data_type);
 	}
-	/**
-	 * @return the width_decimal
-	 */
-	public String getWidth_decimal() {
-		return width_decimal;
-	}
-	/**
-	 * @param width_decimal the width_decimal to set
-	 */
-	public void setWidth_decimal(String width_decimal) {
-		this.width_decimal = width_decimal;
-	}
-	/**
-	 * @return the validation
-	 */
-	public String getValidation() {
-		return validation;
-	}
-	/**
-	 * @param validation the validation to set
-	 */
-	public void setValidation(String validation) {
-		this.validation = validation;
-	}
-	/**
-	 * @return the validation_error_message
-	 */
-	public String getValidation_error_message() {
-		return validation_error_message;
-	}
-	/**
-	 * @param validation_error_message the validation_error_message to set
-	 */
-	public void setValidation_error_message(String validation_error_message) {
-		this.validation_error_message = validation_error_message;
-	}
-	/**
-	 * @return the phi
-	 */
-	public String getPhi() {
-		return phi;
-	}
-	/**
-	 * @param phi the phi to set
-	 */
-	public void setPhi(String phi) {
-		this.phi = phi;
-	}
-	/**
-	 * @return the required
-	 */
-	public String getRequired() {
-		return required;
-	}
-	/**
-	 * @param required the required to set
-	 */
-	public void setRequired(String required) {
-		this.required = required;
-	}
-	/**
-	 * @return the item_display_status
-	 */
-	public String getItem_display_status() {
-		return item_display_status;
-	}
-	/**
-	 * @param item_display_status the item_display_status to set
-	 */
-	public void setItem_display_status(String item_display_status) {
-		this.item_display_status = item_display_status;
-	}
-
+//	/**
+//	 * @return the width_decimal
+//	 */
+//	public String getWidth_decimal() {
+//		return width_decimal;
+//	}
+//	/**
+//	 * @param width_decimal the width_decimal to set
+//	 */
+//	public void setWidth_decimal(String width_decimal) {
+//		this.width_decimal = width_decimal;
+//	}
+//	/**
+//	 * @return the validation
+//	 */
+//	public String getValidation() {
+//		return validation;
+//	}
+//	/**
+//	 * @param validation the validation to set
+//	 */
+//	public void setValidation(String validation) {
+//		this.validation = validation;
+//	}
+//	/**
+//	 * @return the validation_error_message
+//	 */
+//	public String getValidation_error_message() {
+//		return validation_error_message;
+//	}
+//	/**
+//	 * @param validation_error_message the validation_error_message to set
+//	 */
+//	public void setValidation_error_message(String validation_error_message) {
+//		this.validation_error_message = validation_error_message;
+//	}
+//	/**
+//	 * @return the phi
+//	 */
+//	public String getPhi() {
+//		return phi;
+//	}
+//	/**
+//	 * @param phi the phi to set
+//	 */
+//	public void setPhi(String phi) {
+//		this.phi = phi;
+//	}
+//	/**
+//	 * @return the required
+//	 */
+//	public String getRequired() {
+//		return required;
+//	}
+//	/**
+//	 * @param required the required to set
+//	 */
+//	public void setRequired(String required) {
+//		this.required = required;
+//	}
+//	/**
+//	 * @return the item_display_status
+//	 */
+//	public String getItem_display_status() {
+//		return item_display_status;
+//	}
+//	/**
+//	 * @param item_display_status the item_display_status to set
+//	 */
+//	public void setItem_display_status(String item_display_status) {
+//		this.item_display_status = item_display_status;
+//	}
+//
 	/*
 	 * for itemName (column 0
 	 */
@@ -663,14 +660,61 @@ public class SpreadSheetItemUtil {
 	 * @return the response_options
 	 */
 	public String[] getResponseOptions() {
-		return response_options;
+		return responseOptions;
 	}
 
 	/**
 	 * @param response_options the response_options to set
 	 */
 	public void setResponseOptions(String[] response_options) {
-		this.response_options = response_options;
+		this.responseOptions = response_options;
 	}
 	
+	
+	public static void verifyUniqueItemPlacementInGroups(ArrayList< SpreadSheetItemUtil> row_items,
+			ArrayList<String> ver_errors, HashMap<String,String> htmlErrors,
+			int sheetNumber,
+			ResourceBundle resPageMsg,
+			String crfName, javax.sql.DataSource ds){
+		
+		/*ver_errors.add(resPageMsg.getString("duplicate") + " " + resPageMsg.getString("item_name_column") + " " + itemName + " "
+                + resPageMsg.getString("was_detected_at_row") + " " + k + ", " + resPageMsg.getString("items_worksheet_with_dot") );
+            htmlErrors.put(sheetNumber + "," + k + ","+CrfTemplateColumnNameEnum.ITEM_NAME.getCellNumber(),
+            		resPageMsg.getString("INVALID_FIELD"));
+            		*/
+		
+		//get all items with group / version info from db 
+		 ItemDAO idao = new ItemDAO(ds);
+		 int row_count = 1; int check_group_count = 0;
+		 StringBuffer item_messages = null;
+		 ArrayList<ItemGroupCrvVersionUtil> item_group_crf_records= idao.findAllWithItemGroupCRFVersionMetadataByCRFId(   crfName) ;
+	     for ( SpreadSheetItemUtil row_item : row_items){
+	    	 item_messages = new StringBuffer();
+			 for   ( ItemGroupCrvVersionUtil check_group : item_group_crf_records){
+				 check_group_count++;
+		    	 //we expect no more than one hit
+		    	 if (check_group.getItemName().equals(row_item.getItemName()) && 
+		    	 	!(row_item.getGroupLabel().equals("") && check_group.getGroupName().equals("Ungrouped"))){
+		    		 
+			    		 if ( !row_item.getGroupLabel().equals(check_group.getGroupName()) && check_group.getCrfVersionStatus()==1){
+			    			 item_messages.append(resPageMsg.getString("verifyUniqueItemPlacementInGroups_4") + check_group.getGroupName() );
+			    			 item_messages.append(resPageMsg.getString("verifyUniqueItemPlacementInGroups_5"));
+			    			 item_messages.append(check_group.getCrfVersionName());
+			    			 if ( check_group_count != item_group_crf_records.size()){item_messages.append("', "); }
+		    		 }
+		    	 }
+		    }
+		     
+			
+			 if ( item_messages.length()>0){
+				 htmlErrors.put(sheetNumber + "," + row_count + ","+CrfTemplateColumnNameEnum.GROUP_LABEL.getCellNumber(),
+		            		resPageMsg.getString("INVALID_FIELD"));
+				 ver_errors.add(resPageMsg.getString("verifyUniqueItemPlacementInGroups_1")+row_item.getItemName()
+    					+"' "+ resPageMsg.getString("at_row") +" '"+ row_count+
+    					resPageMsg.getString("verifyUniqueItemPlacementInGroups_2")+row_item.getItemName()+
+    					  resPageMsg.getString("verifyUniqueItemPlacementInGroups_3")+item_messages.toString()+").");
+			 }
+			 row_count++;
+	}
+}
 }

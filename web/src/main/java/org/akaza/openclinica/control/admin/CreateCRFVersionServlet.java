@@ -361,13 +361,14 @@ public class CreateCRFVersionServlet extends SecureController {
             }
         } else if ("delete".equalsIgnoreCase(action)) {
             logger.info("user wants to delete previous version");
-            session.setAttribute("deletePreviousVersion", Boolean.TRUE);
             List excelErr = (ArrayList) session.getAttribute("excelErrors");
             logger.info("for overwrite CRF version, excelErr.isEmpty()=" + excelErr.isEmpty());
             if (excelErr != null && excelErr.isEmpty()) {
                 addPageMessage(resword.getString("congratulations_your_spreadsheet_no_errors"));
+                session.setAttribute("deletePreviousVersion", Boolean.TRUE);//should be moved to excelErr != null block
                 forwardPage(Page.VIEW_SECTION_DATA_ENTRY_PREVIEW);
-            } else {
+             } else {
+                session.setAttribute("deletePreviousVersion", Boolean.FALSE);//should be moved to excelErr != null block
                 logger.info("OpenClinicaException thrown, forwarding to CREATE_CRF_VERSION_CONFIRM.");
                 forwardPage(Page.CREATE_CRF_VERSION_CONFIRM);
             }
@@ -615,17 +616,7 @@ public class CreateCRFVersionServlet extends SecureController {
                     || item.getDataType().getId() != newItem.getDataType().getId() || !item.getDescription().equalsIgnoreCase(newItem.getDescription())) {
 
                     logger.info("found two items with same name but different units/phi/datatype/description");
-                    // logger.info("item" + newItem.getId() );
-                    // logger.info("unit" + newItem.getUnits() + " |" +
-                    // item.getUnits() );
-                    // logger.info("phi" + newItem.isPhiStatus() + "| " +
-                    // item.isPhiStatus() );
-                    // logger.info("DataType" + newItem.getDataType().getId() +
-                    // " | " +
-                    // item.getDataType().getId() );
-                    // logger.info("Description" + newItem.getDescription() + "
-                    // |" +
-                    // item.getDescription() );
+                  
                     diffItems.add(newItem);
                 }
             }

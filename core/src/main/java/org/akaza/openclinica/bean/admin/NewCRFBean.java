@@ -612,9 +612,12 @@ public class NewCRFBean extends Object implements java.io.Serializable {
         Connection con = null;
         ResultSet rs = null;
         PreparedStatement prep_statement = null;
+        ArrayList<String> error = new ArrayList<String>();
+        String cur_query=null;
         try {
             con = ds.getConnection();
             if (con.isClosed()) {
+            	 error.add("The connection to the database is not open.");
                  throw new OpenClinicaException("newCRFBean, deleteInsertToDB, connection not open", "1");
             }
             con.setAutoCommit(false);
@@ -622,6 +625,7 @@ public class NewCRFBean extends Object implements java.io.Serializable {
             // delete version and related info
              for (String dQuery : (ArrayList<String>)deleteQueries) {
             	 logger.debug(dQuery);
+            	 cur_query= dQuery;
             	 statement = con.createStatement();
                  statement.executeUpdate(dQuery);
             	 statement.close();
@@ -632,6 +636,7 @@ public class NewCRFBean extends Object implements java.io.Serializable {
             
             for (String  pQuery: (Collection<String>)itemQueries.values()){
             	logger.debug(pQuery);
+            	cur_query = pQuery;
             	statement = con.createStatement();
             	statement.executeUpdate(pQuery);
             	statement.close();
@@ -640,6 +645,7 @@ public class NewCRFBean extends Object implements java.io.Serializable {
             logger.debug("deleteInsertToDB function  ---pause in query generation, items---");
            for (String crQuery : (ArrayList<String>)queries) {
         	   logger.debug(crQuery);
+        	   cur_query= crQuery;
                 statement = con.createStatement();
                 statement.executeUpdate(crQuery);
                 statement.close();
@@ -679,18 +685,25 @@ public class NewCRFBean extends Object implements java.io.Serializable {
             try {
                 con.rollback();
                 logger.error("Error detected, rollback " + se.getMessage());
-                throw new OpenClinicaException("", "");
+                String msg2 = "The following error was returned from the database: " + se.getMessage() + " using the following query: " + cur_query;
+                error.add(msg2);
+                  throw new OpenClinicaException("", "");
             } catch (SQLException seq) {
+            	error.add( "The following error was returned from the database: " + seq.getMessage());
+                
             	logger.error("Error within rollback " + seq.getMessage());
                 throw new OpenClinicaException("", "");
             }
         } catch (OpenClinicaException pe) {
             pe.printStackTrace();
             try {
+                error.add("The following error was returned from the application: " + pe.getMessage());
                 con.rollback();
                 logger.error("OpenClinica Error detected, rollback " + pe.getMessage());
                 throw new OpenClinicaException("", "");
             } catch (SQLException seq) {
+                error.add("The following error was returned from the application: " + seq.getMessage());
+                 
             	logger.error("OpenClinica Error within rollback " + seq.getMessage());
                 throw new OpenClinicaException("", "");
              }
@@ -705,10 +718,12 @@ public class NewCRFBean extends Object implements java.io.Serializable {
                 if (rs != null)                    rs.close();
                 
             } catch (SQLException e) {
+                error.add("The following error was returned from the application: " + e.getMessage());
+                
                 logger.error(e.getMessage());
                 throw new OpenClinicaException(e.getMessage(), "1");
             }
-
+            this.setErrors(error);
         }
     }
 }

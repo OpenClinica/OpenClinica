@@ -3,7 +3,7 @@
  * GNU Lesser General Public License (GNU LGPL).
 
  * For details see: http://www.openclinica.org/license
- * copyright 2003-2005 Akaza Research
+ * copyright 2003-2011 Akaza Research
  */
 package org.akaza.openclinica.control.admin;
 
@@ -16,9 +16,11 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.core.util.ItemGroupCrvVersionUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
@@ -104,15 +106,12 @@ public class ViewCRFServlet extends SecureController {
             request.setAttribute("crfName", crf.getName());
             ArrayList<CRFVersionBean> versions = (ArrayList<CRFVersionBean>) vdao.findAllByCRF(crfId);
             crf.setVersions(versions);
+            ArrayList< ItemGroupCrvVersionUtil> items_verified = verifyUniqueItemPlacementInGroups(	crf.getName());
+            request.setAttribute("items", items_verified);
+            
             if ("admin".equalsIgnoreCase(module)) {
                 //BWP 3279: generate a table showing a list of studies associated with the CRF>>
                 StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
-
-                /*ArrayList<StudyEventDefinitionBean> studyEventDefinitionBeans = ( ArrayList<StudyEventDefinitionBean>)
-                  studyEventDefinitionDAO.findAll();
-
-                studyBeans = findStudiesForCRF(studyEventDefinitionBeans,crfId,
-                  cdao,studyDAO);*/
 
                 studyBeans = findStudiesForCRFId(crfId, studyDAO);
                 //Create the Jmesa table for the studies associated with the CRF
@@ -120,33 +119,64 @@ public class ViewCRFServlet extends SecureController {
                 request.setAttribute("studiesTableHTML", studyHtml);
                 //>>
             }
-            // Collection<RuleSetBean> items =
-            // getRuleSetService().getRuleSetsByCrf(crf);
-            Collection<TableColumnHolder> items = populate(crf, versions);
-            /********* No need for this table anymore
-            TableFacade tableFacade = createTableFacade("rules", request);
-            tableFacade.setItems(items); // set the items
-            tableFacade.setExportTypes(response, CSV, JEXCEL);
-            tableFacade.setStateAttr("restore");
-
-            Limit limit = tableFacade.getLimit();
-            if (limit.isExported()) {
-                export(tableFacade);
-                // return null; // In Spring returning null tells the controller
-                // not to do anything.
-            }
-
-            String html = html(tableFacade);
-            request.setAttribute("rules", html); // Set the Html in the
-            */
-            // request for the JSP.
-
+             Collection<TableColumnHolder> items = populate(crf, versions);
             request.setAttribute(CRF, crf);
             forwardPage(Page.VIEW_CRF);
 
         }
     }
 
+    
+    private  ArrayList< ItemGroupCrvVersionUtil> verifyUniqueItemPlacementInGroups(	String crfName){
+		
+		//get all items with group / version info from db 
+		 ItemDAO idao = new ItemDAO(sm.getDataSource());
+		 int check_group_count = 0;
+		 StringBuffer item_messages = null; String temp_buffer=null; //use for first record in the group
+		 ArrayList< ItemGroupCrvVersionUtil> results = new ArrayList< ItemGroupCrvVersionUtil>();
+		 ItemGroupCrvVersionUtil cur_item = null;
+		 StringBuffer error_message = null;
+		 ArrayList<ItemGroupCrvVersionUtil> item_group_crf_records=
+				 idao.findAllWithItemDetailsGroupCRFVersionMetadataByCRFId(   crfName) ;
+	   	 for   ( ItemGroupCrvVersionUtil check_group : item_group_crf_records){
+	   		 if (results.size() == 0 || !check_group.getItemName().equals(cur_item.getItemName()) ){
+	   			 //delete ',' from versions property
+	   			if ( cur_item != null && cur_item.getErrorMesages() != null){
+	   				cur_item.setErrorMesages(cur_item.getErrorMesages().substring(0,cur_item.getErrorMesages().length()-2 ) +")");} 
+	   			cur_item = new ItemGroupCrvVersionUtil(check_group.getItemName(),check_group.getGroupName(),
+	   					check_group.getGroupOID()  , check_group.getCrfVersionName() , check_group.getCrfVersionStatus(),
+	   					check_group.getItemOID(), check_group.getItemDescription(),
+	   					check_group.getItemDataType(),check_group.getId());
+	   			cur_item.setVersions( check_group.getCrfVersionName());
+	   			temp_buffer=respage.getString("verifyUniqueItemPlacementInGroups_4") + check_group.getGroupName() +
+	   					respage.getString("verifyUniqueItemPlacementInGroups_5")+check_group.getCrfVersionName()+"'; ";
+	   			results.add(cur_item);
+	   		 }else {
+	   			 if (  check_group.getItemName().equals(cur_item.getItemName()) &&
+	   		 
+	   				 ! check_group.getGroupName().equals(cur_item.getGroupName())){
+	   				 // add message for the first item 
+		   			error_message = new StringBuffer();
+		   			error_message.append(respage.getString("verifyUniqueItemPlacementInGroups_4") + check_group.getGroupName() );
+		   			error_message.append(	respage.getString("verifyUniqueItemPlacementInGroups_5"));
+		   			error_message.append(	check_group.getCrfVersionName()+"'; ");
+		   			if ( cur_item.getErrorMesages() == null){cur_item.setErrorMesages("(");}
+		   			if ( temp_buffer != null){cur_item.setErrorMesages(cur_item.getErrorMesages() + temp_buffer);}
+		   			temp_buffer=null;
+		   			cur_item.setErrorMesages( cur_item.getErrorMesages() + error_message);
+		   			if (check_group.getCrfVersionStatus() == 1 && cur_item.getCrfVersionStatus()!= 1){
+		   				cur_item.setCrfVersionStatus(1);
+		   			}
+		   			
+	   			 }
+	   			cur_item.setVersions(cur_item.getVersions()+","+check_group.getCrfVersionName());
+	   		 }
+	   		
+	   		
+				 	
+	     }
+	   	 return results;
+	}
     /*
     Create a JMesa-based table for showing the studies associated with a CRF.
      */
