@@ -24,9 +24,9 @@ public class EntityBean implements java.io.Serializable {
      * is set to true. This reflects our notion that an entity is active if it
      * comes from the database, and otherwise inactive. Note however that if a
      * bean is retrieved from the database, changed in the application, and then
-     * updated in the databse, it should be changed when it is changed – the
+     * updated in the databse, it should be changed when it is changed  the
      * notion being that the bean no longer reflects the current state of the
-     * database. The relevant DAO’s update method should set active to true
+     * database. The relevant DAOs update method should set active to true
      * again once the database has been successfully changed.
      */
     protected boolean active = false;

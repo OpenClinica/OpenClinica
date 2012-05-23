@@ -1,5 +1,5 @@
 <assembly>
-  <id></id>
+  <id>OpenClinica</id>
   <formats>
     <format>zip</format>
   </formats>

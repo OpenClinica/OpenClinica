@@ -123,28 +123,10 @@
 			<version>2.1.2</version>
 			<scope>compile</scope>
 		</dependency>
-		<!-- for servlet tests -->
-		<dependency>
-			<groupId>javax.j2ee</groupId>
-			<artifactId>j2ee</artifactId>
-			<version>1.4</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.persistence</groupId>
-			<artifactId>persistence-api</artifactId>
-			<version>1.0</version>
-			<scope>compile</scope>
-		</dependency>
-		<!-- <dependency> <groupId>org.mockejb</groupId> <artifactId>mockejb</artifactId>
-			<version>0.6-beta2</version> <scope>test</scope> </dependency> -->
-		<dependency>
-			<groupId>org.jmesa</groupId>
-			<artifactId>jmesa</artifactId>
-			<version>2.4.2</version>
-			<scope>compile</scope>
-		</dependency>
-		<!-- end servlet tests -->
+        <dependency>
+            <groupId>org.jmesa</groupId>
+            <artifactId>jmesa</artifactId>
+        </dependency>
 		<dependency>
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
@@ -211,12 +193,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>javax.activation</groupId>
-			<artifactId>activation</artifactId>
-			<version>1.0.2</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.jdom</groupId>
 			<artifactId>jdom</artifactId>
 			<version>1.1</version>
@@ -260,7 +236,7 @@
 		<dependency>
 			<groupId>net.sourceforge.jexcelapi</groupId>
 			<artifactId>jxl</artifactId>
-			<version>2.6.6</version>
+			<version>2.6.10</version>
 			<scope>compile</scope>
 		</dependency>
 		<!-- Struts web framework -->
@@ -277,47 +253,38 @@
 			<version>8.1-404.jdbc3</version>
 			<scope>runtime</scope>
 		</dependency>
-		<!-- Oracle JDBC driver -->
-		<dependency>
-			<groupId>oracle</groupId>
-			<artifactId>ojdbc14</artifactId>
-			<version>10g</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
+        <!-- Oracle JDBC driver -->
+        <dependency>
+            <groupId>oracle.ojdbc14</groupId>
+            <artifactId>ojdbc14</artifactId>
+            <version>10g</version>
+        </dependency>
+        <dependency>
 			<groupId>org.codehaus.castor</groupId>
 			<artifactId>castor</artifactId>
 			<version>1.2</version>
 		</dependency>
 	</dependencies>
 
-	<build>
-		<plugins>
-			<plugin>
-				<inherited>true</inherited>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.3.1</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>test-jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
-	<scm>
-		<connection>${scm.path}/web</connection>
-		<developerConnection>${scm.path}/web</developerConnection>
-	</scm>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.cargo</groupId>
+                <artifactId>cargo-maven2-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.zeroturnaround</groupId>
+                <artifactId>jrebel-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>
