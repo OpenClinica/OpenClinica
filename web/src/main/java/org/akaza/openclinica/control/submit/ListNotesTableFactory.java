@@ -153,6 +153,21 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         tableFacade.setToolbar(toolbar);
     }
 
+    public List<DiscrepancyNoteBean> findAllNotes(TableFacade tableFacade) {
+    	Limit limit = tableFacade.getLimit();
+    	limit.setRowSelect(null);
+    	ViewNotesFilterCriteria filter = ViewNotesFilterCriteria.buildFilterCriteria(
+    			limit,
+    			getDateFormat(),
+                discrepancyNoteTypeDropdown.getDecoder(),
+                resolutionStatusDropdown.getDecoder());
+        List<DiscrepancyNoteBean> items = getViewNotesService().listNotes(
+        		getCurrentStudy(),
+        		filter,
+                ViewNotesSortCriteria.buildFilterCriteria(limit.getSortSet()));
+        return items;
+    }
+
     @Override
     public void setDataAndLimitVariables(TableFacade tableFacade) {
         Stopwatch sw = Stopwatch.createAndStart("setDataAndLimitVariables");
