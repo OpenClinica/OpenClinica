@@ -4,6 +4,7 @@
 
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="respage"/>
 
 
 <c:choose>
@@ -163,12 +164,18 @@
                     <td class="table_cell"><c:out value="${item.versions}"/></td>
                     <td class="table_cell">
                      <c:choose>
-    <c:when test="${empty item.errorMesages}"><%-- no errors - green image --%>
-    	 <img src="images/icon_DEcomplete.gif">
+     <c:when test="${empty item.arrErrorMesages}"><span class="aka_green_highlight"><b><fmt:message key="ok" bundle="${respage}"/></b></span>   	
     </c:when>
     <c:otherwise>
-    <c:if test="${item.crfVersionStatus == 1 }">    	<img src="images/bt_Delete.gif"><c:out value="${item.errorMesages}"/></c:if>
-     <c:if test="${item.crfVersionStatus != 1 }">    	<img src="images/icon_Skipped.gif"><c:out value="${item.errorMesages}"/></c:if>
+    <c:if test="${item.crfVersionStatus == 1 }"><span class="aka_red_highlight"><b><fmt:message key="problem" bundle="${respage}"/></b>
+   <fmt:message key="problem_message" bundle="${respage}"/><br></c:if>
+     <c:if test="${item.crfVersionStatus != 1 }">  <span class="aka_orange_highlight"><b><fmt:message key="warning" bundle="${respage}"/></b>
+      <fmt:message key="warning_message" bundle="${respage}"/></c:if>
+  	<ul class="list_a_ul">
+  		<c:forEach var = "error" items="${item.arrErrorMesages}">
+  			<li class="list_a"><c:out value="${ error}"/>;</li>
+  		</c:forEach>
+  		</ul>
     </c:otherwise>
     </c:choose>
                    
