@@ -50,11 +50,18 @@
  not originating from doubleDataEntry--%>
 <c:if test="${hasDataFlag == null || empty hasDataFlag}">
   <c:set var="hasDataFlag" value="${false}"/></c:if>
+  
+  
+  <c:if test="${! empty formMessages}">
+ 	<c:set var="pageHasErrors" value="${true}" />
+ </c:if>
+ 
+ <!-- 24-May-2012 fix for issue #13822 do not display default values when page is displayed back with validation errors -->
 <c:choose>
   <c:when test="${(originJSP eq 'doubleDataEntry' ||
   (! (originJSP eq 'administrativeEditing'))) && (ddeEntered || (! hasDataFlag))
   && (ddeEntered || (! sessionScope['groupHasData']))   &&
-  empty displayItem.metadata.responseSet.value}">
+  empty displayItem.metadata.responseSet.value && !pageHasErrors}">
     <c:set var="inputTxtValue" value="${defValue}"/>
   </c:when>
   <c:otherwise>

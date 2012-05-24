@@ -284,12 +284,23 @@ function switchStr(itemId, id,attribute,str1,str2) {
  <c:if test="${empty displayItem.data.value}">
         <c:set var="isBlank" value="1" />
  </c:if>
+ 
+ <c:if test="${! empty formMessages}">
+ 	<c:set var="pageHasErrors" value="${true}" />
+ </c:if>
+ 
 <%-- text input value--%>
+<!-- 24-May-2012 fix for issue #13822 do not display default values when page is displayed back with validation errors -->
 <c:choose>
-  <c:when test="${(originJSP eq 'doubleDataEntry' ||
+ <%--  <c:when test="${(originJSP eq 'doubleDataEntry' ||
   (! (originJSP eq 'administrativeEditing'))) && (ddeEntered || (! hasDataFlag))
   && (ddeEntered || (! sessionScope['groupHasData'])) &&
   empty displayItem.metadata.responseSet.value}">
+  --%>
+  <c:when test="${(originJSP eq 'doubleDataEntry' ||
+  (! (originJSP eq 'administrativeEditing'))) && (ddeEntered || (! hasDataFlag))
+  && (ddeEntered || (! sessionScope['groupHasData'])) &&
+  empty displayItem.metadata.responseSet.value && !pageHasErrors}">
     <c:set var="inputTxtValue" value="${defValue}"/>
   </c:when>
  <%-- <c:when test="${isNewItem eq true }">
