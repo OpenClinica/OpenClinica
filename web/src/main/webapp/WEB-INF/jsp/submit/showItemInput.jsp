@@ -56,7 +56,7 @@
  	<c:set var="pageHasErrors" value="${true}" />
  </c:if>
  
- <!-- 24-May-2012 fix for issue #13822 do not display default values when page is displayed back with validation errors -->
+ <%-- 24-May-2012 fix for issue #13822 do not display default values when page is displayed back with validation errors --%>
 <c:choose>
   <c:when test="${(originJSP eq 'doubleDataEntry' ||
   (! (originJSP eq 'administrativeEditing'))) && (ddeEntered || (! hasDataFlag))
