@@ -88,10 +88,6 @@ public class ViewNotesServlet extends SecureController {
         }
 
         FormProcessor fp = new FormProcessor(request);
-        if ("yes".equalsIgnoreCase(fp.getString(PRINT))) {
-            forwardPage(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_PRINT);
-            return;
-        }
         if(fp.getString("showMoreLink").equals("")){
             showMoreLink = true;
         }else {
@@ -220,16 +216,13 @@ public class ViewNotesServlet extends SecureController {
         String viewNotesPageFileName = this.getPageServletFileName();
         session.setAttribute("viewNotesPageFileName", viewNotesPageFileName);
 
-        List<DiscrepancyNoteBean> allNotes = factory.getAllNotes();
-
-        session.setAttribute("allNotes", allNotes);
-
         request.setAttribute("mapKeys", ResolutionStatus.getMembers());
         request.setAttribute("typeNames", DiscrepancyNoteUtil.getTypeNames());
         request.setAttribute("typeKeys", totalMap);
         request.setAttribute("grandTotal", grandTotal);
 
         if ("yes".equalsIgnoreCase(fp.getString(PRINT))) {
+        	List<DiscrepancyNoteBean> allNotes = factory.findAllNotes(tf);
             request.setAttribute("allNotes", allNotes);
             forwardPage(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_PRINT);
         } else {
