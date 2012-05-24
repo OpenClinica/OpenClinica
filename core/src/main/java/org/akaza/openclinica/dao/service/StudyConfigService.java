@@ -45,11 +45,11 @@ public class StudyConfigService {
     }
 
     /**
-     * – true if the study has a value defined for this parameter o if studyId
+     *  true if the study has a value defined for this parameter o if studyId
      * is a parent study, then this is true iff there is a row for this
      * study/parameter pair in the study_parameter_value table o if studyId is a
      * site, then this is true if: ? * the parameter is inheritable and the
-     * study’s parent has a defined parameter value; OR ? * the parameter is not
+     * studys parent has a defined parameter value; OR ? * the parameter is not
      * inheritable and there is a row for this studyId/parameter pair in the
      * study_parameter_value table
      * 

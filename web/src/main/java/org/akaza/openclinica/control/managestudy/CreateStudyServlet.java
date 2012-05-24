@@ -1013,7 +1013,7 @@ public class CreateStudyServlet extends SecureController {
 
     }
 
-    // it�s not necessary its use.
+    // its not necessary its use.
     private void updateMaps() {
         if (current_maps_locale != resadmin.getLocale()) {
             current_maps_locale = resadmin.getLocale();

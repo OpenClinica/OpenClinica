@@ -27,7 +27,7 @@ public abstract class Table {
     protected int totalPageNumbers; // how many page numbers are there total?
     // always equal to ceil(rows.size() /
     // NUM_ROWS_PER_PAGE)
-    protected int sortingColumnInd; // index into arrColumns of the Column we’re
+    protected int sortingColumnInd; // index into arrColumns of the Column were
     // current sorting by
     protected boolean ascendingSort; // true for ascending sort, false
     // otherwise

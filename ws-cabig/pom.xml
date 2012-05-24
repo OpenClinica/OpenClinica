@@ -55,11 +55,6 @@
     		<artifactId>serializer</artifactId>
     		<version>2.7.1</version>
 		</dependency>
-		<!--  <dependency>
-    		<groupId>org.apache.ws.commons.axiom</groupId>
-    		<artifactId>axiom</artifactId>
-    		<version>1.2.10</version>
-		</dependency> -->
 		<dependency>
            <groupId>org.apache.ws.commons.axiom</groupId>
            <artifactId>axiom-api</artifactId>
@@ -147,34 +142,6 @@
 			<artifactId>sitemesh</artifactId>
 			<version>2.3</version>
 		</dependency>
-		<!-- for servlet tests  -->
-		<dependency>
-			<groupId>javax.j2ee</groupId>
-			<artifactId>j2ee</artifactId>
-			<version>1.4</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.persistence</groupId>
-			<artifactId>persistence-api</artifactId>
-			<version>1.0</version>
-			<scope>compile</scope>
-		</dependency>
-		<!-- 
-		<dependency>
-			<groupId>org.mockejb</groupId>
-			<artifactId>mockejb</artifactId>
-			<version>0.6-beta2</version>
-			<scope>test</scope>
-		</dependency>
-		 -->
-		<dependency>
-			<groupId>org.jmesa</groupId>
-			<artifactId>jmesa</artifactId>
-			<version>2.5.2</version>
-			<scope>compile</scope>
-		</dependency>
-		<!-- end servlet tests -->
 		<dependency>
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
@@ -223,12 +190,6 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>cos</groupId>
-			<artifactId>cos</artifactId>
-			<version>05Nov2002</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
 			<groupId>commons-fileupload</groupId>
 			<artifactId>commons-fileupload</artifactId>
 			<version>1.2.1</version>
@@ -245,12 +206,6 @@
 			<artifactId>httpunit</artifactId>
 			<version>1.6.1</version>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.activation</groupId>
-			<artifactId>activation</artifactId>
-			<version>1.0.2</version>
-			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.jdom</groupId>
@@ -297,7 +252,7 @@
 		<dependency>
 			<groupId>net.sourceforge.jexcelapi</groupId>
 			<artifactId>jxl</artifactId>
-			<version>2.6.6</version>
+			<version>2.6.10</version>
 			<scope>compile</scope>
 		</dependency>
 		<!-- Struts web framework -->
@@ -328,72 +283,20 @@
 			<version>1.2</version>
 		</dependency>		
 	</dependencies>
-	<!-- @pgawade 16-NOV-2010 unit tests through maven -->
-	<reporting>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.7</version>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-report-plugin</artifactId>
-                <version>2.8</version>
-			</plugin>
-		</plugins>
-	</reporting>
     <build>
         <plugins>
-            <plugin>
-                <inherited>true</inherited>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.3.1</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
 			<plugin>
 				<groupId>org.jvnet.jaxb2.maven2</groupId>
 				<artifactId>maven-jaxb2-plugin</artifactId>
-                <version>0.7.5</version>
-				<executions>
-					<execution>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<schemaDirectory>src/main/webapp/WEB-INF/schemas</schemaDirectory>
-				</configuration>
 			</plugin>
-			<!-- @pgawade 16-NOV-2010 surefire maven plugin to run the unit tests -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-                <version>2.6</version>
-				<configuration>					
-				</configuration>
-			</plugin>
+            <plugin>
+                <groupId>org.zeroturnaround</groupId>
+                <artifactId>jrebel-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+            </plugin>
         </plugins>
     </build>
-    <scm>
-		<connection>${scm.path}/ws-cabig</connection>
-		<developerConnection>${scm.path}/ws-cabig</developerConnection>
-	</scm>
 </project>

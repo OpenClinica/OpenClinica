@@ -17,19 +17,19 @@ import java.util.List;
 /**
  * @author jxu
  *
- * Text – free form text entry limited to one line
+ * Text  free form text entry limited to one line
  *
- * Text Area – free form text area display
+ * Text Area  free form text area display
  *
  * Single-Select - pick one from a list
  *
- * Multi-Select – pick many from a list
+ * Multi-Select  pick many from a list
  *
- * Checkbox – selecting multiple options
+ * Checkbox  selecting multiple options
  *
- * Radio button – selecting one from many options
+ * Radio button  selecting one from many options
  *
- * File – for upload of files
+ * File  for upload of files
  * @deprecated
  */
 

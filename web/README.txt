@@ -101,7 +101,7 @@ phone: 617.621.8585
 fax: 617.621.0065
 email: contact@openclinica.com
 
-For more about OpenClinica’s products and services see:
+For more about OpenClinica's products and services see:
 http://www.OpenClinica.com/ [^] [^]
 
 

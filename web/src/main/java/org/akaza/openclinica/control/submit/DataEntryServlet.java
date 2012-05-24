@@ -3,7 +3,7 @@
  * GNU Lesser General Public License (GNU LGPL).
 
  * For details see: http://www.openclinica.org/license
- * copyright 2003-2005 Akaza Research
+ * copyright 2003-2011 Akaza Research
  */
 package org.akaza.openclinica.control.submit;
 
@@ -115,6 +115,7 @@ import org.akaza.openclinica.service.crfdata.front.InstantOnChangeFrontStrGroup;
 import org.akaza.openclinica.service.crfdata.front.InstantOnChangeFrontStrParcel;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.Page;
+import org.akaza.openclinica.view.form.DataEntryInputGenerator;
 import org.akaza.openclinica.view.form.FormBeanUtil;
 import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -4358,6 +4359,10 @@ public abstract class DataEntryServlet extends CoreSecureController {
         // method returns null values as a List<String>
         // >>BWP
         ArrayList items = dsb.getItems();
+        // For adding null values to display items
+        FormBeanUtil formBeanUtil = new FormBeanUtil();
+        List<String> nullValuesList =  formBeanUtil.getNullValuesByEventCRFDefId(eventCRFDefId, getDataSource());
+        
         LOGGER.trace("single items size: " + items.size());
         for (int i = 0; i < items.size(); i++) {
             DisplayItemBean item = (DisplayItemBean) items.get(i);
@@ -4405,7 +4410,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 boolean hasData = false;
                 int checkAllColumns = 0;
                 if(data.size()>0) hasData=true;
-                newOne =   buildMatrixForRepeatingGroups(newOne,itemGroup,ecb, sb,itBeans,dataMap);
+                newOne =   buildMatrixForRepeatingGroups(newOne,itemGroup,ecb, sb,itBeans,dataMap, nullValuesList);
 
              if (hasData) {
                  //TODO: fix the group_has_data flag on bean not on session
@@ -4415,7 +4420,13 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 else {
                     session.setAttribute(GROUP_HAS_DATA, Boolean.FALSE);
                     // no data, still add a blank row for displaying
+                    if ( nullValuesList != null && nullValuesList.size() >0){
+                    	LOGGER.trace("set with nullValuesList of : " + nullValuesList);
+                    }
+                    dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb, sb.getId(), nullValuesList, getServletContext());
+                    
                     DisplayItemGroupBean digb2 = new DisplayItemGroupBean();
+                    
                     digb2.setItems(dibs);
                     digb2.setEditFlag("initial");
 
@@ -4440,7 +4451,10 @@ public abstract class DataEntryServlet extends CoreSecureController {
       }
       return returnMap;
   }
-    protected DisplayItemWithGroupBean buildMatrixForRepeatingGroups(DisplayItemWithGroupBean diwgb, DisplayItemGroupBean itemGroup, EventCRFBean ecb, SectionBean sb,List<ItemBean>itBeans, Map<String,ItemDataBean> dataMap)
+    protected DisplayItemWithGroupBean buildMatrixForRepeatingGroups(DisplayItemWithGroupBean diwgb, 
+    		DisplayItemGroupBean itemGroup, EventCRFBean ecb, 
+    		SectionBean sb,List<ItemBean>itBeans, Map<String,ItemDataBean> dataMap,
+    		List<String> nullValuesList)
     {
         int tempOrdinal = 1;
         ItemDataDAO iddao = new ItemDataDAO(getDataSource(),locale);
@@ -4471,8 +4485,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     itemData = displayItemBean.getData();
                     itemData.setValue("");
                     itemData.setOrdinal(i);
-
                 }
+                addNullValues(displayItemBean,nullValuesList);
                 displayItemBean.setData(itemData);
                 displayItemBean.loadDBValue();
 
@@ -4492,7 +4506,43 @@ public abstract class DataEntryServlet extends CoreSecureController {
     }
 
 
+    /*
+	 *  * @param nullValuesList
+	     *            A List of Strings containing "null values" such as "not
+	     *            applicable" or NA.
+	 */
+	private void addNullValues( DisplayItemBean displayItemBean,  List<String> nullValuesList) {
+	        // logger = LoggerFactory.getLogger(getClass().getName());
+	       
+	        boolean hasNullValues = nullValuesList != null && !nullValuesList.isEmpty();
+	        if ( !hasNullValues) {return;}
+	        String tmpVal = "";
+	        String responseName = displayItemBean.getMetadata().getResponseSet().getResponseType().getName();;
+	        List<ResponseOptionBean> respOptions = displayItemBean.getMetadata().getResponseSet().getOptions();
+	        ResponseOptionBean respBean;
+	        if ( respOptions != null
+	                    && ("checkbox".equalsIgnoreCase(responseName) || 
+	                    		"radio".equalsIgnoreCase(responseName) || 
+	                    		"single-select".equalsIgnoreCase(responseName) ||
+	                    		"multi-select".equalsIgnoreCase(responseName))) {
 
+	                    for (String val : nullValuesList) {
+	                        respBean = new ResponseOptionBean();
+	                        // BWP>> set text to the extended version, "not
+	                        // applicable"?
+	                        tmpVal = DataEntryInputGenerator.NULL_VALUES_LONGVERSION.get(val);
+	                        if (tmpVal != null && tmpVal.length() > 0) {
+	                            respBean.setText(tmpVal);
+	                        } else {
+	                            respBean.setText(val);
+	                        }
+
+	                        respBean.setValue(val);
+	                        displayItemBean.getMetadata().getResponseSet().addOption(respBean);
+	                        //respOptions.add(respBean);
+	                    }
+	                }
+	}
     protected void loadItemsWithGroupRows(DisplayItemWithGroupBean itemWithGroup, SectionBean sb, EventDefinitionCRFBean edcb, EventCRFBean ecb, HttpServletRequest request) {
         //this method is a copy of the method: createItemWithGroups ,
         //only modified for load one DisplayItemWithGroupBean.

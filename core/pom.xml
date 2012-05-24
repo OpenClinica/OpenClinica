@@ -54,20 +54,6 @@
 			<version>2.1.2</version>
 			<scope>compile</scope>
 		</dependency>
-		<!-- for servlet tests  -->
-		<dependency>
-			<groupId>javax.j2ee</groupId>
-			<artifactId>j2ee</artifactId>
-			<version>1.4</version>
-			<scope>test</scope>
-		</dependency>
-		<!--@pgawade 12-NOV-2010 Commented out the JPA API depenedency as it was conflicting with that from the hibernate
-		<dependency>
-			<groupId>javax.persistence</groupId>
-			<artifactId>persistence-api</artifactId>
-			<version>1.0</version>
-			<scope>compile</scope>
-		</dependency>-->
 		<!-- end servlet tests -->
 		<dependency>
 			<groupId>commons-beanutils</groupId>
@@ -140,12 +126,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>javax.activation</groupId>
-			<artifactId>activation</artifactId>
-			<version>1.0.2</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.jdom</groupId>
 			<artifactId>jdom</artifactId>
 			<version>1.1</version>
@@ -190,7 +170,7 @@
 		<dependency>
 			<groupId>net.sourceforge.jexcelapi</groupId>
 			<artifactId>jxl</artifactId>
-			<version>2.6.6</version>
+			<version>2.6.10</version>
 			<scope>compile</scope>
 		</dependency>
 		<!-- Struts web framework -->
@@ -214,14 +194,13 @@
 			<version>8.1-404.jdbc3</version>
 			<scope>runtime</scope>
 		</dependency>
-		<!-- Oracle JDBC driver -->
-		<dependency>
-			<groupId>oracle</groupId>
-			<artifactId>ojdbc14</artifactId>
-			<version>10g</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
+        <!-- Oracle JDBC driver -->
+        <dependency>
+            <groupId>oracle.ojdbc14</groupId>
+            <artifactId>ojdbc14</artifactId>
+            <version>10g</version>
+        </dependency>
+        <dependency>
 			<groupId>org.codehaus.castor</groupId>
 			<artifactId>castor-xml</artifactId>
 			<version>1.3.1</version>
@@ -230,8 +209,6 @@
 		<dependency>
 			<groupId>org.jmesa</groupId>
 			<artifactId>jmesa</artifactId>
-			<version>2.4.2</version>
-			<scope>compile</scope>
 		</dependency>
         <dependency>
             <groupId>org.apache.xmlgraphics</groupId>
@@ -239,96 +216,27 @@
             <version>1.4</version>
         </dependency>
 		<dependency>
-		<groupId>org.akaza.openclinica.odm</groupId>
+    		<groupId>org.akaza.openclinica.odm</groupId>
 			<artifactId>openclinica-odm</artifactId>
-			<version>0.1.0.BUILD-SNAPSHOT</version>
-			<type>jar</type>
-			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 	<!-- @pgawade 16-NOV-2010 unit tests through maven -->
-	<reporting>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.5</version>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-report-plugin</artifactId>
-                <version>2.8</version>
-			</plugin>
-		</plugins>
-	</reporting>
 
- <!-- JN:Adding these back here, since not sure if whats in parent would reflect here when running tests from core package, perhaps it can be removed from parent?-->
-	<properties>
-		<catalina.home>C:\\Java\\tomcat</catalina.home>
-		<test.dbName>postgres</test.dbName>
-		<test.dbDriverClassName>org.postgresql.Driver</test.dbDriverClassName>
-		<test.dbUrl>jdbc:postgresql://svn.akazaresearch.com:5432/</test.dbUrl>
-		<test.dbUsername>clinica</test.dbUsername>
-		<test.dbPassword>clinica</test.dbPassword>
-		<test.db>OpenClinica-core-3.1-SNAPSHOT-TEST</test.db>
-		<test.hibernateDialect>org.hibernate.dialect.PostgreSQLDialect</test.hibernateDialect>
-		<test.locale>en_US</test.locale>
-
-		<!--  Library Versions -->
-		<!--<spring.version>2.5.6.SEC01</spring.version>-->
-
- 	</properties>
     <build>
-		<!-- @pgawade 16-NOV-2010 filter test resources -->
         <plugins>
-            <plugin>
-                <inherited>true</inherited>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
-                      <!--
-                       <nonFilteredFileExtensions> -->
-            <!-- default value contains jpg,jpeg,gif,bmp,png -->
-         <!--    <nonFilteredFileExtension>xls</nonFilteredFileExtension>
-            <nonFilteredFileExtension>XLS</nonFilteredFileExtension>
-          </nonFilteredFileExtensions> -->
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.3.1</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-			<!-- @pgawade 16-NOV-2010 surefire maven plugin to run the unit tests -->
-            <plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-                <version>2.6</version>
-				<configuration>					
-				</configuration>
-			</plugin>
             <plugin>
                 <groupId>org.liquibase</groupId>
                 <artifactId>liquibase-plugin</artifactId>
-                <version>1.9.1.0</version>
-                <configuration>
-                    <!--<propertyFile>src/main/resources/datainfo.properties</propertyFile>-->
-                    <propertyFile>${config.file}</propertyFile>
-                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.zeroturnaround</groupId>
+                <artifactId>jrebel-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
-    <scm>
-		<connection>${scm.path}/core</connection>
-		<developerConnection>${scm.path}/core</developerConnection>
-	</scm>
+
 </project>

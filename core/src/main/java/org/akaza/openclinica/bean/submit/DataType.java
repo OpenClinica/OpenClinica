@@ -17,20 +17,20 @@ import java.util.List;
 /**
  * BL - Boolean
  *
- * BN – BooleanNonNull
+ * BN  BooleanNonNull
  *
- * ED – Encapsulated Data (Files w/ specified MIME type e.g. ED-pdf, ED-jpg
+ * ED  Encapsulated Data (Files w/ specified MIME type e.g. ED-pdf, ED-jpg
  * defined in a separate ED Types table in the future)
  *
  * TEL - A telecommunication address (TEL), such as a URL for HTTP or FTP, which
  * will resolve to precisely the same binary data that could as well have been
  * provided as inline data.
  *
- * ST – Character String
+ * ST  Character String
  *
- * INT – Integer
+ * INT  Integer
  *
- * REAL – Floating
+ * REAL  Floating
  *
  * SET - a value that contains other distinct values in no particular order.
  *
