@@ -1,5 +1,8 @@
 package org.akaza.openclinica.core.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ItemGroupCrvVersionUtil {
 
 	private String itemName;
@@ -14,10 +17,12 @@ public class ItemGroupCrvVersionUtil {
 	private String itemDataType;
 	private String versions;
 	private String errorMesages;
+	private List arrErrorMesages;
+	
 	private int    id;
 	
 	
-	public ItemGroupCrvVersionUtil(){}
+	public ItemGroupCrvVersionUtil(){arrErrorMesages = new ArrayList<String>();}
 	public ItemGroupCrvVersionUtil(String itemName,String groupName,String groupOID , 
 			String crfVersionName,  int crfVersionStatus){
 		this.itemName= itemName;
@@ -25,6 +30,7 @@ public class ItemGroupCrvVersionUtil {
 		this.groupOID= groupOID;
 		this.crfVersionName=  crfVersionName;
 		this.crfVersionStatus= crfVersionStatus;
+		arrErrorMesages = new ArrayList<String>();
 	}
 	public ItemGroupCrvVersionUtil(String itemName,String groupName,String groupOID , 
 			String crfVersionName,  int crfVersionStatus,  
@@ -168,5 +174,11 @@ public class ItemGroupCrvVersionUtil {
 	 */
 	public void setId(int i_id) {
 		this.id = i_id;
+	}
+	public List getArrErrorMesages() {
+		return arrErrorMesages;
+	}
+	public void setArrErrorMesages(List arrErrorMesages) {
+		this.arrErrorMesages = arrErrorMesages;
 	}
 }

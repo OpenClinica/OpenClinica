@@ -99,6 +99,9 @@
     color:#ff0000;
 }
 
+.aka_orange_highlight{
+    color:#FFA500;
+}
 .aka_err_message{
     border: 1px solid #c5c5c5;
     background: #ECECEC;
@@ -1974,3 +1977,19 @@ background-color: transparent;
 		-moz-box-shadow: 2px 2px 11px #C0C0C0;
 		-webkit-box-shadow: 2px 2px 11px #C0C0C0;
 	}
+
+	
+	/*13923*/
+.list_a {
+    color: #4D4D4D;
+    font-family: Tahoma,Arial,Helvetica,Sans-Serif;
+    font-size: 11px;
+    list-style-image: url("");
+    padding: 0px;;
+	margin: 0px;;
+}
+
+.list_a_ul {
+padding-left: 12px;;
+margin: 2px;;
+}

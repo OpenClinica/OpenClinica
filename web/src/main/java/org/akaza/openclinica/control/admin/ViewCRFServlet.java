@@ -141,15 +141,13 @@ public class ViewCRFServlet extends SecureController {
 	   	 for   ( ItemGroupCrvVersionUtil check_group : item_group_crf_records){
 	   		 if (results.size() == 0 || !check_group.getItemName().equals(cur_item.getItemName()) ){
 	   			 //delete ',' from versions property
-	   			if ( cur_item != null && cur_item.getErrorMesages() != null){
-	   				cur_item.setErrorMesages(cur_item.getErrorMesages().substring(0,cur_item.getErrorMesages().length()-2 ) +")");} 
 	   			cur_item = new ItemGroupCrvVersionUtil(check_group.getItemName(),check_group.getGroupName(),
 	   					check_group.getGroupOID()  , check_group.getCrfVersionName() , check_group.getCrfVersionStatus(),
 	   					check_group.getItemOID(), check_group.getItemDescription(),
 	   					check_group.getItemDataType(),check_group.getId());
 	   			cur_item.setVersions( check_group.getCrfVersionName());
 	   			temp_buffer=respage.getString("verifyUniqueItemPlacementInGroups_4") + check_group.getGroupName() +
-	   					respage.getString("verifyUniqueItemPlacementInGroups_5")+check_group.getCrfVersionName()+"'; ";
+	   					respage.getString("verifyUniqueItemPlacementInGroups_5")+check_group.getCrfVersionName()+"'";
 	   			results.add(cur_item);
 	   		 }else {
 	   			 if (  check_group.getItemName().equals(cur_item.getItemName()) &&
@@ -159,11 +157,12 @@ public class ViewCRFServlet extends SecureController {
 		   			error_message = new StringBuffer();
 		   			error_message.append(respage.getString("verifyUniqueItemPlacementInGroups_4") + check_group.getGroupName() );
 		   			error_message.append(	respage.getString("verifyUniqueItemPlacementInGroups_5"));
-		   			error_message.append(	check_group.getCrfVersionName()+"'; ");
-		   			if ( cur_item.getErrorMesages() == null){cur_item.setErrorMesages("(");}
-		   			if ( temp_buffer != null){cur_item.setErrorMesages(cur_item.getErrorMesages() + temp_buffer);}
+		   			error_message.append(	check_group.getCrfVersionName());
+		   		
+		   		//	if ( temp_buffer != null){cur_item.setErrorMesages(cur_item.getErrorMesages() + temp_buffer);}
+		   			if ( temp_buffer != null){cur_item.getArrErrorMesages().add( temp_buffer);}
 		   			temp_buffer=null;
-		   			cur_item.setErrorMesages( cur_item.getErrorMesages() + error_message);
+		   			cur_item.getArrErrorMesages().add(  error_message);
 		   			if (check_group.getCrfVersionStatus() == 1 && cur_item.getCrfVersionStatus()!= 1){
 		   				cur_item.setCrfVersionStatus(1);
 		   			}

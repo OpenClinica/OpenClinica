@@ -284,12 +284,23 @@ function switchStr(itemId, id,attribute,str1,str2) {
  <c:if test="${empty displayItem.data.value}">
         <c:set var="isBlank" value="1" />
  </c:if>
+ 
+ <c:if test="${! empty formMessages}">
+ 	<c:set var="pageHasErrors" value="${true}" />
+ </c:if>
+ 
 <%-- text input value--%>
+<%-- 24-May-2012 fix for issue #13822 do not display default values when page is displayed back with validation errors --%>
 <c:choose>
-  <c:when test="${(originJSP eq 'doubleDataEntry' ||
+ <%--  <c:when test="${(originJSP eq 'doubleDataEntry' ||
   (! (originJSP eq 'administrativeEditing'))) && (ddeEntered || (! hasDataFlag))
   && (ddeEntered || (! sessionScope['groupHasData'])) &&
   empty displayItem.metadata.responseSet.value}">
+  --%>
+  <c:when test="${(originJSP eq 'doubleDataEntry' ||
+  (! (originJSP eq 'administrativeEditing'))) && (ddeEntered || (! hasDataFlag))
+  && (ddeEntered || (! sessionScope['groupHasData'])) &&
+  empty displayItem.metadata.responseSet.value && !pageHasErrors}">
     <c:set var="inputTxtValue" value="${defValue}"/>
   </c:when>
  <%-- <c:when test="${isNewItem eq true }">
@@ -538,12 +549,24 @@ function switchStr(itemId, id,attribute,str1,str2) {
     </c:when>
     <c:otherwise><c:set var="printDefault" value="false"/></c:otherwise>
   </c:choose>
+ <%-- 24-May-2012 fix for issue #13772 --%> 
+   <%-- determine whether a default value is not included in response options; if it's not, then
+include the default value first in the select list --%>
+    <c:if test="${printDefault}">
+        <c:set var="printDefaultFirst" value="true"/>
+        <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
+            <c:if test="${option.text eq displayItem.metadata.defaultValue}">
+                <c:set var="printDefaultFirst" value="false"/>
+            </c:if>
+        </c:forEach>
+    </c:if>
+    
   <c:choose>
     <c:when test="${isInError}">
       <span class="aka_exclaim_error">! </span>
       <select class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
       onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" name="<c:out value="${inputName}"/>" class="formfield">
-          <c:choose>
+          <%-- <c:choose>
           <c:when test="${printDefault == 'true'}">
             <c:set var="count" value="0"/>
             <option value="<c:out value="" />" <c:out value=""/> ><c:out value="${displayItem.metadata.defaultValue}" /></option>
@@ -576,7 +599,19 @@ function switchStr(itemId, id,attribute,str1,str2) {
           	<c:set var="count" value="${count+1}"/>
         	</c:forEach>
           </c:otherwise>
-        </c:choose>
+        </c:choose>--%>
+        <c:if test="${printDefaultFirst}">
+             <option value="<c:out value="" />" selected="selected"
+                            <c:out value=""/> ><c:out value="${displayItem.metadata.defaultValue}" />
+             </option>
+          </c:if>
+    <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
+                <option value="<c:out value="${option.value}" />"
+                        <c:if test="${option.selected}"> selected="selected"</c:if>>
+                    <c:out value="${option.text}" />
+                </option>
+        <c:set var="count" value="${count+1}"/>
+    </c:forEach>
       </select>
     </c:when>
 
