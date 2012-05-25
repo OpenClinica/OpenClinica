@@ -1143,4 +1143,29 @@ public class StudyEventDAO extends AuditableEntityDAO {
         return returnMe;
     }
 
+    
+    public String getStudyEventIdsForWSReq(int studyId,int ssubjectId){
+    	StringBuilder sb = new StringBuilder();
+         this.setTypesExpected();
+
+         HashMap variables = new HashMap();
+         variables.put(Integer.valueOf(1), Integer.valueOf(studyId));
+         variables.put(Integer.valueOf(2), Integer.valueOf(ssubjectId));
+
+         ArrayList<HashMap> alist = this.select(digester.getQuery("getStudyEventIdsForWSReq"), variables);
+         
+         
+         for(HashMap item: alist){
+             if(sb.length() > 0){
+                 sb.append(',');
+             }
+             String temp = item.entrySet().toArray()[0].toString();
+             if(temp!=null &&!temp.isEmpty())
+             sb.append(temp.split("=")[1]);
+         }
+         String result = sb.toString();
+         
+         return result;
+         
+    }
 }
