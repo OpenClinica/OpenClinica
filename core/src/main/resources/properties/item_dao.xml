@@ -219,4 +219,16 @@
 
     	</sql>
    </query>
+    <query>
+        <name>getItemsForSpecificEvents</name>
+        <sql>
+            
+select item_id from versioning_map where crf_version_id in (select distinct crf_version_id from event_crf ec where ec.study_event_id in 
+    		(
+
+select study_event_id from study_event where study_event_id in (select sed.study_event_definition_id from event_crf ec,study_event_definition sed where sed.study_id = ? and 
+ec.study_subject_id = ? and ec.study_event_id = sed.study_event_definition_id)))
+
+    	</sql>
+   </query>
 </queries>

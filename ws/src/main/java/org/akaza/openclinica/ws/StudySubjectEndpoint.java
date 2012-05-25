@@ -7,7 +7,10 @@
  */
 package org.akaza.openclinica.ws;
 
+import org.akaza.openclinica.bean.core.DatasetItemStatus;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.extract.DatasetBean;
+import org.akaza.openclinica.bean.extract.odm.FullReportBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -15,18 +18,27 @@ import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
+import org.akaza.openclinica.bean.odmbeans.ODMBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.logic.odmExport.AdminDataCollector;
+import org.akaza.openclinica.logic.odmExport.ClinicalDataCollector;
+import org.akaza.openclinica.logic.odmExport.ClinicalDataUnit;
+import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
 import org.akaza.openclinica.service.subject.SubjectServiceInterface;
 import org.akaza.openclinica.ws.bean.SubjectStudyDefinitionBean;
 import org.akaza.openclinica.ws.validator.SubjectTransferValidator;
+import org.hibernate.mapping.Collection;
 import org.openclinica.ws.beans.EventType;
 import org.openclinica.ws.beans.EventsType;
 import org.openclinica.ws.beans.GenderType;
@@ -89,18 +101,29 @@ public class StudySubjectEndpoint {
     UserAccountDAO userAccountDao;
     SubjectDAO subjectDao;
     private final Locale locale;
-
+    private final CoreResources coreResources;
+    private final RuleSetRuleDao ruleSetRuleDao;
+    private final static String sqlStatement ="select distinct * from extract_data_table where study_event_definition_id in";
+    		//"(select study_event_definition_id from study_event_definition) " +
+    		//"and item_id in " +
+    		//"(select item_id from versioning_map where crf_version_id in (select distinct crf_version_id from event_crf ec where ec.study_event_id in " +
+    		//"(select study_event_id from study_event))) " +
+    		//" and (date(date_created) >= date('1900-01-01')) and (date(date_created) <= date('2100-12-31')) order by date_start asc";
+  
     /**
      * Constructor
      * 
      * @param subjectService
      * @param dataSource
      */
-    public StudySubjectEndpoint(SubjectServiceInterface subjectService, DataSource dataSource, MessageSource messages) {
+    public StudySubjectEndpoint(SubjectServiceInterface subjectService, DataSource dataSource, MessageSource messages,CoreResources coreResources, RuleSetRuleDao ruleSetRuleDao) {
         this.subjectService = subjectService;
         this.dataSource = dataSource;
         this.messages = messages;
         this.locale = new Locale("en_US");
+        this.coreResources = coreResources;
+        this.ruleSetRuleDao = ruleSetRuleDao;
+       
     }
 
     /**
@@ -205,7 +228,144 @@ public class StudySubjectEndpoint {
         }
     }
     
-    /**
+    
+    
+    @PayloadRoot(localPart = "getStudySubjectEventRequest", namespace = NAMESPACE_URI_V1)
+    public Source getStudySubjectEvent(@XPathParam("//studySubject:studySubject") NodeList subject) throws Exception
+    {
+    	 ResourceBundleProvider.updateLocale(new Locale("en_US"));
+         
+
+    	 Element subjectElement = (Element) subject.item(0);
+    	 
+    	 SubjectStudyDefinitionBean subjectStudyBean = unMarshallToSubjectStudy(subjectElement);//,studyElement);
+    	 DataBinder dataBinder = new DataBinder((subjectStudyBean));
+    	 Errors errors = dataBinder.getBindingResult();
+         SubjectTransferBean subjectTransferBean = unMarshallToSubjectTransfer(subjectElement);
+         SubjectTransferValidator subjectTransferValidator = new SubjectTransferValidator(dataSource);
+         subjectTransferValidator.validateIsSubjectExists((subjectStudyBean), errors);
+         
+         if (subjectStudyBean.getSubjectOIDId() == null ){//case for core misfunction
+             errors.reject("studySubjectEndpoint.fail");
+             
+        }
+         if (!errors.hasErrors()) {
+        	 
+             StudySubjectDAO studySubjectDao = new StudySubjectDAO(dataSource);
+        	 StudyDAO studyDao = new StudyDAO(dataSource);
+        	String name = subjectStudyBean.getSiteUniqueId()==null?subjectStudyBean.getStudyUniqueId(): subjectStudyBean.getSiteUniqueId();
+        	StudyBean currentStudy =  (StudyBean)studyDao.findByUniqueIdentifier(name);
+             StudySubjectBean ssbean = studySubjectDao.findByLabelAndStudy(subjectStudyBean.getSubjectLabel(),currentStudy);
+        	 return new DOMSource(mapSuccessConfirmation( subjectStudyBean.getStudy(),messages.getMessage("studyEndpoint.success", null, "Success", locale)
+        			 ,ssbean.getId()));
+        	
+
+         } else {
+             return new DOMSource(mapConfirmation(messages.getMessage("studySubjectEndpoint.fail", null, "Fail", locale), null, errors));
+             
+         }
+    }
+    
+    
+    private Element mapSuccessConfirmation(StudyBean study, String confirmation,int studySubjectId) throws Exception {
+        DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
+        Document document = docBuilder.newDocument();
+
+        Element responseElement = document.createElementNS(NAMESPACE_URI_V1, "createResponse");
+        Element resultElement = document.createElementNS(NAMESPACE_URI_V1, "result");
+        resultElement.setTextContent(confirmation);
+        responseElement.appendChild(resultElement);
+        Element odmElement = document.createElementNS(NAMESPACE_URI_V1, "odm");
+        String reportText = getReport(study,studySubjectId);
+        odmElement.setTextContent(reportText);//meta.getXmlOutput().toString());
+        responseElement.appendChild(odmElement);
+
+        return responseElement;
+
+    }
+    private String getReport(StudyBean currentStudy,int studySubjectId){
+        DatasetBean dataset = setDataSetValues(currentStudy, studySubjectId);
+        MetaDataCollector mdc = new MetaDataCollector(dataSource, currentStudy,ruleSetRuleDao);
+        AdminDataCollector adc = new AdminDataCollector(dataSource, currentStudy);
+        ClinicalDataCollector cdc =  new ClinicalDataCollector(dataSource,dataset,currentStudy);
+        FullReportBean report = new FullReportBean();
+        MetaDataCollector.setTextLength(200);  
+        ODMBean odmb = mdc.getODMBean();
+        
+        
+        
+        
+        odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC2-0.xsd");
+        ArrayList<String> xmlnsList = new ArrayList<String>();
+        xmlnsList.add("xmlns=\"http://www.cdisc.org/ns/odm/v1.3\"");
+        //xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/openclinica_odm/v1.3\"");
+        xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/odm_ext_v130/v3.1\"");
+        xmlnsList.add("xmlns:OpenClinicaRules=\"http://www.openclinica.org/ns/rules/v3.1\"");
+        odmb.setXmlnsList(xmlnsList);
+        odmb.setODMVersion("oc1.3");
+        mdc.setODMBean(odmb);
+        adc.setOdmbean(odmb);
+        cdc.setODMBean(odmb);
+       mdc.collectFileData();
+       adc.collectFileData();
+
+        cdc.setDataset(dataset); 
+        cdc.populateStudyBaseMap(currentStudy.getId());
+        cdc.collectOdmClinicalDataMapPerStudySubj(studySubjectId, currentStudy,dataset);
+        
+     //   report.setAdminDataMap(adc.getOdmAdminDataMap());
+        report.setOdmStudyMap(mdc.getOdmStudyMap());
+        report.setCoreResources(coreResources);
+        report.setOdmBean(mdc.getODMBean());
+        report.setClinicalDataMap(cdc.getOdmClinicalDataMap());
+        report.setODMVersion("oc1.3");
+        report.createOdmXml(true);
+        return  report.getXmlOutput().toString().trim();
+    }
+//Fake DataSet
+    private DatasetBean setDataSetValues(StudyBean currentStudy,int studySubjectId) {
+    	DatasetBean dataset = new DatasetBean(); 
+    	dataset.setName("jikan");         
+         DatasetItemStatus distatus = DatasetItemStatus.COMPLETED_AND_NONCOMPLETED;
+         dataset.setDatasetItemStatus(distatus);
+         dataset.setShowCRFinterviewerDate(true);
+         dataset.setShowCRFstatus(true);
+         dataset.setShowCRFversion(true);
+         dataset.setShowEventStart(true);
+         dataset.setShowSubjectStatus(true);
+         dataset.setShowSubjectUniqueIdentifier(true);
+         dataset.setSQLStatement(getSqlStatement(currentStudy.getId(),studySubjectId));
+         dataset.setCollectItemData(false);//JN:Added this to have more control on when to display item data values
+         dataset.setShowSubjectGender(true);
+         dataset.setShowSubjectGroupInformation(true);
+         dataset.setShowEventEnd(true);
+         dataset.setShowEventEndTime(true);
+         dataset.setShowEventStatus(true);
+         dataset.setShowCRFinterviewerName(true);
+         dataset.setCollectFormAuditData(false);//not collecting form audit
+         dataset.setCollectFormDNdata(false);
+		return dataset;
+	}
+
+//The ODM bean expects the sql statement in this format, this might be a good candidate for util method for the cases of leveraging the CRF 
+    private String getSqlStatement(int studyId,int studySubjectId) {
+    	String sqlStatement = StudySubjectEndpoint.sqlStatement;
+    	StudyEventDAO studyEventDao = new StudyEventDAO(this.dataSource);
+    	ItemDAO itemDao = new ItemDAO(this.dataSource);
+    	
+    	String results1 = studyEventDao.getStudyEventIdsForWSReq(studyId, studySubjectId);
+    
+    	sqlStatement+="("+results1+")";
+    	sqlStatement+="and item_id in ";
+    
+    	sqlStatement+="("+itemDao.getItemsForSpecificEvents(studyId, studySubjectId)+")";
+    	sqlStatement+=" and (date(date_created) >= date('1900-01-01')) and (date(date_created) <= date('2100-12-31')) order by date_start asc";
+    	
+    	return sqlStatement;
+	}
+
+	/**
      * Build the response for listStudySubjectsInStudy method
      * 
      * @param study
@@ -558,11 +718,14 @@ public class StudySubjectEndpoint {
     private Date getDate(String dateAsString) throws ParseException, Exception {
         SimpleDateFormat sdf = new SimpleDateFormat(getDateFormat());
         sdf.setLenient(false);
-        Date dd = sdf.parse(dateAsString);
+        Date dd = null;
+        if(!dateAsString.isEmpty())
+        {  dd = sdf.parse(dateAsString);
         Calendar c = Calendar.getInstance();
         c.setTime(dd);
         if (c.get(Calendar.YEAR) < 1900 || c.get(Calendar.YEAR) > 9999) {
         	throw new Exception("Unparsable date: "+dateAsString);
+        }
         }
         return dd;
     }
@@ -593,17 +756,17 @@ public class StudySubjectEndpoint {
     }
 
     public StudyDAO getStudyDao() {
-        studyDao = studyDao != null ? studyDao : new StudyDAO(dataSource);
+        studyDao = new StudyDAO(dataSource);
         return studyDao;
     }
 
     public UserAccountDAO getUserAccountDao() {
-        userAccountDao = userAccountDao != null ? userAccountDao : new UserAccountDAO(dataSource);
+        userAccountDao = new UserAccountDAO(dataSource);
         return userAccountDao;
     }
 
     public SubjectDAO getSubjectDao() {
-        subjectDao = subjectDao != null ? subjectDao : new SubjectDAO(dataSource);
+        subjectDao = new SubjectDAO(dataSource);
         return subjectDao;
     }
 
