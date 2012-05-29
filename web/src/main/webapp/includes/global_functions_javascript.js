@@ -416,6 +416,8 @@ function clearInputElementValues(trElement) {
     var options;
     var myDiv;
     var myId="";
+	var defValDelimiter = "-----";
+	var defValDelimiterValues = ",";
     if(tdElements){
         for(var i = 0; i < tdElements.length; i++) {
             if(tdElements[i]) {
@@ -423,7 +425,8 @@ function clearInputElementValues(trElement) {
 			    var rm=-1;
 			    var myDivEls="";
 			    var defVal = "";
-			    var defValDelimiter = "-----";
+				var defValuesArray="";
+			    
                 inputs = tdElements[i].getElementsByTagName('input');
                 selects= tdElements[i].getElementsByTagName('select');
 
@@ -444,10 +447,25 @@ function clearInputElementValues(trElement) {
                     for(var j = 0; j < inputs.length; j++){
                         if(inputs[j]){
                             if(inputs[j].getAttribute("type") &&
-                               (inputs[j].getAttribute("type").indexOf("checkbox") != -1 ||
-                                inputs[j].getAttribute("type").indexOf("radio") != 1)){
+                                inputs[j].getAttribute("type").indexOf("radio") != 1){
                                 inputs[j].removeAttribute("checked");
                                 inputs[j].checked=false;
+                            }
+                            if(inputs[j].getAttribute("type") &&
+                                    inputs[j].getAttribute("type").indexOf("checkbox") != -1 ){
+									inputs[j].removeAttribute("checked");
+                                    inputs[j].checked=false;
+									if(defVal && defVal.length > 0 && defVal.indexOf(defValDelimiter)>0)	{ 
+										var def_temp = defVal.split(defValDelimiter);
+										var lookedId = def_temp[0];
+										if(selects[h].getAttribute("id")==lookedId) {
+											defValuesArray=def_temp[1].split(defValDelimiterValues);
+										}
+										for (var i_count = 0; i_count < defValuesArray.length; i_count++){
+											
+										}
+										
+									}
                             }
                             if(inputs[j].getAttribute("type") &&
                                inputs[j].getAttribute("type").indexOf("text") != -1) {
@@ -521,11 +539,27 @@ function clearInputElementValues(trElement) {
                     for(var h = 0; h < selects.length; h++){
                         if(selects[h]){
                             options = selects[h].getElementsByTagName("option");
+							if(defVal && defVal.length > 0 && defVal.indexOf(defValDelimiter)>0)	{ 
+									var def_temp = defVal.split(defValDelimiter);
+	                        	    var lookedId = def_temp[0];
+	                        		if(selects[h].getAttribute("id")==lookedId) {
+										defValuesArray=def_temp[1].split(defValDelimiterValues);
+									}
+							}
                             if(options){
                                 if(! detectIEWindows(navigator.userAgent)){
                                     for(var k = 0; k < options.length; k++){
                                         if(options[k]) {
                                             options[k].selected=false;
+											if (def_temp[1] != null && def_temp[1] != "" ){
+												for ( var i_count = 0; i_count < defValuesArray.length; i_count++)
+												{
+													if ( defValuesArray[i_count] == options[k].text){
+														options[k].selected=true;
+														break;
+													}
+												}
+											}
                                         }
 
                                     }
@@ -533,18 +567,6 @@ function clearInputElementValues(trElement) {
                                 // for IE6/7
                                 if(detectIEWindows(navigator.userAgent)){
                                     selects[h].selectedIndex=0;
-                                    /* var opt;
-                                     for(var p = 0; p < options.length; p++){
-                                     opt=document.createElement("option");
-                                     opt.selected=false;
-                                     opt.setAttribute("value",options[p].getAttribute("value"));
-                                     opt.innerHTML=options[p].innerHTML;
-
-
-                                     //  $(options[p]).remove();
-                                     selects[h].removeChild(options[p]);
-                                     selects[h].appendChild(opt);
-                                     }*/
                                 }
                             }
                         }

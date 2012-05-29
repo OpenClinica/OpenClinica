@@ -440,6 +440,13 @@ function switchStr(itemId, id,attribute,str1,str2) {
   </c:choose>
 </c:if>
 <c:if test='${inputType == "checkbox"}'>
+<%-- prepare default values for check box --%>
+<c:set var="defValuesForCheckBox" value=""/>
+<c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
+     	<c:out value ="b"/><c:set var="defValuesForCheckBox" value="${defValuesForCheckBox},${option.value}" />
+</c:forEach>
+  <input type="hidden" id="defValue<c:out value="${inputName}"/>" name="defValue<c:out value="${inputName}"/>" value="<c:out value="${defValue}___${defValuesForCheckBox}"/>"/>
+
   <c:if test="${! isHorizontal}">
     <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
       <c:choose>
@@ -542,6 +549,8 @@ function switchStr(itemId, id,attribute,str1,str2) {
 <c:if test='${inputType == "single-select"}'>
 
   <label for="<c:out value="${inputName}"/>"></label>
+  <input type="hidden" id="defValue<c:out value="${inputName}"/>" name="defValue<c:out value="${inputName}"/>" value="<c:out value="${defValue}"/>"/>
+  
   <c:choose>
   	<c:when test="${displayItem.metadata.defaultValue != '' &&
                 displayItem.metadata.defaultValue != null}">
@@ -662,6 +671,8 @@ include the default value first in the select list --%>
 </c:if>
 <c:if test='${inputType == "multi-select"}'>
   <label for="<c:out value="${inputName}"/>"></label>
+    <input type="hidden" id="defValue<c:out value="${inputName}"/>" name="defValue<c:out value="${inputName}"/>" value="<c:out value="${defValue}"/>"/>
+  
   <c:choose>
     <c:when test="${isInError}">
       <span class="aka_exclaim_error">! </span><select  class="aka_input_error" id="<c:out value="${inputName}"/>" multiple  tabindex=
