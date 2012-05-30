@@ -451,10 +451,13 @@ function clearInputElementValues(trElement) {
                             }
                             if(inputs[j].getAttribute("type") &&
                                inputs[j].getAttribute("type").indexOf("text") != -1) {
-	                           if(defVal && defVal.length > 0)	{ var lookedId = defVal.split(defValDelimiter)[0];
+	                           if(defVal && defVal.length > 0 && defVal.indexOf(defValDelimiter)>0)	{ 
+	                        	    var lookedId = defVal.split(defValDelimiter)[0];
 	                        		if(inputs[j].getAttribute("id")==lookedId) {
 	                        			inputs[j].setAttribute("value",defVal.split(defValDelimiter)[1]); defVal="";}
-                            	} else	inputs[j].setAttribute("value","");
+                            	} else	{
+                            		inputs[j].setAttribute("value","");
+                            	}
                             }
                             //remove two buttons, Replace, Remove, for File datatype.if(inputs[j].getAttribute("type") &&
                            if(inputs[j].getAttribute("type") &&
@@ -466,7 +469,8 @@ function clearInputElementValues(trElement) {
                         	   }
                            }
                        	   else if(inputs[j].getAttribute("type") &&
-                               inputs[j].getAttribute("type").indexOf("hidden") != -1) {
+                               inputs[j].getAttribute("type").indexOf("hidden") != -1
+                               && inputs[j].hasAttribute("id") ) {
 								if(inputs[j].getAttribute("id") == "hidft"+myId) {
 		                           inputs[j].setAttribute("id", "ft"+myId);
 		                           try {
@@ -550,10 +554,13 @@ function clearInputElementValues(trElement) {
                 if(textareas) {
                     for(var m = 0; m < textareas.length; m++){
                         if(textareas[m]) {
-	                        if(defVal && defVal.length > 0)	{ var lookedId = defVal.split(defValDelimiter)[0];
+	                        if(defVal && defVal.length > 0  && defVal.indexOf(defValDelimiter)>0)	{
+	                        	var lookedId = defVal.split(defValDelimiter)[0];
 	                        	if(textareas[m].getAttribute("id")==lookedId) {
 	                        		textareas[m].innerHTML=defVal.split(defValDelimiter)[1]; defVal="";}
-                            	} else	textareas[m].innerHTML="";
+                            	} else	{
+                            		textareas[m].innerHTML="";
+                            	}
                         }
                     }
                 }
