@@ -489,7 +489,8 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
         // If the Horizontal type table will be used, then set the
         // DisplaySectionBean's
         // DisplayFormGroups List to the ones we have just generated
-        List<DisplayItemWithGroupBean> displayItemWithGroups = super.createItemWithGroups(dsb, hasItemGroup, eventDefinitionCRFId, request);
+      //@pgawade 30-May-2012 Fix for issue 13963 - added an extra parameter 'isSubmitted' to method createItemWithGroups
+        List<DisplayItemWithGroupBean> displayItemWithGroups = super.createItemWithGroups(dsb, hasItemGroup, eventDefinitionCRFId, request, isSubmitted);
         dsb.setDisplayItemGroups(displayItemWithGroups);
 
         super.populateNotesWithDBNoteCounts(discNotes, dsb, request);
