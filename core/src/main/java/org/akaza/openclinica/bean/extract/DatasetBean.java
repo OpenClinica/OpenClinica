@@ -35,7 +35,18 @@ public class DatasetBean extends AuditableEntityBean {
     private Boolean collectItemData = true;
     private Boolean collectFormAuditData = true;
     private Boolean collectFormDNdata = true;
-    // private int maxItemDataBeanOrdinal = 0;
+    private Boolean collectStudyEventAuditLogs = true;//for use from webservice only,default is true from webservice getStudySubjectEvent it is false
+    private boolean showSubjectDataAuditLogs = true;
+    
+    public Boolean getCollectStudyEventAuditLogs() {
+		return collectStudyEventAuditLogs;
+	}
+
+	public void setCollectStudyEventAuditLogs(Boolean collectStudyEventAuditLogs) {
+		this.collectStudyEventAuditLogs = collectStudyEventAuditLogs;
+	}
+
+	// private int maxItemDataBeanOrdinal = 0;
     // above somewhat of a hack,
     // we need to deliver the maximum ordinal size
     // for repeating items to the extract data bean
@@ -78,6 +89,8 @@ public class DatasetBean extends AuditableEntityBean {
     private boolean showCRFcompletionDate = false;
     // again, how is it different from Start/End?
     private boolean showSubjectGroupInformation = false;
+    
+    
     // private boolean showGroupInformation = false;
     // private boolean showDiscrepancyInformation = false;
     // removed above after meeting 07/16/2007, tbh
@@ -647,6 +660,14 @@ public class DatasetBean extends AuditableEntityBean {
 
 	public Boolean getCollectFormDNdata() {
 		return collectFormDNdata;
+	}
+
+	public void setShowSubjectDataAuditLogs(boolean showSubjectDataAuditLogs) {
+		this.showSubjectDataAuditLogs = showSubjectDataAuditLogs;
+	}
+
+	public boolean isShowSubjectDataAuditLogs() {
+		return showSubjectDataAuditLogs;
 	}
 
     /*

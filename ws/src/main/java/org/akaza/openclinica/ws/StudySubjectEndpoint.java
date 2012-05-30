@@ -307,14 +307,13 @@ public class StudySubjectEndpoint {
         mdc.setODMBean(odmb);
         adc.setOdmbean(odmb);
         cdc.setODMBean(odmb);
-       mdc.collectFileData();
-       adc.collectFileData();
-
         cdc.setDataset(dataset); 
         cdc.populateStudyBaseMap(currentStudy.getId());
         cdc.collectOdmClinicalDataMapPerStudySubj(studySubjectId, currentStudy,dataset);
         
-     //   report.setAdminDataMap(adc.getOdmAdminDataMap());
+        //although we do not have study metadata as part of this response, setting the map information to avoid null pointer.
+        
+        report.setAdminDataMap(adc.getOdmAdminDataMap());
         report.setOdmStudyMap(mdc.getOdmStudyMap());
         report.setCoreResources(coreResources);
         report.setOdmBean(mdc.getODMBean());
@@ -345,6 +344,9 @@ public class StudySubjectEndpoint {
          dataset.setShowCRFinterviewerName(true);
          dataset.setCollectFormAuditData(false);//not collecting form audit
          dataset.setCollectFormDNdata(false);
+         dataset.setCollectStudyEventAuditLogs(false);
+         dataset.setShowSubjectGroupInformation(true);
+         dataset.setShowSubjectDataAuditLogs(false);
 		return dataset;
 	}
 

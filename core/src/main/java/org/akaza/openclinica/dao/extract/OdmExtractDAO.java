@@ -2378,8 +2378,12 @@ public class OdmExtractDAO extends DatasetDAO {
         }
         else{
             if(studySubjectOids.length()>0) {
-                this.setOCSubjectDataAuditLogs(parentStudy, data, studySubjectOids, subOidPoses);
-                this.setOCEventDataAuditLogs(parentStudy, data, studySubjectOids, evnOidPoses);
+            	if(dataset.isShowSubjectDataAuditLogs())
+            		this.setOCSubjectDataAuditLogs(parentStudy, data, studySubjectOids, subOidPoses);
+                if(dataset.getCollectStudyEventAuditLogs() )	
+                	{
+                	this.setOCEventDataAuditLogs(parentStudy, data, studySubjectOids, evnOidPoses);
+                	}
                 if(ecIds.length()>0 && dataset.getCollectFormAuditData()) {
                     this.setOCFormDataAuditLogs(parentStudy, data, studySubjectOids, ecIds, oidPoses);
                 } else{
