@@ -1571,7 +1571,7 @@ public class OdmExtractDAO extends DatasetDAO {
                     }
                     ecprev = ecId;
                 }
-                if (goon && dataset.getCollectItemData()) {
+                if (goon) {
                     ImportItemGroupDataBean ig = new ImportItemGroupDataBean();
                     // key = ecId + igOID;
                     key = ecId + "-" + igId;
@@ -2380,13 +2380,13 @@ public class OdmExtractDAO extends DatasetDAO {
             if(studySubjectOids.length()>0) {
                 this.setOCSubjectDataAuditLogs(parentStudy, data, studySubjectOids, subOidPoses);
                 this.setOCEventDataAuditLogs(parentStudy, data, studySubjectOids, evnOidPoses);
-                if(ecIds.length()>0 && dataset.getCollectFormAuditData()) {
+                if(ecIds.length()>0) {
                     this.setOCFormDataAuditLogs(parentStudy, data, studySubjectOids, ecIds, oidPoses);
                 } else{
                     logger.debug("OdmExtractDAO.setOCFormDataAuditLogs wasn't called because of empty ecIds");
                 }
                 this.setOCSubjectDataDNs(data, studySubjectOids, subOidPoses);
-                if(sedOids.length()>0 && dataset.getCollectFormDNdata()) {
+                if(sedOids.length()>0) {
                     this.setOCEventDataDNs(data, sedOids, studySubjectOids, evnOidPoses);
                 } else {
                     logger.info("OdmExtractDAO.setOCEventDataDNs wasn't called because of empty sedOids");

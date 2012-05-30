@@ -284,12 +284,4 @@
 			and sed.study_event_definition_id = ?
     	</sql>
     </query>
-    <query>
-    	<name>getStudyEventIdsForWSReq</name>
-    	<sql>
-    		select study_event_id from study_event where study_event_id in (select sed.study_event_definition_id from event_crf ec,study_event_definition sed where sed.study_id = ? and 
-ec.study_subject_id = ? and ec.study_event_id = sed.study_event_definition_id)
-
-    	</sql>
-    </query>
 </queries>

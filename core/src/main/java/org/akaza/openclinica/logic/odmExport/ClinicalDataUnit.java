@@ -47,12 +47,6 @@ public class ClinicalDataUnit extends OdmUnit {
         this.odmClinicalData = new OdmClinicalDataBean();
         this.studySubjectIds = studySubjectIds;
     }
-    
-    public ClinicalDataUnit(DataSource ds,  ODMBean odmBean, StudyBean study, int category, String studySubjectIds) {
-    	  super(ds, study, category);
-    	  this.odmClinicalData = new OdmClinicalDataBean();
-          this.studySubjectIds = studySubjectIds;
-    }
 
     public void collectOdmClinicalData() {
         StudyBean study = studyBase.getStudy();
@@ -84,39 +78,7 @@ public class ClinicalDataUnit extends OdmUnit {
         }
         oedao.getClinicalData(study, this.dataset, odmClinicalData, this.odmBean.getODMVersion(), studySubjectIds, this.odmBean.getOdmType());
     }
-    public void collectOdmClinicalData(DatasetBean dataset) {
-        StudyBean study = studyBase.getStudy();
-        String studyOID = study.getOid();
-        if (studyOID == null || studyOID.length() <= 0) {
-            logger.info("Constructed studyOID using study_id because oc_oid is missing from the table - study.");
-            studyOID = "" + study.getId();
-        }
-        odmClinicalData.setStudyOID(studyOID);
 
-        OdmExtractDAO oedao = new OdmExtractDAO(this.ds);
-        if (this.getCategory() == 1 && study.isSite(study.getParentStudyId())) {
-            String mvoid = "";
-            if (dataset != null) {
-                mvoid = dataset.getODMMetaDataVersionOid();
-            }
-            if (mvoid.length() > 0) {
-                mvoid += "-" + studyOID;
-            } else {
-                mvoid = "v1.0.0" + "-" + studyOID;
-            }
-            odmClinicalData.setMetaDataVersionOID(mvoid);
-
-        } else {
-            odmClinicalData.setMetaDataVersionOID(dataset.getODMMetaDataVersionOid());
-            if (odmClinicalData.getMetaDataVersionOID() == null || odmClinicalData.getMetaDataVersionOID().length() <= 0) {
-                odmClinicalData.setMetaDataVersionOID("v1.0.0");
-            }
-        }
-        oedao.getClinicalData(study, dataset, odmClinicalData, this.odmBean.getODMVersion(), studySubjectIds, this.odmBean.getOdmType());
-    }
-    
-    
-    
     public OdmClinicalDataBean getOdmClinicalData() {
         return odmClinicalData;
     }

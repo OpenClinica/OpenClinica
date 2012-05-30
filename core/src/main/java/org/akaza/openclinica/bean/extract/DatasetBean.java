@@ -31,10 +31,6 @@ public class DatasetBean extends AuditableEntityBean {
     private java.util.Date dateStart;
     private java.util.Date dateEnd;
     private int approverId = 0;
-    //For use for webservice, getStudySubjectODM which does not have item data
-    private Boolean collectItemData = true;
-    private Boolean collectFormAuditData = true;
-    private Boolean collectFormDNdata = true;
     // private int maxItemDataBeanOrdinal = 0;
     // above somewhat of a hack,
     // we need to deliver the maximum ordinal size
@@ -621,33 +617,6 @@ public class DatasetBean extends AuditableEntityBean {
         sql += s1[0] + itemIdStr + s1[1].substring(s1[1].indexOf(")"));
         return sql;
     }
-/**
- * For use for webservice, getStudySubjectODM which does not have item data
- * @param collectItemData
- */
-	public void setCollectItemData(Boolean collectItemData) {
-		this.collectItemData = collectItemData;
-	}
-
-	public Boolean getCollectItemData() {
-		return collectItemData;
-	}
-
-	public void setCollectFormAuditData(Boolean collectFormAuditData) {
-		this.collectFormAuditData = collectFormAuditData;
-	}
-
-	public Boolean getCollectFormAuditData() {
-		return collectFormAuditData;
-	}
-
-	public void setCollectFormDNdata(Boolean collectFormDNdata) {
-		this.collectFormDNdata = collectFormDNdata;
-	}
-
-	public Boolean getCollectFormDNdata() {
-		return collectFormDNdata;
-	}
 
     /*
      * public int getMaxItemDataBeanOrdinal() { return maxItemDataBeanOrdinal; }

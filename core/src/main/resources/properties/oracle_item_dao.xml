@@ -209,14 +209,4 @@
              select   name, ordinal, oc_oid, item_data_id, i.item_id as item_id,    value from item_data id, item i,versioning_map v            where    v.item_id =i.item_id and v.crf_version_id=? and            id.item_id=i.item_id and event_crf_id = ? order  by i.item_id,ordinal
     	</sql>
     </query>
-       <query>
-        <name>getItemsForSpecificEvents</name>
-        <sql>            
-select item_id from versioning_map where crf_version_id in (select distinct crf_version_id from event_crf ec where ec.study_event_id in 
-    		(
-select study_event_id from study_event where study_event_id in (select sed.study_event_definition_id from event_crf ec,study_event_definition sed where sed.study_id = ? and 
-ec.study_subject_id = ? and ec.study_event_id = sed.study_event_definition_id)))
-
-    	</sql>
-   </query>
 </queries>
