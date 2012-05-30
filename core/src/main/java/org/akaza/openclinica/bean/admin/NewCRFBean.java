@@ -626,6 +626,8 @@ public class NewCRFBean extends Object implements java.io.Serializable {
              for (String dQuery : (ArrayList<String>)deleteQueries) {
             	 logger.debug(dQuery);
             	 cur_query= dQuery;
+            	 if ( cur_query==null || cur_query.trim().length()<1){continue;}
+             	
             	 statement = con.createStatement();
                  statement.executeUpdate(dQuery);
             	 statement.close();
@@ -637,6 +639,7 @@ public class NewCRFBean extends Object implements java.io.Serializable {
             for (String  pQuery: (Collection<String>)itemQueries.values()){
             	logger.debug(pQuery);
             	cur_query = pQuery;
+            	if ( cur_query==null || cur_query.trim().length()<1){continue;}
             	statement = con.createStatement();
             	statement.executeUpdate(pQuery);
             	statement.close();
@@ -646,6 +649,8 @@ public class NewCRFBean extends Object implements java.io.Serializable {
            for (String crQuery : (ArrayList<String>)queries) {
         	   logger.debug(crQuery);
         	   cur_query= crQuery;
+        	   if ( cur_query==null || cur_query.trim().length()<1){continue;}
+           	
                 statement = con.createStatement();
                 statement.executeUpdate(crQuery);
                 statement.close();
