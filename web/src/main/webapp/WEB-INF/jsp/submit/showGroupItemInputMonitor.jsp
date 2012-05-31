@@ -204,6 +204,8 @@
   <%-- <c:out value="txt item"/> --%>
   <%-- add for error messages --%>
   <label for="<c:out value="${inputName}"/>"></label>
+  <input type="hidden" id="defValue<c:out value="${inputName}"/>" name="defValue<c:out value="${inputName}"/>" value="<c:out value="${defValue}"/>"/>
+ 
   <c:choose>
     <c:when test="${isInError}">
       <span class="aka_exclaim_error">! </span><input class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" type="text" name="<c:out value="${inputName}"/>" value="<c:out value="${inputTxtValue}"/>" />
@@ -227,6 +229,8 @@
 </c:if>
 <c:if test='${inputType == "textarea"}'>
   <label for="<c:out value="${inputName}"/>"></label>
+   <input type="hidden" id="defValue<c:out value="${inputName}"/>" name="defValue<c:out value="${inputName}"/>" value="<c:out value="${defValue}"/>"/>
+ 
   <c:choose>
     <c:when test="${isInError}">
       <span class="aka_exclaim_error">! </span><textarea class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>" onChange="this.className='changedField'; javascript:setImage('DataStatus_top','images/icon_UnsavedData.gif'); javascript:setImage('DataStatus_bottom','images/icon_UnsavedData.gif');" name="<c:out value="${inputName}"/>" rows="5" cols="40"><c:out value="${inputTxtValue}"/></textarea>
@@ -237,6 +241,21 @@
   </c:choose>
 </c:if>
 <c:if test='${inputType == "checkbox"}'>
+<%-- prepare default values for check box --%>
+<c:set var="defValuesForCheckBox" value=""/>
+<c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
+     	<c:set var="defValuesForCheckBox" value="${defValuesForCheckBox}|||||${option.value}.....${option.text}" />
+</c:forEach>
+<c:choose>
+<c:when test="${! empty defValue}">
+	<c:set var="defValuesForCheckBox" value="${defValue}_____${defValuesForCheckBox}" />
+</c:when>
+<c:otherwise >
+	<c:set var="defValuesForCheckBox" value="" />
+</c:otherwise>
+</c:choose>
+ <input type="hidden" id="defValue<c:out value="${inputName}"/>" name="defValue<c:out value="${inputName}"/>" value="<c:out value="${defValuesForCheckBox}"/>"/>
+
   <c:if test="${! isHorizontal}">
     <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
       <c:choose>
@@ -332,6 +351,8 @@
 <c:if test='${inputType == "single-select"}'>
 
   <label for="<c:out value="${inputName}"/>"></label>
+  <input type="hidden" id="defValue<c:out value="${inputName}"/>" name="defValue<c:out value="${inputName}"/>" value="<c:out value="${defValue}"/>"/>
+ 
   <c:choose>
 
     <c:when test="${isInError}">
@@ -412,6 +433,8 @@
 </c:if>
 <c:if test='${inputType == "multi-select"}'>
   <label for="<c:out value="${inputName}"/>"></label>
+     <input type="hidden" id="defValue<c:out value="${inputName}"/>" name="defValue<c:out value="${inputName}"/>" value="<c:out value="${defValue}"/>"/>
+  
   <c:choose>
     <c:when test="${isInError}">
       <span class="aka_exclaim_error">! </span><select  class="aka_input_error" id="<c:out value="${inputName}"/>" multiple  tabindex=
@@ -477,7 +500,7 @@
   </c:choose>
   <c:choose>
     <c:when test="${displayItem.numDiscrepancyNotes > 0}">
-
+ 
     <a tabindex="<c:out value="${tabNum + 1000}"/>" href="#" onmouseover="callTip(genToolTips(${itemId}));"
            onmouseout="UnTip()" onClick=
     "openDNoteWindow('ViewDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=<c:out value="${parsedInputName}"/>&column=value&monitor=1&writeToDB=1&errorFlag=<c:out value="${errorFlag}"/>&isLocked=<c:out value="${isLocked}"/>','spanAlert-<c:out value="${parsedInputName}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
@@ -486,19 +509,19 @@
     "<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"
      ></a>
 
-
     </c:when>
     <c:otherwise>
     <c:set var="notLocked" value="no"/>
      <c:if test="${isLocked eq notLocked}">
       <c:set var="imageFileName" value="icon_noNote" />
  
-       <a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"  onmouseover="callTip(genToolTips(${itemId}));"
+     <a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"  onmouseover="callTip(genToolTips(${itemId}));"
            onmouseout="UnTip()" onClick=
     "openDNWindow('CreateDiscrepancyNote?subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&groupLabel=<c:out value="${displayItem.metadata.groupLabel}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${displayItem.data.id}"/>&name=itemData&field=<c:out value="${parsedInputName}"/>&column=value&monitor=1&writeToDB=1&errorFlag=<c:out value="${errorFlag}"/>&isLocked=<c:out value="${isLocked}"/>','spanAlert-<c:out value="${parsedInputName}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
     ><img id="flag_<c:out value="${inputName}"/>" name="flag_<c:out value="${inputName}"/>" src=
     "images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"
     ></a>
+    
     </c:if>
     </c:otherwise>
   </c:choose>
@@ -506,35 +529,6 @@
 
 
 </c:if>
-<%-- we won't need this if we're not embedding error messages
-<br><c:import url="../showMessage.jsp"><c:param name="key" value=
-              "${inputName}" /></c:import>    --%>
-<%--
-adding units...
- if(responseName.equalsIgnoreCase("text") ||
-      responseName.equalsIgnoreCase("textarea") ||
-      responseName.equalsIgnoreCase("single-select") ||
-      responseName.equalsIgnoreCase("multi-select")){
-
-       td = this.addUnits(td,displayBean);
-       //td = this.addRightItemText(td,displayBean);
-    }
-    if(responseName.equalsIgnoreCase("radio") ||
-      responseName.equalsIgnoreCase("checkbox") ){
-      String grLabel = displayBean.getMetadata().getGroupLabel();
-      boolean grouped = (grLabel != null && (! "".equalsIgnoreCase(grLabel)) &&
-      (! grLabel.equalsIgnoreCase("ungrouped")));
-
-      if(! grouped) {
-         td = this.addUnits(td,displayBean);
-      }  else {
-        //the radio or checkbox does appear in a group table
-        //Do not add units if the layout is horizontal
-        if(! displayBean.getMetadata().getResponseLayout().
-          equalsIgnoreCase("Horizontal")){
-           td = this.addUnits(td,displayBean);
-        }
---%>
 <c:if test='${inputType == "text"|| inputType == "textarea" ||
 inputType == "multi-select" || inputType == "single-select" ||
 inputType == "calculation" }'>
