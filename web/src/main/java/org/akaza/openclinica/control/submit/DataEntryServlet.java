@@ -558,7 +558,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
         // ironically, this only covers vertical null value result sets
         // horizontal ones are covered in FormBeanUtil, tbh 112007
         logMe("Entering  displayItemWithGroups "+System.currentTimeMillis());
-        List<DisplayItemWithGroupBean> displayItemWithGroups = createItemWithGroups(section, hasGroup, eventDefinitionCRFId, request);
+       //@pgawade 30-May-2012 Fix for issue 13963 - added an extra parameter 'isSubmitted' to method createItemWithGroups
+        List<DisplayItemWithGroupBean> displayItemWithGroups = createItemWithGroups(section, hasGroup, eventDefinitionCRFId, request, isSubmitted); 
         logMe("Entering  displayItemWithGroups end "+System.currentTimeMillis());
         this.getItemMetadataService().updateGroupDynamicsInSection(displayItemWithGroups, section.getSection().getId(), ecb);
         section.setDisplayItemGroups(displayItemWithGroups);
@@ -4347,8 +4348,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
 
 
-
-    protected List<DisplayItemWithGroupBean> createItemWithGroups(DisplaySectionBean dsb, boolean hasItemGroup, int eventCRFDefId, HttpServletRequest request) {
+  //@pgawade 30-May-2012 Fix for issue 13963 - added an extra parameter 'isSubmitted' to method createItemWithGroups
+    protected List<DisplayItemWithGroupBean> createItemWithGroups(DisplaySectionBean dsb, boolean hasItemGroup, int eventCRFDefId, HttpServletRequest request, boolean isSubmitted) {
         HttpSession session = request.getSession();
         List<DisplayItemWithGroupBean> displayItemWithGroups = new ArrayList<DisplayItemWithGroupBean>();
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
@@ -4410,7 +4411,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 boolean hasData = false;
                 int checkAllColumns = 0;
                 if(data.size()>0) hasData=true;
-                newOne =   buildMatrixForRepeatingGroups(newOne,itemGroup,ecb, sb,itBeans,dataMap, nullValuesList);
+              //@pgawade 30-May-2012 Fix for issue 13963 - added an extra parameter 'isSubmitted' to method buildMatrixForRepeatingGroups
+                newOne =   buildMatrixForRepeatingGroups(newOne,itemGroup,ecb, sb,itBeans,dataMap, nullValuesList, isSubmitted);
 
              if (hasData) {
                  //TODO: fix the group_has_data flag on bean not on session
@@ -4451,10 +4453,11 @@ public abstract class DataEntryServlet extends CoreSecureController {
       }
       return returnMap;
   }
+  	//@pgawade 30-May-2012 Fix for issue 13963 - added an extra parameter 'isSubmitted' to method buildMatrixForRepeatingGroups
     protected DisplayItemWithGroupBean buildMatrixForRepeatingGroups(DisplayItemWithGroupBean diwgb, 
     		DisplayItemGroupBean itemGroup, EventCRFBean ecb, 
     		SectionBean sb,List<ItemBean>itBeans, Map<String,ItemDataBean> dataMap,
-    		List<String> nullValuesList)
+    		List<String> nullValuesList, boolean isSubmitted)
     {
         int tempOrdinal = 1;
         ItemDataDAO iddao = new ItemDataDAO(getDataSource(),locale);
@@ -4488,7 +4491,20 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 }
                 addNullValues(displayItemBean,nullValuesList);
                 displayItemBean.setData(itemData);
-                displayItemBean.loadDBValue();
+                //@pgawade 30-May-2012 Fix for issue 13963 Call to method "displayItemBean.loadDBValue()" is made conditional to show
+                // the data wherever it is appropriate in the stages of data entry
+//                displayItemBean.loadDBValue();                
+                if (ecb.getStage() == DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE || ecb.getStage() == DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) {
+                    if (shouldLoadDBValues(displayItemBean) && !isSubmitted) {
+                    	displayItemBean.loadDBValue();
+                    }
+                } else {
+                    if (shouldLoadDBValues(displayItemBean)) {
+                        LOGGER.trace("should load db values is true, set value");
+                        displayItemBean.loadDBValue();
+                        LOGGER.trace("just got data loaded: " + displayItemBean.getData().getValue());
+                    }
+                }
 
                 displayItemBeans.add(displayItemBean);
 
