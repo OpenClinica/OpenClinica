@@ -35,6 +35,7 @@ import org.akaza.openclinica.logic.odmExport.AdminDataCollector;
 import org.akaza.openclinica.logic.odmExport.ClinicalDataCollector;
 import org.akaza.openclinica.logic.odmExport.ClinicalDataUnit;
 import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
+import org.akaza.openclinica.logic.odmExport.OdmStudyBase;
 import org.akaza.openclinica.service.subject.SubjectServiceInterface;
 import org.akaza.openclinica.ws.bean.SubjectStudyDefinitionBean;
 import org.akaza.openclinica.ws.validator.SubjectTransferValidator;
@@ -70,6 +71,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -306,15 +308,19 @@ public class StudySubjectEndpoint {
         odmb.setODMVersion("oc1.3");
         mdc.setODMBean(odmb);
         adc.setOdmbean(odmb);
+        //mdc.collectFileData();
         cdc.setODMBean(odmb);
         cdc.setDataset(dataset); 
         cdc.populateStudyBaseMap(currentStudy.getId());
-        cdc.collectOdmClinicalDataMapPerStudySubj(studySubjectId, currentStudy,dataset);
+        cdc.setStudyBaseMap((LinkedHashMap<String, OdmStudyBase>) mdc.getStudyBaseMap());
+               report.setAdminDataMap(adc.getOdmAdminDataMap());
+        report.setOdmStudyMap(mdc.getOdmStudyMap());
+        cdc.collectOdmClinicalDataMap(studySubjectId, currentStudy,dataset);
         
+        //cdc.collectFileData();
         //although we do not have study metadata as part of this response, setting the map information to avoid null pointer.
         
-        report.setAdminDataMap(adc.getOdmAdminDataMap());
-        report.setOdmStudyMap(mdc.getOdmStudyMap());
+    
         report.setCoreResources(coreResources);
         report.setOdmBean(mdc.getODMBean());
         report.setClinicalDataMap(cdc.getOdmClinicalDataMap());

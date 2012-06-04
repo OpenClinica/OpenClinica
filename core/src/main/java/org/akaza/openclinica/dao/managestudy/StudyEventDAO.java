@@ -1149,8 +1149,7 @@ public class StudyEventDAO extends AuditableEntityDAO {
          this.setTypesExpected();
 
          HashMap variables = new HashMap();
-         variables.put(Integer.valueOf(1), Integer.valueOf(studyId));
-         variables.put(Integer.valueOf(2), Integer.valueOf(ssubjectId));
+         variables.put(Integer.valueOf(1), Integer.valueOf(ssubjectId));
 
          ArrayList<HashMap> alist = this.select(digester.getQuery("getStudyEventIdsForWSReq"), variables);
          

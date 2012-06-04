@@ -84,6 +84,14 @@ public class ClinicalDataCollector extends OdmDataCollector {
     	cdata.collectOdmClinicalData(dataset);
     	odmClinicalDataMap.put(study.getOid(), cdata.getOdmClinicalData());
     }
+    
+    public void collectOdmClinicalDataMap(Integer StudySubjectId,StudyBean study,DatasetBean dataset ){
+    	ClinicalDataUnit cdata = new ClinicalDataUnit(this.ds,dataset,this.getOdmbean(),study,this.getCategory());
+    	  StudySubjectDAO ssdao = new StudySubjectDAO(this.ds);
+    	cdata.setStudySubjectIds(StudySubjectId+"");
+    	cdata.collectOdmClinicalData(dataset);
+    	odmClinicalDataMap.put(study.getOid(), cdata.getOdmClinicalData());
+    }
     public LinkedHashMap<String, OdmClinicalDataBean> getOdmClinicalDataMap() {
         return odmClinicalDataMap;
     }

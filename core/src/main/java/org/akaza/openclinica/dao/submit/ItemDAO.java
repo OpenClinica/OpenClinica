@@ -633,8 +633,7 @@ public class ItemDAO<K extends String,V extends ArrayList> extends AuditableEnti
         this.setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(Integer.valueOf(1), Integer.valueOf(studyId));
-        variables.put(Integer.valueOf(2), Integer.valueOf(ssubjectId));
+        variables.put(Integer.valueOf(1), Integer.valueOf(ssubjectId));
 
         ArrayList alist2 =(ArrayList<V>) this.select(digester.getQuery("getItemsForSpecificEvents"), variables);
         
