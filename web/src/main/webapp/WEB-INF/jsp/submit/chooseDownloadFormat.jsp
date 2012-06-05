@@ -23,10 +23,55 @@
         <input type="hidden" name="list" value="y"/>
         <input type="hidden" name="subjectId" value="${subjectId}"/>
         <input type="hidden" name="fileName" value="dnotes${subjectId}_${studyIdentifier}"/>
-        <input type="hidden" name="studyIdentifier" value="${studyIdentifier}"/>        
+        <input type="hidden" name="studyIdentifier" value="${studyIdentifier}"/>
         <input type="hidden" name="eventId" value="${param.eventId}"/>
         <input type="hidden" name="resolutionStatus" value="${param.resolutionStatus}"/>
-        <input type="hidden" name="discNoteType" value="${param.discNoteType}"/>        
+        <input type="hidden" name="discNoteType" value="${param.discNoteType}"/>
+
+<%
+        String[] filterParams = {
+             "studySubject.label",
+             "siteId",
+             "studySubject.labelExact",
+             "discrepancyNoteBean.createdDate",
+             "discrepancyNoteBean.updatedDate",
+             "discrepancyNoteBean.description",
+             "discrepancyNoteBean.user",
+             "discrepancyNoteBean.disType",
+             "discrepancyNoteBean.entityType",
+             "discrepancyNoteBean.resolutionStatus",
+             "age",
+             "days",
+
+             "eventName",
+             "crfName",
+             "entityName",
+             "entityValue",
+             "discrepancyNoteBean.description",
+             "discrepancyNoteBean.user"
+        };
+        for (String p: filterParams) {
+            String value = request.getParameter(p);
+            if (value != null) {
+%>              <input type="hidden" name="<%= p %>" value="<%= value %>" />
+<%
+            }
+        }
+
+        String[] sortParams = {
+            "sort.studySubject.label",
+            "sort.discrepancyNoteBean.createdDate",
+            "sort.days",
+            "sort.age"
+        };
+        for (String s: sortParams) {
+            String value = request.getParameter(s);
+            if (value != null) {
+%>              <input type="hidden" name="<%= s %>" value="<%= value %>" />
+<%            	
+            }
+        }
+%>
         <input type="submit" name="submitFormat" value="<fmt:message key="download_notes" bundle="${resword}"/>" class=
                                   "button_medium" />
 

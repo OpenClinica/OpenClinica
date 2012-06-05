@@ -1,8 +1,18 @@
 package org.akaza.openclinica.control.submit;
 
+import static java.util.Arrays.sort;
+
+import java.util.Comparator;
+import java.util.Map;
+import java.util.ResourceBundle;
+
 import org.akaza.openclinica.control.DefaultToolbar;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.jmesa.core.CoreContext;
+import org.jmesa.limit.Filter;
+import org.jmesa.limit.FilterSet;
+import org.jmesa.limit.Sort;
+import org.jmesa.limit.SortSet;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.toolbar.AbstractItem;
 import org.jmesa.view.html.toolbar.AbstractItemRenderer;
@@ -10,8 +20,6 @@ import org.jmesa.view.html.toolbar.ClearItemRenderer;
 import org.jmesa.view.html.toolbar.ToolbarItem;
 import org.jmesa.view.html.toolbar.ToolbarItemRenderer;
 import org.jmesa.view.html.toolbar.ToolbarItemType;
-
-import java.util.ResourceBundle;
 
 public class ListNotesTableToolbar extends DefaultToolbar {
     private ResourceBundle reswords = ResourceBundleProvider.getWordsBundle();
@@ -26,6 +34,16 @@ public class ListNotesTableToolbar extends DefaultToolbar {
         this.showMoreLink = showMoreLink;
     }
 
+    private FilterSet filterSet;
+    private SortSet sortSet;
+
+    public void setFilterSet(FilterSet filterSet) {
+		this.filterSet = filterSet;
+	}
+    public void setSortSet(SortSet sortSet) {
+		this.sortSet = sortSet;
+	}
+    
     @Override
     protected void addToolbarItems() {
         addToolbarItem(ToolbarItemType.SEPARATOR);
@@ -74,6 +92,7 @@ public class ListNotesTableToolbar extends DefaultToolbar {
         renderer.setOnInvokeAction("onInvokeAction");
         item.setToolbarItemRenderer(renderer);
 
+        
         return item;
     }
 
@@ -163,9 +182,29 @@ public class ListNotesTableToolbar extends DefaultToolbar {
         @Override
         public String enabled() {
             HtmlBuilder html = new HtmlBuilder();
-            html.a().href(
-                    "javascript:openDocWindow('ChooseDownloadFormat?resolutionStatus=" + resolutionStatus + "&discNoteType=" + discNoteType + "&module="
-                        + module + "')");
+            String js = "javascript:openDocWindow('ChooseDownloadFormat" +
+            		"?resolutionStatus=" + resolutionStatus
+            		+ "&discNoteType=" + discNoteType
+            		+ "&module=" + module;
+            
+            for (Filter f: filterSet.getFilters()) {
+            	js += "&" + f.getProperty() + "=" + f.getValue();
+            }
+
+            Sort sorts[] = sortSet.getSorts().toArray(new Sort[0]);
+            sort(sorts, new Comparator<Sort>() {
+				@Override
+				public int compare(Sort s1, Sort s2) {
+					return s1.getPosition() - s2.getPosition();
+				}
+            });
+            for (Sort s: sorts) {
+            	js += "&" + "sort." + s.getProperty() + "=" + s.getOrder().name();
+            }
+            
+            js += "')";
+
+            html.a().href(js);
             html.quote();
             html.append(getAction());
             html.quote().close();

@@ -150,6 +150,10 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         toolbar.setResolutionStatus(resolutionStatus);
         toolbar.setModule(module);
         toolbar.setResword(resword);
+
+        Limit limit = tableFacade.getLimit();
+        toolbar.setFilterSet(limit.getFilterSet());
+        toolbar.setSortSet(limit.getSortSet());
         tableFacade.setToolbar(toolbar);
     }
 
