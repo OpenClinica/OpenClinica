@@ -440,6 +440,21 @@ function switchStr(itemId, id,attribute,str1,str2) {
   </c:choose>
 </c:if>
 <c:if test='${inputType == "checkbox"}'>
+<%-- prepare default values for check box --%>
+<c:set var="defValuesForCheckBox" value=""/>
+<c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
+     	<c:set var="defValuesForCheckBox" value="${defValuesForCheckBox}|||||${option.value}.....${option.text}" />
+</c:forEach>
+<c:choose>
+<c:when test="${! empty defValue}">
+	<c:set var="defValuesForCheckBox" value="${defValue}_____${defValuesForCheckBox}" />
+</c:when>
+<c:otherwise >
+	<c:set var="defValuesForCheckBox" value="" />
+</c:otherwise>
+</c:choose>
+ <input type="hidden" id="defValue<c:out value="${inputName}"/>" name="defValue<c:out value="${inputName}"/>" value="<c:out value="${defValuesForCheckBox}"/>"/>
+
   <c:if test="${! isHorizontal}">
     <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
       <c:choose>
@@ -542,6 +557,8 @@ function switchStr(itemId, id,attribute,str1,str2) {
 <c:if test='${inputType == "single-select"}'>
 
   <label for="<c:out value="${inputName}"/>"></label>
+  <input type="hidden" id="defValue<c:out value="${inputName}"/>" name="defValue<c:out value="${inputName}"/>" value="<c:out value="${defValue}"/>"/>
+ 
   <c:choose>
   	<c:when test="${displayItem.metadata.defaultValue != '' &&
                 displayItem.metadata.defaultValue != null}">
@@ -662,6 +679,8 @@ include the default value first in the select list --%>
 </c:if>
 <c:if test='${inputType == "multi-select"}'>
   <label for="<c:out value="${inputName}"/>"></label>
+     <input type="hidden" id="defValue<c:out value="${inputName}"/>" name="defValue<c:out value="${inputName}"/>" value="<c:out value="${defValue}"/>"/>
+  
   <c:choose>
     <c:when test="${isInError}">
       <span class="aka_exclaim_error">! </span><select  class="aka_input_error" id="<c:out value="${inputName}"/>" multiple  tabindex=
@@ -808,10 +827,7 @@ include the default value first in the select list --%>
     <c:when test="${displayItem.discrepancyNoteStatus == 5}">
         <c:set var="imageFileName" value="icon_flagWhite" />
     </c:when>
-    <%-- new template row --%>
-    <c:when test="${isNewItem == true}">
-	    <c:set var="imageFileName" value="icon_noNote" />
-	</c:when>
+    
     <c:otherwise>
     </c:otherwise>
   </c:choose>
