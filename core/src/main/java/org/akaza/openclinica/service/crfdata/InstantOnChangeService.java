@@ -159,9 +159,9 @@ public class InstantOnChangeService {
         for(int i=0; i<allItems.size(); ++i) {
             if(allItems.get(i).isInGroup()) {
                 List<DisplayItemGroupBean> digs = allItems.get(i).getItemGroups();
+                String oid = allItems.get(i).getItemGroup().getItemGroupBean().getOid();
                 for(DisplayItemGroupBean dig : digs) {
-                    if(repOrigins.containsKey(dig.getItemGroupBean().getOid())) {
-                        String oid = dig.getItemGroupBean().getOid();
+                    if(repOrigins.containsKey(oid)) {
                         HashMap<Integer,InstantOnChangeFrontStrGroup> oMap = (HashMap<Integer,InstantOnChangeFrontStrGroup>) repOrigins.get(oid);
                         List<DisplayItemBean> items = dig.getItems();
                         for(DisplayItemBean dib : items) {
