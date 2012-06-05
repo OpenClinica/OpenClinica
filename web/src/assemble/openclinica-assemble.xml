@@ -4,14 +4,7 @@
     <format>zip</format>
   </formats>
   <fileSets>
-    <fileSet>
-      <includes>
-        <include>README*</include>
-        <include>LICENSE*</include>
-        <include>NOTICE*</include>
-      </includes>
-    </fileSet>
-	<fileSet>
+  	<fileSet>
       <directory>src/main/config/install-docs</directory>
       <outputDirectory>install-docs</outputDirectory>
     </fileSet>
@@ -25,6 +18,16 @@
     </fileSet>
   </fileSets>
   <files>
+    <file>
+      <source>README.txt</source>
+      <outputDirectory>/</outputDirectory>
+      <filtered>true</filtered>
+    </file>
+    <file>
+      <source>LICENSE.txt</source>
+      <outputDirectory>/</outputDirectory>
+      <filtered>false</filtered>
+    </file>
   	<file>
   		<source>${project.build.directory}/${project.build.finalName}.war</source>
   		<outputDirectory>distribution</outputDirectory>
