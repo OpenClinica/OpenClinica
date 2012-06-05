@@ -416,15 +416,18 @@ function clearInputElementValues(trElement) {
     var options;
     var myDiv;
     var myId="";
+    var defValDelimiter = "-----";
+	var defValDelimiterValues = ",";
+  
     if(tdElements){
         for(var i = 0; i < tdElements.length; i++) {
+        try {
             if(tdElements[i]) {
 			    var rp=-1;
 			    var rm=-1;
 			    var myDivEls="";
 			    var defVal = "";
-			    var defValDelimiter = "-----";
-                inputs = tdElements[i].getElementsByTagName('input');
+			    inputs = tdElements[i].getElementsByTagName('input');
                 selects= tdElements[i].getElementsByTagName('select');
 
                 textareas = tdElements[i].getElementsByTagName('textarea');
@@ -443,12 +446,44 @@ function clearInputElementValues(trElement) {
                 if(inputs) {
                     for(var j = 0; j < inputs.length; j++){
                         if(inputs[j]){
-                            if(inputs[j].getAttribute("type") &&
-                               (inputs[j].getAttribute("type").indexOf("checkbox") != -1 ||
-                                inputs[j].getAttribute("type").indexOf("radio") != 1)){
-                                inputs[j].removeAttribute("checked");
-                                inputs[j].checked=false;
-                            }
+                        	if(inputs[j].getAttribute("type") &&
+                                    inputs[j].getAttribute("type").indexOf("radio") != 1){
+                                    inputs[j].removeAttribute("checked");
+                                    inputs[j].checked=false;
+                                }
+                                if(inputs[j].getAttribute("type") &&
+                                        inputs[j].getAttribute("type").indexOf("checkbox") != -1 ){
+    									inputs[j].removeAttribute("checked");
+                                        inputs[j].checked=false;
+										
+										if(defVal && defVal.length > 0 && defVal.indexOf(defValDelimiter)>0)	{ 
+    										var def_temp = defVal.split(defValDelimiter);
+    										var lookedId = def_temp[0];
+											var def_tmp= def_temp[1];
+											
+											if(inputs[j].getAttribute("id")==lookedId && def_temp.size() == 2 && def_tmp.length>0) {
+												var defValuesArrayCheckbox=def_temp[1].split("_____");
+												var defValForCheckBox = defValuesArrayCheckbox[0].split(defValDelimiterValues);
+												var allValuesForCheckbox = defValuesArrayCheckbox[1].split("|||||");
+						
+												for (var i_count = 0; i_count < allValuesForCheckbox.length; i_count++){
+    												var cur_checkbox = allValuesForCheckbox[i_count];
+    												var cur_checkbox_text_value = cur_checkbox.split(".....");
+				
+    												if ( cur_checkbox_text_value.length==2 && inputs[j].value == cur_checkbox_text_value[0] &&
+    													(defValForCheckBox.indexOf (cur_checkbox_text_value[1])!= -1
+														|| defValForCheckBox.indexOf (cur_checkbox_text_value[0])!= -1)){
+    													inputs[j].checked=true;
+													}
+    											}
+    											
+    										}
+    										
+    										
+    									}
+										
+                                }
+    							
                             if(inputs[j].getAttribute("type") &&
                                inputs[j].getAttribute("type").indexOf("text") != -1) {
 	                           if(defVal && defVal.length > 0 && defVal.indexOf(defValDelimiter)>0)	{ 
@@ -518,37 +553,43 @@ function clearInputElementValues(trElement) {
                 /* select element behavior removed for 2791: */
 
                 if(selects) {
-                    for(var h = 0; h < selects.length; h++){
-                        if(selects[h]){
-                            options = selects[h].getElementsByTagName("option");
-                            if(options){
-                                if(! detectIEWindows(navigator.userAgent)){
-                                    for(var k = 0; k < options.length; k++){
-                                        if(options[k]) {
-                                            options[k].selected=false;
-                                        }
+                	 for(var h = 0; h < selects.length; h++){
+                         if(selects[h]){
+                             options = selects[h].getElementsByTagName("option");
+                             var def_temp="";
+ 							if(defVal && defVal.length > 0 && defVal.indexOf(defValDelimiter)>0)	{ 
+ 									def_temp = defVal.split(defValDelimiter);
+ 	                        	    var lookedId = def_temp[0];
+ 	                        		if(selects[h].getAttribute("id")==lookedId) {
+ 										defValuesArray=def_temp[1].split(defValDelimiterValues);
+ 									}
+ 							}
+                             if(options){
+                                 if(! detectIEWindowsNew(navigator.userAgent)){
+                                     for(var k = 0; k < options.length; k++){
+                                         if(options[k]) {
+                                             options[k].selected=false;
+ 											if (def_temp[1] != null && def_temp[1] != "" ){
+ 												for ( var i_count = 0; i_count < defValuesArray.length; i_count++)
+ 												{
+ 													if ( defValuesArray[i_count] == options[k].text ||
+ 															defValuesArray[i_count]== options[k].value){
+ 														options[k].selected=true;
+ 														break;
+ 													}
+ 												}
+ 											}
+                                         }
 
-                                    }
-                                }
-                                // for IE6/7
-                                if(detectIEWindows(navigator.userAgent)){
-                                    selects[h].selectedIndex=0;
-                                    /* var opt;
-                                     for(var p = 0; p < options.length; p++){
-                                     opt=document.createElement("option");
-                                     opt.selected=false;
-                                     opt.setAttribute("value",options[p].getAttribute("value"));
-                                     opt.innerHTML=options[p].innerHTML;
-
-
-                                     //  $(options[p]).remove();
-                                     selects[h].removeChild(options[p]);
-                                     selects[h].appendChild(opt);
-                                     }*/
-                                }
-                            }
-                        }
-                    }
+                                     }
+                                 }
+                                 // for IE6/7
+                                 if(detectIEWindowsNew(navigator.userAgent)){
+                                     selects[h].selectedIndex=0;
+                                 }
+                             }
+                         }
+                     }
 
                 }//end if selects
                 if(textareas) {
@@ -565,10 +606,25 @@ function clearInputElementValues(trElement) {
                     }
                 }
             }//end   if(tdElements[i])
+        }catch(e){}
         }//end for
     }//end if (tdElements)
 }//end function
 
+/* Return true, if the browser used is IE6 or IE7. */
+function detectIEWindowsNew(userAgentString) {
+	 if (/MSIE (\d+\.\d+);/.test(userAgentString)){ //test for MSIE x.x;
+		 var ieversion=new Number(RegExp.$1) // capture x.x portion and store as a number
+		 if (ieversion>=9 || ieversion>=8)
+		  return false;
+		 else if (ieversion>=7 || ieversion>=6)
+		  return true;
+		 
+		  
+		  }
+		  return false;
+  
+}
 /*A METHOD CALLED BY THE WEB 2.0 FORMS JS LIBRARY, AFTER LINE 942.
  BWP: 08/21/2008; The method sets a discrepancy note icon to a certain image, to prevent the copying of
  icons that represent created notes in prior rows. */
@@ -587,6 +643,7 @@ function changeDNoteIcon(trElement) {
                     if(hrefElements[j].childNodes){
                         for(var h = 0; h < hrefElements[j].childNodes.length; h++){
                             checkImgIcon(hrefElements[j].childNodes[h]);
+							
                         }
                     }
                 }
@@ -603,8 +660,13 @@ function checkImgIcon(imgObject) {
         return;
     }
     // alert(imgObject.src)
-    if(imgObject.src && (imgObject.src.indexOf("images/icon_Note.gif") != -1)) {
-
+    // alert(imgObject.src)
+    if(imgObject.src && (imgObject.src.indexOf("images/icon_Note.gif") != -1
+    		|| imgObject.src.indexOf("images/icon_flagYellow.gif") != -1
+    				|| imgObject.src.indexOf("images/icon_flagGreen.gif") != -1
+    						|| imgObject.src.indexOf("images/icon_flagBlack.gif") != -1
+    								|| imgObject.src.indexOf("images/icon_flagWhite.gif") != -1)
+    ) {
         imgObject.src = "images/icon_noNote.gif";
     }
 }
