@@ -36,7 +36,8 @@ public class DatasetBean extends AuditableEntityBean {
     private Boolean collectFormAuditData = true;
     private Boolean collectFormDNdata = true;
     private Boolean collectStudyEventAuditLogs = true;//for use from webservice only,default is true from webservice getStudySubjectEvent it is false
-    private boolean showSubjectDataAuditLogs = true;
+    private Boolean showSubjectDataAuditLogs = true;
+    private Boolean collectFormsWithNoEventCRFS=false;
     
     public Boolean getCollectStudyEventAuditLogs() {
 		return collectStudyEventAuditLogs;
@@ -668,6 +669,15 @@ public class DatasetBean extends AuditableEntityBean {
 
 	public boolean isShowSubjectDataAuditLogs() {
 		return showSubjectDataAuditLogs;
+	}
+
+	public void setCollectFormsWithNoEventCRFS(
+			Boolean collectFormsWithNoEventCRFS) {
+		this.collectFormsWithNoEventCRFS = collectFormsWithNoEventCRFS;
+	}
+
+	public Boolean getCollectFormsWithNoEventCRFS() {
+		return collectFormsWithNoEventCRFS;
 	}
 
     /*

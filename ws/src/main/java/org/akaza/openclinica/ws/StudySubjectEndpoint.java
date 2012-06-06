@@ -235,6 +235,7 @@ public class StudySubjectEndpoint {
     @PayloadRoot(localPart = "getStudySubjectEventRequest", namespace = NAMESPACE_URI_V1)
     public Source getStudySubjectEvent(@XPathParam("//studySubject:studySubject") NodeList subject) throws Exception
     {
+    	try{
     	 ResourceBundleProvider.updateLocale(new Locale("en_US"));
          
 
@@ -266,6 +267,10 @@ public class StudySubjectEndpoint {
              return new DOMSource(mapConfirmation(messages.getMessage("studySubjectEndpoint.fail", null, "Fail", locale), null, errors));
              
          }
+    	}catch(Exception e){
+    		e.printStackTrace();
+    		throw e;
+    	}
     }
     
     
@@ -353,6 +358,7 @@ public class StudySubjectEndpoint {
          dataset.setCollectStudyEventAuditLogs(false);
          dataset.setShowSubjectGroupInformation(true);
          dataset.setShowSubjectDataAuditLogs(false);
+         dataset.setCollectFormsWithNoEventCRFS(true);
 		return dataset;
 	}
 
