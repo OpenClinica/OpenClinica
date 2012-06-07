@@ -82,6 +82,20 @@
     <bean id="datasetDao" class="org.akaza.openclinica.dao.extract.DatasetDAO">
         <constructor-arg ref="dataSource"/>
     </bean>
+    
+    <bean id="userAccountDao" class="org.akaza.openclinica.dao.login.UserAccountDAO">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+    
+    <bean id="archivedDatasetFileDao" class="org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+    
+    <bean id="generateExtractFileService" class="org.akaza.openclinica.service.extract.GenerateExtractFileService">
+        <constructor-arg ref="dataSource"/>
+        <constructor-arg ref="coreResources"/>
+        <constructor-arg ref="ruleSetRuleDao"/>
+    </bean>
 
     <bean id="studySubjectService" class="org.akaza.openclinica.service.managestudy.StudySubjectServiceImpl">
         <property name="studyDao" ref="studyDao"/>
