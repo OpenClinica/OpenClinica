@@ -44,6 +44,7 @@ import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.job.JobInterruptedException;
+import org.akaza.openclinica.log.Stopwatch;
 import org.akaza.openclinica.logic.odmExport.AdminDataCollector;
 import org.akaza.openclinica.logic.odmExport.ClinicalDataCollector;
 import org.akaza.openclinica.logic.odmExport.ClinicalDataUnit;
@@ -54,29 +55,26 @@ import org.slf4j.LoggerFactory;
 
 public class GenerateExtractFileService {
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    private static final Logger logger = LoggerFactory.getLogger(GenerateExtractFileService.class);
     private final DataSource ds;
     private HttpServletRequest request;
-    private DatasetDAO datasetDao;
     public static ResourceBundle resword;
-    private final UserAccountBean userBean;
     private final CoreResources coreResources;
 
-     private static File files[]=null;
+    private static File files[]=null;
     private static List<File> oldFiles = new LinkedList<File>();
     private final RuleSetRuleDao ruleSetRuleDao;
 
-    public GenerateExtractFileService(DataSource ds, HttpServletRequest request, UserAccountBean userBean,CoreResources coreResources,RuleSetRuleDao ruleSetRuleDao) {
+    public GenerateExtractFileService(DataSource ds, HttpServletRequest request, CoreResources coreResources,
+            RuleSetRuleDao ruleSetRuleDao) {
         this.ds = ds;
         this.request = request;
-        this.userBean = userBean;
         this.coreResources = coreResources;
         this.ruleSetRuleDao = ruleSetRuleDao;
     }
 
-    public GenerateExtractFileService(DataSource ds, UserAccountBean userBean, CoreResources coreResources,RuleSetRuleDao ruleSetRuleDao) {
+    public GenerateExtractFileService(DataSource ds, CoreResources coreResources,RuleSetRuleDao ruleSetRuleDao) {
         this.ds = ds;
-        this.userBean = userBean;
         this.coreResources = coreResources;
         this.ruleSetRuleDao = ruleSetRuleDao;
     }
@@ -97,7 +95,7 @@ public class GenerateExtractFileService {
      * createTabFile, added by tbh, 01/2009
      */
     public HashMap<String, Integer> createTabFile(ExtractBean eb, long sysTimeBegin, String generalFileDir, DatasetBean datasetBean, int activeStudyId,
-            int parentStudyId, String generalFileDirCopy) {
+            int parentStudyId, String generalFileDirCopy, UserAccountBean userBean) {
 
         TabReportBean answer = new TabReportBean();
 
@@ -110,9 +108,9 @@ public class GenerateExtractFileService {
         long sysTimeEnd = System.currentTimeMillis() - sysTimeBegin;
         String TXTFileName = datasetBean.getName() + "_tab.xls";
 
-        int fId = this.createFile(TXTFileName, generalFileDir, answer.toString(), datasetBean, sysTimeEnd, ExportFormatBean.TXTFILE, true);
+        int fId = this.createFile(TXTFileName, generalFileDir, answer.toString(), datasetBean, sysTimeEnd, ExportFormatBean.TXTFILE, true, userBean);
         if (!"".equals(generalFileDirCopy)) {
-            int fId2 = this.createFile(TXTFileName, generalFileDirCopy, answer.toString(), datasetBean, sysTimeEnd, ExportFormatBean.TXTFILE, false);
+            int fId2 = this.createFile(TXTFileName, generalFileDirCopy, answer.toString(), datasetBean, sysTimeEnd, ExportFormatBean.TXTFILE, false, userBean);
         }
         logger.info("created txt file");
         // return TXTFileName;
@@ -136,10 +134,10 @@ public class GenerateExtractFileService {
      */
     public HashMap<String, Integer> createODMFile(String odmVersion, long sysTimeBegin, String generalFileDir, DatasetBean datasetBean,
             StudyBean currentStudy, String generalFileDirCopy,ExtractBean eb,
-            Integer currentStudyId, Integer parentStudyId, String studySubjectNumber) throws JobInterruptedException {
+            Integer currentStudyId, Integer parentStudyId, String studySubjectNumber, UserAccountBean userBean) throws JobInterruptedException {
         // default zipped - true
         return createODMFile(odmVersion, sysTimeBegin, generalFileDir, datasetBean,
-                currentStudy, generalFileDirCopy, eb, currentStudyId, parentStudyId, studySubjectNumber, true, true, true, null);
+                currentStudy, generalFileDirCopy, eb, currentStudyId, parentStudyId, studySubjectNumber, true, true, true, null, userBean);
     }
     /**
      * createODMfile, added by tbh, 01/2009
@@ -150,26 +148,29 @@ public class GenerateExtractFileService {
     @Deprecated
     public HashMap<String, Integer> createODMFile(String odmVersion, long sysTimeBegin, String generalFileDir, DatasetBean datasetBean,
             StudyBean currentStudy, String generalFileDirCopy,ExtractBean eb,
-            Integer currentStudyId, Integer parentStudyId, String studySubjectNumber, boolean zipped, boolean saveToDB, boolean deleteOld, String odmType)
+            Integer currentStudyId, Integer parentStudyId, String studySubjectNumber, boolean zipped, boolean saveToDB, boolean deleteOld, String odmType, UserAccountBean userBean)
         throws JobInterruptedException {
 
         return new OdmFileCreation().createODMFile(odmVersion, sysTimeBegin, generalFileDir, datasetBean,
                 currentStudy, generalFileDirCopy, eb,
-                currentStudyId, parentStudyId, studySubjectNumber, zipped, saveToDB, deleteOld, odmType);
+                currentStudyId, parentStudyId, studySubjectNumber, zipped, saveToDB, deleteOld, odmType, userBean);
     }
 
     /**
      * An operation that creates an ODM file.
-     * 
+     *
      * This operation can be interrupted.
-     * 
+     *
      * @author Leonel Gayard leonel.gayard@openclinica.com
      */
     public class OdmFileCreation {
-        public HashMap<String,Integer> createODMFile(String odmVersion, long sysTimeBegin, String generalFileDir, DatasetBean datasetBean,
-                StudyBean currentStudy, String generalFileDirCopy,ExtractBean eb,
-                Integer currentStudyId, Integer parentStudyId, String studySubjectNumber, boolean zipped, boolean saveToDB, boolean deleteOld, String odmType)
+        public HashMap<String,Integer> createODMFile(String odmVersion, long sysTimeBegin, String generalFileDir,
+                DatasetBean datasetBean, StudyBean currentStudy, String generalFileDirCopy, ExtractBean eb,
+                Integer currentStudyId, Integer parentStudyId, String studySubjectNumber, boolean zipped,
+                boolean saveToDB, boolean deleteOld, String odmType, UserAccountBean userBean)
             throws JobInterruptedException {
+
+            Stopwatch sw = Stopwatch.createAndStart("OdmFileCreation.createODMFile");
 
             Integer ssNumber = getStudySubjectNumber(studySubjectNumber);
             MetaDataCollector mdc = new MetaDataCollector(ds, datasetBean, currentStudy,ruleSetRuleDao);
@@ -233,6 +234,7 @@ public class GenerateExtractFileService {
 
             //////////////////////////////////////////
             ////////// MetaData Extraction //////////
+            Stopwatch sw1 = Stopwatch.createAndStart("createODM - MetaData");
             mdc.collectFileData();
             MetaDataReportBean metaReport = new MetaDataReportBean(mdc.getOdmStudyMap(),coreResources);
             metaReport.setODMVersion(odmVersion);
@@ -245,15 +247,17 @@ public class GenerateExtractFileService {
             long sysTimeEnd = System.currentTimeMillis() - sysTimeBegin;
             String ODMXMLFileName = mdc.getODMBean().getFileOID() + ".xml";
             int fId =
-                createFileK(ODMXMLFileName, generalFileDir, metaReport.getXmlOutput().toString(), datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE, false, zipped, deleteOld);
+                createFileK(ODMXMLFileName, generalFileDir, metaReport.getXmlOutput().toString(), datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE, false, zipped, deleteOld, userBean);
             if (!"".equals(generalFileDirCopy)) {
                 int fId2 =
                     createFileK(ODMXMLFileName, generalFileDirCopy, metaReport.getXmlOutput().toString(), datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE,
-                            false, zipped, deleteOld);
+                            false, zipped, deleteOld, userBean);
             }
+            sw1.stop();
             //////////////////////////////////////////
             ////////// AdminData Extraction //////////
 
+            Stopwatch sw2 = Stopwatch.createAndStart("createODM - AdminData");
             adc.collectFileData();
             AdminDataReportBean adminReport = new AdminDataReportBean(adc.getOdmAdminDataMap());
             adminReport.setODMVersion(odmVersion);
@@ -264,16 +268,18 @@ public class GenerateExtractFileService {
 
             sysTimeEnd = System.currentTimeMillis() - sysTimeBegin;
             fId =
-                createFileK(ODMXMLFileName, generalFileDir, adminReport.getXmlOutput().toString(), datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE, false, zipped, deleteOld);
+                createFileK(ODMXMLFileName, generalFileDir, adminReport.getXmlOutput().toString(), datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE, false, zipped, deleteOld, userBean);
             if (!"".equals(generalFileDirCopy)) {
                 int fId2 =
                     createFileK(ODMXMLFileName, generalFileDirCopy, adminReport.getXmlOutput().toString(), datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE,
-                            false, zipped, deleteOld);
+                            false, zipped, deleteOld, userBean);
             }
+            sw2.stop();
 
             //////////////////////////////////////////
             ////////// ClinicalData Extraction ///////
 
+            Stopwatch sw3 = Stopwatch.createAndStart("createODM - ClinicalData");
             DatasetDAO dsdao = new DatasetDAO(ds);
             String sql = eb.getDataset().getSQLStatement();
             String st_sed_in = dsdao.parseSQLDataset(sql, true, true);
@@ -287,6 +293,7 @@ public class GenerateExtractFileService {
                 if (interrupted) {
                 	throw new JobInterruptedException("Job interrupted during ODM file creation.");
                 }
+                Stopwatch sw4 = Stopwatch.createAndStart("SelectStudySubjects");
 
                 OdmStudyBase u = it.next();
                 ArrayList newRows =
@@ -300,6 +307,7 @@ public class GenerateExtractFileService {
                     if (interrupted) {
                     	throw new JobInterruptedException("Job interrupted during ODM file creation.");
                     }
+                    Stopwatch sw5 = Stopwatch.createAndStart("SelectStudySubjects - inner loop");
 
                     int toIndex = fromIndex + ssNumber < newRows.size() ? fromIndex + ssNumber : newRows.size() - 1;
                     List x = newRows.subList(fromIndex, toIndex + 1);
@@ -334,19 +342,22 @@ public class GenerateExtractFileService {
                         report.createChunkedOdmXml(Boolean.TRUE, false, false);
                     }
                     fId = createFileK(ODMXMLFileName, generalFileDir, report.getXmlOutput().toString(), datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE,
-                                        false, zipped, deleteOld);
+                                        false, zipped, deleteOld, userBean);
                     if (!"".equals(generalFileDirCopy)) {
                         int fId2 = createFileK(ODMXMLFileName, generalFileDirCopy, report.getXmlOutput().toString(), datasetBean, sysTimeEnd,
-                                    ExportFormatBean.XMLFILE, false, zipped, deleteOld);
+                                    ExportFormatBean.XMLFILE, false, zipped, deleteOld, userBean);
                     }
+                    sw5.stop();
                 }
+                sw4.stop();
             }
 
             sysTimeEnd = System.currentTimeMillis() - sysTimeBegin;
-            fId = createFileK(ODMXMLFileName, generalFileDir, "</ODM>", datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE, saveToDB, zipped, deleteOld);
+            fId = createFileK(ODMXMLFileName, generalFileDir, "</ODM>", datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE, saveToDB, zipped, deleteOld, userBean);
             if (!"".equals(generalFileDirCopy)) {
-                int fId2 = createFileK(ODMXMLFileName, generalFileDirCopy, "</ODM>", datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE, false, zipped, deleteOld);
+                int fId2 = createFileK(ODMXMLFileName, generalFileDirCopy, "</ODM>", datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE, false, zipped, deleteOld, userBean);
             }
+            sw3.stop();
 
 
             //////////////////////////////////////////
@@ -384,6 +395,8 @@ public class GenerateExtractFileService {
 
             answerMap.put(ODMXMLFileName, new Integer(fId));
         //    if(deleteOld && files!=null &&oldFiles!=null) setOldFiles(oldFiles);
+
+            sw.stop();
             return answerMap;
         }
 
@@ -411,7 +424,7 @@ public class GenerateExtractFileService {
      * @return
      */
     public HashMap<String, Integer> createSPSSFile(DatasetBean db, ExtractBean eb2, StudyBean currentStudy, StudyBean parentStudy, long sysTimeBegin,
-            String generalFileDir, SPSSReportBean answer, String generalFileDirCopy) {
+            String generalFileDir, SPSSReportBean answer, String generalFileDirCopy, UserAccountBean userBean) {
         setUpResourceBundles();
 
         String SPSSFileName = db.getName() + "_data_spss.dat";
@@ -488,9 +501,9 @@ public class GenerateExtractFileService {
 
         // create new createFile method that accepts array lists to
         // put into zip files
-        int fId = this.createFile(ZIPFileName, titles, generalFileDir, generatedReports, db, sysTimeEnd, ExportFormatBean.TXTFILE, true);
+        int fId = this.createFile(ZIPFileName, titles, generalFileDir, generatedReports, db, sysTimeEnd, ExportFormatBean.TXTFILE, true, userBean);
         if (!"".equals(generalFileDirCopy)) {
-            int fId2 = this.createFile(ZIPFileName, titles, generalFileDirCopy, generatedReports, db, sysTimeEnd, ExportFormatBean.TXTFILE, false);
+            int fId2 = this.createFile(ZIPFileName, titles, generalFileDirCopy, generatedReports, db, sysTimeEnd, ExportFormatBean.TXTFILE, false, userBean);
         }
         // return DDLFileName;
         HashMap answerMap = new HashMap<String, Integer>();
@@ -499,7 +512,7 @@ public class GenerateExtractFileService {
     }
 
     public int createFile(String zipName, ArrayList names, String dir, ArrayList contents, DatasetBean datasetBean, long time,
-            ExportFormatBean efb, boolean saveToDB) {
+            ExportFormatBean efb, boolean saveToDB, UserAccountBean userBean) {
         ArchivedDatasetFileBean fbFinal = new ArchivedDatasetFileBean();
         // >> tbh #4915
         zipName = zipName.replaceAll(" ", "_");
@@ -614,7 +627,7 @@ public class GenerateExtractFileService {
 
     public int createFileK(String name, String dir, String content,
             DatasetBean datasetBean, long time, ExportFormatBean efb,
-            boolean saveToDB, boolean zipped, boolean deleteOld) {
+            boolean saveToDB, boolean zipped, boolean deleteOld, UserAccountBean userBean) {
         ArchivedDatasetFileBean fbFinal = new ArchivedDatasetFileBean();
         // >> tbh 04/2010 #4915 replace all names' spaces with underscores
         name = name.replaceAll(" ", "_");
@@ -726,7 +739,8 @@ public class GenerateExtractFileService {
 
     }
 
-    public int createFile(String name, String dir, String content, DatasetBean datasetBean, long time, ExportFormatBean efb, boolean saveToDB) {
+    public int createFile(String name, String dir, String content, DatasetBean datasetBean, long time,
+            ExportFormatBean efb, boolean saveToDB, UserAccountBean userBean) {
         ArchivedDatasetFileBean fbFinal = new ArchivedDatasetFileBean();
         // >> tbh 04/2010 #4915 replace all names' spaces with underscores
         name = name.replaceAll(" ", "_");

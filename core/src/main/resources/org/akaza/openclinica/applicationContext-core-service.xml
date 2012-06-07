@@ -74,6 +74,14 @@
     <bean id="crfVersionDao" class="org.akaza.openclinica.dao.submit.CRFVersionDAO">
         <constructor-arg ref="dataSource"/>
     </bean>
+    
+    <bean id="auditEventDao" class="org.akaza.openclinica.dao.admin.AuditEventDAO">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+    
+    <bean id="datasetDao" class="org.akaza.openclinica.dao.extract.DatasetDAO">
+        <constructor-arg ref="dataSource"/>
+    </bean>
 
     <bean id="studySubjectService" class="org.akaza.openclinica.service.managestudy.StudySubjectServiceImpl">
         <property name="studyDao" ref="studyDao"/>

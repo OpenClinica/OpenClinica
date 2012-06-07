@@ -1,11 +1,17 @@
 package org.akaza.openclinica.controller;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
@@ -14,9 +20,9 @@ import org.akaza.openclinica.service.extract.ExtractUtils;
 import org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.apache.commons.dbcp.BasicDataSource;
+import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
-import org.quartz.impl.StdScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,13 +33,6 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 @Controller("extractController")
 @RequestMapping("/extract")
@@ -48,13 +47,12 @@ public class ExtractController {
 
     private DatasetDAO datasetDao;
 
-    private StdScheduler scheduler;
-
-    private final  String SCHEDULER = "schedulerFactoryBean";
+    @Autowired
+    private Scheduler scheduler;
 
     public static String TRIGGER_GROUP_NAME = "XsltTriggers";
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-    
+
     public ExtractController() {
 
     }
@@ -116,9 +114,6 @@ public class ExtractController {
     	}
     	epBean.setDoNotDelFiles(temp);
     	epBean.setExportFileName(temp);
-    	   scheduler = getScheduler(request);
-      // while(cnt < fileSize)
-       {
 
         XsltTriggerService xsltService = new XsltTriggerService();
 
@@ -181,7 +176,6 @@ public class ExtractController {
             se.printStackTrace();
         }
 
-       }
         request.setAttribute("datasetId", datasetId);
         // set the job name here in the user's session, so that we can ping the scheduler to pull it out later
         if(jobDetailBean!=null)
@@ -286,11 +280,6 @@ public class ExtractController {
 
     public void setSidebarInit(SidebarInit sidebarInit) {
         this.sidebarInit = sidebarInit;
-    }
-
-    private StdScheduler getScheduler(HttpServletRequest request) {
-        scheduler = this.scheduler != null ? scheduler : (StdScheduler) SpringServletAccess.getApplicationContext(request.getSession().getServletContext()).getBean(SCHEDULER);
-        return scheduler;
     }
 
     private String resolveExportFilePath(String  epBeanFileName) {

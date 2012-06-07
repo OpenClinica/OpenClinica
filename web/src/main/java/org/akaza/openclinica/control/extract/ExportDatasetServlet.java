@@ -7,6 +7,19 @@
  */
 package org.akaza.openclinica.control.extract;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.extract.CommaReportBean;
@@ -37,38 +50,25 @@ import org.quartz.SimpleTrigger;
 import org.quartz.impl.StdScheduler;
 import org.springframework.scheduling.quartz.JobDetailBean;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-
 /**
  * Take a dataset and show it in different formats,<BR/> Detect whether or not
  * files exist in the system or database,<BR/> Give the user the option of
  * showing a stored dataset, or refresh the current one.
  * </P>
- * 
+ *
  * TODO eventually allow for a thread to be split off, so that exporting can run
  * seperately from the servlet and be retrieved at a later time.
- * 
+ *
  * @author thickerson
- * 
- * 
+ *
+ *
  */
 public class ExportDatasetServlet extends SecureController {
 
     public static String getLink(int dsId) {
         return "ExportDataset?datasetId=" + dsId;
     }
-    
+
     private StdScheduler scheduler;
 
     private static String SCHEDULER = "schedulerFactoryBean";
@@ -92,7 +92,8 @@ public class ExportDatasetServlet extends SecureController {
         ArchivedDatasetFileDAO asdfdao = new ArchivedDatasetFileDAO(sm.getDataSource());
         FormProcessor fp = new FormProcessor(request);
 
-        GenerateExtractFileService generateFileService = new GenerateExtractFileService(sm.getDataSource(), request, sm.getUserBean(),(CoreResources) SpringServletAccess.getApplicationContext(context).getBean("coreResources"),
+        GenerateExtractFileService generateFileService = new GenerateExtractFileService(sm.getDataSource(),
+                (CoreResources) SpringServletAccess.getApplicationContext(context).getBean("coreResources"),
                 (RuleSetRuleDao) SpringServletAccess.getApplicationContext(context).getBean("ruleSetRuleDao"));
         String action = fp.getString("action");
         int datasetId = fp.getInt("datasetId");
@@ -196,7 +197,7 @@ public class ExportDatasetServlet extends SecureController {
                 long sysTimeEnd = System.currentTimeMillis() - sysTimeBegin;
                 String SASFileName = db.getName() + "_sas.sas";
                 // logger.info("found data set: "+generateReport);
-                generateFileService.createFile(SASFileName, generalFileDir, generateReport, db, sysTimeEnd, ExportFormatBean.TXTFILE, true);
+                generateFileService.createFile(SASFileName, generalFileDir, generateReport, db, sysTimeEnd, ExportFormatBean.TXTFILE, true, ub);
                 logger.info("created sas file");
                 request.setAttribute("generate", generalFileDir + SASFileName);
                 finalTarget.setFileName(generalFileDir + SASFileName);
@@ -207,8 +208,8 @@ public class ExportDatasetServlet extends SecureController {
                 String ODMXMLFileName = "";
                 // DRY
                 // HashMap answerMap = generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, db, this.currentStudy, "");
-                HashMap answerMap = generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, db, this.currentStudy, "", eb, currentStudy.getId(), currentStudy.getParentStudyId(), "99", true, true, true, null);
-                
+                HashMap answerMap = generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, db, this.currentStudy, "", eb, currentStudy.getId(), currentStudy.getParentStudyId(), "99", true, true, true, null, ub);
+
                 for (Iterator it = answerMap.entrySet().iterator(); it.hasNext();) {
                     java.util.Map.Entry entry = (java.util.Map.Entry) it.next();
                     Object key = entry.getKey();
@@ -221,21 +222,21 @@ public class ExportDatasetServlet extends SecureController {
                 request.setAttribute("generate", generalFileDir + ODMXMLFileName);
                 logger.debug("+++ set the following: " + generalFileDir + ODMXMLFileName);
                 // >> tbh #xslt working group
-                // put an extra flag here, where we generate the XML, and then find the XSL, run a job and 
+                // put an extra flag here, where we generate the XML, and then find the XSL, run a job and
                 // send a link with the SQL file? put the generated SQL file with the dataset?
                 if (fp.getString("xalan") != null) {
                     XalanTriggerService xts = new XalanTriggerService();
-                    
+
                     String propertiesPath = SQLInitServlet.getField("filePath");
-                    
+
                     // the trick there, we need to open up the zipped file and get at the XML
                     openZipFile(generalFileDir + ODMXMLFileName + ".zip");
                     // need to find out how to copy this xml file from /bin to the generalFileDir
-                    SimpleTrigger simpleTrigger = xts.generateXalanTrigger(propertiesPath + File.separator + "ODMReportStylesheet.xsl", 
-                            ODMXMLFileName, 
+                    SimpleTrigger simpleTrigger = xts.generateXalanTrigger(propertiesPath + File.separator + "ODMReportStylesheet.xsl",
+                            ODMXMLFileName,
                             generalFileDir + "output.sql", db.getId());
                     scheduler = getScheduler();
-                    
+
                     JobDetailBean jobDetailBean = new JobDetailBean();
                     jobDetailBean.setGroup(xts.TRIGGER_GROUP_NAME);
                     jobDetailBean.setName(simpleTrigger.getName());
@@ -243,7 +244,7 @@ public class ExportDatasetServlet extends SecureController {
                     jobDetailBean.setJobDataMap(simpleTrigger.getJobDataMap());
                     jobDetailBean.setDurability(true); // need durability?
                     jobDetailBean.setVolatility(false);
-                    
+
                     try {
                         Date dateStart = scheduler.scheduleJob(jobDetailBean, simpleTrigger);
                         logger.info("== found job date: " + dateStart.toString());
@@ -259,7 +260,8 @@ public class ExportDatasetServlet extends SecureController {
                 // parentStudy);
                 // eb = dsdao.getDatasetData(eb, currentstudyid, parentstudy);
                 String TXTFileName = "";
-                HashMap answerMap = generateFileService.createTabFile(eb, sysTimeBegin, generalFileDir, db, currentstudyid, parentstudy, "");
+                HashMap answerMap = generateFileService.createTabFile(eb, sysTimeBegin, generalFileDir, db,
+                        currentstudyid, parentstudy, "", ub);
                 // the above gets us the best of both worlds - the file name,
                 // together with the file id which we can then
                 // push out to the browser. Shame that it is a long hack,
@@ -304,7 +306,7 @@ public class ExportDatasetServlet extends SecureController {
                 // TODO in the spirit of DRY, if this works we need to remove
                 // lines 443-776 in this servlet, tbh 01/2009
                 String DDLFileName = "";
-                HashMap answerMap = generateFileService.createSPSSFile(db, eb, currentStudy, parentStudy, sysTimeBegin, generalFileDir, answer, "");
+                HashMap answerMap = generateFileService.createSPSSFile(db, eb, currentStudy, parentStudy, sysTimeBegin, generalFileDir, answer, "", ub);
                 // String DDLFileName = createSPSSFile(db, eb, currentstudyid,
                 // parentstudy);
                 /*
@@ -312,7 +314,7 @@ public class ExportDatasetServlet extends SecureController {
                  * this.createFile(SPSSFileName,generalFileDir, dataReport, db,
                  * sysTimeEnd, ExportFormatBean.TXTFILE); logger.info("*** just
                  * created test spss data file: " + SPSSFileName);
-                 * 
+                 *
                  * String ddlReport = (String)generatedReports.get(1);
                  * this.createFile(DDLFileName,generalFileDir,ddlReport,db,
                  * sysTimeEnd, ExportFormatBean.TXTFILE); logger.info("*** just
@@ -342,7 +344,7 @@ public class ExportDatasetServlet extends SecureController {
                 long sysTimeEnd = System.currentTimeMillis() - sysTimeBegin;
                 // logger.info("found data set: "+generateReport);
                 String CSVFileName = db.getName() + "_comma.txt";
-                fId = generateFileService.createFile(CSVFileName, generalFileDir, answer.toString(), db, sysTimeEnd, ExportFormatBean.CSVFILE, true);
+                fId = generateFileService.createFile(CSVFileName, generalFileDir, answer.toString(), db, sysTimeEnd, ExportFormatBean.CSVFILE, true, ub);
                 fileName = CSVFileName;
                 logger.info("just created csv file");
                 request.setAttribute("generate", generalFileDir + CSVFileName);
@@ -424,7 +426,7 @@ public class ExportDatasetServlet extends SecureController {
                 request.setAttribute("dataset", db);
                 request.setAttribute("file", asdfBean);
                 table.setRows(filterRows);
-                
+
                 table.computeDisplay();
 
                 request.setAttribute("table", table);
@@ -474,7 +476,7 @@ public class ExportDatasetServlet extends SecureController {
         adfb.setDateCreated(new java.util.Date(datasetFile.lastModified()));
         return adfb;
     }
-    
+
     private void openZipFile(String fileName) {
         try {
             ZipFile zipFile = new ZipFile(fileName);
@@ -506,7 +508,7 @@ public class ExportDatasetServlet extends SecureController {
             return;
           }
     }
-    
+
     public void loadList(DatasetBean db, ArchivedDatasetFileDAO asdfdao, int datasetId, FormProcessor fp, ExtractBean eb) {
         logger.info("action is blank");
         request.setAttribute("dataset", db);
@@ -514,7 +516,7 @@ public class ExportDatasetServlet extends SecureController {
         request.setAttribute("extractProperties", CoreResources.getExtractProperties());
         // find out if there are any files here:
         File currentDir = new File(DATASET_DIR + db.getId() + File.separator);
-       
+
         //JN: Commenting out this, as its creating directories without any reason. TODO: Check why was this added.
        // if (!currentDir.isDirectory()) {
       //      currentDir.mkdirs();
@@ -586,12 +588,12 @@ public class ExportDatasetServlet extends SecureController {
         logger.warn("just set file list to request, sending to page");
 
     }
-    
+
     private StdScheduler getScheduler() {
         scheduler = this.scheduler != null ? scheduler : (StdScheduler) SpringServletAccess.getApplicationContext(context).getBean(SCHEDULER);
         return scheduler;
     }
-    
+
     private static final void copyInputStream(InputStream in, OutputStream out)
     throws IOException
     {

@@ -9,8 +9,6 @@ import org.quartz.UnableToInterruptJobException;
 public class XsltStatefulJob extends XsltTransformJob
     implements StatefulJob, InterruptableJob {
 
-    private Thread thread;
-
     public XsltStatefulJob() {
         super();
     }
