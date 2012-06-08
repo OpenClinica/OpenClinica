@@ -52,6 +52,7 @@ import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.log.Stopwatch;
 import org.akaza.openclinica.service.extract.GenerateExtractFileService;
+import org.akaza.openclinica.service.extract.OdmFileCreation;
 import org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -94,7 +95,7 @@ public class XsltTransformJob extends QuartzJobBean {
 
     private OpenClinicaMailSender mailSender;
     private GenerateExtractFileService generateFileService;
-    private GenerateExtractFileService.OdmFileCreation odmFileCreation;
+    private OdmFileCreation odmFileCreation;
     private StudyDAO studyDao;
     private UserAccountDAO userAccountDao;
     private ArchivedDatasetFileDAO archivedDatasetFileDao;
@@ -584,8 +585,10 @@ public class XsltTransformJob extends QuartzJobBean {
             datasetDao = ctx.getBean(DatasetDAO.class);
             userAccountDao = ctx.getBean(UserAccountDAO.class);
             studyDao = ctx.getBean(StudyDAO.class);
+            archivedDatasetFileDao = ctx.getBean(ArchivedDatasetFileDAO.class);
             generateFileService = ctx.getBean(GenerateExtractFileService.class);
-            odmFileCreation = generateFileService.new OdmFileCreation();
+            odmFileCreation = ctx.getBean(OdmFileCreation.class);
+
 
         } catch (SchedulerException e) {
             throw new IllegalStateException("Could not load dependencies from scheduler context", e);

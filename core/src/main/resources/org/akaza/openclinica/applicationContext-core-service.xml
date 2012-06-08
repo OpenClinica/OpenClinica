@@ -96,6 +96,12 @@
         <constructor-arg ref="coreResources"/>
         <constructor-arg ref="ruleSetRuleDao"/>
     </bean>
+    
+    <bean id="odmFileCreation" class="org.akaza.openclinica.service.extract.OdmFileCreation">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="coreResources" ref="coreResources"/>
+        <property name="ruleSetRuleDao" ref="ruleSetRuleDao"/>
+    </bean>
 
     <bean id="studySubjectService" class="org.akaza.openclinica.service.managestudy.StudySubjectServiceImpl">
         <property name="studyDao" ref="studyDao"/>
