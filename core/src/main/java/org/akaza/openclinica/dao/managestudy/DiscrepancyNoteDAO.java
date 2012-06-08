@@ -35,7 +35,6 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
-import org.akaza.openclinica.log.Stopwatch;
 
 /**
  * @author jxu
@@ -122,6 +121,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
      * <p>
      * getEntityFromHashMap, the method that gets the object from the database query.
      */
+    @Override
     public Object getEntityFromHashMap(HashMap hm) {
         DiscrepancyNoteBean eb = new DiscrepancyNoteBean();
         Date dateCreated = (Date) hm.get("date_created");
@@ -159,6 +159,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         return eb;
     }
 
+    @Override
     public Collection findAll() {
         return this.executeFindAllQuery("findAll");
     }
@@ -463,7 +464,6 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
     */
 
     public ArrayList<DiscrepancyNoteBean> getViewNotesWithFilterAndSort(StudyBean currentStudy, ListNotesFilter filter, ListNotesSort sort) {
-        Stopwatch sw = Stopwatch.createAndStart("getViewNotesWithFilterAndSort");
         ArrayList<DiscrepancyNoteBean> discNotes = new ArrayList<DiscrepancyNoteBean>();
         setTypesExpected();
         this.setTypeExpected(12, TypeNames.STRING);
@@ -517,7 +517,6 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
             discBean = findSingleMapping(discBean);
             discNotes.add(discBean);
         }
-        sw.stop();
         return discNotes;
     }
 
@@ -1357,12 +1356,14 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         return al;
     }
 
+    @Override
     public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
         ArrayList al = new ArrayList();
 
         return al;
     }
 
+    @Override
     public EntityBean findByPK(int ID) {
         DiscrepancyNoteBean eb = new DiscrepancyNoteBean();
         this.setTypesExpected();
@@ -1388,6 +1389,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
     /**
      * Creates a new discrepancy note
      */
+    @Override
     public EntityBean create(EntityBean eb) {
         DiscrepancyNoteBean sb = (DiscrepancyNoteBean) eb;
         HashMap variables = new HashMap();
@@ -1454,6 +1456,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
     /**
      * Updates a Study event
      */
+    @Override
     public EntityBean update(EntityBean eb) {
         // update discrepancy_note set
         // description =?,
@@ -1528,12 +1531,14 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
     }
 
+    @Override
     public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
         ArrayList al = new ArrayList();
 
         return al;
     }
 
+    @Override
     public Collection findAllByPermission(Object objCurrentUser, int intActionType) {
         ArrayList al = new ArrayList();
 

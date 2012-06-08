@@ -184,9 +184,10 @@ public class XsltTransformJob extends QuartzJobBean {
 
             HashMap<String, Integer> answerMap = null;
             try {
-	            answerMap =
-	                odmFileCreation.createODMFile(epBean.getFormat(), sysTimeBegin, generalFileDir, datasetBean, currentStudy, "", eb, currentStudy.getId(),
-	                        currentStudy.getParentStudyId(), "99", (Boolean) dataMap.get(ZIPPED), false, (Boolean) dataMap.get(DELETE_OLD), epBean.getOdmType(), userBean);
+	            answerMap = odmFileCreation.createODMFile(epBean.getFormat(), sysTimeBegin, generalFileDir, datasetBean,
+	                    currentStudy, "", eb, currentStudy.getId(), currentStudy.getParentStudyId(), "99",
+	                    (Boolean) dataMap.get(ZIPPED), false, (Boolean) dataMap.get(DELETE_OLD), epBean.getOdmType(),
+	                    userBean);
             } catch (JobInterruptedException ex) {
             	logger.info(ex.getMessage());
             	return;
