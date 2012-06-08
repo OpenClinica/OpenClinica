@@ -60,7 +60,6 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.UnableToInterruptJobException;
 import org.quartz.impl.StdScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,6 +103,8 @@ public class XsltTransformJob extends QuartzJobBean {
 
     private final TransformerFactory transformerFactory = TransformerFactory.newInstance();
 
+    protected final JobTerminationMonitor jobTerminationFlag = new JobTerminationMonitor();
+
     // POST PROCESSING VARIABLES
     public static final String POST_PROC_DELETE_OLD = "postProcDeleteOld";
     public static final String POST_PROC_ZIP = "postProcZip";
@@ -113,6 +114,14 @@ public class XsltTransformJob extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
+        try {
+            executeJob(context);
+        } catch (JobInterruptedException e) {
+            logger.info("Job interrupted");
+        }
+    }
+
+    private void executeJob(JobExecutionContext context) throws JobExecutionException {
         initDependencies(context.getScheduler());
         Stopwatch sw = Stopwatch.createAndStart("XsltTransformJob.executeInternal");
         // need to generate a Locale for emailing users with i18n
@@ -203,10 +212,7 @@ public class XsltTransformJob extends QuartzJobBean {
             int fId = 0;
             Iterator<Entry<String, Integer>> it = answerMap.entrySet().iterator();
             while(it.hasNext()) {
-            	if (interrupted) {
-            		logger.info("XsltTransformJob interrupted.");
-            		return;
-            	}
+            	jobTerminationFlag.check();
 
             	Entry<String, Integer> entry = it.next();
                 String key = entry.getKey();
@@ -234,11 +240,7 @@ public class XsltTransformJob extends QuartzJobBean {
             File oldFilesPath = new File(generalFileDir);
             while(fileCntr<numXLS)
             {
-            	if (interrupted) {
-            		logger.info("XsltTransformJob interrupted.");
-            		return;
-            	}
-
+            	jobTerminationFlag.check();
 
                 String xsltPath = dataMap.getString(XSLT_PATH)+ File.separator +epBean.getFileName()[fileCntr];
                 in = new java.io.FileInputStream(xsltPath);
@@ -594,16 +596,6 @@ public class XsltTransformJob extends QuartzJobBean {
             throw new IllegalStateException("Could not load dependencies from scheduler context", e);
         }
 
-    }
-
-    private boolean interrupted = false;
-
-    protected void interrupt() throws UnableToInterruptJobException {
-    	interrupted = true;
-
-    	if (odmFileCreation != null) {
-    		odmFileCreation.interrupt();
-    	}
     }
 
     private void zipAll(String path, String[] files, String zipname) throws IOException {

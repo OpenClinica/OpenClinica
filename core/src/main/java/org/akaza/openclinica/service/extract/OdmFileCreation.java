@@ -37,7 +37,7 @@ import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.job.JobCancelledEvent;
-import org.akaza.openclinica.job.JobInterruptedException;
+import org.akaza.openclinica.job.JobTerminationMonitor;
 import org.akaza.openclinica.log.Stopwatch;
 import org.akaza.openclinica.logic.odmExport.AdminDataCollector;
 import org.akaza.openclinica.logic.odmExport.ClinicalDataCollector;
@@ -63,11 +63,12 @@ public class OdmFileCreation implements ApplicationListener<JobCancelledEvent> {
     private static File files[]=null;
     private static List<File> oldFiles = new LinkedList<File>();
 
+    private final JobTerminationMonitor jobTerminationFlag = new JobTerminationMonitor();
+
     public HashMap<String,Integer> createODMFile(String odmVersion, long sysTimeBegin, String generalFileDir,
             DatasetBean datasetBean, StudyBean currentStudy, String generalFileDirCopy, ExtractBean eb,
             Integer currentStudyId, Integer parentStudyId, String studySubjectNumber, boolean zipped,
-            boolean saveToDB, boolean deleteOld, String odmType, UserAccountBean userBean)
-        throws JobInterruptedException {
+            boolean saveToDB, boolean deleteOld, String odmType, UserAccountBean userBean) {
 
         Stopwatch sw = Stopwatch.createAndStart("OdmFileCreation.createODMFile");
 
@@ -189,9 +190,7 @@ public class OdmFileCreation implements ApplicationListener<JobCancelledEvent> {
 
         Iterator<OdmStudyBase> it = cdc.getStudyBaseMap().values().iterator();
         while (it.hasNext()) {
-            if (interrupted) {
-                throw new JobInterruptedException("Job interrupted during ODM file creation.");
-            }
+            jobTerminationFlag.check();
             Stopwatch sw4 = Stopwatch.createAndStart("SelectStudySubjects");
 
             OdmStudyBase u = it.next();
@@ -203,9 +202,7 @@ public class OdmFileCreation implements ApplicationListener<JobCancelledEvent> {
             int fromIndex = 0;
             boolean firstIteration = true;
             while (fromIndex < newRows.size()) {
-                if (interrupted) {
-                    throw new JobInterruptedException("Job interrupted during ODM file creation.");
-                }
+                jobTerminationFlag.check();
                 Stopwatch sw5 = Stopwatch.createAndStart("SelectStudySubjects - inner loop");
 
                 int toIndex = fromIndex + ssNumber < newRows.size() ? fromIndex + ssNumber : newRows.size() - 1;
@@ -409,16 +406,9 @@ public class OdmFileCreation implements ApplicationListener<JobCancelledEvent> {
         }
     }
 
-
-    private boolean interrupted = false;
-
-    public void interrupt() {
-        interrupted = true;
-    }
-
     @Override
     public void onApplicationEvent(JobCancelledEvent event) {
-        //TODO Implement
+        jobTerminationFlag.terminate();
     }
 
 

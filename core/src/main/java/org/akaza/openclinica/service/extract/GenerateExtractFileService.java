@@ -39,7 +39,6 @@ import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.job.JobCancelledEvent;
-import org.akaza.openclinica.job.JobInterruptedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
@@ -125,7 +124,7 @@ public class GenerateExtractFileService implements ApplicationListener<JobCancel
      */
     public HashMap<String, Integer> createODMFile(String odmVersion, long sysTimeBegin, String generalFileDir, DatasetBean datasetBean,
             StudyBean currentStudy, String generalFileDirCopy,ExtractBean eb,
-            Integer currentStudyId, Integer parentStudyId, String studySubjectNumber, UserAccountBean userBean) throws JobInterruptedException {
+            Integer currentStudyId, Integer parentStudyId, String studySubjectNumber, UserAccountBean userBean) {
         // default zipped - true
         return createODMFile(odmVersion, sysTimeBegin, generalFileDir, datasetBean,
                 currentStudy, generalFileDirCopy, eb, currentStudyId, parentStudyId, studySubjectNumber, true, true, true, null, userBean);
@@ -139,8 +138,7 @@ public class GenerateExtractFileService implements ApplicationListener<JobCancel
     @Deprecated
     public HashMap<String, Integer> createODMFile(String odmVersion, long sysTimeBegin, String generalFileDir, DatasetBean datasetBean,
             StudyBean currentStudy, String generalFileDirCopy,ExtractBean eb,
-            Integer currentStudyId, Integer parentStudyId, String studySubjectNumber, boolean zipped, boolean saveToDB, boolean deleteOld, String odmType, UserAccountBean userBean)
-        throws JobInterruptedException {
+            Integer currentStudyId, Integer parentStudyId, String studySubjectNumber, boolean zipped, boolean saveToDB, boolean deleteOld, String odmType, UserAccountBean userBean){
 
         return new OdmFileCreation().createODMFile(odmVersion, sysTimeBegin, generalFileDir, datasetBean,
                 currentStudy, generalFileDirCopy, eb,
