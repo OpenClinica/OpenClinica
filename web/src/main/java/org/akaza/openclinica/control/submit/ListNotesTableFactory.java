@@ -41,7 +41,6 @@ import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.log.Stopwatch;
 import org.akaza.openclinica.service.DiscrepancyNotesSummary;
 import org.akaza.openclinica.service.managestudy.ViewNotesFilterCriteria;
 import org.akaza.openclinica.service.managestudy.ViewNotesService;
@@ -174,7 +173,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
     @Override
     public void setDataAndLimitVariables(TableFacade tableFacade) {
-        Stopwatch sw = Stopwatch.createAndStart("setDataAndLimitVariables");
         // initialize i18n
         resword = ResourceBundleProvider.getWordsBundle(getLocale());
         resformat = ResourceBundleProvider.getFormatBundle(getLocale());
@@ -238,8 +236,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             setStudyHasDiscNotes(true);
         }
         tableFacade.setItems(theItems);
-        sw.stop();
-
     }
 
     @Override
@@ -347,6 +343,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     }
 
     private class ResolutionStatusCellEditor implements CellEditor {
+        @Override
         @SuppressWarnings("unchecked")
         public Object getValue(Object item, String property, int rowcount) {
             String value = "";
@@ -360,6 +357,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     }
 
     private class DiscrepancyNoteTypeCellEditor implements CellEditor {
+        @Override
         @SuppressWarnings("unchecked")
         public Object getValue(Object item, String property, int rowcount) {
             String value = "";
@@ -373,6 +371,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     }
 
     private class OwnerCellEditor implements CellEditor {
+        @Override
         @SuppressWarnings("unchecked")
         public Object getValue(Object item, String property, int rowcount) {
             String value = "";
@@ -386,6 +385,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     }
 
     private class AssignedUserCellEditor implements CellEditor {
+        @Override
         @SuppressWarnings("unchecked")
         public Object getValue(Object item, String property, int rowcount) {
             String value = "";
@@ -403,6 +403,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
 
 
+        @Override
         @SuppressWarnings("rawtypes")
         public Object getValue(Object item, String property, int rowcount) {
             DiscrepancyNoteBean bean = (DiscrepancyNoteBean) ((Map) item).get("discrepancyNoteBean");
@@ -424,6 +425,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     }
 
     private class ActionsCellEditor implements CellEditor {
+        @Override
         @SuppressWarnings("unchecked")
         public Object getValue(Object item, String property, int rowcount) {
             String value = "";
@@ -492,6 +494,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
     // Ignore the mathing values with filter
     public class AgeDaysFilterMatcher implements FilterMatcher {
+        @Override
         public boolean evaluate(Object itemValue, String filterValue) {
             return true;
         }

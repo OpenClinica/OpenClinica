@@ -1,5 +1,15 @@
 package org.akaza.openclinica.web.job;
 
+import java.io.File;
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.TriggerBean;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.extract.ExtractBean;
@@ -28,16 +38,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.JobDetailBean;
 import org.springframework.scheduling.quartz.QuartzJobBean;
-
-import java.io.File;
-import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.ResourceBundle;
-
-import javax.sql.DataSource;
 
 public class ExampleSpringJob extends QuartzJobBean {
 
@@ -179,7 +179,7 @@ public class ExampleSpringJob extends QuartzJobBean {
                 userBean = (UserAccountBean) userAccountDAO.findByPK(userId);
                 // needs to also be captured by the servlet, tbh
                 // logger.debug("-- gen tab file 00");
-                generateFileService = new GenerateExtractFileService(dataSource, userBean,coreResources,ruleSetRuleDao);
+                generateFileService = new GenerateExtractFileService(dataSource, coreResources, ruleSetRuleDao);
 
                 // logger.debug("-- gen tab file 00");
 
@@ -218,7 +218,7 @@ public class ExampleSpringJob extends QuartzJobBean {
                     logger.debug("-- gen tab file 01");
                     fileName =
                         generateFileService.createTabFile(eb, sysTimeBegin, generalFileDir, datasetBean, activeStudy.getId(), parentStudy.getId(),
-                                generalFileDirCopy);
+                                generalFileDirCopy, userBean);
                     message.append("<p>" + pageMessages.getString("html_email_body_4") + " " + getFileNameStr(fileName)
                         + pageMessages.getString("html_email_body_4_5") + SQLInitServlet.getField("sysURL.base") + "AccessFile?fileId="
                         + getFileIdInt(fileName) + pageMessages.getString("html_email_body_3") + "</p>");
@@ -238,7 +238,7 @@ public class ExampleSpringJob extends QuartzJobBean {
                     String odmVersion = "oc1.2";
                     fileName =
                         generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, datasetBean, activeStudy, generalFileDirCopy, eb,
-                                activeStudy.getId(), parentStudy.getId(),studySubjectNumber, true, true, true, null);
+                                activeStudy.getId(), parentStudy.getId(),studySubjectNumber, true, true, true, null, userBean);
                     logger.debug("-- gen odm file");
                     message.append("<p>" + pageMessages.getString("html_email_body_4") + " " + getFileNameStr(fileName)
                         + pageMessages.getString("html_email_body_4_5") + SQLInitServlet.getField("sysURL.base") + "AccessFile?fileId="
@@ -261,7 +261,7 @@ public class ExampleSpringJob extends QuartzJobBean {
                     String odmVersion = "1.2";
                     fileName =
                         generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, datasetBean, activeStudy, generalFileDirCopy, eb,
-                                activeStudy.getId(), parentStudy.getId(),studySubjectNumber, true, true,true, null);
+                                activeStudy.getId(), parentStudy.getId(),studySubjectNumber, true, true,true, null, userBean);
                     logger.debug("-- gen odm file 1.2 default");
                     message.append("<p>" + pageMessages.getString("html_email_body_4") + " " + getFileNameStr(fileName)
                         + pageMessages.getString("html_email_body_4_5") + SQLInitServlet.getField("sysURL.base") + "AccessFile?fileId="
@@ -281,7 +281,7 @@ public class ExampleSpringJob extends QuartzJobBean {
                     String odmVersion = "1.3";
                     fileName =
                         generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, datasetBean, activeStudy, generalFileDirCopy, eb,
-                                activeStudy.getId(), parentStudy.getId(),studySubjectNumber, true, true, true, null);
+                                activeStudy.getId(), parentStudy.getId(),studySubjectNumber, true, true, true, null, userBean);
                     logger.debug("-- gen odm file 1.3");
                     message.append("<p>" + pageMessages.getString("html_email_body_4") + " " + getFileNameStr(fileName)
                         + pageMessages.getString("html_email_body_4_5") + SQLInitServlet.getField("sysURL.base") + "AccessFile?fileId="
@@ -303,7 +303,7 @@ public class ExampleSpringJob extends QuartzJobBean {
                     String odmVersion = "oc1.3";
                     fileName =
                         generateFileService.createODMFile(odmVersion, sysTimeBegin, generalFileDir, datasetBean, activeStudy, generalFileDirCopy, eb,
-                                activeStudy.getId(), parentStudy.getId(),studySubjectNumber, true, true, true, null);
+                                activeStudy.getId(), parentStudy.getId(),studySubjectNumber, true, true, true, null, userBean);
                     logger.debug("-- gen odm file 1.3 oc");
                     message.append("<p>" + pageMessages.getString("html_email_body_4") + " " + getFileNameStr(fileName)
                         + pageMessages.getString("html_email_body_4_5") + SQLInitServlet.getField("sysURL.base") + "AccessFile?fileId="
@@ -324,7 +324,7 @@ public class ExampleSpringJob extends QuartzJobBean {
                 if ("1".equals(spss)) {
                     SPSSReportBean answer = new SPSSReportBean();
                     fileName =
-                        generateFileService.createSPSSFile(datasetBean, eb, activeStudy, parentStudy, sysTimeBegin, generalFileDir, answer, generalFileDirCopy);
+                        generateFileService.createSPSSFile(datasetBean, eb, activeStudy, parentStudy, sysTimeBegin, generalFileDir, answer, generalFileDirCopy, userBean);
                     logger.debug("-- gen spss file");
                     message.append("<p>" + pageMessages.getString("html_email_body_4") + " " + getFileNameStr(fileName)
                         + pageMessages.getString("html_email_body_4_5") + SQLInitServlet.getField("sysURL.base") + "AccessFile?fileId="

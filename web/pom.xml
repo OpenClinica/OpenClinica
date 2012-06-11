@@ -263,6 +263,14 @@
 			<artifactId>castor</artifactId>
 			<version>1.2</version>
 		</dependency>
+		<dependency>
+		    <groupId>org.quartz-scheduler</groupId>
+		    <artifactId>quartz</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>org.quartz-scheduler</groupId>
+		    <artifactId>quartz-oracle</artifactId>
+		</dependency>
 	</dependencies>
 
     <build>

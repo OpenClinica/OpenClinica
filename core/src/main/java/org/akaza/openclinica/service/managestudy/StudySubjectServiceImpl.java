@@ -39,7 +39,6 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.log.Stopwatch;
 
 /**
  * @author Doug Rodrigues (douglas.rodrigues@openclinica.com)
@@ -66,11 +65,11 @@ public class StudySubjectServiceImpl implements StudySubjectService {
     @SuppressWarnings("rawtypes")
     private CRFVersionDAO crfVersionDao;
 
+    @Override
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public List<DisplayStudyEventBean> getDisplayStudyEventsForStudySubject(StudySubjectBean studySubject,
             UserAccountBean userAccount, StudyUserRoleBean currentRole) {
 
-        Stopwatch stopwatch = Stopwatch.createAndStart("getDisplayStudyEventsForStudySubject");
 
         ArrayList events = studyEventDao.findAllByStudySubject(studySubject);
 
@@ -106,7 +105,6 @@ public class StudySubjectServiceImpl implements StudySubjectService {
 
         ArrayList<DisplayStudyEventBean> displayEvents = new ArrayList<DisplayStudyEventBean>();
         for (int i = 0; i < events.size(); i++) {
-            Stopwatch s1 = Stopwatch.createAndStart("displayEvents " + i);
             StudyEventBean event = (StudyEventBean) events.get(i);
 
             StudyEventDefinitionBean sed = eventDefinitionByEvent.get(event.getStudyEventDefinitionId());
@@ -141,11 +139,10 @@ public class StudySubjectServiceImpl implements StudySubjectService {
             displayEvents.add(de);
             // event.setEventCRFs(createAllEventCRFs(eventCRFs,
             // eventDefinitionCRFs));
-            s1.stop();
 
         }
 
-        stopwatch.stop();
+
         return displayEvents;
     }
 
@@ -153,7 +150,6 @@ public class StudySubjectServiceImpl implements StudySubjectService {
             StudyUserRoleBean currentRole, SubjectEventStatus status, StudyBean study, Set<Integer> nonEmptyEventCrf,
             Map<Integer, CRFVersionBean> crfVersionById, Map<Integer, CRFBean> crfById, Integer studyEventDefinitionId,
             List eventDefinitionCRFs) {
-        Stopwatch stopwatch = Stopwatch.createAndStart("getDisplayEventCRFs");
         ArrayList<DisplayEventCRFBean> answer = new ArrayList<DisplayEventCRFBean>();
 
         for (int i = 0; i < eventCRFs.size(); i++) {
@@ -217,14 +213,12 @@ public class StudySubjectServiceImpl implements StudySubjectService {
             }
         }
 
-        stopwatch.stop();
         return answer;
     }
 
     private ArrayList<DisplayEventDefinitionCRFBean> getUncompletedCRFs(List eventDefinitionCRFs,
             List eventCRFs, SubjectEventStatus status, Set<Integer> nonEmptyEventCrf,
             Map<Integer, CRFVersionBean> crfVersionById, Map<Integer, CRFBean> crfById) {
-        Stopwatch stopwatch = Stopwatch.createAndStart("getUncompletedCRFs");
         int i;
         HashMap<Integer, Boolean> completed = new HashMap<Integer, Boolean>();
         HashMap<Integer, EventCRFBean> startedButIncompleted = new HashMap<Integer, EventCRFBean>();
@@ -289,10 +283,9 @@ public class StudySubjectServiceImpl implements StudySubjectService {
                 dedc.setEventCRF(ev);
                 answer.add(dedc);
 
-                
+
             }
         }
-        stopwatch.stop();
         return answer;
     }
 

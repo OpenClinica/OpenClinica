@@ -16,6 +16,7 @@ import org.akaza.openclinica.bean.service.SasProcessingFunction;
 import org.akaza.openclinica.bean.service.SqlProcessingFunction;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ResourceLoaderAware;
@@ -83,6 +84,7 @@ public class CoreResources implements ResourceLoaderAware {
         }
     }
 
+    @Override
     public void setResourceLoader(ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
         try {
@@ -188,7 +190,7 @@ public class CoreResources implements ResourceLoaderAware {
         //            logMe("%s=%s%n"+ envName+ env.get(envName));
         //        }
 
-        
+
         if (value.contains("${catalina.home}") &&  catalina != null) {
             value = value.replace("${catalina.home}", catalina);
         }
@@ -343,13 +345,21 @@ public class CoreResources implements ResourceLoaderAware {
         DATAINFO.setProperty("password", DATAINFO.getProperty("dbPass"));
         String url = null, driver = null, hibernateDialect = null;
         if (database.equalsIgnoreCase("postgres")) {
-            url = "jdbc:postgresql:" + "//" + DATAINFO.getProperty("dbHost") + ":" + DATAINFO.getProperty("dbPort") + "/" + DATAINFO.getProperty("db");
+            url = "jdbc:postgresql:" + "//" + DATAINFO.getProperty("dbHost") + ":" + DATAINFO.getProperty("dbPort") +
+                    "/" + DATAINFO.getProperty("db");
             driver = "org.postgresql.Driver";
             hibernateDialect = "org.hibernate.dialect.PostgreSQLDialect";
         } else if (database.equalsIgnoreCase("oracle")) {
-            url = "jdbc:oracle:thin:" + "@" + DATAINFO.getProperty("dbHost") + ":" + DATAINFO.getProperty("dbPort") + ":" + DATAINFO.getProperty("db");
+            url = "jdbc:oracle:thin:" + "@" + DATAINFO.getProperty("dbHost") + ":" + DATAINFO.getProperty("dbPort") +
+                    ":" + DATAINFO.getProperty("db");
             driver = "oracle.jdbc.driver.OracleDriver";
             hibernateDialect = "org.hibernate.dialect.OracleDialect";
+        }
+        // If logLevel is 'TRACE' or 'DEBUG', enagle log4jdbc
+        String logLevel = DATAINFO.getProperty("logLevel");
+        if (logLevel != null && (logLevel.equalsIgnoreCase("TRACE") || logLevel.equalsIgnoreCase("DEBUG"))) {
+            driver = "net.sf.log4jdbc.DriverSpy";
+            url = StringUtils.replace(url, "jdbc:", "jdbc:log4jdbc:");
         }
         DATAINFO.setProperty("dataBase", database);
         DATAINFO.setProperty("url", url);
@@ -365,7 +375,7 @@ public class CoreResources implements ResourceLoaderAware {
     		/*
     		 * Use classpath* to search for resources that match this pattern in ALL of the
     		 * jars in the application class path.
-    		 * See: http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/resources.html#resources-classpath-wildcards 
+    		 * See: http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/resources.html#resources-classpath-wildcards
     		 */
     		resources = resolver.getResources("classpath*:properties/xslt/*.xsl");
 
@@ -384,7 +394,7 @@ public class CoreResources implements ResourceLoaderAware {
     	for (Resource r: resources) {
     		File f = new File(dest, r.getFilename());
     		try {
-    			
+
     			FileOutputStream out = new FileOutputStream(f);
     			IOUtils.copy(r.getInputStream(), out);
     			out.close();
@@ -420,7 +430,7 @@ public class CoreResources implements ResourceLoaderAware {
 
     }
 
-    
+
     /**
      * @deprecated. ByteArrayInputStream keeps the whole file in memory needlessly.
      * Use Commons IO's {@link IOUtils#copy(java.io.InputStream, java.io.OutputStream)} instead.
@@ -480,7 +490,7 @@ public class CoreResources implements ResourceLoaderAware {
      *          from core jar file
      */
     private void copyODMMappingXMLtoResources(ResourceLoader resourceLoader) {
-      
+
         ByteArrayInputStream listSrcFiles[] = new ByteArrayInputStream[10];
         String[] fileNames = { "cd_odm_mapping.xml" };
         try {

@@ -9,8 +9,6 @@ import org.quartz.UnableToInterruptJobException;
 public class XsltStatefulJob extends XsltTransformJob
     implements StatefulJob, InterruptableJob {
 
-    private Thread thread;
-
     public XsltStatefulJob() {
         super();
     }
@@ -23,6 +21,6 @@ public class XsltStatefulJob extends XsltTransformJob
 
     @Override
     public void interrupt() throws UnableToInterruptJobException {
-    	super.interrupt();
+    	jobTerminationFlag.terminate();
     }
 }

@@ -102,7 +102,6 @@ import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.log.Stopwatch;
 import org.akaza.openclinica.logic.expressionTree.ExpressionTreeHelper;
 import org.akaza.openclinica.logic.rulerunner.MessageContainer.MessageType;
 import org.akaza.openclinica.logic.score.ScoreCalculator;
@@ -294,9 +293,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
     @Override
     protected  void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        Stopwatch sw = Stopwatch.createAndStart("DataEntryServlet#processRequest");
-        try {
-
         //JN:The following were the the global variables, moved as local.
         locale = LocaleResolver.getLocale(request);
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
@@ -559,7 +555,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         // horizontal ones are covered in FormBeanUtil, tbh 112007
         logMe("Entering  displayItemWithGroups "+System.currentTimeMillis());
        //@pgawade 30-May-2012 Fix for issue 13963 - added an extra parameter 'isSubmitted' to method createItemWithGroups
-        List<DisplayItemWithGroupBean> displayItemWithGroups = createItemWithGroups(section, hasGroup, eventDefinitionCRFId, request, isSubmitted); 
+        List<DisplayItemWithGroupBean> displayItemWithGroups = createItemWithGroups(section, hasGroup, eventDefinitionCRFId, request, isSubmitted);
         logMe("Entering  displayItemWithGroups end "+System.currentTimeMillis());
         this.getItemMetadataService().updateGroupDynamicsInSection(displayItemWithGroups, section.getSection().getId(), ecb);
         section.setDisplayItemGroups(displayItemWithGroups);
@@ -2021,9 +2017,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     }
                 }// end of if-block for dynamic rules not in same section, tbh 05/2010
             }// end of save
-        }
-        } finally {
-            sw.stop();
         }
 
     }
@@ -3692,7 +3685,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
      */
 
     protected DisplaySectionBean populateNotesWithDBNoteCounts(FormDiscrepancyNotes discNotes, DisplaySectionBean section, HttpServletRequest request) {
-        Stopwatch sw = Stopwatch.createAndStart("populateNotesWithDBNoteCounts");
         DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(getDataSource());
        // ArrayList items = section.getItems();
         EventCRFBean ecb = (EventCRFBean)request.getAttribute(INPUT_EVENT_CRF);
@@ -3817,7 +3809,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
         }
 
         section.setDisplayItemGroups(allItems);
-        sw.stop();
         return section;
     }
 
@@ -4368,7 +4359,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         // For adding null values to display items
         FormBeanUtil formBeanUtil = new FormBeanUtil();
         List<String> nullValuesList =  formBeanUtil.getNullValuesByEventCRFDefId(eventCRFDefId, getDataSource());
-        
+
         LOGGER.trace("single items size: " + items.size());
         for (int i = 0; i < items.size(); i++) {
             DisplayItemBean item = (DisplayItemBean) items.get(i);
@@ -4431,9 +4422,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
                     	LOGGER.trace("set with nullValuesList of : " + nullValuesList);
                     }
                     dibs = FormBeanUtil.getDisplayBeansFromItems(itBeans, getDataSource(), ecb, sb.getId(), nullValuesList, getServletContext());
-                    
+
                     DisplayItemGroupBean digb2 = new DisplayItemGroupBean();
-                    
+
                     digb2.setItems(dibs);
                     digb2.setEditFlag("initial");
 
@@ -4459,8 +4450,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
       return returnMap;
   }
   	//@pgawade 30-May-2012 Fix for issue 13963 - added an extra parameter 'isSubmitted' to method buildMatrixForRepeatingGroups
-    protected DisplayItemWithGroupBean buildMatrixForRepeatingGroups(DisplayItemWithGroupBean diwgb, 
-    		DisplayItemGroupBean itemGroup, EventCRFBean ecb, 
+    protected DisplayItemWithGroupBean buildMatrixForRepeatingGroups(DisplayItemWithGroupBean diwgb,
+    		DisplayItemGroupBean itemGroup, EventCRFBean ecb,
     		SectionBean sb,List<ItemBean>itBeans, Map<String,ItemDataBean> dataMap,
     		List<String> nullValuesList, boolean isSubmitted)
     {
@@ -4498,7 +4489,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 displayItemBean.setData(itemData);
                 //@pgawade 30-May-2012 Fix for issue 13963 Call to method "displayItemBean.loadDBValue()" is made conditional to show
                 // the data wherever it is appropriate in the stages of data entry
-//                displayItemBean.loadDBValue();                
+//                displayItemBean.loadDBValue();
                 if (ecb.getStage() == DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE || ecb.getStage() == DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) {
                     if (shouldLoadDBValues(displayItemBean) && !isSubmitted) {
                     	displayItemBean.loadDBValue();
@@ -4534,7 +4525,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 	 */
 	private void addNullValues( DisplayItemBean displayItemBean,  List<String> nullValuesList) {
 	        // logger = LoggerFactory.getLogger(getClass().getName());
-	       
+
 	        boolean hasNullValues = nullValuesList != null && !nullValuesList.isEmpty();
 	        if ( !hasNullValues) {return;}
 	        String tmpVal = "";
@@ -4542,8 +4533,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
 	        List<ResponseOptionBean> respOptions = displayItemBean.getMetadata().getResponseSet().getOptions();
 	        ResponseOptionBean respBean;
 	        if ( respOptions != null
-	                    && ("checkbox".equalsIgnoreCase(responseName) || 
-	                    		"radio".equalsIgnoreCase(responseName) || 
+	                    && ("checkbox".equalsIgnoreCase(responseName) ||
+	                    		"radio".equalsIgnoreCase(responseName) ||
 	                    		"single-select".equalsIgnoreCase(responseName) ||
 	                    		"multi-select".equalsIgnoreCase(responseName))) {
 
