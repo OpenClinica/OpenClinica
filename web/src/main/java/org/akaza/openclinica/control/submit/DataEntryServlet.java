@@ -1522,6 +1522,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
                 // items = section.getItems();
                 allItems = section.getDisplayItemGroups();
+                int nextOrdinal = 0;
 
                 LOGGER.debug("all items before saving into DB" + allItems.size());
                 this.output(allItems);
@@ -1546,7 +1547,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
                             // this ordinal will only useful to create a new
                             // item data
                             // update an item data won't touch its ordinal
-                            int nextOrdinal = iddao.getMaxOrdinalForGroup(ecb, sb, displayGroup.getItemGroupBean()) + 1;
+                          //  int nextOrdinal = iddao.getMaxOrdinalForGroup(ecb, sb, displayGroup.getItemGroupBean()) + 1;
+                      
 
                             for (DisplayItemBean displayItem : items) {
                                 String fileName = this.addAttachedFilePath(displayItem, attachedFilePath);
@@ -1555,6 +1557,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                 if ("add".equalsIgnoreCase(displayItem.getEditFlag()) && fileName.length() > 0 && !newUploadedFiles.containsKey(fileName)) {
                                     displayItem.getData().setValue("");
                                 }
+                                //pulling from dataset instead of database and correcting the flawed logic of using the database ordinals as max ordinal...
+                                nextOrdinal =      displayItem.getData().getOrdinal();
                                 temp = writeToDB(displayItem, iddao, nextOrdinal, request);
                                 LOGGER.debug("just executed writeToDB - 1");
                                 LOGGER.debug("next ordinal: " + nextOrdinal);
@@ -1587,6 +1591,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                         }
                         for (int j = 0; j < dbGroups.size(); j++) {
                             DisplayItemGroupBean displayGroup = dbGroups.get(j);
+                            //JN: Since remove button is gone, the following code can be commented out, however it needs to be tested? Can be tackled when handling discrepancy note w/repeating groups issues.
                             if ("remove".equalsIgnoreCase(displayGroup.getEditFlag())) {
                                 List<DisplayItemBean> items = displayGroup.getItems();
                                 for (DisplayItemBean displayItem : items) {
