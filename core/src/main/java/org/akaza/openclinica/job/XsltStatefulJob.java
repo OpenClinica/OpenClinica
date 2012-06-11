@@ -2,7 +2,6 @@ package org.akaza.openclinica.job;
 
 import org.quartz.InterruptableJob;
 import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.quartz.StatefulJob;
 import org.quartz.UnableToInterruptJobException;
 
@@ -14,8 +13,7 @@ public class XsltStatefulJob extends XsltTransformJob
     }
 
     @Override
-    protected void executeInternal(JobExecutionContext context)
-            throws JobExecutionException {
+    protected void executeInternal(JobExecutionContext context) {
         super.executeInternal(context);
     }
 

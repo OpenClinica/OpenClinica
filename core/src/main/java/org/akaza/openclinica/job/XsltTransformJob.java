@@ -57,7 +57,6 @@ import org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.impl.StdScheduler;
@@ -113,15 +112,7 @@ public class XsltTransformJob extends QuartzJobBean {
     private static final long KILOBYTE = 1024;
 
     @Override
-    protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-        try {
-            executeJob(context);
-        } catch (JobInterruptedException e) {
-            logger.info("Job interrupted");
-        }
-    }
-
-    private void executeJob(JobExecutionContext context) throws JobExecutionException {
+    protected void executeInternal(JobExecutionContext context) {
         initDependencies(context.getScheduler());
         Stopwatch sw = Stopwatch.createAndStart("XsltTransformJob.executeInternal");
         // need to generate a Locale for emailing users with i18n
@@ -192,16 +183,11 @@ public class XsltTransformJob extends QuartzJobBean {
             datasetBean.setName(datasetBean.getName().replaceAll(" ", "_"));
             logger.debug("--> job starting: ");
 
-            HashMap<String, Integer> answerMap = null;
-            try {
-	            answerMap = odmFileCreation.createODMFile(epBean.getFormat(), sysTimeBegin, generalFileDir, datasetBean,
-	                    currentStudy, "", eb, currentStudy.getId(), currentStudy.getParentStudyId(), "99",
-	                    (Boolean) dataMap.get(ZIPPED), false, (Boolean) dataMap.get(DELETE_OLD), epBean.getOdmType(),
-	                    userBean);
-            } catch (JobInterruptedException ex) {
-            	logger.info(ex.getMessage());
-            	return;
-            }
+            HashMap<String, Integer> answerMap =
+                    odmFileCreation.createODMFile(epBean.getFormat(), sysTimeBegin, generalFileDir, datasetBean,
+                    currentStudy, "", eb, currentStudy.getId(), currentStudy.getParentStudyId(), "99",
+                    (Boolean) dataMap.get(ZIPPED), false, (Boolean) dataMap.get(DELETE_OLD), epBean.getOdmType(),
+                    userBean);
 
             // won't save a record of the XML to db
             // won't be a zipped file, so that we can submit it for
@@ -499,6 +485,9 @@ public class XsltTransformJob extends QuartzJobBean {
 
 
            postSuccessMessage(successMsg, context);
+        } catch (JobInterruptedException e) {
+            logger.info("Job was cancelled by the user");
+            exceptions = true;
         } catch (TransformerConfigurationException e) {
             sendErrorEmail(e.getMessage(), context, alertEmail);
             postErrorMessage(e.getMessage(), context);
