@@ -60,10 +60,10 @@ public class OdmFileCreation implements ApplicationListener<JobCancelledEvent> {
     private DataSource dataSource;
     private CoreResources coreResources;
 
+    private JobTerminationMonitor jobTerminationMonitor;
+
     private static File files[]=null;
     private static List<File> oldFiles = new LinkedList<File>();
-
-    private final JobTerminationMonitor jobTerminationFlag = new JobTerminationMonitor();
 
     public HashMap<String,Integer> createODMFile(String odmVersion, long sysTimeBegin, String generalFileDir,
             DatasetBean datasetBean, StudyBean currentStudy, String generalFileDirCopy, ExtractBean eb,
@@ -74,8 +74,11 @@ public class OdmFileCreation implements ApplicationListener<JobCancelledEvent> {
 
         Integer ssNumber = getStudySubjectNumber(studySubjectNumber);
         MetaDataCollector mdc = new MetaDataCollector(dataSource, datasetBean, currentStudy,ruleSetRuleDao);
+        mdc.setJobTerminationMonitor(jobTerminationMonitor);
         AdminDataCollector adc = new AdminDataCollector(dataSource, datasetBean, currentStudy);
+        adc.setJobTerminationMonitor(jobTerminationMonitor);
         ClinicalDataCollector cdc = new ClinicalDataCollector(dataSource, datasetBean, currentStudy);
+        cdc.setJobTerminationMonitor(jobTerminationMonitor);
 
         MetaDataCollector.setTextLength(200);
         if(deleteOld){
@@ -190,7 +193,7 @@ public class OdmFileCreation implements ApplicationListener<JobCancelledEvent> {
 
         Iterator<OdmStudyBase> it = cdc.getStudyBaseMap().values().iterator();
         while (it.hasNext()) {
-            jobTerminationFlag.check();
+            checkTermination();
             Stopwatch sw4 = Stopwatch.createAndStart("SelectStudySubjects");
 
             OdmStudyBase u = it.next();
@@ -202,7 +205,7 @@ public class OdmFileCreation implements ApplicationListener<JobCancelledEvent> {
             int fromIndex = 0;
             boolean firstIteration = true;
             while (fromIndex < newRows.size()) {
-                jobTerminationFlag.check();
+                checkTermination();
                 Stopwatch sw5 = Stopwatch.createAndStart("SelectStudySubjects - inner loop");
 
                 int toIndex = fromIndex + ssNumber < newRows.size() ? fromIndex + ssNumber : newRows.size() - 1;
@@ -218,7 +221,7 @@ public class OdmFileCreation implements ApplicationListener<JobCancelledEvent> {
 
                 ClinicalDataUnit cdata = new ClinicalDataUnit(dataSource, datasetBean, cdc.getOdmbean(), u.getStudy(), cdc.getCategory(), studySubjectIds);
                 cdata.setCategory(cdc.getCategory());
-                cdata.collectOdmClinicalData();
+                cdata.collectOdmClinicalData(jobTerminationMonitor);
 
                 FullReportBean report = new FullReportBean();
                 report.setClinicalData(cdata.getOdmClinicalData());
@@ -408,7 +411,15 @@ public class OdmFileCreation implements ApplicationListener<JobCancelledEvent> {
 
     @Override
     public void onApplicationEvent(JobCancelledEvent event) {
-        jobTerminationFlag.terminate();
+        if (jobTerminationMonitor != null) {
+            jobTerminationMonitor.terminate();
+        }
+    }
+
+    private void checkTermination() {
+        if (jobTerminationMonitor != null) {
+            jobTerminationMonitor.check();
+        }
     }
 
 
@@ -436,5 +447,12 @@ public class OdmFileCreation implements ApplicationListener<JobCancelledEvent> {
         this.coreResources = coreResources;
     }
 
+    public JobTerminationMonitor getJobTerminationMonitor() {
+        return jobTerminationMonitor;
+    }
+
+    public void setJobTerminationMonitor(JobTerminationMonitor jobTerminationMonitor) {
+        this.jobTerminationMonitor = jobTerminationMonitor;
+    }
 
 }

@@ -17,6 +17,7 @@ import javax.sql.DataSource;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.OdmAdminDataBean;
+import org.akaza.openclinica.job.JobTerminationMonitor;
 
 /**
  * Populate ODM AdminData Element for a ODM XML file. It supports:
@@ -25,20 +26,22 @@ import org.akaza.openclinica.bean.odmbeans.OdmAdminDataBean;
  * <li>ODM XML file contains multiple AdminData elements - one parent study
  * and its site(s). </li>
  * </ul>
- * 
+ *
  * @author ywang (March, 2010)
  */
 
 public class AdminDataCollector extends OdmDataCollector {
     private LinkedHashMap<String, OdmAdminDataBean> odmAdminDataMap;
 
+    private JobTerminationMonitor jobTerminationMonitor;
+
     public AdminDataCollector(DataSource ds, StudyBean currentStudy) {
         super(ds, currentStudy);
         this.odmAdminDataMap = new LinkedHashMap<String, OdmAdminDataBean>();
     }
-    
+
     /**
-     * 
+     *
      * @param ds
      * @param dataset
      */
@@ -55,6 +58,9 @@ public class AdminDataCollector extends OdmDataCollector {
     public void collectOdmAdminDataMap() {
         Iterator<OdmStudyBase> it = this.getStudyBaseMap().values().iterator();
         while (it.hasNext()) {
+            if (jobTerminationMonitor != null) {
+                jobTerminationMonitor.check();
+            }
             OdmStudyBase u = it.next();
             AdminDataUnit adata = new AdminDataUnit(this.ds, this.dataset, this.getOdmbean(), u.getStudy(), this.getCategory());
             adata.setCategory(this.getCategory());
@@ -69,5 +75,13 @@ public class AdminDataCollector extends OdmDataCollector {
 
     public void setOdmClinicalDataMap(LinkedHashMap<String, OdmAdminDataBean> odmAdminDataMap) {
         this.odmAdminDataMap = odmAdminDataMap;
+    }
+
+    public JobTerminationMonitor getJobTerminationMonitor() {
+        return jobTerminationMonitor;
+    }
+
+    public void setJobTerminationMonitor(JobTerminationMonitor jobTerminationMonitor) {
+        this.jobTerminationMonitor = jobTerminationMonitor;
     }
 }

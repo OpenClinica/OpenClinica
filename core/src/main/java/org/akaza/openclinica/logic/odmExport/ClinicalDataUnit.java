@@ -9,19 +9,20 @@
 
 package org.akaza.openclinica.logic.odmExport;
 
+import java.util.HashMap;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.ODMBean;
 import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
 import org.akaza.openclinica.dao.extract.OdmExtractDAO;
-
-import java.util.HashMap;
-
-import javax.sql.DataSource;
+import org.akaza.openclinica.job.JobTerminationMonitor;
 
 /**
  * A class for one ODM ClinicalData Element.
- * 
+ *
  * @author ywang (May, 2009)
  */
 
@@ -48,7 +49,7 @@ public class ClinicalDataUnit extends OdmUnit {
         this.studySubjectIds = studySubjectIds;
     }
 
-    public void collectOdmClinicalData() {
+    public void collectOdmClinicalData(JobTerminationMonitor jobTerminatorMonitor) {
         StudyBean study = studyBase.getStudy();
         String studyOID = study.getOid();
         if (studyOID == null || studyOID.length() <= 0) {
@@ -57,7 +58,7 @@ public class ClinicalDataUnit extends OdmUnit {
         }
         odmClinicalData.setStudyOID(studyOID);
 
-        OdmExtractDAO oedao = new OdmExtractDAO(this.ds);
+        OdmExtractDAO oedao = new OdmExtractDAO(this.ds, jobTerminatorMonitor);
         if (this.getCategory() == 1 && study.isSite(study.getParentStudyId())) {
             String mvoid = "";
             if (this.dataset != null) {

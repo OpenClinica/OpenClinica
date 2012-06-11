@@ -19,6 +19,6 @@ public class XsltStatefulJob extends XsltTransformJob
 
     @Override
     public void interrupt() throws UnableToInterruptJobException {
-    	jobTerminationFlag.terminate();
+    	jobTerminationMonitor.terminate();
     }
 }
