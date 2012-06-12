@@ -102,8 +102,6 @@ public class XsltTransformJob extends QuartzJobBean {
 
     private final TransformerFactory transformerFactory = TransformerFactory.newInstance();
 
-    protected final JobTerminationMonitor jobTerminationMonitor = new JobTerminationMonitor();
-
     // POST PROCESSING VARIABLES
     public static final String POST_PROC_DELETE_OLD = "postProcDeleteOld";
     public static final String POST_PROC_ZIP = "postProcZip";
@@ -198,7 +196,7 @@ public class XsltTransformJob extends QuartzJobBean {
             int fId = 0;
             Iterator<Entry<String, Integer>> it = answerMap.entrySet().iterator();
             while(it.hasNext()) {
-            	jobTerminationMonitor.check();
+            	JobTerminationMonitor.check();
 
             	Entry<String, Integer> entry = it.next();
                 String key = entry.getKey();
@@ -226,7 +224,7 @@ public class XsltTransformJob extends QuartzJobBean {
             File oldFilesPath = new File(generalFileDir);
             while(fileCntr<numXLS)
             {
-            	jobTerminationMonitor.check();
+            	JobTerminationMonitor.check();
 
                 String xsltPath = dataMap.getString(XSLT_PATH)+ File.separator +epBean.getFileName()[fileCntr];
                 in = new java.io.FileInputStream(xsltPath);
@@ -579,9 +577,6 @@ public class XsltTransformJob extends QuartzJobBean {
             archivedDatasetFileDao = ctx.getBean(ArchivedDatasetFileDAO.class);
             generateFileService = ctx.getBean(GenerateExtractFileService.class);
             odmFileCreation = ctx.getBean(OdmFileCreation.class);
-            odmFileCreation.setJobTerminationMonitor(jobTerminationMonitor);
-
-
         } catch (SchedulerException e) {
             throw new IllegalStateException("Could not load dependencies from scheduler context", e);
         }

@@ -18,7 +18,6 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.ODMBean;
 import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
 import org.akaza.openclinica.dao.extract.OdmExtractDAO;
-import org.akaza.openclinica.job.JobTerminationMonitor;
 
 /**
  * A class for one ODM ClinicalData Element.
@@ -49,7 +48,7 @@ public class ClinicalDataUnit extends OdmUnit {
         this.studySubjectIds = studySubjectIds;
     }
 
-    public void collectOdmClinicalData(JobTerminationMonitor jobTerminatorMonitor) {
+    public void collectOdmClinicalData() {
         StudyBean study = studyBase.getStudy();
         String studyOID = study.getOid();
         if (studyOID == null || studyOID.length() <= 0) {
@@ -58,7 +57,7 @@ public class ClinicalDataUnit extends OdmUnit {
         }
         odmClinicalData.setStudyOID(studyOID);
 
-        OdmExtractDAO oedao = new OdmExtractDAO(this.ds, jobTerminatorMonitor);
+        OdmExtractDAO oedao = new OdmExtractDAO(this.ds);
         if (this.getCategory() == 1 && study.isSite(study.getParentStudyId())) {
             String mvoid = "";
             if (this.dataset != null) {

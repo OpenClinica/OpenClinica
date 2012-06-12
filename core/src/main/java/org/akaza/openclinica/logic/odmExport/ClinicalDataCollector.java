@@ -34,7 +34,6 @@ import org.akaza.openclinica.job.JobTerminationMonitor;
 public class ClinicalDataCollector extends OdmDataCollector {
     private LinkedHashMap<String, OdmClinicalDataBean> odmClinicalDataMap;
 
-    private JobTerminationMonitor jobTerminationMonitor;
 
     /**
      *
@@ -55,15 +54,12 @@ public class ClinicalDataCollector extends OdmDataCollector {
     public void collectOdmClinicalDataMap() {
         Iterator<OdmStudyBase> it = this.getStudyBaseMap().values().iterator();
         while (it.hasNext()) {
-            if (jobTerminationMonitor != null) {
-                jobTerminationMonitor.check();
-            }
+            JobTerminationMonitor.check();
             OdmStudyBase u = it.next();
             ClinicalDataUnit cdata = new ClinicalDataUnit(this.ds, this.dataset, this.getOdmbean(), u.getStudy(), this.getCategory());
             cdata.setCategory(this.getCategory());
             StudySubjectDAO ssdao = new StudySubjectDAO(this.ds);
             cdata.setStudySubjectIds(ssdao.findStudySubjectIdsByStudyIds(u.getStudy().getId()+""));
-            cdata.collectOdmClinicalData(jobTerminationMonitor);
             odmClinicalDataMap.put(u.getStudy().getOid(), cdata.getOdmClinicalData());
         }
     }
@@ -74,14 +70,6 @@ public class ClinicalDataCollector extends OdmDataCollector {
 
     public void setOdmClinicalDataMap(LinkedHashMap<String, OdmClinicalDataBean> odmClinicalDataMap) {
         this.odmClinicalDataMap = odmClinicalDataMap;
-    }
-
-    public JobTerminationMonitor getJobTerminationMonitor() {
-        return jobTerminationMonitor;
-    }
-
-    public void setJobTerminationMonitor(JobTerminationMonitor jobTerminationMonitor) {
-        this.jobTerminationMonitor = jobTerminationMonitor;
     }
 
 }

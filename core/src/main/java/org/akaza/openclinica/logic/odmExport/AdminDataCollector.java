@@ -33,8 +33,6 @@ import org.akaza.openclinica.job.JobTerminationMonitor;
 public class AdminDataCollector extends OdmDataCollector {
     private LinkedHashMap<String, OdmAdminDataBean> odmAdminDataMap;
 
-    private JobTerminationMonitor jobTerminationMonitor;
-
     public AdminDataCollector(DataSource ds, StudyBean currentStudy) {
         super(ds, currentStudy);
         this.odmAdminDataMap = new LinkedHashMap<String, OdmAdminDataBean>();
@@ -58,9 +56,7 @@ public class AdminDataCollector extends OdmDataCollector {
     public void collectOdmAdminDataMap() {
         Iterator<OdmStudyBase> it = this.getStudyBaseMap().values().iterator();
         while (it.hasNext()) {
-            if (jobTerminationMonitor != null) {
-                jobTerminationMonitor.check();
-            }
+            JobTerminationMonitor.check();
             OdmStudyBase u = it.next();
             AdminDataUnit adata = new AdminDataUnit(this.ds, this.dataset, this.getOdmbean(), u.getStudy(), this.getCategory());
             adata.setCategory(this.getCategory());
@@ -77,11 +73,4 @@ public class AdminDataCollector extends OdmDataCollector {
         this.odmAdminDataMap = odmAdminDataMap;
     }
 
-    public JobTerminationMonitor getJobTerminationMonitor() {
-        return jobTerminationMonitor;
-    }
-
-    public void setJobTerminationMonitor(JobTerminationMonitor jobTerminationMonitor) {
-        this.jobTerminationMonitor = jobTerminationMonitor;
-    }
 }

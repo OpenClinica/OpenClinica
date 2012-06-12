@@ -8,17 +8,22 @@ import org.quartz.UnableToInterruptJobException;
 public class XsltStatefulJob extends XsltTransformJob
     implements StatefulJob, InterruptableJob {
 
+    protected JobTerminationMonitor jobTerminationMonitor;
+
     public XsltStatefulJob() {
         super();
     }
 
     @Override
     protected void executeInternal(JobExecutionContext context) {
+        jobTerminationMonitor = JobTerminationMonitor.createInstance();
         super.executeInternal(context);
     }
 
     @Override
     public void interrupt() throws UnableToInterruptJobException {
-    	jobTerminationMonitor.terminate();
+        if (jobTerminationMonitor != null) {
+            jobTerminationMonitor.terminate();
+        }
     }
 }

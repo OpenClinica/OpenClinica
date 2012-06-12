@@ -38,12 +38,10 @@ import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.job.JobCancelledEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationListener;
 
-public class GenerateExtractFileService implements ApplicationListener<JobCancelledEvent> {
+public class GenerateExtractFileService {
 
     private static final Logger logger = LoggerFactory.getLogger(GenerateExtractFileService.class);
     private final DataSource ds;
@@ -661,12 +659,5 @@ public class GenerateExtractFileService implements ApplicationListener<JobCancel
             logger.info("finished zipping up file...");
        // }
     }
-
-    @Override
-    public void onApplicationEvent(JobCancelledEvent event) {
-        //TODO Implement
-
-    }
-
 
 }

@@ -41,7 +41,6 @@ public class MetaDataCollector extends OdmDataCollector {
     private LinkedHashMap<String, OdmStudyBean> odmStudyMap;
     private static int textLength = 4000;
     private RuleSetRuleDao ruleSetRuleDao;
-    private JobTerminationMonitor jobTerminationMonitor;
 
     // protected final Logger logger =
     // LoggerFactory.getLogger(getClass().getName());
@@ -71,9 +70,7 @@ public class MetaDataCollector extends OdmDataCollector {
         Iterator<OdmStudyBase> it = this.getStudyBaseMap().values().iterator();
         MetaDataVersionProtocolBean protocol = new MetaDataVersionProtocolBean();
         while (it.hasNext()) {
-            if (jobTerminationMonitor != null) {
-                jobTerminationMonitor.check();
-            }
+            JobTerminationMonitor.check();
             OdmStudyBase u = it.next();
             StudyBean study = u.getStudy();
             MetadataUnit meta = new MetadataUnit(this.ds, this.dataset, this.getOdmbean(), study, this.getCategory(),getRuleSetRuleDao());
@@ -119,13 +116,5 @@ public class MetaDataCollector extends OdmDataCollector {
 
     public void setRuleSetRuleDao(RuleSetRuleDao ruleSetRuleDao) {
         this.ruleSetRuleDao = ruleSetRuleDao;
-    }
-
-    public JobTerminationMonitor getJobTerminationMonitor() {
-        return jobTerminationMonitor;
-    }
-
-    public void setJobTerminationMonitor(JobTerminationMonitor jobTerminationMonitor) {
-        this.jobTerminationMonitor = jobTerminationMonitor;
     }
 }

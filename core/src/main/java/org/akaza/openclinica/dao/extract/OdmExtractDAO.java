@@ -89,15 +89,8 @@ import org.akaza.openclinica.logic.odmExport.MetadataUnit;
 
 public class OdmExtractDAO extends DatasetDAO {
 
-    private JobTerminationMonitor jobTerminatorMonitor;
-
     public OdmExtractDAO(DataSource ds) {
         super(ds);
-    }
-
-    public OdmExtractDAO(DataSource ds, JobTerminationMonitor jobTerminatorMonitor) {
-        super(ds);
-        this.jobTerminatorMonitor = jobTerminatorMonitor;
     }
 
     @Override
@@ -1475,7 +1468,7 @@ public class OdmExtractDAO extends DatasetDAO {
             // the method "setDataWithOCAttributes" should be checked about the
             // updated as well because this method came from here.
             while (iter.hasNext()) {
-                checkTermination();
+                JobTerminationMonitor.check();
                 HashMap row = (HashMap) iter.next();
                 String studySubjectLabel = (String) row.get("study_subject_oid");
                 String sedOID = (String) row.get("definition_oid");
@@ -1555,7 +1548,7 @@ public class OdmExtractDAO extends DatasetDAO {
             String yearMonthFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString("date_format_year_month"));
             String yearFormat = StringUtil.parseDateFormat(ResourceBundleProvider.getFormatBundle(locale).getString("date_format_year"));
             while (iter.hasNext()) {
-                checkTermination();
+                JobTerminationMonitor.check();
                 HashMap row = (HashMap) iter.next();
                 Integer ecId = (Integer) row.get("event_crf_id");
                 Integer igId = (Integer) row.get("item_group_id");
@@ -2987,9 +2980,4 @@ public class OdmExtractDAO extends DatasetDAO {
             + "      and ifm.item_id in " + itemIds + ")";
     }
 
-    private void checkTermination() {
-        if (jobTerminatorMonitor != null) {
-            jobTerminatorMonitor.check();
-        }
-    }
 }

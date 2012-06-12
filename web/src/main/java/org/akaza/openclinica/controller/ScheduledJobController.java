@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.job.JobCancelledEvent;
 import org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.akaza.openclinica.web.table.scheduledjobs.ScheduledJobTableFactory;
 import org.akaza.openclinica.web.table.scheduledjobs.ScheduledJobs;
@@ -27,8 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.scheduling.quartz.JobDetailBean;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -40,7 +37,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  *  Controller for listing all the scheduled jobs. Also an interface for canceling the jobs which are running.
  */
 @Controller("ScheduledJobController")
-public class ScheduledJobController implements ApplicationEventPublisherAware {
+public class ScheduledJobController {
     private final static Logger logger = LoggerFactory.getLogger(ScheduledJobController.class);
 
     public final static String SCHEDULED_TABLE_ATTRIBUTE = "scheduledTableAttribute";
@@ -56,13 +53,6 @@ public class ScheduledJobController implements ApplicationEventPublisherAware {
 
     @Autowired
     private Scheduler scheduler;
-
-    private ApplicationEventPublisher applicationEventPublisher;
-
-
-    public ScheduledJobController(){
-
-    }
 
     @RequestMapping("/listCurrentScheduledJobs")
     public ModelMap listScheduledJobs(HttpServletRequest request, HttpServletResponse response) throws SchedulerException{
@@ -242,14 +232,8 @@ public class ScheduledJobController implements ApplicationEventPublisherAware {
         return null;
     }
 
-    @Override
-    public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
-        this.applicationEventPublisher = applicationEventPublisher;
-    }
-
     private void interruptQuartzJob(Scheduler scheduler, String jobName, String jobGroup) throws SchedulerException {
         scheduler.interrupt(jobName, jobGroup);
-        applicationEventPublisher.publishEvent(new JobCancelledEvent(jobName));
     }
 
     private String longFormatString() {

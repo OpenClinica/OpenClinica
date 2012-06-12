@@ -36,7 +36,6 @@ import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
-import org.akaza.openclinica.job.JobCancelledEvent;
 import org.akaza.openclinica.job.JobTerminationMonitor;
 import org.akaza.openclinica.log.Stopwatch;
 import org.akaza.openclinica.logic.odmExport.AdminDataCollector;
@@ -46,21 +45,18 @@ import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
 import org.akaza.openclinica.logic.odmExport.OdmStudyBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationListener;
 
 /**
  * @author Doug Rodrigues (douglas.rodrigues@openclinica.com)
  *
  */
-public class OdmFileCreation implements ApplicationListener<JobCancelledEvent> {
+public class OdmFileCreation {
 
     private static final Logger LOG = LoggerFactory.getLogger(OdmFileCreation.class);
 
     private RuleSetRuleDao ruleSetRuleDao;
     private DataSource dataSource;
     private CoreResources coreResources;
-
-    private JobTerminationMonitor jobTerminationMonitor;
 
     private static File files[]=null;
     private static List<File> oldFiles = new LinkedList<File>();
@@ -74,11 +70,8 @@ public class OdmFileCreation implements ApplicationListener<JobCancelledEvent> {
 
         Integer ssNumber = getStudySubjectNumber(studySubjectNumber);
         MetaDataCollector mdc = new MetaDataCollector(dataSource, datasetBean, currentStudy,ruleSetRuleDao);
-        mdc.setJobTerminationMonitor(jobTerminationMonitor);
         AdminDataCollector adc = new AdminDataCollector(dataSource, datasetBean, currentStudy);
-        adc.setJobTerminationMonitor(jobTerminationMonitor);
         ClinicalDataCollector cdc = new ClinicalDataCollector(dataSource, datasetBean, currentStudy);
-        cdc.setJobTerminationMonitor(jobTerminationMonitor);
 
         MetaDataCollector.setTextLength(200);
         if(deleteOld){
@@ -193,7 +186,7 @@ public class OdmFileCreation implements ApplicationListener<JobCancelledEvent> {
 
         Iterator<OdmStudyBase> it = cdc.getStudyBaseMap().values().iterator();
         while (it.hasNext()) {
-            checkTermination();
+            JobTerminationMonitor.check();
             Stopwatch sw4 = Stopwatch.createAndStart("SelectStudySubjects");
 
             OdmStudyBase u = it.next();
@@ -205,7 +198,7 @@ public class OdmFileCreation implements ApplicationListener<JobCancelledEvent> {
             int fromIndex = 0;
             boolean firstIteration = true;
             while (fromIndex < newRows.size()) {
-                checkTermination();
+                JobTerminationMonitor.check();
                 Stopwatch sw5 = Stopwatch.createAndStart("SelectStudySubjects - inner loop");
 
                 int toIndex = fromIndex + ssNumber < newRows.size() ? fromIndex + ssNumber : newRows.size() - 1;
@@ -221,7 +214,6 @@ public class OdmFileCreation implements ApplicationListener<JobCancelledEvent> {
 
                 ClinicalDataUnit cdata = new ClinicalDataUnit(dataSource, datasetBean, cdc.getOdmbean(), u.getStudy(), cdc.getCategory(), studySubjectIds);
                 cdata.setCategory(cdc.getCategory());
-                cdata.collectOdmClinicalData(jobTerminationMonitor);
 
                 FullReportBean report = new FullReportBean();
                 report.setClinicalData(cdata.getOdmClinicalData());
@@ -409,20 +401,6 @@ public class OdmFileCreation implements ApplicationListener<JobCancelledEvent> {
         }
     }
 
-    @Override
-    public void onApplicationEvent(JobCancelledEvent event) {
-        if (jobTerminationMonitor != null) {
-            jobTerminationMonitor.terminate();
-        }
-    }
-
-    private void checkTermination() {
-        if (jobTerminationMonitor != null) {
-            jobTerminationMonitor.check();
-        }
-    }
-
-
     public DataSource getDataSource() {
         return dataSource;
     }
@@ -445,14 +423,6 @@ public class OdmFileCreation implements ApplicationListener<JobCancelledEvent> {
 
     public void setCoreResources(CoreResources coreResources) {
         this.coreResources = coreResources;
-    }
-
-    public JobTerminationMonitor getJobTerminationMonitor() {
-        return jobTerminationMonitor;
-    }
-
-    public void setJobTerminationMonitor(JobTerminationMonitor jobTerminationMonitor) {
-        this.jobTerminationMonitor = jobTerminationMonitor;
     }
 
 }
