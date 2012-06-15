@@ -13,6 +13,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * This class is used to introduce checkpoints in the extract job execution in which a job cancellation request
+ * performed by the user can be processed.
+ * Upon a cancellation request this monitor will throw a {@link JobInterruptedException} to interrupt the normal
+ * job execution flow.
+ *
  * @author Doug Rodrigues (douglas.rodrigues@openclinica.com)
  *
  */
@@ -22,6 +27,9 @@ public class JobTerminationMonitor implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobTerminationMonitor.class);
 
+    /**
+     * A ThreadLocal ensures that each thread will have its own monitor instance
+     */
     private static ThreadLocal<JobTerminationMonitor> instance = new ThreadLocal<JobTerminationMonitor>() {
         @Override
         protected JobTerminationMonitor initialValue() {
@@ -29,14 +37,13 @@ public class JobTerminationMonitor implements Serializable {
         }
     };
 
-    private final String jobName;
+    private String jobName = "<untitled>";
 
     private JobTerminationMonitor() {
-        this("<untitled>");
+        // Nothing to do
     }
 
     private JobTerminationMonitor(String jobName) {
-        // Prevent instantiation by other classes
         this.jobName = jobName;
     }
 

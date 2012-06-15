@@ -562,6 +562,8 @@ public class XsltTransformJob extends QuartzJobBean {
     }
 
     /**
+     * Initializes the dependencies of this job with the components from the Spring application context.
+     *
      * @param scheduler
      */
     private void initDependencies(Scheduler scheduler) {
