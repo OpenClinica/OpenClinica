@@ -55,6 +55,12 @@ public class JobTerminationMonitor implements Serializable {
 
     private boolean running = true;
 
+    /**
+     * Verifies if the termination of a job was requested, in which case this method throws a
+     * {@link JobInterruptedException}.
+     *
+     * @see #terminate()
+     */
     public static void check() {
         JobTerminationMonitor monitor = instance.get();
         if (!monitor.running) {
@@ -63,6 +69,9 @@ public class JobTerminationMonitor implements Serializable {
         }
     }
 
+    /**
+     * Request the monitor to throw an interruption exception in the next checkpoint
+     */
     public void terminate() {
         running = false;
     }
