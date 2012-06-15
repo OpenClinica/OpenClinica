@@ -111,6 +111,7 @@ public class XsltTransformJob extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext context) {
+        logger.info("Job " + context.getJobDetail().getFullName() + " started.");
         initDependencies(context.getScheduler());
         Stopwatch sw = Stopwatch.createAndStart("XsltTransformJob.executeInternal");
         // need to generate a Locale for emailing users with i18n
@@ -209,6 +210,7 @@ public class XsltTransformJob extends QuartzJobBean {
                 fId = fileID.intValue();
                 logger.debug("found " + fId + " and " + ODMXMLFileName);
             }
+            logger.info("Finished ODM generation of job " + context.getJobDetail().getFullName());
 
             // create dirs
             File output = new File(outputPath);
@@ -556,8 +558,8 @@ public class XsltTransformJob extends QuartzJobBean {
             if (datasetBean != null)
                 resetArchiveDataset(datasetBean.getId());
 
+            logger.info("Job " + context.getJobDetail().getFullName() + " finished.");
             sw.stop();
-
         }
 
     }

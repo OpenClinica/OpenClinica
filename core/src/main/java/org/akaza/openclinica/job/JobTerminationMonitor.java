@@ -9,6 +9,9 @@ package org.akaza.openclinica.job;
 
 import java.io.Serializable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author Doug Rodrigues (douglas.rodrigues@openclinica.com)
  *
@@ -17,6 +20,8 @@ public class JobTerminationMonitor implements Serializable {
 
     private static final long serialVersionUID = 361394087982395855L;
 
+    private static final Logger LOG = LoggerFactory.getLogger(JobTerminationMonitor.class);
+
     private static ThreadLocal<JobTerminationMonitor> instance = new ThreadLocal<JobTerminationMonitor>() {
         @Override
         protected JobTerminationMonitor initialValue() {
@@ -24,12 +29,20 @@ public class JobTerminationMonitor implements Serializable {
         }
     };
 
+    private final String jobName;
+
     private JobTerminationMonitor() {
-        // Prevent instantiation by other classes
+        this("<untitled>");
     }
 
-    public static JobTerminationMonitor createInstance() {
+    private JobTerminationMonitor(String jobName) {
+        // Prevent instantiation by other classes
+        this.jobName = jobName;
+    }
+
+    public static JobTerminationMonitor createInstance(String jobName) {
         instance.remove();
+        instance.set(new JobTerminationMonitor(jobName));
         return instance.get();
     }
 
@@ -37,7 +50,8 @@ public class JobTerminationMonitor implements Serializable {
 
     public static void check() {
         JobTerminationMonitor monitor = instance.get();
-        if (!monitor.isRunning()) {
+        if (!monitor.running) {
+            LOG.info("Raising termination exception for job " + monitor.jobName);
             throw new JobInterruptedException();
         }
     }
@@ -46,8 +60,8 @@ public class JobTerminationMonitor implements Serializable {
         running = false;
     }
 
-    public boolean isRunning() {
-        return running;
+    public String getJobName() {
+        return jobName;
     }
 
 }
