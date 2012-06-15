@@ -37,7 +37,6 @@ import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.job.JobTerminationMonitor;
-import org.akaza.openclinica.log.Stopwatch;
 import org.akaza.openclinica.logic.odmExport.AdminDataCollector;
 import org.akaza.openclinica.logic.odmExport.ClinicalDataCollector;
 import org.akaza.openclinica.logic.odmExport.ClinicalDataUnit;
@@ -65,8 +64,6 @@ public class OdmFileCreation {
             DatasetBean datasetBean, StudyBean currentStudy, String generalFileDirCopy, ExtractBean eb,
             Integer currentStudyId, Integer parentStudyId, String studySubjectNumber, boolean zipped,
             boolean saveToDB, boolean deleteOld, String odmType, UserAccountBean userBean) {
-
-        Stopwatch sw = Stopwatch.createAndStart("OdmFileCreation.createODMFile");
 
         Integer ssNumber = getStudySubjectNumber(studySubjectNumber);
         MetaDataCollector mdc = new MetaDataCollector(dataSource, datasetBean, currentStudy,ruleSetRuleDao);
@@ -130,7 +127,6 @@ public class OdmFileCreation {
 
         //////////////////////////////////////////
         ////////// MetaData Extraction //////////
-        Stopwatch sw1 = Stopwatch.createAndStart("createODM - MetaData");
         mdc.collectFileData();
         MetaDataReportBean metaReport = new MetaDataReportBean(mdc.getOdmStudyMap(),coreResources);
         metaReport.setODMVersion(odmVersion);
@@ -149,11 +145,9 @@ public class OdmFileCreation {
                 createFileK(ODMXMLFileName, generalFileDirCopy, metaReport.getXmlOutput().toString(), datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE,
                         false, zipped, deleteOld, userBean);
         }
-        sw1.stop();
         //////////////////////////////////////////
         ////////// AdminData Extraction //////////
 
-        Stopwatch sw2 = Stopwatch.createAndStart("createODM - AdminData");
         adc.collectFileData();
         AdminDataReportBean adminReport = new AdminDataReportBean(adc.getOdmAdminDataMap());
         adminReport.setODMVersion(odmVersion);
@@ -170,12 +164,10 @@ public class OdmFileCreation {
                 createFileK(ODMXMLFileName, generalFileDirCopy, adminReport.getXmlOutput().toString(), datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE,
                         false, zipped, deleteOld, userBean);
         }
-        sw2.stop();
 
         //////////////////////////////////////////
         ////////// ClinicalData Extraction ///////
 
-        Stopwatch sw3 = Stopwatch.createAndStart("createODM - ClinicalData");
         DatasetDAO dsdao = new DatasetDAO(dataSource);
         String sql = eb.getDataset().getSQLStatement();
         String st_sed_in = dsdao.parseSQLDataset(sql, true, true);
@@ -187,7 +179,6 @@ public class OdmFileCreation {
         Iterator<OdmStudyBase> it = cdc.getStudyBaseMap().values().iterator();
         while (it.hasNext()) {
             JobTerminationMonitor.check();
-            Stopwatch sw4 = Stopwatch.createAndStart("SelectStudySubjects");
 
             OdmStudyBase u = it.next();
             ArrayList newRows =
@@ -199,7 +190,6 @@ public class OdmFileCreation {
             boolean firstIteration = true;
             while (fromIndex < newRows.size()) {
                 JobTerminationMonitor.check();
-                Stopwatch sw5 = Stopwatch.createAndStart("SelectStudySubjects - inner loop");
 
                 int toIndex = fromIndex + ssNumber < newRows.size() ? fromIndex + ssNumber : newRows.size() - 1;
                 List x = newRows.subList(fromIndex, toIndex + 1);
@@ -238,9 +228,7 @@ public class OdmFileCreation {
                     int fId2 = createFileK(ODMXMLFileName, generalFileDirCopy, report.getXmlOutput().toString(), datasetBean, sysTimeEnd,
                                 ExportFormatBean.XMLFILE, false, zipped, deleteOld, userBean);
                 }
-                sw5.stop();
             }
-            sw4.stop();
         }
 
         sysTimeEnd = System.currentTimeMillis() - sysTimeBegin;
@@ -248,8 +236,6 @@ public class OdmFileCreation {
         if (!"".equals(generalFileDirCopy)) {
             int fId2 = createFileK(ODMXMLFileName, generalFileDirCopy, "</ODM>", datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE, false, zipped, deleteOld, userBean);
         }
-        sw3.stop();
-
 
         //////////////////////////////////////////
         ////////// pre pagination extraction /////
@@ -287,7 +273,6 @@ public class OdmFileCreation {
         answerMap.put(ODMXMLFileName, new Integer(fId));
     //    if(deleteOld && files!=null &&oldFiles!=null) setOldFiles(oldFiles);
 
-        sw.stop();
         return answerMap;
     }
 

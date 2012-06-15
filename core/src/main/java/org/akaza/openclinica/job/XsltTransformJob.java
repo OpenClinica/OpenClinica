@@ -50,7 +50,6 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.log.Stopwatch;
 import org.akaza.openclinica.service.extract.GenerateExtractFileService;
 import org.akaza.openclinica.service.extract.OdmFileCreation;
 import org.akaza.openclinica.service.extract.XsltTriggerService;
@@ -113,7 +112,6 @@ public class XsltTransformJob extends QuartzJobBean {
     protected void executeInternal(JobExecutionContext context) {
         logger.info("Job " + context.getJobDetail().getFullName() + " started.");
         initDependencies(context.getScheduler());
-        Stopwatch sw = Stopwatch.createAndStart("XsltTransformJob.executeInternal");
         // need to generate a Locale for emailing users with i18n
         // TODO make dynamic?
         Locale locale = new Locale("en-US");
@@ -559,7 +557,6 @@ public class XsltTransformJob extends QuartzJobBean {
                 resetArchiveDataset(datasetBean.getId());
 
             logger.info("Job " + context.getJobDetail().getFullName() + " finished.");
-            sw.stop();
         }
 
     }
