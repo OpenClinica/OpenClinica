@@ -258,8 +258,6 @@ function switchStr(itemId, id,attribute,str1,str2) {
 <c:set var="originJSP" value="${param.originJSP}" />
 <c:set var="hasDataFlag" value="${hasDataFlag}" />
 <c:set var="ddeEntered" value="${requestScope['ddeEntered']}" />
-<!-- for the rows in model, input name processed by back-end servlet, needs to change them back to the name got from form, so we can show error frame around the input -->
-<c:set var="autoParsedInputName" value="${repeatParentId}_${rowCount - manualRows}input${itemId}" />
 <c:if test="${isNewItem eq true }"> 
 	<c:set property = "isNewItem" target="${displayItem }" value="true"/>
 </c:if>
@@ -289,36 +287,24 @@ function switchStr(itemId, id,attribute,str1,str2) {
  	<c:set var="pageHasErrors" value="${true}" />
  </c:if>
  
-<%-- text input value--%>
 <%-- 24-May-2012 fix for issue #13822 do not display default values when page is displayed back with validation errors --%>
 <c:choose>
- <%--  <c:when test="${(originJSP eq 'doubleDataEntry' ||
-  (! (originJSP eq 'administrativeEditing'))) && (ddeEntered || (! hasDataFlag))
-  && (ddeEntered || (! sessionScope['groupHasData'])) &&
-  empty displayItem.metadata.responseSet.value}">
-  --%>
+
   <c:when test="${(originJSP eq 'doubleDataEntry' ||
   (! (originJSP eq 'administrativeEditing'))) && (ddeEntered || (! hasDataFlag))
   && (ddeEntered || (! sessionScope['groupHasData'])) &&
   empty displayItem.metadata.responseSet.value && !pageHasErrors}">
     <c:set var="inputTxtValue" value="${defValue}"/>
   </c:when>
- <%-- <c:when test="${isNewItem eq true }">
-  <c:if test='${inputType == "text"|| inputType == "textarea" }' >
-  		<c:set var="inputTxtValue" value="${defValue}"/>
-  </c:if>
-
-  	 
-  </c:when>--%>
-  <%--htaycher: question - when this case should be ::: --%>
-  <c:otherwise>
+ 
+ <c:otherwise>
    <c:set var="inputTxtValue" value="${displayItem.metadata.responseSet.value}"/>
    </c:otherwise>
 </c:choose>
 
 
 <c:forEach var="frmMsg" items="${formMessages}">
-   <c:if test="${(frmMsg.key eq parsedInputName) || (frmMsg.key eq autoParsedInputName)}">
+   <c:if test="${(frmMsg.key eq parsedInputName)}">
     <c:set var="isInError" value="${true}" />
     <c:set var="errorTxtMessage" value="${frmMsg.value}" />
   </c:if>
@@ -399,7 +385,6 @@ function switchStr(itemId, id,attribute,str1,str2) {
   </c:choose>
 </c:if>
 <c:if test='${inputType == "text"}'>
-  <%-- <c:out value="txt item"/> --%>
   <%-- add for error messages --%>
   <label for="<c:out value="${inputName}"/>"></label>
   <input type="hidden" id="defValue<c:out value="${inputName}"/>" name="defValue<c:out value="${inputName}"/>" value="<c:out value="${defValue}"/>"/>
@@ -583,40 +568,7 @@ include the default value first in the select list --%>
       <span class="aka_exclaim_error">! </span>
       <select class="aka_input_error" id="<c:out value="${inputName}"/>" tabindex="<c:out value="${tabNum}"/>"
       onChange="this.className='changedField'; sameRepGrpInstant('<c:out value="${inputName}"/>', '<c:out value="${itemId}"/>', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStr}" />', '<c:out value="${displayItem.instantFrontStrGroup.sameRepGrpFrontStr.frontStrDelimiter.code}" />'); javascript:setImageWithTitle('DataStatus_top','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>'); javascript:setImageWithTitle('DataStatus_bottom','images/icon_UnsavedData.gif', '<fmt:message key="changed_not_saved" bundle="${restext}"/>');" name="<c:out value="${inputName}"/>" class="formfield">
-          <%-- <c:choose>
-          <c:when test="${printDefault == 'true'}">
-            <c:set var="count" value="0"/>
-            <option value="<c:out value="" />" <c:out value=""/> ><c:out value="${displayItem.metadata.defaultValue}" /></option>
-            <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
-              <c:choose>
-                <c:when test="${count==selectedOption}"><c:set var="checked" value="selected" /></c:when>
-                <c:otherwise><c:set var="checked" value="" /></c:otherwise>
-              </c:choose>
-              <option value="<c:out value="${option.value}" />" <c:out value="${checked}"/> ><c:out value="${option.text}" /></option>
-              <c:set var="count" value="${count+1}"/>
-            </c:forEach>
-          </c:when>
-          <c:otherwise>
-           <c:forEach var="option" items="${displayItem.metadata.responseSet.options}">
-	          <c:choose>
-	            <c:when test="${count==selectedOption}">
-	              <c:set var="checked" value="selected" />
-	            </c:when>
-	            <c:otherwise>
-	              <c:set var="checked" value="" />
-	            </c:otherwise>
-	          </c:choose>
-	          <option value="<c:out value="${option.value}" />" <c:out value="${checked}"/>
-	                    <c:if test="${option.selected}">
-	      	                selected="selected"
-	                    </c:if>
-	                  >
-	            <c:out value="${option.text}" />
-	          </option>
-          	<c:set var="count" value="${count+1}"/>
-        	</c:forEach>
-          </c:otherwise>
-        </c:choose>--%>
+         
         <c:if test="${printDefaultFirst}">
              <option value="<c:out value="" />" selected="selected"
                             <c:out value=""/> ><c:out value="${displayItem.metadata.defaultValue}" />
@@ -758,8 +710,6 @@ include the default value first in the select list --%>
 						return;
 					}
 
-					// document.crfForm.<c:out value="${inputName}"/>.value = e.data.substring(e.data.indexOf(":") + 1);
-					// document.crfForm.<c:out value="${parsedInputName}"/>.value = e.data.substring(e.data.indexOf(":") + 1);
 				}
 			</script>
 
