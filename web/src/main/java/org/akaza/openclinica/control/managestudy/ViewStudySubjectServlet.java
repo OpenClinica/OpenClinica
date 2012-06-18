@@ -58,7 +58,6 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
-import org.akaza.openclinica.log.Stopwatch;
 import org.akaza.openclinica.service.crfdata.HideCRFManager;
 import org.akaza.openclinica.service.managestudy.StudySubjectService;
 import org.akaza.openclinica.view.Page;
@@ -121,8 +120,6 @@ public class ViewStudySubjectServlet extends SecureController {
 
     public static ArrayList<DisplayStudyEventBean> getDisplayStudyEventsForStudySubject(StudySubjectBean studySub, DataSource ds, UserAccountBean ub,
             StudyUserRoleBean currentRole) {
-        Stopwatch stopwatch = Stopwatch.createAndStart("getDisplayStudyEventsForStudySubject (study: "
-            + studySub.getId() + "; user: " + ub.getId() + "; role: " + currentRole.getId() + ")");
         StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(ds);
         StudyEventDAO sedao = new StudyEventDAO(ds);
         EventCRFDAO ecdao = new EventCRFDAO(ds);
@@ -134,7 +131,6 @@ public class ViewStudySubjectServlet extends SecureController {
 
         ArrayList displayEvents = new ArrayList();
         for (int i = 0; i < events.size(); i++) {
-            Stopwatch s1 = Stopwatch.createAndStart("displayEvents " + i);
             StudyEventBean event = (StudyEventBean) events.get(i);
             StudySubjectBean studySubject = (StudySubjectBean) ssdao.findByPK(event.getStudySubjectId());
 
@@ -159,11 +155,9 @@ public class ViewStudySubjectServlet extends SecureController {
             displayEvents.add(de);
             // event.setEventCRFs(createAllEventCRFs(eventCRFs,
             // eventDefinitionCRFs));
-            s1.stop();
 
         }
 
-        stopwatch.stop();
         return displayEvents;
     }
 
@@ -428,7 +422,6 @@ public class ViewStudySubjectServlet extends SecureController {
      */
     public static ArrayList getDisplayEventCRFs(DataSource ds, ArrayList eventCRFs, ArrayList eventDefinitionCRFs, UserAccountBean ub,
             StudyUserRoleBean currentRole, SubjectEventStatus status, StudyBean study) {
-        Stopwatch stopwatch = Stopwatch.createAndStart("getDisplayEventCRFs");
         ArrayList answer = new ArrayList();
 
         // HashMap definitionsById = new HashMap();
@@ -506,7 +499,6 @@ public class ViewStudySubjectServlet extends SecureController {
             }
         }
 
-        stopwatch.stop();
         return answer;
     }
 
@@ -521,7 +513,6 @@ public class ViewStudySubjectServlet extends SecureController {
      * @return The list of event definitions for which no event CRF exists.
      */
     public static ArrayList getUncompletedCRFs(DataSource ds, ArrayList eventDefinitionCRFs, ArrayList eventCRFs, SubjectEventStatus status) {
-        Stopwatch stopwatch = Stopwatch.createAndStart("getUncompletedCRFs");
         int i;
         HashMap completed = new HashMap();
         HashMap startedButIncompleted = new HashMap();
@@ -602,7 +593,6 @@ public class ViewStudySubjectServlet extends SecureController {
             }
         }
         // System.out.println("size of answer" + answer.size());
-        stopwatch.stop();
         return answer;
     }
 

@@ -8,8 +8,10 @@
 package org.akaza.openclinica.service.managestudy;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.akaza.openclinica.core.util.Pair;
 import org.jmesa.limit.Sort;
 import org.jmesa.limit.SortSet;
 
@@ -30,6 +32,19 @@ public class ViewNotesSortCriteria {
 
     private final Map<String, String> sorters = new HashMap<String, String>();
 
+    public static ViewNotesSortCriteria buildFilterCriteria(List<Pair<String,String>> sorts) {
+        ViewNotesSortCriteria criteria = new ViewNotesSortCriteria();
+        for (Pair<String,String> p: sorts) {
+        	String
+        		sortField = SORT_BY_TABLE_COLUMN.get(p.getFirst()),
+        		sortOrder = p.getSecond();
+        	if (sortField != null) {
+        		criteria.getSorters().put(sortField, sortOrder);
+        	}
+        }
+        return criteria;
+    }
+    
     public static ViewNotesSortCriteria buildFilterCriteria(SortSet sortSet) {
         ViewNotesSortCriteria criteria = new ViewNotesSortCriteria();
         for (Sort sort : sortSet.getSorts()) {

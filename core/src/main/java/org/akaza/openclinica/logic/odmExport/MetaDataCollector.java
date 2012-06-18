@@ -9,16 +9,17 @@
 
 package org.akaza.openclinica.logic.odmExport;
 
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.MetaDataVersionProtocolBean;
 import org.akaza.openclinica.bean.odmbeans.OdmStudyBean;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
-
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-
-import javax.sql.DataSource;
+import org.akaza.openclinica.job.JobTerminationMonitor;
 
 /**
  * Populate metadata for a ODM XML file. It supports:
@@ -32,7 +33,7 @@ import javax.sql.DataSource;
  * MetadataVersion. ODM fields in dataset table are for the study. For site(s),
  * siteOID will be appended automatically. </li>
  * </ul>
- * 
+ *
  * @author ywang (May, 2009)
  */
 
@@ -69,6 +70,7 @@ public class MetaDataCollector extends OdmDataCollector {
         Iterator<OdmStudyBase> it = this.getStudyBaseMap().values().iterator();
         MetaDataVersionProtocolBean protocol = new MetaDataVersionProtocolBean();
         while (it.hasNext()) {
+            JobTerminationMonitor.check();
             OdmStudyBase u = it.next();
             StudyBean study = u.getStudy();
             MetadataUnit meta = new MetadataUnit(this.ds, this.dataset, this.getOdmbean(), study, this.getCategory(),getRuleSetRuleDao());
@@ -84,7 +86,7 @@ public class MetaDataCollector extends OdmDataCollector {
                     }
                 } else {
                     protocol = meta.getOdmStudy().getMetaDataVersion().getProtocol();
-                    
+
 
                 }
             }

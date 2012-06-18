@@ -37,7 +37,6 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
-import org.akaza.openclinica.log.Stopwatch;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.service.DiscrepancyNotesSummary;
 import org.akaza.openclinica.service.managestudy.ViewNotesService;
@@ -70,9 +69,6 @@ public class ViewNotesServlet extends SecureController {
      */
     @Override
     protected void processRequest() throws Exception {
-        Stopwatch sw = Stopwatch.createAndStart("ViewNotesServlet#processRequest");
-        try {
-
         String module = request.getParameter("module");
         String moduleStr = "manage";
         if (module != null && module.trim().length() > 0) {
@@ -227,9 +223,6 @@ public class ViewNotesServlet extends SecureController {
             forwardPage(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_PRINT);
         } else {
             forwardPage(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY);
-        }
-        } finally {
-            sw.stop();
         }
     }
 

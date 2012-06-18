@@ -1,14 +1,25 @@
 package org.akaza.openclinica.control.extract;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptySet;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
+import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
+import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.extract.DownloadDiscrepancyNote;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -23,10 +34,10 @@ import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.core.util.Pair;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.ListNotesFilter;
-import org.akaza.openclinica.dao.managestudy.ListNotesSort;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -39,7 +50,11 @@ import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
+import org.akaza.openclinica.service.managestudy.ViewNotesFilterCriteria;
+import org.akaza.openclinica.service.managestudy.ViewNotesService;
+import org.akaza.openclinica.service.managestudy.ViewNotesSortCriteria;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * A servlet that sends via HTTP a file containing Discrepancy-Note related data.
@@ -97,7 +112,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         // Not needed now: boolean isList = ("y".equalsIgnoreCase(isAList));
         StudyBean studyBean = (StudyBean) session.getAttribute("study");
 
-        Set<Integer> resolutionStatusIds = (HashSet) session.getAttribute("resolutionStatus");
+//        Set<Integer> resolutionStatusIds = (HashSet) session.getAttribute("resolutionStatus");
 
         // It will also change any resolution status IDs among parents of children that have a different
         // id value (last boolean parameter; 'true' to perform the latter task)
@@ -105,30 +120,32 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         // type filtering, because we don't want to filter out parents, thus leaving out a child note
         // that might match the desired res status
         ListNotesFilter listNotesFilter = new ListNotesFilter();
-        StudySubjectBean studySubject = new StudySubjectBean();
-        if(subjectId>0) {
-            studySubject = (StudySubjectBean) new StudySubjectDAO(sm.getDataSource()).findByPK(subjectId);
-            listNotesFilter.addFilter("studySubject.labelExact", studySubject.getLabel());
-        }
-        if(discNoteType >= 1 && discNoteType <= 5) {
-            listNotesFilter.addFilter("discrepancyNoteBean.disType", discNoteType);
-        }
-        if(resolutionStatusIds != null && !resolutionStatusIds.isEmpty()) {
-            for(Integer statusId : resolutionStatusIds) {
-                listNotesFilter.addFilter("discrepancyNoteBean.resolutionStatus", statusId);
-            }
-        }
-        ListNotesSort listNotesSort = new ListNotesSort();//getListSubjectSort(limit);
-        listNotesSort.addSort("","");
-        ArrayList<DiscrepancyNoteBean> allDiscNotes = new DiscrepancyNoteDAO(sm.getDataSource()).getNotesWithFilterAndSort(studyBean, listNotesFilter, listNotesSort);
+
+        ViewNotesService viewNotesService = (ViewNotesService) WebApplicationContextUtils.getWebApplicationContext(
+        		getServletContext()).getBean("viewNotesService");
+
+    	ViewNotesFilterCriteria filter = ViewNotesFilterCriteria.buildFilterCriteria(
+    			getFilters(request),
+    			getDateFormat(),
+    	    	discrepancyNoteTypesDecoder,
+                resolutionStatusDecoder);
+        List<DiscrepancyNoteBean> notes = viewNotesService.listNotes(
+        		currentStudy,
+        		filter,
+                ViewNotesSortCriteria.buildFilterCriteria(getSortOrder(request)));
+        ArrayList<DiscrepancyNoteBean> allDiscNotes = notes instanceof ArrayList
+        		? (ArrayList<DiscrepancyNoteBean>) notes
+        		: new ArrayList<DiscrepancyNoteBean>(notes);
+        
         allDiscNotes = populateRowsWithAttachedData(allDiscNotes);
 
         // Now we have to package all the discrepancy notes in DiscrepancyNoteThread objects
         // Do the filtering for type or status here
         DiscrepancyNoteUtil discNoteUtil = new DiscrepancyNoteUtil();
 
+        Set<Integer> resolutionStatusIds = emptySet();
         List<DiscrepancyNoteThread> discrepancyNoteThreads =
-            discNoteUtil.createThreads(allDiscNotes, sm.getDataSource(), studyBean, resolutionStatusIds, discNoteType);
+            discNoteUtil.createThreads(allDiscNotes, sm.getDataSource(), studyBean);
 
         if ("csv".equalsIgnoreCase(format)) {
             /*response.setContentLength(
@@ -147,9 +164,99 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
               response.getOutputStream(), studyIdentifier);*/
             downLoader.downLoadThreadedDiscBeans(discrepancyNoteThreads, DownloadDiscrepancyNote.PDF, response.getOutputStream(), studyIdentifier);
         }
-
     }
 
+    private Map<String,String> makeDiscrepancyNoteTypesDecoder() {
+    	Map<String,String> decoder = new HashMap<String,String>();
+    	
+        ResourceBundle reterm = ResourceBundleProvider.getTermsBundle();
+        for (DiscrepancyNoteType type : DiscrepancyNoteType.list) {
+        	decoder.put(type.getName(), Integer.toString(type.getId()));
+        }
+        decoder.put(reterm.getString("Query_and_Failed_Validation_Check"), "1,3");
+
+        return decoder;
+    }
+
+    private Map<String,String> discrepancyNoteTypesDecoder = makeDiscrepancyNoteTypesDecoder();
+
+    private Map<String,String> makeResolutionStatusDecoder() {
+    	Map<String,String> decoder = new HashMap<String,String>();
+    	
+        ResourceBundle reterm = ResourceBundleProvider.getTermsBundle();
+        for (ResolutionStatus status : ResolutionStatus.list) {
+            decoder.put(status.getName(), Integer.toString(status.getId()));
+        }
+        decoder.put(reterm.getString("New_and_Updated"), "1,2");
+    	return decoder;
+    }
+
+    private Map<String,String> resolutionStatusDecoder = makeResolutionStatusDecoder();
+    
+    private String getDateFormat() {
+        Locale locale = LocaleResolver.getLocale(request);
+        ResourceBundle resformat = ResourceBundleProvider.getFormatBundle(locale);
+        return resformat.getString("date_format_string");
+    }
+
+    private Map<String,String> getFilters(HttpServletRequest request) {
+    	Map<String,String> filters = new HashMap<String,String>();
+    	String ids[] = {
+                "studySubject.label",
+                "siteId",
+                "studySubject.labelExact",
+                "discrepancyNoteBean.createdDate",
+                "discrepancyNoteBean.updatedDate",
+                "discrepancyNoteBean.description",
+                "discrepancyNoteBean.user",
+                "discrepancyNoteBean.disType",
+                "discrepancyNoteBean.entityType",
+                "discrepancyNoteBean.resolutionStatus",
+                "age",
+                "days",
+
+                "eventName",
+                "crfName",
+                "entityName",
+                "entityValue",
+                "discrepancyNoteBean.description",
+                "discrepancyNoteBean.user"
+    	};
+    	for (String s: ids) {
+    		String val = request.getParameter(s);
+    		if (val != null) {
+    			filters.put(s, val);
+    		}
+    	}
+    	return filters;
+    }
+
+    private List<Pair<String,String>> getSortOrder(HttpServletRequest request) {
+    	String ids[] = {
+    			"studySubject.label",
+    			"discrepancyNoteBean.createdDate",
+    			"days",
+    			"age"
+    	};
+    	
+    	List<Pair<String,String>> sortOrders = new ArrayList<Pair<String,String>>(4);
+    	for (String s: ids) {
+    		/*
+    		 * The HTTP parameters for sorting are prefixed with 'sort'.
+    		 */
+    		String orders[] = request.getParameterValues("sort." + s);
+    		if (orders != null) {
+	    		for (String order: orders) {
+	    			if ("ASC".equals(order) || "DESC".equals(order)) {
+	    				sortOrders.add(new Pair<String,String>(s, order));
+	    				break;
+	    			}
+	    		}
+    		}
+    	}
+    	return sortOrders;
+    }
+    
     private ArrayList<DiscrepancyNoteBean> populateRowsWithAttachedData(ArrayList<DiscrepancyNoteBean> noteRows) {
         Locale l = LocaleResolver.getLocale(request);
         resword = ResourceBundleProvider.getWordsBundle(l);

@@ -1,29 +1,5 @@
 package org.akaza.openclinica.controller;
 
-import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
-import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.i18n.core.LocaleResolver;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.service.extract.XsltTriggerService;
-import org.akaza.openclinica.web.table.scheduledjobs.ScheduledJobTableFactory;
-import org.akaza.openclinica.web.table.scheduledjobs.ScheduledJobs;
-import org.akaza.openclinica.web.table.sdv.SDVUtil;
-import org.apache.commons.dbcp.BasicDataSource;
-import org.jmesa.facade.TableFacade;
-import org.quartz.JobExecutionContext;
-import org.quartz.SchedulerException;
-import org.quartz.SimpleTrigger;
-import org.quartz.impl.StdScheduler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.scheduling.quartz.JobDetailBean;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -33,6 +9,28 @@ import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.extract.XsltTriggerService;
+import org.akaza.openclinica.web.table.scheduledjobs.ScheduledJobTableFactory;
+import org.akaza.openclinica.web.table.scheduledjobs.ScheduledJobs;
+import org.akaza.openclinica.web.table.sdv.SDVUtil;
+import org.jmesa.facade.TableFacade;
+import org.quartz.JobExecutionContext;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.SimpleTrigger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.quartz.JobDetailBean;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 /**
  *
  * @author jnyayapathi
@@ -40,11 +38,9 @@ import javax.servlet.http.HttpServletResponse;
  */
 @Controller("ScheduledJobController")
 public class ScheduledJobController {
+    private final static Logger logger = LoggerFactory.getLogger(ScheduledJobController.class);
+
     public final static String SCHEDULED_TABLE_ATTRIBUTE = "scheduledTableAttribute";
-    @Autowired
-    @Qualifier("dataSource")
-    private BasicDataSource dataSource;
-    private final  String SCHEDULER = "schedulerFactoryBean";
 
     @Autowired
     @Qualifier("scheduledJobTableFactory")
@@ -55,17 +51,14 @@ public class ScheduledJobController {
     @Qualifier("sdvUtil")
     private SDVUtil sdvUtil;
 
-    protected final static Logger logger = LoggerFactory.getLogger("org.akaza.openclinica.controller.ScheduledJobController");
-    public ScheduledJobController(){
-
-    }
+    @Autowired
+    private Scheduler scheduler;
 
     @RequestMapping("/listCurrentScheduledJobs")
     public ModelMap listScheduledJobs(HttpServletRequest request, HttpServletResponse response) throws SchedulerException{
         Locale locale = LocaleResolver.getLocale(request);
         ResourceBundleProvider.updateLocale(locale);
         ModelMap gridMap = new ModelMap();
-        StdScheduler scheduler = getScheduler(request);
         String[] triggersInGroup;
 
         boolean showMoreLink = false;
@@ -98,34 +91,6 @@ public class ScheduledJobController {
             currentJobList.add(temp.getTrigger().getJobName()+temp.getTrigger().getGroup());
         }
 
-
-       Iterator<SimpleTrigger> it =  scheduler.getPausedTriggerGroups().iterator();
-        while(it.hasNext())
-        {
-            logMe("Paused Job Group"+it.next().getJobGroup());
-            logMe("Paused Job Name:"+it.next().getJobName());
-            logMe("Paused Trigger Name:"+it.next().getName());
-            logMe("Paused Trigger Next Fire Time:"+it.next().getNextFireTime());
-
-        }
-
-     // enumerate each job group
-     /*   for(String group: scheduler.getJobGroupNames()) {
-            // enumerate each job in group
-
-
-            for(StdScheduler currentJob:listCurrentJobs)
-            {
-                currentJob.getJobNames(group);
-            }
-
-
-         for(String jobName:scheduler.getJobNames(group)){
-
-             System.out.println("Found job identified by: " + jobName);
-
-         }
-        }*/
         String[] triggerGroups =  scheduler.getTriggerGroupNames();
         List<SimpleTrigger> simpleTriggers = new ArrayList<SimpleTrigger>();
         int index1 =0;
@@ -134,7 +99,7 @@ public class ScheduledJobController {
             triggersInGroup = scheduler.getTriggerNames(triggerGroup);
 
             for (String element : triggersInGroup) {
-               logMe("- " + element);
+               logger.debug("- " + element);
                  simpleTriggers.add(index1,(SimpleTrigger) scheduler.getTrigger(element, triggerGroup));
                  index1++;
 
@@ -143,21 +108,6 @@ public class ScheduledJobController {
 
        List <ScheduledJobs>jobsScheduled = new ArrayList<ScheduledJobs>();
        int index = 0;
-  /*      for(JobExecutionContext jec:listCurrentJobs)
-        {
-            ScheduledJobs jobs = new ScheduledJobs();
-            StringBuilder schedulerStatus = new StringBuilder("");
-
-            schedulerStatus.append("<center><input style='margin-right: 5px' type='checkbox' ").append("class='sdvCheck'").append(" name='").append("sdvCheck_")
-            .append((Integer)jec.getTrigger().getJobDataMap().get("dsId")).append("' /></center>");
-
-            jobs.setCheckbox(schedulerStatus.toString());
-            jobs.setDatasetId((Integer)jec.getTrigger().getJobDataMap().get("dsId")+"");
-            jobs.setFireTime(jec.getFireTime()+"");
-            jobs.setScheduledFireTime(jec.getScheduledFireTime()+"");
-            jobsScheduled.add(index, jobs);
-            index++;
-        }*/
         for(SimpleTrigger st:simpleTriggers)
         {
 
@@ -187,7 +137,6 @@ public class ScheduledJobController {
 
 
             jobs.setCheckbox(checkbox.toString());
-            //jobs.setDatasetId((Integer)st.getJobDataMap().get("dsId")+"");
             jobs.setDatasetId(epBean.getDatasetName());
             String fireTime = st.getStartTime() != null ?
                 longFormat(locale).format(st.getStartTime()) : "";
@@ -203,7 +152,7 @@ public class ScheduledJobController {
             index++;
             }
         }
-        logMe("totalRows"+index);
+        logger.debug("totalRows"+index);
 
             request.setAttribute("totalJobs", index);
 
@@ -222,10 +171,9 @@ public class ScheduledJobController {
             @RequestParam("theTriggerName")   String triggerName,@RequestParam("theTriggerGroupName")   String triggerGroupName,
             @RequestParam("redirection") String redirection, ModelMap model) throws SchedulerException
         {
-        StdScheduler scheduler = getScheduler(request);
 
         scheduler.getJobDetail(theJobName, theJobGroupName);
-        logMe("About to pause the job-->"+theJobName+"Job Group Name -->"+theJobGroupName);
+        logger.debug("About to pause the job-->"+theJobName+"Job Group Name -->"+theJobGroupName);
 
         SimpleTrigger oldTrigger = (SimpleTrigger) scheduler.getTrigger(triggerName, triggerGroupName);
         if(oldTrigger!=null)
@@ -233,7 +181,7 @@ public class ScheduledJobController {
         Date startTime = new Date(oldTrigger.getStartTime().getTime()+oldTrigger.getRepeatInterval());
         if(triggerGroupName.equals(ExtractController.TRIGGER_GROUP_NAME))
         {
-            scheduler.interrupt(theJobName, theJobGroupName);
+            interruptQuartzJob(scheduler, theJobName, theJobGroupName);
         }
 
         scheduler.pauseJob(theJobName, theJobGroupName);
@@ -241,7 +189,6 @@ public class ScheduledJobController {
         SimpleTrigger newTrigger = new SimpleTrigger(triggerName,triggerGroupName);
         newTrigger.setJobName(theJobName);
         newTrigger.setJobGroup(theJobGroupName);
-      //  newTrigger.setNextFireTime(nextFireTime );
         newTrigger.setMisfireInstruction(oldTrigger.getMisfireInstruction());
         newTrigger.setJobDataMap(oldTrigger.getJobDataMap());
         newTrigger.setVolatility(false);
@@ -273,26 +220,20 @@ public class ScheduledJobController {
             jobDetailBean.setVolatility(false);
 
            scheduler.deleteJob(theJobName, theJobGroupName);
-            //scheduler.rescheduleJob(triggerName, triggerGroupName, newTrigger); // These are the jobs which come from export job and need to be rescheduled.
            scheduler.scheduleJob(jobDetailBean, newTrigger);
            pageMessages.add("The Job "+theJobName+"  has been rescheduled");
         }
 
         request.setAttribute("pageMessages", pageMessages);
 
-        logMe("jobDetails>"+ scheduler.getJobDetail(theJobName, theJobGroupName));
+        logger.debug("jobDetails>"+ scheduler.getJobDetail(theJobName, theJobGroupName));
         }
         sdvUtil.forwardRequestFromController(request, response, "/pages/" + redirection);
         return null;
-        }
-    private void logMe(String msg){
-      //  System.out.println(msg);
-        logger.info(msg);
     }
 
-    private StdScheduler getScheduler(HttpServletRequest request) {
-        StdScheduler scheduler =  (StdScheduler) SpringServletAccess.getApplicationContext(request.getSession().getServletContext()).getBean(SCHEDULER);
-        return scheduler;
+    private void interruptQuartzJob(Scheduler scheduler, String jobName, String jobGroup) throws SchedulerException {
+        scheduler.interrupt(jobName, jobGroup);
     }
 
     private String longFormatString() {
@@ -302,4 +243,5 @@ public class ScheduledJobController {
     private SimpleDateFormat longFormat(Locale locale) {
         return new SimpleDateFormat(longFormatString(), locale);
     }
+
 }

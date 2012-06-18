@@ -505,7 +505,12 @@
 				<appender-ref ref="SYSLOG-USAGESTATS"/>	
 			</then>	
 		</if>	
-	</logger>	
+	</logger>
+    
+    <logger additivity="false" name="jdbc.sqltiming">
+        <level value="${logLevel}"/>
+        <appender-ref ref="DB_LOGFILE"/>
+    </logger>	
 
   <root>
     <!-- <level value="INFO" />

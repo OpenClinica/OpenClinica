@@ -17,6 +17,7 @@ import javax.sql.DataSource;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.OdmAdminDataBean;
+import org.akaza.openclinica.job.JobTerminationMonitor;
 
 /**
  * Populate ODM AdminData Element for a ODM XML file. It supports:
@@ -25,7 +26,7 @@ import org.akaza.openclinica.bean.odmbeans.OdmAdminDataBean;
  * <li>ODM XML file contains multiple AdminData elements - one parent study
  * and its site(s). </li>
  * </ul>
- * 
+ *
  * @author ywang (March, 2010)
  */
 
@@ -36,9 +37,9 @@ public class AdminDataCollector extends OdmDataCollector {
         super(ds, currentStudy);
         this.odmAdminDataMap = new LinkedHashMap<String, OdmAdminDataBean>();
     }
-    
+
     /**
-     * 
+     *
      * @param ds
      * @param dataset
      */
@@ -55,6 +56,7 @@ public class AdminDataCollector extends OdmDataCollector {
     public void collectOdmAdminDataMap() {
         Iterator<OdmStudyBase> it = this.getStudyBaseMap().values().iterator();
         while (it.hasNext()) {
+            JobTerminationMonitor.check();
             OdmStudyBase u = it.next();
             AdminDataUnit adata = new AdminDataUnit(this.ds, this.dataset, this.getOdmbean(), u.getStudy(), this.getCategory());
             adata.setCategory(this.getCategory());
@@ -70,4 +72,5 @@ public class AdminDataCollector extends OdmDataCollector {
     public void setOdmClinicalDataMap(LinkedHashMap<String, OdmAdminDataBean> odmAdminDataMap) {
         this.odmAdminDataMap = odmAdminDataMap;
     }
+
 }

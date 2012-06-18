@@ -9,19 +9,19 @@
 
 package org.akaza.openclinica.logic.odmExport;
 
+import java.util.HashMap;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.ODMBean;
 import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
 import org.akaza.openclinica.dao.extract.OdmExtractDAO;
 
-import java.util.HashMap;
-
-import javax.sql.DataSource;
-
 /**
  * A class for one ODM ClinicalData Element.
- * 
+ *
  * @author ywang (May, 2009)
  */
 

@@ -1455,8 +1455,7 @@ public class DiscrepancyNoteUtil {
         return 0;
     }
 
-    public List<DiscrepancyNoteThread> createThreads(List<DiscrepancyNoteBean> allDiscNotes, DataSource dataSource, StudyBean currentStudy,
-            Set<Integer> resolutionStatusIds, int discNoteType) {
+    public List<DiscrepancyNoteThread> createThreads(List<DiscrepancyNoteBean> allDiscNotes, DataSource dataSource, StudyBean currentStudy) {
 
         List<DiscrepancyNoteThread> dnThreads = new ArrayList<DiscrepancyNoteThread>();
         if (allDiscNotes == null || allDiscNotes.isEmpty()) {

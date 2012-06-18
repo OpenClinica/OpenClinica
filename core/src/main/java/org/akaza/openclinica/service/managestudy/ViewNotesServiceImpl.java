@@ -12,7 +12,6 @@ import java.util.List;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.managestudy.ViewNotesDao;
-import org.akaza.openclinica.log.Stopwatch;
 import org.akaza.openclinica.service.DiscrepancyNotesSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,20 +27,18 @@ public class ViewNotesServiceImpl implements ViewNotesService {
 
     private ViewNotesDao viewNotesDao;
 
+    @Override
     public List<DiscrepancyNoteBean> listNotes(StudyBean currentStudy,
             ViewNotesFilterCriteria filter, ViewNotesSortCriteria sort) {
-        Stopwatch sw = Stopwatch.createAndStart("listNotes");
         List<DiscrepancyNoteBean> result = viewNotesDao.findAllDiscrepancyNotes(currentStudy, filter, sort);
         LOG.debug("Found " + result.size() + " discrepancy notes");
-        sw.stop();
         return result;
     }
 
+    @Override
     public DiscrepancyNotesSummary calculateNotesSummary(StudyBean currentStudy,
             ViewNotesFilterCriteria filter) {
-        Stopwatch sw = Stopwatch.createAndStart("calculateNotesSummary");
         DiscrepancyNotesSummary result = viewNotesDao.calculateNotesSummary(currentStudy, filter);
-        sw.stop();
         return result;
     }
 

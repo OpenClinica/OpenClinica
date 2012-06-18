@@ -1,6 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>OpenClinica-core</artifactId>
     <packaging>jar</packaging>
@@ -218,6 +216,18 @@
 		<dependency>
     		<groupId>org.akaza.openclinica.odm</groupId>
 			<artifactId>openclinica-odm</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>org.quartz-scheduler</groupId>
+		    <artifactId>quartz</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>org.quartz-scheduler</groupId>
+		    <artifactId>quartz-oracle</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>log4jdbc</groupId>
+		    <artifactId>log4jdbc4</artifactId>
 		</dependency>
 	</dependencies>
 	<!-- @pgawade 16-NOV-2010 unit tests through maven -->

@@ -63,6 +63,32 @@ public class ViewNotesFilterCriteria {
 
     private Integer pageSize;
 
+    public static ViewNotesFilterCriteria buildFilterCriteria(
+    		Map<String,String> filters,
+    		String datePattern,
+    		Map<String, String> discrepancyNoteTypeDecoder,
+    		Map<String, String> resolutionTypeDecoder) {
+    	DateFormat df = new SimpleDateFormat(datePattern);
+        ViewNotesFilterCriteria criteria = new ViewNotesFilterCriteria();
+
+        for (Map.Entry<String, String> e: filters.entrySet()) {
+            String columnName = e.getKey();
+            String filterName = FILTER_BY_TABLE_COLUMN.get(columnName);
+            if (filterName == null) {
+                throw new IllegalArgumentException("No query fragment available for column '" + columnName + "'");
+            }
+            String value = e.getValue();
+            if (filterName.equals("discrepancy_note_type_id")) {
+                value = discrepancyNoteTypeDecoder.get(value);
+            } else if (filterName.equals("resolution_status_id")) {
+                value = resolutionTypeDecoder.get(value);
+            }
+
+            criteria.getFilters().put(filterName, processValue(filterName, value, df));
+        }
+        return criteria;
+    }
+
     public static ViewNotesFilterCriteria buildFilterCriteria(Limit limit, String datePattern,
             Map<String, String> discrepancyNoteTypeDecoder, Map<String, String> resolutionTypeDecoder) {
         ViewNotesFilterCriteria criteria = new ViewNotesFilterCriteria();

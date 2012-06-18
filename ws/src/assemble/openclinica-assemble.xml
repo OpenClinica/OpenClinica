@@ -4,14 +4,7 @@
     <format>zip</format>
   </formats>
   <fileSets>
-    <fileSet>
-      <includes>
-        <include>README*</include>
-        <include>LICENSE*</include>
-        <include>NOTICE*</include>
-      </includes>
-    </fileSet>
-	<fileSet>
+  	<fileSet>
       <directory>src/main/config/install-docs</directory>
       <outputDirectory>install-docs</outputDirectory>
     </fileSet>
@@ -19,15 +12,24 @@
       <directory>src/main/config</directory>
       <outputDirectory>config</outputDirectory>
       <includes>
-        <include>database/PostgreSQL/${pom.version}/*/*</include>
-        <include>database/Oracle/${pom.version}/*/*</include>
-        <include>languages/*</include>
+        <include>database/PostgreSQL/3.1.2/*/*</include>
+        <include>database/Oracle/3.1.2/*/*</include>
       </includes>
     </fileSet>
   </fileSets>
   <files>
+    <file>
+      <source>README.txt</source>
+      <outputDirectory>/</outputDirectory>
+      <filtered>true</filtered>
+    </file>
+    <file>
+      <source>LICENSE.txt</source>
+      <outputDirectory>/</outputDirectory>
+      <filtered>false</filtered>
+    </file>
   	<file>
-  		<source>target/OpenClinica-ws-3.1-SNAPSHOT.war</source>
+  		<source>${project.build.directory}/${project.build.finalName}.war</source>
   		<outputDirectory>distribution</outputDirectory>
   		<destName>OpenClinica-ws.war</destName>
   	</file>

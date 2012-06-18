@@ -1,6 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.akaza.openclinica</groupId>
     <artifactId>OpenClinica</artifactId>
@@ -101,6 +99,21 @@
                 <groupId>org.akaza.openclinica.odm</groupId>
                 <artifactId>openclinica-odm</artifactId>
                 <version>1.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.quartz-scheduler</groupId>
+                <artifactId>quartz</artifactId>
+                <version>1.8.6</version>
+            </dependency>
+            <dependency>
+                <groupId>org.quartz-scheduler</groupId>
+                <artifactId>quartz-oracle</artifactId>
+                <version>1.8.6</version>
+            </dependency>
+            <dependency>
+                <groupId>log4jdbc</groupId>
+                <artifactId>log4jdbc4</artifactId>
+                <version>1.2</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -286,19 +299,6 @@
 			<artifactId>javassist </artifactId>
 			<version>3.8.0.GA</version>
 		</dependency>
-		 <!-- QUARTZ -->
-    	<dependency>
-			<groupId>org.quartz-scheduler</groupId>
-			<artifactId>quartz</artifactId>
-			<version>1.8.0</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-            <groupId>org.quartz-scheduler</groupId>
-            <artifactId>quartz-oracle</artifactId>
-            <version>1.8.0</version>
-            <scope>compile</scope>
-        </dependency>
         <!-- LIQUIBASE -->
         <dependency>
 			<groupId>org.liquibase</groupId>
@@ -500,7 +500,8 @@
     <scm>
 		<connection>scm:hg:${hg.url}</connection>
 		<developerConnection>scm:hg:${hg.url}</developerConnection>
-	</scm>
+	  <tag>HEAD</tag>
+  </scm>
 
     <repositories>
         <repository>
@@ -512,7 +513,7 @@
             <url>https://dev.openclinica.com/artifactory/libs-release</url>
         </repository>
         <repository>
-            <snapshots/>
+            <snapshots />
             <id>snapshots</id>
             <name>libs-snapshot</name>
             <url>https://dev.openclinica.com/artifactory/libs-snapshot</url>
@@ -542,7 +543,7 @@
             <url>https://dev.openclinica.com/artifactory/plugins-release</url>
         </pluginRepository>
         <pluginRepository>
-            <snapshots/>
+            <snapshots />
             <id>snapshots</id>
             <name>plugins-snapshot</name>
             <url>https://dev.openclinica.com/artifactory/plugins-snapshot</url>
