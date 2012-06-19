@@ -204,6 +204,7 @@ public class OdmFileCreation {
 
                 ClinicalDataUnit cdata = new ClinicalDataUnit(dataSource, datasetBean, cdc.getOdmbean(), u.getStudy(), cdc.getCategory(), studySubjectIds);
                 cdata.setCategory(cdc.getCategory());
+                cdata.collectOdmClinicalData();
 
                 FullReportBean report = new FullReportBean();
                 report.setClinicalData(cdata.getOdmClinicalData());
