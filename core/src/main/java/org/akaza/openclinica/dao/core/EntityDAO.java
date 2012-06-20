@@ -29,7 +29,6 @@ import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.extract.ExtractBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.dao.cache.EhCacheWrapper;
-
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +49,7 @@ import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
  * first statement. 2. Every method executing a query must call either signalSuccess or signalFailure before returning.
  * <p/>
  * At the time of writing, the only methods which execute queries are select and execute.
- * 
+ *
  * @author thickerson
  * @param <V>
  * @param <K>
@@ -68,7 +67,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
     protected EhCacheWrapper cache;
   //  protected EhCacheWrapper cache = new EhCacheWrapper();
     protected EhCacheManagerFactoryBean cacheManager;
-    
+
     // set the types we expect from the database
 
     // private ArrayList results = new ArrayList();
@@ -103,7 +102,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
     protected String local_df_string = "";
 
     protected EhCacheWrapper ehCacheWrapper;
-    
+
     public EntityDAO(DataSource ds) {
         this.ds = ds;
         setDigesterName();
@@ -111,7 +110,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
         initializeI18nStrings();
      setCache( SQLFactory.getInstance().getEhCacheWrapper());
     }
-    
+
     /**
      * This is the method added to cache the queries
      * @param cache
@@ -126,7 +125,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
 
     /**
      * setTypeExpected, expects to enter the type of object to retrieve from the database
-     * 
+     *
      * @param num
      *            the order the column should be extracted from the database
      * @param type
@@ -144,7 +143,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
      * select, a static query interface to the database, returning an array of hashmaps that contain key->object pairs.
      * <P>
      * This is the first operation created for the database, so therefore it is the simplest; cull information from the database but not specify any parameters.
-     * 
+     *
      * @param query
      *            a static query of the database.
      * @return ArrayList of HashMaps carrying the database values.
@@ -194,12 +193,12 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
         clearSignals();
 
         ArrayList results = new ArrayList();
-       
+
         ResultSet rs = null;
         Connection con = null;
         PreparedStatementFactory psf = new PreparedStatementFactory(variables);
         PreparedStatement ps = null;
-        
+
         try {
             con = ds.getConnection();
             if (con.isClosed()) {
@@ -209,23 +208,23 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
             }
 
            ps = con.prepareStatement(query);
-           
-       
+
+
             ps = psf.generate(ps);// enter variables here!
-       
+
             {
             rs = ps.executeQuery();
             results = this.processResultRows(rs);
-        
+
             }
-            
+
           //  if (logger.isInfoEnabled()) {
-            
+
                 logger.debug("Executing dynamic query, EntityDAO.select:query " + query);
           //  }
             signalSuccess();
-         
-              
+
+
 
         } catch (SQLException sqle) {
             signalFailure(sqle);
@@ -274,9 +273,9 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
         return results;
 
     }
-    
+
     //JN: The following method is added for when certain queries needed caching...
-    
+
     public ArrayList<V> selectByCache(String query, HashMap variables) {
         clearSignals();
 
@@ -450,7 +449,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
 
     /**
      * execute, the static version of executing an update or insert on a table in the database.
-     * 
+     *
      * @param query
      *            a static SQL statement which updates or inserts.
      */
@@ -557,11 +556,11 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
 
     /**
      * This method inserts one row for an entity table and gets latestPK of this row.
-     * 
+     *
      * @param query
      * @param variables
      * @param nullVars
-     * 
+     *
      * @author ywang 11-26-2007
      */
     public void executeWithPK(String query, HashMap variables, HashMap nullVars) {
@@ -622,7 +621,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
         return latestPK;
     }
 
-    
+
     private void logMe(String message){
        // System.out.println(message);
         logger.debug(message);
@@ -802,9 +801,9 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
      * <li>e.g., "WHERE item_id = ?" when selecting from item
      * <li>e.g., "WHERE item_id = ? AND event_crf_id=?" when selecting from item_data
      * </ol>
-     * 
+     *
      * Note that queries which join two tables may be included in the definition of "findByPK-style" query, as long as the first criterion is met.
-     * 
+     *
      * @param queryName
      *            The name of the query which should be executed.
      * @param variables
@@ -816,7 +815,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
 
         String sql = digester.getQuery(queryName);
         logMe("query:"+queryName+"variables:"+variables);
-        
+
         ArrayList rows;
         if (variables == null || variables.isEmpty()) {
             rows = this.select(sql);
@@ -835,7 +834,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
 
     /**
      * Exactly equivalent to calling <code>executeFindByPKQuery(queryName, new HashMap())</code>.
-     * 
+     *
      * @param queryName
      *            The name of the query which should be executed.
      * @return The EntityBean selected by the query.
@@ -938,7 +937,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
 
     /**
      * getDS, had to add it to allow queries of other daos within the daos
-     * 
+     *
      * @return Returns the ds.
      */
     public DataSource getDs() {
@@ -968,7 +967,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
 
     /**
      * Signal that the query was unsuccessful. Either this method or signalSuccess should be called by the time a select or execute method returns.
-     * 
+     *
      * @param sqle
      *            The SQLException which was thrown by PreparedStatement.execute/executeUpdate.
      */
@@ -1044,19 +1043,19 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
     /**
      * ********************************************************************************
      * ********************************************************************************
-     * 
+     *
      * @vbc 08/06/2008 NEW EXTRACT DATA IMPLEMENTATION - a new section that uses a different way to access the data - this is to improve performance and fix
      *      some bugs with the data extraction *******************************************************************************
-     * 
-     * 
+     *
+     *
      * @ywang, 09-09-2008, modified syntax of some sql scripts for oracle database.
-     * 
+     *
      */
     /**
      * select, a static query interface to the database, returning an array of hashmaps that contain key->object pairs.
      * <P>
      * This is the first operation created for the database, so therefore it is the simplest; cull information from the database but not specify any parameters.
-     * 
+     *
      * @param query
      *            a static query of the database.
      * @return ArrayList of HashMaps carrying the database values.
@@ -1066,7 +1065,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
         clearSignals();
         String query =
             getSQLSubjectStudySubjectDataset(studyid, parentid, sedin, it_in, dateConstraint, ecStatusConstraint, itStatusConstraint, CoreResources.getDBName());
-        logger.error("sqlSubjectStudySubjectDataset=" + query);
+        logger.debug("sqlSubjectStudySubjectDataset=" + query);
         ArrayList results = new ArrayList();
         ResultSet rs = null;
         Connection con = null;
@@ -1107,7 +1106,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
     }//
 
     /**
-     * 
+     *
      * @param rs
      * @return
      */
@@ -1192,53 +1191,53 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
     protected String getSQLSubjectStudySubjectDataset(int studyid, int studyparentid, String sedin, String it_in, String dateConstraint,
             String ecStatusConstraint, String itStatusConstraint, String databaseName) {
         /**
-         * 
+         *
          * SELECT
-         * 
+         *
          * DISTINCT ON (study_subject.study_subject_id ) study_subject.study_subject_id , study_subject.subject_id, study_subject.label, subject.date_of_birth,
          * subject.gender, subject.unique_identifier,subject.dob_collected, subject.status_id, study_subject.secondary_label, study_event.start_time_flag,
          * study_event.end_time_flag FROM study_subject
-         * 
-         * 
+         *
+         *
          * JOIN subject ON (study_subject.subject_id = subject.subject_id::numeric) JOIN study_event ON (study_subject.study_subject_id =
          * study_event.study_subject_id)
-         * 
-         * 
+         *
+         *
          * WHERE
-         * 
+         *
          * study_subject.study_subject_id IN (
-         * 
+         *
          * SELECT DISTINCT studysubjectid FROM
-         * 
+         *
          * (SELECT
-         * 
+         *
          * itemdataid, studysubjectid, study_event.sample_ordinal, study_event.study_event_definition_id, study_event_definition.name, study_event.location,
          * study_event.date_start, study_event.date_end,
-         * 
+         *
          * itemid, crfversionid, eventcrfid, studyeventid
-         * 
+         *
          * FROM ( SELECT item_data.item_data_id AS itemdataid, item_data.item_id AS itemid, item_data.value AS itemvalue, item.name AS itemname,
          * item.description AS itemdesc, item.units AS itemunits, event_crf.event_crf_id AS eventcrfid, crf_version.name AS crfversioname,
          * crf_version.crf_version_id AS crfversionid, event_crf.study_subject_id as studysubjectid, event_crf.study_event_id AS studyeventid
-         * 
+         *
          * FROM item_data, item, event_crf
-         * 
+         *
          * join crf_version ON event_crf.crf_version_id = crf_version.crf_version_id and (event_crf.status_id = 2::numeric OR event_crf.status_id = 6::numeric)
-         * 
+         *
          * WHERE
-         * 
+         *
          * item_data.item_id = item.item_id AND item_data.event_crf_id = event_crf.event_crf_id AND
-         * 
+         *
          * item_data.item_id IN ( 1005, 1006, 1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014, 1015, 1016, 1017, 1018, 1133, 1134, 1198, 1135, 1136, 1137, 1138,
          * 1139, 1140, 1141, 1142, 1143, 1144, 1145, 1146, 1147, 1148, 1149, 1150, 1151, 1152, 1153, 1154, 1155, 1156, 1157, 1158, 1159, 1160, 1161, 1162, 1163,
          * 1164, 1165, 1166, 1167, 1168, 1169, 1170, 1171, 1172, 1173, 1174, 1175, 1176, 1177, 1178, 1179, 1180, 1181, 1182, 1183, 1184, 1185, 1186, 1187, 1188,
          * 1189, 1190, 1191, 1192, 1193, 1194, 1195, 1196, 1197 )
-         * 
+         *
          * AND item_data.event_crf_id IN ( SELECT event_crf_id FROM event_crf WHERE event_crf.study_event_id IN ( SELECT study_event_id FROM study_event
-         * 
+         *
          * WHERE study_event.study_event_definition_id IN (9) AND ( study_event.sample_ordinal IS NOT NULL AND study_event.location IS NOT NULL AND
          * study_event.date_start IS NOT NULL ) AND study_event.study_subject_id IN (
-         * 
+         *
          * SELECT DISTINCT study_subject.study_subject_id FROM study_subject JOIN study ON ( study.study_id::numeric = study_subject.study_id AND
          * (study.study_id=2 OR study.parent_study_id=2) ) JOIN subject ON study_subject.subject_id = subject.subject_id::numeric JOIN study_event_definition ON
          * ( study.study_id::numeric = study_event_definition.study_id OR study.parent_study_id = study_event_definition.study_id ) JOIN study_event ON (
@@ -1255,16 +1254,16 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
          * date('1900-01-01')) and (date(study_subject.enrollment_date) <= date('2100-12-31')) AND study_event_definition.study_event_definition_id IN (9) ) AND
          * (event_crf.status_id = 2::numeric OR event_crf.status_id = 6::numeric) ) AND (item_data.status_id = 2::numeric OR item_data.status_id = 6::numeric) )
          * AS SBQONE, study_event, study_event_definition
-         * 
-         * 
-         * 
+         *
+         *
+         *
          * WHERE
-         * 
+         *
          * (study_event.study_event_id = SBQONE.studyeventid) AND (study_event.study_event_definition_id = study_event_definition.study_event_definition_id) )
          * AS SBQTWO )
-         * 
-         * 
-         * 
+         *
+         *
+         *
          */
         if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
             // The original sql for postgresql fetched only one record for each
@@ -1306,7 +1305,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
     }// getSQLSubjectStudySubjectDataset
 
     /**
-     * 
+     *
      * @param studyid
      * @param parentid
      * @param sedin
@@ -1366,7 +1365,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
 
     /**
      * Main function call
-     * 
+     *
      * @param studyid
      * @param parentid
      * @param sedin
@@ -1424,7 +1423,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
 
     /**
      * For each item_data_id stores a getSQLDatasetBASE_ITEMGROUPSIDE object
-     * 
+     *
      * @param rs
      * @return
      */
@@ -1437,10 +1436,10 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
          * fields are: SELECT itemdataid, itemdataordinal, item_group_metadata.item_group_id , item_group.name, itemdesc, itemname, itemvalue, itemunits,
          * crfversioname, crfversionstatusid, dateinterviewed, interviewername, eventcrfdatecompleted, eventcrfdatevalidatecompleted,
          * eventcrfcompletionstatusid, repeat_number, crfid,
-         * 
-         * 
+         *
+         *
          * //and ids studysubjectid, eventcrfid, itemid, crfversionid
-         * 
+         *
          */
         try {
             while (rs.next()) {
@@ -1628,7 +1627,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
 
     /**
      * For each item_data_id stores a getSQLDatasetBASE_ITEMGROUPSIDE object
-     * 
+     *
      * @param rs
      * @return
      */
@@ -1637,15 +1636,15 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
 
         /**
          * fields are: SELECT
-         * 
+         *
          * itemdataid, studysubjectid, study_event.sample_ordinal, study_event.study_event_definition_id, study_event_definition.name, study_event.location,
          * study_event.date_start, study_event.date_end,
-         * 
+         *
          * study_event.start_time_flag study_event.end_time_flag study_event.status_id study_event.subject_event_status_id
-         * 
-         * 
+         *
+         *
          * //ids itemid, crfversionid, eventcrfid, studyeventid
-         * 
+         *
          */
 
         int cnt = 0;
@@ -1842,7 +1841,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
 
     /**
      * There are two base querries for dataset
-     * 
+     *
      * @param studyid
      * @param studyparentid
      * @param sedin
@@ -1855,36 +1854,36 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
         /**
          * NEEEDS to replace four elements: - item_id IN (...) from dataset sql - study_event_definition_id IN (...) from sql dataset - study_id and
          * parent_study_id from current study
-         * 
+         *
          * SELECT
-         * 
+         *
          * itemdataid, studysubjectid, study_event.sample_ordinal, study_event.study_event_definition_id, study_event_definition.name, study_event.location,
          * study_event.date_start, study_event.date_end,
-         * 
+         *
          * itemid, crfversionid, eventcrfid, studyeventid
-         * 
+         *
          * FROM ( SELECT item_data.item_data_id AS itemdataid, item_data.item_id AS itemid, item_data.value AS itemvalue, item.name AS itemname,
          * item.description AS itemdesc, item.units AS itemunits, event_crf.event_crf_id AS eventcrfid, crf_version.name AS crfversioname,
          * crf_version.crf_version_id AS crfversionid, event_crf.study_subject_id as studysubjectid, event_crf.study_event_id AS studyeventid
-         * 
+         *
          * FROM item_data, item, event_crf
-         * 
+         *
          * join crf_version ON event_crf.crf_version_id = crf_version.crf_version_id and (event_crf.status_id = 2::numeric OR event_crf.status_id = 6::numeric)
-         * 
+         *
          * WHERE
-         * 
+         *
          * item_data.item_id = item.item_id AND item_data.event_crf_id = event_crf.event_crf_id AND
-         * 
+         *
          * item_data.item_id IN ( 1005, 1006, 1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014, 1015, 1016, 1017, 1018, 1133, 1134, 1198, 1135, 1136, 1137, 1138,
          * 1139, 1140, 1141, 1142, 1143, 1144, 1145, 1146, 1147, 1148, 1149, 1150, 1151, 1152, 1153, 1154, 1155, 1156, 1157, 1158, 1159, 1160, 1161, 1162, 1163,
          * 1164, 1165, 1166, 1167, 1168, 1169, 1170, 1171, 1172, 1173, 1174, 1175, 1176, 1177, 1178, 1179, 1180, 1181, 1182, 1183, 1184, 1185, 1186, 1187, 1188,
          * 1189, 1190, 1191, 1192, 1193, 1194, 1195, 1196, 1197 )
-         * 
+         *
          * AND item_data.event_crf_id IN ( SELECT event_crf_id FROM event_crf WHERE event_crf.study_event_id IN ( SELECT study_event_id FROM study_event
-         * 
+         *
          * WHERE study_event.study_event_definition_id IN (9) AND ( study_event.sample_ordinal IS NOT NULL AND study_event.location IS NOT NULL AND
          * study_event.date_start IS NOT NULL ) AND study_event.study_subject_id IN (
-         * 
+         *
          * SELECT DISTINCT study_subject.study_subject_id FROM study_subject JOIN study ON ( study.study_id::numeric = study_subject.study_id AND
          * (study.study_id=2 OR study.parent_study_id=2) ) JOIN subject ON study_subject.subject_id = subject.subject_id::numeric JOIN study_event_definition ON
          * ( study.study_id::numeric = study_event_definition.study_id OR study.parent_study_id = study_event_definition.study_id ) JOIN study_event ON (
@@ -1901,11 +1900,11 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
          * date('1900-01-01')) and (date(study_subject.enrollment_date) <= date('2100-12-31')) AND study_event_definition.study_event_definition_id IN (9) ) AND
          * (event_crf.status_id = 2::numeric OR event_crf.status_id = 6::numeric) ) AND (item_data.status_id = 2::numeric OR item_data.status_id = 6::numeric) )
          * AS SBQONE, study_event, study_event_definition
-         * 
-         * 
-         * 
+         *
+         *
+         *
          * WHERE
-         * 
+         *
          * (study_event.study_event_id = SBQONE.studyeventid) AND (study_event.study_event_definition_id = study_event_definition.study_event_definition_id)
          */
 
@@ -2179,7 +2178,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
 
     /**
      * This is the second base sql
-     * 
+     *
      * @param studyid
      * @param studyparentid
      * @param sedin
@@ -2191,37 +2190,37 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
         /**
          * NEEEDS to replace four elements: - item_id IN (...) from dataset sql - study_event_definition_id IN (...) from sql dataset - study_id and
          * parent_study_id from current study
-         * 
-         * 
+         *
+         *
          * SELECT itemdataid, itemdataordinal, item_group_metadata.item_group_id , item_group.name, itemdesc, itemname, itemvalue, itemunits, crfversioname,
          * crfversionstatusid, crfid, item_group_metadata.repeat_number, dateinterviewed, interviewername,
          * eventcrfdatevalidatecompleted,eventcrfcompletionstatusid,
-         * 
-         * 
+         *
+         *
          * studysubjectid, eventcrfid, itemid, crfversionid FROM ( SELECT item_data.item_data_id AS itemdataid, item_data.item_id AS itemid, item_data.value AS
          * itemvalue, item_data.ordinal AS itemdataordinal, item.name AS itemname, item.description AS itemdesc, item.units AS itemunits, event_crf.event_crf_id
          * AS eventcrfid, crf_version.name AS crfversioname, crf_version.crf_version_id AS crfversionid, crf_version.crf_id AS crfid, event_crf.study_subject_id
          * as studysubjectid, crf_version.status_id AS crfversionstatusid, event_crf.date_interviewed AS dateinterviewed, event_crf.interviewer_name as
          * interviewername, event_crf.date_validate_completed AS eventcrfdatevalidatecompleted, event_crf.completion_status_id AS eventcrfcompletionstatusid
-         * 
+         *
          * FROM item_data, item, event_crf
-         * 
+         *
          * join crf_version ON event_crf.crf_version_id = crf_version.crf_version_id and (event_crf.status_id = 2::numeric OR event_crf.status_id = 6::numeric)
-         * 
+         *
          * WHERE
-         * 
+         *
          * item_data.item_id = item.item_id AND item_data.event_crf_id = event_crf.event_crf_id AND
-         * 
+         *
          * item_data.item_id IN ( 1005, 1006, 1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014, 1015, 1016, 1017, 1018, 1133, 1134, 1198, 1135, 1136, 1137, 1138,
          * 1139, 1140, 1141, 1142, 1143, 1144, 1145, 1146, 1147, 1148, 1149, 1150, 1151, 1152, 1153, 1154, 1155, 1156, 1157, 1158, 1159, 1160, 1161, 1162, 1163,
          * 1164, 1165, 1166, 1167, 1168, 1169, 1170, 1171, 1172, 1173, 1174, 1175, 1176, 1177, 1178, 1179, 1180, 1181, 1182, 1183, 1184, 1185, 1186, 1187, 1188,
          * 1189, 1190, 1191, 1192, 1193, 1194, 1195, 1196, 1197 )
-         * 
+         *
          * AND item_data.event_crf_id IN ( SELECT event_crf_id FROM event_crf WHERE event_crf.study_event_id IN ( SELECT study_event_id FROM study_event
-         * 
+         *
          * WHERE study_event.study_event_definition_id IN (9) AND ( study_event.sample_ordinal IS NOT NULL AND study_event.location IS NOT NULL AND
          * study_event.date_start IS NOT NULL ) AND study_event.study_subject_id IN (
-         * 
+         *
          * SELECT DISTINCT study_subject.study_subject_id FROM study_subject JOIN study ON ( study.study_id::numeric = study_subject.study_id AND
          * (study.study_id=2 OR study.parent_study_id=2) ) JOIN subject ON study_subject.subject_id = subject.subject_id::numeric JOIN study_event_definition ON
          * ( study.study_id::numeric = study_event_definition.study_id OR study.parent_study_id = study_event_definition.study_id ) JOIN study_event ON (
@@ -2238,15 +2237,15 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
          * date('1900-01-01')) and (date(study_subject.enrollment_date) <= date('2100-12-31')) AND study_event_definition.study_event_definition_id IN (9) ) AND
          * (event_crf.status_id = 2::numeric OR event_crf.status_id = 6::numeric) ) AND (item_data.status_id = 2::numeric OR item_data.status_id = 6::numeric) )
          * AS SBQONE, item_group_metadata, item_group
-         * 
-         * 
-         * 
+         *
+         *
+         *
          * WHERE
-         * 
+         *
          * (item_group_metadata.item_id = SBQONE.itemid AND item_group_metadata.crf_version_id = SBQONE.crfversionid)
-         * 
+         *
          * AND
-         * 
+         *
          * (item_group.item_group_id = item_group_metadata.item_group_id)
          */
 
@@ -2524,7 +2523,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
     }// getSQLDatasetBASE_ITEMGROUPSIDE
 
     /**
-     * 
+     *
      * @param sedin
      * @param itin
      * @param currentstudyid
@@ -2536,42 +2535,42 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
         /**
          * SELECT DISTINCT study_event.study_event_definition_id, study_event.sample_ordinal, crfv.crf_id, it.item_id, ig.name AS item_group_name FROM event_crf
          * ec
-         * 
+         *
          * JOIN crf_version crfv ON ec.crf_version_id = crfv.crf_version_id AND (ec.status_id = 2::numeric OR ec.status_id = 6::numeric) JOIN item_form_metadata
          * ifm ON crfv.crf_version_id = ifm.crf_version_id LEFT JOIN item_group_metadata igm ON ifm.item_id = igm.item_id AND crfv.crf_version_id::numeric =
          * igm.crf_version_id LEFT JOIN item_group ig ON igm.item_group_id = ig.item_group_id::numeric JOIN item it ON ifm.item_id = it.item_id::numeric JOIN
          * study_event ON study_event.study_event_id = ec.study_event_id AND study_event.study_subject_id = ec.study_subject_id
-         * 
+         *
          * WHERE ec.event_crf_id IN (
-         * 
+         *
          * SELECT DISTINCT eventcrfid FROM ( SELECT
-         * 
+         *
          * itemdataid, studysubjectid, study_event.sample_ordinal, study_event.study_event_definition_id, study_event_definition.name, study_event.location,
          * study_event.date_start, study_event.date_end,
-         * 
+         *
          * itemid, crfversionid, eventcrfid, studyeventid
-         * 
+         *
          * FROM ( SELECT item_data.item_data_id AS itemdataid, item_data.item_id AS itemid, item_data.value AS itemvalue, item.name AS itemname,
          * item.description AS itemdesc, item.units AS itemunits, event_crf.event_crf_id AS eventcrfid, crf_version.name AS crfversioname,
          * crf_version.crf_version_id AS crfversionid, event_crf.study_subject_id as studysubjectid, event_crf.study_event_id AS studyeventid
-         * 
+         *
          * FROM item_data, item, event_crf
-         * 
+         *
          * join crf_version ON event_crf.crf_version_id = crf_version.crf_version_id and (event_crf.status_id = 2::numeric OR event_crf.status_id = 6::numeric)
-         * 
+         *
          * WHERE
-         * 
+         *
          * item_data.item_id = item.item_id AND item_data.event_crf_id = event_crf.event_crf_id AND
-         * 
+         *
          * item_data.item_id IN ( 1005, 1006, 1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014, 1015, 1016, 1017, 1018, 1133, 1134, 1198, 1135, 1136, 1137, 1138,
          * 1139, 1140, 1141, 1142, 1143, 1144, 1145, 1146, 1147, 1148, 1149, 1150, 1151, 1152, 1153, 1154, 1155, 1156, 1157, 1158, 1159, 1160, 1161, 1162, 1163,
          * 1164, 1165, 1166, 1167, 1168, 1169, 1170, 1171, 1172, 1173, 1174, 1175, 1176, 1177, 1178, 1179, 1180, 1181, 1182, 1183, 1184, 1185, 1186, 1187, 1188,
          * 1189, 1190, 1191, 1192, 1193, 1194, 1195, 1196, 1197 ) AND item_data.event_crf_id IN ( SELECT event_crf_id FROM event_crf WHERE
          * event_crf.study_event_id IN ( SELECT study_event_id FROM study_event
-         * 
+         *
          * WHERE study_event.study_event_definition_id IN (9) AND ( study_event.sample_ordinal IS NOT NULL AND study_event.location IS NOT NULL AND
          * study_event.date_start IS NOT NULL ) AND study_event.study_subject_id IN (
-         * 
+         *
          * SELECT DISTINCT study_subject.study_subject_id FROM study_subject JOIN study ON ( study.study_id::numeric = study_subject.study_id AND
          * (study.study_id=2 OR study.parent_study_id=2) ) JOIN subject ON study_subject.subject_id = subject.subject_id::numeric JOIN study_event_definition ON
          * ( study.study_id::numeric = study_event_definition.study_id OR study.parent_study_id = study_event_definition.study_id ) JOIN study_event ON (
@@ -2588,11 +2587,11 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
          * date('1900-01-01')) and (date(study_subject.enrollment_date) <= date('2100-12-31')) AND study_event_definition.study_event_definition_id IN (9) ) AND
          * (event_crf.status_id = 2::numeric OR event_crf.status_id = 6::numeric) ) AND (item_data.status_id = 2::numeric OR item_data.status_id = 6::numeric) )
          * AS SBQONE, study_event, study_event_definition
-         * 
-         * 
-         * 
+         *
+         *
+         *
          * WHERE
-         * 
+         *
          * (study_event.study_event_id = SBQONE.studyeventid) AND (study_event.study_event_definition_id = study_event_definition.study_event_definition_id) )
          * AS SBQTWO )
          */
@@ -2627,7 +2626,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
     }
 
     /**
-     * 
+     *
      * @param studyid
      * @param parentid
      * @param sedin
@@ -2679,7 +2678,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
 
     /**
      * Return directly the HashMap with the key It shouldn't be NULL !! TODO - throw an error if any of the fields is null!
-     * 
+     *
      * @param rs
      * @return
      */
@@ -2747,7 +2746,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
 
     /**
      * ******************************************************************************* This returns the final array of strings of event_crf_id
-     * 
+     *
      * @param studyid
      * @param parentid
      * @param sedin
@@ -2797,7 +2796,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
 
     /**
      * This returns an ArrayList of Strings
-     * 
+     *
      * @param rs
      * @return
      */
@@ -2829,7 +2828,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
     }
 
     /**
-     * 
+     *
      * @param studyid
      * @param studyparentid
      * @param sedin
@@ -2840,40 +2839,40 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
 
         /**
          * This is the SQL that will extract the event_crf_id list
-         * 
+         *
          * SELECT DISTINCT eventcrfid FROM
-         * 
+         *
          * (SELECT
-         * 
+         *
          * itemdataid, studysubjectid, study_event.sample_ordinal, study_event.study_event_definition_id, study_event_definition.name, study_event.location,
          * study_event.date_start, study_event.date_end,
-         * 
+         *
          * itemid, crfversionid, eventcrfid, studyeventid
-         * 
+         *
          * FROM ( SELECT item_data.item_data_id AS itemdataid, item_data.item_id AS itemid, item_data.value AS itemvalue, item.name AS itemname,
          * item.description AS itemdesc, item.units AS itemunits, event_crf.event_crf_id AS eventcrfid, crf_version.name AS crfversioname,
          * crf_version.crf_version_id AS crfversionid, event_crf.study_subject_id as studysubjectid, event_crf.study_event_id AS studyeventid
-         * 
+         *
          * FROM item_data, item, event_crf
-         * 
+         *
          * join crf_version ON event_crf.crf_version_id = crf_version.crf_version_id and (event_crf.status_id = 2::numeric OR event_crf.status_id = 6::numeric)
-         * 
+         *
          * WHERE
-         * 
+         *
          * item_data.item_id = item.item_id AND item_data.event_crf_id = event_crf.event_crf_id AND
-         * 
+         *
          * item_data.item_id IN
-         * 
+         *
          * (98, 99, 100, 102, 103, 104, 105, 106, 107, 108, 109, 110, 37, 38, 39, 41, 42, 43, 44, 45, 46, 47, 48, 49, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46,
          * 47, 48, 49, 1632, 1633, 1634, 1635, 1636, 1637, 1638, 1639, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
          * 25, 26, 27, 431, 28, 432, 433, 29, 434, 30, 435, 31, 32, 436, 437, 438, 439, 440, 441, 442, 443, 444, 445, 446, 447, 448, 449, 450, 451, 452, 453,
          * 454, 455, 456, 457, 458, 459, 460, 461, 462)
-         * 
+         *
          * AND item_data.event_crf_id IN ( SELECT event_crf_id FROM event_crf WHERE event_crf.study_event_id IN ( SELECT study_event_id FROM study_event
-         * 
+         *
          * WHERE study_event.study_event_definition_id IN (2, 7, 3) AND ( study_event.sample_ordinal IS NOT NULL AND study_event.location IS NOT NULL AND
          * study_event.date_start IS NOT NULL ) AND study_event.study_subject_id IN (
-         * 
+         *
          * SELECT DISTINCT study_subject.study_subject_id FROM study_subject JOIN study ON ( study.study_id::numeric = study_subject.study_id AND
          * (study.study_id=2 OR study.parent_study_id=2) ) JOIN subject ON study_subject.subject_id = subject.subject_id::numeric JOIN study_event_definition ON
          * ( study.study_id::numeric = study_event_definition.study_id OR study.parent_study_id = study_event_definition.study_id ) JOIN study_event ON (
@@ -2890,14 +2889,14 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
          * date('1900-01-01')) and (date(study_subject.enrollment_date) <= date('2100-12-31')) AND study_event_definition.study_event_definition_id IN (2, 7, 3)
          * ) AND (event_crf.status_id = 2::numeric OR event_crf.status_id = 6::numeric) ) AND (item_data.status_id = 2::numeric OR item_data.status_id =
          * 6::numeric) ) AS SBQONE, study_event, study_event_definition
-         * 
-         * 
-         * 
+         *
+         *
+         *
          * WHERE
-         * 
+         *
          * (study_event.study_event_id = SBQONE.studyeventid) AND (study_event.study_event_definition_id = study_event_definition.study_event_definition_id) )
          * AS SBQTWO
-         * 
+         *
          */
 
         String ret = "";
@@ -2910,7 +2909,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
 
     /**
      * ******************************************************************************* Returns a list with study_subject_id
-     * 
+     *
      * @param studyid
      * @param studyparentid
      * @param sedin
@@ -2958,7 +2957,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
 
     /**
      * This returns an ArrayList of Strings
-     * 
+     *
      * @param rs
      * @return
      */
@@ -2993,7 +2992,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
 
     /**
      * This returns the SQL with all active study_subject_id.
-     * 
+     *
      * @param studyid
      * @param studyparentid
      * @param sedin
@@ -3108,7 +3107,7 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
         }
         return statusConstraint;
     }
-    
-    
-    
+
+
+
 }
