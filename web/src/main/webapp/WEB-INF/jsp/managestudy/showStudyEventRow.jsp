@@ -28,7 +28,7 @@
      <td class="table_cell">
        <table border="0" cellpadding="0" cellspacing="0">
 		<tr>
-		<td>
+		<td> 
         <a href="EnterDataForStudyEvent?eventId=<c:out value="${currRow.bean.studyEvent.id}"/>"
 		onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
 		onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
@@ -232,7 +232,14 @@
 			     onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
 			     onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><img
 		         name="bt_Print1" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print_default" bundle="${resword}"/>" title="<fmt:message key="print_default" bundle="${resword}"/>" align="left" hspace="6"></a></td>
-
+<c:if test="${dedc.eventCRF.id>0 && (userBean.sysAdmin) && (study.status.available) && (dedc.edc.status.name != 'completed')}">
+   <td>
+<a href="pages/managestudy/chooseCRFVersion?crfId=<c:out value="${dedc.eventCRF.crf.id}" />&crfName=<c:out value="${dedc.eventCRF.crf.name}" />&crfversionId=<c:out value="${dedc.edc.defaultVersionId}" />&crfVersionName=<c:out value="${dedc.eventCRF.crfVersion.name}" />&studySubjectLabel=<c:out value="${studySub.label}"/>&studySubjectId=<c:out value="${studySub.id}"/>&eventCRFId=<c:out value="${dedc.eventCRF.id}"/>&eventDefinitionCRFId=<c:out value="${dedc.edc.id}"/>"
+   onMouseDown="javascript:setImage('bt_Reassign','images/bt_Reassign_d.gif');"
+   onMouseUp="javascript:setImage('bt_Reassign','images/bt_Reassign.gif');"><img
+   name="Reassign" src="images/bt_Reassign.gif" border="0" alt="<fmt:message key="reassign_crf_version" bundle="${resword}"/>" title="<fmt:message key="reassign_crf_version" bundle="${resword}"/>" align="left" hspace="6"></a>
+    </td>
+   </c:if>
 				</tr></table>
 				</td>
 			</tr>
@@ -313,6 +320,7 @@
 				    <img name="bt_EnterData1" src="images/bt_EnterData.gif" border="0" alt="<fmt:message key="continue_entering_data" bundle="${resword}"/>" title="<fmt:message key="continue_entering_data" bundle="${resword}"/>" align="left" hspace="6"></a>
     			</c:if>
     			<c:if test="${(dec.performAdministrativeEditingPermitted) &&(study.status.available)}">
+        		   
         		    <a href="#"
 				    onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
 				    onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');"
@@ -327,12 +335,7 @@
     		</c:if>
 		</td>
 	     <td>
-	     <!--
-		 <a href="ViewEventCRFContent?id=<c:out value="${studySub.id}"/>&ecId=<c:out value="${dec.eventCRF.id}"/>&eventId=<c:out value="${currRow.bean.studyEvent.id}"/>"
-			onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-			onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
-		    name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
-		 -->
+	    
 		 <a href="ViewSectionDataEntry?ecId=<c:out value="${dec.eventCRF.id}"/>&eventDefinitionCRFId=<c:out value="${dec.eventDefinitionCRF.id}"/>&tabId=1&studySubjectId=<c:out value="${studySub.id}"/>&exitTo=ViewStudySubject?id=${studySub.id}"
 			onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
 			onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
