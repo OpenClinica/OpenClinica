@@ -37,6 +37,24 @@
                     +'<fmt:message key="Leave_the_CRF" bundle="${resword}"/>');
             return false;
         }
+        function confirmCancelAction( pageName, contextPath){
+            var confirm1 = confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>');
+            if(confirm1){
+            	 var tform = document.forms["fr_cancel_button"];
+            	tform.action=contextPath+"/"+pageName;
+            	tform.submit();
+
+            }
+        }
+        function confirmExitAction( pageName, contextPath){
+            var confirm1 = confirm('<fmt:message key="sure_to_exit" bundle="${resword}"/>');
+            if(confirm1){
+            	 var tform = document.forms["fr_cancel_button"];
+            	tform.action=contextPath+"/"+pageName;
+            	tform.submit();
+
+            }
+        }
 </script>
 
 
