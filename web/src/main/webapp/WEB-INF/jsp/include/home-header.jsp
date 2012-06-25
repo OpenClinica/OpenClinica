@@ -40,7 +40,8 @@ org.akaza.openclinica.web.util.WebUtil.basePath(pageContext) %>" />
     <link rel="stylesheet" type="text/css" media="all" href="includes/new_cal/skins/aqua/theme.css" title="Aqua" />
     <script type="text/javascript" src="includes/new_cal/calendar.js"></script>
      <!--  fix for issue 14427 Removed the mapping with wrong file name calendar_en.js-->
-    <script type="text/javascript" src="includes/new_cal/lang/<fmt:message key="jscalendar_language_file" bundle="${resformat}"/>"></script>
+      <script type="text/javascript" src="includes/new_cal/lang/calendar-en.js"></script>
+      <script type="text/javascript" src="includes/new_cal/lang/<fmt:message key="jscalendar_language_file" bundle="${resformat}"/>"></script>
     <script type="text/javascript" src="includes/new_cal/calendar-setup.js"></script>
 <!-- End -->
 
