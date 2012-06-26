@@ -110,5 +110,6 @@
     <script type="text/javascript">hideCols('s_sdv',[2,3,4])</script>
 
 </div>
+<jsp:include page="include/footer.jsp"/>
 </body>
 </html>
