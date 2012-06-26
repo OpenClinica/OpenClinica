@@ -66,7 +66,7 @@
 <c:set var="urlPrefix" value=""/>
 <c:set var="requestFromSpringController" value="${param.isSpringController}" />
 <c:if test="${requestFromSpringController == 'true' }">
-    <c:set var="urlPrefix" value="../"/>
+      <c:set var="urlPrefix" value="${pageContext.request.contextPath}/"/>
 </c:if>
 
 <!-- Main Navigation -->
