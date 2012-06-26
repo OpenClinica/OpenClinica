@@ -133,17 +133,10 @@ $.noConflict();
 
 <table cellpadding="0" cellspacing="0" border="1" class="shaded_table" >
 <tr>
-<!-- 
-<td class="table_header_row" style="color: #789EC5;"><fmt:message key="CRF_name" bundle="${resword}"/></td>
-<td class="table_header_row" style="color: #789EC5;"><fmt:message key="date_updated" bundle="${resword}"/></td>
-<td class="table_header_row" style="color: #789EC5;"><fmt:message key="last_updated_by" bundle="${resword}"/></td>
-<td class="table_header_row" style="color: #789EC5;"><fmt:message key="crf_oid" bundle="${resword}"/></td> -->
 <td class="table_header_row" style="color: #789EC5;"><fmt:message key="version_name" bundle="${resword}"/></td>
 <td class="table_header_row" style="color: #789EC5;"><fmt:message key="version_oid" bundle="${resword}"/></td>
 <td class="table_header_row" style="color: #789EC5;"><fmt:message key="date_created" bundle="${resword}"/></td>
 <td class="table_header_row" style="color: #789EC5;"><fmt:message key="owner" bundle="${resword}"/></td>
-<!--<td class="table_header_row" style="color: #789EC5;"><fmt:message key="status" bundle="${resword}"/></td>-->
-<!-- <td class="table_header_row" style="color: #789EC5;"><fmt:message key="download" bundle="${resword}"/></td> -->
 <td class="table_header_row" style="color: #789EC5;"><fmt:message key="default_version" bundle="${resword}"/></td>
 <td class="table_header_row" style="color: #789EC5;"><fmt:message key="action" bundle="${resword}"/></td>
 </tr>
@@ -182,10 +175,7 @@ href="#" onclick="window.openNewWindow('../../ViewCRFVersion?id=<c:out value="${
 
 <table border="0" cellpadding="0" cellspacing="0">
 <tr><td VALIGN="top">
-<!--<input type="submit" name="confirmCRFVersionSubmit" class="button_long" 
-value="<fmt:message key="continue" bundle="${resword}"/>" 
-onclick="this.form.action='${pageContext.request.contextPath}/pages/confirmCRFVersionChange';this.form.submit();"/>
-        -->
+
 <input type="submit" name="confirmCRFVersionSubmit" class="button_long" 
 value="<fmt:message key="continue" bundle="${resword}"/>" >
 
@@ -199,7 +189,5 @@ class="button_long" onClick="confirmCancelAction('ViewStudySubject', '${pageCont
 </form>
 </td>
 </tr></table>
-<jsp:include page="../include/footer.jsp">
- <jsp:param name="isSpringControllerFooter" value="2" />
-    </jsp:include>
+<jsp:include page="../include/footer.jsp"/>
 
