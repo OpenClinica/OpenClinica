@@ -80,7 +80,7 @@
 <!-- CRF name  here -->
 <tr><td>
 <fmt:message key="choose_CRF_version_crf_name" bundle="${resword}"/>:</td>
-<td><a href="#" onclick="window.openNewWindow('../../ViewCRF?module=admin&crfId=<c:out value="${crfId}"/>' ,'','','dn')">
+<td><a href="#" onclick="window.openNewWindow('${pageContext.request.contextPath}/ViewCRF?module=admin&crfId=<c:out value="${crfId}"/>' ,'','','dn')">
 <c:out value="${crfName}"/></a></td></tr>
 <tr><td>
 
@@ -202,6 +202,4 @@
 </td></tr></table>
 
 
-<jsp:include page="../include/footer.jsp">
- <jsp:param name="isSpringControllerFooter" value="2" />
-    </jsp:include>
+<jsp:include page="../include/footer.jsp"/>
