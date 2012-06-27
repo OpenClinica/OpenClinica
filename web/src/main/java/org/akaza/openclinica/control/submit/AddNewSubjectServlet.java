@@ -1113,11 +1113,11 @@ public class AddNewSubjectServlet extends SecureController {
         InsertPropertyActionBean ruleAction = new InsertPropertyActionBean();
         ruleAction.addProperty(createPropertyBean("SE_RANDOMIZATION.dateStarted","SS.enrollmentDate + 0"));
         ruleAction.addProperty(createPropertyBean("SE_RANDOMIZATION.subjectEventStatus","Scheduled"));
-        ruleAction.addProperty(createPropertyBean("SE_TREATMENTVISIT1.dateStarted","SE_RANDOMIZATION.startDate + 2"));
+        ruleAction.addProperty(createPropertyBean("SE_TREATMENTVISIT1.dateStarted","SE_RANDOMIZATION.dateStarted + 2"));
         ruleAction.addProperty(createPropertyBean("SE_TREATMENTVISIT1.subjectEventStatus","Scheduled"));
-        ruleAction.addProperty(createPropertyBean("SE_TREATMENTVISIT2.dateStarted","SE_TREATMENTVISIT1.startDate + 4"));
+        ruleAction.addProperty(createPropertyBean("SE_TREATMENTVISIT2.dateStarted","SE_TREATMENTVISIT1.dateStarted + 4"));
         ruleAction.addProperty(createPropertyBean("SE_TREATMENTVISIT2.subjectEventStatus","Scheduled"));
-        ruleAction.addProperty(createPropertyBean("SE_FOLLOWUPVISIT1.dateStarted","SE_TREATMENTVISIT2.startDate + 5"));
+        ruleAction.addProperty(createPropertyBean("SE_FOLLOWUPVISIT1.dateStarted","SE_TREATMENTVISIT2.dateStarted + 5"));
         ruleAction.addProperty(createPropertyBean("SE_FOLLOWUPVISIT1.subjectEventStatus","Scheduled"));
         ruleAction.addProperty(createPropertyBean("SE_FOLLOWUPVISIT2.dateStarted","SE_FOLLOWUPVISIT1.dateStarted + 7"));
         ruleAction.addProperty(createPropertyBean("SE_FOLLOWUPVISIT2.subjectEventStatus","Scheduled"));
