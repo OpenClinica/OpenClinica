@@ -157,19 +157,19 @@ public class OpenClinicaExpressionParserTest extends TestCase {
         OpenClinicaExpressionParser expressionParserL = new OpenClinicaExpressionParser();
         OpenClinicaExpressionParser expressionParserM = new OpenClinicaExpressionParser();
 
-        String resultA = expressionParserA.parseAndEvaluateExpression(expressionA);
-        String resultB = expressionParserB.parseAndEvaluateExpression(expressionB);
-        String resultC = expressionParserC.parseAndEvaluateExpression(expressionC);
-        String resultD = expressionParserD.parseAndEvaluateExpression(expressionD);
-        String resultE = expressionParserE.parseAndEvaluateExpression(expressionE);
-        String resultF = expressionParserF.parseAndEvaluateExpression(expressionF);
-        String resultG = expressionParserG.parseAndEvaluateExpression(expressionG);
-        String resultH = expressionParserH.parseAndEvaluateExpression(expressionH);
-        String resultI = expressionParserI.parseAndEvaluateExpression(expressionI);
-        String resultJ = expressionParserJ.parseAndEvaluateExpression(expressionJ);
-        String resultK = expressionParserK.parseAndEvaluateExpression(expressionK);
-        String resultL = expressionParserL.parseAndEvaluateExpression(expressionL);
-        String resultM = expressionParserM.parseAndEvaluateExpression(expressionM);
+        String resultA = (String) expressionParserA.parseAndEvaluateExpression(expressionA);
+        String resultB = (String) expressionParserB.parseAndEvaluateExpression(expressionB);
+        String resultC = (String) expressionParserC.parseAndEvaluateExpression(expressionC);
+        String resultD = (String) expressionParserD.parseAndEvaluateExpression(expressionD);
+        String resultE = (String) expressionParserE.parseAndEvaluateExpression(expressionE);
+        String resultF = (String) expressionParserF.parseAndEvaluateExpression(expressionF);
+        String resultG = (String) expressionParserG.parseAndEvaluateExpression(expressionG);
+        String resultH = (String) expressionParserH.parseAndEvaluateExpression(expressionH);
+        String resultI = (String) expressionParserI.parseAndEvaluateExpression(expressionI);
+        String resultJ = (String) expressionParserJ.parseAndEvaluateExpression(expressionJ);
+        String resultK = (String) expressionParserK.parseAndEvaluateExpression(expressionK);
+        String resultL = (String) expressionParserL.parseAndEvaluateExpression(expressionL);
+        String resultM = (String) expressionParserM.parseAndEvaluateExpression(expressionM);
 
         assertEquals("The result should be true", "true", resultA);
         assertEquals("The result should be true", "true", resultB);
@@ -199,8 +199,8 @@ public class OpenClinicaExpressionParserTest extends TestCase {
         OpenClinicaExpressionParser expressionParserA = new OpenClinicaExpressionParser();
         OpenClinicaExpressionParser expressionParserB = new OpenClinicaExpressionParser();
 
-        String resultA = expressionParserA.parseAndEvaluateExpression(expressionA);
-        String resultB = expressionParserB.parseAndEvaluateExpression(expressionB);
+        String resultA = (String) expressionParserA.parseAndEvaluateExpression(expressionA);
+        String resultB = (String) expressionParserB.parseAndEvaluateExpression(expressionB);
 
         assertEquals("The result should be true", "true", resultA);
         assertEquals("The result should be true", "true", resultB);

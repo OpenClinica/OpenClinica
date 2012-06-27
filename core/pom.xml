@@ -245,6 +245,12 @@
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
+		        <dependency>
+            <groupId>com.ecyrd.speed4j</groupId>
+            <artifactId>speed4j</artifactId>
+            <version>0.12</version>
+        </dependency>
+		
 	</dependencies>
 	<!-- @pgawade 16-NOV-2010 unit tests through maven -->
 	<reporting>

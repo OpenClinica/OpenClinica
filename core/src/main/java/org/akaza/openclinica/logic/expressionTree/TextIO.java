@@ -488,12 +488,19 @@ public class TextIO {
     private String readDateString() { // read chars from input
         // following syntax of real
         // numbers
+    	
         skipWhitespace();
         if (lookChar() == EOF)
             return null;
+        try{
         if (dateMatcher == null)
             dateMatcher = dateRegex.matcher(buffer);
         dateMatcher.region(pos, buffer.length());
+        }catch(IndexOutOfBoundsException ioe){
+        	ioe.printStackTrace();
+        	//TODO: swallowing the exception, investigate further on what can be done to avoid this, perhaps its alright
+        }
+       
         if (dateMatcher.lookingAt()) {
             String str = dateMatcher.group();
             pos = dateMatcher.end();

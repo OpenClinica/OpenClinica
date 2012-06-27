@@ -19,6 +19,9 @@
           and Hibernate DAO injection via autowiring -->
 
 
+    <bean id="beanPropertyService" class="org.akaza.openclinica.service.crfdata.BeanPropertyService" autowire="byName">
+        <constructor-arg ref="dataSource"/>
+    </bean>
     <bean id="dynamicsMetadataService" class="org.akaza.openclinica.service.crfdata.DynamicsMetadataService" autowire="byName">
         <constructor-arg ref="dataSource"/>
     </bean>
