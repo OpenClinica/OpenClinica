@@ -14,6 +14,7 @@ import org.akaza.openclinica.control.admin.SiteStatisticsTableFactory;
 import org.akaza.openclinica.control.admin.StudyStatisticsTableFactory;
 import org.akaza.openclinica.control.admin.StudySubjectStatusStatisticsTableFactory;
 import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.ListStudySubjectTableFactory;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
@@ -74,6 +75,8 @@ public class MainMenuServlet extends SecureController {
 
     @Override
     public void processRequest() throws Exception {
+    	
+    	FormProcessor fp = new FormProcessor(request);
         ub.incNumVisitsToMainMenu();
         session.setAttribute(USER_BEAN_NAME, ub);
         request.setAttribute("iconInfoShown", true);
@@ -166,8 +169,11 @@ public class MainMenuServlet extends SecureController {
                     //int nextLabel = this.getStudySubjectDAO().findTheGreatestLabel() + 1;
                     //request.setAttribute("label", new Integer(nextLabel).toString());
                     request.setAttribute("label", resword.getString("id_generated_Save_Add"));
+                    //@pgawade 27-June-2012 fix for issue 13477: set label to "ID will be generated on Save or Add" in case of auto generated subject id
+                    fp.addPresetValue("label", resword.getString("id_generated_Save_Add"));
                 }
-
+                setPresetValues(fp.getPresetValues());
+                
                 if (currentRole.isInvestigator() || currentRole.isResearchAssistant()) {
                     setupListStudySubjectTable();
                 }
