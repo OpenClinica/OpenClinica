@@ -206,7 +206,7 @@ public class ImportSpringJob extends QuartzJobBean {
             logger.debug("found " + files.length + " files under directory "
                     + SQLInitServlet.getField("filePath") + DIR_PATH + File.separator + directory);
             File[] target = new File[files.length];
-            File[] destination = new File[files.length];
+            File[] destination = new File[files.length];            
             int placeHolder = 0;
             for (int i = 0; i < files.length; i++) {
                 // hmm
@@ -231,6 +231,10 @@ public class ImportSpringJob extends QuartzJobBean {
             }
             if (target.length > 0 && destination.length > 0) {
                 cutAndPaste(target, destination);
+                //@pgawade 28-June-2012: Fix for issue  #13964 - Remove the null elements from destination array of files
+                // which might be created because of presense of sub-directories or non-xml files under scheduled_data_import directory
+                // which are non-usable files for import.
+                destination = removeNullElements(destination);
                 // do everything else here with 'destination'
                ArrayList<String> auditMessages = processData(destination, dataSource, respage, ub, studyBean,
                         destDirectory, triggerBean, ruleSetService);
@@ -792,5 +796,16 @@ public class ImportSpringJob extends QuartzJobBean {
             }
         }
         return messages;
+    }
+    
+    private File[] removeNullElements (File[] source){    	
+    	
+    	ArrayList<File> list = new ArrayList<File>();
+    	for (File f : source){
+    	    if (f !=null){
+    	        list.add(f);
+    	    }
+    	}
+    	return list.toArray(new File[list.size()]);
     }
 }
