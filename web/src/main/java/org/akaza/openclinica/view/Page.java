@@ -120,6 +120,7 @@ public class Page {
     public final static Page VIEW_USER_ACCOUNT_SERVLET = new Page("/ViewUserAccount", "View user account servlet");
 
     public final static Page CONFIGURATION = new Page("/WEB-INF/jsp/admin/configuration.jsp", "Configuration");
+    public final static Page CONFIGURATION_PASSWORD_REQUIREMENTS = new Page("/WEB-INF/jsp/admin/configurationPasswordRequirements.jsp", "Configuration");
     public final static Page SYSTEM_STATUS = new Page("/WEB-INF/jsp/admin/systemStatus.jsp", "System Status");
 
     /**

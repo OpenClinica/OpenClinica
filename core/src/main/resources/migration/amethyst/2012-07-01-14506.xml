@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="
+                       http://www.liquibase.org/xml/ns/dbchangelog/1.9
+                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+     <changeSet author="lgayard" id="2012-07-01-14506" dbms="postgresql">
+        <comment>Configuration options to control user passwords</comment>
+        <sql splitStatements="true">
+<![CDATA[
+insert into configuration (key, value,description, version) values ('pwd.length.min',       '8',    'Password minimum length', 0);
+insert into configuration (key, value,description, version) values ('pwd.length.max',       '12',   'Password maximum length', 0);
+insert into configuration (key, value,description, version) values ('pwd.chars.case.lower', 'true', 'Whether the password must contain lowercase letters', 0);
+insert into configuration (key, value,description, version) values ('pwd.chars.case.upper', 'true', 'Whether the password must contain upper case letters', 0);
+insert into configuration (key, value,description, version) values ('pwd.chars.digit',      'true', 'Whether the password must contain digits', 0);
+insert into configuration (key, value,description, version) values ('pwd.chars.special',    'true', 'Whether the password must contain digits', 0);
+insert into configuration (key, value,description, version) values ('pwd.allow.reuse',      'true', 'Whether the password can be equal to a previous password', 0);
+insert into configuration (key, value,description, version) values ('pwd.history.size',     '3',    'How many old passwords to remember and to forbid repeating', 0);]]>
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
