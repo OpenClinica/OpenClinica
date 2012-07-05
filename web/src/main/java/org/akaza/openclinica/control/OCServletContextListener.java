@@ -15,18 +15,19 @@ import org.akaza.openclinica.service.usageStats.LogUsageStatsService;
 /**
  * ServletContextListener used as a controller for throwing an error when
  * reading up the properties
- * 
+ *
  * @author jnyayapathi, pgawade
- * 
+ *
  */
 public class OCServletContextListener implements ServletContextListener {
     private final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(this.getClass().getName());
 
     UsageStatsServiceDAO usageStatsServiceDAO;
     OpenClinicaVersionDAO openClinicaVersionDAO;
-    public static String OpenClinicaVersion = "OpenClinica_version";
+    public static String OpenClinicaVersion = "OpenClinica.version";
 
-	public void contextDestroyed(ServletContextEvent event) {
+	@Override
+    public void contextDestroyed(ServletContextEvent event) {
         logger.debug("OCServletContextListener -> contextDestroyed");
 
         // Save the OpenClinica stop time into database
@@ -34,7 +35,8 @@ public class OCServletContextListener implements ServletContextListener {
         getUsageStatsServiceDAO(context).saveOCStopTimeToDB();
 	}
 
-	public void contextInitialized(ServletContextEvent event) {
+	@Override
+    public void contextInitialized(ServletContextEvent event) {
         logger.debug("OCServletContextListener -> contextInitialized");
 		 CoreResources cr = (CoreResources) SpringServletAccess.getApplicationContext(event.getServletContext()).getBean("coreResources");
 
@@ -59,7 +61,7 @@ public class OCServletContextListener implements ServletContextListener {
         // add OpenClinica version into OC start event details
 
         OpenClinicaVersionBean openClinicaVersionBean = getOpenClinicaVersionDAO(context).findDefault();
-        if (null != openClinicaVersionBean) {            
+        if (null != openClinicaVersionBean) {
             OCStartEventDetails.put(LogUsageStatsService.OC_version, openClinicaVersionBean.getName());
         }
         return OCStartEventDetails;
