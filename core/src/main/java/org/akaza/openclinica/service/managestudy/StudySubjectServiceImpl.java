@@ -110,15 +110,10 @@ public class StudySubjectServiceImpl implements StudySubjectService {
             StudyEventDefinitionBean sed = eventDefinitionByEvent.get(event.getStudyEventDefinitionId());
             event.setStudyEventDefinition(sed);
 
-            /*
-            ArrayList eventDefinitionCRFs = (ArrayList) eventDefinitionCrfDao.findAllActiveByEventDefinitionId(
-                    study, sed.getId()); // Extract and replace by buildEventDefinitionCRFListByEventDefinition
-                    */
+            List eventDefinitionCRFs = new ArrayList(
+                    (eventDefinitionCrfByStudyEventDefinition.containsKey(sed.getId()) ?
+                            eventDefinitionCrfByStudyEventDefinition.get(sed.getId()) : Collections.EMPTY_LIST));
 
-            List eventDefinitionCRFs = new ArrayList(eventDefinitionCrfByStudyEventDefinition.get(sed.getId()));
-
-            // ArrayList eventCRFs = eventCrfDao.findAllByStudyEvent(event);
-            //FIXME Confirm that there may be no EventCRFs for a StudyEvent
             List eventCRFs = new ArrayList((eventCrfListByStudyEvent.containsKey(event.getId())) ?
                     eventCrfListByStudyEvent.get(event.getId()) : Collections.EMPTY_LIST);
 
