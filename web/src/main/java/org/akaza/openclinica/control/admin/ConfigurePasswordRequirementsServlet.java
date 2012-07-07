@@ -8,8 +8,6 @@ package org.akaza.openclinica.control.admin;
 
 import java.util.HashMap;
 
-import javax.servlet.ServletException;
-
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -36,22 +34,16 @@ public class ConfigurePasswordRequirementsServlet extends SecureController {
         }
         return;
     }
-    
-    @Override
-    public void init() throws ServletException {
-    	super.init();
-    	ConfigurationDao configurationDao = SpringServletAccess
-    			.getApplicationContext(context)
-    			.getBean(ConfigurationDao.class);
-    	this.passwordRequirementsDao = new PasswordRequirementsDao(configurationDao);
-    }
-
-    private PasswordRequirementsDao passwordRequirementsDao;
 
     @Override
     protected void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
 
+    	ConfigurationDao configurationDao = SpringServletAccess
+    			.getApplicationContext(context)
+    			.getBean(ConfigurationDao.class);
+    	PasswordRequirementsDao passwordRequirementsDao = new PasswordRequirementsDao(configurationDao);
+        
         if (!fp.isSubmitted()) {
         	setPresetValues(new HashMap<String,Object>(passwordRequirementsDao.configs()));
             forwardPage(Page.CONFIGURATION_PASSWORD_REQUIREMENTS);
@@ -64,27 +56,28 @@ public class ConfigurePasswordRequirementsServlet extends SecureController {
 
         	HashMap<?,?> errors = v.validate();
         	if (errors.isEmpty()) {
-				this.passwordRequirementsDao.setHasLower(   Boolean.valueOf(fp.getString("pwd.chars.case.lower")));
-				this.passwordRequirementsDao.setHasUpper(   Boolean.valueOf(fp.getString("pwd.chars.case.upper")));
-				this.passwordRequirementsDao.setHasDigits(  Boolean.valueOf(fp.getString("pwd.chars.digits")));
-				this.passwordRequirementsDao.setHasSpecials(Boolean.valueOf(fp.getString("pwd.chars.specials")));
-				this.passwordRequirementsDao.setAllowReuse( Boolean.valueOf(fp.getString("pwd.allow.reuse")));
+				passwordRequirementsDao.setHasLower(   Boolean.valueOf(fp.getString("pwd.chars.case.lower")));
+				passwordRequirementsDao.setHasUpper(   Boolean.valueOf(fp.getString("pwd.chars.case.upper")));
+				passwordRequirementsDao.setHasDigits(  Boolean.valueOf(fp.getString("pwd.chars.digits")));
+				passwordRequirementsDao.setHasSpecials(Boolean.valueOf(fp.getString("pwd.chars.specials")));
+				passwordRequirementsDao.setAllowReuse( Boolean.valueOf(fp.getString("pwd.allow.reuse")));
 
-				this.passwordRequirementsDao.setMinLength(fp.getInt("pwd.chars.min"));
-				this.passwordRequirementsDao.setMaxLength(fp.getInt("pwd.chars.max"));
-				this.passwordRequirementsDao.setHistorySize(fp.getInt("pwd.history.size"));
+				passwordRequirementsDao.setMinLength(fp.getInt("pwd.chars.min"));
+				passwordRequirementsDao.setMaxLength(fp.getInt("pwd.chars.max"));
+				passwordRequirementsDao.setHistorySize(fp.getInt("pwd.history.size"));
 
 				addPageMessage(respage.getString("password_req_changes_have_been_saved"));
 				forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET);
         	} else {
-        		setPresetValues(submittedValues(fp));
+        		setPresetValues(submittedValues(passwordRequirementsDao, fp));
         		setInputMessages(errors);
 				forwardPage(Page.CONFIGURATION_PASSWORD_REQUIREMENTS);
         	}
         }
     }
 
-    private HashMap<String,Object> submittedValues(FormProcessor fp) {
+    private HashMap<String,Object> submittedValues(
+    		PasswordRequirementsDao passwordRequirementsDao, FormProcessor fp) {
     	HashMap<String,Object> values = new HashMap<String,Object>();
     	for (String key: passwordRequirementsDao.boolConfigKeys()) {
     		String val = fp.getString(key);

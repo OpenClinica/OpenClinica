@@ -4,20 +4,19 @@
 
 <%
 String key = request.getParameter("key");
-String message="";
+boolean hasMessages = false;
 if (formMessages.get(key)!=null) {
 	ArrayList messages = (ArrayList) formMessages.get(key);
 	if (messages !=null) {
 	  for (int messagecount = 0; messagecount < messages.size(); messagecount++) {
-		message = (String) messages.get(messagecount);
+		hasMessages = true;
+        String message = (String) messages.get(messagecount);
+        %><div ID="spanAlert-<%=key%>" class="alert"><%=message%></div><%
 	  }
     }
 }
-%>
-<span ID="spanAlert-<%=key%>" class="alert"><%=message%></span>
-<%
-if (! message.equals("")) { %>
-<br/><br/>
- <%
- }
+
+if (hasMessages) {
+	%><br /><br /><%
+}
 %>

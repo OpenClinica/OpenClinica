@@ -7,6 +7,13 @@
  */
 package org.akaza.openclinica.control.login;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.ServletException;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.SpringServletAccess;
@@ -15,13 +22,12 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
+import org.akaza.openclinica.dao.hibernate.PasswordRequirementsDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
-import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * @author jxu
@@ -68,8 +74,66 @@ public class UpdateProfileServlet extends SecureController {
         }
 
     }
+    
+    private boolean hasLowerCaseChars(String str) {
+    	int len = str.length();
+    	for (int i = 0; i < len; i++) { 
+    		if (Character.isLowerCase(str.charAt(i))) return true;
+    	}
+    	return false;
+    }
+    private boolean hasUpperCaseChars(String str) {
+    	int len = str.length();
+    	for (int i = 0; i < len; i++) { 
+    		if (Character.isUpperCase(str.charAt(i))) return true;
+    	}
+    	return false;
+    }
+    private boolean hasDigits(String str) {
+    	int len = str.length();
+    	for (int i = 0; i < len; i++) { 
+    		if (Character.isDigit(str.charAt(i))) return true;
+    	}
+    	return false;
+    }
+    private boolean hasSpecialChars(String str) {
+    	int len = str.length();
+    	for (int i = 0; i < len; i++) { 
+    		if (PasswordRequirementsDao.SPECIALS.indexOf(str.charAt(i)) >= 0)
+    			return true;
+    	}
+    	return false;
+    }
 
-    private void confirmProfile(UserAccountBean userBean1) throws Exception {
+    private ArrayList<String> validatePassword(
+    		UserAccountBean userBean, String newPassword) {
+    	ConfigurationDao configurationDao = SpringServletAccess
+    			.getApplicationContext(context)
+    			.getBean(ConfigurationDao.class);
+    	PasswordRequirementsDao passwordRequirementsDao = new PasswordRequirementsDao(configurationDao);
+    	
+    	ArrayList<String> errors = new ArrayList<String>();
+    	// TODO - check for 'allow reuse' option
+    	// TODO - check min length
+    	// TODO - check max length
+
+    	if (passwordRequirementsDao.hasLower() && !hasLowerCaseChars(newPassword)) {
+    		errors.add("pwd_needs_lower_case");
+    	}
+    	if (passwordRequirementsDao.hasUpper() && !hasUpperCaseChars(newPassword)) {
+    		errors.add("pwd_needs_upper_case");
+    	}
+    	if (passwordRequirementsDao.hasDigits() && !hasDigits(newPassword)) {
+    		errors.add("pwd_needs_digits");
+    	}
+    	if (passwordRequirementsDao.hasSpecials() && !hasSpecialChars(newPassword)) {
+    		errors.add("pwd_needs_special_chars");
+    	}
+    	return errors;
+    }
+
+    @SuppressWarnings("unchecked")
+	private void confirmProfile(UserAccountBean userBean1) throws Exception {
         Validator v = new Validator(request);
         FormProcessor fp = new FormProcessor(request);
 
@@ -88,6 +152,11 @@ public class UpdateProfileServlet extends SecureController {
         v.addValidation("phone", Validator.NO_BLANKS);
         errors = v.validate();
 
+        ArrayList<String> pwdErrors = validatePassword(userBean1, fp.getString("passwd"));
+        for (String err: pwdErrors) {
+        	v.addError(errors, "passwd", v.messageFor(err));
+        }
+        
         userBean1.setFirstName(fp.getString("firstName"));
         userBean1.setLastName(fp.getString("lastName"));
         userBean1.setEmail(fp.getString("email"));

@@ -2,6 +2,7 @@ package org.akaza.openclinica.dao.hibernate;
 
 import static java.util.Arrays.asList;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,20 +12,32 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PasswordRequirementsDao {
+	public static final String
+		PWD_HISTORY_SIZE = "pwd.history.size",
+	    PWD_ALLOW_REUSE = "pwd.allow.reuse",
+	    PWD_CHARS_MIN = "pwd.chars.min",
+	    PWD_CHARS_MAX = "pwd.chars.max",
+	    PWD_CHARS_SPECIALS = "pwd.chars.specials",
+	    PWD_CHARS_DIGITS = "pwd.chars.digits",
+	    PWD_CHARS_CASE_UPPER = "pwd.chars.case.upper",
+	    PWD_CHARS_CASE_LOWER = "pwd.chars.case.lower",
+
+	    SPECIALS = "!@#$%&*()";
+
 	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	private ConfigurationDao configurationDao;
 
     private List<String> 
 		boolConfigKeys = asList(
-				"pwd.chars.case.lower",
-				"pwd.chars.case.upper",
-				"pwd.chars.digits",
-				"pwd.chars.specials",
-				"pwd.allow.reuse"),
+				PWD_CHARS_CASE_LOWER,
+				PWD_CHARS_CASE_UPPER,
+				PWD_CHARS_DIGITS,
+				PWD_CHARS_SPECIALS,
+				PWD_ALLOW_REUSE),
 		intConfigKeys  = asList(
-				"pwd.chars.min",
-				"pwd.chars.max",
-				"pwd.history.size");
+				PWD_CHARS_MIN,
+				PWD_CHARS_MAX,
+				PWD_HISTORY_SIZE);
 	
 	public PasswordRequirementsDao(ConfigurationDao configurationDao) {
 		this.configurationDao = configurationDao;
@@ -60,35 +73,80 @@ public class PasswordRequirementsDao {
 	}
 
 	public void setHasLower(boolean hasLower) {
-		setValue("pwd.chars.case.lower", hasLower);
+		setValue(PWD_CHARS_CASE_LOWER, hasLower);
 	}
 
 	public void setHasUpper(boolean hasUpper) {
-		setValue("pwd.chars.case.upper", hasUpper);
+		setValue(PWD_CHARS_CASE_UPPER, hasUpper);
 	}
 
 	public void setHasDigits(boolean hasDigits) {
-		setValue("pwd.chars.digits", hasDigits);
+		setValue(PWD_CHARS_DIGITS, hasDigits);
 	}
 
 	public void setHasSpecials(boolean hasSpecials) {
-		setValue("pwd.chars.specials", hasSpecials);
+		setValue(PWD_CHARS_SPECIALS, hasSpecials);
 	}
 
 	public void setAllowReuse(boolean allowReuse) {
-        setValue("pwd.allow.reuse", allowReuse);
+        setValue(PWD_ALLOW_REUSE, allowReuse);
 	}
 
 	public void setMinLength(int minLen) {
-        setValue("pwd.chars.min", minLen);
+        setValue(PWD_CHARS_MIN, minLen);
 	}
 
 	public void setMaxLength(int maxLen) {
-        setValue("pwd.chars.max", maxLen);
+        setValue(PWD_CHARS_MAX, maxLen);
 	}
 
+	/**
+	 * How many old passwords the user cannot reuse 
+	 */
 	public void setHistorySize(int size) {
-		setValue("pwd.history.size", size);
+		setValue(PWD_HISTORY_SIZE, size);
+	}
+
+	public boolean hasLower() {
+		return getBoolProperty(PWD_CHARS_CASE_LOWER);
+	}
+	public boolean hasUpper() {
+		return getBoolProperty(PWD_CHARS_CASE_UPPER);
+	}
+	public boolean hasDigits() {
+		return getBoolProperty(PWD_CHARS_DIGITS);
+	}
+	public boolean hasSpecials() {
+		return getBoolProperty(PWD_CHARS_SPECIALS);
+	}
+	public boolean allowReuse() {
+		return getBoolProperty(PWD_CHARS_DIGITS);
+	}
+	public int minLength() {
+		return getIntProperty(PWD_CHARS_MIN);
+	}
+	public int maxLength() {
+		return getIntProperty(PWD_CHARS_MAX);
+	}
+	/**
+	 * The user's last passwords.
+	 * 
+	 * The size of the list is as set by {@link #setHistorySize(int)}
+	 * and configuration pwd.history.size in the database.
+	 */
+	public List<String> lastPasswordHashes() {
+		// TODO - finish me.
+		return Collections.emptyList();
+	}
+
+	private int getIntProperty(String key) {
+		ConfigurationBean bean = this.configurationDao.findByKey(key);
+		return Integer.parseInt(bean.getValue());
+	}
+
+	private boolean getBoolProperty(String key) {
+		ConfigurationBean bean = this.configurationDao.findByKey(key);
+		return Boolean.parseBoolean(bean.getValue());
 	}
 
 	private void setValue(String key, boolean value) {
