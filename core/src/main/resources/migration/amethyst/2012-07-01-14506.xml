@@ -20,4 +20,19 @@ insert into configuration (key, value,description, version) values ('pwd.history
         </sql>
     </changeSet>
 
+     <changeSet author="lgayard" id="2012-07-01-14506-2" dbms="postgresql">
+        <comment>New table to store user's old passwords, so they cannot repeat passwords.</comment>
+		<createTable tableName="user_old_password_hashes">
+			<column autoIncrement="true" name="id" type="serial">
+				<constraints nullable="false" primaryKey="true"/>
+			</column>
+			<column name="user_id"       type="int" />
+			<column name="password_hash" type="varchar(255)"/>
+		</createTable>
+        <addForeignKeyConstraint constraintName="userid"
+                                 referencedTableName="user_account"
+                                 referencedColumnNames="user_id"
+                                 baseColumnNames="user_id"
+                                 baseTableName="user_old_password_hashes" />
+    </changeSet>
 </databaseChangeLog>

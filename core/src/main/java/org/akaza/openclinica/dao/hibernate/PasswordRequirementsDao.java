@@ -2,7 +2,6 @@ package org.akaza.openclinica.dao.hibernate;
 
 import static java.util.Arrays.asList;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -120,23 +119,19 @@ public class PasswordRequirementsDao {
 		return getBoolProperty(PWD_CHARS_SPECIALS);
 	}
 	public boolean allowReuse() {
-		return getBoolProperty(PWD_CHARS_DIGITS);
+		return getBoolProperty(PWD_ALLOW_REUSE);
+	}
+	/**
+	 * How many old passwords the user cannot reuse 
+	 */
+	public int historySize() {
+		return getIntProperty(PWD_HISTORY_SIZE);
 	}
 	public int minLength() {
 		return getIntProperty(PWD_CHARS_MIN);
 	}
 	public int maxLength() {
 		return getIntProperty(PWD_CHARS_MAX);
-	}
-	/**
-	 * The user's last passwords.
-	 * 
-	 * The size of the list is as set by {@link #setHistorySize(int)}
-	 * and configuration pwd.history.size in the database.
-	 */
-	public List<String> lastPasswordHashes() {
-		// TODO - finish me.
-		return Collections.emptyList();
 	}
 
 	private int getIntProperty(String key) {

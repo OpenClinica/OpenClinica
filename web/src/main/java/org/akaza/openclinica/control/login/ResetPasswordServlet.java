@@ -13,6 +13,8 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
+import org.akaza.openclinica.dao.hibernate.PasswordRequirementsDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -87,6 +89,22 @@ public class ResetPasswordServlet extends SecureController {
             }
             errors = v.validate();
 
+            ConfigurationDao configurationDao = SpringServletAccess
+            		.getApplicationContext(context)
+            		.getBean(ConfigurationDao.class);
+            PasswordRequirementsDao passwordRequirementsDao = new PasswordRequirementsDao(configurationDao);
+            String newDigestPass = sm.encrytPassword(newPwd, getUserDetails());
+            ArrayList<String> pwdErrors = 
+            		new PasswordValidator().validatePassword(
+            				passwordRequirementsDao,
+            				udao,
+            				ub.getId(),
+            				fp.getString("passwd"),
+            				newDigestPass);
+            for (String err: pwdErrors) {
+            	v.addError(errors, "passwd", v.messageFor(err));
+            }
+
             if (!errors.isEmpty()) {
                 logger.info("ResetPassword page has validation errors");
                 request.setAttribute("formMessages", errors);
@@ -95,7 +113,7 @@ public class ResetPasswordServlet extends SecureController {
                 logger.info("ResetPassword page has no errors");
 
                 if (!StringUtil.isBlank(newPwd)) {
-                    String newDigestPass = sm.encrytPassword(newPwd, getUserDetails());
+                	udao.saveOldPassword(ub.getId(), oldPwd);
                     ub.setPasswd(newDigestPass);
                     ub.setPasswdTimestamp(new Date());
                 } else if ("no".equalsIgnoreCase(mustChangePwd)) {
