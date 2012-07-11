@@ -7,21 +7,28 @@
  */
 package org.akaza.openclinica.control.login;
 
+import static java.lang.Boolean.TRUE;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.ServletException;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
-import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
+import org.akaza.openclinica.dao.hibernate.PasswordRequirementsDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
-import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * @author jxu
@@ -55,7 +62,7 @@ public class UpdateProfileServlet extends SecureController {
             if ("confirm".equalsIgnoreCase(action)) {
                 logger.info("confirm");
                 request.setAttribute("studies", studies);
-                confirmProfile(userBean1);
+                confirmProfile(userBean1, udao);
 
             } else if ("submit".equalsIgnoreCase(action)) {
                 logger.info("submit");
@@ -68,8 +75,9 @@ public class UpdateProfileServlet extends SecureController {
         }
 
     }
-
-    private void confirmProfile(UserAccountBean userBean1) throws Exception {
+    
+    @SuppressWarnings("unchecked")
+	private void confirmProfile(UserAccountBean userBean1, UserAccountDAO udao) throws Exception {
         Validator v = new Validator(request);
         FormProcessor fp = new FormProcessor(request);
 
@@ -88,6 +96,28 @@ public class UpdateProfileServlet extends SecureController {
         v.addValidation("phone", Validator.NO_BLANKS);
         errors = v.validate();
 
+        ConfigurationDao configurationDao = SpringServletAccess
+        		.getApplicationContext(context)
+        		.getBean(ConfigurationDao.class);
+        org.akaza.openclinica.core.SecurityManager sm =
+        		(org.akaza.openclinica.core.SecurityManager) SpringServletAccess
+        		.getApplicationContext(context)
+        		.getBean("securityManager");
+
+        String newDigestPass = sm.encrytPassword(fp.getString("passwd"), getUserDetails());
+        
+        PasswordRequirementsDao passwordRequirementsDao = new PasswordRequirementsDao(configurationDao);
+        ArrayList<String> pwdErrors = 
+        		new PasswordValidator().validatePassword(
+        				passwordRequirementsDao,
+        				udao,
+        				userBean1.getId(),
+        				fp.getString("passwd"),
+        				newDigestPass);
+        for (String err: pwdErrors) {
+        	v.addError(errors, "passwd", v.messageFor(err));
+        }
+        
         userBean1.setFirstName(fp.getString("firstName"));
         userBean1.setLastName(fp.getString("lastName"));
         userBean1.setEmail(fp.getString("email"));
@@ -96,7 +126,7 @@ public class UpdateProfileServlet extends SecureController {
         userBean1.setPasswdChallengeAnswer(fp.getString("passwdChallengeAnswer"));
         userBean1.setPhone(fp.getString("phone"));
         userBean1.setActiveStudyId(fp.getInt("activeStudyId"));
-        StudyDAO sdao = new StudyDAO(sm.getDataSource());
+        StudyDAO sdao = new StudyDAO(this.sm.getDataSource());
 
         StudyBean newActiveStudy = (StudyBean) sdao.findByPK(userBean1.getActiveStudyId());
         request.setAttribute("newActiveStudy", newActiveStudy);
@@ -112,8 +142,8 @@ public class UpdateProfileServlet extends SecureController {
             // + ub.getPasswd());
 
             String oldPass = fp.getString("oldPasswd").trim();
-            SecurityManager sm = (SecurityManager) SpringServletAccess.getApplicationContext(context).getBean("securityManager");
             String oldDigestPass = sm.encrytPassword(oldPass, getUserDetails());
+            
             if (!sm.isPasswordValid(ub.getPasswd(), oldPass, getUserDetails())) {
                 Validator.addError(errors, "oldPasswd", resexception.getString("wrong_old_password"));
                 request.setAttribute("formMessages", errors);
@@ -121,7 +151,7 @@ public class UpdateProfileServlet extends SecureController {
                 forwardPage(Page.UPDATE_PROFILE);
             } else {
                 if (!StringUtil.isBlank(fp.getString("passwd"))) {
-                    String newDigestPass = sm.encrytPassword(fp.getString("passwd"), getUserDetails());
+                	session.setAttribute("oldPasswdHash", oldDigestPass);
                     userBean1.setPasswd(newDigestPass);
                     userBean1.setPasswdTimestamp(new Date());
                 }
@@ -143,18 +173,24 @@ public class UpdateProfileServlet extends SecureController {
      * 
      */
     private void submitProfile(UserAccountDAO udao) {
-
         logger.info("user bean to be updated:" + ub.getId() + ub.getFirstName());
+
         UserAccountBean userBean1 = (UserAccountBean) session.getAttribute("userBean1");
         if (userBean1 != null) {
-            userBean1.setLastVisitDate(new Date());
+        	userBean1.setLastVisitDate(new Date());
             userBean1.setUpdater(ub);
             udao.update(userBean1);
-            session.setAttribute("userBean", userBean1);
+
+        	String oldPasswordHash = (String) session.getAttribute("oldPasswdHash");
+        	if (oldPasswordHash != null) {
+        		udao.saveOldPassword(ub.getId(), oldPasswordHash);
+        		session.removeAttribute("oldPasswdHash");
+        	}
+
+        	session.setAttribute("userBean", userBean1);
             ub = userBean1;
             session.removeAttribute("userBean1");
         }
-
     }
 
 }

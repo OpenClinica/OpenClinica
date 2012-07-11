@@ -758,9 +758,6 @@ public class Validator {
             case IS_IN_SET:
                 errorMessage = resexception.getString("input_not_acceptable_option");
                 break;
-            case IS_A_PASSWORD:
-                errorMessage = resexception.getString("password_must_be_at_least") + PASSWORD_MINIMUM_LENGTH + " " + resword.getString("characters_long") + ".";
-                break;
             case IS_A_USERNAME:
                 errorMessage = resexception.getString("input_not_valid_username") + USERNAME.getDescription() + " " + resexception.getString("format5") + ".";
                 break;
@@ -848,6 +845,12 @@ public class Validator {
 
     protected void addError(String fieldName, String errorMessage) {
         Validator.addError(errors, fieldName, errorMessage);
+    }
+
+    public String messageFor(String error) {
+        Locale locale = LocaleResolver.getLocale(request);
+        ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle(locale);
+        return resexception.getString(error);
     }
 
     /**
@@ -968,11 +971,6 @@ public class Validator {
             ArrayList set = (ArrayList) v.getArg(0);
 
             if (!isInSet(fieldName, set)) {
-                addError(fieldName, v);
-            }
-            break;
-        case IS_A_PASSWORD:
-            if (!lengthComparesToStaticValue(fieldName, NumericComparisonOperator.GREATER_THAN_OR_EQUAL_TO, PASSWORD_MINIMUM_LENGTH)) {
                 addError(fieldName, v);
             }
             break;
