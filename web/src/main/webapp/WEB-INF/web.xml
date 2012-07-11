@@ -283,6 +283,12 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
     </servlet>
 
     <servlet>
+        <servlet-name>ConfigurePasswordRequirementsServlet</servlet-name>
+        <description>ConfigurePasswordRequirementsServlet</description>
+        <servlet-class>org.akaza.openclinica.control.admin.ConfigurePasswordRequirementsServlet</servlet-class>
+    </servlet>
+
+    <servlet>
         <servlet-name>DiscrepancyNoteOutputServlet</servlet-name>
         <description>DiscrepancyNoteOutputServlet</description>
         <servlet-class>org.akaza.openclinica.control.extract.DiscrepancyNoteOutputServlet</servlet-class>
@@ -2094,6 +2100,10 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
     <servlet-mapping>
         <servlet-name>SystemStatusServlet</servlet-name>
         <url-pattern>/SystemStatus</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ConfigurePasswordRequirementsServlet</servlet-name>
+        <url-pattern>/ConfigurePasswordRequirements</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ConfigureServlet</servlet-name>

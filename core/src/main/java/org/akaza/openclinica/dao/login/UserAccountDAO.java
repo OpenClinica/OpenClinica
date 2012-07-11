@@ -29,6 +29,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.sql.DataSource;
 
@@ -125,6 +127,12 @@ public class UserAccountDAO extends AuditableEntityDAO {
         this.setTypeExpected(8, TypeNames.STRING);
     }
 
+    private void setPasswordTypesExpected() {
+    	// assume getting list of old passwords
+    	this.unsetTypeExpected();
+    	this.setTypeExpected(1, TypeNames.STRING);
+    }
+
     public EntityBean update(EntityBean eb) {
         UserAccountBean uab = (UserAccountBean) eb;
         HashMap variables = new HashMap();
@@ -177,7 +185,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         variables.put(new Integer(18), uab.getRunWebservices());
 
         variables.put(new Integer(19), new Integer(uab.getId()));
-
+        
         String sql = digester.getQuery("update");
         this.execute(sql, variables, nullVars);
 
@@ -1030,4 +1038,29 @@ public class UserAccountDAO extends AuditableEntityDAO {
         return al;
     }
 
+    /** Returns the user's old password hashes */
+    public Set<String> findOldPasswordHashes(int userId, int amount) {
+    	this.setPasswordTypesExpected();
+
+    	HashMap variables = new HashMap();
+        variables.put(new Integer(1), userId);
+        variables.put(new Integer(2), amount);
+
+        ArrayList rows = this.select(digester.getQuery("findOldPasswordHashes"), variables);
+        Set<String> ret = new TreeSet<String>();
+        Iterator it = rows.iterator();
+        while (it.hasNext()) {
+        	HashMap row = (HashMap) it.next();
+        	ret.add((String) row.get("password_hash"));
+        }
+        return ret;
+    }
+
+    public void saveOldPassword(int userId, String oldPassword) {
+    	String sql = digester.getQuery("addOldPasswordHash");
+    	HashMap vars = new HashMap();
+    	vars.put(1, userId);
+    	vars.put(2, oldPassword);
+    	execute(sql, vars);
+    }
 }
