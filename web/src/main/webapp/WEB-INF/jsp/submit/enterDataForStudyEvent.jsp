@@ -420,20 +420,23 @@
               name="bt_Print1" align="left" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print_default" bundle="${resword}"/>" title="<fmt:message key="print_default" bundle="${resword}"/>"  hspace="2"></a>&nbsp;
        
        
-        <c:if test="${studySubject.status.name != 'removed'&& 
-        studySubject.status.name != 'auto-removed' && 
-        (study.status.available) && !studyEvent.status.deleted && (userBean.sysAdmin)
+       <%--  <c:if test="${(study.status.available || study.status.pending) 
+        &&  !(dedc.edc.status.locked || dedc.edc.status.skipped )
+        && (userBean.sysAdmin || (userRole.director || userRole.coordinator))
         && dedc.eventCRF.id>0}">
-                 
-                 
+        --%>
+        
+      <c:if test="${ 
+        (study.status.available || study.status.pending)  && 
+        (userBean.sysAdmin || (userRole.director || userRole.coordinator))
+        && !(studyEvent.subjectEventStatus.locked || studyEvent.subjectEventStatus.skipped)
+        && dedc.eventCRF.id>0}">
    
     <a href="pages/managestudy/chooseCRFVersion?crfId=<c:out value="${dedc.eventCRF.crf.id}" />&crfName=<c:out value="${dedc.eventCRF.crf.name}" />&crfversionId=<c:out value="${dedc.eventCRF.crfVersion.id}" />&crfVersionName=<c:out value="${dedc.eventCRF.crfVersion.name}" />&studySubjectLabel=<c:out value="${studySubject.label}"/>&studySubjectId=<c:out value="${studySubject.id}"/>&eventCRFId=<c:out value="${dedc.eventCRF.id}"/>&eventDefinitionCRFId=<c:out value="${dedc.edc.id}" />"
    onMouseDown="javascript:setImage('bt_Reassign','images/bt_Reassign_d.gif');"
    onMouseUp="javascript:setImage('bt_Reassign','images/bt_Reassign.gif');"><img
       name="Reassign" src="images/bt_Reassign.gif" border="0" alt="<fmt:message key="reassign_crf_version" bundle="${resword}"/>" title="<fmt:message key="reassign_crf_version" bundle="${resword}"/>" align="left" hspace="6"></a>
                 </c:if>
-       
-       
         </td>
         </tr>
     </table>
@@ -620,7 +623,11 @@
             </c:if>
 
 			   <!--  reasign crf version -->
-             <c:if test="${(userBean.sysAdmin) && (study.status.available) }">
+            
+    
+ <c:if test="${(userBean.sysAdmin || (userRole.director || userRole.coordinator)) &&
+ (study.status.available || study.status.pending) 
+ && !(studyEvent.subjectEventStatus.locked || studyEvent.subjectEventStatus.skipped)}">
    
   <td>  <a href="pages/managestudy/chooseCRFVersion?crfId=<c:out value="${dec.eventCRF.crf.id}" />&crfName=<c:out value="${dec.eventCRF.crf.name}" />&crfversionId=<c:out value="${dec.eventCRF.crfVersion.id}" />&crfVersionName=<c:out value="${dec.eventCRF.crfVersion.name}" />&studySubjectLabel=<c:out value="${studySubject.label}"/>&studySubjectId=<c:out value="${studySubject.id}"/>&eventCRFId=<c:out value="${dec.eventCRF.id}"/>&eventDefinitionCRFId=<c:out value="${dec.eventDefinitionCRF.id}"/>"
    onMouseDown="javascript:setImage('bt_Reassign','images/bt_Reassign_d.gif');"

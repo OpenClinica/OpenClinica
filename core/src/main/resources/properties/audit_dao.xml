@@ -117,5 +117,11 @@
             limit 2
         </sql>
     </query>
-	
+	<query>
+		<name>findLastStatus</name>
+		<sql>
+		 SELECT old_value FROM audit_log_event
+  			where   audit_table=? and entity_id=? and new_value=? order by audit_date LIMIT 1
+		</sql>
+	</query>
 </queries>

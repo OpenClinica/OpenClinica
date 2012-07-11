@@ -118,4 +118,12 @@
             order by ae.audit_date desc
         </sql>
     </query>
+    
+    <query>
+		<name>findLastStatus</name>
+		<sql>
+		 SELECT old_value FROM audit_log_event
+  			where rownum=1 and   audit_table=? and entity_id=? and new_value=? order by audit_date 
+		</sql>
+	</query>
 </queries>

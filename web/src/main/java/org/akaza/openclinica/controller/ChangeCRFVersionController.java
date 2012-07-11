@@ -4,20 +4,22 @@ import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
+import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
-import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
@@ -32,10 +34,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.akaza.openclinica.view.StudyInfoPanel;
-import org.akaza.openclinica.web.SQLInitServlet;
-import org.akaza.openclinica.web.table.sdv.SDVUtil;
-
-import java.io.File;
+import java.sql.Connection;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -49,7 +48,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 
 
 /**
@@ -498,9 +500,46 @@ public class ChangeCRFVersionController {
 //update event_crf_id table
         try{
 	        EventCRFDAO event_crf_dao = new EventCRFDAO(dataSource);
-	        event_crf_dao.updateCRFVersionID(eventCRFId, newCRFVersionId);
-	        //create AuditEvent
+	        StudyEventDAO sedao = new StudyEventDAO(dataSource);
 	        
+	        EventCRFBean ev_bean = (EventCRFBean)event_crf_dao.findByPK(eventCRFId);
+	        StudyEventBean st_event_bean = (StudyEventBean)sedao.findByPK(ev_bean.getStudyEventId());
+
+	        	Connection con = dataSource.getConnection();
+	        	con.setAutoCommit(false);
+	        	event_crf_dao.updateCRFVersionID(eventCRFId, newCRFVersionId, getCurrentUser(request).getId(), con);
+	        	
+	        	String status_before_update = null;
+	        	SubjectEventStatus eventStatus=null; Status subjectStatus = null;
+	        	AuditDAO auditDao = new AuditDAO(dataSource);
+	            
+	        	//event signed, check if subject is signed as well
+	        	StudySubjectDAO studySubDao = new StudySubjectDAO(dataSource);
+	        	StudySubjectBean studySubBean = (StudySubjectBean)studySubDao.findByPK(st_event_bean.getStudySubjectId());
+	        	if (studySubBean.getStatus().isSigned() ){
+	        		 status_before_update = auditDao.findLastStatus("study_subject",  studySubBean.getId(), "8");
+ 	            	 if ( status_before_update != null && status_before_update.length()==1){
+ 	            		int subject_status = Integer.parseInt(status_before_update);
+ 	            		subjectStatus= Status.get(subject_status);
+ 	            		studySubBean.setStatus(subjectStatus);
+ 	            	 }
+	                 studySubBean.setUpdater(getCurrentUser(request));
+	                 studySubDao.update(studySubBean, con);
+	        	 }
+	        	 st_event_bean.setUpdater(getCurrentUser(request));
+            	 st_event_bean.setUpdatedDate(new Date());
+        		
+            	status_before_update = auditDao.findLastStatus("study_event",  st_event_bean.getId(), "8");
+            	if ( status_before_update != null && status_before_update.length()==1){
+            		int status = Integer.parseInt(status_before_update);
+            		eventStatus = SubjectEventStatus.get(status);
+            		st_event_bean.setSubjectEventStatus(eventStatus);
+            	}
+                sedao.update(st_event_bean, con);
+                
+	            con.commit();
+	            con.setAutoCommit(true);
+	            con.close();
 	        pageMessages.add(resword.getString("confirm_crf_version_ms"));
 	        String msg=resword.getString("confirm_crf_version_ms");
 	        redirect( request, response, "/ViewStudySubject?isFromCRFVersionChange="+msg+"&id="+studySubjectId);
@@ -557,7 +596,10 @@ public class ChangeCRFVersionController {
         }
         return false;
     }
-    
+    private UserAccountBean getCurrentUser (HttpServletRequest request){
+        UserAccountBean ub = (UserAccountBean)request.getSession().getAttribute("userBean");
+        return ub;
+    }
     private Object redirect(HttpServletRequest request,HttpServletResponse response, String location){
     	 try{
                 response.sendRedirect(request.getContextPath() + location);

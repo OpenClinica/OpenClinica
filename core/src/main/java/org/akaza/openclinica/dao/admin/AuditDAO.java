@@ -13,6 +13,7 @@ import org.akaza.openclinica.bean.core.ApplicationConstants;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.Utils;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.EntityDAO;
@@ -448,4 +449,31 @@ public class AuditDAO extends EntityDAO {
         }
         return temp;
     }
+    //      SELECT old_value FROM audit_log_event
+//	where   audit_table=? and entity_id=? 
+    //and new_value=? order by audit_date LIMIT 1
+
+    public String findLastStatus(String audit_table,  int entity_id, String new_value) {
+    	this.setTypesExpected();
+    	this.setTypeExpected(1, TypeNames.STRING); // crf name
+    	this.setTypeExpected(2, TypeNames.INT); // crf name
+    	this.setTypeExpected(3, TypeNames.STRING); // crf name
+        
+    	
+        HashMap variables = new HashMap();
+        variables.put(1, audit_table);
+        variables.put(2, entity_id);
+        variables.put(3, new_value);
+
+        String sql = digester.getQuery("findLastStatus");
+        ArrayList rows = this.select(sql, variables);
+        Iterator it = rows.iterator();
+ 
+        if (it.hasNext()) {
+            return (String) ((HashMap) it.next()).get("old_value");
+        } else {
+            return null;
+        }
+    }
+  
 }

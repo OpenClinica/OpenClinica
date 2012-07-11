@@ -1028,6 +1028,12 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
      * Updates a StudySubject
      */
     public EntityBean update(EntityBean eb) {
+   	 Connection con = null;
+   	 return update( eb, con);
+   }
+   
+    /* this function allows to run transactional updates for an action*/
+    public EntityBean update(EntityBean eb, Connection con) {
         StudySubjectBean sb = (StudySubjectBean) eb;
         HashMap variables = new HashMap();
         HashMap nullVars = new HashMap();
@@ -1064,8 +1070,11 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
         ind++;
 
         String sql = digester.getQuery("update");
-        this.execute(sql, variables, nullVars);
-
+        if ( con == null){
+        	this.execute(sql, variables, nullVars);
+        }else{
+        	this.execute(sql, variables, nullVars, con);
+        }
         return sb;
     }
 

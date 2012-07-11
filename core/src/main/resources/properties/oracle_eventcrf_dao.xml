@@ -490,9 +490,9 @@
  <query>
         <name>updateCRFVersionID</name>
         <sql>
-            UPDATE EVENT_CRF
-            SET CRF_VERSION_ID=?
-            WHERE EVENT_CRF_ID=?
+              UPDATE EVENT_CRF
+            SET CRF_VERSION_ID=?,  sdv_update_id=?, update_id=?, DATE_UPDATED=sysdate, sdv_status= ?
+           WHERE EVENT_CRF_ID=?
         </sql>
     </query>
 

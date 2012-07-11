@@ -334,14 +334,26 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
      *
      * @param query
      *            a static SQL statement which updates or inserts.
+     *            
+     *  
      */
+    
     public void execute(String query) {
+    	Connection con = null;
+    	execute( query,  con) ;
+    }
+    /*
+     *  this function is used for transactional updates to allow all updates in 
+     *  one actions to run as one transaction 
+     */
+    public void execute(String query, Connection con) {
         clearSignals();
 
-        Connection con = null;
+        boolean isTrasactional = false;
+        if (con != null){isTrasactional = true;}
         PreparedStatement ps = null;
         try {
-            con = ds.getConnection();
+            if ( !isTrasactional){ con = ds.getConnection();}
             if (con.isClosed()) {
                 if (logger.isWarnEnabled())
                     logger.warn("Connection is closed: EntityDAO.execute!");
@@ -363,18 +375,25 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
                 logger.error(sqle.getMessage(), sqle);
             }
         } finally {
-            this.closeIfNecessary(con, ps);
+            if ( !isTrasactional) {this.closeIfNecessary(con, ps);}
+            else {closePreparedStatement(ps);}
         }
     }
-
     public void execute(String query, HashMap variables) {
+    	 Connection con = null;
+    	 execute( query,  variables,  con);
+    }
+    		    
+     public void execute(String query, HashMap variables, Connection con) {
         clearSignals();
 
-        Connection con = null;
+        boolean isTrasactional = false;
+        if (con != null){isTrasactional = true;}
+       
         PreparedStatement ps = null;
         PreparedStatementFactory psf = new PreparedStatementFactory(variables);
         try {
-            con = ds.getConnection();
+        	 if ( !isTrasactional){ con = ds.getConnection();}
             if (con.isClosed()) {
                 if (logger.isWarnEnabled())
                     logger.warn("Connection is closed: EntityDAO.execute!");
@@ -398,19 +417,26 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
                 logger.error(sqle.getMessage(), sqle);
             }
         } finally {
-            this.closeIfNecessary(con, ps);
+        	  if ( !isTrasactional) {this.closeIfNecessary(con, ps);}
+              else {closePreparedStatement(ps);}
         }
     }
-
     public void execute(String query, HashMap variables, HashMap nullVars) {
+    	Connection con = null;
+    	execute( query,  variables,  nullVars,  con) ;
+    }
+    	   
+    public void execute(String query, HashMap variables, HashMap nullVars, Connection con) {
         clearSignals();
 
-        Connection con = null;
-        PreparedStatement ps = null;
+        boolean isTrasactional = false;
+        if (con != null){isTrasactional = true;}
+       
+       	 PreparedStatement ps = null;
         PreparedStatementFactory psf = new PreparedStatementFactory(variables, nullVars);
         try {
-            con = ds.getConnection();
-            if (con.isClosed()) {
+        	if ( !isTrasactional){ con = ds.getConnection();}
+           if (con.isClosed()) {
                 if (logger.isWarnEnabled())
                     logger.warn("Connection is closed: EntityDAO.execute!");
                 throw new SQLException();
@@ -432,7 +458,8 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
                 logger.error(sqle.getMessage(), sqle);
             }
         } finally {
-            this.closeIfNecessary(con, ps);
+        	 if ( !isTrasactional) {this.closeIfNecessary(con, ps);}
+             else {closePreparedStatement(ps);}
         }
     }
 
@@ -2990,6 +3017,18 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
         return statusConstraint;
     }
 
-
+    public void closePreparedStatement( PreparedStatement ps) {
+        try {
+            if (ps != null)
+                ps.close();
+          
+        } catch (SQLException sqle) {// eventually throw a custom
+            // exception,tbh
+            if (logger.isWarnEnabled()) {
+                logger.warn("Exception thrown in GenericDAO.closeIfNecessary");
+                logger.error(sqle.getMessage(), sqle);
+            }
+        }// end of catch
+    }
 
 }

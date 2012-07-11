@@ -7,6 +7,7 @@
  */
 package org.akaza.openclinica.dao.managestudy;
 
+import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -517,6 +518,12 @@ public class StudyEventDAO extends AuditableEntityDAO {
      * Updates a Study event
      */
     public EntityBean update(EntityBean eb) {
+    	 Connection con = null;
+    	 return update( eb, con);
+    }
+    /* this function allows to run transactional updates for an action*/
+    
+    public EntityBean update(EntityBean eb, Connection con) {
         StudyEventBean sb = (StudyEventBean) eb;
         HashMap nullVars = new HashMap();
         HashMap variables = new HashMap();
@@ -553,8 +560,12 @@ public class StudyEventDAO extends AuditableEntityDAO {
         variables.put(Integer.valueOf(13), Integer.valueOf(sb.getId()));
 
         String sql = digester.getQuery("update");
-        this.execute(sql, variables, nullVars);
-
+        if ( con == null){
+        	this.execute(sql, variables, nullVars);
+        }else{
+        	this.execute(sql, variables, nullVars, con);
+        }
+        
         if (isQuerySuccessful()) {
             sb.setActive(true);
         }

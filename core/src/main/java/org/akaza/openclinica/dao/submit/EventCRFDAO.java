@@ -8,6 +8,7 @@
 
 package org.akaza.openclinica.dao.submit;
 
+import java.sql.Connection;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.dao.EventCRFSDVFilter;
 import org.akaza.openclinica.dao.EventCRFSDVSort;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
@@ -938,17 +940,35 @@ public class EventCRFDAO  <K extends String,V extends ArrayList> extends Auditab
 
         return result;
     }
-	 public void updateCRFVersionID(int event_crf_id, int crf_version_id){
+    
+    public void updateCRFVersionID(int event_crf_id, int crf_version_id, int user_id ){
+    	 Connection con = null;
+    	updateCRFVersionID( event_crf_id,  crf_version_id,  user_id, con);
+    }
+    /* this function allows to run transactional updates for an action*/
+    
+	 public void updateCRFVersionID(int event_crf_id, int crf_version_id, int user_id,  Connection con){
     	 this.unsetTypeExpected();
          this.setTypeExpected(1, TypeNames.INT);
          this.setTypeExpected(2, TypeNames.INT);
-
+         this.setTypeExpected(3, TypeNames.INT);
+         this.setTypeExpected(4, TypeNames.BOOL);
+         this.setTypeExpected(3, TypeNames.INT);
+                        
          HashMap variables = new HashMap();
          variables.put(1, crf_version_id);
-         variables.put(2, event_crf_id);
+         variables.put(2, user_id);
+         variables.put(3, user_id);
+         variables.put(4, false);
+         variables.put(5, event_crf_id);
          String sql = digester.getQuery("updateCRFVersionID");
-         this.execute(sql, variables);
+         // this is the way to make the change transactional
+         if (con == null){
+        	 this.execute(sql, variables);}
+         else{
+        	 this.execute(sql, variables, con);
+         }
     }
-
+	
 
 }
