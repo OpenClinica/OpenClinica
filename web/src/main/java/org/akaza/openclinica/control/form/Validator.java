@@ -2108,7 +2108,12 @@ public class Validator {
         if (decimal > 0) {
             if ("REAL".equalsIgnoreCase(dataType)) {
                 try {
-                	String temp = "10"+fieldValue;
+                	String temp ="";
+                	if (fieldValue.indexOf("-") !=0 ){
+                		fieldValue.replaceAll("-", "");
+                		
+                	}
+                	temp = "10"+fieldValue;
                     Double d = NumberFormat.getInstance().parse(temp).doubleValue();
                     if (d > 0 && BigDecimal.valueOf(d).scale() > decimal) {
                         message.append(resexception.getString("exceeds_decimal") + "=" + decimal + ".");
