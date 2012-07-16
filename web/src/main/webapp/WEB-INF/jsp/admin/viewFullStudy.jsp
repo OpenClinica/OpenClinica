@@ -565,7 +565,8 @@
        <td class="table_header_column"><fmt:message key="when_entering_data_entry_interviewer" bundle="${resword}"/></td>
        <td class="table_cell">
             <c:choose>
-		   <c:when test="${studyToView.studyParameterConfig.interviewerNameRequired == 'true'}">
+		   <c:when test="${studyToView.studyParameterConfig.interviewerNameRequired == 'true' ||
+		   studyToView.studyParameterConfig.interviewerNameRequired == 'yes' }">
 		   <fmt:message key="yes" bundle="${resword}"/>
 
 		   </c:when>
@@ -622,7 +623,8 @@
       <td class="table_header_column"><fmt:message key="interview_date_required" bundle="${restext}"/></td>
       <td class="table_cell">
            <c:choose>
-		   <c:when test="${studyToView.studyParameterConfig.interviewDateRequired == 'true'}">
+		   <c:when test="${studyToView.studyParameterConfig.interviewDateRequired == 'true' ||
+		   studyToView.studyParameterConfig.interviewDateRequired == 'yes'}">
 		   <fmt:message key="yes" bundle="${resword}"/>
 
 		   </c:when>

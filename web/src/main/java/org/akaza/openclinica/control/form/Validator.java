@@ -2108,8 +2108,14 @@ public class Validator {
         if (decimal > 0) {
             if ("REAL".equalsIgnoreCase(dataType)) {
                 try {
-                    Double d = NumberFormat.getInstance().parse(fieldValue).doubleValue();
-                    if (BigDecimal.valueOf(d).scale() > decimal) {
+                	String temp ="";
+                	if (fieldValue.indexOf("-") !=0 ){
+                		fieldValue.replaceAll("-", "");
+                		
+                	}
+                	temp = "10"+fieldValue;
+                    Double d = NumberFormat.getInstance().parse(temp).doubleValue();
+                    if (d > 0 && BigDecimal.valueOf(d).scale() > decimal) {
                         message.append(resexception.getString("exceeds_decimal") + "=" + decimal + ".");
                     }
                 } catch (ParseException pe) {
