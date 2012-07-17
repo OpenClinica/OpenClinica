@@ -218,7 +218,7 @@
 	 from item, item_group  , item_group_metadata, crf_version
 	 where    item.item_id= item_group_metadata.item_id  and item_group_metadata.item_group_id =  item_group.item_group_id
 	 and item_group_metadata.crf_version_id = crf_version.crf_version_id
-	 and    item_group.crf_id =(select crf_id from CRF where name=?) order by item.name;
+	 and    item_group.crf_id =(select crf_id from CRF where name=?) order by item.name
  	</sql>
    </query>
     <query>
@@ -232,7 +232,7 @@
 	 from item, item_group  , item_group_metadata, crf_version
 	 where    item.item_id= item_group_metadata.item_id  and item_group_metadata.item_group_id =  item_group.item_group_id
 	 and item_group_metadata.crf_version_id = crf_version.crf_version_id
-	 and    item_group.crf_id =(select crf_id from CRF where name=?) order by item.name;
+	 and    item_group.crf_id =(select crf_id from CRF where name=?) order by item.name
 	 	</sql>
    </query>
 </queries>
