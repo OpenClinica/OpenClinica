@@ -629,7 +629,7 @@ public class UpdateStudyServletNew extends SecureController {
             studyParameterValueBean.setParameter("interviewerNameEditable");
             studyParameterValueBean.setValue(studyBean.getStudyParameterConfig().getInterviewerNameEditable());
         } else {
-            studyParameterValueBean.setParameter("interviewerDateEditable");
+            studyParameterValueBean.setParameter("interviewDateEditable");
             studyParameterValueBean.setValue(studyBean.getStudyParameterConfig().getInterviewDateEditable());
         }
         for (StudyBean siteBean : sites) {
