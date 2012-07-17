@@ -198,19 +198,6 @@
   <fmt:formatDate value="${studyToView.protocolDateVerification}" pattern="${dteFormat}"/>
   </td></tr>
 
- <!--
-  <tr valign="top"><td class="table_header_column">Collect Subject Father/Mother Information?:</td><td class="table_cell">
-  <c:choose>
-    <c:when test="${studyToView.genetic == true}">
-     Yes
-    </c:when>
-    <c:otherwise>
-     No
-    </c:otherwise>
-   </c:choose>
- </td></tr>
- -->
-
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="start_date" bundle="${resword}"/>:</td><td class="table_cell">
    <fmt:formatDate value="${studyToView.datePlannedStart}" pattern="${dteFormat}"/>
@@ -565,14 +552,16 @@
        <td class="table_header_column"><fmt:message key="when_entering_data_entry_interviewer" bundle="${resword}"/></td>
        <td class="table_cell">
             <c:choose>
-		   <c:when test="${studyToView.studyParameterConfig.interviewerNameRequired == 'true' ||
-		   studyToView.studyParameterConfig.interviewerNameRequired == 'yes' }">
+		   <c:when test="${   studyToView.studyParameterConfig.interviewerNameRequired == 'yes' }">
 		   <fmt:message key="yes" bundle="${resword}"/>
 
 		   </c:when>
+		   <c:when test="${studyToView.studyParameterConfig.interviewerNameRequired == 'no' }">
+		  			<fmt:message key="no" bundle="${resword}"/>
+		  </c:when>
 		   <c:otherwise>
-		  <fmt:message key="no" bundle="${resword}"/>
-		   </c:otherwise>
+		   <fmt:message key="not_used" bundle="${resword}"/>
+		     </c:otherwise>
 		  </c:choose>
       </td>
    </tr>
@@ -623,14 +612,16 @@
       <td class="table_header_column"><fmt:message key="interview_date_required" bundle="${restext}"/></td>
       <td class="table_cell">
            <c:choose>
-		   <c:when test="${studyToView.studyParameterConfig.interviewDateRequired == 'true' ||
-		   studyToView.studyParameterConfig.interviewDateRequired == 'yes'}">
+		   <c:when test="${  studyToView.studyParameterConfig.interviewDateRequired == 'yes'}">
 		   <fmt:message key="yes" bundle="${resword}"/>
 
 		   </c:when>
+		  <c:when test="${studyToView.studyParameterConfig.interviewDateRequired == 'no'  }">
+		  			<fmt:message key="no" bundle="${resword}"/>
+		  </c:when>
 		   <c:otherwise>
-		  <fmt:message key="no" bundle="${resword}"/>
-		   </c:otherwise>
+		   <fmt:message key="not_used" bundle="${resword}"/>
+		     </c:otherwise>
 		  </c:choose>
       </td>
   </tr>
@@ -805,10 +796,5 @@
 </div>
 </div>
 
-<%--<br>--%>
-<%--<input type="button" onclick="confirmExit('ListStudy');"  name="cancel" value="   <fmt:message key="exit" bundle="${resword}"/>   " class="button_medium"/>--%>
-<%--<br>--%>
- <%--<c:import url="../include/workflow.jsp">--%>
-  <%--<c:param name="module" value="admin"/>--%>
- <%--</c:import>--%>
+
 <jsp:include page="../include/footer.jsp"/>

@@ -402,17 +402,10 @@ function updateThis(multiSelEle, count) {
 	</c:when>
 	<c:when test="${config.parameter.handle=='interviewerNameRequired'}">
 		   <tr valign="top"><td class="formlabel"><fmt:message key="when_entering_data_entry_interviewer" bundle="${resword}"/></td><td>
-		   <c:choose>
-		   <c:when test="${config.value.value== 'true'}">
-		    <input type="radio" checked name="interviewerNameRequired" value="true"><fmt:message key="yes" bundle="${resword}"/>
-		    <input type="radio" name="interviewerNameRequired" value="false"><fmt:message key="no" bundle="${resword}"/>
-
-		   </c:when>
-		   <c:otherwise>
-		    <input type="radio" name="interviewerNameRequired" value="true"><fmt:message key="yes" bundle="${resword}"/>
-		    <input type="radio" checked name="interviewerNameRequired" value="false"><fmt:message key="no" bundle="${resword}"/>
-		   </c:otherwise>
-		  </c:choose>
+		    <input type="radio" <c:if test="${config.value.value== 'yes'}">checked</c:if> name="interviewerNameRequired" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+            <input type="radio" <c:if test="${config.value.value== 'no'}">checked</c:if> name="interviewerNameRequired" value="no"><fmt:message key="no" bundle="${resword}"/>
+            <input type="radio" <c:if test="${config.value.value== 'not_used'}">checked</c:if> name="interviewerNameRequired" value="not_used"><fmt:message key="not_used" bundle="${resword}"/>
+ 
 		  </td>
 		  </tr>
 	</c:when>
@@ -450,17 +443,11 @@ function updateThis(multiSelEle, count) {
 	</c:when>
 	<c:when test="${config.parameter.handle=='interviewDateRequired'}">
 		  <tr valign="top"><td class="formlabel"><fmt:message key="interviewer_date_required" bundle="${resword}"/></td><td>
-		   <c:choose>
-		   <c:when test="${config.value.value== 'true'}">
-		    <input type="radio" checked name="interviewDateRequired" value="true"><fmt:message key="yes" bundle="${resword}"/>
-		    <input type="radio" name="interviewDateRequired" value="false"><fmt:message key="no" bundle="${resword}"/>
-
-		   </c:when>
-		   <c:otherwise>
-		    <input type="radio" name="interviewDateRequired" value="true"><fmt:message key="yes" bundle="${resword}"/>
-		    <input type="radio" checked name="interviewDateRequired" value="false"><fmt:message key="no" bundle="${resword}"/>
-		   </c:otherwise>
-		  </c:choose>
+		      <input type="radio" <c:if test="${config.value.value== 'yes'}"> checked </c:if> name="interviewDateRequired" value="yes"><fmt:message key="yes" bundle="${resword}"/>
+              <input type="radio" <c:if test="${config.value.value== 'no'}"> checked </c:if> name="interviewDateRequired" value="no"><fmt:message key="no" bundle="${resword}"/>
+              <input type="radio" <c:if test="${config.value.value== 'not_used'}"> checked </c:if> name="interviewDateRequired" value="not_used"><fmt:message key="not_used" bundle="${resword}"/>
+		
+		   
 		  </td>
 		  </tr>
     </c:when>

@@ -214,109 +214,21 @@
 
   <c:forEach var="config" items="${siteToView.studyParameters}">
    <c:choose>
-   <%--
-   <c:when test="${config.parameter.handle=='collectDOB'}">
-     <tr valign="top"><td class="table_header_column"><fmt:message key="collect_subject" bundle="${resword}"/></td><td class="table_cell">
-       <c:choose>
-         <c:when test="${config.value.value == '1'}">
-          <fmt:message key="yes" bundle="${resword}"/>
-         </c:when>
-         <c:when test="${config.value.value == '2'}">
-
-          <fmt:message key="only_year_of_birth" bundle="${resword}"/>
-
-         </c:when>
-         <c:otherwise>
-          <fmt:message key="not_used" bundle="${resword}"/>
-         </c:otherwise>
-      </c:choose>
-      </td></tr>
-
-   </c:when>
-
-   <c:when test="${config.parameter.handle=='discrepancyManagement'}">
-		  <tr valign="top"><td class="table_header_column"><fmt:message key="allow_discrepancy_management" bundle="${resword}"/>:</td><td class="table_cell">
-		   <c:choose>
-		   <c:when test="${config.value.value == 'false'}">
-		    <fmt:message key="No" bundle="${resword}"/>
-		   </c:when>
-		   <c:otherwise>
-		   <fmt:message key="yes" bundle="${resword}"/>
-		   </c:otherwise>
-		  </c:choose>
-		  </td>
-		  </tr>
-	</c:when>
-
-	<c:when test="${config.parameter.handle=='genderRequired'}">
-		  <tr valign="top"><td class="table_header_column"><fmt:message key="gender_required" bundle="${resword}"/>:</td><td class="table_cell">
-		   <c:choose>
-		   <c:when test="${config.value.value == false}">
-		   <fmt:message key="No" bundle="${resword}"/>
-		   </c:when>
-		   <c:otherwise>
-		   <fmt:message key="yes" bundle="${resword}"/>
-		   </c:otherwise>
-		  </c:choose>
-		  </td>
-		  </tr>
-	</c:when>
-    <c:when test="${config.parameter.handle=='subjectPersonIdRequired'}">
-		  <tr valign="top"><td class="table_header_column"><fmt:message key="subject_person_ID_required" bundle="${resword}"/>:</td><td class="table_cell">
-		   <c:choose>
-		   <c:when test="${config.value.value == 'required'}">
-		    <fmt:message key="required" bundle="${resword}"/>
-		   </c:when>
-		    <c:when test="${newStudy.studyParameterConfig.subjectPersonIdRequired == 'optional'}">
-		     <fmt:message key="optional" bundle="${resword}"/>
-		   </c:when>
-		   <c:otherwise>
-		     <fmt:message key="not_used" bundle="${resword}"/>
-		   </c:otherwise>
-		  </c:choose>
-		  </td>
-		  </tr>
-	</c:when>
-	<c:when test="${config.parameter.handle=='subjectIdGeneration'}">
-		   <tr valign="top"><td class="table_header_column"><fmt:message key="how_to_generate" bundle="${resword}"/>:</td><td class="table_cell">
-		   <c:choose>
-		   <c:when test="${config.value.value == 'manual'}">
-		     <fmt:message key="manual_entry" bundle="${resword}"/>
-		   </c:when>
-		    <c:when test="${newStudy.studyParameterConfig.subjectPersonIdRequired == 'auto editable'}">
-		      <fmt:message key="auto_generated_and_editable" bundle="${resword}"/>
-		   </c:when>
-		   <c:otherwise>
-		    <fmt:message key="auto_generated_and_non_editable" bundle="${resword}"/>
-		   </c:otherwise>
-		  </c:choose>
-		  </td>
-		  </tr>
-	</c:when>
-	<c:when test="${config.parameter.handle=='subjectIdPrefixSuffix'}">
-		   <tr valign="top"><td class="table_header_column"><fmt:message key="generate_subject_ID" bundle="${resword}"/>:</td><td class="table_cell">
-		   <c:choose>
-		   <c:when test="${config.value.value == 'true'}">
-		    <fmt:message key="yes" bundle="${resword}"/>
-		   </c:when>
-		   <c:otherwise>
-		   <fmt:message key="no" bundle="${resword}"/>
-		   </c:otherwise>
-		  </c:choose>
-		  </td>
-		  </tr>
-	</c:when>
-	--%>
+  
 	<c:when test="${config.parameter.handle=='interviewerNameRequired'}">
 		   <tr valign="top"><td class="table_header_column"><fmt:message key="when_entering_data" bundle="${resword}"/></td><td class="table_cell">
+		   
 		   <c:choose>
-		   <c:when test="${config.value.value== 'true'}">
+		   <c:when test="${   config.value.value == 'yes' }">
 		   <fmt:message key="yes" bundle="${resword}"/>
 
 		   </c:when>
+		   <c:when test="${config.value.value == 'no' }">
+		  			<fmt:message key="no" bundle="${resword}"/>
+		  </c:when>
 		   <c:otherwise>
-		  <fmt:message key="no" bundle="${resword}"/>
-		   </c:otherwise>
+		   <fmt:message key="not_used" bundle="${resword}"/>
+		     </c:otherwise>
 		  </c:choose>
 		  </td>
 		  </tr>
@@ -335,30 +247,20 @@
 		  </td>
 		  </tr>
 	</c:when>
-	<%--
-	<c:when test="${config.parameter.handle=='interviewerNameEditable'}">
-		  <tr valign="top"><td class="table_header_column"><fmt:message key="interviewer_name_editable" bundle="${resword}"/></td><td class="table_cell">
-		   <c:choose>
-		   <c:when test="${config.value.value== 'true'}">
-		    <fmt:message key="yes" bundle="${resword}"/>
-		   </c:when>
-		   <c:otherwise>
-		   <fmt:message key="no" bundle="${resword}"/>
-		   </c:otherwise>
-		  </c:choose>
-		  </td>
-		  </tr>
-	</c:when>
-	--%>
 	<c:when test="${config.parameter.handle=='interviewDateRequired'}">
 		  <tr valign="top"><td class="table_header_column"><fmt:message key="interview_date_required" bundle="${resword}"/></td><td class="table_cell">
-		   <c:choose>
-		   <c:when test="${config.value.value== 'true'}">
-		    <fmt:message key="yes" bundle="${resword}"/>
+		  
+		  <c:choose>
+		   <c:when test="${  config.value.value == 'yes'}">
+		   <fmt:message key="yes" bundle="${resword}"/>
+
 		   </c:when>
+		  <c:when test="${config.value.value == 'no'  }">
+		  			<fmt:message key="no" bundle="${resword}"/>
+		  </c:when>
 		   <c:otherwise>
-		    <fmt:message key="no" bundle="${resword}"/>
-		   </c:otherwise>
+		   <fmt:message key="not_used" bundle="${resword}"/>
+		     </c:otherwise>
 		  </c:choose>
 		  </td>
 		  </tr>
@@ -378,22 +280,7 @@
 		  </td>
 		  </tr>
 	 </c:when>
-	 <%--
-	 <c:otherwise>
-		  <tr valign="top"><td class="table_header_column"><fmt:message key="interview_date_editable" bundle="${resword}"/></td><td class="table_cell">
-		   <c:choose>
-		   <c:when test="${config.value.value== 'true'}">
-		    <fmt:message key="yes" bundle="${resword}"/>
-		   </c:when>
-		   <c:otherwise>
-		    <fmt:message key="no" bundle="${resword}"/>
-		   </c:otherwise>
-		  </c:choose>
-		  </td>
-		  </tr>
-     </c:otherwise>
-     --%>
-   </c:choose>
+	</c:choose>
 
   </c:forEach>
 
@@ -543,12 +430,7 @@
      </c:choose>
     </td>
 
-    <%--<td class="table_cell">
-     <c:choose>
-      <c:when test="${crf.decisionCondition == true}"> <fmt:message key="yes" bundle="${resword}"/> </c:when>
-      <c:otherwise> No </c:otherwise>
-     </c:choose>
-   </td>--%>
+  
 
    <td class="table_cell">
     <c:out value="${crf.defaultVersionName}"/>
@@ -566,31 +448,13 @@
      <table border="0" cellpadding="0" cellspacing="0">
 	  <tr>
         <td>
-          <!-- <a href="ViewTableOfContent?crfVersionId=<c:out value="${crf.defaultVersionId}"/>&sedId=<c:out value="${definition.id}"/>"
-			onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-			onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
-			name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view_CRF_version" bundle="${resword}"/>" title="<fmt:message key="view_CRF_version" bundle="${resword}"/>" align="left" hspace="6"></a>-->
-		  <!--<a href="ViewSectionDataEntry?module=<c:out value="${module}"/>&crfId=<c:out value="${crf.crfId}"/>&crfVersionId=<c:out value="${crf.defaultVersionId}"/>&tabId=1"
-               onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-               onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
-              name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>-->
-            <a href="ViewCRF?crfId=<c:out value="${crf.crfId}"/>"
+                   <a href="ViewCRF?crfId=<c:out value="${crf.crfId}"/>"
                  onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
                  onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
                 name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
 
         </td>
-		<%--
-		<c:if test="${crf.status.id==1 && crf.owner.id==userBean.id}">
-		<td>
-		 <a href="InitUpdateCRF?crfId=<c:out value="${crf.crfId}"/>"
-			onMouseDown="javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');"
-			onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"><img
-			name="bt_Edit1" src="images/bt_Edit.gif" border="0" alt="<fmt:message key="edit_CRF" bundle="${resword}"/>" title="<fmt:message key="edit_CRF" bundle="${resword}"/>" align="left" hspace="6"></a>
-
-		</td>
-		</c:if>
-		--%>
+		
 	  </tr>
 	 </table>
    </td>
