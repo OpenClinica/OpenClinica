@@ -241,5 +241,24 @@
                 user_name = ? and study_id = ?
             </sql>
         </query>
-
+ <query>
+        <name>findOldPasswordHashes</name>
+        <sql>
+            select
+              ua.password_hash as password_hash
+            from user_old_password_hashes ua
+            where ua.user_id = ?
+            order by id desc
+            limit ?
+        </sql>
+    </query>
+    <query>
+      <name>addOldPasswordHash</name>
+      <sql>
+        insert into user_old_password_hashes
+          (user_id, password_hash)
+        values
+          (?, ?) 
+      </sql>
+    </query>
 </queries>
