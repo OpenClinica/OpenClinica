@@ -16,11 +16,15 @@ import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.dao.hibernate.PasswordRequirementsDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * Reset expired password
@@ -94,15 +98,20 @@ public class ResetPasswordServlet extends SecureController {
             		.getBean(ConfigurationDao.class);
             PasswordRequirementsDao passwordRequirementsDao = new PasswordRequirementsDao(configurationDao);
             String newDigestPass = sm.encrytPassword(newPwd, getUserDetails());
+            
+            Locale locale = LocaleResolver.getLocale(request);
+            ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle(locale);
+          
             ArrayList<String> pwdErrors = 
             		new PasswordValidator().validatePassword(
             				passwordRequirementsDao,
             				udao,
             				ub.getId(),
             				fp.getString("passwd"),
-            				newDigestPass);
+            				newDigestPass,
+            				resexception);
             for (String err: pwdErrors) {
-            	v.addError(errors, "passwd", v.messageFor(err));
+            	v.addError(errors, "passwd", err);
             }
 
             if (!errors.isEmpty()) {

@@ -12,7 +12,9 @@ import static java.lang.Boolean.TRUE;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import javax.servlet.ServletException;
 
@@ -27,6 +29,8 @@ import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.dao.hibernate.PasswordRequirementsDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -107,15 +111,19 @@ public class UpdateProfileServlet extends SecureController {
         String newDigestPass = sm.encrytPassword(fp.getString("passwd"), getUserDetails());
         
         PasswordRequirementsDao passwordRequirementsDao = new PasswordRequirementsDao(configurationDao);
+        Locale locale = LocaleResolver.getLocale(request);
+        ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle(locale);
+      
         ArrayList<String> pwdErrors = 
         		new PasswordValidator().validatePassword(
         				passwordRequirementsDao,
         				udao,
         				userBean1.getId(),
         				fp.getString("passwd"),
-        				newDigestPass);
+        				newDigestPass,
+        				resexception);
         for (String err: pwdErrors) {
-        	v.addError(errors, "passwd", v.messageFor(err));
+        	v.addError(errors, "passwd", err);
         }
         
         userBean1.setFirstName(fp.getString("firstName"));

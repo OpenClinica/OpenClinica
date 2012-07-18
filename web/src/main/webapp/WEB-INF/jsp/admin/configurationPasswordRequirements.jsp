@@ -44,7 +44,9 @@
 <form action="ConfigurePasswordRequirements" method="post">
 <jsp:include page="../include/showSubmitted.jsp" />
 
-<div style="width: 400px">
+<div style="width: 600px">
+
+
 
 <!-- These DIVs define shaded box borders -->
 
@@ -55,26 +57,21 @@
 
 		<!-- Table Contents -->
 
-<%! String checked(HttpServletRequest request, String attrName) {
-      Map formValues = (Map) request.getAttribute("presetValues");
-      Boolean attr = (Boolean) formValues.get(attrName);
-      if (attr == null || !attr.booleanValue())
-        return "";
-      return "checked=\'checked\'";
-    } %>
 
-<table border="0" cellpadding="0" cellspacing="0" width="100%">
+
+<table border="0" cellpadding="2" cellspacing="2" width="100%">
   <tr>
-    <td class="formlabel">
+    <td style="width: 200px" class="formlabel">
       <label for="pwd.chars.min"><fmt:message bundle="${resword}" key="pwd_reqs_min_length" /></label></td>
-    <td>
+    <td >
       <div class="formfieldM_BG">
         <input class="formfieldM"
                id="pwd.chars.min"
                name="pwd.chars.min"
                type="text"
-               value="${presetValues['pwd.chars.min']}" /></div></td>
-    <td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="pwd.chars.min" /></jsp:include></td>
+               value="${presetValues['pwd.chars.min']}" /></div>  <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="pwd.chars.min" /></jsp:include></td>
+    <td><fmt:message bundle="${resword}" key="pwd_reqs_min_length_note" />
+  </td>
   </tr>
   <tr>
     <td class="formlabel"><label for="pwd.chars.max"><fmt:message bundle="${resword}" key="pwd_reqs_max_length" /></label></td>
@@ -84,8 +81,8 @@
                id="pwd.chars.max"
                name="pwd.chars.max"
                type="text"
-               value="${presetValues['pwd.chars.max']}" /></div></td>
-    <td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="pwd.chars.max" /></jsp:include></td>
+               value="${presetValues['pwd.chars.max']}" /></div><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="pwd.chars.max" /></jsp:include></td>
+    <td><fmt:message bundle="${resword}" key="pwd_reqs_max_length_note" /></td>
   </tr>
   <tr>
     <td class="formlabel">
@@ -97,7 +94,8 @@
                id="pwd.chars.case.lower"
                name="pwd.chars.case.lower"
                value="true"
-               <%= checked(request, "pwd.chars.case.lower") %> />
+               <c:if test="${presetValues['pwd.chars.case.lower']}">checked</c:if>
+               />
         <label for="pwd.chars.case.lower"><fmt:message bundle="${resword}" key="pwd_reqs_lower_case" /></label>
       </div>
       <div>
@@ -105,7 +103,9 @@
                id="pwd.chars.case.upper"
                name="pwd.chars.case.upper"
                value="true"
-               <%= checked(request, "pwd.chars.case.upper") %> />
+            
+               <c:if test="${presetValues['pwd.chars.case.upper']}">checked</c:if>
+               />
         <label for="pwd.chars.case.upper"><fmt:message bundle="${resword}" key="pwd_reqs_upper_case" /></label>
       </div>
       <div>
@@ -113,7 +113,8 @@
                id="pwd.chars.digits"
                name="pwd.chars.digits"
                value="true"
-               <%= checked(request, "pwd.chars.digits") %> />
+                 <c:if test="${presetValues['pwd.chars.digits']}">checked</c:if>
+                />
         <label for="pwd.chars.digits"><fmt:message bundle="${resword}" key="pwd_reqs_digits" /></label>
         </div>
       <div>
@@ -121,7 +122,8 @@
                id="pwd.chars.specials"
                name="pwd.chars.specials"
                value="true"
-               <%= checked(request, "pwd.chars.specials") %> />
+               <c:if test="${presetValues['pwd.chars.specials']}">checked</c:if>
+           />
         <label for="pwd.chars.specials"><fmt:message bundle="${resword}" key="pwd_reqs_special_chars" /></label>
       </div>
   </td></tr>
@@ -132,15 +134,15 @@
              id="pwd_allow_reuse_yes"
              name="pwd.allow.reuse"
              value="true"
-             <%= checked(request, "pwd.allow.reuse") %> />
+              <c:if test="${presetValues['pwd.allow.reuse']  }">checked</c:if>
+            />
       <label for="pwd_allow_reuse_yes"><fmt:message key="yes" bundle="${resword}" /></label>
       <input type="radio"
              id="pwd_allow_reuse_no"
              name="pwd.allow.reuse"
              value="false"
-             <% Map formValues = (Map) request.getAttribute("presetValues");
-                Boolean attr   = (Boolean) formValues.get("pwd.allow.reuse"); %>
-             <%= attr == null || !attr.booleanValue() ? "checked=\'checked\'" : "" %> />
+             <c:if test="${presetValues['pwd.allow.reuse'] eq null || presetValues['pwd.allow.reuse'] == 'false'}">checked</c:if>
+             />
       <label for="pwd_allow_reuse_no" ><fmt:message key="no"  bundle="${resword}" /></label>
   </td></tr>
   <tr>
@@ -166,5 +168,5 @@
 <input type="button" onclick="confirmCancel('ListUserAccounts');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
 
 </form>
-
+<br>
 <jsp:include page="../include/footer.jsp"/>

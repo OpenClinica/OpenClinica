@@ -1,10 +1,14 @@
 package org.akaza.openclinica.control.login;
 
 import java.util.ArrayList;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.Set;
 
 import org.akaza.openclinica.dao.hibernate.PasswordRequirementsDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
 public class PasswordValidator {
     private boolean hasLowerCaseChars(String str) {
@@ -50,39 +54,46 @@ public class PasswordValidator {
     		UserAccountDAO userDao,
     		int userId,
     		String newPassword,
-    		String newHash) {
+    		String newHash,
+    		ResourceBundle resexception) {
     	ArrayList<String> errors = new ArrayList<String>();
-
+    	 
     	if (!passwordRequirementsDao.allowReuse()) {
     		int historySize = passwordRequirementsDao.historySize();
     		Set<String> oldHashes = userDao.findOldPasswordHashes(userId, historySize);
 
     		if (oldHashes.contains(newHash)) {
-    			errors.add("pwd_cannot_reuse");
+    			errors.add( resexception.getString("pwd_cannot_reuse"));
     		}
     	}
 
     	int
     		minLen = passwordRequirementsDao.minLength(),
     		maxLen = passwordRequirementsDao.maxLength();
+    	
+    	if ( newPassword.length() == 0) {
+    		return new ArrayList();
+    		
+    	}
+
     	if (minLen >= 0 && newPassword.length() < minLen) {
-    		errors.add("pwd_too_short");
+    		errors.add(resexception.getString("pwd_too_short") + " " + minLen + " "+resexception.getString("chars"));
     	}
 
     	if (maxLen >= 0 && newPassword.length() > maxLen) {
-    		errors.add("pwd_too_long");
+    		errors.add(resexception.getString("pwd_too_long") + " "+  + maxLen + " "+resexception.getString("chars" ));
     	}
     	if (passwordRequirementsDao.hasLower() && !hasLowerCaseChars(newPassword)) {
-    		errors.add("pwd_needs_lower_case");
+    		errors.add(resexception.getString("pwd_needs_lower_case"));
     	}
     	if (passwordRequirementsDao.hasUpper() && !hasUpperCaseChars(newPassword)) {
-    		errors.add("pwd_needs_upper_case");
+    		errors.add(resexception.getString("pwd_needs_upper_case"));
     	}
     	if (passwordRequirementsDao.hasDigits() && !hasDigits(newPassword)) {
-    		errors.add("pwd_needs_digits");
+    		errors.add(resexception.getString("pwd_needs_digits"));
     	}
     	if (passwordRequirementsDao.hasSpecials() && !hasSpecialChars(newPassword)) {
-    		errors.add("pwd_needs_special_chars");
+    		errors.add(resexception.getString("pwd_needs_special_chars"));
     	}
     	return errors;
     }
