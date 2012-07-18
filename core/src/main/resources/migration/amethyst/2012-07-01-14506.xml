@@ -5,30 +5,97 @@
                        http://www.liquibase.org/xml/ns/dbchangelog/1.9
                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
 
-     <changeSet author="lgayard" id="2012-07-01-14506">
-        <comment>Configuration options to control user passwords</comment>
-        <sql splitStatements="false">
-
-insert into configuration (key, value,description, version) values ('pwd.chars.min',       '8',    'Password minimum length', 0);
-insert into configuration (key, value,description, version) values ('pwd.chars.max',       '-1',   'Password maximum length', 0);
-insert into configuration (key, value,description, version) values ('pwd.chars.case.lower', 'false', 'Whether the password must contain lowercase letters', 0);
-insert into configuration (key, value,description, version) values ('pwd.chars.case.upper', 'false', 'Whether the password must contain upper case letters', 0);
-insert into configuration (key, value,description, version) values ('pwd.chars.digits',      'false', 'Whether the password must contain digits', 0);
-insert into configuration (key, value,description, version) values ('pwd.chars.specials',    'false', 'Whether the password must contain digits', 0);
-insert into configuration (key, value,description, version) values ('pwd.allow.reuse',      'false', 'Whether the password can be equal to a previous password', 0);
-insert into configuration (key, value,description, version) values ('pwd.history.size',     '1',    'How many old passwords to remember and to forbid repeating', 0);
-        </sql>
+  
+  <changeSet author="htaycher" id="2012-07-01-14506-11">
+	<insert tableName="configuration">
+	    <column name="key" value="pwd.chars.min"/>
+	    <column name="value" value="8"/>
+	    <column name="description" value="Password minimum length"/>
+	    <column name="version" value="0"/>
+	   
+	</insert>
+ </changeSet>
+    <changeSet author="htaycher" id="2012-07-01-14506-12">
+	
+	<insert tableName="configuration">
+	    <column name="key" value="pwd.chars.max"/>
+	    <column name="value" value="-1"/>
+	    <column name="description" value="Password maximum length"/>
+	    <column name="version" value="0"/>
+	   
+	</insert>
+	 </changeSet>
+    <changeSet author="htaycher" id="2012-07-01-14506-13">
+	
+	<insert tableName="configuration">
+	    <column name="key" value="pwd.chars.case.lower"/>
+	    <column name="value" value="false"/>
+	    <column name="description" value="Whether the password must contain lowercase letters"/>
+	    <column name="version" value="0"/>
+	   
+	</insert>
+	 </changeSet>
+    <changeSet author="htaycher" id="2012-07-01-14506-14">
+	
+	<insert tableName="configuration">
+	    <column name="key" value="pwd.chars.case.upper"/>
+	    <column name="value" value="false"/>
+	    <column name="description" value="Whether the password must contain upper case letters"/>
+	    <column name="version" value="0"/>
+	   
+	</insert>
+	 </changeSet>
+    <changeSet author="htaycher" id="2012-07-01-14506-19">
+	
+	<insert tableName="configuration">
+	    <column name="key" value="pwd.chars.digits"/>
+	    <column name="value" value="false"/>
+	    <column name="description" value="Whether the password must contain digits"/>
+	    <column name="version" value="0"/>
+	   
+	</insert>
+	 </changeSet>
+    <changeSet author="htaycher" id="2012-07-01-14506-15">
+	
+	<insert tableName="configuration">
+	    <column name="key" value="pwd.chars.specials"/>
+	    <column name="value" value="false"/>
+	    <column name="description" value="Whether the password must special character"/>
+	    <column name="version" value="0"/>
+	   
+	</insert>
+	 </changeSet>
+    <changeSet author="htaycher" id="2012-07-01-14506-16">
+	
+	<insert tableName="configuration">
+	    <column name="key" value="pwd.history.size"/>
+	    <column name="value" value="1"/>
+	    <column name="description" value="How many old passwords to remember and to forbid repeating"/>
+	    <column name="version" value="0"/>
+	   
+	</insert>
+	 </changeSet>
+    <changeSet author="htaycher" id="2012-07-01-14506-17">
+	
+	<insert tableName="configuration">
+	    <column name="key" value="pwd.allow.reuse"/>
+	    <column name="value" value="false"/>
+	    <column name="description" value="Whether the password can be equal to a previous password"/>
+	    <column name="version" value="0"/>
+	   
+	</insert>
     </changeSet>
-
+    
      <changeSet author="lgayard" id="2012-07-01-14506-2">
         <comment>New table to store user's old passwords, so they cannot repeat passwords.</comment>
 		<createTable tableName="user_old_password_hashes">
-			<column autoIncrement="true" name="id" type="serial">
+			<column autoIncrement="true" name="id" type="int">
 				<constraints nullable="false" primaryKey="true"/>
 			</column>
 			<column name="user_id"       type="int" />
 			<column name="password_hash" type="varchar(255)"/>
 		</createTable>
+		
         <addForeignKeyConstraint constraintName="userid"
                                  referencedTableName="user_account"
                                  referencedColumnNames="user_id"
