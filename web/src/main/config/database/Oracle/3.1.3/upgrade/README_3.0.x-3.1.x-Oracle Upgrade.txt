@@ -28,8 +28,10 @@ OpenClinica.
 
 The database and user permissions for Oracle are different in 
 OpenClinica 3.0.x then in 3.1.x. These scripts were designed to 
-run on a 3.1.x OpenClinica created database. In order to upgrade, 
-you will have to perform the following steps:
+run on a 3.1.x OpenClinica created database. Database user you 
+will use to run these scripts needs to have permissions to create 
+the package. In order to upgrade, you will have to perform the 
+following steps:
 
 1. Backup your data. We recommend doing this as the db user 
 "clinica" and another as "sysdba". This is crucial and be sure 
@@ -49,7 +51,7 @@ the names should match exactly the names used in 3.0.x.
 structure you just created.
 
 6. Open a sqlplus command prompt using the "clinica" user account. 
-Once opened, execute "Duplicate_Delete_v10_oracle.sql" file on 
+Once opened, execute "Duplicate_Delete_v2.sql" file on 
 your database. The script can be found in the Oracle\upgrade 
 directory within the OpenClinica 3.1.x package.
 
