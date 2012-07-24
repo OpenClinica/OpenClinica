@@ -426,9 +426,8 @@
         && dedc.eventCRF.id>0}">
         --%>
         
-      <c:if test="${ 
-        (study.status.available || study.status.pending)  && 
-        (userBean.sysAdmin || (userRole.director || userRole.coordinator))
+      <c:if test="${ study.status.available   && 
+        (userRole.director || userRole.coordinator)
         && !(studyEvent.subjectEventStatus.locked || studyEvent.subjectEventStatus.skipped)
         && dedc.eventCRF.id>0}">
    
@@ -625,8 +624,8 @@
 			   <!--  reasign crf version -->
             
     
- <c:if test="${(userBean.sysAdmin || (userRole.director || userRole.coordinator)) &&
- (study.status.available || study.status.pending) 
+ <c:if test="${( userRole.director || userRole.coordinator) &&
+ (study.status.available ) 
  && !(studyEvent.subjectEventStatus.locked || studyEvent.subjectEventStatus.skipped)}">
    
   <td>  <a href="pages/managestudy/chooseCRFVersion?crfId=<c:out value="${dec.eventCRF.crf.id}" />&crfName=<c:out value="${dec.eventCRF.crf.name}" />&crfversionId=<c:out value="${dec.eventCRF.crfVersion.id}" />&crfVersionName=<c:out value="${dec.eventCRF.crfVersion.name}" />&studySubjectLabel=<c:out value="${studySubject.label}"/>&studySubjectId=<c:out value="${studySubject.id}"/>&eventCRFId=<c:out value="${dec.eventCRF.id}"/>&eventDefinitionCRFId=<c:out value="${dec.eventDefinitionCRF.id}"/>"
