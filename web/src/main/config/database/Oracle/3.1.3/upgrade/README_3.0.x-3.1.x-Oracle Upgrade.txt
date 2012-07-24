@@ -28,10 +28,8 @@ OpenClinica.
 
 The database and user permissions for Oracle are different in 
 OpenClinica 3.0.x then in 3.1.x. These scripts were designed to 
-run on a 3.1.x OpenClinica created database. Database user you 
-will use to run these scripts needs to have permissions to create 
-the package. In order to upgrade, you will have to perform the 
-following steps:
+run on a 3.1.x OpenClinica created database. In order to upgrade,
+ you will have to perform the following steps:
 
 1. Backup your data. We recommend doing this as the db user 
 "clinica" and another as "sysdba". This is crucial and be sure 

@@ -245,6 +245,8 @@ public class XsltTransformJob extends QuartzJobBean {
             endFileStream.close();
 
             fileCntr++;
+
+            JobTerminationMonitor.check();
             }
             if (oldFilesPath.isDirectory()) {
 
@@ -538,9 +540,7 @@ public class XsltTransformJob extends QuartzJobBean {
                 logger.debug("EXCEPTIONS... EVEN TEHN DELETING OFF OLD FILES");
                 String generalFileDir = dataMap.getString(XML_FILE_PATH);
                 File oldFilesPath = new File(generalFileDir);
-                String endFile = "";
 
-                endFile = dataMap.getString(POST_FILE_PATH) + File.separator + dataMap.getString(POST_FILE_NAME);
                 if (oldFilesPath.isDirectory()) {
 
                     markForDelete = Arrays.asList(oldFilesPath.listFiles());
@@ -549,7 +549,7 @@ public class XsltTransformJob extends QuartzJobBean {
                 logger.debug("deleting the old files reference from archive dataset");
 
                 if (deleteOld) {
-                    deleteIntermFiles(markForDelete, endFile, doNotDeleteUntilExtract);
+                    deleteIntermFiles(markForDelete, "", doNotDeleteUntilExtract);
                 }
 
             }
