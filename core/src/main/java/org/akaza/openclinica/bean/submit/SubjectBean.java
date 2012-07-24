@@ -19,8 +19,6 @@ public class SubjectBean extends AuditableEntityBean {
      * since we extend entity bean, we already have the following: subject_id,
      * date_created, date_updated, update_id
      */
-    private int fatherId;
-    private int motherId;
     private Date dateOfBirth;
     private char gender = 'm';
     private String uniqueIdentifier = "";
@@ -66,22 +64,7 @@ public class SubjectBean extends AuditableEntityBean {
         this.dateOfBirth = dateOfBirth;
     }
 
-    /**
-     * @return Returns the fatherId.
-     */
-    public int getFatherId() {
-        return fatherId;
-    }
-
-    /**
-     * @param fatherId
-     *            The fatherId to set.
-     */
-    public void setFatherId(int fatherId) {
-        this.fatherId = fatherId;
-    }
-
-    /**
+       /**
      * @return Returns the gender.
      */
     public char getGender() {
@@ -96,20 +79,7 @@ public class SubjectBean extends AuditableEntityBean {
         this.gender = gender;
     }
 
-    /**
-     * @return Returns the motherId.
-     */
-    public int getMotherId() {
-        return motherId;
-    }
-
-    /**
-     * @param motherId
-     *            The motherId to set.
-     */
-    public void setMotherId(int motherId) {
-        this.motherId = motherId;
-    }
+  
 
     /**
      * @return Returns the uniqueIdentifier.

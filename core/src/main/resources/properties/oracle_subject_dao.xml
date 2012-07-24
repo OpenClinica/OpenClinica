@@ -77,16 +77,16 @@
 		<name>create</name>
 		<sql>
 		   INSERT INTO subject 
-		   (FATHER_ID,MOTHER_ID, STATUS_ID, 
+		   (STATUS_ID, 
 		   DATE_OF_BIRTH,GENDER,UNIQUE_IDENTIFIER,DATE_CREATED,
            OWNER_ID,DOB_COLLECTED) 
-		   VALUES (?,?,?,?,?,?,sysdate,?,?)
+		   VALUES (?,?,?,?,sysdate,?,?)
 		</sql>
 	</query>
 	<query>
 		<name>update</name>
 		<sql>
-		  UPDATE subject SET FATHER_ID=?,MOTHER_ID=?, STATUS_ID=?, 
+		  UPDATE subject SET  STATUS_ID=?, 
 		  DATE_OF_BIRTH=?,GENDER=?,UNIQUE_IDENTIFIER=?, DATE_UPDATED=?,
 		  UPDATE_ID=?,DOB_COLLECTED=? WHERE SUBJECT_ID=?
 	    </sql>

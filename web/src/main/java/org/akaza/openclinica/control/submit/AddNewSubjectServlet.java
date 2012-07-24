@@ -86,15 +86,9 @@ public class AddNewSubjectServlet extends SecureController {
 
     public static final String INPUT_GROUP = "group";
 
-    public static final String INPUT_FATHER = "father";
-
-    public static final String INPUT_MOTHER = "mother";
 
     public static final String BEAN_GROUPS = "groups";
 
-    public static final String BEAN_FATHERS = "fathers";
-
-    public static final String BEAN_MOTHERS = "mothers";
 
     public static final String SUBMIT_EVENT_BUTTON = "submitEvent";
 
@@ -359,21 +353,6 @@ public class AddNewSubjectServlet extends SecureController {
                 }
             }// end of the block if(!uniqueIdentifier.equals(""))
 
-            boolean insertWithParents = fp.getInt(INPUT_MOTHER) > 0 || fp.getInt(INPUT_FATHER) > 0;
-
-            if (fp.getInt(INPUT_MOTHER) > 0) {
-                SubjectBean mother = (SubjectBean) sdao.findByPK(fp.getInt(INPUT_MOTHER));
-                if (mother == null || !mother.isActive() || mother.getGender() != 'f') {
-                    Validator.addError(errors, INPUT_MOTHER, resexception.getString("please_choose_valid_female_subject_as_mother"));
-                }
-            }
-
-            if (fp.getInt(INPUT_FATHER) > 0) {
-                SubjectBean father = (SubjectBean) sdao.findByPK(fp.getInt(INPUT_FATHER));
-                if (father == null || !father.isActive() || father.getGender() != 'm') {
-                    Validator.addError(errors, INPUT_FATHER, resexception.getString("please_choose_valid_male_subject_as_father"));
-                }
-            }
 
             String label = fp.getString(INPUT_LABEL);
             // Shaoyu Su: if the form submitted for field "INPUT_LABEL" has
@@ -440,10 +419,7 @@ public class AddNewSubjectServlet extends SecureController {
                 fp.addPresetValue(STUDY_EVENT_DEFINITION, fp.getInt(STUDY_EVENT_DEFINITION));
                 fp.addPresetValue(LOCATION, fp.getString(LOCATION));
 
-                if (currentStudy.isGenetic()) {
-                    String intFields[] = { INPUT_GROUP, INPUT_FATHER, INPUT_MOTHER };
-                    fp.setCurrentIntValuesAsPreset(intFields);
-                }
+
                 fp.addPresetValue(EDIT_DOB, fp.getString(EDIT_DOB));
                 setPresetValues(fp.getPresetValues());
 
@@ -517,8 +493,6 @@ public class AddNewSubjectServlet extends SecureController {
 
                     fp.addPresetValue(INPUT_UNIQUE_IDENTIFIER, subject.getUniqueIdentifier());
 
-                    fp.addPresetValue(INPUT_FATHER, subject.getFatherId());
-                    fp.addPresetValue(INPUT_MOTHER, subject.getMotherId());
 
                     setPresetValues(fp.getPresetValues());
                     setUpBeans(classes);
@@ -688,14 +662,8 @@ public class AddNewSubjectServlet extends SecureController {
                     subject.setStatus(Status.AVAILABLE);
                     subject.setOwner(ub);
 
-                    if (insertWithParents) {
-                        subject.setFatherId(fp.getInt(INPUT_FATHER));
-                        subject.setMotherId(fp.getInt(INPUT_MOTHER));
-                        subject = sdao.create(subject);
-                    } else {
-                        subject = sdao.create(subject);
-                    }
 
+                        subject = sdao.create(subject);
                     if (!subject.isActive()) {
                         throw new OpenClinicaException(resexception.getString("could_not_create_subject"), "3");
                     }
@@ -918,22 +886,6 @@ public class AddNewSubjectServlet extends SecureController {
         // however, there are no groups in this Study. Please contact your Study
         // Director.",
         // Page.SUBMIT_DATA);
-
-        SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
-        ArrayList fathers = sdao.findAllByGender('m');
-        ArrayList mothers = sdao.findAllByGender('f');
-
-        ArrayList dsFathers = new ArrayList();
-        ArrayList dsMothers = new ArrayList();
-
-        StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
-        StudyDAO stdao = new StudyDAO(sm.getDataSource());
-
-        displaySubjects(dsFathers, fathers, ssdao, stdao);
-        displaySubjects(dsMothers, mothers, ssdao, stdao);
-
-        request.setAttribute(BEAN_FATHERS, dsFathers);
-        request.setAttribute(BEAN_MOTHERS, dsMothers);
 
         for (int i = 0; i < classes.size(); i++) {
             StudyGroupClassBean group = (StudyGroupClassBean) classes.get(i);
