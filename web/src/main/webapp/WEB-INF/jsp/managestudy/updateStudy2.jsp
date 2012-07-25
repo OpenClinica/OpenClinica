@@ -120,20 +120,6 @@
   </c:choose>
   </td></tr>
 
-  <!--
-  <tr valign="top"><td class="formlabel">Collect Subject Father/Mother Information?:</td><td>
-   <c:choose>
-   <c:when test="${newStudy.genetic == false}">
-    <input type="radio" name="genetic" value="1">Yes
-    <input type="radio" checked name="genetic" value="2">No
-   </c:when>
-   <c:otherwise>
-    <input type="radio" checked name="genetic" value="1">Yes
-    <input type="radio" name="genetic" value="2">No
-   </c:otherwise>
-  </c:choose>
-  </td></tr>
-  -->
 
 
     <c:choose>

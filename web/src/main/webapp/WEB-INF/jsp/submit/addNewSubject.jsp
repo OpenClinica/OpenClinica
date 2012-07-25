@@ -44,8 +44,6 @@
 <jsp:useBean scope="request" id="presetValues" class="java.util.HashMap" />
 
 <jsp:useBean scope="request" id="groups" class="java.util.ArrayList" />
-<jsp:useBean scope="request" id="fathers" class="java.util.ArrayList" />
-<jsp:useBean scope="request" id="mothers" class="java.util.ArrayList" />
 
 <c:set var="uniqueIdentifier" value="" />
 <c:set var="chosenGender" value="" />
@@ -55,8 +53,6 @@
 <c:set var="dob" value="" />
 <c:set var="yob" value="" />
 <c:set var="groupId" value="${0}" />
-<c:set var="fatherId" value="${0}" />
-<c:set var="motherId" value="${0}" />
 
 <c:forEach var="presetValue" items="${presetValues}">
 	<c:if test='${presetValue.key == "uniqueIdentifier"}'>
@@ -83,12 +79,7 @@
 	<c:if test='${presetValue.key == "group"}'>
 		<c:set var="groupId" value="${presetValue.value}" />
 	</c:if>
-	<c:if test='${presetValue.key == "mother"}'>
-		<c:set var="motherId" value="${presetValue.value}" />
-	</c:if>
-	<c:if test='${presetValue.key == "father"}'>
-		<c:set var="fatherId" value="${presetValue.value}" />
-	</c:if>
+	
 </c:forEach>
 
 
@@ -98,11 +89,7 @@
     <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/add-subject')">
         <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${restext}"/>" title="<fmt:message key="help" bundle="${restext}"/>"></a>
 </span></h1>
-<!--
-<c:if test="${study.genetic && (!empty mothers) || (!empty fathers)}">
-<p class="text">Indicate the subject's parents, if applicable.
-</c:if>
--->
+
 <p class="text">
 <br/><fmt:message key="field_required" bundle="${resword}"/></P>
 <form action="AddNewSubject" method="post">
@@ -344,108 +331,7 @@
   </c:otherwise>
  </c:choose>
 
- <!--
-<c:if test="${study.genetic}">
-	<c:if test="${!empty fathers}">
-	<tr>
-		<td class="formlabel"><fmt:message key="father" bundle="${resword}"/>:
-		<td valign="top">
-			<table border="0" cellpadding="0" cellspacing="0">
-				<tr>
-					<td valign="top"><div class="formfieldS_BG">
-						<select name="father" class="formfieldS">
-							<option value="">-<fmt:message key="select" bundle="${resword}"/>-</option>
-							<c:forEach var="father" items="${fathers}">
-								<c:choose>
-									<c:when test="${fatherId == father.subject.id}">
-										<option value="<c:out value="${father.subject.id}" />" selected>
-										<c:choose>
-										 <c:when test="${father.subject.name!=null && father.subject.name!=''}">
-										  <c:out value="${father.subject.name}"/>
-										 </c:when>
-										 <c:otherwise>
-										   <c:out value="${father.studySubjectIds}"/>
-										 </c:otherwise>
-										</c:choose>
-										</option>
-									</c:when>
-									<c:otherwise>
-										<option value="<c:out value="${father.subject.id}" />">
-										  <c:choose>
-										 <c:when test="${father.subject.name!=null && father.subject.name!=''}">
-										  <c:out value="${father.subject.name}"/>
-										 </c:when>
-										 <c:otherwise>
-										   <c:out value="${father.studySubjectIds}"/>
-										 </c:otherwise>
-										</c:choose>
-										</option>
-									</c:otherwise>
-								</c:choose>
-							</c:forEach>
-						</select>
-					</div></td>
-					<td></td>
-				</tr>
-				<tr>
-					<td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="father"/></jsp:include></td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	</c:if>
-
-	<c:if test="${(!empty mothers)}">
-	<tr>
-		<td class="formlabel"><fmt:message key="mother" bundle="${resword}"/>:
-		<td valign="top">
-			<table border="0" cellpadding="0" cellspacing="0">
-				<tr>
-					<td valign="top"><div class="formfieldS_BG">
-						<select name="mother" class="formfieldS">
-							<option value="">-<fmt:message key="select" bundle="${resword}"/>-</option>
-							<c:forEach var="mother" items="${mothers}">
-								<c:choose>
-									<c:when test="${motherId == mother.subject.id}">
-										<option value="<c:out value="${mother.subject.id}" />" selected>
-										 <c:choose>
-										 <c:when test="${mother.subject.name!=null && mother.subject.name!=''}">
-										  <c:out value="${mother.subject.name}"/>
-										 </c:when>
-										 <c:otherwise>
-										   <c:out value="${mother.studySubjectIds}"/>
-										 </c:otherwise>
-										</c:choose>
-										</option>
-									</c:when>
-									<c:otherwise>
-										<option value="<c:out value="${mother.subject.id}" />">
-										<c:choose>
-										 <c:when test="${mother.subject.name==null || mother.subject.name==''}">
-										   <c:out value="${mother.studySubjectIds}"/>
-										 </c:when>
-										 <c:otherwise>
-										   <c:out value="${mother.subject.name}"/>
-										 </c:otherwise>
-										</c:choose>
-										</option>
-									</c:otherwise>
-								</c:choose>
-							</c:forEach>
-						</select>
-					</td>
-					<td></td>
-				</tr>
-				<tr>
-					<td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="mother"/></jsp:include></td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	</c:if>
-</c:if>
--->
-
+ 
 </table>
 </div>
 

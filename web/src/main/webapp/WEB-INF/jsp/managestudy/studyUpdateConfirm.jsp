@@ -104,18 +104,6 @@
   <fmt:formatDate value="${newStudy.protocolDateVerification}" pattern="${dteFormat}"/>
   </td></tr>
 
-  <!--
-  <tr valign="top"><td class="table_header_column">Collect Subject Father/Mother Information?:</td><td class="table_cell">
-  <c:choose>
-    <c:when test="${newStudy.genetic == true}">
-     Yes
-    </c:when>
-    <c:otherwise>
-     No
-    </c:otherwise>
-   </c:choose>
- </td></tr>
- -->
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="start_date" bundle="${resword}"/>:</td><td class="table_cell">
    <fmt:formatDate value="${newStudy.datePlannedStart}" pattern="${dteFormat}"/>

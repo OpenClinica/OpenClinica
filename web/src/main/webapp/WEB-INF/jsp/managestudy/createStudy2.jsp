@@ -119,20 +119,7 @@
   </c:choose>
   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="protocolType"/></jsp:include></td><td>*</td></tr>
 
-  <!--
-  <tr valign="top"><td class="formlabel">Collect Subject Father/Mother Information?:</td><td>
-   <c:choose>
-   <c:when test="${newStudy.genetic == false}">
-    <input type="radio" name="genetic" value="1"><fmt:message key="yes" bundle="${resword}"/>
-    <input type="radio" checked name="genetic" value="2"><fmt:message key="no" bundle="${resword}"/>
-   </c:when>
-   <c:otherwise>
-    <input type="radio" checked name="genetic" value="1"><fmt:message key="yes" bundle="${resword}"/>
-    <input type="radio" name="genetic" value="2"><fmt:message key="no" bundle="${resword}"/>
-   </c:otherwise>
-  </c:choose>
-  </td></tr>
-  -->
+  
 
     <c:choose>
      <c:when test="${newStudy.parentStudyId == 0}">
