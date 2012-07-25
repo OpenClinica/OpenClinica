@@ -38,14 +38,7 @@ import java.util.Date;
  *
  */
 public class UpdateSubjectServlet extends SecureController {
-    public static final String INPUT_FATHER = "fatherId";
-
-    public static final String INPUT_MOTHER = "motherId";
-
-    public static final String BEAN_FATHERS = "fathers";
-
-    public static final String BEAN_MOTHERS = "mothers";
-
+   
     public static final String YEAR_DOB = "yearOfBirth";
 
     public static final String DATE_DOB = "dateOfBirth";
@@ -98,17 +91,11 @@ public class UpdateSubjectServlet extends SecureController {
             SubjectBean sub = (SubjectBean) sdao.findByPK(subjectId);
 
             request.setAttribute("studySubId", new Integer(studySubId));
-            ArrayList fathers = sdao.findAllByGenderNotSelf('m', sub.getId());
-            ArrayList mothers = sdao.findAllByGenderNotSelf('f', sub.getId());
-            ArrayList dsFathers = new ArrayList();
-            ArrayList dsMothers = new ArrayList();
-
+           
             StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
             StudyDAO stdao = new StudyDAO(sm.getDataSource());
 
-            AddNewSubjectServlet.displaySubjects(dsFathers, fathers, ssdao, stdao);
-            AddNewSubjectServlet.displaySubjects(dsMothers, mothers, ssdao, stdao);
-
+      
             if (!sub.isDobCollected()) {
                 Date dob = sub.getDateOfBirth();
                 Calendar cal = Calendar.getInstance();
@@ -134,23 +121,11 @@ public class UpdateSubjectServlet extends SecureController {
                     e.printStackTrace();
                 }
                 // added 102007, tbh
-                request.setAttribute(BEAN_FATHERS, dsFathers);
-                request.setAttribute(BEAN_MOTHERS, dsMothers);
-
+          
                 discNotes = new FormDiscrepancyNotes();
                 session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
 
-                /*
-                ArrayList<DiscrepancyNoteBean> dns = dndao.findAllSubjectByStudyAndId(currentStudy, subjectId);
-                if(dns.size()>0) {
-                    for(DiscrepancyNoteBean dn : dns) {
-                        if("gender".equalsIgnoreCase(dn.getColumn())) {
-                            session.setAttribute("genderDNFlag", AbstractTableFactory.getDNFlagIconName(dn.getResolutionStatusId()));
-                        } else if("date_of_birth".equalsIgnoreCase(dn.getColumn())) {
-                            session.setAttribute("birthDNFlag", AbstractTableFactory.getDNFlagIconName(dn.getResolutionStatusId()));
-                        }
-                    }
-                    */
+              
                 int flagRStatusId = dndao.getResolutionStatusIdForSubjectDNFlag(subjectId, "gender");
                 if(flagRStatusId > 0) {
                     session.setAttribute("genderDNFlag",AbstractTableFactory.getDNFlagIconName(flagRStatusId));
@@ -166,9 +141,7 @@ public class UpdateSubjectServlet extends SecureController {
 
                 forwardPage(Page.UPDATE_SUBJECT);
             } else if ("confirm".equalsIgnoreCase(action)) {
-                request.setAttribute(BEAN_FATHERS, dsFathers);
-                request.setAttribute(BEAN_MOTHERS, dsMothers);
-                confirm();
+                    confirm();
             } else {
                 SubjectBean subject = (SubjectBean) session.getAttribute("subjectToUpdate");
                 subject.setUpdater(ub);
@@ -247,47 +220,10 @@ public class UpdateSubjectServlet extends SecureController {
         }
 
         SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
-        SubjectBean mother = (SubjectBean) sdao.findByPK(fp.getInt(INPUT_MOTHER));
-        SubjectBean father = (SubjectBean) sdao.findByPK(fp.getInt(INPUT_FATHER));
-
+        
         StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
         StudyDAO stdao = new StudyDAO(sm.getDataSource());
-        // display mother
-        ArrayList studySubs = ssdao.findAllBySubjectId(mother.getId());
-        String protocolSubjectIds = "";
-        for (int j = 0; j < studySubs.size(); j++) {
-            StudySubjectBean studySub = (StudySubjectBean) studySubs.get(j);
-            int studyId = studySub.getStudyId();
-            StudyBean stu = (StudyBean) stdao.findByPK(studyId);
-            String protocolId = stu.getIdentifier();
-            if (j == studySubs.size() - 1) {
-                protocolSubjectIds += protocolId + "-" + studySub.getLabel();
-            } else {
-                protocolSubjectIds += protocolId + "-" + studySub.getLabel() + ", ";
-            }
-        }
-        DisplaySubjectBean dsbm = new DisplaySubjectBean();
-        dsbm.setSubject(mother);
-        dsbm.setStudySubjectIds(protocolSubjectIds);
-
-        // display father
-        studySubs = ssdao.findAllBySubjectId(father.getId());
-        protocolSubjectIds = "";
-        for (int j = 0; j < studySubs.size(); j++) {
-            StudySubjectBean studySub = (StudySubjectBean) studySubs.get(j);
-            int studyId = studySub.getStudyId();
-            StudyBean stu = (StudyBean) stdao.findByPK(studyId);
-            String protocolId = stu.getIdentifier();
-            if (j == studySubs.size() - 1) {
-                protocolSubjectIds += protocolId + "-" + studySub.getLabel();
-            } else {
-                protocolSubjectIds += protocolId + "-" + studySub.getLabel() + ", ";
-            }
-        }
-        DisplaySubjectBean dsbf = new DisplaySubjectBean();
-        dsbf.setSubject(father);
-        dsbf.setStudySubjectIds(protocolSubjectIds);
-
+       
         String uniqueIdentifier = fp.getString("uniqueIdentifier");
         if (!StringUtil.isBlank(uniqueIdentifier)) {
             SubjectBean subjectWithSameId = sdao.findByUniqueIdentifier(uniqueIdentifier);
@@ -296,17 +232,7 @@ public class UpdateSubjectServlet extends SecureController {
             }
         }
 
-        boolean insertWithParents = fp.getInt(INPUT_MOTHER) > 0 || fp.getInt(INPUT_FATHER) > 0;
-
-        if (insertWithParents) {
-            if (mother == null || !mother.isActive() || mother.getGender() != 'f') {
-                Validator.addError(errors, INPUT_MOTHER, resexception.getString("please_choose_valid_female_subject_as_mother"));
-            }
-
-            if (father == null || !father.isActive() || father.getGender() != 'm') {
-                Validator.addError(errors, INPUT_FATHER, resexception.getString("please_choose_valid_male_subject_as_father"));
-            }
-        }
+       
 
         boolean newDobInput = false;
         if (!sub.isDobCollected()) {
@@ -353,19 +279,13 @@ public class UpdateSubjectServlet extends SecureController {
         } else {
             sub.setGender(' ');
         }
-        sub.setFatherId(fp.getInt(INPUT_FATHER));
-        sub.setMotherId(fp.getInt(INPUT_MOTHER));
         sub.setUniqueIdentifier(uniqueIdentifier);
         session.setAttribute("subjectToUpdate", sub);
 
         if (errors.isEmpty()) {
             logger.info("no errors");
 
-            request.setAttribute("father", father);
-            request.setAttribute("mother", mother);
-
-            request.setAttribute("disFather", dsbf);
-            request.setAttribute("disMother", dsbm);
+           
             if (newDobInput) {
                 sub.setDobCollected(true);
             }
