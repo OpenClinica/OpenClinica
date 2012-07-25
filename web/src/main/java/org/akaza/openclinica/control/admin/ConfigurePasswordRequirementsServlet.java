@@ -53,6 +53,12 @@ public class ConfigurePasswordRequirementsServlet extends SecureController {
             }
 
             HashMap<?,?> errors = v.validate();
+
+            int minChars = fp.getInt("pwd.chars.min");
+            int maxChars = fp.getInt("pwd.chars.max");
+            if (minChars > 0 && maxChars > 0 && maxChars < minChars) {
+                Validator.addError(errors, "pwd.chars.min",resexception.getString("pwd_min_greater_than_max"));
+            }
             if (errors.isEmpty()) {
                 passwordRequirementsDao.setHasLower(   Boolean.valueOf(fp.getString("pwd.chars.case.lower")));
                 passwordRequirementsDao.setHasUpper(   Boolean.valueOf(fp.getString("pwd.chars.case.upper")));
