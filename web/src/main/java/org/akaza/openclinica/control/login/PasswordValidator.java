@@ -1,40 +1,44 @@
 package org.akaza.openclinica.control.login;
 
 import java.util.ArrayList;
-import java.util.Locale;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 
 import org.akaza.openclinica.dao.hibernate.PasswordRequirementsDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.i18n.core.LocaleResolver;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
+/**
+ *
+ * @author Leonel Gayard
+ * @author Doug Rodrigues (douglas.rodrigues@openclinica.com)
+ *
+ */
 public class PasswordValidator {
-    private boolean hasLowerCaseChars(String str) {
+    private static boolean hasLowerCaseChars(String str) {
     	int len = str.length();
-    	for (int i = 0; i < len; i++) { 
+    	for (int i = 0; i < len; i++) {
     		if (Character.isLowerCase(str.charAt(i))) return true;
     	}
     	return false;
     }
-    private boolean hasUpperCaseChars(String str) {
+    private static boolean hasUpperCaseChars(String str) {
     	int len = str.length();
-    	for (int i = 0; i < len; i++) { 
+    	for (int i = 0; i < len; i++) {
     		if (Character.isUpperCase(str.charAt(i))) return true;
     	}
     	return false;
     }
-    private boolean hasDigits(String str) {
+    private static boolean hasDigits(String str) {
     	int len = str.length();
-    	for (int i = 0; i < len; i++) { 
+    	for (int i = 0; i < len; i++) {
     		if (Character.isDigit(str.charAt(i))) return true;
     	}
     	return false;
     }
-    private boolean hasSpecialChars(String str) {
+    private static boolean hasSpecialChars(String str) {
     	int len = str.length();
-    	for (int i = 0; i < len; i++) { 
+    	for (int i = 0; i < len; i++) {
     		if (PasswordRequirementsDao.SPECIALS.indexOf(str.charAt(i)) >= 0)
     			return true;
     	}
@@ -47,9 +51,10 @@ public class PasswordValidator {
      * @param passwordRequirementsDao
      * @param newPassword
      * @return list of strings with validation errors; empty list if password
-     *  meets all validation requirements 
+     *  meets all validation requirements
      */
-    public ArrayList<String> validatePassword(
+
+    public static List<String> validatePassword(
     		PasswordRequirementsDao passwordRequirementsDao,
     		UserAccountDAO userDao,
     		int userId,
@@ -57,7 +62,7 @@ public class PasswordValidator {
     		String newHash,
     		ResourceBundle resexception) {
     	ArrayList<String> errors = new ArrayList<String>();
-    	 
+
     	if (!passwordRequirementsDao.allowReuse()) {
     		int historySize = passwordRequirementsDao.historySize();
     		Set<String> oldHashes = userDao.findOldPasswordHashes(userId, historySize);
@@ -70,18 +75,17 @@ public class PasswordValidator {
     	int
     		minLen = passwordRequirementsDao.minLength(),
     		maxLen = passwordRequirementsDao.maxLength();
-    	
+
     	if ( newPassword.length() == 0) {
-    		return new ArrayList();
-    		
+    	    return new ArrayList<String>();
     	}
 
-    	if (minLen >= 0 && newPassword.length() < minLen) {
-    		errors.add(resexception.getString("pwd_too_short") + " " + minLen + " "+resexception.getString("chars"));
+    	if (minLen > 0 && newPassword.length() < minLen) {
+    		errors.add(resexception.getString("pwd_too_short") + " " + minLen + " " + resexception.getString("chars"));
     	}
 
-    	if (maxLen >= 0 && newPassword.length() > maxLen) {
-    		errors.add(resexception.getString("pwd_too_long") + " "+  + maxLen + " "+resexception.getString("chars" ));
+    	if (maxLen > 0 && newPassword.length() > maxLen) {
+    		errors.add(resexception.getString("pwd_too_long") + " " + maxLen + " " + resexception.getString("chars" ));
     	}
     	if (passwordRequirementsDao.hasLower() && !hasLowerCaseChars(newPassword)) {
     		errors.add(resexception.getString("pwd_needs_lower_case"));
