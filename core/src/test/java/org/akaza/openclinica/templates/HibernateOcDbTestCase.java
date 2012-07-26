@@ -156,9 +156,11 @@ public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
         // baseDir + File.separator + "src" + File.separator + "main" +
         // File.separator + "webapp" + File.separator + "properties" +
         // File.separator;
-        SQLFactory.JUNIT_XML_DIR =
+  
+        //Revisit this later
+        /*    SQLFactory.JUNIT_XML_DIR =
             baseDir + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "properties" + File.separator;
-
+*/
         // @pgawade 10272010 - Added the ResourceLoader instance as a parameter
         // to run method of SQLFactory
         // SQLFactory.getnstance().run(dbName);

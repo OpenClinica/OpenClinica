@@ -95,9 +95,9 @@ public abstract class OcDbTestCase extends DataSourceBasedDBTestCase {
         // baseDir + File.separator + "src" + File.separator + "main" +
         // File.separator + "webapp" + File.separator + "properties" +
         // File.separator;
-        SQLFactory.JUNIT_XML_DIR =
+     /*   SQLFactory.JUNIT_XML_DIR =
             baseDir + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "properties" + File.separator;
-
+*/
         // @pgawade 05-Nov-2010 Updated the path of directory storing xml files
         // containing sql queries
         // SQLFactory.getInstance().run(dbName);
