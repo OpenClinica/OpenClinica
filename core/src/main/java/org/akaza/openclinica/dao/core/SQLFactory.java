@@ -45,7 +45,9 @@ public class SQLFactory {
     public final String DAO_EVENTDEFINITIONCRF = "event_definition_crf";
     public final String DAO_AUDITEVENT = "audit_event";
     public final String DAO_AUDIT = "audit";
-    public final String DAO_DATAVIEW = "dataview_dao";
+
+    //
+    //    public final String DAO_DATAVIEW = "dataview_dao";
     public final String DAO_ITEM = "item";
     public final String DAO_ITEMDATA = "item_data";
     public final String DAO_ITEMFORMMETADATA = "item_form_metadata";
@@ -79,7 +81,12 @@ public class SQLFactory {
     // cacheManagerBean.setConfigLocation(new FileSystemReour(""));
      
 
-    public EhCacheWrapper ehCacheWrapper;
+    private SQLFactory(){
+    	//to thwart any instantiation of this class
+    }
+    
+    
+    public static EhCacheWrapper ehCacheWrapper;
     
 
     public EhCacheWrapper getEhCacheWrapper() {
@@ -90,12 +97,14 @@ public class SQLFactory {
         this.ehCacheWrapper = ehCacheWrapper;
     }
 
-    public static String JUNIT_XML_DIR =
+    
+   //TODO: for some reason, this is hardcoded, not sure how we run junits from server if this is hardcoded ??? 
+    public static final String  JUNIT_XML_DIR =
         "C:\\work\\eclipse\\workspace\\OpenClinica" + File.separator + "webapp" + File.separator + "properties" + File.separator;
 
-    public static void setXMLDir(String path) {
+  /*  public  void setXMLDir(String path) {
         JUNIT_XML_DIR = path;
-    }
+    }*/
 
     private static Hashtable digesters = new Hashtable();
 
@@ -113,8 +122,9 @@ public class SQLFactory {
     static public SQLFactory getInstance() {
         // set so that we could test an xml file in a unit test, tbh
         if (facInstance == null) {
-
+        	synchronized(SQLFactory.class) {
             facInstance = new SQLFactory();
+        	}
         }
         return facInstance;
     }
