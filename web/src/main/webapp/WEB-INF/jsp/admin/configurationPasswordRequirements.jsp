@@ -126,7 +126,9 @@
            />
         <label for="pwd.chars.specials"><fmt:message bundle="${resword}" key="pwd_reqs_special_chars" /></label>
       </div>
-  </td></tr>
+  </td>
+  <td></td>
+  </tr>
   <tr>
     <td class="formlabel"><fmt:message bundle="${resword}" key="pwd_reqs_allow_reuse" /></td>
     <td>
@@ -144,7 +146,9 @@
              <c:if test="${presetValues['pwd.allow.reuse'] eq null || presetValues['pwd.allow.reuse'] == 'false'}">checked</c:if>
              />
       <label for="pwd_allow_reuse_no" ><fmt:message key="no"  bundle="${resword}" /></label>
-  </td></tr>
+  </td>
+  <td></td>
+  </tr>
   <tr>
     <td class="formlabel"><label for="pwd.history.size"><fmt:message bundle="${resword}" key="pwd_reqs_history_size" /></label></td>
     <td>
@@ -154,7 +158,8 @@
                name="pwd.history.size"
                type="text"
                value="${presetValues['pwd.history.size']}" /></div>
-    <td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="pwd.history.size" /></jsp:include></td>
+    <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="pwd.history.size" /></jsp:include></td>
+    <td><fmt:message bundle="${resword}" key="pwd_reqs_history_size_note"/></td>
   </tr>
 </table>
 

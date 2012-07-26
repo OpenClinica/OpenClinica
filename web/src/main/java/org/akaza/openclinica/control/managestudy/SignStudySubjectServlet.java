@@ -270,19 +270,6 @@ public class SignStudySubjectServlet extends SecureController {
 
         request.setAttribute("subject", subject);
 
-        if (subject.getFatherId() > 0) {
-            SubjectBean father = (SubjectBean) sdao.findByPK(subject.getFatherId());
-            request.setAttribute("father", father);
-        } else {
-            request.setAttribute("father", new SubjectBean());
-        }
-
-        if (subject.getMotherId() > 0) {
-            SubjectBean mother = (SubjectBean) sdao.findByPK(subject.getMotherId());
-            request.setAttribute("mother", mother);
-        } else {
-            request.setAttribute("mother", new SubjectBean());
-        }
 
         StudyDAO studydao = new StudyDAO(sm.getDataSource());
         StudyBean study = (StudyBean) studydao.findByPK(studyId);

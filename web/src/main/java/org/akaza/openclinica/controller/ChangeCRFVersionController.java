@@ -321,59 +321,34 @@ public class ChangeCRFVersionController {
 	       
 	         ItemBean cur_element=null; ItemBean new_element=null;
 	        ItemGroupMetadataBean bn_mdata= null;ItemGroupMetadataBean bn_new_mdata=null;
-	        while ( true){
-	        	if (cur_counter >= (cur_items.size()-1) && new_counter >= (new_items.size()-1 )){break;}
-	        	cur_element = cur_items.get(cur_counter);
-        		bn_mdata = hash_item_form_mdata.get( new Integer(cur_element.getId()));
-        		new_element = new_items.get(new_counter);
-        		bn_new_mdata = hash_new_item_form_mdata.get( new Integer(new_element.getId()));
+	        while ( cur_counter < cur_items.size() || new_counter < new_items.size()){
+	        	
+	        	if (cur_counter < cur_items.size() ){
+		        	cur_element = cur_items.get(cur_counter);
+	        		bn_mdata = hash_item_form_mdata.get( new Integer(cur_element.getId()));
+	        	}
+	        	if ( new_counter < new_items.size() ){
+	        		new_element = new_items.get(new_counter);
+	        		bn_new_mdata = hash_new_item_form_mdata.get( new Integer(new_element.getId()));
+	        	}
         		
-	        	if (  new_element.getId() == cur_element.getId()){
+	        	if (cur_counter < cur_items.size() && new_counter < new_items.size() &&  new_element.getId() == cur_element.getId() ){
 	        		buildRecord( cur_element,  new_element,  bn_mdata, bn_new_mdata, rows);
+	        		cur_counter++;new_counter++;
 	        	}
-	        	else if (  new_element.getId() < cur_element.getId()){
-	        		buildRecord( null,  new_element,  null, bn_new_mdata, rows);  		
-	        	}
-	        	else if (  new_element.getId() > cur_element.getId()){
+	        	else if ( cur_counter < cur_items.size() && ( new_counter >= new_items.size() || new_element.getId() > cur_element.getId())){
 	        		buildRecord( cur_element,  null,  bn_mdata, null, rows);
+	        		cur_counter++;
 	        	}
-	        	
-	        	
-	        	if ( cur_counter >= (cur_items.size()-1) && new_counter < (new_items.size()-1 )){
-	        		while(new_counter< new_items.size()-1){
-	        			new_counter ++; 
-	        			new_element = new_items.get(new_counter);
-	            		bn_new_mdata = hash_new_item_form_mdata.get( new Integer(new_element.getId()));
-	            		
-	            		buildRecord( null,  new_element,  null, bn_new_mdata, rows);  		
-	        		}
-	        		break;
-             	}
-	        	if ( cur_counter < (cur_items.size()-1) && new_counter >= (new_items.size()-1 )){
-	        		while(cur_counter< cur_items.size()-1){
-	        			cur_counter ++; 
-		        		cur_element = cur_items.get(cur_counter);
-		        		bn_mdata = hash_item_form_mdata.get( new Integer(cur_element.getId()));
-		        		buildRecord( cur_element,  null,  bn_mdata, null, rows);
-	        		}
-	        		break;
+	        	else if (new_counter < new_items.size() && ( cur_counter >= cur_items.size() ||
+	        		new_element.getId() < cur_element.getId())){
+	        		
+	        		buildRecord( null,  new_element,  null, bn_new_mdata, rows);  	
+	        		new_counter++;
 	        	}
-	        	if ( new_element.getId() == cur_element.getId()){
-	        		cur_counter ++;  new_counter++;continue;
-	        	}
-	        	else if (new_element.getId() < cur_element.getId()){
-	        		 new_counter++;continue;
-	        	}
-	        	else if ( new_element.getId() > cur_element.getId()){
-	        		cur_counter ++; continue;
-	        	}
-	        	
 	        	
 	        }
-	        
-
-	       
-        }catch(Exception e){
+       }catch(Exception e){
         	 logger.error(cur_counter+" "+new_counter);
         	 pageMessages.add(resword.getString("confirm_crf_version_em_dataextraction"));
             

@@ -18,8 +18,6 @@
 <jsp:useBean scope="request" id="presetValues" class="java.util.HashMap" />
 
 <jsp:useBean scope="request" id="groups" class="java.util.ArrayList" />
-<jsp:useBean scope="request" id="fathers" class="java.util.ArrayList" />
-<jsp:useBean scope="request" id="mothers" class="java.util.ArrayList" />
 
 <c:set var="uniqueIdentifier" value="" />
 <c:set var="chosenGender" value="" />
@@ -30,8 +28,6 @@
 <c:set var="dob" value="" />
 <c:set var="yob" value="" />
 <c:set var="groupId" value="${0}" />
-<c:set var="fatherId" value="${0}" />
-<c:set var="motherId" value="${0}" />
 <c:set var="studyEventDefinition" value=""/>
 <c:set var="location" value=""/>
 
@@ -63,12 +59,7 @@
 	<c:if test='${presetValue.key == "group"}'>
 		<c:set var="groupId" value="${presetValue.value}" />
 	</c:if>
-	<c:if test='${presetValue.key == "mother"}'>
-		<c:set var="motherId" value="${presetValue.value}" />
-	</c:if>
-	<c:if test='${presetValue.key == "father"}'>
-		<c:set var="fatherId" value="${presetValue.value}" />
-	</c:if>
+	
 	<c:if test='${presetValue.key == "studyEventDefinition"}'>
 		<c:set var="studyEventDefinition" value="${presetValue.value}" />
 	</c:if>

@@ -230,8 +230,6 @@ public class SubjectDAO extends AuditableEntityDAO {
         SubjectBean eb = new SubjectBean();
         super.setEntityAuditInformation(eb, hm);
         eb.setId(((Integer) hm.get("subject_id")).intValue());
-        eb.setFatherId(((Integer) hm.get("father_id")).intValue());
-        eb.setMotherId(((Integer) hm.get("mother_id")).intValue());
         Date birthday = (Date) hm.get("date_of_birth");
         eb.setDateOfBirth(birthday);
         try {
@@ -393,9 +391,7 @@ public class SubjectDAO extends AuditableEntityDAO {
         // FATHER_ID,MOTHER_ID, STATUS_ID,
         // DATE_OF_BIRTH,GENDER,UNIQUE_IDENTIFIER,DATE_CREATED,
         // OWNER_ID
-        variables.put(new Integer(1), new Integer(sb.getFatherId()));
-        variables.put(new Integer(2), new Integer(sb.getMotherId()));
-        variables.put(new Integer(3), new Integer(sb.getStatus().getId()));
+        variables.put(new Integer(1), new Integer(sb.getStatus().getId()));
         if (sb.getDateOfBirth() == null) {
             nullVars.put(new Integer(4), new Integer(Types.DATE));
             variables.put(new Integer(4), null);
@@ -440,22 +436,7 @@ public class SubjectDAO extends AuditableEntityDAO {
         logger.warn("Logged in subject DAO.create");
         int ind = 1;
 
-        if (sb.getFatherId() > 0) {
-            variables.put(new Integer(ind), new Integer(sb.getFatherId()));
-            ind++;
-        } else {
-            nullVars.put(new Integer(ind), new Integer(Types.INTEGER));
-            variables.put(new Integer(ind), null);
-            ind++;
-        }
-        if (sb.getMotherId() > 0) {
-            variables.put(new Integer(ind), new Integer(sb.getMotherId()));
-            ind++;
-        } else {
-            nullVars.put(new Integer(ind), new Integer(Types.INTEGER));
-            variables.put(new Integer(ind), null);
-            ind++;
-        }
+        
 
         variables.put(new Integer(ind), new Integer(sb.getStatus().getId()));
         ind++;
@@ -554,40 +535,30 @@ public class SubjectDAO extends AuditableEntityDAO {
         // DATE_OF_BIRTH=?,GENDER=?,UNIQUE_IDENTIFIER=?, DATE_UPDATED=?,
         // UPDATE_ID=? DOB_COLLECTED=? WHERE SUBJECT_ID=?
         // YW <<
-        if (sb.getFatherId() == 0) {
-            nullVars.put(new Integer(1), new Integer(Types.INTEGER));
-            variables.put(new Integer(1), null);
-        } else {
-            variables.put(new Integer(1), new Integer(sb.getFatherId()));
-        }
-        if (sb.getMotherId() == 0) {
-            nullVars.put(new Integer(2), new Integer(Types.INTEGER));
-            variables.put(new Integer(2), null);
-        } else {
-            variables.put(new Integer(2), new Integer(sb.getMotherId()));
-        }
-        variables.put(new Integer(3), new Integer(sb.getStatus().getId()));
+        int ind = 1;
+        variables.put(new Integer(ind++), new Integer(sb.getStatus().getId()));
         if (sb.getDateOfBirth() != null) {
-            variables.put(new Integer(4), sb.getDateOfBirth());
+            variables.put(new Integer(ind), sb.getDateOfBirth());
         } else {
-            nullVars.put(new Integer(4), new Integer(Types.DATE));
-            variables.put(new Integer(4), null);
+            nullVars.put(new Integer(ind), new Integer(Types.DATE));
+            variables.put(new Integer(ind), null);
         }
+        ind++;
         if (sb.getGender() != 'm' && sb.getGender() != 'f') {
-            nullVars.put(new Integer(5), new Integer(Types.CHAR));
-            variables.put(new Integer(5), null);
+            nullVars.put(new Integer(ind), new Integer(Types.CHAR));
+            variables.put(new Integer(ind), null);
         } else {
             char[] ch = { sb.getGender() };
-            variables.put(new Integer(5), new String(ch));
+            variables.put(new Integer(ind), new String(ch));
         }
-
-        variables.put(new Integer(6), new String(sb.getUniqueIdentifier()));
-        variables.put(new Integer(7), new java.util.Date());
-        variables.put(new Integer(8), new Integer(sb.getUpdater().getId()));
-        variables.put(new Integer(9), new Boolean(sb.isDobCollected()));
+        ind++;
+        variables.put(new Integer(ind++), new String(sb.getUniqueIdentifier()));
+        variables.put(new Integer(ind++), new java.util.Date());
+        variables.put(new Integer(ind++), new Integer(sb.getUpdater().getId()));
+        variables.put(new Integer(ind++), new Boolean(sb.isDobCollected()));
         // YW >>
 
-        variables.put(new Integer(10), new Integer(sb.getId()));
+        variables.put(new Integer(ind++), new Integer(sb.getId()));
 
         String sql = digester.getQuery("update");
         this.execute(sql, variables, nullVars);

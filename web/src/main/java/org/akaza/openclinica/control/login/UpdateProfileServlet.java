@@ -7,16 +7,11 @@
  */
 package org.akaza.openclinica.control.login;
 
-import static java.lang.Boolean.TRUE;
-
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.ResourceBundle;
-
-import javax.servlet.ServletException;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -33,12 +28,13 @@ import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * @author jxu
  * @version CVS: $Id: UpdateProfileServlet.java,v 1.9 2005/02/23 18:58:11 jxu
  *          Exp $
- * 
+ *
  * Servlet for processing 'update profile' request from user
  */
 public class UpdateProfileServlet extends SecureController {
@@ -79,8 +75,7 @@ public class UpdateProfileServlet extends SecureController {
         }
 
     }
-    
-    @SuppressWarnings("unchecked")
+
 	private void confirmProfile(UserAccountBean userBean1, UserAccountDAO udao) throws Exception {
         Validator v = new Validator(request);
         FormProcessor fp = new FormProcessor(request);
@@ -92,40 +87,43 @@ public class UpdateProfileServlet extends SecureController {
         v.addValidation("passwdChallengeAnswer", Validator.NO_BLANKS);
         // v.addValidation("activeStudyId", Validator.IS_AN_INTEGER);
         v.addValidation("oldPasswd", Validator.NO_BLANKS);// old password
-        if (!StringUtil.isBlank(fp.getString("passwd"))) {
+        String password = fp.getString("passwd");
+
+        ConfigurationDao configurationDao = SpringServletAccess
+                .getApplicationContext(context)
+                .getBean(ConfigurationDao.class);
+
+        org.akaza.openclinica.core.SecurityManager sm =
+                (org.akaza.openclinica.core.SecurityManager) SpringServletAccess
+                .getApplicationContext(context)
+                .getBean("securityManager");
+
+        String newDigestPass = sm.encrytPassword(fp.getString("passwd"), getUserDetails());
+        List<String> pwdErrors = new ArrayList<String>();
+
+        if (!StringUtils.isBlank(password)) {
             v.addValidation("passwd", Validator.IS_A_PASSWORD);// new password
             v.addValidation("passwd1", Validator.CHECK_SAME, "passwd");// confirm
             // password
+
+            PasswordRequirementsDao passwordRequirementsDao = new PasswordRequirementsDao(configurationDao);
+            Locale locale = LocaleResolver.getLocale(request);
+            ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle(locale);
+
+            pwdErrors = PasswordValidator.validatePassword(
+                            passwordRequirementsDao,
+                            udao,
+                            userBean1.getId(),
+                            password,
+                            newDigestPass,
+                            resexception);
         }
         v.addValidation("phone", Validator.NO_BLANKS);
         errors = v.validate();
-
-        ConfigurationDao configurationDao = SpringServletAccess
-        		.getApplicationContext(context)
-        		.getBean(ConfigurationDao.class);
-        org.akaza.openclinica.core.SecurityManager sm =
-        		(org.akaza.openclinica.core.SecurityManager) SpringServletAccess
-        		.getApplicationContext(context)
-        		.getBean("securityManager");
-
-        String newDigestPass = sm.encrytPassword(fp.getString("passwd"), getUserDetails());
-        
-        PasswordRequirementsDao passwordRequirementsDao = new PasswordRequirementsDao(configurationDao);
-        Locale locale = LocaleResolver.getLocale(request);
-        ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle(locale);
-      
-        ArrayList<String> pwdErrors = 
-        		new PasswordValidator().validatePassword(
-        				passwordRequirementsDao,
-        				udao,
-        				userBean1.getId(),
-        				fp.getString("passwd"),
-        				newDigestPass,
-        				resexception);
         for (String err: pwdErrors) {
-        	v.addError(errors, "passwd", err);
+            v.addError(errors, "passwd", err);
         }
-        
+
         userBean1.setFirstName(fp.getString("firstName"));
         userBean1.setLastName(fp.getString("lastName"));
         userBean1.setEmail(fp.getString("email"));
@@ -151,7 +149,7 @@ public class UpdateProfileServlet extends SecureController {
 
             String oldPass = fp.getString("oldPasswd").trim();
             String oldDigestPass = sm.encrytPassword(oldPass, getUserDetails());
-            
+
             if (!sm.isPasswordValid(ub.getPasswd(), oldPass, getUserDetails())) {
                 Validator.addError(errors, "oldPasswd", resexception.getString("wrong_old_password"));
                 request.setAttribute("formMessages", errors);
@@ -178,7 +176,7 @@ public class UpdateProfileServlet extends SecureController {
 
     /**
      * Updates user new profile
-     * 
+     *
      */
     private void submitProfile(UserAccountDAO udao) {
         logger.info("user bean to be updated:" + ub.getId() + ub.getFirstName());

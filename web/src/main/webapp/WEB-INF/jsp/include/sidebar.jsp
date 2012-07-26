@@ -85,18 +85,7 @@
 	<fmt:formatDate value="${study.protocolDateVerification}" pattern="${dteFormat}"/>
 
 	<br><br>
-	
-	<%--<b><fmt:message key="collect_subject_father_mother_information" bundle="${resword}"/>:</b>&nbsp; 
-	<c:choose>
-    <c:when test="${study.genetic == true}">
-     <fmt:message key="yes" bundle="${resword}"/>
-    </c:when>
-    <c:otherwise>
-     No
-    </c:otherwise> 
-   </c:choose>--%>
-   
-  	
+ 	
 	<b><fmt:message key="collect_subject" bundle="${resword}"/></b>&nbsp; 
 	<c:choose>
     <c:when test="${study.studyParameterConfig.collectDob == '1'}">

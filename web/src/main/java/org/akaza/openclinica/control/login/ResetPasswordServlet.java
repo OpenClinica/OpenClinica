@@ -7,6 +7,12 @@
  */
 package org.akaza.openclinica.control.login;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -20,15 +26,11 @@ import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Reset expired password
- * 
+ *
  * @author ywang
  */
 public class ResetPasswordServlet extends SecureController {
@@ -87,31 +89,36 @@ public class ResetPasswordServlet extends SecureController {
                 v.addValidation("passwdChallengeA", Validator.NO_BLANKS);
                 v.addValidation("passwd", Validator.CHECK_DIFFERENT, "oldPasswd");
             }
-            if (!StringUtil.isBlank(newPwd)) {
+
+            String newDigestPass = sm.encrytPassword(newPwd, getUserDetails());
+
+            List<String> pwdErrors = new ArrayList<String>();
+
+            if (!StringUtils.isEmpty(newPwd)) {
                 v.addValidation("passwd", Validator.IS_A_PASSWORD);
                 v.addValidation("passwd1", Validator.CHECK_SAME, "passwd");
+
+                ConfigurationDao configurationDao = SpringServletAccess
+                        .getApplicationContext(context)
+                        .getBean(ConfigurationDao.class);
+
+                PasswordRequirementsDao passwordRequirementsDao = new PasswordRequirementsDao(configurationDao);
+
+                Locale locale = LocaleResolver.getLocale(request);
+                ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle(locale);
+
+                pwdErrors = PasswordValidator.validatePassword(
+                                passwordRequirementsDao,
+                                udao,
+                                ub.getId(),
+                                newPwd,
+                                newDigestPass,
+                                resexception);
+
             }
             errors = v.validate();
-
-            ConfigurationDao configurationDao = SpringServletAccess
-            		.getApplicationContext(context)
-            		.getBean(ConfigurationDao.class);
-            PasswordRequirementsDao passwordRequirementsDao = new PasswordRequirementsDao(configurationDao);
-            String newDigestPass = sm.encrytPassword(newPwd, getUserDetails());
-            
-            Locale locale = LocaleResolver.getLocale(request);
-            ResourceBundle resexception = ResourceBundleProvider.getExceptionsBundle(locale);
-          
-            ArrayList<String> pwdErrors = 
-            		new PasswordValidator().validatePassword(
-            				passwordRequirementsDao,
-            				udao,
-            				ub.getId(),
-            				fp.getString("passwd"),
-            				newDigestPass,
-            				resexception);
             for (String err: pwdErrors) {
-            	v.addError(errors, "passwd", err);
+                v.addError(errors, "passwd", err);
             }
 
             if (!errors.isEmpty()) {
