@@ -89,7 +89,7 @@ public class ContactServlet extends SecureController {
         if (ub != null && ub.getId() > 0) {
             forwardPage(Page.MENU_SERVLET);
         } else {
-            forwardPage(PageEnum.LOGIN);
+            forwardPage(Page.LOGIN);
         }
     }
 
