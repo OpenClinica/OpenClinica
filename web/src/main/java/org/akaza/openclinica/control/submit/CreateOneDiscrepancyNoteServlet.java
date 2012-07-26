@@ -356,7 +356,14 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
         session.setAttribute(BOX_DN_MAP, boxDNMap);
         viewNoteLink = this.appendPageFileName(viewNoteLink, "refresh", refresh+"");
         viewNoteLink = this.appendPageFileName(viewNoteLink, "y", ypos!=null&&ypos.length()>0 ? ypos : "0");
-        forwardPage(Page.setNewPage(viewNoteLink, Page.VIEW_DISCREPANCY_NOTE.getTitle()));
+       
+   	 getServletContext().getRequestDispatcher(viewNoteLink).forward(request, response);
+       // forwardPage(Page.setNewPage(viewNoteLink, Page.VIEW_DISCREPANCY_NOTE.getTitle()));
+        
+        
+        
+        
+        
     }
 
     private void updateStudySubjectStatus(String entityType, int entityId) {

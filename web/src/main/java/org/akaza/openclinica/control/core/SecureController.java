@@ -11,6 +11,7 @@ package org.akaza.openclinica.control.core;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -695,7 +696,16 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                     int p = t.length() > 0 ? Integer.valueOf(t).intValue() : -1;
                     if (p > 1) {
                         viewNotesURL = viewNotesURL.replace("listNotes_p_=" + p, "listNotes_p_=" + (p - 1));
-                        forwardPage(Page.setNewPage(viewNotesURL, "View Notes"));
+                        //forwardPage(Page.setNewPage(viewNotesURL, "View Notes"));
+                    	try {
+							getServletContext().getRequestDispatcher(viewNotesURL).forward(request, response);
+						} catch (ServletException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
                     } else if (p <= 0) {
                         forwardPage(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY);
                     }

@@ -1987,7 +1987,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                         session.removeAttribute("viewNotesPageFileName");
                                         session.removeAttribute("viewNotesURL");
                                         if(viewNotesPageFileName!=null && viewNotesPageFileName.length()>0) {
-                                            forwardPage(Page.setNewPage(viewNotesPageFileName, "View Notes"), request, response);
+                                           // forwardPage(Page.setNewPage(viewNotesPageFileName, "View Notes"), request, response);
+                                        	 getServletContext().getRequestDispatcher(viewNotesPageFileName).forward(request, response);
                                         }
                                     }
                                     session.removeAttribute(instantAtt);
