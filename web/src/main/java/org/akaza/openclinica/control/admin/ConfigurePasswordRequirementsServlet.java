@@ -30,7 +30,6 @@ public class ConfigurePasswordRequirementsServlet extends SecureController {
             addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
             throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("you_may_not_perform_administrative_functions"), "1");
         }
-        return;
     }
 
     @Override
