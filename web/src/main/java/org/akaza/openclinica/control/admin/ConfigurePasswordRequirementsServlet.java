@@ -65,9 +65,12 @@ public class ConfigurePasswordRequirementsServlet extends SecureController {
                 passwordRequirementsDao.setHasSpecials(Boolean.valueOf(fp.getString("pwd.chars.specials")));
                 passwordRequirementsDao.setAllowReuse( Boolean.valueOf(fp.getString("pwd.allow.reuse")));
 
+
                 passwordRequirementsDao.setMinLength(fp.getInt("pwd.chars.min"));
                 passwordRequirementsDao.setMaxLength(fp.getInt("pwd.chars.max"));
                 passwordRequirementsDao.setHistorySize(fp.getInt("pwd.history.size"));
+                passwordRequirementsDao.setExpirationDays(fp.getInt("pwd.expiration.days"));
+                passwordRequirementsDao.setChangeRequired(fp.getInt("pwd.change.required"));
 
                 addPageMessage(respage.getString("password_req_changes_have_been_saved"));
                 forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET);
