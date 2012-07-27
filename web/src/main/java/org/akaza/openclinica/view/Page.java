@@ -430,7 +430,7 @@ public enum Page {
     // Dataset and select discrepancy Attribute"),
     CREATE_DATASET_SELECT_ITEMS ("/WEB-INF/jsp/extract/selectItems.jsp", "Create Dataset and select Items"),
 
-    CREATE_DATASET_APPLY_FILTER_SERVLET ("CreateDatasetApplyFilter", "Create Dataset Apply Filter"),
+   // CREATE_DATASET_APPLY_FILTER_SERVLET ("CreateDatasetApplyFilter", "Create Dataset Apply Filter"),
     CREATE_DATASET_APPLY_FILTER ("/WEB-INF/jsp/extract/createDatasetApplyFilter.jsp", "Create Dataset Apply Filter"),
 
     CREATE_DATASET_VIEW_SELECTED ("/WEB-INF/jsp/extract/viewSelected.jsp", "View Selected Items"),
@@ -623,7 +623,7 @@ public enum Page {
     LIST_SUBJECT_DISC_NOTE_SERVLET ("/ListDiscNotesSubjectServlet", "List Disc Notes Servlet"),
 
     FILE_UPLOAD ("/WEB-INF/jsp/submit/uploadFile.jsp", "Form For File Uploading"),
-    UPLOAD_FILE_SERVLET ("/UploadFile", "Upload File"),
+    //UPLOAD_FILE_SERVLET ("/UploadFile", "Upload File"),
     DOWNLOAD_ATTACHED_FILE ("/WEB-INF/jsp/submit/downloadAttachedFile.jsp", "Download Attached File"),
 
     CONFIRM_LOCKING_CRF_VERSION ("/WEB-INF/jsp/managestudy/confirmLockingCRFVersion.jsp", "confirm locking crf version"),

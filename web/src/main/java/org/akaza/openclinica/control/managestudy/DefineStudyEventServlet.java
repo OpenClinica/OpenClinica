@@ -121,7 +121,7 @@ public class DefineStudyEventServlet extends SecureController {
                             //forwardPage(Page.LIST_DEFINITION_SERVLET);
                             ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
                             session.setAttribute("pageMessages", pageMessages);
-                            response.sendRedirect(request.getContextPath() + Page.MANAGE_STUDY_MODULE);
+                            response.sendRedirect(request.getContextPath() + Page.MANAGE_STUDY_MODULE.getFileName());
                             //forwardPage(Page.MANAGE_STUDY_MODULE);
 //                            request.getRequestDispatcher("/pages/studymodule").forward(request, response);
 //                            org.akaza.openclinica.service.sdv.SDVUtil sdvUtil = new org.akaza.openclinica.service.sdv.SDVUtil();

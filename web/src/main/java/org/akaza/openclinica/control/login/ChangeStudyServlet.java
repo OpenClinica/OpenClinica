@@ -289,7 +289,7 @@ public class ChangeStudyServlet extends SecureController {
             setupSubjectSDVTable();
         } else if (currentRole.isCoordinator() || currentRole.isDirector()) {
             if (currentStudy.getStatus().isPending()) {
-                response.sendRedirect(request.getContextPath() + Page.MANAGE_STUDY_MODULE);
+                response.sendRedirect(request.getContextPath() + Page.MANAGE_STUDY_MODULE.getFileName());
                 return;
             }
             setupStudySiteStatisticsTable();

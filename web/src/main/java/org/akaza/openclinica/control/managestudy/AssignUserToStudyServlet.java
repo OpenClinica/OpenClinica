@@ -226,7 +226,7 @@ public class AssignUserToStudyServlet extends SecureController {
         session.setAttribute("pageMessages", pageMessages);
         // tbh #3936 07/2009
         if (currentStudy.getParentStudyId() == 0) {
-            response.sendRedirect(request.getContextPath() + Page.MANAGE_STUDY_MODULE);
+            response.sendRedirect(request.getContextPath() + Page.MANAGE_STUDY_MODULE.getFileName());
         } else {
             // you are in a site which means you should NOT access build study
             // module

@@ -178,7 +178,7 @@ public class CreateSubjectGroupClassServlet extends SecureController {
         }
         ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
         session.setAttribute("pageMessages", pageMessages);
-        response.sendRedirect(request.getContextPath() + Page.MANAGE_STUDY_MODULE);
+        response.sendRedirect(request.getContextPath() + Page.MANAGE_STUDY_MODULE.getFileName());
 
     }
 
