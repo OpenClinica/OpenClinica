@@ -161,6 +161,42 @@
     <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="pwd.history.size" /></jsp:include></td>
     <td><fmt:message bundle="${resword}" key="pwd_reqs_history_size_note"/></td>
   </tr>
+
+  <tr>
+    <td class="formlabel"><label for="pwd.history.size"><fmt:message bundle="${resword}" key="pwd_reqs_change_required" /></label></td>
+
+    <td>
+      <input type="radio"
+             id="pwd.change.required_yes"
+             name="pwd.change.required"
+             value="1"
+              <c:if test="${presetValues['pwd.change.required'] == '1'  }">checked</c:if>
+            />
+      <label for="pwd.change.required_yes"><fmt:message key="yes" bundle="${resword}" /></label>
+      <input type="radio"
+             id="pwd.change.required_no"
+             name="pwd.change.required"
+             value="0"
+             <c:if test="${presetValues['pwd.change.required'] eq null || presetValues['pwd.change.required'] != '1'}">checked</c:if>
+             />
+      <label for="pwd.change.required_no" ><fmt:message key="no"  bundle="${resword}" /></label>
+  </td>
+    <td><fmt:message bundle="${resword}" key="pwd_reqs_server_restart"/></td>
+  </tr>
+
+  <tr>
+    <td class="formlabel"><label for="pwd.history.size"><fmt:message bundle="${resword}" key="pwd_reqs_expiration_days" /></label></td>
+    <td>
+      <div class="formfieldM_BG">
+        <input class="formfieldM"
+               id="pwd.expiration.days"
+               name="pwd.expiration.days"
+               type="text"
+               value="${presetValues['pwd.expiration.days']}" /></div>
+    <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="pwd.expiration.days" /></jsp:include></td>
+    <td><fmt:message bundle="${resword}" key="pwd_reqs_server_restart"/></td>
+  </tr>
+
 </table>
 
 	</div>

@@ -20,13 +20,15 @@ public class PasswordRequirementsDao {
 	    PWD_CHARS_DIGITS = "pwd.chars.digits",
 	    PWD_CHARS_CASE_UPPER = "pwd.chars.case.upper",
 	    PWD_CHARS_CASE_LOWER = "pwd.chars.case.lower",
+	    PWD_CHANGE_REQUIRED = "pwd.change.required",
+	    PWD_EXPIRATION_DAYS = "pwd.expiration.days",
 
 	    SPECIALS = "!@#$%&*()";
 
 	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
-	private ConfigurationDao configurationDao;
+	private final ConfigurationDao configurationDao;
 
-    private List<String> 
+    private final List<String>
 		boolConfigKeys = asList(
 				PWD_CHARS_CASE_LOWER,
 				PWD_CHARS_CASE_UPPER,
@@ -36,8 +38,10 @@ public class PasswordRequirementsDao {
 		intConfigKeys  = asList(
 				PWD_CHARS_MIN,
 				PWD_CHARS_MAX,
-				PWD_HISTORY_SIZE);
-	
+				PWD_HISTORY_SIZE,
+				PWD_EXPIRATION_DAYS,
+				PWD_CHANGE_REQUIRED); // PWD_CHANGE_REQUIRED is in the 'int' list for\backwards compatibility reasons
+
 	public PasswordRequirementsDao(ConfigurationDao configurationDao) {
 		this.configurationDao = configurationDao;
 	}
@@ -87,7 +91,7 @@ public class PasswordRequirementsDao {
 		setValue(PWD_CHARS_SPECIALS, hasSpecials);
 	}
 
-	public void setAllowReuse(boolean allowReuse) {
+    public void setAllowReuse(boolean allowReuse) {
         setValue(PWD_ALLOW_REUSE, allowReuse);
 	}
 
@@ -98,9 +102,16 @@ public class PasswordRequirementsDao {
 	public void setMaxLength(int maxLen) {
         setValue(PWD_CHARS_MAX, maxLen);
 	}
+	public void setExpirationDays(int expirationDays) {
+	    setValue(PWD_EXPIRATION_DAYS, expirationDays);
+	}
+
+	public void setChangeRequired(int changeRequired) {
+        setValue(PWD_CHANGE_REQUIRED, changeRequired);
+    }
 
 	/**
-	 * How many old passwords the user cannot reuse 
+	 * How many old passwords the user cannot reuse
 	 */
 	public void setHistorySize(int size) {
 		setValue(PWD_HISTORY_SIZE, size);
@@ -121,8 +132,11 @@ public class PasswordRequirementsDao {
 	public boolean allowReuse() {
 		return getBoolProperty(PWD_ALLOW_REUSE);
 	}
+	public boolean changeRequired() {
+	    return getBoolProperty(PWD_CHANGE_REQUIRED);
+	}
 	/**
-	 * How many old passwords the user cannot reuse 
+	 * How many old passwords the user cannot reuse
 	 */
 	public int historySize() {
 		return getIntProperty(PWD_HISTORY_SIZE);
@@ -132,6 +146,9 @@ public class PasswordRequirementsDao {
 	}
 	public int maxLength() {
 		return getIntProperty(PWD_CHARS_MAX);
+	}
+	public int expirationDays() {
+	    return getIntProperty(PWD_EXPIRATION_DAYS);
 	}
 
 	private int getIntProperty(String key) {
