@@ -22,6 +22,7 @@ import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.apache.commons.lang.StringUtils;
 
 import java.text.ParseException;
 import java.util.Calendar;
@@ -63,7 +64,7 @@ public class UpdateSubjectServlet extends SecureController {
         FormDiscrepancyNotes discNotes = new FormDiscrepancyNotes();
 
         String fromResolvingNotes = fp.getString("fromResolvingNotes",true);
-        if (StringUtil.isBlank(fromResolvingNotes)) {
+        if (StringUtils.isBlank(fromResolvingNotes)) {
             session.removeAttribute(ViewNotesServlet.WIN_LOCATION);
             session.removeAttribute(ViewNotesServlet.NOTES_TABLE);
             checkStudyLocked(Page.LIST_SUBJECT_SERVLET, respage.getString("current_study_locked"));
@@ -81,7 +82,7 @@ public class UpdateSubjectServlet extends SecureController {
 
             String action = fp.getString("action", true);
 
-            if (StringUtil.isBlank("action")) {
+            if (StringUtils.isBlank("action")) {
                 addPageMessage(respage.getString("no_action_specified"));
                 forwardPage(Page.LIST_SUBJECT_SERVLET);
                 return;
@@ -181,7 +182,7 @@ public class UpdateSubjectServlet extends SecureController {
         	
         }
         else if ( currentStudy.getStudyParameterConfig().getCollectDob().equals("2")){
-        	if (!StringUtil.isBlank(fp.getString(DATE_DOB))) {
+        	if (!StringUtils.isBlank(fp.getString(DATE_DOB))) {
                
                 // if DOB was not updated (and originally entered as a full day, post it as is
                 String submitted_date = fp.getString(DATE_DOB);
@@ -194,7 +195,7 @@ public class UpdateSubjectServlet extends SecureController {
                 		request.setAttribute(DATE_DOB_TO_SAVE, converted_date);
                  	}
                 }catch(ParseException pe){
-                	//do nothing 
+                	logger.debug("update subject: cannot convert date " + submitted_date);
                 }
                 
                 if ( !isTheSameDate){
@@ -313,8 +314,7 @@ public class UpdateSubjectServlet extends SecureController {
             String localBirthDate = local_df.format(birthDate);
             request.setAttribute("localBirthDate", localBirthDate);
         } catch (NullPointerException e) {
-            // TODO Auto-generated catch block
-            //nothing should be done here : 
+        	logger.debug("update subject: cannot convert date " + birthDate);
         }
     }
     @Override
