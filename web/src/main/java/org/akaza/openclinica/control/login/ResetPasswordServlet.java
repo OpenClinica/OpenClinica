@@ -18,7 +18,6 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.SecurityManager;
-import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.dao.hibernate.PasswordRequirementsDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -128,8 +127,7 @@ public class ResetPasswordServlet extends SecureController {
             } else {
                 logger.info("ResetPassword page has no errors");
 
-                if (!StringUtil.isBlank(newPwd)) {
-                	udao.saveOldPassword(ub.getId(), oldPwd);
+                if (!StringUtils.isBlank(newPwd)) {
                     ub.setPasswd(newDigestPass);
                     ub.setPasswdTimestamp(new Date());
                 } else if ("no".equalsIgnoreCase(mustChangePwd)) {

@@ -7,6 +7,16 @@
  */
 package org.akaza.openclinica.dao.login;
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Privilege;
 import org.akaza.openclinica.bean.core.Role;
@@ -22,24 +32,12 @@ import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.sql.DataSource;
-
 /**
  * <P>
  * UserAccountDAO, the data access object for the User_Account table in the OpenClinica 2.0 database.
- * 
+ *
  * @author thickerson
- * 
+ *
  *         TODO
  *         <P>
  *         add functions for admin use cases such as assign user to study, remove user from study, etc.
@@ -133,6 +131,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
     	this.setTypeExpected(1, TypeNames.STRING);
     }
 
+    @Override
     public EntityBean update(EntityBean eb) {
         UserAccountBean uab = (UserAccountBean) eb;
         HashMap variables = new HashMap();
@@ -185,7 +184,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         variables.put(new Integer(18), uab.getRunWebservices());
 
         variables.put(new Integer(19), new Integer(uab.getId()));
-        
+
         String sql = digester.getQuery("update");
         this.execute(sql, variables, nullVars);
 
@@ -207,7 +206,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
 
     /**
      * deleteTestOnly, used only to clean up after unit testing, tbh
-     * 
+     *
      * @param name
      */
     public void deleteTestOnly(String name) {
@@ -258,6 +257,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         this.execute(digester.getQuery("lockUser"), variables);
     }
 
+    @Override
     public EntityBean create(EntityBean eb) {
         UserAccountBean uab = (UserAccountBean) eb;
         HashMap variables = new HashMap();
@@ -340,7 +340,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         variables.put(new Integer(2),  new Integer(studyRole.getStudyId()));
         variables.put(new Integer(3), new Integer(studyRole.getStatus().getId()));
         variables.put(new Integer(4), user.getName());
-        
+
         ArrayList alist = this.select(digester.getQuery("findStudyUserRole"), variables);
         UserAccountBean eb = new UserAccountBean();
         Iterator it = alist.iterator();
@@ -350,6 +350,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         return eb;
     }
 
+    @Override
     public Object getEntityFromHashMap(HashMap hm) {
         UserAccountBean uab = (UserAccountBean) this.getEntityFromHashMap(hm, true);
         return uab;
@@ -467,6 +468,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         return eb;
     }
 
+    @Override
     public Collection findAll() {
         return findAllByLimit(false);
     }
@@ -492,12 +494,14 @@ public class UserAccountDAO extends AuditableEntityDAO {
      * next on our list, how can we affect the query??? SELECT FROM USER_ACCOUNT ORDER BY ? DESC?
      * @see org.akaza.openclinica.dao.core.DAOInterface#findAll(java.lang.String, boolean, java.lang.String)
      */
+    @Override
     public Collection findAll(String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
         ArrayList al = new ArrayList();
 
         return al;
     }
 
+    @Override
     public EntityBean findByPK(int ID) {
         this.setTypesExpected();
 
@@ -543,12 +547,12 @@ public class UserAccountDAO extends AuditableEntityDAO {
         }
         return eb;
     }
-    
+
 
 
     /**
      * Finds all the studies with roles for a user
-     * 
+     *
      * @param userName
      * @param allStudies
      *            The result of calling StudyDAO.findAll();
@@ -765,7 +769,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
 
     /**
      * Finds all user and roles in a study
-     * 
+     *
      * @param studyId
      */
     public ArrayList findAllByStudyId(int studyId) {
@@ -776,7 +780,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
 
     /**
      * Finds all user and roles in a study
-     * 
+     *
      * @param studyId
      */
     public ArrayList findAllUsersByStudyIdAndLimit(int studyId, boolean isLimited) {
@@ -804,7 +808,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
 
     /**
      * Finds all user and roles in a study
-     * 
+     *
      * @param studyId
      */
     public ArrayList findAllUsersByStudy(int studyId) {
@@ -936,12 +940,14 @@ public class UserAccountDAO extends AuditableEntityDAO {
         return al;
     }
 
+    @Override
     public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
         ArrayList al = new ArrayList();
 
         return al;
     }
 
+    @Override
     public Collection findAllByPermission(Object objCurrentUser, int intActionType) {
         ArrayList al = new ArrayList();
 
@@ -1038,29 +1044,4 @@ public class UserAccountDAO extends AuditableEntityDAO {
         return al;
     }
 
-    /** Returns the user's old password hashes */
-    public Set<String> findOldPasswordHashes(int userId, int amount) {
-    	this.setPasswordTypesExpected();
-
-    	HashMap variables = new HashMap();
-        variables.put(new Integer(1), userId);
-        variables.put(new Integer(2), amount);
-
-        ArrayList rows = this.select(digester.getQuery("findOldPasswordHashes"), variables);
-        Set<String> ret = new TreeSet<String>();
-        Iterator it = rows.iterator();
-        while (it.hasNext()) {
-        	HashMap row = (HashMap) it.next();
-        	ret.add((String) row.get("password_hash"));
-        }
-        return ret;
-    }
-
-    public void saveOldPassword(int userId, String oldPassword) {
-    	String sql = digester.getQuery("addOldPasswordHash");
-    	HashMap vars = new HashMap();
-    	vars.put(1, userId);
-    	vars.put(2, oldPassword);
-    	execute(sql, vars);
-    }
 }

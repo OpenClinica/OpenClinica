@@ -130,40 +130,7 @@
   <td></td>
   </tr>
   <tr>
-    <td class="formlabel"><fmt:message bundle="${resword}" key="pwd_reqs_allow_reuse" /></td>
-    <td>
-      <input type="radio"
-             id="pwd_allow_reuse_yes"
-             name="pwd.allow.reuse"
-             value="true"
-              <c:if test="${presetValues['pwd.allow.reuse']  }">checked</c:if>
-            />
-      <label for="pwd_allow_reuse_yes"><fmt:message key="yes" bundle="${resword}" /></label>
-      <input type="radio"
-             id="pwd_allow_reuse_no"
-             name="pwd.allow.reuse"
-             value="false"
-             <c:if test="${presetValues['pwd.allow.reuse'] eq null || presetValues['pwd.allow.reuse'] == 'false'}">checked</c:if>
-             />
-      <label for="pwd_allow_reuse_no" ><fmt:message key="no"  bundle="${resword}" /></label>
-  </td>
-  <td></td>
-  </tr>
-  <tr>
-    <td class="formlabel"><label for="pwd.history.size"><fmt:message bundle="${resword}" key="pwd_reqs_history_size" /></label></td>
-    <td>
-      <div class="formfieldM_BG">
-        <input class="formfieldM"
-               id="pwd.history.size"
-               name="pwd.history.size"
-               type="text"
-               value="${presetValues['pwd.history.size']}" /></div>
-    <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="pwd.history.size" /></jsp:include></td>
-    <td><fmt:message bundle="${resword}" key="pwd_reqs_history_size_note"/></td>
-  </tr>
-
-  <tr>
-    <td class="formlabel"><label for="pwd.history.size"><fmt:message bundle="${resword}" key="pwd_reqs_change_required" /></label></td>
+    <td class="formlabel"><label for="pwd.change.required"><fmt:message bundle="${resword}" key="pwd_reqs_change_required" /></label></td>
 
     <td>
       <input type="radio"

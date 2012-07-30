@@ -5,24 +5,6 @@
                        http://www.liquibase.org/xml/ns/dbchangelog/1.9
                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
 
-  
-    <changeSet author="lgayard" id="2012-07-01-14506-2">
-        <comment>New table to store user's old passwords, so they cannot repeat passwords.</comment>
-		<createTable tableName="user_old_password_hashes">
-			<column autoIncrement="true" name="id" type="int">
-				<constraints nullable="false" primaryKey="true"/>
-			</column>
-			<column name="user_id"       type="int" />
-			<column name="password_hash" type="varchar(255)"/>
-		</createTable>
-		
-        <addForeignKeyConstraint constraintName="userid"
-                                 referencedTableName="user_account"
-                                 referencedColumnNames="user_id"
-                                 baseColumnNames="user_id"
-                                 baseTableName="user_old_password_hashes" />
-    </changeSet>
-
   <changeSet author="htaycher" id="2012-07-01-14506-11">
 	<insert tableName="configuration">
 	    <column name="key" value="pwd.chars.min"/>
@@ -82,26 +64,6 @@
 	   
 	</insert>
 	 </changeSet>
-    <changeSet author="htaycher" id="2012-07-01-14506-16">
-	
-	<insert tableName="configuration">
-	    <column name="key" value="pwd.history.size"/>
-	    <column name="value" value="1"/>
-	    <column name="description" value="How many old passwords to remember and to forbid repeating"/>
-	    <column name="version" value="0"/>
-	   
-	</insert>
-	 </changeSet>
-    <changeSet author="htaycher" id="2012-07-01-14506-17">
-	
-	<insert tableName="configuration">
-	    <column name="key" value="pwd.allow.reuse"/>
-	    <column name="value" value="false"/>
-	    <column name="description" value="Whether the password can be equal to a previous password"/>
-	    <column name="version" value="0"/>
-	   
-	</insert>
-    </changeSet>
 
     <changeSet author="drodrigues" id="2012-07-01-14506-18">
     	<insert tableName="configuration">
@@ -117,6 +79,16 @@
 	    	<column name="description" value="If the user is required to change their password after the first login"/>
 	    	<column name="version" value="0"/>
     	</insert>
+    </changeSet>
+
+    <changeSet author="drodrigues" id="2012-07-01-14506-19" failOnError="false">
+        <dropTable tableName="user_old_password_hashes"/>
+    </changeSet>
+
+    <changeSet author="drodrigues" id="2012-07-01-14506-20" failOnError="false">
+        <delete tableName="configuration">
+            <where>key = 'pwd.history.size' or key = 'pwd.allow.reuse'</where>
+        </delete>
     </changeSet>
     
 </databaseChangeLog>

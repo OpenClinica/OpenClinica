@@ -63,12 +63,10 @@ public class ConfigurePasswordRequirementsServlet extends SecureController {
                 passwordRequirementsDao.setHasUpper(   Boolean.valueOf(fp.getString("pwd.chars.case.upper")));
                 passwordRequirementsDao.setHasDigits(  Boolean.valueOf(fp.getString("pwd.chars.digits")));
                 passwordRequirementsDao.setHasSpecials(Boolean.valueOf(fp.getString("pwd.chars.specials")));
-                passwordRequirementsDao.setAllowReuse( Boolean.valueOf(fp.getString("pwd.allow.reuse")));
 
 
                 passwordRequirementsDao.setMinLength(fp.getInt("pwd.chars.min"));
                 passwordRequirementsDao.setMaxLength(fp.getInt("pwd.chars.max"));
-                passwordRequirementsDao.setHistorySize(fp.getInt("pwd.history.size"));
                 passwordRequirementsDao.setExpirationDays(fp.getInt("pwd.expiration.days"));
                 passwordRequirementsDao.setChangeRequired(fp.getInt("pwd.change.required"));
 

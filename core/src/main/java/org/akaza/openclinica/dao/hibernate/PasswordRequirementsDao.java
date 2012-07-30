@@ -12,8 +12,6 @@ import org.slf4j.LoggerFactory;
 
 public class PasswordRequirementsDao {
 	public static final String
-		PWD_HISTORY_SIZE = "pwd.history.size",
-	    PWD_ALLOW_REUSE = "pwd.allow.reuse",
 	    PWD_CHARS_MIN = "pwd.chars.min",
 	    PWD_CHARS_MAX = "pwd.chars.max",
 	    PWD_CHARS_SPECIALS = "pwd.chars.specials",
@@ -33,12 +31,10 @@ public class PasswordRequirementsDao {
 				PWD_CHARS_CASE_LOWER,
 				PWD_CHARS_CASE_UPPER,
 				PWD_CHARS_DIGITS,
-				PWD_CHARS_SPECIALS,
-				PWD_ALLOW_REUSE),
+				PWD_CHARS_SPECIALS),
 		intConfigKeys  = asList(
 				PWD_CHARS_MIN,
 				PWD_CHARS_MAX,
-				PWD_HISTORY_SIZE,
 				PWD_EXPIRATION_DAYS,
 				PWD_CHANGE_REQUIRED); // PWD_CHANGE_REQUIRED is in the 'int' list for\backwards compatibility reasons
 
@@ -91,10 +87,6 @@ public class PasswordRequirementsDao {
 		setValue(PWD_CHARS_SPECIALS, hasSpecials);
 	}
 
-    public void setAllowReuse(boolean allowReuse) {
-        setValue(PWD_ALLOW_REUSE, allowReuse);
-	}
-
 	public void setMinLength(int minLen) {
         setValue(PWD_CHARS_MIN, minLen);
 	}
@@ -109,14 +101,6 @@ public class PasswordRequirementsDao {
 	public void setChangeRequired(int changeRequired) {
         setValue(PWD_CHANGE_REQUIRED, changeRequired);
     }
-
-	/**
-	 * How many old passwords the user cannot reuse
-	 */
-	public void setHistorySize(int size) {
-		setValue(PWD_HISTORY_SIZE, size);
-	}
-
 	public boolean hasLower() {
 		return getBoolProperty(PWD_CHARS_CASE_LOWER);
 	}
@@ -129,17 +113,8 @@ public class PasswordRequirementsDao {
 	public boolean hasSpecials() {
 		return getBoolProperty(PWD_CHARS_SPECIALS);
 	}
-	public boolean allowReuse() {
-		return getBoolProperty(PWD_ALLOW_REUSE);
-	}
 	public boolean changeRequired() {
 	    return getBoolProperty(PWD_CHANGE_REQUIRED);
-	}
-	/**
-	 * How many old passwords the user cannot reuse
-	 */
-	public int historySize() {
-		return getIntProperty(PWD_HISTORY_SIZE);
 	}
 	public int minLength() {
 		return getIntProperty(PWD_CHARS_MIN);
