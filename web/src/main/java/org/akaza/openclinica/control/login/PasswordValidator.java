@@ -3,8 +3,8 @@ package org.akaza.openclinica.control.login;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.Set;
 
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.dao.hibernate.PasswordRequirementsDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 
@@ -63,20 +63,16 @@ public class PasswordValidator {
     		ResourceBundle resexception) {
     	ArrayList<String> errors = new ArrayList<String>();
 
-    	if (!passwordRequirementsDao.allowReuse()) {
-    		int historySize = passwordRequirementsDao.historySize();
-    		Set<String> oldHashes = userDao.findOldPasswordHashes(userId, historySize);
-
-    		if (oldHashes.contains(newHash)) {
-    			errors.add( resexception.getString("pwd_cannot_reuse"));
-    		}
-    	}
+    	UserAccountBean userBean = (UserAccountBean) userDao.findByPK(userId);
+        if (userBean.getPasswd().equals(newHash)) {
+            errors.add(resexception.getString("pwd_cannot_reuse"));
+        }
 
     	int
     		minLen = passwordRequirementsDao.minLength(),
     		maxLen = passwordRequirementsDao.maxLength();
 
-    	if ( newPassword.length() == 0) {
+    	if (newPassword.length() == 0) {
     	    return new ArrayList<String>();
     	}
 

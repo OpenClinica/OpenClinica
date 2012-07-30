@@ -148,7 +148,6 @@ public class UpdateProfileServlet extends SecureController {
             // + ub.getPasswd());
 
             String oldPass = fp.getString("oldPasswd").trim();
-            String oldDigestPass = sm.encrytPassword(oldPass, getUserDetails());
 
             if (!sm.isPasswordValid(ub.getPasswd(), oldPass, getUserDetails())) {
                 Validator.addError(errors, "oldPasswd", resexception.getString("wrong_old_password"));
@@ -156,8 +155,7 @@ public class UpdateProfileServlet extends SecureController {
                 // addPageMessage("Wrong old password. Please try again.");
                 forwardPage(Page.UPDATE_PROFILE);
             } else {
-                if (!StringUtil.isBlank(fp.getString("passwd"))) {
-                	session.setAttribute("oldPasswdHash", oldDigestPass);
+                if (!StringUtils.isBlank(fp.getString("passwd"))) {
                     userBean1.setPasswd(newDigestPass);
                     userBean1.setPasswdTimestamp(new Date());
                 }
@@ -186,12 +184,6 @@ public class UpdateProfileServlet extends SecureController {
         	userBean1.setLastVisitDate(new Date());
             userBean1.setUpdater(ub);
             udao.update(userBean1);
-
-        	String oldPasswordHash = (String) session.getAttribute("oldPasswdHash");
-        	if (oldPasswordHash != null) {
-        		udao.saveOldPassword(ub.getId(), oldPasswordHash);
-        		session.removeAttribute("oldPasswdHash");
-        	}
 
         	session.setAttribute("userBean", userBean1);
             ub = userBean1;
