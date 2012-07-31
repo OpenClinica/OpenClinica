@@ -16,6 +16,7 @@ import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.bean.submit.ResponseOptionBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.control.SpringServletAccess;
+import org.akaza.openclinica.control.core.CoreSecureController;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
@@ -28,6 +29,7 @@ import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.jdom.Element;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,7 +51,7 @@ import javax.sql.DataSource;
  */
 public class FormBeanUtil {
 
-    private static Logger logger = null;//LoggerFactory.getLogger(getClass().getName());
+    private static Logger logger = LoggerFactory.getLogger(FormBeanUtil.class);
     public static final String UNGROUPED = "Ungrouped";
     public static final String ADMIN_EDIT = "administrativeEditing";
     private static DynamicsMetadataService itemMetadataService;
