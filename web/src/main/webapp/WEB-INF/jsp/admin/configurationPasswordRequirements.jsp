@@ -161,7 +161,7 @@
                type="text"
                value="${presetValues['pwd.expiration.days']}" /></div>
     <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="pwd.expiration.days" /></jsp:include></td>
-    <td><fmt:message bundle="${resword}" key="pwd_reqs_server_restart"/></td>
+    <td><fmt:message bundle="${resword}" key="pwd_reqs_expiration_days_note"/></td>
   </tr>
 
 </table>
