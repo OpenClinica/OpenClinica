@@ -189,7 +189,6 @@ public class ScheduledJobController {
         SimpleTrigger newTrigger = new SimpleTrigger(triggerName,triggerGroupName);
         newTrigger.setJobName(theJobName);
         newTrigger.setJobGroup(theJobGroupName);
-        newTrigger.setMisfireInstruction(oldTrigger.getMisfireInstruction());
         newTrigger.setJobDataMap(oldTrigger.getJobDataMap());
         newTrigger.setVolatility(false);
         newTrigger.setRepeatCount(oldTrigger.getRepeatCount());

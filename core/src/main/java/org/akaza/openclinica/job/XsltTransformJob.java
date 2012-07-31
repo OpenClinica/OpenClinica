@@ -858,9 +858,9 @@ public class XsltTransformJob extends QuartzJobBean {
             mailSender.sendEmail(target, EmailEngine.getAdminEmail(), subject, emailBody, false);
             logger.info("sending an email to " + target + " from " + EmailEngine.getAdminEmail());
         } catch (SchedulerException se) {
-            throw new IllegalStateException("Error sending email", se);
+            logger.warn("Error sending email", se);
         } catch (OpenClinicaSystemException ose) {
-            throw new IllegalStateException("Error sending email", ose);
+            logger.warn("Error sending email", ose);
         }
 
     }

@@ -36,6 +36,11 @@
                 <bean class="org.akaza.openclinica.job.JobExecutionExceptionListener"/>
             </list>
         </property>
+        <property name="globalTriggerListeners">
+            <list>
+                <bean class="org.akaza.openclinica.job.JobTriggerListener"/>
+            </list>
+        </property>
     </bean>
 
     <bean id="legacyJobTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
