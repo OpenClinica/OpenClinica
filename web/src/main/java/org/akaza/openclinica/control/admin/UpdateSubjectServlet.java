@@ -219,7 +219,7 @@ public class UpdateSubjectServlet extends SecureController {
 	                    if (yob != 0){subject.setDateOfBirth(fakeDOB);}
 	                    request.setAttribute(DATE_DOB_TO_SAVE, dobString);	
 	                } catch (ParseException pe) {
-	                    logger.info("Parse exception happened.");
+	                    logger.debug("Parse exception happened.");
 	                    Validator.addError(errors, DATE_DOB, resexception.getString("please_enter_a_valid_year_birth"));
 	                }
                 }
