@@ -7,6 +7,11 @@
  */
 package org.akaza.openclinica.control;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.control.admin.EventStatusStatisticsTableFactory;
@@ -34,11 +39,6 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
 
 /**
  *
@@ -75,7 +75,7 @@ public class MainMenuServlet extends SecureController {
 
     @Override
     public void processRequest() throws Exception {
-    	
+
     	FormProcessor fp = new FormProcessor(request);
         ub.incNumVisitsToMainMenu();
         session.setAttribute(USER_BEAN_NAME, ub);
@@ -118,7 +118,7 @@ public class MainMenuServlet extends SecureController {
             long days = difference / (1000 * 60 * 60 * 24);
             session.setAttribute("passwordExpired", "no");
 
-            if (days >= pwdExpireDay) {// password expired, need to be changed
+            if (pwdExpireDay > 0 && days >= pwdExpireDay) {// password expired, need to be changed
                 studies = (ArrayList) sdao.findAllByUser(ub.getName());
                 request.setAttribute("studies", studies);
                 session.setAttribute("userBean1", ub);
@@ -173,7 +173,7 @@ public class MainMenuServlet extends SecureController {
                     fp.addPresetValue("label", resword.getString("id_generated_Save_Add"));
                 }
                 setPresetValues(fp.getPresetValues());
-                
+
                 if (currentRole.isInvestigator() || currentRole.isResearchAssistant()) {
                     setupListStudySubjectTable();
                 }
