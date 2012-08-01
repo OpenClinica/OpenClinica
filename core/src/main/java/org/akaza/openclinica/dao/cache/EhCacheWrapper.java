@@ -21,26 +21,27 @@ public class EhCacheWrapper<K, V> implements CacheWrapper<K, V>
     
     public void put(final K key, final V value)
     {
-    getCache().put(new Element(key, value));
+    	getCache().put(new Element(key, value));
     }
     
     public V get(final K key) 
-    {Element element =null;
-        Ehcache ehCache = getCache();
-        if(ehCache!=null)          
-        {
-            element = getCache().get(key);
-            logMe("element  null"+element);
-        }
-    if (element != null) {
-        logMe("element not null"+element);
-        return (V) element.getObjectValue();
-    }
-    return null;
+    {
+ //   Element element =null;
+//        Ehcache ehCache = getCache();
+//        if(ehCache!=null)          
+//        {
+//            element = getCache().get(key);
+//            logMe("element  null"+element);
+//        }
+//    if (element != null) {
+//        logMe("element not null"+element);
+//        return (V) element.getObjectValue();
+//    }
+    	return null;
     }
     public Ehcache getCache() 
     {
-    return cacheManager.getEhcache(cacheName);
+    	return cacheManager.getEhcache(cacheName);
     }
 
     
