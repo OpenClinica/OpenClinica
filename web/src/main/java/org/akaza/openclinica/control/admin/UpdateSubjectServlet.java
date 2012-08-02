@@ -196,6 +196,9 @@ public class UpdateSubjectServlet extends SecureController {
                  	}
                 }catch(ParseException pe){
                 	logger.debug("update subject: cannot convert date " + submitted_date);
+                	//I am putting on Pradnya's request the link to code review with a long discussion
+                	//about what type of logging should be here: enjoy
+                	//https://dev.openclinica.com/crucible/cru/OC-117
                 }
                 
                 if ( !isTheSameDate){
@@ -220,6 +223,9 @@ public class UpdateSubjectServlet extends SecureController {
 	                    request.setAttribute(DATE_DOB_TO_SAVE, dobString);	
 	                } catch (ParseException pe) {
 	                    logger.debug("Parse exception happened.");
+	                  //I am putting on Pradnya's request the link to code review with a long discussion
+	                	//about what type of logging should be here: enjoy
+	                	//https://dev.openclinica.com/crucible/cru/OC-117
 	                    Validator.addError(errors, DATE_DOB, resexception.getString("please_enter_a_valid_year_birth"));
 	                }
                 }
@@ -284,6 +290,9 @@ public class UpdateSubjectServlet extends SecureController {
         if (errors.isEmpty()) {
             forwardPage(Page.UPDATE_SUBJECT_CONFIRM);
         } else {
+        	//I am putting on Pradnya's request the link to code review with a long discussion
+        	//about what type of logging should be here: enjoy
+        	//https://dev.openclinica.com/crucible/cru/OC-117
             logger.error("update subject validation errors");
             setInputMessages(errors);
             setDNFlag( subjectId);
