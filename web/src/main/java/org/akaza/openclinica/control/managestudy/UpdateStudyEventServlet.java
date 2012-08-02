@@ -580,7 +580,7 @@ public class UpdateStudyEventServlet extends SecureController {
             if (studyEvent.getStartTimeFlag() == true) {
                 Calendar c = new GregorianCalendar();
                 c.setTime(studyEvent.getDateStarted());
-                presetValues.put(INPUT_STARTDATE_PREFIX + "Hour", new Integer(c.get(Calendar.HOUR)));
+                presetValues.put(INPUT_STARTDATE_PREFIX + "Hour", new Integer(c.get(Calendar.HOUR_OF_DAY)));
                 presetValues.put(INPUT_STARTDATE_PREFIX + "Minute", new Integer(c.get(Calendar.MINUTE)));
                 // Later it could be put to somewhere as a static method if
                 // necessary.
@@ -613,7 +613,7 @@ public class UpdateStudyEventServlet extends SecureController {
                 if (studyEvent.getEndTimeFlag() == true) {
                     Calendar c = new GregorianCalendar();
                     c.setTime(studyEvent.getDateEnded());
-                    presetValues.put(INPUT_ENDDATE_PREFIX + "Hour", new Integer(c.get(Calendar.HOUR)));
+                    presetValues.put(INPUT_ENDDATE_PREFIX + "Hour", new Integer(c.get(Calendar.HOUR_OF_DAY)));
                     presetValues.put(INPUT_ENDDATE_PREFIX + "Minute", new Integer(c.get(Calendar.MINUTE)));
                     // Later it could be put to somewhere as a static method if
                     // necessary.
