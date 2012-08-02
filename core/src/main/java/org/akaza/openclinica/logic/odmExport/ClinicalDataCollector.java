@@ -60,6 +60,7 @@ public class ClinicalDataCollector extends OdmDataCollector {
             cdata.setCategory(this.getCategory());
             StudySubjectDAO ssdao = new StudySubjectDAO(this.ds);
             cdata.setStudySubjectIds(ssdao.findStudySubjectIdsByStudyIds(u.getStudy().getId()+""));
+            cdata.collectOdmClinicalData();
             odmClinicalDataMap.put(u.getStudy().getOid(), cdata.getOdmClinicalData());
         }
     }
