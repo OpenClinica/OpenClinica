@@ -1,5 +1,6 @@
 package org.akaza.openclinica.dao.cache;
 
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,17 +27,20 @@ public class EhCacheWrapper<K, V> implements CacheWrapper<K, V>
     
     public V get(final K key) 
     {
- //   Element element =null;
-//        Ehcache ehCache = getCache();
-//        if(ehCache!=null)          
-//        {
-//            element = getCache().get(key);
-//            logMe("element  null"+element);
-//        }
-//    if (element != null) {
-//        logMe("element not null"+element);
-//        return (V) element.getObjectValue();
-//    }
+    	String db_type = CoreResources.getField("dbType");
+    	if ( db_type.equalsIgnoreCase("postgres")){
+	    	Element element =null;
+		        Ehcache ehCache = getCache();
+		        if(ehCache!=null)          
+		        {
+		            element = getCache().get(key);
+		            logMe("element  null"+element);
+		        }
+		    if (element != null) {
+		        logMe("element not null"+element);
+		        return (V) element.getObjectValue();
+		    }
+    	}
     	return null;
     }
     public Ehcache getCache() 
