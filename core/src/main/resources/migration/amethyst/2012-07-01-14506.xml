@@ -80,15 +80,5 @@
 	    	<column name="version" value="0"/>
     	</insert>
     </changeSet>
-
-    <changeSet author="drodrigues" id="2012-07-01-14506-19" failOnError="false">
-        <dropTable tableName="user_old_password_hashes"/>
-    </changeSet>
-
-    <changeSet author="drodrigues" id="2012-07-01-14506-20" failOnError="false">
-        <delete tableName="configuration">
-            <where>key = 'pwd.history.size' or key = 'pwd.allow.reuse'</where>
-        </delete>
-    </changeSet>
     
 </databaseChangeLog>
