@@ -104,13 +104,7 @@
     </bean>
 
     <bean id="studySubjectService" class="org.akaza.openclinica.service.managestudy.StudySubjectServiceImpl">
-        <property name="studyDao" ref="studyDao"/>
-        <property name="studyEventDao" ref="studyEventDao"/>
-        <property name="studyEventDefinitionDao" ref="studyEventDefinitionDao"/>
-        <property name="eventDefinitionCrfDao" ref="eventDefinitionCrfDao"/>
-        <property name="eventCrfDao" ref="eventCrfDao"/>
-        <property name="crfDao" ref="crfDao"/>
-        <property name="crfVersionDao" ref="crfVersionDao"/>
+        <property name="dataSource" ref="dataSource"/>
     </bean>
    <!--
     <bean id="sdvUtil" class="org.akaza.openclinica.web.table.sdv.SDVUtil"  name="sdvUtil">

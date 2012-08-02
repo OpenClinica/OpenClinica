@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
@@ -46,29 +48,20 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
  */
 public class StudySubjectServiceImpl implements StudySubjectService {
 
-    @SuppressWarnings("rawtypes")
-    private StudyEventDefinitionDAO studyEventDefinitionDao;
-
-    private StudyEventDAO studyEventDao;
-
-    @SuppressWarnings("rawtypes")
-    private EventCRFDAO eventCrfDao;
-
-    private EventDefinitionCRFDAO eventDefinitionCrfDao;
-
-    @SuppressWarnings("rawtypes")
-    private StudyDAO studyDao;
-
-    @SuppressWarnings("rawtypes")
-    private CRFDAO crfDao;
-
-    @SuppressWarnings("rawtypes")
-    private CRFVersionDAO crfVersionDao;
+    private DataSource dataSource;
 
     @Override
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public List<DisplayStudyEventBean> getDisplayStudyEventsForStudySubject(StudySubjectBean studySubject,
             UserAccountBean userAccount, StudyUserRoleBean currentRole) {
+
+        StudyEventDAO studyEventDao = new StudyEventDAO(dataSource);
+        StudyEventDefinitionDAO studyEventDefinitionDao = new StudyEventDefinitionDAO(dataSource);
+        StudyDAO studyDao = new StudyDAO(dataSource);
+        EventDefinitionCRFDAO eventDefinitionCrfDao = new EventDefinitionCRFDAO(dataSource);
+        EventCRFDAO eventCrfDao = new EventCRFDAO(dataSource);
+        CRFDAO crfDao = new CRFDAO(dataSource);
+        CRFVersionDAO crfVersionDao = new CRFVersionDAO(dataSource);
 
 
         ArrayList events = studyEventDao.findAllByStudySubject(studySubject);
@@ -284,9 +277,12 @@ public class StudySubjectServiceImpl implements StudySubjectService {
         return answer;
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public void populateUncompletedCRFsWithCRFAndVersions(
             ArrayList<DisplayEventDefinitionCRFBean> uncompletedEventDefinitionCRFs,
             Map<Integer, CRFVersionBean> crfVersionById, Map<Integer, CRFBean> crfById) {
+
+        CRFVersionDAO crfVersionDao = new CRFVersionDAO(dataSource);
 
         int size = uncompletedEventDefinitionCRFs.size();
         for (int i = 0; i < size; i++) {
@@ -320,60 +316,12 @@ public class StudySubjectServiceImpl implements StudySubjectService {
         }
     }
 
-    public StudyEventDefinitionDAO getStudyEventDefinitionDao() {
-        return studyEventDefinitionDao;
+    public DataSource getDataSource() {
+        return dataSource;
     }
 
-    public void setStudyEventDefinitionDao(StudyEventDefinitionDAO studyEventDefinitionDao) {
-        this.studyEventDefinitionDao = studyEventDefinitionDao;
-    }
-
-    public StudyEventDAO getStudyEventDao() {
-        return studyEventDao;
-    }
-
-    public void setStudyEventDao(StudyEventDAO studyEventDao) {
-        this.studyEventDao = studyEventDao;
-    }
-
-    public EventCRFDAO getEventCrfDao() {
-        return eventCrfDao;
-    }
-
-    public void setEventCrfDao(EventCRFDAO eventCrfDao) {
-        this.eventCrfDao = eventCrfDao;
-    }
-
-    public EventDefinitionCRFDAO getEventDefinitionCrfDao() {
-        return eventDefinitionCrfDao;
-    }
-
-    public void setEventDefinitionCrfDao(EventDefinitionCRFDAO eventDefinitionCrfDao) {
-        this.eventDefinitionCrfDao = eventDefinitionCrfDao;
-    }
-
-    public StudyDAO getStudyDao() {
-        return studyDao;
-    }
-
-    public void setStudyDao(StudyDAO studyDao) {
-        this.studyDao = studyDao;
-    }
-
-    public CRFDAO getCrfDao() {
-        return crfDao;
-    }
-
-    public void setCrfDao(CRFDAO crfDao) {
-        this.crfDao = crfDao;
-    }
-
-    public CRFVersionDAO getCrfVersionDao() {
-        return crfVersionDao;
-    }
-
-    public void setCrfVersionDao(CRFVersionDAO crfVersionDao) {
-        this.crfVersionDao = crfVersionDao;
+    public void setDataSource(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
 }
