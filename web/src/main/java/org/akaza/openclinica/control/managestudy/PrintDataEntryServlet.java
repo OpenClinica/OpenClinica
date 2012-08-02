@@ -282,8 +282,8 @@ public class PrintDataEntryServlet extends DataEntryServlet {
      * @see org.akaza.openclinica.control.submit.DataEntryServlet#getServletPage()
      */
     @Override
-    protected Page getServletPage(HttpServletRequest request) {
-        return Page.VIEW_SECTION_DATA_ENTRY_SERVLET;
+    protected String getServletPage(HttpServletRequest request) {
+        return Page.VIEW_SECTION_DATA_ENTRY_SERVLET.getFileName();
     }
 
     /*

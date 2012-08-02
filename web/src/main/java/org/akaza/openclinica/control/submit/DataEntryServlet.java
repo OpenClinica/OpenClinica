@@ -1929,7 +1929,9 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                     tabNum = fp.getInt("tab");
                                 }
                                 request.setAttribute("tab", new Integer(tabNum - 1).toString());
-                                forwardPage(getServletPage(request), request, response);
+                                
+                              //  forwardPage(getServletPage(request), request, response);
+                                getServletContext().getRequestDispatcher(getServletPage(request)).forward(request, response);
                             }
                         } else if (!fp.getString(GO_NEXT).equals("")) {
                             if (nextSec.isActive()) {
@@ -1943,7 +1945,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                     tabNum = fp.getInt("tab");
                                 }
                                 request.setAttribute("tab", new Integer(tabNum + 1).toString());
-                                forwardPage(getServletPage(request), request, response);
+                                getServletContext().getRequestDispatcher(getServletPage(request)).forward(request, response);
+                                //forwardPage(getServletPage(request), request, response);
                             }
                         }
 
@@ -2008,8 +2011,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
                                     request.setAttribute("tab", new Integer(tabNum + 1).toString());
                                 }
 
-                                forwardPage(getServletPage(request), request, response);
-
+                              //  forwardPage(getServletPage(request), request, response);
+                                getServletContext().getRequestDispatcher(getServletPage(request)).forward(request, response);
                             }
                             // session.removeAttribute(AddNewSubjectServlet.
                             // FORM_DISCREPANCY_NOTES_NAME);
@@ -3670,7 +3673,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
      * @param request TODO
      * @return The Page object which represents this servlet.
      */
-    protected abstract Page getServletPage(HttpServletRequest request);
+    protected abstract String getServletPage(HttpServletRequest request);
 
     protected abstract boolean shouldLoadDBValues(DisplayItemBean dib);
 

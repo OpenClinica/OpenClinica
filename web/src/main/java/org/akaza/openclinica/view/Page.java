@@ -10,7 +10,7 @@ package org.akaza.openclinica.view;
 /**
  * 
  * 
- *         Provides a type-safe enumeration for JSP Page
+ *         Provides a type-safe enumeration for JSP Page,converted from original static class.
  *         @author jnyayapathi
  */
 public enum Page {

@@ -59,16 +59,17 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
      * org.akaza.openclinica.control.submit.DataEntryServlet#getServletPage()
      */
     @Override
-    protected Page getServletPage(HttpServletRequest request) {
+    protected String getServletPage(HttpServletRequest request) {
         FormProcessor fp = new FormProcessor(request);
         String tabId = fp.getString("tab", true);
         String sectionId = fp.getString(DataEntryServlet.INPUT_SECTION_ID, true);
         String eventCRFId = fp.getString(INPUT_EVENT_CRF_ID, true);
         if (StringUtil.isBlank(sectionId) || StringUtil.isBlank(tabId)) {
-            return Page.ADMIN_EDIT_SERVLET;
+            return Page.ADMIN_EDIT_SERVLET.getFileName();
         } else {
             Page target = Page.ADMIN_EDIT_SERVLET;
             String s = target.getFileName().trim();
+            String url ;
             if(s.contains("?")) {
                 String[] t = s.split("\\?");
                 String x = "";
@@ -114,15 +115,17 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
                         }
                     }
                     y = y.substring(0,y.length()-1);
-                    target.setFileName(y);
+                    //target.setFileName(y);
+                    url = y;
                 } else {
                     LOGGER.info("It's a wrong servlet page:" + s);
                 }
             }else {
-                target.setFileName(target.getFileName() + "?eventCRFId=" + eventCRFId + "&sectionId=" + sectionId + "&tab=" + tabId);
+                //target.setFileName(target.getFileName() + "?eventCRFId=" + eventCRFId + "&sectionId=" + sectionId + "&tab=" + tabId);
+            	url = target.getFileName() + "?eventCRFId=" + eventCRFId + "&sectionId=" + sectionId + "&tab=" + tabId;
             }
             //target.setFileName(target.getFileName() + "?eventCRFId=" + eventCRFId + "&sectionId=" + sectionId + "&tab=" + tabId);
-            return target;
+            return target.getFileName();
         }
 
     }

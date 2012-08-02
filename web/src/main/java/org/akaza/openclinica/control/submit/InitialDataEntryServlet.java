@@ -317,17 +317,17 @@ public class InitialDataEntryServlet extends DataEntryServlet {
      * org.akaza.openclinica.control.submit.DataEntryServlet#getServletPage()
      */
     @Override
-    protected Page getServletPage(HttpServletRequest request) {
+    protected String getServletPage(HttpServletRequest request) {
         FormProcessor fp = new FormProcessor(request);
         String tabId = fp.getString("tab", true);
         String sectionId = fp.getString(DataEntryServlet.INPUT_SECTION_ID, true);
         String eventCRFId = fp.getString(INPUT_EVENT_CRF_ID, true);
         if (StringUtil.isBlank(sectionId) || StringUtil.isBlank(tabId)) {
-            return Page.INITIAL_DATA_ENTRY_SERVLET;
+            return Page.INITIAL_DATA_ENTRY_SERVLET.getFileName();
         } else {
             Page target = Page.INITIAL_DATA_ENTRY_SERVLET;
-            target.setFileName(target.getFileName() + "?eventCRFId=" + eventCRFId + "&sectionId=" + sectionId + "&tab=" + tabId);
-            return target;
+            return target.getFileName() + "?eventCRFId=" + eventCRFId + "&sectionId=" + sectionId + "&tab=" + tabId;
+            //return target.getFileName()+;
         }
     }
 

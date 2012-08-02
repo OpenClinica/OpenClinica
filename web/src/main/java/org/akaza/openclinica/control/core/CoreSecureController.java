@@ -598,7 +598,14 @@ public abstract class CoreSecureController extends HttpServlet {
      *            TODO
      */
     protected void forwardPage(Page jspPage, boolean checkTrail, HttpServletRequest request, HttpServletResponse response) {
-        // YW 10-03-2007 <<
+   	 String temp;
+	 String str = new String();
+	
+	 str = jspPage.name();
+	
+	Page page1 =  Page.valueOf(Page.class,str);
+    	
+    	// YW 10-03-2007 <<
         response.setHeader("Cache-Control", "no-cache");
         response.setHeader("Pragma", "no-cache");
         response.setDateHeader("Expires", -1);
@@ -612,7 +619,7 @@ public abstract class CoreSecureController extends HttpServlet {
 
         try {
             // Added 01/19/2005 for breadcrumbs, tbh
-            if (checkTrail) {
+        /*    if (checkTrail) {
                 BreadcrumbTrail bt = new BreadcrumbTrail();
                 if (session != null) {// added bu jxu, fixed bug for log out
                     ArrayList trail = (ArrayList) session.getAttribute("trail");
@@ -635,14 +642,14 @@ public abstract class CoreSecureController extends HttpServlet {
                 }
                 // we are also using checkTrail to update the panel, tbh
                 // 01/31/2005
-            }
-            // above added 01/19/2005, tbh
-
-            getServletContext().getRequestDispatcher(jspPage.getFileName()).forward(request, response);
+            }*/
+           // above added 01/19/2005, tbh
+            temp = page1.getFileName();
+            getServletContext().getRequestDispatcher(temp).forward(request, response);
 
             // response.sendRedirect(request.getContextPath()+jspPage.getFileName());
-        } catch (Exception se) {
-            if ("View Notes".equals(jspPage.getTitle())) {
+       } catch (Exception se) {
+            /*if ("View Notes".equals(jspPage.getTitle())) {
                 String viewNotesURL = jspPage.getFileName();
                 if (viewNotesURL != null && viewNotesURL.contains("listNotes_p_=")) {
                     String[] ps = viewNotesURL.split("listNotes_p_=");
@@ -670,8 +677,14 @@ public abstract class CoreSecureController extends HttpServlet {
                     }
                 }
             }
-            se.printStackTrace();
+         */   se.printStackTrace();
         }
+        finally {
+        	page1 = null;
+        	jspPage = null;
+        	str = null;
+        	temp = null;
+        }	
 
     }
 

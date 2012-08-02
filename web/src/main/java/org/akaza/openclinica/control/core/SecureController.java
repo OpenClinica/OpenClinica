@@ -648,7 +648,13 @@ public abstract class SecureController extends HttpServlet implements SingleThre
      * @param checkTrail The command to check for, and set a trail in the session.
      */
     protected void forwardPage(Page jspPage, boolean checkTrail) {
-        // YW 10-03-2007 <<
+    	 String temp;
+    	 String str = new String();
+    	
+    	 str = jspPage.name();
+    	
+    	Page page1 =  Page.valueOf(Page.class,str);
+    	// YW 10-03-2007 <<
         response.setHeader("Cache-Control", "no-cache");
         response.setHeader("Pragma", "no-cache");
         response.setDateHeader("Expires", -1);
@@ -661,7 +667,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
         try {
             // Added 01/19/2005 for breadcrumbs, tbh
-            if (checkTrail) {
+  /*          if (checkTrail) {
                 BreadcrumbTrail bt = new BreadcrumbTrail();
                 if (session != null) {// added bu jxu, fixed bug for log out
                     ArrayList trail = (ArrayList) session.getAttribute("trail");
@@ -685,10 +691,12 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 // we are also using checkTrail to update the panel, tbh
                 // 01/31/2005
             }
+*/           
+             temp = page1.getFileName();
             // above added 01/19/2005, tbh
-            context.getRequestDispatcher(jspPage.getFileName()).forward(request, response);
+            context.getRequestDispatcher(temp).forward(request, response);
         } catch (Exception se) {
-            if ("View Notes".equals(jspPage.getTitle())) {
+/*            if ("View Notes".equals(jspPage.getTitle())) {
                 String viewNotesURL = jspPage.getFileName();
                 if (viewNotesURL != null && viewNotesURL.contains("listNotes_p_=")) {
                     String[] ps = viewNotesURL.split("listNotes_p_=");
@@ -711,9 +719,14 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                     }
                 }
             }
-            se.printStackTrace();
+*/            se.printStackTrace();
         }
-
+        finally {
+        	page1 = null;
+        	jspPage = null;
+        	temp= null;
+        	str = null;
+        }
     }
 
     protected void forwardPage(Page jspPage) {
