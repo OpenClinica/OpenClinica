@@ -957,10 +957,7 @@ public class Validator {
                 addError(fieldName, v);
             }
             break;
-        // case IS_A_FILE:
-        // break;
-        // case IS_OF_FILE_TYPE:
-        // break;
+       
         case IS_IN_SET:
             ArrayList set = (ArrayList) v.getArg(0);
 
@@ -1087,11 +1084,7 @@ public class Validator {
             boolean isPDate = Boolean.FALSE;
             String fieldValue = getFieldValue(fieldName);
             if (fieldValue != null) {
-                // if (StringUtil.isFormatYearMonth(fieldValue,
-                // resformat.getString("date_format_year_month")) ||
-                // StringUtil.isFormatYear(fieldValue)
-                // || StringUtil.isFormatDate(fieldValue,
-                // resformat.getString("date_format_string"))) {
+              
                 if (StringUtil.isFormatDate(fieldValue, resformat.getString("date_format_string"), locale) || StringUtil.isPartialYear(fieldValue, "yyyy", locale)
                     || StringUtil.isPartialYearMonth(fieldValue, resformat.getString("date_format_year_month"),locale)) {
 
@@ -1303,22 +1296,7 @@ public class Validator {
     protected boolean isYearNotFourDigits(Date d) {
         Calendar c = Calendar.getInstance();
         c.setTime(d);
-        if (c.get(Calendar.YEAR) < 1000 || c.get(Calendar.YEAR) > 9999) { // did
-            // the
-            // user
-            // enter
-            // a
-            // year
-            // with
-            // less
-            // than
-            // 4
-            // digits
-            // or
-            // more
-            // than
-            // 4
-            // digits?
+        if (c.get(Calendar.YEAR) < 1000 || c.get(Calendar.YEAR) > 9999) { 
             return false;
         }
         return true;
@@ -1375,8 +1353,8 @@ public class Validator {
     }
 
     protected boolean isSame(String field1, String field2) {
-        String value1 = getFieldValue(field1);
-        String value2 = getFieldValue(field2);
+        String value1 = getFieldValue(field1).trim();
+        String value2 = getFieldValue(field2).trim();
 
         if (value1 == null && value2 == null) {
             return true;

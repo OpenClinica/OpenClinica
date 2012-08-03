@@ -19,7 +19,6 @@ import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
-import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.dao.hibernate.PasswordRequirementsDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -39,7 +38,12 @@ import org.apache.commons.lang.StringUtils;
  */
 public class UpdateProfileServlet extends SecureController {
 
-    @Override
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2519124535258437372L;
+
+	@Override
     public void mayProceed() throws InsufficientPermissionException {
 
     }
@@ -54,7 +58,7 @@ public class UpdateProfileServlet extends SecureController {
 
         ArrayList studies = (ArrayList) sdao.findAllByUser(ub.getName());
 
-        if (StringUtil.isBlank(action)) {
+        if (StringUtils.isBlank(action)) {
             request.setAttribute("studies", studies);
             session.setAttribute("userBean1", userBean1);
             forwardPage(Page.UPDATE_PROFILE);
@@ -87,7 +91,7 @@ public class UpdateProfileServlet extends SecureController {
         v.addValidation("passwdChallengeAnswer", Validator.NO_BLANKS);
         // v.addValidation("activeStudyId", Validator.IS_AN_INTEGER);
         v.addValidation("oldPasswd", Validator.NO_BLANKS);// old password
-        String password = fp.getString("passwd");
+        String password = fp.getString("passwd").trim();
 
         ConfigurationDao configurationDao = SpringServletAccess
                 .getApplicationContext(context)
@@ -98,7 +102,7 @@ public class UpdateProfileServlet extends SecureController {
                 .getApplicationContext(context)
                 .getBean("securityManager");
 
-        String newDigestPass = sm.encrytPassword(fp.getString("passwd"), getUserDetails());
+        String newDigestPass = sm.encrytPassword(password, getUserDetails());
         List<String> pwdErrors = new ArrayList<String>();
 
         if (!StringUtils.isBlank(password)) {
@@ -141,12 +145,6 @@ public class UpdateProfileServlet extends SecureController {
             logger.info("no errors");
 
             session.setAttribute("userBean1", userBean1);
-
-            // logger.info("old password:" + "in Form:" +
-            // fp.getString("oldPasswd") +
-            // ", in Session:"
-            // + ub.getPasswd());
-
             String oldPass = fp.getString("oldPasswd").trim();
 
             if (!sm.isPasswordValid(ub.getPasswd(), oldPass, getUserDetails())) {

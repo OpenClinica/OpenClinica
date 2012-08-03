@@ -34,7 +34,17 @@ import org.apache.commons.lang.StringUtils;
  */
 public class ResetPasswordServlet extends SecureController {
 
-    @Override
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -5259201015824317949L;
+
+	/**
+	 * 
+	 */
+	
+
+	@Override
     public void mayProceed() throws InsufficientPermissionException {
     }
 
@@ -44,8 +54,7 @@ public class ResetPasswordServlet extends SecureController {
      * <li>Validation:
      * <ol>
      * <li>1. old password match database record
-     * <li>2. new password is different from old password
-     * <li>3. new password satisfy required length and patterns
+     * <li>2. new password is follows requirements
      * <li>4. two times entered passwords are same
      * <li>5. all required fields are filled
      * </ol>
@@ -61,7 +70,7 @@ public class ResetPasswordServlet extends SecureController {
         errors.clear();
         FormProcessor fp = new FormProcessor(request);
         String mustChangePwd = request.getParameter("mustChangePwd");
-        String newPwd = fp.getString("passwd");
+        String newPwd = fp.getString("passwd").trim();
         String passwdChallengeQ = fp.getString("passwdChallengeQ");
         String passwdChallengeA = fp.getString("passwdChallengeA");
 
@@ -75,7 +84,6 @@ public class ResetPasswordServlet extends SecureController {
 
         String oldPwd = fp.getString("oldPasswd").trim();
         SecurityManager sm = ((SecurityManager) SpringServletAccess.getApplicationContext(context).getBean("securityManager"));
-        String oldDigestPass = sm.encrytPassword(oldPwd, getUserDetails());
         if (!sm.isPasswordValid(ub.getPasswd(), oldPwd, getUserDetails())) {
             Validator.addError(errors, "oldPasswd", resexception.getString("wrong_old_password"));
             request.setAttribute("formMessages", errors);
