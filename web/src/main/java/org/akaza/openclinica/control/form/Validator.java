@@ -392,8 +392,7 @@ public class Validator {
         return new ValidatorRegularExpression(resformat.getString("phone_format"), resformat.getString("phone_regexp"));
     }
 
-    public static final int PASSWORD_MINIMUM_LENGTH = 8;
-
+  
     public static final ValidatorRegularExpression USERNAME =
         new ValidatorRegularExpression("at least 5 alphanumeric or underscore characters", "[A-Za-z0-9_]{5,}");
 
