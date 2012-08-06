@@ -716,7 +716,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                     }
                 }
             }
-*/          	LOGGER.error(se.getMessage(),se);
+*/          	logger.error(se.getMessage(),se);
         }
         finally {
         	page1 = null;
