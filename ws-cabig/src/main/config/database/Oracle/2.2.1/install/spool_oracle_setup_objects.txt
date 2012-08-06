@@ -1,8 +1,0 @@
-	se.location,
-	*
-ERROR at line 54:
-ORA-00904: "SE"."LOCATION": invalid identifier 
-
-
-Clinica objects are created in the schema clinica. Please
-check the spool_oracle_create_objects.txt file for errors.
