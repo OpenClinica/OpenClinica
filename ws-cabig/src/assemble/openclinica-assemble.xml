@@ -12,8 +12,8 @@
       <directory>src/main/config</directory>
       <outputDirectory>config</outputDirectory>
       <includes>
-        <include>database/PostgreSQL/3.1.2/*/*</include>
-        <include>database/Oracle/3.1.2/*/*</include>
+        <include>database/PostgreSQL/*/*</include>
+        <include>database/Oracle/*/*</include>
       </includes>
     </fileSet>
   </fileSets>
