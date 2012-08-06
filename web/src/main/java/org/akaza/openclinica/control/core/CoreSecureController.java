@@ -673,7 +673,8 @@ public abstract class CoreSecureController extends HttpServlet {
                     }
                 }
             }
-         */   se.printStackTrace();
+         */
+    	LOGGER.error(se.getMessage(),se);
         }
         finally {
         	page1 = null;
