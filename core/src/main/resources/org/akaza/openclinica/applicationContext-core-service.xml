@@ -47,34 +47,6 @@
         <constructor-arg ref="dataSource"/>
     </bean>
 
-    <bean id="studyEventDao" class="org.akaza.openclinica.dao.managestudy.StudyEventDAO">
-        <constructor-arg ref="dataSource"/>
-    </bean>
-
-    <bean id="studyDao" class="org.akaza.openclinica.dao.managestudy.StudyDAO">
-        <constructor-arg ref="dataSource"/>
-    </bean>
-
-    <bean id="studyEventDefinitionDao" class="org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO">
-        <constructor-arg ref="dataSource"/>
-    </bean>
-
-    <bean id="eventDefinitionCrfDao" class="org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO">
-        <constructor-arg ref="dataSource"/>
-    </bean>
-
-    <bean id="eventCrfDao" class="org.akaza.openclinica.dao.submit.EventCRFDAO">
-        <constructor-arg ref="dataSource"/>
-    </bean>
-
-    <bean id="crfDao" class="org.akaza.openclinica.dao.admin.CRFDAO">
-        <constructor-arg ref="dataSource"/>
-    </bean>
-
-    <bean id="crfVersionDao" class="org.akaza.openclinica.dao.submit.CRFVersionDAO">
-        <constructor-arg ref="dataSource"/>
-    </bean>
-    
     <bean id="auditEventDao" class="org.akaza.openclinica.dao.admin.AuditEventDAO">
         <constructor-arg ref="dataSource"/>
     </bean>
