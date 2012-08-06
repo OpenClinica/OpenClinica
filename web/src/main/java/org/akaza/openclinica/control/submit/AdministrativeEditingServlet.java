@@ -69,7 +69,7 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
         } else {
             Page target = Page.ADMIN_EDIT_SERVLET;
             String s = target.getFileName().trim();
-            String url ;
+            String url=null ;
             if(s.contains("?")) {
                 String[] t = s.split("\\?");
                 String x = "";
@@ -125,7 +125,7 @@ public class AdministrativeEditingServlet extends DataEntryServlet {
             	url = target.getFileName() + "?eventCRFId=" + eventCRFId + "&sectionId=" + sectionId + "&tab=" + tabId;
             }
             //target.setFileName(target.getFileName() + "?eventCRFId=" + eventCRFId + "&sectionId=" + sectionId + "&tab=" + tabId);
-            return target.getFileName();
+            return url;
         }
 
     }

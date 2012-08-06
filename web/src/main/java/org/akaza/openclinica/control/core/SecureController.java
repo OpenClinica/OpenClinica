@@ -648,12 +648,9 @@ public abstract class SecureController extends HttpServlet implements SingleThre
      * @param checkTrail The command to check for, and set a trail in the session.
      */
     protected void forwardPage(Page jspPage, boolean checkTrail) {
-    	 String temp;
-    	 String str = new String();
+    	Page page1 = Page.valueOf(jspPage.name());
+    	String temp;
     	
-    	 str = jspPage.name();
-    	
-    	Page page1 =  Page.valueOf(Page.class,str);
     	// YW 10-03-2007 <<
         response.setHeader("Cache-Control", "no-cache");
         response.setHeader("Pragma", "no-cache");
@@ -725,7 +722,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         	page1 = null;
         	jspPage = null;
         	temp= null;
-        	str = null;
         }
     }
 
