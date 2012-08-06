@@ -500,7 +500,7 @@
     <scm>
 		<connection>scm:hg:${hg.url}</connection>
 		<developerConnection>scm:hg:${hg.url}</developerConnection>
-	<version>3.1-SNAPSHOT</version>
+	<tag>HEAD</tag>
   </scm>
 
     <repositories>
