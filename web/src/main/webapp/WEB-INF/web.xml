@@ -43,7 +43,14 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>-->
         <listener-class>org.akaza.openclinica.dao.core.OCContextLoaderListener</listener-class>
     </listener>
+    
     <listener>
+      <listener-class>net.sf.ehcache.constructs.web.ShutdownListener</listener-class>
+</listener> 
+    
+    <listener>
+    
+    
     <listener-class>
       org.springframework.security.web.session.HttpSessionEventPublisher
     </listener-class>
