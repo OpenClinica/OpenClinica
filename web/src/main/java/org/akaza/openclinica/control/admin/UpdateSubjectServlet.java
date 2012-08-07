@@ -124,8 +124,11 @@ public class UpdateSubjectServlet extends SecureController {
             	}
                 subject.setUpdater(ub);
                 if (! currentStudy.getStudyParameterConfig().getCollectDob().equals("3")){
-                	Date date_new = local_df.parse(fp.getString(DATE_DOB_TO_SAVE));
-	                subject.setDateOfBirth(date_new);
+                	String d_date = fp.getString(DATE_DOB_TO_SAVE);
+                	if ( !(d_date == null || d_date.trim().length()==0)){
+	                	Date date_new = local_df.parse(fp.getString(DATE_DOB_TO_SAVE));
+		                subject.setDateOfBirth(date_new);
+                	}
                 	
                 }
                 sdao.update(subject);
