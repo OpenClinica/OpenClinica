@@ -7,7 +7,7 @@
  */
 package org.akaza.openclinica.web;
 
-
+import org.akaza.openclinica.view.Page;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -60,7 +60,8 @@ public class SQLInitServlet extends HttpServlet {
         Role.RESEARCHASSISTANT.setDescription(getField("ra"));
         Role.MONITOR.setDescription(getField("monitor"));
         
-     
+        Page.INITIAL_DATA_ENTRY_NW.getFileName();
+
         //The crf/original/CRF Template  will be created if not exist.
         String theDir = getField("filePath");
         String dir1 = "crf" + File.separator;
