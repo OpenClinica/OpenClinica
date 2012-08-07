@@ -107,54 +107,61 @@ public class ScheduledJobController {
          }
 
        List <ScheduledJobs>jobsScheduled = new ArrayList<ScheduledJobs>();
-       int index = 0;
-        for(SimpleTrigger st:simpleTriggers)
-        {
+
+        int index = 0;
+
+        for (SimpleTrigger st : simpleTriggers) {
+            boolean isExecuting = currentJobList.contains(st.getJobName() + st.getGroup());
 
             ScheduledJobs jobs = new ScheduledJobs();
 
             ExtractPropertyBean epBean = null;
-            if(st.getJobDataMap()!=null)
-            epBean = (ExtractPropertyBean)st.getJobDataMap().get(EP_BEAN);
-
-            if(epBean!=null)
-            {
-            StringBuilder checkbox = new StringBuilder("");
-             checkbox.append("<input style='margin-right: 5px' type='checkbox' ") .append("' />");
-
-             StringBuilder actions = new StringBuilder("<table><tr><td>");
-             String contextPath = request.getContextPath();
-            StringBuilder jsCodeString =
-                 new StringBuilder("this.form.method='GET'; this.form.action='").append(contextPath).append("/pages/cancelScheduledJob").append("';").append(
-                         "this.form.theJobName.value='").append(st.getJobName()).append("';").append(
-                         "this.form.theJobGroupName.value='").append(st.getJobGroup()).append("';").append(
-                         "this.form.theTriggerName.value='").append(st.getName()).append("';").
-                         append("this.form.theTriggerGroupName.value='").append(st.getGroup()).append("';").append("this.form.submit();");
-
-             actions.append("<td><input type=\"submit\" class=\"button\" value=\"Cancel Job\" name=\"cancelJob\" ").append("onclick=\"")
-             .append(jsCodeString.toString()).append("\" /></td>");
-             actions.append("</tr></table>");
+            if (st.getJobDataMap() != null) {
+                epBean = (ExtractPropertyBean) st.getJobDataMap().get(EP_BEAN);
+            }
 
 
-            jobs.setCheckbox(checkbox.toString());
-            jobs.setDatasetId(epBean.getDatasetName());
-            String fireTime = st.getStartTime() != null ?
-                longFormat(locale).format(st.getStartTime()) : "";
-            jobs.setFireTime(fireTime);
-            if(st.getNextFireTime()!=null)
-            jobs.setScheduledFireTime(longFormat(locale).format(st.getNextFireTime()));
-            jobs.setExportFileName(epBean.getExportFileName()[0]);
-            jobs.setAction(actions.toString());
-            jobs.setJobStatus(currentJobList.contains(st.getJobName()+st.getGroup())?"Currently Executing":"Scheduled");
+            if (epBean != null) {
+                StringBuilder checkbox = new StringBuilder();
+                checkbox.append("<input style='margin-right: 5px' type='checkbox'/>");
 
-            jobsScheduled.add(index, jobs);
+                StringBuilder actions = new StringBuilder("<table><tr><td>");
+                if (isExecuting) {
+                    actions.append("&nbsp;");
+                } else {
+                    String contextPath = request.getContextPath();
+                    StringBuilder jsCodeString = new StringBuilder("this.form.method='GET'; this.form.action='").
+                            append(contextPath).append("/pages/cancelScheduledJob").append("';").
+                            append("this.form.theJobName.value='").append(st.getJobName()).append("';").
+                            append("this.form.theJobGroupName.value='").append(st.getJobGroup()).append("';").
+                            append("this.form.theTriggerName.value='").append(st.getName()).append("';").
+                            append("this.form.theTriggerGroupName.value='").append(st.getGroup()).append("';").
+                            append("this.form.submit();");
 
-            index++;
+                    actions.append("<td><input type=\"submit\" class=\"button\" value=\"Cancel Job\" ").
+                            append("name=\"cancelJob\" onclick=\"").append(jsCodeString.toString()).append("\" />");
+
+                }
+
+                actions.append("</td></tr></table>");
+
+                jobs.setCheckbox(checkbox.toString());
+                jobs.setDatasetId(epBean.getDatasetName());
+                String fireTime = st.getStartTime() != null ? longFormat(locale).format(st.getStartTime()) : "";
+                jobs.setFireTime(fireTime);
+                if(st.getNextFireTime() != null) {
+                    jobs.setScheduledFireTime(longFormat(locale).format(st.getNextFireTime()));
+                }
+                jobs.setExportFileName(epBean.getExportFileName()[0]);
+                jobs.setAction(actions.toString());
+                jobs.setJobStatus(isExecuting ? "Currently Executing" : "Scheduled");
+                jobsScheduled.add(index, jobs);
+                index++;
             }
         }
         logger.debug("totalRows"+index);
 
-            request.setAttribute("totalJobs", index);
+        request.setAttribute("totalJobs", index);
 
         request.setAttribute("jobs", jobsScheduled);
 
