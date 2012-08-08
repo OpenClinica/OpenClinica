@@ -664,17 +664,17 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
         try {
             // Added 01/19/2005 for breadcrumbs, tbh
-  /*          if (checkTrail) {
+            if (checkTrail) {
                 BreadcrumbTrail bt = new BreadcrumbTrail();
                 if (session != null) {// added bu jxu, fixed bug for log out
-                    ArrayList trail = (ArrayList) session.getAttribute("trail");
+                /*    ArrayList trail = (ArrayList) session.getAttribute("trail");
                     if (trail == null) {
                         trail = bt.generateTrail(jspPage, request);
                     } else {
                         bt.setTrail(trail);
                         trail = bt.generateTrail(jspPage, request);
                     }
-                    session.setAttribute("trail", trail);
+                    session.setAttribute("trail", trail);*/
                     panel = (StudyInfoPanel) session.getAttribute(STUDY_INFO_PANEL);
                     if (panel == null) {
                         panel = new StudyInfoPanel();
@@ -688,7 +688,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 // we are also using checkTrail to update the panel, tbh
                 // 01/31/2005
             }
-*/           
+           
              temp = page1.getFileName();
             // above added 01/19/2005, tbh
             context.getRequestDispatcher(temp).forward(request, response);
