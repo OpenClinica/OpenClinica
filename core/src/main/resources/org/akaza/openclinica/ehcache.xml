@@ -1,4 +1,4 @@
-<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../properties/ehcache.xsd" maxBytesLocalHeap="128M" maxBytesLocalOffHeap="128M">
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../properties/ehcache.xsd" maxBytesLocalHeap="128M">
 <defaultCache maxElementsInMemory="10000" eternal="false" overflowToDisk="true" timeToIdleSeconds="10" timeToLiveSeconds="20" diskPersistent="true" />
 <cache name="com.akaza.openclinica.dao.core.DAOCache" eternal="false"
     maxElementsInMemory="10000" overflowToDisk="false" diskPersistent="false"
