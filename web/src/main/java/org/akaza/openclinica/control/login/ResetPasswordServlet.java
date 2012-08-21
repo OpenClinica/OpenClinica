@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -83,10 +84,19 @@ public class ResetPasswordServlet extends SecureController {
         request.setAttribute("mustChangePass", mustChangePwd);
 
         String oldPwd = fp.getString("oldPasswd").trim();
+        UserAccountBean ubForm = new UserAccountBean(); // user bean from web
+        // form
+        ubForm.setPasswd(oldPwd);
+        ubForm.setPasswdChallengeQuestion(passwdChallengeQ);
+        ubForm.setPasswdChallengeAnswer(passwdChallengeA);
+        request.setAttribute("userBean1", ubForm);
+        
         SecurityManager sm = ((SecurityManager) SpringServletAccess.getApplicationContext(context).getBean("securityManager"));
         if (!sm.isPasswordValid(ub.getPasswd(), oldPwd, getUserDetails())) {
             Validator.addError(errors, "oldPasswd", resexception.getString("wrong_old_password"));
             request.setAttribute("formMessages", errors);
+           
+            
             forwardPage(Page.RESET_PASSWORD);
         } else {
             if (mustChangePwd.equalsIgnoreCase("yes")) {

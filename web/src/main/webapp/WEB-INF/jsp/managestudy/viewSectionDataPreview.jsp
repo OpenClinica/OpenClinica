@@ -1,29 +1,17 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <jsp:useBean scope="request" id="section" class="org.akaza.openclinica.bean.submit.DisplaySectionBean" />
 <jsp:useBean scope="request" id="sec" class="org.akaza.openclinica.bean.submit.SectionBean" />
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+
+
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
-<c:choose>
-<c:when test="${userBean.sysAdmin && module=='admin'}">
-<h1><span class="title_manage">
-</c:when>
-<c:otherwise>
-  <h1>
-     <c:choose>
-      <c:when test="${userRole.role.name=='coordinator' || userRole.role.name=='director'}">
-       <span class="title_manage">
-      </c:when>
-      <c:otherwise>
-       <span class="title_manage">
-      </c:otherwise>
-    </c:choose>
-</c:otherwise>
-</c:choose>
 
+<h1><span class="title_manage">
 
 <!-- Preview CRF Version for <c:out value="${section.crf.name}" /> <c:out value="${section.crfVersion.name}" /> -->
 <c:if test="${studySubject != null && studySubject.id>0}">
@@ -69,52 +57,19 @@ function getSib(theSibling){
 // ]]>
 </script>
 
-<c:choose>
-<c:when test="${studySubject != null && studySubject.id>0}">
+
+<c:if test="${studySubject != null && studySubject.id>0}">
 <p>
 <div class="homebox_bullets"><a href="ViewEventCRF?id=<c:out value="${EventCRFBean.id}"/>&studySubId=<c:out value="${studySubject.id}"/>">View Event CRF Properties</a></div>
 <p>
 <p>
 <div class="homebox_bullets" style="width:117">
 
-<%--<a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${EventCRFBean.id}"/>')"
-					onMouseDown="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print_d.gif');"
-					onMouseUp="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');">
-					<img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_Print.gif" border="0" alt="Print" title="Print CRF" align="right" hspace="10"></a>
-					<a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${EventCRFBean.id}"/>')">Print CRF</a>--%>
 
 </div>
-</c:when>
-<c:otherwise><!--
-<p>
-<div class="homebox_bullets"><a href="ViewCRFVersionPreview?crfId=<c:out value="${crfId}"/>">View CRF Version Metadata</a></div>
-<p>
-<div class="homebox_bullets" style="width:120">
+</c:if>
 
-<%--<a href="javascript:openDocWindow('PrintCRFPreview')"
-					onMouseDown="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print_d.gif');"
-					onMouseUp="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');">
-					<img name="bt_Print<c:out value="${rowCount}"/>" src="images/bt_Print.gif" border="0" alt="Print CRF" title="Print CRF" align="right" hspace="25"></a>
-					<a href="javascript:openDocWindow('PrintCRFPreview')">Print CRF</a>--%>
 
-</div>
-<p>
-	<c:choose>
-		<c:when test="${tabId==0}">
-			<div class="homebox_bullets"><%--<a href="ViewTableOfContent?crfVersionId=<c:out value="${section.crfVersion.id}"/>&sedId=1">Go Back to Section Properties</a>--%></div>
-			<p>
-		</c:when>
-		<c:otherwise>
-			<div class="homebox_bullets"><%--<a href="ViewCRF?crfId=<c:out value="${crfId}"/>">View CRF Details</a>--%></div>
-			<p>
-			<div class="homebox_bullets"><a href="ListCRF">Go Back to CRF List</a></div>
-      <p>
-      <div class="homebox_bullets"><a href="CreateCRFVersion?module=<c:out value="${module}"/>&crfId=<c:out value="${crfId}"/>">Reload CRF Version</a></div>
-      <p>
-    </c:otherwise>
-	</c:choose> -->
-</c:otherwise>
-</c:choose>
 </span>
 
 <c:if test="${studySubject != null && studySubject.id>0}">
@@ -245,9 +200,11 @@ function getSib(theSibling){
 <!-- section tabs here -->
 <table border="0" cellpadding="0" cellspacing="0">
    <tr>
-	<td align="right" style="padding-left: 12px; display: none" id="TabsBack"><a href="javascript:TabsBack()"><img src="images/arrow_back.gif" border="0"></a></td>
+<c:if test="${fn:length(toc.sections) gt 1}">
+	<td align="right" style="padding-left: 12px; display: none" id="TabsBack">
+	<a href="javascript:TabsBack()"><img src="images/arrow_back.gif" border="0"></a></td>
 	<td align="right" style="padding-left: 12px; display: all" id="TabsBackDis"><img src="images/arrow_back_dis.gif" border="0"></td>
-
+</c:if>
 
 <script langauge="JavaScript">
 <!--
@@ -335,7 +292,8 @@ window.location = document.sForm.sectionSelect.options[OptionIndex].value;
 }
 //-->
 </script>
-
+<%-- if only one section show no arrows & section jump --%>
+<c:if test="${fn:length(toc.sections) gt 1}">
 	<td align="right"id="TabsNextDis" style="display: none"><img src="images/arrow_next_dis.gif" border="0"></td>
 	<td align="right"id="TabsNext" style="display: all"><a href="javascript:TabsForward()"><img src="images/arrow_next.gif" border="0"></a></td>
     <td>&nbsp;
@@ -358,6 +316,7 @@ window.location = document.sForm.sectionSelect.options[OptionIndex].value;
         </select>
         </div>
      </td>
+     </c:if>
    </tr>
 </table>
 

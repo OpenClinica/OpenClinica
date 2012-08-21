@@ -664,10 +664,10 @@ function updateThis(multiSelEle, count) {
 
 <br><br>
   <table border="0" cellpadding="0" cellspacing="0">
-  <input type="submit" name="Submit" value="<fmt:message key="submit_site" bundle="${resword}"/>" class="button_long">
-    &nbsp;
+  <tr><td><input type="submit" name="Submit" value="<fmt:message key="submit_site" bundle="${resword}"/>" class="button_long">
+    </td><td>
   <input type="button" onclick="confirmCancel('ListSite');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
-	</table>
+	</td></tr></table>
 </form>
 <DIV ID="testdiv1" STYLE="position:absolute;visibility:hidden;background-color:white;layer-background-color:white;"></DIV>
 <jsp:include page="../include/footer.jsp"/>
