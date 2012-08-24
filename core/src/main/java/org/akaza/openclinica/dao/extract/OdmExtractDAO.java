@@ -1822,6 +1822,7 @@ public class OdmExtractDAO extends DatasetDAO {
     protected void setOCFormDataAuditLogs(StudyBean study, OdmClinicalDataBean data, String studySubjectOids, String ecIds,
             HashMap<Integer, String> formOidPoses) {
         this.setOCFormDataAuditsTypesExpected();
+        String dbName = CoreResources.getDBName();
         logger.debug("Begin to execute GetOCFormDataAuditsSql");
         logger.debug("getOCFormDataAuditsSql= " + this.getOCFormDataAuditsSql(studySubjectOids, ecIds));
         ArrayList rows = select(this.getOCFormDataAuditsSql(studySubjectOids, ecIds));
@@ -1837,7 +1838,7 @@ public class OdmExtractDAO extends DatasetDAO {
             String oldValue = (String) row.get("old_value");
             String newValue = (String) row.get("new_value");
             Integer typeId = (Integer) row.get("audit_log_event_type_id");
-
+            
             if (formOidPoses.containsKey(ecId)) {
                 String[] poses = formOidPoses.get(ecId).split("---");
                 ExportFormDataBean form =
@@ -1861,7 +1862,10 @@ public class OdmExtractDAO extends DatasetDAO {
                         auditLog.setOldValue(Status.getFromMap(Integer.parseInt(oldValue)).getName());
                     }
                 } //Fix for 0011675: SDV'ed subject is dipslayed as not SDV'ed in the 1.3 Full ODM Extract commenting out the following lines as these are treated like booleans while they are strings
-                /* else if (typeId == 32) {
+                //JN:The Oracle still continues to have 1 and 2 for this audit type 32 so enabling the following code for oracle only, ideally the trigger should be coded same for both postgres and oracle and since the trigger doesnt do same things, the existing data would still be a problem, so doing this patch work
+               
+                 else if (typeId == 32) {
+                	 if ("oracle".equalsIgnoreCase(dbName)){
                     if ("1".equals(newValue)) {
                         auditLog.setNewValue("TRUE");
                     } else {
@@ -1872,7 +1876,8 @@ public class OdmExtractDAO extends DatasetDAO {
                     } else {
                         auditLog.setOldValue("FALSE");
                     }
-                }*/ else {
+                	 }
+                } else {
                     auditLog.setNewValue(newValue);
                     auditLog.setOldValue(oldValue);
                 }
