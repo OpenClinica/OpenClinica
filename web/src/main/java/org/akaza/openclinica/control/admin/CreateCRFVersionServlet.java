@@ -502,14 +502,14 @@ public class CreateCRFVersionServlet extends SecureController {
                             if (ib.getOwner().getId() == ub.getId()) {
                                 warnings.add(resword.getString("the_item") + " '" + ib.getName() + "' "
                                     + resexception.getString("in_your_spreadsheet_already_exists") + ib.getDescription() + "), DATA_TYPE("
-                                    + ib.getDataType().getName() + "), UNITS(" + ib.getUnits() + "), " + resword.getString("and_or") + "PHI_STATUS("
+                                    + ib.getDataType().getName() + "), UNITS(" + ib.getUnits() + "), " + resword.getString("and_or") + " PHI_STATUS("
                                     + ib.isPhiStatus() + "). UNITS " + resword.getString("and") + " DATA_TYPE(PDATE to DATE) " + resexception.getString("will_not_be_changed_if")
-                                    + "PHI, DESCRIPTION, DATA_TYPE from PDATE to DATE" + resexception.getString("will_be_changed_if_you_continue"));
+                                    + " PHI, DESCRIPTION, DATA_TYPE from PDATE to DATE " + resexception.getString("will_be_changed_if_you_continue"));
                             } else {
                                 warnings.add(resword.getString("the_item") + " '" + ib.getName() + "' "
-                                    + resexception.getString("in_your_spreadsheet_already_exists") + ib.getDescription() + "), " + "DATA_TYPE("
-                                    + ib.getDataType().getName() + ") ," + "UNITS(" + ib.getUnits() + ")," + resword.getString("and_or") + "PHI_STATUS("
-                                    + ib.isPhiStatus() + ")." + resexception.getString("these_field_cannot_be_modified_because_not_owner"));
+                                    + resexception.getString("in_your_spreadsheet_already_exists") + ib.getDescription() + "), DATA_TYPE("
+                                    + ib.getDataType().getName() + "), UNITS(" + ib.getUnits() + "), " + resword.getString("and_or") + " PHI_STATUS("
+                                    + ib.isPhiStatus() + "). " + resexception.getString("these_field_cannot_be_modified_because_not_owner"));
                             }
 
                             request.setAttribute("warnings", warnings);
