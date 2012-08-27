@@ -640,7 +640,8 @@ public enum Page {
             "View default crf versions print"),
     VIEW_ALL_DEFAULT_CRF_VERSIONS_PRINT ("/WEB-INF/jsp/managestudy/defaultAllCrfVersionPrint.jsp",
             "View default crf versions print"),
-     MANAGE_STUDY_MODULE ( "/pages/studymodule",null);
+     MANAGE_STUDY_MODULE ( "/pages/studymodule",null),
+     VIEW_SECTION_DATA_ENTRY_SERVLET_REST_URL ("/ViewSectionDataEntryRESTUrlServlet", "View Section Data Entry Servlet for REST Url call");
     
   //  private final static String path = "/WEB-INF/jsp/";
   //  public final static String servletPath = "/OpenClinica";

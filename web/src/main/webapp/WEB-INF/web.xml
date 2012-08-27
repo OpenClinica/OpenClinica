@@ -972,6 +972,11 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <servlet-class>org.akaza.openclinica.control.managestudy.ViewSectionDataEntryServlet</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>ViewSectionDataEntryRESTUrlServlet</servlet-name>
+        <display-name>ViewSectionDataEntryRESTUrlServlet</display-name>
+        <servlet-class>org.akaza.openclinica.control.managestudy.ViewSectionDataEntryRESTUrlServlet</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>ViewSectionDataEntryByIdServlet</servlet-name>
         <display-name>ViewSectionDataEntryById</display-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ViewSectionDataEntryByIdServlet</servlet-class>
@@ -1955,6 +1960,10 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
     <servlet-mapping>
         <servlet-name>ViewSectionDataEntryServlet</servlet-name>
         <url-pattern>/ViewSectionDataEntry</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ViewSectionDataEntryRESTUrlServlet</servlet-name>
+        <url-pattern>/ViewSectionDataEntryRESTUrlServlet</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ViewSectionDataEntryByIdServlet</servlet-name>

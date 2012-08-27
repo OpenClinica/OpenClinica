@@ -416,4 +416,27 @@ public class SectionDAO extends AuditableEntityDAO {
             return false;
         }
     }
+    
+    public HashMap getSectionIdForTabId(int crfVersionId, int tabId) {
+    	this.unsetTypeExpected();
+        this.setTypeExpected(1, TypeNames.INT); // section_id                
+        
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(crfVersionId));
+        variables.put(new Integer(2), new Integer(tabId));
+        
+        ArrayList rows = this.select(digester.getQuery("getSectionIdForTabId"), variables);
+        return getSectionIdFromRows(rows);
+    }
+    
+    private HashMap getSectionIdFromRows(ArrayList rows) {
+        HashMap answer = new HashMap();
+        Iterator it = rows.iterator();
+        HashMap hm = new HashMap();
+        while (it.hasNext()) {
+            hm = (HashMap) it.next();
+        }
+
+        return hm;
+    }
 }

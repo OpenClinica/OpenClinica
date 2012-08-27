@@ -58,7 +58,7 @@ public class OpenClinicaResource {
                                 * of studyEventId, eventDefinitionCrfId i.e. a
                                 * CRF with data for a given subject for a given
                                 * event
-                                */
+                                */    
     private boolean isInValid; /* this is to validate the OID parameters specified to identify the resource are correct */
     
     private List<String> messages; /* this is to store the validation error messages */ 
@@ -395,6 +395,6 @@ public class OpenClinicaResource {
 
 	public void setMessages(List<String> messages) {
 		this.messages = messages;
-	}	
-
+	}		
+	
 }
