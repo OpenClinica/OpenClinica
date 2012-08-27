@@ -43,83 +43,7 @@
 <jsp:useBean scope='request' id='eventDefinitionCRFs' class='java.util.ArrayList'/>
 <h1><span class="title_manage"><fmt:message key="confirm_event_definition_creation"  bundle="${resword}"/></span></h1>
 
-<%-- removed since it repeats at the bottom, tbh 09112007 --%>
-<%--
-<table border="0" cellpadding="0" cellspacing="0">
-			<tr>
-				<td>
 
-				<!-- These DIVs define shaded box borders -->
-					<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-
-						<div class="textbox_center" align="center">
-
-						<span class="title_manage">
-						<fmt:message key="enter_definition_name_and_description" bundle="${resword}"/><br><br>
-						</span>
-
-						</div>
-
-					</div></div></div></div></div></div></div></div>
-
-				</td>
-				<td><img src="images/arrow.gif"></td>
-				<td>
-
-				<!-- These DIVs define shaded box borders -->
-					<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-
-						<div class="textbox_center" align="center">
-
-						<span class="title_manage">
-						<fmt:message key="add_CRFs_to_definition" bundle="${resword}"/><br><br>
-						</span>
-
-						</div>
-
-					</div></div></div></div></div></div></div></div>
-
-				</td>
-				<td><img src="images/arrow.gif"></td>
-				<td>
-
-				<!-- These DIVs define shaded box borders -->
-					<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-
-						<div class="textbox_center" align="center">
-
-						<span class="title_manage">
-						<fmt:message key="edit_properties_for_each_CRF" bundle="${resword}"/><br><br>
-						</span>
-
-						</div>
-
-					</div></div></div></div></div></div></div></div>
-
-				</td>
-				<td><img src="images/arrow.gif"></td>
-				<td>
-
-				<!-- These DIVs define shaded box borders -->
-					<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-
-						<div class="textbox_center" align="center">
-
-						<span class="title_manage">
-						<b><fmt:message key="confirm_and_submit_definition" bundle="${resword}"/><br><br></b>
-						</span>
-
-						</div>
-
-					</div></div></div></div></div></div></div></div>
-
-				</td>				
-			
-				
-				<td></td>
-			</tr>
-		</table>
---%>
 		<br>
 <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -166,7 +90,6 @@
     <td class="table_header_row"><fmt:message key="double_data_entry" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="password_required" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="hidden_crf" bundle="${resword}"/></td>   
-    <!-- <td class="table_header_row"><fmt:message key="enforce_decision_conditions" bundle="${resword}"/></td>-->  
     <td class="table_header_row"><fmt:message key="default_version" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="sdv_option" bundle="${resword}"/></td>  
     <td class="table_header_row"><fmt:message key="null_values" bundle="${resword}"/></td>    
@@ -201,12 +124,7 @@
       <c:otherwise> <fmt:message key="no" bundle="${resword}"/> </c:otherwise>
      </c:choose>
     </td>
-    <%--<td class="table_cell">
-     <c:choose>
-      <c:when test="${crf.decisionCondition == true}"> <fmt:message key="yes" bundle="${resword}"/> </c:when>
-      <c:otherwise> No </c:otherwise>
-     </c:choose>
-   </td>--%>
+   
   
    <td class="table_cell">  
     <c:out value="${crf.defaultVersionName}"/>     
