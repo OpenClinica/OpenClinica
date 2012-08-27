@@ -1121,13 +1121,17 @@ public class StudyEventDAO extends AuditableEntityDAO {
     
     public HashMap getStudySubjectCRFData(StudyBean sb, int studySubjectId, int eventDefId, String crfVersionOID, int eventOrdinal) {
         HashMap studySubjectCRFDataDetails = new HashMap();
-        this.setNewCRFTypesExpected();
+        this.unsetTypeExpected();
+        this.setTypeExpected(1, TypeNames.INT);
+        this.setTypeExpected(2, TypeNames.INT);
+        this.setTypeExpected(2, TypeNames.INT);
+       
         HashMap variables = new HashMap();
-        variables.put(Integer.valueOf(1), Integer.valueOf(sb.getId()));
-        variables.put(Integer.valueOf(2), Integer.valueOf(eventOrdinal));
-        variables.put(Integer.valueOf(3), crfVersionOID);
-        variables.put(Integer.valueOf(4), Integer.valueOf(studySubjectId));
-        variables.put(Integer.valueOf(5), Integer.valueOf(eventDefId));
+        variables.put(1, Integer.valueOf(sb.getId()));
+        variables.put(2, Integer.valueOf(eventOrdinal));
+        variables.put(3, crfVersionOID);
+        variables.put(4, Integer.valueOf(studySubjectId));
+        variables.put(5, Integer.valueOf(eventDefId));
         
         ArrayList alist = this.select(digester.getQuery("getStudySubjectCRFDataDetails"), variables);
         // TODO make sure this other statement for eliciting crfs works, tbh
