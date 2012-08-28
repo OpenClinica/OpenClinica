@@ -28,7 +28,10 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.CRFRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.apache.commons.lang.StringUtils;
 
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -238,20 +241,18 @@ public class DefineStudyEventServlet extends SecureController {
             HashMap args = new HashMap();
             args.put("actionName", "next");
             args.put("pageNum", "1");
-            args.put("name", def1.getName());
+            args.put("name", URLEncoder.encode(def1.getName(),"UTF-8"));
             args.put("repeating", new Boolean(def1.isRepeating()).toString());
             args.put("category", def1.getCategory());
-            args.put("description", def1.getDescription());
+            args.put("description", URLEncoder.encode(def1.getDescription(),"UTF-8"));
             args.put("type", def1.getType());
-            table.setQuery("DefineStudyEvent", args);
+            table.setQuery("DefineStudyEvent", args, true);
             table.setRows(allRows);
             table.computeDisplay();
 
             request.setAttribute("table", table);
-            // request.setAttribute("crfs", crfs);
-
-            // YW <<
-            forwardPage(Page.DEFINE_STUDY_EVENT2);
+            
+             forwardPage(Page.DEFINE_STUDY_EVENT2);
 
         } else {
             logger.info("has validation errors in the first section");
@@ -298,27 +299,27 @@ public class DefineStudyEventServlet extends SecureController {
             }
             // >>
             String sdvOption = fp.getString("sdvOption" + i);
-            if (!StringUtil.isBlank(sdvOption)) {
+            if (!StringUtils.isBlank(sdvOption)) {
                 int id = Integer.valueOf(sdvOption);
                 edcBean.setSourceDataVerification(SourceDataVerification.getByCode(id));
             }
-            if (!StringUtil.isBlank(requiredCRF) && "yes".equalsIgnoreCase(requiredCRF.trim())) {
+            if (!StringUtils.isBlank(requiredCRF) && "yes".equalsIgnoreCase(requiredCRF.trim())) {
                 edcBean.setRequiredCRF(true);
             } else {
                 edcBean.setRequiredCRF(false);
             }
-            if (!StringUtil.isBlank(doubleEntry) && "yes".equalsIgnoreCase(doubleEntry.trim())) {
+            if (!StringUtils.isBlank(doubleEntry) && "yes".equalsIgnoreCase(doubleEntry.trim())) {
                 edcBean.setDoubleEntry(true);
             } else {
                 edcBean.setDoubleEntry(false);
             }
-            if (!StringUtil.isBlank(decisionCondition) && "yes".equalsIgnoreCase(decisionCondition.trim())) {
+            if (!StringUtils.isBlank(decisionCondition) && "yes".equalsIgnoreCase(decisionCondition.trim())) {
                 edcBean.setDecisionCondition(true);
             } else {
                 edcBean.setDecisionCondition(false);
             }
 
-            if (!StringUtil.isBlank(electronicSignature) && "yes".equalsIgnoreCase(electronicSignature.trim())) {
+            if (!StringUtils.isBlank(electronicSignature) && "yes".equalsIgnoreCase(electronicSignature.trim())) {
                 edcBean.setElectronicSignature(true);
             } else {
                 edcBean.setElectronicSignature(false);
@@ -330,7 +331,7 @@ public class DefineStudyEventServlet extends SecureController {
             for (int a = 0; a < nulls.size(); a++) {
                 NullValue n = (NullValue) nulls.get(a);
                 String myNull = fp.getString(n.getName().toLowerCase() + i);
-                if (!StringUtil.isBlank(myNull) && "yes".equalsIgnoreCase(myNull.trim())) {
+                if (!StringUtils.isBlank(myNull) && "yes".equalsIgnoreCase(myNull.trim())) {
                     nullString = nullString + n.getName().toUpperCase() + ",";
                 }
 
@@ -352,9 +353,23 @@ public class DefineStudyEventServlet extends SecureController {
      * @return
      */
     private StudyEventDefinitionBean createStudyEventDefinition() {
+    	
+
         FormProcessor fp = new FormProcessor(request);
         StudyEventDefinitionBean sed = (StudyEventDefinitionBean) session.getAttribute("definition");
-        sed.setName(fp.getString("name"));
+        
+        try{
+	        String name = URLDecoder.decode(request.getParameter("name"), "UTF-8");
+	        String description = URLDecoder.decode(request.getParameter("description"), "UTF-8");
+	    
+	        sed.setName(name);
+	        sed.setDescription(description);
+        }
+        catch(Exception e){
+        	//leaving old code here 
+        	sed.setName(fp.getString("name"));
+	        sed.setDescription(fp.getString("description"));
+        }
         // YW <<
         String temp = fp.getString("repeating");
         if ("true".equalsIgnoreCase(temp) || "1".equals(temp)) {
@@ -364,7 +379,7 @@ public class DefineStudyEventServlet extends SecureController {
         }
         // YW >>
         sed.setCategory(fp.getString("category"));
-        sed.setDescription(fp.getString("description"));
+        
         sed.setType(fp.getString("type"));
         return sed;
 
@@ -387,7 +402,7 @@ public class DefineStudyEventServlet extends SecureController {
             // String label = fp.getString("label" + i);
             String selected = fp.getString("selected" + i);
             // logger.info("selected:" + selected);
-            if (!StringUtil.isBlank(selected) && "yes".equalsIgnoreCase(selected.trim())) {
+            if (!StringUtils.isBlank(selected) && "yes".equalsIgnoreCase(selected.trim())) {
                 logger.info("one crf selected");
                 CRFBean cb = new CRFBean();
                 cb.setId(id);
