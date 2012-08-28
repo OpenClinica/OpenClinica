@@ -186,6 +186,10 @@ public class ViewSectionDataEntryRESTUrlServlet extends ViewSectionDataEntryServ
                 request.setAttribute("isLocked", "yes");
                 // System.out.println("this event crf is locked");
             } 
+            //@pgawade 28-Aug-2012 Reverted the change no. 2 in https://issuetracker.openclinica.com/view.php?id=12343#c56722
+            else {
+                request.setAttribute("isLocked", "no");
+            }
 
             if (studySubjectId <= 0) {
 
