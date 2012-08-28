@@ -1668,7 +1668,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                     errors = (ArrayList<String>)instantValidator.getSheetErrors().addErrorsToSheet(errors);
                     htmlErrors = (HashMap<String,String>)instantValidator.getSheetErrors().putHtmlErrorsToSheet(htmlErrors);
                 } else if (sheetName.equalsIgnoreCase("Groups")) {
-                    logger.info("read groups, ***comment added 5.14.07");
+                    logger.debug("read groups, ***comment added 5.14.07");
                     ArrayList groupNames = new ArrayList();
                     // create a group - item relationship with this table? hmm
 
@@ -1984,7 +1984,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         // }
                     }
                 } else if (sheetName.equalsIgnoreCase("Sections")) {
-                    logger.info("read sections");
+                    logger.debug("read sections");
 
                     // multiple rows, six cells, last one is number
                     // changed 06/14/2007: seven cells, last on is number, the
