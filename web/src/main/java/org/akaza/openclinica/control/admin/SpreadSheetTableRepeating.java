@@ -1381,7 +1381,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                     + "', "
                                     + (isShowItem ? 1 : 0)
                                     + ")";
-                            logger.warn(sql2);
+                            logger.debug(sql2);
 
                         } else {
                             sql2 =
@@ -1498,9 +1498,9 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             itemGroup = new ItemGroupBean();
 
                             try {
-                                logger.info("found " + groupLabel);
+                                logger.debug("found " + groupLabel);
                                 itemGroup = (ItemGroupBean) itemGroups.get(groupLabel);
-                                logger.info("*** Found " + groupLabel + " and matched with " + itemGroup.getName());
+                                logger.debug("*** Found " + groupLabel + " and matched with " + itemGroup.getName());
 
                                 // if(itemGroup != null){
                                 igMeta = itemGroup.getMeta();

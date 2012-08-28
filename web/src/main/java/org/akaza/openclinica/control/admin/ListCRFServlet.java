@@ -96,7 +96,7 @@ public class ListCRFServlet extends SecureController {
         // crf
         // version
         // spreadsheet
-        logger.info("found directory: " + dir);
+        logger.debug("found directory: " + dir);
 
         CRFDAO cdao = new CRFDAO(sm.getDataSource());
         CRFVersionDAO vdao = new CRFVersionDAO(sm.getDataSource());
@@ -110,12 +110,12 @@ public class ListCRFServlet extends SecureController {
             for (int j = 0; j < versions.size(); j++) {
                 CRFVersionBean cv = (CRFVersionBean) versions.get(j);
                 File file = new File(dir + eb.getId() + cv.getOid() + ".xls");
-                logger.info("looking in " + dir + eb.getId() + cv.getOid() + ".xls");
+                logger.debug("looking in " + dir + eb.getId() + cv.getOid() + ".xls");
                 if (file.exists()) {
                     cv.setDownloadable(true);
                 } else {
                     File file2 = new File(dir + eb.getId() + cv.getName() + ".xls");
-                    logger.info("initial failed, looking in " + dir + eb.getId() + cv.getName() + ".xls");
+                    logger.debug("initial failed, looking in " + dir + eb.getId() + cv.getName() + ".xls");
                     if (file2.exists()) {
                         cv.setDownloadable(true);
                     }
