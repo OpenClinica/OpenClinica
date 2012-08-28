@@ -1,5 +1,4 @@
 /*
-https://issuetracker.openclinica.com/view.php?id=10348 * OpenClinica is distributed under the
  * GNU Lesser General Public License (GNU LGPL).
 
  * For details see: http://www.openclinica.org/license
