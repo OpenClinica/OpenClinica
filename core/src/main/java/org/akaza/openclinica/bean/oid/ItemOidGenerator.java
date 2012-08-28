@@ -28,8 +28,8 @@ public class ItemOidGenerator extends OidGenerator {
         String crfName = keys[0];
         String itemLabel = keys[1];
 
-        logger.info(crfName);
-        logger.info(itemLabel);
+        logger.debug(crfName);
+        logger.debug(itemLabel);
 
         crfName = truncateToXChars(capitalize(stripNonAlphaNumeric(crfName)), 5);
         itemLabel = truncateToXChars(capitalize(stripNonAlphaNumeric(itemLabel)), 27);
