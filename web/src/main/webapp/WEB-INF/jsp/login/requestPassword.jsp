@@ -30,12 +30,25 @@
   <td><div class="formfieldXL_BG"><input type="text" name="email" value="<c:out value="${userBean1.email}"/>" class="formfieldXL"></div>
   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="email"/></jsp:include></td></tr>
   <tr valign="top"><td class="formlabel"><fmt:message key="password_challenge_question" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG">
-  <select name="passwdChallengeQuestion" class="formfieldXL">
-            <option><fmt:message key="favourite_pet" bundle="${resword}"/></option>
-            <option><fmt:message key="city_of_birth" bundle="${resword}"/></option>
-            <option><fmt:message key="mother_maiden_name" bundle="${resword}"/></option>
-            <option><fmt:message key="favorite_color" bundle="${resword}"/></option>
-   </select></div></td></tr>
+  
+             
+           <fmt:message key='favourite_pet' bundle='${resword}'  var = "favourite_pet" />
+          <fmt:message key='city_of_birth' bundle='${resword}'  var = "city_of_birth" />
+          <fmt:message key='mother_maiden_name' bundle='${resword}'  var = "mother_maiden_name" />
+         <fmt:message key='favorite_color' bundle='${resword}'  var = "favorite_color" />  
+ <select name="passwdChallengeQuestion" class="formfieldXL">
+                <option value="" ><fmt:message key="Please_Select_One" bundle="${resword}"/></option>
+            
+ <option <c:if test="${userBean1.passwdChallengeQuestion eq favourite_pet }" > selected </c:if> ><fmt:message key="favourite_pet" bundle="${resword}"/></option>
+            <option <c:if test="${ userBean1.passwdChallengeQuestion eq city_of_birth}" > selected </c:if>><fmt:message key="city_of_birth" bundle="${resword}"/></option>
+            <option <c:if test="${ userBean1.passwdChallengeQuestion eq mother_maiden_name}" > selected </c:if>><fmt:message key="mother_maiden_name" bundle="${resword}"/></option>
+            <option <c:if test="${ userBean1.passwdChallengeQuestion eq favorite_color}" > selected </c:if>><fmt:message key="favorite_color" bundle="${resword}"/></option>
+       
+          
+   </select>
+   
+   
+   </div></td></tr>
   <tr valign="top"><td class="formlabel"><fmt:message key="password_challenge_answer" bundle="${resword}"/>:</td>
   <td><div class="formfieldXL_BG"><input type="text" name="passwdChallengeAnswer" value="<c:out value="${userBean1.passwdChallengeAnswer}"/>" class="formfieldXL"></div>
   <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="passwdChallengeAnswer"/></jsp:include></td></tr> 

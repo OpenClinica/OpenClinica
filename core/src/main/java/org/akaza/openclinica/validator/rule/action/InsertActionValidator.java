@@ -106,6 +106,7 @@ public class InsertActionValidator implements Validator {
             }
             // Use ValueExression in destinationProperty to get CRF
             ItemBean item = getExpressionService().getItemBeanFromExpression(propertyBean.getValueExpression().getValue());
+            if (item == null) return;
             CRFBean destinationPropertyValueExpressionCrf = getCrfDAO().findByItemOid(item.getOid());
             // Use Target to get CRF
             CRFBean targetCrf = getExpressionService().getCRFFromExpression(getRuleSetBean().getTarget().getValue());

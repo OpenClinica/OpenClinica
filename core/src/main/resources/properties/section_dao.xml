@@ -184,4 +184,11 @@
     limit 1
 	</sql>
 	</query>
+	<query>
+		<name>getSectionIdForTabId</name>
+		<sql>
+			select section_id from section where crf_version_id = ? and ordinal = ?
+		</sql>
+	
+	</query>
 </queries>
