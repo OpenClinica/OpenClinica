@@ -40,7 +40,7 @@ public class ItemOidGenerator extends OidGenerator {
         if (oid.equals("I_") || oid.equals("I__")) {
             oid = randomizeOid("I_");
         }
-        logger.info("OID : " + oid);
+        logger.debug("OID : " + oid);
         return oid;
     }
 }
