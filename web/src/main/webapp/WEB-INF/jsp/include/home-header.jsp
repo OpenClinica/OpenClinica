@@ -1,5 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
-
+<%@ page import="org.akaza.openclinica.dao.core.CoreResources" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
@@ -15,15 +15,19 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<base href="<%=
-org.akaza.openclinica.web.util.WebUtil.basePath(pageContext) %>" />
+  <% String sysURL = CoreResources.getField("sysURL");
+String contextPath = "";
+		if(sysURL.contains("/MainMenu")){
+			contextPath = sysURL.substring(0, sysURL.indexOf("/MainMenu")+1);	
+		}
+%>
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=8" />
 
 
 <title><fmt:message key="openclinica" bundle="${resword}"/></title>
 
-<link rel="stylesheet" href="includes/styles.css" type="text/css"/>
+<link rel="stylesheet" href="<c:out value="<%=contextPath%>" />includes/styles.css" type="text/css"/>
 <%-- <link rel="stylesheet" href="includes/styles2.css" type="text/css">--%>
 <%-- <link rel="stylesheet" href="includes/NewNavStyles.css" type="text/css" />--%>
 <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>

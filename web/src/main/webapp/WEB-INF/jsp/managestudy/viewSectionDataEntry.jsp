@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="org.akaza.openclinica.dao.core.CoreResources" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -32,14 +33,17 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<base href="<%=
-org.akaza.openclinica.web.util.WebUtil.basePath(pageContext) %>" />
+<% String sysURL = CoreResources.getField("sysURL");
+String contextPath = "";
+		if(sysURL.contains("/MainMenu")){
+			contextPath = sysURL.substring(0, sysURL.indexOf("/MainMenu")+1);	
+		}
+%>
 <title>OpenClinica <fmt:message key="view_data_entry" bundle="${resword}"/></title>
     <meta http-equiv="X-UA-Compatible" content="IE=8" />
 
-    <link rel="stylesheet" href="includes/styles.css" type="text/css" media="screen">
-<%-- <link rel="stylesheet" href="includes/styles2.css" type="text/css">--%>
-    <link rel="stylesheet" href="includes/print.css" type="text/css" media="print">
+    <link rel="stylesheet" href="<c:out value="<%=contextPath%>" />includes/styles.css" type="text/css" media="screen">
+    <link rel="stylesheet" href="<c:out value="<%=contextPath%>" />includes/print.css" type="text/css" media="print">
     <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
     <script type="text/JavaScript" language="JavaScript" src="includes/Tabs.js"></script>
     <!-- <script type="text/JavaScript" language="JavaScript" src="includes/CalendarPopup.js"></script> -->
