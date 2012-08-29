@@ -11,6 +11,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
+
 <link rel="stylesheet" href="includes/styles.css" type="text/css">
 
 <html>
@@ -33,17 +34,28 @@
 		f.value = "";
 		window.close();
 	}
+	function checkForm(form) {
+    var file_name = form.elements['file'].value;
+     if(file_name==''){
+	 alert ("Select a file to upload!");
+	 return false;}
+	 return true;
+}
+
 </script>
 
 <body>
 <br><br><br>
+	<div style="position:absolute;  left:20px; width: 600px;">
 <c:forEach var="message" items="${pageMessages}">
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<c:out value="${message}" escapeXml="false"/>
+ <c:out value="${message}" escapeXml="false"/>
 </c:forEach>
+</div>
 <br><br><br>
-<form name="uploadForm" action="UploadFile" method="post" enctype="multipart/form-data">
+<form name="uploadForm" action="UploadFile" method="post" enctype="multipart/form-data" onsubmit="return checkForm(this)">
 	<input type="hidden" name="itemId" value="${fileItemId}">
 	<input type="hidden" name="inputName" value="${inputName}">
+		<div style="position:absolute;  left:20px; width: 600px;">
 	<c:choose>
 	<c:when test="${mayProcessUploading=='true'}">
 		<c:choose>
@@ -63,24 +75,25 @@
 			<br><br>
 			<fmt:message key="select_close_window_button" bundle="${restext}"/>
 			<br><br><br>
-			<P>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" name="close" value="<fmt:message key="close_window" bundle="${resword}"/>" onClick="javascript:window.close();" class="button_long"></P>
+			<P><input type="button" name="close" value="<fmt:message key="close_window" bundle="${resword}"/>" onClick="javascript:window.close();" class="button_long"></P>
 		</c:when>
 		<c:otherwise>
 			<fmt:message key="upload_note" bundle="${restext}"/>
 			<br><br>
 			<fmt:message key="select_cancel_upload_button" bundle="${restext}"/>
 			<br><br><br>
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id="file" type="file" name="browse" size="60">
-			<P>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" name="upload" value="<fmt:message key="upload_file" bundle="${resword}"/>" class="button_long">
+			<input id="file" type="file" name="browse" size="60">
+			<P><input type="submit" name="upload" value="<fmt:message key="upload_file" bundle="${resword}"/>" class="button_long">
 			<input type="button" name="cancel" value="<fmt:message key="cancel_upload" bundle="${resword}"/>" onClick="cleanFile()" class="button_long"></P>
 			<input type="hidden" name="crfId" value="<c:out value="${version.crfId}"/>">
 		</c:otherwise>
 		</c:choose>
 	</c:when>
 	<c:otherwise>
-		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <fmt:message key="uploading_not_process_because_permission" bundle="${restext}"/>
+		<fmt:message key="uploading_not_process_because_permission" bundle="${restext}"/>
 	</c:otherwise>
 	</c:choose>
+	</div>
 </form>
 
 </body>
