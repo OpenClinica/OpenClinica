@@ -114,6 +114,7 @@ import org.akaza.openclinica.service.crfdata.front.InstantOnChangeFrontStrGroup;
 import org.akaza.openclinica.service.crfdata.front.InstantOnChangeFrontStrParcel;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.Page;
+import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.view.form.DataEntryInputGenerator;
 import org.akaza.openclinica.view.form.FormBeanUtil;
 import org.akaza.openclinica.web.InconsistentStateException;
@@ -302,6 +303,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         StudyBean currentStudy =    (StudyBean) session.getAttribute("study");
         StudyUserRoleBean  currentRole = (StudyUserRoleBean) session.getAttribute("userRole");
         SectionDAO sdao =  new SectionDAO(getDataSource());
+        StudyInfoPanel panel = new StudyInfoPanel();
         /**
          * Determines whether the form was submitted. Calculated once in processRequest. The reason we don't use the normal means to determine if the form was
          * submitted (ie FormProcessor.isSubmitted) is because when we use forwardPage, Java confuses the inputs from the just-processed form with the inputs for
@@ -659,7 +661,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
             int keyId = ecb.getId();
             session.removeAttribute(DoubleDataEntryServlet.COUNT_VALIDATE + keyId);
 
-            setUpPanel(section);
+            setUpPanel(section,panel);
             if (newUploadedFiles.size() > 0) {
                 if (this.unloadFiles(newUploadedFiles)) {
 
@@ -1446,7 +1448,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 // we do not save any DNs if we get here, so we have to set it back into session...
                 session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
                 // << tbh 01/2010
-                setUpPanel(section);
+                setUpPanel(section,panel);
                 forwardPage(getJSPPage(), request, response);
             } else {
                 LOGGER.debug("Do we hit this in save ?????");
@@ -1817,7 +1819,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                         request.setAttribute("hasShown", "true");
 
                         session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);
-                        setUpPanel(section);
+                        setUpPanel(section,panel);
                         forwardPage(getJSPPage(), request, response);
                     }
                 }
@@ -1853,7 +1855,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
                         if (!markSuccessfully) {
                             request.setAttribute(BEAN_DISPLAY, section);
                             request.setAttribute(BEAN_ANNOTATIONS, fp.getString(INPUT_ANNOTATIONS));
-                            setUpPanel(section);
+                            setUpPanel(section,panel);
                             forwardPage(getJSPPage(), request, response);
                             return;
                         }
@@ -3374,7 +3376,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         LOGGER.debug("just ran get parent display, has group " + hasGroup + " has ungrouped " + hasUngroupedItems);
         // now sort them by ordinal,
         //JN: Commenting out this logic, its wrong and will give erroneous results.
-        //Collections.sort(displayItems);
+        Collections.sort(displayItems);
 
         // now get the child DisplayItemBeans
         for (int i = 0; i < displayItems.size(); i++) {
@@ -3677,8 +3679,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
 
     protected abstract boolean shouldLoadDBValues(DisplayItemBean dib);
 
-    protected void setUpPanel(DisplaySectionBean section) {
-        resetPanel();
+    protected void setUpPanel(DisplaySectionBean section,StudyInfoPanel panel) {
+        resetPanel(panel);
         panel.setStudyInfoShown(false);
         panel.setOrderedData(true);
 
