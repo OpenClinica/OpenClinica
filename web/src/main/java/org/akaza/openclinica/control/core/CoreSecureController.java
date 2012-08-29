@@ -86,7 +86,7 @@ public abstract class CoreSecureController extends HttpServlet {
 
     public static ResourceBundle resadmin, resaudit, resexception, resformat, respage, resterm, restext, resword, resworkflow;
 
-  
+    protected StudyInfoPanel panel = new StudyInfoPanel();
 
     public static final String PAGE_MESSAGE = "pageMessages";// for showing
     // page
@@ -155,11 +155,11 @@ public abstract class CoreSecureController extends HttpServlet {
         return dataSource;
     }
 
-    protected void resetPanel(StudyInfoPanel panel) {
+    protected void resetPanel() {
         panel.reset();
     }
 
- /*   protected void setToPanel(String title, String info, HttpServletRequest request) {
+    protected void setToPanel(String title, String info, HttpServletRequest request) {
         if (panel.isOrderedData()) {
             ArrayList data = panel.getUserOrderedData();
             data.add(new StudyInfoPanelLine(title, info));
@@ -168,7 +168,7 @@ public abstract class CoreSecureController extends HttpServlet {
             panel.setData(title, info);
         }
         request.setAttribute(STUDY_INFO_PANEL, panel);
-    }*/
+    }
 
     protected void setInputMessages(HashMap messages, HttpServletRequest request) {
         request.setAttribute(INPUT_MESSAGES, messages);
@@ -306,7 +306,6 @@ public abstract class CoreSecureController extends HttpServlet {
         response.setHeader("Content-Encoding", "gzip");
 
         HttpSession session = request.getSession();
-        StudyInfoPanel panel = new StudyInfoPanel();
         // BWP >> 1/8/2008
         try {
             // YW 10-03-2007 <<
