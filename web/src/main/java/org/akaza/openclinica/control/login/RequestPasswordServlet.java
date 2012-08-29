@@ -155,11 +155,13 @@ public class RequestPasswordServlet extends SecureController {
 
         logger.info("Sending email...");
 
-        StringBuffer email = new StringBuffer("Hi " + ubDB.getFirstName() + ", <br>");
-        email.append(restext.getString("this_email_is_from_openclinica_admin") + "<br>").append(
-                restext.getString("your_password_has_been_reset_as") + ":" + passwd).append("<br>" + restext.getString("you_will_be_required_to_change"))
-                .append(restext.getString("time_you_login_to_the_system")).append(restext.getString("use_the_following_link_to_log") + ":<br>").append(
-                        SQLInitServlet.getField("sysURL"));
+        StringBuffer email = new StringBuffer("Hello, " + ubDB.getFirstName() + ", <br>");
+        email.append(restext.getString("this_email_is_from_openclinica_admin") + "<br>");
+        email.append( restext.getString("your_password_has_been_reset_as") + ": " + passwd);
+        email.append("<br> " + restext.getString("you_will_be_required_to_change")+" ");
+        email.append(restext.getString("time_you_login_to_the_system")+" ");
+        email.append(restext.getString("use_the_following_link_to_log") + ":<br> ");
+        email.append(SQLInitServlet.getField("sysURL"));
 
         String emailBody = email.toString();
         sendEmail(ubDB.getEmail().trim(), EmailEngine.getAdminEmail(), restext.getString("your_openclinica_password"), emailBody, true, respage

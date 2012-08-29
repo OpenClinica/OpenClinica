@@ -311,16 +311,17 @@ public class CreateUserAccountServlet extends SecureController {
     private void sendNewAccountEmail(UserAccountBean createdUserAccountBean, String password) throws Exception {
         logger.info("Sending account creation notification to " + createdUserAccountBean.getName());
 
-        String body = resword.getString("dear") + " " + createdUserAccountBean.getFirstName() + " " + createdUserAccountBean.getLastName() + ",\n";
-        body += restext.getString("a_new_user_account_has_been_created_for_you") + "\n\n";
-        body += resword.getString("user_name") + ": " + createdUserAccountBean.getName() + "\n";
-        body += resword.getString("password") + ": " + password + "\n\n";
-        body += restext.getString("please_test_your_login_information_and_let") + "\n";
-        body += SQLInitServlet.getField("sysURL");
-        body += " . ";
+        StringBuffer body = new StringBuffer();
+        		
+        body.append(resword.getString("dear") + " " + createdUserAccountBean.getFirstName() + " " + createdUserAccountBean.getLastName() + ",<br><br> ");
+        body.append(restext.getString("a_new_user_account_has_been_created_for_you") + "<br>,br>");
+        body.append( resword.getString("user_name") + ": " + createdUserAccountBean.getName() + "<br>");
+        body.append( resword.getString("password") + ": " + password + "<br><br>");
+        body.append( restext.getString("please_test_your_login_information_and_let") + "<br>");
+        body.append( SQLInitServlet.getField("sysURL"));
         // body += restext.getString("openclinica_system_administrator");
 
-        sendEmail(createdUserAccountBean.getEmail().trim(), restext.getString("your_new_openclinica_account"), body, false);
+        sendEmail(createdUserAccountBean.getEmail().trim(), restext.getString("your_new_openclinica_account"), body.toString(), false);
     }
 
     @Override
