@@ -1,4 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
+<%@ page import="org.akaza.openclinica.dao.core.CoreResources" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <jsp:useBean scope='request' id='strResStatus' class='java.lang.String' />
@@ -14,8 +15,14 @@
 
 <html>
 <head>
+<% String sysURL = CoreResources.getField("sysURL");
+String contextPath = "";
+		if(sysURL.contains("/MainMenu")){
+			contextPath = sysURL.substring(0, sysURL.indexOf("/MainMenu")+1);	
+		}
+%>
 <title><fmt:message key="openclinica" bundle="${resword}"/>- <fmt:message key="add_discrepancy_note" bundle="${resword}"/></title>
-<link rel="stylesheet" href="includes/styles.css" type="text/css">
+<link rel="stylesheet" href="<c:out value="<%=contextPath%>" />includes/styles.css" type="text/css">
 <script language="JavaScript" src="includes/global_functions_javascript.js"></script>
 
 <script language="JavaScript" src="includes/CalendarPopup.js"></script>
