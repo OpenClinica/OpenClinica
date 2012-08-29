@@ -6,6 +6,8 @@ package org.akaza.openclinica.web.bean;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.view.Link;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -298,21 +300,31 @@ public class EntityBeanTable {
     }
 
     public void setQuery(String baseURL, HashMap args) {
+    	 setQuery(  baseURL,   args, false) ;
+    }
+    public void setQuery(String baseURL, HashMap args, boolean isUTFEncode) {
         postAction = baseURL;
         postArgs = args;
 
         baseGetQuery = baseURL + "?";
         baseGetQuery += FormProcessor.FIELD_SUBMITTED + "=" + 1;
-
-        Iterator it = args.keySet().iterator();
-        while (it.hasNext()) {
-            String key = (String) it.next();
-            String value = (String) args.get(key);
-            // TODO: provide URL Encoding!
-            baseGetQuery += "&" + key + "=" + value;
+        String value = null; 
+        for ( Object key : args.keySet()){
+        	value = (String) args.get(key);
+        	if (isUTFEncode){
+            	try{
+            		value = URLEncoder.encode((String) args.get(key), "UTF-8");
+            	}catch(UnsupportedEncodingException ev){
+            		value = (String) args.get(key);
+            	}
+            }
+        	baseGetQuery += "&" + (String)key + "=" + value;
         }
+       
 
     }
+    
+    
 
     /**
      * @return Returns the baseGetQuery.

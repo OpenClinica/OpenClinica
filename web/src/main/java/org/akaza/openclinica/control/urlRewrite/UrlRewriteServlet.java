@@ -3,6 +3,7 @@
  */
 package org.akaza.openclinica.control.urlRewrite;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.servlet.ServletException;
@@ -18,6 +19,7 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
+import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.control.core.CoreSecureController;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -28,6 +30,7 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
+import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.slf4j.Logger;
@@ -102,7 +105,7 @@ public class UrlRewriteServlet extends CoreSecureController {
 
 		            // set the required parameters into request
 		                if (null != ocResource.getEventDefinitionCrfId()) {
-		                    request.setAttribute("eventDefinitionCRFId", ocResource.getEventDefinitionCrfId().toString());
+		                    request.setAttribute("eventDefinitionCRFId", ocResource.getEventDefinitionCrfId());
 		                }
 		                if (null != ocResource.getEventCrfId()) {
 		                    request.setAttribute("ecId", ocResource.getEventCrfId().toString());
@@ -123,6 +126,17 @@ public class UrlRewriteServlet extends CoreSecureController {
 		                    if ((null != ocResource.getStudySubjectID()) && (mapQueryParams.containsKey("exitTo"))) {
 		                        request.setAttribute("exitTo", "ViewStudySubject?id=" + ocResource.getStudySubjectID());
 		                    }
+		                    //@pgawade 16-Aug-2012: fix for issue https://issuetracker.openclinica.com/view.php?id=12343#c55853
+		                    //retrieve sectionId from tabId
+		                    SectionDAO sdao = new SectionDAO(getDataSource());
+		                    HashMap sectionIdMap = sdao.getSectionIdForTabId(ocResource.getFormVersionID(), Integer.parseInt(mapQueryParams.get("tabId")));
+		                    Integer sectionId = null;
+		                    if((sectionIdMap != null) && (sectionIdMap.size() != 0)){
+		                    	sectionId = (Integer) sectionIdMap.get("section_id");
+		                    }
+		                    if(null != sectionId){
+		                    	request.setAttribute("sectionId", sectionId);
+		                    }
 		                }
 		                //ToDo: Changes to work on to fix #0012507
 //		                else{
@@ -131,7 +145,7 @@ public class UrlRewriteServlet extends CoreSecureController {
 //		                	request.setAttribute("module", "?");
 //		                }
 
-		                forwardPage(Page.VIEW_SECTION_DATA_ENTRY_SERVLET, request, response);
+		                forwardPage(Page.VIEW_SECTION_DATA_ENTRY_SERVLET_REST_URL, request, response);
 		                // response.sendRedirect(Page.VIEW_SECTION_DATA_ENTRY_SERVLET.getFileName());
 		            }
             }
@@ -147,7 +161,7 @@ public class UrlRewriteServlet extends CoreSecureController {
 
     private HashMap<String, String> getQueryStringParameters(String queryString) {
         HashMap<String, String> mapQueryParams = new HashMap<String, String>();
-
+        
         if ((null != queryString) && (!queryString.equalsIgnoreCase(""))) {
             if (queryString.contains("&")) {
                 String[] tokens = queryString.split("&");
@@ -164,6 +178,11 @@ public class UrlRewriteServlet extends CoreSecureController {
                         }
                     }
                 }
+            }
+            else{
+            	if(queryString.contains("=")){
+            		mapQueryParams.put(queryString.substring(0, queryString.indexOf("=")), queryString.substring(queryString.indexOf("=") + 1));
+            	}
             }
         }
         return mapQueryParams;
@@ -323,6 +342,7 @@ public class UrlRewriteServlet extends CoreSecureController {
                                 	return openClinicaResource;
                                 }
                                 else{
+                                	openClinicaResource.setFormVersionID(cv.getId());
                                 	//validate if crf is removed
                                 	if(cv.getStatus().equals(Status.DELETED)){
                                 		openClinicaResource.setInValid(true);
@@ -347,12 +367,20 @@ public class UrlRewriteServlet extends CoreSecureController {
 		                                        }
 
 		                                        if (studySubjectCRFDataDetails.containsKey("event_definition_crf_id")) {
-		                                            openClinicaResource.setEventDefinitionCrfId((Integer) studySubjectCRFDataDetails.get("event_crf_id"));
+		                                            openClinicaResource.setEventDefinitionCrfId((Integer) studySubjectCRFDataDetails.get("event_definition_crf_id"));
 		                                        }
 
 		                                        if (studySubjectCRFDataDetails.containsKey("study_event_id")) {
-		                                            openClinicaResource.setStudyEventId((Integer) studySubjectCRFDataDetails.get("event_crf_id"));
+		                                            openClinicaResource.setStudyEventId((Integer) studySubjectCRFDataDetails.get("study_event_id"));
 		                                        }
+		                                    }
+		                                    else{//no data was found in the database for the combination of parameters in the RESTful URL. There are 2 possible reasons:
+		                                    	//a. The data entry is not started yet for this event CRF. As of OpenClinica 3.1.3 we have not implemented the 
+		                                    	// RESTful URL functionality in this case.
+		                                    	//b. The form version OID entered in the URL could be different than the one used in the data entry
+		                                    	openClinicaResource.setInValid(true);
+		                                    	openClinicaResource.getMessages().add(resexception.getString("either_no_data_for_crf_or_data_entry_not_started"));
+		                                    	return openClinicaResource;
 		                                    }
 		                                }
                                 	}

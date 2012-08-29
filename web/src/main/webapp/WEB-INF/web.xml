@@ -43,7 +43,14 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>-->
         <listener-class>org.akaza.openclinica.dao.core.OCContextLoaderListener</listener-class>
     </listener>
+    
+<!--     <listener>
+      <listener-class>net.sf.ehcache.constructs.web.ShutdownListener</listener-class>
+</listener>  -->
+    
     <listener>
+    
+    
     <listener-class>
       org.springframework.security.web.session.HttpSessionEventPublisher
     </listener-class>
@@ -963,6 +970,11 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
         <servlet-name>ViewSectionDataEntryServlet</servlet-name>
         <display-name>ViewSectionDataEntry</display-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.ViewSectionDataEntryServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ViewSectionDataEntryRESTUrlServlet</servlet-name>
+        <display-name>ViewSectionDataEntryRESTUrlServlet</display-name>
+        <servlet-class>org.akaza.openclinica.control.managestudy.ViewSectionDataEntryRESTUrlServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ViewSectionDataEntryByIdServlet</servlet-name>
@@ -1948,6 +1960,10 @@ classpath:org/akaza/openclinica/applicationContext-core-db.xml
     <servlet-mapping>
         <servlet-name>ViewSectionDataEntryServlet</servlet-name>
         <url-pattern>/ViewSectionDataEntry</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ViewSectionDataEntryRESTUrlServlet</servlet-name>
+        <url-pattern>/ViewSectionDataEntryRESTUrlServlet</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ViewSectionDataEntryByIdServlet</servlet-name>

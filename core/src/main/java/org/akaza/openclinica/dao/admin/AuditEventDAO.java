@@ -630,17 +630,17 @@ public class AuditEventDAO extends AuditableEntityDAO {
         this.setTypeExpected(10, TypeNames.STRING); // column name
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(studySubjectId));
-        logger.warn("&&& querying study log...");
+        logger.debug("&&& querying study log...");
         String sql = digester.getQuery("findEventStatusLogByStudySubject");
         ArrayList alist = this.select(sql, variables);
         ArrayList al = new ArrayList();
         Iterator it = alist.iterator();
-        logger.warn("&&& about to get entities from HM...");
+        logger.debug("&&& about to get entities from HM...");
         while (it.hasNext()) {
             AuditEventBean eb = (AuditEventBean) this.getEntityFromHashMap((HashMap) it.next(), true, true, false);
             al.add(eb);
         }
-        logger.warn("&&& returning array list...");
+        logger.debug("&&& returning array list...");
         return al;
 
     }

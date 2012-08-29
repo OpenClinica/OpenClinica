@@ -3374,7 +3374,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
         LOGGER.debug("just ran get parent display, has group " + hasGroup + " has ungrouped " + hasUngroupedItems);
         // now sort them by ordinal,
         //JN: Commenting out this logic, its wrong and will give erroneous results.
-        //Collections.sort(displayItems);
+        Collections.sort(displayItems);
 
         // now get the child DisplayItemBeans
         for (int i = 0; i < displayItems.size(); i++) {
@@ -4459,6 +4459,7 @@ public abstract class DataEntryServlet extends CoreSecureController {
     		SectionBean sb,List<ItemBean>itBeans, Map<String,ItemDataBean> dataMap,
     		List<String> nullValuesList, boolean isSubmitted)
     {
+  
         int tempOrdinal = 1;
         ItemDataDAO iddao = new ItemDataDAO(getDataSource(),locale);
         int maxOrdinal = iddao.getMaxOrdinalForGroup(ecb, sb, itemGroup.getItemGroupBean());
@@ -4509,13 +4510,13 @@ public abstract class DataEntryServlet extends CoreSecureController {
                 displayItemBeans.add(displayItemBean);
 
             }
+            Collections.sort(displayItemBeans);
             dig.setItems(displayItemBeans);
             dig.setHasData(groupHasData);
             itemGroups.add(dig);
         }
 
-
-
+       
        diwgb.setItemGroups(itemGroups);
        diwgb.setDbItemGroups(itemGroups);
         return diwgb;

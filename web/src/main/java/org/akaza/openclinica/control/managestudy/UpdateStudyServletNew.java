@@ -23,9 +23,11 @@ import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
@@ -125,12 +127,12 @@ public class UpdateStudyServletNew extends SecureController {
         if (action.equals("submit")) {
 
             validateStudy1(fp, v);
-            validateStudy2(fp, v);
-            validateStudy3(isInterventional, v, fp);
-            validateStudy4(fp, v);
-            validateStudy5(fp, v);
-            validateStudy6(fp, v);
-            confirmWholeStudy(fp, v);
+            validateStudy2(fp, new Validator(request));
+            validateStudy3(isInterventional, new Validator(request), fp);
+            validateStudy4(fp, new Validator(request));
+            validateStudy5(fp, new Validator(request));
+            validateStudy6(fp, new Validator(request));
+            confirmWholeStudy(fp);
 
             request.setAttribute("studyToView", study);
             if (!errors.isEmpty()) {
@@ -189,42 +191,33 @@ public class UpdateStudyServletNew extends SecureController {
     private void validateStudy2(FormProcessor fp, Validator v) {
 
         v.addValidation(INPUT_START_DATE, Validator.IS_A_DATE);
-        if (!StringUtil.isBlank(fp.getString(INPUT_END_DATE))) {
+        if (!StringUtils.isBlank(fp.getString(INPUT_END_DATE))) {
             v.addValidation(INPUT_END_DATE, Validator.IS_A_DATE);
+            //validation for end >= start should be provided here, but outside the scope
+            //it would be great  to write all validation as one function, the solution provided now is a bad patch
+//            Date end = fp.getDateTime(INPUT_END_DATE);
+//            Date start = fp.getDateTime(INPUT_START_DATE);
+//            if (end.before(start)) {
+//                Validator.addError(errors, INPUT_END_DATE, resexception.getString("input_provided_not_occure_after_previous_start_date_time"));
+//            }
         }
-        if (!StringUtil.isBlank(fp.getString(INPUT_VER_DATE))) {
+        if (!StringUtils.isBlank(fp.getString(INPUT_VER_DATE))) {
             v.addValidation(INPUT_VER_DATE, Validator.IS_A_DATE);
         }
 
-        errors = v.validate();
+        HashMap vStudy2 = v.validate();
+        if (vStudy2 != null && vStudy2.size()>0 ) { errors.putAll(vStudy2 );}
+        vStudy2 = null;
+        
         logger.info("has validation errors");
-        /*
-        try {
-            local_df.parse(fp.getString(INPUT_START_DATE));
-            fp.addPresetValue(INPUT_START_DATE, local_df.format(fp.getDate(INPUT_START_DATE)));
-        } catch (ParseException pe) {
+        
+        if (!StringUtils.isBlank(fp.getString(INPUT_START_DATE))) {
             fp.addPresetValue(INPUT_START_DATE, fp.getString(INPUT_START_DATE));
         }
-        try {
-            local_df.parse(fp.getString(INPUT_VER_DATE));
-            fp.addPresetValue(INPUT_VER_DATE, local_df.format(fp.getDate(INPUT_VER_DATE)));
-        } catch (ParseException pe) {
+        if (!StringUtils.isBlank(fp.getString(INPUT_VER_DATE))) {
             fp.addPresetValue(INPUT_VER_DATE, fp.getString(INPUT_VER_DATE));
         }
-        try {
-            local_df.parse(fp.getString(INPUT_END_DATE));
-            fp.addPresetValue(INPUT_END_DATE, local_df.format(fp.getDate(INPUT_END_DATE)));
-        } catch (ParseException pe) {
-            fp.addPresetValue(INPUT_END_DATE, fp.getString(INPUT_END_DATE));
-        }
-        */
-        if (!StringUtil.isBlank(fp.getString(INPUT_START_DATE))) {
-            fp.addPresetValue(INPUT_START_DATE, fp.getString(INPUT_START_DATE));
-        }
-        if (!StringUtil.isBlank(fp.getString(INPUT_VER_DATE))) {
-            fp.addPresetValue(INPUT_VER_DATE, fp.getString(INPUT_VER_DATE));
-        }
-        if (!StringUtil.isBlank(fp.getString(INPUT_END_DATE))) {
+        if (!StringUtils.isBlank(fp.getString(INPUT_END_DATE))) {
             fp.addPresetValue(INPUT_END_DATE, fp.getString(INPUT_END_DATE));
         }
         updateStudy2(fp);
@@ -258,7 +251,11 @@ public class UpdateStudyServletNew extends SecureController {
         v.addValidation("conditions", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 500);
         v.addValidation("keywords", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
         v.addValidation("eligibility", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 500);
-        errors = v.validate();
+        
+        HashMap vStudy4 = v.validate();
+        if (vStudy4 != null && vStudy4.size()>0 ) { errors.putAll(vStudy4 );}
+        vStudy4 = null;
+        
         if (fp.getInt("expectedTotalEnrollment") <= 0) {
             Validator.addError(errors, "expectedTotalEnrollment", respage.getString("expected_total_enrollment_must_be_a_positive_number"));
         }
@@ -293,8 +290,11 @@ public class UpdateStudyServletNew extends SecureController {
         v.addValidation("facConDegree", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
         v.addValidation("facConPhone", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
         v.addValidation("facConEmail", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-        errors = v.validate();
-
+      
+        HashMap vStudy5 = v.validate();
+        if (vStudy5 != null && vStudy5.size()>0 ) { errors.putAll(vStudy5 );}
+        vStudy5 = null;
+        
         study.setFacilityCity(fp.getString("facCity"));
         study.setFacilityContactDegree(fp.getString("facConDrgree"));
         study.setFacilityName(fp.getString("facName"));
@@ -307,8 +307,7 @@ public class UpdateStudyServletNew extends SecureController {
         study.setFacilityState(fp.getString("facState"));
         study.setFacilityZip(fp.getString("facZip"));
 
-        if (errors.isEmpty()) {
-        } else {
+        if ( !errors.isEmpty()) {
             request.setAttribute("formMessages", errors);
             request.setAttribute("facRecruitStatusMap", CreateStudyServlet.facRecruitStatusMap);
         }
@@ -319,7 +318,9 @@ public class UpdateStudyServletNew extends SecureController {
         v.addValidation("url", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
         v.addValidation("urlDescription", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
 
-        errors = v.validate();
+        HashMap vStudy6 = v.validate();
+        if (vStudy6 != null && vStudy6.size()>0 ) { errors.putAll(vStudy6 );}
+        vStudy6=null;
 
         study.setMedlineIdentifier(fp.getString("medlineIdentifier"));
         study.setResultsReference(fp.getBoolean("resultsReference"));
@@ -332,8 +333,7 @@ public class UpdateStudyServletNew extends SecureController {
         }
     }
 
-    private void confirmWholeStudy(FormProcessor fp, Validator v) {
-        errors = v.validate();
+    private void confirmWholeStudy(FormProcessor fp) {
         if (study.getStatus().isLocked()) {
             study.getStudyParameterConfig().setDiscrepancyManagement("false");
         } else {

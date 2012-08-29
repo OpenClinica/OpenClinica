@@ -3,6 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
  
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.licensing" var="licensing"/>
 
 
 <!-- END MAIN CONTENT AREA -->
@@ -41,7 +42,7 @@ document.write('<table border="0" cellpadding=0" cellspacing="0" width="' + docu
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				<a href="#"><fmt:message key="openclinica_enterprise" bundle="${resword}"/></a>
 				</td>
-				<td class="footer" align="right"><fmt:message key="Version_release" bundle="${resword}"/> &nbsp;&nbsp;</td>
+				<td class="footer" align="right"><fmt:message key="Version_release" bundle="${licensing}"/> &nbsp;&nbsp;</td>
 				<td width="80" align="right" valign="bottom"><a href="http://www.akazaresearch.com"><img src="images/Akazalogo.gif" border="0" alt="<fmt:message key="developed_by_akaza" bundle="${resword}"/>" title="<fmt:message key="developed_by_akaza" bundle="${resword}"/>"></a></td>
 			</tr>
 		</table>

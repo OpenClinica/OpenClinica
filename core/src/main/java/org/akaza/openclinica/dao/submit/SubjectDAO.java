@@ -433,7 +433,7 @@ public class SubjectDAO extends AuditableEntityDAO {
     public SubjectBean create(SubjectBean sb) {
         HashMap variables = new HashMap();
         HashMap nullVars = new HashMap();
-        logger.warn("Logged in subject DAO.create");
+        logger.debug("Logged in subject DAO.create");
         int ind = 1;
 
         

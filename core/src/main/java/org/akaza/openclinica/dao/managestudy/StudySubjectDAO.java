@@ -635,7 +635,7 @@ public class StudySubjectDAO<K extends String,V extends ArrayList> extends Audit
     private String getValidOid(StudySubjectBean ssb) {
 
         String oid = getOid(ssb);
-        logger.info(oid);
+        logger.debug(oid);
         String oidPreRandomization = oid;
         while (findByOid(oid) != null) {
             oid = ssb.getOidGenerator().randomizeOid(oidPreRandomization);

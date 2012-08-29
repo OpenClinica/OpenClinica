@@ -648,12 +648,9 @@ public abstract class SecureController extends HttpServlet implements SingleThre
      * @param checkTrail The command to check for, and set a trail in the session.
      */
     protected void forwardPage(Page jspPage, boolean checkTrail) {
-    	 String temp;
-    	 String str = new String();
+    	Page page1 = Page.valueOf(jspPage.name());
+    	String temp;
     	
-    	 str = jspPage.name();
-    	
-    	Page page1 =  Page.valueOf(Page.class,str);
     	// YW 10-03-2007 <<
         response.setHeader("Cache-Control", "no-cache");
         response.setHeader("Pragma", "no-cache");
@@ -667,17 +664,17 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
         try {
             // Added 01/19/2005 for breadcrumbs, tbh
-  /*          if (checkTrail) {
+            if (checkTrail) {
                 BreadcrumbTrail bt = new BreadcrumbTrail();
                 if (session != null) {// added bu jxu, fixed bug for log out
-                    ArrayList trail = (ArrayList) session.getAttribute("trail");
+                /*    ArrayList trail = (ArrayList) session.getAttribute("trail");
                     if (trail == null) {
                         trail = bt.generateTrail(jspPage, request);
                     } else {
                         bt.setTrail(trail);
                         trail = bt.generateTrail(jspPage, request);
                     }
-                    session.setAttribute("trail", trail);
+                    session.setAttribute("trail", trail);*/
                     panel = (StudyInfoPanel) session.getAttribute(STUDY_INFO_PANEL);
                     if (panel == null) {
                         panel = new StudyInfoPanel();
@@ -691,7 +688,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 // we are also using checkTrail to update the panel, tbh
                 // 01/31/2005
             }
-*/           
+           
              temp = page1.getFileName();
             // above added 01/19/2005, tbh
             context.getRequestDispatcher(temp).forward(request, response);
@@ -719,13 +716,12 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                     }
                 }
             }
-*/            se.printStackTrace();
+*/          	logger.error(se.getMessage(),se);
         }
         finally {
         	page1 = null;
         	jspPage = null;
         	temp= null;
-        	str = null;
         }
     }
 

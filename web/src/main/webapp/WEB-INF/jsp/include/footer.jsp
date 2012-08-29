@@ -35,7 +35,7 @@
                     <span onmouseover="Tip('<fmt:message key="footer.tooltip" bundle="${licensing}"/>')" onmouseout="UnTip()" style="color: #789EC5;"  >
                       <fmt:message key="footer.edition.2" bundle="${licensing}" /></span>
 					  </div>
-					 <div  id="version"></div><fmt:message key="Version_release" bundle="${resword}"/> </div>
+					 <div  id="version"></div><fmt:message key="Version_release" bundle="${licensing}"/> </div>
                 </td>
             </tr>
         </table>

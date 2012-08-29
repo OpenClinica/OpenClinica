@@ -92,6 +92,12 @@
                 <name>findAllByEventCRFIdAndItemId</name>
                 <sql>select * from item_data where event_crf_id=? and item_id = ? and status_id!=5 and status_id!=7 Order by ordinal asc </sql>
         </query>
+        
+        <query>
+        		<name>findAllByEventCRFIdAndItemIdNoStatus</name>
+        		<sql>select * from item_data where event_crf_id=? and item_id = ? Order by item_data.ordinal asc </sql>
+    	</query>
+    
         <query>
                 <name>getCurrentPK</name>
                 <sql> select item_data_id_seq.currval as key from dual</sql>

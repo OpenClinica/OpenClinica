@@ -598,12 +598,8 @@ public abstract class CoreSecureController extends HttpServlet {
      *            TODO
      */
     protected void forwardPage(Page jspPage, boolean checkTrail, HttpServletRequest request, HttpServletResponse response) {
-   	 String temp;
-	 String str = new String();
-	
-	 str = jspPage.name();
-	
-	Page page1 =  Page.valueOf(Page.class,str);
+    	Page page1 = Page.valueOf(jspPage.name());
+    	String temp;
     	
     	// YW 10-03-2007 <<
         response.setHeader("Cache-Control", "no-cache");
@@ -677,12 +673,12 @@ public abstract class CoreSecureController extends HttpServlet {
                     }
                 }
             }
-         */   se.printStackTrace();
+         */
+    	LOGGER.error(se.getMessage(),se);
         }
         finally {
         	page1 = null;
         	jspPage = null;
-        	str = null;
         	temp = null;
         }	
 
