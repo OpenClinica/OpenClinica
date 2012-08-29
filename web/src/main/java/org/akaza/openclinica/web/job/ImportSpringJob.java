@@ -7,6 +7,8 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -733,24 +735,34 @@ public class ImportSpringJob extends QuartzJobBean {
     }
 
     private void cutAndPaste(File[] tar, File[] dest) throws IOException {
-        for (int j = 0; j < tar.length; j++) {
+    	InputStream in = null;
+    	OutputStream out = null;
+    	int fle_count = 0;
+    	
+        for (File cur_file: tar) {
+        	if (cur_file == null) continue;
             try {
-                java.io.InputStream in = new FileInputStream(tar[j]);
-                java.io.OutputStream out = new FileOutputStream(dest[j]);
+                 in = new FileInputStream(cur_file);
+                 out = new FileOutputStream(dest[fle_count++]);
 
                 byte[] buf = new byte[1024];
                 int len = 0;
 
-                while ((len = in.read(buf)) > 0) {
+                while (( len = in.read(buf)) > 0) {
                     out.write(buf, 0, len);
                 }
                 in.close();
                 out.close();
-                tar[j].delete();
+                cur_file.delete();
             } catch (NullPointerException npe) {
-                // list can be 'gappy' which is why we need to catch this
-            	logger.error("found Npe: " + npe.getMessage());
+            	logger.debug("found Npe: " + npe.getMessage());
+            	//maybe no need to catch, but leaving as is not to change too much in code
             }
+            finally{
+            	if ( in != null) {in.close();}
+            	if ( out != null){out.close();}
+            }
+            
         }
     }
 
