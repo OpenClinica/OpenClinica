@@ -59,8 +59,8 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 
 /**
  * @author jxu
- *
- * View the detail of a discrepancy note on the data entry page
+ * 
+ *         View the detail of a discrepancy note on the data entry page
  */
 public class ViewDiscrepancyNoteServlet extends SecureController {
 
@@ -85,7 +85,8 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
     public static final String AUTOVIEWS = "autoViews";
     public static final String BOX_TO_SHOW = "boxToShow";
     public static final String VIEW_DN_LINK = "viewDNLink";
-    //public static final String USER_ACCOUNT_ID = "strUserAccountId"; // use to provide a
+    // public static final String USER_ACCOUNT_ID = "strUserAccountId"; // use
+    // to provide a
     // single user id, to whom the query is assigned, tbh 02/2009
     public static final String FORM_DISCREPANCY_NOTES_NAME = "fdnotes";
     public static final String IS_REASON_FOR_CHANGE = "isRfc";
@@ -93,17 +94,15 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
     public static final String ERROR_FLAG = "errorFlag";
     public static final String FROM_BOX = "fromBox";
 
-
     public String exceptionName = resexception.getString("no_permission_to_create_discrepancy_note");
     public String noAccessMessage = respage.getString("you_may_not_create_discrepancy_note") + respage.getString("change_study_contact_sysadmin");
-
 
     // locked, so don't
     // allow to enter notes
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.akaza.openclinica.control.core.SecureController#mayProceed()
      */
     @Override
@@ -114,7 +113,6 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
         // resexception=ResourceBundle.getBundle("org.akaza.openclinica.i18n.exceptions",locale);
         // < respage =
         // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",locale);
-
 
         if (SubmitDataServlet.mayViewData(ub, currentRole)) {
             return;
@@ -135,7 +133,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
             resStatuses.add(ResolutionStatus.UPDATED);
             resStatuses.add(ResolutionStatus.RESOLVED);
             request.setAttribute(RES_STATUSES, resStatuses);
-            //it's for parentDNId is null or 0
+            // it's for parentDNId is null or 0
             request.setAttribute(WHICH_RES_STATUSES, "22");
             ArrayList<ResolutionStatus> resStatuses2 = new ArrayList<ResolutionStatus>();
             resStatuses2.add(ResolutionStatus.OPEN);
@@ -144,7 +142,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
             List<DiscrepancyNoteType> types2 = new ArrayList<DiscrepancyNoteType>(DiscrepancyNoteType.list);
             types2.remove(DiscrepancyNoteType.QUERY);
             request.setAttribute(DIS_TYPES2, types2);
-        } else if(currentRole.getRole().equals(Role.MONITOR)){
+        } else if (currentRole.getRole().equals(Role.MONITOR)) {
             ArrayList<ResolutionStatus> resStatuses = new ArrayList();
             resStatuses.add(ResolutionStatus.OPEN);
             resStatuses.add(ResolutionStatus.UPDATED);
@@ -154,32 +152,33 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
             ArrayList<DiscrepancyNoteType> types2 = new ArrayList<DiscrepancyNoteType>();
             types2.add(DiscrepancyNoteType.QUERY);
             request.setAttribute(DIS_TYPES2, types2);
-        } else {//Role.STUDYDIRECTOR Role.COORDINATOR
+        } else {// Role.STUDYDIRECTOR Role.COORDINATOR
             List<ResolutionStatus> resStatuses = new ArrayList<ResolutionStatus>(ResolutionStatus.list);
             resStatuses.remove(ResolutionStatus.NOT_APPLICABLE);
-            request.setAttribute(RES_STATUSES, resStatuses); ;
-            //it's for parentDNId is null or 0 and FVC
+            request.setAttribute(RES_STATUSES, resStatuses);
+            ;
+            // it's for parentDNId is null or 0 and FVC
             request.setAttribute(WHICH_RES_STATUSES, "2");
             ArrayList<ResolutionStatus> resStatuses2 = new ArrayList<ResolutionStatus>();
             resStatuses2.add(ResolutionStatus.OPEN);
             resStatuses2.add(ResolutionStatus.RESOLVED);
             request.setAttribute(RES_STATUSES2, resStatuses2);
         }
-        //logic from CreateDiscrepancyNoteServlet
+        // logic from CreateDiscrepancyNoteServlet
         request.setAttribute("unlock", "0");
-        boolean isReasonForChange = fp.getBoolean(IS_REASON_FOR_CHANGE);
-        boolean isInError = fp.getBoolean(ERROR_FLAG);
+        fp.getBoolean(IS_REASON_FOR_CHANGE);
+        fp.getBoolean(ERROR_FLAG);
         String monitor = fp.getString("monitor");
-        //String enterData = fp.getString("enterData");
-        //request.setAttribute("enterData", enterData);
-        //boolean enteringData = false;
-        //if (enterData != null && "1".equalsIgnoreCase(enterData)) {
-            // variables are not set in JSP, so not from viewing data and from
-            // entering data
-            //request.setAttribute(CAN_MONITOR, "1");
-            //request.setAttribute("monitor", monitor);
-            //enteringData = true;
-        //} else if ("1".equalsIgnoreCase(monitor)) {// change to allow user to
+        // String enterData = fp.getString("enterData");
+        // request.setAttribute("enterData", enterData);
+        // boolean enteringData = false;
+        // if (enterData != null && "1".equalsIgnoreCase(enterData)) {
+        // variables are not set in JSP, so not from viewing data and from
+        // entering data
+        // request.setAttribute(CAN_MONITOR, "1");
+        // request.setAttribute("monitor", monitor);
+        // enteringData = true;
+        // } else if ("1".equalsIgnoreCase(monitor)) {// change to allow user to
         if ("1".equalsIgnoreCase(monitor)) {// change to allow user to
             // enter note for all items,
             // not just blank items
@@ -190,14 +189,14 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
         }
 
         Boolean fromBox = fp.getBoolean(FROM_BOX);
-        if(fromBox==null || !fromBox) {
+        if (fromBox == null || !fromBox) {
             session.removeAttribute(BOX_TO_SHOW);
             session.removeAttribute(BOX_DN_MAP);
             session.removeAttribute(AUTOVIEWS);
         }
 
         Boolean refresh = fp.getBoolean("refresh");
-        request.setAttribute("refresh", refresh+"");
+        request.setAttribute("refresh", refresh + "");
         String ypos = fp.getString("y");
         if (ypos == null || ypos.length() == 0) {
             ypos = "0";
@@ -252,7 +251,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 
                 EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
                 EventCRFBean ec = (EventCRFBean) ecdao.findByPK(itemData.getEventCRFId());
-                preUserId = ec.getOwnerId()>0 ? ec.getOwnerId() : 0;
+                preUserId = ec.getOwnerId() > 0 ? ec.getOwnerId() : 0;
                 request.setAttribute("entityCreatedDate", sdf.format(ec.getCreatedDate()));
 
                 StudyEventDAO sed = new StudyEventDAO(sm.getDataSource());
@@ -299,7 +298,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
                         request.setAttribute("entityName", resword.getString("unique_identifier"));
                     }
                 }
-                preUserId = ssub.getOwnerId()>0 ? ssub.getOwnerId() : 0;
+                preUserId = ssub.getOwnerId() > 0 ? ssub.getOwnerId() : 0;
                 request.setAttribute("entityCreatedDate", sdf.format(ssub.getCreatedDate()));
 
             } else if ("subject".equalsIgnoreCase(name)) {
@@ -325,7 +324,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
                         request.setAttribute("entityName", resword.getString("unique_identifier"));
                     }
                 }
-                preUserId = sub.getOwnerId()>0 ? sub.getOwnerId() : 0;
+                preUserId = sub.getOwnerId() > 0 ? sub.getOwnerId() : 0;
                 request.setAttribute("entityCreatedDate", sdf.format(sub.getCreatedDate()));
 
             } else if ("studyEvent".equalsIgnoreCase(name)) {
@@ -343,13 +342,13 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
                     if ("location".equalsIgnoreCase(column)) {
                         request.setAttribute("entityValue", se.getLocation());
                         request.setAttribute("entityName", resword.getString("location"));
-                    } else if ("date_start".equalsIgnoreCase(column)) {
+                    } else if ("start_date".equalsIgnoreCase(column)) {
                         if (se.getDateStarted() != null) {
                             request.setAttribute("entityValue", dateFormatter.format(se.getDateStarted()));
                         }
                         request.setAttribute("entityName", resword.getString("start_date"));
 
-                    } else if ("date_end".equalsIgnoreCase(column)) {
+                    } else if ("end_date".equalsIgnoreCase(column)) {
                         if (se.getDateEnded() != null) {
                             request.setAttribute("entityValue", dateFormatter.format(se.getDateEnded()));
                         }
@@ -357,7 +356,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 
                     }
                 }
-                preUserId = se.getOwnerId()>0 ? se.getOwnerId() : 0;
+                preUserId = se.getOwnerId() > 0 ? se.getOwnerId() : 0;
                 request.setAttribute("entityCreatedDate", sdf.format(se.getCreatedDate()));
 
             } else if ("eventCrf".equalsIgnoreCase(name)) {
@@ -377,45 +376,44 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
 
                 setupStudyEventCRFAttributes(ec);
 
-                preUserId = ec.getOwnerId()>0 ? ec.getOwnerId() : 0;
+                preUserId = ec.getOwnerId() > 0 ? ec.getOwnerId() : 0;
                 request.setAttribute("entityCreatedDate", sdf.format(ec.getCreatedDate()));
             }
 
         }
         boolean writeToDB = fp.getBoolean(CreateDiscrepancyNoteServlet.WRITE_TO_DB, true);
 
-
-        HashMap<Integer,Integer> autoviews = (HashMap<Integer,Integer>)session.getAttribute(AUTOVIEWS);
-        autoviews = autoviews==null ? new HashMap<Integer,Integer>() : autoviews;
-        HashMap<Integer, DiscrepancyNoteBean> boxDNMap = (HashMap<Integer, DiscrepancyNoteBean>)session.getAttribute(BOX_DN_MAP);
-        if(boxDNMap==null || !boxDNMap.containsKey(0)) {
+        HashMap<Integer, Integer> autoviews = (HashMap<Integer, Integer>) session.getAttribute(AUTOVIEWS);
+        autoviews = autoviews == null ? new HashMap<Integer, Integer>() : autoviews;
+        HashMap<Integer, DiscrepancyNoteBean> boxDNMap = (HashMap<Integer, DiscrepancyNoteBean>) session.getAttribute(BOX_DN_MAP);
+        if (boxDNMap == null || !boxDNMap.containsKey(0)) {
             boxDNMap = new HashMap<Integer, DiscrepancyNoteBean>();
-            //initialize dn for a new thread
+            // initialize dn for a new thread
             DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
             if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.INVESTIGATOR)) {
                 dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.ANNOTATION.getId());
                 dnb.setResolutionStatusId(ResolutionStatus.NOT_APPLICABLE.getId());
                 autoviews.put(0, 0);
-                //request.setAttribute("autoView", "0");
+                // request.setAttribute("autoView", "0");
             } else {
                 dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.QUERY.getId());
                 dnb.setAssignedUserId(preUserId);
                 autoviews.put(0, 1);
-                //request.setAttribute("autoView", "1");
+                // request.setAttribute("autoView", "1");
             }
             boxDNMap.put(0, dnb);
-        } else if(boxDNMap.containsKey(0)) {
+        } else if (boxDNMap.containsKey(0)) {
             int dnTypeId = boxDNMap.get(0).getDiscrepancyNoteTypeId();
-            autoviews.put(0, dnTypeId==3 ? 1 : 0);
+            autoviews.put(0, dnTypeId == 3 ? 1 : 0);
         }
-        if(boxDNMap.containsKey(0)) {
+        if (boxDNMap.containsKey(0)) {
             int dnTypeId0 = boxDNMap.get(0).getDiscrepancyNoteTypeId();
-            if(dnTypeId0==2||dnTypeId0==4) {
-                request.setAttribute("typeID0", dnTypeId0+"");
+            if (dnTypeId0 == 2 || dnTypeId0 == 4) {
+                request.setAttribute("typeID0", dnTypeId0 + "");
             }
         }
 
-        //request.setAttribute("enterData", enterData);
+        // request.setAttribute("enterData", enterData);
         request.setAttribute("monitor", monitor);
         request.setAttribute(ENTITY_ID, entityId + "");
         request.setAttribute(ENTITY_TYPE, name);
@@ -427,15 +425,17 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
         ArrayList notes = (ArrayList) dndao.findAllByEntityAndColumn(name, entityId, column);
 
         if (notes.size() > 0) {
-            DiscrepancyNoteBean note = (DiscrepancyNoteBean) notes.get(0);
+            notes.get(0);
             // @pgawade 21-May-2011 Corrected the condition to throw no access
             // error
             StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
             int parentStudyForNoteSub = 0;
-          //@pgawade #9801: 07-June-2011 corrected the way to get study subject id associated with discrepancy note
-            //int noteSubId = note.getOwnerId();
+            // @pgawade #9801: 07-June-2011 corrected the way to get study
+            // subject id associated with discrepancy note
+            // int noteSubId = note.getOwnerId();
             StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
-//            StudySubjectBean notessub = (StudySubjectBean) ssdao.findByPK(noteSubId);
+            // StudySubjectBean notessub = (StudySubjectBean)
+            // ssdao.findByPK(noteSubId);
 
             StudySubjectBean notessub = (StudySubjectBean) ssdao.findByPK(subjectId);
             StudyBean studyBeanSub = (StudyBean) studyDAO.findByPK(notessub.getStudyId());
@@ -464,7 +464,8 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
         // BWP 5/13/2009 3468 WHO; update the resolution status of parent disc
         // notes based
         // on the status of child notes
-        //new DiscrepancyNoteUtil().updateStatusOfParents(notes, sm.getDataSource(), currentStudy);
+        // new DiscrepancyNoteUtil().updateStatusOfParents(notes,
+        // sm.getDataSource(), currentStudy);
 
         FormDiscrepancyNotes newNotes = (FormDiscrepancyNotes) session.getAttribute(FORM_DISCREPANCY_NOTES_NAME);
 
@@ -517,7 +518,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
         }
 
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-        HashMap<Integer,String> fvcInitAssigns = new HashMap<Integer,String>();
+        HashMap<Integer, String> fvcInitAssigns = new HashMap<Integer, String>();
         for (int i = 0; i < notes.size(); i++) {
             DiscrepancyNoteBean note = (DiscrepancyNoteBean) notes.get(i);
             note.setColumn(column);
@@ -561,16 +562,16 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
                         parent.setLastDateUpdated(note.getCreatedDate());
                     }
 
-                    if(note.getDiscrepancyNoteTypeId()==1 && note.getAssignedUserId()>0) {
+                    if (note.getDiscrepancyNoteTypeId() == 1 && note.getAssignedUserId() > 0) {
                         int ownerId = note.getOwnerId();
-                        if(fvcInitAssigns.containsKey(pId)) {
+                        if (fvcInitAssigns.containsKey(pId)) {
                             String f = fvcInitAssigns.get(pId);
-                            String fn = note.getId()+"."+ownerId;
-                            if(fn.compareTo(f)<0) {
-                                fvcInitAssigns.put(pId,fn);
+                            String fn = note.getId() + "." + ownerId;
+                            if (fn.compareTo(f) < 0) {
+                                fvcInitAssigns.put(pId, fn);
                             }
                         } else {
-                            fvcInitAssigns.put(pId, note.getId()+"."+ownerId);
+                            fvcInitAssigns.put(pId, note.getId() + "." + ownerId);
                         }
                     }
                 }
@@ -585,67 +586,76 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
             note.setNumChildren(note.getChildren().size());
             note.setEntityType(name);
 
-            if(!boxDNMap.containsKey(key)) {
+            if (!boxDNMap.containsKey(key)) {
                 DiscrepancyNoteBean dn = new DiscrepancyNoteBean();
                 dn.setId(key);
                 int dnTypeId = note.getDiscrepancyNoteTypeId();
                 dn.setDiscrepancyNoteTypeId(dnTypeId);
-                if(dnTypeId == 3) {//Query
+                if (dnTypeId == 3) {// Query
                     dn.setAssignedUserId(note.getOwnerId());
-                } else if(dnTypeId == 1) {//FVC
-                    if(fvcInitAssigns.containsKey(key)) {
+                } else if (dnTypeId == 1) {// FVC
+                    if (fvcInitAssigns.containsKey(key)) {
                         String[] s = fvcInitAssigns.get(key).split("\\.");
-                        int i = Integer.parseInt(s.length==2 ? s[1].trim() : "0");
+                        int i = Integer.parseInt(s.length == 2 ? s[1].trim() : "0");
                         dn.setAssignedUserId(i);
                     }
                 }
                 Role r = currentRole.getRole();
-                //if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) && currentStudy.getId() != currentStudy.getParentStudyId()) {
-                if (r.equals(Role.RESEARCHASSISTANT)||r.equals(Role.INVESTIGATOR)) {
-                    if(dn.getDiscrepancyNoteTypeId()==DiscrepancyNoteType.QUERY.getId() && note.getResStatus().getId()==ResolutionStatus.UPDATED.getId()) {
+                // if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) &&
+                // currentStudy.getId() != currentStudy.getParentStudyId()) {
+                if (r.equals(Role.RESEARCHASSISTANT) || r.equals(Role.INVESTIGATOR)) {
+                    if (dn.getDiscrepancyNoteTypeId() == DiscrepancyNoteType.QUERY.getId() && note.getResStatus().getId() == ResolutionStatus.UPDATED.getId()) {
                         dn.setResolutionStatusId(ResolutionStatus.UPDATED.getId());
                     } else {
                         dn.setResolutionStatusId(ResolutionStatus.RESOLVED.getId());
                     }
-                    if(dn.getAssignedUserId()>0) {
+                    if (dn.getAssignedUserId() > 0) {
                         autoviews.put(key, 1);
                     } else {
                         autoviews.put(key, 0);
                     }
-                    //copied from CreateDiscrepancyNoteServlet
-                    //request.setAttribute("autoView", "0");
+                    // copied from CreateDiscrepancyNoteServlet
+                    // request.setAttribute("autoView", "0");
                     // hide the panel, tbh
                 } else {
-                    if(note.getResStatus().getId()==ResolutionStatus.RESOLVED.getId()) {
+                    if (note.getResStatus().getId() == ResolutionStatus.RESOLVED.getId()) {
                         dn.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
-                    } else if(note.getResStatus().getId()==ResolutionStatus.CLOSED.getId()) {
+                    } else if (note.getResStatus().getId() == ResolutionStatus.CLOSED.getId()) {
                         dn.setResolutionStatusId(ResolutionStatus.UPDATED.getId());
-                    } else if(r.equals(Role.MONITOR)){
+                    } else if (r.equals(Role.MONITOR)) {
                         dn.setResolutionStatusId(ResolutionStatus.UPDATED.getId());
-                    } else if(dn.getDiscrepancyNoteTypeId()==1) {
+                    } else if (dn.getDiscrepancyNoteTypeId() == 1) {
                         dn.setResolutionStatusId(ResolutionStatus.RESOLVED.getId());
                     } else {
                         dn.setResolutionStatusId(ResolutionStatus.UPDATED.getId());
                     }
                     autoviews.put(key, 1);
-                    if(dn.getAssignedUserId()>0) {
+                    if (dn.getAssignedUserId() > 0) {
                     } else {
                         dn.setAssignedUserId(preUserId);
                     }
                 }
-                //if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) && currentStudy.getId() != currentStudy.getParentStudyId()) {
-                    //dn.setAssignedUserId(note.getOwner().getId());
-                    //// assigning back to OP, tbh
-                    ////request.setAttribute(USER_ACCOUNT_ID, new Integer(parent.getOwnerId()).toString());
-                    ////System.out.println("assigned owner id: " + parent.getOwnerId());
-                //} else if (note.getEventCRFId() > 0) {
-                    ////System.out.println("found a event crf id: " + dnb.getEventCRFId());
-                    //EventCRFDAO eventCrfDAO = new EventCRFDAO(sm.getDataSource());
-                    //EventCRFBean eventCrfBean = new EventCRFBean();
-                    //eventCrfBean = (EventCRFBean) eventCrfDAO.findByPK(note.getEventCRFId());
-                    //dn.setAssignedUserId(eventCrfBean.getOwner().getId());
-                    ////request.setAttribute(USER_ACCOUNT_ID, new Integer(eventCrfBean.getOwnerId()).toString());
-                    ////System.out.println("assigned owner id: " + eventCrfBean.getOwnerId());
+                // if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) &&
+                // currentStudy.getId() != currentStudy.getParentStudyId()) {
+                // dn.setAssignedUserId(note.getOwner().getId());
+                // // assigning back to OP, tbh
+                // //request.setAttribute(USER_ACCOUNT_ID, new
+                // Integer(parent.getOwnerId()).toString());
+                // //System.out.println("assigned owner id: " +
+                // parent.getOwnerId());
+                // } else if (note.getEventCRFId() > 0) {
+                // //System.out.println("found a event crf id: " +
+                // dnb.getEventCRFId());
+                // EventCRFDAO eventCrfDAO = new
+                // EventCRFDAO(sm.getDataSource());
+                // EventCRFBean eventCrfBean = new EventCRFBean();
+                // eventCrfBean = (EventCRFBean)
+                // eventCrfDAO.findByPK(note.getEventCRFId());
+                // dn.setAssignedUserId(eventCrfBean.getOwner().getId());
+                // //request.setAttribute(USER_ACCOUNT_ID, new
+                // Integer(eventCrfBean.getOwnerId()).toString());
+                // //System.out.println("assigned owner id: " +
+                // eventCrfBean.getOwnerId());
                 boxDNMap.put(key, dn);
             }
         }
@@ -660,7 +670,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
         fixStatusUpdatedDate(noteTree);
         request.setAttribute(DIS_NOTES, noteTree);
 
-        //copied from CreatediscrepancyNoteServlet generateUserAccounts
+        // copied from CreatediscrepancyNoteServlet generateUserAccounts
         StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
         StudyBean subjectStudy = studyDAO.findByStudySubjectId(subjectId);
         int studyId = currentStudy.getId();
@@ -675,16 +685,15 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
         request.setAttribute(USER_ACCOUNTS, userAccounts);
         request.setAttribute(VIEW_DN_LINK, this.getPageServletFileName());
 
-
-        //audit log items (from ViewItemAuditLogServlet.java)
+        // audit log items (from ViewItemAuditLogServlet.java)
         AuditDAO adao = new AuditDAO(sm.getDataSource());
-        if(name.equalsIgnoreCase("studysub")){
+        if (name.equalsIgnoreCase("studysub")) {
             name = "study_subject";
-        }else if(name.equalsIgnoreCase("eventcrf")){
+        } else if (name.equalsIgnoreCase("eventcrf")) {
             name = "event_crf";
-        }else if(name.equalsIgnoreCase("studyevent")){
+        } else if (name.equalsIgnoreCase("studyevent")) {
             name = "study_event";
-        }else if(name.equalsIgnoreCase("itemdata")){
+        } else if (name.equalsIgnoreCase("itemdata")) {
             name = "item_data";
         }
         ArrayList itemAuditEvents = adao.findItemAuditEvents(entityId, name);
@@ -714,7 +723,7 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
     /**
      * Update a parent DiscrepancyNoteBean's resolution status and updated date
      * to that of the latest child DiscrepancyNoteBean.
-     *
+     * 
      * @param noteTree
      *            A HashMap of an Integer representing the DiscrepancyNoteBean,
      *            pointing to a parent DiscrepancyNoteBean.
@@ -743,22 +752,26 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
                     UserAccountBean lastUpdator = (UserAccountBean) userDAO.findByPK(lastChild.getOwnerId());
                     parent.setLastUpdator(lastUpdator);
                     parent.setLastDateUpdated(lastUpdatedDate);
-                    //parent.setResolutionStatusId(lastChild.getResolutionStatusId());
-                    //parent.setResStatus(ResolutionStatus.get(lastChild.getResolutionStatusId()));
+                    // parent.setResolutionStatusId(lastChild.getResolutionStatusId());
+                    // parent.setResStatus(ResolutionStatus.get(lastChild.getResolutionStatusId()));
                 }
             }
         }
 
-        //Sorting parent notes according to the last child being updated. The parent who has the most recently updated child gets into the top.
+        // Sorting parent notes according to the last child being updated. The
+        // parent who has the most recently updated child gets into the top.
         List<DiscrepancyNoteBean> parentNotes = new ArrayList<DiscrepancyNoteBean>(noteTree.values());
-        Collections.sort(parentNotes, new Comparator<DiscrepancyNoteBean>(){
+        Collections.sort(parentNotes, new Comparator<DiscrepancyNoteBean>() {
+            @Override
             public int compare(DiscrepancyNoteBean dn1, DiscrepancyNoteBean dn2) {
                 ArrayList<DiscrepancyNoteBean> cn1 = dn1.getChildren();
                 DiscrepancyNoteBean child1 = cn1.size() > 0 ? cn1.get(cn1.size() - 1) : dn1;
                 ArrayList<DiscrepancyNoteBean> cn2 = dn2.getChildren();
                 DiscrepancyNoteBean child2 = cn2.size() > 0 ? cn2.get(cn2.size() - 1) : dn2;
                 return child1.getId() > child2.getId() ? -1 : 1;
-                //return ((DiscrepancyNoteBean)o1).getLastDateUpdated().after(((DiscrepancyNoteBean)o2).getLastDateUpdated()) ? -1 : 1;
+                // return
+                // ((DiscrepancyNoteBean)o1).getLastDateUpdated().after(((DiscrepancyNoteBean)o2).getLastDateUpdated())
+                // ? -1 : 1;
             }
         });
         noteTree.clear();
